@@ -1303,9 +1303,9 @@ public:
 		m_pia(*this, "pia%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_discrete(*this, "discrete"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_discrete(*this, "discrete"),
 		m_ay8910(*this, "ay8910"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
@@ -1366,6 +1366,7 @@ protected:
 	required_device_array<pia6821_device, 2> m_pia;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<discrete_device> m_discrete;
 
 private:
 	DECLARE_READ8_MEMBER(goldnpkr_mux_port_r);
@@ -1403,7 +1404,6 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	optional_device<discrete_device> m_discrete;
 	optional_device<ay8910_device> m_ay8910;
 	output_finder<5> m_lamps;
 
@@ -4653,11 +4653,11 @@ static INPUT_PORTS_START( megadpkr )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(blitz_state::megadpkr)
-
+void blitz_state::megadpkr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(megadpkr_map)
+	M6502(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz_state::megadpkr_map);
 
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&blitz_state::megadpkr_banked_map).set_data_width(8).set_addr_width(16).set_stride(0x4000);
 
@@ -4677,13 +4677,13 @@ MACHINE_CONFIG_START(blitz_state::megadpkr)
 	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::mux_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((32)*8, (32)*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldnpkr_state, screen_update_goldnpkr)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((32)*8, (32)*8);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
+	screen.set_palette(m_palette);
 
 	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK));
 	crtc.set_screen("screen");
@@ -4696,9 +4696,8 @@ MACHINE_CONFIG_START(blitz_state::megadpkr)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("discrete", DISCRETE, goldnpkr_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*********************************************

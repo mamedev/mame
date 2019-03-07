@@ -67,13 +67,16 @@ class galgames_cart_device : public device_t, public device_rom_interface
 {
 public:
 	// construction/destruction
-	galgames_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		galgames_cart_device(mconfig, GALGAMES_CART, tag, owner, clock)
-	{ }
+
+	galgames_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint8_t cart)
+		: galgames_cart_device(mconfig, GALGAMES_CART, tag, owner, (uint32_t)0)
+	{
+		set_cart(cart);
+	}
 
 	// static configuration
-	static void static_set_cart(device_t &device, uint8_t cart) { downcast<galgames_cart_device &>(device).m_cart = cart; }
-	static void static_set_pic_bits(device_t &device, int clk, int in, int out, int dis) { downcast<galgames_cart_device &>(device).set_pic_bits(clk, in, out, dis); }
+	void set_cart(uint8_t cart) { m_cart = cart; }
+	void set_pic_bits(int clk, int in, int out, int dis);
 
 	// ROM
 	DECLARE_READ16_MEMBER(rom_r)    { return read_word(offset*2); }
@@ -122,24 +125,12 @@ protected:
 	uint8_t m_pic_iobits, m_pic_data, m_pic_data_rdy, m_pic_data_bit, m_pic_data_clk;
 	uint8_t m_pic_clk_mask, m_pic_in_mask, m_pic_out_mask, m_pic_dis_mask;
 
-	void set_pic_bits(int clk, int in, int out, int dis);
 	void log_cart_comm(const char *text, uint8_t data);
 	void pic_comm_reset();
 };
 
 // device type definition
 DEFINE_DEVICE_TYPE(GALGAMES_CART, galgames_cart_device, "starpak_cart", "Galaxy Games StarPak Cartridge")
-
-#define MCFG_GALGAMES_CART_INDEX(_cart) \
-	galgames_cart_device::static_set_cart(*device, _cart);
-
-#define MCFG_GALGAMES_PIC_BITS(_clk, _in, _out, _dis) \
-	galgames_cart_device::static_set_pic_bits(*device, _clk, _in, _out, _dis);
-
-#define MCFG_GALGAMES_EMPTY_CART_ADD(_tag, _cart) \
-	MCFG_DEVICE_ADD(_tag, GALGAMES_CART, 0) \
-	MCFG_GALGAMES_CART_INDEX(_cart)
-
 
 
 // BIOS "cart"
@@ -148,9 +139,12 @@ class galgames_bios_cart_device : public galgames_cart_device
 {
 public:
 	// construction/destruction
-	galgames_bios_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		galgames_cart_device(mconfig, GALGAMES_BIOS_CART, tag, owner, clock)
-	{ }
+	galgames_bios_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint8_t cart)
+		: galgames_cart_device(mconfig, GALGAMES_BIOS_CART, tag, owner, (uint32_t)0)
+	{
+		set_cart(cart);
+	}
+
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -163,11 +157,6 @@ void galgames_bios_cart_device::device_add_mconfig(machine_config &config)
 	EEPROM_93C76_8BIT(config, "eeprom");
 }
 
-#define MCFG_GALGAMES_BIOS_CART_ADD(_tag, _cart) \
-	MCFG_DEVICE_ADD(_tag, GALGAMES_BIOS_CART, 0) \
-	MCFG_GALGAMES_CART_INDEX(_cart)
-
-
 
 // STARPAK2 cart
 
@@ -175,9 +164,13 @@ class galgames_starpak2_cart_device : public galgames_cart_device
 {
 public:
 	// construction/destruction
-	galgames_starpak2_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		galgames_cart_device(mconfig, GALGAMES_STARPAK2_CART, tag, owner, clock)
-	{ }
+	galgames_starpak2_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint8_t cart)
+		: galgames_cart_device(mconfig, GALGAMES_STARPAK2_CART, tag, owner, (uint32_t)0)
+	{
+		set_cart(cart);
+		set_pic_bits(5, 4, 2, 1);
+	}
+
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -194,12 +187,6 @@ void galgames_starpak2_cart_device::device_add_mconfig(machine_config &config)
 	EEPROM_93C76_8BIT(config, "eeprom");
 }
 
-#define MCFG_GALGAMES_STARPAK2_CART_ADD(_tag, _cart) \
-	MCFG_DEVICE_ADD(_tag, GALGAMES_STARPAK2_CART, 0) \
-	MCFG_GALGAMES_CART_INDEX(_cart) \
-	MCFG_GALGAMES_PIC_BITS(5, 4, 2, 1)
-
-
 
 // STARPAK3 cart
 
@@ -207,9 +194,13 @@ class galgames_starpak3_cart_device : public galgames_cart_device
 {
 public:
 	// construction/destruction
-	galgames_starpak3_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		galgames_cart_device(mconfig, GALGAMES_STARPAK3_CART, tag, owner, clock)
-	{ }
+	galgames_starpak3_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint8_t cart)
+		: galgames_cart_device(mconfig, GALGAMES_STARPAK3_CART, tag, owner, (uint32_t)0)
+	{
+		set_cart(cart);
+		set_pic_bits(0, 2, 3, 4);
+	}
+
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -226,12 +217,6 @@ void galgames_starpak3_cart_device::device_add_mconfig(machine_config &config)
 
 	EEPROM_93C76_8BIT(config, "eeprom");
 }
-
-#define MCFG_GALGAMES_STARPAK3_CART_ADD(_tag, _cart) \
-	MCFG_DEVICE_ADD(_tag, GALGAMES_STARPAK3_CART, 0) \
-	MCFG_GALGAMES_CART_INDEX(_cart) \
-	MCFG_GALGAMES_PIC_BITS(0, 2, 3, 4)
-
 
 
 /***************************************************************************
@@ -314,9 +299,6 @@ device_memory_interface::space_config_vector galgames_slot_device::memory_space_
 
 // device type definition
 DEFINE_DEVICE_TYPE(GALGAMES_SLOT, galgames_slot_device, "starpak_slot", "Galaxy Games Slot")
-
-#define MCFG_GALGAMES_SLOT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, GALGAMES_SLOT, 0)
 
 // CART implementation
 
@@ -981,23 +963,24 @@ int galgames_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high)
 	return reg_low | (reg_mid << 16);
 }
 
-MACHINE_CONFIG_START(galgames_state::galgames_base)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(galgames_map)
+void galgames_state::galgames_base(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(24'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &galgames_state::galgames_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(galgames_state::scanline_interrupt), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_GALGAMES_SLOT_ADD("slot")
-	MCFG_GALGAMES_BIOS_CART_ADD( "cart0", 0)
+	GALGAMES_SLOT(config, m_slot, 0);
+	GALGAMES_BIOS_CART(config, "cart0", 0);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(400, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(galgames_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(400, 256);
+	m_screen->set_visarea(0, 400-1, 0, 256-1);
+	m_screen->set_screen_update(FUNC(galgames_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	CESBLIT(config, m_blitter, XTAL(24'000'000), m_screen);
 	m_blitter->set_addrmap(AS_PROGRAM, &galgames_state::blitter_map);
@@ -1008,33 +991,35 @@ MACHINE_CONFIG_START(galgames_state::galgames_base)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(24'000'000) / 16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified (voices in galgame4 seem ok)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(24'000'000) / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified (voices in galgame4 seem ok)
+}
 
-MACHINE_CONFIG_START(galgames_state::galgbios)
+void galgames_state::galgbios(machine_config &config)
+{
 	galgames_base(config);
-	MCFG_GALGAMES_EMPTY_CART_ADD("cart1", 1)
-	MCFG_GALGAMES_EMPTY_CART_ADD("cart2", 2)
-	MCFG_GALGAMES_EMPTY_CART_ADD("cart3", 3)
-	MCFG_GALGAMES_EMPTY_CART_ADD("cart4", 4)
-MACHINE_CONFIG_END
+	GALGAMES_CART(config, "cart1", 1);
+	GALGAMES_CART(config, "cart2", 2);
+	GALGAMES_CART(config, "cart3", 3);
+	GALGAMES_CART(config, "cart4", 4);
+}
 
-MACHINE_CONFIG_START(galgames_state::galgame2)
+void galgames_state::galgame2(machine_config &config)
+{
 	galgames_base(config);
-	MCFG_GALGAMES_STARPAK2_CART_ADD("cart1", 1)
-	MCFG_GALGAMES_EMPTY_CART_ADD("cart2", 2)
-	MCFG_GALGAMES_EMPTY_CART_ADD("cart3", 3)
-	MCFG_GALGAMES_EMPTY_CART_ADD("cart4", 4)
-MACHINE_CONFIG_END
+	GALGAMES_STARPAK2_CART(config, "cart1", 1);
+	GALGAMES_CART(config, "cart2", 2);
+	GALGAMES_CART(config, "cart3", 3);
+	GALGAMES_CART(config, "cart4", 4);
+}
 
-MACHINE_CONFIG_START(galgames_state::galgame3)
+void galgames_state::galgame3(machine_config &config)
+{
 	galgames_base(config);
-	MCFG_GALGAMES_STARPAK3_CART_ADD("cart1", 1)
-	MCFG_GALGAMES_EMPTY_CART_ADD("cart2", 2)
-	MCFG_GALGAMES_EMPTY_CART_ADD("cart3", 3)
-	MCFG_GALGAMES_EMPTY_CART_ADD("cart4", 4)
-MACHINE_CONFIG_END
+	GALGAMES_STARPAK3_CART(config, "cart1", 1);
+	GALGAMES_CART(config, "cart2", 2);
+	GALGAMES_CART(config, "cart3", 3);
+	GALGAMES_CART(config, "cart4", 4);
+}
 
 /***************************************************************************
 

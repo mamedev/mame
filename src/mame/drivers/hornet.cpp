@@ -1064,8 +1064,8 @@ double hornet_state::adc12138_input_callback(uint8_t input)
 	return (double)(value) / 2047.0;
 }
 
-MACHINE_CONFIG_START(hornet_state::hornet)
-
+void hornet_state::hornet(machine_config &config)
+{
 	/* basic machine hardware */
 	PPC403GA(config, m_maincpu, XTAL(64'000'000) / 2);   /* PowerPC 403GA 32MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &hornet_state::hornet_map);
@@ -1125,9 +1125,10 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 	KONPPC(config, m_konppc, 0);
 	m_konppc->set_num_boards(1);
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_HORNET);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hornet_state::hornet_2board)
+void hornet_state::hornet_2board(machine_config &config)
+{
 	hornet(config);
 
 	ADSP21062(config, m_dsp2, XTAL(36'000'000));
@@ -1170,16 +1171,18 @@ MACHINE_CONFIG_START(hornet_state::hornet_2board)
 	rscreen.set_screen_update(FUNC(hornet_state::screen_update_rscreen));
 
 	m_konppc->set_num_boards(2);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hornet_state::terabrst)
+void hornet_state::terabrst(machine_config &config)
+{
 	hornet(config);
 
 	M68000(config, m_gn680, XTAL(32'000'000) / 2);   /* 16MHz */
 	m_gn680->set_addrmap(AS_PROGRAM, &hornet_state::gn680_memmap);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hornet_state::hornet_2board_v2)
+void hornet_state::hornet_2board_v2(machine_config &config)
+{
 	hornet_2board(config);
 
 	VOODOO_2(config.replace(), m_voodoo[0], STD_VOODOO_2_CLOCK);
@@ -1195,7 +1198,7 @@ MACHINE_CONFIG_START(hornet_state::hornet_2board_v2)
 	m_voodoo[1]->set_screen_tag("rscreen");
 	m_voodoo[1]->set_cpu_tag("dsp2"); // ??
 	m_voodoo[1]->vblank_callback().set(FUNC(hornet_state::voodoo_vblank_1));
-MACHINE_CONFIG_END
+}
 
 void hornet_state::sscope2(machine_config &config)
 {

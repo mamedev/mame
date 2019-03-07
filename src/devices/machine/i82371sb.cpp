@@ -834,12 +834,12 @@ WRITE_LINE_MEMBER( i82371sb_isa_device::iochck_w )
 
 READ8_MEMBER( i82371sb_isa_device::at_dma8237_2_r )
 {
-	return m_dma8237_2->read( space, offset / 2);
+	return m_dma8237_2->read(offset / 2);
 }
 
 WRITE8_MEMBER( i82371sb_isa_device::at_dma8237_2_w )
 {
-	m_dma8237_2->write( space, offset / 2, data);
+	m_dma8237_2->write(offset / 2, data);
 }
 
 READ8_MEMBER(i82371sb_isa_device::eisa_irq_read)

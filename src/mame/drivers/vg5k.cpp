@@ -131,13 +131,13 @@ WRITE8_MEMBER ( vg5k_state::ef9345_offset_w )
 
 READ8_MEMBER ( vg5k_state::ef9345_io_r )
 {
-	return m_ef9345->data_r(space, m_ef9345_offset, 0xff);
+	return m_ef9345->data_r(m_ef9345_offset);
 }
 
 
 WRITE8_MEMBER ( vg5k_state::ef9345_io_w )
 {
-	m_ef9345->data_w(space, m_ef9345_offset, data, 0xff);
+	m_ef9345->data_w(m_ef9345_offset, data);
 }
 
 

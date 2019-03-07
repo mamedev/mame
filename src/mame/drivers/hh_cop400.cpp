@@ -77,6 +77,7 @@ public:
 	u16 m_inp_mux;                  // multiplexed inputs mask
 
 	u16 read_inputs(int columns, u16 colmask = ~0);
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
@@ -236,6 +237,12 @@ u16 hh_cop400_state::read_inputs(int columns, u16 colmask)
 			ret &= m_inp_matrix[i]->read();
 
 	return ret;
+}
+
+INPUT_CHANGED_MEMBER(hh_cop400_state::reset_button)
+{
+	// when an input is directly wired to MCU reset pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -613,7 +620,7 @@ void einvaderc_state::einvaderc(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(913, 1080);
-	screen.set_visarea(0, 913-1, 0, 1080-1);
+	screen.set_visarea_full();
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_cop400_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_einvaderc);
@@ -1061,8 +1068,6 @@ public:
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_WRITE8_MEMBER(write_g);
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	void funrlgl(machine_config &config);
 };
 
@@ -1101,14 +1106,8 @@ static INPUT_PORTS_START( funrlgl )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, funrlgl_state, reset_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_cop400_state, reset_button, nullptr)
 INPUT_PORTS_END
-
-INPUT_CHANGED_MEMBER(funrlgl_state::reset_button)
-{
-	// middle button is directly tied to MCU reset pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
 
 void funrlgl_state::funrlgl(machine_config &config)
 {

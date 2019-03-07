@@ -317,11 +317,11 @@ static uint8_t dn3000_dma_channel2 = 5; // 5 = memory dma channel
 
 WRITE8_MEMBER(apollo_state::apollo_dma_1_w){
 	SLOG1(("apollo_dma_1_w: writing DMA Controller 1 at offset %02x = %02x", offset, data));
-	m_dma8237_1->write(space, offset, data);
+	m_dma8237_1->write(offset, data);
 }
 
 READ8_MEMBER(apollo_state::apollo_dma_1_r){
-	uint8_t data = m_dma8237_1->read(space, offset);
+	uint8_t data = m_dma8237_1->read(offset);
 	SLOG1(("apollo_dma_1_r: reading DMA Controller 1 at offset %02x = %02x", offset, data));
 	return data;
 }
@@ -332,7 +332,7 @@ READ8_MEMBER(apollo_state::apollo_dma_1_r){
 
 WRITE8_MEMBER(apollo_state::apollo_dma_2_w){
 	SLOG1(("apollo_dma_2_w: writing DMA Controller 2 at offset %02x = %02x", offset/2, data));
-	m_dma8237_2->write(space, offset / 2, data);
+	m_dma8237_2->write(offset / 2, data);
 }
 
 READ8_MEMBER(apollo_state::apollo_dma_2_r){
@@ -351,7 +351,7 @@ READ8_MEMBER(apollo_state::apollo_dma_2_r){
 			break;
 		}
 	}
-	uint8_t data = m_dma8237_2->read(space, offset / 2);
+	uint8_t data = m_dma8237_2->read(offset / 2);
 	SLOG1(("apollo_dma_2_r: reading DMA Controller 2 at offset %02x = %02x", offset/2, data));
 	return data;
 }
@@ -672,8 +672,7 @@ WRITE_LINE_MEMBER(apollo_state::apollo_ptm_irq_function)
 
 WRITE8_MEMBER(apollo_state::apollo_rtc_w)
 {
-	m_rtc->write(space, 0, offset);
-	m_rtc->write(space, 1, data);
+	m_rtc->write_direct(offset, data);
 	if (offset >= 0x0b && offset <= 0x0c)
 	{
 		SLOG2(("writing MC146818 at offset %02x = %02x", offset, data));
@@ -683,8 +682,7 @@ WRITE8_MEMBER(apollo_state::apollo_rtc_w)
 READ8_MEMBER(apollo_state::apollo_rtc_r)
 {
 	uint8_t data;
-	m_rtc->write(space, 0, offset);
-	data = m_rtc->read(space, 1);
+	data = m_rtc->read_direct(offset);
 	if (offset >= 0x0b && offset <= 0x0c)
 	{
 		SLOG2(("reading MC146818 at offset %02x = %02x", offset, data));

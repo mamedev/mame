@@ -165,31 +165,28 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( ready_line );
 	DECLARE_WRITE_LINE_MEMBER( extint );
 	DECLARE_WRITE_LINE_MEMBER( notconnected );
-	DECLARE_READ8_MEMBER( interrupt_level );
+	uint8_t interrupt_level();
 
-	DECLARE_READ8_MEMBER( setoffset );
-	DECLARE_READ16_MEMBER( memread );
-	DECLARE_WRITE16_MEMBER( memwrite );
+	uint8_t setoffset(offs_t offset);
+	uint16_t memread(offs_t offset);
+	void memwrite(offs_t offset, uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER( dbin_in );
 
-	DECLARE_READ16_MEMBER( samsmem_read );
-	DECLARE_WRITE16_MEMBER( samsmem_write );
-
-	DECLARE_WRITE8_MEMBER(external_operation);
+	void external_operation(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
 	DECLARE_WRITE_LINE_MEMBER( dbin_line );
 
 	// CRU (Communication Register Unit) handling
-	DECLARE_READ8_MEMBER( cruread );
-	DECLARE_WRITE8_MEMBER( cruwrite );
-	DECLARE_READ8_MEMBER( read_by_9901 );
+	uint8_t cruread(offs_t offset);
+	void cruwrite(offs_t offset, uint8_t data);
+	uint8_t read_by_9901(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(keyC0);
 	DECLARE_WRITE_LINE_MEMBER(keyC1);
 	DECLARE_WRITE_LINE_MEMBER(keyC2);
 	DECLARE_WRITE_LINE_MEMBER(cs_motor);
 	DECLARE_WRITE_LINE_MEMBER(audio_gate);
 	DECLARE_WRITE_LINE_MEMBER(cassette_output);
-	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
+	void tms9901_interrupt(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(alphaW);
 
 	DECLARE_WRITE_LINE_MEMBER(video_interrupt_in);
@@ -213,8 +210,8 @@ private:
 	required_ioport m_alpha;
 
 	int decode_address(int address);
-	DECLARE_READ16_MEMBER( debugger_read );
-	DECLARE_WRITE16_MEMBER( debugger_write );
+	uint16_t debugger_read(offs_t offset);
+	void debugger_write(offs_t offset, uint16_t data);
 	void ready_join();
 	void set_keyboard_column(int number, int data);
 
@@ -256,9 +253,6 @@ private:
 
 	// Incoming Ready level
 	int m_sysready;
-
-	// Saves a pointer to the address space
-	address_space* m_spacep;
 
 	// Internal DSR mapped in
 	bool m_internal_dsr_active;
@@ -309,11 +303,8 @@ void ti99_4p_state::memmap_setoffset(address_map &map)
 
 void ti99_4p_state::crumap(address_map &map)
 {
-	map(0x0000, 0x01ff).r(FUNC(ti99_4p_state::cruread));
-	map(0x0000, 0x003f).r(m_tms9901, FUNC(tms9901_device::read));
-
-	map(0x0000, 0x0fff).w(FUNC(ti99_4p_state::cruwrite));
-	map(0x0000, 0x01ff).w(m_tms9901, FUNC(tms9901_device::write));
+	map(0x0000, 0x1fff).rw(FUNC(ti99_4p_state::cruread), FUNC(ti99_4p_state::cruwrite));
+	map(0x0000, 0x03ff).rw(m_tms9901, FUNC(tms9901_device::read), FUNC(tms9901_device::write));
 }
 
 /*
@@ -440,7 +431,7 @@ int ti99_4p_state::decode_address(int address)
     Called when the memory access starts by setting the address bus. From that
     point on, we suspend the CPU until all operations are done.
 */
-READ8_MEMBER( ti99_4p_state::setoffset )
+uint8_t ti99_4p_state::setoffset(offs_t offset)
 {
 	m_addr_buf = offset;
 	m_waitcount = 0;
@@ -449,7 +440,6 @@ READ8_MEMBER( ti99_4p_state::setoffset )
 
 	m_decode = SGCPU_NONE;
 	m_muxready = true;
-	m_spacep = &space;
 
 	m_decode = decode_address(m_addr_buf);
 
@@ -462,7 +452,7 @@ READ8_MEMBER( ti99_4p_state::setoffset )
 		m_waitcount = 5;
 		m_muxready = false;
 		m_peribox->memen_in(ASSERT_LINE);
-		m_peribox->setaddress_dbin(space, m_addr_buf+1, m_dbin);
+		m_peribox->setaddress_dbin(m_addr_buf+1, m_dbin);
 	}
 
 	ready_join();
@@ -470,7 +460,7 @@ READ8_MEMBER( ti99_4p_state::setoffset )
 	return 0;
 }
 
-READ16_MEMBER( ti99_4p_state::memread )
+uint16_t ti99_4p_state::memread(offs_t offset)
 {
 	int address = 0;
 	uint8_t hbyte = 0;
@@ -523,10 +513,10 @@ READ16_MEMBER( ti99_4p_state::memread )
 		break;
 
 	case SGCPU_PEB:
-		if (machine().side_effects_disabled()) return debugger_read(space, offset);
+		if (machine().side_effects_disabled()) return debugger_read(offset);
 		// The byte from the odd address has already been read into the latch
 		// Reading the even address now
-		m_peribox->readz(space, m_addr_buf, &hbyte);
+		m_peribox->readz(m_addr_buf, &hbyte);
 		m_peribox->memen_in(CLEAR_LINE);
 		LOGMASKED(LOG_MEM, "Read even byte from address %04x -> %02x\n",  m_addr_buf, hbyte);
 		value = (hbyte<<8) | m_latch;
@@ -536,7 +526,7 @@ READ16_MEMBER( ti99_4p_state::memread )
 }
 
 
-WRITE16_MEMBER( ti99_4p_state::memwrite )
+void ti99_4p_state::memwrite(offs_t offset, uint16_t data)
 {
 	int address = 0;
 
@@ -585,7 +575,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 		break;
 
 	case SGCPU_PEB:
-		if (machine().side_effects_disabled()) { debugger_write(space, offset, data); return; }
+		if (machine().side_effects_disabled()) { debugger_write(offset, data); return; }
 
 		// Writing the even address now (addr)
 		// The databus multiplexer puts the even value into the latch and outputs the odd value now.
@@ -593,7 +583,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 
 		// write odd byte
 		LOGMASKED(LOG_MEM, "datamux: write odd byte to address %04x <- %02x\n",  m_addr_buf+1, data & 0xff);
-		m_peribox->write(space, m_addr_buf+1, data & 0xff);
+		m_peribox->write(m_addr_buf+1, data & 0xff);
 		m_peribox->memen_in(CLEAR_LINE);
 	}
 }
@@ -601,14 +591,14 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 /*
     Used when the debugger is reading values from PEB cards.
 */
-READ16_MEMBER( ti99_4p_state::debugger_read )
+uint16_t ti99_4p_state::debugger_read(offs_t offset)
 {
 	uint8_t lval = 0;
 	uint8_t hval = 0;
 	uint16_t addrb = offset << 1;
 	m_peribox->memen_in(ASSERT_LINE);
-	m_peribox->readz(space, addrb+1, &lval);
-	m_peribox->readz(space, addrb, &hval);
+	m_peribox->readz(addrb+1, &lval);
+	m_peribox->readz(addrb, &hval);
 	m_peribox->memen_in(CLEAR_LINE);
 	return ((hval << 8)&0xff00) | (lval & 0xff);
 }
@@ -616,12 +606,12 @@ READ16_MEMBER( ti99_4p_state::debugger_read )
 /*
     Used when the debugger is writing values to PEB cards.
 */
-WRITE16_MEMBER( ti99_4p_state::debugger_write )
+void ti99_4p_state::debugger_write(offs_t offset, uint16_t data)
 {
 	int addrb = offset << 1;
 	m_peribox->memen_in(ASSERT_LINE);
-	m_peribox->write(space, addrb+1, data & 0xff);
-	m_peribox->write(space, addrb,  (data>>8) & 0xff);
+	m_peribox->write(addrb+1, data & 0xff);
+	m_peribox->write(addrb,  (data>>8) & 0xff);
 	m_peribox->memen_in(CLEAR_LINE);
 }
 
@@ -662,14 +652,14 @@ WRITE_LINE_MEMBER( ti99_4p_state::datamux_clock_in )
 				if (m_waitcount==2)
 				{
 					// read odd byte
-					m_peribox->readz(*m_spacep, m_addr_buf+1, &m_latch);
+					m_peribox->readz(m_addr_buf+1, &m_latch);
 					m_peribox->memen_in(CLEAR_LINE);
 
 					LOGMASKED(LOG_MEM, "datamux: read odd byte from address %04x -> %02x\n",  m_addr_buf+1, m_latch);
 
 					// do the setaddress for the even address
 					m_peribox->memen_in(ASSERT_LINE);
-					m_peribox->setaddress_dbin(*m_spacep, m_addr_buf, m_dbin);
+					m_peribox->setaddress_dbin(m_addr_buf, m_dbin);
 				}
 			}
 		}
@@ -689,11 +679,11 @@ WRITE_LINE_MEMBER( ti99_4p_state::datamux_clock_in )
 				{
 					// do the setaddress for the even address
 					m_peribox->memen_in(ASSERT_LINE);
-					m_peribox->setaddress_dbin(*m_spacep, m_addr_buf, m_dbin);
+					m_peribox->setaddress_dbin(m_addr_buf, m_dbin);
 
 					// write even byte
 					LOGMASKED(LOG_MEM, "datamux: write even byte to address %04x <- %02x\n",  m_addr_buf, m_latch);
-					m_peribox->write(*m_spacep,  m_addr_buf, m_latch);
+					m_peribox->write(m_addr_buf, m_latch);
 					m_peribox->memen_in(CLEAR_LINE);
 				}
 			}
@@ -711,7 +701,7 @@ WRITE_LINE_MEMBER( ti99_4p_state::datamux_clock_in )
 /*
     CRU write
 */
-WRITE8_MEMBER( ti99_4p_state::cruwrite )
+void ti99_4p_state::cruwrite(offs_t offset, uint8_t data)
 {
 	int addroff = offset<<1;
 
@@ -732,13 +722,13 @@ WRITE8_MEMBER( ti99_4p_state::cruwrite )
 	}
 
 	// No match - pass to peribox
-	m_peribox->cruwrite(space, addroff, data);
+	m_peribox->cruwrite(addroff, data);
 }
 
-READ8_MEMBER( ti99_4p_state::cruread )
+uint8_t ti99_4p_state::cruread(offs_t offset)
 {
 	uint8_t value = 0;
-	m_peribox->crureadz(space, offset<<4, &value);
+	m_peribox->crureadz(offset<<4, &value);
 	return value;
 }
 
@@ -746,7 +736,7 @@ READ8_MEMBER( ti99_4p_state::cruread )
     Keyboard/tape control
 ****************************************************************************/
 
-READ8_MEMBER( ti99_4p_state::read_by_9901 )
+uint8_t ti99_4p_state::read_by_9901(offs_t offset)
 {
 	int answer=0;
 
@@ -924,7 +914,7 @@ WRITE_LINE_MEMBER( ti99_4p_state::clock_out )
 	m_peribox->clock_in(state);
 }
 
-WRITE8_MEMBER( ti99_4p_state::tms9901_interrupt )
+void ti99_4p_state::tms9901_interrupt(offs_t offset, uint8_t data)
 {
 	// offset contains the interrupt level (0-15)
 	// However, the TI board just ignores that level and hardwires it to 1
@@ -932,14 +922,14 @@ WRITE8_MEMBER( ti99_4p_state::tms9901_interrupt )
 	m_cpu->set_input_line(INT_9900_INTREQ, data);
 }
 
-READ8_MEMBER( ti99_4p_state::interrupt_level )
+uint8_t ti99_4p_state::interrupt_level()
 {
 	// On the TI-99 systems these IC lines are not used; the input lines
 	// at the CPU are hardwired to level 1.
 	return 1;
 }
 
-WRITE8_MEMBER( ti99_4p_state::external_operation )
+void ti99_4p_state::external_operation(offs_t offset, uint8_t data)
 {
 	static char const *const extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (offset != IDLE_OP) logerror("External operation %s not implemented on the SGCPU board\n", extop[offset]);

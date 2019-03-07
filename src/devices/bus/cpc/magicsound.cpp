@@ -115,12 +115,12 @@ void al_magicsound_device::device_reset()
 
 READ8_MEMBER(al_magicsound_device::dmac_r)
 {
-	return m_dmac->read(space,offset);
+	return m_dmac->read(offset);
 }
 
 WRITE8_MEMBER(al_magicsound_device::dmac_w)
 {
-	m_dmac->write(space,offset,data);
+	m_dmac->write(offset,data);
 }
 
 WRITE8_MEMBER(al_magicsound_device::timer_w)

@@ -134,8 +134,8 @@ void jazz_state::jazz_common_map(address_map &map)
 	map(0x80002000, 0x8000200f).m(m_scsi, FUNC(ncr53c94_device::map));
 	map(0x80003000, 0x8000300f).m(m_fdc, FUNC(n82077aa_device::map));
 	map(0x80004000, 0x80004007).lrw8("rtc",
-		[this](address_space &space, offs_t offset) { return m_rtc->read(space, 1); },
-		[this](address_space &space, offs_t offset, u8 data) { m_rtc->write(space, 1, data); }).umask64(0xff);
+		[this](offs_t offset) { return m_rtc->read(1); },
+		[this](offs_t offset, u8 data) { m_rtc->write(1, data); }).umask64(0xff);
 	map(0x80005000, 0x80005007).rw(m_kbdc, FUNC(at_keyboard_controller_device::data_r), FUNC(at_keyboard_controller_device::data_w)).umask64(0x00ff);
 	map(0x80005000, 0x80005007).rw(m_kbdc, FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w)).umask64(0xff00);
 	map(0x80006000, 0x80006007).rw(m_ace[0], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));

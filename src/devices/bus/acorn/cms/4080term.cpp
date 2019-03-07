@@ -147,7 +147,7 @@ void cms_4080term_device::device_start()
 {
 	address_space &space = m_bus->memspace();
 
-	space.install_readwrite_handler(0xfd20, 0xfd2f, read8_delegate(FUNC(ef9345_device::data_r), m_ef9345.target()), write8_delegate(FUNC(ef9345_device::data_w), m_ef9345.target()));
+	space.install_readwrite_handler(0xfd20, 0xfd2f, read8sm_delegate(FUNC(ef9345_device::data_r), m_ef9345.target()), write8sm_delegate(FUNC(ef9345_device::data_w), m_ef9345.target()));
 	space.install_readwrite_handler(0xfd30, 0xfd3f, read8sm_delegate(FUNC(via6522_device::read), m_via.target()), write8sm_delegate(FUNC(via6522_device::write), m_via.target()));
 	space.install_readwrite_handler(0xfd40, 0xfd4f, read8sm_delegate(FUNC(mos6551_device::read), m_acia.target()), write8sm_delegate(FUNC(mos6551_device::write), m_acia.target()));
 

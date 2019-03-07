@@ -262,11 +262,11 @@ void finalizr_state::machine_reset()
 	m_irq_enable = 0;
 }
 
-MACHINE_CONFIG_START(finalizr_state::finalizr)
-
+void finalizr_state::finalizr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", KONAMI1, XTAL(18'432'000)/6) /* ??? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	KONAMI1(config, m_maincpu, XTAL(18'432'000)/6); /* ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &finalizr_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(finalizr_state::finalizr_scanline), "screen", 0, 1);
 
 	I8039(config, m_audiocpu, XTAL(18'432'000)/2); /* 9.216MHz clkin ?? */
@@ -279,13 +279,13 @@ MACHINE_CONFIG_START(finalizr_state::finalizr)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 35*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(finalizr_state, screen_update_finalizr)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(36*8, 32*8);
+	screen.set_visarea(1*8, 35*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(finalizr_state::screen_update_finalizr));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_finalizr);
 	PALETTE(config, m_palette, FUNC(finalizr_state::finalizr_palette), 2*16*16, 32);
@@ -295,14 +295,13 @@ MACHINE_CONFIG_START(finalizr_state::finalizr)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("snsnd", SN76489A, XTAL(18'432'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
+	SN76489A(config, "snsnd", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.75);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.325); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 
 

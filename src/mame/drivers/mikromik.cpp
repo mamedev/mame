@@ -92,7 +92,7 @@ READ8_MEMBER( mm1_state::read )
 		switch ((offset >> 4) & 0x07)
 		{
 		case 0:
-			data = m_dmac->read(space, offset & 0x0f);
+			data = m_dmac->read(offset & 0x0f);
 			break;
 
 		case 1:
@@ -161,7 +161,7 @@ WRITE8_MEMBER( mm1_state::write )
 		switch ((offset >> 4) & 0x07)
 		{
 		case 0:
-			m_dmac->write(space, offset & 0x0f, data);
+			m_dmac->write(offset & 0x0f, data);
 			break;
 
 		case 1:

@@ -610,30 +610,31 @@ static GFXDECODE_START( gfx_gal3_r )
 	GFXDECODE_ENTRY( "obj_board2", 0x000000, tile_layout,  0x000, 0x20 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(gal3_state::gal3)
-	MCFG_DEVICE_ADD("maincpu", M68020, 49152000/2)
-	MCFG_DEVICE_PROGRAM_MAP(cpu_mst_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq1_line_hold)
+void gal3_state::gal3(machine_config &config)
+{
+	m68020_device &maincpu(M68020(config, "maincpu", 49152000/2));
+	maincpu.set_addrmap(AS_PROGRAM, &gal3_state::cpu_mst_map);
+	maincpu.set_vblank_int("lscreen", FUNC(gal3_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("cpuslv", M68020, 49152000/2)
-	MCFG_DEVICE_PROGRAM_MAP(cpu_slv_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq1_line_hold)
+	m68020_device &cpusly(M68020(config, "cpuslv", 49152000/2));
+	cpusly.set_addrmap(AS_PROGRAM, &gal3_state::cpu_slv_map);
+	cpusly.set_vblank_int("lscreen", FUNC(gal3_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("rs_cpu", M68000, 49152000/4)
-	MCFG_DEVICE_PROGRAM_MAP(rs_cpu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq5_line_hold)  /// programmable via 148 IC
+	m68000_device &rs_cpu(M68000(config, "rs_cpu", 49152000/4));
+	rs_cpu.set_addrmap(AS_PROGRAM, &gal3_state::rs_cpu_map);
+	rs_cpu.set_vblank_int("lscreen", FUNC(gal3_state::irq5_line_hold));  /// programmable via 148 IC
 
-	MCFG_DEVICE_ADD("sound_cpu", M68000, 12000000) // ??
-	MCFG_DEVICE_PROGRAM_MAP(sound_cpu_map)
+	m68000_device &sound_cpu(M68000(config, "sound_cpu", 12000000)); // ??
+	sound_cpu.set_addrmap(AS_PROGRAM, &gal3_state::sound_cpu_map);
 
-	MCFG_DEVICE_ADD("psn_b1_cpu", M68000, 12000000) // ??
-	MCFG_DEVICE_PROGRAM_MAP(psn_b1_cpu_map)
+	m68000_device &psn_b1_cpu(M68000(config, "psn_b1_cpu", 12000000)); // ??
+	psn_b1_cpu.set_addrmap(AS_PROGRAM, &gal3_state::psn_b1_cpu_map);
 /*
-    MCFG_DEVICE_ADD("psn_b2_cpu", M68000, 12000000) // ??
-    MCFG_DEVICE_PROGRAM_MAP(psn_b1_cpu_map,0)
+    m68000_device &psn_b2_cpu(M68000(config, "psn_b2_cpu", 12000000)); // ??
+    psn_b2_cpu.set_addrmap(AS_PROGRAM, &gal3_state::psn_b1_cpu_map);
 
-    MCFG_DEVICE_ADD("psn_b3_cpu", M68000, 12000000) // ??
-    MCFG_DEVICE_PROGRAM_MAP(psn_b1_cpu_map,0)
+    m68000_device &psn_b3_cpu(M68000(config, "psn_b3_cpu", 12000000)); // ??
+    psn_b3_cpu.set_addrmap(AS_PROGRAM, &gal3_state::psn_b1_cpu_map);
 */
 	config.m_minimum_quantum = attotime::from_hz(60*8000); /* 8000 CPU slices per frame */
 
@@ -641,13 +642,13 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 
 	// video chain 1
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("palette_1")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(64*8, 64*8);
+	lscreen.set_visarea(0*8, 512-1, 0*8, 512-1);
+	lscreen.set_screen_update(FUNC(gal3_state::screen_update_left));
+	lscreen.set_palette(m_palette[0]);
 
 	GFXDECODE(config, "gfxdecode_1", m_palette[0], gfx_gal3_l);
 	PALETTE(config, m_palette[0]).set_format(palette_device::xBRG_888, NAMCOS21_NUM_COLORS);
@@ -671,13 +672,13 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 
 	// video chain 2
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("palette_2")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(64*8, 64*8);
+	rscreen.set_visarea(0*8, 512-1, 0*8, 512-1);
+	rscreen.set_screen_update(FUNC(gal3_state::screen_update_right));
+	rscreen.set_palette(m_palette[1]);
 
 	GFXDECODE(config, "gfxdecode_2", m_palette[1], gfx_gal3_r);
 	PALETTE(config, m_palette[1]).set_format(palette_device::xBRG_888, NAMCOS21_NUM_COLORS);
@@ -712,7 +713,7 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 	m_c140_16a->set_bank_type(c140_device::C140_TYPE::SYSTEM21);
 	m_c140_16a->add_route(0, "lspeaker", 0.50);
 	m_c140_16a->add_route(1, "rspeaker", 0.50);
-MACHINE_CONFIG_END
+}
 
 /*
 

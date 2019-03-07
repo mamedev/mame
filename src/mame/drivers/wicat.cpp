@@ -584,13 +584,13 @@ WRITE8_MEMBER( wicat_state::vram_w )
 
 READ8_MEMBER(wicat_state::video_dma_r)
 {
-	return m_videodma->read(space,offset/2);
+	return m_videodma->read(offset/2);
 }
 
 WRITE8_MEMBER(wicat_state::video_dma_w)
 {
 	if(!(offset & 0x01))
-		m_videodma->write(space,offset/2,data);
+		m_videodma->write(offset/2,data);
 }
 
 READ8_MEMBER(wicat_state::video_uart0_r)

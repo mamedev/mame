@@ -274,13 +274,13 @@ static GFXDECODE_START( gfx_crzrally )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(holeland_state::holeland)
-
+void holeland_state::holeland(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3355700) /* measured 298ns on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(holeland_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", holeland_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 3355700); /* measured 298ns on PCB */
+	m_maincpu->set_addrmap(AS_PROGRAM, &holeland_state::holeland_map);
+	m_maincpu->set_addrmap(AS_IO, &holeland_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(holeland_state::irq0_line_hold));
 
 	LS259(config, m_latch); // 3J
 	m_latch->parallel_out_cb().set(FUNC(holeland_state::pal_offs_w)).mask(0x03);
@@ -291,13 +291,13 @@ MACHINE_CONFIG_START(holeland_state::holeland)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 2*16, 30*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(holeland_state, screen_update_holeland)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*16, 32*16);
+	screen.set_visarea(0*16, 32*16-1, 2*16, 30*16-1);
+	screen.set_screen_update(FUNC(holeland_state::screen_update_holeland));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_holeland);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(holeland_state::holeland)
 	sp0256_device &speech(SP0256(config, "speech", 3355700)); /* measured 298ns on PCB */
 	speech.data_request_callback().set_inputline("maincpu", INPUT_LINE_NMI);
 	speech.add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 /*
 
@@ -355,13 +355,13 @@ Notes:
 
 */
 
-MACHINE_CONFIG_START(holeland_state::crzrally)
-
+void holeland_state::crzrally(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 20000000/4)        /* 5 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(crzrally_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", holeland_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 20000000/4);        /* 5 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &holeland_state::crzrally_map);
+	m_maincpu->set_addrmap(AS_IO, &holeland_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(holeland_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -372,13 +372,13 @@ MACHINE_CONFIG_START(holeland_state::crzrally)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(holeland_state, screen_update_crzrally)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(holeland_state::screen_update_crzrally));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_crzrally);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
@@ -396,7 +396,7 @@ MACHINE_CONFIG_START(holeland_state::crzrally)
 	ay2.port_a_read_callback().set_ioport("DSW1");
 	ay2.port_b_read_callback().set_ioport("DSW2");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

@@ -44,38 +44,38 @@ ds12885ext_device::ds12885ext_device(const machine_config &mconfig, const char *
 //  ds12885ext_device - handlers that allow acces to extended memory size
 //-------------------------------------------------
 
-READ8_MEMBER(ds12885ext_device::read_extended)
+uint8_t ds12885ext_device::read_extended(offs_t offset)
 {
 	switch (offset)
 	{
 	case 0:
 	case 1:
-		return read(space, offset, mem_mask);
+		return read(offset);
 		break;
 	case 2:
 	case 3:
-		return read(space, offset - 2, mem_mask);
+		return read(offset - 2);
 		break;
 	default:
 		return 0xff;
 	}
 }
 
-WRITE8_MEMBER(ds12885ext_device::write_extended)
+void ds12885ext_device::write_extended(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 	case 0:
-		write(space, offset, data & 127, mem_mask);
+		write(offset, data & 127);
 		break;
 	case 1:
-		write(space, offset, data, mem_mask);
+		write(offset, data);
 		break;
 	case 2:
-		write(space, offset - 2, data, mem_mask);
+		write(offset - 2, data);
 		break;
 	case 3:
-		write(space, offset - 2, data, mem_mask);
+		write(offset - 2, data);
 		break;
 	}
 }

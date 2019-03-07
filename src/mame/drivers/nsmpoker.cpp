@@ -175,7 +175,7 @@ INTERRUPT_GEN_MEMBER(nsmpoker_state::nsmpoker_interrupt)
 
 READ8_MEMBER(nsmpoker_state::debug_r)
 {
-	return machine().rand() & 0xff;
+	return BIT(machine().rand(), offset);
 }
 
 
@@ -194,8 +194,8 @@ void nsmpoker_state::nsmpoker_map(address_map &map)
 
 void nsmpoker_state::nsmpoker_portmap(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0xf0, 0xf0).r(FUNC(nsmpoker_state::debug_r));   // kind of trap at beginning
+	map.global_mask(0xfff);
+	map(0xf00, 0xf0f).r(FUNC(nsmpoker_state::debug_r));   // kind of trap at beginning
 }
 
 /* I/O byte R/W

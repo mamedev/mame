@@ -233,17 +233,17 @@ READ8_MEMBER( mbee_state::speed_high_r )
 
 WRITE8_MEMBER( mbee_state::port04_w )  // address
 {
-	m_rtc->write(space, 0, data);
+	m_rtc->write(0, data);
 }
 
 WRITE8_MEMBER( mbee_state::port06_w )  // write
 {
-	m_rtc->write(space, 1, data);
+	m_rtc->write(1, data);
 }
 
 READ8_MEMBER( mbee_state::port07_r )   // read
 {
-	return m_rtc->read(space, 1);
+	return m_rtc->read(1);
 }
 
 // See it work: Run mbeett, choose RTC in the config switches, run the F3 test, press Esc.

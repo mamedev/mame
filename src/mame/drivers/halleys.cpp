@@ -1930,25 +1930,26 @@ void halleys_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(halleys_state::halleys)
-	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(19'968'000)/12) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(halleys_map)
+void halleys_state::halleys(machine_config &config)
+{
+	MC6809E(config, m_maincpu, XTAL(19'968'000)/12); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &halleys_state::halleys_map);
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(halleys_state::halleys_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(6'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(halleys_state, irq0_line_hold,  (double)6000000/(4*16*16*10*16))
+	Z80(config, m_audiocpu, XTAL(6'000'000)/2); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &halleys_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(halleys_state::irq0_line_hold), attotime::from_hz((double)6000000/(4*16*16*10*16)));
 
 
 	// video hardware
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.50) /* verified on PCB */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(SCREEN_WIDTH, SCREEN_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(VIS_MINX, VIS_MAXX, VIS_MINY, VIS_MAXY)
-	MCFG_SCREEN_UPDATE_DRIVER(halleys_state, screen_update_halleys)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.50); /* verified on PCB */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(SCREEN_WIDTH, SCREEN_HEIGHT);
+	screen.set_visarea(VIS_MINX, VIS_MAXX, VIS_MINY, VIS_MAXY);
+	screen.set_screen_update(FUNC(halleys_state::screen_update_halleys));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(halleys_state::halleys_palette), PALETTE_SIZE);
 
@@ -1966,19 +1967,19 @@ MACHINE_CONFIG_START(halleys_state::halleys)
 	ym2149_device &ay4(YM2149(config, "ay4", XTAL(6'000'000)/4)); /* verified on pcb */
 	ay4.port_b_write_callback().set(FUNC(halleys_state::sndnmi_msk_w));
 	ay4.add_route(ALL_OUTPUTS, "mono", 0.15);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(halleys_state::benberob)
+void halleys_state::benberob(machine_config &config)
+{
 	halleys(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(19'968'000)/12) /* not verified but pcb identical to halley's comet */
+
+	m_maincpu->set_clock(XTAL(19'968'000)/12); /* not verified but pcb identical to halley's comet */
 
 	subdevice<timer_device>("scantimer")->set_callback(FUNC(halleys_state::benberob_scanline));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(halleys_state, screen_update_benberob)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(halleys_state::screen_update_benberob));
+}
 
 
 //**************************************************************************

@@ -229,6 +229,7 @@ public:
 	void set_vblank_time(attoseconds_t time) { m_vblank = time; m_oldstyle_vblank_supplied = true; }
 	void set_size(u16 width, u16 height) { m_width = width; m_height = height; }
 	void set_visarea(s16 minx, s16 maxx, s16 miny, s16 maxy) { m_visarea.set(minx, maxx, miny, maxy); }
+	void set_visarea_full() { m_visarea.set(0, m_width - 1, 0, m_height - 1); } // call after set_size
 	void set_default_position(double xscale, double xoffs, double yscale, double yoffs) {
 		m_xscale = xscale;
 		m_xoffset = xoffs;

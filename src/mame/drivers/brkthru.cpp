@@ -133,6 +133,12 @@ Notes:
     Connectors:
                2x flat cable to upper board
 
+
+brkthru, brkthruj and brkthrut have a Self Test Mode not mentioned anywhere
+in the manual. It is accessed by holding down both player 1 and player 2 start
+buttons while powering up the game. It can be accessed in MAME by holding the
+buttons down after the game has started then pressing F3 to reset the game.
+
 ***************************************************************************/
 
 #include "emu.h"

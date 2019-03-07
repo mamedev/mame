@@ -178,21 +178,20 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(galaxy_state::galaxy)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(galaxy_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(galaxy_state,galaxy_irq_callback)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_PALETTE("palette")
+	Z80(config, m_maincpu, XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxy_state::galaxy_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(galaxy_state::galaxy_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(galaxy_state::galaxy_irq_callback));
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxy_state, galaxy )
 
 	/* video hardware */
-	MCFG_SCREEN_SIZE(384, 212)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
-	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_palette("palette");
+	m_screen->set_size(384, 212);
+	m_screen->set_visarea(0, 384-1, 0, 208-1);
+	m_screen->set_screen_update(FUNC(galaxy_state::screen_update_galaxy));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_galaxy);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -216,22 +215,21 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxy_state::galaxyp)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(galaxyp_mem)
-	MCFG_DEVICE_IO_MAP(galaxyp_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(galaxy_state,galaxy_irq_callback)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_PALETTE("palette")
+	Z80(config, m_maincpu, XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxy_state::galaxyp_mem);
+	m_maincpu->set_addrmap(AS_IO, &galaxy_state::galaxyp_io);
+	m_maincpu->set_vblank_int("screen", FUNC(galaxy_state::galaxy_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(galaxy_state::galaxy_irq_callback));
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxy_state, galaxyp )
 
 	/* video hardware */
-	MCFG_SCREEN_SIZE(384, 208)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
-	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_palette("palette");
+	m_screen->set_size(384, 208);
+	m_screen->set_visarea(0, 384-1, 0, 208-1);
+	m_screen->set_screen_update(FUNC(galaxy_state::screen_update_galaxy));
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 

@@ -355,7 +355,7 @@ READ8_MEMBER(tmspoker_state::unk_r)
 
 void tmspoker_state::tmspoker_cru_map(address_map &map)
 {
-	map(0x0000, 0x07ff).r(FUNC(tmspoker_state::unk_r));
+	map(0x0000, 0x0fff).r(FUNC(tmspoker_state::unk_r));
 }
 
 /* I/O byte R/W

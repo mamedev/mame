@@ -115,11 +115,12 @@ void fruitpc_state::fruitpc_sb_conf(device_t *device)
 	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
 }
 
-MACHINE_CONFIG_START(fruitpc_state::fruitpc)
-	MCFG_DEVICE_ADD("maincpu", I486, 66000000) // ST STPCD0166BTC3 66 MHz 486 CPU
-	MCFG_DEVICE_PROGRAM_MAP(fruitpc_map)
-	MCFG_DEVICE_IO_MAP(fruitpc_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+void fruitpc_state::fruitpc(machine_config &config)
+{
+	I486(config, m_maincpu, 66000000); // ST STPCD0166BTC3 66 MHz 486 CPU
+	m_maincpu->set_addrmap(AS_PROGRAM, &fruitpc_state::fruitpc_map);
+	m_maincpu->set_addrmap(AS_IO, &fruitpc_state::fruitpc_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
@@ -145,10 +146,10 @@ MACHINE_CONFIG_START(fruitpc_state::fruitpc)
 	m_isabus->drq3_callback().set("dma8237_1", FUNC(am9517a_device::dreq3_w));
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", fruitpc_isa8_cards, "sb15", true)
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("sb15", fruitpc_sb_def)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("sb15", fruitpc_sb_conf)
-MACHINE_CONFIG_END
+	isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", 0, "isa", fruitpc_isa8_cards, "sb15", true));
+	isa1.set_option_device_input_defaults("sb15", DEVICE_INPUT_DEFAULTS_NAME(fruitpc_sb_def));
+	isa1.set_option_machine_config("sb15", fruitpc_sb_conf);
+}
 
 ROM_START( fruitpc )
 	ROM_REGION( 0x20000, "bios", 0 )

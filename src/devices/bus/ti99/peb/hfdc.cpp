@@ -223,14 +223,14 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
 
 		if (m_HDCsel)
 		{
-			*value = m_hdc9234->read(space, (m_address>>2)&1, 0xff);
+			*value = m_hdc9234->read((m_address>>2)&1);
 			LOGMASKED(LOG_COMP, "%04x[HDC] -> %02x\n", m_address & 0xffff, *value);
 			return;
 		}
 
 		if (m_RTCsel)
 		{
-			*value = m_clock->read(space, (m_address & 0x001e) >> 1);
+			*value = m_clock->read((m_address & 0x001e) >> 1);
 			LOGMASKED(LOG_COMP, "%04x[CLK] -> %02x\n", m_address & 0xffff, *value);
 			return;
 		}
@@ -278,7 +278,7 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
     0x5800 - 0x5bff static RAM page any of 32 pages
     0x5c00 - 0x5fff static RAM page any of 32 pages
 */
-WRITE8_MEMBER( myarc_hfdc_device::write )
+void myarc_hfdc_device::write(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled())
 	{
@@ -297,14 +297,14 @@ WRITE8_MEMBER( myarc_hfdc_device::write )
 		if (m_HDCsel)
 		{
 			LOGMASKED(LOG_COMP, "%04x[HDC] <- %02x\n", m_address & 0xffff, data);
-			m_hdc9234->write(space, (m_address>>2)&1, data, 0xff);
+			m_hdc9234->write((m_address>>2)&1, data);
 			return;
 		}
 
 		if (m_RTCsel)
 		{
 			LOGMASKED(LOG_COMP, "%04x[CLK] <- %02x\n", m_address & 0xffff, data);
-			m_clock->write(space, (m_address & 0x001e) >> 1, data);
+			m_clock->write((m_address & 0x001e) >> 1, data);
 			return;
 		}
 
@@ -376,7 +376,7 @@ READ8Z_MEMBER(myarc_hfdc_device::crureadz)
 	uint8_t reply;
 	if ((offset & 0xff00)==m_cru_base)
 	{
-		if ((offset & 0x00ff)==0)  // CRU bits 0-7
+		if ((offset & 0x00f0)==0)  // CRU bits 0-7
 		{
 			if (m_see_switches)
 			{
@@ -390,7 +390,7 @@ READ8Z_MEMBER(myarc_hfdc_device::crureadz)
 				if (!m_motor_running) reply |= 0x04;
 				if (m_wait_for_hd1) reply |= 0x08;
 			}
-			*value = reply;
+			*value = BIT(reply, (offset >> 1) & 7);
 		}
 		else   // CRU bits 8+
 		{
@@ -425,7 +425,7 @@ READ8Z_MEMBER(myarc_hfdc_device::crureadz)
 
     HFDC manual p. 43
 */
-WRITE8_MEMBER(myarc_hfdc_device::cruwrite)
+void myarc_hfdc_device::cruwrite(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -627,7 +627,7 @@ void myarc_hfdc_device::signal_drive_status()
     (1,0) = OUTPUT1
     (1,1) = OUTPUT2
 */
-WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
+void myarc_hfdc_device::auxbus_out(offs_t offset, uint8_t data)
 {
 	int index;
 	switch (offset)
@@ -848,7 +848,7 @@ WRITE_LINE_MEMBER( myarc_hfdc_device::dip_w )
 /*
     Read a byte from the onboard SRAM. This is called from the HDC9234.
 */
-READ8_MEMBER( myarc_hfdc_device::read_buffer )
+uint8_t myarc_hfdc_device::read_buffer()
 {
 	LOGMASKED(LOG_DMA, "Read access to onboard SRAM at %04x\n", m_dma_address);
 	if (m_dma_address > 0x8000) LOGMASKED(LOG_WARN, "Read access beyond RAM size: %06x\n", m_dma_address);
@@ -860,7 +860,7 @@ READ8_MEMBER( myarc_hfdc_device::read_buffer )
 /*
     Write a byte to the onboard SRAM. This is called from the HDC9234.
 */
-WRITE8_MEMBER( myarc_hfdc_device::write_buffer )
+void myarc_hfdc_device::write_buffer(uint8_t data)
 {
 	LOGMASKED(LOG_DMA, "Write access to onboard SRAM at %04x: %02x\n", m_dma_address, data);
 	if (m_dma_address > 0x8000) LOGMASKED(LOG_WARN, "Write access beyond RAM size: %06x\n", m_dma_address);

@@ -33,8 +33,8 @@ public:
 	ds12885ext_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 32'768);
 
 	// read/write access to extended ram
-	DECLARE_READ8_MEMBER(read_extended);
-	DECLARE_WRITE8_MEMBER(write_extended);
+	uint8_t read_extended(offs_t offset);
+	void write_extended(offs_t offset, uint8_t data);
 
 protected:
 	virtual int data_size() override { return 256; }

@@ -303,16 +303,13 @@ namespace netlist
 	{
 	public:
 
-		explicit setup_t(netlist_t &netlist);
+		explicit setup_t(netlist_state_t &nlstate);
 		~setup_t() noexcept;
 
 		COPYASSIGNMOVE(setup_t, delete)
 
-		netlist_state_t &netlist();
-		const netlist_state_t &netlist() const;
-
-		netlist_t &exec() { return m_netlist; }
-		const netlist_t &exec() const { return m_netlist; }
+		netlist_state_t &nlstate() { return m_nlstate; }
+		const netlist_state_t &nlstate() const { return m_nlstate; }
 
 		void register_param_t(const pstring &name, param_t &param);
 
@@ -384,7 +381,7 @@ namespace netlist
 
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 
-		netlist_t                                   &m_netlist;
+		netlist_state_t                             &m_nlstate;
 		devices::nld_netlistparams                  *m_netlist_params;
 		std::unordered_map<pstring, param_ref_t>    m_params;
 

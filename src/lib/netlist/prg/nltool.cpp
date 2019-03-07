@@ -632,7 +632,7 @@ void tool_app_t::listdevices()
 		pstring out = plib::pfmt("{1:-20} {2}(<id>")(f->classname())(f->name());
 
 		f->macro_actions(nt.setup(), f->name() + "_lc");
-		auto d = f->Create(nt.setup().netlist(), f->name() + "_lc");
+		auto d = f->Create(nt.nlstate(), f->name() + "_lc");
 		// get the list of terminals ...
 
 		std::vector<pstring> terms(nt.setup().get_terminals_for_device_name(d->name()));

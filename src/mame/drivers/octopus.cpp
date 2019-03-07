@@ -524,9 +524,9 @@ READ8_MEMBER(octopus_state::rtc_r)
 	uint8_t ret = 0xff;
 
 	if(m_rtc_data)
-		ret = m_rtc->read(space,1);
+		ret = m_rtc->read(1);
 	else if(m_rtc_address)
-		ret = m_rtc->read(space,0);
+		ret = m_rtc->read(0);
 
 	return ret;
 }
@@ -534,9 +534,9 @@ READ8_MEMBER(octopus_state::rtc_r)
 WRITE8_MEMBER(octopus_state::rtc_w)
 {
 	if(m_rtc_data)
-		m_rtc->write(space,1,data);
+		m_rtc->write(1,data);
 	else if(m_rtc_address)
-		m_rtc->write(space,0,data);
+		m_rtc->write(0,data);
 }
 
 // RTC/FDC control - PPI port B

@@ -179,7 +179,7 @@ static void horizon_s100_cards(device_slot_interface &device)
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( horizon )
+//  machine_config( horizon )
 //-------------------------------------------------
 
 void horizon_state::horizon(machine_config &config)

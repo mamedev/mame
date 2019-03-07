@@ -122,11 +122,12 @@ static GFXDECODE_START( gfx_gomoku )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(gomoku_state::gomoku)
+void gomoku_state::gomoku(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/12)      /* 1.536 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(gomoku_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gomoku_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(18'432'000)/12);      /* 1.536 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gomoku_state::gomoku_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gomoku_state::irq0_line_hold));
 
 	ls259_device &latch(LS259(config, "latch")); // 7J
 	latch.q_out_cb<1>().set(FUNC(gomoku_state::flipscreen_w));
@@ -134,13 +135,13 @@ MACHINE_CONFIG_START(gomoku_state::gomoku)
 	latch.q_out_cb<7>().set_nop(); // start LED?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gomoku_state, screen_update_gomoku)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 16, 256-16-1);
+	m_screen->set_screen_update(FUNC(gomoku_state::screen_update_gomoku));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_gomoku);
 	PALETTE(config, "palette", FUNC(gomoku_state::gomoku_palette), 64);
@@ -148,9 +149,8 @@ MACHINE_CONFIG_START(gomoku_state::gomoku)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("gomoku", GOMOKU_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	GOMOKU_SOUND(config, "gomoku").add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 ROM_START( gomoku )

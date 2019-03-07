@@ -354,7 +354,8 @@ void ufombs_state::ufombs(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(243, 1080);
-	screen.set_visarea(0, 243-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -511,7 +512,8 @@ void ssfball_state::ssfball(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 482);
-	screen.set_visarea(0, 1920-1, 0, 482-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -657,7 +659,8 @@ void bmsoccer_state::bmsoccer(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(271, 1080);
-	screen.set_visarea(0, 271-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -774,7 +777,8 @@ void bmsafari_state::bmsafari(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(248, 1080);
-	screen.set_visarea(0, 248-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -935,7 +939,8 @@ void splasfgt_state::splasfgt(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 476);
-	screen.set_visarea(0, 1920-1, 0, 476-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1049,7 +1054,8 @@ void bcclimbr_state::bcclimbr(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(310, 1080);
-	screen.set_visarea(0, 310-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1283,7 +1289,8 @@ void invspace_state::invspace(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(289, 1080);
-	screen.set_visarea(0, 289-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1516,7 +1523,8 @@ void galaxy2_state::galaxy2(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(304, 1080);
-	screen.set_visarea(0, 304-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1532,7 +1540,7 @@ void galaxy2_state::galaxy2b(machine_config &config)
 	/* video hardware */
 	screen_device *screen = subdevice<screen_device>("screen");
 	screen->set_size(306, 1080);
-	screen->set_visarea(0, 306-1, 0, 1080-1);
+	screen->set_visarea_full();
 }
 
 // roms
@@ -1654,7 +1662,8 @@ void astrocmd_state::astrocmd(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 525);
-	screen.set_visarea(0, 1920-1, 0, 525-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1760,7 +1769,8 @@ void edracula_state::edracula(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 526);
-	screen.set_visarea(0, 1920-1, 0, 526-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2184,7 +2194,8 @@ void tccombat_state::tccombat(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(300, 1080);
-	screen.set_visarea(0, 300-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2347,7 +2358,7 @@ void tmtennis_state::tmtennis(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 417);
-	screen.set_visarea(0, 1920-1, 0, 417-1);
+	screen.set_visarea_full();
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_tmtennis);
@@ -2468,7 +2479,8 @@ void tmpacman_state::tmpacman(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 508);
-	screen.set_visarea(0, 1920-1, 0, 508-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2581,7 +2593,8 @@ void tmscramb_state::tmscramb(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 556);
-	screen.set_visarea(0, 1920-1, 0, 556-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2690,7 +2703,8 @@ void tcaveman_state::tcaveman(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 559);
-	screen.set_visarea(0, 1920-1, 0, 559-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2833,7 +2847,8 @@ void alnchase_state::alnchase(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(365, 1080);
-	screen.set_visarea(0, 365-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */

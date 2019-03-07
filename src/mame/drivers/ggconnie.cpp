@@ -262,7 +262,8 @@ static INPUT_PORTS_START(smf)
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(ggconnie_state::ggconnie)
+void ggconnie_state::ggconnie(machine_config &config)
+{
 	/* basic machine hardware */
 	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ggconnie_state::sgx_mem);
@@ -273,10 +274,10 @@ MACHINE_CONFIG_START(ggconnie_state::ggconnie)
 	m_maincpu->add_route(1, "rspeaker", 1.00);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/3, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
-	MCFG_SCREEN_UPDATE_DRIVER( ggconnie_state, screen_update )
-	MCFG_SCREEN_PALETTE("huc6260")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PCE_MAIN_CLOCK/3, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
+	screen.set_screen_update(FUNC(ggconnie_state::screen_update));
+	screen.set_palette(m_huc6260);
 
 	HUC6260(config, m_huc6260, PCE_MAIN_CLOCK/3);
 	m_huc6260->next_pixel_data().set("huc6202", FUNC(huc6202_device::next_pixel));
@@ -311,10 +312,10 @@ MACHINE_CONFIG_START(ggconnie_state::ggconnie)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, PCE_MAIN_CLOCK/12, okim6295_device::PIN7_HIGH) /* unknown clock / pin 7 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, PCE_MAIN_CLOCK/12, okim6295_device::PIN7_HIGH); /* unknown clock / pin 7 */
+	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
+	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
+}
 
 ROM_START(ggconnie)
 	ROM_REGION( 0x180000, "maincpu", 0 )

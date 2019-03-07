@@ -170,7 +170,7 @@ tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, 
 		PC_debug(0),
 		m_program_config("program", ENDIANNESS_BIG, 8, 16),
 		m_setoffset_config("setoffset", ENDIANNESS_BIG, 8, 16),
-		m_io_config("cru", ENDIANNESS_BIG, 8, 16),
+		m_io_config("cru", ENDIANNESS_LITTLE, 8, 16, 1),
 		m_prgspace(nullptr),
 		m_sospace(nullptr),
 		m_cru(nullptr),
@@ -288,8 +288,6 @@ void tms9995_device::device_start()
 	save_item(NAME(m_cru_address));
 	save_item(NAME(m_cru_value));
 	save_item(NAME(m_cru_first_read));
-	save_item(NAME(m_cru_bits_left));
-	save_item(NAME(m_cru_read));
 	save_pointer(NAME(m_flag),16);
 	save_item(NAME(IR));
 	save_item(NAME(m_pre_IR));
@@ -2096,8 +2094,8 @@ void tms9995_device::return_with_address_copy()
 
 */
 
-#define CRUREADMASK 0x0fff
-#define CRUWRITEMASK 0x7fff
+#define CRUREADMASK 0xfffe
+#define CRUWRITEMASK 0xfffe
 
 void tms9995_device::cru_output_operation()
 {
@@ -2133,7 +2131,7 @@ void tms9995_device::cru_output_operation()
 	// of the CPU. However, no wait states are generated for internal
 	// accesses. ([1], section 2.3.3.2)
 
-	m_cru->write_byte((m_cru_address >> 1)& CRUWRITEMASK, (m_cru_value & 0x01));
+	m_cru->write_byte(m_cru_address & CRUWRITEMASK, (m_cru_value & 0x01));
 	m_cru_value >>= 1;
 	m_cru_address = (m_cru_address + 2) & 0xfffe;
 	m_count--;
@@ -2154,55 +2152,28 @@ void tms9995_device::cru_output_operation()
 
 void tms9995_device::cru_input_operation()
 {
-	uint16_t crubit;
-	uint8_t crubyte;
-
-	// Reading is different, since MESS uses 8 bit transfers
-	// We read 8 bits in one go, then iterate another min(n-1,7) times to allow
-	// for wait states.
-
-	// read_byte for CRU delivers the first bit on the rightmost position
-
-	int offset = (m_cru_address>>1) & 0x07;
-
-	if (m_cru_first_read || m_cru_bits_left == 0)
+	if (m_cru_first_read)
 	{
-		// Read next 8 bits
-		// 00000000 0rrrrrrr r
-		//                   v
-		// ........ ........ X....... ........
-		//
-		crubyte = m_cru->read_byte((m_cru_address >> 4)& CRUREADMASK);
-		LOGMASKED(LOG_DETAIL, "Need to get next 8 bits (addresses %04x-%04x): %02x\n", (m_cru_address&0xfff0)+14, m_cru_address&0xfff0, crubyte);
-		m_cru_read = crubyte << 15;
-		m_cru_bits_left = 8;
-
-		if (m_cru_first_read)
-		{
-			m_cru_read >>= offset;
-			m_cru_bits_left -= offset;
-			m_cru_value = 0;
-			m_cru_first_read = false;
-			m_pass = m_count;
-		}
-		LOGMASKED(LOG_DETAIL, "adjusted value for shift: %06x\n", m_cru_read);
+		m_cru_value = 0;
+		m_cru_first_read = false;
+		m_pass = m_count;
 	}
 
-	crubit = (m_cru_read & 0x8000);
+	bool crubit = BIT(m_cru->read_byte(m_cru_address & CRUREADMASK), 0);
 	m_cru_value = (m_cru_value >> 1) & 0x7fff;
 
 	// During internal reading, the CRUIN line will be ignored. We emulate this
 	// by overwriting the bit which we got from outside. Also, READY is ignored.
 	if (m_cru_address == 0x1fda)
 	{
-		crubit = m_mid_flag? 0x8000 : 0x0000;
+		crubit = m_mid_flag;
 		m_check_ready = false;
 	}
 	else
 	{
 		if ((m_cru_address & 0xffe0)==0x1ee0)
 		{
-			crubit = (m_flag[(m_cru_address>>1)&0x000f]==true)? 0x8000 : 0x0000;
+			crubit = m_flag[(m_cru_address>>1)&0x000f];
 			m_check_ready = false;
 		}
 		else
@@ -2211,18 +2182,14 @@ void tms9995_device::cru_input_operation()
 		}
 	}
 
-	LOGMASKED(LOG_CRU, "CRU input operation, address %04x, value %d\n", m_cru_address, (crubit & 0x8000)>>15);
+	LOGMASKED(LOG_CRU, "CRU input operation, address %04x, value %d\n", m_cru_address, crubit ? 1 : 0);
 
-	m_cru_value |= crubit;
+	if (crubit)
+		m_cru_value |= 0x8000;
 
 	m_cru_address = (m_cru_address + 2) & 0xfffe;
-	m_cru_bits_left--;
 
-	if (m_pass > 1)
-	{
-		m_cru_read >>= 1;
-	}
-	else
+	if (m_pass == 1)
 	{
 		// This is the final shift. For both byte and word length transfers,
 		// the first bit is always m_cru_value & 0x0001.

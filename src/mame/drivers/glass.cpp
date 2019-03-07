@@ -220,12 +220,12 @@ void glass_state::machine_reset()
 	m_blitter_command = 0;
 }
 
-MACHINE_CONFIG_START(glass_state::glass)
-
+void glass_state::glass(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)      /* 12 MHz verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(glass_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", glass_state,  interrupt)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);      /* 12 MHz verified on PCB */
+	m_maincpu->set_addrmap(AS_PROGRAM, &glass_state::glass_map);
+	m_maincpu->set_vblank_int("screen", FUNC(glass_state::interrupt));
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<0>().set(FUNC(glass_state::coin1_lockout_w));
@@ -235,13 +235,13 @@ MACHINE_CONFIG_START(glass_state::glass)
 	m_outlatch->q_out_cb<4>().set_nop(); // Sound Muting (if bit 0 == 1, sound output stream = 0)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 368-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(glass_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*16, 32*16);
+	screen.set_visarea(0, 368-1, 16, 256-1);
+	screen.set_screen_update(FUNC(glass_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_glass);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
@@ -249,16 +249,17 @@ MACHINE_CONFIG_START(glass_state::glass)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) /* 1MHz Resonator & pin 7 high verified on PCB */
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH)); /* 1MHz Resonator & pin 7 high verified on PCB */
+	oki.set_addrmap(0, &glass_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(glass_state::glass_ds5002fp)
+void glass_state::glass_ds5002fp(machine_config &config)
+{
 	glass(config);
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) /* verified on pcb */
-	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
-MACHINE_CONFIG_END
+	gaelco_ds5002fp_device &ds5002fp(GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2)); /* verified on pcb */
+	ds5002fp.set_addrmap(0, &glass_state::mcu_hostmem_map);
+}
 
 ROM_START( glass ) /* Version 1.1 */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
