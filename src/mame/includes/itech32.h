@@ -159,9 +159,9 @@ protected:
 	void bloodstm_plane_w(u8 data);
 	void itech020_plane_w(u8 data);
 	DECLARE_WRITE16_MEMBER(bloodstm_paletteram_w);
-	void video_w(offs_t offset, u16 data, u16 mem_mask);
+	void video_w(offs_t offset, u16 data, u16 mem_mask = u16(~0));
 	u16 video_r(offs_t offset);
-	void bloodstm_video_w(offs_t offset, u16 data, u16 mem_mask);
+	void bloodstm_video_w(offs_t offset, u16 data, u16 mem_mask = u16(~0));
 	u16 bloodstm_video_r(offs_t offset);
 	void pia_portb_out(u8 data);
 
@@ -235,7 +235,7 @@ protected:
 	DECLARE_WRITE32_MEMBER(tms1_trigger_w);
 	DECLARE_WRITE32_MEMBER(tms2_trigger_w);
 
-	void zbuf_control_w(offs_t offset, u32 data, u32 mem_mask);
+	void zbuf_control_w(offs_t offset, u32 data, u32 mem_mask = u32(~0));
 
 	void portb_out(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(turbo_light);
