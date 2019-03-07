@@ -3843,7 +3843,7 @@ void einvader_state::einvader(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(939, 1080);
-	screen.set_visarea(0, 939-1, 0, 1080-1);
+	screen.set_visarea_full();
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_einvader);
 
@@ -4940,7 +4940,7 @@ void ginv1000_state::ginv1000(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(226, 1080);
-	screen.set_visarea(0, 226-1, 0, 1080-1);
+	screen.set_visarea_full();
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -5091,7 +5091,7 @@ void ginv2000_state::ginv2000(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(364, 1080);
-	screen.set_visarea(0, 364-1, 0, 1080-1);
+	screen.set_visarea_full();
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
