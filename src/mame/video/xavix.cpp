@@ -171,7 +171,7 @@ void xavix_state::update_pen(int pen, uint8_t shval, uint8_t lval)
 	double g0 = hues[h_raw][1];
 	double b0 = hues[h_raw][2];
 
-	double z = wr * r0 + wg * b0 + wb * b0;
+	double z = wr * r0 + wg * g0 + wb * b0;
 
 	if(y < z)
 		c *= y/z;
