@@ -27,41 +27,41 @@
 
 	<!-- 9 digits -->
 
-		<bezel name="digit8" element="digit"><bounds x="0" y="0" width="10" height="15" /></bezel>
-		<bezel name="8.14" element="lamp_dp"><bounds x="-1.5" y="11" width="1.5" height="1.5" /></bezel>
-		<bezel name="8.15" element="lamp_ct"><bounds x="-0.8" y="13.5" width="0.75" height="1.5" /></bezel>
+		<bezel name="digit0" element="digit"><bounds x="0" y="0" width="10" height="15" /></bezel>
+		<bezel name="0.14" element="lamp_dp"><bounds x="-1.5" y="11" width="1.5" height="1.5" /></bezel>
+		<bezel name="0.15" element="lamp_ct"><bounds x="-0.8" y="13.5" width="0.75" height="1.5" /></bezel>
 
-		<bezel name="digit7" element="digit"><bounds x="11" y="0" width="10" height="15" /></bezel>
-		<bezel name="7.14" element="lamp_dp"><bounds x="9.5" y="11" width="1.5" height="1.5" /></bezel>
-		<bezel name="7.15" element="lamp_ct"><bounds x="10.2" y="13.5" width="0.75" height="1.5" /></bezel>
+		<bezel name="digit1" element="digit"><bounds x="11" y="0" width="10" height="15" /></bezel>
+		<bezel name="1.14" element="lamp_dp"><bounds x="9.5" y="11" width="1.5" height="1.5" /></bezel>
+		<bezel name="1.15" element="lamp_ct"><bounds x="10.2" y="13.5" width="0.75" height="1.5" /></bezel>
 
-		<bezel name="digit6" element="digit"><bounds x="22" y="0" width="10" height="15" /></bezel>
-		<bezel name="6.14" element="lamp_dp"><bounds x="20.5" y="11" width="1.5" height="1.5" /></bezel>
-		<bezel name="6.15" element="lamp_ct"><bounds x="21.2" y="13.5" width="0.75" height="1.5" /></bezel>
+		<bezel name="digit2" element="digit"><bounds x="22" y="0" width="10" height="15" /></bezel>
+		<bezel name="2.14" element="lamp_dp"><bounds x="20.5" y="11" width="1.5" height="1.5" /></bezel>
+		<bezel name="2.15" element="lamp_ct"><bounds x="21.2" y="13.5" width="0.75" height="1.5" /></bezel>
 
-		<bezel name="digit5" element="digit"><bounds x="33" y="0" width="10" height="15" /></bezel>
-		<bezel name="5.14" element="lamp_dp"><bounds x="31.5" y="11" width="1.5" height="1.5" /></bezel>
-		<bezel name="5.15" element="lamp_ct"><bounds x="32.2" y="13.5" width="0.75" height="1.5" /></bezel>
+		<bezel name="digit3" element="digit"><bounds x="33" y="0" width="10" height="15" /></bezel>
+		<bezel name="3.14" element="lamp_dp"><bounds x="31.5" y="11" width="1.5" height="1.5" /></bezel>
+		<bezel name="3.15" element="lamp_ct"><bounds x="32.2" y="13.5" width="0.75" height="1.5" /></bezel>
 
 		<bezel name="digit4" element="digit"><bounds x="44" y="0" width="10" height="15" /></bezel>
 		<bezel name="4.14" element="lamp_dp"><bounds x="42.5" y="11" width="1.5" height="1.5" /></bezel>
 		<bezel name="4.15" element="lamp_ct"><bounds x="43.2" y="13.5" width="0.75" height="1.5" /></bezel>
 
-		<bezel name="digit3" element="digit"><bounds x="55" y="0" width="10" height="15" /></bezel>
-		<bezel name="3.14" element="lamp_dp"><bounds x="53.5" y="11" width="1.5" height="1.5" /></bezel>
-		<bezel name="3.15" element="lamp_ct"><bounds x="54.2" y="13.5" width="0.75" height="1.5" /></bezel>
+		<bezel name="digit5" element="digit"><bounds x="55" y="0" width="10" height="15" /></bezel>
+		<bezel name="5.14" element="lamp_dp"><bounds x="53.5" y="11" width="1.5" height="1.5" /></bezel>
+		<bezel name="5.15" element="lamp_ct"><bounds x="54.2" y="13.5" width="0.75" height="1.5" /></bezel>
 
-		<bezel name="digit2" element="digit"><bounds x="66" y="0" width="10" height="15" /></bezel>
-		<bezel name="2.14" element="lamp_dp"><bounds x="64.5" y="11" width="1.5" height="1.5" /></bezel>
-		<bezel name="2.15" element="lamp_ct"><bounds x="65.2" y="13.5" width="0.75" height="1.5" /></bezel>
+		<bezel name="digit6" element="digit"><bounds x="66" y="0" width="10" height="15" /></bezel>
+		<bezel name="6.14" element="lamp_dp"><bounds x="64.5" y="11" width="1.5" height="1.5" /></bezel>
+		<bezel name="6.15" element="lamp_ct"><bounds x="65.2" y="13.5" width="0.75" height="1.5" /></bezel>
 
-		<bezel name="digit1" element="digit"><bounds x="77" y="0" width="10" height="15" /></bezel>
-		<bezel name="1.14" element="lamp_dp"><bounds x="75.5" y="11" width="1.5" height="1.5" /></bezel>
-		<bezel name="1.15" element="lamp_ct"><bounds x="76.2" y="13.5" width="0.75" height="1.5" /></bezel>
+		<bezel name="digit7" element="digit"><bounds x="77" y="0" width="10" height="15" /></bezel>
+		<bezel name="7.14" element="lamp_dp"><bounds x="75.5" y="11" width="1.5" height="1.5" /></bezel>
+		<bezel name="7.15" element="lamp_ct"><bounds x="76.2" y="13.5" width="0.75" height="1.5" /></bezel>
 
-		<bezel name="digit0" element="digit"><bounds x="88" y="0" width="10" height="15" /></bezel>
-		<bezel name="0.14" element="lamp_dp"><bounds x="86.5" y="11" width="1.5" height="1.5" /></bezel>
-		<bezel name="0.15" element="lamp_ct"><bounds x="87.2" y="13.5" width="0.75" height="1.5" /></bezel>
+		<bezel name="digit8" element="digit"><bounds x="88" y="0" width="10" height="15" /></bezel>
+		<bezel name="8.14" element="lamp_dp"><bounds x="86.5" y="11" width="1.5" height="1.5" /></bezel>
+		<bezel name="8.15" element="lamp_ct"><bounds x="87.2" y="13.5" width="0.75" height="1.5" /></bezel>
 
 	</view>
 </mamelayout>

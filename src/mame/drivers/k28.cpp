@@ -16,7 +16,6 @@
 
   TODO:
   - external module support (no dumps yet)
-  - make MM5445N a device
 
 ***************************************************************************/
 
@@ -25,6 +24,7 @@
 #include "machine/timer.h"
 #include "machine/tms6100.h"
 #include "sound/votrax.h"
+#include "video/mm5445.h"
 #include "speaker.h"
 
 #include "k28.lh"
@@ -38,6 +38,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_tms6100(*this, "tms6100"),
 		m_speech(*this, "speech"),
+		m_vfd(*this, "vfd"),
 		m_onbutton_timer(*this, "on_button"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_out_x(*this, "%u.%u", 0U, 0U),
@@ -57,6 +58,7 @@ private:
 	required_device<i8021_device> m_maincpu;
 	required_device<tms6100_device> m_tms6100;
 	required_device<votrax_sc01_device> m_speech;
+	required_device<mm5445_device> m_vfd;
 	required_device<timer_device> m_onbutton_timer;
 	required_ioport_array<7> m_inp_matrix;
 	output_finder<0x20, 0x20> m_out_x;
@@ -89,11 +91,11 @@ private:
 	u64 m_vfd_shiftreg_out;
 	int m_vfd_shiftcount;
 
+	DECLARE_WRITE64_MEMBER(vfd_output_w);
 	DECLARE_WRITE8_MEMBER(mcu_p0_w);
 	DECLARE_READ8_MEMBER(mcu_p1_r);
 	DECLARE_READ8_MEMBER(mcu_p2_r);
 	DECLARE_WRITE8_MEMBER(mcu_p2_w);
-	DECLARE_WRITE_LINE_MEMBER(mcu_prog_w);
 
 	void power_off();
 
@@ -252,9 +254,25 @@ void k28_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool upda
 
 /***************************************************************************
 
-  I/O, Address Map(s)
+  I/O
 
 ***************************************************************************/
+
+WRITE64_MEMBER(k28_state::vfd_output_w)
+{
+	// O1-O16: digit segment data
+	// O17-O25: digit select
+	u16 seg_data = bitswap<16>(data,15,14,2,6,5,3,1,7,12,11,10,13,0,4,9,8);
+	u16 digit_sel = data >> 16 & 0x1ff;
+
+	set_display_segmask(0x1ff, 0x3fff);
+	display_matrix(16, 9, seg_data, digit_sel);
+
+	// O26: power-off request on falling edge
+	if (~data & m_vfd_shiftreg_out & 0x2000000)
+		power_off();
+	m_vfd_shiftreg_out = data;
+}
 
 WRITE8_MEMBER(k28_state::mcu_p0_w)
 {
@@ -270,9 +288,7 @@ WRITE8_MEMBER(k28_state::mcu_p0_w)
 	m_speech_strobe = strobe;
 
 	// d5: VFD driver data enable
-	m_vfd_data_enable = ~data >> 5 & 1;
-	if (m_vfd_data_enable)
-		m_vfd_shiftreg = (m_vfd_shiftreg & ~u64(1)) | m_vfd_data_in;
+	m_vfd->enable_w(data >> 5 & 1);
 
 	// d4: VSM chip enable
 	// d6: VSM M0
@@ -311,54 +327,12 @@ READ8_MEMBER(k28_state::mcu_p2_r)
 WRITE8_MEMBER(k28_state::mcu_p2_w)
 {
 	// d0: VFD driver serial data
-	m_vfd_data_in = data & 1;
-	if (m_vfd_data_enable)
-		m_vfd_shiftreg = (m_vfd_shiftreg & ~u64(1)) | m_vfd_data_in;
+	m_vfd->data_w(data & 1);
 
 	// d0-d3: VSM data, input mux and SC-01 phoneme lower nibble
 	m_tms6100->add_w(space, 0, data);
 	m_inp_mux = (m_inp_mux & ~0xf) | (~data & 0xf);
 	m_phoneme = (m_phoneme & ~0xf) | (data & 0xf);
-}
-
-WRITE_LINE_MEMBER(k28_state::mcu_prog_w)
-{
-	// 8021 PROG: clock VFD driver
-	bool rise = state == 1 && !m_vfd_clock;
-	m_vfd_clock = state;
-
-	// on rising edge
-	if (rise)
-	{
-		// leading 1 triggers shift start
-		if (m_vfd_shiftcount == 0 && ~m_vfd_shiftreg & 1)
-			return;
-
-		// output shiftreg on 35th clock
-		if (m_vfd_shiftcount == 35)
-		{
-			m_vfd_shiftcount = 0;
-
-			// output 0-15: digit segment data
-			u16 seg_data = (u16)(m_vfd_shiftreg >> 19);
-			seg_data = bitswap<16>(seg_data,0,1,13,9,10,12,14,8,3,4,5,2,15,11,6,7);
-
-			// output 16-24: digit select
-			u16 digit_sel = (u16)(m_vfd_shiftreg >> 10) & 0x1ff;
-			set_display_segmask(0x1ff, 0x3fff);
-			display_matrix(16, 9, seg_data, digit_sel);
-
-			// output 25: power-off request on falling edge
-			if (~m_vfd_shiftreg & m_vfd_shiftreg_out & 0x200)
-				power_off();
-			m_vfd_shiftreg_out = m_vfd_shiftreg;
-		}
-		else
-		{
-			m_vfd_shiftreg <<= 1;
-			m_vfd_shiftcount++;
-		}
-	}
 }
 
 
@@ -457,14 +431,18 @@ void k28_state::k28(machine_config &config)
 	m_maincpu->p1_in_cb().set(FUNC(k28_state::mcu_p1_r));
 	m_maincpu->p2_in_cb().set(FUNC(k28_state::mcu_p2_r));
 	m_maincpu->p2_out_cb().set(FUNC(k28_state::mcu_p2_w));
-	m_maincpu->prog_out_cb().set(FUNC(k28_state::mcu_prog_w));
-	m_maincpu->t1_in_cb().set("speech", FUNC(votrax_sc01_device::request)); // SC-01 A/R pin
+	m_maincpu->prog_out_cb().set("vfd", FUNC(mm5445_device::clock_w));
+	m_maincpu->t1_in_cb().set("speech", FUNC(votrax_sc01_device::request));
 
-	TMS6100(config, m_tms6100, 3.579545_MHz_XTAL); // CLK tied to 8021 ALE pin
+	TMS6100(config, m_tms6100, 3.579545_MHz_XTAL / 15); // CLK tied to 8021 ALE pin
 
 	TIMER(config, "on_button").configure_generic(timer_device::expired_delegate());
-	TIMER(config, "display_decay").configure_periodic(FUNC(k28_state::display_decay_tick), attotime::from_msec(1));
+
+	/* video hardware */
+	MM5445(config, m_vfd).output_cb().set(FUNC(k28_state::vfd_output_w));
 	config.set_default_layout(layout_k28);
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(k28_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

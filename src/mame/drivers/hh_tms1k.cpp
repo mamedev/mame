@@ -5931,9 +5931,9 @@ WRITE16_MEMBER(horseran_state::write_r)
 	// R0: HLCD0569 clock
 	// R1: HLCD0569 data in
 	// R2: HLCD0569 _CS
-	m_lcd->write_cs(data >> 2 & 1);
-	m_lcd->write_data(data >> 1 & 1);
-	m_lcd->write_clock(data & 1);
+	m_lcd->cs_w(data >> 2 & 1);
+	m_lcd->data_w(data >> 1 & 1);
+	m_lcd->clock_w(data & 1);
 
 	// R3-R10: input mux
 	m_inp_mux = data >> 3 & 0xff;
