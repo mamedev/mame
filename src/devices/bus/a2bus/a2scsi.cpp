@@ -154,7 +154,7 @@ uint8_t a2bus_scsi_device::read_c0nx(uint8_t offset)
 		case 6:
 		case 7:
 //          logerror("Read 5380 @ %x\n", offset);
-			return m_ncr5380->read(machine().dummy_space(), offset);
+			return m_ncr5380->read(offset);
 
 		case 8:     // read and DACK
 			return m_ncr5380->dma_r();
@@ -194,7 +194,7 @@ void a2bus_scsi_device::write_c0nx(uint8_t offset, uint8_t data)
 		case 6:
 		case 7:
 //          logerror("%02x to 5380 reg %x\n", data, offset);
-			m_ncr5380->write(machine().dummy_space(), offset, data);
+			m_ncr5380->write(offset, data);
 			break;
 
 		case 8: // write and DACK

@@ -34,7 +34,7 @@ void ncr5385_device::device_reset()
 	m_diag_status_reg = DIAG_COMPLETE;
 }
 
-WRITE8_MEMBER(ncr5385_device::write)
+void ncr5385_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -96,7 +96,7 @@ WRITE8_MEMBER(ncr5385_device::write)
 	}
 }
 
-READ8_MEMBER(ncr5385_device::read)
+uint8_t ncr5385_device::read(offs_t offset)
 {
 	switch (offset)
 	{
