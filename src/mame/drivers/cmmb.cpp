@@ -146,12 +146,12 @@ WRITE8_MEMBER(cmmb_state::cmmb_charram_w)
 
 READ8_MEMBER(cmmb_state::flash_r)
 {
-	return m_flash->read(space, offset + 0x2000);
+	return m_flash->read(offset + 0x2000);
 }
 
 WRITE8_MEMBER(cmmb_state::flash_w)
 {
-	m_flash->write(space, offset + 0x2000, data);
+	m_flash->write(offset + 0x2000, data);
 }
 
 READ8_MEMBER(cmmb_state::cmmb_input_r)

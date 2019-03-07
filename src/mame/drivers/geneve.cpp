@@ -230,11 +230,11 @@ public:
 
 private:
 	// CRU (Communication Register Unit) handling
-	DECLARE_READ8_MEMBER(cruread);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	uint8_t cruread(offs_t offset);
+	void cruwrite(offs_t offset, uint8_t data);
 
 	// Connections with the system interface TMS9901
-	DECLARE_READ8_MEMBER(read_by_9901);
+	uint8_t read_by_9901(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(peripheral_bus_reset);
 	DECLARE_WRITE_LINE_MEMBER(VDP_reset);
 	DECLARE_WRITE_LINE_MEMBER(joystick_select);
@@ -244,9 +244,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(clock_out);
 	DECLARE_WRITE_LINE_MEMBER(dbin_line);
 
-	DECLARE_WRITE8_MEMBER(external_operation);
+	void external_operation(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
+	void tms9901_interrupt(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( keyboard_interrupt );
 
@@ -357,7 +357,7 @@ INPUT_PORTS_END
 #define CRU_CONTROL_BASE 0x1ee0
 #define CRU_SSTEP_BASE 0x13c0
 
-WRITE8_MEMBER ( geneve_state::cruwrite )
+void geneve_state::cruwrite(offs_t offset, uint8_t data)
 {
 	int addroff = offset << 1;
 
@@ -424,11 +424,11 @@ WRITE8_MEMBER ( geneve_state::cruwrite )
 	}
 	else
 	{
-		m_peribox->cruwrite(space, addroff, data);
+		m_peribox->cruwrite(addroff, data);
 	}
 }
 
-READ8_MEMBER( geneve_state::cruread )
+uint8_t geneve_state::cruread(offs_t offset)
 {
 	uint8_t value = 0;
 	uint16_t addroff = offset << 1;
@@ -446,7 +446,7 @@ READ8_MEMBER( geneve_state::cruread )
 	// so we just don't arrive here
 
 	// Propagate the CRU access to external devices
-	m_peribox->crureadz(space, addroff, &value);
+	m_peribox->crureadz(addroff, &value);
 	return value;
 }
 
@@ -454,7 +454,7 @@ READ8_MEMBER( geneve_state::cruread )
     CRU callbacks
 ***********************************************************************/
 
-READ8_MEMBER( geneve_state::read_by_9901 )
+uint8_t geneve_state::read_by_9901(offs_t offset)
 {
 	int answer = 0;
 
@@ -562,7 +562,7 @@ WRITE_LINE_MEMBER( geneve_state::video_wait_states )
     but again it is ignored. Anyway, the TMS9995 has only two external inputs
     (INT1 and INT4).
 */
-WRITE8_MEMBER( geneve_state::tms9901_interrupt )
+void geneve_state::tms9901_interrupt(offs_t offset, uint8_t data)
 {
 	/* INTREQ is connected to INT1. */
 	m_cpu->set_input_line(INT_9995_INT1, data);
@@ -632,7 +632,7 @@ WRITE_LINE_MEMBER( geneve_state::keyboard_interrupt )
 	m_tms9901->set_single_int(8, state);
 }
 
-WRITE8_MEMBER( geneve_state::external_operation )
+void geneve_state::external_operation(offs_t offset, uint8_t data)
 {
 	static char const *const extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (offset != IDLE_OP)

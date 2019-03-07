@@ -123,7 +123,7 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::crureadz)
 /*
     CRU write
 */
-WRITE8_MEMBER(nouspikel_usb_smartmedia_device::cruwrite)
+void nouspikel_usb_smartmedia_device::cruwrite(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -211,7 +211,7 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
 				{
 					// FEEPROM
 					if (!m_write_flash)
-						m_input_latch = m_flash->read16(space, (offset>>1)&0xffff);
+						m_input_latch = m_flash->read16((offset>>1)&0xffff);
 				}
 			}
 			else
@@ -239,7 +239,7 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
 /*
     Memory write. The controller is 16 bit, so we need to demultiplex again.
 */
-WRITE8_MEMBER(nouspikel_usb_smartmedia_device::write)
+void nouspikel_usb_smartmedia_device::write(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled()) return;
 
@@ -279,7 +279,7 @@ WRITE8_MEMBER(nouspikel_usb_smartmedia_device::write)
 				else
 				{   // FEEPROM
 					if (m_write_flash)
-						m_flash->write16(space, (offset>>1)&0xffff, m_output_latch);
+						m_flash->write16((offset>>1)&0xffff, m_output_latch);
 				}
 			}
 			else

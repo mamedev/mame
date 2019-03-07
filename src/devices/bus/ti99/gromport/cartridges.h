@@ -66,9 +66,9 @@ public:
 	ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	void write(offs_t offset, uint8_t data);
 	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	void cruwrite(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
 	DECLARE_WRITE_LINE_MEMBER(romgq_line);
@@ -213,9 +213,9 @@ public:
 
 protected:
 	virtual DECLARE_READ8Z_MEMBER(readz);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual void write(offs_t offset, uint8_t data);
 	virtual DECLARE_READ8Z_MEMBER(crureadz);
-	virtual DECLARE_WRITE8_MEMBER(cruwrite);
+	virtual void cruwrite(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(romgq_line);
 	virtual void set_gromlines(line_state mline, line_state moline, line_state gsq);
@@ -263,7 +263,7 @@ class ti99_paged12k_cartridge : public ti99_cartridge_pcb
 {
 public:
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 };
 
 /*********** Paged cartridge (others) ********************/
@@ -272,7 +272,7 @@ class ti99_paged16k_cartridge : public ti99_cartridge_pcb
 {
 public:
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 };
 
 /*********** Paged7 cartridge (late carts) ********************/
@@ -281,7 +281,7 @@ class ti99_paged7_cartridge : public ti99_cartridge_pcb
 {
 public:
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 };
 
 /********************** Mini Memory ***********************************/
@@ -290,7 +290,7 @@ class ti99_minimem_cartridge : public ti99_cartridge_pcb
 {
 public:
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 };
 
 /********************* Super Space II *********************************/
@@ -299,9 +299,9 @@ class ti99_super_cartridge : public ti99_cartridge_pcb
 {
 public:
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	void cruwrite(offs_t offset, uint8_t data) override;
 };
 
 /************************* MBX  ***************************************/
@@ -310,7 +310,7 @@ class ti99_mbx_cartridge : public ti99_cartridge_pcb
 {
 public:
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 };
 
 /********************** Paged 379i ************************************/
@@ -319,7 +319,7 @@ class ti99_paged379i_cartridge : public ti99_cartridge_pcb
 {
 public:
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 private:
 	int     get_paged379i_bank(int rompage);
 };
@@ -330,7 +330,7 @@ class ti99_paged378_cartridge : public ti99_cartridge_pcb
 {
 public:
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 };
 
 /********************** Paged 377 ************************************/
@@ -339,7 +339,7 @@ class ti99_paged377_cartridge : public ti99_cartridge_pcb
 {
 public:
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 };
 
 /********************** Paged CRU  ************************************/
@@ -348,9 +348,9 @@ class ti99_pagedcru_cartridge : public ti99_cartridge_pcb
 {
 public:
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	void cruwrite(offs_t offset, uint8_t data) override;
 };
 
 /********************** GROM emulation cartridge  ************************************/
@@ -361,9 +361,9 @@ public:
 	ti99_gromemu_cartridge(): m_waddr_LSB(false), m_grom_selected(false), m_grom_read_mode(false), m_grom_address_mode(false)
 	{  m_grom_address = 0; }
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 	DECLARE_READ8Z_MEMBER(gromemureadz);
-	DECLARE_WRITE8_MEMBER(gromemuwrite);
+	void gromemuwrite(offs_t offset, uint8_t data);
 	void set_gromlines(line_state mline, line_state moline, line_state gsq) override;
 
 private:

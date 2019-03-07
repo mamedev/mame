@@ -456,7 +456,7 @@ void io992_device::device_start()
 	m_set_rom_bank.resolve();
 }
 
-READ8_MEMBER(io992_device::cruread)
+uint8_t io992_device::cruread(offs_t offset)
 {
 	int address = offset << 1;
 	uint8_t value = 0x7f;  // All Hexbus lines high
@@ -497,7 +497,7 @@ READ8_MEMBER(io992_device::cruread)
 	return BIT(value, offset & 7);
 }
 
-WRITE8_MEMBER(io992_device::cruwrite)
+void io992_device::cruwrite(offs_t offset, uint8_t data)
 {
 	int address = (offset << 1) & 0xf80e;
 

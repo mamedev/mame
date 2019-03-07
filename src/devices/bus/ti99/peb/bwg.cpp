@@ -228,7 +228,7 @@ READ8Z_MEMBER(snug_bwg_device::readz)
 				if (m_RTCsel)
 				{
 					// .... ..11 111x xxx0
-					*value = m_clock->read(space, (m_address & 0x001e) >> 1);
+					*value = m_clock->read((m_address & 0x001e) >> 1);
 					LOGMASKED(LOG_RW, "read RTC: %04x -> %02x\n", m_address & 0xffff, *value);
 				}
 				else
@@ -275,7 +275,7 @@ READ8Z_MEMBER(snug_bwg_device::readz)
     5c00 - 5fdf: RAM
     5fe0 - 5fff: Clock (even addr)
 */
-WRITE8_MEMBER(snug_bwg_device::write)
+void snug_bwg_device::write(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled())
 	{
@@ -293,7 +293,7 @@ WRITE8_MEMBER(snug_bwg_device::write)
 				{
 					// .... ..11 111x xxx0
 					LOGMASKED(LOG_RW, "write RTC: %04x <- %02x\n", m_address & 0xffff, data);
-					m_clock->write(space, (m_address & 0x001e) >> 1, data);
+					m_clock->write((m_address & 0x001e) >> 1, data);
 				}
 				else
 				{
@@ -363,7 +363,7 @@ READ8Z_MEMBER(snug_bwg_device::crureadz)
 	}
 }
 
-WRITE8_MEMBER(snug_bwg_device::cruwrite)
+void snug_bwg_device::cruwrite(offs_t offset, uint8_t data)
 {
 //  int drive, drivebit;
 
