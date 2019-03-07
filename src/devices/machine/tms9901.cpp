@@ -279,9 +279,9 @@ READ8_MEMBER( tms9901_device::read )
 {
 	int answer = 0;
 
-	offset &= 0x003;
+	offset &= 0x01f;
 
-	switch (offset)
+	switch (offset >> 3)
 	{
 	case 0:
 		if (m_clock_mode)
@@ -356,7 +356,7 @@ READ8_MEMBER( tms9901_device::read )
 		break;
 	}
 
-	return answer;
+	return BIT(answer, offset & 7);
 }
 
 /*

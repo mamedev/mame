@@ -826,15 +826,11 @@ READ8Z_MEMBER(ti99_super_cartridge::crureadz)
 	//         SRL   R0,1        Restore Bank Number (optional)
 	//         RT
 
-	// Our implementation in MESS always gets 8 bits in one go. Also, the address
-	// is twice the bit number. That is, the offset value is always a multiple
-	// of 0x10.
-
 	if ((offset & 0xfff0) == 0x0800)
 	{
 		LOGMASKED(LOG_CRU, "CRU accessed at %04x\n", offset);
 		uint8_t val = 0x02 << (m_ram_page << 1);
-		*value = (val >> ((offset - 0x0800)>>1)) & 0xff;
+		*value = BIT(val, (offset & 0x000e) >> 1);
 	}
 }
 
@@ -1231,7 +1227,7 @@ READ8Z_MEMBER(ti99_pagedcru_cartridge::crureadz)
 		{
 			page = page-(bit/2);  // 4 page flags per 8 bits
 		}
-		*value = 1 << (page*2+1);
+		*value = (offset & 0x000e) == (page * 4 + 2) ? 1 : 0;
 	}
 }
 

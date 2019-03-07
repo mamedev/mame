@@ -978,19 +978,20 @@ INTERRUPT_GEN_MEMBER(gei_state::vblank_irq)
 }
 
 
-MACHINE_CONFIG_START(gei_state::getrivia)
-	MCFG_DEVICE_ADD("maincpu",Z80,4000000) /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(getrivia_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gei_state, vblank_irq)
+void gei_state::getrivia(machine_config &config)
+{
+	Z80(config, m_maincpu, 4000000); /* 4 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::getrivia_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gei_state::vblank_irq));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(gei_state, screen_update)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(48, 511-48, 16, 255-16)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_screen_update(FUNC(gei_state::screen_update));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(48, 511-48, 16, 255-16);
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::GBR_3BIT);
 
@@ -1013,92 +1014,92 @@ MACHINE_CONFIG_START(gei_state::getrivia)
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(gei_state::findout)
+void gei_state::findout(machine_config &config)
+{
 	getrivia(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(findout_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::findout_map);
 
 	m_ppi[1]->in_pc_callback().set(FUNC(gei_state::portC_r));
 	m_ppi[1]->out_pc_callback().set_nop();
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(gei_state::quizvid)
+void gei_state::quizvid(machine_config &config)
+{
 	findout(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(quizvid_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::quizvid_map);
 
 	PALETTE(config.replace(), "palette", palette_device::GRB_3BIT);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(gei_state::gselect)
+void gei_state::gselect(machine_config &config)
+{
 	getrivia(config);
 
 	/* basic machine hardware */
 
 	config.device_remove("ticket");
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(gselect_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::gselect_map);
 
 	m_ppi[0]->out_pc_callback().set(FUNC(gei_state::sound2_w));
 
 	m_ppi[1]->in_pc_callback().set_ioport("IN2");
 	m_ppi[1]->out_pc_callback().set(FUNC(gei_state::nmi_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(gei_state::jokpokera)
+void gei_state::jokpokera(machine_config &config)
+{
 	getrivia(config);
 
 	/* basic machine hardware */
 
 	config.device_remove("ticket");
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(gselect_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::gselect_map);
+}
 
-MACHINE_CONFIG_START(gei_state::amuse)
+void gei_state::amuse(machine_config &config)
+{
 	getrivia(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(amuse_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::amuse_map);
+}
 
-MACHINE_CONFIG_START(gei_state::gepoker)
+void gei_state::gepoker(machine_config &config)
+{
 	getrivia(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(gepoker_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::gepoker_map);
+}
 
-MACHINE_CONFIG_START(gei_state::amuse1)
+void gei_state::amuse1(machine_config &config)
+{
 	getrivia(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(amuse1_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::amuse1_map);
+}
 
-MACHINE_CONFIG_START(gei_state::suprpokr)
+void gei_state::suprpokr(machine_config &config)
+{
 	getrivia(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(suprpokr_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::suprpokr_map);
+}
 
-MACHINE_CONFIG_START(gei_state::sprtauth)
+void gei_state::sprtauth(machine_config &config)
+{
 	getrivia(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sprtauth_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::sprtauth_map);
+}
 
 
 /***************************************************

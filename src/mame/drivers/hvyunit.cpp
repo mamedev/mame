@@ -618,22 +618,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::scanline)
  *
  *************************************/
 
-MACHINE_CONFIG_START(hvyunit_state::hvyunit)
-
-	MCFG_DEVICE_ADD("master", Z80, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(master_memory)
-	MCFG_DEVICE_IO_MAP(master_io)
+void hvyunit_state::hvyunit(machine_config &config)
+{
+	Z80(config, m_mastercpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
+	m_mastercpu->set_addrmap(AS_PROGRAM, &hvyunit_state::master_memory);
+	m_mastercpu->set_addrmap(AS_IO, &hvyunit_state::master_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(hvyunit_state::scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("slave", Z80, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(slave_memory)
-	MCFG_DEVICE_IO_MAP(slave_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", hvyunit_state,  irq0_line_hold)
+	Z80(config, m_slavecpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
+	m_slavecpu->set_addrmap(AS_PROGRAM, &hvyunit_state::slave_memory);
+	m_slavecpu->set_addrmap(AS_IO, &hvyunit_state::slave_io);
+	m_slavecpu->set_vblank_int("screen", FUNC(hvyunit_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(sound_memory)
-	MCFG_DEVICE_IO_MAP(sound_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", hvyunit_state,  irq0_line_hold)
+	Z80(config, m_soundcpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &hvyunit_state::sound_memory);
+	m_soundcpu->set_addrmap(AS_IO, &hvyunit_state::sound_io);
+	m_soundcpu->set_vblank_int("screen", FUNC(hvyunit_state::irq0_line_hold));
 
 	I80C51(config, m_mermaid, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
 	m_mermaid->port_in_cb<0>().set(FUNC(hvyunit_state::mermaid_p0_r));
@@ -652,14 +652,14 @@ MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hvyunit_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hvyunit_state, screen_vblank))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 240-1);
+	screen.set_screen_update(FUNC(hvyunit_state::screen_update));
+	screen.screen_vblank().set(FUNC(hvyunit_state::screen_vblank));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hvyunit);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
@@ -673,9 +673,8 @@ MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/4) /* 3MHz verified on PCB */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	YM2203(config, "ymsnd", XTAL(12'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.80); /* 3MHz verified on PCB */
+}
 
 
 

@@ -101,19 +101,19 @@ void hotstuff_state::hotstuff_map(address_map &map)
 static INPUT_PORTS_START( hotstuff )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(hotstuff_state::hotstuff)
+void hotstuff_state::hotstuff(machine_config &config)
+{
+	M68000(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hotstuff_state::hotstuff_map);
 
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(hotstuff_map)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(128*8, 64*8);
+	screen.set_visarea((0x10*4)+8, 101*8-1, 0*8, 33*8-1);
+	screen.set_screen_update(FUNC(hotstuff_state::screen_update_hotstuff));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(128*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA((0x10*4)+8, 101*8-1, 0*8, 33*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hotstuff_state, screen_update_hotstuff)
-
-	MCFG_PALETTE_ADD("palette", 0x200)
+	PALETTE(config, "palette").set_entries(0x200);
 
 	scc8530_device& scc1(SCC8530N(config, "scc1", 4915200));
 	scc1.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_4);
@@ -123,7 +123,7 @@ MACHINE_CONFIG_START(hotstuff_state::hotstuff)
 
 	MC146818(config, m_rtc, XTAL(32'768));
 	m_rtc->irq().set_inputline("maincpu", M68K_IRQ_1);
-MACHINE_CONFIG_END
+}
 
 
 

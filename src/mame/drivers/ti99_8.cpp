@@ -327,11 +327,8 @@ void ti99_8_state::memmap_setoffset(address_map &map)
 
 void ti99_8_state::crumap(address_map &map)
 {
-	map(0x0000, 0x02ff).r(FUNC(ti99_8_state::cruread));
-	map(0x0000, 0x0003).r(m_tms9901, FUNC(tms9901_device::read));
-
-	map(0x0000, 0x17ff).w(FUNC(ti99_8_state::cruwrite));
-	map(0x0000, 0x001f).w(m_tms9901, FUNC(tms9901_device::write));
+	map(0x0000, 0x2fff).rw(FUNC(ti99_8_state::cruread), FUNC(ti99_8_state::cruwrite));
+	map(0x0000, 0x003f).rw(m_tms9901, FUNC(tms9901_device::read), FUNC(tms9901_device::write));
 }
 
 /* ti99/8 : 54-key keyboard */
@@ -439,17 +436,16 @@ INPUT_PORTS_END
 
 READ8_MEMBER( ti99_8_state::cruread )
 {
-	LOGMASKED(LOG_CRUREAD, "read access to CRU address %04x\n", offset << 4);
+	LOGMASKED(LOG_CRUREAD, "read access to CRU address %04x\n", offset);
 	uint8_t value = 0;
 
 	// Let the mapper, the gromport, and the p-box decide whether they want
 	// to change the value at the CRU address
-	// Also, we translate the bit addresses to base addresses
-	m_mainboard->crureadz(space, offset<<4, &value);
-	m_gromport->crureadz(space, offset<<4, &value);
-	m_ioport->crureadz(space, offset<<4, &value);
+	m_mainboard->crureadz(space, offset<<1, &value);
+	m_gromport->crureadz(space, offset<<1, &value);
+	m_ioport->crureadz(space, offset<<1, &value);
 
-	LOGMASKED(LOG_CRU, "CRU %04x -> %02x\n", offset<<4, value);
+	LOGMASKED(LOG_CRU, "CRU %04x -> %x\n", offset<<1, value);
 	return value;
 }
 

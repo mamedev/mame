@@ -426,7 +426,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
-	optional_device<discrete_device> m_discrete;
+	optional_device<discrete_sound_device> m_discrete;
 
 	optional_ioport m_fake_select;
 	optional_ioport_array<10> m_tenspot_game_dsw;

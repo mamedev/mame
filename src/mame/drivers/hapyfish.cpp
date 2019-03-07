@@ -241,19 +241,19 @@ void hapyfish_state::init_mini2440()
 	// do nothing
 }
 
-MACHINE_CONFIG_START(hapyfish_state::hapyfish)
-	MCFG_DEVICE_ADD("maincpu", ARM920T, 100000000)
-	MCFG_DEVICE_PROGRAM_MAP(hapyfish_map)
+void hapyfish_state::hapyfish(machine_config &config)
+{
+	ARM920T(config, m_maincpu, 100000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hapyfish_state::hapyfish_map);
 
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, "palette").set_entries(32768);
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1024, 768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-
-	MCFG_SCREEN_UPDATE_DEVICE("s3c2440", s3c2440_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(1024, 768);
+	screen.set_visarea(0, 639, 0, 479);
+	screen.set_screen_update("s3c2440", FUNC(s3c2440_device::screen_update));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -283,7 +283,7 @@ MACHINE_CONFIG_START(hapyfish_state::hapyfish)
 	NAND(config, m_nand2, 0);
 	m_nand2->set_nand_type(nand_device::chip::K9LAG08U0M);
 	m_nand2->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( hapyfish )
 INPUT_PORTS_END

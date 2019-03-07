@@ -185,7 +185,7 @@ void detail::queue_t::on_post_load(plib::state_manager_t &manager)
 // ----------------------------------------------------------------------------------------
 
 detail::netlist_ref::netlist_ref(netlist_state_t &nl)
-: m_netlist(nl.setup().exec()) { }
+: m_netlist(nl.exec()) { }
 
 // ----------------------------------------------------------------------------------------
 // object_t
@@ -237,9 +237,7 @@ detail::terminal_type detail::core_terminal_t::type() const
 // ----------------------------------------------------------------------------------------
 
 netlist_t::netlist_t(const pstring &aname, plib::unique_ptr<callbacks_t> callbacks)
-	: m_state(plib::make_unique<netlist_state_t>(aname,
-		std::move(callbacks),
-		plib::make_unique<setup_t>(*this))) // FIXME, ugly but needed to have netlist_state_t constructed first
+	: m_state(plib::make_unique<netlist_state_t>(aname, *this, std::move(callbacks)))
 	, m_solver(nullptr)
 	, m_time(netlist_time::zero())
 	, m_mainclock(nullptr)
@@ -256,13 +254,14 @@ netlist_t::netlist_t(const pstring &aname, plib::unique_ptr<callbacks_t> callbac
 // ----------------------------------------------------------------------------------------
 
 netlist_state_t::netlist_state_t(const pstring &aname,
-	plib::unique_ptr<callbacks_t> &&callbacks,
-	plib::unique_ptr<setup_t> &&setup)
+	netlist_t & anetlist,
+	plib::unique_ptr<callbacks_t> &&callbacks)
 : m_name(aname)
+, m_netlist(anetlist)
 , m_state()
 , m_callbacks(std::move(callbacks)) // Order is important here
 , m_log(*m_callbacks)
-, m_setup(std::move(setup))
+, m_setup(plib::make_unique<setup_t>(*this))
 {
 	pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
 	m_lib = plib::make_unique<plib::dynlib>(libpath);

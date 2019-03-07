@@ -71,9 +71,7 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::crureadz)
 	uint8_t reply = 0;
 	if ((offset & 0xff00)==m_cru_base)
 	{
-		int bit = (offset >> 4) & 7;
-
-		if (bit==0)
+		if ((offset & 0x0070) == 0)
 		{
 			reply = m_cru_register & 0x30;
 			reply |= 8; /* IDE bus IORDY always set */
@@ -84,7 +82,7 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::crureadz)
 			if (!m_ata_irq)
 				reply |= 1;
 		}
-		*value = reply;
+		*value = BIT(reply, (offset >> 1) & 7);
 	}
 }
 

@@ -47,7 +47,7 @@ public:
 	u16 m_inp_mux;                  // multiplexed inputs mask
 
 	u8 read_inputs(int columns);
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
@@ -292,7 +292,7 @@ static INPUT_PORTS_START( cfrogger )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x08, "2" )
 
-	PORT_START("IN.3") // fake
+	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, nullptr)
 INPUT_PORTS_END
 
@@ -416,7 +416,7 @@ static INPUT_PORTS_START( gjungler )
 	PORT_CONFSETTING(    0x00, "A" )
 	PORT_CONFSETTING(    0x08, "B" )
 
-	PORT_START("IN.3") // fake
+	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, nullptr)
 INPUT_PORTS_END
 

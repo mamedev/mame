@@ -323,8 +323,9 @@ READ8Z_MEMBER(snug_enhanced_video_device::crureadz)
 	{
 		if ((offset & 0x00f0)==0) // offset 0 delivers bits 0-7 (address 00-0f)
 		{
-			*value = ~(ioport("EVPC-SW1")->read() | (ioport("EVPC-SW3")->read()<<2)
+			uint8_t p = ~(ioport("EVPC-SW1")->read() | (ioport("EVPC-SW3")->read()<<2)
 				| (ioport("EVPC-SW4")->read()<<3) | (ioport("EVPC-SW8")->read()<<7));
+			*value = BIT(p, (offset >> 1) & 7);
 		}
 	}
 }

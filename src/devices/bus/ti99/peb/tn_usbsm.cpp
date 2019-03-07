@@ -93,9 +93,8 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::crureadz)
 	if ((offset & 0xff00)==m_cru_base)
 	{
 		uint8_t reply = 0;
-		offset &= 3;
 
-		if (offset == 0)
+		if ((offset & 0x0030) == 0)
 		{
 			// bit
 			// 0   >1x00   0: USB Host controller requests interrupt.
@@ -117,7 +116,7 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::crureadz)
 			else if (!m_smartmedia->is_protected())
 				reply |= 0x80;
 		}
-		*value = reply;
+		*value = BIT(reply, (offset >> 1) & 7);
 	}
 }
 

@@ -249,8 +249,9 @@ private:
 static INPUT_PORTS_START( hp2100 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(hp2100_state::hp2100)
-MACHINE_CONFIG_END
+void hp2100_state::hp2100(machine_config &config)
+{
+}
 
 ROM_START( hp2100 )
 	ROM_REGION( 0x0400, "maincpu", 0 )
