@@ -92,15 +92,15 @@ void cortex_state::mem_map(address_map &map)
 	map(0xf100, 0xf11f).ram(); // memory mapping unit
 	map(0xf120, 0xf120).rw("crtc", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
 	map(0xf121, 0xf121).rw("crtc", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
-	//AM_RANGE(0xf140, 0xf147) // fdc tms9909
+	//map(0xf140, 0xf147) // fdc tms9909
 }
 
 void cortex_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x000f).mirror(0x30).w("control", FUNC(ls259_device::write_d0));
-	map(0x0000, 0x0007).r(FUNC(cortex_state::pio_r));
-	map(0x0008, 0x000f).r(FUNC(cortex_state::keyboard_r));
+	map(0x0000, 0x000f).r(FUNC(cortex_state::pio_r));
+	map(0x0010, 0x001f).r(FUNC(cortex_state::keyboard_r));
 	//map(0x0080, 0x00bf).rw("uart1", FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite)); // RS232 (r12 = 80-bf)
 	//map(0x0180, 0x01bf).rw("uart2", FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite)); // Cassette (r12 = 180-1bf)
 	//map(0x01c0, 0x01ff).rw("dma", FUNC(tms9911_device::read), FUNC(tms9911_device::write)); // r12 = 1c0-1fe
