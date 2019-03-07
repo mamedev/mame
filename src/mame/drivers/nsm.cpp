@@ -74,7 +74,7 @@ void nsm_state::nsm_io_map(address_map &map)
 	map(0x0600, 0x061f).r(FUNC(nsm_state::ff_r)); // sum of analog outputs of ay2
 	//map(0x0700, 0x071f).nopr(); // serial data in
 	map(0x1ee0, 0x1efb).nopw();
-	map(0xfe40, 0xfff0).nopr();
+	map(0xfe40, 0xfff1).nopr();
 	map(0xff60, 0xff7f).w(FUNC(nsm_state::cru_w));
 	map(0xffa0, 0xffa3).w(FUNC(nsm_state::oe_w));
 }
