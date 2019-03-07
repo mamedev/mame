@@ -72,7 +72,7 @@ public:
 		m_led(*this, "led%u", 0U)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void intel02(machine_config &config);
 
 	// assume that reset button is tied to RESET pin
@@ -196,7 +196,7 @@ WRITE8_MEMBER(intel02_state::control_w)
 		if (BIT(data, i))
 			m_led_active |= 1 << i;
 
-		// on falling edge, delay it going off to prevent flicker
+		// they're strobed, so on falling edge, delay them going off to prevent flicker
 		else if (BIT(m_led_select, i))
 			m_led_delay[i]->adjust(attotime::from_msec(10), i);
 	}
@@ -261,7 +261,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void intel02_state::intel02(machine_config &config)
@@ -278,7 +278,7 @@ void intel02_state::intel02(machine_config &config)
 	m_ppi8255->tri_pb_callback().set_constant(0);
 	m_ppi8255->out_pc_callback().set(FUNC(intel02_state::control_w));
 
-	/* display hardware */
+	/* video hardware */
 	for (int i = 0; i < 6; i++)
 		TIMER(config, m_led_delay[i]).configure_generic(FUNC(intel02_state::led_delay_off));
 
