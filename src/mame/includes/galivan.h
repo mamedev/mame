@@ -21,9 +21,9 @@ class galivan_state : public driver_device
 public:
 	galivan_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu"),
 		m_nb1414m4(*this, "nb1414m4"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -38,6 +38,8 @@ public:
 
 protected:
 	void io_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
 
 private:
 	/* memory pointers */
@@ -84,7 +86,7 @@ private:
 	uint32_t screen_update_galivan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ninjemak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	required_device<cpu_device> m_maincpu;
+
 	optional_device<nb1414m4_device> m_nb1414m4;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

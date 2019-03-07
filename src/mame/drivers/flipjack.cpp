@@ -419,8 +419,8 @@ void flipjack_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(flipjack_state::flipjack)
-
+void flipjack_state::flipjack(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &flipjack_state::main_map);
@@ -462,7 +462,7 @@ MACHINE_CONFIG_START(flipjack_state::flipjack)
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	AY8910(config, "ay2", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( flipjack )

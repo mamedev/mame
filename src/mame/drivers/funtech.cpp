@@ -487,22 +487,22 @@ void fun_tech_corp_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(fun_tech_corp_state::funtech)
-
+void fun_tech_corp_state::funtech(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(funtech_map)
-	MCFG_DEVICE_IO_MAP(funtech_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fun_tech_corp_state, vblank_interrupt)
+	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &fun_tech_corp_state::funtech_map);
+	m_maincpu->set_addrmap(AS_IO, &fun_tech_corp_state::funtech_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fun_tech_corp_state::vblank_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 8, 256-8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fun_tech_corp_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 8, 256-8-1);
+	screen.set_screen_update(FUNC(fun_tech_corp_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_funtech);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 0x200);
@@ -515,7 +515,7 @@ MACHINE_CONFIG_START(fun_tech_corp_state::funtech)
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, "aysnd", 1500000).add_route(ALL_OUTPUTS, "mono", 1.00); /* M5255, ? MHz */
-MACHINE_CONFIG_END
+}
 
 
 

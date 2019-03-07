@@ -463,25 +463,25 @@ void caveman_state::video_io_map(address_map &map)
 
 }
 
-MACHINE_CONFIG_START(caveman_state::caveman)
+void caveman_state::caveman(machine_config &config)
+{
 	gts80a_ss(config);
-	MCFG_DEVICE_ADD("video_cpu", I8088, 5000000)
-	MCFG_DEVICE_PROGRAM_MAP(video_map)
-	MCFG_DEVICE_IO_MAP(video_io_map)
+	I8088(config, m_videocpu, 5000000);
+	m_videocpu->set_addrmap(AS_PROGRAM, &caveman_state::video_map);
+	m_videocpu->set_addrmap(AS_IO, &caveman_state::video_io_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 248-1)
-	MCFG_SCREEN_UPDATE_DRIVER(caveman_state, screen_update_caveman)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0, 248-1);
+	screen.set_screen_update(FUNC(caveman_state::screen_update_caveman));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, "palette").set_entries(16);
 
 	config.set_default_layout(layout_gts80a_caveman);
-
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( caveman )
 	PORT_INCLUDE(gts80a)

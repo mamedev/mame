@@ -2031,16 +2031,17 @@ static void fm7_floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(fm7_state::fm7)
+void fm7_state::fm7(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, 16.128_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(fm7_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
+	MC6809(config, m_maincpu, 16.128_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fm7_state::fm7_mem);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_irq_ack));
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_DEVICE_ADD("sub", MC6809, 16.128_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(fm7_sub_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
+	MC6809(config, m_sub, 16.128_MHz_XTAL / 2);
+	m_sub->set_addrmap(AS_PROGRAM, &fm7_state::fm7_sub_mem);
+	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_sub_irq_ack));
 	config.m_perfect_cpu_quantum = subtag("sub");
 
 	SPEAKER(config, "mono").front_center();
@@ -2051,9 +2052,9 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200) // H = 15.75 KHz, V = 60.1145 Hz
-	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200); // H = 15.75 KHz, V = 60.1145 Hz
+	m_screen->set_screen_update(FUNC(fm7_state::screen_update_fm7));
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
@@ -2082,18 +2083,19 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(fm7_state::fm8)
+void fm7_state::fm8(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, 4.9152_MHz_XTAL)  // 1.2MHz 68A09
-	MCFG_DEVICE_PROGRAM_MAP(fm8_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
+	MC6809(config, m_maincpu, 4.9152_MHz_XTAL);  // 1.2MHz 68A09
+	m_maincpu->set_addrmap(AS_PROGRAM, &fm7_state::fm8_mem);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_irq_ack));
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_DEVICE_ADD("sub", MC6809, 16.128_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(fm7_sub_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
+	MC6809(config, m_sub, 16.128_MHz_XTAL / 2);
+	m_sub->set_addrmap(AS_PROGRAM, &fm7_state::fm7_sub_mem);
+	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_sub_irq_ack));
 	config.m_perfect_cpu_quantum = subtag("sub");
 
 	SPEAKER(config, "mono").front_center();
@@ -2103,9 +2105,9 @@ MACHINE_CONFIG_START(fm7_state::fm8)
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200)
-	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200);
+	m_screen->set_screen_update(FUNC(fm7_state::screen_update_fm7));
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
@@ -2129,18 +2131,19 @@ MACHINE_CONFIG_START(fm7_state::fm8)
 
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(fm7_state::fm77av)
+void fm7_state::fm77av(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 16.128_MHz_XTAL / 8)
-	MCFG_DEVICE_PROGRAM_MAP(fm77av_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
+	MC6809E(config, m_maincpu, 16.128_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fm7_state::fm77av_mem);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_irq_ack));
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_DEVICE_ADD("sub", MC6809E, 16.128_MHz_XTAL / 8)
-	MCFG_DEVICE_PROGRAM_MAP(fm77av_sub_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
+	MC6809E(config, m_sub, 16.128_MHz_XTAL / 8);
+	m_sub->set_addrmap(AS_PROGRAM, &fm7_state::fm77av_sub_mem);
+	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_sub_irq_ack));
 	config.m_perfect_cpu_quantum = subtag("sub");
 
 	SPEAKER(config, "mono").front_center();
@@ -2160,12 +2163,12 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 	}
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200)
-	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200);
+	m_screen->set_screen_update(FUNC(fm7_state::screen_update_fm7));
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
-	MCFG_PALETTE_ADD("av_palette", 4096)
+	PALETTE(config, m_av_palette).set_entries(4096);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(fm7_cassette_formats);
@@ -2192,23 +2195,24 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(fm7_state::fm11)
+void fm7_state::fm11(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)  // 2MHz 68B09E
-	MCFG_DEVICE_PROGRAM_MAP(fm11_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
+	MC6809E(config, m_maincpu, 2000000);  // 2MHz 68B09E
+	m_maincpu->set_addrmap(AS_PROGRAM, &fm7_state::fm11_mem);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_irq_ack));
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_DEVICE_ADD("sub", MC6809, 8000000)  // 2MHz 68B09
-	MCFG_DEVICE_PROGRAM_MAP(fm11_sub_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
+	MC6809(config, m_sub, 8000000);  // 2MHz 68B09
+	m_sub->set_addrmap(AS_PROGRAM, &fm7_state::fm11_sub_mem);
+	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_sub_irq_ack));
 	config.m_perfect_cpu_quantum = subtag("sub");
 
-	MCFG_DEVICE_ADD("x86", I8088, 8000000)  // 8MHz i8088
-	MCFG_DEVICE_PROGRAM_MAP(fm11_x86_mem)
-	MCFG_DEVICE_IO_MAP(fm11_x86_io)
+	I8088(config, m_x86, 8000000);  // 8MHz i8088
+	m_x86->set_addrmap(AS_PROGRAM, &fm7_state::fm11_x86_mem);
+	m_x86->set_addrmap(AS_IO, &fm7_state::fm11_x86_io);
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -2222,9 +2226,9 @@ MACHINE_CONFIG_START(fm7_state::fm11)
 	}
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16128000, 1024, 0, 640, 262, 0, 200)
-	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16128000, 1024, 0, 640, 262, 0, 200);
+	m_screen->set_screen_update(FUNC(fm7_state::screen_update_fm7));
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
@@ -2248,18 +2252,19 @@ MACHINE_CONFIG_START(fm7_state::fm11)
 
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(fm7_state::fm16beta)
+void fm7_state::fm16beta(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8086, 8000000)  // 8MHz i8086
-	MCFG_DEVICE_PROGRAM_MAP(fm16_mem)
-	MCFG_DEVICE_IO_MAP(fm16_io)
+	I8086(config, m_maincpu, 8000000);  // 8MHz i8086
+	m_maincpu->set_addrmap(AS_PROGRAM, &fm7_state::fm16_mem);
+	m_maincpu->set_addrmap(AS_IO, &fm7_state::fm16_io);
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_DEVICE_ADD("sub", MC6809, 8000000)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
-	MCFG_DEVICE_PROGRAM_MAP(fm16_sub_mem)
+	MC6809(config, m_sub, 8000000);
+	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_sub_irq_ack));
+	m_sub->set_addrmap(AS_PROGRAM, &fm7_state::fm16_sub_mem);
 	config.m_perfect_cpu_quantum = subtag("sub");
 
 	SPEAKER(config, "mono").front_center();
@@ -2269,9 +2274,9 @@ MACHINE_CONFIG_START(fm7_state::fm16beta)
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm16)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16128000, 1024, 0, 640, 262, 0, 200)
-	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16128000, 1024, 0, 640, 262, 0, 200);
+	m_screen->set_screen_update(FUNC(fm7_state::screen_update_fm7));
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
@@ -2295,7 +2300,7 @@ MACHINE_CONFIG_START(fm7_state::fm16beta)
 
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( fm8 )

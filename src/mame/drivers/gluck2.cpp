@@ -484,26 +484,26 @@ GFXDECODE_END
 *              Machine Drivers               *
 *********************************************/
 
-MACHINE_CONFIG_START(gluck2_state::gluck2)
-
+void gluck2_state::gluck2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/16) /* guess */
-	MCFG_DEVICE_PROGRAM_MAP(gluck2_map)
+	M6502(config, m_maincpu, MASTER_CLOCK/16); /* guess */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gluck2_state::gluck2_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 
 /* CRTC Register:  00   01   02   03   04   05   06
    CRTC Value   : 0x27 0x20 0x23 0x03 0x26 0x00 0x20
 */
-	MCFG_SCREEN_SIZE((39+1)*8, (38+1)*8)                /* from MC6845 init, registers 00 & 04. (value - 1) */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)  /* from MC6845 init, registers 01 & 06. */
-	MCFG_SCREEN_UPDATE_DRIVER(gluck2_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_size((39+1)*8, (38+1)*8);                /* from MC6845 init, registers 00 & 04. (value - 1) */
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);  /* from MC6845 init, registers 01 & 06. */
+	screen.set_screen_update(FUNC(gluck2_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_gluck2);
 	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 256);
@@ -525,10 +525,8 @@ MACHINE_CONFIG_START(gluck2_state::gluck2)
 */
 	ay8910.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, SND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-MACHINE_CONFIG_END
+	YM2413(config, "ymsnd", SND_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*********************************************

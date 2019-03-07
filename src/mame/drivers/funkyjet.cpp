@@ -302,12 +302,12 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-MACHINE_CONFIG_START(funkyjet_state::funkyjet)
-
+void funkyjet_state::funkyjet(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(28'000'000)/2) /* 28 MHz crystal */
-	MCFG_DEVICE_PROGRAM_MAP(funkyjet_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", funkyjet_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(28'000'000)/2); /* 28 MHz crystal */
+	m_maincpu->set_addrmap(AS_PROGRAM, &funkyjet_state::funkyjet_map);
+	m_maincpu->set_vblank_int("screen", FUNC(funkyjet_state::irq6_line_hold));
 
 	H6280(config, m_audiocpu, XTAL(32'220'000)/4); /* Custom chip 45, Audio section crystal is 32.220 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &funkyjet_state::sound_map);
@@ -315,13 +315,13 @@ MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(funkyjet_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(funkyjet_state::screen_update));
+	screen.set_palette("palette");
 
 	DECO146PROT(config, m_deco146, 0);
 	m_deco146->port_a_cb().set_ioport("INPUTS");
@@ -360,10 +360,10 @@ MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 	ymsnd.add_route(0, "lspeaker", 0.45);
 	ymsnd.add_route(1, "rspeaker", 0.45);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'000'000)/28, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(28'000'000)/28, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+}
 
 /******************************************************************************/
 

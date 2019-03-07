@@ -245,15 +245,15 @@ WRITE_LINE_MEMBER(ginganin_state::ptm_irq)
 }
 
 
-MACHINE_CONFIG_START(ginganin_state::ginganin)
-
+void ginganin_state::ginganin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, MAIN_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(ginganin_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ginganin_state,  irq1_line_hold) /* ? (vectors 1-7 cointain the same address) */
+	M68000(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ginganin_state::ginganin_map);
+	m_maincpu->set_vblank_int("screen", FUNC(ginganin_state::irq1_line_hold)); /* ? (vectors 1-7 contain the same address) */
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809, SOUND_CLOCK) // MBL68B09?
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MC6809(config, m_audiocpu, SOUND_CLOCK); // MBL68B09?
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ginganin_state::sound_map);
 
 
 	ptm6840_device &ptm(PTM6840(config, "6840ptm", SOUND_CLOCK/2));
@@ -261,13 +261,13 @@ MACHINE_CONFIG_START(ginganin_state::ginganin)
 	ptm.o1_callback().set(FUNC(ginganin_state::ptm_irq));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0 + 16 , 255 - 16)
-	MCFG_SCREEN_UPDATE_DRIVER(ginganin_state, screen_update_ginganin)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 255, 0 + 16 , 255 - 16);
+	screen.set_screen_update(FUNC(ginganin_state::screen_update_ginganin));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ginganin);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
@@ -279,9 +279,8 @@ MACHINE_CONFIG_START(ginganin_state::ginganin)
 
 	YM2149(config, "psg", SOUND_CLOCK / 2).add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ymsnd", Y8950, SOUND_CLOCK) /* The Y8950 is basically a YM3526 with ADPCM built in */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	Y8950(config, "ymsnd", SOUND_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.0); /* The Y8950 is basically a YM3526 with ADPCM built in */
+}
 
 
 

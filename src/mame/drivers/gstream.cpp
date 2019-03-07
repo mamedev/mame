@@ -828,23 +828,23 @@ void gstream_state::machine_reset()
 	m_oki_bank[0] = m_oki_bank[1] = 0;
 }
 
-MACHINE_CONFIG_START(gstream_state::gstream)
-
+void gstream_state::gstream(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
-	MCFG_DEVICE_PROGRAM_MAP(gstream_32bit_map)
-	MCFG_DEVICE_IO_MAP(gstream_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
+	E132XT(config, m_maincpu, 16000000*4); /* 4x internal multiplier */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gstream_state::gstream_32bit_map);
+	m_maincpu->set_addrmap(AS_IO, &gstream_state::gstream_io);
+	m_maincpu->set_vblank_int("screen", FUNC(gstream_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(320, 240);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(gstream_state::screen_update));
 
 	PALETTE(config, m_palette).set_format(palette_device::BGR_565, 0x1000 + 0x400 + 0x400 + 0x400); // sprites + 3 bg layers
 
@@ -852,30 +852,28 @@ MACHINE_CONFIG_START(gstream_state::gstream)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) /* 1 Mhz? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	OKIM6295(config, m_oki[0], 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); /* 1 Mhz? */
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) /* 1 Mhz? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); /* 1 Mhz? */
+}
 
-MACHINE_CONFIG_START(gstream_state::x2222)
-
+void gstream_state::x2222(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
-	MCFG_DEVICE_PROGRAM_MAP(x2222_32bit_map)
-	MCFG_DEVICE_IO_MAP(x2222_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
+	E132XT(config, m_maincpu, 16000000*4); /* 4x internal multiplier */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gstream_state::x2222_32bit_map);
+	m_maincpu->set_addrmap(AS_IO, &gstream_state::x2222_io);
+	m_maincpu->set_vblank_int("screen", FUNC(gstream_state::irq0_line_hold));
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(320, 240);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(gstream_state::screen_update));
 
 	PALETTE(config, m_palette, palette_device::BGR_565);
 
@@ -885,9 +883,8 @@ MACHINE_CONFIG_START(gstream_state::x2222)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) /* 1 Mhz? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[0], 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); /* 1 Mhz? */
+}
 
 
 ROM_START( gstream )

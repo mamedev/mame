@@ -412,12 +412,13 @@ uint32_t fk1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-MACHINE_CONFIG_START(fk1_state::fk1)
+void fk1_state::fk1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(8'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(fk1_mem)
-	MCFG_DEVICE_IO_MAP(fk1_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fk1_state,fk1_irq_callback)
+	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fk1_state::fk1_mem);
+	m_maincpu->set_addrmap(AS_IO, &fk1_state::fk1_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(fk1_state::fk1_irq_callback));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
@@ -468,7 +469,7 @@ MACHINE_CONFIG_START(fk1_state::fk1)
 
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(fk1_state::keyboard_callback), attotime::from_hz(24000));
 	TIMER(config, "vsync_timer").configure_periodic(FUNC(fk1_state::vsync_callback), attotime::from_hz(50));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( fk1 )

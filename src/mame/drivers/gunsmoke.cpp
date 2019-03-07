@@ -301,27 +301,27 @@ void gunsmoke_state::machine_reset()
 	m_sprite3bank = 0;
 }
 
-MACHINE_CONFIG_START(gunsmoke_state::gunsmoke)
-
+void gunsmoke_state::gunsmoke(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   // 4 MHz
-	MCFG_DEVICE_PROGRAM_MAP(gunsmoke_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gunsmoke_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 4000000);   // 4 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &gunsmoke_state::gunsmoke_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gunsmoke_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)  // 3 MHz
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(gunsmoke_state, irq0_line_hold,  4*60)
+	z80_device &audiocpu(Z80(config, "audiocpu", 3000000));  // 3 MHz
+	audiocpu.set_addrmap(AS_PROGRAM, &gunsmoke_state::sound_map);
+	audiocpu.set_periodic_int(FUNC(gunsmoke_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gunsmoke_state, screen_update_gunsmoke)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(gunsmoke_state::screen_update_gunsmoke));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gunsmoke);
 
@@ -332,18 +332,18 @@ MACHINE_CONFIG_START(gunsmoke_state::gunsmoke)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
-	MCFG_SOUND_ROUTE(0, "mono", 0.22)
-	MCFG_SOUND_ROUTE(1, "mono", 0.22)
-	MCFG_SOUND_ROUTE(2, "mono", 0.22)
-	MCFG_SOUND_ROUTE(3, "mono", 0.14)
+	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym1.add_route(0, "mono", 0.22);
+	ym1.add_route(1, "mono", 0.22);
+	ym1.add_route(2, "mono", 0.22);
+	ym1.add_route(3, "mono", 0.14);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, 1500000)
-	MCFG_SOUND_ROUTE(0, "mono", 0.22)
-	MCFG_SOUND_ROUTE(1, "mono", 0.22)
-	MCFG_SOUND_ROUTE(2, "mono", 0.22)
-	MCFG_SOUND_ROUTE(3, "mono", 0.14)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", 1500000));
+	ym2.add_route(0, "mono", 0.22);
+	ym2.add_route(1, "mono", 0.22);
+	ym2.add_route(2, "mono", 0.22);
+	ym2.add_route(3, "mono", 0.14);
+}
 
 /* ROMs */
 

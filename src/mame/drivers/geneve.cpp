@@ -692,7 +692,8 @@ void geneve_state::machine_reset()
 	m_joyport->write_port(0x01);    // select Joystick 1
 }
 
-MACHINE_CONFIG_START(geneve_state::geneve)
+void geneve_state::geneve(machine_config &config)
+{
 	geneve_common(config);
 
 	// Mapper
@@ -704,9 +705,10 @@ MACHINE_CONFIG_START(geneve_state::geneve)
 	m_peribox->inta_cb().set(FUNC(geneve_state::inta));
 	m_peribox->intb_cb().set(FUNC(geneve_state::intb));
 	m_peribox->ready_cb().set(FUNC(geneve_state::ext_ready));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(geneve_state::genmod)
+void geneve_state::genmod(machine_config &config)
+{
 	geneve_common(config);
 
 	// Mapper
@@ -718,9 +720,10 @@ MACHINE_CONFIG_START(geneve_state::genmod)
 	m_peribox->inta_cb().set(FUNC(geneve_state::inta));
 	m_peribox->intb_cb().set(FUNC(geneve_state::intb));
 	m_peribox->ready_cb().set(FUNC(geneve_state::ext_ready));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(geneve_state::geneve_common)
+void geneve_state::geneve_common(machine_config &config)
+{
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	TMS9995(config, m_cpu, 12000000);
@@ -783,7 +786,7 @@ MACHINE_CONFIG_START(geneve_state::geneve_common)
 
 	// SRAM 384K (max; stock Geneve: 32K, but later MDOS releases require 64K)
 	RAM(config, GENEVE_SRAM_TAG).set_default_size("384K").set_default_value(0);
-MACHINE_CONFIG_END
+}
 
 /*
     ROM loading

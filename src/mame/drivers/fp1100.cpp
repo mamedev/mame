@@ -638,12 +638,13 @@ void fp1100_state::init_fp1100()
 	membank("bankw0")->configure_entry(0, &wram[0x0000]);
 }
 
-MACHINE_CONFIG_START(fp1100_state::fp1100)
+void fp1100_state::fp1100(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fp1100_state, vblank_irq)
+	Z80(config, m_maincpu, MAIN_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fp1100_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &fp1100_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fp1100_state::vblank_irq));
 
 	upd7801_device &sub(UPD7801(config, m_subcpu, MAIN_CLOCK/4));
 	sub.set_addrmap(AS_PROGRAM, &fp1100_state::sub_map);
@@ -655,13 +656,13 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 	sub.txd_func().set(FUNC(fp1100_state::cass_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 8)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea_full();
+	screen.set_screen_update("crtc", FUNC(h46505_device::screen_update));
+	PALETTE(config, m_palette).set_entries(8);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_fp1100);
 
 	/* sound hardware */
@@ -687,7 +688,7 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	TIMER(config, "timer_c").configure_periodic(FUNC(fp1100_state::timer_c), attotime::from_hz(4800)); // cass write
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( fp1100 )

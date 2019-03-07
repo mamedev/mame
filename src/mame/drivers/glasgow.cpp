@@ -311,10 +311,11 @@ static INPUT_PORTS_START( old_keyboard )   //Glasgow,Dallas
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(glasgow_state::glasgow)
+void glasgow_state::glasgow(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(glasgow_mem)
+	M68000(config, m_maincpu, 12_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &glasgow_state::glasgow_mem);
 
 	MEPHISTO_SENSORS_BOARD(config, m_board, 0);
 
@@ -322,30 +323,30 @@ MACHINE_CONFIG_START(glasgow_state::glasgow)
 	config.set_default_layout(layout_glasgow);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 44)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	BEEP(config, m_beep, 44).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(glasgow_state::update_nmi), attotime::from_hz(50));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(amsterd_state::amsterd)
+void amsterd_state::amsterd(machine_config &config)
+{
 	glasgow(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(amsterd_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &amsterd_state::amsterd_mem);
+}
 
-MACHINE_CONFIG_START(amsterd_state::dallas32)
+void amsterd_state::dallas32(machine_config &config)
+{
 	glasgow(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", M68020, 14_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(dallas32_mem)
+	M68020(config.replace(), m_maincpu, 14_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &amsterd_state::dallas32_mem);
 
 	config.device_remove("nmi_timer");
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(amsterd_state::update_nmi32), attotime::from_hz(50));
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

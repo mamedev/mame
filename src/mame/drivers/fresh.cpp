@@ -597,21 +597,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(fresh_state::fake_scanline)
 }
 
 
-MACHINE_CONFIG_START(fresh_state::fresh)
-
+void fresh_state::fresh(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24000000/2 )
-	MCFG_DEVICE_PROGRAM_MAP(fresh_map)
+	M68000(config, m_maincpu, 24000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fresh_state::fresh_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(fresh_state::fake_scanline), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fresh_state, screen_update_fresh)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(fresh_state::screen_update_fresh));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0x1000); // or 0xc00
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fresh);
@@ -619,9 +619,8 @@ MACHINE_CONFIG_START(fresh_state::fresh)
 	/* sound hw? */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 4000000) // actual clock and type unknown
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM2413(config, "ymsnd", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0); // actual clock and type unknown
+}
 
 
 ROM_START( fresh )

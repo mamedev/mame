@@ -344,26 +344,26 @@ void go2000_state::machine_start()
 
 }
 
-MACHINE_CONFIG_START(go2000_state::go2000)
+void go2000_state::go2000(machine_config &config)
+{
+	M68000(config, m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &go2000_state::go2000_map);
+	m_maincpu->set_vblank_int("screen", FUNC(go2000_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(go2000_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", go2000_state,  irq1_line_hold)
-
-	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(go2000_sound_map)
-	MCFG_DEVICE_IO_MAP(go2000_sound_io)
+	Z80(config, m_soundcpu, 4000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &go2000_state::go2000_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &go2000_state::go2000_sound_io);
 
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_go2000);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(go2000_state, screen_update_go2000)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(go2000_state::screen_update_go2000));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(go2000_state::go2000)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 ROM_START( go2000 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */

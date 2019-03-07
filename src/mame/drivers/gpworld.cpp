@@ -500,29 +500,27 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gpworld_state::gpworld)
 
 	/* main cpu */
-	MCFG_DEVICE_ADD("maincpu", Z80, GUESSED_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(mainmem)
-	MCFG_DEVICE_IO_MAP(mainport)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gpworld_state,  vblank_callback)
+	Z80(config, m_maincpu, GUESSED_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gpworld_state::mainmem);
+	m_maincpu->set_addrmap(AS_IO, &gpworld_state::mainport);
+	m_maincpu->set_vblank_int("screen", FUNC(gpworld_state::vblank_callback));
 
 
-	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_DRIVER(512, 256, gpworld_state, screen_update)
-	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
+	PIONEER_LDV1000(config, m_laserdisc, 0);
+	m_laserdisc->set_overlay(512, 256, FUNC(gpworld_state::screen_update));
+	m_laserdisc->set_overlay_palette(m_palette);
+	m_laserdisc->add_route(0, "lspeaker", 1.0);
+	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gpworld);
-	MCFG_PALETTE_ADD("palette", 1024)
+	PALETTE(config, m_palette).set_entries(1024);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-
-	MCFG_DEVICE_MODIFY("laserdisc")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
