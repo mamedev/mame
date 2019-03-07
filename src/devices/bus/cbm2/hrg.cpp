@@ -205,7 +205,7 @@ uint8_t cbm2_hrg_device::cbm2_bd_r(offs_t offset, uint8_t data, int csbank1, int
 		}
 		else if (offset >= 0x7ff0)
 		{
-			data = m_gdc->data_r(machine().dummy_space(), offset & 0x0f);
+			data = m_gdc->data_r(offset & 0x0f);
 		}
 	}
 
@@ -240,7 +240,7 @@ void cbm2_hrg_device::cbm2_bd_w(offs_t offset, uint8_t data, int csbank1, int cs
 		}
 		else if (offset >= 0x7ff0)
 		{
-			m_gdc->data_w(machine().dummy_space(), offset & 0x0f, data);
+			m_gdc->data_w(offset & 0x0f, data);
 		}
 	}
 }

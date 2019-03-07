@@ -266,14 +266,14 @@ READ8_MEMBER(minitel_state::dev_keyb_ser_r)
 
 READ8_MEMBER ( minitel_state::ts9347_io_r )
 {
-	return m_ts9347->data_r(space, offset, 0xff);
+	return m_ts9347->data_r(offset);
 }
 
 WRITE8_MEMBER ( minitel_state::ts9347_io_w )
 {
 	LOG("minitel_state::ts9347_io_w : %x %x\n",offset, data);
 
-	m_ts9347->data_w(space, offset, data, 0xff);
+	m_ts9347->data_w(offset, data);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(minitel_state::minitel_scanline)

@@ -224,7 +224,7 @@ uint8_t cbm8000_hsg_device::pet_bd_r(offs_t offset, uint8_t data, int &sel)
 		}
 		else if (offset >= 0xaf70 && offset < 0xaf80)
 		{
-			data = m_gdc->data_r(machine().dummy_space(), offset & 0x0f);
+			data = m_gdc->data_r(offset & 0x0f);
 		}
 		break;
 	}
@@ -258,6 +258,6 @@ void cbm8000_hsg_device::pet_bd_w(offs_t offset, uint8_t data, int &sel)
 	}
 	else if (offset >= 0xaf70 && offset < 0xaf80)
 	{
-		m_gdc->data_w(machine().dummy_space(), offset & 0x0f, data);
+		m_gdc->data_w(offset & 0x0f, data);
 	}
 }
