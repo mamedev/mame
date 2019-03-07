@@ -446,7 +446,7 @@ void bambball_state::bambball(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 478);
-	screen.set_visarea(0, 1920-1, 0, 478-1);
+	screen.set_visarea_full();
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_bambball);
@@ -595,7 +595,8 @@ void bmboxing_state::bmboxing(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 529);
-	screen.set_visarea(0, 1920-1, 0, 529-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -724,7 +725,8 @@ void bfriskyt_state::bfriskyt(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 675);
-	screen.set_visarea(0, 1920-1, 0, 675-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -845,7 +847,7 @@ void packmon_state::packmon(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 680);
-	screen.set_visarea(0, 1920-1, 0, 680-1);
+	screen.set_visarea_full();
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_packmon);
@@ -986,7 +988,7 @@ void msthawk_state::msthawk(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 696);
-	screen.set_visarea(0, 1920-1, 0, 696-1);
+	screen.set_visarea_full();
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_msthawk);
@@ -1115,7 +1117,8 @@ void bzaxxon_state::bzaxxon(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(613, 1080);
-	screen.set_visarea(0, 613-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1238,7 +1241,8 @@ void zackman_state::zackman(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(487, 1080);
-	screen.set_visarea(0, 487-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1371,7 +1375,8 @@ void bpengo_state::bpengo(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 759);
-	screen.set_visarea(0, 1920-1, 0, 759-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1500,7 +1505,8 @@ void bbtime_state::bbtime(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(379, 1080);
-	screen.set_visarea(0, 379-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1609,7 +1615,8 @@ void bdoramon_state::bdoramon(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 668);
-	screen.set_visarea(0, 1920-1, 0, 668-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1711,7 +1718,8 @@ void bultrman_state::bultrman(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 673);
-	screen.set_visarea(0, 1920-1, 0, 673-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1811,7 +1819,8 @@ void machiman_state::machiman(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1534, 1080);
-	screen.set_visarea(0, 1534-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2104,7 +2113,8 @@ void alnattck_state::alnattck(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 700);
-	screen.set_visarea(0, 1920-1, 0, 700-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2248,7 +2258,8 @@ void cdkong_state::cdkong(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(605, 1080);
-	screen.set_visarea(0, 605-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2393,7 +2404,8 @@ void cgalaxn_state::cgalaxn(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(526, 1080);
-	screen.set_visarea(0, 526-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2525,7 +2537,8 @@ void cpacman_state::cpacman(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(484, 1080);
-	screen.set_visarea(0, 484-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2661,7 +2674,8 @@ void cmspacmn_state::cmspacmn(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(481, 1080);
-	screen.set_visarea(0, 481-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2952,7 +2966,8 @@ void egalaxn2_state::egalaxn2(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(505, 1080);
-	screen.set_visarea(0, 505-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -3037,7 +3052,7 @@ void epacman2_state::epacman2(machine_config &config)
 	/* video hardware */
 	screen_device *screen = subdevice<screen_device>("screen");
 	screen->set_size(505, 1080);
-	screen->set_visarea(0, 505-1, 0, 1080-1);
+	screen->set_visarea_full();
 }
 
 // roms
@@ -3241,7 +3256,8 @@ void eturtles_state::eturtles(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(484, 1080);
-	screen.set_visarea(0, 484-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -3363,7 +3379,8 @@ void estargte_state::estargte(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 854);
-	screen.set_visarea(0, 1920-1, 0, 854-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -3492,7 +3509,8 @@ void ghalien_state::ghalien(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 699);
-	screen.set_visarea(0, 1920-1, 0, 699-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -3624,7 +3642,7 @@ void gckong_state::gckong(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(479, 1080);
-	screen.set_visarea(0, 479-1, 0, 1080-1);
+	screen.set_visarea_full();
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_gckong);
@@ -3752,7 +3770,8 @@ void gdigdug_state::gdigdug(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(476, 1080);
-	screen.set_visarea(0, 476-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -3923,7 +3942,7 @@ void mwcbaseb_state::mwcbaseb(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 478);
-	screen.set_visarea(0, 1920-1, 0, 478-1);
+	screen.set_visarea_full();
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_mwcbaseb);
@@ -4025,7 +4044,8 @@ void pbqbert_state::pbqbert(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(603, 1080);
-	screen.set_visarea(0, 603-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -4151,7 +4171,8 @@ void kingman_state::kingman(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(374, 1080);
-	screen.set_visarea(0, 374-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -4277,7 +4298,8 @@ void tmtron_state::tmtron(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 662);
-	screen.set_visarea(0, 1920-1, 0, 662-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -4382,7 +4404,8 @@ void vinvader_state::vinvader(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(233, 1080);
-	screen.set_visarea(0, 233-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */

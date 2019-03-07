@@ -620,7 +620,7 @@ void einvaderc_state::einvaderc(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(913, 1080);
-	screen.set_visarea(0, 913-1, 0, 1080-1);
+	screen.set_visarea_full();
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_cop400_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_einvaderc);

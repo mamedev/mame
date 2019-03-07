@@ -603,6 +603,7 @@ MACHINE_CONFIG_START(cc40_state::cc40)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(6*31+1, 9*1+1+1)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*31, 0, 9*1+1)
+	//screen.set_visarea_full();
 	config.set_default_layout(layout_cc40);
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")

@@ -311,7 +311,8 @@ void cfrogger_state::cfrogger(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", "svg"));
 	screen.set_refresh_hz(50);
 	screen.set_size(500, 1080);
-	screen.set_visarea(0, 500-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_melps4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -436,7 +437,8 @@ void gjungler_state::gjungler(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", "svg"));
 	screen.set_refresh_hz(50);
 	screen.set_size(481, 1080);
-	screen.set_visarea(0, 481-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_melps4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
