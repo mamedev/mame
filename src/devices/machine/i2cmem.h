@@ -92,6 +92,8 @@ protected:
 	int m_byteaddr;
 	std::vector<uint8_t> m_page;
 	int m_page_offset;
+	int m_page_written_size;
+	bool m_in_write;
 };
 
 #define DECLARE_I2C_DEVICE(name) \
