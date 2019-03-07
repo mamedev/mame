@@ -250,7 +250,7 @@ void funybubl_state::funybubl(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	OKIM6295(config, m_oki, 8000000/8, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki->set_addrmap(0, funybubl_state::oki_map);
+	m_oki->set_addrmap(0, &funybubl_state::oki_map);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
