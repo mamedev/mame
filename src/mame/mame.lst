@@ -11553,9 +11553,11 @@ divebomb                        // GX840 (c) 1989 (Japan)
 diverboy                        // (c) 1992 Electronic Devices
 
 @source:djboy.cpp
-djboy                           // (c) 1989 Kaneko
-djboya                          // (c) 1989 Kaneko
-djboyj                          // (c) 1989 Kaneko
+djboy                           // (c) 1989 Kaneko (World)
+djboyj                          // (c) 1989 Kaneko (Japan, Sega license)
+djboyja                         // (c) 1989 Kaneko (Japan, Sega license)
+djboyu                          // (c) 1990 Kaneko (USA, American Sammy license)
+djboyua                         // (c) 1990 Kaneko (USA, American Sammy license)
 
 @source:djmain.cpp
 bm1stmix                        // GQ753 (c) 1997 (Japan)
