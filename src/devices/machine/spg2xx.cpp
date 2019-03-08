@@ -52,7 +52,7 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 #define LOG_PPU             (LOG_PPU_READS | LOG_PPU_WRITES | LOG_UNKNOWN_PPU)
 #define LOG_ALL             (LOG_IO | LOG_SPU | LOG_PPU | LOG_VLINES | LOG_SEGMENT | LOG_FIQ)
 
-//#define VERBOSE             (LOG_ALL & ~LOG_SPU)
+//#define VERBOSE             (LOG_SPU &~ LOG_BEAT)
 #include "logmacro.h"
 
 #define SPG_DEBUG_VIDEO     (0)
@@ -2617,7 +2617,6 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 		case AUDIO_CHANNEL_STOP:
 			LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel Stop Status: %04x\n", data);
 			m_audio_regs[offset] &= ~data;
-			m_audio_regs[AUDIO_CHANNEL_ENABLE] &= ~data;
 			break;
 
 		case AUDIO_CHANNEL_ZERO_CROSS:
@@ -2941,7 +2940,6 @@ inline void spg2xx_device::stop_channel(const uint32_t channel)
 	// TODO: IRQs
 	m_audio_regs[AUDIO_CHANNEL_ENABLE] &= ~(1 << channel);
 	m_audio_regs[AUDIO_CHANNEL_STATUS] &= ~(1 << channel);
-	m_audio_regs[AUDIO_CHANNEL_STOP] |= (1 << channel);
 	m_audio_regs[(channel << 4) | AUDIO_MODE] &= ~AUDIO_ADPCM_MASK;
 	m_audio_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~(1 << channel);
 }
@@ -3078,14 +3076,14 @@ bool spg2xx_device::fetch_sample(address_space &space, const uint32_t channel)
 			{
 				if (tone_mode == AUDIO_TONE_MODE_HW_ONESHOT)
 				{
-					LOGMASKED(LOG_SAMPLES, "8-bit PCM stopped after %d samples\n", m_sample_count[channel]);
+					LOGMASKED(LOG_SAMPLES, "Channel %d: 8-bit PCM stopped after %d samples\n", channel, m_sample_count[channel]);
 					m_sample_count[channel] = 0;
 					stop_channel(channel);
 					return false;
 				}
 				else
 				{
-					LOGMASKED(LOG_SAMPLES, "8-bit PCM looping after %d samples\n", m_sample_count[channel]);
+					LOGMASKED(LOG_SAMPLES, "Channel %d: 8-bit PCM looping after %d samples\n", channel, m_sample_count[channel]);
 					m_sample_count[channel] = 0;
 					loop_channel(channel);
 				}
