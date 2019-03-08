@@ -242,7 +242,8 @@ private:
 			m_counter = (m_counter + 1) & 0xff;
 			if (m_counter == 0 && m_borrow_cnt == 0)
 			{
-				m_borrow_cnt = 3;
+				m_borrow_cnt = m_parent->m_borrow_all_max = 3;
+
 				if (m_parent->m_IRQEN & m_INTMask)
 				{
 					/* Exposed state has changed: This should only be updated after a resync ... */
@@ -286,6 +287,7 @@ private:
 
 	uint32_t m_out_raw;         /* raw output */
 	bool m_old_raw_inval;       /* true: recalc m_out_raw required */
+	uint32_t m_borrow_all_max;  /* max borrow count for all channels */
 	double m_out_filter;        /* filtered output */
 
 	int32_t m_clock_cnt[3];     /* clock counters */
