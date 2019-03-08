@@ -219,29 +219,29 @@ void exedexes_state::machine_reset()
 	m_sc2on = 0;
 }
 
-MACHINE_CONFIG_START(exedexes_state::exedexes)
-
+void exedexes_state::exedexes(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz (?) */
-	MCFG_DEVICE_PROGRAM_MAP(exedexes_map)
+	Z80(config, m_maincpu, 4000000);   /* 4 MHz (?) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &exedexes_state::exedexes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(exedexes_state::exedexes_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)  /* 3 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(exedexes_state, irq0_line_hold, 4*60)
+	z80_device &audiocpu(Z80(config, "audiocpu", 3000000));  /* 3 MHz ??? */
+	audiocpu.set_addrmap(AS_PROGRAM, &exedexes_state::sound_map);
+	audiocpu.set_periodic_int(FUNC(exedexes_state::irq0_line_hold), attotime::from_hz(4*60));
 
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(exedexes_state, screen_update_exedexes)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(exedexes_state::screen_update_exedexes));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exedexes);
 
@@ -254,12 +254,10 @@ MACHINE_CONFIG_START(exedexes_state::exedexes)
 
 	AY8910(config, "aysnd", 1500000).add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("sn1", SN76489, 3000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.36)
+	SN76489(config, "sn1", 3000000).add_route(ALL_OUTPUTS, "mono", 0.36);
 
-	MCFG_DEVICE_ADD("sn2", SN76489, 3000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.36)
-MACHINE_CONFIG_END
+	SN76489(config, "sn2", 3000000).add_route(ALL_OUTPUTS, "mono", 0.36);
+}
 
 
 

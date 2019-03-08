@@ -838,76 +838,75 @@ MACHINE_START_MEMBER(exidy_state,teetert)
  *
  *************************************/
 
-MACHINE_CONFIG_START(exidy_state::base)
-
+void exidy_state::base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, EXIDY_CPU_CLOCK)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exidy_state,  exidy_vblank_interrupt)
+	M6502(config, m_maincpu, EXIDY_CPU_CLOCK);
+	m_maincpu->set_vblank_int("screen", FUNC(exidy_state::exidy_vblank_interrupt));
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exidy);
-	MCFG_PALETTE_ADD("palette", 8)
+	PALETTE(config, m_palette).set_entries(8);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_RAW_PARAMS(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(exidy_state, screen_update_exidy)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_raw(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART);
+	m_screen->set_screen_update(FUNC(exidy_state::screen_update_exidy));
+	m_screen->set_palette(m_palette);
+}
 
-MACHINE_CONFIG_END
 
-
-MACHINE_CONFIG_START(exidy_state::sidetrac)
+void exidy_state::sidetrac(machine_config &config)
+{
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sidetrac_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::sidetrac_map);
 
 	/* audio hardware */
 	spectar_audio(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(exidy_state::targ)
+void exidy_state::targ(machine_config &config)
+{
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(targ_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::targ_map);
 
 	/* audio hardware */
 	targ_audio(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(exidy_state::spectar)
+void exidy_state::spectar(machine_config &config)
+{
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(spectar_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::spectar_map);
 
 	/* audio hardware */
 	spectar_audio(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(exidy_state::rallys)
+void exidy_state::rallys(machine_config &config)
+{
 	spectar(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(rallys_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::rallys_map);
+}
 
 
-MACHINE_CONFIG_START(exidy_state::venture)
+void exidy_state::venture(machine_config &config)
+{
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(venture_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::venture_map);
 
 	config.m_minimum_quantum = attotime::from_hz(600);
 
@@ -923,27 +922,26 @@ MACHINE_CONFIG_START(exidy_state::venture)
 	soundbd.pb_callback().set("pia", FUNC(pia6821_device::porta_w));
 	soundbd.ca2_callback().set("pia", FUNC(pia6821_device::cb1_w));
 	soundbd.cb2_callback().set("pia", FUNC(pia6821_device::ca1_w));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(exidy_state::teetert)
+void exidy_state::teetert(machine_config &config)
+{
 	venture(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(exidy_state, nmi_line_pulse, 10*60)
+	m_maincpu->set_periodic_int(FUNC(exidy_state::nmi_line_pulse), attotime::from_hz(10*60));
 
 	MCFG_MACHINE_START_OVERRIDE(exidy_state, teetert )
+}
 
-MACHINE_CONFIG_END
 
-
-MACHINE_CONFIG_START(exidy_state::mtrap)
+void exidy_state::mtrap(machine_config &config)
+{
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mtrap_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::mtrap_map);
 
 	config.m_minimum_quantum = attotime::from_hz(1920);
 
@@ -959,25 +957,25 @@ MACHINE_CONFIG_START(exidy_state::mtrap)
 	soundbd.pb_callback().set("pia", FUNC(pia6821_device::porta_w));
 	soundbd.ca2_callback().set("pia", FUNC(pia6821_device::cb1_w));
 	soundbd.cb2_callback().set("pia", FUNC(pia6821_device::ca1_w));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(exidy_state::pepper2)
+void exidy_state::pepper2(machine_config &config)
+{
 	venture(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pepper2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::pepper2_map);
+}
 
 
-MACHINE_CONFIG_START(exidy_state::fax)
+void exidy_state::fax(machine_config &config)
+{
 	pepper2(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(fax_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::fax_map);
+}
 
 
 

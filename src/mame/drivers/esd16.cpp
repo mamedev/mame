@@ -631,27 +631,27 @@ DECOSPR_PRIORITY_CB_MEMBER(esd16_state::hedpanic_pri_callback)
 		return 0; // above everything
 }
 
-MACHINE_CONFIG_START(esd16_state::esd16)
-
+void esd16_state::esd16(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(16'000'000))  /* 16MHz */
-	MCFG_DEVICE_PROGRAM_MAP(multchmp_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", esd16_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(16'000'000));  /* 16MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &esd16_state::multchmp_map);
+	m_maincpu->set_vblank_int("screen", FUNC(esd16_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* 4MHz */
-	MCFG_DEVICE_PROGRAM_MAP(multchmp_sound_map)
-	MCFG_DEVICE_IO_MAP(multchmp_sound_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(esd16_state, nmi_line_pulse, 32*60)    /* IRQ By Main CPU */
+	Z80(config, m_audiocpu, XTAL(16'000'000)/4); /* 4MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &esd16_state::multchmp_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &esd16_state::multchmp_sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(esd16_state::nmi_line_pulse), attotime::from_hz(32*60));    /* IRQ By Main CPU */
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x140, 0x100)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0+8, 0x100-8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(esd16_state, screen_update_hedpanic)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(0x140, 0x100);
+	screen.set_visarea(0, 0x140-1, 0+8, 0x100-8-1);
+	screen.set_screen_update(FUNC(esd16_state::screen_update_hedpanic));
+	screen.set_palette("palette");
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(0);
@@ -669,44 +669,39 @@ MACHINE_CONFIG_START(esd16_state::esd16)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(16'000'000)/4)   /* 4MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	YM3812(config, "ymsnd", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.30);   /* 4MHz */
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* 1MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60); /* 1MHz */
+}
 
 
-MACHINE_CONFIG_START(esd16_state::jumppop)
+void esd16_state::jumppop(machine_config &config)
+{
 	esd16(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(jumppop_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &esd16_state::jumppop_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_CLOCK( XTAL(14'000'000)/4) /* 3.5MHz - Verified */
+	m_audiocpu->set_clock(XTAL(14'000'000)/4); /* 3.5MHz - Verified */
 
 	m_gfxdecode->set_info(gfx_jumppop);
 
-	MCFG_DEVICE_REPLACE("ymsnd", YM3812, XTAL(14'000'000)/4) /* 3.5MHz - Verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	subdevice<ym3812_device>("ymsnd")->set_clock(XTAL(14'000'000)/4); /* 3.5MHz - Verified */
 
-	MCFG_DEVICE_REPLACE("oki", OKIM6295, XTAL(14'000'000)/16, okim6295_device::PIN7_HIGH) /* 875kHz - Verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	subdevice<okim6295_device>("oki")->set_clock(XTAL(14'000'000)/16); /* 875kHz - Verified */
+}
 
 /* The ESD 05-28-99 PCB adds an EEPROM */
 
-MACHINE_CONFIG_START(esd16_state::hedpanio)
+void esd16_state::hedpanio(machine_config &config)
+{
 	esd16(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hedpanic_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &esd16_state::hedpanic_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
-MACHINE_CONFIG_END
+}
 
 /* The ESD 08-26-1999 PCBs take that further and modify the sprite offsets */
 
@@ -718,21 +713,17 @@ void esd16_state::hedpanic(machine_config &config)
 
 /* ESD 08-26-1999 PCBs with different memory maps */
 
-MACHINE_CONFIG_START(esd16_state::mchampdx)
+void esd16_state::mchampdx(machine_config &config)
+{
 	hedpanic(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mchampdx_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &esd16_state::mchampdx_map);
+}
 
-MACHINE_CONFIG_START(esd16_state::tangtang)
+void esd16_state::tangtang(machine_config &config)
+{
 	hedpanic(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tangtang_map)
-MACHINE_CONFIG_END
-
-
-
-
+	m_maincpu->set_addrmap(AS_PROGRAM, &esd16_state::tangtang_map);
+}
 
 
 /***************************************************************************

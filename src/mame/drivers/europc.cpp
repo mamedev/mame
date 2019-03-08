@@ -587,18 +587,16 @@ void europc_pc_state::europc2(machine_config &config)
 }
 
 //Euro XT
-MACHINE_CONFIG_START(europc_pc_state::euroxt)
+void europc_pc_state::euroxt(machine_config &config)
+{
 	europc(config);
 
 	m_ram->set_default_size("768K");
 
-	MCFG_DEVICE_MODIFY("isa2")
-	MCFG_SLOT_DEFAULT_OPTION(nullptr)
-	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "xtide", false) // FIXME: determine ISA bus clock
-	MCFG_SLOT_FIXED(true)
-	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
-	MCFG_SLOT_FIXED(true)
-MACHINE_CONFIG_END
+	subdevice<isa8_slot_device>("isa2")->set_default_option(nullptr);
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, "xtide", true); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, "lpt", true);
+}
 
 ROM_START( europc )
 	ROM_REGION(0x10000,"bios", 0)

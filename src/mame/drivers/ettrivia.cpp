@@ -297,22 +297,23 @@ INTERRUPT_GEN_MEMBER(ettrivia_state::ettrivia_interrupt)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(ettrivia_state::ettrivia)
-	MCFG_DEVICE_ADD("maincpu", Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
-	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ettrivia_state,  ettrivia_interrupt)
+void ettrivia_state::ettrivia(machine_config &config)
+{
+	Z80(config, m_maincpu, 12000000/4-48000); //should be ok, it gives the 300 interrupts expected
+	m_maincpu->set_addrmap(AS_PROGRAM, &ettrivia_state::cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &ettrivia_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(ettrivia_state::ettrivia_interrupt));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ettrivia_state, screen_update_ettrivia)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	screen.set_screen_update(FUNC(ettrivia_state::screen_update_ettrivia));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_ettrivia);
 	PALETTE(config, "palette", FUNC(ettrivia_state::ettrivia_palette), 256);
@@ -329,7 +330,7 @@ MACHINE_CONFIG_START(ettrivia_state::ettrivia)
 	AY8912(config, m_ay[2], 1500000);
 	m_ay[2]->port_a_read_callback().set_ioport("IN0");
 	m_ay[2]->add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
 ROM_START( promutrv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
