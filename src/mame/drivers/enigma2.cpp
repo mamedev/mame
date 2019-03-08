@@ -637,11 +637,11 @@ void enigma2_state::enigma2a(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080(config, m_maincpu, CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &enigma2a_main_cpu_map);
-	m_maincpu->set_addrmap(AS_IO, &enigma2a_main_cpu_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2a_main_cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &enigma2_state::enigma2a_main_cpu_io_map);
 
 	Z80(config, m_audiocpu, 2500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &enigma2_audio_cpu_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_audio_cpu_map);
 	m_audiocpu->set_periodic_int(FUNC(enigma2_state::irq0_line_hold), attotime::from_hz(8*52));
 
 
