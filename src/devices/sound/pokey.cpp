@@ -99,11 +99,6 @@
 #define TIMER2  1
 #define TIMER4  2
 
-/* values to add to the divisors for the different modes */
-#define DIVADD_LOCLK        1
-#define DIVADD_HICLK        4
-#define DIVADD_HICLK_JOINED 7
-
 /* AUDCx */
 #define NOTPOLY5    0x80    /* selects POLY5 or direct CLOCK */
 #define POLY4       0x40    /* selects POLY4 or POLY17 */
@@ -151,11 +146,6 @@
 
 #define DIV_64      28       /* divisor for 1.78979 MHz clock to 63.9211 kHz */
 #define DIV_15      114      /* divisor for 1.78979 MHz clock to 15.6999 kHz */
-
-#define P4(chip)  chip->poly4[chip->p4]
-#define P5(chip)  chip->poly5[chip->p5]
-#define P9(chip)  chip->poly9[chip->p9]
-#define P17(chip) chip->poly17[chip->p17]
 
 #define CLK_1 0
 #define CLK_28 1
