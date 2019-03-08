@@ -13726,6 +13726,9 @@ gcbr                            // (c) 2002 Nintendo
 gamekin3                        //
 gameking                        //
 
+@source:gamemachine.cpp
+2001tgm                         //
+
 @source:gamemasters.cpp
 gmsshoot                        // (c) 1989 GameMasters
 
@@ -15038,7 +15041,7 @@ gdigdug                         // Gakken
 ghalien                         // Gakken
 kingman                         // Tomy
 machiman                        // Bandai
-msthawk                         // Bandai/Mattel
+msthawk                         // Mattel
 mwcbaseb                        // Mattel
 packmon                         // Bandai
 pairmtch                        // Bandai
