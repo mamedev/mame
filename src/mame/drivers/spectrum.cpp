@@ -295,14 +295,14 @@ SamRam
 WRITE8_MEMBER(spectrum_state::spectrum_rom_w)
 {
 	if (m_exp->romcs())
-		m_exp->mreq_w(space, offset, data);
+		m_exp->mreq_w(offset, data);
 }
 
 READ8_MEMBER(spectrum_state::spectrum_rom_r)
 {
 	uint8_t data;
 
-	data = m_exp->mreq_r(space, offset);
+	data = m_exp->mreq_r(offset);
 
 	if (!m_exp->romcs())
 		data = memregion("maincpu")->base()[offset];
@@ -412,7 +412,7 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 
 	/* expansion port */
 	if (m_exp)
-		data &= m_exp->port_fe_r(space, offset);
+		data &= m_exp->port_fe_r(offset);
 
 	/* Issue 2 Spectrums default to having bits 5, 6 & 7 set.
 	Issue 3 Spectrums default to having bits 5 & 7 set and bit 6 reset. */

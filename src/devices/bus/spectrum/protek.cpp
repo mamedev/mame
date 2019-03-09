@@ -72,7 +72,7 @@ void spectrum_protek_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(spectrum_protek_device::port_fe_r)
+uint8_t spectrum_protek_device::port_fe_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 

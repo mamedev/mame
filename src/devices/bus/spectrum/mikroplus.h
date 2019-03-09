@@ -38,10 +38,10 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
-	virtual DECLARE_READ8_MEMBER(mreq_r) override;
+	virtual uint8_t mreq_r(offs_t offset) override;
 
 private:
-	DECLARE_READ8_MEMBER(joystick_r);
+	uint8_t joystick_r();
 
 	required_memory_region m_rom;
 	required_ioport m_joy;

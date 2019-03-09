@@ -37,7 +37,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	DECLARE_READ8_MEMBER(joystick_r);
+	uint8_t joystick_r();
 
 	required_ioport m_joy;
 };

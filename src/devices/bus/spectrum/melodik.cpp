@@ -79,23 +79,23 @@ READ_LINE_MEMBER(spectrum_melodik_device::romcs)
 	return m_exp->romcs();
 }
 
-READ8_MEMBER(spectrum_melodik_device::mreq_r)
+uint8_t spectrum_melodik_device::mreq_r(offs_t offset)
 {
-	return m_exp->mreq_r(space, offset);
+	return m_exp->mreq_r(offset);
 }
 
-WRITE8_MEMBER(spectrum_melodik_device::mreq_w)
+void spectrum_melodik_device::mreq_w(offs_t offset, uint8_t data)
 {
 	if (m_exp->romcs())
-		m_exp->mreq_w(space, offset, data);
+		m_exp->mreq_w(offset, data);
 }
 
-READ8_MEMBER(spectrum_melodik_device::port_fe_r)
+uint8_t spectrum_melodik_device::port_fe_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
 	if (m_exp->romcs())
-		data &= m_exp->port_fe_r(space, offset);
+		data &= m_exp->port_fe_r(offset);
 
 	return data;
 }
