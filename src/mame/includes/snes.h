@@ -421,7 +421,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(snes_w_bank1);
 	DECLARE_WRITE8_MEMBER(snes_w_bank2);
 	uint8_t snes_open_bus_r();
-	DECLARE_READ8_MEMBER(snes_open_bus_r);
 	TIMER_CALLBACK_MEMBER(snes_nmi_tick);
 	TIMER_CALLBACK_MEMBER(snes_hirq_tick_callback);
 	TIMER_CALLBACK_MEMBER(snes_reset_oam_address);

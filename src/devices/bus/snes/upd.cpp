@@ -97,12 +97,12 @@ void sns_rom_setadsp_device::device_start()
 // Lo-ROM
 
 // DSP dump contains prg at offset 0 and data at offset 0x2000
-READ32_MEMBER( sns_rom20_necdsp_device::necdsp_prg_r )
+uint32_t sns_rom20_necdsp_device::necdsp_prg_r(offs_t offset)
 {
 	return get_prg(&m_bios[0], offset);
 }
 
-READ16_MEMBER( sns_rom20_necdsp_device::necdsp_data_r )
+uint16_t sns_rom20_necdsp_device::necdsp_data_r(offs_t offset)
 {
 	return get_data(&m_bios[0], offset + 0x2000/2);
 }
@@ -139,14 +139,14 @@ void sns_rom20_necdsp_device::device_add_mconfig(machine_config &config)
 	m_upd7725->set_addrmap(AS_DATA, &sns_rom20_necdsp_device::dsp_data_map_lorom);
 }
 
-READ8_MEMBER( sns_rom20_necdsp_device::chip_read )
+uint8_t sns_rom20_necdsp_device::chip_read(offs_t offset)
 {
 	offset &= 0x7fff;
 	return m_upd7725->snesdsp_read(offset < 0x4000);
 }
 
 
-WRITE8_MEMBER( sns_rom20_necdsp_device::chip_write )
+void sns_rom20_necdsp_device::chip_write(offs_t offset, uint8_t data)
 {
 	offset &= 0x7fff;
 	m_upd7725->snesdsp_write(offset < 0x4000, data);
@@ -156,12 +156,12 @@ WRITE8_MEMBER( sns_rom20_necdsp_device::chip_write )
 // Hi-ROM
 
 // DSP dump contains prg at offset 0 and data at offset 0x2000
-READ32_MEMBER( sns_rom21_necdsp_device::necdsp_prg_r )
+uint32_t sns_rom21_necdsp_device::necdsp_prg_r(offs_t offset)
 {
 	return get_prg(&m_bios[0], offset);
 }
 
-READ16_MEMBER( sns_rom21_necdsp_device::necdsp_data_r )
+uint16_t sns_rom21_necdsp_device::necdsp_data_r(offs_t offset)
 {
 	return get_data(&m_bios[0], offset + 0x2000/2);
 }
@@ -197,14 +197,14 @@ void sns_rom21_necdsp_device::device_add_mconfig(machine_config &config)
 	m_upd7725->set_addrmap(AS_DATA, &sns_rom21_necdsp_device::dsp_data_map_hirom);
 }
 
-READ8_MEMBER( sns_rom21_necdsp_device::chip_read )
+uint8_t sns_rom21_necdsp_device::chip_read(offs_t offset)
 {
 	offset &= 0x1fff;
 	return m_upd7725->snesdsp_read(offset < 0x1000);
 }
 
 
-WRITE8_MEMBER( sns_rom21_necdsp_device::chip_write )
+void sns_rom21_necdsp_device::chip_write(offs_t offset, uint8_t data)
 {
 	offset &= 0x1fff;
 	m_upd7725->snesdsp_write(offset < 0x1000, data);
@@ -217,7 +217,7 @@ WRITE8_MEMBER( sns_rom21_necdsp_device::chip_write )
 
 // same as above but additional read/write handling for the add-on chip
 
-READ8_MEMBER( sns_rom_setadsp_device::chip_read )
+uint8_t sns_rom_setadsp_device::chip_read(offs_t offset)
 {
 	if (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000)
 		m_upd96050->snesdsp_read((offset & 0x01) ? false : true);
@@ -236,7 +236,7 @@ READ8_MEMBER( sns_rom_setadsp_device::chip_read )
 }
 
 
-WRITE8_MEMBER( sns_rom_setadsp_device::chip_write )
+void sns_rom_setadsp_device::chip_write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000)
 	{
@@ -267,12 +267,12 @@ WRITE8_MEMBER( sns_rom_setadsp_device::chip_write )
 
 
 // DSP dump contains prg at offset 0 and data at offset 0x10000
-READ32_MEMBER( sns_rom_setadsp_device::setadsp_prg_r )
+uint32_t sns_rom_setadsp_device::setadsp_prg_r(offs_t offset)
 {
 	return get_prg(&m_bios[0], offset);
 }
 
-READ16_MEMBER( sns_rom_setadsp_device::setadsp_data_r )
+uint16_t sns_rom_setadsp_device::setadsp_data_r(offs_t offset)
 {
 	return get_data(&m_bios[0], offset + 0x10000/2);
 }
