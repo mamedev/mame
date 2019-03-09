@@ -21,6 +21,9 @@ Other: LED, 20MHz crystal. Next to the MC68901P is another chip just as large (4
 #include "machine/74259.h"
 #include "machine/eepromser.h"
 #include "machine/mc68901.h"
+#include "machine/ncr5390.h"
+#include "machine/nscsi_cd.h"
+#include "machine/nscsi_hd.h"
 
 class tti_state : public driver_device
 {
@@ -34,6 +37,8 @@ public:
 	void tti(machine_config &config);
 
 private:
+	void asc_config(device_t *device);
+
 	IRQ_CALLBACK_MEMBER(intack);
 
 	void prg_map(address_map &map);
@@ -55,7 +60,26 @@ void tti_state::prg_map(address_map &map)
 	map(0x00000, 0x07fff).rom().region("maincpu", 0);
 	map(0x7e000, 0x7ffff).ram();
 	map(0x80000, 0x80017).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write));
+	map(0x80020, 0x8002b).m("scsibus:7:asc", FUNC(ncr53c90a_device::map));
 	map(0x80070, 0x80077).w("bitlatch", FUNC(ls259_device::write_d0));
+}
+
+static void tti_scsi_devices(device_slot_interface &device)
+{
+	// FIXME: these device options are placeholders
+	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add_internal("asc", NCR53C90A);
+}
+
+void tti_state::asc_config(device_t *device)
+{
+	ncr53c90a_device &adapter = downcast<ncr53c90a_device &>(*device);
+
+	adapter.set_clock(20_MHz_XTAL);
+
+	adapter.irq_handler_cb().set(m_mfp, FUNC(mc68901_device::i7_w)).invert();
+	//adapter.drq_handler_cb().set(?);
 }
 
 void tti_state::tti(machine_config &config)
@@ -70,6 +94,16 @@ void tti_state::tti(machine_config &config)
 	m_mfp->set_tx_clock(9600); // for testing (FIXME: actually 16x)
 	m_mfp->out_so_cb().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_mfp->out_irq_cb().set_inputline("maincpu", M68K_IRQ_5);
+
+	NSCSI_BUS(config, "scsibus");
+	NSCSI_CONNECTOR(config, "scsibus:0", tti_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:1", tti_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:2", tti_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", tti_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", tti_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", tti_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", tti_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:7", tti_scsi_devices, "asc", true).set_option_machine_config("asc", [this] (device_t *device) { asc_config(device); });
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set(m_mfp, FUNC(mc68901_device::write_rx));
