@@ -287,6 +287,8 @@ public:
 		: spg2xx_game_state(mconfig, type, tag)
 		, m_cart(*this, "cartslot")
 		, m_cart_region(nullptr)
+		, m_porta_in(*this, "INA_%u", 0U)
+		, m_portc_in(*this, "INC_%u", 0U)
 	{ }
 
 	void icanguit(machine_config &config);
@@ -294,12 +296,26 @@ public:
 
 private:
 	virtual void machine_start() override;
-	//virtual void machine_reset() override;
+	virtual void machine_reset() override;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(icanguit_cart);
 
+	DECLARE_READ16_MEMBER(porta_r);
+	DECLARE_READ16_MEMBER(portb_r);
+	DECLARE_READ16_MEMBER(portc_r);
+	DECLARE_WRITE16_MEMBER(porta_w);
+	DECLARE_WRITE16_MEMBER(portb_w);
+	DECLARE_WRITE16_MEMBER(portc_w);
+
+
 	required_device<generic_slot_device> m_cart;
 	memory_region *m_cart_region;
+
+	uint16_t m_inlatch_a;
+	uint16_t m_inlatch_c;
+	optional_ioport_array<3> m_porta_in;
+	optional_ioport_array<3> m_portc_in;
+
 };
 
 
@@ -1144,19 +1160,20 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( icanpian ) // this has an entire piano keyboard + extras
-	PORT_START("P1") // the keyboard keys are in here, but each seems triple mapped to 3 octaves so there must be multiplexing
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON4 )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON5 )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON6 )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON7 )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON8 )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON9 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON10 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON11 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON12 )
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON13 )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON14 )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON15 )
+
+	PORT_START("INA_0")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON4 )  PORT_PLAYER(1) PORT_NAME("Octatve 0 F (Green)")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON5 )  PORT_PLAYER(1) PORT_NAME("Octatve 0 F# (Purple)")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON6 )  PORT_PLAYER(1) PORT_NAME("Octatve 0 G (Yellow)")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON7 )  PORT_PLAYER(1) PORT_NAME("Octatve 0 G# (Dark Blue)")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON8 )  PORT_PLAYER(1) PORT_NAME("Octatve 0 A (Flesh)")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON9 )  PORT_PLAYER(1) PORT_NAME("Octatve 0 A# (Dark Green)")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_PLAYER(1) PORT_NAME("Octatve 0 B (Pink)")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_PLAYER(1) PORT_NAME("Octatve 0 C (White)")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_PLAYER(1) PORT_NAME("Octatve 0 C# (Black)")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_PLAYER(1) PORT_NAME("Octatve 0 D (Blue)")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_PLAYER(1) PORT_NAME("Octatve 0 D# (Red)")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_PLAYER(1) PORT_NAME("Octatve 0 E (Orange)")
 	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1169,6 +1186,61 @@ static INPUT_PORTS_START( icanpian ) // this has an entire piano keyboard + extr
 	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("INA_1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON4 )  PORT_PLAYER(2) PORT_NAME("Octatve 1 F (Green)")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON5 )  PORT_PLAYER(2) PORT_NAME("Octatve 1 F# (Purple)")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON6 )  PORT_PLAYER(2) PORT_NAME("Octatve 1 G (Yellow)")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON7 )  PORT_PLAYER(2) PORT_NAME("Octatve 1 G# (Dark Blue)")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON8 )  PORT_PLAYER(2) PORT_NAME("Octatve 1 A (Flesh)")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON9 )  PORT_PLAYER(2) PORT_NAME("Octatve 1 A# (Dark Green)")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_PLAYER(2) PORT_NAME("Octatve 1 B (Pink)")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_PLAYER(2) PORT_NAME("Octatve 1 C (White)")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_PLAYER(2) PORT_NAME("Octatve 1 C# (Black)")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_PLAYER(2) PORT_NAME("Octatve 1 D (Blue)")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_PLAYER(2) PORT_NAME("Octatve 1 D# (Red)")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_PLAYER(2) PORT_NAME("Octatve 1 E (Orange)")
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("INA_2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON4 )  PORT_PLAYER(3) PORT_NAME("Octatve 2 F (Green)")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON5 )  PORT_PLAYER(3) PORT_NAME("Octatve 2 F# (Purple)")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON6 )  PORT_PLAYER(3) PORT_NAME("Octatve 2 G (Yellow)")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON7 )  PORT_PLAYER(3) PORT_NAME("Octatve 2 G# (Dark Blue)")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON8 )  PORT_PLAYER(3) PORT_NAME("Octatve 2 A (Flesh)")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON9 )  PORT_PLAYER(3) PORT_NAME("Octatve 2 A# (Dark Green)")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_PLAYER(3) PORT_NAME("Octatve 2 B (Pink)")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_PLAYER(3) PORT_NAME("Octatve 2 C (White)")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_PLAYER(3) PORT_NAME("Octatve 2 C# (Black)")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_PLAYER(3) PORT_NAME("Octatve 2 D (Blue)")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_PLAYER(3) PORT_NAME("Octatve 2 D# (Red)")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_PLAYER(3) PORT_NAME("Octatve 2 E (Orange)")
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("P1")
+	// uses multiplexed ports instead
 
 	PORT_START("P2")
 	PORT_DIPNAME( 0x0001, 0x0001, "P2" )
@@ -1220,7 +1292,108 @@ static INPUT_PORTS_START( icanpian ) // this has an entire piano keyboard + extr
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("P3") // the system ALWAYS requires a cartridge, but has 2 modes of operation depending on a switch.  The only way to use it as a normal keyboard is by flipping this switch.
+	PORT_START("P3")
+	// uses multiplexed ports instead
+
+	PORT_START("INC_0")
+	PORT_DIPNAME( 0x0001, 0x0001, "INC_0" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // presumably power, kils the game
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("INC_1")
+	PORT_DIPNAME( 0x0001, 0x0001, "INC_1" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("INC_2") // the system ALWAYS requires a cartridge, but has 2 modes of operation depending on a switch.  The only way to use it as a normal keyboard is by flipping this switch.
 	PORT_DIPNAME( 0x0001, 0x0000, "System Mode" )
 	PORT_DIPSETTING(      0x0001, "Keyboard Mode (no TV output)" )
 	PORT_DIPSETTING(      0x0000, "TV Mode" )
@@ -1229,7 +1402,7 @@ static INPUT_PORTS_START( icanpian ) // this has an entire piano keyboard + extr
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_DIPNAME( 0x0040, 0x0000, "P3" )
+	PORT_DIPNAME( 0x0040, 0x0000, "INC_2" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) )
@@ -1244,7 +1417,9 @@ static INPUT_PORTS_START( icanpian ) // this has an entire piano keyboard + extr
 	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // presumably power, kils the game
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1257,6 +1432,7 @@ static INPUT_PORTS_START( icanpian ) // this has an entire piano keyboard + extr
 	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
 INPUT_PORTS_END
 
 
@@ -1412,6 +1588,67 @@ static INPUT_PORTS_START( lexizeus ) // how many buttons does this have?  I acci
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
+READ16_MEMBER(icanguit_state::porta_r)
+{
+	//logerror("%s: porta_r\n", machine().describe_context());
+	return m_inlatch_a;
+}
+
+
+READ16_MEMBER(icanguit_state::portc_r)
+{
+	//logerror("%s: portc_r\n", machine().describe_context());
+	return m_inlatch_c;
+}
+
+WRITE16_MEMBER(icanguit_state::porta_w)
+{
+	if (data == 0x0000)
+	{
+		m_inlatch_a = m_inlatch_c = 0x0000;
+	}
+	else if (data == 0x1000)
+	{
+		m_inlatch_a = m_porta_in[2]->read();
+		m_inlatch_c = m_portc_in[2]->read();
+	}
+	else if (data == 0x2000)
+	{
+		m_inlatch_a = m_porta_in[1]->read();
+		m_inlatch_c = m_portc_in[1]->read();
+	}
+	else if (data == 0x4000)
+	{
+		m_inlatch_a = m_porta_in[0]->read();
+		m_inlatch_c = m_portc_in[0]->read();
+	}
+	else
+	{
+		logerror("%s: unknown porta_w (%04x)\n", machine().describe_context(), data);
+	}
+}
+
+WRITE16_MEMBER(icanguit_state::portc_w)
+{
+	//logerror("%s: portc_w (%04x)\n", machine().describe_context(), data);
+}
+
+
+// portb is used on startup, something serial?
+READ16_MEMBER(icanguit_state::portb_r)
+{
+	//logerror("%s: portb_r\n", machine().describe_context());
+	return m_io_p2->read();
+}
+
+WRITE16_MEMBER(icanguit_state::portb_w)
+{
+	//logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
+}
+
+
+
 void icanguit_state::machine_start()
 {
 	spg2xx_game_state::machine_start();
@@ -1425,6 +1662,14 @@ void icanguit_state::machine_start()
 		m_bank->set_entry(0);
 	}
 }
+
+void icanguit_state::machine_reset()
+{
+	spg2xx_game_state::machine_reset();
+	m_inlatch_a = 0x0000;
+	m_inlatch_c = 0x0000;
+}
+
 
 DEVICE_IMAGE_LOAD_MEMBER(icanguit_state, icanguit_cart)
 {
@@ -1599,10 +1844,18 @@ void icanguit_state::icanguit(machine_config &config)
 	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 
 	spg2xx_base(config);
-
+	/*
+	m_spg->porta_in().set(FUNC(icanguit_state::porta_r));
+	m_spg->portb_in().set(FUNC(icanguit_state::portb_r));
+	m_spg->portc_in().set(FUNC(icanguit_state::portc_r));
+	m_spg->porta_out().set(FUNC(icanguit_state::porta_w));
+	m_spg->portb_out().set(FUNC(icanguit_state::portb_w));
+	m_spg->portc_out().set(FUNC(icanguit_state::portc_w));
+	*/
 	m_spg->porta_in().set_ioport("P1");
 	m_spg->portb_in().set_ioport("P2");
 	m_spg->portc_in().set_ioport("P3");
+
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "icanguit_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -1618,9 +1871,12 @@ void icanguit_state::icanpian(machine_config &config)
 
 	spg2xx_base(config);
 
-	m_spg->porta_in().set_ioport("P1");
-	m_spg->portb_in().set_ioport("P2");
-	m_spg->portc_in().set_ioport("P3");
+	m_spg->porta_in().set(FUNC(icanguit_state::porta_r));
+	m_spg->portb_in().set(FUNC(icanguit_state::portb_r));
+	m_spg->portc_in().set(FUNC(icanguit_state::portc_r));
+	m_spg->porta_out().set(FUNC(icanguit_state::porta_w));
+	m_spg->portb_out().set(FUNC(icanguit_state::portb_w));
+	m_spg->portc_out().set(FUNC(icanguit_state::portc_w));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "icanpian_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
