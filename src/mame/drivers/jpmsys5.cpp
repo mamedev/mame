@@ -91,10 +91,10 @@ WRITE16_MEMBER(jpmsys5v_state::sys5_tms34061_w)
 	}
 
 	if (ACCESSING_BITS_8_15)
-		m_tms34061->write(space, col, row, func, data >> 8);
+		m_tms34061->write(col, row, func, data >> 8);
 
 	if (ACCESSING_BITS_0_7)
-		m_tms34061->write(space, col | 1, row, func, data & 0xff);
+		m_tms34061->write(col | 1, row, func, data & 0xff);
 }
 
 READ16_MEMBER(jpmsys5v_state::sys5_tms34061_r)
@@ -115,10 +115,10 @@ READ16_MEMBER(jpmsys5v_state::sys5_tms34061_r)
 	}
 
 	if (ACCESSING_BITS_8_15)
-		data |= m_tms34061->read(space, col, row, func) << 8;
+		data |= m_tms34061->read(col, row, func) << 8;
 
 	if (ACCESSING_BITS_0_7)
-		data |= m_tms34061->read(space, col | 1, row, func);
+		data |= m_tms34061->read(col | 1, row, func);
 
 	return data;
 }
