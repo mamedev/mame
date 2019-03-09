@@ -151,10 +151,8 @@ void svi3x8_state::svi3x8_io_bank(address_map &map)
 {
 	map(0x000, 0x0ff).rw(m_expander, FUNC(svi_expander_device::iorq_r), FUNC(svi_expander_device::iorq_w));
 	map(0x100, 0x17f).rw(m_expander, FUNC(svi_expander_device::iorq_r), FUNC(svi_expander_device::iorq_w));
-	map(0x180, 0x180).mirror(0x22).w(m_vdp, FUNC(tms9928a_device::vram_w));
-	map(0x181, 0x181).mirror(0x22).w(m_vdp, FUNC(tms9928a_device::register_w));
-	map(0x184, 0x184).mirror(0x22).r(m_vdp, FUNC(tms9928a_device::vram_r));
-	map(0x185, 0x185).mirror(0x22).r(m_vdp, FUNC(tms9928a_device::register_r));
+	map(0x180, 0x181).mirror(0x22).w(m_vdp, FUNC(tms9928a_device::write));
+	map(0x184, 0x185).mirror(0x22).r(m_vdp, FUNC(tms9928a_device::read));
 	map(0x188, 0x188).mirror(0x23).w("psg", FUNC(ay8910_device::address_w));
 	map(0x18c, 0x18c).mirror(0x23).w("psg", FUNC(ay8910_device::data_w));
 	map(0x190, 0x190).mirror(0x23).r("psg", FUNC(ay8910_device::data_r));

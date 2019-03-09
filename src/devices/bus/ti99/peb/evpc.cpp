@@ -213,7 +213,7 @@ READ8Z_MEMBER(snug_enhanced_video_device::readz)
 
 	if (m_video_accessed)
 	{
-		*value = m_video->read(machine().dummy_space(), m_address>>1);
+		*value = m_video->read(m_address>>1);
 	}
 }
 
@@ -296,7 +296,7 @@ void snug_enhanced_video_device::write(offs_t offset, uint8_t data)
 
 	if (m_video_accessed)
 	{
-		m_video->write(machine().dummy_space(), m_address>>1, data);
+		m_video->write(m_address>>1, data);
 	}
 
 	if (m_sound_accessed)

@@ -557,8 +557,7 @@ void msx_state::msx_io_map(address_map &map)
 	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x98, 0x98).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0x99, 0x99).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x98, 0x99).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 	map(0xd8, 0xd9).rw(FUNC(msx_state::msx_kanji_r), FUNC(msx_state::msx_kanji_w));
 	// 0xfc - 0xff : Memory mapper I/O ports. I/O handlers will be installed if a memory mapper is present in a system
 }

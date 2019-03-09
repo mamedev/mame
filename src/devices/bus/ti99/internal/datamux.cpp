@@ -143,7 +143,7 @@ void datamux_device::read_all(uint16_t addr, uint8_t *value)
 		if ((addr & 0xf801)==0x8800)
 		{
 			// Forward to VDP unless we have an EVPC
-			if (m_video != nullptr) *value = m_video->read(machine().dummy_space(), addr>>1); // A14 determines data or register read
+			if (m_video != nullptr) *value = m_video->read(addr>>1); // A14 determines data or register read
 		}
 	}
 
@@ -184,7 +184,7 @@ void datamux_device::write_all(uint16_t addr, uint8_t value)
 	if ((addr & 0xf801)==0x8800)
 	{
 		// Forward to VDP unless we have an EVPC
-		if (m_video != nullptr) m_video->write(machine().dummy_space(), addr>>1, value);   // A14 determines data or register write
+		if (m_video != nullptr) m_video->write(addr>>1, value);   // A14 determines data or register write
 	}
 
 	// I/O port gets all accesses

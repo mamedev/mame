@@ -166,8 +166,7 @@ void by133_state::video_map(address_map &map)
 { // U8 Vidiot
 	map(0x0000, 0x1fff).rw(FUNC(by133_state::sound_data_r), FUNC(by133_state::sound_data_w));
 	map(0x2000, 0x2003).mirror(0x0ffc).rw(m_pia_u7, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // PIA U7 Vidiot
-	map(0x4000, 0x4000).mirror(0x0ffe).rw(m_crtc, FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0x4001, 0x4001).mirror(0x0ffe).rw(m_crtc, FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x4000, 0x4001).mirror(0x0ffe).rw(m_crtc, FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 	map(0x6000, 0x63ff).mirror(0x1c00).ram();
 	map(0x8000, 0xffff).rom();
 }
@@ -175,10 +174,8 @@ void by133_state::video_map(address_map &map)
 void by133_state::granny_map(address_map &map)
 {
 	map(0x0000, 0x0001).rw(FUNC(by133_state::sound_data_r), FUNC(by133_state::sound_data_w));
-	map(0x0002, 0x0002).rw(m_crtc, FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0x0003, 0x0003).rw(m_crtc, FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
-	map(0x0004, 0x0004).rw(m_crtc2, FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0x0005, 0x0005).rw(m_crtc2, FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x0002, 0x0003).rw(m_crtc, FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
+	map(0x0004, 0x0005).rw(m_crtc2, FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 	map(0x0006, 0x0007).w(FUNC(by133_state::granny_crtc_w)); // can write to both at once
 	map(0x0008, 0x000b).rw(m_pia_u7, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x2000, 0x27ff).ram();
@@ -536,16 +533,8 @@ INPUT_PORTS_END
 
 WRITE8_MEMBER( by133_state::granny_crtc_w )
 {
-	if (offset)
-	{
-		m_crtc->register_write(data);
-		m_crtc2->register_write(data);
-	}
-	else
-	{
-		m_crtc->vram_write(data);
-		m_crtc2->vram_write(data);
-	}
+	m_crtc->write(offset, data);
+	m_crtc2->write(offset, data);
 }
 
 READ8_MEMBER( by133_state::sound_data_r )
