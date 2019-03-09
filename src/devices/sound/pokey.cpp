@@ -99,11 +99,6 @@
 #define TIMER2  1
 #define TIMER4  2
 
-/* values to add to the divisors for the different modes */
-#define DIVADD_LOCLK        1
-#define DIVADD_HICLK        4
-#define DIVADD_HICLK_JOINED 7
-
 /* AUDCx */
 #define NOTPOLY5    0x80    /* selects POLY5 or direct CLOCK */
 #define POLY4       0x40    /* selects POLY4 or POLY17 */
@@ -151,11 +146,6 @@
 
 #define DIV_64      28       /* divisor for 1.78979 MHz clock to 63.9211 kHz */
 #define DIV_15      114      /* divisor for 1.78979 MHz clock to 15.6999 kHz */
-
-#define P4(chip)  chip->poly4[chip->p4]
-#define P5(chip)  chip->poly5[chip->p5]
-#define P9(chip)  chip->poly9[chip->p9]
-#define P17(chip) chip->poly17[chip->p17]
 
 #define CLK_1 0
 #define CLK_28 1
@@ -253,6 +243,7 @@ void pokey_device::device_start()
 	m_out_filter = 0;
 	m_out_raw = 0;
 	m_old_raw_inval = true;
+	m_borrow_all_max = 0;
 	m_kbd_state = 0;
 
 	/* reset more internal state */
@@ -591,15 +582,34 @@ void pokey_device::step_one_clock(void)
 			clock_triggered[CLK_114] = 1;
 		}
 
+		/* in case
+		 *   no channel is at high speed AND
+		 *   no prescaler-clock has triggered AND
+		 *   we are not expecting a borrow-count finish
+		 * => we are done and can exit here
+		 *
+		 * Note: for best performance on no-match case (matching case has to ask
+		 * for all conditions anyway), the sequence chosen is:
+		 * most likely no-match -> least likely no-match */
+		if (!clock_triggered[CLK_28] && !clock_triggered[CLK_114] &&
+		    m_borrow_all_max == 0 &&
+		    (m_AUDCTL & (CH1_HICLK || CH3_HICLK)) == 0)
+		{
+			/* not quite: high speed potentiometer requires handling on each
+			 * cycle */
+			if ((m_SKCTL & SK_PADDLE) && (m_pot_counter < 228))
+				step_pot();
+			return;
+		}
+
 		int const base_clock = (m_AUDCTL & CLK_15KHZ) ? CLK_114 : CLK_28;
-		int clk = (m_AUDCTL & CH1_HICLK) ? CLK_1 : base_clock;
-		if (clock_triggered[clk])
+		/* increment CHAN1 & CHAN3 at each cycle for high speed or on prescaler
+		 * clock trigger */
+		if ((m_AUDCTL & CH1_HICLK) || clock_triggered[base_clock])
 			m_channel[CHAN1].inc_chan();
-
-		clk = (m_AUDCTL & CH3_HICLK) ? CLK_1 : base_clock;
-		if (clock_triggered[clk])
+		if ((m_AUDCTL & CH3_HICLK) || clock_triggered[base_clock])
 			m_channel[CHAN3].inc_chan();
-
+		/* same for CHAN2 & CHAN4 - if not joined as upper bits */
 		if (clock_triggered[base_clock])
 		{
 			if (!(m_AUDCTL & CH12_JOINED))
@@ -616,6 +626,10 @@ void pokey_device::step_one_clock(void)
 		if (clock_triggered[CLK_114] && (m_SKCTL & SK_KEYSCAN))
 			step_keyboard();
 	}
+
+	/* performance-cheap decrement of shared helper max borrow counter */
+	if(m_borrow_all_max != 0)
+		m_borrow_all_max--;
 
 	/* do CHAN2 before CHAN1 because CHAN1 may set borrow! */
 	if (m_channel[CHAN2].check_borrow())
