@@ -1220,16 +1220,16 @@ static INPUT_PORTS_START( icanpian ) // this has an entire piano keyboard + extr
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("P3")
-	PORT_DIPNAME( 0x0001, 0x0000, "P3" ) // must be 'ON' to boot
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_START("P3") // the system ALWAYS requires a cartridge, but has 2 modes of operation depending on a switch.  The only way to use it as a normal keyboard is by flipping this switch.
+	PORT_DIPNAME( 0x0001, 0x0000, "System Mode" )
+	PORT_DIPSETTING(      0x0001, "Keyboard Mode (no TV output)" )
+	PORT_DIPSETTING(      0x0000, "TV Mode" )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0040, 0x0000, "P3" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) )
