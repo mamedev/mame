@@ -137,7 +137,7 @@ void wswan_state::dma_sound_cb()
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 		/* TODO: Output sound DMA byte */
-		port_w(space, 0x89, space.read_byte(m_sound_dma.source));
+		port_w(0x89, space.read_byte(m_sound_dma.source));
 		m_sound_dma.size--;
 		m_sound_dma.source = (m_sound_dma.source + 1) & 0x0fffff;
 		if (m_sound_dma.size == 0)
@@ -180,15 +180,15 @@ void wswan_state::common_start()
 	if (m_cart->exists())
 	{
 		// ROM
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000, 0x2ffff, read8_delegate(FUNC(ws_cart_slot_device::read_rom20),(ws_cart_slot_device*)m_cart));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x30000, 0x3ffff, read8_delegate(FUNC(ws_cart_slot_device::read_rom30),(ws_cart_slot_device*)m_cart));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x40000, 0xeffff, read8_delegate(FUNC(ws_cart_slot_device::read_rom40),(ws_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000, 0x2ffff, read8sm_delegate(FUNC(ws_cart_slot_device::read_rom20),(ws_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x30000, 0x3ffff, read8sm_delegate(FUNC(ws_cart_slot_device::read_rom30),(ws_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x40000, 0xeffff, read8sm_delegate(FUNC(ws_cart_slot_device::read_rom40),(ws_cart_slot_device*)m_cart));
 
 		// SRAM
 		if (m_cart->get_type() == WS_SRAM)
 		{
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x10000, 0x1ffff, read8_delegate(FUNC(ws_cart_slot_device::read_ram),(ws_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0x10000, 0x1ffff, write8_delegate(FUNC(ws_cart_slot_device::write_ram),(ws_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x10000, 0x1ffff, read8sm_delegate(FUNC(ws_cart_slot_device::read_ram),(ws_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x10000, 0x1ffff, write8sm_delegate(FUNC(ws_cart_slot_device::write_ram),(ws_cart_slot_device*)m_cart));
 		}
 	}
 }
@@ -224,15 +224,15 @@ void wswan_state::machine_reset()
 	memset(&m_sound_dma, 0, sizeof(m_sound_dma));
 }
 
-READ8_MEMBER( wswan_state::bios_r )
+uint8_t wswan_state::bios_r(offs_t offset)
 {
 	if (!m_bios_disabled)
 		return m_ws_bios_bank[offset];
 	else
-		return m_cart->read_rom40(space, offset + 0xb0000);
+		return m_cart->read_rom40(offset + 0xb0000);
 }
 
-READ8_MEMBER( wswan_state::port_r )
+uint8_t wswan_state::port_r(offs_t offset)
 {
 	uint8_t value = m_ws_portram[offset];
 
@@ -240,7 +240,7 @@ READ8_MEMBER( wswan_state::port_r )
 		logerror("PC=%X: port read %02X\n", m_maincpu->pc(), offset);
 
 	if (offset < 0x40 || (offset >= 0xa1 && offset < 0xb0))
-		return m_vdp->reg_r(space, offset);
+		return m_vdp->reg_r(offset);
 
 	switch (offset)
 	{
@@ -263,7 +263,7 @@ READ8_MEMBER( wswan_state::port_r )
 			value = m_sound_dma.enable;
 			break;
 		case 0x60:
-			value = m_vdp->reg_r(space, offset);
+			value = m_vdp->reg_r(offset);
 			break;
 		case 0xa0:      // Hardware type
 			// Bit 0 - Disable/enable Bios
@@ -289,14 +289,14 @@ READ8_MEMBER( wswan_state::port_r )
 		case 0xcd:
 		case 0xce:
 		case 0xcf:
-			value = m_cart->read_io(space, offset & 0x0f);
+			value = m_cart->read_io(offset & 0x0f);
 			break;
 	}
 
 	return value;
 }
 
-WRITE8_MEMBER( wswan_state::port_w )
+void wswan_state::port_w(offs_t offset, uint8_t data)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	uint8_t input;
@@ -304,7 +304,7 @@ WRITE8_MEMBER( wswan_state::port_w )
 
 	if (offset < 0x40 || (offset >= 0xa1 && offset < 0xb0))
 	{
-		m_vdp->reg_w(space, offset, data);
+		m_vdp->reg_w(offset, data);
 		return;
 	}
 
@@ -403,7 +403,7 @@ WRITE8_MEMBER( wswan_state::port_w )
 			m_sound_dma.enable = data;
 			break;
 		case 0x60:
-			m_vdp->reg_w(space, offset, data);
+			m_vdp->reg_w(offset, data);
 			break;
 		case 0x80:  /* Audio 1 freq (lo)
 		             Bit 0-7 - Audio channel 1 frequency bit 0-7
@@ -488,7 +488,7 @@ WRITE8_MEMBER( wswan_state::port_w )
 		             Bit 0-3 - Master volume
 		             Bit 4-7 - Unknown
 		             */
-			m_sound->port_w(space, offset, data);
+			m_sound->port_w(offset, data);
 			break;
 		case 0xa0:  /* Hardware type - this is probably read only
 		             Bit 0   - Enable cartridge slot and/or disable bios
@@ -652,7 +652,7 @@ WRITE8_MEMBER( wswan_state::port_w )
 		case 0xcd:
 		case 0xce:
 		case 0xcf:
-			m_cart->write_io(space, offset & 0x0f, data);
+			m_cart->write_io(offset & 0x0f, data);
 			break;
 		default:
 			logerror( "Write to unsupported port: %X - %X\n", offset, data );
