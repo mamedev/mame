@@ -94,25 +94,36 @@ There are more!
 #include "emu.h"
 #include "kaneko_tmap.h"
 
+void kaneko_view2_tilemap_device::vram_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rw(FUNC(kaneko_view2_tilemap_device::vram_1_r), FUNC(kaneko_view2_tilemap_device::vram_1_w)).share("vram_1");
+	map(0x1000, 0x1fff).rw(FUNC(kaneko_view2_tilemap_device::vram_0_r), FUNC(kaneko_view2_tilemap_device::vram_0_w)).share("vram_0");
+	map(0x2000, 0x2fff).rw(FUNC(kaneko_view2_tilemap_device::scroll_1_r), FUNC(kaneko_view2_tilemap_device::scroll_1_w)).share("scroll_1");
+	map(0x3000, 0x3fff).rw(FUNC(kaneko_view2_tilemap_device::scroll_0_r), FUNC(kaneko_view2_tilemap_device::scroll_0_w)).share("scroll_0");
+}
+
 DEFINE_DEVICE_TYPE(KANEKO_TMAP, kaneko_view2_tilemap_device, "kaneko_view2", "Kaneko VIEW2 Tilemaps")
 
-kaneko_view2_tilemap_device::kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kaneko_view2_tilemap_device::kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, KANEKO_TMAP, tag, owner, clock)
+	, m_vram(*this, "vram_%u", 0U)
+	, m_vscroll(*this, "scroll_%u", 0U)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 	m_invert_flip = 0;
 }
 
-void kaneko_view2_tilemap_device::get_tile_info(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
+template<unsigned Layer>
+TILE_GET_INFO_MEMBER(kaneko_view2_tilemap_device::get_tile_info)
 {
-	uint16_t code_hi = m_vram[_N_][ 2 * tile_index + 0];
-	uint16_t code_lo = m_vram[_N_][ 2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(m_tilebase, code_lo + m_vram_tile_addition[_N_], (code_hi >> 2) & 0x3f, TILE_FLIPXY( code_hi & 3 ));
-	tileinfo.category   =   (code_hi >> 8) & 7;
-}
+	u16 attr = m_vram[Layer][ 2 * tile_index + 0];
+	u32 code = m_vram[Layer][ 2 * tile_index + 1];
+	if (!m_view2_cb.isnull())
+		m_view2_cb(Layer, &code);
 
-TILE_GET_INFO_MEMBER(kaneko_view2_tilemap_device::get_tile_info_0) { get_tile_info(tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(kaneko_view2_tilemap_device::get_tile_info_1) { get_tile_info(tileinfo, tile_index, 1); }
+	SET_TILE_INFO_MEMBER(m_tilebase, code, (attr >> 2) & 0x3f, TILE_FLIPXY(attr & 3));
+	tileinfo.category   =   (attr >> 8) & 7;
+}
 
 
 void kaneko_view2_tilemap_device::device_start()
@@ -120,20 +131,17 @@ void kaneko_view2_tilemap_device::device_start()
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_vram[0] = make_unique_clear<uint16_t[]>(0x1000/2);
-	m_vram[1] = make_unique_clear<uint16_t[]>(0x1000/2);
-	m_vscroll[0] = make_unique_clear<uint16_t[]>(0x1000/2);
-	m_vscroll[1] = make_unique_clear<uint16_t[]>(0x1000/2);
-	m_regs = make_unique_clear<uint16_t[]>(0x20/2);
+	m_view2_cb.bind_relative_to(*owner());
+	m_regs = make_unique_clear<u16[]>(0x20/2);
 
 	m_tmap[0] = &machine().tilemap().create(
 			*m_gfxdecode,
-			tilemap_get_info_delegate(FUNC(kaneko_view2_tilemap_device::get_tile_info_0),this),
+			tilemap_get_info_delegate(FUNC(kaneko_view2_tilemap_device::get_tile_info<0>),this),
 			TILEMAP_SCAN_ROWS,
 			16,16, 0x20,0x20);
 	m_tmap[1] = &machine().tilemap().create(
 			*m_gfxdecode,
-			tilemap_get_info_delegate(FUNC(kaneko_view2_tilemap_device::get_tile_info_1),this),
+			tilemap_get_info_delegate(FUNC(kaneko_view2_tilemap_device::get_tile_info<1>),this),
 			TILEMAP_SCAN_ROWS,
 			16,16, 0x20,0x20);
 
@@ -143,44 +151,35 @@ void kaneko_view2_tilemap_device::device_start()
 	m_tmap[0]->set_scroll_rows(0x200);  // Line Scroll
 	m_tmap[1]->set_scroll_rows(0x200);
 
-
 	m_tmap[0]->set_scrolldx(-m_dx,      m_xdim + m_dx -1        );
 	m_tmap[1]->set_scrolldx(-(m_dx+2),  m_xdim + (m_dx + 2) - 1 );
 
 	m_tmap[0]->set_scrolldy(-m_dy,      m_ydim + m_dy -1 );
 	m_tmap[1]->set_scrolldy(-m_dy,      m_ydim + m_dy -1 );
 
-	save_pointer(NAME(m_vram[0]), 0x1000/2);
-	save_pointer(NAME(m_vram[1]), 0x1000/2);
-	save_pointer(NAME(m_vscroll[0]), 0x1000/2);
-	save_pointer(NAME(m_vscroll[1]), 0x1000/2);
 	save_pointer(NAME(m_regs), 0x20/2);
-	save_item(NAME(m_vram_tile_addition[0]));
-	save_item(NAME(m_vram_tile_addition[1]));
 }
 
 void kaneko_view2_tilemap_device::device_reset()
 {
-	m_vram_tile_addition[0] = 0;
-	m_vram_tile_addition[1] = 0;
 }
 
 
-void kaneko_view2_tilemap_device::kaneko16_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int _N_)
+void kaneko_view2_tilemap_device::vram_w(int _N_, offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram[_N_][offset]);
 	m_tmap[_N_]->mark_tile_dirty(offset/2);
 }
 
-void kaneko_view2_tilemap_device::kaneko16_prepare(bitmap_ind16 &bitmap, const rectangle &cliprect) { kaneko16_prepare_common(bitmap, cliprect); }
-void kaneko_view2_tilemap_device::kaneko16_prepare(bitmap_rgb32 &bitmap, const rectangle &cliprect) { kaneko16_prepare_common(bitmap, cliprect); }
+void kaneko_view2_tilemap_device::prepare(bitmap_ind16 &bitmap, const rectangle &cliprect) { prepare_common(bitmap, cliprect); }
+void kaneko_view2_tilemap_device::prepare(bitmap_rgb32 &bitmap, const rectangle &cliprect) { prepare_common(bitmap, cliprect); }
 
 template<class _BitmapClass>
-void kaneko_view2_tilemap_device::kaneko16_prepare_common(_BitmapClass &bitmap, const rectangle &cliprect)
+void kaneko_view2_tilemap_device::prepare_common(_BitmapClass &bitmap, const rectangle &cliprect)
 {
 	int layers_flip_0;
-	uint16_t layer0_scrollx, layer0_scrolly;
-	uint16_t layer1_scrollx, layer1_scrolly;
+	u16 layer0_scrollx, layer0_scrolly;
+	u16 layer1_scrollx, layer1_scrolly;
 	int i;
 
 	layers_flip_0 = m_regs[ 4 ];
@@ -211,12 +210,12 @@ void kaneko_view2_tilemap_device::kaneko16_prepare_common(_BitmapClass &bitmap, 
 	layer1_scrollx      =   m_regs[ 0 ];
 	layer1_scrolly      =   m_regs[ 1 ] >> 6;
 
-	m_tmap[0]->set_scrolly(0,layer0_scrolly);
-	m_tmap[1]->set_scrolly(0,layer1_scrolly);
+	m_tmap[0]->set_scrolly(0, layer0_scrolly);
+	m_tmap[1]->set_scrolly(0, layer1_scrolly);
 
-	for (i=0; i<0x200; i++)
+	for (i = 0; i < 0x200; i++)
 	{
-		uint16_t scroll;
+		u16 scroll;
 		scroll = (layers_flip_0 & 0x0800) ? m_vscroll[0][i] : 0;
 		m_tmap[0]->set_scrollx(i,(layer0_scrollx + scroll) >> 6 );
 		scroll = (layers_flip_0 & 0x0008) ? m_vscroll[1][i] : 0;
@@ -224,94 +223,51 @@ void kaneko_view2_tilemap_device::kaneko16_prepare_common(_BitmapClass &bitmap, 
 	}
 }
 
-void kaneko_view2_tilemap_device::render_tilemap_chip(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri) { render_tilemap_chip_common(screen, bitmap, cliprect, pri); }
-void kaneko_view2_tilemap_device::render_tilemap_chip(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri) { render_tilemap_chip_common(screen, bitmap, cliprect, pri); }
+void kaneko_view2_tilemap_device::render_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri) { render_tilemap_common(screen, bitmap, cliprect, pri); }
+void kaneko_view2_tilemap_device::render_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri) { render_tilemap_common(screen, bitmap, cliprect, pri); }
 
 template<class _BitmapClass>
-void kaneko_view2_tilemap_device::render_tilemap_chip_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri)
+void kaneko_view2_tilemap_device::render_tilemap_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri)
 {
 	m_tmap[0]->draw(screen, bitmap, cliprect, pri, pri, 0);
 	m_tmap[1]->draw(screen, bitmap, cliprect, pri, pri, 0);
 }
 
-void kaneko_view2_tilemap_device::render_tilemap_chip_alt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int v2pri) { render_tilemap_chip_alt_common(screen, bitmap, cliprect, pri, v2pri); }
-void kaneko_view2_tilemap_device::render_tilemap_chip_alt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri, int v2pri) { render_tilemap_chip_alt_common(screen, bitmap, cliprect, pri, v2pri); }
+void kaneko_view2_tilemap_device::render_tilemap_alt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int v2pri) { render_tilemap_alt_common(screen, bitmap, cliprect, pri, v2pri); }
+void kaneko_view2_tilemap_device::render_tilemap_alt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri, int v2pri) { render_tilemap_alt_common(screen, bitmap, cliprect, pri, v2pri); }
 
 template<class _BitmapClass>
-void kaneko_view2_tilemap_device::render_tilemap_chip_alt_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri, int v2pri)
+void kaneko_view2_tilemap_device::render_tilemap_alt_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri, int v2pri)
 {
 	m_tmap[0]->draw(screen, bitmap, cliprect, pri, v2pri ? pri : 0, 0);
 	m_tmap[1]->draw(screen, bitmap, cliprect, pri, v2pri ? pri : 0, 0);
 }
 
-WRITE16_MEMBER(kaneko_view2_tilemap_device::kaneko16_vram_0_w){ kaneko16_vram_w(offset, data, mem_mask, 0); }
-WRITE16_MEMBER(kaneko_view2_tilemap_device::kaneko16_vram_1_w){ kaneko16_vram_w(offset, data, mem_mask, 1); }
+void kaneko_view2_tilemap_device::vram_0_w(offs_t offset, u16 data, u16 mem_mask){ vram_w(0, offset, data, mem_mask); }
+void kaneko_view2_tilemap_device::vram_1_w(offs_t offset, u16 data, u16 mem_mask){ vram_w(1, offset, data, mem_mask); }
 
-READ16_MEMBER(kaneko_view2_tilemap_device::kaneko16_vram_0_r){ return m_vram[0][offset]; }
-READ16_MEMBER(kaneko_view2_tilemap_device::kaneko16_vram_1_r){ return m_vram[1][offset]; }
-
-
-WRITE16_MEMBER(kaneko_view2_tilemap_device::kaneko16_scroll_0_w){ COMBINE_DATA(&m_vscroll[0][offset]); }
-WRITE16_MEMBER(kaneko_view2_tilemap_device::kaneko16_scroll_1_w){ COMBINE_DATA(&m_vscroll[1][offset]); }
-
-READ16_MEMBER(kaneko_view2_tilemap_device::kaneko16_scroll_0_r){ return m_vscroll[0][offset]; }
-READ16_MEMBER(kaneko_view2_tilemap_device::kaneko16_scroll_1_r){ return m_vscroll[1][offset]; }
+u16 kaneko_view2_tilemap_device::vram_0_r(offs_t offset){ return m_vram[0][offset]; }
+u16 kaneko_view2_tilemap_device::vram_1_r(offs_t offset){ return m_vram[1][offset]; }
 
 
-READ16_MEMBER( kaneko_view2_tilemap_device::kaneko_tmap_vram_r )
-{
-	if      (offset<(0x1000/2)) return kaneko16_vram_1_r(space, offset&((0x1000/2)-1),mem_mask);
-	else if (offset<(0x2000/2)) return kaneko16_vram_0_r(space, offset&((0x1000/2)-1),mem_mask);
-	else if (offset<(0x3000/2)) return kaneko16_scroll_1_r(space, offset&((0x1000/2)-1),mem_mask);
-	else if (offset<(0x4000/2)) return kaneko16_scroll_0_r(space, offset&((0x1000/2)-1),mem_mask);
+void kaneko_view2_tilemap_device::scroll_0_w(offs_t offset, u16 data, u16 mem_mask){ COMBINE_DATA(&m_vscroll[0][offset]); }
+void kaneko_view2_tilemap_device::scroll_1_w(offs_t offset, u16 data, u16 mem_mask){ COMBINE_DATA(&m_vscroll[1][offset]); }
 
-	return 0x0000;
-}
+u16 kaneko_view2_tilemap_device::scroll_0_r(offs_t offset){ return m_vscroll[0][offset]; }
+u16 kaneko_view2_tilemap_device::scroll_1_r(offs_t offset){ return m_vscroll[1][offset]; }
 
-WRITE16_MEMBER( kaneko_view2_tilemap_device::kaneko_tmap_vram_w )
-{
-	if      (offset<(0x1000/2)) kaneko16_vram_1_w(space, offset&((0x1000/2)-1),data,mem_mask);
-	else if (offset<(0x2000/2)) kaneko16_vram_0_w(space, offset&((0x1000/2)-1),data,mem_mask);
-	else if (offset<(0x3000/2)) kaneko16_scroll_1_w(space, offset&((0x1000/2)-1),data,mem_mask);
-	else if (offset<(0x4000/2)) kaneko16_scroll_0_w(space, offset&((0x1000/2)-1),data,mem_mask);
-}
 
-READ16_MEMBER( kaneko_view2_tilemap_device::kaneko_tmap_regs_r )
+u16 kaneko_view2_tilemap_device::regs_r(offs_t offset)
 {
 	return m_regs[offset];
 }
 
-WRITE16_MEMBER( kaneko_view2_tilemap_device::kaneko_tmap_regs_w )
+void kaneko_view2_tilemap_device::regs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_regs[offset]);
 }
 
-
-/* some weird logic needed for Gals Panic on the EXPRO02 board */
-WRITE16_MEMBER(kaneko_view2_tilemap_device::galsnew_vram_0_tilebank_w)
+void kaneko_view2_tilemap_device::mark_layer_dirty(u8 Layer)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		int val = (data & 0x00ff)<<8;
-
-		if (m_vram_tile_addition[0] != val)
-		{
-			m_vram_tile_addition[0] = val;
-			m_tmap[0]->mark_all_dirty();
-		}
-	}
-}
-
-WRITE16_MEMBER(kaneko_view2_tilemap_device::galsnew_vram_1_tilebank_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		int val = (data & 0x00ff)<<8;
-
-		if (m_vram_tile_addition[1] != val)
-		{
-			m_vram_tile_addition[1] = val;
-			m_tmap[1]->mark_all_dirty();
-		}
-	}
+	m_tmap[Layer]->mark_all_dirty();
 }

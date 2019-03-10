@@ -310,8 +310,8 @@ void kaneko16_berlwall_state::berlwall_map(address_map &map)
 	map(0x800200, 0x80021f).rw(FUNC(kaneko16_berlwall_state::kaneko16_ay_YM2149_r<1>), FUNC(kaneko16_berlwall_state::kaneko16_ay_YM2149_w<1>));
 	map(0x8003fe, 0x8003ff).noprw(); // for OKI when accessed as .l
 	map(0x800400, 0x800401).rw(FUNC(kaneko16_berlwall_state::berlwall_oki_r), FUNC(kaneko16_berlwall_state::berlwall_oki_w));
-	map(0xc00000, 0xc03fff).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
-	map(0xd00000, 0xd0001f).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0xc00000, 0xc03fff).m(m_view2[0], FUNC(kaneko_view2_tilemap_device::vram_map));
+	map(0xd00000, 0xd0001f).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
 }
 
 
@@ -332,14 +332,14 @@ void kaneko16_state::bakubrkr_map(address_map &map)
 	map(0x40001f, 0x40001f).w(FUNC(kaneko16_state::oki_bank0_w<7>)); // OKI bank Switch
 	map(0x400200, 0x40021f).rw(FUNC(kaneko16_state::kaneko16_ay_YM2149_r<1>), FUNC(kaneko16_state::kaneko16_ay_YM2149_w<1>));          // Sound
 	map(0x400401, 0x400401).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  //
-	map(0x500000, 0x503fff).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
-	map(0x580000, 0x583fff).rw("view2_1", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x500000, 0x503fff).m(m_view2[0], FUNC(kaneko_view2_tilemap_device::vram_map));
+	map(0x580000, 0x583fff).m(m_view2[1], FUNC(kaneko_view2_tilemap_device::vram_map));
 	map(0x600000, 0x601fff).ram().share("spriteram");                   // Sprites
 	map(0x700000, 0x700fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0x800000, 0x80001f).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x800000, 0x80001f).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
 	map(0x900000, 0x90001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
 	map(0xa80000, 0xa80001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0xb00000, 0xb0001f).rw("view2_1", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0xb00000, 0xb0001f).rw(m_view2[1], FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
 	map(0xd00000, 0xd00001).w(FUNC(kaneko16_state::kaneko16_eeprom_w));    // EEPROM
 	map(0xe00000, 0xe00001).portr("P1");
 	map(0xe00002, 0xe00003).portr("P2");
@@ -357,9 +357,9 @@ void kaneko16_state::blazeon_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();     // ROM
 	map(0x300000, 0x30ffff).ram();     // Work RAM
 	map(0x500000, 0x500fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0x600000, 0x603fff).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x600000, 0x603fff).m(m_view2[0], FUNC(kaneko_view2_tilemap_device::vram_map));
 	map(0x700000, 0x700fff).ram().share("spriteram");                   // Sprites
-	map(0x800000, 0x80001f).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x800000, 0x80001f).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
 	map(0x900000, 0x90001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
 	map(0x980000, 0x98001f).ram();                                                                             // Sprites Regs #2
 	map(0xc00000, 0xc00001).portr("DSW2_P1");
@@ -401,10 +401,10 @@ void kaneko16_gtmr_state::bloodwar_map(address_map &map)
 	map(0x2d0000, 0x2d0001).w("toybox", FUNC(kaneko_toybox_device::mcu_com3_w));
 	map(0x300000, 0x30ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0x400000, 0x401fff).ram().share("spriteram");                   // Sprites
-	map(0x500000, 0x503fff).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
-	map(0x580000, 0x583fff).rw("view2_1", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
-	map(0x600000, 0x60001f).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
-	map(0x680000, 0x68001f).rw("view2_1", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x500000, 0x503fff).m(m_view2[0], FUNC(kaneko_view2_tilemap_device::vram_map));
+	map(0x580000, 0x583fff).m(m_view2[1], FUNC(kaneko_view2_tilemap_device::vram_map));
+	map(0x600000, 0x60001f).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
+	map(0x680000, 0x68001f).rw(m_view2[1], FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
 	map(0x700000, 0x70001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
 	map(0x800001, 0x800001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x880001, 0x880001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -437,10 +437,10 @@ void kaneko16_gtmr_state::bonkadv_map(address_map &map)
 	map(0x2d0000, 0x2d0001).w("toybox", FUNC(kaneko_toybox_device::mcu_com3_w));
 	map(0x300000, 0x30ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0x400000, 0x401fff).ram().share("spriteram");                   // Sprites
-	map(0x500000, 0x503fff).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
-	map(0x580000, 0x583fff).rw("view2_1", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
-	map(0x600000, 0x60001f).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
-	map(0x680000, 0x68001f).rw("view2_1", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x500000, 0x503fff).m(m_view2[0], FUNC(kaneko_view2_tilemap_device::vram_map));
+	map(0x580000, 0x583fff).m(m_view2[1], FUNC(kaneko_view2_tilemap_device::vram_map));
+	map(0x600000, 0x60001f).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
+	map(0x680000, 0x68001f).rw(m_view2[1], FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
 	map(0x700000, 0x70001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
 	map(0x800001, 0x800001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x880001, 0x880001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -494,11 +494,11 @@ void kaneko16_gtmr_state::gtmr_map(address_map &map)
 	map(0x310000, 0x327fff).ram();                                                                     //
 	map(0x400000, 0x401fff).ram().share(m_spriteram);                       // Sprites
 
-	map(0x500000, 0x503fff).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
-	map(0x580000, 0x583fff).rw(m_view2[1], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x500000, 0x503fff).m(m_view2[0], FUNC(kaneko_view2_tilemap_device::vram_map));
+	map(0x580000, 0x583fff).m(m_view2[1], FUNC(kaneko_view2_tilemap_device::vram_map));
 
-	map(0x600000, 0x60000f).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
-	map(0x680000, 0x68001f).rw(m_view2[1], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x600000, 0x60000f).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
+	map(0x680000, 0x68001f).rw(m_view2[1], FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
 
 	map(0x700000, 0x70001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
 
@@ -564,10 +564,10 @@ void kaneko16_gtmr_state::gtmr2_map(address_map &map)
 	map(0x310000, 0x327fff).ram(); //
 	map(0x400000, 0x401fff).ram().share(m_spriteram); // Sprites
 
-	map(0x500000, 0x503fff).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
-	map(0x580000, 0x583fff).rw(m_view2[1], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
-	map(0x600000, 0x60000f).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
-	map(0x680000, 0x68001f).rw(m_view2[1], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x500000, 0x503fff).m(m_view2[0], FUNC(kaneko_view2_tilemap_device::vram_map));
+	map(0x580000, 0x583fff).m(m_view2[1], FUNC(kaneko_view2_tilemap_device::vram_map));
+	map(0x600000, 0x60000f).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
+	map(0x680000, 0x68001f).rw(m_view2[1], FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
 
 	map(0x700000, 0x70001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
 	map(0x800001, 0x800001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // Samples
@@ -602,12 +602,12 @@ void kaneko16_state::mgcrystl_map(address_map &map)
 	map(0x400200, 0x40021f).rw(FUNC(kaneko16_state::kaneko16_ay_YM2149_r<1>), FUNC(kaneko16_state::kaneko16_ay_YM2149_w<1>));
 	map(0x400401, 0x400401).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x500000, 0x500fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0x600000, 0x603fff).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
-	map(0x680000, 0x683fff).rw(m_view2[1], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x600000, 0x603fff).m(m_view2[0], FUNC(kaneko_view2_tilemap_device::vram_map));
+	map(0x680000, 0x683fff).m(m_view2[1], FUNC(kaneko_view2_tilemap_device::vram_map));
 	map(0x700000, 0x701fff).ram().share("spriteram");                   // Sprites
-	map(0x800000, 0x80001f).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x800000, 0x80001f).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
 	map(0x900000, 0x90001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
-	map(0xb00000, 0xb0001f).rw(m_view2[1], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0xb00000, 0xb0001f).rw(m_view2[1], FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
 	map(0xa00000, 0xa00001).r(m_watchdog, FUNC(watchdog_timer_device::reset16_r));    // Watchdog
 	map(0xc00000, 0xc00001).portr("DSW_P1");
 	map(0xc00002, 0xc00003).portr("P2");
@@ -644,8 +644,8 @@ void kaneko16_shogwarr_state::shogwarr_map(address_map &map)
 	map(0x400001, 0x400001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // Samples
 	map(0x480001, 0x480001).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x580000, 0x581fff).ram().share("spriteram");                   // Sprites
-	map(0x600000, 0x603fff).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
-	map(0x800000, 0x80001f).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x600000, 0x603fff).m(m_view2[0], FUNC(kaneko_view2_tilemap_device::vram_map));
+	map(0x800000, 0x80001f).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
 	map(0x900000, 0x90001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
 	map(0xa00000, 0xa0007f).rw(m_kaneko_hit, FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
 	map(0xa80000, 0xa80001).rw(m_watchdog, FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));

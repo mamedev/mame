@@ -299,11 +299,11 @@ uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	screen.priority().fill(0, cliprect);
 
-	m_view2->kaneko16_prepare(bitmap, cliprect);
+	m_view2->prepare(bitmap, cliprect);
 
 	for (int i = 0; i < 8; i++)
 	{
-		m_view2->render_tilemap_chip(screen,bitmap,cliprect,i);
+		m_view2->render_tilemap(screen,bitmap,cliprect,i);
 	}
 
 	for (int chip = 0; chip < 2; chip++)
@@ -486,8 +486,8 @@ void jchan_state::jchan_sub(address_map &map)
 	map(0x400000, 0x403fff).ram().share("mainsub_shared");
 
 	/* VIEW2 Tilemap - [D] grid tested, cleared ($1d84), also cleared at startup ($810-$826) */
-	map(0x500000, 0x503fff).rw(m_view2, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
-	map(0x600000, 0x60001f).rw(m_view2, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x500000, 0x503fff).m(m_view2, FUNC(kaneko_view2_tilemap_device::vram_map));
+	map(0x600000, 0x60001f).rw(m_view2, FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
 
 	/* background sprites */
 	map(0x700000, 0x703fff).ram().w(FUNC(jchan_state::sknsspr_sprite32_w<1>)).share("spriteram_2");
@@ -510,7 +510,7 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-// we don't decode the sprites, they are non-tile based and RLE encoded!, see suprnova.cpp */
+// we don't decode the sprites, they are non-tile based and RLE encoded!, see sknsspr.cpp */
 
 static GFXDECODE_START( gfx_jchan )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0, 0x4000/16  )
