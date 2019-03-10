@@ -272,12 +272,10 @@ void msx_cart_disk_type1_device::device_start()
 
 	save_item(NAME(m_side_control));
 	save_item(NAME(m_control));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_disk_type1_device::post_load), this));
 }
 
 
-void msx_cart_disk_type1_device::post_load()
+void msx_cart_disk_type1_device::device_post_load()
 {
 	uint8_t data = m_control;
 
@@ -342,7 +340,7 @@ void msx_cart_disk_type1_device::device_reset()
 }
 
 
-READ8_MEMBER(msx_cart_disk_type1_device::read_cart)
+uint8_t msx_cart_disk_type1_device::read_cart(offs_t offset)
 {
 	switch (offset)
 	{
@@ -383,7 +381,7 @@ READ8_MEMBER(msx_cart_disk_type1_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_disk_type1_device::write_cart)
+void msx_cart_disk_type1_device::write_cart(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -429,8 +427,6 @@ void msx_cart_disk_type2_device::device_start()
 	m_led.resolve();
 
 	save_item(NAME(m_control));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_disk_type2_device::post_load), this));
 }
 
 
@@ -440,7 +436,7 @@ void msx_cart_disk_type2_device::device_reset()
 }
 
 
-void msx_cart_disk_type2_device::post_load()
+void msx_cart_disk_type2_device::device_post_load()
 {
 	uint8_t data = m_control;
 
@@ -487,7 +483,7 @@ void msx_cart_disk_type2_device::set_control(uint8_t data)
 }
 
 
-READ8_MEMBER(msx_cart_disk_type2_device::read_cart)
+uint8_t msx_cart_disk_type2_device::read_cart(offs_t offset)
 {
 	switch (offset)
 	{
@@ -520,7 +516,7 @@ READ8_MEMBER(msx_cart_disk_type2_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_disk_type2_device::write_cart)
+void msx_cart_disk_type2_device::write_cart(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -568,8 +564,10 @@ void msx_cart_fsfd1a_device::device_reset()
 }
 
 
-READ8_MEMBER(msx_cart_fsfd1a_device::read_cart)
+uint8_t msx_cart_fsfd1a_device::read_cart(offs_t offset)
 {
+	address_space &space = machine().dummy_space();
+
 	switch (offset)
 	{
 		case 0x7ffa:
@@ -589,8 +587,10 @@ READ8_MEMBER(msx_cart_fsfd1a_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_fsfd1a_device::write_cart)
+void msx_cart_fsfd1a_device::write_cart(offs_t offset, uint8_t data)
 {
+	address_space &space = machine().dummy_space();
+
 	switch (offset)
 	{
 		case 0x7ff8:

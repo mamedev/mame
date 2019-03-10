@@ -137,8 +137,6 @@ void msx_slot_disk1_device::device_start()
 
 	save_item(NAME(m_side_control));
 	save_item(NAME(m_control));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_slot_disk1_device::post_load), this));
 }
 
 
@@ -148,7 +146,7 @@ void msx_slot_disk1_device::device_reset()
 }
 
 
-void msx_slot_disk1_device::post_load()
+void msx_slot_disk1_device::device_post_load()
 {
 	uint8_t data = m_control;
 
@@ -207,7 +205,7 @@ void msx_slot_disk1_device::set_control(uint8_t data)
 }
 
 
-READ8_MEMBER(msx_slot_disk1_device::read)
+uint8_t msx_slot_disk1_device::read(offs_t offset)
 {
 	switch (offset)
 	{
@@ -240,11 +238,11 @@ READ8_MEMBER(msx_slot_disk1_device::read)
 			return 0x3f | (m_fdc->intrq_r() ? 0 : 0x40) | (m_fdc->drq_r() ? 0 : 0x80);
 	}
 
-	return msx_slot_rom_device::read(space, offset);
+	return msx_slot_rom_device::read(offset);
 }
 
 
-WRITE8_MEMBER(msx_slot_disk1_device::write)
+void msx_slot_disk1_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -298,8 +296,6 @@ void msx_slot_disk2_device::device_start()
 	msx_slot_wd_disk_device::device_start();
 
 	save_item(NAME(m_control));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_slot_disk2_device::post_load), this));
 }
 
 
@@ -309,7 +305,7 @@ void msx_slot_disk2_device::device_reset()
 }
 
 
-void msx_slot_disk2_device::post_load()
+void msx_slot_disk2_device::device_post_load()
 {
 	uint8_t data = m_control;
 
@@ -356,7 +352,7 @@ void msx_slot_disk2_device::set_control(uint8_t data)
 }
 
 
-READ8_MEMBER(msx_slot_disk2_device::read)
+uint8_t msx_slot_disk2_device::read(offs_t offset)
 {
 	switch (offset)
 	{
@@ -381,11 +377,11 @@ READ8_MEMBER(msx_slot_disk2_device::read)
 			return 0x3f | (m_fdc->drq_r() ? 0 : 0x40) | (m_fdc->intrq_r() ? 0x80 : 0);
 	}
 
-	return msx_slot_rom_device::read(space, offset);
+	return msx_slot_rom_device::read(offset);
 }
 
 
-WRITE8_MEMBER(msx_slot_disk2_device::write)
+void msx_slot_disk2_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -431,8 +427,10 @@ msx_slot_disk3_device::msx_slot_disk3_device(const machine_config &mconfig, cons
 }
 
 
-WRITE8_MEMBER(msx_slot_disk3_device::write)
+void msx_slot_disk3_device::write(offs_t offset, uint8_t data)
 {
+	address_space &space = machine().dummy_space();
+
 	switch (offset)
 	{
 		case 0x7ff8:   // CR0 : 0 - 0 - MEN1 - MEN0 - 0 - -FRST - 0 - DSA
@@ -454,8 +452,10 @@ WRITE8_MEMBER(msx_slot_disk3_device::write)
 }
 
 
-READ8_MEMBER(msx_slot_disk3_device::read)
+uint8_t msx_slot_disk3_device::read(offs_t offset)
 {
+	address_space &space = machine().dummy_space();
+
 	switch (offset)
 	{
 		case 0x7ffa:   // Status Register
@@ -464,7 +464,7 @@ READ8_MEMBER(msx_slot_disk3_device::read)
 			return m_fdc->fifo_r(space, 5);
 	}
 
-	return msx_slot_rom_device::read(space, offset);
+	return msx_slot_rom_device::read(offset);
 }
 
 
@@ -477,8 +477,10 @@ msx_slot_disk4_device::msx_slot_disk4_device(const machine_config &mconfig, cons
 }
 
 
-WRITE8_MEMBER(msx_slot_disk4_device::write)
+void msx_slot_disk4_device::write(offs_t offset, uint8_t data)
 {
+	address_space &space = machine().dummy_space();
+
 	switch (offset)
 	{
 		case 0x7ff1:   // FDD : x - x - MC1 - MC0 - x - x - x - x
@@ -503,8 +505,10 @@ WRITE8_MEMBER(msx_slot_disk4_device::write)
 }
 
 
-READ8_MEMBER(msx_slot_disk4_device::read)
+uint8_t msx_slot_disk4_device::read(offs_t offset)
 {
+	address_space &space = machine().dummy_space();
+
 	switch (offset)
 	{
 		case 0x7ff1:   // FDD : x - x - MC1 - MC0 - x - x - x - x
@@ -517,7 +521,7 @@ READ8_MEMBER(msx_slot_disk4_device::read)
 			return m_fdc->fifo_r(space, 5);
 	}
 
-	return msx_slot_rom_device::read(space, offset);
+	return msx_slot_rom_device::read(offset);
 }
 
 
@@ -536,12 +540,9 @@ void msx_slot_disk5_device::device_start()
 
 	save_item(NAME(m_control));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_slot_disk5_device::post_load), this));
-
 	// Install IO read/write handlers
-	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
-	space.install_write_handler(0xd0, 0xd4, write8_delegate(FUNC(msx_slot_disk5_device::io_write), this));
-	space.install_read_handler(0xd0, 0xd4, read8_delegate(FUNC(msx_slot_disk5_device::io_read), this));
+	io_space().install_write_handler(0xd0, 0xd4, write8sm_delegate(FUNC(msx_slot_disk5_device::io_write), this));
+	io_space().install_read_handler(0xd0, 0xd4, read8sm_delegate(FUNC(msx_slot_disk5_device::io_read), this));
 }
 
 
@@ -551,7 +552,7 @@ void msx_slot_disk5_device::device_reset()
 }
 
 
-void msx_slot_disk5_device::post_load()
+void msx_slot_disk5_device::device_post_load()
 {
 	set_control(m_control);
 }
@@ -594,7 +595,7 @@ void msx_slot_disk5_device::set_control(uint8_t control)
 }
 
 
-READ8_MEMBER(msx_slot_disk5_device::io_read)
+uint8_t msx_slot_disk5_device::io_read(offs_t offset)
 {
 	switch (offset)
 	{
@@ -618,7 +619,7 @@ READ8_MEMBER(msx_slot_disk5_device::io_read)
 }
 
 
-WRITE8_MEMBER(msx_slot_disk5_device::io_write)
+void msx_slot_disk5_device::io_write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -662,8 +663,6 @@ void msx_slot_disk6_device::device_start()
 	save_item(NAME(m_side_motor));
 	save_item(NAME(m_drive_select0));
 	save_item(NAME(m_drive_select1));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_slot_disk6_device::post_load), this));
 }
 
 
@@ -673,7 +672,7 @@ void msx_slot_disk6_device::device_reset()
 }
 
 
-void msx_slot_disk6_device::post_load()
+void msx_slot_disk6_device::device_post_load()
 {
 	select_drive();
 }
@@ -715,7 +714,7 @@ void msx_slot_disk6_device::set_side_motor()
 }
 
 
-READ8_MEMBER(msx_slot_disk6_device::read)
+uint8_t msx_slot_disk6_device::read(offs_t offset)
 {
 	switch (offset)
 	{
@@ -757,11 +756,11 @@ READ8_MEMBER(msx_slot_disk6_device::read)
 			return 0x3f | (m_fdc->intrq_r() ? 0 : 0x40) | (m_fdc->drq_r() ? 0 : 0x80);
 	}
 
-	return msx_slot_rom_device::read(space, offset);
+	return msx_slot_rom_device::read(offset);
 }
 
 
-WRITE8_MEMBER(msx_slot_disk6_device::write)
+void msx_slot_disk6_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

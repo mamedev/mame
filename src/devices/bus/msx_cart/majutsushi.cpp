@@ -40,8 +40,12 @@ void msx_cart_majutsushi_device::device_add_mconfig(machine_config &config)
 void msx_cart_majutsushi_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
+}
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_majutsushi_device::restore_banks), this));
+
+void msx_cart_majutsushi_device::device_post_load()
+{
+	restore_banks();
 }
 
 
@@ -78,13 +82,13 @@ void msx_cart_majutsushi_device::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_majutsushi_device::read_cart)
+uint8_t msx_cart_majutsushi_device::read_cart(offs_t offset)
 {
 	return m_bank_base[offset >> 13][offset & 0x1fff];
 }
 
 
-WRITE8_MEMBER(msx_cart_majutsushi_device::write_cart)
+void msx_cart_majutsushi_device::write_cart(offs_t offset, uint8_t data)
 {
 	switch (offset & 0xe000)
 	{

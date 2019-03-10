@@ -18,8 +18,8 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart) override;
-	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+	virtual uint8_t read_cart(offs_t offset) override;
+	virtual void write_cart(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides

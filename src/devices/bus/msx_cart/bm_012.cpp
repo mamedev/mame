@@ -94,9 +94,8 @@ const tiny_rom_entry *msx_cart_bm_012_device::device_rom_region() const
 void msx_cart_bm_012_device::device_start()
 {
 	// Install IO read/write handlers
-	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
-	space.install_write_handler(0x70, 0x73, write8_delegate(FUNC(z80pio_device::write_alt), m_bm012_pio.target()));
-	space.install_read_handler(0x70, 0x73, read8_delegate(FUNC(z80pio_device::read_alt), m_bm012_pio.target()));
+	io_space().install_write_handler(0x70, 0x73, write8_delegate(FUNC(z80pio_device::write_alt), m_bm012_pio.target()));
+	io_space().install_read_handler(0x70, 0x73, read8_delegate(FUNC(z80pio_device::read_alt), m_bm012_pio.target()));
 }
 
 
