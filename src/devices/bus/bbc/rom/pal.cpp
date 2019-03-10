@@ -133,10 +133,14 @@ READ8_MEMBER(bbc_cciword_device::read)
 {
 	if (!machine().side_effects_disabled())
 	{
+		/* switching zones for Inter-Word */
 		switch (offset & 0x3fe0)
 		{
-		case 0x0040: m_bank = 1; break;
-		case 0x0060: m_bank = 0; break;
+		case 0x0060:
+		case 0x3fc0: m_bank = 0; break;
+		case 0x0040:
+		case 0x3fa0:
+		case 0x3fe0: m_bank = 1; break;
 		}
 	}
 
