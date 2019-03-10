@@ -10,6 +10,10 @@
   The LCD screen graphics are provided internally with an SVG file.
   MAME external artwork is recommended for the backgrounds inlays.
 
+  Trivia: Most of the Nintendo G&W have built-in cheats, likely kept
+  in by Nintendo to test the game. These were not accessible to users
+  of course, but for the sake of fun they're available on MAME.
+
   TODO:
   - improve/redo SVGs of: gnw_mmouse, gnw_egg, exospace
   - confirm gnw_mmouse/gnw_egg rom (dumped from Soviet clone,
@@ -1180,9 +1184,9 @@ static INPUT_PORTS_START( gnw_pchute )
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // * Infinite lives cheat here, but configuring it is weird:
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // * One of the R3 inputs needs to be held down, followed
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // * by pressing ACL, then release.
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // alarm test?
 
 	PORT_START("IN.2") // R4
