@@ -69,6 +69,7 @@ namespace netlist
 		, m_OUT(*this, "OUT")         // Pin 3
 		, m_last_out(*this, "m_last_out", false)
 		, m_ff(*this, "m_ff", false)
+		, m_last_reset(*this, "m_last_reset", false)
 		{
 			register_subalias("GND",  m_R3.m_N);    // Pin 1
 			register_subalias("CONT", m_R1.m_N);    // Pin 5
@@ -83,7 +84,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 		NETLIB_RESETI();
 
-	protected:
+	private:
 		analog::NETLIB_SUB(R_base) m_R1;
 		analog::NETLIB_SUB(R_base) m_R2;
 		analog::NETLIB_SUB(R_base) m_R3;
@@ -94,9 +95,9 @@ namespace netlist
 		analog_input_t m_TRIG;
 		analog_output_t m_OUT;
 
-	private:
 		state_var<bool> m_last_out;
 		state_var<bool> m_ff;
+		state_var<bool> m_last_reset;
 
 		nl_double clamp(const nl_double v, const nl_double a, const nl_double b)
 		{
@@ -115,14 +116,14 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR_DERIVED(NE555_dip, NE555)
 		{
-			register_subalias("1",  m_R3.m_N);      // Pin 1
-			register_subalias("2",    m_TRIG);      // Pin 2
-			register_subalias("3",    m_OUT);       // Pin 3
-			register_subalias("4",   m_RESET);      // Pin 4
-			register_subalias("5", m_R1.m_N);       // Pin 5
-			register_subalias("6",  m_THRES);       // Pin 6
-			register_subalias("7", m_RDIS.m_P);     // Pin 7
-			register_subalias("8",  m_R1.m_P);      // Pin 8
+			register_subalias("1", "GND");      // Pin 1
+			register_subalias("2", "TRIG");     // Pin 2
+			register_subalias("3", "OUT");      // Pin 3
+			register_subalias("4", "RESET");    // Pin 4
+			register_subalias("5", "CONT");     // Pin 5
+			register_subalias("6", "THRESH");   // Pin 6
+			register_subalias("7", "DISCH");    // Pin 7
+			register_subalias("8", "VCC");      // Pin 8
 		}
 	};
 
@@ -146,8 +147,10 @@ namespace netlist
 	{
 		// FIXME: assumes GND is connected to 0V.
 
-		if (!m_RESET())
+		if (!m_RESET() && m_last_reset)
+		{
 			m_ff = false;
+		}
 		else
 		{
 			const nl_double vt = clamp(m_R2.m_P(), 0.7, 1.4);
@@ -160,7 +163,7 @@ namespace netlist
 				m_ff = false;
 		}
 
-		const bool out = m_ff;
+		const bool out = (!m_RESET() ? false : m_ff);
 
 		if (m_last_out && !out)
 		{
@@ -175,6 +178,7 @@ namespace netlist
 			m_OUT.push(m_R1.m_P());
 			m_RDIS.set_R(R_OFF);
 		}
+		m_last_reset = m_RESET();
 		m_last_out = out;
 	}
 
