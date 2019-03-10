@@ -64,7 +64,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ppi8255(*this, "ppi8255"),
-		m_led_delay(*this, "led_delay_%u", 0),
+		m_delay_display(*this, "delay_display_%u", 0),
 		m_keypad(*this, "IN.%u", 0),
 		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot"),
@@ -85,7 +85,7 @@ private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
-	required_device_array<timer_device, 6> m_led_delay;
+	required_device_array<timer_device, 6> m_delay_display;
 	required_ioport_array<2> m_keypad;
 	required_device<dac_bit_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
@@ -96,9 +96,9 @@ private:
 
 	// display stuff
 	void update_display();
-	TIMER_DEVICE_CALLBACK_MEMBER(led_delay_off);
+	TIMER_DEVICE_CALLBACK_MEMBER(delay_display);
 
-	u8 m_7seg_data;
+	u8 m_digit_data;
 	u8 m_led_select;
 	u8 m_led_active;
 
@@ -108,7 +108,7 @@ private:
 
 	// I/O handlers
 	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(_7seg_w);
+	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(control_w);
 };
 
@@ -119,15 +119,16 @@ void intel02_state::machine_start()
 	m_out_digit.resolve();
 
 	// zerofill
-	m_7seg_data = 0;
+	m_digit_data = 0;
 	m_led_select = 0;
 	m_led_active = 0;
 
 	// register for savestates
-	save_item(NAME(m_7seg_data));
+	save_item(NAME(m_digit_data));
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_active));
 }
+
 
 
 /******************************************************************************
@@ -154,7 +155,7 @@ void intel02_state::update_display()
 	for (int i = 0; i < 4; i++)
 	{
 		if (BIT(m_led_select, i))
-			m_out_digit[i] = m_7seg_data;
+			m_out_digit[i] = m_digit_data;
 		else if (!BIT(m_led_active, i))
 			m_out_digit[i] = 0;
 	}
@@ -164,7 +165,7 @@ void intel02_state::update_display()
 	m_out_led[1] = BIT(m_led_active, 5);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(intel02_state::led_delay_off)
+TIMER_DEVICE_CALLBACK_MEMBER(intel02_state::delay_display)
 {
 	u8 mask = 1 << param;
 	m_led_active = (m_led_active & ~mask) | (m_led_select & mask);
@@ -181,10 +182,10 @@ READ8_MEMBER(intel02_state::input_r)
 	return (count_leading_zeros(m_keypad[0]->read()) - 17) | (~m_keypad[1]->read() << 4 & 0xf0);
 }
 
-WRITE8_MEMBER(intel02_state::_7seg_w)
+WRITE8_MEMBER(intel02_state::digit_w)
 {
 	// d0-d7: digit segment data
-	m_7seg_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
+	m_digit_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
 	update_display();
 }
 
@@ -198,7 +199,7 @@ WRITE8_MEMBER(intel02_state::control_w)
 
 		// they're strobed, so on falling edge, delay them going off to prevent flicker
 		else if (BIT(m_led_select, i))
-			m_led_delay[i]->adjust(attotime::from_msec(10), i);
+			m_delay_display[i]->adjust(attotime::from_msec(10), i);
 	}
 
 	m_led_select = data;
@@ -274,13 +275,13 @@ void intel02_state::intel02(machine_config &config)
 	I8255(config, m_ppi8255);
 	m_ppi8255->in_pa_callback().set(FUNC(intel02_state::input_r));
 	m_ppi8255->tri_pa_callback().set_constant(0);
-	m_ppi8255->out_pb_callback().set(FUNC(intel02_state::_7seg_w));
+	m_ppi8255->out_pb_callback().set(FUNC(intel02_state::digit_w));
 	m_ppi8255->tri_pb_callback().set_constant(0);
 	m_ppi8255->out_pc_callback().set(FUNC(intel02_state::control_w));
 
 	/* video hardware */
 	for (int i = 0; i < 6; i++)
-		TIMER(config, m_led_delay[i]).configure_generic(FUNC(intel02_state::led_delay_off));
+		TIMER(config, m_delay_display[i]).configure_generic(FUNC(intel02_state::delay_display));
 
 	config.set_default_layout(layout_intellect02);
 

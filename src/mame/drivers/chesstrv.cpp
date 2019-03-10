@@ -301,14 +301,6 @@ ROM_START( chesstrv )
 	ROM_REGION(0x0100, "ram", ROMREGION_ERASE)
 ROM_END
 
-ROM_START( boris )
-	ROM_REGION(0x0c00, "maincpu", 0)
-	ROM_LOAD("007-7020-00_c10502_korea.bin", 0x0000, 0x0800, CRC(18182870) SHA1(cb717a4b5269b04b0d7ae61aaf4a8f6a019626a5))
-	ROM_LOAD("007-7021-00_c10503_korea.bin", 0x0800, 0x0400, CRC(49b77505) SHA1(474b665ee2955497f6d70878d817f1783ba1a835))
-
-	ROM_REGION(0x0100, "ram", ROMREGION_ERASE)
-ROM_END
-
 ROM_START( borisdpl )
 	ROM_REGION(0x0800, "maincpu", 0)
 	ROM_LOAD("007-7024-00_7847.u8", 0x0000, 0x0800, CRC(e20bac03) SHA1(9e17b9d90522371fbf7018926356150f70b9a3b6))
@@ -319,5 +311,4 @@ ROM_END
 
 //    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT        COMPANY             FULLNAME           FLAGS
 CONS( 1980,  chesstrv, 0,      0,      chesstrv, chesstrv, chesstrv_state, empty_init, "Acetronic",        "Chess Traveller", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
-CONS( 1979,  boris,    0,      0,      borisdpl, borisdpl, borisdpl_state, empty_init, "Applied Concepts", "Boris - Electronic Chess Computer",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
 CONS( 1979,  borisdpl, 0,      0,      borisdpl, borisdpl, borisdpl_state, empty_init, "Applied Concepts", "Boris Diplomat",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

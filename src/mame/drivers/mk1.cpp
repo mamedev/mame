@@ -214,4 +214,4 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE      INIT        COMPANY  FULLNAME                FLAGS
-CONS( 1979, ccmk1, 0,      0,      mk1,     mk1,   mk1_state, empty_init, "Novag", "Chess Champion: MK I", MACHINE_NO_SOUND_HW )
+CONS( 1978, ccmk1, 0,      0,      mk1,     mk1,   mk1_state, empty_init, "Novag", "Chess Champion: MK I", MACHINE_NO_SOUND_HW )

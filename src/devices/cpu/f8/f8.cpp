@@ -37,11 +37,11 @@
 
 
 /* status flags */
-static constexpr u8 S = 0x01;
-static constexpr u8 C = 0x02;
-static constexpr u8 Z = 0x04;
-static constexpr u8 O = 0x08;
-static constexpr u8 I = 0x10;
+static constexpr u8 S = 0x01; // sign
+static constexpr u8 C = 0x02; // carry
+static constexpr u8 Z = 0x04; // zero
+static constexpr u8 O = 0x08; // overflow
+static constexpr u8 I = 0x10; // interrupt control bit (ICB)
 
 /* cycle (short/long) */
 static constexpr int cS = 4;
@@ -216,30 +216,6 @@ void f8_cpu_device::device_reset()
 	ROMC_08();
 	/* fetch the first opcode */
 	ROMC_00(cS);
-
-	/* initialize the timer shift register
-	 * this is an 8 bit polynomial counter which can be loaded parallel
-	 * with 0xff the outputs never change and thus the timer is disabled.
-	 * with 0xfe the shifter starts cycling through 255 states until it
-	 * reaches 0xfe again (and then issues an interrupt).
-	 * the counter output values are not sequential, but go like this:
-	 * 0xfe, 0xfd, 0xfb, 0xf7, 0xee, 0xdc ... etc. :-)
-	 * We have to build a lookup table to tell how many cycles a write
-
-	 */
-	u8 data = 0xfe;    /* initial value */
-	for (int i = 0; i < 256; i++)
-	{
-		timer_shifter[i] = data;
-		if ( (((data >> 3) ^ (data >> 4)) ^ ((data >> 5) ^ (data >> 7))) & 1 )
-		{
-			data <<= 1;
-		}
-		else
-		{
-			data = (data << 1) | 1;
-		}
-	}
 }
 
 
@@ -516,7 +492,7 @@ void f8_cpu_device::ROMC_10()
 	/*
 	 * Inhibit any modification to the interrupt priority logic.
 	 */
-	m_w |= 0x20;   /* ???? */
+	// TODO
 	m_icount -= cL;
 }
 
@@ -1002,7 +978,7 @@ void f8_cpu_device::f8_pop()
 void f8_cpu_device::f8_lr_w_j()
 {
 	ROMC_1C(cS);
-	m_w = m_r[9];
+	m_w = m_r[9] & 0x1f;
 }
 
 /***************************************************
@@ -1955,17 +1931,19 @@ void f8_cpu_device::execute_run()
 			case 0xff: /* 1111 1111 */  illegal();          break;
 		}
 		switch (op) {
-			case 0x0d: case 0x1b: case 0x1c: case 0x1d:
+			case 0x0c: case 0x1b: case 0x1c: case 0x1d:
 			case 0x27: case 0x28: case 0x29:
 			case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 			case 0xb8: case 0xb9: case 0xba: case 0xbb:
 			case 0xbc: case 0xbd: case 0xbe: case 0xbf:
+				// don't handle irq after privileged instruction
 				ROMC_00(cS);
 				break;
 
 			default:
 				if (m_w&I && m_irq_request)
 				{
+					ROMC_10();
 					ROMC_1C(cL);
 					ROMC_0F();
 					ROMC_13();

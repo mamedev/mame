@@ -5,16 +5,17 @@
 *
 * novag_delta1.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
-TODO:
-- ccdelta1 doesn't work, goes bonkers when you press Enter. CPU core bug?
-  I suspect related to interrupts
+Novag Delta-1, the chess engine seems similar to Boris (see aci_boris.cpp)
 
-*******************************************************************************
-
-Novag Delta-1 overview:
 - 3850PK CPU at ~2MHz, 3853PK memory interface
 - 4KB ROM(2332A), 256 bytes RAM(2*2111A-4)
 - 4-digit 7seg panel, no sound, no chessboard
+
+TODO:
+- After the computer is done calculating its move, sometimes it will blank the
+  display, making game progress impossible. CPU bug, or unexpected interrupt?
+  An easy way to repro this is by repeatedly pressing enter without inputting
+  a move: it's a feature to make it play against itself.
 
 ******************************************************************************/
 
@@ -40,31 +41,16 @@ public:
 	// machine drivers
 	void delta1(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-
 private:
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(io0_w);
-	DECLARE_WRITE8_MEMBER(io1_w);
-	DECLARE_READ8_MEMBER(io0_r);
-	DECLARE_READ8_MEMBER(io1_r);
-
-	u8 m_io[2]; // F8 CPU I/O ports
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_WRITE8_MEMBER(digit_w);
+	DECLARE_READ8_MEMBER(input_r);
 };
-
-void delta1_state::machine_start()
-{
-	novagbase_state::machine_start();
-
-	// zerofill/register for savestates
-	memset(m_io, 0, sizeof(m_io));
-	save_item(NAME(m_io));
-}
 
 
 /******************************************************************************
@@ -73,10 +59,8 @@ void delta1_state::machine_start()
 
 // CPU I/O ports
 
-WRITE8_MEMBER(delta1_state::io0_w)
+WRITE8_MEMBER(delta1_state::mux_w)
 {
-	m_io[0] = data;
-
 	// IO00-02: MC14028B A-C (IO03: GND)
 	// MC14028B Q3-Q7: input mux
 	// MC14028B Q4-Q7: digit select through 75492
@@ -86,28 +70,22 @@ WRITE8_MEMBER(delta1_state::io0_w)
 	// update display here
 	set_display_segmask(0xf, 0x7f);
 	display_matrix(7, 4, m_7seg_data, sel >> 4);
+
+	m_led_select = data;
 }
 
-READ8_MEMBER(delta1_state::io0_r)
+READ8_MEMBER(delta1_state::input_r)
 {
 	// IO04-07: multiplexed inputs
-	return read_inputs(5) << 4 | m_io[0];
+	return read_inputs(5) << 4 | m_led_select;
 }
 
-WRITE8_MEMBER(delta1_state::io1_w)
+WRITE8_MEMBER(delta1_state::digit_w)
 {
-	m_io[1] = data;
-
 	// IO17: segment commons, active low (always 0?)
 	// IO10-16: digit segments A-G
 	data = (data & 0x80) ? 0 : (data & 0x7f);
 	m_7seg_data = bitswap<7>(data, 0,1,2,3,4,5,6);
-}
-
-READ8_MEMBER(delta1_state::io1_r)
-{
-	// unused?
-	return m_io[1];
 }
 
 
@@ -125,8 +103,8 @@ void delta1_state::main_map(address_map &map)
 
 void delta1_state::main_io(address_map &map)
 {
-	map(0x0, 0x0).rw(FUNC(delta1_state::io0_r), FUNC(delta1_state::io0_w));
-	map(0x1, 0x1).rw(FUNC(delta1_state::io1_r), FUNC(delta1_state::io1_w));
+	map(0x0, 0x0).rw(FUNC(delta1_state::input_r), FUNC(delta1_state::mux_w));
+	map(0x1, 0x1).w(FUNC(delta1_state::digit_w));
 	map(0xc, 0xf).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
