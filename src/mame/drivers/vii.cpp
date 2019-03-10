@@ -66,11 +66,15 @@
         All systems:
             Various inaccuracies in samples/envelopes.
 
-        walle:
+        jak_wall, jak_sdoo:
             Game seems unhappy with NVRAM, clears contents on each boot.
         jak_pooh:
             In the 'Light Tag' minigame (select the rock) you can't move left with the DRC (ok with -nodrc)
             and the game usually softlocks when you find a friend (with or without DRC)
+		jak_disf:
+			shows corrupt logo on first boot with no valid nvram (possibly hardware does too, or layer disable?)
+		jak_nick:
+			channel chasers (first game) title screen background should be blue, not the current pattern (possible layer disable?)
 
         vii:
             When loading a cart from file manager, sometimes MAME will crash.
@@ -214,6 +218,7 @@ public:
 	void jakks_gkr_2m_i2c(machine_config &config);
 	void jakks_gkr_nk(machine_config &config);
 	void jakks_gkr_nk_i2c(machine_config &config);
+	void jakks_gkr_dy(machine_config &config);
 	void jakks_gkr_dy_i2c(machine_config &config);
 	void jakks_gkr_dp_i2c(machine_config &config);
 	void jakks_gkr_sw_i2c(machine_config &config);
@@ -283,6 +288,8 @@ public:
 		: spg2xx_game_state(mconfig, type, tag)
 		, m_cart(*this, "cartslot")
 		, m_cart_region(nullptr)
+		, m_porta_in(*this, "INA_%u", 0U)
+		, m_portc_in(*this, "INC_%u", 0U)
 	{ }
 
 	void icanguit(machine_config &config);
@@ -290,12 +297,26 @@ public:
 
 private:
 	virtual void machine_start() override;
-	//virtual void machine_reset() override;
+	virtual void machine_reset() override;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(icanguit_cart);
 
+	DECLARE_READ16_MEMBER(porta_r);
+	DECLARE_READ16_MEMBER(portb_r);
+	DECLARE_READ16_MEMBER(portc_r);
+	DECLARE_WRITE16_MEMBER(porta_w);
+	DECLARE_WRITE16_MEMBER(portb_w);
+	DECLARE_WRITE16_MEMBER(portc_w);
+
+
 	required_device<generic_slot_device> m_cart;
 	memory_region *m_cart_region;
+
+	uint16_t m_inlatch_a;
+	uint16_t m_inlatch_c;
+	optional_ioport_array<3> m_porta_in;
+	optional_ioport_array<3> m_portc_in;
+
 };
 
 
@@ -550,7 +571,8 @@ static INPUT_PORTS_START( walle )
 
 	PORT_START("P3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, spg2xx_game_state,i2c_r, nullptr)
-	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xfff6, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jak_sith_i2c )
@@ -562,7 +584,8 @@ static INPUT_PORTS_START( jak_sith_i2c )
 
 	PORT_START("P3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr)
-	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
+	PORT_BIT( 0xfff6, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("JOYX")
 	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
@@ -578,7 +601,8 @@ static INPUT_PORTS_START( jak_pooh )
 	PORT_BIT( 0xf7df, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
-	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xfff7, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
 
 	PORT_START("JOYX")
 	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
@@ -601,7 +625,7 @@ static INPUT_PORTS_START( jak_nm_i2c )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag? music speed changes in Mappy
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC
 	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 
@@ -624,9 +648,10 @@ static INPUT_PORTS_START( jak_wf_i2c )
 
 	PORT_START("P3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr)
-	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xfff6, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC
 
-	/* on real unit you can spin the wheel (and must make sure it completes a full circle, or you lose your turn) instead of pressing 'B' for a random spin but where does it map?
+	/* on real unit you can spin the wheel (and must make sure it completes a full circle, or you lose your turn) instead of pressing 'B' for a random spin but where does it map? (it can be tested in secret test mode)
 	PORT_START("DIALX")
 	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
 
@@ -659,9 +684,7 @@ static INPUT_PORTS_START( jak_gkr )
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (not verified for all games, state can be seen in secret test menu of many tho)
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) // this causes WWE to think the unit is a '2nd Controller' and tells you to plug the 1st one in.
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -722,9 +745,7 @@ static INPUT_PORTS_START( jak_sdoo_i2c ) // GameKeyReady units had 2 main button
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -787,7 +808,8 @@ static INPUT_PORTS_START( jak_disp_i2c )
 
 	PORT_START("P3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr)
-	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
+	PORT_BIT( 0xfff6, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1140,19 +1162,20 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( icanpian ) // this has an entire piano keyboard + extras
-	PORT_START("P1") // the keyboard keys are in here, but each seems triple mapped to 3 octaves so there must be multiplexing
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON4 )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON5 )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON6 )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON7 )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON8 )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON9 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON10 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON11 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON12 )
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON13 )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON14 )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON15 )
+
+	PORT_START("INA_0")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON4 )  PORT_PLAYER(1) PORT_NAME("Octatve 0 F (Green)")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON5 )  PORT_PLAYER(1) PORT_NAME("Octatve 0 F# (Purple)")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON6 )  PORT_PLAYER(1) PORT_NAME("Octatve 0 G (Yellow)")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON7 )  PORT_PLAYER(1) PORT_NAME("Octatve 0 G# (Dark Blue)")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON8 )  PORT_PLAYER(1) PORT_NAME("Octatve 0 A (Flesh)")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON9 )  PORT_PLAYER(1) PORT_NAME("Octatve 0 A# (Dark Green)")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_PLAYER(1) PORT_NAME("Octatve 0 B (Pink)")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_PLAYER(1) PORT_NAME("Octatve 0 C (White)")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_PLAYER(1) PORT_NAME("Octatve 0 C# (Black)")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_PLAYER(1) PORT_NAME("Octatve 0 D (Blue)")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_PLAYER(1) PORT_NAME("Octatve 0 D# (Red)")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_PLAYER(1) PORT_NAME("Octatve 0 E (Orange)")
 	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1165,6 +1188,61 @@ static INPUT_PORTS_START( icanpian ) // this has an entire piano keyboard + extr
 	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("INA_1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON4 )  PORT_PLAYER(2) PORT_NAME("Octatve 1 F (Green)")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON5 )  PORT_PLAYER(2) PORT_NAME("Octatve 1 F# (Purple)")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON6 )  PORT_PLAYER(2) PORT_NAME("Octatve 1 G (Yellow)")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON7 )  PORT_PLAYER(2) PORT_NAME("Octatve 1 G# (Dark Blue)")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON8 )  PORT_PLAYER(2) PORT_NAME("Octatve 1 A (Flesh)")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON9 )  PORT_PLAYER(2) PORT_NAME("Octatve 1 A# (Dark Green)")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_PLAYER(2) PORT_NAME("Octatve 1 B (Pink)")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_PLAYER(2) PORT_NAME("Octatve 1 C (White)")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_PLAYER(2) PORT_NAME("Octatve 1 C# (Black)")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_PLAYER(2) PORT_NAME("Octatve 1 D (Blue)")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_PLAYER(2) PORT_NAME("Octatve 1 D# (Red)")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_PLAYER(2) PORT_NAME("Octatve 1 E (Orange)")
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("INA_2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON4 )  PORT_PLAYER(3) PORT_NAME("Octatve 2 F (Green)")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON5 )  PORT_PLAYER(3) PORT_NAME("Octatve 2 F# (Purple)")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON6 )  PORT_PLAYER(3) PORT_NAME("Octatve 2 G (Yellow)")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON7 )  PORT_PLAYER(3) PORT_NAME("Octatve 2 G# (Dark Blue)")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON8 )  PORT_PLAYER(3) PORT_NAME("Octatve 2 A (Flesh)")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON9 )  PORT_PLAYER(3) PORT_NAME("Octatve 2 A# (Dark Green)")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_PLAYER(3) PORT_NAME("Octatve 2 B (Pink)")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_PLAYER(3) PORT_NAME("Octatve 2 C (White)")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_PLAYER(3) PORT_NAME("Octatve 2 C# (Black)")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_PLAYER(3) PORT_NAME("Octatve 2 D (Blue)")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_PLAYER(3) PORT_NAME("Octatve 2 D# (Red)")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_PLAYER(3) PORT_NAME("Octatve 2 E (Orange)")
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("P1")
+	// uses multiplexed ports instead
 
 	PORT_START("P2")
 	PORT_DIPNAME( 0x0001, 0x0001, "P2" )
@@ -1217,15 +1295,82 @@ static INPUT_PORTS_START( icanpian ) // this has an entire piano keyboard + extr
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("P3")
-	PORT_DIPNAME( 0x0001, 0x0000, "P3" ) // must be 'ON' to boot
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	// uses multiplexed ports instead
+
+	PORT_START("INC_0")
+	PORT_BIT( 0x003f, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // are these some of the other buttons? having any of them pressed will corrupt the startup of dpmagic and jjs at least
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // presumably power, kils the game
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("INC_1")
+	PORT_BIT( 0x003f, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // are these some of the other buttons? having any of them pressed will corrupt the startup of dpmagic and jjs at least
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("INC_2") // the system ALWAYS requires a cartridge, but has 2 modes of operation depending on a switch.  The only way to use it as a normal keyboard is by flipping this switch.
+	PORT_DIPNAME( 0x0001, 0x0000, "System Mode" )
+	PORT_DIPSETTING(      0x0001, "Keyboard Mode (no TV output)" )
+	PORT_DIPSETTING(      0x0000, "TV Mode" )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0040, 0x0000, "INC_2" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) )
@@ -1240,7 +1385,9 @@ static INPUT_PORTS_START( icanpian ) // this has an entire piano keyboard + extr
 	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // presumably power, kils the game
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1253,6 +1400,7 @@ static INPUT_PORTS_START( icanpian ) // this has an entire piano keyboard + extr
 	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
 INPUT_PORTS_END
 
 
@@ -1408,6 +1556,67 @@ static INPUT_PORTS_START( lexizeus ) // how many buttons does this have?  I acci
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
+READ16_MEMBER(icanguit_state::porta_r)
+{
+	//logerror("%s: porta_r\n", machine().describe_context());
+	return m_inlatch_a;
+}
+
+
+READ16_MEMBER(icanguit_state::portc_r)
+{
+	//logerror("%s: portc_r\n", machine().describe_context());
+	return m_inlatch_c;
+}
+
+WRITE16_MEMBER(icanguit_state::porta_w)
+{
+	if (data == 0x0000)
+	{
+		m_inlatch_a = m_inlatch_c = 0x0000;
+	}
+	else if (data == 0x1000)
+	{
+		m_inlatch_a = m_porta_in[2]->read();
+		m_inlatch_c = m_portc_in[2]->read();
+	}
+	else if (data == 0x2000)
+	{
+		m_inlatch_a = m_porta_in[1]->read();
+		m_inlatch_c = m_portc_in[1]->read();
+	}
+	else if (data == 0x4000)
+	{
+		m_inlatch_a = m_porta_in[0]->read();
+		m_inlatch_c = m_portc_in[0]->read();
+	}
+	else
+	{
+		logerror("%s: unknown porta_w (%04x)\n", machine().describe_context(), data);
+	}
+}
+
+WRITE16_MEMBER(icanguit_state::portc_w)
+{
+	//logerror("%s: portc_w (%04x)\n", machine().describe_context(), data);
+}
+
+
+// portb is used on startup, something serial?
+READ16_MEMBER(icanguit_state::portb_r)
+{
+	//logerror("%s: portb_r\n", machine().describe_context());
+	return m_io_p2->read();
+}
+
+WRITE16_MEMBER(icanguit_state::portb_w)
+{
+	//logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
+}
+
+
+
 void icanguit_state::machine_start()
 {
 	spg2xx_game_state::machine_start();
@@ -1421,6 +1630,14 @@ void icanguit_state::machine_start()
 		m_bank->set_entry(0);
 	}
 }
+
+void icanguit_state::machine_reset()
+{
+	spg2xx_game_state::machine_reset();
+	m_inlatch_a = 0x0000;
+	m_inlatch_c = 0x0000;
+}
+
 
 DEVICE_IMAGE_LOAD_MEMBER(icanguit_state, icanguit_cart)
 {
@@ -1595,10 +1812,18 @@ void icanguit_state::icanguit(machine_config &config)
 	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 
 	spg2xx_base(config);
-
+	/*
+	m_spg->porta_in().set(FUNC(icanguit_state::porta_r));
+	m_spg->portb_in().set(FUNC(icanguit_state::portb_r));
+	m_spg->portc_in().set(FUNC(icanguit_state::portc_r));
+	m_spg->porta_out().set(FUNC(icanguit_state::porta_w));
+	m_spg->portb_out().set(FUNC(icanguit_state::portb_w));
+	m_spg->portc_out().set(FUNC(icanguit_state::portc_w));
+	*/
 	m_spg->porta_in().set_ioport("P1");
 	m_spg->portb_in().set_ioport("P2");
 	m_spg->portc_in().set_ioport("P3");
+
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "icanguit_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -1614,9 +1839,12 @@ void icanguit_state::icanpian(machine_config &config)
 
 	spg2xx_base(config);
 
-	m_spg->porta_in().set_ioport("P1");
-	m_spg->portb_in().set_ioport("P2");
-	m_spg->portc_in().set_ioport("P3");
+	m_spg->porta_in().set(FUNC(icanguit_state::porta_r));
+	m_spg->portb_in().set(FUNC(icanguit_state::portb_r));
+	m_spg->portc_in().set(FUNC(icanguit_state::portc_r));
+	m_spg->porta_out().set(FUNC(icanguit_state::porta_w));
+	m_spg->portb_out().set(FUNC(icanguit_state::portb_w));
+	m_spg->portc_out().set(FUNC(icanguit_state::portc_w));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "icanpian_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -1717,6 +1945,13 @@ void jakks_gkr_state::jakks_gkr_nk_i2c(machine_config &config)
 	jakks_gkr_i2c(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
 	SOFTWARE_LIST(config, "jakks_gamekey_nk").set_original("jakks_gamekey_nk");
+}
+
+void jakks_gkr_state::jakks_gkr_dy(machine_config &config)
+{
+	jakks_gkr(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
+	SOFTWARE_LIST(config, "jakks_gamekey_dy").set_original("jakks_gamekey_dy");
 }
 
 void jakks_gkr_state::jakks_gkr_dy_i2c(machine_config &config)
@@ -1909,6 +2144,11 @@ ROM_END
 ROM_START( jak_wof )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "jakkswheeloffortunegkr.bin", 0x000000, 0x200000, CRC(6a879620) SHA1(95478764a61741569041c2299528f6464651d593) )
+ROM_END
+
+ROM_START( jak_disn )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "disneygkr.bin", 0x000000, 0x100000,  CRC(7a5ebcd7) SHA1(9add8c2a6e3f0409c8957a2ba2d054fd2c4c39c1) )
 ROM_END
 
 ROM_START( jak_disf )
@@ -2194,21 +2434,23 @@ CONS( 2008, jak_wall, 0, 0, walle, walle,  spg2xx_game_state, empty_init, "JAKKS
 // 'Game-Key Ready' JAKKS games (these can also take per-game specific expansion cartridges, although not all games had them released)
 // Some of these were available in versions without Game-Key ports, it is unconfirmed if code was the same unless otherwise stated
 // For units released AFTER the GameKey promotion was cancelled it appears the code is the same as the PCB inside is the same, just the external port closed off, earlier units might be different hardware in some cases.
+// units released BEFORE the GameKey support were sometimes different hardware, eg. the Spider-Man and Disney units were SPG110 based
 CONS( 2005, jak_wwe,  0, 0, jakks_gkr_1m_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",              "WWE (JAKKS Pacific TV Game, Game-Key Ready)",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // WW (no game-keys released)
 CONS( 2005, jak_fan4, 0, 0, jakks_gkr_1m_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",         "Fantastic Four (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // F4 (no game-keys released)
-CONS( 2005, jak_just, 0, 0, jakks_gkr_1m_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Taniko",                  "Justice League (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DC (no game-keys released)
+CONS( 2005, jak_just, 0, 0, jakks_gkr_1m_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Taniko",                  "Justice League (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DC (no game-keys released)
 CONS( 2005, jak_dora, 0, 0, jakks_gkr_nk,     jak_gkr,      jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",          "Dora the Explorer - Nursery Rhyme Adventure (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys (same as Nicktoons & Spongebob) (3 released) - The upper part of this one is pink/purple.
 CONS( 2005, jak_dorr, 0, 0, jakks_gkr_nk_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",          "Dora the Explorer - Race to Play Park (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys (same as Nicktoons & Spongebob) (3 released) - The upper part of this one is blue
 CONS( 2004, jak_nick, 0, 0, jakks_gkr_nk_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",          "Nicktoons (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys
 CONS( 2005, jak_sbfc, 0, 0, jakks_gkr_nk_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",              "SpongeBob SquarePants - The Fry Cook Games (JAKKS Pacific TV Game, Game-Key Ready) (AUG 18 2005 21:31:56)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys
 CONS( 2005, jak_sdoo, 0, 0, jakks_gkr_2m_i2c, jak_sdoo_i2c, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Jolliford Management",    "Scooby-Doo! and the Mystery of the Castle (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) //  SD (no game-keys released)  (was dumped from a later unit with GameKey port missing, but internal PCB still supported it, code likely the same)
-CONS( 2005, jak_disf, 0, 0, jakks_gkr_dy_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",              "Disney Friends (JAKKS Pacific TV Game, Game-Key Ready) (17 MAY 2005 A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses DY keys (3 released)
+CONS( 2005, jak_disn, 0, 0, jakks_gkr_dy,     jak_gkr,      jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",              "Disney (JAKKS Pacific TV Game, Game-Key Ready) (08 FEB 2005 A)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses DY keys (3 released)
+CONS( 2005, jak_disf, 0, 0, jakks_gkr_dy_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",              "Disney Friends (JAKKS Pacific TV Game, Game-Key Ready) (17 MAY 2005 A)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses DY keys (3 released)
 CONS( 2005, jak_disp, 0, 0, jakks_gkr_dp_i2c, jak_disp_i2c, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / 5000ft, Inc",             "Disney Princess (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses DP keys (1 key released)
 // There seems to be a second game called 'Disney Princesses' with a 'board game' style front end as well as the minigames, also GKR, see https://www.youtube.com/watch?v=w9p5TI029bQ  The one we have is https://www.youtube.com/watch?v=9ppPKVbpoMs  the physical package seems identical.
 CONS( 2005, jak_sith, 0, 0, jakks_gkr_sw_i2c, jak_sith_i2c, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Griptonite Games",        "Star Wars - Revenge of the Sith (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses SW keys (1 released)
 CONS( 2005, jak_dbz,  0, 0, jakks_gkr_1m_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",          "Dragon Ball Z (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DB (no game-keys released, 1 in development but cancelled)
 CONS( 2005, jak_mpac, 0, 0, jakks_gkr_nm_i2c, jak_nm_i2c,   jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd",      "Ms. Pac-Man 5-in-1 (Ms. Pac-Man, Pole Position, Galaga, Xevious, Mappy) (JAKKS Pacific TV Game, Game-Key Ready) (07 FEB 2005 A SKU F)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NM (3 keys available [Dig Dug, New Rally-X], [Rally-X, Pac-Man, Bosconian], [Pac-Man, Bosconian])
-CONS( 2005, jak_wof,  0, 0, jakks_gkr_wf_i2c, jak_wf_i2c,   jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",              "Wheel of Fortune (JAKKS Pacific TV Game, Game-Key Ready)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses WF keys (no game-keys released)  analog wheel not emulated
+CONS( 2005, jak_wof,  0, 0, jakks_gkr_wf_i2c, jak_wf_i2c,   jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",              "Wheel of Fortune (JAKKS Pacific TV Game, Game-Key Ready) (Jul 11 2005 ORIG)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses WF keys (no game-keys released)  analog wheel not emulated
 // There is a 'Second Edition' version of Wheel of Fortune with a Gold case, GameKey port removed, and a '2' over the usual Game Key Ready logo, internals are different too, not Game-Key Ready
 CONS( 2004, jak_spdm, 0, 0, jakks_gkr_mv_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",         "Spider-Man (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) //  MV (1 key available)
 CONS( 2005, jak_pooh, 0, 0, jakks_gkr_wp,     jak_pooh,     jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Backbone Entertainment",  "Winnie the Pooh - Piglet's Special Day (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // WP (no game-keys released)

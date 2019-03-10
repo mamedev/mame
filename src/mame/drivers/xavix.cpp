@@ -1291,6 +1291,19 @@ static INPUT_PORTS_START( has_wamg )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // waits for this after fading out title, what is it?
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( evio )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
+INPUT_PORTS_END
+
 /* correct, 4bpp gfxs */
 static const gfx_layout charlayout =
 {
@@ -1391,7 +1404,7 @@ void xavix_i2c_state::xavix_i2c_24lc02(machine_config &config)
 {
 	xavix(config);
 
-	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x100); // 24LC02 (taiko)
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24LC02 (taiko)
 }
 
 void xavix_i2c_state::xavix_i2c_24c02(machine_config &config)
@@ -1407,14 +1420,14 @@ void xavix_i2c_state::xavix_i2c_24lc04(machine_config &config)
 
 	// according to http://ww1.microchip.com/downloads/en/devicedoc/21708k.pdf 'the master transmits up to 16 data bytes' however this breaks the Nostalgia games
 	// of note Galplus Phalanx on Namco Nostalgia 2, which will hang between stages unable to properly access the device, but with no page support it doesn't hang and scores save
-	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x200); // 24LC04 on Nostalgia games, 24C04 on others
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // 24LC04 on Nostalgia games, 24C04 on others
 }
 
 void xavix_i2c_state::xavix_i2c_24c08(machine_config &config)
 {
 	xavix(config);
 
-	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x400); // 24C08 (Excite Fishing DX)
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x400); // 24C08 (Excite Fishing DX)
 }
 
 void xavix_state::xavixp(machine_config &config)
@@ -1475,7 +1488,7 @@ void xavix_i2c_jmat_state::xavix2002_i2c_jmat(machine_config &config)
 {
 	xavix2002(config);
 
-	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x200); // ?
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // ?
 
 	m_xavix2002io->read_0_callback().set(FUNC(xavix_i2c_jmat_state::read_extended_io0));
 	m_xavix2002io->write_0_callback().set(FUNC(xavix_i2c_jmat_state::write_extended_io0));
@@ -1542,7 +1555,7 @@ void xavix_i2c_cart_state::xavix_i2c_taiko(machine_config &config)
 {
 	xavix_cart(config);
 
-	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x100); // 24LC02
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24LC02
 
 	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
 	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
@@ -1878,6 +1891,14 @@ ROM_START( taikodp )
 	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
 
+ROM_START( evio )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "evio.bin", 0x600000, 0x200000, CRC(ee22c764) SHA1(f2b7e213eb78065a63ef484a619bcfc61299e30e))
+	ROM_RELOAD(0x000000, 0x200000)
+ROM_END
+
+
+
 
 /* XaviX hardware titles (1st Generation)
 
@@ -1987,6 +2008,9 @@ CONS( 2002, popira2,  0,           0,  xavix_cart_popira,popira2,  xavix_popira2
 
 CONS( 2003, taikodp,  0,           0,  xavix_i2c_taiko,  taikodp,  xavix_i2c_cart_state, init_xavix,    "Takara / SSD Company LTD",                     "Taiko De Popira (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? are the drums analog?
 
+CONS( 2003, evio,     0,           0,  xavix_nv,         evio,     xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Evio (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? it's a violin controller
+
+
 // Let’s!TVプレイ 超にんきスポット!ころがしほーだい たまごっちりぞーと   (Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort) (only on the Japanese list? http://test.shinsedai.co.jp/english/products/Applied/list.html )   This also allows you to use an IR reciever to import a Tamagotchi from compatible games
 CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04,  ltv_tam,xavix_i2c_ltv_tam_state,      init_xavix,    "Bandai / SSD Company LTD",                      "Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
@@ -2042,7 +2066,7 @@ CONS( 2004, epo_sdb,  0, 0, xavix2000_nv,        epo_sdb,     xavix_state,      
 
 CONS( 2005, ttv_sw,   0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Tiger / SSD Company LTD",       "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, ttv_lotr, 0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Tiger / SSD Company LTD",       "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2005, ttv_mx,   0, 0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_state,      init_xavix, "Tiger / SSD Company LTD",       "MX Dirt Rebel", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ttv_mx,   0, 0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_state,      init_xavix, "Tiger / SSD Company LTD",       "MX Dirt Rebel", MACHINE_IMPERFECT_SOUND )
 CONS( 2003, drgqst,   0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // hangs after starting a game, or after quite a long time in attract mode (first problem could be bad save data read with the eeprom code, 2nd problem might just be how it is, ends up in a dead loop, not executing invalid code)

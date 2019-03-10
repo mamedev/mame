@@ -148,21 +148,21 @@ bool ekara_rom_i2c_24c08_epitch_device::is_write_access_not_rom(void)
 
 void ekara_rom_i2c_24c08_epitch_device::device_add_mconfig(machine_config &config)
 {
-	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x400); // 24C08
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x400); // 24C08
 }
 
 // i2c 24lc04
 
 void ekara_rom_i2c_24lc04_device::device_add_mconfig(machine_config &config)
 {
-	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x200); // 24LC04
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // 24LC04
 }
 
 // i2c 24lc02
 
 void ekara_rom_i2c_24lc02_device::device_add_mconfig(machine_config &config)
 {
-	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x100); // 24LC02
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24LC02
 }
 
 // i2c 24lc02 with direct IO port access

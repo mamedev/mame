@@ -2,22 +2,23 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-    Known cartridges (*=dumped)
-	there could be more
+    Known cartridges (*=dumped) (#=sourced)
 
     *Piano Favourites (J7522)
-	Jammin Jungle Safari (Disney The Lion King, Disney The Jungle Book, Disney Tarzan)
-	Jungle Boogie
-	Scooby-Doo! Monster Mayhem
-	Rockin' Dance Party
-	Nicktoons Show Tunes
-	Holiday Wonderland
-	Barbie Princess Enchanted Sounds
-	Pop Hits
-	Dora the Explorer Musical Adventure
-	American Idol - Take The Stage
-	Disney Princess Magical Melodies
-	The Wizard of Oz - We're Off to Play the Piano
+	*Jammin Jungle Safari (Disney The Lion King, Disney The Jungle Book, Disney Tarzan) (K4653)
+	*Jungle Boogie (J7524)
+	*Scooby-Doo! Monster Mayhem (J7525)
+	*Rockin' Dance Party (J8715)
+	*Nicktoons Show Tunes (J7527)
+	*Disney Princess Magical Melodies (K4656)
+	#Barbie Princess Enchanted Sounds
+	#Pop Hits
+	#Dora the Explorer Musical Adventure
+	#American Idol - Take The Stage
+	#Holiday Wonderland
+	#The Wizard of Oz - We're Off to Play the Piano
+	
+	(were there any more?)
 	
 	cartridge pinout (not identical to I Can Play Guitar)
 	
@@ -49,8 +50,8 @@
 
 <softwarelist name="icanpian_cart" description="Fisher-Price / Mattel I Can Play Piano cartridges">
 	<software name="pianfav" supported="no">
-		<description>Piano Favorites</description>
-		<year>2007</year>
+		<description>Piano Favorites (J7522)</description>
+		<year>2005</year>
 		<publisher>Fisher-Price / Mattel</publisher>
 		<part name="cart" interface="icanpian_cart">
 			<dataarea name="rom" size="0x800000">
@@ -58,4 +59,71 @@
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="dpmagic" supported="no">
+		<description>Disney Princess Magical Melodies (K4656)</description>
+		<year>2005</year>
+		<publisher>Fisher-Price / Mattel</publisher>
+		<part name="cart" interface="icanpian_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="icppmagicalmelodies.bin" size="0x800000" crc="c5f4c7eb" sha1="d47feebba010c498cd11cd6019df6c7680840ee5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="jungboog" supported="no">
+		<description>Jungle Boogie (J7524)</description>
+		<year>2005</year>
+		<publisher>Fisher-Price / Mattel</publisher>
+		<part name="cart" interface="icanpian_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="icppjungleboogie.bin" size="0x800000" crc="632ab0a3" sha1="ec8b56cc0eaec0ac31f7c224167449e691c07bc6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="scoobymm" supported="no">
+		<description>Scooby-Doo! Monster Mayhem (J7525)</description>
+		<year>2005</year>
+		<publisher>Fisher-Price / Mattel</publisher>
+		<part name="cart" interface="icanpian_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="icppscoobydoomonstermayhem.bin" size="0x800000" crc="e16c715e" sha1="3f6322ea9404b87620d924f0c0b0ad405f50f674" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="jjs" supported="no">
+		<description>Jammin' Jungle Safari (Disney's The Lion King, Jungle Book, Tarzan) (K4653)</description> <!-- Tarzan is shown on the cart, but none of the songs are from it? -->
+		<year>2005</year>
+		<publisher>Fisher-Price / Mattel</publisher>
+		<part name="cart" interface="icanpian_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="icppjamminjunglesafari.bin" size="0x800000" crc="6408abb6" sha1="9c9c050e919222a80369d2a116a85db6cc4d7acb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="showtune" supported="no">
+		<description>Nicktoons Show Tunes (J7527)</description>
+		<year>2005</year>
+		<publisher>Fisher-Price / Mattel</publisher>
+		<part name="cart" interface="icanpian_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="icppshowtunes.bin" size="0x800000" crc="c95836fd" sha1="c07b500f241fc6b3a3302b580794bb2eb86977c7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="rdp" supported="no">
+		<description>Rockin' Dance Party (J8715)</description>
+		<year>2005</year>
+		<publisher>Fisher-Price / Mattel</publisher>
+		<part name="cart" interface="icanpian_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="icpprockindanceparty.bin" size="0x800000" crc="00d597d3" sha1="603c8d9d11f5e1d075a1b524e99b581d859b43ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+	
 </softwarelist>
