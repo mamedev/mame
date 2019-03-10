@@ -572,8 +572,8 @@ READ8_MEMBER( pasopia7_state::pasopia7_fdc_r )
 {
 	switch(offset)
 	{
-		case 4: return m_fdc->msr_r(space, 0, 0xff);
-		case 5: return m_fdc->fifo_r(space, 0, 0xff);
+		case 4: return m_fdc->msr_r();
+		case 5: return m_fdc->fifo_r();
 		//case 6: bit 7 interrupt bit
 	}
 
@@ -586,7 +586,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_fdc_w )
 	{
 		case 0: m_fdc->tc_w(false); break;
 		case 2: m_fdc->tc_w(true); break;
-		case 5: m_fdc->fifo_w(space, 0, data, 0xff); break;
+		case 5: m_fdc->fifo_w(data); break;
 		case 6:
 			if(data & 0x80)
 				m_fdc->reset();

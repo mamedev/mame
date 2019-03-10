@@ -33,7 +33,7 @@ void kc_d004_device::kc_d004_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0xf0, 0xf1).m(UPD765_TAG, FUNC(upd765a_device::map));
-	map(0xf2, 0xf3).rw(UPD765_TAG, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
+	map(0xf2, 0xf3).rw(UPD765_TAG, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
 	map(0xf4, 0xf4).r(FUNC(kc_d004_device::hw_input_gate_r));
 	map(0xf6, 0xf7).w(FUNC(kc_d004_device::fdd_select_w));
 	map(0xf8, 0xf9).w(FUNC(kc_d004_device::hw_terminal_count_w));
@@ -45,7 +45,7 @@ void kc_d004_gide_device::kc_d004_gide_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0xffff).rw(FUNC(kc_d004_gide_device::gide_r), FUNC(kc_d004_gide_device::gide_w));
 	map(0x00f0, 0x00f1).mirror(0xff00).m(UPD765_TAG, FUNC(upd765a_device::map));
-	map(0x00f2, 0x00f3).mirror(0xff00).rw(UPD765_TAG, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
+	map(0x00f2, 0x00f3).mirror(0xff00).rw(UPD765_TAG, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
 	map(0x00f4, 0x00f4).mirror(0xff00).r(FUNC(kc_d004_gide_device::hw_input_gate_r));
 	map(0x00f6, 0x00f7).mirror(0xff00).w(FUNC(kc_d004_gide_device::fdd_select_w));
 	map(0x00f8, 0x00f9).mirror(0xff00).w(FUNC(kc_d004_gide_device::hw_terminal_count_w));

@@ -566,8 +566,8 @@ READ8_MEMBER( pc1640_state::io_r )
 	else if (addr >= 0x078 && addr <= 0x07f) { data = mouse_r(space, offset & 0x07); decoded = true; }
 	else if (addr >= 0x378 && addr <= 0x37b) { data = printer_r(space, offset & 0x03); decoded = true; }
 	else if (addr >= 0x3b0 && addr <= 0x3df) { decoded = true; }
-	else if (addr >= 0x3f4 && addr <= 0x3f4) { data = m_fdc->fdc->msr_r(space, offset & 0x01); decoded = true; }
-	else if (addr >= 0x3f5 && addr <= 0x3f5) { data = m_fdc->fdc->fifo_r(space, offset & 0x01); decoded = true; }
+	else if (addr >= 0x3f4 && addr <= 0x3f4) { data = m_fdc->fdc->msr_r(); decoded = true; }
+	else if (addr >= 0x3f5 && addr <= 0x3f5) { data = m_fdc->fdc->fifo_r(); decoded = true; }
 	else if (addr >= 0x3f8 && addr <= 0x3ff) { data = m_uart->ins8250_r(space, offset & 0x07); decoded = true; }
 
 	if (decoded)

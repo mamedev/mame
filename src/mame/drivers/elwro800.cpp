@@ -284,11 +284,11 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 		// CSFDC
 		if (offset & 1)
 		{
-			return m_upd765->fifo_r(space, 0, 0xff);
+			return m_upd765->fifo_r();
 		}
 		else
 		{
-			return m_upd765->msr_r(space, 0, 0xff);
+			return m_upd765->msr_r();
 		}
 	}
 	else if (!BIT(cs,4))
@@ -332,7 +332,7 @@ WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
 		// CSFDC
 		if (offset & 1)
 		{
-			m_upd765->fifo_w(space, 0, data, 0xff);
+			m_upd765->fifo_w(data);
 		}
 	}
 	else if (!BIT(cs,4))

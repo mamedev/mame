@@ -429,20 +429,18 @@ msx_slot_disk3_device::msx_slot_disk3_device(const machine_config &mconfig, cons
 
 void msx_slot_disk3_device::write(offs_t offset, uint8_t data)
 {
-	address_space &space = machine().dummy_space();
-
 	switch (offset)
 	{
 		case 0x7ff8:   // CR0 : 0 - 0 - MEN1 - MEN0 - 0 - -FRST - 0 - DSA
-			m_fdc->dor_w(space, 2, data);
+			m_fdc->dor_w(data);
 			break;
 
 		case 0x7ff9:   // CR1 : 0 - 0 - C4E - C4 - SBME - SBM - TCE - FDCTC
-			m_fdc->cr1_w(space, 3, data);
+			m_fdc->cr1_w(data);
 			break;
 
 		case 0x7ffb:   // Data Register
-			m_fdc->fifo_w(space, 5, data);
+			m_fdc->fifo_w(data);
 			break;
 
 		default:
@@ -454,14 +452,12 @@ void msx_slot_disk3_device::write(offs_t offset, uint8_t data)
 
 uint8_t msx_slot_disk3_device::read(offs_t offset)
 {
-	address_space &space = machine().dummy_space();
-
 	switch (offset)
 	{
 		case 0x7ffa:   // Status Register
-			return m_fdc->msr_r(space, 4);
+			return m_fdc->msr_r();
 		case 0x7ffb:   // Data Register
-			return m_fdc->fifo_r(space, 5);
+			return m_fdc->fifo_r();
 	}
 
 	return msx_slot_rom_device::read(offset);
@@ -479,23 +475,21 @@ msx_slot_disk4_device::msx_slot_disk4_device(const machine_config &mconfig, cons
 
 void msx_slot_disk4_device::write(offs_t offset, uint8_t data)
 {
-	address_space &space = machine().dummy_space();
-
 	switch (offset)
 	{
 		case 0x7ff1:   // FDD : x - x - MC1 - MC0 - x - x - x - x
 			break;
 
 		case 0x7ff2:   // CR0 : 0 - 0 - MEN1 - MEN0 - 0 - -FRST - 0 - DSA
-			m_fdc->dor_w(space, 2, data);
+			m_fdc->dor_w(data);
 			break;
 
 		case 0x7ff3:   // CR1 : 0 - 0 - C4E - C4 - SBME - SBM - TCE - FDCTC
-			m_fdc->cr1_w(space, 3, data);
+			m_fdc->cr1_w(data);
 			break;
 
 		case 0x7ff5:   // Data Register
-			m_fdc->fifo_w(space, 5, data);
+			m_fdc->fifo_w(data);
 			break;
 
 		default:
@@ -507,8 +501,6 @@ void msx_slot_disk4_device::write(offs_t offset, uint8_t data)
 
 uint8_t msx_slot_disk4_device::read(offs_t offset)
 {
-	address_space &space = machine().dummy_space();
-
 	switch (offset)
 	{
 		case 0x7ff1:   // FDD : x - x - MC1 - MC0 - x - x - x - x
@@ -516,9 +508,9 @@ uint8_t msx_slot_disk4_device::read(offs_t offset)
 			break;
 
 		case 0x7ff4:   // Status Register
-			return m_fdc->msr_r(space, 4);
+			return m_fdc->msr_r();
 		case 0x7ff5:   // Data Register
-			return m_fdc->fifo_r(space, 5);
+			return m_fdc->fifo_r();
 	}
 
 	return msx_slot_rom_device::read(offset);

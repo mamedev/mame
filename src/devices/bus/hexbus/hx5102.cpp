@@ -373,12 +373,12 @@ READ8_MEMBER(hx5102_device::fdc_read)
 	{
 	case 0:
 		// Main status register
-		val = m_floppy_ctrl->read_msr();
+		val = m_floppy_ctrl->msr_r();
 		LOGMASKED(LOG_STATUS, "i8272A.msr -> %02x\n", val);
 		break;
 	case 4:
 		// FIFO read
-		val = m_floppy_ctrl->read_fifo();
+		val = m_floppy_ctrl->fifo_r();
 		LOGMASKED(LOG_FIFO, "i8272A.fifo -> %02x\n", val);
 		break;
 	}
@@ -397,7 +397,7 @@ WRITE8_MEMBER(hx5102_device::fdc_write)
 	case 0x08:
 		// Command register (FIFO write)
 		LOGMASKED(LOG_STATUS, "i8272A.fifo <- %02x\n", data);
-		m_floppy_ctrl->write_fifo(data);
+		m_floppy_ctrl->fifo_w(data);
 		break;
 	case 0x0c:
 		// DMA lock

@@ -95,7 +95,7 @@ const tiny_rom_entry *iq151_disc2_device::device_rom_region() const
 
 void iq151_disc2_device::read(offs_t offset, uint8_t &data)
 {
-	// interal ROM is mapped at 0xe000-0xe7ff
+	// internal ROM is mapped at 0xe000-0xe7ff
 	if (offset >= 0xe000 && offset < 0xe800 && m_rom_enabled)
 		data = m_rom[offset & 0x7ff];
 }
@@ -107,12 +107,10 @@ void iq151_disc2_device::read(offs_t offset, uint8_t &data)
 
 void iq151_disc2_device::io_read(offs_t offset, uint8_t &data)
 {
-	/* This is gross */
-	address_space *space = nullptr;
 	if (offset == 0xaa)
-		data = m_fdc->msr_r(*space, 0, 0xff);
+		data = m_fdc->msr_r();
 	else if (offset == 0xab)
-		data = m_fdc->fifo_r(*space, 0, 0xff);
+		data = m_fdc->fifo_r();
 }
 
 //-------------------------------------------------
@@ -121,9 +119,8 @@ void iq151_disc2_device::io_read(offs_t offset, uint8_t &data)
 
 void iq151_disc2_device::io_write(offs_t offset, uint8_t data)
 {
-	address_space *space = nullptr;
 	if (offset == 0xab)
-		m_fdc->fifo_w(*space, 0, data, 0xff);
+		m_fdc->fifo_w(data);
 	else if (offset == 0xac)
 		m_rom_enabled = (data == 0x01);
 }

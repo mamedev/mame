@@ -187,7 +187,7 @@ void kdt6_state::psi98_io(address_map &map)
 	map(0x19, 0x19).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x1c, 0x1c).w(FUNC(kdt6_state::status0_w));
 	map(0x1d, 0x1d).r(m_keyboard, FUNC(psi_keyboard_bus_device::key_data_r));
-	map(0x1e, 0x1e).rw(m_fdc, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
+	map(0x1e, 0x1e).rw(m_fdc, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
 	map(0x1f, 0x1f).w(FUNC(kdt6_state::fdc_tc_w));
 	map(0x20, 0x2f).rw(FUNC(kdt6_state::mapper_r), FUNC(kdt6_state::mapper_w));
 	map(0x30, 0x30).rw(FUNC(kdt6_state::video_data_r), FUNC(kdt6_state::video_data_w));

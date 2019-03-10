@@ -158,11 +158,11 @@ WRITE_LINE_MEMBER( dps1_state::fdc_drq_w )
 		address_space& mem = m_maincpu->space(AS_PROGRAM);
 		if (m_dma_dir)
 		{ // disk to mem
-			mem.write_byte(m_dma_adr, m_fdc->mdma_r(mem, 0));
+			mem.write_byte(m_dma_adr, m_fdc->dma_r());
 		}
 		else
 		{ // mem to disk
-			m_fdc->mdma_w(mem, 0, mem.read_byte(m_dma_adr));
+			m_fdc->dma_w(mem.read_byte(m_dma_adr));
 		}
 		m_dma_adr++;
 	}

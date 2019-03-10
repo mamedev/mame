@@ -413,7 +413,7 @@ void rt1715_state::rt1715w_io(address_map &map)
 //	map(0x3c, 0x3f) // RST (RST2) -- Ru:cksetzen von Flip-Flops in V.24 (Pru:ftechnik)
 	// used via DMA only
 	map(0x40, 0x40).r(m_fdc, FUNC(i8272a_device::msr_r));
-	map(0x41, 0x41).rw(m_fdc, FUNC(i8272a_device::mdma_r), FUNC(i8272a_device::mdma_w));
+	map(0x41, 0x41).rw(m_fdc, FUNC(i8272a_device::dma_r), FUNC(i8272a_device::dma_w));
 }
 
 void rt1715_state::k7658_mem(address_map &map)

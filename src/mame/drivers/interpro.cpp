@@ -780,8 +780,8 @@ void interpro_state::ioga(machine_config &config)
 	//m_ioga->dma_r_callback<0>().set(unknown); // plotter
 	m_ioga->dma_r_callback<1>().set(INTERPRO_SCSI_DEVICE_TAG, FUNC(ncr53c90a_device::dma_r));
 	m_ioga->dma_w_callback<1>().set(INTERPRO_SCSI_DEVICE_TAG, FUNC(ncr53c90a_device::dma_w));
-	m_ioga->dma_r_callback<2>().set(m_fdc, FUNC(upd765_family_device::mdma_r));
-	m_ioga->dma_w_callback<2>().set(m_fdc, FUNC(upd765_family_device::mdma_w));
+	m_ioga->dma_r_callback<2>().set(m_fdc, FUNC(upd765_family_device::dma_r));
+	m_ioga->dma_w_callback<2>().set(m_fdc, FUNC(upd765_family_device::dma_w));
 	m_ioga->serial_dma_r_callback<0>().set(m_scc2, FUNC(z80scc_device::db_r));
 	m_ioga->serial_dma_w_callback<0>().set(m_scc2, FUNC(z80scc_device::db_w));
 	m_ioga->serial_dma_r_callback<1>().set(m_scc1, FUNC(z80scc_device::da_r));

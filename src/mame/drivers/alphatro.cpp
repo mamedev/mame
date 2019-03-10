@@ -763,9 +763,9 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	m_dmac->out_hrq_cb().set(FUNC(alphatro_state::hrq_w));
 	m_dmac->in_memr_cb().set(FUNC(alphatro_state::ram0000_r));
 	m_dmac->out_memw_cb().set(FUNC(alphatro_state::ram0000_w));
-	m_dmac->in_ior_cb<2>().set("fdc", FUNC(upd765a_device::mdma_r));
-	m_dmac->out_iow_cb<2>().set("fdc", FUNC(upd765a_device::mdma_w));
-	m_dmac->out_tc_cb().set("fdc", FUNC(upd765a_device::tc_line_w));
+	m_dmac->in_ior_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_dmac->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
+	m_dmac->out_tc_cb().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 
 	HD6845(config, m_crtc, 16_MHz_XTAL / 8);
 	m_crtc->set_screen(m_screen);

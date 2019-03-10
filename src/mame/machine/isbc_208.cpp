@@ -38,8 +38,8 @@ void isbc_208_device::device_add_mconfig(machine_config &config)
 	m_dmac->out_eop_callback().set(FUNC(isbc_208_device::out_eop_w));
 	m_dmac->in_memr_callback().set(FUNC(isbc_208_device::dma_read_byte));
 	m_dmac->out_memw_callback().set(FUNC(isbc_208_device::dma_write_byte));
-	m_dmac->in_ior_callback<0>().set(m_fdc, FUNC(i8272a_device::mdma_r));
-	m_dmac->out_iow_callback<0>().set(m_fdc, FUNC(i8272a_device::mdma_w));
+	m_dmac->in_ior_callback<0>().set(m_fdc, FUNC(i8272a_device::dma_r));
+	m_dmac->out_iow_callback<0>().set(m_fdc, FUNC(i8272a_device::dma_w));
 
 	I8272A(config, m_fdc, 8_MHz_XTAL, true);
 	m_fdc->intrq_wr_callback().set(FUNC(isbc_208_device::irq_w));

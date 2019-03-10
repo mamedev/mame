@@ -175,7 +175,7 @@ static const int spectrum_plus3_memory_selections[]=
 WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_3ffd_w )
 {
 	if (m_floppy==1)
-		m_upd765->fifo_w(space, 0, data, 0xff);
+		m_upd765->fifo_w(data);
 }
 
 READ8_MEMBER( spectrum_state::spectrum_plus3_port_3ffd_r )
@@ -183,7 +183,7 @@ READ8_MEMBER( spectrum_state::spectrum_plus3_port_3ffd_r )
 	if (m_floppy==0)
 		return 0xff;
 	else
-		return m_upd765->fifo_r(space, 0, 0xff);
+		return m_upd765->fifo_r();
 }
 
 
@@ -192,7 +192,7 @@ READ8_MEMBER( spectrum_state::spectrum_plus3_port_2ffd_r )
 	if (m_floppy==0)
 		return 0xff;
 	else
-		return m_upd765->msr_r(space, 0, 0xff);
+		return m_upd765->msr_r();
 }
 
 

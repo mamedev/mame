@@ -566,17 +566,15 @@ void msx_cart_fsfd1a_device::device_reset()
 
 uint8_t msx_cart_fsfd1a_device::read_cart(offs_t offset)
 {
-	address_space &space = machine().dummy_space();
-
 	switch (offset)
 	{
 		case 0x7ffa:
 		case 0xbffa:
-			return m_fdc->msr_r(space, 4);
+			return m_fdc->msr_r();
 
 		case 0x7ffb:
 		case 0xbffb:
-			return m_fdc->fifo_r(space, 5);
+			return m_fdc->fifo_r();
 	}
 
 	if (offset >= 0x4000 && offset < 0x8000)
@@ -589,23 +587,21 @@ uint8_t msx_cart_fsfd1a_device::read_cart(offs_t offset)
 
 void msx_cart_fsfd1a_device::write_cart(offs_t offset, uint8_t data)
 {
-	address_space &space = machine().dummy_space();
-
 	switch (offset)
 	{
 		case 0x7ff8:
 		case 0xbff8:
-			m_fdc->dor_w(space, 2, data);
+			m_fdc->dor_w(data);
 			break;
 
 		case 0x7ff9:
 		case 0xbff9:
-			m_fdc->cr1_w(space, 3, data);
+			m_fdc->cr1_w(data);
 			break;
 
 		case 0x7ffb:
 		case 0xbffb:
-			m_fdc->fifo_w(space, 5, data);
+			m_fdc->fifo_w(data);
 			break;
 
 		default:

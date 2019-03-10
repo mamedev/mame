@@ -110,7 +110,7 @@ void hec2hrp_state::hecdisc2_io(address_map &map)
 	map(0x050, 0x05f).rw(FUNC(hec2hrp_state::disc2_io50_port_r), FUNC(hec2hrp_state::disc2_io50_port_w));
 	// uPD765 link
 	map(0x060, 0x061).m(m_upd_fdc, FUNC(upd765a_device::map));
-	map(0x070, 0x07f).rw(m_upd_fdc, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
+	map(0x070, 0x070).mirror(0x00f).rw(m_upd_fdc, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
 }
 
 void hec2hrp_state::hec2hrp_mem(address_map &map)

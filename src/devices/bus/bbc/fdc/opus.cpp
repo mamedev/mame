@@ -227,14 +227,14 @@ READ8_MEMBER(bbc_opus8272_device::read)
 		if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(1);
 		if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(1);
 	case 0x04:
-		data = m_fdc->msr_r(space, 0);
+		data = m_fdc->msr_r();
 		break;
 
 	case 0x05:
 		if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(0);
 		if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(0);
 	case 0x07:
-		data = m_fdc->fifo_r(space, 0);
+		data = m_fdc->fifo_r();
 		break;
 	}
 	return data;
@@ -259,7 +259,7 @@ WRITE8_MEMBER(bbc_opus8272_device::write)
 		if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(0);
 		if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(0);
 	case 0x07:
-		m_fdc->fifo_w(space, 0, data);
+		m_fdc->fifo_w(data);
 		break;
 	}
 }
