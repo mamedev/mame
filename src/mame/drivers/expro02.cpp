@@ -54,9 +54,9 @@ EXPRO-02
 |    GP-U27             PAL  41464  |---------|                           |
 |J   PAL   GP-U41            41464  |KANEKO   |                           |
 |A MC-8282  PAL              41464  |VU-002   | PM006E.U83     PM018E.U94 |
-|M                     6116  41464  |         |                           |
+|M                   D42101C 41464  |         |                           |
 |M                                  |         |          PM019U_U93-01.U93|
-|A                     6116         |---------| PM206E.U82                |
+|A                   D42101C        |---------| PM206E.U82                |
 |            HM53461                                                      |
 |    PAL     HM53461   PAL    |-------|         CALC1-CHIP                |
 |            HM53461   PAL    |KANEKO |                      PM016E.U92   |
@@ -82,6 +82,7 @@ EXPRO-02
     CALC1-CHIP clock - 16.0MHz
     GP-U41 clocks - pins 21 & 22 - 12.0MHz, pins 1 & 2 - 6.0MHz, pins 8 & 9 - 15.6249kHz (HSync?)
     GP-U27 clock - none (so it's not an MCU)
+    D42101C - Line buffer for NTSC TV
 
     (TODO: which is correct?)
     OKI M6295 clock - 2.0MHz (12/6). pin7 = low
@@ -107,7 +108,7 @@ M6100575A GALS PANIC (PCB manufactured by Taito)
 CPU: MC68000
 Sound: M6295
 OSC: 12.0000MHz, 16.0000MHz
-Custom: VU-002, VIEW2, CACL1
+Custom: VU-002, VIEW2, CALC1
 
 ROMs:
 PM109J.U88 (OKI M271000ZB) - Main programs
