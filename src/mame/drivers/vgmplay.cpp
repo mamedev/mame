@@ -3087,22 +3087,22 @@ WRITE8_MEMBER(vgmplay_state::scc_w)
 		switch (offset >> 1)
 		{
 		case 0x00:
-			m_k051649[Index]->k051649_waveform_w(space, m_scc_reg[Index], data);
+			m_k051649[Index]->k051649_waveform_w(m_scc_reg[Index], data);
 			break;
 		case 0x01:
-			m_k051649[Index]->k051649_frequency_w(space, m_scc_reg[Index], data);
+			m_k051649[Index]->k051649_frequency_w(m_scc_reg[Index], data);
 			break;
 		case 0x02:
-			m_k051649[Index]->k051649_volume_w(space, m_scc_reg[Index], data);
+			m_k051649[Index]->k051649_volume_w(m_scc_reg[Index], data);
 			break;
 		case 0x03:
-			m_k051649[Index]->k051649_keyonoff_w(space, m_scc_reg[Index], data);
+			m_k051649[Index]->k051649_keyonoff_w(data);
 			break;
 		case 0x04:
-			m_k051649[Index]->k052539_waveform_w(space, m_scc_reg[Index], data);
+			m_k051649[Index]->k052539_waveform_w(m_scc_reg[Index], data);
 			break;
 		case 0x05:
-			m_k051649[Index]->k051649_test_w(space, m_scc_reg[Index], data);
+			m_k051649[Index]->k051649_test_w(data);
 			break;
 		}
 		break;

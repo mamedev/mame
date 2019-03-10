@@ -213,21 +213,19 @@ void msx_cart_konami_scc_device::initialize_cartridge()
 
 uint8_t msx_cart_konami_scc_device::read_cart(offs_t offset)
 {
-	address_space &space = machine().dummy_space();
-
 	if ( m_scc_active && offset >= 0x9800 && offset < 0xa000 )
 	{
 		if (offset & 0x80)
 		{
 			if ((offset & 0xff) >= 0xe0)
 			{
-				return m_k051649->k051649_test_r(space, offset & 0xff);
+				return m_k051649->k051649_test_r();
 			}
 			return 0xff;
 		}
 		else
 		{
-			return m_k051649->k051649_waveform_r(space, offset & 0x7f);
+			return m_k051649->k051649_waveform_r(offset & 0x7f);
 		}
 	}
 
@@ -237,8 +235,6 @@ uint8_t msx_cart_konami_scc_device::read_cart(offs_t offset)
 
 void msx_cart_konami_scc_device::write_cart(offs_t offset, uint8_t data)
 {
-	address_space &space = machine().dummy_space();
-
 	switch (offset & 0xf800)
 	{
 		case 0x5000:
@@ -267,27 +263,27 @@ void msx_cart_konami_scc_device::write_cart(offs_t offset, uint8_t data)
 
 				if (offset < 0x80)
 				{
-					m_k051649->k051649_waveform_w(space, offset, data);
+					m_k051649->k051649_waveform_w(offset, data);
 				}
 				else if (offset < 0xa0)
 				{
 					offset &= 0x0f;
 					if (offset < 0x0a)
 					{
-						m_k051649->k051649_frequency_w(space, offset, data);
+						m_k051649->k051649_frequency_w(offset, data);
 					}
 					else if (offset < 0x0f)
 					{
-						m_k051649->k051649_volume_w(space, offset - 0xa, data);
+						m_k051649->k051649_volume_w(offset - 0xa, data);
 					}
 					else
 					{
-						m_k051649->k051649_keyonoff_w(space, 0, data);
+						m_k051649->k051649_keyonoff_w(data);
 					}
 				}
 				else if (offset >= 0xe0)
 				{
-					m_k051649->k051649_test_w(space, offset, data);
+					m_k051649->k051649_test_w(data);
 				}
 			}
 			break;
@@ -642,14 +638,12 @@ void msx_cart_konami_sound_device::initialize_cartridge()
 
 uint8_t msx_cart_konami_sound_device::read_cart(offs_t offset)
 {
-	address_space &space = machine().dummy_space();
-
 	if ( m_scc_active && offset >= 0x9800 && offset < 0x9fe0 )
 	{
 		offset &= 0xff;
 		if (offset < 0x80)
 		{
-			return m_k052539->k051649_waveform_r(space, offset);
+			return m_k052539->k051649_waveform_r(offset);
 		}
 		if (offset < 0xa0)
 		{
@@ -657,11 +651,11 @@ uint8_t msx_cart_konami_sound_device::read_cart(offs_t offset)
 		}
 		if (offset < 0xc0)
 		{
-			return m_k052539->k051649_waveform_r(space, offset & 0x9f);
+			return m_k052539->k051649_waveform_r(offset & 0x9f);
 		}
 		if (offset < 0xe0)
 		{
-			return m_k052539->k051649_test_r(space, offset & 0xff);
+			return m_k052539->k051649_test_r();
 		}
 		return 0xff;
 	}
@@ -671,11 +665,11 @@ uint8_t msx_cart_konami_sound_device::read_cart(offs_t offset)
 
 		if (offset < 0xa0)
 		{
-			return m_k052539->k052539_waveform_r(space, offset);
+			return m_k052539->k052539_waveform_r(offset);
 		}
 		if (offset >= 0xc0 && offset < 0xe0)
 		{
-			return m_k052539->k051649_test_r(space, offset);
+			return m_k052539->k051649_test_r();
 		}
 		return 0xff;
 	}
@@ -692,8 +686,6 @@ uint8_t msx_cart_konami_sound_device::read_cart(offs_t offset)
 
 void msx_cart_konami_sound_device::write_cart(offs_t offset, uint8_t data)
 {
-	address_space &space = machine().dummy_space();
-
 	switch (offset & 0xe000)
 	{
 		case 0x4000:
@@ -740,27 +732,27 @@ void msx_cart_konami_sound_device::write_cart(offs_t offset, uint8_t data)
 
 						if (offset < 0x80)
 						{
-							m_k052539->k051649_waveform_w(space, offset, data);
+							m_k052539->k051649_waveform_w(offset, data);
 						}
 						else if (offset < 0xa0)
 						{
 							offset &= 0x0f;
 							if (offset < 0x0a)
 							{
-								m_k052539->k051649_frequency_w(space, offset, data);
+								m_k052539->k051649_frequency_w(offset, data);
 							}
 							else if (offset < 0x0f)
 							{
-								m_k052539->k051649_volume_w(space, offset - 0xa, data);
+								m_k052539->k051649_volume_w(offset - 0xa, data);
 							}
 							else
 							{
-								m_k052539->k051649_keyonoff_w(space, 0, data);
+								m_k052539->k051649_keyonoff_w(data);
 							}
 						}
 						else if (offset >= 0xe0)
 						{
-							m_k052539->k051649_test_w(space, offset, data);
+							m_k052539->k051649_test_w(data);
 						}
 					}
 					break;
@@ -803,27 +795,27 @@ void msx_cart_konami_sound_device::write_cart(offs_t offset, uint8_t data)
 							offset &= 0xff;
 							if (offset < 0xa0)
 							{
-								m_k052539->k052539_waveform_w(space, offset, data);
+								m_k052539->k052539_waveform_w(offset, data);
 							}
 							else if (offset < 0xc0)
 							{
 								offset &= 0x0f;
 								if (offset < 0x0a)
 								{
-									m_k052539->k051649_frequency_w(space, offset, data);
+									m_k052539->k051649_frequency_w(offset, data);
 								}
 								else if (offset < 0x0f)
 								{
-									m_k052539->k051649_volume_w(space, offset - 0x0a, data);
+									m_k052539->k051649_volume_w(offset - 0x0a, data);
 								}
 								else if (offset == 0x0f)
 								{
-									m_k052539->k051649_keyonoff_w(space, 0, data);
+									m_k052539->k051649_keyonoff_w(data);
 								}
 							}
 							else if (offset < 0xe0)
 							{
-								m_k052539->k051649_test_w(space, offset, data);
+								m_k052539->k051649_test_w(data);
 							}
 						}
 					}

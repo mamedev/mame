@@ -119,11 +119,11 @@ READ8_MEMBER(quickpick5_state::vram_r)
 		offset |= 0x800;
 		if ((offset >= 0x800) && (offset <= 0x880))
 		{
-			return m_k051649->k051649_waveform_r(space, offset & 0x7f);
+			return m_k051649->k051649_waveform_r(offset & 0x7f);
 		}
 		else if ((offset >= 0x8e0) && (offset <= 0x8ff))
 		{
-			return m_k051649->k051649_test_r(space, offset-0x8e0);
+			return m_k051649->k051649_test_r();
 		}
 	}
 
@@ -143,26 +143,26 @@ WRITE8_MEMBER(quickpick5_state::vram_w)
 		offset |= 0x800;
 		if ((offset >= 0x800) && (offset < 0x880))
 		{
-			m_k051649->k051649_waveform_w(space, offset-0x800, data);
+			m_k051649->k051649_waveform_w(offset-0x800, data);
 			return;
 		}
 		else if (offset < 0x88a)
 		{
-			m_k051649->k051649_frequency_w(space, offset-0x880, data);
+			m_k051649->k051649_frequency_w(offset-0x880, data);
 			return;
 		}
 		else if (offset < 0x88f)
 		{
-			m_k051649->k051649_volume_w(space, offset-0x88a, data);
+			m_k051649->k051649_volume_w(offset-0x88a, data);
 			return;
 		}
 		else if (offset < 0x890)
 		{
-			m_k051649->k051649_keyonoff_w(space, 0, data);
+			m_k051649->k051649_keyonoff_w(data);
 			return;
 		}
 
-		m_k051649->k051649_test_w(space, offset-0x8e0, data);
+		m_k051649->k051649_test_w(data);
 		return;
 	}
 
