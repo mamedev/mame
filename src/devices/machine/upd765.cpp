@@ -444,7 +444,7 @@ uint8_t upd765_family_device::msr_r()
 		}
 	msr |= get_drive_busy();
 
-	if(data_irq) {
+	if(data_irq && !machine().side_effects_disabled()) {
 		data_irq = false;
 		check_irq();
 	}
@@ -471,6 +471,8 @@ uint8_t upd765_family_device::fifo_r()
 	uint8_t r = 0xff;
 	switch(main_phase) {
 	case PHASE_EXEC:
+		if(machine().side_effects_disabled())
+			return fifo[0];
 		if(internal_drq)
 			return fifo_pop(false);
 		LOGFIFO("fifo_r in phase %d\n", main_phase);
@@ -478,16 +480,18 @@ uint8_t upd765_family_device::fifo_r()
 
 	case PHASE_RESULT:
 		r = result[0];
-		result_pos--;
-		memmove(result, result+1, result_pos);
-		if(!result_pos)
-			main_phase = PHASE_CMD;
-		else if(result_pos == 1) {
-			// clear drive busy bit after the first sense interrupt status result byte is read
-			for(floppy_info &fi : flopi)
-				if((fi.main_state == RECALIBRATE || fi.main_state == SEEK) && fi.sub_state == IDLE && fi.st0_filled == false)
-					fi.main_state = IDLE;
-			clr_drive_busy();
+		if(!machine().side_effects_disabled()) {
+			result_pos--;
+			memmove(result, result+1, result_pos);
+			if(!result_pos)
+				main_phase = PHASE_CMD;
+			else if(result_pos == 1) {
+				// clear drive busy bit after the first sense interrupt status result byte is read
+				for(floppy_info &fi : flopi)
+					if((fi.main_state == RECALIBRATE || fi.main_state == SEEK) && fi.sub_state == IDLE && fi.st0_filled == false)
+						fi.main_state = IDLE;
+				clr_drive_busy();
+			}
 		}
 		break;
 	default:
@@ -645,6 +649,8 @@ void upd765_family_device::fifo_expect(int size, bool write)
 
 uint8_t upd765_family_device::dma_r()
 {
+	if(machine().side_effects_disabled())
+		return fifo[0];
 	return fifo_pop(false);
 }
 
