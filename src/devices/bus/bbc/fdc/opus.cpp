@@ -212,7 +212,7 @@ void bbc_opusfdc_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_opus8272_device::read)
+uint8_t bbc_opus8272_device::read(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -240,7 +240,7 @@ READ8_MEMBER(bbc_opus8272_device::read)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_opus8272_device::write)
+void bbc_opus8272_device::write(offs_t offset, uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -265,7 +265,7 @@ WRITE8_MEMBER(bbc_opus8272_device::write)
 }
 
 
-READ8_MEMBER(bbc_opusfdc_device::read)
+uint8_t bbc_opusfdc_device::read(offs_t offset)
 {
 	uint8_t data;
 
@@ -280,7 +280,7 @@ READ8_MEMBER(bbc_opusfdc_device::read)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_opusfdc_device::write)
+void bbc_opusfdc_device::write(offs_t offset, uint8_t data)
 {
 	if (offset & 0x04)
 	{
