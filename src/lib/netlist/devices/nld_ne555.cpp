@@ -147,7 +147,9 @@ namespace netlist
 	{
 		// FIXME: assumes GND is connected to 0V.
 
-		if (!m_RESET() && m_last_reset)
+		const auto reset = m_RESET();
+
+		if (!reset && m_last_reset)
 		{
 			m_ff = false;
 		}
@@ -163,7 +165,7 @@ namespace netlist
 				m_ff = false;
 		}
 
-		const bool out = (!m_RESET() ? false : m_ff);
+		const bool out = (!reset ? false : m_ff);
 
 		if (m_last_out && !out)
 		{
@@ -178,7 +180,7 @@ namespace netlist
 			m_OUT.push(m_R1.m_P());
 			m_RDIS.set_R(R_OFF);
 		}
-		m_last_reset = m_RESET();
+		m_last_reset = reset;
 		m_last_out = out;
 	}
 

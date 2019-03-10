@@ -271,7 +271,10 @@ NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_composite_monochrome)
 	int colv = (int) ((data - m_sync_threshold) * m_gain * 255.0);
 	if (colv > 255)
 		colv = 255;
-	m_col = rgb_t(colv, colv, colv);
+	if (colv < 0)
+		m_col = rgb_t(255, 0, 0);
+	else
+		m_col = rgb_t(colv, colv, colv);
 }
 
 NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_red)

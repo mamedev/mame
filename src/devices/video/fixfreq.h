@@ -45,6 +45,7 @@ public:
 		m_vsync = sync;
 		m_vbackporch = backporch;
 	}
+	void set_horz_scale(int hscale) { m_hscale = hscale; }
 
 	// pre-defined configurations
 	void set_mode_ntsc720() //ModeLine "720x480@30i" 13.5 720 736 799 858 480 486 492 525 interlace -hsync -vsync

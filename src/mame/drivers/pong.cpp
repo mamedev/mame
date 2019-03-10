@@ -58,10 +58,12 @@ TODO: Superpong is believed to use the Pong (Rev E) PCB with some minor modifica
 #include "machine/nl_breakout.h"
 #include "machine/nl_pong.h"
 #include "machine/nl_pongd.h"
+#include "machine/nl_rebound.h"
 
 #include "screen.h"
 #include "speaker.h"
 
+#include "rebound.lh"
 #include "breakout.lh"
 
 #include <cmath>
@@ -114,13 +116,6 @@ TODO: Superpong is believed to use the Pong (Rev E) PCB with some minor modifica
 
 #define V_TOTAL_BREAKOUT         (0xFC)       // 252
 #define H_TOTAL_BREAKOUT         (448)    // 448
-
-#if 0
-#define HBSTART                 (H_TOTAL_PONG)
-#define HBEND                   (80)
-#define VBSTART                 (V_TOTAL_PONG)
-#define VBEND                   (16)
-#endif
 
 enum input_changed_enum
 {
@@ -269,15 +264,56 @@ private:
 
 };
 
-#if 0
-static NETLIST_START(pong)
+class rebound_state : public ttl_mono_state
+{
+public:
+	rebound_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ttl_mono_state(mconfig, type, tag)
+		, m_sw1a(*this, "maincpu:dsw1a")
+		, m_sw1b(*this, "maincpu:dsw1b")
+	{
+	}
 
-	MEMREGION_SOURCE("maincpu")
-	PARAM(NETLIST.USE_DEACTIVATE, 1)
-	INCLUDE(pong_schematics)
+	// sub devices
+	required_device<netlist_mame_logic_input_device> m_sw1a;
+	required_device<netlist_mame_logic_input_device> m_sw1b;
 
-NETLIST_END()
-#endif
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+
+	NETDEV_ANALOG_CALLBACK_MEMBER(led_credit_cb)
+	{
+		output().set_value("credit_led", (data < 3.5) ? 1 : 0);
+	}
+
+	NETDEV_ANALOG_CALLBACK_MEMBER(coin_counter_cb)
+	{
+		machine().bookkeeping().coin_counter_w(0, (data < 1.0));
+	}
+
+	void rebound(machine_config &config);
+
+	NETLIST_START(rebound)
+
+		//MEMREGION_SOURCE("maincpu")
+		LOCAL_SOURCE(rebound_schematics)
+		PARAM(NETLIST.USE_DEACTIVATE, 1)
+		//FIXME: unknown name causes segmentation fault
+		//INCLUDE(rebound)
+		INCLUDE(rebound_schematics)
+
+	NETLIST_END()
+
+protected:
+
+	// driver_device overrides
+	virtual void machine_start() override { };
+	virtual void machine_reset() override { };
+	virtual void video_start() override  { };
+
+private:
+
+};
+
 
 INPUT_CHANGED_MEMBER(pong_state::input_changed)
 {
@@ -291,6 +327,20 @@ INPUT_CHANGED_MEMBER(pong_state::input_changed)
 		break;
 	}
 }
+
+INPUT_CHANGED_MEMBER(rebound_state::input_changed)
+{
+	int numpad = uintptr_t(param);
+
+	switch (numpad)
+	{
+	case IC_SWITCH:
+		m_sw1a->write(newval ? 1 : 0);
+		m_sw1b->write(newval ? 1 : 0);
+		break;
+	}
+}
+
 
 static INPUT_PORTS_START( pong )
 	PORT_START( "PADDLE0" ) /* fake input port for player 1 paddle */
@@ -385,6 +435,30 @@ static INPUT_PORTS_START( breakout )
 	PORT_DIPSETTING(    0x80, "800" )
 
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( rebound )
+// FIXME later
+	PORT_START( "PADDLE0" ) /* fake input port for player 1 paddle */
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(1) PORT_KEYDELTA(100) PORT_CENTERDELTA(0)   NETLIST_ANALOG_PORT_CHANGED("maincpu", "pot1")
+
+	PORT_START( "PADDLE1" ) /* fake input port for player 2 paddle */
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(1) PORT_KEYDELTA(100) PORT_CENTERDELTA(0) PORT_PLAYER(2) NETLIST_ANALOG_PORT_CHANGED("maincpu", "pot2")
+
+	PORT_START("IN0") /* fake as well */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "coinsw")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "startsw")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_NAME("Antenna") NETLIST_LOGIC_PORT_CHANGED("maincpu", "antenna")
+
+	PORT_START("DIPS")
+	PORT_DIPNAME( 0x03, 0x00, "Game Won" )          PORT_DIPLOCATION("SW1A:1,SW1A:2") PORT_CHANGED_MEMBER(DEVICE_SELF, rebound_state, input_changed, IC_SWITCH)
+	PORT_DIPSETTING(    0x00, "11" )
+	PORT_DIPSETTING(    0x03, "15" )
+
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1A:3") NETLIST_LOGIC_PORT_CHANGED("maincpu", "dsw2")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+INPUT_PORTS_END
+
 
 MACHINE_CONFIG_START(pong_state::pong)
 
@@ -502,6 +576,7 @@ MACHINE_CONFIG_START(pong_state::pongd)
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1b", "DIPSW2.POS", 0)
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw", "COIN_SW.POS", 0)
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "startsw", "START_SW.POS", 0)
+
 #if 0
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.IN", 0, 0x01)
 #endif
@@ -526,6 +601,53 @@ MACHINE_CONFIG_START(pong_state::pongd)
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(rebound_state::rebound)
+
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
+	MCFG_NETLIST_SETUP(rebound_schematics)
+	//FIXME: doesn't work - segmentation fault
+	//MCFG_NETLIST_SETUP_MEMBER(this, &rebound_state::NETLIST_NAME(rebound))
+
+	// FIXME: Later
+	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot1", "POTP1.DIAL")
+	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot2", "POTP2.DIAL")
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.IN", 0)
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw", "COIN1_SW.POS", 0)
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "startsw", "START_SW.POS", 0)
+
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "dsw1a", "DSW1a.POS", 0)
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "dsw1b", "DSW1b.POS", 0)
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "dsw2", "DSW2.POS", 0)
+
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "snd0", "sound", rebound_state, sound_cb, "")
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_composite_monochrome, "fixfreq")
+
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "led_credit", "CON11", rebound_state, led_credit_cb, "")
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "coin_counter", "CON10", rebound_state, coin_counter_cb, "")
+
+	/* video hardware */
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	FIXFREQ(config, m_video).set_screen("screen");
+	m_video->set_monitor_clock(MASTER_CLOCK);
+	//m_video->set_horz_params(H_TOTAL_PONG-67,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG);
+	m_video->set_horz_params(H_TOTAL_PONG-51,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG);
+	m_video->set_vert_params(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG);
+	m_video->set_fieldcount(1);
+	m_video->set_threshold(1.0);
+	m_video->set_gain(0.6);
+	m_video->set_horz_scale(2);
+
+	/* sound hardware */
+	SPEAKER(config, "speaker").front_center();
+	//FIXME: this is not related to reality at all.
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+MACHINE_CONFIG_END
+
+
 /***************************************************************************
 
   Game driver(s)
@@ -546,6 +668,10 @@ ROM_START( pongf ) /* dummy to satisfy game entry*/
 ROM_END
 
 ROM_START( pongd ) /* dummy to satisfy game entry*/
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( rebound ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
@@ -591,6 +717,7 @@ ROM_END
 GAME(  1972, pong,      0, pong,     pong,      pong_state,     empty_init, ROT0,  "Atari", "Pong (Rev E) external [TTL]", MACHINE_SUPPORTS_SAVE)
 GAME(  1972, pongf,     0, pongf,    pong,      pong_state,     empty_init, ROT0,  "Atari", "Pong (Rev E) [TTL]", MACHINE_SUPPORTS_SAVE)
 GAME(  1973, pongd,     0, pongd,    pongd,     pong_state,     empty_init, ROT0,  "Atari", "Pong Doubles [TTL]", MACHINE_SUPPORTS_SAVE)
+GAMEL( 1974, rebound,   0, rebound,  rebound,   rebound_state,  empty_init, ROT0,  "Atari", "Rebound (Rev B) [TTL]", MACHINE_SUPPORTS_SAVE, layout_rebound)
 GAMEL( 1976, breakout,  0, breakout, breakout,  breakout_state, empty_init, ROT90, "Atari", "Breakout [TTL]", MACHINE_SUPPORTS_SAVE, layout_breakout)
 
 // 100% TTL
