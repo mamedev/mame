@@ -155,7 +155,7 @@ uint8_t msx_cart_sfg_device::read_cart(offs_t offset)
 		case 0x3ff6:     // YM-2148 MIDI UART status register
 							// ------x- - 1 = received a byte/receive buffer full?
 							// -------x - 1 = ready to send next byte/send buffer empty?
-			return m_ym2148->read(machine().dummy_space(), offset & 7);
+			return m_ym2148->read(offset & 7);
 	}
 
 	if (offset < 0x8000)
@@ -191,7 +191,7 @@ void msx_cart_sfg_device::write_cart(offs_t offset, uint8_t data)
 						// x------- - 1 = reset
 						// -----x-- - 1 = enable receiving / sending midi data
 						// -------x - 1 = enable receiving / sending midi data
-			m_ym2148->write(machine().dummy_space(), offset & 7, data);
+			m_ym2148->write(offset & 7, data);
 			break;
 
 		default:

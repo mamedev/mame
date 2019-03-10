@@ -14,7 +14,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( bsy );
 
 	/* latch contoll data */
-	DECLARE_WRITE8_MEMBER( data_w );
+	void data_w(uint8_t data);
 
 	/* set RST pin level : reset / set table address A8-A15 */
 	DECLARE_WRITE_LINE_MEMBER( rst );
