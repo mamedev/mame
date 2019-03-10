@@ -146,20 +146,21 @@ namespace netlist
 	{
 		// FIXME: assumes GND is connected to 0V.
 
-		nl_double vt = clamp(m_R2.m_P(), 0.7, 1.4);
-		bool bthresh = (m_THRES() > vt);
-		bool btrig = (m_TRIG() > clamp(m_R2.m_N(), 0.7, 1.4));
-
-		if (!btrig)
-		{
-			m_ff = true;
-		}
-		else if (bthresh)
-		{
+		if (!m_RESET())
 			m_ff = false;
+		else
+		{
+			const nl_double vt = clamp(m_R2.m_P(), 0.7, 1.4);
+			const bool bthresh = (m_THRES() > vt);
+			const bool btrig = (m_TRIG() > clamp(m_R2.m_N(), 0.7, 1.4));
+
+			if (!btrig)
+				m_ff = true;
+			else if (bthresh)
+				m_ff = false;
 		}
 
-		bool out = (!m_RESET() ? false : m_ff);
+		const bool out = m_ff;
 
 		if (m_last_out && !out)
 		{

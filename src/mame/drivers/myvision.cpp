@@ -78,8 +78,8 @@ void myvision_state::myvision_mem(address_map &map)
 	map.unmap_value_high();
 	//AM_RANGE(0x0000, 0x5fff)      // mapped by the cartslot
 	map(0xa000, 0xa7ff).ram();
-	map(0xe000, 0xe000).rw("tms9918", FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
-	map(0xe002, 0xe002).rw("tms9918", FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0xe000, 0xe000).rw("tms9918", FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
+	map(0xe002, 0xe002).rw("tms9918", FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
 }
 
 

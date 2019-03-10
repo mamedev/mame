@@ -3642,6 +3642,7 @@ createMESSProjects(_target, _subtarget, "vtech")
 files {
 	MAME_DIR .. "src/mame/drivers/crvision.cpp",
 	MAME_DIR .. "src/mame/includes/crvision.h",
+	MAME_DIR .. "src/mame/drivers/gamemachine.cpp",
 	MAME_DIR .. "src/mame/drivers/geniusiq.cpp",
 	MAME_DIR .. "src/mame/drivers/vtech_unk1.cpp",
 	MAME_DIR .. "src/mame/drivers/vtech_unk2.cpp",

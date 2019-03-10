@@ -41,8 +41,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
-	virtual DECLARE_READ8_MEMBER(mreq_r) override;
-	virtual DECLARE_WRITE8_MEMBER(mreq_w) override;
+	virtual uint8_t mreq_r(offs_t offset) override;
+	virtual void mreq_w(offs_t offset, uint8_t data) override;
 
 private:
 	required_device<sp0256_device> m_nsp;

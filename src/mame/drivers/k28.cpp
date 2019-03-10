@@ -1,23 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:hap, Kevin Horton
-/***************************************************************************
+/******************************************************************************
 
-  Tiger Electronics K28: Talking Learning Computer (model 7-230/7-231)
-  * PCB marked PB-123 WIZARD, TIGER
-  * Intel P8021 MCU with 1KB internal ROM
-  * MM5445N VFD driver, 9-digit alphanumeric display same as snmath
-  * 2*TMS6100 (32KB VSM)
-  * SC-01-A speech chip
+Tiger Electronics K28: Talking Learning Computer (model 7-230/7-231)
+* PCB marked PB-123 WIZARD, TIGER
+* Intel P8021 MCU with 1KB internal ROM
+* MM5445N VFD driver, 9-digit alphanumeric display same as snmath
+* 2*TMS6100 (32KB VSM)
+* SC-01-A speech chip
 
-  3 models exist:
-  - 7-230: darkblue case, toy-ish looks
-  - 7-231: gray case, hardware is the same
-  - 7-232: this one is completely different hw --> driver tispeak.cpp
+3 models exist:
+- 7-230: darkblue case, toy-ish looks
+- 7-231: gray case, hardware is the same
+- 7-232: this one is completely different hw --> driver tispeak.cpp
 
-  TODO:
-  - external module support (no dumps yet)
+TODO:
+- external module support (no dumps yet)
 
-***************************************************************************/
+******************************************************************************/
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
@@ -40,7 +40,7 @@ public:
 		m_tms6100(*this, "tms6100"),
 		m_speech(*this, "speech"),
 		m_vfd(*this, "vfd"),
-		m_digit_delay(*this, "led_delay_%u", 0),
+		m_vfd_delay(*this, "led_delay_%u", 0),
 		m_onbutton_timer(*this, "on_button"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_out_x(*this, "%u.%u", 0U, 0U),
@@ -56,18 +56,18 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	// devices
+	// devices/pointers
 	required_device<i8021_device> m_maincpu;
 	required_device<tms6100_device> m_tms6100;
 	required_device<votrax_sc01_device> m_speech;
 	required_device<mm5445_device> m_vfd;
-	required_device_array<timer_device, 9> m_digit_delay;
+	required_device_array<timer_device, 9> m_vfd_delay;
 	required_device<timer_device> m_onbutton_timer;
 	required_ioport_array<7> m_inp_matrix;
 	output_finder<9, 16> m_out_x;
 	output_finder<9> m_out_digit;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(digit_delay_off);
+	TIMER_DEVICE_CALLBACK_MEMBER(vfd_delay_off);
 
 	bool m_power_on;
 	u8 m_inp_mux;
@@ -137,9 +137,9 @@ void k28_state::power_off()
 
 // VFD handling
 
-TIMER_DEVICE_CALLBACK_MEMBER(k28_state::digit_delay_off)
+TIMER_DEVICE_CALLBACK_MEMBER(k28_state::vfd_delay_off)
 {
-	// clear vfd outputs
+	// clear VFD outputs
 	if (!BIT(m_vfd_data, param+16))
 	{
 		m_out_digit[param] = 0;
@@ -168,7 +168,7 @@ WRITE64_MEMBER(k28_state::vfd_output_w)
 
 		// they're strobed, so on falling edge, delay them going off to prevent flicker
 		else if (BIT(m_vfd_data, i+16))
-			m_digit_delay[i]->adjust(attotime::from_msec(50), i);
+			m_vfd_delay[i]->adjust(attotime::from_msec(50), i);
 	}
 
 	// O26: power-off request on falling edge
@@ -345,7 +345,7 @@ void k28_state::k28(machine_config &config)
 	config.set_default_layout(layout_k28);
 
 	for (int i = 0; i < 9; i++)
-		TIMER(config, m_digit_delay[i]).configure_generic(FUNC(k28_state::digit_delay_off));
+		TIMER(config, m_vfd_delay[i]).configure_generic(FUNC(k28_state::vfd_delay_off));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

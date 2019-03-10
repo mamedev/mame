@@ -488,10 +488,10 @@ std::string intv_cart_slot_device::get_default_card_software(get_default_card_so
  read_ay
  -------------------------------------------------*/
 
-READ16_MEMBER(intv_cart_slot_device::read_ay)
+uint16_t intv_cart_slot_device::read_ay(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_ay(space, offset, mem_mask);
+		return m_cart->read_ay(offset);
 	else
 		return 0xffff;
 }
@@ -500,20 +500,20 @@ READ16_MEMBER(intv_cart_slot_device::read_ay)
  write_ay
  -------------------------------------------------*/
 
-WRITE16_MEMBER(intv_cart_slot_device::write_ay)
+void intv_cart_slot_device::write_ay(offs_t offset, uint16_t data)
 {
 	if (m_cart)
-		m_cart->write_ay(space, offset, data, mem_mask);
+		m_cart->write_ay(offset, data);
 }
 
 /*-------------------------------------------------
  read_speech
  -------------------------------------------------*/
 
-READ16_MEMBER(intv_cart_slot_device::read_speech)
+uint16_t intv_cart_slot_device::read_speech(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_speech(space, offset, mem_mask);
+		return m_cart->read_speech(offset);
 	else
 		return 0xffff;
 }
@@ -522,10 +522,10 @@ READ16_MEMBER(intv_cart_slot_device::read_speech)
  write_speech
  -------------------------------------------------*/
 
-WRITE16_MEMBER(intv_cart_slot_device::write_speech)
+void intv_cart_slot_device::write_speech(offs_t offset, uint16_t data)
 {
 	if (m_cart)
-		m_cart->write_speech(space, offset, data, mem_mask);
+		m_cart->write_speech(offset, data);
 }
 
 

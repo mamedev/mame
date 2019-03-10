@@ -1668,7 +1668,7 @@ INPUT_PORTS_END
 
 void itech32_state::base_devices(machine_config &config)
 {
-	MC6809(config, m_soundcpu, SOUND_CLOCK/2);
+	MC6809E(config, m_soundcpu, SOUND_CLOCK/8); // EF68B09EP
 	m_soundcpu->set_addrmap(AS_PROGRAM, &itech32_state::sound_map);
 
 	nvram_device &nvram(NVRAM(config, "nvram"));

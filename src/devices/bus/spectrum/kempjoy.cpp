@@ -71,7 +71,7 @@ void spectrum_kempjoy_device::device_start()
 
 void spectrum_kempjoy_device::device_reset()
 {
-	io_space().install_read_handler(0x1f, 0x1f, 0, 0xff00, 0, read8_delegate(FUNC(spectrum_kempjoy_device::joystick_r), this));
+	io_space().install_read_handler(0x1f, 0x1f, 0, 0xff00, 0, read8smo_delegate(FUNC(spectrum_kempjoy_device::joystick_r), this));
 }
 
 
@@ -79,7 +79,7 @@ void spectrum_kempjoy_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(spectrum_kempjoy_device::joystick_r)
+uint8_t spectrum_kempjoy_device::joystick_r()
 {
 	return m_joy->read() & 0x1f;
 }

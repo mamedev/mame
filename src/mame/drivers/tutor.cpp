@@ -296,13 +296,13 @@ READ8_MEMBER( tutor_state::key_r )
 	char port[12];
 	uint8_t value;
 
-	snprintf(port, ARRAY_LENGTH(port), "LINE%d", offset >> 3);
+	snprintf(port, ARRAY_LENGTH(port), "LINE%d", (offset & 0x007e) >> 3);
 	value = ioport(port)->read();
 
 	/* hack for ports overlapping with joystick */
 	if (offset >= 32 && offset < 48)
 	{
-		snprintf(port, ARRAY_LENGTH(port), "LINE%d_alt", offset >> 3);
+		snprintf(port, ARRAY_LENGTH(port), "LINE%d_alt", (offset & 0x007e) >> 3);
 		value |= ioport(port)->read();
 	}
 
@@ -559,8 +559,8 @@ void tutor_state::tutor_memmap(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank2").nopw();
 	map(0xc000, 0xdfff).noprw(); /*free for expansion, or cartridge ROM?*/
 
-	map(0xe000, 0xe000).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));    /*VDP data*/
-	map(0xe002, 0xe002).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));/*VDP status*/
+	map(0xe000, 0xe000).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));    /*VDP data*/
+	map(0xe002, 0xe002).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));/*VDP status*/
 	map(0xe100, 0xe1ff).rw(FUNC(tutor_state::tutor_mapper_r), FUNC(tutor_state::tutor_mapper_w));   /*cartridge mapper*/
 	map(0xe200, 0xe200).w("sn76489a", FUNC(sn76489a_device::write));    /*sound chip*/
 	map(0xe800, 0xe8ff).rw(FUNC(tutor_state::tutor_printer_r), FUNC(tutor_state::tutor_printer_w)); /*printer*/
@@ -576,8 +576,8 @@ void tutor_state::pyuutajr_mem(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank2").nopw();
 	map(0xc000, 0xdfff).noprw(); /*free for expansion, or cartridge ROM?*/
 
-	map(0xe000, 0xe000).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));    /*VDP data*/
-	map(0xe002, 0xe002).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));/*VDP status*/
+	map(0xe000, 0xe000).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));    /*VDP data*/
+	map(0xe002, 0xe002).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));/*VDP status*/
 	map(0xe100, 0xe1ff).rw(FUNC(tutor_state::tutor_mapper_r), FUNC(tutor_state::tutor_mapper_w));   /*cartridge mapper*/
 	map(0xe200, 0xe200).w("sn76489a", FUNC(sn76489a_device::write));    /*sound chip*/
 	map(0xe800, 0xe800).portr("LINE0");

@@ -158,7 +158,7 @@ void spg2xx_device::device_start()
 	m_timer_src_c = timer_alloc(TIMER_SRC_C);
 	m_timer_src_c->adjust(attotime::never);
 
-	m_stream = stream_alloc(0, 2, 44100);
+	m_stream = stream_alloc(0, 2, 281250/4);
 
 	m_channel_debug = -1;
 
@@ -717,6 +717,7 @@ uint32_t spg2xx_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			}
 		}
 	}
+
 	return 0;
 }
 
@@ -1941,7 +1942,7 @@ void spg2xx_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		}
 
 		case TIMER_BEAT:
-			audio_frame_tick();
+			audio_beat_tick();
 			break;
 
 		case TIMER_UART_TX:
@@ -2497,10 +2498,11 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 				}
 				else
 				{
-					m_audio_regs[offset] &= ~mask;
-					m_audio_regs[AUDIO_CHANNEL_STATUS] &= ~mask;
-					m_audio_regs[AUDIO_CHANNEL_STOP] |= mask;
-					m_audio_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~mask;
+					stop_channel(channel_bit);
+					//m_audio_regs[offset] &= ~mask;
+					//m_audio_regs[AUDIO_CHANNEL_STATUS] &= ~mask;
+					//m_audio_regs[AUDIO_CHANNEL_STOP] |= mask;
+					//m_audio_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~mask;
 				}
 			}
 			break;
@@ -2535,9 +2537,6 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 			m_audio_regs[offset] &= AUDIO_BIS_MASK;
 			m_audio_regs[offset] |= data & ~AUDIO_BIS_MASK;
 			const uint16_t changed = old ^ m_audio_regs[offset];
-			if (data == 0xc000 && m_audio_regs[offset])
-			{
-			}
 			if (changed & (AUDIO_BIS_MASK | AUDIO_BIE_MASK))
 			{
 				LOGMASKED(LOG_BEAT, "BIS mask changed, updating IRQ\n");
@@ -2597,7 +2596,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 		{
 			LOGMASKED(LOG_SPU_WRITES | LOG_RAMPDOWN, "audio_w: Envelope Fast Ramp Down: %04x\n", data);
 			const uint16_t old = m_audio_regs[offset];
-			m_audio_regs[offset] = data & AUDIO_ENV_RAMP_DOWN_MASK;
+			m_audio_regs[offset] = (data & AUDIO_ENV_RAMP_DOWN_MASK) & m_audio_regs[AUDIO_CHANNEL_STATUS];
 			const uint16_t changed = old ^ m_audio_regs[offset];
 			if (!changed)
 				break;
@@ -2874,34 +2873,34 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		int32_t right_total = 0;
 		int32_t active_count = 0;
 
-		for (uint32_t ch_index = 0; ch_index < 16; ch_index++)
+		for (uint32_t channel = 0; channel < 16; channel++)
 		{
-			if (!get_channel_status(ch_index))
+			if (!get_channel_status(channel))
 			{
 				continue;
 			}
 
 			if (SPG_DEBUG_AUDIO && m_debug_rates)
-				printf("%f:%f ", m_channel_rate[ch_index], m_channel_rate_accum[ch_index]);
-			bool playing = advance_channel(space, ch_index);
+				printf("%f:%f ", m_channel_rate[channel], m_channel_rate_accum[channel]);
+			bool playing = advance_channel(space, channel);
 			if (playing)
 			{
-				int32_t sample = (int16_t)(m_audio_regs[(ch_index << 4) | AUDIO_WAVE_DATA] ^ 0x8000);
+				int32_t sample = (int16_t)(m_audio_regs[(channel << 4) | AUDIO_WAVE_DATA] ^ 0x8000);
 				if (!(m_audio_regs[AUDIO_CONTROL] & AUDIO_CONTROL_NOINT_MASK))
 				{
-					int32_t prev_sample = (int16_t)(m_audio_regs[(ch_index << 4) | AUDIO_WAVE_DATA_PREV] ^ 0x8000);
-					int16_t lerp_factor = (int16_t)((m_channel_rate_accum[ch_index] / 44100.0) * 256.0);
+					int32_t prev_sample = (int16_t)(m_audio_regs[(channel << 4) | AUDIO_WAVE_DATA_PREV] ^ 0x8000);
+					int16_t lerp_factor = (int16_t)((m_channel_rate_accum[channel] / 70312.5) * 256.0);
 					prev_sample = (prev_sample * (0x100 - lerp_factor)) >> 8;
 					sample = (sample * lerp_factor) >> 8;
 					sample += prev_sample;
 				}
 
-				sample = (sample * (int16_t)get_edd(ch_index)) >> 7;
+				sample = (sample * (int32_t)get_edd(channel)) >> 7;
 
 				active_count++;
 
-				int32_t vol = get_volume(ch_index);
-				int32_t pan = get_pan(ch_index);
+				int32_t vol = get_volume(channel);
+				int32_t pan = get_pan(channel);
 
 				int32_t pan_left, pan_right;
 				if (pan < 0x40)
@@ -2917,6 +2916,27 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 				left_total += ((int16_t)sample * (int16_t)pan_left) >> 14;
 				right_total += ((int16_t)sample * (int16_t)pan_right) >> 14;
+
+				const uint16_t mask = (1 << channel);
+				if (m_audio_regs[AUDIO_ENV_RAMP_DOWN] & mask)
+				{
+					if (m_rampdown_frame[channel] == 0)
+					{
+						LOGMASKED(LOG_RAMPDOWN, "Ticking rampdown for channel %d\n", channel);
+						audio_rampdown_tick(channel);
+					}
+					m_rampdown_frame[channel]--;
+				}
+				else if (!(m_audio_regs[AUDIO_CHANNEL_ENV_MODE] & mask))
+				{
+					if (m_envclk_frame[channel] == 0)
+					{
+						LOGMASKED(LOG_ENVELOPES, "Ticking envelope for channel %d\n", channel);
+						audio_envelope_tick(space, channel);
+						m_envclk_frame[channel] = get_envclk_frame_count(channel);
+					}
+					m_envclk_frame[channel]--;
+				}
 			}
 		}
 
@@ -2942,15 +2962,16 @@ inline void spg2xx_device::stop_channel(const uint32_t channel)
 	m_audio_regs[AUDIO_CHANNEL_STATUS] &= ~(1 << channel);
 	m_audio_regs[(channel << 4) | AUDIO_MODE] &= ~AUDIO_ADPCM_MASK;
 	m_audio_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~(1 << channel);
+	m_audio_regs[AUDIO_ENV_RAMP_DOWN] &= ~(1 << channel);
 }
 
 bool spg2xx_device::advance_channel(address_space &space, const uint32_t channel)
 {
 	m_channel_rate_accum[channel] += m_channel_rate[channel];
 	uint32_t samples_to_advance = 0;
-	while (m_channel_rate_accum[channel] >= 44100.0)
+	while (m_channel_rate_accum[channel] >= 70312.5)
 	{
-		m_channel_rate_accum[channel] -= 44100.0;
+		m_channel_rate_accum[channel] -= 70312.5;
 		samples_to_advance++;
 	}
 
@@ -3014,15 +3035,13 @@ bool spg2xx_device::fetch_sample(address_space &space, const uint32_t channel)
 
 	const uint32_t wave_data_reg = channel_mask | AUDIO_WAVE_DATA;
 	const uint16_t tone_mode = get_tone_mode(channel);
-	const uint16_t raw_sample = tone_mode ? space.read_word(m_sample_addr[channel]) : m_audio_regs[wave_data_reg];
+	uint16_t raw_sample = tone_mode ? space.read_word(m_sample_addr[channel]) : m_audio_regs[wave_data_reg];
 
-	m_audio_regs[wave_data_reg] = raw_sample;
+	LOGMASKED(LOG_SAMPLES, "Channel %d: Raw sample %04x\n", channel, raw_sample);
 
 	if (get_adpcm_bit(channel))
 	{
 		// ADPCM mode
-		m_audio_regs[wave_data_reg] >>= m_sample_shift[channel];
-		m_audio_regs[wave_data_reg] = (uint16_t)(m_adpcm[channel].clock((uint8_t)(m_audio_regs[wave_data_reg] & 0x000f)) * 7) ^ 0x8000;
 		if (tone_mode != 0 && raw_sample == 0xffff)
 		{
 			if (tone_mode == AUDIO_TONE_MODE_HW_ONESHOT)
@@ -3037,7 +3056,15 @@ bool spg2xx_device::fetch_sample(address_space &space, const uint32_t channel)
 				LOGMASKED(LOG_SAMPLES, "ADPCM looping after %d samples\n", m_sample_count[channel]);
 				m_sample_count[channel] = 0;
 				loop_channel(channel);
+				m_audio_regs[(channel << 4) | AUDIO_MODE] &= ~AUDIO_ADPCM_MASK;
 			}
+		}
+		else
+		{
+			m_audio_regs[wave_data_reg] = raw_sample;
+			m_audio_regs[wave_data_reg] >>= m_sample_shift[channel];
+			const uint8_t adpcm_sample = (uint8_t)(m_audio_regs[wave_data_reg] & 0x000f);
+			m_audio_regs[wave_data_reg] = (uint16_t)(m_adpcm[channel].clock(adpcm_sample) << 4) ^ 0x8000;
 		}
 		m_sample_count[channel]++;
 	}
@@ -3060,6 +3087,10 @@ bool spg2xx_device::fetch_sample(address_space &space, const uint32_t channel)
 				loop_channel(channel);
 			}
 		}
+		else
+		{
+			m_audio_regs[wave_data_reg] = raw_sample;
+		}
 		m_sample_count[channel]++;
 	}
 	else
@@ -3068,11 +3099,12 @@ bool spg2xx_device::fetch_sample(address_space &space, const uint32_t channel)
 		if (tone_mode != 0)
 		{
 			if (m_sample_shift[channel])
-				m_audio_regs[wave_data_reg] <<= 8;
+				raw_sample &= 0xff00;
 			else
-				m_audio_regs[wave_data_reg] &= 0xff00;
+				raw_sample <<= 8;
+			raw_sample |= raw_sample >> 8;
 
-			if (m_audio_regs[wave_data_reg] == 0xff00)
+			if (raw_sample == 0xffff)
 			{
 				if (tone_mode == AUDIO_TONE_MODE_HW_ONESHOT)
 				{
@@ -3088,6 +3120,10 @@ bool spg2xx_device::fetch_sample(address_space &space, const uint32_t channel)
 					loop_channel(channel);
 				}
 			}
+			else
+			{
+				m_audio_regs[wave_data_reg] = raw_sample;
+			}
 		}
 		m_sample_count[channel]++;
 	}
@@ -3099,50 +3135,7 @@ inline void spg2xx_device::loop_channel(const uint32_t channel)
 {
 	m_sample_addr[channel] = get_loop_addr(channel);
 	m_sample_shift[channel] = 0;
-}
-
-void spg2xx_device::audio_frame_tick()
-{
-	audio_beat_tick();
-
-	address_space &space = m_cpu->space(AS_PROGRAM);
-	bool any_changed = false;
-	for (uint32_t channel = 0; channel < 16; channel++)
-	{
-		const uint16_t mask = (1 << channel);
-		if (!(m_audio_regs[AUDIO_CHANNEL_STATUS] & mask))
-		{
-			continue;
-		}
-
-		if (m_audio_regs[AUDIO_ENV_RAMP_DOWN] & mask)
-		{
-			m_rampdown_frame[channel]--;
-			if (m_rampdown_frame[channel] == 0)
-			{
-				LOGMASKED(LOG_RAMPDOWN, "Ticking rampdown for channel %d\n", channel);
-				audio_rampdown_tick(channel);
-				any_changed = true;
-			}
-			continue;
-		}
-
-		if (!(m_audio_regs[AUDIO_CHANNEL_ENV_MODE] & mask))
-		{
-			m_envclk_frame[channel]--;
-			if (m_envclk_frame[channel] == 0)
-			{
-				LOGMASKED(LOG_ENVELOPES, "Ticking envelope for channel %d\n", channel);
-				any_changed = audio_envelope_tick(space, channel) || any_changed;
-				m_envclk_frame[channel] = get_envclk_frame_count(channel);
-			}
-		}
-	}
-
-	if (any_changed)
-	{
-		m_stream->update();
-	}
+	LOGMASKED(LOG_SAMPLES, "Channel %d: Looping to address %08x\n", channel, m_sample_addr[channel]);
 }
 
 void spg2xx_device::audio_beat_tick()
@@ -3172,10 +3165,7 @@ void spg2xx_device::audio_beat_tick()
 			m_audio_regs[AUDIO_BEAT_COUNT] = (m_audio_regs[AUDIO_BEAT_COUNT] & ~AUDIO_BEAT_COUNT_MASK) | beat_count;
 		}
 	}
-	else
-	{
-		m_audio_curr_beat_base_count--;
-	}
+	m_audio_curr_beat_base_count--;
 }
 
 void spg2xx_device::audio_rampdown_tick(const uint32_t channel)
@@ -3271,7 +3261,7 @@ bool spg2xx_device::audio_envelope_tick(address_space &space, const uint32_t cha
 			else
 			{
 				new_edd += inc;
-				LOGMASKED(LOG_ENVELOPES, "Envelope %d new EDD+: %04x\n", channel, new_edd);
+				LOGMASKED(LOG_ENVELOPES, "Envelope %d new EDD+: %04x (%04x), inc %04x\n", channel, new_edd, target, inc);
 				if (new_edd >= target)
 					new_edd = target;
 			}

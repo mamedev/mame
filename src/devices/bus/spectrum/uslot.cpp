@@ -77,40 +77,40 @@ READ_LINE_MEMBER(spectrum_uslot_device::romcs)
 }
 
 
-READ8_MEMBER(spectrum_uslot_device::mreq_r)
+uint8_t spectrum_uslot_device::mreq_r(offs_t offset)
 {
 	uint8_t temp;
 	uint8_t data = 0xff;
 
-	temp = m_exp1->mreq_r(space, offset);
+	temp = m_exp1->mreq_r(offset);
 	if (m_exp1->romcs())
 		data &= temp;
 
-	temp = m_exp2->mreq_r(space, offset);
+	temp = m_exp2->mreq_r(offset);
 	if (m_exp2->romcs())
 		data &= temp;
 
 	return data;
 }
 
-WRITE8_MEMBER(spectrum_uslot_device::mreq_w)
+void spectrum_uslot_device::mreq_w(offs_t offset, uint8_t data)
 {
 	if (m_exp1->romcs())
-		m_exp1->mreq_w(space, offset, data);
+		m_exp1->mreq_w(offset, data);
 
 	if (m_exp2->romcs())
-		m_exp2->mreq_w(space, offset, data);
+		m_exp2->mreq_w(offset, data);
 }
 
-READ8_MEMBER(spectrum_uslot_device::port_fe_r)
+uint8_t spectrum_uslot_device::port_fe_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
 	if (m_exp1->romcs())
-		data &= m_exp1->port_fe_r(space, offset);
+		data &= m_exp1->port_fe_r(offset);
 
 	if (m_exp2->romcs())
-		data &= m_exp2->port_fe_r(space, offset);
+		data &= m_exp2->port_fe_r(offset);
 
 	return data;
 }

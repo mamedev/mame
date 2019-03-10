@@ -83,7 +83,7 @@ READ_LINE_MEMBER(spectrum_usource_device::romcs)
 }
 
 
-READ8_MEMBER(spectrum_usource_device::mreq_r)
+uint8_t spectrum_usource_device::mreq_r(offs_t offset)
 {
 	uint8_t data;
 

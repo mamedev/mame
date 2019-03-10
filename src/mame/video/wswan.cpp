@@ -856,7 +856,7 @@ uint32_t wswan_video_device::screen_update(screen_device &screen, bitmap_ind16 &
 }
 
 
-READ8_MEMBER(wswan_video_device::reg_r)
+uint8_t wswan_video_device::reg_r(offs_t offset)
 {
 	uint8_t value = m_regs[offset];
 
@@ -892,7 +892,7 @@ READ8_MEMBER(wswan_video_device::reg_r)
 }
 
 
-WRITE8_MEMBER(wswan_video_device::reg_w)
+void wswan_video_device::reg_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x20 && offset < 0x40)
 	{
@@ -1206,12 +1206,12 @@ void wswan_video_device::scanline_interrupt()
 }
 
 
-READ8_MEMBER(wswan_video_device::vram_r)
+uint8_t wswan_video_device::vram_r(offs_t offset)
 {
 	return m_vram[offset];
 }
 
-WRITE8_MEMBER(wswan_video_device::vram_w)
+void wswan_video_device::vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = data;
 }

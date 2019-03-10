@@ -90,8 +90,7 @@ void cortex_state::mem_map(address_map &map)
 	map(0x0000, 0x7fff).bankr("bankr0").bankw("bankw0");
 	map(0x8000, 0xefff).ram();
 	map(0xf100, 0xf11f).ram(); // memory mapping unit
-	map(0xf120, 0xf120).rw("crtc", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0xf121, 0xf121).rw("crtc", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0xf120, 0xf121).rw("crtc", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 	//map(0xf140, 0xf147) // fdc tms9909
 }
 

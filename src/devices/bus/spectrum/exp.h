@@ -75,9 +75,9 @@ public:
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
-	DECLARE_READ8_MEMBER( mreq_r );
-	DECLARE_WRITE8_MEMBER( mreq_w );
-	DECLARE_READ8_MEMBER( port_fe_r );
+	uint8_t mreq_r(offs_t offset);
+	void mreq_w(offs_t offset, uint8_t data);
+	uint8_t port_fe_r(offs_t offset);
 	DECLARE_READ_LINE_MEMBER( romcs );
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
@@ -109,9 +109,9 @@ public:
 	device_spectrum_expansion_interface(const machine_config &mconfig, device_t &device);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(mreq_r) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(mreq_w) { }
-	virtual DECLARE_READ8_MEMBER(port_fe_r) { return 0xff; }
+	virtual uint8_t mreq_r(offs_t offset) { return 0xff; }
+	virtual void mreq_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t port_fe_r(offs_t offset) { return 0xff; }
 	virtual DECLARE_READ_LINE_MEMBER(romcs) { return 0; }
 
 protected:

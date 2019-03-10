@@ -99,7 +99,6 @@ protected:
 		TILE_Y_FLIP             = 0x0008
 	};
 
-	void audio_frame_tick();
 	void audio_beat_tick();
 	void audio_rampdown_tick(const uint32_t channel);
 	bool audio_envelope_tick(address_space &space, const uint32_t channel);

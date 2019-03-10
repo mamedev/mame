@@ -211,6 +211,7 @@ protected:
 	void set_hsync(int state);
 	void set_vsync(int state);
 	void set_cur(int state);
+	bool match_line();
 	void handle_line_timer();
 	virtual void update_cursor_state();
 	virtual uint8_t draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect);

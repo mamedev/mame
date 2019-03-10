@@ -107,10 +107,10 @@ void spectrum_expansion_slot_device::device_reset()
 //  port_fe_r
 //-------------------------------------------------
 
-READ8_MEMBER(spectrum_expansion_slot_device::port_fe_r)
+uint8_t spectrum_expansion_slot_device::port_fe_r(offs_t offset)
 {
 	if (m_card)
-		return m_card->port_fe_r(space, offset);
+		return m_card->port_fe_r(offset);
 	else
 		return 0xff;
 }
@@ -131,10 +131,10 @@ READ_LINE_MEMBER(spectrum_expansion_slot_device::romcs)
 //  mreq_r
 //-------------------------------------------------
 
-READ8_MEMBER(spectrum_expansion_slot_device::mreq_r)
+uint8_t spectrum_expansion_slot_device::mreq_r(offs_t offset)
 {
 	if (m_card)
-		return m_card->mreq_r(space, offset);
+		return m_card->mreq_r(offset);
 	else
 		return 0xff;
 }
@@ -143,10 +143,10 @@ READ8_MEMBER(spectrum_expansion_slot_device::mreq_r)
 //  mreq_w
 //-------------------------------------------------
 
-WRITE8_MEMBER(spectrum_expansion_slot_device::mreq_w)
+void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 {
 	if (m_card)
-		m_card->mreq_w(space, offset, data);
+		m_card->mreq_w(offset, data);
 }
 
 

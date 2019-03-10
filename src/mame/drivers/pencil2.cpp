@@ -149,8 +149,7 @@ void pencil2_state::io_map(address_map &map)
 	map(0x10, 0x1f).w(FUNC(pencil2_state::port10_w));
 	map(0x30, 0x3f).w(FUNC(pencil2_state::port30_w));
 	map(0x80, 0x9f).w(FUNC(pencil2_state::port80_w));
-	map(0xa0, 0xa0).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0xa1, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0xa0, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 	map(0xc0, 0xdf).w(FUNC(pencil2_state::portc0_w));
 	map(0xe0, 0xff).w("sn76489a", FUNC(sn76489a_device::write));
 	map(0xe0, 0xe0).portr("E0");

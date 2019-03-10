@@ -275,6 +275,7 @@ gamate.cpp
 gamecom.cpp
 gamecube.cpp
 gameking.cpp
+gamemachine.cpp
 gamepock.cpp
 gb.cpp
 gba.cpp

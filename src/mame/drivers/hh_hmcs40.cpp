@@ -25,7 +25,7 @@
  *41      HD38800A  1982, Gakken Puck Monster
  *51      HD38800A  1981, Actronics(Hanzawa) Twinvader (larger white version)
  @70      HD38800A  1982, Coleco Galaxian
- @73      HD38800A  1982, Bandai(Mattel) Star Hawk (PT-317B)
+ @73      HD38800A  1982, Mattel Star Hawk (PT-317B)
  @77      HD38800A  1982, Bandai Frisky Tom (PT-327A)
  @88      HD38800A  1984, Tomy Tron (THN-02)
 
@@ -866,147 +866,6 @@ ROM_START( packmon )
 
 	ROM_REGION( 224386, "svg", 0)
 	ROM_LOAD( "packmon.svg", 0, 224386, CRC(b2ee5b6b) SHA1(e53b4d5a4118cc5fbec4656580c2aab76af8f8d7) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Bandai/Mattel Star Hawk (manufactured in Japan)
-  * PCB label Kaken, PT-317B
-  * Hitachi HD38800A73 MCU
-  * cyan/red VFD display Futaba DM-41ZK, with partial color overlay + bezel
-
-  Kaken was a subsidiary of Bandai. The original Japanese release is unknown,
-  was it canceled and only released in the USA?
-
-  known releases:
-  - Japan: ?
-  - USA: Star Hawk, published by Mattel
-
-***************************************************************************/
-
-class msthawk_state : public hh_hmcs40_state
-{
-public:
-	msthawk_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_hmcs40_state(mconfig, type, tag)
-	{ }
-
-	void prepare_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-
-	void update_int0();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
-	void msthawk(machine_config &config);
-};
-
-// handlers
-
-void msthawk_state::prepare_display()
-{
-	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	u32 plate = bitswap<24>(m_plate,23,22,21,19,20,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
-	display_matrix(21, 10, plate, grid);
-}
-
-WRITE8_MEMBER(msthawk_state::plate_w)
-{
-	// R0x-R3x: vfd plate
-	int shift = offset * 4;
-	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
-}
-
-WRITE16_MEMBER(msthawk_state::grid_w)
-{
-	// D5: speaker out
-	m_speaker->level_w(data >> 5 & 1);
-
-	// D10-D15: input mux
-	u8 inp_mux = data >> 10 & 0x3f;
-	if (inp_mux != m_inp_mux)
-	{
-		m_inp_mux = inp_mux;
-		update_int0();
-	}
-
-	// D6-D15: vfd grid
-	m_grid = data >> 6 & 0x3ff;
-
-	// D0-D4: more plates
-	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x1f0000);
-	prepare_display();
-}
-
-void msthawk_state::update_int0()
-{
-	// INT0 on multiplexed inputs
-	set_interrupt(0, read_inputs(6));
-}
-
-// config
-
-static INPUT_PORTS_START( msthawk )
-	PORT_START("IN.0") // D10 INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr) PORT_NAME("Score")
-
-	PORT_START("IN.1") // D11 INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr) PORT_NAME("Land")
-
-	PORT_START("IN.2") // D12 INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr)
-
-	PORT_START("IN.3") // D13 INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr)
-
-	PORT_START("IN.4") // D14 INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr)
-
-	PORT_START("IN.5") // D15 INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr)
-
-	PORT_START("IN.6") // INT1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1) PORT_NAME("Fire")
-INPUT_PORTS_END
-
-void msthawk_state::msthawk(machine_config &config)
-{
-	/* basic machine hardware */
-	HD38800(config, m_maincpu, 400000); // approximation
-	m_maincpu->write_r<0>().set(FUNC(msthawk_state::plate_w));
-	m_maincpu->write_r<1>().set(FUNC(msthawk_state::plate_w));
-	m_maincpu->write_r<2>().set(FUNC(msthawk_state::plate_w));
-	m_maincpu->write_r<3>().set(FUNC(msthawk_state::plate_w));
-	m_maincpu->write_d().set(FUNC(msthawk_state::grid_w));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
-	screen.set_size(1920, 696);
-	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_msthawk);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( msthawk )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "hd38800a73", 0x0000, 0x1000, CRC(a4f9a523) SHA1(465f06b02e2e7d2277218fd447830725790a816c) )
-	ROM_CONTINUE(           0x1e80, 0x0100 )
-
-	ROM_REGION( 191888, "svg", 0)
-	ROM_LOAD( "msthawk.svg", 0, 191888, CRC(a607fc0f) SHA1(282a412f6462128e09ee8bd18d682dda01297611) )
 ROM_END
 
 
@@ -3970,6 +3829,145 @@ ROM_END
 
 /***************************************************************************
 
+  Mattel Star Hawk (manufactured in Japan)
+  * PCB label Kaken, PT-317B
+  * Hitachi HD38800A73 MCU
+  * cyan/red VFD display Futaba DM-41ZK, with partial color overlay + bezel
+
+  Before release, it was advertised as "Space Battle"(a Mattel Intellivision game).
+  Kaken was a subsidiary of Bandai. Star Hawk shell design is the same as Bandai's
+  games from the same era. It's likely that this was made under contract exclusively
+  for Mattel. There is no indication that this game was released in Japan by Bandai.
+
+***************************************************************************/
+
+class msthawk_state : public hh_hmcs40_state
+{
+public:
+	msthawk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+
+	void update_int0();
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
+	void msthawk(machine_config &config);
+};
+
+// handlers
+
+void msthawk_state::prepare_display()
+{
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	u32 plate = bitswap<24>(m_plate,23,22,21,19,20,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
+	display_matrix(21, 10, plate, grid);
+}
+
+WRITE8_MEMBER(msthawk_state::plate_w)
+{
+	// R0x-R3x: vfd plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	prepare_display();
+}
+
+WRITE16_MEMBER(msthawk_state::grid_w)
+{
+	// D5: speaker out
+	m_speaker->level_w(data >> 5 & 1);
+
+	// D10-D15: input mux
+	u8 inp_mux = data >> 10 & 0x3f;
+	if (inp_mux != m_inp_mux)
+	{
+		m_inp_mux = inp_mux;
+		update_int0();
+	}
+
+	// D6-D15: vfd grid
+	m_grid = data >> 6 & 0x3ff;
+
+	// D0-D4: more plates
+	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x1f0000);
+	prepare_display();
+}
+
+void msthawk_state::update_int0()
+{
+	// INT0 on multiplexed inputs
+	set_interrupt(0, read_inputs(6));
+}
+
+// config
+
+static INPUT_PORTS_START( msthawk )
+	PORT_START("IN.0") // D10 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr) PORT_NAME("Score")
+
+	PORT_START("IN.1") // D11 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr) PORT_NAME("Land")
+
+	PORT_START("IN.2") // D12 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr)
+
+	PORT_START("IN.3") // D13 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr)
+
+	PORT_START("IN.4") // D14 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr)
+
+	PORT_START("IN.5") // D15 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr)
+
+	PORT_START("IN.6") // INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1) PORT_NAME("Fire")
+INPUT_PORTS_END
+
+void msthawk_state::msthawk(machine_config &config)
+{
+	/* basic machine hardware */
+	HD38800(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(msthawk_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(msthawk_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(msthawk_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(msthawk_state::plate_w));
+	m_maincpu->write_d().set(FUNC(msthawk_state::grid_w));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 696);
+	screen.set_visarea_full();
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_msthawk);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( msthawk )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38800a73", 0x0000, 0x1000, CRC(a4f9a523) SHA1(465f06b02e2e7d2277218fd447830725790a816c) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+
+	ROM_REGION( 191888, "svg", 0)
+	ROM_LOAD( "msthawk.svg", 0, 191888, CRC(a607fc0f) SHA1(282a412f6462128e09ee8bd18d682dda01297611) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Parker Brothers Q*Bert
   * PCB label 13662 REV-4
   * Hitachi QFP HD38820A70 MCU
@@ -4440,7 +4438,6 @@ CONS( 1979, bmboxing,  0,        0, bmboxing, bmboxing, bmboxing_state, empty_in
 
 CONS( 1982, bfriskyt,  0,        0, bfriskyt, bfriskyt, bfriskyt_state, empty_init, "Bandai", "Frisky Tom (Bandai)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, packmon,   0,        0, packmon,  packmon,  packmon_state,  empty_init, "Bandai", "Packri Monster", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  msthawk_state,  empty_init, "Bandai (Mattel license)", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, bzaxxon,   0,        0, bzaxxon,  bzaxxon,  bzaxxon_state,  empty_init, "Bandai", "Zaxxon (Bandai)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, zackman,   0,        0, zackman,  zackman,  zackman_state,  empty_init, "Bandai", "Zackman", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, bpengo,    0,        0, bpengo,   bpengo,   bpengo_state,   empty_init, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE )
@@ -4471,6 +4468,7 @@ CONS( 1982, gckong,    0,        0, gckong,   gckong,   gckong_state,   empty_in
 CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  gdigdug_state,  empty_init, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, mwcbaseb_state, empty_init, "Mattel", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  msthawk_state,  empty_init, "Mattel", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  pbqbert_state,  empty_init, "Parker Brothers", "Q*Bert (Parker Brothers)", MACHINE_SUPPORTS_SAVE )
 

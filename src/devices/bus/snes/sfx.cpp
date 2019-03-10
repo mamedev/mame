@@ -40,30 +40,30 @@ void sns_rom_superfx_device::device_reset()
 // LoROM + SuperFX (GSU-1,2)
 // TODO: mask sfx_ram based on the actual RAM...
 
-READ8_MEMBER( sns_rom_superfx_device::superfx_r_bank1 )
+uint8_t sns_rom_superfx_device::superfx_r_bank1(offs_t offset)
 {
 	return m_rom[rom_bank_map[offset / 0x10000] * 0x8000 + (offset & 0x7fff)];
 }
 
-READ8_MEMBER( sns_rom_superfx_device::superfx_r_bank2 )
+uint8_t sns_rom_superfx_device::superfx_r_bank2(offs_t offset)
 {
 	return m_rom[rom_bank_map[offset / 0x8000] * 0x8000 + (offset & 0x7fff)];
 }
 
-READ8_MEMBER( sns_rom_superfx_device::superfx_r_bank3 )
+uint8_t sns_rom_superfx_device::superfx_r_bank3(offs_t offset)
 {
 	return sfx_ram[offset & 0xfffff];
 }
 
-WRITE8_MEMBER( sns_rom_superfx_device::superfx_w_bank1 )
+void sns_rom_superfx_device::superfx_w_bank1(offs_t offset, uint8_t data)
 {
 }
 
-WRITE8_MEMBER( sns_rom_superfx_device::superfx_w_bank2 )
+void sns_rom_superfx_device::superfx_w_bank2(offs_t offset, uint8_t data)
 {
 }
 
-WRITE8_MEMBER( sns_rom_superfx_device::superfx_w_bank3 )
+void sns_rom_superfx_device::superfx_w_bank3(offs_t offset, uint8_t data)
 {
 	sfx_ram[offset & 0xfffff] = data;
 }
@@ -92,23 +92,23 @@ void sns_rom_superfx_device::device_add_mconfig(machine_config &config)
 	m_superfx->irq().set(FUNC(sns_rom_superfx_device::snes_extern_irq_w));  /* IRQ line from cart */
 }
 
-READ8_MEMBER( sns_rom_superfx_device::chip_read )
+uint8_t sns_rom_superfx_device::chip_read(offs_t offset)
 {
 	return m_superfx->mmio_read(offset);
 }
 
-WRITE8_MEMBER( sns_rom_superfx_device::chip_write )
+void sns_rom_superfx_device::chip_write(offs_t offset, uint8_t data)
 {
 	m_superfx->mmio_write(offset, data);
 }
 
 
-READ8_MEMBER( sns_rom_superfx_device::read_l )
+uint8_t sns_rom_superfx_device::read_l(offs_t offset)
 {
-	return read_h(space, offset);
+	return read_h(offset);
 }
 
-READ8_MEMBER(sns_rom_superfx_device::read_h)
+uint8_t sns_rom_superfx_device::read_h(offs_t offset)
 {
 	if (offset < 0x400000)
 		return m_rom[rom_bank_map[offset / 0x10000] * 0x8000 + (offset & 0x7fff)];
@@ -130,14 +130,14 @@ READ8_MEMBER(sns_rom_superfx_device::read_h)
 	return 0xff;    // this handler should never be called for [60-7f]/[e0-ff] ranges
 }
 
-READ8_MEMBER( sns_rom_superfx_device::read_ram )
+uint8_t sns_rom_superfx_device::read_ram(offs_t offset)
 {
 	if (m_superfx->access_ram())
 		return sfx_ram[offset & 0xfffff];
 	return 0xff;    // should be open bus...
 }
 
-WRITE8_MEMBER( sns_rom_superfx_device::write_ram )
+void sns_rom_superfx_device::write_ram(offs_t offset, uint8_t data)
 {
 	if (m_superfx->access_ram())
 		sfx_ram[offset & 0xfffff] = data;

@@ -168,7 +168,7 @@ resulting mess can be seen in the F4 viewer display.
 WRITE8_MEMBER( spectrum_state::spectrum_128_bank1_w )
 {
 	if (m_exp->romcs())
-		m_exp->mreq_w(space, offset, data);
+		m_exp->mreq_w(offset, data);
 }
 
 READ8_MEMBER( spectrum_state::spectrum_128_bank1_r )
@@ -177,7 +177,7 @@ READ8_MEMBER( spectrum_state::spectrum_128_bank1_r )
 
 	if (m_exp->romcs())
 	{
-		data = m_exp->mreq_r(space, offset);
+		data = m_exp->mreq_r(offset);
 	}
 	else
 	{

@@ -105,7 +105,7 @@ READ_LINE_MEMBER(spectrum_intf1_device::romcs)
 	return m_romcs | m_exp->romcs();
 }
 
-READ8_MEMBER(spectrum_intf1_device::mreq_r)
+uint8_t spectrum_intf1_device::mreq_r(offs_t offset)
 {
 	uint8_t temp;
 	uint8_t data = 0xff;
@@ -116,7 +116,7 @@ READ8_MEMBER(spectrum_intf1_device::mreq_r)
 			m_romcs = 1;
 	}
 
-	temp = m_exp->mreq_r(space, offset);
+	temp = m_exp->mreq_r(offset);
 	if (m_exp->romcs())
 		data &= temp;
 
@@ -132,18 +132,18 @@ READ8_MEMBER(spectrum_intf1_device::mreq_r)
 	return data;
 }
 
-WRITE8_MEMBER(spectrum_intf1_device::mreq_w)
+void spectrum_intf1_device::mreq_w(offs_t offset, uint8_t data)
 {
 	if (m_exp->romcs())
-		m_exp->mreq_w(space, offset, data);
+		m_exp->mreq_w(offset, data);
 }
 
-READ8_MEMBER(spectrum_intf1_device::port_fe_r)
+uint8_t spectrum_intf1_device::port_fe_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
 	if (m_exp->romcs())
-		data &= m_exp->port_fe_r(space, offset);
+		data &= m_exp->port_fe_r(offset);
 
 	return data;
 }

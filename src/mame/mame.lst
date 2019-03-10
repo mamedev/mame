@@ -11553,9 +11553,11 @@ divebomb                        // GX840 (c) 1989 (Japan)
 diverboy                        // (c) 1992 Electronic Devices
 
 @source:djboy.cpp
-djboy                           // (c) 1989 Kaneko
-djboya                          // (c) 1989 Kaneko
-djboyj                          // (c) 1989 Kaneko
+djboy                           // (c) 1989 Kaneko (World)
+djboyj                          // (c) 1989 Kaneko (Japan, Sega license)
+djboyja                         // (c) 1989 Kaneko (Japan, Sega license)
+djboyu                          // (c) 1990 Kaneko (USA, American Sammy license)
+djboyua                         // (c) 1990 Kaneko (USA, American Sammy license)
 
 @source:djmain.cpp
 bm1stmix                        // GQ753 (c) 1997 (Japan)
@@ -13724,6 +13726,9 @@ gcbr                            // (c) 2002 Nintendo
 gamekin3                        //
 gameking                        //
 
+@source:gamemachine.cpp
+2001tgm                         //
+
 @source:gamemasters.cpp
 gmsshoot                        // (c) 1989 GameMasters
 
@@ -15036,7 +15041,7 @@ gdigdug                         // Gakken
 ghalien                         // Gakken
 kingman                         // Tomy
 machiman                        // Bandai
-msthawk                         // Bandai/Mattel
+msthawk                         // Mattel
 mwcbaseb                        // Mattel
 packmon                         // Bandai
 pairmtch                        // Bandai
@@ -31376,6 +31381,7 @@ pengo4                          // 834-0386 (c) 1982 Sega
 pengo5                          // 834-0386 (c) 1982 Sega
 pengob                          // bootleg
 penta                           // bootleg
+schick                          // Microhard
 
 @source:pentagon.cpp
 pent1024                        //

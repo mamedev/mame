@@ -111,14 +111,14 @@ public:
 	virtual ~device_sns_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) { return 0xff; }   // ROM access in range [00-7f]
-	virtual DECLARE_READ8_MEMBER(read_h) { return 0xff; }   // ROM access in range [80-ff]
-	virtual DECLARE_READ8_MEMBER(read_ram) { if (!m_nvram.empty()) return m_nvram[offset & (m_nvram.size()-1)]; else return 0xff; }   // NVRAM access
-	virtual DECLARE_WRITE8_MEMBER(write_l) { }   // used by carts with subslots
-	virtual DECLARE_WRITE8_MEMBER(write_h) { }   // used by carts with subslots
-	virtual DECLARE_WRITE8_MEMBER(write_ram) { if (!m_nvram.empty()) m_nvram[offset & (m_nvram.size()-1)] = data; } // NVRAM access
-	virtual DECLARE_READ8_MEMBER(chip_read) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(chip_write) { }
+	virtual uint8_t read_l(offs_t offset) { return 0xff; }   // ROM access in range [00-7f]
+	virtual uint8_t read_h(offs_t offset) { return 0xff; }   // ROM access in range [80-ff]
+	virtual uint8_t read_ram(offs_t offset) { if (!m_nvram.empty()) return m_nvram[offset & (m_nvram.size()-1)]; else return 0xff; }   // NVRAM access
+	virtual void write_l(offs_t offset, uint8_t data) { }   // used by carts with subslots
+	virtual void write_h(offs_t offset, uint8_t data) { }   // used by carts with subslots
+	virtual void write_ram(offs_t offset, uint8_t data) { if (!m_nvram.empty()) m_nvram[offset & (m_nvram.size()-1)] = data; } // NVRAM access
+	virtual uint8_t chip_read(offs_t offset) { return 0xff; }
+	virtual void chip_write(offs_t offset, uint8_t data) { }
 	virtual void speedup_addon_bios_access() {}
 
 	void rom_alloc(uint32_t size, const char *tag);
@@ -142,6 +142,7 @@ protected:
 	device_sns_cart_interface(const machine_config &mconfig, device_t &device);
 
 	DECLARE_WRITE_LINE_MEMBER(write_irq);
+	uint8_t read_open_bus();
 
 	// internal state
 	uint8_t *m_rom;
@@ -168,6 +169,7 @@ public:
 
 	// configuration
 	auto irq_callback() { return m_irq_callback.bind(); }
+	auto open_bus_callback() { return m_open_bus_callback.bind(); }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -198,16 +200,17 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
-	DECLARE_READ8_MEMBER(read_l);
-	DECLARE_READ8_MEMBER(read_h);
-	DECLARE_READ8_MEMBER(read_ram);
-	DECLARE_WRITE8_MEMBER(write_l);
-	DECLARE_WRITE8_MEMBER(write_h);
-	DECLARE_WRITE8_MEMBER(write_ram);
-	DECLARE_READ8_MEMBER(chip_read);
-	DECLARE_WRITE8_MEMBER(chip_write);
+	uint8_t read_l(offs_t offset);
+	uint8_t read_h(offs_t offset);
+	uint8_t read_ram(offs_t offset);
+	void write_l(offs_t offset, uint8_t data);
+	void write_h(offs_t offset, uint8_t data);
+	void write_ram(offs_t offset, uint8_t data);
+	uint8_t chip_read(offs_t offset);
+	void chip_write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(write_irq) { m_irq_callback(state); }
+	uint8_t read_open_bus() { return m_open_bus_callback(); }
 
 	// in order to support legacy dumps + add-on CPU dump appended at the end of the file, we
 	// check if the required data is present and update bank map accordingly
@@ -230,6 +233,7 @@ protected:
 
 private:
 	devcb_write_line m_irq_callback;
+	devcb_read8 m_open_bus_callback;
 };
 
 // ======================> sns_cart_slot_device

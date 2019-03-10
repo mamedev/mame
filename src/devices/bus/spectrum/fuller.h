@@ -38,13 +38,13 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual DECLARE_READ8_MEMBER(mreq_r) override;
-	virtual DECLARE_WRITE8_MEMBER(mreq_w) override;
-	virtual DECLARE_READ8_MEMBER(port_fe_r) override;
+	virtual uint8_t mreq_r(offs_t offset) override;
+	virtual void mreq_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t port_fe_r(offs_t offset) override;
 	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
 
 private:
-	DECLARE_READ8_MEMBER(joystick_r);
+	uint8_t joystick_r();
 
 	required_device<spectrum_expansion_slot_device> m_exp;
 	required_device<ay8910_device> m_psg;

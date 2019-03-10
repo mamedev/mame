@@ -99,7 +99,7 @@ READ_LINE_MEMBER(spectrum_uspeech_device::romcs)
 }
 
 
-READ8_MEMBER(spectrum_uspeech_device::mreq_r)
+uint8_t spectrum_uspeech_device::mreq_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -121,7 +121,7 @@ READ8_MEMBER(spectrum_uspeech_device::mreq_r)
 	return data;
 }
 
-WRITE8_MEMBER(spectrum_uspeech_device::mreq_w)
+void spectrum_uspeech_device::mreq_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

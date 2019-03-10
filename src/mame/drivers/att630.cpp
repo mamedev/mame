@@ -48,18 +48,20 @@ void att630_state::mem_map(address_map &map)
 static INPUT_PORTS_START( att630 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(att630_state::att630)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(40'000'000) / 4) // clock not confirmed
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+void att630_state::att630(machine_config &config)
+{
+	M68000(config, m_maincpu, 40_MHz_XTAL / 4); // clock not confirmed
+	m_maincpu->set_addrmap(AS_PROGRAM, &att630_state::mem_map);
+	// TODO: interrupt vector callback
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(87'183'360), 1376, 0, 1024, 1056, 0, 1024)
-	MCFG_SCREEN_UPDATE_DRIVER(att630_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(87.18336_MHz_XTAL, 1376, 0, 1024, 1056, 0, 1024);
+	screen.set_screen_update(FUNC(att630_state::screen_update));
 
-	SCN2681(config, "duart1", XTAL(3'686'400));
+	SCN2681(config, "duart1", 3.6864_MHz_XTAL);
 
-	SCN2681(config, "duart2", XTAL(3'686'400));
-MACHINE_CONFIG_END
+	SCN2681(config, "duart2", 3.6864_MHz_XTAL);
+}
 
 
 /**************************************************************************************************************

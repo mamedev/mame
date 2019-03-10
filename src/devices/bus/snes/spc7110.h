@@ -18,13 +18,13 @@ public:
 	sns_rom_spc7110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_l(offs_t offset) override;
+	virtual uint8_t read_h(offs_t offset) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 
-	virtual DECLARE_READ8_MEMBER(chip_read) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
+	virtual uint8_t chip_read(offs_t offset) override;
+	virtual void chip_write(offs_t offset, uint8_t data) override;
 
 protected:
 	sns_rom_spc7110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -199,11 +199,11 @@ public:
 	// reading and writing
 
 // we just use the spc7110 ones for the moment, pending the split of regs 0x4840-0x4842 (RTC) from the base add-on
-//  virtual DECLARE_READ8_MEMBER(read_l);
-//  virtual DECLARE_READ8_MEMBER(read_h);
+//  virtual uint8_t read_l(offs_t offset);
+//  virtual uint8_t read_h(offs_t offset);
 
-//  virtual DECLARE_READ8_MEMBER(chip_read);
-//  virtual DECLARE_WRITE8_MEMBER(chip_write);
+//  virtual uint8_t chip_read(offs_t offset);
+//  virtual void chip_write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

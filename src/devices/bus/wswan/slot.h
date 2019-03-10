@@ -31,13 +31,13 @@ public:
 	virtual ~device_ws_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom20) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_rom30) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_rom40) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
-	virtual DECLARE_READ8_MEMBER(read_io) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_io) { }
+	virtual uint8_t read_rom20(offs_t offset) { return 0xff; }
+	virtual uint8_t read_rom30(offs_t offset) { return 0xff; }
+	virtual uint8_t read_rom40(offs_t offset) { return 0xff; }
+	virtual uint8_t read_ram(offs_t offset) { return 0xff; }
+	virtual void write_ram(offs_t offset, uint8_t data) {}
+	virtual uint8_t read_io(offs_t offset) { return 0xff; }
+	virtual void write_io(offs_t offset, uint8_t data) { }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void nvram_alloc(uint32_t size);
@@ -109,13 +109,13 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom20);
-	virtual DECLARE_READ8_MEMBER(read_rom30);
-	virtual DECLARE_READ8_MEMBER(read_rom40);
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
-	virtual DECLARE_READ8_MEMBER(read_io);
-	virtual DECLARE_WRITE8_MEMBER(write_io);
+	virtual uint8_t read_rom20(offs_t offset);
+	virtual uint8_t read_rom30(offs_t offset);
+	virtual uint8_t read_rom40(offs_t offset);
+	virtual uint8_t read_ram(offs_t offset);
+	virtual void write_ram(offs_t offset, uint8_t data);
+	virtual uint8_t read_io(offs_t offset);
+	virtual void write_io(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
