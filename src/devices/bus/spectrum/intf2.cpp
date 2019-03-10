@@ -125,17 +125,20 @@ uint8_t spectrum_intf2_device::mreq_r(offs_t offset)
 		return 0xff;
 }
 
-uint8_t spectrum_intf2_device::port_fe_r(offs_t offset)
+uint8_t spectrum_intf2_device::iorq_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	uint8_t lines = offset >> 8;
+	switch (offset & 0xff)
+	{
+	case 0xfe:
+		if (((offset >> 8) & 8) == 0)
+			data = m_exp_line3->read() | (0xff ^ 0x1f);
 
-	if ((lines & 8) == 0)
-		data = m_exp_line3->read() | (0xff ^ 0x1f);
-
-	if ((lines & 16) == 0)
-		data = m_exp_line4->read() | (0xff ^ 0x1f);
+		if (((offset >> 8) & 16) == 0)
+			data = m_exp_line4->read() | (0xff ^ 0x1f);
+		break;
+	}
 
 	return data;
 }

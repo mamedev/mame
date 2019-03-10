@@ -235,11 +235,12 @@ READ8_MEMBER( spectrum_state::spectrum_128_ula_r )
 
 void spectrum_state::spectrum_128_io(address_map &map)
 {
+	map(0x0000, 0xffff).rw(m_exp, FUNC(spectrum_expansion_slot_device::iorq_r), FUNC(spectrum_expansion_slot_device::iorq_w));
 	map(0x0000, 0x0000).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
 	map(0x0001, 0x0001).w(FUNC(spectrum_state::spectrum_128_port_7ffd_w)).mirror(0x7ffc);   // (A15 | A1) == 0, note: reading from this port does write to it by value from data bus
 	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
 	map(0xc000, 0xc000).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3ffd);
-	map(0x0001, 0x0001).r(FUNC(spectrum_state::spectrum_128_ula_r)).mirror(0xfffe);
+	map(0x0001, 0x0001).r(FUNC(spectrum_state::spectrum_128_ula_r)); // .mirror(0xfffe);
 }
 
 void spectrum_state::spectrum_128_mem(address_map &map)
@@ -297,6 +298,7 @@ void spectrum_state::spectrum_128(machine_config &config)
 	Z80(config.replace(), m_maincpu, X1_128_SINCLAIR / 5);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_state::spectrum_128_mem);
 	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_128_io);
+	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_state::spectrum_fetch);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
 	config.m_minimum_quantum = attotime::from_hz(60);
 
@@ -313,7 +315,6 @@ void spectrum_state::spectrum_128(machine_config &config)
 
 	/* expansion port */
 	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, spec128_expansion_devices, nullptr);
-	m_exp->set_io_space(m_maincpu, AS_IO);
 	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 

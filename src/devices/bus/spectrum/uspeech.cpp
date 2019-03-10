@@ -76,6 +76,7 @@ spectrum_uspeech_device::spectrum_uspeech_device(const machine_config &mconfig, 
 
 void spectrum_uspeech_device::device_start()
 {
+	save_item(NAME(m_romcs));
 }
 
 
@@ -98,23 +99,25 @@ READ_LINE_MEMBER(spectrum_uspeech_device::romcs)
 	return m_romcs;
 }
 
-
-uint8_t spectrum_uspeech_device::mreq_r(offs_t offset)
+void spectrum_uspeech_device::opcode_fetch(offs_t offset)
 {
-	uint8_t data;
-
-	if (!machine().side_effects_disabled() && (offset == 0x38))
+	if (!machine().side_effects_disabled() && (offset == 0x0038))
 	{
 		m_romcs = !m_romcs;
 	}
+}
 
-	switch (offset)
+uint8_t spectrum_uspeech_device::mreq_r(offs_t offset)
+{
+	uint8_t data = 0xff;
+
+	switch (offset & 0xf000)
 	{
+	case 0x0000:
+		data = m_rom->base()[offset & 0x7ff];
+		break;
 	case 0x1000:
 		data = !m_nsp->lrq_r(); // (m_nsp->lrq_r() && (m_nsp->sby_r() != 0)) ? 0x00 : 0x01;
-		break;
-	default:
-		data = m_rom->base()[offset & 0x7ff];
 		break;
 	}
 
@@ -123,7 +126,7 @@ uint8_t spectrum_uspeech_device::mreq_r(offs_t offset)
 
 void spectrum_uspeech_device::mreq_w(offs_t offset, uint8_t data)
 {
-	switch (offset)
+	switch (offset & 0xf001)
 	{
 	case 0x1000:
 		// allophone

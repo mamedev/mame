@@ -31,7 +31,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -39,10 +38,9 @@ protected:
 
 	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
 	virtual uint8_t mreq_r(offs_t offset) override;
+	virtual uint8_t iorq_r(offs_t offset) override;
 
 private:
-	uint8_t joystick_r();
-
 	required_memory_region m_rom;
 	required_ioport m_joy;
 };

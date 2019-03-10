@@ -36,7 +36,7 @@ protected:
 
 	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
 	virtual uint8_t mreq_r(offs_t offset) override;
-	virtual uint8_t port_fe_r(offs_t offset) override;
+	virtual uint8_t iorq_r(offs_t offset) override;
 
 private:
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
