@@ -1291,6 +1291,19 @@ static INPUT_PORTS_START( has_wamg )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // waits for this after fading out title, what is it?
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( evio )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
+INPUT_PORTS_END
+
 /* correct, 4bpp gfxs */
 static const gfx_layout charlayout =
 {
@@ -1878,6 +1891,14 @@ ROM_START( taikodp )
 	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
 
+ROM_START( evio )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "evio.bin", 0x600000, 0x200000, CRC(ee22c764) SHA1(f2b7e213eb78065a63ef484a619bcfc61299e30e))
+	ROM_RELOAD(0x000000, 0x200000)
+ROM_END
+
+
+
 
 /* XaviX hardware titles (1st Generation)
 
@@ -1986,6 +2007,9 @@ CONS( 2000, popira,   0,           0,  xavix_cart_popira,popira,   xavix_cart_st
 CONS( 2002, popira2,  0,           0,  xavix_cart_popira,popira2,  xavix_popira2_cart_state, init_xavix,    "Takara / SSD Company LTD",                 "Popira 2 (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // Popira 2 is a set of 2 blue & green linked units (2nd unit is just a controller, no CPU or TV out)
 
 CONS( 2003, taikodp,  0,           0,  xavix_i2c_taiko,  taikodp,  xavix_i2c_cart_state, init_xavix,    "Takara / SSD Company LTD",                     "Taiko De Popira (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? are the drums analog?
+
+CONS( 2003, evio,     0,           0,  xavix_nv,         evio,     xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Evio (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? it's a violin controller
+
 
 // Let’s!TVプレイ 超にんきスポット!ころがしほーだい たまごっちりぞーと   (Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort) (only on the Japanese list? http://test.shinsedai.co.jp/english/products/Applied/list.html )   This also allows you to use an IR reciever to import a Tamagotchi from compatible games
 CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04,  ltv_tam,xavix_i2c_ltv_tam_state,      init_xavix,    "Bandai / SSD Company LTD",                      "Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
