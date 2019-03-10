@@ -879,6 +879,8 @@ if (BUSES["ELECTRON_CART"]~=null) then
 		MAME_DIR .. "src/devices/bus/electron/cart/mgc.h",
 		MAME_DIR .. "src/devices/bus/electron/cart/peg400.cpp",
 		MAME_DIR .. "src/devices/bus/electron/cart/peg400.h",
+		MAME_DIR .. "src/devices/bus/electron/cart/romp144.cpp",
+		MAME_DIR .. "src/devices/bus/electron/cart/romp144.h",
 		MAME_DIR .. "src/devices/bus/electron/cart/sndexp.cpp",
 		MAME_DIR .. "src/devices/bus/electron/cart/sndexp.h",
 		MAME_DIR .. "src/devices/bus/electron/cart/sndexp3.cpp",
