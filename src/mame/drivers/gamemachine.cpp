@@ -210,11 +210,11 @@ void tgm_state::main_map(address_map &map)
 
 void tgm_state::main_io(address_map &map)
 {
-	map(0x0, 0x0).w(FUNC(tgm_state::mux1_w));
-	map(0x1, 0x1).rw(FUNC(tgm_state::input_r), FUNC(tgm_state::mux2_w));
-	map(0x4, 0x4).w(FUNC(tgm_state::sound_w));
-	map(0x5, 0x5).w(FUNC(tgm_state::digit_w));
-	map(0x7, 0x7).r(FUNC(tgm_state::timer_r));
+	map(0x00, 0x00).w(FUNC(tgm_state::mux1_w));
+	map(0x01, 0x01).rw(FUNC(tgm_state::input_r), FUNC(tgm_state::mux2_w));
+	map(0x04, 0x04).w(FUNC(tgm_state::sound_w));
+	map(0x05, 0x05).w(FUNC(tgm_state::digit_w));
+	map(0x07, 0x07).r(FUNC(tgm_state::timer_r));
 }
 
 

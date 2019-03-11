@@ -157,9 +157,9 @@ void boris_state::main_map(address_map &map)
 
 void boris_state::main_io(address_map &map)
 {
-	map(0x0, 0x0).rw(FUNC(boris_state::input_r), FUNC(boris_state::mux_w));
-	map(0x1, 0x1).w(FUNC(boris_state::digit_w));
-	map(0xc, 0xf).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
+	map(0x00, 0x00).rw(FUNC(boris_state::input_r), FUNC(boris_state::mux_w));
+	map(0x01, 0x01).w(FUNC(boris_state::digit_w));
+	map(0x0c, 0x0f).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
 
