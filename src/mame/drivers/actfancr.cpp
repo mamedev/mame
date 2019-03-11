@@ -215,53 +215,38 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-static const gfx_layout chars =
+static const gfx_layout layout_8x8x4 =
 {
 	8,8,    /* 8*8 chars */
-	4096,
+	RGN_FRAC(1,4),
 	4,      /* 4 bits per pixel  */
-	{ 0x08000*8, 0x18000*8, 0x00000*8, 0x10000*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ RGN_FRAC(1,4), RGN_FRAC(3,4), RGN_FRAC(0,4), RGN_FRAC(2,4) },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static const gfx_layout tiles =
+static const gfx_layout layout_16x16x4 =
 {
 	16,16,  /* 16*16 sprites */
-	2048,
+	RGN_FRAC(1,4),
 	4,
-	{ 0, 0x10000*8, 0x20000*8,0x30000*8 },  /* plane offset */
-	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8    /* every sprite takes 32 consecutive bytes */
-};
-
-static const gfx_layout sprites =
-{
-	16,16,  /* 16*16 sprites */
-	2048+1024,
-	4,
-	{ 0, 0x18000*8, 0x30000*8, 0x48000*8 }, /* plane offset */
-	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ 0, RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },  /* plane offset */
+	{ STEP8(16*8,1), STEP8(0,1) },
+	{ STEP16(0,8) },
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 static GFXDECODE_START( gfx_actfan )
-	GFXDECODE_ENTRY( "chars",   0, chars,       0, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, sprites,   512, 16 )
-	GFXDECODE_ENTRY( "tiles",   0, tiles,     256, 16 )
+	GFXDECODE_ENTRY( "chars",   0, layout_8x8x4,     0, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 512, 16 )
+	GFXDECODE_ENTRY( "tiles",   0, layout_16x16x4, 256, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_triothep )
-	GFXDECODE_ENTRY( "chars",   0, chars,       0, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, sprites,   256, 16 )
-	GFXDECODE_ENTRY( "tiles",   0, tiles,     512, 16 )
+	GFXDECODE_ENTRY( "chars",   0, layout_8x8x4,     0, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 256, 16 )
+	GFXDECODE_ENTRY( "tiles",   0, layout_16x16x4, 512, 16 )
 GFXDECODE_END
 
 /******************************************************************************/
@@ -432,7 +417,7 @@ ROM_START( actfancr2 )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* Need to allow full RAM allocation for now */
 	ROM_LOAD( "fe08-2.bin", 0x00000, 0x10000, CRC(0d36fbfa) SHA1(cef5cfd053beac5ca2ac52421024c316bdbfba42) )
 	ROM_LOAD( "fe09-2.bin", 0x10000, 0x10000, CRC(27ce2bb1) SHA1(52a423dfc2bba7b3330d1a10f4149ae6eeb9198c) )
-	ROM_LOAD( "10",   0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
+	ROM_LOAD( "10",         0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "17-1", 0x08000, 0x8000, CRC(289ad106) SHA1(cf1b32ac41d3d92860fab04d82a08efe57b6ecf3) )
@@ -498,7 +483,7 @@ ROM_START( actfancrj )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* Need to allow full RAM allocation for now */
 	ROM_LOAD( "fd08-1.bin", 0x00000, 0x10000, CRC(69004b60) SHA1(7c6b876ca04377d2aa2d3c3f19d8e6cc7345363d) )
 	ROM_LOAD( "fd09-1.bin", 0x10000, 0x10000, CRC(a455ae3e) SHA1(960798271c8370c1c4ffce2a453f59d7a301c9f9) )
-	ROM_LOAD( "10",   0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
+	ROM_LOAD( "10",         0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "17-1", 0x08000, 0x8000, CRC(289ad106) SHA1(cf1b32ac41d3d92860fab04d82a08efe57b6ecf3) )
