@@ -19,7 +19,7 @@
 const char *const n8x300_disassembler::reg_names[32] =
 {
 	"AUX", "R1", "R2", "R3", "R4", "R5", "R6", "IVL", "OVF", "R11",
-	"Unused12", "Unused13", "Unused14", "Unused15", "Unused16", "IVR",
+	"R12", "R13", "R14", "R15", "R16", "IVR",
 	"LIV0", "LIV1", "LIV2", "LIV3", "LIV4", "LIV5", "LIV6", "LIV7",
 	"RIV0", "RIV1", "RIV2", "RIV3", "RIV4", "RIV5", "RIV6", "RIV7"
 };
