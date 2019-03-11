@@ -2871,7 +2871,6 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	{
 		int32_t left_total = 0;
 		int32_t right_total = 0;
-		int32_t active_count = 0;
 
 		for (uint32_t channel = 0; channel < 16; channel++)
 		{
@@ -2896,8 +2895,6 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				}
 
 				sample = (sample * (int32_t)get_edd(channel)) >> 7;
-
-				active_count++;
 
 				int32_t vol = get_volume(channel);
 				int32_t pan = get_pan(channel);
@@ -2940,18 +2937,10 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			}
 		}
 
-		if (active_count)
-		{
-			left_total /= active_count;
-			right_total /= active_count;
-			*out_l++ = (left_total * (int16_t)m_audio_regs[AUDIO_MAIN_VOLUME]) >> 7;
-			*out_r++ = (right_total * (int16_t)m_audio_regs[AUDIO_MAIN_VOLUME]) >> 7;
-		}
-		else
-		{
-			*out_l++ = 0;
-			*out_r++ = 0;
-		}
+		left_total >>= 4;
+		right_total >>= 4;
+		*out_l++ = (left_total * (int16_t)m_audio_regs[AUDIO_MAIN_VOLUME]) >> 7;
+		*out_r++ = (right_total * (int16_t)m_audio_regs[AUDIO_MAIN_VOLUME]) >> 7;
 	}
 }
 
