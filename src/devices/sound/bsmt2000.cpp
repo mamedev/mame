@@ -180,8 +180,8 @@ void bsmt2000_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	// just fill with current left/right values
 	for (int samp = 0; samp < samples; samp++)
 	{
-		outputs[0][samp] = m_left_data * 16;
-		outputs[1][samp] = m_right_data * 16;
+		outputs[0][samp] = m_left_data;
+		outputs[1][samp] = m_right_data;
 	}
 }
 
@@ -264,8 +264,8 @@ READ16_MEMBER( bsmt2000_device::tms_data_r )
 
 READ16_MEMBER( bsmt2000_device::tms_rom_r )
 {
-	// underlying logic assumes this is a sign-extended value
-	return (int8_t)read_byte((m_rom_bank << 16) + m_rom_address);
+	// DSP code expects a 16-bit value with the data in the high byte
+	return (int16_t)(read_byte((m_rom_bank << 16) + m_rom_address) << 8);
 }
 
 
