@@ -285,7 +285,7 @@ void k051649_device::k051649_test_w(uint8_t data)
 uint8_t k051649_device::k051649_test_r()
 {
 	// reading the test register sets it to $ff!
-	if (machine().side_effects_disabled())
+	if (!machine().side_effects_disabled())
 		k051649_test_w(0xff);
 	return 0xff;
 }
