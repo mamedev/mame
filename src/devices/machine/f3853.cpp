@@ -32,19 +32,30 @@
 
 // device type definition
 DEFINE_DEVICE_TYPE(F3853, f3853_device, "f3853_device", "F3853 SMI")
+DEFINE_DEVICE_TYPE(F3856, f3856_device, "f3856_device", "F3856 PSU")
 
 //-------------------------------------------------
 //  f3853_device - constructor
 //-------------------------------------------------
 
-f3853_device::f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, F3853, tag, owner, clock)
-	, m_int_req_callback(*this)
-	, m_pri_out_callback(*this)
-	, m_priority_line(false)
-	, m_external_interrupt_line(true)
-{
-}
+f3853_device::f3853_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_int_req_callback(*this),
+	m_pri_out_callback(*this),
+	m_int_vector(0),
+	m_prescaler(31),
+	m_priority_line(false),
+	m_external_interrupt_line(true)
+{ }
+
+f3853_device::f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	f3853_device(mconfig, F3853, tag, owner, clock)
+{ }
+
+f3856_device::f3856_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	f3853_device(mconfig, F3856, tag, owner, clock)
+{ }
+
 
 void f3853_device::device_resolve_objects()
 {
@@ -68,7 +79,14 @@ void f3853_device::device_start()
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(f3853_device::timer_callback),this));
 
+	// zerofill (what's not in constructor)
+	m_external_enable = false;
+	m_timer_enable = false;
+	m_request_flipflop = false;
+
+	// register for savestates
 	save_item(NAME(m_int_vector));
+	save_item(NAME(m_prescaler));
 	save_item(NAME(m_external_enable));
 	save_item(NAME(m_timer_enable));
 	save_item(NAME(m_request_flipflop));
@@ -83,14 +101,9 @@ void f3853_device::device_start()
 
 void f3853_device::device_reset()
 {
-	m_int_vector = 0;
-	m_external_enable = false;
-	m_timer_enable = false;
-	m_request_flipflop = false;
-	m_external_interrupt_line = true;
-	set_interrupt_request_line();
-
-	m_timer->enable(false);
+	// clear ports
+	for (int i = 0; i < 4; i++)
+		write(machine().dummy_space(), i, 0);
 }
 
 
@@ -127,7 +140,7 @@ IRQ_CALLBACK_MEMBER(f3853_device::int_acknowledge)
 
 void f3853_device::timer_start(uint8_t value)
 {
-	attotime period = (value != 0xff) ? attotime::from_hz(clock()) * (m_value_to_cycle[value]*31) : attotime::never;
+	attotime period = (value != 0xff) ? attotime::from_hz(clock()) * (m_value_to_cycle[value] * m_prescaler) : attotime::never;
 
 	m_timer->adjust(period);
 }
@@ -181,7 +194,6 @@ READ8_MEMBER(f3853_device::read)
 	return data;
 }
 
-
 WRITE8_MEMBER(f3853_device::write)
 {
 	switch(offset)
@@ -194,13 +206,72 @@ WRITE8_MEMBER(f3853_device::write)
 		m_int_vector = data | (m_int_vector & 0xff00);
 		break;
 
-	case 2: //interrupt control
+	// interrupt control
+	case 2:
 		m_external_enable = ((data & 3) == 1);
 		m_timer_enable = ((data & 3) == 3);
 		set_interrupt_request_line();
 		break;
 
-	case 3: //timer
+	// timer
+	case 3:
+		m_request_flipflop = false;
+		set_interrupt_request_line();
+		timer_start(data);
+		break;
+	}
+}
+
+
+READ8_MEMBER(f3856_device::read)
+{
+	uint8_t data = 0;
+
+	switch (offset)
+	{
+	case 0:
+		break;
+
+	case 1:
+		break;
+
+	case 2:
+		break;
+
+	case 3:
+		break;
+	}
+
+	return data;
+}
+
+WRITE8_MEMBER(f3856_device::write)
+{
+	switch(offset)
+	{
+	case 0:
+		break;
+
+	case 1:
+		break;
+
+	// interrupt control
+	case 2:
+		// timer prescaler in high 3 bits
+		static const u8 prescaler[8] = { 0, 2, 5, 10, 20, 40, 100, 200 };
+		m_prescaler = prescaler[data >> 5 & 7];
+
+		// TODO: event counter mode
+		if (m_prescaler == 0)
+			m_prescaler = 100;
+
+		m_external_enable = bool(data & 1);
+		m_timer_enable = bool(data & 2);
+		set_interrupt_request_line();
+		break;
+
+	// timer
+	case 3:
 		m_request_flipflop = false;
 		set_interrupt_request_line();
 		timer_start(data);

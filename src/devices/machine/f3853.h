@@ -51,12 +51,15 @@ public:
 	// construction/destruction
 	f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// interrupt vector is a mask option on 3851 and 3856
+	void set_int_vector(u16 vector) { m_int_vector = vector; }
+
 	auto int_req_callback() { return m_int_req_callback.bind(); }
 	auto pri_out_callback() { return m_pri_out_callback.bind(); }
 	template<typename Object> void set_int_daisy_chain_callback(Object &&cb) { m_int_daisy_chain_callback = std::forward<Object>(cb); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read);
+	virtual DECLARE_WRITE8_MEMBER(write);
 
 	DECLARE_WRITE_LINE_MEMBER(ext_int_w);
 	DECLARE_WRITE_LINE_MEMBER(pri_in_w);
@@ -66,12 +69,13 @@ public:
 	IRQ_CALLBACK_MEMBER(int_acknowledge);
 
 protected:
+	f3853_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-private:
 	uint16_t timer_interrupt_vector() const { return m_int_vector & ~uint16_t(0x0080); }
 	uint16_t external_interrupt_vector() const { return m_int_vector | uint16_t(0x0080); }
 
@@ -83,6 +87,7 @@ private:
 	device_irq_acknowledge_delegate m_int_daisy_chain_callback;
 
 	uint16_t m_int_vector; // Bit 7 is set to 0 for timer interrupts, 1 for external interrupts
+	u8 m_prescaler;
 	bool m_external_enable;
 	bool m_timer_enable;
 
@@ -96,8 +101,17 @@ private:
 	uint8_t m_value_to_cycle[0x100];
 };
 
+class f3856_device : public f3853_device
+{
+public:
+	f3856_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
+};
 
 // device type definition
 DECLARE_DEVICE_TYPE(F3853, f3853_device)
+DECLARE_DEVICE_TYPE(F3856, f3856_device)
 
 #endif // MAME_MACHINE_F3853_H

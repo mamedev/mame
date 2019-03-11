@@ -4,14 +4,11 @@
 
     Acetronic Chess Traveller
 
-    TODO:
-    - Add emulation of the 3870 MCU to the F8 core, including timer interrupt
-      that is used by the Boris Diplomat.
-
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/f8/f8.h"
+#include "machine/f3853.h"
 #include "machine/timer.h"
 #include "chesstrv.lh"
 #include "borisdpl.lh"
@@ -82,8 +79,6 @@ private:
 
 	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_READ8_MEMBER(keypad_r);
-
-	//TIMER_DEVICE_CALLBACK_MEMBER(timer_interrupt);
 
 	output_finder<8> m_digits;
 	required_ioport_array<4> m_keypad;
@@ -156,7 +151,7 @@ READ8_MEMBER(borisdpl_state::keypad_r)
 		case 3:     data |= m_keypad[3]->read();    break;
 	}
 
-	return data;
+	return data | m_matrix;
 }
 
 
@@ -179,6 +174,7 @@ void borisdpl_state::borisdpl_io(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(borisdpl_state::keypad_r), FUNC(borisdpl_state::matrix_w));
 	map(0x01, 0x01).w(FUNC(borisdpl_state::display_w));
+	map(0x04, 0x07).rw("f3856", FUNC(f3856_device::read), FUNC(f3856_device::write));
 	map(0x04, 0x04).rw(FUNC(borisdpl_state::ram_r), FUNC(borisdpl_state::ram_w));
 	map(0x05, 0x05).rw(FUNC(borisdpl_state::ram_addr_r), FUNC(borisdpl_state::ram_addr_w));
 }
@@ -241,15 +237,8 @@ static INPUT_PORTS_START( borisdpl )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8")      PORT_CODE(KEYCODE_H)    PORT_CODE(KEYCODE_8)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("9/SET")   PORT_CODE(KEYCODE_S)    PORT_CODE(KEYCODE_9)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CE")      PORT_CODE(KEYCODE_DEL)
-
 INPUT_PORTS_END
 
-/*
-TIMER_DEVICE_CALLBACK_MEMBER(borisdpl_state::timer_interrupt)
-{
-    m_maincpu->set_input_line_and_vector(F8_INPUT_LINE_INT_REQ, HOLD_LINE, 0x20);
-}
-*/
 
 void chesstrv_base_state::machine_start()
 {
@@ -271,27 +260,32 @@ void borisdpl_state::machine_start()
 	m_digits.resolve();
 }
 
-MACHINE_CONFIG_START(chesstrv_state::chesstrv)
+void chesstrv_state::chesstrv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", F8, 3000000 )      // Fairchild 3870
-	MCFG_DEVICE_PROGRAM_MAP( chesstrv_mem )
-	MCFG_DEVICE_IO_MAP( chesstrv_io )
+	F8(config, m_maincpu, 3000000/2); // Fairchild 3870, measured ~3MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &chesstrv_state::chesstrv_mem);
+	m_maincpu->set_addrmap(AS_IO, &chesstrv_state::chesstrv_io);
 
 	/* video hardware */
 	config.set_default_layout(layout_chesstrv);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(borisdpl_state::borisdpl)
+void borisdpl_state::borisdpl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", F8, 30000000 )     // Motorola SC80265P
-	MCFG_DEVICE_PROGRAM_MAP( chesstrv_mem )
-	MCFG_DEVICE_IO_MAP( borisdpl_io )
+	F8(config, m_maincpu, 4000000/2); // Motorola SC80265P, frequency guessed
+	m_maincpu->set_addrmap(AS_PROGRAM, &borisdpl_state::chesstrv_mem);
+	m_maincpu->set_addrmap(AS_IO, &borisdpl_state::borisdpl_io);
+	m_maincpu->set_irq_acknowledge_callback("f3856", FUNC(f3856_device::int_acknowledge));
+
+	f3856_device &f3856(F3856(config, "f3856", 4000000/2));
+	f3856.set_int_vector(0x5020);
+	f3856.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	/* video hardware */
 	config.set_default_layout(layout_borisdpl);
-
-	//TIMER(config, "timer_interrupt").configure_periodic(FUNC(borisdpl_state::timer_interrupt), attotime::from_hz(40));
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( chesstrv )
