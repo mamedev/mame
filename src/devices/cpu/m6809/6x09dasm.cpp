@@ -908,7 +908,7 @@ void m6x09_disassembler::indirect(std::ostream &stream, uint8_t pb, const data_b
 		break;
 
 	case 0x8c:  // (+/- 7 bit offset),PC
-		offset = (int8_t)params.r8(p);
+		offset = (int8_t)params.r8(p++);
 		util::stream_format(stream, "%s", (offset < 0) ? "-" : "");
 		util::stream_format(stream, "$%02X,PC", (offset < 0) ? -offset : offset);
 		break;
