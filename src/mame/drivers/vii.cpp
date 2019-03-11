@@ -2514,7 +2514,7 @@ CONS( 200?, lexizeus,    0,       0,        lexizeus, lexizeus, spg2xx_game_stat
 
 // valid looking code, but extended periperhal area (twice the size?) makes use of unemulated opcode 0xfe00 ?
 CONS( 2011, wrlshunt,  0,       0,        non_spg_base, wirels60, spg2xx_game_state, empty_init, "Hamy / Kids Station Toys Inc",                      "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-// extended opcode,s different internal map?
+// extended opcodes different internal map?
 CONS( 2009, smartfp,   0,       0,        non_spg_base, wirels60, spg2xx_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
 
