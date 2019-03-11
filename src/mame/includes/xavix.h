@@ -907,21 +907,6 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
 
-	void init_jpopira()
-	{
-		init_xavix();
-#if 0	
-		// SEEPROM init stuff?
-		uint8_t *rom = memregion("bios")->base();
-
-		rom[0xcbfe] = 0xea;
-		rom[0xcbff] = 0xea;
-
-		rom[0xcc04] = 0xea;
-		rom[0xcc05] = 0xea;
-#endif
-	};
-
 protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
