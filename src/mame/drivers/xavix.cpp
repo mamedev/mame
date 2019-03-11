@@ -634,6 +634,21 @@ static INPUT_PORTS_START( taikodp )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xavix_i2c_cart_state,i2c_r, nullptr)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( jpopira )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pad 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Pad 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Pad 3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pad 4")
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xavix_i2c_cart_state,i2c_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
+INPUT_PORTS_END
+
+
 
 static INPUT_PORTS_START( xavixp )
 	PORT_INCLUDE(xavix)
@@ -1559,8 +1574,18 @@ void xavix_i2c_cart_state::xavix_i2c_taiko(machine_config &config)
 
 	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
 	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
+}
 
-	// do any of the later G/P series carts with SEEPROM work with this too? check
+void xavix_i2c_cart_state::xavix_i2c_jpopira(machine_config &config)
+{
+	xavix_cart(config);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24LC02
+
+	SOFTWARE_LIST(config, "cart_list_jpopira_jp").set_original("jpopira_jp"); // NOTE, these are for Jumping Popira only, they don't work with the karaoke or regular popira units
+	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
 }
 
 void xavix_cart_state::xavix_cart_ekara(machine_config &config)
@@ -1582,7 +1607,6 @@ void xavix_cart_state::xavix_cart_ekara(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list_japan_a").set_original("ekara_japan_a");
 	SOFTWARE_LIST(config, "cart_list_japan_gk").set_original("ekara_japan_gk");
 	SOFTWARE_LIST(config, "cart_list_japan_bh").set_original("ekara_japan_bh");
-	SOFTWARE_LIST(config, "cart_list_jpopira_jp").set_original("jpopira_jp"); // NOTE, these are for Jumping Popira only, they don't work with the karaoke or regular popira units
 }
 
 void xavix_cart_state::xavix_cart_popira(machine_config &config)
@@ -1891,6 +1915,15 @@ ROM_START( taikodp )
 	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
 
+ROM_START( jpopira )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "jumpingpopira.bin", 0x600000, 0x200000, CRC(a7bedbd2) SHA1(d62d4ca660c8df14891217fb7b7a2b4a931ff35f) )
+	ROM_RELOAD(0x000000, 0x200000)
+
+	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 ) // maybe we can remove this eventually, but for now it won't init without a reset between
+	ROM_LOAD( "i2cmem.bin", 0x000, 0x100, CRC(70a05af1) SHA1(e8f4ab51445777fe459f9ff09333f548c4e3507c) )
+ROM_END
+
 ROM_START( evio )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "evio.bin", 0x600000, 0x200000, CRC(ee22c764) SHA1(f2b7e213eb78065a63ef484a619bcfc61299e30e))
@@ -2008,6 +2041,9 @@ CONS( 2002, popira2,  0,           0,  xavix_cart_popira,popira2,  xavix_popira2
 
 CONS( 2003, taikodp,  0,           0,  xavix_i2c_taiko,  taikodp,  xavix_i2c_cart_state, init_xavix,    "Takara / SSD Company LTD",                     "Taiko De Popira (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? are the drums analog?
 
+CONS( 2004, jpopira,  0,           0,  xavix_i2c_jpopira,jpopira,  xavix_i2c_cart_state, init_xavix,    "Takara / SSD Company LTD",                     "Jumping Popira (Japan)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ )
+
+
 CONS( 2003, evio,     0,           0,  xavix_nv,         evio,     xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Evio (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? it's a violin controller
 
 
@@ -2020,7 +2056,7 @@ CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04,  ltv_tam,xavix_i2c_ltv_
    these use the SSD 2000 NEC 85605-621 type CPU
 
    XavixPort Golf is "SSD 2003 SuperXaviX MXIC 2003 3009" (not dumped yet, but actually marked as SuperXaviX unlike the others!)
-
+   
    This CPU type adds extra opcodes that don't appear to be present in the 97/98 types
    It does not appear to support the bitmap modes or 16-bit ROMs found in the 2002 type
 */

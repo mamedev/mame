@@ -903,6 +903,7 @@ public:
 	{ }
 
 	void xavix_i2c_taiko(machine_config &config);
+	void xavix_i2c_jpopira(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
 

@@ -9,49 +9,67 @@
         die markings show
         "SunPlus QL8041" ( also known as Sunplus SPG240 & PAC300 )
 
-        (all GameKeyReady units?)
-        Disney Princess (GKR)
-        Wheel of Fortune (GKR)
-        JAKKS WWE (GKR)
-        Fantastic 4 (GKR)
-        Justice League (GKR)
-        Dora the Explorer Nursery Rhyme (GKR)
-        Dora the Explorer Play Park (GKR)
-		Spiderman 5-in-1 (GKR)
-		etc.
+			(all GameKeyReady units?)
+			Disney Princess (GKR)
+			Wheel of Fortune (GKR)
+			JAKKS WWE (GKR)
+			Fantastic 4 (GKR)
+			Justice League (GKR)
+			Dora the Explorer Nursery Rhyme (GKR)
+			Dora the Explorer Play Park (GKR)
+			Spiderman 5-in-1 (GKR)
+			etc.
 
-		(other non GKR JAKKS games)
-		X-Men (Wolverine pad)
-		Avatar: The Last Airbender
+			(other non GKR JAKKS games)
+			X-Men (Wolverine pad)
+			Avatar: The Last Airbender
 
-		(other games)
-		Mattel Classic Sports
+			(other games)
+			Mattel Classic Sports
 
         "SunPlus QL8041C" ( known as Sunplus SPG2??, seems to be compatible with above, so probably just a chip revision )
-        Clickstart ( see clickstart.cpp instead)
-        Wheel of Fortune 2nd Edition
-		Spider-man - Villain Roundup
+	
+			Clickstart ( see clickstart.cpp instead)
+			Wheel of Fortune 2nd Edition
+			Spider-man - Villain Roundup
 
-        "SunPlus PA7801" ( known as Sunplus SPG110? ) see spg110.cpp instead
-        Classic Arcade Pinball
-        EA Sports (NHL95 + Madden 95)
-		Spiderman 5-in-1 (original release)
+		"SunPlus QU7074-P69A"
+
+			The Batman
+
+		--- 
 
         It is unknown if the following are close to this architecture or not (no dumps yet)
 
         "SunPlus QU7073-P69A"
-        Mortal Kombat
 
+			Mortal Kombat
+		
 		"Sunplus PU7799-P680?" (difficult to read)
-		Mission Paintball
+
+			Mission Paintball
 
         "Sunplus QL8167"
-        Disney Princess (newer?)
-        Go Diego Go
-		Shrek - Over the Hedge (this unit shows a GameKey Unlock More Games' on startup, but has no port, not even on the internal PCB)
-		Marvel Heroes (Spider-man)
-		Spiderman 3 (Movie - black) 
 
+			Disney Princess (newer?)
+			Go Diego Go
+			Shrek - Over the Hedge (this unit shows a GameKey Unlock More Games' on startup, but has no port, not even on the internal PCB)
+			Marvel Heroes (Spider-man)
+			Spiderman 3 (Movie - black)
+
+		---
+
+		These are definitely different
+
+        "SunPlus PA7801" ( known as Sunplus SPG110? ) see spg110.cpp instead
+
+			Classic Arcade Pinball
+			EA Sports (NHL95 + Madden 95)
+			Spiderman 5-in-1 (original release)
+
+		"GCM394" (this is clearly newer, has extra opcodes, different internal map etc.)
+
+			Smart Fit Park
 
 	Status:
 
@@ -2244,6 +2262,13 @@ ROM_START( dreamlif )
 	ROM_LOAD16_WORD_SWAP( "dreamlife.bin", 0x000000, 0x800000, CRC(632e0237) SHA1(a8586e8a626d75cf7782f13cfd9f1b938af23d56) )
 ROM_END
 
+ROM_START( smartfp )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "smartfitpark.bin", 0x000000, 0x800000, CRC(ada84507) SHA1(a3a80bf71fae62ebcbf939166a51d29c24504428) )
+ROM_END
+
+
+
 ROM_START( icanguit )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	// no internal ROM, requires a cartridge
@@ -2474,8 +2499,10 @@ CONS( 2005, mattelcs,  0,        0, rad_skat, mattelcs,   spg2xx_game_state, emp
 // Hasbro games
 CONS( 2007, dreamlif,  0,        0, rad_skat, rad_crik,   spg2xx_game_state, empty_init, "Hasbro", "Dream Life",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2007, icanguit,  0,        0, icanguit, icanguit,   icanguit_state, empty_init, "Mattel / Fisher-Price", "I Can Play Guitar",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2007, icanpian,  0,        0, icanpian, icanpian,   icanguit_state, empty_init, "Mattel / Fisher-Price", "I Can Play Piano",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+
+CONS( 2007, icanguit,  0,        0, icanguit, icanguit,   icanguit_state, empty_init, "Fisher-Price", "I Can Play Guitar",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, icanpian,  0,        0, icanpian, icanpian,   icanguit_state, empty_init, "Fisher-Price", "I Can Play Piano",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // might not fit here.  First 0x8000 bytes are blank (not too uncommon for these) then rest of rom looks like it's probably encrypted at least
 // could be later model VT based instead? even after decrypting (simple word xor) the vectors have a different format and are at a different location to the SunPlus titles
@@ -2487,6 +2514,9 @@ CONS( 200?, lexizeus,    0,       0,        lexizeus, lexizeus, spg2xx_game_stat
 
 // valid looking code, but extended periperhal area (twice the size?) makes use of unemulated opcode 0xfe00 ?
 CONS( 2011, wrlshunt,  0,       0,        non_spg_base, wirels60, spg2xx_game_state, empty_init, "Hamy / Kids Station Toys Inc",                      "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+// extended opcodes different internal map?
+CONS( 2009, smartfp,   0,       0,        non_spg_base, wirels60, spg2xx_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// Fun 2 Learn 3-in-1 SMART SPORTS  ?
 
 // NAND dumps w/ internal bootstrap. Almost certainly do not fit in this driver, as the SPG2xx can only address up to 4Mwords. These are 'GeneralPlus' instead?
 CONS( 2010, wlsair60,  0,       0,        non_spg_base, wirels60, spg2xx_game_state, empty_init, "Jungle Soft / Kids Station Toys Inc",               "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

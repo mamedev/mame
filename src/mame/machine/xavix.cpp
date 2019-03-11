@@ -547,12 +547,16 @@ CUSTOM_INPUT_MEMBER(xavix_ekara_state::ekara_multi1_r)
 
 uint8_t xavix_state::read_io0(uint8_t direction)
 {
+//	LOG("%s: read_io0\n", machine().describe_context());
+
 	// no special handling
 	return m_in0->read();
 }
 
 uint8_t xavix_state::read_io1(uint8_t direction)
 {
+//	LOG("%s: read_io1\n", machine().describe_context());
+
 	// no special handling
 	return m_in1->read();
 }
@@ -605,8 +609,15 @@ void xavix_i2c_ltv_tam_state::write_io1(uint8_t data, uint8_t direction)
 // for taikodp
 void xavix_i2c_cart_state::write_io1(uint8_t data, uint8_t direction)
 {
-	m_i2cmem->write_sda((data & 0x08) >> 3);
-	m_i2cmem->write_scl((data & 0x10) >> 4);
+	if (direction & 0x08)
+	{
+		m_i2cmem->write_sda((data & 0x08) >> 3);
+	}
+
+	if (direction & 0x10)
+	{
+		m_i2cmem->write_scl((data & 0x10) >> 4);
+	}
 }
 
 void xavix_ekara_state::write_io0(uint8_t data, uint8_t direction)
@@ -713,14 +724,14 @@ READ8_MEMBER(xavix_state::io1_direction_r)
 WRITE8_MEMBER(xavix_state::io0_data_w)
 {
 	m_io0_data = data;
-	write_io0(data, m_io0_direction);
+	write_io0((data & m_io0_direction) | (read_io0(m_io0_direction) & ~m_io0_direction), m_io0_direction);
 	LOG("%s: io0_data_w %02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(xavix_state::io1_data_w)
 {
 	m_io1_data = data;
-	write_io1(data, m_io1_direction);
+	write_io1((data & m_io1_direction) | (read_io1(m_io1_direction) & ~m_io1_direction), m_io1_direction);
 	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data);
 }
 
