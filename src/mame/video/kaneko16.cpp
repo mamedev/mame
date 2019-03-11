@@ -91,7 +91,7 @@ uint32_t kaneko16_state::screen_update_kaneko16(screen_device &screen, bitmap_in
 	if (!m_disp_enable) return 0;
 
 	screen_update_common(screen, bitmap, cliprect);
-	m_kaneko_spr->kaneko16_render_sprites(bitmap,cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
+	m_kaneko_spr->render_sprites(bitmap,cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
 	return 0;
 }
 
@@ -241,6 +241,6 @@ uint32_t kaneko16_berlwall_state::screen_update_berlwall(screen_device &screen, 
 	if (!m_disp_enable) return 0;
 
 	screen_update_common(screen, bitmap, cliprect);
-	m_kaneko_spr->kaneko16_render_sprites(bitmap,cliprect, screen.priority(), m_spriteram, m_spriteram.bytes()/2);
+	m_kaneko_spr->render_sprites(bitmap,cliprect, screen.priority(), m_spriteram, m_spriteram.bytes()/2);
 	return 0;
 }

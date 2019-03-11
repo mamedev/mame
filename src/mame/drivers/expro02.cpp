@@ -360,7 +360,7 @@ uint32_t expro02_state::screen_update_backgrounds(screen_device &screen, bitmap_
 uint32_t expro02_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update_backgrounds(screen, bitmap, cliprect);
-	m_kaneko_spr->kaneko16_render_sprites(bitmap,cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
+	m_kaneko_spr->render_sprites(bitmap,cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
 	return 0;
 }
 
@@ -661,7 +661,7 @@ void expro02_state::expro02_video_base_map(address_map &map)
 	map(0x600000, 0x600fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // palette?
 	map(0x680000, 0x68001f).rw(m_view2_0, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
 	map(0x700000, 0x700fff).ram().share("spriteram");    // sprites? 0x72f words tested
-	map(0x780000, 0x78001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
+	map(0x780000, 0x78001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::regs_r), FUNC(kaneko16_sprite_device::regs_w));
 	map(0xd80000, 0xd80001).w(m_view2_0, FUNC(kaneko_view2_tilemap_device::galsnew_vram_1_tilebank_w));   /* ??? */
 	map(0xe80000, 0xe80001).w(m_view2_0, FUNC(kaneko_view2_tilemap_device::galsnew_vram_0_tilebank_w));   /* ??? */
 }
@@ -674,7 +674,7 @@ void expro02_state::expro02_video_base_map_noview2(address_map &map)
 	map(0x600000, 0x600fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // palette?
 	map(0x680000, 0x68001f).noprw(); // games still makes leftover accesses
 	map(0x700000, 0x700fff).ram().share("spriteram");    // sprites? 0x72f words tested
-	map(0x780000, 0x78001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
+	map(0x780000, 0x78001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::regs_r), FUNC(kaneko16_sprite_device::regs_w));
 	map(0xd80000, 0xd80001).noprw(); // games still makes leftover accesses
 	map(0xe80000, 0xe80001).noprw(); // games still makes leftover accesses
 }
