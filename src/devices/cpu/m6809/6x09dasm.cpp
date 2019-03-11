@@ -909,15 +909,13 @@ void m6x09_disassembler::indexed(std::ostream &stream, uint8_t pb, const data_bu
 
 	case 0x8c:  // (+/- 7 bit offset),PC
 		offset = (int8_t)params.r8(p++);
-		util::stream_format(stream, "%s", (offset < 0) ? "-" : "");
-		util::stream_format(stream, "$%02X,PC", (offset < 0) ? -offset : offset);
+		util::stream_format(stream, "$%04X,PCR", (p+offset)); // PC Relative addressing (assembler computes offset from specified absolute address)
 		break;
 
 	case 0x8d:  // (+/- 15 bit offset),PC
 		offset = (int16_t)params.r16(p);
 		p += 2;
-		util::stream_format(stream, "%s", (offset < 0) ? "-" : "");
-		util::stream_format(stream, "$%04X,PC", (offset < 0) ? -offset : offset);
+		util::stream_format(stream, "$%04X,PCR", (p+offset)); // PC Relative addressing (assembler computes offset from specified absolute address)
 		break;
 
 	case 0x8e:  // (+/- W),R
