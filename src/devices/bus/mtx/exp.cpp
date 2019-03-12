@@ -43,7 +43,8 @@ device_mtx_exp_interface::device_mtx_exp_interface(const machine_config &mconfig
 mtx_exp_slot_device::mtx_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MTX_EXP_SLOT, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
-	, m_io(nullptr)
+	, m_program(*this, finder_base::DUMMY_TAG, -1)
+	, m_io(*this, finder_base::DUMMY_TAG, -1)
 	, m_card(nullptr)
 	, m_busreq_handler(*this)
 	, m_int_handler(*this)
@@ -89,24 +90,6 @@ void mtx_exp_slot_device::device_reset()
 {
 }
 
-
-//-------------------------------------------------
-//  set_program_space - set address space we are attached to
-//-------------------------------------------------
-
-void mtx_exp_slot_device::set_program_space(address_space *program)
-{
-	m_program = program;
-}
-
-//-------------------------------------------------
-//  set_io_space - set address space we are attached to
-//-------------------------------------------------
-
-void mtx_exp_slot_device::set_io_space(address_space *io)
-{
-	m_io = io;
-}
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( mtx_exp_devices )

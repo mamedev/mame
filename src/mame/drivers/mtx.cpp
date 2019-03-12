@@ -338,6 +338,8 @@ void mtx_state::mtx512(machine_config &config)
 
 	/* rs232 board with disk drive bus */
 	MTX_EXP_SLOT(config, m_exp, mtx_expansion_devices, nullptr);
+	m_exp->set_program_space(m_maincpu, AS_PROGRAM);
+	m_exp->set_io_space(m_maincpu, AS_IO);
 	m_exp->int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_exp->busreq_handler().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);

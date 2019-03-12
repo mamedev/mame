@@ -565,10 +565,6 @@ void mtx_state::machine_start()
 
 	/* install 4000h bytes common block */
 	program.install_ram(0xc000, 0xffff, m_ram->pointer());
-
-	/* setup expansion slot */
-	m_exp->set_program_space(&m_maincpu->space(AS_PROGRAM));
-	m_exp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 void mtx_state::machine_reset()

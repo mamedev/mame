@@ -37,8 +37,8 @@ public:
 
 	mtx_exp_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 
-	void set_program_space(address_space *program);
-	void set_io_space(address_space *io);
+	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io.set_tag(std::forward<T>(tag), spacenum); }
 
 	// callbacks
 	auto busreq_handler() { return m_busreq_handler.bind(); }
@@ -49,8 +49,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
 
-	address_space *m_program;
-	address_space *m_io;
+	// address spaces we are attached to
+	required_address_space m_program;
+	required_address_space m_io;
 
 protected:
 	// device-level overrides
