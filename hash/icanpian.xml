@@ -48,7 +48,7 @@
 	47 ground   48 Gnd	
 -->
 
-<softwarelist name="icanpian_cart" description="Fisher-Price / Mattel I Can Play Piano cartridges">
+<softwarelist name="icanpian" description="Fisher-Price / Mattel I Can Play Piano cartridges">
 	<software name="pianfav" supported="no">
 		<description>Piano Favorites (J7522)</description>
 		<year>2005</year>

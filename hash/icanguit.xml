@@ -43,7 +43,7 @@
  
 -->
 
-<softwarelist name="icanguit_cart" description="Fisher-Price / Mattel I Can Play Guitar cartridges">
+<softwarelist name="icanguit" description="Fisher-Price / Mattel I Can Play Guitar cartridges">
 	<software name="guitfav" supported="no">
 		<description>Guitar Favorites (K7357)</description>
 		<year>2007</year>
