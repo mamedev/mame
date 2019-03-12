@@ -82,7 +82,7 @@ void bbc_beebspch_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE8_MEMBER(bbc_beebspch_device::pb_w)
+void bbc_beebspch_device::pb_w(uint8_t data)
 {
 	switch (data & 0xc0)
 	{

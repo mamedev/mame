@@ -64,8 +64,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cb1_w) { m_cb1_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER(cb2_w) { m_cb2_handler(state); }
 
-	DECLARE_READ8_MEMBER(pb_r);
-	DECLARE_WRITE8_MEMBER(pb_w);
+	uint8_t pb_r();
+	void pb_w(uint8_t data);
 
 protected:
 	// device-level overrides
@@ -86,8 +86,8 @@ private:
 class device_bbc_joyport_interface : public device_slot_card_interface
 {
 public:
-	virtual DECLARE_READ8_MEMBER(pb_r) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(pb_w) { }
+	virtual uint8_t pb_r() { return 0xff; }
+	virtual void pb_w(uint8_t data) { }
 
 protected:
 	device_bbc_joyport_interface(const machine_config &mconfig, device_t &device);

@@ -156,10 +156,10 @@ WRITE8_MEMBER(bbc_mertec_device::sheila_w)
 
 READ8_MEMBER(bbc_mertec_device::pb_r)
 {
-	return m_userport->pb_r(space, 0);
+	return m_userport->pb_r();
 }
 
 WRITE8_MEMBER(bbc_mertec_device::pb_w)
 {
-	m_userport->pb_w(space, 0, data);
+	m_userport->pb_w(data);
 }
