@@ -52,7 +52,7 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 #define LOG_PPU             (LOG_PPU_READS | LOG_PPU_WRITES | LOG_UNKNOWN_PPU)
 #define LOG_ALL             (LOG_IO | LOG_SPU | LOG_PPU | LOG_VLINES | LOG_SEGMENT | LOG_FIQ)
 
-//#define VERBOSE             (LOG_SPU &~ LOG_BEAT)
+#define VERBOSE             (0)
 #include "logmacro.h"
 
 #define SPG_DEBUG_VIDEO     (0)
@@ -443,7 +443,7 @@ void spg2xx_device::blit_page(const rectangle &cliprect, uint32_t scanline, int 
 		if (!tile)
 			continue;
 
-		palette = space.read_word(palette_map + tile_address / 2);
+		palette = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
 		if (x0 & 1)
 			palette >>= 8;
 
@@ -2624,12 +2624,13 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 			break;
 
 		case AUDIO_CONTROL:
-			LOGMASKED(LOG_SPU_WRITES, "audio_w: Control: %04x (SOFTCH:%d, COMPEN:%d, NOHIGH:%d, NOINT:%d, EQEN:%d\n", data
+			LOGMASKED(LOG_SPU_WRITES, "audio_w: Control: %04x (SOFTCH:%d, COMPEN:%d, NOHIGH:%d, NOINT:%d, EQEN:%d, VOLSEL:%d)\n", data
 				, (data & AUDIO_CONTROL_SOFTCH_MASK) ? 1 : 0
 				, (data & AUDIO_CONTROL_COMPEN_MASK) ? 1 : 0
 				, (data & AUDIO_CONTROL_NOHIGH_MASK) ? 1 : 0
 				, (data & AUDIO_CONTROL_NOINT_MASK) ? 1 : 0
-				, (data & AUDIO_CONTROL_EQEN_MASK) ? 1 : 0);
+				, (data & AUDIO_CONTROL_EQEN_MASK) ? 1 : 0
+				, (data & AUDIO_CONTROL_VOLSEL_MASK) >> AUDIO_CONTROL_VOLSEL_SHIFT);
 			m_audio_regs[offset] = data & AUDIO_CONTROL_MASK;
 			break;
 
@@ -2937,8 +2938,19 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			}
 		}
 
-		left_total >>= 4;
-		right_total >>= 4;
+		switch (get_vol_sel())
+		{
+			case 0: // 1/16
+				left_total >>= 4;
+				right_total >>= 4;
+				break;
+			case 1: // 1/4
+			case 2: // 1
+			case 3: // 2 // Both x1 and x2 clip like mad even with only 6 voices. Hack it for now.
+				left_total >>= 2;
+				right_total >>= 2;
+				break;
+		}
 		*out_l++ = (left_total * (int16_t)m_audio_regs[AUDIO_MAIN_VOLUME]) >> 7;
 		*out_r++ = (right_total * (int16_t)m_audio_regs[AUDIO_MAIN_VOLUME]) >> 7;
 	}
@@ -3148,11 +3160,9 @@ void spg2xx_device::audio_beat_tick()
 				LOGMASKED(LOG_BEAT, "Beat count elapsed but IRQ not enabled\n");
 			}
 		}
-		else
-		{
-			beat_count--;
-			m_audio_regs[AUDIO_BEAT_COUNT] = (m_audio_regs[AUDIO_BEAT_COUNT] & ~AUDIO_BEAT_COUNT_MASK) | beat_count;
-		}
+
+		beat_count--;
+		m_audio_regs[AUDIO_BEAT_COUNT] = (m_audio_regs[AUDIO_BEAT_COUNT] & ~AUDIO_BEAT_COUNT_MASK) | beat_count;
 	}
 	m_audio_curr_beat_base_count--;
 }

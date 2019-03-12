@@ -111,6 +111,7 @@ protected:
 	bool get_manual_envelope_enable(const offs_t channel) const { return m_audio_regs[AUDIO_CHANNEL_ENV_MODE] & (1 << channel); }
 	bool get_auto_envelope_enable(const offs_t channel) const { return !get_manual_envelope_enable(channel); }
 	uint32_t get_envelope_clock(const offs_t channel) const;
+	uint16_t get_vol_sel() const { return (m_audio_regs[AUDIO_CONTROL] & AUDIO_CONTROL_VOLSEL_MASK) >> AUDIO_CONTROL_VOLSEL_SHIFT; }
 
 	// Audio Mode getters
 	uint16_t get_wave_addr_high(const offs_t channel) const { return m_audio_regs[(channel << 4) | AUDIO_MODE] & AUDIO_WADDR_HIGH_MASK; }
