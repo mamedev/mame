@@ -32665,6 +32665,7 @@ breakout                        // (c) 1976 Atari
 pong                            // (c) 1972 Atari
 pongd                           // (c) 1973 Atari
 pongf                           // (c) 1972 Atari
+rebound                         //
 
 @source:poolshrk.cpp
 poolshrk                        // 006281           1977/06 [6800]
