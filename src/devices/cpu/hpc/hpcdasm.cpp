@@ -66,7 +66,7 @@ hpc_disassembler::hpc_disassembler(const char *const regs[])
 {
 }
 
-util::u32 hpc_disassembler::opcode_alignment() const
+u32 hpc_disassembler::opcode_alignment() const
 {
 	return 1;
 }
@@ -79,7 +79,7 @@ void hpc_disassembler::format_register(std::ostream &stream, u16 reg) const
 		if (name != nullptr)
 		{
 			stream << name;
-			if (util::BIT(reg, 0))
+			if (BIT(reg, 0))
 				stream << "+1";
 			return;
 		}
@@ -160,7 +160,7 @@ void hpc_disassembler::disassemble_unary_op(std::ostream &stream, const char *op
 
 void hpc_disassembler::disassemble_bit_op(std::ostream &stream, const char *op, u8 bit, u16 offset, u16 src, bool indir, bool idx) const
 {
-	if (src >= 0x00c0 && src < 0x01c0 && util::BIT(src, 0) && !indir && m_regs[(src - 0x00c0) >> 1] != nullptr)
+	if (src >= 0x00c0 && src < 0x01c0 && BIT(src, 0) && !indir && m_regs[(src - 0x00c0) >> 1] != nullptr)
 	{
 		src &= 0xfffe;
 		bit += 8;
@@ -178,7 +178,7 @@ void hpc_disassembler::disassemble_bit_op(std::ostream &stream, const char *op, 
 		stream << "].b";
 }
 
-util::disasm_interface::offs_t hpc_disassembler::disassemble(std::ostream &stream, util::disasm_interface::offs_t pc, const hpc_disassembler::data_buffer &opcodes, const hpc_disassembler::data_buffer &params)
+offs_t hpc_disassembler::disassemble(std::ostream &stream, offs_t pc, const hpc_disassembler::data_buffer &opcodes, const hpc_disassembler::data_buffer &params)
 {
 	u8 opcode = opcodes.r8(pc);
 	u16 reg = REGISTER_A;
@@ -253,7 +253,7 @@ util::disasm_interface::offs_t hpc_disassembler::disassemble(std::ostream &strea
 	case 0xa0:
 		dmode = true;
 		indir = false;
-		if (util::BIT(opcode, 1))
+		if (BIT(opcode, 1))
 			imm = true;
 
 		src = opcodes.r8(pc + 1);
@@ -266,7 +266,7 @@ util::disasm_interface::offs_t hpc_disassembler::disassemble(std::ostream &strea
 	case 0xa4:
 		dmode = true;
 		indir = false;
-		if (util::BIT(opcode, 1))
+		if (BIT(opcode, 1))
 			imm = true;
 
 		src = (opcodes.r8(pc + 1) << 8) | opcodes.r8(pc + 2);
@@ -279,7 +279,7 @@ util::disasm_interface::offs_t hpc_disassembler::disassemble(std::ostream &strea
 	case 0xa1:
 		dmode = true;
 		indir = false;
-		if (util::BIT(opcode, 1))
+		if (BIT(opcode, 1))
 			imm = true;
 
 		src = opcodes.r8(pc + 1);
@@ -300,7 +300,7 @@ util::disasm_interface::offs_t hpc_disassembler::disassemble(std::ostream &strea
 	case 0xa5:
 		dmode = true;
 		indir = false;
-		if (util::BIT(opcode, 1))
+		if (BIT(opcode, 1))
 			imm = true;
 
 		src = (opcodes.r8(pc + 1) << 8) | opcodes.r8(pc + 2);
@@ -583,17 +583,17 @@ util::disasm_interface::offs_t hpc_disassembler::disassemble(std::ostream &strea
 	case 0xd4:
 	case 0xe4:
 	case 0xf4:
-		disassemble_op(stream, "ld", reg, src, imm, indir, idx, util::BIT(opcode, 5));
+		disassemble_op(stream, "ld", reg, src, imm, indir, idx, BIT(opcode, 5));
 		break;
 
 	case 0x89:
 	case 0xa9:
-		disassemble_unary_op(stream, "inc", reg, src, indir, idx, util::BIT(opcode, 5));
+		disassemble_unary_op(stream, "inc", reg, src, indir, idx, BIT(opcode, 5));
 		break;
 
 	case 0x8a:
 	case 0xaa:
-		disassemble_unary_op(stream, "decsz", reg, src, indir, idx, util::BIT(opcode, 5));
+		disassemble_unary_op(stream, "decsz", reg, src, indir, idx, BIT(opcode, 5));
 		bytes |= STEP_OVER | (1 << OVERINSTSHIFT);
 		break;
 
@@ -603,7 +603,7 @@ util::disasm_interface::offs_t hpc_disassembler::disassemble(std::ostream &strea
 	case 0xd6:
 	case 0xe6:
 	case 0xf6:
-		disassemble_op(stream, dmode ? "ld" : "st", reg, src, imm, indir, idx, util::BIT(opcode, 5));
+		disassemble_op(stream, dmode ? "ld" : "st", reg, src, imm, indir, idx, BIT(opcode, 5));
 		break;
 
 	case 0x8d:
@@ -619,7 +619,7 @@ util::disasm_interface::offs_t hpc_disassembler::disassemble(std::ostream &strea
 	case 0xd5:
 	case 0xe5:
 	case 0xf5:
-		disassemble_op(stream, "x", reg, src, imm, indir, idx, util::BIT(opcode, 5));
+		disassemble_op(stream, "x", reg, src, imm, indir, idx, BIT(opcode, 5));
 		break;
 
 	case 0x94: case 0x95:
@@ -631,35 +631,35 @@ util::disasm_interface::offs_t hpc_disassembler::disassemble(std::ostream &strea
 		break;
 
 	case 0x98: case 0xb8: case 0xd8: case 0xf8:
-		disassemble_op(stream, "add", reg, src, imm, indir, idx, util::BIT(opcode, 5));
+		disassemble_op(stream, "add", reg, src, imm, indir, idx, BIT(opcode, 5));
 		break;
 
 	case 0x99: case 0xb9: case 0xd9: case 0xf9:
-		disassemble_op(stream, "and", reg, src, imm, indir, idx, util::BIT(opcode, 5));
+		disassemble_op(stream, "and", reg, src, imm, indir, idx, BIT(opcode, 5));
 		break;
 
 	case 0x9a: case 0xba: case 0xda: case 0xfa:
-		disassemble_op(stream, "or", reg, src, imm, indir, idx, util::BIT(opcode, 5));
+		disassemble_op(stream, "or", reg, src, imm, indir, idx, BIT(opcode, 5));
 		break;
 
 	case 0x9b: case 0xbb: case 0xdb: case 0xfb:
-		disassemble_op(stream, "xor", reg, src, imm, indir, idx, util::BIT(opcode, 5));
+		disassemble_op(stream, "xor", reg, src, imm, indir, idx, BIT(opcode, 5));
 		break;
 
 	case 0x9c: case 0xbc: case 0xdc: case 0xfc:
-		disassemble_op(stream, "ifeq", reg, src, imm, indir, idx, util::BIT(opcode, 5));
+		disassemble_op(stream, "ifeq", reg, src, imm, indir, idx, BIT(opcode, 5));
 		break;
 
 	case 0x9d: case 0xbd: case 0xdd: case 0xfd:
-		disassemble_op(stream, "ifgt", reg, src, imm, indir, idx, util::BIT(opcode, 5));
+		disassemble_op(stream, "ifgt", reg, src, imm, indir, idx, BIT(opcode, 5));
 		break;
 
 	case 0x9e: case 0xbe: case 0xde: case 0xfe:
-		disassemble_op(stream, "mult", reg, src, imm, indir, idx, util::BIT(opcode, 5));
+		disassemble_op(stream, "mult", reg, src, imm, indir, idx, BIT(opcode, 5));
 		break;
 
 	case 0x9f: case 0xbf: case 0xdf: case 0xff:
-		disassemble_op(stream, "div", reg, src, imm, indir, idx, util::BIT(opcode, 5));
+		disassemble_op(stream, "div", reg, src, imm, indir, idx, BIT(opcode, 5));
 		break;
 
 	case 0xa7:
@@ -694,65 +694,65 @@ util::disasm_interface::offs_t hpc_disassembler::disassemble(std::ostream &strea
 	case 0xc0: case 0xc2:
 	case 0xe0: case 0xe2:
 		util::stream_format(stream, "%-8sA,[B%c].%c", "lds",
-			util::BIT(opcode, 1) ? '-' : '+',
-			util::BIT(opcode, 5) ? 'w' : 'b');
+			BIT(opcode, 1) ? '-' : '+',
+			BIT(opcode, 5) ? 'w' : 'b');
 		bytes |= STEP_OVER | (1 << OVERINSTSHIFT);
 		break;
 
 	case 0xd0: case 0xd2:
 	case 0xf0: case 0xf2:
 		util::stream_format(stream, "%-8sA,[X%c].%c", "ld",
-			util::BIT(opcode, 1) ? '-' : '+',
-			util::BIT(opcode, 5) ? 'w' : 'b');
+			BIT(opcode, 1) ? '-' : '+',
+			BIT(opcode, 5) ? 'w' : 'b');
 		break;
 
 	case 0xc1: case 0xc3:
 	case 0xe1: case 0xe3:
 		util::stream_format(stream, "%-8sA,[B%c].%c", "xs",
-			util::BIT(opcode, 1) ? '-' : '+',
-			util::BIT(opcode, 5) ? 'w' : 'b');
+			BIT(opcode, 1) ? '-' : '+',
+			BIT(opcode, 5) ? 'w' : 'b');
 		bytes |= STEP_OVER | (1 << OVERINSTSHIFT);
 		break;
 
 	case 0xd1: case 0xd3:
 	case 0xf1: case 0xf3:
 		util::stream_format(stream, "%-8sA,[X%c].%c", "x",
-			util::BIT(opcode, 1) ? '-' : '+',
-			util::BIT(opcode, 5) ? 'w' : 'b');
+			BIT(opcode, 1) ? '-' : '+',
+			BIT(opcode, 5) ? 'w' : 'b');
 		break;
 
 	case 0xc7: case 0xe7:
-		util::stream_format(stream, "%-8sA", util::BIT(opcode, 5) ? "shl" : "shr");
+		util::stream_format(stream, "%-8sA", BIT(opcode, 5) ? "shl" : "shr");
 		break;
 
 	case 0xd7: case 0xf7:
-		util::stream_format(stream, "%-8sA", util::BIT(opcode, 5) ? "rlc" : "rrc");
+		util::stream_format(stream, "%-8sA", BIT(opcode, 5) ? "rlc" : "rrc");
 		break;
 
 	case 0xc8: case 0xe8:
-		disassemble_op(stream, "adc", reg, src, imm, indir, idx, util::BIT(opcode, 5));
+		disassemble_op(stream, "adc", reg, src, imm, indir, idx, BIT(opcode, 5));
 		break;
 
 	case 0xc9: case 0xe9:
-		disassemble_op(stream, "dadc", reg, src, imm, indir, idx, util::BIT(opcode, 5));
+		disassemble_op(stream, "dadc", reg, src, imm, indir, idx, BIT(opcode, 5));
 		break;
 
 	case 0xca: case 0xea:
-		disassemble_op(stream, "dsubc", reg, src, imm, indir, idx, util::BIT(opcode, 5));
+		disassemble_op(stream, "dsubc", reg, src, imm, indir, idx, BIT(opcode, 5));
 		break;
 
 	case 0xcb: case 0xeb:
-		disassemble_op(stream, "subc", reg, src, imm, indir, idx, util::BIT(opcode, 5));
+		disassemble_op(stream, "subc", reg, src, imm, indir, idx, BIT(opcode, 5));
 		break;
 
 	case 0xcc: case 0xec:
 		stream << "jid";
-		if (util::BIT(opcode, 5))
+		if (BIT(opcode, 5))
 			stream << "w";
 		break;
 
 	case 0xcf: case 0xef:
-		disassemble_op(stream, "divd", reg, src, imm, indir, idx, util::BIT(opcode, 5));
+		disassemble_op(stream, "divd", reg, src, imm, indir, idx, BIT(opcode, 5));
 		break;
 
 	default:
