@@ -716,24 +716,34 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/coleco/ctrl.h,BUSES["COLECO"] = true
---@src/devices/bus/coleco/exp.h,BUSES["COLECO"] = true
+--@src/devices/bus/coleco/controller/ctrl.h,BUSES["COLECO_CONTROLLER"] = true
 ---------------------------------------------------
 
-if (BUSES["COLECO"]~=null) then
+if (BUSES["COLECO_CONTROLLER"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/coleco/ctrl.cpp",
-		MAME_DIR .. "src/devices/bus/coleco/ctrl.h",
-		MAME_DIR .. "src/devices/bus/coleco/hand.cpp",
-		MAME_DIR .. "src/devices/bus/coleco/hand.h",
-		MAME_DIR .. "src/devices/bus/coleco/sac.cpp",
-		MAME_DIR .. "src/devices/bus/coleco/sac.h",
-		MAME_DIR .. "src/devices/bus/coleco/exp.cpp",
-		MAME_DIR .. "src/devices/bus/coleco/exp.h",
-		MAME_DIR .. "src/devices/bus/coleco/std.cpp",
-		MAME_DIR .. "src/devices/bus/coleco/std.h",
-		MAME_DIR .. "src/devices/bus/coleco/xin1.h",
-		MAME_DIR .. "src/devices/bus/coleco/xin1.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/controller/ctrl.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/controller/ctrl.h",
+		MAME_DIR .. "src/devices/bus/coleco/controller/hand.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/controller/hand.h",
+		MAME_DIR .. "src/devices/bus/coleco/controller/sac.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/controller/sac.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/coleco/exp.h,BUSES["COLECO_CART"] = true
+---------------------------------------------------
+
+if (BUSES["COLECO_CART"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/coleco/cartridge/exp.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/cartridge/exp.h",
+		MAME_DIR .. "src/devices/bus/coleco/cartridge/std.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/cartridge/std.h",
+		MAME_DIR .. "src/devices/bus/coleco/cartridge/xin1.h",
+		MAME_DIR .. "src/devices/bus/coleco/cartridge/xin1.cpp",
 	}
 end
 
