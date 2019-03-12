@@ -2,18 +2,28 @@
 // copyright-holders:Wilbert Pol, hap
 /**********************************************************************
 
-Fairchild F3853 SRAM interface with integrated interrupt
-controller and timer (SMI)
+Fairchild F3853 SMI, F3851 PSU, F3856 PSU, F38T56 PSU
 
-This chip is a timer shift register, basically the same as in the
-F3851.
+This device only emulates the I/O, interrupt, timer functions. Not the
+low-level ROMC signals.
 
-Based on a datasheet obtained from www.freetradezone.com
+F3853: Static memory interface with integrated interrupt controller and timer.
 
-8-bit shift register:
+The timer is a shift register:
 Feedback in0 = !((out3 ^ out4) ^ (out5 ^ out7))
 Interrupts are at 0xfe
 0xff stops the register (0xfe is never reached)
+
+F3851: Program Storage Unit, same timer and interrupt controller as F3853,
+but has 2 I/O ports instead of a programmable interrupt vector.
+
+F3856/F38T56 Program Storage Unit: similar interrupt controller, timer
+is more versatile, a simple downcounter instead of shift register.
+
+TODO:
+- emulate at lower level and place this stuff into devices/cpu/f8 folder
+- interrupt priority pin
+- 3856/38T56 timer pulse counter mode, event counter mode
 
 **********************************************************************/
 
@@ -21,18 +31,16 @@ Interrupts are at 0xfe
 #include "f3853.h"
 
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
 // device type definition
-DEFINE_DEVICE_TYPE(F3853, f3853_device, "f3853_device", "F3853 SMI")
-DEFINE_DEVICE_TYPE(F3851, f3851_device, "f3851_device", "F3851 PSU")
-DEFINE_DEVICE_TYPE(F3856, f3856_device, "f3856_device", "F3856 PSU")
-DEFINE_DEVICE_TYPE(F38T56, f38t56_device, "f38t56_device", "F38T56 PSU")
+
+DEFINE_DEVICE_TYPE(F3853, f3853_device, "f3853_smi", "Fairchild F3853 SMI")
+DEFINE_DEVICE_TYPE(F3851, f3851_device, "f3851_psu", "Fairchild F3851 PSU")
+DEFINE_DEVICE_TYPE(F3856, f3856_device, "f3856_psu", "Fairchild F3856 PSU")
+DEFINE_DEVICE_TYPE(F38T56, f38t56_device, "f38t56_psu", "Fairchild F38T56 PSU")
+
 
 //-------------------------------------------------
-//  f3853_device - constructor
+//  constructor
 //-------------------------------------------------
 
 f3853_device::f3853_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
@@ -72,6 +80,11 @@ f38t56_device::f38t56_device(const machine_config &mconfig, const char *tag, dev
 { }
 
 
+
+//-------------------------------------------------
+//  initialisation
+//-------------------------------------------------
+
 void f3853_device::device_resolve_objects()
 {
 	m_int_req_callback.resolve_safe();
@@ -90,11 +103,6 @@ void f3851_device::device_resolve_objects()
 		cb.resolve_safe();
 }
 
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
 void f3853_device::device_start()
 {
 	// lookup table for 3851/3853 lfsr timer
@@ -108,15 +116,15 @@ void f3853_device::device_start()
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(f3853_device::timer_callback),this));
 
 	// zerofill (what's not in constructor)
-	m_external_enable = false;
-	m_timer_enable = false;
+	m_external_int_enable = false;
+	m_timer_int_enable = false;
 	m_request_flipflop = false;
 
 	// register for savestates
 	save_item(NAME(m_int_vector));
 	save_item(NAME(m_prescaler));
-	save_item(NAME(m_external_enable));
-	save_item(NAME(m_timer_enable));
+	save_item(NAME(m_external_int_enable));
+	save_item(NAME(m_timer_int_enable));
 	save_item(NAME(m_request_flipflop));
 	save_item(NAME(m_priority_line));
 	save_item(NAME(m_external_interrupt_line));
@@ -135,33 +143,34 @@ void f3856_device::device_start()
 	save_item(NAME(m_timer_start));
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
 void f3853_device::device_reset()
 {
-	// clear ports
+	// note that standalone peripherals don't have a reset pin, but 3870 does
+
+	// clear ports at power-on
 	for (int i = 0; i < 4; i++)
 		write(machine().dummy_space(), i, 0);
 }
 
+
+//-------------------------------------------------
+//  implementation
+//-------------------------------------------------
 
 void f3853_device::set_interrupt_request_line()
 {
 	m_int_req_callback(m_request_flipflop && !m_priority_line ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
 IRQ_CALLBACK_MEMBER(f3853_device::int_acknowledge)
 {
-	if (m_external_enable && !m_priority_line && m_request_flipflop)
+	if (m_external_int_enable && !m_priority_line && m_request_flipflop)
 	{
 		m_request_flipflop = false;
 		set_interrupt_request_line();
 		return external_interrupt_vector();
 	}
-	else if (m_timer_enable && !m_priority_line && m_request_flipflop)
+	else if (m_timer_int_enable && !m_priority_line && m_request_flipflop)
 	{
 		m_request_flipflop = false;
 		set_interrupt_request_line();
@@ -187,7 +196,7 @@ void f3853_device::timer_start(uint8_t value)
 
 TIMER_CALLBACK_MEMBER(f3853_device::timer_callback)
 {
-	if(m_timer_enable)
+	if(m_timer_int_enable)
 	{
 		m_request_flipflop = true;
 		set_interrupt_request_line();
@@ -195,9 +204,10 @@ TIMER_CALLBACK_MEMBER(f3853_device::timer_callback)
 	timer_start(0xfe);
 }
 
+
 WRITE_LINE_MEMBER(f3853_device::ext_int_w)
 {
-	if(m_external_interrupt_line && !state && m_external_enable)
+	if(m_external_interrupt_line && !state && m_external_int_enable)
 	{
 		m_request_flipflop = true;
 	}
@@ -242,8 +252,8 @@ WRITE8_MEMBER(f3853_device::write)
 
 	// interrupt control
 	case 2:
-		m_external_enable = (data & 3) == 1;
-		m_timer_enable = (data & 3) == 3;
+		m_external_int_enable = (data & 3) == 1;
+		m_timer_int_enable = (data & 3) == 3;
 		set_interrupt_request_line();
 		break;
 
@@ -256,6 +266,10 @@ WRITE8_MEMBER(f3853_device::write)
 	}
 }
 
+
+//-------------------------------------------------
+//  f3851_device-specific handlers
+//-------------------------------------------------
 
 READ8_MEMBER(f3851_device::read)
 {
@@ -288,6 +302,10 @@ WRITE8_MEMBER(f3851_device::write)
 }
 
 
+//-------------------------------------------------
+//  f3856_device-specific handlers
+//-------------------------------------------------
+
 void f3856_device::timer_start(uint8_t value)
 {
 	m_timer_count = value;
@@ -301,7 +319,7 @@ TIMER_CALLBACK_MEMBER(f3856_device::timer_callback)
 	if (--m_timer_count == 0)
 	{
 		m_timer_count = m_timer_modulo;
-		if (m_timer_enable)
+		if (m_timer_int_enable)
 		{
 			m_request_flipflop = true;
 			set_interrupt_request_line();
@@ -334,7 +352,7 @@ WRITE8_MEMBER(f3856_device::write)
 		f3851_device::write(space, offset, data);
 		break;
 
-	// interrupt control
+	// interrupt/timer control
 	case 2:
 	{
 		// timer prescaler
@@ -348,8 +366,8 @@ WRITE8_MEMBER(f3856_device::write)
 			timer_start(m_timer_count);
 
 		// enable interrupts
-		m_external_enable = (data & 3) == 1 || (data & 3) == 2;
-		m_timer_enable = bool(data & 2);
+		m_external_int_enable = (data & 3) == 1 || (data & 3) == 2;
+		m_timer_int_enable = bool(data & 2);
 		set_interrupt_request_line();
 		break;
 	}
@@ -362,16 +380,20 @@ WRITE8_MEMBER(f3856_device::write)
 }
 
 
+//-------------------------------------------------
+//  f38t56_device-specific handlers
+//-------------------------------------------------
+
 WRITE8_MEMBER(f38t56_device::write)
 {
 	switch (offset & 3)
 	{
 	// I/O ports: same as 3851
-	default:
+	case 0: case 1:
 		f3851_device::write(space, offset, data);
 		break;
 
-	// interrupt control
+	// interrupt/timer control
 	case 2:
 	{
 		// timer prescaler
@@ -387,8 +409,8 @@ WRITE8_MEMBER(f38t56_device::write)
 			timer_start(m_timer_count);
 
 		// enable interrupts
-		m_external_enable = bool(data & 1);
-		m_timer_enable = bool(data & 2);
+		m_external_int_enable = bool(data & 1);
+		m_timer_int_enable = bool(data & 2);
 		set_interrupt_request_line();
 		break;
 	}

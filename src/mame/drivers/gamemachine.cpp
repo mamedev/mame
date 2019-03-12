@@ -28,6 +28,9 @@ hardware notes:
 
 TODO:
 - discrete sound, currently it's emulated crudely, just enough to make it beep when supposed to
+- MCU frequency was measured approx 2.1MHz on its XTL2 pin, but considering that
+  the MK3870 has an internal /2 divider, this is way too slow when compared to
+  video references of the game
 
 ******************************************************************************/
 
@@ -265,11 +268,11 @@ INPUT_PORTS_END
 void tgm_state::tgm(machine_config &config)
 {
 	/* basic machine hardware */
-	F8(config, m_maincpu, 2000000); // MK3870, measured around 2.1MHz
+	F8(config, m_maincpu, 4000000/2); // MK3870, frequency is approximate
 	m_maincpu->set_addrmap(AS_PROGRAM, &tgm_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &tgm_state::main_io);
 
-	f38t56_device &psu(F38T56(config, "psu", 2000000));
+	f38t56_device &psu(F38T56(config, "psu", 4000000/2));
 	psu.write_a().set(FUNC(tgm_state::sound_w));
 	psu.write_b().set(FUNC(tgm_state::digit_w));
 
