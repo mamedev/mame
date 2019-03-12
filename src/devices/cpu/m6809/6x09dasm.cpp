@@ -214,6 +214,10 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		else if (numoperands == 2)
 		{
 			ea = params.r16(ppc);
+			if( !(ea & 0xff00) )
+			{
+				stream << '>'; // need the '>' to force an assembler to use EXT addressing
+			}
 			util::stream_format(stream, "$%04X", ea);
 		}
 		break;
