@@ -159,7 +159,7 @@ void boris_state::main_io(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(boris_state::input_r), FUNC(boris_state::mux_w));
 	map(0x01, 0x01).w(FUNC(boris_state::digit_w));
-	map(0x0c, 0x0f).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
+	map(0x0c, 0x0f).rw("smi", FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
 
@@ -206,13 +206,13 @@ INPUT_PORTS_END
 void boris_state::boris(machine_config &config)
 {
 	/* basic machine hardware */
-	F8(config, m_maincpu, 2_MHz_XTAL);
+	F8(config, m_maincpu, 2_MHz_XTAL); // MK3850, 2MHz XTAL according to schematics
 	m_maincpu->set_addrmap(AS_PROGRAM, &boris_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &boris_state::main_io);
-	m_maincpu->set_irq_acknowledge_callback("f3853", FUNC(f3853_device::int_acknowledge));
+	m_maincpu->set_irq_acknowledge_callback("smi", FUNC(f3853_device::int_acknowledge));
 
-	f3853_device &f3853(F3853(config, "f3853", 2_MHz_XTAL));
-	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
+	f3853_device &smi(F3853(config, "smi", 2_MHz_XTAL));
+	smi.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	/* video hardware */
 	for (int i = 0; i < 8; i++)

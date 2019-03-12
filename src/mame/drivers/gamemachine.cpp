@@ -28,12 +28,12 @@ hardware notes:
 
 TODO:
 - discrete sound, currently it's emulated crudely, just enough to make it beep when supposed to
-- MK3870 is not emulated in MAME, plain F8 is used here instead
 
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/f8/f8.h"
+#include "machine/f3853.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "speaker.h"
@@ -79,7 +79,6 @@ private:
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(timer_r);
 
 	u16 m_inp_mux;
 	u16 m_digit_select;
@@ -190,12 +189,6 @@ WRITE8_MEMBER(tgm_state::sound_w)
 	//..
 }
 
-READ8_MEMBER(tgm_state::timer_r)
-{
-	// MK3870 internal timer register (used as RNG here)
-	return machine().rand();
-}
-
 
 
 /******************************************************************************
@@ -212,9 +205,7 @@ void tgm_state::main_io(address_map &map)
 {
 	map(0x00, 0x00).w(FUNC(tgm_state::mux1_w));
 	map(0x01, 0x01).rw(FUNC(tgm_state::input_r), FUNC(tgm_state::mux2_w));
-	map(0x04, 0x04).w(FUNC(tgm_state::sound_w));
-	map(0x05, 0x05).w(FUNC(tgm_state::digit_w));
-	map(0x07, 0x07).r(FUNC(tgm_state::timer_r));
+	map(0x04, 0x07).rw("psu", FUNC(f38t56_device::read), FUNC(f38t56_device::write));
 }
 
 
@@ -274,9 +265,13 @@ INPUT_PORTS_END
 void tgm_state::tgm(machine_config &config)
 {
 	/* basic machine hardware */
-	F8(config, m_maincpu, 2000000); // measured around 2.1MHz
+	F8(config, m_maincpu, 2000000); // MK3870, measured around 2.1MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &tgm_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &tgm_state::main_io);
+
+	f38t56_device &psu(F38T56(config, "psu", 2000000));
+	psu.write_a().set(FUNC(tgm_state::sound_w));
+	psu.write_b().set(FUNC(tgm_state::digit_w));
 
 	/* video hardware */
 	for (int i = 0; i < 12; i++)

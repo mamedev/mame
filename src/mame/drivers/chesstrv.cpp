@@ -174,9 +174,7 @@ void borisdpl_state::borisdpl_io(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(borisdpl_state::keypad_r), FUNC(borisdpl_state::matrix_w));
 	map(0x01, 0x01).w(FUNC(borisdpl_state::display_w));
-	map(0x04, 0x07).rw("f3856", FUNC(f3856_device::read), FUNC(f3856_device::write));
-	map(0x04, 0x04).rw(FUNC(borisdpl_state::ram_r), FUNC(borisdpl_state::ram_w));
-	map(0x05, 0x05).rw(FUNC(borisdpl_state::ram_addr_r), FUNC(borisdpl_state::ram_addr_w));
+	map(0x04, 0x07).rw("psu", FUNC(f38t56_device::read), FUNC(f38t56_device::write));
 }
 
 static INPUT_PORTS_START( chesstrv )
@@ -274,14 +272,18 @@ void chesstrv_state::chesstrv(machine_config &config)
 void borisdpl_state::borisdpl(machine_config &config)
 {
 	/* basic machine hardware */
-	F8(config, m_maincpu, 4000000/2); // Motorola SC80265P, frequency guessed
+	F8(config, m_maincpu, 3000000/2); // Motorola SC80265P, frequency approximated from video reference
 	m_maincpu->set_addrmap(AS_PROGRAM, &borisdpl_state::chesstrv_mem);
 	m_maincpu->set_addrmap(AS_IO, &borisdpl_state::borisdpl_io);
-	m_maincpu->set_irq_acknowledge_callback("f3856", FUNC(f3856_device::int_acknowledge));
+	m_maincpu->set_irq_acknowledge_callback("psu", FUNC(f38t56_device::int_acknowledge));
 
-	f3856_device &f3856(F3856(config, "f3856", 4000000/2));
-	f3856.set_int_vector(0x5020);
-	f3856.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
+	f38t56_device &psu(F38T56(config, "psu", 3000000/2));
+	psu.set_int_vector(0x5020);
+	psu.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
+	psu.read_a().set(FUNC(borisdpl_state::ram_r));
+	psu.write_a().set(FUNC(borisdpl_state::ram_w));
+	psu.read_b().set(FUNC(borisdpl_state::ram_addr_r));
+	psu.write_b().set(FUNC(borisdpl_state::ram_addr_w));
 
 	/* video hardware */
 	config.set_default_layout(layout_borisdpl);

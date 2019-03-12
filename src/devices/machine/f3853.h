@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol, hap
 /***************************************************************************
 
     Fairchild F3853 SRAM interface with integrated interrupt
@@ -51,9 +51,6 @@ public:
 	// construction/destruction
 	f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// interrupt vector is a mask option on 3851 and 3856
-	void set_int_vector(u16 vector) { m_int_vector = vector; }
-
 	auto int_req_callback() { return m_int_req_callback.bind(); }
 	auto pri_out_callback() { return m_pri_out_callback.bind(); }
 	template<typename Object> void set_int_daisy_chain_callback(Object &&cb) { m_int_daisy_chain_callback = std::forward<Object>(cb); }
@@ -64,7 +61,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ext_int_w);
 	DECLARE_WRITE_LINE_MEMBER(pri_in_w);
 
-	TIMER_CALLBACK_MEMBER(timer_callback);
+	virtual TIMER_CALLBACK_MEMBER(timer_callback);
 
 	IRQ_CALLBACK_MEMBER(int_acknowledge);
 
@@ -80,7 +77,7 @@ protected:
 	uint16_t external_interrupt_vector() const { return m_int_vector | uint16_t(0x0080); }
 
 	void set_interrupt_request_line();
-	void timer_start(uint8_t value);
+	virtual void timer_start(uint8_t value);
 
 	devcb_write_line m_int_req_callback;
 	devcb_write_line m_pri_out_callback;
@@ -101,17 +98,66 @@ protected:
 	uint8_t m_value_to_cycle[0x100];
 };
 
-class f3856_device : public f3853_device
+class f3851_device : public f3853_device
+{
+public:
+	f3851_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// interrupt vector is a mask option on 3851 and 3856
+	void set_int_vector(u16 vector) { m_int_vector = vector; }
+
+	// bidirectional I/O ports A and B
+	auto read_a() { return m_read_port[0].bind(); }
+	auto read_b() { return m_read_port[1].bind(); }
+	auto write_a() { return m_write_port[0].bind(); }
+	auto write_b() { return m_write_port[1].bind(); }
+
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
+
+protected:
+	f3851_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_resolve_objects() override;
+
+	devcb_read8 m_read_port[2];
+	devcb_write8 m_write_port[2];
+};
+
+class f3856_device : public f3851_device
 {
 public:
 	f3856_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
+
+	virtual TIMER_CALLBACK_MEMBER(timer_callback) override;
+
+protected:
+	f3856_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+
+	virtual void timer_start(uint8_t value) override;
+
+	u8 m_timer_count;
+	u8 m_timer_modulo;
+	bool m_timer_start;
+};
+
+class f38t56_device : public f3856_device
+{
+public:
+	f38t56_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(F3853, f3853_device)
+DECLARE_DEVICE_TYPE(F3851, f3851_device)
 DECLARE_DEVICE_TYPE(F3856, f3856_device)
+DECLARE_DEVICE_TYPE(F38T56, f38t56_device)
 
 #endif // MAME_MACHINE_F3853_H

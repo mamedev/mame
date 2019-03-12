@@ -38,9 +38,6 @@ Hardware descriptions:
 - Hardware addressing is controlled by a NBF4001AE.
 - Unknown if there is a speaker.
 
-TODO:
-- Figure out exact clock frequency
-
 ******************************************************************************/
 
 #include "emu.h"
@@ -125,7 +122,7 @@ void mk1_state::mk1_mem(address_map &map)
 void mk1_state::mk1_io(address_map &map)
 {
 	map(0x0, 0x1).rw(FUNC(mk1_state::mk1_f8_r), FUNC(mk1_state::mk1_f8_w));
-	map(0xc, 0xf).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
+	map(0xc, 0xf).rw("smi", FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
 
@@ -186,13 +183,13 @@ void mk1_state::machine_start()
 void mk1_state::mk1(machine_config &config)
 {
 	/* basic machine hardware */
-	F8(config, m_maincpu, 2000000); // MK3850
+	F8(config, m_maincpu, 2000000); // MK3850, approx 2MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &mk1_state::mk1_mem);
 	m_maincpu->set_addrmap(AS_IO, &mk1_state::mk1_io);
-	m_maincpu->set_irq_acknowledge_callback("f3853", FUNC(f3853_device::int_acknowledge));
+	m_maincpu->set_irq_acknowledge_callback("smi", FUNC(f3853_device::int_acknowledge));
 
-	f3853_device &f3853(F3853(config, "f3853", 2000000));
-	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
+	f3853_device &smi(F3853(config, "smi", 2000000));
+	smi.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	/* video hardware */
 	config.set_default_layout(layout_mk1);

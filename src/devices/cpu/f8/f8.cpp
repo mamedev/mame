@@ -19,7 +19,9 @@
  *  - 3851 Program Storage Unit (PSU)
  *  - 3852 Dynamic Memory Interface (DMI)
  *  - 3853 Static Memory Interface (SMI)
+ *  - 3854 Direct Memory Access Controller (DMAC)
  *  - 3856 Program Storage Unit (PSU)
+ *  - 38T56 Program Storage Unit (PSU)
  *  - 3861 Peripheral Input/Output (PIO)
  *  - 3871 Peripheral Input/Output (PIO)
  *
@@ -35,7 +37,7 @@
  *
  *  Combined packages:
  *  - 3859 = 3850 + 3851
- *  - 3870 = 3850 + 3856
+ *  - 3870 = 3850 + 38T56
  *  - 3872 = 3870 + extra 2KB ROM
  *  - 3873 = 3870 + extra 64 bytes executable RAM
  *
