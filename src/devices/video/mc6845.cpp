@@ -741,8 +741,11 @@ void mc6845_device::handle_line_timer()
 			m_line_address = m_disp_start_addr;
 			m_line_enable_ff = true;
 
-			if (match_line())
-				new_vsync = true;
+			if (m_supports_vert_sync_width)
+			{
+				if (match_line())
+					new_vsync = true;
+			}
 
 			/* also update the cursor state now */
 			update_cursor_state();
