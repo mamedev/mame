@@ -550,7 +550,7 @@ MACHINE_CONFIG_END
 
 ROM_START( djboy )
 	ROM_REGION( 0x40000, "mastercpu", 0 )
-	ROM_LOAD( "djboy.4b",  0x00000, 0x20000, CRC(354531ec) SHA1(4722376601ca2d8fb79622fef35ab5b5b084555d) ) // verified on 2 PCBs, neither PCB had a label on the rom
+	ROM_LOAD( "djboy.4b",  0x00000, 0x20000, CRC(354531ec) SHA1(4722376601ca2d8fb79622fef35ab5b5b084555d) ) // verified on 2 PCBs, neither PCB had a label on the ROM
 	ROM_LOAD( "bs100.4d",  0x20000, 0x20000, CRC(081e8af8) SHA1(3589dab1cf31b109a40370b4db1f31785023e2ed) )
 
 	ROM_REGION( 0x30000, "slavecpu", 0 )
