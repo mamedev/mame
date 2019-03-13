@@ -145,125 +145,125 @@ READ16_MEMBER(spg2xx_audio_device::audio_ctrl_r)
 	switch (offset)
 	{
 	case AUDIO_CHANNEL_ENABLE:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Channel Enable: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Channel Enable: %04x\n", data);
 		break;
 
 	case AUDIO_MAIN_VOLUME:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Main Volume: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Main Volume: %04x\n", data);
 		break;
 
 	case AUDIO_CHANNEL_FIQ_ENABLE:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Channel FIQ Enable: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Channel FIQ Enable: %04x\n", data);
 		break;
 
 	case AUDIO_CHANNEL_FIQ_STATUS:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Channel FIQ Acknowledge: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Channel FIQ Acknowledge: %04x\n", data);
 		break;
 
 	case AUDIO_BEAT_BASE_COUNT:
-		LOGMASKED(LOG_SPU_READS | LOG_BEAT, "audio_r: Beat Base Count: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS | LOG_BEAT, "audio_ctrl_r: Beat Base Count: %04x\n", data);
 		break;
 
 	case AUDIO_BEAT_COUNT:
-		LOGMASKED(LOG_SPU_READS | LOG_BEAT, "audio_r: Beat Count: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS | LOG_BEAT, "audio_ctrl_r: Beat Count: %04x\n", data);
 		break;
 
 	case AUDIO_ENVCLK0:
 	case AUDIO_ENVCLK1:
-		LOGMASKED(LOG_SPU_READS | LOG_ENVELOPES, "audio_r: Envelope Interval %d (lo): %04x\n", offset == AUDIO_ENVCLK0 ? 0 : 1, data);
+		LOGMASKED(LOG_SPU_READS | LOG_ENVELOPES, "audio_ctrl_r: Envelope Interval %d (lo): %04x\n", offset == AUDIO_ENVCLK0 ? 0 : 1, data);
 		break;
 
 	case AUDIO_ENVCLK0_HIGH:
 	case AUDIO_ENVCLK1_HIGH:
-		LOGMASKED(LOG_SPU_READS | LOG_ENVELOPES, "audio_r: Envelope Interval %d (hi): %04x\n", offset == AUDIO_ENVCLK0_HIGH ? 0 : 1, data);
+		LOGMASKED(LOG_SPU_READS | LOG_ENVELOPES, "audio_ctrl_r: Envelope Interval %d (hi): %04x\n", offset == AUDIO_ENVCLK0_HIGH ? 0 : 1, data);
 		break;
 
 	case AUDIO_ENV_RAMP_DOWN:
-		LOGMASKED(LOG_SPU_READS | LOG_RAMPDOWN, "audio_r: Envelope Fast Ramp Down: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS | LOG_RAMPDOWN, "audio_ctrl_r: Envelope Fast Ramp Down: %04x\n", data);
 		break;
 
 	case AUDIO_CHANNEL_STOP:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Channel Stop Status: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Channel Stop Status: %04x\n", data);
 		break;
 
 	case AUDIO_CHANNEL_ZERO_CROSS:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Channel Zero-Cross Enable: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Channel Zero-Cross Enable: %04x\n", data);
 		break;
 
 	case AUDIO_CONTROL:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Control: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Control: %04x\n", data);
 		break;
 
 	case AUDIO_COMPRESS_CTRL:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Compressor Control: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Compressor Control: %04x\n", data);
 		break;
 
 	case AUDIO_CHANNEL_STATUS:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Channel Status: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Channel Status: %04x\n", data);
 		break;
 
 	case AUDIO_WAVE_IN_L:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Wave In (L) / FIFO Write Data: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Wave In (L) / FIFO Write Data: %04x\n", data);
 		break;
 
 	case AUDIO_WAVE_IN_R:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Wave In (R) / Software Channel FIFO IRQ Control: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Wave In (R) / Software Channel FIFO IRQ Control: %04x\n", data);
 		break;
 
 	case AUDIO_WAVE_OUT_L:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Wave Out (L): %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Wave Out (L): %04x\n", data);
 		break;
 
 	case AUDIO_WAVE_OUT_R:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Wave Out (R): %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Wave Out (R): %04x\n", data);
 		break;
 
 	case AUDIO_CHANNEL_REPEAT:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Channel Repeat Enable: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Channel Repeat Enable: %04x\n", data);
 		break;
 
 	case AUDIO_CHANNEL_ENV_MODE:
-		LOGMASKED(LOG_SPU_READS | LOG_ENVELOPES, "audio_r: Channel Envelope Enable: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS | LOG_ENVELOPES, "audio_ctrl_r: Channel Envelope Enable: %04x\n", data);
 		break;
 
 	case AUDIO_CHANNEL_TONE_RELEASE:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Channel Tone Release Enable: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Channel Tone Release Enable: %04x\n", data);
 		break;
 
 	case AUDIO_CHANNEL_ENV_IRQ:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Channel Envelope IRQ Status: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Channel Envelope IRQ Status: %04x\n", data);
 		break;
 
 	case AUDIO_CHANNEL_PITCH_BEND:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Channel Pitch Bend Enable: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Channel Pitch Bend Enable: %04x\n", data);
 		break;
 
 	case AUDIO_SOFT_PHASE:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Software Channel Phase: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Software Channel Phase: %04x\n", data);
 		break;
 
 	case AUDIO_ATTACK_RELEASE:
-		LOGMASKED(LOG_SPU_READS, "audio_r: Attack/Release Time Control: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: Attack/Release Time Control: %04x\n", data);
 		break;
 
 	case AUDIO_EQ_CUTOFF10:
-		LOGMASKED(LOG_SPU_READS, "audio_r: EQ Cutoff Frequency 0/1: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: EQ Cutoff Frequency 0/1: %04x\n", data);
 		break;
 
 	case AUDIO_EQ_CUTOFF32:
-		LOGMASKED(LOG_SPU_READS, "audio_r: EQ Cutoff Frequency 2/3: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: EQ Cutoff Frequency 2/3: %04x\n", data);
 		break;
 
 	case AUDIO_EQ_GAIN10:
-		LOGMASKED(LOG_SPU_READS, "audio_r: EQ Cutoff Gain 0/1: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: EQ Cutoff Gain 0/1: %04x\n", data);
 		break;
 
 	case AUDIO_EQ_GAIN32:
-		LOGMASKED(LOG_SPU_READS, "audio_r: EQ Cutoff Gain 2/3: %04x\n", data);
+		LOGMASKED(LOG_SPU_READS, "audio_ctrl_r: EQ Cutoff Gain 2/3: %04x\n", data);
 		break;
 
 	default:
-		LOGMASKED(LOG_UNKNOWN_SPU, "audio_r: Unknown register %04x = %04x\n", 0x3000 + offset, data);
+		LOGMASKED(LOG_UNKNOWN_SPU, "audio_ctrl_r: Unknown register %04x = %04x\n", 0x3000 + offset, data);
 		break;
 	}
 
@@ -392,7 +392,7 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 	{
 	case AUDIO_CHANNEL_ENABLE:
 	{
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel Enable: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Channel Enable: %04x\n", data);
 		const uint16_t changed = m_audio_ctrl_regs[AUDIO_CHANNEL_ENABLE] ^ data;
 		for (uint32_t channel_bit = 0; channel_bit < 16; channel_bit++)
 		{
@@ -432,29 +432,29 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 	}
 
 	case AUDIO_MAIN_VOLUME:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Main Volume: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Main Volume: %04x\n", data);
 		m_audio_ctrl_regs[offset] = data & AUDIO_MAIN_VOLUME_MASK;
 		break;
 
 	case AUDIO_CHANNEL_FIQ_ENABLE:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel FIQ Enable: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Channel FIQ Enable: %04x\n", data);
 		m_audio_ctrl_regs[offset] = data & AUDIO_CHANNEL_FIQ_ENABLE_MASK;
 		break;
 
 	case AUDIO_CHANNEL_FIQ_STATUS:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel FIQ Acknowledge: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Channel FIQ Acknowledge: %04x\n", data);
 		m_audio_ctrl_regs[offset] &= ~(data & AUDIO_CHANNEL_FIQ_STATUS_MASK);
 		break;
 
 	case AUDIO_BEAT_BASE_COUNT:
-		LOGMASKED(LOG_SPU_WRITES | LOG_BEAT, "audio_w: Beat Base Count: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES | LOG_BEAT, "audio_ctrl_w: Beat Base Count: %04x\n", data);
 		m_audio_ctrl_regs[offset] = data & AUDIO_BEAT_BASE_COUNT_MASK;
 		m_audio_curr_beat_base_count = m_audio_ctrl_regs[offset];
 		break;
 
 	case AUDIO_BEAT_COUNT:
 	{
-		LOGMASKED(LOG_SPU_WRITES | LOG_BEAT, "audio_w: Beat Count: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES | LOG_BEAT, "audio_ctrl_w: Beat Count: %04x\n", data);
 		const uint16_t old = m_audio_ctrl_regs[offset];
 		m_audio_ctrl_regs[offset] &= ~(data & AUDIO_BIS_MASK);
 		m_audio_ctrl_regs[offset] &= AUDIO_BIS_MASK;
@@ -471,7 +471,7 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 	case AUDIO_ENVCLK0:
 	case AUDIO_ENVCLK1:
 	{
-		LOGMASKED(LOG_SPU_WRITES | LOG_ENVELOPES, "audio_w: Envelope Interval %d (lo): %04x\n", offset == AUDIO_ENVCLK0 ? 0 : 1, data);
+		LOGMASKED(LOG_SPU_WRITES | LOG_ENVELOPES, "audio_ctrl_w: Envelope Interval %d (lo): %04x\n", offset == AUDIO_ENVCLK0 ? 0 : 1, data);
 		const uint16_t old = m_audio_ctrl_regs[offset];
 		m_audio_ctrl_regs[offset] = data;
 		const uint16_t changed = old ^ m_audio_ctrl_regs[offset];
@@ -495,7 +495,7 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 	case AUDIO_ENVCLK0_HIGH:
 	case AUDIO_ENVCLK1_HIGH:
 	{
-		LOGMASKED(LOG_SPU_WRITES | LOG_ENVELOPES, "audio_w: Envelope Interval %d (hi): %04x\n", offset == AUDIO_ENVCLK0_HIGH ? 0 : 1, data);
+		LOGMASKED(LOG_SPU_WRITES | LOG_ENVELOPES, "audio_ctrl_w: Envelope Interval %d (hi): %04x\n", offset == AUDIO_ENVCLK0_HIGH ? 0 : 1, data);
 		const uint16_t old = m_audio_ctrl_regs[offset];
 		m_audio_ctrl_regs[offset] = data;
 		const uint16_t changed = old ^ m_audio_ctrl_regs[offset];
@@ -517,7 +517,7 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 
 	case AUDIO_ENV_RAMP_DOWN:
 	{
-		LOGMASKED(LOG_SPU_WRITES | LOG_RAMPDOWN, "audio_w: Envelope Fast Ramp Down: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES | LOG_RAMPDOWN, "audio_ctrl_w: Envelope Fast Ramp Down: %04x\n", data);
 		const uint16_t old = m_audio_ctrl_regs[offset];
 		m_audio_ctrl_regs[offset] = (data & AUDIO_ENV_RAMP_DOWN_MASK) & m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS];
 		const uint16_t changed = old ^ m_audio_ctrl_regs[offset];
@@ -537,17 +537,17 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 	}
 
 	case AUDIO_CHANNEL_STOP:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel Stop Status: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Channel Stop Status: %04x\n", data);
 		m_audio_ctrl_regs[offset] &= ~data;
 		break;
 
 	case AUDIO_CHANNEL_ZERO_CROSS:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel Zero-Cross Enable: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Channel Zero-Cross Enable: %04x\n", data);
 		m_audio_ctrl_regs[offset] = data & AUDIO_CHANNEL_ZERO_CROSS_MASK;
 		break;
 
 	case AUDIO_CONTROL:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Control: %04x (SOFTCH:%d, COMPEN:%d, NOHIGH:%d, NOINT:%d, EQEN:%d, VOLSEL:%d)\n", data
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Control: %04x (SOFTCH:%d, COMPEN:%d, NOHIGH:%d, NOINT:%d, EQEN:%d, VOLSEL:%d)\n", data
 			, (data & AUDIO_CONTROL_SOFTCH_MASK) ? 1 : 0
 			, (data & AUDIO_CONTROL_COMPEN_MASK) ? 1 : 0
 			, (data & AUDIO_CONTROL_NOHIGH_MASK) ? 1 : 0
@@ -558,92 +558,92 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 		break;
 
 	case AUDIO_COMPRESS_CTRL:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Compressor Control: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Compressor Control: %04x\n", data);
 		m_audio_ctrl_regs[offset] = data;
 		break;
 
 	case AUDIO_CHANNEL_STATUS:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel Status (read-only): %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Channel Status (read-only): %04x\n", data);
 		break;
 
-	case AUDIO_WAVE_IN_L:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Wave In (L) / FIFO Write Data: %04x\n", data);
+	case audio_ctrl_wAVE_IN_L:
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Wave In (L) / FIFO Write Data: %04x\n", data);
 		m_audio_ctrl_regs[offset] = data;
 		break;
 
-	case AUDIO_WAVE_IN_R:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Wave In (R) / Software Channel FIFO IRQ Control: %04x\n", data);
+	case audio_ctrl_wAVE_IN_R:
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Wave In (R) / Software Channel FIFO IRQ Control: %04x\n", data);
 		m_audio_ctrl_regs[offset] = data;
 		break;
 
-	case AUDIO_WAVE_OUT_L:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Wave Out (L): %04x\n", data);
+	case audio_ctrl_wAVE_OUT_L:
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Wave Out (L): %04x\n", data);
 		m_audio_ctrl_regs[offset] = data;
 		break;
 
-	case AUDIO_WAVE_OUT_R:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Wave Out (R): %04x\n", data);
+	case audio_ctrl_wAVE_OUT_R:
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Wave Out (R): %04x\n", data);
 		m_audio_ctrl_regs[offset] = data;
 		break;
 
 	case AUDIO_CHANNEL_REPEAT:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel Repeat Enable: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Channel Repeat Enable: %04x\n", data);
 		m_audio_ctrl_regs[offset] = data & AUDIO_CHANNEL_REPEAT_MASK;
 		break;
 
 	case AUDIO_CHANNEL_ENV_MODE:
-		LOGMASKED(LOG_SPU_WRITES | LOG_ENVELOPES, "audio_w: Channel Envelope Enable: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES | LOG_ENVELOPES, "audio_ctrl_w: Channel Envelope Enable: %04x\n", data);
 		m_audio_ctrl_regs[offset] = data & AUDIO_CHANNEL_ENV_MODE_MASK;
 		break;
 
 	case AUDIO_CHANNEL_TONE_RELEASE:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel Tone Release Enable: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Channel Tone Release Enable: %04x\n", data);
 		m_audio_ctrl_regs[offset] = data & AUDIO_CHANNEL_TONE_RELEASE_MASK;
 		break;
 
 	case AUDIO_CHANNEL_ENV_IRQ:
-		LOGMASKED(LOG_SPU_WRITES | LOG_ENVELOPES, "audio_w: Channel Envelope IRQ Acknowledge: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES | LOG_ENVELOPES, "audio_ctrl_w: Channel Envelope IRQ Acknowledge: %04x\n", data);
 		m_audio_ctrl_regs[offset] &= ~data & AUDIO_CHANNEL_ENV_IRQ_MASK;
 		break;
 
 	case AUDIO_CHANNEL_PITCH_BEND:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel Pitch Bend Enable: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Channel Pitch Bend Enable: %04x\n", data);
 		m_audio_ctrl_regs[offset] = data & AUDIO_CHANNEL_PITCH_BEND_MASK;
 		break;
 
 	case AUDIO_SOFT_PHASE:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Software Channel Phase: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Software Channel Phase: %04x\n", data);
 		m_audio_ctrl_regs[offset] = data;
 		break;
 
 	case AUDIO_ATTACK_RELEASE:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Attack/Release Time Control: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Attack/Release Time Control: %04x\n", data);
 		m_audio_ctrl_regs[offset] = data;
 		break;
 
 	case AUDIO_EQ_CUTOFF10:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: EQ Cutoff Frequency 0/1: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: EQ Cutoff Frequency 0/1: %04x\n", data);
 		m_audio_ctrl_regs[offset] = data & AUDIO_EQ_CUTOFF10_MASK;
 		break;
 
 	case AUDIO_EQ_CUTOFF32:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: EQ Cutoff Frequency 2/3: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: EQ Cutoff Frequency 2/3: %04x\n", data);
 		m_audio_ctrl_regs[offset] = data & AUDIO_EQ_CUTOFF32_MASK;
 		break;
 
 	case AUDIO_EQ_GAIN10:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: EQ Cutoff Gain 0/1: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: EQ Cutoff Gain 0/1: %04x\n", data);
 		m_audio_ctrl_regs[offset] = data & AUDIO_EQ_GAIN10_MASK;
 		break;
 
 	case AUDIO_EQ_GAIN32:
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: EQ Cutoff Gain 2/3: %04x\n", data);
+		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: EQ Cutoff Gain 2/3: %04x\n", data);
 		m_audio_ctrl_regs[offset] = data & AUDIO_EQ_GAIN32_MASK;
 		break;
 
 	default:
 		m_audio_ctrl_regs[offset] = data;
-		LOGMASKED(LOG_UNKNOWN_SPU, "audio_w: Unknown register %04x = %04x\n", 0x3000 + offset, data);
+		LOGMASKED(LOG_UNKNOWN_SPU, "audio_ctrl_w: Unknown register %04x = %04x\n", 0x3000 + offset, data);
 		break;
 	}
 }
