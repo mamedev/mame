@@ -139,7 +139,6 @@ void spg2xx_audio_device::check_irqs(const uint16_t changed)
 
 READ16_MEMBER(spg2xx_audio_device::audio_ctrl_r)
 {
-	//const uint16_t channel = (offset & 0x00f0) >> 4;
 	uint16_t data = m_audio_ctrl_regs[offset];
 
 	switch (offset)
@@ -386,8 +385,6 @@ READ16_MEMBER(spg2xx_audio_device::audio_r)
 
 WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 {
-	const uint16_t channel = (offset & 0x00f0) >> 4;
-
 	switch (offset)
 	{
 	case AUDIO_CHANNEL_ENABLE:
@@ -412,6 +409,9 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 						m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] |= mask;
 						m_sample_addr[channel_bit] = get_wave_addr(channel_bit);
 						m_envelope_addr[channel_bit] = get_envelope_addr(channel_bit);
+
+						const uint16_t channel = (offset & 0x00f0) >> 4; // this can't be correct? bit 0x10 is part of register select?  (AUDIO_CHANNEL_ENABLE is 0x00 AUDIO_WAVE_IN_L is 0x10)
+
 						set_envelope_count(channel, get_envelope_load(channel));
 					}
 					m_adpcm[channel_bit].reset();
@@ -1092,9 +1092,11 @@ void spg2xx_audio_device::audio_beat_tick()
 				LOGMASKED(LOG_BEAT, "Beat count elapsed but IRQ not enabled\n");
 			}
 		}
-
-		beat_count--;
-		m_audio_ctrl_regs[AUDIO_BEAT_COUNT] = (m_audio_ctrl_regs[AUDIO_BEAT_COUNT] & ~AUDIO_BEAT_COUNT_MASK) | beat_count;
+		else
+		{
+			beat_count--;
+			m_audio_ctrl_regs[AUDIO_BEAT_COUNT] = (m_audio_ctrl_regs[AUDIO_BEAT_COUNT] & ~AUDIO_BEAT_COUNT_MASK) | beat_count;
+		}
 	}
 	m_audio_curr_beat_base_count--;
 }
