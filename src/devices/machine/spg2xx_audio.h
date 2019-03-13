@@ -39,12 +39,12 @@ protected:
 	inline uint32_t get_envclk_frame_count(const uint32_t channel);
 
 	// Audio getters
-	bool get_channel_enable(const offs_t channel) const { return m_audio_regs[AUDIO_CHANNEL_ENABLE] & (1 << channel); }
-	bool get_channel_status(const offs_t channel) const { return m_audio_regs[AUDIO_CHANNEL_STATUS] & (1 << channel); }
-	bool get_manual_envelope_enable(const offs_t channel) const { return m_audio_regs[AUDIO_CHANNEL_ENV_MODE] & (1 << channel); }
+	bool get_channel_enable(const offs_t channel) const { return m_audio_ctrl_regs[AUDIO_CHANNEL_ENABLE] & (1 << channel); }
+	bool get_channel_status(const offs_t channel) const { return m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] & (1 << channel); }
+	bool get_manual_envelope_enable(const offs_t channel) const { return m_audio_ctrl_regs[AUDIO_CHANNEL_ENV_MODE] & (1 << channel); }
 	bool get_auto_envelope_enable(const offs_t channel) const { return !get_manual_envelope_enable(channel); }
 	uint32_t get_envelope_clock(const offs_t channel) const;
-	uint16_t get_vol_sel() const { return (m_audio_regs[AUDIO_CONTROL] & AUDIO_CONTROL_VOLSEL_MASK) >> AUDIO_CONTROL_VOLSEL_SHIFT; }
+	uint16_t get_vol_sel() const { return (m_audio_ctrl_regs[AUDIO_CONTROL] & AUDIO_CONTROL_VOLSEL_MASK) >> AUDIO_CONTROL_VOLSEL_SHIFT; }
 
 	// Audio Mode getters
 	uint16_t get_wave_addr_high(const offs_t channel) const { return m_audio_regs[(channel << 4) | AUDIO_MODE] & AUDIO_WADDR_HIGH_MASK; }
@@ -108,7 +108,7 @@ protected:
 	uint32_t get_loop_addr(const offs_t channel) const { return ((uint32_t)get_loop_addr_high(channel) << 16) | m_audio_regs[(channel << 4) | AUDIO_LOOP_ADDR]; }
 	uint32_t get_envelope_addr(const offs_t channel) const { return ((uint32_t)get_envelope_addr_high(channel) << 16) | m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_ADDR]; }
 
-	enum
+	enum // at audio write offset 0x000 in spg2xx
 	{
 		AUDIO_WAVE_ADDR             = 0x000,
 
@@ -197,47 +197,51 @@ protected:
 		AUDIO_PHASE_TIME_STEP_SHIFT = 13,
 
 		AUDIO_CHAN_OFFSET_MASK      = 0xf0f,
+	};
+	
+	enum // at audio write offset 0x400 in spg2xx
+	{
 
-		AUDIO_CHANNEL_ENABLE            = 0x400,
+		AUDIO_CHANNEL_ENABLE            = 0x000,
 		AUDIO_CHANNEL_ENABLE_MASK       = 0xffff,
 
-		AUDIO_MAIN_VOLUME               = 0x401,
+		AUDIO_MAIN_VOLUME               = 0x001,
 		AUDIO_MAIN_VOLUME_MASK          = 0x007f,
 
-		AUDIO_CHANNEL_FIQ_ENABLE        = 0x402,
+		AUDIO_CHANNEL_FIQ_ENABLE        = 0x002,
 		AUDIO_CHANNEL_FIQ_ENABLE_MASK   = 0xffff,
 
-		AUDIO_CHANNEL_FIQ_STATUS        = 0x403,
+		AUDIO_CHANNEL_FIQ_STATUS        = 0x003,
 		AUDIO_CHANNEL_FIQ_STATUS_MASK   = 0xffff,
 
-		AUDIO_BEAT_BASE_COUNT           = 0x404,
+		AUDIO_BEAT_BASE_COUNT           = 0x004,
 		AUDIO_BEAT_BASE_COUNT_MASK      = 0x07ff,
 
-		AUDIO_BEAT_COUNT                = 0x405,
+		AUDIO_BEAT_COUNT                = 0x005,
 		AUDIO_BEAT_COUNT_MASK           = 0x3fff,
 		AUDIO_BIS_MASK                  = 0x4000,
 		AUDIO_BIE_MASK                  = 0x8000,
 
-		AUDIO_ENVCLK0                   = 0x406,
+		AUDIO_ENVCLK0                   = 0x006,
 
-		AUDIO_ENVCLK0_HIGH              = 0x407,
+		AUDIO_ENVCLK0_HIGH              = 0x007,
 		AUDIO_ENVCLK0_HIGH_MASK         = 0xffff,
 
-		AUDIO_ENVCLK1                   = 0x408,
+		AUDIO_ENVCLK1                   = 0x008,
 
-		AUDIO_ENVCLK1_HIGH              = 0x409,
+		AUDIO_ENVCLK1_HIGH              = 0x009,
 		AUDIO_ENVCLK1_HIGH_MASK         = 0xffff,
 
-		AUDIO_ENV_RAMP_DOWN             = 0x40a,
+		AUDIO_ENV_RAMP_DOWN             = 0x00a,
 		AUDIO_ENV_RAMP_DOWN_MASK        = 0xffff,
 
-		AUDIO_CHANNEL_STOP              = 0x40b,
+		AUDIO_CHANNEL_STOP              = 0x00b,
 		AUDIO_CHANNEL_STOP_MASK         = 0xffff,
 
-		AUDIO_CHANNEL_ZERO_CROSS        = 0x40c,
+		AUDIO_CHANNEL_ZERO_CROSS        = 0x00c,
 		AUDIO_CHANNEL_ZERO_CROSS_MASK   = 0xffff,
 
-		AUDIO_CONTROL                   = 0x40d,
+		AUDIO_CONTROL                   = 0x00d,
 		AUDIO_CONTROL_MASK              = 0x9fe8,
 		AUDIO_CONTROL_SATURATE_MASK     = 0x8000,
 		AUDIO_CONTROL_SOFTCH_MASK       = 0x1000,
@@ -250,7 +254,7 @@ protected:
 		AUDIO_CONTROL_FOF_MASK          = 0x0020,
 		AUDIO_CONTROL_INIT_MASK         = 0x0008,
 
-		AUDIO_COMPRESS_CTRL             = 0x40e,
+		AUDIO_COMPRESS_CTRL             = 0x00e,
 		AUDIO_COMPRESS_CTRL_PEAK_MASK   = 0x8000,
 		AUDIO_COMPRESS_CTRL_THRESHOLD_MASK  = 0x7f00,
 		AUDIO_COMPRESS_CTRL_THRESHOLD_SHIFT = 8,
@@ -261,53 +265,53 @@ protected:
 		AUDIO_COMPRESS_CTRL_DISZC_MASK      = 0x0008,
 		AUDIO_COMPRESS_CTRL_RATIO_MASK      = 0x0007,
 
-		AUDIO_CHANNEL_STATUS            = 0x40f,
+		AUDIO_CHANNEL_STATUS            = 0x00f,
 		AUDIO_CHANNEL_STATUS_MASK       = 0xffff,
 
-		AUDIO_WAVE_IN_L                 = 0x410,
+		AUDIO_WAVE_IN_L                 = 0x010,
 
-		AUDIO_WAVE_IN_R                 = 0x411,
+		AUDIO_WAVE_IN_R                 = 0x011,
 		AUDIO_SOFTIRQ_MASK              = 0x8000,
 		AUDIO_SOFTIRQ_EN_MASK           = 0x4000,
 		AUDIO_SOFT_PHASE_HIGH_MASK      = 0x0070,
 		AUDIO_SOFT_PHASE_HIGH_SHIFT     = 4,
 		AUDIO_FIFO_IRQ_THRESHOLD_MASK   = 0x000f,
 
-		AUDIO_WAVE_OUT_L                = 0x412,
-		AUDIO_WAVE_OUT_R                = 0x413,
+		AUDIO_WAVE_OUT_L                = 0x012,
+		AUDIO_WAVE_OUT_R                = 0x013,
 
-		AUDIO_CHANNEL_REPEAT            = 0x414,
+		AUDIO_CHANNEL_REPEAT            = 0x014,
 		AUDIO_CHANNEL_REPEAT_MASK       = 0xffff,
 
-		AUDIO_CHANNEL_ENV_MODE          = 0x415,
+		AUDIO_CHANNEL_ENV_MODE          = 0x015,
 		AUDIO_CHANNEL_ENV_MODE_MASK     = 0xffff,
 
-		AUDIO_CHANNEL_TONE_RELEASE      = 0x416,
+		AUDIO_CHANNEL_TONE_RELEASE      = 0x016,
 		AUDIO_CHANNEL_TONE_RELEASE_MASK = 0xffff,
 
-		AUDIO_CHANNEL_ENV_IRQ           = 0x417,
+		AUDIO_CHANNEL_ENV_IRQ           = 0x017,
 		AUDIO_CHANNEL_ENV_IRQ_MASK      = 0xffff,
 
-		AUDIO_CHANNEL_PITCH_BEND        = 0x418,
+		AUDIO_CHANNEL_PITCH_BEND        = 0x018,
 		AUDIO_CHANNEL_PITCH_BEND_MASK   = 0xffff,
 
-		AUDIO_SOFT_PHASE                = 0x419,
+		AUDIO_SOFT_PHASE                = 0x019,
 
-		AUDIO_ATTACK_RELEASE            = 0x41a,
+		AUDIO_ATTACK_RELEASE            = 0x01a,
 		AUDIO_RELEASE_TIME_MASK         = 0x00ff,
 		AUDIO_ATTACK_TIME_MASK          = 0xff00,
 		AUDIO_ATTACK_TIME_SHIFT         = 8,
 
-		AUDIO_EQ_CUTOFF10               = 0x41b,
+		AUDIO_EQ_CUTOFF10               = 0x01b,
 		AUDIO_EQ_CUTOFF10_MASK          = 0x7f7f,
 
-		AUDIO_EQ_CUTOFF32               = 0x41c,
+		AUDIO_EQ_CUTOFF32               = 0x01c,
 		AUDIO_EQ_CUTOFF32_MASK          = 0x7f7f,
 
-		AUDIO_EQ_GAIN10                 = 0x41d,
+		AUDIO_EQ_GAIN10                 = 0x01d,
 		AUDIO_EQ_GAIN10_MASK            = 0x7f7f,
 
-		AUDIO_EQ_GAIN32                 = 0x41e,
+		AUDIO_EQ_GAIN32                 = 0x01e,
 		AUDIO_EQ_GAIN32_MASK            = 0x7f7f
 	};
 
@@ -329,7 +333,8 @@ protected:
 	bool m_debug_samples;
 	bool m_debug_rates;
 
-	uint16_t m_audio_regs[0x800];
+	uint16_t m_audio_regs[0x400];
+	uint16_t m_audio_ctrl_regs[0x400];
 	uint8_t m_sample_shift[16];
 	uint32_t m_sample_count[16];
 	uint32_t m_sample_addr[16];

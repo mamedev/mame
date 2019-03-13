@@ -58,6 +58,8 @@ void spg2xx_audio_device::device_start()
 	save_item(NAME(m_debug_rates));
 
 	save_item(NAME(m_audio_regs));
+	save_item(NAME(m_audio_ctrl_regs));
+
 	save_item(NAME(m_sample_shift));
 	save_item(NAME(m_sample_count));
 	save_item(NAME(m_sample_addr));
@@ -82,7 +84,9 @@ void spg2xx_audio_device::device_start()
 
 void spg2xx_audio_device::device_reset()
 {
-	memset(m_audio_regs, 0, 0x800 * sizeof(uint16_t));
+	memset(m_audio_regs, 0, 0x400 * sizeof(uint16_t));
+	memset(m_audio_ctrl_regs, 0, 0x400 * sizeof(uint16_t));
+
 	memset(m_sample_shift, 0, 16);
 	memset(m_sample_count, 0, sizeof(uint32_t) * 16);
 	memset(m_sample_addr, 0, sizeof(uint32_t) * 16);
@@ -96,8 +100,8 @@ void spg2xx_audio_device::device_reset()
 	m_debug_rates = false;
 	m_audio_curr_beat_base_count = 0;
 
-	m_audio_regs[AUDIO_CHANNEL_REPEAT] = 0x3f;
-	m_audio_regs[AUDIO_CHANNEL_ENV_MODE] = 0x3f;
+	m_audio_ctrl_regs[AUDIO_CHANNEL_REPEAT] = 0x3f;
+	m_audio_ctrl_regs[AUDIO_CHANNEL_ENV_MODE] = 0x3f;
 
 	m_audio_beat->adjust(attotime::from_ticks(4, 281250), 0, attotime::from_ticks(4, 281250));
 }
@@ -120,7 +124,7 @@ void spg2xx_audio_device::check_irqs(const uint16_t changed)
 {
 	if (changed & (AUDIO_BIS_MASK | AUDIO_BIE_MASK)) // Beat IRQ
 	{
-		if ((m_audio_regs[AUDIO_BEAT_COUNT] & (AUDIO_BIS_MASK | AUDIO_BIE_MASK)) == (AUDIO_BIS_MASK | AUDIO_BIE_MASK))
+		if ((m_audio_ctrl_regs[AUDIO_BEAT_COUNT] & (AUDIO_BIS_MASK | AUDIO_BIE_MASK)) == (AUDIO_BIS_MASK | AUDIO_BIE_MASK))
 		{
 			LOGMASKED(LOG_BEAT, "Asserting beat IRQ\n");
 			m_irq_cb(true);
@@ -135,10 +139,8 @@ void spg2xx_audio_device::check_irqs(const uint16_t changed)
 
 READ16_MEMBER(spg2xx_audio_device::audio_ctrl_r)
 {
-	offset += 0x400;
-
 	//const uint16_t channel = (offset & 0x00f0) >> 4;
-	uint16_t data = m_audio_regs[offset];
+	uint16_t data = m_audio_ctrl_regs[offset];
 
 	switch (offset)
 	{
@@ -385,14 +387,13 @@ READ16_MEMBER(spg2xx_audio_device::audio_r)
 WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 {
 	const uint16_t channel = (offset & 0x00f0) >> 4;
-	offset += 0x400;
 
 	switch (offset)
 	{
 	case AUDIO_CHANNEL_ENABLE:
 	{
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel Enable: %04x\n", data);
-		const uint16_t changed = m_audio_regs[AUDIO_CHANNEL_ENABLE] ^ data;
+		const uint16_t changed = m_audio_ctrl_regs[AUDIO_CHANNEL_ENABLE] ^ data;
 		for (uint32_t channel_bit = 0; channel_bit < 16; channel_bit++)
 		{
 			const uint16_t mask = 1 << channel_bit;
@@ -401,14 +402,14 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 
 			if (data & mask)
 			{
-				if (!(m_audio_regs[AUDIO_CHANNEL_STATUS] & mask))
+				if (!(m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] & mask))
 				{
 					LOGMASKED(LOG_SPU_WRITES, "Enabling channel %d\n", channel_bit);
-					m_audio_regs[offset] |= mask;
-					if (!(m_audio_regs[AUDIO_CHANNEL_STOP] & mask))
+					m_audio_ctrl_regs[offset] |= mask;
+					if (!(m_audio_ctrl_regs[AUDIO_CHANNEL_STOP] & mask))
 					{
 						LOGMASKED(LOG_SPU_WRITES, "Stop not set, starting playback on channel %d, mask %04x\n", channel_bit, mask);
-						m_audio_regs[AUDIO_CHANNEL_STATUS] |= mask;
+						m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] |= mask;
 						m_sample_addr[channel_bit] = get_wave_addr(channel_bit);
 						m_envelope_addr[channel_bit] = get_envelope_addr(channel_bit);
 						set_envelope_count(channel, get_envelope_load(channel));
@@ -421,10 +422,10 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 			else
 			{
 				stop_channel(channel_bit);
-				//m_audio_regs[offset] &= ~mask;
-				//m_audio_regs[AUDIO_CHANNEL_STATUS] &= ~mask;
-				//m_audio_regs[AUDIO_CHANNEL_STOP] |= mask;
-				//m_audio_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~mask;
+				//m_audio_ctrl_regs[offset] &= ~mask;
+				//m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] &= ~mask;
+				//m_audio_ctrl_regs[AUDIO_CHANNEL_STOP] |= mask;
+				//m_audio_ctrl_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~mask;
 			}
 		}
 		break;
@@ -432,33 +433,33 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 
 	case AUDIO_MAIN_VOLUME:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: Main Volume: %04x\n", data);
-		m_audio_regs[offset] = data & AUDIO_MAIN_VOLUME_MASK;
+		m_audio_ctrl_regs[offset] = data & AUDIO_MAIN_VOLUME_MASK;
 		break;
 
 	case AUDIO_CHANNEL_FIQ_ENABLE:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel FIQ Enable: %04x\n", data);
-		m_audio_regs[offset] = data & AUDIO_CHANNEL_FIQ_ENABLE_MASK;
+		m_audio_ctrl_regs[offset] = data & AUDIO_CHANNEL_FIQ_ENABLE_MASK;
 		break;
 
 	case AUDIO_CHANNEL_FIQ_STATUS:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel FIQ Acknowledge: %04x\n", data);
-		m_audio_regs[offset] &= ~(data & AUDIO_CHANNEL_FIQ_STATUS_MASK);
+		m_audio_ctrl_regs[offset] &= ~(data & AUDIO_CHANNEL_FIQ_STATUS_MASK);
 		break;
 
 	case AUDIO_BEAT_BASE_COUNT:
 		LOGMASKED(LOG_SPU_WRITES | LOG_BEAT, "audio_w: Beat Base Count: %04x\n", data);
-		m_audio_regs[offset] = data & AUDIO_BEAT_BASE_COUNT_MASK;
-		m_audio_curr_beat_base_count = m_audio_regs[offset];
+		m_audio_ctrl_regs[offset] = data & AUDIO_BEAT_BASE_COUNT_MASK;
+		m_audio_curr_beat_base_count = m_audio_ctrl_regs[offset];
 		break;
 
 	case AUDIO_BEAT_COUNT:
 	{
 		LOGMASKED(LOG_SPU_WRITES | LOG_BEAT, "audio_w: Beat Count: %04x\n", data);
-		const uint16_t old = m_audio_regs[offset];
-		m_audio_regs[offset] &= ~(data & AUDIO_BIS_MASK);
-		m_audio_regs[offset] &= AUDIO_BIS_MASK;
-		m_audio_regs[offset] |= data & ~AUDIO_BIS_MASK;
-		const uint16_t changed = old ^ m_audio_regs[offset];
+		const uint16_t old = m_audio_ctrl_regs[offset];
+		m_audio_ctrl_regs[offset] &= ~(data & AUDIO_BIS_MASK);
+		m_audio_ctrl_regs[offset] &= AUDIO_BIS_MASK;
+		m_audio_ctrl_regs[offset] |= data & ~AUDIO_BIS_MASK;
+		const uint16_t changed = old ^ m_audio_ctrl_regs[offset];
 		if (changed & (AUDIO_BIS_MASK | AUDIO_BIE_MASK))
 		{
 			LOGMASKED(LOG_BEAT, "BIS mask changed, updating IRQ\n");
@@ -471,9 +472,9 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 	case AUDIO_ENVCLK1:
 	{
 		LOGMASKED(LOG_SPU_WRITES | LOG_ENVELOPES, "audio_w: Envelope Interval %d (lo): %04x\n", offset == AUDIO_ENVCLK0 ? 0 : 1, data);
-		const uint16_t old = m_audio_regs[offset];
-		m_audio_regs[offset] = data;
-		const uint16_t changed = old ^ m_audio_regs[offset];
+		const uint16_t old = m_audio_ctrl_regs[offset];
+		m_audio_ctrl_regs[offset] = data;
+		const uint16_t changed = old ^ m_audio_ctrl_regs[offset];
 
 		if (!changed)
 			break;
@@ -495,9 +496,9 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 	case AUDIO_ENVCLK1_HIGH:
 	{
 		LOGMASKED(LOG_SPU_WRITES | LOG_ENVELOPES, "audio_w: Envelope Interval %d (hi): %04x\n", offset == AUDIO_ENVCLK0_HIGH ? 0 : 1, data);
-		const uint16_t old = m_audio_regs[offset];
-		m_audio_regs[offset] = data;
-		const uint16_t changed = old ^ m_audio_regs[offset];
+		const uint16_t old = m_audio_ctrl_regs[offset];
+		m_audio_ctrl_regs[offset] = data;
+		const uint16_t changed = old ^ m_audio_ctrl_regs[offset];
 		if (!changed)
 			break;
 
@@ -517,9 +518,9 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 	case AUDIO_ENV_RAMP_DOWN:
 	{
 		LOGMASKED(LOG_SPU_WRITES | LOG_RAMPDOWN, "audio_w: Envelope Fast Ramp Down: %04x\n", data);
-		const uint16_t old = m_audio_regs[offset];
-		m_audio_regs[offset] = (data & AUDIO_ENV_RAMP_DOWN_MASK) & m_audio_regs[AUDIO_CHANNEL_STATUS];
-		const uint16_t changed = old ^ m_audio_regs[offset];
+		const uint16_t old = m_audio_ctrl_regs[offset];
+		m_audio_ctrl_regs[offset] = (data & AUDIO_ENV_RAMP_DOWN_MASK) & m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS];
+		const uint16_t changed = old ^ m_audio_ctrl_regs[offset];
 		if (!changed)
 			break;
 
@@ -537,12 +538,12 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 
 	case AUDIO_CHANNEL_STOP:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel Stop Status: %04x\n", data);
-		m_audio_regs[offset] &= ~data;
+		m_audio_ctrl_regs[offset] &= ~data;
 		break;
 
 	case AUDIO_CHANNEL_ZERO_CROSS:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel Zero-Cross Enable: %04x\n", data);
-		m_audio_regs[offset] = data & AUDIO_CHANNEL_ZERO_CROSS_MASK;
+		m_audio_ctrl_regs[offset] = data & AUDIO_CHANNEL_ZERO_CROSS_MASK;
 		break;
 
 	case AUDIO_CONTROL:
@@ -553,12 +554,12 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 			, (data & AUDIO_CONTROL_NOINT_MASK) ? 1 : 0
 			, (data & AUDIO_CONTROL_EQEN_MASK) ? 1 : 0
 			, (data & AUDIO_CONTROL_VOLSEL_MASK) >> AUDIO_CONTROL_VOLSEL_SHIFT);
-		m_audio_regs[offset] = data & AUDIO_CONTROL_MASK;
+		m_audio_ctrl_regs[offset] = data & AUDIO_CONTROL_MASK;
 		break;
 
 	case AUDIO_COMPRESS_CTRL:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: Compressor Control: %04x\n", data);
-		m_audio_regs[offset] = data;
+		m_audio_ctrl_regs[offset] = data;
 		break;
 
 	case AUDIO_CHANNEL_STATUS:
@@ -567,81 +568,81 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 
 	case AUDIO_WAVE_IN_L:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: Wave In (L) / FIFO Write Data: %04x\n", data);
-		m_audio_regs[offset] = data;
+		m_audio_ctrl_regs[offset] = data;
 		break;
 
 	case AUDIO_WAVE_IN_R:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: Wave In (R) / Software Channel FIFO IRQ Control: %04x\n", data);
-		m_audio_regs[offset] = data;
+		m_audio_ctrl_regs[offset] = data;
 		break;
 
 	case AUDIO_WAVE_OUT_L:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: Wave Out (L): %04x\n", data);
-		m_audio_regs[offset] = data;
+		m_audio_ctrl_regs[offset] = data;
 		break;
 
 	case AUDIO_WAVE_OUT_R:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: Wave Out (R): %04x\n", data);
-		m_audio_regs[offset] = data;
+		m_audio_ctrl_regs[offset] = data;
 		break;
 
 	case AUDIO_CHANNEL_REPEAT:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel Repeat Enable: %04x\n", data);
-		m_audio_regs[offset] = data & AUDIO_CHANNEL_REPEAT_MASK;
+		m_audio_ctrl_regs[offset] = data & AUDIO_CHANNEL_REPEAT_MASK;
 		break;
 
 	case AUDIO_CHANNEL_ENV_MODE:
 		LOGMASKED(LOG_SPU_WRITES | LOG_ENVELOPES, "audio_w: Channel Envelope Enable: %04x\n", data);
-		m_audio_regs[offset] = data & AUDIO_CHANNEL_ENV_MODE_MASK;
+		m_audio_ctrl_regs[offset] = data & AUDIO_CHANNEL_ENV_MODE_MASK;
 		break;
 
 	case AUDIO_CHANNEL_TONE_RELEASE:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel Tone Release Enable: %04x\n", data);
-		m_audio_regs[offset] = data & AUDIO_CHANNEL_TONE_RELEASE_MASK;
+		m_audio_ctrl_regs[offset] = data & AUDIO_CHANNEL_TONE_RELEASE_MASK;
 		break;
 
 	case AUDIO_CHANNEL_ENV_IRQ:
 		LOGMASKED(LOG_SPU_WRITES | LOG_ENVELOPES, "audio_w: Channel Envelope IRQ Acknowledge: %04x\n", data);
-		m_audio_regs[offset] &= ~data & AUDIO_CHANNEL_ENV_IRQ_MASK;
+		m_audio_ctrl_regs[offset] &= ~data & AUDIO_CHANNEL_ENV_IRQ_MASK;
 		break;
 
 	case AUDIO_CHANNEL_PITCH_BEND:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel Pitch Bend Enable: %04x\n", data);
-		m_audio_regs[offset] = data & AUDIO_CHANNEL_PITCH_BEND_MASK;
+		m_audio_ctrl_regs[offset] = data & AUDIO_CHANNEL_PITCH_BEND_MASK;
 		break;
 
 	case AUDIO_SOFT_PHASE:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: Software Channel Phase: %04x\n", data);
-		m_audio_regs[offset] = data;
+		m_audio_ctrl_regs[offset] = data;
 		break;
 
 	case AUDIO_ATTACK_RELEASE:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: Attack/Release Time Control: %04x\n", data);
-		m_audio_regs[offset] = data;
+		m_audio_ctrl_regs[offset] = data;
 		break;
 
 	case AUDIO_EQ_CUTOFF10:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: EQ Cutoff Frequency 0/1: %04x\n", data);
-		m_audio_regs[offset] = data & AUDIO_EQ_CUTOFF10_MASK;
+		m_audio_ctrl_regs[offset] = data & AUDIO_EQ_CUTOFF10_MASK;
 		break;
 
 	case AUDIO_EQ_CUTOFF32:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: EQ Cutoff Frequency 2/3: %04x\n", data);
-		m_audio_regs[offset] = data & AUDIO_EQ_CUTOFF32_MASK;
+		m_audio_ctrl_regs[offset] = data & AUDIO_EQ_CUTOFF32_MASK;
 		break;
 
 	case AUDIO_EQ_GAIN10:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: EQ Cutoff Gain 0/1: %04x\n", data);
-		m_audio_regs[offset] = data & AUDIO_EQ_GAIN10_MASK;
+		m_audio_ctrl_regs[offset] = data & AUDIO_EQ_GAIN10_MASK;
 		break;
 
 	case AUDIO_EQ_GAIN32:
 		LOGMASKED(LOG_SPU_WRITES, "audio_w: EQ Cutoff Gain 2/3: %04x\n", data);
-		m_audio_regs[offset] = data & AUDIO_EQ_GAIN32_MASK;
+		m_audio_ctrl_regs[offset] = data & AUDIO_EQ_GAIN32_MASK;
 		break;
 
 	default:
-		m_audio_regs[offset] = data;
+		m_audio_ctrl_regs[offset] = data;
 		LOGMASKED(LOG_UNKNOWN_SPU, "audio_w: Unknown register %04x = %04x\n", 0x3000 + offset, data);
 		break;
 	}
@@ -812,7 +813,7 @@ void spg2xx_audio_device::sound_stream_update(sound_stream &stream, stream_sampl
 			if (playing)
 			{
 				int32_t sample = (int16_t)(m_audio_regs[(channel << 4) | AUDIO_WAVE_DATA] ^ 0x8000);
-				if (!(m_audio_regs[AUDIO_CONTROL] & AUDIO_CONTROL_NOINT_MASK))
+				if (!(m_audio_ctrl_regs[AUDIO_CONTROL] & AUDIO_CONTROL_NOINT_MASK))
 				{
 					int32_t prev_sample = (int16_t)(m_audio_regs[(channel << 4) | AUDIO_WAVE_DATA_PREV] ^ 0x8000);
 					int16_t lerp_factor = (int16_t)((m_channel_rate_accum[channel] / 70312.5) * 256.0);
@@ -842,7 +843,7 @@ void spg2xx_audio_device::sound_stream_update(sound_stream &stream, stream_sampl
 				right_total += ((int16_t)sample * (int16_t)pan_right) >> 14;
 
 				const uint16_t mask = (1 << channel);
-				if (m_audio_regs[AUDIO_ENV_RAMP_DOWN] & mask)
+				if (m_audio_ctrl_regs[AUDIO_ENV_RAMP_DOWN] & mask)
 				{
 					if (m_rampdown_frame[channel] == 0)
 					{
@@ -851,7 +852,7 @@ void spg2xx_audio_device::sound_stream_update(sound_stream &stream, stream_sampl
 					}
 					m_rampdown_frame[channel]--;
 				}
-				else if (!(m_audio_regs[AUDIO_CHANNEL_ENV_MODE] & mask))
+				else if (!(m_audio_ctrl_regs[AUDIO_CHANNEL_ENV_MODE] & mask))
 				{
 					if (m_envclk_frame[channel] == 0)
 					{
@@ -877,19 +878,19 @@ void spg2xx_audio_device::sound_stream_update(sound_stream &stream, stream_sampl
 				right_total >>= 2;
 				break;
 		}
-		*out_l++ = (left_total * (int16_t)m_audio_regs[AUDIO_MAIN_VOLUME]) >> 7;
-		*out_r++ = (right_total * (int16_t)m_audio_regs[AUDIO_MAIN_VOLUME]) >> 7;
+		*out_l++ = (left_total * (int16_t)m_audio_ctrl_regs[AUDIO_MAIN_VOLUME]) >> 7;
+		*out_r++ = (right_total * (int16_t)m_audio_ctrl_regs[AUDIO_MAIN_VOLUME]) >> 7;
 	}
 }
 
 inline void spg2xx_audio_device::stop_channel(const uint32_t channel)
 {
 	// TODO: IRQs
-	m_audio_regs[AUDIO_CHANNEL_ENABLE] &= ~(1 << channel);
-	m_audio_regs[AUDIO_CHANNEL_STATUS] &= ~(1 << channel);
+	m_audio_ctrl_regs[AUDIO_CHANNEL_ENABLE] &= ~(1 << channel);
+	m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] &= ~(1 << channel);
 	m_audio_regs[(channel << 4) | AUDIO_MODE] &= ~AUDIO_ADPCM_MASK;
-	m_audio_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~(1 << channel);
-	m_audio_regs[AUDIO_ENV_RAMP_DOWN] &= ~(1 << channel);
+	m_audio_ctrl_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~(1 << channel);
+	m_audio_ctrl_regs[AUDIO_ENV_RAMP_DOWN] &= ~(1 << channel);
 }
 
 bool spg2xx_audio_device::advance_channel(const uint32_t channel)
@@ -1074,16 +1075,16 @@ void spg2xx_audio_device::audio_beat_tick()
 {
 	if (m_audio_curr_beat_base_count == 0)
 	{
-		LOGMASKED(LOG_BEAT, "Beat base count elapsed, reloading with %d\n", m_audio_regs[AUDIO_BEAT_BASE_COUNT]);
-		m_audio_curr_beat_base_count = m_audio_regs[AUDIO_BEAT_BASE_COUNT];
+		LOGMASKED(LOG_BEAT, "Beat base count elapsed, reloading with %d\n", m_audio_ctrl_regs[AUDIO_BEAT_BASE_COUNT]);
+		m_audio_curr_beat_base_count = m_audio_ctrl_regs[AUDIO_BEAT_BASE_COUNT];
 
-		uint16_t beat_count = m_audio_regs[AUDIO_BEAT_COUNT] & AUDIO_BEAT_COUNT_MASK;
+		uint16_t beat_count = m_audio_ctrl_regs[AUDIO_BEAT_COUNT] & AUDIO_BEAT_COUNT_MASK;
 		if (beat_count == 0)
 		{
-			if (m_audio_regs[AUDIO_BEAT_COUNT] & AUDIO_BIE_MASK)
+			if (m_audio_ctrl_regs[AUDIO_BEAT_COUNT] & AUDIO_BIE_MASK)
 			{
 				LOGMASKED(LOG_BEAT, "Beat count elapsed, setting Status bit and checking IRQs\n");
-				m_audio_regs[AUDIO_BEAT_COUNT] |= AUDIO_BIS_MASK;
+				m_audio_ctrl_regs[AUDIO_BEAT_COUNT] |= AUDIO_BIS_MASK;
 				check_irqs(AUDIO_BIS_MASK);
 			}
 			else
@@ -1093,7 +1094,7 @@ void spg2xx_audio_device::audio_beat_tick()
 		}
 
 		beat_count--;
-		m_audio_regs[AUDIO_BEAT_COUNT] = (m_audio_regs[AUDIO_BEAT_COUNT] & ~AUDIO_BEAT_COUNT_MASK) | beat_count;
+		m_audio_ctrl_regs[AUDIO_BEAT_COUNT] = (m_audio_ctrl_regs[AUDIO_BEAT_COUNT] & ~AUDIO_BEAT_COUNT_MASK) | beat_count;
 	}
 	m_audio_curr_beat_base_count--;
 }
@@ -1117,11 +1118,11 @@ void spg2xx_audio_device::audio_rampdown_tick(const uint32_t channel)
 	{
 		LOGMASKED(LOG_RAMPDOWN, "Stopping channel %d due to rampdown\n", channel);
 		const uint16_t channel_mask = 1 << channel;
-		m_audio_regs[AUDIO_CHANNEL_ENABLE] &= ~channel_mask;
-		m_audio_regs[AUDIO_CHANNEL_STATUS] &= ~channel_mask;
-		m_audio_regs[AUDIO_CHANNEL_STOP] |= channel_mask;
-		m_audio_regs[AUDIO_ENV_RAMP_DOWN] &= ~channel_mask;
-		m_audio_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~channel_mask;
+		m_audio_ctrl_regs[AUDIO_CHANNEL_ENABLE] &= ~channel_mask;
+		m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] &= ~channel_mask;
+		m_audio_ctrl_regs[AUDIO_CHANNEL_STOP] |= channel_mask;
+		m_audio_ctrl_regs[AUDIO_ENV_RAMP_DOWN] &= ~channel_mask;
+		m_audio_ctrl_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~channel_mask;
 	}
 }
 
@@ -1148,13 +1149,13 @@ uint32_t spg2xx_audio_device::get_envclk_frame_count(const uint32_t channel)
 uint32_t spg2xx_audio_device::get_envelope_clock(const offs_t channel) const
 {
 	if (channel < 4)
-		return (m_audio_regs[AUDIO_ENVCLK0] >> (channel << 2)) & 0x000f;
+		return (m_audio_ctrl_regs[AUDIO_ENVCLK0] >> (channel << 2)) & 0x000f;
 	else if (channel < 8)
-		return (m_audio_regs[AUDIO_ENVCLK0_HIGH] >> ((channel - 4) << 2)) & 0x000f;
+		return (m_audio_ctrl_regs[AUDIO_ENVCLK0_HIGH] >> ((channel - 4) << 2)) & 0x000f;
 	else if (channel < 12)
-		return (m_audio_regs[AUDIO_ENVCLK1] >> ((channel - 8) << 2)) & 0x000f;
+		return (m_audio_ctrl_regs[AUDIO_ENVCLK1] >> ((channel - 8) << 2)) & 0x000f;
 	else
-		return (m_audio_regs[AUDIO_ENVCLK1_HIGH] >> ((channel - 12) << 2)) & 0x000f;
+		return (m_audio_ctrl_regs[AUDIO_ENVCLK1_HIGH] >> ((channel - 12) << 2)) & 0x000f;
 }
 
 bool spg2xx_audio_device::audio_envelope_tick(const uint32_t channel)
