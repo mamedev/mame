@@ -25,6 +25,8 @@ public:
 
 	DECLARE_READ16_MEMBER(audio_r);
 	DECLARE_WRITE16_MEMBER(audio_w);
+	DECLARE_READ16_MEMBER(audio_ctrl_r);
+	DECLARE_WRITE16_MEMBER(audio_ctrl_w);
 
 protected:
 	// sound stream update overrides
