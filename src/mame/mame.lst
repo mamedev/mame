@@ -33222,6 +33222,7 @@ raidenkb                        // (c) bootleg
 raident                         // (c) 1990 Seibu Kaihatsu + Liang HWA Electronics license
 raidenu                         // (c) 1990 Seibu Kaihatsu + Fabtek license
 raidenua                        // (c) 1990 Seibu Kaihatsu + Fabtek license
+raidenub                        // (c) 1990 Seibu Kaihatsu + Fabtek license
 
 @source:raiden2.cpp
 raiden2                         // (c) 1993 Seibu Kaihatsu + Fabtek license
@@ -34698,6 +34699,7 @@ arabfgtu                        // 1992.03 Arabian Fight (US)
 arescue                         // 1992.03 Air Rescue (World)
 arescuej                        // 1992.04 Air Rescue (Japan)
 arescueu                        // 1992.03 Air Rescue (US)
+as1                             // 1993.?? AS-1
 brival                          // 1993.?? Burning Rival (World)
 brivalj                         // 1993.08 Burning Rival (Japan)
 darkedge                        // 1993.?? Dark Edge (World)
