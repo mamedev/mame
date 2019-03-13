@@ -58,6 +58,7 @@ void spg2xx_audio_device::device_start()
 	save_item(NAME(m_debug_rates));
 
 	save_item(NAME(m_audio_regs));
+	save_item(NAME(m_audio_phase_regs));
 	save_item(NAME(m_audio_ctrl_regs));
 
 	save_item(NAME(m_sample_shift));
@@ -84,7 +85,8 @@ void spg2xx_audio_device::device_start()
 
 void spg2xx_audio_device::device_reset()
 {
-	memset(m_audio_regs, 0, 0x400 * sizeof(uint16_t));
+	memset(m_audio_regs, 0, 0x200 * sizeof(uint16_t));
+	memset(m_audio_phase_regs, 0, 0x200 * sizeof(uint16_t));
 	memset(m_audio_ctrl_regs, 0, 0x400 * sizeof(uint16_t));
 
 	memset(m_sample_shift, 0, 16);
@@ -274,112 +276,124 @@ READ16_MEMBER(spg2xx_audio_device::audio_r)
 	const uint16_t channel = (offset & 0x00f0) >> 4;
 	uint16_t data = m_audio_regs[offset];
 
-	if (channel < 16) // this is always true?
+
+	switch (offset & AUDIO_CHAN_OFFSET_MASK)
 	{
-		switch (offset & AUDIO_CHAN_OFFSET_MASK)
-		{
-		case AUDIO_WAVE_ADDR:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Wave Addr (lo): %04x\n", channel, data);
-			break;
+	case AUDIO_WAVE_ADDR:
+		LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Wave Addr (lo): %04x\n", channel, data);
+		break;
 
-		case AUDIO_MODE:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Mode: %04x (ADPCM:%d, 16M:%d, TONE:%d, LADDR_HI:%04x, WADDR_HI:%04x)\n", channel, data,
-				get_adpcm_bit(channel), get_16bit_bit(channel), get_tone_mode(channel), get_loop_addr_high(channel), get_wave_addr_high(channel));
-			break;
+	case AUDIO_MODE:
+		LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Mode: %04x (ADPCM:%d, 16M:%d, TONE:%d, LADDR_HI:%04x, WADDR_HI:%04x)\n", channel, data,
+			get_adpcm_bit(channel), get_16bit_bit(channel), get_tone_mode(channel), get_loop_addr_high(channel), get_wave_addr_high(channel));
+		break;
 
-		case AUDIO_LOOP_ADDR:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Loop Addr: %04x\n", channel, data);
-			break;
+	case AUDIO_LOOP_ADDR:
+		LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Loop Addr: %04x\n", channel, data);
+		break;
 
-		case AUDIO_PAN_VOL:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Pan/Vol: %04x (PAN:%02x, VOL:%02x)\n", channel, data,
-				get_pan(channel), get_volume(channel));
-			break;
+	case AUDIO_PAN_VOL:
+		LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Pan/Vol: %04x (PAN:%02x, VOL:%02x)\n", channel, data,
+			get_pan(channel), get_volume(channel));
+		break;
 
-		case AUDIO_ENVELOPE0:
-			LOGMASKED(LOG_CHANNEL_READS | LOG_ENVELOPES, "audio_r: Channel %d: Envelope0: %04x (RPTPER:%d, TARGET:%02x, SIGN:%d, INC:%02x)\n", channel, data,
-				get_repeat_period_bit(channel), get_envelope_target(channel), get_envelope_sign_bit(channel), get_envelope_inc(channel));
-			break;
+	case AUDIO_ENVELOPE0:
+		LOGMASKED(LOG_CHANNEL_READS | LOG_ENVELOPES, "audio_r: Channel %d: Envelope0: %04x (RPTPER:%d, TARGET:%02x, SIGN:%d, INC:%02x)\n", channel, data,
+			get_repeat_period_bit(channel), get_envelope_target(channel), get_envelope_sign_bit(channel), get_envelope_inc(channel));
+		break;
 
-		case AUDIO_ENVELOPE_DATA:
-			LOGMASKED(LOG_CHANNEL_READS | LOG_ENVELOPES, "audio_r: Channel %d: Envelope Data: %04x (CNT:%d, EDD:%02x)\n", channel, data,
-				get_envelope_count(channel), get_edd(channel));
-			break;
+	case AUDIO_ENVELOPE_DATA:
+		LOGMASKED(LOG_CHANNEL_READS | LOG_ENVELOPES, "audio_r: Channel %d: Envelope Data: %04x (CNT:%d, EDD:%02x)\n", channel, data,
+			get_envelope_count(channel), get_edd(channel));
+		break;
 
-		case AUDIO_ENVELOPE1:
-			LOGMASKED(LOG_CHANNEL_READS | LOG_ENVELOPES, "audio_r: Channel %d: Envelope1 Data: %04x (RPTCNT:%02x, RPT:%d, LOAD:%02x)\n", channel, data,
-				get_envelope_repeat_count(channel), get_envelope_repeat_bit(channel), get_envelope_load(channel));
-			break;
+	case AUDIO_ENVELOPE1:
+		LOGMASKED(LOG_CHANNEL_READS | LOG_ENVELOPES, "audio_r: Channel %d: Envelope1 Data: %04x (RPTCNT:%02x, RPT:%d, LOAD:%02x)\n", channel, data,
+			get_envelope_repeat_count(channel), get_envelope_repeat_bit(channel), get_envelope_load(channel));
+		break;
 
-		case AUDIO_ENVELOPE_ADDR_HIGH:
-			LOGMASKED(LOG_CHANNEL_READS | LOG_ENVELOPES, "audio_r: Channel %d: Envelope Addr (hi): %04x (IRQADDR:%03x, IRQEN:%d, EADDR_HI:%02x)\n", channel, data,
-				get_audio_irq_addr(channel), get_audio_irq_enable_bit(channel), get_envelope_addr_high(channel));
-			break;
+	case AUDIO_ENVELOPE_ADDR_HIGH:
+		LOGMASKED(LOG_CHANNEL_READS | LOG_ENVELOPES, "audio_r: Channel %d: Envelope Addr (hi): %04x (IRQADDR:%03x, IRQEN:%d, EADDR_HI:%02x)\n", channel, data,
+			get_audio_irq_addr(channel), get_audio_irq_enable_bit(channel), get_envelope_addr_high(channel));
+		break;
 
-		case AUDIO_ENVELOPE_ADDR:
-			LOGMASKED(LOG_CHANNEL_READS | LOG_ENVELOPES, "audio_r: Channel %d: Envelope Addr (lo): %04x \n", channel, data);
-			break;
+	case AUDIO_ENVELOPE_ADDR:
+		LOGMASKED(LOG_CHANNEL_READS | LOG_ENVELOPES, "audio_r: Channel %d: Envelope Addr (lo): %04x \n", channel, data);
+		break;
 
-		case AUDIO_WAVE_DATA_PREV:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Wave Data Prev: %04x \n", channel, data);
-			break;
+	case AUDIO_WAVE_DATA_PREV:
+		LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Wave Data Prev: %04x \n", channel, data);
+		break;
 
-		case AUDIO_ENVELOPE_LOOP_CTRL:
-			LOGMASKED(LOG_CHANNEL_READS | LOG_ENVELOPES, "audio_r: Channel %d: Envelope Loop Ctrl: %04x (RDOFFS:%02x, EAOFFS:%03x)\n", channel, data,
-				get_rampdown_offset(channel), get_envelope_eaoffset(channel));
-			break;
+	case AUDIO_ENVELOPE_LOOP_CTRL:
+		LOGMASKED(LOG_CHANNEL_READS | LOG_ENVELOPES, "audio_r: Channel %d: Envelope Loop Ctrl: %04x (RDOFFS:%02x, EAOFFS:%03x)\n", channel, data,
+			get_rampdown_offset(channel), get_envelope_eaoffset(channel));
+		break;
 
-		case AUDIO_WAVE_DATA:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Wave Data: %04x\n", channel, data);
-			break;
+	case AUDIO_WAVE_DATA:
+		LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Wave Data: %04x\n", channel, data);
+		break;
 
-		case AUDIO_ADPCM_SEL:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: ADPCM Sel: %04x (ADPCM36:%d, POINTNUM:%02x\n", channel, data,
-				get_adpcm36_bit(channel), get_point_number(channel));
-			break;
+	case AUDIO_ADPCM_SEL:
+		LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: ADPCM Sel: %04x (ADPCM36:%d, POINTNUM:%02x\n", channel, data,
+			get_adpcm36_bit(channel), get_point_number(channel));
+		break;
 
-		case AUDIO_PHASE_HIGH:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Phase High: %04x\n", channel, data);
-			break;
+	default:
+		LOGMASKED(LOG_UNKNOWN_SPU, "audio_r: Unknown register %04x\n", 0x3000 + offset);
+		break;
 
-		case AUDIO_PHASE_ACCUM_HIGH:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Phase Accum High: %04x\n", channel, data);
-			break;
-
-		case AUDIO_TARGET_PHASE_HIGH:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Target Phase High: %04x\n", channel, data);
-			break;
-
-		case AUDIO_RAMP_DOWN_CLOCK:
-			LOGMASKED(LOG_CHANNEL_READS | LOG_RAMPDOWN, "audio_r: Channel %d: Rampdown Clock: %04x\n", channel, data);
-			break;
-
-		case AUDIO_PHASE:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Phase: %04x\n", channel, data);
-			break;
-
-		case AUDIO_PHASE_ACCUM:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Phase Accum: %04x\n", channel, data);
-			break;
-
-		case AUDIO_TARGET_PHASE:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Target Phase: %04x\n", channel, data);
-			break;
-
-		case AUDIO_PHASE_CTRL:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Phase Ctrl: %04x (TIMESTEP:%d, SIGN:%d, OFFSET:%03x\n", channel, data,
-				get_phase_time_step(channel), get_phase_sign_bit(channel), get_phase_offset(channel));
-			break;
-
-		default:
-			LOGMASKED(LOG_UNKNOWN_SPU, "audio_r: Unknown register %04x\n", 0x3000 + offset);
-			break;
-		}
 	}
-	else if (channel >= 16)
+
+	return data;
+}
+
+
+READ16_MEMBER(spg2xx_audio_device::audio_phase_r)
+{
+	const uint16_t channel = (offset & 0x00f0) >> 4;
+	uint16_t data = m_audio_phase_regs[offset];
+
+	switch (offset & AUDIO_CHAN_OFFSET_MASK)
 	{
-		LOGMASKED(LOG_UNKNOWN_SPU, "audio_r: Trying to read from channel %d\n", channel);
+	case AUDIO_PHASE_HIGH:
+		LOGMASKED(LOG_CHANNEL_READS, "audio_phase_r: Channel %d: Phase High: %04x\n", channel, data);
+		break;
+
+	case AUDIO_PHASE_ACCUM_HIGH:
+		LOGMASKED(LOG_CHANNEL_READS, "audio_phase_r: Channel %d: Phase Accum High: %04x\n", channel, data);
+		break;
+
+	case AUDIO_TARGET_PHASE_HIGH:
+		LOGMASKED(LOG_CHANNEL_READS, "audio_phase_r: Channel %d: Target Phase High: %04x\n", channel, data);
+		break;
+
+	case AUDIO_RAMP_DOWN_CLOCK:
+		LOGMASKED(LOG_CHANNEL_READS | LOG_RAMPDOWN, "audio_phase_r: Channel %d: Rampdown Clock: %04x\n", channel, data);
+		break;
+
+	case AUDIO_PHASE:
+		LOGMASKED(LOG_CHANNEL_READS, "audio_phase_r: Channel %d: Phase: %04x\n", channel, data);
+		break;
+
+	case AUDIO_PHASE_ACCUM:
+		LOGMASKED(LOG_CHANNEL_READS, "audio_phase_r: Channel %d: Phase Accum: %04x\n", channel, data);
+		break;
+
+	case AUDIO_TARGET_PHASE:
+		LOGMASKED(LOG_CHANNEL_READS, "audio_phase_r: Channel %d: Target Phase: %04x\n", channel, data);
+		break;
+
+	case AUDIO_PHASE_CTRL:
+		LOGMASKED(LOG_CHANNEL_READS, "audio_phase_r: Channel %d: Phase Ctrl: %04x (TIMESTEP:%d, SIGN:%d, OFFSET:%03x\n", channel, data,
+			get_phase_time_step(channel), get_phase_sign_bit(channel), get_phase_offset(channel));
+		break;
+
+	default:
+		LOGMASKED(LOG_UNKNOWN_SPU, "audio_phase_r: Unknown register %04x\n", 0x3000 + offset);
+		break;
 	}
+
 	return data;
 }
 
@@ -645,145 +659,149 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 	}
 }
 
+WRITE16_MEMBER(spg2xx_audio_device::audio_phase_w)
+{
+	const uint16_t channel = (offset & 0x00f0) >> 4;
+
+	switch (offset & AUDIO_CHAN_OFFSET_MASK)
+	{
+	case AUDIO_PHASE_HIGH:
+		m_audio_phase_regs[offset] = data & AUDIO_PHASE_HIGH_MASK;
+		m_channel_rate[channel] = ((double)get_phase(channel) * 140625.0 * 2.0) / (double)(1 << 19);
+		m_channel_rate_accum[channel] = 0.0;
+		LOGMASKED(LOG_CHANNEL_WRITES, "audio_phase_w: Channel %d: Phase High: %04x (rate: %f)\n", channel, data, m_channel_rate[channel]);
+		break;
+
+	case AUDIO_PHASE_ACCUM_HIGH:
+		m_audio_phase_regs[offset] = data & AUDIO_PHASE_ACCUM_HIGH_MASK;
+		LOGMASKED(LOG_CHANNEL_WRITES, "audio_phase_w: Channel %d: Phase Accum High: %04x\n", channel, data);
+		break;
+
+	case AUDIO_TARGET_PHASE_HIGH:
+		m_audio_phase_regs[offset] = data & AUDIO_TARGET_PHASE_HIGH_MASK;
+		LOGMASKED(LOG_CHANNEL_WRITES, "audio_phase_w: Channel %d: Target Phase High: %04x\n", channel, data);
+		break;
+
+	case AUDIO_RAMP_DOWN_CLOCK:
+		m_audio_phase_regs[offset] = data & AUDIO_RAMP_DOWN_CLOCK_MASK;
+		LOGMASKED(LOG_CHANNEL_WRITES | LOG_RAMPDOWN, "audio_phase_w: Channel %d: Rampdown Clock: %04x\n", channel, data);
+		break;
+
+	case AUDIO_PHASE:
+		m_audio_phase_regs[offset] = data;
+		m_channel_rate[channel] = ((double)get_phase(channel) * 140625.0 * 2.0) / (double)(1 << 19);
+		m_channel_rate_accum[channel] = 0.0;
+		LOGMASKED(LOG_CHANNEL_WRITES, "audio_phase_w: Channel %d: Phase: %04x (rate: %f)\n", channel, data, m_channel_rate[channel]);
+		break;
+
+	case AUDIO_PHASE_ACCUM:
+		m_audio_phase_regs[offset] = data;
+		LOGMASKED(LOG_CHANNEL_WRITES, "audio_phase_w: Channel %d: Phase Accum: %04x\n", channel, data);
+		break;
+
+	case AUDIO_TARGET_PHASE:
+		m_audio_phase_regs[offset] = data;
+		LOGMASKED(LOG_CHANNEL_WRITES, "audio_phase_w: Channel %d: Target Phase: %04x\n", channel, data);
+		break;
+
+	case AUDIO_PHASE_CTRL:
+		m_audio_phase_regs[offset] = data;
+		LOGMASKED(LOG_CHANNEL_WRITES, "audio_phase_w: Channel %d: Phase Ctrl: %04x (TIMESTEP:%d, SIGN:%d, OFFSET:%03x\n", channel, data,
+			get_phase_time_step(channel), get_phase_sign_bit(channel), get_phase_offset(channel));
+		break;
+
+	default:
+		m_audio_phase_regs[offset] = data;
+		LOGMASKED(LOG_UNKNOWN_SPU, "audio_phase_w: Unknown register %04x = %04x\n", 0x3000 + offset, data);
+		break;
+	}
+}
+
+
 WRITE16_MEMBER(spg2xx_audio_device::audio_w)
 {
 	const uint16_t channel = (offset & 0x00f0) >> 4;
 
-	if (channel < 16) // this is always true?
+	switch (offset & AUDIO_CHAN_OFFSET_MASK)
 	{
-		switch (offset & AUDIO_CHAN_OFFSET_MASK)
-		{
-		case AUDIO_WAVE_ADDR:
-			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Wave Addr (lo): %04x\n", channel, data);
-			break;
-
-		case AUDIO_MODE:
-			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Mode: %04x (ADPCM:%d, 16M:%d, TONE:%d, LADDR_HI:%04x, WADDR_HI:%04x)\n", channel, data,
-				get_adpcm_bit(channel), get_16bit_bit(channel), get_tone_mode(channel), get_loop_addr_high(channel), get_wave_addr_high(channel));
-			break;
-
-		case AUDIO_LOOP_ADDR:
-			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Loop Addr: %04x\n", channel, data);
-			break;
-
-		case AUDIO_PAN_VOL:
-			m_audio_regs[offset] = data & AUDIO_PAN_VOL_MASK;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Pan/Vol: %04x (PAN:%02x, VOL:%02x)\n", channel, data,
-				get_pan(channel), get_volume(channel));
-			break;
-
-		case AUDIO_ENVELOPE0:
-			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES | LOG_ENVELOPES, "audio_w: Channel %d: Envelope0: %04x (RPTPER:%d, TARGET:%02x, SIGN:%d, INC:%02x)\n", channel, data,
-				get_repeat_period_bit(channel), get_envelope_target(channel), get_envelope_sign_bit(channel), get_envelope_inc(channel));
-			break;
-
-		case AUDIO_ENVELOPE_DATA:
-			m_audio_regs[offset] = data & AUDIO_ENVELOPE_DATA_MASK;
-			LOGMASKED(LOG_CHANNEL_WRITES | LOG_ENVELOPES, "audio_w: Channel %d: Envelope Data: %04x (CNT:%d, EDD:%02x)\n", channel, data,
-				get_envelope_count(channel), get_edd(channel));
-			break;
-
-		case AUDIO_ENVELOPE1:
-			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES | LOG_ENVELOPES, "audio_w: Channel %d: Envelope1 Data: %04x (RPTCNT:%02x, RPT:%d, LOAD:%02x)\n", channel, data,
-				get_envelope_repeat_count(channel), get_envelope_repeat_bit(channel), get_envelope_load(channel));
-			break;
-
-		case AUDIO_ENVELOPE_ADDR_HIGH:
-			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES | LOG_ENVELOPES, "audio_w: Channel %d: Envelope Addr (hi): %04x (IRQADDR:%03x, IRQEN:%d, EADDR_HI:%02x)\n", channel, data,
-				get_audio_irq_addr(channel), get_audio_irq_enable_bit(channel), get_envelope_addr_high(channel));
-			break;
-
-		case AUDIO_ENVELOPE_ADDR:
-			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES | LOG_ENVELOPES, "audio_w: Channel %d: Envelope Addr (lo): %04x\n", channel, data);
-			break;
-
-		case AUDIO_WAVE_DATA_PREV:
-			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Wave Data Prev: %04x \n", channel, data);
-			break;
-
-		case AUDIO_ENVELOPE_LOOP_CTRL:
-			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES | LOG_ENVELOPES, "audio_w: Channel %d: Envelope Loop Ctrl: %04x (RDOFFS:%02x, EAOFFS:%03x)\n", channel, data,
-				get_rampdown_offset(channel), get_envelope_eaoffset(channel));
-			break;
-
-		case AUDIO_WAVE_DATA:
-			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Wave Data: %04x\n", channel, data);
-			break;
-
-		case AUDIO_ADPCM_SEL:
-			m_audio_regs[offset] = data & AUDIO_ADPCM_SEL_MASK;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: ADPCM Sel: %04x (ADPCM36:%d, POINTNUM:%02x\n", channel, data,
-				get_adpcm36_bit(channel), get_point_number(channel));
-			break;
-
-		case AUDIO_PHASE_HIGH:
-			m_audio_regs[offset] = data & AUDIO_PHASE_HIGH_MASK;
-			m_channel_rate[channel] = ((double)get_phase(channel) * 140625.0 * 2.0) / (double)(1 << 19);
-			m_channel_rate_accum[channel] = 0.0;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Phase High: %04x (rate: %f)\n", channel, data, m_channel_rate[channel]);
-			break;
-
-		case AUDIO_PHASE_ACCUM_HIGH:
-			m_audio_regs[offset] = data & AUDIO_PHASE_ACCUM_HIGH_MASK;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Phase Accum High: %04x\n", channel, data);
-			break;
-
-		case AUDIO_TARGET_PHASE_HIGH:
-			m_audio_regs[offset] = data & AUDIO_TARGET_PHASE_HIGH_MASK;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Target Phase High: %04x\n", channel, data);
-			break;
-
-		case AUDIO_RAMP_DOWN_CLOCK:
-			m_audio_regs[offset] = data & AUDIO_RAMP_DOWN_CLOCK_MASK;
-			LOGMASKED(LOG_CHANNEL_WRITES | LOG_RAMPDOWN, "audio_w: Channel %d: Rampdown Clock: %04x\n", channel, data);
-			break;
-
-		case AUDIO_PHASE:
-			m_audio_regs[offset] = data;
-			m_channel_rate[channel] = ((double)get_phase(channel) * 140625.0 * 2.0) / (double)(1 << 19);
-			m_channel_rate_accum[channel] = 0.0;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Phase: %04x (rate: %f)\n", channel, data, m_channel_rate[channel]);
-			break;
-
-		case AUDIO_PHASE_ACCUM:
-			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Phase Accum: %04x\n", channel, data);
-			break;
-
-		case AUDIO_TARGET_PHASE:
-			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Target Phase: %04x\n", channel, data);
-			break;
-
-		case AUDIO_PHASE_CTRL:
-			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Phase Ctrl: %04x (TIMESTEP:%d, SIGN:%d, OFFSET:%03x\n", channel, data,
-				get_phase_time_step(channel), get_phase_sign_bit(channel), get_phase_offset(channel));
-			break;
-
-		default:
-			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_UNKNOWN_SPU, "audio_w: Unknown register %04x = %04x\n", 0x3000 + offset, data);
-			break;
-		}
-	}
-	else if (channel >= 16)
-	{
-		LOGMASKED(LOG_UNKNOWN_SPU, "audio_w: Trying to write to channel %d: %04x = %04x\n", channel, 0x3000 + offset, data);
-	}
-	else
-	{
+	case AUDIO_WAVE_ADDR:
 		m_audio_regs[offset] = data;
+		LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Wave Addr (lo): %04x\n", channel, data);
+		break;
+
+	case AUDIO_MODE:
+		m_audio_regs[offset] = data;
+		LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Mode: %04x (ADPCM:%d, 16M:%d, TONE:%d, LADDR_HI:%04x, WADDR_HI:%04x)\n", channel, data,
+			get_adpcm_bit(channel), get_16bit_bit(channel), get_tone_mode(channel), get_loop_addr_high(channel), get_wave_addr_high(channel));
+		break;
+
+	case AUDIO_LOOP_ADDR:
+		m_audio_regs[offset] = data;
+		LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Loop Addr: %04x\n", channel, data);
+		break;
+
+	case AUDIO_PAN_VOL:
+		m_audio_regs[offset] = data & AUDIO_PAN_VOL_MASK;
+		LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Pan/Vol: %04x (PAN:%02x, VOL:%02x)\n", channel, data,
+			get_pan(channel), get_volume(channel));
+		break;
+
+	case AUDIO_ENVELOPE0:
+		m_audio_regs[offset] = data;
+		LOGMASKED(LOG_CHANNEL_WRITES | LOG_ENVELOPES, "audio_w: Channel %d: Envelope0: %04x (RPTPER:%d, TARGET:%02x, SIGN:%d, INC:%02x)\n", channel, data,
+			get_repeat_period_bit(channel), get_envelope_target(channel), get_envelope_sign_bit(channel), get_envelope_inc(channel));
+		break;
+
+	case AUDIO_ENVELOPE_DATA:
+		m_audio_regs[offset] = data & AUDIO_ENVELOPE_DATA_MASK;
+		LOGMASKED(LOG_CHANNEL_WRITES | LOG_ENVELOPES, "audio_w: Channel %d: Envelope Data: %04x (CNT:%d, EDD:%02x)\n", channel, data,
+			get_envelope_count(channel), get_edd(channel));
+		break;
+
+	case AUDIO_ENVELOPE1:
+		m_audio_regs[offset] = data;
+		LOGMASKED(LOG_CHANNEL_WRITES | LOG_ENVELOPES, "audio_w: Channel %d: Envelope1 Data: %04x (RPTCNT:%02x, RPT:%d, LOAD:%02x)\n", channel, data,
+			get_envelope_repeat_count(channel), get_envelope_repeat_bit(channel), get_envelope_load(channel));
+		break;
+
+	case AUDIO_ENVELOPE_ADDR_HIGH:
+		m_audio_regs[offset] = data;
+		LOGMASKED(LOG_CHANNEL_WRITES | LOG_ENVELOPES, "audio_w: Channel %d: Envelope Addr (hi): %04x (IRQADDR:%03x, IRQEN:%d, EADDR_HI:%02x)\n", channel, data,
+			get_audio_irq_addr(channel), get_audio_irq_enable_bit(channel), get_envelope_addr_high(channel));
+		break;
+
+	case AUDIO_ENVELOPE_ADDR:
+		m_audio_regs[offset] = data;
+		LOGMASKED(LOG_CHANNEL_WRITES | LOG_ENVELOPES, "audio_w: Channel %d: Envelope Addr (lo): %04x\n", channel, data);
+		break;
+
+	case AUDIO_WAVE_DATA_PREV:
+		m_audio_regs[offset] = data;
+		LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Wave Data Prev: %04x \n", channel, data);
+		break;
+
+	case AUDIO_ENVELOPE_LOOP_CTRL:
+		m_audio_regs[offset] = data;
+		LOGMASKED(LOG_CHANNEL_WRITES | LOG_ENVELOPES, "audio_w: Channel %d: Envelope Loop Ctrl: %04x (RDOFFS:%02x, EAOFFS:%03x)\n", channel, data,
+			get_rampdown_offset(channel), get_envelope_eaoffset(channel));
+		break;
+
+	case AUDIO_WAVE_DATA:
+		m_audio_regs[offset] = data;
+		LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Wave Data: %04x\n", channel, data);
+		break;
+
+	case AUDIO_ADPCM_SEL:
+		m_audio_regs[offset] = data & AUDIO_ADPCM_SEL_MASK;
+		LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: ADPCM Sel: %04x (ADPCM36:%d, POINTNUM:%02x\n", channel, data,
+			get_adpcm36_bit(channel), get_point_number(channel));
+		break;
+
+	default:
+		m_audio_regs[offset] = data;
+		LOGMASKED(LOG_UNKNOWN_SPU, "audio_w: Unknown register %04x = %04x\n", 0x3000 + offset, data);
+		break;
+
 	}
 }
 

@@ -27,6 +27,8 @@ public:
 	DECLARE_WRITE16_MEMBER(audio_w);
 	DECLARE_READ16_MEMBER(audio_ctrl_r);
 	DECLARE_WRITE16_MEMBER(audio_ctrl_w);
+	DECLARE_READ16_MEMBER(audio_phase_r);
+	DECLARE_WRITE16_MEMBER(audio_phase_w);
 
 protected:
 	// sound stream update overrides
@@ -90,20 +92,21 @@ protected:
 	uint16_t get_adpcm36_bit(const offs_t channel) const { return (m_audio_regs[(channel << 4) | AUDIO_ADPCM_SEL] & AUDIO_ADPCM36_MASK) ? 1 : 0; }
 
 	// Audio high-word getters
-	uint16_t get_phase_high(const offs_t channel) const { return m_audio_regs[(channel << 4) | AUDIO_PHASE_HIGH] & AUDIO_PHASE_HIGH_MASK; }
-	uint16_t get_phase_accum_high(const offs_t channel) const { return m_audio_regs[(channel << 4) | AUDIO_PHASE_ACCUM_HIGH] & AUDIO_PHASE_ACCUM_HIGH_MASK; }
-	uint16_t get_target_phase_high(const offs_t channel) const { return m_audio_regs[(channel << 4) | AUDIO_TARGET_PHASE_HIGH] & AUDIO_TARGET_PHASE_HIGH_MASK; }
-	uint16_t get_rampdown_clock(const offs_t channel) const { return m_audio_regs[(channel << 4) | AUDIO_RAMP_DOWN_CLOCK] & AUDIO_RAMP_DOWN_CLOCK_MASK; }
+	uint16_t get_phase_high(const offs_t channel) const { return m_audio_phase_regs[(channel << 4) | AUDIO_PHASE_HIGH] & AUDIO_PHASE_HIGH_MASK; }
+	uint16_t get_phase_accum_high(const offs_t channel) const { return m_audio_phase_regs[(channel << 4) | AUDIO_PHASE_ACCUM_HIGH] & AUDIO_PHASE_ACCUM_HIGH_MASK; }
+	uint16_t get_target_phase_high(const offs_t channel) const { return m_audio_phase_regs[(channel << 4) | AUDIO_TARGET_PHASE_HIGH] & AUDIO_TARGET_PHASE_HIGH_MASK; }
+	uint16_t get_rampdown_clock(const offs_t channel) const { return m_audio_phase_regs[(channel << 4) | AUDIO_RAMP_DOWN_CLOCK] & AUDIO_RAMP_DOWN_CLOCK_MASK; }
 
 	// Audio ADPCM getters
-	uint16_t get_phase_offset(const offs_t channel) const { return m_audio_regs[(channel << 4) | AUDIO_PHASE_CTRL] & AUDIO_PHASE_OFFSET_MASK; }
-	uint16_t get_phase_sign_bit(const offs_t channel) const { return (m_audio_regs[(channel << 4) | AUDIO_PHASE_CTRL] & AUDIO_PHASE_SIGN_MASK) >> AUDIO_PHASE_SIGN_SHIFT; }
-	uint16_t get_phase_time_step(const offs_t channel) const { return (m_audio_regs[(channel << 4) | AUDIO_PHASE_CTRL] & AUDIO_PHASE_TIME_STEP_MASK) >> AUDIO_PHASE_TIME_STEP_SHIFT; }
+	uint16_t get_phase_offset(const offs_t channel) const { return m_audio_phase_regs[(channel << 4) | AUDIO_PHASE_CTRL] & AUDIO_PHASE_OFFSET_MASK; }
+	uint16_t get_phase_sign_bit(const offs_t channel) const { return (m_audio_phase_regs[(channel << 4) | AUDIO_PHASE_CTRL] & AUDIO_PHASE_SIGN_MASK) >> AUDIO_PHASE_SIGN_SHIFT; }
+	uint16_t get_phase_time_step(const offs_t channel) const { return (m_audio_phase_regs[(channel << 4) | AUDIO_PHASE_CTRL] & AUDIO_PHASE_TIME_STEP_MASK) >> AUDIO_PHASE_TIME_STEP_SHIFT; }
 
 	// Audio combined getters
-	uint32_t get_phase(const offs_t channel) const { return ((uint32_t)get_phase_high(channel) << 16) | m_audio_regs[(channel << 4) | AUDIO_PHASE]; }
-	uint32_t get_phase_accum(const offs_t channel) const { return ((uint32_t)get_phase_accum_high(channel) << 16) | m_audio_regs[(channel << 4) | AUDIO_PHASE_ACCUM]; }
-	uint32_t get_target_phase(const offs_t channel) const { return ((uint32_t)get_target_phase_high(channel) << 16) | m_audio_regs[(channel << 4) | AUDIO_TARGET_PHASE]; }
+	uint32_t get_phase(const offs_t channel) const { return ((uint32_t)get_phase_high(channel) << 16) | m_audio_phase_regs[(channel << 4) | AUDIO_PHASE]; }
+	uint32_t get_phase_accum(const offs_t channel) const { return ((uint32_t)get_phase_accum_high(channel) << 16) | m_audio_phase_regs[(channel << 4) | AUDIO_PHASE_ACCUM]; }
+	uint32_t get_target_phase(const offs_t channel) const { return ((uint32_t)get_target_phase_high(channel) << 16) | m_audio_phase_regs[(channel << 4) | AUDIO_TARGET_PHASE]; }
+
 	uint32_t get_wave_addr(const offs_t channel) const { return ((uint32_t)get_wave_addr_high(channel) << 16) | m_audio_regs[(channel << 4) | AUDIO_WAVE_ADDR]; }
 	uint32_t get_loop_addr(const offs_t channel) const { return ((uint32_t)get_loop_addr_high(channel) << 16) | m_audio_regs[(channel << 4) | AUDIO_LOOP_ADDR]; }
 	uint32_t get_envelope_addr(const offs_t channel) const { return ((uint32_t)get_envelope_addr_high(channel) << 16) | m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_ADDR]; }
@@ -172,24 +175,27 @@ protected:
 		AUDIO_POINT_NUMBER_MASK     = 0x7e00,
 		AUDIO_POINT_NUMBER_SHIFT    = 9,
 		AUDIO_ADPCM36_MASK          = 0x8000,
+	};
 
-		AUDIO_PHASE_HIGH            = 0x200,
+	enum // at audio write offset 0x200 in spg2xx
+	{
+		AUDIO_PHASE_HIGH            = 0x000,
 		AUDIO_PHASE_HIGH_MASK       = 0x0007,
 
-		AUDIO_PHASE_ACCUM_HIGH      = 0x201,
+		AUDIO_PHASE_ACCUM_HIGH      = 0x001,
 		AUDIO_PHASE_ACCUM_HIGH_MASK = 0x0007,
 
-		AUDIO_TARGET_PHASE_HIGH     = 0x202,
+		AUDIO_TARGET_PHASE_HIGH     = 0x002,
 		AUDIO_TARGET_PHASE_HIGH_MASK= 0x0007,
 
-		AUDIO_RAMP_DOWN_CLOCK       = 0x203,
+		AUDIO_RAMP_DOWN_CLOCK       = 0x003,
 		AUDIO_RAMP_DOWN_CLOCK_MASK  = 0x0007,
 
-		AUDIO_PHASE                 = 0x204,
-		AUDIO_PHASE_ACCUM           = 0x205,
-		AUDIO_TARGET_PHASE          = 0x206,
+		AUDIO_PHASE                 = 0x004,
+		AUDIO_PHASE_ACCUM           = 0x005,
+		AUDIO_TARGET_PHASE          = 0x006,
 
-		AUDIO_PHASE_CTRL            = 0x207,
+		AUDIO_PHASE_CTRL            = 0x007,
 		AUDIO_PHASE_OFFSET_MASK     = 0x0fff,
 		AUDIO_PHASE_SIGN_MASK       = 0x1000,
 		AUDIO_PHASE_SIGN_SHIFT      = 12,
@@ -333,7 +339,8 @@ protected:
 	bool m_debug_samples;
 	bool m_debug_rates;
 
-	uint16_t m_audio_regs[0x400];
+	uint16_t m_audio_regs[0x200];
+	uint16_t m_audio_phase_regs[0x200];
 	uint16_t m_audio_ctrl_regs[0x400];
 	uint8_t m_sample_shift[16];
 	uint32_t m_sample_count[16];
