@@ -409,10 +409,7 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 						m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] |= mask;
 						m_sample_addr[channel_bit] = get_wave_addr(channel_bit);
 						m_envelope_addr[channel_bit] = get_envelope_addr(channel_bit);
-
-						const uint16_t channel = (offset & 0x00f0) >> 4; // this can't be correct? bit 0x10 is part of register select?  (AUDIO_CHANNEL_ENABLE is 0x00 AUDIO_WAVE_IN_L is 0x10)
-
-						set_envelope_count(channel, get_envelope_load(channel));
+						set_envelope_count(channel_bit, get_envelope_load(channel_bit));
 					}
 					m_adpcm[channel_bit].reset();
 					m_sample_shift[channel_bit] = 0;
