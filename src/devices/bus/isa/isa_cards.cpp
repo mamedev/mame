@@ -37,6 +37,7 @@
 #include "mcd.h"
 #include "lbaenhancer.h"
 #include "cl_sh260.h"
+#include "bt54x.h"
 
 // sound
 #include "adlib.h"
@@ -173,4 +174,5 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("wd1007a", WD1007A);
 	device.option_add("ev346", EV346);
 	device.option_add("jc1310", JC1310);
+	device.option_add("bt545s", BT545S);
 }

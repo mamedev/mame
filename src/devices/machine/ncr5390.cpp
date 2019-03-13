@@ -20,9 +20,10 @@
 
 #define DELAY_HACK
 
-DEFINE_DEVICE_TYPE(NCR5390, ncr5390_device, "ncr5390", "NCR 5390 SCSI")
-DEFINE_DEVICE_TYPE(NCR53C90A, ncr53c90a_device, "ncr53c90a", "NCR 53C90A SCSI")
-DEFINE_DEVICE_TYPE(NCR53C94, ncr53c94_device, "ncr53c94", "NCR 53C94 SCSI")
+DEFINE_DEVICE_TYPE(NCR5390, ncr5390_device, "ncr5390", "NCR 5390 SCSI Controller")
+DEFINE_DEVICE_TYPE(NCR53C90A, ncr53c90a_device, "ncr53c90a", "NCR 53C90A Advanced SCSI Controller")
+DEFINE_DEVICE_TYPE(NCR53C94, ncr53c94_device, "ncr53c94", "NCR 53C94 Advanced SCSI Controller")
+DEFINE_DEVICE_TYPE(NCR53CF94, ncr53cf94_device, "ncr53cf94", "NCR 53CF94-2 Fast SCSI Controller") // TODO: differences not emulated
 
 void ncr5390_device::map(address_map &map)
 {
@@ -147,9 +148,19 @@ ncr53c90a_device::ncr53c90a_device(const machine_config &mconfig, const char *ta
 }
 
 ncr53c94_device::ncr53c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ncr53c90a_device(mconfig, NCR53C94, tag, owner, clock)
+	: ncr53c94_device(mconfig, NCR53C94, tag, owner, clock)
+{
+}
+
+ncr53c94_device::ncr53c94_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: ncr53c90a_device(mconfig, type, tag, owner, clock)
 	, config3(0)
 	, m_busmd(BUSMD_0)
+{
+}
+
+ncr53cf94_device::ncr53cf94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ncr53c94_device(mconfig, NCR53CF94, tag, owner, clock)
 {
 }
 

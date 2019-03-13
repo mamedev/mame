@@ -307,6 +307,8 @@ public:
 	void dma16_w(u16 data);
 
 protected:
+	ncr53c94_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	enum conf3_mask : u8
 	{
 		BS8  = 0x01, // burst size 8
@@ -324,8 +326,15 @@ private:
 	busmd_t m_busmd;
 };
 
+class ncr53cf94_device : public ncr53c94_device
+{
+public:
+	ncr53cf94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 DECLARE_DEVICE_TYPE(NCR5390, ncr5390_device)
 DECLARE_DEVICE_TYPE(NCR53C90A, ncr53c90a_device)
 DECLARE_DEVICE_TYPE(NCR53C94, ncr53c94_device)
+DECLARE_DEVICE_TYPE(NCR53CF94, ncr53cf94_device)
 
 #endif // MAME_MACHINE_NCR5390_H
