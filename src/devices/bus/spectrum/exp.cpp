@@ -171,6 +171,7 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 #include "plus2test.h"
 //#include "plusd.h"
 #include "protek.h"
+#include "specdrum.h"
 #include "uslot.h"
 #include "usource.h"
 #include "uspeech.h"
@@ -192,6 +193,7 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	//device.option_add("opus", SPECTRUM_OPUS);
 	//device.option_add("plusd", SPECTRUM_PLUSD);
 	device.option_add("protek", SPECTRUM_PROTEK);
+	device.option_add("specdrum", SPECTRUM_SPECDRUM);
 	device.option_add("uslot", SPECTRUM_USLOT);
 	device.option_add("usource", SPECTRUM_USOURCE);
 	device.option_add("uspeech", SPECTRUM_USPEECH);
@@ -209,6 +211,7 @@ void spec128_expansion_devices(device_slot_interface &device)
 	device.option_add("mprint", SPECTRUM_MPRINT);
 	device.option_add("plus2test", SPECTRUM_PLUS2TEST);
 	device.option_add("protek", SPECTRUM_PROTEK);
+	device.option_add("specdrum", SPECTRUM_SPECDRUM);
 }
 
 void specpls3_expansion_devices(device_slot_interface &device)
