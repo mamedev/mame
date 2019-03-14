@@ -1087,6 +1087,7 @@ if (CPUS["I386"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/i386/i386.cpp",
 		MAME_DIR .. "src/devices/cpu/i386/i386.h",
+		MAME_DIR .. "src/devices/cpu/i386/cache.h",
 		MAME_DIR .. "src/devices/cpu/i386/cycles.h",
 		MAME_DIR .. "src/devices/cpu/i386/i386op16.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/i386op32.hxx",
