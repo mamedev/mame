@@ -42810,7 +42810,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Fire Pro Wrestling G (Japan) (v1.1).cue" size="101" crc="235169a5" sha1="8d8e7d6247ba63290b18224639ef7f97e89121d1"/>
 		<rom name="Fire Pro Wrestling G (Japan) (v1.1).bin" size="303358608" crc="8ddb5a09" sha1="26c1da5e5b64d162e9f85c285ffaf2cf2d82214a"/>
 		-->
-		<description>Fire Pro Wrestling G (Japan) (v1.1)</description>
+		<description>Fire Pro Wrestling G (Jpn) (v1.1)</description>
 		<year>2000</year>
 		<publisher>Spike</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -43417,7 +43417,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="King of Braves Gaogaigar - Blockaded Numbers (Japan) [SLPS-01980].bin" size="708417696" crc="312b7d05" sha1="8ac17340c8ff0dff6479eb5c68752a7853d4ef17"/>
 		<rom name="King of Braves Gaogaigar - Blockaded Numbers (Japan) [SLPS-01980].cue" size="131" crc="54b7c369" sha1="bdf27465b2e2f0e15c1550bda109ecc6f3559a71"/>
 		-->
-		<description>Yuusha-Ou GaoGaiGar - Blockaded Numbers (Japan)</description>
+		<description>Yuusha-Ou GaoGaiGar - Blockaded Numbers (Jpn)</description>
 		<year>1999</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="SLPS-01980" />
@@ -44066,7 +44066,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Gradius Gaiden (Japan) (v1.1).cue" size="95" crc="2a2a5d50" sha1="2e638e4f7e1e11e14cf121a14dc5a6835b808579"/>
 		<rom name="Gradius Gaiden (Japan) (v1.1).bin" size="589716960" crc="8ddb5a09" sha1="5c4794957782bed1ec79851c3ac40d673495b2be"/>
 		-->
-		<description>Gradius Gaiden (Japan) (v1.1)</description>
+		<description>Gradius Gaiden (Jpn) (v1.1)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -44223,7 +44223,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Gunners Heaven (Japan).cue" size="88" crc="6c5136cc" sha1="44136d13f418a67d8342f07d0d3fac2f165ee039"/>
 		<rom name="Gunners Heaven (Japan).bin" size="398306496" crc="4ff1d1aa" sha1="82bc08baacad979beea29cea702c2c9d85a7c206"/>
 		-->
-		<description>Gunners Heaven (Japan)</description>
+		<description>Gunners Heaven (Jpn)</description>
 		<year>1995</year>
 		<publisher>Media Vision</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -45022,7 +45022,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Hokuto no Ken - Seikimatsu Kyuuseishu Densetsu (Japan) (Track 1).bin" size="659056272" crc="79e9fc16" sha1="1f9b064ceafef91641bb3bbcc075a604f478489e"/>
 		<rom name="Hokuto no Ken - Seikimatsu Kyuuseishu Densetsu (Japan) (Track 2).bin" size="37396800" crc="7976083e" sha1="d9f92af296360772e62caa4cb276de3fa74f5538"/>
 		-->
-		<description>Hokuto no Ken - Seikimatsu Kyuuseishu Densetsu (Japan)</description>
+		<description>Hokuto no Ken - Seikimatsu Kyuuseishu Densetsu (Jpn)</description>
 		<year>2000</year>
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -45588,7 +45588,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Jikkyou Oshaberi Parodius - Forever with Me (Japan).cue" size="117" crc="5a953380" sha1="c00f3a13075a1fa66c451a7427a12354ee9855b6"/>
 		<rom name="Jikkyou Oshaberi Parodius - Forever with Me (Japan).bin" size="236070240" crc="6818a16d" sha1="b133e7d7ab6679e742b9c29053fba239d948287e"/>
 		-->
-		<description>Jikkyou Oshaberi Parodius - Forever with Me (Japan)</description>
+		<description>Jikkyou Oshaberi Parodius - Forever with Me (Jpn)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -45641,7 +45641,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Kaette Kita Cyborg Kuro-chan (Japan).cue" size="102" crc="9708bd74" sha1="8312951576c460a9260afe0c6c90a4f394cf08b7"/>
 		<rom name="Kaette Kita Cyborg Kuro-chan (Japan).bin" size="86581824" crc="12d2c699" sha1="adbb7f5efaf20068ef5f2723fa31e6f5e33acb5a"/>
 		-->
-		<description>Kaette Kita Cyborg Kuro-chan (Japan)</description>
+		<description>Kaette Kita Cyborg Kuro-chan (Jpn)</description>
 		<year>2002</year>
 		<publisher>Konami</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -47388,7 +47388,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan) (Disc 2).cue" size="129" crc="2c2b2088" sha1="a9cd8b80b8f7f239dc945bdcd61472dafc6b775f"/>
 		<rom name="Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan) (Disc 2).bin" size="567194208" crc="7471d971" sha1="96e0f7a3387621f044b53722e341b7b566529743"/>
 		-->
-		<description>Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan)</description>
+		<description>Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Jpn)</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -47409,7 +47409,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Macross Digital Mission VF-X (Japan) (v1.1) (Track 1).bin" size="650036352" crc="a8eead5b" sha1="732bb1fb49b6822d960d8b1cfd3e8e44e15d5195"/>
 		<rom name="Macross Digital Mission VF-X (Japan) (v1.1) (Track 2).bin" size="1712256" crc="c9cc476e" sha1="4f9f15c5f519429eccb33d5ceebf18cdf681849c"/>
 		-->
-		<description>Macross Digital Mission VF-X (Japan)</description>
+		<description>Macross Digital Mission VF-X (Jpn)</description>
 		<year>1997</year>
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -47426,7 +47426,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Macross VF-X2 (Japan) (Track 2).bin" size="47451600" crc="2e07f6eb" sha1="68f587366f2ad490fe47d9c14056cb087ab47c46"/>
 		<rom name="Macross VF-X2 (Japan) (Track 3).bin" size="37573200" crc="b65806d8" sha1="4bda128d58304d25207af2ffa564fd2493771db8"/>
 		-->
-		<description>Macross VF-X2 (Japan)</description>
+		<description>Macross VF-X2 (Jpn)</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -48600,7 +48600,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Maestro Music, The (Japan) [SLPM-86585].bin" size="282625728" crc="c5f3edb5" sha1="f723e5a3caa226665c9e423cd9fefac8d4108f6d"/>
 		<rom name="Maestro Music, The (Japan) [SLPM-86585].cue" size="167" crc="80eb9171" sha1="2fc875db82810ccdf6b17d1b1302f4cc39c73ba5"/>
 		-->
-		<description>The Maestro Music (Japan, with Baton Stick)</description>
+		<description>The Maestro Music (Jpn, with Baton Stick)</description>
 		<year>2000</year>
 		<publisher>Global A</publisher>
 		<info name="serial" value="SLPM-86585" />
@@ -50076,7 +50076,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Picnic! Excellent (Japan) [SLPS-01345].bin" size="116066496" crc="f8014d99" sha1="d2ce1855716b95777a0f22d011ed81c98626b715"/>
 		<rom name="Picnic! Excellent (Japan) [SLPS-01345].cue" size="230" crc="b11fbc2e" sha1="b8f155f308e8fbb6185ade3d33f3930a57958793"/>
 		-->
-		<description>Pikinya! Excellent (Japan)</description>
+		<description>Pikinya! Excellent (Jpn)</description>
 		<year>1998</year>
 		<publisher>ASCII</publisher>
 		<info name="serial" value="SLPS-01345" />
@@ -53666,7 +53666,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Super Robot Taisen Alpha (Japan) (v1.1).cue" size="105" crc="a64072b6" sha1="e48e50c8dd42eb4ec94eac0b124606d9f19484b5"/>
 		<rom name="Super Robot Taisen Alpha (Japan) (v1.1).bin" size="646374288" crc="b6550e08" sha1="914a07e58ed4b68ea7a2b732372a565f532fab0d"/>
 		-->
-		<description>Super Robot Taisen Alpha (Japan) (v1.1)</description>
+		<description>Super Robot Taisen Alpha (Jpn) (v1.1)</description>
 		<year>2000</year>
 		<publisher>Banpresto</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -53681,7 +53681,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Super Robot Taisen Alpha Gaiden (Japan) (Premium Edition).cue" size="123" crc="ee787a65" sha1="5877e52eafb38b0cec2fb888ecba26aaa1e02d28"/>
 		<rom name="Super Robot Taisen Alpha Gaiden (Japan) (Premium Edition).bin" size="718310208" crc="366c1cf1" sha1="b0d87ae8cf6434e2cb5c47d03812e0c0874a874c"/>
 		-->
-		<description>Super Robot Taisen Alpha Gaiden - Premium Edition (Japan)</description>
+		<description>Super Robot Taisen Alpha Gaiden - Premium Edition (Jpn)</description>
 		<year>2001</year>
 		<publisher>Banpresto</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -53696,7 +53696,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Super Robot Taisen Alpha Gaiden (Japan) (Shokai Genteiban).cue" size="124" crc="8715a811" sha1="e8e634d9b85372ec0169cbffe47cac88b060eb90"/>
 		<rom name="Super Robot Taisen Alpha Gaiden (Japan) (Shokai Genteiban).bin" size="718310208" crc="b9bef60c" sha1="546675f35773bdf68a5b24a0fe429443a175cc44"/>
 		-->
-		<description>Super Robot Taisen Alpha Gaiden - Shokai Genteiban (Japan)</description>
+		<description>Super Robot Taisen Alpha Gaiden - Shokai Genteiban (Jpn)</description>
 		<year>2001</year>
 		<publisher>Banpresto</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -53714,7 +53714,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Super Robot Taisen - Complete Box (Japan) (Disc 2) (History of Super Robot Wars).cue" size="146" crc="50c54b6d" sha1="990fb4f7d6563eacc9b7ee425a4c34105d2404c6"/>
 		<rom name="Super Robot Taisen - Complete Box (Japan) (Disc 2) (History of Super Robot Wars).bin" size="642105408" crc="bef35311" sha1="65ffad2101381dbc4821ef1d152029e99d9f0996"/>
 		-->
-		<description>Super Robot Taisen Complete Box (Japan)</description>
+		<description>Super Robot Taisen Complete Box (Jpn)</description>
 		<year>1999</year>
 		<publisher>Banpresto</publisher>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -53735,7 +53735,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Super Robot Taisen F (Japan) (Track 1).bin" size="" crc="c9d941ba" sha1="582019486fa0288100086d3a1866b9b91031c8f7"/>
 		<rom name="Super Robot Taisen F (Japan) (Track 2).bin" size="" crc="9b94ea54" sha1="bd1fde88c2b79e3cf8821c969373460d51f3155a"/>
 		-->
-		<description>Super Robot Taisen F (Japan)</description>
+		<description>Super Robot Taisen F (Jpn)</description>
 		<year>1998</year>
 		<publisher>Banpresto</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -53751,7 +53751,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Super Robot Taisen F Kanketsuhen (Japan) (Track 1).bin" size="" crc="a04ec282" sha1="28b3988d5e405f5bd602ed42113c709b4bc4e0d4"/>
 		<rom name="Super Robot Taisen F Kanketsuhen (Japan) (Track 2).bin" size="" crc="9b94ea54" sha1="bd1fde88c2b79e3cf8821c969373460d51f3155a"/>
 		-->
-		<description>Super Robot Taisen F Kanketsuhen (Japan)</description>
+		<description>Super Robot Taisen F Kanketsuhen (Jpn)</description>
 		<year>1999</year>
 		<publisher>Banpresto</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -58533,7 +58533,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="Zanac x Zanac (Japan).cue" size="87" crc="bf9b92c3" sha1="6a6d9eccb0e4c5d7443e616b0591de3df8643709"/>
 		<rom name="Zanac x Zanac (Japan).bin" size="379659840" crc="cf5625d4" sha1="8d8e7d6247ba63290b18224639ef7f97e89121d1"/>
 		-->
-		<description>Zanac X Zanac (Japan)</description>
+		<description>Zanac X Zanac (Jpn)</description>
 		<year>2001</year>
 		<publisher>Compile</publisher>
 		<part name="cdrom" interface="psx_cdrom">
