@@ -17,11 +17,14 @@
 		<description>007 - Everything or Nothing (Euro, USA)</description>
 		<year>2003</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="AGB-BJBE-USA, AGB-BJBP-EUR"/>
+		<info name="serial" value="AGB-BJBE-USA, AGB-BJBP-EUR, AGB-BJBP-EUR-1"/>
+		<feature name="pcb" value="AGB-E03-20" />
+		<feature name="u1" value="U1 GPIO MASKROM" />
+		<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="007 - everything or nothing (usa, europe) (en,fr,de).bin" size="8388608" crc="9d4f1e18" sha1="fc6163f99b71b05c10686a0d29010b31274e1dc4" offset="000000" />
+				<rom name="agb-bjbp-0.u1" size="8388608" crc="9d4f1e18" sha1="fc6163f99b71b05c10686a0d29010b31274e1dc4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -61,11 +64,14 @@
 		<description>2006 FIFA World Cup - Germany 2006 (Euro, USA)</description>
 		<year>2006</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="AGB-B6WE-USA, AGB-B6WP"/>
+		<info name="serial" value="AGB-B6WE-USA, AGB-B6WP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="2006 fifa world cup - germany 2006 (usa, europe) (en,fr,de,es,it).bin" size="8388608" crc="50ab4544" sha1="295580745787ba9593799213564484aaaa7fd463" offset="000000" />
+				<rom name="agb-b6wp-0.u1" size="8388608" crc="50ab4544" sha1="295580745787ba9593799213564484aaaa7fd463" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -804,7 +810,7 @@
 		</part>
 	</software>
 
-	<software name="akachan">
+	<software name="akachan1" cloneof="akachan">
 		<description>Aka-chan Doubutsuen (Jpn)</description>
 		<year>2004</year>
 		<publisher>TDK Core</publisher>
@@ -815,6 +821,24 @@
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="aka-chan doubutsuen (japan).bin" size="4194304" crc="b50cd166" sha1="9a0623a8680c4cf9b745f940b99da0a192764828" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akachan">
+		<description>Aka-chan Doubutsuen (Jpn, Rev. 1)</description>
+		<year>2004</year>
+		<publisher>TDK Core</publisher>
+		<info name="serial" value="AGB-BAZJ-JPN"/>
+		<info name="release" value="20040326"/>
+		<info name="alt_title" value="あかちゃんどうぶつ園 動物のあかちゃん飼育係育成ゲーム"/>
+		<feature name="pcb" value="AGB-E03-20" />
+		<feature name="u1" value="U1 GPIO MASKROM" />
+		<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_64k" />
+			<dataarea name="rom" size="4194304">
+				<rom name="agb-bazj-1.u1" size="4194304" crc="c1072e26" sha1="634624c77c90a8ff40bec9046133c50041efc49b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -897,11 +921,14 @@
 		<description>Alex Rider - Stormbreaker (Euro)</description>
 		<year>2006</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="AGB-BAWP"/>
+		<info name="serial" value="AGB-BAWX-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="alex rider - stormbreaker (europe) (en,fr,de,es).bin" size="4194304" crc="25e8e2cd" sha1="659dbde917fc74d1cec3e41d1fb4cdd249ae04a0" offset="000000" />
+				<rom name="agb-bawx-0.u1" size="4194304" crc="25e8e2cd" sha1="659dbde917fc74d1cec3e41d1fb4cdd249ae04a0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6555,11 +6582,14 @@
 		<description>Dave Mirra Freestyle BMX 2 (Euro)</description>
 		<year>2001</year>
 		<publisher>Acclaim</publisher>
-		<info name="serial" value="AGB-AX2P"/>
+		<info name="serial" value="AGB-AX2P-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="dave mirra freestyle bmx 2 (europe) (en,fr,de,es,it).bin" size="8388608" crc="69e89581" sha1="5d98b5179f4e9ae7ae72d6a43bed5f046f881a7b" offset="000000" />
+				<rom name="agb-ax2p-0.u1" size="8388608" crc="69e89581" sha1="5d98b5179f4e9ae7ae72d6a43bed5f046f881a7b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6797,11 +6827,14 @@
 		<description>Denki Blocks! (Euro)</description>
 		<year>2001</year>
 		<publisher>Rage Software</publisher>
-		<info name="serial" value="AGB-ADBP"/>
+		<info name="serial" value="AGB-ADBP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="denki blocks! (europe) (en,fr,de,es,it).bin" size="4194304" crc="6144ec15" sha1="fe9047dd7940e55a9d667824aeeeb7abbd025e59" offset="000000" />
+				<rom name="agb-adbp-0.u1" size="4194304" crc="6144ec15" sha1="fe9047dd7940e55a9d667824aeeeb7abbd025e59" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16365,10 +16398,12 @@
 		<description>Kao the Kangaroo (Euro)</description>
 		<year>2001</year>
 		<publisher>Titus</publisher>
-		<info name="serial" value="AGB-AKKP"/>
+		<info name="serial" value="AGB-AKKP-EUR"/>
+		<feature name="pcb" value="AGB-E01-10" />
+		<feature name="u1" value="U1 32M MROM" />
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="kao the kangaroo (europe) (en,fr,de,es,it,nl).bin" size="4194304" crc="51e7522c" sha1="5a337fcc321eaa0c350644c026767824add338f3" offset="000000" />
+				<rom name="agb-akkp-0.u1" size="4194304" crc="51e7522c" sha1="5a337fcc321eaa0c350644c026767824add338f3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16615,11 +16650,14 @@
 		<description>Kid Paddle (Euro)</description>
 		<year>2005</year>
 		<publisher>Atari</publisher>
-		<info name="serial" value="AGB-BYLP-EUR"/>
+		<info name="serial" value="AGB-BYLP-FRA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="kid paddle (europe) (fr,nl).bin" size="8388608" crc="69951aa9" sha1="4ce6021d930fe946c512b2e5584f31d0b6435256" offset="000000" />
+				<rom name="agb-bylp-0.u1" size="8388608" crc="69951aa9" sha1="4ce6021d930fe946c512b2e5584f31d0b6435256" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16769,10 +16807,12 @@
 		<description>Killer 3D Pool (Euro)</description>
 		<year>2005</year>
 		<publisher>Zoo Digital Publishing</publisher>
-		<info name="serial" value="AGB-B3LP"/>
+		<info name="serial" value="AGB-B3LP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-40" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="killer 3d pool (europe) (en,fr,de,es,it).bin" size="4194304" crc="e6fda065" sha1="a4e3107f0797d42ee8888488cf0f87af140b8652" offset="000000" />
+				<rom name="agb-b3lp-0.u1" size="4194304" crc="e6fda065" sha1="a4e3107f0797d42ee8888488cf0f87af140b8652" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -38590,13 +38630,17 @@
 	</software>
 
 	<software name="2disney">
-		<description>2 Disney Games: Disney's Peter Pan - Return to Neverland + Disney's Lilo &amp; Stitch 2 (Euro)</description>
-		<year>200?</year>
+		<description>2 Disney Games: Disney's Lilo &amp; Stitch 2 + Disney's Peter Pan - Return to Neverland (Euro)</description>
+		<year>2004</year>
 		<publisher>Disney Interactive</publisher>
+		<info name="serial" value="AGB-BLQP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
-				<rom name="2 disney games - lilo &amp; stitch 2 + peter pan - return to neverland (europe) (en,fr,de,es+en,fr,de,es,it,nl).bin" size="16777216" crc="75703943" sha1="4b0455173b592407db9460b7e38fb209fd549772" offset="000000" />
+				<rom name="agb-blqp-0.u1" size="16777216" crc="75703943" sha1="4b0455173b592407db9460b7e38fb209fd549772" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -38780,7 +38824,7 @@
 		<description>2 Game Pack!: Hot Wheels - Stunt Track Challenge + Hot Wheels - World Race (Euro, USA)</description>
 		<year>200?</year>
 		<publisher>DSI Games</publisher>
-		<info name="serial" value="AGB-BQJE-USA, AGB-BQJP"/>
+		<info name="serial" value="AGB-BQJE-USA, AGB-BQJP-UKV"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-41" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
