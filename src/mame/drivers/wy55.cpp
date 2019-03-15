@@ -21,6 +21,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
+		, m_progbank(*this, "progbank")
 	{
 	}
 
@@ -38,11 +39,14 @@ private:
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_memory_bank m_progbank;
 };
 
 
 void wy55_state::machine_start()
 {
+	m_progbank->configure_entries(0, 2, memregion("program")->base(), 0x10000);
+	m_progbank->set_entry(0);
 }
 
 u32 wy55_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -52,14 +56,14 @@ u32 wy55_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 void wy55_state::prog_map(address_map &map)
 {
-	// TODO: banking (probably selected by a port pin)
-	map(0x0000, 0xffff).rom().region("program", 0);
+	map(0x0000, 0xffff).bankr("progbank");
 }
 
 void wy55_state::ext_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x8000, 0x97ff).ram();
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xbfff).ram();
 	//map(0xf028, 0xf037).rw("uart", FUNC(pc16552_device::read), FUNC(pc16552_device::write));
 }
 
@@ -72,6 +76,7 @@ void wy55_state::wy55(machine_config &config)
 	I8032(config, m_maincpu, 14.7456_MHz_XTAL); // exact type and clock divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &wy55_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &wy55_state::ext_map);
+	m_maincpu->port_out_cb<1>().set_membank("progbank").bit(2);
 
 	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 8K SRAM + battery?
 
