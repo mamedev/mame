@@ -49,7 +49,7 @@
 -->
 
 <softwarelist name="icanpian" description="Fisher-Price / Mattel I Can Play Piano cartridges">
-	<software name="pianfav" supported="no">
+	<software name="pianfav">
 		<description>Piano Favorites (J7522)</description>
 		<year>2005</year>
 		<publisher>Fisher-Price / Mattel</publisher>
@@ -60,7 +60,7 @@
 		</part>
 	</software>
 	
-	<software name="dpmagic" supported="no">
+	<software name="dpmagic">
 		<description>Disney Princess Magical Melodies (K4656)</description>
 		<year>2005</year>
 		<publisher>Fisher-Price / Mattel</publisher>
@@ -71,7 +71,7 @@
 		</part>
 	</software>
 	
-	<software name="jungboog" supported="no">
+	<software name="jungboog">
 		<description>Jungle Boogie (J7524)</description>
 		<year>2005</year>
 		<publisher>Fisher-Price / Mattel</publisher>
@@ -82,7 +82,7 @@
 		</part>
 	</software>
 	
-	<software name="scoobymm" supported="no">
+	<software name="scoobymm">
 		<description>Scooby-Doo! Monster Mayhem (J7525)</description>
 		<year>2005</year>
 		<publisher>Fisher-Price / Mattel</publisher>
@@ -93,7 +93,7 @@
 		</part>
 	</software>
 	
-	<software name="jjs" supported="no">
+	<software name="jjs">
 		<description>Jammin' Jungle Safari (Disney's The Lion King, Jungle Book, Tarzan) (K4653)</description> <!-- Tarzan is shown on the cart, but none of the songs are from it? -->
 		<year>2005</year>
 		<publisher>Fisher-Price / Mattel</publisher>
@@ -104,7 +104,7 @@
 		</part>
 	</software>
 	
-	<software name="showtune" supported="no">
+	<software name="showtune">
 		<description>Nicktoons Show Tunes (J7527)</description>
 		<year>2005</year>
 		<publisher>Fisher-Price / Mattel</publisher>
@@ -115,7 +115,7 @@
 		</part>
 	</software>
 	
-	<software name="rdp" supported="no">
+	<software name="rdp">
 		<description>Rockin' Dance Party (J8715)</description>
 		<year>2005</year>
 		<publisher>Fisher-Price / Mattel</publisher>
