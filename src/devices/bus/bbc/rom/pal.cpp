@@ -129,7 +129,7 @@ void bbc_pal_device::device_start()
 //  read
 //-------------------------------------------------
 
-READ8_MEMBER(bbc_cciword_device::read)
+uint8_t bbc_cciword_device::read(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -147,7 +147,7 @@ READ8_MEMBER(bbc_cciword_device::read)
 	return get_rom_base()[(offset & 0x3fff) | (m_bank << 14)];
 }
 
-READ8_MEMBER(bbc_ccibase_device::read)
+uint8_t bbc_ccibase_device::read(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -164,7 +164,7 @@ READ8_MEMBER(bbc_ccibase_device::read)
 	return get_rom_base()[(offset & 0x3fff) | (m_bank << 14)];
 }
 
-READ8_MEMBER(bbc_ccispell_device::read)
+uint8_t bbc_ccispell_device::read(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -191,7 +191,7 @@ READ8_MEMBER(bbc_ccispell_device::read)
 	return get_rom_base()[(offset & 0x3fff) | (m_bank << 14)];
 }
 
-READ8_MEMBER(bbc_palqst_device::read)
+uint8_t bbc_palqst_device::read(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -215,7 +215,7 @@ READ8_MEMBER(bbc_palqst_device::read)
 	}
 }
 
-READ8_MEMBER(bbc_palwap_device::read)
+uint8_t bbc_palwap_device::read(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -243,7 +243,7 @@ READ8_MEMBER(bbc_palwap_device::read)
 	}
 }
 
-READ8_MEMBER(bbc_palted_device::read)
+uint8_t bbc_palted_device::read(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -267,7 +267,7 @@ READ8_MEMBER(bbc_palted_device::read)
 	}
 }
 
-READ8_MEMBER(bbc_palabep_device::read)
+uint8_t bbc_palabep_device::read(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -282,7 +282,7 @@ READ8_MEMBER(bbc_palabep_device::read)
 	return get_rom_base()[(offset & 0x3fff) | (m_bank << 14)];
 }
 
-READ8_MEMBER(bbc_palabe_device::read)
+uint8_t bbc_palabe_device::read(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -297,7 +297,7 @@ READ8_MEMBER(bbc_palabe_device::read)
 	return get_rom_base()[(offset & 0x3fff) | (m_bank << 14)];
 }
 
-READ8_MEMBER(bbc_palmo2_device::read)
+uint8_t bbc_palmo2_device::read(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{

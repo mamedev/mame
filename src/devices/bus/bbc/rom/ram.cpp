@@ -42,7 +42,7 @@ void bbc_ram_device::device_start()
 //  read
 //-------------------------------------------------
 
-READ8_MEMBER(bbc_ram_device::read)
+uint8_t bbc_ram_device::read(offs_t offset)
 {
 	return get_ram_base()[offset & (get_ram_size() - 1)];
 }
@@ -51,7 +51,7 @@ READ8_MEMBER(bbc_ram_device::read)
 //  write
 //-------------------------------------------------
 
-WRITE8_MEMBER(bbc_ram_device::write)
+void bbc_ram_device::write(offs_t offset, uint8_t data)
 {
 	get_ram_base()[offset & (get_ram_size() - 1)] = data;
 }

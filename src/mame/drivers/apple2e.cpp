@@ -467,7 +467,7 @@ private:
 	uint8_t *m_exp_ram;
 	int m_exp_wptr, m_exp_liveptr;
 
-	void do_io(address_space &space, int offset, bool is_iic);
+	void do_io(int offset, bool is_iic);
 	uint8_t read_floatingbus();
 	void update_slotrom_banks();
 	void lc_update(int offset, bool writing);
@@ -1397,7 +1397,7 @@ void apple2e_state::cec_lcrom_update()
 }
 
 // most softswitches don't care about read vs write, so handle them here
-void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
+void apple2e_state::do_io(int offset, bool is_iic)
 {
 	if(machine().side_effects_disabled()) return;
 
@@ -1724,7 +1724,7 @@ READ8_MEMBER(apple2e_state::c000_r)
 			return (m_video->m_dhires ? 0x00 : 0x80) | uFloatingBus7;
 
 		default:
-			do_io(space, offset, false);
+			do_io(offset, false);
 			break;
 	}
 
@@ -1844,7 +1844,7 @@ WRITE8_MEMBER(apple2e_state::c000_w)
 				// card may have banked auxram; get a new bank pointer
 				m_aux_bank_ptr = m_auxslotdevice->get_auxbank_ptr();
 			}
-			do_io(space, offset, false);    // make sure it also side-effect resets the paddles as documented
+			do_io(offset, false);    // make sure it also side-effect resets the paddles as documented
 			break;
 
 		case 0x7e:  // SETIOUDIS
@@ -1854,7 +1854,7 @@ WRITE8_MEMBER(apple2e_state::c000_w)
 			m_ioudis = false; break;
 
 		default:
-			do_io(space, offset, false);
+			do_io(offset, false);
 			break;
 	}
 }
@@ -1977,7 +1977,7 @@ READ8_MEMBER(apple2e_state::c000_iic_r)
 			return (m_video->m_dhires ? 0x00 : 0x80) | uFloatingBus7;
 
 		default:
-			do_io(space, offset, true);
+			do_io(offset, true);
 			break;
 	}
 
@@ -2115,7 +2115,7 @@ WRITE8_MEMBER(apple2e_state::c000_iic_w)
 			break;
 
 		default:
-			do_io(space, offset, true);
+			do_io(offset, true);
 			break;
 	}
 }
@@ -2333,7 +2333,7 @@ void apple2e_state::write_slot_rom(int slotbias, int offset, uint8_t data)
 uint8_t apple2e_state::read_int_rom(int slotbias, int offset)
 {
 	//return m_rom_ptr[slotbias + offset];
-	return m_ds1315->read(machine().dummy_space(), slotbias + offset);
+	return m_ds1315->read(slotbias + offset);
 }
 
 READ8_MEMBER(apple2e_state::nsc_backing_r) { return m_rom_ptr[offset]; }
