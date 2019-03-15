@@ -259,14 +259,6 @@
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
 		<text string="LV"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
-	<element name="text_k1">
-		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="&#x2654;"><color red="0.17" green="0.15" blue="0.15" /></text>
-	</element>
-	<element name="text_k2">
-		<disk><color red="0.17" green="0.15" blue="0.15" /></disk>
-		<text string="&#x265a;"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
 
 
 <!-- build screen -->
@@ -514,8 +506,24 @@
 		<bezel element="text_lv"><bounds x="108" y="36.5" width="5" height="3" /></bezel>
 		<bezel element="text_cl"><bounds x="108" y="46.5" width="5" height="3" /></bezel>
 		<bezel element="text_rv"><bounds x="108" y="56.5" width="5" height="3" /></bezel>
-		<bezel element="text_k1"><bounds x="108.5" y="75.5" width="4.5" height="4.5" /></bezel>
-		<bezel element="text_k2"><bounds x="108.5" y="95.5" width="4.5" height="4.5" /></bezel>
+
+		<bezel element="black"><bounds x="109" y="76.5" width="3" height="0.3" /></bezel>
+		<bezel element="black"><bounds x="109" y="77.5" width="3" height="0.3" /></bezel>
+		<bezel element="black"><bounds x="109" y="78.1" width="3" height="0.3" /></bezel>
+		<bezel element="black"><bounds x="109" y="79.1" width="3" height="0.3" /></bezel>
+		<bezel element="black"><bounds x="109" y="76.6" width="0.3" height="1.1" /></bezel>
+		<bezel element="black"><bounds x="109" y="78.2" width="0.3" height="1.1" /></bezel>
+		<bezel element="black"><bounds x="111.7" y="76.6" width="0.3" height="1.1" /></bezel>
+		<bezel element="black"><bounds x="111.7" y="78.2" width="0.3" height="1.1" /></bezel>
+
+		<bezel element="white"><bounds x="109" y="96.5" width="3" height="0.3" /></bezel>
+		<bezel element="white"><bounds x="109" y="97.5" width="3" height="0.3" /></bezel>
+		<bezel element="white"><bounds x="109" y="98.1" width="3" height="0.3" /></bezel>
+		<bezel element="white"><bounds x="109" y="99.1" width="3" height="0.3" /></bezel>
+		<bezel element="white"><bounds x="109" y="96.6" width="0.3" height="1.1" /></bezel>
+		<bezel element="white"><bounds x="109" y="98.2" width="0.3" height="1.1" /></bezel>
+		<bezel element="white"><bounds x="111.7" y="96.6" width="0.3" height="1.1" /></bezel>
+		<bezel element="white"><bounds x="111.7" y="98.2" width="0.3" height="1.1" /></bezel>
 
 		<bezel element="hlb" inputtag="IN.7" inputmask="0x10"><bounds x="107" y="14.5" width="7" height="7" /><color alpha="0.3" /></bezel>
 		<bezel element="hlb" inputtag="IN.7" inputmask="0x20"><bounds x="107" y="24.5" width="7" height="7" /><color alpha="0.3" /></bezel>
