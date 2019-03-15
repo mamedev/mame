@@ -3,27 +3,102 @@
 // thanks-to:Igor, ChoccyHobNob, RColtrane
 /***************************************************************************
 
-  Sharp SM5xx family handhelds.
-  List of child drivers:
-  - rzone: Tiger R-Zone
+Sharp SM5xx family handhelds.
+List of child drivers:
+- rzone: Tiger R-Zone
 
-  The LCD screen graphics are provided internally with an SVG file.
-  MAME external artwork is recommended for the backgrounds inlays.
+The LCD screen graphics are provided internally with an SVG file.
+MAME external artwork is recommended for the backgrounds inlays.
 
-  Trivia: Most of the Nintendo G&W have built-in cheats, likely kept
-  in by Nintendo to test the game. These were not accessible to users
-  of course, but for the sake of fun they're available on MAME.
+TODO:
+- improve/redo SVGs of: gnw_mmouse, gnw_egg, exospace
+- confirm gnw_mmouse/gnw_egg rom (dumped from Soviet clone, but pretty
+  confident that it's same)
+- Currently there is no accurate way to dump the SM511/SM511 melody ROM
+  electronically. For the ones that weren't decapped, they were read by
+  playing back all melody data and reconstructing it to ROM.
+  Visual(decap) verification is wanted for:
+  * gnw_climber, gnw_bjack
+- identify lcd segments for tgaiden
 
-  TODO:
-  - improve/redo SVGs of: gnw_mmouse, gnw_egg, exospace
-  - confirm gnw_mmouse/gnw_egg rom (dumped from Soviet clone,
-    but pretty confident that it's same)
-  - Currently there is no accurate way to dump the SM511/SM511 melody
-    ROM electronically. For the ones that weren't decapped, they were
-    read by playing back all melody data and reconstructing it to ROM.
-    Visual(decap) verification is wanted for:
-    * gnw_climber, gnw_bjack
-  - identify lcd segments for tgaiden
+****************************************************************************
+
+Misc Nintendo Game & Watch notes:
+
+Trivia: Most of the Nintendo G&W have built-in cheats, likely kept in by
+Nintendo to test the game. These were not accessible to users of course,
+but for the sake of fun they're (usually) available on MAME.
+
+BTANB: On some of the earlier G&W games, eg. gnw_mmouse, gnw_pchute, gnw_fire,
+the controls still work after game over, this happens on the real thing too.
+
+Game list (* denotes not emulated yet)
+
+Serial  Series MCU     Title
+---------------------------------------------
+AC-01*    s    ?       Ball (aka Toss-Up)
+FL-02*    s    ?       Flagman
+MT-03*    s    ?       Vermin (aka The Exterminator)
+RC-04*    s    ?       Fire (aka Fireman Fireman)
+IP-05*    g    ?       Judge
+MN-06*    g    ?       Manhole
+CN-07*    g    ?       Helmet (aka Headache)
+LN-08*    g    ?       Lion
+PR-21     ws   SM5A    Parachute
+OC-22     ws   SM5A    Octopus
+PP-23*    ws   SM5A?   Popeye
+FP-24*    ws   SM5A    Chef
+MC-25     ws   SM5A    Mickey Mouse
+EG-26     ws   SM5A    Egg (near-certainly same ROM as MC-25, but LCD differs)
+FR-27     ws   SM5A    Fire
+TL-28     ws   SM510   Turtle Bridge
+ID-29     ws   SM510   Fire Attack
+SP-30     ws   SM510   Snoopy Tennis
+OP-51     ms   SM510   Oil Panic
+DK-52     ms   SM510   Donkey Kong
+DM-53     ms   SM510   Mickey & Donald
+GH-54     ms   SM510   Green House
+JR-55     ms   SM510   Donkey Kong II
+MW-56     ms   SM510   Mario
+LP-57     ms   SM510   Rain Shower
+TC-58     ms   SM510   Life Boat
+PB-59*    ms   SM511?  Pinball
+BJ-60     ms   SM512   Black Jack
+MG-61     ms   SM510   Squish
+BD-62*    ms   SM512   Bomb Sweeper
+JB-63*    ms   SM511?  Safe Buster
+MV-64*    ms   SM511?  Gold Cliff
+ZL-65*    ms   SM511?  Zelda
+CJ-71*    tt   SM511?  Donkey Kong Jr.
+CM-72*    tt   SM511?  Mario's Cement Factory
+SM-73*    tt   SM511?  Snoopy
+PG-74*    tt   SM511?  Popeye
+SM-91*    p    SM511?  Snoopy (assume same ROM & LCD as tabletop version)
+PG-92*    p    SM511?  Popeye          "
+CJ-93*    p    SM511?  Donkey Kong Jr. "
+PB-94*    p    SM511?  Mario's Bombs Away
+DC-95*    p    SM511?  Mickey Mouse
+MK-96*    p    SM511?  Donkey Kong Circus (same ROM as DC-95? LCD is different)
+DJ-101    nws  SM510   Donkey Kong Jr.
+ML-102    nws  SM510   Mario's Cement Factory
+NH-103    nws  SM510   Manhole
+TF-104    nws  SM510   Tropical Fish
+YM-105    nws  SM511   Super Mario Bros.
+DR-106    nws  SM511   Climber
+BF-107*   nws  SM511?  Balloon Fight
+MJ-108*   nws  SM511?  Mario The Juggler
+BU-201    sc   SM510?  Spitball Sparky
+UD-202*   sc   SM510?  Crab Grab
+BX-301    mvs  SM511   Boxing (aka Punch Out)
+AK-302*   mvs  SM511?  Donkey Kong 3
+HK-303*   mvs  SM511?  Donkey Kong Hockey
+YM-801*   cs   SM511   Super Mario Bros. (assume same ROM as nws version)
+DR-802*   cs   SM511   Climber            "
+BF-803*   cs   SM511?  Balloon Fight      "
+YM-901-S* x    SM511   Super Mario Bros.  "
+
+RGW-001 (2010 Ball remake) is on different hardware, ATmega169PV MCU.
+The "Mini Classics" keychains are by Nelsonic, not Nintendo.
 
 ***************************************************************************/
 
