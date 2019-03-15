@@ -53,8 +53,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_beeper(*this, "beeper"),
+		m_keypad(*this, "IN.%u", 0),
 		m_delay_display(*this, "delay_display_%u", 0),
-		m_inp_matrix(*this, "IN.%u", 0),
 		m_out_digit(*this, "digit%u", 0U)
 	{ }
 
@@ -67,8 +67,8 @@ private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
+	required_ioport_array<10> m_keypad;
 	required_device_array<timer_device, 12> m_delay_display;
-	required_ioport_array<10> m_inp_matrix;
 	output_finder<12> m_out_digit;
 
 	void main_map(address_map &map);
@@ -127,7 +127,7 @@ void tgm_state::update_display(u16 edge)
 		if (BIT(m_digit_select, i))
 			m_out_digit[i] = m_digit_data;
 
-		// they're strobed, so on falling edge, delay them going off to prevent flicker
+		// they're strobed, so on falling edge, delay them going off to prevent flicker or stuck display
 		// BTANB: some digit segments get stuck after crashing in the GP game, it's not due to the simulated delay here
 		else if (BIT(edge, i))
 			m_delay_display[i]->adjust(attotime::from_msec(20), i);
@@ -173,7 +173,7 @@ READ8_MEMBER(tgm_state::input_r)
 	// P12,P13: multiplexed inputs
 	for (int i = 0; i < 10; i++)
 		if (m_inp_mux >> i & 1)
-			data |= m_inp_matrix[i]->read();
+			data |= m_keypad[i]->read();
 
 	return data << 2;
 }

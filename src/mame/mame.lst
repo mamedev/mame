@@ -875,6 +875,9 @@ sp_zigzgm                       //
 @source:aci_boris.cpp
 boris                           //
 
+@source:aci_borisdpl.cpp
+borisdpl                        //
+
 @source:acommand.cpp
 acommand                        // (c) 1990
 
@@ -9758,7 +9761,6 @@ chessmsta                       //
 chessmstdm                      //
 
 @source:chesstrv.cpp
-borisdpl                        //
 chesstrv                        //
 
 @source:chexx.cpp

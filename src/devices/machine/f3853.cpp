@@ -9,7 +9,7 @@ low-level ROMC signals.
 
 F3853: Static memory interface with integrated interrupt controller and timer.
 
-The timer is a shift register:
+The timer is an 8-bit linear feedback shift register:
 Feedback in0 = !((out3 ^ out4) ^ (out5 ^ out7))
 Interrupts are at 0xfe
 0xff stops the register (0xfe is never reached)
