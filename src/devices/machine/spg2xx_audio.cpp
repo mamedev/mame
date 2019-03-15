@@ -11,19 +11,18 @@
 
 DEFINE_DEVICE_TYPE(SPG2XX_AUDIO, spg2xx_audio_device, "spg2xx", "SPG2xx-series System-on-a-Chip Audio")
 
-#define LOG_SPU_READS       (1U << 13)
-#define LOG_SPU_WRITES      (1U << 14)
-#define LOG_UNKNOWN_SPU     (1U << 15)
-#define LOG_CHANNEL_READS   (1U << 16)
-#define LOG_CHANNEL_WRITES  (1U << 17)
-#define LOG_ENVELOPES       (1U << 18)
-#define LOG_SAMPLES         (1U << 19)
-#define LOG_RAMPDOWN        (1U << 20)
-#define LOG_BEAT            (1U << 21)
+#define LOG_SPU_READS       (1U << 0)
+#define LOG_SPU_WRITES      (1U << 1)
+#define LOG_UNKNOWN_SPU     (1U << 2)
+#define LOG_CHANNEL_READS   (1U << 3)
+#define LOG_CHANNEL_WRITES  (1U << 4)
+#define LOG_ENVELOPES       (1U << 5)
+#define LOG_SAMPLES         (1U << 6)
+#define LOG_RAMPDOWN        (1U << 7)
+#define LOG_BEAT            (1U << 8)
 
-#define LOG_SPU             (LOG_SPU_READS | LOG_SPU_WRITES | LOG_UNKNOWN_SPU | LOG_CHANNEL_READS | LOG_CHANNEL_WRITES \
+#define LOG_ALL             (LOG_SPU_READS | LOG_SPU_WRITES | LOG_UNKNOWN_SPU | LOG_CHANNEL_READS | LOG_CHANNEL_WRITES \
 							| LOG_ENVELOPES | LOG_SAMPLES | LOG_RAMPDOWN | LOG_BEAT)
-#define LOG_ALL             (LOG_SPU)
 
 #define VERBOSE             (0)
 #include "logmacro.h"
@@ -923,47 +922,35 @@ bool spg2xx_audio_device::advance_channel(const uint32_t channel)
 
 	bool playing = true;
 
-	if (get_adpcm_bit(channel))
+	for (uint32_t sample = 0; sample < samples_to_advance; sample++)
 	{
-		// ADPCM mode
-		for (uint32_t sample = 0; sample < samples_to_advance && playing; sample++)
+		playing = fetch_sample(channel);
+		if (!playing)
+			break;
+
+		if (get_adpcm_bit(channel))
 		{
-			playing = fetch_sample(channel);
-			if (playing)
+			// ADPCM mode
+			m_sample_shift[channel] += 4;
+			if (m_sample_shift[channel] >= 16)
 			{
-				m_sample_shift[channel] += 4;
-				if (m_sample_shift[channel] == 16)
-				{
-					m_sample_shift[channel] = 0;
-					m_sample_addr[channel]++;
-				}
+				m_sample_shift[channel] = 0;
+				m_sample_addr[channel]++;
 			}
 		}
-	}
-	else if (get_16bit_bit(channel))
-	{
-		// 16-bit mode
-		for (uint32_t sample = 0; sample < samples_to_advance && playing; sample++)
+		else if (get_16bit_bit(channel))
 		{
-			playing = fetch_sample(channel);
-			if (playing)
-				m_sample_addr[channel]++;
+			// 16-bit mode
+			m_sample_addr[channel]++;
 		}
-	}
-	else
-	{
-		// 8-bit mode
-		for (uint32_t sample = 0; sample < samples_to_advance && playing; sample++)
+		else
 		{
-			playing = fetch_sample(channel);
-			if (playing)
+			// 8-bit mode
+			m_sample_shift[channel] += 8;
+			if (m_sample_shift[channel] >= 16)
 			{
-				m_sample_shift[channel] += 8;
-				if (m_sample_shift[channel] == 16)
-				{
-					m_sample_shift[channel] = 0;
-					m_sample_addr[channel]++;
-				}
+				m_sample_shift[channel] = 0;
+				m_sample_addr[channel]++;
 			}
 		}
 	}
@@ -1044,6 +1031,7 @@ bool spg2xx_audio_device::fetch_sample(const uint32_t channel)
 	else
 	{
 		// 8-bit mode
+		LOGMASKED(LOG_SAMPLES, "Channel %d: Processing as 8-bit sample, tone_mode is %d, sample_shift is %d\n", channel, tone_mode, m_sample_shift[channel]);
 		if (tone_mode != 0)
 		{
 			if (m_sample_shift[channel])
