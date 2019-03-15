@@ -2381,7 +2381,7 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="u1" value="U1 EPROM" />
 			<feature name="u2" value="U2 CIC" />
 			<feature name="lockout" value="D411 C127 05B" />
-      <feature name="cart_model" value="no shell" />
+			<feature name="cart_model" value="no shell" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="striker snes fd6b.u1" size="524288" crc="fce4da63" sha1="92ad4372b7e3fe648e21031f3be60cb156494802" offset="0x000000" />
