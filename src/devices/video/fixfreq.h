@@ -59,7 +59,7 @@ struct fixedfreq_monitor_desc
 struct fixedfreq_monitor_intf
 {
 	virtual ~fixedfreq_monitor_intf() = default;
-	virtual void update_screen_parameters(double refresh_time) = 0;
+	virtual void vsync_start_cb(double refresh_time) = 0;
 	virtual void plot_hline(int x, int y, int w, uint32_t col) = 0;
 };
 
@@ -87,7 +87,10 @@ struct fixedfreq_monitor_state
 	m_sig_field(0)
 	{}
 
-	void dev_start_helper()
+	/***
+	 * \brief To be called after monitor parameters are set
+	 */
+	void start()
 	{
 		// FIXME: once moved to netlist this may no longer be necessary.
 		//        Only copies constructor init
@@ -110,9 +113,22 @@ struct fixedfreq_monitor_state
 		m_sig_vsync = 0;
 		m_sig_composite = 0;
 		m_sig_field = 0;
+
+		// htotal = m_desc.m_hbackporch;
+		// vtotal = m_desc.m_vbackporch;
+
+		/* sync separator */
+
+		m_vsync_threshold = (exp(- 3.0/(3.0+3.0))) - exp(-1.0);
+		m_vsync_filter_timeconst = (double) (m_desc.m_monitor_clock) / (double) m_desc.m_hbackporch * 1.0; // / (3.0 + 3.0);
+		//LOG("trigger %f with len %f\n", m_vsync_threshold, 1e6 / m_vsync_filter_timeconst);
+
+		m_clock_period = 1.0 / m_desc.m_monitor_clock;
+		m_intf.vsync_start_cb(m_clock_period * m_desc.m_vbackporch * m_desc.m_hbackporch);
+
 	}
 
-	void dev_reset_helper()
+	void reset()
 	{
 		m_last_sync_time = time_type(0);
 		m_line_time = time_type(0);
@@ -121,7 +137,6 @@ struct fixedfreq_monitor_state
 		m_vsync_filter = 0;
 	}
 
-	void compute_parameters();
 	void update_sync_channel(const time_type &time, const double newval);
 	void update_bm(const time_type &time);
 	void update_composite_monochrome(const time_type &time, const double newval);
@@ -225,7 +240,7 @@ protected:
 	virtual void device_post_load() override;
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	void update_screen_parameters(double refresh_time) override;
+	void vsync_start_cb(double refresh_time) override;
 	void plot_hline(int x, int y, int w, uint32_t col) override;
 
 private:

@@ -46,7 +46,7 @@ void fixedfreq_monitor_state::update_sync_channel(const time_type &time, const d
 	{
 		//LOG("VSYNC %d %d\n", m_last_x, m_last_y + m_sig_field);
 		m_last_y = m_desc.m_vbackporch - m_desc.m_vsync;
-		m_intf.update_screen_parameters(time - m_last_vsync_time);
+		m_intf.vsync_start_cb(time - m_last_vsync_time);
 		m_last_vsync_time = time;
 	}
 	else if (last_vsync && !m_sig_vsync)
@@ -79,28 +79,12 @@ void fixedfreq_monitor_state::update_sync_channel(const time_type &time, const d
 	m_last_sync_time = time;
 }
 
-void fixedfreq_monitor_state::compute_parameters()
-{
-
-	// htotal = m_desc.m_hbackporch;
-	// vtotal = m_desc.m_vbackporch;
-
-	/* sync separator */
-
-	m_vsync_threshold = (exp(- 3.0/(3.0+3.0))) - exp(-1.0);
-	m_vsync_filter_timeconst = (double) (m_desc.m_monitor_clock) / (double) m_desc.m_hbackporch * 1.0; // / (3.0 + 3.0);
-	//LOG("trigger %f with len %f\n", m_vsync_threshold, 1e6 / m_vsync_filter_timeconst);
-
-	m_clock_period = 1.0 / m_desc.m_monitor_clock;
-	m_intf.update_screen_parameters(m_clock_period * m_desc.m_vbackporch * m_desc.m_hbackporch);
-}
-
 void fixedfreq_monitor_state::update_bm(const time_type &time)
 {
 	const int pixels = round((time - m_line_time) * m_desc.m_hscale / m_clock_period);
 	const int has_fields = (m_desc.m_fieldcount > 1) ? 1: 0;
 
-	uint32_t col(0xFFFF0000); // Mark sync areas
+	uint32_t col(0xffff0000); // Mark sync areas
 
 	if (m_sync_signal >= m_desc.m_sync_threshold)
 		col = m_col;
@@ -211,8 +195,7 @@ void fixedfreq_device::device_start()
 	m_bitmap[0] = std::make_unique<bitmap_rgb32>(m_htotal * m_monitor.m_hscale, m_vtotal);
 	m_bitmap[1] = std::make_unique<bitmap_rgb32>(m_htotal * m_monitor.m_hscale, m_vtotal);
 
-	m_state.dev_start_helper();
-	m_state.compute_parameters();
+	m_state.start();
 
 	// FIXME: will be done by netlist going forward
 	save_item(NAME(m_state.m_sync_signal));
@@ -240,7 +223,7 @@ void fixedfreq_device::device_start()
 
 void fixedfreq_device::device_reset()
 {
-	m_state.dev_reset_helper();
+	m_state.reset();
 }
 
 void fixedfreq_device::device_post_load()
@@ -255,7 +238,7 @@ uint32_t fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-void fixedfreq_device::update_screen_parameters(double refresh_time)
+void fixedfreq_device::vsync_start_cb(double refresh_time)
 {
 	// toggle bitmap
 	m_cur_bm ^= 1;
