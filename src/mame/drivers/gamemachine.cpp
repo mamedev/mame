@@ -10,6 +10,18 @@ It was possibly created by VTech, but they didn't distribute it by themselves
 until later in 1980 as the Computer Game System. There's also a handheld version
 "Mini Game Machine". VTech later made a sequel "Game Machine 2" with 5 games.
 
+hardware notes:
+- Mostek MK3870 MCU, 2KB internal ROM
+- 12 digits 7seg VFD panel
+- MC1455P(555 timer) + bunch of discrete components for sound
+
+TODO:
+- MCU frequency was measured approx 2.1MHz on its XTL2 pin, but considering that
+  the MK3870 has an internal /2 divider, this is way too slow when compared to
+  video references of the game
+
+*******************************************************************************
+
 After boot, press a number to start a game:
 0: 4 Function Calculator (not a game)
 1: Shooting Gallery
@@ -17,19 +29,30 @@ After boot, press a number to start a game:
 3: Code Hunter
 4: Grand Prix
 
-Screen and keyboard overlays were provided for each game, though the default keyboard
+Screen and keypad overlays were provided for each game, though the default keypad
 labels already show the alternate functions.
 
-hardware notes:
-- Mostek MK3870 MCU, 2KB internal ROM
-- 12 digits 7seg VFD panel
-- MC1455P(555 timer) + bunch of discrete components for sound
+keypad reference (mapped to PC keyboard A-row and Z-row by default)
 
-TODO:
-- sound pitch is wrong, standard beep should be highpitched
-- MCU frequency was measured approx 2.1MHz on its XTL2 pin, but considering that
-  the MK3870 has an internal /2 divider, this is way too slow when compared to
-  video references of the game
+Calculator:
+  [RET] [MS ] [MR ] [+/-] [.  ] [+= ] [-= ] [x  ] [/  ] [CL ]
+  [0  ] [1  ] [2  ] [3  ] [4  ] [5  ] [6  ] [7  ] [8  ] [9  ]
+
+Shooting Gallery:
+  [RET] [Cyc] [Zig] [   ] [   ] [   ] [   ] [   ] [   ] [   ] * Cyclic, Zigzag
+  [   ] [   ] [   ] [   ] [   ] [   ] [   ] [   ] [   ] [   ]
+
+Black Jack:
+  [RET] [Dl ] [   ] [   ] [   ] [   ] [   ] [   ] [Hit] [Stn] * Deal, Hit, Stand
+  [   ] [   ] [   ] [   ] [   ] [   ] [   ] [   ] [   ] [   ]
+
+Code Hunter:
+  [RET] [Sta] [Dis] [   ] [   ] [Ent] [   ] [Crs] [R< ] [R> ] * Start, Display, Enter, Cursor key, Review back, Review ahead
+  [   ] [   ] [   ] [   ] [   ] [   ] [   ] [   ] [   ] [   ]
+
+Grand Prix:
+  [RET] [Go ] [   ] [   ] [   ] [   ] [   ] [Up ] [Up ] [Up ]
+  [Brk] [Gas] [   ] [   ] [   ] [   ] [   ] [Dwn] [Dwn] [Dwn]
 
 ******************************************************************************/
 
@@ -262,13 +285,6 @@ WRITE8_MEMBER(tgm_state::sound_w)
 	// P40-P47: 555 to speaker (see netlist above)
 	for (int i = 0; i < 8; i++)
 		m_audio_pin[i]->write_line(BIT(~data, i));
-
-#if 0
-	static int last = 0;
-	if (data != last)
-		printf("Data: 0x%03x\n", data);
-	last = data;
-#endif
 }
 
 
@@ -298,23 +314,23 @@ void tgm_state::main_io(address_map &map)
 
 static INPUT_PORTS_START( tgm )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COLON) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CL")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COLON) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("CL")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SLASH) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CODE(KEYCODE_LEFT) PORT_NAME(UTF8_DIVIDE)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 
 	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COMMA) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_CODE(KEYCODE_ASTERISK) PORT_CODE(KEYCODE_UP) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COMMA) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_DOWN) PORT_NAME("7")
 
 	PORT_START("IN.3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-=")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
 
 	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+=")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("+=")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
 
 	PORT_START("IN.5")
@@ -334,7 +350,7 @@ static INPUT_PORTS_START( tgm )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
 
 	PORT_START("IN.9")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Return")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_R) PORT_NAME("Return")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 INPUT_PORTS_END
 
