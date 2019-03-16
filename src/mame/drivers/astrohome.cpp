@@ -201,6 +201,7 @@ static void astrocade_cart(device_slot_interface &device)
 	device.option_add_internal("rom",       ASTROCADE_ROM_STD);
 	device.option_add_internal("rom_256k",  ASTROCADE_ROM_256K);
 	device.option_add_internal("rom_512k",  ASTROCADE_ROM_512K);
+	device.option_add_internal("rom_cass",  ASTROCADE_ROM_CASS);
 }
 
 static void astrocade_exp(device_slot_interface &device)
