@@ -4310,11 +4310,14 @@
 		<description>Cabela's Big Game Hunter - 2005 Adventures (Euro, USA)</description>
 		<year>2004</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="AGB-BG5E-USA, AGB-BG5P"/>
+		<info name="serial" value="AGB-BG5E-USA, AGB-BG5P-UKV, AGB-BG5P-UKV-1"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="cabela's big game hunter - 2005 adventures (usa, europe).bin" size="4194304" crc="bd054567" sha1="aff3c5bc948c2c868be7da8a327aee25beaa027c" offset="000000" />
+				<rom name="agb-bg5p-0.u1" size="4194304" crc="bd054567" sha1="aff3c5bc948c2c868be7da8a327aee25beaa027c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4484,11 +4487,14 @@
 		<description>Care Bears - The Care Quests (Euro)</description>
 		<year>2005</year>
 		<publisher>The Game Factory</publisher>
-		<info name="serial" value="AGB-BEAP"/>
+		<info name="serial" value="AGB-BEAP-EUU"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="care bears - the care quests (europe) (en,fr,de,es,it,nl,pt,da).bin" size="4194304" crc="6111ed1e" sha1="606ad547286fdf14cc0fe60e5c34f9db83a059dc" offset="000000" />
+				<rom name="agb-beap-0.u1" size="4194304" crc="6111ed1e" sha1="606ad547286fdf14cc0fe60e5c34f9db83a059dc" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4523,13 +4529,17 @@
 	</software>
 
 	<software name="carsb" cloneof="cars">
-		<description>Cars (Euro, Spanish / Portuguese)</description>
+		<description>Disney/Pixar Cars (Euro, Spanish / Portuguese)</description>
 		<year>2006</year>
 		<publisher>THQ</publisher>
+		<info name="serial" value="AGB-BCAY-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="cars (europe) (es,pt).bin" size="8388608" crc="0b058db2" sha1="b7dbdf12678e0f36973ca660178f8978450f4a3e" offset="000000" />
+				<rom name="agb-bcay-0.u1" size="8388608" crc="0b058db2" sha1="b7dbdf12678e0f36973ca660178f8978450f4a3e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4599,12 +4609,15 @@
 	</software>
 
 	<software name="carschmp">
-		<description>Disney Pixar Cars - Mater-National Championship (Euro)</description>
+		<description>Disney/Pixar Cars - Mater-National Championship (Euro)</description>
 		<year>2007</year>
 		<publisher>THQ</publisher>
+		<info name="serial" value="AGB-BCPP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-41" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="cars - mater-national championship (europe) (en,fr,de,es,it,nl).bin" size="4194304" crc="d3db9787" sha1="16c666082db0e12384d342e5db4336ac66869d28" offset="000000" />
+				<rom name="agb-bcpp-0.u1" size="4194304" crc="d3db9787" sha1="16c666082db0e12384d342e5db4336ac66869d28" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -37367,7 +37380,7 @@
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E02-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-			<feature name="u2" value="U2 512K/1M FLASH" />
+			<feature name="u2" value="U2 512K/1M FLASH [39VF512]" />
 			<feature name="slot" value="gba_flash" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-aydp-0.u1" size="8388608" crc="ee317f69" sha1="3ded1227698fbdb2ba47f03025cd1934fc184b99" offset="000000" />
@@ -37437,11 +37450,12 @@
 		<description>Yu-Gi-Oh! - The Sacred Cards (Euro)</description>
 		<year>2004</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="AGB-AY7P-FRA"/>
+		<info name="serial" value="AGB-AY7P-FRA, AGB-AY7P-UKV"/>
+		<info name="alt_title" value="Yu-Gi-Oh! - Les Cartes Sacrées (Box)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E11-10" />
 			<feature name="u1" value="U1 MASK ROM AGB" />
-			<feature name="u2" value="U2 256K FRAM" />
+			<feature name="u2" value="U2 256K FRAM [MB85R256A]" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-ay7p-0.u1" size="16777216" crc="d19db37c" sha1="9a23ad34f67ac1f1343b7009f11ac95c77b782ef" offset="000000" />
@@ -37455,9 +37469,12 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-AY7E-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E11-01" />
+			<feature name="u1" value="U1 MASK ROM AGB" />
+			<feature name="u2" value="U2 256K FRAM [MB85R256A]" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
-				<rom name="yu-gi-oh! - the sacred cards (usa).bin" size="16777216" crc="141fb1cc" sha1="a06735f9c3d10be9339657026981aef77af34b27" offset="000000" />
+				<rom name="agb-ay7e-0.u1" size="16777216" crc="141fb1cc" sha1="a06735f9c3d10be9339657026981aef77af34b27" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -37468,9 +37485,12 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BYWP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E11-10" />
+			<feature name="u1" value="U1 MASK ROM AGB" />
+			<feature name="u2" value="U2 256K FRAM [MB85R256A]" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
-				<rom name="yu-gi-oh! - world championship tournament 2004 (europe) (en,ja,fr,de,es,it).bin" size="16777216" crc="31edef1b" sha1="97a2e7cf6613538216dc807ae5ed92eaa4b9d7a8" offset="000000" />
+				<rom name="agb-bywp-0.u1" size="16777216" crc="3c42e84c" sha1="b791ee3241caef0566bca56bb70c6d37ad3b8621" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -37556,7 +37576,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-AY5E-USA"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="pcb" value="AGB-E06-10" />
+			<feature name="pcb" value="AGB-E06-10" /> <!-- Also found with AGB-E06-20 -->
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 256K SRAM [B62LV256C-70]" />
 			<feature name="u3" value="U3 9803F [LV2416]" />
@@ -37573,11 +37593,15 @@
 		<description>Shonen Jump's Yu-Gi-Oh! - Ultimate Masters Edition - World Championship Tournament 2006 (Euro)</description>
 		<year>2006</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="AGB-BY6P"/>
+		<info name="serial" value="AGB-BY6P-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-Y11-02" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 256K SRAM [MB85R256S]" />
+			<feature name="u3" value="U3 [empty]" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="33554432">
-				<rom name="yu-gi-oh! - ultimate masters edition - world championship tournament 2006 (europe) (en,ja,fr,de,es,it).bin" size="33554432" crc="cede4060" sha1="0734be2fe17d9ef5ede88e0a14cd194656aa23d8" offset="000000" />
+				<rom name="agb-by6p-0.u1" size="33554432" crc="cede4060" sha1="0734be2fe17d9ef5ede88e0a14cd194656aa23d8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -37755,6 +37779,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BYGE-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-Y11-02" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="33554432">
 				<rom name="yu-gi-oh! gx - duel academy (usa).bin" size="33554432" crc="3b8a00fe" sha1="57d6bb789833b62b360072902982d5f1011b3640" offset="000000" />
@@ -38090,9 +38115,15 @@
 		<info name="release" value="20011130"/>
 		<info name="alt_title" value="ゾイドサーガ"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [HY62WT081ED70C]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
-				<rom name="zoids saga (japan).bin" size="8388608" crc="5975dda8" sha1="75d8c15ac281ea93c8ac7cc7641c490799557081" offset="000000" />
+				<rom name="agb-atzj-0.u1" size="8388608" crc="5975dda8" sha1="75d8c15ac281ea93c8ac7cc7641c490799557081" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -38160,7 +38191,7 @@
 		<description>Zone of the Enders - The Fist of Mars (Euro)</description>
 		<year>2002</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="AGB-AZEP"/>
+		<info name="serial" value="AGB-AZEP-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E02-10" />
 			<feature name="u1" value="U1 MASKROM AGB" />
