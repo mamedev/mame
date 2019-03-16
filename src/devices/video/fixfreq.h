@@ -56,20 +56,22 @@ struct fixedfreq_monitor_desc
 	int m_hscale;
 };
 
+struct fixedfreq_monitor_intf
+{
+	virtual ~fixedfreq_monitor_intf() = default;
+	virtual void update_screen_parameters(double refresh_time) = 0;
+	virtual void plot_hline(int x, int y, int w, uint32_t col) = 0;
+};
+
 struct fixedfreq_monitor_state
 {
-	typedef double time_type;
-
-	struct fixedfreq_monitor_intf
-	{
-		virtual ~fixedfreq_monitor_intf() = default;
-		virtual void update_screen_parameters(const time_type &refresh) = 0;
-	};
+	using time_type = double;
 
 	fixedfreq_monitor_state(fixedfreq_monitor_desc &desc, fixedfreq_monitor_intf &intf)
 	: m_desc(desc),
 	m_intf(intf),
 	m_sync_signal(0),
+	m_col(0),
 	m_last_x(0),
 	m_last_y(0),
 	m_last_sync_time(time_type(0)),
@@ -82,10 +84,7 @@ struct fixedfreq_monitor_state
 	m_vsync_filter_timeconst(0),
 	m_sig_vsync(0),
 	m_sig_composite(0),
-	m_sig_field(0),
-	m_cur_bm(0),
-	m_htotal(0),
-	m_vtotal(0)
+	m_sig_field(0)
 	{}
 
 	void dev_start_helper()
@@ -111,14 +110,6 @@ struct fixedfreq_monitor_state
 		m_sig_vsync = 0;
 		m_sig_composite = 0;
 		m_sig_field = 0;
-		m_cur_bm = 0;
-
-		m_bitmap[0] = nullptr;
-		m_bitmap[1] = nullptr;
-
-		m_htotal = 0;
-		m_vtotal = 0;
-
 	}
 
 	void dev_reset_helper()
@@ -130,7 +121,7 @@ struct fixedfreq_monitor_state
 		m_vsync_filter = 0;
 	}
 
-	void recompute_parameters();
+	void compute_parameters();
 	void update_sync_channel(const time_type &time, const double newval);
 	void update_bm(const time_type &time);
 	void update_composite_monochrome(const time_type &time, const double newval);
@@ -143,7 +134,7 @@ struct fixedfreq_monitor_state
 	fixedfreq_monitor_intf &m_intf;
 
 	double m_sync_signal;
-	rgb_t m_col;
+	uint32_t m_col;
 	int m_last_x;
 	int m_last_y;
 	time_type m_last_sync_time;
@@ -161,16 +152,12 @@ struct fixedfreq_monitor_state
 	int m_sig_composite;
 	int m_sig_field;
 
-	std::unique_ptr<bitmap_rgb32> m_bitmap[2];
-	int m_cur_bm;
-	int m_htotal;
-	int m_vtotal;
 };
 
 // ======================> fixedfreq_device
 
 class fixedfreq_device : public device_t, public device_video_interface,
-						 public fixedfreq_monitor_state::fixedfreq_monitor_intf
+						 public fixedfreq_monitor_intf
 {
 public:
 
@@ -238,9 +225,15 @@ protected:
 	virtual void device_post_load() override;
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	void update_screen_parameters(const time_type &refresh) override;
+	void update_screen_parameters(double refresh_time) override;
+	void plot_hline(int x, int y, int w, uint32_t col) override;
 
 private:
+
+	std::unique_ptr<bitmap_rgb32> m_bitmap[2];
+	int m_cur_bm;
+	int m_htotal;
+	int m_vtotal;
 
 	time_type m_refresh_period;
 

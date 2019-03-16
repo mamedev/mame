@@ -46,8 +46,6 @@ void fixedfreq_monitor_state::update_sync_channel(const time_type &time, const d
 	{
 		//LOG("VSYNC %d %d\n", m_last_x, m_last_y + m_sig_field);
 		m_last_y = m_desc.m_vbackporch - m_desc.m_vsync;
-		// toggle bitmap
-		m_cur_bm ^= 1;
 		m_intf.update_screen_parameters(time - m_last_vsync_time);
 		m_last_vsync_time = time;
 	}
@@ -81,29 +79,20 @@ void fixedfreq_monitor_state::update_sync_channel(const time_type &time, const d
 	m_last_sync_time = time;
 }
 
-void fixedfreq_monitor_state::recompute_parameters()
+void fixedfreq_monitor_state::compute_parameters()
 {
-	bool needs_realloc = (m_htotal != m_desc.m_hbackporch) && (m_vtotal != m_desc.m_vbackporch);
 
-	if (m_bitmap[0] != nullptr || needs_realloc)
-		m_bitmap[0] = nullptr;
-	if (m_bitmap[1] != nullptr || needs_realloc)
-		m_bitmap[1] = nullptr;
-
-	m_htotal = m_desc.m_hbackporch;
-	m_vtotal = m_desc.m_vbackporch;
+	// htotal = m_desc.m_hbackporch;
+	// vtotal = m_desc.m_vbackporch;
 
 	/* sync separator */
 
 	m_vsync_threshold = (exp(- 3.0/(3.0+3.0))) - exp(-1.0);
-	m_vsync_filter_timeconst = (double) (m_desc.m_monitor_clock) / (double) m_htotal * 1.0; // / (3.0 + 3.0);
+	m_vsync_filter_timeconst = (double) (m_desc.m_monitor_clock) / (double) m_desc.m_hbackporch * 1.0; // / (3.0 + 3.0);
 	//LOG("trigger %f with len %f\n", m_vsync_threshold, 1e6 / m_vsync_filter_timeconst);
 
-	m_bitmap[0] = std::make_unique<bitmap_rgb32>(m_htotal * m_desc.m_hscale, m_vtotal);
-	m_bitmap[1] = std::make_unique<bitmap_rgb32>(m_htotal * m_desc.m_hscale, m_vtotal);
-
 	m_clock_period = 1.0 / m_desc.m_monitor_clock;
-	m_intf.update_screen_parameters(m_clock_period * m_vtotal * m_htotal);
+	m_intf.update_screen_parameters(m_clock_period * m_desc.m_vbackporch * m_desc.m_hbackporch);
 }
 
 void fixedfreq_monitor_state::update_bm(const time_type &time)
@@ -111,25 +100,80 @@ void fixedfreq_monitor_state::update_bm(const time_type &time)
 	const int pixels = round((time - m_line_time) * m_desc.m_hscale / m_clock_period);
 	const int has_fields = (m_desc.m_fieldcount > 1) ? 1: 0;
 
-	bitmap_rgb32 *bm = m_bitmap[m_cur_bm].get();
+	uint32_t col(0xFFFF0000); // Mark sync areas
 
-	if (m_last_y < bm->height())
-	{
-		rgb_t col(255, 0, 0); // Mark sync areas
+	if (m_sync_signal >= m_desc.m_sync_threshold)
+		col = m_col;
 
-		if (m_sync_signal >= m_desc.m_sync_threshold)
-		{
-			col = m_col;
-		}
-		bm->plot_box(m_last_x, m_last_y + m_sig_field * has_fields, pixels - m_last_x, 1, col);
-		m_last_x = pixels;
-	}
+	m_intf.plot_hline(m_last_x, m_last_y + m_sig_field * has_fields, pixels - m_last_x, col);
+	m_last_x = pixels;
 }
 
+void fixedfreq_monitor_state::update_composite_monochrome(const time_type &time, const double data)
+{
+	update_bm(time);
+	update_sync_channel(time, data);
+
+	int colv = (int) ((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
+	if (colv > 255)
+		colv = 255;
+	if (colv < 0)
+		m_col = 0xffff0000;
+	else
+		m_col = 0xff000000 | (colv<<16) | (colv<<8) | colv;
+}
+
+void fixedfreq_monitor_state::update_red(const time_type &time, const double data)
+{
+	update_bm(time);
+
+	int colv = (int) ((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
+	if (colv > 255)
+		colv = 255;
+	if (colv < 0)
+		colv = 0;
+	m_col = (m_col & 0xff00ffff) | (colv<<16);
+}
+
+void fixedfreq_monitor_state::update_green(const time_type &time, const double data)
+{
+	update_bm(time);
+	//update_sync_channel(ctime, data);
+
+	int colv = (int) ((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
+	if (colv > 255)
+		colv = 255;
+	if (colv < 0)
+		colv = 0;
+	m_col = (m_col & 0xffff00ff) | (colv<<8);
+}
+
+void fixedfreq_monitor_state::update_blue(const time_type &time, const double data)
+{
+	update_bm(time);
+	//update_sync_channel(ctime, data);
+
+	int colv = (int) ((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
+	if (colv > 255)
+		colv = 255;
+	if (colv < 0)
+		colv = 0;
+	m_col = (m_col & 0xffffff00) | colv;
+
+}
+
+void fixedfreq_monitor_state::update_sync(const time_type &time, const double data)
+{
+	update_bm(time);
+	update_sync_channel(time, data);
+}
 
 fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_video_interface(mconfig, *this, false),
+		m_cur_bm(0),
+		m_htotal(0),
+		m_vtotal(0),
 		m_refresh_period(time_type(0)),
 		m_monitor(),
 		m_state(m_monitor, *this)
@@ -160,9 +204,15 @@ void fixedfreq_device::device_start()
 
 	m_refresh_period = time_type(0);
 
-	m_state.dev_start_helper();
+	m_cur_bm = 0;
 
-	m_state.recompute_parameters();
+	m_htotal = m_monitor.m_hbackporch;
+	m_vtotal = m_monitor.m_vbackporch;
+	m_bitmap[0] = std::make_unique<bitmap_rgb32>(m_htotal * m_monitor.m_hscale, m_vtotal);
+	m_bitmap[1] = std::make_unique<bitmap_rgb32>(m_htotal * m_monitor.m_hscale, m_vtotal);
+
+	m_state.dev_start_helper();
+	m_state.compute_parameters();
 
 	// FIXME: will be done by netlist going forward
 	save_item(NAME(m_state.m_sync_signal));
@@ -176,7 +226,7 @@ void fixedfreq_device::device_start()
 	save_item(NAME(m_state.m_clock_period));
 	//save_item(NAME(m_bitmap[0]));
 	//save_item(NAME(m_bitmap[1]));
-	save_item(NAME(m_state.m_cur_bm));
+	save_item(NAME(m_cur_bm));
 
 	/* sync separator */
 	save_item(NAME(m_state.m_vsync_filter));
@@ -186,9 +236,6 @@ void fixedfreq_device::device_start()
 	save_item(NAME(m_state.m_sig_vsync));
 	save_item(NAME(m_state.m_sig_composite));
 	save_item(NAME(m_state.m_sig_field));
-
-
-
 }
 
 void fixedfreq_device::device_reset()
@@ -196,81 +243,35 @@ void fixedfreq_device::device_reset()
 	m_state.dev_reset_helper();
 }
 
-
 void fixedfreq_device::device_post_load()
 {
 	//recompute_parameters();
 }
 
-void fixedfreq_device::update_screen_parameters(const time_type &refresh)
-{
-	rectangle visarea(m_monitor.minh(), m_monitor.maxh(), m_monitor.minv(), m_monitor.maxv());
-
-	m_refresh_period = refresh;
-	screen().configure(m_state.m_htotal * m_monitor.m_hscale, m_state.m_vtotal, visarea, DOUBLE_TO_ATTOSECONDS(m_refresh_period));
-}
-
 uint32_t fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	copybitmap(bitmap, *m_state.m_bitmap[!m_state.m_cur_bm], 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *m_bitmap[!m_cur_bm], 0, 0, 0, 0, cliprect);
 
 	return 0;
 }
 
-void fixedfreq_monitor_state::update_composite_monochrome(const time_type &time, const double data)
+void fixedfreq_device::update_screen_parameters(double refresh_time)
 {
-	update_bm(time);
-	update_sync_channel(time, data);
+	// toggle bitmap
+	m_cur_bm ^= 1;
 
-	int colv = (int) ((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
-	if (colv > 255)
-		colv = 255;
-	if (colv < 0)
-		m_col = rgb_t(255, 0, 0);
-	else
-		m_col = rgb_t(colv, colv, colv);
+	rectangle visarea(m_monitor.minh(), m_monitor.maxh(), m_monitor.minv(), m_monitor.maxv());
+
+	m_refresh_period = refresh_time;
+	screen().configure(m_htotal * m_monitor.m_hscale, m_vtotal, visarea, DOUBLE_TO_ATTOSECONDS(m_refresh_period));
 }
 
-void fixedfreq_monitor_state::update_red(const time_type &time, const double data)
+void fixedfreq_device::plot_hline(int x, int y, int w, uint32_t col)
 {
-	update_bm(time);
-	//update_sync_channel(ctime, data);
-
-	int colv = (int) ((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
-	if (colv > 255)
-		colv = 255;
-	m_col.set_r(colv);
+	bitmap_rgb32 *bm = m_bitmap[m_cur_bm].get();
+	if (y < bm->height())
+		bm->plot_box(x, y, w, 1, col);
 }
-
-void fixedfreq_monitor_state::update_green(const time_type &time, const double data)
-{
-	update_bm(time);
-	//update_sync_channel(ctime, data);
-
-	int colv = (int) ((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
-	if (colv > 255)
-		colv = 255;
-	m_col.set_g(colv);
-}
-
-void fixedfreq_monitor_state::update_blue(const time_type &time, const double data)
-{
-	update_bm(time);
-	//update_sync_channel(ctime, data);
-
-	int colv = (int) ((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
-	if (colv > 255)
-		colv = 255;
-	m_col.set_b(colv);
-
-}
-
-void fixedfreq_monitor_state::update_sync(const time_type &time, const double data)
-{
-	update_bm(time);
-	update_sync_channel(time, data);
-}
-
 
 NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_composite_monochrome)
 {
