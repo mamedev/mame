@@ -299,4 +299,4 @@ ROM_END
 
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                   FULLNAME */
-COMP( 1989, slc1, 0,      0,      slc1,    slc1,  slc1_state, empty_init, "Dr. Dieter Scheuschner", "SLC-1" , 0 )
+COMP( 1989, slc1, 0,      0,      slc1,    slc1,  slc1_state, empty_init, "Dr. Dieter Scheuschner", "Schach- und Lerncomputer SLC 1", 0 )

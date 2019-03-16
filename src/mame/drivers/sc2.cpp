@@ -9,6 +9,9 @@ Fidelity Chess Challenger 10.
 
 3 versions known: initial version, revision E, revision EP.
 
+Schachcomputer SC 1 was canceled before wide release, it's assumed to
+be on similar hardware(but PCB photos show 10 ROM chips instead of 9).
+
 keypad legend:
 
 R - Rückstellen (reset)
