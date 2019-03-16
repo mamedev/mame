@@ -684,7 +684,6 @@ saturn.cpp
 savia84.cpp
 sbc6510.cpp
 sbrain.cpp
-sc1.cpp
 sc2.cpp
 scopus.cpp
 scorpion.cpp
@@ -706,6 +705,7 @@ si5500.cpp
 sitcom.cpp
 sk1.cpp
 slc1.cpp
+slc1a.cpp
 slicer.cpp
 sm1800.cpp
 sm7238.cpp
