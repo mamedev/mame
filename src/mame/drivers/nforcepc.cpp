@@ -14,6 +14,7 @@
   - An IDE hard disk
   - A floppy disk drive
   - A keyboard
+  - A ddr dimm memory module
   Later add:
   - A Nvidia NV25 based AGP video card
 
@@ -26,6 +27,14 @@
 #include "machine/pci-ide.h"
 #include "includes/xbox_pci.h"
 #include "includes/nforcepc.h"
+
+// for now let's use this as the contents of the spd chip in the ddr dimm memory module
+static const uint8_t test_spd_data[] = {
+	0x80,0x08,0x07,0x0D,0x0A,0x01,0x40,0x00,0x04,0x75,0x75,0x00,0x82,0x10,0x00,0x01,0x0E,0x04,0x0C,0x01,0x02,0x20,0xC0,0xA0,0x75,0x00,
+	0x00,0x50,0x3C,0x50,0x2D,0x40,0x90,0x90,0x50,0x50,0x00,0x00,0x00,0x00,0x00,0x41,0x4B,0x30,0x32,0x75,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xEA,0xAD,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x48,0x59,0x4D,0x44,0x35,
+	0x33,0x32,0x4D,0x36,0x34,0x36,0x43,0x36,0x2D,0x48,0x20,0x20,0x20
+};
 
 /*
   Pci devices
@@ -101,7 +110,11 @@ WRITE8_MEMBER(crush11_host_device::test_w)
 	logerror("test = %02x\n", data);
 }
 
-// device connected to SMBus
+/*
+  Ddevices connected to SMBus
+*/
+
+// access logger
 
 DEFINE_DEVICE_TYPE(SMBUS_LOGGER, smbus_logger_device, "smbus_logger", "SMBUS LOGGER")
 
@@ -128,6 +141,40 @@ void smbus_logger_device::device_start()
 }
 
 void smbus_logger_device::device_reset()
+{
+}
+
+// read-only data
+
+DEFINE_DEVICE_TYPE(SMBUS_ROM, smbus_rom_device, "smbus_rom", "SMBUS ROM")
+
+smbus_rom_device::smbus_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SMBUS_ROM, tag, owner, clock)
+{
+}
+
+smbus_rom_device::smbus_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const uint8_t *data, int size) :
+	smbus_rom_device(mconfig, tag, owner, clock)
+{
+	buffer = data;
+	buffer_size = size;
+}
+
+int smbus_rom_device::execute_command(int command, int rw, int data)
+{
+	if ((rw == 1) && (command < buffer_size) && (buffer != nullptr))
+	{
+		logerror("smbus rom read from %02x %02x\n", command, buffer[command]);
+		return buffer[command];
+	}
+	return 0;
+}
+
+void smbus_rom_device::device_start()
+{
+}
+
+void smbus_rom_device::device_reset()
 {
 }
 
@@ -243,7 +290,7 @@ nforcepc_state::nforcepc_state(const machine_config &mconfig, device_type type, 
 	driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	isalpc(*this, ":pci:01.0"),
-	m_as99127f(*this, ":pci:01.1:2d")
+	m_as99127f(*this, ":pci:01.1:12d")
 {
 }
 
@@ -313,10 +360,13 @@ void nforcepc_state::nforcepc(machine_config &config)
 	isa.boot_state_hook().set(FUNC(nforcepc_state::boot_state_award_w));
 	isa.interrupt_output().set(FUNC(nforcepc_state::maincpu_interrupt));
 	MCPX_SMBUS(config, ":pci:01.1", 0); // 10de:01b4 NVIDIA Corporation nForce PCI System Management (SMBus)
-	SMBUS_LOGGER(config, ":pci:01.1:08", 0);
-	AS99127F(config, ":pci:01.1:2d", 0);
-	AS99127F_SENSOR2(config, ":pci:01.1:48", 0);
-	AS99127F_SENSOR3(config, ":pci:01.1:49", 0);
+	SMBUS_ROM(config, ":pci:01.1:050", 0, test_spd_data, sizeof(test_spd_data)); // these 3 are on smbus number 0
+	SMBUS_LOGGER(config, ":pci:01.1:051", 0);
+	SMBUS_LOGGER(config, ":pci:01.1:052", 0);
+	SMBUS_LOGGER(config, ":pci:01.1:108", 0); // these 4 are on smbus number 1
+	AS99127F(config, ":pci:01.1:12d", 0);
+	AS99127F_SENSOR2(config, ":pci:01.1:148", 0);
+	AS99127F_SENSOR3(config, ":pci:01.1:149", 0);
 	/*10de:01c2 NVIDIA Corporation nForce USB Controller
 	10de:01c2 NVIDIA Corporation nForce USB Controller
 	10de:01b0 NVIDIA Corporation nForce Audio Processing Unit

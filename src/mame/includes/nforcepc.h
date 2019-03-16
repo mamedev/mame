@@ -63,6 +63,26 @@ private:
 
 DECLARE_DEVICE_TYPE(SMBUS_LOGGER, smbus_logger_device)
 
+// Simple smbus rom used as a placeholder for the serial presence detect chip in a ddr dimm
+
+class smbus_rom_device : public device_t, public smbus_interface
+{
+public:
+	smbus_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const uint8_t *data, int size);
+	smbus_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual int execute_command(int command, int rw, int data) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	const uint8_t *buffer;
+	int buffer_size;
+};
+
+DECLARE_DEVICE_TYPE(SMBUS_ROM, smbus_rom_device)
+
 // Asus AS99127F chip
 // It answerst to three smbus addresses, by default 0x2d 0x48 0x49
 
