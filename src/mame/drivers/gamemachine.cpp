@@ -121,7 +121,7 @@ static NETLIST_START(nl_gamemachine)
 
 	QBJT_EB(Q1, "9013")
 
-	NE555_DIP(IC1)					// MC1455P
+	MC1455P_DIP(IC1)
 
 	NET_C(P08.Q, R2.2, IC1.4)
 	NET_C(P09.Q, C8.2)

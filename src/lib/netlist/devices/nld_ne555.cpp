@@ -194,5 +194,7 @@ namespace netlist
 	NETLIB_DEVICE_IMPL(NE555,     "NE555", "")
 	NETLIB_DEVICE_IMPL(NE555_dip, "NE555_DIP", "")
 
+	NETLIB_DEVICE_IMPL_ALIAS(MC1455P, NE555,     "MC1455P", "")
+	NETLIB_DEVICE_IMPL_ALIAS(MC1455P_dip, NE555_dip, "MC1455P_DIP", "")
 	} //namespace devices
 } // namespace netlist
