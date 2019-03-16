@@ -17,6 +17,7 @@
 #include "bus/astrocde/rom.h"
 #include "bus/astrocde/exp.h"
 #include "bus/astrocde/ram.h"
+#include "bus/astrocde/ctrl.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -29,6 +30,7 @@ public:
 		: astrocde_state(mconfig, type, tag)
 		, m_cart(*this, "cartslot")
 		, m_exp(*this, "exp")
+		, m_ctrl(*this, "ctrl%u", 1U)
 		, m_keypad(*this, "KEYPAD%u", 0U)
 	{ }
 
@@ -42,6 +44,7 @@ private:
 
 	required_device<astrocade_cart_slot_device> m_cart;
 	required_device<astrocade_exp_device> m_exp;
+	required_device_array<astrocade_ctrl_port_device, 4> m_ctrl;
 	required_ioport_array<4> m_keypad;
 };
 
@@ -104,42 +107,10 @@ READ8_MEMBER(astrocde_home_state::inputs_r)
 	if (BIT(offset, 2))
 		return m_keypad[offset & 3]->read();
 	else
-		return m_handle[offset & 3]->read();
+		return m_ctrl[offset & 3]->read_handle();
 }
 
 static INPUT_PORTS_START( astrocde )
-	PORT_START("P1HANDLE")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)        PORT_PLAYER(1)
-	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("P2HANDLE")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)        PORT_PLAYER(2)
-	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("P3HANDLE")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_PLAYER(3) PORT_8WAY
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_PLAYER(3) PORT_8WAY
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_PLAYER(3) PORT_8WAY
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(3) PORT_8WAY
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)        PORT_PLAYER(3)
-	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("P4HANDLE")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_PLAYER(4) PORT_8WAY
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_PLAYER(4) PORT_8WAY
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_PLAYER(4) PORT_8WAY
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(4) PORT_8WAY
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)        PORT_PLAYER(4)
-	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
-
 	PORT_START("KEYPAD0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("%   \xC3\xB7         [   ]   LIST") PORT_CODE(KEYCODE_O)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("/   x     J   K   L   NEXT") PORT_CODE(KEYCODE_SLASH_PAD)
@@ -175,18 +146,6 @@ static INPUT_PORTS_START( astrocde )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("1   SPACE $   ,   ?") PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CE  GREEN Shift") PORT_CODE(KEYCODE_E)
 	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("P1_KNOB")
-	PORT_BIT(0xff, 0x00, IPT_PADDLE) PORT_INVERT PORT_SENSITIVITY(85) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_MINMAX(0,255) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
-
-	PORT_START("P2_KNOB")
-	PORT_BIT(0xff, 0x00, IPT_PADDLE) PORT_INVERT PORT_SENSITIVITY(85) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_MINMAX(0,255) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
-
-	PORT_START("P3_KNOB")
-	PORT_BIT(0xff, 0x00, IPT_PADDLE) PORT_INVERT PORT_SENSITIVITY(85) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_MINMAX(0,255) PORT_CODE_DEC(KEYCODE_Q) PORT_CODE_INC(KEYCODE_W) PORT_PLAYER(3)
-
-	PORT_START("P4_KNOB")
-	PORT_BIT(0xff, 0x00, IPT_PADDLE) PORT_INVERT PORT_SENSITIVITY(85) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_MINMAX(0,255) PORT_CODE_DEC(KEYCODE_Y) PORT_CODE_INC(KEYCODE_U) PORT_PLAYER(4)
 INPUT_PORTS_END
 
 
@@ -232,14 +191,20 @@ void astrocde_home_state::astrocde(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(astrocde_home_state::astrocade_palette), 512);
 
+	/* control ports */
+	ASTROCADE_CTRL_PORT(config, m_ctrl[0], astrocade_controllers, "joy");
+	ASTROCADE_CTRL_PORT(config, m_ctrl[1], astrocade_controllers, nullptr);
+	ASTROCADE_CTRL_PORT(config, m_ctrl[2], astrocade_controllers, nullptr);
+	ASTROCADE_CTRL_PORT(config, m_ctrl[3], astrocade_controllers, nullptr);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	ASTROCADE_IO(config, m_astrocade_sound1, ASTROCADE_CLOCK/4);
 	m_astrocade_sound1->si_cb().set(FUNC(astrocde_home_state::inputs_r));
-	m_astrocade_sound1->set_pot_tag<0>("P1_KNOB");
-	m_astrocade_sound1->set_pot_tag<1>("P2_KNOB");
-	m_astrocade_sound1->set_pot_tag<2>("P3_KNOB");
-	m_astrocade_sound1->set_pot_tag<3>("P4_KNOB");
+	m_astrocade_sound1->pot_cb<0>().set(m_ctrl[0], FUNC(astrocade_ctrl_port_device::read_knob));
+	m_astrocade_sound1->pot_cb<1>().set(m_ctrl[1], FUNC(astrocade_ctrl_port_device::read_knob));
+	m_astrocade_sound1->pot_cb<2>().set(m_ctrl[2], FUNC(astrocade_ctrl_port_device::read_knob));
+	m_astrocade_sound1->pot_cb<3>().set(m_ctrl[3], FUNC(astrocade_ctrl_port_device::read_knob));
 	m_astrocade_sound1->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* expansion port */

@@ -86,7 +86,7 @@ astrocade_io_device::astrocade_io_device(const machine_config &mconfig, const ch
 	, m_c_state(0)
 	, m_si_callback(*this)
 	, m_so_callback{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_pots(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
+	, m_pots{{*this}, {*this}, {*this}, {*this}}
 {
 	memset(m_reg, 0, sizeof(uint8_t)*8);
 	memset(m_bitswap, 0, sizeof(uint8_t)*256);
@@ -104,6 +104,8 @@ void astrocade_io_device::device_resolve_objects()
 	m_si_callback.resolve_safe(0);
 	for (auto &cb : m_so_callback)
 		cb.resolve_safe();
+	for (auto &pot : m_pots)
+		pot.resolve_safe(0);
 }
 
 
@@ -323,7 +325,7 @@ READ8_MEMBER(astrocade_io_device::read)
 		return m_si_callback(space, offset & 7);
 	}
 	else if ((offset & 0x0f) >= 0x0c)
-		return m_pots[offset & 3].read_safe(0);
+		return m_pots[offset & 3]();
 	else
 		return 0xff;
 }
