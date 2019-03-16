@@ -315,6 +315,16 @@ public:
 		}
 	}
 
+	ATTR_HOT void sound_update_fill(int samples)
+	{
+		if (samples > m_bufsize)
+			throw emu_fatalerror("sound %s: pos %d exceeded bufsize %d\n", name().c_str(), samples, m_bufsize);
+		while (m_last_pos < samples )
+		{
+			m_buffer[m_last_pos++] = (stream_sample_t) m_cur;
+		}
+	}
+
 	NETLIB_UPDATEI()
 	{
 		nl_double val = m_in() * m_mult() + m_offset();
@@ -334,7 +344,6 @@ public:
 	{
 		m_last_pos = 0;
 		m_last_buffer_time = upto;
-		m_cur = 0.0;
 	}
 
 	netlist::param_int_t m_channel;
@@ -1194,7 +1203,7 @@ void netlist_mame_sound_device::sound_stream_update(sound_stream &stream, stream
 
 	for (auto &e : m_out)
 	{
-		e.second->sound_update(cur);
+		e.second->sound_update_fill(samples);
 		e.second->buffer_reset(cur);
 	}
 }
