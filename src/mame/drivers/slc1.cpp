@@ -13,6 +13,8 @@ This computer is both a Z80 trainer, and a chess computer.
 
         There is no chess board attached. You supply your own
         and you sync the pieces and the computer instructions.
+        The chess engine was copied from Fidelity's Sensory
+        Chess Challenger 8.
 
         When started, it is in Chess mode. Press 11111 to switch to
         Trainer mode.
