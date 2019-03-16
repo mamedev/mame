@@ -467,7 +467,7 @@ bool debugger_commands::validate_cpu_parameter(const char *param, device_t *&res
 	{
 		// real CPUs should have pcbase
 		const device_state_interface *state;
-		if (exec.device().interface(state) && state->state_string(STATE_GENPCBASE) != "???" && index++ == cpunum)
+		if (exec.device().interface(state) && state->state_find_entry(STATE_GENPCBASE) != nullptr && index++ == cpunum)
 		{
 			result = &exec.device();
 			return true;
