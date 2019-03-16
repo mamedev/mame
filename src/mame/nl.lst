@@ -20,6 +20,9 @@
 1942p                           // prototype
 1942h                           // hack (Two Bit Score?)
 
+@source:gamemachine.cpp
+2001tgm                         //
+
 // hazeltin.cpp
 hazl1500                        // Hazeltine 1500 (c) 1977
 
