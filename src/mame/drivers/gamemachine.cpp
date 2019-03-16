@@ -23,10 +23,10 @@ labels already show the alternate functions.
 hardware notes:
 - Mostek MK3870 MCU, 2KB internal ROM
 - 12 digits 7seg VFD panel
-- MC1455P(555 timer) + bunch of discrete components for sound, see schematic:
-  http://seanriddle.com/gamemachineaudio.JPG
+- MC1455P(555 timer) + bunch of discrete components for sound
 
 TODO:
+- sound pitch is wrong, standard beep should be highpitched
 - MCU frequency was measured approx 2.1MHz on its XTL2 pin, but considering that
   the MK3870 has an internal /2 divider, this is way too slow when compared to
   video references of the game
@@ -37,11 +37,9 @@ TODO:
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
 #include "machine/timer.h"
-#include "sound/beep.h"
 #include "speaker.h"
 #include "machine/netlist.h"
 #include "netlist/devices/net_lib.h"
-
 #include "tgm.lh"
 
 /*
@@ -124,6 +122,7 @@ static NETLIST_START(nl_gamemachine)
 
 NETLIST_END()
 
+
 namespace {
 
 class tgm_state : public driver_device
@@ -132,21 +131,13 @@ public:
 	tgm_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audio_p08(*this, "snd_nl:p08"),
-		m_audio_p09(*this, "snd_nl:p09"),
-		m_audio_p10(*this, "snd_nl:p10"),
-		m_audio_p11(*this, "snd_nl:p11"),
-		m_audio_p12(*this, "snd_nl:p12"),
-		m_audio_p13(*this, "snd_nl:p13"),
-		m_audio_p14(*this, "snd_nl:p14"),
-		m_audio_p15(*this, "snd_nl:p15"),
+		m_audio_pin(*this, "snd_nl:p%02u", 8U),
 		m_keypad(*this, "IN.%u", 0),
 		m_delay_display(*this, "delay_display_%u", 0),
 		m_out_digit(*this, "digit%u", 0U),
 		m_inp_mux(0),
 		m_digit_select(0),
 		m_digit_data(0)
-
 	{ }
 
 	void tgm(machine_config &config);
@@ -157,15 +148,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<netlist_mame_logic_input_device> m_audio_p08;
-	required_device<netlist_mame_logic_input_device> m_audio_p09;
-	required_device<netlist_mame_logic_input_device> m_audio_p10;
-	required_device<netlist_mame_logic_input_device> m_audio_p11;
-	required_device<netlist_mame_logic_input_device> m_audio_p12;
-	required_device<netlist_mame_logic_input_device> m_audio_p13;
-	required_device<netlist_mame_logic_input_device> m_audio_p14;
-	required_device<netlist_mame_logic_input_device> m_audio_p15;
-
+	required_device_array<netlist_mame_logic_input_device, 8> m_audio_pin;
 	required_ioport_array<10> m_keypad;
 	required_device_array<timer_device, 12> m_delay_display;
 	output_finder<12> m_out_digit;
@@ -191,11 +174,6 @@ void tgm_state::machine_start()
 {
 	// resolve handlers
 	m_out_digit.resolve();
-
-	// zerofill
-	m_inp_mux = 0;
-	m_digit_select = 0;
-	m_digit_data = 0;
 
 	// register for savestates
 	save_item(NAME(m_inp_mux));
@@ -279,15 +257,9 @@ READ8_MEMBER(tgm_state::input_r)
 
 WRITE8_MEMBER(tgm_state::sound_w)
 {
-
-	m_audio_p08->write_line(data & 0x01 ? 0 : 1);
-	m_audio_p09->write_line(data & 0x02 ? 0 : 1);
-	m_audio_p10->write_line(data & 0x04 ? 0 : 1);
-	m_audio_p11->write_line(data & 0x08 ? 0 : 1);
-	m_audio_p12->write_line(data & 0x10 ? 0 : 1);
-	m_audio_p13->write_line(data & 0x20 ? 0 : 1);
-	m_audio_p14->write_line(data & 0x40 ? 0 : 1);
-	m_audio_p15->write_line(data & 0x80 ? 0 : 1);
+	// P40-P47: 555 to speaker (see netlist above)
+	for (int i = 0; i < 8; i++)
+		m_audio_pin[i]->write_line(BIT(~data, i));
 
 #if 0
 	static int last = 0;
@@ -404,7 +376,6 @@ void tgm_state::tgm(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "snd_nl:p13", "P13.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "snd_nl:p14", "P14.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "snd_nl:p15", "P15.IN", 0);
-
 }
 
 
