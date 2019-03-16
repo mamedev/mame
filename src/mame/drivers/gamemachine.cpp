@@ -50,7 +50,7 @@ static NETLIST_START(nl_gamemachine)
 
 	/* Standard stuff */
 
-	SOLVER(Solver, 480000)
+	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-7)
 	ANALOG_INPUT(V5, 5)
 
@@ -98,7 +98,7 @@ static NETLIST_START(nl_gamemachine)
 
 	QBJT_EB(Q1, "9013")
 
-	NE555_DIP(IC1)
+	NE555_DIP(IC1)					// MC1455P
 
 	NET_C(P08.Q, R2.2, IC1.4)
 	NET_C(P09.Q, C8.2)
@@ -116,6 +116,7 @@ static NETLIST_START(nl_gamemachine)
 	NET_C(V5, R4.1, R2.1, IC1.8, SPK1.1, R3.1)
 
 	NET_C(C7.1, R6.1, IC1.3)
+
 	NET_C(C7.2, R6.2, Q1.B)
 	NET_C(Q1.C, SPK1.2)
 
