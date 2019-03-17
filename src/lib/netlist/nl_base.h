@@ -702,7 +702,7 @@ namespace netlist
 			template <typename T>
 			void process(const T mask, netlist_sig_t sig);
 		};
-	} // detail
+	} // namespace detail
 
 	// -----------------------------------------------------------------------------
 	// analog_t
