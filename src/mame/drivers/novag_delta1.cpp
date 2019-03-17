@@ -11,12 +11,6 @@ Novag Delta-1, the chess engine seems similar to Boris (see aci_boris.cpp)
 - 4KB ROM(2332A), 256 bytes RAM(2*2111A-4)
 - 4-digit 7seg panel, no sound, no chessboard
 
-TODO:
-- After the computer is done calculating its move, sometimes it will blank the
-  display, making game progress impossible. CPU bug, or unexpected interrupt?
-  An easy way to repro this is by repeatedly pressing enter without inputting
-  a move: it's a feature to make it play against itself.
-
 ******************************************************************************/
 
 #include "emu.h"
@@ -41,6 +35,9 @@ public:
 	// machine drivers
 	void delta1(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// address maps
 	void main_map(address_map &map);
@@ -51,6 +48,15 @@ private:
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(input_r);
 };
+
+void delta1_state::machine_start()
+{
+	novagbase_state::machine_start();
+
+	// game relies on RAM filled with FF at power-on
+	for (int i = 0; i < 0x100; i++)
+		m_maincpu->space(AS_PROGRAM).write_byte(i + 0x2000, 0xff);
+}
 
 
 /******************************************************************************
@@ -188,4 +194,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, ccdelta1, 0,      0, delta1,  delta1, delta1_state, empty_init, "Novag", "Chess Champion: Delta-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+CONS( 1979, ccdelta1, 0,      0, delta1,  delta1, delta1_state, empty_init, "Novag", "Chess Champion: Delta-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

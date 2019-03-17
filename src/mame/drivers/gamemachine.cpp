@@ -40,7 +40,7 @@ Calculator:
 
 Shooting Gallery:
   [RET] [Cyc] [Zig] [Rnd] [   ] [   ] [   ] [   ] [   ] [   ] * Cyclic, Zigzag, Random
-  [   ] [   ] [   ] [   ] [   ] [   ] [   ] [   ] [   ] [   ]
+  [   ] [   ] [   ] [   ] [   ] [   ] [   ] [   ] [   ] [   ] * + any of 20 buttons for shooting target
 
 Black Jack:
   [RET] [Dl ] [   ] [   ] [   ] [   ] [   ] [   ] [Hit] [Stn] * Deal, Hit, Stand
