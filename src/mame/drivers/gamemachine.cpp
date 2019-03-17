@@ -39,7 +39,7 @@ Calculator:
   [0  ] [1  ] [2  ] [3  ] [4  ] [5  ] [6  ] [7  ] [8  ] [9  ]
 
 Shooting Gallery:
-  [RET] [Cyc] [Zig] [   ] [   ] [   ] [   ] [   ] [   ] [   ] * Cyclic, Zigzag
+  [RET] [Cyc] [Zig] [Rnd] [   ] [   ] [   ] [   ] [   ] [   ] * Cyclic, Zigzag, Random
   [   ] [   ] [   ] [   ] [   ] [   ] [   ] [   ] [   ] [   ]
 
 Black Jack:
