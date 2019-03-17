@@ -17,10 +17,10 @@
 //  astrocade_rom_device - constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(ASTROCADE_ROM_STD,  astrocade_rom_device,      "astrocade_rom",  "Bally Astrocade Standard Carts")
-DEFINE_DEVICE_TYPE(ASTROCADE_ROM_256K, astrocade_rom_256k_device, "astrocade_256k", "Bally Astrocade 256K Carts")
-DEFINE_DEVICE_TYPE(ASTROCADE_ROM_512K, astrocade_rom_512k_device, "astrocade_512k", "Bally Astrocade 512K Carts")
-DEFINE_DEVICE_TYPE(ASTROCADE_ROM_CASS, astrocade_rom_cass_device, "astrocade_cass", "Bally Astrocade AstroBASIC Cart")
+DEFINE_DEVICE_TYPE(ASTROCADE_ROM_STD,  astrocade_rom_device,      "astrocade_rom",      "Bally Astrocade Standard Carts")
+DEFINE_DEVICE_TYPE(ASTROCADE_ROM_256K, astrocade_rom_256k_device, "astrocade_rom_256k", "Bally Astrocade 256K Carts")
+DEFINE_DEVICE_TYPE(ASTROCADE_ROM_512K, astrocade_rom_512k_device, "astrocade_rom_512k", "Bally Astrocade 512K Carts")
+DEFINE_DEVICE_TYPE(ASTROCADE_ROM_CASS, astrocade_rom_cass_device, "astrocade_rom_cass", "Bally Astrocade AstroBASIC Cart")
 
 
 astrocade_rom_device::astrocade_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
