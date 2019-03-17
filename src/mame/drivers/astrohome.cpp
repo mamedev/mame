@@ -107,7 +107,11 @@ READ8_MEMBER(astrocde_home_state::inputs_r)
 	if (BIT(offset, 2))
 		return m_keypad[offset & 3]->read();
 	else
-		return m_ctrl[offset & 3]->read_handle();
+	{
+		uint8_t data = m_ctrl[offset & 3]->read_handle();
+		//printf("%d", BIT(data, 0));
+		return data;
+	}
 }
 
 static INPUT_PORTS_START( astrocde )
@@ -258,7 +262,10 @@ MACHINE_START_MEMBER(astrocde_home_state, astrocde)
 	// if no RAM is mounted and the handlers are installed, the system starts with garbage on screen and a RESET is necessary
 	// thus, install RAM only if an expansion is mounted
 	if (m_exp->get_card_mounted())
+	{
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x5000, 0xffff, read8_delegate(FUNC(astrocade_exp_device::read),(astrocade_exp_device*)m_exp), write8_delegate(FUNC(astrocade_exp_device::write),(astrocade_exp_device*)m_exp));
+		m_maincpu->space(AS_IO).install_readwrite_handler(0x0080, 0x00ff, 0x0000, 0x0000, 0xff00, read8_delegate(FUNC(astrocade_exp_device::read_io),(astrocade_exp_device*)m_exp), write8_delegate(FUNC(astrocade_exp_device::write_io),(astrocade_exp_device*)m_exp));
+	}
 }
 
 /*************************************

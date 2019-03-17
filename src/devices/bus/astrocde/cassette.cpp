@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
+//
+// TODO: Emulation of the circuitry to convert 300-baud Kansas City Standard data into bits.
+//
+// Decoding is done in hardware by an external box, and decoded bits are fed to bit 0 of the controller port,
+// with sync bits being fed to bit 1.
 
 #include "emu.h"
 #include "cassette.h"
@@ -29,13 +34,11 @@ astrocade_cassette_device::~astrocade_cassette_device()
 uint8_t astrocade_cassette_device::read_handle()
 {
 	uint8_t data = m_cassette->input() > 0.0 ? 0 : 1;
-	logerror("%s: Cassette Handle Read: %d\n", machine().describe_context(), data);
 	return data;
 }
 
 uint8_t astrocade_cassette_device::read_knob()
 {
-	logerror("%s: Cassette Knob Read\n", machine().describe_context());
 	return 0;
 }
 

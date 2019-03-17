@@ -649,8 +649,8 @@ void modulab_state::modulab_map(address_map &map)
 	// map(0x0800, 0x13ff).ram().mirror(0xe000); // expansion port area consisting of 3 chip selects each selecting 0x3ff byte addresses
 	map(0x1400, 0x17ff).rom().mirror(0xe000).region("maincpu", 0x0000);
 	map(0x1800, 0x187f).rw(FUNC(modulab_state::io_r), FUNC(modulab_state::io_w)).mirror(0xe200);
-	map(0x1900, 0x197f).rw(m_pia1, FUNC(ins8154_device::ins8154_r), FUNC(ins8154_device::ins8154_w)).mirror(0xe200);
-	map(0x1980, 0x19ff).ram().mirror(0xe200); // 8154 internal RAM
+	map(0x1900, 0x197f).rw(m_pia1, FUNC(ins8154_device::read_io), FUNC(ins8154_device::write_io)).mirror(0xe200);
+	map(0x1980, 0x19ff).rw(m_pia1, FUNC(ins8154_device::read_ram), FUNC(ins8154_device::write_ram)).mirror(0xe200);
 	map(0x1c00, 0x1fff).rom().mirror(0xe000).region("maincpu", 0x0400);
 }
 
