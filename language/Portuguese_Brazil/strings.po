@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-03-17 13:37+1100\n"
-"PO-Revision-Date: 2019-02-05 17:50-0300\n"
+"PO-Revision-Date: 2019-03-17 02:30-0300\n"
 "Last-Translator: Katananja, Ashura-X\n"
 "Language-Team: MAME Language Team\n"
 "Language: pt_BR\n"
@@ -1117,7 +1117,7 @@ msgstr "[criar]"
 #: src/frontend/mame/ui/filesel.cpp:320
 #, c-format
 msgid "Error accessing %s"
-msgstr ""
+msgstr "Erro ao acessar %s"
 
 #: src/frontend/mame/ui/filesel.cpp:536
 msgid "Select access mode"
@@ -1598,11 +1598,11 @@ msgstr "Som\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1079
 msgid "Capture\tUnimplemented\n"
-msgstr ""
+msgstr "Captura\tNão Implementado\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1081
 msgid "Capture\tImperfect\n"
-msgstr ""
+msgstr "Captura\tImperfeita\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1084
 msgid "Camera\tUnimplemented\n"
@@ -1646,11 +1646,11 @@ msgstr "Mouse\tImperfeito\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1109
 msgid "Media\tUnimplemented\n"
-msgstr ""
+msgstr "Mídia\tNão Implementada\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1111
 msgid "Media\tImperfect\n"
-msgstr ""
+msgstr "Mídia\tImperfeita\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1114
 msgid "Disk\tUnimplemented\n"
@@ -1670,43 +1670,43 @@ msgstr "Impressora\tImperfeita\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1124
 msgid "Mag. Tape\tUnimplemented\n"
-msgstr ""
+msgstr "Fita Mag.\tNão Implementada\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1126
 msgid "Mag. Tape\tImperfect\n"
-msgstr ""
+msgstr "Fita Mag.\tImperfeita\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1129
 msgid "Punch Tape\tUnimplemented\n"
-msgstr ""
+msgstr "Fita Perfurada\tNão Implementada\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1131
 msgid "Punch Tape\tImperfect\n"
-msgstr ""
+msgstr "Fita Perfurada\tImperfeita\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1134
 msgid "Mag. Drum\tUnimplemented\n"
-msgstr ""
+msgstr "Cab. Mag.\tNão Implementado\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1136
 msgid "Mag. Drum\tImperfect\n"
-msgstr ""
+msgstr "Cab. Mag.\Imperfeito\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1139
 msgid "(EP)ROM\tUnimplemented\n"
-msgstr ""
+msgstr "(EP)ROM\tNão Implementado\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1141
 msgid "(EP)ROM\tImperfect\n"
-msgstr ""
+msgstr "(EP)ROM\tImperfeito\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1144
 msgid "Communications\tUnimplemented\n"
-msgstr ""
+msgstr "Communicações\tNão Implementado\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1146
 msgid "Communications\tImperfect\n"
-msgstr ""
+msgstr "Communicações\tImperfeito\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1149
 msgid "LAN\tUnimplemented\n"
@@ -1875,7 +1875,7 @@ msgstr "Aumentar as imagens no painel direito"
 
 #: src/frontend/mame/ui/submenu.cpp:26
 msgid "Show mouse pointer"
-msgstr "Mostrar o ponteiro do mouse"
+msgstr "Exibir o ponteiro do mouse"
 
 #: src/frontend/mame/ui/submenu.cpp:27
 msgid "Confirm quit from machines"
@@ -1883,11 +1883,11 @@ msgstr "Confirmar saída das máquinas"
 
 #: src/frontend/mame/ui/submenu.cpp:28
 msgid "Skip information screen at startup"
-msgstr "Pular a tela de informação ao iniciar"
+msgstr "Omitir a tela de informações ao iniciar"
 
 #: src/frontend/mame/ui/submenu.cpp:29
 msgid "Force 4:3 aspect for snapshot display"
-msgstr "Forçar o aspecto 4:3 para a tela de snapshot"
+msgstr "Manter aspecto 4:3 para os instantâneos da tela"
 
 #: src/frontend/mame/ui/submenu.cpp:30
 msgid "Use image as background"
@@ -1895,11 +1895,11 @@ msgstr "Usar imagem como plano de fundo"
 
 #: src/frontend/mame/ui/submenu.cpp:31
 msgid "Skip BIOS selection menu"
-msgstr "Pular o menu de seleção de BIOS"
+msgstr "Omitir a tela de seleção de BIOS"
 
 #: src/frontend/mame/ui/submenu.cpp:32
 msgid "Skip software parts selection menu"
-msgstr "Pular menu de seleção para o programa em partes"
+msgstr "Omitir partes do cardápio de seleção de software"
 
 #: src/frontend/mame/ui/submenu.cpp:33
 msgid "Info auto audit"
@@ -1919,11 +1919,11 @@ msgstr "Opções de Performance"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Auto frame skip"
-msgstr "Pulo de quadro Automático"
+msgstr "Salto de quadro Automático"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Frame skip"
-msgstr "Pulo de quadro"
+msgstr "Salto de quadro"
 
 #: src/frontend/mame/ui/submenu.cpp:42
 msgid "Throttle"
@@ -2147,7 +2147,7 @@ msgstr "Modo Janelado"
 
 #: src/frontend/mame/ui/submenu.cpp:112
 msgid "Enforce Aspect Ratio"
-msgstr "Forçar Razão de Aspecto"
+msgstr "Manter a proporção da tela"
 
 #: src/frontend/mame/ui/submenu.cpp:113
 msgid "Start Out Maximized"
@@ -2155,7 +2155,7 @@ msgstr "Iniciar Maximizado"
 
 #: src/frontend/mame/ui/submenu.cpp:114
 msgid "Synchronized Refresh"
-msgstr "Atualização de Quadros Sincronizada"
+msgstr "Atualização Sincronizada de Quadros"
 
 #: src/frontend/mame/ui/submenu.cpp:115
 msgid "Wait Vertical Sync"
@@ -2399,7 +2399,7 @@ msgstr "som"
 
 #: src/frontend/mame/ui/info.cpp:36
 msgid "capture hardware"
-msgstr ""
+msgstr "capturar hardware"
 
 #: src/frontend/mame/ui/info.cpp:37
 msgid "camera"
@@ -2423,7 +2423,7 @@ msgstr "mouse"
 
 #: src/frontend/mame/ui/info.cpp:42
 msgid "media"
-msgstr ""
+msgstr "mídia"
 
 #: src/frontend/mame/ui/info.cpp:43
 msgid "disk"
@@ -2435,23 +2435,23 @@ msgstr "impressora"
 
 #: src/frontend/mame/ui/info.cpp:45
 msgid "magnetic tape"
-msgstr ""
+msgstr "fita magnética"
 
 #: src/frontend/mame/ui/info.cpp:46
 msgid "punch tape"
-msgstr ""
+msgstr "fita de dados em papel perfurado"
 
 #: src/frontend/mame/ui/info.cpp:47
 msgid "magnetic drum"
-msgstr ""
+msgstr "cabeçote magnético"
 
 #: src/frontend/mame/ui/info.cpp:48
 msgid "solid state storage"
-msgstr ""
+msgstr "armazenamento em estado sólido"
 
 #: src/frontend/mame/ui/info.cpp:49
 msgid "communications"
-msgstr ""
+msgstr "comunicações"
 
 #: src/frontend/mame/ui/info.cpp:50
 msgid "LAN"
@@ -2924,15 +2924,15 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:504
 msgid "Pause Mode"
-msgstr ""
+msgstr "Modo de Pausa"
 
 #: plugins/cheatfind/init.lua:511
 msgid "Manually pause & unpause the game when needed with the pause hotkey"
-msgstr ""
+msgstr "Pause Manualmente & libere o jogo quando for necessário usando a tecla para o atalho pause"
 
 #: plugins/cheatfind/init.lua:536
 msgid "All slots cleared and current state saved to Slot 1"
-msgstr ""
+msgstr "Todos os slots foram apagados e a condição da memória atual foi salva no Slot 1"
 
 #: plugins/cheatfind/init.lua:551
 msgid "Start new search"
@@ -2941,11 +2941,11 @@ msgstr "Iniciar nova pesquisa"
 #: plugins/cheatfind/init.lua:564
 #, lua-format
 msgid "Memory State saved to Slot %d"
-msgstr ""
+msgstr "A Condição da Memória foi Salva no Slot %d"
 
 #: plugins/cheatfind/init.lua:583
 msgid "Save Current Memory State to Slot "
-msgstr ""
+msgstr "Salvar a Condição Atual da Memória para o Slot"
 
 #: plugins/cheatfind/init.lua:614
 #, lua-format
@@ -2954,15 +2954,15 @@ msgstr "Um total de %d correspondências foram encontradas"
 
 #: plugins/cheatfind/init.lua:655
 msgid "Perform Compare  :  "
-msgstr ""
+msgstr "Fazer uma Comparação  :  "
 
 #: plugins/cheatfind/init.lua:672
 msgid "Left less than right"
-msgstr ""
+msgstr "Esquerda menor que a direita"
 
 #: plugins/cheatfind/init.lua:674
 msgid "Left greater than right"
-msgstr ""
+msgstr "Esquerda maior que a direita"
 
 #: plugins/cheatfind/init.lua:676
 msgid "Left equal to right"
@@ -2970,7 +2970,7 @@ msgstr "Esquerda igual à direita"
 
 #: plugins/cheatfind/init.lua:678
 msgid "Left not equal to right"
-msgstr ""
+msgstr "Esquerda não é igual à direita"
 
 #: plugins/cheatfind/init.lua:680
 msgid "Left equal to right with bitmask"
@@ -3002,7 +3002,7 @@ msgstr "Valor"
 
 #: plugins/cheatfind/init.lua:714
 msgid "Difference"
-msgstr ""
+msgstr "Diferença"
 
 #: plugins/cheatfind/init.lua:719
 msgid "Any"
@@ -3014,91 +3014,93 @@ msgstr "Formato do dado"
 
 #: plugins/cheatfind/init.lua:731
 msgid "Test/Write Poke Value"
-msgstr ""
+msgstr "Testar/Escrever o Valor do Poke"
 
 #: plugins/cheatfind/init.lua:738
 msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke o Slot 1 (Quando você
+começa com algo mas o perde)"
 
 #: plugins/cheatfind/init.lua:740
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com o valor do Último Slot (Quando você começa
+sem um item e depois você o consegue por exemplo)"
 
 #: plugins/cheatfind/init.lua:742
 msgid "Use this if you want to poke 0x00"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com 0x00"
 
 #: plugins/cheatfind/init.lua:744
 msgid "Use this if you want to poke 0x01"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com 0x01"
 
 #: plugins/cheatfind/init.lua:746
 msgid "Use this if you want to poke 0x02"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com 0x02"
 
 #: plugins/cheatfind/init.lua:748
 msgid "Use this if you want to poke 0x03"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com 0x03"
 
 #: plugins/cheatfind/init.lua:750
 msgid "Use this if you want to poke 0x04"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com 0x04"
 
 #: plugins/cheatfind/init.lua:752
 msgid "Use this if you want to poke 0x05"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com 0x05"
 
 #: plugins/cheatfind/init.lua:754
 msgid "Use this if you want to poke 0x06"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com 0x06"
 
 #: plugins/cheatfind/init.lua:756
 msgid "Use this if you want to poke 0x07"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com 0x07"
 
 #: plugins/cheatfind/init.lua:758
 msgid "Use this if you want to poke 0x08"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com 0x08"
 
 #: plugins/cheatfind/init.lua:760
 msgid "Use this if you want to poke 0x09"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com 0x09"
 
 #: plugins/cheatfind/init.lua:762
 msgid "Use this if you want to poke 0x63 (Decimal 99)"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com 0x63 (Decimal 99)"
 
 #: plugins/cheatfind/init.lua:764
 msgid "Use this if you want to poke 0x99 (BCD 99)"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com 0x99 (BCD 99)"
 
 #: plugins/cheatfind/init.lua:766
 msgid "Use this if you want to poke 0xFF (Decimal 255)"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com 0xFF (Decimal 255)"
 
 #: plugins/cheatfind/init.lua:768
 msgid "Use this if you want to poke 0x3E7 (Decimal 999)"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com 0x3E7 (Decimal 999)"
 
 #: plugins/cheatfind/init.lua:770
 msgid "Use this if you want to poke 0x999 (BCD 999)"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com 0x9999 (BCD 999)"
 
 #: plugins/cheatfind/init.lua:772
 msgid "Use this if you want to poke 0x270F (Decimal 9999)"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com 0x27F (Decimal 9999)"
 
 #: plugins/cheatfind/init.lua:774
 msgid "Use this if you want to poke 0x9999 (BCD 9999)"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com 0x9999 (BCD 9999)"
 
 #: plugins/cheatfind/init.lua:776
 msgid "Use this if you want to poke 0xFFFF (Decimal 65535)"
-msgstr ""
+msgstr "Use isto se quiser fazer um poke com 0xFFFF (Decimal 65535)"
 
 #: plugins/cheatfind/init.lua:816
 msgid "Undo last search -- #"
@@ -3115,7 +3117,7 @@ msgstr "Todos"
 #: plugins/cheatfind/init.lua:934
 #, lua-format
 msgid "Test Cheat %08X:%02X"
-msgstr ""
+msgstr "Testar Trapaça %08X:%02X"
 
 #: plugins/cheatfind/init.lua:974
 msgid "Cheat engine not available"
