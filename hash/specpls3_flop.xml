@@ -10747,7 +10747,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- May be the same edition as the IPF -->
-	<software name="linekskla" cloneof name="linekskl">
+	<software name="linekskla" cloneof="linekskl">
 		<description>Gary Lineker's Super Skills (alt)</description>
 		<year>1988</year>
 		<publisher>Gremlin Graphics Software</publisher>
