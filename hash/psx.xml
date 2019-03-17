@@ -26576,8 +26576,10 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="tobal1">
-		<!-- Original images (Redump)
+	<!-- boot OK -->
+	<software name="tobal1" supported="yes">
+		<!-- 
+		Original images (Redump)
 		<rom name="Tobal No. 1 (USA).cue" size="2222" crc="2f29ef74" sha1="5d1800bdee7352ea9b58ad55608c445a0e890d19"/>
 		<rom name="Tobal No. 1 (USA) (Track 01).bin" size="65183328" crc="98d915fc" sha1="c2f05f69e9257de1e5558ea4948f06d0505ddf06"/>
 		<rom name="Tobal No. 1 (USA) (Track 02).bin" size="26302416" crc="92f90880" sha1="23671b5f340410d89c3f0265f769a82f8fb25416"/>
@@ -37427,7 +37429,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="acid" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Acid (Japan) (SLPS-02119).bin" size="749629440" crc="40900258" sha1="a7182901dbb80d987a5a3f1b14b4a75f99f2d24e"/>
 		<rom name="Acid (Japan) (SLPS-02119).cue" size="91" crc="164a1a32" sha1="64df752c21c47d1b8d353c9e07ee2b270e39931a"/>
 		-->
@@ -37440,7 +37443,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="acid (japan) (slps-02119)" sha1="7a9be5ec10cd928a5dcad61ba200c8908abc8ba4"/>
+				<disk name="acid (japan) (slps-02119)" sha1="7a9be5ec10cd928a5dcad61ba200c8908abc8ba4" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -39342,9 +39345,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- black screen -->
-	<software name="blockhlp" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="blockhlp" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Block Kuzushi Kowashite Help! (Japan) [SLPS-03042].bin" size="231290976" crc="8f266be8" sha1="361a56890e272530dc74ea23df273c1b5fd3a7ee"/>
 		<rom name="Block Kuzushi Kowashite Help! (Japan) [SLPS-03042].cue" size="1294" crc="5aca88cb" sha1="7994c21eb3503e8251f187be6558570c0c1d766f"/>
 		-->
@@ -39357,7 +39361,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="block kuzushi kowashite help! (japan) [slps-03042]" sha1="5f76b744b0c6a5e1050426f962b51bcc47226ce7"/>
+				<disk name="block kuzushi kowashite help! (japan) [slps-03042]" sha1="5f76b744b0c6a5e1050426f962b51bcc47226ce7" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -42221,8 +42225,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="engacho" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="engacho" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Engacho! (Japan) [SLPS-02263].bin" size="403250400" crc="ccfdf826" sha1="02d5a81d61c7aac2e8fb620ee289fbea383893a8"/>
 		<rom name="Engacho! (Japan) [SLPS-02263].cue" size="157" crc="d98dc805" sha1="bb4a0eee2432d29824504139e40f45399c47b09c"/>
 		-->
@@ -42235,7 +42241,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="engacho! (japan) [slps-02263]" sha1="8d1a0d1c02cbd63d637f89b0fa53e40a5afd34ac"/>
+				<disk name="engacho! (japan) [slps-02263]" sha1="8d1a0d1c02cbd63d637f89b0fa53e40a5afd34ac" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -43933,8 +43939,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="gokuden" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="gokuden" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Gokuu Densetsu - Magic Beast Warriors (Japan) [SLPS-00048].bin" size="671347824" crc="283cc68c" sha1="e8da709e13ace14af485838162e533c05c03eb00"/>
 		<rom name="Gokuu Densetsu - Magic Beast Warriors (Japan) [SLPS-00048].cue" size="390" crc="9269b297" sha1="bb48f11acff4836f87d2b8807dc057e0dafaa0e5"/>
 		-->
@@ -43947,13 +43955,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gokuu densetsu - magic beast warriors (japan) [slps-00048]" sha1="60a43530d1f5c5a634374e274dd236e1ec5ebc4d"/>
+				<disk name="gokuu densetsu - magic beast warriors (japan) [slps-00048]" sha1="60a43530d1f5c5a634374e274dd236e1ec5ebc4d" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
+	<!-- hangs at PS logo -->
 	<software name="gokunind" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Fuuun Gokuu Ninjin (Japan) [SLPS-00441].bin" size="610569792" crc="e65eb161" sha1="d6288b29468f55ce01c3609b248245596876860c"/>
 		<rom name="Fuuun Gokuu Ninjin (Japan) [SLPS-00441].cue" size="1058" crc="2b37e344" sha1="6e81085931b45ec5db6f0bc04891b0d7ed5f99a2"/>
 		-->
@@ -43966,7 +43976,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="fuuun gokuu ninjin (japan) [slps-00441]" sha1="4b96a290fb5477479729c1f6e7f2bc0c50a4dae7"/>
+				<disk name="fuuun gokuu ninjin (japan) [slps-00441]" sha1="4b96a290fb5477479729c1f6e7f2bc0c50a4dae7" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -45178,8 +45188,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="hypcclim" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="hypcclim" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Hyper Crazy Climber (Japan) [SLPS-00248].bin" size="418378464" crc="d7867192" sha1="49a9baefcfe487ebc7a07f787965aa06ee014b23"/>
 		<rom name="Hyper Crazy Climber (Japan) [SLPS-00248].cue" size="1133" crc="43e9a0a1" sha1="6697da8135b6db05e7741ffab964c1bf03fe9f40"/>
 		-->
@@ -45192,7 +45204,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hyper crazy climber (japan) [slps-00248]" sha1="c894a23037cb77c7f7e87ae6883be64852608b50"/>
+				<disk name="hyper crazy climber (japan) [slps-00248]" sha1="c894a23037cb77c7f7e87ae6883be64852608b50" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -51070,9 +51082,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- boot ok -->
-	<software name="rallyafr" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="rallyafr" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Rally de Africa (Japan) [SLPS-01601].bin" size="185205888" crc="e40169d6" sha1="4ae190b1f1f575dc198f349ba71030e72a0dc0ed"/>
 		<rom name="Rally de Africa (Japan) [SLPS-01601].cue" size="100" crc="296e5c78" sha1="ac9fef9b05cb0690e33efc616f8bebce06d405e8"/>
 		-->
@@ -51085,7 +51098,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rally de africa (japan) [slps-01601]" sha1="145436794bac3b21bcbcfdce681ad0cd5e093b0e"/>
+				<disk name="rally de africa (japan) [slps-01601]" sha1="145436794bac3b21bcbcfdce681ad0cd5e093b0e" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -51940,8 +51953,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<!-- boot OK -->
-	<software name="sateltv" supported="no">
-		<!-- Unknown source
+	<software name="sateltv" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Satelli TV (Japan) [SLPS-01203].bin" size="102937632" crc="96445bc6" sha1="23a87b50307d2d450ab03f1cc3d562dcc6b8a0b0"/>
 		<rom name="Satelli TV (Japan) [SLPS-01203].cue" size="97" crc="a889d996" sha1="8c9e630f8ecea2040f3f73a8bfefc32feceeda96"/>
 		-->
@@ -53843,8 +53857,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="ss067soc" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="ss067soc" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Simple 1500 Series Vol.067 - The Soccer - Dynamite Soccer 1500 (Japan) [SLPM-86864].bin" size="266070000" crc="b6c99d65" sha1="d1cc9042f8961cd9139cb3d86d0574abf4f92f53"/>
 		<rom name="Simple 1500 Series Vol.067 - The Soccer - Dynamite Soccer 1500 (Japan) [SLPM-86864].cue" size="659" crc="56845014" sha1="bcf5b9ba309a54a34c871df056a0a971aaf6036e"/>
 		-->
@@ -53857,7 +53873,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="simple 1500 series vol.067 - the soccer - dynamite soccer 1500 (japan) [slpm-86864]" sha1="acf2ab78bac9ec558c0096770bc51d833372aec7"/>
+				<disk name="simple 1500 series vol.067 - the soccer - dynamite soccer 1500 (japan) [slpm-86864]" sha1="acf2ab78bac9ec558c0096770bc51d833372aec7" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -54436,8 +54452,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="sunsoft2" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="sunsoft2" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Sunsoft Classics Vol.2 - Memorial Series (Japan) [SLPS-03181].bin" size="49904736" crc="d7a5d50f" sha1="2ac9e03c2864d49c0aa32def666519b96bc31049"/>
 		<rom name="Sunsoft Classics Vol.2 - Memorial Series (Japan) [SLPS-03181].cue" size="125" crc="48a2c01e" sha1="4ae55daabf240b109bdda4988a3c3ef57ea4705a"/>
 		-->
@@ -54450,7 +54468,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sunsoft classics vol.2 - memorial series (japan) [slps-03181]" sha1="94c75b1a62d230fcd2246223676c217da225df80"/>
+				<disk name="sunsoft classics vol.2 - memorial series (japan) [slps-03181]" sha1="94c75b1a62d230fcd2246223676c217da225df80" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
