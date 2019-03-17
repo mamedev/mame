@@ -259,13 +259,13 @@ public:
 
 		if (m_model.m_CJE > 0.0)
 		{
-			register_sub("m_CJE", m_CJE);
+			create_and_register_subdevice("m_CJE", m_CJE);
 			connect("B", "m_CJE.1");
 			connect("E", "m_CJE.2");
 		}
 		if (m_model.m_CJC > 0.0)
 		{
-			register_sub("m_CJC", m_CJC);
+			create_and_register_subdevice("m_CJC", m_CJC);
 			connect("B", "m_CJC.1");
 			connect("C", "m_CJC.2");
 		}

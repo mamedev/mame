@@ -1189,10 +1189,9 @@ namespace netlist
 		const setup_t &setup() const;
 
 		template<class C, typename... Args>
-		void register_sub(const pstring &name, pool_owned_ptr<C> &dev, const Args&... args)
+		void create_and_register_subdevice(const pstring &name, pool_owned_ptr<C> &dev, Args&&... args)
 		{
-			//dev.reset(plib::palloc<C>(*this, name, args...));
-			dev = pool().make_poolptr<C>(*this, name, args...);
+			dev = pool().make_poolptr<C>(*this, name, std::forward<Args>(args)...);
 		}
 
 		void register_subalias(const pstring &name, detail::core_terminal_t &term);
