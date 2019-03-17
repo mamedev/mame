@@ -288,11 +288,6 @@ void setup_t::register_term(detail::core_terminal_t &term)
 	log().debug("{1} {2}\n", termtype_as_str(term), term.name());
 }
 
-
-
-
-
-
 void setup_t::remove_connections(const pstring &pin)
 {
 	pstring pinfn = build_fqn(pin);
