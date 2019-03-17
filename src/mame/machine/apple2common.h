@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include "cpu/g65816/g65816.h"
 
 // ======================> apple2_common_device
 
@@ -21,15 +22,20 @@ public:
 	// construction/destruction
 	apple2_common_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template <typename T> void set_GS_cputag(T &&tag) { m_GScpu.set_tag(std::forward<T>(tag)); }
+
 	offs_t dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
+	offs_t dasm_override_GS(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:
-	double m_x_calibration, m_y_calibration;
+	optional_device<g65816_device> m_GScpu;
 
+	double m_x_calibration, m_y_calibration;
 	double m_joystick_x1_time;
 	double m_joystick_y1_time;
 	double m_joystick_x2_time;
@@ -37,6 +43,7 @@ private:
 
 	offs_t com_2byte_op(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname);
 	offs_t com_3byte_op(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname);
+	offs_t com_long_op(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname);
 };
 
 
