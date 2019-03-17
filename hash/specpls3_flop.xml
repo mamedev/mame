@@ -430,7 +430,7 @@
 		<!-- SPS (CAPS) release 3510 -->
 		<description>Four Smash Hits From Hewson</description>
 		<year>198?</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
 
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="238800">
@@ -2462,7 +2462,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Applications - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="pawes" cloneof="paw">
-		<description>Professional Adventure Writer (Spanish)</description>
+		<description>Professional Adventure Writer (Spa)</description>
 		<year>1986</year>
 		<publisher>Aventuras AD</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -2711,7 +2711,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Applications - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="tasworp3sp" cloneof="tasworp3">
-		<description>Tasword Plus Three (Spanish)</description>
+		<description>Tasword Plus Three (Spa)</description>
 		<year>1987</year>
 		<publisher>Tasman</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -2967,7 +2967,7 @@
 	<software name="2x1chqin">
 		<description>2 Por 1: Chase H.Q. + Indiana Jones y la Ultima Cruzada</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Chase H.Q."/>
 			<dataarea name="flop" size="185088">
@@ -2986,7 +2986,7 @@
 	<software name="2x1motfa">
 		<description>2 Por 1: Motor Massacre + Final Assault</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Motor Massacre"/>
 			<dataarea name="flop" size="108032">
@@ -3005,7 +3005,7 @@
 	<software name="2x1plar2">
 		<description>2 por 1: Platoon + Arkanoid II: Revenge of Doh</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Platoon"/>
 			<dataarea name="flop" size="194816">
@@ -3024,7 +3024,7 @@
 	<software name="2x1plar2a" cloneof="2x1plar2">
 		<description>2 por 1: Platoon + Arkanoid II: Revenge of Doh (alt)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Platoon"/>
 			<dataarea name="flop" size="194816">
@@ -3043,7 +3043,7 @@
 	<software name="2x1rentr">
 		<description>2 Por 1: Renegade + Target Renegade</description>
 		<year>1988</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Renegade"/>
 			<dataarea name="flop" size="73472">
@@ -3062,7 +3062,7 @@
 	<software name="2x1silmm">
 		<description>2 Por 1: Silent Shadow + Mad Mix Game</description>
 		<year>1988</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Silent Shadow"/>
 			<dataarea name="flop" size="194816">
@@ -3081,7 +3081,7 @@
 	<software name="2x1silmma" cloneof="2x1silmm">
 		<description>2 Por 1: Silent Shadow + Mad Mix Game (alt)</description>
 		<year>1988</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Silent Shadow"/>
 			<dataarea name="flop" size="194816">
@@ -3101,7 +3101,7 @@
 	<software name="2x1tecmm">
 		<description>2 Por 1: Techno Cop + Mickey Mouse</description>
 		<year>1988</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Techno Cop"/>
 			<dataarea name="flop" size="224512">
@@ -3120,7 +3120,7 @@
 	<software name="2x1tdmun">
 		<description>2 Por 1: The Deep + The Muncher</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: The Deep"/>
 			<dataarea name="flop" size="213760">
@@ -3139,7 +3139,7 @@
 	<software name="2x1tblc2">
 		<description>2 Por 1: Thunder Blade + Cybernoid II</description>
 		<year>1988</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Thunder Blade"/>
 			<dataarea name="flop" size="194816">
@@ -3158,7 +3158,7 @@
 	<software name="2x1vsbns">
 		<description>2 Por 1: MASK III: VENOM Strikes Back + North Star</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: MASK III: VENOM Strikes Back"/>
 			<dataarea name="flop" size="173824">
@@ -3177,7 +3177,7 @@
 	<software name="2x1csmnv">
 		<description>2 X 1: Capitan Sevilla + Meganova</description>
 		<year>1988</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Capitan Sevilla"/>
 			<dataarea name="flop" size="112640">
@@ -3215,7 +3215,7 @@
 	<software name="2x1quimc">
 		<description>2 X 1: Don Quijote + Mega-Corp</description>
 		<year>1987</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Don Quijote"/>
 			<dataarea name="flop" size="109568">
@@ -3303,7 +3303,7 @@
 	<software name="los40v1">
 		<description>Los 40 Principales Vol. 1</description>
 		<year>1987</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Batman + Thanatos"/>
 			<dataarea name="flop" size="194816">
@@ -3322,7 +3322,7 @@
 	<software name="los40v1a" cloneof="los40v1">
 		<description>Los 40 Principales Vol. 1 (alt)</description>
 		<year>1987</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Batman + Thanatos"/>
 			<dataarea name="flop" size="194816">
@@ -3341,7 +3341,7 @@
 	<software name="los40v10">
 		<description>Los 40 Principales Vol. 10</description>
 		<year>1987</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Super Soccer + Ramon Rodriguez"/>
 			<dataarea name="flop" size="194816">
@@ -3360,7 +3360,7 @@
 	<software name="los40v10a" cloneof="los40v10">
 		<description>Los 40 Principales Vol. 10 (alt)</description>
 		<year>1987</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Super Soccer + Ramon Rodriguez"/>
 			<dataarea name="flop" size="194816">
@@ -3379,7 +3379,7 @@
 	<software name="los40v2">
 		<description>Los 40 Principales Vol. 2</description>
 		<year>1987</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: The Great Escape + Zorro"/>
 			<dataarea name="flop" size="194816">
@@ -3398,7 +3398,7 @@
 	<software name="los40v3">
 		<description>Los 40 Principales Vol. 3</description>
 		<year>1987</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Arkanoid + Nightmare Rally"/>
 			<dataarea name="flop" size="194816">
@@ -3417,7 +3417,7 @@
 	<software name="los40v3a" cloneof="los40v3">
 		<description>Los 40 Principales Vol. 3 (alt)</description>
 		<year>1987</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Arkanoid + Nightmare Rally"/>
 			<dataarea name="flop" size="194816">
@@ -3436,7 +3436,7 @@
 	<software name="los40v5">
 		<description>Los 40 Principales Vol. 5</description>
 		<year>1987</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Kung-Fu Master + Three Weeks in Paradise"/>
 			<dataarea name="flop" size="194816">
@@ -3455,7 +3455,7 @@
 	<software name="los40v6">
 		<description>Los 40 Principales Vol. 6</description>
 		<year>1987</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Rocky + Survivor"/>
 			<dataarea name="flop" size="194816">
@@ -3475,7 +3475,7 @@
 	<software name="los40v6a" cloneof="los40v6">
 		<description>Los 40 Principales Vol. 6 (alt)</description>
 		<year>1987</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Rocky + Survivor"/>
 			<dataarea name="flop" size="194816">
@@ -3494,7 +3494,7 @@
 	<software name="los40v7">
 		<description>Los 40 Principales Vol. 7</description>
 		<year>1987</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Saboteur 2 + Las Tres Luces de Glaurung"/>
 			<dataarea name="flop" size="194816">
@@ -3513,7 +3513,7 @@
 	<software name="los40v8">
 		<description>Los 40 Principales Vol. 8</description>
 		<year>1987</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Barbarian + Cauldron II"/>
 			<dataarea name="flop" size="194816">
@@ -3532,7 +3532,7 @@
 	<software name="los40v8a" cloneof="los40v8">
 		<description>Los 40 Principales Vol. 8 (alt)</description>
 		<year>1987</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Barbarian + Cauldron II"/>
 			<dataarea name="flop" size="194816">
@@ -3551,7 +3551,7 @@
 	<software name="los40v8b" cloneof="los40v8">
 		<description>Los 40 Principales Vol. 8 (alt 2)</description>
 		<year>1987</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Barbarian + Cauldron II"/>
 			<dataarea name="flop" size="194816">
@@ -3570,7 +3570,7 @@
 	<software name="los40v9">
 		<description>Los 40 Principales Vol. 9</description>
 		<year>1987</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Uridium + Uchi Mata"/>
 			<dataarea name="flop" size="194816">
@@ -3895,7 +3895,7 @@
 	<software name="chartbus">
 		<description>Chartbusters</description>
 		<year>19??</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Cobra + Mutants + Green Beret"/>
 			<dataarea name="flop" size="194560">
@@ -3914,7 +3914,7 @@
 	<software name="clasgam4">
 		<description>Classic Games 4</description>
 		<year>1989</year>
-		<publisher>CP</publisher>
+		<publisher>CP Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="classic games 4 (1989)(cp).dsk" size="194816" crc="c2c629e1" sha1="20a45c48006b88ca85800a1f8a6d8c38381e35d7" offset="0" />
@@ -3926,7 +3926,7 @@
 	<software name="colexdin">
 		<description>Coleccion de Exitos Dinamic</description>
 		<year>1988</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Army Moves + Game Over + Camelot Warriors + Nonamed"/>
 			<dataarea name="flop" size="214784">
@@ -3991,7 +3991,7 @@
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
-			<feature name="part_id" value="Side B: Headliner + Typeliner & Font Editor"/>
+			<feature name="part_id" value="Side B: Headliner + Typeliner &amp; Font Editor"/>
 			<dataarea name="flop" size="194816">
 				<rom name="dtp pack (1988)(p.c.g. computer)(side b).dsk" size="194816" crc="b3f9e13d" sha1="af4ebdf3ebcf3c7143fac4740bf4f9b90894e440" offset="0" />
 			</dataarea>
@@ -4071,7 +4071,7 @@
 	<software name="dinamic5">
 		<description>Dinamic 5 Aniversario</description>
 		<year>1989</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Disk 1, Side A: Los Pajaros de Bangkok + Mega-Corp"/>
 			<dataarea name="flop" size="214784">
@@ -4102,7 +4102,7 @@
 	<software name="dinamic5a" cloneof="dinamic5">
 		<description>Dinamic 5 Aniversario (alt)</description>
 		<year>1989</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Disk 1, Side A: Los Pajaros de Bangkok + Mega-Corp"/>
 			<dataarea name="flop" size="214784">
@@ -4197,7 +4197,7 @@
 	<software name="erbe88">
 		<description>Erbe 88</description>
 		<year>1988</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Disk 1, Side A: Chicago 30's + Coliseum"/>
 			<dataarea name="flop" size="194816">
@@ -4228,7 +4228,7 @@
 	<software name="erbe88a" cloneof="erbe88">
 		<description>Erbe 88 (alt)</description>
 		<year>1988</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Disk 1, Side A: Chicago 30's + Coliseum"/>
 			<dataarea name="flop" size="116992">
@@ -4259,7 +4259,7 @@
 	<software name="erbe88b" cloneof="erbe88">
 		<description>Erbe 88 (alt 2)</description>
 		<year>1988</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 		<!-- Side missing from dump, using same as parent set -->
 			<feature name="part_id" value="Disk 1, Side A: Chicago 30's + Coliseum"/>
@@ -4450,7 +4450,7 @@
 	<software name="gsandmat">
 		<description>Game, Set and Match</description>
 		<year>1987</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: GBA Championship Basketball + Super Soccer + World Series Baseball"/>
 			<dataarea name="flop" size="194560">
@@ -5141,7 +5141,7 @@
 	<software name="liveammo">
 		<description>Live Ammo</description>
 		<year>1987</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Green Beret + Top Gun + Rambo"/>
 			<dataarea name="flop" size="194560">
@@ -5160,7 +5160,7 @@
 	<software name="liveammoa" cloneof="liveammo">
 		<description>Live Ammo - Green Beret + Top Gun + Rambo (alt)</description>
 		<year>1987</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Green Beret + Top Gun + Rambo"/>
 			<dataarea name="flop" size="194560">
@@ -5179,7 +5179,7 @@
 	<software name="lomejdin">
 		<description>Lo Mejor de Dinamic</description>
 		<year>1988</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Game Over + Freddy Hardest + Fernando Martin Basket Master"/>
 			<dataarea name="flop" size="209408">
@@ -5255,7 +5255,7 @@
 	<software name="magnsevn">
 		<description>The Magnificent Seven</description>
 		<year>1987</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Wizball + Arkanoid + Yie Ar Kung-Fu + Short Circuit"/>
 			<dataarea name="flop" size="215291">
@@ -5324,7 +5324,7 @@
 	<software name="megabox">
 		<description>Mega Box</description>
 		<year>1991</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Disk 1, Side A: Narco Police"/>
 			<dataarea name="flop" size="131584">
@@ -5356,7 +5356,7 @@
 	<software name="metalact">
 		<description>Metal Action</description>
 		<year>1990</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: After the War + La Aventura Original + Satan I"/>
 			<dataarea name="flop" size="214784">
@@ -5457,7 +5457,7 @@
 	<software name="multispo">
 		<description>Multi Sports</description>
 		<year>1991</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Basket Master + Aspar GP Master + Simulador Profesional de Tenis"/>
 			<dataarea name="flop" size="144896">
@@ -5680,7 +5680,7 @@
 	<software name="packrsp3">
 		<description>Pack Regalo Sinclair +3</description>
 		<year>1988</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Game Over + Phantomas 1 + Phantomas 2"/>
 			<dataarea name="flop" size="187904">
@@ -5699,7 +5699,7 @@
 	<software name="packrsp3a" cloneof="packrsp3">
 		<description>Pack Regalo Sinclair +3 (alt)</description>
 		<year>1988</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Game Over + Phantomas 1 + Phantomas 2"/>
 			<dataarea name="flop" size="187904">
@@ -5837,7 +5837,7 @@
 	<software name="plus3pac">
 		<description>Plus 3 Pack</description>
 		<year>1987</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Krakout + Future Knight"/>
 			<dataarea name="flop" size="174848">
@@ -5856,7 +5856,7 @@
 	<software name="plus3pac">
 		<description>Plus 3 Pack (Dinamic)</description>
 		<year>1988</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Game Over + Fernando Martin Basket Master"/>
 			<dataarea name="flop" size="144384">
@@ -5913,7 +5913,7 @@
 	<software name="powerspo">
 		<description>Powersports</description>
 		<year>1991</year>
-		<publisher>Zigurat</publisher>
+		<publisher>Zigurat Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Carlos Sainz + Paris-Dakar"/>
 			<dataarea name="flop" size="194816">
@@ -5982,7 +5982,7 @@
 	<software name="reptonmn">
 		<description>Repton Mania</description>
 		<year>1989</year>
-		<publisher>Superior</publisher>
+		<publisher>Superior Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="254720">
 				<rom name="repton mania - repton 1 + 2 (1989)(superior).dsk" size="254720" crc="2ed24adb" sha1="c452b252272ba4ebb7c509c6a7358b867df94c64" offset="0" />
@@ -6390,7 +6390,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="tntdomrksp" cloneof="tntdomrk">
-		<description>TNT (Spain)</description>
+		<description>TNT (Spa)</description>
 		<year>1991</year>
 		<publisher>Dro Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -6504,7 +6504,7 @@
 	<software name="atodamaq">
 		<description>A Toda Maquina</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Dragon Ninja + Afterburner"/>
 			<dataarea name="flop" size="261120">
@@ -6562,7 +6562,7 @@
 	<software name="totalerb">
 		<description>Total</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Platoon + Arkanoid II: Revenge of Doh + Combat School"/>
 			<dataarea name="flop" size="215296">
@@ -6600,7 +6600,7 @@
 	<software name="vitamina">
 		<description>Vitaminas</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Street Fighter + Bionic Commando (loader) + Road Blasters + 1943"/>
 			<dataarea name="flop" size="198656">
@@ -6619,7 +6619,7 @@
 	<software name="watchamp">
 		<description>We Are the Champions</description>
 		<year>1988</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: International Karate+ + Renegade"/>
 			<dataarea name="flop" size="214784">
@@ -7164,7 +7164,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="atfsp" cloneof="atf">
-		<description>ATF - Advanced Tactical Fighter (Spain)</description>
+		<description>ATF - Advanced Tactical Fighter (Spa)</description>
 		<year>1988</year>
 		<publisher>Zafiro Software Division</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -7226,9 +7226,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="tiebreaksp" cloneof="tiebreak">
-		<description>Adidas Championship Tie-Break (Spain)</description>
+		<description>Adidas Championship Tie-Break (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="73216">
 				<rom name="adidas championship tie-break (1990)(erbe)(es)(en)[re-release].dsk" size="73216" crc="dd6cd54d" sha1="bd915b96fe9fa36c17c3f92f2bbc954720567867" offset="0" />
@@ -7241,7 +7241,7 @@
 	<software name="tiebreaka" cloneof="tiebreak">
 		<description>Adidas Championship Tie-Break (alt)</description>
 		<year>1990</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="196352">
 				<rom name="adidas championship tie-break (1990)(ocean).dsk" size="196352" crc="c5a7238c" sha1="815ca74726a688d0878303bfd7558b5f82c17388" offset="0" />
@@ -7253,7 +7253,7 @@
 	<software name="afterwar">
 		<description>After the War</description>
 		<year>1989</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="118016">
 				<rom name="after the war (1989)(dinamic)(es)(en).dsk" size="118016" crc="cb90314d" sha1="970d0ef6ec0223be59b46298e91be212bdeceda1" offset="0" />
@@ -7263,9 +7263,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="afterwarsp" cloneof="afterwar">
-		<description>After the War (Spain)</description>
+		<description>After the War (Spa)</description>
 		<year>1989</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="166400">
 				<rom name="after the war (1989)(dinamic)(es).dsk" size="166400" crc="3dabca4d" sha1="202216a662531fa8c5fba654aac78d91c6db0f4c" offset="0" />
@@ -7376,9 +7376,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="astormsp" cloneof="astorm">
-		<description>Alien Storm (Spain)</description>
+		<description>Alien Storm (Spa)</description>
 		<year>1991</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="255232">
 				<rom name="alien storm (1991)(erbe)(es)(en)[re-release].dsk" size="255232" crc="deea5c29" sha1="fce55879436faff99fb58de3bdc3b52ee7e15e17" offset="0" />
@@ -7412,7 +7412,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="aliensynsp" cloneof="aliensyn">
-		<description>Alien Syndrome (Spain)</description>
+		<description>Alien Syndrome (Spa)</description>
 		<year>1988</year>
 		<publisher>Dro Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -7493,7 +7493,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="amnes102sp" cloneof="amnes102">
-		<description>Amnesia v1.02 (Spanish)</description>
+		<description>Amnesia v1.02 (Spa)</description>
 		<year>2015</year>
 		<publisher>Huelvy</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -7628,7 +7628,7 @@
 	<software name="arturaa" cloneof="artura">
 		<description>Artura (alt)</description>
 		<year>1989</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -7660,7 +7660,7 @@
 	<software name="aspargpm">
 		<description>Aspar GP Master</description>
 		<year>1988</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="58880">
@@ -7679,7 +7679,7 @@
 	<software name="aspargpmsp" cloneof="aspargpm">
 		<description>Aspar GP Master (alt)</description>
 		<year>1988</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="58880">
 				<rom name="aspar gp master (1988)(dinamic)(es).dsk" size="58880" crc="8c452eea" sha1="1618afa3986147ee842af394198ea662de76f6a9" offset="0" />
@@ -7691,7 +7691,7 @@
 	<software name="amc">
 		<description>Astro Marine Corps</description>
 		<year>1989</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="128768">
 				<rom name="astro marine corps (1989)(dinamic)(es)[aka amc].dsk" size="128768" crc="49da31a0" sha1="045a8026457cebe101fa76c856654812e4830c3f" offset="0" />
@@ -7715,7 +7715,7 @@
 	<software name="autocras">
 		<description>Autocrash</description>
 		<year>1991</year>
-		<publisher>Zigurat</publisher>
+		<publisher>Zigurat Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="63488">
 				<rom name="autocrash (1991)(zigurat)(es).dsk" size="63488" crc="9d26fed0" sha1="1aea386a6243646e3dfce6bce6d013e6e86a6ca3" offset="0" />
@@ -7892,9 +7892,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="barbari2sp" cloneof="barbari2">
-		<description>Barbarian II - The Dungeon of Drax (Spain)</description>
+		<description>Barbarian II - The Dungeon of Drax (Spa)</description>
 		<year>1988</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="144384">
 				<rom name="barbarian ii - the dungeon of drax (1988)(erbe)(es)(en)[re-release].dsk" size="144384" crc="8ba96bd6" sha1="aed9c7159d67af12e649f6a4b7f69c767ed38f94" offset="0" />
@@ -7961,7 +7961,7 @@
 	<software name="batmancc">
 		<description>Batman - The Caped Crusader</description>
 		<year>1988</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="123392">
 				<rom name="batman - the caped crusader (1988)(ocean).dsk" size="123392" crc="91bfb255" sha1="004538f2c6b9258c301a5c232075d7d762f444a9" offset="0" />
@@ -7973,7 +7973,7 @@
 	<software name="batmantm">
 		<description>Batman - The Movie</description>
 		<year>1989</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="batman - the movie (1989)(ocean).dsk" size="194816" crc="31da53d6" sha1="50a94f8a0261fc4661af6fc791f684ed1737c9ba" offset="0" />
@@ -7985,7 +7985,7 @@
 	<software name="batmantma" cloneof="batmantm">
 		<description>Batman - The Movie (alt)</description>
 		<year>1989</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="152576">
 				<rom name="batman - the movie (1989)(ocean)[a].dsk" size="152576" crc="a4db4011" sha1="e56a88a1837d8ad02c64ddd786ff8ece1d064087" offset="0" />
@@ -7997,7 +7997,7 @@
 	<software name="batmantmb" cloneof="batmantm">
 		<description>Batman - The Movie (alt 2)</description>
 		<year>1989</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="batman - the movie (1989)(ocean)[a2].dsk" size="194816" crc="111bd6db" sha1="2920d5ea39b487bd1c8713cf8117752ecc7a12a3" offset="0" />
@@ -8007,9 +8007,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="batmantmspa" cloneof="batmantm">
-		<description>Batman - The Movie (Spain) (alt)</description>
+		<description>Batman - The Movie (Spa) (alt)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="185088">
 				<rom name="batman - the movie (1989)(erbe)(es)(en)[a][re-release].dsk" size="185088" crc="d07587bc" sha1="94918c10f53710577cc86c3e3b89b37fec6577f9" offset="0" />
@@ -8019,9 +8019,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="batmantmsp" cloneof="batmantm">
-		<description>Batman - The Movie (Spain)</description>
+		<description>Batman - The Movie (Spa)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="185088">
 				<rom name="batman - the movie (1989)(erbe)(es)(en)[re-release].dsk" size="185088" crc="42936386" sha1="75b4ea3e5659f5d39b115abf795ff8175dc0ae06" offset="0" />
@@ -8033,7 +8033,7 @@
 	<software name="beachvol">
 		<description>Beach Volley</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="97536">
 				<rom name="beach volley (1989)(erbe)(es)(en)[re-release].dsk" size="97536" crc="f8c13542" sha1="93673eaec3f66e8e14461e94d55cbb69b944f171" offset="0" />
@@ -8055,9 +8055,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="bedlamsp" cloneof="bedlam">
-		<description>Bedlam (Spain)</description>
+		<description>Bedlam (Spa)</description>
 		<year>1988</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="bedlam (1988)(erbe)(es)(en)[re-release].dsk" size="194816" crc="4f8f724b" sha1="c93e9de8363fbd4b48c9aa23095af34b4e42a940" offset="0" />
@@ -8117,7 +8117,7 @@
 	<software name="bestialwgs" cloneof="bestialw">
 		<description>Bestial Warrior (Gun Stick)</description>
 		<year>1989</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<info name="usage" value="Requires Gun Stick light gun"/>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="75008">
@@ -8131,7 +8131,7 @@
 	<software name="bestialw">
 		<description>Bestial Warrior</description>
 		<year>1989</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="80384">
 				<rom name="bestial warrior (1989)(dinamic)(es)[a].dsk" size="80384" crc="208235f6" sha1="50d9a3bb79b82deb6c08253cfbffa460bb8abaa2" offset="0" />
@@ -8145,7 +8145,7 @@
 	<software name="bestialw">
 		<description>Bestial Warrior (rerelease)</description>
 		<year>1989</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="91136">
 				<rom name="bestial warrior (1989)(dinamic)(es)(side b).dsk" size="91136" crc="3fd882c2" sha1="977204c72ef1b1643e33516ffe904b35ad87c826" offset="0" />
@@ -8182,7 +8182,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="bticepalsp" cloneof="bticepal">
-		<description>Beyond the Ice Palace (Spain)</description>
+		<description>Beyond the Ice Palace (Spa)</description>
 		<year>1988</year>
 		<publisher>MCM</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -8362,7 +8362,7 @@
 	<software name="brdgpgal">
 		<description>Bridge Player Galactica</description>
 		<year>1989</year>
-		<publisher>CP</publisher>
+		<publisher>CP Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="bridge player galactica (1989)(cp).dsk" size="194816" crc="be950646" sha1="b921a28c699b1e785b613ac8a7e5fb2ee0fcf6ba" offset="0" />
@@ -8396,7 +8396,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="bbrg" cloneof="bbrg">
-		<description>Buffalo Bill's Wild West Show (Spain)</description>
+		<description>Buffalo Bill's Wild West Show (Spa)</description>
 		<year>1989</year>
 		<publisher>System 4</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -8447,7 +8447,7 @@
 	<software name="buggyran">
 		<description>Buggy Ranger</description>
 		<year>1990</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="64256">
 				<rom name="buggy ranger (1990)(dinamic)(es).dsk" size="64256" crc="8b7ece82" sha1="fba219989f6d81a249a92deee818762d017c9b37" offset="0" />
@@ -8484,7 +8484,7 @@
 	<software name="butchilla" cloneof="butchill">
 		<description>Butcher Hill (alt)</description>
 		<year>1989</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="butcher hill (1989)(gremlin graphics).dsk" size="194816" crc="43d9764d" sha1="cdc2d744c058bb8f788ecf7c46a127db486dc915" offset="0" />
@@ -8496,7 +8496,7 @@
 	<software name="byfairme">
 		<description>By Fair Means...or Foul</description>
 		<year>1989</year>
-		<publisher>Superior</publisher>
+		<publisher>Superior Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="214784">
 				<rom name="by fair means...or foul (1989)(superior).dsk" size="214784" crc="6d191978" sha1="9bc03db30b5825be2b65c8e3b2be112f6b5c5ffb" offset="0" />
@@ -8506,9 +8506,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="cabalsp" cloneof="cabal">
-		<description>Cabal (Spain)</description>
+		<description>Cabal (Spa)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="185088">
 				<rom name="cabal (1989)(erbe)(es)(en)[re-release].dsk" size="185088" crc="64cd1c52" sha1="eaff4e540200b432387ad8159b9ebfd2fda37deb" offset="0" />
@@ -8520,7 +8520,7 @@
 	<software name="cabal">
 		<description>Cabal</description>
 		<year>1989</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="164352">
 				<rom name="cabal (1989)(ocean).dsk" size="164352" crc="12a62acc" sha1="e021057ade1a87dc0f429f505af97f587295478a" offset="0" />
@@ -8556,7 +8556,7 @@
 	<software name="cpsevill">
 		<description>Capitan Sevilla</description>
 		<year>1988</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="175360">
 				<rom name="capitan sevilla (1988)(dinamic)(es).dsk" size="175360" crc="e7a740da" sha1="5b00d1bea69edd2b9ea7069aae5bd6467528be0d" offset="0" />
@@ -8568,7 +8568,7 @@
 	<software name="cptrueno">
 		<description>El Capitan Trueno</description>
 		<year>1990</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="107264">
 				<rom name="capitan trueno, el (1990)(dinamic)(es).dsk" size="107264" crc="ae4033aa" sha1="ebfba4e9b058aec5d123d5c5d00d8ed6e325ce72" offset="0" />
@@ -8629,7 +8629,7 @@
 	<software name="csainz">
 		<description>Carlos Sainz - Campeonato del Mundo de Rallies</description>
 		<year>1990</year>
-		<publisher>Zigurat</publisher>
+		<publisher>Zigurat Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="58624">
 				<rom name="carlos sainz - campeonato del mundo de rallies (1990)(zigurat)(es).dsk" size="58624" crc="69b938d9" sha1="8c78ff2f741668a9d583598bd0d71ae3c94ec054" offset="0" />
@@ -8664,9 +8664,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="castlmassp" cloneof="castlmas">
-		<description>Castle Master (Spanish)</description>
+		<description>Castle Master (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="68352">
 				<rom name="castle master (1990)(erbe)(es)[re-release].dsk" size="68352" crc="a6e15f9f" sha1="adb6fa50b973e23868e2ecdbada09894e39835a2" offset="0" />
@@ -8712,7 +8712,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="cvaniasisp" cloneof="cvaniasi">
-		<description>Castlevania - Spectral Interlude (Spanish)</description>
+		<description>Castlevania - Spectral Interlude (Spa)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -8828,7 +8828,7 @@
 			<feature name="part_id" value="Side B"/>
 	<!-- Side B image shared with other master disks from Zeppelin Games. Verified at World of Spectrum. -->
 			<dataarea name="flop" size="256">
-				<rom name="championship run (1991)(zeppelin games)(side b)[master disk backup][re-release].dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98" offset="0" />
+				<rom name="zeppelin games master disk side b.dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -8848,7 +8848,7 @@
 			<feature name="part_id" value="Side B"/>
 	<!-- Side B image shared with other master disks from Zeppelin Games. Verified at World of Spectrum. -->
 			<dataarea name="flop" size="256">
-				<rom name="championship run (1991)(zeppelin games)(side b)[master disk backup][re-release].dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98" offset="0" />
+				<rom name="zeppelin games master disk side b.dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -8881,9 +8881,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="chasehqsp" cloneof="chasehq">
-		<description>Chase H.Q. (Spain)</description>
+		<description>Chase H.Q. (Spa)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="185088">
 				<rom name="chase h.q. (1989)(erbe)(es)(en)[re-release].dsk" size="185088" crc="317e46d5" sha1="66de397575284efb76a08ef63dbe5db41be03249" offset="0" />
@@ -8895,7 +8895,7 @@
 	<software name="chasehq">
 		<description>Chase H.Q.</description>
 		<year>1989</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="168192">
 				<rom name="chase h.q. (1989)(ocean).dsk" size="168192" crc="9c56fc47" sha1="1347cb84b7b232da4a587c573ba893cf171c6df3" offset="0" />
@@ -8905,9 +8905,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="chasehq2sp" cloneof="chasehq2">
-		<description>Chase H.Q. II - Special Criminal Investigation (Spain)</description>
+		<description>Chase H.Q. II - Special Criminal Investigation (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="146176">
 				<rom name="chase h.q. ii - special criminal investigation (1990)(erbe)(es)(en)[re-release].dsk" size="146176" crc="5b451c6e" sha1="58101ac75972e690b13eb7665d0ae245c47cefab" offset="0" />
@@ -8919,7 +8919,7 @@
 	<software name="chasehq2">
 		<description>Chase H.Q. II - Special Criminal Investigations</description>
 		<year>1990</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="127232">
 				<rom name="chase h.q. ii - special criminal investigations (1990)(ocean).dsk" size="127232" crc="3b77b2ad" sha1="82ca5734e13e42347f3c6ca182049d45d5cc6bad" offset="0" />
@@ -9048,7 +9048,7 @@
 	<software name="clckch89">
 		<description>Clock Chess '89</description>
 		<year>1989</year>
-		<publisher>CP</publisher>
+		<publisher>CP Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="clock chess '89 (1989)(cp).dsk" size="194816" crc="32467893" sha1="a6b698715f6c413dd3f1910d6dff8720e3643aa8" offset="0" />
@@ -9058,7 +9058,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="clckch89sp" cloneof="clckch89">
-		<description>Clock Chess '89 (Spain)</description>
+		<description>Clock Chess '89 (Spa)</description>
 		<year>1989</year>
 		<publisher>System 4</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -9141,7 +9141,7 @@
 	<software name="cmquatro">
 		<description>Comando Quatro</description>
 		<year>1989</year>
-		<publisher>Zigurat</publisher>
+		<publisher>Zigurat Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="68352">
 				<rom name="comando quatro (1989)(zigurat)(es).dsk" size="68352" crc="1f253875" sha1="ba4c1ba3e604bb35bb1ef91a855b993833f090e7" offset="0" />
@@ -9153,7 +9153,7 @@
 	<software name="comtracr">
 		<description>Comando Tracer</description>
 		<year>1989</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="75008">
 				<rom name="comando tracer (1989)(dinamic)(es).dsk" size="75008" crc="985c2136" sha1="be76783bd8429b9f3ec2cd8702e7419b1c632ee6" offset="0" />
@@ -9166,7 +9166,7 @@
 	<software name="combatsg">
 		<description>Combat School + Gryzor Preview</description>
 		<year>1987</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="214784">
 				<rom name="combat school + gryzor preview (1987)(ocean).dsk" size="214784" crc="2996f5e8" sha1="0dc0e1340835d35071a5a2873346462faa07233d" offset="0" />
@@ -9176,7 +9176,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="contcircsp" cloneof="contcirc">
-		<description>Continental Circus (Spain)</description>
+		<description>Continental Circus (Spa)</description>
 		<year>1989</year>
 		<publisher>Dro Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -9253,7 +9253,7 @@
 	<software name="cosmicsh">
 		<description>Cosmic Sheriff</description>
 		<year>1990</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="101888">
 				<rom name="cosmic sheriff (1990)(dinamic)(es).dsk" size="101888" crc="98a9e2ff" sha1="93de281cb9c787633c86448d1e0a0ba0cd3001c8" offset="0" />
@@ -9349,7 +9349,7 @@
 	<software name="currojim">
 		<description>Curro Jimenez</description>
 		<year>1989</year>
-		<publisher>Zigurat</publisher>
+		<publisher>Zigurat Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="73216">
 				<rom name="curro jimenez (1989)(zigurat)(es).dsk" size="73216" crc="0e92a03c" sha1="c5de62cfdd369a8a13c685aa54595087c61f9a74" offset="0" />
@@ -9422,7 +9422,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="thecyclesp" cloneof="thecycle">
-		<description>The Cycles (Spain)</description>
+		<description>The Cycles (Spa)</description>
 		<year>1989</year>
 		<publisher>Dro Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -9436,7 +9436,7 @@
 	<software name="daleytoc">
 		<description>Daley Thompson's Olympic Challenge</description>
 		<year>1988</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="220160">
 				<rom name="daley thompson's olympic challenge (1988)(ocean)[aka daley thompson '88].dsk" size="220160" crc="5d0ed5ac" sha1="ff4726f3e2b4281fb251526f876c74a7a0ac132c" offset="0" />
@@ -9493,7 +9493,7 @@
 	<software name="darkfusna" cloneof="darkfusn">
 		<description>Dark Fusion (alt)</description>
 		<year>1988</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="219136">
 				<rom name="dark fusion (1988)(gremlin graphics).dsk" size="219136" crc="bcc16b2e" sha1="e4802f43c53db059cce6a398056fb0823c8c2a52" offset="0" />
@@ -9527,7 +9527,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="darksidesp" cloneof="darkside">
-		<description>Dark Side (Spain)</description>
+		<description>Dark Side (Spa)</description>
 		<year>1988</year>
 		<publisher>System 4</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -9565,7 +9565,7 @@
 	<software name="deawish3">
 		<description>Death Wish 3</description>
 		<year>1987</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="death wish 3 (1987)(gremlin graphics).dsk" size="194816" crc="43f7fd6d" sha1="07fc65dd723143b183280074cdb2f786427b0f5e" offset="0" />
@@ -9577,7 +9577,7 @@
 	<software name="deawish3a" cloneof="deawish3">
 		<description>Death Wish 3 (alt)</description>
 		<year>1987</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="death wish 3 (1987)(gremlin graphics)[a].dsk" size="194816" crc="668d8e22" sha1="500e9e2746f1e914052465b56597b2a77a1389d5" offset="0" />
@@ -9589,7 +9589,7 @@
 	<software name="deawish3b" cloneof="deawish3">
 		<description>Death Wish 3 (alt 2)</description>
 		<year>1987</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="death wish 3 (1987)(gremlin graphics)[a2].dsk" size="194816" crc="c0b36014" sha1="cf4cdcd8cc6bcd090e639679818a66fa73944550" offset="0" />
@@ -9651,7 +9651,7 @@
 	<software name="deflektra" cloneof="deflektr">
 		<description>Deflektor (alt)</description>
 		<year>1987</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="174848">
 				<rom name="deflektor (1987)(gremlin graphics).dsk" size="174848" crc="63929c07" sha1="adc7f9ba5f9bbded9a60f104b51973ff1808a94f" offset="0" />
@@ -9663,7 +9663,7 @@
 	<software name="totrecalsp" cloneof="totrecal">
 		<description>Desafio Total</description>
 		<year>1991</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="151040">
 				<rom name="desafio total (1991)(erbe)(es)(en)[aka total recall][re-release].dsk" size="151040" crc="341d1500" sha1="793d902be2b432531b8e901750ca301a16e0675d" offset="0" />
@@ -9709,7 +9709,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="dominatrsp" cloneof="dominatr">
-		<description>Dominator (Spain)</description>
+		<description>Dominator (Spa)</description>
 		<year>1989</year>
 		<publisher>MCM</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -9734,7 +9734,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="ddragonsp" cloneof="ddragon">
-		<description>Double Dragon (Spain)</description>
+		<description>Double Dragon (Spa)</description>
 		<year>1989</year>
 		<publisher>Dro Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -9810,9 +9810,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="baddudessp" cloneof="baddudes">
-		<description>Dragon Ninja (Spain)</description>
+		<description>Dragon Ninja (Spa)</description>
 		<year>1988</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="135680">
 				<rom name="dragon ninja (1988)(erbe)(es)(en)[re-release].dsk" size="135680" crc="13338cd1" sha1="8b6703803bf4afe5fd7de30fdabab4ffcccbb0ac" offset="0" />
@@ -9836,7 +9836,7 @@
 	<software name="drakkar">
 		<description>Drakkar</description>
 		<year>1989</year>
-		<publisher>Delta Software S.L.</publisher>
+		<publisher>Delta Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="102400">
 				<rom name="drakkar (1989)(delta software s.l.)(es)[aka drakar].dsk" size="102400" crc="816c2a6d" sha1="4d7eaf60c528cfae76a79de655da4732f151f8b2" offset="0" />
@@ -9944,7 +9944,7 @@
 	<software name="emotion">
 		<description>E-motion</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="78080">
 				<rom name="e-motion (1990)(erbe)(es)(en)[re-release].dsk" size="78080" crc="216e6ce4" sha1="96f573de05900cd43a3351c031cf8eeb3b16f1f8" offset="0" />
@@ -10029,7 +10029,7 @@
 	<software name="eliminat">
 		<description>Eliminator</description>
 		<year>1988</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="52992">
 				<rom name="eliminator (1988)(erbe)(es)(en)[re-release].dsk" size="52992" crc="d14edabd" sha1="d375b03df6b0fcf137a57580f572c6fc2c56cb22" offset="0" />
@@ -10089,7 +10089,7 @@
 	<software name="esanchvi">
 		<description>Emilio Sanchez Vicario Grand Slam</description>
 		<year>1990</year>
-		<publisher>Zigurat</publisher>
+		<publisher>Zigurat Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="58624">
 				<rom name="emilio sanchez vicario grand slam (1990)(zigurat)(es).dsk" size="58624" crc="c048d1f6" sha1="2bee364efe14224fba67057635970d7ebbf24a94" offset="0" />
@@ -10101,7 +10101,7 @@
 	<software name="esanchvia" cloneof="esanchvi">
 		<description>Emilio Sanchez Vicario Grand Slam (alt)</description>
 		<year>1990</year>
-		<publisher>Zigurat</publisher>
+		<publisher>Zigurat Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="58624">
 				<rom name="emilio sanchez vicario grand slam (1990)(zigurat)(es)[a].dsk" size="58624" crc="09b82d36" sha1="78c5f01c0d0af55813a4eb69495f430a338d39e9" offset="0" />
@@ -10187,7 +10187,7 @@
 	<software name="espionaga" cloneof="espionag">
 		<description>Espionage (alt)</description>
 		<year>1988</year>
-		<publisher>Grandslam</publisher>
+		<publisher>Grandslam Entertainments</publisher>
 		<info name="usage" value="Requires manual for password protection"/>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="78080">
@@ -10236,7 +10236,7 @@
 	<software name="f1">
 		<description>F-1</description>
 		<year>1991</year>
-		<publisher>Zigurat</publisher>
+		<publisher>Zigurat Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="58624">
 				<rom name="f-1 (1991)(zigurat)(es)[aka formula 1 g.p. simulator].dsk" size="58624" crc="0aa6b65d" sha1="671fd441c1efeae1e78f7ecbe78990d590e45179" offset="0" />
@@ -10248,7 +10248,7 @@
 	<software name="f15strik">
 		<description>F-15 Strike Eagle</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="48896">
 				<rom name="f-15 strike eagle (1990)(erbe)(es)(en).dsk" size="48896" crc="23150627" sha1="2f9f70218a77982f01a4dc12436a1cf90cc6da4c" offset="0" />
@@ -10310,7 +10310,7 @@
 	<software name="fmbasket">
 		<description>Fernando Martin Basket Master</description>
 		<year>1987</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="61696">
 				<rom name="fernando martin basket master (1987)(dinamic)(es).dsk" size="61696" crc="72b4c4a7" sha1="d051b2fa332e4a043be9db87a5fabf865a7280fb" offset="0" />
@@ -10398,7 +10398,7 @@
 	<software name="fireflya" cloneof="firefly">
 		<description>Firefly (alt)</description>
 		<year>1988</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="214784">
 				<rom name="firefly (1988)(ocean).dsk" size="214784" crc="ea47b03f" sha1="e0f89ccf21303bee7fa8121b82e92b5827d288c6" offset="0" />
@@ -10529,7 +10529,7 @@
 	<software name="foty2a" cloneof="foty2">
 		<description>Footballer of the Year 2 (alt)</description>
 		<year>1989</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="255232">
 				<rom name="footballer of the year 2 (1989)(gremlin graphics).dsk" size="255232" crc="ed6b20ca" sha1="e9e349e01090b6323036cbe476e2197d3999e598" offset="0" />
@@ -10601,7 +10601,7 @@
 	<software name="fredhams">
 		<description>Freddy Hardest en Manhattan Sur</description>
 		<year>1989</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="69632">
 				<rom name="freddy hardest en manhattan sur (1989)(dinamic)(es)[aka freddy hardest in south manhattan].dsk" size="69632" crc="421fbbe2" sha1="fd35f4b9f7c2525eed5dff0958d74732a1a46a1b" offset="0" />
@@ -10672,9 +10672,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="glocr360sp" cloneof="glocr360">
-		<description>G-LOC (Spain)</description>
+		<description>G-LOC (Spa)</description>
 		<year>1992</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="127232">
 				<rom name="g-loc (1992)(erbe)(es)(en)[re-release].dsk" size="127232" crc="49e92c72" sha1="2b72df02d48e33984ed7e07ea064d6cf76cedbfe" offset="0" />
@@ -10750,7 +10750,7 @@
 	<software name="linekskla" cloneof name="linekskl">
 		<description>Gary Lineker's Super Skills (alt)</description>
 		<year>1988</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="gary lineker's super skills (1988)(gremlin graphics).dsk" size="194816" crc="0383082c" sha1="3d62fbab0784ee24e2d624d84f4607ba39556879" offset="0" />
@@ -10763,7 +10763,7 @@
 	<software name="lineksssa" cloneof="lineksss">
 		<description>Gary Lineker's Super Star Soccer (alt)</description>
 		<year>1987</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="174848">
 				<rom name="gary lineker's super star soccer (1987)(gremlin graphics).dsk" size="174848" crc="5ad471d4" sha1="9dfb8be61451f07184a1570dc0c42a290f884e75" offset="0" />
@@ -10776,7 +10776,7 @@
 	<software name="lineksssb" cloneof="lineksss">
 		<description>Gary Lineker's Super Star Soccer (alt 2)</description>
 		<year>1987</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="174848">
 				<rom name="gary lineker's super star soccer (1987)(gremlin graphics)[a].dsk" size="174848" crc="33b7cea7" sha1="5147ecbc3eddb6bcada1f4516ca0139087b96851" offset="0" />
@@ -10827,7 +10827,7 @@
 	<software name="gaunt3">
 		<description>Gauntlet III - The Final Quest</description>
 		<year>1991</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="255232">
@@ -10857,7 +10857,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="gazzasp" cloneof="gazza">
-		<description>Gazza's Super Soccer (Spain)</description>
+		<description>Gazza's Super Soccer (Spa)</description>
 		<year>1990</year>
 		<publisher>Proein Soft Line</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -10900,9 +10900,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="ghoulssp" cloneof="ghouls">
-		<description>Ghouls 'n' Ghosts (Spain)</description>
+		<description>Ghouls 'n' Ghosts (Spa)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="255232">
 				<rom name="ghouls 'n' ghosts (1989)(erbe)(es)(en)[re-release].dsk" size="255232" crc="0e2116f3" sha1="7872f08c3ed59f1a0fe25c47483588ddaacff99e" offset="0" />
@@ -10987,7 +10987,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="goldnaxesp" cloneof="goldnaxe">
-		<description>Golden Axe (Spain)</description>
+		<description>Golden Axe (Spa)</description>
 		<year>1990</year>
 		<publisher>MCM</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -11100,7 +11100,7 @@
 	<software name="hudsonhasp">
 		<description>El Gran Halcon</description>
 		<year>1991</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="146176">
 				<rom name="gran halcon, el (1991)(erbe)(es)(en)[aka hudson hawk][re-release].dsk" size="146176" crc="9bcc8c2b" sha1="df35fafcb381b0d02eb04baf6926b61ac83f0581" offset="0" />
@@ -11112,7 +11112,7 @@
 	<software name="gryzor">
 		<description>Gryzor</description>
 		<year>1987</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="gryzor (1987)(ocean).dsk" size="194816" crc="c237d67d" sha1="1ffb3dac932ab7b84cd9d06ed4a88312680026e9" offset="0" />
@@ -11226,7 +11226,7 @@
 	<software name="hatea" cloneof="hate">
 		<description>H.A.T.E. - Hostile All Terrain Encounter (alt)</description>
 		<year>1989</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="219136">
 				<rom name="h.a.t.e. (1989)(gremlin graphics)[aka hostile all terrain encounter].dsk" size="219136" crc="c77d0383" sha1="60c22e50e0827fa2d8ee63fe496cd2e47046ba5a" offset="0" />
@@ -11248,9 +11248,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="harddrivsp" cloneof="harddriv">
-		<description>Hard Drivin' (Spain)</description>
+		<description>Hard Drivin' (Spa)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="63488">
 				<rom name="hard drivin' (1989)(erbe)(es)(en)[re-release].dsk" size="63488" crc="e6f85a75" sha1="4e9a802f657b7fc04a02b0e0877830c582105ccf" offset="0" />
@@ -11325,7 +11325,7 @@
 	<software name="heroqsta" cloneof="heroqst">
 		<description>Hero Quest (alt)</description>
 		<year>1991</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="hero quest (1991)(gremlin graphics).dsk" size="194816" crc="ab30a1d0" sha1="915dde45e84df561fea89b8b4c3cea6892ca85c1" offset="0" />
@@ -11338,7 +11338,7 @@
 	<software name="heroqstb" cloneof="heroqst">
 		<description>Hero Quest (alt 2)</description>
 		<year>1991</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="hero quest (1991)(gremlin graphics)[a].dsk" size="194816" crc="758aca42" sha1="1646d3fc7ad3719351cc9be38f3a7e714d9d866f" offset="0" />
@@ -11351,7 +11351,7 @@
 	<software name="heroqstc" cloneof="heroqst">
 		<description>Hero Quest (alt 3)</description>
 		<year>1991</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="hero quest (1991)(gremlin graphics)[a2].dsk" size="194816" crc="dec047e7" sha1="94dae34b89d72eed5e05f64a85f86aeac4ae8827" offset="0" />
@@ -11364,7 +11364,7 @@
 	<software name="heroqstd" cloneof="heroqst">
 		<description>Hero Quest (alt 4)</description>
 		<year>1991</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="199680">
 				<rom name="hero quest (1991)(gremlin graphics)[a3].dsk" size="199680" crc="ceb5f071" sha1="1033f9307c145f34d8bc6d0fb8f8c7e581165588" offset="0" />
@@ -11376,7 +11376,7 @@
 	<software name="heroque2">
 		<description>Hero Quest - Return of the Witch Lord</description>
 		<year>1991</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="hero quest - return of the witch lord (1991)(gremlin graphics).dsk" size="194816" crc="e11de839" sha1="6e72c9ffdfcefc98f26be651d6af9897f42c1826" offset="0" />
@@ -11388,7 +11388,7 @@
 	<software name="heroque2a" cloneof="heroque2">
 		<description>Hero Quest - Return of the Witch Lord (alt)</description>
 		<year>1991</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="hero quest - return of the witch lord (1991)(gremlin graphics)[a].dsk" size="194816" crc="4ed5a340" sha1="71954827b51a39b4a682f94198026adf9f6f9205" offset="0" />
@@ -11400,7 +11400,7 @@
 	<software name="heroque2b" cloneof="heroque2">
 		<description>Hero Quest - Return of the Witch Lord (alt 2)</description>
 		<year>1991</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="hero quest - return of the witch lord (1991)(gremlin graphics)[a2].dsk" size="194816" crc="86da0a2e" sha1="003e63884fb0a6dffcab7de701fad9df3206b4b5" offset="0" />
@@ -11412,7 +11412,7 @@
 	<software name="heroque2c" cloneof="heroque2">
 		<description>Hero Quest - Return of the Witch Lord (alt 3)</description>
 		<year>1991</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="199680">
 				<rom name="hero quest - return of the witch lord (1991)(gremlin graphics)[a3].dsk" size="199680" crc="cdac513e" sha1="c20215ef636d6c2f92a5af5a87a8c2e8ce8be774" offset="0" />
@@ -11434,9 +11434,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="herolancsp" cloneof="herolanc">
-		<description>Heroes of the Lance (Spain)</description>
+		<description>Heroes of the Lance (Spa)</description>
 		<year>1988</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="heroes of the lance (1988)(erbe)(es)(en)[re-release].dsk" size="194816" crc="99cc6af8" sha1="afd6e3b1ae18888ed999d690a9373a0f7778c7a5" offset="0" />
@@ -11495,9 +11495,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="hostagessp" cloneof="hostages">
-		<description>Hostages (Spain)</description>
+		<description>Hostages (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="174848">
@@ -11654,9 +11654,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="impossamsp" cloneof="impossam">
-		<description>Impossamole (Spain)</description>
+		<description>Impossamole (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="214784">
 				<rom name="impossamole (1990)(erbe)(es)(en)[re-release].dsk" size="214784" crc="4e9a963d" sha1="1f0723d701dbaad0c57a47e0bde0ff79d5a58dd1" offset="0" />
@@ -11668,7 +11668,7 @@
 	<software name="impossam">
 		<description>Impossamole</description>
 		<year>1990</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="214784">
 				<rom name="impossamole (1990)(gremlin graphics).dsk" size="214784" crc="04ece926" sha1="dd49acee739bf6629420813275271305f8b48db2" offset="0" />
@@ -11680,7 +11680,7 @@
 	<software name="indy3sp">
 		<description>Indiana Jones y la Ultima Cruzada</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="indiana jones y la ultima cruzada (1989)(erbe)(es)(en)[aka indiana jones and the last crusade][re-release].dsk" size="194816" crc="e2de5128" sha1="e0c5862105818b5d88fe5543f04ddc67f45be587" offset="0" />
@@ -11835,7 +11835,7 @@
 	<software name="untouchasp" cloneof="untoucha">
 		<description>Los Intocables</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="39168">
@@ -11900,7 +11900,7 @@
 	<software name="italy90sp">
 		<description>Italia 1990</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="80896">
 				<rom name="italia 1990 (1990)(erbe)(es)(en)[aka italy 1990][re-release].dsk" size="80896" crc="c682f692" sha1="682b9a4e2c93700635507aaeeaac92ce4a0bfb2f" offset="0" />
@@ -12086,7 +12086,7 @@
 	<software name="junglewa">
 		<description>Jungle Warrior</description>
 		<year>1990</year>
-		<publisher>Zigurat</publisher>
+		<publisher>Zigurat Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="63488">
 				<rom name="jungle warrior (1990)(zigurat)(es).dsk" size="63488" crc="3ca364a1" sha1="5cbaa05e1994dab8b18a9d9a126296d00a9bda66" offset="0" />
@@ -12179,7 +12179,7 @@
 	<software name="klax">
 		<description>Klax</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="146176">
 				<rom name="klax (1990)(erbe)(es)(en)[re-release].dsk" size="146176" crc="125e3c32" sha1="5148844e91af58b41f1b0867584d16dc4c52203c" offset="0" />
@@ -12420,9 +12420,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="lightcorsp" cloneof="lightcor">
-		<description>The Light Corridor (Spain)</description>
+		<description>The Light Corridor (Spa)</description>
 		<year>1991</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="light corridor, the (1991)(erbe)(es)(en)[re-release].dsk" size="194816" crc="9b575adf" sha1="5022b6e27edcc1072fda6bc516652b09e11c9277" offset="0" />
@@ -12432,9 +12432,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="lightcorspa" cloneof="lightcor">
-		<description>The Light Corridor (Spain) (alt)</description>
+		<description>The Light Corridor (Spa) (alt)</description>
 		<year>1991</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="light corridor, the (1991)(erbe)(es)(en)[a][re-release].dsk" size="194816" crc="fb7dbaf8" sha1="681888333e367e1673b6d1afad9d65880bb2125d" offset="0" />
@@ -12604,9 +12604,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="lotussp" cloneof="lotus">
-		<description>Lotus Esprit Turbo Challenge (Spain)</description>
+		<description>Lotus Esprit Turbo Challenge (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="199680">
 				<rom name="lotus esprit turbo challenge (1990)(erbe)(es)(en)[re-release].dsk" size="199680" crc="f187be6b" sha1="da097b93b3f0b1e86b7842272a45afea4899e878" offset="0" />
@@ -12619,7 +12619,7 @@
 	<software name="lotusa" cloneof="lotus">
 		<description>Lotus Esprit Turbo Challenge (alt)</description>
 		<year>1990</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="199680">
 				<rom name="lotus esprit turbo challenge (1990)(gremlin graphics).dsk" size="199680" crc="e923e142" sha1="ee13b432dfc4ed546e18404f6a87390904b05de9" offset="0" />
@@ -12632,7 +12632,7 @@
 	<software name="mask3a" cloneof="mask3">
 		<description>Mask III - Venom Strikes Back (alt)</description>
 		<year>1988</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="174848">
 				<rom name="mask iii - venom strikes back (1988)(gremlin graphics).dsk" size="174848" crc="8b33e09b" sha1="91884a8317c4a1db2d06e7683f6e5d7ee93e68c2" offset="0" />
@@ -12721,7 +12721,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="manchunisp" cloneof="manchuni">
-		<description>Manchester United (Spain)</description>
+		<description>Manchester United (Spa)</description>
 		<year>1990</year>
 		<publisher>System 4</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -12767,7 +12767,7 @@
 	<software name="mastersa" cloneof="masters">
 		<description>Masters of the Universe - The Movie (alt)</description>
 		<year>1987</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="174848">
 				<rom name="masters of the universe - the movie (1987)(gremlin graphics).dsk" size="174848" crc="2f9a0bdb" sha1="e7c580e989076026cded8688e70e264ab36ece19" offset="0" />
@@ -12779,7 +12779,7 @@
 	<software name="matchda2a" cloneof="matchda2">
 		<description>Match Day II (alt)</description>
 		<year>1987</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="214784">
 				<rom name="match day ii (1987)(ocean).dsk" size="214784" crc="bf33c550" sha1="a07e166575814e59f3b4a95ea9617de6bec7525a" offset="0" />
@@ -12791,7 +12791,7 @@
 	<software name="matchda2">
 		<description>Match Day II</description>
 		<year>1987</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="208384">
 				<rom name="match day ii (1987)(ocean)[a].dsk" size="208384" crc="584f511d" sha1="50bf8521cc8b86af9d2307f0af6d2441707cf82e" offset="0" />
@@ -12822,7 +12822,7 @@
 	<software name="megaphx">
 		<description>Mega Phoenix</description>
 		<year>1991</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="61952">
 				<rom name="mega phoenix (1991)(dinamic)(es)(en).dsk" size="61952" crc="c0b40920" sha1="794b2904af91cb3cc9ab90b755d0585a5575db96" offset="0" />
@@ -12896,7 +12896,7 @@
 	<software name="mickey" cloneof="mickey">
 		<description>Mickey Mouse - The Computer Game (alt)</description>
 		<year>1988</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="174848">
 				<rom name="mickey mouse - the computer game (1988)(gremlin graphics).dsk" size="174848" crc="7ffc722d" sha1="29a312a7d1c5a9bc90c6e747c05d6a28947a0b11" offset="0" />
@@ -12964,9 +12964,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="micpsoccsp" cloneof="micpsocc">
-		<description>MicroProse Soccer (Spain)</description>
+		<description>MicroProse Soccer (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="126720">
@@ -12983,9 +12983,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="midressp" cloneof="midres">
-		<description>Midnight Resistance (Spain)</description>
+		<description>Midnight Resistance (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="155904">
 				<rom name="midnight resistance (1990)(erbe)(es)(en)[re-release].dsk" size="155904" crc="f76b30d2" sha1="55c8124f6fc372eaae8c83d42a0dbfec8331aa23" offset="0" />
@@ -12997,7 +12997,7 @@
 	<software name="midresa" cloneof="midres">
 		<description>Midnight Resistance (alt)</description>
 		<year>1990</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="midnight resistance (1990)(ocean).dsk" size="194816" crc="bebed342" sha1="ed5067b98d17085961e4079630f78a8cae1c2e6b" offset="0" />
@@ -13009,7 +13009,7 @@
 	<software name="midresb" cloneof="midres">
 		<description>Midnight Resistance (alt 2)</description>
 		<year>1990</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="133120">
 				<rom name="midnight resistance (1990)(ocean)[a].dsk" size="133120" crc="cd5e36f6" sha1="4264fe3752d41250bb506a4e55d05ee609fbe89b" offset="0" />
@@ -13040,7 +13040,7 @@
 	<software name="mikegunn">
 		<description>Mike Gunner</description>
 		<year>1988</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<info name="usage" value="Requires Gun Stick lightgun"/>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="48128">
@@ -13090,7 +13090,7 @@
 	<software name="moonwalk">
 		<description>Moonwalker</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="175360">
 				<rom name="moonwalker (1989)(erbe)(es)(en)[re-release].dsk" size="175360" crc="39947fe4" sha1="101558c1c2d1eaa6cceb0e577ea5e592a9b5d77f" offset="0" />
@@ -13200,7 +13200,7 @@
 	<software name="themunch">
 		<description>The Muncher Eats Chewits</description>
 		<year>1988</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="219136">
 				<rom name="muncher eats chewits, the (1988)(gremlin graphics)[aka t-wrecks].dsk" size="219136" crc="270a56fa" sha1="783a340ffcc78cee07e51953272467302277e459" offset="0" />
@@ -13315,7 +13315,7 @@
 	<software name="narc">
 		<description>NARC</description>
 		<year>1990</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="472832">
@@ -13334,7 +13334,7 @@
 	<software name="narcopol">
 		<description>Narco Police</description>
 		<year>1990</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="131584">
 				<rom name="narco police (1990)(dinamic)(es)(en).dsk" size="131584" crc="732da12d" sha1="856417a7c4902b5a88398dadf8528aab4527880d" offset="0" />
@@ -13345,9 +13345,9 @@
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 <!-- Spanish version includes Army Moves as a bonus. -->
 	<software name="navymovesp" cloneof="navymove">
-		<description>Navy Moves (Spanish)</description>
+		<description>Navy Moves (Spa)</description>
 		<year>1988</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="166400">
 				<rom name="navy moves + army moves (1988)(dinamic)(es).dsk" size="166400" crc="ac230638" sha1="6eb9dd96efe181d0d9f09698501f5fb3f4d77a10" offset="0" />
@@ -13371,7 +13371,7 @@
 	<software name="navyseal">
 		<description>Navy SEALs</description>
 		<year>1991</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="155904">
@@ -13401,7 +13401,7 @@
 			<feature name="part_id" value="Side B"/>
 	<!-- Side B image shared with other master disks from Zeppelin Games. Verified at World of Spectrum. -->
 			<dataarea name="flop" size="256">
-				<rom name="championship run (1991)(zeppelin games)(side b)[master disk backup][re-release].dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98" offset="0" />
+				<rom name="zeppelin games master disk side b.dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -13452,9 +13452,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="tnzssp" cloneof="tnzs">
-		<description>The New Zealand Story (Spain)</description>
+		<description>The New Zealand Story (Spa)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="68352">
@@ -13473,7 +13473,7 @@
 	<software name="tnzs">
 		<description>The New Zealand Story</description>
 		<year>1989</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="62720">
@@ -13504,7 +13504,7 @@
 	<software name="nightbre">
 		<description>Night Breed - The Action Game</description>
 		<year>1990</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="389376">
 				<rom name="night breed - the action game (1990)(ocean).dsk" size="389376" crc="8e6cd752" sha1="c4a2ff13a02ae7b6bbf3b2ff6a79b391c0198853" offset="0" />
@@ -13535,7 +13535,7 @@
 	<software name="nighraid">
 		<description>Night Raider</description>
 		<year>1988</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="174848">
 				<rom name="night raider (1988)(gremlin graphics).dsk" size="174848" crc="0d889fc6" sha1="bb06295dae9be9ebf460e170d3672351aaa83438" offset="0" />
@@ -13545,7 +13545,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="ninjawarsp" cloneof="ninjawar">
-		<description>The Ninja Warriors (Spain)</description>
+		<description>The Ninja Warriors (Spa)</description>
 		<year>1989</year>
 		<publisher>Dro Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -13648,7 +13648,7 @@
 	<software name="northstra" cloneof="northstr">
 		<description>North Star (alt)</description>
 		<year>1988</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="174848">
 				<rom name="north star (1988)(gremlin graphics).dsk" size="174848" crc="2472f3ba" sha1="0704862da03f1e09f822412f18fea05e74112239" offset="0" />
@@ -13660,7 +13660,7 @@
 	<software name="northstrb" cloneof="northstr">
 		<description>North Star (alt 2)</description>
 		<year>1988</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="162048">
 				<rom name="north star (1988)(gremlin graphics)[a].dsk" size="162048" crc="17fe7830" sha1="0af689b80ddbc79a4c62c97b1dc7ee4918b54172" offset="0" />
@@ -13670,7 +13670,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="oblitersp" cloneof="obliter">
-		<description>Obliterator (Spain)</description>
+		<description>Obliterator (Spa)</description>
 		<year>1989</year>
 		<publisher>Dro Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -13701,9 +13701,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="othundersp" cloneof="othunder">
-		<description>Operation Thunderbolt (Spain)</description>
+		<description>Operation Thunderbolt (Spa)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="48896">
@@ -13722,7 +13722,7 @@
 	<software name="othunder">
 		<description>Operation Thunderbolt</description>
 		<year>1989</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="128256">
@@ -13739,9 +13739,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="opwolfsp" cloneof="opwolf">
-		<description>Operation Wolf (Spain)</description>
+		<description>Operation Wolf (Spa)</description>
 		<year>1988</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="operation wolf (1988)(erbe)(es)(en)[re-release].dsk" size="194816" crc="937ab39f" sha1="6d9bfdd66290b424300bdf57266a24d5e2b85750" offset="0" />
@@ -13753,7 +13753,7 @@
 	<software name="opwolf">
 		<description>Operation Wolf</description>
 		<year>1988</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="operation wolf (1988)(ocean).dsk" size="194816" crc="8fb0ea8d" sha1="3fb8835bba7eeb68ff5ce3ab3dd950f7a33f71a6" offset="0" />
@@ -13765,7 +13765,7 @@
 	<software name="opwolfa" cloneof="opwolf">
 		<description>Operation Wolf (alt)</description>
 		<year>1988</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="150272">
 				<rom name="operation wolf (1988)(ocean)[a].dsk" size="150272" crc="79031b22" sha1="6c0cf20992922bf114f7a1a59c967a32c670fea1" offset="0" />
@@ -13777,7 +13777,7 @@
 	<software name="opwolfb" cloneof="opwolf">
 		<description>Operation Wolf (alt 2)</description>
 		<year>1988</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="operation wolf (1988)(ocean)[a2].dsk" size="194816" crc="7c713a26" sha1="b971311ee8938b3c5bf2937fc4cac8a6dbfd0572" offset="0" />
@@ -13799,7 +13799,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="origamessp" cloneof="origames">
-		<description>Oriental Games (Spain)</description>
+		<description>Oriental Games (Spa)</description>
 		<year>1990</year>
 		<publisher>MCM</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -13880,7 +13880,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="overlandsp" cloneof="overland">
-		<description>Overlander (Spain)</description>
+		<description>Overlander (Spa)</description>
 		<year>1988</year>
 		<publisher>MCM</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -13933,7 +13933,7 @@
 	<software name="pacmania">
 		<description>Pac-Mania</description>
 		<year>1988</year>
-		<publisher>Grandslam</publisher>
+		<publisher>Grandslam Entertainments</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="195328">
 				<rom name="pac-mania (1988)(grandslam).dsk" size="195328" crc="88f5506b" sha1="827c95935dd3a1dd919989fc6d7a0efa4e5aebc1" offset="0" />
@@ -13943,9 +13943,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="pangsp" cloneof="pang">
-		<description>Pang (Spain)</description>
+		<description>Pang (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="pang (1990)(erbe)(es)(en)[re-release].dsk" size="194816" crc="8407042b" sha1="8cf020876ba5d66995fa5752dd6c036913135f23" offset="0" />
@@ -13957,7 +13957,7 @@
 	<software name="panga" cloneof="pang">
 		<description>Pang (alt)</description>
 		<year>1990</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="173312">
 				<rom name="pang (1990)(ocean).dsk" size="173312" crc="28b7f247" sha1="3ba6421683859545be99d43c06a1fb887a60f80f" offset="0" />
@@ -13988,7 +13988,7 @@
 	<software name="parisdak">
 		<description>Paris-Dakar</description>
 		<year>1988</year>
-		<publisher>Zigurat</publisher>
+		<publisher>Zigurat Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="87808">
 				<rom name="paris-dakar (1988)(zigurat)(es).dsk" size="87808" crc="2a06e40a" sha1="8d210174ddd8f21404943b7509f101edaa37b90b" offset="0" />
@@ -14011,7 +14011,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="passshtsp" cloneof="passsht">
-		<description>Passing Shot (Spain)</description>
+		<description>Passing Shot (Spa)</description>
 		<year>1989</year>
 		<publisher>MCM</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -14075,7 +14075,7 @@
 	<software name="lospajbk">
 		<description>Pepe Carvalho en los Pajaros de Bangkok</description>
 		<year>1988</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="112640">
 				<rom name="pepe carvalho en los pajaros de bangkok (1988)(dinamic)(es).dsk" size="112640" crc="eaf66708" sha1="5723b9cca75f13917254ba2efb720be6dc3843ad" offset="0" />
@@ -14159,7 +14159,7 @@
 	<software name="pictionasp" cloneof="pictiona">
 		<description>Pictionary - El juego en el que todos pintan</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="180224">
 				<rom name="pictionary (1989)(erbe)(es)[re-release].dsk" size="180224" crc="6ad3cefb" sha1="299e4e31ae07102b2d84e1858d9346b1b38d2099" offset="0" />
@@ -14216,7 +14216,7 @@
 	<software name="platoona" cloneof="platoon">
 		<description>Platoon (alt)</description>
 		<year>1988</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="131072">
 				<rom name="platoon (1988)(ocean).dsk" size="131072" crc="45dc4898" sha1="a19824ab2b59ab29d31d6cb56851e0bcc3c4138b" offset="0" />
@@ -14460,7 +14460,7 @@
 	<software name="rbislanda" cloneof="rbisland">
 		<description>Rainbow Islands (alt)</description>
 		<year>1990</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="175360">
 				<rom name="rainbow islands - the story of bubble bobble 2 (1990)(ocean).dsk" size="175360" crc="8409c9ed" sha1="db9bf5bd455ac679142d5727226e9685aeebb1f5" offset="0" />
@@ -14482,9 +14482,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="redheatsp" cloneof="redheat">
-		<description>Red Heat (Spain)</description>
+		<description>Red Heat (Spa)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="175360">
 				<rom name="red heat (1989)(erbe)(es)(en)[re-release].dsk" size="175360" crc="59b14ef2" sha1="19fccf544fb00c9767c8472684d936effa76fca6" offset="0" />
@@ -14496,7 +14496,7 @@
 	<software name="redheat">
 		<description>Red Heat</description>
 		<year>1989</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="157184">
 				<rom name="red heat (1989)(ocean).dsk" size="157184" crc="2be37cbe" sha1="75c53860247c0af7c81337519f25f84ed8700dd2" offset="0" />
@@ -14554,7 +14554,7 @@
 	<software name="rescatla">
 		<description>Rescate Atlantida</description>
 		<year>1989</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="150272">
@@ -14573,7 +14573,7 @@
 	<software name="rescatlaa" cloneof="rescatla">
 		<description>Rescate Atlantida (alt)</description>
 		<year>1989</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="214784">
 				<rom name="rescate atlantida (1989)(dinamic)(es).dsk" size="214784" crc="176a12e4" sha1="4c71b572b282007732fb6a4ff617369c68f8c1ab" offset="0" />
@@ -14585,7 +14585,7 @@
 	<software name="rescatlab" cloneof="rescatla">
 		<description>Rescate Atlantida (alt 2)</description>
 		<year>1989</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="214784">
 				<rom name="rescate atlantida (1989)(dinamic)(es)[a].dsk" size="214784" crc="b259c19e" sha1="1dda1d59b8fafa91ca3fe15df6f5aada24d85cd5" offset="0" />
@@ -14607,9 +14607,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="jedisp" cloneof="jedi">
-		<description>Star Wars - Return of the Jedi (Spain)</description>
+		<description>Star Wars - Return of the Jedi (Spa)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="68352">
 				<rom name="return of the jedi (1989)(erbe)(es)(en)[re-release].dsk" size="68352" crc="c0f1f626" sha1="f4cb6a5bd15f7e6c3b35678f2da31b9a332d11b1" offset="0" />
@@ -14619,9 +14619,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="jedispa" cloneof="jedi">
-		<description>Star Wars - Return of the Jedi (Spain) (alt)</description>
+		<description>Star Wars - Return of the Jedi (Spa) (alt)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="136448">
 				<rom name="return of the jedi (1989)(erbe)(es)(en)[a][re-release].dsk" size="136448" crc="c5cdb566" sha1="6befbc050becec8e084b1dec01d1c59487192cd0" offset="0" />
@@ -14699,9 +14699,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="roadblst" cloneof="roadblst">
-		<description>Road Blasters (Spain)</description>
+		<description>Road Blasters (Spa)</description>
 		<year>1988</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="214784">
 				<rom name="road blasters (1988)(erbe)(es)(en)[re-release].dsk" size="214784" crc="5966a1bc" sha1="59df737d0dd64fe5c8a6973b1c88efca1892f80a" offset="0" />
@@ -14726,7 +14726,7 @@
 	<software name="robocop">
 		<description>Robocop</description>
 		<year>1988</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="134144">
 				<rom name="robocop (1988)(ocean).dsk" size="134144" crc="545558f7" sha1="ad1e7ed55d62d8eec7bae80904f73be7f5ffd59e" offset="0" />
@@ -14738,7 +14738,7 @@
 	<software name="robocopa" cloneof="robocop">
 		<description>Robocop (alt)</description>
 		<year>1988</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="128768">
 				<rom name="robocop (1988)(ocean)[a].dsk" size="128768" crc="c3218b5c" sha1="f56181f60553f4ac00631f8720b713bd42490a85" offset="0" />
@@ -14748,9 +14748,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="robocop2sp" cloneof="robocop2">
-		<description>Robocop 2 (Spain)</description>
+		<description>Robocop 2 (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="160768">
 				<rom name="robocop 2 (1990)(erbe)(es)(en)[re-release].dsk" size="160768" crc="93b27353" sha1="78047deee2d869dbe4554617e385aa2c0998ac48" offset="0" />
@@ -14763,7 +14763,7 @@
 	<software name="robocop2a" cloneof="robocop2">
 		<description>Robocop 2 (alt)</description>
 		<year>1990</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="225536">
 				<rom name="robocop 2 (1990)(ocean).dsk" size="225536" crc="afa8626e" sha1="eaf866424fa3d2b0ea006a970d3fd475147040ac" offset="0" />
@@ -14776,7 +14776,7 @@
 	<software name="robocop2b" cloneof="robocop2">
 		<description>Robocop 2 (alt 2)</description>
 		<year>1990</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="225536">
 				<rom name="robocop 2 (1990)(ocean)[a].dsk" size="225536" crc="d3298f36" sha1="e7815e2062f98883759629dd4a0cda36862f1961" offset="0" />
@@ -14872,7 +14872,7 @@
 	<software name="rungaunta" cloneof="rungaunt">
 		<description>Run the Gauntlet</description>
 		<year>1989</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="174848">
 				<rom name="run the gauntlet (1989)(ocean).dsk" size="174848" crc="908cd12d" sha1="bc74b1f45b05e3e5a0f93e186aeb9e938d469d0f" offset="0" />
@@ -14933,7 +14933,7 @@
 	<software name="saintgrva" cloneof="saintgrv">
 		<description>Saint &amp; Greavsie</description>
 		<year>1989</year>
-		<publisher>Grandslam</publisher>
+		<publisher>Grandslam Entertainments</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="220160">
 				<rom name="saint and greavsie (1989)(grandslam).dsk" size="220160" crc="5152c80b" sha1="5175ce4e09020f840dddd7da345b9c0b4eb30af6" offset="0" />
@@ -14980,7 +14980,7 @@
 			<feature name="part_id" value="Side B"/>
 	<!-- Side B image shared with other master disks from Zeppelin Games. Verified at World of Spectrum. -->
 			<dataarea name="flop" size="256">
-				<rom name="championship run (1991)(zeppelin games)(side b)[master disk backup][re-release].dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98" offset="0" />
+				<rom name="zeppelin games master disk side b.dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -14989,7 +14989,7 @@
 	<software name="satan">
 		<description>Satan</description>
 		<year>1989</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="107264">
 				<rom name="satan (1989)(dinamic)(es).dsk" size="107264" crc="82642bef" sha1="344dd36d44076d079d8a62b678a8f4139a274526" offset="0" />
@@ -15051,7 +15051,7 @@
 	<software name="sspirits">
 		<description>Scramble Spirits</description>
 		<year>1990</year>
-		<publisher>Grandslam</publisher>
+		<publisher>Grandslam Entertainments</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="scramble spirits (1990)(grandslam).dsk" size="194816" crc="28617137" sha1="b1898340c7eadb2bf29417aaf8006792277c09f8" offset="0" />
@@ -15075,7 +15075,7 @@
 	<software name="sendasal">
 		<description>Senda Salvaje</description>
 		<year>1990</year>
-		<publisher>Zigurat</publisher>
+		<publisher>Zigurat Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="102400">
 				<rom name="senda salvaje (1990)(zigurat)(es).dsk" size="102400" crc="54f0d03f" sha1="a334fc0d768554e29e678017d90cff53adba1ab6" offset="0" />
@@ -15159,7 +15159,7 @@
 	<software name="shdancer">
 		<description>Shadow Dancer</description>
 		<year>1991</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="165632">
@@ -15178,7 +15178,7 @@
 	<software name="shadoww">
 		<description>Shadow Warriors</description>
 		<year>1990</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="208640">
 				<rom name="shadow warriors (1990)(ocean).dsk" size="208640" crc="4d0a3727" sha1="ae8c3160465f6b021355fa83997ae2a90c0ef649" offset="0" />
@@ -15188,9 +15188,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="sotbeastsp" cloneof="sotbeast">
-		<description>Shadow of the Beast (Spain)</description>
+		<description>Shadow of the Beast (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="44288">
@@ -15209,7 +15209,7 @@
 	<software name="sotbeast">
 		<description>Shadow of the Beast</description>
 		<year>1990</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="174848">
@@ -15251,7 +15251,7 @@
 			<feature name="part_id" value="Side B"/>
 	<!-- Side B image shared with other master disks from Zeppelin Games. Verified at World of Spectrum. -->
 			<dataarea name="flop" size="256">
-				<rom name="championship run (1991)(zeppelin games)(side b)[master disk backup][re-release].dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98" offset="0" />
+				<rom name="zeppelin games master disk side b.dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -15270,7 +15270,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="shinobisp" cloneof="shinobi">
-		<description>Shinobi (Spain)</description>
+		<description>Shinobi (Spa)</description>
 		<year>1989</year>
 		<publisher>Dro Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -15318,9 +15318,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="silkwormsp" cloneofe="silkworm">>
-		<description>Silkworm (Spain)</description>
+		<description>Silkworm (Spa)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="68352">
 				<rom name="silkworm (1989)(erbe)(es)(en)[re-release].dsk" size="68352" crc="1f3bb8ca" sha1="aeb2576b0f616e920145f3e4575e188d84f578db" offset="0" />
@@ -15330,9 +15330,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="silkwormspa" cloneofe="silkworm">>
-		<description>Silkworm (Spain) (alt)</description>
+		<description>Silkworm (Spa) (alt)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="68352">
 				<rom name="silkworm (1989)(erbe)(es)(en)[a][re-release].dsk" size="68352" crc="1a5a1dac" sha1="cbe96a6d5448f6d0681599abfd48aaed372917ee" offset="0" />
@@ -15342,9 +15342,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="silkwormspb" cloneofe="silkworm">>
-		<description>Silkworm (Spain) (alt 2)</description>
+		<description>Silkworm (Spa) (alt 2)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="67328">
 				<rom name="silkworm (1989)(erbe)(es)(en)[a2][re-release].dsk" size="67328" crc="e3321b40" sha1="f54c7d1851a1acaf867e747f801a595934eeb0af" offset="0" />
@@ -15381,7 +15381,7 @@
 	<software name="bartvssm">
 		<description>The Simpsons - Bart vs. the Space Mutants</description>
 		<year>1991</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="216320">
@@ -15412,7 +15412,7 @@
 	<software name="sitopons">
 		<description>Sito Pons 500cc Grand Prix</description>
 		<year>1990</year>
-		<publisher>Zigurat</publisher>
+		<publisher>Zigurat Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="58624">
 				<rom name="sito pons 500cc grand prix (1990)(zigurat)(es).dsk" size="58624" crc="a4d2515f" sha1="f9cd0be687108f3a7ef68aae4fbafa306722d41d" offset="0" />
@@ -15493,7 +15493,7 @@
 	<software name="smashtv">
 		<description>Smash TV</description>
 		<year>1991</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="63232">
 				<rom name="smash tv (1991)(erbe)(es)(en)[re-release].dsk" size="63232" crc="537c4c8b" sha1="7b196f932ee796e8a1b2726dff93ccc99fe39f67" offset="0" />
@@ -15528,7 +15528,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="sokobansp" cloneof="sokoban">
-		<description>Sokoban (Spanish)</description>
+		<description>Sokoban (Spa)</description>
 		<year>2006</year>
 		<publisher>Compiler</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -15616,7 +15616,7 @@
 	<software name="spacecrsa" cloneof="spacecrs">
 		<description>Space Crusade</description>
 		<year>1992</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="199680">
 				<rom name="space crusade (1992)(gremlin graphics).dsk" size="199680" crc="ac78c209" sha1="8a2ea68d31c5ee026ca0a9b44c0a0c7657e7ed06" offset="0" />
@@ -15628,7 +15628,7 @@
 	<software name="sharrie2">
 		<description>Space Harrier II</description>
 		<year>1990</year>
-		<publisher>Grandslam</publisher>
+		<publisher>Grandslam Entertainments</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -15676,9 +15676,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="spittimasp" cloneof="spittima">
-		<description>Spitting Image (Spain)</description>
+		<description>Spitting Image (Spa)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="116992">
 				<rom name="spitting image (1989)(erbe)(es)(en).dsk" size="116992" crc="2592e3a9" sha1="9452d23da666547fa05ae4f5e1adc05a46da0999" offset="0" />
@@ -15926,9 +15926,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="stircrazsp" cloneof="stircraz">
-		<description>Stir Crazy Featuring Bobo (Spain)</description>
+		<description>Stir Crazy Featuring Bobo (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="stir crazy featuring bobo (1990)(erbe)(es)(en)[re-release].dsk" size="194816" crc="e8fb3ec4" sha1="50c5bda1b9d57e23eff42da53fb8cbe2523ac85e" offset="0" />
@@ -16021,7 +16021,7 @@
 	<!-- May be the same edition as the IPF -->
 		<description>Super Cars (alt)</description>
 		<year>1990</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="174848">
 				<rom name="super cars (1990)(gremlin graphics).dsk" size="174848" crc="0ca22a11" sha1="10d892855a61470343d3e9fe68411e9d2f6b3f83" offset="0" />
@@ -16044,9 +16044,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="spscsimusp" cloneof="spscsimu">
-		<description>Super Scramble Simulator (Spain)</description>
+		<description>Super Scramble Simulator (Spa)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="68608">
 				<rom name="super scramble simulator (1989)(erbe)(es)(en)[re-release].dsk" size="68608" crc="7e7e0a71" sha1="6fcb326fed039e3cf5dd2aa35bcd1a76b88e3f52" offset="0" />
@@ -16058,7 +16058,7 @@
 	<software name="spscsimu">
 		<description>Super Scramble Simulator</description>
 		<year>1989</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="219136">
 				<rom name="super scramble simulator (1989)(gremlin graphics).dsk" size="219136" crc="28831769" sha1="efc4c460794941aad2c6acbc5aa48e98f1b3e949" offset="0" />
@@ -16118,7 +16118,7 @@
 	<software name="spchs335">
 		<description>Superchess 3 v3.5</description>
 		<year>1984</year>
-		<publisher>CP</publisher>
+		<publisher>CP Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="superchess 3 v3.5 (1984)(cp).dsk" size="194816" crc="a3329d71" sha1="181ff40d2f69b2409909ef8941dffc10c70d4cc6" offset="0" />
@@ -16149,7 +16149,7 @@
 	<software name="supsport">
 		<description>Supersports - The Alternative Olympics</description>
 		<year>1988</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="176103">
@@ -16166,7 +16166,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="swoiannasp" cloneof="swoianna">
-		<description>The Sword of IANNA (Spanish)</description>
+		<description>The Sword of IANNA (Spa)</description>
 		<year>2017</year>
 		<publisher>RetroWorks</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -16248,7 +16248,7 @@
 			<feature name="part_id" value="Side B"/>
 	<!-- Side B image shared with other master disks from Zeppelin Games. Verified at World of Spectrum. -->
 			<dataarea name="flop" size="256">
-				<rom name="championship run (1991)(zeppelin games)(side b)[master disk backup][re-release].dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98" offset="0" />
+				<rom name="zeppelin games master disk side b.dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -16258,7 +16258,7 @@
 	<software name="taipana" cloneof="taipan">
 		<description>Tai-Pan (alt)</description>
 		<year>1987</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194560">
 				<rom name="tai-pan (1987)(ocean).dsk" size="194560" crc="458c4b7c" sha1="6fe0e05aa78573fda4b5c563cba5e5d287c25864" offset="0" />
@@ -16306,7 +16306,7 @@
 	<software name="targetpl">
 		<description>Target Plus</description>
 		<year>1988</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<info name="usage" value="Requires Gun Stick lightgun"/>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="53504">
@@ -16355,7 +16355,7 @@
 	<software name="technoco">
 		<description>Techno-Cop</description>
 		<year>1988</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="219136">
 				<rom name="techno-cop (1988)(gremlin graphics).dsk" size="219136" crc="d3de6ce2" sha1="ad966892ac92495095e565706ed4f672b39a7021" offset="0" />
@@ -16420,7 +16420,7 @@
 	<software name="term2a" cloneof="term2">
 		<description>Terminator 2 - Judgment Day (alt)</description>
 		<year>1991</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="216320">
 				<rom name="terminator 2 - judgment day (1991)(ocean).dsk" size="216320" crc="d97a5f2a" sha1="512127b1523d9ba51889b3891592007dcbb89ed0" offset="0" />
@@ -16554,7 +16554,7 @@
 	<software name="thunderb">
 		<description>Thunderbirds</description>
 		<year>1989</year>
-		<publisher>Grandslam</publisher>
+		<publisher>Grandslam Entertainments</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -16571,7 +16571,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="thunderbsp" cloneof="thunderb">
-		<description>Thunderbirds (Spain)</description>
+		<description>Thunderbirds (Spa)</description>
 		<year>1989</year>
 		<publisher>MCM</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -16592,7 +16592,7 @@
 	<software name="thunderba" cloneof="thunderb">
 		<description>Thunderbirds (alt)</description>
 		<year>1989</year>
-		<publisher>Grandslam</publisher>
+		<publisher>Grandslam Entertainments</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -16624,7 +16624,7 @@
 	<software name="tiburon" cloneof="jaws">
 		<description>Tiburon</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="78080">
 				<rom name="tiburon (1989)(erbe)(es)(en)[aka jaws][re-release].dsk" size="78080" crc="aaa7b9fe" sha1="f028fc6cc04d585c570193560849896925c3472f" offset="0" />
@@ -16659,7 +16659,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="timescansp" cloneof="timescan">
-		<description>Time Scanner (Spain)</description>
+		<description>Time Scanner (Spa)</description>
 		<year>1989</year>
 		<publisher>MCM</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -16673,7 +16673,7 @@
 	<software name="tintmoonsp" cloneof="tintmoon">
 		<description>Tintin en la Luna</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="63488">
 				<rom name="tintin en la luna (1989)(erbe)(es)(en)[aka tintin on the moon][re-release].dsk" size="63488" crc="e4e8df96" sha1="e60fda54d391d7e1b073529f12e7aa74d6e5b7d2" offset="0" />
@@ -16762,9 +16762,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="toobinsp" cloneof="toobin">
-		<description>Toobin' (Spain)</description>
+		<description>Toobin' (Spa)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="121856">
 				<rom name="toobin' (1989)(erbe)(es)(en)[re-release].dsk" size="121856" crc="0aa86bcb" sha1="6e22f2395bc263e0d2c33d058770f8a5e84d7369" offset="0" />
@@ -16815,7 +16815,7 @@
 	<software name="totrecala" cloneof="totrecal">
 		<description>Total Recall (alt)</description>
 		<year>1991</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="178432">
 				<rom name="total recall (1991)(ocean).dsk" size="178432" crc="d58b27ec" sha1="618542c813bec4f3f55196af9033e51a37776965" offset="0" />
@@ -16827,7 +16827,7 @@
 	<software name="tourdefo">
 		<description>Tour de Force</description>
 		<year>1988</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="174848">
 				<rom name="tour de force (1988)(gremlin graphics).dsk" size="174848" crc="c8999948" sha1="3ccb02f23add396d4e45eedf8a7511e7be206b77" offset="0" />
@@ -16932,7 +16932,7 @@
 	<software name="turbogir">
 		<description>Turbo Girl</description>
 		<year>1988</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="58880">
 				<rom name="turbo girl (1988)(dinamic)(es).dsk" size="58880" crc="4fc6bb30" sha1="b98e25c0a5a75828bf930324dbe008a73a9e0ac9" offset="0" />
@@ -16961,9 +16961,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="turbooutsp" cloneof="turboout">
-		<description>Turbo Out Run (Spain)</description>
+		<description>Turbo Out Run (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="255232">
@@ -17018,9 +17018,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="turrican" cloneof="turrican">
-		<description>Turrican (Spain)</description>
+		<description>Turrican (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -17169,7 +17169,7 @@
 	<software name="untoucha">
 		<description>The Untouchables</description>
 		<year>1989</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="128256">
@@ -17188,7 +17188,7 @@
 	<software name="untouchaa" cloneof="untoucha">
 		<description>The Untouchables (alt)</description>
 		<year>1989</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="128256">
@@ -17207,7 +17207,7 @@
 	<software name="untouchab" cloneof="untoucha">
 		<description>The Untouchables (alt 2)</description>
 		<year>1989</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="untouchables, the (1989)(ocean).dsk" size="194816" crc="bcafafe3" sha1="f219d9eac35b054f49f2be5dbfc7c4940bb66415" offset="0" />
@@ -17219,7 +17219,7 @@
 	<software name="untouchac" cloneof="untoucha">
 		<description>The Untouchables (alt 3)</description>
 		<year>1989</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="389376">
 				<rom name="untouchables, the (1989)(ocean)[a].dsk" size="389376" crc="6d4df741" sha1="a1f9b963c7181d062a45434f88a977a7314c5580" offset="0" />
@@ -17277,9 +17277,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="vigilantsp" cloneof="vigilant">
-		<description>Vigilante (Spain)</description>
+		<description>Vigilante (Spa)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="127744">
 				<rom name="vigilante (1989)(erbe)(es)(en)[re-release].dsk" size="127744" crc="688b068b" sha1="e29674d3d8b797022334543bb9e48ce687a2738b" offset="0" />
@@ -17425,9 +17425,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="weclemansp" cloneof="wecleman">
-		<description>WEC Le Mans (Spain)</description>
+		<description>WEC Le Mans (Spa)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="70400">
 				<rom name="wec le mans (1989)(erbe)(es)(en).dsk" size="70400" crc="51cff9a9" sha1="6c83a3f0d1865094925d932f907001f96cca6002" offset="0" />
@@ -17439,7 +17439,7 @@
 	<software name="wwfwrest">
 		<description>WWF WrestleMania</description>
 		<year>1991</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="187904">
@@ -17526,7 +17526,7 @@
 	<software name="welltris">
 		<description>Welltris</description>
 		<year>1991</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="78080">
 				<rom name="welltris (1991)(erbe)(es)(en)[re-release].dsk" size="78080" crc="e2c07cf0" sha1="fb270ca2c53498bd04d5e4ddc8a806c51f887318" offset="0" />
@@ -17551,7 +17551,7 @@
 	<software name="wtss">
 		<description>Where Time Stood Still</description>
 		<year>1988</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="155648">
 				<rom name="where time stood still (1988)(ocean)[aka land that time forgot, the][aka tibet].dsk" size="155648" crc="b14f1c51" sha1="6bd26b6364493679e8c956cef34ebcdc6db13894" offset="0" />
@@ -17654,7 +17654,7 @@
 			<feature name="part_id" value="Side B"/>
 	<!-- Side B image shared with other master disks from Zeppelin Games. Verified at World of Spectrum. -->
 			<dataarea name="flop" size="256">
-				<rom name="championship run (1991)(zeppelin games)(side b)[master disk backup][re-release].dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98" offset="0" />
+				<rom name="zeppelin games master disk side b.dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -17748,9 +17748,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="xoutsp" cloneof="xout">
-		<description>X-Out (Spain)</description>
+		<description>X-Out (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="53760">
@@ -17827,9 +17827,9 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="xybotssp" cloneof="xybots">
-		<description>Xybots (Spain)</description>
+		<description>Xybots (Spa)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="131328">
 				<rom name="xybots (1989)(erbe)(es)(en)[re-release].dsk" size="131328" crc="f06c87e4" sha1="7ee414b540d5cce2e13f90e1d5aa4c860ff5162e" offset="0" />
@@ -19456,7 +19456,7 @@
 	<software name="2x1fhpha">
 		<description>2 X 1: Phantis + Freddy Hardest</description>
 		<year>1987</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Freddy Hardest"/>
 			<dataarea name="flop" size = "109568">
@@ -19474,7 +19474,7 @@
 	<software name="2x1huntg">
 		<description>2 X 1: Hundra + Turbo Girl</description>
 		<year>1988</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Hundra"/>
 			<dataarea name="flop" size = "59097">
@@ -19508,9 +19508,9 @@
 	</software>
 
 	<software name="ausgamessp">
-		<description>Australian Games (Spain)</description>
+		<description>Australian Games (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size = "194816">
@@ -19526,9 +19526,9 @@
 	</software>
 
 	<software name="badlandssp" cloneof="badlands">
-		<description>Badlands (Spain)</description>
+		<description>Badlands (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size = "97995">
 				<rom name="Badlands.dsk" size="97995" crc="44ae6f1e" sha1="683489b807cced8c290f8274e428df56d3535cd1" offset="0"/>
@@ -19537,7 +19537,7 @@
 	</software>
 
 	<software name="buggyboysp" cloneof="buggyboy">
-		<description>Buggy Boy (Spain)</description>
+		<description>Buggy Boy (Spa)</description>
 		<year>1988</year>
 		<publisher>MCM</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -19548,7 +19548,7 @@
 	</software>
 
 	<software name="clschss4sp" cloneof="clschss4">
-		<description>Colossus Chess 4 (Spain)</description>
+		<description>Colossus Chess 4 (Spa)</description>
 		<year>1986</year>
 		<publisher>Proein</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -19591,7 +19591,7 @@
 	<software name="Drazen Petrovic Basket (Erbe)">
 		<description>Drazen Petrovic Basket</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size = "73216">
 				<rom name="Drazen Petrovic Basket (Erbe).DSK" size="73216" crc="17eeb154" sha1="4e0b0edd771ad5dc622c449a73bae1b0a11e4789" offset="0"/>
@@ -19620,7 +19620,7 @@
 	<software name="esanchvib" cloneof="esanchvi">
 		<description>Emilio Sanchez Vicario Grand Slam (alt 2)</description>
 		<year>1990</year>
-		<publisher>Zigurat</publisher>
+		<publisher>Zigurat Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size = "58939">
 				<rom name="Emilio Sanchez Vicario Grand Slam.dsk" size="58939" crc="5640d214" sha1="6c033e39e84822a6fbf9c6ee61125693c8f86d3b" offset="0"/>
@@ -19629,9 +19629,9 @@
 	</software>
 
 	<software name="epromsp" cloneof="eprom">
-		<description>Escape from the Planet of the Robot Monsters (Spain)</description>
+		<description>Escape from the Planet of the Robot Monsters (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size = "194816">
 				<rom name="Escape from the planet of the robot monsters (Erbe).dsk" size="194816" crc="0bb41cee" sha1="689e11d47ba487499ba952f0ef401deed4a1be13" offset="0"/>
@@ -19662,7 +19662,7 @@
 	</software>
 
 	<software name="goldnaxespa" cloneof="goldnaxe">
-		<description>Golden Axe (Spain) (alt)</description>
+		<description>Golden Axe (Spa) (alt)</description>
 		<year>1990</year>
 		<publisher>MCM</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -19680,9 +19680,9 @@
 	</software>
 
 	<software name="gunshipsp" cloneof="gunship">
-		<description>Gunship (Spain)</description>
+		<description>Gunship (Spa)</description>
 		<year>1987</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size = "151040">
@@ -19698,9 +19698,9 @@
 	</software>
 
 	<software name="highstelsp">
-		<description>High Steel (Spain)</description>
+		<description>High Steel (Spa)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size = "58624">
 				<rom name="High Steel (Erbe Software).dsk" size="58624" crc="39f355cc" sha1="79cc8da772100bf639af90efbd85d10735cbd7e0" offset="0"/>
@@ -19709,7 +19709,7 @@
 	</software>
 
 	<software name="italia90sp" cloneof="italia90">
-		<description>Italia '90 - World Cup Soccer (Spain)</description>
+		<description>Italia '90 - World Cup Soccer (Spa)</description>
 		<year>1989</year>
 		<publisher>Dro Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -19733,7 +19733,7 @@
 	<software name="los40v5">
 		<description>Los 40 Principales Vol. 4</description>
 		<year>1987</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Rambo + Krakout"/>
 			<dataarea name="flop" size="194816">
@@ -19791,9 +19791,9 @@
 
 	<software name="narcsp" cloneof="narc">
 	<!-- This dump of Side A has been manually fixed, a new untampered one may be needed for verification. -->
-		<description>NARC (Spain)</description>
+		<description>NARC (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size = "226048">
@@ -19811,9 +19811,9 @@
 	<!-- This image came from a dual-system Spectrum/Amstrad release (Side A: Spectrum, Side B: Amstrad) -->
 	<!-- Dump made with SAMdisk -->
 	<software name="navymovespa" cloneof="navymove">
-		<description>Navy Moves (Spanish) (alt)</description>
+		<description>Navy Moves (Spa) (alt)</description>
 		<year>1988</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="166817">
 				<rom name="Navy Moves (Doble Edición) (side A).dsk" size="166817" crc="718149f4" sha1="5018740f71bc2ae08343f4040590cfa2550333bf" offset="0" />
@@ -19828,7 +19828,7 @@
 	<software name="navymove">
 		<description>Navy Moves</description>
 		<year>1988</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="214784">
 				<rom name="navy moves (1988)(dinamic)(es)(en)(side b).dsk" size="214784" crc="c32323a2" sha1="da30c11411368b22474b032f39e8f8b968f7903b" offset="0" />
@@ -19837,7 +19837,7 @@
 -->
 
 	<software name="ninjawarsp" cloneof="ninjawar">
-		<description>The Ninja Warriors (Spain)</description>
+		<description>The Ninja Warriors (Spa)</description>
 		<year>1990</year>
 		<publisher>Dro Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -19850,7 +19850,7 @@
 	<software name="powrmagc">
 		<description>Power Magic</description>
 		<year>1990</year>
-		<publisher>Zigurat</publisher>
+		<publisher>Zigurat Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size = "63488">
 				<rom name="Power Magic.dsk" size="63488" crc="2a0017e0" sha1="1a6bdbbef1a1e22176a492b228b508a982db29ee" offset="0"/>
@@ -19859,9 +19859,9 @@
 	</software>
 
 	<software name="rbislandsp" cloneof="rbisland">
-		<description>Rainbow Islands (Spain)</description>
+		<description>Rainbow Islands (Spa)</description>
 		<year>1990</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size = "176107">
 				<rom name="Rainbow Islands (Erbe Software).dsk" size="176107" crc="8011bfaa" sha1="28356ae9a4df3144248cae45c0a1b7fd812f8fb0" offset="0"/>
@@ -19891,7 +19891,7 @@
 	<!-- This dump of Side A has been manually fixed, a new untampered one may be needed for verification. -->
 		<description>Rescate Atlantida (alt 3)</description>
 		<year>1989</year>
-		<publisher>Dinamic</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size = "150659">
@@ -19907,7 +19907,7 @@
 	</software>
 
 	<software name="ringwarssp">
-		<description>Ring Wars (Spain)</description>
+		<description>Ring Wars (Spa)</description>
 		<year>1989</year>
 		<publisher>MCM</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -19919,7 +19919,7 @@
 
 	<software name="simuhitssp">
 	<!-- No good dump known of Side B, but Side A seems to include everything. -->
-		<description>Simulation Hits (Spain)</description>
+		<description>Simulation Hits (Spa)</description>
 		<year>1989</year>
 		<publisher>Proein</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -19963,7 +19963,7 @@
 	<!-- Game recovered from the original developer's archives -->
 		<description>The Prayer Of The Warrior</description>
 		<year>1992</year>
-		<publisher>Zigurat</publisher>
+		<publisher>Zigurat Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size = "194816">
@@ -20009,9 +20009,9 @@
 	</software>
 
 	<software name="toobinspa" cloneof="toobin">
-		<description>Toobin' (Spain) (alt)</description>
+		<description>Toobin' (Spa) (alt)</description>
 		<year>1989</year>
-		<publisher>Erbe</publisher>
+		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size = "122405">
 				<rom name="Toobin (Erbe).dsk" size="122405" crc="19c5e569" sha1="3eb3eecaf23e4ef5bd3ca5761eccf9aad1fa60b7" offset="0"/>
@@ -20020,7 +20020,7 @@
 	</software>
 
 	<software name="trainetnsp">
-		<description>The Train: Escape to Normandy (Spain)</description>
+		<description>The Train: Escape to Normandy (Spa)</description>
 		<year>1988</year>
 		<publisher>Dro Soft</publisher>
 		<part name="flop1" interface="floppy_3">
