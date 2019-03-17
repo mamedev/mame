@@ -285,9 +285,9 @@ ppreprocessor::ppreprocessor(defines_map_type *defines)
 	m_expr_sep.emplace_back(" ");
 	m_expr_sep.emplace_back("\t");
 
-	m_defines.insert({"__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1")});
 	if (defines != nullptr)
 		m_defines = *defines;
+	m_defines.insert({"__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1")});
 }
 
 void ppreprocessor::error(const pstring &err)
