@@ -2416,7 +2416,7 @@
 	<software name="ocpartst">
 		<description>The OCP Art Studio</description>
 		<year>1985</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="ocp art studio, the (1985)(rainbird)[m useless soft].dsk" size="194816" crc="696c593c" sha1="1b1a0307bd265a55d7f4a701acedbbc4cb34a724" offset="0" />
@@ -2428,7 +2428,7 @@
 	<software name="ocpartsta" cloneof="ocpartst">
 		<description>The OCP Art Studio (alt)</description>
 		<year>1985</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="ocp art studio, the (1985)(rainbird)[m useless soft][a].dsk" size="194816" crc="fcc3298f" sha1="1eed3410b0810b3854a07acd1eb0c371571c501d" offset="0" />
@@ -2440,7 +2440,7 @@
 	<software name="ocpartstb" cloneof="ocpartst">
 		<description>The OCP Art Studio (alt 2)</description>
 		<year>1985</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="ocp art studio, the (1985)(rainbird)[m useless soft][a2].dsk" size="194816" crc="a9652e70" sha1="4f329c43beaae11bca917fb6928916f4f805baa0" offset="0" />
@@ -3647,7 +3647,7 @@
 	<software name="anbigdsk">
 		<description>Another Big Disk</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: The Menagerie + The Miser + Bog of Brit"/>
 			<dataarea name="flop" size="194816">
@@ -3721,7 +3721,7 @@
 	<software name="arnadv12">
 		<description>Arnold the Adventurer 1 + 2</description>
 		<year>19??</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="arnold the adventurer 1 + 2 (19xx)(zenobi).dsk" size="194816" crc="2de22fac" sha1="b721610fbf50a964560810e678c55fae31d2a0d4" offset="0" />
@@ -3733,7 +3733,7 @@
 	<software name="balrogbd">
 		<description>Balrog's Big Disk</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Pawns of War + Crack City + Stalker"/>
 			<dataarea name="flop" size="194816">
@@ -3752,7 +3752,7 @@
 	<software name="balrtril">
 		<description>The Balrogian Trilogy</description>
 		<year>1990</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Fuddo &amp; Slam + An Everyday Tale of a Seeker of Gold"/>
 			<dataarea name="flop" size="194816">
@@ -3771,7 +3771,7 @@
 	<software name="barddraq">
 		<description>The Bardic Rites + Dragon-Quest</description>
 		<year>1994</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: The Bardic Rites"/>
 			<dataarea name="flop" size="194816">
@@ -3790,7 +3790,7 @@
 	<software name="bartbret">
 		<description>Bart Bear + The Return of Bart Bear</description>
 		<year>19??</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="bart bear - the return of bart bear (19xx)(zenobi).dsk" size="194816" crc="0396887f" sha1="c2f8db9fea7b7fc90fd043d7e509691a32856b2b" offset="0" />
@@ -3802,7 +3802,7 @@
 	<software name="bstclles">
 		<description>The Best of Clive and Les</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="best of clive and les, the - the little wandering guru + nightwing + demi-god (1991)(zenobi).dsk" size="194816" crc="f577d853" sha1="4fd34aecf2a22be831ebfb498724c1b52b593e92" offset="0" />
@@ -3833,7 +3833,7 @@
 	<software name="bogbmena">
 		<description>Bog of Brit + The Menagerie</description>
 		<year>1990</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="bog of brit + menagerie, the (1990)(zenobi)[re-release].dsk" size="194816" crc="dc47c945" sha1="1d999f7809037b4207bb5feeba9f52172edb1cc3" offset="0" />
@@ -4052,7 +4052,7 @@
 	<software name="dicksgal">
 		<description>Dicks Galore</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Robin of Sherlock"/>
 			<dataarea name="flop" size="197376">
@@ -4153,7 +4153,7 @@
 	<software name="doublecl">
 		<description>Double Classic</description>
 		<year>1988</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Diablo!"/>
 			<dataarea name="flop" size="194816">
@@ -4311,7 +4311,7 @@
 	<software name="evenyeta">
 		<description>Even Yet Another Big Disk</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: The Dogboy + Kobyashi Ag'Kwo - A Return to Naru"/>
 			<dataarea name="flop" size="194816">
@@ -4349,7 +4349,7 @@
 	<software name="fyabdisk">
 		<description>Found Yet Another Big Disk</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: The End is Nigh"/>
 			<dataarea name="flop" size="194816">
@@ -4412,7 +4412,7 @@
 	<software name="gaggeorg">
 		<description>Gaggles of George</description>
 		<year>1996</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Brian - The Novice Barbarian + A Fistful of Necronomicons"/>
 			<dataarea name="flop" size="194816">
@@ -4431,7 +4431,7 @@
 	<software name="gameover">
 		<description>Game Over + Game Over 2</description>
 		<year>19??</year>
-		<publisher>Imagine</publisher>
+		<publisher>Imagine Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Game Over"/>
 			<dataarea name="flop" size="101888">
@@ -4611,7 +4611,7 @@
 	<software name="hairytoe">
 		<description>Hairy Toes</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Bored of the Rings"/>
 			<dataarea name="flop" size="194816">
@@ -4630,7 +4630,7 @@
 	<software name="handfham">
 		<description>A Handful of Hamsters</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Brian + Aunt Velma + Desmond and Gertrude"/>
 			<dataarea name="flop" size="194816">
@@ -4840,7 +4840,7 @@
 	<software name="jennybd1">
 		<description>Jenny's Big Disk Vol 1</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Behold Atlantis"/>
 			<dataarea name="flop" size="194816">
@@ -4859,7 +4859,7 @@
 	<software name="jennybd2">
 		<description>Jenny's Big Disk Vol 2</description>
 		<year>1990</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: The Lost Temple"/>
 			<dataarea name="flop" size="194816">
@@ -4878,7 +4878,7 @@
 	<software name="jenynbd1">
 		<description>Jenny's Next Big Disk Vol 1</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: The Curse of Calutha"/>
 			<dataarea name="flop" size="194816">
@@ -4897,7 +4897,7 @@
 	<software name="jenynbd2">
 		<description>Jenny's Next Big Disk Vol 2</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Laskar's Crystals"/>
 			<dataarea name="flop" size="209408">
@@ -5016,7 +5016,7 @@
 	<software name="jeweldar">
 		<description>Jewels of Darkness</description>
 		<year>1986</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="jewels of darkness (1986)(rainbird).dsk" size="194816" crc="1b1a7650" sha1="da619ff04356ce9ae0f22cf0eeabe2dc39aa918e" offset="0" />
@@ -5028,7 +5028,7 @@
 	<software name="kidnafps">
 		<description>Kidnapped + For Pete's Sake</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Kidnapped"/>
 			<dataarea name="flop" size="195121">
@@ -5047,7 +5047,7 @@
 	<software name="konaccol">
 		<description>Konami's Arcade Collection</description>
 		<year>1988</year>
-		<publisher>Imagine</publisher>
+		<publisher>Imagine Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Disk 1, Side A: Shao-Lin's Road + Jail Break + Nemesis"/>
 			<dataarea name="flop" size="214784">
@@ -5097,7 +5097,7 @@
 	<software name="lotbdsks">
 		<description>Last of the Big Disks</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Kidnapped + Celtic Carnage + Personal Computer Whirled"/>
 			<dataarea name="flop" size="194816">
@@ -5198,7 +5198,7 @@
 	<software name="loflaur1">
 		<description>Loads of Laurence Vol. 1</description>
 		<year>1996</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: There's a Bomb Under Parliament + The Mummy's Crypt"/>
 			<dataarea name="flop" size="194816">
@@ -5217,7 +5217,7 @@
 	<software name="loflaur2">
 		<description>Loads of Laurence Vol. 2</description>
 		<year>1996</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: The Golden Pyramid + Lost in Time + Meltdown"/>
 			<dataarea name="flop" size="194816">
@@ -5401,7 +5401,7 @@
 	<software name="micfmadp">
 		<description>Microfair Madness Plus</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -5476,7 +5476,7 @@
 	<software name="nopehiao">
 		<description>Nope Here's Another One</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Diarmid I + For Pete's Sake"/>
 			<dataarea name="flop" size="194816">
@@ -5495,7 +5495,7 @@
 	<software name="notanobd">
 		<description>Not Another Big Disk</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: The Fisher King + Darkest Road II - 'Twas a Time of Dread"/>
 			<dataarea name="flop" size="194816">
@@ -5514,7 +5514,7 @@
 	<software name="ohshiabd">
 		<description>Oh Sh1t Another Big Disk</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Project Nova + Arnold the Adventurer III"/>
 			<dataarea name="flop" size="194816">
@@ -5533,7 +5533,7 @@
 	<software name="onemorbd">
 		<description>One More Big Disk</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: The Violator of Voodoo + The Amulet of Darath + The Taxman Cometh"/>
 			<dataarea name="flop" size="194816">
@@ -5932,7 +5932,7 @@
 	<software name="probtlbd">
 		<description>Probably the Last Big Disk</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Perseus + The Final Demand"/>
 			<dataarea name="flop" size="194816">
@@ -5951,7 +5951,7 @@
 	<software name="prjnbote">
 		<description>Project Nova + Beginning of the End</description>
 		<year>19??</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Project Nova"/>
 			<dataarea name="flop" size="194816">
@@ -6037,7 +6037,7 @@
 	<software name="samuahos">
 		<description>Sam's Un-Excellent Adventure + The Hospital</description>
 		<year>1994</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="sam's un-excellent adventure + the hospital - sam's un-excellent adventure (1994)(zenobi).dsk" size="194816" crc="c4293106" sha1="de58f5aaa5be5a3af953068b179e9b8fb72377bd" offset="0" />
@@ -6061,7 +6061,7 @@
 	<software name="silicond">
 		<description>Silicon Dreams</description>
 		<year>1986</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -6167,7 +6167,7 @@
 	<software name="smallcol">
 		<description>A Small Collection of Hamster Droppings</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: The Life of a Lone Electron + The Quest for the Holy"/>
 			<dataarea name="flop" size="194816">
@@ -6260,7 +6260,7 @@
 	<software name="stillabd">
 		<description>Still Another Big Disk</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Darkest Road III - The Unborn One + Phoenix"/>
 			<dataarea name="flop" size="194816">
@@ -6279,7 +6279,7 @@
 	<software name="stilombd">
 		<description>Still One More Big Disk</description>
 		<year>19??</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: The Tears of the Moon + The Mines of Lithiad"/>
 			<dataarea name="flop" size="194816">
@@ -6298,7 +6298,7 @@
 	<software name="stufmabd">
 		<description>Stuff Me Another Big Disk</description>
 		<year>19??</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Aztec Assault + The Lost Twilight"/>
 			<dataarea name="flop" size="194816">
@@ -6454,7 +6454,7 @@
 	<software name="taxbills">
 		<description>Tax Bills</description>
 		<year>19??</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="tax bills - the taxman cometh + tax returns + the final demand (19xx)(zenobi).dsk" size="194816" crc="cc30a3da" sha1="fa056d97fdf52341229aab72d09d9396fc286a17" offset="0" />
@@ -6581,7 +6581,7 @@
 	<software name="travtals">
 		<description>Traveller's Tales</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Phoenix + The Violator of Voodoo"/>
 			<dataarea name="flop" size="194816">
@@ -6669,7 +6669,7 @@
 	<software name="whoopabd">
 		<description>Whoops Another Big Disk</description>
 		<year>1994</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Leopold the Minstrel"/>
 			<dataarea name="flop" size="194816">
@@ -6744,7 +6744,7 @@
 	<software name="yetanobd">
 		<description>Yet Another Big Disk</description>
 		<year>19??</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Agatha's Folly + Arnold the Adventurer"/>
 			<dataarea name="flop" size="194816">
@@ -6763,7 +6763,7 @@
 	<software name="yippombd">
 		<description>Yippee One More Big Disk</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Stranded + Out of the Limelight"/>
 			<dataarea name="flop" size="194816">
@@ -7178,7 +7178,7 @@
 	<software name="abadcrima" cloneof="abadcrim">
 		<description>La Abadia del Crimen (alt)</description>
 		<year>1988</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="191744">
 				<rom name="abadia del crimen, la (1988)(mcm)(es)[re-release].dsk" size="191744" crc="1052ece9" sha1="d94b16011f80428d49edb0af7dec4d73e13021f2" offset="0" />
@@ -7190,7 +7190,7 @@
 	<software name="afighter">
 		<description>Action Fighter</description>
 		<year>1989</year>
-		<publisher>Firebird</publisher>
+		<publisher>Firebird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="action fighter (1989)(firebird).dsk" size="194816" crc="2db88300" sha1="f8511df3b99924755ca52ec3f1b0ec175e18b7c4" offset="0" />
@@ -7316,7 +7316,7 @@
 	<software name="agathafo">
 		<description>Agatha's Folly</description>
 		<year>1989</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -7335,7 +7335,7 @@
 	<software name="agathafoa" cloneof="agathafo">
 		<description>Agatha's Folly (alt)</description>
 		<year>1989</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="agatha's folly (1989)(zenobi).dsk" size="194816" crc="6ac0d7e5" sha1="d8e2f4cc3c49087c14dd9b73996d17a2186f45fd" offset="0" />
@@ -7366,7 +7366,7 @@
 	<software name="alienres">
 		<description>Alien Research Centre</description>
 		<year>1990</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="alien research centre (1990)(zenobi).dsk" size="194816" crc="db2bc7a4" sha1="4c9aade94605af27eb7d50a82a00bc1053ce87b8" offset="0" />
@@ -7426,7 +7426,7 @@
 	<software name="allinada">
 		<description>All in a Day's Work</description>
 		<year>1996</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -7531,7 +7531,7 @@
 	<software name="amuldara">
 		<description>The Amulet of Darath</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="amulet of darath, the (1992)(zenobi).dsk" size="194816" crc="6c2d3b50" sha1="6fe5169df72e34a41e0ea557ae1c85540a4b8600" offset="0" />
@@ -7543,7 +7543,7 @@
 	<software name="apprenti">
 		<description>The Apprentice</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="apprentice, the (1993)(zenobi).dsk" size="194816" crc="86e40adc" sha1="f8b6f9a8fb83c9e004aeb9e84dd7989323adb2cb" offset="0" />
@@ -7555,7 +7555,7 @@
 	<software name="april7th">
 		<description>April 7th</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="april 7th (1992)(zenobi).dsk" size="194816" crc="f2ee2bd1" sha1="501de56a06afc02e13623eab143664754acd9248" offset="0" />
@@ -7603,7 +7603,7 @@
 	<software name="arkanoi2">
 		<description>Arkanoid - Revenge of Doh</description>
 		<year>1988</year>
-		<publisher>Imagine</publisher>
+		<publisher>Imagine Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="214784">
 				<rom name="arkanoid - revenge of doh (1988)(imagine)[aka arkanoid 2].dsk" size="214784" crc="e5dafb18" sha1="9e3d9552dd438d3a224ea19fc5e19730e1738bef" offset="0" />
@@ -7615,7 +7615,7 @@
 	<software name="arntadv3">
 		<description>Arnold the Adventurer III - This Time It's Personal</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="arnold the adventurer iii - this time it's personal (1992)(zenobi).dsk" size="194816" crc="c5159e2b" sha1="f1916459527b2f153849d05624cad97c3dd650f4" offset="0" />
@@ -7703,7 +7703,7 @@
 	<software name="aurascop">
 		<description>Aura-Scope</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="aura-scope (1991)(zenobi)[aka horrorscope][re-release].dsk" size="194816" crc="06e2ce3b" sha1="4da4ad217593a8e6301bc2800a2a836bd7417ea1" offset="0" />
@@ -7783,7 +7783,7 @@
 	<software name="aztcaslt">
 		<description>Aztec Assault</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="aztec assault (1992)(zenobi).dsk" size="194816" crc="9c23191d" sha1="d6ae6a418a37a5467e2c3ff969f5e1aeeb2e6a61" offset="0" />
@@ -7845,7 +7845,7 @@
 	<software name="baddudes">
 		<description>Bad Dudes vs. Dragon Ninja</description>
 		<year>1988</year>
-		<publisher>Imagine</publisher>
+		<publisher>Imagine Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="144896">
 				<rom name="bad dudes vs. dragon ninja (1988)(imagine).dsk" size="144896" crc="62c50d95" sha1="bc00cd74d7ef98d43ca9bfafe4edbea825d30c0c" offset="0" />
@@ -7870,7 +7870,7 @@
 	<software name="balrgcat">
 		<description>The Balrog and the Cat</description>
 		<year>1988</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="balrog and the cat, the (1988)(zenobi).dsk" size="194816" crc="646814a2" sha1="3548ee10ccc4a77ebc96b5b79c037aac85d475ce" offset="0" />
@@ -7949,7 +7949,7 @@
 	<software name="bardrite">
 		<description>The Bardic Rites</description>
 		<year>1994</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="bardic rites, the (1994)(zenobi).dsk" size="194816" crc="99c8df43" sha1="627fd79979146655854164c8b20165ef9f2045aa" offset="0" />
@@ -8045,7 +8045,7 @@
 	<software name="thebeast">
 		<description>The Beast</description>
 		<year>1988</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="beast, the (1988)(zenobi)[re-release].dsk" size="194816" crc="33cc73f0" sha1="747f285b901f388aed5dd547cf5cc2740833d50b" offset="0" />
@@ -8081,7 +8081,7 @@
 	<software name="begotend">
 		<description>The Beginning of the End</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="beginning of the end, the (1992)(zenobi).dsk" size="194816" crc="d7513346" sha1="61c9b420a52fa920374b9f2ac7b326ed6bc1c8ed" offset="0" />
@@ -8093,7 +8093,7 @@
 	<software name="behclod4">
 		<description>Behind Closed Doors 4 - Balrog's Day Out</description>
 		<year>1989</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="behind closed doors 4 - balrog's day out (1989)(zenobi).dsk" size="194816" crc="dc5066f6" sha1="500d838a4327e72ef829c31b31fedb755cba4a5c" offset="0" />
@@ -8105,7 +8105,7 @@
 	<software name="bermtria">
 		<description>The Bermuda Triangle</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="bermuda triangle, the (1991)(zenobi).dsk" size="194816" crc="1f56095c" sha1="8515f73018bccab506daaae8274ca394eda9c8b5" offset="0" />
@@ -8184,7 +8184,7 @@
 	<software name="bticepalsp" cloneof="bticepal">
 		<description>Beyond the Ice Palace (Spa)</description>
 		<year>1988</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="beyond the ice palace (1988)(mcm)(es)(en)[re-release].dsk" size="194816" crc="a547670b" sha1="cde06121712e3beeeb1faca842a1731f2dab850b" offset="0" />
@@ -8208,7 +8208,7 @@
 	<software name="blacklam">
 		<description>Black Lamp</description>
 		<year>1988</year>
-		<publisher>Firebird</publisher>
+		<publisher>Firebird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="78080">
 				<rom name="black lamp (1988)(firebird).dsk" size="78080" crc="e90869b8" sha1="c98bc347c956d2b0ee2542fc07b171237a324ad5" offset="0" />
@@ -8220,7 +8220,7 @@
 	<software name="blacktwr">
 		<description>The Black Tower</description>
 		<year>1984</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="black tower, the (1984)(zenobi).dsk" size="194816" crc="d3b64e66" sha1="80f9a5b6eeafcc185019b818ac40e6786f57bef5" offset="0" />
@@ -8314,7 +8314,7 @@
 	<software name="boydfile">
 		<description>The Boyd File</description>
 		<year>1990</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="boyd file, the (1990)(zenobi).dsk" size="194816" crc="a10f7dcb" sha1="338836359459d8adfb54bd2c9e99bc683dad71db" offset="0" />
@@ -8338,7 +8338,7 @@
 	<software name="btnovbar">
 		<description>Brian - The Novice Barbarian</description>
 		<year>1994</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="brian - the novice barbarian (1994)(zenobi).dsk" size="194816" crc="5118b277" sha1="71138e6dd21e30728c1a388b1eaa25efbd93f8ff" offset="0" />
@@ -8374,7 +8374,7 @@
 	<software name="bublbobl">
 		<description>Bubble Bobble</description>
 		<year>1987</year>
-		<publisher>Firebird</publisher>
+		<publisher>Firebird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="78080">
 				<rom name="bubble bobble (1987)(firebird).dsk" size="78080" crc="ad820cf2" sha1="dc43630be33bdf4279d6cf51d2539b8a3e4ac768" offset="0" />
@@ -8459,7 +8459,7 @@
 	<software name="bugsy">
 		<description>Bugsy</description>
 		<year>1986</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="bugsy (1986)(zenobi)[re-release].dsk" size="194816" crc="60b11040" sha1="6d3744cec7aa20dda6d7edf7ad4420fed318b66e" offset="0" />
@@ -8642,7 +8642,7 @@
 	<software name="carrierca" cloneof="carrierc">
 		<description>Carrier Command (alt)</description>
 		<year>1989</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="carrier command (1989)(rainbird)[passworded].dsk" size="194816" crc="dc5836b6" sha1="834acdb689df5ce1fae378830fd40706176a1759" offset="0" />
@@ -8654,7 +8654,7 @@
 	<software name="cotbehsm">
 		<description>The Case of the Beheaded Smuggler</description>
 		<year>1988</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="case of the beheaded smuggler, the (1988)(zenobi)[re-release].dsk" size="194816" crc="b6283daf" sha1="ae1fdb8f733286d58242c872fa43a48d6dd2c2e3" offset="0" />
@@ -8762,7 +8762,7 @@
 	<software name="celtcarn">
 		<description>Celtic Carnage</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="celtic carnage (1993)(zenobi).dsk" size="194816" crc="505f7fca" sha1="f902367330bcfe90564404a3ec640a79aaf1dda3" offset="0" />
@@ -8774,7 +8774,7 @@
 	<software name="chainrea">
 		<description>Chain Reaction</description>
 		<year>1987</year>
-		<publisher>Durell</publisher>
+		<publisher>Durell Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="chain reaction (1987)(durell).dsk" size="194816" crc="37f5a6d9" sha1="237922f83435be87ec93ca2eedcd1ae10c7304a5" offset="0" />
@@ -9024,7 +9024,7 @@
 	<software name="tcitadel">
 		<description>The Citadel</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="citadel, the (1995)(zenobi).dsk" size="194816" crc="274ae290" sha1="8aed7e6ae7cb69e11e6cd2f44bc1c6bc6d02c5f7" offset="0" />
@@ -9036,7 +9036,7 @@
 	<software name="civlsrv2">
 		<description>Civil Service II</description>
 		<year>1994</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="civil service ii (1994)(zenobi).dsk" size="194816" crc="88ecdb07" sha1="0a9aa0bbd6122edde9c9bce9303583b6a98be283" offset="0" />
@@ -9072,7 +9072,7 @@
 	<software name="cloud99">
 		<description>Cloud 99</description>
 		<year>1988</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="cloud 99 (1988)(zenobi)[re-release].dsk" size="194816" crc="5842de80" sha1="b454e12a32543825a6c593dc68dd9a2b8654d567" offset="0" />
@@ -9202,7 +9202,7 @@
 	<software name="corpston">
 		<description>Corporal Stone</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="corporal stone (1992)(zenobi).dsk" size="194816" crc="8b578a60" sha1="ef6d6a69d6d953b73ca780e370aec12cd99373f8" offset="0" />
@@ -9215,7 +9215,7 @@
 	<software name="corruptna" cloneof="corruptn">
 		<description>Corruption (alt)</description>
 		<year>1988</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="corruption (1988)(rainbird).dsk" size="194816" crc="1dc27c17" sha1="3fd52b22960c0285472a7e87ea6a9fdb5684ee82" offset="0" />
@@ -9228,7 +9228,7 @@
 	<software name="corruptnb" cloneof="corruptn">
 		<description>Corruption (alt 2)</description>
 		<year>1988</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="corruption (1988)(rainbird)[a].dsk" size="194816" crc="4e60b833" sha1="cdf95bb26eb4d5e0baec7838cfca832936cc7540" offset="0" />
@@ -9241,7 +9241,7 @@
 	<software name="corruptnc" cloneof="corruptn">
 		<description>Corruption (alt 3)</description>
 		<year>1988</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="corruption (1988)(rainbird)[a2].dsk" size="194816" crc="e7e5feaf" sha1="94b0b7203a9478ec7e232677a902cb90ec4abbdd" offset="0" />
@@ -9265,7 +9265,7 @@
 	<software name="crackcty">
 		<description>Crack City</description>
 		<year>1989</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="crack city (1989)(zenobi).dsk" size="194816" crc="e4ef29e9" sha1="1b8d94c8adb69ec1f963d6fddd49f43947a46afb" offset="0" />
@@ -9337,7 +9337,7 @@
 	<software name="crystkin">
 		<description>Crystals of Kings</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="crystals of kings (1993)(zenobi).dsk" size="194816" crc="6fa4745e" sha1="4e0ce417dee743183886bce9ccc4f3c2d3fe72f9" offset="0" />
@@ -9361,7 +9361,7 @@
 	<software name="cursnimu">
 		<description>The Curse of Nimue</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="curse of nimue, the (1995)(zenobi).dsk" size="194816" crc="77db9af2" sha1="ffc3cc67bf86dc4091bd600443e615dbeaee3aea" offset="0" />
@@ -9541,7 +9541,7 @@
 	<software name="darktowr">
 		<description>The Dark Tower</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="204544">
 				<rom name="dark tower, the (1992)(zenobi)[re-release].dsk" size="204544" crc="57131a03" sha1="58f8bd782f144bd7f15e07b6f9240f3c06a936c1" offset="0" />
@@ -9553,7 +9553,7 @@
 	<software name="darkstro">
 		<description>The Darkest Road</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="darkest road, the (1991)(zenobi).dsk" size="194816" crc="9226b17e" sha1="dd2517993b61100372798225c63869462dfcb99c" offset="0" />
@@ -9613,7 +9613,7 @@
 	<software name="deeksdee">
 		<description>Deek's Deeds</description>
 		<year>1990</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="deek's deeds (1990)(zenobi)[re-release].dsk" size="194816" crc="b5ba9c79" sha1="c8bc7bcf561c44daab22a75662ddc69e25b08e80" offset="0" />
@@ -9675,7 +9675,7 @@
 	<software name="diarmid">
 		<description>Diarmid</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="diarmid (1993)(zenobi).dsk" size="194816" crc="4b08234a" sha1="173e145e0bbe47764618022be5edcb632dc6cefe" offset="0" />
@@ -9699,7 +9699,7 @@
 	<software name="dogboy">
 		<description>The Dogboy</description>
 		<year>1985</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="dogboy, the (1985)(zenobi)[re-release].dsk" size="194816" crc="b7f4582c" sha1="40828308aa82e7208c4d154ace4b79a861c3a0c1" offset="0" />
@@ -9711,7 +9711,7 @@
 	<software name="dominatrsp" cloneof="dominatr">
 		<description>Dominator (Spa)</description>
 		<year>1989</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="121856">
 				<rom name="dominator (1989)(mcm)(es)(en)[re-release].dsk" size="121856" crc="0ca1868a" sha1="dc6d54da26a5271340910aa52a76d49dc67216bd" offset="0" />
@@ -9724,7 +9724,7 @@
 	<software name="dominatra" cloneof="dominatr">
 		<description>Dominator (alt)</description>
 		<year>1989</year>
-		<publisher>System 3</publisher>
+		<publisher>System 3 Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234752">
 				<rom name="dominator (1989)(system 3).dsk" size="234752" crc="a8475699" sha1="fc39aa181b7db27aa0a92a0458f54e75fe610ede" offset="0" />
@@ -9793,7 +9793,7 @@
 	<software name="drjekyll">
 		<description>Dr. Jekyll and Mr. Hyde (master disk)</description>
 		<year>1988</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -9824,7 +9824,7 @@
 	<software name="dragnque">
 		<description>Dragon-Quest</description>
 		<year>1994</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="dragon-quest (1994)(zenobi).dsk" size="194816" crc="74097eb9" sha1="7cb723772404ec52399aab549ca2324877a75cad" offset="0" />
@@ -9896,7 +9896,7 @@
 	<software name="dungromp">
 		<description>A Dungeon Romp</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="dungeon romp, a (1995)(zenobi).dsk" size="194816" crc="3e99350f" sha1="4db3b696c9659c060ed51eb658e97b06a79f92ba" offset="0" />
@@ -9908,7 +9908,7 @@
 	<software name="dungmald">
 		<description>The Dungeons of Maldread</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="dungeons of maldread, the (1995)(zenobi).dsk" size="194816" crc="f83f9881" sha1="50d3747b5e45bba24e92054525efc41a855f4b6d" offset="0" />
@@ -10005,7 +10005,7 @@
 	<software name="elfinwar">
 		<description>The Elfin Wars</description>
 		<year>1994</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="elfin wars, the (1994)(zenobi).dsk" size="194816" crc="026b892b" sha1="49b9412ac4e400ae53a1dbcef4f7c6c977880f6b" offset="0" />
@@ -10017,7 +10017,7 @@
 	<software name="elfindor">
 		<description>Elfindor</description>
 		<year>1989</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="elfindor (1989)(zenobi)[re-release].dsk" size="194816" crc="3d6b222f" sha1="75a57b2af4042253332808a1298f5e8174e95227" offset="0" />
@@ -10041,7 +10041,7 @@
 	<software name="ellisndi">
 		<description>The Ellisnore Diamond</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="ellisnore diamond, the (1992)(zenobi)[re-release].dsk" size="194816" crc="ee8934c6" sha1="3947b2c10415643d432e905ffca736aaf1142511" offset="0" />
@@ -10053,7 +10053,7 @@
 	<software name="emeraelf">
 		<description>The Emerald Elf</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="emerald elf, the (1995)(zenobi).dsk" size="194816" crc="95eaa5a9" sha1="38c565f37d17a6235f3db1d0e1bfcd06377baaca" offset="0" />
@@ -10113,7 +10113,7 @@
 	<software name="emlynhug">
 		<description>Emlyn Hughes International Soccer</description>
 		<year>1989</year>
-		<publisher>Audiogenic</publisher>
+		<publisher>Audiogenic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="emlyn hughes international soccer (1989)(audiogenic).dsk" size="194816" crc="ebc0e76c" sha1="594526e9c2f40bdddd11c7f8a0d9ed4455d66377" offset="0" />
@@ -10137,7 +10137,7 @@
 	<software name="endisnig">
 		<description>The End Is Nigh</description>
 		<year>1994</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="196096">
 				<rom name="end is nigh, the (1994)(zenobi).dsk" size="196096" crc="48e73904" sha1="23e85f5830bcc3cdfbfd385a80e2f4d7351c50fd" offset="0" />
@@ -10162,7 +10162,7 @@
 	<software name="efhodkma">
 		<description>The Escape from Hodgkins' Manor</description>
 		<year>1990</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="escape from hodgkins' manor, the (1990)(zenobi).dsk" size="194816" crc="4943ed9f" sha1="d2fa28b6de2422860bba3c76ec24119b2ab791fa" offset="0" />
@@ -10174,7 +10174,7 @@
 	<software name="eschabit">
 		<description>The Escaping Habit</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="escaping habit, the (1992)(zenobi).dsk" size="194816" crc="8083eba9" sha1="9e74c50b00acc63c9a93a68f275924b21e9fbd50" offset="0" />
@@ -10354,7 +10354,7 @@
 	<software name="finalch4">
 		<description>The Final Chorus v4</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="final chorus, the v4 (1995)(zenobi).dsk" size="194816" crc="d08b9197" sha1="1e468dc36387e0bd1e0dd940f1a789a92176fd30" offset="0" />
@@ -10366,7 +10366,7 @@
 	<software name="findeman">
 		<description>The Final Demand</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="final demand, the (1993)(zenobi).dsk" size="194816" crc="a40709ef" sha1="4c5f3188c56403299a939e0f2f2d851ab45fb0e3" offset="0" />
@@ -10424,7 +10424,7 @@
 	<software name="fisha" cloneof="fish">
 		<description>Fish! (alt)</description>
 		<year>1989</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="195072">
 				<rom name="fish (1989)(rainbird).dsk" size="195072" crc="9b110b8c" sha1="fb2313141dda5289a12b40cd91a12ac271f763bc" offset="0" />
@@ -10436,7 +10436,7 @@
 	<software name="fishv103">
 		<description>Fish v1.03</description>
 		<year>1989</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="fish v1.03 (1989)(rainbird).dsk" size="194816" crc="367d44c8" sha1="a51b0cdefaffeae1d905be7f43af9a9bd3f60db7" offset="0" />
@@ -10448,7 +10448,7 @@
 	<software name="fishrkin">
 		<description>The Fisher King</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="fisher king, the (1991)(zenobi).dsk" size="194816" crc="59f46ec1" sha1="e845c6a90def997cf23b21ad2f8778d017a699f2" offset="0" />
@@ -10460,7 +10460,7 @@
 	<software name="ffonecro">
 		<description>A Fistful of Necronomicons</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="fistful of necronomicons, a (1995)(zenobi).dsk" size="194816" crc="9708f9dc" sha1="017585b35183a3b34251598ba3bd487fa79209ee" offset="0" />
@@ -10472,7 +10472,7 @@
 	<software name="flameout">
 		<description>Flameout</description>
 		<year>1994</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="flameout (1994)(zenobi).dsk" size="194816" crc="7fe10b1b" sha1="7b9682942393ab38974f9fa92580685c639f34af" offset="0" />
@@ -10541,7 +10541,7 @@
 	<software name="forpetes">
 		<description>For Pete's Sake</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="for pete's sake (1993)(zenobi).dsk" size="194816" crc="2013dbe6" sha1="d2cd15437ebda07e9e40708c4847b9e61636583a" offset="0" />
@@ -10705,7 +10705,7 @@
 	<software name="gwoaname">
 		<description>Game Without a Name</description>
 		<year>1987</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="game without a name (1987)(zenobi)[re-release].dsk" size="194816" crc="def2f93d" sha1="5638e013a70b850ba3d99cb96149f40b9db49b7d" offset="0" />
@@ -10977,7 +10977,7 @@
 	<software name="godsowar">
 		<description>The Gods of War</description>
 		<year>1987</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="gods of war, the (1987)(zenobi)[re-release].dsk" size="194816" crc="5f17551f" sha1="323f1944464f40f6f3d3c71f3325720f976cee81" offset="0" />
@@ -10989,7 +10989,7 @@
 	<software name="goldnaxesp" cloneof="goldnaxe">
 		<description>Golden Axe (Spa)</description>
 		<year>1990</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="165888">
@@ -11039,7 +11039,7 @@
 	<software name="goldlock">
 		<description>The Golden Locket</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="golden locket, the (1993)(zenobi)[re-release].dsk" size="194816" crc="53843bdd" sha1="607631dea927f5e00fba2818e0f5b795e954fe9e" offset="0" />
@@ -11051,7 +11051,7 @@
 	<software name="goldpyra">
 		<description>The Golden Pyramid</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="golden pyramid, the (1991)(zenobi).dsk" size="194816" crc="bedb25dc" sha1="706f7604eac2baeb15ebdfef25c631c1dd82ecdd" offset="0" />
@@ -11063,7 +11063,7 @@
 	<software name="gswobhak">
 		<description>The Golden Sword of Bhakhor</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="golden sword of bhakhor, the (1991)(zenobi).dsk" size="194816" crc="d02d944a" sha1="6b4eb8e54dcd781f04d7c37e6198bb60fb75ed79" offset="0" />
@@ -11124,7 +11124,7 @@
 	<software name="gwar">
 		<description>Guerrilla War - Hail the Heroes</description>
 		<year>1988</year>
-		<publisher>Imagine</publisher>
+		<publisher>Imagine Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="134144">
 				<rom name="guerrilla war - hail the heroes (1988)(imagine).dsk" size="134144" crc="58d62d43" sha1="e17740a5fe4fd6468f9d107229bf252d94f3ef45" offset="0" />
@@ -11136,7 +11136,7 @@
 	<software name="guilthie">
 		<description>The Guild of Thieves</description>
 		<year>1988</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -11155,7 +11155,7 @@
 	<software name="guilthiea" cloneof="guilthie">
 		<description>The Guild of Thieves (alt)</description>
 		<year>1988</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="guild of thieves, the (1988)(rainbird)(side a)[a].dsk" size="194816" crc="7832e385" sha1="a4c37a58156b5b957be5aefb9aaf0878c39f1123" offset="0" />
@@ -11461,7 +11461,7 @@
 	<software name="hidnseek">
 		<description>Hide and Seek</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="hide and seek (1995)(zenobi)[re-release].dsk" size="194816" crc="a7b8a803" sha1="ee73f444d4637195c7272ea392dd174e534e0413" offset="0" />
@@ -11473,7 +11473,7 @@
 	<software name="hobshoar">
 		<description>Hob's Hoard</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="hob's hoard (1991)(zenobi).dsk" size="194816" crc="beca6e53" sha1="9b7f1c131bbab3b588a79667f06930535d0e47e8" offset="0" />
@@ -11547,7 +11547,7 @@
 	<software name="houseott">
 		<description>The House on the Tor</description>
 		<year>1990</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="house on the tor, the (1990)(zenobi).dsk" size="194816" crc="a29246d9" sha1="49b35455d6747345933cefac220fe46fdd6cb76e" offset="0" />
@@ -11559,7 +11559,7 @@
 	<software name="thehouse">
 		<description>The House</description>
 		<year>1994</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="house, the (1994)(zenobi).dsk" size="194816" crc="ce8ac110" sha1="56edf0e0151b87a7bf0e559638373a92a9c99496" offset="0" />
@@ -11644,7 +11644,7 @@
 	<software name="impact">
 		<description>Impact</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="impact (1992)(zenobi).dsk" size="194816" crc="596680d7" sha1="8b834a5283f06b3d14bd70e3ba7d5aa82b5378db" offset="0" />
@@ -11792,7 +11792,7 @@
 	<software name="inkarate">
 		<description>International Karate</description>
 		<year>1985</year>
-		<publisher>System 3</publisher>
+		<publisher>System 3 Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="international karate (1985)(system 3).dsk" size="194816" crc="7321dcb7" sha1="85b8c729932f58e096a6d7dcbcb0441ea1162c6e" offset="0" />
@@ -11937,7 +11937,7 @@
 	<software name="jadeston">
 		<description>The Jade Stone</description>
 		<year>1987</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -11956,7 +11956,7 @@
 	<software name="jadestona" cloneof="jadeston">>
 		<description>The Jade Stone (alt)</description>
 		<year>1987</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="jade stone, the (1987)(zenobi)[re-release].dsk" size="194816" crc="49966c26" sha1="9b58a66a9733afc97b9313279e90084436b9ef1d" offset="0" />
@@ -12000,7 +12000,7 @@
 	<software name="jesterqu">
 		<description>Jester Quest</description>
 		<year>1988</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="jester quest (1988)(zenobi)[re-release].dsk" size="194816" crc="3503d839" sha1="c01d6ed8687c2ef51470e8ac0993f18be847bd4f" offset="0" />
@@ -12012,7 +12012,7 @@
 	<software name="jbikesim">
 		<description>Jet Bike Simulator</description>
 		<year>1989</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="208384">
@@ -12043,7 +12043,7 @@
 	<software name="jinxter">
 		<description>Jinxter</description>
 		<year>1988</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="jinxter (1988)(rainbird).dsk" size="194816" crc="845679ed" sha1="81abfa5dc7aaba651416e4cd3e608a35efcb6003" offset="0" />
@@ -12055,7 +12055,7 @@
 	<software name="jinxtera" cloneof="jinxter">
 		<description>Jinxter (alt)</description>
 		<year>1988</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="jinxter (1988)(rainbird)[a].dsk" size="194816" crc="7e71fb55" sha1="46d026205cec35b7852096ae05a7b7921d14f947" offset="0" />
@@ -12111,7 +12111,7 @@
 	<software name="khangpla">
 		<description>The Khangrin Plans</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="khangrin plans, the (1992)(zenobi).dsk" size="194816" crc="775b884f" sha1="669b305e0c2dfde4b27b5141c620dbc7dd3b9a67" offset="0" />
@@ -12167,7 +12167,7 @@
 	<software name="kidnappe">
 		<description>Kidnapped</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="kidnapped (1993)(zenobi).dsk" size="194816" crc="81158672" sha1="cde1ce0687c59de52c7e7ea040d948f8e9fd5ebd" offset="0" />
@@ -12191,7 +12191,7 @@
 	<software name="kniglife">
 		<description>Knight Life</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="knight life (1995)(zenobi)[re-release].dsk" size="194816" crc="475d8674" sha1="d70a7c9754461ed5f00c53d64c77aea49e8a26dd" offset="0" />
@@ -12203,7 +12203,7 @@
 	<software name="knigorc2">
 		<description>Knight Orc v2</description>
 		<year>1987</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -12222,7 +12222,7 @@
 	<software name="kobyaak">
 		<description>Kobyashi Ag'Kwo - A Return to Naru</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="kobyashi ag'kwo - a return to naru (1991)(zenobi).dsk" size="194816" crc="c2fe764f" sha1="b7bb825691f738fc86ec3c7fb5439135abb699f0" offset="0" />
@@ -12234,7 +12234,7 @@
 	<software name="kobyanar">
 		<description>Kobyashi Naru</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="kobyashi naru (1992)(zenobi).dsk" size="194816" crc="36838f89" sha1="f565893ae4bf1f6624ab01684a662cd9e6561d43" offset="0" />
@@ -12246,7 +12246,7 @@
 	<software name="krazykar">
 		<description>The Krazy Kartoonist Kaper</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="krazy kartoonist kaper, the (1991)(zenobi)[re-release].dsk" size="194816" crc="2b788d74" sha1="09959def47b5983c292933bf5c5cf3cb7e0ffc1a" offset="0" />
@@ -12294,7 +12294,7 @@
 	<software name="labopain">
 		<description>Labour Pains</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="labour pains (1995)(zenobi).dsk" size="194816" crc="738366d9" sha1="898a86b4d51470078c0ef6972da6b4b8c6df1aff" offset="0" />
@@ -12306,7 +12306,7 @@
 	<software name="laboherc">
 		<description>The Labours of Hercules</description>
 		<year>1987</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="labours of hercules, the (1987)(zenobi)[re-release].dsk" size="194816" crc="227a46ce" sha1="6df89841500cb7804beb566fd8cd77f0c6370cb4" offset="0" />
@@ -12337,7 +12337,7 @@
 	<software name="laskretu">
 		<description>Laskar's Return</description>
 		<year>1996</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="laskar's return (1996)(zenobi).dsk" size="194816" crc="fcd56503" sha1="da7c6830dd2e0b8868eab0c6f48b8b70eccec6be" offset="0" />
@@ -12386,7 +12386,7 @@
 	<software name="legalami">
 		<description>A Legacy for Alaric - The Magic Isle</description>
 		<year>1989</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="legacy for alaric, a - the magic isle (1989)(zenobi).dsk" size="194816" crc="eee4511d" sha1="2c9509a694c1522b7654b7666ee340053d5ce275" offset="0" />
@@ -12485,7 +12485,7 @@
 	<software name="lightmar">
 		<description>Lightmare</description>
 		<year>1989</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="lightmare (1989)(zenobi)[re-release].dsk" size="194816" crc="7fab0f98" sha1="6f75150a0a570d0b9f3685682f141068837507b0" offset="0" />
@@ -12497,7 +12497,7 @@
 	<software name="litwangu">
 		<description>Little Wandering Guru</description>
 		<year>1990</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="little wandering guru (1990)(zenobi).dsk" size="194816" crc="d67fd30b" sha1="be5524083666238d46f6cfc63676e6257c0d3b38" offset="0" />
@@ -12534,7 +12534,7 @@
 	<software name="lonewolfa" cloneof="lonewolf">
 		<description>Lone Wolf - The Mirror of Death (alt)</description>
 		<year>1991</year>
-		<publisher>Audiogenic</publisher>
+		<publisher>Audiogenic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="lone wolf - the mirror of death (1991)(audiogenic)[aka lone wolf 3].dsk" size="194816" crc="f3f5dfe2" sha1="6545eabf78d4dfda9381864c30680cd49d06fce0" offset="0" />
@@ -12546,7 +12546,7 @@
 	<software name="looseend">
 		<description>Loose Ends</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="loose ends (1995)(zenobi).dsk" size="194816" crc="ff20dd56" sha1="e700e95fd910e4d3879cad07d85785433da7fe78" offset="0" />
@@ -12582,7 +12582,7 @@
 	<software name="losttwil">
 		<description>The Lost Twilight</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="lost twilight, the (1992)(zenobi).dsk" size="194816" crc="30650533" sha1="8027860047eb4930e2fdf038d9afc0e292ab9f6b" offset="0" />
@@ -12594,7 +12594,7 @@
 	<software name="lostinti">
 		<description>Lost in Time</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="lost in time (1993)(zenobi).dsk" size="194816" crc="880e6526" sha1="024adaa12a5ec729a38a889369115c00197257f4" offset="0" />
@@ -12711,7 +12711,7 @@
 	<software name="manabtho">
 		<description>Man About the House</description>
 		<year>1994</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="195584">
 				<rom name="man about the house (1994)(zenobi).dsk" size="195584" crc="228ce391" sha1="13c4903dcb060c867f5ecf4e47148e100e361891" offset="0" />
@@ -12754,7 +12754,7 @@
 	<software name="themappe">
 		<description>The Mapper</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="mapper, the (1992)(zenobi).dsk" size="194816" crc="5a054203" sha1="1242f4424b6dafa9818a7a95260600a349525161" offset="0" />
@@ -12859,7 +12859,7 @@
 	<software name="meltdown">
 		<description>Meltdown</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="meltdown (1993)(zenobi).dsk" size="194816" crc="79e96439" sha1="67bfe6fe8124d9ab64c2c2eec27c663b1ba1a0fb" offset="0" />
@@ -13053,7 +13053,7 @@
 	<software name="mineslit">
 		<description>The Mines of Lithiad</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="mines of lithiad, the (1992)(zenobi).dsk" size="194816" crc="ef26827d" sha1="1d8816a4efb4110804144d6bc8c01e30f40e4a6d" offset="0" />
@@ -13065,7 +13065,7 @@
 	<software name="themiser">
 		<description>The Miser</description>
 		<year>1990</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="miser, the (1990)(zenobi)[re-release].dsk" size="194816" crc="e6047e88" sha1="8a0ffb19d6d945069f1c81e2bed5d542d9f3242f" offset="0" />
@@ -13176,7 +13176,7 @@
 	<software name="mrheli">
 		<description>Mr. Heli</description>
 		<year>1989</year>
-		<publisher>Firebird</publisher>
+		<publisher>Firebird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="mr. heli (1989)(firebird).dsk" size="194816" crc="90d80eb1" sha1="b8564ca8d32e8148b8383c2d2438d82557f67d2b" offset="0" />
@@ -13188,7 +13188,7 @@
 	<software name="mumcry21">
 		<description>The Mummy's Crypt v2.1</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="mummy's crypt, the v2.1 (1992)(zenobi)[re-release].dsk" size="194816" crc="608ab573" sha1="9548ee0a3a2d4fb3f838bb8578fa817f1069da2b" offset="0" />
@@ -13248,7 +13248,7 @@
 	<software name="murdhesa">
 		<description>Murder - He Said</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="murder - he said (1993)(zenobi).dsk" size="194816" crc="80b24b05" sha1="221d3290ca81d52fae54f265f33ba8d346265166" offset="0" />
@@ -13260,7 +13260,7 @@
 	<software name="murdhunt">
 		<description>Murder Hunt</description>
 		<year>1989</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="murder hunt (1989)(zenobi)[re-release].dsk" size="194816" crc="ac1eb412" sha1="9ee6625ae921fab337c1b6ab840791ba9be75a66" offset="0" />
@@ -13272,7 +13272,7 @@
 	<software name="murdhun2">
 		<description>Murder Hunt II</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="murder hunt ii (1992)(zenobi).dsk" size="194816" crc="4e8c8f76" sha1="71d1d2a16d069072589ac7dc2017972495f0c4ff" offset="0" />
@@ -13284,7 +13284,7 @@
 	<software name="mutiny">
 		<description>Mutiny</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -13559,7 +13559,7 @@
 	<software name="normlame">
 		<description>Norman's Lament</description>
 		<year>1990</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="norman's lament (1990)(zenobi).dsk" size="194816" crc="5320aa7a" sha1="dd3a9d5b8fe0191ecc0374fc52dbec2cc1ee992a" offset="0" />
@@ -13684,7 +13684,7 @@
 	<software name="ooowomim">
 		<description>One of our Wombats is Missing</description>
 		<year>1990</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -13789,7 +13789,7 @@
 	<software name="opprland">
 		<description>The Oppressed Land</description>
 		<year>1990</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="oppressed land, the (1990)(zenobi).dsk" size="194816" crc="784f03dc" sha1="fbbdf6f40860d13f6dbb0f3f88d1d04fda9c85dd" offset="0" />
@@ -13801,7 +13801,7 @@
 	<software name="origamessp" cloneof="origames">
 		<description>Oriental Games (Spa)</description>
 		<year>1990</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="73216">
@@ -13858,7 +13858,7 @@
 	<software name="ootlimel">
 		<description>Out of the Limelight</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="out of the limelight (1992)(zenobi).dsk" size="194816" crc="af5dd72d" sha1="665105700b8b92575304ac6a0a7affeee3bbe072" offset="0" />
@@ -13882,7 +13882,7 @@
 	<software name="overlandsp" cloneof="overland">
 		<description>Overlander (Spa)</description>
 		<year>1988</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="overlander (1988)(mcm)(es)(en)[re-release].dsk" size="194816" crc="fd817c95" sha1="8fe3b288a4451eeea76aa0ec95200e9478e49a4c" offset="0" />
@@ -13895,7 +13895,7 @@
 	<software name="p47thuna" cloneof="p47thun">>
 		<description>P-47 Thunderbolt (alt)</description>
 		<year>1990</year>
-		<publisher>Firebird</publisher>
+		<publisher>Firebird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="p-47 thunderbolt (1990)(firebird)[aka p-47 - the freedom fighter].dsk" size="194816" crc="ff20e266" sha1="85b1597808079780bca508d5ecb4cc950c168fe3" offset="0" />
@@ -14013,7 +14013,7 @@
 	<software name="passshtsp" cloneof="passsht">
 		<description>Passing Shot (Spa)</description>
 		<year>1989</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="passing shot (1989)(mcm)(es)(en)[re-release].dsk" size="194816" crc="41e3ce91" sha1="ddcbdf011275f3d1dcb456f6208f7aec4a75e2b0" offset="0" />
@@ -14026,7 +14026,7 @@
 	<software name="pawn" cloneof="pawn">
 		<description>The Pawn v2.4 (alt)</description>
 		<year>1987</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="pawn, the v2.4 (1987)(rainbird).dsk" size="194816" crc="fdb74ece" sha1="3f96becbf552b207213bdabd950e6ea752b7d8ca" offset="0" />
@@ -14039,7 +14039,7 @@
 	<software name="pawn" cloneof="pawn">
 		<description>The Pawn v2.4 (alt 2)</description>
 		<year>1987</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="pawn, the v2.4 (1987)(rainbird)[a].dsk" size="194816" crc="0790cc76" sha1="17cecc0a0c3c0fa4f081267b45db375e4fb3a3d5" offset="0" />
@@ -14051,7 +14051,7 @@
 	<software name="powthein">
 		<description>Pawns of War - The Infiltrator</description>
 		<year>1989</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="pawns of war - the infiltrator (1989)(zenobi)[re-release].dsk" size="194816" crc="71814e63" sha1="7db46cb122021913544d9c483c2d78e3ba309298" offset="0" />
@@ -14063,7 +14063,7 @@
 	<software name="pendlogr">
 		<description>The Pendant of Logryn</description>
 		<year>1989</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="pendant of logryn, the (1989)(zenobi)[re-release].dsk" size="194816" crc="1ac9391d" sha1="3b4a421e912e37b3c8f3d8f225e29ea339434c4f" offset="0" />
@@ -14099,7 +14099,7 @@
 	<software name="perseus">
 		<description>Perseus</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="perseus (1993)(zenobi).dsk" size="194816" crc="5f5a500c" sha1="1f58f7f143ff2cf659ed3a2921e153a2c7d8ee0a" offset="0" />
@@ -14111,7 +14111,7 @@
 	<software name="pecompwi">
 		<description>Personal Computer Whirled</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="personal computer whirled (1992)(zenobi)[re-release].dsk" size="194816" crc="4b45d4c9" sha1="496c79dee580d91b07edf3f5bb5dee5f3735e57a" offset="0" />
@@ -14135,7 +14135,7 @@
 	<software name="phoenix">
 		<description>Phoenix</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="phoenix (1991)(zenobi).dsk" size="194816" crc="3b1dcbab" sha1="262d3728db62851bbf7a95fc33f0f9993d1567f1" offset="0" />
@@ -14266,7 +14266,7 @@
 	<software name="protenntsp" cloneof="protennt">>
 		<description>Pro Tennis Tour</description>
 		<year>1990</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="63488">
 				<rom name="pro tennis tour (1990)(mcm)(es)(en)[re-release].dsk" size="63488" crc="3cc76873" sha1="ac0fd453b2f00ef63477a25a43bd482a65b8cb84" offset="0" />
@@ -14303,7 +14303,7 @@
 	<software name="projnova">
 		<description>Project Nova</description>
 		<year>1987</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="project nova (1987)(zenobi)[re-release].dsk" size="194816" crc="430d1985" sha1="c065c33b861fd4882569407ae27b50c22784ab0e" offset="0" />
@@ -14365,7 +14365,7 @@
 	<software name="qholysmt">
 		<description>Quest for the Holy Something</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="quest for the holy something (1992)(zenobi).dsk" size="194816" crc="966cab79" sha1="c9d0e3a2c98c89251ad0bde5a6a1a60d5401bbf0" offset="0" />
@@ -14428,7 +14428,7 @@
 	<software name="radioman">
 		<description>Radiomania</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="radiomania (1991)(zenobi).dsk" size="194816" crc="74edb005" sha1="7226284e7a66c8ed8290046b0e44a0f3ffb89281" offset="0" />
@@ -14496,7 +14496,7 @@
 	<software name="bttf3sp" cloneof="bttf3">
 		<description>Regreso al Futuro - Parte III</description>
 		<year>1991</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -14516,7 +14516,7 @@
 	<software name="renegadea" cloneof="renegade">
 		<description>Renegade (alt)</description>
 		<year>1987</year>
-		<publisher>Imagine</publisher>
+		<publisher>Imagine Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="renegade (1987)(imagine).dsk" size="194816" crc="9414eedd" sha1="ea6ba8c9f8db52cd827cfbe7cb576cf746865de9" offset="0" />
@@ -14529,7 +14529,7 @@
 	<software name="renegadeb" cloneof="renegade">
 		<description>Renegade (alt 2)</description>
 		<year>1987</year>
-		<publisher>Imagine</publisher>
+		<publisher>Imagine Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="renegade (1987)(imagine)[a].dsk" size="194816" crc="bddac6b2" sha1="c4311ea7f5ee36a6b112299aaae107e4855adad9" offset="0" />
@@ -14634,7 +14634,7 @@
 	<software name="rhymecry">
 		<description>Rhyme Cryme</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -14653,7 +14653,7 @@
 	<software name="rickdang">
 		<description>Rick Dangerous</description>
 		<year>1989</year>
-		<publisher>Firebird</publisher>
+		<publisher>Firebird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="rick dangerous (1989)(firebird).dsk" size="194816" crc="23a903d9" sha1="4d216ea0e695d7cc931dd4cd6f5cc64350d20450" offset="0" />
@@ -14884,7 +14884,7 @@
 	<software name="runngman">
 		<description>The Running Man</description>
 		<year>1989</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="160768">
 				<rom name="running man, the (1989)(mcm)(es)(en)[re-release].dsk" size="160768" crc="502e531a" sha1="ca50672595b1f8da4ba1b614d761039b42b90f3a" offset="0" />
@@ -14908,7 +14908,7 @@
 	<software name="saboteu2">
 		<description>Saboteur II - Avenging Angel</description>
 		<year>1987</year>
-		<publisher>Durell</publisher>
+		<publisher>Durell Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="saboteur ii - avenging angel (1987)(durell)[h alex rider, 2015][tr pl][speed-up version].dsk" size="194816" crc="4c9b8d3d" sha1="7ed014dadff63cedd9ea6744793b76af8782611b" offset="0" />
@@ -14933,7 +14933,7 @@
 	<software name="salamand">
 		<description>Salamander</description>
 		<year>1987</year>
-		<publisher>Imagine</publisher>
+		<publisher>Imagine Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="70656">
 				<rom name="salamander (1987)(imagine)[re-release].dsk" size="70656" crc="62bfd974" sha1="fc4bc578c463f58a023c716f7df679afb8cb253e" offset="0" />
@@ -14945,7 +14945,7 @@
 	<software name="usagiyoj">
 		<description>Samurai Warrior - The Battles of... Usagi Yojimbo</description>
 		<year>1988</year>
-		<publisher>Firebird</publisher>
+		<publisher>Firebird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="73216">
 				<rom name="samurai warrior - the battles of... usagi yojimbo (1988)(firebird)[aka battle of... usagi yojimbo, the].dsk" size="73216" crc="fa8df0ac" sha1="ef854f176c30934d1309982322f983194ae60153" offset="0" />
@@ -15051,7 +15051,7 @@
 	<software name="seasorce">
 		<description>Seaside Sorcery</description>
 		<year>1997</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="seaside sorcery (1997)(zenobi).dsk" size="194816" crc="f58ff9dc" sha1="5ad5d43bfb5c7ec4e763a03317c85698e889b905" offset="0" />
@@ -15075,7 +15075,7 @@
 	<software name="sentinel">
 		<description>The Sentinel</description>
 		<year>1987</year>
-		<publisher>Firebird</publisher>
+		<publisher>Firebird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="78080">
 				<rom name="sentinel, the (1987)(firebird).dsk" size="78080" crc="5665c629" sha1="d03ca9d8dd2fca34aa174edccf17eda12d202409" offset="0" />
@@ -15087,7 +15087,7 @@
 	<software name="serptale">
 		<description>A Serpentine Tale</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="serpentine tale, a (1993)(zenobi)[re-release].dsk" size="194816" crc="bd0e89f2" sha1="7af072b5755b119ec22141ed4ab10ac0c54cc52e" offset="0" />
@@ -15216,7 +15216,7 @@
 	<software name="shardino">
 		<description>Shard of Inovar</description>
 		<year>1987</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="shard of inovar (1987)(zenobi)[re-release].dsk" size="194816" crc="517d327c" sha1="284702077cee0618f6eae705557a290717b9bd5e" offset="0" />
@@ -15248,7 +15248,7 @@
 	<software name="sherlami">
 		<description>Sherlock Holmes - The Lamberley Mystery</description>
 		<year>1990</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="sherlock holmes - the lamberley mystery (1990)(zenobi).dsk" size="194816" crc="2a9c732a" sha1="36fae868e3a83cd4f553b070384048cf5959170a" offset="0" />
@@ -15344,7 +15344,7 @@
 	<software name="silvwolf">
 		<description>Silverwolf</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="silverwolf (1992)(zenobi)[re-release].dsk" size="194816" crc="a1ced916" sha1="f99b5f686b4d2cafe58ee284562d009087319e87" offset="0" />
@@ -15438,7 +15438,7 @@
 	<software name="slaugcav">
 		<description>The Slaughter Caves</description>
 		<year>1989</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="slaughter caves, the (1989)(zenobi).dsk" size="194816" crc="4ec7b7e1" sha1="05cb1351e4226244ba3ac0756419b4ac2a0b2f7d" offset="0" />
@@ -15542,7 +15542,7 @@
 	<software name="soldoffo">
 		<description>Soldier of Fortune</description>
 		<year>1988</year>
-		<publisher>Firebird</publisher>
+		<publisher>Firebird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="73216">
 				<rom name="soldier of fortune (1988)(firebird).dsk" size="73216" crc="a88165f9" sha1="720363a3afad04d495279db7fd8f43902d67b1f3" offset="0" />
@@ -15579,7 +15579,7 @@
 	<software name="songofta">
 		<description>The Song of Taliesin</description>
 		<year>1994</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="song of taliesin, the (1994)(zenobi).dsk" size="194816" crc="b7e4fb2d" sha1="071eaa34379e895102c3007e2eca28f89c0eab93" offset="0" />
@@ -15773,7 +15773,7 @@
 	<software name="staffofp">
 		<description>The Staff of Power</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="staff of power, the (1991)(zenobi).dsk" size="194816" crc="58cf287b" sha1="4d6ab194e4ce1b42992a64784dd7f676c6ffdb06" offset="0" />
@@ -15798,7 +15798,7 @@
 	<software name="stalker">
 		<description>Stalker</description>
 		<year>1990</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="stalker (1990)(zenobi).dsk" size="194816" crc="b0390b04" sha1="c34fcf6cc5d09d2a3a15632152bfb07ec8c428f2" offset="0" />
@@ -15860,7 +15860,7 @@
 	<software name="starglida" cloneof="starglid">
 		<description>Starglider (alt)</description>
 		<year>1986</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="starglider (1986)(rainbird).dsk" size="194816" crc="2a296abd" sha1="36420eae3caf6ae04c3b03d1ade59a13dad29ee9" offset="0" />
@@ -15872,7 +15872,7 @@
 	<software name="stargli2">
 		<description>Starglider 2 - The Egrons Strike Back</description>
 		<year>1989</year>
-		<publisher>Rainbird</publisher>
+		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="starglider 2 - the egrons strike back (1989)(rainbird).dsk" size="194816" crc="f6bdeb90" sha1="69f0b5f5b1ebdf67dad43eb7852b95b33db3d5d3" offset="0" />
@@ -15952,7 +15952,7 @@
 	<software name="stranded">
 		<description>Stranded</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="stranded (1992)(zenobi).dsk" size="194816" crc="9483615b" sha1="dfbe0660b1725999f76af69770491b71f7fb437f" offset="0" />
@@ -16213,7 +16213,7 @@
 	<software name="twasatim">
 		<description>T'Was a Time of Dread</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="t'was a time of dread (1992)(zenobi).dsk" size="194816" crc="a6d11b34" sha1="b59d8b92bd71bdbe2bf383ab8c0468e54981018c" offset="0" />
@@ -16258,7 +16258,7 @@
 	<software name="tlsmathe">
 		<description>The Tales of Mathematica</description>
 		<year>1990</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="tales of mathematica, the (1990)(zenobi).dsk" size="194816" crc="254feaae" sha1="fe4e845b1e380bcbf9a1c352429476d21c9432a9" offset="0" />
@@ -16282,7 +16282,7 @@
 	<software name="targrene">
 		<description>Target: Renegade</description>
 		<year>1988</year>
-		<publisher>Imagine</publisher>
+		<publisher>Imagine Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="134144">
 				<rom name="target - renegade (1988)(imagine).dsk" size="134144" crc="c93b5664" sha1="61f5623c5a614558b8431c4cddbc5ae11313c897" offset="0" />
@@ -16307,7 +16307,7 @@
 	<software name="taxretur">
 		<description>Tax Returns</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="tax returns (1992)(zenobi).dsk" size="194816" crc="03d83545" sha1="3dce8cdb905a5ef79ff5af534af19a202433ecf4" offset="0" />
@@ -16319,7 +16319,7 @@
 	<software name="taxmanco">
 		<description>The Taxman Cometh</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="taxman cometh, the (1991)(zenobi).dsk" size="194816" crc="05399461" sha1="e626dcb4c47a4bf4f5c4a7564d36672f85edeef8" offset="0" />
@@ -16331,7 +16331,7 @@
 	<software name="tearmoon">
 		<description>The Tears of the Moon</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="204544">
 				<rom name="tears of the moon, the (1992)(zenobi).dsk" size="204544" crc="e21084cf" sha1="bf084143f9b7f5825742f7259804e3babcef0bb8" offset="0" />
@@ -16355,7 +16355,7 @@
 	<software name="teenagee">
 		<description>Teenage Emergency</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="teenage emergency (1995)(zenobi).dsk" size="194816" crc="a945f2f5" sha1="7e5cba7d570959609896663a6a0d6d735cc5d1a3" offset="0" />
@@ -16395,7 +16395,7 @@
 	<software name="tengrebt">
 		<description>Ten Green Bottles</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="ten green bottles (1995)(zenobi).dsk" size="194816" crc="667dfed2" sha1="da5f6806ebc46dec7ae7c63d9f11e650f39ab845" offset="0" />
@@ -16468,7 +16468,7 @@
 	<software name="tparkuk">
 		<description>Theme Park U.K.</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="theme park u.k. (1993)(zenobi)[re-release].dsk" size="194816" crc="82d68d37" sha1="b43330b5962f776ae595d88bd3711378c7d80a17" offset="0" />
@@ -16480,7 +16480,7 @@
 	<software name="tparkusa">
 		<description>Theme Park U.S.A.</description>
 		<year>1993</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="theme park u.s.a. (1993)(zenobi).dsk" size="194816" crc="fa6b510f" sha1="4141a805840d7c990ec5b9b671ca2ddde5853807" offset="0" />
@@ -16492,7 +16492,7 @@
 	<software name="tabombup">
 		<description>There's a Bomb Under Parliament</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="there's a bomb under parliament (1991)(zenobi).dsk" size="194816" crc="61cfed6b" sha1="67b4598e5b2e961cbe4215f364bb5b71c37e5e5c" offset="0" />
@@ -16504,7 +16504,7 @@
 	<software name="thirnins">
 		<description>The Thirty-Nine Steps</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="thirty-nine steps, the (1995)(zenobi)[aka 39 steps, the].dsk" size="194816" crc="97ce88e7" sha1="bbeb7c4764736f822e31a0518026f890ca0b81e4" offset="0" />
@@ -16561,7 +16561,7 @@
 	<software name="thunderbsp" cloneof="thunderb">
 		<description>Thunderbirds (Spa)</description>
 		<year>1989</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="174848">
@@ -16649,7 +16649,7 @@
 	<software name="timescansp" cloneof="timescan">
 		<description>Time Scanner (Spa)</description>
 		<year>1989</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="144384">
 				<rom name="time scanner (1989)(mcm)(es)(en)[re-release].dsk" size="144384" crc="f6be60cc" sha1="980ff8cbcf5727eca1cbe3d5158d2514d66f1504" offset="0" />
@@ -16704,7 +16704,7 @@
 	<software name="toddlert">
 		<description>Toddler Trouble</description>
 		<year>1996</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="toddler trouble (1996)(zenobi).dsk" size="194816" crc="bad46cb8" sha1="1393e49ebea152d62a47b43ac4d28b9e3e86932b" offset="0" />
@@ -16764,7 +16764,7 @@
 	<software name="tmhtsp" cloneof="tmht">
 		<description>Tortugas Ninja</description>
 		<year>1990</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<info name="usage" value="Requires manual for password protection"/>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="73216">
@@ -16778,7 +16778,7 @@
 	<software name="tmhtsp2" cloneof="tmht">
 		<description>Tortugas Ninja (unprotected)</description>
 		<year>1990</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="73216">
 				<rom name="tortugas ninja (1990)(mcm)(es)(en)[aka teenage mutant hero turtles][re-release].dsk" size="73216" crc="6766d492" sha1="7ae9c02004b4f67c7c70d0cc1e3e1157538d3418" offset="0" />
@@ -16827,7 +16827,7 @@
 	<software name="treasisl">
 		<description>Treasure Island</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="treasure island (1991)(zenobi)[re-release].dsk" size="194816" crc="a9627167" sha1="2b72da4fa8c55c883b33bbfd7288b83e9acdb526" offset="0" />
@@ -16896,7 +16896,7 @@
 	<software name="troublew">
 		<description>Trouble with Trolls</description>
 		<year>1996</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="trouble with trolls (1996)(zenobi).dsk" size="194816" crc="b4b266d8" sha1="457b199bd8d62a11813e985caad268a4adbcf259" offset="0" />
@@ -17065,7 +17065,7 @@
 	<software name="twdaysch">
 		<description>The Twelve Days of Christmas</description>
 		<year>1994</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="twelve days of christmas, the (1994)(zenobi).dsk" size="194816" crc="954564f0" sha1="f24abcc5bda989a189f6d817332db7becb865e01" offset="0" />
@@ -17108,7 +17108,7 @@
 	<software name="typhoon">
 		<description>Typhoon</description>
 		<year>1988</year>
-		<publisher>Imagine</publisher>
+		<publisher>Imagine Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="156672">
 				<rom name="typhoon (1988)(imagine).dsk" size="156672" crc="71be4480" sha1="8475b7e1957fccad01db0ad92f2a741be11f62c8" offset="0" />
@@ -17120,7 +17120,7 @@
 	<software name="typhoonb" cloneof="typhoon">
 		<description>Typhoon (alt)</description>
 		<year>1988</year>
-		<publisher>Imagine</publisher>
+		<publisher>Imagine Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="typhoon (1988)(imagine)[a].dsk" size="194816" crc="a3d5abe7" sha1="8e106d7fc0f2048712f5179e9b57f8d5ad93eb41" offset="0" />
@@ -17132,7 +17132,7 @@
 	<software name="typhoonc" cloneof="typhoon">
 		<description>Typhoon (alt 2)</description>
 		<year>1988</year>
-		<publisher>Imagine</publisher>
+		<publisher>Imagine Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="155648">
 				<rom name="typhoon (1988)(imagine)[a2].dsk" size="155648" crc="192f7e58" sha1="f9285638c65e08bed3a11e0ae44293743b4fb917" offset="0" />
@@ -17144,7 +17144,7 @@
 	<software name="unbornon">
 		<description>The Unborn One</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="unborn one, the (1991)(zenobi).dsk" size="194816" crc="70778ba8" sha1="05a8f137a7fba635a1a57226e6873ca081644b12" offset="0" />
@@ -17219,7 +17219,7 @@
 	<software name="urban">
 		<description>Urban</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="urban (1991)(zenobi).dsk" size="194816" crc="d2c13bb6" sha1="961b3b7c51943998326074b9db3c9a12899d92ae" offset="0" />
@@ -17231,7 +17231,7 @@
 	<software name="venom">
 		<description>Venom</description>
 		<year>1988</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="venom (1988)(zenobi)[re-release].dsk" size="194816" crc="4ef0d1ee" sha1="6623a8b2d8934afc6a1197594a97ae8330164ced" offset="0" />
@@ -17243,7 +17243,7 @@
 	<software name="verybigc">
 		<description>The Very Big Cave Adventure</description>
 		<year>1986</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="very big cave adventure, the (1986)(zenobi)[re-release].dsk" size="194816" crc="57d0ccbb" sha1="5d35574bc5d8ccf621aa3b24691e739615840c6a" offset="0" />
@@ -17318,7 +17318,7 @@
 	<software name="vindicat">
 		<description>The Vindicator</description>
 		<year>1988</year>
-		<publisher>Imagine</publisher>
+		<publisher>Imagine Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="221184">
 				<rom name="vindicator, the (1988)(imagine).dsk" size="221184" crc="c63202dc" sha1="b0bcc18baf2134ebbde4b1ac1c231ebaf8d5084b" offset="0" />
@@ -17330,7 +17330,7 @@
 	<software name="vindicata" cloneof="vindicat">
 		<description>The Vindicator (alt)</description>
 		<year>1988</year>
-		<publisher>Imagine</publisher>
+		<publisher>Imagine Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="vindicator, the (1988)(imagine)[a].dsk" size="194816" crc="7cddd8a0" sha1="194b8cf0dcca32553e3a880e20fea4d37454ef2e" offset="0" />
@@ -17342,7 +17342,7 @@
 	<software name="vindicatb" cloneof="vindicat">
 		<description>The Vindicator (alt 2)</description>
 		<year>1988</year>
-		<publisher>Imagine</publisher>
+		<publisher>Imagine Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="vindicator, the (1988)(imagine)[a2].dsk" size="194816" crc="f7318fed" sha1="b287dfd9651095aa4d7e93ce03061ea0fae80499" offset="0" />
@@ -17354,7 +17354,7 @@
 	<software name="violvood">
 		<description>The Violator of Voodoo</description>
 		<year>1991</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="violator of voodoo, the (1991)(zenobi).dsk" size="194816" crc="1360096e" sha1="7d3d1d1b7e79a9b4f3fd3f8ec418303828283295" offset="0" />
@@ -17366,7 +17366,7 @@
 	<software name="virus">
 		<description>Virus</description>
 		<year>1988</year>
-		<publisher>Firebird</publisher>
+		<publisher>Firebird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="73216">
 				<rom name="virus (1988)(firebird).dsk" size="73216" crc="7fb23c60" sha1="5b8ffbd10aab44a224064f794432c229846ab627" offset="0" />
@@ -17391,7 +17391,7 @@
 	<software name="wecleman">
 		<description>WEC Le Mans</description>
 		<year>1988</year>
-		<publisher>Imagine</publisher>
+		<publisher>Imagine Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="wec le mans (1988)(imagine).dsk" size="194816" crc="7e865452" sha1="d6e41f7a5c257858922b8b9d26131be93abb344d" offset="0" />
@@ -17403,7 +17403,7 @@
 	<software name="weclemana" cloneof="wecleman">
 		<description>WEC Le Mans (alt)</description>
 		<year>1988</year>
-		<publisher>Imagine</publisher>
+		<publisher>Imagine Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="112640">
 				<rom name="wec le mans (1988)(imagine)[a].dsk" size="112640" crc="ee4cc288" sha1="2aaf533389d90dc4377396386c4abb6e07d4c7aa" offset="0" />
@@ -17446,7 +17446,7 @@
 	<software name="wanderer">
 		<description>Wanderer</description>
 		<year>1989</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="85760">
 				<rom name="wanderer (1989)(mcm)(es)(en)[re-release].dsk" size="85760" crc="79b50978" sha1="3d3101f5d9ea075b837fe68caff99eb0947c811a" offset="0" />
@@ -17502,7 +17502,7 @@
 	<software name="wellofzo">
 		<description>The Well of Zol</description>
 		<year>1994</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="well of zol, the (1994)(zenobi).dsk" size="194816" crc="53239936" sha1="a7dd128057ee8dfba7718e7c691413dcc0f7fb3d" offset="0" />
@@ -17551,7 +17551,7 @@
 	<software name="whitefea">
 		<description>The White Feather Cloak</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="white feather cloak, the (1992)(zenobi)[re-release].dsk" size="194816" crc="b9cba097" sha1="24a74a05414d5565d3ecdae3badb8d31fd980696" offset="0" />
@@ -17582,7 +17582,7 @@
 	<software name="wizardqu">
 		<description>Wizard Quest</description>
 		<year>1992</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="wizard quest (1992)(zenobi).dsk" size="194816" crc="68a39e6b" sha1="dfbd2ff0cad92e093535cb2bf7698e14fbc46803" offset="0" />
@@ -17594,7 +17594,7 @@
 	<software name="wizardoz">
 		<description>The Wizard of Oz</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="wizard of oz, the (1995)(zenobi).dsk" size="194816" crc="49211c28" sha1="5e910a68ca1f4e36e75a2cb598f1ff37037a01e3" offset="0" />
@@ -17619,7 +17619,7 @@
 	<software name="wrldclru">
 		<description>World Class Rugby</description>
 		<year>1991</year>
-		<publisher>Audiogenic</publisher>
+		<publisher>Audiogenic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="world class rugby (1991)(audiogenic)[aka sports action rugby].dsk" size="194816" crc="b872dd44" sha1="2955b8cc19dc423caa56c52f1d87201379bff23e" offset="0" />
@@ -17829,7 +17829,7 @@
 	<software name="zenquest">
 		<description>Zen Quest</description>
 		<year>1995</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="zen quest (1995)(zenobi).dsk" size="194816" crc="eafce910" sha1="cc5adca5233706f5480fe1bfc10f12cacd910a10" offset="0" />
@@ -17873,7 +17873,7 @@
 	<software name="zzzz">
 		<description>Zzzz</description>
 		<year>1986</year>
-		<publisher>Zenobi</publisher>
+		<publisher>Zenobi Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="zzzz (1986)(zenobi)[re-release].dsk" size="194816" crc="87122e5a" sha1="455c344a7b0ffce91dbf18c33d0e696fd569c7c1" offset="0" />
@@ -19527,7 +19527,7 @@
 	<software name="buggyboysp" cloneof="buggyboy">
 		<description>Buggy Boy (Spa)</description>
 		<year>1988</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size = "195635">
 				<rom name="Buggy Boy.dsk" size="195635" crc="c37afecb" sha1="19550826617711dd2d8c0d17421b6f5266a44cd1" offset="0"/>
@@ -19652,7 +19652,7 @@
 	<software name="goldnaxespa" cloneof="goldnaxe">
 		<description>Golden Axe (Spa) (alt)</description>
 		<year>1990</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size = "166599">
@@ -19860,7 +19860,7 @@
 	<software name="bttf3spa" cloneof="bttf3">
 		<description>Regreso al Futuro - Parte III (alt)</description>
 		<year>1991</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size = "195635">
@@ -19897,7 +19897,7 @@
 	<software name="ringwarssp">
 		<description>Ring Wars (Spa)</description>
 		<year>1989</year>
-		<publisher>MCM</publisher>
+		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size = "189952">
 				<rom name="Ring Wars.dsk" size="189952" crc="2dd821c4" sha1="e662b7d4b6915078901caadc8028b0b2acdc8a06" offset="0"/>
