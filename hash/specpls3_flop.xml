@@ -14469,18 +14469,6 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="recvives">
-		<description>Recopilacion Vives</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="194816">
-				<rom name="recopilacion vives (19xx)(-)(es).dsk" size="194816" crc="7e3ae000" sha1="a0a4de3585943f143b559986e837ab34068e6e67" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="redheatsp" cloneof="redheat">
 		<description>Red Heat (Spa)</description>
 		<year>1989</year>
