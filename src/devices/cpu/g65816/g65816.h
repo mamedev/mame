@@ -58,7 +58,6 @@ public:
 
 	auto wdm_handler() { return m_wdm_w.bind(); }
 
-protected:
 	/* Registers - used by g65816_set_reg() and g65816_get_reg() */
 	enum
 	{
@@ -68,6 +67,7 @@ protected:
 		_5A22_FASTROM
 	};
 
+protected:
 	g65816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal);
 
 	// device-level overrides
