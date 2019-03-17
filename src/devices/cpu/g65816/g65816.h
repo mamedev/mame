@@ -142,8 +142,10 @@ protected:
 	void g65816_set_pc(unsigned val);
 	unsigned g65816_get_sp();
 	void g65816_set_sp(unsigned val);
+public:
 	unsigned g65816_get_reg(int regnum);
 	void g65816_set_reg(int regnum, unsigned value);
+protected:
 	void g65816_restore_state();
 	unsigned g65816i_read_8_normal(unsigned address);
 	unsigned g65816i_read_8_immediate(unsigned address);
