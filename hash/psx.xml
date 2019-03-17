@@ -37284,8 +37284,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="10101wil" supported="no">
-		<!-- Unknown source
+	<!-- boot OK, a sound note seems stuck (btanb?) -->
+	<software name="10101wil" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="10101 - Will the Starship (Japan) (Track 01) [SLPS-01054].bin" size="292257168" crc="a477735a" sha1="3b8141a9ec76405f0779e1cfbd29acd167f0747c"/>
 		<rom name="10101 - Will the Starship (Japan) (Track 02) [SLPS-01054].bin" size="11496576" crc="17982736" sha1="8bb68d853fbda1a8c2000f8e9257cd8675efb098"/>
 		<rom name="10101 - Will the Starship (Japan) (Track 03) [SLPS-01054].bin" size="11557728" crc="ea8d2a87" sha1="a9c0efd691d738804562ecd7d60f931f773bb161"/>
@@ -37312,7 +37314,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="10101 - will the starship (japan) [slps-01054]" sha1="aa8abc4feb8a5681119091da60e25fa4a39fbfd5"/>
+				<disk name="10101 - will the starship (japan) [slps-01054]" sha1="aa8abc4feb8a5681119091da60e25fa4a39fbfd5" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -38324,8 +38326,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- boot OK, but dump has Paradox trainer so not really original disc -->
 	<software name="arknoi2k" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Arkanoid R 2000 (Japan) [SLPM-86262].bin" size="168374976" crc="3b7edf3f" sha1="eb629eff3ca346a86026731f8965056c1eb8af14"/>
 		<rom name="Arkanoid R 2000 (Japan) [SLPM-86262].cue" size="102" crc="ae6e7fad" sha1="fc4eb6d6307056fcf1b49f7c4655995da0d3a42b"/>
 		-->
@@ -38338,13 +38342,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="arkanoid r 2000 (japan) [slpm-86262]" sha1="e3c77a5c7438beab3c5d6692eaddb60d840f34ca"/>
+				<disk name="arkanoid r 2000 (japan) [slpm-86262]" sha1="e3c77a5c7438beab3c5d6692eaddb60d840f34ca" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="armedfgt" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="armedfgt" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Armed Fighter (Japan) [SLPS-01598].bin" size="421878240" crc="3c8fae4d" sha1="71932c3eee340a37e2d566598f810180d33ce57c"/>
 		<rom name="Armed Fighter (Japan) [SLPS-01598].cue" size="100" crc="055dbb70" sha1="af7f8d523150e9f7d60c254a25a83735f6cc02f4"/>
 		-->
@@ -38357,7 +38363,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="armed fighter (japan) [slps-01598]" sha1="9af77275f184a012f463d0254232e1c8b22a773c"/>
+				<disk name="armed fighter (japan) [slps-01598]" sha1="9af77275f184a012f463d0254232e1c8b22a773c" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -39027,8 +39033,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="beavis" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="beavis" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Beavis &amp; Butthead - Virtual Aho Shoukougun (Japan) [SLPS-01219].bin" size="453933648" crc="e29a3775" sha1="68763144d68e4d390f077ee0cef327d03340b327"/>
 		<rom name="Beavis &amp; Butthead - Virtual Aho Shoukougun (Japan) [SLPS-01219].cue" size="129" crc="7ee05a6c" sha1="3caa6f325edf978100bf7ae3b340871ccf852d9d"/>
 		-->
@@ -39041,7 +39049,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="beavis &amp; butthead - virtual aho shoukougun (japan) [slps-01219]" sha1="d71e22fa3a48c5233f7cbeaa050b0aecf4e82f0e"/>
+				<disk name="beavis &amp; butthead - virtual aho shoukougun (japan) [slps-01219]" sha1="d71e22fa3a48c5233f7cbeaa050b0aecf4e82f0e" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -42916,8 +42924,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<!-- boot OK -->
-	<software name="fn99" supported="no">
-		<!-- Unknown source
+	<software name="fn99" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Formula Nippon '99 (Japan) [SLPS-02259].bin" size="413037072" crc="4ba38e24" sha1="412df96f892b296ce6450fff10d95c1d2900f641"/>
 		<rom name="Formula Nippon '99 (Japan) [SLPS-02259].cue" size="956" crc="29e4732c" sha1="bf1536379672ff20876fc297dc8ec03ca74068bb"/>
 		-->
@@ -42930,7 +42939,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="formula nippon '99 (japan) [slps-02259]" sha1="28178710ba1b5b98ff6649d058fbf41160d2964c"/>
+				<disk name="formula nippon '99 (japan) [slps-02259]" sha1="28178710ba1b5b98ff6649d058fbf41160d2964c" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -56179,9 +56188,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- hangs loading afte initial fmv -->
-	<software name="volfoss" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="volfoss" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Volfoss (Japan) [SLPS-03140].bin" size="622282752" crc="207df109" sha1="e62f2ba05751a0ceed977a35eaa735c3f7446f6b"/>
 		<rom name="Volfoss (Japan) [SLPS-03140].cue" size="92" crc="093820d9" sha1="5b99f2492245f1db4e2f73b055de8681d5eca169"/>
 		-->
@@ -56194,7 +56204,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="volfoss (japan) [slps-03140]" sha1="93622ab30cde9a2215eeacfea3f71a14bb04a724"/>
+				<disk name="volfoss (japan) [slps-03140]" sha1="93622ab30cde9a2215eeacfea3f71a14bb04a724" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -57050,9 +57060,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- boot ok -->
-	<software name="zeiramzn" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="zeiramzn" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Zeiramzone (Japan) [SLPS-00575].bin" size="674784096" crc="f8aa3c57" sha1="b134e9fcc770c612911e79f71d229942223b0878"/>
 		<rom name="Zeiramzone (Japan) [SLPS-00575].cue" size="3611" crc="07cf8b2b" sha1="f8bcce5819e455a7c21b0df3b41266badcbb1c78"/>
 		-->
@@ -57065,14 +57076,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="zeiramzone (japan) [slps-00575]" sha1="34415b4c79871300147eac45b11aa82b75af2fe2"/>
+				<disk name="zeiramzone (japan) [slps-00575]" sha1="34415b4c79871300147eac45b11aa82b75af2fe2" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<!-- black screen after company logos -->
-	<software name="zeitgest" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="zeitgest" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Zeitgeist (Japan) [SLPS-00034].bin" size="375061680" crc="65acd6d1" sha1="10b0eeb5b5cb74d97bdb2cc1ba1cc95196f687d3"/>
 		<rom name="Zeitgeist (Japan) [SLPS-00034].cue" size="362" crc="abb90983" sha1="c1613f62ac44050539b898367e857d8d4bbc0cad"/>
 		-->
@@ -57085,14 +57097,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="zeitgeist (japan) [slps-00034]" sha1="e748638065f2b3e5fc706465ca28b195bf139f0c"/>
+				<disk name="zeitgeist (japan) [slps-00034]" sha1="e748638065f2b3e5fc706465ca28b195bf139f0c" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<!-- boot OK -->
-	<software name="zero4" supported="no">
-		<!-- Unknown source
+	<software name="zero4" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Zero 4 Champ Doozy-J (Japan) [SLPS-00755].bin" size="581539056" crc="fc27eb8d" sha1="267109617be4bbb3065907e9c493c6456c3c57a8"/>
 		<rom name="Zero 4 Champ Doozy-J (Japan) [SLPS-00755].cue" size="373" crc="9f9e5a2a" sha1="e87c47d6b1e76062e04afb183d164f30278eeafa"/>
 		-->
@@ -57105,7 +57118,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="zero 4 champ doozy-j (japan) [slps-00755]" sha1="e559ec8882efe4b0aecc13dbcdb9d1cfed9c0830"/>
+				<disk name="zero 4 champ doozy-j (japan) [slps-00755]" sha1="e559ec8882efe4b0aecc13dbcdb9d1cfed9c0830" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -57190,9 +57203,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- black screen -->
-	<software name="znpwok" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="znpwok" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Zen-Nippon Pro-Wrestling - Ouja no Kon (Japan) [SLPS-01849].bin" size="498751008" crc="8ae69263" sha1="1bc41b753496de3487538a68bbf49714001d7f03"/>
 		<rom name="Zen-Nippon Pro-Wrestling - Ouja no Kon (Japan) [SLPS-01849].cue" size="391" crc="13ce9519" sha1="03c936f35232c97d1b4c9f1d7ead264d7187b03f"/>
 		-->
@@ -57205,14 +57219,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="zen-nippon pro-wrestling - ouja no kon (japan) [slps-01849]" sha1="78822a4e3c9c9eac043e8c875f9ab05014d71f67"/>
+				<disk name="zen-nippon pro-wrestling - ouja no kon (japan) [slps-01849]" sha1="78822a4e3c9c9eac043e8c875f9ab05014d71f67" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<!-- boot OK -->
-	<software name="zoids" supported="no">
-		<!-- Unknown source
+	<software name="zoids" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Zoids - Teikoku vs. Kyouwakoku - Meka Seitai no Idenshi (Japan) [SLPS-02982].bin" size="457334640" crc="386e9e1e" sha1="b2062bbf4a6998c89ae5c66bdf4059163991338b"/>
 		<rom name="Zoids - Teikoku vs. Kyouwakoku - Meka Seitai no Idenshi (Japan) [SLPS-02982].cue" size="142" crc="649d405f" sha1="31a172855f67c772f3a137e7ba62a22ae23442de"/>
 		-->
@@ -57225,7 +57240,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="zoids - teikoku vs. kyouwakoku - meka seitai no idenshi (japan) [slps-02982]" sha1="052fc27f0a6fe17f7d0f70709941dbbdd8a7f53b"/>
+				<disk name="zoids - teikoku vs. kyouwakoku - meka seitai no idenshi (japan) [slps-02982]" sha1="052fc27f0a6fe17f7d0f70709941dbbdd8a7f53b" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -57314,8 +57329,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- black screen after company logos -->
-	<software name="zork" supported="no">
+	<!-- boot OK -->
+	<software name="zork" supported="yes">
 		<!-- Unknown source
 		<rom name="Zork I - The Great Underground Empire (Japan) [SLPS-00271].bin" size="645033648" crc="7c08407b" sha1="6f99d91d5f5f7cc1a8d389da391684db6a745f77"/>
 		<rom name="Zork I - The Great Underground Empire (Japan) [SLPS-00271].cue" size="2106" crc="146cf080" sha1="a382820f2a657873db1834a74adec885e077e019"/>
@@ -57329,7 +57344,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="zork i - the great underground empire (japan) [slps-00271]" sha1="010b72e2b4cfd970fa47d919e70c172f5765aa8b"/>
+				<disk name="zork i - the great underground empire (japan) [slps-00271]" sha1="010b72e2b4cfd970fa47d919e70c172f5765aa8b" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -57380,8 +57395,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 <!-- Demos & Extra Discs -->
 
-	<software name="ffantxc" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="ffantxc" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Final Fantasy Extra Collection (Japan) [SLPM-80073].bin" size="716882544" crc="0647ffaf" sha1="e75b866f583e6dcea84f4ad08bc36ce00a2e079b"/>
 		<rom name="Final Fantasy Extra Collection (Japan) [SLPM-80073].cue" size="115" crc="2c18fe65" sha1="6cd5af7bc18a8ff3b7fc4123b756548e040c18cc"/>
 		-->
@@ -57394,7 +57411,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final fantasy extra collection (japan) [slpm-80073]" sha1="6690eccbc01529d7ccc8854298959163bf499239"/>
+				<disk name="final fantasy extra collection (japan) [slpm-80073]" sha1="6690eccbc01529d7ccc8854298959163bf499239" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -57592,9 +57609,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<!-- Non-redump PAL (Europe) -->
 
-	<!-- corrupt text -->
+	<!-- boot OK -->
 	<software name="firebugs" supported="partial">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Firebugs (E).bin" size="608048448" crc="82b8ccd3" sha1="52bec5d0fa3bc954f4168806838a6723bcce265d"/>
 		<rom name="Firebugs (E).cue" size="908" crc="f17332da" sha1="e0f9f781a3c5e19a33dc25fc9b9c7529eab87031"/>
 		-->
@@ -57605,14 +57623,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="firebugs (e)" sha1="763f232c64d2fa7091c3c6f8eed13686f636da49"/>
+				<disk name="firebugs (e)" sha1="763f232c64d2fa7091c3c6f8eed13686f636da49" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<!-- boot ok -->
+	<!-- boot OK -->
 	<software name="terracon" supported="yes">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Terracon_PAL.bin" size="622536768" crc="4ceb0a37" sha1="40f1dfc3cc8c47f3288283907c231c43c2fbe940"/>
 		<rom name="Terracon_PAL.cue" size="1187" crc="3b2098b7" sha1="7f9780eeeedc8eac693b2c18c5a6e58202bc97b3"/>
 		-->
@@ -57623,7 +57642,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="terracon_pal" sha1="06f1e225c8e214cb7717d5a131a0c6ed9f53a42b"/>
+				<disk name="terracon_pal" sha1="06f1e225c8e214cb7717d5a131a0c6ed9f53a42b" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -58510,8 +58529,9 @@ use an alternate design found on the demo disk... It might be possible to enable
 		</part>
 	</software>
 
-	<software name="sotne3" cloneof="sotn">
-		<!-- Original images (unknown source)
+	<software name="sotne3" cloneof="sotn" supported="yes">
+		<!-- 
+		Original images (unknown source) (er, wut? -AS)
 		<rom name="castlevania - symphony of the night e3 demo.img" size="587811840" crc="22b981c9" sha1="c94c1fb5548c21721835928f294d0301452eb90d"/>
 		<rom name="castlevania - symphony of the night e3 demo.ccd" size="964" crc="d6a03944" sha1="b1a1e08e3837d3d39949097fb1c5f12b648aa5ce"/>
 		<rom name="castlevania - symphony of the night e3 demo.cue" size="163" crc="919c7241" sha1="09413093892a1cb79b5bf99e0424000ace0eeae8"/>
