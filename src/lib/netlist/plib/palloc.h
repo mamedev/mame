@@ -147,6 +147,12 @@ namespace plib {
 			m_is_owned = false;
 			m_ptr = nullptr;
 		}
+
+		/**
+		 * \brief Return @c true if the stored pointer is not null.
+		 */
+	    explicit operator bool() const noexcept { return m_ptr != nullptr; }
+
 		pointer  release()
 		{
 			pointer tmp = m_ptr;

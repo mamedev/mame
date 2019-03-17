@@ -73,7 +73,7 @@ private:
 	 * |     | RBM  | minimum base resistance at high currents                              |       |       RB |              10 |   *  |
 	 * |     | RE   | emitter resistance                                                    |       |        0 |               1 |   *  |
 	 * |     | RC   | collector resistance                                                  |       |        0 |              10 |   *  |
-	 * |     | CJE  | B-E zero-bias depletion capacitance                                   | F     |        0 |             2pF |   *  |
+	 * |  Y  | CJE  | B-E zero-bias depletion capacitance                                   | F     |        0 |             2pF |   *  |
 	 * |     | VJE  | B-E built-in potential                                                | V     |     0.75 |             0.6 |      |
 	 * |     | MJE  | B-E junction exponential factor                                       | -     |     0.33 |            0.33 |      |
 	 * |     | TF   | ideal forward transit time                                            | sec   |        0 |           0.1ns |      |
@@ -81,7 +81,7 @@ private:
 	 * |     | VTF  | voltage describing VBC  dependence of TF                              | V     | infinite |                 |      |
 	 * |     | ITF  | high-current parameter  for effect on TF                              | A     |        0 |                 |   *  |
 	 * |     | PTF  | excess phase at freq=1.0/(TF*2PI) Hz                                  | deg   |        0 |                 |      |
-	 * |     | CJC  | B-C zero-bias depletion capacitance                                   | F     |        0 |             2pF |   *  |
+	 * |  Y  | CJC  | B-C zero-bias depletion capacitance                                   | F     |        0 |             2pF |   *  |
 	 * |     | VJC  | B-C built-in potential                                                | V     |     0.75 |             0.5 |      |
 	 * |     | MJC  | B-C junction exponential factor                                       | -     |     0.33 |             0.5 |      |
 	 * |     | XCJC | fraction of B-C depletion capacitance connected to internal base node | -     |        1 |                 |      |
@@ -95,25 +95,31 @@ private:
 	 * |     | KF   | flicker-noise coefficient                                             | -     |        0 |                 |      |
 	 * |     | AF   | flicker-noise exponent                                                | -     |        1 |                 |      |
 	 * |     | FC   | coefficient for forward-bias depletion capacitance formula            | -     |      0.5 |                 |      |
-	 * |     | TNOM | Parameter measurement temperature                                     | C     |       27 |              50 |      |    */
+	 * |     | TNOM | Parameter measurement temperature                                     | C     |       27 |              50 |      |
+	 * */
 
 	class bjt_model_t : public param_model_t
 	{
 	public:
 		bjt_model_t(device_t &device, const pstring &name, const pstring &val)
 		: param_model_t(device, name, val)
-		, m_IS(*this, "IS")
-		, m_BF(*this, "BF")
-		, m_NF(*this, "NF")
-		, m_BR(*this, "BR")
-		, m_NR(*this, "NR")
+		, m_IS (*this, "IS")
+		, m_BF (*this, "BF")
+		, m_NF (*this, "NF")
+		, m_BR (*this, "BR")
+		, m_NR (*this, "NR")
+		, m_CJE(*this, "CJE")
+		, m_CJC(*this, "CJC")
 		{}
 
-		value_t m_IS; //!< transport saturation current
-		value_t m_BF; //!< ideal maximum forward beta
-		value_t m_NF; //!< forward current emission coefficient
-		value_t m_BR; //!< ideal maximum reverse beta
-		value_t m_NR; //!< reverse current emission coefficient
+		value_t m_IS;  //!< transport saturation current
+		value_t m_BF;  //!< ideal maximum forward beta
+		value_t m_NF;  //!< forward current emission coefficient
+		value_t m_BR;  //!< ideal maximum reverse beta
+		value_t m_NR;  //!< reverse current emission coefficient
+		value_t m_CJE; //!< B-E zero-bias depletion capacitance
+		value_t m_CJC; //!< B-C zero-bias depletion capacitance
+
 	};
 
 	// Have a common start for transistors
@@ -250,6 +256,19 @@ public:
 		connect(m_D_EB.m_P, m_D_EC.m_P);
 		connect(m_D_EB.m_N, m_D_CB.m_N);
 		connect(m_D_CB.m_P, m_D_EC.m_N);
+
+		if (m_model.m_CJE > 0.0)
+		{
+			register_sub("m_CJE", m_CJE);
+			connect("B", "m_CJE.1");
+			connect("E", "m_CJE.2");
+		}
+		if (m_model.m_CJC > 0.0)
+		{
+			register_sub("m_CJC", m_CJC);
+			connect("B", "m_CJC.1");
+			connect("C", "m_CJC.2");
+		}
 	}
 
 protected:
@@ -269,6 +288,9 @@ private:
 
 	nl_double m_alpha_f;
 	nl_double m_alpha_r;
+
+	NETLIB_SUBXX(analog, C) m_CJE;
+	NETLIB_SUBXX(analog, C) m_CJC;
 
 };
 
@@ -376,6 +398,17 @@ NETLIB_UPDATE(QBJT_EB)
 NETLIB_RESET(QBJT_EB)
 {
 	NETLIB_NAME(Q)::reset();
+	if (m_CJE)
+	{
+		m_CJE->reset();
+		m_CJE->m_C.setTo(m_model.m_CJE);
+	}
+	if (m_CJC)
+	{
+		m_CJC->reset();
+		m_CJC->m_C.setTo(m_model.m_CJC);
+	}
+
 }
 
 NETLIB_UPDATE_TERMINALS(QBJT_EB)

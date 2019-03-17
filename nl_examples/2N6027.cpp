@@ -76,7 +76,7 @@ NETLIST_START(PUT_2N6027)
 	 * FIXME: Needs to be removed when added to the
 	 * transistor EB model.
 	 */
-#if 1
+#if 0
 	CAP(CJE1, CAP_N(1))
 	CAP(CJE2, CAP_N(1))
 
