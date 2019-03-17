@@ -914,6 +914,7 @@ nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
 	if (factor != plib::constants<nl_double>::one())
 		tmp = plib::left(tmp, tmp.size() - 1);
 	// FIXME: check for errors
+	//printf("%s %s %e %e\n", entity.c_str(), tmp.c_str(), plib::pstonum<nl_double>(tmp), factor);
 	return plib::pstonum<nl_double>(tmp) * factor;
 }
 
