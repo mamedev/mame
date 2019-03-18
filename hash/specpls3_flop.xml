@@ -2461,7 +2461,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Applications - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="pawes" cloneof="paw">
+	<software name="pawsp" cloneof="paw">
 		<description>Professional Adventure Writer (Spa)</description>
 		<year>1986</year>
 		<publisher>Aventuras AD</publisher>
@@ -8395,7 +8395,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="bbrg" cloneof="bbrg">
+	<software name="bbrgsp" cloneof="bbrg">
 		<description>Buffalo Bill's Wild West Show (Spa)</description>
 		<year>1989</year>
 		<publisher>System 4</publisher>
@@ -8724,7 +8724,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="cvaniasiit" cloneof="cvaniasi">
-		<description>Castlevania - Spectral Interlude (Italian)</description>
+		<description>Castlevania - Spectral Interlude (Ita)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -8736,7 +8736,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="cvaniasiru" cloneof="cvaniasi">
-		<description>Castlevania - Spectral Interlude (Russian)</description>
+		<description>Castlevania - Spectral Interlude (Rus)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -8748,7 +8748,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="cvaniasipo" cloneof="cvaniasi">
-		<description>Castlevania - Spectral Interlude (Polish)</description>
+		<description>Castlevania - Spectral Interlude (Pol)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -9384,7 +9384,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- May be the same edition as the IPF -->
-	<software name="cyberno2" cloneof="cyberno2">
+	<software name="cyberno2a" cloneof="cyberno2">
 		<description>Cybernoid II - The Revenge (alt)</description>
 		<year>1988</year>
 		<publisher>Hewson Consultants</publisher>
@@ -11446,7 +11446,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- May be the same edition as the IPF -->
-	<software name="herolanca" name="herolanc">
+	<software name="herolanca" cloneof="herolanc">
 		<description>Heroes of the Lance (alt)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
@@ -11581,8 +11581,8 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="hkma" cloneof="hkm">
-		<description>Human Killing Machine (alt)</description>
+	<software name="hkmb" cloneof="hkm">
+		<description>Human Killing Machine (alt 2)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -11885,7 +11885,7 @@
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- May be the same edition as the IPF -->
 	<software name="italia90a" cloneof="italia90">
-		<description>Italia '90 - World Cup Soccer</description>
+		<description>Italia '90 - World Cup Soccer (alt)</description>
 		<year>1989</year>
 		<publisher>Virgin Games</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -12893,7 +12893,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- May be the same edition as the IPF -->
-	<software name="mickey" cloneof="mickey">
+	<software name="mickeya" cloneof="mickey">
 		<description>Mickey Mouse - The Computer Game (alt)</description>
 		<year>1988</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -14023,7 +14023,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- May be the same edition as the IPF -->
-	<software name="pawn" cloneof="pawn">
+	<software name="pawna" cloneof="pawn">
 		<description>The Pawn v2.4 (alt)</description>
 		<year>1987</year>
 		<publisher>Rainbird Software</publisher>
@@ -14036,7 +14036,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- May be the same edition as the IPF -->
-	<software name="pawn" cloneof="pawn">
+	<software name="pawnb" cloneof="pawn">
 		<description>The Pawn v2.4 (alt 2)</description>
 		<year>1987</year>
 		<publisher>Rainbird Software</publisher>
@@ -14686,7 +14686,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="roadblst" cloneof="roadblst">
+	<software name="roadblstsp" cloneof="roadblst">
 		<description>Road Blasters (Spa)</description>
 		<year>1988</year>
 		<publisher>Erbe Software</publisher>
@@ -14699,7 +14699,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- May be the same edition as the IPF -->
-	<software name="roadblst" cloneof="roadblst">
+	<software name="roadblsta" cloneof="roadblst">
 		<description>Road Blasters (alt)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
@@ -14793,7 +14793,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- May be the same edition as the IPF -->
-	<software name="rthunder" cloneof="rthunder">
+	<software name="rthundera" cloneof="rthunder">
 		<description>Rolling Thunder (alt)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
@@ -15005,7 +15005,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="scapegho" cloneof="scapegho">
+	<software name="scapeghoa" cloneof="scapegho">
 		<description>Scapeghost (alt)</description>
 		<year>1989</year>
 		<publisher>Level 9 Computing</publisher>
@@ -16609,7 +16609,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="tiburon" cloneof="jaws">
+	<software name="jawssp">
 		<description>Tiburon</description>
 		<year>1989</year>
 		<publisher>Erbe Software</publisher>
@@ -17005,7 +17005,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="turrican" cloneof="turrican">
+	<software name="turricansp" cloneof="turrican">
 		<description>Turrican (Spa)</description>
 		<year>1990</year>
 		<publisher>Erbe Software</publisher>
@@ -19576,8 +19576,8 @@
 		</part>
 	</software>
 
-	<software name="Drazen Petrovic Basket (Erbe)">
-		<description>Drazen Petrovic Basket</description>
+	<software name="drazenpba" cloneof="drazenpb">
+		<description>Drazen Petrovic Basket (alt)</description>
 		<year>1989</year>
 		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
