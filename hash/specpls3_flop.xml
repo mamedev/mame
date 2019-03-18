@@ -1683,7 +1683,7 @@
 	Notes about the known DSK dumps:
 		Some dumps may come with an empty Side B, which is technically correct for games which were released with an empty side on purpose. These were usually labeled as "Sin grabar para tu uso" ("Unrecorded for your use") in many Spanish releases.
 		Some of the "master disks" from Zeppelin Games share the same file (same SHA-1) for their Side B. This has been verified against the downloads available in World of Spectrum.
-		A few releases had a version for a different system on the other side. These have been commented out but not removed, for reference.
+		A few releases had a version for a different system on the other side. These haven't been removed, as it was possible for the user to insert those sides and do anything they wanted with them.
 		
 -->
 
@@ -8133,27 +8133,18 @@
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: Spectrum"/>
 			<dataarea name="flop" size="80384">
 				<rom name="bestial warrior (1989)(dinamic)(es)[a].dsk" size="80384" crc="208235f6" sha1="50d9a3bb79b82deb6c08253cfbffa460bb8abaa2" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-<!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- This image came from a dual-system Spectrum/Amstrad release (Side A: Spectrum, Side B: Amstrad) -->
-<!--
-	<software name="bestialw">
-		<description>Bestial Warrior (rerelease)</description>
-		<year>1989</year>
-		<publisher>Dinamic Software</publisher>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Amstrad"/>
 			<dataarea name="flop" size="91136">
 				<rom name="bestial warrior (1989)(dinamic)(es)(side b).dsk" size="91136" crc="3fd882c2" sha1="977204c72ef1b1643e33516ffe904b35ad87c826" offset="0" />
 			</dataarea>
 		</part>
 	</software>
--->
-
 	
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- May be the same edition as the IPF -->
@@ -19803,21 +19794,13 @@
 		<year>1988</year>
 		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: Spectrum"/>
 			<dataarea name="flop" size="166817">
 				<rom name="Navy Moves (Doble Edición) (side A).dsk" size="166817" crc="718149f4" sha1="5018740f71bc2ae08343f4040590cfa2550333bf" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-<!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- This image came from a dual-system Spectrum/Amstrad release (Side A: Spectrum, Side B: Amstrad) -->
-	<!-- Dump made with CPDRead -->
-<!--
-	<software name="navymove">
-		<description>Navy Moves</description>
-		<year>1988</year>
-		<publisher>Dinamic Software</publisher>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Amstrad"/>
 			<dataarea name="flop" size="214784">
 				<rom name="navy moves (1988)(dinamic)(es)(en)(side b).dsk" size="214784" crc="c32323a2" sha1="da30c11411368b22474b032f39e8f8b968f7903b" offset="0" />
 			</dataarea>
