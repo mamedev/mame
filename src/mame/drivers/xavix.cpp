@@ -1448,7 +1448,7 @@ void xavix_cart_state::xavix_cart_popira(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
 }
 
-
+// see code at 028060, using table from 00eb6d for conversion
 READ8_MEMBER(xavix_popira2_cart_state::popira2_adc0_r)
 {
 	uint8_t p2 = ioport("P2")->read() & 0x03;
