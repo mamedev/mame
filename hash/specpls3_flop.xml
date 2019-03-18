@@ -19788,7 +19788,6 @@
 	</software>
 
 	<!-- This image came from a dual-system Spectrum/Amstrad release (Side A: Spectrum, Side B: Amstrad) -->
-	<!-- Dump made with SAMdisk -->
 	<software name="navymovespa" cloneof="navymove">
 		<description>Navy Moves (Spa) (alt)</description>
 		<year>1988</year>
