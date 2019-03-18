@@ -177,10 +177,6 @@ public:
 	{ }
 
 	// machine drivers
-	void fex68k(machine_config &config);
-	void fex68km2(machine_config &config);
-	void fex68km3(machine_config &config);
-
 	void eagv2(machine_config &config);
 	void eagv3(machine_config &config);
 	void eagv5(machine_config &config);
@@ -198,10 +194,6 @@ protected:
 	optional_device<ram_device> m_ram;
 
 	// address maps
-	void fex68k_map(address_map &map);
-	void fex68km2_map(address_map &map);
-	void fex68km3_map(address_map &map);
-
 	void eag_map(address_map &map);
 	void eagv7_map(address_map &map);
 	void eagv10_map(address_map &map);
@@ -243,6 +235,26 @@ private:
 	DECLARE_READ8_MEMBER(main_ack_r);
 	DECLARE_READ8_MEMBER(sub_ack_r);
 };
+
+class excel68k_state : public eag_state
+{
+public:
+	excel68k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		eag_state(mconfig, type, tag)
+	{ }
+
+	// machine drivers
+	void fex68k(machine_config &config);
+	void fex68km2(machine_config &config);
+	void fex68km3(machine_config &config);
+
+private:
+	// address maps
+	void fex68k_map(address_map &map);
+	void fex68km2_map(address_map &map);
+	void fex68km3_map(address_map &map);
+};
+
 
 
 /******************************************************************************
@@ -330,23 +342,23 @@ READ8_MEMBER(eagv5_state::sub_ack_r)
 
 // Excel 68000
 
-void eag_state::fex68k_map(address_map &map)
+void excel68k_state::fex68k_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
-	map(0x000000, 0x00000f).mirror(0x00fff0).w(FUNC(eag_state::leds_w)).umask16(0x00ff);
-	map(0x000000, 0x00000f).mirror(0x00fff0).w(FUNC(eag_state::digit_w)).umask16(0xff00);
+	map(0x000000, 0x00000f).mirror(0x00fff0).w(FUNC(excel68k_state::leds_w)).umask16(0x00ff);
+	map(0x000000, 0x00000f).mirror(0x00fff0).w(FUNC(excel68k_state::digit_w)).umask16(0xff00);
 	map(0x044000, 0x047fff).ram();
-	map(0x100000, 0x10000f).mirror(0x03fff0).r(FUNC(eag_state::input1_r)).umask16(0x00ff);
-	map(0x140000, 0x14000f).mirror(0x03fff0).w(FUNC(eag_state::mux_w)).umask16(0x00ff);
+	map(0x100000, 0x10000f).mirror(0x03fff0).r(FUNC(excel68k_state::input1_r)).umask16(0x00ff);
+	map(0x140000, 0x14000f).mirror(0x03fff0).w(FUNC(excel68k_state::mux_w)).umask16(0x00ff);
 }
 
-void eag_state::fex68km2_map(address_map &map)
+void excel68k_state::fex68km2_map(address_map &map)
 {
 	fex68k_map(map);
 	map(0x200000, 0x21ffff).ram();
 }
 
-void eag_state::fex68km3_map(address_map &map)
+void excel68k_state::fex68km3_map(address_map &map)
 {
 	fex68k_map(map);
 	map(0x200000, 0x20ffff).ram();
@@ -466,18 +478,18 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-void eag_state::fex68k(machine_config &config)
+void excel68k_state::fex68k(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12_MHz_XTAL); // HD68HC000P12
-	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::fex68k_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &excel68k_state::fex68k_map);
 
 	const attotime irq_period = attotime::from_hz(618); // theoretical frequency from 556 timer (22nF, 91K + 20K POT @ 14.8K, 0.1K), measurement was 580Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(eag_state::irq_on<M68K_IRQ_2>), irq_period);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(excel68k_state::irq_on<M68K_IRQ_2>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1528)); // active for 1.525us
-	TIMER(config, "irq_off").configure_periodic(FUNC(eag_state::irq_off<M68K_IRQ_2>), irq_period);
+	TIMER(config, "irq_off").configure_periodic(FUNC(excel68k_state::irq_off<M68K_IRQ_2>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(eag_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(excel68k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_ex_68k);
 
 	/* sound hardware */
@@ -486,21 +498,21 @@ void eag_state::fex68k(machine_config &config)
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
-void eag_state::fex68km2(machine_config &config)
+void excel68k_state::fex68km2(machine_config &config)
 {
 	fex68k(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::fex68km2_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &excel68k_state::fex68km2_map);
 }
 
-void eag_state::fex68km3(machine_config &config)
+void excel68k_state::fex68km3(machine_config &config)
 {
 	fex68k(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(16_MHz_XTAL); // factory overclock
-	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::fex68km3_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &excel68k_state::fex68km3_map);
 }
 
 void eag_state::eag_base(machine_config &config)
@@ -708,18 +720,18 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT   CMP MACHINE   INPUT     CLASS        INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1987, fex68k,   0,        0, fex68k,   excel68k, eag_state,   empty_init, "Fidelity Electronics", "Excel 68000 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, fex68ka,  fex68k,   0, fex68k,   excel68k, eag_state,   empty_init, "Fidelity Electronics", "Excel 68000 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, fex68kb,  fex68k,   0, fex68k,   excel68k, eag_state,   empty_init, "Fidelity Electronics", "Excel 68000 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, fex68km2, fex68k,   0, fex68km2, excel68k, eag_state,   empty_init, "Fidelity Electronics", "Excel 68000 Mach II (rev. C+)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, fex68km3, fex68k,   0, fex68km3, excel68k, eag_state,   empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME      PARENT   CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1987, fex68k,   0,        0, fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, fex68ka,  fex68k,   0, fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, fex68kb,  fex68k,   0, fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, fex68km2, fex68k,   0, fex68km2, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach II (rev. C+)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, fex68km3, fex68k,   0, fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1989, feagv2,   0,        0, eagv2,    eag,      eag_state,   init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1989, feagv3,   feagv2,   0, eagv3,    eag,      eag_state,   init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1989, feagv5,   feagv2,   0, eagv5,    eag,      eagv5_state, init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, feagv7,   feagv2,   0, eagv7,    eag,      eag_state,   empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, feagv7a,  feagv2,   0, eagv7,    eag,      eag_state,   empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, feagv9,   feagv2,   0, eagv9,    eag,      eag_state,   empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, feagv10,  feagv2,   0, eagv10,   eag,      eag_state,   empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 2002, feagv11,  feagv2,   0, eagv11,   eag,      eag_state,   empty_init, "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND )
+CONS( 1989, feagv2,   0,        0, eagv2,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1989, feagv3,   feagv2,   0, eagv3,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1989, feagv5,   feagv2,   0, eagv5,    eag,      eagv5_state,    init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, feagv7,   feagv2,   0, eagv7,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, feagv7a,  feagv2,   0, eagv7,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, feagv9,   feagv2,   0, eagv9,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, feagv10,  feagv2,   0, eagv10,   eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 2002, feagv11,  feagv2,   0, eagv11,   eag,      eag_state,      empty_init, "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND )
