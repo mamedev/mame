@@ -19804,6 +19804,7 @@
 				<rom name="navy moves (1988)(dinamic)(es)(en)(side b).dsk" size="214784" crc="c32323a2" sha1="da30c11411368b22474b032f39e8f8b968f7903b" offset="0" />
 			</dataarea>
 		</part>
+	</software>
 
 	<software name="ninjawarsp" cloneof="ninjawar">
 		<description>The Ninja Warriors (Spa)</description>
