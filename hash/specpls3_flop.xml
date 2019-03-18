@@ -16153,8 +16153,9 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="swoiannasp" cloneof="swoianna">
-		<description>The Sword of IANNA (Spa)</description>
+	<!-- This is an older version of the game, dated 20170922 -->
+	<software name="swoiannaa" cloneof="swoianna">
+		<description>The Sword of IANNA (alt)</description>
 		<year>2017</year>
 		<publisher>RetroWorks</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -16172,6 +16173,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
+	<!-- This version is dated 20171126 -->
 	<software name="swoianna">
 		<description>The Sword of IANNA</description>
 		<year>2017</year>
