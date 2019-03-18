@@ -2771,7 +2771,7 @@
 				<rom name="transfer +3 (1988)(topo soft)(es)(side a).dsk" size="180224" crc="ce9356db" sha1="3c20847d71a2ff8227ba0205b5fecad8bb3597d0" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="180224">
 				<rom name="transfer +3 (1988)(topo soft)(es)(side b)[a].dsk" size="180224" crc="475be7a1" sha1="f4f38459f6154d2cad84264409a6a353a0393882" offset="0" />
@@ -3031,7 +3031,7 @@
 				<rom name="2 por 1 - platoon (1989)(erbe).dsk" size="194816" crc="0341da38" sha1="ced84b0c722d3b7ca87727003c1d825f0bb723e9" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: Arkanoid II: Revenge of Doh"/>
 			<dataarea name="flop" size="58624">
 				<rom name="2 por 1 - arkanoid ii - revenge of doh (1989)(erbe).dsk" size="58624" crc="671b73b3" sha1="56d72c852be3ab2547d348b92fe96dc6cfa4c095" offset="0" />
@@ -3088,7 +3088,7 @@
 				<rom name="2 por 1 - silent shadow (1988)(erbe)(es).dsk" size="194816" crc="e308222a" sha1="3512aba07e8087b3b3b22952f30133c057f92897" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: Mad Mix Game"/>
 			<dataarea name="flop" size="194816">
 				<rom name="2 por 1 - mad mix game (1988)(erbe)(es).dsk" size="194816" crc="c530fc92" sha1="3ba4cae93aded2a468e8b424dd46f1b05f7b18bd" offset="0" />
@@ -3247,13 +3247,13 @@
 				<rom name="20 game pack (19xx)(comet)(disk 1 of 2 side b).dsk" size="194816" crc="0c4f057a" sha1="ab36f880f872d18a4315f5bad78bd5961f7787b2" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop3" interface="floppy_3">
 			<feature name="part_id" value="Disk 2, Side A"/>
 			<dataarea name="flop" size="194816">
 				<rom name="20 game pack (19xx)(comet)(disk 2 of 2 side a).dsk" size="194816" crc="f374a90f" sha1="c053291bea9fd33ea463e9aa5e5530056cf4a615" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3">
+		<part name="flop4" interface="floppy_3">
 			<feature name="part_id" value="Disk 2, Side B"/>
 			<dataarea name="flop" size="194816">
 				<rom name="20 game pack (19xx)(comet)(disk 2 of 2 side b).dsk" size="194816" crc="e794781e" sha1="6a6c9e4a8083bef5e405db20ed4897668965296a" offset="0" />
@@ -3367,7 +3367,7 @@
 				<rom name="40 principales vol. 10, los - super soccer + ramon rodriguez (1987)(erbe)(es)(en).dsk" size="194816" crc="e3cfb4fd" sha1="d91dffe5f813aa2bb55883568487c6073f158911" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: Pole Position + Abu Simbel Profanation"/>
 			<dataarea name="flop" size="194816">
 				<rom name="40 principales vol. 10, los - pole position + abu simbel profanation (1987)(erbe)(es)(en).dsk" size="194816" crc="624a60d6" sha1="5a669643703075479ab57123bb82aa46d755272a" offset="0" />
@@ -3577,7 +3577,7 @@
 				<rom name="40 principales vol. 9, los (1987)(erbe)(es)(en-es)(side a).dsk" size="194816" crc="fad70a24" sha1="05b136fbcbc2ff78ee1b9df8a8c8eee84b5b27cd" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: World Series Basketball + Nonamed"/>
 			<dataarea name="flop" size="194816">
 				<rom name="40 principales vol. 9, los (1987)(erbe)(es)(en)(side b).dsk" size="194816" crc="8c5e18a1" sha1="ede67667b46bb8d785398c58d22263158ed744af" offset="0" />
@@ -3821,7 +3821,7 @@
 				<rom name="best of elite vol 1 - frank bruno's boxing + bomb jack (1987)(hit-pak).dsk" size="214784" crc="d7dcaba9" sha1="4390a79bea5a12930b52d12e8bc3a0eb4bafb5eb" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: Airwolf + Commando"/>
 			<dataarea name="flop" size="214784">
 				<rom name="best of elite vol 1 - airwolf + commando (1987)(hit-pak).dsk" size="214784" crc="36042980" sha1="41b40047372fac5c7001031de46ff4db79b27561" offset="0" />
@@ -3971,7 +3971,7 @@
 				<rom name="computer classics - aliens + cauldron ii - the pumpkin strikes back + dynamite dan (1987)(beau-jolly).dsk" size="204544" crc="f34e00f7" sha1="293aa4a82b1163cff606a9c8a8ff1e9c4a4d9364" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: Into the Eagle's Nest + Exolon"/>
 			<dataarea name="flop" size="204544">
 				<rom name="computer classics - into the eagle's nest + exolon (1987)(beau-jolly).dsk" size="204544" crc="a1d84366" sha1="c8e1f9ae43d3e44614eb0bf6b51807e1c6ee79df" offset="0" />
@@ -4028,7 +4028,7 @@
 				<rom name="data east's arcade alley - express raider + last mission (1988)(u.s. gold)(side a).dsk" size="194816" crc="4621ccee" sha1="6357e892ac1e242d93f145bd1fc3a925133db1a4" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: Kung-Fu Master + Breakthru"/>
 			<dataarea name="flop" size="194816">
 				<rom name="data east's arcade alley - kung-fu master + breakthru (1988)(u.s. gold).dsk" size="194816" crc="3ec5943f" sha1="1a653fa41d7fcd7aaffe928d2c0185301dd764d7" offset="0" />
@@ -4337,7 +4337,7 @@
 				<rom name="five star games 3 - aliens + the sacred armour of antiriad + the way of the exploding fist (1987)(beau-jolly).dsk" size="194816" crc="a4183f58" sha1="bda5e566d528700d8dc829636a59a55a8755f055" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: Spindizzy + Starquake + Tau Ceti + Uridium+"/>
 			<dataarea name="flop" size="194816">
 				<rom name="five star games 3 - spindizzy + starquake + tau ceti + uridium+ (1987)(beau-jolly).dsk" size="194816" crc="52571952" sha1="23a2ce48d8ea3116578084c398702be0c3adb8d4" offset="0" />
@@ -4506,25 +4506,25 @@
 				<rom name="giants - out run (1988)(u.s. gold)(disk 1 of 3 side b).dsk" size="154624" crc="e55f2a26" sha1="296cc4091571beb20dbea551adaf7a53e13214a2" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop3" interface="floppy_3">
 			<feature name="part_id" value="Side A: 720 Degrees + Rolling Thunder"/>
 			<dataarea name="flop" size="194816">
 				<rom name="giants - 720 degrees + rolling thunder (1988)(u.s. gold)(disk 2 of 3 side a).dsk" size="194816" crc="f2ded21e" sha1="055f552e55fc5d2d698f9a17c6524cf8a21d2614" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3">
+		<part name="flop4" interface="floppy_3">
 			<feature name="part_id" value="Side B: Gauntlet II"/>
 			<dataarea name="flop" size="174336">
 				<rom name="giants - gauntlet ii (1988)(u.s. gold)(disk 2 of 3 side b).dsk" size="174336" crc="34f085e5" sha1="f15d5d0f21192a7d3e8881b20fcf26b63a93173e" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop5" interface="floppy_3">
 			<feature name="part_id" value="Side A: California Games"/>
 			<dataarea name="flop" size="182016">
 				<rom name="giants - california games (1988)(u.s. gold)(disk 3 of 3 side a).dsk" size="182016" crc="345824a9" sha1="d071db70eca434477322f6b105cc7830f2892f73" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3">
+		<part name="flop6" interface="floppy_3">
 			<feature name="part_id" value="Side B: California Games"/>
 			<dataarea name="flop" size="182528">
 				<rom name="giants - california games (1988)(u.s. gold)(disk 3 of 3 side b).dsk" size="182528" crc="3b596738" sha1="2333a2612b1dbd633dadaba41c5c058bcf52e8ba" offset="0" />
@@ -5884,7 +5884,7 @@
 				<rom name="plus 3 sports - strike (1987)(mastertronic)(side a).dsk" size="194816" crc="3ca3f142" sha1="dfaf7bb837087a04b993fa83a45471177e91be4f" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: Speed King 2"/>
 			<dataarea name="flop" size="194816">
 				<rom name="plus 3 sports - speed king 2 (1987)(mastertronic)(side b).dsk" size="194816" crc="2519315e" sha1="ae1f1e21969fec88305fc9200eae5b288d711739" offset="0" />
@@ -6196,19 +6196,19 @@
 				<rom name="soccer mania (1990)(addictive games)(disk 1 of 2 side a).dsk" size="194816" crc="bfcc36bb" sha1="6d6a74fe478bdfc039f3dc67e851a6951413dbf8" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Disk 1, Side A: Football Manager: World Cup Edition"/>
 			<dataarea name="flop" size="194816">
 				<rom name="soccer mania - world cup edition (1990)(addictive games)(disk 1 of 2 side b).dsk" size="194816" crc="7f49f5cd" sha1="6d6a3ea81aeffbc9a300ae6252c81183a3df5aa4" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3">
+		<part name="flop3" interface="floppy_3">
 			<feature name="part_id" value="Disk 2, Side A: Gazza's Super Soccer"/>
 			<dataarea name="flop" size="194816">
 				<rom name="soccer mania (1990)(addictive games)(disk 2 of 2 side a).dsk" size="194816" crc="347bc85e" sha1="f89876979105843a68d1e06aa8dab94dc599597e" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_3">
+		<part name="flop4" interface="floppy_3">
 			<feature name="part_id" value="Disk 2, Side B: MicroProse Soccer"/>
 			<dataarea name="flop" size="194816">
 				<rom name="soccer mania (1990)(addictive games)(disk 2 of 2 side b).dsk" size="194816" crc="53a7650a" sha1="5c44e0b45cbb2dccbd2725fa96be07caf9563cc3" offset="0" />
@@ -6447,7 +6447,7 @@
 				<rom name="take five - gangplank + just imagine (1988)(pirate)(side a).dsk" size="194816" crc="60ef133d" sha1="c1c85b3014eccf68baead4015688528c2eb325dd" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: Dusty Droid and the Garbage Gobblers + O.K. Yah + Don't Say It, Spray It"/>
 			<dataarea name="flop" size="194816">
 				<rom name="take five - dusty droid and the garbage gobblers + o.k. yah + don't say it, spray it (1988)(pirate)(side b).dsk" size="194816" crc="c02bad77" sha1="a28709dbc02fd94161e51516aae7a6dd4f62df20" offset="0" />
@@ -6593,7 +6593,7 @@
 				<rom name="traveller's tales - phoenix + the violator of voodoo (1993)(zenobi)(side a).dsk" size="194816" crc="30e96557" sha1="72179269718719ea83e2c1994f938c99b015145d" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: Aztec Assault + Celtic Carnage"/>
 			<dataarea name="flop" size="194816">
 				<rom name="traveller's tales - aztec assault + celtic carnage (1993)(zenobi)(side b).dsk" size="194816" crc="6af8f2c7" sha1="636611c8143f00b4b47ba2ac593481d07ae83642" offset="0" />
@@ -15011,7 +15011,7 @@
 			</dataarea>
 		</part>
 		<publisher>Level 9 Computing</publisher>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop2" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="scapeghost (1989)(level 9 computing)(side b)[a][aka spook].dsk" size="194816" crc="c464a1e9" sha1="baf17b2ebba89cbb29af430be2399c05f03d4ad3" offset="0" />
 			</dataarea>
@@ -19960,8 +19960,8 @@
 	<software name="prayoftwa" cloneof="prayoftw">
 	<!-- Modified version of the game which includes both loads in one side of the disc. -->
 		<description>The Prayer of the Warrior (alt)</description>
-		<year></year>
-		<publisher></publisher>
+		<year>1992</year>
+		<publisher>Zigurat Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size = "194816">
 				<rom name="The Prayer of the Warrior (Zup).dsk" size="194816" crc="f9b00ee9" sha1="f18303f4295f1127c8e499ce197d6a17397cd70a" offset="0"/>
