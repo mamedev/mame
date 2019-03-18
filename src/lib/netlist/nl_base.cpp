@@ -988,12 +988,9 @@ pstring param_t::get_initial(const device_t &dev, bool *found)
 	return res;
 }
 
-
 const pstring param_model_t::model_type()
 {
-	if (m_map.size() == 0)
-		state().setup().model_parse(this->Value(), m_map);
-	return m_map["COREMODEL"];
+	return state().setup().models().model_type(value());
 }
 
 param_str_t::param_str_t(device_t &device, const pstring &name, const pstring &val)
@@ -1016,27 +1013,22 @@ param_ptr_t::param_ptr_t(device_t &device, const pstring &name, uint8_t * val)
 void param_model_t::changed()
 {
 	state().log().fatal(MF_1_MODEL_1_CAN_NOT_BE_CHANGED_AT_RUNTIME, name());
-	m_map.clear();
 }
 
 const pstring param_model_t::model_value_str(const pstring &entity)
 {
-	if (m_map.size() == 0)
-		state().setup().model_parse(this->Value(), m_map);
-	return state().setup().model_value_str(m_map, entity);
+	return state().setup().models().model_value_str(value(), entity);
 }
 
 nl_double param_model_t::model_value(const pstring &entity)
 {
-	if (m_map.size() == 0)
-		state().setup().model_parse(this->Value(), m_map);
-	return state().setup().model_value(m_map, entity);
+	return state().setup().models().model_value(value(), entity);
 }
 
 
 plib::unique_ptr<plib::pistream> param_data_t::stream()
 {
-	return device().setup().get_data_stream(Value());
+	return device().setup().get_data_stream(value());
 }
 
 	bool detail::core_terminal_t::is_logic() const NL_NOEXCEPT

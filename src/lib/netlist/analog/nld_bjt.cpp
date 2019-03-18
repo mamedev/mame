@@ -291,7 +291,6 @@ namespace analog
 
 		NETLIB_SUBXX(analog, C) m_CJE;
 		NETLIB_SUBXX(analog, C) m_CJC;
-
 	};
 
 
