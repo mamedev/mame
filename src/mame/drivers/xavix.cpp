@@ -381,8 +381,8 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	//map(0x7b18, 0x7b1b)
 
 	// ADC registers
-	map(0x7b80, 0x7b80).rw(FUNC(xavix_state::adc_7b80_r), FUNC(xavix_state::adc_7b80_w)); // rad_snow (not often)
-	map(0x7b81, 0x7b81).rw(FUNC(xavix_state::adc_7b81_r), FUNC(xavix_state::adc_7b81_w)); // written (often, m_trck, analog related?)
+	map(0x7b80, 0x7b80).rw("adc", FUNC(xavix_adc_device::adc_7b80_r), FUNC(xavix_adc_device::adc_7b80_w)); // rad_snow (not often)
+	map(0x7b81, 0x7b81).rw("adc", FUNC(xavix_adc_device::adc_7b81_r), FUNC(xavix_adc_device::adc_7b81_w)); // written (often, m_trck, analog related?)
 
 	// Sleep control
 	//map(0x7b82, 0x7b83)
@@ -1390,6 +1390,16 @@ void xavix_state::xavix(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(xavix_state::scanline_cb), "screen", 0, 1);
 
 	ADDRESS_MAP_BANK(config, "lowbus").set_map(&xavix_state::xavix_lowbus_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
+
+	XAVIX_ADC(config, m_adc, 0);
+	m_adc->read_0_callback().set(FUNC(xavix_state::adc0_r));
+	m_adc->read_1_callback().set(FUNC(xavix_state::adc1_r));
+	m_adc->read_2_callback().set(FUNC(xavix_state::adc2_r));
+	m_adc->read_3_callback().set(FUNC(xavix_state::adc3_r));
+	m_adc->read_4_callback().set(FUNC(xavix_state::adc4_r));
+	m_adc->read_5_callback().set(FUNC(xavix_state::adc5_r));
+	m_adc->read_6_callback().set(FUNC(xavix_state::adc6_r));
+	m_adc->read_7_callback().set(FUNC(xavix_state::adc7_r));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
