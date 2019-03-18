@@ -310,52 +310,6 @@ WRITE8_MEMBER(xavix_state::mouse_7b11_w)
 
 
 
-READ8_MEMBER(xavix_state::adc_7b80_r)
-{
-	LOG("%s: adc_7b80_r\n", machine().describe_context());
-	return m_adc_inlatch;
-}
-
-WRITE8_MEMBER(xavix_state::adc_7b80_w)
-{
-	// is the latch writeable?
-	LOG("%s: adc_7b80_w %02x\n", machine().describe_context(), data);
-}
-
-WRITE8_MEMBER(xavix_state::adc_7b81_w)
-{
-//  m_irqsource &= ~0x04;
-//  update_irqs();
-
-	LOG("%s: adc_7b81_w %02x\n", machine().describe_context(), data);
-	m_adc_control = data;
-
-	// bit 0x40 = run? or IRQ? (doesn't seem to be any obvious way to clear IRQs tho, ADC handling is usually done in timer IRQ?)
-	// should probably set latch after a timer has expired not instantly?
-	// bits 0x0c are not port select?
-	// bit 0x80 is some kind of ack? / done flag?
-	switch (m_adc_control & 0x13)
-	{
-	case 0x00: m_adc_inlatch = m_an_in[0]->read(); break;
-	case 0x01: m_adc_inlatch = m_an_in[1]->read(); break;
-	case 0x02: m_adc_inlatch = m_an_in[2]->read(); break;
-	case 0x03: m_adc_inlatch = m_an_in[3]->read(); break;
-	case 0x10: m_adc_inlatch = m_an_in[4]->read(); break;
-	case 0x11: m_adc_inlatch = m_an_in[5]->read(); break;
-	case 0x12: m_adc_inlatch = m_an_in[6]->read(); break;
-	case 0x13: m_adc_inlatch = m_an_in[7]->read(); break;
-	}
-
-//  m_adc_timer->adjust(attotime::from_usec(200));
-}
-
-READ8_MEMBER(xavix_state::adc_7b81_r)
-{
-//  has_wamg polls this if interrupt is enabled
-	return machine().rand();
-}
-
-
 
 WRITE8_MEMBER(xavix_state::slotreg_7810_w)
 {
@@ -915,12 +869,6 @@ TIMER_CALLBACK_MEMBER(xavix_state::freq_timer_done)
 	//m_freq_timer->adjust(attotime::from_usec(50000));
 }
 
-TIMER_CALLBACK_MEMBER(xavix_state::adc_timer_done)
-{
-	//m_irqsource |= 0x04;
-	//update_irqs();
-}
-
 // epo_guru uses this for ground movement in 3d stages (and other places)
 READ8_MEMBER(xavix_state::barrel_r)
 {
@@ -1073,7 +1021,6 @@ void xavix_state::machine_start()
 
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::interrupt_gen), this));
 	m_freq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::freq_timer_done), this));
-	m_adc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::adc_timer_done), this));
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -1091,7 +1038,6 @@ void xavix_state::machine_start()
 	save_item(NAME(m_io1_data));
 	save_item(NAME(m_io0_direction));
 	save_item(NAME(m_io1_direction));
-	save_item(NAME(m_adc_control));
 	save_item(NAME(m_sound_irqstatus));
 	save_item(NAME(m_soundreg16_0));
 	save_item(NAME(m_soundreg16_1));
@@ -1191,7 +1137,6 @@ void xavix_state::machine_reset()
 
 	m_sound_regbase = 0x02; // rad_bb doesn't initialize this and expects it here.  It is possible the default is 0x00, but since 0x00 and 0x01 are special (zero page and stack) those values would also use bank 0x02
 
-	m_adc_control = 0x00;
 
 	m_sprite_xhigh_ignore_hack = true;
 
