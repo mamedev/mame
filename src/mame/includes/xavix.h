@@ -729,7 +729,6 @@ public:
 	void xavix_cart(machine_config &config);
 	void xavix_cart_ekara(machine_config &config);
 	void xavix_cart_popira(machine_config &config);
-	void xavix_cart_popira2(machine_config &config);
 	void xavix_cart_ddrfammt(machine_config &config);
 
 protected:
@@ -894,11 +893,6 @@ protected:
 	}
 
 	required_device<ekara_cart_slot_device> m_cartslot;
-
-	private:
-
-	DECLARE_READ8_MEMBER(popira2_adc0_r);
-	DECLARE_READ8_MEMBER(popira2_adc1_r);
 };
 
 class xavix_i2c_cart_state : public xavix_cart_state
@@ -927,11 +921,16 @@ public:
 		: xavix_cart_state(mconfig,type,tag)
 	{ }
 
+	void xavix_cart_popira2(machine_config &config);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
 
 protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
+private:
+	DECLARE_READ8_MEMBER(popira2_adc0_r);
+	DECLARE_READ8_MEMBER(popira2_adc1_r);
 };
 
 

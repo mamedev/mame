@@ -889,6 +889,7 @@ static INPUT_PORTS_START( popira2 ) // player 2 buttons have heavy latency, prob
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
+	// main input processing code is at 028059, which ends with setting a timer (028079) to read analog ports and get these buttons that way.  main timer handler is at 00eb77, which reads ports via the ADC.  $c3 where ports are stored is also checked at 00e6f4
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Pad 1") PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Pad 2") PORT_PLAYER(2)
@@ -1448,7 +1449,7 @@ void xavix_cart_state::xavix_cart_popira(machine_config &config)
 }
 
 
-READ8_MEMBER(xavix_cart_state::popira2_adc0_r)
+READ8_MEMBER(xavix_popira2_cart_state::popira2_adc0_r)
 {
 	uint8_t p2 = ioport("P2")->read() & 0x03;
 	switch (p2)
@@ -1462,7 +1463,7 @@ READ8_MEMBER(xavix_cart_state::popira2_adc0_r)
 	return 0x00;
 }
 
-READ8_MEMBER(xavix_cart_state::popira2_adc1_r)
+READ8_MEMBER(xavix_popira2_cart_state::popira2_adc1_r)
 {
 	uint8_t p2 = (ioport("P2")->read() >> 2) & 0x03;
 	switch (p2)
@@ -1476,12 +1477,12 @@ READ8_MEMBER(xavix_cart_state::popira2_adc1_r)
 	return 0x00;
 }
 
-void xavix_cart_state::xavix_cart_popira2(machine_config &config)
+void xavix_popira2_cart_state::xavix_cart_popira2(machine_config &config)
 {
 	xavix_cart_popira(config);
 
-	m_adc->read_0_callback().set(FUNC(xavix_cart_state::popira2_adc0_r));
-	m_adc->read_1_callback().set(FUNC(xavix_cart_state::popira2_adc1_r));
+	m_adc->read_0_callback().set(FUNC(xavix_popira2_cart_state::popira2_adc0_r));
+	m_adc->read_1_callback().set(FUNC(xavix_popira2_cart_state::popira2_adc1_r));
 }
 
 void xavix_cart_state::xavix_cart_ddrfammt(machine_config &config)
@@ -1897,7 +1898,7 @@ CONS( 2001, ddrfammt, 0,           0,  xavix_cart_ddrfammt,ddrfammt, xavix_cart_
 
 CONS( 2000, popira,   0,           0,  xavix_cart_popira,popira,   xavix_cart_state,     init_xavix,    "Takara / SSD Company LTD",                     "Popira (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // The original Popira is a single yellow unit
 
-CONS( 2002, popira2,  0,           0,  xavix_cart_popira2,popira2,  xavix_popira2_cart_state, init_xavix,    "Takara / SSD Company LTD",                 "Popira 2 (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // Popira 2 is a set of 2 blue & green linked units (2nd unit is just a controller, no CPU or TV out)
+CONS( 2002, popira2,  0,           0,  xavix_cart_popira2,popira2,  xavix_popira2_cart_state, init_xavix,    "Takara / SSD Company LTD",                 "Popira 2 (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // Popira 2 is a set of 2 blue & green linked units (2nd unit is just a controller, no CPU or TV out)
 
 CONS( 2003, taikodp,  0,           0,  xavix_i2c_taiko,  taikodp,  xavix_i2c_cart_state, init_xavix,    "Takara / SSD Company LTD",                     "Taiko De Popira (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? are the drums analog?
 
