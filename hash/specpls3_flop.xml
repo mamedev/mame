@@ -3709,7 +3709,7 @@
 	<software name="acextra3">
 		<description>Arcade Extravaganza Disk 3</description>
 		<year>1988</year>
-		<publisher>Alternative</publisher>
+		<publisher>Alternative Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="arcade extravaganza disk 3 (1988)(alternative).dsk" size="194816" crc="e421ac09" sha1="5d8fce028a7793d3ecf84086244a9fb77104cc94" offset="0" />
@@ -3883,7 +3883,7 @@
 	<software name="cartcap3">
 		<description>Cartoon Capers Disk 3</description>
 		<year>1988</year>
-		<publisher>Alternative</publisher>
+		<publisher>Alternative Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="cartoon capers disk 3 (1988)(alternative).dsk" size="194816" crc="bd43f24b" sha1="a5a5f52b283f84d7dfa2d904712a1d25ba75dcb8" offset="0" />
@@ -5233,8 +5233,9 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="magkntri">
-		<description>Magic Knight Trilogy</description>
+	<!-- May be the same edition as the IPF -->
+	<software name="mknitrila" cloneof="mknitril">
+		<description>Magic Knight Trilogy (alt)</description>
 		<year>1988</year>
 		<publisher>Mastertronic</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -5746,8 +5747,9 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="pirat3p3">
-		<description>Pirate 3 +3</description>
+	<!-- May be the same edition as the IPF -->
+	<software name="pirate33a" cloneof="pirate33">
+		<description>Pirate 3 +3 (alt)</description>
 		<year>1987</year>
 		<publisher>Pirate</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -5853,7 +5855,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="plus3pac">
+	<software name="plus3pad">
 		<description>Plus 3 Pack (Dinamic)</description>
 		<year>1988</year>
 		<publisher>Dinamic Software</publisher>
@@ -6046,10 +6048,11 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="shootac2">
-		<description>Shootacular Disk 2</description>
+	<!-- May be the same edition as the IPF -->
+	<software name="shootdska" cloneof="shootdsk">
+		<description>Shootacular Disk 2 (alt)</description>
 		<year>1988</year>
-		<publisher>Alternative</publisher>
+		<publisher>Alternative Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="195328">
 				<rom name="shootacular disk 2 (1988)(alternative).dsk" size="195328" crc="ce79b362" sha1="2eef6ecdc55ebb3fb5bd2550470b8435cdab4c07" offset="0" />
@@ -6245,10 +6248,11 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="sportac1">
-		<description>Sportacular Disk 1</description>
+	<!-- May be the same edition as the IPF -->
+	<software name="sportdska" cloneof="sportdsk">
+		<description>Sportacular Disk 1 (alt)</description>
 		<year>1988</year>
-		<publisher>Alternative</publisher>
+		<publisher>Alternative Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="sportacular disk 1 - soccer boss + olympic spectacular + indoor soccer (1988)(alternative).dsk" size="194816" crc="d42b8502" sha1="7299f66abbe1f01b02b43274a8ca9e3dabe56a7f" offset="0" />
@@ -6314,8 +6318,9 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="suncompu">
-		<description>The Sun Computer Crosswords Volume 1</description>
+	<!-- May be the same edition as the IPF -->
+	<software name="sunxworda" cloneof="sunxword">
+		<description>The Sun Computer Crosswords Volume 1 (alt)</description>
 		<year>1988</year>
 		<publisher>Akom</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -6345,7 +6350,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="supremec">
+	<software name="suprecss">
 		<description>Supreme Challenge: Soccer Spectacular</description>
 		<year>1989</year>
 		<publisher>Beau-Jolly</publisher>
@@ -11620,7 +11625,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="ikariwara" alt="ikariwar">
+	<software name="ikariwara" cloneof="ikariwar">
 		<description>Ikari Warriors (alt)</description>
 		<year>1988</year>
 		<publisher>Elite Systems</publisher>
@@ -11944,7 +11949,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="jadestona" cloneof="jadeston">>
+	<software name="jadestona" cloneof="jadeston">
 		<description>The Jade Stone (alt)</description>
 		<year>1987</year>
 		<publisher>Zenobi Software</publisher>
@@ -13537,7 +13542,7 @@
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="ninjawarsp" cloneof="ninjawar">
 		<description>The Ninja Warriors (Spa)</description>
-		<year>1989</year>
+		<year>1990</year>
 		<publisher>Dro Soft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
@@ -13883,7 +13888,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- May be the same edition as the IPF -->
-	<software name="p47thuna" cloneof="p47thun">>
+	<software name="p47thuna" cloneof="p47thun">
 		<description>P-47 Thunderbolt (alt)</description>
 		<year>1990</year>
 		<publisher>Firebird Software</publisher>
@@ -14254,8 +14259,8 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="protenntsp" cloneof="protennt">>
-		<description>Pro Tennis Tour</description>
+	<software name="protenntsp" cloneof="protennt">
+		<description>Pro Tennis Tour (Spa)</description>
 		<year>1990</year>
 		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -14267,7 +14272,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- May be the same edition as the IPF -->
-	<software name="protennta" cloneof="protennt">>
+	<software name="protennta" cloneof="protennt">
 		<description>Pro Tennis Tour (alt)</description>
 		<year>1990</year>
 		<publisher>Ubi Soft</publisher>
@@ -14849,7 +14854,7 @@
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- May be the same edition as the IPF -->
 	<software name="rungaunta" cloneof="rungaunt">
-		<description>Run the Gauntlet</description>
+		<description>Run the Gauntlet (alt)</description>
 		<year>1989</year>
 		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -14910,7 +14915,7 @@
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- May be the same edition as the IPF -->
 	<software name="saintgrva" cloneof="saintgrv">
-		<description>Saint &amp; Greavsie</description>
+		<description>Saint &amp; Greavsie (alt)</description>
 		<year>1989</year>
 		<publisher>Grandslam Entertainments</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -15087,7 +15092,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="setotaisde" cloneof="setotais">>
+	<software name="setotaisde" cloneof="setotais">
 		<description>Seto Taisho vs Yokai (German, Spanish)</description>
 		<year>2016</year>
 		<publisher>Alessandro Grussu</publisher>
@@ -15111,7 +15116,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="setotaisfr" cloneof="setotais">>
+	<software name="setotaisfr" cloneof="setotais">
 		<description>Seto Taisho vs Yokai (French, Portuguese)</description>
 		<year>2016</year>
 		<publisher>Alessandro Grussu</publisher>
@@ -15296,7 +15301,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="silkwormsp" cloneofe="silkworm">>
+	<software name="silkwormsp" cloneof="silkworm">
 		<description>Silkworm (Spa)</description>
 		<year>1989</year>
 		<publisher>Erbe Software</publisher>
@@ -15308,7 +15313,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="silkwormspa" cloneofe="silkworm">>
+	<software name="silkwormspa" cloneof="silkworm">
 		<description>Silkworm (Spa) (alt)</description>
 		<year>1989</year>
 		<publisher>Erbe Software</publisher>
@@ -15320,7 +15325,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="silkwormspb" cloneofe="silkworm">>
+	<software name="silkwormspb" cloneof="silkworm">
 		<description>Silkworm (Spa) (alt 2)</description>
 		<year>1989</year>
 		<publisher>Erbe Software</publisher>
@@ -15542,8 +15547,9 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="soldiero">
-		<description>Soldier of Light</description>
+	<!-- May be the same edition as the IPF -->
+	<software name="soldlghta" cloneof="soldlght">
+		<description>Soldier of Light (alt)</description>
 		<year>1988</year>
 		<publisher>ACE</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -15554,9 +15560,8 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
-	<software name="soldlghta" cloneof="soldlght">
-		<description>Soldier of Light (alt)</description>
+	<software name="soldlghtsp" cloneof="soldlght">
+		<description>Soldier of Light (Spa)</description>
 		<year>1988</year>
 		<publisher>Dro Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -15593,7 +15598,7 @@
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- May be the same edition as the IPF -->
 	<software name="spacecrsa" cloneof="spacecrs">
-		<description>Space Crusade</description>
+		<description>Space Crusade (alt)</description>
 		<year>1992</year>
 		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -16046,6 +16051,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
+	<!-- May be the same edition as the IPF -->
 	<software name="ssinva" cloneof="ssinv">
 		<description>Super Space Invaders (alt)</description>
 		<year>1991</year>
@@ -16058,6 +16064,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
+	<!-- May be the same edition as the IPF -->
 	<software name="ssinvb" cloneof="ssinv">
 		<description>Super Space Invaders (alt 2)</description>
 		<year>1991</year>
@@ -16070,6 +16077,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
+	<!-- May be the same edition as the IPF -->
 	<software name="ssinvc" cloneof="ssinv">
 		<description>Super Space Invaders (alt 3)</description>
 		<year>1991</year>
@@ -16082,8 +16090,9 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="superspa">
-		<description>Super Space Invaders</description>
+	<!-- May be the same edition as the IPF -->
+	<software name="ssinvd" cloneof="ssinv">
+		<description>Super Space Invaders (alt 4)</description>
 		<year>1991</year>
 		<publisher>Domark</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -17458,8 +17467,8 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="warinmid">
-		<description>War in Middle Earth</description>
+	<software name="warmidlesp" cloneof="warmidle">
+		<description>War in Middle Earth (Spa)</description>
 		<year>1989</year>
 		<publisher>Dro Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -17472,7 +17481,7 @@
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- May be the same edition as the IPF -->
 	<software name="warmidlea" cloneof="warmidle">
-		<description>War in Middle Earth</description>
+		<description>War in Middle Earth (alt)</description>
 		<year>1989</year>
 		<publisher>Melbourne House</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -17502,8 +17511,8 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="welltris">
-		<description>Welltris</description>
+	<software name="welltrissp">
+		<description>Welltris (Spa)</description>
 		<year>1991</year>
 		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -19687,8 +19696,8 @@
 		</part>
 	</software>
 
-	<software name="italia90sp" cloneof="italia90">
-		<description>Italia '90 - World Cup Soccer (Spa)</description>
+	<software name="italia90spb" cloneof="italia90">
+		<description>Mundial de Futbol Italia '90 (alt 2)</description>
 		<year>1989</year>
 		<publisher>Dro Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -19709,7 +19718,7 @@
 		</part>
 	</software>
 
-	<software name="los40v5">
+	<software name="los40v4">
 		<description>Los 40 Principales Vol. 4</description>
 		<year>1987</year>
 		<publisher>Erbe Software</publisher>
@@ -19806,8 +19815,8 @@
 		</part>
 	</software>
 
-	<software name="ninjawarsp" cloneof="ninjawar">
-		<description>The Ninja Warriors (Spa)</description>
+	<software name="ninjawarspa" cloneof="ninjawar">
+		<description>The Ninja Warriors (Spa) (alt)</description>
 		<year>1990</year>
 		<publisher>Dro Soft</publisher>
 		<part name="flop1" interface="floppy_3">
