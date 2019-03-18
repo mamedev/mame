@@ -17752,6 +17752,8 @@ karatevs                        // (c) 1984 Data East Corporation (Japan)
 kchamp                          // (c) 1984 Data East USA (US)
 kchampvs                        // (c) 1984 Data East USA (US)
 kchampvs2                       // (c) 1984 Data East USA (US)
+kchampvs3                       // (c) 1984 Data East USA (US)
+kchampvs4                       // (c) 1984 Data East USA (US)
 
 @source:kdt6.cpp
 psi98                           // (c) 1984 Kontron
@@ -39689,6 +39691,7 @@ sttng_g7                        //
 sttng_l1                        //
 sttng_l2                        //
 sttng_l3                        //
+sttng_l5                        //
 sttng_l7                        //
 sttng_p4                        //
 sttng_p5                        //
