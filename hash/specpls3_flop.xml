@@ -5751,7 +5751,7 @@
 	<software name="pirate33a" cloneof="pirate33">
 		<description>Pirate 3 +3 (alt)</description>
 		<year>1987</year>
-		<publisher>Pirate</publisher>
+		<publisher>Pirate Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="pirate 3 +3 - smash out + call me psycho + holiday in sumaria (1987)(pirate).dsk" size="194816" crc="c9c2142f" sha1="9ae3faaa820eceb282dde70c7a22117747a1c36b" offset="0" />
@@ -6440,7 +6440,7 @@
 	<software name="takefive">
 		<description>Take Five</description>
 		<year>1988</year>
-		<publisher>Pirate</publisher>
+		<publisher>Pirate Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Gangplank + Just Imagine"/>
 			<dataarea name="flop" size="194816">
