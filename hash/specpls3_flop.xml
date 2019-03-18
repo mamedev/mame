@@ -7884,8 +7884,8 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="barbariasp">
-		<description>Barbarian (Spa)</description>
+	<software name="barbaria">
+		<description>Barbarian</description>
 		<year>1988</year>
 		<publisher>Dro Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -16417,8 +16417,8 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="terrorposp">
-		<description>Terrorpods (Spa)</description>
+	<software name="terrorpo">
+		<description>Terrorpods</description>
 		<year>1989</year>
 		<publisher>Dro Soft</publisher>
 		<part name="flop1" interface="floppy_3">
