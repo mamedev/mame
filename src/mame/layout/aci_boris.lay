@@ -5,6 +5,7 @@
 
 	<element name="black"><rect><color red="0.16" green="0.16" blue="0.16" /></rect></element>
 	<element name="disk_white"><disk><color red="0.8" green="0.8" blue="0.8" /></disk></element>
+	<element name="disk_white2"><disk><color red="0.73" green="0.73" blue="0.73" /></disk></element>
 
 	<element name="button" defstate="0">
 		<rect state="0"><color red="0.55" green="0.55" blue="0.55" /></rect>
@@ -35,11 +36,11 @@
 	<element name="digitq" defstate="28536"><led16seg><color red="0.8" green="0.35" blue="0.05" /></led16seg></element>
 	<element name="digitk" defstate="28668"><led16seg><color red="0.8" green="0.35" blue="0.05" /></led16seg></element>
 
-	<element name="text_u1"><text string="from" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_u2"><text string="to" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_u3"><text string="hrs" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_u4"><text string="min" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_u5"><text string="sec" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_u1"><text string="from" align="1"><color red="0.72" green="0.72" blue="0.72" /></text></element>
+	<element name="text_u2"><text string="to" align="1"><color red="0.72" green="0.72" blue="0.72" /></text></element>
+	<element name="text_u3"><text string="hrs" align="1"><color red="0.72" green="0.72" blue="0.72" /></text></element>
+	<element name="text_u4"><text string="min" align="1"><color red="0.72" green="0.72" blue="0.72" /></text></element>
+	<element name="text_u5"><text string="sec" align="1"><color red="0.72" green="0.72" blue="0.72" /></text></element>
 
 	<element name="text_l01a"><text string="G" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l01b"><text string="7" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
@@ -88,14 +89,14 @@
 		<bezel name="digit1" element="digit"><bounds x="16.50" y="18.3" width="2.75" height="4.125" /></bezel>
 		<bezel name="digit0" element="digit"><bounds x="19.25" y="18.3" width="2.75" height="4.125" /></bezel>
 
-		<bezel element="disk_white"><bounds x="1.125"  y="23" width="0.5" height="0.5" /></bezel>
-		<bezel element="disk_white"><bounds x="3.875"  y="23" width="0.5" height="0.5" /></bezel>
-		<bezel element="disk_white"><bounds x="6.625"  y="23" width="0.5" height="0.5" /></bezel>
-		<bezel element="disk_white"><bounds x="9.375"  y="23" width="0.5" height="0.5" /></bezel>
-		<bezel element="disk_white"><bounds x="12.125" y="23" width="0.5" height="0.5" /></bezel>
-		<bezel element="disk_white"><bounds x="14.875" y="23" width="0.5" height="0.5" /></bezel>
-		<bezel element="disk_white"><bounds x="17.625" y="23" width="0.5" height="0.5" /></bezel>
-		<bezel element="disk_white"><bounds x="20.375" y="23" width="0.5" height="0.5" /></bezel>
+		<bezel element="disk_white2"><bounds x="1.125"  y="23" width="0.5" height="0.5" /></bezel>
+		<bezel element="disk_white2"><bounds x="3.875"  y="23" width="0.5" height="0.5" /></bezel>
+		<bezel element="disk_white2"><bounds x="6.625"  y="23" width="0.5" height="0.5" /></bezel>
+		<bezel element="disk_white2"><bounds x="9.375"  y="23" width="0.5" height="0.5" /></bezel>
+		<bezel element="disk_white2"><bounds x="12.125" y="23" width="0.5" height="0.5" /></bezel>
+		<bezel element="disk_white2"><bounds x="14.875" y="23" width="0.5" height="0.5" /></bezel>
+		<bezel element="disk_white2"><bounds x="17.625" y="23" width="0.5" height="0.5" /></bezel>
+		<bezel element="disk_white2"><bounds x="20.375" y="23" width="0.5" height="0.5" /></bezel>
 
 		<bezel element="text_u1"><bounds x="1.125" y="15.8" width="6" height="1.8" /></bezel>
 		<bezel element="text_u2"><bounds x="9.375" y="15.8" width="6" height="1.8" /></bezel>
