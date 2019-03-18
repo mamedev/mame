@@ -107,11 +107,7 @@ READ8_MEMBER(astrocde_home_state::inputs_r)
 	if (BIT(offset, 2))
 		return m_keypad[offset & 3]->read();
 	else
-	{
-		uint8_t data = m_ctrl[offset & 3]->read_handle();
-		//printf("%d", BIT(data, 0));
-		return data;
-	}
+		return m_ctrl[offset & 3]->read_handle();
 }
 
 static INPUT_PORTS_START( astrocde )
@@ -185,6 +181,8 @@ void astrocde_home_state::astrocde(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &astrocde_home_state::astrocade_mem);
 	m_maincpu->set_addrmap(AS_IO, &astrocde_home_state::astrocade_io);
 
+	config.m_perfect_cpu_quantum = subtag("maincpu");
+
 	MCFG_MACHINE_START_OVERRIDE(astrocde_home_state, astrocde)
 
 	/* video hardware */
@@ -196,10 +194,11 @@ void astrocde_home_state::astrocde(machine_config &config)
 	PALETTE(config, "palette", FUNC(astrocde_home_state::astrocade_palette), 512);
 
 	/* control ports */
-	ASTROCADE_CTRL_PORT(config, m_ctrl[0], astrocade_controllers, "joy");
-	ASTROCADE_CTRL_PORT(config, m_ctrl[1], astrocade_controllers, nullptr);
-	ASTROCADE_CTRL_PORT(config, m_ctrl[2], astrocade_controllers, nullptr);
-	ASTROCADE_CTRL_PORT(config, m_ctrl[3], astrocade_controllers, nullptr);
+	for (uint32_t port = 0; port < 4; port++)
+	{
+		ASTROCADE_CTRL_PORT(config, m_ctrl[port], astrocade_controllers, port == 0 ? "joy" : nullptr);
+		m_ctrl[port]->ltpen_handler().set(FUNC(astrocde_home_state::lightpen_trigger_w));
+	}
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -251,7 +250,7 @@ ROM_END
 
 void astrocde_state::init_astrocde()
 {
-	m_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS;
+	m_video_config = AC_SOUND_PRESENT;
 }
 
 MACHINE_START_MEMBER(astrocde_home_state, astrocde)

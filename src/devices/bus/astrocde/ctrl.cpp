@@ -54,6 +54,9 @@ void device_astrocade_ctrl_interface::interface_pre_start()
 astrocade_ctrl_port_device::astrocade_ctrl_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ASTROCADE_CTRL_PORT, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
+	, m_ltpen(0)
+	, m_ltpen_handler(*this)
+	, m_device(nullptr)
 {
 }
 
@@ -75,6 +78,8 @@ void astrocade_ctrl_port_device::device_resolve_objects()
 	device_astrocade_ctrl_interface *const card(dynamic_cast<device_astrocade_ctrl_interface *>(get_card_device()));
 	if (card)
 		m_device = card;
+
+	m_ltpen_handler.resolve_safe();
 }
 
 void astrocade_ctrl_port_device::device_start()
@@ -87,6 +92,12 @@ void astrocade_ctrl_port_device::device_start()
 			throw emu_fatalerror("astrocade_ctrl_port_device: card device %s (%s) does not implement device_astrocade_ctrl_interface\n", card->tag(), card->name());
 		}
 	}
+
+	save_item(NAME(m_ltpen));
+
+	m_ltpen = 0;
+
+	m_ltpen_handler(0);
 }
 
 uint8_t astrocade_ctrl_port_device::read_handle()

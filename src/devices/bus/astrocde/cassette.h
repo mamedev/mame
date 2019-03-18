@@ -7,6 +7,10 @@
 
 #include "ctrl.h"
 #include "imagedev/cassette.h"
+#include "machine/timer.h"
+
+#include <queue>
+
 
 /***************************************************************************
  TYPE DEFINITIONS
@@ -30,11 +34,21 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override { }
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(check_cassette_wave);
+	TIMER_DEVICE_CALLBACK_MEMBER(pulse_cassette_clock);
 
 private:
 	required_device<cassette_image_device> m_cassette;
+	double m_cass_wave;
+	double m_cass_delta;
+	uint32_t m_cass_wave_ticks;
+	uint32_t m_cass_cycles;
+	bool m_cass_mark;
+	std::queue<uint8_t> m_cass_data;
 };
 
 
