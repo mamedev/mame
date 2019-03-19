@@ -16,18 +16,18 @@
 		<led7seg><color red="1.0" green="0.15" blue="0.08" /></led7seg>
 	</element>
 
-	<element name="text_z1"><text string="&#x2648;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_z2"><text string="&#x2649;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_z3"><text string="&#x264a;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_z4"><text string="&#x264b;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_z5"><text string="&#x264c;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_z6"><text string="&#x264d;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_z7"><text string="&#x264e;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_z8"><text string="&#x264f;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_z9"><text string="&#x2650;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_z10"><text string="&#x2651;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_z11"><text string="&#x2652;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_z12"><text string="&#x2653;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z1"><text string="Aries" align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element> <!-- ♈ "&#x2648;" -->
+	<element name="text_z2"><text string="Taurus" align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element> <!-- ♉ "&#x2649;" -->
+	<element name="text_z3"><text string="Gemini" align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element> <!-- ♊ "&#x264a;" -->
+	<element name="text_z4"><text string="Cancer" align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element> <!-- ♋ "&#x264b;" -->
+	<element name="text_z5"><text string="Leo" align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element> <!-- ♌ "&#x264c;" -->
+	<element name="text_z6"><text string="Virgo" align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element> <!-- ♍ "&#x264d;" -->
+	<element name="text_z7"><text string="Libra" align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element> <!-- ♎ "&#x264e;" -->
+	<element name="text_z8"><text string="Scorpio" align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element> <!-- ♏ "&#x264f;" -->
+	<element name="text_z9"><text string="Sagittarius" align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element> <!-- ♐ "&#x2650;" -->
+	<element name="text_z10"><text string="Capricorn" align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element> <!-- ♑ "&#x2651;" -->
+	<element name="text_z11"><text string="Aquarius" align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element> <!-- ♒ "&#x2652;" -->
+	<element name="text_z12"><text string="Pisces" align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element> <!-- ♓ "&#x2653;" -->
 
 
 <!-- build screen -->
@@ -64,19 +64,19 @@
 		<bezel name="8.1" element="led"><bounds x="0" y="80" width="3" height="3" /></bezel>
 		<bezel name="8.3" element="led"><bounds x="0" y="120" width="3" height="3" /></bezel>
 
-		<bezel element="text_z1"><bounds x="17" y="143" width="12" height="7" /></bezel>
-		<bezel element="text_z2"><bounds x="42" y="158" width="12" height="7" /></bezel>
-		<bezel element="text_z3"><bounds x="82" y="158" width="12" height="7" /></bezel>
-		<bezel element="text_z4"><bounds x="107" y="143" width="12" height="7" /></bezel>
-		<bezel element="text_z5"><bounds x="122" y="118" width="12" height="7" /></bezel>
-		<bezel element="text_z6"><bounds x="122" y="78" width="12" height="7" /></bezel>
+		<bezel element="text_z1"><bounds x="19" y="144" width="20" height="4" /></bezel>
+		<bezel element="text_z2"><bounds x="44" y="159" width="20" height="4" /></bezel>
+		<bezel element="text_z3"><bounds x="84" y="159" width="20" height="4" /></bezel>
+		<bezel element="text_z4"><bounds x="109" y="144" width="20" height="4" /></bezel>
+		<bezel element="text_z5"><bounds x="124" y="119" width="20" height="4" /></bezel>
+		<bezel element="text_z6"><bounds x="124" y="79" width="20" height="4" /></bezel>
 
-		<bezel element="text_z7"><bounds x="107" y="53" width="12" height="7" /></bezel>
-		<bezel element="text_z8"><bounds x="82" y="38" width="12" height="7" /></bezel>
-		<bezel element="text_z9"><bounds x="42" y="38" width="12" height="7" /></bezel>
-		<bezel element="text_z10"><bounds x="17" y="53" width="12" height="7" /></bezel>
-		<bezel element="text_z11"><bounds x="2" y="78" width="12" height="7" /></bezel>
-		<bezel element="text_z12"><bounds x="2" y="118" width="12" height="7" /></bezel>
+		<bezel element="text_z7"><bounds x="109" y="54" width="20" height="4" /></bezel>
+		<bezel element="text_z8"><bounds x="84" y="39" width="20" height="4" /></bezel>
+		<bezel element="text_z9"><bounds x="44" y="39" width="20" height="4" /></bezel>
+		<bezel element="text_z10"><bounds x="19" y="54" width="20" height="4" /></bezel>
+		<bezel element="text_z11"><bounds x="4" y="79" width="20" height="4" /></bezel>
+		<bezel element="text_z12"><bounds x="4" y="119" width="20" height="4" /></bezel>
 
 	</view>
 </mamelayout>

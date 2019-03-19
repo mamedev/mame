@@ -250,6 +250,9 @@ public:
 	void set_state_string(int index, const char *string);
 	void set_pc(offs_t pc) { set_state_int(STATE_GENPC, pc); }
 
+	// find the entry for a given index
+	const device_state_entry *state_find_entry(int index) const;
+
 	// deliberately ambiguous functions; if you have the state interface
 	// just use it directly
 	device_state_interface &state() { return *this; }
@@ -292,9 +295,6 @@ protected:
 
 	// internal operation overrides
 	virtual void interface_post_start() override;
-
-	// find the entry for a given index
-	const device_state_entry *state_find_entry(int index) const;
 
 	// constants
 	static constexpr int FAST_STATE_MIN = -4;                           // range for fast state

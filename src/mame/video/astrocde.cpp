@@ -395,6 +395,11 @@ void astrocde_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
+WRITE_LINE_MEMBER(astrocde_state::lightpen_trigger_w)
+{
+	if (state)
+		astrocade_trigger_lightpen(m_screen->vpos(), m_screen->hpos());
+}
 
 void astrocde_state::astrocade_trigger_lightpen(uint8_t vfeedback, uint8_t hfeedback)
 {

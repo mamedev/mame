@@ -91,11 +91,11 @@ void bbc_joyport_slot_device::device_reset()
 //  pb_r
 //-------------------------------------------------
 
-READ8_MEMBER(bbc_joyport_slot_device::pb_r)
+uint8_t bbc_joyport_slot_device::pb_r()
 {
 	// TODO: Joyport connected to PB0-PB4 only. PB5-PB7 are expansion port.
 	if (m_device)
-		return 0xe0 | m_device->pb_r(space, 0);
+		return 0xe0 | m_device->pb_r();
 	else
 		return 0xff;
 }
@@ -105,10 +105,10 @@ READ8_MEMBER(bbc_joyport_slot_device::pb_r)
 //  pb_w
 //-------------------------------------------------
 
-WRITE8_MEMBER(bbc_joyport_slot_device::pb_w)
+void bbc_joyport_slot_device::pb_w(uint8_t data)
 {
 	if (m_device)
-		m_device->pb_w(space, 0, data);
+		m_device->pb_w(data);
 }
 
 

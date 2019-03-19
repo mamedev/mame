@@ -288,8 +288,8 @@ void peoplepc_state::olypeopl(machine_config &config)
 	m_dmac->out_tc_cb().set(FUNC(peoplepc_state::tc_w));
 	m_dmac->in_memr_cb().set(FUNC(peoplepc_state::memory_read_byte));
 	m_dmac->out_memw_cb().set(FUNC(peoplepc_state::memory_write_byte));
-	m_dmac->in_ior_cb<0>().set("upd765", FUNC(upd765a_device::mdma_r));
-	m_dmac->out_iow_cb<0>().set("upd765", FUNC(upd765a_device::mdma_w));
+	m_dmac->in_ior_cb<0>().set("upd765", FUNC(upd765a_device::dma_r));
+	m_dmac->out_iow_cb<0>().set("upd765", FUNC(upd765a_device::dma_w));
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set("pic8259_0", FUNC(pic8259_device::ir2_w));

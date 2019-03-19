@@ -375,8 +375,8 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	m_dmac->out_hreq_callback().set(FUNC(duet16_state::hrq_w));
 	m_dmac->in_memr_callback().set(FUNC(duet16_state::dma_mem_r));
 	m_dmac->out_memw_callback().set(FUNC(duet16_state::dma_mem_w));
-	m_dmac->in_ior_callback<0>().set(m_fdc, FUNC(upd765a_device::mdma_r));
-	m_dmac->out_iow_callback<0>().set(m_fdc, FUNC(upd765a_device::mdma_w));
+	m_dmac->in_ior_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_dmac->out_iow_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dmac->out_eop_callback().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 
 	pit8253_device &bgpit(PIT8253(config, "bgpit", 0));

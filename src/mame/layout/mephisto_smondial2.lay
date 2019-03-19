@@ -68,14 +68,14 @@
 	<element name="text_pos">   <rect><color red="0"    green="0" blue="0" /></rect>  <text string="POS">                 <color red="1" green="1" blue="1" /></text> </element>
 	<element name="text_mem">   <rect><color red="0"    green="0" blue="0" /></rect>  <text string="MEM">                 <color red="1" green="1" blue="1" /></text> </element>
 	<element name="text_lev">   <rect><color red="0"    green="0" blue="0" /></rect>  <text string="LEV">                 <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b1">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="&#x265f; 1">          <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b2">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="&#x265e; 2">          <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b3">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="&#x265d; 3">          <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b4">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="&#x265c; 4">          <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b5">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="&#x265b; 5">          <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b6">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="&#x265a; 6">          <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b7">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="&#x25a1; 7 &#x25c0;"> <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b8">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="&#x25a0; 8 &#x25b6;"> <color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_b1">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="[P] 1">               <color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_b2">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="[N] 2">               <color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_b3">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="[B] 3">               <color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_b4">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="[R] 4">               <color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_b5">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="[Q] 5">               <color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_b6">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="[K] 6">               <color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_b7">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="&#x25a1; 7 &#x25c4;"> <color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_b8">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="&#x25a0; 8 &#x25ba;"> <color red="1" green="1" blue="1" /></text> </element>
 	<element name="text_help9"> <rect><color red="0.8"  green="0" blue="0" /></rect>  <text string="HELP 9">              <color red="1" green="1" blue="1" /></text> </element>
 	<element name="text_info0"> <rect><color red="0"    green="0" blue="0" /></rect>  <text string="INFO 0">              <color red="1" green="1" blue="1" /></text> </element>
 	<element name="text_cl">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="CL">                  <color red="1" green="1" blue="1" /></text> </element>

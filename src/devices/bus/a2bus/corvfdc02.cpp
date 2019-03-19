@@ -132,10 +132,10 @@ uint8_t a2bus_corvfdc02_device::read_c0nx(uint8_t offset)
 	switch (offset)
 	{
 		case 0: // 765 FIFO
-			return m_fdc->read_fifo();
+			return m_fdc->fifo_r();
 
 		case 1: // 765 MSR
-			return m_fdc->read_msr();
+			return m_fdc->msr_r();
 
 		case 2: // buffer address
 			return (m_bufptr>>1) & 0xff;
@@ -170,7 +170,7 @@ void a2bus_corvfdc02_device::write_c0nx(uint8_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0:    // FDC FIFO write
-			m_fdc->write_fifo(data);
+			m_fdc->fifo_w(data);
 			break;
 
 		case 1:    // FDC ???

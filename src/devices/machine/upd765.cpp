@@ -355,7 +355,7 @@ void upd765_family_device::set_floppy(floppy_image_device *flop)
 		idx_cb(0);
 }
 
-READ8_MEMBER(upd765_family_device::sra_r)
+uint8_t upd765_family_device::sra_r()
 {
 	uint8_t sra = 0;
 	int fid = dor & 3;
@@ -378,17 +378,17 @@ READ8_MEMBER(upd765_family_device::sra_r)
 	return sra;
 }
 
-READ8_MEMBER(upd765_family_device::srb_r)
+uint8_t upd765_family_device::srb_r()
 {
 	return 0;
 }
 
-READ8_MEMBER(upd765_family_device::dor_r)
+uint8_t upd765_family_device::dor_r()
 {
 	return dor;
 }
 
-WRITE8_MEMBER(upd765_family_device::dor_w)
+void upd765_family_device::dor_w(uint8_t data)
 {
 	LOGREGS("dor = %02x\n", data);
 	uint8_t diff = dor ^ data;
@@ -404,21 +404,16 @@ WRITE8_MEMBER(upd765_family_device::dor_w)
 	check_irq();
 }
 
-READ8_MEMBER(upd765_family_device::tdr_r)
+uint8_t upd765_family_device::tdr_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(upd765_family_device::tdr_w)
+void upd765_family_device::tdr_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(upd765_family_device::msr_r)
-{
-	return read_msr();
-}
-
-uint8_t upd765_family_device::read_msr()
+uint8_t upd765_family_device::msr_r()
 {
 	uint32_t msr = 0;
 	switch(main_phase) {
@@ -449,7 +444,7 @@ uint8_t upd765_family_device::read_msr()
 		}
 	msr |= get_drive_busy();
 
-	if(data_irq) {
+	if(data_irq && !machine().side_effects_disabled()) {
 		data_irq = false;
 		check_irq();
 	}
@@ -457,7 +452,7 @@ uint8_t upd765_family_device::read_msr()
 	return msr;
 }
 
-WRITE8_MEMBER(upd765_family_device::dsr_w)
+void upd765_family_device::dsr_w(uint8_t data)
 {
 	LOGREGS("dsr_w %02x (%s)\n", data, machine().describe_context());
 	if(data & 0x80)
@@ -471,39 +466,43 @@ void upd765_family_device::set_rate(int rate)
 	cur_rate = rate;
 }
 
-uint8_t upd765_family_device::read_fifo()
+uint8_t upd765_family_device::fifo_r()
 {
 	uint8_t r = 0xff;
 	switch(main_phase) {
 	case PHASE_EXEC:
+		if(machine().side_effects_disabled())
+			return fifo[0];
 		if(internal_drq)
 			return fifo_pop(false);
-		LOGFIFO("read_fifo in phase %d\n", main_phase);
+		LOGFIFO("fifo_r in phase %d\n", main_phase);
 		break;
 
 	case PHASE_RESULT:
 		r = result[0];
-		result_pos--;
-		memmove(result, result+1, result_pos);
-		if(!result_pos)
-			main_phase = PHASE_CMD;
-		else if(result_pos == 1) {
-			// clear drive busy bit after the first sense interrupt status result byte is read
-			for(floppy_info &fi : flopi)
-				if((fi.main_state == RECALIBRATE || fi.main_state == SEEK) && fi.sub_state == IDLE && fi.st0_filled == false)
-					fi.main_state = IDLE;
-			clr_drive_busy();
+		if(!machine().side_effects_disabled()) {
+			result_pos--;
+			memmove(result, result+1, result_pos);
+			if(!result_pos)
+				main_phase = PHASE_CMD;
+			else if(result_pos == 1) {
+				// clear drive busy bit after the first sense interrupt status result byte is read
+				for(floppy_info &fi : flopi)
+					if((fi.main_state == RECALIBRATE || fi.main_state == SEEK) && fi.sub_state == IDLE && fi.st0_filled == false)
+						fi.main_state = IDLE;
+				clr_drive_busy();
+			}
 		}
 		break;
 	default:
-		LOGFIFO("read_fifo in phase %d\n", main_phase);
+		LOGFIFO("fifo_r in phase %d\n", main_phase);
 		break;
 	}
 
 	return r;
 }
 
-void upd765_family_device::write_fifo(uint8_t data)
+void upd765_family_device::fifo_w(uint8_t data)
 {
 	switch(main_phase) {
 	case PHASE_CMD: {
@@ -529,11 +528,11 @@ void upd765_family_device::write_fifo(uint8_t data)
 			fifo_push(data, false);
 			return;
 		}
-		LOGFIFO("write_fifo in phase %d\n", main_phase);
+		LOGFIFO("fifo_w in phase %d\n", main_phase);
 		break;
 
 	default:
-		LOGFIFO("write_fifo in phase %d\n", main_phase);
+		LOGFIFO("fifo_w in phase %d\n", main_phase);
 		break;
 	}
 }
@@ -546,12 +545,7 @@ uint8_t upd765_family_device::do_dir_r()
 	return 0x00;
 }
 
-READ8_MEMBER(upd765_family_device::dir_r)
-{
-	return do_dir_r();
-}
-
-WRITE8_MEMBER(upd765_family_device::ccr_w)
+void upd765_family_device::ccr_w(uint8_t data)
 {
 	dsr = (dsr & 0xfc) | (data & 3);
 	cur_rate = rates[data & 3];
@@ -653,18 +647,10 @@ void upd765_family_device::fifo_expect(int size, bool write)
 		enable_transfer();
 }
 
-READ8_MEMBER(upd765_family_device::mdma_r)
-{
-	return dma_r();
-}
-
-WRITE8_MEMBER(upd765_family_device::mdma_w)
-{
-	dma_w(data);
-}
-
 uint8_t upd765_family_device::dma_r()
 {
+	if(machine().side_effects_disabled())
+		return fifo[0];
 	return fifo_pop(false);
 }
 
@@ -2977,7 +2963,7 @@ void mcs3201_device::device_start()
 	m_input_handler.resolve_safe(0);
 }
 
-READ8_MEMBER( mcs3201_device::input_r )
+uint8_t mcs3201_device::input_r()
 {
 	return m_input_handler();
 }
@@ -2997,7 +2983,7 @@ void tc8566af_device::device_start()
 	save_item(NAME(m_cr1));
 }
 
-WRITE8_MEMBER(tc8566af_device::cr1_w)
+void tc8566af_device::cr1_w(uint8_t data)
 {
 	m_cr1 = data;
 
@@ -3007,7 +2993,7 @@ WRITE8_MEMBER(tc8566af_device::cr1_w)
 	}
 }
 
-WRITE8_MEMBER(upd72065_device::auxcmd_w)
+void upd72065_device::auxcmd_w(uint8_t data)
 {
 	switch(data) {
 	case 0x36: // reset

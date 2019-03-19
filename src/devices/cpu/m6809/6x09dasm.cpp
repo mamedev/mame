@@ -214,6 +214,10 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		else if (numoperands == 2)
 		{
 			ea = params.r16(ppc);
+			if( !(ea & 0xff00) )
+			{
+				stream << '>'; // need the '>' to force an assembler to use EXT addressing
+			}
 			util::stream_format(stream, "$%04X", ea);
 		}
 		break;
@@ -230,7 +234,7 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			pb = params.r8(ppc);
 		}
 
-		indirect(stream, pb, params, p);
+		indexed(stream, pb, params, p);
 		break;
 
 	case IMM:
@@ -810,10 +814,10 @@ m6x09_disassembler::m6x09_disassembler(m6x09_instruction_level level, const char
 }
 
 //-------------------------------------------------
-//  indirect addressing mode for M6809/HD6309
+//  indexed addressing mode for M6809/HD6309
 //-------------------------------------------------
 
-void m6x09_disassembler::indirect(std::ostream &stream, uint8_t pb, const data_buffer &params, offs_t &p)
+void m6x09_disassembler::indexed(std::ostream &stream, uint8_t pb, const data_buffer &params, offs_t &p)
 {
 	uint8_t reg = (pb >> 5) & 3;
 	uint8_t pbm = pb & 0x8f;
@@ -908,16 +912,14 @@ void m6x09_disassembler::indirect(std::ostream &stream, uint8_t pb, const data_b
 		break;
 
 	case 0x8c:  // (+/- 7 bit offset),PC
-		offset = (int8_t)params.r8(p);
-		util::stream_format(stream, "%s", (offset < 0) ? "-" : "");
-		util::stream_format(stream, "$%02X,PC", (offset < 0) ? -offset : offset);
+		offset = (int8_t)params.r8(p++);
+		util::stream_format(stream, "$%04X,PCR", (p+offset)); // PC Relative addressing (assembler computes offset from specified absolute address)
 		break;
 
 	case 0x8d:  // (+/- 15 bit offset),PC
 		offset = (int16_t)params.r16(p);
 		p += 2;
-		util::stream_format(stream, "%s", (offset < 0) ? "-" : "");
-		util::stream_format(stream, "$%04X,PC", (offset < 0) ? -offset : offset);
+		util::stream_format(stream, "$%04X,PCR", (p+offset)); // PC Relative addressing (assembler computes offset from specified absolute address)
 		break;
 
 	case 0x8e:  // (+/- W),R
@@ -1240,10 +1242,10 @@ konami_disassembler::konami_disassembler() : m6x09_base_disassembler(konami_opco
 }
 
 //-------------------------------------------------
-//  indirect addressing mode for Konami
+//  indexed addressing mode for Konami
 //-------------------------------------------------
 
-void konami_disassembler::indirect(std::ostream &stream, uint8_t mode, const data_buffer &params, offs_t &p)
+void konami_disassembler::indexed(std::ostream &stream, uint8_t mode, const data_buffer &params, offs_t &p)
 {
 	static const char index_reg[8][3] =
 	{

@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="mtx_flop" description="Memotech MTX diskettes">
+
+	<software name="cpmsdx">
+		<description>CP/M System Disk (SDX)</description>
+		<year>198?</year>
+		<publisher>Memotech</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="402293">
+				<rom name="sdx07sys.imd" size="402293" crc="c6afe230" sha1="3a4aae01a2cfa79d7ba860fb93c06c511492b628" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmfdx">
+		<description>CP/M System Disk (FDX)</description>
+		<year>198?</year>
+		<publisher>Memotech</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="223283">
+				<rom name="fdx07sys.imd" size="223283" crc="1d1d1587" sha1="508740419830d27f7f4cf475adddd0538720e1d3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbase2">
+		<description>dBASE II</description>
+		<year>1983</year>
+		<publisher>Ashton-Tate</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="538973">
+				<rom name="dBase24.imd" size="538973" crc="e1994529" sha1="6b70222432f356145b57b89132893ceefb68ec9f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mex">
+		<description>Modem Executive 1.14</description>
+		<year>1985</year>
+		<publisher>NightOwl Software</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="278873">
+				<rom name="MEX_v1.14.imd" size="278873" crc="55472c63" sha1="42bb6b68baeb740982c0f60f0ab771a64c71e0d1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="newword">
+		<description>FDX NewWord</description>
+		<year>1985</year>
+		<publisher>Memotech</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="267908">
+				<rom name="NewWord.imd" size="267908" crc="a4188525" sha1="f1648ea993b33dc5fcd4b97c14fd4265ff77fc2b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprcalc">
+		<description>SuperCalc</description>
+		<year>1983</year>
+		<publisher>Sorcim</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="2008064">
+				<rom name="SuperCalc_v1.12.hfe" size="2008064" crc="a323a807" sha1="5718bfc65570e0f3b21735777c2125d40d853afe" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tap2dsk">
+		<description>Tape to Disc Transfer (FDX and CP/M only)</description>
+		<year>198?</year>
+		<publisher>Memotech</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="74363">
+				<rom name="FDX_Tape2Disk12.imd" size="74363" crc="0020564c" sha1="2d2ad6eb86f98a6c9884066d3d65a884e248f894" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tpascal2">
+		<description>Turbo PASCAL 2.00A</description>
+		<year>1984</year>
+		<publisher>Borland</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="132248">
+				<rom name="TurboPascal_v2_Type07.imd" size="132248" crc="aac6a41f" sha1="6eecd06c92972beec7f6d0ee9c15fc127b8b3a7f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tpascal3">
+		<description>Turbo PASCAL 3.00A</description>
+		<year>1985</year>
+		<publisher>Borland</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="169223">
+				<rom name="TurboPascal_v3_Type07.imd" size="169223" crc="fcde91fa" sha1="02ff593049011ddb24b4bc17e271f2504f403cf8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordstar">
+		<description>WordStar 3.00</description>
+		<year>198?</year>
+		<publisher>Micropro</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="188858">
+				<rom name="WordStar_v3_Type07.imd" size="188858" crc="be177343" sha1="391b08477020607b2c96fddf3fd2d1e2fa7e269d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

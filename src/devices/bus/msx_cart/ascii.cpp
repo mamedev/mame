@@ -27,8 +27,12 @@ msx_cart_ascii8_device::msx_cart_ascii8_device(const machine_config &mconfig, co
 void msx_cart_ascii8_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
+}
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_ascii8_device::restore_banks), this));
+
+void msx_cart_ascii8_device::device_post_load()
+{
+	restore_banks();
 }
 
 
@@ -72,7 +76,7 @@ void msx_cart_ascii8_device::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_ascii8_device::read_cart)
+uint8_t msx_cart_ascii8_device::read_cart(offs_t offset)
 {
 	if ( offset >= 0x4000 && offset < 0xC000 )
 	{
@@ -82,7 +86,7 @@ READ8_MEMBER(msx_cart_ascii8_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_ascii8_device::write_cart)
+void msx_cart_ascii8_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x6000 && offset < 0x8000)
 	{
@@ -111,8 +115,12 @@ msx_cart_ascii16_device::msx_cart_ascii16_device(const machine_config &mconfig, 
 void msx_cart_ascii16_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
+}
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_ascii16_device::restore_banks), this));
+
+void msx_cart_ascii16_device::device_post_load()
+{
+	restore_banks();
 }
 
 
@@ -156,7 +164,7 @@ void msx_cart_ascii16_device::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_ascii16_device::read_cart)
+uint8_t msx_cart_ascii16_device::read_cart(offs_t offset)
 {
 	if ( offset >= 0x4000 && offset < 0xC000 )
 	{
@@ -166,7 +174,7 @@ READ8_MEMBER(msx_cart_ascii16_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_ascii16_device::write_cart)
+void msx_cart_ascii16_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x6000 && offset < 0x6800)
 	{
@@ -202,8 +210,12 @@ msx_cart_ascii8_sram_device::msx_cart_ascii8_sram_device(const machine_config &m
 void msx_cart_ascii8_sram_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
+}
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_ascii8_sram_device::restore_banks), this));
+
+void msx_cart_ascii8_sram_device::device_post_load()
+{
+	restore_banks();
 }
 
 
@@ -272,7 +284,7 @@ void msx_cart_ascii8_sram_device::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_ascii8_sram_device::read_cart)
+uint8_t msx_cart_ascii8_sram_device::read_cart(offs_t offset)
 {
 	if ( offset >= 0x4000 && offset < 0xC000 )
 	{
@@ -287,7 +299,7 @@ READ8_MEMBER(msx_cart_ascii8_sram_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_ascii8_sram_device::write_cart)
+void msx_cart_ascii8_sram_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x6000 && offset < 0x8000)
 	{
@@ -327,8 +339,12 @@ msx_cart_ascii16_sram_device::msx_cart_ascii16_sram_device(const machine_config 
 void msx_cart_ascii16_sram_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
+}
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_ascii16_sram_device::restore_banks), this));
+
+void msx_cart_ascii16_sram_device::device_post_load()
+{
+	restore_banks();
 }
 
 
@@ -397,7 +413,7 @@ void msx_cart_ascii16_sram_device::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_ascii16_sram_device::read_cart)
+uint8_t msx_cart_ascii16_sram_device::read_cart(offs_t offset)
 {
 	if ( offset >= 0x4000 && offset < 0xC000 )
 	{
@@ -419,7 +435,7 @@ READ8_MEMBER(msx_cart_ascii16_sram_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_ascii16_sram_device::write_cart)
+void msx_cart_ascii16_sram_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x6000 && offset < 0x6800)
 	{
@@ -461,8 +477,12 @@ msx_cart_msxwrite_device::msx_cart_msxwrite_device(const machine_config &mconfig
 void msx_cart_msxwrite_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
+}
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_msxwrite_device::restore_banks), this));
+
+void msx_cart_msxwrite_device::device_post_load()
+{
+	restore_banks();
 }
 
 
@@ -506,7 +526,7 @@ void msx_cart_msxwrite_device::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_msxwrite_device::read_cart)
+uint8_t msx_cart_msxwrite_device::read_cart(offs_t offset)
 {
 	if ( offset >= 0x4000 && offset < 0xC000 )
 	{
@@ -516,7 +536,7 @@ READ8_MEMBER(msx_cart_msxwrite_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_msxwrite_device::write_cart)
+void msx_cart_msxwrite_device::write_cart(offs_t offset, uint8_t data)
 {
 	// The rom writes to 6fff and 7fff for banking, unknown whether
 	// other locations also trigger banking.

@@ -5,7 +5,7 @@
 
 	<software name="forth" supported="no">
 		<description>Forth</description>
-		<year>198?</year>
+		<year>1982</year>
 		<publisher>HCCS Associates</publisher>
 		<part name="rom" interface="opt_rom">
 			<dataarea name="rom" size="8192">

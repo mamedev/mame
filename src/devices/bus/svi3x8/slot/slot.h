@@ -75,10 +75,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ramdis_w ) { m_ramdis_handler(state); };
 
 	// from host
-	DECLARE_READ8_MEMBER( mreq_r );
-	DECLARE_WRITE8_MEMBER( mreq_w );
-	DECLARE_READ8_MEMBER( iorq_r );
-	DECLARE_WRITE8_MEMBER( iorq_w );
+	uint8_t mreq_r(offs_t offset);
+	void mreq_w(offs_t offset, uint8_t data);
+	uint8_t iorq_r(offs_t offset);
+	void iorq_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( bk21_w );
 	DECLARE_WRITE_LINE_MEMBER( bk22_w );
@@ -143,10 +143,10 @@ public:
 
 	device_svi_slot_interface *next() const { return m_next; }
 
-	virtual DECLARE_READ8_MEMBER( mreq_r ) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER( mreq_w ) { }
-	virtual DECLARE_READ8_MEMBER( iorq_r ) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER( iorq_w ) { }
+	virtual uint8_t mreq_r(offs_t offset) { return 0xff; }
+	virtual void mreq_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t iorq_r(offs_t offset) { return 0xff; }
+	virtual void iorq_w(offs_t offset, uint8_t data) { }
 
 	virtual DECLARE_WRITE_LINE_MEMBER( bk21_w ) { }
 	virtual DECLARE_WRITE_LINE_MEMBER( bk22_w ) { }

@@ -47,8 +47,8 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	uint32_t get_rom_size();
 	uint32_t get_slot_size() const { return m_slot_size; }
@@ -116,8 +116,8 @@ public:
 	virtual ~device_bbc_rom_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write) { m_device.logerror("unhandled ROM write to %04X = %02X\n", offset | 0x8000, data); }
+	virtual uint8_t read(offs_t offset) { return 0xff; }
+	virtual void write(offs_t offset, uint8_t data) { m_device.logerror("unhandled ROM write to %04X = %02X\n", offset | 0x8000, data); }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);

@@ -60,7 +60,7 @@ void sns_pfest94_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER(sns_pfest94_device::read_l)
+uint8_t sns_pfest94_device::read_l(offs_t offset)
 {
 	// menu
 	if ((offset & 0x208000) == 0x208000)
@@ -77,7 +77,7 @@ READ8_MEMBER(sns_pfest94_device::read_l)
 	}
 }
 
-READ8_MEMBER(sns_pfest94_device::read_h)
+uint8_t sns_pfest94_device::read_h(offs_t offset)
 {
 	// menu
 	if ((offset & 0x208000) == 0x208000)
@@ -103,7 +103,7 @@ READ8_MEMBER(sns_pfest94_device::read_h)
 
 
 // these are used for two diff effects: both to select game from menu and to access the DSP when running SMK!
-READ8_MEMBER( sns_pfest94_device::chip_read )
+uint8_t sns_pfest94_device::chip_read(offs_t offset)
 {
 	if (offset & 0x8000)
 	{
@@ -119,7 +119,7 @@ READ8_MEMBER( sns_pfest94_device::chip_read )
 }
 
 
-WRITE8_MEMBER( sns_pfest94_device::chip_write )
+void sns_pfest94_device::chip_write(offs_t offset, uint8_t data)
 {
 	if (offset & 0x8000)
 	{
@@ -186,12 +186,12 @@ void sns_pfest94_device::speedup_addon_bios_access()
 
 
 // DSP dump contains prg at offset 0 and data at offset 0x2000
-READ32_MEMBER( sns_pfest94_device::necdsp_prg_r )
+uint32_t sns_pfest94_device::necdsp_prg_r(offs_t offset)
 {
 	return get_prg(&m_bios[0], offset);
 }
 
-READ16_MEMBER( sns_pfest94_device::necdsp_data_r )
+uint16_t sns_pfest94_device::necdsp_data_r(offs_t offset)
 {
 	return get_data(&m_bios[0], offset + 0x2000/2);
 }

@@ -49,7 +49,7 @@ public:
 	// configuration access
 	auto si_cb() { return m_si_callback.bind(); }
 	template <std::size_t Bit> auto so_cb() { return m_so_callback[Bit].bind(); }
-	template <std::size_t Pot> void set_pot_tag(const char *tag) { m_pots[Pot].set_tag(tag); }
+	template <std::size_t Pot> auto pot_cb() { return m_pots[Pot].bind(); }
 
 protected:
 	// device-level overrides
@@ -90,7 +90,7 @@ private:
 
 	devcb_read8   m_si_callback;
 	devcb_write8  m_so_callback[8];
-	optional_ioport_array<4> m_pots;
+	devcb_read8   m_pots[4];
 };
 
 DECLARE_DEVICE_TYPE(ASTROCADE_IO, astrocade_io_device)

@@ -461,12 +461,17 @@ bool debugger_commands::validate_cpu_parameter(const char *param, device_t *&res
 		return false;
 	}
 
-	/* if we got a valid one, return */
-	device_execute_interface *exec = execute_interface_iterator(m_machine.root_device()).byindex(cpunum);
-	if (exec != nullptr)
+	// attempt to find by numerical index
+	int index = 0;
+	for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
 	{
-		result = &exec->device();
-		return true;
+		// real CPUs should have pcbase
+		const device_state_interface *state;
+		if (exec.device().interface(state) && state->state_find_entry(STATE_GENPCBASE) != nullptr && index++ == cpunum)
+		{
+			result = &exec.device();
+			return true;
+		}
 	}
 
 	/* if out of range, complain */

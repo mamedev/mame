@@ -605,6 +605,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/mm5445.h,VIDEOS["MM5445"] = true
+--------------------------------------------------
+
+if (VIDEOS["MM5445"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/mm5445.cpp",
+		MAME_DIR .. "src/devices/video/mm5445.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/msm6222b.h,VIDEOS["MSM6222B"] = true
 --------------------------------------------------
 

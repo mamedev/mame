@@ -119,8 +119,10 @@ public:
 
 	auto interrupt_handler() { return m_interrupt_handler.bind(); }
 
-	DECLARE_READ32_MEMBER(smbus_r);
-	DECLARE_WRITE32_MEMBER(smbus_w);
+	DECLARE_READ32_MEMBER(smbus0_r);
+	DECLARE_WRITE32_MEMBER(smbus0_w);
+	DECLARE_READ32_MEMBER(smbus1_r);
+	DECLARE_WRITE32_MEMBER(smbus1_w);
 
 protected:
 	virtual void device_start() override;
@@ -137,10 +139,12 @@ private:
 		int rw;
 		smbus_interface *devices[128];
 		uint32_t words[256 / 4];
-	} smbusst;
+	} smbusst[2];
 	void smbus_io0(address_map &map);
 	void smbus_io1(address_map &map);
 	void smbus_io2(address_map &map);
+	uint32_t smbus_read(int bus, offs_t offset, uint32_t mem_mask);
+	void smbus_write(int bus, offs_t offset, uint32_t data, uint32_t mem_mask);
 };
 
 DECLARE_DEVICE_TYPE(MCPX_SMBUS, mcpx_smbus_device)

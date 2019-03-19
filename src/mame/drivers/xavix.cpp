@@ -381,8 +381,8 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	//map(0x7b18, 0x7b1b)
 
 	// ADC registers
-	map(0x7b80, 0x7b80).rw(FUNC(xavix_state::adc_7b80_r), FUNC(xavix_state::adc_7b80_w)); // rad_snow (not often)
-	map(0x7b81, 0x7b81).rw(FUNC(xavix_state::adc_7b81_r), FUNC(xavix_state::adc_7b81_w)); // written (often, m_trck, analog related?)
+	map(0x7b80, 0x7b80).rw("adc", FUNC(xavix_adc_device::adc_7b80_r), FUNC(xavix_adc_device::adc_7b80_w)); // rad_snow (not often)
+	map(0x7b81, 0x7b81).rw("adc", FUNC(xavix_adc_device::adc_7b81_r), FUNC(xavix_adc_device::adc_7b81_w)); // written (often, m_trck, analog related?)
 
 	// Sleep control
 	//map(0x7b82, 0x7b83)
@@ -634,6 +634,21 @@ static INPUT_PORTS_START( taikodp )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xavix_i2c_cart_state,i2c_r, nullptr)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( jpopira )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pad 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Pad 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Pad 3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pad 4")
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xavix_i2c_cart_state,i2c_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
+INPUT_PORTS_END
+
+
 
 static INPUT_PORTS_START( xavixp )
 	PORT_INCLUDE(xavix)
@@ -874,202 +889,12 @@ static INPUT_PORTS_START( popira2 ) // player 2 buttons have heavy latency, prob
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_MODIFY("AN0") // 00
-	PORT_DIPNAME( 0x0001, 0x0001, "AN0" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // buttons respond in a strange way if these are high
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Pad 1") PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Pad 2") PORT_PLAYER(2)
-
-	PORT_MODIFY("AN1") // 01
-	PORT_DIPNAME( 0x0001, 0x0001, "AN1" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // buttons respond in a strange way if these are high
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P2 Pad 3") PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P2 Pad 4") PORT_PLAYER(2)
-
-	PORT_MODIFY("AN2") // 02
-	PORT_DIPNAME( 0x0001, 0x0001, "AN2" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-
-	PORT_MODIFY("AN3") // 03
-	PORT_DIPNAME( 0x0001, 0x0001, "AN3" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-
-
-	PORT_MODIFY("AN4") // 10
-	PORT_DIPNAME( 0x0001, 0x0001, "AN4" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-
-	PORT_MODIFY("AN5") // 11
-	PORT_DIPNAME( 0x0001, 0x0001, "AN5" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_MODIFY("AN6") // 12
-	PORT_DIPNAME( 0x0001, 0x0001, "AN6" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-
-	PORT_MODIFY("AN7") // 13
-	PORT_DIPNAME( 0x0001, 0x0001, "AN7" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	// main input processing code is at 028059, which ends with setting a timer (028079) to read analog ports and get these buttons that way.  main timer handler is at 00eb77, which reads ports via the ADC.  $c3 where ports are stored is also checked at 00e6f4
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Pad 1") PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Pad 2") PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P2 Pad 3") PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P2 Pad 4") PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -1220,8 +1045,12 @@ static INPUT_PORTS_START( ttv_mx )
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Accel
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Brake
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Pause")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Motion Up") // you tilt the device, but actual inputs are digital
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Motion Down")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Motion Left")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Motion Right")
 INPUT_PORTS_END
 
 
@@ -1289,6 +1118,19 @@ static INPUT_PORTS_START( has_wamg )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // waits for this after fading out title, what is it?
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( evio )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
 INPUT_PORTS_END
 
 /* correct, 4bpp gfxs */
@@ -1359,6 +1201,16 @@ void xavix_state::xavix(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "lowbus").set_map(&xavix_state::xavix_lowbus_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
+	XAVIX_ADC(config, m_adc, 0);
+	m_adc->read_0_callback().set(FUNC(xavix_state::adc0_r));
+	m_adc->read_1_callback().set(FUNC(xavix_state::adc1_r));
+	m_adc->read_2_callback().set(FUNC(xavix_state::adc2_r));
+	m_adc->read_3_callback().set(FUNC(xavix_state::adc3_r));
+	m_adc->read_4_callback().set(FUNC(xavix_state::adc4_r));
+	m_adc->read_5_callback().set(FUNC(xavix_state::adc5_r));
+	m_adc->read_6_callback().set(FUNC(xavix_state::adc6_r));
+	m_adc->read_7_callback().set(FUNC(xavix_state::adc7_r));
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -1391,7 +1243,7 @@ void xavix_i2c_state::xavix_i2c_24lc02(machine_config &config)
 {
 	xavix(config);
 
-	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x100); // 24LC02 (taiko)
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24LC02 (taiko)
 }
 
 void xavix_i2c_state::xavix_i2c_24c02(machine_config &config)
@@ -1407,14 +1259,14 @@ void xavix_i2c_state::xavix_i2c_24lc04(machine_config &config)
 
 	// according to http://ww1.microchip.com/downloads/en/devicedoc/21708k.pdf 'the master transmits up to 16 data bytes' however this breaks the Nostalgia games
 	// of note Galplus Phalanx on Namco Nostalgia 2, which will hang between stages unable to properly access the device, but with no page support it doesn't hang and scores save
-	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x200); // 24LC04 on Nostalgia games, 24C04 on others
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // 24LC04 on Nostalgia games, 24C04 on others
 }
 
 void xavix_i2c_state::xavix_i2c_24c08(machine_config &config)
 {
 	xavix(config);
 
-	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x400); // 24C08 (Excite Fishing DX)
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x400); // 24C08 (Excite Fishing DX)
 }
 
 void xavix_state::xavixp(machine_config &config)
@@ -1475,7 +1327,7 @@ void xavix_i2c_jmat_state::xavix2002_i2c_jmat(machine_config &config)
 {
 	xavix2002(config);
 
-	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x200); // ?
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // ?
 
 	m_xavix2002io->read_0_callback().set(FUNC(xavix_i2c_jmat_state::read_extended_io0));
 	m_xavix2002io->write_0_callback().set(FUNC(xavix_i2c_jmat_state::write_extended_io0));
@@ -1542,12 +1394,22 @@ void xavix_i2c_cart_state::xavix_i2c_taiko(machine_config &config)
 {
 	xavix_cart(config);
 
-	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x100); // 24LC02
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24LC02
 
 	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
 	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
+}
 
-	// do any of the later G/P series carts with SEEPROM work with this too? check
+void xavix_i2c_cart_state::xavix_i2c_jpopira(machine_config &config)
+{
+	xavix_cart(config);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24LC02
+
+	SOFTWARE_LIST(config, "cart_list_jpopira_jp").set_original("jpopira_jp"); // NOTE, these are for Jumping Popira only, they don't work with the karaoke or regular popira units
+	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
 }
 
 void xavix_cart_state::xavix_cart_ekara(machine_config &config)
@@ -1569,7 +1431,6 @@ void xavix_cart_state::xavix_cart_ekara(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list_japan_a").set_original("ekara_japan_a");
 	SOFTWARE_LIST(config, "cart_list_japan_gk").set_original("ekara_japan_gk");
 	SOFTWARE_LIST(config, "cart_list_japan_bh").set_original("ekara_japan_bh");
-	SOFTWARE_LIST(config, "cart_list_jpopira_jp").set_original("jpopira_jp"); // NOTE, these are for Jumping Popira only, they don't work with the karaoke or regular popira units
 }
 
 void xavix_cart_state::xavix_cart_popira(machine_config &config)
@@ -1585,6 +1446,43 @@ void xavix_cart_state::xavix_cart_popira(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list_japan_p").set_original("ekara_japan_p");
 	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
 	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
+}
+
+// see code at 028060, using table from 00eb6d for conversion
+READ8_MEMBER(xavix_popira2_cart_state::popira2_adc0_r)
+{
+	uint8_t p2 = ioport("P2")->read() & 0x03;
+	switch (p2)
+	{
+	case 0x00: return 0xa0;
+	case 0x01: return 0x60;
+	case 0x02: return 0x10;
+	case 0x03: return 0x00;
+	}
+
+	return 0x00;
+}
+
+READ8_MEMBER(xavix_popira2_cart_state::popira2_adc1_r)
+{
+	uint8_t p2 = (ioport("P2")->read() >> 2) & 0x03;
+	switch (p2)
+	{
+	case 0x00: return 0xa0;
+	case 0x01: return 0x60;
+	case 0x02: return 0x10;
+	case 0x03: return 0x00;
+	}
+
+	return 0x00;
+}
+
+void xavix_popira2_cart_state::xavix_cart_popira2(machine_config &config)
+{
+	xavix_cart_popira(config);
+
+	m_adc->read_0_callback().set(FUNC(xavix_popira2_cart_state::popira2_adc0_r));
+	m_adc->read_1_callback().set(FUNC(xavix_popira2_cart_state::popira2_adc1_r));
 }
 
 void xavix_cart_state::xavix_cart_ddrfammt(machine_config &config)
@@ -1878,6 +1776,23 @@ ROM_START( taikodp )
 	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
 
+ROM_START( jpopira )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "jumpingpopira.bin", 0x600000, 0x200000, CRC(a7bedbd2) SHA1(d62d4ca660c8df14891217fb7b7a2b4a931ff35f) )
+	ROM_RELOAD(0x000000, 0x200000)
+
+	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 ) // maybe we can remove this eventually, but for now it won't init without a reset between
+	ROM_LOAD( "i2cmem.bin", 0x000, 0x100, CRC(70a05af1) SHA1(e8f4ab51445777fe459f9ff09333f548c4e3507c) )
+ROM_END
+
+ROM_START( evio )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "evio.bin", 0x600000, 0x200000, CRC(ee22c764) SHA1(f2b7e213eb78065a63ef484a619bcfc61299e30e))
+	ROM_RELOAD(0x000000, 0x200000)
+ROM_END
+
+
+
 
 /* XaviX hardware titles (1st Generation)
 
@@ -1983,9 +1898,15 @@ CONS( 2001, ddrfammt, 0,           0,  xavix_cart_ddrfammt,ddrfammt, xavix_cart_
 
 CONS( 2000, popira,   0,           0,  xavix_cart_popira,popira,   xavix_cart_state,     init_xavix,    "Takara / SSD Company LTD",                     "Popira (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // The original Popira is a single yellow unit
 
-CONS( 2002, popira2,  0,           0,  xavix_cart_popira,popira2,  xavix_popira2_cart_state, init_xavix,    "Takara / SSD Company LTD",                 "Popira 2 (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // Popira 2 is a set of 2 blue & green linked units (2nd unit is just a controller, no CPU or TV out)
+CONS( 2002, popira2,  0,           0,  xavix_cart_popira2,popira2,  xavix_popira2_cart_state, init_xavix,    "Takara / SSD Company LTD",                 "Popira 2 (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // Popira 2 is a set of 2 blue & green linked units (2nd unit is just a controller, no CPU or TV out)
 
 CONS( 2003, taikodp,  0,           0,  xavix_i2c_taiko,  taikodp,  xavix_i2c_cart_state, init_xavix,    "Takara / SSD Company LTD",                     "Taiko De Popira (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? are the drums analog?
+
+CONS( 2004, jpopira,  0,           0,  xavix_i2c_jpopira,jpopira,  xavix_i2c_cart_state, init_xavix,    "Takara / SSD Company LTD",                     "Jumping Popira (Japan)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ )
+
+
+CONS( 2003, evio,     0,           0,  xavix_nv,         evio,     xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Evio (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? it's a violin controller
+
 
 // Let’s!TVプレイ 超にんきスポット!ころがしほーだい たまごっちりぞーと   (Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort) (only on the Japanese list? http://test.shinsedai.co.jp/english/products/Applied/list.html )   This also allows you to use an IR reciever to import a Tamagotchi from compatible games
 CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04,  ltv_tam,xavix_i2c_ltv_tam_state,      init_xavix,    "Bandai / SSD Company LTD",                      "Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
@@ -1996,7 +1917,7 @@ CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04,  ltv_tam,xavix_i2c_ltv_
    these use the SSD 2000 NEC 85605-621 type CPU
 
    XavixPort Golf is "SSD 2003 SuperXaviX MXIC 2003 3009" (not dumped yet, but actually marked as SuperXaviX unlike the others!)
-
+   
    This CPU type adds extra opcodes that don't appear to be present in the 97/98 types
    It does not appear to support the bitmap modes or 16-bit ROMs found in the 2002 type
 */
@@ -2042,7 +1963,7 @@ CONS( 2004, epo_sdb,  0, 0, xavix2000_nv,        epo_sdb,     xavix_state,      
 
 CONS( 2005, ttv_sw,   0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Tiger / SSD Company LTD",       "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, ttv_lotr, 0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Tiger / SSD Company LTD",       "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2005, ttv_mx,   0, 0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_state,      init_xavix, "Tiger / SSD Company LTD",       "MX Dirt Rebel", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ttv_mx,   0, 0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_state,      init_xavix, "Tiger / SSD Company LTD",       "MX Dirt Rebel", MACHINE_IMPERFECT_SOUND )
 CONS( 2003, drgqst,   0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // hangs after starting a game, or after quite a long time in attract mode (first problem could be bad save data read with the eeprom code, 2nd problem might just be how it is, ends up in a dead loop, not executing invalid code)

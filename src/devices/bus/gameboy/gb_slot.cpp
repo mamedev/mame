@@ -624,18 +624,18 @@ std::string megaduck_cart_slot_device::get_default_card_software(get_default_car
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(gb_cart_slot_device_base::read_rom)
+uint8_t gb_cart_slot_device_base::read_rom(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom(space, offset);
+		return m_cart->read_rom(offset);
 	else
 		return 0xff;
 }
 
-READ8_MEMBER(gb_cart_slot_device_base::read_ram)
+uint8_t gb_cart_slot_device_base::read_ram(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_ram(space, offset);
+		return m_cart->read_ram(offset);
 	else
 		return 0xff;
 }
@@ -645,16 +645,16 @@ READ8_MEMBER(gb_cart_slot_device_base::read_ram)
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(gb_cart_slot_device_base::write_bank)
+void gb_cart_slot_device_base::write_bank(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_bank(space, offset, data);
+		m_cart->write_bank(offset, data);
 }
 
-WRITE8_MEMBER(gb_cart_slot_device_base::write_ram)
+void gb_cart_slot_device_base::write_ram(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_ram(space, offset, data);
+		m_cart->write_ram(offset, data);
 }
 
 

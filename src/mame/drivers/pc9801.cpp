@@ -2317,8 +2317,8 @@ void pc9801_state::pc9801_common(machine_config &config)
 	m_dmac->out_eop_callback().set(FUNC(pc9801_state::tc_w));
 	m_dmac->in_memr_callback().set(FUNC(pc9801_state::dma_read_byte));
 	m_dmac->out_memw_callback().set(FUNC(pc9801_state::dma_write_byte));
-	m_dmac->in_ior_callback<2>().set(m_fdc_2hd, FUNC(upd765a_device::mdma_r));
-	m_dmac->out_iow_callback<2>().set(m_fdc_2hd, FUNC(upd765a_device::mdma_w));
+	m_dmac->in_ior_callback<2>().set(m_fdc_2hd, FUNC(upd765a_device::dma_r));
+	m_dmac->out_iow_callback<2>().set(m_fdc_2hd, FUNC(upd765a_device::dma_w));
 	m_dmac->out_dack_callback<0>().set(FUNC(pc9801_state::dack0_w));
 	m_dmac->out_dack_callback<1>().set(FUNC(pc9801_state::dack1_w));
 	m_dmac->out_dack_callback<2>().set(FUNC(pc9801_state::dack2_w));
@@ -2408,8 +2408,8 @@ void pc9801_state::pc9801(machine_config &config)
 	pc9801_sasi(config);
 	UPD1990A(config, m_rtc);
 
-	m_dmac->in_ior_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::mdma_r));
-	m_dmac->out_iow_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::mdma_w));
+	m_dmac->in_ior_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::dma_r));
+	m_dmac->out_iow_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::dma_w));
 
 	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16);
 }

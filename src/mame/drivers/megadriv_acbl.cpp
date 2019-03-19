@@ -7,6 +7,7 @@
     Games supported:
         * Aladdin
         * Bare Knuckle III
+        * Jurassic Park
         * Mortal Kombat 3
         * Sonic The Hedgehog 2
         * Super Street Fighter II - The New Challengers
@@ -269,7 +270,7 @@ connector, but of course, I can be wrong.
 // smaller ROM region because some bootlegs check for RAM there (used by topshoot and hshavoc)
 void md_boot_state::md_bootleg_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom(); /* Cartridge Program Rom */
+	map(0x000000, 0x1fffff).rom(); /* Cartridge Program Rom */
 	map(0x200000, 0x2023ff).ram(); // tested
 
 	map(0xa00000, 0xa01fff).rw(FUNC(md_boot_state::megadriv_68k_read_z80_ram), FUNC(md_boot_state::megadriv_68k_write_z80_ram));
@@ -339,6 +340,18 @@ READ16_MEMBER(md_boot_state::twinktmb_r )
 	if (m_maincpu->pc()==0x02f84e) return 0x0000; // what's this? dips?
 
 	//logerror("twinktmb_r : %06x\n",m_maincpu->pc());
+
+	return 0x0000;
+}
+
+READ16_MEMBER(md_boot_state::jparkmb_r )
+{
+	if (m_maincpu->pc()==0x1e327a)
+		return ioport("COIN")->read(); // TODO: coins don't respond well
+
+	if (m_maincpu->pc()==0x1e3254) return 0x0000; // what's this? dips?
+
+	//logerror("jparkmb_r : %06x\n",m_maincpu->pc());
 
 	return 0x0000;
 }
@@ -680,11 +693,11 @@ INPUT_PORTS_START( twinktmb )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(4)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(4)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -913,6 +926,17 @@ ROM_START( twinktmb ) // same PCB as sonic2mb, but in this one the PIC is popula
 	ROM_LOAD( "pic16c57xtp", 0x0000, 0x2000, NO_DUMP )
 ROM_END
 
+ROM_START( jparkmb ) // same PCB as twinktmb, JPA-028 label
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "f24.bin", 0x000000, 0x080000,  CRC(bdd851d2) SHA1(1a75922e848fd5c7cd4ab102c99effcfcf382097) )
+	ROM_LOAD16_BYTE( "f23.bin", 0x000001, 0x080000,  CRC(8dc66c71) SHA1(a2741ffa583a4b779b7be3e3ae628e97f792ee3d) )
+	ROM_LOAD16_BYTE( "f22.bin", 0x100000, 0x080000,  CRC(36337d06) SHA1(d537cff2c8ed58da146faf390c09252be359ccd1) )
+	ROM_LOAD16_BYTE( "f21.bin", 0x100001, 0x080000,  CRC(6ede6b6b) SHA1(cf29300d9278ea03f54cf54ea582bdd8b9bbdbbd) )
+
+	ROM_REGION( 0x2000, "pic", ROMREGION_ERASE00 )
+	ROM_LOAD( "pic16c57xtp", 0x0000, 0x2000, NO_DUMP )
+ROM_END
+
 /*************************************
  *
  *  Game-specific driver inits
@@ -1083,6 +1107,13 @@ void md_boot_state::init_twinktmb()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16_delegate(FUNC(md_boot_state::twinktmb_r),this));
 }
 
+void md_boot_state::init_jparkmb()
+{
+	init_megadrij();
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16_delegate(FUNC(md_boot_state::aladmdb_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16_delegate(FUNC(md_boot_state::jparkmb_r),this));
+}
+
 /*************************************
  *
  *  Game driver(s)
@@ -1097,3 +1128,4 @@ GAME( 1995, topshoot, 0, md_bootleg,   topshoot, md_boot_state, init_topshoot, R
 GAME( 1993, sonic2mb, 0, md_bootleg,   sonic2mb, md_boot_state, init_sonic2mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Megadrive version)", 0 ) // flying wires going through the empty PIC space aren't completely understood
 GAME( 1994, barek3mb, 0, megadrvb,     barek3,   md_boot_state, init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Megadrive version)", 0 )
 GAME( 1993, twinktmb, 0, md_bootleg,   twinktmb, md_boot_state, init_twinktmb, ROT0, "bootleg / Sega",   "Twinkle Tale (bootleg of Megadrive version)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // needs PIC decap or simulation
+GAME( 1993, jparkmb,  0, md_bootleg,   twinktmb, md_boot_state, init_jparkmb,  ROT0, "bootleg / Sega",   "Jurassic Park (bootleg of Megadrive version)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // needs PIC decap or simulation

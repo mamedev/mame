@@ -50,30 +50,23 @@ public:
 
 	virtual void map(address_map &map) override = 0;
 
-	DECLARE_READ8_MEMBER (sra_r);
-	DECLARE_READ8_MEMBER (srb_r);
-	DECLARE_READ8_MEMBER (dor_r);
-	DECLARE_WRITE8_MEMBER(dor_w);
-	DECLARE_READ8_MEMBER (tdr_r);
-	DECLARE_WRITE8_MEMBER(tdr_w);
-	uint8_t read_msr();
-	DECLARE_READ8_MEMBER (msr_r);
-	DECLARE_WRITE8_MEMBER(dsr_w);
-	uint8_t read_fifo();
-	void write_fifo(uint8_t data);
-	DECLARE_READ8_MEMBER (fifo_r) { return read_fifo(); }
-	DECLARE_WRITE8_MEMBER(fifo_w) { write_fifo(data); }
-	DECLARE_READ8_MEMBER (dir_r);
-	DECLARE_WRITE8_MEMBER(ccr_w);
+	uint8_t sra_r();
+	uint8_t srb_r();
+	uint8_t dor_r();
+	void dor_w(uint8_t data);
+	uint8_t tdr_r();
+	void tdr_w(uint8_t data);
+	uint8_t msr_r();
+	void dsr_w(uint8_t data);
+	uint8_t fifo_r();
+	void fifo_w(uint8_t data);
+	uint8_t dir_r() { return do_dir_r(); }
+	void ccr_w(uint8_t data);
 
 	virtual uint8_t do_dir_r() override;
 
 	uint8_t dma_r() override;
 	void dma_w(uint8_t data) override;
-
-	// Same as the previous ones, but as memory-mappable members
-	DECLARE_READ8_MEMBER(mdma_r);
-	DECLARE_WRITE8_MEMBER(mdma_w);
 
 	bool get_irq() const;
 	bool get_drq() const;
@@ -477,7 +470,7 @@ public:
 	upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
-	DECLARE_WRITE8_MEMBER(auxcmd_w);
+	void auxcmd_w(uint8_t data);
 };
 
 class n82077aa_device : public upd765_family_device {
@@ -528,7 +521,7 @@ public:
 	auto input_handler() { return m_input_handler.bind(); }
 
 	virtual void map(address_map &map) override;
-	DECLARE_READ8_MEMBER( input_r );
+	uint8_t input_r();
 
 protected:
 	virtual void device_start() override;
@@ -543,7 +536,7 @@ public:
 
 	virtual void map(address_map &map) override;
 
-	DECLARE_WRITE8_MEMBER(cr1_w);
+	void cr1_w(uint8_t data);
 
 protected:
 	virtual void device_start() override;

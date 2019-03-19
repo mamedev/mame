@@ -347,13 +347,11 @@ void nightmare_state::nightmare_map(address_map &map)
 
 void nightmare_state::nightmare_io_map(address_map &map)
 {
-	map(0x0001, 0x0001).r("ic8", FUNC(cdp1852_device::read)).w(FUNC(nightmare_state::unkout_w));
-	map(0x0002, 0x0002).r("ic9", FUNC(cdp1852_device::read)).w("ic10", FUNC(cdp1852_device::write));
+	map(1, 1).r("ic8", FUNC(cdp1852_device::read)).w(FUNC(nightmare_state::unkout_w));
+	map(2, 2).r("ic9", FUNC(cdp1852_device::read)).w("ic10", FUNC(cdp1852_device::write));
 
-	map(0x0004, 0x0004).rw(m_vdc, FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0x0005, 0x0005).rw(m_vdc, FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
-	map(0x0006, 0x0006).rw(m_vdc2, FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0x0007, 0x0007).rw(m_vdc2, FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(4, 5).rw(m_vdc, FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
+	map(6, 7).rw(m_vdc2, FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 }
 
 void nightmare_state::nightmare_sound_map(address_map &map)

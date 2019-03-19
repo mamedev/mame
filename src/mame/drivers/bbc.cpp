@@ -1046,7 +1046,7 @@ void bbc_state::bbcb_us(machine_config &config)
 	FLOPPY_CONNECTOR(config, "i8271:1", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
 
 	/* software lists */
-	SOFTWARE_LIST(config, "flop_ls_b_us").set_original("bbcb_cass_us");
+	SOFTWARE_LIST(config, "flop_ls_b_us").set_original("bbcb_flop_us");
 }
 
 

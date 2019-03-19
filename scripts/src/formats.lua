@@ -1147,6 +1147,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/mtx_dsk.h,FORMATS["MTX_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["MTX_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/mtx_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/mtx_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/mz_cas.h,FORMATS["MZ_CAS"] = true
 --------------------------------------------------
 

@@ -300,7 +300,7 @@ protected:
 	int m_acccon_e;
 	int m_acccon_d;
 
-	void mc146818_set(address_space &space);
+	void mc146818_set();
 	int m_mc146818_as;      // 6522 port b bit 7
 	int m_mc146818_ce;      // 6522 port b bit 6
 

@@ -17,8 +17,8 @@ public:
 	sns_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
+	virtual uint8_t read_l(offs_t offset) override;
+	virtual uint8_t read_h(offs_t offset) override;
 
 protected:
 	sns_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -36,8 +36,8 @@ public:
 	sns_rom_obc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
+	virtual uint8_t chip_read(offs_t offset) override;
+	virtual void chip_write(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -60,9 +60,9 @@ public:
 	// construction/destruction
 	sns_rom_pokemon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;    // protection device
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // protection device
+	// reading and writing (protection device)
+	virtual uint8_t chip_read(offs_t offset) override;
+	virtual void chip_write(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -80,9 +80,9 @@ public:
 	// construction/destruction
 	sns_rom_tekken2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;    // protection device
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // protection device
+	// reading and writing (protection device)
+	virtual uint8_t chip_read(offs_t offset) override;
+	virtual void chip_write(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -104,8 +104,8 @@ public:
 	// construction/destruction
 	sns_rom_soulblad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;    // protection device
+	// reading and writing (protection device)
+	virtual uint8_t chip_read(offs_t offset) override;
 };
 
 // ======================> sns_rom_mcpirate1_device
@@ -117,9 +117,9 @@ public:
 	sns_rom_mcpirate1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // bankswitch device
+	virtual uint8_t read_l(offs_t offset) override;
+	virtual uint8_t read_h(offs_t offset) override;
+	virtual void chip_write(offs_t offset, uint8_t data) override;  // bankswitch device
 
 protected:
 	// device-level overrides
@@ -138,9 +138,9 @@ public:
 	sns_rom_mcpirate2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // bankswitch device
+	virtual uint8_t read_l(offs_t offset) override;
+	virtual uint8_t read_h(offs_t offset) override;
+	virtual void chip_write(offs_t offset, uint8_t data) override;  // bankswitch device
 
 protected:
 	// device-level overrides
@@ -159,9 +159,9 @@ public:
 	sns_rom_20col_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // bankswitch device
+	virtual uint8_t read_l(offs_t offset) override;
+	virtual uint8_t read_h(offs_t offset) override;
+	virtual void chip_write(offs_t offset, uint8_t data) override;  // bankswitch device
 
 protected:
 	// device-level overrides
@@ -178,9 +178,9 @@ public:
 	// construction/destruction
 	sns_rom_banana_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;    // protection device
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // protection device
+	// reading and writing (protection device)
+	virtual uint8_t chip_read(offs_t offset) override;
+	virtual void chip_write(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -198,9 +198,9 @@ public:
 	// construction/destruction
 	sns_rom_bugs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;    // protection device
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // protection device
+	// reading and writing (protection device)
+	virtual uint8_t chip_read(offs_t offset) override;
+	virtual void chip_write(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides

@@ -282,7 +282,7 @@ void wswan_sound_device::wswan_ch_set_freq( CHAN *ch, uint16_t freq )
 	ch->period = 2048 - freq;
 }
 
-WRITE8_MEMBER( wswan_sound_device::port_w )
+void wswan_sound_device::port_w(offs_t offset, uint8_t data)
 {
 	m_channel->update();
 

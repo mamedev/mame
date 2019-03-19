@@ -159,31 +159,32 @@ void eolith16_state::eolith16_palette(palette_device &palette) const
 }
 
 
-MACHINE_CONFIG_START(eolith16_state::eolith16)
-	MCFG_DEVICE_ADD("maincpu", E116T, XTAL(60'000'000))        /* no internal multiplier */
-	MCFG_DEVICE_PROGRAM_MAP(eolith16_map)
+void eolith16_state::eolith16(machine_config &config)
+{
+	E116T(config, m_maincpu, XTAL(60'000'000));        /* no internal multiplier */
+	m_maincpu->set_addrmap(AS_PROGRAM, &eolith16_state::eolith16_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(eolith16_state::eolith_speedup), "screen", 0, 1);
 
 	EEPROM_93C66_8BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(512, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 199)
-	MCFG_SCREEN_UPDATE_DRIVER(eolith16_state, screen_update_eolith16)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(512, 262);
+	m_screen->set_visarea(0, 319, 0, 199);
+	m_screen->set_screen_update(FUNC(eolith16_state::screen_update_eolith16));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(eolith16_state::eolith16_palette), 256);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 /*
 

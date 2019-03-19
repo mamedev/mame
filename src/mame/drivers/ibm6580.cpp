@@ -617,7 +617,7 @@ WRITE8_MEMBER(ibm6580_state::floppy_w)
 		break;
 
 	case 5: // 815A
-		m_fdc->fifo_w(space, offset, data);
+		m_fdc->fifo_w(data);
 		if (m_floppy_idle)
 			m_floppy_idle = false;
 		break;
@@ -646,11 +646,11 @@ READ8_MEMBER(ibm6580_state::floppy_r)
 		break;
 
 	case 4: // 8158
-		data = m_fdc->msr_r(space, offset);
+		data = m_fdc->msr_r();
 		break;
 
 	case 5: // 815a
-		data = m_fdc->fifo_r(space, offset);
+		data = m_fdc->fifo_r();
 		break;
 
 	case 6: // 815c
@@ -919,8 +919,8 @@ void ibm6580_state::ibm6580(machine_config &config)
 	m_dma8257->out_tc_cb().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 	m_dma8257->in_memr_cb().set(FUNC(ibm6580_state::memory_read_byte));
 	m_dma8257->out_memw_cb().set(FUNC(ibm6580_state::memory_write_byte));
-	m_dma8257->in_ior_cb<0>().set(m_fdc, FUNC(upd765a_device::mdma_r));
-	m_dma8257->out_iow_cb<0>().set(m_fdc, FUNC(upd765a_device::mdma_w));
+	m_dma8257->in_ior_cb<0>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_dma8257->out_iow_cb<0>().set(m_fdc, FUNC(upd765a_device::dma_w));
 
 	UPD765A(config, m_fdc, 24_MHz_XTAL / 3, false, false);
 	m_fdc->intrq_wr_callback().set(FUNC(ibm6580_state::floppy_intrq));

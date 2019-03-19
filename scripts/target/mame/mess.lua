@@ -337,6 +337,7 @@ VIDEOS["IMS_CVC"] = true
 --VIDEOS["MB_VCU"] = true
 VIDEOS["MC6845"] = true
 VIDEOS["MC6847"] = true
+VIDEOS["MM5445"] = true
 VIDEOS["MSM6222B"] = true
 VIDEOS["MSM6255"] = true
 VIDEOS["MOS6566"] = true
@@ -725,7 +726,8 @@ BUSES["CGENIE_EXPANSION"] = true
 BUSES["CGENIE_PARALLEL"] = true
 BUSES["CHANNELF"] = true
 BUSES["COCO"] = true
-BUSES["COLECO"] = true
+BUSES["COLECO_CONTROLLER"] = true
+BUSES["COLECO_CART"] = true
 BUSES["COMPIS_GRAPHICS"] = true
 BUSES["COMPUCOLOR"] = true
 BUSES["COMX35"] = true
@@ -771,6 +773,7 @@ BUSES["MACPDS"] = true
 BUSES["MIDI"] = true
 BUSES["MEGADRIVE"] = true
 BUSES["MSX_SLOT"] = true
+BUSES["MTX"] = true
 BUSES["NASBUS"] = true
 BUSES["NEOGEO"] = true
 BUSES["NEOGEO_CTRL"] = true
@@ -863,6 +866,7 @@ FORMATS["APPLIX_DSK"] = true
 FORMATS["APRIDISK"] = true
 FORMATS["AP_DSK35"] = true
 FORMATS["ASST128_DSK"] = true
+FORMATS["ASTROCADE_WAV"] = true
 FORMATS["ATARI_DSK"] = true
 FORMATS["ATOM_DSK"] = true
 FORMATS["ATOM_TAP"] = true
@@ -932,6 +936,7 @@ FORMATS["MFM_HD"] = true
 FORMATS["MM_DSK"] = true
 FORMATS["MS0515_DSK"] = true
 FORMATS["MSX_DSK"] = true
+FORMATS["MTX_DSK"] = true
 FORMATS["MZ_CAS"] = true
 FORMATS["NANOS_DSK"] = true
 FORMATS["NASCOM_DSK"] = true
@@ -2266,6 +2271,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/sbc6510.cpp",
 	MAME_DIR .. "src/mame/drivers/sitcom.cpp",
 	MAME_DIR .. "src/mame/drivers/slc1.cpp",
+	MAME_DIR .. "src/mame/drivers/slc1a.cpp",
 	MAME_DIR .. "src/mame/drivers/uzebox.cpp",
 	MAME_DIR .. "src/mame/drivers/z80dev.cpp",
 }
@@ -3538,6 +3544,8 @@ files {
 	MAME_DIR .. "src/mame/machine/xavix_madfb_ball.h",
 	MAME_DIR .. "src/mame/machine/xavix_io.cpp",
 	MAME_DIR .. "src/mame/machine/xavix_io.h",
+	MAME_DIR .. "src/mame/machine/xavix_adc.cpp",
+	MAME_DIR .. "src/mame/machine/xavix_adc.h",
 	MAME_DIR .. "src/mame/machine/xavix2002_io.cpp",
 	MAME_DIR .. "src/mame/machine/xavix2002_io.h",
 	MAME_DIR .. "src/mame/drivers/xavix2.cpp",
@@ -3592,7 +3600,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/mc8030.cpp",
 	MAME_DIR .. "src/mame/drivers/poly880.cpp",
 	MAME_DIR .. "src/mame/includes/poly880.h",
-	MAME_DIR .. "src/mame/drivers/sc1.cpp",
 	MAME_DIR .. "src/mame/drivers/sc2.cpp",
 }
 
@@ -3641,6 +3648,7 @@ createMESSProjects(_target, _subtarget, "vtech")
 files {
 	MAME_DIR .. "src/mame/drivers/crvision.cpp",
 	MAME_DIR .. "src/mame/includes/crvision.h",
+	MAME_DIR .. "src/mame/drivers/gamemachine.cpp",
 	MAME_DIR .. "src/mame/drivers/geniusiq.cpp",
 	MAME_DIR .. "src/mame/drivers/vtech_unk1.cpp",
 	MAME_DIR .. "src/mame/drivers/vtech_unk2.cpp",
@@ -3757,6 +3765,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/aaa.cpp",
 	MAME_DIR .. "src/mame/drivers/acd.cpp",
 	MAME_DIR .. "src/mame/drivers/aceex.cpp",
+	MAME_DIR .. "src/mame/drivers/aci_boris.cpp",
+	MAME_DIR .. "src/mame/drivers/aci_borisdpl.cpp",
 	MAME_DIR .. "src/mame/drivers/adm23.cpp",
 	MAME_DIR .. "src/mame/drivers/adm31.cpp",
 	MAME_DIR .. "src/mame/drivers/akaiax80.cpp",
@@ -3886,6 +3896,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mice.cpp",
 	MAME_DIR .. "src/mame/drivers/micral.cpp",
 	MAME_DIR .. "src/mame/drivers/micro20.cpp",
+	MAME_DIR .. "src/mame/drivers/micromon.cpp",
 	MAME_DIR .. "src/mame/drivers/micronic.cpp",
 	MAME_DIR .. "src/mame/includes/micronic.h",
 	MAME_DIR .. "src/mame/drivers/microterm.cpp",

@@ -20,6 +20,7 @@
 #include "machine/xavix_madfb_ball.h"
 #include "machine/xavix2002_io.h"
 #include "machine/xavix_io.h"
+#include "machine/xavix_adc.h"
 
 class xavix_sound_device : public device_t, public device_sound_interface
 {
@@ -101,6 +102,7 @@ public:
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_sound(*this, "xavix_sound"),
+		m_adc(*this, "adc"),
 		m_xavix2002io(*this, "xavix2002io")
 	{ }
 
@@ -285,14 +287,6 @@ private:
 	DECLARE_WRITE8_MEMBER(mouse_7b10_w);
 	DECLARE_WRITE8_MEMBER(mouse_7b11_w);
 
-	DECLARE_READ8_MEMBER(adc_7b80_r);
-	DECLARE_WRITE8_MEMBER(adc_7b80_w);
-	DECLARE_READ8_MEMBER(adc_7b81_r);
-	DECLARE_WRITE8_MEMBER(adc_7b81_w);
-	TIMER_CALLBACK_MEMBER(adc_timer_done);
-	emu_timer *m_adc_timer;
-	uint8_t m_adc_control;
-
 	DECLARE_WRITE8_MEMBER(slotreg_7810_w);
 
 	DECLARE_WRITE8_MEMBER(rom_dmatrg_w);
@@ -322,8 +316,6 @@ private:
 	uint8_t m_io1_data;
 	uint8_t m_io0_direction;
 	uint8_t m_io1_direction;
-
-	uint8_t m_adc_inlatch;
 
 	DECLARE_READ8_MEMBER(nmi_vector_lo_r);
 	DECLARE_READ8_MEMBER(nmi_vector_hi_r);
@@ -476,6 +468,14 @@ private:
 	DECLARE_READ8_MEMBER(barrel_r);
 	DECLARE_WRITE8_MEMBER(barrel_w);
 
+	DECLARE_READ8_MEMBER(adc0_r) { return m_an_in[0]->read(); };
+	DECLARE_READ8_MEMBER(adc1_r) { return m_an_in[1]->read(); };
+	DECLARE_READ8_MEMBER(adc2_r) { return m_an_in[2]->read(); };
+	DECLARE_READ8_MEMBER(adc3_r) { return m_an_in[3]->read(); };
+	DECLARE_READ8_MEMBER(adc4_r) { return m_an_in[4]->read(); };
+	DECLARE_READ8_MEMBER(adc5_r) { return m_an_in[5]->read(); };
+	DECLARE_READ8_MEMBER(adc6_r) { return m_an_in[6]->read(); };
+	DECLARE_READ8_MEMBER(adc7_r) { return m_an_in[7]->read(); };
 
 	void update_irqs();
 	uint8_t m_irqsource;
@@ -575,6 +575,7 @@ private:
 	DECLARE_READ8_MEMBER(sound_regram_read_cb);
 
 protected:
+	required_device<xavix_adc_device> m_adc;
 	optional_device<xavix2002_io_device> m_xavix2002io;
 
 	uint8_t m_extbusctrl[3];
@@ -903,6 +904,7 @@ public:
 	{ }
 
 	void xavix_i2c_taiko(machine_config &config);
+	void xavix_i2c_jpopira(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
 
@@ -919,11 +921,16 @@ public:
 		: xavix_cart_state(mconfig,type,tag)
 	{ }
 
+	void xavix_cart_popira2(machine_config &config);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
 
 protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
+private:
+	DECLARE_READ8_MEMBER(popira2_adc0_r);
+	DECLARE_READ8_MEMBER(popira2_adc1_r);
 };
 
 

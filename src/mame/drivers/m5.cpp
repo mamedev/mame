@@ -718,8 +718,7 @@ void m5_state::m5_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x03).mirror(0x0c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x10, 0x10).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0x11, 0x11).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x10, 0x11).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 	map(0x20, 0x20).mirror(0x0f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
 	map(0x30, 0x30).mirror(0x08).portr("Y0").w(FUNC(m5_state::mem64KBF_w)); // 64KBF paging
 	map(0x31, 0x31).mirror(0x08).portr("Y1");
@@ -1040,8 +1039,7 @@ void brno_state::brno_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x03).mirror(0x0c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x10, 0x10).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0x11, 0x11).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x10, 0x11).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 	map(0x20, 0x20).mirror(0x0f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
 	map(0x30, 0x30).portr("Y0");
 	map(0x31, 0x31).portr("Y1");

@@ -5,6 +5,18 @@
 
 <softwarelist name="acrnsys_rom" description="Acorn System ROM images">
 
+	<software name="ade">
+		<description>ADE</description>
+		<year>198?</year>
+		<publisher>Acorn</publisher>
+		<info name="usage" value="GO C000" />
+		<part name="rom1" interface="acrnsys_rom">
+			<dataarea name="rom" size="4096">
+				<rom name="ade.rom" size="4096" crc="14c21b46" sha1="6745f62ee27611222ba96b9115666b1f4c49ae67" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="econ148" supported="no">
 		<description>System/3 Econet 1.48</description>
 		<year>198?</year>

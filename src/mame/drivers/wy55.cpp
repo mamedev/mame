@@ -4,14 +4,15 @@
 
     Skeleton driver for Wyse WY-55 and related terminals.
 
-    The WY-55's custom video gate array is numbered 211019-05. The WY-185 is believed to run on similar hardware.
+    The WY-55's custom video gate array is numbered 211019-05. The WY-185 is believed to run on similar hardware, though with
+    85 Hz and 60 Hz vertical refresh rates rather than 80 Hz and 70 Hz.
 
 ***********************************************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 //#include "machine/ins8250.h"
-//#include "machine/nvram.h"
+#include "machine/nvram.h"
 #include "screen.h"
 
 class wy55_state : public driver_device
@@ -21,6 +22,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
+		, m_progbank(*this, "progbank")
 	{
 	}
 
@@ -38,11 +40,14 @@ private:
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_memory_bank m_progbank;
 };
 
 
 void wy55_state::machine_start()
 {
+	m_progbank->configure_entries(0, 2, memregion("program")->base(), 0x10000);
+	m_progbank->set_entry(0);
 }
 
 u32 wy55_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -52,14 +57,14 @@ u32 wy55_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 void wy55_state::prog_map(address_map &map)
 {
-	// TODO: banking (probably selected by a port pin)
-	map(0x0000, 0xffff).rom().region("program", 0);
+	map(0x0000, 0xffff).bankr("progbank");
 }
 
 void wy55_state::ext_map(address_map &map)
 {
-	map(0x0000, 0x1fff).ram();
-	map(0x8000, 0x97ff).ram();
+	map(0x0000, 0x1fff).ram().share("nvram0");
+	map(0x8000, 0x9fff).ram().share("nvram1");
+	map(0xa000, 0xbfff).ram().share("fontram");
 	//map(0xf028, 0xf037).rw("uart", FUNC(pc16552_device::read), FUNC(pc16552_device::write));
 }
 
@@ -69,17 +74,19 @@ INPUT_PORTS_END
 
 void wy55_state::wy55(machine_config &config)
 {
-	I8032(config, m_maincpu, 14.7456_MHz_XTAL); // exact type and clock divider not verified
+	I8032(config, m_maincpu, 14.7456_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wy55_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &wy55_state::ext_map);
+	m_maincpu->port_out_cb<1>().set_membank("progbank").bit(2);
 
-	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 8K SRAM + battery?
+	NVRAM(config, "nvram0", nvram_device::DEFAULT_ALL_0); // 8K SRAM + battery
+	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0); // 8K SRAM + battery
 
 	//PC16552D(config, "uart", 14.7456_MHz_XTAL / 2); // 16C452 (divider not verified)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(49.4235_MHz_XTAL, 1530, 0, 1200, 369, 0, 338);
-	//m_screen->set_raw(49.4235_MHz_XTAL * 2 / 3, 1050, 0, 800, 523, 0, 338);
+	m_screen->set_raw(49.4235_MHz_XTAL, 1575, 0, 1188, 448, 0, 416);
+	//m_screen->set_raw(49.4235_MHz_XTAL * 2 / 3, 1050, 0, 800, 392, 0, 338);
 	m_screen->set_screen_update(FUNC(wy55_state::screen_update));
 }
 

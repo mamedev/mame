@@ -613,6 +613,8 @@ WRITE8_MEMBER( model1_state::vf_outputs_w )
 
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+
+	m_digits[1] = data;
 }
 
 WRITE8_MEMBER( model1_state::vr_outputs_w )
@@ -645,6 +647,8 @@ WRITE8_MEMBER( model1_state::swa_outputs_w )
 
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+
+	m_digits[1] = data;
 }
 
 WRITE8_MEMBER( model1_state::wingwar_outputs_w )
@@ -659,6 +663,8 @@ WRITE8_MEMBER( model1_state::wingwar_outputs_w )
 	// -------0  coin counter 1
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+
+	m_digits[1] = data;
 }
 
 WRITE8_MEMBER( model1_state::wingwar360_outputs_w )
@@ -671,6 +677,8 @@ WRITE8_MEMBER( model1_state::wingwar360_outputs_w )
 
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+
+	m_digits[1] = data;
 }
 
 WRITE8_MEMBER( model1_state::netmerc_outputs_w )
@@ -683,6 +691,11 @@ WRITE8_MEMBER( model1_state::netmerc_outputs_w )
 	// -------0  coin counter 1
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+}
+
+WRITE8_MEMBER( model1_state::drive_board_w )
+{
+	m_digits[0] = data;
 }
 
 READ8_MEMBER( model1_state::r360_r )
@@ -1747,6 +1760,7 @@ void model1_state::vr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &model1_state::model1_comm_mem);
 
 	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
+	ioboard.drive_write_callback().set(FUNC(model1_state::drive_board_w));
 	ioboard.an_callback<0>().set_ioport("WHEEL");
 	ioboard.an_callback<1>().set_ioport("ACCEL");
 	ioboard.an_callback<2>().set_ioport("BRAKE");
@@ -1762,6 +1776,7 @@ void model1_state::vformula(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &model1_state::model1_comm_mem);
 
 	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
+	ioboard.drive_write_callback().set(FUNC(model1_state::drive_board_w));
 	ioboard.an_callback<0>().set_ioport("WHEEL");
 	ioboard.an_callback<1>().set_ioport("ACCEL");
 	ioboard.an_callback<2>().set_ioport("BRAKE");

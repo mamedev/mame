@@ -32,17 +32,6 @@ namespace netlist
 	, m_frontier_cnt(0)
 	{ }
 
-	void nlparse_t::register_model(const pstring &model_in)
-	{
-		auto pos = model_in.find(" ");
-		if (pos == pstring::npos)
-			log().fatal(MF_1_UNABLE_TO_PARSE_MODEL_1, model_in);
-		pstring model = plib::ucase(plib::trim(plib::left(model_in, pos)));
-		pstring def = plib::trim(model_in.substr(pos + 1));
-		if (!m_models.insert({model, def}).second)
-			log().fatal(MF_1_MODEL_ALREADY_EXISTS_1, model_in);
-	}
-
 	void nlparse_t::register_alias(const pstring &alias, const pstring &out)
 	{
 		pstring alias_fqn = build_fqn(alias);
@@ -287,11 +276,6 @@ void setup_t::register_term(detail::core_terminal_t &term)
 				term.name());
 	log().debug("{1} {2}\n", termtype_as_str(term), term.name());
 }
-
-
-
-
-
 
 void setup_t::remove_connections(const pstring &pin)
 {
@@ -823,19 +807,21 @@ const log_type &setup_t::log() const
 
 
 // ----------------------------------------------------------------------------------------
-// Model
+// Models
 // ----------------------------------------------------------------------------------------
 
-static pstring model_string(detail::model_map_t &map)
+void models_t::register_model(pstring model_in)
 {
-	pstring ret = map["COREMODEL"] + "(";
-	for (auto & i : map)
-		ret = ret + i.first + "=" + i.second + " ";
-
-	return ret + ")";
+	auto pos = model_in.find(" ");
+	if (pos == pstring::npos)
+		throw nl_exception(MF_1_UNABLE_TO_PARSE_MODEL_1, model_in);
+	pstring model = plib::ucase(plib::trim(plib::left(model_in, pos)));
+	pstring def = plib::trim(model_in.substr(pos + 1));
+	if (!m_models.insert({model, def}).second)
+		throw nl_exception(MF_1_MODEL_ALREADY_EXISTS_1, model_in);
 }
 
-void setup_t::model_parse(const pstring &model_in, detail::model_map_t &map)
+void models_t::model_parse(const pstring &model_in, model_map_t &map)
 {
 	pstring model = model_in;
 	std::size_t pos = 0;
@@ -849,7 +835,7 @@ void setup_t::model_parse(const pstring &model_in, detail::model_map_t &map)
 		key = plib::ucase(model);
 		auto i = m_models.find(key);
 		if (i == m_models.end())
-			log().fatal(MF_1_MODEL_NOT_FOUND, model);
+			throw nl_exception(MF_1_MODEL_NOT_FOUND, model);
 		model = i->second;
 	}
 	pstring xmodel = plib::left(model, pos);
@@ -862,12 +848,12 @@ void setup_t::model_parse(const pstring &model_in, detail::model_map_t &map)
 		if (i != m_models.end())
 			model_parse(xmodel, map);
 		else
-			log().fatal(MF_1_MODEL_NOT_FOUND, model_in);
+			throw nl_exception(MF_1_MODEL_NOT_FOUND, model_in);
 	}
 
 	pstring remainder = plib::trim(model.substr(pos + 1));
 	if (!plib::endsWith(remainder, ")"))
-		log().fatal(MF_1_MODEL_ERROR_1, model);
+		throw nl_exception(MF_1_MODEL_ERROR_1, model);
 	// FIMXE: Not optimal
 	remainder = plib::left(remainder, remainder.size() - 1);
 
@@ -876,29 +862,48 @@ void setup_t::model_parse(const pstring &model_in, detail::model_map_t &map)
 	{
 		auto pose = pe.find("=");
 		if (pose == pstring::npos)
-			log().fatal(MF_1_MODEL_ERROR_ON_PAIR_1, model);
+			throw nl_exception(MF_1_MODEL_ERROR_ON_PAIR_1, model);
 		map[plib::ucase(plib::left(pe, pose))] = pe.substr(pose + 1);
 	}
 }
 
-const pstring setup_t::model_value_str(detail::model_map_t &map, const pstring &entity)
+pstring models_t::model_string(model_map_t &map)
 {
+	pstring ret = map["COREMODEL"] + "(";
+	for (auto & i : map)
+		ret = ret + i.first + "=" + i.second + " ";
+
+	return ret + ")";
+}
+
+pstring models_t::model_value_str(pstring model, pstring entity)
+{
+	model_map_t &map = m_cache[model];
+
+	if (map.size() == 0)
+		model_parse(model , map);
+
 	pstring ret;
 
 	if (entity != plib::ucase(entity))
-		log().fatal(MF_2_MODEL_PARAMETERS_NOT_UPPERCASE_1_2, entity,
+		throw nl_exception(MF_2_MODEL_PARAMETERS_NOT_UPPERCASE_1_2, entity,
 				model_string(map));
 	if (map.find(entity) == map.end())
-		log().fatal(MF_2_ENTITY_1_NOT_FOUND_IN_MODEL_2, entity, model_string(map));
+		throw nl_exception(MF_2_ENTITY_1_NOT_FOUND_IN_MODEL_2, entity, model_string(map));
 	else
 		ret = map[entity];
 
 	return ret;
 }
 
-nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
+nl_double models_t::model_value(pstring model, pstring entity)
 {
-	pstring tmp = model_value_str(map, entity);
+	model_map_t &map = m_cache[model];
+
+	if (map.size() == 0)
+		model_parse(model , map);
+
+	pstring tmp = model_value_str(model, entity);
 
 	nl_double factor = plib::constants<nl_double>::one();
 	auto p = std::next(tmp.begin(), static_cast<pstring::difference_type>(tmp.size() - 1));
@@ -914,11 +919,12 @@ nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
 		case 'a': factor = 1e-18; break;
 		default:
 			if (*p < '0' || *p > '9')
-			log().fatal(MF_1_UNKNOWN_NUMBER_FACTOR_IN_1, entity);
+				throw nl_exception(MF_1_UNKNOWN_NUMBER_FACTOR_IN_1, entity);
 	}
 	if (factor != plib::constants<nl_double>::one())
 		tmp = plib::left(tmp, tmp.size() - 1);
 	// FIXME: check for errors
+	//printf("%s %s %e %e\n", entity.c_str(), tmp.c_str(), plib::pstonum<nl_double>(tmp), factor);
 	return plib::pstonum<nl_double>(tmp) * factor;
 }
 
@@ -944,12 +950,10 @@ pool_owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_
 
 const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 {
-	detail::model_map_t map;
-	model_parse(model, map);
 
-	if (model_value_str(map, "TYPE") == "TTL")
+	if (m_models.model_value_str(model, "TYPE") == "TTL")
 		return family_TTL();
-	if (model_value_str(map, "TYPE") == "CD4XXX")
+	if (m_models.model_value_str(model, "TYPE") == "CD4XXX")
 		return family_CD4XXX();
 
 	for (auto & e : m_nlstate.m_family_cache)
@@ -958,13 +962,13 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 
 	auto ret = plib::make_unique<logic_family_std_proxy_t>();
 
-	ret->m_fixed_V = model_value(map, "FV");
-	ret->m_low_thresh_PCNT = model_value(map, "IVL");
-	ret->m_high_thresh_PCNT = model_value(map, "IVH");
-	ret->m_low_VO = model_value(map, "OVL");
-	ret->m_high_VO = model_value(map, "OVH");
-	ret->m_R_low = model_value(map, "ORL");
-	ret->m_R_high = model_value(map, "ORH");
+	ret->m_fixed_V = m_models.model_value(model, "FV");
+	ret->m_low_thresh_PCNT = m_models.model_value(model, "IVL");
+	ret->m_high_thresh_PCNT = m_models.model_value(model, "IVH");
+	ret->m_low_VO = m_models.model_value(model, "OVL");
+	ret->m_high_VO = m_models. model_value(model, "OVH");
+	ret->m_R_low = m_models.model_value(model, "ORL");
+	ret->m_R_high = m_models.model_value(model, "ORH");
 
 	auto retp = ret.get();
 

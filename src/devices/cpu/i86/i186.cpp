@@ -603,6 +603,18 @@ void i80186_cpu_device::device_start()
 	state_add( I80186_T_COUNT + 2, "T2_COUNT", m_timer[2].count ).formatstr("%04X");
 	state_add( I80186_T_MAX_A + 2, "T2_MAX", m_timer[2].maxA ).formatstr("%04X");
 	state_add( I80186_T_CONTROL + 2, "T2_CONTROL", m_timer[2].control ).formatstr("%04X");
+	state_add( I80186_ISR, "ISR", m_intr.in_service ).formatstr("%04X");
+	state_add( I80186_IRR, "IRR", m_intr.request ).formatstr("%04X");
+	state_add( I80186_PMR, "PMR", m_intr.priority_mask ).formatstr("%04X");
+	state_add( I80186_ICSR, "ICSR", m_intr.status ).formatstr("%04X");
+	state_add( I80186_TMRCR, "TMRCR", m_intr.timer ).formatstr("%04X");
+	state_add( I80186_D0CR, "D0CR", m_intr.dma[0] ).formatstr("%04X");
+	state_add( I80186_D1CR, "D1CR", m_intr.dma[1] ).formatstr("%04X");
+	state_add( I80186_I0CR, "I0CR", m_intr.ext[0] ).formatstr("%04X");
+	state_add( I80186_I1CR, "I1CR", m_intr.ext[1] ).formatstr("%04X");
+	state_add( I80186_I2CR, "I2CR", m_intr.ext[2] ).formatstr("%04X");
+	state_add( I80186_I3CR, "I3CR", m_intr.ext[3] ).formatstr("%04X");
+	state_add( I80186_POLL, "POLL", m_intr.poll_status ).formatstr("%04X");
 
 	// register for savestates
 	save_item(NAME(m_timer[0].control));

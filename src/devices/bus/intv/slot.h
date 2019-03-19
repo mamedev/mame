@@ -39,36 +39,36 @@ public:
 	virtual ~device_intv_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read_rom04) { return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_rom20) { return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_rom40) { return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_rom48) { return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_rom50) { return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_rom60) { return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_rom70) { return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_rom80) { return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_rom90) { return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_roma0) { return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_romb0) { return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_romc0) { return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_romd0) { return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_rome0) { return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_romf0) { return 0xffff; }
+	virtual uint16_t read_rom04(offs_t offset) { return 0xffff; }
+	virtual uint16_t read_rom20(offs_t offset) { return 0xffff; }
+	virtual uint16_t read_rom40(offs_t offset) { return 0xffff; }
+	virtual uint16_t read_rom48(offs_t offset) { return 0xffff; }
+	virtual uint16_t read_rom50(offs_t offset) { return 0xffff; }
+	virtual uint16_t read_rom60(offs_t offset) { return 0xffff; }
+	virtual uint16_t read_rom70(offs_t offset) { return 0xffff; }
+	virtual uint16_t read_rom80(offs_t offset) { return 0xffff; }
+	virtual uint16_t read_rom90(offs_t offset) { return 0xffff; }
+	virtual uint16_t read_roma0(offs_t offset) { return 0xffff; }
+	virtual uint16_t read_romb0(offs_t offset) { return 0xffff; }
+	virtual uint16_t read_romc0(offs_t offset) { return 0xffff; }
+	virtual uint16_t read_romd0(offs_t offset) { return 0xffff; }
+	virtual uint16_t read_rome0(offs_t offset) { return 0xffff; }
+	virtual uint16_t read_romf0(offs_t offset) { return 0xffff; }
 
-	virtual DECLARE_READ16_MEMBER(read_ram) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(write_ram) {}
+	virtual uint16_t read_ram(offs_t offset) { return 0xffff; }
+	virtual void write_ram(offs_t offset, uint16_t data) {}
 
 	// Used by IntelliVoice & ECS
-	virtual DECLARE_READ16_MEMBER(read_ay) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(write_ay) {}
-	virtual DECLARE_READ16_MEMBER(read_speech) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(write_speech) {}
-	virtual DECLARE_WRITE16_MEMBER(write_d0) {}
-	virtual DECLARE_WRITE16_MEMBER(write_88) {}
-	virtual DECLARE_WRITE16_MEMBER(write_rom20) {}
-	virtual DECLARE_WRITE16_MEMBER(write_rom70) {}
-	virtual DECLARE_WRITE16_MEMBER(write_rome0) {}
-	virtual DECLARE_WRITE16_MEMBER(write_romf0) {}
+	virtual uint16_t read_ay(offs_t offset) { return 0xffff; }
+	virtual void write_ay(offs_t offset, uint16_t data) {}
+	virtual uint16_t read_speech(offs_t offset) { return 0xffff; }
+	virtual void write_speech(offs_t offset, uint16_t data) {}
+	virtual void write_d0(offs_t offset, uint16_t data) {}
+	virtual void write_88(offs_t offset, uint16_t data) {}
+	virtual void write_rom20(offs_t offset, uint16_t data) {}
+	virtual void write_rom70(offs_t offset, uint16_t data) {}
+	virtual void write_rome0(offs_t offset, uint16_t data) {}
+	virtual void write_romf0(offs_t offset, uint16_t data) {}
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -134,40 +134,40 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read_rom04) { if (m_cart) return m_cart->read_rom04(space, offset, mem_mask); else return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_rom20) { if (m_cart) return m_cart->read_rom20(space, offset, mem_mask); else return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_rom40) { if (m_cart) return m_cart->read_rom40(space, offset, mem_mask); else return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_rom48) { if (m_cart) return m_cart->read_rom48(space, offset, mem_mask); else return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_rom50) { if (m_cart) return m_cart->read_rom50(space, offset, mem_mask); else return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_rom60) { if (m_cart) return m_cart->read_rom60(space, offset, mem_mask); else return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_rom70) { if (m_cart) return m_cart->read_rom70(space, offset, mem_mask); else return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_rom80) { if (m_cart) return m_cart->read_rom80(space, offset, mem_mask); else return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_rom90) { if (m_cart) return m_cart->read_rom90(space, offset, mem_mask); else return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_roma0) { if (m_cart) return m_cart->read_roma0(space, offset, mem_mask); else return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_romb0) { if (m_cart) return m_cart->read_romb0(space, offset, mem_mask); else return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_romc0) { if (m_cart) return m_cart->read_romc0(space, offset, mem_mask); else return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_romd0) { if (m_cart) return m_cart->read_romd0(space, offset, mem_mask); else return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_rome0) { if (m_cart) return m_cart->read_rome0(space, offset, mem_mask); else return 0xffff; }
-	virtual DECLARE_READ16_MEMBER(read_romf0) { if (m_cart) return m_cart->read_romf0(space, offset, mem_mask); else return 0xffff; }
+	uint16_t read_rom04(offs_t offset) { if (m_cart) return m_cart->read_rom04(offset); else return 0xffff; }
+	uint16_t read_rom20(offs_t offset) { if (m_cart) return m_cart->read_rom20(offset); else return 0xffff; }
+	uint16_t read_rom40(offs_t offset) { if (m_cart) return m_cart->read_rom40(offset); else return 0xffff; }
+	uint16_t read_rom48(offs_t offset) { if (m_cart) return m_cart->read_rom48(offset); else return 0xffff; }
+	uint16_t read_rom50(offs_t offset) { if (m_cart) return m_cart->read_rom50(offset); else return 0xffff; }
+	uint16_t read_rom60(offs_t offset) { if (m_cart) return m_cart->read_rom60(offset); else return 0xffff; }
+	uint16_t read_rom70(offs_t offset) { if (m_cart) return m_cart->read_rom70(offset); else return 0xffff; }
+	uint16_t read_rom80(offs_t offset) { if (m_cart) return m_cart->read_rom80(offset); else return 0xffff; }
+	uint16_t read_rom90(offs_t offset) { if (m_cart) return m_cart->read_rom90(offset); else return 0xffff; }
+	uint16_t read_roma0(offs_t offset) { if (m_cart) return m_cart->read_roma0(offset); else return 0xffff; }
+	uint16_t read_romb0(offs_t offset) { if (m_cart) return m_cart->read_romb0(offset); else return 0xffff; }
+	uint16_t read_romc0(offs_t offset) { if (m_cart) return m_cart->read_romc0(offset); else return 0xffff; }
+	uint16_t read_romd0(offs_t offset) { if (m_cart) return m_cart->read_romd0(offset); else return 0xffff; }
+	uint16_t read_rome0(offs_t offset) { if (m_cart) return m_cart->read_rome0(offset); else return 0xffff; }
+	uint16_t read_romf0(offs_t offset) { if (m_cart) return m_cart->read_romf0(offset); else return 0xffff; }
 
-	virtual DECLARE_READ16_MEMBER(read_ay);
-	virtual DECLARE_WRITE16_MEMBER(write_ay);
-	virtual DECLARE_READ16_MEMBER(read_speech);
-	virtual DECLARE_WRITE16_MEMBER(write_speech);
-	virtual DECLARE_READ16_MEMBER(read_ram) { if (m_cart) return m_cart->read_ram(space, offset, mem_mask); else return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(write_ram) { if (m_cart) m_cart->write_ram(space, offset, data, mem_mask); }
+	uint16_t read_ay(offs_t offset);
+	void write_ay(offs_t offset, uint16_t data);
+	uint16_t read_speech(offs_t offset);
+	void write_speech(offs_t offset, uint16_t data);
+	uint16_t read_ram(offs_t offset) { if (m_cart) return m_cart->read_ram(offset); else return 0xffff; }
+	void write_ram(offs_t offset, uint16_t data) { if (m_cart) m_cart->write_ram(offset, data); }
 
 	virtual void late_subslot_setup() { if (m_cart) return m_cart->late_subslot_setup(); }
 
 	// these RAM accessors are needed to deal with IntelliVoice and ECS mounting RAM-equipped carts
-	virtual DECLARE_WRITE16_MEMBER(write_d0) { if (m_cart) m_cart->write_d0(space, offset, data, mem_mask); }
-	virtual DECLARE_WRITE16_MEMBER(write_88) { if (m_cart) m_cart->write_88(space, offset, data, mem_mask); }
+	void write_d0(offs_t offset, uint16_t data) { if (m_cart) m_cart->write_d0(offset, data); }
+	void write_88(offs_t offset, uint16_t data) { if (m_cart) m_cart->write_88(offset, data); }
 
 	// ECS paged roms need these
-	virtual DECLARE_WRITE16_MEMBER(write_rom20) { if (m_cart) m_cart->write_rom20(space, offset, data, mem_mask); }
-	virtual DECLARE_WRITE16_MEMBER(write_rom70) { if (m_cart) m_cart->write_rom70(space, offset, data, mem_mask); }
-	virtual DECLARE_WRITE16_MEMBER(write_rome0) { if (m_cart) m_cart->write_rome0(space, offset, data, mem_mask); }
-	virtual DECLARE_WRITE16_MEMBER(write_romf0) { if (m_cart) m_cart->write_romf0(space, offset, data, mem_mask); }
+	void write_rom20(offs_t offset, uint16_t data) { if (m_cart) m_cart->write_rom20(offset, data); }
+	void write_rom70(offs_t offset, uint16_t data) { if (m_cart) m_cart->write_rom70(offset, data); }
+	void write_rome0(offs_t offset, uint16_t data) { if (m_cart) m_cart->write_rome0(offset, data); }
+	void write_romf0(offs_t offset, uint16_t data) { if (m_cart) m_cart->write_romf0(offset, data); }
 
 protected:
 	// device-level overrides

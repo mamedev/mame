@@ -38,8 +38,9 @@ protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	virtual void opcode_fetch(offs_t offset) override;
 	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
-	virtual DECLARE_READ8_MEMBER(mreq_r) override;
+	virtual uint8_t mreq_r(offs_t offset) override;
 
 private:
 	required_memory_region m_rom;

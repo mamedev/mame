@@ -54,6 +54,7 @@ private:
 	void m65c02_mem(address_map &map);
 
 	void hit_slot(int slot);
+	void hit_slot_joy();
 };
 
 // device type definition

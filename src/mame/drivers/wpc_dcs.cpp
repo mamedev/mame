@@ -860,6 +860,19 @@ ROM_START(sttng_l3)
 	ROM_LOAD16_BYTE("ng_u8_s.l1", 0xc00000, 0x080000, CRC(c9fb065e) SHA1(c148178ee0ea787acc88078db01d17073e75fdc7))
 ROM_END
 
+ROM_START(sttng_l5)
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("trek_lx5.rom", 0x00000, 0x80000, CRC(e004f3a7) SHA1(c724641106115e3f14bbe3998771823d0ac12d69))
+	ROM_REGION16_LE(0x1000000, "dcs",0)
+	ROM_LOAD16_BYTE("ng_u2_s.l1", 0x000000, 0x080000, CRC(c3bd7bf5) SHA1(2476ff90232a52d667a407fac81ee4db028b94e5))
+	ROM_LOAD16_BYTE("ng_u3_s.l1", 0x200000, 0x080000, CRC(9456cac7) SHA1(83e415e0f21bb5418f3677dbc13433e056c523ab))
+	ROM_LOAD16_BYTE("ng_u4_s.l1", 0x400000, 0x080000, CRC(179d22a4) SHA1(456b7189e23d4e2bd7e2a6249fa2a73bf0e12194))
+	ROM_LOAD16_BYTE("ng_u5_s.l1", 0x600000, 0x080000, CRC(231a3e72) SHA1(081b1a042e62ccb723788059d6c1e00b9b32c778))
+	ROM_LOAD16_BYTE("ng_u6_s.l1", 0x800000, 0x080000, CRC(bb21377d) SHA1(229fb42a1f8b22727a809e5d63f26f045a2adda5))
+	ROM_LOAD16_BYTE("ng_u7_s.l1", 0xa00000, 0x080000, CRC(d81b39f0) SHA1(3443e7327c755b85a5b390f7fcd0e9923890425a))
+	ROM_LOAD16_BYTE("ng_u8_s.l1", 0xc00000, 0x080000, CRC(c9fb065e) SHA1(c148178ee0ea787acc88078db01d17073e75fdc7))
+ROM_END
+
 
 /*-------------
 / Addams Family Values (Coin Dropper)
@@ -893,6 +906,7 @@ GAME(1994,  pop_lx5,    0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, init_pop
 GAME(1994,  pop_la4,    pop_lx5,    wpc_dcs,    wpc_dcs, wpc_dcs_state, init_pop,   ROT0,   "Bally",     "Popeye Saves The Earth (LA-4)",                    MACHINE_MECHANICAL)
 GAME(1994,  pop_pa3,    pop_lx5,    wpc_dcs,    wpc_dcs, wpc_dcs_state, init_pop,   ROT0,   "Bally",     "Popeye Saves The Earth (PA-3)",                    MACHINE_MECHANICAL)
 GAME(1994,  sttng_l7,   0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, init_sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-7)",            MACHINE_MECHANICAL)
+GAME(1994,  sttng_l5,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, init_sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-5)",            MACHINE_MECHANICAL)
 GAME(1994,  sttng_x7,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, init_sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-7 Special)",    MACHINE_MECHANICAL)
 GAME(1993,  sttng_p8,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, init_sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (P-8)",             MACHINE_MECHANICAL)
 GAME(1993,  sttng_p5,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, init_sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (P-5)",             MACHINE_MECHANICAL)

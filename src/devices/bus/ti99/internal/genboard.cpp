@@ -509,7 +509,7 @@ uint8_t geneve_mapper_device::readm(offs_t offset)
 	case MLVIDEO:
 		if (!machine().side_effects_disabled())
 		{
-			value = m_video->read(machine().dummy_space(), dec->offset>>1);
+			value = m_video->read(dec->offset>>1);
 			LOGMASKED(LOG_READ, "Read video %04x -> %02x\n", dec->offset, value);
 			// Video wait states are created *after* the access
 			// Accordingly, they have no effect when execution is in onchip RAM
@@ -650,7 +650,7 @@ void geneve_mapper_device::writem(offs_t offset, uint8_t data)
 
 		if (!machine().side_effects_disabled())
 		{
-			m_video->write(machine().dummy_space(), dec->offset>>1, data);
+			m_video->write(dec->offset>>1, data);
 			LOGMASKED(LOG_WRITE, "Write video %04x <- %02x\n", offset, data);
 			// See above
 			if (m_video_waitstates) set_video_waitcount(15);

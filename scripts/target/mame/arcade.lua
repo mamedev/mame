@@ -323,6 +323,7 @@ VIDEOS["MB90082"] = true
 VIDEOS["MB_VCU"] = true
 VIDEOS["MC6845"] = true
 --VIDEOS["MC6847"] = true
+--VIDEOS["MM5445"] = true
 --VIDEOS["MSM6222B"] = true
 --VIDEOS["MSM6255"] = true
 --VIDEOS["MOS6566"] = true
@@ -530,7 +531,7 @@ MACHINES["MSM6242"] = true
 MACHINES["MSM6253"] = true
 --MACHINES["NCR5380"] = true
 --MACHINES["NCR5380N"] = true
---MACHINES["NCR5390"] = true
+MACHINES["NCR5390"] = true
 MACHINES["NCR539x"] = true
 MACHINES["NETLIST"] = true
 --MACHINES["NCR53C7XX"] = true
@@ -679,7 +680,8 @@ BUSES["AMIGA_KEYBOARD"] = true
 BUSES["CENTRONICS"] = true
 --BUSES["CHANNELF"] = true
 --BUSES["COCO"] = true
---BUSES["COLECO"] = true
+--BUSES["COLECO_CONTROLLER"] = true
+--BUSES["COLECO_CART"] = true
 --BUSES["COMPUCOLOR"] = true
 --BUSES["COMX35"] = true
 --BUSES["CPC"] = true
@@ -1197,6 +1199,8 @@ files {
 	MAME_DIR .. "src/mame/machine/nl_pongd.h",
 	MAME_DIR .. "src/mame/machine/nl_breakout.cpp",
 	MAME_DIR .. "src/mame/machine/nl_breakout.h",
+	MAME_DIR .. "src/mame/machine/nl_rebound.cpp",
+	MAME_DIR .. "src/mame/machine/nl_rebound.h",
 	MAME_DIR .. "src/mame/drivers/poolshrk.cpp",
 	MAME_DIR .. "src/mame/includes/poolshrk.h",
 	MAME_DIR .. "src/mame/audio/poolshrk.cpp",

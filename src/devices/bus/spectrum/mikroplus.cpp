@@ -85,23 +85,19 @@ void spectrum_mikroplus_device::device_start()
 }
 
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void spectrum_mikroplus_device::device_reset()
-{
-	io_space().install_read_handler(0xdf, 0xdf, 0, 0xff00, 0, read8_delegate(FUNC(spectrum_mikroplus_device::joystick_r), this));
-}
-
-
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(spectrum_mikroplus_device::joystick_r)
+uint8_t spectrum_mikroplus_device::iorq_r(offs_t offset)
 {
-	return m_joy->read() | (0xff ^ 0x1f);
+	uint8_t data = 0xff;
+
+	if (offset == 0xdf)
+	{
+		data = m_joy->read() | (0xff ^ 0x1f);
+	}
+	return data;
 }
 
 READ_LINE_MEMBER(spectrum_mikroplus_device::romcs)
@@ -109,7 +105,7 @@ READ_LINE_MEMBER(spectrum_mikroplus_device::romcs)
 	return 1;
 }
 
-READ8_MEMBER(spectrum_mikroplus_device::mreq_r)
+uint8_t spectrum_mikroplus_device::mreq_r(offs_t offset)
 {
 	return m_rom->base()[offset & 0x3fff];
 }

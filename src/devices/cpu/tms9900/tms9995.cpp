@@ -1508,10 +1508,13 @@ void tms9995_device::int_prefetch_and_decode()
 			// If the current command is XOP or BLWP, ignore the interrupt
 			if (m_command != XOP && m_command != BLWP)
 			{
-				if (m_flag[2] && intmask >= 1) m_int_pending |= PENDING_LEVEL1;
+				// The actual interrupt trigger is an OR of the latch and of
+				// the interrupt line (for INT1 and INT4); see [1],
+				// section 2.3.2.1.3
+				if ((m_int1_active || m_flag[2]) && intmask >= 1) m_int_pending |= PENDING_LEVEL1;
 				if (m_int_overflow && intmask >= 2) m_int_pending |= PENDING_OVERFLOW;
 				if (m_flag[3] && intmask >= 3) m_int_pending |= PENDING_DECR;
-				if (m_flag[4] && intmask >= 4) m_int_pending |= PENDING_LEVEL4;
+				if ((m_int4_active || m_flag[4]) && intmask >= 4) m_int_pending |= PENDING_LEVEL4;
 			}
 
 			if (m_int_pending!=0)
@@ -2082,8 +2085,7 @@ void tms9995_device::return_with_address_copy()
     1FDA MID flag (only indication, does not trigger when set)
 
     The TMS9995 allows for wait states during external CRU access. Therefore
-    we read one block of 8 bits in one go (as given by the MESS architecture)
-    but we do iterations for each bit, checking every time for the READY line
+    we do iterations for each bit, checking every time for the READY line
     in the main loop.
 
         (write)
@@ -2159,6 +2161,7 @@ void tms9995_device::cru_input_operation()
 		m_pass = m_count;
 	}
 
+	// Read a single CRU bit
 	bool crubit = BIT(m_cru->read_byte(m_cru_address & CRUREADMASK), 0);
 	m_cru_value = (m_cru_value >> 1) & 0x7fff;
 

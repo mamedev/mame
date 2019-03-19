@@ -129,6 +129,7 @@ public:
 	DECLARE_READ8_MEMBER(profpac_videoram_r);
 	DECLARE_WRITE8_MEMBER(profpac_videoram_w);
 	DECLARE_INPUT_CHANGED_MEMBER(spacezap_monitor);
+	DECLARE_WRITE_LINE_MEMBER(lightpen_trigger_w);
 	void init_profpac();
 	void init_spacezap();
 	void init_robby();

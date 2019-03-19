@@ -111,9 +111,9 @@ WRITE8_MEMBER(cforte_state::control_w)
 	// d0: HLCD0538 data in
 	// d1: HLCD0538 clk
 	// d2: HLCD0538 lcd
-	m_hlcd0538->write_data(data & 1);
-	m_hlcd0538->write_clk(data >> 1 & 1);
-	m_hlcd0538->write_lcd(data >> 2 & 1);
+	m_hlcd0538->data_w(data & 1);
+	m_hlcd0538->clk_w(data >> 1 & 1);
+	m_hlcd0538->lcd_w(data >> 2 & 1);
 
 	// d3: unused?
 
@@ -216,8 +216,8 @@ void cforte_state::cforte(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	HLCD0538(config, m_hlcd0538, 0);
-	m_hlcd0538->write_cols_callback().set(FUNC(cforte_state::lcd_output_w));
+	HLCD0538(config, m_hlcd0538);
+	m_hlcd0538->write_cols().set(FUNC(cforte_state::lcd_output_w));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(cforte_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_novag_cforte);

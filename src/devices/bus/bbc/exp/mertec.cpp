@@ -114,52 +114,52 @@ void bbc_mertec_device::upd7002_eoc(int data)
 	//m_via6522_0->write_cb1(data);
 }
 
-READ8_MEMBER(bbc_mertec_device::fred_r)
+uint8_t bbc_mertec_device::fred_r(offs_t offset)
 {
 	return m_2mhzbus->fred_r(offset);
 }
 
-WRITE8_MEMBER(bbc_mertec_device::fred_w)
+void bbc_mertec_device::fred_w(offs_t offset, uint8_t data)
 {
 	m_2mhzbus->fred_w(offset, data);
 }
 
-READ8_MEMBER(bbc_mertec_device::jim_r)
+uint8_t bbc_mertec_device::jim_r(offs_t offset)
 {
 	return m_2mhzbus->jim_r(offset);
 }
 
-WRITE8_MEMBER(bbc_mertec_device::jim_w)
+void bbc_mertec_device::jim_w(offs_t offset, uint8_t data)
 {
 	m_2mhzbus->jim_w(offset, data);
 }
 
-READ8_MEMBER(bbc_mertec_device::sheila_r)
+uint8_t bbc_mertec_device::sheila_r(offs_t offset)
 {
 	uint8_t data = 0xfe;
 
 	if (offset >= 0x18 && offset < 0x20)
 	{
-		data = m_upd7002->read(space, offset & 0x03);
+		data = m_upd7002->read(offset & 0x03);
 	}
 
 	return data;
 }
 
-WRITE8_MEMBER(bbc_mertec_device::sheila_w)
+void bbc_mertec_device::sheila_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x18 && offset < 0x20)
 	{
-		m_upd7002->write(space, offset & 0x03, data);
+		m_upd7002->write(offset & 0x03, data);
 	}
 }
 
-READ8_MEMBER(bbc_mertec_device::pb_r)
+uint8_t bbc_mertec_device::pb_r()
 {
-	return m_userport->pb_r(space, 0);
+	return m_userport->pb_r();
 }
 
-WRITE8_MEMBER(bbc_mertec_device::pb_w)
+void bbc_mertec_device::pb_w(uint8_t data)
 {
-	m_userport->pb_w(space, 0, data);
+	m_userport->pb_w(data);
 }

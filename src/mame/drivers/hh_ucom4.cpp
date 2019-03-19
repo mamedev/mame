@@ -1829,9 +1829,9 @@ WRITE8_MEMBER(mcompgin_state::lcd_w)
 	// E0: HLCD0530 _CS
 	// E1: HLCD0530 clock
 	// E2: HLCD0530 data in
-	m_lcd->write_cs(data & 1);
-	m_lcd->write_data(data >> 2 & 1);
-	m_lcd->write_clock(data >> 1 & 1);
+	m_lcd->cs_w(data & 1);
+	m_lcd->data_w(data >> 2 & 1);
+	m_lcd->clock_w(data >> 1 & 1);
 }
 
 // config

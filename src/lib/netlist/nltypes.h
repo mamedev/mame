@@ -108,11 +108,6 @@ namespace netlist
 			OUTPUT   = 2, /*!< object is an output */
 		};
 
-		/*! Type of the model map used.
-		 *  This is used to hold all #Models in an unordered map
-		 */
-		using model_map_t = std::unordered_map<pstring, pstring>;
-
 	} // namespace detail
 
 #if (PHAS_INT128)
