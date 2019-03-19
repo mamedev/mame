@@ -601,7 +601,7 @@ public:
 protected:
 
 private:
-	DECLARE_READ8_MEMBER(guru_anport2_r) { uint8_t ret = m_mouse1x->read()-0x80; return ret; }
+	DECLARE_READ8_MEMBER(guru_anport2_r) { uint8_t ret = m_mouse1x->read()-0x10; return ret; }
 };
 
 

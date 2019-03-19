@@ -1111,9 +1111,11 @@ static INPUT_PORTS_START( epo_guru )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 
 	PORT_MODIFY("MOUSE1X")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(6) PORT_KEYDELTA(16) PORT_PLAYER(1) PORT_MINMAX(0x44,0xbc)
+//	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(6) PORT_KEYDELTA(16) PORT_PLAYER(1) PORT_MINMAX(0x44,0xbc)
+	PORT_BIT( 0x1f, 0x10, IPT_AD_STICK_X ) PORT_SENSITIVITY(6) PORT_KEYDELTA(16) PORT_PLAYER(1) // PORT_MINMAX(0x44,0xbc)
+
 	/* 
-	 (0x80 is subtracted from value returned in read handler)
+	 (0x20 is subtracted from value returned in read handler)
 
 	 main game
 	 00 still
@@ -1134,6 +1136,7 @@ static INPUT_PORTS_START( epo_guru )
 
 	 so valid range seems to be c4-ff (left), 00 (still), 01-3c (right) even if this means the slowest speed going left is faster than the slowest speed going right
 	 maybe actual range is 5 bits either way?
+	 4 bits either way seems to work best in practice
 
 	 */
 INPUT_PORTS_END
