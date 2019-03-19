@@ -8697,7 +8697,7 @@
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- This is an old version, dated 201711 -->
 	<software name="cvaniasia" cloneof="cvaniasi">
-		<description>Castlevania - Spectral Interlude</description>
+		<description>Castlevania - Spectral Interlude (alt)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -8710,7 +8710,7 @@
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- This is an old version, dated 201711 -->
 	<software name="cvaniasispa" cloneof="cvaniasi">
-		<description>Castlevania - Spectral Interlude (Spa)</description>
+		<description>Castlevania - Spectral Interlude (Spa) (alt)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -8723,7 +8723,7 @@
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- This is an old version, dated 201711 -->
 	<software name="cvaniasiita" cloneof="cvaniasi">
-		<description>Castlevania - Spectral Interlude (Ita)</description>
+		<description>Castlevania - Spectral Interlude (Ita) (alt)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -8736,7 +8736,7 @@
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- This is an old version, dated 201711 -->
 	<software name="cvaniasirua" cloneof="cvaniasi">
-		<description>Castlevania - Spectral Interlude (Rus)</description>
+		<description>Castlevania - Spectral Interlude (Rus) (alt)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -8749,7 +8749,7 @@
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- This is an old version, dated 201711 -->
 	<software name="cvaniasipoa" cloneof="cvaniasi">
-		<description>Castlevania - Spectral Interlude (Pol)</description>
+		<description>Castlevania - Spectral Interlude (Pol) (alt)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
 		<part name="flop1" interface="floppy_3">
