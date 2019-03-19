@@ -601,10 +601,7 @@ public:
 protected:
 
 private:
-	//DECLARE_READ8_MEMBER(guru_anport0_r) { return m_mouse0x->read()^0x7f; }
-	//DECLARE_READ8_MEMBER(guru_anport1_r) { return m_mouse0y->read()^0x7f; }
-	DECLARE_READ8_MEMBER(guru_anport2_r) { return m_mouse1x->read()^0x7f; }
-	//DECLARE_READ8_MEMBER(guru_anport3_r) { return m_mouse1y->read()^0x7f; }
+	DECLARE_READ8_MEMBER(guru_anport2_r) { uint8_t ret = m_mouse1x->read()-0x80; printf("returning %02x\n", ret); return ret; }
 };
 
 

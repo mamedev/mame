@@ -1100,6 +1100,7 @@ static INPUT_PORTS_START( epo_epp )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
+// there is also a rumble output, likely mapped to one of the port bits
 static INPUT_PORTS_START( epo_guru )
 	PORT_INCLUDE(xavix)
 
@@ -1109,15 +1110,32 @@ static INPUT_PORTS_START( epo_guru )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) // used in the 'from behind' game at least
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 
-//	PORT_MODIFY("MOUSE0X")
-//	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
-//	PORT_MODIFY("MOUSE0Y")
-//	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
 	PORT_MODIFY("MOUSE1X")
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)  // seems to respond to these inputs
-//	PORT_MODIFY("MOUSE1Y")
-//	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(6) PORT_KEYDELTA(16) PORT_PLAYER(1) PORT_MINMAX(0x44,0xbc)
+	/* 
+	 (0x80 is subtracted from value returned in read handler)
 
+	 main game
+	 00 still
+	 01 - 3c right
+	 3d - 78 left  - 78 is a nice slow left but invalid for the sub game
+	 79 - 7f right
+	 80 - 87 left
+	 88 - c3 right
+	 c4 - ff left
+	 
+	 sub game (break-out)
+	 00 still
+	 01 - 3f right
+	 40 - 7f left
+	 80 still
+	 81 - bf right
+	 c0 - ff left
+
+	 so valid range seems to be c4-ff (left), 00 (still), 01-3c (right) even if this means the slowest speed going left is faster than the slowest speed going right
+	 maybe actual range is 5 bits either way?
+
+	 */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( epo_efdx )
@@ -1267,12 +1285,9 @@ void xavix_state::xavix(machine_config &config)
 
 void xavix_guru_state::xavix_guru(machine_config &config)
 {
-	xavix(config);
+	xavix_nv(config);
 
-	//m_anport->read_0_callback().set(FUNC(xavix_guru_state::guru_anport0_r));
-	//m_anport->read_1_callback().set(FUNC(xavix_guru_state::guru_anport1_r));
 	m_anport->read_2_callback().set(FUNC(xavix_guru_state::guru_anport2_r));
-	//m_anport->read_3_callback().set(FUNC(xavix_guru_state::guru_anport3_r));
 }
 
 
