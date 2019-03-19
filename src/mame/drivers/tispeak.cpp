@@ -374,7 +374,7 @@ keyboard, VFD display, and use the SC-01 speech chip. --> driver k28.cpp
     - MCU: TMS1400 MP7324
     - TMS51xx: TMS5110A
     - VSM: 16KB CM62084
-    - LCD: unknown 8*16-seg
+    - LCD: SMOS SMC1112 MCU to 8*14-seg display
 
 K28 modules:
 
@@ -394,7 +394,7 @@ K28 modules:
 
   TODO:
   - why doesn't lantutor work?
-  - identify and emulate k28 LCD
+  - emulate k28 LCD
   - emulate other known devices
 
 
