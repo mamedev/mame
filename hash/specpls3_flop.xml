@@ -3905,7 +3905,7 @@
 		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: Short Circuit + The Great Escape + Yie Ar Kung-Fu"/>
 			<dataarea name="flop" size="194560">
-			<rom name="chartbusters - short circuit + the great escape + yie ar kung-fu (19xx)(ocean)(side b).dsk" size="194560" crc="2c6606cf" sha1="e2224ab3990f61d451fa6741419b6a2653314658" offset="0" />
+				<rom name="chartbusters - short circuit + the great escape + yie ar kung-fu (19xx)(ocean)(side b).dsk" size="194560" crc="2c6606cf" sha1="e2224ab3990f61d451fa6741419b6a2653314658" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -8695,7 +8695,8 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="cvaniasi">
+	<!-- This is an old version, dated 201711 -->
+	<software name="cvaniasia" cloneof="cvaniasi">
 		<description>Castlevania - Spectral Interlude</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
@@ -8707,7 +8708,8 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="cvaniasisp" cloneof="cvaniasi">
+	<!-- This is an old version, dated 201711 -->
+	<software name="cvaniasispa" cloneof="cvaniasi">
 		<description>Castlevania - Spectral Interlude (Spa)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
@@ -8719,7 +8721,8 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="cvaniasiit" cloneof="cvaniasi">
+	<!-- This is an old version, dated 201711 -->
+	<software name="cvaniasiita" cloneof="cvaniasi">
 		<description>Castlevania - Spectral Interlude (Ita)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
@@ -8731,7 +8734,8 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="cvaniasiru" cloneof="cvaniasi">
+	<!-- This is an old version, dated 201711 -->
+	<software name="cvaniasirua" cloneof="cvaniasi">
 		<description>Castlevania - Spectral Interlude (Rus)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
@@ -8743,7 +8747,8 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="cvaniasipo" cloneof="cvaniasi">
+	<!-- This is an old version, dated 201711 -->
+	<software name="cvaniasipoa" cloneof="cvaniasi">
 		<description>Castlevania - Spectral Interlude (Pol)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
@@ -20010,5 +20015,60 @@
 		</part>
 	</software>
 
+<!-- Other floppy images -->
+	<software name="cvaniasi">
+		<description>Castlevania - Spectral Interlude</description>
+		<year>2015</year>
+		<publisher>Rewind Team</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="castleenglish.dsk" size="194816" crc="d03dce64" sha1="fa128c8f3cd307018cbe826605fa55277ca9065b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cvaniasiit" cloneof="cvaniasi">
+		<description>Castlevania - Spectral Interlude (Ita)</description>
+		<year>2015</year>
+		<publisher>Rewind Team</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="castleitalian.dsk" size="194816" crc="78bada74" sha1="87915ed0de02bf7ebc69735bc700ac04c42813b0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cvaniasipo" cloneof="cvaniasi">
+		<description>Castlevania - Spectral Interlude (Pol)</description>
+		<year>2015</year>
+		<publisher>Rewind Team</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="castlepoland.dsk" size="194816" crc="e34eb33f" sha1="6885cac79a3061701c68cb414b8e151310735513" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cvaniasiru" cloneof="cvaniasi">
+		<description>Castlevania - Spectral Interlude (Rus)</description>
+		<year>2015</year>
+		<publisher>Rewind Team</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="castlerussian.dsk" size="194816" crc="a90d610c" sha1="40bb9aa34d4fad35dc2574f4721d07b83863bfe9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cvaniasisp" cloneof="cvaniasi">
+		<description>Castlevania - Spectral Interlude (Spa)</description>
+		<year>2015</year>
+		<publisher>Rewind Team</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="castlespanish.dsk" size="194816" crc="0077de9c" sha1="f172cd6a5d39b1a46cfb9151851996e81f5bb4b8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
