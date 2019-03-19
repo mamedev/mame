@@ -5897,13 +5897,13 @@
 		<description>Plus 3 Sports (alt)</description>
 		<year>1987</year>
 		<publisher>Mastertronic</publisher>
-		<part name="flop2" interface="floppy_3">
+		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Strike + Bump, Set, Spike!"/>
 			<dataarea name="flop" size="194816">
 				<rom name="plus 3 sports - strike (1987)(mastertronic).dsk" size="194816" crc="00518e1e" sha1="0e4e653ac7408039aeb711ecb08518504c9d6bb9" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: Speed King 2"/>
 			<dataarea name="flop" size="194816">
 				<rom name="plus 3 sports - speed king 2 (1987)(mastertronic).dsk" size="194816" crc="19eb4e02" sha1="8c9b17e2456f262e3b1e8a4a8ac26aaca5d5a6eb" offset="0" />
@@ -15010,7 +15010,6 @@
 				<rom name="scapeghost (1989)(level 9 computing)(side a)[a][aka spook].dsk" size="194816" crc="1d10fcd4" sha1="221bf55fe048ef70dfb6b0a9e3c9bda2b04ab078" offset="0" />
 			</dataarea>
 		</part>
-		<publisher>Level 9 Computing</publisher>
 		<part name="flop2" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="scapeghost (1989)(level 9 computing)(side b)[a][aka spook].dsk" size="194816" crc="c464a1e9" sha1="baf17b2ebba89cbb29af430be2399c05f03d4ad3" offset="0" />
