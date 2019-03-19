@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-03-17 13:37+1100\n"
-"PO-Revision-Date: 2019-03-18 15:30+0200\n"
+"PO-Revision-Date: 2019-03-19 23:30+0200\n"
 "Last-Translator: Mame.gr\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -1669,11 +1669,11 @@ msgstr "Εκτυπωτής\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1124
 msgid "Mag. Tape\tUnimplemented\n"
-msgstr "Μαγ. Τανία\tΜη υλοποιημένη\n"
+msgstr "Μαγ. Ταινία\tΜη υλοποιημένη\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1126
 msgid "Mag. Tape\tImperfect\n"
-msgstr "Μαγ. Τανία\tΑτελής\n"
+msgstr "Μαγ. Ταινία\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1129
 msgid "Punch Tape\tUnimplemented\n"
