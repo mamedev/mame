@@ -469,10 +469,10 @@ private:
 	DECLARE_READ8_MEMBER(adc6_r) { return m_an_in[6]->read(); };
 	DECLARE_READ8_MEMBER(adc7_r) { return m_an_in[7]->read(); };
 
-	DECLARE_READ8_MEMBER(anport0_r) { return m_mouse0x->read(); }
-	DECLARE_READ8_MEMBER(anport1_r) { return m_mouse0y->read(); }
-	DECLARE_READ8_MEMBER(anport2_r) { return m_mouse1x->read(); }
-	DECLARE_READ8_MEMBER(anport3_r) { return m_mouse1y->read(); }
+	DECLARE_READ8_MEMBER(anport0_r) { logerror("%s: unhandled anport0_r\n", machine().describe_context()); return 0xff; };
+	DECLARE_READ8_MEMBER(anport1_r) { logerror("%s: unhandled anport1_r\n", machine().describe_context()); return 0xff; };
+	DECLARE_READ8_MEMBER(anport2_r) { logerror("%s: unhandled anport2_r\n", machine().describe_context()); return 0xff; };
+	DECLARE_READ8_MEMBER(anport3_r) { logerror("%s: unhandled anport3_r\n", machine().describe_context()); return 0xff; };
 
 	void update_irqs();
 	uint8_t m_irqsource;
@@ -589,6 +589,25 @@ protected:
 	DECLARE_WRITE8_MEMBER(extended_extbus_reg2_w);
 };
 
+class xavix_guru_state : public xavix_state
+{
+public:
+	xavix_guru_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag)
+	{ }
+
+	void xavix_guru(machine_config &config);
+
+protected:
+
+private:
+	//DECLARE_READ8_MEMBER(guru_anport0_r) { return m_mouse0x->read()^0x7f; }
+	//DECLARE_READ8_MEMBER(guru_anport1_r) { return m_mouse0y->read()^0x7f; }
+	DECLARE_READ8_MEMBER(guru_anport2_r) { return m_mouse1x->read()^0x7f; }
+	//DECLARE_READ8_MEMBER(guru_anport3_r) { return m_mouse1y->read()^0x7f; }
+};
+
+
 class xavix_2000_nv_sdb_state : public xavix_state
 {
 public:
@@ -655,8 +674,16 @@ public:
 		: xavix_i2c_state(mconfig, type, tag)
 	{ }
 
+	void xavix_i2c_24lc04_tam(machine_config &config);
+
 private:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
+
+private:
+	DECLARE_READ8_MEMBER(tam_anport0_r) { return m_mouse0x->read()^0x7f; }
+	DECLARE_READ8_MEMBER(tam_anport1_r) { return m_mouse0y->read()^0x7f; }
+	DECLARE_READ8_MEMBER(tam_anport2_r) { return m_mouse1x->read()^0x7f; }
+	DECLARE_READ8_MEMBER(tam_anport3_r) { return m_mouse1y->read()^0x7f; }
 };
 
 
@@ -936,7 +963,8 @@ class xavix_popira2_cart_state : public xavix_cart_state
 {
 public:
 	xavix_popira2_cart_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_cart_state(mconfig,type,tag)
+		: xavix_cart_state(mconfig,type,tag),
+		m_p2(*this, "P2")
 	{ }
 
 	void xavix_cart_popira2(machine_config &config);
@@ -949,6 +977,8 @@ protected:
 private:
 	DECLARE_READ8_MEMBER(popira2_adc0_r);
 	DECLARE_READ8_MEMBER(popira2_adc1_r);
+
+	required_ioport m_p2;
 };
 
 

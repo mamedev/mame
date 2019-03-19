@@ -1100,6 +1100,26 @@ static INPUT_PORTS_START( epo_epp )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( epo_guru )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) // used in the 'from behind' game at least
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+
+//	PORT_MODIFY("MOUSE0X")
+//	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
+//	PORT_MODIFY("MOUSE0Y")
+//	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
+	PORT_MODIFY("MOUSE1X")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)  // seems to respond to these inputs
+//	PORT_MODIFY("MOUSE1Y")
+//	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
+
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( epo_efdx )
 	PORT_INCLUDE(xavix_i2c)
 
@@ -1245,6 +1265,17 @@ void xavix_state::xavix(machine_config &config)
 	m_sound->add_route(1, "rspeaker", 1.0);
 }
 
+void xavix_guru_state::xavix_guru(machine_config &config)
+{
+	xavix(config);
+
+	//m_anport->read_0_callback().set(FUNC(xavix_guru_state::guru_anport0_r));
+	//m_anport->read_1_callback().set(FUNC(xavix_guru_state::guru_anport1_r));
+	m_anport->read_2_callback().set(FUNC(xavix_guru_state::guru_anport2_r));
+	//m_anport->read_3_callback().set(FUNC(xavix_guru_state::guru_anport3_r));
+}
+
+
 void xavix_i2c_state::xavix_i2c_24lc02(machine_config &config)
 {
 	xavix(config);
@@ -1266,6 +1297,16 @@ void xavix_i2c_state::xavix_i2c_24lc04(machine_config &config)
 	// according to http://ww1.microchip.com/downloads/en/devicedoc/21708k.pdf 'the master transmits up to 16 data bytes' however this breaks the Nostalgia games
 	// of note Galplus Phalanx on Namco Nostalgia 2, which will hang between stages unable to properly access the device, but with no page support it doesn't hang and scores save
 	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // 24LC04 on Nostalgia games, 24C04 on others
+}
+
+void xavix_i2c_ltv_tam_state::xavix_i2c_24lc04_tam(machine_config &config)
+{
+	xavix_i2c_24lc04(config);
+
+	m_anport->read_0_callback().set(FUNC(xavix_i2c_ltv_tam_state::tam_anport0_r));
+	m_anport->read_1_callback().set(FUNC(xavix_i2c_ltv_tam_state::tam_anport1_r));
+	m_anport->read_2_callback().set(FUNC(xavix_i2c_ltv_tam_state::tam_anport2_r));
+	m_anport->read_3_callback().set(FUNC(xavix_i2c_ltv_tam_state::tam_anport3_r));
 }
 
 void xavix_i2c_state::xavix_i2c_24c08(machine_config &config)
@@ -1467,7 +1508,7 @@ void xavix_cart_state::xavix_cart_popira(machine_config &config)
 // see code at 028060, using table from 00eb6d for conversion
 READ8_MEMBER(xavix_popira2_cart_state::popira2_adc0_r)
 {
-	uint8_t p2 = ioport("P2")->read() & 0x03;
+	uint8_t p2 = m_p2->read() & 0x03;
 	switch (p2)
 	{
 	case 0x00: return 0xa0;
@@ -1481,7 +1522,7 @@ READ8_MEMBER(xavix_popira2_cart_state::popira2_adc0_r)
 
 READ8_MEMBER(xavix_popira2_cart_state::popira2_adc1_r)
 {
-	uint8_t p2 = (ioport("P2")->read() >> 2) & 0x03;
+	uint8_t p2 = (m_p2->read() >> 2) & 0x03;
 	switch (p2)
 	{
 	case 0x00: return 0xa0;
@@ -1884,7 +1925,7 @@ CONS( 2006, epo_epp3,   0,          0,  xavix,            epo_epp,  xavix_state,
 
 CONS( 200?, epo_efdx,  0,          0,  xavix_i2c_24c08,  epo_efdx, xavix_i2c_state,      init_epo_efdx, "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2005, epo_guru,  0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Gururin World (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, epo_guru,  0,          0,  xavix_guru,       epo_guru,    xavix_guru_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Gururin World (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2002, epo_dmon, 0,           0,  xavix_i2c_24c02,  xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Doraemon Wakuwaku Kuukihou (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // full / proper title?
 
@@ -1925,7 +1966,7 @@ CONS( 2003, evio,     0,           0,  xavix_nv,         evio,     xavix_state, 
 
 
 // Let’s!TVプレイ 超にんきスポット!ころがしほーだい たまごっちりぞーと   (Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort) (only on the Japanese list? http://test.shinsedai.co.jp/english/products/Applied/list.html )   This also allows you to use an IR reciever to import a Tamagotchi from compatible games
-CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04,  ltv_tam,xavix_i2c_ltv_tam_state,      init_xavix,    "Bandai / SSD Company LTD",                      "Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04_tam,  ltv_tam,xavix_i2c_ltv_tam_state,      init_xavix,    "Bandai / SSD Company LTD",                      "Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 
 /* SuperXaviX(?) (XaviX 2000 type CPU) hardware titles (2nd XaviX generation?)
