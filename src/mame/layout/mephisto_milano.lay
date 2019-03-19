@@ -59,12 +59,12 @@
 	<element name="text_enter">    <rect><color red="0" green="0" blue="0" /></rect>    <text string="ENTER">    <color red="1" green="1" blue="1" /></text> </element>
 	<element name="text_clear">    <rect><color red="0" green="0" blue="0" /></rect>    <text string="CLEAR">    <color red="1" green="1" blue="1" /></text> </element>
 	<element name="text_newgame">  <rect><color red="0" green="0" blue="0" /></rect>    <text string="NEW GAME"> <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_p1">       <rect><color red="0" green="0" blue="0" /></rect>    <text string="&#x265a;"> <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_p2">       <rect><color red="0" green="0" blue="0" /></rect>    <text string="&#x265b;"> <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_p3">       <rect><color red="0" green="0" blue="0" /></rect>    <text string="&#x265c;"> <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_p4">       <rect><color red="0" green="0" blue="0" /></rect>    <text string="&#x265d;"> <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_p5">       <rect><color red="0" green="0" blue="0" /></rect>    <text string="&#x265e;"> <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_p6">       <rect><color red="0" green="0" blue="0" /></rect>    <text string="&#x265f;"> <color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_p1">       <rect><color red="0" green="0" blue="0" /></rect>    <text string="[K]">      <color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_p2">       <rect><color red="0" green="0" blue="0" /></rect>    <text string="[Q]">      <color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_p3">       <rect><color red="0" green="0" blue="0" /></rect>    <text string="[R]">      <color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_p4">       <rect><color red="0" green="0" blue="0" /></rect>    <text string="[B]">      <color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_p5">       <rect><color red="0" green="0" blue="0" /></rect>    <text string="[N]">      <color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_p6">       <rect><color red="0" green="0" blue="0" /></rect>    <text string="[P]">      <color red="1" green="1" blue="1" /></text> </element>
 
 <!-- build screen -->
 
@@ -88,12 +88,12 @@
 		<bezel element="text_function"> <bounds x="6.5"  y="18" width="5"  height="1.2" />  </bezel>
 		<bezel element="text_enter">    <bounds x="12.5" y="18" width="5"  height="1.2" />  </bezel>
 		<bezel element="text_clear">    <bounds x="18.5" y="18" width="5"  height="1.2" />  </bezel>
-		<bezel element="text_p6">   <bounds x="0.5"  y="12" width="5"  height="2.5" />  </bezel>
-		<bezel element="text_p5">   <bounds x="6.5"  y="12" width="5"  height="2.5" />  </bezel>
-		<bezel element="text_p4">   <bounds x="12.5" y="12" width="5"  height="2.5" />  </bezel>
-		<bezel element="text_p3">   <bounds x="18.5" y="12" width="5"  height="2.5" />  </bezel>
-		<bezel element="text_p2">   <bounds x="0.5"  y="21" width="5"  height="2.5" />  </bezel>
-		<bezel element="text_p1">   <bounds x="6.5"  y="21" width="5"  height="2.5" />  </bezel>
+		<bezel element="text_p6">   <bounds x="0.5"  y="12" width="5"  height="1.7" />  </bezel>
+		<bezel element="text_p5">   <bounds x="6.5"  y="12" width="5"  height="1.7" />  </bezel>
+		<bezel element="text_p4">   <bounds x="12.5" y="12" width="5"  height="1.7" />  </bezel>
+		<bezel element="text_p3">   <bounds x="18.5" y="12" width="5"  height="1.7" />  </bezel>
+		<bezel element="text_p2">   <bounds x="0.5"  y="21" width="5"  height="1.7" />  </bezel>
+		<bezel element="text_p1">   <bounds x="6.5"  y="21" width="5"  height="1.7" />  </bezel>
 		<bezel element="text_newgame">  <bounds x="12.5" y="22" width="11" height="1.4" />  </bezel>
 
 		<bezel name="led100" element="led"> <bounds x="2.5"  y="7"  width="1.2" height="1.2" /> </bezel>

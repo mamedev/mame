@@ -194,12 +194,12 @@
 	<element name="text_hint">          <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="HINT"         align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="text_white">         <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="WHITE"        align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="text_black">         <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="BLACK"        align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_king" >         <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="&#x2654;"     align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_queen" >        <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="&#x2655;"     align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_rook" >         <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="&#x2656;"     align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_bishop" >       <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="&#x2657;"     align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_knight" >       <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="&#x2658;"     align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_pawn" >         <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="&#x2659;"     align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_king" >         <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="[K]"          align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_queen" >        <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="[Q]"          align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_rook" >         <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="[R]"          align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_bishop" >       <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="[B]"          align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_knight" >       <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="[N]"          align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_pawn" >         <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="[P]"          align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="text_change">        <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="CHANGE"       align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="text_halt">          <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="HALT"         align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="text_reset">         <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="RESET"        align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
@@ -208,19 +208,19 @@
 	<element name="text_cms">           <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="CM'S"         align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 
 	<element name="piece" defstate="0">
-		<text string="&#x265a;" state="1"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265b;" state="2"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265c;" state="3"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265d;" state="4"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265e;" state="5"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265f;" state="6"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[K]" state="1"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[Q]" state="2"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[R]" state="3"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[B]" state="4"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[N]" state="5"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[P]" state="6"><color red="0.27" green="0.25" blue="0.25" /></text>
 
-		<text string="&#x265a;" state="7"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265b;" state="8"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265c;" state="9"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265d;" state="10"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265e;" state="11"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265f;" state="12"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[K]" state="7"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[Q]" state="8"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[R]" state="9"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[B]" state="10"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[N]" state="11"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[P]" state="12"><color red="0.71" green="0.7" blue="0.69" /></text>
 
 		<!-- selected pieces -->
 		<disk state="17"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
@@ -236,19 +236,19 @@
 		<disk state="27"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
 		<disk state="28"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
 
-		<text string="&#x265a;" state="17"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265b;" state="18"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265c;" state="19"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265d;" state="20"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265e;" state="21"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265f;" state="22"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[K]" state="17"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[Q]" state="18"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[R]" state="19"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[B]" state="20"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[N]" state="21"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[P]" state="22"><color red="0.27" green="0.25" blue="0.25" /></text>
 
-		<text string="&#x265a;" state="23"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265b;" state="24"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265c;" state="25"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265d;" state="26"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265e;" state="27"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265f;" state="28"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[K]" state="23"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[Q]" state="24"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[R]" state="25"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[B]" state="26"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[N]" state="27"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[P]" state="28"><color red="0.71" green="0.7" blue="0.69" /></text>
 	</element>
 
 <!-- build screen -->
@@ -558,12 +558,12 @@
 		<bezel element="text_reset">   <bounds x="92.5"  y="82" width="10" height="2" /></bezel>
 		<bezel element="text_halt">    <bounds x="107.5" y="82" width="8"  height="2" /></bezel>
 
-		<bezel element="text_pawn">    <bounds x="95" y="18" width="4"  height="4" /></bezel>
-		<bezel element="text_knight">  <bounds x="95" y="25" width="4"  height="4" /></bezel>
-		<bezel element="text_bishop">  <bounds x="95" y="32" width="4"  height="4" /></bezel>
-		<bezel element="text_rook">    <bounds x="95" y="39" width="4"  height="4" /></bezel>
-		<bezel element="text_queen">   <bounds x="95" y="46" width="4"  height="4" /></bezel>
-		<bezel element="text_king">    <bounds x="95" y="53" width="4"  height="4" /></bezel>
+		<bezel element="text_pawn">    <bounds x="95" y="18.5" width="4"  height="2.6" /></bezel>
+		<bezel element="text_knight">  <bounds x="95" y="25.5" width="4"  height="2.6" /></bezel>
+		<bezel element="text_bishop">  <bounds x="95" y="32.5" width="4"  height="2.6" /></bezel>
+		<bezel element="text_rook">    <bounds x="95" y="39.5" width="4"  height="2.6" /></bezel>
+		<bezel element="text_queen">   <bounds x="95" y="46.5" width="4"  height="2.6" /></bezel>
+		<bezel element="text_king">    <bounds x="95" y="53.5" width="4"  height="2.6" /></bezel>
 		<bezel element="text_white">   <bounds x="90" y="61" width="9" height="1.8" /></bezel>
 		<bezel element="text_black">   <bounds x="90" y="68" width="9" height="1.8" /></bezel>
 
