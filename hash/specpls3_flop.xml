@@ -8695,7 +8695,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- This is an old version, dated 201711 -->
+	<!-- This is an old version, dated 20171114 -->
 	<software name="cvaniasia" cloneof="cvaniasi">
 		<description>Castlevania - Spectral Interlude (alt)</description>
 		<year>2015</year>
@@ -8708,7 +8708,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- This is an old version, dated 201711 -->
+	<!-- This is an old version, dated 20171114 -->
 	<software name="cvaniasispa" cloneof="cvaniasi">
 		<description>Castlevania - Spectral Interlude (Spa) (alt)</description>
 		<year>2015</year>
@@ -8721,7 +8721,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- This is an old version, dated 201711 -->
+	<!-- This is an old version, dated 20171117 -->
 	<software name="cvaniasiita" cloneof="cvaniasi">
 		<description>Castlevania - Spectral Interlude (Ita) (alt)</description>
 		<year>2015</year>
@@ -8734,7 +8734,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- This is an old version, dated 201711 -->
+	<!-- This is an old version, dated 20171114 -->
 	<software name="cvaniasirua" cloneof="cvaniasi">
 		<description>Castlevania - Spectral Interlude (Rus) (alt)</description>
 		<year>2015</year>
@@ -8747,7 +8747,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- This is an old version, dated 201711 -->
+	<!-- This is an old version, dated 20171116 -->
 	<software name="cvaniasipoa" cloneof="cvaniasi">
 		<description>Castlevania - Spectral Interlude (Pol) (alt)</description>
 		<year>2015</year>
@@ -20016,6 +20016,8 @@
 	</software>
 
 <!-- Other floppy images -->
+
+	<!-- This version is dated 20180316 -->
 	<software name="cvaniasi">
 		<description>Castlevania - Spectral Interlude</description>
 		<year>2015</year>
@@ -20027,6 +20029,7 @@
 		</part>
 	</software>
 
+	<!-- This version is dated 20180316 -->
 	<software name="cvaniasiit" cloneof="cvaniasi">
 		<description>Castlevania - Spectral Interlude (Ita)</description>
 		<year>2015</year>
@@ -20038,6 +20041,7 @@
 		</part>
 	</software>
 
+	<!-- This version is dated 20180316 -->
 	<software name="cvaniasipo" cloneof="cvaniasi">
 		<description>Castlevania - Spectral Interlude (Pol)</description>
 		<year>2015</year>
@@ -20049,6 +20053,7 @@
 		</part>
 	</software>
 
+	<!-- This version is dated 20180316 -->
 	<software name="cvaniasiru" cloneof="cvaniasi">
 		<description>Castlevania - Spectral Interlude (Rus)</description>
 		<year>2015</year>
@@ -20060,6 +20065,7 @@
 		</part>
 	</software>
 
+	<!-- This version is dated 20180316 -->
 	<software name="cvaniasisp" cloneof="cvaniasi">
 		<description>Castlevania - Spectral Interlude (Spa)</description>
 		<year>2015</year>
