@@ -41,7 +41,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(AIC6250, aic6250_device, "aic6250", "Adaptec 6250 High-Performance SCSI Protocol Chip")
+DEFINE_DEVICE_TYPE(AIC6250, aic6250_device, "aic6250", "Adaptec AIC-6250 High-Performance SCSI Protocol Chip")
 
 static char const *const nscsi_phase[] = { "DATA OUT", "DATA IN", "COMMAND", "STATUS", "*", "*", "MESSAGE OUT", "MESSAGE IN" };
 static char const *const aic6250_phase[] = { "DATA OUT", "*", "DATA IN", "*", "COMMAND", "MESSAGE OUT", "STATUS", "MESSAGE IN" };
