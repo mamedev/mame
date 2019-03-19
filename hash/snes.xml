@@ -2371,7 +2371,7 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
-  <software name="strikerp1" cloneof="striker">
+	<software name="strikerp1" cloneof="striker">
 		<!-- Niiue -->
 		<description>Striker (Euro, NTSC Prototype)</description>
 		<year>1993</year>
