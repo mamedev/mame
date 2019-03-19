@@ -21,6 +21,7 @@
 #include "machine/xavix2002_io.h"
 #include "machine/xavix_io.h"
 #include "machine/xavix_adc.h"
+#include "machine/xavix_anport.h"
 
 class xavix_sound_device : public device_t, public device_sound_interface
 {
@@ -103,6 +104,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_sound(*this, "xavix_sound"),
 		m_adc(*this, "adc"),
+		m_anport(*this, "anport"),
 		m_xavix2002io(*this, "xavix2002io")
 	{ }
 
@@ -276,16 +278,6 @@ private:
 	uint8_t m_ioevent_enable;
 	uint8_t m_ioevent_active;
 	void process_ioevent(uint8_t bits);
-
-	DECLARE_READ8_MEMBER(mouse_7b00_r);
-	DECLARE_READ8_MEMBER(mouse_7b01_r);
-	DECLARE_READ8_MEMBER(mouse_7b10_r);
-	DECLARE_READ8_MEMBER(mouse_7b11_r);
-
-	DECLARE_WRITE8_MEMBER(mouse_7b00_w);
-	DECLARE_WRITE8_MEMBER(mouse_7b01_w);
-	DECLARE_WRITE8_MEMBER(mouse_7b10_w);
-	DECLARE_WRITE8_MEMBER(mouse_7b11_w);
 
 	DECLARE_WRITE8_MEMBER(slotreg_7810_w);
 
@@ -477,6 +469,11 @@ private:
 	DECLARE_READ8_MEMBER(adc6_r) { return m_an_in[6]->read(); };
 	DECLARE_READ8_MEMBER(adc7_r) { return m_an_in[7]->read(); };
 
+	DECLARE_READ8_MEMBER(anport0_r) { return m_mouse0x->read(); }
+	DECLARE_READ8_MEMBER(anport1_r) { return m_mouse0y->read(); }
+	DECLARE_READ8_MEMBER(anport2_r) { return m_mouse1x->read(); }
+	DECLARE_READ8_MEMBER(anport3_r) { return m_mouse1y->read(); }
+
 	void update_irqs();
 	uint8_t m_irqsource;
 
@@ -576,6 +573,7 @@ private:
 
 protected:
 	required_device<xavix_adc_device> m_adc;
+	required_device<xavix_anport_device> m_anport;
 	optional_device<xavix2002_io_device> m_xavix2002io;
 
 	uint8_t m_extbusctrl[3];
@@ -590,6 +588,26 @@ protected:
 	DECLARE_WRITE8_MEMBER(extended_extbus_reg1_w);
 	DECLARE_WRITE8_MEMBER(extended_extbus_reg2_w);
 };
+
+class xavix_2000_nv_sdb_state : public xavix_state
+{
+public:
+	xavix_2000_nv_sdb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag)
+	{ }
+
+	void xavix2000_nv_sdb(machine_config &config);
+
+protected:
+
+private:
+	DECLARE_READ8_MEMBER(sdb_anport0_r) { return m_mouse0x->read()^0x7f; }
+	DECLARE_READ8_MEMBER(sdb_anport1_r) { return m_mouse0y->read()^0x7f; }
+	DECLARE_READ8_MEMBER(sdb_anport2_r) { return m_mouse1x->read()^0x7f; }
+	DECLARE_READ8_MEMBER(sdb_anport3_r) { return m_mouse1y->read()^0x7f; }
+
+};
+
 
 class xavix_i2c_state : public xavix_state
 {

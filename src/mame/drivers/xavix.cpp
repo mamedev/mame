@@ -371,11 +371,11 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7a80, 0x7a80).rw(FUNC(xavix_state::ioevent_enable_r), FUNC(xavix_state::ioevent_enable_w));
 	map(0x7a81, 0x7a81).rw(FUNC(xavix_state::ioevent_irqstate_r), FUNC(xavix_state::ioevent_irqack_w));
 
-	// Mouse?
-	map(0x7b00, 0x7b00).rw(FUNC(xavix_state::mouse_7b00_r), FUNC(xavix_state::mouse_7b00_w));
-	map(0x7b01, 0x7b01).rw(FUNC(xavix_state::mouse_7b01_r), FUNC(xavix_state::mouse_7b01_w));
-	map(0x7b10, 0x7b10).rw(FUNC(xavix_state::mouse_7b10_r), FUNC(xavix_state::mouse_7b10_w));
-	map(0x7b11, 0x7b11).rw(FUNC(xavix_state::mouse_7b11_r), FUNC(xavix_state::mouse_7b11_w));
+	// Mouse / Trackball?
+	map(0x7b00, 0x7b00).rw("anport", FUNC(xavix_anport_device::mouse_7b00_r), FUNC(xavix_anport_device::mouse_7b00_w));
+	map(0x7b01, 0x7b01).rw("anport", FUNC(xavix_anport_device::mouse_7b01_r), FUNC(xavix_anport_device::mouse_7b01_w));
+	map(0x7b10, 0x7b10).rw("anport", FUNC(xavix_anport_device::mouse_7b10_r), FUNC(xavix_anport_device::mouse_7b10_w));
+	map(0x7b11, 0x7b11).rw("anport", FUNC(xavix_anport_device::mouse_7b11_r), FUNC(xavix_anport_device::mouse_7b11_w));
 
 	// Lightgun / pen 2 control
 	//map(0x7b18, 0x7b1b)
@@ -1211,6 +1211,12 @@ void xavix_state::xavix(machine_config &config)
 	m_adc->read_6_callback().set(FUNC(xavix_state::adc6_r));
 	m_adc->read_7_callback().set(FUNC(xavix_state::adc7_r));
 
+	XAVIX_ANPORT(config, m_anport, 0);
+	m_anport->read_0_callback().set(FUNC(xavix_state::anport0_r));
+	m_anport->read_1_callback().set(FUNC(xavix_state::anport1_r));
+	m_anport->read_2_callback().set(FUNC(xavix_state::anport2_r));
+	m_anport->read_3_callback().set(FUNC(xavix_state::anport3_r));
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -1343,6 +1349,16 @@ void xavix_state::xavix2000_nv(machine_config &config)
 	xavix2000(config);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+}
+
+void xavix_2000_nv_sdb_state::xavix2000_nv_sdb(machine_config &config)
+{
+	xavix2000_nv(config);
+
+	m_anport->read_0_callback().set(FUNC(xavix_2000_nv_sdb_state::sdb_anport0_r));
+	m_anport->read_1_callback().set(FUNC(xavix_2000_nv_sdb_state::sdb_anport1_r));
+	m_anport->read_2_callback().set(FUNC(xavix_2000_nv_sdb_state::sdb_anport2_r));
+	m_anport->read_3_callback().set(FUNC(xavix_2000_nv_sdb_state::sdb_anport3_r));
 }
 
 void xavix_i2c_state::xavix2000_i2c_24c04(machine_config &config)
@@ -1959,7 +1975,7 @@ ROM_START( ban_onep )
 ROM_END
 
 CONS( 2002, epo_ebox, 0, 0, xavix2000_nv,        epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",       "Excite Boxing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // doesn't use XaviX2000 extra opcodes, but had that type of CPU
-CONS( 2004, epo_sdb,  0, 0, xavix2000_nv,        epo_sdb,     xavix_state,          init_xavix, "Epoch / SSD Company LTD",       "Super Dash Ball (Japan)",  MACHINE_IMPERFECT_SOUND )
+CONS( 2004, epo_sdb,  0, 0, xavix2000_nv_sdb,        epo_sdb,     xavix_2000_nv_sdb_state,          init_xavix, "Epoch / SSD Company LTD",       "Super Dash Ball (Japan)",  MACHINE_IMPERFECT_SOUND )
 
 CONS( 2005, ttv_sw,   0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Tiger / SSD Company LTD",       "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, ttv_lotr, 0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Tiger / SSD Company LTD",       "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
