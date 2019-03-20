@@ -631,11 +631,12 @@ WRITE_LINE_MEMBER( ep804_state::ep804_acia_irq_w )
 {
 }
 
-MACHINE_CONFIG_START(digel804_state::digel804)
+void digel804_state::digel804(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, Z80, 3.6864_MHz_XTAL/2) /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
-	MCFG_DEVICE_PROGRAM_MAP(z80_mem_804_1_4)
-	MCFG_DEVICE_IO_MAP(z80_io_1_4)
+	Z80(config, m_maincpu, 3.6864_MHz_XTAL/2); /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &digel804_state::z80_mem_804_1_4);
+	m_maincpu->set_addrmap(AS_IO, &digel804_state::z80_io_1_4);
 	config.m_minimum_quantum = attotime::from_hz(60);
 
 	ROC10937(config, m_vfd); // RIGHT_TO_LEFT
@@ -669,9 +670,8 @@ MACHINE_CONFIG_START(digel804_state::digel804)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 void ep804_state::ep804(machine_config &config)
 {

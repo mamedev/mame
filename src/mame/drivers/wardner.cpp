@@ -181,14 +181,14 @@ void wardner_state::main_program_map(address_map &map)
 {
 	map(0x0000, 0x6fff).rom();
 	map(0x7000, 0x7fff).ram();
-	map(0x8000, 0x8fff).w(FUNC(wardner_state::wardner_sprite_w));                     // AM_SHARE("spriteram8")
-	map(0xa000, 0xafff).w(m_palette, FUNC(palette_device::write8));  // AM_SHARE("palette")
+	map(0x8000, 0x8fff).w(FUNC(wardner_state::wardner_sprite_w));                     // .share("spriteram8")
+	map(0xa000, 0xafff).w(m_palette, FUNC(palette_device::write8));  // .share("palette")
 	map(0xc000, 0xc7ff).writeonly().share("sharedram");
 	map(0x8000, 0xffff).r(m_membank, FUNC(address_map_bank_device::read8));
 }
 
 // Overlapped RAM/Banked ROM
-// Can't use AM_RANGE(0x00000, 0x3ffff) for ROM because the shared pointers get messed up somehow
+// Can't use map(0x00000, 0x3ffff) for ROM because the shared pointers get messed up somehow
 void wardner_state::main_bank_map(address_map &map)
 {
 	map(0x00000, 0x00fff).r(FUNC(wardner_state::wardner_sprite_r)).share("spriteram8");
@@ -338,24 +338,24 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
-	2048,   /* 2048 characters */
-	3,      /* 3 bits per pixel */
-	{ 0*2048*8*8, 1*2048*8*8, 2*2048*8*8 }, /* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8     /* every char takes 8 consecutive bytes */
+	8,8,             /* 8*8 characters */
+	RGN_FRAC(1,3),   /* 2048 characters */
+	3,               /* 3 bits per pixel */
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) }, /* the bitplanes are separated */
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8              /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
 {
-	8,8,    /* 8*8 tiles */
-	4096,   /* 4096 tiles */
-	4,      /* 4 bits per pixel */
-	{ 0*4096*8*8, 1*4096*8*8, 2*4096*8*8, 3*4096*8*8 }, /* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8     /* every tile takes 8 consecutive bytes */
+	8,8,             /* 8*8 tiles */
+	RGN_FRAC(1,4),   /* 4096 tiles */
+	4,               /* 4 bits per pixel */
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) }, /* the bitplanes are separated */
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8              /* every tile takes 8 consecutive bytes */
 };
 
 
@@ -369,12 +369,12 @@ GFXDECODE_END
 void wardner_state::driver_start()
 {
 	/* Save-State stuff in src/machine/twincobr.cpp */
-	twincobr_driver_savestate();
+	driver_savestate();
 }
 
 void wardner_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(twincobr);
+	twincobr_state::machine_reset();
 
 	m_membank->set_bank(0);
 }
@@ -429,7 +429,7 @@ void wardner_state::wardner(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(14_MHz_XTAL/2, 446, 0, 320, 286, 0, 240);
-	m_screen->set_screen_update(FUNC(wardner_state::screen_update_toaplan0));
+	m_screen->set_screen_update(FUNC(wardner_state::screen_update));
 	m_screen->screen_vblank().set(m_spriteram8, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	m_screen->screen_vblank().append(FUNC(wardner_state::wardner_vblank_irq));
 	m_screen->set_palette(m_palette);

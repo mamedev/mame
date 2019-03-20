@@ -93,24 +93,25 @@ void dual68_state::kbd_put(u8 data)
 	//m_term_data = data;
 }
 
-MACHINE_CONFIG_START(dual68_state::dual68)
+void dual68_state::dual68(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL / 2) // MC68000L8
-	MCFG_DEVICE_PROGRAM_MAP(dual68_mem)
+	M68000(config, m_maincpu, 16_MHz_XTAL / 2); // MC68000L8
+	m_maincpu->set_addrmap(AS_PROGRAM, &dual68_state::dual68_mem);
 
-	MCFG_DEVICE_ADD("siocpu", I8085A, 9.8304_MHz_XTAL) // NEC D8085AC-2
-	MCFG_DEVICE_PROGRAM_MAP(sio4_mem)
-	MCFG_DEVICE_IO_MAP(sio4_io)
+	i8085a_cpu_device &siocpu(I8085A(config, "siocpu", 9.8304_MHz_XTAL)); // NEC D8085AC-2
+	siocpu.set_addrmap(AS_PROGRAM, &dual68_state::sio4_mem);
+	siocpu.set_addrmap(AS_IO, &dual68_state::sio4_io);
 
 	/* video hardware */
 	GENERIC_TERMINAL(config, m_terminal, 0);
 	m_terminal->set_keyboard_callback(FUNC(dual68_state::kbd_put));
 
-	MCFG_DEVICE_ADD("usart1", MC2661, 9.8304_MHz_XTAL / 2) // SCN2661B
-	MCFG_DEVICE_ADD("usart2", MC2661, 9.8304_MHz_XTAL / 2) // SCN2661B
-	MCFG_DEVICE_ADD("usart3", MC2661, 9.8304_MHz_XTAL / 2) // SCN2661B
-	MCFG_DEVICE_ADD("usart4", MC2661, 9.8304_MHz_XTAL / 2) // SCN2661B
-MACHINE_CONFIG_END
+	MC2661(config, "usart1", 9.8304_MHz_XTAL / 2); // SCN2661B
+	MC2661(config, "usart2", 9.8304_MHz_XTAL / 2); // SCN2661B
+	MC2661(config, "usart3", 9.8304_MHz_XTAL / 2); // SCN2661B
+	MC2661(config, "usart4", 9.8304_MHz_XTAL / 2); // SCN2661B
+}
 
 /* ROM definition */
 ROM_START( dual68 )

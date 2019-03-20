@@ -628,33 +628,32 @@ void ddealer_state::machine_reset()
 	m_coin_input = 0;
 }
 
-MACHINE_CONFIG_START(ddealer_state::ddealer)
-
-	MCFG_DEVICE_ADD("maincpu" , M68000, XTAL(16'000'000)/2) /* 8MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ddealer_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ddealer_state,  irq4_line_hold)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(ddealer_state, irq1_line_hold,  90)//guess, controls music tempo, 112 is way too fast
+void ddealer_state::ddealer(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(16'000'000)/2); /* 8MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddealer_state::ddealer_map);
+	m_maincpu->set_vblank_int("screen", FUNC(ddealer_state::irq4_line_hold));
+	m_maincpu->set_periodic_int(FUNC(ddealer_state::irq1_line_hold), attotime::from_hz(90)); //guess, controls music tempo, 112 is way too fast
 
 	// M50747 or NMK-110 8131 MCU
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddealer);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ddealer_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(ddealer_state::screen_update));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x200);
 
 	TIMER(config, "coinsim").configure_periodic(FUNC(ddealer_state::mcu_sim), attotime::from_hz(10000));
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(6'000'000) / 8) /* 7.5KHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_CONFIG_END
+	YM2203(config, "ymsnd", XTAL(6'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.40); /* 7.5KHz */
+}
 
 
 

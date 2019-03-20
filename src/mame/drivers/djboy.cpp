@@ -478,22 +478,22 @@ void djboy_state::machine_reset()
 	m_scrolly = 0;
 }
 
-MACHINE_CONFIG_START(djboy_state::djboy)
-
-	MCFG_DEVICE_ADD("mastercpu", Z80, 12_MHz_XTAL / 2) // 6.000MHz, verified
-	MCFG_DEVICE_PROGRAM_MAP(mastercpu_am)
-	MCFG_DEVICE_IO_MAP(mastercpu_port_am)
+void djboy_state::djboy(machine_config &config)
+{
+	Z80(config, m_mastercpu, 12_MHz_XTAL / 2); // 6.000MHz, verified
+	m_mastercpu->set_addrmap(AS_PROGRAM, &djboy_state::mastercpu_am);
+	m_mastercpu->set_addrmap(AS_IO, &djboy_state::mastercpu_port_am);
 	TIMER(config, "scantimer").configure_scanline(FUNC(djboy_state::djboy_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("slavecpu", Z80, 12_MHz_XTAL / 2) // 6.000MHz, verified
-	MCFG_DEVICE_PROGRAM_MAP(slavecpu_am)
-	MCFG_DEVICE_IO_MAP(slavecpu_port_am)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", djboy_state,  irq0_line_hold)
+	Z80(config, m_slavecpu, 12_MHz_XTAL / 2); // 6.000MHz, verified
+	m_slavecpu->set_addrmap(AS_PROGRAM, &djboy_state::slavecpu_am);
+	m_slavecpu->set_addrmap(AS_IO, &djboy_state::slavecpu_port_am);
+	m_slavecpu->set_vblank_int("screen", FUNC(djboy_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 12_MHz_XTAL / 2) // 6.000MHz, verified
-	MCFG_DEVICE_PROGRAM_MAP(soundcpu_am)
-	MCFG_DEVICE_IO_MAP(soundcpu_port_am)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", djboy_state,  irq0_line_hold)
+	Z80(config, m_soundcpu, 12_MHz_XTAL / 2); // 6.000MHz, verified
+	m_soundcpu->set_addrmap(AS_PROGRAM, &djboy_state::soundcpu_am);
+	m_soundcpu->set_addrmap(AS_IO, &djboy_state::soundcpu_port_am);
+	m_soundcpu->set_vblank_int("screen", FUNC(djboy_state::irq0_line_hold));
 
 	I80C51(config, m_beast, 12_MHz_XTAL / 2); // 6.000MHz, verified
 	m_beast->port_in_cb<0>().set(FUNC(djboy_state::beast_p0_r));
@@ -513,14 +513,14 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	m_beastlatch->data_pending_callback().set_inputline(m_beast, INPUT_LINE_IRQ0);
 	m_beastlatch->set_separate_acknowledge(true);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(djboy_state, screen_update_djboy)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, djboy_state, screen_vblank_djboy))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.5);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(djboy_state::screen_update_djboy));
+	screen.screen_vblank().set(FUNC(djboy_state::screen_vblank_djboy));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_djboy);
 	PALETTE(config, m_palette).set_entries(0x200);
@@ -534,18 +534,18 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 12_MHz_XTAL / 4) // 3.000MHz, verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 12_MHz_XTAL / 4)); // 3.000MHz, verified
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
 
-	MCFG_DEVICE_ADD("oki_l", OKIM6295, 12_MHz_XTAL / 8, okim6295_device::PIN7_LOW) // 1.500MHz, verified
-	MCFG_DEVICE_ROM("oki")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	okim6295_device &oki_l(OKIM6295(config, "oki_l", 12_MHz_XTAL / 8, okim6295_device::PIN7_LOW)); // 1.500MHz, verified
+	oki_l.set_device_rom_tag("oki");
+	oki_l.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("oki_r", OKIM6295, 12_MHz_XTAL / 8, okim6295_device::PIN7_LOW) // 1.500MHz, verified
-	MCFG_DEVICE_ROM("oki")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	okim6295_device &oki_r(OKIM6295(config, "oki_r", 12_MHz_XTAL / 8, okim6295_device::PIN7_LOW)); // 1.500MHz, verified
+	oki_r.set_device_rom_tag("oki");
+	oki_r.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+}
 
 
 ROM_START( djboy )

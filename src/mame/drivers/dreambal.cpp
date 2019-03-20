@@ -311,21 +311,21 @@ void dreambal_state::machine_reset()
 }
 
 // xtals = 28.000, 9.8304
-MACHINE_CONFIG_START(dreambal_state::dreambal)
-
+void dreambal_state::dreambal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 28000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(dreambal_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dreambal_state,  irq6_line_hold) // 5 valid too?
+	M68000(config, m_maincpu, 28000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dreambal_state::dreambal_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dreambal_state::irq6_line_hold)); // 5 valid too?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dreambal_state, screen_update_dreambal)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(dreambal_state::screen_update_dreambal));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 0x400/2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_dreambal);
@@ -356,10 +356,8 @@ MACHINE_CONFIG_START(dreambal_state::dreambal)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 9830400/8, okim6295_device::PIN7_HIGH)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 9830400/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
 

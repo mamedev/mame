@@ -329,21 +329,21 @@ DECOSPR_PRIORITY_CB_MEMBER(deco156_state::pri_callback)
 	return 0;
 }
 
-MACHINE_CONFIG_START(deco156_state::hvysmsh)
-
+void deco156_state::hvysmsh(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM, 28000000) /* Unconfirmed */
-	MCFG_DEVICE_PROGRAM_MAP(hvysmsh_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco156_state,  deco32_vbl_interrupt)
+	ARM(config, m_maincpu, 28000000); /* Unconfirmed */
+	m_maincpu->set_addrmap(AS_PROGRAM, &deco156_state::hvysmsh_map);
+	m_maincpu->set_vblank_int("screen", FUNC(deco156_state::deco32_vbl_interrupt));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(deco156_state::screen_update));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_hvysmsh);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 1024);
@@ -373,30 +373,30 @@ MACHINE_CONFIG_START(deco156_state::hvysmsh)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 28000000/28, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6295(config, m_oki1, 28000000/28, okim6295_device::PIN7_HIGH);
+	m_oki1->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki1->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 28000000/14, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki2, 28000000/14, okim6295_device::PIN7_HIGH);
+	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
+	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
+}
 
-MACHINE_CONFIG_START(deco156_state::wcvol95)
-
+void deco156_state::wcvol95(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM, 28000000) /* Unconfirmed */
-	MCFG_DEVICE_PROGRAM_MAP(wcvol95_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco156_state,  deco32_vbl_interrupt)
+	ARM(config, m_maincpu, 28000000); /* Unconfirmed */
+	m_maincpu->set_addrmap(AS_PROGRAM, &deco156_state::wcvol95_map);
+	m_maincpu->set_vblank_int("screen", FUNC(deco156_state::deco32_vbl_interrupt));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(deco156_state::screen_update));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_hvysmsh);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
@@ -426,10 +426,10 @@ MACHINE_CONFIG_START(deco156_state::wcvol95)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 28000000 / 2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 28000000 / 2));
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
+}
 
 
 /**********************************************************************************/

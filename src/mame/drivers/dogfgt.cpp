@@ -227,26 +227,26 @@ void dogfgt_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(dogfgt_state::dogfgt)
-
+void dogfgt_state::dogfgt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, M6502, 1500000) /* 1.5 MHz ???? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(dogfgt_state, irq0_line_hold, 16*60)   /* ? controls music tempo */
+	M6502(config, m_maincpu, 1500000); /* 1.5 MHz ???? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dogfgt_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(dogfgt_state::irq0_line_hold), attotime::from_hz(16*60));   /* ? controls music tempo */
 
-	MCFG_DEVICE_ADD(m_subcpu, M6502, 1500000) /* 1.5 MHz ???? */
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	M6502(config, m_subcpu, 1500000); /* 1.5 MHz ???? */
+	m_subcpu->set_addrmap(AS_PROGRAM, &dogfgt_state::sub_map);
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dogfgt_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(dogfgt_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dogfgt);
 	PALETTE(config, m_palette, FUNC(dogfgt_state::dogfgt_palette)).set_format(palette_device::BGR_233, 16 + 64);
@@ -256,7 +256,7 @@ MACHINE_CONFIG_START(dogfgt_state::dogfgt)
 
 	AY8910(config, m_ay[0], 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
 	AY8910(config, m_ay[1], 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
-MACHINE_CONFIG_END
+}
 
 
 

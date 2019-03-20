@@ -3040,7 +3040,6 @@ files {
 
 createMESSProjects(_target, _subtarget, "segacons")
 files {
-	MAME_DIR .. "src/mame/drivers/apbeena.cpp",
 	MAME_DIR .. "src/mame/drivers/dccons.cpp",
 	MAME_DIR .. "src/mame/includes/dccons.h",
 	MAME_DIR .. "src/mame/machine/dccons.cpp",
@@ -3546,6 +3545,10 @@ files {
 	MAME_DIR .. "src/mame/machine/xavix_io.h",
 	MAME_DIR .. "src/mame/machine/xavix_adc.cpp",
 	MAME_DIR .. "src/mame/machine/xavix_adc.h",
+	MAME_DIR .. "src/mame/machine/xavix_anport.h",	
+	MAME_DIR .. "src/mame/machine/xavix_anport.cpp",
+	MAME_DIR .. "src/mame/machine/xavix_math.h",	
+	MAME_DIR .. "src/mame/machine/xavix_math.cpp",
 	MAME_DIR .. "src/mame/machine/xavix2002_io.cpp",
 	MAME_DIR .. "src/mame/machine/xavix2002_io.h",
 	MAME_DIR .. "src/mame/drivers/xavix2.cpp",

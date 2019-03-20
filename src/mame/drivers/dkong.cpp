@@ -1692,11 +1692,11 @@ WRITE_LINE_MEMBER(dkong_state::busreq_w )
 		m_dma8257->hlda_w(state);
 }
 
-MACHINE_CONFIG_START(dkong_state::dkong_base)
-
+void dkong_state::dkong_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, Z80, CLOCK_1H)
-	MCFG_DEVICE_PROGRAM_MAP(dkong_map)
+	Z80(config, m_maincpu, CLOCK_1H);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dkong_state::dkong_map);
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong2b)
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,dkong)
@@ -1710,19 +1710,20 @@ MACHINE_CONFIG_START(dkong_state::dkong_base)
 	m_dma8257->set_reverse_rw_mode(1); // why?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_dkong)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dkong_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(dkong_state::screen_update_dkong));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(dkong_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dkong);
 	PALETTE(config, m_palette, FUNC(dkong_state::dkong2b_palette), DK2B_PALETTE_LENGTH);
 
 	MCFG_VIDEO_START_OVERRIDE(dkong_state,dkong)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dkong_state::radarscp)
+void dkong_state::radarscp(machine_config &config)
+{
 	dkong_base(config);
 
 	/* basic machine hardware */
@@ -1732,9 +1733,10 @@ MACHINE_CONFIG_START(dkong_state::radarscp)
 
 	/* sound hardware */
 	radarscp_audio(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dkong_state::radarscp1)
+void dkong_state::radarscp1(machine_config &config)
+{
 	dkong_base(config);
 
 	/* basic machine hardware */
@@ -1744,10 +1746,11 @@ MACHINE_CONFIG_START(dkong_state::radarscp1)
 
 	/* sound hardware */
 	radarscp1_audio(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(dkong_state::dkong2b)
+void dkong_state::dkong2b(machine_config &config)
+{
 	dkong_base(config);
 
 	/* basic machine hardware */
@@ -1758,7 +1761,7 @@ MACHINE_CONFIG_START(dkong_state::dkong2b)
 	dkong2b_audio(config);
 
 	WATCHDOG_TIMER(config, m_watchdog);
-MACHINE_CONFIG_END
+}
 
 void dkong_state::dk_braze(machine_config &config)
 {
@@ -1788,12 +1791,12 @@ void dkong_state::dk3_braze(machine_config &config)
 	EEPROM_93C46_8BIT(config, "eeprom");
 }
 
-MACHINE_CONFIG_START(dkong_state::dkong3)
-
+void dkong_state::dkong3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(8'000'000) / 2) /* verified in schematics */
-	MCFG_DEVICE_PROGRAM_MAP(dkong3_map)
-	MCFG_DEVICE_IO_MAP(dkong3_io_map)
+	Z80(config, m_maincpu, XTAL(8'000'000) / 2); /* verified in schematics */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dkong_state::dkong3_map);
+	m_maincpu->set_addrmap(AS_IO, &dkong_state::dkong3_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state, dkong3)
 
@@ -1818,27 +1821,28 @@ MACHINE_CONFIG_START(dkong_state::dkong3)
 
 	/* sound hardware */
 	dkong3_audio(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dkong_state::dkongjr)
+void dkong_state::dkongjr(machine_config &config)
+{
 	dkong_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(dkongjr_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &dkong_state::dkongjr_map);
 
 	/* sound hardware */
 	dkongjr_audio(config);
 
 	WATCHDOG_TIMER(config, m_watchdog);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dkong_state::pestplce)
+void dkong_state::pestplce(machine_config &config)
+{
 	dkongjr(config);
 
 	/* video hardware */
 	m_palette->set_init(FUNC(dkong_state::dkong2b_palette)); // wrong!
 	m_screen->set_screen_update(FUNC(dkong_state::screen_update_pestplce));
-MACHINE_CONFIG_END
+}
 
 void dkong_state::dkong3b(machine_config &config)
 {
@@ -1893,35 +1897,35 @@ void dkong_state::spclforc(machine_config &config)
  *
  *************************************/
 
-MACHINE_CONFIG_START(dkong_state::strtheat)
+void dkong_state::strtheat(machine_config &config)
+{
 	dkong2b(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(epos_readport)
+	m_maincpu->set_addrmap(AS_IO, &dkong_state::epos_readport);
 
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,strtheat)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dkong_state::drakton)
+void dkong_state::drakton(machine_config &config)
+{
 	dkong2b(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(epos_readport)
+	m_maincpu->set_addrmap(AS_IO, &dkong_state::epos_readport);
 
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,drakton)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dkong_state::drktnjr)
+void dkong_state::drktnjr(machine_config &config)
+{
 	dkongjr(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(epos_readport)
+	m_maincpu->set_addrmap(AS_IO, &dkong_state::epos_readport);
 
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,drakton)
-MACHINE_CONFIG_END
+}
 
 /*************************************
  *

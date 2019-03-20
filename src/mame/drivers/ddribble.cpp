@@ -257,33 +257,33 @@ void ddribble_state::machine_reset()
 	m_charbank[1] = 0;
 }
 
-MACHINE_CONFIG_START(ddribble_state::ddribble)
-
+void ddribble_state::ddribble(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(cpu0_map)
+	MC6809E(config, m_maincpu, XTAL(18'432'000)/12);  /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddribble_state::cpu0_map);
 
-	MCFG_DEVICE_ADD(m_cpu1, MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
+	MC6809E(config, m_cpu1, XTAL(18'432'000)/12);  /* verified on pcb */
+	m_cpu1->set_addrmap(AS_PROGRAM, &ddribble_state::cpu1_map);
 
-	MCFG_DEVICE_ADD("cpu2", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
+	mc6809e_device &cpu2(MC6809E(config, "cpu2", XTAL(18'432'000)/12));  /* verified on pcb */
+	cpu2.set_addrmap(AS_PROGRAM, &ddribble_state::cpu2_map);
 
 	config.m_minimum_quantum = attotime::from_hz(6000);  /* we need heavy synch */
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-/*  MCFG_SCREEN_SIZE(64*8, 32*8)
-    MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1) */
-	MCFG_SCREEN_UPDATE_DRIVER(ddribble_state, screen_update_ddribble)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddribble_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+/*  screen.set_size(64*8, 32*8);
+    screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1); */
+	screen.set_screen_update(FUNC(ddribble_state::screen_update_ddribble));
+	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(ddribble_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_ddribble);
 	PALETTE(config, "palette", FUNC(ddribble_state::ddribble_palette)).set_format(palette_device::xBGR_555, 64 + 256, 64);
@@ -299,17 +299,16 @@ MACHINE_CONFIG_START(ddribble_state::ddribble)
 	ymsnd.add_route(2, "filter3", 0.25);
 	ymsnd.add_route(3, "mono", 0.25);
 
-	MCFG_DEVICE_ADD(m_vlm, VLM5030, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
+	VLM5030(config, m_vlm, XTAL(3'579'545)); /* verified on pcb */
+	m_vlm->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_vlm->set_addrmap(0, &ddribble_state::vlm_map);
 
-	MCFG_DEVICE_ADD(m_filter1, FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD(m_filter2, FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD(m_filter3, FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	FILTER_RC(config, m_filter1).add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	FILTER_RC(config, m_filter2).add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	FILTER_RC(config, m_filter3).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 ROM_START( ddribble )

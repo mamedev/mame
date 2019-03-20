@@ -2292,6 +2292,9 @@ void upd765_family_device::read_id_start(floppy_info &fi)
 		return;
 	}
 
+	for(int i=0; i<4; i++)
+		cur_live.idbuf[i] = command[i+2];
+
 	read_id_continue(fi);
 }
 

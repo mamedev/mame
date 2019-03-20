@@ -599,24 +599,24 @@ It needs at least 64 instances because 0xa05b will be eventually nuked by the vb
 }
 
 
-MACHINE_CONFIG_START(dblcrown_state::dblcrown)
-
+void dblcrown_state::dblcrown(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(dblcrown_map)
-	MCFG_DEVICE_IO_MAP(dblcrown_io)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dblcrown_state::dblcrown_map);
+	m_maincpu->set_addrmap(AS_IO, &dblcrown_state::dblcrown_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(dblcrown_state::dblcrown_irq_scanline), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1000));   /* 1000 ms. (minimal of MAX693A watchdog long timeout period with internal oscillator) */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(dblcrown_state, screen_update)
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(dblcrown_state::screen_update));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dblcrown);
 
@@ -632,7 +632,7 @@ MACHINE_CONFIG_START(dblcrown_state::dblcrown)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	YMZ284(config, "ymz", SND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.75);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

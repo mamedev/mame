@@ -414,11 +414,12 @@ static GFXDECODE_START( gfx_ksm )
 	GFXDECODE_ENTRY("chargen", 0x0000, ksm_charlayout, 0, 1)
 GFXDECODE_END
 
-MACHINE_CONFIG_START(ksm_state::ksm)
-	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(15'400'000)/10)
-	MCFG_DEVICE_PROGRAM_MAP(ksm_mem)
-	MCFG_DEVICE_IO_MAP(ksm_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+void ksm_state::ksm(machine_config &config)
+{
+	I8080(config, m_maincpu, XTAL(15'400'000)/10);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ksm_state::ksm_mem);
+	m_maincpu->set_addrmap(AS_IO, &ksm_state::ksm_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(ksm_state::scanline_callback), "screen", 0, 1);
 
@@ -464,7 +465,7 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
 	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4960*16));
 	keyboard_clock.signal_handler().set(FUNC(ksm_state::write_keyboard_clock));
-MACHINE_CONFIG_END
+}
 
 ROM_START( dvk_ksm )
 	ROM_REGION(0x1000, "maincpu", ROMREGION_ERASE00)

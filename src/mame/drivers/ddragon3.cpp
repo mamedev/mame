@@ -820,22 +820,22 @@ void ddragon3_state::machine_reset()
 	m_bg_tilebase = 0;
 }
 
-MACHINE_CONFIG_START(ddragon3_state::ddragon3)
-
+void ddragon3_state::ddragon3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(ddragon3_map)
+	M68000(config, m_maincpu, 20_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddragon3_state::ddragon3_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(ddragon3_state::ddragon3_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ddragon3_state::sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(28_MHz_XTAL / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
-	MCFG_SCREEN_UPDATE_DRIVER(ddragon3_state, screen_update_ddragon3)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(28_MHz_XTAL / 4, 448, 0, 320, 272, 8, 248);   /* HTOTAL and VTOTAL are guessed */
+	m_screen->set_screen_update(FUNC(ddragon3_state::screen_update_ddragon3));
+	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddragon3);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 768);
@@ -854,66 +854,62 @@ MACHINE_CONFIG_START(ddragon3_state::ddragon3)
 	ym2151.add_route(0, "lspeaker", 0.50);
 	ym2151.add_route(1, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.50)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 1.50);
+	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 1.50);
+}
 
-MACHINE_CONFIG_START(ddragon3_state::ddragon3b)
+void ddragon3_state::ddragon3b(machine_config &config)
+{
 	ddragon3(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(dd3b_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddragon3_state::dd3b_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(NOOP)
-MACHINE_CONFIG_END
+	m_screen->screen_vblank().set_nop();
+}
 
-MACHINE_CONFIG_START(ddragon3_state::ctribe)
+void ddragon3_state::ctribe(machine_config &config)
+{
 	ddragon3(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ctribe_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddragon3_state::ctribe_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(ctribe_sound_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ddragon3_state::ctribe_sound_map);
 
 	m_palette->set_format(palette_device::xBGR_444, 768);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(ddragon3_state, screen_update_ctribe)
-	MCFG_SCREEN_VBLANK_CALLBACK(NOOP)
+	m_screen->set_screen_update(FUNC(ddragon3_state::screen_update_ctribe));
+	m_screen->screen_vblank().set_nop();
 
-	MCFG_DEVICE_MODIFY("ym2151")
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.20)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.20)
+	ym2151_device &ym2151(*subdevice<ym2151_device>("ym2151"));
+	ym2151.reset_routes();
+	ym2151.add_route(0, "lspeaker", 1.20);
+	ym2151.add_route(1, "rspeaker", 1.20);
 
-	MCFG_DEVICE_MODIFY("oki")
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-MACHINE_CONFIG_END
+	m_oki->reset_routes();
+	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
+	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+}
 
 
-MACHINE_CONFIG_START(wwfwfest_state::wwfwfest)
-
+void wwfwfest_state::wwfwfest(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)  /* 24 crystal, 12 rated chip */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);  /* 24 crystal, 12 rated chip */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wwfwfest_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(ddragon3_state::ddragon3_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &wwfwfest_state::sound_map);
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(28_MHz_XTAL / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
-	MCFG_SCREEN_UPDATE_DRIVER(wwfwfest_state, screen_update_wwfwfest)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(28_MHz_XTAL / 4, 448, 0, 320, 272, 8, 248);   /* HTOTAL and VTOTAL are guessed */
+	m_screen->set_screen_update(FUNC(wwfwfest_state::screen_update_wwfwfest));
+	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wwfwfest);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 8192);
@@ -929,14 +925,14 @@ MACHINE_CONFIG_START(wwfwfest_state::wwfwfest)
 	ym2151.add_route(0, "mono", 0.45);
 	ym2151.add_route(1, "mono", 0.45);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) /* Verified - Pin 7 tied to +5VDC */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.90); /* Verified - Pin 7 tied to +5VDC */
+}
 
-MACHINE_CONFIG_START(wwfwfest_state::wwfwfstb)
+void wwfwfest_state::wwfwfstb(machine_config &config)
+{
 	wwfwfest(config);
 	MCFG_VIDEO_START_OVERRIDE(wwfwfest_state,wwfwfstb)
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

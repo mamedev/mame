@@ -176,12 +176,13 @@ void diablo1300_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START( diablo1300_state::diablo1300 )
+void diablo1300_state::diablo1300(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", DIABLO1300, XTAL(1'689'600))
-	MCFG_DEVICE_PROGRAM_MAP(diablo1300_map)
-	MCFG_DEVICE_DATA_MAP(diablo1300_data_map)
-MACHINE_CONFIG_END
+	DIABLO1300(config, m_maincpu, XTAL(1'689'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &diablo1300_state::diablo1300_map);
+	m_maincpu->set_addrmap(AS_DATA, &diablo1300_state::diablo1300_data_map);
+}
 
 ROM_START( diablo )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_16BIT )

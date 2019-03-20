@@ -272,24 +272,24 @@ void dragrace_state::machine_reset()
 	m_gear[1] = 0;
 }
 
-MACHINE_CONFIG_START(dragrace_state::dragrace)
-
+void dragrace_state::dragrace(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 12.096_MHz_XTAL / 12)
-	MCFG_DEVICE_PROGRAM_MAP(dragrace_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(dragrace_state, irq0_line_hold,  4*60)
+	M6800(config, m_maincpu, 12.096_MHz_XTAL / 12);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dragrace_state::dragrace_map);
+	m_maincpu->set_periodic_int(FUNC(dragrace_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
 	TIMER(config, "frame_timer").configure_periodic(FUNC(dragrace_state::dragrace_frame_callback), attotime::from_hz(60));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(dragrace_state, screen_update_dragrace)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 262);
+	m_screen->set_visarea(0, 255, 0, 239);
+	m_screen->set_screen_update(FUNC(dragrace_state::screen_update_dragrace));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_dragrace);
 	PALETTE(config, "palette", FUNC(dragrace_state::dragrace_palette), 16);
@@ -298,9 +298,9 @@ MACHINE_CONFIG_START(dragrace_state::dragrace)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, dragrace_discrete)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	DISCRETE(config, m_discrete, dragrace_discrete);
+	m_discrete->add_route(0, "lspeaker", 1.0);
+	m_discrete->add_route(1, "rspeaker", 1.0);
 
 	f9334_device &latch_f5(F9334(config, "latch_f5")); // F5
 	latch_f5.parallel_out_cb().set(FUNC(dragrace_state::speed1_w)).mask(0x1f); // set 3SPEED1-7SPEED1
@@ -324,7 +324,7 @@ MACHINE_CONFIG_START(dragrace_state::dragrace)
 	latch_e5.q_out_cb<3>().set(m_discrete, FUNC(discrete_device::write_line<DRAGRACE_MOTOR2_EN>)); // Motor2 enable
 	latch_e5.q_out_cb<5>().set(m_discrete, FUNC(discrete_device::write_line<DRAGRACE_HITONE_EN>)); // HiTone enable
 	latch_e5.q_out_cb<7>().set_output("led1"); // Player 2 Start Lamp
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( dragrace )
