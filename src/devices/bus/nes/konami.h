@@ -157,7 +157,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	required_device<ym2413_device> m_ym2413;
+	required_device<vrc7snd_device> m_vrc7snd;
 };
 
 
