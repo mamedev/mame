@@ -47,15 +47,18 @@ private:
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(input_r);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(blink) { m_blink = !m_blink; }
+	bool m_blink;
 };
 
 void delta1_state::machine_start()
 {
 	novagbase_state::machine_start();
 
-	// game relies on RAM filled with FF at power-on
-	for (int i = 0; i < 0x100; i++)
-		m_maincpu->space(AS_PROGRAM).write_byte(i + 0x2000, 0xff);
+	// zerofill/register for savestates
+	m_blink = false;
+	save_item(NAME(m_blink));
 }
 
 
@@ -88,9 +91,9 @@ READ8_MEMBER(delta1_state::input_r)
 
 WRITE8_MEMBER(delta1_state::digit_w)
 {
-	// IO17: segment commons, active low (always 0?)
+	// IO17: R/C circuit to segment commons (for automated blinking)
 	// IO10-16: digit segments A-G
-	data = (data & 0x80) ? 0 : (data & 0x7f);
+	data = (data & 0x80 && m_blink) ? 0 : (data & 0x7f);
 	m_7seg_data = bitswap<7>(data, 0,1,2,3,4,5,6);
 }
 
@@ -170,6 +173,7 @@ void delta1_state::delta1(machine_config &config)
 	f3853_device &f3853(F3853(config, "f3853", 2000000));
 	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
+	TIMER(config, "display_blink").configure_periodic(FUNC(delta1_state::blink), attotime::from_msec(250)); // approximation
 	TIMER(config, "display_decay").configure_periodic(FUNC(delta1_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_novag_delta1);
 }
