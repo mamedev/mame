@@ -21,6 +21,8 @@
 #include "machine/xavix2002_io.h"
 #include "machine/xavix_io.h"
 #include "machine/xavix_adc.h"
+#include "machine/xavix_anport.h"
+#include "machine/xavix_math.h"
 
 class xavix_sound_device : public device_t, public device_sound_interface
 {
@@ -103,6 +105,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_sound(*this, "xavix_sound"),
 		m_adc(*this, "adc"),
+		m_anport(*this, "anport"),
+		m_math(*this, "math"),
 		m_xavix2002io(*this, "xavix2002io")
 	{ }
 
@@ -277,16 +281,6 @@ private:
 	uint8_t m_ioevent_active;
 	void process_ioevent(uint8_t bits);
 
-	DECLARE_READ8_MEMBER(mouse_7b00_r);
-	DECLARE_READ8_MEMBER(mouse_7b01_r);
-	DECLARE_READ8_MEMBER(mouse_7b10_r);
-	DECLARE_READ8_MEMBER(mouse_7b11_r);
-
-	DECLARE_WRITE8_MEMBER(mouse_7b00_w);
-	DECLARE_WRITE8_MEMBER(mouse_7b01_w);
-	DECLARE_WRITE8_MEMBER(mouse_7b10_w);
-	DECLARE_WRITE8_MEMBER(mouse_7b11_w);
-
 	DECLARE_WRITE8_MEMBER(slotreg_7810_w);
 
 	DECLARE_WRITE8_MEMBER(rom_dmatrg_w);
@@ -458,15 +452,6 @@ private:
 		return 0xff;
 	}
 
-	DECLARE_READ8_MEMBER(mult_r);
-	DECLARE_WRITE8_MEMBER(mult_w);
-	DECLARE_READ8_MEMBER(mult_param_r);
-	DECLARE_WRITE8_MEMBER(mult_param_w);
-
-	uint8_t m_barrel_params[2];
-
-	DECLARE_READ8_MEMBER(barrel_r);
-	DECLARE_WRITE8_MEMBER(barrel_w);
 
 	DECLARE_READ8_MEMBER(adc0_r) { return m_an_in[0]->read(); };
 	DECLARE_READ8_MEMBER(adc1_r) { return m_an_in[1]->read(); };
@@ -477,6 +462,11 @@ private:
 	DECLARE_READ8_MEMBER(adc6_r) { return m_an_in[6]->read(); };
 	DECLARE_READ8_MEMBER(adc7_r) { return m_an_in[7]->read(); };
 
+	DECLARE_READ8_MEMBER(anport0_r) { logerror("%s: unhandled anport0_r\n", machine().describe_context()); return 0xff; };
+	DECLARE_READ8_MEMBER(anport1_r) { logerror("%s: unhandled anport1_r\n", machine().describe_context()); return 0xff; };
+	DECLARE_READ8_MEMBER(anport2_r) { logerror("%s: unhandled anport2_r\n", machine().describe_context()); return 0xff; };
+	DECLARE_READ8_MEMBER(anport3_r) { logerror("%s: unhandled anport3_r\n", machine().describe_context()); return 0xff; };
+
 	void update_irqs();
 	uint8_t m_irqsource;
 
@@ -485,9 +475,6 @@ private:
 	uint8_t m_nmi_vector_hi_data;
 	uint8_t m_irq_vector_lo_data;
 	uint8_t m_irq_vector_hi_data;
-
-	uint8_t m_multparams[3];
-	uint8_t m_multresults[2];
 
 	uint8_t m_spritefragment_dmaparam1[2];
 	uint8_t m_spritefragment_dmaparam2[2];
@@ -576,6 +563,8 @@ private:
 
 protected:
 	required_device<xavix_adc_device> m_adc;
+	required_device<xavix_anport_device> m_anport;
+	required_device<xavix_math_device> m_math;
 	optional_device<xavix2002_io_device> m_xavix2002io;
 
 	uint8_t m_extbusctrl[3];
@@ -590,6 +579,42 @@ protected:
 	DECLARE_WRITE8_MEMBER(extended_extbus_reg1_w);
 	DECLARE_WRITE8_MEMBER(extended_extbus_reg2_w);
 };
+
+class xavix_guru_state : public xavix_state
+{
+public:
+	xavix_guru_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag)
+	{ }
+
+	void xavix_guru(machine_config &config);
+
+protected:
+
+private:
+	DECLARE_READ8_MEMBER(guru_anport2_r) { uint8_t ret = m_mouse1x->read()-0x10; return ret; }
+};
+
+
+class xavix_2000_nv_sdb_state : public xavix_state
+{
+public:
+	xavix_2000_nv_sdb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag)
+	{ }
+
+	void xavix2000_nv_sdb(machine_config &config);
+
+protected:
+
+private:
+	DECLARE_READ8_MEMBER(sdb_anport0_r) { return m_mouse0x->read()^0x7f; }
+	DECLARE_READ8_MEMBER(sdb_anport1_r) { return m_mouse0y->read()^0x7f; }
+	DECLARE_READ8_MEMBER(sdb_anport2_r) { return m_mouse1x->read()^0x7f; }
+	DECLARE_READ8_MEMBER(sdb_anport3_r) { return m_mouse1y->read()^0x7f; }
+
+};
+
 
 class xavix_i2c_state : public xavix_state
 {
@@ -637,8 +662,16 @@ public:
 		: xavix_i2c_state(mconfig, type, tag)
 	{ }
 
+	void xavix_i2c_24lc04_tam(machine_config &config);
+
 private:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
+
+private:
+	DECLARE_READ8_MEMBER(tam_anport0_r) { return m_mouse0x->read()^0x7f; }
+	DECLARE_READ8_MEMBER(tam_anport1_r) { return m_mouse0y->read()^0x7f; }
+	DECLARE_READ8_MEMBER(tam_anport2_r) { return m_mouse1x->read()^0x7f; }
+	DECLARE_READ8_MEMBER(tam_anport3_r) { return m_mouse1y->read()^0x7f; }
 };
 
 
@@ -918,7 +951,8 @@ class xavix_popira2_cart_state : public xavix_cart_state
 {
 public:
 	xavix_popira2_cart_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_cart_state(mconfig,type,tag)
+		: xavix_cart_state(mconfig,type,tag),
+		m_p2(*this, "P2")
 	{ }
 
 	void xavix_cart_popira2(machine_config &config);
@@ -931,6 +965,8 @@ protected:
 private:
 	DECLARE_READ8_MEMBER(popira2_adc0_r);
 	DECLARE_READ8_MEMBER(popira2_adc1_r);
+
+	required_ioport m_p2;
 };
 
 
