@@ -59,20 +59,21 @@ void toaplan_scu_device::draw_sprites_to_tempbitmap(const rectangle &cliprect, u
 	for (int offs = 0; offs < bytes / 2; offs += 4)
 	{
 		const u16 attribute = spriteram[offs + 1];
-		const int priority = (attribute & 0x0c00) >> 10;
+		const int priority  = (attribute & 0x0c00) >> 10;
 
 		// are 0 priority really skipped, or can they still mask?
 		if (!priority) continue;
 
 		const int sy = spriteram[offs + 3] >> 7;
-		if (sy != 0x0100) {     /* sx = 0x01a0 or 0x0040*/
+		if (sy != 0x0100)     /* sx = 0x01a0 or 0x0040*/
+		{
 			const u32 sprite = spriteram[offs] & 0x7ff;
-			u32 color  = attribute & 0x3f;
+			u32 color        = attribute & 0x3f;
 			color |= priority << 6; // encode colour
 
-			int sx = spriteram[offs + 2] >> 7;
+			int sx          = spriteram[offs + 2] >> 7;
 			const int flipx = attribute & 0x100;
-			if (flipx) sx -= m_xoffs_flipped;
+			if (flipx) sx  -= m_xoffs_flipped;
 
 			const int flipy = attribute & 0x200;
 			gfx(0)->transpen_raw(m_temp_spritebitmap, cliprect,
