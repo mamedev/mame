@@ -1,8 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-// are these still part of the ADC? if so merge into xavix_adc.cpp
-
 #include "emu.h"
 #include "xavix_math.h"
 
@@ -39,13 +37,13 @@ READ8_MEMBER(xavix_math_device::barrel_r)
 	if (offset == 0)
 	{
 		// or upper bits of result?
-		logerror("%s: reading shift trigger?!\n", machine().describe_context());
+		LOG("%s: reading shift trigger?!\n", machine().describe_context());
 		return 0x00;
 	}
 	else
 	{
 		uint8_t retdata = m_barrel_params[1];
-		logerror("%s: reading shift results/data %02x\n", machine().describe_context(), retdata);
+		LOG("%s: reading shift results/data %02x\n", machine().describe_context(), retdata);
 		return retdata;
 	}
 }
@@ -54,6 +52,8 @@ READ8_MEMBER(xavix_math_device::barrel_r)
 // the pickup animations however don't seem to play, which indicates this could still be wrong.
 WRITE8_MEMBER(xavix_math_device::barrel_w)
 {
+	LOG("%s: barrel_w %02x\n", machine().describe_context(), data);
+
 	m_barrel_params[offset] = data;
 
 	// offset 0 = trigger
