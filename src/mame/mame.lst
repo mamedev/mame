@@ -12965,6 +12965,7 @@ vsc                             //
 
 @source:finalizr.cpp
 finalizr                        // GX523 (c) 1985
+finalizra                       // GX523 (c) 1985
 finalizrb                       // bootleg
 
 @source:fireball.cpp
@@ -37343,6 +37344,7 @@ spcteam                         //
 backfirt                        // bootleg [(c) 1988 Tecmo]
 gemini                          // (c) 1987 Tecmo
 geminib                         // bootleg
+geminij                         // (c) 1987 Tecmo
 rygar                           // 6002 - (c) 1986 Tecmo
 rygar2                          // 6002 - (c) 1986 Tecmo
 rygar3                          // 6002 - (c) 1986 Tecmo
