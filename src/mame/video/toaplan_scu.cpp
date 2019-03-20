@@ -54,7 +54,7 @@ void toaplan_scu_device::alloc_sprite_bitmap(screen_device &screen)
 
 void toaplan_scu_device::draw_sprites_to_tempbitmap(const rectangle &cliprect, u16* spriteram, u32 bytes)
 {
-	m_temp_spritebitmap.fill(0,cliprect);
+	m_temp_spritebitmap.fill(0, cliprect);
 
 	for (int offs = 0; offs < bytes / 2; offs += 4)
 	{
