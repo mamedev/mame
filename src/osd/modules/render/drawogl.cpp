@@ -2056,8 +2056,9 @@ static inline void copyline_palette16(uint32_t *dst, const uint16_t *src, int wi
 	for (x = 0; x < width; x++)
 	{
 		int srcpix = *src++;
+		uint32_t dstval = 0xff000000 | palette[srcpix];
 		for (int x2 = 0; x2 < xprescale; x2++)
-			*dst++ = 0xff000000 | palette[srcpix];
+			*dst++ = dstval;
 	}
 	if (xborderpix)
 		*dst++ = 0xff000000 | palette[*--src];
@@ -2079,8 +2080,9 @@ static inline void copyline_palettea16(uint32_t *dst, const uint16_t *src, int w
 	for (x = 0; x < width; x++)
 	{
 		int srcpix = *src++;
+		uint32_t dstval = palette[srcpix];
 		for (int x2 = 0; x2 < xprescale; x2++)
-			*dst++ = palette[srcpix];
+			*dst++ = dstval;
 	}
 	if (xborderpix)
 		*dst++ = palette[*--src];
@@ -2109,10 +2111,9 @@ static inline void copyline_rgb32(uint32_t *dst, const uint32_t *src, int width,
 		for (x = 0; x < width; x++)
 		{
 			rgb_t srcpix = *src++;
+			uint32_t dstval = 0xff000000 | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
 			for (int x2 = 0; x2 < xprescale; x2++)
-			{
-				*dst++ = 0xff000000 | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
-			}
+				*dst++ = dstval;
 		}
 		if (xborderpix)
 		{
@@ -2129,11 +2130,9 @@ static inline void copyline_rgb32(uint32_t *dst, const uint32_t *src, int width,
 		for (x = 0; x < width; x++)
 		{
 			rgb_t srcpix = *src++;
-
+			uint32_t dstval = 0xff000000 | srcpix;
 			for (int x2 = 0; x2 < xprescale; x2++)
-			{
-				*dst++ = 0xff000000 | srcpix;
-			}
+				*dst++ = dstval;
 		}
 		if (xborderpix)
 			*dst++ = 0xff000000 | *--src;
@@ -2161,8 +2160,9 @@ static inline void copyline_argb32(uint32_t *dst, const uint32_t *src, int width
 		for (x = 0; x < width; x++)
 		{
 			rgb_t srcpix = *src++;
+			uint32_t dstval = (srcpix & 0xff000000) | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
 			for (int x2 = 0; x2 < xprescale; x2++)
-				*dst++ = (srcpix & 0xff000000) | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
+				*dst++ = dstval;
 		}
 		if (xborderpix)
 		{
@@ -2257,10 +2257,12 @@ static inline void copyline_yuy16_to_argb(uint32_t *dst, const uint16_t *src, in
 			uint16_t srcpix1 = *src++;
 			uint8_t cb = srcpix0 & 0xff;
 			uint8_t cr = srcpix1 & 0xff;
+			uint32_t dstval0 = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
+			uint32_t dstval1 = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
 			for (int x2 = 0; x2 < xprescale; x2++)
-				*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
+				*dst++ = dstval0;
 			for (int x2 = 0; x2 < xprescale; x2++)
-				*dst++ = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
+				*dst++ = dstval1;
 		}
 		if (xborderpix)
 		{
@@ -2291,10 +2293,12 @@ static inline void copyline_yuy16_to_argb(uint32_t *dst, const uint16_t *src, in
 			uint16_t srcpix1 = *src++;
 			uint8_t cb = srcpix0 & 0xff;
 			uint8_t cr = srcpix1 & 0xff;
+			uint32_t dstval0 = ycc_to_rgb(srcpix0 >> 8, cb, cr);
+			uint32_t dstval1 = ycc_to_rgb(srcpix1 >> 8, cb, cr);
 			for (int x2 = 0; x2 < xprescale; x2++)
-				*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
+				*dst++ = dstval0;
 			for (int x2 = 0; x2 < xprescale; x2++)
-				*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
+				*dst++ = dstval1;
 		}
 		if (xborderpix)
 		{
