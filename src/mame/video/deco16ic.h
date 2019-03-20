@@ -37,7 +37,6 @@ public:
 //  void set_palette_tag(const char *tag);
 	template <typename... T> void set_bank1_callback(T &&... args) { m_bank1_cb = deco16_bank_cb_delegate(std::forward<T>(args)...); }
 	template <typename... T> void set_bank2_callback(T &&... args) { m_bank2_cb = deco16_bank_cb_delegate(std::forward<T>(args)...); }
-	void set_split(int split) { m_split = split; }
 	void set_pf1_size(int size) { m_pf1_size = size; }
 	void set_pf2_size(int size) { m_pf2_size = size; }
 	void set_pf1_trans_mask(int mask) { m_pf1_trans_mask = mask; }
@@ -94,6 +93,9 @@ public:
 	/* used by captaven */
 	void set_pf1_8bpp_mode(int mode);
 
+	/* used by cninja */
+	void set_transmask(int tmap, int group, u32 fgmask, u32 bgmask);
+
 	/* used by stoneage */
 	void set_scrolldx(int tmap, int size, int dx, int dx_if_flipped);
 
@@ -146,7 +148,6 @@ private:
 	int m_pf12_last_small, m_pf12_last_big;
 	int m_pf1_8bpp_mode;
 
-	int m_split;
 	int m_pf1_size;
 	int m_pf2_size;
 	int m_pf1_trans_mask, m_pf2_trans_mask;

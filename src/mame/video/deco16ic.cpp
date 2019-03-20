@@ -191,7 +191,6 @@ deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag,
 		m_pf12_last_small(0),
 		m_pf12_last_big(0),
 		m_pf1_8bpp_mode(0),
-		m_split(0),
 		m_pf1_size(0),
 		m_pf2_size(0),
 		m_pf1_trans_mask(0xf),
@@ -247,9 +246,6 @@ void deco16ic_device::device_start()
 	m_pf2_tilemap_8x8->set_transparent_pen(0);
 	m_pf1_tilemap_16x16->set_transparent_pen(0);
 	m_pf2_tilemap_16x16->set_transparent_pen(0);
-
-	if (m_split) /* Caveman Ninja only */
-		m_pf2_tilemap_16x16->set_transmask(0, 0x00ff, 0xff01);
 
 	m_pf1_8bpp_mode = 0;
 
@@ -518,6 +514,21 @@ void deco16ic_device::custom_tilemap_draw(
 }
 
 /******************************************************************************/
+
+void deco16ic_device::set_transmask(int tmap, int group, u32 fgmask, u32 bgmask)
+{
+	switch (tmap)
+	{
+	case 0:
+		m_pf1_tilemap_16x16->set_transmask(group, fgmask, bgmask);
+		m_pf1_tilemap_8x8->set_transmask(group, fgmask, bgmask);
+		break;
+	case 1:
+		m_pf2_tilemap_16x16->set_transmask(group, fgmask, bgmask);
+		m_pf2_tilemap_8x8->set_transmask(group, fgmask, bgmask);
+		break;
+	}
+}
 
 /* captain america seems to have a similar 8bpp feature to robocop2, investigate merging */
 void deco16ic_device::set_pf1_8bpp_mode(int mode)

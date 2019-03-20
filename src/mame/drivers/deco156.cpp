@@ -349,7 +349,6 @@ MACHINE_CONFIG_START(deco156_state::hvysmsh)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 1024);
 
 	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_split(0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_trans_mask(0x0f);
@@ -402,7 +401,6 @@ MACHINE_CONFIG_START(deco156_state::wcvol95)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
 	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_split(0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_trans_mask(0x0f);

@@ -426,7 +426,6 @@ void simpl156_state::chainrec(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_simpl156);
 
 	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_split(0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_trans_mask(0x0f);
