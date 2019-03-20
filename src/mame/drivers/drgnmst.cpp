@@ -373,11 +373,11 @@ void drgnmst_state::machine_reset()
 	m_oki_bank[0] = 0;
 }
 
-MACHINE_CONFIG_START(drgnmst_state::drgnmst)
-
-	MCFG_DEVICE_ADD("maincpu", M68000, 12_MHz_XTAL) /* Confirmed */
-	MCFG_DEVICE_PROGRAM_MAP(drgnmst_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", drgnmst_state,  irq2_line_hold)
+void drgnmst_state::drgnmst(machine_config &config)
+{
+	M68000(config, m_maincpu, 12_MHz_XTAL); /* Confirmed */
+	m_maincpu->set_addrmap(AS_PROGRAM, &drgnmst_state::drgnmst_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(drgnmst_state::irq2_line_hold));
 
 	PIC16C55(config, m_audiocpu, 32_MHz_XTAL / 8);  /* 4MHz - Confirmed */
 	m_audiocpu->read_a().set(FUNC(drgnmst_state::pic16c5x_port0_r));
@@ -389,26 +389,26 @@ MACHINE_CONFIG_START(drgnmst_state::drgnmst)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_drgnmst);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(drgnmst_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, 56*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(drgnmst_state::screen_update));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(2, &drgnmst_state::drgnmst_IIIIRRRRGGGGBBBB, 0x2000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH)
-	MCFG_DEVICE_ADDRESS_MAP(0, drgnmst_oki1_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	OKIM6295(config, m_oki[0], 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH);
+	m_oki[0]->set_addrmap(0, &drgnmst_state::drgnmst_oki1_map);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
 ROM_START( drgnmst )

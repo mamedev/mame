@@ -593,7 +593,8 @@ void dc_cons_state::gdrom_config(device_t *device)
 	MCFG_SOUND_ROUTE(1, "^^aica", 1.0)
 }
 
-MACHINE_CONFIG_START(dc_cons_state::dc)
+void dc_cons_state::dc(machine_config &config)
+{
 	/* basic machine hardware */
 	SH4LE(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_md(0, 1);
@@ -611,8 +612,8 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(dc_state::dc_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
-	MCFG_DEVICE_PROGRAM_MAP(dc_audio_map)
+	ARM7(config, m_soundcpu, ((XTAL(33'868'800)*2)/3)/8);   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	m_soundcpu->set_addrmap(AS_PROGRAM, &dc_cons_state::dc_audio_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
 
@@ -658,10 +659,10 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	dcctrl3.set_port_tag<7>("P4:A5");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(13458568*2, 857, 0, 640, 524, 0, 480) /* TODO: where pclk actually comes? */
-	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 0x1000)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(13458568*2, 857, 0, 640, 524, 0, 480); /* TODO: where pclk actually comes? */
+	screen.set_screen_update("powervr2", FUNC(powervr2_device::screen_update));
+	PALETTE(config, "palette").set_entries(0x1000);
 	POWERVR2(config, m_powervr2, 0);
 	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
 
@@ -680,13 +681,13 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	ATA_INTERFACE(config, m_ata, 0);
 	m_ata->irq_handler().set(FUNC(dc_cons_state::ata_interrupt));
 
-	MCFG_DEVICE_MODIFY("ata:0")
-	MCFG_SLOT_OPTION_ADD("gdrom", GDROM)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("gdrom", gdrom_config)
-	MCFG_SLOT_DEFAULT_OPTION("gdrom")
+	ata_slot_device &ata_0(*subdevice<ata_slot_device>("ata:0"));
+	ata_0.option_add("gdrom", GDROM);
+	ata_0.set_option_machine_config("gdrom", gdrom_config);
+	ata_0.set_default_option("gdrom");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("dc");
-MACHINE_CONFIG_END
+}
 
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
