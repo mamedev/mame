@@ -413,7 +413,7 @@ void twincobr_state::main_program_map(address_map &map)
 	map(0x078008, 0x078009).portr("VBLANK");         /* V-Blank & FShark Coin/Start */
 	map(0x07800b, 0x07800b).w(m_coinlatch, FUNC(ls259_device::write_nibble_d0)); /* Flying Shark DSP Comms & coin stuff */
 	map(0x07800d, 0x07800d).w(m_mainlatch, FUNC(ls259_device::write_nibble_d0)); /* Twin Cobra DSP Comms & system control */
-	map(0x07a000, 0x07afff).rw(FUNC(twincobr_state::twincobr_sharedram_r), FUNC(twincobr_state::twincobr_sharedram_w));   /* 16-bit on 68000 side, 8-bit on Z80 side */
+	map(0x07a000, 0x07afff).rw(FUNC(twincobr_state::twincobr_sharedram_r), FUNC(twincobr_state::twincobr_sharedram_w)).umask16(0x00ff);   /* 16-bit on 68000 side, 8-bit on Z80 side */
 	map(0x07e000, 0x07e001).rw(FUNC(twincobr_state::twincobr_txram_r), FUNC(twincobr_state::twincobr_txram_w));   /* data for text video RAM */
 	map(0x07e002, 0x07e003).rw(FUNC(twincobr_state::twincobr_bgram_r), FUNC(twincobr_state::twincobr_bgram_w));   /* data for bg video RAM */
 	map(0x07e004, 0x07e005).rw(FUNC(twincobr_state::twincobr_fgram_r), FUNC(twincobr_state::twincobr_fgram_w));   /* data for fg video RAM */
@@ -626,8 +626,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,3),  /* 2048 characters */
 	3,              /* 3 bits per pixel */
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8             /* every char takes 8 consecutive bytes */
 };
 
@@ -637,8 +637,8 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,4),  /* 4096/8192 tiles */
 	4,              /* 4 bits per pixel */
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8             /* every tile takes 8 consecutive bytes */
 };
 
@@ -666,8 +666,6 @@ void twincobr_state::twincobr(machine_config &config)
 	m_dsp->bio().set(FUNC(twincobr_state::twincobr_bio_r));
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
-
-	MCFG_MACHINE_RESET_OVERRIDE(twincobr_state,twincobr)
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<2>().set(FUNC(twincobr_state::int_enable_w));
@@ -698,7 +696,7 @@ void twincobr_state::twincobr(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(28_MHz_XTAL/4, 446, 0, 320, 286, 0, 240);
-	m_screen->set_screen_update(FUNC(twincobr_state::screen_update_toaplan0));
+	m_screen->set_screen_update(FUNC(twincobr_state::screen_update));
 	m_screen->screen_vblank().set(m_spriteram16, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	m_screen->screen_vblank().append(FUNC(twincobr_state::twincobr_vblank_irq));
 	m_screen->set_palette(m_palette);
@@ -1296,7 +1294,7 @@ ROM_END
 
 void twincobr_state::init_twincobr()
 {
-	twincobr_driver_savestate();
+	driver_savestate();
 }
 
 
