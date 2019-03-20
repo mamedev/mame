@@ -18,7 +18,9 @@ TODO:
   electronically. For the ones that weren't decapped, they were read by
   playing back all melody data and reconstructing it to ROM.
   Visual(decap) verification is wanted for:
-  * gnw_climber, gnw_bjack
+  * gnw_bfight
+  * gnw_bjack
+  * gnw_climber
 - identify lcd segments for tgaiden
 
 ****************************************************************************
@@ -85,7 +87,7 @@ NH-103    nws  SM510   Manhole
 TF-104    nws  SM510   Tropical Fish
 YM-105    nws  SM511   Super Mario Bros.
 DR-106    nws  SM511   Climber
-BF-107*   nws  SM511?  Balloon Fight
+BF-107    nws  SM511   Balloon Fight
 MJ-108*   nws  SM511?  Mario The Juggler
 BU-201    sc   SM510?  Spitball Sparky
 UD-202*   sc   SM510?  Crab Grab
@@ -3454,6 +3456,100 @@ ROM_START( gnw_climber )
 
 	ROM_REGION( 542332, "svg", 0)
 	ROM_LOAD( "gnw_climber.svg", 0, 542332, CRC(d7e84c21) SHA1(a5b5b68c8cdb3a09966bfb91b281791bef311248) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Balloon Fight (model: see below)
+  * PCB label DR-106 (same PCB as in Climber (new wide screen version))
+  * Sharp SM511 label BF-107 9031B (new wide screen version) (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+  First released in 1986 on Crystal Screen (model BF-803), rereleased on
+  New Wide Screen in 1988 (model BF-107). The graphic LCD elements look the same
+  in both versions but the graphical background is slightly different.
+  Until further proof, it's assumed that the ROM is the same for both models.
+
+***************************************************************************/
+
+class gnw_bfight_state : public hh_sm510_state
+{
+public:
+	gnw_bfight_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_bfight(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_bfight )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) // Eject
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_bfight_state::gnw_bfight(machine_config &config)
+{
+	/* basic machine hardware */
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1549, 1080);
+	screen.set_visarea_full();
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( gnw_bfight )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bf-107.program", 0x0000, 0x1000, CRC(4c8d07ed) SHA1(a8974dff85d5f3bacaadb71b86e9b30994b6d129) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "bf-107.melody", 0x000, 0x100, BAD_DUMP CRC(aadc22a1) SHA1(f6e5572232eb9e83f6833073e1e1e99776245c50) ) // decap needed for verification
+
+	ROM_REGION( 558341, "svg", 0)
+	ROM_LOAD( "gnw_bfight.svg", 0, 558341, CRC(f0d61fe8) SHA1(b0b56224a967e4b26836c0f7e3015d13b42ae5cc) )
 ROM_END
 
 
@@ -8804,6 +8900,7 @@ CONS( 1983, gnw_manhole, 0,          0, gnw_manhole, gnw_manhole, gnw_manhole_st
 CONS( 1985, gnw_tfish,   0,          0, gnw_tfish,   gnw_tfish,   gnw_tfish_state,   empty_init, "Nintendo", "Game & Watch: Tropical Fish", MACHINE_SUPPORTS_SAVE )
 CONS( 1988, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1988, gnw_climber, 0,          0, gnw_climber, gnw_climber, gnw_climber_state, empty_init, "Nintendo", "Game & Watch: Climber (new wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1988, gnw_bfight,  0,          0, gnw_bfight,  gnw_bfight,  gnw_bfight_state,  empty_init, "Nintendo", "Game & Watch: Balloon Fight (new wide screen)", MACHINE_SUPPORTS_SAVE )
 
 // Nintendo G&W: micro vs. system (actually, no official Game & Watch logo anywhere)
 CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  empty_init, "Nintendo", "Micro Vs. System: Boxing", MACHINE_SUPPORTS_SAVE )
