@@ -394,11 +394,11 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7c03, 0x7c03).r(FUNC(xavix_state::timer_curval_r));
 
 	// Barrel Shifter registers
-	map(0x7ff0, 0x7ff1).rw(FUNC(xavix_state::barrel_r), FUNC(xavix_state::barrel_w));
+	map(0x7ff0, 0x7ff1).rw("math", FUNC(xavix_math_device::barrel_r), FUNC(xavix_math_device::barrel_w));
 
 	// Multiply / Divide registers
-	map(0x7ff2, 0x7ff4).rw(FUNC(xavix_state::mult_param_r), FUNC(xavix_state::mult_param_w));
-	map(0x7ff5, 0x7ff6).rw(FUNC(xavix_state::mult_r), FUNC(xavix_state::mult_w));
+	map(0x7ff2, 0x7ff4).rw("math", FUNC(xavix_math_device::mult_param_r), FUNC(xavix_math_device::mult_param_w));
+	map(0x7ff5, 0x7ff6).rw("math", FUNC(xavix_math_device::mult_r), FUNC(xavix_math_device::mult_w));
 
 	// CPU Vector registers
 	map(0x7ff9, 0x7ff9).w(FUNC(xavix_state::vector_enable_w)); // enables / disables the custom vectors
@@ -1258,6 +1258,8 @@ void xavix_state::xavix(machine_config &config)
 	m_anport->read_2_callback().set(FUNC(xavix_state::anport2_r));
 	m_anport->read_3_callback().set(FUNC(xavix_state::anport3_r));
 
+	XAVIX_MATH(config, m_math, 0);
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -1943,7 +1945,7 @@ CONS( 2006, epo_epp3,   0,          0,  xavix,            epo_epp,  xavix_state,
 
 CONS( 200?, epo_efdx,  0,          0,  xavix_i2c_24c08,  epo_efdx, xavix_i2c_state,      init_epo_efdx, "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2005, epo_guru,  0,          0,  xavix_guru,       epo_guru,    xavix_guru_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Gururin World (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, epo_guru,  0,          0,  xavix_guru,       epo_guru,    xavix_guru_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Gururin World (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2002, epo_dmon, 0,           0,  xavix_i2c_24c02,  xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Doraemon Wakuwaku Kuukihou (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // full / proper title?
 

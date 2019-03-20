@@ -22,6 +22,7 @@
 #include "machine/xavix_io.h"
 #include "machine/xavix_adc.h"
 #include "machine/xavix_anport.h"
+#include "machine/xavix_math.h"
 
 class xavix_sound_device : public device_t, public device_sound_interface
 {
@@ -105,6 +106,7 @@ public:
 		m_sound(*this, "xavix_sound"),
 		m_adc(*this, "adc"),
 		m_anport(*this, "anport"),
+		m_math(*this, "math"),
 		m_xavix2002io(*this, "xavix2002io")
 	{ }
 
@@ -450,15 +452,6 @@ private:
 		return 0xff;
 	}
 
-	DECLARE_READ8_MEMBER(mult_r);
-	DECLARE_WRITE8_MEMBER(mult_w);
-	DECLARE_READ8_MEMBER(mult_param_r);
-	DECLARE_WRITE8_MEMBER(mult_param_w);
-
-	uint8_t m_barrel_params[2];
-
-	DECLARE_READ8_MEMBER(barrel_r);
-	DECLARE_WRITE8_MEMBER(barrel_w);
 
 	DECLARE_READ8_MEMBER(adc0_r) { return m_an_in[0]->read(); };
 	DECLARE_READ8_MEMBER(adc1_r) { return m_an_in[1]->read(); };
@@ -482,9 +475,6 @@ private:
 	uint8_t m_nmi_vector_hi_data;
 	uint8_t m_irq_vector_lo_data;
 	uint8_t m_irq_vector_hi_data;
-
-	uint8_t m_multparams[3];
-	uint8_t m_multresults[2];
 
 	uint8_t m_spritefragment_dmaparam1[2];
 	uint8_t m_spritefragment_dmaparam2[2];
@@ -574,6 +564,7 @@ private:
 protected:
 	required_device<xavix_adc_device> m_adc;
 	required_device<xavix_anport_device> m_anport;
+	required_device<xavix_math_device> m_math;
 	optional_device<xavix2002_io_device> m_xavix2002io;
 
 	uint8_t m_extbusctrl[3];

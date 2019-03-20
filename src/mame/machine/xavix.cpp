@@ -805,116 +805,6 @@ TIMER_CALLBACK_MEMBER(xavix_state::freq_timer_done)
 	//m_freq_timer->adjust(attotime::from_usec(50000));
 }
 
-// epo_guru uses this for ground movement in 3d stages (and other places)
-READ8_MEMBER(xavix_state::barrel_r)
-{
-	if (offset == 0)
-	{
-		// or upper bits of result?
-		logerror("%s: reading shift trigger?!\n", machine().describe_context());
-		return 0x00;
-	}
-	else
-	{
-		uint8_t retdata = m_barrel_params[1];
-		logerror("%s: reading shift results/data %02x\n", machine().describe_context(), retdata);
-		return retdata;
-	}
-}
-
-WRITE8_MEMBER(xavix_state::barrel_w)
-{
-	m_barrel_params[offset] = data;
-
-	if (offset == 0)
-	{
-		int shift_data = m_barrel_params[1];
-		int shift_amount = data & 0x0f;
-		int shift_param = (data & 0xf0)>>4;
-
-		// this can't be right, shift amount would allow us to shift 16 places this way, this is an 8-bit register, uneless it can shift in and out of a private register?
-
-		if (shift_param & 0x8)
-		{
-			m_barrel_params[1] = shift_data >> shift_amount;
-		}
-		else
-		{
-			m_barrel_params[1] = shift_data << shift_amount;
-		}
-
-		// offset 0 = trigger
-		logerror("%s: shifting value %02x by %01x with params %01x\n", machine().describe_context(), shift_data, shift_amount, shift_param);
-	}
-}
-
-
-
-READ8_MEMBER(xavix_state::mult_r)
-{
-	return m_multresults[offset];
-}
-
-WRITE8_MEMBER(xavix_state::mult_w)
-{
-	// rad_madf writes here to set the base value which the multiplication result gets added to
-	m_multresults[offset] = data;
-}
-
-READ8_MEMBER(xavix_state::mult_param_r)
-{
-	return m_multparams[offset];
-}
-
-WRITE8_MEMBER(xavix_state::mult_param_w)
-{
-	COMBINE_DATA(&m_multparams[offset]);
-	// there are NOPs after one of the writes, so presumably the operation is write triggerd and not intstant
-	// see test code at 0184a4 in monster truck
-
-	// offset0 is control
-
-	// mm-- --Ss
-	// mm = mode, S = sign for param1, s = sign for param2
-	// modes 00 = multiply (regular?) 11 = add to previous 01 / 10 unknown (maybe subtract?)
-
-	if (offset == 2)
-	{
-		// assume 0 is upper bits, might be 'mode' instead, check
-
-
-		int signmode = (m_multparams[0] & 0x3f);
-
-		uint16_t result = 0;
-
-		// rad_madf uses this mode (add to previous result)
-		if ((m_multparams[0] & 0xc0) == 0xc0)
-		{
-			const int param1 = signmode & 0x2 ? (int8_t)m_multparams[1] : (uint8_t)m_multparams[1];
-			const int param2 = signmode & 0x1 ? (int8_t)m_multparams[2] : (uint8_t)m_multparams[2];
-
-			result = param1 * param2;
-
-			uint16_t oldresult = (m_multresults[1] << 8) | m_multresults[0];
-			result = oldresult + result;
-		}
-		else if ((m_multparams[0] & 0xc0) == 0x00)
-		{
-			const int param1 = signmode & 0x2 ? (int8_t)m_multparams[1] : (uint8_t)m_multparams[1];
-			const int param2 = signmode & 0x1 ? (int8_t)m_multparams[2] : (uint8_t)m_multparams[2];
-
-			result = param1 * param2;
-		}
-		else
-		{
-			popmessage("unknown multiplier mode %02x", m_multparams[0] & 0xc0);
-		}
-
-		m_multresults[1] = (result >> 8) & 0xff;
-		m_multresults[0] = result & 0xff;
-	}
-}
-
 
 READ8_MEMBER(xavix_state::irq_source_r)
 {
@@ -987,8 +877,6 @@ void xavix_state::machine_start()
 	save_item(NAME(m_nmi_vector_hi_data));
 	save_item(NAME(m_irq_vector_lo_data));
 	save_item(NAME(m_irq_vector_hi_data));
-	save_item(NAME(m_multparams));
-	save_item(NAME(m_multresults));
 	save_item(NAME(m_spritefragment_dmaparam1));
 	save_item(NAME(m_spritefragment_dmaparam2));
 	save_item(NAME(m_tmap1_regs));
@@ -1005,7 +893,6 @@ void xavix_state::machine_start()
 	save_item(NAME(m_sndtimer));
 	save_item(NAME(m_timer_baseval));
 	save_item(NAME(m_spritereg));
-	save_item(NAME(m_barrel_params));
 
 	save_item(NAME(m_sx_extended_extbus));
 }
@@ -1046,8 +933,6 @@ void xavix_state::machine_reset()
 		m_sndtimer[i] = 0x00;
 	}
 
-	std::fill(std::begin(m_multparams), std::end(m_multparams), 0x00);
-	std::fill(std::begin(m_multresults), std::end(m_multresults), 0x00);
 	std::fill(std::begin(m_spritefragment_dmaparam1), std::end(m_spritefragment_dmaparam1), 0x00);
 	std::fill(std::begin(m_tmap1_regs), std::end(m_tmap1_regs), 0x00);
 	std::fill(std::begin(m_tmap2_regs), std::end(m_tmap2_regs), 0x00);
@@ -1082,8 +967,6 @@ void xavix_state::machine_reset()
 	m_extbusctrl[1] = 0x00;
 	m_extbusctrl[2] = 0x00;
 
-	m_barrel_params[0] = 0x00;
-	m_barrel_params[1] = 0x00;
 
 	// SuperXaviX
 
