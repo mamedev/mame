@@ -60,7 +60,7 @@ static void aha154x_scsi_devices(device_slot_interface &device)
 void aha154x_device::scsic_config(device_t *device)
 {
 	device->set_clock(20'000'000);
-	downcast<aic6250_device &>(*device).int_cb().set_inputline("^^localcpu", I8085_RST75_LINE);
+	downcast<aic6250_device &>(*device).int_cb().set_inputline("^^localcpu", I8085_RST65_LINE);
 }
 
 void aha154x_device::device_add_mconfig(machine_config &config)
