@@ -681,17 +681,15 @@ WRITE_LINE_MEMBER(galaxian_state::vblank_interrupt_w)
 		m_maincpu->set_input_line(m_irq_line, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(galaxian_state::tenspot_interrupt_w)
+INPUT_CHANGED_MEMBER(galaxian_state::tenspot_fake)
 {
-	vblank_interrupt_w(state);
-
-	if (m_fake_select.read_safe(0x00))
+	if (newval)
 	{
 		m_tenspot_current_game++;
 		m_tenspot_current_game%=10;
 		tenspot_set_game_bank(m_tenspot_current_game, 1);
-		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(galaxian_state::irq_enable_w)
@@ -3254,7 +3252,7 @@ static INPUT_PORTS_START( tenspot )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("FAKE_SELECT") /* fake button to move onto next game - until select rom is understood! */
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Next Game (Fake)") PORT_IMPULSE(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Next Game (Fake)") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, galaxian_state, tenspot_fake, nullptr)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -6165,9 +6163,6 @@ void galaxian_state::tenspot(machine_config &config)
 
 	/* separate tile/sprite ROMs */
 	m_gfxdecode->set_info(gfx_tenspot);
-
-	/* video hardware */
-	m_screen->screen_vblank().set(FUNC(galaxian_state::tenspot_interrupt_w));
 }
 
 void galaxian_state::zigzag(machine_config &config)
