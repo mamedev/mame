@@ -164,6 +164,32 @@ static INPUT_PORTS_START( mu100 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( vl70 )
+	PORT_START("B0")
+	PORT_BIT(0x83, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Play")      PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Effect")    PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Midi/WX")   PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Enter")     PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Exit")      PORT_CODE(KEYCODE_BACKSPACE)
+
+	PORT_START("B1")
+	PORT_BIT(0x83, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Edit")      PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Mode")      PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Part -")    PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Select <")  PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Part +")    PORT_CODE(KEYCODE_CLOSEBRACE)
+
+	PORT_START("B2")
+	PORT_BIT(0x83, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Util")      PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Breath")    PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Value -")   PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Select >")  PORT_CODE(KEYCODE_STOP)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Value +")   PORT_CODE(KEYCODE_EQUALS)
+INPUT_PORTS_END
+
 class mu100_state : public driver_device
 {
 public:
@@ -176,6 +202,9 @@ public:
 		, m_lcd(*this, "lcd")
 		, m_ioport_p7(*this, "P7")
 		, m_ioport_p8(*this, "P8")
+		, m_ioport_b0(*this, "B0")
+		, m_ioport_b1(*this, "B1")
+		, m_ioport_b2(*this, "B2")
 	{ }
 
 	void vl70(machine_config &config);
@@ -288,8 +317,11 @@ private:
 	optional_device<h83003_device> m_vl70cpu;
 	optional_device<swp30_device> m_swp30;
 	required_device<hd44780_device> m_lcd;
-	required_ioport m_ioport_p7;
-	required_ioport m_ioport_p8;
+	optional_ioport m_ioport_p7;
+	optional_ioport m_ioport_p8;
+	optional_ioport m_ioport_b0;
+	optional_ioport m_ioport_b1;
+	optional_ioport m_ioport_b2;
 
 	u8 cur_p1, cur_p2, cur_p3, cur_p5, cur_p6, cur_pa, cur_pb, cur_pc, cur_pf, cur_pg;
 	u8 cur_ic32, cur_leds;
@@ -794,19 +826,24 @@ void mu100_state::p6_w_vl70(u16 data)
 
 void mu100_state::pb_w_vl70(u16 data)
 {
-	cur_leds = (data >> 2) ^ 0x3f;
+	cur_leds = bitswap<6>((data >> 2) ^ 0x3f, 5, 3, 1, 4, 2, 0);
 }
 
 void mu100_state::pc_w_vl70(u16 data)
 {
 	cur_pc = data;
-	logerror("scan_w %02x\n", data);
 }
 
 u16 mu100_state::pc_r_vl70()
 {
-	logerror("scan with pc = %02x\n", cur_pc);
-	return 0;
+	u8 r = 0xff;
+	if(!(cur_pc & 0x01))
+		r &= m_ioport_b0->read();
+	if(!(cur_pc & 0x02))
+		r &= m_ioport_b1->read();
+	if(!(cur_pc & 0x80))
+		r &= m_ioport_b2->read();
+	return r;
 }
 
 u16 mu100_state::p6_r_vl70()
@@ -1066,4 +1103,4 @@ ROM_END
 CONS( 1997, mu100,  0,     0, mu100, mu100, mu100_state,  empty_init, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
 CONS( 1997, mu100r, mu100, 0, mu100, mu100, mu100r_state, empty_init, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )
 CONS( 1994, mu80,   mu100, 0, mu80,  mu100, mu100_state,  empty_init, "Yamaha", "MU80",                   MACHINE_NOT_WORKING )
-CONS( 1996, vl70,   mu100, 0, vl70,  mu100, mu100_state,  empty_init, "Yamaha", "VL70-m",                  MACHINE_NOT_WORKING )
+CONS( 1996, vl70,   mu100, 0, vl70,  vl70,  mu100_state,  empty_init, "Yamaha", "VL70-m",                 MACHINE_NOT_WORKING )
