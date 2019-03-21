@@ -264,27 +264,27 @@ static GFXDECODE_START( gfx_cball )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(cball_state::cball)
-
+void cball_state::cball(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(12'096'000) / 16) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	M6800(config, m_maincpu, XTAL(12'096'000) / 16); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cball_state::cpu_map);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
-	MCFG_SCREEN_UPDATE_DRIVER(cball_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 262);
+	m_screen->set_visarea(0, 255, 0, 223);
+	m_screen->set_screen_update(FUNC(cball_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cball);
 
 	PALETTE(config, m_palette, FUNC(cball_state::cball_palette), 6);
 
 	/* sound hardware */
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( cball )

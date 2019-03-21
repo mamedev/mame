@@ -489,12 +489,12 @@ WRITE_LINE_MEMBER(champbwl_state::screen_vblank_champbwl)
 }
 
 
-MACHINE_CONFIG_START(champbwl_state::champbwl)
-
+void champbwl_state::champbwl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 16000000/4) /* 4MHz */
-	MCFG_DEVICE_PROGRAM_MAP(champbwl_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", champbwl_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 16000000/4); /* 4MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &champbwl_state::champbwl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(champbwl_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -505,14 +505,14 @@ MACHINE_CONFIG_START(champbwl_state::champbwl)
 	m_seta001->set_gfxdecode_tag("gfxdecode");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(champbwl_state, screen_update_champbwl)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, champbwl_state, screen_vblank_champbwl))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.5);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(champbwl_state::screen_update_champbwl));
+	screen.screen_vblank().set(FUNC(champbwl_state::screen_vblank_champbwl));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_champbwl);
 	PALETTE(config, m_palette, FUNC(champbwl_state::champbwl_palette), 512);
@@ -521,10 +521,10 @@ MACHINE_CONFIG_START(champbwl_state::champbwl)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);
+	m_x1->add_route(0, "lspeaker", 1.0);
+	m_x1->add_route(1, "rspeaker", 1.0);
+}
 
 
 
@@ -553,12 +553,12 @@ MACHINE_START_MEMBER(champbwl_state,doraemon)
 	m_mainbank->configure_entries(0, 4, &ROM[0], 0x4000);
 }
 
-MACHINE_CONFIG_START(champbwl_state::doraemon)
-
+void champbwl_state::doraemon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(14'318'181)/4)
-	MCFG_DEVICE_PROGRAM_MAP(doraemon_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", champbwl_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(14'318'181)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &champbwl_state::doraemon_map);
+	m_maincpu->set_vblank_int("screen", FUNC(champbwl_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -570,23 +570,22 @@ MACHINE_CONFIG_START(champbwl_state::doraemon)
 	MCFG_MACHINE_START_OVERRIDE(champbwl_state,doraemon)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(champbwl_state, screen_update_doraemon)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, champbwl_state, screen_vblank_doraemon))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(320, 256);
+	screen.set_visarea(0, 320-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(champbwl_state::screen_update_doraemon));
+	screen.screen_vblank().set(FUNC(champbwl_state::screen_vblank_doraemon));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_champbwl);
 	PALETTE(config, m_palette, FUNC(champbwl_state::champbwl_palette), 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(14'318'181))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, XTAL(14'318'181)).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

@@ -206,27 +206,27 @@ void contra_state::machine_reset()
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-MACHINE_CONFIG_START(contra_state::contra)
-
+void contra_state::contra(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8) /* 3000000? (HD63C09EP) */
-	MCFG_DEVICE_PROGRAM_MAP(contra_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", contra_state,  contra_interrupt)
+	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8); /* 3000000? (HD63C09EP) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &contra_state::contra_map);
+	m_maincpu->set_vblank_int("screen", FUNC(contra_state::contra_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, XTAL(24'000'000)/8) /* 3000000? (HD68B09EP) */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MC6809E(config, m_audiocpu, XTAL(24'000'000)/8); /* 3000000? (HD68B09EP) */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &contra_state::sound_map);
 
 	config.m_minimum_quantum = attotime::from_hz(6000);  /* enough for the sound CPU to read all commands */
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(37*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(contra_state, screen_update_contra)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(37*8, 32*8);
+	m_screen->set_visarea(0*8, 35*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(contra_state::screen_update_contra));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_contra);
 
@@ -247,7 +247,7 @@ MACHINE_CONFIG_START(contra_state::contra)
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.60).add_route(1, "rspeaker", 0.60);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( contra )

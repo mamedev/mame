@@ -2219,7 +2219,7 @@ MACHINE_RESET_MEMBER( p500_state, p500 )
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( 128k )
+//  machine_config( 128k )
 //-------------------------------------------------
 
 void cbm2_state::_128k(machine_config &config)
@@ -2229,7 +2229,7 @@ void cbm2_state::_128k(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( 256k )
+//  machine_config( 256k )
 //-------------------------------------------------
 
 void cbm2_state::_256k(machine_config &config)
@@ -2239,7 +2239,7 @@ void cbm2_state::_256k(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( p500_ntsc )
+//  machine_config( p500_ntsc )
 //-------------------------------------------------
 
 void p500_state::p500_ntsc(machine_config &config)
@@ -2376,7 +2376,7 @@ void p500_state::p500_ntsc(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( p500_pal )
+//  machine_config( p500_pal )
 //-------------------------------------------------
 
 void p500_state::p500_pal(machine_config &config)
@@ -2510,7 +2510,7 @@ void p500_state::p500_pal(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( cbm2lp_ntsc )
+//  machine_config( cbm2lp_ntsc )
 //-------------------------------------------------
 
 void cbm2_state::cbm2lp_ntsc(machine_config &config)
@@ -2640,7 +2640,7 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( b128 )
+//  machine_config( b128 )
 //-------------------------------------------------
 
 void cbm2_state::b128(machine_config &config)
@@ -2651,7 +2651,7 @@ void cbm2_state::b128(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( b256 )
+//  machine_config( b256 )
 //-------------------------------------------------
 
 void cbm2_state::b256(machine_config &config)
@@ -2662,7 +2662,7 @@ void cbm2_state::b256(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( cbm2lp_pal )
+//  machine_config( cbm2lp_pal )
 //-------------------------------------------------
 
 void cbm2_state::cbm2lp_pal(machine_config &config)
@@ -2674,7 +2674,7 @@ void cbm2_state::cbm2lp_pal(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( cbm610 )
+//  machine_config( cbm610 )
 //-------------------------------------------------
 
 void cbm2_state::cbm610(machine_config &config)
@@ -2685,7 +2685,7 @@ void cbm2_state::cbm610(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( cbm620 )
+//  machine_config( cbm620 )
 //-------------------------------------------------
 
 void cbm2_state::cbm620(machine_config &config)
@@ -2696,7 +2696,7 @@ void cbm2_state::cbm620(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( cbm2hp_ntsc )
+//  machine_config( cbm2hp_ntsc )
 //-------------------------------------------------
 
 void cbm2_state::cbm2hp_ntsc(machine_config &config)
@@ -2707,7 +2707,7 @@ void cbm2_state::cbm2hp_ntsc(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( b128hp )
+//  machine_config( b128hp )
 //-------------------------------------------------
 
 void cbm2hp_state::b128hp(machine_config &config)
@@ -2718,7 +2718,7 @@ void cbm2hp_state::b128hp(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( b256hp )
+//  machine_config( b256hp )
 //-------------------------------------------------
 
 void cbm2hp_state::b256hp(machine_config &config)
@@ -2729,7 +2729,7 @@ void cbm2hp_state::b256hp(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( bx256hp )
+//  machine_config( bx256hp )
 //-------------------------------------------------
 
 void cbm2hp_state::bx256hp(machine_config &config)
@@ -2763,7 +2763,7 @@ void cbm2hp_state::bx256hp(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( cbm2hp_pal )
+//  machine_config( cbm2hp_pal )
 //-------------------------------------------------
 
 void cbm2_state::cbm2hp_pal(machine_config &config)
@@ -2778,7 +2778,7 @@ void cbm2_state::cbm2hp_pal(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( cbm710 )
+//  machine_config( cbm710 )
 //-------------------------------------------------
 
 void cbm2hp_state::cbm710(machine_config &config)
@@ -2789,7 +2789,7 @@ void cbm2hp_state::cbm710(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( cbm720 )
+//  machine_config( cbm720 )
 //-------------------------------------------------
 
 void cbm2hp_state::cbm720(machine_config &config)
@@ -2800,7 +2800,7 @@ void cbm2hp_state::cbm720(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( cbm730 )
+//  machine_config( cbm730 )
 //-------------------------------------------------
 
 void cbm2hp_state::cbm730(machine_config &config)

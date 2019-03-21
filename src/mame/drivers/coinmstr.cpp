@@ -1255,10 +1255,11 @@ uint32_t coinmstr_state::screen_update_coinmstr(screen_device &screen, bitmap_in
 }
 
 
-MACHINE_CONFIG_START(coinmstr_state::coinmstr)
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK) // 7 MHz.
-	MCFG_DEVICE_PROGRAM_MAP(coinmstr_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", coinmstr_state,  irq0_line_hold)
+void coinmstr_state::coinmstr(machine_config &config)
+{
+	Z80(config, m_maincpu, CPU_CLOCK); // 7 MHz.
+	m_maincpu->set_addrmap(AS_PROGRAM, &coinmstr_state::coinmstr_map);
+	m_maincpu->set_vblank_int("screen", FUNC(coinmstr_state::irq0_line_hold));
 
 	pia6821_device &pia0(PIA6821(config, "pia0", 0));
 	pia0.readpa_handler().set_ioport("PIA0.A");
@@ -1273,16 +1274,16 @@ MACHINE_CONFIG_START(coinmstr_state::coinmstr)
 	pia2.readpb_handler().set_ioport("PIA2.B");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 46*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(coinmstr_state, screen_update_coinmstr)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 46*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(coinmstr_state::screen_update_coinmstr));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_coinmstr);
-	MCFG_PALETTE_ADD("palette", 46*32*4)
+	PALETTE(config, m_palette).set_entries(46*32*4);
 
 	h46505_device &crtc(H46505(config, "crtc", 14000000 / 16));
 	crtc.set_screen("screen");
@@ -1295,39 +1296,39 @@ MACHINE_CONFIG_START(coinmstr_state::coinmstr)
 	ay8910_device &aysnd(AY8910(config, "aysnd", SND_CLOCK));
 	aysnd.port_a_read_callback().set_ioport("DSW1");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(coinmstr_state::quizmstr)
+void coinmstr_state::quizmstr(machine_config &config)
+{
 	coinmstr(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(quizmstr_io_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &coinmstr_state::quizmstr_io_map);
+}
 
-MACHINE_CONFIG_START(coinmstr_state::trailblz)
+void coinmstr_state::trailblz(machine_config &config)
+{
 	coinmstr(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(trailblz_io_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &coinmstr_state::trailblz_io_map);
+}
 
-MACHINE_CONFIG_START(coinmstr_state::supnudg2)
+void coinmstr_state::supnudg2(machine_config &config)
+{
 	coinmstr(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(supnudg2_io_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &coinmstr_state::supnudg2_io_map);
+}
 
-MACHINE_CONFIG_START(coinmstr_state::pokeroul)
+void coinmstr_state::pokeroul(machine_config &config)
+{
 	coinmstr(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(pokeroul_io_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &coinmstr_state::pokeroul_io_map);
+}
 
-MACHINE_CONFIG_START(coinmstr_state::jpcoin)
+void coinmstr_state::jpcoin(machine_config &config)
+{
 	coinmstr(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(jpcoin_map)
-	MCFG_DEVICE_IO_MAP(jpcoin_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &coinmstr_state::jpcoin_map);
+	m_maincpu->set_addrmap(AS_IO, &coinmstr_state::jpcoin_io_map);
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 /*
 

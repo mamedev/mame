@@ -458,23 +458,23 @@ void chance32_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(chance32_state::chance32)
-
+void chance32_state::chance32(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(chance32_map)
-	MCFG_DEVICE_IO_MAP(chance32_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chance32_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 12000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &chance32_state::chance32_map);
+	m_maincpu->set_addrmap(AS_IO, &chance32_state::chance32_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(chance32_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(52.786)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*16, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 35*16-1, 0, 29*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(chance32_state, screen_update_chance32)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(52.786);
+//  screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*16, 32*8);
+	screen.set_visarea(0, 35*16-1, 0, 29*8-1);
+	screen.set_screen_update(FUNC(chance32_state::screen_update_chance32));
+	screen.set_palette("palette");
 
 	h46505_device &crtc(H46505(config, "crtc", 12000000/16));   /* 52.786 Hz (similar to Major Poker) */
 	crtc.set_screen("screen");
@@ -488,9 +488,8 @@ MACHINE_CONFIG_START(chance32_state::chance32)
 	SPEAKER(config, "mono").front_center();
 
 	/* clock at 1050 kHz match the 8000 Hz samples stored inside the ROM */
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+}
 
 
 ROM_START( chance32 )

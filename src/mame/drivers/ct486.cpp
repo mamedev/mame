@@ -110,11 +110,12 @@ void ct486_state::ct486_io(address_map &map)
 //  MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(ct486_state::ct486)
-	MCFG_DEVICE_ADD("maincpu", I486, XTAL(25'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(ct486_map)
-	MCFG_DEVICE_IO_MAP(ct486_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("cs4031", cs4031_device, int_ack_r)
+void ct486_state::ct486(machine_config &config)
+{
+	I486(config, m_maincpu, XTAL(25'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ct486_state::ct486_map);
+	m_maincpu->set_addrmap(AS_IO, &ct486_state::ct486_io);
+	m_maincpu->set_irq_acknowledge_callback("cs4031", FUNC(cs4031_device::int_ack_r));
 
 	CS4031(config, m_cs4031, XTAL(25'000'000), "maincpu", "isa", "bios", "keybc");
 	// cpu connections
@@ -166,29 +167,28 @@ MACHINE_CONFIG_START(ct486_state::ct486)
 	m_isabus->drq5_callback().set(m_cs4031, FUNC(cs4031_device::dreq5_w));
 	m_isabus->drq6_callback().set(m_cs4031, FUNC(cs4031_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_cs4031, FUNC(cs4031_device::dreq7_w));
-	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "isabus", pc_isa16_cards, "fdcsmc", true)
-	MCFG_DEVICE_ADD("board2", ISA16_SLOT, 0, "isabus", pc_isa16_cards, "comat", true)
-	MCFG_DEVICE_ADD("board3", ISA16_SLOT, 0, "isabus", pc_isa16_cards, "ide", true)
-	MCFG_DEVICE_ADD("board4", ISA16_SLOT, 0, "isabus", pc_isa16_cards, "lpt", true)
-	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "isabus", pc_isa16_cards, "svga_et4k", false)
-	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
+	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdcsmc", true);
+	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa16_cards, "comat", true);
+	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa16_cards, "ide", true);
+	ISA16_SLOT(config, "board4", 0, "isabus", pc_isa16_cards, "lpt", true);
+	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "svga_et4k", false);
+	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, "isabus", pc_isa16_cards, nullptr, false);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	// video hardware
-	MCFG_PALETTE_ADD("palette", 256) // todo: really needed?
+	PALETTE(config, "palette").set_entries(256); // todo: really needed?
 
 	/* software lists */
 	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
 	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
 	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

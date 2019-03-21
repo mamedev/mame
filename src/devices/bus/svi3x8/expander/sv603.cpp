@@ -36,10 +36,10 @@ const tiny_rom_entry *sv603_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sv603_device::device_add_mconfig)
+void sv603_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("snd", SN76489A, XTAL(10'738'635) / 3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489A(config, m_snd, XTAL(10'738'635) / 3).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// controller ports
 	COLECOVISION_CONTROL_PORT(config, m_joy[0], colecovision_control_port_devices, "hand");
@@ -50,7 +50,7 @@ MACHINE_CONFIG_START(sv603_device::device_add_mconfig)
 	// cartridge slot
 	COLECOVISION_CARTRIDGE_SLOT(config, m_cart, colecovision_cartridges, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("coleco");
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************
