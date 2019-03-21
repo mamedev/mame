@@ -12871,6 +12871,9 @@ bridgeca                        //
 gincribc                        //
 vbrc                            //
 
+@source:fidel_cc1.cpp
+cc1                             //
+
 @source:fidel_cc10.cpp
 cc10                            //
 checkc4                         //

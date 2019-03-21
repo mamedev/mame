@@ -16,11 +16,8 @@ TODO:
   confident that it's same)
 - Currently there is no accurate way to dump the SM511/SM511 melody ROM
   electronically. For the ones that weren't decapped, they were read by
-  playing back all melody data and reconstructing it to ROM.
-  Visual(decap) verification is wanted for:
-  * gnw_bfight
-  * gnw_bjack
-  * gnw_climber
+  playing back all melody data and reconstructing it to ROM. Visual(decap)
+  verification is wanted for: gnw_bfight, gnw_bjack, gnw_climber
 - identify lcd segments for tgaiden
 
 ****************************************************************************
@@ -96,7 +93,7 @@ AK-302*   mvs  SM511?  Donkey Kong 3
 HK-303*   mvs  SM511?  Donkey Kong Hockey
 YM-801*   cs   SM511   Super Mario Bros. (assume same ROM as nws version)
 DR-802*   cs   SM511   Climber            "
-BF-803*   cs   SM511?  Balloon Fight      "
+BF-803*   cs   SM511   Balloon Fight      "
 YM-901-S* x    SM511   Super Mario Bros.  "
 
 RGW-001 (2010 Ball remake) is on different hardware, ATmega169PV MCU.
