@@ -639,7 +639,7 @@ u16 mu100_state::adc_midisw_r()
 // Battery level
 u16 mu100_state::adc_battery_r()
 {
-	return 0x3ff;
+	return 0x200;
 }
 
 // Breath controller
