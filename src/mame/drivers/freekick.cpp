@@ -42,6 +42,68 @@ TODO:
 
  To enter Test Mode - press Button1 durning RESET (code at $79d)
 
+****************************************************************************
+
+        Perfect Billiard/Gigas                        Omega
+        ----------------------                        -----
+
+           GND  A1   B1  GND                    GND  1A   1B  GND
+           GND  A2   B2  GND                    GND  2A   2B  GND
+           +5V  A3   B3  +5V                    +5V  3A   3B  GND
+           +5V  A4   B4  +5V                    +5V  4A   4B  GND
+          +12V  A5   B5  +12V                  +12V  5A   5B  GND
+    SPEAKER(+)  A6   B6  SPEAKER(-)      SPEAKER(+)  6A   6B  SPEAKER(-)
+  COIN METER 1  A7   B7  COIN METER 2        COIN A  7A   7B  COUNTER B
+      COIN SW1  A8   B8  COIN SW2         COUNTER A  8A   8B  COIN B
+      1P START  A9   B9  2P START          1P START  9A   9B  2P START
+         1P UP  A10 B10  2P UP        COIN EMPTY SW  10A 10B
+       1P DOWN  A11 B11  2P DOWN                     11A 11B
+       1P LEFT  A12 B12  2P LEFT                     12A 12B
+      1P RIGHT  A13 B13  2P RIGHT                    13A 13B
+      1P SHOOT  A14 B14  2P SHOOT          1P SHOOT  14A 14B  2P SHOOT
+                A15 B15                              15A 15B
+           RED  A16 B16  BLUE                   RED  16A 16B  BLUE
+         GREEN  A17 B17  SYNC                 GREEN  17A 17B  SYNC
+           GND  A18 B18  GND                    GND  18A 18B  GND
+                                               1P L  19A 19B  2P L
+                                               1P R  20A 20B  2P R
+                                                +5V  21A 21B  GND
+                                              AC IN  22A 22B  AC OUT
+
+                         Counter Run/Free Kick
+                         ---------------------
+
+                           GND  1B   1A  GND
+                           GND  2B   2A  GND
+                           +5V  3B   3A  +5V
+                           +5V  4B   4A  +5V
+                                5B   5A
+                          +12V  6B   6A  +12V
+          INPUT PREVENTION KEY  7B   7A  INPUT PREVENTION KEY
+                     COUNTER B  8B   8A  COUNTER A
+                                9B   9A
+                    SPEAKER(-)  10B 10A  SPEAKER(+)
+                                11B 11A
+                         GREEN  12B 12A  RED
+                          SYNC  13B 13A  BLUE
+                                14B 14A  GND
+                                15B 15A
+               COIN B(SERVICE)  16B 16A  COIN A
+                      2P START  17B 17A  1P START
+                         2P UP  18B 18A  1P UP
+                       2P DOWN  19B 19A  1P DOWN
+                       2P LEFT  20B 20A  1P LEFT
+                      2P RIGHT  21B 21A  1P RIGHT
+                     2P PUSH 1  22B 22A  1P PUSH 1
+                     2P PUSH 2  23B 23A  1P PUSH 2
+                                24B 24A
+             2PL (Sensor Dial)  25B 25A  1PL (Sensor Dial)
+             2PR (Sensor Dial)  26B 26A  1PR (Sensor Dial)
+                           GND  27B 27A  GND
+                           GND  28B 28A  GND
+
+****************************************************************************
+
 */
 
 #include "emu.h"
