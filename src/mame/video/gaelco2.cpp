@@ -104,20 +104,12 @@ Multi monitor notes:
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen0)
+template<unsigned Layer>
+TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info)
 {
-	int data = m_videoram[(((m_vregs[0] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
-	int data2 = m_videoram[(((m_vregs[0] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
-	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
-
-	SET_TILE_INFO_MEMBER(0, code, ((data >> 9) & 0x7f), TILE_FLIPXY((data >> 6) & 0x03));
-}
-
-TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1)
-{
-	int data = m_videoram[(((m_vregs[1] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
-	int data2 = m_videoram[(((m_vregs[1] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
-	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
+	const u16 data = m_videoram[(((m_vregs[Layer] >> 9) & 0x07) * 0x2000 / 2) + (tile_index << 1)];
+	const u16 data2 = m_videoram[(((m_vregs[Layer] >> 9) & 0x07) * 0x2000 / 2) + ((tile_index << 1) + 1)];
+	const u32 code = ((data & 0x07) << 16) | (data2 & 0xffff);
 
 	SET_TILE_INFO_MEMBER(0, code, ((data >> 9) & 0x7f), TILE_FLIPXY((data >> 6) & 0x03));
 }
@@ -145,22 +137,14 @@ TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen0_dual)
+template<unsigned Layer>
+TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_dual)
 {
-	int data = m_videoram[(((m_vregs[0] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
-	int data2 = m_videoram[(((m_vregs[0] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
-	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
+	const u16 data = m_videoram[(((m_vregs[Layer] >> 9) & 0x07) * 0x2000 / 2) + (tile_index << 1)];
+	const u16 data2 = m_videoram[(((m_vregs[Layer] >> 9) & 0x07) * 0x2000 / 2) + ((tile_index << 1) + 1)];
+	const u32 code = ((data & 0x07) << 16) | (data2 & 0xffff);
 
-	SET_TILE_INFO_MEMBER(0, code, ((data >> 9) & 0x3f), TILE_FLIPXY((data >> 6) & 0x03));
-}
-
-TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1_dual)
-{
-	int data = m_videoram[(((m_vregs[1] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
-	int data2 = m_videoram[(((m_vregs[1] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
-	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
-
-	SET_TILE_INFO_MEMBER(0, code, 0x40 + ((data >> 9) & 0x3f), TILE_FLIPXY((data >> 6) & 0x03));
+	SET_TILE_INFO_MEMBER(0, code, (Layer * 0x40) + ((data >> 9) & 0x3f), TILE_FLIPXY((data >> 6) & 0x03));
 }
 
 
@@ -170,23 +154,38 @@ TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1_dual)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(gaelco2_state::gaelco2_vram_w)
+void gaelco2_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	int pant0_start = ((m_vregs[0] >> 9) & 0x07)*0x1000;
-	int pant0_end = pant0_start + 0x1000;
-	int pant1_start = ((m_vregs[1] >> 9) & 0x07)*0x1000;
-	int pant1_end = pant1_start + 0x1000;
+	const u32 pant0_start = ((m_vregs[0] >> 9) & 0x07) * 0x1000;
+	const u32 pant0_end = pant0_start + 0x1000;
+	const u32 pant1_start = ((m_vregs[1] >> 9) & 0x07) * 0x1000;
+	const u32 pant1_end = pant1_start + 0x1000;
 
 	COMBINE_DATA(&m_videoram[offset]);
 
 	/* tilemap 0 writes */
-	if ((offset >= pant0_start) && (offset < pant0_end)){
+	if ((offset >= pant0_start) && (offset < pant0_end))
 		m_pant[0]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
-	}
 
 	/* tilemap 1 writes */
-	if ((offset >= pant1_start) && (offset < pant1_end)){
+	if ((offset >= pant1_start) && (offset < pant1_end))
 		m_pant[1]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
+
+}
+
+void gaelco2_state::vregs_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	u16 old = m_vregs[offset];
+	data = COMBINE_DATA(&m_vregs[offset]);
+	switch (offset)
+	{
+		case 0:
+		case 1:
+			if (((old ^ data) >> 9) & 7) // tilemap ram offset
+			{
+				m_pant[offset]->mark_all_dirty();
+			}
+			break;
 	}
 }
 
@@ -210,44 +209,39 @@ WRITE16_MEMBER(gaelco2_state::gaelco2_vram_w)
 
 ***************************************************************************/
 
-#define RGB_CHG     0x08
-#define ADJUST_COLOR(c) ((c < 0) ? 0 : ((c > 255) ? 255 : c))
+static constexpr u8 RGB_CHG = 0x08;
+static inline const u8 ADJUST_COLOR(s16 c) { return (c < 0) ? 0 : ((c > 255) ? 255 : c); }
 
 /* table used for color adjustment */
-static const int pen_color_adjust[16] = {
-	+RGB_CHG*0, -RGB_CHG*1, -RGB_CHG*2, -RGB_CHG*3, -RGB_CHG*4, -RGB_CHG*5, -RGB_CHG*6, -RGB_CHG*7,
-	+RGB_CHG*8, +RGB_CHG*7, +RGB_CHG*6, +RGB_CHG*5, +RGB_CHG*4, +RGB_CHG*3, +RGB_CHG*2, +RGB_CHG*1
+static const s8 pen_color_adjust[16] = {
+	+RGB_CHG * 0, -RGB_CHG * 1, -RGB_CHG * 2, -RGB_CHG * 3, -RGB_CHG * 4, -RGB_CHG * 5, -RGB_CHG * 6, -RGB_CHG * 7,
+	+RGB_CHG * 8, +RGB_CHG * 7, +RGB_CHG * 6, +RGB_CHG * 5, +RGB_CHG * 4, +RGB_CHG * 3, +RGB_CHG * 2, +RGB_CHG * 1
 };
 
 
-WRITE16_MEMBER(gaelco2_state::gaelco2_palette_w)
+void gaelco2_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	int i, color, r, g, b, auxr, auxg, auxb;
-
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	color = m_generic_paletteram_16[offset];
+	COMBINE_DATA(&m_paletteram[offset]);
+	const u16 color = m_paletteram[offset];
 
 	/* extract RGB components */
-	r = (color >> 10) & 0x1f;
-	g = (color >>  5) & 0x1f;
-	b = (color >>  0) & 0x1f;
-
-	r = pal5bit(r);
-	g = pal5bit(g);
-	b = pal5bit(b);
+	const u8 r = pal5bit(color >>  10);
+	const u8 g = pal5bit(color >>   5);
+	const u8 b = pal5bit(color & 0x1f);
 
 	/* update game palette */
 	m_palette->set_pen_color(4096*0 + offset, rgb_t(r, g, b));
 
-	/* update shadow/highligh palettes */
-	for (i = 1; i < 16; i++){
+	/* update shadow/highlight palettes */
+	for (int i = 1; i < 16; i++)
+	{
 		/* because the last palette entry is reserved for shadows and highlights, we
 		don't use it and that way we save some colors so the UI looks fine ;-) */
 		if ((offset >= 0xff0) && (offset <= 0xfff)) return;
 
-		auxr = ADJUST_COLOR(r + pen_color_adjust[i]);
-		auxg = ADJUST_COLOR(g + pen_color_adjust[i]);
-		auxb = ADJUST_COLOR(b + pen_color_adjust[i]);
+		const u8 auxr = ADJUST_COLOR(r + pen_color_adjust[i]);
+		const u8 auxg = ADJUST_COLOR(g + pen_color_adjust[i]);
+		const u8 auxb = ADJUST_COLOR(b + pen_color_adjust[i]);
 
 		m_palette->set_pen_color(4096*i + offset, rgb_t(auxr, auxg, auxb));
 	}
@@ -264,8 +258,8 @@ VIDEO_START_MEMBER(gaelco2_state,gaelco2)
 	m_videoram = m_spriteram->live();
 
 	/* create tilemaps */
-	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen0),this),TILEMAP_SCAN_ROWS,16,16,64,32);
-	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen1),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info<0>),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info<1>),this),TILEMAP_SCAN_ROWS,16,16,64,32);
 
 	/* set tilemap properties */
 	m_pant[0]->set_transparent_pen(0);
@@ -284,8 +278,8 @@ VIDEO_START_MEMBER(gaelco2_state,gaelco2_dual)
 	m_videoram = m_spriteram->live();
 
 	/* create tilemaps */
-	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen0_dual),this),TILEMAP_SCAN_ROWS,16,16,64,32);
-	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen1_dual),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_dual<0>),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_dual<1>),this),TILEMAP_SCAN_ROWS,16,16,64,32);
 
 	/* set tilemap properties */
 	m_pant[0]->set_transparent_pen(0);
@@ -337,78 +331,85 @@ VIDEO_START_MEMBER(gaelco2_state,gaelco2_dual)
 
 void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int mask)
 {
-	uint16_t *buffered_spriteram16 = m_spriteram->buffer();
-	int j, x, y, ex, ey, px, py;
+	u16 *buffered_spriteram16 = m_spriteram->buffer();
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	/* get sprite ram start and end offsets */
-	int start_offset = (m_vregs[1] & 0x10)*0x100;
-	int end_offset = start_offset + 0x1000;
+	const u32 start_offset = (m_vregs[1] & 0x10) * 0x100;
+	const u32 end_offset = start_offset + 0x1000;
 
 	/* sprite offset is based on the visible area - this seems very kludgy */
-	int spr_x_adjust = (screen.visible_area().max_x - 320 + 1) - (511 - 320 - 1) - ((m_vregs[0] >> 4) & 0x01) + m_global_spritexoff;
+	const int spr_x_adjust = (screen.visible_area().max_x - 320 + 1) - (511 - 320 - 1) - ((m_vregs[0] >> 4) & 0x01) + m_global_spritexoff;
 
-	for (j = start_offset; j < end_offset; j += 8){
-		int data = buffered_spriteram16[(j/2) + 0];
-		int data2 = buffered_spriteram16[(j/2) + 1];
-		int data3 = buffered_spriteram16[(j/2) + 2];
-		int data4 = buffered_spriteram16[(j/2) + 3];
+	for (int j = start_offset; j < end_offset; j += 8)
+	{
+		const u16 data = buffered_spriteram16[(j / 2) + 0];
+		const u16 data2 = buffered_spriteram16[(j / 2) + 1];
+		const u16 data3 = buffered_spriteram16[(j / 2) + 2];
+		const u16 data4 = buffered_spriteram16[(j / 2) + 3];
 
-		int sx = data3 & 0x3ff;
-		int sy = data2 & 0x1ff;
+		const int sx = data3 & 0x3ff;
+		const int sy = data2 & 0x1ff;
 
-		int xflip = data2 & 0x800;
-		int yflip = data2 & 0x400;
+		const bool xflip = data2 & 0x800;
+		const bool yflip = data2 & 0x400;
 
-		int xsize = ((data3 >> 12) & 0x0f) + 1;
-		int ysize = ((data2 >> 12) & 0x0f) + 1;
+		const int xsize = ((data3 >> 12) & 0x0f) + 1;
+		const int ysize = ((data2 >> 12) & 0x0f) + 1;
 
 		if (m_dual_monitor && ((data & 0x8000) != mask)) continue;
 
 		/* if it's enabled, draw it */
-		if ((data2 & 0x0200) != 0){
-			for (y = 0; y < ysize; y++){
-				for (x = 0; x < xsize; x++){
+		if ((data2 & 0x0200) != 0)
+		{
+			for (int y = 0; y < ysize; y++)
+			{
+				for (int x = 0; x < xsize; x++)
+				{
 					/* for each x,y of the sprite, fetch the sprite data */
-					int data5 = buffered_spriteram16[((data4/2) + (y*xsize + x)) & 0x7fff];
-					int number = ((data & 0x1ff) << 10) + (data5 & 0x0fff);
-					int color = ((data >> 9) & 0x7f) + ((data5 >> 12) & 0x0f);
-					int color_effect = m_dual_monitor ? ((color & 0x3f) == 0x3f) : (color == 0x7f);
+					const u16 data5 = buffered_spriteram16[((data4 / 2) + (y*xsize + x)) & 0x7fff];
+					const u32 number = ((data & 0x1ff) << 10) + (data5 & 0x0fff);
+					const u32 color = ((data >> 9) & 0x7f) + ((data5 >> 12) & 0x0f);
+					const bool color_effect = m_dual_monitor ? ((color & 0x3f) == 0x3f) : (color == 0x7f);
 
-					ex = xflip ? (xsize - 1 - x) : x;
-					ey = yflip ? (ysize - 1 - y) : y;
+					const int ex = xflip ? (xsize - 1 - x) : x;
+					const int ey = yflip ? (ysize - 1 - y) : y;
 
 					/* normal sprite, pen 0 transparent */
-					if (color_effect == 0){
+					if (!color_effect)
+					{
 							gfx->transpen(bitmap,cliprect, number,
 							color, xflip, yflip,
-							((sx + ex*16) & 0x3ff) + spr_x_adjust,
-							((sy + ey*16) & 0x1ff), 0);
-
-					} else { /* last palette entry is reserved for shadows and highlights */
+							((sx + ex * 16) & 0x3ff) + spr_x_adjust,
+							((sy + ey * 16) & 0x1ff), 0);
+					}
+					else
+					{ /* last palette entry is reserved for shadows and highlights */
 
 						/* get a pointer to the current sprite's gfx data */
 						const uint8_t *gfx_src = gfx->get_data(number % gfx->elements());
 
-						for (py = 0; py < gfx->height(); py++){
+						for (int py = 0; py < gfx->height(); py++)
+						{
 							/* get a pointer to the current line in the screen bitmap */
-							int ypos = ((sy + ey*16 + py) & 0x1ff);
-							uint16_t *srcy = &bitmap.pix16(ypos);
+							const int ypos = ((sy + ey * 16 + py) & 0x1ff);
+							u16 *srcy = &bitmap.pix16(ypos);
 
-							int gfx_py = yflip ? (gfx->height() - 1 - py) : py;
+							const int gfx_py = yflip ? (gfx->height() - 1 - py) : py;
 
 							if ((ypos < cliprect.min_y) || (ypos > cliprect.max_y)) continue;
 
-							for (px = 0; px < gfx->width(); px++){
+							for (int px = 0; px < gfx->width(); px++)
+							{
 								/* get current pixel */
-								int xpos = (((sx + ex*16 + px) & 0x3ff) + spr_x_adjust) & 0x3ff;
-								uint16_t *pixel = srcy + xpos;
-								int src_color = *pixel;
+								const int xpos = (((sx + ex * 16 + px) & 0x3ff) + spr_x_adjust) & 0x3ff;
+								u16 *pixel = srcy + xpos;
+								const u16 src_color = *pixel;
 
-								int gfx_px = xflip ? (gfx->width() - 1 - px) : px;
+								const int gfx_px = xflip ? (gfx->width() - 1 - px) : px;
 
 								/* get asociated pen for the current sprite pixel */
-								int gfx_pen = gfx_src[gfx->rowbytes()*gfx_py + gfx_px];
+								const u8 gfx_pen = gfx_src[gfx->rowbytes() * gfx_py + gfx_px];
 
 								if ((gfx_pen == 0) || (gfx_pen >= 16)) continue;
 
@@ -431,29 +432,28 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 ***************************************************************************/
 
-uint32_t gaelco2_state::screen_update_gaelco2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 gaelco2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-
 	int xoff0 = 0x14;
 	int xoff1 = xoff0 - 4;
 	int yoff0 = 0x01;
 	int yoff1 = 0x01;
 
 	/* read scroll values */
-	int scroll0x = m_videoram[0x2802/2] + xoff0;
-	int scroll1x = m_videoram[0x2806/2] + xoff1;
-	int scroll0y = m_videoram[0x2800/2] + yoff0;
-	int scroll1y = m_videoram[0x2804/2] + yoff1;
+	int scroll0x = m_videoram[0x2802 / 2] + xoff0;
+	int scroll1x = m_videoram[0x2806 / 2] + xoff1;
+	int scroll0y = m_videoram[0x2800 / 2] + yoff0;
+	int scroll1y = m_videoram[0x2804 / 2] + yoff1;
 
 	/* set y scroll registers */
 	m_pant[0]->set_scrolly(0, scroll0y & 0x1ff);
 	m_pant[1]->set_scrolly(0, scroll1y & 0x1ff);
 
 	/* set x linescroll registers */
-	for (i = 0; i < 512; i++){
-		m_pant[0]->set_scrollx(i & 0x1ff, (m_vregs[0] & 0x8000) ? (m_videoram[(0x2000/2) + i] + xoff0) & 0x3ff : scroll0x & 0x3ff);
-		m_pant[1]->set_scrollx(i & 0x1ff, (m_vregs[1] & 0x8000) ? (m_videoram[(0x2400/2) + i] + xoff1) & 0x3ff : scroll1x & 0x3ff);
+	for (int i = 0; i < 512; i++)
+	{
+		m_pant[0]->set_scrollx(i & 0x1ff, (m_vregs[0] & 0x8000) ? (m_videoram[(0x2000 / 2) + i] + xoff0) & 0x3ff : scroll0x & 0x3ff);
+		m_pant[1]->set_scrollx(i & 0x1ff, (m_vregs[1] & 0x8000) ? (m_videoram[(0x2400 / 2) + i] + xoff1) & 0x3ff : scroll1x & 0x3ff);
 	}
 
 	/* draw screen */
@@ -465,20 +465,18 @@ uint32_t gaelco2_state::screen_update_gaelco2(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-uint32_t gaelco2_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index)
+u32 gaelco2_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index)
 {
-	int i;
-
 	int xoff0 = 0x14; // intro scenes align better with 0x13, but test screen is definitely 0x14
 	int xoff1 = xoff0 - 4;
 	int yoff0 = 0x01;
 	int yoff1 = 0x01;
 
 	/* read scroll values */
-	int scroll0x = m_videoram[0x2802/2] + xoff0;
-	int scroll1x = m_videoram[0x2806/2] + xoff1;
-	int scroll0y = m_videoram[0x2800/2] + yoff0;
-	int scroll1y = m_videoram[0x2804/2] + yoff1;
+	int scroll0x = m_videoram[0x2802 / 2] + xoff0;
+	int scroll1x = m_videoram[0x2806 / 2] + xoff1;
+	int scroll0y = m_videoram[0x2800 / 2] + yoff0;
+	int scroll1y = m_videoram[0x2804 / 2] + yoff1;
 
 	// if linescroll is enabled y-scroll handling changes too?
 	// touchgo uses 0x1f0 / 0x1ef between game and intro screens but actual scroll position needs to be different
@@ -498,12 +496,11 @@ uint32_t gaelco2_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap,
 	m_pant[1]->set_scrolly(0, scroll1y & 0x1ff);
 
 	/* set x linescroll registers */
-	for (i = 0; i < 512; i++){
-		m_pant[0]->set_scrollx(i & 0x1ff, (m_vregs[0] & 0x8000) ? (m_videoram[(0x2000/2) + i] + xoff0) & 0x3ff : scroll0x & 0x3ff);
-		m_pant[1]->set_scrollx(i & 0x1ff, (m_vregs[1] & 0x8000) ? (m_videoram[(0x2400/2) + i] + xoff1) & 0x3ff : scroll1x & 0x3ff);
+	for (int i = 0; i < 512; i++)
+	{
+		m_pant[0]->set_scrollx(i & 0x1ff, (m_vregs[0] & 0x8000) ? (m_videoram[(0x2000 / 2) + i] + xoff0) & 0x3ff : scroll0x & 0x3ff);
+		m_pant[1]->set_scrollx(i & 0x1ff, (m_vregs[1] & 0x8000) ? (m_videoram[(0x2400 / 2) + i] + xoff1) & 0x3ff : scroll1x & 0x3ff);
 	}
-
-
 
 	/* draw screen */
 	bitmap.fill(0, cliprect);
@@ -514,5 +511,5 @@ uint32_t gaelco2_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-uint32_t gaelco2_state::screen_update_gaelco2_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return dual_update(screen, bitmap, cliprect, 0); }
-uint32_t gaelco2_state::screen_update_gaelco2_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return dual_update(screen, bitmap, cliprect, 1); }
+u32 gaelco2_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return dual_update(screen, bitmap, cliprect, 0); }
+u32 gaelco2_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return dual_update(screen, bitmap, cliprect, 1); }

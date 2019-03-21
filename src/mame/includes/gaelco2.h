@@ -10,18 +10,18 @@
 class gaelco2_state : public driver_device
 {
 public:
-	gaelco2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
+	gaelco2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_mainlatch(*this, "mainlatch"),
-		m_spriteram(*this,"spriteram"),
+		m_spriteram(*this, "spriteram"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_global_spritexoff(0),
 		m_vregs(*this, "vregs"),
 		m_snowboar_protection(*this, "snowboar_prot"),
-		m_generic_paletteram_16(*this, "paletteram"),
+		m_paletteram(*this, "paletteram"),
 		m_shareram(*this, "shareram")
 	{ }
 
@@ -38,6 +38,7 @@ public:
 
 	void init_touchgo();
 	void init_snowboar();
+	void init_snowboara();
 	void init_alighunt();
 	void init_wrally2();
 	void init_play2000();
@@ -48,9 +49,9 @@ public:
 	DECLARE_VIDEO_START(gaelco2);
 	DECLARE_VIDEO_START(gaelco2_dual);
 
-	uint32_t screen_update_gaelco2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_gaelco2_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_gaelco2_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	required_device<m68000_device> m_maincpu;
@@ -60,28 +61,27 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE16_MEMBER(gaelco2_vram_w);
-	DECLARE_WRITE16_MEMBER(gaelco2_palette_w);
+	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void vregs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void palette_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER(wrally2_latch_w);
+	void wrally2_latch_w(offs_t offset, u16 data);
 
 	void mcu_hostmem_map(address_map &map);
 
 private:
-	DECLARE_WRITE8_MEMBER(shareram_w);
-	DECLARE_READ8_MEMBER(shareram_r);
-	DECLARE_WRITE16_MEMBER(alighunt_coin_w);
+	void shareram_w(offs_t offset, u8 data);
+	u8 shareram_r(offs_t offset);
+	void alighunt_coin_w(u16 data);
 	DECLARE_WRITE_LINE_MEMBER(coin3_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin4_counter_w);
-	DECLARE_READ16_MEMBER(snowboar_protection_r);
-	DECLARE_WRITE16_MEMBER(snowboar_protection_w);
-	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0);
-	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen1);
-	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0_dual);
-	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen1_dual);
+	u16 snowboar_protection_r();
+	void snowboar_protection_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info_dual);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int mask);
-	uint32_t dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index);
-	void gaelco2_ROM16_split_gfx(const char *src_reg, const char *dst_reg, int start, int length, int dest1, int dest2);
+	u32 dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index);
+	void ROM16_split_gfx(const char *src_reg, const char *dst_reg, int start, int length, int dest1, int dest2);
 
 	void alighunt_map(address_map &map);
 	void maniacsq_map(address_map &map);
@@ -90,17 +90,17 @@ private:
 	void touchgo_map(address_map &map);
 	void saltcrdi_map(address_map &map);
 
-	uint32_t snowboard_latch;
+	u32 m_snowboard_latch;
 
-	uint16_t *m_videoram;
+	u16 *m_videoram;
 	tilemap_t *m_pant[2];
 	int m_dual_monitor;
 	int m_global_spritexoff;
 
-	required_shared_ptr<uint16_t> m_vregs;
-	optional_shared_ptr<uint16_t> m_snowboar_protection;
-	required_shared_ptr<uint16_t> m_generic_paletteram_16;
-	optional_shared_ptr<uint16_t> m_shareram;
+	required_shared_ptr<u16> m_vregs;
+	optional_shared_ptr<u16> m_snowboar_protection;
+	required_shared_ptr<u16> m_paletteram;
+	optional_shared_ptr<u16> m_shareram;
 };
 
 
@@ -127,11 +127,11 @@ private:
 
 	int m_clr_gun_int;
 
-	DECLARE_READ16_MEMBER(p1_gun_x);
-	DECLARE_READ16_MEMBER(p1_gun_y);
-	DECLARE_READ16_MEMBER(p2_gun_x);
-	DECLARE_READ16_MEMBER(p2_gun_y);
-	DECLARE_WRITE16_MEMBER(bang_clr_gun_int_w);
+	u16 p1_gun_x();
+	u16 p1_gun_y();
+	u16 p2_gun_x();
+	u16 p2_gun_y();
+	void bang_clr_gun_int_w(u16 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(bang_irq);
 	void bang_map(address_map &map);
 };
