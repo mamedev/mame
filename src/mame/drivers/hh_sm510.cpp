@@ -3274,6 +3274,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Super Mario Bros. (model: see below)
+  * PCB label YM-105
   * Sharp SM511 label YM-105 9024B (new wide screen version) (die label ?)
   * lcd screen with custom segments, 1-bit sound
 
