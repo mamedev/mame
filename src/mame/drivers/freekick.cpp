@@ -1395,10 +1395,10 @@ ROM_END
 // Omega code/gfx looks to be based on gigas mk2, given the "MarkII" graphic in the gfx roms and gigas MarkII style continue numbers etc
 // PCB is marked "K.K NS6102-A" and seems to be somewhere between gigas hardware and freekick hardware (3x dipswitch arrays)
 // Supposedly an extremely limited release with ~10 PCBs produced.
-// A second PCB found with the CPU (under a metal cap) to be a NEC MC-8123 317-5002 - same Gigas & Gigas Mark II, however
-//  niether Omega set will work with the 317-5002 key in MAME, so maybe the CPU was factory reprogrammed?
+// A second PCB found with the CPU (under a metal cap) to be a NEC MC-8123 317-5002 - same as Gigas & Gigas Mark II, however
+//  neither Omega set will work with the 317-5002 key in MAME, so maybe the CPU was factory reprogrammed?
 // A single byte difference at 0x1120 in 17.M10 (when decoded) looks like a legit bug fix as it changes a branch
-//  which incorrectly jumps over a bit of initialisation code
+//  which incorrectly jumps over a bit of initialization code
 
 ROM_START( omega ) // ROM at M10 labeled "17" to indicate a later Bug fix version
 	ROM_REGION(0xc000, "maincpu", 0) // encrypted
@@ -1427,7 +1427,7 @@ ROM_START( omega ) // ROM at M10 labeled "17" to indicate a later Bug fix versio
 	ROM_LOAD( "tbp24s10n.4e", 0x0500, 0x100, CRC(28321dd8) SHA1(4ba0f6c381ef929a476d4d7aa71b1397c48a644e) )
 ROM_END
 
-ROM_START( omegaa ) // ROM at M10 labeled "7" to indicate the original version skipping some initialisation code
+ROM_START( omegaa ) // ROM at M10 labeled "7" to indicate the original version skipping some initialization code
 	ROM_REGION(0xc000, "maincpu", 0) // encrypted
 	ROM_LOAD(" 7.m10",  0x0000, 0x4000, CRC(6e7d77e1) SHA1(7675cea41391595cd7a3e1893478185989f4c319) ) // 27128
 	ROM_LOAD(" 8.n10",  0x4000, 0x8000, CRC(9bb61910) SHA1(f8a1210dbf93e901e246e6adf4cd905acc3ef376) ) // 27256
