@@ -262,7 +262,7 @@ public:
 	}
 
 protected:
-	virtual u16 adc7_r();
+	virtual u16 adc_type_r();
 
 private:
 	enum {
@@ -291,14 +291,16 @@ private:
 	required_ioport m_ioport_p7;
 	required_ioport m_ioport_p8;
 
-	u8 cur_p1, cur_p2, cur_p3, cur_p5, cur_p6, cur_pa, cur_pb, cur_pf, cur_pg;
-	u8 cur_ic32;
+	u8 cur_p1, cur_p2, cur_p3, cur_p5, cur_p6, cur_pa, cur_pb, cur_pc, cur_pf, cur_pg;
+	u8 cur_ic32, cur_leds;
 	float contrast;
 
-	u16 adc0_r();
-	u16 adc2_r();
-	u16 adc4_r();
-	u16 adc6_r();
+	u16 adc_zero_r();
+	u16 adc_ar_r();
+	u16 adc_al_r();
+	u16 adc_midisw_r();
+	u16 adc_battery_r();
+	u16 adc_breath_r();
 
 	void p1_w(u16 data);
 	u16 p1_r();
@@ -319,6 +321,9 @@ private:
 	u16 p6_r_vl70();
 	void pa_w_vl70(u16 data);
 	u16 pa_r_vl70();
+	void pb_w_vl70(u16 data);
+	void pc_w_vl70(u16 data);
+	u16 pc_r_vl70();
 	void pf_w(u16 data);
 	void pg_w(u16 data);
 
@@ -341,7 +346,7 @@ public:
 	{ }
 
 private:
-	virtual u16 adc7_r() override;
+	virtual u16 adc_type_r() override;
 };
 
 void mu100_state::prg_write_tap(offs_t address, u16 data, u16 mem_mask)
@@ -504,7 +509,8 @@ void mu100_state::chan_write_tap(offs_t address, u16 data, u16 mem_mask)
 
 void mu100_state::machine_start()
 {
-	cur_p1 = cur_p2 = cur_p3 = cur_p5 = cur_p6 = cur_pa = cur_pf = cur_pg = cur_ic32 = 0xff;
+	cur_p1 = cur_p2 = cur_p3 = cur_p5 = cur_p6 = cur_pa = cur_pc = cur_pf = cur_pg = cur_ic32 = 0xff;
+	cur_leds = 0x00;
 	contrast = 1.0;
 }
 
@@ -542,7 +548,7 @@ u32 mu100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	}
 
 	for(int i=0; i<6; i++)
-		if(cur_ic32 & (1 << (i == 5 ? 7 : i))) {
+		if(cur_leds & (1 << i)) {
 			int x = 830 + 40*(i & 1);
 			int y = 55 + 65*(i >> 1);
 			for(int yy=-9; yy <= 9; yy++) {
@@ -574,38 +580,49 @@ void mu100_state::mu100_map(address_map &map)
 	map(0x400000, 0x401fff).m(m_swp30, FUNC(swp30_device::map));
 }
 
-u16 mu100_state::adc0_r()
+// Grounded adc input
+u16 mu100_state::adc_zero_r()
 {
-	//  logerror("adc0_r\n");
 	return 0;
 }
 
-u16 mu100_state::adc2_r()
+// Analog input right (also sent to the swp)
+u16 mu100_state::adc_ar_r()
 {
-	logerror("adc2_r\n");
+	return 0;
+}
+
+// Analog input left (also sent to the swp)
+u16 mu100_state::adc_al_r()
+{
 	return 0;
 }
 
 // Put the host switch to pure midi
-u16 mu100_state::adc4_r()
+u16 mu100_state::adc_midisw_r()
 {
 	return 0;
 }
 
 // Battery level
-u16 mu100_state::adc6_r()
+u16 mu100_state::adc_battery_r()
 {
-	logerror("adc6_r\n");
 	return 0x3ff;
 }
 
+// Breath controller
+u16 mu100_state::adc_breath_r()
+{
+	return 0x000;
+}
+
 // model detect.  pulled to GND (0) on MU100, to 0.5Vcc on the card version, to Vcc on MU100R
-u16 mu100_state::adc7_r()
+u16 mu100_state::adc_type_r()
 {
 	return 0;
 }
 
-u16 mu100r_state::adc7_r()
+u16 mu100r_state::adc_type_r()
 {
 	return 0x3ff;
 }
@@ -692,8 +709,10 @@ u16 mu100_state::pa_r()
 
 void mu100_state::pf_w(u16 data)
 {
-	if(!(cur_pf & 0x01) && (data & 0x01))
+	if(!(cur_pf & 0x01) && (data & 0x01)) {
 		cur_ic32 = cur_p1;
+		cur_leds = (cur_p1 & 0x1f) | ((cur_p1 & 0x80) >> 2);
+	}
 	cur_pf = data;
 }
 
@@ -773,6 +792,23 @@ void mu100_state::p6_w_vl70(u16 data)
 	cur_p6 = data;
 }
 
+void mu100_state::pb_w_vl70(u16 data)
+{
+	cur_leds = (data >> 2) ^ 0x3f;
+}
+
+void mu100_state::pc_w_vl70(u16 data)
+{
+	cur_pc = data;
+	logerror("scan_w %02x\n", data);
+}
+
+u16 mu100_state::pc_r_vl70()
+{
+	logerror("scan with pc = %02x\n", cur_pc);
+	return 0;
+}
+
 u16 mu100_state::p6_r_vl70()
 {
 	return cur_p6;
@@ -803,17 +839,30 @@ void mu100_state::mu80_iomap(address_map &map)
 {
 	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(mu100_state::pa_r_mu80), FUNC(mu100_state::pa_w_mu80));
 	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(mu100_state::pb_r_mu80), FUNC(mu100_state::pb_w_mu80));
-	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu100_state::adc0_r));
-	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu100_state::adc2_r));
-	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu100_state::adc4_r));
-	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu100_state::adc6_r));
-	map(h8_device::ADC_7, h8_device::ADC_7).r(FUNC(mu100_state::adc7_r));
+	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu100_state::adc_ar_r));
+	map(h8_device::ADC_1, h8_device::ADC_1).r(FUNC(mu100_state::adc_zero_r));
+	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu100_state::adc_al_r));
+	map(h8_device::ADC_3, h8_device::ADC_3).r(FUNC(mu100_state::adc_zero_r));
+	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu100_state::adc_midisw_r));
+	map(h8_device::ADC_5, h8_device::ADC_6).r(FUNC(mu100_state::adc_zero_r));
+	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu100_state::adc_battery_r));
+	map(h8_device::ADC_7, h8_device::ADC_7).r(FUNC(mu100_state::adc_zero_r)); // inputmod from the gate array
 }
 
 void mu100_state::vl70_iomap(address_map &map)
 {
 	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(mu100_state::p6_r_vl70), FUNC(mu100_state::p6_w_vl70));
 	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(mu100_state::pa_r_vl70), FUNC(mu100_state::pa_w_vl70));
+	map(h8_device::PORT_B, h8_device::PORT_B).w(FUNC(mu100_state::pb_w_vl70));
+	map(h8_device::PORT_C, h8_device::PORT_C).rw(FUNC(mu100_state::pc_r_vl70), FUNC(mu100_state::pc_w_vl70));
+	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu100_state::adc_breath_r));
+	map(h8_device::ADC_1, h8_device::ADC_6).r(FUNC(mu100_state::adc_zero_r));
+	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu100_state::adc_midisw_r));
+	map(h8_device::ADC_3, h8_device::ADC_6).r(FUNC(mu100_state::adc_zero_r));
+	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu100_state::adc_battery_r));
+	map(h8_device::ADC_5, h8_device::ADC_6).r(FUNC(mu100_state::adc_zero_r));
+	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu100_state::adc_zero_r));
+	map(h8_device::ADC_7, h8_device::ADC_7).r(FUNC(mu100_state::adc_zero_r));
 }
 
 void mu100_state::mu100_iomap(address_map &map)
@@ -826,11 +875,14 @@ void mu100_state::mu100_iomap(address_map &map)
 	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(mu100_state::pa_r), FUNC(mu100_state::pa_w));
 	map(h8_device::PORT_F, h8_device::PORT_F).w(FUNC(mu100_state::pf_w));
 	map(h8_device::PORT_G, h8_device::PORT_G).w(FUNC(mu100_state::pg_w));
-	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu100_state::adc0_r));
-	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu100_state::adc2_r));
-	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu100_state::adc4_r));
-	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu100_state::adc6_r));
-	map(h8_device::ADC_7, h8_device::ADC_7).r(FUNC(mu100_state::adc7_r));
+	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu100_state::adc_ar_r));
+	map(h8_device::ADC_1, h8_device::ADC_1).r(FUNC(mu100_state::adc_zero_r));
+	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu100_state::adc_al_r));
+	map(h8_device::ADC_1, h8_device::ADC_3).r(FUNC(mu100_state::adc_zero_r));
+	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu100_state::adc_midisw_r));
+	map(h8_device::ADC_5, h8_device::ADC_5).r(FUNC(mu100_state::adc_zero_r));
+	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu100_state::adc_battery_r));
+	map(h8_device::ADC_7, h8_device::ADC_7).r(FUNC(mu100_state::adc_type_r));
 }
 
 void mu100_state::swp30_map(address_map &map)
@@ -896,6 +948,7 @@ void mu100_state::mu80(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
+	// In truth, dual swp-20
 	SWP30(config, m_swp30);
 	m_swp30->set_addrmap(0, &mu100_state::swp30_map);
 	m_swp30->add_route(0, "lspeaker", 1.0);
@@ -932,11 +985,6 @@ void mu100_state::vl70(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-
-//  SWP30(config, m_swp30);
-//  m_swp30->set_addrmap(0, &mu100_state::swp30_map);
-//  m_swp30->add_route(0, "lspeaker", 1.0);
-//  m_swp30->add_route(1, "rspeaker", 1.0);
 
 	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
 	midiin_slot(mdin_a);
@@ -1009,8 +1057,6 @@ ROM_END
 ROM_START( vl70 )
 	ROM_REGION( 0x200000, "vl70cpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "vl70m_v111_27c160.bin", 0x000000, 0x200000, CRC(efdba9f0) SHA1(cfa9fb7d2a991e4752393c9677e4ddcbe10866c7) )
-
-	ROM_REGION( 0x1800000, "swp30", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x1000, "lcd", 0)
 	// Hand made, 3 characters unused
