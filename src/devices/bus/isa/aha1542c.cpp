@@ -211,13 +211,47 @@ ROM_START( aha1542cp )
 ROM_END
 
 
+u8 aha1542c_device::local_status_r()
+{
+	return m_eeprom->do_read() << 7;
+}
+
+void aha1542c_device::local_latch_w(u8 data)
+{
+	m_eeprom->cs_write(BIT(data, 2));
+	m_eeprom->clk_write(BIT(data, 1));
+	m_eeprom->di_write(BIT(data, 0));
+	// TODO: several other bits are used
+}
+
 void aha1542c_device::z84c0010_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region(Z84C0010_TAG, 0);
-	map(0x8000, 0x800f).noprw();        // something is mapped there
-	map(0x9000, 0xafff).ram();        // 2kb RAM chip
+	map(0x8000, 0x9fff).ram();        // 2kb RAM chip
+	map(0xa000, 0xa000).r(FUNC(aha1542c_device::local_status_r));
+	map(0xb000, 0xb000).w(FUNC(aha1542c_device::local_latch_w));
 	map(0xe000, 0xe0ff).ram();        // probably PC<->Z80 communication area
-	map(0xb000, 0xb000).noprw();        // something?
+	map(0xe003, 0xe003).lr8("e003_r", []() { return 0x20; });
+}
+
+u8 aha1542cp_device::eeprom_r()
+{
+	return m_eeprom->do_read();
+}
+
+void aha1542cp_device::eeprom_w(u8 data)
+{
+	m_eeprom->cs_write(BIT(data, 2));
+	m_eeprom->clk_write(BIT(data, 1));
+	m_eeprom->di_write(BIT(data, 0));
+}
+
+void aha1542cp_device::local_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region(Z84C0010_TAG, 0);
+	map(0x8000, 0x9fff).ram();
+	map(0xc001, 0xc001).rw(FUNC(aha1542cp_device::eeprom_r), FUNC(aha1542cp_device::eeprom_w));
+	map(0xe003, 0xe003).nopr();
 }
 
 const tiny_rom_entry *aha1542c_device::device_rom_region() const
@@ -239,26 +273,37 @@ void aha1542c_device::device_add_mconfig(machine_config &config)
 {
 	z80_device &cpu(Z80(config, Z84C0010_TAG, 10'000'000));
 	cpu.set_addrmap(AS_PROGRAM, &aha1542c_device::z84c0010_mem);
+
+	EEPROM_93C46_16BIT(config, m_eeprom);
 }
 
-aha1542c_device::aha1542c_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_isa16_card_interface(mconfig, *this)
+void aha1542cp_device::device_add_mconfig(machine_config &config)
+{
+	z80_device &cpu(Z80(config, Z84C0010_TAG, 10'000'000));
+	cpu.set_addrmap(AS_PROGRAM, &aha1542cp_device::local_mem);
+
+	EEPROM_93C46_16BIT(config, m_eeprom);
+}
+
+aha1542c_device::aha1542c_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_isa16_card_interface(mconfig, *this)
+	, m_eeprom(*this, "eeprom")
 {
 }
 
-aha1542c_device::aha1542c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	aha1542c_device(mconfig, AHA1542C, tag, owner, clock)
+aha1542c_device::aha1542c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: aha1542c_device(mconfig, AHA1542C, tag, owner, clock)
 {
 }
 
-aha1542cf_device::aha1542cf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	aha1542c_device(mconfig, AHA1542CF, tag, owner, clock)
+aha1542cf_device::aha1542cf_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: aha1542c_device(mconfig, AHA1542CF, tag, owner, clock)
 {
 }
 
-aha1542cp_device::aha1542cp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	aha1542c_device(mconfig, AHA1542CP, tag, owner, clock)
+aha1542cp_device::aha1542cp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: aha1542c_device(mconfig, AHA1542CP, tag, owner, clock)
 {
 }
 
