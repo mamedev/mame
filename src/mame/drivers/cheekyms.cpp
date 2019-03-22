@@ -121,30 +121,30 @@ INTERRUPT_GEN_MEMBER(cheekyms_state::vblank_irq)
 }
 
 
-MACHINE_CONFIG_START(cheekyms_state::cheekyms)
-
+void cheekyms_state::cheekyms(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,5000000/2)  /* 2.5 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cheekyms_state,  vblank_irq)
+	Z80(config, m_maincpu, 5000000/2);  /* 2.5 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cheekyms_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &cheekyms_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cheekyms_state::vblank_irq));
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cheekyms_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 4*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(cheekyms_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cheekyms);
 	PALETTE(config, m_palette, FUNC(cheekyms_state::cheekyms_palette), 0xc0);
 
 	/* audio hardware */
 	CHEEKY_MOUSE_AUDIO(config, m_sound_board, 0);
-MACHINE_CONFIG_END
+}
 
 
 

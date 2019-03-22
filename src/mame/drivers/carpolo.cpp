@@ -231,8 +231,8 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(carpolo_state::carpolo)
-
+void carpolo_state::carpolo(machine_config &config)
+{
 	/* basic machine hardware */
 	M6502(config, m_maincpu, XTAL(11'289'000)/12); /* 940.75 kHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &carpolo_state::main_map);
@@ -279,18 +279,18 @@ MACHINE_CONFIG_START(carpolo_state::carpolo)
 	m_ttl74153_1k->zb_cb().set(FUNC(carpolo_state::ls153_zb_w)); // pia1 pb4
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 255)
-	MCFG_SCREEN_UPDATE_DRIVER(carpolo_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, carpolo_state, screen_vblank))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 239, 0, 255);
+	screen.set_screen_update(FUNC(carpolo_state::screen_update));
+	screen.screen_vblank().set(FUNC(carpolo_state::screen_vblank));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_carpolo);
 	PALETTE(config, m_palette, FUNC(carpolo_state::carpolo_palette), 12*2+2*16+4*2);
-MACHINE_CONFIG_END
+}
 
 
 

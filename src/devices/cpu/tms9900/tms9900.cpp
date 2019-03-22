@@ -2167,6 +2167,7 @@ void tms99xx_device::alu_clr_swpb()
 
 	bool setstatus = true;
 	bool check_ov = true;
+	bool check_c = true;
 
 	switch (m_command)
 	{
@@ -2184,6 +2185,7 @@ void tms99xx_device::alu_clr_swpb()
 		// LAE
 		dest_new = ~src_val & 0xffff;
 		check_ov = false;
+		check_c = false;
 		break;
 	case NEG:
 		// LAECO
@@ -2226,7 +2228,7 @@ void tms99xx_device::alu_clr_swpb()
 	if (setstatus)
 	{
 		if (check_ov) set_status_bit(ST_OV, ((src_val & 0x8000)==sign) && ((dest_new & 0x8000)!=sign));
-		set_status_bit(ST_C, (dest_new & 0x10000) != 0);
+		if (check_c) set_status_bit(ST_C, (dest_new & 0x10000) != 0);
 		m_current_value = dest_new & 0xffff;
 		compare_and_set_lae(m_current_value, 0);
 	}
@@ -2518,6 +2520,7 @@ void tms99xx_device::alu_shift()
 	uint16_t sign = 0;
 	uint32_t value;
 	int count;
+	bool check_ov = false;
 
 	switch (m_state)
 	{
@@ -2575,6 +2578,7 @@ void tms99xx_device::alu_shift()
 			case SLA:
 				carry = ((value & 0x8000)!=0);
 				value <<= 1;
+				check_ov = true;
 				if (carry != ((value&0x8000)!=0)) overflow = true;
 				break;
 			case SRC:
@@ -2587,7 +2591,7 @@ void tms99xx_device::alu_shift()
 
 		m_current_value = value & 0xffff;
 		set_status_bit(ST_C, carry);
-		set_status_bit(ST_OV, overflow);
+		if (check_ov) set_status_bit(ST_OV, overflow); // only SLA
 		compare_and_set_lae(m_current_value, 0);
 		m_address = m_address_saved;        // Register address
 		if (TRACE_STATUS) logerror("ST = %04x (val=%04x)\n", ST, m_current_value);

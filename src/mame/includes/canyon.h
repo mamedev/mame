@@ -63,7 +63,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	required_device<f9334_device> m_outlatch;
-	required_device<discrete_device> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

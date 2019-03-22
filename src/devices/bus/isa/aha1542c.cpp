@@ -7,71 +7,94 @@
  **********************************************************************/
 
 /*
- PCB layout
- ----------
-           Floppy            SCSI
-       +-----------+ +------------------+  +-
- +-----+-----------+-+------------------+--+
- |                                         |
- | DIPSW DS1                               |\
- |     +-----+                             | |
- |     |     | Y1   +---+   TRM     TRM    | |
- |     | U3  |      |U5 |                  |S|
- | U8  +-----+      +---+                  |C|
- |       +---+ +------+     +-------+      |S|
- |       |U13| |U15   |  Y2 |       |      |I|
- |       +---+ +------+     |       |      | |
- |             |U16   |     |U17    |      | |
- |             +------+     +-------+      |/
- +-----------------------------------------+
- |||||||||  |||||||||||||||||||||||||      |
+Adaptec 1993
+
+PCB Layout
+----------
+
+Adaptec AHA-1542CF/1542CF
+FCC ID: FGT1542CF
+FAB 545107-00 REV C
+ASSY 545106-00
+
+|-------|---------------|---|-------------------|--|
+| J1    |   FLOPPY34    |   |       SCSI50      |  |
+|       |---------------|   |-------------------|  |
+| S1    DS1                                        |
+|                                                  |
+|     |------|                DS2107AS DS2107AS   |--|
+|     |PC8477|  24MHz   Z84C0010                  |  |
+| PAL |BV-1  |                                    |S |
+|     |      |                       |----------| |  |
+|     |------|                       |          | |C |
+|    93C46.U11                 20MHz |          | |  |
+|         UM6264   MCODE.U15         |ADAPTEC   | |S |
+|                                    |AIC-7970Q | |  |
+|                  BIOS.U16          |          | |I |
+|                                    |          | |  |
+|                                    |----------| |--|
+|                                                  |
+|-|              |--|                         |----|
+  |--------------|  |-------------------------|
+
+Notes:
+      J1         - 4-position header for drive activity external LED connection
+      S1         - 8-position DIP Switch (See Table A)
+      PC8477BV-1 - National Semiconductor PC8477BV-1 'SuperFDC' Advanced Floppy Disk Controller (PLCC68)
+                   This is software compatible with NEC uPD765 and pin compatible with Intel 82077AA
+                   Labelled "AHA-1542CF/552800-01 F/9513"
+                   Clock input 24.000MHz
+      SCSI       - 50-pin Centronics style external SCSI connector (DDK 57AE-40500-21D)
+      Z84C0010   - Zilog Z84C0010VEC Z80 CPU. Clock input 20/2 [10.000MHz] sourced from AIC-7970Q (PLCC44)
+      93C46.U11  - Atmel 93C46 128b x8-bit / 64b x16-bit (1kB) EEPROM labelled '545120A' (SOIC8)
+      6264       - Unicorn Microelectronics UM6264BM-10L 8k x8-bit Static RAM (SOJ28)
+      MCODE.U15  - ST Microelectronics M27C256B 32k x8-bit EPROM labelled 'ADAPTEC INC 553801-00 E MCODE 4B81' (DIP28)
+      BIOS.U16   - ST Microelectronics M27C256B 32k x8-bit EPROM labelled 'ADAPTEC INC 553601-00 E BIOS 7600' (DIP28)
+                   BIOS 0x7600h is revision 2.10
+      PAL        - AMD PALCE16V8H-15JC/4 PAL (SOJ20)
+      AIC-7970Q  - Adaptec AIC-7970Q Fast SCSI Controller IC. Clock input 20.000MHz (QFP144)
+      DS2107AS   - Dallas DS2107AS SCSI Active Terminator (SOIC16)
+      DS1        - Internal Drive Activity LED
+      SCSI50     - 50-pin Right Angled Flat Cable Connector With Support For Up To 7 SCSI Drives
+      FLOPPY34   - 34-pin Right Angled Flat Cable Connector With Support For Up To 2 Floppy Drives (360kb,720kb,1.2MB,1.44MB)
 
 
- DIPSW  sw1 - sw8
- U3 Intel chip labelled "AHA-1542CF/552800-01 D/9346", probably FDC (82077)
- U5 Z84C0010VEC
- U8 EEPROM(?) labelled 545120A
- U13    CXK5864CM-10LL (64kbit SRAM)
- U15    M27C256B labelled "ADAPTEC INC/553801-00 C/MCODE 563D/(C) 1993"
- U16    M27C256B labelled "ADAPTEC INC/553601-00 C/BIOS C38D/(C) 1993"
- U17    AIC-7970Q
- Y1 XTAL SRX4054 93-38
- Y2 XTAL SRX4053 93-40
- TRM    Dallas DS2107AS (SCSI termination)
- DS1    LED
+Table A - S1 DIP Switch Description
+-----------------------------------
 
-*/
+Default: All DIP Switches OFF (i.e. Settings changed via BIOS and saved in EEPROM)
+Software Defaults = *
+----------------------+-----+-----+-----+-----+-----+-----+-----+-----+
+                      | SW1 | SW2 | SW3 | SW4 | SW5 | SW6 | SW7 | SW8 |
+----------------------|-----+-----+-----+-----+-----+-----+-----+-----+
+Termination   Enabled | ON  |     |     |     |     |     |     |     |
+          Set In BIOS*| OFF |     |     |     |     |     |     |     |
+----------------------+-----+-----+-----+-----+     |     |     |     |
+I/O Port         330H*|     | OFF | OFF | OFF |     |     |     |     |
+                 334H |     | ON  | OFF | OFF |     |     |     |     |
+                 230H |     | OFF | ON  | OFF |     |     |     |     |
+                 234H |     | ON  | ON  | OFF |     |     |     |     |
+                 130H |     | OFF | OFF | ON  |     |     |     |     |
+                 134H |     | ON  | OFF | ON  |     |     |     |     |
+             Reserved |     | OFF | ON  | ON  |     |     |     |     |
+             Reserved |     | ON  | ON  | ON  |     |     |     |     |
+----------------------+-----+-----+-----+-----+-----+     |     |     |
+Enable Floppy     Yes*|                       | OFF |     |     |     |
+                   No |                       | ON  |     |     |     |
+----------------------+-----------------------+-----+-----+-----+-----+
+BIOS Address   DC000H*|                             | OFF | OFF | OFF |
+               D8000H |                             | ON  | OFF | OFF |
+               D4000H |                             | OFF | ON  | OFF |
+               D0000H |                             | ON  | ON  | OFF |
+               CC000H |                             | OFF | OFF | ON  |
+               C8000H |                             | ON  | OFF | ON  |
+             Reserved |                             | OFF | ON  | ON  |
+        BIOS Disabled |                             | ON  | ON  | ON  |
+----------------------+-----------------------------+-----+-----+-----+
 
-/*
- * The PCB has a couple of DIP switches:
- *
- *  sw1 on  enable termination
- *      off software-controlled termination
- *
- *  sw2 sw3 sw4 I/O Port
- *  off off off 0x330 - 0x333 (default)
- *  on  off off 0x334 - 0x337
- *  off on  off 0x230 - 0x233
- *  on  on  off 0x234 - 0x237
- *  off off on  0x130 - 0x133
- *  on  off on  0x134 - 0x137
- *  off on  on  reserved
- *  on  on  on  reserved
- *
- *  sw5 on  disable floppy interface
- *      off enable floppy interface
- *
- *  sw6 sw7 sw8 BIOS base address
- *  off off off 0xdc000 (default)
- *  on  off off 0xd8000
- *  off on  off 0xd4000
- *  on  on  off 0xd0000
- *  off off on  0xcc000
- *  on  off on  0xc8000
- *  off on  on  reserved
- *  on  on  on  BIOS disabled
- *
- * source: http://download.adaptec.com/pdfs/installation_guides/1540cfig.pdf
+Documentation:
+Adaptec AHA-1540CF/1542CF Installation Guide
+http://download.adaptec.com/pdfs/installation_guides/aha1540cf_ig.pdf
  */
 
 #include "emu.h"
@@ -168,12 +191,15 @@ ROM_START( aha1542cf )
 	ROM_REGION( 0x8000, "aha1542", 0 )
 	ROM_SYSTEM_BIOS( 0, "v201", "Adaptec 1540CF/1542CF BIOS v2.01" )
 	ROMX_LOAD( "553601-00_c_bios_c38d.u16", 0x0000, 0x8000, CRC(ab22fc02) SHA1(f9f783e0272fc14ba3de32316997f1f6cadc67d0), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "v211", "Adaptec 1540CF/1542CF BIOS v2.11" )
-	ROMX_LOAD( "aha1542cf-v2.11-lower-socket.bin", 0x0000, 0x8000, CRC(fddd0b83) SHA1(aabd227cb338d8812e0bb5c17c08ea06c5aedd36), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v210", "Adaptec 1540CF/1542CF BIOS v2.10" )
+	ROMX_LOAD( "adaptec_inc_553601-00_e_bios_7600_1994.u16", 0x0000, 0x8000, CRC(8f3a2692) SHA1(b9dbd49baeec55098195131d0ed1a9bfe8463640), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "v211", "Adaptec 1540CF/1542CF BIOS v2.11" )
+	ROMX_LOAD( "aha1542cf-v2.11-lower-socket.bin", 0x0000, 0x8000, CRC(fddd0b83) SHA1(aabd227cb338d8812e0bb5c17c08ea06c5aedd36), ROM_BIOS(2) )
 
 	ROM_REGION( 0x8000, Z84C0010_TAG, 0 )
 	ROMX_LOAD( "553801-00_c_mcode_563d.u15", 0x0000, 0x8000, CRC(7824397e) SHA1(35bc2c8fab31aad3190a478f2dc8f3a72958cf04), ROM_BIOS(0) )
-	ROMX_LOAD( "aha1542cf-v2.11-upper-socket.bin", 0x0000, 0x8000, CRC(896873cd) SHA1(6edbdd9b0b15ef31ca0741cac31556d2d5266b6e), ROM_BIOS(1) )
+	ROMX_LOAD( "adaptec_inc_553801-00_e_mcode_4b81_1994.u15", 0x0000, 0x8000, CRC(dd651476) SHA1(cda508281302be53ebdcf8daa61754c89ad12111), ROM_BIOS(1) )
+	ROMX_LOAD( "aha1542cf-v2.11-upper-socket.bin", 0x0000, 0x8000, CRC(896873cd) SHA1(6edbdd9b0b15ef31ca0741cac31556d2d5266b6e), ROM_BIOS(2) )
 ROM_END
 
 ROM_START( aha1542cp )

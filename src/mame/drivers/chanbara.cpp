@@ -394,22 +394,22 @@ void chanbara_state::machine_reset()
 	m_scrollhi = 0;
 }
 
-MACHINE_CONFIG_START(chanbara_state::chanbara)
-
-	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(12'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(chanbara_map)
+void chanbara_state::chanbara(machine_config &config)
+{
+	MC6809E(config, m_maincpu, XTAL(12'000'000)/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &chanbara_state::chanbara_map);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(57.4122)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(57.4122);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+//  screen.set_size(32*8, 32*8);
+//  screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
 	// DECO video CRTC
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,16,240)
-	MCFG_SCREEN_UPDATE_DRIVER(chanbara_state, screen_update_chanbara)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen.set_raw(XTAL(12'000'000)/2,384,0,256,272,16,240);
+	screen.set_screen_update(FUNC(chanbara_state::screen_update_chanbara));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chanbara);
 
@@ -422,7 +422,7 @@ MACHINE_CONFIG_START(chanbara_state::chanbara)
 	ymsnd.port_a_write_callback().set(FUNC(chanbara_state::chanbara_ay_out_0_w));
 	ymsnd.port_b_write_callback().set(FUNC(chanbara_state::chanbara_ay_out_1_w));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( chanbara )

@@ -242,9 +242,9 @@ DEVICE_INPUT_DEFAULTS_END
 //  MACHINE CONFIGURATION
 //**************************************************************************
 
-MACHINE_CONFIG_START(coco3_state::coco3)
-	MCFG_DEVICE_MODIFY(":")
-	MCFG_DEVICE_CLOCK(XTAL(28'636'363) / 32)
+void coco3_state::coco3(machine_config &config)
+{
+	this->set_clock(XTAL(28'636'363) / 32);
 
 	// basic machine hardware
 	MC6809E(config, m_maincpu, DERIVED_CLOCK(1, 1));
@@ -329,12 +329,12 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	SOFTWARE_LIST(config, "cart_list").set_original("coco_cart").set_filter("COCO3");
 
 	SOFTWARE_LIST(config, "flop_list").set_original("coco_flop").set_filter("COCO3");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(coco3_state::coco3p)
+void coco3_state::coco3p(machine_config &config)
+{
 	coco3(config);
-	MCFG_DEVICE_MODIFY(":")
-	MCFG_DEVICE_CLOCK(XTAL(28'475'000) / 32)
+	this->set_clock(XTAL(28'475'000) / 32);
 
 	// An additional 4.433618 MHz XTAL is required for PAL color encoding
 	GIME_PAL(config.replace(), m_gime, XTAL(28'475'000), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG);
@@ -344,7 +344,7 @@ MACHINE_CONFIG_START(coco3_state::coco3p)
 	m_gime->irq_wr_callback().set(FUNC(coco3_state::gime_irq_w));
 	m_gime->firq_wr_callback().set(FUNC(coco3_state::gime_firq_w));
 	m_gime->floating_bus_rd_callback().set(FUNC(coco3_state::floating_bus_r));
-MACHINE_CONFIG_END
+}
 
 void coco3_state::coco3h(machine_config &config)
 {

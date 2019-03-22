@@ -3090,6 +3090,7 @@ void tms9995_device::alu_shift()
 	uint16_t sign = 0;
 	uint32_t value;
 	int count;
+	bool check_ov = false;
 
 	switch (m_inst_state)
 	{
@@ -3138,6 +3139,7 @@ void tms9995_device::alu_shift()
 			case SLA:
 				carry = ((value & 0x8000)!=0);
 				value <<= 1;
+				check_ov = true;
 				if (carry != ((value&0x8000)!=0)) overflow = true;
 				break;
 			case SRC:
@@ -3150,7 +3152,7 @@ void tms9995_device::alu_shift()
 
 		m_current_value = value & 0xffff;
 		set_status_bit(ST_C, carry);
-		set_status_bit(ST_OV, overflow);
+		if (check_ov) set_status_bit(ST_OV, overflow); // only SLA
 		compare_and_set_lae(m_current_value, 0);
 		m_address = m_address_saved;        // Register address
 		LOGMASKED(LOG_STATUS, "ST = %04x (val=%04x)\n", ST, m_current_value);
@@ -3168,6 +3170,7 @@ void tms9995_device::alu_single_arithm()
 	uint32_t src_val = m_current_value & 0x0000ffff;
 	uint16_t sign = 0;
 	bool check_ov = true;
+	bool check_c = true;
 
 	switch (m_command)
 	{
@@ -3218,6 +3221,7 @@ void tms9995_device::alu_single_arithm()
 		// LAE
 		dest_new = ~src_val & 0xffff;
 		check_ov = false;
+		check_c = false;
 		break;
 	case NEG:
 		// LAECO
@@ -3245,7 +3249,7 @@ void tms9995_device::alu_single_arithm()
 	}
 
 	if (check_ov) set_status_bit(ST_OV, ((src_val & 0x8000)==sign) && ((dest_new & 0x8000)!=sign));
-	set_status_bit(ST_C, (dest_new & 0x10000) != 0);
+	if (check_c) set_status_bit(ST_C, (dest_new & 0x10000) != 0);
 	m_current_value = dest_new & 0xffff;
 	compare_and_set_lae(m_current_value, 0);
 

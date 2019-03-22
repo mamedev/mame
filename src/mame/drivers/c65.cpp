@@ -684,12 +684,12 @@ WRITE_LINE_MEMBER(c65_state::cia0_irq)
 //  c65_irq(state || m_vicirq);
 }
 
-MACHINE_CONFIG_START(c65_state::c65)
-
+void c65_state::c65(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M4510, MAIN_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(c65_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", c65_state, vic3_vblank_irq)
+	M4510(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c65_state::c65_map);
+	m_maincpu->set_vblank_int("screen", FUNC(c65_state::vic3_vblank_irq));
 
 	MOS6526(config, m_cia0, MAIN_CLOCK);
 	m_cia0->set_tod_clock(60);
@@ -707,14 +707,14 @@ MACHINE_CONFIG_START(c65_state::c65)
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(c65_state, screen_update)
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK*4, 910, 0, 640, 262, 0, 200) // mods needed
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//  m_screen->set_refresh_hz(60);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_screen_update(FUNC(c65_state::screen_update));
+//  m_screen->set_size(32*8, 32*8);
+//  m_screen->set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	m_screen->set_raw(MAIN_CLOCK*4, 910, 0, 640, 262, 0, 200); // mods needed
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_c65);
 
@@ -727,7 +727,7 @@ MACHINE_CONFIG_START(c65_state::c65)
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("c65_flop");
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

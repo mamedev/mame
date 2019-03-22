@@ -1864,9 +1864,8 @@ void chihiro_state::an2131sc_configuration(device_t *device)
 
 MACHINE_CONFIG_START(chihiro_state::chihiro_base)
 	xbox_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(chihiro_map)
-	MCFG_DEVICE_IO_MAP(chihiro_map_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &chihiro_state::chihiro_map);
+	m_maincpu->set_addrmap(AS_IO, &chihiro_state::chihiro_map_io);
 
 	//BUS_MASTER_IDE_CONTROLLER(config, "ide").options(ide_baseboard, nullptr, "bb", true);
 	MCFG_DEVICE_MODIFY(":pci:09.0:ide:0")
@@ -1879,7 +1878,7 @@ MACHINE_CONFIG_START(chihiro_state::chihiro_base)
 	OHCI_USB_CONNECTOR(config, ":pci:02.0:port3", usb_baseboard, nullptr, false);
 	OHCI_USB_CONNECTOR(config, ":pci:02.0:port4", usb_baseboard, nullptr, false);
 
-	MCFG_DEVICE_ADD("jvs_master", JVS_MASTER, 0)
+	JVS_MASTER(config, "jvs_master", 0);
 	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "jvs_master"));
 	sega837.set_port_tag<0>("TILT");
 	sega837.set_port_tag<1>("P1");
