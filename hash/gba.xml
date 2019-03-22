@@ -16412,9 +16412,9 @@
 		<year>2001</year>
 		<publisher>Titus</publisher>
 		<info name="serial" value="AGB-AKKP-EUR"/>
-		<feature name="pcb" value="AGB-E01-10" />
-		<feature name="u1" value="U1 32M MROM" />
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-10" />
+			<feature name="u1" value="U1 32M MROM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-akkp-0.u1" size="4194304" crc="51e7522c" sha1="5a337fcc321eaa0c350644c026767824add338f3" offset="000000" />
 			</dataarea>
@@ -37296,11 +37296,14 @@
 		<description>Yu Yu Hakusho - Ghostfiles - Spirit Detective (Euro)</description>
 		<year>2005</year>
 		<publisher>Atari</publisher>
-		<info name="serial" value="AGB-BYYP"/>
+		<info name="serial" value="AGB-BYYP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="yu yu hakusho - ghostfiles - spirit detective (europe) (en,fr,de,es,it).bin" size="8388608" crc="208d77ec" sha1="66dc426b71195c11761f7ce58ffef231e8e227b1" offset="000000" />
+				<rom name="agb-byyp-0.u1" size="8388608" crc="208d77ec" sha1="66dc426b71195c11761f7ce58ffef231e8e227b1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -38333,10 +38336,11 @@
 		</part>
 	</software>
 
+	<!-- Tech demo compiled from source code. This is a later build from code marked "Copyright (C) 1999-2001 NINTENDO Co.,Ltd." -->
 	<software name="yoshi">
-		<description>Yoshi Demo</description>
-		<year>2001?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Sample Yoshi Game (Prototype, 20010214)</description>
+		<year>2001</year>
+		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="2273956">
 				<rom name="yoshi.bin" size="2273956" crc="954d2619" sha1="89fe5c0b5489a14f5f9bb1d4ebde998f07c4f939" offset="000000" />
@@ -38344,10 +38348,11 @@
 		</part>
 	</software>
 
+	<!-- Tech demo compiled from source code. This is an earlier build from code marked "Copyright (C) 1999-2000 NINTENDO Co.,Ltd." -->
 	<software name="yoshia" cloneof="yoshi">
-		<description>Yoshi Demo (Alt?)</description>
-		<year>2001?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Sample Yoshi Game (Prototype, 20000601)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="1717944">
 				<rom name="yoshi sample (japan) (en).bin" size="1717944" crc="34f2ef47" sha1="71b87b9684babfe5751a9fb6642ace5a927f21e0" offset="000000" />
