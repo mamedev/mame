@@ -424,7 +424,7 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 
 	/* Issue 2 Spectrums default to having bits 5, 6 & 7 set.
 	Issue 3 Spectrums default to having bits 5 & 7 set and bit 6 reset. */
-	if (m_io_config->read() & 0x80)
+	if ((m_io_config->read() & 0x80) == 0)
 		data ^= (0x40);
 
 	return data;
