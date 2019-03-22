@@ -787,7 +787,7 @@ void xbox_base_state::machine_start()
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("xbox", CMDFLAG_NONE, 0, 1, 4, std::bind(&xbox_base_state::xbox_debug_commands, this, _1, _2));
 	}
-	subdevice<xbox_eeprom_device>("pci:01.1:54")->hack_eeprom =
+	subdevice<xbox_eeprom_device>("pci:01.1:154")->hack_eeprom =
 		[&](void)
 	{
 		hack_eeprom();
