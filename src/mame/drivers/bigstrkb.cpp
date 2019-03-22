@@ -200,21 +200,21 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(bigstrkb_state::bigstrkb)
-
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(bigstrkb_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bigstrkb_state,  irq6_line_hold)
+void bigstrkb_state::bigstrkb(machine_config &config)
+{
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bigstrkb_state::bigstrkb_map);
+	m_maincpu->set_vblank_int("screen", FUNC(bigstrkb_state::irq6_line_hold));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bigstrkb);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bigstrkb_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(bigstrkb_state::screen_update));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x400);
 
@@ -222,14 +222,14 @@ MACHINE_CONFIG_START(bigstrkb_state::bigstrkb)
 	SPEAKER(config, "rspeaker").front_right();
 //  YM2151(config, "ymsnd", 4000000);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	okim6295_device &oki1(OKIM6295(config, "oki1", 4000000, okim6295_device::PIN7_HIGH));
+	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
+	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 4000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
-MACHINE_CONFIG_END
+	okim6295_device &oki2(OKIM6295(config, "oki2", 4000000, okim6295_device::PIN7_HIGH));
+	oki2.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
+	oki2.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+}
 
 /* Rom Loading */
 

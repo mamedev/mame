@@ -122,6 +122,10 @@ protected:
 
 	uint8_t   m_forced_inputs[4];   /* allow read even if configured as output */
 
+	// JB-related hacks
+	uint8_t m_last_op;
+	uint8_t m_last_bit;
+
 	int     m_icount;
 
 	struct mcs51_uart

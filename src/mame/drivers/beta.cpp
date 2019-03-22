@@ -347,16 +347,15 @@ void beta_state::machine_start()
 
 MACHINE_CONFIG_START(beta_state::beta)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(4'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(beta_mem)
+	M6502(config, m_maincpu, XTAL(4'000'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &beta_state::beta_mem);
 
 	/* video hardware */
 	config.set_default_layout(layout_beta);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	mos6532_new_device &m6532(MOS6532_NEW(config, M6532_TAG, XTAL(4'000'000)/4));

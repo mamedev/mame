@@ -218,15 +218,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(badlandsbl_state::bootleg_sound_scanline)
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
-
+void badlandsbl_state::badlandsb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000)/4)   /* Divisor estimated */
-	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", badlandsbl_state,  irq1_line_hold) //vblank_int)
+	M68000(config, m_maincpu, XTAL(28'000'000)/4);   /* Divisor estimated */
+	m_maincpu->set_addrmap(AS_PROGRAM, &badlandsbl_state::bootleg_map);
+	m_maincpu->set_vblank_int("screen", FUNC(badlandsbl_state::irq1_line_hold)); //vblank_int)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(20'000'000)/12)    /* Divisor estimated */
-	MCFG_DEVICE_PROGRAM_MAP(bootleg_audio_map)
+	Z80(config, m_audiocpu, XTAL(20'000'000)/12);    /* Divisor estimated */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &badlandsbl_state::bootleg_audio_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(badlandsbl_state::bootleg_sound_scanline), "screen", 0, 1);
 
 //  config.m_perfect_cpu_quantum = subtag("maincpu");
@@ -241,18 +241,18 @@ MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 	palette.set_format(palette_device::IRGB_1555, 256);
 	palette.set_membits(8);
 
-	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, badlands_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)
+	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,32).set_info_callback(FUNC(badlands_state::get_playfield_tile_info));
 
 //  ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, badlands_state::s_mob_config);
 //  m_mob->set_gfxdecode(m_gfxdecode);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(badlandsbl_state, screen_update_badlandsbl)
-	MCFG_SCREEN_PALETTE("palette")
+	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(badlandsbl_state::screen_update_badlandsbl));
+	m_screen->set_palette("palette");
 
 	MCFG_VIDEO_START_OVERRIDE(badlands_state,badlands)
 
@@ -260,7 +260,7 @@ MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 	SPEAKER(config, "mono").front_center();
 
 	YM2151(config, "ymsnd", XTAL(20'000'000)/8).add_route(0, "mono", 0.30).add_route(1, "mono", 0.30); /* Divisor estimated */
-MACHINE_CONFIG_END
+}
 
 
 

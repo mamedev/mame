@@ -187,22 +187,23 @@ static void b2m_floppies(device_slot_interface &device)
 
 
 /* Machine driver */
-MACHINE_CONFIG_START(b2m_state::b2m)
+void b2m_state::b2m(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(b2m_mem)
-	MCFG_DEVICE_IO_MAP(b2m_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", b2m_state,  b2m_vblank_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	I8080(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &b2m_state::b2m_mem);
+	m_maincpu->set_addrmap(AS_IO, &b2m_state::b2m_io);
+	m_maincpu->set_vblank_int("screen", FUNC(b2m_state::b2m_vblank_interrupt));
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(384, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(b2m_state, screen_update_b2m)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(384, 256);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(b2m_state::screen_update_b2m));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(b2m_state::b2m_palette), 4);
 
@@ -233,11 +234,10 @@ MACHINE_CONFIG_START(b2m_state::b2m)
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* uart */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, "uart", 0);
 
 	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->drq_wr_callback().set(FUNC(b2m_state::b2m_fdc_drq));
@@ -248,13 +248,13 @@ MACHINE_CONFIG_START(b2m_state::b2m)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("128K").set_default_value(0x00);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(b2m_state::b2mrom)
+void b2m_state::b2mrom(machine_config &config)
+{
 	b2m(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(b2m_rom_io)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &b2m_state::b2m_rom_io);
+}
 
 /* ROM definition */
 

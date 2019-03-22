@@ -268,19 +268,20 @@ static INPUT_PORTS_START( lw700i )
 
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(lw700i_state::lw700i)
-	MCFG_DEVICE_ADD("maincpu", H83003, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+void lw700i_state::lw700i(machine_config &config)
+{
+	H83003(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &lw700i_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &lw700i_state::io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(lw700i_state::vbl_interrupt), "screen", 0, 1);
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_UPDATE_DRIVER(lw700i_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 480, 0, 128)
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_screen_update(FUNC(lw700i_state::screen_update));
+	m_screen->set_size(640, 400);
+	m_screen->set_visarea(0, 480, 0, 128);
+}
 
 ROM_START(blw700i)
 	ROM_REGION(0x200000, "maincpu", 0)      /* H8/3003 program ROM */

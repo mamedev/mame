@@ -1103,7 +1103,7 @@ void bulletf_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( bullet )
+//  machine_config( bullet )
 //-------------------------------------------------
 
 void bullet_state::bullet(machine_config &config)
@@ -1184,7 +1184,7 @@ void bullet_state::bullet(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( bulletf )
+//  machine_config( bulletf )
 //-------------------------------------------------
 
 void bulletf_state::bulletf(machine_config &config)

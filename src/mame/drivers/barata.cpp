@@ -307,7 +307,8 @@ READ8_MEMBER(barata_state::port2_r)
 *    Machine Drivers    *
 ************************/
 
-MACHINE_CONFIG_START(barata_state::barata)
+void barata_state::barata(machine_config &config)
+{
 	/* basic machine hardware */
 	I8051(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->port_out_cb<0>().set(FUNC(barata_state::port0_w));
@@ -322,7 +323,7 @@ MACHINE_CONFIG_START(barata_state::barata)
 	SPEAKER(config, "speaker").front_center();
 
 	/* TODO: add sound samples */
-MACHINE_CONFIG_END
+}
 
 /*************************
 *        Rom Load        *

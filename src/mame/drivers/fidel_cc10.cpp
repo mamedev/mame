@@ -13,14 +13,12 @@ TODO:
 
 Fidelity Chess Challenger 10 (CCX)
 -------------------
-4 versions are known to exist: A,B,C,D. Strangely, version C(UCC10) has an 8080
-instead of Z80. Chess Challenger 1,3 and 7 also run on very similar hardware.
+3 versions are known to exist: A,B,C. Strangely, version C(UCC10) has an 8080
+instead of Z80 and no beeper, it's on CC1-based hardware.
 
 Z80A CPU @ 4MHz, NEC D8255C
 4KB ROM(NEC 2332A), 2*256 bytes RAM(4*NEC 2111AL-4)
-
 The beeper is via a 556 timer, fixed-frequency at around 1300-1400Hz.
-Not all hardware configurations include the beeper.
 
 Checker Challenger 4 (ACR) is on the same PCB, twice less RAM and the beeper gone.
 

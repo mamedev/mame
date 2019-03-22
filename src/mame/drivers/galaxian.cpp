@@ -7035,6 +7035,12 @@ void galaxian_state::init_nolock()
 	space.unmap_write(0x6002, 0x6002, 0x7f8);
 }
 
+// The first rom loads at 0800, then 1800, 2800?, 3800 and 4800.
+// Unfortunately the 3rd rom appears to be total garbage.
+// Each block of 256 bytes is in reverse order. Some code
+// is missing: 00xx, 4Axx, 10xx, 11xx at least. The game
+// uses 0200-05FF as RAM. It also accesses 6000, 6800, 700x, 7800.
+// Perhaps the missing code was stored in battery-backed RAM?
 void galaxian_state::init_warofbugg()
 {
 	uint8_t* romdata = memregion("maincpu")->base();
@@ -7042,9 +7048,10 @@ void galaxian_state::init_warofbugg()
 	uint8_t buf[0x4000];
 	memcpy(buf, romdata, 0x4000);
 
-	// the rom data is at the very least, backwards, but there still seems to be missing code
-	for (int i = 0; i < 0x4000; i++)
-		romdata[i] = buf[i^0x7ff];
+	// unscramble each block
+	for (int i = 0; i < 0x40; i++)
+		for (int j = 0; j < 0x100; j++)
+			romdata[i*256+j] = buf[i*256+(j^0xff)];
 
 	init_nolock();
 
@@ -8460,11 +8467,11 @@ ROM_END
 
 ROM_START( warofbugg )
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD( "wotbg-u-1.bin",   0x0000, 0x0800, CRC(f43ff0a8) SHA1(b87abeb8af9105fa8fba78f9a68363bd89066e7f) )
-	ROM_LOAD( "wotbg-v-2.bin",   0x0800, 0x0800, CRC(eb7a028b) SHA1(8c822ae11d3cc04f749a7cd639d15b9fc830ab35) )
-	ROM_LOAD( "wotbg-w-3.bin",   0x1000, 0x0800, CRC(693e0e50) SHA1(00b19969cee0f95bfb8251c2df133ff2c9ae3b00) )
-	ROM_LOAD( "wotbg-y-4.bin",   0x1800, 0x0800, CRC(885d4982) SHA1(4aeaf514a9413a9cb9a971fd258c6cf46ca66fc4) )
-	ROM_LOAD( "wotbg-z-5.bin",   0x2000, 0x0800, CRC(60041ef2) SHA1(cced5837a037ac5cd8fa6260d69d8e33de5ecd48) )
+	ROM_LOAD( "wotbg-u-1.bin",   0x0000, 0x0800, CRC(f43ff0a8) SHA1(b87abeb8af9105fa8fba78f9a68363bd89066e7f) ) // -> 0800
+	ROM_LOAD( "wotbg-v-2.bin",   0x0800, 0x0800, CRC(eb7a028b) SHA1(8c822ae11d3cc04f749a7cd639d15b9fc830ab35) ) // -> 1800
+	ROM_LOAD( "wotbg-w-3.bin",   0x1000, 0x0800, CRC(693e0e50) SHA1(00b19969cee0f95bfb8251c2df133ff2c9ae3b00) ) // -> ???? garbage
+	ROM_LOAD( "wotbg-y-4.bin",   0x1800, 0x0800, CRC(885d4982) SHA1(4aeaf514a9413a9cb9a971fd258c6cf46ca66fc4) ) // -> 3800
+	ROM_LOAD( "wotbg-z-5.bin",   0x2000, 0x0800, CRC(60041ef2) SHA1(cced5837a037ac5cd8fa6260d69d8e33de5ecd48) ) // -> 4800
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "warofbug.1k",  0x0000, 0x0800, CRC(8100fa85) SHA1(06641c431cace36dec98b87555f62e72f3e53a31) )
