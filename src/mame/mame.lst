@@ -916,6 +916,9 @@ adm23                           //
 @source:adm31.cpp
 adm31                           //
 
+@source:adm36.cpp
+adm36                           //
+
 @source:adp.cpp
 fashiong                        // (c) 1997
 fashiong2                       // (c) 1997
