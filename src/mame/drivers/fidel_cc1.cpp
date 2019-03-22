@@ -1,9 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:Berger
+// thanks-to:Berger, Sean Riddle
 /******************************************************************************
 *
 * fidel_cc1.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
+
+Fidelity's 1st generation chess computers:
+- *Chess Challenger
+- *Chess Challenger 3
+- *Chess Challenger 10 (UCC10)
+
+* denotes not dumped (actually CC1 is dumped, but with half of the contents missing)
 
 TODO:
 - driver is untested, but it should be easy to get working when a good dump
@@ -11,12 +18,13 @@ TODO:
 
 *******************************************************************************
 
-Fidelity Chess Challenger (1)
--------------------
+Chess Challenger (1)
+--------------------
 This is the world's 1st released dedicated chess computer. Oddly, the rows/columns
-are reversed: left to right is 1-8, bottom to top is A-H, eg. pawn from d2 to d4
-is 4b to 4d here.
+are reversed: left to right is 1-8, bottom to top is A-H, eg. pawn from D2 to D4
+is 4B to 4D here.
 
+PCB label PC-P-86, P179 C-2 7.77
 NEC 8080AF @ 2MHz(18MHz XTAL through a 8224)
 Everything goes via a NEC B8228, its special features are unused.
 NEC 2316A ROM(2KB), 4*2101AL RAM(0.5KB total)
@@ -24,6 +32,10 @@ NEC 2316A ROM(2KB), 4*2101AL RAM(0.5KB total)
 
 Chess Challenger 3 is on the same hardware, but with double ROM size, and they
 corrected the reversed chess notation. It was also offered as an upgrade to CC1.
+
+Chess Challenger 10 version 'C'(model UCC10) is on (nearly) the same PCB too,
+label P179 C-3 9.77, with a small daughterboard for 8KB ROM. Again, it was also
+offered as an upgrade to CC1, or CC3.
 
 ******************************************************************************/
 
@@ -88,8 +100,10 @@ READ8_MEMBER(cc1_state::ppi_porta_r)
 {
 	// 74148(priority encoder) I0-I7: inputs
 	// d0-d2: 74148 S0-S2, d3: 74148 GS
+	u8 data = count_leading_zeros(m_inp_matrix[0]->read()) - 24;
+
 	// d5-d7: more inputs (direct)
-	u8 data = (count_leading_zeros(m_inp_matrix[0]->read()) - 24) | (~m_inp_matrix[1]->read() << 5 & 0xe0);
+	data |= ~m_inp_matrix[1]->read() << 5 & 0xe0;
 
 	// d4: 555 Q
 	return data | ((m_delay->enabled()) ? 0x10 : 0);
