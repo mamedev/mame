@@ -943,6 +943,7 @@ FORMATS["NASCOM_DSK"] = true
 FORMATS["NASLITE_DSK"] = true
 FORMATS["NES_DSK"] = true
 FORMATS["NFD_DSK"] = true
+FORMATS["OPD_DSK"] = true
 FORMATS["ORAO_CAS"] = true
 FORMATS["ORIC_DSK"] = true
 FORMATS["ORIC_TAP"] = true

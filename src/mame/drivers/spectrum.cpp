@@ -443,8 +443,8 @@ void spectrum_state::spectrum_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rw(FUNC(spectrum_state::spectrum_rom_r), FUNC(spectrum_state::spectrum_rom_w));
 	map(0x4000, 0x5aff).ram().share("video_ram");
-	//  AM_RANGE(0x5b00, 0x7fff) AM_RAM
-	//  AM_RANGE(0x8000, 0xffff) AM_RAM
+	//map(0x5b00, 0x7fff).ram();
+	//map(0x8000, 0xffff).ram();
 }
 
 void spectrum_state::spectrum_fetch(address_map &map)

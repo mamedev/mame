@@ -167,7 +167,7 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 #include "melodik.h"
 #include "mface.h"
 #include "mikroplus.h"
-//#include "opus.h"
+#include "opus.h"
 #include "plus2test.h"
 //#include "plusd.h"
 #include "protek.h"
@@ -190,7 +190,7 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("mface128", SPECTRUM_MFACE128);
 	device.option_add("mikroplus", SPECTRUM_MIKROPLUS);
 	device.option_add("mprint", SPECTRUM_MPRINT);
-	//device.option_add("opus", SPECTRUM_OPUS);
+	device.option_add("opus", SPECTRUM_OPUS);
 	//device.option_add("plusd", SPECTRUM_PLUSD);
 	device.option_add("protek", SPECTRUM_PROTEK);
 	device.option_add("specdrum", SPECTRUM_SPECDRUM);
@@ -209,6 +209,7 @@ void spec128_expansion_devices(device_slot_interface &device)
 	device.option_add("mface128", SPECTRUM_MFACE128);
 	device.option_add("mikroplus", SPECTRUM_MIKROPLUS);
 	device.option_add("mprint", SPECTRUM_MPRINT);
+	device.option_add("opus", SPECTRUM_OPUS);
 	device.option_add("plus2test", SPECTRUM_PLUS2TEST);
 	device.option_add("protek", SPECTRUM_PROTEK);
 	device.option_add("specdrum", SPECTRUM_SPECDRUM);
