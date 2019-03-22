@@ -3774,6 +3774,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/aci_borisdpl.cpp",
 	MAME_DIR .. "src/mame/drivers/adm23.cpp",
 	MAME_DIR .. "src/mame/drivers/adm31.cpp",
+	MAME_DIR .. "src/mame/drivers/adm36.cpp",
 	MAME_DIR .. "src/mame/drivers/akaiax80.cpp",
 	MAME_DIR .. "src/mame/drivers/alcat7100.cpp",
 	MAME_DIR .. "src/mame/drivers/alesis_qs.cpp",
