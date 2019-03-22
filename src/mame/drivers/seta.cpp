@@ -8039,7 +8039,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::calibr50_interrupt)
 
 void usclssic_state::machine_start()
 {
-	m_buttonmux->write_ab(0xff);
+	m_buttonmux->ab_w(0xff);
 }
 
 

@@ -184,7 +184,7 @@ WRITE_LINE_MEMBER(rastan_state::rastan_msm5205_vck)
 
 	if (m_adpcm_ff)
 	{
-		m_adpcm_sel->write_ba(m_adpcm_data[m_adpcm_pos]);
+		m_adpcm_sel->ba_w(m_adpcm_data[m_adpcm_pos]);
 		m_adpcm_pos = (m_adpcm_pos + 1) & 0xffff;
 	}
 }

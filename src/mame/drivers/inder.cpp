@@ -1268,9 +1268,9 @@ WRITE8_MEMBER( inder_state::sndbank_w )
 void inder_state::update_mus()
 {
 	if ((m_sound_addr < 0x40000) && (m_sndbank != 0xff))
-		m_13->write_ba(m_p_speech[m_sound_addr]);
+		m_13->ba_w(m_p_speech[m_sound_addr]);
 	else
-		m_13->write_ba(0);
+		m_13->ba_w(0);
 }
 
 WRITE_LINE_MEMBER( inder_state::qc7a_w )
