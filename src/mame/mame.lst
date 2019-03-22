@@ -37685,6 +37685,10 @@ timepltc                        // GX393 (c) 1982 + Centuri license
 timetrv                         // (c) 1991.10 Virtual Image Productions
 timetrv2                        // (c) 1991.10 Virtual Image Productions
 
+@source:titan_soc.cpp
+megadri4
+megadri4a
+
 @source:timex.cpp
 tc2048                          // 198? TC2048
 ts2068                          // 1983 TS2068
