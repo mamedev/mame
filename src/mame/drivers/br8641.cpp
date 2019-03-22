@@ -158,7 +158,8 @@ static const z80_daisy_config daisy_chain_intf[] =
 
 
 
-MACHINE_CONFIG_START(brandt8641_state::brandt8641)
+void brandt8641_state::brandt8641(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(4'000'000)); // U4 ,4MHz crystal on board
 	m_maincpu->set_addrmap(AS_PROGRAM, &brandt8641_state::brandt8641_mem);
@@ -167,8 +168,7 @@ MACHINE_CONFIG_START(brandt8641_state::brandt8641)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 2000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	// Z80APIO U9
 	// Z80APIO U14
@@ -186,7 +186,7 @@ MACHINE_CONFIG_START(brandt8641_state::brandt8641)
 	m_pio3->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80CTC(config, "ctc", XTAL(4'000'000)); // Z80CTC U8
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( br8641 )

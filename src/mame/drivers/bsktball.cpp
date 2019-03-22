@@ -238,11 +238,11 @@ void bsktball_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(bsktball_state::bsktball)
-
+void bsktball_state::bsktball(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502,750000)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M6502(config, m_maincpu, 750000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bsktball_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(bsktball_state::bsktball_scanline), "screen", 0, 1);
 
 	f9334_device &outlatch(F9334(config, "outlatch")); // M6
@@ -255,13 +255,13 @@ MACHINE_CONFIG_START(bsktball_state::bsktball)
 	outlatch.q_out_cb<7>().set(FUNC(bsktball_state::nmion_w)); // NMI On
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bsktball_state, screen_update_bsktball)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 28*8);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(bsktball_state::screen_update_bsktball));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bsktball);
 	PALETTE(config, m_palette, FUNC(bsktball_state::bsktball_palette), 2*4 + 4*4*4*4, 4);
@@ -270,7 +270,7 @@ MACHINE_CONFIG_START(bsktball_state::bsktball)
 	SPEAKER(config, "mono").front_center();
 
 	DISCRETE(config, m_discrete, bsktball_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 

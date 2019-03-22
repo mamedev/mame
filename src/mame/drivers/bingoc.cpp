@@ -168,40 +168,40 @@ static INPUT_PORTS_START( bingoc )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(bingoc_state::bingoc)
+void bingoc_state::bingoc(machine_config &config)
+{
+	M68000(config, m_maincpu, 8000000);      /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &bingoc_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(bingoc_state::irq2_line_hold));
 
-	MCFG_DEVICE_ADD("maincpu", M68000,8000000)      /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bingoc_state,  irq2_line_hold)
-
-	MCFG_DEVICE_ADD("soundcpu", Z80,4000000)        /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io)
+	Z80(config, m_soundcpu, 4000000);        /* ? MHz */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &bingoc_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &bingoc_state::sound_io);
 #if SOUND_TEST
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bingoc_state,  nmi_line_pulse)
+	m_soundcpu->set_vblank_int("screen", FUNC(bingoc_state::nmi_line_pulse));
 #endif
 
-	MCFG_DEVICE_ADD("uart1", I8251, 4000000) // unknown
-	MCFG_DEVICE_ADD("uart2", I8251, 4000000) // unknown
-	MCFG_DEVICE_ADD("uart3", I8251, 4000000) // unknown
-	MCFG_DEVICE_ADD("uart4", I8251, 4000000) // unknown
-	MCFG_DEVICE_ADD("uart5", I8251, 4000000) // unknown
-	MCFG_DEVICE_ADD("uart6", I8251, 4000000) // unknown
-	MCFG_DEVICE_ADD("uart7", I8251, 4000000) // unknown
-	MCFG_DEVICE_ADD("uart8", I8251, 4000000) // unknown
+	I8251(config, "uart1", 4000000); // unknown
+	I8251(config, "uart2", 4000000); // unknown
+	I8251(config, "uart3", 4000000); // unknown
+	I8251(config, "uart4", 4000000); // unknown
+	I8251(config, "uart5", 4000000); // unknown
+	I8251(config, "uart6", 4000000); // unknown
+	I8251(config, "uart7", 4000000); // unknown
+	I8251(config, "uart8", 4000000); // unknown
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5338A, 0) // ?
+	SEGA_315_5338A(config, "io", 0); // ?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bingoc_state, screen_update_bingoc)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(bingoc_state::screen_update_bingoc));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, "palette").set_entries(0x100);
 
 
 	SPEAKER(config, "lspeaker").front_left(); //might just be mono...
@@ -211,10 +211,10 @@ MACHINE_CONFIG_START(bingoc_state::bingoc)
 
 	YM2151(config, "ymsnd", 7159160/2).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 ROM_START( bingoc )
 	ROM_REGION( 0x40000, "maincpu", 0 )

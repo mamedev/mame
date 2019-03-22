@@ -364,24 +364,24 @@ MACHINE_RESET_MEMBER(blmbycar_state,blmbycar)
 }
 
 
-MACHINE_CONFIG_START(blmbycar_state::blmbycar)
-
+void blmbycar_state::blmbycar(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12MHz */
-	MCFG_DEVICE_PROGRAM_MAP(blmbycar_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blmbycar_state,  irq1_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);   /* 12MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &blmbycar_state::blmbycar_map);
+	m_maincpu->set_vblank_int("screen", FUNC(blmbycar_state::irq1_line_hold));
 
 	MCFG_MACHINE_START_OVERRIDE(blmbycar_state,blmbycar)
 	MCFG_MACHINE_RESET_OVERRIDE(blmbycar_state,blmbycar)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x180, 0x100)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0x100-1)
-	MCFG_SCREEN_UPDATE_DRIVER(blmbycar_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(0x180, 0x100);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(blmbycar_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_blmbycar);
 
@@ -394,10 +394,10 @@ MACHINE_CONFIG_START(blmbycar_state::blmbycar)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, blmbycar_oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.set_addrmap(0, &blmbycar_state::blmbycar_oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 MACHINE_START_MEMBER(blmbycar_state,watrball)
@@ -412,21 +412,21 @@ MACHINE_RESET_MEMBER(blmbycar_state,watrball)
 	m_retvalue = 0;
 }
 
-MACHINE_CONFIG_START(blmbycar_state::watrball)
+void blmbycar_state::watrball(machine_config &config)
+{
 	blmbycar(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(watrball_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &blmbycar_state::watrball_map);
 
 	MCFG_MACHINE_START_OVERRIDE(blmbycar_state,watrball)
 	MCFG_MACHINE_RESET_OVERRIDE(blmbycar_state,watrball)
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x180-1, 16, 0x100-1)
-MACHINE_CONFIG_END
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_visarea(0, 0x180-1, 16, 0x100-1);
+}
 
 
 /***************************************************************************

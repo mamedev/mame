@@ -53,22 +53,23 @@ static INPUT_PORTS_START( bntyhunt )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(bntyhunt_state::bntyhunt)
+void bntyhunt_state::bntyhunt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PENTIUM, 200000000) /* Probably a Pentium or higher .. ?? Mhz*/
-	MCFG_DEVICE_PROGRAM_MAP(bntyhunt_map)
+	PENTIUM(config, m_maincpu, 200000000); /* Probably a Pentium or higher .. ?? Mhz*/
+	m_maincpu->set_addrmap(AS_PROGRAM, &bntyhunt_state::bntyhunt_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(bntyhunt_state, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(bntyhunt_state::screen_update));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea_full();
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(0x100);
+}
 
 
 ROM_START(bntyhunt)

@@ -336,13 +336,13 @@ DECO16IC_BANK_CB_MEMBER(boogwing_state::bank_callback2)
 	return offset;
 }
 
-MACHINE_CONFIG_START(boogwing_state::boogwing)
-
+void boogwing_state::boogwing(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, MAIN_XTAL/2)   /* DE102 */
-	MCFG_DEVICE_PROGRAM_MAP(boogwing_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", boogwing_state,  irq6_line_hold)
+	M68000(config, m_maincpu, MAIN_XTAL/2);   /* DE102 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &boogwing_state::boogwing_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &boogwing_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(boogwing_state::irq6_line_hold));
 
 	H6280(config, m_audiocpu, SOUND_XTAL/4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &boogwing_state::audio_map);
@@ -350,14 +350,14 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_XTAL / 4, 442, 0, 320, 274, 8, 248) // same as robocop2(cninja.cpp)? verify this from real pcb.
-	MCFG_SCREEN_UPDATE_DRIVER(boogwing_state, screen_update_boogwing)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MAIN_XTAL / 4, 442, 0, 320, 274, 8, 248); // same as robocop2(cninja.cpp)? verify this from real pcb.
+	screen.set_screen_update(FUNC(boogwing_state::screen_update_boogwing));
 
 	GFXDECODE(config, "gfxdecode", m_deco_ace, gfx_boogwing);
 
-	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
-	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
+	BUFFERED_SPRITERAM16(config, m_spriteram[1]);
 
 	DECO_ACE(config, m_deco_ace, 0);
 
@@ -419,14 +419,14 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	ymsnd.add_route(0, "lspeaker", 0.80);
 	ymsnd.add_route(1, "rspeaker", 0.80);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, SOUND_XTAL/32, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.40)
+	OKIM6295(config, m_oki[0], SOUND_XTAL/32, okim6295_device::PIN7_HIGH);
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.40);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.40);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, SOUND_XTAL/16, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], SOUND_XTAL/16, okim6295_device::PIN7_HIGH);
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+}
 
 /**********************************************************************************/
 

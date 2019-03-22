@@ -79,15 +79,16 @@ INTERRUPT_GEN_MEMBER(adder5_state::ad5_fake_timer_int)
 //  m_maincpu->set_input_line_and_vector(5, HOLD_LINE, 0x8c);
 }
 
-MACHINE_CONFIG_START(adder5_state::bfm_ad5)
-	MCFG_DEVICE_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
-	MCFG_DEVICE_PROGRAM_MAP(ad5_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(adder5_state, ad5_fake_timer_int, 1000)
+void adder5_state::bfm_ad5(machine_config &config)
+{
+	MCF5206E(config, m_maincpu, 40000000); /* MCF5206eFT */
+	m_maincpu->set_addrmap(AS_PROGRAM, &adder5_state::ad5_map);
+	m_maincpu->set_periodic_int(FUNC(adder5_state::ad5_fake_timer_int), attotime::from_hz(1000));
 	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound */
-MACHINE_CONFIG_END
+}
 
 #include "bfm_ad5sw.hxx"

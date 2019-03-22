@@ -939,21 +939,22 @@ static void bml3_cards(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(bml3_state::bml3_common)
+void bml3_state::bml3_common(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, MC6809, CPU_EXT_CLOCK)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bml3_state,  bml3_timer_firq)
-//  MCFG_DEVICE_PERIODIC_INT_DRIVER(bml3_state, bml3_firq, 45)
+	MC6809(config, m_maincpu, CPU_EXT_CLOCK);
+	m_maincpu->set_vblank_int("screen", FUNC(bml3_state::bml3_timer_firq));
+//  m_maincpu->set_periodic_int(FUNC(bml3_state::bml3_firq), attotime::fromhz(45));
 
 //  MCFG_MACHINE_RESET_OVERRIDE(bml3_state,bml3)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2400)) /* Service manual specifies "Raster return period" as 2.4 ms (p.64), although the total vertical non-displaying time seems to be 4 ms. */
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2400)); /* Service manual specifies "Raster return period" as 2.4 ms (p.64), although the total vertical non-displaying time seems to be 4 ms. */
+	screen.set_size(640, 400);
+	screen.set_visarea(0, 320-1, 0, 200-1);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	/* Devices */
@@ -1000,19 +1001,18 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 	   User may want to switch this to MP-1802 (5.25" DS/DD).
 	   Note it isn't feasible to use both, as they each place boot ROM at F800.
 	 */
-	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl1", bml3_cards, "bml3mp1805")
-	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl2", bml3_cards, nullptr)
-	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl3", bml3_cards, nullptr)
-	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl4", bml3_cards, nullptr)
-	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl5", bml3_cards, nullptr)
-	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl6", bml3_cards, "bml3kanji")
+	BML3BUS_SLOT(config, "sl1", "bml3bus", bml3_cards, "bml3mp1805");
+	BML3BUS_SLOT(config, "sl2", "bml3bus", bml3_cards, nullptr);
+	BML3BUS_SLOT(config, "sl3", "bml3bus", bml3_cards, nullptr);
+	BML3BUS_SLOT(config, "sl4", "bml3bus", bml3_cards, nullptr);
+	BML3BUS_SLOT(config, "sl5", "bml3bus", bml3_cards, nullptr);
+	BML3BUS_SLOT(config, "sl6", "bml3bus", bml3_cards, "bml3kanji");
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(bml3_state::bml3)
+void bml3_state::bml3(machine_config &config)
+{
 	bml3_common(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(bml3_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bml3_state::bml3_mem);
 
 #if 0
 	// TODO: slot device for sound card
@@ -1024,23 +1024,23 @@ MACHINE_CONFIG_START(bml3_state::bml3)
 	m_ym2203->add_route(2, "mono", 0.50);
 	m_ym2203->add_route(3, "mono", 0.50);
 #endif
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(bml3_state::bml3mk2)
+void bml3_state::bml3mk2(machine_config &config)
+{
 	bml3_common(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(bml3mk2_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bml3_state::bml3mk2_mem);
 
 	// TODO: anything to add here?
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(bml3_state::bml3mk5)
+void bml3_state::bml3mk5(machine_config &config)
+{
 	bml3_common(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(bml3mk5_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bml3_state::bml3mk5_mem);
 
 	// TODO: anything to add here?
-MACHINE_CONFIG_END
+}
 
 
 

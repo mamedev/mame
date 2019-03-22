@@ -304,25 +304,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(blockout_state::blockout_scanline)
 		m_maincpu->set_input_line(5, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(blockout_state::blockout)
-
+void blockout_state::blockout(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, MAIN_CLOCK)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, MAIN_CLOCK);       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
+	m_maincpu->set_addrmap(AS_PROGRAM, &blockout_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(blockout_state::blockout_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, AUDIO_CLOCK)  /* 3.579545 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	Z80(config, m_audiocpu, AUDIO_CLOCK);  /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &blockout_state::audio_map);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	/* assume same as ddragon3 with adjusted visible display area */
-	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 448, 0, 320, 272, 10, 250)
-	MCFG_SCREEN_UPDATE_DRIVER(blockout_state, screen_update_blockout)
-	MCFG_SCREEN_PALETTE("palette")
+	m_screen->set_raw(XTAL(28'000'000) / 4, 448, 0, 320, 272, 10, 250);
+	m_screen->set_screen_update(FUNC(blockout_state::screen_update_blockout));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 513)
+	PALETTE(config, m_palette).set_entries(513);
 
 
 	/* sound hardware */
@@ -337,16 +337,16 @@ MACHINE_CONFIG_START(blockout_state::blockout)
 	ymsnd.add_route(0, "lspeaker", 0.60);
 	ymsnd.add_route(1, "rspeaker", 0.60);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+}
 
-MACHINE_CONFIG_START(blockout_state::agress)
+void blockout_state::agress(machine_config &config)
+{
 	blockout(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(agress_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &blockout_state::agress_map);
+}
 
 /*************************************
  *

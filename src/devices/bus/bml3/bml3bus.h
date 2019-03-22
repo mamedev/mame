@@ -16,15 +16,6 @@
 
 #define BML3BUS_MAX_SLOTS 6
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_BML3BUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, BML3BUS_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	downcast<bml3bus_slot_device &>(*device).set_bml3bus_slot(_nbtag, _tag);
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -37,7 +28,18 @@ class bml3bus_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	bml3bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	bml3bus_slot_device(machine_config const &mconfig, const char *tag, device_t *owner, const char *nbtag, T &&opts, const char *dflt)
+		: bml3bus_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+		set_bml3bus_slot(nbtag, tag);
+	}
+
+	bml3bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
 	virtual void device_start() override;

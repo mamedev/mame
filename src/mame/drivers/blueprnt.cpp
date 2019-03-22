@@ -346,17 +346,17 @@ void blueprnt_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(blueprnt_state::blueprnt)
-
+void blueprnt_state::blueprnt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 7000000/2) // 3.5 MHz
-	MCFG_DEVICE_PROGRAM_MAP(blueprnt_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blueprnt_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 7000000/2); // 3.5 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &blueprnt_state::blueprnt_map);
+	m_maincpu->set_vblank_int("screen", FUNC(blueprnt_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 10000000/2/2/2)   // 1.25 MHz (2H)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(blueprnt_state, irq0_line_hold,  4*60) // IRQs connected to 32V
+	Z80(config, m_audiocpu, 10000000/2/2/2);   // 1.25 MHz (2H)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &blueprnt_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &blueprnt_state::sound_io);
+	m_audiocpu->set_periodic_int(FUNC(blueprnt_state::irq0_line_hold), attotime::from_hz(4*60)); // IRQs connected to 32V
 									// NMIs are caused by the main CPU
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
@@ -364,14 +364,15 @@ MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(blueprnt_state::screen_update_blueprnt));
+	screen.set_palette(m_palette);
+
 	MCFG_VIDEO_START_OVERRIDE(blueprnt_state, blueprnt)
-	MCFG_SCREEN_UPDATE_DRIVER(blueprnt_state, screen_update_blueprnt)
-	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_blueprnt);
 	PALETTE(config, m_palette, FUNC(blueprnt_state::blueprnt_palette), 128*4+8);
@@ -390,15 +391,15 @@ MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 	ay2.port_a_read_callback().set_ioport("DILSW1");
 	ay2.port_b_read_callback().set_ioport("DILSW2");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(blueprnt_state::grasspin)
+void blueprnt_state::grasspin(machine_config &config)
+{
 	blueprnt(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(grasspin_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &blueprnt_state::grasspin_map);
+}
 
 /*************************************
  *
