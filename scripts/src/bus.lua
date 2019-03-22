@@ -266,6 +266,10 @@ if (BUSES["ASTROCADE"]~=null) then
 		MAME_DIR .. "src/devices/bus/astrocde/joy.h",
 		MAME_DIR .. "src/devices/bus/astrocde/cassette.cpp",
 		MAME_DIR .. "src/devices/bus/astrocde/cassette.h",
+		MAME_DIR .. "src/devices/bus/astrocde/accessory.cpp",
+		MAME_DIR .. "src/devices/bus/astrocde/accessory.h",
+		MAME_DIR .. "src/devices/bus/astrocde/lightpen.cpp",
+		MAME_DIR .. "src/devices/bus/astrocde/lightpen.h",
 	}
 end
 

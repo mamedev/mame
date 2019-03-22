@@ -18,6 +18,7 @@
 #include "bus/astrocde/exp.h"
 #include "bus/astrocde/ram.h"
 #include "bus/astrocde/ctrl.h"
+#include "bus/astrocde/accessory.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -31,6 +32,7 @@ public:
 		, m_cart(*this, "cartslot")
 		, m_exp(*this, "exp")
 		, m_ctrl(*this, "ctrl%u", 1U)
+		, m_accessory(*this, "accessory")
 		, m_keypad(*this, "KEYPAD%u", 0U)
 	{ }
 
@@ -45,6 +47,7 @@ private:
 	required_device<astrocade_cart_slot_device> m_cart;
 	required_device<astrocade_exp_device> m_exp;
 	required_device_array<astrocade_ctrl_port_device, 4> m_ctrl;
+	required_device<astrocade_accessory_port_device> m_accessory;
 	required_ioport_array<4> m_keypad;
 };
 
@@ -215,6 +218,10 @@ void astrocde_home_state::astrocde(machine_config &config)
 
 	/* cartridge */
 	ASTROCADE_CART_SLOT(config, m_cart, astrocade_cart, nullptr);
+
+	/* cartridge */
+	ASTROCADE_ACCESSORY_PORT(config, m_accessory, m_screen, astrocade_accessories, nullptr);
+	m_accessory->ltpen_handler().set(FUNC(astrocde_home_state::lightpen_trigger_w));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("astrocde");
