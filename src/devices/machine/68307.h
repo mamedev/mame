@@ -44,6 +44,8 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 4; }
 	virtual uint32_t execute_max_cycles() const override { return 158; }
 
+	virtual void m68k_reset_peripherals() override;
+
 private:
 	void set_ipl(int level);
 	DECLARE_WRITE_LINE_MEMBER(timer0_interrupt);
