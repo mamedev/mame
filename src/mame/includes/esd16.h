@@ -77,7 +77,7 @@ private:
 	u8 eeprom_r();
 	void eeprom_w(u8 data);
 	void sound_rombank_w(u8 data);
-	template<unsigned Layer> void vram_w(offs_t offset, u16 data, u16 mem_mask);
+	template<unsigned Layer> void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void tilemap0_color_w(u16 data);
 	void tilemap0_color_jumppop_w(u16 data);
 	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info);
