@@ -38444,6 +38444,9 @@ uts20                           //
 @source:unkhorse.cpp
 unkhorse                        //
 
+@source:unkpoker.cpp
+unkpoker                         //
+
 @source:upscope.cpp
 upscope                         // (c) 1986 Grand products
 
