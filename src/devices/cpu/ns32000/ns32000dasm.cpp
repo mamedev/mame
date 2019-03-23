@@ -780,6 +780,7 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			stream_gen(stream, Format9gen1(opcode), Format9i(opcode), pc, opcodes);
 			break;
 		}
+		break;
 
 	case 0x0b: /* Format 11 */
 		pc += 3;
