@@ -18,10 +18,10 @@
 		<year>2003</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="AGB-BJBE-USA, AGB-BJBP-EUR, AGB-BJBP-EUR-1"/>
-		<feature name="pcb" value="AGB-E03-20" />
-		<feature name="u1" value="U1 GPIO MASKROM" />
-		<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-bjbp-0.u1" size="8388608" crc="9d4f1e18" sha1="fc6163f99b71b05c10686a0d29010b31274e1dc4" offset="000000" />
@@ -832,10 +832,10 @@
 		<info name="serial" value="AGB-BAZJ-JPN"/>
 		<info name="release" value="20040326"/>
 		<info name="alt_title" value="あかちゃんどうぶつ園 動物のあかちゃん飼育係育成ゲーム"/>
-		<feature name="pcb" value="AGB-E03-20" />
-		<feature name="u1" value="U1 GPIO MASKROM" />
-		<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-bazj-1.u1" size="4194304" crc="c1072e26" sha1="634624c77c90a8ff40bec9046133c50041efc49b" offset="000000" />
