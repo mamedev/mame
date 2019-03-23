@@ -7,16 +7,15 @@
 	<element name="disk_black"><disk><color red="0.0" green="0.0" blue="0.0" /></disk></element>
 	<element name="disk_grey"><disk><color red="0.6" green="0.6" blue="0.6" /></disk></element>
 
-<!-- TODO: add these, maybe -->
 	<element name="text_game">
 		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
-		<text string="GAME">
+		<text string="GAME (1-3)" align="1">
 			<color red="0.0" green="0.0" blue="0.0" />
 		</text>
 	</element>
 	<element name="text_skill">
 		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
-		<text string="SKILL LEVEL">
+		<text string="SKILL LEVEL (1-4)" align="1">
 			<color red="0.0" green="0.0" blue="0.0" />
 		</text>
 	</element>
@@ -38,6 +37,49 @@
 		<text string="LONGEST">
 			<color red="0.0" green="0.0" blue="0.0" />
 		</text>
+	</element>
+
+	<element name="text_lb">
+		<disk><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<text string="&#x25c4;">
+			<color red="0.3" green="0.4" blue="0.85" />
+		</text>
+	</element>
+	<element name="text_rb">
+		<disk><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<text string="&#x25ba;">
+			<color red="0.3" green="0.4" blue="0.85" />
+		</text>
+	</element>
+	<element name="text_lg">
+		<disk><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<text string="&#x25c4;">
+			<color red="0.33" green="0.8" blue="0.25" />
+		</text>
+	</element>
+	<element name="text_rg">
+		<disk><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<text string="&#x25ba;">
+			<color red="0.33" green="0.8" blue="0.25" />
+		</text>
+	</element>
+
+	<element name="switch_game" defstate="0">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<text state="0x02" string="1"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="0x01" string="2"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="0x04" string="3"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="switch_skill" defstate="0">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<text state="0x02" string="1"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="0x04" string="2"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="0x08" string="3"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="0x01" string="4"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+
+	<element name="nothing" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
 	</element>
 
 	<element name="button_r" defstate="0">
@@ -131,7 +173,6 @@
 			<bounds x="140" y="140" width="20" height="20" />
 		</bezel>
 
-
 		<bezel element="static_black">
 			<bounds x="0" y="90" width="200" height="20" />
 		</bezel>
@@ -149,6 +190,51 @@
 			<bounds x="52" y="90" width="96" height="1" />
 		</bezel>
 
+	<!-- switches -->
+
+		<bezel element="text_game">
+			<bounds x="68" y="93" width="20" height="4" />
+		</bezel>
+		<bezel element="nothing" inputtag="DUMMY" inputmask="0x01">
+			<bounds x="73.9" y="97.9" width="3.2" height="4.2" />
+		</bezel>
+		<bezel element="switch_game" inputtag="IN.0" inputmask="0x07" inputraw="1">
+			<bounds x="74" y="98" width="3" height="4" />
+		</bezel>
+		<bezel element="text_lg">
+			<bounds x="66.5" y="97" width="6" height="6" />
+		</bezel>
+		<bezel element="nothing" inputtag="SWITCH" inputmask="0x01">
+			<bounds x="65.5" y="96" width="8" height="8" />
+		</bezel>
+		<bezel element="text_rg">
+			<bounds x="78" y="97" width="6" height="6" />
+		</bezel>
+		<bezel element="nothing" inputtag="SWITCH" inputmask="0x02">
+			<bounds x="77" y="96" width="8" height="8" />
+		</bezel>
+
+		<bezel element="text_skill">
+			<bounds x="112" y="93" width="30" height="4" />
+		</bezel>
+		<bezel element="nothing" inputtag="DUMMY" inputmask="0x01">
+			<bounds x="122.9" y="97.9" width="3.2" height="4.2" />
+		</bezel>
+		<bezel element="switch_skill" inputtag="IN.3" inputmask="0x0f" inputraw="1">
+			<bounds x="123" y="98" width="3" height="4" />
+		</bezel>
+		<bezel element="text_lb">
+			<bounds x="115.5" y="97" width="6" height="6" />
+		</bezel>
+		<bezel element="nothing" inputtag="SWITCH" inputmask="0x04">
+			<bounds x="114.5" y="96" width="8" height="8" />
+		</bezel>
+		<bezel element="text_rb">
+			<bounds x="127" y="97" width="6" height="6" />
+		</bezel>
+		<bezel element="nothing" inputtag="SWITCH" inputmask="0x08">
+			<bounds x="126" y="96" width="8" height="8" />
+		</bezel>
 
 	<!-- other controls -->
 
