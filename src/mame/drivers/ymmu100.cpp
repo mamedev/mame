@@ -136,6 +136,7 @@
 #include "cpu/h8/h8s2655.h"
 #include "video/hd44780.h"
 #include "sound/swp30.h"
+#include "sound/meg.h"
 
 #include "debugger.h"
 #include "screen.h"
@@ -199,6 +200,7 @@ public:
 		, m_mu80cpu(*this, "mu80cpu")
 		, m_vl70cpu(*this, "vl70cpu")
 		, m_swp30(*this, "swp30")
+		, m_meg(*this, "meg")
 		, m_lcd(*this, "lcd")
 		, m_ioport_p7(*this, "P7")
 		, m_ioport_p8(*this, "P8")
@@ -316,6 +318,7 @@ private:
 	optional_device<h83002_device> m_mu80cpu;
 	optional_device<h83003_device> m_vl70cpu;
 	optional_device<swp30_device> m_swp30;
+	optional_device<meg_device> m_meg;
 	required_device<hd44780_device> m_lcd;
 	optional_ioport m_ioport_p7;
 	optional_ioport m_ioport_p8;
@@ -597,12 +600,14 @@ void mu100_state::mu80_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("mu80cpu", 0);
 	map(0x200000, 0x20ffff).ram(); // 64K work RAM
+	map(0x440000, 0x44001f).m(m_meg, FUNC(meg_device::map));
 }
 
 void mu100_state::vl70_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom().region("vl70cpu", 0);
 	map(0x200000, 0x20ffff).ram(); // 64K work RAM
+	map(0x600000, 0x60001f).m(m_meg, FUNC(meg_device::map));
 }
 
 void mu100_state::mu100_map(address_map &map)
@@ -991,6 +996,8 @@ void mu100_state::mu80(machine_config &config)
 	m_swp30->add_route(0, "lspeaker", 1.0);
 	m_swp30->add_route(1, "rspeaker", 1.0);
 
+	MEG(config, m_meg);
+
 	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
 	midiin_slot(mdin_a);
 	mdin_a.rxd_handler().set("mu80cpu:sci1", FUNC(h8_sci_device::rx_w));
@@ -1022,6 +1029,8 @@ void mu100_state::vl70(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
+
+	MEG(config, m_meg);
 
 	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
 	midiin_slot(mdin_a);

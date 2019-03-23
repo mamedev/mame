@@ -2818,3 +2818,20 @@ if (CPUS["HPC"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hpc/hpcdasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hpc/hpcdasm.h")
 end
+
+--------------------------------------------------
+-- Yamaha Multiple Effects Generator
+--@src/devices/sound/meg.h,CPUS["MEG"] = true
+--------------------------------------------------
+
+if (CPUS["MEG"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/meg.cpp",
+		MAME_DIR .. "src/devices/sound/meg.h",
+	}
+end
+
+if (CPUS["MEG"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/megd.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/megd.h")
+end

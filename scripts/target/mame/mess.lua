@@ -139,6 +139,7 @@ CPUS["CAPRICORN"] = true
 CPUS["ALPHA"] = true
 --CPUS["DSPP"] = true
 CPUS["HPC"] = true
+CPUS["MEG"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
