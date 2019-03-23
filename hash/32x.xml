@@ -114,7 +114,7 @@
 
 	<!-- Dump by Radar -->
 	<software name="pinochio">
-		<description>Pinnochio (Euro, Prototype 19951206)</description>
+		<description>Pinocchio (Euro, Prototype 19951206)</description>
 		<year>1995</year>
 		<publisher>Virgin</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
