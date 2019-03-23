@@ -153,6 +153,7 @@ swp30_device::swp30_device(const machine_config &mconfig, const char *tag, devic
 	  device_rom_interface(mconfig, *this, 25+2, ENDIANNESS_LITTLE, 32),
 	  m_meg(*this, "meg")
 {
+	(void)m_map;
 }
 
 void swp30_device::device_add_mconfig(machine_config &config)

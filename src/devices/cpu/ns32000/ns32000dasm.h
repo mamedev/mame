@@ -112,7 +112,6 @@ private:
 	void stream_gen(std::ostream &stream, u8 gen_addr, u8 op_len, offs_t &pc, const data_buffer &opcodes);
 
 	u32 m_base_pc;
-	unsigned m_pcmask;
 };
 
 #endif
