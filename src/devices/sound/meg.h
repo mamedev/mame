@@ -27,7 +27,7 @@ public:
 	void fp_w(u16 address, u16 value);
 	void offset_w(u16 address, u16 value);
 	void lfo_w(u8 reg, u16 value);
-	void map_w(u8 reg, u16 value); 
+	void map_w(u8 reg, u16 value);
 	u64 prg_r(u16 address) const;
 	virtual u16 fp_r(u16 address) const override;
 	virtual u16 offset_r(u16 address) const override;

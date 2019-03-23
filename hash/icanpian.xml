@@ -5,47 +5,47 @@
     Known cartridges (*=dumped) (#=sourced)
 
     *Piano Favourites (J7522)
-	*Jammin Jungle Safari (Disney The Lion King, Disney The Jungle Book, Disney Tarzan) (K4653)
-	*Jungle Boogie (J7524)
-	*Scooby-Doo! Monster Mayhem (J7525)
-	*Rockin' Dance Party (J8715)
-	*Nicktoons Show Tunes (J7527)
-	*Disney Princess Magical Melodies (K4656)
-	#Barbie Princess Enchanted Sounds
-	#Pop Hits
-	#Dora the Explorer Musical Adventure
-	#American Idol - Take The Stage
-	#Holiday Wonderland
-	#The Wizard of Oz - We're Off to Play the Piano
-	
-	(were there any more?)
-	
-	cartridge pinout (not identical to I Can Play Guitar)
-	
-	1 ground    2 ground
-	3 A1        4 A0
-	5 A3        6 A2
-	7 A5        8 A4
-	9 A7        10 A6
-	11 A18      12 A17
-	13 A20      14 A21
-	15 A8       16 A19
-	17 A10      18 A9
-	19 A12      20 A11
-	21 A14      22 A13
-	23 A16      24 A15
-	25 /OE      26 Vcc
-	27 /CS      28 RW
-	29 Res      30 R7
-	31 D7       32 D15
-	33 D6       34 D14
-	35 D5       36 D13
-	37 D4       38 D12
-	39 D3       40 D11
-	41 D2       42 D10
-	43 D1       44 D9
-	45 D0       46 D8
-	47 ground   48 Gnd	
+    *Jammin Jungle Safari (Disney The Lion King, Disney The Jungle Book, Disney Tarzan) (K4653)
+    *Jungle Boogie (J7524)
+    *Scooby-Doo! Monster Mayhem (J7525)
+    *Rockin' Dance Party (J8715)
+    *Nicktoons Show Tunes (J7527)
+    *Disney Princess Magical Melodies (K4656)
+    #Barbie Princess Enchanted Sounds
+    #Pop Hits
+    #Dora the Explorer Musical Adventure
+    #American Idol - Take The Stage
+    #Holiday Wonderland
+    #The Wizard of Oz - We're Off to Play the Piano
+
+    (were there any more?)
+
+    cartridge pinout (not identical to I Can Play Guitar)
+
+    1 ground    2 ground
+    3 A1        4 A0
+    5 A3        6 A2
+    7 A5        8 A4
+    9 A7        10 A6
+    11 A18      12 A17
+    13 A20      14 A21
+    15 A8       16 A19
+    17 A10      18 A9
+    19 A12      20 A11
+    21 A14      22 A13
+    23 A16      24 A15
+    25 /OE      26 Vcc
+    27 /CS      28 RW
+    29 Res      30 R7
+    31 D7       32 D15
+    33 D6       34 D14
+    35 D5       36 D13
+    37 D4       38 D12
+    39 D3       40 D11
+    41 D2       42 D10
+    43 D1       44 D9
+    45 D0       46 D8
+    47 ground   48 Gnd
 -->
 
 <softwarelist name="icanpian" description="Fisher-Price / Mattel I Can Play Piano cartridges">
@@ -59,7 +59,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dpmagic">
 		<description>Disney Princess Magical Melodies (K4656)</description>
 		<year>2005</year>
@@ -70,7 +70,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jungboog">
 		<description>Jungle Boogie (J7524)</description>
 		<year>2005</year>
@@ -81,7 +81,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="scoobymm">
 		<description>Scooby-Doo! Monster Mayhem (J7525)</description>
 		<year>2005</year>
@@ -92,7 +92,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jjs">
 		<description>Jammin' Jungle Safari (Disney's The Lion King, Jungle Book, Tarzan) (K4653)</description> <!-- Tarzan is shown on the cart, but none of the songs are from it? -->
 		<year>2005</year>
@@ -103,7 +103,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="showtune">
 		<description>Nicktoons Show Tunes (J7527)</description>
 		<year>2005</year>
@@ -114,7 +114,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="rdp">
 		<description>Rockin' Dance Party (J8715)</description>
 		<year>2005</year>
@@ -124,6 +124,6 @@
 				<rom name="icpprockindanceparty.bin" size="0x800000" crc="00d597d3" sha1="603c8d9d11f5e1d075a1b524e99b581d859b43ba" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 </softwarelist>

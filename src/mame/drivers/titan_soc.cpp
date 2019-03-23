@@ -4,20 +4,20 @@
 
     Titan 1.0C (System on a Chip - ARM based processor)
 
-	used by
+    used by
 
-	Atari / Colecovision  / Intellivision Flashback (not dumped)
-	TecToy Mega Drive 4
+    Atari / Colecovision  / Intellivision Flashback (not dumped)
+    TecToy Mega Drive 4
 
 
-	Notes:
+    Notes:
 
-	It is possible to connect a debug terminal
-	Has a USB port for user to plug in a flash drive etc.
-	4MB RAM
+    It is possible to connect a debug terminal
+    Has a USB port for user to plug in a flash drive etc.
+    4MB RAM
 
-	Emulators run on the ARM, games don't use some modes 100% correctly compared to original
-	hardware, only correct for the included emulator.  Some games are not emulation based.
+    Emulators run on the ARM, games don't use some modes 100% correctly compared to original
+    hardware, only correct for the included emulator.  Some games are not emulation based.
 
 */
 

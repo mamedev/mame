@@ -59,7 +59,7 @@
      _I/O B0  20 |_____________| 21  DB0
 
      F38T56 is internal in F3870
-	 note: STROBE is N/C on F3851
+     note: STROBE is N/C on F3851
 */
 
 

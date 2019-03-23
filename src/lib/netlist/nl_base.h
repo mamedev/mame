@@ -1400,7 +1400,7 @@ namespace netlist
 		void reset();
 
 		pstring                             m_name;
-		netlist_t							&m_netlist;
+		netlist_t                           &m_netlist;
 		plib::unique_ptr<plib::dynlib>      m_lib; // external lib needs to be loaded as long as netlist exists
 		plib::state_manager_t               m_state;
 		plib::unique_ptr<callbacks_t>       m_callbacks;

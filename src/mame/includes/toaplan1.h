@@ -60,9 +60,9 @@ protected:
 	std::unique_ptr<u16[]> m_tilevram[4];
 	/*
 	std::unique_ptr<u16[]> m_tilevram[3];   //  ||  Drawn in this order
-	std::unique_ptr<u16[]> m_tilevram[2];   //  || 
+	std::unique_ptr<u16[]> m_tilevram[2];   //  ||
 	std::unique_ptr<u16[]> m_tilevram[1];   // \||/
-	std::unique_ptr<u16[]> m_tilevram[0];   //  \/ 
+	std::unique_ptr<u16[]> m_tilevram[0];   //  \/
 	*/
 
 	optional_shared_ptr<u16> m_spriteram;

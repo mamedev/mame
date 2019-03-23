@@ -26,9 +26,9 @@
 	             Euro / PAL collection, although it's from 2009, so some images may exist in better forms.  These can
 	             be replaced over time.
 
-     15 Mar 19 - Started testing stuff inline to the actual XML parsing, 
+	 15 Mar 19 - Started testing stuff inline to the actual XML parsing,
 	             marking stuff as supported where possible via exploiting "Identifying" dummy comments.
-				 Eventually this list below will be cut off since is worthless and outdated.
+	             Eventually this list below will be cut off since is worthless and outdated.
 
 	*********************************************************************************************************
 	*********************************************************************************************************

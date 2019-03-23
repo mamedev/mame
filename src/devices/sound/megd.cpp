@@ -70,10 +70,10 @@ offs_t meg_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 
 	r = util::string_format("[m%02x]", b(opc, 39, 6));
 
-    if(b(opc, 62, 1))
+	if(b(opc, 62, 1))
 		append(r, "lfo");
 
-    if(b(opc, 23, 1))
+	if(b(opc, 23, 1))
 		switch(b(opc, 24, 2)) {
 		case 0:
 			if(b(opc, 18, 1))
@@ -95,22 +95,22 @@ offs_t meg_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			break;
 		}
 
-    if(b(opc, 30, 1)) {
+	if(b(opc, 30, 1)) {
 		if(b(opc, 61, 1))
 			append(r, "mb = p");
 		else if(b(opc, 46, 1) == 1)
 			append(r, util::string_format("m%02x = p", b(opc, 39, 6)));
 		else
 			append(r, util::string_format("r%02x = p", b(opc, 47, 8)));
-    }
+	}
 
 	u32 memmode = b(opc, 36, 2);
 	if(memmode) {
 		static const char *modes[4] = { nullptr, "w", "r", "rw" };
-		
+
 		append(r, util::string_format("mem_%s %x +%s", modes[memmode], b(opc, 33, 3), goffset(pc/3)));
 			r += util::string_format("-> m%02x", b(opcodes.r64(pc+2), 39, 6));
-    }
+	}
 
 	stream << r;
 

@@ -79,7 +79,7 @@ void ns32000_cpu_device::device_start()
 
 	// floating point registers
 	//for (unsigned i = 0; i < 8; i++)
-	//	state_add(NS32000_R7 + i, util::string_format("F%d", i).c_str(), m_f[i]);
+	//  state_add(NS32000_R7 + i, util::string_format("F%d", i).c_str(), m_f[i]);
 
 	// set our instruction counter
 	//set_icountptr(m_icount);

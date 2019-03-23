@@ -14,7 +14,7 @@
 // ======================> astrocade_joy_device
 
 class astrocade_joy_device : public device_t,
-                             public device_astrocade_ctrl_interface
+							 public device_astrocade_ctrl_interface
 {
 public:
 	// construction/destruction

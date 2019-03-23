@@ -204,7 +204,7 @@ protected:
 
 		AUDIO_CHAN_OFFSET_MASK      = 0xf0f,
 	};
-	
+
 	enum // at audio write offset 0x400 in spg2xx
 	{
 

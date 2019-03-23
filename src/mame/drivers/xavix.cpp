@@ -1111,10 +1111,10 @@ static INPUT_PORTS_START( epo_guru )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 
 	PORT_MODIFY("MOUSE1X")
-//	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(6) PORT_KEYDELTA(16) PORT_PLAYER(1) PORT_MINMAX(0x44,0xbc)
+//  PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(6) PORT_KEYDELTA(16) PORT_PLAYER(1) PORT_MINMAX(0x44,0xbc)
 	PORT_BIT( 0x1f, 0x10, IPT_AD_STICK_X ) PORT_SENSITIVITY(6) PORT_KEYDELTA(16) PORT_PLAYER(1) // PORT_MINMAX(0x44,0xbc)
 
-	/* 
+	/*
 	 (0x20 is subtracted from value returned in read handler)
 
 	 main game
@@ -1125,7 +1125,7 @@ static INPUT_PORTS_START( epo_guru )
 	 80 - 87 left
 	 88 - c3 right
 	 c4 - ff left
-	 
+
 	 sub game (break-out)
 	 00 still
 	 01 - 3f right
@@ -1994,7 +1994,7 @@ CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04_tam,  ltv_tam,xavix_i2c_
    these use the SSD 2000 NEC 85605-621 type CPU
 
    XavixPort Golf is "SSD 2003 SuperXaviX MXIC 2003 3009" (not dumped yet, but actually marked as SuperXaviX unlike the others!)
-   
+
    This CPU type adds extra opcodes that don't appear to be present in the 97/98 types
    It does not appear to support the bitmap modes or 16-bit ROMs found in the 2002 type
 */

@@ -460,7 +460,7 @@ ROM_START( maddonna )
 	ROM_LOAD( "x1", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, unknown purpose
 ROM_END
 
-ROM_START( komocomo ) // ROM PCB marked : GAME B/D TOPnew1 002 
+ROM_START( komocomo ) // ROM PCB marked : GAME B/D TOPnew1 002
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "11.ua24", 0x00000, 0x10000, CRC(31c18579) SHA1(da97207afced0cf844b111752e9f634a49bc7115) )
 	ROM_LOAD16_BYTE( "10.ua22", 0x00001, 0x10000, CRC(fa839c0f) SHA1(53aee489e694e5777bd5ac20aa2b51c2c9e5493a) )
@@ -490,7 +490,7 @@ ROM_END
    Both versions have tiles containing the 'Tuning - Germany' copyright messages, but
    the parent set has additional tiles containing the '(c)Copyright 1995' which is shown
    on the title screen.
-  
+
    The lack of these tiles in this set causes all subsequent tiles to be shifted.  It is
    likely that the correct program roms for this set either don't show '(c)Copyright 1995'
    or display it using the regular font instead. */

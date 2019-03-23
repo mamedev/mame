@@ -37,8 +37,8 @@
      VSS 20 |___________| 21 CLOCK IN
 
     O# = OUTPUT BIT #
-	MM5446, MM5448 don't have the brightness control pin, an extra output pin instead
-	MM5447, MM5448 don't have the data enable pin(always enabled), but another extra output pin
+    MM5446, MM5448 don't have the brightness control pin, an extra output pin instead
+    MM5447, MM5448 don't have the data enable pin(always enabled), but another extra output pin
 */
 
 

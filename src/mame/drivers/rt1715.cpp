@@ -363,11 +363,11 @@ void rt1715_state::rt1715_base_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x08, 0x0b).rw(m_ctc0, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).rw(m_sio0, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
-//	map(0x10, 0x13).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-//	map(0x14, 0x17).rw(m_sio1, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+//  map(0x10, 0x13).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+//  map(0x14, 0x17).rw(m_sio1, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x18, 0x19).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
-//	map(0x2c, 0x2f) // LT107CS -- serial DSR?
-//	map(0x30, 0x33) // LT111CS -- serial SEL? (data rate selector)
+//  map(0x2c, 0x2f) // LT107CS -- serial DSR?
+//  map(0x30, 0x33) // LT111CS -- serial SEL? (data rate selector)
 }
 
 void rt1715_state::rt1715_io(address_map &map)
@@ -377,9 +377,9 @@ void rt1715_state::rt1715_io(address_map &map)
 	map(0x00, 0x03).rw("a71", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)); // floppy data
 	map(0x04, 0x07).rw("a72", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)); // floppy control/status
 	map(0x20, 0x20).w(FUNC(rt1715_state::rt1715_floppy_enable));
-//	map(0x24, 0x27).w(FUNC(rt1715_state::rt1715_rom_enable)); // MEMCS0
+//  map(0x24, 0x27).w(FUNC(rt1715_state::rt1715_rom_enable)); // MEMCS0
 	map(0x28, 0x2b).w(FUNC(rt1715_state::rt1715_rom_disable)); // MEMCS1
-//	map(0x34, 0x37) // BWSCS (read: memory start address, write: switch chargen)
+//  map(0x34, 0x37) // BWSCS (read: memory start address, write: switch chargen)
 }
 
 void rt1715_state::rt1715w_mem(address_map &map)
@@ -403,14 +403,14 @@ void rt1715_state::rt1715w_io(address_map &map)
 
 	map(0x00, 0x00).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w)); // A2
 	map(0x04, 0x07).rw(m_ctc2, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // A4
-//	map(0x1a, 0x1b) // chargen write protection
+//  map(0x1a, 0x1b) // chargen write protection
 	map(0x1c, 0x1d).m(m_fdc, FUNC(i8272a_device::map));
 	map(0x20, 0x23).w(FUNC(rt1715_state::rt1715w_krfd_w)); // KRFD -- FD-Steuerregister (A45)
 	map(0x24, 0x27).w(FUNC(rt1715_state::rt1715w_set_bank)); // BR (A62, A63)
 	map(0x28, 0x2b).w(FUNC(rt1715_state::rt1715w_floppy_motor)); // MOS
 	map(0x34, 0x37).portr("S8"); // KON -- Konfigurations-schalter FD (config switch -- A114, DIP S8)
-//	map(0x38, 0x3b) // SR (RST1) -- Ru:cksetzen von Flip-Flops im FD
-//	map(0x3c, 0x3f) // RST (RST2) -- Ru:cksetzen von Flip-Flops in V.24 (Pru:ftechnik)
+//  map(0x38, 0x3b) // SR (RST1) -- Ru:cksetzen von Flip-Flops im FD
+//  map(0x3c, 0x3f) // RST (RST2) -- Ru:cksetzen von Flip-Flops in V.24 (Pru:ftechnik)
 	// used via DMA only
 	map(0x40, 0x40).r(m_fdc, FUNC(i8272a_device::msr_r));
 	map(0x41, 0x41).rw(m_fdc, FUNC(i8272a_device::dma_r), FUNC(i8272a_device::dma_w));

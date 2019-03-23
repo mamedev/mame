@@ -183,7 +183,7 @@ void xbox_state::xbox(machine_config &config)
 	OHCI_USB_CONNECTOR(config, ":pci:02.0:port3", usb_xbox, "xbox_controller", false);
 	OHCI_USB_CONNECTOR(config, ":pci:02.0:port4", usb_xbox, nullptr, false);
 
-    /* sound hardware */
+	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	OHCI_GAME_CONTROLLER(config, "ohci_gamepad", 0);
