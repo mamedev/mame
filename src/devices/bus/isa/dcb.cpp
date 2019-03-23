@@ -61,7 +61,7 @@ void novell_dcb_device::device_add_mconfig(machine_config &config)
 
 ROM_START(novell_dcb)
 	ROM_REGION(0x2000, "localcpu", 0)
-	ROM_LOAD("817-186-001_rev_e.bin", 0x0000, 0x2000, CRC(2e2037f4) SHA1(a13c0aab46084a0805256f1d2b8b8beaccc9e253))
+	ROM_LOAD("817-186-001_rev_e_5800_11-04-86.bin", 0x0000, 0x2000, CRC(2e2037f4) SHA1(a13c0aab46084a0805256f1d2b8b8beaccc9e253))
 ROM_END
 
 const tiny_rom_entry *novell_dcb_device::device_rom_region() const
