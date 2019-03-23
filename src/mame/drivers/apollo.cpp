@@ -1057,7 +1057,7 @@ MACHINE_CONFIG_START(apollo_state::dn3500)
 
 #ifdef APOLLO_XXL
 	apollo_stdio_device &stdio(APOLLO_STDIO(config, APOLLO_STDIO_TAG, 0));
-	stdio.tx_callback().set(m_sio, FUNC(apollo_sio::rx_b_w));
+	stdio.tx_cb().set(m_sio, FUNC(apollo_sio::rx_b_w));
 #endif
 MACHINE_CONFIG_END
 

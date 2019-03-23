@@ -148,6 +148,7 @@ public:
 	void set_tas_write_callback(write8_delegate callback);
 	uint16_t get_fc();
 	void set_hmmu_enable(int enable);
+	int get_pmmu_enable() {return m_pmmu_enabled;};
 	void set_fpu_enable(int enable);
 	void set_buserror_details(uint32_t fault_addr, uint8_t rw, uint8_t fc);
 

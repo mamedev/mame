@@ -1559,7 +1559,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/apollo.cpp",
 	MAME_DIR .. "src/mame/includes/apollo.h",
 	MAME_DIR .. "src/mame/machine/apollo.cpp",
-	MAME_DIR .. "src/mame/machine/apollo_dbg.cpp",
 	MAME_DIR .. "src/mame/machine/apollo_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/apollo_kbd.h",
 	MAME_DIR .. "src/mame/video/apollo.cpp",

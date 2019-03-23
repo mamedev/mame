@@ -381,15 +381,10 @@ void apollo_kbd_device::mouse::read_mouse()
 	}
 	else
 	{
-		int b = m_device->m_io_mouse[0]->read();
-		int x = m_device->m_io_mouse[1]->read();
-		int y = m_device->m_io_mouse[2]->read();
+		char b = m_device->m_io_mouse[0]->read();
+		char x = m_device->m_io_mouse[1]->read();
+		char y = m_device->m_io_mouse[2]->read();
 
-		/* sign extend values < 0 */
-		if (x & 0x80)
-			x |= 0xffffff00;
-		if (y & 0x80)
-			y |= 0xffffff00;
 		y = -y;
 
 		if (m_last_b < 0)
@@ -436,9 +431,9 @@ void apollo_kbd_device::mouse::read_mouse()
 
 			// mouse data submitted; update current mouse state
 			m_last_b = b;
-			m_last_x += dx;
-			m_last_y += dy;
-			m_tx_pending = 100; // mouse data packet will take 40 ms
+			m_last_x = x;
+			m_last_y = y;
+			m_tx_pending = 50; // mouse data packet will take 40 ms
 		}
 	}
 }
