@@ -7,11 +7,14 @@
     These are actually EISA cards, though they also have a compatibility
     mode that provides an interface like the older ISA AHA-154X series.
 
-    The HPC microcode is copied to and then executed out of RAM, allowing
-    it to be reprogrammed by the host.
+    On the AHA-1740 and AHA-1744, the HPC microcode is stored in an EEPROM
+    (of unknown type), allowing it to be reprogrammed by the host. This is
+    not possible on the AHA-1740A and AHA-1744A, which use a conventional
+    27C256 EPROM for the microcode. In both cases the HPC copies the code
+    to and then executes it out of RAM.
 
-    The AHA-1740 and AHA-1740A have different board layouts and require
-    different microcode, though they share the following ICs:
+    Though the AHA-1740 and AHA-1740A have different board layouts, they
+    share the following ICs:
 
         AIC-565 Bus Auxiliary Interface Chip
         AIC-575 EISA Configuration Chip
