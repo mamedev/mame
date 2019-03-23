@@ -784,7 +784,7 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case 0x0b: /* Format 11 */
 		pc += 3;
-		mnemonic = mnemonic_index(Format11[Format11op(opcode)], nullptr, fType[Format11f(opcode)]);
+		mnemonic = mnemonic_index(Format11[Format11op(opcode)], "", fType[Format11f(opcode)]);
 		switch (Format11op(opcode))
 		{
 		case 0x00: case 0x01: case 0x02: case 0x04: case 0x05 : case 0x08: case 0x0c : case 0x0d:
