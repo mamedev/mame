@@ -22,8 +22,8 @@
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
 
-DEFINE_DEVICE_TYPE(BT542B, bt542b_device, "bt542b", "BusTek BT-542B Fast SCSI Host Adapter") // Rev. G or earlier
-DEFINE_DEVICE_TYPE(BT542BH, bt542bh_device, "bt542bh", "BusLogic BT-542B Fast SCSI Host Adapter (Rev. H)")
+DEFINE_DEVICE_TYPE(BT542B, bt542b_device, "bt542b", "BusTek BT-542B SCSI Host Adapter") // Rev. G or earlier
+DEFINE_DEVICE_TYPE(BT542BH, bt542bh_device, "bt542bh", "BusLogic BT-542B SCSI Host Adapter (Rev. H)")
 DEFINE_DEVICE_TYPE(BT545S, bt545s_device, "bt545s", "BusLogic BT-545S Fast SCSI Host Adapter")
 
 bt54x_device::bt54x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
@@ -86,7 +86,7 @@ void bt54x_device::asc_config(device_t *device)
 {
 	ncr53c94_device &asc = downcast<ncr53c94_device &>(*device);
 
-	asc.set_clock(25_MHz_XTAL);
+	asc.set_clock(25_MHz_XTAL); // not verified; perhaps selectable? (40 MHz XTAL also on board)
 
 	asc.irq_handler_cb().set(m_mpu, FUNC(i80188_cpu_device::int0_w));
 	//asc.drq_handler_cb().set("busintf", FUNC(ncr86c05_device::dma_req_w));
