@@ -71,16 +71,16 @@ private:
 	int         m_tilebank[4];
 	int         m_whichbank;
 
-	void tilebank_w(u16 data)
-	void tilebank1_w(u16 data)
-	void fg_scrolly_w(u16 data)
-	void bg_scrolly_w(u16 data)
-	void fg_scrollx_w(u16 data)
-	void bg_scrollx_w(u16 data)
+	void tilebank_w(u16 data);
+	void tilebank1_w(u16 data);
+	void fg_scrolly_w(u16 data);
+	void bg_scrolly_w(u16 data);
+	void fg_scrollx_w(u16 data);
+	void bg_scrollx_w(u16 data);
 
-	void fg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0)
-	void bg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0)
-	DECLARE_WRITE8_MEMBER(soundcmd_w)
+	void fg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	DECLARE_WRITE8_MEMBER(soundcmd_w);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
