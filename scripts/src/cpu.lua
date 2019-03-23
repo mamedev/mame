@@ -2835,3 +2835,20 @@ if (CPUS["MEG"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/megd.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/megd.h")
 end
+
+--------------------------------------------------
+--  National Semiconductor NS32000 series
+--@src/devices/cpu/ns32000/ns32000.h,CPUS["NS32000"] = true
+--------------------------------------------------
+
+if (CPUS["NS32000"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/ns32000/ns32000.cpp",
+		MAME_DIR .. "src/devices/cpu/ns32000/ns32000.h",
+	}
+end
+
+if (CPUS["NS32000"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ns32000/ns32000dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ns32000/ns32000dasm.h")
+end
