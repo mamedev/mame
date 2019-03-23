@@ -85,6 +85,7 @@
 #include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/mouse.h"
 #include "bus/a2bus/ezcgi.h"
+#include "bus/a2bus/a2vulcan.h"
 //#include "bus/a2bus/pc_xporter.h"
 
 // various timing standards
@@ -4540,6 +4541,8 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("ezcgi", A2BUS_EZCGI);    /* E-Z Color Graphics Interface */
 	device.option_add("ezcgi9938", A2BUS_EZCGI_9938);   /* E-Z Color Graphics Interface (TMS9938) */
 	device.option_add("ezcgi9958", A2BUS_EZCGI_9958);   /* E-Z Color Graphics Interface (TMS9958) */
+	device.option_add("vulcan", A2BUS_VULCAN); /* Applied Engineering Vulcan IDE drive */
+	device.option_add("vulcangold", A2BUS_VULCANGOLD); /* Applied Engineering Vulcan Gold IDE drive */
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
 //  device.option_add("pcxport", A2BUS_PCXPORTER); /* Applied Engineering PC Transporter */
 }
