@@ -366,10 +366,10 @@ READ8_MEMBER(namcos1_state::dsw_r)
 	// ------1-  ls257 dsw selector 3y
 	// -------0  ls257 dsw selector 4y
 
-	m_dsw_sel->write_ba(m_io_dipsw->read());
+	m_dsw_sel->ba_w(m_io_dipsw->read());
 	m_dsw_sel->select_w(BIT(offset, 1));
 
-	return 0xf0 | bitswap<4>(m_dsw_sel->output_r(space, 0), 0, 1, 2, 3);
+	return 0xf0 | bitswap<4>(m_dsw_sel->output_r(), 0, 1, 2, 3);
 }
 
 WRITE8_MEMBER(namcos1_state::coin_w)
