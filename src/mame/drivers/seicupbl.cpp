@@ -11,6 +11,13 @@
     - tilemap chip drawings might be merged between this and other
       Seibu implementations.
 
+OSC: 40MHz, 15MHz & 8MHz
+
+Measured clocks:
+ MC68000P12F - 14.99MHz
+ Z0840006PSC -  3.996MHz
+   OKI M6295 -  0.999MHz
+ 
 ***************************************************************************/
 
 
@@ -24,8 +31,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-
-#define MAIN_CLOCK XTAL(8'000'000)
 
 class seicupbl_state : public driver_device
 {
@@ -551,7 +556,7 @@ static GFXDECODE_START( gfx_seicupbl_csb )
 	GFXDECODE_ENTRY( "char", 0, cupsocsb_8x8_tilelayout,    48*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, cupsocsb_tilelayout,        0*16, 32 )
 	GFXDECODE_ENTRY( "gfx4", 0, cupsocsb_tilelayout,        32*16, 16 ) /* unused */
-	GFXDECODE_ENTRY( "sprite", 0, cupsocsb_spritelayout,      0*16, 8*16 )
+	GFXDECODE_ENTRY( "sprite", 0, cupsocsb_spritelayout,    0*16, 8*16 )
 	GFXDECODE_ENTRY( "gfx5", 0, cupsocsb_tilelayout,        32*16, 16 )
 	GFXDECODE_ENTRY( "gfx6", 0, cupsocsb_tilelayout,        16*16, 16 )
 GFXDECODE_END
@@ -560,14 +565,14 @@ GFXDECODE_END
 void seicupbl_state::cupsocbl(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, 15_MHz_XTAL); // 15MHz verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &seicupbl_state::cupsocbl_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(seicupbl_state::irq4_line_hold)); /* VBL */
 
 	SEIBU_COP_BOOTLEG(config, "seibucop_boot", m_maincpu);
 
 	/*Different Sound hardware*/
-	Z80(config, m_audiocpu, 14318180/4);
+	Z80(config, m_audiocpu, 8_MHz_XTAL/2); // 4MHz verified
 	m_audiocpu->set_addrmap(AS_PROGRAM, &seicupbl_state::cupsocbl_sound_mem);
 	//m_audiocpu->set_periodic_int("screen", FUNC(seicupbl_state::nmi_line_pulse));
 
@@ -597,7 +602,7 @@ void seicupbl_state::cupsocbl(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+	OKIM6295(config, m_oki, 8_MHz_XTAL/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // 1MHz verified
 }
 
 
@@ -621,10 +626,12 @@ Seibu Cup Soccer - Seibu - Bootleg
 1 x oki 6295
 sc_01 (prg)
 sc_02 and sc_03 (data)
+8MHz & 40MHz OSC
 
 (prg)
-1 x 68000
+1 x 68000P12
 sc_04 and sc_05
+15MHz OSC
 
 (gfx)
 2 x ti tpc1020
@@ -832,6 +839,6 @@ ROM_START( cupsocsb3 )
 ROM_END
 
 
-GAME( 1992, cupsocsb, cupsoc,   cupsocbl, cupsoc, seicupbl_state, empty_init, ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, cupsocsb2,cupsoc,   cupsocbl, cupsoc, seicupbl_state, empty_init, ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, cupsocsb3,cupsoc,   cupsocbl, cupsoc, seicupbl_state, empty_init, ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocsb,  cupsoc,   cupsocbl, cupsoc, seicupbl_state, empty_init, ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocsb2, cupsoc,   cupsocbl, cupsoc, seicupbl_state, empty_init, ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocsb3, cupsoc,   cupsocbl, cupsoc, seicupbl_state, empty_init, ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
