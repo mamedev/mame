@@ -1078,7 +1078,7 @@ void mu100_state::mu80(machine_config &config)
 
 void mu100_state::mu50(machine_config &config)
 {
-	H83002(config, m_mu80cpu, 12_MHz_XTAL); // CPU type and speed are uncertain, but should be 3002 or 3003.
+	H83002(config, m_mu80cpu, 16_MHz_XTAL); // CPU type is uncertain, but should be 3002 or 3003.
 	m_mu80cpu->set_addrmap(AS_PROGRAM, &mu100_state::mu80_map);
 	m_mu80cpu->set_addrmap(AS_IO, &mu100_state::mu50_iomap);
 
