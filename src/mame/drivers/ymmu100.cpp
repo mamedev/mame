@@ -349,6 +349,8 @@ private:
 	u16 pa_r();
 	void pb_w(u16 data);
 	u16 pb_r();
+	void p6_w_mu80(u16 data);
+	u16 p6_r_mu80();
 	void pa_w_mu80(u16 data);
 	u16 pa_r_mu80();
 	void pb_w_mu80(u16 data);
@@ -366,6 +368,8 @@ private:
 	u16 p6_r_mu50();
 	void pa_w_mu50(u16 data);
 	u16 pa_r_mu50();
+	u16 pb_r_mu50();
+	void pb_w_mu50(u16 data);
 
 	float lightlevel(const u8 *src, const u8 *render);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -780,19 +784,31 @@ u16 mu100_state::pb_r_mu80()
 			else
 				return m_lcd->control_read();
 		} else
+		{
+			if(!(cur_pa & 0x10)) {
+				u8 val = 0xff;
+				if(!(cur_ic32 & 0x20))
+					val &= m_ioport_p7->read();
+				if(!(cur_ic32 & 0x40))
+					val &= m_ioport_p8->read();
+				return val;
+			}
+
 			return 0x00;
+		}
 	}
 
-	if(!(cur_pa & 0x10)) {
-		u8 val = 0xff;
-		if(!(cur_ic32 & 0x20))
-			val &= m_ioport_p7->read();
-		if(!(cur_ic32 & 0x40))
-			val &= m_ioport_p8->read();
-		return val;
-	}
+	return cur_pb;
+}
 
-	return cur_pa;
+void mu100_state::p6_w_mu80(u16 data)
+{
+	cur_p6 = data;
+}
+
+u16 mu100_state::p6_r_mu80()
+{
+	return cur_p6;
 }
 
 void mu100_state::pa_w_mu80(u16 data)
@@ -808,7 +824,9 @@ void mu100_state::pa_w_mu80(u16 data)
 	}
 
 	if(!(cur_pa & 0x08) && (data & 0x08))
+	{
 		cur_ic32 = cur_pb;
+	}
 
 	cur_pa = data;
 }
@@ -828,9 +846,6 @@ void mu100_state::p6_w_vl70(u16 data)
 			m_lcd->control_write(cur_pa);
 		}
 	}
-
-//  if(!(cur_pa9 & 0x08) && (data & 0x08))
-//      cur_ic32 = cur_pa;
 
 	cur_p6 = data;
 }
@@ -864,7 +879,6 @@ u16 mu100_state::p6_r_vl70()
 
 void mu100_state::pa_w_vl70(u16 data)
 {
-	printf("\n%02x to A\n", data);
 	cur_pa = data;
 }
 
@@ -907,6 +921,16 @@ u16 mu100_state::p6_r_mu50()
 	return cur_p6;
 }
 
+u16 mu100_state::pb_r_mu50()
+{
+	return cur_pb;
+}
+
+void mu100_state::pb_w_mu50(u16 data)
+{
+	cur_pb = data;
+}
+
 void mu100_state::pa_w_mu50(u16 data)
 {
 	cur_pa = data;
@@ -924,12 +948,12 @@ u16 mu100_state::pa_r_mu50()
 		} else
 			return 0x00;
 	}
-
 	return cur_pa;
 }
 
 void mu100_state::mu80_iomap(address_map &map)
 {
+	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(mu100_state::p6_r_mu80), FUNC(mu100_state::p6_w_mu80));
 	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(mu100_state::pa_r_mu80), FUNC(mu100_state::pa_w_mu80));
 	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(mu100_state::pb_r_mu80), FUNC(mu100_state::pb_w_mu80));
 	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu100_state::adc_ar_r));
@@ -946,6 +970,7 @@ void mu100_state::mu50_iomap(address_map &map)
 {
 	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(mu100_state::p6_r_mu50), FUNC(mu100_state::p6_w_mu50));
 	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(mu100_state::pa_r_mu50), FUNC(mu100_state::pa_w_mu50));
+	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(mu100_state::pb_r_mu50), FUNC(mu100_state::pb_w_mu50));
 	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu100_state::adc_ar_r));
 	map(h8_device::ADC_1, h8_device::ADC_1).r(FUNC(mu100_state::adc_zero_r));
 	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu100_state::adc_al_r));
@@ -1078,7 +1103,7 @@ void mu100_state::mu80(machine_config &config)
 
 void mu100_state::mu50(machine_config &config)
 {
-	H83002(config, m_mu80cpu, 16_MHz_XTAL); // CPU type is uncertain, but should be 3002 or 3003.
+	H83002(config, m_mu80cpu, 16_MHz_XTAL);
 	m_mu80cpu->set_addrmap(AS_PROGRAM, &mu100_state::mu80_map);
 	m_mu80cpu->set_addrmap(AS_IO, &mu100_state::mu50_iomap);
 
