@@ -117,5 +117,5 @@ void titan_soc_state::init_titan_soc()
 	memcpy(m_mainram, memregion("serial")->base(), 0x80000);
 }
 
-GAME( 2009, megadri4,  0,        titan_soc, titan_soc, titan_soc_state, init_titan_soc, ROT0, "Tectoy (licensed from Sega)", "Mega Drive 4 / Guitar Idol (set 1)",      MACHINE_IS_SKELETON )
-GAME( 2009, megadri4a, megadri4, titan_soc, titan_soc, titan_soc_state, init_titan_soc, ROT0, "Tectoy (licensed from Sega)", "Mega Drive 4 / Guitar Idol (set 2)",      MACHINE_IS_SKELETON )
+CONS( 2009, megadri4,  0,        0, titan_soc, titan_soc, titan_soc_state, init_titan_soc, "Tectoy (licensed from Sega)", "Mega Drive 4 / Guitar Idol (set 1)",      MACHINE_IS_SKELETON )
+CONS( 2009, megadri4a, megadri4, 0, titan_soc, titan_soc, titan_soc_state, init_titan_soc, "Tectoy (licensed from Sega)", "Mega Drive 4 / Guitar Idol (set 2)",      MACHINE_IS_SKELETON )
