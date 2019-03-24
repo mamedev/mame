@@ -442,6 +442,7 @@ void bcs3_state::bcs3b(machine_config &config)
 {
 	bcs3a(config);
 	subdevice<screen_device>("screen")->set_size(40*8, 24*10);
+	subdevice<screen_device>("screen")->set_visarea(0, 40*8-1, 0, 24*10-1);
 }
 
 
