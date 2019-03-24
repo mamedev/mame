@@ -35,6 +35,85 @@ NOTE: An eBay auction of the PCB shows "1996.9.16 PROMAT" on the JAMMA+ adapter 
       One Shot One Kill.  This information was used for the year & manufacturer.
       Also listed in an Approved Game list on a HK government site as "Promet"
 
+
+Main board:
++---------------------------------------------+
+|      5MHz                    +------------+ |
+|VOL  YM3812  Z80A  M6295      |25x6 row pin| |
+| YM3014 6116           PAL    +------------+ |
+|        PAL                                  |
+|                               +---------+   |
+|                    KM681000LP | ACTEL   |   |
+|                               | A1020A  |   |
+|                    KM681000LP | PL84C   |   |
+|J                              +---------+   |
+|A                                            |
+|M                   +---------++---------+   |
+|M       MB.ROM      | Cypress || ACTEL   |   |
+|A       KM6264      | CY7C384A|| A1020A  |   |
+|        KM6264 PAL  |  -XJC   || PL84C   |   |
+|                    +---------++---------+   |
+|             PAL PAL   KM681000LP            |
+| DSW2       6     6116 KM681000LP  PAL       |
+|            8     6116             PAL       |
+| DSW1       0                 +------------+ |
+|     27MHz  0  CXK58256       |25x4 row pin| |
+|LED  12MHz  0  CXK58256       +------------+ |
++---------------------------------------------+
+
+  CPU: 68000, Z80A
+Sound: YM2812/YM3014 + OKI M6295 (badged as K-666/K-664 + AD-65)
+  OSC: 27MHz, 12MHz & 5MHz
+  RAM: Samsung KM681000LP-10 128Kx8 Low power SRAM x 4
+       Samsung KM6264AL-10 8Kx8 Low power SRAM x 2
+       Sony CXK58256-10L 32Kx8 High speed SRAM x 2
+       UMC UM6116K-2 2Kx8 SRAM x 3
+Other: Cypress CY7C384A 2K Very high speed Gate CMOS FPGA
+       Actel A1020A FPGA
+       DSW 8 position dipswitch x 2
+       LED - Power LED
+       VOL - Volume adjust pot
+Connectors to ROM board:
+  25 pins by 6 rows & 25 pins by 4 rows
+
+Rom board:
++-----------------------+
+|        +------------+ |
+|        |25x6 row pin| |
+|        +------------+ |
+|        U15*     UI8   |
+|                       |
+|        UA2      UI8A  |
+|                       |
+|        U14*     UI11  |
+|                       |
+|        UA22     UI11A |
+|                       |
+|        UA24     UI13  |
+|                       |
+|  +---------+    UI13A |
+|  | ACTEL   |          |
+|  | A1020A  |    UI16  |
+|  | PL84C   |          |
+|  +---------+    UI16A |
+|        +------------+ |
+|        |25x4 row pin| |
+|        +------------+ |
++-----------------------+
+
+Note: * denotes unpopulated
+
+Other: Actel A1020A FPGA
+Connectors to main board:
+  25 pins by 6 rows & 25 pins by 4 rows
+
+For One Shot One Kill:
+ There is an additional board that connects to the JAMMA connector that has some logic chips,
+ a JAMMA edge connector and two 4 pin headers to connect the light guns as well as a 2 wire jumper
+ that connects to some ROM board logic chips (assumed) for light gun input. Also the YM3812 sound
+ chip appears to be unpopulated for One Shot One Kill.
+ The ROM board for One Shot One Kill has 8 additional logic chips along the front edge of the PCB
+
 */
 
 #include "emu.h"
@@ -365,11 +444,11 @@ void oneshot_state::machine_reset()
 void oneshot_state::oneshot(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &oneshot_state::oneshot_map);
 	m_maincpu->set_vblank_int("screen", FUNC(oneshot_state::irq4_line_hold));
 
-	Z80(config, "audiocpu", 5000000).set_addrmap(AS_PROGRAM, &oneshot_state::oneshot_sound_map);
+	Z80(config, "audiocpu", 5_MHz_XTAL).set_addrmap(AS_PROGRAM, &oneshot_state::oneshot_sound_map); // Not verified
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -387,11 +466,11 @@ void oneshot_state::oneshot(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 3500000));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 5_MHz_XTAL/2)); // 2.5MHz or 3MHz (12MHz/4)
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, 5_MHz_XTAL/4, okim6295_device::PIN7_HIGH); // 1.25MHz??? - clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
