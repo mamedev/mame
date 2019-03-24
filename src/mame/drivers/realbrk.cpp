@@ -217,7 +217,6 @@ void realbrk_state::dai2kaku_mem(address_map &map)
 	map(0xc00002, 0xc00003).portr("IN1");                            // Coins
 	map(0xc00004, 0xc00005).ram().r(FUNC(realbrk_state::realbrk_dsw_r)).share("dsw_select");  // DSW select
 	map(0xff0000, 0xfffbff).ram();                                         // RAM
-	map(0xfffd0a, 0xfffd0b).w(FUNC(realbrk_state::dai2kaku_flipscreen_w));   // Hack! Parallel port data register
 }
 
 /***************************************************************************
@@ -819,6 +818,7 @@ void realbrk_state::dai2kaku(machine_config &config)
 	realbrk(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &realbrk_state::dai2kaku_mem);
+	m_maincpu->out_parallel_callback().set(FUNC(realbrk_state::dai2kaku_flipscreen_w));
 
 	m_gfxdecode->set_info(gfx_dai2kaku);
 	m_screen->set_screen_update(FUNC(realbrk_state::screen_update_dai2kaku));
