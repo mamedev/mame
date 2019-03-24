@@ -94,6 +94,7 @@ public:
 	{ }
 
 	void statriv2(machine_config &config);
+	void statusbj(machine_config &config);
 	void funcsino(machine_config &config);
 	void tripdraw(machine_config &config);
 	void statriv2v(machine_config &config);
@@ -112,7 +113,7 @@ private:
 	required_device<tms9927_device> m_tms;
 	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t *m_tilemap;
-	required_shared_ptr<uint8_t> m_question_offset;
+	optional_shared_ptr<uint8_t> m_question_offset;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	uint8_t m_question_offset_low;
@@ -135,8 +136,9 @@ private:
 	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
 	INTERRUPT_GEN_MEMBER(tripdraw_interrupt);
 
-	void statriv2_io_map(address_map &map);
 	void statriv2_map(address_map &map);
+	void statusbj_io_map(address_map &map);
+	void statriv2_io_map(address_map &map);
 };
 
 
@@ -268,7 +270,7 @@ READ8_MEMBER(statriv2_state::question_data_r)
 	uint32_t qromsize = memregion("questions")->bytes();
 	uint32_t address;
 
-	if (m_question_offset_high == 0xff)
+	if (m_question_offset_high == 0xff && !machine().side_effects_disabled())
 		m_question_offset[m_question_offset_low]++;
 
 	address = m_question_offset[m_question_offset_low];
@@ -315,13 +317,18 @@ void statriv2_state::statriv2_map(address_map &map)
 	map(0xc800, 0xcfff).ram().w(FUNC(statriv2_state::statriv2_videoram_w)).share("videoram");
 }
 
-void statriv2_state::statriv2_io_map(address_map &map)
+void statriv2_state::statusbj_io_map(address_map &map)
 {
 	map(0x20, 0x23).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x28, 0x2b).r(FUNC(statriv2_state::question_data_r)).writeonly().share("question_offset");
 	map(0xb0, 0xb1).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xb1, 0xb1).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xc0, 0xcf).rw(m_tms, FUNC(tms9927_device::read), FUNC(tms9927_device::write));
+}
+
+void statriv2_state::statriv2_io_map(address_map &map)
+{
+	statusbj_io_map(map);
+	map(0x28, 0x2b).r(FUNC(statriv2_state::question_data_r)).writeonly().share("question_offset");
 }
 
 
@@ -691,6 +698,12 @@ void statriv2_state::statriv2(machine_config &config)
 	AY8910(config, "aysnd", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void statriv2_state::statusbj(machine_config &config)
+{
+	statriv2(config);
+	m_maincpu->set_addrmap(AS_IO, &statriv2_state::statusbj_io_map); // no question data
+}
+
 void statriv2_state::statriv2v(machine_config &config)
 {
 	statriv2(config);
@@ -705,7 +718,7 @@ void statriv2_state::statriv2v(machine_config &config)
 
 void statriv2_state::funcsino(machine_config &config)
 {
-	statriv2(config);
+	statusbj(config);
 
 	/* basic machine hardware */
 
@@ -714,7 +727,7 @@ void statriv2_state::funcsino(machine_config &config)
 
 void statriv2_state::tripdraw(machine_config &config)
 {
-	statriv2(config);
+	statusbj(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_vblank_int("screen", FUNC(statriv2_state::tripdraw_interrupt));
@@ -1679,11 +1692,11 @@ void statriv2_state::init_laserdisc()
  *
  *************************************/
 
-GAME( 1981, statusbj,   0,        statriv2,  statusbj, statriv2_state, empty_init,     ROT0,  "Status Games",       "Status Black Jack (V1.0c)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, statusbj,   0,        statusbj,  statusbj, statriv2_state, empty_init,     ROT0,  "Status Games",       "Status Black Jack (V1.0c)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, funcsino,   0,        funcsino,  funcsino, statriv2_state, empty_init,     ROT0,  "Status Games",       "Status Fun Casino (V1.3s)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, tripdraw,   0,        tripdraw,  tripdraw, statriv2_state, empty_init,     ROT0,  "Status Games",       "Tripple Draw (V3.1 s)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bigcsino,   0,        statriv2,  bigcsino, statriv2_state, empty_init,     ROT0,  "Status Games",       "Big Casino",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1984, hangman,    0,        statriv2,  hangman,  statriv2_state, init_addr_lmh,  ROT0,  "Status Games",       "Hangman",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bigcsino,   0,        statusbj,  bigcsino, statriv2_state, empty_init,     ROT0,  "Status Games",       "Big Casino",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hangman,    0,        statusbj,  hangman,  statriv2_state, init_addr_lmh,  ROT0,  "Status Games",       "Hangman",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1984, trivquiz,   0,        statriv2,  statriv2, statriv2_state, init_addr_lhx,  ROT0,  "Status Games",       "Triv Quiz",                             MACHINE_SUPPORTS_SAVE )
 GAME( 1984, statriv2,   0,        statriv2,  statriv2, statriv2_state, init_addr_xlh,  ROT0,  "Status Games",       "Triv Two",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1985, statriv2v,  statriv2, statriv2v, statriv2, statriv2_state, init_addr_xlh,  ROT90, "Status Games",       "Triv Two (Vertical)",                   MACHINE_SUPPORTS_SAVE )
@@ -1697,23 +1710,23 @@ GAME( 1986, supertr2,   0,        statriv2,  supertr2, statriv2_state, init_addr
 GAME( 1988, supertr3,   0,        statriv2,  supertr2, statriv2_state, init_addr_lmh,  ROT0,  "Status Games",       "Super Triv III",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1988, nsupertr3,  supertr3, statriv2,  supertr2, statriv2_state, init_addr_lmh,  ROT0,  "Status Games",       "New Super Triv III",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // new questions don't appear correctly, coinage problems
 // The following Casino Strip sets don't show the version on screen (at least without the laserdisc video). It was taken from the rom labels / from the Dragon's Lair Project archive.
-GAME( 1984, cs1_spp,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip I (Poker version, for Pioneer LD, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1984, cs1_spp2,  cs1_spp,   statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip I (Poker version, for Pioneer LD, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs2_sps,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip II (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1992, cs3_qps,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip III (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, cs5_spp,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip V (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, cs5_ssp,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip V (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs6_sps,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VI (Poker version, for Sony LD)",   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, cs6_ssp,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VI (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1986, cs8_ssp,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, cs8_spp,    0,        statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs8_sps,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1992, cs9_qps,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip IX (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, cs9_spp,   0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip IX (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs10_sps,  0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip X (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs11_ssp,  0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs11_sps,  0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Poker version, for Sony LD, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs11_sps2, cs11_sps,  statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Poker version, for Sony LD, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs12_sps,  0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XII (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1996, cspe_qps,  0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip Private Eyes / All Start (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, csv1_qps,  0,         statriv2,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip Vivid 1 (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1984, cs1_spp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip I (Poker version, for Pioneer LD, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1984, cs1_spp2,  cs1_spp,   statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip I (Poker version, for Pioneer LD, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs2_sps,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip II (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1992, cs3_qps,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip III (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs5_spp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip V (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs5_ssp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip V (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs6_sps,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VI (Poker version, for Sony LD)",   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs6_ssp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VI (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1986, cs8_ssp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs8_spp,    0,        statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs8_sps,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1992, cs9_qps,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip IX (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs9_spp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip IX (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs10_sps,  0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip X (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs11_ssp,  0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs11_sps,  0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Poker version, for Sony LD, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs11_sps2, cs11_sps,  statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Poker version, for Sony LD, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs12_sps,  0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XII (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1996, cspe_qps,  0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip Private Eyes / All Start (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, csv1_qps,  0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip Vivid 1 (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
