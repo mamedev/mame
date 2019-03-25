@@ -333,10 +333,10 @@ void rx2030_state::iop_io_map(address_map &map)
 	map(0x0200, 0x0201).rw(m_fio, FUNC(z8038_device::fifo_r<1>), FUNC(z8038_device::fifo_w<1>)).umask16(0xff);
 	map(0x0202, 0x0203).rw(m_fio, FUNC(z8038_device::reg_r<1>), FUNC(z8038_device::reg_w<1>)).umask16(0xff);
 
-	map(0x0240, 0x0241).lw8("rtc", [this](address_space &space, offs_t offset, u8 data) { m_rtc->write(space, 0, data); }).umask16(0xff00);
+	map(0x0240, 0x0241).lw8("rtc", [this](u8 data) { m_rtc->write(0, data); }).umask16(0xff00);
 	map(0x0280, 0x0281).lrw8("rtc",
-		[this](address_space &space, offs_t offset) { return m_rtc->read(space, 1); },
-		[this](address_space &space, offs_t offset, u8 data) { m_rtc->write(space, 1, data); }).umask16(0xff00);
+		[this]() { return m_rtc->read(1); },
+		[this](u8 data) { m_rtc->write(1, data); }).umask16(0xff00);
 
 	map(0x02c0, 0x2c1).lw8("cpu_interface", [this](u8 data)
 	{

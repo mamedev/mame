@@ -535,27 +535,28 @@ INTERRUPT_GEN_MEMBER(dmndrby_state::dderby_timer_irq)
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* RST 08h */
 }
 
-MACHINE_CONFIG_START(dmndrby_state::dderby)
+void dmndrby_state::dderby(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(memmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dmndrby_state,  dderby_irq)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(dmndrby_state, dderby_timer_irq,  244/2)
+	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dmndrby_state::memmap);
+	m_maincpu->set_vblank_int("screen", FUNC(dmndrby_state::dderby_irq));
+	m_maincpu->set_periodic_int(FUNC(dmndrby_state::dderby_timer_irq), attotime::from_hz(244/2));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* verified on schematics */
-	MCFG_DEVICE_PROGRAM_MAP(dderby_sound_map)
+	Z80(config, m_audiocpu, 4000000);  /* verified on schematics */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dmndrby_state::dderby_sound_map);
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dmndrby_state, screen_update_dderby)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(dmndrby_state::screen_update_dderby));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dmndrby);
 	PALETTE(config, m_palette, FUNC(dmndrby_state::dmndrby_palette), 0x300, 0x20);
@@ -565,7 +566,7 @@ MACHINE_CONFIG_START(dmndrby_state::dderby)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	AY8910(config, "ay1", 1789750).add_route(ALL_OUTPUTS, "mono", 0.35); // frequency guessed
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( dmndrby )

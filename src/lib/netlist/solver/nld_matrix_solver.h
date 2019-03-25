@@ -85,7 +85,6 @@ namespace devices
 		analog_net_t *m_proxied_net; // only for proxy nets in analog input logic
 	};
 
-
 	class matrix_solver_t : public device_t
 	{
 	public:
@@ -193,7 +192,7 @@ namespace devices
 				for (std::size_t i = 0; i < count; i++)
 				{
 					m_terms[k]->terms()[i]->set_ptrs(&m_gtn[k][i], &m_gonn[k][i], &m_Idrn[k][i]);
-					m_connected_net_Vn[k][i] = m_terms[k]->terms()[i]->otherterm()->net().Q_Analog_state_ptr();
+					m_connected_net_Vn[k][i] = m_terms[k]->terms()[i]->connected_terminal()->net().Q_Analog_state_ptr();
 				}
 			}
 		}
@@ -255,7 +254,7 @@ namespace devices
 
 		std::vector<plib::unique_ptr<terms_for_net_t>> m_terms;
 		std::vector<analog_net_t *> m_nets;
-		std::vector<poolptr<proxied_analog_output_t>> m_inps;
+		std::vector<pool_owned_ptr<proxied_analog_output_t>> m_inps;
 
 		std::vector<plib::unique_ptr<terms_for_net_t>> m_rails_temp;
 

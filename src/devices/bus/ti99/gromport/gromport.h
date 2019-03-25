@@ -39,10 +39,11 @@ public:
 	}
 
 	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	void write(offs_t offset, uint8_t data);
 	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	void cruwrite(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
 	DECLARE_WRITE_LINE_MEMBER(romgq_line);
 	void set_gromlines(line_state mline, line_state moline, line_state gsq);
@@ -76,11 +77,11 @@ class cartridge_connector_device : public device_t
 {
 public:
 	virtual DECLARE_READ8Z_MEMBER(readz) = 0;
-	virtual DECLARE_WRITE8_MEMBER(write) = 0;
+	virtual void write(offs_t offset, uint8_t data) = 0;
 	virtual DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin ) { }
 
 	virtual DECLARE_READ8Z_MEMBER(crureadz) = 0;
-	virtual DECLARE_WRITE8_MEMBER(cruwrite) = 0;
+	virtual void cruwrite(offs_t offset, uint8_t data) = 0;
 
 	virtual DECLARE_WRITE_LINE_MEMBER(romgq_line) = 0;
 	virtual void set_gromlines(line_state mline, line_state moline, line_state gsq) =0;

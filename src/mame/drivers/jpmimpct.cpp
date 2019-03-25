@@ -838,9 +838,10 @@ WRITE_LINE_MEMBER(jpmimpct_state::tms_irq)
  *
  *************************************/
 
-MACHINE_CONFIG_START(jpmimpct_state::jpmimpct)
-	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(m68k_program_map)
+void jpmimpct_state::jpmimpct(machine_config &config)
+{
+	M68000(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_state::m68k_program_map);
 
 	TMS34010(config, m_dsp, 40000000);
 	m_dsp->set_addrmap(AS_PROGRAM, &jpmimpct_state::tms_program_map);
@@ -859,19 +860,18 @@ MACHINE_CONFIG_START(jpmimpct_state::jpmimpct)
 
 	TIMER(config, m_duart_1_timer).configure_generic(FUNC(jpmimpct_state::duart_1_timer_event));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(40000000/4, 156*4, 0, 100*4, 328, 0, 300)
-	MCFG_SCREEN_UPDATE_DEVICE("dsp", tms34010_device, tms340x0_rgb32)
-	MCFG_PALETTE_ADD("palette", 256)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(40000000/4, 156*4, 0, 100*4, 328, 0, 300);
+	screen.set_screen_update("dsp", FUNC(tms34010_device::tms340x0_rgb32));
+	PALETTE(config, m_palette).set_entries(256);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MCFG_VIDEO_START_OVERRIDE(jpmimpct_state,jpmimpct)
 
 	METERS(config, m_meters, 0).set_number(5);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -1309,9 +1309,10 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(jpmimpct_state::impctawp)
-	MCFG_DEVICE_ADD("maincpu",M68000, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(awp68k_program_map)
+void jpmimpct_state::impctawp(machine_config &config)
+{
+	M68000(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_state::awp68k_program_map);
 
 	config.m_minimum_quantum = attotime::from_hz(30000);
 	S16LF01(config, m_vfd);
@@ -1329,8 +1330,8 @@ MACHINE_CONFIG_START(jpmimpct_state::impctawp)
 	TIMER(config, m_duart_1_timer).configure_generic(FUNC(jpmimpct_state::duart_1_timer_event));
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("upd",UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
+
 	config.set_default_layout(layout_jpmimpct);
 
 	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
@@ -1347,9 +1348,7 @@ MACHINE_CONFIG_START(jpmimpct_state::impctawp)
 	m_reel[5]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<5>));
 
 	METERS(config, m_meters, 0).set_number(5);
-
-MACHINE_CONFIG_END
-
+}
 
 
 /*************************************

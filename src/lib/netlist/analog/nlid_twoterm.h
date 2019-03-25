@@ -35,7 +35,10 @@
 
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
+#include "netlist/solver/nld_solver.h"
 #include "plib/pfunction.h"
+
+#include <cmath>
 
 // -----------------------------------------------------------------------------
 // Implementation
@@ -166,6 +169,7 @@ NETLIB_OBJECT(POT)
 	, m_R(*this, "R", 10000)
 	, m_Dial(*this, "DIAL", 0.5)
 	, m_DialIsLog(*this, "DIALLOG", false)
+	, m_Reverse(*this, "REVERSE", false)
 	{
 		register_subalias("1", m_R1.m_P);
 		register_subalias("2", m_R1.m_N);
@@ -186,6 +190,7 @@ private:
 	param_double_t m_R;
 	param_double_t m_Dial;
 	param_logic_t m_DialIsLog;
+	param_logic_t m_Reverse;
 };
 
 NETLIB_OBJECT(POT2)
@@ -215,6 +220,83 @@ private:
 	param_logic_t m_Reverse;
 };
 
+// -----------------------------------------------------------------------------
+// A generic capacitor model
+// -----------------------------------------------------------------------------
+
+enum class capacitor_e
+{
+	CHARGE_CONSERVING,
+	CONSTANT_CAPACITY
+};
+
+template <capacitor_e TYPE>
+class generic_capacitor
+{
+};
+
+
+template <>
+class generic_capacitor<capacitor_e::CHARGE_CONSERVING>
+{
+public:
+	generic_capacitor(device_t &dev, const pstring &name)
+	: m_h(dev, name + ".m_h", 0.0)
+	, m_charge(dev, name + ".m_charge", 0.0)
+	, m_gmin(0.0)
+	{
+	}
+
+	constexpr capacitor_e type() const { return capacitor_e::CHARGE_CONSERVING; }
+
+	constexpr nl_double G(nl_double cap) const
+	{
+		return cap * m_h +  m_gmin;
+	}
+
+	constexpr nl_double Ieq(nl_double cap, nl_double v) const
+	{
+		return m_h * (cap * v - m_charge) - G(cap) * v;
+	}
+
+	void timestep(nl_double cap, nl_double v, nl_double step)
+	{
+		m_h = 1.0 / step;
+		m_charge = cap * v;
+	}
+
+	void setparams(nl_double gmin) { m_gmin = gmin; }
+
+private:
+	state_var<double> m_h;
+	state_var<double> m_charge;
+	nl_double m_gmin;
+};
+
+template <>
+class generic_capacitor<capacitor_e::CONSTANT_CAPACITY>
+{
+public:
+	generic_capacitor(device_t &dev, const pstring &name)
+	: m_h(dev, name + ".m_h", 0.0)
+	, m_gmin(0.0)
+	{
+	}
+
+	constexpr capacitor_e type() const { return capacitor_e::CONSTANT_CAPACITY; }
+	constexpr nl_double G(nl_double cap) const { return cap * m_h +  m_gmin; }
+	constexpr nl_double Ieq(nl_double cap, nl_double v) const { return - G(cap) * v; }
+
+	void timestep(nl_double cap, nl_double v, nl_double step)
+	{
+		plib::unused_var(cap, v);
+		m_h = 1.0 / step;
+	}
+	void setparams(nl_double gmin) { m_gmin = gmin; }
+private:
+	state_var<nl_double> m_h;
+	nl_double m_gmin;
+};
 
 // -----------------------------------------------------------------------------
 // nld_C
@@ -225,25 +307,45 @@ NETLIB_OBJECT_DERIVED(C, twoterm)
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(C, twoterm)
 	, m_C(*this, "C", 1e-6)
-	, m_GParallel(0.0)
+	, m_cap(*this, "m_cap")
 	{
-		//register_term("1", m_P);
-		//register_term("2", m_N);
 	}
 
 	NETLIB_IS_TIMESTEP(true)
-	NETLIB_TIMESTEPI();
+	NETLIB_TIMESTEPI()
+	{
+		m_cap.timestep(m_C(), deltaV(), step);
+		if (m_cap.type() == capacitor_e::CONSTANT_CAPACITY)
+		{
+			const nl_double I = m_cap.Ieq(m_C(), deltaV());
+			const nl_double G = m_cap.G(m_C());
+			set_mat( G, -G, -I,
+					-G,  G,  I);
+		}
+	}
+
+	NETLIB_IS_DYNAMIC(m_cap.type() == capacitor_e::CHARGE_CONSERVING)
+	NETLIB_UPDATE_TERMINALSI()
+	{
+		const nl_double I = m_cap.Ieq(m_C(), deltaV());
+		const nl_double G = m_cap.G(m_C());
+		set_mat( G, -G, -I,
+				-G,  G,  I);
+	}
 
 	param_double_t m_C;
-	NETLIB_RESETI();
+	NETLIB_RESETI()
+	{
+		m_cap.setparams(exec().gmin());
+	}
 
 protected:
 	//NETLIB_UPDATEI();
-	NETLIB_UPDATE_PARAMI();
+	NETLIB_UPDATE_PARAMI() { }
 
 private:
-	nl_double m_GParallel;
-
+	generic_capacitor<capacitor_e::CHARGE_CONSERVING> m_cap;
+	//generic_capacitor<capacitor_e::CONSTANT_CAPACITY> m_cap;
 };
 
 // -----------------------------------------------------------------------------
@@ -255,7 +357,7 @@ NETLIB_OBJECT_DERIVED(L, twoterm)
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(L, twoterm)
 	, m_L(*this, "L", 1e-6)
-	, m_GParallel(0.0)
+	, m_gmin(0.0)
 	, m_G(0.0)
 	, m_I(0.0)
 	{
@@ -274,7 +376,7 @@ protected:
 private:
 	param_double_t m_L;
 
-	nl_double m_GParallel;
+	nl_double m_gmin;
 	nl_double m_G;
 	nl_double m_I;
 };
@@ -283,14 +385,82 @@ private:
 // A generic diode model to be used in other devices (Diode, BJT ...)
 // -----------------------------------------------------------------------------
 
+enum class diode_e
+{
+	BIPOLAR,
+	MOS
+};
+
+template <diode_e TYPE>
 class generic_diode
 {
 public:
-	generic_diode(device_t &dev, const pstring &name);
+	generic_diode(device_t &dev, const pstring &name)
+	: m_Vd(dev, name + ".m_Vd", 0.7)
+	, m_Id(dev, name + ".m_Id", 0.0)
+	, m_G(dev,  name + ".m_G", 1e-15)
+	, m_Vt(0.0)
+	, m_Vmin(0.0) // not used in MOS model
+	, m_Is(0.0)
+	, m_logIs(0.0)
+	, m_n(0.0)
+	, m_gmin(1e-15)
+	, m_VtInv(0.0)
+	, m_Vcrit(0.0)
+	{
+		set_param(1e-15, 1, 1e-15, 300.0);
+	}
 
-	void update_diode(const double nVd);
+	void update_diode(const double nVd)
+	{
+		if (TYPE == diode_e::BIPOLAR && nVd < m_Vmin)
+		{
+			m_Vd = nVd;
+			m_G = m_gmin;
+			m_Id = - m_Is;
+		}
+		else if (TYPE == diode_e::MOS && nVd < constants::zero())
+		{
+			m_Vd = nVd;
+			m_G = m_Is * m_VtInv + m_gmin;
+			m_Id = m_G * m_Vd;
+		}
+		// FIXME: For MOS, stop here, the critical code path will not converge
+		else if (TYPE == diode_e::MOS || nVd < m_Vcrit)
+		{
+			m_Vd = nVd;
+			const double IseVDVt = std::exp(std::min(700.0, m_logIs + m_Vd * m_VtInv));
+			m_Id = IseVDVt - m_Is;
+			m_G = IseVDVt * m_VtInv + m_gmin;
+		}
+		else
+		{
+			const double a = std::max((nVd - m_Vd) * m_VtInv, constants::cast(-0.99));
+			m_Vd = m_Vd + std::log1p(a) * m_Vt;
+			//const double IseVDVt = m_Is * std::exp(m_Vd * m_VtInv);
+			const double IseVDVt = std::exp(m_logIs + m_Vd * m_VtInv);
+			m_Id = IseVDVt - m_Is;
+			m_G = IseVDVt * m_VtInv + m_gmin;
+		}
+	}
 
-	void set_param(const double Is, const double n, double gmin);
+
+	void set_param(const double Is, const double n, double gmin, double temp)
+	{
+		static constexpr double csqrt2 = 1.414213562373095048801688724209; //std::sqrt(2.0);
+		m_Is = Is;
+		m_logIs = std::log(Is);
+		m_n = n;
+		m_gmin = gmin;
+
+		m_Vt = m_n * temp * constants::k_b() / constants::Q_e();
+
+		m_Vmin = -5.0 * m_Vt;
+
+		m_Vcrit = m_Vt * std::log(m_Vt / m_Is / csqrt2);
+		m_VtInv = 1.0 / m_Vt;
+	}
+
 
 	double I() const { return m_Id; }
 	double G() const { return m_G; }
@@ -389,7 +559,7 @@ protected:
 
 private:
 	diode_model_t m_model;
-	generic_diode m_D;
+	generic_diode<diode_e::BIPOLAR> m_D;
 };
 
 

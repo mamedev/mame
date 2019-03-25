@@ -67,11 +67,11 @@
 	<element name="text_l6b"><text string="Start of Game"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 	<element name="text_l7">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="&lt;-"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string="&#x2190;"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 	<element name="text_l8">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="-&gt;"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string="&#x2192;"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 
 	<element name="text_m1a"><text string="Player/Player"><color red="0.51" green="0.5" blue="0.49" /></text></element>
@@ -110,27 +110,27 @@
 
 	<element name="text_king">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="&#x265a;"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string="[K]"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 	<element name="text_queen">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="&#x265b;"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string="[Q]"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 	<element name="text_rook">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="&#x265c;"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string="[R]"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 	<element name="text_bishop">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="&#x265d;"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string="[B]"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 	<element name="text_knight">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="&#x265e;"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string="[N]"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 	<element name="text_pawn">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="&#x265f;"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string="[P]"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 
 
@@ -338,15 +338,15 @@
 		<bezel element="white"><bounds x="105.25" y="70.29" width="6" height="4" /></bezel>
 		<bezel element="static_red"><bounds x="105.25" y="78.00" width="6" height="4" /></bezel>
 
-		<bezel element="text_l7"><bounds x="87.5" y="70.79" width="3" height="3" /></bezel>
-		<bezel element="text_l8"><bounds x="87.5" y="78.50" width="3" height="3" /></bezel>
+		<bezel element="text_l7"><bounds x="87.5" y="70.59" width="3" height="3" /></bezel>
+		<bezel element="text_l8"><bounds x="87.5" y="78.30" width="3" height="3" /></bezel>
 
-		<bezel element="text_king"><bounds x="97.13" y="24.50" width="3" height="3" /></bezel>
-		<bezel element="text_queen"><bounds x="97.13" y="32.21" width="3" height="3" /></bezel>
-		<bezel element="text_bishop"><bounds x="97.13" y="39.93" width="3" height="3" /></bezel>
-		<bezel element="text_knight"><bounds x="97.13" y="47.64" width="3" height="3" /></bezel>
-		<bezel element="text_rook"><bounds x="97.13" y="55.36" width="3" height="3" /></bezel>
-		<bezel element="text_pawn"><bounds x="97.13" y="63.07" width="3" height="3" /></bezel>
+		<bezel element="text_king"><bounds x="97.13" y="24.70" width="3" height="2.2" /></bezel>
+		<bezel element="text_queen"><bounds x="97.13" y="32.41" width="3" height="2.2" /></bezel>
+		<bezel element="text_bishop"><bounds x="97.13" y="40.13" width="3" height="2.2" /></bezel>
+		<bezel element="text_knight"><bounds x="97.13" y="47.84" width="3" height="2.2" /></bezel>
+		<bezel element="text_rook"><bounds x="97.13" y="55.56" width="3" height="2.2" /></bezel>
+		<bezel element="text_pawn"><bounds x="97.13" y="63.27" width="3" height="2.2" /></bezel>
 
 		<bezel element="hlb" inputtag="IN.7" inputmask="0x400"><bounds x="86" y="24.00" width="6" height="4" /><color alpha="0.4" /></bezel>
 		<bezel element="hlb" inputtag="IN.6" inputmask="0x400"><bounds x="86" y="31.71" width="6" height="4" /><color alpha="0.4" /></bezel>

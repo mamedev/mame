@@ -77,6 +77,7 @@ public:
 	u16 m_inp_mux;                  // multiplexed inputs mask
 
 	u16 read_inputs(int columns, u16 colmask = ~0);
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
@@ -238,13 +239,21 @@ u16 hh_cop400_state::read_inputs(int columns, u16 colmask)
 	return ret;
 }
 
+INPUT_CHANGED_MEMBER(hh_cop400_state::reset_button)
+{
+	// when an input is directly wired to MCU reset pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
 
 
 /***************************************************************************
 
-  Minidrivers (subclass, I/O, Inputs, Machine Config)
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
+
+namespace {
 
 /***************************************************************************
 
@@ -260,8 +269,8 @@ u16 hh_cop400_state::read_inputs(int columns, u16 colmask)
 class ctstein_state : public hh_cop400_state
 {
 public:
-	ctstein_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag)
+	ctstein_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(write_g);
@@ -330,6 +339,13 @@ void ctstein_state::ctstein(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+// roms
+
+ROM_START( ctstein )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop421-nez_n", 0x0000, 0x0400, CRC(16148e03) SHA1(b2b74891d36813d9a1eefd56a925054997c4b7f7) ) // 2nd half empty
+ROM_END
+
 
 
 
@@ -354,8 +370,8 @@ void ctstein_state::ctstein(machine_config &config)
 class h2hbaskbc_state : public hh_cop400_state
 {
 public:
-	h2hbaskbc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag)
+	h2hbaskbc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(write_d);
@@ -485,6 +501,16 @@ void h2hbaskbc_state::h2hsoccerc(machine_config &config)
 	config.set_default_layout(layout_h2hsoccerc);
 }
 
+// roms
+
+ROM_START( h2hbaskbc )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop420l-nmy", 0x0000, 0x0400, CRC(87152509) SHA1(acdb869b65d49b3b9855a557ed671cbbb0f61e2c) )
+ROM_END
+
+#define rom_h2hhockeyc rom_h2hbaskbc // dumped from Basketball
+#define rom_h2hsoccerc rom_h2hbaskbc // "
+
 
 
 
@@ -503,8 +529,8 @@ void h2hbaskbc_state::h2hsoccerc(machine_config &config)
 class einvaderc_state : public hh_cop400_state
 {
 public:
-	einvaderc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag)
+	einvaderc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -594,7 +620,7 @@ void einvaderc_state::einvaderc(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(913, 1080);
-	screen.set_visarea(0, 913-1, 0, 1080-1);
+	screen.set_visarea_full();
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_cop400_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_einvaderc);
@@ -603,6 +629,16 @@ void einvaderc_state::einvaderc(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
+
+// roms
+
+ROM_START( einvaderc )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "copl444-hrz_n_inv_ii", 0x0000, 0x0800, CRC(76400f38) SHA1(0e92ab0517f7b7687293b189d30d57110df20fe0) )
+
+	ROM_REGION( 80636, "svg", 0)
+	ROM_LOAD( "einvaderc.svg", 0, 80636, CRC(a52d0166) SHA1(f69397ebcc518701f30a47b4d62e5a700825375a) )
+ROM_END
 
 
 
@@ -625,8 +661,8 @@ void einvaderc_state::einvaderc(machine_config &config)
 class unkeinv_state : public hh_cop400_state
 {
 public:
-	unkeinv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag)
+	unkeinv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -635,7 +671,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_READ8_MEMBER(read_l);
 
-	DECLARE_INPUT_CHANGED_MEMBER(position_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(position_changed) { prepare_display(); }
 	void unkeinv(machine_config &config);
 };
 
@@ -694,11 +730,6 @@ READ8_MEMBER(unkeinv_state::read_l)
 
 // config
 
-INPUT_CHANGED_MEMBER(unkeinv_state::position_changed)
-{
-	prepare_display();
-}
-
 static INPUT_PORTS_START( unkeinv )
 	PORT_START("IN.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -727,6 +758,13 @@ void unkeinv_state::unkeinv(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+// roms
+
+ROM_START( unkeinv )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop421_us4345764", 0x0000, 0x0400, CRC(0068c3a3) SHA1(4e5fd566a5a26c066cc14623a9bd01e109ebf797) ) // typed in from patent US4345764, good print quality
+ROM_END
+
 
 
 
@@ -749,8 +787,8 @@ void unkeinv_state::unkeinv(machine_config &config)
 class lchicken_state : public hh_cop400_state
 {
 public:
-	lchicken_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag)
+	lchicken_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
 	{ }
 
 	u8 m_motor_pos;
@@ -769,7 +807,21 @@ protected:
 	virtual void machine_start() override;
 };
 
+void lchicken_state::machine_start()
+{
+	hh_cop400_state::machine_start();
+
+	// zerofill, register for savestates
+	m_motor_pos = 0;
+	save_item(NAME(m_motor_pos));
+}
+
 // handlers
+
+CUSTOM_INPUT_MEMBER(lchicken_state::motor_switch)
+{
+	return m_motor_pos > 0xe8; // approximation
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(lchicken_state::motor_sim_tick)
 {
@@ -848,20 +900,6 @@ static INPUT_PORTS_START( lchicken )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lchicken_state, motor_switch, nullptr)
 INPUT_PORTS_END
 
-CUSTOM_INPUT_MEMBER(lchicken_state::motor_switch)
-{
-	return m_motor_pos > 0xe8; // approximation
-}
-
-void lchicken_state::machine_start()
-{
-	hh_cop400_state::machine_start();
-
-	// zerofill, register for savestates
-	m_motor_pos = 0;
-	save_item(NAME(m_motor_pos));
-}
-
 void lchicken_state::lchicken(machine_config &config)
 {
 	/* basic machine hardware */
@@ -883,6 +921,13 @@ void lchicken_state::lchicken(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+// roms
+
+ROM_START( lchicken )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop421-njc_n", 0x0000, 0x0400, CRC(319e7985) SHA1(9714327518f65ebefe38ac7911bed2b9b9c77307) )
+ROM_END
+
 
 
 
@@ -898,8 +943,8 @@ void lchicken_state::lchicken(machine_config &config)
 class funjacks_state : public hh_cop400_state
 {
 public:
-	funjacks_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag)
+	funjacks_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(write_d);
@@ -990,6 +1035,13 @@ void funjacks_state::funjacks(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+// roms
+
+ROM_START( funjacks )
+	ROM_REGION( 0x0200, "maincpu", 0 )
+	ROM_LOAD( "cop410l_b_ngs", 0x0000, 0x0200, CRC(863368ea) SHA1(f116cc27ae721b3a3e178fa13765808bdc275663) )
+ROM_END
+
 
 
 
@@ -1009,15 +1061,13 @@ void funjacks_state::funjacks(machine_config &config)
 class funrlgl_state : public hh_cop400_state
 {
 public:
-	funrlgl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag)
+	funrlgl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_WRITE8_MEMBER(write_g);
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	void funrlgl(machine_config &config);
 };
 
@@ -1056,14 +1106,8 @@ static INPUT_PORTS_START( funrlgl )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, funrlgl_state, reset_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_cop400_state, reset_button, nullptr)
 INPUT_PORTS_END
-
-INPUT_CHANGED_MEMBER(funrlgl_state::reset_button)
-{
-	// middle button is directly tied to MCU reset pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
 
 void funrlgl_state::funrlgl(machine_config &config)
 {
@@ -1084,6 +1128,13 @@ void funrlgl_state::funrlgl(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+// roms
+
+ROM_START( funrlgl )
+	ROM_REGION( 0x0200, "maincpu", 0 )
+	ROM_LOAD( "cop410l_b_nhz", 0x0000, 0x0200, CRC(4065c3ce) SHA1(f0bc8125d922949e0d7ab1ba89c805a836d20e09) )
+ROM_END
+
 
 
 
@@ -1101,8 +1152,8 @@ void funrlgl_state::funrlgl(machine_config &config)
 class mdallas_state : public hh_cop400_state
 {
 public:
-	mdallas_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag)
+	mdallas_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1219,6 +1270,13 @@ void mdallas_state::mdallas(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+// roms
+
+ROM_START( mdallas )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "copl444l-hyn_n", 0x0000, 0x0800, CRC(7848b78c) SHA1(778d24512180892f58c49df3c72ca77b2618d63b) )
+ROM_END
+
 
 
 
@@ -1237,8 +1295,8 @@ void mdallas_state::mdallas(machine_config &config)
 class plus1_state : public hh_cop400_state
 {
 public:
-	plus1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag)
+	plus1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(write_d);
@@ -1300,6 +1358,13 @@ void plus1_state::plus1(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+// roms
+
+ROM_START( plus1 )
+	ROM_REGION( 0x0200, "maincpu", 0 )
+	ROM_LOAD( "cop410l_b_nne", 0x0000, 0x0200, CRC(d861b80c) SHA1(4652f8ee0dd4c3c48b625285bb4f094d96434071) )
+ROM_END
+
 
 
 
@@ -1327,8 +1392,8 @@ void plus1_state::plus1(machine_config &config)
 class lightfgt_state : public hh_cop400_state
 {
 public:
-	lightfgt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag)
+	lightfgt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1429,6 +1494,13 @@ void lightfgt_state::lightfgt(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+// roms
+
+ROM_START( lightfgt )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop421l-hla_n", 0x0000, 0x0400, CRC(aceb2d65) SHA1(2328cbb195faf93c575f3afa3a1fe0079180edd7) )
+ROM_END
+
 
 
 
@@ -1445,8 +1517,8 @@ void lightfgt_state::lightfgt(machine_config &config)
 class bship82_state : public hh_cop400_state
 {
 public:
-	bship82_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag)
+	bship82_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(write_d);
@@ -1586,6 +1658,13 @@ void bship82_state::bship82(machine_config &config)
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
+// roms
+
+ROM_START( bship82 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop420-jwe_n", 0x0000, 0x0400, CRC(5ea8111a) SHA1(34931463b806b48dce4f8ae2361512510bae0ebf) )
+ROM_END
+
 
 
 
@@ -1603,8 +1682,8 @@ void bship82_state::bship82(machine_config &config)
 class qkracer_state : public hh_cop400_state
 {
 public:
-	qkracer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag)
+	qkracer_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1713,6 +1792,13 @@ void qkracer_state::qkracer(machine_config &config)
 	/* no sound! */
 }
 
+// roms
+
+ROM_START( qkracer )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop420-npg_n", 0x0000, 0x0400, CRC(17f8e538) SHA1(23d1a1819e6ba552d8da83da2948af1cf5b13d5b) )
+ROM_END
+
 
 
 
@@ -1737,8 +1823,8 @@ void qkracer_state::qkracer(machine_config &config)
 class vidchal_state : public hh_cop400_state
 {
 public:
-	vidchal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag)
+	vidchal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1809,100 +1895,7 @@ void vidchal_state::vidchal(machine_config &config)
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
-
-
-
-
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
-
-ROM_START( ctstein )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "cop421-nez_n", 0x0000, 0x0400, CRC(16148e03) SHA1(b2b74891d36813d9a1eefd56a925054997c4b7f7) ) // 2nd half empty
-ROM_END
-
-
-ROM_START( h2hbaskbc )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "cop420l-nmy", 0x0000, 0x0400, CRC(87152509) SHA1(acdb869b65d49b3b9855a557ed671cbbb0f61e2c) )
-ROM_END
-
-ROM_START( h2hhockeyc ) // dumped from Basketball
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "cop420l-nmy", 0x0000, 0x0400, CRC(87152509) SHA1(acdb869b65d49b3b9855a557ed671cbbb0f61e2c) )
-ROM_END
-
-ROM_START( h2hsoccerc ) // dumped from Basketball
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "cop420l-nmy", 0x0000, 0x0400, CRC(87152509) SHA1(acdb869b65d49b3b9855a557ed671cbbb0f61e2c) )
-ROM_END
-
-
-ROM_START( einvaderc )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "copl444-hrz_n_inv_ii", 0x0000, 0x0800, CRC(76400f38) SHA1(0e92ab0517f7b7687293b189d30d57110df20fe0) )
-
-	ROM_REGION( 80636, "svg", 0)
-	ROM_LOAD( "einvaderc.svg", 0, 80636, CRC(a52d0166) SHA1(f69397ebcc518701f30a47b4d62e5a700825375a) )
-ROM_END
-
-
-ROM_START( unkeinv )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "cop421_us4345764", 0x0000, 0x0400, CRC(0068c3a3) SHA1(4e5fd566a5a26c066cc14623a9bd01e109ebf797) ) // typed in from patent US4345764, good print quality
-ROM_END
-
-
-ROM_START( lchicken )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "cop421-njc_n", 0x0000, 0x0400, CRC(319e7985) SHA1(9714327518f65ebefe38ac7911bed2b9b9c77307) )
-ROM_END
-
-
-ROM_START( funjacks )
-	ROM_REGION( 0x0200, "maincpu", 0 )
-	ROM_LOAD( "cop410l_b_ngs", 0x0000, 0x0200, CRC(863368ea) SHA1(f116cc27ae721b3a3e178fa13765808bdc275663) )
-ROM_END
-
-
-ROM_START( funrlgl )
-	ROM_REGION( 0x0200, "maincpu", 0 )
-	ROM_LOAD( "cop410l_b_nhz", 0x0000, 0x0200, CRC(4065c3ce) SHA1(f0bc8125d922949e0d7ab1ba89c805a836d20e09) )
-ROM_END
-
-
-ROM_START( mdallas )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "copl444l-hyn_n", 0x0000, 0x0800, CRC(7848b78c) SHA1(778d24512180892f58c49df3c72ca77b2618d63b) )
-ROM_END
-
-
-ROM_START( plus1 )
-	ROM_REGION( 0x0200, "maincpu", 0 )
-	ROM_LOAD( "cop410l_b_nne", 0x0000, 0x0200, CRC(d861b80c) SHA1(4652f8ee0dd4c3c48b625285bb4f094d96434071) )
-ROM_END
-
-
-ROM_START( lightfgt )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "cop421l-hla_n", 0x0000, 0x0400, CRC(aceb2d65) SHA1(2328cbb195faf93c575f3afa3a1fe0079180edd7) )
-ROM_END
-
-
-ROM_START( bship82 )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "cop420-jwe_n", 0x0000, 0x0400, CRC(5ea8111a) SHA1(34931463b806b48dce4f8ae2361512510bae0ebf) )
-ROM_END
-
-
-ROM_START( qkracer )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "cop420-npg_n", 0x0000, 0x0400, CRC(17f8e538) SHA1(23d1a1819e6ba552d8da83da2948af1cf5b13d5b) )
-ROM_END
-
+// roms
 
 ROM_START( vidchal )
 	ROM_REGION( 0x0400, "maincpu", 0 )
@@ -1910,6 +1903,14 @@ ROM_START( vidchal )
 ROM_END
 
 
+
+} // anonymous namespace
+
+/***************************************************************************
+
+  Game driver(s)
+
+***************************************************************************/
 
 //    YEAR  NAME        PARENT    CMP MACHINE     INPUT       CLASS            INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1979, ctstein,    0,         0, ctstein,    ctstein,    ctstein_state,   empty_init, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

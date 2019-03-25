@@ -260,28 +260,28 @@ void dynadice_state::machine_reset()
 	m_ay_data = 0;
 }
 
-MACHINE_CONFIG_START(dynadice_state::dynadice)
-
+void dynadice_state::dynadice(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8080, 18.432_MHz_XTAL / 8)
-	MCFG_DEVICE_PROGRAM_MAP(dynadice_map)
-	MCFG_DEVICE_IO_MAP(dynadice_io_map)
+	I8080(config, m_maincpu, 18.432_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dynadice_state::dynadice_map);
+	m_maincpu->set_addrmap(AS_IO, &dynadice_state::dynadice_io_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 18.432_MHz_XTAL / 6)
-	MCFG_DEVICE_PROGRAM_MAP(dynadice_sound_map)
-	MCFG_DEVICE_IO_MAP(dynadice_sound_io_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", 18.432_MHz_XTAL / 6));
+	audiocpu.set_addrmap(AS_PROGRAM, &dynadice_state::dynadice_sound_map);
+	audiocpu.set_addrmap(AS_IO, &dynadice_state::dynadice_sound_io_map);
 
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256+16, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 3*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dynadice_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256+16, 256);
+	screen.set_visarea(0*8, 34*8-1, 3*8, 28*8-1);
+	screen.set_screen_update(FUNC(dynadice_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_dynadice);
 	PALETTE(config, "palette", palette_device::BRG_3BIT);
@@ -291,7 +291,7 @@ MACHINE_CONFIG_START(dynadice_state::dynadice)
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	AY8910(config, m_ay8910, 2000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 ROM_START( dynadice )
 	ROM_REGION( 0x10000, "maincpu", 0 )

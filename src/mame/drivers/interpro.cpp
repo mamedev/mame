@@ -532,11 +532,11 @@ void interpro_state::interpro_common_map(address_map &map)
 	map(0x7f000400, 0x7f00040f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
 	map(0x7f000410, 0x7f00041f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
 	map(0x7f000500, 0x7f000503).lrw8("rtc_rw",
-									 [this](address_space &space, offs_t offset, u8 mem_mask) {
-										 return m_rtc->read(space, offset^1, mem_mask);
+									 [this](offs_t offset) {
+										 return m_rtc->read(offset^1);
 									 },
-									 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-										 m_rtc->write(space, offset^1, data, mem_mask);
+									 [this](offs_t offset, u8 data) {
+										 m_rtc->write(offset^1, data);
 									 }).umask32(0x000000ff);
 	map(0x7f000600, 0x7f000600).w(m_rtc, FUNC(mc146818_device::write));
 
@@ -780,8 +780,8 @@ void interpro_state::ioga(machine_config &config)
 	//m_ioga->dma_r_callback<0>().set(unknown); // plotter
 	m_ioga->dma_r_callback<1>().set(INTERPRO_SCSI_DEVICE_TAG, FUNC(ncr53c90a_device::dma_r));
 	m_ioga->dma_w_callback<1>().set(INTERPRO_SCSI_DEVICE_TAG, FUNC(ncr53c90a_device::dma_w));
-	m_ioga->dma_r_callback<2>().set(m_fdc, FUNC(upd765_family_device::mdma_r));
-	m_ioga->dma_w_callback<2>().set(m_fdc, FUNC(upd765_family_device::mdma_w));
+	m_ioga->dma_r_callback<2>().set(m_fdc, FUNC(upd765_family_device::dma_r));
+	m_ioga->dma_w_callback<2>().set(m_fdc, FUNC(upd765_family_device::dma_w));
 	m_ioga->serial_dma_r_callback<0>().set(m_scc2, FUNC(z80scc_device::db_r));
 	m_ioga->serial_dma_w_callback<0>().set(m_scc2, FUNC(z80scc_device::db_w));
 	m_ioga->serial_dma_r_callback<1>().set(m_scc1, FUNC(z80scc_device::da_r));

@@ -53,8 +53,6 @@ public:
 	void puzzlove(machine_config &config);
 	void silvmil(machine_config &config);
 
-	void init_silvmil();
-
 private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -63,94 +61,91 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_bg_videoram;
-	required_shared_ptr<uint16_t> m_fg_videoram;
-	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<u16> m_bg_videoram;
+	required_shared_ptr<u16> m_fg_videoram;
+	required_shared_ptr<u16> m_spriteram;
 
 	/* video-related */
 	tilemap_t   *m_bg_layer;
 	tilemap_t   *m_fg_layer;
-	int       m_silvmil_tilebank[4];
-	int     m_whichbank;
+	int         m_tilebank[4];
+	int         m_whichbank;
 
-	DECLARE_WRITE16_MEMBER(silvmil_tilebank_w)
-	{
-		m_silvmil_tilebank[m_whichbank] = (data>>8) & 0x1f;
+	void tilebank_w(u16 data);
+	void tilebank1_w(u16 data);
+	void fg_scrolly_w(u16 data);
+	void bg_scrolly_w(u16 data);
+	void fg_scrollx_w(u16 data);
+	void bg_scrollx_w(u16 data);
 
-	//  printf("%08x tilebank_w %04x (which = %04x)\n",pc, data, m_whichbank);
-		m_fg_layer->mark_all_dirty();
-		m_bg_layer->mark_all_dirty();
-	}
-
-	DECLARE_WRITE16_MEMBER(silvmil_tilebank1_w)
-	{
-		m_whichbank = (data>>8)&0x3;
-	}
-
-	DECLARE_WRITE16_MEMBER(silvmil_fg_scrolly_w)
-	{
-		m_fg_layer->set_scrolly(0, data + 8);
-	}
-
-	DECLARE_WRITE16_MEMBER(silvmil_bg_scrolly_w)
-	{
-		m_bg_layer->set_scrolly(0, data + 8);
-	}
-
-	DECLARE_WRITE16_MEMBER(silvmil_fg_scrollx_w)
-	{
-		m_fg_layer->set_scrollx(0, data);
-	}
-
-	DECLARE_WRITE16_MEMBER(silvmil_bg_scrollx_w)
-	{
-		m_bg_layer->set_scrollx(0, data + 4);
-	}
-
-
-	DECLARE_WRITE16_MEMBER(silvmil_fg_videoram_w)
-	{
-		COMBINE_DATA(&m_fg_videoram[offset]);
-		m_fg_layer->mark_tile_dirty(offset);
-	}
-
-	DECLARE_WRITE16_MEMBER(silvmil_bg_videoram_w)
-	{
-		COMBINE_DATA(&m_bg_videoram[offset]);
-		m_bg_layer->mark_tile_dirty(offset);
-	}
-
-	DECLARE_WRITE16_MEMBER(silvmil_soundcmd_w)
-	{
-		if (ACCESSING_BITS_0_7)
-		{
-			m_soundlatch->write(space, 0, data & 0xff);
-			machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
-
-		}
-	}
-
+	void fg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	DECLARE_WRITE8_MEMBER(soundcmd_w);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILEMAP_MAPPER_MEMBER(deco16_scan_rows);
+	TILEMAP_MAPPER_MEMBER(scan_rows);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tumblepb_gfx1_rearrange();
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void silvmil_map(address_map &map);
-	void silvmil_sound_map(address_map &map);
+	void mem_map(address_map &map);
+	void sound_map(address_map &map);
 };
 
+void silvmil_state::tilebank_w(u16 data)
+{
+	m_tilebank[m_whichbank] = (data >> 8) & 0x1f;
+
+//  printf("%08x tilebank_w %04x (which = %04x)\n",pc, data, m_whichbank);
+	m_fg_layer->mark_all_dirty();
+	m_bg_layer->mark_all_dirty();
+}
+
+void silvmil_state::tilebank1_w(u16 data)
+{
+	m_whichbank = (data >> 8) & 0x3;
+}
+
+void silvmil_state::fg_scrolly_w(u16 data)
+{
+	m_fg_layer->set_scrolly(0, data + 8);
+}
+
+void silvmil_state::bg_scrolly_w(u16 data)
+{
+	m_bg_layer->set_scrolly(0, data + 8);
+}
+
+void silvmil_state::fg_scrollx_w(u16 data)
+{
+	m_fg_layer->set_scrollx(0, data);
+}
+
+void silvmil_state::bg_scrollx_w(u16 data)
+{
+	m_bg_layer->set_scrollx(0, data + 4);
+}
+
+void silvmil_state::fg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_fg_videoram[offset]);
+	m_fg_layer->mark_tile_dirty(offset);
+}
+
+void silvmil_state::bg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_layer->mark_tile_dirty(offset);
+}
 
 TILE_GET_INFO_MEMBER(silvmil_state::get_bg_tile_info)
 {
 	int data  = m_bg_videoram[tile_index];
 	int tile  = data & 0x3ff;
 	int color = (data >> 12) & 0x0f;
-	int bank = m_silvmil_tilebank[(data&0xc00)>>10]*0x400;
+	int bank = m_tilebank[(data & 0xc00) >> 10] * 0x400;
 
 	SET_TILE_INFO_MEMBER(1, tile + bank, color + 0x20, 0);
 }
@@ -160,12 +155,12 @@ TILE_GET_INFO_MEMBER(silvmil_state::get_fg_tile_info)
 	int data  = m_fg_videoram[tile_index];
 	int tile  = data & 0x3ff;
 	int color = (data >> 12) & 0x0f;
-	int bank = m_silvmil_tilebank[(data&0xc00)>>10]*0x400;
+	int bank = m_tilebank[(data & 0xc00) >> 10] * 0x400;
 
 	SET_TILE_INFO_MEMBER(1, tile + bank, color + 0x10, 0);
 }
 
-TILEMAP_MAPPER_MEMBER(silvmil_state::deco16_scan_rows)
+TILEMAP_MAPPER_MEMBER(silvmil_state::scan_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
@@ -173,13 +168,13 @@ TILEMAP_MAPPER_MEMBER(silvmil_state::deco16_scan_rows)
 
 void silvmil_state::video_start()
 {
-	m_bg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(silvmil_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),this), 16, 16, 64, 32);
-	m_fg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(silvmil_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),this), 16, 16, 64, 32);
+	m_bg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(silvmil_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::scan_rows),this), 16, 16, 64, 32);
+	m_fg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(silvmil_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::scan_rows),this), 16, 16, 64, 32);
 
 	m_fg_layer->set_transparent_pen(0);
 }
 
-uint32_t silvmil_state::screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 silvmil_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_layer->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_layer->draw(screen, bitmap, cliprect, 0, 0);
@@ -188,22 +183,28 @@ uint32_t silvmil_state::screen_update_silvmil(screen_device &screen, bitmap_ind1
 }
 
 
-void silvmil_state::silvmil_map(address_map &map)
+WRITE8_MEMBER(silvmil_state::soundcmd_w)
+{
+	m_soundlatch->write(space, 0, data & 0xff);
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
+}
+
+void silvmil_state::mem_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 
-	map(0x100000, 0x100001).w(FUNC(silvmil_state::silvmil_tilebank1_w));
-	map(0x100002, 0x100003).w(FUNC(silvmil_state::silvmil_fg_scrollx_w));
-	map(0x100004, 0x100005).w(FUNC(silvmil_state::silvmil_fg_scrolly_w));
-	map(0x100006, 0x100007).w(FUNC(silvmil_state::silvmil_bg_scrollx_w));
-	map(0x100008, 0x100009).w(FUNC(silvmil_state::silvmil_bg_scrolly_w));
-	map(0x10000e, 0x10000f).w(FUNC(silvmil_state::silvmil_tilebank_w));
+	map(0x100000, 0x100001).w(FUNC(silvmil_state::tilebank1_w));
+	map(0x100002, 0x100003).w(FUNC(silvmil_state::fg_scrollx_w));
+	map(0x100004, 0x100005).w(FUNC(silvmil_state::fg_scrolly_w));
+	map(0x100006, 0x100007).w(FUNC(silvmil_state::bg_scrollx_w));
+	map(0x100008, 0x100009).w(FUNC(silvmil_state::bg_scrolly_w));
+	map(0x10000e, 0x10000f).w(FUNC(silvmil_state::tilebank_w));
 
-	map(0x120000, 0x120fff).ram().w(FUNC(silvmil_state::silvmil_fg_videoram_w)).share("fg_videoram");
-	map(0x122000, 0x122fff).ram().w(FUNC(silvmil_state::silvmil_bg_videoram_w)).share("bg_videoram");
+	map(0x120000, 0x120fff).ram().w(FUNC(silvmil_state::fg_videoram_w)).share("fg_videoram");
+	map(0x122000, 0x122fff).ram().w(FUNC(silvmil_state::bg_videoram_w)).share("bg_videoram");
 	map(0x200000, 0x2005ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x210000, 0x2107ff).ram().share("spriteram");
-	map(0x270000, 0x270001).w(FUNC(silvmil_state::silvmil_soundcmd_w));
+	map(0x270001, 0x270001).w(FUNC(silvmil_state::soundcmd_w));
 	map(0x280000, 0x280001).portr("P1_P2");
 	map(0x280002, 0x280003).portr("COIN");
 	map(0x280004, 0x280005).portr("DSW");
@@ -366,44 +367,53 @@ static const gfx_layout tlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0, 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(8*2*16,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
+	64*8
+};
+
+static const gfx_layout tlayout_alt =
+{
+	16,16,
+	RGN_FRAC(1,2),
+	4,
+	{ 8, 0, RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0 },
+	{ STEP8(0,1), STEP8(8*2*16,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
 
 static GFXDECODE_START( gfx_silvmil )
-	GFXDECODE_ENTRY( "gfx2", 0, tlayout,       0, 64 )  /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx1", 0, tlayout,       0, 64 )  /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tlayout,       0, 64 )  /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, tlayout_alt,   0, 64 )  /* Tiles 16x16 */
 GFXDECODE_END
 
 
 void silvmil_state::machine_start()
 {
-	save_item(NAME(m_silvmil_tilebank));
+	save_item(NAME(m_tilebank));
 	save_item(NAME(m_whichbank));
 }
 
 void silvmil_state::machine_reset()
 {
-	m_silvmil_tilebank[0] = 0;
-	m_silvmil_tilebank[1] = 0;
-	m_silvmil_tilebank[2] = 0;
-	m_silvmil_tilebank[3] = 0;
+	m_tilebank[0] = 0;
+	m_tilebank[1] = 0;
+	m_tilebank[2] = 0;
+	m_tilebank[3] = 0;
 	m_whichbank = 0;
 }
 
 
-void silvmil_state::silvmil_sound_map(address_map &map)
+void silvmil_state::sound_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xd000, 0xd7ff).ram();
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xc002, 0xc002).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).mirror(1);
 	map(0xc006, 0xc006).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xc00f, 0xc00f).nopw(); // ??
+	map(0xd000, 0xd7ff).ram();
 }
 
 
@@ -411,12 +421,11 @@ void silvmil_state::silvmil(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(12'000'000)); /* Verified */
-	m_maincpu->set_addrmap(AS_PROGRAM, &silvmil_state::silvmil_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &silvmil_state::mem_map);
 	m_maincpu->set_vblank_int("screen", FUNC(silvmil_state::irq6_line_hold));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(4'096'000))); /* Verified */
-	audiocpu.set_addrmap(AS_PROGRAM, &silvmil_state::silvmil_sound_map);
-
+	audiocpu.set_addrmap(AS_PROGRAM, &silvmil_state::sound_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -424,7 +433,7 @@ void silvmil_state::silvmil(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(0, 40*8-1, 0, 30*8-1);
-	screen.set_screen_update(FUNC(silvmil_state::screen_update_silvmil));
+	screen.set_screen_update(FUNC(silvmil_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x300);
@@ -572,32 +581,7 @@ ROM_START( puzzlovek )
 	ROM_LOAD16_BYTE( "8.u56", 0x100001, 0x80000, CRC(95b5f049) SHA1(1104dac1fbf6a894b7d8294b3f44a0edbf363157) ) // sldh
 ROM_END
 
-void silvmil_state::tumblepb_gfx1_rearrange()
-{
-	uint8_t *rom = memregion("gfx1")->base();
-	int len = memregion("gfx1")->bytes();
-	int i;
 
-	/* gfx data is in the wrong order */
-	for (i = 0; i < len; i++)
-	{
-		if ((i & 0x20) == 0)
-		{
-			int t = rom[i]; rom[i] = rom[i + 0x20]; rom[i + 0x20] = t;
-		}
-	}
-	/* low/high half are also swapped */
-	for (i = 0; i < len / 2; i++)
-	{
-		int t = rom[i]; rom[i] = rom[i + len / 2]; rom[i + len / 2] = t;
-	}
-}
-
-void silvmil_state::init_silvmil()
-{
-	tumblepb_gfx1_rearrange();
-}
-
-GAME( 1995, silvmil,    0,        silvmil,   silvmil,   silvmil_state, init_silvmil, ROT270, "Para", "Silver Millennium", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, puzzlove,   0,        puzzlove,  puzzlove,  silvmil_state, init_silvmil, ROT0,   "Para", "PuzzLove", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, puzzlovek,  puzzlove, puzzlovek, puzzlovek, silvmil_state, init_silvmil, ROT0,   "Para", "PuzzLove (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, silvmil,    0,        silvmil,   silvmil,   silvmil_state, empty_init, ROT270, "Para", "Silver Millennium", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, puzzlove,   0,        puzzlove,  puzzlove,  silvmil_state, empty_init, ROT0,   "Para", "PuzzLove", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, puzzlovek,  puzzlove, puzzlovek, puzzlovek, silvmil_state, empty_init, ROT0,   "Para", "PuzzLove (Korea)", MACHINE_SUPPORTS_SAVE )

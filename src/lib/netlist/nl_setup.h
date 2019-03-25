@@ -8,11 +8,6 @@
 #ifndef NLSETUP_H_
 #define NLSETUP_H_
 
-#include <memory>
-#include <stack>
-#include <unordered_map>
-#include <vector>
-
 #include "plib/pparser.h"
 #include "plib/pstream.h"
 #include "plib/pstring.h"
@@ -21,6 +16,12 @@
 #include "nl_config.h"
 #include "nl_factory.h"
 #include "nltypes.h"
+
+#include <memory>
+#include <stack>
+#include <unordered_map>
+#include <vector>
+
 
 //============================================================
 //  MACROS / inline netlist definitions
@@ -201,8 +202,35 @@ namespace netlist
 		const type_t m_type;
 	};
 
+
 	// ----------------------------------------------------------------------------------------
-	// setup_t
+	// Collection of models
+	// ----------------------------------------------------------------------------------------
+
+	class models_t
+	{
+	public:
+		void register_model(pstring model_in);
+		/* model / family related */
+
+		pstring model_value_str(pstring model, pstring entity);
+
+		double model_value(pstring model, pstring entity);
+
+		pstring model_type(pstring model) { return model_value_str(model, "COREMODEL"); }
+
+	private:
+		using model_map_t = std::unordered_map<pstring, pstring>;
+
+		void model_parse(const pstring &model, model_map_t &map);
+		pstring model_string(model_map_t &map);
+
+		std::unordered_map<pstring, pstring> m_models;
+		std::unordered_map<pstring, model_map_t> m_cache;
+	};
+
+	// ----------------------------------------------------------------------------------------
+	// nlparse_t
 	// ----------------------------------------------------------------------------------------
 
 	class nlparse_t
@@ -212,7 +240,7 @@ namespace netlist
 
 		nlparse_t(setup_t &netlist, log_type &log);
 
-		void register_model(const pstring &model_in);
+		void register_model(const pstring &model_in) { m_models.register_model(model_in); }
 		void register_alias(const pstring &alias, const pstring &out);
 		void register_dippins_arr(const pstring &terms);
 		void register_dev(const pstring &classname, const pstring &name);
@@ -239,7 +267,6 @@ namespace netlist
 		/* include other files */
 
 		void include(const pstring &netlist_name);
-		/* parse a source */
 
 		pstring build_fqn(const pstring &obj_name) const;
 		void register_alias_nofqn(const pstring &alias, const pstring &out);
@@ -275,8 +302,12 @@ namespace netlist
 		 */
 		setup_t &setup() { return m_setup; }
 		const setup_t &setup() const { return m_setup; }
+
+		models_t &models() { return m_models; }
+		const models_t &models() const { return m_models; }
+
 	protected:
-		std::unordered_map<pstring, pstring>        m_models;
+		models_t                                    m_models;
 		std::stack<pstring>                         m_namespace_stack;
 		std::unordered_map<pstring, pstring>        m_alias;
 		std::vector<link_t>                         m_links;
@@ -298,20 +329,21 @@ namespace netlist
 		unsigned m_frontier_cnt;
 	};
 
+	// ----------------------------------------------------------------------------------------
+	// setup_t
+	// ----------------------------------------------------------------------------------------
+
 	class setup_t : public nlparse_t
 	{
 	public:
 
-		explicit setup_t(netlist_t &netlist);
+		explicit setup_t(netlist_state_t &nlstate);
 		~setup_t() noexcept;
 
 		COPYASSIGNMOVE(setup_t, delete)
 
-		netlist_state_t &netlist();
-		const netlist_state_t &netlist() const;
-
-		netlist_t &exec() { return m_netlist; }
-		const netlist_t &exec() const { return m_netlist; }
+		netlist_state_t &nlstate() { return m_nlstate; }
+		const netlist_state_t &nlstate() const { return m_nlstate; }
 
 		void register_param_t(const pstring &name, param_t &param);
 
@@ -325,23 +357,16 @@ namespace netlist
 
 		param_t *find_param(const pstring &param_in, bool required = true) const;
 
+		/* get family */
+		const logic_family_desc_t *family_from_model(const pstring &model);
+
 		void register_dynamic_log_devices();
 		void resolve_inputs();
 
 		plib::unique_ptr<plib::pistream> get_data_stream(const pstring &name);
 
-
 		factory::list_t &factory() { return m_factory; }
 		const factory::list_t &factory() const { return m_factory; }
-
-		/* model / family related */
-
-		const pstring model_value_str(detail::model_map_t &map, const pstring &entity);
-		double model_value(detail::model_map_t &map, const pstring &entity);
-
-		void model_parse(const pstring &model, detail::model_map_t &map);
-
-		const logic_family_desc_t *family_from_model(const pstring &model);
 
 		/* helper - also used by nltool */
 		const pstring resolve_alias(const pstring &name) const;
@@ -383,7 +408,7 @@ namespace netlist
 
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 
-		netlist_t                                   &m_netlist;
+		netlist_state_t                             &m_nlstate;
 		devices::nld_netlistparams                  *m_netlist_params;
 		std::unordered_map<pstring, param_ref_t>    m_params;
 

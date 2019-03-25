@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco,hap
+// copyright-holders:Kevin Horton, Jonathan Gevaryahu, Sandro Ronco, hap
 /******************************************************************************
 *
 * fidel_card.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp

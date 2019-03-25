@@ -252,16 +252,16 @@ void commando_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(commando_state::commando)
-
+void commando_state::commando(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, PHI_MAIN)  // ???
-	MCFG_DEVICE_PROGRAM_MAP(commando_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	Z80(config, m_maincpu, PHI_MAIN);  // ???
+	m_maincpu->set_addrmap(AS_PROGRAM, &commando_state::commando_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &commando_state::decrypted_opcodes_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, PHI_B)    // 3 MHz
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(commando_state, irq0_line_hold,  4*60)
+	Z80(config, m_audiocpu, PHI_B);    // 3 MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &commando_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(commando_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -287,7 +287,7 @@ MACHINE_CONFIG_START(commando_state::commando)
 	YM2203(config, "ym1", PHI_B/2).add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	YM2203(config, "ym2", PHI_B/2).add_route(ALL_OUTPUTS, "mono", 0.15);
-MACHINE_CONFIG_END
+}
 
 
 /* ROMs */

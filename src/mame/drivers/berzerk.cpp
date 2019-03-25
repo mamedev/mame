@@ -1120,39 +1120,38 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(berzerk_state::berzerk)
-
+void berzerk_state::berzerk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(berzerk_map)
-	MCFG_DEVICE_IO_MAP(berzerk_io_map)
+	Z80(config, m_maincpu, MAIN_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &berzerk_state::berzerk_map);
+	m_maincpu->set_addrmap(AS_IO, &berzerk_state::berzerk_io_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ls181_10c", TTL74181)
-	MCFG_DEVICE_ADD("ls181_12c", TTL74181)
+	TTL74181(config, m_ls181_10c);
+	TTL74181(config, m_ls181_12c);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(berzerk_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(berzerk_state::screen_update));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("speech", S14001A, S14001_CLOCK/16/8) /* placeholder - the clock is software controllable */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	S14001A(config, m_s14001a, S14001_CLOCK/16/8).add_route(ALL_OUTPUTS, "mono", 1.00); /* placeholder - the clock is software controllable */
 	EXIDY(config, m_custom, 0).add_route(ALL_OUTPUTS, "mono", 0.33);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(berzerk_state::frenzy)
+void berzerk_state::frenzy(machine_config &config)
+{
 	berzerk(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(frenzy_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &berzerk_state::frenzy_map);
+}
 
 
 

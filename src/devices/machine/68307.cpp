@@ -90,6 +90,14 @@ void m68307_cpu_device::device_reset()
 	set_ipl(0);
 }
 
+void m68307_cpu_device::m68k_reset_peripherals()
+{
+	m_duart->reset();
+
+	if (m_m68307MBUS) m_m68307MBUS->reset();
+	if (m_m68307TIMER) m_m68307TIMER->reset();
+}
+
 
 /* todo: is it possible to calculate the address map based on CS when they change
    and install handlers?  Going through this logic for every memory access is

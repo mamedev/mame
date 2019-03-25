@@ -129,10 +129,10 @@ namespace netlist
 			}
 			else if (m_type == 3)
 			{
-				register_sub("CP1", m_CP);
-				register_sub("EBUF", m_EBUF);
-				register_sub("DN", m_DN, "D(IS=1e-15 N=1)");
-				register_sub("DP", m_DP, "D(IS=1e-15 N=1)");
+				create_and_register_subdevice("CP1", m_CP);
+				create_and_register_subdevice("EBUF", m_EBUF);
+				create_and_register_subdevice("DN", m_DN, "D(IS=1e-15 N=1)");
+				create_and_register_subdevice("DP", m_DP, "D(IS=1e-15 N=1)");
 
 				//m_DP->m_model.setTo("D(IS=1e-15 N=1)");
 				//m_DN->m_model.setTo("D(IS=1e-15 N=1)");

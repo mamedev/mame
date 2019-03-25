@@ -8,10 +8,10 @@
 #ifndef PEXCEPTION_H_
 #define PEXCEPTION_H_
 
-#include <exception>
-
 #include "pstring.h"
 #include "ptypes.h"
+
+#include <exception>
 
 namespace plib {
 

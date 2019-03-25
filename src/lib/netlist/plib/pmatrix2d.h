@@ -22,21 +22,22 @@ namespace plib
 {
 
 
-	template<typename T, typename A = std::allocator<T>>
+	template<typename T, typename A = aligned_allocator<T>>
 	class pmatrix2d
 	{
 	public:
 		using value_type = T;
+		using allocator_type = A;
 
 		static constexpr const std::size_t align_size = align_traits<A>::align_size;
 		static constexpr const std::size_t stride_size = align_traits<A>::stride_size;
 		pmatrix2d()
-		: m_N(0), m_M(0), m_stride(8)
+		: m_N(0), m_M(0), m_stride(8), m_v()
 		{
 		}
 
 		pmatrix2d(std::size_t N, std::size_t M)
-		: m_N(N), m_M(M)
+		: m_N(N), m_M(M), m_v()
 		{
 			m_stride = ((M + stride_size-1) / stride_size) * stride_size;
 			m_v.resize(N * m_stride);

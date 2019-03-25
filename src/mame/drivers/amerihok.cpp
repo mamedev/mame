@@ -39,18 +39,42 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER(control_w);
+	void control_w(u8 data);
+	void p2_w(u8 data);
+	u8 p3_r();
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z8_device> m_maincpu;
 	required_device<okim6376_device> m_oki;
 	void amerihok_data_map(address_map &map);
 	void amerihok_map(address_map &map);
+
+	u32 m_outputs[2];
+	u32 m_latched_outputs[2];
+	u8 m_old_p2;
 };
 
-WRITE8_MEMBER(amerihok_state::control_w)
+void amerihok_state::control_w(u8 data)
 {
 	m_oki->st_w(!BIT(data, 4));
 	m_oki->ch2_w(!BIT(data, 7));
+}
+
+void amerihok_state::p2_w(u8 data)
+{
+	if (BIT(data, 5) && !BIT(m_old_p2, 5))
+	{
+		m_outputs[1] = (m_outputs[1] << 1) | BIT(m_outputs[0], 31);
+		m_outputs[0] = (m_outputs[0] << 1) | BIT(data, 6);
+	}
+
+	if (BIT(data, 7) && (m_outputs[0] != m_latched_outputs[0] || m_outputs[1] != m_latched_outputs[1]))
+	{
+		m_latched_outputs[0] = m_outputs[0];
+		m_latched_outputs[1] = m_outputs[1];
+		logerror("Outputs = %08X%08X\n", m_latched_outputs[1], m_latched_outputs[0]);
+	}
+
+	m_old_p2 = data;
 }
 
 void amerihok_state::amerihok_map(address_map &map)
@@ -60,17 +84,49 @@ void amerihok_state::amerihok_map(address_map &map)
 
 void amerihok_state::amerihok_data_map(address_map &map)
 {
+	map(0x1000, 0x1000).portr("1000");
 	map(0x2000, 0x2000).w(FUNC(amerihok_state::control_w));
+	map(0x3000, 0x3000).portr("3000");
 	map(0x4000, 0x4000).w(m_oki, FUNC(okim6376_device::write));
 }
 
 static INPUT_PORTS_START( amerihok )
+	PORT_START("1000")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_CODE(KEYCODE_N)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON7) PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON8) PORT_CODE(KEYCODE_COMMA)
+
+	PORT_START("3000")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_A) PORT_NAME("Score Visitor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_S) PORT_NAME("Score Home")
+	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("P2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON9) PORT_CODE(KEYCODE_STOP)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON10) PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT(0xee, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("P3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("oki", okim6376_device, busy_r)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN2)
 INPUT_PORTS_END
 
 
 
 void amerihok_state::machine_start()
 {
+	std::fill(std::begin(m_outputs), std::end(m_outputs), 0);
+	std::fill(std::begin(m_latched_outputs), std::end(m_latched_outputs), 0);
+
+	save_item(NAME(m_outputs));
+	save_item(NAME(m_latched_outputs));
 }
 
 void amerihok_state::machine_reset()
@@ -83,6 +139,9 @@ void amerihok_state::amerihok(machine_config &config)
 	Z8681(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &amerihok_state::amerihok_map);
 	m_maincpu->set_addrmap(AS_DATA, &amerihok_state::amerihok_data_map);
+	m_maincpu->p2_in_cb().set_ioport("P2");
+	m_maincpu->p2_out_cb().set(FUNC(amerihok_state::p2_w));
+	m_maincpu->p3_in_cb().set_ioport("P3");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

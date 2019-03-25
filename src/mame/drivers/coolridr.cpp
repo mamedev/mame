@@ -3219,16 +3219,17 @@ WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 
 #define MAIN_CLOCK XTAL(28'636'363)
 
-MACHINE_CONFIG_START(coolridr_state::coolridr)
-	MCFG_DEVICE_ADD("maincpu", SH2, MAIN_CLOCK)  // 28 MHz
-	MCFG_DEVICE_PROGRAM_MAP(system_h1_map)
+void coolridr_state::coolridr(machine_config &config)
+{
+	SH2(config, m_maincpu, MAIN_CLOCK);  // 28 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &coolridr_state::system_h1_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(coolridr_state::interrupt_main), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("soundcpu", M68000, 22579000/2) // 22.579 MHz XTAL / 2 = 11.2895 MHz
-	MCFG_DEVICE_PROGRAM_MAP(system_h1_sound_map)
+	M68000(config, m_soundcpu, 22579000/2); // 22.579 MHz XTAL / 2 = 11.2895 MHz
+	m_soundcpu->set_addrmap(AS_PROGRAM, &coolridr_state::system_h1_sound_map);
 
-	MCFG_DEVICE_ADD("sub", SH1, 16000000)  // SH7032 HD6417032F20!! 16 MHz
-	MCFG_DEVICE_PROGRAM_MAP(coolridr_submap)
+	SH1(config, m_subcpu, 16000000);  // SH7032 HD6417032F20!! 16 MHz
+	m_subcpu->set_addrmap(AS_PROGRAM, &coolridr_state::coolridr_submap);
 	TIMER(config, "scantimer2").configure_scanline(FUNC(coolridr_state::interrupt_sub), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -3247,19 +3248,19 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_coolridr);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(640, 512)
-	MCFG_SCREEN_VISIBLE_AREA(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL)
-	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update<0>)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(640, 512);
+	m_screen->set_visarea(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL);
+	m_screen->set_screen_update(FUNC(coolridr_state::screen_update<0>));
+	m_screen->set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("screen2", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(640, 512)
-	MCFG_SCREEN_VISIBLE_AREA(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL)
-	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update<1>)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen2.set_refresh_hz(60);
+	screen2.set_size(640, 512);
+	screen2.set_visarea(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL);
+	screen2.set_screen_update(FUNC(coolridr_state::screen_update<1>));
+	screen2.set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::RGB_555);
 
@@ -3280,20 +3281,19 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 	scsp2.main_irq_cb().set(FUNC(coolridr_state::scsp2_to_sh1_irq));
 	scsp2.add_route(0, "lspeaker", 1.0);
 	scsp2.add_route(1, "rspeaker", 1.0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(coolridr_state::aquastge)
+void coolridr_state::aquastge(machine_config &config)
+{
 	coolridr(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(aquastge_h1_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &coolridr_state::aquastge_h1_map);
 
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(aquastge_submap)
+	m_subcpu->set_addrmap(AS_PROGRAM, &coolridr_state::aquastge_submap);
 
 	sega_315_5649_device &io(SEGA_315_5649(config.replace(), "io", 0));
 	io.in_pc_callback().set_ioport("IN0");
 	io.in_pd_callback().set_ioport("IN1");
-MACHINE_CONFIG_END
+}
 
 ROM_START( coolridr )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* SH2 code */

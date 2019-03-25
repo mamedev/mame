@@ -17,10 +17,6 @@
 		<disk state="0"><color red="0.14" green="0.02" blue="0.03" /></disk>
 		<disk state="1"><color red="1.0" green="0.20" blue="0.22" /></disk>
 	</element>
-	<element name="ledr" defstate="0">
-		<rect state="0"><color red="0.14" green="0.02" blue="0.03" /></rect>
-		<rect state="1"><color red="1.0" green="0.20" blue="0.22" /></rect>
-	</element>
 
 	<element name="text_home"><text string="HOME"><color red="0.85" green="0.85" blue="0.85" /></text></element>
 	<element name="text_away"><text string="AWAY"><color red="0.85" green="0.85" blue="0.85" /></text></element>
@@ -88,36 +84,63 @@
 		<bezel name="2.0" element="led"><bounds x="90" y="75" width="4" height="4" /></bezel>
 		<bezel element="text_away"><bounds x="86" y="80.5" width="12" height="3" /></bezel>
 
+	<!-- defense leds -->
+
+		<repeat count="41">
+			<param name="x" start="45.1" increment="0.05" />
+			<param name="y" start="39.6" increment="0.048" />
+			<bezel name="8.0" element="led"><bounds x="~x~" y="~y~" width="1" height="1" /></bezel>
+		</repeat>
+
+		<repeat count="41">
+			<param name="x" start="103.7" increment="-0.05" />
+			<param name="y" start="39.6" increment="0.048" />
+			<bezel name="8.4" element="led"><bounds x="~x~" y="~y~" width="1" height="1" /></bezel>
+		</repeat>
+
+		<repeat count="60">
+			<param name="x" start="73" increment="0.05" />
+			<param name="y" start="46.5" increment="0.0" />
+			<bezel name="8.2" element="led"><bounds x="~x~" y="~y~" width="1" height="1" /></bezel>
+		</repeat>
+
+		<repeat count="56">
+			<param name="x" start="55.8" increment="-0.011" />
+			<param name="y" start="51.7" increment="0.05" />
+			<bezel name="8.1" element="led"><bounds x="~x~" y="~y~" width="1" height="1" /></bezel>
+		</repeat>
+
+		<repeat count="56">
+			<param name="x" start="93.3" increment="0.011" />
+			<param name="y" start="51.7" increment="0.05" />
+			<bezel name="8.3" element="led"><bounds x="~x~" y="~y~" width="1" height="1" /></bezel>
+		</repeat>
+
 	<!-- small leds -->
 
 		<!-- the leds marked "x", sometimes seen unpopulated, maybe cutting costs in some of the production batches -->
 		<bezel name="3.1" element="led"><bounds x="57.1" y="29.1" width="1" height="1" /></bezel>
 		<bezel name="3.2" element="led"><bounds x="52.7" y="33.7" width="1" height="1" /></bezel>
 		<bezel name="3.3" element="led"><bounds x="48.3" y="38.3" width="1" height="1" /></bezel> <!-- x -->
-		<bezel name="8.0" element="ledr"><bounds x="44.6" y="40.6" width="4" height="1" /></bezel>
 		<bezel name="3.4" element="led"><bounds x="43.9" y="42.9" width="1" height="1" /></bezel>
 
 		<bezel name="4.1" element="led"><bounds x="74.5" y="34" width="1" height="1" /></bezel>
 		<bezel name="4.2" element="led"><bounds x="74.5" y="39" width="1" height="1" /></bezel>
 		<bezel name="4.3" element="led"><bounds x="74.5" y="44" width="1" height="1" /></bezel> <!-- x -->
-		<bezel name="8.2" element="ledr"><bounds x="73" y="46.5" width="4" height="1" /></bezel>
 		<bezel name="4.4" element="led"><bounds x="74.5" y="49" width="1" height="1" /></bezel>
 
 		<bezel name="5.1" element="led"><bounds x="91.9" y="29.1" width="1" height="1" /></bezel>
 		<bezel name="5.2" element="led"><bounds x="96.3" y="33.7" width="1" height="1" /></bezel>
 		<bezel name="5.3" element="led"><bounds x="100.7" y="38.3" width="1" height="1" /></bezel> <!-- x -->
-		<bezel name="8.4" element="ledr"><bounds x="101.4" y="40.6" width="4" height="1" /></bezel>
 		<bezel name="5.4" element="led"><bounds x="105.1" y="42.9" width="1" height="1" /></bezel>
 
 		<bezel name="11.1" element="led"><bounds x="45.6" y="50.9" width="1" height="1" /></bezel>
 		<bezel name="11.2" element="led"><bounds x="52.2" y="52.3" width="1" height="1" /></bezel>
-		<bezel name="8.1" element="ledr"><bounds x="55.5" y="51.5" width="1" height="4" /></bezel>
 		<bezel name="11.3" element="led"><bounds x="58.8" y="53.7" width="1" height="1" /></bezel> <!-- x -->
 		<bezel name="11.4" element="led"><bounds x="65.4" y="55.1" width="1" height="1" /></bezel>
 
 		<bezel name="0.4" element="led"><bounds x="103.4" y="50.9" width="1" height="1" /></bezel>
 		<bezel name="0.3" element="led"><bounds x="96.8" y="52.3" width="1" height="1" /></bezel>
-		<bezel name="8.3" element="ledr"><bounds x="93.5" y="51.5" width="1" height="4" /></bezel>
 		<bezel name="0.2" element="led"><bounds x="90.2" y="53.7" width="1" height="1" /></bezel> <!-- x -->
 		<bezel name="0.1" element="led"><bounds x="83.6" y="55.1" width="1" height="1" /></bezel>
 

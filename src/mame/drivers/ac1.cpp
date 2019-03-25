@@ -129,11 +129,12 @@ static INPUT_PORTS_START( ac1 )
 INPUT_PORTS_END
 
 /* Machine driver */
-MACHINE_CONFIG_START(ac1_state::ac1)
+void ac1_state::ac1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(ac1_mem)
-	MCFG_DEVICE_IO_MAP(ac1_io)
+	Z80(config, m_maincpu, XTAL(8'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ac1_state::ac1_mem);
+	m_maincpu->set_addrmap(AS_IO, &ac1_state::ac1_io);
 
 	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(8'000'000)/4));
 	pio.in_pa_callback().set(FUNC(ac1_state::ac1_port_a_r));
@@ -142,13 +143,13 @@ MACHINE_CONFIG_START(ac1_state::ac1)
 	pio.out_pb_callback().set(FUNC(ac1_state::ac1_port_b_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(64*6, 16*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 16*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ac1_state, screen_update_ac1)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*6, 16*8);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(ac1_state::screen_update_ac1));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ac1);
 
@@ -158,19 +159,19 @@ MACHINE_CONFIG_START(ac1_state::ac1)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	CASSETTE(config, m_cassette);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ac1_state::ac1_32)
+void ac1_state::ac1_32(machine_config &config)
+{
 	ac1(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ac1_32_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ac1_state::ac1_32_mem);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(64*6, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ac1_state, screen_update_ac1_32)
-MACHINE_CONFIG_END
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_size(64*6, 32*8);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(ac1_state::screen_update_ac1_32));
+}
 
 /* ROM definition */
 ROM_START( ac1 )

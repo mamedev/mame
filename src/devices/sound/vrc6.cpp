@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-    vrc6.c
+    vrc6.cpp
     Konami VRC6 additional sound channels
 
     Emulation by R. Belmont

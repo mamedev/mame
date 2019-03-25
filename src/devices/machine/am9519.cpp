@@ -103,7 +103,7 @@ IRQ_CALLBACK_MEMBER(am9519_device::iack_cb)
 }
 
 
-READ8_MEMBER( am9519_device::stat_r )
+u8 am9519_device::stat_r()
 {
 	u8 stat = 0;
 	for(int n = 0, irq = m_prio; n < 8; n++, irq = (irq + 1) & 7)
@@ -121,7 +121,7 @@ READ8_MEMBER( am9519_device::stat_r )
 	return stat;
 }
 
-READ8_MEMBER( am9519_device::data_r )
+u8 am9519_device::data_r()
 {
 	switch((m_mode & 0x60) >> 5)
 	{
@@ -137,7 +137,7 @@ READ8_MEMBER( am9519_device::data_r )
 	return 0;
 }
 
-WRITE8_MEMBER( am9519_device::cmd_w )
+void am9519_device::cmd_w(u8 data)
 {
 	m_cmd = data;
 	switch(data >> 3)
@@ -222,7 +222,7 @@ WRITE8_MEMBER( am9519_device::cmd_w )
 	set_timer();
 }
 
-WRITE8_MEMBER( am9519_device::data_w )
+void am9519_device::data_w(u8 data)
 {
 	if((m_cmd & 0xf0) >= 0xb0)
 	{

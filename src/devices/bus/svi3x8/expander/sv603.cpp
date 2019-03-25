@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "sv603.h"
-
 #include "softlist.h"
 #include "speaker.h"
 
@@ -37,31 +36,20 @@ const tiny_rom_entry *sv603_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sv603_device::device_add_mconfig)
+void sv603_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("snd", SN76489A, XTAL(10'738'635) / 3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489A(config, m_snd, XTAL(10'738'635) / 3).add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	// controller ports
+	COLECOVISION_CONTROL_PORT(config, m_joy[0], colecovision_control_port_devices, "hand");
+	m_joy[0]->irq().set(FUNC(sv603_device::joy_irq_w<0>));
+	COLECOVISION_CONTROL_PORT(config, m_joy[1], colecovision_control_port_devices, nullptr);
+	m_joy[1]->irq().set(FUNC(sv603_device::joy_irq_w<1>));
 
 	// cartridge slot
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "coleco_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom,col")
-	MCFG_GENERIC_LOAD(sv603_device, cartridge)
+	COLECOVISION_CARTRIDGE_SLOT(config, m_cart, colecovision_cartridges, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("coleco");
-MACHINE_CONFIG_END
-
-
-//**************************************************************************
-//  CARTRIDGE
-//**************************************************************************
-
-DEVICE_IMAGE_LOAD_MEMBER( sv603_device, cartridge )
-{
-	uint32_t size = m_cart_rom->common_get_size("rom");
-
-	m_cart_rom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart_rom->common_load_rom(m_cart_rom->get_rom_base(), size, "rom");
-
-	return image_init_result::PASS;
 }
 
 
@@ -78,7 +66,8 @@ sv603_device::sv603_device(const machine_config &mconfig, const char *tag, devic
 	device_svi_expander_interface(mconfig, *this),
 	m_bios(*this, "bios"),
 	m_snd(*this, "snd"),
-	m_cart_rom(*this, "cartslot")
+	m_joy{ {*this, "joy1"}, {*this, "joy2"} },
+	m_cart(*this, COLECOVISION_CARTRIDGE_SLOT_TAG)
 {
 }
 
@@ -104,40 +93,84 @@ void sv603_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER( sv603_device::mreq_r )
+template<int N>
+WRITE_LINE_MEMBER( sv603_device::joy_irq_w )
+{
+	m_expander->int_w(state);
+}
+
+uint8_t sv603_device::mreq_r(offs_t offset)
+{
+	uint8_t data = 0xff;
+
+	// ls138 (active low)
+	int ccs1 = ((offset >> 13) == 0) ? 0 : 1;
+	int ccs2 = ((offset >> 13) == 1) ? 0 : 1;
+	int ccs3 = ((offset >> 13) == 2) ? 0 : 1;
+	int ccs4 = ((offset >> 13) == 3) ? 0 : 1;
+	int bios = ((offset >> 13) == 4) ? 0 : 1;
+	// 5, 6, 7: not connected
+
+	m_expander->romdis_w(0);
+	m_expander->ramdis_w(bios);
+
+	data &= m_cart->bd_r(offset, data, ccs1, ccs2, ccs3, ccs4);
+
+	if (bios == 0)
+		data &= m_bios->as_u8(offset & 0x1fff);
+
+	return data;
+}
+
+void sv603_device::mreq_w(offs_t offset, uint8_t data)
 {
 	m_expander->romdis_w(0);
+}
 
-	if (offset < 0x8000)
-		return m_cart_rom->read_rom(offset);
+uint8_t sv603_device::iorq_r(offs_t offset)
+{
+	uint8_t data = 0xff;
 
-	if (offset >= 0x8000 && offset < 0xa000)
+	switch (offset & 0xe0)
 	{
-		m_expander->ramdis_w(0);
-		return m_bios->as_u8(offset & 0x1fff);
+	case 0xa0:
+		data = m_expander->excs_r(offset);
+		break;
+
+	case 0xe0:
+		data = m_joy[BIT(offset, 1)]->read();
+		break;
 	}
 
-	return 0xff;
+	return data;
 }
 
-WRITE8_MEMBER( sv603_device::mreq_w )
+void sv603_device::iorq_w(offs_t offset, uint8_t data)
 {
-	m_expander->romdis_w(0);
-}
+	switch (offset & 0xe0)
+	{
+	case 0x80:
+		// keypad mode
+		m_joy[0]->common0_w(1);
+		m_joy[0]->common1_w(0);
+		m_joy[1]->common0_w(1);
+		m_joy[1]->common1_w(0);
+		break;
 
-READ8_MEMBER( sv603_device::iorq_r )
-{
-	if (offset >= 0xa0 && offset <= 0xbf)
-		return m_expander->excs_r(space, offset);
+	case 0xa0:
+		m_expander->excs_w(offset, data);
+		break;
 
-	return 0xff;
-}
+	case 0xc0:
+		// joystick mode
+		m_joy[0]->common0_w(0);
+		m_joy[0]->common1_w(1);
+		m_joy[1]->common0_w(0);
+		m_joy[1]->common1_w(1);
+		break;
 
-WRITE8_MEMBER( sv603_device::iorq_w )
-{
-	if (offset >= 0xa0 && offset <= 0xbf)
-		m_expander->excs_w(space, offset, data);
-
-	if (offset >= 0xe0 && offset <= 0xff)
+	case 0xe0:
 		m_snd->write(data);
+		break;
+	}
 }

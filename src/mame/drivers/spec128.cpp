@@ -165,19 +165,28 @@ resulting mess can be seen in the F4 viewer display.
 /****************************************************************************************************/
 /* Spectrum 128 specific functions */
 
+READ8_MEMBER(spectrum_state::spectrum_128_opcode_fetch_r)
+{
+	/* this allows expansion devices to act upon opcode fetches from MEM addresses */
+	if (BIT(m_port_7ffd_data, 4))
+		m_exp->opcode_fetch(offset);
+
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
 WRITE8_MEMBER( spectrum_state::spectrum_128_bank1_w )
 {
-	if (m_exp->romcs())
-		m_exp->mreq_w(space, offset, data);
+	if (m_exp->romcs() && BIT(m_port_7ffd_data, 4))
+		m_exp->mreq_w(offset, data);
 }
 
 READ8_MEMBER( spectrum_state::spectrum_128_bank1_r )
 {
 	uint8_t data;
 
-	if (m_exp->romcs())
+	if (m_exp->romcs() && BIT(m_port_7ffd_data, 4))
 	{
-		data = m_exp->mreq_r(space, offset);
+		data = m_exp->mreq_r(offset);
 	}
 	else
 	{
@@ -235,11 +244,12 @@ READ8_MEMBER( spectrum_state::spectrum_128_ula_r )
 
 void spectrum_state::spectrum_128_io(address_map &map)
 {
+	map(0x0000, 0xffff).rw(m_exp, FUNC(spectrum_expansion_slot_device::iorq_r), FUNC(spectrum_expansion_slot_device::iorq_w));
 	map(0x0000, 0x0000).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
 	map(0x0001, 0x0001).w(FUNC(spectrum_state::spectrum_128_port_7ffd_w)).mirror(0x7ffc);   // (A15 | A1) == 0, note: reading from this port does write to it by value from data bus
 	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
 	map(0xc000, 0xc000).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3ffd);
-	map(0x0001, 0x0001).r(FUNC(spectrum_state::spectrum_128_ula_r)).mirror(0xfffe);
+	map(0x0001, 0x0001).r(FUNC(spectrum_state::spectrum_128_ula_r)); // .mirror(0xfffe);
 }
 
 void spectrum_state::spectrum_128_mem(address_map &map)
@@ -248,6 +258,11 @@ void spectrum_state::spectrum_128_mem(address_map &map)
 	map(0x4000, 0x7fff).bankrw("bank2");
 	map(0x8000, 0xbfff).bankrw("bank3");
 	map(0xc000, 0xffff).bankrw("bank4");
+}
+
+void spectrum_state::spectrum_128_fetch(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(spectrum_state::spectrum_128_opcode_fetch_r));
 }
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum_128)
@@ -297,6 +312,7 @@ void spectrum_state::spectrum_128(machine_config &config)
 	Z80(config.replace(), m_maincpu, X1_128_SINCLAIR / 5);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_state::spectrum_128_mem);
 	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_128_io);
+	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_state::spectrum_128_fetch);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
 	config.m_minimum_quantum = attotime::from_hz(60);
 
@@ -313,7 +329,6 @@ void spectrum_state::spectrum_128(machine_config &config)
 
 	/* expansion port */
 	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, spec128_expansion_devices, nullptr);
-	m_exp->set_io_space(m_maincpu, AS_IO);
 	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 

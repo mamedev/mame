@@ -12,6 +12,10 @@
  *    also spanning from $3000 to $FFFF. Added clones
  *  Fabio "etabeta" Priuli, moved carts to be slot devices
  *
+ *  TODO:
+ *  - hook up F3851 and F3853 devices (note: from a black box pov there's
+ *    currently no problem, nothing uses the timer or irq)
+ *
  ******************************************************************/
 
 #include "emu.h"
@@ -20,9 +24,6 @@
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
-
-#define MASTER_CLOCK_PAL    2000000  /* PAL unit has a separate crystal at 4.000 MHz */
-#define PAL_VBLANK_TIME     4623
 
 
 /* The F8 has latches on its port pins
@@ -206,111 +207,107 @@ void channelf_state::channelf_cart(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("channelf");
 }
 
-MACHINE_CONFIG_START(channelf_state::channelf)
+void channelf_state::channelf(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", F8, 3579545/2)        /* Colorburst/2 */
-	MCFG_DEVICE_PROGRAM_MAP(channelf_map)
-	MCFG_DEVICE_IO_MAP(channelf_io)
-	config.m_minimum_quantum = attotime::from_hz(60);
+	F8(config, m_maincpu, 3.579545_MHz_XTAL/2); /* Colorburst/2 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &channelf_state::channelf_map);
+	m_maincpu->set_addrmap(AS_IO, &channelf_state::channelf_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(128, 64)
-	MCFG_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
-	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(128, 64);
+	screen.set_visarea(4, 112 - 7, 4, 64 - 3);
+	screen.set_screen_update(FUNC(channelf_state::screen_update_channelf));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	CHANNELF_SOUND(config, m_custom).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	channelf_cart(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(channelf_state::sabavdpl)
+void channelf_state::sabavdpl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
-	MCFG_DEVICE_PROGRAM_MAP(channelf_map)
-	MCFG_DEVICE_IO_MAP(channelf_io)
-	config.m_minimum_quantum = attotime::from_hz(50);
+	F8(config, m_maincpu, 4_MHz_XTAL/2); /* PAL speed */
+	m_maincpu->set_addrmap(AS_PROGRAM, &channelf_state::channelf_map);
+	m_maincpu->set_addrmap(AS_IO, &channelf_state::channelf_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(PAL_VBLANK_TIME)) /* approximate */
-	MCFG_SCREEN_SIZE(128, 64)
-	MCFG_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
-	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(4623)); /* approximate */
+	screen.set_size(128, 64);
+	screen.set_visarea(4, 112 - 7, 4, 64 - 3);
+	screen.set_screen_update(FUNC(channelf_state::screen_update_channelf));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	CHANNELF_SOUND(config, m_custom).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	channelf_cart(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(channelf_state::channlf2)
+void channelf_state::channlf2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", F8, 3579545/2)        /* Colorburst / 2 */
-	MCFG_DEVICE_PROGRAM_MAP(channelf_map)
-	MCFG_DEVICE_IO_MAP(channelf_io)
-	config.m_minimum_quantum = attotime::from_hz(60);
+	F8(config, m_maincpu, 3.579545_MHz_XTAL/2); /* Colorburst / 2 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &channelf_state::channelf_map);
+	m_maincpu->set_addrmap(AS_IO, &channelf_state::channelf_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(128, 64)
-	MCFG_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
-	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(128, 64);
+	screen.set_visarea(4, 112 - 7, 4, 64 - 3);
+	screen.set_screen_update(FUNC(channelf_state::screen_update_channelf));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	CHANNELF_SOUND(config, m_custom).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	channelf_cart(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(channelf_state::sabavpl2)
+void channelf_state::sabavpl2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
-	MCFG_DEVICE_PROGRAM_MAP(channelf_map)
-	MCFG_DEVICE_IO_MAP(channelf_io)
-	config.m_minimum_quantum = attotime::from_hz(50);
+	F8(config, m_maincpu, 4_MHz_XTAL/2); /* PAL speed */
+	m_maincpu->set_addrmap(AS_PROGRAM, &channelf_state::channelf_map);
+	m_maincpu->set_addrmap(AS_IO, &channelf_state::channelf_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(PAL_VBLANK_TIME)) /* not accurate */
-	MCFG_SCREEN_SIZE(128, 64)
-	MCFG_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
-	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(4623)); /* approximate */
+	screen.set_size(128, 64);
+	screen.set_visarea(4, 112 - 7, 4, 64 - 3);
+	screen.set_screen_update(FUNC(channelf_state::screen_update_channelf));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	CHANNELF_SOUND(config, m_custom).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	channelf_cart(config);
-MACHINE_CONFIG_END
+}
 
 ROM_START( channelf )
 	ROM_REGION(0x10000,"maincpu",0)

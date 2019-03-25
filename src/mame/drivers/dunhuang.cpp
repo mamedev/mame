@@ -804,27 +804,27 @@ void dunhuang_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(dunhuang_state::dunhuang)
-
+void dunhuang_state::dunhuang(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(dunhuang_map)
-	MCFG_DEVICE_IO_MAP(dunhuang_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dunhuang_state, irq0_line_hold)
+	Z80(config, m_maincpu, 12000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dunhuang_state::dunhuang_map);
+	m_maincpu->set_addrmap(AS_IO, &dunhuang_state::dunhuang_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dunhuang_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(5));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0+8, 512-8-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dunhuang_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0+8, 512-8-1, 0+16, 256-16-1);
+	m_screen->set_screen_update(FUNC(dunhuang_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dunhuang);
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, m_palette).set_entries(0x100);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &dunhuang_state::ramdac_map);
@@ -839,9 +839,8 @@ MACHINE_CONFIG_START(dunhuang_state::dunhuang)
 	ay8910.port_a_write_callback().set(FUNC(dunhuang_state::input_w));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 12000000/8, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 12000000/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
 /***************************************************************************

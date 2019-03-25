@@ -374,7 +374,7 @@ keyboard, VFD display, and use the SC-01 speech chip. --> driver k28.cpp
     - MCU: TMS1400 MP7324
     - TMS51xx: TMS5110A
     - VSM: 16KB CM62084
-    - LCD: unknown 8*16-seg
+    - LCD: SMOS SMC1112 MCU to 8*14-seg display
 
 K28 modules:
 
@@ -394,7 +394,7 @@ K28 modules:
 
   TODO:
   - why doesn't lantutor work?
-  - identify and emulate k28 LCD
+  - emulate k28 LCD
   - emulate other known devices
 
 
@@ -500,7 +500,7 @@ private:
 
 	// cartridge
 	u32 m_cart_max_size;
-	u8* m_cart_base;
+	u8 *m_cart_base;
 
 	u8 m_overlay;
 };
@@ -707,15 +707,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 	// pick overlay code from machine config, see comment section above for reference
 	m_overlay = m_inp_matrix[10]->read();
 
-	// try to get from artwork current view name ($ + 2 hex digits)
+	// try to get it from (external) layout
 	if (m_overlay == 0x20)
 	{
+		// as output value, eg. with defstate (in decimal)
+		m_overlay = output().get_value("overlay_code") & 0x1f;
+
+		// and from current view name ($ + 2 hex digits)
 		render_target *target = machine().render().first_target();
 		const char *name = target->view_name(target->view());
 
 		for (int i = 0; name && i < strlen(name); i++)
 			if (name[i] == '$' && strlen(&name[i]) > 2)
-				m_overlay = tntell_get_hexchar(name[i + 1]) << 4 | tntell_get_hexchar(name[i + 2]);
+				m_overlay = (tntell_get_hexchar(name[i + 1]) << 4 | tntell_get_hexchar(name[i + 2])) & 0x1f;
 	}
 
 	// overlay holes
@@ -734,7 +738,8 @@ void tispeak_state::k28_prepare_display(u8 old, u8 data)
 WRITE16_MEMBER(tispeak_state::k28_write_r)
 {
 	// R1234: TMS5100 CTL8421
-	m_tms5100->ctl_w(space, 0, bitswap<4>(data,1,2,3,4));
+	u16 r = bitswap<5>(data,0,1,2,3,4) | (data & ~0x1f);
+	m_tms5100->ctl_w(space, 0, r & 0xf);
 
 	// R0: TMS5100 PDC pin
 	m_tms5100->pdc_w(data & 1);
@@ -748,7 +753,7 @@ WRITE16_MEMBER(tispeak_state::k28_write_r)
 
 	// R7-R10: LCD data
 	k28_prepare_display(m_r >> 7 & 0xf, data >> 7 & 0xf);
-	m_r = data;
+	m_r = r;
 }
 
 WRITE16_MEMBER(tispeak_state::k28_write_o)
@@ -759,8 +764,8 @@ WRITE16_MEMBER(tispeak_state::k28_write_o)
 
 READ8_MEMBER(tispeak_state::k28_read_k)
 {
-	// K: TMS5100 CTL, multiplexed inputs
-	return m_tms5100->ctl_r(space, 0) | read_inputs(9);
+	// K: TMS5100 CTL, multiplexed inputs (also tied to R1234)
+	return m_tms5100->ctl_r(space, 0) | read_inputs(9) | (m_r & 0xf);
 }
 
 
@@ -1304,14 +1309,14 @@ void tispeak_state::tms5110_route(machine_config &config)
 void tispeak_state::snmath(machine_config &config)
 {
 	/* basic machine hardware */
-	tms0270_cpu_device &tms(TMS0270(config, m_maincpu, MASTER_CLOCK/2));
-	tms.k().set(FUNC(tispeak_state::snspell_read_k));
-	tms.o().set(FUNC(tispeak_state::snmath_write_o));
-	tms.r().set(FUNC(tispeak_state::snspell_write_r));
+	TMS0270(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->k().set(FUNC(tispeak_state::snspell_read_k));
+	m_maincpu->o().set(FUNC(tispeak_state::snmath_write_o));
+	m_maincpu->r().set(FUNC(tispeak_state::snspell_write_r));
 
-	tms.read_ctl().set("tms5100", FUNC(tms5110_device::ctl_r));
-	tms.write_ctl().set("tms5100", FUNC(tms5110_device::ctl_w));
-	tms.write_pdc().set("tms5100", FUNC(tms5110_device::pdc_w));
+	m_maincpu->read_ctl().set("tms5100", FUNC(tms5110_device::ctl_r));
+	m_maincpu->write_ctl().set("tms5100", FUNC(tms5110_device::ctl_w));
+	m_maincpu->write_pdc().set("tms5100", FUNC(tms5110_device::pdc_w));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_snmath);

@@ -4877,46 +4877,68 @@ Custom graphics chip - Imagetek I4100 052 9227KK701 (same as Karate Tournament)
 
 ROM_START( pangpoms )
 	ROM_REGION( 0x040000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "ppoms09.bin", 0x000000, 0x020000, CRC(0c292dbc) SHA1(8b09de2a560e804e0dea514c95b317c2e2b6501d) )
-	ROM_LOAD16_BYTE( "ppoms10.bin", 0x000001, 0x020000, CRC(0bc18853) SHA1(68d50ad50caad34e72d32e7b9fea1d85af74b879) )
+	ROM_LOAD16_BYTE( "ppoms09.9.f7",  0x000000, 0x020000, CRC(0c292dbc) SHA1(8b09de2a560e804e0dea514c95b317c2e2b6501d) )
+	ROM_LOAD16_BYTE( "ppoms10.10.f8", 0x000001, 0x020000, CRC(0bc18853) SHA1(68d50ad50caad34e72d32e7b9fea1d85af74b879) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )       /* NEC78C10 Code */
-	ROM_LOAD( "ppoms12.bin", 0x000000, 0x020000, CRC(a749357b) SHA1(1555f565c301c5be7c49fc44a004b5c0cb3777c6) )
+	ROM_LOAD( "pj_a12.12.a7", 0x000000, 0x020000, CRC(a749357b) SHA1(1555f565c301c5be7c49fc44a004b5c0cb3777c6) )
 
 	ROM_REGION( 0x100000, "vdp", 0 )   /* Gfx + Data (Addressable by CPU & Blitter) */
-	ROMX_LOAD( "ppoms02.bin", 0x000000, 0x020000, CRC(88f902f7) SHA1(12ea58d7c000b629ccdceec3dedc2747a63b84be) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_02.i7",  0x000000, 0x020000, CRC(88f902f7) SHA1(12ea58d7c000b629ccdceec3dedc2747a63b84be) , ROM_SKIP(7))
 	ROMX_LOAD( "ppoms04.bin", 0x000001, 0x020000, CRC(9190c2a0) SHA1(a7399cc2dea5a963e7c930e426915e8eb3552213) , ROM_SKIP(7))
 	ROMX_LOAD( "ppoms06.bin", 0x000002, 0x020000, CRC(ed15c93d) SHA1(95072e7d1def0d8e97946a612b90ce078c64aed2) , ROM_SKIP(7))
-	ROMX_LOAD( "ppoms08.bin", 0x000003, 0x020000, CRC(9a3408b9) SHA1(924b184d3a47bbe8aa5d41761ea5e94ba7e4f2e9) , ROM_SKIP(7))
-	ROMX_LOAD( "ppoms01.bin", 0x000004, 0x020000, CRC(11ac3810) SHA1(6ada82a73d4383f99f5be67369b810a692d27ef9) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_08.i16", 0x000003, 0x020000, CRC(9a3408b9) SHA1(924b184d3a47bbe8aa5d41761ea5e94ba7e4f2e9) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_01.i6",  0x000004, 0x020000, CRC(11ac3810) SHA1(6ada82a73d4383f99f5be67369b810a692d27ef9) , ROM_SKIP(7))
 	ROMX_LOAD( "ppoms03.bin", 0x000005, 0x020000, CRC(e595529e) SHA1(91b4bd1f029ce09d7689815099b38916fe0d2686) , ROM_SKIP(7))
 	ROMX_LOAD( "ppoms05.bin", 0x000006, 0x020000, CRC(02226214) SHA1(82302e7f1e7269c45e11dfba45ec7bbf522b47f1) , ROM_SKIP(7))
-	ROMX_LOAD( "ppoms07.bin", 0x000007, 0x020000, CRC(48471c87) SHA1(025fa79993788a0091c4edb83423725abd3a47a2) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_07.i14", 0x000007, 0x020000, CRC(48471c87) SHA1(025fa79993788a0091c4edb83423725abd3a47a2) , ROM_SKIP(7))
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "ppoms11.bin", 0x000000, 0x020000, CRC(e89bd565) SHA1(6c7c1ad67ba708dbbe9654c1d290af290207d2be) )
+	ROM_LOAD( "pj_a11.11.e1", 0x000000, 0x020000, CRC(e89bd565) SHA1(6c7c1ad67ba708dbbe9654c1d290af290207d2be) )
 ROM_END
 
 ROM_START( pangpomsm )
 	ROM_REGION( 0x040000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "pa.c09", 0x000000, 0x020000, CRC(e01a7a08) SHA1(1890b290dfb1521ab73b2392409aaf44b99d63bb) )
-	ROM_LOAD16_BYTE( "pa.c10", 0x000001, 0x020000, CRC(5e509cee) SHA1(821cfbf5f65cc3091eb8008310266f9f2c838072) )
+	ROM_LOAD16_BYTE( "pa_c_09.9.f7",  0x000000, 0x020000, CRC(e01a7a08) SHA1(1890b290dfb1521ab73b2392409aaf44b99d63bb) )
+	ROM_LOAD16_BYTE( "pa_c_10.10.f8", 0x000001, 0x020000, CRC(5e509cee) SHA1(821cfbf5f65cc3091eb8008310266f9f2c838072) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )       /* NEC78C10 Code */
-	ROM_LOAD( "ppoms12.bin", 0x000000, 0x020000, CRC(a749357b) SHA1(1555f565c301c5be7c49fc44a004b5c0cb3777c6) )
+	ROM_LOAD( "pj_a12.12.a7", 0x000000, 0x020000, CRC(a749357b) SHA1(1555f565c301c5be7c49fc44a004b5c0cb3777c6) )
 
 	ROM_REGION( 0x100000, "vdp", 0 )   /* Gfx + Data (Addressable by CPU & Blitter) */
-	ROMX_LOAD( "ppoms02.bin", 0x000000, 0x020000, CRC(88f902f7) SHA1(12ea58d7c000b629ccdceec3dedc2747a63b84be) , ROM_SKIP(7))
-	ROMX_LOAD( "pj.e04",      0x000001, 0x020000, CRC(54bf2f10) SHA1(2f0f18984e336f226457295d375a73bcf86cef31) , ROM_SKIP(7))
-	ROMX_LOAD( "pj.e06",      0x000002, 0x020000, CRC(c8b6347d) SHA1(7090e44dc7032432795b6fb6bc166bf4de159685) , ROM_SKIP(7))
-	ROMX_LOAD( "ppoms08.bin", 0x000003, 0x020000, CRC(9a3408b9) SHA1(924b184d3a47bbe8aa5d41761ea5e94ba7e4f2e9) , ROM_SKIP(7))
-	ROMX_LOAD( "ppoms01.bin", 0x000004, 0x020000, CRC(11ac3810) SHA1(6ada82a73d4383f99f5be67369b810a692d27ef9) , ROM_SKIP(7))
-	ROMX_LOAD( "pj.e03",      0x000005, 0x020000, CRC(d126e774) SHA1(f782d1e1277956f088dc91dec8f338f85b9af13a) , ROM_SKIP(7))
-	ROMX_LOAD( "pj.e05",      0x000006, 0x020000, CRC(79c0ec1e) SHA1(b15582e89d859dda4f82908c62e9e07cb45229b9) , ROM_SKIP(7))
-	ROMX_LOAD( "ppoms07.bin", 0x000007, 0x020000, CRC(48471c87) SHA1(025fa79993788a0091c4edb83423725abd3a47a2) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_02.i7",  0x000000, 0x020000, CRC(88f902f7) SHA1(12ea58d7c000b629ccdceec3dedc2747a63b84be) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_04.i10", 0x000001, 0x020000, CRC(54bf2f10) SHA1(2f0f18984e336f226457295d375a73bcf86cef31) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_06.i13", 0x000002, 0x020000, CRC(c8b6347d) SHA1(7090e44dc7032432795b6fb6bc166bf4de159685) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_08.i16", 0x000003, 0x020000, CRC(9a3408b9) SHA1(924b184d3a47bbe8aa5d41761ea5e94ba7e4f2e9) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_01.i6",  0x000004, 0x020000, CRC(11ac3810) SHA1(6ada82a73d4383f99f5be67369b810a692d27ef9) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_03.i9",  0x000005, 0x020000, CRC(d126e774) SHA1(f782d1e1277956f088dc91dec8f338f85b9af13a) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_05.i12", 0x000006, 0x020000, CRC(79c0ec1e) SHA1(b15582e89d859dda4f82908c62e9e07cb45229b9) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_07.i14", 0x000007, 0x020000, CRC(48471c87) SHA1(025fa79993788a0091c4edb83423725abd3a47a2) , ROM_SKIP(7))
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "ppoms11.bin", 0x000000, 0x020000, CRC(e89bd565) SHA1(6c7c1ad67ba708dbbe9654c1d290af290207d2be) )
+	ROM_LOAD( "pj_a11.11.e1", 0x000000, 0x020000, CRC(e89bd565) SHA1(6c7c1ad67ba708dbbe9654c1d290af290207d2be) )
+ROM_END
+
+ROM_START( pangpomsn )
+	ROM_REGION( 0x040000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "pn_e_09.9.f7",  0x000000, 0x020000, CRC(2cc925aa) SHA1(27a09b4b990a867c624207474cb8c55f7d72ce88) )
+	ROM_LOAD16_BYTE( "pn_e_10.10.f8", 0x000001, 0x020000, CRC(6d7ad1d2) SHA1(4b6f83f90631fa3eac4d6a3d3ab44760be821f54) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )       /* NEC78C10 Code */
+	ROM_LOAD( "pj_a12.12.a7", 0x000000, 0x020000, CRC(a749357b) SHA1(1555f565c301c5be7c49fc44a004b5c0cb3777c6) )
+
+	ROM_REGION( 0x100000, "vdp", 0 )   /* Gfx + Data (Addressable by CPU & Blitter) */
+	ROMX_LOAD( "pj_e_02.i7",  0x000000, 0x020000, CRC(88f902f7) SHA1(12ea58d7c000b629ccdceec3dedc2747a63b84be) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_04.i10", 0x000001, 0x020000, CRC(54bf2f10) SHA1(2f0f18984e336f226457295d375a73bcf86cef31) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_06.i13", 0x000002, 0x020000, CRC(c8b6347d) SHA1(7090e44dc7032432795b6fb6bc166bf4de159685) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_08.i16", 0x000003, 0x020000, CRC(9a3408b9) SHA1(924b184d3a47bbe8aa5d41761ea5e94ba7e4f2e9) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_01.i6",  0x000004, 0x020000, CRC(11ac3810) SHA1(6ada82a73d4383f99f5be67369b810a692d27ef9) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_03.i9",  0x000005, 0x020000, CRC(d126e774) SHA1(f782d1e1277956f088dc91dec8f338f85b9af13a) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_05.i12", 0x000006, 0x020000, CRC(79c0ec1e) SHA1(b15582e89d859dda4f82908c62e9e07cb45229b9) , ROM_SKIP(7))
+	ROMX_LOAD( "pj_e_07.i14", 0x000007, 0x020000, CRC(48471c87) SHA1(025fa79993788a0091c4edb83423725abd3a47a2) , ROM_SKIP(7))
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "pj_a11.11.e1", 0x000000, 0x020000, CRC(e89bd565) SHA1(6c7c1ad67ba708dbbe9654c1d290af290207d2be) )
 ROM_END
 
 
@@ -5574,6 +5596,7 @@ GAME( 1992, karatour,  0,        karatour,  karatour,   metro_state, init_karato
 GAME( 1992, karatourj, karatour, karatour,  karatour,   metro_state, init_karatour, ROT0,   "Mitchell",                                        "Chatan Yarakuu Shanku - The Karate Tournament (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, pangpoms,  0,        pangpoms,  pangpoms,   metro_state, init_metro,    ROT0,   "Metro",                                           "Pang Pom's", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, pangpomsm, pangpoms, pangpoms,  pangpoms,   metro_state, init_metro,    ROT0,   "Metro (Mitchell license)",                        "Pang Pom's (Mitchell)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pangpomsn, pangpoms, pangpoms,  pangpoms,   metro_state, init_metro,    ROT0,   "Nova",                                            "Pang Pom's (Nova)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, skyalert,  0,        skyalert,  skyalert,   metro_state, init_metro,    ROT270, "Metro",                                           "Sky Alert", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ladykill,  0,        karatour,  ladykill,   metro_state, init_karatour, ROT90,  "Yanyaka (Mitchell license)",                      "Lady Killer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, moegonta,  ladykill, karatour,  moegonta,   metro_state, init_karatour, ROT90,  "Yanyaka",                                         "Moeyo Gonta!! (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

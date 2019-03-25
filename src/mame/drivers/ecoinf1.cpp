@@ -253,12 +253,13 @@ static INPUT_PORTS_START( ecoinf1 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(ecoinf1_state::ecoinf1_older)
+void ecoinf1_state::ecoinf1_older(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,4000000)
-	MCFG_DEVICE_PROGRAM_MAP(older_memmap)
-	MCFG_DEVICE_IO_MAP(older_portmap)
-MACHINE_CONFIG_END
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinf1_state::older_memmap);
+	m_maincpu->set_addrmap(AS_IO, &ecoinf1_state::older_portmap);
+}
 
 
 /********************************************************************************************************************

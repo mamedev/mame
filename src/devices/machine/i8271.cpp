@@ -132,7 +132,7 @@ void i8271_device::set_floppy(floppy_image_device *flop)
 		flop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&i8271_device::index_callback, this));
 }
 
-READ8_MEMBER(i8271_device::sr_r)
+uint8_t i8271_device::sr_r()
 {
 	uint32_t ret = (irq ? SR_IRQ : 0);
 	switch(main_phase) {
@@ -151,11 +151,13 @@ READ8_MEMBER(i8271_device::sr_r)
 	return ret;
 }
 
-READ8_MEMBER(i8271_device::rr_r)
+uint8_t i8271_device::rr_r()
 {
-	if(main_phase == PHASE_RESULT)
-		main_phase = PHASE_IDLE;
-	set_irq(false);
+	if (!machine().side_effects_disabled()) {
+		if (main_phase == PHASE_RESULT)
+			main_phase = PHASE_IDLE;
+		set_irq(false);
+	}
 	return rr;
 }
 
@@ -164,31 +166,32 @@ void i8271_device::set_rate(int rate)
 	cur_rate = rate;
 }
 
-READ8_MEMBER(i8271_device::read)
+uint8_t i8271_device::read(offs_t offset)
 {
 	switch(offset & 0x03) {
-	case 0x00: return sr_r(space, 0);
-	case 0x01: return rr_r(space, 0);
+	case 0x00: return sr_r();
+	case 0x01: return rr_r();
 	}
 	return 0xff;
 }
 
-WRITE8_MEMBER(i8271_device::write)
+void i8271_device::write(offs_t offset, uint8_t data)
 {
 	switch(offset & 0x03) {
-	case 0x00: cmd_w(space, 0, data); break;
-	case 0x01: param_w(space, 0, data); break;
-	case 0x02: reset_w(space, 0, data); break;
+	case 0x00: cmd_w(data); break;
+	case 0x01: param_w(data); break;
+	case 0x02: reset_w(data); break;
 	}
 }
 
-READ8_MEMBER(i8271_device::data_r)
+uint8_t i8271_device::data_r()
 {
-	set_drq(false);
+	if (!machine().side_effects_disabled())
+		set_drq(false);
 	return dma_data;
 }
 
-WRITE8_MEMBER(i8271_device::data_w)
+void i8271_device::data_w(uint8_t data)
 {
 	if(drq) {
 		set_drq(false);
@@ -196,7 +199,7 @@ WRITE8_MEMBER(i8271_device::data_w)
 	}
 }
 
-WRITE8_MEMBER(i8271_device::cmd_w)
+void i8271_device::cmd_w(uint8_t data)
 {
 	if(main_phase == PHASE_IDLE) {
 		command[0] = data;
@@ -211,7 +214,7 @@ WRITE8_MEMBER(i8271_device::cmd_w)
 	}
 }
 
-WRITE8_MEMBER(i8271_device::param_w)
+void i8271_device::param_w(uint8_t data)
 {
 	if(main_phase == PHASE_CMD) {
 		command[command_pos++] = data;

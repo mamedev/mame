@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(VP595, vp595_device, "vp595", "VP-595 Simple Sound")
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( vp595 )
+//  machine_config( vp595 )
 //-------------------------------------------------
 
 void vp595_device::device_add_mconfig(machine_config &config)

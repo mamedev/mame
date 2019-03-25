@@ -231,26 +231,26 @@ void battlnts_state::machine_reset()
 	m_spritebank = 0;
 }
 
-MACHINE_CONFIG_START(battlnts_state::battlnts)
-
+void battlnts_state::battlnts(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD6309, XTAL(24'000'000) / 2 /* 3000000*4? */)
-	MCFG_DEVICE_PROGRAM_MAP(battlnts_map)
+	HD6309(config, m_maincpu, XTAL(24'000'000) / 2 /* 3000000*4? */);
+	m_maincpu->set_addrmap(AS_PROGRAM, &battlnts_state::battlnts_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000) / 6 /* 3579545? */)
-	MCFG_DEVICE_PROGRAM_MAP(battlnts_sound_map)
+	Z80(config, m_audiocpu, XTAL(24'000'000) / 6 /* 3579545? */);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &battlnts_state::battlnts_sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(battlnts_state, screen_update_battlnts)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, battlnts_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(battlnts_state::screen_update_battlnts));
+	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(battlnts_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_battlnts);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 128);
@@ -270,12 +270,10 @@ MACHINE_CONFIG_START(battlnts_state::battlnts)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ym1", YM3812, XTAL(24'000'000) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM3812(config, "ym1", XTAL(24'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("ym2", YM3812, XTAL(24'000'000) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM3812(config, "ym2", XTAL(24'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*************************************

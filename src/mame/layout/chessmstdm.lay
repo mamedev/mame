@@ -205,19 +205,19 @@
 	<element name="text_move_back">   <rect><color red="1.00" green="0.88" blue="0.55" /></rect>    <text string="MOVE BACK"    align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 
 	<element name="piece" defstate="0">
-		<text string="&#x265a;" state="1"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265b;" state="2"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265c;" state="3"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265d;" state="4"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265e;" state="5"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265f;" state="6"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[K]" state="1"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[Q]" state="2"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[R]" state="3"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[B]" state="4"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[N]" state="5"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[P]" state="6"><color red="0.27" green="0.25" blue="0.25" /></text>
 
-		<text string="&#x265a;" state="7"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265b;" state="8"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265c;" state="9"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265d;" state="10"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265e;" state="11"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265f;" state="12"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[K]" state="7"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[Q]" state="8"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[R]" state="9"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[B]" state="10"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[N]" state="11"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[P]" state="12"><color red="0.71" green="0.7" blue="0.69" /></text>
 
 		<!-- selected pieces -->
 		<disk state="17"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
@@ -233,19 +233,19 @@
 		<disk state="27"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
 		<disk state="28"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
 
-		<text string="&#x265a;" state="17"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265b;" state="18"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265c;" state="19"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265d;" state="20"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265e;" state="21"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="&#x265f;" state="22"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[K]" state="17"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[Q]" state="18"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[R]" state="19"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[B]" state="20"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[N]" state="21"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="[P]" state="22"><color red="0.27" green="0.25" blue="0.25" /></text>
 
-		<text string="&#x265a;" state="23"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265b;" state="24"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265c;" state="25"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265d;" state="26"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265e;" state="27"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="&#x265f;" state="28"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[K]" state="23"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[Q]" state="24"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[R]" state="25"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[B]" state="26"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[N]" state="27"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="[P]" state="28"><color red="0.71" green="0.7" blue="0.69" /></text>
 	</element>
 
 <!-- build screen -->

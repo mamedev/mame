@@ -1268,9 +1268,9 @@ WRITE8_MEMBER( inder_state::sndbank_w )
 void inder_state::update_mus()
 {
 	if ((m_sound_addr < 0x40000) && (m_sndbank != 0xff))
-		m_13->write_ba(m_p_speech[m_sound_addr]);
+		m_13->ba_w(m_p_speech[m_sound_addr]);
 	else
-		m_13->write_ba(0);
+		m_13->ba_w(0);
 }
 
 WRITE_LINE_MEMBER( inder_state::qc7a_w )
@@ -1357,11 +1357,12 @@ void inder_state::init_inder1()
 	m_game = 1;
 }
 
-MACHINE_CONFIG_START(inder_state::brvteam)
+void inder_state::brvteam(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(brvteam_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
+	Z80(config, m_maincpu, XTAL(5'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &inder_state::brvteam_map);
+	m_maincpu->set_periodic_int(FUNC(inder_state::irq0_line_hold), attotime::from_hz(250)); // NE556
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1371,15 +1372,15 @@ MACHINE_CONFIG_START(inder_state::brvteam)
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "snvol").front_center();
-	MCFG_DEVICE_ADD("sn", SN76489, XTAL(8'000'000) / 2) // jumper choice of 2 or 4 MHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "snvol", 2.0)
-MACHINE_CONFIG_END
+	SN76489(config, m_sn, XTAL(8'000'000) / 2).add_route(ALL_OUTPUTS, "snvol", 2.0); // jumper choice of 2 or 4 MHz
+}
 
-MACHINE_CONFIG_START(inder_state::canasta)
+void inder_state::canasta(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(canasta_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
+	Z80(config, m_maincpu, XTAL(5'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &inder_state::canasta_map);
+	m_maincpu->set_periodic_int(FUNC(inder_state::irq0_line_hold), attotime::from_hz(250)); // NE556
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1390,16 +1391,18 @@ MACHINE_CONFIG_START(inder_state::canasta)
 	genpin_audio(config);
 	SPEAKER(config, "ayvol").front_center();
 	AY8910(config, "ay", XTAL(4'000'000) / 2).add_route(ALL_OUTPUTS, "ayvol", 1.0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(inder_state::lapbylap)
+void inder_state::lapbylap(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(lapbylap_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(2'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(lapbylap_sub_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
+	Z80(config, m_maincpu, XTAL(5'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &inder_state::lapbylap_map);
+	m_maincpu->set_periodic_int(FUNC(inder_state::irq0_line_hold), attotime::from_hz(250)); // NE556
+
+	Z80(config, m_audiocpu, XTAL(2'000'000));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &inder_state::lapbylap_sub_map);
+	m_audiocpu->set_periodic_int(FUNC(inder_state::irq0_line_hold), attotime::from_hz(250)); // NE555
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1413,16 +1416,18 @@ MACHINE_CONFIG_START(inder_state::lapbylap)
 	ay8910_device &ay2(AY8910(config, "ay2", XTAL(2'000'000))); // same xtal that drives subcpu
 	ay2.port_a_read_callback().set(FUNC(inder_state::sndcmd_r));
 	ay2.add_route(ALL_OUTPUTS, "ayvol", 1.0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(inder_state::inder)
+void inder_state::inder(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(inder_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(inder_sub_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
+	Z80(config, m_maincpu, XTAL(5'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &inder_state::inder_map);
+	m_maincpu->set_periodic_int(FUNC(inder_state::irq0_line_hold), attotime::from_hz(250)); // NE556
+
+	Z80(config, m_audiocpu, XTAL(5'000'000) / 2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &inder_state::inder_sub_map);
+	m_audiocpu->set_periodic_int(FUNC(inder_state::irq0_line_hold), attotime::from_hz(250)); // NE555
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1468,7 +1473,7 @@ MACHINE_CONFIG_START(inder_state::inder)
 
 	HCT157(config, m_13, 0);
 	m_13->out_callback().set("msm", FUNC(msm5205_device::data_w));
-MACHINE_CONFIG_END
+}
 
 
 /*-------------------------------------------------------------------

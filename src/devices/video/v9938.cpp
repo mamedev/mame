@@ -369,7 +369,7 @@ uint32_t v99x8_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	return 0;
 }
 
-READ8_MEMBER( v99x8_device::read )
+uint8_t v99x8_device::read(offs_t offset)
 {
 	switch (offset & 3)
 	{
@@ -379,7 +379,7 @@ READ8_MEMBER( v99x8_device::read )
 	return 0xff;
 }
 
-WRITE8_MEMBER( v99x8_device::write )
+void v99x8_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 3)
 	{

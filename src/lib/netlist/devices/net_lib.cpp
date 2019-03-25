@@ -45,6 +45,7 @@ namespace devices
 		LIB_ENTRY(function)   // only for macro devices - NO FEEDBACK loops
 		LIB_ENTRY(QBJT_EB)
 		LIB_ENTRY(QBJT_switch)
+		LIB_ENTRY(MOSFET)
 		LIB_ENTRY(logic_input_ttl)
 		LIB_ENTRY(logic_input)
 		LIB_ENTRY(analog_input)
@@ -132,6 +133,9 @@ namespace devices
 		/* entries with suffix WI are legacy only */
 		//ENTRY(4066,                 CD_4066,              "+A,B")
 		LIB_ENTRY(NE555)
+		LIB_ENTRY(NE555_dip)
+		LIB_ENTRY(MC1455P)
+		LIB_ENTRY(MC1455P_dip)
 		LIB_ENTRY(TMS4800)
 		LIB_ENTRY(TMS4800_dip)
 		LIB_ENTRY(r2r_dac)
@@ -155,7 +159,6 @@ namespace devices
 		LIB_ENTRY(9334_dip)
 		LIB_ENTRY(AM2847_dip)
 		LIB_ENTRY(SN74LS629_dip)
-		LIB_ENTRY(NE555_dip)
 		LIB_ENTRY(MM5837_dip)
 	}
 

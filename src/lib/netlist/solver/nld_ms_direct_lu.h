@@ -8,10 +8,10 @@
 #ifndef NLD_MS_DIRECT_H_
 #define NLD_MS_DIRECT_H_
 
-#include <algorithm>
-
 #include "solver/nld_solver.h"
 #include "solver/nld_matrix_solver.h"
+
+#include <algorithm>
 
 //#define A(r, c) m_A[_r][_c]
 

@@ -54,21 +54,22 @@ static DEVICE_INPUT_DEFAULTS_START(vga)
 	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x00)
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(genpc_state::pcmda)
+void genpc_state::pcmda(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8088, 4772720)
-	MCFG_DEVICE_PROGRAM_MAP(pc8_map)
-	MCFG_DEVICE_IO_MAP(pc8_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	I8088(config, m_maincpu, 4772720);
+	m_maincpu->set_addrmap(AS_PROGRAM, &genpc_state::pc8_map);
+	m_maincpu->set_addrmap(AS_IO, &genpc_state::pc8_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
 	IBM5160_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "mda", false) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "hdc", false)
-	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "adlib", false)
-	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "mda", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "hdc", false);
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, "adlib", false);
+	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 
 	/* keyboard */
 	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
@@ -78,37 +79,37 @@ MACHINE_CONFIG_START(genpc_state::pcmda)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(genpc_state::pcherc)
+void genpc_state::pcherc(machine_config &config)
+{
 	pcmda(config);
-	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "hercules", false)
-MACHINE_CONFIG_END
+	subdevice<isa8_slot_device>("isa1")->set_default_option("hercules");
+}
 
 
-MACHINE_CONFIG_START(genpc_state::pccga)
+void genpc_state::pccga(machine_config &config)
+{
 	pcmda(config);
 	subdevice<ibm5160_mb_device>("mb")->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(cga));
-	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "cga", false)
-MACHINE_CONFIG_END
+	subdevice<isa8_slot_device>("isa1")->set_default_option("cga");
+}
 
 
-MACHINE_CONFIG_START(genpc_state::pcega)
+void genpc_state::pcega(machine_config &config)
+{
 	pccga(config);
-	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "ega", false)
+	subdevice<isa8_slot_device>("isa1")->set_default_option("ega");
 	subdevice<ibm5160_mb_device>("mb")->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(vga));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(genpc_state::pcvga)
+void genpc_state::pcvga(machine_config &config)
+{
 	pcega(config);
-	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "vga", false)
-MACHINE_CONFIG_END
+	subdevice<isa8_slot_device>("isa1")->set_default_option("vga");
+}
 
 ROM_START(pc)
 	ROM_REGION(0x02000, "bios", 0)

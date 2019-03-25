@@ -111,7 +111,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( wangpc_tig_device::hgdc_display_pixels )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( wangpc_tig )
+//  machine_config( wangpc_tig )
 //-------------------------------------------------
 
 void wangpc_tig_device::device_add_mconfig(machine_config &config)

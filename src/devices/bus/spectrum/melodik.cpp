@@ -60,16 +60,6 @@ void spectrum_melodik_device::device_start()
 }
 
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void spectrum_melodik_device::device_reset()
-{
-	io_space().install_write_handler(0x8000, 0x8000, 0, 0x3ffd, 0, write8smo_delegate(FUNC(ay8910_device::address_w), m_psg.target()));
-	io_space().install_readwrite_handler(0xc000, 0xc000, 0, 0x3ffd, 0, read8smo_delegate(FUNC(ay8910_device::data_r), m_psg.target()), write8smo_delegate(FUNC(ay8910_device::data_w), m_psg.target()));
-}
-
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
@@ -79,23 +69,50 @@ READ_LINE_MEMBER(spectrum_melodik_device::romcs)
 	return m_exp->romcs();
 }
 
-READ8_MEMBER(spectrum_melodik_device::mreq_r)
+void spectrum_melodik_device::opcode_fetch(offs_t offset)
 {
-	return m_exp->mreq_r(space, offset);
+	m_exp->opcode_fetch(offset);
 }
 
-WRITE8_MEMBER(spectrum_melodik_device::mreq_w)
-{
-	if (m_exp->romcs())
-		m_exp->mreq_w(space, offset, data);
-}
-
-READ8_MEMBER(spectrum_melodik_device::port_fe_r)
+uint8_t spectrum_melodik_device::mreq_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
 	if (m_exp->romcs())
-		data &= m_exp->port_fe_r(space, offset);
+		data &= m_exp->mreq_r(offset);
 
 	return data;
+}
+
+void spectrum_melodik_device::mreq_w(offs_t offset, uint8_t data)
+{
+	if (m_exp->romcs())
+		m_exp->mreq_w(offset, data);
+}
+
+uint8_t spectrum_melodik_device::iorq_r(offs_t offset)
+{
+	uint8_t data = m_exp->iorq_r(offset);
+
+	switch (offset & 0xc002)
+	{
+	case 0xc000:
+		data &= m_psg->data_r();
+		break;
+	}
+	return data;
+}
+
+void spectrum_melodik_device::iorq_w(offs_t offset, uint8_t data)
+{
+	switch (offset & 0xc002)
+	{
+	case 0x8000:
+		m_psg->address_w(data);
+		break;
+	case 0xc000:
+		m_psg->data_w(data);
+		break;
+	}
+	m_exp->iorq_w(offset, data);
 }

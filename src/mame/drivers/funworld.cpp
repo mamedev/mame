@@ -3067,10 +3067,11 @@ void lunapark_state::machine_reset()
 *     Machine Drivers     *
 **************************/
 
-MACHINE_CONFIG_START(funworld_state::fw1stpal)
+void funworld_state::fw1stpal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M65SC02, CPU_CLOCK)    /* 2MHz */
-	MCFG_DEVICE_PROGRAM_MAP(funworld_map)
+	M65SC02(config, m_maincpu, CPU_CLOCK);    /* 2MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::funworld_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -3085,13 +3086,13 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 
 	/* video hardware */
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((124+1)*4, (30+1)*8)               /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
-	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)  /* Taken from MC6845 init, registers 01 & 06 */
-	MCFG_SCREEN_UPDATE_DRIVER(funworld_state, screen_update_funworld)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((124+1)*4, (30+1)*8);               /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
+	screen.set_visarea(0*4, 96*4-1, 0*8, 29*8-1);  /* Taken from MC6845 init, registers 01 & 06 */
+	screen.set_screen_update(FUNC(funworld_state::screen_update_funworld));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fw1stpal);
 	PALETTE(config, m_palette, FUNC(funworld_state::funworld_palette), 0x200);
@@ -3109,35 +3110,38 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 	ay8910.port_a_write_callback().set(FUNC(funworld_state::funworld_lamp_a_w));
 	ay8910.port_b_write_callback().set(FUNC(funworld_state::funworld_lamp_b_w));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 2.5);  /* analyzed to avoid clips */
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(funworld_state::fw2ndpal)
+void funworld_state::fw2ndpal(machine_config &config)
+{
 	fw1stpal(config);
-	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
-	MCFG_DEVICE_PROGRAM_MAP(funworld_map)
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::funworld_map);
 	m_gfxdecode->set_info(gfx_fw2ndpal);
-MACHINE_CONFIG_END
+}
 
 
 
-MACHINE_CONFIG_START(funworld_state::funquiz)
+void funworld_state::funquiz(machine_config &config)
+{
 	fw1stpal(config);
 //  fw2ndpal(config);
-	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
-	MCFG_DEVICE_PROGRAM_MAP(funquiz_map)
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::funquiz_map);
 
 
 	subdevice<ay8910_device>("ay8910")->port_a_read_callback().set(FUNC(funworld_state::funquiz_ay8910_a_r));
 	subdevice<ay8910_device>("ay8910")->port_b_read_callback().set(FUNC(funworld_state::funquiz_ay8910_b_r));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(magicrd2_state::magicrd2)
+void magicrd2_state::magicrd2(machine_config &config)
+{
 	fw1stpal(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
-	MCFG_DEVICE_PROGRAM_MAP(magicrd2_map)
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &magicrd2_state::magicrd2_map);
 
 	subdevice<mc6845_device>("crtc")->set_visarea_adjust(0, -56, 0, 0);
 
@@ -3145,86 +3149,97 @@ MACHINE_CONFIG_START(magicrd2_state::magicrd2)
 	ay8910.port_a_write_callback().set(FUNC(magicrd2_state::funworld_lamp_a_w));
 	ay8910.port_b_write_callback().set(FUNC(magicrd2_state::funworld_lamp_b_w));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 1.5);  /* analyzed to avoid clips */
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(funworld_state::royalcd1)
+void funworld_state::royalcd1(machine_config &config)
+{
 	fw1stpal(config);
-	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* (G65SC02P in pro version) 2MHz */
-	MCFG_DEVICE_PROGRAM_MAP(magicrd2_map)
-MACHINE_CONFIG_END
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* (G65SC02P in pro version) 2MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::magicrd2_map);
+}
 
 
-MACHINE_CONFIG_START(funworld_state::royalcd2)
+void funworld_state::royalcd2(machine_config &config)
+{
 	fw2ndpal(config);
-	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
-	MCFG_DEVICE_PROGRAM_MAP(magicrd2_map)
-MACHINE_CONFIG_END
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::magicrd2_map);
+}
 
 
-MACHINE_CONFIG_START(funworld_state::cuoreuno)
+void funworld_state::cuoreuno(machine_config &config)
+{
 	fw1stpal(config);
-	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
-	MCFG_DEVICE_PROGRAM_MAP(cuoreuno_map)
-MACHINE_CONFIG_END
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::cuoreuno_map);
+}
 
 
-MACHINE_CONFIG_START(funworld_state::saloon)
+void funworld_state::saloon(machine_config &config)
+{
 	fw1stpal(config);
-	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
-	MCFG_DEVICE_PROGRAM_MAP(saloon_map)
-MACHINE_CONFIG_END
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::saloon_map);
+}
 
 
-MACHINE_CONFIG_START(funworld_state::witchryl)
+void funworld_state::witchryl(machine_config &config)
+{
 	fw1stpal(config);
-	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
-	MCFG_DEVICE_PROGRAM_MAP(witchryl_map)
-MACHINE_CONFIG_END
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::witchryl_map);
+}
 
 
-MACHINE_CONFIG_START(lunapark_state::lunapark)
+void lunapark_state::lunapark(machine_config &config)
+{
 	fw1stpal(config);
-	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
-	MCFG_DEVICE_PROGRAM_MAP(lunapark_map)  // mirrored video RAM (4000/5000 to 6000/7000).
-MACHINE_CONFIG_END
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &lunapark_state::lunapark_map);  // mirrored video RAM (4000/5000 to 6000/7000).
+}
 
 
-MACHINE_CONFIG_START(chinatow_state::chinatow)
+void chinatow_state::chinatow(machine_config &config)
+{
 	fw2ndpal(config);
-	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
-	MCFG_DEVICE_PROGRAM_MAP(chinatow_map)
-MACHINE_CONFIG_END
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &chinatow_state::chinatow_map);
+}
 
-MACHINE_CONFIG_START(chinatow_state::rcdino4)
+void chinatow_state::rcdino4(machine_config &config)
+{
 	fw1stpal(config);
-	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
-	MCFG_DEVICE_PROGRAM_MAP(chinatow_map)
-MACHINE_CONFIG_END
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &chinatow_state::chinatow_map);
+}
 
 
-MACHINE_CONFIG_START(funworld_state::intrgmes)
+void funworld_state::intrgmes(machine_config &config)
+{
 	fw1stpal(config);
-	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
-	MCFG_DEVICE_PROGRAM_MAP(intergames_map)
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::intergames_map);
 	m_gfxdecode->set_info(gfx_fw2ndpal);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(funworld_state::fw_brick_1)
+void funworld_state::fw_brick_1(machine_config &config)
+{
 	fw1stpal(config);
-	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fw_a7_11_map)
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::fw_a7_11_map);
 //  m_gfxdecode->set_info(gfx_fw2ndpal);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(funworld_state::fw_brick_2)
+void funworld_state::fw_brick_2(machine_config &config)
+{
 	fw2ndpal(config);
-	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fw_a7_11_map)
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::fw_a7_11_map);
 //  m_gfxdecode->set_info(gfx_fw2ndpal);
-MACHINE_CONFIG_END
+}
 
 
 /*************************

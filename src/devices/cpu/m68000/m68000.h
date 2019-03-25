@@ -148,6 +148,7 @@ public:
 	void set_tas_write_callback(write8_delegate callback);
 	uint16_t get_fc();
 	void set_hmmu_enable(int enable);
+	int get_pmmu_enable() {return m_pmmu_enabled;};
 	void set_fpu_enable(int enable);
 	void set_buserror_details(uint32_t fault_addr, uint8_t rw, uint8_t fc);
 
@@ -375,21 +376,6 @@ protected:
 
 	m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
 						const device_type type, uint32_t prg_data_width, uint32_t prg_address_bits, address_map_constructor internal_map);
-};
-
-class m68301_device : public m68000_base_device
-{
-public:
-	// construction/destruction
-	m68301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-
-	virtual uint32_t execute_min_cycles() const override { return 4; };
-	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -649,7 +635,6 @@ public:
 
 
 DECLARE_DEVICE_TYPE(M68000, m68000_device)
-DECLARE_DEVICE_TYPE(M68301, m68301_device)
 DECLARE_DEVICE_TYPE(M68008, m68008_device)
 DECLARE_DEVICE_TYPE(M68008PLCC, m68008plcc_device)
 DECLARE_DEVICE_TYPE(M68010, m68010_device)

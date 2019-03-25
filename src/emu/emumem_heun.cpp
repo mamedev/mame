@@ -64,6 +64,8 @@ template<int Width, int AddrShift, int Endian> std::string handler_entry_write_n
 }
 
 
+template class handler_entry_read_unmapped<0,  1, ENDIANNESS_LITTLE>;
+template class handler_entry_read_unmapped<0,  1, ENDIANNESS_BIG>;
 template class handler_entry_read_unmapped<0,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_read_unmapped<0,  0, ENDIANNESS_BIG>;
 template class handler_entry_read_unmapped<1,  3, ENDIANNESS_LITTLE>;
@@ -87,6 +89,8 @@ template class handler_entry_read_unmapped<3, -2, ENDIANNESS_BIG>;
 template class handler_entry_read_unmapped<3, -3, ENDIANNESS_LITTLE>;
 template class handler_entry_read_unmapped<3, -3, ENDIANNESS_BIG>;
 
+template class handler_entry_write_unmapped<0,  1, ENDIANNESS_LITTLE>;
+template class handler_entry_write_unmapped<0,  1, ENDIANNESS_BIG>;
 template class handler_entry_write_unmapped<0,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_write_unmapped<0,  0, ENDIANNESS_BIG>;
 template class handler_entry_write_unmapped<1,  3, ENDIANNESS_LITTLE>;
@@ -111,6 +115,8 @@ template class handler_entry_write_unmapped<3, -3, ENDIANNESS_LITTLE>;
 template class handler_entry_write_unmapped<3, -3, ENDIANNESS_BIG>;
 
 
+template class handler_entry_read_nop<0,  1, ENDIANNESS_LITTLE>;
+template class handler_entry_read_nop<0,  1, ENDIANNESS_BIG>;
 template class handler_entry_read_nop<0,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_read_nop<0,  0, ENDIANNESS_BIG>;
 template class handler_entry_read_nop<1,  3, ENDIANNESS_LITTLE>;
@@ -134,6 +140,8 @@ template class handler_entry_read_nop<3, -2, ENDIANNESS_BIG>;
 template class handler_entry_read_nop<3, -3, ENDIANNESS_LITTLE>;
 template class handler_entry_read_nop<3, -3, ENDIANNESS_BIG>;
 
+template class handler_entry_write_nop<0,  1, ENDIANNESS_LITTLE>;
+template class handler_entry_write_nop<0,  1, ENDIANNESS_BIG>;
 template class handler_entry_write_nop<0,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_write_nop<0,  0, ENDIANNESS_BIG>;
 template class handler_entry_write_nop<1,  3, ENDIANNESS_LITTLE>;
