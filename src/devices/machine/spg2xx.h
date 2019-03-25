@@ -105,9 +105,6 @@ protected:
 	DECLARE_READ16_MEMBER(video_r);
 	DECLARE_WRITE16_MEMBER(video_w);
 
-//	virtual DECLARE_READ16_MEMBER(io_r);
-//	virtual DECLARE_WRITE16_MEMBER(io_w);
-
 	DECLARE_READ16_MEMBER(dma_r);
 	DECLARE_WRITE16_MEMBER(dma_w);
 
@@ -115,41 +112,17 @@ protected:
 	DECLARE_READ16_MEMBER(space_r);
 
 //	void check_extint_irq(int channel);
-	void check_irqs(const uint16_t changed);
 	inline void check_video_irq();
 
 	void spg2xx_map(address_map &map);
 
-//	static const device_timer_id TIMER_TMB1 = 0;
-//	static const device_timer_id TIMER_TMB2 = 1;
 	static const device_timer_id TIMER_SCREENPOS = 2;
-//	static const device_timer_id TIMER_BEAT = 3;
-//	static const device_timer_id TIMER_UART_TX = 4;
-//	static const device_timer_id TIMER_UART_RX = 5;
-//	static const device_timer_id TIMER_4KHZ = 6;
-//	static const device_timer_id TIMER_SRC_AB = 7;
-//	static const device_timer_id TIMER_SRC_C = 8;
+
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-//	void update_porta_special_modes();
-//	void update_portb_special_modes();
-//	void do_gpio(uint32_t offset, bool write);
-//	uint16_t do_special_gpio(uint32_t index, uint16_t mask);
-
-//	void update_timer_b_rate();
-//	void update_timer_ab_src();
-//	void update_timer_c_src();
-//	void increment_timer_a();
-
-//	void uart_transmit_tick();
-//	void uart_receive_tick();
-
-//	void system_timer_tick();
-
-//	void do_i2c();
 	void do_cpu_dma(uint32_t len);
 
 	void do_sprite_dma(uint32_t len);
@@ -195,18 +168,7 @@ protected:
 	bool m_debug_palette;
 	uint8_t m_sprite_index_to_debug;
 
-
-//	uint16_t m_io_regs[0x100];
 	uint16_t m_dma_regs[0x4];
-//	uint8_t m_uart_rx_fifo[8];
-//	uint8_t m_uart_rx_fifo_start;
-//	uint8_t m_uart_rx_fifo_end;
-//	uint8_t m_uart_rx_fifo_count;
-//	bool m_uart_rx_available;
-//	bool m_uart_rx_irq;
-//	bool m_uart_tx_irq;
-
-//	bool m_extint[2];
 
 	uint16_t m_video_regs[0x100];
 	uint32_t m_sprite_limit;
@@ -229,31 +191,21 @@ protected:
 
 	devcb_write8 m_chip_sel;
 
-//	uint16_t m_timer_a_preload;
-//	uint16_t m_timer_b_preload;
-//	uint16_t m_timer_b_divisor;
-//	uint16_t m_timer_b_tick_rate;
-
-//	emu_timer *m_tmb1;
-//	emu_timer *m_tmb2;
-//	emu_timer *m_timer_src_ab;
-//	emu_timer *m_timer_src_c;
 	emu_timer *m_screenpos_timer;
-
-//	emu_timer *m_4khz_timer;
-//	uint32_t m_2khz_divider;
-//	uint32_t m_1khz_divider;
-//	uint32_t m_4hz_divider;
-
-//	uint32_t m_uart_baud_rate;
-//	emu_timer *m_uart_tx_timer;
-//	emu_timer *m_uart_rx_timer;
 
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint16_t> m_scrollram;
 	required_shared_ptr<uint16_t> m_paletteram;
 	required_shared_ptr<uint16_t> m_spriteram;
+
+	DECLARE_READ16_MEMBER(porta_r) { return m_porta_in(); };
+	DECLARE_READ16_MEMBER(portb_r) { return m_portb_in(); };
+	DECLARE_READ16_MEMBER(portc_r) { return m_portc_in(); };
+	DECLARE_WRITE16_MEMBER(porta_w) { m_porta_out(offset, data, mem_mask); };
+	DECLARE_WRITE16_MEMBER(portb_w) { m_portb_out(offset, data, mem_mask); };
+	DECLARE_WRITE16_MEMBER(portc_w) { m_portc_out(offset, data, mem_mask); };
+
 };
 
 class spg24x_device : public spg2xx_device

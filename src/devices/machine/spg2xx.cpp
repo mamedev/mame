@@ -1032,45 +1032,6 @@ void spg2xx_device::device_timer(emu_timer &timer, device_timer_id id, int param
 }
 
 
-void spg2xx_device::check_irqs(const uint16_t changed)
-{
-	//  {
-	//      m_cpu->set_state_unsynced(UNSP_IRQ1_LINE, ASSERT_LINE);
-	//  }
-
-#if 0
-	if (changed & 0x0c00) // Timer A, Timer B IRQ
-	{
-		LOGMASKED(LOG_TIMERS, "%ssserting IRQ2 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00), changed);
-		m_cpu->set_state_unsynced(UNSP_IRQ2_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
-	}
-
-	if (changed & 0x2100) // UART, ADC IRQ
-	{
-		LOGMASKED(LOG_UART, "%ssserting IRQ3 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100), changed);
-		m_cpu->set_state_unsynced(UNSP_IRQ3_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? ASSERT_LINE : CLEAR_LINE);
-	}
-
-	if (changed & 0x1200) // External IRQ
-	{
-		LOGMASKED(LOG_UART, "%ssserting IRQ5 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200), changed);
-		m_cpu->set_state_unsynced(UNSP_IRQ5_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? ASSERT_LINE : CLEAR_LINE);
-	}
-
-	if (changed & 0x0070) // 1024Hz, 2048Hz, 4096Hz IRQ
-	{
-		LOGMASKED(LOG_TIMERS, "%ssserting IRQ6 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070), changed);
-		m_cpu->set_state_unsynced(UNSP_IRQ6_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
-	}
-
-	if (changed & 0x008b) // TMB1, TMB2, 4Hz, key change IRQ
-	{
-		LOGMASKED(LOG_IRQS, "%ssserting IRQ7 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b), changed);
-		m_cpu->set_state_unsynced(UNSP_IRQ7_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? ASSERT_LINE : CLEAR_LINE);
-	}
-#endif
-}
-
 void spg2xx_device::do_cpu_dma(uint32_t len)
 {
 	address_space &mem = m_cpu->space(AS_PROGRAM);
@@ -1100,5 +1061,13 @@ void spg2xx_device::device_add_mconfig(machine_config &config)
 	m_spg_audio->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
 
 	SPG24X_IO(config, m_spg_io, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
+	m_spg_io->porta_in().set(FUNC(spg2xx_device::porta_r));
+	m_spg_io->portb_in().set(FUNC(spg2xx_device::portb_r));
+	m_spg_io->portc_in().set(FUNC(spg2xx_device::portc_r));
+	m_spg_io->porta_out().set(FUNC(spg2xx_device::porta_w));
+	m_spg_io->portb_out().set(FUNC(spg2xx_device::portb_w));
+	m_spg_io->portc_out().set(FUNC(spg2xx_device::portc_w));
+
+
 
 }
