@@ -106,6 +106,9 @@ protected:
 	virtual DECLARE_READ16_MEMBER(io_r);
 	virtual DECLARE_WRITE16_MEMBER(io_w);
 
+	DECLARE_READ16_MEMBER(dma_r);
+	DECLARE_WRITE16_MEMBER(dma_w);
+
 	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
 	DECLARE_READ16_MEMBER(space_r);
 
@@ -191,7 +194,8 @@ protected:
 	uint8_t m_sprite_index_to_debug;
 
 
-	uint16_t m_io_regs[0x200];
+	uint16_t m_io_regs[0x100];
+	uint16_t m_dma_regs[0x4];
 	uint8_t m_uart_rx_fifo[8];
 	uint8_t m_uart_rx_fifo_start;
 	uint8_t m_uart_rx_fifo_end;
