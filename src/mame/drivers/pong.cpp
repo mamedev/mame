@@ -4,6 +4,7 @@
 
 Pong (c) 1972 Atari
 Pong Doubles (c) 1973 Atari
+Rebound (c) 1974 Atari
 Breakout (c) 1976 Atari
 
 driver by Couriersud
@@ -27,6 +28,7 @@ driver by Couriersud
  TM-0??                   Dr. Pong/Puppy Pong/Snoopy Pong (1974)                          A001433?                           NO
  422,TM-029               Superpong (1974)                                                A000423                            NO
  TM-014,029               Pong Doubles/Coupe Davis (1973)                                 A000785                            NO
+ TM-001,023,029,032       Rebound/Spike/Volleyball (1974)                                 A000517,A000846,SPIKE-(A or B)     NO
  TM-058                   Breakout/Breakout Cocktail/Consolette (1976)                    A004533                            NO
 
 Notes:
@@ -41,6 +43,7 @@ TODO: Dr. Pong, Pong In-A-Barrel, Puppy Pong, Snoopy Pong, and Cocktail Pong are
       be verified.
 TODO: Superpong is believed to use the Pong (Rev E) PCB with some minor modifications, this
       needs to be verified.
+TODO: Volleyball...
 
 ***************************************************************************/
 
@@ -675,6 +678,7 @@ ROM_START( rebound ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
+
 /*   // 100% TTL - NO ROMS
 
 ROM_START( pongbarl ) // dummy to satisfy game entry
@@ -721,12 +725,14 @@ GAMEL( 1974, rebound,   0, rebound,  rebound,   rebound_state,  empty_init, ROT0
 GAMEL( 1976, breakout,  0, breakout, breakout,  breakout_state, empty_init, ROT90, "Atari", "Breakout [TTL]", MACHINE_SUPPORTS_SAVE, layout_breakout)
 
 // 100% TTL
-//GAME( 1973, coupedav,   pongd,    pongd,    pongd,     driver_device, empty_init, ROT0,  "Atari France", "Coupe Davis [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAME( 1973, pongbarl,   pong,     pong,     pong,      driver_device, empty_init, ROT0,  "Atari", "Pong In-A-Barrel [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAME( 1974, cktpong,    pong,     pong,     pong,      driver_device, empty_init, ROT0,  "Atari / National Entertainment Co.", "Cocktail Pong [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAME( 1974, drpong,     pong,     pong,     pong,      driver_device, empty_init, ROT0,  "Atari", "Dr. Pong [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAME( 1974, pupppong,   pong,     pong,     pong,      driver_device, empty_init, ROT0,  "Atari", "Puppy Pong [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAME( 1974, snoopong,   pong,     pong,     pong,      driver_device, empty_init, ROT0,  "Atari", "Snoopy Pong [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAME( 1974, suprpong,   0,        suprpong, pong,      driver_device, empty_init, ROT0,  "Atari", "Superpong [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAMEL( 1976, breakckt,  breakout, breakout, breakout,  driver_device, empty_init, ROT90, "Atari", "Breakout Cocktail [TTL]", MACHINE_SUPPORTS_SAVE, layout_breakckt)
-//GAMEL( 1976, consolet,  breakout, breakout, breakout,  driver_device, empty_init, ROT90, "Atari Europe", "Consolette [TTL]", MACHINE_SUPPORTS_SAVE, layout_consolet)
+//GAMEL(1974, spike,      rebound,  rebound,  rebound,  rebound_state,  empty_init, ROT0,  "Atari/Kee", "Spike [TTL]", MACHINE_IS_SKELETON)
+//GAMEL(1974, volleyball, rebound,  rebound,  rebound,  rebound_state,  empty_init, ROT0,  "Atari", "Volleyball [TTL]", MACHINE_IS_SKELETON)
+//GAME( 1973, coupedav,   pongd,    pongd,    pongd,    pong_state,     empty_init, ROT0,  "Atari France", "Coupe Davis [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1973, pongbarl,   pong,     pong,     pong,     pong_state,     empty_init, ROT0,  "Atari", "Pong In-A-Barrel [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1974, cktpong,    pong,     pong,     pong,     pong_state,     empty_init, ROT0,  "Atari / National Entertainment Co.", "Cocktail Pong [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1974, drpong,     pong,     pong,     pong,     pong_state,     empty_init, ROT0,  "Atari", "Dr. Pong [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1974, pupppong,   pong,     pong,     pong,     pong_state,     empty_init, ROT0,  "Atari", "Puppy Pong [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1974, snoopong,   pong,     pong,     pong,     pong_state,     empty_init, ROT0,  "Atari", "Snoopy Pong [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1974, suprpong,   0,        suprpong, pong,     pong_state,     empty_init, ROT0,  "Atari", "Superpong [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAMEL( 1976, breakckt,  breakout, breakout, breakout, breakout_state, empty_init, ROT90, "Atari", "Breakout Cocktail [TTL]", MACHINE_SUPPORTS_SAVE, layout_breakckt)
+//GAMEL( 1976, consolet,  breakout, breakout, breakout, breakout_state, empty_init, ROT90, "Atari Europe", "Consolette [TTL]", MACHINE_SUPPORTS_SAVE, layout_consolet)
