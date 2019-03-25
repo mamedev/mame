@@ -328,10 +328,11 @@ uint32_t stuntcyc_state::screen_update_stuntcyc(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-MACHINE_CONFIG_START(atarikee_state::atarikee)
+void atarikee_state::atarikee(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(atarikee)
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
+	m_maincpu->set_constructor(netlist_atarikee);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -341,15 +342,15 @@ MACHINE_CONFIG_START(atarikee_state::atarikee)
 	m_video->set_vert_params(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL);
 	m_video->set_fieldcount(1);
 	m_video->set_threshold(0.30);
-MACHINE_CONFIG_END
+}
 
 //#define STUNTCYC_NL_CLOCK (14318181*69)
 #define STUNTCYC_NL_CLOCK (SC_HTOTAL*SC_VTOTAL*60*140)
 
 MACHINE_CONFIG_START(stuntcyc_state::stuntcyc)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, STUNTCYC_NL_CLOCK)
-	MCFG_NETLIST_SETUP(stuntcyc)
+	NETLIST_CPU(config, m_maincpu, STUNTCYC_NL_CLOCK);
+	m_maincpu->set_constructor(netlist_stuntcyc);
 
 	//MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "VIDEO_OUT", fixedfreq_device, update_vid, "fixfreq")
 	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit0",  "probe_bit0",  stuntcyc_state, probe_bit0_cb, "")
@@ -362,9 +363,9 @@ MACHINE_CONFIG_START(stuntcyc_state::stuntcyc)
 	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_clock", "probe_clock", stuntcyc_state, probe_clock_cb, "")
 
 /* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(stuntcyc_state, screen_update_stuntcyc)
-	MCFG_SCREEN_RAW_PARAMS(SC_HTOTAL*SC_VTOTAL*60, SC_HTOTAL, 0, SC_HTOTAL, SC_VTOTAL, 0, SC_VTOTAL)
+	SCREEN(config, m_probe_screen, SCREEN_TYPE_RASTER);
+	m_probe_screen->set_screen_update(FUNC(stuntcyc_state::screen_update_stuntcyc));
+	m_probe_screen->set_raw(SC_HTOTAL*SC_VTOTAL*60, SC_HTOTAL, 0, SC_HTOTAL, SC_VTOTAL, 0, SC_VTOTAL);
 	//FIXFREQ(config, m_video).set_screen("screen");
 	//m_video->set_monitor_clock(SC_VIDCLOCK);
 	//m_video->set_horz_params(SC_HTOTAL-67,SC_HTOTAL-40,SC_HTOTAL-8, SC_HTOTAL);
@@ -375,8 +376,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gtrak10_state::gtrak10)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(gtrak10)
+	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_constructor(netlist_gtrak10);
 
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "VIDEO_OUT", fixedfreq_device, update_composite_monochrome, "fixfreq")
 

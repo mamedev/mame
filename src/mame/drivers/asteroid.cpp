@@ -811,18 +811,18 @@ void asteroid_state::astdelux(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(asteroid_state::llander)
+void asteroid_state::llander(machine_config &config)
+{
 	asteroid_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(llander_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(asteroid_state, llander_interrupt,  MASTER_CLOCK/4096/12)
+	m_maincpu->set_addrmap(AS_PROGRAM, &asteroid_state::llander_map);
+	m_maincpu->set_periodic_int(FUNC(asteroid_state::llander_interrupt), attotime::from_hz(MASTER_CLOCK/4096/12));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ/12/6)
-	MCFG_SCREEN_VISIBLE_AREA(522, 1566, 270, 1070)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_refresh_hz(CLOCK_3KHZ/12/6);
+	screen.set_visarea(522, 1566, 270, 1070);
+	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
 	output_latch_device &outlatch(*subdevice<output_latch_device>("outlatch")); // LS174 at N11
 	outlatch.bit_handler<0>().set_output("lamp4"); // LAMP5 (COMMAND MISSION)
@@ -834,7 +834,7 @@ MACHINE_CONFIG_START(asteroid_state::llander)
 
 	/* sound hardware */
 	llander_sound(config);
-MACHINE_CONFIG_END
+}
 
 
 

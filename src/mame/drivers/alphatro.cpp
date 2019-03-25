@@ -731,9 +731,9 @@ static void alphatro_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(alphatro_state::alphatro)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(alphatro_map)
-	MCFG_DEVICE_IO_MAP(alphatro_io)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &alphatro_state::alphatro_map);
+	m_maincpu->set_addrmap(AS_IO, &alphatro_state::alphatro_io);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

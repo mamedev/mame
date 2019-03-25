@@ -420,13 +420,14 @@ void arachnid_state::machine_start()
 ***************************************************************************/
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( arachnid )
+    machine_config( arachnid )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(arachnid_state::arachnid)
+void arachnid_state::arachnid(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(M6809_TAG, MC6809, 10.738635_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(arachnid_map)
+	MC6809(config, m_maincpu, 10.738635_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &arachnid_state::arachnid_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MK48Z02 (or DS1220Y)
 
@@ -456,13 +457,12 @@ MACHINE_CONFIG_START(arachnid_state::arachnid)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	ptm6840_device &ptm(PTM6840(config, PTM6840_TAG, 10.738635_MHz_XTAL / 3 / 4));
 	ptm.set_external_clocks(0, 0, 0);
 	ptm.o1_callback().set(FUNC(arachnid_state::ptm_o1_callback));
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
     ROMS
