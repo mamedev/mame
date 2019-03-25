@@ -129,9 +129,9 @@ For One Shot One Kill:
 #include "speaker.h"
 
 
-READ16_MEMBER(oneshot_state::oneshot_in0_word_r)
+u16 oneshot_state::oneshot_in0_word_r()
 {
-	int data = ioport("DSW1")->read();
+	const u16 data = m_io_dsw1->read();
 
 	switch (data & 0x0c)
 	{
@@ -152,7 +152,7 @@ READ16_MEMBER(oneshot_state::oneshot_in0_word_r)
 	return data;
 }
 
-READ16_MEMBER(oneshot_state::oneshot_gun_x_p1_r)
+u16 oneshot_state::oneshot_gun_x_p1_r()
 {
 	/* shots must be in a different location to register */
 	m_p1_wobble ^= 1;
@@ -160,12 +160,12 @@ READ16_MEMBER(oneshot_state::oneshot_gun_x_p1_r)
 	return m_gun_x_p1 ^ m_p1_wobble;
 }
 
-READ16_MEMBER(oneshot_state::oneshot_gun_y_p1_r)
+u16 oneshot_state::oneshot_gun_y_p1_r()
 {
 	return m_gun_y_p1;
 }
 
-READ16_MEMBER(oneshot_state::oneshot_gun_x_p2_r)
+u16 oneshot_state::oneshot_gun_x_p2_r()
 {
 	/* shots must be in a different location to register */
 	m_p2_wobble ^= 1;
@@ -173,34 +173,32 @@ READ16_MEMBER(oneshot_state::oneshot_gun_x_p2_r)
 	return m_gun_x_p2 ^ m_p2_wobble;
 }
 
-READ16_MEMBER(oneshot_state::oneshot_gun_y_p2_r)
+u16 oneshot_state::oneshot_gun_y_p2_r()
 {
 	return m_gun_y_p2;
 }
 
-WRITE16_MEMBER(oneshot_state::soundbank_w)
+void oneshot_state::soundbank_w(u8 data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_oki->set_rom_bank((data & 0x03) ^ 0x03);
-	}
+	m_oki->set_rom_bank((data & 0x03) ^ 0x03);
 }
 
 
 
-void oneshot_state::oneshot_map(address_map &map)
+void oneshot_state::mem_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x087fff).ram();
 	map(0x0c0000, 0x0c07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x120000, 0x120fff).ram().share("sprites");
-	map(0x180000, 0x180fff).ram().w(FUNC(oneshot_state::oneshot_mid_videoram_w)).share("mid_videoram"); // some people , girl etc.
-	map(0x181000, 0x181fff).ram().w(FUNC(oneshot_state::oneshot_fg_videoram_w)).share("fg_videoram"); // credits etc.
-	map(0x182000, 0x182fff).ram().w(FUNC(oneshot_state::oneshot_bg_videoram_w)).share("bg_videoram"); // credits etc.
+	map(0x120000, 0x120fff).ram().share("spriteram");
+	//map(0x13f000, 0x13f000).noprw(); // Unknown read / writes
+	map(0x180000, 0x180fff).ram().w(FUNC(oneshot_state::mid_videoram_w)).share("mid_videoram"); // some people , girl etc.
+	map(0x181000, 0x181fff).ram().w(FUNC(oneshot_state::fg_videoram_w)).share("fg_videoram"); // credits etc.
+	map(0x182000, 0x182fff).ram().w(FUNC(oneshot_state::bg_videoram_w)).share("bg_videoram"); // credits etc.
 	map(0x188000, 0x18800f).writeonly().share("scroll");    // scroll registers
 	map(0x190003, 0x190003).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x190011, 0x190011).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x190018, 0x190019).w(FUNC(oneshot_state::soundbank_w));
+	map(0x190019, 0x190019).w(FUNC(oneshot_state::soundbank_w));
 	map(0x190026, 0x190027).r(FUNC(oneshot_state::oneshot_gun_x_p1_r));
 	map(0x19002e, 0x19002f).r(FUNC(oneshot_state::oneshot_gun_x_p2_r));
 	map(0x190036, 0x190037).r(FUNC(oneshot_state::oneshot_gun_y_p1_r));
@@ -212,7 +210,7 @@ void oneshot_state::oneshot_map(address_map &map)
 	map(0x19c034, 0x19c035).portr("P2");
 }
 
-void oneshot_state::oneshot_sound_map(address_map &map)
+void oneshot_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8000).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
@@ -395,10 +393,8 @@ static const gfx_layout oneshot16x16_layout =
 	RGN_FRAC(1,8),
 	8,
 	{ RGN_FRAC(0,8),RGN_FRAC(1,8),RGN_FRAC(2,8),RGN_FRAC(3,8),RGN_FRAC(4,8),RGN_FRAC(5,8),RGN_FRAC(6,8),RGN_FRAC(7,8) },
-	{ 0,1,2,3,4,5,6,7,
-		64+0,64+1,64+2,64+3,64+4,64+5,64+6,64+7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-		128+0*8, 128+1*8, 128+2*8, 128+3*8, 128+4*8, 128+5*8, 128+6*8, 128+7*8 },
+	{ STEP8(0,1), STEP8(8*8,1) },
+	{ STEP8(0,8), STEP8(8*8*2,8) },
 	16*16
 };
 
@@ -408,15 +404,15 @@ static const gfx_layout oneshot8x8_layout =
 	RGN_FRAC(1,8),
 	8,
 	{ RGN_FRAC(0,8),RGN_FRAC(1,8),RGN_FRAC(2,8),RGN_FRAC(3,8),RGN_FRAC(4,8),RGN_FRAC(5,8),RGN_FRAC(6,8),RGN_FRAC(7,8) },
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8
 };
 
 
 static GFXDECODE_START( gfx_oneshot )
-	GFXDECODE_ENTRY( "gfx1", 0, oneshot16x16_layout,   0x00, 4  ) /* sprites */
-	GFXDECODE_ENTRY( "gfx1", 0, oneshot8x8_layout,     0x00, 4  ) /* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, oneshot16x16_layout, 0, 4  ) /* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, oneshot8x8_layout,   0, 4  ) /* sprites */
 GFXDECODE_END
 
 void oneshot_state::machine_start()
@@ -445,10 +441,10 @@ void oneshot_state::oneshot(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &oneshot_state::oneshot_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &oneshot_state::mem_map);
 	m_maincpu->set_vblank_int("screen", FUNC(oneshot_state::irq4_line_hold));
 
-	Z80(config, "audiocpu", 5_MHz_XTAL).set_addrmap(AS_PROGRAM, &oneshot_state::oneshot_sound_map); // Not verified
+	Z80(config, "audiocpu", 5_MHz_XTAL).set_addrmap(AS_PROGRAM, &oneshot_state::sound_map); // Not verified
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -497,14 +493,14 @@ ROM_START( oneshot )
 	ROM_LOAD( "1shot.ua2", 0x00000, 0x010000, CRC(f655b80e) SHA1(2574a812c35801755c187a47f46ccdb0983c5feb) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
-	ROM_LOAD( "1shot-ui.16a",0x000000, 0x080000, CRC(f765f9a2) SHA1(f6c386e0421fcb0e420585dd27d9dad951bb2556) )
-	ROM_LOAD( "1shot-ui.13a",0x080000, 0x080000, CRC(3361b5d8) SHA1(f7db674d479765d4e58fb663aa5e13dde2abcce7) )
-	ROM_LOAD( "1shot-ui.11a",0x100000, 0x080000, CRC(8f8bd027) SHA1(fbec952ab5604c8e20c5e7cfd2844f4fe5441186) )
-	ROM_LOAD( "1shot-ui.08a",0x180000, 0x080000, CRC(254b1701) SHA1(163bfa70508fca20be70dd0af8b768ab6bf211b9) )
-	ROM_LOAD( "1shot-ui.16", 0x200000, 0x080000, CRC(ff246b27) SHA1(fef6029030268174ef9648b8f437aeda68475346) )
-	ROM_LOAD( "1shot-ui.13", 0x280000, 0x080000, CRC(80342e83) SHA1(2ac2b300382a607a539d2b0982ab596f05be3ad3) )
-	ROM_LOAD( "1shot-ui.11", 0x300000, 0x080000, CRC(b8938345) SHA1(318cf0d070db786680a45811bbd765fa37caaf62) )
-	ROM_LOAD( "1shot-ui.08", 0x380000, 0x080000, CRC(c9953bef) SHA1(21917a9dcc0afaeec20672ad863d0c9d583369e3) )
+	ROM_LOAD( "1shot-ui.16a", 0x000000, 0x080000, CRC(f765f9a2) SHA1(f6c386e0421fcb0e420585dd27d9dad951bb2556) )
+	ROM_LOAD( "1shot-ui.13a", 0x080000, 0x080000, CRC(3361b5d8) SHA1(f7db674d479765d4e58fb663aa5e13dde2abcce7) )
+	ROM_LOAD( "1shot-ui.11a", 0x100000, 0x080000, CRC(8f8bd027) SHA1(fbec952ab5604c8e20c5e7cfd2844f4fe5441186) )
+	ROM_LOAD( "1shot-ui.08a", 0x180000, 0x080000, CRC(254b1701) SHA1(163bfa70508fca20be70dd0af8b768ab6bf211b9) )
+	ROM_LOAD( "1shot-ui.16",  0x200000, 0x080000, CRC(ff246b27) SHA1(fef6029030268174ef9648b8f437aeda68475346) )
+	ROM_LOAD( "1shot-ui.13",  0x280000, 0x080000, CRC(80342e83) SHA1(2ac2b300382a607a539d2b0982ab596f05be3ad3) )
+	ROM_LOAD( "1shot-ui.11",  0x300000, 0x080000, CRC(b8938345) SHA1(318cf0d070db786680a45811bbd765fa37caaf62) )
+	ROM_LOAD( "1shot-ui.08",  0x380000, 0x080000, CRC(c9953bef) SHA1(21917a9dcc0afaeec20672ad863d0c9d583369e3) )
 
 	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "1shot.u15", 0x000000, 0x080000, CRC(e3759a47) SHA1(1159335924a6d68a0a24bfbe0c9182107f3f05f8) )
@@ -527,10 +523,10 @@ ROM_START( maddonna )
 	ROM_LOAD( "maddonna.b7",  0x080000, 0x080000, CRC(4920d2ec) SHA1(e72a374bca81ffa4f925326455e007df7227ae08) )
 	ROM_LOAD( "maddonna.b9",  0x100000, 0x080000, CRC(3a8a3feb) SHA1(832654902963c163644134431fd1221e1895cfec) )
 	ROM_LOAD( "maddonna.b11", 0x180000, 0x080000, CRC(6f9b7fdf) SHA1(14ced1d43eae3b6db4a0a4c12fb26cbd13eb7428) )
-	ROM_LOAD( "maddonna.b6",   0x200000, 0x080000, CRC(b02e9e0e) SHA1(6e527a2bfda0f4f420c10139c75dac2704e08d08) )
-	ROM_LOAD( "maddonna.b8",   0x280000, 0x080000, CRC(03f1de40) SHA1(bb0c0525155404c0740ac5f048f71ae7651a5941) )
-	ROM_LOAD( "maddonna.b10",  0x300000, 0x080000, CRC(87936423) SHA1(dda42f3685427edad7686d9712ff07d2fd9bf57e) )
-	ROM_LOAD( "maddonna.b12",  0x380000, 0x080000, CRC(879ab23c) SHA1(5288016542a10e60ccb28a930d8dfe4db41c6fc6) )
+	ROM_LOAD( "maddonna.b6",  0x200000, 0x080000, CRC(b02e9e0e) SHA1(6e527a2bfda0f4f420c10139c75dac2704e08d08) )
+	ROM_LOAD( "maddonna.b8",  0x280000, 0x080000, CRC(03f1de40) SHA1(bb0c0525155404c0740ac5f048f71ae7651a5941) )
+	ROM_LOAD( "maddonna.b10", 0x300000, 0x080000, CRC(87936423) SHA1(dda42f3685427edad7686d9712ff07d2fd9bf57e) )
+	ROM_LOAD( "maddonna.b12", 0x380000, 0x080000, CRC(879ab23c) SHA1(5288016542a10e60ccb28a930d8dfe4db41c6fc6) )
 
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	/* no samples for this game */
