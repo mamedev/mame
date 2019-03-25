@@ -15,9 +15,9 @@
 #include <cstddef>
 #include <cstdlib>
 #include <memory>
+#include <type_traits>
 #include <utility>
 #include <vector>
-#include <type_traits>
 
 #if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
 #include <malloc.h>

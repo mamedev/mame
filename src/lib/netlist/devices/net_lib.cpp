@@ -45,6 +45,7 @@ namespace devices
 		LIB_ENTRY(function)   // only for macro devices - NO FEEDBACK loops
 		LIB_ENTRY(QBJT_EB)
 		LIB_ENTRY(QBJT_switch)
+		LIB_ENTRY(MOSFET)
 		LIB_ENTRY(logic_input_ttl)
 		LIB_ENTRY(logic_input)
 		LIB_ENTRY(analog_input)

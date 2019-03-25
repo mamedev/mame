@@ -1024,6 +1024,7 @@ namespace netlist
 		virtual void changed();
 		const pstring &value() const NL_NOEXCEPT { return m_param; }
 	private:
+		PALIGNAS_CACHELINE()
 		pstring m_param;
 	};
 
@@ -1042,8 +1043,8 @@ namespace netlist
 			: m_value(param.model_value(name))
 			{
 			}
-			const double &operator()() const noexcept { return m_value; }
-			operator const double&() const noexcept { return m_value; }
+			double operator()() const noexcept { return m_value; }
+			operator double() const noexcept { return m_value; }
 		private:
 			const double m_value;
 		};
@@ -1091,7 +1092,7 @@ namespace netlist
 
 		param_rom_t(device_t &device, const pstring &name);
 
-		const ST & operator[] (std::size_t n) NL_NOEXCEPT { return m_data[n]; }
+		ST operator[] (std::size_t n) const NL_NOEXCEPT { return m_data[n]; }
 	protected:
 		void changed() override
 		{
