@@ -568,12 +568,12 @@ uint32_t avt_state::screen_update_avt(screen_device &screen, bitmap_ind16 &bitma
 void avt_state::avt_palette(palette_device &palette) const
 {
 	/*  prom bits
-	    7654 3210
-	    ---- ---x   Intensity?.
-	    ---- --x-   Red component.
-	    ---- -x--   Green component.
-	    ---- x---   Blue component.
-	    xxxx ----   Unused.
+		7654 3210
+		---- ---x   Intensity?.
+		---- --x-   Red component.
+		---- -x--   Green component.
+		---- x---   Blue component.
+		xxxx ----   Unused.
 	*/
 
 	/* 0000BGRI */
@@ -624,19 +624,19 @@ void avt_state::avt_palette(palette_device &palette) const
 WRITE8_MEMBER( avt_state::avt_6845_address_w )
 {
 	m_crtc_index = data;
-	m_crtc->address_w(data);
+	m_crtc->address_w(space, offset, data);
 }
 
 WRITE8_MEMBER( avt_state::avt_6845_data_w )
 {
 	m_crtc_vreg[m_crtc_index] = data;
-	m_crtc->register_w(data);
+	m_crtc->register_w(space, offset, data);
 }
 
 READ8_MEMBER( avt_state::avt_6845_data_r )
 {
 	//m_crtc_vreg[m_crtc_index] = data;
-	return m_crtc->register_r();
+	return m_crtc->register_r(space, offset);
 }
 
 /*********************************************
@@ -956,8 +956,7 @@ WRITE_LINE_MEMBER( avt_state::avtbingo_w )
 		m_pio0->port_b_write(ioport("IN0")->read());
 }
 
-void avt_state::avt(machine_config &config)
-{
+MACHINE_CONFIG_START(avt_state::avt)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, CPU_CLOCK); /* guess */
 	m_maincpu->set_daisy_config(daisy_chain);
@@ -965,13 +964,13 @@ void avt_state::avt(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &avt_state::avt_portmap);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea_full();  /* 240x224 (through CRTC) */
-	screen.set_screen_update(FUNC(avt_state::screen_update_avt));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)  /* 240x224 (through CRTC) */
+	MCFG_SCREEN_UPDATE_DRIVER(avt_state, screen_update_avt)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_avt);
 	PALETTE(config, m_palette, FUNC(avt_state::avt_palette), 8*16);
@@ -1005,7 +1004,7 @@ void avt_state::avt(machine_config &config)
 	// PORT A d0-d7 = TP13,TP12,TP11,TP10,TP8,TP7,TP5,TP3
 	// PORT B d0-d7 = "Player2", DCOM, CCOM, BCOM, ACOM, LOCKOUT/TP6, TP4, 50/60HZ (held high, jumper on JP13 grounds it)
 	// DCOM,CCOM,BCOM,ACOM appear to be muxes
-}
+MACHINE_CONFIG_END
 
 // Leave avtnfl as it was until more is learnt.
 WRITE_LINE_MEMBER( avt_state::avtnfl_w )

@@ -416,8 +416,7 @@ GFXDECODE_END
 
 ****************************************************************************/
 
-void p8k_state::p8k(machine_config &config)
-{
+MACHINE_CONFIG_START(p8k_state::p8k)
 	/* basic machine hardware */
 	z80_device& maincpu(Z80(config, "maincpu", 16_MHz_XTAL / 4));
 	maincpu.set_daisy_config(p8k_daisy_chain);
@@ -474,25 +473,25 @@ void p8k_state::p8k(machine_config &config)
 	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio2->in_pa_callback().set_ioport("DSW");
 
-	I8272A(config, m_i8272, 16_MHz_XTAL / 2, true);
+	I8272A(config, m_i8272, 16_MHz_XTAL / 8, true);
 	m_i8272->drq_wr_callback().set("dma", FUNC(z80dma_device::rdy_w));
-	FLOPPY_CONNECTOR(config, "i8272:0", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "i8272:1", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	MCFG_FLOPPY_DRIVE_ADD("i8272:0", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("i8272:1", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	BEEP(config, "beeper", 3250).add_route(ALL_OUTPUTS, "mono", 0.5);
-}
+	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_CONFIG_END
 
-void p8k_state::p8k_16(machine_config &config)
-{
+MACHINE_CONFIG_START(p8k_state::p8k_16)
 	/* basic machine hardware */
-	Z8001(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &p8k_state::p8k_16_memmap);
-	m_maincpu->set_addrmap(AS_DATA, &p8k_state::p8k_16_datamap);
-	m_maincpu->set_addrmap(AS_IO, &p8k_state::p8k_16_iomap);
-	m_maincpu->set_irq_acknowledge_callback("p8k_16_daisy", FUNC(p8k_16_daisy_device::irq_callback));
+	MCFG_DEVICE_ADD("maincpu", Z8001, XTAL(4'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(p8k_16_memmap)
+	MCFG_DEVICE_DATA_MAP(p8k_16_datamap)
+	MCFG_DEVICE_IO_MAP(p8k_16_iomap)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("p8k_16_daisy", p8k_16_daisy_device, irq_callback)
 
 	P8K_16_DAISY(config, m_daisy, 0);
 	m_daisy->set_daisy_config(p8k_16_daisy_chain);
@@ -532,8 +531,9 @@ void p8k_state::p8k_16(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 3250).add_route(ALL_OUTPUTS, "mono", 0.5);
-}
+	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( p8000 )

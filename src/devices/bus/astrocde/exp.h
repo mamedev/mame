@@ -14,8 +14,6 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write) { }
-	virtual DECLARE_READ8_MEMBER(read_io) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_io) { }
 
 protected:
 	device_astrocade_card_interface(const machine_config &mconfig, device_t &device);
@@ -48,8 +46,6 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read);
 	virtual DECLARE_WRITE8_MEMBER(write);
-	virtual DECLARE_READ8_MEMBER(read_io);
-	virtual DECLARE_WRITE8_MEMBER(write_io);
 
 protected:
 	bool m_card_mounted;

@@ -13,7 +13,7 @@ DEFINE_DEVICE_TYPE(MSX_SLOT_FS4600, msx_slot_fs4600_device, "msx_slot_fs4600", "
 
 msx_slot_fs4600_device::msx_slot_fs4600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_SLOT_FS4600, tag, owner, clock)
-	, msx_internal_slot_interface(mconfig, *this)
+	, msx_internal_slot_interface()
 	, m_nvram(*this, "nvram")
 	, m_rom_region(*this, finder_base::DUMMY_TAG)
 	, m_region_offset(0)
@@ -48,12 +48,8 @@ void msx_slot_fs4600_device::device_start()
 	save_item(NAME(m_sram_address));
 	save_item(NAME(m_control));
 
-	restore_banks();
-}
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_slot_fs4600_device::restore_banks), this));
 
-
-void msx_slot_fs4600_device::device_post_load()
-{
 	restore_banks();
 }
 
@@ -67,7 +63,7 @@ void msx_slot_fs4600_device::restore_banks()
 }
 
 
-uint8_t msx_slot_fs4600_device::read(offs_t offset)
+READ8_MEMBER(msx_slot_fs4600_device::read)
 {
 	if ((m_control & 0x02) && ((offset & 0x3fff) == 0x3ffd))
 	{
@@ -81,7 +77,7 @@ uint8_t msx_slot_fs4600_device::read(offs_t offset)
 }
 
 
-void msx_slot_fs4600_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(msx_slot_fs4600_device::write)
 {
 	if (offset == 0x7ff9)
 	{

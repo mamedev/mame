@@ -621,12 +621,11 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 TIMER_CALLBACK_MEMBER(seta2_state::raster_timer_done)
 {
-	auto *tmp68301 = dynamic_cast<tmp68301_device *>(m_maincpu.target());
-	if (tmp68301)
+	if (m_tmp68301)
 	{
 		if (m_rasterenabled & 1)
 		{
-			tmp68301->external_interrupt_1();
+			m_tmp68301->external_interrupt_1();
 			logerror("external int (vpos is %d)\n", m_screen->vpos());
 			m_screen->update_partial(m_screen->vpos() - 1);
 		}

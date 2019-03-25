@@ -111,12 +111,12 @@
 		<text string="H"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 
-	<element name="text_r11"><text string="[K]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r21"><text string="[Q]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r31"><text string="[R]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r41"><text string="[B]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r51"><text string="[N]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r61"><text string="[P]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r11"><text string="&#x265a;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r21"><text string="&#x265b;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r31"><text string="&#x265c;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r41"><text string="&#x265d;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r51"><text string="&#x265e;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r61"><text string="&#x265f;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
 	<element name="text_r12"><text string="PB" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_r22"><text string="PV" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
@@ -375,21 +375,21 @@
 
 	<!-- right side -->
 
-		<bezel element="text_r11"><bounds x="91.6" y="29.65" width="2.5" height="1.5" /></bezel>
-		<bezel element="text_r21"><bounds x="91.6" y="32.15" width="2.5" height="1.5" /></bezel>
-		<bezel element="text_r31"><bounds x="91.6" y="34.65" width="2.5" height="1.5" /></bezel>
-		<bezel element="text_r41"><bounds x="91.6" y="37.15" width="2.5" height="1.5" /></bezel>
-		<bezel element="text_r51"><bounds x="91.6" y="39.65" width="2.5" height="1.5" /></bezel>
-		<bezel element="text_r61"><bounds x="91.6" y="42.15" width="2.5" height="1.5" /></bezel>
+		<bezel element="text_r11"><bounds x="91.5" y="29.3" width="2.5" height="2" /></bezel>
+		<bezel element="text_r21"><bounds x="91.5" y="31.8" width="2.5" height="2" /></bezel>
+		<bezel element="text_r31"><bounds x="91.5" y="34.3" width="2.5" height="2" /></bezel>
+		<bezel element="text_r41"><bounds x="91.5" y="36.8" width="2.5" height="2" /></bezel>
+		<bezel element="text_r51"><bounds x="91.5" y="39.3" width="2.5" height="2" /></bezel>
+		<bezel element="text_r61"><bounds x="91.5" y="41.8" width="2.5" height="2" /></bezel>
 
-		<bezel element="text_r12"><bounds x="96.8" y="29.65" width="10" height="1.5" /></bezel>
-		<bezel element="text_r22"><bounds x="96.8" y="32.15" width="10" height="1.5" /></bezel>
-		<bezel element="text_r32"><bounds x="96.8" y="34.65" width="10" height="1.5" /></bezel>
-		<bezel element="text_r42"><bounds x="96.8" y="37.15" width="10" height="1.5" /></bezel>
-		<bezel element="text_r52"><bounds x="96.8" y="39.65" width="10" height="1.5" /></bezel>
-		<bezel element="text_r62"><bounds x="96.8" y="42.15" width="10" height="1.5" /></bezel>
-		<bezel element="text_r72"><bounds x="96.8" y="44.65" width="10" height="1.5" /></bezel>
-		<bezel element="text_r82"><bounds x="96.8" y="47.15" width="10" height="1.5" /></bezel>
+		<bezel element="text_r12"><bounds x="96.8" y="29.75" width="10" height="1.5" /></bezel>
+		<bezel element="text_r22"><bounds x="96.8" y="32.25" width="10" height="1.5" /></bezel>
+		<bezel element="text_r32"><bounds x="96.8" y="34.75" width="10" height="1.5" /></bezel>
+		<bezel element="text_r42"><bounds x="96.8" y="37.25" width="10" height="1.5" /></bezel>
+		<bezel element="text_r52"><bounds x="96.8" y="39.75" width="10" height="1.5" /></bezel>
+		<bezel element="text_r62"><bounds x="96.8" y="42.25" width="10" height="1.5" /></bezel>
+		<bezel element="text_r72"><bounds x="96.8" y="44.75" width="10" height="1.5" /></bezel>
+		<bezel element="text_r82"><bounds x="96.8" y="47.25" width="10" height="1.5" /></bezel>
 
 		<bezel element="text_r92"><bounds x="96.8" y="49.5" width="10" height="1.5" /></bezel>
 		<bezel element="text_r93"><bounds x="96.8" y="51" width="10" height="1.5" /></bezel>
@@ -411,8 +411,8 @@
 		<bezel element="bt" inputtag="IN.8" inputmask="0x01"><bounds x="94" y="47" width="2" height="2" /></bezel>
 		<bezel element="bt" inputtag="IN.2" inputmask="0x100"><bounds x="94" y="49.5" width="2" height="2" /></bezel>
 
-		<bezel element="text_rx2"><bounds x="96.8" y="79.65" width="10" height="1.5" /></bezel>
-		<bezel element="text_ry2"><bounds x="96.8" y="82.15" width="10" height="1.5" /></bezel>
+		<bezel element="text_rx2"><bounds x="96.8" y="79.75" width="10" height="1.5" /></bezel>
+		<bezel element="text_ry2"><bounds x="96.8" y="82.25" width="10" height="1.5" /></bezel>
 		<bezel element="text_rx1"><bounds x="88" y="78.75" width="6" height="1" /></bezel>
 		<bezel element="text_ry1"><bounds x="88" y="81.25" width="5.5" height="1" /></bezel>
 

@@ -101,27 +101,28 @@ static GFXDECODE_START( gfx_sealy )
 GFXDECODE_END
 
 
-void sealy_state::sealy(machine_config &config)
-{
+MACHINE_CONFIG_START(sealy_state::sealy)
+
 	/* basic machine hardware */
-	H83044(config, m_maincpu, MAIN_CLOCK); /* wrong CPU, but we have not a M16C core ATM */
-	m_maincpu->set_addrmap(AS_PROGRAM, &sealy_state::sealy_map);
+	MCFG_DEVICE_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */
+	MCFG_DEVICE_PROGRAM_MAP(sealy_map)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
-	screen.set_visarea(0, 512-1, 0, 256-1);
-	screen.set_screen_update(FUNC(sealy_state::screen_update_sealy));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE_DRIVER(sealy_state, screen_update_sealy)
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_sealy);
 	PALETTE(config, m_palette, FUNC(sealy_state::sealy_palette), 32768);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, "oki", MAIN_CLOCK/13, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, MAIN_CLOCK/13, okim6295_device::PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 ROM_START( crzyddz )

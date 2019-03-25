@@ -82,11 +82,10 @@ void a26_rom_harmony_device::harmony_arm7_map(address_map &map)
 {
 }
 
-void a26_rom_harmony_device::device_add_mconfig(machine_config &config)
-{
-	LPC2103(config, m_cpu, 70000000);
-	m_cpu->set_addrmap(AS_PROGRAM, &a26_rom_harmony_device::harmony_arm7_map);
-}
+MACHINE_CONFIG_START(a26_rom_harmony_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("arm", LPC2103, 70000000)
+	MCFG_DEVICE_PROGRAM_MAP(harmony_arm7_map)
+MACHINE_CONFIG_END
 
 // actually if the ARM code is doing this and providing every opcode to the main CPU based
 // on bus activity then we shouldn't be doing and of this here (if the ROM is actually

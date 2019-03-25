@@ -224,7 +224,7 @@ WRITE8_MEMBER( votrpss_state::ppi_pa_w )
 WRITE8_MEMBER( votrpss_state::ppi_pb_w )
 {
 	m_portb = data;
-	m_terminal->write(data&0x7f);
+	m_terminal->write(space, offset, data&0x7f);
 }
 
 WRITE8_MEMBER( votrpss_state::ppi_pc_w )
@@ -242,13 +242,12 @@ void votrpss_state::kbd_put(u8 data)
  Machine Drivers
 ******************************************************************************/
 
-void votrpss_state::votrpss(machine_config &config)
-{
+MACHINE_CONFIG_START(votrpss_state::votrpss)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(8'000'000)/2);  /* 4.000 MHz, verified */
-	m_maincpu->set_addrmap(AS_PROGRAM, &votrpss_state::votrpss_mem);
-	m_maincpu->set_addrmap(AS_IO, &votrpss_state::votrpss_io);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(votrpss_state::irq_ack));
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000)/2)  /* 4.000 MHz, verified */
+	MCFG_DEVICE_PROGRAM_MAP(votrpss_mem)
+	MCFG_DEVICE_IO_MAP(votrpss_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(votrpss_state,irq_ack)
 
 	/* video hardware */
 	//config.set_default_layout(layout_votrpss);
@@ -259,7 +258,8 @@ void votrpss_state::votrpss(machine_config &config)
 	ay.port_b_read_callback().set_ioport("DSW1");
 	ay.port_a_write_callback().set("votrax", FUNC(votrax_sc01_device::write));
 	ay.add_route(ALL_OUTPUTS, "mono", 0.25);
-	VOTRAX_SC01(config, "votrax", 720000).add_route(ALL_OUTPUTS, "mono", 1.00); /* 720 kHz? needs verify */
+	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000) /* 720 kHz? needs verify */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
 	GENERIC_TERMINAL(config, m_terminal, 0);
@@ -291,8 +291,8 @@ void votrpss_state::votrpss(machine_config &config)
 	m_ppi->out_pb_callback().set(FUNC(votrpss_state::ppi_pb_w));
 	m_ppi->out_pc_callback().set(FUNC(votrpss_state::ppi_pc_w));
 
-	TIMER(config, "irq_timer").configure_periodic(FUNC(votrpss_state::irq_timer), attotime::from_msec(10));
-}
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", votrpss_state, irq_timer, attotime::from_msec(10))
+MACHINE_CONFIG_END
 
 
 

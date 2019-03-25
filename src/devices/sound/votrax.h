@@ -24,8 +24,8 @@ public:
 
 	auto ar_callback() { return m_ar_cb.bind(); }
 
-	void write(uint8_t data);
-	void inflection_w(uint8_t data);
+	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_WRITE8_MEMBER(inflection_w);
 	DECLARE_READ_LINE_MEMBER(request) { m_stream->update(); return m_ar_state; }
 
 protected:

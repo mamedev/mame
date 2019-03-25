@@ -42,8 +42,6 @@ template<int Width, int AddrShift, int Endian> handler_entry_write_tap<Width, Ad
 
 
 
-template class handler_entry_read_tap<0,  1, ENDIANNESS_LITTLE>;
-template class handler_entry_read_tap<0,  1, ENDIANNESS_BIG>;
 template class handler_entry_read_tap<0,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_read_tap<0,  0, ENDIANNESS_BIG>;
 template class handler_entry_read_tap<1,  3, ENDIANNESS_LITTLE>;
@@ -67,8 +65,6 @@ template class handler_entry_read_tap<3, -2, ENDIANNESS_BIG>;
 template class handler_entry_read_tap<3, -3, ENDIANNESS_LITTLE>;
 template class handler_entry_read_tap<3, -3, ENDIANNESS_BIG>;
 
-template class handler_entry_write_tap<0,  1, ENDIANNESS_LITTLE>;
-template class handler_entry_write_tap<0,  1, ENDIANNESS_BIG>;
 template class handler_entry_write_tap<0,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_write_tap<0,  0, ENDIANNESS_BIG>;
 template class handler_entry_write_tap<1,  3, ENDIANNESS_LITTLE>;

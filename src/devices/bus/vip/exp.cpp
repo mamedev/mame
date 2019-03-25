@@ -80,13 +80,13 @@ void vip_expansion_slot_device::device_start()
 //  program_r - program read
 //-------------------------------------------------
 
-uint8_t vip_expansion_slot_device::program_r(offs_t offset, int cs, int cdef, int *minh)
+uint8_t vip_expansion_slot_device::program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh)
 {
 	uint8_t data = 0;
 
 	if (m_card != nullptr)
 	{
-		data = m_card->vip_program_r(offset, cs, cdef, minh);
+		data = m_card->vip_program_r(space, offset, cs, cdef, minh);
 	}
 
 	return data;
@@ -97,11 +97,11 @@ uint8_t vip_expansion_slot_device::program_r(offs_t offset, int cs, int cdef, in
 //  program_w - program write
 //-------------------------------------------------
 
-void vip_expansion_slot_device::program_w(offs_t offset, uint8_t data, int cdef, int *minh)
+void vip_expansion_slot_device::program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh)
 {
 	if (m_card != nullptr)
 	{
-		m_card->vip_program_w(offset, data, cdef, minh);
+		m_card->vip_program_w(space, offset, data, cdef, minh);
 	}
 }
 
@@ -110,13 +110,13 @@ void vip_expansion_slot_device::program_w(offs_t offset, uint8_t data, int cdef,
 //  io_r - io read
 //-------------------------------------------------
 
-uint8_t vip_expansion_slot_device::io_r(offs_t offset)
+uint8_t vip_expansion_slot_device::io_r(address_space &space, offs_t offset)
 {
 	uint8_t data = 0;
 
 	if (m_card != nullptr)
 	{
-		data = m_card->vip_io_r(offset);
+		data = m_card->vip_io_r(space, offset);
 	}
 
 	return data;
@@ -127,11 +127,11 @@ uint8_t vip_expansion_slot_device::io_r(offs_t offset)
 //  io_w - io write
 //-------------------------------------------------
 
-void vip_expansion_slot_device::io_w(offs_t offset, uint8_t data)
+void vip_expansion_slot_device::io_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if (m_card != nullptr)
 	{
-		m_card->vip_io_w(offset, data);
+		m_card->vip_io_w(space, offset, data);
 	}
 }
 
@@ -140,13 +140,13 @@ void vip_expansion_slot_device::io_w(offs_t offset, uint8_t data)
 //  dma_r - dma read
 //-------------------------------------------------
 
-uint8_t vip_expansion_slot_device::dma_r(offs_t offset)
+READ8_MEMBER(vip_expansion_slot_device::dma_r)
 {
 	uint8_t data = 0;
 
 	if (m_card != nullptr)
 	{
-		data = m_card->vip_dma_r(offset);
+		data = m_card->vip_dma_r(space, offset);
 	}
 
 	return data;
@@ -157,11 +157,11 @@ uint8_t vip_expansion_slot_device::dma_r(offs_t offset)
 //  dma_w - dma write
 //-------------------------------------------------
 
-void vip_expansion_slot_device::dma_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(vip_expansion_slot_device::dma_w)
 {
 	if (m_card != nullptr)
 	{
-		m_card->vip_dma_w(offset, data);
+		m_card->vip_dma_w(space, offset, data);
 	}
 }
 
@@ -206,7 +206,7 @@ READ_LINE_MEMBER(vip_expansion_slot_device::ef4_r)
 	return state;
 }
 
-void vip_expansion_slot_device::sc_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(vip_expansion_slot_device::sc_w)
 {
 	if (m_card != nullptr)
 		m_card->vip_sc_w(offset, data);

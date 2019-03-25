@@ -220,15 +220,14 @@ void compc_state::compciii_io(address_map &map)
 	map(0x0060, 0x0063).rw(FUNC(compc_state::pioiii_r), FUNC(compc_state::pioiii_w));
 }
 
-void compc_state::compc(machine_config &config)
-{
-	I8088(config, m_maincpu, 4772720*2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &compc_state::compc_map);
-	m_maincpu->set_addrmap(AS_IO, &compc_state::compc_io);
-	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
+MACHINE_CONFIG_START(compc_state::compc)
+	MCFG_DEVICE_ADD("maincpu", I8088, 4772720*2)
+	MCFG_DEVICE_PROGRAM_MAP(compc_map)
+	MCFG_DEVICE_IO_MAP(compc_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
-	config.device_remove("mb:pit8253");
+	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
+	MCFG_DEVICE_REMOVE("mb:pit8253")
 	fe2010_pit_device &pit(FE2010_PIT(config, "mb:pit8253", 0));
 	pit.set_clk<0>(XTAL(14'318'181)/12.0); /* heartbeat IRQ */
 	pit.out_handler<0>().set("mb:pic8259", FUNC(pic8259_device::ir0_w));
@@ -238,26 +237,25 @@ void compc_state::compc(machine_config &config)
 	pit.out_handler<2>().set(m_mb, FUNC(ibm5160_mb_device::pc_pit8253_out2_changed));
 
 	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "mda", false);
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "lpt", false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "com", false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "mda", false)
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
 
-	PC_KEYB(config, m_keyboard);
-	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
+	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K, 640K");
 
 	/* software lists */
-	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
-}
+	MCFG_SOFTWARE_LIST_ADD("disk_list", "ibm5150")
+MACHINE_CONFIG_END
 
-void compc_state::pc10iii(machine_config &config)
-{
+MACHINE_CONFIG_START(compc_state::pc10iii)
 	compc(config);
-	m_maincpu->set_addrmap(AS_IO, &compc_state::compciii_io);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(compciii_io)
+MACHINE_CONFIG_END
 
 ROM_START(compc10)
 	ROM_REGION(0x10000, "bios", 0)

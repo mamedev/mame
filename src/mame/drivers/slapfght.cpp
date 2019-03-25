@@ -889,12 +889,12 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-void slapfght_state::perfrman(machine_config &config)
-{
+MACHINE_CONFIG_START(slapfght_state::perfrman)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(16'000'000)/4); // 4MHz? XTAL is known, divider is guessed
-	m_maincpu->set_addrmap(AS_PROGRAM, &slapfght_state::perfrman_map);
-	m_maincpu->set_addrmap(AS_IO, &slapfght_state::io_map_nomcu);
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/4) // 4MHz? XTAL is known, divider is guessed
+	MCFG_DEVICE_PROGRAM_MAP(perfrman_map)
+	MCFG_DEVICE_IO_MAP(io_map_nomcu)
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(slapfght_state::sound_reset_w));
@@ -902,11 +902,11 @@ void slapfght_state::perfrman(machine_config &config)
 	mainlatch.q_out_cb<3>().set(FUNC(slapfght_state::irq_enable_w));
 	mainlatch.q_out_cb<6>().set(FUNC(slapfght_state::palette_bank_w));
 
-	Z80(config, m_audiocpu, XTAL(16'000'000)/8); // 2MHz? XTAL is known, divider is guessed
-	m_audiocpu->set_addrmap(AS_PROGRAM, &slapfght_state::perfrman_sound_map);
-	m_audiocpu->set_periodic_int(FUNC(slapfght_state::sound_nmi), attotime::from_hz(240)); // music speed, verified
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/8) // 2MHz? XTAL is known, divider is guessed
+	MCFG_DEVICE_PROGRAM_MAP(perfrman_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 240) // music speed, verified
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -921,7 +921,7 @@ void slapfght_state::perfrman(machine_config &config)
 	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_perfrman);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_perfrman)
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, perfrman)
 
@@ -937,28 +937,28 @@ void slapfght_state::perfrman(machine_config &config)
 	ay2.port_a_read_callback().set_ioport("DSW1");
 	ay2.port_b_read_callback().set_ioport("DSW2");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+MACHINE_CONFIG_END
 
 
-void slapfght_state::tigerh(machine_config &config)
-{
+MACHINE_CONFIG_START(slapfght_state::tigerh)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(36'000'000)/6); // 6MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &slapfght_state::tigerh_map_mcu);
-	m_maincpu->set_addrmap(AS_IO, &slapfght_state::io_map_mcu);
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(36'000'000)/6) // 6MHz
+	MCFG_DEVICE_PROGRAM_MAP(tigerh_map_mcu)
+	MCFG_DEVICE_IO_MAP(io_map_mcu)
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(slapfght_state::sound_reset_w));
 	mainlatch.q_out_cb<1>().set(FUNC(slapfght_state::flipscreen_w));
 	mainlatch.q_out_cb<3>().set(FUNC(slapfght_state::irq_enable_w));
 
-	Z80(config, m_audiocpu, XTAL(36'000'000)/12); // 3MHz
-	m_audiocpu->set_addrmap(AS_PROGRAM, &slapfght_state::tigerh_sound_map);
-	m_audiocpu->set_periodic_int(FUNC(slapfght_state::sound_nmi), attotime::from_hz(360)); // music speed, verified with pcb recording
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(36'000'000)/12) // 3MHz
+	MCFG_DEVICE_PROGRAM_MAP(tigerh_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 360) // music speed, verified with pcb recording
 
 	TAITO68705_MCU_TIGER(config, m_bmcu, 36_MHz_XTAL/12); // 3MHz
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -973,7 +973,7 @@ void slapfght_state::tigerh(machine_config &config)
 	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapfght);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
@@ -989,34 +989,34 @@ void slapfght_state::tigerh(machine_config &config)
 	ay2.port_a_read_callback().set_ioport("DSW1");
 	ay2.port_b_read_callback().set_ioport("DSW2");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+MACHINE_CONFIG_END
 
-void slapfght_state::tigerhb1(machine_config &config)
-{
+MACHINE_CONFIG_START(slapfght_state::tigerhb1)
 	tigerh(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &slapfght_state::tigerhb1_map);
-	m_maincpu->set_addrmap(AS_IO, &slapfght_state::io_map_nomcu);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tigerhb1_map)
+	MCFG_DEVICE_IO_MAP(io_map_nomcu)
 
-	config.device_remove("bmcu");
-}
+	MCFG_DEVICE_REMOVE("bmcu")
+MACHINE_CONFIG_END
 
-void slapfght_state::tigerhb2(machine_config &config)
-{
+MACHINE_CONFIG_START(slapfght_state::tigerhb2)
 	tigerhb1(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &slapfght_state::tigerhb2_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tigerhb2_map)
+MACHINE_CONFIG_END
 
 
-void slapfght_state::slapfigh(machine_config &config)
-{
+MACHINE_CONFIG_START(slapfght_state::slapfigh)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(36'000'000)/6); // 6MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &slapfght_state::slapfigh_map_mcu);
-	m_maincpu->set_addrmap(AS_IO, &slapfght_state::io_map_mcu);
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(36'000'000)/6) // 6MHz
+	MCFG_DEVICE_PROGRAM_MAP(slapfigh_map_mcu)
+	MCFG_DEVICE_IO_MAP(io_map_mcu)
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(slapfght_state::sound_reset_w));
@@ -1024,14 +1024,14 @@ void slapfght_state::slapfigh(machine_config &config)
 	mainlatch.q_out_cb<3>().set(FUNC(slapfght_state::irq_enable_w));
 	mainlatch.q_out_cb<4>().set_membank("bank1");
 
-	Z80(config, m_audiocpu, XTAL(36'000'000)/12); // 3MHz
-	m_audiocpu->set_addrmap(AS_PROGRAM, &slapfght_state::tigerh_sound_map);
-	m_audiocpu->set_periodic_int(FUNC(slapfght_state::sound_nmi), attotime::from_hz(180));
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(36'000'000)/12) // 3MHz
+	MCFG_DEVICE_PROGRAM_MAP(tigerh_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 180)
 
 	TAITO68705_MCU(config, m_bmcu, 36_MHz_XTAL/12); // 3MHz
 	m_bmcu->aux_strobe_cb().set(FUNC(slapfght_state::scroll_from_mcu_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -1046,7 +1046,7 @@ void slapfght_state::slapfigh(machine_config &config)
 	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapfght);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
@@ -1062,43 +1062,43 @@ void slapfght_state::slapfigh(machine_config &config)
 	ay2.port_a_read_callback().set_ioport("DSW1");
 	ay2.port_b_read_callback().set_ioport("DSW2");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+MACHINE_CONFIG_END
 
-void slapfght_state::slapfighb1(machine_config &config)
-{
+MACHINE_CONFIG_START(slapfght_state::slapfighb1)
 	slapfigh(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &slapfght_state::slapfighb1_map);
-	m_maincpu->set_addrmap(AS_IO, &slapfght_state::io_map_nomcu);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(slapfighb1_map)
+	MCFG_DEVICE_IO_MAP(io_map_nomcu)
 
-	config.device_remove("bmcu");
-}
+	MCFG_DEVICE_REMOVE("bmcu")
+MACHINE_CONFIG_END
 
-void slapfght_state::slapfighb2(machine_config &config)
-{
+MACHINE_CONFIG_START(slapfght_state::slapfighb2)
 	slapfighb1(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &slapfght_state::slapfighb2_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(slapfighb2_map)
+MACHINE_CONFIG_END
 
-void slapfght_state::getstarb1(machine_config &config)
-{
+MACHINE_CONFIG_START(slapfght_state::getstarb1)
 	slapfighb1(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &slapfght_state::getstarb1_io_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(getstarb1_io_map)
+MACHINE_CONFIG_END
 
-void slapfght_state::getstarb2(machine_config &config)
-{
+MACHINE_CONFIG_START(slapfght_state::getstarb2)
 	slapfighb1(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &slapfght_state::getstar_map);
-	m_maincpu->set_addrmap(AS_IO, &slapfght_state::getstarb2_io_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(getstar_map)
+	MCFG_DEVICE_IO_MAP(getstarb2_io_map)
+MACHINE_CONFIG_END
 
 
 

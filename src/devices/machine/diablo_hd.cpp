@@ -1324,9 +1324,11 @@ void diablo_hd_device::device_start()
 void diablo_hd_device::device_reset()
 {
 	// free previous page cache
-	for (int page = 0; page < m_pages; page++)
-		if (m_cache[page])
-			m_cache[page] = nullptr;
+	if (m_cache) {
+		for (int page = 0; page < m_pages; page++)
+			if (m_cache[page])
+				m_cache[page] = nullptr;
+	}
 	// free previous bits cache
 	if (m_bits) {
 		for (int page = 0; page < m_pages; page++)
@@ -1440,10 +1442,9 @@ void diablo_hd_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 	}
 }
 
-void diablo_hd_device::device_add_mconfig(machine_config &config)
-{
-	DIABLO(config, "drive", 0);
-}
+MACHINE_CONFIG_START(diablo_hd_device::device_add_mconfig)
+	MCFG_DIABLO_ADD("drive")
+MACHINE_CONFIG_END
 
 
 DEFINE_DEVICE_TYPE(DIABLO_HD, diablo_hd_device, "diablo_hd", "Diablo Disk")

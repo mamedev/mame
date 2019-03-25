@@ -186,13 +186,12 @@ void vd_state::machine_reset()
 	m_t_c = 0;
 }
 
-void vd_state::vd(machine_config &config)
-{
+MACHINE_CONFIG_START(vd_state::vd)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vd_state::vd_map);
-	m_maincpu->set_addrmap(AS_IO, &vd_state::vd_io);
-	TIMER(config, "irq").configure_periodic(FUNC(vd_state::irq), attotime::from_hz(484));
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(vd_map)
+	MCFG_DEVICE_IO_MAP(vd_io)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", vd_state, irq, attotime::from_hz(484))
 
 	/* Sound */
 	genpin_audio(config);
@@ -208,7 +207,7 @@ void vd_state::vd(machine_config &config)
 
 	/* Video */
 	config.set_default_layout(layout_vd);
-}
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
 / Break '86 (1986)

@@ -85,9 +85,9 @@ protected:
 	required_ioport m_cursy;
 	required_ioport m_buttons;
 
-	uint8_t bios_r(offs_t offset);
-	uint8_t port_r(offs_t offset);
-	void port_w(offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER(bios_r);
+	DECLARE_READ8_MEMBER(port_r);
+	DECLARE_WRITE8_MEMBER(port_w);
 
 	void set_irq_line(int irq);
 	void dma_sound_cb();

@@ -33,7 +33,7 @@ static constexpr uint32_t M68K_MMU_DF_WP              = 0x00000004;
 static constexpr uint32_t M68K_MMU_DF_USED            = 0x00000008;
 static constexpr uint32_t M68K_MMU_DF_MODIFIED        = 0x00000010;
 static constexpr uint32_t M68K_MMU_DF_CI              = 0x00000040;
-static constexpr uint32_t M68K_MMU_DF_SUPERVISOR      = 0x00000100;
+static constexpr uint32_t M68K_MMU_DF_SUPERVISOR      = 0000000100;
 static constexpr uint32_t M68K_MMU_DF_ADDR_MASK       = 0xfffffff0;
 static constexpr uint32_t M68K_MMU_DF_IND_ADDR_MASK   = 0xfffffffc;
 

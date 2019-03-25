@@ -215,11 +215,10 @@ void amico2k_state::machine_start()
 	save_item(NAME(m_segment));
 }
 
-void amico2k_state::amico2k(machine_config &config)
-{
+MACHINE_CONFIG_START(amico2k_state::amico2k)
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1000000); /* 1MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &amico2k_state::amico2k_mem);
+	MCFG_DEVICE_ADD("maincpu", M6502, 1000000) /* 1MHz */
+	MCFG_DEVICE_PROGRAM_MAP(amico2k_mem)
 
 	/* video hardware */
 	config.set_default_layout(layout_amico2k);
@@ -229,7 +228,7 @@ void amico2k_state::amico2k(machine_config &config)
 	ppi.out_pa_callback().set(FUNC(amico2k_state::ppi_pa_w));
 	ppi.in_pb_callback().set(FUNC(amico2k_state::ppi_pb_r));
 	ppi.out_pb_callback().set(FUNC(amico2k_state::ppi_pb_w));
-}
+MACHINE_CONFIG_END
 
 
 /* ROM definition */

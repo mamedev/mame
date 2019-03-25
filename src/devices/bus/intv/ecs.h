@@ -23,41 +23,41 @@ public:
 
 	// actual ECS accesses
 	// paged ROMs
-	virtual uint16_t read_rom20(offs_t offset) override;
-	virtual uint16_t read_rom70(offs_t offset) override;
-	virtual uint16_t read_rome0(offs_t offset) override;
-	virtual uint16_t read_romf0(offs_t offset) override;
+	virtual DECLARE_READ16_MEMBER(read_rom20) override;
+	virtual DECLARE_READ16_MEMBER(read_rom70) override;
+	virtual DECLARE_READ16_MEMBER(read_rome0) override;
+	virtual DECLARE_READ16_MEMBER(read_romf0) override;
 	// RAM
-	virtual uint16_t read_ram(offs_t offset) override { return (int)m_ram[offset & (m_ram.size() - 1)]; }
-	virtual void write_ram(offs_t offset, uint16_t data) override { m_ram[offset & (m_ram.size() - 1)] = data & 0xff; }
+	virtual DECLARE_READ16_MEMBER(read_ram) override { return (int)m_ram[offset & (m_ram.size() - 1)]; }
+	virtual DECLARE_WRITE16_MEMBER(write_ram) override { m_ram[offset & (m_ram.size() - 1)] = data & 0xff; }
 	// AY8914
-	virtual uint16_t read_ay(offs_t offset) override;
-	virtual void write_ay(offs_t offset, uint16_t data) override;
+	virtual DECLARE_READ16_MEMBER(read_ay) override;
+	virtual DECLARE_WRITE16_MEMBER(write_ay) override;
 
 	// passthru accesses
-	virtual uint16_t read_rom04(offs_t offset) override { return m_subslot->read_rom04(offset); }
-	virtual uint16_t read_rom40(offs_t offset) override { return m_subslot->read_rom40(offset); }
-	virtual uint16_t read_rom48(offs_t offset) override { return m_subslot->read_rom48(offset); }
-	virtual uint16_t read_rom50(offs_t offset) override { return m_subslot->read_rom50(offset); }
-	virtual uint16_t read_rom60(offs_t offset) override { return m_subslot->read_rom60(offset); }
-	virtual uint16_t read_rom80(offs_t offset) override;
-	virtual uint16_t read_rom90(offs_t offset) override { return m_subslot->read_rom90(offset); }
-	virtual uint16_t read_roma0(offs_t offset) override { return m_subslot->read_roma0(offset); }
-	virtual uint16_t read_romb0(offs_t offset) override { return m_subslot->read_romb0(offset); }
-	virtual uint16_t read_romc0(offs_t offset) override { return m_subslot->read_romc0(offset); }
-	virtual uint16_t read_romd0(offs_t offset) override;
+	virtual DECLARE_READ16_MEMBER(read_rom04) override { return m_subslot->read_rom04(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_rom40) override { return m_subslot->read_rom40(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_rom48) override { return m_subslot->read_rom48(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_rom50) override { return m_subslot->read_rom50(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_rom60) override { return m_subslot->read_rom60(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_rom80) override;
+	virtual DECLARE_READ16_MEMBER(read_rom90) override { return m_subslot->read_rom90(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_roma0) override { return m_subslot->read_roma0(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_romb0) override { return m_subslot->read_romb0(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_romc0) override { return m_subslot->read_romc0(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_romd0) override;
 
 	// paged ROM banking
-	virtual void write_rom20(offs_t offset, uint16_t data) override;
-	virtual void write_rom70(offs_t offset, uint16_t data) override;
-	virtual void write_rome0(offs_t offset, uint16_t data) override;
-	virtual void write_romf0(offs_t offset, uint16_t data) override;
+	virtual DECLARE_WRITE16_MEMBER(write_rom20) override;
+	virtual DECLARE_WRITE16_MEMBER(write_rom70) override;
+	virtual DECLARE_WRITE16_MEMBER(write_rome0) override;
+	virtual DECLARE_WRITE16_MEMBER(write_romf0) override;
 	// RAM passthru write
-	virtual void write_88(offs_t offset, uint16_t data) override { if (m_ram88_enabled) m_subslot->write_ram(offset, data); }
-	virtual void write_d0(offs_t offset, uint16_t data) override { if (m_ramd0_enabled) m_subslot->write_ram(offset, data); }
+	virtual DECLARE_WRITE16_MEMBER(write_88) override { if (m_ram88_enabled) m_subslot->write_ram(space, offset, data, mem_mask); }
+	virtual DECLARE_WRITE16_MEMBER(write_d0) override { if (m_ramd0_enabled) m_subslot->write_ram(space, offset, data, mem_mask); }
 	// IntelliVoice passthru
-	virtual uint16_t read_speech(offs_t offset) override { if (m_voice_enabled) return m_subslot->read_speech(offset); else return 0xffff; }
-	virtual void write_speech(offs_t offset, uint16_t data) override { if (m_voice_enabled) m_subslot->write_speech(offset, data); }
+	virtual DECLARE_READ16_MEMBER(read_speech) override { if (m_voice_enabled) return m_subslot->read_speech(space, offset, mem_mask); else return 0xffff; }
+	virtual DECLARE_WRITE16_MEMBER(write_speech) override { if (m_voice_enabled) m_subslot->write_speech(space, offset, data, mem_mask); }
 
 	virtual void late_subslot_setup() override;
 

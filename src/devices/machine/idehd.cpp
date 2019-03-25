@@ -869,7 +869,6 @@ uint8_t ide_hdd_device::calculate_status()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void ide_hdd_device::device_add_mconfig(machine_config &config)
-{
-	HARDDISK(config, "image");
-}
+MACHINE_CONFIG_START(ide_hdd_device::device_add_mconfig)
+	MCFG_HARDDISK_ADD( "image" )
+MACHINE_CONFIG_END

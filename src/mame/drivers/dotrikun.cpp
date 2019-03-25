@@ -197,27 +197,26 @@ void dotrikun_state::machine_reset()
 	m_color = 0;
 }
 
-void dotrikun_state::dotrikun(machine_config &config)
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &dotrikun_state::dotrikun_map);
-	m_maincpu->set_addrmap(AS_IO, &dotrikun_state::io_map);
+MACHINE_CONFIG_START(dotrikun_state::dotrikun)
 
-	TIMER(config, "scanline_on").configure_scanline(FUNC(dotrikun_state::scanline_on), "screen", 0, 1);
-	TIMER(config, m_scanline_off_timer).configure_generic(FUNC(dotrikun_state::scanline_off));
-	TIMER(config, m_interrupt_timer).configure_generic(FUNC(dotrikun_state::interrupt));
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(dotrikun_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scanline_on", dotrikun_state, scanline_on, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD("scanline_off", dotrikun_state, scanline_off)
+	MCFG_TIMER_DRIVER_ADD("interrupt", dotrikun_state, interrupt)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK, 128+128, 0, 128, 192+64, 0, 192);
-	m_screen->set_screen_update(FUNC(dotrikun_state::screen_update));
-	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 128+128, 0, 128, 192+64, 0, 192)
+	MCFG_SCREEN_UPDATE_DRIVER(dotrikun_state, screen_update)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_SCREEN_PALETTE("palette")
 	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
 	/* no sound hardware */
-}
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -280,15 +280,14 @@ void alto2_state::alto2_iomem_map(address_map &map)
 	map(0, 2*ALTO2_RAM_SIZE-1).m(m_maincpu, FUNC(alto2_cpu_device::iomem_map));
 }
 
-void alto2_state::alto2(machine_config &config)
-{
+MACHINE_CONFIG_START(alto2_state::alto2)
 	// Basic machine hardware
 	// SYSCLK is Display Control part A51 (tagged 29.4MHz) divided by 5(?)
 	// 5.8MHz according to de.wikipedia.org/wiki/Xerox_Alto
-	ALTO2(config, m_maincpu, XTAL(29'491'200)/5);
-	m_maincpu->set_addrmap(AS_PROGRAM, &alto2_state::alto2_ucode_map);
-	m_maincpu->set_addrmap(AS_DATA, &alto2_state::alto2_const_map);
-	m_maincpu->set_addrmap(AS_IO, &alto2_state::alto2_iomem_map);
+	MCFG_DEVICE_ADD("maincpu", ALTO2, XTAL(29'491'200)/5)
+	MCFG_DEVICE_PROGRAM_MAP(alto2_ucode_map)
+	MCFG_DEVICE_DATA_MAP(alto2_const_map)
+	MCFG_DEVICE_IO_MAP(alto2_iomem_map)
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -303,11 +302,11 @@ void alto2_state::alto2(machine_config &config)
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	DIABLO_HD(config, DIABLO_HD_0, 3333333);
-	DIABLO_HD(config, DIABLO_HD_1, 3333333);
-	}
+	MCFG_DIABLO_DRIVES_ADD()
+MACHINE_CONFIG_END
 
 /* Driver Init */
 

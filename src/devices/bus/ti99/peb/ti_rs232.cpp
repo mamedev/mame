@@ -254,17 +254,17 @@ READ8Z_MEMBER(ti_rs232_pio_device::crureadz)
 			if ((m_signals[0] & tms9902_device::CTS)!=0)    reply |= 0x20;
 			if ((m_signals[1] & tms9902_device::CTS)!=0)    reply |= 0x40;
 			if (m_led)                      reply |= 0x80;
-			*value = BIT(reply, (offset>>1) & 7);
+			*value = reply;
 			return;
 		}
 		if ((offset & 0x00c0)==0x0040)
 		{
-			*value = m_uart0->cruread(offset>>1);
+			*value = m_uart0->cruread(space, offset>>4, 0xff);
 			return;
 		}
 		if ((offset & 0x00c0)==0x0080)
 		{
-			*value = m_uart1->cruread(offset>>1);
+			*value = m_uart1->cruread(space, offset>>4, 0xff);
 			return;
 		}
 	}
@@ -273,18 +273,18 @@ READ8Z_MEMBER(ti_rs232_pio_device::crureadz)
 /*
     CRU write
 */
-void ti_rs232_pio_device::cruwrite(offs_t offset, uint8_t data)
+WRITE8_MEMBER(ti_rs232_pio_device::cruwrite)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
 		if ((offset & 0x00c0)==0x0040)
 		{
-			m_uart0->cruwrite(offset>>1, data);
+			m_uart0->cruwrite(space, offset>>1, data, 0xff);
 			return;
 		}
 		if ((offset & 0x00c0)==0x0080)
 		{
-			m_uart1->cruwrite(offset>>1, data);
+			m_uart1->cruwrite(space, offset>>1, data, 0xff);
 			return;
 		}
 
@@ -403,7 +403,7 @@ READ8Z_MEMBER( ti_rs232_pio_device::readz )
 /*
     Memory write
 */
-void ti_rs232_pio_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( ti_rs232_pio_device::write )
 {
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
@@ -967,12 +967,12 @@ WRITE_LINE_MEMBER( ti_rs232_pio_device::rcv1_callback )
 	receive_data_or_line_state(1);
 }
 
-void ti_rs232_pio_device::xmit0_callback(uint8_t data)
+WRITE8_MEMBER( ti_rs232_pio_device::xmit0_callback )
 {
 	transmit_data(0, data);
 }
 
-void ti_rs232_pio_device::xmit1_callback(uint8_t data)
+WRITE8_MEMBER( ti_rs232_pio_device::xmit1_callback )
 {
 	transmit_data(1, data);
 }
@@ -998,12 +998,12 @@ void ti_rs232_pio_device::ctrl_callback(int uartind, int offset, uint8_t data)
 	}
 }
 
-void ti_rs232_pio_device::ctrl0_callback(offs_t offset, uint8_t data)
+WRITE8_MEMBER( ti_rs232_pio_device::ctrl0_callback )
 {
 	ctrl_callback(0, offset, data);
 }
 
-void ti_rs232_pio_device::ctrl1_callback(offs_t offset, uint8_t data)
+WRITE8_MEMBER( ti_rs232_pio_device::ctrl1_callback )
 {
 	ctrl_callback(1, offset, data);
 }
@@ -1101,8 +1101,7 @@ INPUT_PORTS_START( ti_rs232 )
 		PORT_CONFSETTING(    0x02, "5-20" )
 INPUT_PORTS_END
 
-void ti_rs232_pio_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(ti_rs232_pio_device::device_add_mconfig)
 	TMS9902(config, m_uart0, 3000000);
 	m_uart0->int_cb().set(FUNC(ti_rs232_pio_device::int0_callback));
 	m_uart0->rcv_cb().set(FUNC(ti_rs232_pio_device::rcv0_callback));
@@ -1129,7 +1128,7 @@ void ti_rs232_pio_device::device_add_mconfig(machine_config &config)
 	m_crulatch->q_out_cb<5>().set(FUNC(ti_rs232_pio_device::cts0_w));
 	m_crulatch->q_out_cb<6>().set(FUNC(ti_rs232_pio_device::cts1_w));
 	m_crulatch->q_out_cb<7>().set(FUNC(ti_rs232_pio_device::led_w));
-}
+MACHINE_CONFIG_END
 
 const tiny_rom_entry *ti_rs232_pio_device::device_rom_region() const
 {

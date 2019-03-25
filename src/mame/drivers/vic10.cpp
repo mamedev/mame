@@ -72,21 +72,21 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
-	uint8_t vic_videoram_r(offs_t offset);
-	uint8_t vic_colorram_r(offs_t offset);
+	DECLARE_READ8_MEMBER( vic_videoram_r );
+	DECLARE_READ8_MEMBER( vic_colorram_r );
 
-	uint8_t sid_potx_r();
-	uint8_t sid_poty_r();
+	DECLARE_READ8_MEMBER( sid_potx_r );
+	DECLARE_READ8_MEMBER( sid_poty_r );
 
-	uint8_t cia_pa_r();
-	uint8_t cia_pb_r();
-	void cia_pb_w(uint8_t data);
+	DECLARE_READ8_MEMBER( cia_pa_r );
+	DECLARE_READ8_MEMBER( cia_pb_r );
+	DECLARE_WRITE8_MEMBER( cia_pb_w );
 
-	uint8_t cpu_r();
-	void cpu_w(uint8_t data);
+	DECLARE_READ8_MEMBER( cpu_r );
+	DECLARE_WRITE8_MEMBER( cpu_w );
 
 	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
 
@@ -104,7 +104,7 @@ private:
 //  read -
 //-------------------------------------------------
 
-uint8_t vic10_state::read(offs_t offset)
+READ8_MEMBER( vic10_state::read )
 {
 	// TODO this is really handled by the PLA
 
@@ -125,11 +125,11 @@ uint8_t vic10_state::read(offs_t offset)
 	}
 	else if (offset >= 0xd000 && offset < 0xd400)
 	{
-		data = m_vic->read(offset & 0x3f);
+		data = m_vic->read(space, offset & 0x3f);
 	}
 	else if (offset >= 0xd400 && offset < 0xd800)
 	{
-		data = m_sid->read(offset & 0x1f);
+		data = m_sid->read(space, offset & 0x1f);
 	}
 	else if (offset >= 0xd800 && offset < 0xdc00)
 	{
@@ -137,14 +137,14 @@ uint8_t vic10_state::read(offs_t offset)
 	}
 	else if (offset >= 0xdc00 && offset < 0xe000)
 	{
-		data = m_cia->read(offset & 0x0f);
+		data = m_cia->read(space, offset & 0x0f);
 	}
 	else if (offset >= 0xe000)
 	{
 		uprom = 0;
 	}
 
-	return m_exp->cd_r(offset, data, lorom, uprom, exram);
+	return m_exp->cd_r(space, offset, data, lorom, uprom, exram);
 }
 
 
@@ -152,7 +152,7 @@ uint8_t vic10_state::read(offs_t offset)
 //  write -
 //-------------------------------------------------
 
-void vic10_state::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( vic10_state::write )
 {
 	// TODO this is really handled by the PLA
 
@@ -168,11 +168,11 @@ void vic10_state::write(offs_t offset, uint8_t data)
 	}
 	else if (offset >= 0xd000 && offset < 0xd400)
 	{
-		m_vic->write(offset & 0x3f, data);
+		m_vic->write(space, offset & 0x3f, data);
 	}
 	else if (offset >= 0xd400 && offset < 0xd800)
 	{
-		m_sid->write(offset & 0x1f, data);
+		m_sid->write(space, offset & 0x1f, data);
 	}
 	else if (offset >= 0xd800 && offset < 0xdc00)
 	{
@@ -180,10 +180,10 @@ void vic10_state::write(offs_t offset, uint8_t data)
 	}
 	else if (offset >= 0xdc00 && offset < 0xe000)
 	{
-		m_cia->write(offset & 0x0f, data);
+		m_cia->write(space, offset & 0x0f, data);
 	}
 
-	m_exp->cd_w(offset, data, lorom, uprom, exram);
+	m_exp->cd_w(space, offset, data, lorom, uprom, exram);
 }
 
 
@@ -191,7 +191,7 @@ void vic10_state::write(offs_t offset, uint8_t data)
 //  vic_videoram_r -
 //-------------------------------------------------
 
-uint8_t vic10_state::vic_videoram_r(offs_t offset)
+READ8_MEMBER( vic10_state::vic_videoram_r )
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -206,7 +206,7 @@ uint8_t vic10_state::vic_videoram_r(offs_t offset)
 //  vic_colorram_r -
 //-------------------------------------------------
 
-uint8_t vic10_state::vic_colorram_r(offs_t offset)
+READ8_MEMBER( vic10_state::vic_colorram_r )
 {
 	return m_color_ram[offset];
 }
@@ -355,11 +355,11 @@ INPUT_PORTS_END
 //  sid6581_interface sid_intf
 //-------------------------------------------------
 
-uint8_t vic10_state::sid_potx_r()
+READ8_MEMBER( vic10_state::sid_potx_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia->pa_r() >> 6)
+	switch (m_cia->read_pa() >> 6)
 	{
 	case 1: data = m_joy1->read_pot_x(); break;
 	case 2: data = m_joy2->read_pot_x(); break;
@@ -382,11 +382,11 @@ uint8_t vic10_state::sid_potx_r()
 	return data;
 }
 
-uint8_t vic10_state::sid_poty_r()
+READ8_MEMBER( vic10_state::sid_poty_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia->pa_r() >> 6)
+	switch (m_cia->read_pa() >> 6)
 	{
 	case 1: data = m_joy1->read_pot_y(); break;
 	case 2: data = m_joy2->read_pot_y(); break;
@@ -414,7 +414,7 @@ uint8_t vic10_state::sid_poty_r()
 //  MOS6526_INTERFACE( cia_intf )
 //-------------------------------------------------
 
-uint8_t vic10_state::cia_pa_r()
+READ8_MEMBER( vic10_state::cia_pa_r )
 {
 	/*
 
@@ -440,7 +440,7 @@ uint8_t vic10_state::cia_pa_r()
 	data &= ~(!BIT(joy_b, 5) << 4);
 
 	// keyboard
-	uint8_t cia_pb = m_cia->pb_r();
+	uint8_t cia_pb = m_cia->read_pb();
 	uint32_t row[8] = { m_row[0]->read(), m_row[1]->read() & m_lock->read(), m_row[2]->read(), m_row[3]->read(),
 						m_row[4]->read(), m_row[5]->read(), m_row[6]->read(), m_row[7]->read() };
 
@@ -462,7 +462,7 @@ uint8_t vic10_state::cia_pa_r()
 	return data;
 }
 
-uint8_t vic10_state::cia_pb_r()
+READ8_MEMBER( vic10_state::cia_pb_r )
 {
 	/*
 
@@ -488,7 +488,7 @@ uint8_t vic10_state::cia_pb_r()
 	data &= ~(!BIT(joy_a, 5) << 4);
 
 	// keyboard
-	uint8_t cia_pa = m_cia->pa_r();
+	uint8_t cia_pa = m_cia->read_pa();
 
 	if (!BIT(cia_pa, 7)) data &= m_row[7]->read();
 	if (!BIT(cia_pa, 6)) data &= m_row[6]->read();
@@ -502,7 +502,7 @@ uint8_t vic10_state::cia_pb_r()
 	return data;
 }
 
-void vic10_state::cia_pb_w(uint8_t data)
+WRITE8_MEMBER( vic10_state::cia_pb_w )
 {
 	/*
 
@@ -527,7 +527,7 @@ void vic10_state::cia_pb_w(uint8_t data)
 //  M6510_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
-uint8_t vic10_state::cpu_r()
+READ8_MEMBER( vic10_state::cpu_r )
 {
 	/*
 
@@ -553,7 +553,7 @@ uint8_t vic10_state::cpu_r()
 	return data;
 }
 
-void vic10_state::cpu_w(uint8_t data)
+WRITE8_MEMBER( vic10_state::cpu_w )
 {
 	/*
 
@@ -568,7 +568,7 @@ void vic10_state::cpu_w(uint8_t data)
 
 	*/
 
-	if (0 /*BIT(offset, 0)*/) // what offset?
+	if (BIT(offset, 0))
 	{
 		m_exp->p0_w(BIT(data, 0));
 	}
@@ -637,7 +637,7 @@ void vic10_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  machine_config( vic10 )
+//  MACHINE_CONFIG( vic10 )
 //-------------------------------------------------
 
 void vic10_state::vic10(machine_config &config)

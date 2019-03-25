@@ -58,10 +58,10 @@ public:
 	virtual ~device_gb_cart_interface();
 
 	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) { return 0xff; }
-	virtual void write_bank(offs_t offset, uint8_t data) {}
-	virtual uint8_t read_ram(offs_t offset) { return 0xff; }
-	virtual void write_ram(offs_t offset, uint8_t data) {}
+	virtual DECLARE_READ8_MEMBER(read_rom) { return 0xff; }
+	virtual DECLARE_WRITE8_MEMBER(write_bank) {}
+	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
+	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -145,10 +145,10 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
-	virtual uint8_t read_rom(offs_t offset);
-	virtual void write_bank(offs_t offset, uint8_t data);
-	virtual uint8_t read_ram(offs_t offset);
-	virtual void write_ram(offs_t offset, uint8_t data);
+	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_ram);
+	virtual DECLARE_WRITE8_MEMBER(write_ram);
 
 
 protected:

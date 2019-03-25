@@ -42,6 +42,7 @@ public:
 		, m_timer_irq_state(0)
 		, m_vblank_irq_state(0)
 		, m_misc_io_data(0)
+		, m_tmp_bitmap(512, 512)
 	{
 	}
 
@@ -139,6 +140,7 @@ private:
 	uint8_t           m_timer_irq_state;
 	uint8_t           m_vblank_irq_state;
 	uint8_t           m_misc_io_data;
+	bitmap_ind16    m_tmp_bitmap;
 };
 
 #endif // MAME_INCLUDES_SEGAYBD_H

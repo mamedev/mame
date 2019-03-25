@@ -99,10 +99,9 @@ void qvt201_state::mem_map(address_map &map)
 static INPUT_PORTS_START( qvt201 )
 INPUT_PORTS_END
 
-void qvt201_state::qvt201(machine_config &config)
-{
-	Z80(config, m_maincpu, 3.6864_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &qvt201_state::mem_map); // IORQ is not used at all
+MACHINE_CONFIG_START(qvt201_state::qvt201)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3.6864_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map) // IORQ is not used at all
 
 	input_merger_device &mainint(INPUT_MERGER_ANY_HIGH(config, "mainint")); // open collector
 	mainint.output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
@@ -110,11 +109,11 @@ void qvt201_state::qvt201(machine_config &config)
 	input_merger_device &mainnmi(INPUT_MERGER_ALL_HIGH(config, "mainnmi"));
 	mainnmi.output_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 
-	scn2681_device &duart(SCN2681(config, "duart", 3.6864_MHz_XTAL)); // XTAL not directly connected
-	duart.irq_cb().set("mainint", FUNC(input_merger_device::in_w<1>));
-	duart.a_tx_cb().set(m_eia, FUNC(rs232_port_device::write_txd));
-	duart.b_tx_cb().set("aux", FUNC(rs232_port_device::write_txd));
-	duart.outport_cb().set(FUNC(qvt201_state::duart_out_w));
+	MCFG_DEVICE_ADD("duart", SCN2681, 3.6864_MHz_XTAL) // XTAL not directly connected
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE("mainint", input_merger_device, in_w<1>))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(m_eia, rs232_port_device, write_txd))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("aux", rs232_port_device, write_txd))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, qvt201_state, duart_out_w))
 
 	RS232_PORT(config, m_eia, default_rs232_devices, nullptr);
 	m_eia->rxd_handler().set("duart", FUNC(scn2681_device::rx_a_w));
@@ -135,7 +134,7 @@ void qvt201_state::qvt201(machine_config &config)
 	crtc.intr_callback().set("mainint", FUNC(input_merger_device::in_w<0>));
 	crtc.breq_callback().set("mainnmi", FUNC(input_merger_device::in_w<0>));
 	crtc.set_screen("screen");
-}
+MACHINE_CONFIG_END
 
 
 /**************************************************************************************************************

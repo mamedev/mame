@@ -392,11 +392,10 @@ void s6a_state::init_s6a()
 	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
 }
 
-void s6a_state::s6a(machine_config &config)
-{
+MACHINE_CONFIG_START(s6a_state::s6a)
 	/* basic machine hardware */
-	M6808(config, m_maincpu, 3580000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &s6a_state::s6a_main_map);
+	MCFG_DEVICE_ADD("maincpu", M6808, 3580000)
+	MCFG_DEVICE_PROGRAM_MAP(s6a_main_map)
 	MCFG_MACHINE_RESET_OVERRIDE(s6a_state, s6a)
 
 	/* Video */
@@ -442,17 +441,17 @@ void s6a_state::s6a(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Add the soundcard */
-	M6802(config, m_audiocpu, 3580000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &s6a_state::s6a_audio_map);
+	MCFG_DEVICE_ADD("audiocpu", M6802, 3580000)
+	MCFG_DEVICE_PROGRAM_MAP(s6a_audio_map)
 
 	SPEAKER(config, "speaker").front_center();
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	SPEAKER(config, "speech").front_center();
-	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, "speech", 1.00);
+	MCFG_DEVICE_ADD("hc55516", HC55516, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 1.00)
 
 	PIA6821(config, m_pias, 0);
 	m_pias->readpb_handler().set(FUNC(s6a_state::sound_r));
@@ -461,7 +460,7 @@ void s6a_state::s6a(machine_config &config)
 	m_pias->cb2_handler().set("hc55516", FUNC(hc55516_device::clock_w));
 	m_pias->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE); // FIXME: needs an input merger
 	m_pias->irqb_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
-}
+MACHINE_CONFIG_END
 
 
 /*--------------------------

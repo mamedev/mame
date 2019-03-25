@@ -1382,7 +1382,7 @@ void am9513_device::data_write(u16 data)
 //  read8 - 8-bit read access
 //-------------------------------------------------
 
-u8 am9513_device::read8(offs_t offset)
+READ8_MEMBER(am9513_device::read8)
 {
 	if (BIT(offset, 0))
 		return status_read();
@@ -1395,7 +1395,7 @@ u8 am9513_device::read8(offs_t offset)
 //  write8 - 8-bit write access
 //-------------------------------------------------
 
-void am9513_device::write8(offs_t offset, u8 data)
+WRITE8_MEMBER(am9513_device::write8)
 {
 	if (BIT(offset, 0))
 	{
@@ -1412,7 +1412,7 @@ void am9513_device::write8(offs_t offset, u8 data)
 //  read16 - 16-bit read access
 //-------------------------------------------------
 
-u16 am9513_device::read16(offs_t offset)
+READ16_MEMBER(am9513_device::read16)
 {
 	if (BIT(offset, 0))
 		return status_read() | 0xff00;
@@ -1429,7 +1429,7 @@ u16 am9513_device::read16(offs_t offset)
 //  write16 - 16-bit write access
 //-------------------------------------------------
 
-void am9513_device::write16(offs_t offset, u16 data)
+WRITE16_MEMBER(am9513_device::write16)
 {
 	if ((!bus_is_16_bit() || BIT(offset, 0)) && (data & 0xff00) != 0xff00)
 		logerror("Errant write of %02X to upper byte of %s register in %d-bit bus mode\n",

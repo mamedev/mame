@@ -228,7 +228,7 @@ vc4000_chess2_device::vc4000_chess2_device(const machine_config &mconfig, const 
  mapper specific handlers
  -------------------------------------------------*/
 
-uint8_t vc4000_rom_device::read_rom(offs_t offset)
+READ8_MEMBER(vc4000_rom_device::read_rom)
 {
 	if (offset < m_rom_size)
 		return m_rom[offset];
@@ -237,18 +237,18 @@ uint8_t vc4000_rom_device::read_rom(offs_t offset)
 }
 
 
-uint8_t vc4000_ram1k_device::read_ram(offs_t offset)
+READ8_MEMBER(vc4000_ram1k_device::read_ram)
 {
 	return m_ram[offset & (m_ram.size() - 1)];
 }
 
-void vc4000_ram1k_device::write_ram(offs_t offset, uint8_t data)
+WRITE8_MEMBER(vc4000_ram1k_device::write_ram)
 {
 	m_ram[offset & (m_ram.size() - 1)] = data;
 }
 
 
-uint8_t vc4000_chess2_device::extra_rom(offs_t offset)
+READ8_MEMBER(vc4000_chess2_device::extra_rom)
 {
 	if (offset < (m_rom_size - 0x2000))
 		return m_rom[offset + 0x2000];
@@ -256,12 +256,12 @@ uint8_t vc4000_chess2_device::extra_rom(offs_t offset)
 		return 0xff;
 }
 
-uint8_t vc4000_chess2_device::read_ram(offs_t offset)
+READ8_MEMBER(vc4000_chess2_device::read_ram)
 {
 	return m_ram[offset & (m_ram.size() - 1)];
 }
 
-void vc4000_chess2_device::write_ram(offs_t offset, uint8_t data)
+WRITE8_MEMBER(vc4000_chess2_device::write_ram)
 {
 	m_ram[offset & (m_ram.size() - 1)] = data;
 }

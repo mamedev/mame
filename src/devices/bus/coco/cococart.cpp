@@ -412,11 +412,11 @@ image_init_result cococart_slot_device::call_load()
 	{
 		memory_region *cart_mem = m_cart->get_cart_memregion();
 		uint8_t *base = cart_mem->base();
-		offs_t read_length, cart_length = cart_mem->bytes();;
+		offs_t read_length, cart_legnth = cart_mem->bytes();;
 
 		if (!loaded_through_softlist())
 		{
-			read_length = fread(base, cart_length);
+			read_length = fread(base, cart_legnth);
 		}
 		else
 		{
@@ -424,7 +424,7 @@ image_init_result cococart_slot_device::call_load()
 			memcpy(base, get_software_region("rom"), read_length);
 		}
 
-		while (read_length < cart_length)
+		while (read_length < cart_legnth)
 		{
 			offs_t len = std::min(read_length, m_cart->get_cart_size() - read_length);
 			memcpy(base + read_length, base, len);
@@ -593,6 +593,40 @@ memory_region* device_cococart_interface::get_cart_memregion()
 address_space &device_cococart_interface::cartridge_space()
 {
 	return host().cartridge_space();
+}
+
+
+//-------------------------------------------------
+//  install_read_handler
+//-------------------------------------------------
+
+void device_cococart_interface::install_read_handler(uint16_t addrstart, uint16_t addrend, read8_delegate rhandler)
+{
+	address_space &space(cartridge_space());
+	space.install_read_handler(addrstart, addrend, rhandler);
+}
+
+
+//-------------------------------------------------
+//  install_write_handler
+//-------------------------------------------------
+
+void device_cococart_interface::install_write_handler(uint16_t addrstart, uint16_t addrend, write8_delegate whandler)
+{
+	address_space &space(cartridge_space());
+	space.install_write_handler(addrstart, addrend, whandler);
+}
+
+
+//-------------------------------------------------
+//  install_readwrite_handler
+//-------------------------------------------------
+
+void device_cococart_interface::install_readwrite_handler(uint16_t addrstart, uint16_t addrend, read8_delegate rhandler, write8_delegate whandler)
+{
+	address_space &space(cartridge_space());
+	space.install_read_handler(addrstart, addrend, rhandler);
+	space.install_write_handler(addrstart, addrend, whandler);
 }
 
 

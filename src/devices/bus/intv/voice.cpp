@@ -69,16 +69,15 @@ void intv_voice_device::late_subslot_setup()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void intv_voice_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(intv_voice_device::device_add_mconfig)
 	SPEAKER(config, "mono_voice").front_center();
 
 	SP0256(config, m_speech, 3120000);
 	/* The Intellivoice uses a speaker with its own volume control so the relative volumes to use are subjective */
 	m_speech->add_route(ALL_OUTPUTS, "mono_voice", 1.00);
 
-	INTV_CART_SLOT(config, m_subslot, intv_cart, nullptr);
-}
+	MCFG_INTV_CARTRIDGE_ADD("subslot", intv_cart, nullptr)
+MACHINE_CONFIG_END
 
 
 ROM_START( intellivoice )
@@ -96,33 +95,37 @@ const tiny_rom_entry *intv_voice_device::device_rom_region() const
  read_audio
  -------------------------------------------------*/
 
-uint16_t intv_voice_device::read_speech(offs_t offset)
+READ16_MEMBER(intv_voice_device::read_speech)
 {
-	return 0xff00 | m_speech->spb640_r(offset);
+	if (ACCESSING_BITS_0_7)
+		return m_speech->spb640_r(offset);
+	else
+		return 0xff;
 }
 
 /*-------------------------------------------------
  write_audio
  -------------------------------------------------*/
 
-void intv_voice_device::write_speech(offs_t offset, uint16_t data)
+WRITE16_MEMBER(intv_voice_device::write_speech)
 {
-	m_speech->spb640_w(offset, data & 0x00ff);
+	if (ACCESSING_BITS_0_7)
+		return m_speech->spb640_w(offset, data);
 }
 
 
-uint16_t intv_voice_device::read_rom80(offs_t offset)
+READ16_MEMBER(intv_voice_device::read_rom80)
 {
 	if (m_ram88_enabled && offset >= 0x800)
-		return m_subslot->read_ram(offset & 0x7ff);
+		return m_subslot->read_ram(space, offset & 0x7ff, mem_mask);
 	else
-		return m_subslot->read_rom80(offset);
+		return m_subslot->read_rom80(space, offset, mem_mask);
 }
 
-uint16_t intv_voice_device::read_romd0(offs_t offset)
+READ16_MEMBER(intv_voice_device::read_romd0)
 {
 	if (m_ramd0_enabled && offset < 0x800)
-		return m_subslot->read_ram(offset);
+		return m_subslot->read_ram(space, offset, mem_mask);
 	else
-		return m_subslot->read_romd0(offset);
+		return m_subslot->read_romd0(space, offset, mem_mask);
 }

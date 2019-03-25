@@ -29,16 +29,17 @@
 #include "i7220.h"
 
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_REGISTER  (1U <<  1)
-#define LOG_DEBUG     (1U <<  2)
+#define VERBOSE_DBG 2       /* general debug messages */
 
-//#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC printf
-#include "logmacro.h"
-
-#define LOGREG(...) LOGMASKED(LOG_REGISTER, __VA_ARGS__)
-#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
+#define DBG_LOG(N,M,A) \
+	do { \
+		if(VERBOSE_DBG>=N) \
+		{ \
+			if( M ) \
+				logerror("%11.6f at %s: %-10s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
+			logerror A; \
+		} \
+	} while (0)
 
 
 // device type definition
@@ -223,8 +224,8 @@ void i7220_device::start_command(int cmd)
 	// NFC bits in BLR MSB must be set to 0001 before issuing this command.
 	// MBM GROUP SELECT bits in the AR must select the last MBM in the system.
 	case C_INIT:
-		LOG("BMC INIT: BLR %04x (NFC %d pages %d) AR %04x (MBM %d addr %03x) ER %02d\n",
-			m_blr, blr_nfc, blr_count, m_ar, ar_mbm, ar_addr, m_regs[R_ER]);
+		DBG_LOG(1, "BMC", ("INIT: BLR %04x (NFC %d pages %d) AR %04x (MBM %d addr %03x) ER %02d\n",
+			m_blr, blr_nfc, blr_count, m_ar, ar_mbm, ar_addr, m_regs[R_ER]));
 		if (blr_nfc != 2)
 		{
 			command_fail_start(bi);
@@ -241,8 +242,8 @@ void i7220_device::start_command(int cmd)
 
 	// all parametric registers must be properly set up before issuing Read Bubble Data command
 	case C_READ:
-		LOG("BMC RBD: BLR %04x (NFC %d pages %d) AR %04x (MBM %d addr %03x) ER %02d\n",
-			m_blr, blr_nfc, blr_count, m_ar, ar_mbm, ar_addr, m_regs[R_ER]);
+		DBG_LOG(1, "BMC", ("RBD: BLR %04x (NFC %d pages %d) AR %04x (MBM %d addr %03x) ER %02d\n",
+			m_blr, blr_nfc, blr_count, m_ar, ar_mbm, ar_addr, m_regs[R_ER]));
 		if (ar_mbm >= m_data_size || blr_nfc != 2)
 		{
 			command_fail_start(bi);
@@ -254,8 +255,8 @@ void i7220_device::start_command(int cmd)
 		break;
 
 	case C_WRITE:
-		LOG("BMC WBD: BLR %04x (NFC %d pages %d) AR %04x (MBM %d addr %03x) ER %02d\n",
-			m_blr, blr_nfc, blr_count, m_ar, ar_mbm, ar_addr, m_regs[R_ER]);
+		DBG_LOG(1, "BMC", ("WBD: BLR %04x (NFC %d pages %d) AR %04x (MBM %d addr %03x) ER %02d\n",
+			m_blr, blr_nfc, blr_count, m_ar, ar_mbm, ar_addr, m_regs[R_ER]));
 		if (ar_mbm >= m_data_size || blr_nfc != 2)
 		{
 			command_fail_start(bi);
@@ -338,7 +339,7 @@ void i7220_device::general_continue(bubble_info &bi)
 		break;
 
 	default:
-		LOG("BMC general_continue on unknown main-state %d\n", bi.main_state);
+		DBG_LOG(1,"BMC",("general_continue on unknown main-state %d\n", bi.main_state));
 		break;
 	}
 }
@@ -388,7 +389,7 @@ void i7220_device::command_fail_continue(bubble_info &bi)
 			return;
 
 		default:
-			LOG("BMC fail unknown sub-state %d\n", bi.sub_state);
+			DBG_LOG(1,"BMC",("fail unknown sub-state %d\n", bi.sub_state));
 			return;
 		}
 	}
@@ -422,7 +423,7 @@ void i7220_device::init_continue(bubble_info &bi)
 			return;
 
 		default:
-			LOG("BMC init unknown sub-state %d\n", bi.sub_state);
+			DBG_LOG(1,"BMC",("init unknown sub-state %d\n", bi.sub_state));
 			return;
 		}
 	}
@@ -462,7 +463,7 @@ void i7220_device::read_fsa_continue(bubble_info &bi)
 			return;
 
 		default:
-			LOG("BMC read fsa unknown sub-state %d\n", bi.sub_state);
+			DBG_LOG(1,"BMC",("read fsa unknown sub-state %d\n", bi.sub_state));
 			return;
 		}
 	}
@@ -496,7 +497,7 @@ void i7220_device::read_data_continue(bubble_info &bi)
 			break;
 
 		case WAIT_FSA_REPLY:
-			LOGDBG("BMC read data: ct %02d limit %02d\n", bi.counter, bi.limit);
+			DBG_LOG(3,"BMC",("read data: ct %02d limit %02d\n", bi.counter, bi.limit));
 			if (bi.counter < bi.limit)
 			{
 				for (int a = 0; a < 32; a++)
@@ -514,7 +515,7 @@ void i7220_device::read_data_continue(bubble_info &bi)
 			return;
 
 		default:
-			LOG("BMC read data unknown sub-state %d\n", bi.sub_state);
+			DBG_LOG(1,"BMC",("read data unknown sub-state %d\n", bi.sub_state));
 			return;
 		}
 	}
@@ -542,7 +543,7 @@ void i7220_device::write_data_continue(bubble_info &bi)
 			return;
 
 		case WAIT_FIFO:
-			LOGDBG("BMC write data: fifo %02d ct %02d limit %02d\n", m_fifo_size, bi.counter, bi.limit);
+			DBG_LOG(3,"BMC",("write data: fifo %02d ct %02d limit %02d\n", m_fifo_size, bi.counter, bi.limit));
 			if (m_fifo_size >= 32)
 			{
 				for (int a = 0; a < 32; a++)
@@ -564,7 +565,7 @@ void i7220_device::write_data_continue(bubble_info &bi)
 			return;
 
 		default:
-			LOG("BMC write data unknown sub-state %d\n", bi.sub_state);
+			DBG_LOG(1,"BMC",("write data unknown sub-state %d\n", bi.sub_state));
 			return;
 		}
 	}
@@ -585,14 +586,14 @@ READ8_MEMBER(i7220_device::read)
 		if (m_rac)
 		{
 			data = m_regs[m_rac];
-			LOGREG("BMC R reg @ %02x == %02x\n", m_rac, data);
+			DBG_LOG(2, "BMC", ("R reg @ %02x == %02x\n", m_rac, data));
 			m_rac++;
 			m_rac &= 15;
 		}
 		else
 		{
 			data = fifo_pop();
-			LOGREG("BMC R fifo == %02x\n", data);
+			DBG_LOG(2, "BMC", ("R fifo == %02x\n", data));
 		}
 		break;
 
@@ -625,8 +626,8 @@ READ8_MEMBER(i7220_device::read)
 				data |= SR_FIFO;
 			}
 		}
-		LOGREG("BMC R status == %02x (phase %d state %d:%d fifo %d drq %d)\n",
-			data, main_phase, bi.main_state, bi.sub_state, m_fifo_size, drq);
+		DBG_LOG(2, "BMC", ("R status == %02x (phase %d state %d:%d fifo %d drq %d)\n",
+			data, main_phase, bi.main_state, bi.sub_state, m_fifo_size, drq));
 		if (main_phase == PHASE_RESULT)
 		{
 			main_phase = PHASE_IDLE;
@@ -634,7 +635,7 @@ READ8_MEMBER(i7220_device::read)
 		break;
 	}
 
-	LOGDBG("BMC R @ %d == %02x\n", offset, data);
+	DBG_LOG(3, "BMC", ("R @ %d == %02x\n", offset, data));
 
 	return data;
 }
@@ -664,14 +665,14 @@ WRITE8_MEMBER( i7220_device::write )
 		"Software Reset"
 	};
 
-	LOGDBG("BMC W @ %d <- %02x\n", offset, data);
+	DBG_LOG(3, "BMC", ("W @ %d <- %02x\n", offset, data));
 
 	switch (offset & 1)
 	{
 	case 0:
 		if (m_rac)
 		{
-			LOGREG("BMC W reg @ %02x <- %02x\n", m_rac, data);
+			DBG_LOG(2, "BMC", ("W reg @ %02x <- %02x\n", m_rac, data));
 			m_regs[m_rac] = data;
 			update_regs();
 			m_rac++;
@@ -679,7 +680,7 @@ WRITE8_MEMBER( i7220_device::write )
 		}
 		else
 		{
-			LOGREG("BMC W fifo <- %02x\n", data);
+			DBG_LOG(2, "BMC", ("W fifo <- %02x\n", data));
 			fifo_push(data);
 		}
 		break;
@@ -694,7 +695,7 @@ WRITE8_MEMBER( i7220_device::write )
 			m_cmdr = data & 15;
 			if (main_phase == PHASE_IDLE)
 			{
-				LOG("BMC command %02x '%s'\n", data, commands[m_cmdr]);
+				DBG_LOG(1, "BMC", ("command %02x '%s'\n", data, commands[m_cmdr]));
 				main_phase = PHASE_CMD;
 				start_command(m_cmdr);
 			}

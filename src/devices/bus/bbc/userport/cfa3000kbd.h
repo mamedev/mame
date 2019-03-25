@@ -36,7 +36,7 @@ protected:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual uint8_t pb_r() override;
+	virtual DECLARE_READ8_MEMBER(pb_r) override;
 
 private:
 	required_ioport_array<4> m_kbd;

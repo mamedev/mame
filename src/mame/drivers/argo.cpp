@@ -350,21 +350,20 @@ uint32_t argo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
-void argo_state::argo(machine_config &config)
-{
+MACHINE_CONFIG_START(argo_state::argo)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 3500000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &argo_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &argo_state::io_map);
+	MCFG_DEVICE_ADD("maincpu", Z80, 3500000)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update(FUNC(argo_state::screen_update));
-	screen.set_size(640, 250);
-	screen.set_visarea_full();
-}
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_UPDATE_DRIVER(argo_state, screen_update)
+	MCFG_SCREEN_SIZE(640, 250)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( argo )

@@ -75,20 +75,20 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( gatea20_w );
 	DECLARE_WRITE_LINE_MEMBER( kbrst_w );
 
-	uint16_t refresh_r();
-	void refresh_w(uint16_t data);
-	uint16_t chipsel_r();
-	void chipsel_w(uint16_t data);
-	uint16_t mem_ctrl_r();
-	void mem_ctrl_w(uint16_t data);
-	uint16_t bank_01_start_r(offs_t offset, uint16_t mem_mask);
-	void bank_01_start_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	uint16_t bank_23_start_r(offs_t offset, uint16_t mem_mask);
-	void bank_23_start_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	uint16_t split_addr_r();
-	void split_addr_w(uint16_t data);
-	uint16_t diag_r();
-	void diag_w(uint16_t data);
+	DECLARE_READ16_MEMBER(refresh_r);
+	DECLARE_WRITE16_MEMBER(refresh_w);
+	DECLARE_READ16_MEMBER(chipsel_r);
+	DECLARE_WRITE16_MEMBER(chipsel_w);
+	DECLARE_READ16_MEMBER(mem_ctrl_r);
+	DECLARE_WRITE16_MEMBER(mem_ctrl_w);
+	DECLARE_READ16_MEMBER(bank_01_start_r);
+	DECLARE_WRITE16_MEMBER(bank_01_start_w);
+	DECLARE_READ16_MEMBER(bank_23_start_r);
+	DECLARE_WRITE16_MEMBER(bank_23_start_w);
+	DECLARE_READ16_MEMBER(split_addr_r);
+	DECLARE_WRITE16_MEMBER(split_addr_w);
+	DECLARE_READ16_MEMBER(diag_r);
+	DECLARE_WRITE16_MEMBER(diag_w);
 
 	IRQ_CALLBACK_MEMBER(intack_cb) { return m_pic1->acknowledge(); }
 
@@ -101,39 +101,39 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER( pic1_int_w ) { m_write_intr(state); }
-	uint8_t pic1_slave_ack_r(offs_t offset);
+	DECLARE_READ8_MEMBER( pic1_slave_ack_r );
 	DECLARE_WRITE_LINE_MEMBER( ctc_out1_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_out2_w );
-	void rtc_w(offs_t offset, uint8_t data);
-	void keyb_cmd_w(uint8_t data);
-	void keyb_data_w(uint8_t data);
-	uint8_t keyb_data_r();
-	uint8_t keyb_status_r();
-	void a20_reset_w(uint8_t data);
-	uint8_t a20_reset_r();
-	uint8_t portb_r();
-	void portb_w(uint8_t data);
-	void dma_page_w(offs_t offset, uint8_t data) { m_dma_page[offset & 0x0f] = data; }
-	uint8_t dma_page_r(offs_t offset) { return m_dma_page[offset & 0x0f]; }
-	uint8_t dma_read_byte(offs_t offset);
-	void dma_write_byte(offs_t offset, uint8_t data);
-	uint8_t dma_read_word(offs_t offset);
-	void dma_write_word(offs_t offset, uint8_t data);
+	DECLARE_WRITE8_MEMBER( rtc_w );
+	DECLARE_WRITE8_MEMBER( keyb_cmd_w );
+	DECLARE_WRITE8_MEMBER( keyb_data_w );
+	DECLARE_READ8_MEMBER( keyb_data_r );
+	DECLARE_READ8_MEMBER( keyb_status_r );
+	DECLARE_WRITE8_MEMBER( a20_reset_w );
+	DECLARE_READ8_MEMBER( a20_reset_r );
+	DECLARE_READ8_MEMBER( portb_r );
+	DECLARE_WRITE8_MEMBER( portb_w );
+	DECLARE_WRITE8_MEMBER( dma_page_w ) { m_dma_page[offset & 0x0f] = data; }
+	DECLARE_READ8_MEMBER( dma_page_r ) { return m_dma_page[offset & 0x0f]; }
+	DECLARE_READ8_MEMBER( dma_read_byte );
+	DECLARE_WRITE8_MEMBER( dma_write_byte );
+	DECLARE_READ8_MEMBER( dma_read_word );
+	DECLARE_WRITE8_MEMBER( dma_write_word );
 	DECLARE_WRITE_LINE_MEMBER( dma1_eop_w );
-	uint8_t dma1_ior0_r() { return m_read_ior(0); }
-	uint8_t dma1_ior1_r() { return m_read_ior(1); }
-	uint8_t dma1_ior2_r() { return m_read_ior(2); }
-	uint8_t dma1_ior3_r() { return m_read_ior(3); }
-	uint8_t dma2_ior1_r() { uint16_t result = m_read_ior(5); m_dma_high_byte = result >> 8; return result; }
-	uint8_t dma2_ior2_r() { uint16_t result = m_read_ior(6); m_dma_high_byte = result >> 8; return result; }
-	uint8_t dma2_ior3_r() { uint16_t result = m_read_ior(7); m_dma_high_byte = result >> 8; return result; }
-	void dma1_iow0_w(uint8_t data) { m_write_iow(0, data, 0xffff); }
-	void dma1_iow1_w(uint8_t data) { m_write_iow(1, data, 0xffff); }
-	void dma1_iow2_w(uint8_t data) { m_write_iow(2, data, 0xffff); }
-	void dma1_iow3_w(uint8_t data) { m_write_iow(3, data, 0xffff); }
-	void dma2_iow1_w(uint8_t data) { m_write_iow(5, (m_dma_high_byte << 8) | data, 0xffff); }
-	void dma2_iow2_w(uint8_t data) { m_write_iow(6, (m_dma_high_byte << 8) | data, 0xffff); }
-	void dma2_iow3_w(uint8_t data) { m_write_iow(7, (m_dma_high_byte << 8) | data, 0xffff); }
+	DECLARE_READ8_MEMBER( dma1_ior0_r ) { return m_read_ior(0); }
+	DECLARE_READ8_MEMBER( dma1_ior1_r ) { return m_read_ior(1); }
+	DECLARE_READ8_MEMBER( dma1_ior2_r ) { return m_read_ior(2); }
+	DECLARE_READ8_MEMBER( dma1_ior3_r ) { return m_read_ior(3); }
+	DECLARE_READ8_MEMBER( dma2_ior1_r ) { uint16_t result = m_read_ior(5); m_dma_high_byte = result >> 8; return result; }
+	DECLARE_READ8_MEMBER( dma2_ior2_r ) { uint16_t result = m_read_ior(6); m_dma_high_byte = result >> 8; return result; }
+	DECLARE_READ8_MEMBER( dma2_ior3_r ) { uint16_t result = m_read_ior(7); m_dma_high_byte = result >> 8; return result; }
+	DECLARE_WRITE8_MEMBER( dma1_iow0_w ) { m_write_iow(0, data, 0xffff); }
+	DECLARE_WRITE8_MEMBER( dma1_iow1_w ) { m_write_iow(1, data, 0xffff); }
+	DECLARE_WRITE8_MEMBER( dma1_iow2_w ) { m_write_iow(2, data, 0xffff); }
+	DECLARE_WRITE8_MEMBER( dma1_iow3_w ) { m_write_iow(3, data, 0xffff); }
+	DECLARE_WRITE8_MEMBER( dma2_iow1_w ) { m_write_iow(5, (m_dma_high_byte << 8) | data, 0xffff); }
+	DECLARE_WRITE8_MEMBER( dma2_iow2_w ) { m_write_iow(6, (m_dma_high_byte << 8) | data, 0xffff); }
+	DECLARE_WRITE8_MEMBER( dma2_iow3_w ) { m_write_iow(7, (m_dma_high_byte << 8) | data, 0xffff); }
 	DECLARE_WRITE_LINE_MEMBER( dma1_dack0_w ) { set_dma_channel(0, state); }
 	DECLARE_WRITE_LINE_MEMBER( dma1_dack1_w ) { set_dma_channel(1, state); }
 	DECLARE_WRITE_LINE_MEMBER( dma1_dack2_w ) { set_dma_channel(2, state); }

@@ -16,6 +16,16 @@ namespace plib {
 // A simple tokenizer
 // ----------------------------------------------------------------------------------------
 
+ptokenizer::ptokenizer(plib::putf8_reader &strm)
+: m_strm(strm), m_lineno(0), m_cur_line(""), m_px(m_cur_line.begin()), m_unget(0), m_string('"')
+{
+}
+
+ptokenizer::~ptokenizer()
+{
+}
+
+
 pstring ptokenizer::currentline_str()
 {
 	return m_cur_line;
@@ -24,7 +34,7 @@ pstring ptokenizer::currentline_str()
 
 void ptokenizer::skipeol()
 {
-	pstring::value_type c = getc();
+	pstring::code_t c = getc();
 	while (c)
 	{
 		if (c == 10)
@@ -39,11 +49,11 @@ void ptokenizer::skipeol()
 }
 
 
-pstring::value_type ptokenizer::getc()
+pstring::code_t ptokenizer::getc()
 {
 	if (m_unget != 0)
 	{
-		pstring::value_type c = m_unget;
+		pstring::code_t c = m_unget;
 		m_unget = 0;
 		return c;
 	}
@@ -56,11 +66,11 @@ pstring::value_type ptokenizer::getc()
 			return 0;
 		return '\n';
 	}
-	pstring::value_type c = *(m_px++);
+	pstring::code_t c = *(m_px++);
 	return c;
 }
 
-void ptokenizer::ungetc(pstring::value_type c)
+void ptokenizer::ungetc(pstring::code_t c)
 {
 	m_unget = c;
 }
@@ -112,7 +122,6 @@ pstring ptokenizer::get_identifier_or_number()
 	return tok.str();
 }
 
-// FIXME: combine into template
 double ptokenizer::get_number_double()
 {
 	token_t tok = get_token();
@@ -120,8 +129,8 @@ double ptokenizer::get_number_double()
 	{
 		error(pfmt("Expected a number, got <{1}>")(tok.str()) );
 	}
-	bool err;
-	auto ret = plib::pstonum_ne<double>(tok.str(), err);
+	bool err = false;
+	double ret = tok.str().as_double(&err);
 	if (err)
 		error(pfmt("Expected a number, got <{1}>")(tok.str()) );
 	return ret;
@@ -134,8 +143,8 @@ long ptokenizer::get_number_long()
 	{
 		error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
 	}
-	bool err;
-	auto ret = plib::pstonum_ne<long>(tok.str(), err);
+	bool err = false;
+	long ret = tok.str().as_long(&err);
 	if (err)
 		error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
 	return ret;
@@ -173,7 +182,7 @@ ptokenizer::token_t ptokenizer::get_token()
 ptokenizer::token_t ptokenizer::get_token_internal()
 {
 	/* skip ws */
-	pstring::value_type c = getc();
+	pstring::code_t c = getc();
 	while (m_whitespace.find(c) != pstring::npos)
 	{
 		c = getc();
@@ -263,31 +272,28 @@ void ptokenizer::error(const pstring &errs)
 // A simple preprocessor
 // ----------------------------------------------------------------------------------------
 
-ppreprocessor::ppreprocessor(defines_map_type *defines)
-: pistream()
-, m_ifflag(0)
-, m_level(0)
-, m_lineno(0)
-, m_pos(0)
-, m_state(PROCESS)
-, m_comment(false)
+ppreprocessor::ppreprocessor(std::vector<define_t> *defines)
+: m_ifflag(0), m_level(0), m_lineno(0)
 {
-	m_expr_sep.emplace_back("!");
-	m_expr_sep.emplace_back("(");
-	m_expr_sep.emplace_back(")");
-	m_expr_sep.emplace_back("+");
-	m_expr_sep.emplace_back("-");
-	m_expr_sep.emplace_back("*");
-	m_expr_sep.emplace_back("/");
-	m_expr_sep.emplace_back("&&");
-	m_expr_sep.emplace_back("||");
-	m_expr_sep.emplace_back("==");
-	m_expr_sep.emplace_back(" ");
-	m_expr_sep.emplace_back("\t");
+	m_expr_sep.push_back("!");
+	m_expr_sep.push_back("(");
+	m_expr_sep.push_back(")");
+	m_expr_sep.push_back("+");
+	m_expr_sep.push_back("-");
+	m_expr_sep.push_back("*");
+	m_expr_sep.push_back("/");
+	m_expr_sep.push_back("==");
+	m_expr_sep.push_back(" ");
+	m_expr_sep.push_back("\t");
 
-	if (defines != nullptr)
-		m_defines = *defines;
 	m_defines.insert({"__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1")});
+	if (defines != nullptr)
+	{
+		for (auto & p : *defines)
+		{
+			m_defines.insert({p.m_name, p});
+		}
+	}
 }
 
 void ppreprocessor::error(const pstring &err)
@@ -295,40 +301,33 @@ void ppreprocessor::error(const pstring &err)
 	throw pexception("PREPRO ERROR: " + err);
 }
 
-pstream::size_type ppreprocessor::vread(value_type *buf, const pstream::size_type n)
+
+
+double ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start, int prio)
 {
-	size_type bytes = std::min(m_buf.size() - m_pos, n);
-
-	if (bytes==0)
-		return 0;
-
-	std::memcpy(buf, m_buf.c_str() + m_pos, bytes);
-	m_pos += bytes;
-	return bytes;
-}
-
-#define CHECKTOK2(p_op, p_prio) \
-	else if (tok == # p_op)                         \
-	{                                               \
-		if (prio < (p_prio))                        \
-			return val;                             \
-		start++;                                    \
-		const auto v2 = expr(sexpr, start, (p_prio)); \
-		val = (val p_op v2);                        \
-	}                                               \
-
-// Operator precedence see https://en.cppreference.com/w/cpp/language/operator_precedence
-
-int ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start, int prio)
-{
-	int val = 0;
+	double val;
 	pstring tok=sexpr[start];
 	if (tok == "(")
 	{
 		start++;
-		val = expr(sexpr, start, /*prio*/ 255);
+		val = expr(sexpr, start, /*prio*/ 0);
 		if (sexpr[start] != ")")
 			error("parsing error!");
+		start++;
+	}
+	else if (tok == "!")
+	{
+		start++;
+		val = expr(sexpr, start, 90);
+		if (val != 0)
+			val = 0;
+		else
+			val = 1;
+	}
+	else
+	{
+		tok=sexpr[start];
+		val = tok.as_double();
 		start++;
 	}
 	while (start < sexpr.size())
@@ -339,25 +338,36 @@ int ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start, i
 			// FIXME: catch error
 			return val;
 		}
-		else if (tok == "!")
+		else if (tok == "+")
 		{
-			if (prio < 3)
+			if (prio > 10)
 				return val;
 			start++;
-			val = !expr(sexpr, start, 3);
+			val = val + expr(sexpr, start, 10);
 		}
-		CHECKTOK2(*,  5)
-		CHECKTOK2(/,  5)
-		CHECKTOK2(+,  6)
-		CHECKTOK2(-,  6)
-		CHECKTOK2(==, 10)
-		CHECKTOK2(&&, 14)
-		CHECKTOK2(||, 15)
-		else
+		else if (tok == "-")
 		{
-			// FIXME: error handling
-			val = plib::pstonum<decltype(val)>(tok);
+			if (prio > 10)
+				return val;
 			start++;
+			val = val - expr(sexpr, start, 10);
+		}
+		else if (tok == "*")
+		{
+			start++;
+			val = val * expr(sexpr, start, 20);
+		}
+		else if (tok == "/")
+		{
+			start++;
+			val = val / expr(sexpr, start, 20);
+		}
+		else if (tok == "==")
+		{
+			if (prio > 5)
+				return val;
+			start++;
+			val = (val == expr(sexpr, start, 5)) ? 1.0 : 0.0;
 		}
 	}
 	return val;
@@ -366,7 +376,10 @@ int ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start, i
 ppreprocessor::define_t *ppreprocessor::get_define(const pstring &name)
 {
 	auto idx = m_defines.find(name);
-	return (idx != m_defines.end()) ? &idx->second : nullptr;
+	if (idx != m_defines.end())
+		return &idx->second;
+	else
+		return nullptr;
 }
 
 pstring ppreprocessor::replace_macros(const pstring &line)
@@ -376,135 +389,78 @@ pstring ppreprocessor::replace_macros(const pstring &line)
 	for (auto & elem : elems)
 	{
 		define_t *def = get_define(elem);
-		ret += (def != nullptr) ? def->m_replace : elem;
+		if (def != nullptr)
+			ret += def->m_replace;
+		else
+			ret += elem;
 	}
 	return ret;
 }
 
-static pstring catremainder(const std::vector<pstring> &elems, std::size_t start, const pstring &sep)
+static pstring catremainder(const std::vector<pstring> &elems, std::size_t start, pstring sep)
 {
 	pstring ret("");
-	for (std::size_t i = start; i < elems.size(); i++)
+	for (auto & elem : elems)
 	{
-		ret += elems[i];
+		ret += elem;
 		ret += sep;
 	}
 	return ret;
 }
 
-pstring ppreprocessor::process_comments(pstring line)
+pstring  ppreprocessor::process_line(const pstring &line)
 {
-	bool in_string = false;
-
-	std::size_t e = line.size();
-	pstring ret = "";
-	for (std::size_t i=0; i < e; )
-	{
-		pstring c = plib::left(line, 1);
-		line = line.substr(1);
-		if (!m_comment)
-		{
-			if (c=="\"")
-			{
-				in_string = !in_string;
-				ret += c;
-			}
-			else if (in_string && c=="\\")
-			{
-				i++;
-				ret += (c + plib::left(line, 1));
-				line = line.substr(1);
-			}
-			else if (!in_string && c=="/" && plib::left(line,1) == "*")
-				m_comment = true;
-			else if (!in_string && c=="/" && plib::left(line,1) == "/")
-				break;
-			else
-				ret += c;
-		}
-		else
-			if (c=="*" && plib::left(line,1) == "/")
-			{
-				i++;
-				line = line.substr(1);
-				m_comment = false;
-			}
-		i++;
-	}
-	return ret;
-}
-
-pstring  ppreprocessor::process_line(pstring line)
-{
-	bool line_cont = plib::right(line, 1) == "\\";
-	if (line_cont)
-		line = plib::left(line, line.size() - 1);
-
-	if (m_state == LINE_CONTINUATION)
-		m_line += line;
-	else
-		m_line = line;
-
-	if (line_cont)
-	{
-		m_state = LINE_CONTINUATION;
-		return "";
-	}
-	else
-		m_state = PROCESS;
-
-	line = process_comments(m_line);
-
-	pstring lt = plib::trim(plib::replace_all(line, pstring("\t"), pstring(" ")));
+	pstring lt = line.replace_all("\t"," ").trim();
 	pstring ret;
+	m_lineno++;
 	// FIXME ... revise and extend macro handling
-	if (plib::startsWith(lt, "#"))
+	if (lt.startsWith("#"))
 	{
 		std::vector<pstring> lti(psplit(lt, " ", true));
-		if (lti[0] == "#if")
+		if (lti[0].equals("#if"))
 		{
 			m_level++;
 			std::size_t start = 0;
 			lt = replace_macros(lt);
-			std::vector<pstring> t(psplit(replace_all(lt.substr(3), pstring(" "), pstring("")), m_expr_sep));
-			auto val = static_cast<int>(expr(t, start, 255));
+			std::vector<pstring> t(psplit(lt.substr(3).replace_all(" ",""), m_expr_sep));
+			int val = static_cast<int>(expr(t, start, 0));
 			if (val == 0)
 				m_ifflag |= (1 << m_level);
 		}
-		else if (lti[0] == "#ifdef")
+		else if (lti[0].equals("#ifdef"))
 		{
 			m_level++;
 			if (get_define(lti[1]) == nullptr)
 				m_ifflag |= (1 << m_level);
 		}
-		else if (lti[0] == "#ifndef")
+		else if (lti[0].equals("#ifndef"))
 		{
 			m_level++;
 			if (get_define(lti[1]) != nullptr)
 				m_ifflag |= (1 << m_level);
 		}
-		else if (lti[0] == "#else")
+		else if (lti[0].equals("#else"))
 		{
 			m_ifflag ^= (1 << m_level);
 		}
-		else if (lti[0] == "#endif")
+		else if (lti[0].equals("#endif"))
 		{
 			m_ifflag &= ~(1 << m_level);
 			m_level--;
 		}
-		else if (lti[0] == "#include")
+		else if (lti[0].equals("#include"))
 		{
 			// ignore
 		}
-		else if (lti[0] == "#pragma")
+		else if (lti[0].equals("#pragma"))
 		{
-			if (m_ifflag == 0 && lti.size() > 3 && lti[1] == "NETLIST")
+			if (m_ifflag == 0 && lti.size() > 3 && lti[1].equals("NETLIST"))
 			{
-				if (lti[2] == "warning")
+				if (lti[2].equals("warning"))
 					error("NETLIST: " + catremainder(lti, 3, " "));
 			}
 		}
-		else if (lti[0] == "#define")
+		else if (lti[0].equals("#define"))
 		{
 			if (m_ifflag == 0)
 			{
@@ -514,20 +470,28 @@ pstring  ppreprocessor::process_line(pstring line)
 			}
 		}
 		else
-		{
-			if (m_ifflag == 0)
-				error(pfmt("unknown directive on line {1}: {2}")(m_lineno)(replace_macros(line)));
-		}
+			error(pfmt("unknown directive on line {1}: {2}")(m_lineno)(line));
 	}
 	else
 	{
 		lt = replace_macros(lt);
 		if (m_ifflag == 0)
+		{
 			ret += lt;
+		}
 	}
 	return ret;
 }
 
 
+void ppreprocessor::process(putf8_reader &istrm, putf8_writer &ostrm)
+{
+	pstring line;
+	while (istrm.readline(line))
+	{
+		line = process_line(line);
+		ostrm.writeline(line);
+	}
+}
 
-} // namespace plib
+}

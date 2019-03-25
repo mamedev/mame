@@ -548,8 +548,7 @@ MC6845_UPDATE_ROW( bigbord2_state::crtc_update_row )
 
 #define MAIN_CLOCK 8_MHz_XTAL / 2
 
-void bigbord2_state::bigbord2(machine_config &config)
-{
+MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bigbord2_state::bigbord2_mem);
@@ -557,10 +556,10 @@ void bigbord2_state::bigbord2(machine_config &config)
 	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240);
-	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_crt8002);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crt8002)
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	CLOCK(config, "ctc_clock", MAIN_CLOCK).signal_handler().set(FUNC(bigbord2_state::clock_w));
@@ -591,8 +590,10 @@ void bigbord2_state::bigbord2(machine_config &config)
 
 	MB8877(config, m_fdc, 16_MHz_XTAL / 8); // 2MHz for 8 inch, or 1MHz otherwise (jumper-selectable)
 	//m_fdc->intrq_wr_callback().set_inputline(m_maincpu, ??); // info missing from schematic
-	FLOPPY_CONNECTOR(config, "fdc:0", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	mc6845_device &crtc(MC6845(config, "crtc", 16_MHz_XTAL / 8));
 	crtc.set_screen("screen");
@@ -616,7 +617,7 @@ void bigbord2_state::bigbord2(machine_config &config)
 	m_syslatch1->q_out_cb<6>().set(FUNC(bigbord2_state::disk_motor_w)); // MOTOR
 	m_syslatch1->q_out_cb<7>().set("beeper", FUNC(beep_device::set_state)); // BELL
 
-	LS259(config, "outlatch1", 0); // U96
+	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // U96
 
 	/* keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
@@ -624,8 +625,9 @@ void bigbord2_state::bigbord2(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 950).add_route(ALL_OUTPUTS, "mono", 0.50); // actual frequency is unknown
-}
+	MCFG_DEVICE_ADD("beeper", BEEP, 950) // actual frequency is unknown
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
 
 /* ROMs */

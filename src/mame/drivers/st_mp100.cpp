@@ -709,11 +709,10 @@ TIMER_DEVICE_CALLBACK_MEMBER( st_mp100_state::u11_timer )
 	m_pia_u11->ca1_w(m_u11_timer);
 }
 
-void st_mp100_state::st_mp100(machine_config &config)
-{
+MACHINE_CONFIG_START(st_mp100_state::st_mp100)
 	/* basic machine hardware */
-	M6800(config, m_maincpu, 1000000); // no xtal, just 2 chips forming a random oscillator
-	m_maincpu->set_addrmap(AS_PROGRAM, &st_mp100_state::st_mp100_map);
+	MCFG_DEVICE_ADD("maincpu", M6800, 1000000) // no xtal, just 2 chips forming a random oscillator
+	MCFG_DEVICE_PROGRAM_MAP(st_mp100_map)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -733,7 +732,7 @@ void st_mp100_state::st_mp100(machine_config &config)
 	m_pia_u10->cb2_handler().set(FUNC(st_mp100_state::u10_cb2_w));
 	m_pia_u10->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia_u10->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-	TIMER(config, "timer_x").configure_periodic(FUNC(st_mp100_state::timer_x), attotime::from_hz(120)); // mains freq*2
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x", st_mp100_state, timer_x, attotime::from_hz(120)) // mains freq*2
 
 	PIA6821(config, m_pia_u11, 0);
 	m_pia_u11->readpa_handler().set(FUNC(st_mp100_state::u11_a_r));
@@ -743,8 +742,8 @@ void st_mp100_state::st_mp100(machine_config &config)
 	m_pia_u11->cb2_handler().set(FUNC(st_mp100_state::u11_cb2_w));
 	m_pia_u11->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia_u11->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-	TIMER(config, "timer_d").configure_periodic(FUNC(st_mp100_state::u11_timer), attotime::from_hz(634)); // 555 timer*2
-}
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d", st_mp100_state, u11_timer, attotime::from_hz(634)) // 555 timer*2
+MACHINE_CONFIG_END
 
 
 /*--------------------------------

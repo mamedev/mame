@@ -283,19 +283,18 @@ void hp49gp_state::init_hp49gp()
 	lcd_spi_init();
 }
 
-void hp49gp_state::hp49gp(machine_config &config)
-{
-	ARM9(config, m_maincpu, 400000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &hp49gp_state::hp49gp_map);
+MACHINE_CONFIG_START(hp49gp_state::hp49gp)
+	MCFG_DEVICE_ADD("maincpu", ARM9, 400000000)
+	MCFG_DEVICE_PROGRAM_MAP(hp49gp_map)
 
-	PALETTE(config, "palette").set_entries(32768);
+	MCFG_PALETTE_ADD("palette", 32768)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(160, 85);
-	screen.set_visarea(0, 131 - 1, 0, 80 - 1);
-	screen.set_screen_update("s3c2410", FUNC(s3c2410_device::screen_update));
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(160, 85)
+	MCFG_SCREEN_VISIBLE_AREA(0, 131 - 1, 0, 80 - 1)
+	MCFG_SCREEN_UPDATE_DEVICE("s3c2410", s3c2410_device, screen_update)
 
 	S3C2410(config, m_s3c2410, 12000000);
 	m_s3c2410->set_palette_tag("palette");
@@ -303,7 +302,7 @@ void hp49gp_state::hp49gp(machine_config &config)
 	m_s3c2410->gpio_port_r_callback().set(FUNC(hp49gp_state::s3c2410_gpio_port_r));
 	m_s3c2410->gpio_port_w_callback().set(FUNC(hp49gp_state::s3c2410_gpio_port_w));
 	m_s3c2410->set_lcd_flags(S3C24XX_INTERFACE_LCD_REVERSE);
-}
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( hp49gp )
 	PORT_START("ROW1")

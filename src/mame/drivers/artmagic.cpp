@@ -473,6 +473,7 @@ void artmagic_state::tms_map(address_map &map)
 	map(0x00400000, 0x005fffff).ram().share("vram1");
 	map(0x00800000, 0x0080007f).rw(FUNC(artmagic_state::blitter_r), FUNC(artmagic_state::blitter_w));
 	map(0x00c00000, 0x00c000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffe00000, 0xffffffff).ram();
 }
 
@@ -483,6 +484,7 @@ void artmagic_state::stonebal_tms_map(address_map &map)
 	map(0x00400000, 0x005fffff).ram().share("vram1");
 	map(0x00800000, 0x0080007f).rw(FUNC(artmagic_state::blitter_r), FUNC(artmagic_state::blitter_w));
 	map(0x00c00000, 0x00c000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffc00000, 0xffffffff).ram();
 }
 
@@ -804,11 +806,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void artmagic_state::artmagic(machine_config &config)
-{
+MACHINE_CONFIG_START(artmagic_state::artmagic)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, MASTER_CLOCK_25MHz/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &artmagic_state::main_map);
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	TMS34010(config, m_tms, MASTER_CLOCK_40MHz);
 	m_tms->set_addrmap(AS_PROGRAM, &artmagic_state::tms_map);
@@ -820,58 +822,61 @@ void artmagic_state::artmagic(machine_config &config)
 	m_tms->set_shiftreg_in_callback(FUNC(artmagic_state::to_shiftreg));
 	m_tms->set_shiftreg_out_callback(FUNC(artmagic_state::from_shiftreg));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	EEPROM_2816(config, "eeprom").write_time(attotime::from_usec(1)); // FIXME: false-readback polling should make this unnecessary
 
 	/* video hardware */
-	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
+	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MASTER_CLOCK_40MHz/6, 428, 0, 320, 313, 0, 256);
-	screen.set_screen_update("tms", FUNC(tms34010_device::tms340x0_rgb32));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_40MHz/6, 428, 0, 320, 313, 0, 256)
+	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, MASTER_CLOCK_40MHz/3/10, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.65);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK_40MHz/3/10, okim6295_device::PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
+MACHINE_CONFIG_END
 
 
-void artmagic_state::cheesech(machine_config &config)
-{
+MACHINE_CONFIG_START(artmagic_state::cheesech)
 	artmagic(config);
 
-	m_oki->reset_routes();
-	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_MODIFY("oki")
+	MCFG_SOUND_ROUTES_RESET()
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
-void artmagic_state::stonebal(machine_config &config)
-{
+MACHINE_CONFIG_START(artmagic_state::stonebal)
 	artmagic(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &artmagic_state::stonebal_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(stonebal_map)
 
-	m_tms->set_addrmap(AS_PROGRAM, &artmagic_state::stonebal_tms_map);
+	MCFG_DEVICE_MODIFY("tms")
+	MCFG_DEVICE_PROGRAM_MAP(stonebal_tms_map)
 
-	m_oki->reset_routes();
-	m_oki->add_route(ALL_OUTPUTS, "mono", 0.45);
-}
+	MCFG_DEVICE_MODIFY("oki")
+	MCFG_SOUND_ROUTES_RESET()
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+MACHINE_CONFIG_END
 
-void artmagic_state::shtstar(machine_config &config)
-{
+MACHINE_CONFIG_START(artmagic_state::shtstar)
 	artmagic(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &artmagic_state::shtstar_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(shtstar_map)
 
-	MC68681(config, "mainduart", 3686400);
+	MCFG_DEVICE_ADD("mainduart", MC68681, 3686400)
 
 	/* sub cpu*/
-	m68000_device &subcpu(M68000(config, "subcpu", MASTER_CLOCK_25MHz/2));
-	subcpu.set_addrmap(AS_PROGRAM, &artmagic_state::shtstar_subcpu_map);
+	MCFG_DEVICE_ADD("subcpu", M68000, MASTER_CLOCK_25MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(shtstar_subcpu_map)
 
-	MC68681(config, "subduart", 3686400);
+	MCFG_DEVICE_ADD("subduart", MC68681, 3686400)
 
 	YM2149(config, "aysnd", 3686400/2).add_route(ALL_OUTPUTS, "mono", 0.10);
 
@@ -880,7 +885,7 @@ void artmagic_state::shtstar(machine_config &config)
 	guncpu.set_addrmap(AS_PROGRAM, &artmagic_state::shtstar_guncpu_map);
 	guncpu.set_addrmap(AS_IO, &artmagic_state::shtstar_guncpu_io_map);
 	guncpu.port_in_cb<1>().set_constant(0); // ?
-}
+MACHINE_CONFIG_END
 
 
 

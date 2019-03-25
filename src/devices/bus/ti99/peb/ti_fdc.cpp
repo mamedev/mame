@@ -160,7 +160,7 @@ READ8Z_MEMBER(ti_fdc_device::readz)
 	}
 }
 
-void ti_fdc_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(ti_fdc_device::write)
 {
 	if (machine().side_effects_disabled()) return;
 
@@ -201,7 +201,7 @@ READ8Z_MEMBER(ti_fdc_device::crureadz)
 	if ((offset & 0xff00)==m_cru_base)
 	{
 		uint8_t reply = 0;
-		if ((offset & 0x0070) == 0)
+		if ((offset & 0x07) == 0)
 		{
 			// Selected drive
 			reply |= ((m_DSEL)<<1);
@@ -212,12 +212,12 @@ READ8Z_MEMBER(ti_fdc_device::crureadz)
 			// Selected side
 			if (m_SIDSEL==ASSERT_LINE) reply |= 0x80;
 		}
-		*value = BIT(reply, (offset >> 1) & 0x07);
+		*value = reply;
 		LOGMASKED(LOG_CRU, "Read CRU = %02x\n", *value);
 	}
 }
 
-void ti_fdc_device::cruwrite(offs_t offset, uint8_t data)
+WRITE8_MEMBER(ti_fdc_device::cruwrite)
 {
 	if ((offset & 0xff00)==m_cru_base)
 		m_crulatch->write_bit((offset >> 1) & 0x07, BIT(data, 0));

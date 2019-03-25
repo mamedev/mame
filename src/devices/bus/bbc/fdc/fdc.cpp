@@ -89,10 +89,10 @@ void bbc_fdc_slot_device::device_reset()
 //  read
 //-------------------------------------------------
 
-uint8_t bbc_fdc_slot_device::read(offs_t offset)
+READ8_MEMBER(bbc_fdc_slot_device::read)
 {
 	if (m_card)
-		return m_card->read(offset);
+		return m_card->read(space, offset);
 	else
 		return 0xff;
 }
@@ -101,10 +101,10 @@ uint8_t bbc_fdc_slot_device::read(offs_t offset)
 //  write
 //-------------------------------------------------
 
-void bbc_fdc_slot_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(bbc_fdc_slot_device::write)
 {
 	if (m_card)
-		m_card->write(offset, data);
+		m_card->write(space, offset, data);
 }
 
 //-------------------------------------------------

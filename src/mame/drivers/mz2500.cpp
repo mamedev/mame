@@ -1787,14 +1787,13 @@ static void mz2500_floppies(device_slot_interface &device)
 	device.option_add("dd", FLOPPY_35_DD);
 }
 
-void mz2500_state::mz2500(machine_config &config)
-{
+MACHINE_CONFIG_START(mz2500_state::mz2500)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 6000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mz2500_state::mz2500_map);
-	m_maincpu->set_addrmap(AS_IO, &mz2500_state::mz2500_io);
-	m_maincpu->set_vblank_int("screen", FUNC(mz2500_state::mz2500_vbl));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(mz2500_state::mz2500_irq_ack));
+	MCFG_DEVICE_ADD("maincpu", Z80, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(mz2500_map)
+	MCFG_DEVICE_IO_MAP(mz2500_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mz2500_state,  mz2500_vbl)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mz2500_state,mz2500_irq_ack)
 
 	for (int bank = 0; bank < 8; bank++)
 	{
@@ -1829,18 +1828,18 @@ void mz2500_state::mz2500(machine_config &config)
 
 	MB8877(config, m_fdc, 1_MHz_XTAL);
 
-	FLOPPY_CONNECTOR(config, "mb8877a:0", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "mb8877a:1", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "mb8877a:2", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "mb8877a:3", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats);
+	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("mb8877a:2", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("mb8877a:3", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
 
-	SOFTWARE_LIST(config, "flop_list").set_original("mz2500");
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "mz2500")
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(21'477'272, 640+108, 0, 640, 480, 0, 200); //unknown clock / divider
-	m_screen->set_screen_update(FUNC(mz2500_state::screen_update_mz2500));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(21'477'272, 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
+	MCFG_SCREEN_UPDATE_DRIVER(mz2500_state, screen_update_mz2500)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	PALETTE(config, m_palette, FUNC(mz2500_state::mz2500_palette), 0x200);
 
@@ -1858,8 +1857,9 @@ void mz2500_state::mz2500(machine_config &config)
 	ym.add_route(2, "mono", 0.50);
 	ym.add_route(3, "mono", 0.50);
 
-	BEEP(config, m_beeper, 4096).add_route(ALL_OUTPUTS,"mono",0.50);
-}
+	MCFG_DEVICE_ADD("beeper", BEEP, 4096)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+MACHINE_CONFIG_END
 
 
 

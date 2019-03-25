@@ -92,18 +92,18 @@ void bbc_1mhzbus_slot_device::device_reset()
 //  read
 //-------------------------------------------------
 
-uint8_t bbc_1mhzbus_slot_device::fred_r(offs_t offset)
+READ8_MEMBER(bbc_1mhzbus_slot_device::fred_r)
 {
 	if (m_card)
-		return m_card->fred_r(offset);
+		return m_card->fred_r(space, offset);
 	else
 		return 0xff;
 }
 
-uint8_t bbc_1mhzbus_slot_device::jim_r(offs_t offset)
+READ8_MEMBER(bbc_1mhzbus_slot_device::jim_r)
 {
 	if (m_card)
-		return m_card->jim_r(offset);
+		return m_card->jim_r(space, offset);
 	else
 		return 0xff;
 }
@@ -112,16 +112,16 @@ uint8_t bbc_1mhzbus_slot_device::jim_r(offs_t offset)
 //  write
 //-------------------------------------------------
 
-void bbc_1mhzbus_slot_device::fred_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(bbc_1mhzbus_slot_device::fred_w)
 {
 	if (m_card)
-		m_card->fred_w(offset, data);
+		m_card->fred_w(space, offset, data);
 }
 
-void bbc_1mhzbus_slot_device::jim_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(bbc_1mhzbus_slot_device::jim_w)
 {
 	if (m_card)
-		m_card->jim_w(offset, data);
+		m_card->jim_w(space, offset, data);
 }
 
 //-------------------------------------------------
@@ -142,7 +142,6 @@ void bbc_1mhzbus_slot_device::jim_w(offs_t offset, uint8_t data)
 //#include "graduate.h"
 #include "beebsid.h"
 //#include "prisma3.h"
-#include "sprite.h"
 #include "cfa3000opt.h"
 
 
@@ -162,7 +161,6 @@ void bbc_1mhzbus_devices(device_slot_interface &device)
 	//device.option_add("graduate",   BBC_GRADUATE);        /* The Torch Graduate G400/G800 */
 	device.option_add("beebsid",    BBC_BEEBSID);         /* BeebSID */
 	//device.option_add("prisma3",    BBC_PRISMA3);         /* PRISMA-3 - Millipede 1989 */
-	device.option_add("sprite",     BBC_SPRITE);          /* Logotron Sprite Board */
 }
 
 void bbcm_1mhzbus_devices(device_slot_interface &device)
@@ -185,6 +183,5 @@ void bbcm_1mhzbus_devices(device_slot_interface &device)
 	//device.option_add("graduate",   BBC_GRADUATE);        /* The Torch Graduate G400/G800 */
 	device.option_add("beebsid",    BBC_BEEBSID);         /* BeebSID */
 	//device.option_add("prisma3",    BBC_PRISMA3);         /* PRISMA-3 - Millipede 1989 */
-	device.option_add("sprite",     BBC_SPRITE);          /* Logotron Sprite Board */
 	device.option_add("cfa3000opt", CFA3000_OPT);         /* Henson CFA 3000 Option Board */
 }

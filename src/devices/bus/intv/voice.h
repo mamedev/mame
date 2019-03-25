@@ -18,31 +18,31 @@ public:
 
 	// reading and writing
 	// actual IntelliVoice access
-	virtual uint16_t read_speech(offs_t offset) override;
-	virtual void write_speech(offs_t offset, uint16_t data) override;
+	virtual DECLARE_READ16_MEMBER(read_speech) override;
+	virtual DECLARE_WRITE16_MEMBER(write_speech) override;
 
 	// passthru access
-	virtual uint16_t read_rom04(offs_t offset) override { return m_subslot->read_rom04(offset); }
-	virtual uint16_t read_rom20(offs_t offset) override { return m_subslot->read_rom20(offset); }
-	virtual uint16_t read_rom40(offs_t offset) override { return m_subslot->read_rom40(offset); }
-	virtual uint16_t read_rom48(offs_t offset) override { return m_subslot->read_rom48(offset); }
-	virtual uint16_t read_rom50(offs_t offset) override { return m_subslot->read_rom50(offset); }
-	virtual uint16_t read_rom60(offs_t offset) override { return m_subslot->read_rom60(offset); }
-	virtual uint16_t read_rom70(offs_t offset) override { return m_subslot->read_rom70(offset); }
-	virtual uint16_t read_rom80(offs_t offset) override;
-	virtual uint16_t read_rom90(offs_t offset) override { return m_subslot->read_rom90(offset); }
-	virtual uint16_t read_roma0(offs_t offset) override { return m_subslot->read_roma0(offset); }
-	virtual uint16_t read_romb0(offs_t offset) override { return m_subslot->read_romb0(offset); }
-	virtual uint16_t read_romc0(offs_t offset) override { return m_subslot->read_romc0(offset); }
-	virtual uint16_t read_romd0(offs_t offset) override;
-	virtual uint16_t read_rome0(offs_t offset) override { return m_subslot->read_rome0(offset); }
-	virtual uint16_t read_romf0(offs_t offset) override { return m_subslot->read_romf0(offset); }
+	virtual DECLARE_READ16_MEMBER(read_rom04) override { return m_subslot->read_rom04(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_rom20) override { return m_subslot->read_rom20(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_rom40) override { return m_subslot->read_rom40(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_rom48) override { return m_subslot->read_rom48(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_rom50) override { return m_subslot->read_rom50(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_rom60) override { return m_subslot->read_rom60(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_rom70) override { return m_subslot->read_rom70(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_rom80) override;
+	virtual DECLARE_READ16_MEMBER(read_rom90) override { return m_subslot->read_rom90(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_roma0) override { return m_subslot->read_roma0(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_romb0) override { return m_subslot->read_romb0(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_romc0) override { return m_subslot->read_romc0(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_romd0) override;
+	virtual DECLARE_READ16_MEMBER(read_rome0) override { return m_subslot->read_rome0(space, offset, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_romf0) override { return m_subslot->read_romf0(space, offset, mem_mask); }
 
 	// RAM passthru write
-	virtual void write_88(offs_t offset, uint16_t data) override { if (m_ram88_enabled) m_subslot->write_ram(offset, data); }
-	virtual void write_d0(offs_t offset, uint16_t data) override { if (m_ramd0_enabled) m_subslot->write_ram(offset, data); }
-	virtual uint16_t read_ram(offs_t offset) override { return m_subslot->read_ram(offset); }
-	virtual void write_ram(offs_t offset, uint16_t data) override { m_subslot->write_ram(offset, data); }
+	virtual DECLARE_WRITE16_MEMBER(write_88) override { if (m_ram88_enabled) m_subslot->write_ram(space, offset, data, mem_mask); }
+	virtual DECLARE_WRITE16_MEMBER(write_d0) override { if (m_ramd0_enabled) m_subslot->write_ram(space, offset, data, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(read_ram) override { return m_subslot->read_ram(space, offset, mem_mask); }
+	virtual DECLARE_WRITE16_MEMBER(write_ram) override { m_subslot->write_ram(space, offset, data, mem_mask); }
 
 	virtual void late_subslot_setup() override;
 

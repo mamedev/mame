@@ -27,8 +27,7 @@ decltype(HD61830) HD61830B = HD61830;
 // default address map
 void hd61830_device::hd61830(address_map &map)
 {
-	if (!has_configured_map(0))
-		map(0x0000, 0xffff).ram();
+	map(0x0000, 0xffff).ram();
 }
 
 
@@ -85,7 +84,7 @@ hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, d
 	m_cac(0),
 	m_blink(0),
 	m_cursor(0),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(hd61830_device::hd61830), this)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(hd61830_device::hd61830), this)),
 	m_char_rom(*this, "hd61830")
 {
 }

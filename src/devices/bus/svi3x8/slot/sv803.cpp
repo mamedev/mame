@@ -56,7 +56,7 @@ void sv803_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-uint8_t sv803_device::mreq_r(offs_t offset)
+READ8_MEMBER( sv803_device::mreq_r )
 {
 	if (offset >= 0x8000 && offset <= 0xbfff)
 		return m_ram[offset - 0x8000];
@@ -64,7 +64,7 @@ uint8_t sv803_device::mreq_r(offs_t offset)
 	return 0xff;
 }
 
-void sv803_device::mreq_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( sv803_device::mreq_w )
 {
 	if (offset >= 0x8000 && offset <= 0xbfff)
 		m_ram[offset - 0x8000] = data;

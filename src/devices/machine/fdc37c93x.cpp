@@ -639,12 +639,12 @@ void fdc37c93x_device::map_rtc(address_map &map)
 
 READ8_MEMBER(fdc37c93x_device::rtc_read)
 {
-	return ds12885_rtcdev->read(offset);
+	return ds12885_rtcdev->read(space, offset, mem_mask);
 }
 
 WRITE8_MEMBER(fdc37c93x_device::rtc_write)
 {
-	ds12885_rtcdev->write(offset, data);
+	ds12885_rtcdev->write(space, offset, data, mem_mask);
 }
 
 void fdc37c93x_device::map_rtc_addresses()

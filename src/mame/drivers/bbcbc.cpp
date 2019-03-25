@@ -82,7 +82,8 @@ void bbcbc_state::io_map(address_map &map)
 						 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 							 m_z80pio->write(space, offset >> 5, data, mem_mask);
 						 });
-	map(0x80, 0x81).rw("tms9129", FUNC(tms9129_device::read), FUNC(tms9129_device::write));
+	map(0x80, 0x80).rw("tms9129", FUNC(tms9129_device::vram_r), FUNC(tms9129_device::vram_w));
+	map(0x81, 0x81).rw("tms9129", FUNC(tms9129_device::register_r), FUNC(tms9129_device::register_w));
 }
 
 // Input bits are read through the PIO four at a time, then stored individually in RAM at E030-E03B
@@ -117,8 +118,7 @@ static const z80_daisy_config bbcbc_daisy_chain[] =
 };
 
 
-void bbcbc_state::bbcbc(machine_config &config)
-{
+MACHINE_CONFIG_START(bbcbc_state::bbcbc)
 	Z80(config, m_maincpu, 10.6875_MHz_XTAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbcbc_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &bbcbc_state::io_map);
@@ -136,9 +136,9 @@ void bbcbc_state::bbcbc(machine_config &config)
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// Software on ROM cartridges
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "bbcbc_cart");
-	SOFTWARE_LIST(config, "cart_list").set_original("bbcbc");
-}
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "bbcbc_cart")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","bbcbc")
+MACHINE_CONFIG_END
 
 
 void bbcbc_state::machine_start()

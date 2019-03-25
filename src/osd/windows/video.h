@@ -1,29 +1,19 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles, Vas Crabb
+// copyright-holders:Aaron Giles
 //============================================================
 //
-//  video.h - Win32 video helpers
+//  video.h - Win32 implementation of MAME video routines
 //
 //============================================================
-#ifndef MAME_OSD_WINDOWS_VIDEO_H
-#define MAME_OSD_WINDOWS_VIDEO_H
 
-#pragma once
+#ifndef __WIN_VIDEO__
+#define __WIN_VIDEO__
 
 #include "modules/osdhelper.h"
 
-#include <windows.h>
-
-
-constexpr osd_rect RECT_to_osd_rect(RECT const &r)
+inline osd_rect RECT_to_osd_rect(const RECT &r)
 {
 	return osd_rect(r.left, r.top, r.right - r.left, r.bottom - r.top);
 }
 
-inline RECT osd_rect_to_RECT(osd_rect const &r)
-{
-	RECT const result{ r.left(), r.top(), r.right(), r.bottom() };
-	return result;
-}
-
-#endif // MAME_OSD_WINDOWS_VIDEO_H
+#endif

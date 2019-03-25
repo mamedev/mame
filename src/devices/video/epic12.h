@@ -6,6 +6,12 @@
 
 #pragma once
 
+#define MCFG_EPIC12_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, EPIC12, 0)
+
+#define MCFG_EPIC12_SET_MAINRAMSIZE( _rgn ) \
+	downcast<epic12_device &>(*device).set_mainramsize(_rgn);
+
 
 class epic12_device : public device_t, public device_video_interface
 {

@@ -272,16 +272,16 @@ INTERRUPT_GEN_MEMBER(clshroad_state::sound_timer_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-void clshroad_state::firebatl(machine_config &config)
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MAIN_CLOCK);   /* ? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &clshroad_state::clshroad_map);
-	m_maincpu->set_vblank_int("screen", FUNC(clshroad_state::vblank_irq));
+MACHINE_CONFIG_START(clshroad_state::firebatl)
 
-	Z80(config, m_audiocpu, MAIN_CLOCK);  /* ? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &clshroad_state::clshroad_sound_map);
-	m_audiocpu->set_periodic_int(FUNC(clshroad_state::sound_timer_irq), attotime::from_hz(120));    /* periodic interrupt, don't know about the frequency */
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK)   /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(clshroad_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", clshroad_state,  vblank_irq)
+
+	MCFG_DEVICE_ADD("audiocpu", Z80, MAIN_CLOCK)  /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(clshroad_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 120)    /* periodic interrupt, don't know about the frequency */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert();
@@ -290,13 +290,13 @@ void clshroad_state::firebatl(machine_config &config)
 	mainlatch.q_out_cb<4>().set(FUNC(clshroad_state::flipscreen_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(0x120, 0x100);
-	screen.set_visarea(0, 0x120-1, 0x0+16, 0x100-16-1);
-	screen.set_screen_update(FUNC(clshroad_state::screen_update));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(0x120, 0x100)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x120-1, 0x0+16, 0x100-16-1)
+	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_firebatl);
 	PALETTE(config, m_palette, FUNC(clshroad_state::firebatl_palette), 512+64*4, 256);
@@ -306,20 +306,21 @@ void clshroad_state::firebatl(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	WIPING_CUSTOM(config, "custom", 96000).add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("custom", WIPING_CUSTOM, 96000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
-void clshroad_state::clshroad(machine_config &config)
-{
+MACHINE_CONFIG_START(clshroad_state::clshroad)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MAIN_CLOCK);  /* ? real speed unknown. 3MHz is too low and causes problems */
-	m_maincpu->set_addrmap(AS_PROGRAM, &clshroad_state::clshroad_map);
-	m_maincpu->set_vblank_int("screen", FUNC(clshroad_state::vblank_irq));
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK)  /* ? real speed unknown. 3MHz is too low and causes problems */
+	MCFG_DEVICE_PROGRAM_MAP(clshroad_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", clshroad_state,  vblank_irq)
 
-	Z80(config, m_audiocpu, MAIN_CLOCK); /* ? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &clshroad_state::clshroad_sound_map);
-	//m_audiocpu->set_vblank_int("screen", FUNC(clshroad_state::irq0_line_hold));   /* IRQ, no NMI */
-	m_audiocpu->set_periodic_int(FUNC(clshroad_state::sound_timer_irq), attotime::from_hz(60));    /* periodic interrupt, don't know about the frequency */
+	MCFG_DEVICE_ADD("audiocpu", Z80, MAIN_CLOCK) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(clshroad_sound_map)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", clshroad_state,  irq0_line_hold)   /* IRQ, no NMI */
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 60)    /* periodic interrupt, don't know about the frequency */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set_nop(); // never writes here?
@@ -328,13 +329,13 @@ void clshroad_state::clshroad(machine_config &config)
 	mainlatch.q_out_cb<4>().set(FUNC(clshroad_state::flipscreen_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(0x120, 0x100);
-	screen.set_visarea(0, 0x120-1, 0x0+16, 0x100-16-1);
-	screen.set_screen_update(FUNC(clshroad_state::screen_update));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(0x120, 0x100)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x120-1, 0x0+16, 0x100-16-1)
+	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_clshroad);
 	PALETTE(config, m_palette, FUNC(clshroad_state::clshroad_palette), 256);
@@ -344,8 +345,9 @@ void clshroad_state::clshroad(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	WIPING_CUSTOM(config, "custom", 96000).add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("custom", WIPING_CUSTOM, 96000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

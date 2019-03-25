@@ -201,11 +201,10 @@ WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port9c_w)
 //  printf("%s:sprite_port9c_w %02x\n", machine().describe_context().c_str(), data);
 }
 
-void cedar_magnet_sprite_device::device_add_mconfig(machine_config &config)
-{
-	z80_device &spritecpu(Z80(config, "spritecpu", 4000000));
-	spritecpu.set_addrmap(AS_PROGRAM, &cedar_magnet_sprite_device::cedar_magnet_sprite_map);
-	spritecpu.set_addrmap(AS_IO, &cedar_magnet_sprite_device::cedar_magnet_sprite_io);
+MACHINE_CONFIG_START(cedar_magnet_sprite_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("spritecpu", Z80,4000000)
+	MCFG_DEVICE_PROGRAM_MAP(cedar_magnet_sprite_map)
+	MCFG_DEVICE_IO_MAP(cedar_magnet_sprite_io)
 
 	Z80PIO(config, m_pio0, 4000000/2);
 //  m_pio0->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
@@ -229,8 +228,8 @@ void cedar_magnet_sprite_device::device_add_mconfig(machine_config &config)
 	m_pio2->out_pb_callback().set(FUNC(cedar_magnet_sprite_device::pio2_pb_w));
 
 
-	ADDRESS_MAP_BANK(config, m_sprite_ram_bankdev).set_map(&cedar_magnet_sprite_device::cedar_magnet_sprite_sub_ram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
-}
+	ADDRESS_MAP_BANK(config, "sp_sub_ram").set_map(&cedar_magnet_sprite_device::cedar_magnet_sprite_sub_ram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
+MACHINE_CONFIG_END
 
 
 READ8_MEMBER(cedar_magnet_sprite_device::pio0_pa_r)

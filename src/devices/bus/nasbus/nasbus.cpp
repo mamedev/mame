@@ -22,14 +22,15 @@ DEFINE_DEVICE_TYPE(NASBUS_SLOT, nasbus_slot_device, "nasbus_slot", "NASBUS Slot"
 //  nasbus_slot_device - constructor
 //-------------------------------------------------
 
-nasbus_slot_device::nasbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nasbus_slot_device(mconfig, NASBUS_SLOT, tag, owner, clock)
+nasbus_slot_device::nasbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nasbus_slot_device(mconfig, NASBUS_SLOT, tag, owner, clock)
 {
 }
 
-nasbus_slot_device::nasbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+nasbus_slot_device::nasbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_nasbus_tag(nullptr)
 {
 }
 
@@ -43,7 +44,7 @@ void nasbus_slot_device::device_start()
 
 	if (dev)
 	{
-		nasbus_device *m_nasbus = downcast<nasbus_device *>(owner()->subdevice(NASBUS_TAG));
+		nasbus_device *m_nasbus = downcast<nasbus_device *>(m_owner->subdevice(m_nasbus_tag));
 		m_nasbus->add_card(dev);
 	}
 }
@@ -61,8 +62,8 @@ DEFINE_DEVICE_TYPE(NASBUS, nasbus_device, "nasbus", "NASBUS Backplane")
 
 nasbus_device::nasbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NASBUS, tag, owner, clock),
-	m_program(*this, finder_base::DUMMY_TAG, -1),
-	m_io(*this, finder_base::DUMMY_TAG, -1),
+	m_program(nullptr),
+	m_io(nullptr),
 	m_ram_disable_handler(*this)
 {
 }
@@ -102,6 +103,24 @@ void nasbus_device::add_card(device_nasbus_card_interface *card)
 {
 	card->set_nasbus_device(this);
 	m_dev.append(*card);
+}
+
+//-------------------------------------------------
+//  set_program_space - set address space we are attached to
+//-------------------------------------------------
+
+void nasbus_device::set_program_space(address_space *program)
+{
+	m_program = program;
+}
+
+//-------------------------------------------------
+//  set_io_space - set address space we are attached to
+//-------------------------------------------------
+
+void nasbus_device::set_io_space(address_space *io)
+{
+	m_io = io;
 }
 
 // callbacks from slot device to the host

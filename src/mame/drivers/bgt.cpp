@@ -49,12 +49,11 @@ static INPUT_PORTS_START( bgt )
 INPUT_PORTS_END
 
 
-void bgt_state::bgt(machine_config &config)
-{
-	V30(config, m_maincpu, 12000000); // ? unknown CPU.. definitely x86 based tho
-	m_maincpu->set_addrmap(AS_PROGRAM, &bgt_state::bgt_map);
-	m_maincpu->set_addrmap(AS_IO, &bgt_state::bgt_io);
-}
+MACHINE_CONFIG_START(bgt_state::bgt)
+	MCFG_DEVICE_ADD("maincpu", V30, 12000000 ) // ? unknown CPU.. definitely x86 based tho
+	MCFG_DEVICE_PROGRAM_MAP(bgt_map)
+	MCFG_DEVICE_IO_MAP(bgt_io)
+MACHINE_CONFIG_END
 
 ROM_START( bg_ddb )
 	ROM_REGION( 0x100000, "maincpu", 0 )

@@ -621,23 +621,22 @@ void hyperscan_state::machine_reset()
 }
 
 
-void hyperscan_state::hyperscan(machine_config &config)
-{
+MACHINE_CONFIG_START(hyperscan_state::hyperscan)
 	/* basic machine hardware */
-	SCORE7(config, m_maincpu, XTAL(27'000'000) * 4);   // 108MHz S+core 7
-	m_maincpu->set_addrmap(AS_PROGRAM, &hyperscan_state::spg290_mem);
+	MCFG_DEVICE_ADD("maincpu", SCORE7, XTAL(27'000'000) * 4)   // 108MHz S+core 7
+	MCFG_DEVICE_PROGRAM_MAP(spg290_mem)
 
-	SOFTWARE_LIST(config, "cd_list").set_original("hyperscan");
+	MCFG_SOFTWARE_LIST_ADD("cd_list","hyperscan")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update(FUNC(hyperscan_state::spg290_screen_update));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.screen_vblank().set(FUNC(hyperscan_state::spg290_vblank_irq));
-}
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_UPDATE_DRIVER(hyperscan_state, spg290_screen_update)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hyperscan_state, spg290_vblank_irq))
+MACHINE_CONFIG_END
 
 
 /* ROM definition */

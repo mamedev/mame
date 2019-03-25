@@ -84,11 +84,10 @@ void egret_device::egret_map(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void egret_device::device_add_mconfig(machine_config &config)
-{
-	M68HC05EG(config, m_maincpu, XTAL(32'768)*192);  // 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
-	m_maincpu->set_addrmap(AS_PROGRAM, &egret_device::egret_map);
-}
+MACHINE_CONFIG_START(egret_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(EGRET_CPU_TAG, M68HC05EG, XTAL(32'768)*192)  // 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
+	MCFG_DEVICE_PROGRAM_MAP(egret_map)
+MACHINE_CONFIG_END
 
 const tiny_rom_entry *egret_device::device_rom_region() const
 {

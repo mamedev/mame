@@ -239,24 +239,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::scanline)
 
 
 
-void darkmist_state::darkmist(machine_config &config)
-{
+MACHINE_CONFIG_START(darkmist_state::darkmist)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);         /* ? MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &darkmist_state::memmap);
-	m_maincpu->set_addrmap(AS_OPCODES, &darkmist_state::decrypted_opcodes_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(darkmist_state::scanline), "screen", 0, 1);
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(memmap)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkmist_state, scanline, "screen", 0, 1)
 
-	T5182(config, m_t5182, 0);
+	MCFG_DEVICE_ADD("t5182", T5182, 0)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 256-1, 16, 256-16-1);
-	m_screen->set_screen_update(FUNC(darkmist_state::screen_update));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
+	MCFG_SCREEN_UPDATE_DRIVER(darkmist_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_darkmist);
 	PALETTE(config, m_palette, FUNC(darkmist_state::darkmist_palette));
@@ -270,7 +269,7 @@ void darkmist_state::darkmist(machine_config &config)
 	ymsnd.irq_handler().set(m_t5182, FUNC(t5182_device::ym2151_irq_handler));
 	ymsnd.add_route(0, "mono", 1.0);
 	ymsnd.add_route(1, "mono", 1.0);
-}
+MACHINE_CONFIG_END
 
 ROM_START( darkmist )
 	ROM_REGION( 0x18000, "maincpu", 0 )

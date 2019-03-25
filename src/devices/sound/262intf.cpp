@@ -121,12 +121,12 @@ void ymf262_device::device_clock_changed()
 	m_stream->set_sample_rate(rate);
 }
 
-u8 ymf262_device::read(offs_t offset)
+READ8_MEMBER( ymf262_device::read )
 {
 	return ymf262_read(m_chip, offset & 3);
 }
 
-void ymf262_device::write(offs_t offset, u8 data)
+WRITE8_MEMBER( ymf262_device::write )
 {
 	ymf262_write(m_chip, offset & 3, data);
 }

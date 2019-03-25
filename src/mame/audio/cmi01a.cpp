@@ -26,8 +26,7 @@ cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-void cmi01a_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(cmi01a_device::device_add_mconfig)
 	PIA6821(config, m_pia[0], 0); // pia_cmi01a_1_config
 	m_pia[0]->readcb1_handler().set(FUNC(cmi01a_device::tri_r));
 	m_pia[0]->writepa_handler().set(FUNC(cmi01a_device::ws_dir_w));
@@ -50,8 +49,9 @@ void cmi01a_device::device_add_mconfig(machine_config &config)
 	m_ptm->o1_callback().set(FUNC(cmi01a_device::ptm_o1));
 	m_ptm->irq_callback().set("cmi01a_irq", FUNC(input_merger_device::in_w<4>));
 
-	INPUT_MERGER_ANY_HIGH(config, "cmi01a_irq").output_handler().set(FUNC(cmi01a_device::cmi01a_irq));
-}
+	MCFG_INPUT_MERGER_ANY_HIGH("cmi01a_irq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, cmi01a_device, cmi01a_irq))
+MACHINE_CONFIG_END
 
 
 void cmi01a_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
@@ -124,21 +124,21 @@ WRITE_LINE_MEMBER( cmi01a_device::pia_0_ca2_w )
 	}
 }
 
-void cmi01a_device::pia_1_a_w(uint8_t data)
+WRITE8_MEMBER( cmi01a_device::pia_1_a_w )
 {
 // top two
 }
 
-void cmi01a_device::pia_1_b_w(uint8_t data)
+WRITE8_MEMBER( cmi01a_device::pia_1_b_w )
 {
 }
 
-void cmi01a_device::rp_w(uint8_t data)
+WRITE8_MEMBER( cmi01a_device::rp_w )
 {
 	m_rp = data;
 }
 
-void cmi01a_device::ws_dir_w(uint8_t data)
+WRITE8_MEMBER( cmi01a_device::ws_dir_w )
 {
 	m_ws = data & 0x7f;
 	m_dir = (data >> 7) & 1;
@@ -304,7 +304,7 @@ READ_LINE_MEMBER( cmi01a_device::zx_r )
 	return m_segment_cnt & 0x40;
 }
 
-void cmi01a_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( cmi01a_device::write )
 {
 	//printf("C%d W: %02x = %02x\n", m_channel, offset, data);
 
@@ -335,11 +335,11 @@ void cmi01a_device::write(offs_t offset, uint8_t data)
 			break;
 
 		case 0x8: case 0x9: case 0xa: case 0xb:
-			m_pia[0]->write(offset & 3, data);
+			m_pia[0]->write(space, offset & 3, data);
 			break;
 
 		case 0xc: case 0xd: case 0xe: case 0xf:
-			m_pia[1]->write((BIT(offset, 0) << 1) | BIT(offset, 1), data);
+			m_pia[1]->write(space, (BIT(offset, 0) << 1) | BIT(offset, 1), data);
 			break;
 
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
@@ -350,7 +350,7 @@ void cmi01a_device::write(offs_t offset, uint8_t data)
 			int a2 = BIT(offset, 1);
 
 			//printf("CH%d PTM W: [%x] = %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data);
-			m_ptm->write((a2 << 2) | (a1 << 1) | a0, data);
+			m_ptm->write(space, (a2 << 2) | (a1 << 1) | a0, data);
 			break;
 		}
 
@@ -360,7 +360,7 @@ void cmi01a_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t cmi01a_device::read(offs_t offset)
+READ8_MEMBER( cmi01a_device::read )
 {
 	if (machine().side_effects_disabled())
 		return 0;
@@ -392,11 +392,11 @@ uint8_t cmi01a_device::read(offs_t offset)
 			break;
 
 		case 0x8: case 0x9: case 0xa: case 0xb:
-			data = m_pia[0]->read(offset & 3);
+			data = m_pia[0]->read(space, offset & 3);
 			break;
 
 		case 0xc: case 0xd: case 0xe: case 0xf:
-			data = m_pia[1]->read((BIT(offset, 0) << 1) | BIT(offset, 1));
+			data = m_pia[1]->read(space, (BIT(offset, 0) << 1) | BIT(offset, 1));
 			break;
 
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
@@ -405,7 +405,7 @@ uint8_t cmi01a_device::read(offs_t offset)
 			int a1 = (m_ptm_o1 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
 			int a2 = BIT(offset, 1);
 
-			data = m_ptm->read((a2 << 2) | (a1 << 1) | a0);
+			data = m_ptm->read(space, (a2 << 2) | (a1 << 1) | a0);
 
 			//printf("CH%d PTM R: [%x] %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data);
 			break;

@@ -137,20 +137,67 @@ Abnormalities:
 
 ***************************************************************************/
 
-template<unsigned Layer>
-TILE_GET_INFO_MEMBER(toaplan1_state::get_tile_info)
+TILE_GET_INFO_MEMBER(toaplan1_state::get_pf1_tile_info)
 {
 	int color, tile_number, attrib;
 
-	tile_number = m_tilevram[Layer][2 * tile_index + 1] & 0x7fff;
-	attrib = m_tilevram[Layer][2 * tile_index];
+	tile_number = m_pf1_tilevram16[2*tile_index+1] & 0x7fff;
+	attrib = m_pf1_tilevram16[2*tile_index];
 	color = attrib & 0x3f;
 	SET_TILE_INFO_MEMBER(0,
 			tile_number,
 			color,
 			0);
 	// "disabled" tiles are behind everything else
-	if (m_tilevram[Layer][2 * tile_index + 1] & 0x8000) tileinfo.category = 16;
+	if (m_pf1_tilevram16[2*tile_index+1] & 0x8000) tileinfo.category = 16;
+		else tileinfo.category = (attrib & 0xf000) >> 12;
+}
+
+TILE_GET_INFO_MEMBER(toaplan1_state::get_pf2_tile_info)
+{
+	int color, tile_number, attrib;
+
+	tile_number = m_pf2_tilevram16[2*tile_index+1] & 0x7fff;
+	attrib = m_pf2_tilevram16[2*tile_index];
+	color = attrib & 0x3f;
+	SET_TILE_INFO_MEMBER(0,
+			tile_number,
+			color,
+			0);
+	// "disabled" tiles are behind everything else
+	if (m_pf2_tilevram16[2*tile_index+1] & 0x8000) tileinfo.category = 16;
+		else tileinfo.category = (attrib & 0xf000) >> 12;
+}
+
+TILE_GET_INFO_MEMBER(toaplan1_state::get_pf3_tile_info)
+{
+	int color, tile_number, attrib;
+
+	tile_number = m_pf3_tilevram16[2*tile_index+1] & 0x7fff;
+	attrib = m_pf3_tilevram16[2*tile_index];
+	color = attrib & 0x3f;
+	SET_TILE_INFO_MEMBER(0,
+			tile_number,
+			color,
+			0);
+	// "disabled" tiles are behind everything else
+	if (m_pf3_tilevram16[2*tile_index+1] & 0x8000) tileinfo.category = 16;
+		else tileinfo.category = (attrib & 0xf000) >> 12;
+}
+
+TILE_GET_INFO_MEMBER(toaplan1_state::get_pf4_tile_info)
+{
+	int color, tile_number, attrib;
+
+	tile_number = m_pf4_tilevram16[2*tile_index+1] & 0x7fff;
+	attrib = m_pf4_tilevram16[2*tile_index];
+	color = attrib & 0x3f;
+	SET_TILE_INFO_MEMBER(0,
+			tile_number,
+			color,
+			0);
+	// "disabled" tiles are behind everything else
+	if (m_pf4_tilevram16[2*tile_index+1] & 0x8000) tileinfo.category = 16;
 		else tileinfo.category = (attrib & 0xf000) >> 12;
 }
 
@@ -160,55 +207,62 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_tile_info)
 
 ***************************************************************************/
 
-void toaplan1_state::create_tilemaps()
+void toaplan1_state::toaplan1_create_tilemaps()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(toaplan1_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(toaplan1_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(toaplan1_state::get_tile_info<2>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(toaplan1_state::get_tile_info<3>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_pf1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_pf2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_pf3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf3_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_pf4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf4_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
-	m_tilemap[0]->set_transparent_pen(0);
-	m_tilemap[1]->set_transparent_pen(0);
-	m_tilemap[2]->set_transparent_pen(0);
-	m_tilemap[3]->set_transparent_pen(0);
+	m_pf1_tilemap->set_transparent_pen(0);
+	m_pf2_tilemap->set_transparent_pen(0);
+	m_pf3_tilemap->set_transparent_pen(0);
+	m_pf4_tilemap->set_transparent_pen(0);
 }
 
-void toaplan1_state::vram_alloc()
+void toaplan1_state::toaplan1_vram_alloc()
 {
-	for (int i = 0; i < 4; i++)
-	{
-		m_tilevram[i] = make_unique_clear<u16[]>(TOAPLAN1_TILEVRAM_SIZE / 2);
-		save_pointer(NAME(m_tilevram[i]), TOAPLAN1_TILEVRAM_SIZE / 2, i);
-	}
+	m_pf1_tilevram16 = make_unique_clear<uint16_t[]>(TOAPLAN1_TILEVRAM_SIZE/2);
+	m_pf2_tilevram16 = make_unique_clear<uint16_t[]>(TOAPLAN1_TILEVRAM_SIZE/2);
+	m_pf3_tilevram16 = make_unique_clear<uint16_t[]>(TOAPLAN1_TILEVRAM_SIZE/2);
+	m_pf4_tilevram16 = make_unique_clear<uint16_t[]>(TOAPLAN1_TILEVRAM_SIZE/2);
+
+	save_pointer(NAME(m_pf1_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
+	save_pointer(NAME(m_pf2_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
+	save_pointer(NAME(m_pf3_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
+	save_pointer(NAME(m_pf4_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
 
 #ifdef MAME_DEBUG
-	m_display_pf[0] = 1;
-	m_display_pf[1] = 1;
-	m_display_pf[2] = 1;
-	m_display_pf[3] = 1;
+	m_display_pf1 = 1;
+	m_display_pf2 = 1;
+	m_display_pf3 = 1;
+	m_display_pf4 = 1;
 	m_displog = 0;
 #endif
 }
 
-void toaplan1_state::spritevram_alloc()
+void toaplan1_state::toaplan1_spritevram_alloc()
 {
-	m_spriteram.allocate(TOAPLAN1_SPRITERAM_SIZE / 2);
-	m_buffered_spriteram = make_unique_clear<u16[]>(TOAPLAN1_SPRITERAM_SIZE / 2);
-	m_spritesizeram = make_unique_clear<u16[]>(TOAPLAN1_SPRITESIZERAM_SIZE / 2);
-	m_buffered_spritesizeram = make_unique_clear<u16[]>(TOAPLAN1_SPRITESIZERAM_SIZE / 2);
+	m_spriteram.allocate(TOAPLAN1_SPRITERAM_SIZE/2);
+	m_buffered_spriteram = make_unique_clear<uint16_t[]>(TOAPLAN1_SPRITERAM_SIZE/2);
+	m_spritesizeram16 = make_unique_clear<uint16_t[]>(TOAPLAN1_SPRITESIZERAM_SIZE/2);
+	m_buffered_spritesizeram16 = make_unique_clear<uint16_t[]>(TOAPLAN1_SPRITESIZERAM_SIZE/2);
 
-	save_pointer(NAME(m_buffered_spriteram), TOAPLAN1_SPRITERAM_SIZE / 2);
-	save_pointer(NAME(m_spritesizeram), TOAPLAN1_SPRITESIZERAM_SIZE / 2);
-	save_pointer(NAME(m_buffered_spritesizeram), TOAPLAN1_SPRITESIZERAM_SIZE / 2);
+	save_pointer(NAME(m_buffered_spriteram), TOAPLAN1_SPRITERAM_SIZE/2);
+	save_pointer(NAME(m_spritesizeram16), TOAPLAN1_SPRITESIZERAM_SIZE/2);
+	save_pointer(NAME(m_buffered_spritesizeram16), TOAPLAN1_SPRITESIZERAM_SIZE/2);
 }
 
-void toaplan1_state::set_scrolls()
+void toaplan1_state::toaplan1_set_scrolls()
 {
-	for (int i = 0; i < 4; i++)
-	{
-		m_tilemap[i]->set_scrollx(0, (m_scrollx[i] >> 7) - m_tiles_offsetx);
-		m_tilemap[i]->set_scrolly(0, (m_scrolly[i] >> 7) - m_tiles_offsety);
-	}
+	m_pf1_tilemap->set_scrollx(0, (m_pf1_scrollx >> 7) - m_tiles_offsetx);
+	m_pf2_tilemap->set_scrollx(0, (m_pf2_scrollx >> 7) - m_tiles_offsetx);
+	m_pf3_tilemap->set_scrollx(0, (m_pf3_scrollx >> 7) - m_tiles_offsetx);
+	m_pf4_tilemap->set_scrollx(0, (m_pf4_scrollx >> 7) - m_tiles_offsetx);
+	m_pf1_tilemap->set_scrolly(0, (m_pf1_scrolly >> 7) - m_tiles_offsety);
+	m_pf2_tilemap->set_scrolly(0, (m_pf2_scrolly >> 7) - m_tiles_offsety);
+	m_pf3_tilemap->set_scrolly(0, (m_pf3_scrolly >> 7) - m_tiles_offsety);
+	m_pf4_tilemap->set_scrolly(0, (m_pf4_scrolly >> 7) - m_tiles_offsety);
 }
 
 void toaplan1_state::register_common()
@@ -216,8 +270,14 @@ void toaplan1_state::register_common()
 	save_item(NAME(m_bcu_flipscreen));
 	save_item(NAME(m_fcu_flipscreen));
 
-	save_item(NAME(m_scrollx));
-	save_item(NAME(m_scrolly));
+	save_item(NAME(m_pf1_scrollx));
+	save_item(NAME(m_pf1_scrolly));
+	save_item(NAME(m_pf2_scrollx));
+	save_item(NAME(m_pf2_scrolly));
+	save_item(NAME(m_pf3_scrollx));
+	save_item(NAME(m_pf3_scrolly));
+	save_item(NAME(m_pf4_scrollx));
+	save_item(NAME(m_pf4_scrolly));
 
 	save_item(NAME(m_tiles_offsetx));
 	save_item(NAME(m_tiles_offsety));
@@ -226,25 +286,25 @@ void toaplan1_state::register_common()
 }
 
 
-void toaplan1_rallybik_state::video_start()
+VIDEO_START_MEMBER(toaplan1_rallybik_state,rallybik)
 {
 	m_spritegen->alloc_sprite_bitmap(*m_screen);
 	m_spritegen->gfx(0)->set_colorbase(64*16);
 
-	create_tilemaps();
-	vram_alloc();
+	toaplan1_create_tilemaps();
+	toaplan1_vram_alloc();
 
-	m_buffered_spriteram = make_unique_clear<u16[]>(m_spriteram.bytes() / 2);
-	save_pointer(NAME(m_buffered_spriteram), m_spriteram.bytes() / 2);
+	m_buffered_spriteram = make_unique_clear<uint16_t[]>(m_spriteram.bytes()/2);
+	save_pointer(NAME(m_buffered_spriteram), m_spriteram.bytes()/2);
 
-	m_tilemap[0]->set_scrolldx(-0x00d - 6, -0x80 + 6);
-	m_tilemap[1]->set_scrolldx(-0x00d - 4, -0x80 + 4);
-	m_tilemap[2]->set_scrolldx(-0x00d - 2, -0x80 + 2);
-	m_tilemap[3]->set_scrolldx(-0x00d - 0, -0x80 + 0);
-	m_tilemap[0]->set_scrolldy(-0x111, 0x8);
-	m_tilemap[1]->set_scrolldy(-0x111, 0x8);
-	m_tilemap[2]->set_scrolldy(-0x111, 0x8);
-	m_tilemap[3]->set_scrolldy(-0x111, 0x8);
+	m_pf1_tilemap->set_scrolldx(-0x00d-6, -0x80+6);
+	m_pf2_tilemap->set_scrolldx(-0x00d-4, -0x80+4);
+	m_pf3_tilemap->set_scrolldx(-0x00d-2, -0x80+2);
+	m_pf4_tilemap->set_scrolldx(-0x00d-0, -0x80+0);
+	m_pf1_tilemap->set_scrolldy(-0x111, 0x8);
+	m_pf2_tilemap->set_scrolldy(-0x111, 0x8);
+	m_pf3_tilemap->set_scrolldy(-0x111, 0x8);
+	m_pf4_tilemap->set_scrolldy(-0x111, 0x8);
 
 	m_bcu_flipscreen = -1;
 	m_fcu_flipscreen = 0;
@@ -252,20 +312,20 @@ void toaplan1_rallybik_state::video_start()
 	register_common();
 }
 
-void toaplan1_state::video_start()
+VIDEO_START_MEMBER(toaplan1_state,toaplan1)
 {
-	create_tilemaps();
-	vram_alloc();
-	spritevram_alloc();
+	toaplan1_create_tilemaps();
+	toaplan1_vram_alloc();
+	toaplan1_spritevram_alloc();
 
-	m_tilemap[0]->set_scrolldx(-0x1ef - 6, -0x11 + 6);
-	m_tilemap[1]->set_scrolldx(-0x1ef - 4, -0x11 + 4);
-	m_tilemap[2]->set_scrolldx(-0x1ef - 2, -0x11 + 2);
-	m_tilemap[3]->set_scrolldx(-0x1ef - 0, -0x11 + 0);
-	m_tilemap[0]->set_scrolldy(-0x101, -0xff);
-	m_tilemap[1]->set_scrolldy(-0x101, -0xff);
-	m_tilemap[2]->set_scrolldy(-0x101, -0xff);
-	m_tilemap[3]->set_scrolldy(-0x101, -0xff);
+	m_pf1_tilemap->set_scrolldx(-0x1ef-6, -0x11+6);
+	m_pf2_tilemap->set_scrolldx(-0x1ef-4, -0x11+4);
+	m_pf3_tilemap->set_scrolldx(-0x1ef-2, -0x11+2);
+	m_pf4_tilemap->set_scrolldx(-0x1ef-0, -0x11+0);
+	m_pf1_tilemap->set_scrolldy(-0x101, -0xff);
+	m_pf2_tilemap->set_scrolldy(-0x101, -0xff);
+	m_pf3_tilemap->set_scrolldy(-0x101, -0xff);
+	m_pf4_tilemap->set_scrolldy(-0x101, -0xff);
 
 	m_bcu_flipscreen = -1;
 	m_fcu_flipscreen = 0;
@@ -280,14 +340,14 @@ void toaplan1_state::video_start()
 
 ***************************************************************************/
 
-u16 toaplan1_state::frame_done_r()
+READ16_MEMBER(toaplan1_state::toaplan1_frame_done_r)
 {
 	return m_screen->vblank();
 }
 
-WRITE16_MEMBER(toaplan1_state::tile_offsets_w)
+WRITE16_MEMBER(toaplan1_state::toaplan1_tile_offsets_w)
 {
-	if (offset == 0)
+	if ( offset == 0 )
 	{
 		COMBINE_DATA(&m_tiles_offsetx);
 		logerror("Tiles_offsetx now = %08x\n", m_tiles_offsetx);
@@ -297,46 +357,49 @@ WRITE16_MEMBER(toaplan1_state::tile_offsets_w)
 		COMBINE_DATA(&m_tiles_offsety);
 		logerror("Tiles_offsety now = %08x\n", m_tiles_offsety);
 	}
-	set_scrolls();
+	toaplan1_set_scrolls();
 }
 
-void toaplan1_state::bcu_flipscreen_w(u8 data)
+WRITE16_MEMBER(toaplan1_state::toaplan1_bcu_flipscreen_w)
 {
-	if (data != m_bcu_flipscreen)
+	if (ACCESSING_BITS_0_7 && (data != m_bcu_flipscreen))
 	{
-		logerror("Setting BCU controller flipscreen port to %02x\n",data);
+		logerror("Setting BCU controller flipscreen port to %04x\n",data);
 		m_bcu_flipscreen = data & 0x01;     /* 0x0001 = flip, 0x0000 = no flip */
 		machine().tilemap().set_flip_all((data ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
 
-		set_scrolls();
+		toaplan1_set_scrolls();
 	}
 }
 
-void toaplan1_state::fcu_flipscreen_w(u8 data)
+WRITE16_MEMBER(toaplan1_state::toaplan1_fcu_flipscreen_w)
 {
-	logerror("Setting FCU controller flipscreen port to %02x\n",data);
-	m_fcu_flipscreen = data & 0x80;   /* 0x80 = flip, 0x00 = no flip */
+	if (ACCESSING_BITS_8_15)
+	{
+		logerror("Setting FCU controller flipscreen port to %04x\n",data);
+		m_fcu_flipscreen = data & 0x8000;   /* 0x8000 = flip, 0x0000 = no flip */
+	}
 }
 
-u16 toaplan1_state::spriteram_offs_r() // this aint really needed ?
+READ16_MEMBER(toaplan1_state::toaplan1_spriteram_offs_r)/// this aint really needed ?
 {
 	return m_spriteram_offs;
 }
 
-void toaplan1_state::spriteram_offs_w(offs_t offset, u16 data, u16 mem_mask)
+WRITE16_MEMBER(toaplan1_state::toaplan1_spriteram_offs_w)
 {
 	COMBINE_DATA(&m_spriteram_offs);
 }
 
 
-void toaplan1_state::bgpalette_w(offs_t offset, u16 data, u16 mem_mask)
+WRITE16_MEMBER(toaplan1_state::toaplan1_bgpalette_w)
 {
 	COMBINE_DATA(&m_bgpaletteram[offset]);
 	data = m_bgpaletteram[offset];
 	m_palette->set_pen_color(offset, pal5bit(data>>0), pal5bit(data>>5), pal5bit(data>>10));
 }
 
-void toaplan1_state::fgpalette_w(offs_t offset, u16 data, u16 mem_mask)
+WRITE16_MEMBER(toaplan1_state::toaplan1_fgpalette_w)
 {
 	COMBINE_DATA(&m_fgpaletteram[offset]);
 	data = m_fgpaletteram[offset];
@@ -344,17 +407,17 @@ void toaplan1_state::fgpalette_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 
-u16 toaplan1_state::spriteram_r()
+READ16_MEMBER(toaplan1_state::toaplan1_spriteram16_r)
 {
-	return m_spriteram[m_spriteram_offs & ((TOAPLAN1_SPRITERAM_SIZE / 2)-1)];
+	return m_spriteram[m_spriteram_offs & ((TOAPLAN1_SPRITERAM_SIZE/2)-1)];
 }
 
-void toaplan1_state::spriteram_w(offs_t offset, u16 data, u16 mem_mask)
+WRITE16_MEMBER(toaplan1_state::toaplan1_spriteram16_w)
 {
-	COMBINE_DATA(&m_spriteram[m_spriteram_offs & ((TOAPLAN1_SPRITERAM_SIZE / 2)-1)]);
+	COMBINE_DATA(&m_spriteram[m_spriteram_offs & ((TOAPLAN1_SPRITERAM_SIZE/2)-1)]);
 
 #ifdef MAME_DEBUG
-	if (m_spriteram_offs >= (TOAPLAN1_SPRITERAM_SIZE / 2))
+	if (m_spriteram_offs >= (TOAPLAN1_SPRITERAM_SIZE/2))
 	{
 		logerror("Sprite_RAM_word_w, %08x out of range !\n", m_spriteram_offs);
 		return;
@@ -364,17 +427,17 @@ void toaplan1_state::spriteram_w(offs_t offset, u16 data, u16 mem_mask)
 	m_spriteram_offs++;
 }
 
-u16 toaplan1_state::spritesizeram_r()
+READ16_MEMBER(toaplan1_state::toaplan1_spritesizeram16_r)
 {
-	return m_spritesizeram[m_spriteram_offs & ((TOAPLAN1_SPRITESIZERAM_SIZE / 2)-1)];
+	return m_spritesizeram16[m_spriteram_offs & ((TOAPLAN1_SPRITESIZERAM_SIZE/2)-1)];
 }
 
-void toaplan1_state::spritesizeram_w(offs_t offset, u16 data, u16 mem_mask)
+WRITE16_MEMBER(toaplan1_state::toaplan1_spritesizeram16_w)
 {
-	COMBINE_DATA(&m_spritesizeram[m_spriteram_offs & ((TOAPLAN1_SPRITESIZERAM_SIZE / 2)-1)]);
+	COMBINE_DATA(&m_spritesizeram16[m_spriteram_offs & ((TOAPLAN1_SPRITESIZERAM_SIZE/2)-1)]);
 
 #ifdef MAME_DEBUG
-	if (m_spriteram_offs >= (TOAPLAN1_SPRITESIZERAM_SIZE / 2))
+	if (m_spriteram_offs >= (TOAPLAN1_SPRITESIZERAM_SIZE/2))
 	{
 		logerror("Sprite_Size_RAM_word_w, %08x out of range !\n", m_spriteram_offs);
 		return;
@@ -386,17 +449,17 @@ void toaplan1_state::spritesizeram_w(offs_t offset, u16 data, u16 mem_mask)
 
 
 
-void toaplan1_state::bcu_control_w(offs_t offset, u16 data)
+WRITE16_MEMBER(toaplan1_state::toaplan1_bcu_control_w)
 {
 	logerror("BCU tile controller register:%02x now = %04x\n",offset,data);
 }
 
-u16 toaplan1_state::tileram_offs_r()
+READ16_MEMBER(toaplan1_state::toaplan1_tileram_offs_r)
 {
 	return m_pf_voffs;
 }
 
-void toaplan1_state::tileram_offs_w(offs_t offset, u16 data, u16 mem_mask)
+WRITE16_MEMBER(toaplan1_state::toaplan1_tileram_offs_w)
 {
 	if (data >= 0x4000)
 		logerror("Hmmm, unknown video layer being selected (%08x)\n",data);
@@ -404,21 +467,28 @@ void toaplan1_state::tileram_offs_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 
-u16 toaplan1_state::tileram_r(offs_t offset)
+READ16_MEMBER(toaplan1_state::toaplan1_tileram16_r)
 {
-	const int layer = m_pf_voffs >> 12;
-	const int offs = m_pf_voffs & 0xfff;
 	offs_t vram_offset;
-	u16 video_data = 0;
+	uint16_t video_data = 0;
 
-	switch (layer)    /* Locate Layer (PlayField) */
+	switch (m_pf_voffs & 0xf000)    /* Locate Layer (PlayField) */
 	{
-		case 0x0:
-		case 0x1:
-		case 0x2:
-		case 0x3:
-				vram_offset = ((offs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE / 2)-1);
-				video_data = m_tilevram[layer][vram_offset];
+		case 0x0000:
+				vram_offset = ((m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
+				video_data = m_pf1_tilevram16[vram_offset];
+				break;
+		case 0x1000:
+				vram_offset = ((m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
+				video_data = m_pf2_tilevram16[vram_offset];
+				break;
+		case 0x2000:
+				vram_offset = ((m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
+				video_data = m_pf3_tilevram16[vram_offset];
+				break;
+		case 0x3000:
+				vram_offset = ((m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
+				video_data = m_pf4_tilevram16[vram_offset];
 				break;
 		default:
 				logerror("Hmmm, reading %04x from unknown playfield layer address %06x  Offset:%01x !!!\n", video_data, m_pf_voffs, offset);
@@ -428,9 +498,9 @@ u16 toaplan1_state::tileram_r(offs_t offset)
 	return video_data;
 }
 
-u16 toaplan1_rallybik_state::tileram_r(offs_t offset)
+READ16_MEMBER(toaplan1_rallybik_state::rallybik_tileram16_r)
 {
-	u16 data = toaplan1_state::tileram_r(offset);
+	uint16_t data = toaplan1_tileram16_r(space, offset, mem_mask);
 
 	if (offset == 0)    /* some bit lines may be stuck to others */
 	{
@@ -440,21 +510,31 @@ u16 toaplan1_rallybik_state::tileram_r(offs_t offset)
 	return data;
 }
 
-void toaplan1_state::tileram_w(offs_t offset, u16 data, u16 mem_mask)
+WRITE16_MEMBER(toaplan1_state::toaplan1_tileram16_w)
 {
-	const int layer = m_pf_voffs >> 12;
-	const int offs = m_pf_voffs & 0xfff;
 	offs_t vram_offset;
 
-	switch (layer)    /* Locate Layer (PlayField) */
+	switch (m_pf_voffs & 0xf000)    /* Locate Layer (PlayField) */
 	{
-		case 0x0:
-		case 0x1:
-		case 0x2:
-		case 0x3:
-				vram_offset = ((offs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE / 2)-1);
-				COMBINE_DATA(&m_tilevram[layer][vram_offset]);
-				m_tilemap[layer]->mark_tile_dirty(vram_offset / 2);
+		case 0x0000:
+				vram_offset = ((m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
+				COMBINE_DATA(&m_pf1_tilevram16[vram_offset]);
+				m_pf1_tilemap->mark_tile_dirty(vram_offset/2);
+				break;
+		case 0x1000:
+				vram_offset = ((m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
+				COMBINE_DATA(&m_pf2_tilevram16[vram_offset]);
+				m_pf2_tilemap->mark_tile_dirty(vram_offset/2);
+				break;
+		case 0x2000:
+				vram_offset = ((m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
+				COMBINE_DATA(&m_pf3_tilevram16[vram_offset]);
+				m_pf3_tilemap->mark_tile_dirty(vram_offset/2);
+				break;
+		case 0x3000:
+				vram_offset = ((m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
+				COMBINE_DATA(&m_pf4_tilevram16[vram_offset]);
+				m_pf4_tilemap->mark_tile_dirty(vram_offset/2);
 				break;
 		default:
 				logerror("Hmmm, writing %04x to unknown playfield layer address %06x  Offset:%01x\n", data, m_pf_voffs, offset);
@@ -464,48 +544,56 @@ void toaplan1_state::tileram_w(offs_t offset, u16 data, u16 mem_mask)
 
 
 
-u16 toaplan1_state::scroll_regs_r(offs_t offset)
+READ16_MEMBER(toaplan1_state::toaplan1_scroll_regs_r)
 {
-	const int layer = (offset >> 1);
-	u16 scroll = 0;
+	uint16_t scroll = 0;
 
-	switch (offset)
+	switch(offset)
 	{
-		case 00:
-		case 02:
-		case 04:
-		case 06: scroll = m_scrollx[layer]; break;
-		case 01:
-		case 03:
-		case 05:
-		case 07: scroll = m_scrolly[layer]; break;
-		default: logerror("Hmmm, reading unknown video scroll register (%02x) !!!\n",offset);
+		case 00: scroll = m_pf1_scrollx; break;
+		case 01: scroll = m_pf1_scrolly; break;
+		case 02: scroll = m_pf2_scrollx; break;
+		case 03: scroll = m_pf2_scrolly; break;
+		case 04: scroll = m_pf3_scrollx; break;
+		case 05: scroll = m_pf3_scrolly; break;
+		case 06: scroll = m_pf4_scrollx; break;
+		case 07: scroll = m_pf4_scrolly; break;
+		default: logerror("Hmmm, reading unknown video scroll register (%08x) !!!\n",offset);
 					break;
 	}
 	return scroll;
 }
 
 
-void toaplan1_state::scroll_regs_w(offs_t offset, u16 data, u16 mem_mask)
+WRITE16_MEMBER(toaplan1_state::toaplan1_scroll_regs_w)
 {
-	const int layer = (offset >> 1);
-	switch (offset)
+	switch(offset)
 	{
-		case 00:      /* 1D3h */
-		case 02:      /* 1D5h */
-		case 04:      /* 1D7h */
-		case 06:      /* 1D9h */
-					COMBINE_DATA(&m_scrollx[layer]);
-					m_tilemap[layer]->set_scrollx(0, (m_scrollx[layer] >> 7) - m_tiles_offsetx);
+		case 00: COMBINE_DATA(&m_pf1_scrollx);      /* 1D3h */
+					m_pf1_tilemap->set_scrollx(0, (m_pf1_scrollx >> 7) - m_tiles_offsetx);
 					break;
-		case 01:      /* 1EBh */
-		case 03:      /* 1EBh */
-		case 05:      /* 1EBh */
-		case 07:      /* 1EBh */
-					COMBINE_DATA(&m_scrolly[layer]);
-					m_tilemap[layer]->set_scrolly(0, (m_scrolly[layer] >> 7) - m_tiles_offsety);
+		case 01: COMBINE_DATA(&m_pf1_scrolly);      /* 1EBh */
+					m_pf1_tilemap->set_scrolly(0, (m_pf1_scrolly >> 7) - m_tiles_offsety);
 					break;
-		default: logerror("Hmmm, writing %04x to unknown video scroll register (%02x) !!!\n",data ,offset);
+		case 02: COMBINE_DATA(&m_pf2_scrollx);      /* 1D5h */
+					m_pf2_tilemap->set_scrollx(0, (m_pf2_scrollx >> 7) - m_tiles_offsetx);
+					break;
+		case 03: COMBINE_DATA(&m_pf2_scrolly);      /* 1EBh */
+					m_pf2_tilemap->set_scrolly(0, (m_pf2_scrolly >> 7) - m_tiles_offsety);
+					break;
+		case 04: COMBINE_DATA(&m_pf3_scrollx);      /* 1D7h */
+					m_pf3_tilemap->set_scrollx(0, (m_pf3_scrollx >> 7) - m_tiles_offsetx);
+					break;
+		case 05: COMBINE_DATA(&m_pf3_scrolly);      /* 1EBh */
+					m_pf3_tilemap->set_scrolly(0, (m_pf3_scrolly >> 7) - m_tiles_offsety);
+					break;
+		case 06: COMBINE_DATA(&m_pf4_scrollx);      /* 1D9h */
+					m_pf4_tilemap->set_scrollx(0, (m_pf4_scrollx >> 7) - m_tiles_offsetx);
+					break;
+		case 07: COMBINE_DATA(&m_pf4_scrolly);      /* 1EBh */
+					m_pf4_tilemap->set_scrolly(0, (m_pf4_scrolly >> 7) - m_tiles_offsety);
+					break;
+		default: logerror("Hmmm, writing %08x to unknown video scroll register (%08x) !!!\n",data ,offset);
 					break;
 	}
 }
@@ -513,37 +601,37 @@ void toaplan1_state::scroll_regs_w(offs_t offset, u16 data, u16 mem_mask)
 
 
 
-void toaplan1_state::log_vram()
+void toaplan1_state::toaplan1_log_vram()
 {
 #ifdef MAME_DEBUG
 
-	if (machine().input().code_pressed(KEYCODE_M))
+	if ( machine().input().code_pressed(KEYCODE_M) )
 	{
-		u16 *spriteram = m_spriteram;
-		u16 *buffered_spriteram = m_buffered_spriteram.get();
+		uint16_t *spriteram16 = m_spriteram;
+		uint16_t *buffered_spriteram16 = m_buffered_spriteram.get();
 		offs_t sprite_voffs;
 		while (machine().input().code_pressed(KEYCODE_M)) ;
-		if (m_spritesizeram)           /* FCU controller */
+		if (m_spritesizeram16)           /* FCU controller */
 		{
 			int schar,sattr,sxpos,sypos,bschar,bsattr,bsxpos,bsypos;
-			u16 *size  = (u16 *)(m_spritesizeram.get());
-			u16 *bsize = (u16 *)(m_buffered_spritesizeram.get());
+			uint16_t *size  = (uint16_t *)(m_spritesizeram16.get());
+			uint16_t *bsize = (uint16_t *)(m_buffered_spritesizeram16.get());
 			logerror("Scrolls    PF1-X  PF1-Y     PF2-X  PF2-Y     PF3-X  PF3-Y     PF4-X  PF4-Y\n");
 			logerror("------>    #%04x  #%04x     #%04x  #%04x     #%04x  #%04x     #%04x  #%04x\n",
-				m_scrollx[0], m_scrolly[0], m_scrollx[1], m_scrolly[1], m_scrollx[2], m_scrolly[2], m_scrollx[3], m_scrolly[3]);
-			for (sprite_voffs = 0; sprite_voffs < m_spriteram.bytes() / 2; sprite_voffs += 4)
+				m_pf1_scrollx, m_pf1_scrolly, m_pf2_scrollx, m_pf2_scrolly, m_pf3_scrollx, m_pf3_scrolly, m_pf4_scrollx, m_pf4_scrolly);
+			for ( sprite_voffs = 0; sprite_voffs < m_spriteram.bytes()/2; sprite_voffs += 4 )
 			{
-				bschar = buffered_spriteram[sprite_voffs];
-				bsattr = buffered_spriteram[sprite_voffs + 1];
-				bsxpos = buffered_spriteram[sprite_voffs + 2];
-				bsypos = buffered_spriteram[sprite_voffs + 3];
-				schar = spriteram[sprite_voffs];
-				sattr = spriteram[sprite_voffs + 1];
-				sxpos = spriteram[sprite_voffs + 2];
-				sypos = spriteram[sprite_voffs + 3];
+				bschar = buffered_spriteram16[sprite_voffs];
+				bsattr = buffered_spriteram16[sprite_voffs + 1];
+				bsxpos = buffered_spriteram16[sprite_voffs + 2];
+				bsypos = buffered_spriteram16[sprite_voffs + 3];
+				schar = spriteram16[sprite_voffs];
+				sattr = spriteram16[sprite_voffs + 1];
+				sxpos = spriteram16[sprite_voffs + 2];
+				sypos = spriteram16[sprite_voffs + 3];
 				logerror("$(%04x)  Tile-Attr-Xpos-Ypos Now:%04x %04x %04x.%01x %04x.%01x  nxt:%04x %04x %04x.%01x %04x.%01x\n", sprite_voffs,
-												schar, sattr, sxpos, size[( sattr >> 6) & 0x3f] & 0xf, sypos,( size[( sattr >> 6) & 0x3f] >> 4) & 0xf,
-											bschar,bsattr,bsxpos,bsize[(bsattr >> 6) & 0x3f] & 0xf,bsypos,(bsize[(bsattr >> 6) & 0x3f] >> 4) & 0xf);
+												schar, sattr, sxpos, size[( sattr>>6)&0x3f]&0xf, sypos,( size[( sattr>>6)&0x3f]>>4)&0xf,
+											bschar,bsattr,bsxpos,bsize[(bsattr>>6)&0x3f]&0xf,bsypos,(bsize[(bsattr>>6)&0x3f]>>4)&0xf);
 			}
 		}
 		else                                    /* SCU controller */
@@ -551,17 +639,17 @@ void toaplan1_state::log_vram()
 			int schar,sattr,sxpos,sypos,bschar,bsattr,bsxpos,bsypos;
 			logerror("Scrolls    PF1-X  PF1-Y     PF2-X  PF2-Y     PF3-X  PF3-Y     PF4-X  PF4-Y\n");
 			logerror("------>    #%04x  #%04x     #%04x  #%04x     #%04x  #%04x     #%04x  #%04x\n",
-				m_scrollx[0], m_scrolly[0], m_scrollx[1], m_scrolly[1], m_scrollx[2], m_scrolly[2], m_scrollx[3], m_scrolly[3]);
-			for (sprite_voffs = 0; sprite_voffs < m_spriteram.bytes() / 2; sprite_voffs += 4)
+				m_pf1_scrollx, m_pf1_scrolly, m_pf2_scrollx, m_pf2_scrolly, m_pf3_scrollx, m_pf3_scrolly, m_pf4_scrollx, m_pf4_scrolly);
+			for ( sprite_voffs = 0; sprite_voffs < m_spriteram.bytes()/2; sprite_voffs += 4 )
 			{
-				bschar = buffered_spriteram[sprite_voffs];
-				bsattr = buffered_spriteram[sprite_voffs + 1];
-				bsypos = buffered_spriteram[sprite_voffs + 2];
-				bsxpos = buffered_spriteram[sprite_voffs + 3];
-				schar = spriteram[sprite_voffs];
-				sattr = spriteram[sprite_voffs + 1];
-				sypos = spriteram[sprite_voffs + 2];
-				sxpos = spriteram[sprite_voffs + 3];
+				bschar = buffered_spriteram16[sprite_voffs];
+				bsattr = buffered_spriteram16[sprite_voffs + 1];
+				bsypos = buffered_spriteram16[sprite_voffs + 2];
+				bsxpos = buffered_spriteram16[sprite_voffs + 3];
+				schar = spriteram16[sprite_voffs];
+				sattr = spriteram16[sprite_voffs + 1];
+				sypos = spriteram16[sprite_voffs + 2];
+				sxpos = spriteram16[sprite_voffs + 3];
 				logerror("$(%04x)  Tile-Attr-Xpos-Ypos Now:%04x %04x %04x %04x  nxt:%04x %04x %04x %04x\n", sprite_voffs,
 												schar, sattr, sxpos, sypos,
 											bschar,bsattr,bsxpos, bsypos);
@@ -569,59 +657,59 @@ void toaplan1_state::log_vram()
 		}
 	}
 
-	if (machine().input().code_pressed(KEYCODE_SLASH))
+	if ( machine().input().code_pressed(KEYCODE_SLASH) )
 	{
-		u16 *size  = (u16 *)(m_spritesizeram.get());
-		u16 *bsize = (u16 *)(m_buffered_spritesizeram.get());
+		uint16_t *size  = (uint16_t *)(m_spritesizeram16.get());
+		uint16_t *bsize = (uint16_t *)(m_buffered_spritesizeram16.get());
 		offs_t offs;
 		while (machine().input().code_pressed(KEYCODE_SLASH)) ;
-		if (m_spritesizeram)           /* FCU controller */
+		if (m_spritesizeram16)           /* FCU controller */
 		{
 			logerror("Scrolls    PF1-X  PF1-Y     PF2-X  PF2-Y     PF3-X  PF3-Y     PF4-X  PF4-Y\n");
 			logerror("------>    #%04x  #%04x     #%04x  #%04x     #%04x  #%04x     #%04x  #%04x\n",
-				m_scrollx[0], m_scrolly[0], m_scrollx[1], m_scrolly[1], m_scrollx[2], m_scrolly[2], m_scrollx[3], m_scrolly[3]);
-			for (offs = 0; offs < (TOAPLAN1_SPRITESIZERAM_SIZE / 2); offs += 4)
+				m_pf1_scrollx, m_pf1_scrolly, m_pf2_scrollx, m_pf2_scrolly, m_pf3_scrollx, m_pf3_scrolly, m_pf4_scrollx, m_pf4_scrolly);
+			for ( offs = 0; offs < (TOAPLAN1_SPRITESIZERAM_SIZE/2); offs +=4 )
 			{
 				logerror("SizeOffs:%04x   now:%04x %04x %04x %04x    next: %04x %04x %04x %04x\n", offs,
-												bsize[offs + 0], bsize[offs + 1],
-												bsize[offs + 2], bsize[offs + 3],
-												size[offs + 0], size[offs + 1],
-												size[offs + 2], size[offs + 3]);
+												bsize[offs+0], bsize[offs+1],
+												bsize[offs+2], bsize[offs+3],
+												size[offs+0], size[offs+1],
+												size[offs+2], size[offs+3]);
 			}
 		}
 	}
 
-	if (machine().input().code_pressed(KEYCODE_N))
+	if ( machine().input().code_pressed(KEYCODE_N) )
 	{
 		offs_t tile_voffs;
-		int tchar[4], tattr[4];
+		int tchar[5], tattr[5];
 		while (machine().input().code_pressed(KEYCODE_N)) ;   /* BCU controller */
 		logerror("Scrolls    PF1-X  PF1-Y     PF2-X  PF2-Y     PF3-X  PF3-Y     PF4-X  PF4-Y\n");
 		logerror("------>    #%04x  #%04x     #%04x  #%04x     #%04x  #%04x     #%04x  #%04x\n",
-			m_scrollx[0], m_scrolly[0], m_scrollx[1], m_scrolly[1], m_scrollx[2], m_scrolly[2], m_scrollx[3], m_scrolly[3]);
-		for (tile_voffs = 0; tile_voffs < (TOAPLAN1_TILEVRAM_SIZE / 2); tile_voffs += 2)
+			m_pf1_scrollx, m_pf1_scrolly, m_pf2_scrollx, m_pf2_scrolly, m_pf3_scrollx, m_pf3_scrolly, m_pf4_scrollx, m_pf4_scrolly);
+		for ( tile_voffs = 0; tile_voffs < (TOAPLAN1_TILEVRAM_SIZE/2); tile_voffs += 2 )
 		{
-			tchar[0] = m_tilevram[0][tile_voffs + 1];
-			tattr[0] = m_tilevram[0][tile_voffs];
-			tchar[1] = m_tilevram[1][tile_voffs + 1];
-			tattr[1] = m_tilevram[1][tile_voffs];
-			tchar[2] = m_tilevram[2][tile_voffs + 1];
-			tattr[2] = m_tilevram[2][tile_voffs];
-			tchar[3] = m_tilevram[3][tile_voffs + 1];
-			tattr[3] = m_tilevram[3][tile_voffs];
+			tchar[1] = m_pf1_tilevram16[tile_voffs + 1];
+			tattr[1] = m_pf1_tilevram16[tile_voffs];
+			tchar[2] = m_pf2_tilevram16[tile_voffs + 1];
+			tattr[2] = m_pf2_tilevram16[tile_voffs];
+			tchar[3] = m_pf3_tilevram16[tile_voffs + 1];
+			tattr[3] = m_pf3_tilevram16[tile_voffs];
+			tchar[4] = m_pf4_tilevram16[tile_voffs + 1];
+			tattr[4] = m_pf4_tilevram16[tile_voffs];
 //          logerror("PF3 offs:%04x   Tile:%04x  Attr:%04x\n", tile_voffs, tchar, tattr);
 			logerror("$(%04x)  Attr-Tile PF1:%04x-%04x  PF2:%04x-%04x  PF3:%04x-%04x  PF4:%04x-%04x\n", tile_voffs,
-									tattr[0], tchar[0],  tattr[1], tchar[1],
-									tattr[2], tchar[2],  tattr[3], tchar[3]);
+									tattr[1], tchar[1],  tattr[2], tchar[2],
+									tattr[3], tchar[3],  tattr[4], tchar[4]);
 		}
 	}
 
-	if (machine().input().code_pressed(KEYCODE_W))
+	if ( machine().input().code_pressed(KEYCODE_W) )
 	{
 		while (machine().input().code_pressed(KEYCODE_W)) ;
 		logerror("Mark here\n");
 	}
-	if (machine().input().code_pressed(KEYCODE_E))
+	if ( machine().input().code_pressed(KEYCODE_E) )
 	{
 		while (machine().input().code_pressed(KEYCODE_E)) ;
 		m_displog += 1;
@@ -631,35 +719,35 @@ void toaplan1_state::log_vram()
 	{
 		logerror("Scrolls    PF1-X  PF1-Y     PF2-X  PF2-Y     PF3-X  PF3-Y     PF4-X  PF4-Y\n");
 		logerror("------>    #%04x  #%04x     #%04x  #%04x     #%04x  #%04x     #%04x  #%04x\n",
-			m_scrollx[0], m_scrolly[0], m_scrollx[1], m_scrolly[1], m_scrollx[2], m_scrolly[2], m_scrollx[3], m_scrolly[3]);
+			m_pf1_scrollx, m_pf1_scrolly, m_pf2_scrollx, m_pf2_scrolly, m_pf3_scrollx, m_pf3_scrolly, m_pf4_scrollx, m_pf4_scrolly);
 	}
-	if (machine().input().code_pressed(KEYCODE_L))      /* Turn Playfield 4 on/off */
+	if ( machine().input().code_pressed(KEYCODE_L) )      /* Turn Playfield 4 on/off */
 	{
 		while (machine().input().code_pressed(KEYCODE_L)) ;
-		m_display_pf[3] += 1;
-		m_display_pf[3] &= 1;
-		m_tilemap[3]->enable(m_display_pf[3]);
+		m_display_pf4 += 1;
+		m_display_pf4 &= 1;
+		m_pf4_tilemap->enable(m_display_pf4);
 	}
-	if (machine().input().code_pressed(KEYCODE_K))      /* Turn Playfield 3 on/off */
+	if ( machine().input().code_pressed(KEYCODE_K) )      /* Turn Playfield 3 on/off */
 	{
 		while (machine().input().code_pressed(KEYCODE_K)) ;
-		m_display_pf[2] += 1;
-		m_display_pf[2] &= 1;
-		m_tilemap[2]->enable(m_display_pf[2]);
+		m_display_pf3 += 1;
+		m_display_pf3 &= 1;
+		m_pf3_tilemap->enable(m_display_pf3);
 	}
-	if (machine().input().code_pressed(KEYCODE_J))      /* Turn Playfield 2 on/off */
+	if ( machine().input().code_pressed(KEYCODE_J) )      /* Turn Playfield 2 on/off */
 	{
 		while (machine().input().code_pressed(KEYCODE_J)) ;
-		m_display_pf[1] += 1;
-		m_display_pf[1] &= 1;
-		m_tilemap[1]->enable(m_display_pf[1]);
+		m_display_pf2 += 1;
+		m_display_pf2 &= 1;
+		m_pf2_tilemap->enable(m_display_pf2);
 	}
-	if (machine().input().code_pressed(KEYCODE_H))      /* Turn Playfield 1 on/off */
+	if ( machine().input().code_pressed(KEYCODE_H) )      /* Turn Playfield 1 on/off */
 	{
 		while (machine().input().code_pressed(KEYCODE_H)) ;
-		m_display_pf[0] += 1;
-		m_display_pf[0] &= 1;
-		m_tilemap[0]->enable(m_display_pf[0]);
+		m_display_pf1 += 1;
+		m_display_pf1 &= 1;
+		m_pf1_tilemap->enable(m_display_pf1);
 	}
 #endif
 }
@@ -671,31 +759,31 @@ void toaplan1_state::log_vram()
 ***************************************************************************/
 
 // custom function to draw a single sprite. needed to keep correct sprites - sprites and sprites - tilemaps priorities
-static void draw_sprite_custom(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
-		u32 code, u32 color, int flipx, int flipy, int sx, int sy,
+static void toaplan1_draw_sprite_custom(screen_device &screen, bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+		uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,
 		int priority)
 {
-	const u32 pal_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-	const u8 *source_base = gfx->get_data(code % gfx->elements());
+	int pal_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
+	const uint8_t *source_base = gfx->get_data(code % gfx->elements());
 	bitmap_ind8 &priority_bitmap = screen.priority();
-	const int sprite_screen_height = ((1 << 16) * gfx->height() + 0x8000) >> 16;
-	const int sprite_screen_width = ((1 << 16) * gfx->width() + 0x8000) >> 16;
+	int sprite_screen_height = ((1<<16)*gfx->height()+0x8000)>>16;
+	int sprite_screen_width = ((1<<16)*gfx->width()+0x8000)>>16;
 
 	if (sprite_screen_width && sprite_screen_height)
 	{
 		/* compute sprite increment per screen pixel */
-		int dx = (gfx->width() << 16) / sprite_screen_width;
-		int dy = (gfx->height() << 16) / sprite_screen_height;
+		int dx = (gfx->width()<<16)/sprite_screen_width;
+		int dy = (gfx->height()<<16)/sprite_screen_height;
 
-		int ex = sx + sprite_screen_width;
-		int ey = sy + sprite_screen_height;
+		int ex = sx+sprite_screen_width;
+		int ey = sy+sprite_screen_height;
 
 		int x_index_base;
 		int y_index;
 
-		if (flipx)
+		if( flipx )
 		{
-			x_index_base = (sprite_screen_width - 1) * dx;
+			x_index_base = (sprite_screen_width-1)*dx;
 			dx = -dx;
 		}
 		else
@@ -703,9 +791,9 @@ static void draw_sprite_custom(screen_device &screen, bitmap_ind16 &dest_bmp, co
 			x_index_base = 0;
 		}
 
-		if (flipy)
+		if( flipy )
 		{
-			y_index = (sprite_screen_height - 1) * dy;
+			y_index = (sprite_screen_height-1)*dy;
 			dy = -dy;
 		}
 		else
@@ -713,46 +801,48 @@ static void draw_sprite_custom(screen_device &screen, bitmap_ind16 &dest_bmp, co
 			y_index = 0;
 		}
 
-		if (sx < clip.min_x)
+		if( sx < clip.min_x)
 		{ /* clip left */
-			int pixels = clip.min_x - sx;
+			int pixels = clip.min_x-sx;
 			sx += pixels;
-			x_index_base += pixels * dx;
+			x_index_base += pixels*dx;
 		}
-		if (sy < clip.min_y)
+		if( sy < clip.min_y )
 		{ /* clip top */
-			int pixels = clip.min_y - sy;
+			int pixels = clip.min_y-sy;
 			sy += pixels;
-			y_index += pixels * dy;
+			y_index += pixels*dy;
 		}
 		/* NS 980211 - fixed incorrect clipping */
-		if (ex > clip.max_x + 1)
+		if( ex > clip.max_x+1 )
 		{ /* clip right */
-			int pixels = ex-clip.max_x - 1;
+			int pixels = ex-clip.max_x-1;
 			ex -= pixels;
 		}
-		if (ey > clip.max_y + 1)
+		if( ey > clip.max_y+1 )
 		{ /* clip bottom */
-			int pixels = ey-clip.max_y - 1;
+			int pixels = ey-clip.max_y-1;
 			ey -= pixels;
 		}
 
-		if (ex > sx)
+		if( ex>sx )
 		{ /* skip if inner loop doesn't draw anything */
-			for (int y = sy; y < ey; y++)
-			{
-				const u8 *source = source_base + (y_index >> 16) * gfx->rowbytes();
-				u16 *dest = &dest_bmp.pix16(y);
-				u8 *pri = &priority_bitmap.pix8(y);
+			int y;
 
-				int x_index = x_index_base;
-				for (int x = sx; x < ex; x++)
+			for( y=sy; y<ey; y++ )
+			{
+				const uint8_t *source = source_base + (y_index>>16) * gfx->rowbytes();
+				uint16_t *dest = &dest_bmp.pix16(y);
+				uint8_t *pri = &priority_bitmap.pix8(y);
+
+				int x, x_index = x_index_base;
+				for( x=sx; x<ex; x++ )
 				{
-					const u8 c = source[x_index >> 16];
-					if (c != 0)
+					int c = source[x_index>>16];
+					if( c != 0 )
 					{
 						if (pri[x] < priority)
-							dest[x] = pal_base + c;
+							dest[x] = pal_base+c;
 						pri[x] = 0xff; // mark it "already drawn"
 					}
 					x_index += dx;
@@ -765,32 +855,35 @@ static void draw_sprite_custom(screen_device &screen, bitmap_ind16 &dest_bmp, co
 }
 
 
-void toaplan1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void toaplan1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	u16 *source = (u16 *)m_buffered_spriteram.get();
-	u16 *size   = (u16 *)m_buffered_spritesizeram.get();
+	uint16_t *source = (uint16_t *)m_buffered_spriteram.get();
+	uint16_t *size   = (uint16_t *)m_buffered_spritesizeram16.get();
 	int fcu_flipscreen = m_fcu_flipscreen;
+	int offs;
 
-	for (int offs = m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes()/2 - 4; offs >= 0; offs -= 4)
 	{
 		if (!(source[offs] & 0x8000))
 		{
-			int sx, sy;
+			int attrib, sprite, color, priority, sx, sy;
+			int sprite_sizex, sprite_sizey, dim_x, dim_y, sx_base, sy_base;
+			int sizeram_ptr;
 
-			const u16 attrib = source[offs + 1];
-			const u8 priority = (attrib & 0xf000) >> 12;
+			attrib = source[offs+1];
+			priority = (attrib & 0xf000) >> 12;
 
-			u32 sprite = source[offs] & 0x7fff;
-			u32 color = attrib & 0x3f;
+			sprite = source[offs] & 0x7fff;
+			color = attrib & 0x3f;
 
 			/****** find sprite dimension ******/
-			const u32 sizeram_ptr = (attrib >> 6) & 0x3f;
-			const u32 sprite_sizex = ( size[sizeram_ptr]       & 0x0f) * 8;
-			const u32 sprite_sizey = ((size[sizeram_ptr] >> 4) & 0x0f) * 8;
+			sizeram_ptr = (attrib >> 6) & 0x3f;
+			sprite_sizex = ( size[sizeram_ptr]       & 0x0f) * 8;
+			sprite_sizey = ((size[sizeram_ptr] >> 4) & 0x0f) * 8;
 
 			/****** find position to display sprite ******/
-			int sx_base = (source[offs + 2] >> 7) & 0x1ff;
-			int sy_base = (source[offs + 3] >> 7) & 0x1ff;
+			sx_base = (source[offs + 2] >> 7) & 0x1ff;
+			sy_base = (source[offs + 3] >> 7) & 0x1ff;
 
 			if (sx_base >= 0x180) sx_base -= 0x200;
 			if (sy_base >= 0x180) sy_base -= 0x200;
@@ -802,26 +895,26 @@ void toaplan1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 				sx_base = visarea.width() - (sx_base + 8);  /* visarea.x = 320 */
 				sy_base = visarea.height() - (sy_base + 8); /* visarea.y = 240 */
-				sy_base += ((visarea.max_y + 1) - visarea.height()) * 2;    /* Horizontal games are offset so adjust by  + 0x20 */
+				sy_base += ((visarea.max_y + 1) - visarea.height()) * 2;    /* Horizontal games are offset so adjust by +0x20 */
 			}
 
-			for (int dim_y = 0; dim_y < sprite_sizey; dim_y += 8)
+			for (dim_y = 0; dim_y < sprite_sizey; dim_y += 8)
 			{
 				if (fcu_flipscreen) sy = sy_base - dim_y;
 				else                sy = sy_base + dim_y;
 
-				for (int dim_x = 0; dim_x < sprite_sizex; dim_x += 8)
+				for (dim_x = 0; dim_x < sprite_sizex; dim_x += 8)
 				{
 					if (fcu_flipscreen) sx = sx_base - dim_x;
 					else                sx = sx_base + dim_x;
 
-					draw_sprite_custom(screen,bitmap,cliprect,m_gfxdecode->gfx(1),
+					toaplan1_draw_sprite_custom(screen,bitmap,cliprect,m_gfxdecode->gfx(1),
 												sprite,color,
 												fcu_flipscreen,fcu_flipscreen,
 												sx,sy,
 												priority);
 
-					sprite++;
+					sprite++ ;
 				}
 			}
 		}
@@ -835,22 +928,24 @@ void toaplan1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
     Draw the game screen in the given bitmap_ind16.
 ***************************************************************************/
 
-u32 toaplan1_rallybik_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t toaplan1_rallybik_state::screen_update_rallybik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	log_vram();
+	int priority;
+
+	toaplan1_log_vram();
 
 	m_spritegen->draw_sprites_to_tempbitmap(cliprect, m_buffered_spriteram.get(),  m_spriteram.bytes());
 
 	// first draw everything, including "disabled" tiles and priority 0
-	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
+	m_pf1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
 	// then draw the higher priority layers in order
-	for (int priority = 1; priority < 16; priority++)
+	for (priority = 1; priority < 16; priority++)
 	{
-		m_tilemap[3]->draw(screen, bitmap, cliprect, priority, 0);
-		m_tilemap[2]->draw(screen, bitmap, cliprect, priority, 0);
-		m_tilemap[1]->draw(screen, bitmap, cliprect, priority, 0);
-		m_tilemap[0]->draw(screen, bitmap, cliprect, priority, 0);
+		m_pf4_tilemap->draw(screen, bitmap, cliprect, priority, 0);
+		m_pf3_tilemap->draw(screen, bitmap, cliprect, priority, 0);
+		m_pf2_tilemap->draw(screen, bitmap, cliprect, priority, 0);
+		m_pf1_tilemap->draw(screen, bitmap, cliprect, priority, 0);
 
 		//if (pririoty==0x00)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,0);
 		if (priority==0x04)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,1);
@@ -862,22 +957,24 @@ u32 toaplan1_rallybik_state::screen_update(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-u32 toaplan1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t toaplan1_state::screen_update_toaplan1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	log_vram();
+	int priority;
+
+	toaplan1_log_vram();
 
 	screen.priority().fill(0, cliprect);
 
 	// first draw everything, including "disabled" tiles and priority 0
-	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
+	m_pf1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
 	// then draw the higher priority layers in order
-	for (int priority = 1; priority < 16; priority++)
+	for (priority = 1; priority < 16; priority++)
 	{
-		m_tilemap[3]->draw(screen, bitmap, cliprect, priority, priority, 0);
-		m_tilemap[2]->draw(screen, bitmap, cliprect, priority, priority, 0);
-		m_tilemap[1]->draw(screen, bitmap, cliprect, priority, priority, 0);
-		m_tilemap[0]->draw(screen, bitmap, cliprect, priority, priority, 0);
+		m_pf4_tilemap->draw(screen, bitmap, cliprect, priority, priority, 0);
+		m_pf3_tilemap->draw(screen, bitmap, cliprect, priority, priority, 0);
+		m_pf2_tilemap->draw(screen, bitmap, cliprect, priority, priority, 0);
+		m_pf1_tilemap->draw(screen, bitmap, cliprect, priority, priority, 0);
 	}
 
 	draw_sprites(screen, bitmap, cliprect);
@@ -890,35 +987,35 @@ u32 toaplan1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
     assume it happens automatically every frame, at the end of vblank
 ****************************************************************************/
 
-WRITE_LINE_MEMBER(toaplan1_rallybik_state::screen_vblank)
+WRITE_LINE_MEMBER(toaplan1_rallybik_state::screen_vblank_rallybik)
 {
 	// rising edge
 	if (state)
 	{
 		memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
-		interrupt();
+		toaplan1_interrupt();
 	}
 }
 
-WRITE_LINE_MEMBER(toaplan1_state::screen_vblank)
+WRITE_LINE_MEMBER(toaplan1_state::screen_vblank_toaplan1)
 {
 	// rising edge
 	if (state)
 	{
 		memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
-		memcpy(m_buffered_spritesizeram.get(), m_spritesizeram.get(), TOAPLAN1_SPRITESIZERAM_SIZE);
-		interrupt();
+		memcpy(m_buffered_spritesizeram16.get(), m_spritesizeram16.get(), TOAPLAN1_SPRITESIZERAM_SIZE);
+		toaplan1_interrupt();
 	}
 }
 
-WRITE_LINE_MEMBER(toaplan1_samesame_state::screen_vblank)
+WRITE_LINE_MEMBER(toaplan1_state::screen_vblank_samesame)
 {
 	// rising edge
 	if (state)
 	{
 		memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
-		memcpy(m_buffered_spritesizeram.get(), m_spritesizeram.get(), TOAPLAN1_SPRITESIZERAM_SIZE);
-		interrupt();
+		memcpy(m_buffered_spritesizeram16.get(), m_spritesizeram16.get(), TOAPLAN1_SPRITESIZERAM_SIZE);
+		toaplan1_interrupt();
 		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);   /* Frame done */
 	}
 }

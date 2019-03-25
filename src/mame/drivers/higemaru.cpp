@@ -163,23 +163,23 @@ static GFXDECODE_START( gfx_higemaru )
 GFXDECODE_END
 
 
-void higemaru_state::higemaru(machine_config &config)
-{
+MACHINE_CONFIG_START(higemaru_state::higemaru)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/4);  /* 3 MHz Sharp LH0080A Z80A-CPU-D */
-	m_maincpu->set_addrmap(AS_PROGRAM, &higemaru_state::higemaru_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(higemaru_state::higemaru_scanline), "screen", 0, 1);
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/4)  /* 3 MHz Sharp LH0080A Z80A-CPU-D */
+	MCFG_DEVICE_PROGRAM_MAP(higemaru_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", higemaru_state, higemaru_scanline, "screen", 0, 1)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(higemaru_state::screen_update_higemaru));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(higemaru_state, screen_update_higemaru)
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_higemaru);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_higemaru)
 
 	PALETTE(config, m_palette, FUNC(higemaru_state::higemaru_palette), 32*4+16*16, 32);
 
@@ -189,7 +189,7 @@ void higemaru_state::higemaru(machine_config &config)
 	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

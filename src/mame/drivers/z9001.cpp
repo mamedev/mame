@@ -206,8 +206,7 @@ static GFXDECODE_START( gfx_z9001 )
 GFXDECODE_END
 
 
-void z9001_state::z9001(machine_config &config)
-{
+MACHINE_CONFIG_START(z9001_state::z9001)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(9'830'400) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &z9001_state::z9001_mem);
@@ -215,16 +214,16 @@ void z9001_state::z9001(machine_config &config)
 	m_maincpu->set_daisy_config(z9001_daisy_chain);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(40*8, 24*8);
-	screen.set_visarea(0, 40*8-1, 0, 24*8-1);
-	screen.set_screen_update(FUNC(z9001_state::screen_update_z9001));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(40*8, 24*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 24*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(z9001_state, screen_update_z9001)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_z9001);
-	PALETTE(config, "palette").set_entries(16);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_z9001)
+	MCFG_PALETTE_ADD("palette", 16)
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
@@ -234,7 +233,7 @@ void z9001_state::z9001(machine_config &config)
 	/* Devices */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(z9001_state::kbd_put));
-	TIMER(config, "z9001_timer").configure_periodic(FUNC(z9001_state::timer_callback), attotime::from_msec(10));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("z9001_timer", z9001_state, timer_callback, attotime::from_msec(10))
 
 	z80pio_device& pio1(Z80PIO(config, "z80pio1", XTAL(9'830'400) / 4));
 	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -248,8 +247,8 @@ void z9001_state::z9001(machine_config &config)
 	ctc.zc_callback<0>().set(FUNC(z9001_state::cass_w));
 	ctc.zc_callback<2>().set("z80ctc", FUNC(z80ctc_device::trg3));
 
-	CASSETTE(config, m_cass);
-}
+	MCFG_CASSETTE_ADD( "cassette" )
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( z9001 )

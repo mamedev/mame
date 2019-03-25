@@ -283,13 +283,12 @@ void midcoin24cdjuke_state::machine_reset()
 }
 
 
-void midcoin24cdjuke_state::midcoin24cdjuke(machine_config &config)
-{
+MACHINE_CONFIG_START(midcoin24cdjuke_state::midcoin24cdjuke)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 6000000);         /* ? MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &midcoin24cdjuke_state::midcoin24cdjuke_map);
-	m_maincpu->set_addrmap(AS_IO, &midcoin24cdjuke_state::midcoin24cdjuke_io);
-	m_maincpu->set_periodic_int(FUNC(midcoin24cdjuke_state::irq0_line_hold), attotime::from_hz(500));
+	MCFG_DEVICE_ADD("maincpu", Z80,6000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(midcoin24cdjuke_map)
+	MCFG_DEVICE_IO_MAP(midcoin24cdjuke_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(midcoin24cdjuke_state, irq0_line_hold, 500)
 
 	config.set_default_layout(layout_24cdjuke);
 
@@ -306,7 +305,7 @@ void midcoin24cdjuke_state::midcoin24cdjuke(machine_config &config)
 	i8255_device &ic31(I8255A(config, "ic31", 0));
 	ic31.out_pb_callback().set_log("PPI8255 - unmapped write port B");
 	ic31.in_pc_callback().set_ioport("MD4");
-}
+MACHINE_CONFIG_END
 
 
 ROM_START( 24cdjuke )

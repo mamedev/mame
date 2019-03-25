@@ -24,16 +24,15 @@ DEFINE_DEVICE_TYPE(ACORN_CASS, acorn_cass_device, "acorn_cass", "Acorn Cassette 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void acorn_cass_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(acorn_cass_device::device_add_mconfig)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	CASSETTE(config, "cassette", 0);
-	TIMER(config, "cass_c").configure_periodic(FUNC(acorn_cass_device::cass_c), attotime::from_hz(4800));
-	TIMER(config, "cass_p").configure_periodic(FUNC(acorn_cass_device::cass_p), attotime::from_hz(40000));
-}
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("cass_c", acorn_cass_device, cass_c, attotime::from_hz(4800))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("cass_p", acorn_cass_device, cass_p, attotime::from_hz(40000))
+MACHINE_CONFIG_END
 
 
 //**************************************************************************

@@ -24,12 +24,12 @@ public:
 	auto read_backing() { return m_backing_read.bind(); }
 
 	// this handler automates the bits 0/2 stuff
-	uint8_t read(offs_t offset);
+	DECLARE_READ8_MEMBER(read);
 
-	uint8_t read_0();
-	uint8_t read_1();
-	uint8_t read_data();
-	uint8_t write_data(offs_t offset);
+	DECLARE_READ8_MEMBER(read_0);
+	DECLARE_READ8_MEMBER(read_1);
+	DECLARE_READ8_MEMBER(read_data);
+	DECLARE_READ8_MEMBER(write_data);
 
 	bool chip_enable();
 	void chip_reset();

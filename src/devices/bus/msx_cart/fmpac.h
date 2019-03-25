@@ -19,13 +19,14 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+
+	DECLARE_WRITE8_MEMBER(write_ym2413);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -33,8 +34,6 @@ protected:
 	void restore_banks();
 
 private:
-	void write_ym2413(offs_t offset, uint8_t data);
-
 	required_device<ym2413_device> m_ym2413;
 
 	uint8_t m_selected_bank;

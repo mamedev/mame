@@ -165,7 +165,7 @@ protected:
 	inline void consume_raw(int count);
 	inline uint8_t fetch_next_rle();
 	inline void consume_rle(int count);
-	void perform_blit();
+	void perform_blit(address_space &space);
 	void update_interrupts(int periodic, int tms34061, int blitter);
 
 	/*----------- defined in machine/itech8.cpp -----------*/

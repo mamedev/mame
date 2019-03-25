@@ -25,6 +25,7 @@ public:
 	template <unsigned Channel> auto dma_w() { return m_channel[Channel].write_cb.bind(); }
 
 	// input lines
+	template <unsigned Interrupt> DECLARE_WRITE_LINE_MEMBER(irq_w) {}
 	template <unsigned Channel> DECLARE_WRITE_LINE_MEMBER(drq_w);
 
 	void map(address_map &map);
@@ -37,12 +38,12 @@ protected:
 
 	template <unsigned Channel> DECLARE_READ32_MEMBER(load_address_r) { return m_channel[Channel].load_address; }
 	template <unsigned Channel> DECLARE_READ32_MEMBER(diag_r) { return 0; }
-	template <unsigned Channel> u16 fifo_r();
-	template <unsigned Channel> DECLARE_READ32_MEMBER(mode_r);
+	template <unsigned Channel> DECLARE_READ16_MEMBER(fifo_r) { return 0; }
+	template <unsigned Channel> DECLARE_READ32_MEMBER(mode_r) { return m_channel[Channel].mode; }
 	template <unsigned Channel> DECLARE_READ16_MEMBER(block_count_r)
 	{
 		if ((Channel == 0) || !(m_channel[Channel].mode & MODE_CHANNEL_EN))
-			return m_channel[Channel].block_count;
+			return m_channel[0].block_count;
 
 		/*
 		 * HACK: The RISC/os boot sequence tests the dma channel 1 block count
@@ -64,7 +65,7 @@ protected:
 	DECLARE_READ32_MEMBER(control_r) { return 0; }
 
 	template <unsigned Channel> DECLARE_WRITE32_MEMBER(load_address_w);
-	template <unsigned Channel> void fifo_w(u16 data);
+	template <unsigned Channel> DECLARE_WRITE16_MEMBER(fifo_w);
 	template <unsigned Channel> DECLARE_WRITE32_MEMBER(mode_w);
 	template <unsigned Channel> DECLARE_WRITE16_MEMBER(block_count_w);
 
@@ -73,8 +74,7 @@ protected:
 	DECLARE_WRITE32_MEMBER(control_w);
 
 	TIMER_CALLBACK_MEMBER(timer);
-	TIMER_CALLBACK_MEMBER(dma);
-	TIMER_CALLBACK_MEMBER(buzzer);
+	TIMER_CALLBACK_MEMBER(buzzer_toggle);
 
 private:
 	enum mode_mask : u32
@@ -92,7 +92,7 @@ private:
 		MODE_FIFO_EMPTY  = 0x00000400, // fifo empty state
 		MODE_DMA_ERROR   = 0x00000200, // parity error during transfer
 		MODE_DMA_INTR    = 0x00000100, // channel interrupt pending
-		MODE_COUNT_MASK  = 0x000000ff, // fifo queue length
+		MODE_COUNT_MASK  = 0x000000ff, // halfword count bits
 
 		MODE_WRITE_MASK  = 0xff000000,
 	};
@@ -124,18 +124,16 @@ private:
 
 		bool drq_asserted;
 
-		devcb_read16 read_cb;
-		devcb_write16 write_cb;
+		// FIXME: 16 bit dma
+		devcb_read8 read_cb;
+		devcb_write8 write_cb;
 	}
 	m_channel[2];
 
-	// FIXME: move this into dma_t
-	util::fifo<u16, 32> m_fifo[2];
-
 	emu_timer *m_timer;
-	emu_timer *m_dma;
-	emu_timer *m_buzzer;
+	emu_timer *m_buzzer_timer;
 
+	int m_irq_out_state;
 	int m_buzzer_out_state;
 
 	attotime m_tcount;

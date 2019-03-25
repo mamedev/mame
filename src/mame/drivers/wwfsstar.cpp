@@ -413,22 +413,21 @@ GFXDECODE_END
  Machine Driver(s)
 *******************************************************************************/
 
-void wwfsstar_state::wwfsstar(machine_config &config)
-{
+MACHINE_CONFIG_START(wwfsstar_state::wwfsstar)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &wwfsstar_state::main_map);
+	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", wwfsstar_state, scanline, "screen", 0, 1)
 
-	TIMER(config, "scantimer").configure_scanline(FUNC(wwfsstar_state::scanline), "screen", 0, 1);
-
-	Z80(config, m_audiocpu, XTAL(3'579'545));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &wwfsstar_state::sound_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(PIXEL_CLOCK, 320, 0, 256, 272, 8, 248);   /* HTOTAL and VTOTAL are guessed */
-	m_screen->set_screen_update(FUNC(wwfsstar_state::screen_update));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 320, 0, 256, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
+	MCFG_SCREEN_UPDATE_DRIVER(wwfsstar_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wwfsstar);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 384);
@@ -445,10 +444,10 @@ void wwfsstar_state::wwfsstar(machine_config &config)
 	ymsnd.add_route(0, "lspeaker", 0.45);
 	ymsnd.add_route(1, "rspeaker", 0.45);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH));
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.47);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.47);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
+MACHINE_CONFIG_END
 
 /*******************************************************************************
  Rom Loaders / Game Drivers

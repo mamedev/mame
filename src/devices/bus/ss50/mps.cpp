@@ -38,8 +38,8 @@ protected:
 	virtual void device_start() override { }
 
 	// interface-specific overrides
-	virtual u8 register_read(offs_t offset) override;
-	virtual void register_write(offs_t offset, u8 data) override;
+	virtual DECLARE_READ8_MEMBER(register_read) override;
+	virtual DECLARE_WRITE8_MEMBER(register_write) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(f110_w) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(f150_9600_w) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(f300_w) override;
@@ -113,18 +113,18 @@ void ss50_mps_device::device_add_mconfig(machine_config &config)
 //  register_read - read from a port register
 //-------------------------------------------------
 
-u8 ss50_mps_device::register_read(offs_t offset)
+READ8_MEMBER(ss50_mps_device::register_read)
 {
-	return m_acia->read(offset & 1);
+	return m_acia->read(space, offset & 1, 0);
 }
 
 //-------------------------------------------------
 //  register_write - write to a port register
 //-------------------------------------------------
 
-void ss50_mps_device::register_write(offs_t offset, u8 data)
+WRITE8_MEMBER(ss50_mps_device::register_write)
 {
-	m_acia->write(offset & 1, data);
+	m_acia->write(space, offset & 1, data);
 }
 
 WRITE_LINE_MEMBER(ss50_mps_device::f110_w)

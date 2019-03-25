@@ -74,55 +74,55 @@ void sns_rom_sgb_device::device_reset()
 //  ADDRESS_MAP( supergb_map )
 //-------------------------------------------------
 
-uint8_t sns_rom_sgb_device::gb_cart_r(offs_t offset)
+READ8_MEMBER(sns_rom_sgb_device::gb_cart_r)
 {
 	if (offset < 0x100 && !m_bios_disabled)
 	{
 		return m_region_bios->base()[offset];
 	}
-	return m_cartslot->read_rom(offset);
+	return m_cartslot->read_rom(space, offset);
 }
 
-void sns_rom_sgb_device::gb_bank_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(sns_rom_sgb_device::gb_bank_w)
 {
-	m_cartslot->write_bank(offset, data);
+	m_cartslot->write_bank(space, offset, data);
 }
 
-uint8_t sns_rom_sgb_device::gb_ram_r(offs_t offset)
+READ8_MEMBER(sns_rom_sgb_device::gb_ram_r)
 {
-	return m_cartslot->read_ram(offset);
+	return m_cartslot->read_ram(space, offset);
 }
 
-void sns_rom_sgb_device::gb_ram_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(sns_rom_sgb_device::gb_ram_w)
 {
-	m_cartslot->write_ram(offset, data);
+	m_cartslot->write_ram(space, offset, data);
 }
 
-uint8_t sns_rom_sgb_device::gb_echo_r(offs_t offset)
+READ8_MEMBER(sns_rom_sgb_device::gb_echo_r)
 {
-	return m_sgb_cpu->space(AS_PROGRAM).read_byte(0xc000 + offset);
+	return space.read_byte(0xc000 + offset);
 }
 
-void sns_rom_sgb_device::gb_echo_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(sns_rom_sgb_device::gb_echo_w)
 {
-	return m_sgb_cpu->space(AS_PROGRAM).write_byte(0xc000 + offset, data);
+	return space.write_byte(0xc000 + offset, data);
 }
 
-uint8_t sns_rom_sgb_device::gb_io_r(offs_t offset)
+READ8_MEMBER(sns_rom_sgb_device::gb_io_r)
 {
 	return 0;
 }
 
-void sns_rom_sgb_device::gb_io_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(sns_rom_sgb_device::gb_io_w)
 {
 }
 
-uint8_t sns_rom_sgb_device::gb_ie_r(offs_t offset)
+READ8_MEMBER(sns_rom_sgb_device::gb_ie_r)
 {
 	return m_sgb_cpu->get_ie();
 }
 
-void sns_rom_sgb_device::gb_ie_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(sns_rom_sgb_device::gb_ie_w)
 {
 	m_sgb_cpu->set_ie(data);
 }
@@ -149,7 +149,7 @@ void sns_rom_sgb_device::supergb_map(address_map &map)
 
 
 
-void sns_rom_sgb_device::gb_timer_callback(uint8_t data)
+WRITE8_MEMBER( sns_rom_sgb_device::gb_timer_callback )
 {
 }
 
@@ -220,18 +220,18 @@ const tiny_rom_entry *sns_rom_sgb2_device::device_rom_region() const
  -------------------------------------------------*/
 
 
-uint8_t sns_rom_sgb_device::read_l(offs_t offset)
+READ8_MEMBER(sns_rom_sgb_device::read_l)
 {
-	return read_h(offset);
+	return read_h(space, offset);
 }
 
-uint8_t sns_rom_sgb_device::read_h(offs_t offset)
+READ8_MEMBER(sns_rom_sgb_device::read_h)
 {
 	int bank = offset / 0x10000;
 	return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 }
 
-uint8_t sns_rom_sgb_device::chip_read(offs_t offset)
+READ8_MEMBER( sns_rom_sgb_device::chip_read )
 {
 	uint16_t address = offset & 0xffff;
 
@@ -299,7 +299,7 @@ void sns_rom_sgb_device::lcd_render(uint32_t *source)
 	}
 }
 
-void sns_rom_sgb_device::chip_write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( sns_rom_sgb_device::chip_write )
 {
 	uint16_t address = offset & 0xffff;
 

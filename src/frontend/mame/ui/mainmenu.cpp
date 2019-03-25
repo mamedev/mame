@@ -123,7 +123,7 @@ void menu_main::populate(float &customtop, float &custombottom)
 
 	item_append(menu_item_type::SEPARATOR);
 
-	if (!mame_machine_manager::instance()->favorite().is_favorite(machine()))
+	if (!mame_machine_manager::instance()->favorite().isgame_favorite())
 		item_append(_("Add To Favorites"), "", 0, (void *)ADD_FAVORITE);
 	else
 		item_append(_("Remove From Favorites"), "", 0, (void *)REMOVE_FAVORITE);
@@ -249,12 +249,12 @@ void menu_main::handle()
 			break;
 
 		case ADD_FAVORITE:
-			mame_machine_manager::instance()->favorite().add_favorite(machine());
+			mame_machine_manager::instance()->favorite().add_favorite_game();
 			reset(reset_options::REMEMBER_POSITION);
 			break;
 
 		case REMOVE_FAVORITE:
-			mame_machine_manager::instance()->favorite().remove_favorite(machine());
+			mame_machine_manager::instance()->favorite().remove_favorite_game();
 			reset(reset_options::REMEMBER_POSITION);
 			break;
 

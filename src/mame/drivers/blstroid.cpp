@@ -175,11 +175,11 @@ GFXDECODE_END
  *
  *************************************/
 
-void blstroid_state::blstroid(machine_config &config)
-{
+MACHINE_CONFIG_START(blstroid_state::blstroid)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &blstroid_state::main_map);
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
@@ -190,19 +190,19 @@ void blstroid_state::blstroid(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 512);
 
-	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 16,8, TILEMAP_SCAN_ROWS, 64,64).set_info_callback(FUNC(blstroid_state::get_playfield_tile_info));
+	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, blstroid_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, blstroid_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	m_screen->set_raw(ATARI_CLOCK_14MHz, 456*2, 0, 320*2, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(blstroid_state::screen_update_blstroid));
-	m_screen->set_palette("palette");
-	m_screen->screen_vblank().set(FUNC(blstroid_state::video_int_write_line));
+	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 320*2, 262, 0, 240)
+	MCFG_SCREEN_UPDATE_DRIVER(blstroid_state, screen_update_blstroid)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, blstroid_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(blstroid_state,blstroid)
 
@@ -217,7 +217,7 @@ void blstroid_state::blstroid(machine_config &config)
 	m_jsa->add_route(1, "rspeaker", 1.0);
 	config.device_remove("jsa:pokey");
 	config.device_remove("jsa:tms");
-}
+MACHINE_CONFIG_END
 
 
 

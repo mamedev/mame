@@ -12,68 +12,79 @@
 #include "debugger.h"
 #include "dvbpoints.h"
 
-#include <algorithm>
 #include <iomanip>
 
 
 
 // Sorting functors for the qsort function
-static bool cIndexAscending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static int cIndexAscending(const void* a, const void* b)
 {
-	return a->index() < b->index();
+	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
+	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
+	return left->index() - right->index();
 }
 
-static bool cIndexDescending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static int cIndexDescending(const void* a, const void* b)
 {
 	return cIndexAscending(b, a);
 }
 
-static bool cEnabledAscending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static int cEnabledAscending(const void* a, const void* b)
 {
-	return !a->enabled() && b->enabled();
+	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
+	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
+	return (left->enabled() ? 1 : 0) - (right->enabled() ? 1 : 0);
 }
 
-static bool cEnabledDescending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static int cEnabledDescending(const void* a, const void* b)
 {
 	return cEnabledAscending(b, a);
 }
 
-static bool cCpuAscending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static int cCpuAscending(const void* a, const void* b)
 {
-	return strcmp(a->debugInterface()->device().tag(), b->debugInterface()->device().tag()) < 0;
+	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
+	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
+	return strcmp(left->debugInterface()->device().tag(), right->debugInterface()->device().tag());
 }
 
-static bool cCpuDescending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static int cCpuDescending(const void* a, const void* b)
 {
 	return cCpuAscending(b, a);
 }
 
-static bool cAddressAscending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static int cAddressAscending(const void* a, const void* b)
 {
-	return a->address() < b->address();
+	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
+	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
+	return (left->address() > right->address()) ? 1 : (left->address() < right->address()) ? -1 : 0;
 }
 
-static bool cAddressDescending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static int cAddressDescending(const void* a, const void* b)
 {
 	return cAddressAscending(b, a);
 }
 
-static bool cConditionAscending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static int cConditionAscending(const void* a, const void* b)
 {
-	return strcmp(a->condition(), b->condition()) < 0;
+	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
+	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
+	return strcmp(left->condition(), right->condition());
 }
 
-static bool cConditionDescending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static int cConditionDescending(const void* a, const void* b)
 {
 	return cConditionAscending(b, a);
 }
 
-static bool cActionAscending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static int cActionAscending(const void* a, const void* b)
 {
-	return strcmp(a->action(), b->action()) < 0;
+	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
+	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
+	return strcmp(left->action(), right->action());
 }
 
-static bool cActionDescending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static int cActionDescending(const void* a, const void* b)
 {
 	return cActionAscending(b, a);
 }
@@ -199,7 +210,7 @@ void debug_view_breakpoints::gather_breakpoints()
 
 	// And now for the sort
 	if (!m_buffer.empty())
-		std::stable_sort(m_buffer.begin(), m_buffer.end(), m_sortType);
+		qsort(&m_buffer[0], m_buffer.size(), sizeof(device_debug::breakpoint *), m_sortType);
 }
 
 

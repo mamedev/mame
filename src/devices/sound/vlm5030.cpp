@@ -397,9 +397,9 @@ READ_LINE_MEMBER( vlm5030_device::bsy )
 }
 
 /* latch contoll data */
-void vlm5030_device::data_w(uint8_t data)
+WRITE8_MEMBER( vlm5030_device::data_w )
 {
-	m_latch_data = data;
+	m_latch_data = (uint8_t)data;
 }
 
 /* set RST pin level : reset / set table address A8-A15 */

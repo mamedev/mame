@@ -251,10 +251,10 @@ std::string vc4000_cart_slot_device::get_default_card_software(get_default_card_
  read
  -------------------------------------------------*/
 
-uint8_t vc4000_cart_slot_device::read_rom(offs_t offset)
+READ8_MEMBER(vc4000_cart_slot_device::read_rom)
 {
 	if (m_cart)
-		return m_cart->read_rom(offset);
+		return m_cart->read_rom(space, offset);
 	else
 		return 0xff;
 }
@@ -263,10 +263,10 @@ uint8_t vc4000_cart_slot_device::read_rom(offs_t offset)
  read
  -------------------------------------------------*/
 
-uint8_t vc4000_cart_slot_device::extra_rom(offs_t offset)
+READ8_MEMBER(vc4000_cart_slot_device::extra_rom)
 {
 	if (m_cart)
-		return m_cart->extra_rom(offset);
+		return m_cart->extra_rom(space, offset);
 	else
 		return 0xff;
 }
@@ -275,10 +275,10 @@ uint8_t vc4000_cart_slot_device::extra_rom(offs_t offset)
  read
  -------------------------------------------------*/
 
-uint8_t vc4000_cart_slot_device::read_ram(offs_t offset)
+READ8_MEMBER(vc4000_cart_slot_device::read_ram)
 {
 	if (m_cart)
-		return m_cart->read_ram(offset);
+		return m_cart->read_ram(space, offset);
 	else
 		return 0xff;
 }
@@ -287,8 +287,8 @@ uint8_t vc4000_cart_slot_device::read_ram(offs_t offset)
  write
  -------------------------------------------------*/
 
-void vc4000_cart_slot_device::write_ram(offs_t offset, uint8_t data)
+WRITE8_MEMBER(vc4000_cart_slot_device::write_ram)
 {
 	if (m_cart)
-		m_cart->write_ram(offset, data);
+		m_cart->write_ram(space, offset, data);
 }

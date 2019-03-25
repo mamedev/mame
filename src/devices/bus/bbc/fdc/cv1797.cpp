@@ -100,7 +100,7 @@ void bbc_cv1797_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-uint8_t bbc_cv1797_device::read(offs_t offset)
+READ8_MEMBER(bbc_cv1797_device::read)
 {
 	uint8_t data;
 
@@ -115,7 +115,7 @@ uint8_t bbc_cv1797_device::read(offs_t offset)
 	return data;
 }
 
-void bbc_cv1797_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(bbc_cv1797_device::write)
 {
 	if (offset & 0x04)
 	{

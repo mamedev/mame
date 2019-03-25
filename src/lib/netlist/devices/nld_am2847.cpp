@@ -6,7 +6,7 @@
  */
 
 #include "nld_am2847.h"
-#include "netlist/nl_base.h"
+#include "../nl_base.h"
 
 namespace netlist
 {
@@ -30,7 +30,7 @@ namespace netlist
 		logic_input_t m_RC;
 		logic_input_t m_IN;
 
-		state_array<uint16_t, 5> m_buffer;
+		state_var<uint16_t[5]> m_buffer;
 
 		logic_output_t m_OUT;
 	};
@@ -116,7 +116,7 @@ namespace netlist
 		/* do nothing */
 	}
 
-	NETLIB_FUNC_VOID(Am2847_shifter, shift, ())
+	inline NETLIB_FUNC_VOID(Am2847_shifter, shift, (void))
 	{
 		uint32_t out = m_buffer[0] & 1;
 		uint32_t in = (m_RC() ? out : m_IN());
@@ -130,8 +130,8 @@ namespace netlist
 		m_OUT.push(out, NLTIME_FROM_NS(200));
 	}
 
-	NETLIB_DEVICE_IMPL(AM2847,     "TTL_AM2847",     "+CP,+INA,+INB,+INC,+IND,+RCA,+RCB,+RCC,+RCD")
-	NETLIB_DEVICE_IMPL(AM2847_dip, "TTL_AM2847_DIP", "")
+	NETLIB_DEVICE_IMPL(AM2847)
+	NETLIB_DEVICE_IMPL(AM2847_dip)
 
 	} //namespace devices
 } // namespace netlist

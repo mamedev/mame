@@ -263,19 +263,19 @@ void cs4031_device::device_start()
 	m_space->install_rom(0xffff0000, 0xffffffff, m_bios + 0xf0000);
 
 	// install i/o accesses
-	m_space_io->install_readwrite_handler(0x0000, 0x000f, read8sm_delegate(FUNC(am9517a_device::read), &(*m_dma1)), write8sm_delegate(FUNC(am9517a_device::write), &(*m_dma1)), 0xffffffff);
+	m_space_io->install_readwrite_handler(0x0000, 0x000f, read8_delegate(FUNC(am9517a_device::read), &(*m_dma1)), write8_delegate(FUNC(am9517a_device::write), &(*m_dma1)), 0xffffffff);
 	m_space_io->install_readwrite_handler(0x0020, 0x0023, read8sm_delegate(FUNC(pic8259_device::read), &(*m_intc1)), write8sm_delegate(FUNC(pic8259_device::write), &(*m_intc1)), 0x0000ffff);
-	m_space_io->install_write_handler(0x0020, 0x0023, write8smo_delegate(FUNC(cs4031_device::config_address_w), this), 0x00ff0000);
-	m_space_io->install_readwrite_handler(0x0020, 0x0023, read8smo_delegate(FUNC(cs4031_device::config_data_r), this), write8smo_delegate(FUNC(cs4031_device::config_data_w), this), 0xff000000);
+	m_space_io->install_write_handler(0x0020, 0x0023, write8_delegate(FUNC(cs4031_device::config_address_w), this), 0x00ff0000);
+	m_space_io->install_readwrite_handler(0x0020, 0x0023, read8_delegate(FUNC(cs4031_device::config_data_r), this), write8_delegate(FUNC(cs4031_device::config_data_w), this), 0xff000000);
 	m_space_io->install_readwrite_handler(0x0040, 0x0043, read8sm_delegate(FUNC(pit8254_device::read), &(*m_ctc)), write8sm_delegate(FUNC(pit8254_device::write), &(*m_ctc)), 0xffffffff);
-	m_space_io->install_readwrite_handler(0x0060, 0x0063, read8smo_delegate(FUNC(cs4031_device::keyb_data_r), this), write8smo_delegate(FUNC(cs4031_device::keyb_data_w), this), 0x000000ff);
-	m_space_io->install_readwrite_handler(0x0060, 0x0063, read8smo_delegate(FUNC(cs4031_device::portb_r), this), write8smo_delegate(FUNC(cs4031_device::portb_w), this), 0x0000ff00);
-	m_space_io->install_readwrite_handler(0x0064, 0x0067, read8smo_delegate(FUNC(cs4031_device::keyb_status_r), this), write8smo_delegate(FUNC(cs4031_device::keyb_command_w), this), 0x000000ff);
-	m_space_io->install_readwrite_handler(0x0070, 0x0073, read8sm_delegate(FUNC(mc146818_device::read), &(*m_rtc)), write8sm_delegate(FUNC(cs4031_device::rtc_w), this), 0x0000ffff);
-	m_space_io->install_readwrite_handler(0x0080, 0x008f, read8sm_delegate(FUNC(cs4031_device::dma_page_r), this), write8sm_delegate(FUNC(cs4031_device::dma_page_w), this), 0xffffffff);
-	m_space_io->install_readwrite_handler(0x0090, 0x0093, read8smo_delegate(FUNC(cs4031_device::sysctrl_r), this), write8smo_delegate(FUNC(cs4031_device::sysctrl_w), this), 0x00ff0000);
+	m_space_io->install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(cs4031_device::keyb_data_r), this), write8_delegate(FUNC(cs4031_device::keyb_data_w), this), 0x000000ff);
+	m_space_io->install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(cs4031_device::portb_r), this), write8_delegate(FUNC(cs4031_device::portb_w), this), 0x0000ff00);
+	m_space_io->install_readwrite_handler(0x0064, 0x0067, read8_delegate(FUNC(cs4031_device::keyb_status_r), this), write8_delegate(FUNC(cs4031_device::keyb_command_w), this), 0x000000ff);
+	m_space_io->install_readwrite_handler(0x0070, 0x0073, read8_delegate(FUNC(mc146818_device::read), &(*m_rtc)), write8_delegate(FUNC(cs4031_device::rtc_w), this), 0x0000ffff);
+	m_space_io->install_readwrite_handler(0x0080, 0x008f, read8_delegate(FUNC(cs4031_device::dma_page_r), this), write8_delegate(FUNC(cs4031_device::dma_page_w), this), 0xffffffff);
+	m_space_io->install_readwrite_handler(0x0090, 0x0093, read8_delegate(FUNC(cs4031_device::sysctrl_r), this), write8_delegate(FUNC(cs4031_device::sysctrl_w), this), 0x00ff0000);
 	m_space_io->install_readwrite_handler(0x00a0, 0x00a3, read8sm_delegate(FUNC(pic8259_device::read), &(*m_intc2)), write8sm_delegate(FUNC(pic8259_device::write), &(*m_intc2)), 0x0000ffff);
-	m_space_io->install_readwrite_handler(0x00c0, 0x00df, read8sm_delegate(FUNC(cs4031_device::dma2_r),this), write8sm_delegate(FUNC(cs4031_device::dma2_w),this), 0xffffffff);
+	m_space_io->install_readwrite_handler(0x00c0, 0x00df, read8_delegate(FUNC(cs4031_device::dma2_r),this), write8_delegate(FUNC(cs4031_device::dma2_w),this), 0xffffffff);
 }
 
 //-------------------------------------------------
@@ -328,7 +328,7 @@ offs_t cs4031_device::page_offset()
 	return 0xff0000;
 }
 
-uint8_t cs4031_device::dma_read_byte(offs_t offset)
+READ8_MEMBER( cs4031_device::dma_read_byte )
 {
 	if (m_dma_channel == -1)
 		return 0xff;
@@ -336,7 +336,7 @@ uint8_t cs4031_device::dma_read_byte(offs_t offset)
 	return m_space->read_byte(page_offset() + offset);
 }
 
-void cs4031_device::dma_write_byte(offs_t offset, uint8_t data)
+WRITE8_MEMBER( cs4031_device::dma_write_byte )
 {
 	if (m_dma_channel == -1)
 		return;
@@ -344,7 +344,7 @@ void cs4031_device::dma_write_byte(offs_t offset, uint8_t data)
 	m_space->write_byte(page_offset() + offset, data);
 }
 
-uint8_t cs4031_device::dma_read_word(offs_t offset)
+READ8_MEMBER( cs4031_device::dma_read_word )
 {
 	if (m_dma_channel == -1)
 		return 0xff;
@@ -355,7 +355,7 @@ uint8_t cs4031_device::dma_read_word(offs_t offset)
 	return result;
 }
 
-void cs4031_device::dma_write_word(offs_t offset, uint8_t data)
+WRITE8_MEMBER( cs4031_device::dma_write_word )
 {
 	if (m_dma_channel == -1)
 		return;
@@ -377,8 +377,6 @@ WRITE_LINE_MEMBER( cs4031_device::dma1_eop_w )
 
 void cs4031_device::set_dma_channel(int channel, bool state)
 {
-	//m_write_dack(channel, state);
-
 	if (!state)
 	{
 		m_dma_channel = channel;
@@ -431,7 +429,7 @@ void cs4031_device::trigger_nmi()
 	}
 }
 
-uint8_t cs4031_device::intc1_slave_ack_r(offs_t offset)
+READ8_MEMBER( cs4031_device::intc1_slave_ack_r )
 {
 	if (offset == 2) // IRQ 2
 		return m_intc2->acknowledge();
@@ -478,13 +476,13 @@ WRITE_LINE_MEMBER( cs4031_device::ctc_out2_w )
 //  CHIPSET CONFIGURATION
 //**************************************************************************
 
-void cs4031_device::config_address_w(uint8_t data)
+WRITE8_MEMBER( cs4031_device::config_address_w )
 {
 	m_address = data;
 	m_address_valid = (m_address < 0x20) ? true : false;
 }
 
-uint8_t cs4031_device::config_data_r()
+READ8_MEMBER( cs4031_device::config_data_r )
 {
 	uint8_t result = 0xff;
 
@@ -501,7 +499,7 @@ uint8_t cs4031_device::config_data_r()
 	return result;
 }
 
-void cs4031_device::config_data_w(uint8_t data)
+WRITE8_MEMBER( cs4031_device::config_data_w )
 {
 	if (m_address_valid)
 	{
@@ -694,21 +692,21 @@ void cs4031_device::keyboard_gatea20(int state)
 	update_a20m();
 }
 
-uint8_t cs4031_device::keyb_status_r()
+READ8_MEMBER( cs4031_device::keyb_status_r )
 {
 	LOGKEYBOARD("cs4031_device::keyb_status_r\n");
 
-	return m_keybc->status_r();
+	return m_keybc->status_r(space, 0);
 }
 
-void cs4031_device::keyb_command_blocked_w(uint8_t data)
+WRITE8_MEMBER( cs4031_device::keyb_command_blocked_w )
 {
 	// command is optionally blocked
 	if (!BIT(m_registers[SOFT_RESET_AND_GATEA20], 7))
-		m_keybc->command_w(data);
+		m_keybc->command_w(space, 0, data);
 }
 
-void cs4031_device::keyb_command_w(uint8_t data)
+WRITE8_MEMBER( cs4031_device::keyb_command_w )
 {
 	LOGKEYBOARD("cs4031_device::keyb_command_w: %02x\n", data);
 
@@ -722,12 +720,12 @@ void cs4031_device::keyb_command_w(uint8_t data)
 		emulated_gatea20(1);
 
 		// self-test is never blocked
-		m_keybc->command_w(data);
+		m_keybc->command_w(space, 0, data);
 		break;
 
 	case 0xd1:
 		m_keybc_d1_written = true;
-		keyb_command_blocked_w(data);
+		keyb_command_blocked_w(space, 0, data);
 		break;
 
 	case 0xf0:
@@ -756,7 +754,7 @@ void cs4031_device::keyb_command_w(uint8_t data)
 			emulated_gatea20(1);
 		}
 
-		keyb_command_blocked_w(data);
+		keyb_command_blocked_w(space, 0, data);
 
 		break;
 
@@ -765,28 +763,28 @@ void cs4031_device::keyb_command_w(uint8_t data)
 		if (m_keybc_data_blocked)
 		{
 			m_keybc_data_blocked = false;
-			keyb_command_blocked_w(data);
+			keyb_command_blocked_w(space, 0, data);
 		}
 		else
-			m_keybc->command_w(data);
+			m_keybc->command_w(space, 0, data);
 
 		break;
 
 	// everything else goes directly to the keyboard controller
 	default:
-		m_keybc->command_w(data);
+		m_keybc->command_w(space, 0, data);
 		break;
 	}
 }
 
-uint8_t cs4031_device::keyb_data_r()
+READ8_MEMBER( cs4031_device::keyb_data_r )
 {
 	LOGKEYBOARD("cs4031_device::keyb_data_r\n");
 
-	return m_keybc->data_r();
+	return m_keybc->data_r(space, 0);
 }
 
-void cs4031_device::keyb_data_w(uint8_t data)
+WRITE8_MEMBER( cs4031_device::keyb_data_w )
 {
 	LOGKEYBOARD("cs4031_device::keyb_data_w: %02x\n", data);
 
@@ -800,7 +798,7 @@ void cs4031_device::keyb_data_w(uint8_t data)
 	else
 	{
 		m_keybc_data_blocked = false;
-		m_keybc->data_w(data);
+		m_keybc->data_w(space, 0, data);
 	}
 }
 
@@ -839,7 +837,7 @@ WRITE_LINE_MEMBER( cs4031_device::kbrst_w )
     1 - Fast Gate A20
 
  */
-void cs4031_device::sysctrl_w(uint8_t data)
+WRITE8_MEMBER( cs4031_device::sysctrl_w )
 {
 	LOGIO("cs4031_device::sysctrl_w: %u\n", data);
 
@@ -855,7 +853,7 @@ void cs4031_device::sysctrl_w(uint8_t data)
 	m_cpureset = BIT(data, 0);
 }
 
-uint8_t cs4031_device::sysctrl_r()
+READ8_MEMBER( cs4031_device::sysctrl_r )
 {
 	uint8_t result = 0; // reserved bits read as 0?
 
@@ -885,7 +883,7 @@ uint8_t cs4031_device::sysctrl_r()
     7 - Parity check latch (r) [not emulated]
 */
 
-uint8_t cs4031_device::portb_r()
+READ8_MEMBER( cs4031_device::portb_r )
 {
 	if (0)
 		logerror("cs4031_device::portb_r: %02x\n", m_portb);
@@ -893,7 +891,7 @@ uint8_t cs4031_device::portb_r()
 	return m_portb;
 }
 
-void cs4031_device::portb_w(uint8_t data)
+WRITE8_MEMBER( cs4031_device::portb_w )
 {
 	if (0)
 		logerror("cs4031_device::portb_w: %02x\n", data);
@@ -919,7 +917,7 @@ void cs4031_device::portb_w(uint8_t data)
     7   - NMI mask
     6:0 - RTC address
  */
-void cs4031_device::rtc_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( cs4031_device::rtc_w )
 {
 	if (0)
 		logerror("cs4031_device::rtc_w: %02x\n", data);
@@ -930,5 +928,5 @@ void cs4031_device::rtc_w(offs_t offset, uint8_t data)
 		data &= 0x7f;
 	}
 
-	m_rtc->write(offset, data);
+	m_rtc->write(space, offset, data);
 }

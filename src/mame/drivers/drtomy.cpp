@@ -306,22 +306,22 @@ void drtomy_state::machine_reset()
 	m_oki_bank = 0;
 }
 
-void drtomy_state::drtomy(machine_config &config)
-{
+MACHINE_CONFIG_START(drtomy_state::drtomy)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 24000000/2);          /* ? MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &drtomy_state::drtomy_map);
-	m_maincpu->set_vblank_int("screen", FUNC(drtomy_state::irq6_line_hold));
+	MCFG_DEVICE_ADD("maincpu", M68000,24000000/2)          /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(drtomy_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", drtomy_state,  irq6_line_hold)
 
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(32*16, 32*16);
-	screen.set_visarea(0, 320-1, 16, 256-1);
-	screen.set_screen_update(FUNC(drtomy_state::screen_update_drtomy));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(32*16, 32*16)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
+	MCFG_SCREEN_UPDATE_DRIVER(drtomy_state, screen_update_drtomy)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_drtomy);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
@@ -329,8 +329,9 @@ void drtomy_state::drtomy(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, 26000000/16, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.8);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, 26000000/16, okim6295_device::PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+MACHINE_CONFIG_END
 
 
 ROM_START( drtomy )

@@ -266,10 +266,9 @@ void a26_rom_dpc_device::setup_addon_ptr(uint8_t *ptr)
 }
 
 
-void a26_rom_dpc_device::device_add_mconfig(machine_config &config)
-{
-	ATARI_DPC(config, m_dpc, 0);
-}
+MACHINE_CONFIG_START(a26_rom_dpc_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("dpc", ATARI_DPC, 0)
+MACHINE_CONFIG_END
 
 READ8_MEMBER(a26_rom_dpc_device::read_rom)
 {

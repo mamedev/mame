@@ -65,14 +65,17 @@ void electron_mgc_device::device_reset()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t electron_mgc_device::read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
+uint8_t electron_mgc_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa)
 {
 	uint8_t data = 0xff;
 
-	if (oe)
+	if (!infc && !infd)
 	{
-		int m_page_mode = BIT(m_control_latch, 2) ? BIT(m_control_latch, 1) : !romqa;
-		data = m_nvram[(offset & 0x3fff) | (m_page_latch << 14) | (m_page_mode << 21)];
+		if (offset >= 0x0000 && offset < 0x4000)
+		{
+			int m_page_mode = BIT(m_control_latch, 2) ? BIT(m_control_latch, 1) : !romqa;
+			data = m_nvram[(offset & 0x3fff) | (m_page_latch << 14) | (m_page_mode << 21)];
+		}
 	}
 
 	return data;
@@ -82,7 +85,7 @@ uint8_t electron_mgc_device::read(offs_t offset, int infc, int infd, int romqa, 
 //  write - cartridge data write
 //-------------------------------------------------
 
-void electron_mgc_device::write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
+void electron_mgc_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa)
 {
 	if (infc)
 	{
@@ -97,9 +100,13 @@ void electron_mgc_device::write(offs_t offset, uint8_t data, int infc, int infd,
 			break;
 		}
 	}
-	else if (oe)
+
+	if (!infc && !infd)
 	{
-		int m_page_mode = BIT(m_control_latch, 2) ? BIT(m_control_latch, 1) : !romqa;
-		m_nvram[(offset & 0x3fff) | (m_page_latch << 14) | (m_page_mode << 21)] = data;
+		if (offset >= 0x0000 && offset < 0x4000 && BIT(m_control_latch, 0))
+		{
+			int m_page_mode = BIT(m_control_latch, 2) ? BIT(m_control_latch, 1) : !romqa;
+			m_nvram[(offset & 0x3fff) | (m_page_latch << 14) | (m_page_mode << 21)] = data;
+		}
 	}
 }

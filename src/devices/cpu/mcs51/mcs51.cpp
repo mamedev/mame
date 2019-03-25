@@ -874,8 +874,6 @@ uint8_t mcs51_cpu_device::bit_address_r(uint8_t offset)
 	int distance;   /* distance between bit addressable words */
 					/* 1 for normal bits, 8 for sfr bit addresses */
 
-	m_last_bit = offset;
-
 	//User defined bit addresses 0x20-0x2f (values are 0x0-0x7f)
 	if (offset < 0x80) {
 		distance = 1;
@@ -1360,8 +1358,6 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 		m_recalc_parity = 0;
 	}
 
-	m_last_op = op;
-
 	switch( op )
 	{
 		case 0x00:  nop(op);                           break;  //NOP
@@ -1781,10 +1777,6 @@ void mcs51_cpu_device::check_irqs()
 		return;
 	}
 
-	// Hack to work around polling latency issue with JB INT0/INT1
-	if (m_last_op == 0x20 && ((int_vec == V_IE0 && m_last_bit == 0xb2) || (int_vec == V_IE1 && m_last_bit == 0xb3)))
-		PC = PPC + 3;
-
 	//Save current pc to stack, set pc to new interrupt vector
 	push_pc();
 	PC = int_vec;
@@ -2134,8 +2126,6 @@ void mcs51_cpu_device::device_start()
 
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_pc));
-	save_item(NAME(m_last_op));
-	save_item(NAME(m_last_bit));
 	save_item(NAME(m_rwm) );
 	save_item(NAME(m_cur_irq_prio) );
 	save_item(NAME(m_last_line_state) );
@@ -2223,8 +2213,6 @@ void mcs51_cpu_device::device_reset()
 	/* Flag as NO IRQ in Progress */
 	m_irq_active = 0;
 	m_cur_irq_prio = -1;
-	m_last_op = 0;
-	m_last_bit = 0;
 
 	/* these are all defined reset states */
 	PC = 0;

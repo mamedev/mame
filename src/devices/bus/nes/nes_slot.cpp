@@ -592,12 +592,6 @@ void device_nes_cart_interface::reset_cpu()
 	m_maincpu->set_pc(0xfffc);
 }
 
-void device_nes_cart_interface::poke(offs_t offset, uint8_t data)
-{
-	// even worse hack
-	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
-}
-
 //-------------------------------------------------
 //  Other helpers
 //-------------------------------------------------
@@ -630,7 +624,7 @@ uint8_t device_nes_cart_interface::account_bus_conflict(uint32_t offset, uint8_t
 //  PPU accessors
 //-------------------------------------------------
 
-void device_nes_cart_interface::chr_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(device_nes_cart_interface::chr_w)
 {
 	int bank = offset >> 10;
 
@@ -638,14 +632,14 @@ void device_nes_cart_interface::chr_w(offs_t offset, uint8_t data)
 		m_chr_access[bank][offset & 0x3ff] = data;
 }
 
-uint8_t device_nes_cart_interface::chr_r(offs_t offset)
+READ8_MEMBER(device_nes_cart_interface::chr_r)
 {
 	int bank = offset >> 10;
 	return m_chr_access[bank][offset & 0x3ff];
 }
 
 
-void device_nes_cart_interface::nt_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(device_nes_cart_interface::nt_w)
 {
 	int page = ((offset & 0xc00) >> 10);
 
@@ -655,7 +649,7 @@ void device_nes_cart_interface::nt_w(offs_t offset, uint8_t data)
 	m_nt_access[page][offset & 0x3ff] = data;
 }
 
-uint8_t device_nes_cart_interface::nt_r(offs_t offset)
+READ8_MEMBER(device_nes_cart_interface::nt_r)
 {
 	int page = ((offset & 0xc00) >> 10);
 	return m_nt_access[page][offset & 0x3ff];
@@ -671,26 +665,26 @@ uint8_t device_nes_cart_interface::nt_r(offs_t offset)
 //  source)
 //-------------------------------------------------
 
-uint8_t device_nes_cart_interface::read_l(offs_t offset)
+READ8_MEMBER(device_nes_cart_interface::read_l)
 {
-	return get_open_bus();
+	return m_open_bus;
 }
 
-uint8_t device_nes_cart_interface::read_m(offs_t offset)
+READ8_MEMBER(device_nes_cart_interface::read_m)
 {
 	if (!m_battery.empty())
 		return m_battery[offset & (m_battery.size() - 1)];
 	if (!m_prgram.empty())
 		return m_prgram[offset & (m_prgram.size() - 1)];
 
-	return get_open_bus();
+	return m_open_bus;
 }
 
-void device_nes_cart_interface::write_l(offs_t offset, uint8_t data)
+WRITE8_MEMBER(device_nes_cart_interface::write_l)
 {
 }
 
-void device_nes_cart_interface::write_m(offs_t offset, uint8_t data)
+WRITE8_MEMBER(device_nes_cart_interface::write_m)
 {
 	if (!m_battery.empty())
 		m_battery[offset & (m_battery.size() - 1)] = data;
@@ -698,7 +692,7 @@ void device_nes_cart_interface::write_m(offs_t offset, uint8_t data)
 		m_prgram[offset & (m_prgram.size() - 1)] = data;
 }
 
-void device_nes_cart_interface::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(device_nes_cart_interface::write_h)
 {
 }
 
@@ -746,9 +740,6 @@ void device_nes_cart_interface::pcb_start(running_machine &machine, uint8_t *cir
 		device().save_item(NAME(m_vram));
 	if (!m_battery.empty())
 		device().save_item(NAME(m_battery));
-
-	// open bus
-	device().save_item(NAME(m_open_bus));
 }
 
 void device_nes_cart_interface::pcb_reg_postload(running_machine &machine)
@@ -952,11 +943,11 @@ std::string nes_cart_slot_device::get_default_card_software(get_default_card_sof
  read
  -------------------------------------------------*/
 
-uint8_t nes_cart_slot_device::read_l(offs_t offset)
+READ8_MEMBER(nes_cart_slot_device::read_l)
 {
 	if (m_cart)
 	{
-		uint8_t val = m_cart->read_l(offset);
+		uint8_t val = m_cart->read_l(space, offset);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x4100) & 0xff00) >> 8);
 		return val;
@@ -965,11 +956,11 @@ uint8_t nes_cart_slot_device::read_l(offs_t offset)
 		return 0xff;
 }
 
-uint8_t nes_cart_slot_device::read_m(offs_t offset)
+READ8_MEMBER(nes_cart_slot_device::read_m)
 {
 	if (m_cart)
 	{
-		uint8_t val = m_cart->read_m(offset);
+		uint8_t val = m_cart->read_m(space, offset);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x6000) & 0xff00) >> 8);
 		return val;
@@ -978,11 +969,11 @@ uint8_t nes_cart_slot_device::read_m(offs_t offset)
 		return 0xff;
 }
 
-uint8_t nes_cart_slot_device::read_h(offs_t offset)
+READ8_MEMBER(nes_cart_slot_device::read_h)
 {
 	if (m_cart)
 	{
-		uint8_t val = m_cart->read_h(offset);
+		uint8_t val = m_cart->read_h(space, offset);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x8000) & 0xff00) >> 8);
 		return val;
@@ -991,11 +982,11 @@ uint8_t nes_cart_slot_device::read_h(offs_t offset)
 		return 0xff;
 }
 
-uint8_t nes_cart_slot_device::read_ex(offs_t offset)
+READ8_MEMBER(nes_cart_slot_device::read_ex)
 {
 	if (m_cart)
 	{
-		uint8_t val = m_cart->read_ex(offset);
+		uint8_t val = m_cart->read_ex(space, offset);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x4020) & 0xff00) >> 8);
 		return val;
@@ -1009,41 +1000,41 @@ uint8_t nes_cart_slot_device::read_ex(offs_t offset)
  write
  -------------------------------------------------*/
 
-void nes_cart_slot_device::write_l(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_cart_slot_device::write_l)
 {
 	if (m_cart)
 	{
-		m_cart->write_l(offset, data);
+		m_cart->write_l(space, offset, data);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x4100) & 0xff00) >> 8);
 	}
 }
 
-void nes_cart_slot_device::write_m(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_cart_slot_device::write_m)
 {
 	if (m_cart)
 	{
-		m_cart->write_m(offset, data);
+		m_cart->write_m(space, offset, data);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x6000) & 0xff00) >> 8);
 	}
 }
 
-void nes_cart_slot_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_cart_slot_device::write_h)
 {
 	if (m_cart)
 	{
-		m_cart->write_h(offset, data);
+		m_cart->write_h(space, offset, data);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x8000) & 0xff00) >> 8);
 	}
 }
 
-void nes_cart_slot_device::write_ex(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_cart_slot_device::write_ex)
 {
 	if (m_cart)
 	{
-		m_cart->write_ex(offset, data);
+		m_cart->write_ex(space, offset, data);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x4020) & 0xff00) >> 8);
 	}

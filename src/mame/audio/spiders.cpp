@@ -204,8 +204,9 @@ WRITE8_MEMBER(spiders_state::spiders_audio_ctrl_w)
 }
 
 
-void spiders_state::spiders_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(spiders_state::spiders_audio)
+
 	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, spiders_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, spiders_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END

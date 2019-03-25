@@ -10,8 +10,8 @@ class t6w28_device : public device_t, public device_sound_interface
 public:
 	t6w28_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void write(offs_t offset, uint8_t data);
-	void set_enable(bool enable);
+	DECLARE_WRITE8_MEMBER( write );
+	void set_enable( bool enable );
 
 protected:
 	// device-level overrides

@@ -1,24 +1,21 @@
 // license:GPL-2.0+
 // copyright-holders:Dirk Best
-/******************************************************************************
+/***************************************************************************
 
     National Semiconductor INS8154
 
     N-Channel 128-by-8 Bit RAM Input/Output (RAM I/O)
 
     TODO: Strobed modes
-    TODO: Check the ODRx register for where to get pin values, _cb() vs m_out_x
 
-*******************************************************************************/
+***************************************************************************/
 
 #include "emu.h"
 #include "ins8154.h"
 
-#define LOG_BITS   (1U <<  1)
-//#define VERBOSE (LOG_BITS) // (LOG_GENERAL|LOG_BITS)
+#define VERBOSE 1
 #include "logmacro.h"
 
-#define LOGBITS(...)   LOGMASKED(LOG_BITS,   __VA_ARGS__)
 
 /***************************************************************************
     CONSTANTS
@@ -78,7 +75,6 @@ void ins8154_device::device_start()
 	save_item(NAME(m_mdr));
 	save_item(NAME(m_odra));
 	save_item(NAME(m_odrb));
-	save_item(NAME(m_ram));
 }
 
 
@@ -98,7 +94,7 @@ void ins8154_device::device_reset()
 }
 
 
-uint8_t ins8154_device::read_io(offs_t offset)
+READ8_MEMBER(ins8154_device::ins8154_r)
 {
 	uint8_t val = 0xff;
 
@@ -123,23 +119,17 @@ uint8_t ins8154_device::read_io(offs_t offset)
 		break;
 
 	default:
-		val = 0;
-		if (offset < 0x08) // Read a bit in Port A
+		if (offset < 0x08)
 		{
 			if (!m_in_a_cb.isnull())
-			{
-				//val = (m_in_a_cb(0) << (8 - offset)) & 0x80;
-				val = (m_in_a_cb(0) & ~m_odra & (1 << (offset & 0x07))) ? 0x80 : 0x00;
-			}
-			LOGBITS("%s: INS8154 Port A read bit %02x: %02x\n", machine().describe_context(), offset & 0x07, val);
+				val = (m_in_a_cb(0) << (8 - offset)) & 0x80;
+			m_in_a = val;
 		}
-		else  // Read a bit in Port B
+		else
 		{
 			if (!m_in_b_cb.isnull())
-			{
-				val = (m_in_b_cb(0) & ~m_odrb & (1 << (offset & 0x07))) ? 0x80 : 0x00;
-			}
-			LOGBITS("%s: INS8154 Port B read bit %02x: %02x\n", machine().describe_context(), offset & 0x07, val);
+				val = (m_in_b_cb(0) << (8 - (offset >> 4))) & 0x80;
+			m_in_b = val;
 		}
 		break;
 	}
@@ -147,12 +137,7 @@ uint8_t ins8154_device::read_io(offs_t offset)
 	return val;
 }
 
-uint8_t ins8154_device::read_ram(offs_t offset)
-{
-	return m_ram[offset & 0x7f];
-}
-
-void ins8154_device::porta_w(uint8_t data)
+WRITE8_MEMBER(ins8154_device::ins8154_porta_w)
 {
 	m_out_a = data;
 
@@ -161,9 +146,8 @@ void ins8154_device::porta_w(uint8_t data)
 		m_out_a_cb(offs_t(0), (data & m_odra) | (m_odra ^ 0xff));
 }
 
-void ins8154_device::portb_w(uint8_t data)
+WRITE8_MEMBER(ins8154_device::ins8154_portb_w)
 {
-	LOG("%s: INS8154 Write PortB %02x with odrb: %02x\n", machine().describe_context(), data, m_odrb);
 	m_out_b = data;
 
 	/* Test if any pins are set as outputs */
@@ -171,7 +155,7 @@ void ins8154_device::portb_w(uint8_t data)
 		m_out_b_cb(offs_t(0), (data & m_odrb) | (m_odrb ^ 0xff));
 }
 
-void ins8154_device::write_io(offs_t offset, uint8_t data)
+WRITE8_MEMBER(ins8154_device::ins8154_w)
 {
 	if (offset > 0x24)
 	{
@@ -182,11 +166,11 @@ void ins8154_device::write_io(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 	case 0x20:
-		porta_w(data);
+		ins8154_porta_w(space, 0, data);
 		break;
 
 	case 0x21:
-		portb_w(data);
+		ins8154_portb_w(space, 0, data);
 		break;
 
 	case 0x22:
@@ -209,35 +193,18 @@ void ins8154_device::write_io(offs_t offset, uint8_t data)
 		{
 			/* Set bit */
 			if (offset < 0x08)
-			{
-				LOGBITS("%s: INS8154 Port A set bit %02x\n", machine().describe_context(), offset & 0x07);
-				porta_w(m_out_a |= (1 << (offset & 0x07)));
-			}
+				ins8154_porta_w(space, 0, m_out_a |= offset & 0x07);
 			else
-			{
-				LOGBITS("%s: INS8154 Port B set bit %02x\n", machine().describe_context(), offset & 0x07);
-				portb_w(m_out_b |= (1 << (offset & 0x07)));
-			}
+				ins8154_portb_w(space, 0, m_out_b |= (offset >> 4) & 0x07);
 		}
 		else
 		{
 			/* Clear bit */
 			if (offset < 0x08)
-			{
-				LOGBITS("%s: INS8154 Port A clear bit %02x\n", machine().describe_context(), offset & 0x07);
-				porta_w(m_out_a & ~(1 << (offset & 0x07)));
-			}
+				ins8154_porta_w(space, 0, m_out_a & ~(offset & 0x07));
 			else
-			{
-				LOGBITS("%s: INS8154 Port B clear bit %02x\n", machine().describe_context(), offset & 0x07);
-				portb_w(m_out_b & ~(1 << (offset & 0x07)));
-			}
+				ins8154_portb_w(space, 0, m_out_b & ~((offset >> 4) & 0x07));
 		}
 		break;
 	}
-}
-
-void ins8154_device::write_ram(offs_t offset, uint8_t data)
-{
-	m_ram[offset & 0x7f] = data;
 }

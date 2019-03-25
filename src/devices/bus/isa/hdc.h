@@ -19,6 +19,11 @@
 
 // XT HD controller device
 
+#define MCFG_XTHDC_IRQ_HANDLER(_devcb) \
+	downcast<xt_hdc_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+
+#define MCFG_XTHDC_DRQ_HANDLER(_devcb) \
+	downcast<xt_hdc_device &>(*device).set_drq_handler(DEVCB_##_devcb);
 
 class xt_hdc_device :
 		public device_t
@@ -27,8 +32,8 @@ public:
 	// construction/destruction
 	xt_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto irq_handler() { return m_irq_handler.bind(); }
-	auto drq_handler() { return m_drq_handler.bind(); }
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_drq_handler(Object &&cb) { return m_drq_handler.set_callback(std::forward<Object>(cb)); }
 
 	int dack_r();
 	int dack_rs();

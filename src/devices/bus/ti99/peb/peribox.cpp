@@ -272,15 +272,15 @@ READ8Z_MEMBER(peribox_device::readz)
 {
 	for (int i=2; i <= 8; i++)
 	{
-		if (m_slot[i]!=nullptr) m_slot[i]->readz(offset | m_address_prefix, value);
+		if (m_slot[i]!=nullptr) m_slot[i]->readz(space, offset | m_address_prefix, value, mem_mask);
 	}
 }
 
-void peribox_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(peribox_device::write)
 {
 	for (int i=2; i <= 8; i++)
 	{
-		if (m_slot[i]!=nullptr) m_slot[i]->write(offset | m_address_prefix, data);
+		if (m_slot[i]!=nullptr) m_slot[i]->write(space, offset | m_address_prefix, data, mem_mask);
 	}
 }
 
@@ -291,7 +291,7 @@ SETADDRESS_DBIN_MEMBER(peribox_device::setaddress_dbin)
 
 	for (int i=2; i <= 8; i++)
 	{
-		if (m_slot[i]!=nullptr) m_slot[i]->setaddress_dbin(offset | m_address_prefix, state);
+		if (m_slot[i]!=nullptr) m_slot[i]->setaddress_dbin(space, offset | m_address_prefix, state);
 	}
 }
 
@@ -299,15 +299,15 @@ READ8Z_MEMBER(peribox_device::crureadz)
 {
 	for (int i=2; i <= 8; i++)
 	{
-		if (m_slot[i]!=nullptr) m_slot[i]->crureadz(offset, value);
+		if (m_slot[i]!=nullptr) m_slot[i]->crureadz(space, offset, value);
 	}
 }
 
-void peribox_device::cruwrite(offs_t offset, uint8_t data)
+WRITE8_MEMBER(peribox_device::cruwrite)
 {
 	for (int i=2; i <= 8; i++)
 	{
-		if (m_slot[i]!=nullptr) m_slot[i]->cruwrite(offset, data);
+		if (m_slot[i]!=nullptr) m_slot[i]->cruwrite(space, offset, data);
 	}
 }
 
@@ -647,27 +647,27 @@ peribox_slot_device::peribox_slot_device(const machine_config &mconfig, const ch
 
 READ8Z_MEMBER(peribox_slot_device::readz)
 {
-	m_card->readz(offset, value);
+	m_card->readz(space, offset, value, mem_mask);
 }
 
-void peribox_slot_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(peribox_slot_device::write)
 {
-	m_card->write(offset, data);
+	m_card->write(space, offset, data, mem_mask);
 }
 
 SETADDRESS_DBIN_MEMBER(peribox_slot_device::setaddress_dbin)
 {
-	m_card->setaddress_dbin(offset, state);
+	m_card->setaddress_dbin(space, offset, state);
 }
 
 READ8Z_MEMBER(peribox_slot_device::crureadz)
 {
-	m_card->crureadz(offset, value);
+	m_card->crureadz(space, offset, value);
 }
 
-void peribox_slot_device::cruwrite(offs_t offset, uint8_t data)
+WRITE8_MEMBER(peribox_slot_device::cruwrite)
 {
-	m_card->cruwrite(offset, data);
+	m_card->cruwrite(space, offset, data);
 }
 
 WRITE_LINE_MEMBER( peribox_slot_device::senila )

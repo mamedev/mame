@@ -84,14 +84,13 @@ static INPUT_PORTS_START( castrev )
 INPUT_PORTS_END
 
 
-void castle_state::castle_V1rvE(machine_config &config)
-{
-	HD6303Y(config, m_maincpu, 1000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &castle_state::V1rvE_mastermap);
+MACHINE_CONFIG_START(castle_state::castle_V1rvE)
+	MCFG_DEVICE_ADD("maincpu", HD6303Y, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(V1rvE_mastermap)
 
-	hd6303y_cpu_device &slavecpu(HD6303Y(config, "slavecpu", 1000000));
-	slavecpu.set_addrmap(AS_PROGRAM, &castle_state::V1rvE_slavemap);
-}
+	MCFG_DEVICE_ADD("slavecpu", HD6303Y, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(V1rvE_slavemap)
+MACHINE_CONFIG_END
 
 
 
@@ -103,13 +102,12 @@ void castle_state::V2rvA_map(address_map &map)
 }
 
 
-void castle_state::castle_V2rvA(machine_config &config)
-{
-	HD6303Y(config, m_maincpu, 1000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &castle_state::V2rvA_map);
+MACHINE_CONFIG_START(castle_state::castle_V2rvA)
+	MCFG_DEVICE_ADD("maincpu", HD6303Y, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(V2rvA_map)
 
-	PIA6821(config, "pia");
-}
+	MCFG_DEVICE_ADD("pia", PIA6821)
+MACHINE_CONFIG_END
 
 
 ROM_START( castrev )

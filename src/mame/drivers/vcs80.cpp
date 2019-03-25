@@ -213,8 +213,7 @@ void vcs80_state::machine_start()
 
 /* Machine Driver */
 
-void vcs80_state::vcs80(machine_config &config)
-{
+MACHINE_CONFIG_START(vcs80_state::vcs80)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(5'000'000)/2); /* U880D */
 	m_maincpu->set_addrmap(AS_PROGRAM, &vcs80_state::vcs80_mem);
@@ -222,7 +221,7 @@ void vcs80_state::vcs80(machine_config &config)
 	m_maincpu->set_daisy_config(vcs80_daisy_chain);
 
 	/* keyboard timer */
-	TIMER(config, "keyboard").configure_periodic(FUNC(vcs80_state::vcs80_keyboard_tick), attotime::from_hz(1000));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", vcs80_state, vcs80_keyboard_tick, attotime::from_hz(1000))
 
 	/* video hardware */
 	config.set_default_layout(layout_vcs80);
@@ -238,7 +237,7 @@ void vcs80_state::vcs80(machine_config &config)
 
 	/* bankdev */
 	ADDRESS_MAP_BANK(config, "bdmem").set_map(&vcs80_state::vcs80_bd_mem).set_options(ENDIANNESS_BIG, 8, 32, 0x10000);
-}
+MACHINE_CONFIG_END
 
 /* ROMs */
 

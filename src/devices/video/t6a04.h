@@ -65,4 +65,7 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(T6A04, t6a04_device)
 
+#define MCFG_T6A04_SIZE(_width, _height) \
+	downcast<t6a04_device &>(*device).set_size(_width, _height);
+
 #endif // MAME_VIDEO_T6A04_H

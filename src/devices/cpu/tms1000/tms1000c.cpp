@@ -52,3 +52,21 @@ u32 tms1000c_cpu_device::decode_micro(u8 sel)
 
 	return decode;
 }
+
+
+// execute
+void tms1000c_cpu_device::execute_run()
+{
+	while (m_icount > 0)
+	{
+		if (m_halt_pin)
+		{
+			// not running (output pins remain unchanged)
+			m_icount = 0;
+			return;
+		}
+
+		m_icount--;
+		execute_one();
+	}
+}

@@ -66,17 +66,7 @@ class m5_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	template <typename T>
-	m5_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: m5_cart_slot_device(mconfig, tag, owner, 0)
-	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
-	}
-
-	m5_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	m5_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~m5_cart_slot_device();
 
 	// device-level overrides
@@ -125,5 +115,10 @@ DECLARE_DEVICE_TYPE(M5_CART_SLOT, m5_cart_slot_device)
  ***************************************************************************/
 
 #define M5SLOT_ROM_REGION_TAG ":cart:rom"
+
+#define MCFG_M5_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
+	MCFG_DEVICE_ADD(_tag, M5_CART_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
 
 #endif // MAME_BUS_M5_SLOT_H

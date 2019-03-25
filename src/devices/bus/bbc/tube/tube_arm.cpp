@@ -120,18 +120,18 @@ void bbc_tube_arm_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-uint8_t bbc_tube_arm_device::host_r(offs_t offset)
+READ8_MEMBER(bbc_tube_arm_device::host_r)
 {
-	return m_ula->host_r(offset);
+	return m_ula->host_r(space, offset);
 }
 
-void bbc_tube_arm_device::host_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(bbc_tube_arm_device::host_w)
 {
-	m_ula->host_w(offset, data);
+	m_ula->host_w(space, offset, data);
 }
 
 
-uint8_t bbc_tube_arm_device::ram_r(offs_t offset)
+READ8_MEMBER(bbc_tube_arm_device::ram_r)
 {
 	uint8_t data;
 
@@ -143,7 +143,7 @@ uint8_t bbc_tube_arm_device::ram_r(offs_t offset)
 	return data;
 }
 
-void bbc_tube_arm_device::ram_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(bbc_tube_arm_device::ram_w)
 {
 	/* clear ROM select on first write */
 	if (!machine().side_effects_disabled()) m_rom_select = false;

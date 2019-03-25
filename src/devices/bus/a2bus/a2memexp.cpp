@@ -46,9 +46,8 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void a2bus_memexp_device::device_add_mconfig(machine_config &config)
-{
-}
+MACHINE_CONFIG_START(a2bus_memexp_device::device_add_mconfig)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

@@ -63,11 +63,10 @@ const int mos6551_device::transmitter_controls[4][3] =
 	{0, 1, 1}
 };
 
-void mos6551_device::device_add_mconfig(machine_config &config)
-{
-	CLOCK(config, m_internal_clock, 0);
-	m_internal_clock->signal_handler().set(FUNC(mos6551_device::internal_clock));
-}
+MACHINE_CONFIG_START(mos6551_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("clock", CLOCK, 0)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, mos6551_device, internal_clock))
+MACHINE_CONFIG_END
 
 
 void mos6551_device::device_start()
@@ -271,8 +270,7 @@ void mos6551_device::update_divider()
 
 uint8_t mos6551_device::read_rdr()
 {
-	if (!machine().side_effects_disabled())
-		m_status &= ~(SR_PARITY_ERROR | SR_FRAMING_ERROR | SR_OVERRUN | SR_RDRF);
+	m_status &= ~(SR_PARITY_ERROR | SR_FRAMING_ERROR | SR_OVERRUN | SR_RDRF);
 	return m_rdr;
 }
 
@@ -280,18 +278,15 @@ uint8_t mos6551_device::read_status()
 {
 	uint8_t status = m_status;
 
-	if (!machine().side_effects_disabled())
+	if (m_cts)
 	{
-		if (m_cts)
-		{
-			status &= ~SR_TDRE;
-		}
+		status &= ~SR_TDRE;
+	}
 
-		if (m_irq_state != 0)
-		{
-			m_irq_state = 0;
-			update_irq();
-		}
+	if (m_irq_state != 0)
+	{
+		m_irq_state = 0;
+		update_irq();
 	}
 
 	return status;
@@ -379,8 +374,11 @@ void mos6551_device::write_command(uint8_t data)
 	update_divider();
 }
 
-uint8_t mos6551_device::read(offs_t offset)
+READ8_MEMBER( mos6551_device::read )
 {
+	if (machine().side_effects_disabled())
+		return 0xff;
+
 	switch (offset & 0x03)
 	{
 	case 0:
@@ -398,7 +396,7 @@ uint8_t mos6551_device::read(offs_t offset)
 	}
 }
 
-void mos6551_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( mos6551_device::write )
 {
 	switch (offset & 0x03)
 	{

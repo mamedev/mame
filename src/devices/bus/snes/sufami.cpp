@@ -66,12 +66,12 @@ void sns_rom_sufami_device::device_add_mconfig(machine_config &config)
  mapper specific handlers
  -------------------------------------------------*/
 
-uint8_t sns_rom_sufami_device::read_l(offs_t offset)
+READ8_MEMBER(sns_rom_sufami_device::read_l)
 {
-	return read_h(offset);
+	return read_h(space, offset);
 }
 
-uint8_t sns_rom_sufami_device::read_h(offs_t offset)
+READ8_MEMBER(sns_rom_sufami_device::read_h)
 {
 	int bank;
 
@@ -82,11 +82,11 @@ uint8_t sns_rom_sufami_device::read_h(offs_t offset)
 	}
 	if (offset >= 0x200000 && offset < 0x400000)    // SLOT1 STROM
 	{
-		return m_slot1->read_l(offset - 0x200000);
+		return m_slot1->read_l(space, offset - 0x200000);
 	}
 	if (offset >= 0x400000 && offset < 0x600000)    // SLOT2 STROM
 	{
-		return m_slot2->read_l(offset - 0x400000);
+		return m_slot2->read_l(space, offset - 0x400000);
 	}
 	if (offset >= 0x600000 && offset < 0x640000)    // SLOT1 RAM
 	{
@@ -94,7 +94,7 @@ uint8_t sns_rom_sufami_device::read_h(offs_t offset)
 		{
 			offset -= 0x600000;
 			bank = offset / 0x10000;
-			return m_slot1->read_ram(bank * 0x8000 + (offset & 0x7fff));
+			return m_slot1->read_ram(space, bank * 0x8000 + (offset & 0x7fff));
 		}
 	}
 	if (offset >= 0x700000 && offset < 0x740000)    // SLOT2 RAM
@@ -103,19 +103,19 @@ uint8_t sns_rom_sufami_device::read_h(offs_t offset)
 		{
 			offset -= 0x700000;
 			bank = offset / 0x10000;
-			return m_slot2->read_ram(bank * 0x8000 + (offset & 0x7fff));
+			return m_slot2->read_ram(space, bank * 0x8000 + (offset & 0x7fff));
 		}
 	}
 
 	return 0xff;
 }
 
-void sns_rom_sufami_device::write_l(offs_t offset, uint8_t data)
+WRITE8_MEMBER(sns_rom_sufami_device::write_l)
 {
-	write_h(offset, data);
+	write_h(space, offset, data);
 }
 
-void sns_rom_sufami_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(sns_rom_sufami_device::write_h)
 {
 	int bank;
 	if (offset >= 0x600000 && offset < 0x640000)    // SLOT1 RAM
@@ -124,7 +124,7 @@ void sns_rom_sufami_device::write_h(offs_t offset, uint8_t data)
 		{
 			offset -= 0x600000;
 			bank = offset / 0x10000;
-			m_slot1->write_ram(bank * 0x8000 + (offset & 0x7fff), data);
+			m_slot1->write_ram(space, bank * 0x8000 + (offset & 0x7fff), data);
 		}
 	}
 
@@ -134,7 +134,7 @@ void sns_rom_sufami_device::write_h(offs_t offset, uint8_t data)
 		{
 			offset -= 0x700000;
 			bank = offset / 0x10000;
-			m_slot2->write_ram(bank * 0x8000 + (offset & 0x7fff), data);
+			m_slot2->write_ram(space, bank * 0x8000 + (offset & 0x7fff), data);
 		}
 	}
 
@@ -144,7 +144,7 @@ void sns_rom_sufami_device::write_h(offs_t offset, uint8_t data)
  Sufami Turbo 'minicart' emulation
  -------------------------------------------------*/
 
-uint8_t sns_rom_strom_device::read_l(offs_t offset)
+READ8_MEMBER(sns_rom_strom_device::read_l)
 {
 	if (offset < 0x200000)
 	{

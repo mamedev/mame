@@ -121,10 +121,10 @@ public:
 
 private:
 	// Processor connections with the main board
-	uint8_t cruread(offs_t offset);
-	uint8_t interrupt_level();
-	void cruwrite(offs_t offset, uint8_t data);
-	void external_operation(offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER( cruread );
+	DECLARE_READ8_MEMBER( interrupt_level );
+	DECLARE_WRITE8_MEMBER( cruwrite );
+	DECLARE_WRITE8_MEMBER( external_operation );
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
 	DECLARE_WRITE_LINE_MEMBER( dbin_line );
 
@@ -146,14 +146,14 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( handset_interrupt_in );
 
 	// Connections with the system interface TMS9901
-	uint8_t read_by_9901(offs_t offset);
+	DECLARE_READ8_MEMBER(read_by_9901);
 	DECLARE_WRITE_LINE_MEMBER(keyC0);
 	DECLARE_WRITE_LINE_MEMBER(keyC1);
 	DECLARE_WRITE_LINE_MEMBER(keyC2);
 	DECLARE_WRITE_LINE_MEMBER(cs1_motor);
 	DECLARE_WRITE_LINE_MEMBER(audio_gate);
 	DECLARE_WRITE_LINE_MEMBER(cassette_output);
-	void tms9901_interrupt(offs_t offset, uint8_t data);
+	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(handset_ack);
 	DECLARE_WRITE_LINE_MEMBER(cs2_motor);
 	DECLARE_WRITE_LINE_MEMBER(alphaW);
@@ -249,11 +249,25 @@ void ti99_4x_state::memmap_setoffset(address_map &map)
     The TMS9901 is incompletely decoded
     ---0 00xx xxcc ccc0
     causing 16 mirrors (0000, 0040, 0080, 00c0, ... , 03c0)
+
+    Reading is done by transfering 8 successive bits, so addresses refer to
+    8 bit groups; writing, however, is done using output lines. The CRU base
+    address in the ti99 systems is twice the bit address:
+
+    (base=0, bit=0x10) == (base=0x20,bit=0)
+
+    Read: 0000 - 003f translates to base addresses 0000 - 03fe
+          0000 - 01ff is the complete CRU address space 0000 - 1ffe (for TMS9900)
+
+    Write:0000 - 01ff corresponds to bit 0 of base address 0000 - 03fe
 */
 void ti99_4x_state::crumap(address_map &map)
 {
-	map(0x0000, 0x1fff).rw(FUNC(ti99_4x_state::cruread), FUNC(ti99_4x_state::cruwrite));
-	map(0x0000, 0x003f).mirror(0x03c0).rw(m_tms9901, FUNC(tms9901_device::read), FUNC(tms9901_device::write));
+	map(0x0000, 0x01ff).r(FUNC(ti99_4x_state::cruread));
+	map(0x0000, 0x0003).mirror(0x003c).r(m_tms9901, FUNC(tms9901_device::read));
+
+	map(0x0000, 0x0fff).w(FUNC(ti99_4x_state::cruwrite));
+	map(0x0000, 0x001f).mirror(0x01e0).w(m_tms9901, FUNC(tms9901_device::write));
 }
 
 
@@ -403,29 +417,30 @@ INPUT_PORTS_END
     Components
 ******************************************************************************/
 
-uint8_t ti99_4x_state::cruread(offs_t offset)
+READ8_MEMBER( ti99_4x_state::cruread )
 {
-	LOGMASKED(LOG_CRUREAD, "read access to CRU address %04x\n", offset << 1);
+	LOGMASKED(LOG_CRUREAD, "read access to CRU address %04x\n", offset << 4);
 	uint8_t value = 0;
 
 	// Let the gromport (not in the QI version) and the p-box behind the I/O port
 	// decide whether they want to change the value at the CRU address
+	// Also, we translate the bit addresses to base addresses
 
-	if (m_model != MODEL_4QI) m_gromport->crureadz(offset<<1, &value);
-	m_ioport->crureadz(offset<<1, &value);
+	if (m_model != MODEL_4QI) m_gromport->crureadz(space, offset<<4, &value);
+	m_ioport->crureadz(space, offset<<4, &value);
 
 	return value;
 }
 
-void ti99_4x_state::cruwrite(offs_t offset, uint8_t data)
+WRITE8_MEMBER( ti99_4x_state::cruwrite )
 {
 	LOGMASKED(LOG_CRU, "Write access to CRU address %04x\n", offset << 1);
 	// The QI version does not propagate the CRU signals to the cartridge slot
-	if (m_model != MODEL_4QI) m_gromport->cruwrite(offset<<1, data);
-	m_ioport->cruwrite(offset<<1, data);
+	if (m_model != MODEL_4QI) m_gromport->cruwrite(space, offset<<1, data);
+	m_ioport->cruwrite(space, offset<<1, data);
 }
 
-void ti99_4x_state::external_operation(offs_t offset, uint8_t data)
+WRITE8_MEMBER( ti99_4x_state::external_operation )
 {
 	static char const *const extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	// Some games (e.g. Slymoids) actually use IDLE for synchronization
@@ -460,7 +475,7 @@ void ti99_4x_state::external_operation(offs_t offset, uint8_t data)
 ***************************************************************************/
 
 
-uint8_t ti99_4x_state::read_by_9901(offs_t offset)
+READ8_MEMBER( ti99_4x_state::read_by_9901 )
 {
 	int answer=0;
 
@@ -629,7 +644,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::cassette_output )
 	m_cassette2->output(state==ASSERT_LINE? +1 : -1);
 }
 
-void ti99_4x_state::tms9901_interrupt(offs_t offset, uint8_t data)
+WRITE8_MEMBER( ti99_4x_state::tms9901_interrupt )
 {
 	// offset contains the interrupt level (0-15)
 	// However, the TI board just ignores that level and hardwires it to 1
@@ -637,7 +652,7 @@ void ti99_4x_state::tms9901_interrupt(offs_t offset, uint8_t data)
 	m_cpu->set_input_line(INT_9900_INTREQ, data);
 }
 
-uint8_t ti99_4x_state::interrupt_level()
+READ8_MEMBER( ti99_4x_state::interrupt_level )
 {
 	// On the TI-99 systems these IC lines are not used; the input lines
 	// at the CPU are hardwired to level 1.
@@ -649,7 +664,6 @@ uint8_t ti99_4x_state::interrupt_level()
 */
 WRITE_LINE_MEMBER( ti99_4x_state::clock_out )
 {
-	m_tms9901->phi_line(state);
 	m_datamux->clock_in(state);
 	m_ioport->clock_in(state);
 }
@@ -853,8 +867,8 @@ void ti99_4x_state::ti99_4_common(machine_config& config)
 	m_cpu->clkout_cb().set(FUNC(ti99_4x_state::clock_out));
 	m_cpu->dbin_cb().set(FUNC(ti99_4x_state::dbin_line));
 
-	// Programmable system interface (driven by CLKOUT)
-	TMS9901(config, m_tms9901, 0);
+	// Main board
+	TMS9901(config, m_tms9901, 3000000);
 	m_tms9901->read_cb().set(FUNC(ti99_4x_state::read_by_9901));
 	m_tms9901->p_out_cb(2).set(FUNC(ti99_4x_state::keyC0));
 	m_tms9901->p_out_cb(3).set(FUNC(ti99_4x_state::keyC1));

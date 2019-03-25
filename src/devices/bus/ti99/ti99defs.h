@@ -52,8 +52,8 @@
     devices as in the real machine, and only the active device changes the bus lines.
 */
 
-#define READ8Z_MEMBER(name)             void name(ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t *value)
-#define DECLARE_READ8Z_MEMBER(name)     void name(ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t *value)
+#define READ8Z_MEMBER(name)             void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t *value, ATTR_UNUSED uint8_t mem_mask)
+#define DECLARE_READ8Z_MEMBER(name)     void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t *value, ATTR_UNUSED uint8_t mem_mask = 0xff)
 
 /*
     For almost all applications of setoffset, we also need the data bus
@@ -61,7 +61,7 @@
     that this is a general rule, we use new macros here which contain the
     DBIN setting.
 */
-#define SETADDRESS_DBIN_MEMBER(name)          void  name(ATTR_UNUSED offs_t offset, ATTR_UNUSED int state)
-#define DECLARE_SETADDRESS_DBIN_MEMBER(name)  void  name(ATTR_UNUSED offs_t offset, ATTR_UNUSED int state)
+#define SETADDRESS_DBIN_MEMBER(name)          void  name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED int state)
+#define DECLARE_SETADDRESS_DBIN_MEMBER(name)  void  name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED int state)
 
 #endif // MAME_BUS_TI99_TI99DEFS_H

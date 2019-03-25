@@ -20,7 +20,7 @@ READ8_MEMBER( isa8_adlib_device::ym3812_16_r )
 	uint8_t retVal = 0xff;
 	switch(offset)
 	{
-		case 0 : retVal = m_ym3812->status_port_r(); break;
+		case 0 : retVal = m_ym3812->status_port_r( space, offset ); break;
 	}
 	return retVal;
 }
@@ -29,8 +29,8 @@ WRITE8_MEMBER( isa8_adlib_device::ym3812_16_w )
 {
 	switch(offset)
 	{
-		case 0 : m_ym3812->control_port_w(data); break;
-		case 1 : m_ym3812->write_port_w(data); break;
+		case 0 : m_ym3812->control_port_w( space, offset, data ); break;
+		case 1 : m_ym3812->write_port_w( space, offset, data ); break;
 	}
 }
 
@@ -44,11 +44,11 @@ DEFINE_DEVICE_TYPE(ISA8_ADLIB, isa8_adlib_device, "isa_adlib", "Ad Lib Sound Car
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void isa8_adlib_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(isa8_adlib_device::device_add_mconfig)
 	SPEAKER(config, "mono").front_center();
-	YM3812(config, m_ym3812, ym3812_StdClock).add_route(ALL_OUTPUTS, "mono", 3.00);
-}
+	MCFG_DEVICE_ADD("ym3812", YM3812, ym3812_StdClock)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 3.00)
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  LIVE DEVICE

@@ -56,8 +56,7 @@ public:
 	// construction/destruction
 	g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto wdm_handler() { return m_wdm_w.bind(); }
-
+protected:
 	/* Registers - used by g65816_set_reg() and g65816_get_reg() */
 	enum
 	{
@@ -67,7 +66,6 @@ public:
 		_5A22_FASTROM
 	};
 
-protected:
 	g65816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal);
 
 	// device-level overrides
@@ -98,7 +96,6 @@ protected:
 	address_space_config m_data_config;
 	address_space_config m_opcode_config;
 	address_space_config m_vector_config;
-	devcb_write8 m_wdm_w;     /* WDM callback */
 
 	typedef void (g65816_device::*opcode_func) ();
 	typedef unsigned (g65816_device::*get_reg_func)(int regnum);
@@ -142,10 +139,8 @@ protected:
 	void g65816_set_pc(unsigned val);
 	unsigned g65816_get_sp();
 	void g65816_set_sp(unsigned val);
-public:
 	unsigned g65816_get_reg(int regnum);
 	void g65816_set_reg(int regnum, unsigned value);
-protected:
 	void g65816_restore_state();
 	unsigned g65816i_read_8_normal(unsigned address);
 	unsigned g65816i_read_8_immediate(unsigned address);

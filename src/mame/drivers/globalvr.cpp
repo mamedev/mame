@@ -87,12 +87,11 @@ static INPUT_PORTS_START( globalvr )
 INPUT_PORTS_END
 
 
-void globalvr_state::globalvr(machine_config &config)
-{
+MACHINE_CONFIG_START(globalvr_state::globalvr)
 	/* basic machine hardware */
-	PENTIUM(config, m_maincpu, 100000000);      /* ? MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &globalvr_state::globalvr_map);
-}
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 100000000)      /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(globalvr_map)
+MACHINE_CONFIG_END
 
 
 ROM_START( hyperv2 )

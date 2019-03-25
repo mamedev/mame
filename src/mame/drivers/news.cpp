@@ -130,22 +130,22 @@ void news_state::machine_reset()
 	m_bgpic = 0;
 }
 
-void news_state::news(machine_config &config)
-{
+MACHINE_CONFIG_START(news_state::news)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 8000000);         /* ? MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &news_state::news_map);
-	m_maincpu->set_vblank_int("screen", FUNC(news_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80,8000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(news_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", news_state,  irq0_line_hold)
 
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(256, 256);
-	screen.set_visarea(0, 256-1, 16, 256-16-1);
-	screen.set_screen_update(FUNC(news_state::screen_update_news));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
+	MCFG_SCREEN_UPDATE_DRIVER(news_state, screen_update_news)
+	MCFG_SCREEN_PALETTE("palette")
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_news);
 	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 0x100).set_endianness(ENDIANNESS_BIG);
@@ -153,8 +153,9 @@ void news_state::news(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 

@@ -172,7 +172,7 @@ void nes_x1_017_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_tc0190fmc_device::tc0190fmc_write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_tc0190fmc_device::tc0190fmc_write)
 {
 	LOG_MMC(("tc0190fmc_write, offset: %04x, data: %02x\n", offset, data));
 
@@ -240,7 +240,7 @@ void nes_tc0190fmc_pal16r4_device::hblank_irq( int scanline, int vblank, int bla
 	}
 }
 
-void nes_tc0190fmc_pal16r4_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_tc0190fmc_pal16r4_device::write_h)
 {
 	LOG_MMC(("tc0190fmc pal16r4 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -256,7 +256,7 @@ void nes_tc0190fmc_pal16r4_device::write_h(offs_t offset, uint8_t data)
 		case 0x2001:
 		case 0x2002:
 		case 0x2003:
-			tc0190fmc_write(offset, data);
+			tc0190fmc_write(space, offset, data, mem_mask);
 			break;
 		case 0x4000:
 			m_irq_count_latch = (0x100 - data) & 0xff;
@@ -291,7 +291,7 @@ void nes_tc0190fmc_pal16r4_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_x1_005_device::write_m(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_x1_005_device::write_m)
 {
 	LOG_MMC(("x1_005 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -355,14 +355,14 @@ void nes_x1_005_device::write_m(offs_t offset, uint8_t data)
 		m_x1_005_ram[offset & 0x7f] = data;
 }
 
-uint8_t nes_x1_005_device::read_m(offs_t offset)
+READ8_MEMBER(nes_x1_005_device::read_m)
 {
 	LOG_MMC(("x1_005 read_m, offset: %04x\n", offset));
 
 	if (offset >= 0x1f00 && m_latch == 0xa3)
 		return m_x1_005_ram[offset & 0x7f];
 
-	return get_open_bus();   // open bus
+	return m_open_bus;   // open bus
 }
 
 /*-------------------------------------------------
@@ -399,7 +399,7 @@ void nes_x1_017_device::set_chr()
 	chr1_x(7 ^ m_latch, m_mmc_vrom_bank[5], CHRROM);
 }
 
-void nes_x1_017_device::write_m(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_x1_017_device::write_m)
 {
 	LOG_MMC(("x1017 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -453,7 +453,7 @@ void nes_x1_017_device::write_m(offs_t offset, uint8_t data)
 		m_x1_017_ram[0x1000 + (offset & 0x3ff)] = data;
 }
 
-uint8_t nes_x1_017_device::read_m(offs_t offset)
+READ8_MEMBER(nes_x1_017_device::read_m)
 {
 	LOG_MMC(("x1017 read_m, offset: %04x\n", offset));
 
@@ -465,5 +465,5 @@ uint8_t nes_x1_017_device::read_m(offs_t offset)
 	if (offset < 0x1400 && m_reg[2] == 0x84)
 		return m_x1_017_ram[0x1000 + (offset & 0x3ff)];
 
-	return get_open_bus();   // open bus
+	return m_open_bus;   // open bus
 }

@@ -397,26 +397,26 @@ static INPUT_PORTS_START( galds )
 INPUT_PORTS_END
 
 
-void pastelg_state::pastelg(machine_config &config)
-{
+MACHINE_CONFIG_START(pastelg_state::pastelg)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 19968000/4);    /* unknown divider, galds definitely relies on this for correct voice pitch */
-	m_maincpu->set_addrmap(AS_PROGRAM, &pastelg_state::pastelg_map);
-	m_maincpu->set_addrmap(AS_IO, &pastelg_state::pastelg_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(pastelg_state::irq0_line_assert)); // nmiclock not written, chip is 1411M1 instead of 1413M3
+	MCFG_DEVICE_ADD("maincpu", Z80, 19968000/4)    /* unknown divider, galds definitely relies on this for correct voice pitch */
+	MCFG_DEVICE_PROGRAM_MAP(pastelg_map)
+	MCFG_DEVICE_IO_MAP(pastelg_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pastelg_state,  irq0_line_assert) // nmiclock not written, chip is 1411M1 instead of 1413M3
 
 	NB1413M3(config, m_nb1413m3, 0, NB1413M3_PASTELG);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 256-1, 16, 240-1);
-	m_screen->set_screen_update(FUNC(pastelg_state::screen_update_pastelg));
-	m_screen->set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
+	MCFG_SCREEN_UPDATE_DRIVER(pastelg_state, screen_update_pastelg)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", FUNC(pastelg_state::pastelg_palette), 32);
 
@@ -428,11 +428,10 @@ void pastelg_state::pastelg(machine_config &config)
 	aysnd.port_b_read_callback().set_ioport("DSWB");
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-}
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+MACHINE_CONFIG_END
 
 /*
 
@@ -457,25 +456,25 @@ Note
 
 */
 
-void pastelg_state::threeds(machine_config &config)
-{
+MACHINE_CONFIG_START(pastelg_state::threeds)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 19968000/4);    /* unknown divider, galds definitely relies on this for correct voice pitch */
-	m_maincpu->set_addrmap(AS_PROGRAM, &pastelg_state::pastelg_map);
-	m_maincpu->set_addrmap(AS_IO, &pastelg_state::threeds_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(pastelg_state::irq0_line_assert));
+	MCFG_DEVICE_ADD("maincpu", Z80, 19968000/4)    /* unknown divider, galds definitely relies on this for correct voice pitch */
+	MCFG_DEVICE_PROGRAM_MAP(pastelg_map)
+	MCFG_DEVICE_IO_MAP(threeds_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pastelg_state,  irq0_line_assert)
 
 	NB1413M3(config, m_nb1413m3, 0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 256-1, 16, 240-1);
-	m_screen->set_screen_update(FUNC(pastelg_state::screen_update_pastelg));
-	m_screen->set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
+	MCFG_SCREEN_UPDATE_DRIVER(pastelg_state, screen_update_pastelg)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", FUNC(pastelg_state::pastelg_palette), 32);
 
@@ -487,11 +486,10 @@ void pastelg_state::threeds(machine_config &config)
 	aysnd.port_b_read_callback().set_ioport("DSWA");
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-}
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+MACHINE_CONFIG_END
 
 
 ROM_START( pastelg )

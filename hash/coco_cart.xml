@@ -475,7 +475,6 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>Tandy</publisher>
 		<info name="serial" value="26-2226" />
 		<part name="cart" interface="coco_cart">
-			<feature name="slot" value="rs232" />
 			<dataarea name="rom" size="4096">
 				<rom name="deluxe rs-232 program pak (1983)(26-2226)(tandy).rom" size="4096" crc="d990e1f9" sha1="3fad25f3462a0b581b9c182ac11ad90c8fa08cb6" offset="0" />
 			</dataarea>
@@ -553,7 +552,6 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>Tandy</publisher>
 		<info name="serial" value="26-2228" />
 		<part name="cart" interface="coco_cart">
-			<feature name="slot" value="dcmodem" />
 			<dataarea name="rom" size="8192">
 				<rom name="color computer modem pak (1985)(26-2228)(tandy).rom" size="8192" crc="667bc55d" sha1="703fe0aba4a603591078cb675ffd26a67c02df88" offset="0" />
 			</dataarea>
@@ -978,7 +976,6 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="author" value="Jon Bokelman" />
 		<info name="serial" value="26-3143" />
 		<part name="cart" interface="coco_cart">
-			<feature name="slot" value="orch90" />
 			<dataarea name="rom" size="8192">
 				<rom name="orchestra 90 (1984)(26-3143)(tandy).rom" size="8192" crc="15fb39af" sha1="6a20fee9c70b36a6435ac8378f31d5b626017df0" offset="0" />
 			</dataarea>

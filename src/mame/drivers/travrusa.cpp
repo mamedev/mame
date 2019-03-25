@@ -304,48 +304,49 @@ void travrusa_state::machine_reset()
 	m_scrollx[1] = 0;
 }
 
-void travrusa_state::travrusa(machine_config &config)
-{
+MACHINE_CONFIG_START(travrusa_state::travrusa)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);   /* 4 MHz (?) */
-	m_maincpu->set_addrmap(AS_PROGRAM, &travrusa_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(travrusa_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", travrusa_state,  irq0_line_hold)
+
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(56.75);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1790)   /* accurate frequency, measured on a Moon Patrol board, is 56.75Hz. */);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56.75)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790)   /* accurate frequency, measured on a Moon Patrol board, is 56.75Hz. */)
 				/* the Lode Runner manual (similar but different hardware) */
 				/* talks about 55Hz and 1790ms vblank duration. */
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(1*8, 31*8-1, 0*8, 32*8-1);
-	screen.set_screen_update(FUNC(travrusa_state::screen_update_travrusa));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(travrusa_state, screen_update_travrusa)
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_travrusa);
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_travrusa)
+
 	PALETTE(config, m_palette, FUNC(travrusa_state::travrusa_palette), 16*8+16*8, 128+16);
 
 	/* sound hardware */
 	//m52_sound_c_audio(config);
-	IREM_M52_SOUNDC_AUDIO(config, "irem_audio", 0);
-}
+	MCFG_DEVICE_ADD("irem_audio", IREM_M52_SOUNDC_AUDIO, 0)
 
-void travrusa_state::shtrider(machine_config &config)
-{
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(travrusa_state::shtrider)
 	travrusa(config);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_shtrider);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_shtrider)
 	m_palette->set_init(FUNC(travrusa_state::shtrider_palette));
-}
+MACHINE_CONFIG_END
 
-void travrusa_state::shtriderb(machine_config &config)
-{
+MACHINE_CONFIG_START(travrusa_state::shtriderb)
 	travrusa(config);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_shtrider);
-}
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_shtrider)
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

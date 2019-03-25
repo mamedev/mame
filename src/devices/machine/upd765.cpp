@@ -18,7 +18,6 @@
 #define LOG_MATCH   (1U << 10)  // Sector matching
 #define LOG_STATE   (1U << 11)  // State machine
 #define LOG_LIVE    (1U << 12)  // Live states
-#define LOG_DONE    (1U << 13)  // Command done
 
 #define VERBOSE (LOG_GENERAL | LOG_WARN )
 
@@ -39,7 +38,6 @@
 #define LOGMATCH(...)    LOGMASKED(LOG_MATCH, __VA_ARGS__)
 #define LOGSTATE(...)    LOGMASKED(LOG_STATE, __VA_ARGS__)
 #define LOGLIVE(...)     LOGMASKED(LOG_LIVE, __VA_ARGS__)
-#define LOGDONE(...)     LOGMASKED(LOG_DONE, __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(UPD765A,        upd765a_device,        "upd765a",        "NEC uPD765A FDC")
 DEFINE_DEVICE_TYPE(UPD765B,        upd765b_device,        "upd765b",        "NEC uPD765B FDC")
@@ -168,9 +166,7 @@ upd765_family_device::upd765_family_device(const machine_config &mconfig, device
 	pc_fdc_interface(mconfig, type, tag, owner, clock),
 	intrq_cb(*this),
 	drq_cb(*this),
-	hdl_cb(*this),
-	idx_cb(*this),
-	us_cb(*this)
+	hdl_cb(*this)
 {
 	ready_polled = true;
 	ready_connected = true;
@@ -195,19 +191,14 @@ void upd765_family_device::set_mode(int _mode)
 	mode = _mode;
 }
 
-void upd765_family_device::device_resolve_objects()
-{
-	intrq_cb.resolve_safe();
-	drq_cb.resolve_safe();
-	hdl_cb.resolve_safe();
-	idx_cb.resolve_safe();
-	us_cb.resolve_safe();
-}
-
 void upd765_family_device::device_start()
 {
 	save_item(NAME(motorcfg));
 	save_item(NAME(selected_drive));
+
+	intrq_cb.resolve_safe();
+	drq_cb.resolve_safe();
+	hdl_cb.resolve_safe();
 
 	for(int i=0; i != 4; i++) {
 		char name[2];
@@ -336,7 +327,6 @@ void upd765_family_device::set_ds(int fid)
 	for(floppy_info &fi : flopi)
 		if(fi.dev)
 			fi.dev->ds_w(fid);
-	us_cb(fid);
 
 	// record selected drive
 	selected_drive = fid;
@@ -351,11 +341,9 @@ void upd765_family_device::set_floppy(floppy_image_device *flop)
 	}
 	if(flop)
 		flop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&upd765_family_device::index_callback, this));
-	else
-		idx_cb(0);
 }
 
-uint8_t upd765_family_device::sra_r()
+READ8_MEMBER(upd765_family_device::sra_r)
 {
 	uint8_t sra = 0;
 	int fid = dor & 3;
@@ -378,17 +366,17 @@ uint8_t upd765_family_device::sra_r()
 	return sra;
 }
 
-uint8_t upd765_family_device::srb_r()
+READ8_MEMBER(upd765_family_device::srb_r)
 {
 	return 0;
 }
 
-uint8_t upd765_family_device::dor_r()
+READ8_MEMBER(upd765_family_device::dor_r)
 {
 	return dor;
 }
 
-void upd765_family_device::dor_w(uint8_t data)
+WRITE8_MEMBER(upd765_family_device::dor_w)
 {
 	LOGREGS("dor = %02x\n", data);
 	uint8_t diff = dor ^ data;
@@ -404,16 +392,21 @@ void upd765_family_device::dor_w(uint8_t data)
 	check_irq();
 }
 
-uint8_t upd765_family_device::tdr_r()
+READ8_MEMBER(upd765_family_device::tdr_r)
 {
 	return 0;
 }
 
-void upd765_family_device::tdr_w(uint8_t data)
+WRITE8_MEMBER(upd765_family_device::tdr_w)
 {
 }
 
-uint8_t upd765_family_device::msr_r()
+READ8_MEMBER(upd765_family_device::msr_r)
+{
+	return read_msr();
+}
+
+uint8_t upd765_family_device::read_msr()
 {
 	uint32_t msr = 0;
 	switch(main_phase) {
@@ -444,7 +437,7 @@ uint8_t upd765_family_device::msr_r()
 		}
 	msr |= get_drive_busy();
 
-	if(data_irq && !machine().side_effects_disabled()) {
+	if(data_irq) {
 		data_irq = false;
 		check_irq();
 	}
@@ -452,7 +445,7 @@ uint8_t upd765_family_device::msr_r()
 	return msr;
 }
 
-void upd765_family_device::dsr_w(uint8_t data)
+WRITE8_MEMBER(upd765_family_device::dsr_w)
 {
 	LOGREGS("dsr_w %02x (%s)\n", data, machine().describe_context());
 	if(data & 0x80)
@@ -466,43 +459,39 @@ void upd765_family_device::set_rate(int rate)
 	cur_rate = rate;
 }
 
-uint8_t upd765_family_device::fifo_r()
+uint8_t upd765_family_device::read_fifo()
 {
 	uint8_t r = 0xff;
 	switch(main_phase) {
 	case PHASE_EXEC:
-		if(machine().side_effects_disabled())
-			return fifo[0];
 		if(internal_drq)
 			return fifo_pop(false);
-		LOGFIFO("fifo_r in phase %d\n", main_phase);
+		LOGFIFO("read_fifo in phase %d\n", main_phase);
 		break;
 
 	case PHASE_RESULT:
 		r = result[0];
-		if(!machine().side_effects_disabled()) {
-			result_pos--;
-			memmove(result, result+1, result_pos);
-			if(!result_pos)
-				main_phase = PHASE_CMD;
-			else if(result_pos == 1) {
-				// clear drive busy bit after the first sense interrupt status result byte is read
-				for(floppy_info &fi : flopi)
-					if((fi.main_state == RECALIBRATE || fi.main_state == SEEK) && fi.sub_state == IDLE && fi.st0_filled == false)
-						fi.main_state = IDLE;
-				clr_drive_busy();
-			}
+		result_pos--;
+		memmove(result, result+1, result_pos);
+		if(!result_pos)
+			main_phase = PHASE_CMD;
+		else if(result_pos == 1) {
+			// clear drive busy bit after the first sense interrupt status result byte is read
+			for(floppy_info &fi : flopi)
+				if((fi.main_state == RECALIBRATE || fi.main_state == SEEK) && fi.sub_state == IDLE && fi.st0_filled == false)
+					fi.main_state = IDLE;
+			clr_drive_busy();
 		}
 		break;
 	default:
-		LOGFIFO("fifo_r in phase %d\n", main_phase);
+		LOGFIFO("read_fifo in phase %d\n", main_phase);
 		break;
 	}
 
 	return r;
 }
 
-void upd765_family_device::fifo_w(uint8_t data)
+void upd765_family_device::write_fifo(uint8_t data)
 {
 	switch(main_phase) {
 	case PHASE_CMD: {
@@ -528,11 +517,11 @@ void upd765_family_device::fifo_w(uint8_t data)
 			fifo_push(data, false);
 			return;
 		}
-		LOGFIFO("fifo_w in phase %d\n", main_phase);
+		LOGFIFO("write_fifo in phase %d\n", main_phase);
 		break;
 
 	default:
-		LOGFIFO("fifo_w in phase %d\n", main_phase);
+		LOGFIFO("write_fifo in phase %d\n", main_phase);
 		break;
 	}
 }
@@ -545,7 +534,12 @@ uint8_t upd765_family_device::do_dir_r()
 	return 0x00;
 }
 
-void upd765_family_device::ccr_w(uint8_t data)
+READ8_MEMBER(upd765_family_device::dir_r)
+{
+	return do_dir_r();
+}
+
+WRITE8_MEMBER(upd765_family_device::ccr_w)
 {
 	dsr = (dsr & 0xfc) | (data & 3);
 	cur_rate = rates[data & 3];
@@ -647,10 +641,18 @@ void upd765_family_device::fifo_expect(int size, bool write)
 		enable_transfer();
 }
 
+READ8_MEMBER(upd765_family_device::mdma_r)
+{
+	return dma_r();
+}
+
+WRITE8_MEMBER(upd765_family_device::mdma_w)
+{
+	dma_w(data);
+}
+
 uint8_t upd765_family_device::dma_r()
 {
-	if(machine().side_effects_disabled())
-		return fifo[0];
 	return fifo_pop(false);
 }
 
@@ -1472,7 +1474,7 @@ void upd765_family_device::execute_command(int cmd)
 
 void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 {
-	LOGDONE("command done (%s) - %s\n", data_completion ? "data" : "seek", results());
+	LOGCOMMAND("command done (%s) - %s\n", data_completion ? "data" : "seek", results());
 	fi.main_state = fi.sub_state = IDLE;
 	if(data_completion)
 		data_irq = true;
@@ -1744,16 +1746,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 				fi.sub_state = COMMAND_DONE;
 				break;
 			}
-			// MZ: This st1 handling ensures that both HX5102 floppy and the
-			// Speedlock protection scheme are properly working.
-			// a) HX5102 requires that the ND flag not be set when no address
-			// marks could be found on the track at all (particularly due to
-			// wrong density)
-			// b) Speedlock requires the ND flag be set when there are valid
-			// sectors on the track, but the desired sector is missing, also
-			// when it has no valid address marks
 			st1 &= ~ST1_MA;
-			st1 |= ST1_ND;
 			if(!sector_matches()) {
 				if(cur_live.idbuf[0] != command[2]) {
 					if(cur_live.idbuf[0] == 0xff)
@@ -1765,7 +1758,6 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
-			st1 &= ~ST1_ND;
 			LOGRW("reading sector %02x %02x %02x %02x\n",
 						cur_live.idbuf[0],
 						cur_live.idbuf[1],
@@ -1784,6 +1776,11 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 		case SCAN_ID_FAILED:
 			LOGSTATE("SCAN_ID_FAILED\n");
 			fi.st0 |= ST0_FAIL;
+			// MZ: The HX5102 does not correctly detect a FM/MFM mismatch
+			// when the ND bit is set, because in the firmware the ND bit wins
+			// against MA, and thus concludes that the format is correct
+			// but the sector is missing.
+			// st1 |= ST1_ND;
 			fi.sub_state = COMMAND_DONE;
 			break;
 
@@ -1855,7 +1852,7 @@ void upd765_family_device::write_data_start(floppy_info &fi)
 	fi.main_state = WRITE_DATA;
 	fi.sub_state = HEAD_LOAD;
 	mfm = command[0] & 0x40;
-	LOGCOMMAND("command write%s data%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
+	LOGRW("command write%s data%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
 				command[0] & 0x08 ? " deleted" : "",
 				command[0] & 0x80 ? " mt" : "",
 				command[0] & 0x40 ? " mfm" : "",
@@ -1923,11 +1920,6 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 				break;
 			}
 			st1 &= ~ST1_MA;
-			LOGRW("writing sector %02x %02x %02x %02x\n",
-						cur_live.idbuf[0],
-						cur_live.idbuf[1],
-						cur_live.idbuf[2],
-						cur_live.idbuf[3]);
 			sector_size = calc_sector_size(cur_live.idbuf[3]);
 			fifo_expect(sector_size, true);
 			fi.sub_state = SECTOR_WRITTEN;
@@ -2000,7 +1992,7 @@ void upd765_family_device::read_track_start(floppy_info &fi)
 	mfm = command[0] & 0x40;
 	sectors_read = 0;
 
-	LOGCOMMAND("command read track%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
+	LOGRW("command read track%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
 				command[0] & 0x40 ? " mfm" : "",
 				command[0],
 				command[1],
@@ -2292,9 +2284,6 @@ void upd765_family_device::read_id_start(floppy_info &fi)
 		return;
 	}
 
-	for(int i=0; i<4; i++)
-		cur_live.idbuf[i] = command[i+2];
-
 	read_id_continue(fi);
 }
 
@@ -2327,7 +2316,8 @@ void upd765_family_device::read_id_continue(floppy_info &fi)
 		case SCAN_ID_FAILED:
 			LOGSTATE("SCAN_ID_FAILED\n");
 			fi.st0 |= ST0_FAIL;
-			st1 |= ST1_ND|ST1_MA;
+			// st1 |= ST1_ND|ST1_MA;
+			st1 = ST1_MA;
 			fi.sub_state = COMMAND_DONE;
 			break;
 
@@ -2453,7 +2443,6 @@ void upd765_family_device::index_callback(floppy_image_device *floppy, int state
 		if(fi.live)
 			live_sync();
 		fi.index = state;
-		idx_cb(state);
 
 		if(!state) {
 			general_continue(fi);
@@ -2966,7 +2955,7 @@ void mcs3201_device::device_start()
 	m_input_handler.resolve_safe(0);
 }
 
-uint8_t mcs3201_device::input_r()
+READ8_MEMBER( mcs3201_device::input_r )
 {
 	return m_input_handler();
 }
@@ -2986,7 +2975,7 @@ void tc8566af_device::device_start()
 	save_item(NAME(m_cr1));
 }
 
-void tc8566af_device::cr1_w(uint8_t data)
+WRITE8_MEMBER(tc8566af_device::cr1_w)
 {
 	m_cr1 = data;
 
@@ -2996,7 +2985,7 @@ void tc8566af_device::cr1_w(uint8_t data)
 	}
 }
 
-void upd72065_device::auxcmd_w(uint8_t data)
+WRITE8_MEMBER(upd72065_device::auxcmd_w)
 {
 	switch(data) {
 	case 0x36: // reset

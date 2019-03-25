@@ -674,11 +674,9 @@ uint8_t i8251_device::data_r()
 {
 	LOG("read data: %02x, STATUS=%02x\n",m_rx_data,m_status);
 	/* reading clears */
-	if (!machine().side_effects_disabled())
-	{
-		m_status &= ~I8251_STATUS_RX_READY;
-		update_rx_ready();
-	}
+	m_status &= ~I8251_STATUS_RX_READY;
+
+	update_rx_ready();
 	return m_rx_data;
 }
 

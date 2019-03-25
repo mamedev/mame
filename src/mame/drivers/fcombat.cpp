@@ -288,20 +288,20 @@ void fcombat_state::machine_reset()
 	m_ty = 0;
 }
 
-void fcombat_state::fcombat(machine_config &config)
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 10000000/3);
-	m_maincpu->set_addrmap(AS_PROGRAM, &fcombat_state::main_map);
+MACHINE_CONFIG_START(fcombat_state::fcombat)
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 10000000/3));
-	audiocpu.set_addrmap(AS_PROGRAM, &fcombat_state::audio_map);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", Z80, 10000000/3)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+
+	MCFG_DEVICE_ADD("audiocpu", Z80, 10000000/3)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(FCOMBAT_PIXEL_CLOCK, FCOMBAT_HTOTAL, FCOMBAT_HBEND, FCOMBAT_HBSTART, FCOMBAT_VTOTAL, FCOMBAT_VBEND, FCOMBAT_VBSTART);
-	screen.set_screen_update(FUNC(fcombat_state::screen_update_fcombat));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(FCOMBAT_PIXEL_CLOCK, FCOMBAT_HTOTAL, FCOMBAT_HBEND, FCOMBAT_HBSTART, FCOMBAT_VTOTAL, FCOMBAT_VBEND, FCOMBAT_VBSTART)
+	MCFG_SCREEN_UPDATE_DRIVER(fcombat_state, screen_update_fcombat)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fcombat);
 	PALETTE(config, m_palette, FUNC(fcombat_state::fcombat_palette), 256*3, 32);
@@ -316,7 +316,7 @@ void fcombat_state::fcombat(machine_config &config)
 	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
 
 	YM2149(config, "ay3", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
-}
+MACHINE_CONFIG_END
 
 /*************************************
  *

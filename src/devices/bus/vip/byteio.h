@@ -45,6 +45,18 @@
 #define VIP_BYTEIO_PORT_TAG     "byteio"
 
 
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_VIP_BYTEIO_PORT_ADD(_tag, _slot_intf, _def_slot, _inst) \
+	MCFG_DEVICE_ADD(_tag, VIP_BYTEIO_PORT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
+	downcast<vip_byteio_port_device *>(device)->set_inst_callback(DEVCB_##_inst);
+
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -58,19 +70,9 @@ class vip_byteio_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	template <typename T>
-	vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: vip_byteio_port_device(mconfig, tag, owner, 0)
-	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
-	}
+	vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-
-	auto inst_callback() { return m_write_inst.bind(); }
+	template <class Object> void set_inst_callback(Object &&inst) { m_write_inst.set_callback(std::forward<Object>(inst)); }
 
 	// computer interface
 	uint8_t in_r();

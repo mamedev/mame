@@ -648,14 +648,12 @@ static void mvme147_vme_cards(device_slot_interface &device)
 /*
  * Machine configuration
  */
-void mvme147_state::mvme147(machine_config &config)
-{
+MACHINE_CONFIG_START(mvme147_state::mvme147)
 	/* basic machine hardware */
-	M68030(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mvme147_state::mvme147_mem);
-
-	VME(config, "vme", 0);
-	VME_SLOT(config, "slot1", mvme147_vme_cards, nullptr, 1, "vme");
+	MCFG_DEVICE_ADD("maincpu", M68030, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(mvme147_mem)
+	MCFG_VME_DEVICE_ADD("vme")
+	MCFG_VME_SLOT_ADD("vme", 1, mvme147_vme_cards, nullptr)
 
 	M48T02(config, "m48t18", 0); /* t08 differs only in accepted voltage levels compared to t18 */
 
@@ -670,7 +668,7 @@ void mvme147_state::mvme147(machine_config &config)
 	rs232trm.cts_handler().set(m_sccterm, FUNC(scc85c30_device::ctsa_w));
 
 	SCC85C30(config, m_sccterm2, SCC_CLOCK);
-}
+MACHINE_CONFIG_END
 
 /* ROM definitions */
 ROM_START (mvme147)

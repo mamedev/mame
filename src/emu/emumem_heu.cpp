@@ -230,8 +230,6 @@ template<int Width, int AddrShift, int Endian> std::string handler_entry_write_u
 }
 
 
-template class handler_entry_read_units<0,  1, ENDIANNESS_LITTLE>;
-template class handler_entry_read_units<0,  1, ENDIANNESS_BIG>;
 template class handler_entry_read_units<0,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_read_units<0,  0, ENDIANNESS_BIG>;
 template class handler_entry_read_units<1,  3, ENDIANNESS_LITTLE>;
@@ -255,8 +253,6 @@ template class handler_entry_read_units<3, -2, ENDIANNESS_BIG>;
 template class handler_entry_read_units<3, -3, ENDIANNESS_LITTLE>;
 template class handler_entry_read_units<3, -3, ENDIANNESS_BIG>;
 
-template class handler_entry_write_units<0,  1, ENDIANNESS_LITTLE>;
-template class handler_entry_write_units<0,  1, ENDIANNESS_BIG>;
 template class handler_entry_write_units<0,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_write_units<0,  0, ENDIANNESS_BIG>;
 template class handler_entry_write_units<1,  3, ENDIANNESS_LITTLE>;

@@ -2722,6 +2722,7 @@ void segaybd_state::init_generic()
 	save_item(NAME(m_timer_irq_state));
 	save_item(NAME(m_vblank_irq_state));
 	save_item(NAME(m_misc_io_data));
+	save_item(NAME(m_tmp_bitmap));
 }
 
 

@@ -1428,9 +1428,9 @@ READ8_MEMBER(dooyong_z80_ym2203_state::unk_r)
 ***************************************************************************/
 
 
-void dooyong_z80_ym2203_state::sound_2203(machine_config &config)
-{
-	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
+MACHINE_CONFIG_START(dooyong_z80_ym2203_state::sound_2203)
+	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1445,10 +1445,9 @@ void dooyong_z80_ym2203_state::sound_2203(machine_config &config)
 	ym2.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
 	ym2.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
-}
+MACHINE_CONFIG_END
 
-void dooyong_z80_state::sound_2151(machine_config &config)
-{
+MACHINE_CONFIG_START(dooyong_z80_state::sound_2151)
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
@@ -1458,11 +1457,11 @@ void dooyong_z80_state::sound_2151(machine_config &config)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	OKIM6295(config, "oki", 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1_MHz_XTAL, okim6295_device::PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+MACHINE_CONFIG_END
 
-void dooyong_state::sound_2151_4mhz(machine_config &config)
-{
+MACHINE_CONFIG_START(dooyong_state::sound_2151_4mhz)
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
@@ -1472,32 +1471,33 @@ void dooyong_state::sound_2151_4mhz(machine_config &config)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	OKIM6295(config, "oki", 16_MHz_XTAL/16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60);  /* 1MHz (16MHz/16 for most, 8Mhz/8 for Super-X) */
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, 16_MHz_XTAL/16, okim6295_device::PIN7_HIGH)  /* 1MHz (16MHz/16 for most, 8Mhz/8 for Super-X) */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+MACHINE_CONFIG_END
 
-void dooyong_z80_ym2203_state::lastday(machine_config &config)
-{
+MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 16_MHz_XTAL/2);   /* 8MHz verified for Last Day / D-day */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dooyong_z80_ym2203_state::lastday_map);
-	m_maincpu->set_vblank_int("screen", FUNC(dooyong_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL/2)   /* 8MHz verified for Last Day / D-day */
+	MCFG_DEVICE_PROGRAM_MAP(lastday_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
 
-	Z80(config, m_audiocpu, 16_MHz_XTAL/4);  /* 4MHz verified for Last Day / D-day */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_ym2203_state::lastday_sound_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/4)  /* 4MHz verified for Last Day / D-day */
+	MCFG_DEVICE_PROGRAM_MAP(lastday_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
 
 	/* video hardware */
-	BUFFERED_SPRITERAM8(config, m_spriteram);
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1 );
-	screen.set_screen_update(FUNC(dooyong_z80_ym2203_state::screen_update_lastday));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_ym2203_state, screen_update_lastday)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lastday);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
@@ -1509,7 +1509,8 @@ void dooyong_z80_ym2203_state::lastday(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, lastday)
 
 	/* sound hardware */
-	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
+	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1524,31 +1525,31 @@ void dooyong_z80_ym2203_state::lastday(machine_config &config)
 	ym2.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
 	ym2.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
-}
+MACHINE_CONFIG_END
 
-void dooyong_z80_ym2203_state::gulfstrm(machine_config &config)
-{
+MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 8000000);   /* ??? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dooyong_z80_ym2203_state::gulfstrm_map);
-	m_maincpu->set_vblank_int("screen", FUNC(dooyong_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80, 8000000)   /* ??? */
+	MCFG_DEVICE_PROGRAM_MAP(gulfstrm_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
 
-	Z80(config, m_audiocpu, 8000000);  /* ??? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_ym2203_state::lastday_sound_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)  /* ??? */
+	MCFG_DEVICE_PROGRAM_MAP(lastday_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
 
 	/* video hardware */
-	BUFFERED_SPRITERAM8(config, m_spriteram);
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1 );
-	screen.set_screen_update(FUNC(dooyong_z80_ym2203_state::screen_update_gulfstrm));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_ym2203_state, screen_update_gulfstrm)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lastday);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
@@ -1561,31 +1562,31 @@ void dooyong_z80_ym2203_state::gulfstrm(machine_config &config)
 
 	/* sound hardware */
 	sound_2203(config); /* 3.579545MHz */
-}
+MACHINE_CONFIG_END
 
-void dooyong_z80_ym2203_state::pollux(machine_config &config)
-{
+MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 16_MHz_XTAL/2);   /* 8Mhz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dooyong_z80_ym2203_state::pollux_map);
-	m_maincpu->set_vblank_int("screen", FUNC(dooyong_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL/2)   /* 8Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(pollux_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
 
-	Z80(config, m_audiocpu, 16_MHz_XTAL/4);  /* 4Mhz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_ym2203_state::pollux_sound_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/4)  /* 4Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(pollux_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
 
 	/* video hardware */
-	BUFFERED_SPRITERAM8(config, m_spriteram);
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1 );
-	screen.set_screen_update(FUNC(dooyong_z80_ym2203_state::screen_update_pollux));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_ym2203_state, screen_update_pollux)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lastday);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024*2);
@@ -1598,31 +1599,31 @@ void dooyong_z80_ym2203_state::pollux(machine_config &config)
 
 	/* sound hardware */
 	sound_2203(config); /* 3.579545MHz or 4Mhz ??? */
-}
+MACHINE_CONFIG_END
 
-void dooyong_z80_state::bluehawk(machine_config &config)
-{
+MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 8000000);   /* ??? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dooyong_z80_state::bluehawk_map);
-	m_maincpu->set_vblank_int("screen", FUNC(dooyong_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80, 8000000)   /* ??? */
+	MCFG_DEVICE_PROGRAM_MAP(bluehawk_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
 
-	Z80(config, m_audiocpu, 4000000);  /* ??? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_state::bluehawk_sound_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* ??? */
+	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
 	/* video hardware */
-	BUFFERED_SPRITERAM8(config, m_spriteram);
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1 );
-	screen.set_screen_update(FUNC(dooyong_z80_state::screen_update_bluehawk));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_state, screen_update_bluehawk)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bluehawk);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
@@ -1637,31 +1638,31 @@ void dooyong_z80_state::bluehawk(machine_config &config)
 
 	/* sound hardware */
 	sound_2151(config); /* 3.579545MHz or 4Mhz ??? */
-}
+MACHINE_CONFIG_END
 
-void dooyong_z80_state::flytiger(machine_config &config)
-{
+MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 16_MHz_XTAL/2);   /* 8MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dooyong_z80_state::flytiger_map);
-	m_maincpu->set_vblank_int("screen", FUNC(dooyong_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL/2)   /* 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(flytiger_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
 
-	Z80(config, m_audiocpu, 16_MHz_XTAL/4);  /* 4Mhz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_state::bluehawk_sound_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/4)  /* 4Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
 	/* video hardware */
-	BUFFERED_SPRITERAM8(config, m_spriteram);
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1 );
-	screen.set_screen_update(FUNC(dooyong_z80_state::screen_update_flytiger));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_state, screen_update_flytiger)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_flytiger);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024*2);
@@ -1675,28 +1676,28 @@ void dooyong_z80_state::flytiger(machine_config &config)
 
 	/* sound hardware */
 	sound_2151(config);
-}
+MACHINE_CONFIG_END
 
-void dooyong_z80_state::primella(machine_config &config)
-{
+MACHINE_CONFIG_START(dooyong_z80_state::primella)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 16_MHz_XTAL/2);   /* 8MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dooyong_z80_state::primella_map);
-	m_maincpu->set_vblank_int("screen", FUNC(dooyong_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL/2)   /* 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(primella_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
 
-	Z80(config, m_audiocpu, 16_MHz_XTAL/4);   /* 4MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_state::bluehawk_sound_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/4)   /* 4MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(8*8, (64-8)*8-1, 0*8, 32*8-1 );
-	screen.set_screen_update(FUNC(dooyong_z80_state::screen_update_primella));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 0*8, 32*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_state, screen_update_primella)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_primella);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
@@ -1711,7 +1712,7 @@ void dooyong_z80_state::primella(machine_config &config)
 
 	/* sound hardware */
 	sound_2151_4mhz(config); /* PCB has only 1 OSC at 16Mhz */
-}
+MACHINE_CONFIG_END
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(dooyong_68k_state::scanline)
@@ -1726,28 +1727,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(dooyong_68k_state::scanline)
 }
 
 
-void rshark_state::dooyong_68k(machine_config &config)
-{
-	// basic machine hardware
-	M68000(config, m_maincpu, 8_MHz_XTAL);  // 8MHz measured on Super-X
-	TIMER(config, "scantimer").configure_scanline(FUNC(rshark_state::scanline), "screen", 0, 1);
+MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 
-	Z80(config, m_audiocpu, 8_MHz_XTAL/2);  // 4MHz measured on Super-X
-	m_audiocpu->set_addrmap(AS_PROGRAM, &rshark_state::bluehawk_sound_map);
+	// basic machine hardware
+	MCFG_DEVICE_ADD("maincpu", M68000, 8_MHz_XTAL)  // 8MHz measured on Super-X
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", rshark_state, scanline, "screen", 0, 1)
+
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8_MHz_XTAL/2)  // 4MHz measured on Super-X
+	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
 	// video hardware
-	BUFFERED_SPRITERAM16(config, m_spriteram);
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM16)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(rshark_state::screen_update_rshark));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(rshark_state, screen_update_rshark)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rshark);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rshark)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	RSHARK_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 4, "gfx5", 0x00000, "gfx6", 0x60000);
@@ -1760,45 +1761,45 @@ void rshark_state::dooyong_68k(machine_config &config)
 
 	// sound hardware
 	sound_2151_4mhz(config);
-}
+MACHINE_CONFIG_END
 
-void rshark_state::rshark(machine_config &config)
-{
+MACHINE_CONFIG_START(rshark_state::rshark)
 	dooyong_68k(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &rshark_state::rshark_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(rshark_map)
+MACHINE_CONFIG_END
 
-void rshark_state::superx(machine_config &config)
-{
+MACHINE_CONFIG_START(rshark_state::superx)
 	dooyong_68k(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &rshark_state::superx_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(superx_map)
+MACHINE_CONFIG_END
 
-void popbingo_state::popbingo(machine_config &config)
-{
+MACHINE_CONFIG_START(popbingo_state::popbingo)
+
 	// basic machine hardware
-	M68000(config, m_maincpu, 20_MHz_XTAL/2);   // 10MHz measured
-	m_maincpu->set_addrmap(AS_PROGRAM, &popbingo_state::popbingo_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(popbingo_state::scanline), "screen", 0, 1);
+	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL/2)   // 10MHz measured
+	MCFG_DEVICE_PROGRAM_MAP(popbingo_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", popbingo_state, scanline, "screen", 0, 1)
 
-	Z80(config, m_audiocpu, 16_MHz_XTAL/4);     // 4MHz measured
-	m_audiocpu->set_addrmap(AS_PROGRAM, &popbingo_state::bluehawk_sound_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/4)     // 4MHz measured
+	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
 	// video hardware
-	BUFFERED_SPRITERAM16(config, m_spriteram);
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM16)
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1);
-	m_screen->set_screen_update(FUNC(popbingo_state::screen_update_popbingo));
-	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(popbingo_state, screen_update_popbingo)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_popbingo);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popbingo)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 1, "gfx2", 0x00000);
@@ -1808,7 +1809,7 @@ void popbingo_state::popbingo(machine_config &config)
 
 	// sound hardware
 	sound_2151_4mhz(config);
-}
+MACHINE_CONFIG_END
 
 } // anonymous namespace
 

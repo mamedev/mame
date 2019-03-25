@@ -141,12 +141,12 @@ void ym2608_device::rom_bank_updated()
 }
 
 
-u8 ym2608_device::read(offs_t offset)
+READ8_MEMBER( ym2608_device::read )
 {
 	return ym2608_read(m_chip, offset & 3);
 }
 
-void ym2608_device::write(offs_t offset, u8 data)
+WRITE8_MEMBER( ym2608_device::write )
 {
 	ym2608_write(m_chip, offset & 3, data);
 }

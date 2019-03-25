@@ -53,7 +53,7 @@ Namco System 1 Video Hardware
 
 ***************************************************************************/
 
-void namcos1_state::TilemapCB(u16 code, int *tile, int *mask)
+void namcos1_state::TilemapCB(uint16_t code, int *tile, int *mask)
 {
 	code &= 0x3fff;
 	*tile = code;
@@ -82,7 +82,7 @@ void namcos1_state::video_start()
 	for (i = 0x0800;i < 0x1000;i++)
 		m_c116->shadow_table()[i] = i + 0x0800;
 
-	m_copy_sprites = false;
+	m_copy_sprites = 0;
 
 	save_item(NAME(m_copy_sprites));
 }
@@ -95,7 +95,7 @@ void namcos1_state::video_start()
 
 ***************************************************************************/
 
-void namcos1_state::spriteram_w(offs_t offset, u8 data)
+WRITE8_MEMBER( namcos1_state::spriteram_w )
 {
 	/* 0000-07ff work ram */
 	/* 0800-0fff sprite ram */
@@ -103,7 +103,7 @@ void namcos1_state::spriteram_w(offs_t offset, u8 data)
 
 	/* a write to this offset tells the sprite chip to buffer the sprite list */
 	if (offset == 0x0ff2)
-		m_copy_sprites = true;
+		m_copy_sprites = 1;
 }
 
 
@@ -136,32 +136,32 @@ sprite format:
 
 void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 *spriteram = m_spriteram + 0x800;
-	const u8 *source = &spriteram[0x800-0x20];   /* the last is NOT a sprite */
-	const u8 *finish = &spriteram[0];
+	uint8_t *spriteram = m_spriteram + 0x800;
+	const uint8_t *source = &spriteram[0x800-0x20];   /* the last is NOT a sprite */
+	const uint8_t *finish = &spriteram[0];
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
-	const int sprite_xoffs = spriteram[0x07f5] + ((spriteram[0x07f4] & 1) << 8);
-	const int sprite_yoffs = spriteram[0x07f7];
+	int sprite_xoffs = spriteram[0x07f5] + ((spriteram[0x07f4] & 1) << 8);
+	int sprite_yoffs = spriteram[0x07f7];
 
 	while (source >= finish)
 	{
 		static const int sprite_size[4] = { 16, 8, 32, 4 };
-		const u8 attr1 = source[10];
-		const u8 attr2 = source[14];
-		u32 color = source[12];
+		int attr1 = source[10];
+		int attr2 = source[14];
+		int color = source[12];
 		int flipx = (attr1 & 0x20) >> 5;
 		int flipy = (attr2 & 0x01);
-		const u16 sizex = sprite_size[(attr1 & 0xc0) >> 6];
-		const u16 sizey = sprite_size[(attr2 & 0x06) >> 1];
-		const u16 tx = (attr1 & 0x18) & (~(sizex - 1));
-		const u16 ty = (attr2 & 0x18) & (~(sizey - 1));
+		int sizex = sprite_size[(attr1 & 0xc0) >> 6];
+		int sizey = sprite_size[(attr2 & 0x06) >> 1];
+		int tx = (attr1 & 0x18) & (~(sizex-1));
+		int ty = (attr2 & 0x18) & (~(sizey-1));
 		int sx = source[13] + ((color & 0x01) << 8);
 		int sy = -source[15] - sizey;
-		u32 sprite = source[11];
-		const u32 sprite_bank = attr1 & 7;
-		const int priority = (source[14] & 0xe0) >> 5;
-		const u8 pri_mask = (0xff << (priority + 1)) & 0xff;
+		int sprite = source[11];
+		int sprite_bank = attr1 & 7;
+		int priority = (source[14] & 0xe0) >> 5;
+		int pri_mask = (0xff << (priority + 1)) & 0xff;
 
 		sprite += sprite_bank * 256;
 		color = color >> 1;
@@ -205,7 +205,7 @@ void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 
 
-u32 namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	rectangle new_clip = cliprect;
@@ -252,15 +252,16 @@ WRITE_LINE_MEMBER(namcos1_state::screen_vblank)
 	{
 		if (m_copy_sprites)
 		{
-			u8 *spriteram = m_spriteram + 0x800;
+			uint8_t *spriteram = m_spriteram + 0x800;
+			int i,j;
 
-			for (int i = 0; i < 0x800; i += 16)
+			for (i = 0;i < 0x800;i += 16)
 			{
-				for (int j = 10; j < 16; j++)
-					spriteram[i + j] = spriteram[i + j - 6];
+				for (j = 10;j < 16;j++)
+					spriteram[i+j] = spriteram[i+j - 6];
 			}
 
-			m_copy_sprites = false;
+			m_copy_sprites = 0;
 		}
 		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 		m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);

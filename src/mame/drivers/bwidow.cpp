@@ -763,22 +763,22 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void bwidow_state::bwidow(machine_config &config)
-{
-	/* basic machine hardware */
-	M6502(config, m_maincpu, MASTER_CLOCK / 8);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bwidow_state::bwidow_map);
-	m_maincpu->set_periodic_int(FUNC(bwidow_state::irq0_line_assert), attotime::from_hz(CLOCK_3KHZ / 12));
+MACHINE_CONFIG_START(bwidow_state::bwidow)
 
-	ER2055(config, m_earom);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(bwidow_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bwidow_state, irq0_line_assert, CLOCK_3KHZ / 12)
+
+	MCFG_DEVICE_ADD("earom", ER2055)
 
 	/* video hardware */
-	VECTOR(config, "vector", 0);
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
-	screen.set_refresh_hz(CLOCK_3KHZ / 12 / 4);
-	screen.set_size(400, 300);
-	screen.set_visarea(0, 480, 0, 440);
-	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
+	MCFG_VECTOR_ADD("vector")
+	MCFG_SCREEN_ADD("screen", VECTOR)
+	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ / 12 / 4)
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 480, 0, 440)
+	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
 	avg_device &avg(AVG(config, "avg", 0));
 	avg.set_vector_tag("vector");
@@ -786,52 +786,54 @@ void bwidow_state::bwidow(machine_config &config)
 	/* sound hardware */
 	bwidow_audio(config);
 
-}
+MACHINE_CONFIG_END
 
-void bwidow_state::bwidowp(machine_config &config)
-{
+MACHINE_CONFIG_START(bwidow_state::bwidowp)
 	bwidow(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bwidow_state::bwidowp_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bwidowp_map)
 
 	WATCHDOG_TIMER(config, "watchdog");
-}
+MACHINE_CONFIG_END
 
-void bwidow_state::gravitar(machine_config &config)
-{
+MACHINE_CONFIG_START(bwidow_state::gravitar)
 	bwidow(config);
 
 	/* basic machine hardware */
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea(0, 420, 0, 400);
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 420, 0, 400)
 
 	/* sound hardware */
 	gravitar_audio(config);
-}
+MACHINE_CONFIG_END
 
 
-void bwidow_state::lunarbat(machine_config &config)
-{
+MACHINE_CONFIG_START(bwidow_state::lunarbat)
 	gravitar(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &bwidow_state::spacduel_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spacduel_map)
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea(0, 500, 0, 440);
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 500, 0, 440)
+MACHINE_CONFIG_END
 
 
-void bwidow_state::spacduel(machine_config &config)
-{
+MACHINE_CONFIG_START(bwidow_state::spacduel)
 	gravitar(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &bwidow_state::spacduel_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spacduel_map)
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea(0, 540, 0, 400);
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 540, 0, 400)
+MACHINE_CONFIG_END
 
 
 

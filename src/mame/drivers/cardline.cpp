@@ -326,8 +326,8 @@ void cardline_state::cardline_palette(palette_device &palette) const
 	}
 }
 
-void cardline_state::cardline(machine_config &config)
-{
+MACHINE_CONFIG_START(cardline_state::cardline)
+
 	/* basic machine hardware */
 	I80C32(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_port_forced_input(1, 0x10);
@@ -338,14 +338,14 @@ void cardline_state::cardline(machine_config &config)
 	//m_maincpu->set_vblank_int("screen", FUNC(cardline_state::irq1_line_hold));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 35*8);
-	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
-	//screen.set_screen_update(FUNC(cardline_state::screen_update_cardline));
-	//screen.set_palette(m_palette);
-	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 35*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	//MCFG_SCREEN_UPDATE_DRIVER(cardline_state, screen_update_cardline)
+	//MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cardline);
 	PALETTE(config, m_palette, FUNC(cardline_state::cardline_palette), 512);
@@ -365,10 +365,11 @@ void cardline_state::cardline(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

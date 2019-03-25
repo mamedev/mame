@@ -26,11 +26,11 @@ class ti_speech_synthesizer_device : public device_t, public device_ti99_peribox
 public:
 	ti_speech_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
-	void write(offs_t offset, uint8_t data) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz) override { }
-	void cruwrite(offs_t offset, uint8_t data) override { }
+	DECLARE_WRITE8_MEMBER(cruwrite) override { }
 
 protected:
 	virtual void            device_start() override;
@@ -41,6 +41,7 @@ protected:
 private:
 	DECLARE_WRITE_LINE_MEMBER( speech_ready );
 
+	address_space*  m_space;
 	required_device<cd2501e_device> m_vsp;
 	bool            m_reading;
 	bool            m_sbe;          // Signal "Speech block enable"

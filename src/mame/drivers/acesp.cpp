@@ -86,13 +86,13 @@ static INPUT_PORTS_START( ace_sp )
 INPUT_PORTS_END
 
 
-void ace_sp_state::ace_sp(machine_config &config)
-{
-	HD6303Y(config, m_maincpu, 1000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ace_sp_state::ace_sp_map);
+MACHINE_CONFIG_START(ace_sp_state::ace_sp)
+	MCFG_DEVICE_ADD("maincpu", HD6303Y, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(ace_sp_map)
 
-	PIA6821(config, "pia0", 0);
-}
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+
+MACHINE_CONFIG_END
 
 
 #define SP_CBOWL_SOUND \

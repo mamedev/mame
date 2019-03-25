@@ -15,6 +15,9 @@
 
 #include "diserial.h"
 
+#define MCFG_MIDIIN_INPUT_CB(_devcb) \
+	downcast<midiin_device &>(*device).set_input_callback(DEVCB_##_devcb);
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -28,7 +31,7 @@ public:
 	// construction/destruction
 	midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto input_callback() { return m_input_cb.bind(); }
+	template <class Object> devcb_base &set_input_callback(Object &&cb) { return m_input_cb.set_callback(std::forward<Object>(cb)); }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;

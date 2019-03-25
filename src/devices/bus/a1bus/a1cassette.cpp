@@ -36,12 +36,11 @@ ROM_END
 
 /* sound output */
 
-void a1bus_cassette_device::device_add_mconfig(machine_config &config)
-{
-	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED);
-	m_cassette->set_interface("apple1_cass");
-}
+MACHINE_CONFIG_START(a1bus_cassette_device::device_add_mconfig)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	MCFG_CASSETTE_INTERFACE("apple1_cass")
+MACHINE_CONFIG_END
 
 const tiny_rom_entry *a1bus_cassette_device::device_rom_region() const
 {

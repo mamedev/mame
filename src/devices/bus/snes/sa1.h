@@ -26,25 +26,25 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
-	virtual uint8_t read_l(offs_t offset) override;
-	virtual uint8_t read_h(offs_t offset) override;
-	virtual void write_l(offs_t offset, uint8_t data) override;
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_READ8_MEMBER(read_h) override;
+	virtual DECLARE_WRITE8_MEMBER(write_l) override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	// additional reading and writing
-	virtual uint8_t chip_read(offs_t offset) override;
-	virtual void chip_write(offs_t offset, uint8_t data) override;
+	virtual DECLARE_READ8_MEMBER(chip_read) override;
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
 
 private:
-	uint8_t var_length_read(uint32_t offset);
-	void dma_transfer();
-	void dma_cctype1_transfer();
-	void dma_cctype2_transfer();
+	uint8_t var_length_read(address_space &space, uint32_t offset);
+	void dma_transfer(address_space &space);
+	void dma_cctype1_transfer(address_space &space);
+	void dma_cctype2_transfer(address_space &space);
 
-	uint8_t read_regs(uint32_t offset);
+	uint8_t read_regs(address_space &space, uint32_t offset);
 	uint8_t read_iram(uint32_t offset);
 	uint8_t read_bwram(uint32_t offset);
-	void write_regs(uint32_t offset, uint8_t data);
+	void write_regs(address_space &space, uint32_t offset, uint8_t data);
 	void write_iram(uint32_t offset, uint8_t data);
 	void write_bwram(uint32_t offset, uint8_t data);
 	void recalc_irqs();
@@ -103,10 +103,10 @@ private:
 	// $2302-$2305
 	uint16_t m_hcr, m_vcr;
 
-	uint8_t sa1_lo_r(offs_t offset);
-	uint8_t sa1_hi_r(offs_t offset);
-	void sa1_lo_w(offs_t offset, uint8_t data);
-	void sa1_hi_w(offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER(sa1_lo_r);
+	DECLARE_READ8_MEMBER(sa1_hi_r);
+	DECLARE_WRITE8_MEMBER(sa1_lo_w);
+	DECLARE_WRITE8_MEMBER(sa1_hi_w);
 
 	void sa1_map(address_map &map);
 };

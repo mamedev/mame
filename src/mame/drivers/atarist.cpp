@@ -1867,7 +1867,7 @@ void st_state::machine_start()
 	configure_memory();
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
 
 	// allocate timers
 	if (m_mousex.found())
@@ -1922,7 +1922,7 @@ void ste_state::machine_start()
 	configure_memory();
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
 
 	/* allocate timers */
 	m_dmasound_timer = timer_alloc(TIMER_DMASOUND_TICK);
@@ -1969,7 +1969,7 @@ void stbook_state::machine_start()
 	}
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
 
 	/* register for state saving */
 	ste_state::state_save();
@@ -2074,7 +2074,7 @@ void st_state::keyboard(machine_config &config)
 }
 
 //-------------------------------------------------
-//  machine_config( st )
+//  MACHINE_CONFIG( st )
 //-------------------------------------------------
 
 void st_state::st(machine_config &config)
@@ -2106,7 +2106,7 @@ void st_state::st(machine_config &config)
 
 
 //-------------------------------------------------
-//  machine_config( megast )
+//  MACHINE_CONFIG( megast )
 //-------------------------------------------------
 
 void megast_state::megast(machine_config &config)
@@ -2141,7 +2141,7 @@ void megast_state::megast(machine_config &config)
 
 
 //-------------------------------------------------
-//  machine_config( ste )
+//  MACHINE_CONFIG( ste )
 //-------------------------------------------------
 
 void ste_state::ste(machine_config &config)
@@ -2171,7 +2171,7 @@ void ste_state::ste(machine_config &config)
 	LMC1992(config, LMC1992_TAG);
 
 	// cartridge
-//  SOFTWARE_LIST(config, "cart_list").set_original("ste_cart");
+//  MCFG_SOFTWARE_LIST_ADD("cart_list", "ste_cart")
 
 	// internal ram
 	RAM(config, m_ram);
@@ -2181,7 +2181,7 @@ void ste_state::ste(machine_config &config)
 
 
 //-------------------------------------------------
-//  machine_config( megaste )
+//  MACHINE_CONFIG( megaste )
 //-------------------------------------------------
 
 void megaste_state::megaste(machine_config &config)
@@ -2198,7 +2198,7 @@ void megaste_state::megaste(machine_config &config)
 
 
 //-------------------------------------------------
-//  machine_config( stbook )
+//  MACHINE_CONFIG( stbook )
 //-------------------------------------------------
 #if 0
 void stbook_state::stbook(machine_config &config)
@@ -2282,7 +2282,7 @@ void stbook_state::stbook(machine_config &config)
 #endif
 
 //-------------------------------------------------
-//  machine_config( tt030 )
+//  MACHINE_CONFIG( tt030 )
 //-------------------------------------------------
 
 void ste_state::tt030(machine_config &config)
@@ -2292,7 +2292,7 @@ void ste_state::tt030(machine_config &config)
 
 
 //-------------------------------------------------
-//  machine_config( falcon )
+//  MACHINE_CONFIG( falcon )
 //-------------------------------------------------
 
 void ste_state::falcon(machine_config &config)
@@ -2302,7 +2302,7 @@ void ste_state::falcon(machine_config &config)
 
 
 //-------------------------------------------------
-//  machine_config( falcon40 )
+//  MACHINE_CONFIG( falcon40 )
 //-------------------------------------------------
 
 void ste_state::falcon40(machine_config &config)

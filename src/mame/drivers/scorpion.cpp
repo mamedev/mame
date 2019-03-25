@@ -292,39 +292,36 @@ static GFXDECODE_START( gfx_quorum )
 	GFXDECODE_ENTRY( "maincpu", 0x1fb00, quorum_charlayout, 0, 8 )
 GFXDECODE_END
 
-void scorpion_state::scorpion(machine_config &config)
-{
+MACHINE_CONFIG_START(scorpion_state::scorpion)
 	spectrum_128(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &scorpion_state::scorpion_mem);
-	m_maincpu->set_addrmap(AS_IO, &scorpion_state::scorpion_io);
-	m_maincpu->set_addrmap(AS_OPCODES, &scorpion_state::scorpion_switch);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(scorpion_mem)
+	MCFG_DEVICE_IO_MAP(scorpion_io)
+	MCFG_DEVICE_OPCODES_MAP(scorpion_switch)
 
 	MCFG_MACHINE_START_OVERRIDE(scorpion_state, scorpion )
 	MCFG_MACHINE_RESET_OVERRIDE(scorpion_state, scorpion )
-	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_scorpion);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_scorpion)
 
 	BETA_DISK(config, m_beta, 0);
 
 	/* internal ram */
 	m_ram->set_default_size("256K");
 
-	TIMER(config, "nmi_timer").configure_periodic(FUNC(scorpion_state::nmi_check_callback), attotime::from_hz(50));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", scorpion_state, nmi_check_callback, attotime::from_hz(50))
 
-	config.device_remove("exp");
-}
+	MCFG_DEVICE_REMOVE("exp")
+MACHINE_CONFIG_END
 
-void scorpion_state::profi(machine_config &config)
-{
+MACHINE_CONFIG_START(scorpion_state::profi)
 	scorpion(config);
-	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_profi);
-}
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_profi)
+MACHINE_CONFIG_END
 
-void scorpion_state::quorum(machine_config &config)
-{
+MACHINE_CONFIG_START(scorpion_state::quorum)
 	scorpion(config);
-	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_quorum);
-}
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_quorum)
+MACHINE_CONFIG_END
 
 
 

@@ -13,14 +13,11 @@ class oneshot_state : public driver_device
 public:
 	oneshot_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram"),
+		m_sprites(*this, "sprites"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_mid_videoram(*this, "mid_videoram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_scroll(*this, "scroll"),
-		m_io_dsw1(*this, "DSW1"),
-		m_io_lightgun_x(*this, "LIGHT%u_X", 0U),
-		m_io_lightgun_y(*this, "LIGHT%u_Y", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -28,7 +25,6 @@ public:
 	{ }
 
 	void maddonna(machine_config &config);
-	void komocomo(machine_config &config);
 	void oneshot(machine_config &config);
 
 protected:
@@ -38,15 +34,11 @@ protected:
 
 private:
 	/* memory pointers */
-	required_shared_ptr<u16> m_spriteram;
-	required_shared_ptr<u16> m_bg_videoram;
-	required_shared_ptr<u16> m_mid_videoram;
-	required_shared_ptr<u16> m_fg_videoram;
-	required_shared_ptr<u16> m_scroll;
-
-	optional_ioport m_io_dsw1;
-	optional_ioport_array<2> m_io_lightgun_x;
-	optional_ioport_array<2> m_io_lightgun_y;
+	required_shared_ptr<uint16_t> m_sprites;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	required_shared_ptr<uint16_t> m_mid_videoram;
+	required_shared_ptr<uint16_t> m_fg_videoram;
+	required_shared_ptr<uint16_t> m_scroll;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -68,25 +60,24 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	u16 oneshot_in0_word_r();
-	u16 oneshot_gun_x_p1_r();
-	u16 oneshot_gun_y_p1_r();
-	u16 oneshot_gun_x_p2_r();
-	u16 oneshot_gun_y_p2_r();
-	void bg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void mid_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void fg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void soundbank_w(u8 data);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_mid_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	u32 screen_update_oneshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	u32 screen_update_maddonna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	u32 screen_update_komocomo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_crosshairs();
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mem_map(address_map &map);
-	void sound_map(address_map &map);
+	DECLARE_READ16_MEMBER(oneshot_in0_word_r);
+	DECLARE_READ16_MEMBER(oneshot_gun_x_p1_r);
+	DECLARE_READ16_MEMBER(oneshot_gun_y_p1_r);
+	DECLARE_READ16_MEMBER(oneshot_gun_x_p2_r);
+	DECLARE_READ16_MEMBER(oneshot_gun_y_p2_r);
+	DECLARE_WRITE16_MEMBER(oneshot_bg_videoram_w);
+	DECLARE_WRITE16_MEMBER(oneshot_mid_videoram_w);
+	DECLARE_WRITE16_MEMBER(oneshot_fg_videoram_w);
+	DECLARE_WRITE16_MEMBER(soundbank_w);
+	TILE_GET_INFO_MEMBER(get_oneshot_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_oneshot_mid_tile_info);
+	TILE_GET_INFO_MEMBER(get_oneshot_fg_tile_info);
+	uint32_t screen_update_oneshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_maddonna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_crosshairs( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void oneshot_map(address_map &map);
+	void oneshot_sound_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_ONESHOT_H

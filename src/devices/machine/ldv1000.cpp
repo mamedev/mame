@@ -272,8 +272,7 @@ const tiny_rom_entry *pioneer_ldv1000_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void pioneer_ldv1000_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(pioneer_ldv1000_device::device_add_mconfig)
 	Z80(config, m_z80_cpu, XTAL(5'000'000)/2);
 	m_z80_cpu->set_daisy_config(daisy_chain);
 	m_z80_cpu->set_addrmap(AS_PROGRAM, &pioneer_ldv1000_device::ldv1000_map);
@@ -292,7 +291,7 @@ void pioneer_ldv1000_device::device_add_mconfig(machine_config &config)
 	ldvppi1.in_pa_callback().set(FUNC(pioneer_ldv1000_device::ppi1_porta_r));
 	ldvppi1.out_pb_callback().set(FUNC(pioneer_ldv1000_device::ppi1_portb_w));
 	ldvppi1.out_pc_callback().set(FUNC(pioneer_ldv1000_device::ppi1_portc_w));
-}
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------

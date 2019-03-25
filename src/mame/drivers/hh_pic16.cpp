@@ -9,7 +9,6 @@
   serial  device  etc.
 -----------------------------------------------------------
  *020     1650    19??, GI Economega IV TV PPL Tuning System Control
- *021     1650    1978, GI AY-3-8910 demo board
  @024     1655    1979, Toytronic? Football
  @033     1655A   1979, Toytronic Football (newer)
  @036     1655A   1979, Ideal Maniac
@@ -40,6 +39,7 @@
   - tweak MCU frequency for games when video/audio recording surfaces(YouTube etc.)
   - some of the games rely on the fact that faster/longer strobed leds appear brighter,
     eg. hccbaskb(player led), ..
+  - leboom discrete sound for volume decay (simulated for now)
   - ttfball: discrete sound part, for volume gating?
   - what's the relation between hccbaskb and tbaskb? Is one the bootleg
     of the other? Or are they both made by the same subcontractor?
@@ -70,8 +70,8 @@
 class hh_pic16_state : public driver_device
 {
 public:
-	hh_pic16_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	hh_pic16_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_out_x(*this, "%u.%u", 0U, 0U),
@@ -100,7 +100,6 @@ public:
 
 	u16 read_inputs(int columns, u16 colmask = ~0);
 	u8 read_rotated_inputs(int columns, u8 rowmask = ~0);
-	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
@@ -274,21 +273,13 @@ u8 hh_pic16_state::read_rotated_inputs(int columns, u8 rowmask)
 	return ~ret & rowmask;
 }
 
-INPUT_CHANGED_MEMBER(hh_pic16_state::reset_button)
-{
-	// when an input is directly wired to MCU MCLR pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
-
 
 
 /***************************************************************************
 
-  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+  Minidrivers (subclass, I/O, Inputs, Machine Config)
 
 ***************************************************************************/
-
-namespace {
 
 /***************************************************************************
 
@@ -307,8 +298,8 @@ namespace {
 class touchme_state : public hh_pic16_state
 {
 public:
-	touchme_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_pic16_state(mconfig, type, tag)
+	touchme_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -409,13 +400,6 @@ void touchme_state::touchme(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-// roms
-
-ROM_START( touchme )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic_1655a-053", 0x0000, 0x0400, CRC(f0858f0a) SHA1(53ffe111d43db1c110847590350ef62f02ed5e0e) )
-ROM_END
-
 
 
 
@@ -431,13 +415,15 @@ ROM_END
 class pabball_state : public hh_pic16_state
 {
 public:
-	pabball_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_pic16_state(mconfig, type, tag)
+	pabball_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	void pabball(machine_config &config);
 };
 
@@ -492,8 +478,14 @@ static INPUT_PORTS_START( pabball )
 	PORT_CONFSETTING(    0x20, "2" )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_pic16_state, reset_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, pabball_state, reset_button, nullptr)
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(pabball_state::reset_button)
+{
+	// reset button is directly tied to MCLR pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
 void pabball_state::pabball(machine_config &config)
 {
@@ -511,13 +503,6 @@ void pabball_state::pabball(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
-
-// roms
-
-ROM_START( pabball )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic_1655a-043", 0x0000, 0x0400, CRC(43c9b765) SHA1(888a431bab9bcb241c14f33f70863fa2ad89c96b) )
-ROM_END
 
 
 
@@ -537,8 +522,8 @@ ROM_END
 class melodym_state : public hh_pic16_state
 {
 public:
-	melodym_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_pic16_state(mconfig, type, tag)
+	melodym_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(write_b);
@@ -633,13 +618,6 @@ void melodym_state::melodym(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-// roms
-
-ROM_START( melodym )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic_1655a-094", 0x0000, 0x0400, CRC(6d35bd7b) SHA1(20e326085878f69a9d4ef1651ef4443f27188567) )
-ROM_END
-
 
 
 
@@ -662,8 +640,8 @@ ROM_END
 class maniac_state : public hh_pic16_state
 {
 public:
-	maniac_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_pic16_state(mconfig, type, tag)
+	maniac_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -740,13 +718,6 @@ void maniac_state::maniac(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-// roms
-
-ROM_START( maniac )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic_1655a-036", 0x0000, 0x0400, CRC(a96f7011) SHA1(e97ae44d3c1e74c7e1024bb0bdab03eecdc9f827) )
-ROM_END
-
 
 
 
@@ -770,8 +741,8 @@ ROM_END
 class matchme_state : public hh_pic16_state
 {
 public:
-	matchme_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_pic16_state(mconfig, type, tag)
+	matchme_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(write_b);
@@ -779,27 +750,14 @@ public:
 	DECLARE_READ8_MEMBER(read_c);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(speed_switch) { set_clock(); }
+	DECLARE_INPUT_CHANGED_MEMBER(speed_switch);
 	void matchme(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
 };
 
-void matchme_state::machine_reset()
-{
-	hh_pic16_state::machine_reset();
-	set_clock();
-}
-
 // handlers
-
-void matchme_state::set_clock()
-{
-	// MCU clock is ~1.2MHz by default (R=18K, C=15pF), high speed setting adds a
-	// 10pF cap to speed it up by about 7.5%.
-	m_maincpu->set_unscaled_clock((m_inp_matrix[4]->read() & 1) ? 1300000 : 1200000);
-}
 
 WRITE8_MEMBER(matchme_state::write_b)
 {
@@ -873,6 +831,24 @@ static INPUT_PORTS_START( matchme )
 	PORT_CONFSETTING(    0x00, "Auto" )
 INPUT_PORTS_END
 
+INPUT_CHANGED_MEMBER(matchme_state::speed_switch)
+{
+	set_clock();
+}
+
+void matchme_state::set_clock()
+{
+	// MCU clock is ~1.2MHz by default (R=18K, C=15pF), high speed setting adds a
+	// 10pF cap to speed it up by about 7.5%.
+	m_maincpu->set_unscaled_clock((m_inp_matrix[4]->read() & 1) ? 1300000 : 1200000);
+}
+
+void matchme_state::machine_reset()
+{
+	hh_pic16_state::machine_reset();
+	set_clock();
+}
+
 void matchme_state::matchme(machine_config &config)
 {
 	/* basic machine hardware */
@@ -889,13 +865,6 @@ void matchme_state::matchme(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
-
-// roms
-
-ROM_START( matchme )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic_1655a-049", 0x0000, 0x0400, CRC(fa3f4805) SHA1(57cbac18baa201927e99cd69cc2ffda4d2e642bb) )
-ROM_END
 
 
 
@@ -927,8 +896,8 @@ ROM_END
 class leboom_state : public hh_pic16_state
 {
 public:
-	leboom_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_pic16_state(mconfig, type, tag)
+	leboom_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_READ8_MEMBER(read_a);
@@ -943,15 +912,6 @@ public:
 protected:
 	virtual void machine_start() override;
 };
-
-void leboom_state::machine_start()
-{
-	hh_pic16_state::machine_start();
-
-	// zerofill/init
-	m_speaker_volume = 0;
-	save_item(NAME(m_speaker_volume));
-}
 
 // handlers
 
@@ -1035,6 +995,15 @@ static INPUT_PORTS_START( leboom )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("Blue Button 8")
 INPUT_PORTS_END
 
+void leboom_state::machine_start()
+{
+	hh_pic16_state::machine_start();
+
+	// zerofill/init
+	m_speaker_volume = 0;
+	save_item(NAME(m_speaker_volume));
+}
+
 void leboom_state::leboom(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1052,13 +1021,6 @@ void leboom_state::leboom(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 	TIMER(config, "speaker_decay").configure_periodic(FUNC(leboom_state::speaker_decay_sim), attotime::from_msec(25));
 }
-
-// roms
-
-ROM_START( leboom )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic_1655a-061", 0x0000, 0x0400, CRC(5880eea1) SHA1(e3795b347fd5df9de084da36e33f6b70fbc0b0ae) )
-ROM_END
 
 
 
@@ -1078,8 +1040,8 @@ ROM_END
 class tbaskb_state : public hh_pic16_state
 {
 public:
-	tbaskb_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_pic16_state(mconfig, type, tag)
+	tbaskb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1168,13 +1130,6 @@ void tbaskb_state::tbaskb(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-// roms
-
-ROM_START( tbaskb )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic_1655a-051", 0x0000, 0x0400, CRC(92534b40) SHA1(7055e32846c913e68f7d35f279cd537f6325f4f2) )
-ROM_END
-
 
 
 
@@ -1195,8 +1150,8 @@ ROM_END
 class rockpin_state : public hh_pic16_state
 {
 public:
-	rockpin_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_pic16_state(mconfig, type, tag)
+	rockpin_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1292,13 +1247,6 @@ void rockpin_state::rockpin(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-// roms
-
-ROM_START( rockpin )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic_1650a-110_69-11397", 0x0000, 0x0400, CRC(d5396e77) SHA1(952feaff70fde53a9eda84c54704520d50749e78) )
-ROM_END
-
 
 
 
@@ -1318,8 +1266,8 @@ ROM_END
 class hccbaskb_state : public hh_pic16_state
 {
 public:
-	hccbaskb_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_pic16_state(mconfig, type, tag)
+	hccbaskb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1408,13 +1356,6 @@ void hccbaskb_state::hccbaskb(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-// roms
-
-ROM_START( hccbaskb )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "69-11557", 0x0000, 0x0400, CRC(56e81079) SHA1(1933f87f82c4c53f953534dba7757c9afc52d5bc) )
-ROM_END
-
 
 
 
@@ -1438,8 +1379,8 @@ ROM_END
 class ttfball_state : public hh_pic16_state
 {
 public:
-	ttfball_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_pic16_state(mconfig, type, tag)
+	ttfball_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1566,18 +1507,6 @@ void ttfball_state::ttfball(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-// roms
-
-ROM_START( ttfball )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic_1655a-033", 0x0000, 0x0400, CRC(2b500501) SHA1(f7fe464663c56e2181a31a1dc5f1f5239df57bed) )
-ROM_END
-
-ROM_START( ttfballa )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic_1655-024", 0x0000, 0x0400, CRC(9091102f) SHA1(ef72759f20b5a99e0366863caad1e26be114263f) )
-ROM_END
-
 
 
 
@@ -1597,8 +1526,8 @@ ROM_END
 class uspbball_state : public hh_pic16_state
 {
 public:
-	uspbball_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_pic16_state(mconfig, type, tag)
+	uspbball_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1688,13 +1617,6 @@ void uspbball_state::uspbball(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-// roms
-
-ROM_START( uspbball )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic_1650a-133", 0x0000, 0x0400, CRC(479e98be) SHA1(67437177b059dfa6e01940da26daf997cec96ead) )
-ROM_END
-
 
 
 
@@ -1714,8 +1636,8 @@ ROM_END
 class us2pfball_state : public hh_pic16_state
 {
 public:
-	us2pfball_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_pic16_state(mconfig, type, tag)
+	us2pfball_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1829,7 +1751,86 @@ void us2pfball_state::us2pfball(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-// roms
+
+
+
+
+/***************************************************************************
+
+  Game driver(s)
+
+***************************************************************************/
+
+ROM_START( touchme )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic_1655a-053", 0x0000, 0x0400, CRC(f0858f0a) SHA1(53ffe111d43db1c110847590350ef62f02ed5e0e) )
+ROM_END
+
+
+ROM_START( pabball )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic_1655a-043", 0x0000, 0x0400, CRC(43c9b765) SHA1(888a431bab9bcb241c14f33f70863fa2ad89c96b) )
+ROM_END
+
+
+ROM_START( melodym )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic_1655a-094", 0x0000, 0x0400, CRC(6d35bd7b) SHA1(20e326085878f69a9d4ef1651ef4443f27188567) )
+ROM_END
+
+
+ROM_START( maniac )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic_1655a-036", 0x0000, 0x0400, CRC(a96f7011) SHA1(e97ae44d3c1e74c7e1024bb0bdab03eecdc9f827) )
+ROM_END
+
+
+ROM_START( matchme )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic_1655a-049", 0x0000, 0x0400, CRC(fa3f4805) SHA1(57cbac18baa201927e99cd69cc2ffda4d2e642bb) )
+ROM_END
+
+
+ROM_START( leboom )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic_1655a-061", 0x0000, 0x0400, CRC(5880eea1) SHA1(e3795b347fd5df9de084da36e33f6b70fbc0b0ae) )
+ROM_END
+
+
+ROM_START( tbaskb )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic_1655a-051", 0x0000, 0x0400, CRC(92534b40) SHA1(7055e32846c913e68f7d35f279cd537f6325f4f2) )
+ROM_END
+
+
+ROM_START( rockpin )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic_1650a-110_69-11397", 0x0000, 0x0400, CRC(d5396e77) SHA1(952feaff70fde53a9eda84c54704520d50749e78) )
+ROM_END
+
+
+ROM_START( hccbaskb )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "69-11557", 0x0000, 0x0400, CRC(56e81079) SHA1(1933f87f82c4c53f953534dba7757c9afc52d5bc) )
+ROM_END
+
+
+ROM_START( ttfball )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic_1655a-033", 0x0000, 0x0400, CRC(2b500501) SHA1(f7fe464663c56e2181a31a1dc5f1f5239df57bed) )
+ROM_END
+
+ROM_START( ttfballa )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic_1655-024", 0x0000, 0x0400, CRC(9091102f) SHA1(ef72759f20b5a99e0366863caad1e26be114263f) )
+ROM_END
+
+
+ROM_START( uspbball )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic_1650a-133", 0x0000, 0x0400, CRC(479e98be) SHA1(67437177b059dfa6e01940da26daf997cec96ead) )
+ROM_END
+
 
 ROM_START( us2pfball )
 	ROM_REGION( 0x0400, "maincpu", 0 )
@@ -1837,14 +1838,6 @@ ROM_START( us2pfball )
 ROM_END
 
 
-
-} // anonymous namespace
-
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
 
 //    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1979, touchme,   0,       0, touchme,   touchme,   touchme_state,   empty_init, "Atari", "Touch Me (handheld, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
@@ -1857,7 +1850,7 @@ CONS( 1979, maniac,    0,       0, maniac,    maniac,    maniac_state,    empty_
 
 CONS( 1980, matchme,   0,       0, matchme,   matchme,   matchme_state,   empty_init, "Kingsford", "Match Me", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, leboom,    0,       0, leboom,    leboom,    leboom_state,    empty_init, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, leboom,    0,       0, leboom,    leboom,    leboom_state,    empty_init, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, tbaskb,    0,       0, tbaskb,    tbaskb,    tbaskb_state,    empty_init, "Tandy Radio Shack", "Electronic Basketball (Tandy)", MACHINE_SUPPORTS_SAVE )
 

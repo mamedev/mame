@@ -175,7 +175,7 @@ static const int spectrum_plus3_memory_selections[]=
 WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_3ffd_w )
 {
 	if (m_floppy==1)
-		m_upd765->fifo_w(data);
+		m_upd765->fifo_w(space, 0, data, 0xff);
 }
 
 READ8_MEMBER( spectrum_state::spectrum_plus3_port_3ffd_r )
@@ -183,7 +183,7 @@ READ8_MEMBER( spectrum_state::spectrum_plus3_port_3ffd_r )
 	if (m_floppy==0)
 		return 0xff;
 	else
-		return m_upd765->fifo_r();
+		return m_upd765->fifo_r(space, 0, 0xff);
 }
 
 
@@ -192,53 +192,71 @@ READ8_MEMBER( spectrum_state::spectrum_plus3_port_2ffd_r )
 	if (m_floppy==0)
 		return 0xff;
 	else
-		return m_upd765->msr_r();
+		return m_upd765->msr_r(space, 0, 0xff);
 }
 
 
 void spectrum_state::spectrum_plus3_update_memory()
 {
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	uint8_t *messram = m_ram->pointer();
+
 	if (m_port_7ffd_data & 8)
 	{
 		logerror("+3 SCREEN 1: BLOCK 7\n");
-		m_screen_location = m_ram->pointer() + (7 << 14);
+		m_screen_location = messram + (7 << 14);
 	}
 	else
 	{
 		logerror("+3 SCREEN 0: BLOCK 5\n");
-		m_screen_location = m_ram->pointer() + (5 << 14);
+		m_screen_location = messram + (5 << 14);
 	}
 
 	if ((m_port_1ffd_data & 0x01) == 0)
 	{
 		/* select ram at 0x0c000-0x0ffff */
 		int ram_page = m_port_7ffd_data & 0x07;
-		unsigned char *ram_data = m_ram->pointer() + (ram_page<<14);
+		unsigned char *ram_data = messram + (ram_page<<14);
 		membank("bank4")->set_base(ram_data);
 
 		logerror("RAM at 0xc000: %02x\n", ram_page);
 
 		/* Reset memory between 0x4000 - 0xbfff in case extended paging was being used */
 		/* Bank 5 in 0x4000 - 0x7fff */
-		membank("bank2")->set_base(m_ram->pointer() + (5 << 14));
+		membank("bank2")->set_base(messram + (5 << 14));
 
 		/* Bank 2 in 0x8000 - 0xbfff */
-		membank("bank3")->set_base(m_ram->pointer() + (2 << 14));
+		membank("bank3")->set_base(messram + (2 << 14));
+
+		/* ROM switching */
+		int ROMSelection = BIT(m_port_7ffd_data, 4) | ((m_port_1ffd_data >> 1) & 0x02);
+
+		/* rom 0 is editor, rom 1 is syntax, rom 2 is DOS, rom 3 is 48 BASIC */
+		unsigned char *ChosenROM = memregion("maincpu")->base() + 0x010000 + (ROMSelection << 14);
+
+		membank("bank1")->set_base(ChosenROM);
+		space.unmap_write(0x0000, 0x3fff);
+
+		logerror("rom switch: %02x\n", ROMSelection);
 	}
 	else
 	{
 		/* Extended memory paging */
 		int MemorySelection = (m_port_1ffd_data >> 1) & 0x03;
 		const int *memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
-		unsigned char *ram_data = m_ram->pointer() + (memory_selection[0] << 14);
+		unsigned char *ram_data = messram + (memory_selection[0] << 14);
 
-		ram_data = m_ram->pointer() + (memory_selection[1] << 14);
+		membank("bank1")->set_base(ram_data);
+		/* allow writes to 0x0000-0x03fff */
+		space.install_write_bank(0x0000, 0x3fff, "bank1");
+
+		ram_data = messram + (memory_selection[1] << 14);
 		membank("bank2")->set_base(ram_data);
 
-		ram_data = m_ram->pointer() + (memory_selection[2] << 14);
+		ram_data = messram + (memory_selection[2] << 14);
 		membank("bank3")->set_base(ram_data);
 
-		ram_data = m_ram->pointer() + (memory_selection[3] << 14);
+		ram_data = messram + (memory_selection[3] << 14);
 		membank("bank4")->set_base(ram_data);
 
 		logerror("extended memory paging: %02x\n", MemorySelection);
@@ -246,49 +264,6 @@ void spectrum_state::spectrum_plus3_update_memory()
 }
 
 
-WRITE8_MEMBER(spectrum_state::spectrum_plus3_bank1_w)
-{
-	if (m_exp->romcs())
-	{
-		m_exp->mreq_w(offset, data);
-	}
-	else if ((m_port_1ffd_data & 0x01) != 0)
-	{
-		/* Extended memory paging */
-		int MemorySelection = (m_port_1ffd_data >> 1) & 0x03;
-		const int *memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
-		m_ram->pointer()[(memory_selection[0] << 14) + offset] = data;
-	}
-}
-
-READ8_MEMBER(spectrum_state::spectrum_plus3_bank1_r)
-{
-	uint8_t data;
-
-	if (m_exp->romcs())
-	{
-		data = m_exp->mreq_r(offset);
-	}
-	else
-	{
-		if ((m_port_1ffd_data & 0x01) == 0)
-		{
-			/* ROM switching */
-			int ROMSelection = BIT(m_port_7ffd_data, 4) | ((m_port_1ffd_data >> 1) & 0x02);
-
-			/* rom 0 is editor, rom 1 is syntax, rom 2 is DOS, rom 3 is 48 BASIC */
-			data = memregion("maincpu")->base()[0x010000 + (ROMSelection << 14) + offset];
-		}
-		else
-		{
-			/* Extended memory paging */
-			int MemorySelection = (m_port_1ffd_data >> 1) & 0x03;
-			const int *memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
-			data = m_ram->pointer()[(memory_selection[0] << 14) + offset];
-		}
-	}
-	return data;
-}
 
 WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_7ffd_w )
 {
@@ -332,7 +307,7 @@ WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_1ffd_w )
 The function decodes the ports appropriately */
 void spectrum_state::spectrum_plus3_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(m_exp, FUNC(spectrum_expansion_slot_device::iorq_r), FUNC(spectrum_expansion_slot_device::iorq_w));
+	map.unmap_value_high();
 	map(0x0000, 0x0000).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
 	map(0x4000, 0x4000).w(FUNC(spectrum_state::spectrum_plus3_port_7ffd_w)).mirror(0x3ffd);
 	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
@@ -344,7 +319,7 @@ void spectrum_state::spectrum_plus3_io(address_map &map)
 
 void spectrum_state::spectrum_plus3_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(FUNC(spectrum_state::spectrum_plus3_bank1_r), FUNC(spectrum_state::spectrum_plus3_bank1_w)); //.bankr("bank1");
+	map(0x0000, 0x3fff).bankr("bank1");
 	map(0x4000, 0x7fff).bankrw("bank2");
 	map(0x8000, 0xbfff).bankrw("bank3");
 	map(0xc000, 0xffff).bankrw("bank4");
@@ -366,11 +341,17 @@ MACHINE_RESET_MEMBER(spectrum_state,spectrum_plus3)
 void spectrum_state::init_plus3()
 {
 	m_floppy = 1;
+
+	// setup expansion slot
+	m_exp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 void spectrum_state::init_plus2()
 {
 	m_floppy = 0;
+
+	// setup expansion slot
+	m_exp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 static void specpls3_floppies(device_slot_interface &device)
@@ -397,29 +378,26 @@ static GFXDECODE_START( specpls3 )
 GFXDECODE_END
 
 
-void spectrum_state::spectrum_plus3(machine_config &config)
-{
+MACHINE_CONFIG_START(spectrum_state::spectrum_plus3)
 	spectrum_128(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_state::spectrum_plus3_mem);
-	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_plus3_io);
-
-	m_screen->set_refresh_hz(50.01);
-
-	subdevice<gfxdecode_device>("gfxdecode")->set_info(specpls3);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spectrum_plus3_mem)
+	MCFG_DEVICE_IO_MAP(spectrum_plus3_io)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(50.01)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", specpls3)
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_plus3 )
 
 	UPD765A(config, m_upd765, 4'000'000, true, true);
-	FLOPPY_CONNECTOR(config, "upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats);
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 
-	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, specpls3_expansion_devices, nullptr);
-	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	MCFG_DEVICE_MODIFY("exp")
+	MCFG_DEVICE_SLOT_INTERFACE(specpls3_expansion_devices, nullptr, false)
 
-	SOFTWARE_LIST(config, "flop_list").set_original("specpls3_flop");
-}
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "specpls3_flop")
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

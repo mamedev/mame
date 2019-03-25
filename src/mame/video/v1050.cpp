@@ -109,8 +109,7 @@ void v1050_state::video_start()
 
 /* Machine Drivers */
 
-void v1050_state::v1050_video(machine_config &config)
-{
+MACHINE_CONFIG_START(v1050_state::v1050_video)
 	H46505(config, m_crtc, 15.36_MHz_XTAL/8);
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
@@ -118,12 +117,12 @@ void v1050_state::v1050_video(machine_config &config)
 	m_crtc->set_update_row_callback(FUNC(v1050_state::crtc_update_row), this);
 	m_crtc->out_vsync_callback().set(FUNC(v1050_state::crtc_vs_w));
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
-	screen.set_screen_update(H46505_TAG, FUNC(h46505_device::screen_update));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(640, 400);
-	screen.set_visarea(0,640-1, 0, 400-1);
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
+	MCFG_SCREEN_UPDATE_DEVICE(H46505_TAG, h46505_device, screen_update)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(640, 400)
+	MCFG_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
-}
+MACHINE_CONFIG_END

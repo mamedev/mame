@@ -145,13 +145,13 @@ void megaduck_rom_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-uint8_t gb_rom_device::read_rom(offs_t offset)
+READ8_MEMBER(gb_rom_device::read_rom)
 {
 	m_latch_bank = offset / 0x4000;
 	return m_rom[rom_bank_map[m_latch_bank] * 0x4000 + (offset & 0x3fff)];
 }
 
-uint8_t gb_rom_device::read_ram(offs_t offset)
+READ8_MEMBER(gb_rom_device::read_ram)
 {
 	if (!m_ram.empty())
 		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + offset];
@@ -159,7 +159,7 @@ uint8_t gb_rom_device::read_ram(offs_t offset)
 		return 0xff;
 }
 
-void gb_rom_device::write_ram(offs_t offset, uint8_t data)
+WRITE8_MEMBER(gb_rom_device::write_ram)
 {
 	if (!m_ram.empty())
 		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + offset] = data;
@@ -168,7 +168,7 @@ void gb_rom_device::write_ram(offs_t offset, uint8_t data)
 
 // Tamagotchi
 
-uint8_t gb_rom_tama5_device::read_rom(offs_t offset)
+READ8_MEMBER(gb_rom_tama5_device::read_rom)
 {
 	if (offset < 0x4000)
 		return m_rom[rom_bank_map[m_latch_bank] * 0x4000 + (offset & 0x3fff)];
@@ -176,12 +176,12 @@ uint8_t gb_rom_tama5_device::read_rom(offs_t offset)
 		return m_rom[rom_bank_map[m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
 }
 
-uint8_t gb_rom_tama5_device::read_ram(offs_t offset)
+READ8_MEMBER(gb_rom_tama5_device::read_ram)
 {
 	return m_rtc_reg;
 }
 
-void gb_rom_tama5_device::write_ram(offs_t offset, uint8_t data)
+WRITE8_MEMBER(gb_rom_tama5_device::write_ram)
 {
 	switch (offset & 0x0001)
 	{
@@ -259,12 +259,12 @@ void gb_rom_tama5_device::write_ram(offs_t offset, uint8_t data)
 
 // Wisdom Tree
 
-uint8_t gb_rom_wisdom_device::read_rom(offs_t offset)
+READ8_MEMBER(gb_rom_wisdom_device::read_rom)
 {
 	return m_rom[rom_bank_map[m_latch_bank] * 0x4000 + offset];
 }
 
-void gb_rom_wisdom_device::write_bank(offs_t offset, uint8_t data)
+WRITE8_MEMBER(gb_rom_wisdom_device::write_bank)
 {
 	if (offset < 0x4000)
 		m_latch_bank = (offset << 1) & 0x1ff;
@@ -273,7 +273,7 @@ void gb_rom_wisdom_device::write_bank(offs_t offset, uint8_t data)
 
 // Yong Yong pirate
 
-uint8_t gb_rom_yong_device::read_rom(offs_t offset)
+READ8_MEMBER(gb_rom_yong_device::read_rom)
 {
 	if (offset < 0x4000)
 		return m_rom[rom_bank_map[m_latch_bank] * 0x4000 + (offset & 0x3fff)];
@@ -281,7 +281,7 @@ uint8_t gb_rom_yong_device::read_rom(offs_t offset)
 		return m_rom[rom_bank_map[m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
 }
 
-void gb_rom_yong_device::write_bank(offs_t offset, uint8_t data)
+WRITE8_MEMBER(gb_rom_yong_device::write_bank)
 {
 	if (offset == 0x2000)
 		m_latch_bank2 = data;
@@ -290,7 +290,7 @@ void gb_rom_yong_device::write_bank(offs_t offset, uint8_t data)
 
 // ATV Racin pirate (incomplete)
 
-uint8_t gb_rom_atvrac_device::read_rom(offs_t offset)
+READ8_MEMBER(gb_rom_atvrac_device::read_rom)
 {
 	if (offset < 0x4000)
 		return m_rom[rom_bank_map[m_latch_bank] * 0x4000 + (offset & 0x3fff)];
@@ -298,7 +298,7 @@ uint8_t gb_rom_atvrac_device::read_rom(offs_t offset)
 		return m_rom[rom_bank_map[m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
 }
 
-void gb_rom_atvrac_device::write_bank(offs_t offset, uint8_t data)
+WRITE8_MEMBER(gb_rom_atvrac_device::write_bank)
 {
 	if (offset == 0x3f00)
 	{
@@ -312,7 +312,7 @@ void gb_rom_atvrac_device::write_bank(offs_t offset, uint8_t data)
 
 // La Sa Ma pirate (incomplete)
 
-uint8_t gb_rom_lasama_device::read_rom(offs_t offset)
+READ8_MEMBER(gb_rom_lasama_device::read_rom)
 {
 	if (offset < 0x4000)
 		return m_rom[rom_bank_map[m_latch_bank] * 0x4000 + (offset & 0x3fff)];
@@ -320,7 +320,7 @@ uint8_t gb_rom_lasama_device::read_rom(offs_t offset)
 		return m_rom[rom_bank_map[m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
 }
 
-void gb_rom_lasama_device::write_bank(offs_t offset, uint8_t data)
+WRITE8_MEMBER(gb_rom_lasama_device::write_bank)
 {
 	if (offset == 0x2080)
 	{
@@ -341,7 +341,7 @@ void gb_rom_lasama_device::write_bank(offs_t offset, uint8_t data)
 
 // MegaDuck carts
 
-uint8_t megaduck_rom_device::read_rom(offs_t offset)
+READ8_MEMBER(megaduck_rom_device::read_rom)
 {
 	if (offset < 0x4000)
 		return m_rom[rom_bank_map[m_latch_bank] * 0x4000 + (offset & 0x3fff)];
@@ -349,13 +349,13 @@ uint8_t megaduck_rom_device::read_rom(offs_t offset)
 		return m_rom[rom_bank_map[m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
 }
 
-void megaduck_rom_device::write_bank(offs_t offset, uint8_t data)
+WRITE8_MEMBER(megaduck_rom_device::write_bank)
 {
 	if (offset == 0x0001)
 		m_latch_bank2 = data;
 }
 
-void megaduck_rom_device::write_ram(offs_t offset, uint8_t data)
+WRITE8_MEMBER(megaduck_rom_device::write_ram)
 {
 	m_latch_bank = data * 2;
 	m_latch_bank2 = data * 2 + 1;

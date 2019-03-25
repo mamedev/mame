@@ -45,28 +45,33 @@ public:
 	auto intrq_wr_callback() { return intrq_cb.bind(); }
 	auto drq_wr_callback() { return drq_cb.bind(); }
 	auto hdl_wr_callback() { return hdl_cb.bind(); }
-	auto us_wr_callback() { return us_cb.bind(); }
-	auto idx_wr_callback() { return idx_cb.bind(); }
 
 	virtual void map(address_map &map) override = 0;
 
-	uint8_t sra_r();
-	uint8_t srb_r();
-	uint8_t dor_r();
-	void dor_w(uint8_t data);
-	uint8_t tdr_r();
-	void tdr_w(uint8_t data);
-	uint8_t msr_r();
-	void dsr_w(uint8_t data);
-	uint8_t fifo_r();
-	void fifo_w(uint8_t data);
-	uint8_t dir_r() { return do_dir_r(); }
-	void ccr_w(uint8_t data);
+	DECLARE_READ8_MEMBER (sra_r);
+	DECLARE_READ8_MEMBER (srb_r);
+	DECLARE_READ8_MEMBER (dor_r);
+	DECLARE_WRITE8_MEMBER(dor_w);
+	DECLARE_READ8_MEMBER (tdr_r);
+	DECLARE_WRITE8_MEMBER(tdr_w);
+	uint8_t read_msr();
+	DECLARE_READ8_MEMBER (msr_r);
+	DECLARE_WRITE8_MEMBER(dsr_w);
+	uint8_t read_fifo();
+	void write_fifo(uint8_t data);
+	DECLARE_READ8_MEMBER (fifo_r) { return read_fifo(); }
+	DECLARE_WRITE8_MEMBER(fifo_w) { write_fifo(data); }
+	DECLARE_READ8_MEMBER (dir_r);
+	DECLARE_WRITE8_MEMBER(ccr_w);
 
 	virtual uint8_t do_dir_r() override;
 
 	uint8_t dma_r() override;
 	void dma_w(uint8_t data) override;
+
+	// Same as the previous ones, but as memory-mappable members
+	DECLARE_READ8_MEMBER(mdma_r);
+	DECLARE_WRITE8_MEMBER(mdma_w);
 
 	bool get_irq() const;
 	bool get_drq() const;
@@ -86,7 +91,6 @@ public:
 protected:
 	upd765_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -265,8 +269,7 @@ protected:
 	int main_phase;
 
 	live_info cur_live, checkpoint_live;
-	devcb_write_line intrq_cb, drq_cb, hdl_cb, idx_cb;
-	devcb_write8 us_cb;
+	devcb_write_line intrq_cb, drq_cb, hdl_cb;
 	bool cur_irq, other_irq, data_irq, drq, internal_drq, tc, tc_done, locked, mfm, scan_done;
 	floppy_info flopi[4];
 
@@ -470,7 +473,7 @@ public:
 	upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
-	void auxcmd_w(uint8_t data);
+	DECLARE_WRITE8_MEMBER(auxcmd_w);
 };
 
 class n82077aa_device : public upd765_family_device {
@@ -521,7 +524,7 @@ public:
 	auto input_handler() { return m_input_handler.bind(); }
 
 	virtual void map(address_map &map) override;
-	uint8_t input_r();
+	DECLARE_READ8_MEMBER( input_r );
 
 protected:
 	virtual void device_start() override;
@@ -536,7 +539,7 @@ public:
 
 	virtual void map(address_map &map) override;
 
-	void cr1_w(uint8_t data);
+	DECLARE_WRITE8_MEMBER(cr1_w);
 
 protected:
 	virtual void device_start() override;

@@ -150,15 +150,8 @@ DEFINE_DEVICE_TYPE(SWP30, swp30_device, "swp30", "Yamaha SWP30 sound chip")
 swp30_device::swp30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SWP30, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
-	  device_rom_interface(mconfig, *this, 25+2, ENDIANNESS_LITTLE, 32),
-	  m_meg(*this, "meg")
+	  device_rom_interface(mconfig, *this, 25+2, ENDIANNESS_LITTLE, 32)
 {
-	(void)m_map;
-}
-
-void swp30_device::device_add_mconfig(machine_config &config)
-{
-	MEGEMB(config, m_meg);
 }
 
 void swp30_device::device_start()
@@ -167,7 +160,7 @@ void swp30_device::device_start()
 
 	// Attenuantion for panning is 4.4 floating point.  That means 0
 	// to -96.3dB.  Since it's a nice range, we assume it's the same
-	// for other attenuation values.  Computed value is 1.16
+	// for other attenuation values.  Computed value is is 1.16
 	// format, to avoid overflow
 
 	for(int i=0; i<256; i++)
@@ -335,8 +328,8 @@ void swp30_device::map(address_map &map)
 	rchan(map, 0x27).rw(FUNC(swp30_device::prg_fp_r<3>), FUNC(swp30_device::prg_fp_w<3>));
 	rchan(map, 0x29).rw(FUNC(swp30_device::prg_fp_r<4>), FUNC(swp30_device::prg_fp_w<4>));
 	rchan(map, 0x2b).rw(FUNC(swp30_device::prg_fp_r<5>), FUNC(swp30_device::prg_fp_w<5>));
-	rchan(map, 0x30).rw(FUNC(swp30_device::prg_off_r<0>), FUNC(swp30_device::prg_off_w<0>));
-	rchan(map, 0x31).rw(FUNC(swp30_device::prg_off_r<1>), FUNC(swp30_device::prg_off_w<1>));
+	rchan(map, 0x30).rw(FUNC(swp30_device::prg_int_r<0>), FUNC(swp30_device::prg_int_w<0>));
+	rchan(map, 0x31).rw(FUNC(swp30_device::prg_int_r<1>), FUNC(swp30_device::prg_int_w<1>));
 	rchan(map, 0x3e).rw(FUNC(swp30_device::prg_lfo_r<0>), FUNC(swp30_device::prg_lfo_w<0>));
 	rchan(map, 0x3f).rw(FUNC(swp30_device::prg_lfo_r<1>), FUNC(swp30_device::prg_lfo_w<1>));
 }
@@ -388,14 +381,14 @@ void swp30_device::prg_address_w(u16 data)
 template<int sel> u16 swp30_device::prg_r()
 {
 	constexpr offs_t shift = 48-16*sel;
-	return m_meg->prg_r(m_program_address) >> shift;
+	return m_program[m_program_address] >> shift;
 }
 
 template<int sel> void swp30_device::prg_w(u16 data)
 {
 	constexpr offs_t shift = 48-16*sel;
 	constexpr u64 mask = ~(u64(0xffff) << shift);
-	m_meg->prg_w(m_program_address, (m_meg->prg_r(m_program_address) & mask) | (u64(data) << shift));
+	m_program[m_program_address] = (m_program[m_program_address] & mask) | (u64(data) << shift);
 
 	if(sel == 3) {
 		if(0)
@@ -409,12 +402,14 @@ template<int sel> void swp30_device::prg_w(u16 data)
 
 template<int sel> u16 swp30_device::map_r()
 {
-	return m_meg->map_r(sel);
+	return m_map[sel];
 }
 
 template<int sel> void swp30_device::map_w(u16 data)
 {
-	m_meg->map_w(sel, data);
+	m_map[sel] = data;
+	if(0)
+		logerror("map %d: type=%02x offset=%05x size=%05x\n", sel, data >> 11, (data & 0xff) << 10, 0x400 << ((data >> 8) & 7));
 }
 
 
@@ -661,36 +656,54 @@ void swp30_device::address_l_w(offs_t offset, u16 data)
 }
 
 
-// MEG registers forwarding
+// MEG registers (Multiple Effects Generator)
 
 template<int sel> u16 swp30_device::prg_fp_r(offs_t offset)
 {
-	return m_meg->fp_r((offset >> 6)*6 + sel);
+	offs_t adr = (offset >> 6)*6 + sel;
+	return m_program_pfp[adr];
 }
 
 template<int sel> void swp30_device::prg_fp_w(offs_t offset, u16 data)
 {
-	m_meg->fp_w((offset >> 6)*6 + sel, data);
+	offs_t adr = (offset >> 6)*6 + sel;
+	m_program_pfp[adr] = data;
+	if(0)
+		logerror("prg_fp_w %03x, %04x\n", adr, data);
 }
 
-template<int sel> u16 swp30_device::prg_off_r(offs_t offset)
+template<int sel> u16 swp30_device::prg_int_r(offs_t offset)
 {
-	return m_meg->offset_r((offset >> 6)*2 + sel);
+	offs_t adr = (offset >> 6)*2 + sel;
+	return m_program_pint[adr];
 }
 
-template<int sel> void swp30_device::prg_off_w(offs_t offset, u16 data)
+template<int sel> void swp30_device::prg_int_w(offs_t offset, u16 data)
 {
-	m_meg->offset_w((offset >> 6)*2 + sel, data);
+	offs_t adr = (offset >> 6)*2 + sel;
+	m_program_pint[adr] = data;
+	if(0)
+		logerror("prg_int_w %02x, %04x\n", adr, data);
 }
 
 template<int sel> u16 swp30_device::prg_lfo_r(offs_t offset)
 {
-	return m_meg->lfo_r((offset >> 6)*2 + sel);
+	offs_t adr = (offset >> 6)*2 + sel;
+	return m_program_plfo[adr];
 }
 
 template<int sel> void swp30_device::prg_lfo_w(offs_t offset, u16 data)
 {
-	m_meg->lfo_w((offset >> 6)*2 + sel, data);
+	offs_t adr = (offset >> 6)*2 + sel;
+	m_program_plfo[adr] = data;
+
+	static const int dt[8] = { 0, 32, 64, 128, 256, 512,  1024, 2048 };
+	static const int sh[8] = { 0,  0,  1,   2,   3,   4,     5,    6 };
+
+	int scale = (data >> 5) & 7;
+	int step = ((data & 31) << sh[scale]) + dt[scale];
+	if(0)
+		logerror("prg_lfo_w %02x freq=%5.2f phase=%6.4f\n", adr, step * 44100.0/4194304, (data >> 8)/256.0);
 }
 
 

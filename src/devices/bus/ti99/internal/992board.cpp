@@ -456,15 +456,15 @@ void io992_device::device_start()
 	m_set_rom_bank.resolve();
 }
 
-uint8_t io992_device::cruread(offs_t offset)
+READ8_MEMBER(io992_device::cruread)
 {
-	int address = offset << 1;
+	int address = offset << 4;
 	uint8_t value = 0x7f;  // All Hexbus lines high
 	double inp = 0;
 	int i;
 	uint8_t bit = 1;
 
-	switch (address & 0xf800)
+	switch (address)
 	{
 	case 0xe000:
 		// CRU E000-E7fE: Keyboard
@@ -494,10 +494,10 @@ uint8_t io992_device::cruread(offs_t offset)
 
 	LOGMASKED(LOG_CRU, "CRU %04x ->  %02x\n", address, value);
 
-	return BIT(value, offset & 7);
+	return value;
 }
 
-void io992_device::cruwrite(offs_t offset, uint8_t data)
+WRITE8_MEMBER(io992_device::cruwrite)
 {
 	int address = (offset << 1) & 0xf80e;
 

@@ -177,18 +177,6 @@ WRITE_LINE_MEMBER(device_sns_cart_interface::write_irq)
 		m_slot->write_irq(state);
 }
 
-//-------------------------------------------------
-//  read_open_bus - read from the open bus
-//-------------------------------------------------
-
-uint8_t device_sns_cart_interface::read_open_bus()
-{
-	if (m_slot != nullptr)
-		return m_slot->read_open_bus();
-
-	return 0xff;
-}
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -203,8 +191,7 @@ base_sns_cart_slot_device::base_sns_cart_slot_device(const machine_config &mconf
 	m_addon(ADDON_NONE),
 	m_type(SNES_MODE20),
 	m_cart(nullptr),
-	m_irq_callback(*this),
-	m_open_bus_callback(*this)
+	m_irq_callback(*this)
 {
 }
 
@@ -238,11 +225,9 @@ base_sns_cart_slot_device::~base_sns_cart_slot_device()
 void base_sns_cart_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_sns_cart_interface *>(get_card_device());
-	if (m_cart != nullptr)
-		m_cart->m_slot = this;
+	m_cart->m_slot = this;
 
 	m_irq_callback.resolve_safe();
-	m_open_bus_callback.resolve_safe(0xff);
 }
 
 
@@ -1075,34 +1060,34 @@ std::string base_sns_cart_slot_device::get_default_card_software(get_default_car
  read
  -------------------------------------------------*/
 
-uint8_t base_sns_cart_slot_device::read_l(offs_t offset)
+READ8_MEMBER(base_sns_cart_slot_device::read_l)
 {
 	if (m_cart)
-		return m_cart->read_l(offset);
+		return m_cart->read_l(space, offset);
 	else
 		return 0xff;
 }
 
-uint8_t base_sns_cart_slot_device::read_h(offs_t offset)
+READ8_MEMBER(base_sns_cart_slot_device::read_h)
 {
 	if (m_cart)
-		return m_cart->read_h(offset);
+		return m_cart->read_h(space, offset);
 	else
 		return 0xff;
 }
 
-uint8_t base_sns_cart_slot_device::read_ram(offs_t offset)
+READ8_MEMBER(base_sns_cart_slot_device::read_ram)
 {
 	if (m_cart)
-		return m_cart->read_ram(offset);
+		return m_cart->read_ram(space, offset);
 	else
 		return 0xff;
 }
 
-uint8_t base_sns_cart_slot_device::chip_read(offs_t offset)
+READ8_MEMBER(base_sns_cart_slot_device::chip_read)
 {
 	if (m_cart)
-		return m_cart->chip_read(offset);
+		return m_cart->chip_read(space, offset);
 	else
 		return 0xff;
 }
@@ -1111,28 +1096,28 @@ uint8_t base_sns_cart_slot_device::chip_read(offs_t offset)
  write
  -------------------------------------------------*/
 
-void base_sns_cart_slot_device::write_l(offs_t offset, uint8_t data)
+WRITE8_MEMBER(base_sns_cart_slot_device::write_l)
 {
 	if (m_cart)
-		m_cart->write_l(offset, data);
+		m_cart->write_l(space, offset, data);
 }
 
-void base_sns_cart_slot_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(base_sns_cart_slot_device::write_h)
 {
 	if (m_cart)
-		m_cart->write_h(offset, data);
+		m_cart->write_h(space, offset, data);
 }
 
-void base_sns_cart_slot_device::write_ram(offs_t offset, uint8_t data)
+WRITE8_MEMBER(base_sns_cart_slot_device::write_ram)
 {
 	if (m_cart)
-		m_cart->write_ram(offset, data);
+		m_cart->write_ram(space, offset, data);
 }
 
-void base_sns_cart_slot_device::chip_write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(base_sns_cart_slot_device::chip_write)
 {
 	if (m_cart)
-		m_cart->chip_write(offset, data);
+		m_cart->chip_write(space, offset, data);
 }
 
 

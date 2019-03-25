@@ -47,6 +47,17 @@
 #pragma once
 
 
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_MOS8726_ADD(tag) \
+		MCFG_DEVICE_ADD((tag), MOS8726, 1000000) // dummy clock
+
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -60,8 +71,8 @@ public:
 	// construction/destruction
 	mos8726_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
 	DECLARE_WRITE_LINE_MEMBER( bs_w );
 

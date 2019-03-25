@@ -18,7 +18,10 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+
+	DECLARE_WRITE8_MEMBER(io_7f_w);
+	DECLARE_READ8_MEMBER(io_7f_r);
 
 protected:
 	// device-level overrides
@@ -26,9 +29,6 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	void io_7f_w(uint8_t data);
-	uint8_t io_7f_r();
-
 	uint8_t m_7f;
 };
 

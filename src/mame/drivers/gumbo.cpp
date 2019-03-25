@@ -237,45 +237,45 @@ static GFXDECODE_START( gfx_gumbo )
 GFXDECODE_END
 
 
-void gumbo_state::gumbo(machine_config &config)
-{
-	M68000(config, m_maincpu, XTAL(14'318'181)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gumbo_state::gumbo_map);
-	m_maincpu->set_vblank_int("screen", FUNC(gumbo_state::irq1_line_hold)); // all the same
+MACHINE_CONFIG_START(gumbo_state::gumbo)
+
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(14'318'181)/2)
+	MCFG_DEVICE_PROGRAM_MAP(gumbo_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gumbo_state,  irq1_line_hold) // all the same
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_gumbo);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(8*8, 48*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(gumbo_state::screen_update_gumbo));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(gumbo_state, screen_update_gumbo)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	okim6295_device &oki(OKIM6295(config, "oki", XTAL(14'318'181)/16, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.47);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.47);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(14'318'181)/16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
+MACHINE_CONFIG_END
 
-void gumbo_state::mspuzzle(machine_config &config)
-{
+MACHINE_CONFIG_START(gumbo_state::mspuzzle)
 	gumbo(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &gumbo_state::mspuzzle_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mspuzzle_map)
+MACHINE_CONFIG_END
 
-void gumbo_state::dblpoint(machine_config &config)
-{
+MACHINE_CONFIG_START(gumbo_state::dblpoint)
 	gumbo(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &gumbo_state::dblpoint_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dblpoint_map)
+MACHINE_CONFIG_END
 
 ROM_START( gumbo )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */

@@ -353,10 +353,9 @@ static INPUT_PORTS_START( pntnpuzl )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
-void pntnpuzl_state::pntnpuzl(machine_config &config)
-{
-	M68000(config, m_maincpu, 12_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pntnpuzl_state::pntnpuzl_map);
+MACHINE_CONFIG_START(pntnpuzl_state::pntnpuzl)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(pntnpuzl_map)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -374,12 +373,13 @@ void pntnpuzl_state::pntnpuzl(machine_config &config)
 	mcu.ach7_cb().set_constant(0x180); // ?
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
-	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", vga_device, screen_update)
 
-	VGA(config, "vga", 0).set_screen("screen");
-}
+	MCFG_DEVICE_ADD("vga", VGA, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
+MACHINE_CONFIG_END
 
 ROM_START( pntnpuzl )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */

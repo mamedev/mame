@@ -189,7 +189,7 @@ void rf5c68_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 //    RF5C68 write register
 //-------------------------------------------------
 
-u8 rf5c68_device::rf5c68_r(offs_t offset)
+READ8_MEMBER( rf5c68_device::rf5c68_r )
 {
 	uint8_t shift;
 
@@ -201,7 +201,7 @@ u8 rf5c68_device::rf5c68_r(offs_t offset)
 	return (m_chan[(offset & 0x0e) >> 1].addr) >> (shift);
 }
 
-void rf5c68_device::rf5c68_w(offs_t offset, u8 data)
+WRITE8_MEMBER( rf5c68_device::rf5c68_w )
 {
 	pcm_channel &chan = m_chan[m_cbank];
 	int i;
@@ -266,7 +266,7 @@ void rf5c68_device::rf5c68_w(offs_t offset, u8 data)
 //    RF5C68 read memory
 //-------------------------------------------------
 
-u8 rf5c68_device::rf5c68_mem_r(offs_t offset)
+READ8_MEMBER( rf5c68_device::rf5c68_mem_r )
 {
 	return m_cache->read_byte(m_wbank | offset);
 }
@@ -276,7 +276,7 @@ u8 rf5c68_device::rf5c68_mem_r(offs_t offset)
 //    RF5C68 write memory
 //-------------------------------------------------
 
-void rf5c68_device::rf5c68_mem_w(offs_t offset, u8 data)
+WRITE8_MEMBER( rf5c68_device::rf5c68_mem_w )
 {
 	m_data->write_byte(m_wbank | offset, data);
 }

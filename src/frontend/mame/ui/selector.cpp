@@ -60,6 +60,7 @@ void menu_selector::handle()
 
 			m_handler(selection);
 
+			ui_globals::switch_image = true;
 			stack_pop();
 		}
 		else if (menu_event->iptkey == IPT_SPECIAL)
@@ -135,17 +136,12 @@ void menu_selector::custom_render(void *selectedref, float top, float bottom, fl
 void menu_selector::find_matches(const char *str)
 {
 	// allocate memory to track the penalty value
-	m_ucs_items.reserve(m_str_items.size());
-	std::vector<double> penalty(VISIBLE_GAMES_IN_SEARCH, 1.0);
-	std::u32string const search(ustr_from_utf8(normalize_unicode(str, unicode_normalization_form::D, true)));
-
+	std::vector<int> penalty(VISIBLE_GAMES_IN_SEARCH, 9999);
 	int index = 0;
-	for ( ; index < m_str_items.size(); ++index)
+
+	for (; index < m_str_items.size(); ++index)
 	{
-		assert(m_ucs_items.size() >= index);
-		if (m_ucs_items.size() == index)
-			m_ucs_items.emplace_back(ustr_from_utf8(normalize_unicode(m_str_items[index], unicode_normalization_form::D, true)));
-		double const curpenalty(util::edit_distance(search, m_ucs_items[index]));
+		int curpenalty = fuzzy_substring(str, m_str_items[index]);
 
 		// insert into the sorted table of matches
 		for (int matchnum = VISIBLE_GAMES_IN_SEARCH - 1; matchnum >= 0; --matchnum)

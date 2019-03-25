@@ -36,10 +36,10 @@ public:
 
 	auto out_int_callback() { return m_out_int_func.bind(); }
 
-	u8 stat_r();
-	u8 data_r();
-	void cmd_w(u8 data);
-	void data_w(u8 data);
+	DECLARE_READ8_MEMBER( stat_r );
+	DECLARE_READ8_MEMBER( data_r );
+	DECLARE_WRITE8_MEMBER( cmd_w );
+	DECLARE_WRITE8_MEMBER( data_w );
 	u32 acknowledge();
 
 	DECLARE_WRITE_LINE_MEMBER( ireq0_w ) { set_irq_line(0, state); }

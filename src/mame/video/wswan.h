@@ -47,10 +47,10 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint8_t vram_r(offs_t offset);
-	void vram_w(offs_t offset, uint8_t data);
-	uint8_t reg_r(offs_t offset);
-	void reg_w(offs_t offset, uint8_t data);
+	virtual DECLARE_READ8_MEMBER(vram_r);
+	virtual DECLARE_WRITE8_MEMBER(vram_w);
+	virtual DECLARE_READ8_MEMBER(reg_r);
+	virtual DECLARE_WRITE8_MEMBER(reg_w);
 
 protected:
 	// device-level overrides

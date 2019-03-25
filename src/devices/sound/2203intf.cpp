@@ -130,34 +130,34 @@ void ym2203_device::device_reset()
 }
 
 
-u8 ym2203_device::read(offs_t offset)
+READ8_MEMBER( ym2203_device::read )
 {
 	return ym2203_read(m_chip, offset & 1);
 }
 
-void ym2203_device::write(offs_t offset, u8 data)
+WRITE8_MEMBER( ym2203_device::write )
 {
 	ym2203_write(m_chip, offset & 1, data);
 }
 
-u8 ym2203_device::status_port_r()
+READ8_MEMBER( ym2203_device::status_port_r )
 {
-	return read(0);
+	return read(space, 0);
 }
 
-u8 ym2203_device::read_port_r()
+READ8_MEMBER( ym2203_device::read_port_r )
 {
-	return read(1);
+	return read(space, 1);
 }
 
-void ym2203_device::control_port_w(u8 data)
+WRITE8_MEMBER( ym2203_device::control_port_w )
 {
-	write(0, data);
+	write(space, 0, data);
 }
 
-void ym2203_device::write_port_w(u8 data)
+WRITE8_MEMBER( ym2203_device::write_port_w )
 {
-	write(1, data);
+	write(space, 1, data);
 }
 
 DEFINE_DEVICE_TYPE(YM2203, ym2203_device, "ym2203", "YM2203 OPN")

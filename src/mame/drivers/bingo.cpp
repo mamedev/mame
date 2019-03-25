@@ -46,12 +46,11 @@ void bingo_state::init_bingo()
 {
 }
 
-void bingo_state::bingo(machine_config &config)
-{
+MACHINE_CONFIG_START(bingo_state::bingo)
 	/* basic machine hardware */
-	S2650(config, m_maincpu, 1000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bingo_state::bingo_map);
-}
+	MCFG_DEVICE_ADD("maincpu", S2650, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(bingo_map)
+MACHINE_CONFIG_END
 
 class seeben_state : public driver_device
 {
@@ -90,12 +89,11 @@ void seeben_state::init_seeben()
 {
 }
 
-void seeben_state::seeben(machine_config &config)
-{
+MACHINE_CONFIG_START(seeben_state::seeben)
 	/* basic machine hardware */
-	I8085A(config, m_maincpu, 1000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &seeben_state::seeben_map);
-}
+	MCFG_DEVICE_ADD("maincpu", I8085A, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(seeben_map)
+MACHINE_CONFIG_END
 
 class splin_state : public driver_device
 {
@@ -136,12 +134,11 @@ void splin_state::init_splin()
 {
 }
 
-void splin_state::splin(machine_config &config)
-{
+MACHINE_CONFIG_START(splin_state::splin)
 	/* basic machine hardware */
-	I80186(config, m_maincpu, 16000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &splin_state::splin_map);
-}
+	MCFG_DEVICE_ADD("maincpu", I80186, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(splin_map)
+MACHINE_CONFIG_END
 
 ROM_START(cntinntl)
 	ROM_REGION(0x8000, "maincpu", 0)

@@ -49,16 +49,16 @@ private:
 	DECLARE_READ8_MEMBER( pio_pa_r );
 	DECLARE_WRITE8_MEMBER( pio_pb_w );
 
-	uint8_t mem_r(offs_t offset)
+	DECLARE_READ8_MEMBER( mem_r )
 	{
 		m_pio->port_b_write((!BIT(offset, 0)) << 7);
-		return m_bdmem->read8(offset);
+		return m_bdmem->read8(space, offset);
 	}
 
-	void mem_w(offs_t offset, uint8_t data)
+	DECLARE_WRITE8_MEMBER( mem_w )
 	{
 		m_pio->port_b_write((!BIT(offset, 0)) << 7);
-		m_bdmem->write8(offset, data);
+		m_bdmem->write8(space, offset, data);
 	}
 
 	DECLARE_READ8_MEMBER( io_r )

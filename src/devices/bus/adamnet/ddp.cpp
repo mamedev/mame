@@ -70,8 +70,7 @@ static const struct CassetteOptions adam_cassette_options =
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void adam_digital_data_pack_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(adam_digital_data_pack_device::device_add_mconfig)
 	M6801(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &adam_digital_data_pack_device::adam_ddp_mem);
 	m_maincpu->out_p1_cb().set(FUNC(adam_digital_data_pack_device::p1_w));
@@ -80,18 +79,18 @@ void adam_digital_data_pack_device::device_add_mconfig(machine_config &config)
 	// Port 3 = Multiplexed Address/Data
 	m_maincpu->in_p4_cb().set(FUNC(adam_digital_data_pack_device::p4_r));
 
-	CASSETTE(config, m_ddp0);
-	m_ddp0->set_formats(coleco_adam_cassette_formats);
-	m_ddp0->set_create_opts(&adam_cassette_options);
-	m_ddp0->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
-	m_ddp0->set_interface("adam_cass");
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(coleco_adam_cassette_formats)
+	MCFG_CASSETTE_CREATE_OPTS(&adam_cassette_options)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_CASSETTE_INTERFACE("adam_cass")
 
-	CASSETTE(config, m_ddp1);
-	m_ddp1->set_formats(coleco_adam_cassette_formats);
-	m_ddp1->set_create_opts(&adam_cassette_options);
-	m_ddp1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
-	m_ddp1->set_interface("adam_cass");
-}
+	MCFG_CASSETTE_ADD("cassette2")
+	MCFG_CASSETTE_FORMATS(coleco_adam_cassette_formats)
+	MCFG_CASSETTE_CREATE_OPTS(&adam_cassette_options)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_CASSETTE_INTERFACE("adam_cass")
+MACHINE_CONFIG_END
 
 
 

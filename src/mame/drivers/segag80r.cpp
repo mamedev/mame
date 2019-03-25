@@ -827,30 +827,31 @@ GFXDECODE_END
  *
  *************************************/
 
-void segag80r_state::g80r_base(machine_config &config)
-{
+MACHINE_CONFIG_START(segag80r_state::g80r_base)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, VIDEO_CLOCK/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &segag80r_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &segag80r_state::main_portmap);
-	m_maincpu->set_addrmap(AS_OPCODES, &segag80r_state::g80r_opcodes_map);
-	m_maincpu->set_vblank_int("screen", FUNC(segag80r_state::segag80r_vblank_start));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(segag80r_state::segag80r_irq_ack));
+	MCFG_DEVICE_ADD("maincpu", Z80, VIDEO_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_OPCODES_MAP(g80r_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
 
 	/* video hardware */
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segag80r);
-	PALETTE(config, m_palette).set_entries(64);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segag80r)
+	MCFG_PALETTE_ADD("palette", 64)
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	m_screen->set_screen_update(FUNC(segag80r_state::screen_update_segag80r));
-	m_screen->set_palette(m_palette);
-}
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_UPDATE_DRIVER(segag80r_state, screen_update_segag80r)
+	MCFG_SCREEN_PALETTE("palette")
+MACHINE_CONFIG_END
 
 
-void segag80r_state::astrob(machine_config &config)
-{
+MACHINE_CONFIG_START(segag80r_state::astrob)
 	g80r_base(config);
+
+	/* basic machine hardware */
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -858,47 +859,51 @@ void segag80r_state::astrob(machine_config &config)
 	/* sound boards */
 	astrob_sound_board(config);
 	sega_speech_board(config);
-}
+MACHINE_CONFIG_END
 
 
-void segag80r_state::sega005(machine_config &config)
-{
+MACHINE_CONFIG_START(segag80r_state::sega005)
 	g80r_base(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &segag80r_state::main_ppi8255_portmap);
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(main_ppi8255_portmap)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
 	/* sound boards */
 	sega005_sound_board(config);
-}
+MACHINE_CONFIG_END
 
 
-void segag80r_state::spaceod(machine_config &config)
-{
+MACHINE_CONFIG_START(segag80r_state::spaceod)
 	g80r_base(config);
 
+	/* basic machine hardware */
+
 	/* background board changes */
-	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_gfxdecode->set_info(gfx_spaceod);
-	m_palette->set_entries(64 + 64);
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spaceod)
+	MCFG_DEVICE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
 	/* sound boards */
 	spaceod_sound_board(config);
-}
+MACHINE_CONFIG_END
 
 
-void segag80r_state::monsterb(machine_config &config)
-{
+MACHINE_CONFIG_START(segag80r_state::monsterb)
 	g80r_base(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &segag80r_state::main_ppi8255_portmap);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(main_ppi8255_portmap)
 
 	i8255_device &ppi(I8255A(config, "ppi8255"));
 	ppi.out_pa_callback().set(m_soundbrd, FUNC(monsterb_sound_device::sound_a_w));
@@ -907,12 +912,13 @@ void segag80r_state::monsterb(machine_config &config)
 	ppi.out_pc_callback().set(m_soundbrd, FUNC(monsterb_sound_device::n7751_command_w));
 
 	/* background board changes */
-	m_gfxdecode->set_info(gfx_monsterb);
-	m_palette->set_entries(64 + 64);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
+	MCFG_DEVICE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound boards */
-	MONSTERB_SOUND(config, m_soundbrd, 0);
-}
+	MCFG_DEVICE_ADD(m_soundbrd, MONSTERB_SOUND, 0)
+MACHINE_CONFIG_END
 
 void segag80r_state::monster2(machine_config &config)
 {
@@ -926,24 +932,25 @@ void segag80r_state::monster2(machine_config &config)
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
 }
 
-void segag80r_state::pignewt(machine_config &config)
-{
+MACHINE_CONFIG_START(segag80r_state::pignewt)
 	g80r_base(config);
 
+	/* basic machine hardware */
+
 	/* background board changes */
-	m_gfxdecode->set_info(gfx_monsterb);
-	m_palette->set_entries(64 + 64);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
+	MCFG_DEVICE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
 	/* sound boards */
 	SEGAUSB(config, m_usbsnd, 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
-}
+MACHINE_CONFIG_END
 
 
-void segag80r_state::sindbadm(machine_config &config)
-{
+MACHINE_CONFIG_START(segag80r_state::sindbadm)
 	g80r_base(config);
 
 	/* basic machine hardware */
@@ -959,8 +966,9 @@ void segag80r_state::sindbadm(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(segag80r_state::sindbadm_misc_w));
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_monsterb);
-	m_palette->set_entries(64 + 64);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
+	MCFG_DEVICE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -971,10 +979,12 @@ void segag80r_state::sindbadm(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(segag80r_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	/* sound hardware */
-	SN76496(config, m_sn1, SINDBADM_SOUND_CLOCK/2).add_route(ALL_OUTPUTS, "speaker", 1.0); /* matches PCB videos, correct? */
+	MCFG_DEVICE_ADD("sn1", SN76496, SINDBADM_SOUND_CLOCK/2) /* matches PCB videos, correct? */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	SN76496(config, m_sn2, SINDBADM_SOUND_CLOCK/4).add_route(ALL_OUTPUTS, "speaker", 1.0); /* matches PCB videos, correct? */
-}
+	MCFG_DEVICE_ADD("sn2", SN76496, SINDBADM_SOUND_CLOCK/4) /* matches PCB videos, correct? */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+MACHINE_CONFIG_END
 
 
 
@@ -1017,7 +1027,7 @@ ROM_START( astrob )
 	ROM_LOAD( "812a.speech-u3", 0x1800, 0x0800, CRC(410ad0d2) SHA1(9b5f05bb64a6ecfe3543025a10c6ec67de797333) )
 
 	ROM_REGION( 0x0440, "proms", 0 ) // not dumped for this set, but believed identical
-	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
+	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128B6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
 	ROM_LOAD( "pr84.speech-u30",     0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
 ROM_END
@@ -1055,7 +1065,7 @@ ROM_START( astrob2 )
 	ROM_LOAD( "812a.speech-u3", 0x1800, 0x0800, CRC(410ad0d2) SHA1(9b5f05bb64a6ecfe3543025a10c6ec67de797333) )
 
 	ROM_REGION( 0x0440, "proms", 0 ) // not dumped for this set, but believed identical
-	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
+	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128B6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
 	ROM_LOAD( "pr84.speech-u30",     0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
 ROM_END
@@ -1093,7 +1103,7 @@ ROM_START( astrob2a )
 	ROM_LOAD( "812a.speech-u3", 0x1800, 0x0800, CRC(410ad0d2) SHA1(9b5f05bb64a6ecfe3543025a10c6ec67de797333) )
 
 	ROM_REGION( 0x0440, "proms", 0 )
-	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
+	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128B6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
 	ROM_LOAD( "pr84.speech-u30",     0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
 ROM_END
@@ -1131,7 +1141,7 @@ ROM_START( astrob2b ) // This was dumped from 2 different PCB sets, with matchin
 	ROM_LOAD( "812a.speech-u3", 0x1800, 0x0800, CRC(410ad0d2) SHA1(9b5f05bb64a6ecfe3543025a10c6ec67de797333) )
 
 	ROM_REGION( 0x0440, "proms", 0 )
-	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
+	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128B6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
 	ROM_LOAD( "pr84.speech-u30",     0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
 ROM_END
@@ -1166,7 +1176,7 @@ ROM_START( astrob1 )
 	ROM_LOAD( "812a.speech-u3", 0x1800, 0x0800, CRC(410ad0d2) SHA1(9b5f05bb64a6ecfe3543025a10c6ec67de797333) )
 
 	ROM_REGION( 0x0440, "proms", 0 ) // not dumped for this set, but believed identical
-	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
+	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128B6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
 	ROM_LOAD( "pr84.speech-u30",     0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
 ROM_END
@@ -1201,7 +1211,7 @@ ROM_START( astrobg )
 	ROM_LOAD( "833_speech_de.u03", 0x1800, 0x0800, CRC(08f11459) SHA1(da6dc2bf30b95882f95c21739ec02fc89d286a66) )
 
 	ROM_REGION( 0x0440, "proms", 0 ) // not dumped for this set, but believed identical
-	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
+	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128B6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
 	ROM_LOAD( "pr84.speech-u30",     0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
 ROM_END

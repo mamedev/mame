@@ -70,7 +70,7 @@ DEFINE_DEVICE_TYPE(WILLIAMS_ADPCM_SOUND, williams_adpcm_sound_device, "wmsadpcm"
 //  williams_cvsd_sound_device - constructor
 //-------------------------------------------------
 
-williams_cvsd_sound_device::williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+williams_cvsd_sound_device::williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WILLIAMS_CVSD_SOUND, tag, owner, clock),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
@@ -87,7 +87,7 @@ williams_cvsd_sound_device::williams_cvsd_sound_device(const machine_config &mco
 //  latch
 //-------------------------------------------------
 
-void williams_cvsd_sound_device::write(u16 data)
+WRITE16_MEMBER(williams_cvsd_sound_device::write)
 {
 	synchronize(0, data);
 }
@@ -102,7 +102,7 @@ WRITE_LINE_MEMBER(williams_cvsd_sound_device::reset_write)
 	// going high halts the CPU
 	if (state)
 	{
-		bank_select_w(0);
+		bank_select_w(m_cpu->space(), 0, 0);
 		device_reset();
 		m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
@@ -117,7 +117,7 @@ WRITE_LINE_MEMBER(williams_cvsd_sound_device::reset_write)
 //  bank_select_w - change memory banks
 //-------------------------------------------------
 
-void williams_cvsd_sound_device::bank_select_w(u8 data)
+WRITE8_MEMBER(williams_cvsd_sound_device::bank_select_w)
 {
 	m_rombank->set_entry(data & 0x0f);
 }
@@ -127,7 +127,7 @@ void williams_cvsd_sound_device::bank_select_w(u8 data)
 //  talkback_w - write to the talkback latch
 //-------------------------------------------------
 
-void williams_cvsd_sound_device::talkback_w(u8 data)
+WRITE8_MEMBER(williams_cvsd_sound_device::talkback_w)
 {
 	m_talkback = data;
 	logerror("CVSD Talkback = %02X\n", data);
@@ -139,7 +139,7 @@ void williams_cvsd_sound_device::talkback_w(u8 data)
 //  the HC55516 and clock the data
 //-------------------------------------------------
 
-void williams_cvsd_sound_device::cvsd_digit_clock_clear_w(u8 data)
+WRITE8_MEMBER(williams_cvsd_sound_device::cvsd_digit_clock_clear_w)
 {
 	m_hc55516->digit_w(data);
 	m_hc55516->clock_w(0);
@@ -150,7 +150,7 @@ void williams_cvsd_sound_device::cvsd_digit_clock_clear_w(u8 data)
 //  cvsd_clock_set_w - set the clock on the HC55516
 //-------------------------------------------------
 
-void williams_cvsd_sound_device::cvsd_clock_set_w(u8 data)
+WRITE8_MEMBER(williams_cvsd_sound_device::cvsd_clock_set_w)
 {
 	m_hc55516->clock_w(1);
 }
@@ -176,10 +176,9 @@ void williams_cvsd_sound_device::williams_cvsd_map(address_map &map)
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void williams_cvsd_sound_device::device_add_mconfig(machine_config &config)
-{
-	MC6809E(config, m_cpu, CVSD_MASTER_CLOCK / 4);
-	m_cpu->set_addrmap(AS_PROGRAM, &williams_cvsd_sound_device::williams_cvsd_map);
+MACHINE_CONFIG_START(williams_cvsd_sound_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(m_cpu, MC6809E, CVSD_MASTER_CLOCK / 4)
+	MCFG_DEVICE_PROGRAM_MAP(williams_cvsd_map)
 
 	PIA6821(config, m_pia, 0);
 	m_pia->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
@@ -192,13 +191,12 @@ void williams_cvsd_sound_device::device_add_mconfig(machine_config &config)
 	ym.add_route(ALL_OUTPUTS, *this, 0.10);
 
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	HC55516(config, m_hc55516, 0);
 	m_hc55516->add_route(ALL_OUTPUTS, *this, 0.60);
-}
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -208,7 +206,7 @@ void williams_cvsd_sound_device::device_add_mconfig(machine_config &config)
 void williams_cvsd_sound_device::device_start()
 {
 	// configure master CPU banks
-	u8 *rom = memregion("cpu")->base();
+	uint8_t *rom = memregion("cpu")->base();
 	for (int bank = 0; bank < 16; bank++)
 	{
 		//
@@ -264,7 +262,7 @@ void williams_cvsd_sound_device::device_timer(emu_timer &timer, device_timer_id 
 //  williams_narc_sound_device - constructor
 //-------------------------------------------------
 
-williams_narc_sound_device::williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+williams_narc_sound_device::williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WILLIAMS_NARC_SOUND, tag, owner, clock),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu%u", 0U),
@@ -285,7 +283,7 @@ williams_narc_sound_device::williams_narc_sound_device(const machine_config &mco
 //  SYNC bits in bits 8 and 9
 //-------------------------------------------------
 
-u16 williams_narc_sound_device::read()
+READ16_MEMBER(williams_narc_sound_device::read)
 {
 	return m_talkback | (m_audio_sync << 8);
 }
@@ -296,7 +294,7 @@ u16 williams_narc_sound_device::read()
 //  latch
 //-------------------------------------------------
 
-void williams_narc_sound_device::write(u16 data)
+WRITE16_MEMBER(williams_narc_sound_device::write)
 {
 	synchronize(TID_MASTER_COMMAND, data);
 }
@@ -311,8 +309,8 @@ WRITE_LINE_MEMBER(williams_narc_sound_device::reset_write)
 	// going high halts the CPU
 	if (state)
 	{
-		master_bank_select_w(0);
-		slave_bank_select_w(0);
+		master_bank_select_w(m_cpu[0]->space(), 0, 0);
+		slave_bank_select_w(m_cpu[1]->space(), 0, 0);
 		device_reset();
 		m_cpu[0]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		m_cpu[1]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -332,7 +330,7 @@ WRITE_LINE_MEMBER(williams_narc_sound_device::reset_write)
 //  master CPU
 //-------------------------------------------------
 
-void williams_narc_sound_device::master_bank_select_w(u8 data)
+WRITE8_MEMBER(williams_narc_sound_device::master_bank_select_w)
 {
 	m_masterbank->set_entry(data & 0x0f);
 }
@@ -343,7 +341,7 @@ void williams_narc_sound_device::master_bank_select_w(u8 data)
 //  slave CPU
 //-------------------------------------------------
 
-void williams_narc_sound_device::slave_bank_select_w(u8 data)
+WRITE8_MEMBER(williams_narc_sound_device::slave_bank_select_w)
 {
 	m_slavebank->set_entry(data & 0x0f);
 }
@@ -354,7 +352,7 @@ void williams_narc_sound_device::slave_bank_select_w(u8 data)
 //  agent
 //-------------------------------------------------
 
-u8 williams_narc_sound_device::command_r()
+READ8_MEMBER(williams_narc_sound_device::command_r)
 {
 	m_cpu[0]->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	m_sound_int_state = 0;
@@ -367,7 +365,7 @@ u8 williams_narc_sound_device::command_r()
 //  slave CPU
 //-------------------------------------------------
 
-void williams_narc_sound_device::command2_w(u8 data)
+WRITE8_MEMBER(williams_narc_sound_device::command2_w)
 {
 	synchronize(TID_SLAVE_COMMAND, data);
 }
@@ -378,7 +376,7 @@ void williams_narc_sound_device::command2_w(u8 data)
 //  CPU
 //-------------------------------------------------
 
-u8 williams_narc_sound_device::command2_r()
+READ8_MEMBER(williams_narc_sound_device::command2_r)
 {
 	m_cpu[1]->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	return m_latch2;
@@ -390,7 +388,7 @@ u8 williams_narc_sound_device::command2_r()
 //  talkback latch from the master CPU
 //-------------------------------------------------
 
-void williams_narc_sound_device::master_talkback_w(u8 data)
+WRITE8_MEMBER(williams_narc_sound_device::master_talkback_w)
 {
 	m_talkback = data;
 	logerror("Master Talkback = %02X\n", data);
@@ -402,7 +400,7 @@ void williams_narc_sound_device::master_talkback_w(u8 data)
 //  SYNC register
 //-------------------------------------------------
 
-void williams_narc_sound_device::master_sync_w(u8 data)
+WRITE8_MEMBER(williams_narc_sound_device::master_sync_w)
 {
 	timer_set(attotime::from_double(TIME_OF_74LS123(180000, 0.000001)), TID_SYNC_CLEAR, 0x01);
 	m_audio_sync |= 0x01;
@@ -415,7 +413,7 @@ void williams_narc_sound_device::master_sync_w(u8 data)
 //  talkback latch from the slave CPU
 //-------------------------------------------------
 
-void williams_narc_sound_device::slave_talkback_w(u8 data)
+WRITE8_MEMBER(williams_narc_sound_device::slave_talkback_w)
 {
 	logerror("Slave Talkback = %02X\n", data);
 }
@@ -426,7 +424,7 @@ void williams_narc_sound_device::slave_talkback_w(u8 data)
 //  SYNC register
 //-------------------------------------------------
 
-void williams_narc_sound_device::slave_sync_w(u8 data)
+WRITE8_MEMBER(williams_narc_sound_device::slave_sync_w)
 {
 	timer_set(attotime::from_double(TIME_OF_74LS123(180000, 0.000001)), TID_SYNC_CLEAR, 0x02);
 	m_audio_sync |= 0x02;
@@ -439,7 +437,7 @@ void williams_narc_sound_device::slave_sync_w(u8 data)
 //  the HC55516 and clock the data
 //-------------------------------------------------
 
-void williams_narc_sound_device::cvsd_digit_clock_clear_w(u8 data)
+WRITE8_MEMBER(williams_narc_sound_device::cvsd_digit_clock_clear_w)
 {
 	m_hc55516->digit_w(data);
 	m_hc55516->clock_w(0);
@@ -450,7 +448,7 @@ void williams_narc_sound_device::cvsd_digit_clock_clear_w(u8 data)
 //  cvsd_clock_set_w - set the clock on the HC55516
 //-------------------------------------------------
 
-void williams_narc_sound_device::cvsd_clock_set_w(u8 data)
+WRITE8_MEMBER(williams_narc_sound_device::cvsd_clock_set_w)
 {
 	m_hc55516->clock_w(1);
 }
@@ -499,26 +497,26 @@ void williams_narc_sound_device::williams_narc_slave_map(address_map &map)
 //-------------------------------------------------
 
 
-void williams_narc_sound_device::device_add_mconfig(machine_config &config)
-{
-	MC6809E(config, m_cpu[0], NARC_MASTER_CLOCK / 4);
-	m_cpu[0]->set_addrmap(AS_PROGRAM, &williams_narc_sound_device::williams_narc_master_map);
+MACHINE_CONFIG_START(williams_narc_sound_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("cpu0", MC6809E, NARC_MASTER_CLOCK / 4)
+	MCFG_DEVICE_PROGRAM_MAP(williams_narc_master_map)
 
-	MC6809E(config, m_cpu[1], NARC_MASTER_CLOCK / 4);
-	m_cpu[1]->set_addrmap(AS_PROGRAM, &williams_narc_sound_device::williams_narc_slave_map);
+	MCFG_DEVICE_ADD("cpu1", MC6809E, NARC_MASTER_CLOCK / 4)
+	MCFG_DEVICE_PROGRAM_MAP(williams_narc_slave_map)
 
 	ym2151_device &ym2151(YM2151(config, "ym2151", NARC_FM_CLOCK));
 	ym2151.irq_handler().set_inputline("cpu0", M6809_FIRQ_LINE);
 	ym2151.add_route(ALL_OUTPUTS, *this, 0.10);
 
-	AD7224(config, "dac1", 0).add_route(ALL_OUTPUTS, *this, 0.25);
-	AD7224(config, "dac2", 0).add_route(ALL_OUTPUTS, *this, 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
+	MCFG_DEVICE_ADD("dac1", AD7224, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.25)
+	MCFG_DEVICE_ADD("dac2", AD7224, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 
-	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, *this, 0.60);
-}
+	MCFG_DEVICE_ADD("cvsd", HC55516, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.60)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -528,7 +526,7 @@ void williams_narc_sound_device::device_add_mconfig(machine_config &config)
 void williams_narc_sound_device::device_start()
 {
 	// configure master CPU banks
-	u8 *rom = memregion("cpu0")->base();
+	uint8_t *rom = memregion("cpu0")->base();
 	for (int bank = 0; bank < 16; bank++)
 	{
 		//
@@ -619,7 +617,7 @@ void williams_narc_sound_device::device_timer(emu_timer &timer, device_timer_id 
 //  williams_adpcm_sound_device - constructor
 //-------------------------------------------------
 
-williams_adpcm_sound_device::williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+williams_adpcm_sound_device::williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WILLIAMS_ADPCM_SOUND, tag, owner, clock),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
@@ -637,7 +635,7 @@ williams_adpcm_sound_device::williams_adpcm_sound_device(const machine_config &m
 //  latch
 //-------------------------------------------------
 
-void williams_adpcm_sound_device::write(u16 data)
+WRITE16_MEMBER(williams_adpcm_sound_device::write)
 {
 	synchronize(TID_COMMAND, data);
 }
@@ -652,7 +650,7 @@ WRITE_LINE_MEMBER(williams_adpcm_sound_device::reset_write)
 	// going high halts the CPU
 	if (state)
 	{
-		bank_select_w(0);
+		bank_select_w(m_cpu->space(), 0, 0);
 		device_reset();
 		m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
@@ -678,18 +676,18 @@ READ_LINE_MEMBER(williams_adpcm_sound_device::irq_read)
 //  bank
 //-------------------------------------------------
 
-void williams_adpcm_sound_device::bank_select_w(u8 data)
+WRITE8_MEMBER(williams_adpcm_sound_device::bank_select_w)
 {
 	m_rombank->set_entry(data & 0x07);
 }
 
 
 //-------------------------------------------------
-//  oki6295_bank_select_w - select the OKI6295
-//  memory bank
+//  bank_select_w - select the OKI6295 memory
+//  bank
 //-------------------------------------------------
 
-void williams_adpcm_sound_device::oki6295_bank_select_w(u8 data)
+WRITE8_MEMBER(williams_adpcm_sound_device::oki6295_bank_select_w)
 {
 	m_okibank->set_entry(data & 7);
 }
@@ -700,7 +698,7 @@ void williams_adpcm_sound_device::oki6295_bank_select_w(u8 data)
 //  latch
 //-------------------------------------------------
 
-u8 williams_adpcm_sound_device::command_r()
+READ8_MEMBER(williams_adpcm_sound_device::command_r)
 {
 	m_cpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 
@@ -715,7 +713,7 @@ u8 williams_adpcm_sound_device::command_r()
 //  talkback_w - write to the talkback latch
 //-------------------------------------------------
 
-void williams_adpcm_sound_device::talkback_w(u8 data)
+WRITE8_MEMBER(williams_adpcm_sound_device::talkback_w)
 {
 	m_talkback = data;
 	logerror("ADPCM Talkback = %02X\n", data);
@@ -756,24 +754,22 @@ void williams_adpcm_sound_device::williams_adpcm_oki_map(address_map &map)
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void williams_adpcm_sound_device::device_add_mconfig(machine_config &config)
-{
-	MC6809E(config, m_cpu, ADPCM_MASTER_CLOCK / 4);
-	m_cpu->set_addrmap(AS_PROGRAM, &williams_adpcm_sound_device::williams_adpcm_map);
+MACHINE_CONFIG_START(williams_adpcm_sound_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("cpu", MC6809E, ADPCM_MASTER_CLOCK / 4)
+	MCFG_DEVICE_PROGRAM_MAP(williams_adpcm_map)
 
 	ym2151_device &ym2151(YM2151(config, "ym2151", ADPCM_FM_CLOCK));
 	ym2151.irq_handler().set_inputline("cpu", M6809_FIRQ_LINE);
 	ym2151.add_route(ALL_OUTPUTS, *this, 0.10);
 
-	AD7524(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.10);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	MCFG_DEVICE_ADD("dac", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.10)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	okim6295_device &oki(OKIM6295(config, "oki", ADPCM_MASTER_CLOCK/8, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
-	oki.set_addrmap(0, &williams_adpcm_sound_device::williams_adpcm_oki_map);
-	oki.add_route(ALL_OUTPUTS, *this, 0.15);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, ADPCM_MASTER_CLOCK/8, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(0, williams_adpcm_oki_map)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.15)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -783,7 +779,7 @@ void williams_adpcm_sound_device::device_add_mconfig(machine_config &config)
 void williams_adpcm_sound_device::device_start()
 {
 	// configure banks
-	u8 *rom = memregion("cpu")->base();
+	uint8_t *rom = memregion("cpu")->base();
 	m_rombank->configure_entries(0, 8, &rom[0x10000], 0x8000);
 	membank("romupper")->set_base(&rom[0x10000 + 0x4000 + 7 * 0x8000]);
 

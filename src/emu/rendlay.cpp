@@ -3283,8 +3283,6 @@ layout_view::item::item(
 	, m_input_tag(env.get_attribute_string(itemnode, "inputtag", ""))
 	, m_input_port(nullptr)
 	, m_input_mask(0)
-	, m_input_shift(0)
-	, m_input_raw(false)
 	, m_screen(nullptr)
 	, m_orientation(orientation_add(env.parse_orientation(itemnode.get_child("orientation")), orientation))
 	, m_color(render_color_multiply(env.parse_color(itemnode.get_child("color")), color))
@@ -3310,8 +3308,6 @@ layout_view::item::item(
 	if (index != -1)
 		m_screen = screen_device_iterator(env.machine().root_device()).byindex(index);
 	m_input_mask = env.get_attribute_int(itemnode, "inputmask", 0);
-	for (u32 mask = m_input_mask; (mask != 0) && (~mask & 1); mask >>= 1) m_input_shift++;
-	m_input_raw = env.get_attribute_int(itemnode, "inputraw", 0) == 1;
 	if (m_have_output && m_element)
 		m_output = m_element->default_state();
 	env.parse_bounds(itemnode.get_child("bounds"), m_rawbounds);
@@ -3384,16 +3380,9 @@ int layout_view::item::state() const
 		// if configured to an input, fetch the input value
 		if (m_input_port)
 		{
-			if (m_input_raw)
-			{
-				return (m_input_port->read() & m_input_mask) >> m_input_shift;
-			}
-			else
-			{
-				ioport_field const *const field = m_input_port->field(m_input_mask);
-				if (field)
-					return ((m_input_port->read() ^ field->defvalue()) & m_input_mask) ? 1 : 0;
-			}
+			ioport_field const *const field = m_input_port->field(m_input_mask);
+			if (field)
+				return ((m_input_port->read() ^ field->defvalue()) & m_input_mask) ? 1 : 0;
 		}
 	}
 

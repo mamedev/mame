@@ -159,7 +159,7 @@ void bbc_opusa_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-uint8_t bbc_opus3_device::fred_r(offs_t offset)
+READ8_MEMBER(bbc_opus3_device::fred_r)
 {
 	uint8_t data = 0xff;
 
@@ -175,7 +175,7 @@ uint8_t bbc_opus3_device::fred_r(offs_t offset)
 	return data;
 }
 
-void bbc_opus3_device::fred_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(bbc_opus3_device::fred_w)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -219,7 +219,7 @@ WRITE_LINE_MEMBER(bbc_opus3_device::fdc_drq_w)
 	m_slot->nmi_w((m_fdc_drq && m_fdc_ie) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-uint8_t bbc_opus3_device::jim_r(offs_t offset)
+READ8_MEMBER(bbc_opus3_device::jim_r)
 {
 	if ((m_ramdisk_page << 8) < m_ramdisk->size())
 		return m_ramdisk->read((m_ramdisk_page << 8) + offset);
@@ -227,7 +227,7 @@ uint8_t bbc_opus3_device::jim_r(offs_t offset)
 		return 0xff;
 }
 
-void bbc_opus3_device::jim_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(bbc_opus3_device::jim_w)
 {
 	if ((m_ramdisk_page << 8) < m_ramdisk->size())
 		m_ramdisk->write((m_ramdisk_page << 8) + offset, data);

@@ -2220,16 +2220,14 @@ WRITE8_MEMBER(vga_device::mem_linear_w)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void ati_vga_device::device_add_mconfig(machine_config &config)
-{
-	MACH8(config, "8514a", 0).set_vga_owner();
+MACHINE_CONFIG_START(ati_vga_device::device_add_mconfig)
+	MCFG_MACH8_ADD_OWNER("8514a")
 	EEPROM_93C46_16BIT(config, "ati_eeprom");
-}
+MACHINE_CONFIG_END
 
-void s3_vga_device::device_add_mconfig(machine_config &config)
-{
-	IBM8514A(config, "8514a", 0).set_vga_owner();
-}
+MACHINE_CONFIG_START(s3_vga_device::device_add_mconfig)
+	MCFG_8514A_ADD_OWNER("8514a")
+MACHINE_CONFIG_END
 
 /******************************************
 

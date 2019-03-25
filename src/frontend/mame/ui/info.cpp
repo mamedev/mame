@@ -28,27 +28,20 @@ constexpr machine_flags::type MACHINE_WARNINGS  = machine_flags::NO_COCKTAIL | m
 constexpr machine_flags::type MACHINE_BTANB     = machine_flags::NO_SOUND_HW | machine_flags::IS_INCOMPLETE;
 
 constexpr std::pair<device_t::feature_type, char const *> FEATURE_NAMES[] = {
-		{ device_t::feature::PROTECTION,    __("protection")            },
-		{ device_t::feature::TIMING,        __("timing")                },
-		{ device_t::feature::GRAPHICS,      __("graphics")              },
-		{ device_t::feature::PALETTE,       __("color palette")         },
-		{ device_t::feature::SOUND,         __("sound")                 },
-		{ device_t::feature::CAPTURE,       __("capture hardware")      },
-		{ device_t::feature::CAMERA,        __("camera")                },
-		{ device_t::feature::MICROPHONE,    __("microphone")            },
-		{ device_t::feature::CONTROLS,      __("controls")              },
-		{ device_t::feature::KEYBOARD,      __("keyboard")              },
-		{ device_t::feature::MOUSE,         __("mouse")                 },
-		{ device_t::feature::MEDIA,         __("media")                 },
-		{ device_t::feature::DISK,          __("disk")                  },
-		{ device_t::feature::PRINTER,       __("printer")               },
-		{ device_t::feature::TAPE,          __("magnetic tape")         },
-		{ device_t::feature::PUNCH,         __("punch tape")            },
-		{ device_t::feature::DRUM,          __("magnetic drum")         },
-		{ device_t::feature::ROM,           __("solid state storage")   },
-		{ device_t::feature::COMMS,         __("communications")        },
-		{ device_t::feature::LAN,           __("LAN")                   },
-		{ device_t::feature::WAN,           __("WAN")                   } };
+		{ device_t::feature::PROTECTION,    __("protection")    },
+		{ device_t::feature::PALETTE,       __("color palette") },
+		{ device_t::feature::GRAPHICS,      __("graphics")      },
+		{ device_t::feature::SOUND,         __("sound")         },
+		{ device_t::feature::CONTROLS,      __("controls")      },
+		{ device_t::feature::KEYBOARD,      __("keyboard")      },
+		{ device_t::feature::MOUSE,         __("mouse")         },
+		{ device_t::feature::MICROPHONE,    __("microphone")    },
+		{ device_t::feature::CAMERA,        __("camera")        },
+		{ device_t::feature::DISK,          __("disk")          },
+		{ device_t::feature::PRINTER,       __("printer")       },
+		{ device_t::feature::LAN,           __("LAN")           },
+		{ device_t::feature::WAN,           __("WAN")           },
+		{ device_t::feature::TIMING,        __("timing")        } };
 
 } // anonymous namespace
 

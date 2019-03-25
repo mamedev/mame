@@ -802,24 +802,24 @@ MACHINE_RESET_MEMBER(snk6502_state,sasuke)
  *
  *************************************/
 
-void snk6502_state::sasuke(machine_config &config)
-{
+MACHINE_CONFIG_START(snk6502_state::sasuke)
+
 	// basic machine hardware
-	M6502(config, m_maincpu, MASTER_CLOCK / 16); // 700 kHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &snk6502_state::sasuke_map);
-	m_maincpu->set_vblank_int("screen", FUNC(snk6502_state::satansat_interrupt));
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) // 700 kHz
+	MCFG_DEVICE_PROGRAM_MAP(sasuke_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk6502_state, satansat_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,sasuke)
 
 	// video hardware
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz((MASTER_CLOCK / 16) / (45 * 32 * 8));
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
-	screen.set_screen_update(FUNC(snk6502_state::screen_update));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE((MASTER_CLOCK / 16) / (45 * 32 * 8))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(snk6502_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sasuke);
 	PALETTE(config, m_palette, FUNC(snk6502_state::satansat_palette), 32);
@@ -830,41 +830,42 @@ void snk6502_state::sasuke(machine_config &config)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 
-	TIMER(config, "sasuke_timer").configure_periodic(FUNC(snk6502_state::sasuke_update_counter), attotime::from_hz(MASTER_CLOCK / 8));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("sasuke_timer", snk6502_state, sasuke_update_counter, attotime::from_hz(MASTER_CLOCK / 8))
 
 	// sound hardware
-	SASUKE_SOUND(config, "snk6502", 0);
-}
+	MCFG_DEVICE_ADD("snk6502", SASUKE_SOUND, 0)
+MACHINE_CONFIG_END
 
-void snk6502_state::satansat(machine_config &config)
-{
+MACHINE_CONFIG_START(snk6502_state::satansat)
 	sasuke(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &snk6502_state::satansat_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(satansat_map)
 
 	// video hardware
-	m_gfxdecode->set_info(gfx_satansat);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_satansat)
 
 	// sound hardware
-	SATANSAT_SOUND(config.replace(), "snk6502", 0);
-}
+	MCFG_DEVICE_REPLACE("snk6502", SATANSAT_SOUND, 0)
+MACHINE_CONFIG_END
 
-void snk6502_state::vanguard(machine_config &config)
-{
+MACHINE_CONFIG_START(snk6502_state::vanguard)
+
 	// basic machine hardware
-	M6502(config, m_maincpu, MASTER_CLOCK / 16); // adjusted using common divisor
-	m_maincpu->set_addrmap(AS_PROGRAM, &snk6502_state::vanguard_map);
-	m_maincpu->set_vblank_int("screen", FUNC(snk6502_state::snk6502_interrupt));
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) // adjusted using common divisor
+
+	MCFG_DEVICE_PROGRAM_MAP(vanguard_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk6502_state, snk6502_interrupt)
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz((MASTER_CLOCK / 16) / (45 * 32 * 8));
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
-	screen.set_screen_update(FUNC(snk6502_state::screen_update));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE((MASTER_CLOCK / 16) / (45 * 32 * 8))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(snk6502_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vanguard);
 	PALETTE(config, m_palette, FUNC(snk6502_state::snk6502_palette), 64);
@@ -876,40 +877,39 @@ void snk6502_state::vanguard(machine_config &config)
 	crtc.set_char_width(8);
 
 	// sound hardware
-	VANGUARD_SOUND(config, "snk6502", 0);
-}
+	MCFG_DEVICE_ADD("snk6502", VANGUARD_SOUND, 0)
+MACHINE_CONFIG_END
 
-void fantasy_state::fantasy(machine_config &config)
-{
+MACHINE_CONFIG_START(fantasy_state::fantasy)
 	vanguard(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &fantasy_state::fantasy_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fantasy_map)
 
 	// sound hardware
-	FANTASY_SOUND(config.replace(), "snk6502", 0);
-}
+	MCFG_DEVICE_REPLACE("snk6502", FANTASY_SOUND, 0)
+MACHINE_CONFIG_END
 
-void fantasy_state::nibbler(machine_config &config)
-{
+MACHINE_CONFIG_START(fantasy_state::nibbler)
 	fantasy(config);
 
 	// sound hardware
-	NIBBLER_SOUND(config.replace(), "snk6502", 0);
-}
+	MCFG_DEVICE_REPLACE("snk6502", NIBBLER_SOUND, 0)
+MACHINE_CONFIG_END
 
-void fantasy_state::pballoon(machine_config &config)
-{
+MACHINE_CONFIG_START(fantasy_state::pballoon)
 	nibbler(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &fantasy_state::pballoon_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pballoon_map)
 
 	MCFG_VIDEO_START_OVERRIDE(snk6502_state, pballoon)
 
 	// sound hardware
-	PBALLOON_SOUND(config.replace(), "snk6502", 0);
-}
+	MCFG_DEVICE_REPLACE("snk6502", PBALLOON_SOUND, 0)
+MACHINE_CONFIG_END
 
 
 /*************************************

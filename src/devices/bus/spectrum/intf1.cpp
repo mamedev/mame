@@ -85,7 +85,6 @@ spectrum_intf1_device::spectrum_intf1_device(const machine_config &mconfig, cons
 
 void spectrum_intf1_device::device_start()
 {
-	save_item(NAME(m_romcs));
 }
 
 //-------------------------------------------------
@@ -94,6 +93,8 @@ void spectrum_intf1_device::device_start()
 
 void spectrum_intf1_device::device_reset()
 {
+	m_exp->set_io_space(&io_space());
+
 	m_romcs = 0;
 }
 
@@ -106,49 +107,45 @@ READ_LINE_MEMBER(spectrum_intf1_device::romcs)
 	return m_romcs | m_exp->romcs();
 }
 
-void spectrum_intf1_device::opcode_fetch(offs_t offset)
+READ8_MEMBER(spectrum_intf1_device::mreq_r)
 {
-	m_exp->opcode_fetch(offset);
+	uint8_t temp;
+	uint8_t data = 0xff;
 
 	if (!machine().side_effects_disabled())
 	{
-		switch (offset)
-		{
-		case 0x0008: case 0x1708:
+		if (offset == 0x0008 || offset == 0x1708)
 			m_romcs = 1;
-			break;
-		case 0x0700:
-			m_romcs = 0;
-			break;
-		}
 	}
-}
 
-uint8_t spectrum_intf1_device::mreq_r(offs_t offset)
-{
-	uint8_t data = 0xff;
+	temp = m_exp->mreq_r(space, offset);
+	if (m_exp->romcs())
+		data &= temp;
 
 	if (m_romcs)
 		data &= m_rom->base()[offset & 0x1fff];
 
-	if (m_exp->romcs())
-		data &= m_exp->mreq_r(offset);
+	if (!machine().side_effects_disabled())
+	{
+		if (offset == 0x0700)
+			m_romcs = 0;
+	}
 
 	return data;
 }
 
-void spectrum_intf1_device::mreq_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(spectrum_intf1_device::mreq_w)
 {
 	if (m_exp->romcs())
-		m_exp->mreq_w(offset, data);
+		m_exp->mreq_w(space, offset, data);
 }
 
-uint8_t spectrum_intf1_device::iorq_r(offs_t offset)
+READ8_MEMBER(spectrum_intf1_device::port_fe_r)
 {
-	return m_exp->iorq_r(offset);
-}
+	uint8_t data = 0xff;
 
-void spectrum_intf1_device::iorq_w(offs_t offset, uint8_t data)
-{
-	m_exp->iorq_w(offset, data);
+	if (m_exp->romcs())
+		data &= m_exp->port_fe_r(space, offset);
+
+	return data;
 }

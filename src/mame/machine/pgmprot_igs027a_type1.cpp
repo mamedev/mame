@@ -215,37 +215,38 @@ MACHINE_START_MEMBER(pgm_arm_type1_state,pgm_arm_type1)
 	save_item(NAME(m_slots));
 }
 
-void pgm_arm_type1_state::pgm_arm_type1_cave(machine_config &config)
-{
+MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1_cave)
 	pgmbase(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::cavepgm_mem);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(cavepgm_mem)
 
 	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type1_state, pgm_arm_type1 )
 
-	subdevice<screen_device>("screen")->set_refresh_hz(59.17); // verified on pcb
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(59.17) // verified on pcb
+MACHINE_CONFIG_END
 
-void pgm_arm_type1_state::pgm_arm_type1_sim(machine_config &config)
-{
+MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1_sim)
 	pgm_arm_type1_cave(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::kov_sim_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(kov_sim_map)
 
 	/* protection CPU */
-	ARM7(config, m_prot, 20000000);   // 55857E?
-	m_prot->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::_55857E_arm7_map);
-	m_prot->set_disable();
-}
+	MCFG_DEVICE_ADD("prot", ARM7, 20000000 )   // 55857E?
+	MCFG_DEVICE_PROGRAM_MAP(_55857E_arm7_map)
+	MCFG_DEVICE_DISABLE()
+MACHINE_CONFIG_END
 
-void pgm_arm_type1_state::pgm_arm_type1(machine_config &config)
-{
+MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1)
 	pgm_arm_type1_cave(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::kov_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(kov_map)
 
 	/* protection CPU */
-	ARM7(config, m_prot, 20000000);   // 55857E?
-	m_prot->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::_55857E_arm7_map);
-}
+	MCFG_DEVICE_ADD("prot", ARM7, 20000000)    // 55857E?
+	MCFG_DEVICE_PROGRAM_MAP(_55857E_arm7_map)
+MACHINE_CONFIG_END
 
 void pgm_arm_type1_state::pgm_arm7_type1_latch_init()
 {

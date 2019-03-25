@@ -62,7 +62,10 @@ public:
 		, m_link_port(*this, "linkport")
 		, m_nvram(*this, "nvram")
 		, m_flash(*this, "flash")
-		, m_membank(*this, "membank%u", 0U)
+		, m_membank1(*this, "membank1")
+		, m_membank2(*this, "membank2")
+		, m_membank3(*this, "membank3")
+		, m_membank4(*this, "membank4")
 	{
 	}
 
@@ -84,7 +87,10 @@ private:
 	optional_device<ti8x_link_port_device> m_link_port;
 	optional_shared_ptr<uint8_t> m_nvram;
 	optional_device<intelfsh8_device> m_flash;
-	optional_device_array<address_map_bank_device, 4> m_membank;
+	optional_device<address_map_bank_device> m_membank1;
+	optional_device<address_map_bank_device> m_membank2;
+	optional_device<address_map_bank_device> m_membank3;
+	optional_device<address_map_bank_device> m_membank4;
 
 	ti85_model m_model;
 
@@ -220,8 +226,8 @@ private:
 	DECLARE_WRITE8_MEMBER(ti83pse_ctimer3_loop_w);
 	DECLARE_READ8_MEMBER(ti83pse_ctimer3_count_r);
 	DECLARE_WRITE8_MEMBER(ti83pse_ctimer3_count_w);
-	uint8_t ti83p_membank2_r(offs_t offset);
-	uint8_t ti83p_membank3_r(offs_t offset);
+	DECLARE_READ8_MEMBER(ti83p_membank2_r);
+	DECLARE_READ8_MEMBER(ti83p_membank3_r);
 
 	void ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram);
 	void update_ti85_memory();

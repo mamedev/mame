@@ -18,8 +18,9 @@ msx_cart_arc_device::msx_cart_arc_device(const machine_config &mconfig, const ch
 void msx_cart_arc_device::device_start()
 {
 	// Install IO read/write handlers
-	io_space().install_write_handler(0x7f, 0x7f, write8smo_delegate(FUNC(msx_cart_arc_device::io_7f_w), this));
-	io_space().install_read_handler(0x7f, 0x7f, read8smo_delegate(FUNC(msx_cart_arc_device::io_7f_r), this));
+	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
+	space.install_write_handler(0x7f, 0x7f, write8_delegate(FUNC(msx_cart_arc_device::io_7f_w), this));
+	space.install_read_handler(0x7f, 0x7f, read8_delegate(FUNC(msx_cart_arc_device::io_7f_r), this));
 }
 
 
@@ -38,7 +39,7 @@ void msx_cart_arc_device::initialize_cartridge()
 }
 
 
-uint8_t msx_cart_arc_device::read_cart(offs_t offset)
+READ8_MEMBER(msx_cart_arc_device::read_cart)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -48,7 +49,7 @@ uint8_t msx_cart_arc_device::read_cart(offs_t offset)
 }
 
 
-void msx_cart_arc_device::io_7f_w(uint8_t data)
+WRITE8_MEMBER(msx_cart_arc_device::io_7f_w)
 {
 	if (data == 0x35)
 	{
@@ -57,7 +58,7 @@ void msx_cart_arc_device::io_7f_w(uint8_t data)
 }
 
 
-uint8_t msx_cart_arc_device::io_7f_r()
+READ8_MEMBER(msx_cart_arc_device::io_7f_r)
 {
 	return ((m_7f & 0x03) == 0x03) ? 0xda : 0xff;
 }

@@ -164,12 +164,12 @@ device_memory_interface::space_config_vector ym2610_device::memory_space_config(
 }
 
 
-u8 ym2610_device::read(offs_t offset)
+READ8_MEMBER( ym2610_device::read )
 {
 	return ym2610_read(m_chip, offset & 3);
 }
 
-void ym2610_device::write(offs_t offset, u8 data)
+WRITE8_MEMBER( ym2610_device::write )
 {
 	ym2610_write(m_chip, offset & 3, data);
 }

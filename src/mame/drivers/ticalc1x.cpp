@@ -38,8 +38,8 @@
 class ticalc1x_state : public hh_tms1k_state
 {
 public:
-	ticalc1x_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_tms1k_state(mconfig, type, tag)
+	ticalc1x_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 };
 
@@ -47,11 +47,9 @@ public:
 
 /***************************************************************************
 
-  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+  Minidrivers (subclass, I/O, Inputs, Machine Config)
 
 ***************************************************************************/
-
-namespace {
 
 /***************************************************************************
 
@@ -65,8 +63,8 @@ namespace {
 class cmulti8_state : public ticalc1x_state
 {
 public:
-	cmulti8_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ticalc1x_state(mconfig, type, tag)
+	cmulti8_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
 	void cmulti8(machine_config &config);
@@ -112,6 +110,7 @@ READ8_MEMBER(cmulti8_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(11);
 }
+
 
 // config
 
@@ -188,31 +187,19 @@ static INPUT_PORTS_START( cmulti8 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void cmulti8_state::cmulti8(machine_config &config)
-{
+MACHINE_CONFIG_START(cmulti8_state::cmulti8)
+
 	/* basic machine hardware */
 	TMS1070(config, m_maincpu, 250000); // approximation - RC osc. R=56K, C=68pf
 	m_maincpu->k().set(FUNC(cmulti8_state::read_k));
 	m_maincpu->o().set(FUNC(cmulti8_state::write_o));
 	m_maincpu->r().set(FUNC(cmulti8_state::write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_cmulti8);
 
 	/* no sound! */
-}
-
-// roms
-
-ROM_START( cmulti8 )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "tmc1079nl", 0x0000, 0x0400, CRC(202c5ed8) SHA1(0143975cac20cb4a4e9f659ca0535e8a9056f5bb) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_cmulti8_output.pla", 0, 365, CRC(e999cece) SHA1(c5012877cd030a4dc66228f109fa23eec1867873) )
-ROM_END
+MACHINE_CONFIG_END
 
 
 
@@ -233,8 +220,8 @@ ROM_END
 class tisr16_state : public ticalc1x_state
 {
 public:
-	tisr16_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ticalc1x_state(mconfig, type, tag)
+	tisr16_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -277,6 +264,7 @@ READ8_MEMBER(tisr16_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(11);
 }
+
 
 // config
 
@@ -416,41 +404,19 @@ static INPUT_PORTS_START( tisr16ii )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 INPUT_PORTS_END
 
-void tisr16_state::tisr16(machine_config &config)
-{
+MACHINE_CONFIG_START(tisr16_state::tisr16)
+
 	/* basic machine hardware */
 	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
 	m_maincpu->k().set(FUNC(tisr16_state::read_k));
 	m_maincpu->o().set(FUNC(tisr16_state::write_o));
 	m_maincpu->r().set(FUNC(tisr16_state::write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_tisr16);
 
 	/* no sound! */
-}
-
-// roms
-
-ROM_START( tisr16 )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "tms1001nl", 0x0000, 0x0400, CRC(b7ce3c1d) SHA1(95cdb0c6be31043f4fe06314ed41c0ca1337bc46) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_sr16_micro.pla", 0, 867, CRC(5b35019c) SHA1(730d3b9041ed76d57fbedd73b009477fe432b386) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_sr16_output.pla", 0, 365, CRC(29b08739) SHA1(d55f01e40a2d493d45ea422f12e63b01bcde08fb) )
-ROM_END
-
-ROM_START( tisr16ii )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "tms1016nl", 0x0000, 0x0400, CRC(c07a7b27) SHA1(34ea4d3b59871e08db74f8c5bfb7ff00d1f0adc7) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_sr16ii_micro.pla", 0, 867, CRC(31b43e95) SHA1(6864e4c20f3affffcd3810dcefbc9484dd781547) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_sr16ii_output.pla", 0, 365, CRC(c45dfbd0) SHA1(5d588c1abc317134b51eb08ac3953f1009d80056) )
-ROM_END
+MACHINE_CONFIG_END
 
 
 
@@ -484,8 +450,8 @@ ROM_END
 class ti1250_state : public ticalc1x_state
 {
 public:
-	ti1250_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ticalc1x_state(mconfig, type, tag)
+	ti1250_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
 	void ti1270(machine_config &config);
@@ -520,6 +486,7 @@ READ8_MEMBER(ti1250_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(6);
 }
+
 
 // config
 
@@ -579,22 +546,21 @@ static INPUT_PORTS_START( ti1270 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
 INPUT_PORTS_END
 
-void ti1250_state::ti1250(machine_config &config)
-{
+MACHINE_CONFIG_START(ti1250_state::ti1250)
+
 	/* basic machine hardware */
 	TMS0950(config, m_maincpu, 200000); // approximation - RC osc. R=68K, C=68pf
 	m_maincpu->k().set(FUNC(ti1250_state::read_k));
 	m_maincpu->o().set(FUNC(ti1250_state::write_o));
 	m_maincpu->r().set(FUNC(ti1250_state::write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_ti1250);
 
 	/* no sound! */
-}
+MACHINE_CONFIG_END
 
-void ti1250_state::ti1270(machine_config &config)
-{
+MACHINE_CONFIG_START(ti1250_state::ti1270)
 	ti1250(config);
 
 	/* basic machine hardware */
@@ -604,49 +570,7 @@ void ti1250_state::ti1270(machine_config &config)
 	m_maincpu->r().set(FUNC(ti1250_state::write_r));
 
 	config.set_default_layout(layout_ti1270);
-}
-
-// roms
-
-ROM_START( ti1250 )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "tmc0952nl", 0x0000, 0x0400, CRC(fc0cee65) SHA1(1480e4553181f081281d3b78457721b9ecb20173) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_ti1250_micro.pla", 0, 867, CRC(cb3fd2d6) SHA1(82cf36a65dfc3ccb9dd08e48f45ac4d90f693238) )
-	ROM_REGION( 195, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0950_ti1250_output.pla", 0, 195, CRC(31570eb8) SHA1(c1cb17c31367b65aa777925459515c3d5c565508) )
-	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
-ROM_END
-
-ROM_START( ti125076 )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "tms0972nl_za0348", 0x0000, 0x0400, CRC(6e3f8add) SHA1(a249209e2a92f5016e33b7ad2c6c2660df1df959) )
-
-	ROM_REGION( 782, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
-	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
-	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_ti1270_output.pla", 0, 352, CRC(472f95a0) SHA1(32adb17285f2f3f93a4b027a3dd2156ec48000ec) )
-	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
-ROM_END
-
-ROM_START( ti1270 )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "tmc0974nl_za0355", 0x0000, 0x0400, CRC(48e09b4b) SHA1(17f27167164df223f9f06082ece4c3fc3900eda3) )
-
-	ROM_REGION( 782, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
-	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
-	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_ti1270_output.pla", 0, 352, CRC(472f95a0) SHA1(32adb17285f2f3f93a4b027a3dd2156ec48000ec) )
-	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
-ROM_END
+MACHINE_CONFIG_END
 
 
 
@@ -663,8 +587,8 @@ ROM_END
 class ti25503_state : public ticalc1x_state
 {
 public:
-	ti25503_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ticalc1x_state(mconfig, type, tag)
+	ti25503_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
 	void ti25503(machine_config &config);
@@ -704,6 +628,7 @@ READ8_MEMBER(ti25503_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(7);
 }
+
 
 // config
 
@@ -751,31 +676,19 @@ static INPUT_PORTS_START( ti25503 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
 INPUT_PORTS_END
 
-void ti25503_state::ti25503(machine_config &config)
-{
+MACHINE_CONFIG_START(ti25503_state::ti25503)
+
 	/* basic machine hardware */
 	TMS1000(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(ti25503_state::read_k));
 	m_maincpu->o().set(FUNC(ti25503_state::write_o));
 	m_maincpu->r().set(FUNC(ti25503_state::write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_ti25503);
 
 	/* no sound! */
-}
-
-// roms
-
-ROM_START( ti25503 )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "tms1043nl_za0352", 0x0000, 0x0400, CRC(434c2684) SHA1(ff566f1991f63cfe057879674e6bc7ccd580a919) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_ti25503_micro.pla", 0, 867, CRC(65d274ae) SHA1(33d77efe38f8b067096c643d71263bb5adde0ca9) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_ti25503_output.pla", 0, 365, CRC(ac43b768) SHA1(5eb19b493328c73edab73e44591afda0fbe4965f) )
-ROM_END
+MACHINE_CONFIG_END
 
 
 
@@ -795,8 +708,8 @@ ROM_END
 class ti1000_state : public ticalc1x_state
 {
 public:
-	ti1000_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ticalc1x_state(mconfig, type, tag)
+	ti1000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
 	void ti1000(machine_config &config);
@@ -830,6 +743,7 @@ READ8_MEMBER(ti1000_state::read_k)
 	return read_inputs(5);
 }
 
+
 // config
 
 static INPUT_PORTS_START( ti1000 )
@@ -853,47 +767,31 @@ static INPUT_PORTS_START( ti1000 )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.3") // O3 or O4?
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 
 	PORT_START("IN.4") // O5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
 INPUT_PORTS_END
 
-void ti1000_state::ti1000(machine_config &config)
-{
+MACHINE_CONFIG_START(ti1000_state::ti1000)
+
 	/* basic machine hardware */
 	TMS1990(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(ti1000_state::read_k));
 	m_maincpu->o().set(FUNC(ti1000_state::write_o));
 	m_maincpu->r().set(FUNC(ti1000_state::write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_ti1270);
 
 	/* no sound! */
-}
-
-// roms
-
-ROM_START( ti1000 )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "tmc1991nl", 0x0000, 0x0400, CRC(2da5381d) SHA1(b5dc14553db2068ed48e130e5ec9109930d8cda9) )
-
-	ROM_REGION( 782, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
-	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_common2_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
-	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_ti1000_output.pla", 0, 352, CRC(a936631e) SHA1(1f900b12a41419d6e1ffbddd5cf72be3adaa4435) )
-	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0980_common3_segment.pla", 0, 157, CRC(b5b3153f) SHA1(e0145c729695a4f962970aee0571d42cee6f5a9e) )
-ROM_END
+MACHINE_CONFIG_END
 
 
 
@@ -910,8 +808,8 @@ ROM_END
 class wizatron_state : public ticalc1x_state
 {
 public:
-	wizatron_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ticalc1x_state(mconfig, type, tag)
+	wizatron_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
 	void wizatron(machine_config &config);
@@ -954,6 +852,7 @@ READ8_MEMBER(wizatron_state::read_k)
 	return read_inputs(4);
 }
 
+
 // config
 
 static INPUT_PORTS_START( wizatron )
@@ -982,35 +881,19 @@ static INPUT_PORTS_START( wizatron )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 INPUT_PORTS_END
 
-void wizatron_state::wizatron(machine_config &config)
-{
+MACHINE_CONFIG_START(wizatron_state::wizatron)
+
 	/* basic machine hardware */
 	TMS0970(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(wizatron_state::read_k));
 	m_maincpu->o().set(FUNC(wizatron_state::write_o));
 	m_maincpu->r().set(FUNC(wizatron_state::write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_wizatron);
 
 	/* no sound! */
-}
-
-// roms
-
-ROM_START( wizatron )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "tmc0907nl_za0379", 0x0000, 0x0400, CRC(5a6af094) SHA1(b1f27e1f13f4db3b052dd50fb08dbf9c4d8db26e) )
-
-	ROM_REGION( 782, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
-	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_common2_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
-	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_wizatron_output.pla", 0, 352, CRC(c0ee5c04) SHA1(e9fadcef688309adbe6c1c0545aac6883ce4a1ac) )
-	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
-ROM_END
+MACHINE_CONFIG_END
 
 
 
@@ -1030,8 +913,8 @@ ROM_END
 class lilprof_state : public wizatron_state
 {
 public:
-	lilprof_state(const machine_config &mconfig, device_type type, const char *tag) :
-		wizatron_state(mconfig, type, tag)
+	lilprof_state(const machine_config &mconfig, device_type type, const char *tag)
+		: wizatron_state(mconfig, type, tag)
 	{ }
 
 	void lilprof(machine_config &config);
@@ -1057,6 +940,7 @@ READ8_MEMBER(lilprof_state::read_k)
 	return read_inputs(5);
 }
 
+
 // config
 
 static INPUT_PORTS_START( lilprof )
@@ -1074,35 +958,19 @@ static INPUT_PORTS_START( lilprof )
 	PORT_CONFSETTING(    0x08, "4" )
 INPUT_PORTS_END
 
-void lilprof_state::lilprof(machine_config &config)
-{
+MACHINE_CONFIG_START(lilprof_state::lilprof)
+
 	/* basic machine hardware */
 	TMS0970(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(lilprof_state::read_k));
 	m_maincpu->o().set(FUNC(lilprof_state::write_o));
 	m_maincpu->r().set(FUNC(wizatron_state::write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_wizatron);
 
 	/* no sound! */
-}
-
-// roms
-
-ROM_START( lilprof )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "tms0975nl_za0356", 0x0000, 0x0400, CRC(fef9dd39) SHA1(5c9614c9c5092d55dabeee2d6e0387d50d6ad4d5) )
-
-	ROM_REGION( 782, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
-	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
-	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_lilprof_output.pla", 0, 352, CRC(73f9ca93) SHA1(9d6c559e2c1886c62bcd57e3c3aa897e8829b4d2) )
-	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
-ROM_END
+MACHINE_CONFIG_END
 
 
 
@@ -1122,8 +990,8 @@ ROM_END
 class lilprof78_state : public ticalc1x_state
 {
 public:
-	lilprof78_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ticalc1x_state(mconfig, type, tag)
+	lilprof78_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
 	void lilprof78(machine_config &config);
@@ -1167,6 +1035,7 @@ READ8_MEMBER(lilprof78_state::read_k)
 	return read_inputs(5);
 }
 
+
 // config
 
 static INPUT_PORTS_START( lilprof78 )
@@ -1190,47 +1059,31 @@ static INPUT_PORTS_START( lilprof78 )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.3") // O3 or O4?
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Set")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
 
 	PORT_START("IN.4") // O5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Go")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 INPUT_PORTS_END
 
-void lilprof78_state::lilprof78(machine_config &config)
-{
+MACHINE_CONFIG_START(lilprof78_state::lilprof78)
+
 	/* basic machine hardware */
 	TMS1990(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(lilprof78_state::read_k));
 	m_maincpu->o().set(FUNC(lilprof78_state::write_o));
 	m_maincpu->r().set(FUNC(lilprof78_state::write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_wizatron);
 
 	/* no sound! */
-}
-
-// roms
-
-ROM_START( lilprof78 )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "tmc1993nl", 0x0000, 0x0400, CRC(e941316b) SHA1(7e1542045d1e731cea81a639c9ac9e91bb233b15) )
-
-	ROM_REGION( 782, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
-	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_common2_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
-	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_lilprof78_output.pla", 0, 352, CRC(b7416cc0) SHA1(57891ffeaf34aafe8a915086c6d2feb78f5113af) )
-	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0980_common3_segment.pla", 0, 157, CRC(b5b3153f) SHA1(e0145c729695a4f962970aee0571d42cee6f5a9e) )
-ROM_END
+MACHINE_CONFIG_END
 
 
 
@@ -1247,8 +1100,8 @@ ROM_END
 class dataman_state : public ticalc1x_state
 {
 public:
-	dataman_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ticalc1x_state(mconfig, type, tag)
+	dataman_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
 	void dataman(machine_config &config);
@@ -1290,6 +1143,7 @@ READ8_MEMBER(dataman_state::read_k)
 	return m_inp_matrix[5]->read() | read_inputs(5);
 }
 
+
 // config
 
 static INPUT_PORTS_START( dataman )
@@ -1325,14 +1179,14 @@ static INPUT_PORTS_START( dataman )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.5") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_U) PORT_NAME("On/User Entry") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_U) PORT_NAME("On/User Entry") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("?")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Electro Flash")
 INPUT_PORTS_END
 
-void dataman_state::dataman(machine_config &config)
-{
+MACHINE_CONFIG_START(dataman_state::dataman)
+
 	/* basic machine hardware */
 	TMS1980(config, m_maincpu, 300000); // patent says 300kHz
 	m_maincpu->k().set(FUNC(dataman_state::read_k));
@@ -1340,25 +1194,11 @@ void dataman_state::dataman(machine_config &config)
 	m_maincpu->r().set(FUNC(dataman_state::write_r));
 	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_dataman);
 
 	/* no sound! */
-}
-
-// roms
-
-ROM_START( dataman )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD16_WORD( "tmc1982nl", 0x0000, 0x1000, CRC(3521f53f) SHA1(c46fe7fe20715fdf5aed65833fb867cfd3938062) ) // matches patent US4340374
-
-	ROM_REGION( 1246, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
-	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
-	ROM_REGION( 525, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1980_dataman_output.pla", 0, 525, CRC(5fc6f451) SHA1(11475c785c34eab5b13c5dc67f413c709cd4bd4d) )
-ROM_END
+MACHINE_CONFIG_END
 
 
 
@@ -1377,8 +1217,8 @@ ROM_END
 class mathmarv_state : public dataman_state
 {
 public:
-	mathmarv_state(const machine_config &mconfig, device_type type, const char *tag) :
-		dataman_state(mconfig, type, tag)
+	mathmarv_state(const machine_config &mconfig, device_type type, const char *tag)
+		: dataman_state(mconfig, type, tag)
 	{ }
 
 	void mathmarv(machine_config &config);
@@ -1398,6 +1238,7 @@ WRITE16_MEMBER(mathmarv_state::write_r)
 	dataman_state::write_r(space, offset, data);
 }
 
+
 // config
 
 static INPUT_PORTS_START( mathmarv )
@@ -1409,13 +1250,13 @@ static INPUT_PORTS_START( mathmarv )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Review")
 
 	PORT_MODIFY("IN.5") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_N) PORT_NAME("On/Numberific") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_N) PORT_NAME("On/Numberific") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Zap")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Flash")
 INPUT_PORTS_END
 
-void mathmarv_state::mathmarv(machine_config &config)
-{
+MACHINE_CONFIG_START(mathmarv_state::mathmarv)
+
 	/* basic machine hardware */
 	TMS1980(config, m_maincpu, 300000); // assume same as dataman
 	m_maincpu->k().set(FUNC(dataman_state::read_k));
@@ -1423,27 +1264,14 @@ void mathmarv_state::mathmarv(machine_config &config)
 	m_maincpu->r().set(FUNC(mathmarv_state::write_r));
 	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_mathmarv);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( mathmarv )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD16_WORD( "tmc1986anl", 0x0000, 0x1000, CRC(79fda72d) SHA1(137852b29d9136459f78e29e7810195a956a5903) )
-
-	ROM_REGION( 1246, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
-	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
-	ROM_REGION( 525, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1980_mathmarv_output.pla", 0, 525, CRC(5fc6f451) SHA1(11475c785c34eab5b13c5dc67f413c709cd4bd4d) )
-ROM_END
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -1473,8 +1301,8 @@ ROM_END
 class ti30_state : public ticalc1x_state
 {
 public:
-	ti30_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ticalc1x_state(mconfig, type, tag)
+	ti30_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
 	void ti30(machine_config &config);
@@ -1508,6 +1336,7 @@ READ8_MEMBER(ti30_state::read_k)
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inp_matrix[7]->read() | read_inputs(7);
 }
+
 
 // config
 
@@ -1563,11 +1392,11 @@ static INPUT_PORTS_START( ti30 )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.7") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT"x")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tiprog )
@@ -1622,11 +1451,11 @@ static INPUT_PORTS_START( tiprog )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.7") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_PGUP) PORT_NAME("C/ON") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_PGUP) PORT_NAME("C/ON") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_NAME("DEC")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_NAME("OCT")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_NAME("HEX")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tibusan )
@@ -1682,15 +1511,15 @@ static INPUT_PORTS_START( tibusan )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.7") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("2nd")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2"  " UTF8_SQUAREROOT"x")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME("ln(x)  e" UTF8_POW_X)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
-void ti30_state::ti30(machine_config &config)
-{
+MACHINE_CONFIG_START(ti30_state::ti30)
+
 	/* basic machine hardware */
 	TMS0980(config, m_maincpu, 400000); // guessed
 	m_maincpu->k().set(FUNC(ti30_state::read_k));
@@ -1698,13 +1527,192 @@ void ti30_state::ti30(machine_config &config)
 	m_maincpu->r().set(FUNC(ti30_state::write_r));
 	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_ti30);
 
 	/* no sound! */
-}
+MACHINE_CONFIG_END
 
-// roms
+
+
+
+
+/***************************************************************************
+
+  Game driver(s)
+
+***************************************************************************/
+
+ROM_START( cmulti8 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc1079nl", 0x0000, 0x0400, CRC(202c5ed8) SHA1(0143975cac20cb4a4e9f659ca0535e8a9056f5bb) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_cmulti8_output.pla", 0, 365, CRC(e999cece) SHA1(c5012877cd030a4dc66228f109fa23eec1867873) )
+ROM_END
+
+
+ROM_START( tisr16 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms1001nl", 0x0000, 0x0400, CRC(b7ce3c1d) SHA1(95cdb0c6be31043f4fe06314ed41c0ca1337bc46) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_sr16_micro.pla", 0, 867, CRC(5b35019c) SHA1(730d3b9041ed76d57fbedd73b009477fe432b386) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_sr16_output.pla", 0, 365, CRC(29b08739) SHA1(d55f01e40a2d493d45ea422f12e63b01bcde08fb) )
+ROM_END
+
+
+ROM_START( tisr16ii )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms1016nl", 0x0000, 0x0400, CRC(c07a7b27) SHA1(34ea4d3b59871e08db74f8c5bfb7ff00d1f0adc7) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_sr16ii_micro.pla", 0, 867, CRC(31b43e95) SHA1(6864e4c20f3affffcd3810dcefbc9484dd781547) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_sr16ii_output.pla", 0, 365, CRC(c45dfbd0) SHA1(5d588c1abc317134b51eb08ac3953f1009d80056) )
+ROM_END
+
+
+ROM_START( ti1250 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc0952nl", 0x0000, 0x0400, CRC(fc0cee65) SHA1(1480e4553181f081281d3b78457721b9ecb20173) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_ti1250_micro.pla", 0, 867, CRC(cb3fd2d6) SHA1(82cf36a65dfc3ccb9dd08e48f45ac4d90f693238) )
+	ROM_REGION( 195, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0950_ti1250_output.pla", 0, 195, CRC(31570eb8) SHA1(c1cb17c31367b65aa777925459515c3d5c565508) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
+ROM_END
+
+ROM_START( ti125076 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms0972nl_za0348", 0x0000, 0x0400, CRC(6e3f8add) SHA1(a249209e2a92f5016e33b7ad2c6c2660df1df959) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_ti1270_output.pla", 0, 352, CRC(472f95a0) SHA1(32adb17285f2f3f93a4b027a3dd2156ec48000ec) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
+ROM_END
+
+
+ROM_START( ti1270 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc0974nl_za0355", 0x0000, 0x0400, CRC(48e09b4b) SHA1(17f27167164df223f9f06082ece4c3fc3900eda3) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_ti1270_output.pla", 0, 352, CRC(472f95a0) SHA1(32adb17285f2f3f93a4b027a3dd2156ec48000ec) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
+ROM_END
+
+
+ROM_START( ti25503 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms1043nl_za0352", 0x0000, 0x0400, CRC(434c2684) SHA1(ff566f1991f63cfe057879674e6bc7ccd580a919) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_ti25503_micro.pla", 0, 867, CRC(65d274ae) SHA1(33d77efe38f8b067096c643d71263bb5adde0ca9) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_ti25503_output.pla", 0, 365, CRC(ac43b768) SHA1(5eb19b493328c73edab73e44591afda0fbe4965f) )
+ROM_END
+
+
+ROM_START( ti1000 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc1991nl", 0x0000, 0x0400, CRC(2da5381d) SHA1(b5dc14553db2068ed48e130e5ec9109930d8cda9) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_common2_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_ti1000_output.pla", 0, 352, CRC(a936631e) SHA1(1f900b12a41419d6e1ffbddd5cf72be3adaa4435) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common3_segment.pla", 0, 157, CRC(b5b3153f) SHA1(e0145c729695a4f962970aee0571d42cee6f5a9e) )
+ROM_END
+
+
+ROM_START( wizatron )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc0907nl_za0379", 0x0000, 0x0400, CRC(5a6af094) SHA1(b1f27e1f13f4db3b052dd50fb08dbf9c4d8db26e) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_common2_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_wizatron_output.pla", 0, 352, CRC(c0ee5c04) SHA1(e9fadcef688309adbe6c1c0545aac6883ce4a1ac) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
+ROM_END
+
+
+ROM_START( lilprof )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms0975nl_za0356", 0x0000, 0x0400, CRC(fef9dd39) SHA1(5c9614c9c5092d55dabeee2d6e0387d50d6ad4d5) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_lilprof_output.pla", 0, 352, CRC(73f9ca93) SHA1(9d6c559e2c1886c62bcd57e3c3aa897e8829b4d2) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
+ROM_END
+
+ROM_START( lilprof78 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc1993nl", 0x0000, 0x0400, CRC(e941316b) SHA1(7e1542045d1e731cea81a639c9ac9e91bb233b15) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_common2_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_lilprof78_output.pla", 0, 352, CRC(b7416cc0) SHA1(57891ffeaf34aafe8a915086c6d2feb78f5113af) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common3_segment.pla", 0, 157, CRC(b5b3153f) SHA1(e0145c729695a4f962970aee0571d42cee6f5a9e) )
+ROM_END
+
+
+ROM_START( dataman )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "tmc1982nl", 0x0000, 0x1000, CRC(3521f53f) SHA1(c46fe7fe20715fdf5aed65833fb867cfd3938062) ) // matches patent US4340374
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
+	ROM_REGION( 525, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1980_dataman_output.pla", 0, 525, CRC(5fc6f451) SHA1(11475c785c34eab5b13c5dc67f413c709cd4bd4d) )
+ROM_END
+
+
+ROM_START( mathmarv )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "tmc1986anl", 0x0000, 0x1000, CRC(79fda72d) SHA1(137852b29d9136459f78e29e7810195a956a5903) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
+	ROM_REGION( 525, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1980_mathmarv_output.pla", 0, 525, CRC(5fc6f451) SHA1(11475c785c34eab5b13c5dc67f413c709cd4bd4d) )
+ROM_END
+
 
 ROM_START( ti30 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -1720,6 +1728,7 @@ ROM_START( ti30 )
 	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
 ROM_END
 
+
 ROM_START( tibusan )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "tmc0982nl", 0x0000, 0x1000, CRC(6954560a) SHA1(6c153a0c9239a811e3514a43d809964c06f8f88e) )
@@ -1733,6 +1742,7 @@ ROM_START( tibusan )
 	ROM_REGION( 157, "maincpu:spla", 0 )
 	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
 ROM_END
+
 
 ROM_START( tiprog )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -1750,16 +1760,8 @@ ROM_END
 
 
 
-} // anonymous namespace
-
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
-
-//    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1977, cmulti8,   0,       0, cmulti8,   cmulti8,   cmulti8_state,   empty_init, "Canon", "Multi 8 (Canon)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY              FULLNAME, FLAGS
+COMP( 1977, cmulti8,   0,       0, cmulti8,   cmulti8,   cmulti8_state,   empty_init, "Canon",             "Multi 8 (Canon)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 COMP( 1974, tisr16,    0,       0, tisr16,    tisr16,    tisr16_state,    empty_init, "Texas Instruments", "SR-16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1975, tisr16ii,  0,       0, tisr16,    tisr16ii,  tisr16_state,    empty_init, "Texas Instruments", "SR-16 II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

@@ -976,27 +976,26 @@ static GFXDECODE_START( gfx_cyclemb )
 	GFXDECODE_ENTRY( "sprite_data", 0, spritelayout_32x32,    0x00, 0x40 )
 GFXDECODE_END
 
-void cyclemb_state::cyclemb(machine_config &config)
-{
+MACHINE_CONFIG_START(cyclemb_state::cyclemb)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(18'000'000)/3); // Z8400BPS
-	m_maincpu->set_addrmap(AS_PROGRAM, &cyclemb_state::cyclemb_map);
-	m_maincpu->set_addrmap(AS_IO, &cyclemb_state::cyclemb_io);
-	m_maincpu->set_vblank_int("screen", FUNC(cyclemb_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'000'000)/3) // Z8400BPS
+	MCFG_DEVICE_PROGRAM_MAP(cyclemb_map)
+	MCFG_DEVICE_IO_MAP(cyclemb_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyclemb_state,  irq0_line_hold)
 
-	Z80(config, m_audiocpu, XTAL(18'000'000)/6);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &cyclemb_state::cyclemb_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &cyclemb_state::cyclemb_sound_io);
-	m_audiocpu->set_periodic_int(FUNC(cyclemb_state::irq0_line_hold), attotime::from_hz(60));
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'000'000)/6)
+	MCFG_DEVICE_PROGRAM_MAP(cyclemb_sound_map)
+	MCFG_DEVICE_IO_MAP(cyclemb_sound_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cyclemb_state,  irq0_line_hold, 60)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(cyclemb_state::screen_update_cyclemb));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(cyclemb_state, screen_update_cyclemb)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cyclemb);
 	PALETTE(config, m_palette, FUNC(cyclemb_state::cyclemb_palette), 256);
@@ -1011,20 +1010,20 @@ void cyclemb_state::cyclemb(machine_config &config)
 //  ymsnd.irq_handler().set(FUNC(cyclemb_state::ym_irq));
 //  ymsnd.port_b_read_callback().set_ioport("UNK");
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+MACHINE_CONFIG_END
 
-void cyclemb_state::skydest(machine_config &config)
-{
+MACHINE_CONFIG_START(cyclemb_state::skydest)
 	cyclemb(config);
-	m_maincpu->set_addrmap(AS_IO, &cyclemb_state::skydest_io);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(skydest_io)
 
-	screen_device &screen(*subdevice<screen_device>("screen"));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(2*8, 34*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(cyclemb_state::screen_update_skydest));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(2*8, 34*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(cyclemb_state, screen_update_skydest)
 
-//  m_palette->set_init(FUNC(cyclemb_state::skydest));
-}
+//  MCFG_PALETTE_INIT_OWNER(cyclemb_state,skydest)
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

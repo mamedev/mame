@@ -126,7 +126,7 @@ void nes_tengen032_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_tengen008_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_tengen008_device::write_h)
 {
 	LOG_MMC(("tengen008 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -240,7 +240,7 @@ void nes_tengen032_device::set_chr()
 	chr_cb(7 ^ chr_page, m_mmc_vrom_bank[5], CHRROM);
 }
 
-void nes_tengen032_device::tengen032_write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_tengen032_device::tengen032_write)
 {
 	uint8_t helper, cmd;
 	LOG_MMC(("tengen032_write, offset: %04x, data: %02x\n", offset, data));
@@ -359,7 +359,7 @@ void nes_tengen037_device::chr_cb( int start, int bank, int source )
 }
 
 
-void nes_tengen037_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_tengen037_device::write_h)
 {
 	LOG_MMC(("tengen037 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -369,7 +369,7 @@ void nes_tengen037_device::write_h(offs_t offset, uint8_t data)
 			break;
 
 		default:
-			tengen032_write(offset, data);
+			tengen032_write(space, offset, data, mem_mask);
 			break;
 	}
 }

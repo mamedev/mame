@@ -9,20 +9,10 @@
 #define PTYPES_H_
 
 #include "pconfig.h"
+#include "pstring.h"
 
-#include <limits>
-#include <string>
 #include <type_traits>
-
-#define COPYASSIGNMOVE(name, def)  \
-		name(const name &) = def; \
-		name(name &&) noexcept = def; \
-		name &operator=(const name &) = def; \
-		name &operator=(name &&) noexcept = def;
-
-#define COPYASSIGN(name, def)  \
-		name(const name &) = def; \
-		name &operator=(const name &) = def; \
+#include <limits>
 
 namespace plib
 {
@@ -35,14 +25,14 @@ namespace plib
 	template<> struct is_integral<INT128> { static constexpr bool value = true; };
 	template<> struct numeric_limits<UINT128>
 	{
-		static constexpr UINT128 max()
+		static inline constexpr UINT128 max()
 		{
 			return ~((UINT128)0);
 		}
 	};
 	template<> struct numeric_limits<INT128>
 	{
-		static constexpr INT128 max()
+		static inline constexpr INT128 max()
 		{
 			return (~((UINT128)0)) >> 1;
 		}
@@ -55,98 +45,56 @@ namespace plib
 
 	struct nocopyassignmove
 	{
+	protected:
+		nocopyassignmove() = default;
+		~nocopyassignmove() = default;
+	private:
 		nocopyassignmove(const nocopyassignmove &) = delete;
 		nocopyassignmove(nocopyassignmove &&) = delete;
 		nocopyassignmove &operator=(const nocopyassignmove &) = delete;
 		nocopyassignmove &operator=(nocopyassignmove &&) = delete;
-	protected:
-		nocopyassignmove() = default;
-		~nocopyassignmove() = default;
 	};
 
 	struct nocopyassign
 	{
-		nocopyassign(const nocopyassign &) = delete;
-		nocopyassign &operator=(const nocopyassign &) = delete;
 	protected:
 		nocopyassign() = default;
 		~nocopyassign() = default;
-		nocopyassign(nocopyassign &&) = default;
-		nocopyassign &operator=(nocopyassign &&) = default;
+	private:
+		nocopyassign(const nocopyassign &) = delete;
+		nocopyassign &operator=(const nocopyassign &) = delete;
 	};
 
 	//============================================================
-	// Avoid unused variable warnings
-	//============================================================
-	template<typename... Ts>
-	inline void unused_var(Ts&&...) {}
-
-	//============================================================
-	// is_pow2
-	//============================================================
-	template <typename T>
-	constexpr bool is_pow2(T v) noexcept
-	{
-		static_assert(is_integral<T>::value, "is_pow2 needs integer arguments");
-		return !(v & (v-1));
-	}
-
-
-	//============================================================
-	// abs, lcd, gcm
+	//  penum - strongly typed enumeration
 	//============================================================
 
-	template<typename T>
-	constexpr
-	typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value, T>::type
-	abs(T v)
+	struct penum_base
 	{
-		return v < 0 ? -v : v;
-	}
+	protected:
+		static int from_string_int(const char *str, const char *x);
+		static pstring nthstr(int n, const char *str);
+	};
 
-	template<typename T>
-	constexpr
-	typename std::enable_if<std::is_integral<T>::value && std::is_unsigned<T>::value, T>::type
-	abs(T v)
-	{
-		return v;
-	}
+}
 
-	template<typename M, typename N>
-	constexpr typename std::common_type<M, N>::type
-	gcd(M m, N n)
-	{
-		static_assert(std::is_integral<M>::value, "gcd: M must be an integer");
-		static_assert(std::is_integral<N>::value, "gcd: N must be an integer");
+#define P_ENUM(ename, ...) \
+	struct ename : public plib::penum_base { \
+		enum E { __VA_ARGS__ }; \
+		ename (E v) : m_v(v) { } \
+		bool set_from_string (const pstring &s) { \
+			static char const *const strings = # __VA_ARGS__; \
+			int f = from_string_int(strings, s.c_str()); \
+			if (f>=0) { m_v = static_cast<E>(f); return true; } else { return false; } \
+		} \
+		operator E() const {return m_v;} \
+		bool operator==(const ename &rhs) const {return m_v == rhs.m_v;} \
+		bool operator==(const E &rhs) const {return m_v == rhs;} \
+		const pstring name() const { \
+			static char const *const strings = # __VA_ARGS__; \
+			return nthstr(static_cast<int>(m_v), strings); \
+		} \
+		private: E m_v; };
 
-		return m == 0 ? plib::abs(n)
-			 : n == 0 ? plib::abs(m)
-			 : gcd(n, m % n);
-	}
-
-	template<typename M, typename N>
-	constexpr typename std::common_type<M, N>::type
-	lcm(M m, N n)
-	{
-		static_assert(std::is_integral<M>::value, "lcm: M must be an integer");
-		static_assert(std::is_integral<N>::value, "lcm: N must be an integer");
-
-		return (m != 0 && n != 0) ? (plib::abs(m) / gcd(m, n)) * plib::abs(n) : 0;
-	}
-
-} // namespace plib
-
-//============================================================
-// Define a "has member" trait.
-//============================================================
-
-#define PDEFINE_HAS_MEMBER(name, member)                                        \
-	template <typename T> class name                                            \
-	{                                                                           \
-		template <typename U> static long test(decltype(&U:: member));          \
-		template <typename U> static char  test(...);                           \
-	public:                                                                     \
-		static constexpr const bool value = sizeof(test<T>(nullptr)) == sizeof(long);   \
-	}
 
 #endif /* PTYPES_H_ */

@@ -913,79 +913,81 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void astrof_state::base(machine_config &config)
-{
+MACHINE_CONFIG_START(astrof_state::base)
+
 	/* basic machine hardware */
-	M6502(config, m_maincpu, MAIN_CPU_CLOCK);
-	TIMER(config, "vblank").configure_scanline(FUNC(astrof_state::irq_callback), "screen", VBSTART, 0);
+	MCFG_DEVICE_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank", astrof_state, irq_callback, "screen", VBSTART, 0)
 
 	/* video hardware */
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-}
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+MACHINE_CONFIG_END
 
 
-void astrof_state::astrof(machine_config &config)
-{
+MACHINE_CONFIG_START(astrof_state::astrof)
 	base(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &astrof_state::astrof_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(astrof_map)
 
 	MCFG_MACHINE_START_OVERRIDE(astrof_state,astrof)
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(astrof_state::screen_update_astrof));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(astrof_state, screen_update_astrof)
 
 	/* audio hardware */
 	astrof_audio(config);
-}
+MACHINE_CONFIG_END
 
 
-void astrof_state::abattle(machine_config &config)
-{
+MACHINE_CONFIG_START(astrof_state::abattle)
 	astrof(config);
 
 	/* basic machine hardware */
 
 	MCFG_MACHINE_START_OVERRIDE(astrof_state,abattle)
 	MCFG_MACHINE_RESET_OVERRIDE(astrof_state,abattle)
-}
+MACHINE_CONFIG_END
 
 
-void astrof_state::spfghmk2(machine_config &config)
-{
+MACHINE_CONFIG_START(astrof_state::spfghmk2)
 	base(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &astrof_state::spfghmk2_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spfghmk2_map)
 
 	MCFG_MACHINE_START_OVERRIDE(astrof_state,spfghmk2)
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(astrof_state::screen_update_astrof));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(astrof_state, screen_update_astrof)
 
 	/* audio hardware */
 	spfghmk2_audio(config);
-}
+MACHINE_CONFIG_END
 
 
-void astrof_state::tomahawk(machine_config &config)
-{
+MACHINE_CONFIG_START(astrof_state::tomahawk)
 	base(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &astrof_state::tomahawk_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tomahawk_map)
 
 	MCFG_MACHINE_START_OVERRIDE(astrof_state,tomahawk)
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(astrof_state::screen_update_tomahawk));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(astrof_state, screen_update_tomahawk)
 
 	/* audio hardware */
 	tomahawk_audio(config);
-}
+MACHINE_CONFIG_END
 
 
 

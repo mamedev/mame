@@ -21,12 +21,8 @@ msx_cart_crossblaim_device::msx_cart_crossblaim_device(const machine_config &mco
 void msx_cart_crossblaim_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
-}
 
-
-void msx_cart_crossblaim_device::device_post_load()
-{
-	restore_banks();
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_crossblaim_device::restore_banks), this));
 }
 
 
@@ -62,7 +58,7 @@ void msx_cart_crossblaim_device::initialize_cartridge()
 }
 
 
-uint8_t msx_cart_crossblaim_device::read_cart(offs_t offset)
+READ8_MEMBER(msx_cart_crossblaim_device::read_cart)
 {
 	uint8_t *bank_base = m_bank_base[offset >> 14];
 
@@ -75,7 +71,7 @@ uint8_t msx_cart_crossblaim_device::read_cart(offs_t offset)
 }
 
 
-void msx_cart_crossblaim_device::write_cart(offs_t offset, uint8_t data)
+WRITE8_MEMBER(msx_cart_crossblaim_device::write_cart)
 {
 	m_selected_bank = data & 3;
 	if (m_selected_bank == 0)

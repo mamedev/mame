@@ -40,10 +40,9 @@ xxx_device::xxx_device(const machine_config &mconfig, const char *tag, device_t 
 //  configuration addiitons
 //-------------------------------------------------
 
-void xxx_device::device_add_mconfig(machine_config &config)
-{
-	//DEVICE(config, ...);
-}
+MACHINE_CONFIG_START(xxx_device::device_add_mconfig)
+	//MCFG_DEVICE_ADD(...)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------

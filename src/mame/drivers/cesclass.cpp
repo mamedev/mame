@@ -248,28 +248,29 @@ void cesclassic_state::cesclassic_palette(palette_device &palette) const
 		palette.set_pen_color(i, pal2bit(i), 0, 0);
 }
 
-void cesclassic_state::cesclassic(machine_config &config)
-{
-	M68000(config, m_maincpu, 24000000/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cesclassic_state::cesclassic_map);
-	m_maincpu->set_vblank_int("l_lcd", FUNC(cesclassic_state::irq2_line_assert));  // TODO: unknown sources
-	m_maincpu->set_periodic_int(FUNC(cesclassic_state::irq3_line_assert), attotime::from_hz(60*8));
+MACHINE_CONFIG_START(cesclassic_state::cesclassic)
+
+	MCFG_DEVICE_ADD("maincpu", M68000, 24000000/2 )
+	MCFG_DEVICE_PROGRAM_MAP(cesclassic_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("l_lcd", cesclassic_state,  irq2_line_assert)  // TODO: unknown sources
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cesclassic_state, irq3_line_assert, 60*8)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "l_lcd", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_screen_update(FUNC(cesclassic_state::screen_update));
-	screen.set_size(8*16*2, 8*8+3*8);
-	screen.set_visarea(0*8, 8*16*2-1, 0*8, 8*8-1);
+	MCFG_SCREEN_ADD("l_lcd", LCD)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_UPDATE_DRIVER(cesclassic_state, screen_update)
+	MCFG_SCREEN_SIZE(8*16*2, 8*8+3*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 8*16*2-1, 0*8, 8*8-1)
 
 	PALETTE(config, m_palette, FUNC(cesclassic_state::cesclassic_palette), 4);
 
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, m_oki, 24000000/16, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.5);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, 24000000/16, okim6295_device::PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_CONFIG_END
 
 
 ROM_START(hrclass)

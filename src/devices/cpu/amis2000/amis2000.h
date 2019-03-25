@@ -30,13 +30,12 @@ public:
 
 	// S2000 has a hardcoded 7seg table, that (unlike S2200) is officially
 	// uncustomizable, but wildfire proves to be an exception to that rule.
-	void set_7seg_table(const u8 *ptr) { m_7seg_table = ptr; } // d0=A, d1=B, etc.
+	void set_7seg_table(const u8 *ptr) { m_7seg_table = ptr; }
 
 	void data_64x4(address_map &map);
 	void data_80x4(address_map &map);
 	void program_1_5k(address_map &map);
 	void program_1k(address_map &map);
-
 protected:
 	// construction/destruction
 	amis2000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bu_bits, u8 callstack_bits, u8 callstack_depth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)

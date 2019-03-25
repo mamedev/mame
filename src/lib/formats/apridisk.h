@@ -33,7 +33,7 @@ private:
 	static const int APR_HEADER_SIZE = 128;
 
 	// sector types
-	enum : uint32_t
+	enum
 	{
 		APR_DELETED = 0xe31d0000,
 		APR_SECTOR  = 0xe31d0001,

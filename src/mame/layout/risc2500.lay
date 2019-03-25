@@ -181,21 +181,21 @@
 	<element name="text_up">      <rect><color red="0.63" green="0.63" blue="0.63" /></rect>    <text string="&#x2191;" > <color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="text_down">    <rect><color red="0.63" green="0.63" blue="0.63" /></rect>    <text string="&#x2193;" > <color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="text_enter">   <rect><color red="0.63" green="0.63" blue="0.63" /></rect>    <text string="ENTER" >    <color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_p1">      <rect><color red="0.63" green="0.63" blue="0.63" /></rect>    <text string="[K]" >      <color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_p2">      <rect><color red="0.63" green="0.63" blue="0.63" /></rect>    <text string="[Q]" >      <color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_p3">      <rect><color red="0.63" green="0.63" blue="0.63" /></rect>    <text string="[R]" >      <color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_p4">      <rect><color red="0.63" green="0.63" blue="0.63" /></rect>    <text string="[B]" >      <color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_p5">      <rect><color red="0.63" green="0.63" blue="0.63" /></rect>    <text string="[N]" >      <color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_p6">      <rect><color red="0.63" green="0.63" blue="0.63" /></rect>    <text string="[P]" >      <color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_p1">      <rect><color red="0.63" green="0.63" blue="0.63" /></rect>    <text string="&#x265a;" > <color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_p2">      <rect><color red="0.63" green="0.63" blue="0.63" /></rect>    <text string="&#x265b;" > <color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_p3">      <rect><color red="0.63" green="0.63" blue="0.63" /></rect>    <text string="&#x265c;" > <color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_p4">      <rect><color red="0.63" green="0.63" blue="0.63" /></rect>    <text string="&#x265d;" > <color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_p5">      <rect><color red="0.63" green="0.63" blue="0.63" /></rect>    <text string="&#x265e;" > <color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_p6">      <rect><color red="0.63" green="0.63" blue="0.63" /></rect>    <text string="&#x265f;" > <color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="sym_colon">    <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string=":"  state="1"> <color red="1.0" green="1.0" blue="1.0" /></text> </element>
 	<element name="sym_left">     <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x2190;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
 	<element name="sym_right">    <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x2192;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
-	<element name="sym_p1">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="[K]" state="1">       <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
-	<element name="sym_p2">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="[Q]" state="1">       <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
-	<element name="sym_p3">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="[R]" state="1">       <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
-	<element name="sym_p4">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="[B]" state="1">       <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
-	<element name="sym_p5">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="[N]" state="1">       <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
-	<element name="sym_p6">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="[P]" state="1">       <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
+	<element name="sym_p1">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x265a;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
+	<element name="sym_p2">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x265b;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
+	<element name="sym_p3">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x265c;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
+	<element name="sym_p4">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x265d;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
+	<element name="sym_p5">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x265e;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
+	<element name="sym_p6">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x265f;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
 	<element name="sym_white">    <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x25cb;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
 	<element name="sym_black">    <text string="&#x25cf;" state="1">    <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
 	<element name="white"><rect><color red="1" green="1" blue="1" /></rect></element>
@@ -203,19 +203,19 @@
 	<element name="background"><rect><color red="0.63" green="0.63" blue="0.63" /></rect></element>
 
 	<element name="piece" defstate="0">
-		<text string="[K]" state="1"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[Q]" state="2"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[R]" state="3"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[B]" state="4"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[N]" state="5"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[P]" state="6"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="&#x265a;" state="1"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="&#x265b;" state="2"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="&#x265c;" state="3"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="&#x265d;" state="4"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="&#x265e;" state="5"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="&#x265f;" state="6"><color red="0.27" green="0.25" blue="0.25" /></text>
 
-		<text string="[K]" state="7"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[Q]" state="8"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[R]" state="9"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[B]" state="10"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[N]" state="11"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[P]" state="12"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="&#x265a;" state="7"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="&#x265b;" state="8"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="&#x265c;" state="9"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="&#x265d;" state="10"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="&#x265e;" state="11"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="&#x265f;" state="12"><color red="0.71" green="0.7" blue="0.69" /></text>
 
 		<!-- selected pieces -->
 		<disk state="17"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
@@ -231,19 +231,19 @@
 		<disk state="27"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
 		<disk state="28"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
 
-		<text string="[K]" state="17"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[Q]" state="18"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[R]" state="19"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[B]" state="20"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[N]" state="21"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[P]" state="22"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="&#x265a;" state="17"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="&#x265b;" state="18"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="&#x265c;" state="19"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="&#x265d;" state="20"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="&#x265e;" state="21"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="&#x265f;" state="22"><color red="0.27" green="0.25" blue="0.25" /></text>
 
-		<text string="[K]" state="23"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[Q]" state="24"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[R]" state="25"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[B]" state="26"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[N]" state="27"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[P]" state="28"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="&#x265a;" state="23"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="&#x265b;" state="24"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="&#x265c;" state="25"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="&#x265d;" state="26"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="&#x265e;" state="27"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="&#x265f;" state="28"><color red="0.71" green="0.7" blue="0.69" /></text>
 	</element>
 
 <!-- build screen -->
@@ -479,12 +479,12 @@
 		<bezel name="digit0"  element="digit" ><bounds x="122.85" y="9" width="1.6" height="3" /></bezel>
 
 		<bezel name="sym1" element="sym_right" >  <bounds x="121.60"  y="12.7" width="3" height="3" /></bezel>
-		<bezel name="sym2" element="sym_p6" >     <bounds x="116.60"  y="12.7" width="3.5" height="2.2" /></bezel>
-		<bezel name="sym3" element="sym_p5" >     <bounds x="113.75"  y="12.7" width="3.5" height="2.2" /></bezel>
-		<bezel name="sym4" element="sym_p4" >     <bounds x="110.88"  y="12.7" width="3.5" height="2.2" /></bezel>
-		<bezel name="sym6" element="sym_p3" >     <bounds x="108.00"  y="12.7" width="3.5" height="2.2" /></bezel>
-		<bezel name="sym7" element="sym_p2" >     <bounds x="105.13"  y="12.7" width="3.5" height="2.2" /></bezel>
-		<bezel name="sym8" element="sym_p1" >     <bounds x="102.25"  y="12.7" width="3.5" height="2.2" /></bezel>
+		<bezel name="sym2" element="sym_p6" >     <bounds x="116.60"  y="12.5" width="5" height="3" /></bezel>
+		<bezel name="sym3" element="sym_p5" >     <bounds x="113.75"  y="12.5" width="4" height="3" /></bezel>
+		<bezel name="sym4" element="sym_p4" >     <bounds x="110.88"  y="12.5" width="4" height="3" /></bezel>
+		<bezel name="sym6" element="sym_p3" >     <bounds x="108.00"  y="12.5" width="4" height="3" /></bezel>
+		<bezel name="sym7" element="sym_p2" >     <bounds x="105.13"  y="12.5" width="4" height="3" /></bezel>
+		<bezel name="sym8" element="sym_p1" >     <bounds x="102.25"  y="12.5" width="4" height="3" /></bezel>
 		<bezel name="sym9" element="sym_white" >  <bounds x="99.00"   y="12.5" width="4" height="3" /></bezel>
 		<bezel name="sym10" element="sym_black" > <bounds x="99.90"   y="13.0" width="2.2" height="2.2" /></bezel>
 		<bezel name="sym11" element="sym_left" >  <bounds x="95.40"   y="12.7" width="3" height="3" /></bezel>
@@ -504,12 +504,12 @@
 		<bezel element="text_down"  ><bounds x="132" y="51" width="7" height="3" /></bezel>
 		<bezel element="text_enter" ><bounds x="141" y="52" width="7" height="2" /></bezel>
 
-		<bezel element="text_p1" ><bounds x="96"  y="66" width="7" height="3" /></bezel>
-		<bezel element="text_p2" ><bounds x="105" y="66" width="7" height="3" /></bezel>
-		<bezel element="text_p3" ><bounds x="114" y="66" width="7" height="3" /></bezel>
-		<bezel element="text_p4" ><bounds x="123" y="66" width="7" height="3" /></bezel>
-		<bezel element="text_p5" ><bounds x="132" y="66" width="7" height="3" /></bezel>
-		<bezel element="text_p6" ><bounds x="141" y="66" width="7" height="3" /></bezel>
+		<bezel element="text_p1" ><bounds x="96"  y="65" width="7" height="5" /></bezel>
+		<bezel element="text_p2" ><bounds x="105" y="65" width="7" height="5" /></bezel>
+		<bezel element="text_p3" ><bounds x="114" y="65" width="7" height="5" /></bezel>
+		<bezel element="text_p4" ><bounds x="123" y="65" width="7" height="5" /></bezel>
+		<bezel element="text_p5" ><bounds x="132" y="65" width="7" height="5" /></bezel>
+		<bezel element="text_p6" ><bounds x="141" y="65" width="7" height="5" /></bezel>
 
 		<bezel element="button" inputtag="RESET" inputmask="0x00000001"><bounds x="96"  y="40" width="8" height="2" /></bezel>
 		<bezel element="button" inputtag="P7" inputmask="0x80000000"><bounds x="107" y="40" width="8" height="2" /></bezel>

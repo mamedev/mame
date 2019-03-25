@@ -264,7 +264,8 @@ void re900_state::mem_io(address_map &map)
 	map(0x0000, 0xbfff).r(FUNC(re900_state::rom_r));
 	map(0xc000, 0xdfff).ram().share("nvram");
 	map(0xe000, 0xefff).w(FUNC(re900_state::watchdog_reset_w));
-	map(0xe000, 0xe001).w("tms9128", FUNC(tms9928a_device::write));
+	map(0xe000, 0xe000).w("tms9128", FUNC(tms9928a_device::vram_w));
+	map(0xe001, 0xe001).w("tms9128", FUNC(tms9928a_device::register_w));
 	map(0xe800, 0xe801).w("ay_re900", FUNC(ay8910_device::address_data_w));
 	map(0xe802, 0xe802).r("ay_re900", FUNC(ay8910_device::data_r));
 }

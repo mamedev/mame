@@ -10,7 +10,6 @@ class m68340_dma
 {
 public:
 	void reset();
-	void module_reset();
 };
 
 #endif // MAME_MACHINE_68340DMA_H

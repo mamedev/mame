@@ -308,7 +308,7 @@ void nes_sachen_8259d_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_sachen_sa009_device::write_l(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_sachen_sa009_device::write_l)
 {
 	LOG_MMC(("SA009 write_l, offset: %04x, data: %02x\n", offset, data));
 
@@ -327,7 +327,7 @@ void nes_sachen_sa009_device::write_l(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_sachen_sa0036_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_sachen_sa0036_device::write_h)
 {
 	LOG_MMC(("sa0036 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -346,7 +346,7 @@ void nes_sachen_sa0036_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_sachen_sa0037_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_sachen_sa0037_device::write_h)
 {
 	LOG_MMC(("sa0037 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -369,7 +369,7 @@ void nes_sachen_sa0037_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_sachen_sa72007_device::write_l(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_sachen_sa72007_device::write_l)
 {
 	LOG_MMC(("SA72007 write_l, offset: %04x, data: %02x\n", offset, data));
 
@@ -390,7 +390,7 @@ void nes_sachen_sa72007_device::write_l(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_sachen_sa72008_device::write_l(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_sachen_sa72008_device::write_l)
 {
 	LOG_MMC(("SA72008 write_l, offset: %04x, data: %02x\n", offset, data));
 
@@ -410,7 +410,7 @@ void nes_sachen_sa72008_device::write_l(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-uint8_t nes_sachen_tca01_device::read_l(offs_t offset)
+READ8_MEMBER(nes_sachen_tca01_device::read_l)
 {
 	LOG_MMC(("TCA-01 read_l, offset: %04x\n", offset));
 
@@ -433,7 +433,7 @@ uint8_t nes_sachen_tca01_device::read_l(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_sachen_tcu01_device::write_l(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_sachen_tcu01_device::write_l)
 {
 	LOG_MMC(("TCU-01 write_l, offset: %04x, data: %02x\n", offset, data));
 
@@ -456,7 +456,7 @@ void nes_sachen_tcu01_device::write_l(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_sachen_tcu02_device::write_l(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_sachen_tcu02_device::write_l)
 {
 	LOG_MMC(("TCU-02 write_l, offset: %04x, data: %02x\n", offset, data));
 
@@ -467,7 +467,7 @@ void nes_sachen_tcu02_device::write_l(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t nes_sachen_tcu02_device::read_l(offs_t offset)
+READ8_MEMBER(nes_sachen_tcu02_device::read_l)
 {
 	LOG_MMC(("TCU-02 read_l, offset: %04x\n", offset));
 
@@ -512,7 +512,7 @@ void nes_sachen_74x374_device::set_mirror(uint8_t nt) // also used by mappers 13
 }
 
 
-void nes_sachen_74x374_device::write_l(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_sachen_74x374_device::write_l)
 {
 	LOG_MMC(("Sachen 74*374 write_l, offset: %04x, data: %02x\n", offset, data));
 
@@ -551,7 +551,7 @@ void nes_sachen_74x374_device::write_l(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t nes_sachen_74x374_device::read_l(offs_t offset)
+READ8_MEMBER(nes_sachen_74x374_device::read_l)
 {
 	LOG_MMC(("Sachen 74*374 read_l, offset: %04x", offset));
 
@@ -562,7 +562,7 @@ uint8_t nes_sachen_74x374_device::read_l(offs_t offset)
 		return 0;
 }
 
-void nes_sachen_74x374_alt_device::write_l(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_sachen_74x374_alt_device::write_l)
 {
 	LOG_MMC(("Sachen 74*374 Alt write_l, offset: %04x, data: %02x\n", offset, data));
 
@@ -626,7 +626,7 @@ void nes_sachen_8259a_device::chr_update()
 	}
 }
 
-void nes_sachen_8259a_device::write_l(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_sachen_8259a_device::write_l)
 {
 	LOG_MMC(("Sachen 8259 write_l, offset: %04x, data: %02x\n", offset, data));
 

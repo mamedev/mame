@@ -508,8 +508,8 @@ void jongkyo_state::machine_reset()
 }
 
 
-void jongkyo_state::jongkyo(machine_config &config)
-{
+MACHINE_CONFIG_START(jongkyo_state::jongkyo)
+
 	/* basic machine hardware */
 	sega_315_5084_device &maincpu(SEGA_315_5084(config, m_maincpu, JONGKYO_CLOCK/4));
 	maincpu.set_addrmap(AS_PROGRAM, &jongkyo_state::jongkyo_memmap);
@@ -522,13 +522,13 @@ void jongkyo_state::jongkyo(machine_config &config)
 
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(256, 256);
-	screen.set_visarea(0, 256-1, 8, 256-8-1);
-	screen.set_screen_update(FUNC(jongkyo_state::screen_update_jongkyo));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 8, 256-8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(jongkyo_state, screen_update_jongkyo)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", FUNC(jongkyo_state::jongkyo_palette), 0x100);
 
@@ -537,7 +537,7 @@ void jongkyo_state::jongkyo(machine_config &config)
 	aysnd.port_a_read_callback().set(FUNC(jongkyo_state::input_1p_r));
 	aysnd.port_b_read_callback().set(FUNC(jongkyo_state::input_2p_r));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.33);
-}
+MACHINE_CONFIG_END
 
 
 

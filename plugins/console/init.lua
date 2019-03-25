@@ -18,16 +18,6 @@ function console.startplugin()
 	local matches = {}
 	local lastindex = 0
 	local consolebuf
-	_G.history = function (index)
-		local history = ln.historyget()
-		if index then
-			ln.preload(history[index])
-			return
-		end
-		for num, line in ipairs(history) do
-			print(num, line)
-		end
-	end
 	print("    _/      _/    _/_/    _/      _/  _/_/_/_/");
 	print("   _/_/  _/_/  _/    _/  _/_/  _/_/  _/       ");
 	print("  _/  _/  _/  _/_/_/_/  _/  _/  _/  _/_/_/    ");
@@ -38,7 +28,7 @@ function console.startplugin()
 	-- linenoise isn't thread safe but that means history can handled here
 	-- that also means that bad things will happen if anything outside lua tries to use it
 	-- especially the completion callback
-	ln.historysetmaxlen(50)
+	ln.historysetmaxlen(10)
 	local scr = [[
 local ln = require('linenoise')
 ln.setcompletion(function(c, str, pos)

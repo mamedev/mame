@@ -198,7 +198,7 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 // Debugger support
 // The memory accesses by the debugger are routed around the custom chip logic
 
-uint8_t mainboard8_device::debugger_read(offs_t offset)
+READ8_MEMBER( mainboard8_device::debugger_read )
 {
 	int logical_address = offset;
 	bool compat_mode = (m_crus_debug==ASSERT_LINE);
@@ -243,7 +243,7 @@ uint8_t mainboard8_device::debugger_read(offs_t offset)
 		if (m_mofetta->hexbus_access_debug()) return m_rom1[(physical_address & 0x1fff) | 0x6000];
 		if (m_mofetta->intdsr_access_debug()) return m_rom1[(physical_address & 0x1fff) | 0x4000];
 		m_ioport->memen_in(ASSERT_LINE);
-		m_ioport->readz(physical_address & 0xffff, &value);
+		m_ioport->readz(space, physical_address & 0xffff, &value);
 		m_ioport->memen_in(CLEAR_LINE);
 		return value;
 	}
@@ -251,7 +251,7 @@ uint8_t mainboard8_device::debugger_read(offs_t offset)
 	{
 		// Cartridge space lower 8
 		m_gromport->romgq_line(ASSERT_LINE);
-		m_gromport->readz(physical_address & 0x1fff, &value);
+		m_gromport->readz(space, physical_address & 0x1fff, &value);
 		m_gromport->romgq_line(CLEAR_LINE);
 		return value;
 	}
@@ -259,7 +259,7 @@ uint8_t mainboard8_device::debugger_read(offs_t offset)
 	{
 		// Cartridge space upper 8
 		m_gromport->romgq_line(ASSERT_LINE);
-		m_gromport->readz((physical_address & 0x1fff) | 0x2000, &value);
+		m_gromport->readz(space, (physical_address & 0x1fff) | 0x2000, &value);
 		m_gromport->romgq_line(CLEAR_LINE);
 		return value;
 	}
@@ -276,7 +276,7 @@ uint8_t mainboard8_device::debugger_read(offs_t offset)
 	return 0;
 }
 
-void mainboard8_device::debugger_write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( mainboard8_device::debugger_write )
 {
 	int logical_address = offset;
 	bool compat_mode = (m_crus_debug==ASSERT_LINE);
@@ -324,14 +324,14 @@ void mainboard8_device::debugger_write(offs_t offset, uint8_t data)
 		if (m_mofetta->hexbus_access_debug()) return;
 		if (m_mofetta->intdsr_access_debug()) return;
 		m_ioport->memen_in(ASSERT_LINE);
-		m_ioport->write(physical_address & 0xffff, data & 0xff);
+		m_ioport->write(space, physical_address & 0xffff, data & 0xff);
 		m_ioport->memen_in(CLEAR_LINE);     return;
 	}
 	if ((physical_address & 0x00ffe000)==0x00ff6000)
 	{
 		// Cartridge space lower 8
 		m_gromport->romgq_line(ASSERT_LINE);
-		m_gromport->write(physical_address & 0x1fff, data & 0xff);
+		m_gromport->write(space, physical_address & 0x1fff, data & 0xff);
 		m_gromport->romgq_line(CLEAR_LINE);
 		return;
 	}
@@ -339,7 +339,7 @@ void mainboard8_device::debugger_write(offs_t offset, uint8_t data)
 	{
 		// Cartridge space upper 8
 		m_gromport->romgq_line(ASSERT_LINE);
-		m_gromport->write((physical_address & 0x1fff) | 0x2000, data & 0xff);
+		m_gromport->write(space, (physical_address & 0x1fff) | 0x2000, data & 0xff);
 		m_gromport->romgq_line(CLEAR_LINE);
 		return;
 	}
@@ -352,16 +352,16 @@ void mainboard8_device::debugger_write(offs_t offset, uint8_t data)
 
 READ8Z_MEMBER(mainboard8_device::crureadz)
 {
-	m_ioport->crureadz(offset, value);
+	m_ioport->crureadz(space, offset, value);
 }
 
 /*
     CRU handling. Mofetta is the only chip that bothers to handle it, beside the PEB
 */
-void mainboard8_device::cruwrite(offs_t offset, uint8_t data)
+WRITE8_MEMBER(mainboard8_device::cruwrite)
 {
-	m_mofetta->cruwrite(offset, data);
-	m_ioport->cruwrite(offset, data);
+	m_mofetta->cruwrite(space, offset, data);
+	m_ioport->cruwrite(space, offset, data);
 }
 
 // =============== Memory bus access ==================
@@ -371,7 +371,7 @@ WRITE_LINE_MEMBER( mainboard8_device::dbin_in )
 	m_dbin_level = (line_state)state;
 }
 
-uint8_t mainboard8_device::setoffset(offs_t offset)
+READ8_MEMBER( mainboard8_device::setoffset )
 {
 	LOGMASKED(LOG_ADDRESS, "set %s %04x\n", (m_dbin_level==ASSERT_LINE)? "R" : "W", offset);
 
@@ -390,7 +390,7 @@ uint8_t mainboard8_device::setoffset(offs_t offset)
 	m_A14_set = ((m_logical_address & 2)!=0); // Needed for clock_in
 
 	// Check for match in logical space
-	m_vaquerro->set_address(m_logical_address, m_dbin_level);
+	m_vaquerro->set_address(space, m_logical_address, m_dbin_level);
 
 	// Select GROMs if addressed
 	select_groms();
@@ -405,7 +405,7 @@ uint8_t mainboard8_device::setoffset(offs_t offset)
 	m_mofetta->lascs_in(lasreq);
 
 	// Need to set the address in any case so that the lines can be cleared
-	m_amigo->set_address(m_logical_address);
+	m_amigo->set_address(space, m_logical_address);
 
 	// AMIGO is the one to control the READY line to the CPU
 	// MOFETTA does not contribute to READY
@@ -539,7 +539,7 @@ WRITE_LINE_MEMBER( mainboard8_device::clock_in )
 
 		if (m_mofetta->alccs_out()==ASSERT_LINE)
 		{
-			m_oso->write(m_physical_address>>1, m_latched_data);
+			m_oso->write(*m_space, m_physical_address>>1, m_latched_data);
 			m_pending_write = false;
 			LOGMASKED(LOG_MEM, "Write %04x (phys %06x, OSO) <- %02x\n", m_logical_address, m_physical_address, m_latched_data);
 		}
@@ -547,7 +547,7 @@ WRITE_LINE_MEMBER( mainboard8_device::clock_in )
 		if (m_mofetta->cmas_out()==ASSERT_LINE)
 		{
 			m_gromport->romgq_line(ASSERT_LINE);
-			m_gromport->write(m_physical_address & 0x3fff, m_latched_data);
+			m_gromport->write(*m_space, m_physical_address & 0x3fff, m_latched_data);
 			m_pending_write = false;
 			LOGMASKED(LOG_MEM, "Write %04x (phys %06x, cartridge) <- %02x\n", m_logical_address, m_physical_address, m_latched_data);
 		}
@@ -558,7 +558,7 @@ WRITE_LINE_MEMBER( mainboard8_device::clock_in )
 
 		if (m_mofetta->dbc_out()==ASSERT_LINE)
 		{
-			m_ioport->write(m_physical_address, m_latched_data);
+			m_ioport->write(*m_space, m_physical_address, m_latched_data);
 			m_pending_write = false;
 			LOGMASKED(LOG_MEM, "Write %04x (phys %06x, PEB) <- %02x\n", m_logical_address, m_physical_address, m_latched_data);
 		}
@@ -635,7 +635,7 @@ void mainboard8_device::select_groms()
 			m_sgrom1->write(m_latched_data);
 			m_sgrom2->write(m_latched_data);
 			LOGMASKED(LOG_MEM, "Write GS <- %02x\n", m_latched_data);
-			m_gromport->write(0, m_latched_data);
+			m_gromport->write(*m_space, 0, m_latched_data);
 			break;
 
 		case TSGSEL:
@@ -682,8 +682,8 @@ void mainboard8_device::set_paddress(int address)
 	m_physical_address = (m_physical_address << 16) | address;
 	LOGMASKED(LOG_DETAIL, "Setting physical address %06x\n", m_physical_address);
 
-	m_mofetta->set_address(address, m_dbin_level);
-	m_ioport->setaddress_dbin(address, m_dbin_level);
+	m_mofetta->set_address(*m_space, address, m_dbin_level);
+	m_ioport->setaddress_dbin(*m_space, address, m_dbin_level);
 }
 
 WRITE_LINE_MEMBER( mainboard8_device::msast_in )
@@ -701,14 +701,14 @@ WRITE_LINE_MEMBER( mainboard8_device::msast_in )
 }
 
 
-uint8_t mainboard8_device::read(offs_t offset)
+READ8_MEMBER( mainboard8_device::read )
 {
 	uint8_t value = 0;
 	const char* what;
 
 	if (machine().side_effects_disabled())
 	{
-		return debugger_read(offset);
+		return debugger_read(space, offset);
 	}
 
 	// =================================================
@@ -716,7 +716,7 @@ uint8_t mainboard8_device::read(offs_t offset)
 	// =================================================
 	if (m_amigo->mapper_accessed())
 	{
-		value = m_amigo->read();
+		value = m_amigo->read(space, 0);
 		what = "mapper";
 		goto readdone;
 	}
@@ -762,7 +762,7 @@ uint8_t mainboard8_device::read(offs_t offset)
 			m_sgrom0->readz(&value);
 			m_sgrom1->readz(&value);
 			m_sgrom2->readz(&value);
-			m_gromport->readz(0, &value);
+			m_gromport->readz(space, 0, &value);
 			if (!m_A14_set) LOGMASKED(LOG_GROM, "GS>%04x\n", m_sgrom0->debug_get_address()-1);
 			what = "system GROM";
 			goto readdone;
@@ -843,7 +843,7 @@ uint8_t mainboard8_device::read(offs_t offset)
 
 		if (m_mofetta->alccs_out()==ASSERT_LINE)
 		{
-			value = m_oso->read(m_physical_address>>1);
+			value = m_oso->read(*m_space, m_physical_address>>1);
 			what = "OSO";
 			goto readdonephys;
 		}
@@ -858,14 +858,14 @@ uint8_t mainboard8_device::read(offs_t offset)
 		if (m_mofetta->cmas_out()==ASSERT_LINE)
 		{
 			m_gromport->romgq_line(ASSERT_LINE);
-			m_gromport->readz(m_physical_address & 0x3fff, &value);
+			m_gromport->readz(*m_space, m_physical_address & 0x3fff, &value);
 			what = "Cartridge";
 			goto readdonephys;
 		}
 
 		if (m_mofetta->dbc_out()==ASSERT_LINE)
 		{
-			m_ioport->readz(m_physical_address & 0xffff, &value);
+			m_ioport->readz(*m_space, m_physical_address & 0xffff, &value);
 			what = "PEB";
 			goto readdonephys;
 		}
@@ -905,14 +905,14 @@ void mainboard8_device::cycle_end()
     If the READY line is pulled down due to the mapping process, we must
     store the data bus value until the physical address is available.
 */
-void mainboard8_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( mainboard8_device::write )
 {
 	m_latched_data = data;
 	m_pending_write = true;
 
 	if (machine().side_effects_disabled())
 	{
-		return debugger_write(offset, data);
+		return debugger_write(space, offset, data);
 	}
 
 	// Some logical space devices can be written immediately
@@ -920,7 +920,7 @@ void mainboard8_device::write(offs_t offset, uint8_t data)
 	if (m_amigo->mapper_accessed())
 	{
 		LOGMASKED(LOG_MEM, "Write %04x (mapper) <- %02x\n", m_logical_address, data);
-		m_amigo->write(data);
+		m_amigo->write(space, 0, data);
 		m_pending_write = false;
 	}
 
@@ -1064,6 +1064,10 @@ void mainboard8_device::device_reset()
 	m_A14_set = false;
 	// Configure RAM and AMIGO
 	m_amigo->connect_sram(m_sram->pointer());
+
+	// Get the pointer to the address space; we need it outside of the
+	// usual memory functions. TODO: Possibly not anymore.
+	m_space = &m_maincpu->space(AS_PROGRAM);
 }
 
 void mainboard8_device::device_add_mconfig(machine_config &config)
@@ -1731,7 +1735,7 @@ bool mofetta_device::intdsr_access_debug()
 	return m_txspg;
 }
 
-void mofetta_device::cruwrite(offs_t offset, uint8_t data)
+WRITE8_MEMBER(mofetta_device::cruwrite)
 {
 	if ((offset & 0xff00)==0x2700)
 	{
@@ -1996,7 +2000,7 @@ WRITE_LINE_MEMBER( amigo_device::lascs_in )
     3. Set the physical address bus with the second 16 bits of the physical
        address. Clear the MSAST line. Forward any incoming READY=0 to the CPU.
 */
-uint8_t amigo_device::set_address(offs_t offset)
+READ8_MEMBER( amigo_device::set_address )
 {
 	// Check whether the mapper itself is accessed
 	int mapaddr = (m_crus==ASSERT_LINE)? 0x8810 : 0xf870;
@@ -2049,7 +2053,7 @@ uint8_t amigo_device::set_address(offs_t offset)
 /*
     Read the mapper status bits
 */
-uint8_t amigo_device::read()
+READ8_MEMBER( amigo_device::read )
 {
 	// Read the protection status bits and reset them
 	uint8_t value = m_protflag;
@@ -2060,7 +2064,7 @@ uint8_t amigo_device::read()
 /*
     Configure the mapper. This is the only reason to write to the AMIGO.
 */
-void amigo_device::write(uint8_t data)
+WRITE8_MEMBER( amigo_device::write )
 {
 	// Load or save map file
 	if ((data & 0xf0)==0x00)
@@ -2291,7 +2295,7 @@ oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t 
 	m_hexbus_outbound = nullptr;
 }
 
-uint8_t oso_device::read(offs_t offset)
+READ8_MEMBER( oso_device::read )
 {
 	int value = 0;
 	offset &= 0x03;
@@ -2327,7 +2331,7 @@ uint8_t oso_device::read(offs_t offset)
 	return value;
 }
 
-void oso_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( oso_device::write )
 {
 	offset &= 0x03;
 	switch (offset)

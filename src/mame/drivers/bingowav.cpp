@@ -82,6 +82,7 @@ void bingowav_state::bingowav_main_map(address_map &map)
 	map(0x140000, 0x140001).nopr();
 	map(0x150001, 0x150001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x150003, 0x150003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+	map(0xfffc00, 0xffffff).rw("maintmp", FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));
 }
 
 void bingowav_state::bingowav_audio_map(address_map &map)
@@ -113,8 +114,11 @@ INPUT_PORTS_END
 
 void bingowav_state::bingowav(machine_config &config)
 {
-	TMP68301(config, m_maincpu, 12000000); // actually TMP63803F-16
+	M68000(config, m_maincpu, 12000000); // actually TMP63803F-16
 	m_maincpu->set_addrmap(AS_PROGRAM, &bingowav_state::bingowav_main_map);
+
+	tmp68301_device &tmp68301(TMP68301(config, "maintmp", 0)); // wrong
+	tmp68301.set_cputag(m_maincpu);
 
 	te7750_device &mainioh(TE7750(config, "mainioh"));
 	mainioh.ios_cb().set_constant(5);

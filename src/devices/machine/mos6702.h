@@ -25,6 +25,16 @@
 #pragma once
 
 
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_MOS6702_ADD(tag, clock) \
+	MCFG_DEVICE_ADD(tag, MOS6702, clock)
+
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -37,8 +47,8 @@ public:
 	// construction/destruction
 	mos6702_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
 protected:
 	// device-level overrides

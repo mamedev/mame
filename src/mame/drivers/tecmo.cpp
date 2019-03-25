@@ -1221,39 +1221,6 @@ ROM_END
 
 ROM_START( gemini )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "4-5s",  0x00000, 0x10000, CRC(ce71e27a) SHA1(5aac0434edd39e444687d9988c7f49e0752a4900) )  /* c000-ffff is not used */
-	ROM_LOAD( "5-6s",  0x10000, 0x10000, CRC(216784a9) SHA1(ec74a3753e5b6384b875125ec0db7beea0a6aa6d) )  /* banked at f000-f7ff */
-
-	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "gw03-5h.rom",  0x0000, 0x8000, CRC(9bc79596) SHA1(61de9ddd45140e8ed88173294bd26147e2abfa21) )
-
-	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "gw02-3h.rom",  0x00000, 0x08000, CRC(7acc8d35) SHA1(05056e9f077e7571b314390b508c72d56ad0f43b) )  /* characters */
-
-	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "gw06-1c.rom",  0x00000, 0x10000, CRC(4ea51631) SHA1(9aee0f1ba210ac953dc193cfc739322966b6de8a) )  /* sprites */
-	ROM_LOAD( "gw07-1d.rom",  0x10000, 0x10000, CRC(da42637e) SHA1(9885c52823279f26871092c77bdbe027df08268f) )  /* sprites */
-	ROM_LOAD( "gw08-1f.rom",  0x20000, 0x10000, CRC(0b4e8d70) SHA1(55069f3df1c8db83f306d46b8262fd23585e6013) )  /* sprites */
-	ROM_LOAD( "gw09-1h.rom",  0x30000, 0x10000, CRC(b65c5e4c) SHA1(699e1a9e72b8d94edae7382ba119fe5da113514d) )  /* sprites */
-
-	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "gw10-1n.rom",  0x00000, 0x10000, CRC(5e84cd4f) SHA1(e85320291027a16619c87fc2365448367bda454a) )  /* tiles #1 */
-	ROM_LOAD( "gw11-2na.rom", 0x10000, 0x10000, CRC(08b458e1) SHA1(b3426faa57dca51dc053db44fa4968425d8bf3ee) )  /* tiles #1 */
-	ROM_LOAD( "gw12-2nb.rom", 0x20000, 0x10000, CRC(229c9714) SHA1(f4f47d6b379c973c22f9ae7d7bec7041cdf3f737) )  /* tiles #1 */
-	ROM_LOAD( "gw13-3n.rom",  0x30000, 0x10000, CRC(c5dfaf47) SHA1(c3202ca8c7f3c5c7dc9acdc09c1c894e168ef9fe) )  /* tiles #1 */
-
-	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "gw14-1r.rom",  0x00000, 0x10000, CRC(9c10e5b5) SHA1(a81399b85d8f3ddca26883ec3535cb9044c35ada) )  /* tiles #2 */
-	ROM_LOAD( "gw15-2ra.rom", 0x10000, 0x10000, CRC(4cd18cfa) SHA1(c197a098a7c1e5220aad039383a40702fe7c4f21) )  /* tiles #2 */
-	ROM_LOAD( "gw16-2rb.rom", 0x20000, 0x10000, CRC(f911c7be) SHA1(3f49f6c4734f2b644d93c4a54249aae6ff080e1d) )  /* tiles #2 */
-	ROM_LOAD( "gw17-3r.rom",  0x30000, 0x10000, CRC(79a9ce25) SHA1(74e3917b8e7a920ceb2135d7ef8fb2f2c5176b21) )  /* tiles #2 */
-
-	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples */
-	ROM_LOAD( "gw01-6a.rom",  0x0000, 0x8000, CRC(d78afa05) SHA1(b02a739b045f5cddf943ce59226ef234463eeebe) )
-ROM_END
-
-ROM_START( geminij )
-	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "gw04-5s.rom",  0x00000, 0x10000, CRC(ff9de855) SHA1(34167af8456a081f68b338f10d4319ce1e703fd4) )  /* c000-ffff is not used */
 	ROM_LOAD( "gw05-6s.rom",  0x10000, 0x10000, CRC(5a6947a9) SHA1(18b7aeb0f0e2c396bc759118dd7c45fd6070b804) )  /* banked at f000-f7ff */
 
@@ -1353,9 +1320,8 @@ GAME( 1986, rygar,     0,        rygar,     rygar,     tecmo_state, init_rygar, 
 GAME( 1986, rygar2,    rygar,    rygar,     rygar,     tecmo_state, init_rygar,    ROT0,  "Tecmo",   "Rygar (US set 2)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rygar3,    rygar,    rygar,     rygar,     tecmo_state, init_rygar,    ROT0,  "Tecmo",   "Rygar (US set 3 Old Version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rygarj,    rygar,    rygar,     rygar,     tecmo_state, init_rygar,    ROT0,  "Tecmo",   "Argus no Senshi (Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gemini,    0,        gemini,    gemini,    tecmo_state, init_gemini,   ROT90, "Tecmo",   "Gemini Wing (World)",          MACHINE_SUPPORTS_SAVE ) // No regional "Warning, if you are playing ..." screen
-GAME( 1987, geminij,   gemini,   gemini,    gemini,    tecmo_state, init_gemini,   ROT90, "Tecmo",   "Gemini Wing (Japan)",          MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
-GAME( 1987, geminib,   gemini,   geminib,   gemini,    tecmo_state, init_gemini,   ROT90, "bootleg", "Gemini Wing (bootleg)",        MACHINE_SUPPORTS_SAVE ) // regional warning screen is blanked (still get a delay)
+GAME( 1987, gemini,    0,        gemini,    gemini,    tecmo_state, init_gemini,   ROT90, "Tecmo",   "Gemini Wing (Japan)",          MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
+GAME( 1987, geminib,   gemini,   geminib,   gemini,    tecmo_state, init_gemini,   ROT90, "bootleg", "Gemini Wing (bootleg)",        MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
 GAME( 1988, silkworm,  0,        silkworm,  silkworm,  tecmo_state, init_silkworm, ROT0,  "Tecmo",   "Silk Worm (World)",            MACHINE_SUPPORTS_SAVE ) // No regional "Warning, if you are playing ..." screen
 GAME( 1988, silkwormj, silkworm, silkworm,  silkworm,  tecmo_state, init_silkworm, ROT0,  "Tecmo",   "Silk Worm (Japan)",            MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
 GAME( 1988, silkwormp, silkworm, silkwormp, silkwormp, tecmo_state, init_silkworm, ROT0,  "Tecmo",   "Silk Worm (prototype)",        MACHINE_SUPPORTS_SAVE ) // prototype

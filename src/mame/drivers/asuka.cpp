@@ -275,7 +275,7 @@ WRITE_LINE_MEMBER(asuka_state::asuka_msm5205_vck)
 
 	if (m_adpcm_ff)
 	{
-		m_adpcm_select->ba_w(m_sound_data[m_adpcm_pos]);
+		m_adpcm_select->write_ba(m_sound_data[m_adpcm_pos]);
 		m_adpcm_pos = (m_adpcm_pos + 1) & 0xffff;
 	}
 }

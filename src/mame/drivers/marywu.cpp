@@ -186,12 +186,11 @@ void marywu_state::machine_start()
 	m_leds.resolve();
 }
 
-void marywu_state::marywu(machine_config &config)
-{
+MACHINE_CONFIG_START(marywu_state::marywu)
 	/* basic machine hardware */
-	i80c31_device &maincpu(I80C31(config, "maincpu", XTAL(10'738'635))); //actual CPU is a Winbond w78c31b-24
-	maincpu.set_addrmap(AS_PROGRAM, &marywu_state::program_map);
-	maincpu.set_addrmap(AS_IO, &marywu_state::io_map);
+	MCFG_DEVICE_ADD("maincpu", I80C31, XTAL(10'738'635)) //actual CPU is a Winbond w78c31b-24
+	MCFG_DEVICE_PROGRAM_MAP(program_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
 
 	/* Keyboard & display interface */
@@ -214,7 +213,7 @@ void marywu_state::marywu(machine_config &config)
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.50);
 	ay2.port_a_write_callback().set(FUNC(marywu_state::ay2_port_a_w));
 	ay2.port_b_write_callback().set(FUNC(marywu_state::ay2_port_b_w));
-}
+MACHINE_CONFIG_END
 
 ROM_START( marywu )
 	ROM_REGION( 0x8000, "maincpu", 0 )

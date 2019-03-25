@@ -731,9 +731,9 @@ static void alphatro_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(alphatro_state::alphatro)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &alphatro_state::alphatro_map);
-	m_maincpu->set_addrmap(AS_IO, &alphatro_state::alphatro_io);
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(alphatro_map)
+	MCFG_DEVICE_IO_MAP(alphatro_io)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -755,17 +755,17 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, true, true); // clocked through SED-9420C
 	m_fdc->intrq_wr_callback().set(FUNC(alphatro_state::fdc_irq_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq2_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", alphatro_floppies, "525dd", alphatro_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", alphatro_floppies, "525dd", alphatro_state::floppy_formats);
-	SOFTWARE_LIST(config, "flop_list").set_original("alphatro_flop");
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatro_floppies, "525dd", alphatro_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatro_floppies, "525dd", alphatro_state::floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "alphatro_flop")
 
 	I8257(config, m_dmac, 16_MHz_XTAL / 4);
 	m_dmac->out_hrq_cb().set(FUNC(alphatro_state::hrq_w));
 	m_dmac->in_memr_cb().set(FUNC(alphatro_state::ram0000_r));
 	m_dmac->out_memw_cb().set(FUNC(alphatro_state::ram0000_w));
-	m_dmac->in_ior_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_r));
-	m_dmac->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
-	m_dmac->out_tc_cb().set(m_fdc, FUNC(upd765a_device::tc_line_w));
+	m_dmac->in_ior_cb<2>().set("fdc", FUNC(upd765a_device::mdma_r));
+	m_dmac->out_iow_cb<2>().set("fdc", FUNC(upd765a_device::mdma_w));
+	m_dmac->out_tc_cb().set("fdc", FUNC(upd765a_device::tc_line_w));
 
 	HD6845(config, m_crtc, 16_MHz_XTAL / 8);
 	m_crtc->set_screen(m_screen);
@@ -780,13 +780,13 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	usart_clock.signal_handler().set(m_usart, FUNC(i8251_device::write_txc));
 	usart_clock.signal_handler().append(m_usart, FUNC(i8251_device::write_rxc));
 
-	CASSETTE(config, m_cass);
-	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cass->set_interface("alphatro_cass");
-	SOFTWARE_LIST(config, "cass_list").set_original("alphatro_cass");
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("alphatro_cass")
+	MCFG_SOFTWARE_LIST_ADD("cass_list","alphatro_cass")
 
-	TIMER(config, "timer_c").configure_periodic(FUNC(alphatro_state::timer_c), attotime::from_hz(4800));
-	TIMER(config, "timer_p").configure_periodic(FUNC(alphatro_state::timer_p), attotime::from_hz(40000));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", alphatro_state, timer_c, attotime::from_hz(4800))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", alphatro_state, timer_p, attotime::from_hz(40000))
 
 	RAM(config, "ram").set_default_size("64K");
 
@@ -794,7 +794,7 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "alphatro_cart")
 	MCFG_GENERIC_EXTENSIONS("bin")
 	MCFG_GENERIC_LOAD(alphatro_state, cart_load)
-	SOFTWARE_LIST(config, "cart_list").set_original("alphatro_cart");
+	MCFG_SOFTWARE_LIST_ADD("cart_list","alphatro_cart")
 
 	/* 0000 banking */
 	ADDRESS_MAP_BANK(config, "lowbank").set_map(&alphatro_state::rombank_map).set_options(ENDIANNESS_BIG, 8, 32, 0x6000);

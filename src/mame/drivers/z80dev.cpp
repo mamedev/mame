@@ -123,16 +123,15 @@ INPUT_PORTS_START( z80dev )
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LD") PORT_CODE(KEYCODE_L)
 INPUT_PORTS_END
 
-void z80dev_state::z80dev(machine_config &config)
-{
+MACHINE_CONFIG_START(z80dev_state::z80dev)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &z80dev_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &z80dev_state::io_map);
+	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	config.set_default_layout(layout_z80dev);
-}
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( z80dev )

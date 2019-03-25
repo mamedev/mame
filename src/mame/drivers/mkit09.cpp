@@ -198,11 +198,10 @@ WRITE8_MEMBER( mkit09_state::pb_w )
 }
 
 
-void mkit09_state::mkit09(machine_config &config)
-{
+MACHINE_CONFIG_START(mkit09_state::mkit09)
 	/* basic machine hardware */
-	MC6809(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &mkit09_state::mkit09_mem);
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mkit09_mem)
 
 	/* video hardware */
 	config.set_default_layout(layout_mkit09);
@@ -220,14 +219,13 @@ void mkit09_state::mkit09(machine_config &config)
 	m_pia->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	m_pia->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	CASSETTE(config, m_cass);
-}
+	MCFG_CASSETTE_ADD( "cassette" )
+MACHINE_CONFIG_END
 
-void mkit09_state::mkit09a(machine_config &config)
-{
+MACHINE_CONFIG_START(mkit09_state::mkit09a)
 	/* basic machine hardware */
-	MC6809(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &mkit09_state::mkit09a_mem);
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mkit09a_mem)
 
 	/* video hardware */
 	config.set_default_layout(layout_mkit09);
@@ -245,8 +243,8 @@ void mkit09_state::mkit09a(machine_config &config)
 	m_pia->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	m_pia->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	CASSETTE(config, m_cass);
-}
+	MCFG_CASSETTE_ADD( "cassette" )
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( mkit09 )

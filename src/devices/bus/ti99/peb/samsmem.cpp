@@ -70,7 +70,7 @@ READ8Z_MEMBER(sams_memory_expansion_device::readz)
 	}
 }
 
-void sams_memory_expansion_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(sams_memory_expansion_device::write)
 {
 	int base;
 
@@ -104,7 +104,7 @@ READ8Z_MEMBER(sams_memory_expansion_device::crureadz)
 /*
     CRU write. Turns on the mapper and allows to change it.
 */
-void sams_memory_expansion_device::cruwrite(offs_t offset, uint8_t data)
+WRITE8_MEMBER(sams_memory_expansion_device::cruwrite)
 {
 	if ((offset & 0xff00)==SAMS_CRU_BASE)
 		m_crulatch->write_bit((offset & 0x000e) >> 1, data);

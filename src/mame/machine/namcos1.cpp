@@ -10,20 +10,20 @@
 *                                                                              *
 *******************************************************************************/
 
-void namcos1_state::_3dcs_w(offs_t offset, u8 data)
+WRITE8_MEMBER( namcos1_state::_3dcs_w )
 {
 	if (offset & 1) popmessage("LEFT");
 	else            popmessage("RIGHT");
 }
 
 
-u8 namcos1_state::no_key_r(offs_t offset)
+READ8_MEMBER( namcos1_state::no_key_r )
 {
 	popmessage("%s: keychip read %04x\n", m_mcu->tag(), m_mcu->pc(), offset);
 	return 0;
 }
 
-void namcos1_state::no_key_w(offs_t offset, u8 data)
+WRITE8_MEMBER( namcos1_state::no_key_w )
 {
 	popmessage("%s: keychip write %04x=%02x\n", m_mcu->tag(), m_mcu->pc(), offset, data);
 }
@@ -128,7 +128,7 @@ puzlclub:
 CPU #0 PC e017: keychip write 0003=35 [they probably used RAM instead of a key chip for this prototype]
 CPU #0 PC e3d4: keychip read 0003     [AND #$37 = key no.]
 */
-u8 namcos1_state::key_type1_r(offs_t offset)
+READ8_MEMBER( namcos1_state::key_type1_r )
 {
 //  logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
 
@@ -159,7 +159,7 @@ u8 namcos1_state::key_type1_r(offs_t offset)
 	return 0;
 }
 
-void namcos1_state::key_type1_w(offs_t offset, u8 data)
+WRITE8_MEMBER( namcos1_state::key_type1_w )
 {
 //  logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
 
@@ -311,7 +311,7 @@ CPU #0 PC e574: keychip read 0001
 
 */
 
-u8 namcos1_state::key_type2_r(offs_t offset)
+READ8_MEMBER( namcos1_state::key_type2_r )
 {
 //  logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
 
@@ -330,7 +330,7 @@ u8 namcos1_state::key_type2_r(offs_t offset)
 	return 0;
 }
 
-void namcos1_state::key_type2_w(offs_t offset, u8 data)
+WRITE8_MEMBER( namcos1_state::key_type2_w )
 {
 //  logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
 
@@ -340,8 +340,8 @@ void namcos1_state::key_type2_w(offs_t offset, u8 data)
 
 		if (offset == 3)
 		{
-			u32 d = (m_key[0] << 8) | m_key[1];
-			u32 n = (m_key_numerator_high_word << 16) | (m_key[2] << 8) | m_key[3];
+			unsigned int d = (m_key[0] << 8) | m_key[1];
+			unsigned int n = (m_key_numerator_high_word << 16) | (m_key[2] << 8) | m_key[3];
 
 			if (d)
 			{
@@ -437,7 +437,7 @@ CPU #0 PC ca96: keychip read 0043     [0x30 | (ARG & 0x0f)]
 CPU #0 PC e45a: keychip read 0030     [discarded]
 */
 
-u8 namcos1_state::key_type3_r(offs_t offset)
+READ8_MEMBER( namcos1_state::key_type3_r )
 {
 //  logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
 
@@ -447,7 +447,7 @@ u8 namcos1_state::key_type3_r(offs_t offset)
 	   The schematics don't show A11 being used, so I go for this handling.
 	  */
 
-	const int op = (offset & 0x70) >> 4;
+	int op = (offset & 0x70) >> 4;
 
 	if (op == m_key_reg)     return m_key_id;
 	if (op == m_key_rng)     return machine().rand();
@@ -461,7 +461,7 @@ u8 namcos1_state::key_type3_r(offs_t offset)
 	return 0;
 }
 
-void namcos1_state::key_type3_w(offs_t offset, u8 data)
+WRITE8_MEMBER( namcos1_state::key_type3_w )
 {
 //  logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
 
@@ -476,7 +476,7 @@ void namcos1_state::key_type3_w(offs_t offset, u8 data)
 *                                                                              *
 *******************************************************************************/
 
-void namcos1_state::sound_bankswitch_w(u8 data)
+WRITE8_MEMBER(namcos1_state::sound_bankswitch_w)
 {
 	m_soundbank->set_entry((data & 0x70) >> 4);
 }
@@ -545,7 +545,7 @@ void namcos1_state::machine_reset()
 *******************************************************************************/
 
 /* mcu banked rom area select */
-void namcos1_state::mcu_bankswitch_w(u8 data)
+WRITE8_MEMBER(namcos1_state::mcu_bankswitch_w)
 {
 	int bank;
 
@@ -581,7 +581,7 @@ void namcos1_state::mcu_bankswitch_w(u8 data)
 /* I found set $A6 only initialize in MCU                       */
 /* This patch kill write this data by MCU case $A6 to xx(clear) */
 
-void namcos1_state::mcu_patch_w(u8 data)
+WRITE8_MEMBER(namcos1_state::mcu_patch_w)
 {
 	//logerror("mcu C000 write %s data=%02x\n",machine().describe_context(),data);
 	if (m_mcu_patch_data == 0xa6) return;
@@ -603,14 +603,14 @@ void namcos1_state::driver_init()
 	{
 		if ((i & 0x010000) == 0)
 		{
-			u8 t = m_rom[i];
+			uint8_t t = m_rom[i];
 			m_rom[i] = m_rom[i + 0x010000];
 			m_rom[i + 0x010000] = t;
 		}
 	}
 
 	// kludge! see notes
-	m_mcu->space(AS_PROGRAM).install_write_handler(0xc000, 0xc000, write8smo_delegate(FUNC(namcos1_state::mcu_patch_w), this));
+	m_mcu->space(AS_PROGRAM).install_write_handler(0xc000, 0xc000, write8_delegate(FUNC(namcos1_state::mcu_patch_w), this));
 
 	// these are overridden as needed in the specific DRIVER_INIT_MEMBERs
 	m_key_id        = 0;
@@ -622,38 +622,6 @@ void namcos1_state::driver_init()
 	m_key_top4      = 0;
 }
 
-void namcos1_state::key_type_1_init(int key_id)
-{
-	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
-		read8sm_delegate(FUNC(namcos1_state::key_type1_r),this),
-		write8sm_delegate(FUNC(namcos1_state::key_type1_w),this));
-	m_key_id = key_id;
-}
-
-void namcos1_state::key_type_2_init(int key_id)
-{
-	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
-		read8sm_delegate(FUNC(namcos1_state::key_type2_r),this),
-		write8sm_delegate(FUNC(namcos1_state::key_type2_w),this));
-	m_key_id = key_id;
-	save_item(NAME(m_key_quotient));
-	save_item(NAME(m_key_reminder));
-	save_item(NAME(m_key_numerator_high_word));
-}
-
-void namcos1_state::key_type_3_init(int key_id, int reg, int rng, int swap4_arg, int swap4, int bottom4, int top4)
-{
-	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
-		read8sm_delegate(FUNC(namcos1_state::key_type3_r),this),
-		write8sm_delegate(FUNC(namcos1_state::key_type3_w),this));
-	m_key_id        = key_id;
-	m_key_reg       = reg;
-	m_key_rng       = rng;
-	m_key_swap4_arg = swap4_arg;
-	m_key_swap4     = swap4;
-	m_key_bottom4   = bottom4;
-	m_key_top4      = top4;
-}
 
 /*******************************************************************************
 *   Shadowland / Youkai Douchuuki specific                                     *
@@ -669,7 +637,10 @@ void namcos1_state::init_shadowld()
 void namcos1_state::init_dspirit()
 {
 	driver_init();
-	key_type_1_init(0x36);
+	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
+		read8_delegate(FUNC(namcos1_state::key_type1_r),this),
+		write8_delegate(FUNC(namcos1_state::key_type1_w),this));
+	m_key_id = 0x36;
 }
 
 /*******************************************************************************
@@ -678,7 +649,10 @@ void namcos1_state::init_dspirit()
 void namcos1_state::init_wldcourt()
 {
 	driver_init();
-	key_type_1_init(0x35);
+	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
+		read8_delegate(FUNC(namcos1_state::key_type1_r),this),
+		write8_delegate(FUNC(namcos1_state::key_type1_w),this));
+	m_key_id = 0x35;
 }
 
 /*******************************************************************************
@@ -687,7 +661,10 @@ void namcos1_state::init_wldcourt()
 void namcos1_state::init_blazer()
 {
 	driver_init();
-	key_type_1_init(0x13);
+	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
+		read8_delegate(FUNC(namcos1_state::key_type1_r),this),
+		write8_delegate(FUNC(namcos1_state::key_type1_w),this));
+	m_key_id = 0x13;
 }
 
 /*******************************************************************************
@@ -696,7 +673,10 @@ void namcos1_state::init_blazer()
 void namcos1_state::init_puzlclub()
 {
 	driver_init();
-	key_type_1_init(0x35);
+	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
+		read8_delegate(FUNC(namcos1_state::key_type1_r),this),
+		write8_delegate(FUNC(namcos1_state::key_type1_w),this));
+	m_key_id = 0x35;
 }
 
 /*******************************************************************************
@@ -705,7 +685,13 @@ void namcos1_state::init_puzlclub()
 void namcos1_state::init_pacmania()
 {
 	driver_init();
-	key_type_2_init(0x12);
+	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
+		read8_delegate(FUNC(namcos1_state::key_type2_r),this),
+		write8_delegate(FUNC(namcos1_state::key_type2_w),this));
+	m_key_id = 0x12;
+	save_item(NAME(m_key_quotient));
+	save_item(NAME(m_key_reminder));
+	save_item(NAME(m_key_numerator_high_word));
 }
 
 /*******************************************************************************
@@ -714,7 +700,13 @@ void namcos1_state::init_pacmania()
 void namcos1_state::init_alice()
 {
 	driver_init();
-	key_type_2_init(0x25);
+	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
+		read8_delegate(FUNC(namcos1_state::key_type2_r),this),
+		write8_delegate(FUNC(namcos1_state::key_type2_w),this));
+	m_key_id = 0x25;
+	save_item(NAME(m_key_quotient));
+	save_item(NAME(m_key_reminder));
+	save_item(NAME(m_key_numerator_high_word));
 }
 
 /*******************************************************************************
@@ -723,7 +715,13 @@ void namcos1_state::init_alice()
 void namcos1_state::init_galaga88()
 {
 	driver_init();
-	key_type_2_init(0x31);
+	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
+		read8_delegate(FUNC(namcos1_state::key_type2_r),this),
+		write8_delegate(FUNC(namcos1_state::key_type2_w),this));
+	m_key_id = 0x31;
+	save_item(NAME(m_key_quotient));
+	save_item(NAME(m_key_reminder));
+	save_item(NAME(m_key_numerator_high_word));
 }
 
 /*******************************************************************************
@@ -732,7 +730,13 @@ void namcos1_state::init_galaga88()
 void namcos1_state::init_ws()
 {
 	driver_init();
-	key_type_2_init(0x07);
+	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
+		read8_delegate(FUNC(namcos1_state::key_type2_r),this),
+		write8_delegate(FUNC(namcos1_state::key_type2_w),this));
+	m_key_id = 0x07;
+	save_item(NAME(m_key_quotient));
+	save_item(NAME(m_key_reminder));
+	save_item(NAME(m_key_numerator_high_word));
 }
 
 /*******************************************************************************
@@ -741,7 +745,13 @@ void namcos1_state::init_ws()
 void namcos1_state::init_bakutotu()
 {
 	driver_init();
-	key_type_2_init(0x22);
+	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
+		read8_delegate(FUNC(namcos1_state::key_type2_r),this),
+		write8_delegate(FUNC(namcos1_state::key_type2_w),this));
+	m_key_id = 0x22;
+	save_item(NAME(m_key_quotient));
+	save_item(NAME(m_key_reminder));
+	save_item(NAME(m_key_numerator_high_word));
 }
 
 /*******************************************************************************
@@ -750,7 +760,16 @@ void namcos1_state::init_bakutotu()
 void namcos1_state::init_splatter()
 {
 	driver_init();
-	key_type_3_init(181, 3, 4, -1, -1, -1, -1);
+	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
+		read8_delegate(FUNC(namcos1_state::key_type3_r),this),
+		write8_delegate(FUNC(namcos1_state::key_type3_w),this));
+	m_key_id        = 181;
+	m_key_reg       = 3;
+	m_key_rng       = 4;
+	m_key_swap4_arg = -1;
+	m_key_swap4     = -1;
+	m_key_bottom4   = -1;
+	m_key_top4      = -1;
 }
 
 /*******************************************************************************
@@ -759,7 +778,16 @@ void namcos1_state::init_splatter()
 void namcos1_state::init_rompers()
 {
 	driver_init();
-	key_type_3_init(182, 7, -1, -1, -1, -1, -1);
+	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
+		read8_delegate(FUNC(namcos1_state::key_type3_r),this),
+		write8_delegate(FUNC(namcos1_state::key_type3_w),this));
+	m_key_id        = 182;
+	m_key_reg       = 7;
+	m_key_rng       = -1;
+	m_key_swap4_arg = -1;
+	m_key_swap4     = -1;
+	m_key_bottom4   = -1;
+	m_key_top4      = -1;
 }
 
 /*******************************************************************************
@@ -768,7 +796,16 @@ void namcos1_state::init_rompers()
 void namcos1_state::init_blastoff()
 {
 	driver_init();
-	key_type_3_init(183, 0, 7, 3, 5, -1, -1);
+	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
+		read8_delegate(FUNC(namcos1_state::key_type3_r),this),
+		write8_delegate(FUNC(namcos1_state::key_type3_w),this));
+	m_key_id        = 183;
+	m_key_reg       = 0;
+	m_key_rng       = 7;
+	m_key_swap4_arg = 3;
+	m_key_swap4     = 5;
+	m_key_bottom4   = -1;
+	m_key_top4      = -1;
 }
 
 /*******************************************************************************
@@ -777,7 +814,16 @@ void namcos1_state::init_blastoff()
 void namcos1_state::init_ws89()
 {
 	driver_init();
-	key_type_3_init(184, 2, -1, -1, -1, -1, -1);
+	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
+		read8_delegate(FUNC(namcos1_state::key_type3_r),this),
+		write8_delegate(FUNC(namcos1_state::key_type3_w),this));
+	m_key_id        = 184;
+	m_key_reg       = 2;
+	m_key_rng       = -1;
+	m_key_swap4_arg = -1;
+	m_key_swap4     = -1;
+	m_key_bottom4   = -1;
+	m_key_top4      = -1;
 }
 
 /*******************************************************************************
@@ -786,7 +832,16 @@ void namcos1_state::init_ws89()
 void namcos1_state::init_tankfrce()
 {
 	driver_init();
-	key_type_3_init(185, 5, -1, 1, -1, 2, -1);
+	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
+		read8_delegate(FUNC(namcos1_state::key_type3_r),this),
+		write8_delegate(FUNC(namcos1_state::key_type3_w),this));
+	m_key_id        = 185;
+	m_key_reg       = 5;
+	m_key_rng       = -1;
+	m_key_swap4_arg = 1;
+	m_key_swap4     = -1;
+	m_key_bottom4   = 2;
+	m_key_top4      = -1;
 }
 
 void namcos1_state::init_tankfrc4()
@@ -798,7 +853,7 @@ void namcos1_state::init_tankfrc4()
 	m_stored_input[0] = 0;
 	m_stored_input[1] = 0;
 
-	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8sm_delegate(FUNC(namcos1_state::faceoff_inputs_r), this));
+	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8_delegate(FUNC(namcos1_state::faceoff_inputs_r), this));
 	save_item(NAME(m_input_count));
 	save_item(NAME(m_stored_input));
 }
@@ -809,7 +864,16 @@ void namcos1_state::init_tankfrc4()
 void namcos1_state::init_dangseed()
 {
 	driver_init();
-	key_type_3_init(308, 6, -1, 5, -1, 0, 4);
+	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
+		read8_delegate(FUNC(namcos1_state::key_type3_r),this),
+		write8_delegate(FUNC(namcos1_state::key_type3_w),this));
+	m_key_id        = 308;
+	m_key_reg       = 6;
+	m_key_rng       = -1;
+	m_key_swap4_arg = 5;
+	m_key_swap4     = -1;
+	m_key_bottom4   = 0;
+	m_key_top4      = 4;
 }
 
 /*******************************************************************************
@@ -818,7 +882,16 @@ void namcos1_state::init_dangseed()
 void namcos1_state::init_pistoldm()
 {
 	driver_init();
-	key_type_3_init(309, 1, 2, 0, -1, 4, -1);
+	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
+		read8_delegate(FUNC(namcos1_state::key_type3_r),this),
+		write8_delegate(FUNC(namcos1_state::key_type3_w),this));
+	m_key_id        = 309;
+	m_key_reg       = 1;
+	m_key_rng       = 2;
+	m_key_swap4_arg = 0;
+	m_key_swap4     = -1;
+	m_key_bottom4   = 4;
+	m_key_top4      = -1;
 }
 
 /*******************************************************************************
@@ -827,7 +900,16 @@ void namcos1_state::init_pistoldm()
 void namcos1_state::init_ws90()
 {
 	driver_init();
-	key_type_3_init(310, 4, -1, 7, -1, 3, -1);
+	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
+		read8_delegate(FUNC(namcos1_state::key_type3_r),this),
+		write8_delegate(FUNC(namcos1_state::key_type3_w),this));
+	m_key_id        = 310;
+	m_key_reg       = 4;
+	m_key_rng       = -1;
+	m_key_swap4_arg = 7;
+	m_key_swap4     = -1;
+	m_key_bottom4   = 3;
+	m_key_top4      = -1;
 }
 
 /*******************************************************************************
@@ -836,7 +918,16 @@ void namcos1_state::init_ws90()
 void namcos1_state::init_soukobdx()
 {
 	driver_init();
-	key_type_3_init(311, 2, 3 /*?*/, 0, -1, 4, -1);
+	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
+		read8_delegate(FUNC(namcos1_state::key_type3_r),this),
+		write8_delegate(FUNC(namcos1_state::key_type3_w),this));
+	m_key_id        = 311;
+	m_key_reg       = 2;
+	m_key_rng       = 3; /*?*/
+	m_key_swap4_arg = 0;
+	m_key_swap4     = -1;
+	m_key_bottom4   = 4;
+	m_key_top4      = -1;
 }
 
 
@@ -844,16 +935,16 @@ void namcos1_state::init_soukobdx()
 /*******************************************************************************
 *   Quester specific                                                           *
 *******************************************************************************/
-u8 namcos1_state::quester_paddle_r(offs_t offset)
+READ8_MEMBER( namcos1_state::quester_paddle_r )
 {
 	if (offset == 0)
 	{
 		int ret;
 
 		if (!(m_strobe & 0x20))
-			ret = (m_io_control[0]->read()&0x90) | (m_strobe & 0x40) | (m_io_paddle[0]->read()&0x0f);
+			ret = (ioport("CONTROL0")->read()&0x90) | (m_strobe & 0x40) | (ioport("PADDLE0")->read()&0x0f);
 		else
-			ret = (m_io_control[0]->read()&0x90) | (m_strobe & 0x40) | (m_io_paddle[1]->read()&0x0f);
+			ret = (ioport("CONTROL0")->read()&0x90) | (m_strobe & 0x40) | (ioport("PADDLE1")->read()&0x0f);
 
 		m_strobe ^= 0x40;
 
@@ -864,9 +955,9 @@ u8 namcos1_state::quester_paddle_r(offs_t offset)
 		int ret;
 
 		if (!(m_strobe & 0x20))
-			ret = (m_io_control[1]->read()&0x90) | 0x00 | (m_io_paddle[0]->read()>>4);
+			ret = (ioport("CONTROL1")->read()&0x90) | 0x00 | (ioport("PADDLE0")->read()>>4);
 		else
-			ret = (m_io_control[1]->read()&0x90) | 0x20 | (m_io_paddle[1]->read()>>4);
+			ret = (ioport("CONTROL1")->read()&0x90) | 0x20 | (ioport("PADDLE1")->read()>>4);
 
 		if (!(m_strobe & 0x40)) m_strobe ^= 0x20;
 
@@ -878,7 +969,7 @@ void namcos1_state::init_quester()
 {
 	m_strobe = 0;
 	driver_init();
-	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8sm_delegate(FUNC(namcos1_state::quester_paddle_r), this));
+	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8_delegate(FUNC(namcos1_state::quester_paddle_r), this));
 	save_item(NAME(m_strobe));
 }
 
@@ -888,7 +979,7 @@ void namcos1_state::init_quester()
 *   Beraboh Man specific                                                       *
 *******************************************************************************/
 
-u8 namcos1_state::berabohm_buttons_r(offs_t offset)
+READ8_MEMBER( namcos1_state::berabohm_buttons_r )
 {
 	int res;
 
@@ -896,13 +987,16 @@ u8 namcos1_state::berabohm_buttons_r(offs_t offset)
 	{
 		int inp = m_input_count;
 
-		if (inp == 4) res = m_io_control[0]->read();
+		if (inp == 4) res = ioport("CONTROL0")->read();
 		else
 		{
+			char portname[40];
+
 #ifdef PRESSURE_SENSITIVE
 			static int counter[4];
 
-			res = m_io_in[inp]->read();   /* IN0-IN3 */
+			sprintf(portname,"IN%d",inp);   /* IN0-IN3 */
+			res = ioport(portname)->read();
 			if (res & 0x80)
 			{
 				if (counter[inp] >= 0)
@@ -925,7 +1019,8 @@ u8 namcos1_state::berabohm_buttons_r(offs_t offset)
 			else
 				counter[inp] = -1;
 #else
-			res = m_io_in[inp]->read();   /* IN0-IN3 */
+			sprintf(portname,"IN%d",inp);   /* IN0-IN3 */
+			res = ioport(portname)->read();
 			if (res & 1) res = 0x7f;        /* weak */
 			else if (res & 2) res = 0x48;   /* medium */
 			else if (res & 4) res = 0x40;   /* strong */
@@ -936,7 +1031,7 @@ u8 namcos1_state::berabohm_buttons_r(offs_t offset)
 	}
 	else
 	{
-		res = m_io_control[1]->read() & 0x8f;
+		res = ioport("CONTROL1")->read() & 0x8f;
 
 		/* the strobe cannot happen too often, otherwise the MCU will waste too
 		   much time reading the inputs and won't have enough cycles to play two
@@ -964,7 +1059,7 @@ void namcos1_state::init_berabohm()
 	m_strobe = 0;
 	m_strobe_count = 0;
 	driver_init();
-	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8sm_delegate(FUNC(namcos1_state::berabohm_buttons_r), this));
+	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8_delegate(FUNC(namcos1_state::berabohm_buttons_r), this));
 	save_item(NAME(m_input_count));
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_strobe_count));
@@ -978,19 +1073,19 @@ void namcos1_state::init_berabohm()
 
 // used by faceoff and tankforce 4 player (input multiplex)
 
-u8 namcos1_state::faceoff_inputs_r(offs_t offset)
+READ8_MEMBER( namcos1_state::faceoff_inputs_r )
 {
 	int res;
 
 	if (offset == 0)
 	{
-		res = (m_io_control[0]->read() & 0x80) | m_stored_input[0];
+		res = (ioport("CONTROL0")->read() & 0x80) | m_stored_input[0];
 
 		return res;
 	}
 	else
 	{
-		res = m_io_control[1]->read() & 0x80;
+		res = ioport("CONTROL1")->read() & 0x80;
 
 		/* the strobe cannot happen too often, otherwise the MCU will waste too
 		   much time reading the inputs and won't have enough cycles to play two
@@ -1005,17 +1100,17 @@ u8 namcos1_state::faceoff_inputs_r(offs_t offset)
 			switch (m_input_count)
 			{
 				case 0:
-					m_stored_input[0] = m_io_in[0]->read() & 0x1f;
-					m_stored_input[1] = (m_io_in[3]->read() & 0x07) << 3;
+					m_stored_input[0] = ioport("IN0")->read() & 0x1f;
+					m_stored_input[1] = (ioport("IN3")->read() & 0x07) << 3;
 					break;
 
 				case 3:
-					m_stored_input[0] = m_io_in[2]->read() & 0x1f;
+					m_stored_input[0] = ioport("IN2")->read() & 0x1f;
 					break;
 
 				case 4:
-					m_stored_input[0] = m_io_in[1]->read() & 0x1f;
-					m_stored_input[1] = m_io_in[3]->read() & 0x18;
+					m_stored_input[0] = ioport("IN1")->read() & 0x1f;
+					m_stored_input[1] = ioport("IN3")->read() & 0x18;
 					break;
 
 				default:
@@ -1043,7 +1138,7 @@ void namcos1_state::init_faceoff()
 	m_stored_input[1] = 0;
 
 	driver_init();
-	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8sm_delegate(FUNC(namcos1_state::faceoff_inputs_r), this));
+	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8_delegate(FUNC(namcos1_state::faceoff_inputs_r), this));
 	save_item(NAME(m_input_count));
 	save_item(NAME(m_stored_input));
 }

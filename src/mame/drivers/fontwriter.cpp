@@ -112,37 +112,35 @@ void fontwriter_state::fw600_map(address_map &map)
 static INPUT_PORTS_START( fontwriter )
 INPUT_PORTS_END
 
-void fontwriter_state::fontwriter(machine_config &config)
-{
-	M37720S1(config, m_maincpu, XTAL(16'000'000)); /* M37720S1 @ 16MHz - main CPU */
-	m_maincpu->set_addrmap(AS_PROGRAM, &fontwriter_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &fontwriter_state::io_map);
+MACHINE_CONFIG_START(fontwriter_state::fontwriter)
+	MCFG_DEVICE_ADD("maincpu", M37720S1, XTAL(16'000'000)) /* M37720S1 @ 16MHz - main CPU */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
-	AT28C16(config, "at28c16", 0);
+	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_screen_update(FUNC(fontwriter_state::screen_update));
-	screen.set_size(640, 400);
-	screen.set_visarea_full();
-}
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_UPDATE_DRIVER(fontwriter_state, screen_update)
+	MCFG_SCREEN_SIZE(640, 400)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 399)
+MACHINE_CONFIG_END
 
-void fontwriter_state::fw600(machine_config &config)
-{
-	M37720S1(config, m_maincpu, XTAL(16'000'000)); /* M37720S1 @ 16MHz - main CPU */
-	m_maincpu->set_addrmap(AS_PROGRAM, &fontwriter_state::fw600_map);
-	m_maincpu->set_addrmap(AS_IO, &fontwriter_state::io_map);
+MACHINE_CONFIG_START(fontwriter_state::fw600)
+	MCFG_DEVICE_ADD("maincpu", M37720S1, XTAL(16'000'000)) /* M37720S1 @ 16MHz - main CPU */
+	MCFG_DEVICE_PROGRAM_MAP(fw600_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
-	AT28C16(config, "at28c16", 0);
+	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_screen_update(FUNC(fontwriter_state::screen_update));
-	screen.set_size(640, 400);
-	screen.set_visarea_full();
-}
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_UPDATE_DRIVER(fontwriter_state, screen_update)
+	MCFG_SCREEN_SIZE(640, 400)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 399)
+MACHINE_CONFIG_END
 
 ROM_START(fw600)
 	ROM_REGION(0x200000, "maincpu", 0)      /* M37720 program ROM */

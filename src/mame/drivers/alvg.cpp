@@ -45,12 +45,11 @@ void alvg_state::init_alvg()
 {
 }
 
-void alvg_state::alvg(machine_config &config)
-{
+MACHINE_CONFIG_START(alvg_state::alvg)
 	/* basic machine hardware */
-	M65C02(config, m_maincpu, 2000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &alvg_state::alvg_map);
-}
+	MCFG_DEVICE_ADD("maincpu", M65C02, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(alvg_map)
+MACHINE_CONFIG_END
 
 /*----------------------------------------------------------------------------
 / A.G. Soccer Ball - A.G. Football has identical ROMs but different playfield

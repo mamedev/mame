@@ -185,8 +185,8 @@ WRITE8_MEMBER( acrnsys1_state::acrnsys1_led_segment_w )
 void acrnsys1_state::acrnsys1_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0e00, 0x0e7f).mirror(0x100).rw("b1", FUNC(ins8154_device::read_io), FUNC(ins8154_device::write_io));
-	map(0x0e80, 0x0eff).mirror(0x100).rw("b1", FUNC(ins8154_device::read_ram), FUNC(ins8154_device::write_ram));
+	map(0x0e00, 0x0e7f).mirror(0x100).rw("b1", FUNC(ins8154_device::ins8154_r), FUNC(ins8154_device::ins8154_w));
+	map(0x0e80, 0x0eff).mirror(0x100).ram();
 	map(0xf800, 0xf9ff).mirror(0x600).rom();
 }
 
@@ -264,17 +264,16 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-void acrnsys1_state::acrnsys1(machine_config &config)
-{
+MACHINE_CONFIG_START(acrnsys1_state::acrnsys1)
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1.008_MHz_XTAL);  /* 1.008 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &acrnsys1_state::acrnsys1_map);
+	MCFG_DEVICE_ADD("maincpu", M6502, 1.008_MHz_XTAL)  /* 1.008 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(acrnsys1_map)
 
 	config.set_default_layout(layout_acrnsys1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	ins8154_device &b1(INS8154(config, "b1"));
@@ -284,11 +283,11 @@ void acrnsys1_state::acrnsys1(machine_config &config)
 
 	TTL74145(config, m_ttl74145, 0);
 
-	CASSETTE(config, m_cass);
+	MCFG_CASSETTE_ADD( "cassette" )
 
-	TIMER(config, "acrnsys1_c").configure_periodic(FUNC(acrnsys1_state::acrnsys1_c), attotime::from_hz(4800));
-	TIMER(config, "acrnsys1_p").configure_periodic(FUNC(acrnsys1_state::acrnsys1_p), attotime::from_hz(40000));
-}
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("acrnsys1_c", acrnsys1_state, acrnsys1_c, attotime::from_hz(4800))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("acrnsys1_p", acrnsys1_state, acrnsys1_p, attotime::from_hz(40000))
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

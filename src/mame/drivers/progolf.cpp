@@ -418,31 +418,30 @@ void progolf_state::progolf_palette(palette_device &palette) const
 	}
 }
 
-void progolf_state::progolf(machine_config &config)
-{
+MACHINE_CONFIG_START(progolf_state::progolf)
 	/* basic machine hardware */
-	DECO_222(config, m_maincpu, 3000000/2); /* guess, 3 Mhz makes the game to behave worse? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &progolf_state::main_cpu);
+	MCFG_DEVICE_ADD("maincpu", DECO_222, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
+	MCFG_DEVICE_PROGRAM_MAP(main_cpu)
 
-	M6502(config, m_audiocpu, 500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &progolf_state::sound_cpu);
+	MCFG_DEVICE_ADD("audiocpu", M6502, 500000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_cpu)
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
 	soundlatch.data_pending_callback().set_inputline(m_audiocpu, 0);
 	soundlatch.set_separate_acknowledge(true);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3072));
-	screen.set_size(256, 256);
-	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
-	screen.set_screen_update(FUNC(progolf_state::screen_update));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072))
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(progolf_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_progolf);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_progolf)
 	PALETTE(config, m_palette, FUNC(progolf_state::progolf_palette), 32 * 3);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 3000000/4)); /* hand tuned to get ~57 fps */
@@ -456,15 +455,14 @@ void progolf_state::progolf(machine_config &config)
 	AY8910(config, "ay1", 12000000/8).add_route(ALL_OUTPUTS, "mono", 0.23);
 
 	AY8910(config, "ay2", 12000000/8).add_route(ALL_OUTPUTS, "mono", 0.23);
-}
+MACHINE_CONFIG_END
 
-void progolf_state::progolfa(machine_config &config)
-{
+MACHINE_CONFIG_START(progolf_state::progolfa)
 	progolf(config);
-	/* different encrypted cpu to progolf */
-	DECO_CPU6(config.replace(), m_maincpu, 3000000/2); /* guess, 3 Mhz makes the game to behave worse? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &progolf_state::main_cpu);
-}
+	MCFG_DEVICE_REMOVE("maincpu") /* different encrypted cpu to progolf */
+	MCFG_DEVICE_ADD("maincpu", DECO_CPU6, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
+	MCFG_DEVICE_PROGRAM_MAP(main_cpu)
+MACHINE_CONFIG_END
 
 
 ROM_START( progolf )

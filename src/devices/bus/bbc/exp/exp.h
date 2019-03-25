@@ -75,12 +75,12 @@ public:
 	auto cb1_handler() { return m_cb1_handler.bind(); }
 	auto cb2_handler() { return m_cb2_handler.bind(); }
 
-	uint8_t fred_r(offs_t offset);
-	void fred_w(offs_t offset, uint8_t data);
-	uint8_t jim_r(offs_t offset);
-	void jim_w(offs_t offset, uint8_t data);
-	uint8_t sheila_r(offs_t offset);
-	void sheila_w(offs_t offset, uint8_t data);
+	virtual DECLARE_READ8_MEMBER(fred_r);
+	virtual DECLARE_WRITE8_MEMBER(fred_w);
+	virtual DECLARE_READ8_MEMBER(jim_r);
+	virtual DECLARE_WRITE8_MEMBER(jim_w);
+	virtual DECLARE_READ8_MEMBER(sheila_r);
+	virtual DECLARE_WRITE8_MEMBER(sheila_w);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
@@ -89,8 +89,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cb1_w) { m_cb1_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER(cb2_w) { m_cb2_handler(state); }
 
-	uint8_t pb_r();
-	void pb_w(uint8_t data);
+	DECLARE_READ8_MEMBER(pb_r);
+	DECLARE_WRITE8_MEMBER(pb_w);
 
 protected:
 	// device-level overrides
@@ -114,15 +114,15 @@ private:
 class device_bbc_exp_interface : public device_slot_card_interface
 {
 public:
-	virtual uint8_t fred_r(offs_t offset) { return 0xff; }
-	virtual void fred_w(offs_t offset, uint8_t data) { }
-	virtual uint8_t jim_r(offs_t offset) { return 0xff; }
-	virtual void jim_w(offs_t offset, uint8_t data) { }
-	virtual uint8_t sheila_r(offs_t offset) { return 0xfe; }
-	virtual void sheila_w(offs_t offset, uint8_t data) { }
+	virtual DECLARE_READ8_MEMBER(fred_r) { return 0xff; }
+	virtual DECLARE_WRITE8_MEMBER(fred_w) { }
+	virtual DECLARE_READ8_MEMBER(jim_r) { return 0xff; }
+	virtual DECLARE_WRITE8_MEMBER(jim_w) { }
+	virtual DECLARE_READ8_MEMBER(sheila_r) { return 0xfe; }
+	virtual DECLARE_WRITE8_MEMBER(sheila_w) { }
 
-	virtual uint8_t pb_r() { return 0xff; }
-	virtual void pb_w(uint8_t data) { }
+	virtual DECLARE_READ8_MEMBER(pb_r) { return 0xff; }
+	virtual DECLARE_WRITE8_MEMBER(pb_w) { }
 
 protected:
 	device_bbc_exp_interface(const machine_config &mconfig, device_t &device);

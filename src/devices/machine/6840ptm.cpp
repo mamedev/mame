@@ -423,7 +423,7 @@ void ptm6840_device::reload_count(int idx)
 //  read - Read Timer
 //-------------------------------------------------
 
-uint8_t ptm6840_device::read(offs_t offset)
+READ8_MEMBER( ptm6840_device::read )
 {
 	int val;
 
@@ -487,7 +487,7 @@ uint8_t ptm6840_device::read(offs_t offset)
 //  write - Write Timer
 //-------------------------------------------------
 
-void ptm6840_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( ptm6840_device::write )
 {
 	switch ( offset )
 	{

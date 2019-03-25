@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /***************************************************************************
 
- NXP (Philips) LPC2103 series
+ NXP (Phillips) LPC2103 series
  covering LPC2101, LPC2102, LPC2103*
 
  *currently only LPC2103
@@ -276,6 +276,5 @@ void lpc210x_device::write_timer(address_space &space, int timer, int offset, ui
 
 
 
-void lpc210x_device::device_add_mconfig(machine_config &config)
-{
-}
+MACHINE_CONFIG_START(lpc210x_device::device_add_mconfig)
+MACHINE_CONFIG_END

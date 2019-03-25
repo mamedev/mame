@@ -4192,13 +4192,13 @@ MACHINE_START_MEMBER(dynax_state,hanamai)
                                 Castle Of Dracula
 ***************************************************************************/
 
-void dynax_state::cdracula(machine_config &config)
-{
+MACHINE_CONFIG_START(dynax_state::cdracula)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(21'477'272)/4); /* 5.3693175MHz measured */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::cdracula_mem_map);
-	m_maincpu->set_addrmap(AS_IO, &dynax_state::cdracula_io_map);
-	m_maincpu->set_irq_acknowledge_callback("mainirq", FUNC(rst_pos_buffer_device::inta_cb));  // IM 0 needs an opcode on the data bus
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/4) /* 5.3693175MHz measured */
+	MCFG_DEVICE_PROGRAM_MAP(cdracula_mem_map)
+	MCFG_DEVICE_IO_MAP(cdracula_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)  // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4235,22 +4235,22 @@ void dynax_state::cdracula(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, XTAL(4'000'000) / 4, okim6295_device::PIN7_HIGH); /* 1MHz measured */
-	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000) / 4, okim6295_device::PIN7_HIGH) /* 1MHz measured */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                 Hana no Mai
 ***************************************************************************/
 
-void dynax_state::hanamai(machine_config &config)
-{
+MACHINE_CONFIG_START(dynax_state::hanamai)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 22000000 / 4);   /* 5.5MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::sprtmtch_mem_map);
-	m_maincpu->set_addrmap(AS_IO, &dynax_state::hanamai_io_map);
-	m_maincpu->set_irq_acknowledge_callback("mainirq", FUNC(rst_pos_buffer_device::inta_cb));   // IM 0 needs an opcode on the data bus
+	MCFG_DEVICE_ADD("maincpu",Z80,22000000 / 4)    /* 5.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sprtmtch_mem_map)
+	MCFG_DEVICE_IO_MAP(hanamai_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)   // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4302,11 +4302,11 @@ void dynax_state::hanamai(machine_config &config)
 	ym2203.add_route(2, "mono", 0.20);
 	ym2203.add_route(3, "mono", 0.50);
 
-	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(dynax_state::adpcm_int));     /* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits  */
-	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dynax_state, adpcm_int))          /* IRQ handler */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 
@@ -4314,13 +4314,13 @@ void dynax_state::hanamai(machine_config &config)
                                 Hana Oriduru
 ***************************************************************************/
 
-void dynax_state::hnoridur(machine_config &config)
-{
+MACHINE_CONFIG_START(dynax_state::hnoridur)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(22'000'000) / 4);   /* 5.5MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::hnoridur_mem_map);
-	m_maincpu->set_addrmap(AS_IO, &dynax_state::hnoridur_io_map);
-	m_maincpu->set_irq_acknowledge_callback("mainirq", FUNC(rst_pos_buffer_device::inta_cb));   // IM 0 needs an opcode on the data bus
+	MCFG_DEVICE_ADD("maincpu",Z80,XTAL(22'000'000) / 4)    /* 5.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(hnoridur_mem_map)
+	MCFG_DEVICE_IO_MAP(hnoridur_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)   // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4370,24 +4370,24 @@ void dynax_state::hnoridur(machine_config &config)
 
 	YM2413(config, "ym2413", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MSM5205(config, m_msm, XTAL(384'000));
-	m_msm->vck_legacy_callback().set(FUNC(dynax_state::adpcm_int)); /* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits  */
-	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dynax_state, adpcm_int))          /* IRQ handler */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                 Hana Jingi
 ***************************************************************************/
 
-void dynax_state::hjingi(machine_config &config)
-{
+MACHINE_CONFIG_START(dynax_state::hjingi)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(22'000'000) / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::hjingi_mem_map);
-	m_maincpu->set_addrmap(AS_IO, &dynax_state::hjingi_io_map);
-	m_maincpu->set_irq_acknowledge_callback("mainirq", FUNC(rst_pos_buffer_device::inta_cb));   // IM 0 needs an opcode on the data bus
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(22'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(hjingi_mem_map)
+	MCFG_DEVICE_IO_MAP(hjingi_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)   // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hjingi)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4439,24 +4439,24 @@ void dynax_state::hjingi(machine_config &config)
 
 	YM2413(config, "ym2413", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MSM5205(config, m_msm, XTAL(384'000));
-	m_msm->vck_legacy_callback().set(FUNC(dynax_state::adpcm_int));     /* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits  */
-	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000) )
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dynax_state, adpcm_int))          /* IRQ handler */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                 Sports Match
 ***************************************************************************/
 
-void dynax_state::sprtmtch(machine_config &config)
-{
+MACHINE_CONFIG_START(dynax_state::sprtmtch)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 22000000 / 4);   /* 5.5MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::sprtmtch_mem_map);
-	m_maincpu->set_addrmap(AS_IO, &dynax_state::sprtmtch_io_map);
-	m_maincpu->set_irq_acknowledge_callback("mainirq", FUNC(rst_pos_buffer_device::inta_cb));   // IM 0 needs an opcode on the data bus
+	MCFG_DEVICE_ADD("maincpu", Z80,22000000 / 4)   /* 5.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sprtmtch_mem_map)
+	MCFG_DEVICE_IO_MAP(sprtmtch_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)   // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4502,7 +4502,7 @@ void dynax_state::sprtmtch(machine_config &config)
 	ym2203.add_route(1, "mono", 0.20);
 	ym2203.add_route(2, "mono", 0.20);
 	ym2203.add_route(3, "mono", 1.0);
-}
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -4515,12 +4515,12 @@ WRITE_LINE_MEMBER(dynax_state::mjfriday_vblank_w)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-void dynax_state::mjfriday(machine_config &config)
-{
+MACHINE_CONFIG_START(dynax_state::mjfriday)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 24000000/4);  /* 6 MHz? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::sprtmtch_mem_map);
-	m_maincpu->set_addrmap(AS_IO, &dynax_state::mjfriday_io_map);
+	MCFG_DEVICE_ADD("maincpu",Z80,24000000/4)  /* 6 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(sprtmtch_mem_map)
+	MCFG_DEVICE_IO_MAP(mjfriday_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4560,85 +4560,87 @@ void dynax_state::mjfriday(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	YM2413(config, "ym2413", 24000000/6).add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                             Mahjong Dial Q2
 ***************************************************************************/
 
-void dynax_state::mjdialq2(machine_config &config)
-{
+MACHINE_CONFIG_START(dynax_state::mjdialq2)
 	mjfriday(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::mjdialq2_mem_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mjdialq2_mem_map)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                     Yarunara / Quiz TV Q&Q / Mahjong Angels
 ***************************************************************************/
 
-void dynax_state::yarunara(machine_config &config)
-{
+MACHINE_CONFIG_START(dynax_state::yarunara)
 	hnoridur(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::yarunara_mem_map);
-	m_maincpu->set_addrmap(AS_IO, &dynax_state::yarunara_io_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(yarunara_mem_map)
+	MCFG_DEVICE_IO_MAP(yarunara_io_map)
 
-	m_bankdev->set_addrmap(AS_PROGRAM, &dynax_state::yarunara_banked_map);
+	MCFG_DEVICE_MODIFY("bankdev")
+	MCFG_DEVICE_PROGRAM_MAP(yarunara_banked_map)
 
-	config.device_remove("outlatch"); // ???
+	MCFG_DEVICE_REMOVE("outlatch") // ???
 
 	m_screen->set_visarea(0, 336-1, 8, 256-1-8-1);
 
 	/* devices */
 	MSM6242(config, "rtc", 32.768_kHz_XTAL).out_int_handler().set(m_mainirq, FUNC(rst_pos_buffer_device::rst1_w));
-}
+MACHINE_CONFIG_END
 
-void dynax_state::mjangels(machine_config &config)
-{
+MACHINE_CONFIG_START(dynax_state::mjangels)
 	yarunara(config);
+	MCFG_DEVICE_MODIFY("bankdev")
 	m_bankdev->set_map(&dynax_state::mjangels_banked_map).set_addr_width(21);
-}
+MACHINE_CONFIG_END
 
-void dynax_state::quiztvqq(machine_config &config)
-{
+MACHINE_CONFIG_START(dynax_state::quiztvqq)
 	mjangels(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::quiztvqq_mem_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(quiztvqq_mem_map)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                             Mahjong Campus Hunting
 ***************************************************************************/
 
-void dynax_state::mcnpshnt(machine_config &config)
-{
+MACHINE_CONFIG_START(dynax_state::mcnpshnt)
 	hnoridur(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::mcnpshnt_mem_map);
-	m_maincpu->set_addrmap(AS_IO, &dynax_state::mcnpshnt_io_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mcnpshnt_mem_map)
+	MCFG_DEVICE_IO_MAP(mcnpshnt_io_map)
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mcnpshnt) // different priorities
-}
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                             7jigen
 ***************************************************************************/
 
-void dynax_state::nanajign(machine_config &config)
-{
+MACHINE_CONFIG_START(dynax_state::nanajign)
 	hnoridur(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::nanajign_mem_map);
-	m_maincpu->set_addrmap(AS_IO, &dynax_state::nanajign_io_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nanajign_mem_map)
+	MCFG_DEVICE_IO_MAP(nanajign_io_map)
 
-	m_bankdev->set_addrmap(AS_PROGRAM, &dynax_state::nanajign_banked_map);
-}
+	MCFG_DEVICE_MODIFY("bankdev")
+	MCFG_DEVICE_PROGRAM_MAP(nanajign_banked_map)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -4659,18 +4661,18 @@ MACHINE_START_MEMBER(dynax_state,jantouki)
 }
 
 
-void dynax_state::jantouki(machine_config &config)
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 22000000 / 4);   /* 5.5MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::jantouki_mem_map);
-	m_maincpu->set_addrmap(AS_IO, &dynax_state::jantouki_io_map);
-	m_maincpu->set_irq_acknowledge_callback("mainirq", FUNC(rst_pos_buffer_device::inta_cb));   // IM 0 needs an opcode on the data bus
+MACHINE_CONFIG_START(dynax_state::jantouki)
 
-	Z80(config, m_soundcpu, 22000000 / 4);  /* 5.5MHz */
-	m_soundcpu->set_addrmap(AS_PROGRAM, &dynax_state::jantouki_sound_mem_map);
-	m_soundcpu->set_addrmap(AS_IO, &dynax_state::jantouki_sound_io_map);
-	m_soundcpu->set_irq_acknowledge_callback("soundirq", FUNC(rst_pos_buffer_device::inta_cb)); // IM 0 needs an opcode on the data bus
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu",Z80,22000000 / 4)    /* 5.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(jantouki_mem_map)
+	MCFG_DEVICE_IO_MAP(jantouki_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)  // IM 0 needs an opcode on the data bus
+
+	MCFG_DEVICE_ADD("soundcpu",Z80,22000000 / 4)   /* 5.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(jantouki_sound_mem_map)
+	MCFG_DEVICE_IO_MAP(jantouki_sound_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_pos_buffer_device, inta_cb)    // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,jantouki)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4678,6 +4680,7 @@ void dynax_state::jantouki(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
+
 	RST_POS_BUFFER(config, m_soundirq, 0).int_callback().set_inputline(m_soundcpu, 0);
 
 	LS259(config, m_mainlatch);
@@ -4738,14 +4741,14 @@ void dynax_state::jantouki(machine_config &config)
 	ym2203.add_route(2, "mono", 0.20);
 	ym2203.add_route(3, "mono", 0.50);
 
-	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(dynax_state::adpcm_int_cpu1));    /* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits  */
-	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dynax_state, adpcm_int_cpu1))         /* IRQ handler */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
 	MSM6242(config, "rtc", 32.768_kHz_XTAL);
-}
+MACHINE_CONFIG_END
 
 void dynax_state::janyuki(machine_config &config)
 {
@@ -4762,14 +4765,14 @@ void dynax_state::janyuki(machine_config &config)
     0xfa and 0xfc are very similar, they should be triggered by the blitter
     0xf8 is vblank  */
 
-void dynax_state::mjelctrn(machine_config &config)
-{
+MACHINE_CONFIG_START(dynax_state::mjelctrn)
 	hnoridur(config);
 	TMPZ84C015(config.replace(), m_maincpu, XTAL(22'000'000) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::nanajign_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dynax_state::mjelctrn_io_map);
 
-	m_bankdev->set_addrmap(AS_PROGRAM, &dynax_state::mjelctrn_banked_map);
+	MCFG_DEVICE_MODIFY("bankdev")
+	MCFG_DEVICE_PROGRAM_MAP(mjelctrn_banked_map)
 
 	LS259(config.replace(), m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w));
@@ -4777,7 +4780,7 @@ void dynax_state::mjelctrn(machine_config &config)
 	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::layer_half2_w));
 	// Q3, Q4 seem to be related to wrap around enable
 
-	config.device_remove("mainirq");
+	MCFG_DEVICE_REMOVE("mainirq")
 
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0)).invert();
 
@@ -4785,10 +4788,9 @@ void dynax_state::mjelctrn(machine_config &config)
 	m_blitter->ready_cb().append(m_maincpu, FUNC(tmpz84c015_device::trg2));
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjelctrn)
-}
+MACHINE_CONFIG_END
 
-void dynax_state::mjembase(machine_config &config)
-{
+MACHINE_CONFIG_START(dynax_state::mjembase)
 	mjelctrn(config);
 
 	tmpz84c015_device &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
@@ -4800,10 +4802,10 @@ void dynax_state::mjembase(machine_config &config)
 	m_mainlatch->q_out_cb<3>().set(FUNC(dynax_state::coincounter_0_w));
 	m_mainlatch->q_out_cb<4>().set(FUNC(dynax_state::coincounter_1_w));
 
-	config.device_remove("outlatch");
+	MCFG_DEVICE_REMOVE("outlatch")
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjembase)
-}
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                     Neruton
@@ -4814,11 +4816,10 @@ void dynax_state::mjembase(machine_config &config)
     0x40 is vblank
     0x46 is a periodic irq? */
 
-void dynax_state::neruton(machine_config &config)
-{
+MACHINE_CONFIG_START(dynax_state::neruton)
 	mjelctrn(config);
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,neruton)
-}
+MACHINE_CONFIG_END
 
 
 
@@ -4841,8 +4842,8 @@ WRITE_LINE_MEMBER(dynax_state::tenkai_blitter_ack_w)
 }
 
 
-void dynax_state::tenkai(machine_config &config)
-{
+MACHINE_CONFIG_START(dynax_state::tenkai)
+
 	/* basic machine hardware */
 	tmp91640_device &tmp(TMP91640(config, m_maincpu, 21472700 / 2));
 	tmp.set_addrmap(AS_PROGRAM, &dynax_state::tenkai_map);
@@ -4902,7 +4903,7 @@ void dynax_state::tenkai(machine_config &config)
 
 	/* devices */
 	MSM6242(config, "rtc", 32.768_kHz_XTAL).out_int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
-}
+MACHINE_CONFIG_END
 
 void dynax_state::majrjhdx(machine_config &config)
 {
@@ -4921,8 +4922,8 @@ void dynax_state::mjreach(machine_config &config)
                                 Mahjong Gekisha
 ***************************************************************************/
 
-void dynax_state::gekisha(machine_config &config)
-{
+MACHINE_CONFIG_START(dynax_state::gekisha)
+
 	/* basic machine hardware */
 	tmp90841_device &tmp(TMP90841(config, m_maincpu, XTAL(10'000'000)));   // ?
 	tmp.set_addrmap(AS_PROGRAM, &dynax_state::gekisha_map);
@@ -4972,7 +4973,7 @@ void dynax_state::gekisha(machine_config &config)
 	ay8910.add_route(ALL_OUTPUTS, "mono", 0.20);
 
 	YM2413(config, "ym2413", XTAL(24'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 1.0); // ?
-}
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -54,7 +54,10 @@ public:
 
 	DECLARE_READ_LINE_MEMBER(txrdy_r);
 
-protected:
+	/// TODO: REMOVE THIS
+	void receive_character(uint8_t ch);
+
+	/// TODO: this shouldn't be public
 	enum
 	{
 		I8251_STATUS_FRAMING_ERROR = 0x20,
@@ -65,6 +68,7 @@ protected:
 		I8251_STATUS_TX_READY = 0x01
 	};
 
+protected:
 	i8251_device(
 			const machine_config &mconfig,
 			device_type type,
@@ -78,8 +82,6 @@ protected:
 
 	void command_w(uint8_t data);
 	void mode_w(uint8_t data);
-
-	void receive_character(uint8_t ch);
 
 	void update_rx_ready();
 	void update_tx_ready();

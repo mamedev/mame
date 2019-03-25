@@ -16,11 +16,11 @@ public:
 	ws_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual uint8_t read_rom20(offs_t offset) override;
-	virtual uint8_t read_rom30(offs_t offset) override;
-	virtual uint8_t read_rom40(offs_t offset) override;
-	virtual uint8_t read_io(offs_t offset) override;
-	virtual void write_io(offs_t offset, uint8_t data) override;
+	virtual DECLARE_READ8_MEMBER(read_rom20) override;
+	virtual DECLARE_READ8_MEMBER(read_rom30) override;
+	virtual DECLARE_READ8_MEMBER(read_rom40) override;
+	virtual DECLARE_READ8_MEMBER(read_io) override;
+	virtual DECLARE_WRITE8_MEMBER(write_io) override;
 
 protected:
 	static constexpr device_timer_id TIMER_RTC = 0;
@@ -59,9 +59,9 @@ public:
 	ws_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual uint8_t read_ram(offs_t offset) override;
-	virtual void write_ram(offs_t offset, uint8_t data) override;
-	virtual void write_io(offs_t offset, uint8_t data) override;
+	virtual DECLARE_READ8_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_io) override;
 
 protected:
 	// device-level overrides
@@ -82,8 +82,8 @@ public:
 	ws_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual uint8_t read_io(offs_t offset) override;
-	virtual void write_io(offs_t offset, uint8_t data) override;
+	virtual DECLARE_READ8_MEMBER(read_io) override;
+	virtual DECLARE_WRITE8_MEMBER(write_io) override;
 
 protected:
 	// device-level overrides

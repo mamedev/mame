@@ -523,11 +523,10 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 	}
 }
 
-void ltd_state::ltd3(machine_config &config)
-{
+MACHINE_CONFIG_START(ltd_state::ltd3)
 	/* basic machine hardware */
-	M6802(config, m_maincpu, XTAL(3'579'545));
-	m_maincpu->set_addrmap(AS_PROGRAM, &ltd_state::ltd3_map);
+	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(ltd3_map)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -537,11 +536,10 @@ void ltd_state::ltd3(machine_config &config)
 	/* Sound */
 	genpin_audio(config);
 
-	TIMER(config, "timer_r").configure_periodic(FUNC(ltd_state::timer_r), attotime::from_hz(500));
-}
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_r", ltd_state, timer_r, attotime::from_hz(500))
+MACHINE_CONFIG_END
 
-void ltd_state::ltd4(machine_config &config)
-{
+MACHINE_CONFIG_START(ltd_state::ltd4)
 	/* basic machine hardware */
 	m6803_cpu_device &maincpu(M6803(config, "maincpu", XTAL(3'579'545))); // guess, no details available
 	maincpu.set_addrmap(AS_PROGRAM, &ltd_state::ltd4_map);
@@ -561,7 +559,7 @@ void ltd_state::ltd4(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, "aysnd_0", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.3); /* guess */
 	AY8910(config, "aysnd_1", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.3); /* guess */
-}
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
 / Arizona

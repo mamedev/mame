@@ -65,7 +65,7 @@ void sv805_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-uint8_t sv805_device::iorq_r(offs_t offset)
+READ8_MEMBER( sv805_device::iorq_r )
 {
 	switch (offset)
 	{
@@ -77,13 +77,13 @@ uint8_t sv805_device::iorq_r(offs_t offset)
 	case 0x2d:
 	case 0x2e:
 	case 0x2f:
-		return m_uart->ins8250_r(machine().dummy_space(), offset & 0x07);
+		return m_uart->ins8250_r(space, offset & 0x07);
 	}
 
 	return 0xff;
 }
 
-void sv805_device::iorq_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( sv805_device::iorq_w )
 {
 	switch (offset)
 	{
@@ -95,7 +95,7 @@ void sv805_device::iorq_w(offs_t offset, uint8_t data)
 	case 0x2d:
 	case 0x2e:
 	case 0x2f:
-		m_uart->ins8250_w(machine().dummy_space(), offset & 0x07, data);
+		m_uart->ins8250_w(space, offset & 0x07, data);
 	}
 }
 

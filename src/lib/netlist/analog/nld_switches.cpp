@@ -6,13 +6,10 @@
  */
 
 #include "nlid_twoterm.h"
-#include "netlist/nl_base.h"
-#include "netlist/nl_factory.h"
-#include "netlist/solver/nld_solver.h"
+#include "../nl_base.h"
+#include "../nl_factory.h"
 
-/* FIXME : convert to parameters */
-
-#define R_OFF   (1.0 / exec().gmin())
+#define R_OFF   (1.0 / netlist().gmin())
 #define R_ON    0.01
 
 namespace netlist
@@ -27,7 +24,7 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(switch1)
 		, m_R(*this, "R")
-		, m_POS(*this, "POS", false)
+		, m_POS(*this, "POS", 0)
 		{
 			register_subalias("1", m_R.m_P);
 			register_subalias("2", m_R.m_N);
@@ -49,11 +46,6 @@ namespace netlist
 
 	NETLIB_UPDATE(switch1)
 	{
-	}
-
-	NETLIB_UPDATE_PARAM(switch1)
-	{
-		m_R.solve_now();
 		if (!m_POS())
 		{
 			m_R.set_R(R_OFF);
@@ -62,8 +54,13 @@ namespace netlist
 		{
 			m_R.set_R(R_ON);
 		}
-		m_R.solve_later();
 
+		m_R.update_dev();
+	}
+
+	NETLIB_UPDATE_PARAM(switch1)
+	{
+		update();
 	}
 
 // ----------------------------------------------------------------------------------------
@@ -75,7 +72,7 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(switch2)
 		, m_R1(*this, "R1")
 		, m_R2(*this, "R2")
-		, m_POS(*this, "POS", false)
+		, m_POS(*this, "POS", 0)
 		{
 			connect(m_R1.m_N, m_R2.m_N);
 
@@ -113,31 +110,19 @@ namespace netlist
 			m_R2.set_R(R_ON);
 		}
 
-		//m_R1.update_dev(time);
-		//m_R2.update_dev(time);
+		m_R1.update_dev();
+		m_R2.update_dev();
 	}
 
 	NETLIB_UPDATE_PARAM(switch2)
 	{
-		if (!m_POS())
-		{
-			m_R1.set_R(R_ON);
-			m_R2.set_R(R_OFF);
-		}
-		else
-		{
-			m_R1.set_R(R_OFF);
-			m_R2.set_R(R_ON);
-		}
-
-		m_R1.solve_now();
-		m_R2.solve_now();
+		update();
 	}
 
 	} //namespace analog
 
 	namespace devices {
-		NETLIB_DEVICE_IMPL_NS(analog, switch1, "SWITCH",  "")
-		NETLIB_DEVICE_IMPL_NS(analog, switch2, "SWITCH2", "")
-	} // namespace devices
+		NETLIB_DEVICE_IMPL_NS(analog, switch1)
+		NETLIB_DEVICE_IMPL_NS(analog, switch2)
+	}
 } // namespace netlist

@@ -746,46 +746,48 @@ void dreamwld_state::machine_reset()
 }
 
 
-void dreamwld_state::baryon(machine_config &config)
-{
-	/* basic machine hardware */
-	M68EC020(config, m_maincpu, XTAL(32'000'000)/2); /* 16MHz verified */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dreamwld_state::baryon_map);
-	m_maincpu->set_vblank_int("screen", FUNC(dreamwld_state::irq4_line_hold));
+MACHINE_CONFIG_START(dreamwld_state::baryon)
 
-	AT89C52(config, "mcu", XTAL(32'000'000)/2).set_disable(); /* AT89C52 or 87(C)52, unknown clock (value from docs), internal ROMs aren't dumped */
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* 16MHz verified */
+	MCFG_DEVICE_PROGRAM_MAP(baryon_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
+
+	MCFG_DEVICE_ADD("mcu", AT89C52, XTAL(32'000'000)/2) /* AT89C52 or 87(C)52, unknown clock (value from docs) */
+	MCFG_DEVICE_DISABLE()   /* Internal ROM aren't dumped */
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57.793);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(512,256);
-	screen.set_visarea(0, 308-1, 0, 224-1);
-	screen.set_screen_update(FUNC(dreamwld_state::screen_update_dreamwld));
-	screen.screen_vblank().set(FUNC(dreamwld_state::screen_vblank_dreamwld));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57.793)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(512,256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 308-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE_DRIVER(dreamwld_state, screen_update_dreamwld)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dreamwld_state, screen_vblank_dreamwld))
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dreamwld);
 
 	SPEAKER(config, "mono").front_center();
 
-	okim6295_device &oki1(OKIM6295(config, "oki1", XTAL(32'000'000)/32, okim6295_device::PIN7_LOW)); /* 1MHz verified */
-	oki1.add_route(ALL_OUTPUTS, "mono", 1.00);
-	oki1.set_addrmap(0, &dreamwld_state::oki1_map);
-}
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'000'000)/32, okim6295_device::PIN7_LOW) /* 1MHz verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
+MACHINE_CONFIG_END
 
-void dreamwld_state::dreamwld(machine_config &config)
-{
+MACHINE_CONFIG_START(dreamwld_state::dreamwld)
 	baryon(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dreamwld_state::dreamwld_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dreamwld_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
 
-	okim6295_device &oki2(OKIM6295(config, "oki2", XTAL(32'000'000)/32, okim6295_device::PIN7_LOW)); /* 1MHz verified */
-	oki2.add_route(ALL_OUTPUTS, "mono", 1.00);
-	oki2.set_addrmap(0, &dreamwld_state::oki2_map);
-}
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(32'000'000)/32, okim6295_device::PIN7_LOW) /* 1MHz verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
+MACHINE_CONFIG_END
 
 
 /*
@@ -1021,7 +1023,7 @@ ROM_START( rolcrush )
 	ROM_LOAD( "mx27c4000_5.bin", 0x000000, 0x80000, CRC(7afa6adb) SHA1(d4049e1068a5f7abf0e14d0b9fbbbc6dfb5d0170) )
 
 	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 ) /* OKI Samples - 2nd chip (neither OKI or rom is present, empty sockets) */
-	/* not populated */
+	/* not populared */
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
 	ROM_LOAD( "m27c160.8.bin", 0x000000, 0x200000, CRC(a509bc36) SHA1(aaa008e07e4b24ff9dbcee5925d6516d1662931c) )
@@ -1055,7 +1057,7 @@ ROM_START( rolcrusha )
 	ROM_LOAD( "5", 0x000000, 0x80000, CRC(7afa6adb) SHA1(d4049e1068a5f7abf0e14d0b9fbbbc6dfb5d0170) )
 
 	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 ) /* OKI Samples - 2nd chip (neither OKI or rom is present, empty sockets) */
-	/* not populated */
+	/* not populared */
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
 	ROM_LOAD( "8", 0x000000, 0x200000, CRC(01446191) SHA1(b106ed6c085fad617552972db78866a3346e4553) )
@@ -1217,7 +1219,7 @@ ROM_START( gaialast )
 	ROM_LOAD( "1", 0x000000, 0x80000, CRC(2dbad410) SHA1(bb788ea14bb605be9af9c8f8adec94ad1c17ab55) )
 
 	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 ) /* OKI Samples - 2nd chip (neither OKI or rom is present, empty sockets) */
-	/* not populated */
+	/* not populared */
 
 	ROM_REGION( 0x800000, "gfx1", 0 ) /* Sprite Tiles - decoded */
 	ROM_LOAD( "10", 0x000000, 0x200000, CRC(5822ef93) SHA1(8ce22c30f8027f35c5f72eb6ce57a74540dd55da) )

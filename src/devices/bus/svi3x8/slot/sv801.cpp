@@ -97,7 +97,7 @@ WRITE_LINE_MEMBER( sv801_device::drq_w )
 	m_drq = state;
 }
 
-void sv801_device::motor_w(uint8_t data)
+WRITE8_MEMBER( sv801_device::motor_w )
 {
 	m_floppy = nullptr;
 
@@ -112,7 +112,7 @@ void sv801_device::motor_w(uint8_t data)
 		m_floppy1->get_device()->mon_w(!BIT(data, 3));
 }
 
-uint8_t sv801_device::iorq_r(offs_t offset)
+READ8_MEMBER( sv801_device::iorq_r )
 {
 	switch (offset)
 	{
@@ -126,7 +126,7 @@ uint8_t sv801_device::iorq_r(offs_t offset)
 	return 0xff;
 }
 
-void sv801_device::iorq_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( sv801_device::iorq_w )
 {
 	switch (offset)
 	{
@@ -134,7 +134,7 @@ void sv801_device::iorq_w(offs_t offset, uint8_t data)
 	case 0x31: m_fdc->track_w(data); break;
 	case 0x32: m_fdc->sector_w(data); break;
 	case 0x33: m_fdc->data_w(data); break;
-	case 0x34: motor_w(data); break;
+	case 0x34: motor_w(space, 0, data); break;
 	case 0x38:
 		m_fdc->dden_w(BIT(data, 0));
 		if (m_floppy)

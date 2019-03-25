@@ -23,7 +23,7 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
 
 protected:
 	virtual void device_start() override;
@@ -44,7 +44,7 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
 
 protected:
 	virtual void device_start() override;
@@ -71,8 +71,8 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 
 protected:
 	virtual void device_start() override;
@@ -82,12 +82,12 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-private:
-	void write_y8950(offs_t offset, uint8_t data);
-	uint8_t read_y8950(offs_t offset);
+	DECLARE_WRITE8_MEMBER(write_y8950);
+	DECLARE_READ8_MEMBER(read_y8950);
 
-	void y8950_io_w(uint8_t data);
-	uint8_t y8950_io_r();
+private:
+	DECLARE_WRITE8_MEMBER(y8950_io_w);
+	DECLARE_READ8_MEMBER(y8950_io_r);
 
 	required_device<y8950_device> m_y8950;
 	required_ioport m_io_config;

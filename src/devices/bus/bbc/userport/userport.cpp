@@ -89,10 +89,10 @@ void bbc_userport_slot_device::device_reset()
 //  pb_r
 //-------------------------------------------------
 
-uint8_t bbc_userport_slot_device::pb_r()
+READ8_MEMBER(bbc_userport_slot_device::pb_r)
 {
 	if (m_device)
-		return m_device->pb_r();
+		return m_device->pb_r(space, 0);
 	else
 		return 0xff;
 }
@@ -102,10 +102,10 @@ uint8_t bbc_userport_slot_device::pb_r()
 //  pb_w
 //-------------------------------------------------
 
-void bbc_userport_slot_device::pb_w(uint8_t data)
+WRITE8_MEMBER(bbc_userport_slot_device::pb_w)
 {
 	if (m_device)
-		m_device->pb_w(data);
+		m_device->pb_w(space, 0, data);
 }
 
 

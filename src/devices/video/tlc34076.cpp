@@ -127,7 +127,7 @@ void tlc34076_device::update_pen(uint8_t i)
 //  read - read access
 //-------------------------------------------------
 
-u8 tlc34076_device::read(offs_t offset)
+READ8_MEMBER( tlc34076_device::read )
 {
 	uint8_t result;
 
@@ -161,7 +161,7 @@ u8 tlc34076_device::read(offs_t offset)
 //  write - write access
 //-------------------------------------------------
 
-void tlc34076_device::write(offs_t offset, u8 data)
+WRITE8_MEMBER( tlc34076_device::write )
 {
 //  uint8_t oldval;
 

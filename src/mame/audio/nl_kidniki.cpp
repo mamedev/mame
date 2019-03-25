@@ -2,17 +2,8 @@
 // copyright-holders:Andrew Gardner, Couriersud
 #include "netlist/devices/net_lib.h"
 
-#ifdef NLBASE_H_
-#error Somehow nl_base.h made it into the include chain.
-#endif
-
-#ifndef NLTOOL_VERSION
 #define USE_FRONTIERS 1
 #define USE_FIXED_STV 1
-#else
-#define USE_FRONTIERS 0
-#define USE_FIXED_STV 1
-#endif
 
 /* ----------------------------------------------------------------------------
  *  Library section header START
@@ -317,7 +308,7 @@ NETLIST_END()
 
 NETLIST_START(kidniki)
 
-#if (0 || USE_FRONTIERS)
+#if (1 || USE_FRONTIERS)
 	SOLVER(Solver, 18000)
 	PARAM(Solver.ACCURACY, 1e-7)
 	PARAM(Solver.NR_LOOPS, 100)
@@ -326,19 +317,16 @@ NETLIST_START(kidniki)
 	PARAM(Solver.METHOD, "MAT_CR")
 	//PARAM(Solver.METHOD, "MAT")
 	//PARAM(Solver.METHOD, "GMRES")
-	PARAM(Solver.SOR_FACTOR, 1.313)
+	PARAM(Solver.SOR_FACTOR, 1.00)
 	PARAM(Solver.DYNAMIC_TS, 0)
 	PARAM(Solver.DYNAMIC_LTE, 5e-4)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 20e-6)
 #else
-	SOLVER(Solver, 18000)
-	PARAM(Solver.ACCURACY, 1e-7)
-	PARAM(Solver.NR_LOOPS, 100)
-	PARAM(Solver.GS_LOOPS, 300)
-	//PARAM(Solver.METHOD, "MAT_CR")
+	SOLVER(Solver, 12000)
+	PARAM(Solver.ACCURACY, 1e-8)
+	PARAM(Solver.NR_LOOPS, 300)
+	PARAM(Solver.GS_LOOPS, 20)
 	PARAM(Solver.METHOD, "GMRES")
-	//PARAM(Solver.SOR_FACTOR, 1.73)
-	//PARAM(Solver.METHOD, "SOR")
 #endif
 
 #if (USE_FRONTIERS)
@@ -384,13 +372,16 @@ NETLIST_START(kidniki)
 	ALIAS(I_SINH0, SINH_DUMMY.2)
 #endif
 
-	NET_MODEL("AY8910PORT FAMILY(OVL=0.05 OVH=0.05 ORL=100.0 ORH=0.5k)")
+	NET_MODEL("AY8910PORT FAMILY(OVL=0.05 OVH=4.95 ORL=100.0 ORH=0.5k)")
 
 	LOGIC_INPUT(I_SD0, 1, "AY8910PORT")
+	//CLOCK(I_SD0, 5)
 	LOGIC_INPUT(I_BD0, 1, "AY8910PORT")
+	//CLOCK(I_BD0, 5)
 	LOGIC_INPUT(I_CH0, 1, "AY8910PORT")
+	//CLOCK(I_CH0, 2.2  )
 	LOGIC_INPUT(I_OH0, 1, "AY8910PORT")
-
+	//CLOCK(I_OH0, 1.0)
 	ANALOG_INPUT(I_MSM2K0, 0)
 	ANALOG_INPUT(I_MSM3K0, 0)
 

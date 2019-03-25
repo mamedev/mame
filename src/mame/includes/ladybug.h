@@ -53,9 +53,8 @@ protected:
 
 	void ladybug_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
-
 private:
+	required_device<cpu_device> m_maincpu;
 	required_device<ladybug_video_device> m_video;
 
 	required_ioport m_port_dsw0;

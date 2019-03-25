@@ -184,8 +184,7 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-void mc8030_state::mc8030(machine_config &config)
-{
+MACHINE_CONFIG_START(mc8030_state::mc8030)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(2'457'600));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mc8030_state::mem_map);
@@ -193,13 +192,13 @@ void mc8030_state::mc8030(machine_config &config)
 	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(512, 256);
-	screen.set_visarea(0, 512-1, 0, 256-1);
-	screen.set_screen_update(FUNC(mc8030_state::screen_update_mc8030));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE_DRIVER(mc8030_state, screen_update_mc8030)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -241,7 +240,7 @@ void mc8030_state::mc8030(machine_config &config)
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
 	rs232.rxd_handler().set("asp_sio", FUNC(z80sio_device::rxa_w));
 	rs232.cts_handler().set("asp_sio", FUNC(z80sio_device::ctsa_w));
-}
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( mc8030 )

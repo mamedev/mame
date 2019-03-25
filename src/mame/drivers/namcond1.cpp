@@ -10,14 +10,13 @@
             Walter Fath
 
     abcheck TODOs:
-    - Ending has a rowscroll GFX bug;
+    - GFX rom banking is a mystery (bad ROMs? Encryption?)
     - Where is the extra data ROM mapped?
 
     gynotai TODOs:
-    - printer (disable it in service mode to suppress POST error);
+    - printer (disable it in service mode);
     - ball sensors aren't understood;
-    - Seems to dislike our YGV608 row/colscroll handling
-      (for example vertical bounding box is halved offset & size wise for Pac-Man goal stage);
+    - Seems to dislike our YGV608 row/colscroll handling;
 
     To make abcheck run when the EEPROM is clear:
     - F2 to enter service mode
@@ -368,19 +367,19 @@ WRITE_LINE_MEMBER( namcond1_state::raster_irq_w )
 	m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void namcond1_state::namcond1(machine_config &config)
-{
+MACHINE_CONFIG_START(namcond1_state::namcond1)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(49'152'000)/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcond1_state::namcond1_map);
-//  m_maincpu->set_vblank_int("screen", FUNC(namcond1_state::irq1_line_hold));
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(49'152'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(namcond1_map)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
 
-	H83002(config, m_mcu, XTAL(49'152'000)/3 );
-	m_mcu->set_addrmap(AS_PROGRAM, &namcond1_state::nd1h8rwmap);
-	m_mcu->set_addrmap(AS_IO, &namcond1_state::nd1h8iomap);
-	m_mcu->set_vblank_int("screen", FUNC(namcond1_state::mcu_interrupt));
+	MCFG_DEVICE_ADD("mcu", H83002, XTAL(49'152'000)/3 )
+	MCFG_DEVICE_PROGRAM_MAP( nd1h8rwmap)
+	MCFG_DEVICE_IO_MAP( nd1h8iomap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcond1_state,  mcu_interrupt)
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	YGV608(config, m_ygv608, 0);
 	m_ygv608->set_palette("palette");
@@ -389,39 +388,39 @@ void namcond1_state::namcond1(machine_config &config)
 	m_ygv608->set_screen("screen");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	MCFG_SCREEN_ADD("screen", RASTER)
 	/*
 	H 804 108 576 48 32
 	V 261 26 224 3 0
 	*/
-	screen.set_raw( XTAL(49'152'000)/8, 804/2, 108/2, (108+576)/2, 261, 26, 26+224);
-	screen.set_screen_update("ygv608", FUNC(ygv608_device::update_screen));
-	screen.set_palette("palette");
+	MCFG_SCREEN_RAW_PARAMS( XTAL(49'152'000)/8, 804/2, 108/2, (108+576)/2, 261, 26, 26+224)
+	MCFG_SCREEN_UPDATE_DEVICE("ygv608", ygv608_device, update_screen)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette").set_entries(256);
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	c352_device &c352(C352(config, "c352", XTAL(49'152'000)/2, 288));
-	c352.add_route(0, "lspeaker", 1.00);
-	c352.add_route(1, "rspeaker", 1.00);
-	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
-	//c352.add_route(3, "rspeaker", 1.00);
+	MCFG_DEVICE_ADD("c352", C352, XTAL(49'152'000)/2, 288)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
+	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	AT28C16(config, "at28c16", 0);
-}
+	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
+MACHINE_CONFIG_END
 
-void namcond1_state::abcheck(machine_config &config)
-{
+MACHINE_CONFIG_START(namcond1_state::abcheck)
 	namcond1(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcond1_state::abcheck_map);
-//  m_maincpu->set_vblank_int("screen", FUNC(namcond1_state::irq1_line_hold));
+	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(49'152'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(abcheck_map)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
 
 	NVRAM(config, "zpr1", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "zpr2", nvram_device::DEFAULT_ALL_0);
-}
+MACHINE_CONFIG_END
 
 ROM_START( ncv1 )
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 16MB for Main CPU */

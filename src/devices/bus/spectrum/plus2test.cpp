@@ -68,7 +68,7 @@ READ_LINE_MEMBER(spectrum_plus2test_device::romcs)
 	return 1;
 }
 
-uint8_t spectrum_plus2test_device::mreq_r(offs_t offset)
+READ8_MEMBER(spectrum_plus2test_device::mreq_r)
 {
 	return m_rom->base()[offset & 0x3fff];
 }

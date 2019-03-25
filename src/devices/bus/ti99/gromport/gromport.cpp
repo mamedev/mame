@@ -143,7 +143,7 @@ READ8Z_MEMBER(gromport_device::readz)
 {
 	if (m_connector != nullptr)
 	{
-		m_connector->readz(offset & m_mask, value);
+		m_connector->readz(space, offset & m_mask, value);
 		if (m_romgq) LOGMASKED(LOG_READ, "Read %04x -> %02x\n", offset | 0x6000, *value);
 	}
 }
@@ -152,25 +152,25 @@ READ8Z_MEMBER(gromport_device::readz)
     Writing via the GROM port. Only 13 address lines are passed through
     on the TI-99/4A, and 14 lines on the TI-99/8.
 */
-void gromport_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(gromport_device::write)
 {
 	if (m_connector != nullptr)
 	{
 		if (m_romgq) LOGMASKED(LOG_WRITE, "Write %04x <- %02x\n", offset | 0x6000, data);
-		m_connector->write(offset & m_mask, data);
+		m_connector->write(space, offset & m_mask, data);
 	}
 }
 
 READ8Z_MEMBER(gromport_device::crureadz)
 {
 	if (m_connector != nullptr)
-		m_connector->crureadz(offset, value);
+		m_connector->crureadz(space, offset, value);
 }
 
-void gromport_device::cruwrite(offs_t offset, uint8_t data)
+WRITE8_MEMBER(gromport_device::cruwrite)
 {
 	if (m_connector != nullptr)
-		m_connector->cruwrite(offset, data);
+		m_connector->cruwrite(space, offset, data);
 }
 
 WRITE_LINE_MEMBER(gromport_device::ready_line)

@@ -376,14 +376,13 @@ void hp9122c_device::cpu_map(address_map &map)
 	map(0xc000, 0xffff).rom().region("cpu", 0);
 }
 
-void hp9122c_device::device_add_mconfig(machine_config &config)
-{
-	MC6809(config, m_cpu, XTAL(8'000'000));
-	m_cpu->set_addrmap(AS_PROGRAM, &hp9122c_device::cpu_map);
+MACHINE_CONFIG_START(hp9122c_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("cpu" , MC6809 , XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
 	// without this flag, 'DMA' transfer via SYNC instruction
 	// will not work
-	config.m_perfect_cpu_quantum = subtag("cpu");
+	MCFG_QUANTUM_PERFECT_CPU("cpu")
 
 	MB8876(config, m_fdc, 8_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(hp9122c_device::fdc_intrq_w));
@@ -400,7 +399,11 @@ void hp9122c_device::device_add_mconfig(machine_config &config)
 	m_i8291a->int_write().set(FUNC(hp9122c_device::i8291a_int_w));
 	m_i8291a->dreq_write().set(FUNC(hp9122c_device::i8291a_dreq_w));
 
-	FLOPPY_CONNECTOR(config, "floppy0" , hp9122c_floppies , "35hd" , hp9122c_floppy_formats, true).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "floppy1" , hp9122c_floppies , "35hd" , hp9122c_floppy_formats, true).enable_sound(true);
+	MCFG_FLOPPY_DRIVE_ADD("floppy0" , hp9122c_floppies , "35hd" , hp9122c_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_SLOT_FIXED(true)
+	MCFG_FLOPPY_DRIVE_ADD("floppy1" , hp9122c_floppies , "35hd" , hp9122c_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_SLOT_FIXED(true)
 	config.set_default_layout(layout_hp9122c);
-}
+MACHINE_CONFIG_END

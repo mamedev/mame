@@ -152,7 +152,7 @@ attotime mm58274c_device::interrupt_period_table(int val)
 	}
 }
 
-uint8_t mm58274c_device::read(offs_t offset)
+READ8_MEMBER( mm58274c_device::read )
 {
 	int reply;
 
@@ -242,7 +242,7 @@ uint8_t mm58274c_device::read(offs_t offset)
 }
 
 
-void mm58274c_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( mm58274c_device::write )
 {
 	offset &= 0xf;
 	data &= 0xf;

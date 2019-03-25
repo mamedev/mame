@@ -8,20 +8,18 @@
 #ifndef NLSETUP_H_
 #define NLSETUP_H_
 
-#include "plib/pparser.h"
-#include "plib/pstream.h"
 #include "plib/pstring.h"
 #include "plib/putil.h"
+#include "plib/pstream.h"
+#include "plib/pparser.h"
 
-#include "nl_config.h"
 #include "nl_factory.h"
-#include "nltypes.h"
+#include "nl_config.h"
+#include "netlist_types.h"
 
-#include <memory>
 #include <stack>
-#include <unordered_map>
 #include <vector>
-
+#include <memory>
 
 //============================================================
 //  MACROS / inline netlist definitions
@@ -29,46 +27,46 @@
 
 #define NET_STR(x) # x
 
-#define NET_MODEL(model)                                                       \
+#define NET_MODEL(model)                                                           \
 	setup.register_model(model);
 
-#define ALIAS(alias, name)                                                     \
+#define ALIAS(alias, name)                                                        \
 	setup.register_alias(# alias, # name);
 
-#define DIPPINS(pin1, ...)                                                     \
+#define DIPPINS(pin1, ...)                                                          \
 		setup.register_dippins_arr( # pin1 ", " # __VA_ARGS__);
 
 /* to be used to reference new library truthtable devices */
-#define NET_REGISTER_DEV(type, name)                                           \
+#define NET_REGISTER_DEV(type, name)                                            \
 		setup.register_dev(# type, # name);
 
-#define NET_CONNECT(name, input, output)                                       \
+#define NET_CONNECT(name, input, output)                                        \
 		setup.register_link(# name "." # input, # output);
 
-#define NET_C(term1, ...)                                                      \
+#define NET_C(term1, ...)                                                       \
 		setup.register_link_arr( # term1 ", " # __VA_ARGS__);
 
-#define PARAM(name, val)                                                       \
+#define PARAM(name, val)                                                        \
 		setup.register_param(# name, val);
 
 #define HINT(name, val)                                                        \
 		setup.register_param(# name ".HINT_" # val, 1);
 
-#define NETDEV_PARAMI(name, param, val)                                        \
+#define NETDEV_PARAMI(name, param, val)                                         \
 		setup.register_param(# name "." # param, val);
 
 #define NETLIST_NAME(name) netlist ## _ ## name
 
 #define NETLIST_EXTERNAL(name)                                                 \
-		void NETLIST_NAME(name)(netlist::nlparse_t &setup);
+		void NETLIST_NAME(name)(netlist::setup_t &setup);
 
 #define NETLIST_START(name)                                                    \
-void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
+void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 {
 #define NETLIST_END()  }
 
 #define LOCAL_SOURCE(name)                                                     \
-		setup.register_source(plib::make_unique<netlist::source_proc_t>(# name, &NETLIST_NAME(name)));
+		setup.register_source(plib::make_unique_base<netlist::source_t, netlist::source_proc_t>(setup, # name, &NETLIST_NAME(name)));
 
 #define LOCAL_LIB_ENTRY(name)                                                  \
 		LOCAL_SOURCE(name)                                                     \
@@ -82,7 +80,7 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 		NETLIST_NAME(model)(setup);                                            \
 		setup.namespace_pop();
 
-#define OPTIMIZE_FRONTIER(attach, r_in, r_out)                                 \
+#define OPTIMIZE_FRONTIER(attach, r_in, r_out)                                  \
 		setup.register_frontier(# attach, r_in, r_out);
 
 // -----------------------------------------------------------------------------
@@ -100,10 +98,10 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 		desc.family = "";
 
 #define TT_HEAD(x) \
-		desc.desc.emplace_back(x);
+		desc.desc.push_back(x);
 
 #define TT_LINE(x) \
-		desc.desc.emplace_back(x);
+		desc.desc.push_back(x);
 
 #define TT_FAMILY(x) \
 		desc.family = x;
@@ -112,23 +110,22 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 		setup.tt_factory_create(desc, __FILE__);       \
 	}
 
+
 namespace netlist
 {
 
 	namespace detail {
 		class core_terminal_t;
 		class net_t;
-	} // namespace detail
+	}
 
 	namespace devices {
 		class nld_base_proxy;
-		class nld_netlistparams;
-	} // namespace devices
+	}
 
 	class core_device_t;
 	class param_t;
 	class setup_t;
-	class netlist_state_t;
 	class netlist_t;
 	class logic_family_desc_t;
 	class terminal_t;
@@ -139,7 +136,6 @@ namespace netlist
 
 	struct tt_desc
 	{
-		tt_desc() : ni(0), no(0) { }
 		pstring name;
 		pstring classname;
 		unsigned long ni;
@@ -172,221 +168,137 @@ namespace netlist
 	class source_t
 	{
 	public:
-
-		friend class setup_t;
-
 		enum type_t
 		{
 			SOURCE,
 			DATA
 		};
 
-		using list_t = std::vector<plib::unique_ptr<source_t>>;
+		using list_t = std::vector<std::unique_ptr<source_t>>;
 
-		source_t(const type_t type = SOURCE)
-		: m_type(type)
+		source_t(setup_t &setup, const type_t type = SOURCE)
+		: m_setup(setup), m_type(type)
 		{}
 
-		COPYASSIGNMOVE(source_t, delete)
+		virtual ~source_t() { }
 
-		virtual ~source_t() noexcept = default;
+		virtual bool parse(const pstring &name);
+		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) = 0;
 
-		virtual bool parse(nlparse_t &setup, const pstring &name);
-
-		type_t type() const { return m_type; }
-
-	protected:
-		virtual plib::unique_ptr<plib::pistream> stream(const pstring &name) = 0;
-
-	private:
-		const type_t m_type;
-	};
-
-
-	// ----------------------------------------------------------------------------------------
-	// Collection of models
-	// ----------------------------------------------------------------------------------------
-
-	class models_t
-	{
-	public:
-		void register_model(pstring model_in);
-		/* model / family related */
-
-		pstring model_value_str(pstring model, pstring entity);
-
-		double model_value(pstring model, pstring entity);
-
-		pstring model_type(pstring model) { return model_value_str(model, "COREMODEL"); }
-
-	private:
-		using model_map_t = std::unordered_map<pstring, pstring>;
-
-		void model_parse(const pstring &model, model_map_t &map);
-		pstring model_string(model_map_t &map);
-
-		std::unordered_map<pstring, pstring> m_models;
-		std::unordered_map<pstring, model_map_t> m_cache;
-	};
-
-	// ----------------------------------------------------------------------------------------
-	// nlparse_t
-	// ----------------------------------------------------------------------------------------
-
-	class nlparse_t
-	{
-	public:
-		using link_t = std::pair<pstring, pstring>;
-
-		nlparse_t(setup_t &netlist, log_type &log);
-
-		void register_model(const pstring &model_in) { m_models.register_model(model_in); }
-		void register_alias(const pstring &alias, const pstring &out);
-		void register_dippins_arr(const pstring &terms);
-		void register_dev(const pstring &classname, const pstring &name);
-		void register_link(const pstring &sin, const pstring &sout);
-		void register_link_arr(const pstring &terms);
-		void register_param(const pstring &param, const pstring &value);
-		void register_param(const pstring &param, const double value);
-		void register_lib_entry(const pstring &name, const pstring &sourcefile);
-		void register_frontier(const pstring &attach, const double r_IN, const double r_OUT);
-
-		/* register a source */
-		void register_source(plib::unique_ptr<source_t> &&src)
-		{
-			m_sources.push_back(std::move(src));
-		}
-
-		void tt_factory_create(tt_desc &desc, const pstring &sourcefile);
-
-		/* handle namespace */
-
-		void namespace_push(const pstring &aname);
-		void namespace_pop();
-
-		/* include other files */
-
-		void include(const pstring &netlist_name);
-
-		pstring build_fqn(const pstring &obj_name) const;
-		void register_alias_nofqn(const pstring &alias, const pstring &out);
-
-		/* also called from devices for latebinding connected terminals */
-		void register_link_fqn(const pstring &sin, const pstring &sout);
-
-		/* used from netlist.cpp (mame) */
-		bool device_exists(const pstring &name) const;
-
-		/* FIXME: used by source_t - need a different approach at some time */
-		bool parse_stream(plib::unique_ptr<plib::pistream> &&istrm, const pstring &name);
-
-		void add_define(const pstring &def, const pstring &val)
-		{
-			m_defines.insert({ def, plib::ppreprocessor::define_t(def, val)});
-		}
-
-		void add_define(const pstring &defstr);
-
-		factory::list_t &factory() { return m_factory; }
-		const factory::list_t &factory() const { return m_factory; }
-
-		log_type &log() { return m_log; }
-		const log_type &log() const { return m_log; }
-
-		/* FIXME: sources may need access to the netlist parent type
-		 * since they may be created in a context in which they don't
-		 * have access to their environment.
-		 * Example is the MAME memregion source.
-		 * We thus need a better approach to creating netlists in a context
-		 * other than static procedures.
-		 */
 		setup_t &setup() { return m_setup; }
-		const setup_t &setup() const { return m_setup; }
-
-		models_t &models() { return m_models; }
-		const models_t &models() const { return m_models; }
-
-	protected:
-		models_t                                    m_models;
-		std::stack<pstring>                         m_namespace_stack;
-		std::unordered_map<pstring, pstring>        m_alias;
-		std::vector<link_t>                         m_links;
-		std::unordered_map<pstring, pstring>        m_param_values;
-
-		source_t::list_t                            m_sources;
-
-		factory::list_t                             m_factory;
-
-		/* need to preserve order of device creation ... */
-		std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
-
-
+		type_t type() const { return m_type; }
 	private:
-		plib::ppreprocessor::defines_map_type       m_defines;
-
-		setup_t  &m_setup;
-		log_type &m_log;
-		unsigned m_frontier_cnt;
+		setup_t &m_setup;
+		const type_t m_type;
 	};
 
 	// ----------------------------------------------------------------------------------------
 	// setup_t
 	// ----------------------------------------------------------------------------------------
 
-	class setup_t : public nlparse_t
+
+	class setup_t : plib::nocopyassignmove
 	{
 	public:
 
-		explicit setup_t(netlist_state_t &nlstate);
-		~setup_t() noexcept;
+		using link_t = std::pair<pstring, pstring>;
 
-		COPYASSIGNMOVE(setup_t, delete)
+		explicit setup_t(netlist_t &netlist);
+		~setup_t();
 
-		netlist_state_t &nlstate() { return m_nlstate; }
-		const netlist_state_t &nlstate() const { return m_nlstate; }
+		netlist_t &netlist() { return m_netlist; }
+		const netlist_t &netlist() const { return m_netlist; }
 
-		void register_param_t(const pstring &name, param_t &param);
+		pstring build_fqn(const pstring &obj_name) const;
 
-		pstring get_initial_param_val(const pstring &name, const pstring &def) const;
+		void register_param(const pstring &name, param_t &param);
+		pstring get_initial_param_val(const pstring &name, const pstring &def);
+		double get_initial_param_val(const pstring &name, const double def);
+		int get_initial_param_val(const pstring &name, const int def);
 
 		void register_term(detail::core_terminal_t &obj);
+
+		void register_dev(const pstring &classname, const pstring &name);
+
+		void register_lib_entry(const pstring &name, const pstring &sourcefile);
+
+		void register_model(const pstring &model_in);
+		void register_alias(const pstring &alias, const pstring &out);
+		void register_dippins_arr(const pstring &terms);
+
+		void register_alias_nofqn(const pstring &alias, const pstring &out);
+
+		void register_link_arr(const pstring &terms);
+		void register_link_fqn(const pstring &sin, const pstring &sout);
+		void register_link(const pstring &sin, const pstring &sout);
+
+		void register_param(const pstring &param, const pstring &value);
+		void register_param(const pstring &param, const double value);
+
+		void register_frontier(const pstring &attach, const double r_IN, const double r_OUT);
 
 		void remove_connections(const pstring &attach);
 
 		bool connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 
+		bool device_exists(const pstring &name) const;
+
 		param_t *find_param(const pstring &param_in, bool required = true) const;
 
-		/* get family */
-		const logic_family_desc_t *family_from_model(const pstring &model);
-
-		void register_dynamic_log_devices();
+		void start_devices();
 		void resolve_inputs();
 
-		plib::unique_ptr<plib::pistream> get_data_stream(const pstring &name);
+		/* handle namespace */
+
+		void namespace_push(const pstring &aname);
+		void namespace_pop();
+
+		/* parse a source */
+
+		void include(const pstring &netlist_name);
+
+		std::unique_ptr<plib::pistream> get_data_stream(const pstring &name);
+
+		bool parse_stream(plib::putf8_reader &istrm, const pstring &name);
+
+		/* register a source */
+
+		void register_source(std::unique_ptr<source_t> &&src)
+		{
+			m_sources.push_back(std::move(src));
+		}
+
+		void register_define(pstring def, pstring val) { m_defines.push_back(plib::ppreprocessor::define_t(def, val)); }
+		void register_define(pstring defstr);
 
 		factory::list_t &factory() { return m_factory; }
 		const factory::list_t &factory() const { return m_factory; }
 
+		/* model / family related */
+
+		const pstring model_value_str(detail::model_map_t &map, const pstring &entity);
+		double model_value(detail::model_map_t &map, const pstring &entity);
+
+		void model_parse(const pstring &model, detail::model_map_t &map);
+
+		const logic_family_desc_t *family_from_model(const pstring &model);
+
+		void tt_factory_create(tt_desc &desc, const pstring &sourcefile);
+
 		/* helper - also used by nltool */
 		const pstring resolve_alias(const pstring &name) const;
 
-		/* needed by nltool */
-		std::vector<pstring> get_terminals_for_device_name(const pstring &devname);
+		plib::plog_base<netlist_t, NL_DEBUG> &log();
+		const plib::plog_base<netlist_t, NL_DEBUG> &log() const;
 
-		log_type &log();
-		const log_type &log() const;
+		std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
+
+		std::unordered_map<pstring, pstring> m_alias;
+		std::unordered_map<pstring, pstring> m_param_values;
+		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 
 		/* needed by proxy */
 		detail::core_terminal_t *find_terminal(const pstring &outname_in, const detail::terminal_type atype, bool required = true);
-
-		/* core net handling */
-
-		void delete_empty_nets();
-
-		/* run preparation */
-
-		void prepare_to_run();
 
 	private:
 
@@ -406,30 +318,35 @@ namespace netlist
 		devices::nld_base_proxy *get_d_a_proxy(detail::core_terminal_t &out);
 		devices::nld_base_proxy *get_a_d_proxy(detail::core_terminal_t &inp);
 
-		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
-
-		netlist_state_t                             &m_nlstate;
-		devices::nld_netlistparams                  *m_netlist_params;
+		netlist_t                                   &m_netlist;
 		std::unordered_map<pstring, param_ref_t>    m_params;
+		std::vector<link_t>                         m_links;
+		factory::list_t                             m_factory;
+		std::unordered_map<pstring, pstring>        m_models;
+
+		std::stack<pstring>                         m_namespace_stack;
+		source_t::list_t                            m_sources;
+		std::vector<plib::ppreprocessor::define_t>  m_defines;
 
 		unsigned m_proxy_cnt;
-	};
+		unsigned m_frontier_cnt;
+};
 
 	// ----------------------------------------------------------------------------------------
 	// base sources
 	// ----------------------------------------------------------------------------------------
 
+
 	class source_string_t : public source_t
 	{
 	public:
 
-		source_string_t(const pstring &source)
-		: source_t(), m_str(source)
+		source_string_t(setup_t &setup, const pstring &source)
+		: source_t(setup), m_str(source)
 		{
 		}
 
-	protected:
-		plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
+		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:
 		pstring m_str;
@@ -439,13 +356,12 @@ namespace netlist
 	{
 	public:
 
-		source_file_t(const pstring &filename)
-		: source_t(), m_filename(filename)
+		source_file_t(setup_t &setup, const pstring &filename)
+		: source_t(setup), m_filename(filename)
 		{
 		}
 
-	protected:
-		plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
+		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:
 		pstring m_filename;
@@ -454,13 +370,12 @@ namespace netlist
 	class source_mem_t : public source_t
 	{
 	public:
-		source_mem_t(const char *mem)
-		: source_t(), m_str(mem)
+		source_mem_t(setup_t &setup, const char *mem)
+		: source_t(setup), m_str(mem, pstring::UTF8)
 		{
 		}
 
-	protected:
-		plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
+		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:
 		pstring m_str;
@@ -469,28 +384,22 @@ namespace netlist
 	class source_proc_t : public source_t
 	{
 	public:
-		source_proc_t(const pstring &name, void (*setup_func)(nlparse_t &))
-		: source_t(),
+		source_proc_t(setup_t &setup, pstring name, void (*setup_func)(setup_t &))
+		: source_t(setup),
 			m_setup_func(setup_func),
 			m_setup_func_name(name)
 		{
 		}
 
-		bool parse(nlparse_t &setup, const pstring &name) override;
-
-	protected:
-		plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
+		virtual bool parse(const pstring &name) override;
+		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:
-		void (*m_setup_func)(nlparse_t &);
+		void (*m_setup_func)(setup_t &);
 		pstring m_setup_func_name;
 	};
 
-	// -----------------------------------------------------------------------------
-	// inline implementations
-	// -----------------------------------------------------------------------------
-
-} // namespace netlist
+}
 
 
 #endif /* NLSETUP_H_ */

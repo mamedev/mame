@@ -56,21 +56,21 @@ void clowndwn_state::machine_reset()
 }
 
 
-void clowndwn_state::clowndwn(machine_config &config)
-{
-	/* basic machine hardware */
-	M6802(config, m_maincpu, 8000000); // unknown type and clock
-	m_maincpu->set_addrmap(AS_PROGRAM, &clowndwn_state::clowndwn_map);
+MACHINE_CONFIG_START(clowndwn_state::clowndwn)
 
-	PIA6821(config, "pia0", 0);
-	PIA6821(config, "pia1", 0);
-	PIA6821(config, "pia2", 0);
-	PIA6821(config, "pia3", 0);
-	PIA6821(config, "pia4", 0);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M6802, 8000000) // unknown type and clock
+	MCFG_DEVICE_PROGRAM_MAP(clowndwn_map)
+
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
+	MCFG_DEVICE_ADD("pia3", PIA6821, 0)
+	MCFG_DEVICE_ADD("pia4", PIA6821, 0)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-}
+MACHINE_CONFIG_END
 
 
 // has

@@ -98,9 +98,9 @@ WRITE8_MEMBER(asteroid_state::llander_sounds_w)
 }
 
 
-void asteroid_state::llander_sound(machine_config &config)
-{
+MACHINE_CONFIG_START(asteroid_state::llander_sound)
 	SPEAKER(config, "mono").front_center();
 
-	DISCRETE(config, m_discrete, llander_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, llander_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END

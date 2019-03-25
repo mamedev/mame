@@ -306,6 +306,10 @@ void cgenie_state::machine_start()
 {
 	// setup ram
 	m_maincpu->space(AS_PROGRAM).install_ram(0x4000, 0x4000 + m_ram->size() - 1, m_ram->pointer());
+
+	// setup expansion bus
+	m_exp->set_program_space(&m_maincpu->space(AS_PROGRAM));
+	m_exp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 
@@ -434,17 +438,16 @@ const rgb_t cgenie_state::m_palette_nz[] =
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-void cgenie_state::cgenie(machine_config &config)
-{
+MACHINE_CONFIG_START(cgenie_state::cgenie)
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(17'734'470) / 8); // 2.2168 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &cgenie_state::cgenie_mem);
-	m_maincpu->set_addrmap(AS_IO, &cgenie_state::cgenie_io);
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(17'734'470) / 8)  // 2.2168 MHz
+	MCFG_DEVICE_PROGRAM_MAP(cgenie_mem)
+	MCFG_DEVICE_IO_MAP(cgenie_io)
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(17'734'470) / 2, 568, 32, 416, 312, 28, 284);
-	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(17'734'470) / 2, 568, 32, 416, 312, 28, 284)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
 
 	HD6845(config, m_crtc, XTAL(17'734'470) / 16);
 	m_crtc->set_screen("screen");
@@ -462,12 +465,12 @@ void cgenie_state::cgenie(machine_config &config)
 	ay8910.port_b_write_callback().set("par", FUNC(cg_parallel_slot_device::pb_w));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(cgenie_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_STOPPED);
-	m_cassette->set_interface("cgenie_cass");
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(cgenie_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	MCFG_CASSETTE_INTERFACE("cgenie_cass")
 
-	SOFTWARE_LIST(config, "cass_list").set_original("cgenie_cass");
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "cgenie_cass")
 
 	// serial port
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
@@ -475,17 +478,15 @@ void cgenie_state::cgenie(machine_config &config)
 	rs232.dcd_handler().set(FUNC(cgenie_state::rs232_dcd_w));
 
 	// cartridge expansion slot
-	CG_EXP_SLOT(config, m_exp);
-	m_exp->set_program_space(m_maincpu, AS_PROGRAM);
-	m_exp->set_io_space(m_maincpu, AS_IO);
-	m_exp->int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	MCFG_CG_EXP_SLOT_ADD("exp")
+	MCFG_CG_EXP_SLOT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	// parallel slot
-	CG_PARALLEL_SLOT(config, "par");
+	MCFG_CG_PARALLEL_SLOT_ADD("par")
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
-}
+MACHINE_CONFIG_END
 
 
 //**************************************************************************

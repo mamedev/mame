@@ -94,26 +94,25 @@ uint32_t dms5000_state::screen_update_dms5000(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void dms5000_state::dms5000(machine_config &config)
-{
+MACHINE_CONFIG_START(dms5000_state::dms5000)
 	/* basic machine hardware */
-	I8086(config, m_maincpu, XTAL(9'830'400));
-	m_maincpu->set_addrmap(AS_PROGRAM, &dms5000_state::dms5000_mem);
-	m_maincpu->set_addrmap(AS_IO, &dms5000_state::dms5000_io);
+	MCFG_DEVICE_ADD("maincpu",I8086, XTAL(9'830'400))
+	MCFG_DEVICE_PROGRAM_MAP(dms5000_mem)
+	MCFG_DEVICE_IO_MAP(dms5000_io)
 
-	LS259(config, "cntlatch", 0); // V34
+	MCFG_DEVICE_ADD("cntlatch", LS259, 0) // V34
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(640, 480);
-	m_screen->set_visarea_full();
-	m_screen->set_screen_update(FUNC(dms5000_state::screen_update_dms5000));
-	m_screen->set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE_DRIVER(dms5000_state, screen_update_dms5000)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-}
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( dms5000 )

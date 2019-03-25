@@ -19,7 +19,7 @@
 
     TODO:
 
-    - m6800.cpp rewrite
+    - m6800.c rewrite
     - keyboard interrupt
     - LCD controller
     - serial
@@ -801,7 +801,7 @@ DEVICE_IMAGE_LOAD_MEMBER(hx20_state, optrom_load)
 READ8_MEMBER(hx20_state::optrom_r)
 {
 	if (m_optrom->exists())
-		return m_optrom->read_rom(offset);
+		return m_optrom->read_rom(space, offset);
 	else
 		return 0;
 }
@@ -833,7 +833,7 @@ void hx20_state::machine_start()
 //**************************************************************************
 
 //-------------------------------------------------
-//  machine_config( hx20 )
+//  MACHINE_CONFIG( hx20 )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(hx20_state::hx20)
@@ -859,13 +859,13 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 	m_subcpu->out_p4_cb().set(FUNC(hx20_state::slave_p4_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(120, 32);
-	screen.set_visarea(0, 120-1, 0, 32-1);
-	screen.set_screen_update(FUNC(hx20_state::screen_update));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(120, 32)
+	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 32-1)
+	MCFG_SCREEN_UPDATE_DRIVER(hx20_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", FUNC(hx20_state::hx20_palette), 2);
 
@@ -882,11 +882,10 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 	m_rtc->irq().set(FUNC(hx20_state::rtc_irq_w));
 
 	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
-	CASSETTE(config, m_cassette);
-
-	EPSON_SIO(config, m_sio, "tf20");
-	m_sio->rx_callback().set(FUNC(hx20_state::sio_rx_w));
-	m_sio->pin_callback().set(FUNC(hx20_state::sio_pin_w));
+	MCFG_CASSETTE_ADD(CASSETTE_TAG)
+	MCFG_EPSON_SIO_ADD("sio", "tf20")
+	MCFG_EPSON_SIO_RX(WRITELINE(*this, hx20_state, sio_rx_w))
+	MCFG_EPSON_SIO_PIN(WRITELINE(*this, hx20_state, sio_pin_w))
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
@@ -897,28 +896,27 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 	MCFG_GENERIC_LOAD(hx20_state, optrom_load)
 
 	// software lists
-	SOFTWARE_LIST(config, "hx20_opt_list").set_original("hx20_rom");
-	SOFTWARE_LIST(config, "epson_cpm_list").set_original("epson_cpm");
+	MCFG_SOFTWARE_LIST_ADD("hx20_opt_list", "hx20_rom")
+	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
 MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  machine_config( hx20 )
+//  MACHINE_CONFIG( hx20 )
 //-------------------------------------------------
 
-void hx20_state::cm6000(machine_config &config)
-{
+MACHINE_CONFIG_START(hx20_state::cm6000)
 	hx20(config);
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &hx20_state::cm6000_mem);
 
 	// optional rom
-	config.device_remove("optrom");
+	MCFG_DEVICE_REMOVE("optrom")
 
 	// software lists
-	config.device_remove("epson_cpm_list");
-	config.device_remove("hx20_opt_list");
-}
+	MCFG_SOFTWARE_LIST_REMOVE("epson_cpm_list")
+	MCFG_SOFTWARE_LIST_REMOVE("hx20_opt_list")
+MACHINE_CONFIG_END
 
 
 //**************************************************************************

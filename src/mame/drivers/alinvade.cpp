@@ -207,25 +207,26 @@ WRITE_LINE_MEMBER(alinvade_state::vblank_irq)
 		m_maincpu->set_input_line(0,HOLD_LINE);
 }
 
-void alinvade_state::alinvade(machine_config &config)
-{
+MACHINE_CONFIG_START(alinvade_state::alinvade)
+
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 2000000);         /* ? MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &alinvade_state::alinvade_map);
+	MCFG_DEVICE_ADD("maincpu", M6502,2000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(alinvade_map)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(128, 128);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(alinvade_state::screen_update));
-	screen.screen_vblank().set(FUNC(alinvade_state::vblank_irq));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(128, 128)
+	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 128-1)
+	MCFG_SCREEN_UPDATE_DRIVER(alinvade_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, alinvade_state, vblank_irq))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, alinvade_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, alinvade_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 

@@ -180,7 +180,7 @@ void mm58167_device::update_rtc()
 	m_milliseconds = (bcd_to_integer(m_regs[R_CNT_HUNDTENTHS]) * 10) + (bcd_to_integer(m_regs[R_CNT_MILLISECONDS] >> 4) % 10);
 }
 
-uint8_t mm58167_device::read(offs_t offset)
+READ8_MEMBER(mm58167_device::read)
 {
 //  printf("read reg %x = %02x\n", offset, m_regs[offset]);
 
@@ -196,7 +196,7 @@ uint8_t mm58167_device::read(offs_t offset)
 	return m_regs[offset];
 }
 
-void mm58167_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(mm58167_device::write)
 {
 //  printf("%02x to reg %x\n", data, offset);
 

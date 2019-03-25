@@ -137,11 +137,10 @@ const tiny_rom_entry *hp9845_printer_device::device_rom_region() const
 	return ROM_NAME(hp9845_printer);
 }
 
-void hp9845_printer_device::device_add_mconfig(machine_config &config)
-{
-	BITBANGER(config, m_prt_alpha_out, 0);
-	BITBANGER(config, m_prt_graph_out, 0);
-}
+MACHINE_CONFIG_START(hp9845_printer_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("prt_alpha", BITBANGER, 0)
+	MCFG_DEVICE_ADD("prt_graphic", BITBANGER, 0)
+MACHINE_CONFIG_END
 
 void hp9845_printer_device::device_start()
 {

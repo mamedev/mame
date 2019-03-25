@@ -728,42 +728,6 @@ ROM_START( raidenb )/* Different hardware, Main & Sub CPU code not encrypted. */
 	ROM_LOAD( "jj3010.u0116", 0x0000, 0x0100, NO_DUMP )
 ROM_END
 
-ROM_START( raidenub ) // only region bits differ from raidenb
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
-	ROM_LOAD16_BYTE( "1.u0253", 0x0a0000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
-	ROM_LOAD16_BYTE( "2.u0252", 0x0a0001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
-	ROM_LOAD16_BYTE( "3u.u022", 0x0c0000, 0x20000, CRC(9d735bf5) SHA1(531981eac2ef0c0635f067a649899f98738d5c67) ) /* Simply labeled as 3u */
-	ROM_LOAD16_BYTE( "4u.u023", 0x0c0001, 0x20000, CRC(95c110ef) SHA1(e6aea374ca63cdd851af66240e51461882d170e8) ) /* Simply labeled as 4u */
-
-	ROM_REGION( 0x100000, "sub", 0 ) /* v30 sub cpu */
-	ROM_LOAD16_BYTE( "5__,raidenb.u042", 0x0c0000, 0x20000, CRC(7aca6d61) SHA1(4d80ec87e54d7495b9bdf819b9985b1c8183c80d) ) /* Simply labeled as 5 */
-	ROM_LOAD16_BYTE( "6__,raidenb.u043", 0x0c0001, 0x20000, CRC(e3d35cc2) SHA1(4329865985aaf3fb524618e2e958563c8fa6ead5) ) /* Simply labeled as 6 */
-
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
-	ROM_LOAD( "rai6.u212",   0x000000, 0x08000, CRC(723a483b) SHA1(50e67945e83ea1748fb748de3287d26446d4e0a0) ) /* Should be labeled "8" ??? */
-	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
-
-	ROM_REGION( 0x010000, "gfx1", 0 ) /* Chars */
-	ROM_LOAD( "9",  0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* On some PCBs there is no explicit */
-	ROM_LOAD( "10", 0x08000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) /* U location for these two roms     */
-
-	ROM_REGION( 0x080000, "gfx2", 0 ) /* tiles */
-	ROM_LOAD( "sei420", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) /* U919 on this PCB */
-
-	ROM_REGION( 0x080000, "gfx3", 0 ) /* tiles */
-	ROM_LOAD( "sei430", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) /* U920 on this PCB */
-
-	ROM_REGION( 0x090000, "gfx4", 0 ) /* Sprites */
-	ROM_LOAD( "sei440", 0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) /* U165 on this PCB */
-
-	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
-	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
-
-	ROM_REGION( 0x0100, "proms", 0 ) // N82S135N bipolar PROM
-	ROM_LOAD( "jj3010.u0116", 0x0000, 0x0100, NO_DUMP )
-ROM_END
-
 ROM_START( raidenua )/* Different hardware, Main, Sub & sound CPU code not encrypted. */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "1.c8",   0x0a0000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
@@ -860,4 +824,3 @@ GAME( 1990, raidenua, raiden, raidenu,  raiden, raiden_state,  empty_init,   ROT
 
 /* Alternate hardware. Main, Sub & Sound CPU code not encrypted. It also sports Seibu custom CRTC. */
 GAME( 1990, raidenb,  raiden, raidenb,  raiden, raiden_state,  empty_init,   ROT270, "Seibu Kaihatsu", "Raiden (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, raidenub, raiden, raidenb,  raiden, raiden_state,  empty_init,   ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 3)", MACHINE_SUPPORTS_SAVE )

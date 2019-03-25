@@ -2704,12 +2704,11 @@ GFXDECODE_END
 *                             Machine Drivers                              *
 ***************************************************************************/
 
-void subsino_state::victor21(machine_config &config)
-{
+MACHINE_CONFIG_START(subsino_state::victor21)
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 8);   /* Unknown clock */
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::victor21_map);
-	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'000'000) / 8)   /* Unknown clock */
+	MCFG_DEVICE_PROGRAM_MAP(victor21_map)
+	MCFG_DEVICE_IO_MAP(subsino_iomap)
 
 	i8255_device &ppi(I8255A(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(subsino_state::out_a_w));
@@ -2718,16 +2717,16 @@ void subsino_state::victor21(machine_config &config)
 	ppi.tri_pb_callback().set_constant(0);
 	ppi.in_pc_callback().set_ioport("INC");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
-	screen.set_visarea(0, 512-1, 0+16, 256-16-1);
-	screen.set_screen_update(FUNC(subsino_state::screen_update));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, subsino_depth3);
 
@@ -2738,38 +2737,39 @@ void subsino_state::victor21(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	OKIM6295(config, "oki", XTAL(4'433'619) / 4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  /* Clock frequency & pin 7 not verified */
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'433'619) / 4, okim6295_device::PIN7_HIGH)  /* Clock frequency & pin 7 not verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 /* same but with an additional protection. */
-void subsino_state::victor5(machine_config &config)
-{
+MACHINE_CONFIG_START(subsino_state::victor5)
 	victor21(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::victor5_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(victor5_map)
+MACHINE_CONFIG_END
 
 
-void subsino_state::crsbingo(machine_config &config)
-{
+MACHINE_CONFIG_START(subsino_state::crsbingo)
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 8);   /* Unknown CPU and clock */
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::crsbingo_map);
-	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'000'000) / 8)   /* Unknown CPU and clock */
+	MCFG_DEVICE_PROGRAM_MAP(crsbingo_map)
+	MCFG_DEVICE_IO_MAP(subsino_iomap)
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
-	screen.set_visarea(0, 512-1, 0+16, 256-16-1);
-	screen.set_screen_update(FUNC(subsino_state::screen_update));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, subsino_depth4);
 
@@ -2780,16 +2780,16 @@ void subsino_state::crsbingo(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);   /* Unknown clock */
-}
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))   /* Unknown clock */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
-void subsino_state::srider(machine_config &config)
-{
+MACHINE_CONFIG_START(subsino_state::srider)
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 8);   /* Unknown clock */
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::srider_map);
-	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'000'000) / 8)   /* Unknown clock */
+	MCFG_DEVICE_PROGRAM_MAP(srider_map)
+	MCFG_DEVICE_IO_MAP(subsino_iomap)
 
 	i8255_device &ppi1(I8255A(config, "ppi1"));
 	ppi1.in_pa_callback().set_ioport("SW1");
@@ -2801,16 +2801,16 @@ void subsino_state::srider(machine_config &config)
 	ppi2.in_pb_callback().set_ioport("INA");
 	ppi2.in_pc_callback().set_ioport("INB");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
-	screen.set_visarea(0, 512-1, 0+16, 256-16-1);
-	screen.set_screen_update(FUNC(subsino_state::screen_update));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, subsino_depth4);
 
@@ -2821,26 +2821,27 @@ void subsino_state::srider(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	OKIM6295(config, "oki", XTAL(4'433'619) / 4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  /* Clock frequency & pin 7 not verified */
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'433'619) / 4, okim6295_device::PIN7_HIGH)  /* Clock frequency & pin 7 not verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
-void subsino_state::sharkpy(machine_config &config)
-{
+MACHINE_CONFIG_START(subsino_state::sharkpy)
 	srider(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::sharkpy_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sharkpy_map)
+MACHINE_CONFIG_END
 
-void subsino_state::tisub(machine_config &config)
-{
+MACHINE_CONFIG_START(subsino_state::tisub)
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 8);   /* Unknown CPU and clock */
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::tisub_map);
-	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'000'000) / 8)   /* Unknown CPU and clock */
+	MCFG_DEVICE_PROGRAM_MAP(tisub_map)
+	MCFG_DEVICE_IO_MAP(subsino_iomap)
 
 	i8255_device &ppi1(I8255A(config, "ppi1"));
 	ppi1.in_pa_callback().set_ioport("SW1");
@@ -2852,16 +2853,16 @@ void subsino_state::tisub(machine_config &config)
 	ppi2.in_pb_callback().set_ioport("INA");
 	ppi2.in_pc_callback().set_ioport("INB");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
-	screen.set_visarea(0, 512-1, 0+16, 256-16-1);
-	screen.set_screen_update(FUNC(subsino_state::screen_update_reels));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_reels)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, subsino_depth4_reels);
 
@@ -2872,15 +2873,15 @@ void subsino_state::tisub(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);   /* Unknown clock */
-}
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))   /* Unknown clock */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
-void subsino_state::stbsub(machine_config &config)
-{
+MACHINE_CONFIG_START(subsino_state::stbsub)
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 8);   /* Unknown clock */
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::stbsub_map);
-	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'000'000) / 8)   /* Unknown clock */
+	MCFG_DEVICE_PROGRAM_MAP(stbsub_map)
+	MCFG_DEVICE_IO_MAP(subsino_iomap)
 
 	i8255_device &ppi1(I8255A(config, "ppi1"));
 	ppi1.in_pa_callback().set_ioport("SW1");
@@ -2893,16 +2894,16 @@ void subsino_state::stbsub(machine_config &config)
 	ppi2.in_pc_callback().set_ioport("INA");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
-	screen.set_visarea(0, 512-1, 0+16, 256-16-1);
-	screen.set_screen_update(FUNC(subsino_state::screen_update_stbsub_reels));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_stbsub_reels)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, subsino_stbsub);
 
@@ -2917,16 +2918,17 @@ void subsino_state::stbsub(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
-void subsino_state::mtrainnv(machine_config &config)
-{
+MACHINE_CONFIG_START(subsino_state::mtrainnv)
 	stbsub(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::mtrainnv_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mtrainnv_map)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

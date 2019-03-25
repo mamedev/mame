@@ -567,23 +567,23 @@ void topspeed_state::machine_reset()
 }
 
 
-void topspeed_state::topspeed(machine_config &config)
-{
+MACHINE_CONFIG_START(topspeed_state::topspeed)
+
 	// basic machine hardware
-	M68000(config, m_maincpu, XTAL(16'000'000) / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &topspeed_state::cpua_map);
-	m_maincpu->set_vblank_int("screen", FUNC(topspeed_state::irq6_line_hold));
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(cpua_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", topspeed_state, irq6_line_hold)
 
-	M68000(config, m_subcpu, XTAL(16'000'000) / 2);
-	m_subcpu->set_addrmap(AS_PROGRAM, &topspeed_state::cpub_map);
-	m_subcpu->set_vblank_int("screen", FUNC(topspeed_state::irq5_line_hold));
+	MCFG_DEVICE_ADD("subcpu", M68000, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", topspeed_state, irq5_line_hold)
 
-	Z80(config, m_audiocpu, XTAL(16'000'000) / 4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &topspeed_state::z80_prg);
-	m_audiocpu->set_addrmap(AS_IO, &topspeed_state::z80_io);
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(z80_prg)
+	MCFG_DEVICE_IO_MAP(z80_io)
 
 	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(16'000'000) / 4));
-	ctc.zc_callback<0>().set(FUNC(topspeed_state::z80ctc_to0));
+	ctc.intr_callback().set(FUNC(topspeed_state::z80ctc_to0));
 
 	PC080SN(config, m_pc080sn[0], 0);
 	m_pc080sn[0]->set_gfx_region(1);
@@ -608,13 +608,13 @@ void topspeed_state::topspeed(machine_config &config)
 	m_tc0040ioc->read_7_callback().set_ioport("IN2");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60.0532); // Measured on real hardware
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(topspeed_state::screen_update_topspeed));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60.0532) // Measured on real hardware
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(topspeed_state, screen_update_topspeed)
+	MCFG_SCREEN_PALETTE("palette")
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_topspeed);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 8192);
@@ -629,14 +629,14 @@ void topspeed_state::topspeed(machine_config &config)
 	ymsnd.add_route(0, "filter1l", 1.0);
 	ymsnd.add_route(1, "filter1r", 1.0);
 
-	MSM5205(config, m_msm[0], XTAL(384'000));
-	m_msm[0]->vck_legacy_callback().set(FUNC(topspeed_state::msm5205_1_vck));
-	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B);   // 8 kHz, 4-bit
-	m_msm[0]->add_route(ALL_OUTPUTS, "filter2", 1.0);
+	MCFG_DEVICE_ADD("msm1", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, topspeed_state, msm5205_1_vck)) // VCK function
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      // 8 kHz, 4-bit
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter2", 1.0)
 
-	MSM5205(config, m_msm[1], XTAL(384'000));
-	m_msm[1]->set_prescaler_selector(msm5205_device::SEX_4B);   // Slave mode, 4-bit
-	m_msm[1]->add_route(ALL_OUTPUTS, "filter3", 1.0);
+	MCFG_DEVICE_ADD("msm2", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      // Slave mode, 4-bit
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter3", 1.0)
 
 	FILTER_VOLUME(config, "filter1l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "filter1r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
@@ -644,7 +644,7 @@ void topspeed_state::topspeed(machine_config &config)
 	FILTER_VOLUME(config, "filter2").add_route(ALL_OUTPUTS, "lspeaker", 1.0).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	FILTER_VOLUME(config, "filter3").add_route(ALL_OUTPUTS, "lspeaker", 1.0).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
+MACHINE_CONFIG_END
 
 
 

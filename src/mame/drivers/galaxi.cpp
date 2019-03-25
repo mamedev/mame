@@ -463,23 +463,23 @@ void galaxi_state::machine_reset()
                               Machine Drivers
 ***************************************************************************/
 
-void galaxi_state::galaxi(machine_config &config)
-{
+MACHINE_CONFIG_START(galaxi_state::galaxi)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &galaxi_state::galaxi_map);
-	m_maincpu->set_vblank_int("screen", FUNC(galaxi_state::irq4_line_hold));
+	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(galaxi_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxi_state,  irq4_line_hold)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(512, 256);
-	m_screen->set_visarea(16*5, 512-16*2-1, 16*1, 256-1);
-	m_screen->set_screen_update(FUNC(galaxi_state::screen_update));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(16*5, 512-16*2-1, 16*1, 256-1)
+	MCFG_SCREEN_UPDATE_DRIVER(galaxi_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxi);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x400);
@@ -487,29 +487,30 @@ void galaxi_state::galaxi(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", SND_CLOCK, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);  // ?
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, SND_CLOCK, okim6295_device::PIN7_LOW)  // ?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
-void galaxi_state::magjoker(machine_config &config)
-{
+MACHINE_CONFIG_START(galaxi_state::magjoker)
 	galaxi(config);
 
 	/* sound hardware */
+	MCFG_DEVICE_MODIFY("oki")
 
 	/* ADPCM samples are recorded with extremely low volume */
-	subdevice<okim6295_device>("oki")->reset_routes();
-	subdevice<okim6295_device>("oki")->add_route(ALL_OUTPUTS, "mono", 4.0);
-}
+	MCFG_SOUND_ROUTES_RESET()
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 4.0)
+MACHINE_CONFIG_END
 
 
-void galaxi_state::lastfour(machine_config &config)
-{
+MACHINE_CONFIG_START(galaxi_state::lastfour)
 	galaxi(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &galaxi_state::lastfour_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(lastfour_map)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -91,22 +91,21 @@ void st17xx_state::machine_start()
 
 /* Machine Driver */
 
-void st17xx_state::st17xx(machine_config &config)
-{
+MACHINE_CONFIG_START(st17xx_state::st17xx)
 	/* basic machine hardware */
-	arm7_cpu_device &maincpu(ARM7(config, "maincpu", 50000000)); /* speed unknown */
-	maincpu.set_addrmap(AS_PROGRAM, &st17xx_state::cpu_map);
+	MCFG_DEVICE_ADD("maincpu", ARM7, 50000000) /* speed unknown */
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update(FUNC(st17xx_state::screen_update));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_UPDATE_DRIVER(st17xx_state, screen_update)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	PALETTE(config, "palette").set_entries(64);
-}
+	MCFG_PALETTE_ADD("palette", 64)
+MACHINE_CONFIG_END
 
 /* ROMs */
 

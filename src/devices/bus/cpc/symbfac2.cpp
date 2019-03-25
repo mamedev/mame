@@ -161,12 +161,27 @@ WRITE8_MEMBER(cpc_symbiface2_device::ide_cs1_w)
 // #FD14 (read/write) read from or write into selected register
 READ8_MEMBER(cpc_symbiface2_device::rtc_r)
 {
-	return m_rtc->read(~offset & 0x01);
+	switch(offset & 0x01)
+	{
+	case 0x00:
+		return m_rtc->read(space,1);
+	case 0x01:
+		return m_rtc->read(space,0);
+	}
+	return 0;
 }
 
 WRITE8_MEMBER(cpc_symbiface2_device::rtc_w)
 {
-	m_rtc->write(~offset & 0x01, data);
+	switch(offset & 0x01)
+	{
+	case 0x00:
+		m_rtc->write(space,1,data);
+		break;
+	case 0x01:
+		m_rtc->write(space,0,data);
+		break;
+	}
 }
 
 // PS/2 Mouse connector

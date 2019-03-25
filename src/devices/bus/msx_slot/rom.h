@@ -7,6 +7,10 @@
 
 #include "slot.h"
 
+#define MCFG_MSX_SLOT_ROM_ADD(_tag, _startpage, _numpages, _region, _offset) \
+	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_ROM, _startpage, _numpages) \
+	downcast<msx_slot_rom_device &>(*device).set_rom_start(_region, _offset);
+
 class msx_slot_rom_device : public device_t,
 							public msx_internal_slot_interface
 {
@@ -16,7 +20,7 @@ public:
 	// configuration helpers
 	void set_rom_start(const char *region, uint32_t offset) { m_rom_region.set_tag(region); m_region_offset = offset; }
 
-	virtual uint8_t read(offs_t offset) override;
+	virtual DECLARE_READ8_MEMBER(read) override;
 
 protected:
 	msx_slot_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

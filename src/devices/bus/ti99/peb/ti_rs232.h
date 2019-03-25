@@ -32,10 +32,10 @@ class ti_rs232_pio_device : public device_t, public device_ti99_peribox_card_int
 public:
 	ti_rs232_pio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
-	void write(offs_t offset, uint8_t data) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	void cruwrite(offs_t offset, uint8_t data) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
 protected:
 	void device_start() override;
@@ -50,10 +50,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(int1_callback);
 	DECLARE_WRITE_LINE_MEMBER(rcv0_callback);
 	DECLARE_WRITE_LINE_MEMBER(rcv1_callback);
-	void xmit0_callback(uint8_t data);
-	void xmit1_callback(uint8_t data);
-	void ctrl0_callback(offs_t offset, uint8_t data);
-	void ctrl1_callback(offs_t offset, uint8_t data);
+	DECLARE_WRITE8_MEMBER(xmit0_callback);
+	DECLARE_WRITE8_MEMBER(xmit1_callback);
+	DECLARE_WRITE8_MEMBER(ctrl0_callback);
+	DECLARE_WRITE8_MEMBER(ctrl1_callback);
 
 	DECLARE_WRITE_LINE_MEMBER(selected_w);
 	DECLARE_WRITE_LINE_MEMBER(pio_direction_in_w);

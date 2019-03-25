@@ -29,9 +29,8 @@ private:
 static INPUT_PORTS_START( perq )
 INPUT_PORTS_END
 
-void perq_state::perq(machine_config &config)
-{
-}
+MACHINE_CONFIG_START(perq_state::perq)
+MACHINE_CONFIG_END
 
 ROM_START( perq )
 	ROM_REGION( 0x10000, "maincpu", 0 )

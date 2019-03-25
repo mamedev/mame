@@ -18,18 +18,18 @@ public:
 	auto drq_cb() { return m_drq_cb.bind(); }
 
 	// Direct Addressing Interface
-	uint8_t dir_r(offs_t offset);
-	void dir_w(offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER(dir_r);
+	DECLARE_WRITE8_MEMBER(dir_w);
 
 	// Indirect Addressing Interface
-	uint8_t indir_r(offs_t offset);
-	void indir_w(offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER(indir_r);
+	DECLARE_WRITE8_MEMBER(indir_w);
 
 	// Alternative Indirect Addressing Interface
-	uint8_t indir_addr_r();
-	void indir_addr_w(uint8_t data);
-	uint8_t indir_reg_r();
-	void indir_reg_w(uint8_t data);
+	DECLARE_READ8_MEMBER(indir_addr_r);
+	DECLARE_WRITE8_MEMBER(indir_addr_w);
+	DECLARE_READ8_MEMBER(indir_reg_r);
+	DECLARE_WRITE8_MEMBER(indir_reg_w);
 
 	// Master Reset (MR) Interface
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
@@ -48,14 +48,11 @@ protected:
 	virtual void scsi_ctrl_changed() override;
 
 private:
-	static const char *const state_names[];
-	static const char *const substate_names[];
 	static constexpr uint8_t NUM_REGS = 0x20;
 	static constexpr uint8_t REGS_MASK = NUM_REGS - 1;
 	uint8_t m_addr;
 	uint8_t m_regs[NUM_REGS];
 	uint8_t m_command_length;
-	uint8_t m_last_message;
 
 	void start_command();
 
@@ -65,6 +62,7 @@ private:
 	uint16_t m_scsi_state;
 	uint8_t m_mode;
 	uint8_t m_xfr_phase;
+	uint8_t m_step_count;
 
 	void load_transfer_count();
 	bool decrement_transfer_count();
@@ -119,15 +117,15 @@ public:
 	wd33c92_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class wd33c93_device : public wd33c9x_base_device
+class wd33c93n_device : public wd33c9x_base_device
 {
 public:
-	wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: wd33c93_device(mconfig, tag, owner, 0)
+	wd33c93n_device(const machine_config &mconfig, const char *tag, device_t *owner)
+		: wd33c93n_device(mconfig, tag, owner, 0)
 	{
 	}
 
-	wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd33c93n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class wd33c93a_device : public wd33c9x_base_device
@@ -153,8 +151,8 @@ public:
 };
 
 
-DECLARE_DEVICE_TYPE(WD33C92,  wd33c92_device)
-DECLARE_DEVICE_TYPE(WD33C93,  wd33c93_device)
+DECLARE_DEVICE_TYPE(WD33C92, wd33c92_device)
+DECLARE_DEVICE_TYPE(WD33C93N, wd33c93n_device)
 DECLARE_DEVICE_TYPE(WD33C93A, wd33c93a_device)
 DECLARE_DEVICE_TYPE(WD33C93B, wd33c93b_device)
 

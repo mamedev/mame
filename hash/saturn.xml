@@ -26,9 +26,6 @@
 	             Euro / PAL collection, although it's from 2009, so some images may exist in better forms.  These can
 	             be replaced over time.
 
-	 15 Mar 19 - Started testing stuff inline to the actual XML parsing,
-	             marking stuff as supported where possible via exploiting "Identifying" dummy comments.
-	             Eventually this list below will be cut off since is worthless and outdated.
 
 	*********************************************************************************************************
 	*********************************************************************************************************
@@ -2522,8 +2519,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- -->
-	<software name="aishogi" supported="yes">
+	<!-- Identifying AI Shougi (Japan)... -->
+	<software name="aishogi" supported="no">
 		<description>AI Shougi (Jpn)</description>
 		<year>1995</year>
 		<publisher>Soft Bank</publisher>
@@ -2682,7 +2679,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Black screen in Roosters after game over, other games untested -->
+	<!-- Identifying Arcade Gears Vol.3 - Wonder 3 (Japan)... -->
 	<software name="wonder3" supported="no">
 		<description>Arcade Gears Vol. 3 - Wonder 3 (Jpn)</description>
 		<year>1998</year>
@@ -3068,8 +3065,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Works including mouse support -->
-	<software name="catrip" supported="yes">
+	<!-- Identifying Cat the Ripper - 13Ninme no Tanteishi (Japan)... -->
+	<software name="catrip" supported="no">
 		<description>Cat the Ripper - 13-ninme no Tanteishi (Jpn)</description>
 		<year>1997</year>
 		<publisher>Tonkin House</publisher>
@@ -3554,8 +3551,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Works including loading from Save Game Manager CDs -->
-	<software name="dezaemn2" supported="yes">
+	<!-- Identifying Dezaemon 2 (Japan)... -->
+	<software name="dezaemn2" supported="no">
 		<description>Dezaemon 2 (Jpn)</description>
 		<year>1997</year>
 		<publisher>Athena</publisher>
@@ -4060,7 +4057,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Dragon Slayer crashes in DRC after being selected, with NODRC sound eventually dies during gameplay. -->
+	<!-- Identifying Falcom Classics (Japan)... -->
 	<software name="falcom1" supported="no">
 		<description>Falcom Classics (Jpn)</description>
 		<year>1997</year>
@@ -7323,7 +7320,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Phantasy Star 2 (at least) has not working BGMs (repeats a very short chunk over and over) -->
+	<!-- Identifying Sega Ages - Phantasy Star Collection (Japan)... -->
 	<software name="pstarcol" supported="no">
 		<description>Sega Ages - Phantasy Star Collection (Jpn)</description>
 		<year>1998</year>
@@ -17697,7 +17694,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Crashes at KSS logo with DRC -->
+	<!-- Identifying Goiken Muyou - Anarchy in the Nippon (T-28902G)... -->
 	<software name="anarchy" supported="no">
 		<description>Goiken Muyou - Anarchy in the Nippon (Jpn)</description>
 		<year>1997</year>
@@ -29839,7 +29836,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Hangs during some scenes -->
+	<!-- Identifying timegal... -->
 	<software name="timegal" supported="no">
 		<description>Time Gal (Time Gal &amp; Ninja Hayate Disc 1) (Jpn)</description>
 		<year>1997</year>
@@ -29855,7 +29852,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Hangs during some scenes -->
+	<!-- Identifying hayate... -->
 	<software name="nhayate" supported="no">
 		<description>Ninja Hayate (Time Gal &amp; Ninja Hayate Disc 2) (Jpn)</description>
 		<year>1997</year>

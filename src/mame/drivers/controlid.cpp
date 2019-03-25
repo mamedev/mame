@@ -144,8 +144,7 @@ void controlidx628_state::controlidx628_palette(palette_device &palette) const
 *     Machine Driver     *
 *************************/
 
-void controlidx628_state::controlidx628(machine_config &config)
-{
+MACHINE_CONFIG_START(controlidx628_state::controlidx628)
 	// basic machine hardware
 	at89s52_device &maincpu(AT89S52(config, "maincpu", XTAL(11'059'200)));
 	maincpu.set_addrmap(AS_IO, &controlidx628_state::io_map);
@@ -157,18 +156,18 @@ void controlidx628_state::controlidx628(machine_config &config)
 	maincpu.port_out_cb<3>().set(FUNC(controlidx628_state::p3_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(132, 65);
-	screen.set_visarea(3, 130, 0, 63);
-	screen.set_screen_update("nt7534", FUNC(nt7534_device::screen_update));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
+	MCFG_SCREEN_SIZE(132, 65)
+	MCFG_SCREEN_VISIBLE_AREA(3, 130, 0, 63)
+	MCFG_SCREEN_UPDATE_DEVICE("nt7534", nt7534_device, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", FUNC(controlidx628_state::controlidx628_palette), 2);
 
 	NT7534(config, m_lcdc);
-}
+MACHINE_CONFIG_END
 
 
 /*************************

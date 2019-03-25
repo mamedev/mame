@@ -43,8 +43,8 @@ public:
 	auto ch3_callback() { return m_ch3_cb.bind(); }
 	auto ch4_callback() { return m_ch4_cb.bind(); }
 
-	u8 read();
-	virtual void write(u8 data);
+	DECLARE_READ8_MEMBER(read);
+	virtual DECLARE_WRITE8_MEMBER(write);
 
 protected:
 	adc0844_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -78,7 +78,7 @@ public:
 	auto ch7_callback() { return m_ch7_cb.bind(); }
 	auto ch8_callback() { return m_ch8_cb.bind(); }
 
-	virtual void write(u8 data) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 protected:
 	// device-level overrides

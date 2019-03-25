@@ -38,6 +38,7 @@ public:
 
 	// read/write handlers
 	u8 read(offs_t offset);
+	u8 read_byte(offs_t offset); // hack
 	void write(offs_t offset, u8 data);
 
 	// control lines

@@ -136,9 +136,7 @@ void h83003_device::map(address_map &map)
 	map(0xffffd2, 0xffffd2).rw("port9", FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xffffd3, 0xffffd3).rw("porta", FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xffffd4, 0xffffd4).w("portb", FUNC(h8_port_device::ddr_w));
-	map(0xffffd5, 0xffffd5).w("portc", FUNC(h8_port_device::ddr_w));
 	map(0xffffd6, 0xffffd6).rw("portb", FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(0xffffd7, 0xffffd7).rw("portc", FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xffffda, 0xffffda).rw("port4", FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
 
 	map(0xffffe0, 0xffffe7).r("adc", FUNC(h8_adc_device::addr8_r));
@@ -169,7 +167,6 @@ void h83003_device::device_add_mconfig(machine_config &config)
 	H8_PORT(config, "port9", h8_device::PORT_9, 0x00, 0xc0);
 	H8_PORT(config, "porta", h8_device::PORT_A, 0x00, 0x00);
 	H8_PORT(config, "portb", h8_device::PORT_B, 0x00, 0x00);
-	H8_PORT(config, "portc", h8_device::PORT_C, 0x00, 0x00);
 	H8_TIMER16(config, "timer16", 5, 0xe0);
 	H8H_TIMER16_CHANNEL(config, "timer16:0", 2, 2, "intc", 24);
 	H8H_TIMER16_CHANNEL(config, "timer16:1", 2, 2, "intc", 28);

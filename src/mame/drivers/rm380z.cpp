@@ -234,30 +234,29 @@ uint32_t rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-void rm380z_state::rm380z(machine_config &config)
-{
+MACHINE_CONFIG_START(rm380z_state::rm380z)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &rm380z_state::rm380z_mem);
-	m_maincpu->set_addrmap(AS_IO, &rm380z_state::rm380z_io);
+	MCFG_DEVICE_ADD(RM380Z_MAINCPU_TAG, Z80, 16_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(rm380z_mem)
+	MCFG_DEVICE_IO_MAP(rm380z_io)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	// according to videos and pictures of the real hardware, chars are spaced of at least 1 pixel
 	// and there is at least 1 pixel between each row of characters
-	screen.set_size((RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1)), (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1)));
-	screen.set_visarea(0, (RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))-1, 0, (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1))-1);
-	screen.set_screen_update(FUNC(rm380z_state::screen_update_rm380z));
-	screen.set_palette("palette");
+	MCFG_SCREEN_SIZE((RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1)), (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1)))
+	MCFG_SCREEN_VISIBLE_AREA(0, (RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))-1, 0, (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1))-1)
+	MCFG_SCREEN_UPDATE_DRIVER(rm380z_state, screen_update_rm380z)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* cassette */
-	CASSETTE(config, m_cassette);
-//  m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
-	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED);
+	MCFG_CASSETTE_ADD( "cassette" )
+//  MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED)
 	//m_cassette->change_state((BIT(data,x)) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* RAM configurations */
@@ -266,37 +265,36 @@ void rm380z_state::rm380z(machine_config &config)
 	/* floppy disk */
 	FD1771(config, m_fdc, 1_MHz_XTAL);
 
-	FLOPPY_CONNECTOR(config, "wd1771:0", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "wd1771:1", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats);
+	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
 
 	/* keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(rm380z_state::keyboard_put));
-}
+MACHINE_CONFIG_END
 
-void rm380z_state::rm480z(machine_config &config)
-{
+MACHINE_CONFIG_START(rm380z_state::rm480z)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &rm380z_state::rm480z_mem);
-	m_maincpu->set_addrmap(AS_IO, &rm380z_state::rm480z_io);
+	MCFG_DEVICE_ADD(RM380Z_MAINCPU_TAG, Z80, 16_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(rm480z_mem)
+	MCFG_DEVICE_IO_MAP(rm480z_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(rm380z_state, rm480z)
 	/* video hardware */
-//  screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_refresh_hz(50);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-//  screen.set_size((RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1)), (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1)));
-//  screen.set_visarea(0, (RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))-1, 0, (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1))-1);
-//  screen.set_screen_update(FUNC(rm380z_state::screen_update_rm480z));
-//  screen.set_palette("palette");
+//  MCFG_SCREEN_ADD("screen", RASTER)
+//  MCFG_SCREEN_REFRESH_RATE(50)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//  MCFG_SCREEN_SIZE((RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1)), (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1)))
+//  MCFG_SCREEN_VISIBLE_AREA(0, (RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))-1, 0, (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1))-1)
+//  MCFG_SCREEN_UPDATE_DRIVER(rm380z_state, screen_update_rm480z)
+//  MCFG_SCREEN_PALETTE("palette")
 
-//  PALETTE(config, "palette", palette_device::MONOCHROME);
+//  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* keyboard */
 //  generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 //  keyboard.set_keyboard_callback(FUNC(rm380z_state::keyboard_put));
-}
+MACHINE_CONFIG_END
 
 
 /* ROM definitions */

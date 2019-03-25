@@ -895,14 +895,14 @@ WRITE_LINE_MEMBER(trackfld_state::vblank_nmi)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-void trackfld_state::trackfld(machine_config &config)
-{
-	/* basic machine hardware */
-	KONAMI1(config, m_maincpu, MASTER_CLOCK/6/2);   /* a guess for now */
-	m_maincpu->set_addrmap(AS_PROGRAM, &trackfld_state::main_map);
+MACHINE_CONFIG_START(trackfld_state::trackfld)
 
-	Z80(config, m_audiocpu, SOUND_CLOCK/4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &trackfld_state::sound_map);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD(m_maincpu, KONAMI1, MASTER_CLOCK/6/2)    /* a guess for now */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+
+	MCFG_DEVICE_ADD(m_audiocpu, Z80, SOUND_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
@@ -922,14 +922,14 @@ void trackfld_state::trackfld(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(trackfld_state::screen_update_trackfld));
-	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(trackfld_state::vblank_irq));
+	MCFG_SCREEN_ADD(m_screen, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(trackfld_state, screen_update_trackfld)
+	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, trackfld_state, vblank_irq))
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_trackfld);
 	PALETTE(config, m_palette, FUNC(trackfld_state::trackfld_palette), 16*16+16*16, 32);
@@ -940,27 +940,26 @@ void trackfld_state::trackfld(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	TRACKFLD_AUDIO(config, m_soundbrd, 0, m_audiocpu, m_vlm);
+	MCFG_DEVICE_ADD(m_soundbrd, TRACKFLD_AUDIO, 0, m_audiocpu, m_vlm)
 
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	MCFG_DEVICE_ADD(m_dac, DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	SN76496(config, m_sn, SOUND_CLOCK/8);
-	m_sn->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	MCFG_DEVICE_ADD(m_sn, SN76496, SOUND_CLOCK/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	VLM5030(config, m_vlm, VLM_CLOCK);
-	m_vlm->set_addrmap(0, &trackfld_state::vlm_map);
-	m_vlm->add_route(ALL_OUTPUTS, "speaker", 1.0);
-}
+	MCFG_DEVICE_ADD(m_vlm, VLM5030, VLM_CLOCK)
+	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+MACHINE_CONFIG_END
 
-void trackfld_state::trackfldu(machine_config &config)
-{
+MACHINE_CONFIG_START(trackfld_state::trackfldu)
 	trackfld(config);
-	MC6809E(config.replace(), m_maincpu, MASTER_CLOCK/6/2); /* exact M6809 model unknown */
-	m_maincpu->set_addrmap(AS_PROGRAM, &trackfld_state::main_map);
-}
+	MCFG_DEVICE_REPLACE("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* exact M6809 model unknown */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+
+MACHINE_CONFIG_END
 
 INTERRUPT_GEN_MEMBER(trackfld_state::yieartf_timer_irq)
 {
@@ -968,16 +967,16 @@ INTERRUPT_GEN_MEMBER(trackfld_state::yieartf_timer_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-void trackfld_state::yieartf(machine_config &config)
-{
+MACHINE_CONFIG_START(trackfld_state::yieartf)
+
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, MASTER_CLOCK/6/2);   /* a guess for now */
-	m_maincpu->set_addrmap(AS_PROGRAM, &trackfld_state::yieartf_map);
-	m_maincpu->set_periodic_int(FUNC(trackfld_state::yieartf_timer_irq), attotime::from_hz(480));
+	MCFG_DEVICE_ADD(m_maincpu, MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
+	MCFG_DEVICE_PROGRAM_MAP(yieartf_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(trackfld_state, yieartf_timer_irq, 480)
 
 //  z80 isn't used
-//  Z80(config, m_audiocpu, SOUND_CLOCK/4);
-//  m_audiocpu->set_addrmap(AS_PROGRAM, &trackfld_state::sound_map);
+//  MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/4)
+//  MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
@@ -997,14 +996,14 @@ void trackfld_state::yieartf(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(trackfld_state::screen_update_trackfld));
-	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(trackfld_state::vblank_irq));
+	MCFG_SCREEN_ADD(m_screen, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(trackfld_state, screen_update_trackfld)
+	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, trackfld_state, vblank_irq))
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_trackfld);
 	PALETTE(config, m_palette, FUNC(trackfld_state::trackfld_palette), 16*16+16*16, 32);
@@ -1015,20 +1014,19 @@ void trackfld_state::yieartf(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	TRACKFLD_AUDIO(config, m_soundbrd, 0, finder_base::DUMMY_TAG, m_vlm);
+	MCFG_DEVICE_ADD(m_soundbrd, TRACKFLD_AUDIO, 0, finder_base::DUMMY_TAG, m_vlm)
 
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	MCFG_DEVICE_ADD(m_dac, DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	SN76496(config, m_sn, MASTER_CLOCK/6/2);
-	m_sn->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	MCFG_DEVICE_ADD(m_sn, SN76496, MASTER_CLOCK/6/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	VLM5030(config, m_vlm, VLM_CLOCK);
-	m_vlm->set_addrmap(0, &trackfld_state::vlm_map);
-	m_vlm->add_route(ALL_OUTPUTS, "speaker", 1.0);
-}
+	MCFG_DEVICE_ADD(m_vlm, VLM5030, VLM_CLOCK)
+	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+MACHINE_CONFIG_END
 
 void trackfld_state::hyprolyb_adpcm_map(address_map &map)
 {
@@ -1055,8 +1053,7 @@ void trackfld_state::hyprolyb_adpcm_map(address_map &map)
 
 /* same as the original, but uses ADPCM instead of VLM5030 */
 /* also different memory handlers do handle that */
-void trackfld_state::hyprolyb(machine_config &config)
-{
+MACHINE_CONFIG_START(trackfld_state::hyprolyb)
 	trackfld(config);
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::hyprolyb_sound_map, tag(), this));
@@ -1065,61 +1062,59 @@ void trackfld_state::hyprolyb(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 
 	/* sound hardware */
-	config.device_remove("vlm");
-	M6802(config, "adpcm", XTAL(14'318'181)/8).set_addrmap(AS_PROGRAM, &trackfld_state::hyprolyb_adpcm_map); /* unknown clock */
+	MCFG_DEVICE_REMOVE("vlm")
+	MCFG_DEVICE_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
+	MCFG_DEVICE_PROGRAM_MAP(hyprolyb_adpcm_map)
 
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	HYPROLYB_ADPCM(config, "hyprolyb_adpcm", 0);
+	MCFG_DEVICE_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
 
-	msm5205_device &msm(MSM5205(config, "msm", 384000));
-	msm.vck_legacy_callback().set("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::vck_callback));
-	msm.set_prescaler_selector(msm5205_device::S96_4B); /* 4 kHz */
-	msm.add_route(ALL_OUTPUTS, "speaker", 0.5);
-}
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE("hyprolyb_adpcm", hyprolyb_adpcm_device, vck_callback)) /* VCK function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4 kHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+MACHINE_CONFIG_END
 
-void trackfld_state::atlantol(machine_config &config)
-{
+MACHINE_CONFIG_START(trackfld_state::atlantol)
 	hyprolyb(config);
 
 	MCFG_VIDEO_START_OVERRIDE(trackfld_state,atlantol)
-}
+MACHINE_CONFIG_END
 
-void trackfld_state::mastkin(machine_config &config)
-{
+
+MACHINE_CONFIG_START(trackfld_state::mastkin)
 	trackfld(config);
 
 	/* basic machine hardware */
-	MC6809E(config.replace(), m_maincpu, MASTER_CLOCK/6/2); /* a guess for now */
-	m_maincpu->set_addrmap(AS_PROGRAM, &trackfld_state::mastkin_map);
+	MCFG_DEVICE_REPLACE(m_maincpu, MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
+	MCFG_DEVICE_PROGRAM_MAP(mastkin_map)
 
 	m_mainlatch->q_out_cb<3>().set_nop(); // actually not used
 	m_mainlatch->q_out_cb<4>().set_nop(); // actually not used
-}
+MACHINE_CONFIG_END
 
-void trackfld_state::wizzquiz(machine_config &config)
-{
+MACHINE_CONFIG_START(trackfld_state::wizzquiz)
 	trackfld(config);
 
 	/* basic machine hardware */
 	// right cpu?
-	M6800(config.replace(), m_maincpu, 2048000);    /* 1.400 MHz ??? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &trackfld_state::wizzquiz_map);
+	MCFG_DEVICE_REPLACE(m_maincpu, M6800, 2048000)       /* 1.400 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(wizzquiz_map)
 
 	m_screen->set_screen_vblank(DEVCB_WRITELINE(*this, trackfld_state, vblank_nmi));
 
 	m_mainlatch->q_out_cb<7>().set(FUNC(trackfld_state::nmi_mask_w));
-}
+MACHINE_CONFIG_END
 
-void trackfld_state::reaktor(machine_config &config)
-{
+MACHINE_CONFIG_START(trackfld_state::reaktor)
 	trackfld(config);
 
 	/* basic machine hardware */
-	Z80(config.replace(), m_maincpu, MASTER_CLOCK/6);
-	m_maincpu->set_addrmap(AS_PROGRAM, &trackfld_state::reaktor_map);
-	m_maincpu->set_addrmap(AS_IO, &trackfld_state::reaktor_io_map);
-}
+	MCFG_DEVICE_REPLACE(m_maincpu, Z80, MASTER_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(reaktor_map)
+	MCFG_DEVICE_IO_MAP(reaktor_io_map)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

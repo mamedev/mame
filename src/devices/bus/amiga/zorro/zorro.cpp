@@ -30,7 +30,7 @@ zorro_slot_device::zorro_slot_device(const machine_config &mconfig, const char *
 zorro_slot_device::zorro_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
-	m_zorro_bus(*this, finder_base::DUMMY_TAG)
+	m_zorro_tag(nullptr)
 {
 }
 
@@ -43,7 +43,10 @@ void zorro_slot_device::device_start()
 	device_zorro_card_interface *dev = dynamic_cast<device_zorro_card_interface *>(get_card_device());
 
 	if (dev)
+	{
+		zorro_device *m_zorro_bus = downcast<zorro_device *>(m_owner->subdevice(m_zorro_tag));
 		m_zorro_bus->add_card(dev);
+	}
 }
 
 
@@ -57,25 +60,12 @@ void zorro_slot_device::device_start()
 
 zorro_device::zorro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_space(*this, finder_base::DUMMY_TAG, -1),
+	m_space(nullptr),
+	m_cputag(nullptr),
 	m_ovr_handler(*this),
 	m_int2_handler(*this),
 	m_int6_handler(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void zorro_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_ovr_handler.resolve_safe();
-	m_int2_handler.resolve_safe();
-	m_int6_handler.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -84,6 +74,14 @@ void zorro_device::device_resolve_objects()
 
 void zorro_device::device_start()
 {
+	// get address space
+	device_t *cpu = machine().device(m_cputag);
+	m_space = &cpu->memory().space(AS_PROGRAM);
+
+	// resolve callbacks
+	m_ovr_handler.resolve_safe();
+	m_int2_handler.resolve_safe();
+	m_int6_handler.resolve_safe();
 }
 
 // from slot device
@@ -117,18 +115,16 @@ exp_slot_device::exp_slot_device(const machine_config &mconfig, device_type type
 }
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
+//  device_start - device-specific startup
 //-------------------------------------------------
 
-void exp_slot_device::device_resolve_objects()
+void exp_slot_device::device_start()
 {
 	// resolve callbacks
 	m_ipl_handler.resolve_safe();
 
-	// call base device
-	zorro_device::device_resolve_objects();
+	// call base device start
+	zorro_device::device_start();
 }
 
 //-------------------------------------------------
@@ -194,12 +190,10 @@ zorro2_device::~zorro2_device()
 }
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
+//  device_start - device-specific startup
 //-------------------------------------------------
 
-void zorro2_device::device_resolve_objects()
+void zorro2_device::device_start()
 {
 	// resolve callbacks
 	m_eint1_handler.resolve_safe();
@@ -207,8 +201,8 @@ void zorro2_device::device_resolve_objects()
 	m_eint5_handler.resolve_safe();
 	m_eint7_handler.resolve_safe();
 
-	// call base device
-	zorro_device::device_resolve_objects();
+	// call base device start
+	zorro_device::device_start();
 }
 
 //-------------------------------------------------

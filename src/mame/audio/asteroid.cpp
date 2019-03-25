@@ -315,11 +315,11 @@ WRITE8_MEMBER(asteroid_state::asteroid_noise_reset_w)
 }
 
 
-void asteroid_state::asteroid_sound(machine_config &config)
-{
+MACHINE_CONFIG_START(asteroid_state::asteroid_sound)
 	SPEAKER(config, "mono").front_center();
 
-	DISCRETE(config, m_discrete, asteroid_discrete).add_route(ALL_OUTPUTS, "mono", 1.4);
+	MCFG_DEVICE_ADD("discrete", DISCRETE, asteroid_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.4)
 
 	ls259_device &audiolatch(LS259(config, "audiolatch")); // M10
 	audiolatch.q_out_cb<0>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_SAUCER_SND_EN>));
@@ -328,15 +328,15 @@ void asteroid_state::asteroid_sound(machine_config &config)
 	audiolatch.q_out_cb<3>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_THRUST_EN>));
 	audiolatch.q_out_cb<4>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_SHIP_FIRE_EN>));
 	audiolatch.q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_LIFE_EN>));
-}
+MACHINE_CONFIG_END
 
 
-void asteroid_state::astdelux_sound(machine_config &config)
-{
+MACHINE_CONFIG_START(asteroid_state::astdelux_sound)
 	SPEAKER(config, "mono").front_center();
 
-	DISCRETE(config, m_discrete, astdelux_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("discrete", DISCRETE, astdelux_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	ls259_device &audiolatch(LS259(config, "audiolatch")); // M10
 	audiolatch.q_out_cb<3>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_THRUST_EN>));
-}
+MACHINE_CONFIG_END

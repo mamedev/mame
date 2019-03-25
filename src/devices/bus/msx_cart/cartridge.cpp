@@ -26,8 +26,6 @@
 #include "super_swangi.h"
 #include "yamaha.h"
 
-#include "bus/msx_slot/cartridge.h"
-
 
 void msx_cart(device_slot_interface &device)
 {
@@ -74,7 +72,7 @@ void msx_cart(device_slot_interface &device)
 
 msx_cart_interface::msx_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
-	, m_exp(nullptr)
+	, m_out_irq_cb(*this)
 {
 }
 
@@ -100,21 +98,6 @@ void msx_cart_interface::sram_alloc(uint32_t size)
 {
 	m_sram.resize(size);
 	std::fill_n(m_sram.begin(), size, 0x00);
-}
-
-WRITE_LINE_MEMBER(msx_cart_interface::irq_out)
-{
-	m_exp->irq_out(state);
-}
-
-address_space &msx_cart_interface::memory_space() const
-{
-	return m_exp->memory_space();
-}
-
-address_space &msx_cart_interface::io_space() const
-{
-	return m_exp->io_space();
 }
 
 

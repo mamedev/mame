@@ -26,6 +26,29 @@ DECLARE_DEVICE_TYPE(GBA_LCD, gba_lcd_device)
 
 
 //**************************************************************************
+//  DEVICE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_GBA_LCD_ADD(_tag) \
+		MCFG_DEVICE_ADD(_tag, GBA_LCD, 0)
+
+#define MCFG_GBA_LCD_INT_HBLANK(_devcb) \
+	downcast<gba_lcd_device &>(*device).set_int_hblank_callback(DEVCB_##_devcb);
+
+#define MCFG_GBA_LCD_INT_VBLANK(_devcb) \
+	downcast<gba_lcd_device &>(*device).set_int_vblank_callback(DEVCB_##_devcb);
+
+#define MCFG_GBA_LCD_INT_VCOUNT(_devcb) \
+	downcast<gba_lcd_device &>(*device).set_int_vcount_callback(DEVCB_##_devcb);
+
+#define MCFG_GBA_LCD_DMA_HBLANK(_devcb) \
+	downcast<gba_lcd_device &>(*device).set_dma_hblank_callback(DEVCB_##_devcb);
+
+#define MCFG_GBA_LCD_DMA_VBLANK(_devcb) \
+	downcast<gba_lcd_device &>(*device).set_dma_vblank_callback(DEVCB_##_devcb);
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -76,11 +99,11 @@ public:
 	TIMER_CALLBACK_MEMBER(perform_hbl);
 	TIMER_CALLBACK_MEMBER(perform_scan);
 
-	auto int_hblank_callback() { return m_int_hblank_cb.bind(); }
-	auto int_vblank_callback() { return m_int_vblank_cb.bind(); }
-	auto int_vcount_callback() { return m_int_vcount_cb.bind(); }
-	auto dma_hblank_callback() { return m_dma_hblank_cb.bind(); }
-	auto dma_vblank_callback() { return m_dma_vblank_cb.bind(); }
+	template <class Object> devcb_base &set_int_hblank_callback(Object &&cb) { return m_int_hblank_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_int_vblank_callback(Object &&cb) { return m_int_vblank_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_int_vcount_callback(Object &&cb) { return m_int_vcount_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_hblank_callback(Object &&cb) { return m_dma_hblank_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_vblank_callback(Object &&cb) { return m_dma_vblank_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides

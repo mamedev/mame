@@ -1428,8 +1428,7 @@
 #undef OP_WDM
 #define OP_WDM()                                                            \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			SRC = OPER_8_IMM();                                             \
-			m_wdm_w(SRC);
+			REGISTER_PC++
 
 /* G65816  Exchange accum high and low bytes */
 #undef OP_XBA

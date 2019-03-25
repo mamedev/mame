@@ -99,8 +99,7 @@ ioport_constructor pcd_video_device::device_input_ports() const
 	return INPUT_PORTS_NAME(pcd_mouse);
 }
 
-void pcd_video_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(pcd_video_device::device_add_mconfig)
 	i8741_device &mcu(I8741(config, "graphics", 16_MHz_XTAL / 2));
 	mcu.p1_in_cb().set(FUNC(pcd_video_device::p1_r));
 	mcu.p2_out_cb().set(FUNC(pcd_video_device::p2_w));
@@ -118,8 +117,8 @@ void pcd_video_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_display_callback(FUNC(pcd_video_device::display_pixels));
 	m_crtc->set_screen("screen");
 
-	TIMER(config, "mouse_timer").configure_periodic(FUNC(pcd_video_device::mouse_timer), attotime::from_hz(15000)); // guess
-}
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", pcd_video_device, mouse_timer, attotime::from_hz(15000)) // guess
+MACHINE_CONFIG_END
 
 void pcx_video_device::pcx_vid_map(address_map &map)
 {
@@ -192,7 +191,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcd_video_device::display_pixels)
 		int bgnd = 0, fgnd = 1;
 		data = m_charram[m_vram[address] * 16 + linecount];
 		attr = m_vram[address + 1];
-		if(cursor)
+		if(cursor && blink)
 			data = 0xff;
 		if(ul && (attr & 0x20))
 			data = 0xff;
@@ -220,16 +219,16 @@ SCN2672_DRAW_CHARACTER_MEMBER(pcx_video_device::display_pixels)
 {
 	uint16_t data = m_charrom[charcode * 16 + linecount + (attrcode & 0x20 ? 4096 : 0)];
 
-	if (cursor)
-		data = 0x7ff;
+	if (cursor && blink)
+		data = 0x3ff;
 	else
 	{
 		data <<= 1;
 		data |= data << 1;
 	}
 
-	if (BIT(m_p1, 5))
-		data ^= 0x7ff;
+	if (m_p1 & 0x20)
+		data ^= 0x3ff;
 
 	for (int i = 0; i < 12; i++)
 	{

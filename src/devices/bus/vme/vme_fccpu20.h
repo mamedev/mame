@@ -54,8 +54,6 @@ protected:
 
 	emu_timer *m_arbiter_start; // Need a startup delay because it is hooked up to the sense inputs of the PIT
 
-	required_device<cpu_device> m_maincpu;
-
 private:
 	DECLARE_WRITE_LINE_MEMBER(bim_irq_callback);
 
@@ -70,6 +68,7 @@ private:
 
 	void cpu20_mem(address_map &map);
 
+	required_device<cpu_device> m_maincpu;
 	required_device<pit68230_device> m_pit;
 	required_device<bim68153_device> m_bim;
 	required_device<mpcc68561_device> m_mpcc;

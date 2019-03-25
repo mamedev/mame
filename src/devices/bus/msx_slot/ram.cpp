@@ -8,7 +8,7 @@ DEFINE_DEVICE_TYPE(MSX_SLOT_RAM, msx_slot_ram_device, "msx_slot_ram", "MSX Inter
 
 msx_slot_ram_device::msx_slot_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_SLOT_RAM, tag, owner, clock)
-	, msx_internal_slot_interface(mconfig, *this)
+	, msx_internal_slot_interface()
 {
 }
 
@@ -18,7 +18,7 @@ void msx_slot_ram_device::device_start()
 	save_item(NAME(m_ram));
 }
 
-uint8_t msx_slot_ram_device::read(offs_t offset)
+READ8_MEMBER(msx_slot_ram_device::read)
 {
 	if ( offset >= m_start_address && offset < m_end_address )
 	{
@@ -27,7 +27,7 @@ uint8_t msx_slot_ram_device::read(offs_t offset)
 	return 0xFF;
 }
 
-void msx_slot_ram_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(msx_slot_ram_device::write)
 {
 	if ( offset >= m_start_address && offset < m_end_address )
 	{

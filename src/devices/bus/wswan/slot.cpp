@@ -312,10 +312,10 @@ std::string ws_cart_slot_device::get_default_card_software(get_default_card_soft
  read_rom20
  -------------------------------------------------*/
 
-uint8_t ws_cart_slot_device::read_rom20(offs_t offset)
+READ8_MEMBER(ws_cart_slot_device::read_rom20)
 {
 	if (m_cart)
-		return m_cart->read_rom20(offset);
+		return m_cart->read_rom20(space, offset);
 	else
 		return 0xff;
 }
@@ -324,10 +324,10 @@ uint8_t ws_cart_slot_device::read_rom20(offs_t offset)
  read_rom30
  -------------------------------------------------*/
 
-uint8_t ws_cart_slot_device::read_rom30(offs_t offset)
+READ8_MEMBER(ws_cart_slot_device::read_rom30)
 {
 	if (m_cart)
-		return m_cart->read_rom30(offset);
+		return m_cart->read_rom30(space, offset);
 	else
 		return 0xff;
 }
@@ -336,10 +336,10 @@ uint8_t ws_cart_slot_device::read_rom30(offs_t offset)
  read_rom40
  -------------------------------------------------*/
 
-uint8_t ws_cart_slot_device::read_rom40(offs_t offset)
+READ8_MEMBER(ws_cart_slot_device::read_rom40)
 {
 	if (m_cart)
-		return m_cart->read_rom40(offset);
+		return m_cart->read_rom40(space, offset);
 	else
 		return 0xff;
 }
@@ -348,10 +348,10 @@ uint8_t ws_cart_slot_device::read_rom40(offs_t offset)
  read_ram
  -------------------------------------------------*/
 
-uint8_t ws_cart_slot_device::read_ram(offs_t offset)
+READ8_MEMBER(ws_cart_slot_device::read_ram)
 {
 	if (m_cart)
-		return m_cart->read_ram(offset);
+		return m_cart->read_ram(space, offset);
 	else
 		return 0xff;
 }
@@ -360,20 +360,20 @@ uint8_t ws_cart_slot_device::read_ram(offs_t offset)
  write_ram
  -------------------------------------------------*/
 
-void ws_cart_slot_device::write_ram(offs_t offset, uint8_t data)
+WRITE8_MEMBER(ws_cart_slot_device::write_ram)
 {
 	if (m_cart)
-		m_cart->write_ram(offset, data);
+		m_cart->write_ram(space, offset, data);
 }
 
 /*-------------------------------------------------
  read_io
  -------------------------------------------------*/
 
-uint8_t ws_cart_slot_device::read_io(offs_t offset)
+READ8_MEMBER(ws_cart_slot_device::read_io)
 {
 	if (m_cart)
-		return m_cart->read_io(offset);
+		return m_cart->read_io(space, offset);
 	else
 		return 0xff;
 }
@@ -382,10 +382,10 @@ uint8_t ws_cart_slot_device::read_io(offs_t offset)
  write_io
  -------------------------------------------------*/
 
-void ws_cart_slot_device::write_io(offs_t offset, uint8_t data)
+WRITE8_MEMBER(ws_cart_slot_device::write_io)
 {
 	if (m_cart)
-		m_cart->write_io(offset, data);
+		m_cart->write_io(space, offset, data);
 }
 
 

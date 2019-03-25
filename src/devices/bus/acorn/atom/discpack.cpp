@@ -84,7 +84,7 @@ void atom_discpack_device::device_start()
 	address_space &space = m_bus->memspace();
 
 	space.install_device(0x0a00, 0x0a03, *m_fdc, &i8271_device::map);
-	space.install_readwrite_handler(0x0a04, 0x0a04, 0, 0x1f8, 0, read8smo_delegate(FUNC(i8271_device::data_r), m_fdc.target()), write8smo_delegate(FUNC(i8271_device::data_w), m_fdc.target()));
+	space.install_readwrite_handler(0x0a04, 0x0a04, 0, 0x1f8, 0, read8_delegate(FUNC(i8271_device::data_r), m_fdc.target()), write8_delegate(FUNC(i8271_device::data_w), m_fdc.target()));
 	space.install_ram(0x2000, 0x23ff);
 	space.install_ram(0x2400, 0x27ff);
 	space.install_ram(0x3c00, 0x3fff);

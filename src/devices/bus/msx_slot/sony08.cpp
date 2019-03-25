@@ -15,7 +15,7 @@ DEFINE_DEVICE_TYPE(MSX_SLOT_SONY08, msx_slot_sony08_device, "msx_slot_sony08", "
 
 msx_slot_sony08_device::msx_slot_sony08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_SLOT_SONY08, tag, owner, clock)
-	, msx_internal_slot_interface(mconfig, *this)
+	, msx_internal_slot_interface()
 	, m_nvram(*this, "nvram")
 	, m_rom_region(*this, finder_base::DUMMY_TAG)
 	, m_region_offset(0)
@@ -50,12 +50,8 @@ void msx_slot_sony08_device::device_start()
 
 	save_item(NAME(m_selected_bank));
 
-	restore_banks();
-}
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_slot_sony08_device::restore_banks), this));
 
-
-void msx_slot_sony08_device::device_post_load()
-{
 	restore_banks();
 }
 
@@ -100,7 +96,7 @@ void msx_slot_sony08_device::restore_banks()
 }
 
 
-uint8_t msx_slot_sony08_device::read(offs_t offset)
+READ8_MEMBER(msx_slot_sony08_device::read)
 {
 	if (offset >= 0xc000)
 	{
@@ -122,7 +118,7 @@ uint8_t msx_slot_sony08_device::read(offs_t offset)
 }
 
 
-void msx_slot_sony08_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(msx_slot_sony08_device::write)
 {
 	if (offset < 0x4000)
 	{

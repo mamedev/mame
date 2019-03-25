@@ -257,29 +257,30 @@ void cswat_state::machine_start()
 	save_item(NAME(m_nmi_enabled));
 }
 
-void cswat_state::cswat(machine_config &config)
-{
+MACHINE_CONFIG_START(cswat_state::cswat)
+
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, XTAL(18'432'000)/3/4); // HD68A09EP, 1.5MHz?
-	m_maincpu->set_addrmap(AS_PROGRAM, &cswat_state::cswat_map);
-	m_maincpu->set_vblank_int("screen", FUNC(cswat_state::irq0_line_assert));
-	m_maincpu->set_periodic_int(FUNC(cswat_state::nmi_handler), attotime::from_hz(300)); // ?
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(18'432'000)/3/4) // HD68A09EP, 1.5MHz?
+	MCFG_DEVICE_PROGRAM_MAP(cswat_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cswat_state, irq0_line_assert)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cswat_state, nmi_handler, 300) // ?
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(36*8, 28*8);
-	screen.set_visarea_full();
-	screen.set_palette("palette");
-	screen.set_screen_update(FUNC(cswat_state::screen_update_cswat));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(36*8, 28*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_cswat);
-	PALETTE(config, "palette").set_entries(4*256);
+	MCFG_SCREEN_UPDATE_DRIVER(cswat_state, screen_update_cswat)
+
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cswat)
+	MCFG_PALETTE_ADD("palette", 4*256)
 
 	/* sound hardware */
 	// TODO
-}
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

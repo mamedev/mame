@@ -78,7 +78,7 @@ void bbcmc_joystick_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-uint8_t bbcmc_joystick_device::pb_r()
+READ8_MEMBER(bbcmc_joystick_device::pb_r)
 {
 	return m_joy->read();
 }

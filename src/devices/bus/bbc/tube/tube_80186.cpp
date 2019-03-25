@@ -126,12 +126,12 @@ void bbc_tube_80186_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-uint8_t bbc_tube_80186_device::host_r(offs_t offset)
+READ8_MEMBER(bbc_tube_80186_device::host_r)
 {
-	return m_ula->host_r(offset);
+	return m_ula->host_r(space, offset);
 }
 
-void bbc_tube_80186_device::host_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(bbc_tube_80186_device::host_w)
 {
-	m_ula->host_w(offset, data);
+	m_ula->host_w(space, offset, data);
 }

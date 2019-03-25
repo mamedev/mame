@@ -268,13 +268,13 @@ void dribling_state::machine_reset()
 }
 
 
-void dribling_state::dribling(machine_config &config)
-{
+MACHINE_CONFIG_START(dribling_state::dribling)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 20_MHz_XTAL / 4); // XTAL verified, divider not
-	m_maincpu->set_addrmap(AS_PROGRAM, &dribling_state::dribling_map);
-	m_maincpu->set_addrmap(AS_IO, &dribling_state::io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(dribling_state::dribling_irq_gen));
+	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)
+	MCFG_DEVICE_PROGRAM_MAP(dribling_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dribling_state,  dribling_irq_gen)
 
 	I8255A(config, m_ppi8255_0);
 	m_ppi8255_0->in_pa_callback().set(FUNC(dribling_state::dsr_r));
@@ -290,19 +290,19 @@ void dribling_state::dribling(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(256, 256);
-	screen.set_visarea(0, 255, 40, 255);
-	screen.set_screen_update(FUNC(dribling_state::screen_update_dribling));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 40, 255)
+	MCFG_SCREEN_UPDATE_DRIVER(dribling_state, screen_update_dribling)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", FUNC(dribling_state::dribling_palette), 256);
 
 	/* sound hardware */
-}
+MACHINE_CONFIG_END
 
 
 

@@ -9,7 +9,6 @@ Witch / Pinball Champ '95 / Keirin Ou
 #ifndef MAME_INCLUDES_WITCH_H
 #define MAME_INCLUDES_WITCH_H
 
-#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
@@ -73,7 +72,8 @@ public:
 protected:
 	void common_map(address_map &map);
 
-	tilemap_t *m_gfx0_tilemap;
+	tilemap_t *m_gfx0a_tilemap;
+	tilemap_t *m_gfx0b_tilemap;
 	tilemap_t *m_gfx1_tilemap;
 
 	required_device<cpu_device> m_maincpu;
@@ -97,10 +97,11 @@ protected:
 	uint8_t m_reg_a002;
 	uint8_t m_motor_active;
 
-	TILE_GET_INFO_MEMBER(get_gfx0_tile_info);
+	TILE_GET_INFO_MEMBER(get_gfx0b_tile_info);
+	TILE_GET_INFO_MEMBER(get_gfx0a_tile_info);
 	TILE_GET_INFO_MEMBER(get_gfx1_tile_info);
 	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_witch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override;
 

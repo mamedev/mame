@@ -15,6 +15,16 @@
 #include "video/huc6272.h"
 
 
+#define MCFG_HUC6261_VDC1(_tag) \
+	downcast<huc6261_device &>(*device).set_vdc1_tag(_tag);
+
+#define MCFG_HUC6261_VDC2(_tag) \
+	downcast<huc6261_device &>(*device).set_vdc2_tag(_tag);
+
+#define MCFG_HUC6261_KING(_tag) \
+	downcast<huc6261_device &>(*device).set_king_tag(_tag);
+
+
 class huc6261_device :  public device_t,
 						public device_video_interface
 {

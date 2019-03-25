@@ -66,14 +66,14 @@ void sns_rom21_srtc_device::device_reset()
 
 // low and hi reads are not the same! (different ROM banks are accessed)
 
-uint8_t sns_rom21_device::read_l(offs_t offset)
+READ8_MEMBER(sns_rom21_device::read_l)
 {
 	// here ROM banks from 128 to 255, mirrored twice
 	int bank = (offset & 0x3fffff) / 0x8000;
 	return m_rom[rom_bank_map[bank + 0x80] * 0x8000 + (offset & 0x7fff)];
 }
 
-uint8_t sns_rom21_device::read_h(offs_t offset)
+READ8_MEMBER(sns_rom21_device::read_h)
 {
 	// here ROM banks from 0 to 127, mirrored twice
 	int bank = (offset & 0x3fffff) / 0x8000;
@@ -173,7 +173,7 @@ uint8_t sns_rom21_srtc_device::srtc_weekday( uint32_t year, uint32_t month, uint
 
 // this gets called only for accesses at 0x2800,
 // because for 0x2801 open bus gets returned...
-uint8_t sns_rom21_srtc_device::chip_read(offs_t offset)
+READ8_MEMBER(sns_rom21_srtc_device::chip_read)
 {
 	if (m_mode != RTCM_Read)
 		return 0x00;
@@ -194,7 +194,7 @@ uint8_t sns_rom21_srtc_device::chip_read(offs_t offset)
 }
 
 // this gets called only for accesses at 0x2801
-void sns_rom21_srtc_device::chip_write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(sns_rom21_srtc_device::chip_write)
 {
 	data &= 0x0f;   // Only the low four bits are used
 

@@ -27,11 +27,11 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	void write_ymf278b_fm(offs_t offset, uint8_t data);
-	uint8_t read_ymf278b_fm(offs_t offset);
-	void write_ymf278b_pcm(offs_t offset, uint8_t data);
-	uint8_t read_ymf278b_pcm(offs_t offset);
-	uint8_t read_c0();
+	DECLARE_WRITE8_MEMBER(write_ymf278b_fm);
+	DECLARE_READ8_MEMBER(read_ymf278b_fm);
+	DECLARE_WRITE8_MEMBER(write_ymf278b_pcm);
+	DECLARE_READ8_MEMBER(read_ymf278b_pcm);
+	DECLARE_READ8_MEMBER(read_c0);
 
 	void ymf278b_map(address_map &map);
 

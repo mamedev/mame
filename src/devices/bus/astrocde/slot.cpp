@@ -104,8 +104,7 @@ static const astrocade_slot slot_list[] =
 {
 	{ ASTROCADE_STD,  "rom" },
 	{ ASTROCADE_256K, "rom_256k" },
-	{ ASTROCADE_512K, "rom_512k" },
-	{ ASTROCADE_CASS, "rom_cass" }
+	{ ASTROCADE_512K, "rom_512k" }
 };
 
 static int astrocade_get_pcb_id(const char *slot)

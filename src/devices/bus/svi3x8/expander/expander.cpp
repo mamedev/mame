@@ -80,38 +80,38 @@ void svi_expander_device::device_reset()
 //  host to module interface
 //-------------------------------------------------
 
-uint8_t svi_expander_device::mreq_r(offs_t offset)
+READ8_MEMBER( svi_expander_device::mreq_r )
 {
 	romdis_w(1);
 	ramdis_w(1);
 
 	if (m_module)
-		return m_module->mreq_r(offset);
+		return m_module->mreq_r(space, offset);
 
 	return 0xff;
 }
 
-void svi_expander_device::mreq_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( svi_expander_device::mreq_w )
 {
 	romdis_w(1);
 	ramdis_w(1);
 
 	if (m_module)
-		m_module->mreq_w(offset, data);
+		m_module->mreq_w(space, offset, data);
 }
 
-uint8_t svi_expander_device::iorq_r(offs_t offset)
+READ8_MEMBER( svi_expander_device::iorq_r )
 {
 	if (m_module)
-		return m_module->iorq_r(offset);
+		return m_module->iorq_r(space, offset);
 
 	return 0xff;
 }
 
-void svi_expander_device::iorq_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( svi_expander_device::iorq_w )
 {
 	if (m_module)
-		m_module->iorq_w(offset, data);
+		m_module->iorq_w(space, offset, data);
 }
 
 WRITE_LINE_MEMBER( svi_expander_device::bk21_w )

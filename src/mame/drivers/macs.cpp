@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /*
 
-macs.cpp - Multi Amenity Cassette System
+macs.c - Multi Amenity Cassette System
 
 processor seems to be ST0016 (z80 based) from SETA
 
@@ -500,7 +500,6 @@ uint8_t macs_state::dma_offset()
 {
 	return m_cart_bank;
 }
-
 
 MACHINE_CONFIG_START(macs_state::macs)
 	/* basic machine hardware */

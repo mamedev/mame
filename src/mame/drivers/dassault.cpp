@@ -522,39 +522,39 @@ void dassault_state::machine_reset()
 	m_priority = 0;
 }
 
-void dassault_state::dassault(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(28'000'000)/2);   /* 14MHz - Accurate */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dassault_state::dassault_map);
-	m_maincpu->set_vblank_int("screen", FUNC(dassault_state::irq4_line_assert));
+MACHINE_CONFIG_START(dassault_state::dassault)
 
-	M68000(config, m_subcpu, XTAL(28'000'000)/2);   /* 14MHz - Accurate */
-	m_subcpu->set_addrmap(AS_PROGRAM, &dassault_state::dassault_sub_map);
-	m_subcpu->set_vblank_int("screen", FUNC(dassault_state::irq5_line_assert));
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000)/2)   /* 14MHz - Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(dassault_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dassault_state,  irq4_line_assert)
+
+	MCFG_DEVICE_ADD("sub", M68000, XTAL(28'000'000)/2)   /* 14MHz - Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(dassault_sub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dassault_state,  irq5_line_assert)
 
 	H6280(config, m_audiocpu, XTAL(32'220'000)/8);    /* Accurate */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dassault_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
-//  config.m_minimum_quantum = attotime::from_hz(8400); /* 140 CPU slices per frame */
-	config.m_perfect_cpu_quantum = subtag("maincpu"); // I was seeing random lockups.. let's see if this helps
+//  MCFG_QUANTUM_TIME(attotime::from_hz(8400)) /* 140 CPU slices per frame */
+	MCFG_QUANTUM_PERFECT_CPU("maincpu") // I was seeing random lockups.. let's see if this helps
 
 	mb8421_mb8431_16_device &sharedram(MB8421_MB8431_16BIT(config, "sharedram"));
 	sharedram.intl_callback().set_inputline("maincpu", M68K_IRQ_5);
 	sharedram.intr_callback().set_inputline("sub", M68K_IRQ_6);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248);  // same as robocop2(cninja.cpp)? verify this from real pcb.
-	screen.set_screen_update(FUNC(dassault_state::screen_update_dassault));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)  // same as robocop2(cninja.cpp)? verify this from real pcb.
+	MCFG_SCREEN_UPDATE_DRIVER(dassault_state, screen_update_dassault)
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_dassault);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dassault)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 4096);
 
-	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
-	BUFFERED_SPRITERAM16(config, m_spriteram[1]);
+	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_split(0);
@@ -603,9 +603,9 @@ void dassault_state::dassault(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0); // IRQ1
 
-	ym2203_device &ym1(YM2203(config, "ym1", XTAL(32'220'000)/8));
-	ym1.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
-	ym1.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000)/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
 	ym2151_device &ym2(YM2151(config, "ym2", XTAL(32'220'000)/9));
 	ym2.irq_handler().set_inputline(m_audiocpu, 1);
@@ -613,14 +613,14 @@ void dassault_state::dassault(machine_config &config)
 	ym2.add_route(0, "lspeaker", 0.45);
 	ym2.add_route(1, "rspeaker", 0.45);
 
-	okim6295_device &oki1(OKIM6295(config, "oki1", XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH)); // verified
-	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH) // verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	OKIM6295(config, m_oki2, XTAL(32'220'000)/16, okim6295_device::PIN7_HIGH); // verified
-	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
-}
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(32'220'000)/16, okim6295_device::PIN7_HIGH) // verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
+MACHINE_CONFIG_END
 
 /**********************************************************************************/
 

@@ -188,23 +188,23 @@ WRITE8_MEMBER( paso1600_state::paso1600_pcg_w )
 WRITE8_MEMBER( paso1600_state::paso1600_6845_address_w )
 {
 	m_crtc_index = data;
-	m_crtc->address_w(data);
+	m_crtc->address_w(space, offset, data);
 }
 
 WRITE8_MEMBER( paso1600_state::paso1600_6845_data_w )
 {
 	m_crtc_vreg[m_crtc_index] = data;
-	m_crtc->register_w(data);
+	m_crtc->register_w(space, offset, data);
 }
 
 READ8_MEMBER( paso1600_state::paso1600_6845_data_r )
 {
-	return m_crtc->register_r();
+	return m_crtc->register_r(space, offset);
 }
 
 READ8_MEMBER( paso1600_state::paso1600_6845_status_r )
 {
-	return m_crtc->status_r();
+	return m_crtc->status_r(space, offset);
 }
 
 READ8_MEMBER( paso1600_state::key_r )
@@ -304,25 +304,25 @@ WRITE8_MEMBER(paso1600_state::pc_dma_write_byte)
 	space.write_byte(offset, data);
 }
 
-void paso1600_state::paso1600(machine_config &config)
-{
+MACHINE_CONFIG_START(paso1600_state::paso1600)
 	/* basic machine hardware */
-	I8086(config, m_maincpu, 16000000/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &paso1600_state::paso1600_map);
-	m_maincpu->set_addrmap(AS_IO, &paso1600_state::paso1600_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	MCFG_DEVICE_ADD("maincpu", I8086, 16000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(paso1600_map)
+	MCFG_DEVICE_IO_MAP(paso1600_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(paso1600_state::screen_update_paso1600));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE_DRIVER(paso1600_state, screen_update_paso1600)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_paso1600);
-	PALETTE(config, m_palette).set_entries(8);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_paso1600)
+	MCFG_PALETTE_ADD("palette", 8)
+//  MCFG_PALETTE_INIT(black_and_white)
 
 	/* Devices */
 	h46505_device &crtc(H46505(config, "crtc", 16000000/4));    /* unknown clock, hand tuned to get ~60 fps */
@@ -336,7 +336,7 @@ void paso1600_state::paso1600(machine_config &config)
 	AM9517A(config, m_dma, 16000000/4);
 	m_dma->in_memr_callback().set(FUNC(paso1600_state::pc_dma_read_byte));
 	m_dma->out_memw_callback().set(FUNC(paso1600_state::pc_dma_write_byte));
-}
+MACHINE_CONFIG_END
 
 ROM_START( paso1600 )
 	ROM_REGION16_LE(0x2000,"ipl", 0)

@@ -17,6 +17,7 @@
 #include "cpu/i386/i386.h"
 #include "machine/atapicdr.h"
 #include "machine/idehd.h"
+#include "machine/pit8253.h"
 
 #include "debug/debugcmd.h"
 #include "debug/debugcon.h"
@@ -33,7 +34,7 @@ class xbox_state : public xbox_base_state
 public:
 	xbox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xbox_base_state(mconfig, type, tag)
-		, m_ide(*this, "pci:09.0:ide")
+		, m_ide(*this, "ide")
 		, m_devh(*this, "pci:09.0:ide:0:hdd")
 		, m_devc(*this, "pci:09.0:ide:1:cdrom")
 	{ }
@@ -170,24 +171,27 @@ void xbox_ata_devices(device_slot_interface &device)
 	device.option_add("cdrom", ATAPI_CDROM);
 }
 
-void xbox_state::xbox(machine_config &config)
-{
+MACHINE_CONFIG_START(xbox_state::xbox)
 	xbox_base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &xbox_state::xbox_map);
-	m_maincpu->set_addrmap(AS_IO, &xbox_state::xbox_map_io);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(xbox_map)
+	MCFG_DEVICE_IO_MAP(xbox_map_io)
 
-	subdevice<ide_controller_32_device>(":pci:09.0:ide")->options(xbox_ata_devices, "hdd", "cdrom", true);
+	MCFG_DEVICE_MODIFY(":pci:09.0:ide:0")
+	MCFG_DEVICE_SLOT_INTERFACE(xbox_ata_devices, "hdd", true)
+	MCFG_DEVICE_MODIFY(":pci:09.0:ide:1")
+	MCFG_DEVICE_SLOT_INTERFACE(xbox_ata_devices, "cdrom", true)
 
 	OHCI_USB_CONNECTOR(config, ":pci:02.0:port1", usb_xbox, nullptr, false);
 	OHCI_USB_CONNECTOR(config, ":pci:02.0:port2", usb_xbox, nullptr, false);
 	OHCI_USB_CONNECTOR(config, ":pci:02.0:port3", usb_xbox, "xbox_controller", false);
 	OHCI_USB_CONNECTOR(config, ":pci:02.0:port4", usb_xbox, nullptr, false);
 
-	/* sound hardware */
+/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OHCI_GAME_CONTROLLER(config, "ohci_gamepad", 0);
-}
+	MCFG_DEVICE_ADD("ohci_gamepad", OHCI_GAME_CONTROLLER, 0)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

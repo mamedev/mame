@@ -715,17 +715,17 @@ INTERRUPT_GEN_MEMBER(thepit_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-void thepit_state::thepit(machine_config &config)
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, PIXEL_CLOCK/2);     /* 3.072 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &thepit_state::thepit_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(thepit_state::vblank_irq));
+MACHINE_CONFIG_START(thepit_state::thepit)
 
-	z80_device &audiocpu(Z80(config, "audiocpu", SOUND_CLOCK/4));     /* 2.5 MHz */
-	audiocpu.set_addrmap(AS_PROGRAM, &thepit_state::audio_map);
-	audiocpu.set_addrmap(AS_IO, &thepit_state::audio_io_map);
-	audiocpu.set_vblank_int("screen", FUNC(thepit_state::irq0_line_hold));
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", Z80, PIXEL_CLOCK/2)     /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(thepit_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", thepit_state,  vblank_irq)
+
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/4)     /* 2.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_IO_MAP(audio_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", thepit_state,  irq0_line_hold)
 
 	LS259(config, m_mainlatch); // IC42
 	m_mainlatch->q_out_cb<0>().set(FUNC(thepit_state::nmi_mask_w));
@@ -740,10 +740,10 @@ void thepit_state::thepit(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_thepit);
 	PALETTE(config, m_palette, FUNC(thepit_state::thepit_palette), 32+8);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	screen.set_screen_update(FUNC(thepit_state::screen_update));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_UPDATE_DRIVER(thepit_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -755,7 +755,7 @@ void thepit_state::thepit(machine_config &config)
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	AY8910(config, "ay2", PIXEL_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+MACHINE_CONFIG_END
 
 void thepit_state::fitter(machine_config &config)
 {
@@ -763,41 +763,43 @@ void thepit_state::fitter(machine_config &config)
 	m_mainlatch->q_out_cb<2>().set(FUNC(thepit_state::coin_lockout_w));
 }
 
-void thepit_state::desertdn(machine_config &config)
-{
+MACHINE_CONFIG_START(thepit_state::desertdn)
 	fitter(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &thepit_state::desertdan_main_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(desertdan_main_map)
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(thepit_state::screen_update_desertdan));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(thepit_state, screen_update_desertdan)
 
-	m_gfxdecode->set_info(gfx_intrepid);
-}
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_intrepid)
+MACHINE_CONFIG_END
 
-void thepit_state::intrepid(machine_config &config)
-{
+MACHINE_CONFIG_START(thepit_state::intrepid)
 	fitter(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &thepit_state::intrepid_main_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(intrepid_main_map)
 
 	m_mainlatch->q_out_cb<5>().set(FUNC(thepit_state::intrepid_graphics_bank_w));
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_intrepid);
-}
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_intrepid)
+MACHINE_CONFIG_END
 
 
-void thepit_state::suprmous(machine_config &config)
-{
+MACHINE_CONFIG_START(thepit_state::suprmous)
 	intrepid(config);
+
+	/* basic machine hardware */
 
 	/* video hardware */
 	m_palette->set_init(FUNC(thepit_state::suprmous_palette));
-	m_gfxdecode->set_info(gfx_suprmous);
-}
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_suprmous)
+MACHINE_CONFIG_END
 
 
 

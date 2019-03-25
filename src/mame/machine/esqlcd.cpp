@@ -162,10 +162,9 @@ static unsigned char const Font5x7[][5] = {
 };
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void esq2x16_sq1_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(esq2x16_sq1_device::device_add_mconfig)
 	config.set_default_layout(layout_esq2by16);
-}
+MACHINE_CONFIG_END
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 void esq2x16_sq1_device::write_char(int data)

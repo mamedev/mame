@@ -58,7 +58,7 @@ public:
 	// construction/destruction
 	bbc_amxmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t pb_r() override;
+	DECLARE_READ8_MEMBER(pb_r) override;
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -73,7 +73,7 @@ public:
 	// construction/destruction
 	bbc_m512mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t pb_r() override;
+	DECLARE_READ8_MEMBER(pb_r) override;
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -88,7 +88,7 @@ public:
 	// construction/destruction
 	bbc_tracker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t pb_r() override;
+	DECLARE_READ8_MEMBER(pb_r) override;
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

@@ -40,15 +40,14 @@ void m68307_cpu_device::m68307_internal_map(address_map &map)
 }
 
 
-void m68307_cpu_device::device_add_mconfig(machine_config &config)
-{
-	MC68681(config, m_duart, 16000000/4); // ?? Mhz - should be specified in inline config
-	m_duart->irq_cb().set(FUNC(m68307_cpu_device::m68307_duart_irq_handler));
-	m_duart->a_tx_cb().set(FUNC(m68307_cpu_device::m68307_duart_txa));
-	m_duart->b_tx_cb().set(FUNC(m68307_cpu_device::m68307_duart_txb));
-	m_duart->inport_cb().set(FUNC(m68307_cpu_device::m68307_duart_input_r));
-	m_duart->outport_cb().set(FUNC(m68307_cpu_device::m68307_duart_output_w));
-}
+MACHINE_CONFIG_START(m68307_cpu_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("internal68681", MC68681, 16000000/4) // ?? Mhz - should be specified in inline config
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, m68307_cpu_device, m68307_duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, m68307_cpu_device, m68307_duart_txa))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, m68307_cpu_device, m68307_duart_txb))
+	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, m68307_cpu_device, m68307_duart_input_r))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, m68307_cpu_device, m68307_duart_output_w))
+MACHINE_CONFIG_END
 
 
 m68307_cpu_device::m68307_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -88,14 +87,6 @@ void m68307_cpu_device::device_reset()
 	m_m68307_scrlow = 0xf010;
 
 	set_ipl(0);
-}
-
-void m68307_cpu_device::m68k_reset_peripherals()
-{
-	m_duart->reset();
-
-	if (m_m68307MBUS) m_m68307MBUS->reset();
-	if (m_m68307TIMER) m_m68307TIMER->reset();
 }
 
 

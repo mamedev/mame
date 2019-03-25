@@ -358,6 +358,7 @@ struct key_trans_entry {
 
 #if defined(OSD_SDL)
 	int             sdl_scancode;
+	int             sdl_key;
 #elif defined(OSD_WINDOWS)
 	int             scan_code;
 	unsigned char   virtual_key;

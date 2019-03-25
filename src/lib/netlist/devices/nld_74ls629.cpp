@@ -40,7 +40,7 @@
 
 
 #include "nld_74ls629.h"
-#include "netlist/analog/nlid_twoterm.h"
+#include "../analog/nlid_twoterm.h"
 
 namespace netlist
 {
@@ -100,14 +100,11 @@ namespace netlist
 		{
 			m_R_FC.set_R(90000.0);
 			m_R_RNG.set_R(90000.0);
-			m_clock.reset();
+			m_clock.do_reset();
 		}
 		NETLIB_UPDATEI();
 
-		NETLIB_UPDATE_PARAMI()
-		{
-			/* update param may be called from anywhere, update_dev(time) is not a good idea */
-		}
+		NETLIB_UPDATE_PARAMI() { update_dev(); }
 
 	public:
 		NETLIB_SUB(SN74LS629clk) m_clock;
@@ -148,8 +145,8 @@ namespace netlist
 
 		NETLIB_RESETI()
 		{
-			m_1.reset();
-			m_2.reset();
+			m_1.do_reset();
+			m_2.do_reset();
 		}
 
 	private:
@@ -210,7 +207,7 @@ namespace netlist
 			freq += k9 * v_rng * v_freq_3;
 			freq += k10 * v_rng * v_freq_4;
 
-			freq *= plib::constants<nl_double>::cast(0.1e-6) / m_CAP();
+			freq *= NL_FCONST(0.1e-6) / m_CAP();
 
 			// FIXME: we need a possibility to remove entries from queue ...
 			//        or an exact model ...
@@ -234,8 +231,8 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL(SN74LS629,     "SN74LS629",     "CAP")
-	NETLIB_DEVICE_IMPL(SN74LS629_dip, "SN74LS629_DIP", "1.CAP1,2.CAP2")
+	NETLIB_DEVICE_IMPL(SN74LS629)
+	NETLIB_DEVICE_IMPL(SN74LS629_dip)
 
 	} //namespace devices
 } // namespace netlist

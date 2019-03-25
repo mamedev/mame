@@ -53,6 +53,7 @@ Dennou Sakka DX (Cyber Writer Deluxe)                         Nikkonren Kikaku  
 Dennou Seito (Cyber Pupil)                                    Nikkonren Kikaku                  1993/?     FD
 Dor                                                           D.O.                              1992/5     FD×04
 Dor Part 3                                                    D.O.                              1992/11    FD×04
+Dragon Slayer: Eiyuu Densetsu 2                               Brother Kougyou (Takeru)          1993/2     FD×05
 D-Return                                                      Nikkonren Kikaku                  1990/11    FD×02
 Elle                                                          Elf                               1991/11    FD×05
 Euphony V1.1                                                  Fujitsu                           1989/7     FD
@@ -243,7 +244,7 @@ Towns Drill Shougaku Sansuu 6-nen Gear V1.1L20                Kyouiku Soft Kenky
 Towns Drill Shougaku Sansuu 6-nen Gear V2.1                   Kyouiku Soft Kenkyuusho           1990/2     FD
 Towns Hair Simulator: Hair Maker Towns                        Computer System                   1991/12    FD×10
 Towns Jouhou Kiso Select-F                                    Tokyo Shoseki                     1993/3     FD×03
-*Towns Karaoke V1.1                                            Fujitsu                           1989/7     FD
+Towns Karaoke V1.1                                            Fujitsu                           1989/7     FD
 TownsGEAR de Obenkyou Dai-1-kan: Seigo Mondai                 Kyouiku Soft Kenkyuusho           1992/3     FD×02
 TownsGEAR de Obenkyou Dai-2-kan: Sentaku Mondai               Kyouiku Soft Kenkyuusho           1992/3     FD×02
 TownsGEAR de Obenkyou Dai-3-kan: Suuchi Mondai                Kyouiku Soft Kenkyuusho           1992/3     FD×02
@@ -736,48 +737,6 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 			<feature name="part_id" value="Scenario Disk" />
 			<dataarea name="flop" size="3576598">
 				<rom name="loh_scenariodisk.mfm" size="3576598" crc="f47f814f" sha1="9b350ab36a8fe7255cdebb2e03ac25fb7f62e6a4" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!--
-	The Program Disk is modified, as it was intended to be used to save the game, but it's possible to create a new fresh copy with the
-	プログラムディスクのバックアップ (Program Disk backup) option. This requires the Master Program Disk, which is not bootable by itself.
-	-->
-	<software name="dsloh2">
-		<description>Dragon Slayer - The Legend of Heroes II</description>
-		<year>1993</year>
-		<publisher>タケル (Takeru) / 日本ファルコム (Nihon Falcom)</publisher>
-		<info name="release" value="199302xx" />
-		<info name="alt_title" value="ドラゴンスレイヤー 英雄伝説II" />
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Program Disk" />
-			<dataarea name="flop" size="3590084">
-				<rom name="loh2_programdisk.mfm" size="3590084" crc="bf015288" sha1="5dc1bf9bfc99c71996c38dd7b150132eb701d8e3" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Scenario Disk 1" />
-			<dataarea name="flop" size="3583888">
-				<rom name="loh2_scenariodisk1.mfm" size="3583888" crc="47520a2f" sha1="416b671ba5423329620a5c993548888ca7c84f0b" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Scenario Disk 2" />
-			<dataarea name="flop" size="3583160">
-				<rom name="loh2_scenariodisk2.mfm" size="3583160" crc="aa325e10" sha1="21e99860e3ad8473f8af707e08d5a8aa34e31492" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Scenario Disk 3" />
-			<dataarea name="flop" size="3582193">
-				<rom name="loh2_scenariodisk3.mfm" size="3582193" crc="588d3a38" sha1="59acc89c9cc4c862637be3bffb16434af101517a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Master Program Disk" />
-			<dataarea name="flop" size="3582174">
-				<rom name="loh2_masterprogramdisk.mfm" size="3582174" crc="e7a1fd4d" sha1="9a12b8f49322f8617753efbf5118a51e95590daf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1607,20 +1566,6 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- The disk this image comes from had 5 bad sectors. The software seems to work correctly, but it should be redumped from a better source -->
-	<software name="tkaraoke">
-		<description>Towns Karaoke V1.1L10</description>
-		<year>1989</year>
-		<publisher>富士通 (Fujitsu)</publisher>
-		<info name="alt_title" value="Townsカラオケ V1.1L10" />
-		<info name="release" value="198907xx" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="townskaraoke.hdm" size="1261568" crc="ebf71c2f" sha1="523b8f365ba056c1e38574fbc86551b60da8d1c9" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- Runs too fast -->
 	<software name="toshinto" supported="partial">
 		<description>Toushin Toshi</description>
@@ -1738,20 +1683,6 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261568">
 				<rom name="ushinawareta rakuen (disk e).hdm" size="1261568" crc="1481c370" sha1="95676fc68d7e402fd9e463a5ad9d82490ac544a8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="viewpoid">
-		<!--
-		Origin: David Swanson
-		-->
-		<description>Viewpoint Demonstration No. 1</description>
-		<year>1994</year>
-		<publisher>ビング (Ving)</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="vp_demo.bin" size="1261568" crc="dba229be" sha1="f4c5fe2cad77183e91b676609050dfe9d324dc8a" offset="0" />
 			</dataarea>
 		</part>
 	</software>

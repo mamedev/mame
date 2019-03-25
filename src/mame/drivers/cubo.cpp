@@ -411,7 +411,7 @@ WRITE8_MEMBER( cubo_state::akiko_cia_0_port_a_write )
 	/* bit 1 = Power Led on Amiga */
 	m_power_led = BIT(~data, 1);
 
-	handle_joystick_cia(data, m_cia_0->read(2));
+	handle_joystick_cia(data, m_cia_0->read(space, 2));
 }
 
 
@@ -1030,11 +1030,11 @@ static INPUT_PORTS_START( mgprem11 )
 INPUT_PORTS_END
 
 
-void cubo_state::cubo(machine_config &config)
-{
+MACHINE_CONFIG_START(cubo_state::cubo)
+
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, amiga_state::CLK_28M_PAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cubo_state::cubo_mem);
+	MCFG_DEVICE_ADD("maincpu", M68EC020, amiga_state::CLK_28M_PAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(cubo_mem)
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
@@ -1050,8 +1050,9 @@ void cubo_state::cubo(machine_config &config)
 
 	// video hardware
 	pal_video(config);
-	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
-	m_screen->set_palette(finder_base::DUMMY_TAG);
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
@@ -1067,23 +1068,23 @@ void cubo_state::cubo(machine_config &config)
 	paula.mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
 	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
 
-	CDDA(config, m_cdda);
-	m_cdda->add_route(0, "lspeaker", 0.50);
-	m_cdda->add_route(1, "rspeaker", 0.50);
+	MCFG_DEVICE_ADD("cdda", CDDA)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* cia */
 	// these are setup differently on other amiga drivers (needed for floppy to work) which is correct / why?
-	MOS8520(config, m_cia_0, amiga_state::CLK_E_PAL);
-	m_cia_0->irq_wr_callback().set(FUNC(amiga_state::cia_0_irq));
-	m_cia_0->pa_rd_callback().set_ioport("CIA0PORTA");
-	m_cia_0->pa_wr_callback().set(FUNC(cubo_state::akiko_cia_0_port_a_write));
+	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_PAL)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_0_irq))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(IOPORT("CIA0PORTA"))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, cubo_state, akiko_cia_0_port_a_write))
+	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_PAL)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_1_irq))
 
-	MOS8520(config, m_cia_1, amiga_state::CLK_E_PAL);
-	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
+	MCFG_MICROTOUCH_ADD("microtouch", 9600, WRITELINE(*this, cubo_state, rs232_rx_w))
 
-	MICROTOUCH(config, m_microtouch, 9600).stx().set(FUNC(cubo_state::rs232_rx_w));
-
-	CDROM(config, "cd32_cdrom").set_interface("cd32_cdrom");
+	MCFG_CDROM_ADD("cd32_cdrom")
+	MCFG_CDROM_INTERFACE("cd32_cdrom")
 
 	/* fdc */
 	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_PAL);
@@ -1092,7 +1093,7 @@ void cubo_state::cubo(machine_config &config)
 	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));
 	m_fdc->dskblk_callback().set(FUNC(amiga_state::fdc_dskblk_w));
 	m_fdc->dsksyn_callback().set(FUNC(amiga_state::fdc_dsksyn_w));
-}
+MACHINE_CONFIG_END
 
 
 

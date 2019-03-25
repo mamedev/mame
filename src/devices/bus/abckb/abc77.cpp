@@ -129,8 +129,7 @@ DISCRETE_SOUND_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void abc77_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(abc77_device::device_add_mconfig)
 	// keyboard cpu
 	I8035(config, m_maincpu, XTAL(4'608'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &abc77_device::abc77_map);
@@ -145,8 +144,9 @@ void abc77_device::device_add_mconfig(machine_config &config)
 
 	// discrete sound
 	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, abc77_discrete).add_route(ALL_OUTPUTS, "mono", 0.80);
-}
+	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, abc77_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------

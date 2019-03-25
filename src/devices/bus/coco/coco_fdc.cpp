@@ -180,15 +180,6 @@ uint8_t* coco_family_fdc_device_base::get_cart_base()
 	return memregion("eprom")->base();
 }
 
-//-------------------------------------------------
-//  coco_family_fdc_device_base::get_cart_memregion
-//-------------------------------------------------
-
-memory_region* coco_family_fdc_device_base::get_cart_memregion()
-{
-	return memregion("eprom");
-}
-
 
 //***************************************************************************
 //  COCO FDCs
@@ -343,17 +334,17 @@ READ8_MEMBER(coco_fdc_device_base::scs_read)
 
 	case 0x38:  /* FF78 */
 		if (real_time_clock() == rtc_type::CLOUD9)
-			m_ds1315->read_0();
+			m_ds1315->read_0(space, offset);
 		break;
 
 	case 0x39:  /* FF79 */
 		if (real_time_clock() == rtc_type::CLOUD9)
-			m_ds1315->read_1();
+			m_ds1315->read_1(space, offset);
 		break;
 
 	case 0x3C:  /* FF7C */
 		if (real_time_clock() == rtc_type::CLOUD9)
-			result = m_ds1315->read_data();
+			result = m_ds1315->read_data(space, offset);
 		break;
 	}
 	return result;

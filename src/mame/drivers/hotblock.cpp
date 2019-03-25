@@ -207,21 +207,21 @@ static INPUT_PORTS_START( hotblock )
 INPUT_PORTS_END
 
 
-void hotblock_state::hotblock(machine_config &config)
-{
+MACHINE_CONFIG_START(hotblock_state::hotblock)
+
 	/* basic machine hardware */
-	I8088(config, m_maincpu, 24_MHz_XTAL / 3); // Unknown clock
-	m_maincpu->set_addrmap(AS_PROGRAM, &hotblock_state::hotblock_map);
-	m_maincpu->set_addrmap(AS_IO, &hotblock_state::hotblock_io);
+	MCFG_DEVICE_ADD("maincpu", I8088, 24_MHz_XTAL / 3) // Unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(hotblock_map)
+	MCFG_DEVICE_IO_MAP(hotblock_io)
 
 //  I2CMEM(config, m_i2cmem, 0).set_page_size(16).set_data_size(0x200); // 24C04
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(24_MHz_XTAL / 3, 512, 0, 320, 312, 0, 200); // 15.625 kHz horizontal???
-	screen.set_screen_update(FUNC(hotblock_state::screen_update));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI); // right?
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(24_MHz_XTAL / 3, 512, 0, 320, 312, 0, 200) // 15.625 kHz horizontal???
+	MCFG_SCREEN_UPDATE_DRIVER(hotblock_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI)) // right?
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x200/2);
 
@@ -232,7 +232,7 @@ void hotblock_state::hotblock(machine_config &config)
 	aysnd.port_a_read_callback().set_ioport("P1");
 	aysnd.port_b_read_callback().set_ioport("P2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+MACHINE_CONFIG_END
 
 ROM_START( hotblock )
 	ROM_REGION( 0x100000, "maincpu", 0 )

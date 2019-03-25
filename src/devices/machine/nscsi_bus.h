@@ -6,12 +6,19 @@
 #pragma once
 
 
+#define MCFG_NSCSI_BUS_ADD(_tag)        \
+	MCFG_DEVICE_ADD(_tag, NSCSI_BUS, 0)
+
+#define MCFG_NSCSI_ADD(_tag, _slot_intf, _def_slot, _fixed) \
+	MCFG_DEVICE_ADD(_tag, NSCSI_CONNECTOR, 0)                   \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
+
 class nscsi_device;
 
 class nscsi_bus_device : public device_t
 {
 public:
-	nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void ctrl_w(int refid, uint32_t lines, uint32_t mask);
 	void data_w(int refid, uint32_t lines);
@@ -42,19 +49,10 @@ private:
 };
 
 class nscsi_connector: public device_t,
-					   public device_slot_interface
+						public device_slot_interface
 {
 public:
-	template <typename T>
-	nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed = false)
-		: nscsi_connector(mconfig, tag, owner, 0)
-	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
-	}
-	nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nscsi_connector();
 
 	nscsi_device *get_device();
@@ -169,9 +167,7 @@ protected:
 
 	// SCSI addtional sense code qualifiers
 	enum {
-		SK_ASC_INVALID_FIELD_IN_CDB       = 0x24,
-		SK_ASC_LOGICAL_UNIT_NOT_SUPPORTED = 0x25,
-		SK_ASC_MEDIUM_NOT_PRESENT         = 0x3a
+		SK_ASC_MEDIUM_NOT_PRESENT       = 0x3a
 	};
 
 	// SCSI commands
@@ -308,7 +304,6 @@ protected:
 
 	virtual void scsi_message();
 	virtual void scsi_command();
-	virtual bool scsi_command_done(uint8_t command, uint8_t length);
 
 	void scsi_unknown_command();
 	void scsi_status_complete(uint8_t st);
@@ -449,6 +444,7 @@ private:
 	void target_recv_byte();
 	void target_send_byte(uint8_t val);
 	void target_send_buffer_byte();
+	bool command_done();
 };
 
 
