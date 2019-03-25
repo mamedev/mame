@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood, Paul Priest
 /*
 Psikyo PS6406B (PS3v1/PS5/PS5v2):
-See src/drivers/psikyosh.c for more info
+See src/mame/drivers/psikyosh.cpp for more info
 
 Hardware is extremely flexible (and luckily underused, although we now have a relatively complete implementation :). Many effects are subtle (e.g. fades, scanline effects).
 
