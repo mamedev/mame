@@ -7,8 +7,8 @@
 
 #include "bus/adam/exp.h"
 #include "bus/adamnet/adamnet.h"
-#include "bus/coleco/controller/ctrl.h"
-#include "bus/coleco/cartridge/exp.h"
+#include "bus/coleco/ctrl.h"
+#include "bus/coleco/exp.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6801.h"
 #include "machine/coleco.h"

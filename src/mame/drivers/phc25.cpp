@@ -308,12 +308,11 @@ void phc25_state::video_start()
 
 /* Machine Driver */
 
-void phc25_state::phc25(machine_config &config)
-{
+MACHINE_CONFIG_START(phc25_state::phc25)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &phc25_state::phc25_mem);
-	m_maincpu->set_addrmap(AS_IO, &phc25_state::phc25_io);
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(phc25_mem)
+	MCFG_DEVICE_IO_MAP(phc25_io)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -321,56 +320,51 @@ void phc25_state::phc25(machine_config &config)
 	psg.port_a_read_callback().set_ioport("JOY0");
 	psg.port_b_read_callback().set_ioport("JOY1");
 	psg.add_route(ALL_OUTPUTS, "mono", 1.00);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.15);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	/* devices */
-	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(phc25_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette->set_interface("phc25_cass");
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(phc25_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("phc25_cass")
 
-	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-	m_centronics->busy_handler().set(FUNC(phc25_state::write_centronics_busy));
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, phc25_state, write_centronics_busy))
 
-	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
-	m_centronics->set_output_latch(cent_data_out);
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("16K");
 
 	/* software lists */
-	SOFTWARE_LIST(config, "cass_list").set_original("phc25_cass");
-}
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "phc25_cass")
+MACHINE_CONFIG_END
 
-void phc25_state::pal(machine_config &config)
-{
+MACHINE_CONFIG_START(phc25_state::pal)
 	phc25(config);
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
 
-	MC6847_PAL(config, m_vdg, XTAL(4'433'619));
-	m_vdg->set_screen("screen");
-	m_vdg->fsync_wr_callback().set(FUNC(phc25_state::irq_w));
-	m_vdg->input_callback().set(FUNC(phc25_state::video_ram_r));
-	m_vdg->set_get_char_rom(FUNC(phc25_state::pal_char_rom_r));
-	m_vdg->set_get_fixed_mode(mc6847_pal_device::MODE_GM2 | mc6847_pal_device::MODE_GM1 | mc6847_pal_device::MODE_INTEXT);
+	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL(4'433'619))
+	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, phc25_state, irq_w))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, phc25_state, video_ram_r))
+	MCFG_MC6847_CHARROM_CALLBACK(phc25_state, pal_char_rom_r)
+	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM2 | mc6847_pal_device::MODE_GM1 | mc6847_pal_device::MODE_INTEXT)
 	// other lines not connected
-}
+MACHINE_CONFIG_END
 
-void phc25_state::ntsc(machine_config &config)
-{
+MACHINE_CONFIG_START(phc25_state::ntsc)
 	phc25(config);
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	MCFG_SCREEN_MC6847_NTSC_ADD(SCREEN_TAG, MC6847_TAG)
 
-	MC6847_NTSC(config, m_vdg, XTAL(3'579'545));
-	m_vdg->set_screen("screen");
-	m_vdg->fsync_wr_callback().set(FUNC(phc25_state::irq_w));
-	m_vdg->input_callback().set(FUNC(phc25_state::video_ram_r));
-	m_vdg->set_get_char_rom(FUNC(phc25_state::ntsc_char_rom_r));
-	m_vdg->set_get_fixed_mode(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1 | mc6847_ntsc_device::MODE_INTEXT);
+	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_NTSC, XTAL(3'579'545))
+	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, phc25_state, irq_w))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, phc25_state, video_ram_r))
+	MCFG_MC6847_CHARROM_CALLBACK(phc25_state, ntsc_char_rom_r)
+	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1 | mc6847_ntsc_device::MODE_INTEXT)
 	// other lines not connected
-}
+MACHINE_CONFIG_END
 
 /* ROMs */
 

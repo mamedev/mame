@@ -65,12 +65,17 @@ void k2000_state::k2000_map(address_map &map)
 	map(0x000000, 0x0fffff).rom().region("maincpu", 0);
 	map(0x100000, 0x11ffff).ram(); // is this area banked between RAM (write of 0x20 to 7e0001) vs setup/SU ROM (write of 0x30 to 7e0001) ?
 	// byte writes to 7e0000-7e0001 - unknown, possibly banking or status?
+	map(0xfffc00, 0xffffff).rw("tmp68301", FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
 
 void k2000_state::k2000(machine_config &config)
 {
-	TMP68301(config, m_maincpu, XTAL(12'000'000));
+	M68301(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &k2000_state::k2000_map);
+	m_maincpu->set_irq_acknowledge_callback("tmp68301", FUNC(tmp68301_device::irq_callback));
+
+	tmp68301_device &tmp68301(TMP68301(config, "tmp68301", 0));
+	tmp68301.set_cputag(m_maincpu);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

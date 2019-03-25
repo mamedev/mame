@@ -22,7 +22,7 @@
 
 #define VERBOSE_MDA 0       /* MDA (Monochrome Display Adapter) */
 
-#define MDA_CLOCK   16.257_MHz_XTAL
+#define MDA_CLOCK   16257000
 
 #define MDA_LOG(N,M,A) \
 	do { \
@@ -107,13 +107,12 @@ DEFINE_DEVICE_TYPE(ISA8_MDA, isa8_mda_device, "isa_ibm_mda", "IBM Monochrome Dis
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void isa8_mda_device::device_add_mconfig(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, MDA_SCREEN_NAME, SCREEN_TYPE_RASTER));
-	screen.set_raw(MDA_CLOCK, 882, 0, 720, 370, 0, 350);
-	screen.set_screen_update(MC6845_NAME, FUNC(mc6845_device::screen_update));
+MACHINE_CONFIG_START(isa8_mda_device::device_add_mconfig)
+	MCFG_SCREEN_ADD( MDA_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
+	MCFG_SCREEN_UPDATE_DEVICE( MC6845_NAME, mc6845_device, screen_update )
 
-	PALETTE(config, m_palette).set_entries(4);
+	MCFG_PALETTE_ADD( "palette", 4 )
 
 	MC6845(config, m_crtc, MDA_CLOCK/9);
 	m_crtc->set_screen(MDA_SCREEN_NAME);
@@ -123,11 +122,11 @@ void isa8_mda_device::device_add_mconfig(machine_config &config)
 	m_crtc->out_hsync_callback().set(FUNC(isa8_mda_device::hsync_changed));
 	m_crtc->out_vsync_callback().set(FUNC(isa8_mda_device::vsync_changed));
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_pcmda);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pcmda)
 
 	PC_LPT(config, m_lpt);
 	m_lpt->irq_handler().set(FUNC(isa8_mda_device::pc_cpu_line));
-}
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -463,10 +462,10 @@ WRITE8_MEMBER( isa8_mda_device::io_write)
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
-			m_crtc->address_w(data);
+			m_crtc->address_w( space, offset, data );
 			break;
 		case 1: case 3: case 5: case 7:
-			m_crtc->register_w(data);
+			m_crtc->register_w( space, offset, data );
 			break;
 		case 8:
 			mode_control_w(space, offset, data);
@@ -486,7 +485,7 @@ READ8_MEMBER( isa8_mda_device::io_read)
 			/* return last written mc6845 address value here? */
 			break;
 		case 1: case 3: case 5: case 7:
-			data = m_crtc->register_r();
+			data = m_crtc->register_r( space, offset );
 			break;
 		case 10:
 			data = status_r(space, offset);
@@ -533,13 +532,12 @@ DEFINE_DEVICE_TYPE(ISA8_HERCULES, isa8_hercules_device, "isa_hercules", "Hercule
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void isa8_hercules_device::device_add_mconfig(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, HERCULES_SCREEN_NAME, SCREEN_TYPE_RASTER));
-	screen.set_raw(MDA_CLOCK, 882, 0, 720, 370, 0, 350);
-	screen.set_screen_update(MC6845_NAME, FUNC(mc6845_device::screen_update));
+MACHINE_CONFIG_START(isa8_hercules_device::device_add_mconfig)
+	MCFG_SCREEN_ADD( HERCULES_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
+	MCFG_SCREEN_UPDATE_DEVICE( MC6845_NAME, mc6845_device, screen_update )
 
-	PALETTE(config, m_palette).set_entries(4);
+	MCFG_PALETTE_ADD( "palette", 4 )
 
 	MC6845(config, m_crtc, MDA_CLOCK/9);
 	m_crtc->set_screen(HERCULES_SCREEN_NAME);
@@ -549,11 +547,11 @@ void isa8_hercules_device::device_add_mconfig(machine_config &config)
 	m_crtc->out_hsync_callback().set(FUNC(isa8_mda_device::hsync_changed));
 	m_crtc->out_vsync_callback().set(FUNC(isa8_mda_device::vsync_changed));
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_pcherc);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pcherc)
 
 	PC_LPT(config, m_lpt);
 	m_lpt->irq_handler().set(FUNC(isa8_mda_device::pc_cpu_line));
-}
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -679,10 +677,10 @@ WRITE8_MEMBER( isa8_hercules_device::io_write )
 	switch( offset )
 	{
 	case 0: case 2: case 4: case 6:
-		m_crtc->address_w(data);
+		m_crtc->address_w( space, offset, data );
 		break;
 	case 1: case 3: case 5: case 7:
-		m_crtc->register_w(data);
+		m_crtc->register_w( space, offset, data );
 		break;
 	case 8:
 		mode_control_w(space, offset, data);
@@ -726,7 +724,7 @@ READ8_MEMBER( isa8_hercules_device::io_read )
 		/* return last written mc6845 address value here? */
 		break;
 	case 1: case 3: case 5: case 7:
-		data = m_crtc->register_r();
+		data = m_crtc->register_r( space, offset );
 		break;
 	case 10:
 		data = status_r(space, offset);
@@ -747,13 +745,12 @@ DEFINE_DEVICE_TYPE(ISA8_EC1840_0002, isa8_ec1840_0002_device, "ec1840_0002", "EC
 //-------------------------------------------------
 
 // XXX
-void isa8_ec1840_0002_device::device_add_mconfig(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, MDA_SCREEN_NAME, SCREEN_TYPE_RASTER));
-	screen.set_raw(MDA_CLOCK, 792, 0, 640, 370, 0, 350);
-	screen.set_screen_update(MC6845_NAME, FUNC(mc6845_device::screen_update));
+MACHINE_CONFIG_START(isa8_ec1840_0002_device::device_add_mconfig)
+	MCFG_SCREEN_ADD( MDA_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 792, 0, 640, 370, 0, 350 )
+	MCFG_SCREEN_UPDATE_DEVICE( MC6845_NAME, mc6845_device, screen_update )
 
-	PALETTE(config, m_palette).set_entries(4);
+	MCFG_PALETTE_ADD( "palette", 4 )
 
 	MC6845(config, m_crtc, MDA_CLOCK/8);
 	m_crtc->set_screen(MDA_SCREEN_NAME);
@@ -762,7 +759,7 @@ void isa8_ec1840_0002_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_update_row_callback(FUNC(isa8_mda_device::crtc_update_row), this);
 	m_crtc->out_hsync_callback().set(FUNC(isa8_mda_device::hsync_changed));
 	m_crtc->out_vsync_callback().set(FUNC(isa8_mda_device::vsync_changed));
-}
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  isa8_ec1840_0002_device - constructor

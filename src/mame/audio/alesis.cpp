@@ -41,17 +41,15 @@ alesis_dm3ag_device::alesis_dm3ag_device(const machine_config &mconfig, const ch
 //  device_add_mconfig
 //-------------------------------------------------
 
-void alesis_dm3ag_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(alesis_dm3ag_device::device_add_mconfig)
 	SPEAKER(config, "lspeaker1").front_left();
 	SPEAKER(config, "rspeaker1").front_right();
 	SPEAKER(config, "lspeaker2").front_left();
 	SPEAKER(config, "rspeaker2").front_right();
-	PCM54HP(config, m_dac, 0).add_route(ALL_OUTPUTS, "lspeaker1", 1.0).add_route(ALL_OUTPUTS, "rspeaker1", 1.0); // PCM54HP DAC + R63/R73-75 + Sample and hold
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-}
+	MCFG_DEVICE_ADD("dac", PCM54HP, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker1", 1.0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker1", 1.0) // PCM54HP DAC + R63/R73-75 + Sample and hold
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_start - device-specific startup

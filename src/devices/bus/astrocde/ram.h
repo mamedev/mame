@@ -6,8 +6,6 @@
 #pragma once
 
 #include "exp.h"
-#include "imagedev/cassette.h"
-#include "machine/ins8154.h"
 
 
 // ======================> astrocade_blueram_4k_device
@@ -24,25 +22,15 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
-	virtual DECLARE_READ8_MEMBER(read_io) override;
-	virtual DECLARE_WRITE8_MEMBER(write_io) override;
-
-	uint8_t porta_r();
-	uint8_t portb_r();
-	void porta_w(uint8_t data);
-	void portb_w(uint8_t data);
 
 protected:
 	astrocade_blueram_4k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override { m_ram.resize(0x1000); save_item(NAME(m_ram)); }
 	virtual void device_reset() override { }
-	virtual void device_add_mconfig(machine_config &config) override;
 
 	std::vector<uint8_t> m_ram;
 	required_ioport m_write_prot;
-	required_device<ins8154_device> m_ramio;
-	required_device<cassette_image_device> m_cassette;
 };
 
 // ======================> astrocade_blueram_16k_device

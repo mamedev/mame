@@ -112,7 +112,7 @@ void nes_rex_sl1632_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_rex_dbz5_device::write_l(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_rex_dbz5_device::write_l)
 {
 	LOG_MMC(("rex_dbz write_l, offset: %04x, data: %02x\n", offset, data));
 
@@ -121,7 +121,7 @@ void nes_rex_dbz5_device::write_l(offs_t offset, uint8_t data)
 }
 
 /* we would need to use this read handler in 0x6000-0x7fff as well */
-uint8_t nes_rex_dbz5_device::read_l(offs_t offset)
+READ8_MEMBER(nes_rex_dbz5_device::read_l)
 {
 	LOG_MMC(("rex_dbz read_l, offset: %04x\n", offset));
 	return 0x01;
@@ -208,7 +208,7 @@ void nes_rex_sl1632_device::set_chr(uint8_t chr, int chr_base, int chr_mask)
 	chr1_x(chr_page ^ 7, chr_base2[7] | (bank[7] & chr_mask), chr);
 }
 
-void nes_rex_sl1632_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_rex_sl1632_device::write_h)
 {
 	uint8_t helper1, helper2;
 	LOG_MMC(("rex_sl1632 write_h, offset: %04x, data: %02x\n", offset, data));
@@ -232,7 +232,7 @@ void nes_rex_sl1632_device::write_h(offs_t offset, uint8_t data)
 				break;
 
 			default:
-				txrom_write(offset, data);
+				txrom_write(space, offset, data, mem_mask);
 				break;
 		}
 	}

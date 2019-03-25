@@ -114,7 +114,7 @@ MC6845_UPDATE_ROW( sv806_device::crtc_update_row )
 	}
 }
 
-uint8_t sv806_device::mreq_r(offs_t offset)
+READ8_MEMBER( sv806_device::mreq_r )
 {
 	if (offset >= 0xf000 && m_ram_enabled)
 	{
@@ -125,7 +125,7 @@ uint8_t sv806_device::mreq_r(offs_t offset)
 	return 0xff;
 }
 
-void sv806_device::mreq_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( sv806_device::mreq_w )
 {
 	if (offset >= 0xf000 && m_ram_enabled)
 	{
@@ -134,20 +134,20 @@ void sv806_device::mreq_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t sv806_device::iorq_r(offs_t offset)
+READ8_MEMBER( sv806_device::iorq_r )
 {
 	if (offset == 0x51)
-		return m_crtc->register_r();
+		return m_crtc->register_r(space, 0);
 
 	return 0xff;
 }
 
-void sv806_device::iorq_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( sv806_device::iorq_w )
 {
 	switch (offset)
 	{
-	case 0x50: m_crtc->address_w(data); break;
-	case 0x51: m_crtc->register_w(data); break;
+	case 0x50: m_crtc->address_w(space, 0, data); break;
+	case 0x51: m_crtc->register_w(space, 0, data); break;
 	case 0x58: m_ram_enabled = data; break;
 	}
 }

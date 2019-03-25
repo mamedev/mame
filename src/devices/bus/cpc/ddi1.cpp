@@ -116,7 +116,7 @@ WRITE8_MEMBER(cpc_ddi1_device::fdc_w)
 	switch(offset)
 	{
 	case 0x01:
-		m_fdc->fifo_w(data);
+		m_fdc->fifo_w(space, 0,data);
 		break;
 	}
 }
@@ -128,10 +128,10 @@ READ8_MEMBER(cpc_ddi1_device::fdc_r)
 	switch(offset)
 	{
 	case 0x00:
-		data = m_fdc->msr_r();
+		data = m_fdc->msr_r(space, 0);
 		break;
 	case 0x01:
-		data = m_fdc->fifo_r();
+		data = m_fdc->fifo_r(space, 0);
 		break;
 	}
 	return data;

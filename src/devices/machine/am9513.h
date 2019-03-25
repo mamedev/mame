@@ -55,12 +55,12 @@ public:
 	auto fout_cb() { return m_fout_cb.bind(); }
 
 	// 8-bit data bus interface
-	u8 read8(offs_t offset);
-	void write8(offs_t offset, u8 data);
+	DECLARE_READ8_MEMBER(read8);
+	DECLARE_WRITE8_MEMBER(write8);
 
 	// 16-bit data bus interface
-	u16 read16(offs_t offset);
-	void write16(offs_t offset, u16 data);
+	DECLARE_READ16_MEMBER(read16);
+	DECLARE_WRITE16_MEMBER(write16);
 
 	// Source N inputs
 	DECLARE_WRITE_LINE_MEMBER(source1_w) { write_source(0, state); }

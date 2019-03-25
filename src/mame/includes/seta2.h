@@ -28,6 +28,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 
+		m_tmp68301(*this, "tmp68301"),
 		m_oki(*this, "oki"),
 		m_eeprom(*this, "eeprom"),
 		m_flash(*this, "flash"),
@@ -118,6 +119,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
+	optional_device<tmp68301_device> m_tmp68301;
 	optional_device<okim9810_device> m_oki;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<intelfsh16_device> m_flash;

@@ -118,17 +118,17 @@ static INPUT_PORTS_START( daruma )
 
 INPUT_PORTS_END
 
-void daruma_state::daruma(machine_config &config)
-{
+MACHINE_CONFIG_START(daruma_state::daruma)
 	/* basic machine hardware */
-	I80C32(config, m_maincpu, 11059200); //verified on pcb
-	m_maincpu->set_addrmap(AS_PROGRAM, &daruma_state::mem_prg);
-	m_maincpu->set_addrmap(AS_IO, &daruma_state::mem_io);
+	MCFG_DEVICE_ADD("maincpu", I80C32,11059200) //verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(mem_prg)
+	MCFG_DEVICE_IO_MAP(mem_io)
 	// TODO: ports
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 1.00);
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(0, "mono", 1.00)
 
 /*  TODO:
     config.set_default_layout(layout_daruma);
@@ -136,9 +136,9 @@ void daruma_state::daruma(machine_config &config)
     Motors: MTA011
     http://pdf.datasheetcatalog.com/datasheet/Shindengen/mXstzvq.pdf
 
-    The motor controller supposedly is used to cut the paper strip out after finishing printing something.
+    The motor controller suposedly is used to cut the paper strip out after finishing printing something.
 */
-}
+MACHINE_CONFIG_END
 
 ROM_START( ds348 )
 	ROM_REGION( 0x10000, "maincpu", 0 )

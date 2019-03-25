@@ -261,29 +261,28 @@ static void tdv2324_floppies(device_slot_interface &device)
 //**************************************************************************
 
 //-------------------------------------------------
-//  machine_config( tdv2324 )
+//  MACHINE_CONFIG( tdv2324 )
 //-------------------------------------------------
 
-void tdv2324_state::tdv2324(machine_config &config)
-{
+MACHINE_CONFIG_START(tdv2324_state::tdv2324)
 	// basic system hardware
-	I8085A(config, m_maincpu, 8700000/2); // ???
-	m_maincpu->set_addrmap(AS_PROGRAM, &tdv2324_state::tdv2324_mem);
-	m_maincpu->set_addrmap(AS_IO, &tdv2324_state::tdv2324_io);
+	MCFG_DEVICE_ADD(P8085AH_0_TAG, I8085A, 8700000/2) // ???
+	MCFG_DEVICE_PROGRAM_MAP(tdv2324_mem)
+	MCFG_DEVICE_IO_MAP(tdv2324_io)
 
-	I8085A(config, m_subcpu, 8000000/2); // ???
-	m_subcpu->set_addrmap(AS_PROGRAM, &tdv2324_state::tdv2324_sub_mem);
-	m_subcpu->set_addrmap(AS_IO, &tdv2324_state::tdv2324_sub_io);
+	MCFG_DEVICE_ADD(P8085AH_1_TAG, I8085A, 8000000/2) // ???
+	MCFG_DEVICE_PROGRAM_MAP(tdv2324_sub_mem)
+	MCFG_DEVICE_IO_MAP(tdv2324_sub_io)
 
-	M6802(config, m_fdccpu, 8000000/2); // ???
-	m_fdccpu->set_addrmap(AS_PROGRAM, &tdv2324_state::tdv2324_fdc_mem);
+	MCFG_DEVICE_ADD(MC68B02P_TAG, M6802, 8000000/2) // ???
+	MCFG_DEVICE_PROGRAM_MAP(tdv2324_fdc_mem)
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
-	screen.set_refresh_hz(50);
-	screen.set_screen_update(FUNC(tdv2324_state::screen_update));
-	screen.set_size(800, 400);
-	screen.set_visarea(0, 800-1, 0, 400-1);
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_UPDATE_DRIVER(tdv2324_state, screen_update)
+	MCFG_SCREEN_SIZE(800, 400)
+	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -299,15 +298,15 @@ void tdv2324_state::tdv2324(machine_config &config)
 	Z80SIO2(config, MK3887N4_TAG, 8000000/2);
 
 	FD1797(config, FD1797PL02_TAG, 8000000/4);
-	FLOPPY_CONNECTOR(config, FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1797PL02_TAG":1", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
+	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":1", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software list
-	SOFTWARE_LIST(config, "flop_list").set_original("tdv2324");
-}
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "tdv2324")
+MACHINE_CONFIG_END
 
 
 

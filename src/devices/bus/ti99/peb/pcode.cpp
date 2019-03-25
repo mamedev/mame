@@ -142,7 +142,7 @@ SETADDRESS_DBIN_MEMBER( ti_pcode_card_device::setaddress_dbin )
 	}
 }
 
-void ti_pcode_card_device::debugger_read(uint16_t offset, uint8_t& value)
+void ti_pcode_card_device::debugger_read(address_space& space, uint16_t offset, uint8_t& value)
 {
 	// The debuger does not call setaddress
 	if (m_active && ((offset & m_select_mask)==m_select_value))
@@ -160,7 +160,7 @@ READ8Z_MEMBER( ti_pcode_card_device::readz )
 	// Care for debugger
 	if (machine().side_effects_disabled())
 	{
-		debugger_read(offset, *value);
+		debugger_read(space, offset, *value);
 	}
 
 	if (m_active && m_inDsrArea && m_selected)
@@ -200,7 +200,7 @@ READ8Z_MEMBER( ti_pcode_card_device::readz )
     Write a byte in P-Code ROM space. This is only used for setting the
     GROM address.
 */
-void ti_pcode_card_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( ti_pcode_card_device::write )
 {
 	if (machine().side_effects_disabled()) return;
 	if (m_active && m_isgrom && m_selected)
@@ -253,7 +253,7 @@ READ8Z_MEMBER(ti_pcode_card_device::crureadz)
     A8, A13, and A14 so bit 0 is at 0x1f00, but bit 4 is at 0x1f80. Accordingly,
     bit 7 would be 0x1f86 but it is not used.
 */
-void ti_pcode_card_device::cruwrite(offs_t offset, uint8_t data)
+WRITE8_MEMBER(ti_pcode_card_device::cruwrite)
 {
 	if ((offset & 0xff00)==CRU_BASE)
 		m_crulatch->write_bit((offset & 0x80) >> 5 | (offset & 0x06) >> 1, data);

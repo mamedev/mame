@@ -90,22 +90,26 @@ void cortex_state::mem_map(address_map &map)
 	map(0x0000, 0x7fff).bankr("bankr0").bankw("bankw0");
 	map(0x8000, 0xefff).ram();
 	map(0xf100, 0xf11f).ram(); // memory mapping unit
-	map(0xf120, 0xf121).rw("crtc", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
-	//map(0xf140, 0xf147) // fdc tms9909
+	map(0xf120, 0xf120).rw("crtc", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0xf121, 0xf121).rw("crtc", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	//AM_RANGE(0xf140, 0xf147) // fdc tms9909
 }
 
 void cortex_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x000f).mirror(0x30).w("control", FUNC(ls259_device::write_d0));
-	map(0x0000, 0x000f).r(FUNC(cortex_state::pio_r));
-	map(0x0010, 0x001f).r(FUNC(cortex_state::keyboard_r));
-	//map(0x0080, 0x00bf).rw("uart1", FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite)); // RS232 (r12 = 80-bf)
-	//map(0x0180, 0x01bf).rw("uart2", FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite)); // Cassette (r12 = 180-1bf)
-	//map(0x01c0, 0x01ff).rw("dma", FUNC(tms9911_device::read), FUNC(tms9911_device::write)); // r12 = 1c0-1fe
-	//map(0x0800, 0x080f).w(cortex_state::cent_data_w)); // r12 = 800-80e
-	//map(0x0810, 0x0811).w(FUNC(cortex_state::cent_strobe_w)); // r12 = 810
-	//map(0x0812, 0x0813).r(FUNC(cortex_state::cent_stat_r)); // CRU 409 (r12 = 812)
+	map(0x0000, 0x0007).mirror(0x18).w("control", FUNC(ls259_device::write_d0));
+	map(0x0000, 0x0000).r(FUNC(cortex_state::pio_r));
+	map(0x0001, 0x0001).r(FUNC(cortex_state::keyboard_r));
+	//AM_RANGE(0x0040, 0x005f) AM_DEVWRITE("uart1", tms9902_device, cruwrite) // RS232 (r12 = 80-bf)
+	//AM_RANGE(0x0008, 0x000b) AM_DEVREAD("uart1", tms9902_device, cruread) // RS232
+	//AM_RANGE(0x00c0, 0x00df) AM_DEVWRITE("uart2", tms9902_device, cruwrite) // Cassette (r12 = 180-1bf)
+	//AM_RANGE(0x0018, 0x001b) AM_DEVREAD("uart2", tms9902_device, cruread) // Cassette
+	//AM_RANGE(0x00e0, 0x00ff) AM_WRITE("dma", tms9911_device, write) // r12 = 1c0-1fe
+	//AM_RANGE(0x001c, 0x001f) AM_READ("dma", tms9911_device, read) // if reading is needed
+	//AM_RANGE(0x0400, 0x0407) AM_WRITE(cent_data_w) // r12 = 800-80e
+	//AM_RANGE(0x0408, 0x0408) AM_WRITE(cent_strobe_w) // r12 = 810
+	//AM_RANGE(0x0081, 0x0081) AM_READ(cent_stat_r) // CRU 409 (r12 = 812)
 }
 
 /* Input ports */
@@ -121,26 +125,12 @@ INPUT_PORTS_END
 
 READ8_MEMBER( cortex_state::pio_r )
 {
-	switch (offset)
-	{
-	case 5:
-		return m_kbd_ack;
-
-	case 6:
-		return m_vdp_int;
-
-	case 2:
-	case 3:
-		return BIT(m_io_dsw->read(), offset);
-
-	default:
-		return 1;
-	}
+	return (m_kbd_ack ? 0x20 : 0) | (m_vdp_int ? 0x40 : 0) | m_io_dsw->read() | 0x93;
 }
 
 READ8_MEMBER( cortex_state::keyboard_r )
 {
-	return BIT(m_term_data, offset);
+	return m_term_data;
 }
 
 WRITE_LINE_MEMBER( cortex_state::keyboard_ack_w )

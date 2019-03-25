@@ -135,15 +135,14 @@ static INPUT_PORTS_START( cvicny )
 INPUT_PORTS_END
 
 
-void cvicny_state::cvicny(machine_config &config)
-{
+MACHINE_CONFIG_START(cvicny_state::cvicny)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(2'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &cvicny_state::cvicny_mem);
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(2'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(cvicny_mem)
 
 	/* video hardware */
 	config.set_default_layout(layout_cvicny);
-}
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( cvicny )

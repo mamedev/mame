@@ -101,7 +101,7 @@ READ8Z_MEMBER( geneve_memex_device::readz )
 /*
     Memory write
 */
-void geneve_memex_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( geneve_memex_device::write )
 {
 	/* If not Genmod, add the upper two address bits 10 */
 	if (!m_genmod) offset |= 0x100000;
@@ -152,12 +152,11 @@ INPUT_PORTS_START( memex )
 		PORT_DIPSETTING( MDIP8, "Lock out pages FC-FF")
 INPUT_PORTS_END
 
-void geneve_memex_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(geneve_memex_device::device_add_mconfig)
 	RAM(config, m_ram, 0);
 	m_ram->set_default_size("2M");
 	m_ram->set_default_value(0);
-}
+MACHINE_CONFIG_END
 
 ioport_constructor geneve_memex_device::device_input_ports() const
 {

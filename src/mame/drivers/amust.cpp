@@ -433,26 +433,26 @@ void amust_state::init_amust()
 	membank("bankw0")->configure_entry(0, &main[0xf800]);
 }
 
-void amust_state::amust(machine_config &config)
-{
+MACHINE_CONFIG_START(amust_state::amust)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(16'000'000) / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &amust_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &amust_state::io_map);
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_amust);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amust)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("beeper", BEEP, 800)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
 	h46505_device &crtc(H46505(config, "crtc", XTAL(14'318'181) / 8));
@@ -466,8 +466,10 @@ void amust_state::amust(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->drq_wr_callback().set(FUNC(amust_state::drq_w));
 	m_fdc->intrq_wr_callback().set(FUNC(amust_state::intrq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", amust_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", amust_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amust_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amust_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
 	uart_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));
@@ -503,7 +505,7 @@ void amust_state::amust(machine_config &config)
 	ppi2.in_pb_callback().set(FUNC(amust_state::port09_r));
 	ppi2.in_pc_callback().set(FUNC(amust_state::port0a_r));
 	ppi2.out_pc_callback().set(FUNC(amust_state::port0a_w));
-}
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( amust )

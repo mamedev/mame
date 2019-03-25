@@ -122,9 +122,8 @@ const tiny_rom_entry *ie15_keyboard_device::device_rom_region() const
 	return ROM_NAME( ie15_keyboard );
 }
 
-void ie15_keyboard_device::device_add_mconfig(machine_config &config)
-{
-}
+MACHINE_CONFIG_START(ie15_keyboard_device::device_add_mconfig)
+MACHINE_CONFIG_END
 
 
 void ie15_keyboard_device::device_start()

@@ -65,17 +65,21 @@ void spectrum_kempjoy_device::device_start()
 }
 
 
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void spectrum_kempjoy_device::device_reset()
+{
+	io_space().install_read_handler(0x1f, 0x1f, 0, 0xff00, 0, read8_delegate(FUNC(spectrum_kempjoy_device::joystick_r), this));
+}
+
+
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
 
-uint8_t spectrum_kempjoy_device::iorq_r(offs_t offset)
+READ8_MEMBER(spectrum_kempjoy_device::joystick_r)
 {
-	uint8_t data = 0xff;
-
-	if (offset == 0x1f)
-	{
-		data = m_joy->read() & 0x1f;
-	}
-	return data;
+	return m_joy->read() & 0x1f;
 }

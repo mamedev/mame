@@ -595,14 +595,14 @@ static void apple1_cards(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(apple1_state::apple1)
-	M6502(config, m_maincpu, 960000);        // effective CPU speed
-	m_maincpu->set_addrmap(AS_PROGRAM, &apple1_state::apple1_map);
+	MCFG_DEVICE_ADD(m_maincpu, M6502, 960000)        // effective CPU speed
+	MCFG_DEVICE_PROGRAM_MAP(apple1_map)
 
 	// video timings are identical to the Apple II, unsurprisingly
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(14'318'181), (65*7)*2, 0, (40*7)*2, 262, 0, 192);
-	m_screen->set_screen_update(FUNC(apple1_state::screen_update));
-	m_screen->set_palette("palette");
+	MCFG_SCREEN_ADD(m_screen, RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181), (65*7)*2, 0, (40*7)*2, 262, 0, 192)
+	MCFG_SCREEN_UPDATE_DRIVER(apple1_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -611,12 +611,13 @@ MACHINE_CONFIG_START(apple1_state::apple1)
 	m_pia->writepb_handler().set(FUNC(apple1_state::pia_display_w));
 	m_pia->cb2_handler().set(FUNC(apple1_state::pia_display_gate_w));
 
-	A1BUS(config, A1_BUS_TAG, 0).set_space(m_maincpu, AS_PROGRAM);
-	A1BUS_SLOT(config, "exp", 0, A1_BUS_TAG, apple1_cards, "cassette");
+	MCFG_DEVICE_ADD(A1_BUS_TAG, A1BUS, 0)
+	MCFG_A1BUS_CPU(m_maincpu)
+	MCFG_DEVICE_ADD("exp", A1BUS_SLOT, 0, A1_BUS_TAG, apple1_cards, "cassette")
 
-	MCFG_SNAPSHOT_ADD("snapshot", apple1_state, apple1, "snp")
+	MCFG_SNAPSHOT_ADD("snapshot", apple1_state, apple1, "snp", 0)
 
-	SOFTWARE_LIST(config, "cass_list").set_original("apple1");
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "apple1")
 
 	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("4K,8K,12K,16K,20K,24K,28K,32K,36K,40K,44K");
 MACHINE_CONFIG_END

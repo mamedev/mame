@@ -874,44 +874,48 @@ static void saturn_cart(device_slot_interface &device)
 }
 
 
-void sat_console_state::saturnus(machine_config &config)
-{
+MACHINE_CONFIG_START(sat_console_state::saturnus)
 	saturn(config);
-	SATURN_CDB(config, "saturn_cdb", 16000000);
+	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
 
-	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("NTSC-U");
+	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
+	MCFG_SOFTWARE_LIST_FILTER("cd_list","NTSC-U")
 
-	SATURN_CART_SLOT(config, "exp", saturn_cart, nullptr);
-	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");
+	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, nullptr)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
-	m_smpc_hle->set_region_code(4);
-}
+	MCFG_DEVICE_MODIFY("smpc")
+	downcast<smpc_hle_device &>(*device).set_region_code(4);
 
-void sat_console_state::saturneu(machine_config &config)
-{
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(sat_console_state::saturneu)
 	saturn(config);
-	SATURN_CDB(config, "saturn_cdb", 16000000);
+	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
 
-	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("PAL");
+	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
+	MCFG_SOFTWARE_LIST_FILTER("cd_list","PAL")
 
-	SATURN_CART_SLOT(config, "exp", saturn_cart, nullptr);
-	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");
+	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, nullptr)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
-	m_smpc_hle->set_region_code(12);
-}
+	MCFG_DEVICE_MODIFY("smpc")
+	downcast<smpc_hle_device &>(*device).set_region_code(12);
+MACHINE_CONFIG_END
 
-void sat_console_state::saturnjp(machine_config &config)
-{
+MACHINE_CONFIG_START(sat_console_state::saturnjp)
 	saturn(config);
-	SATURN_CDB(config, "saturn_cdb", 16000000);
+	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
 
-	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("NTSC-J");
+	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
+	MCFG_SOFTWARE_LIST_FILTER("cd_list","NTSC-J")
 
-	SATURN_CART_SLOT(config, "exp", saturn_cart, nullptr);
-	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");
+	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, nullptr)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
-	m_smpc_hle->set_region_code(1);
-}
+	MCFG_DEVICE_MODIFY("smpc")
+	downcast<smpc_hle_device &>(*device).set_region_code(1);
+MACHINE_CONFIG_END
 
 
 void sat_console_state::saturn_init_driver(int rgn)

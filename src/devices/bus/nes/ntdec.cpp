@@ -102,7 +102,7 @@ void nes_ntdec_fh_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_ntdec_asder_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_ntdec_asder_device::write_h)
 {
 	LOG_MMC(("ntdec_asder write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -165,7 +165,7 @@ void nes_ntdec_asder_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_ntdec_fh_device::write_m(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_ntdec_fh_device::write_m)
 {
 	LOG_MMC(("ntdec_fh write_m, offset: %04x, data: %02x\n", offset, data));
 

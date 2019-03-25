@@ -4265,7 +4265,7 @@ uint16_t hdc92x4_device::encode_a1_hd()
     Read a byte of data from the controller
     The address (offset) encodes the C/D* line (command and /data)
 */
-uint8_t hdc92x4_device::read(offs_t offset)
+READ8_MEMBER( hdc92x4_device::read )
 {
 	uint8_t reply;
 	if ((offset & 1) == 0)
@@ -4300,7 +4300,7 @@ uint8_t hdc92x4_device::read(offs_t offset)
     The operation terminates immediately, and the controller picks up the
     values stored in this phase at a later time.
 */
-void hdc92x4_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( hdc92x4_device::write )
 {
 	if ((offset & 1) == 0)
 	{

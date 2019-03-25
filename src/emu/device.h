@@ -90,43 +90,23 @@ struct device_feature
 {
 	enum type : u32
 	{
-		// Functionality-related
 		PROTECTION  = u32(1) <<  0,
-		TIMING      = u32(1) <<  1,
-
-		// Graphics
+		PALETTE     = u32(1) <<  1,
 		GRAPHICS    = u32(1) <<  2,
-		PALETTE     = u32(1) <<  3,
-
-		// Sound
-		SOUND       = u32(1) <<  4,
-
-		// Capture/Media Output
-		CAPTURE     = u32(1) <<  5,
-		CAMERA      = u32(1) <<  6,
+		SOUND       = u32(1) <<  3,
+		CONTROLS    = u32(1) <<  4,
+		KEYBOARD    = u32(1) <<  5,
+		MOUSE       = u32(1) <<  6,
 		MICROPHONE  = u32(1) <<  7,
-
-		// Controls/HID
-		CONTROLS    = u32(1) <<  8,
-		KEYBOARD    = u32(1) <<  9,
-		MOUSE       = u32(1) << 10,
-
-		// Media Output
-		MEDIA       = u32(1) << 11,
-		DISK        = u32(1) << 12,
-		PRINTER     = u32(1) << 13,
-		TAPE        = u32(1) << 14,
-		PUNCH       = u32(1) << 15,
-		DRUM        = u32(1) << 16,
-		ROM         = u32(1) << 17,
-
-		// Comms/Network
-		COMMS       = u32(1) << 18,
-		LAN         = u32(1) << 19,
-		WAN         = u32(1) << 20,
+		CAMERA      = u32(1) <<  8,
+		DISK        = u32(1) <<  9,
+		PRINTER     = u32(1) << 10,
+		LAN         = u32(1) << 11,
+		WAN         = u32(1) << 12,
+		TIMING      = u32(1) << 13,
 
 		NONE        = u32(0),
-		ALL         = (u32(1) << 21) - 1U
+		ALL         = (u32(1) << 14) - 1U
 	};
 };
 

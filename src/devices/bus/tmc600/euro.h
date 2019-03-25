@@ -56,6 +56,17 @@
 #define TMC600_EURO_BUS_TAG     "bus"
 
 
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_TMC600_EURO_BUS_SLOT_ADD(_tag, _slot_intf, _def_slot) \
+	MCFG_DEVICE_ADD(_tag, TMC600_EURO_BUS_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -85,17 +96,7 @@ class tmc600_euro_bus_slot_t : public device_t,
 {
 public:
 	// construction/destruction
-	template <typename T>
-	tmc600_euro_bus_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: tmc600_euro_bus_slot_t(mconfig, tag, owner, 0)
-	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
-	}
-
-	tmc600_euro_bus_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	tmc600_euro_bus_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides

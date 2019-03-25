@@ -46,13 +46,16 @@ void electron_abr_device::device_start()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t electron_abr_device::read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
+uint8_t electron_abr_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa)
 {
 	uint8_t data = 0xff;
 
-	if (oe)
+	if (!infc && !infd)
 	{
-		data = m_nvram[(offset & 0x3fff) | (romqa << 14)];
+		if (offset >= 0x0000 && offset < 0x4000)
+		{
+			data = m_nvram[(offset & 0x3fff) | (romqa << 14)];
+		}
 	}
 
 	return data;
@@ -62,7 +65,7 @@ uint8_t electron_abr_device::read(offs_t offset, int infc, int infd, int romqa, 
 //  write - cartridge data write
 //-------------------------------------------------
 
-void electron_abr_device::write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
+void electron_abr_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa)
 {
 	if (infc)
 	{
@@ -82,9 +85,10 @@ void electron_abr_device::write(offs_t offset, uint8_t data, int infc, int infd,
 			break;
 		}
 	}
-	else if (oe)
+
+	if (!infc && !infd)
 	{
-		if (!m_bank_locked[romqa])
+		if (offset >= 0x0000 && offset < 0x4000 && !m_bank_locked[romqa])
 		{
 			m_nvram[(offset & 0x3fff) | (romqa << 14)] = data;
 		}

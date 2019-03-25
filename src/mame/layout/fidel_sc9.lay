@@ -137,27 +137,27 @@
 
 	<element name="text_king">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="[K]"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="&#x2654;"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_queen">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="[Q]"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="&#x2655;"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_rook">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="[R]"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="&#x2656;"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_bishop">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="[B]"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="&#x2657;"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_knight">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="[N]"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="&#x2658;"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_pawn">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="[P]"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="&#x2659;"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 
 
@@ -385,12 +385,12 @@
 
 		<bezel name="8.7" element="led"><bounds x="91.95" y="7.25" width="1.5" height="1.5" /></bezel>
 
-		<bezel element="text_king"><bounds x="84.01" y="32.8" width="5.7" height="3" /></bezel>
-		<bezel element="text_queen"><bounds x="84.01" y="41.6" width="5.7" height="3" /></bezel>
-		<bezel element="text_rook"><bounds x="84.01" y="50.4" width="5.7" height="3" /></bezel>
-		<bezel element="text_bishop"><bounds x="84.01" y="59.2" width="5.7" height="3" /></bezel>
-		<bezel element="text_knight"><bounds x="84.01" y="68" width="5.7" height="3" /></bezel>
-		<bezel element="text_pawn"><bounds x="84.01" y="76.8" width="5.7" height="3" /></bezel>
+		<bezel element="text_king"><bounds x="84.01" y="31.1" width="6" height="6" /></bezel>
+		<bezel element="text_queen"><bounds x="84.01" y="39.9" width="6" height="6" /></bezel>
+		<bezel element="text_rook"><bounds x="84.01" y="48.7" width="6" height="6" /></bezel>
+		<bezel element="text_bishop"><bounds x="84.01" y="57.5" width="6" height="6" /></bezel>
+		<bezel element="text_knight"><bounds x="84.01" y="66.3" width="6" height="6" /></bezel>
+		<bezel element="text_pawn"><bounds x="84.01" y="75.1" width="6" height="6" /></bezel>
 
 		<bezel element="disk_black"><bounds x="89" y="13" width="7.4" height="7.4" /></bezel>
 		<bezel element="disk_black"><bounds x="89" y="21.8" width="7.4" height="7.4" /></bezel>

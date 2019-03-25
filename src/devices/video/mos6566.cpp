@@ -227,14 +227,12 @@ DEFINE_DEVICE_TYPE(MOS8566, mos8566_device, "mos8566", "MOS 8566 VIC-II")
 // default address maps
 void mos6566_device::mos6566_videoram_map(address_map &map)
 {
-	if (!has_configured_map(0))
-		map(0x0000, 0x3fff).ram();
+	map(0x0000, 0x3fff).ram();
 }
 
 void mos6566_device::mos6566_colorram_map(address_map &map)
 {
-	if (!has_configured_map(1))
-		map(0x000, 0x3ff).ram();
+	map(0x000, 0x3ff).ram();
 }
 
 
@@ -589,8 +587,8 @@ mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, 
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_variant(variant),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(FUNC(mos6566_device::mos6566_videoram_map), this)),
-		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, address_map_constructor(FUNC(mos6566_device::mos6566_colorram_map), this)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(), address_map_constructor(FUNC(mos6566_device::mos6566_videoram_map), this)),
+		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, address_map_constructor(), address_map_constructor(FUNC(mos6566_device::mos6566_colorram_map), this)),
 		m_write_irq(*this),
 		m_write_ba(*this),
 		m_write_aec(*this),
@@ -2448,7 +2446,7 @@ uint32_t mos6566_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 //  read -
 //-------------------------------------------------
 
-uint8_t mos6566_device::read(offs_t offset)
+READ8_MEMBER( mos6566_device::read )
 {
 	uint8_t val = 0;
 
@@ -2593,7 +2591,7 @@ uint8_t mos6566_device::read(offs_t offset)
 //  write -
 //-------------------------------------------------
 
-void mos6566_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( mos6566_device::write )
 {
 	DBG_LOG(2, "vic write", ("%.2x:%.2x\n", offset, data));
 	offset &= 0x3f;

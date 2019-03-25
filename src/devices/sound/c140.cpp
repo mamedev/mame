@@ -374,14 +374,14 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 }
 
 
-u8 c140_device::c140_r(offs_t offset)
+READ8_MEMBER( c140_device::c140_r )
 {
 	offset&=0x1ff;
 	return m_REG[offset];
 }
 
 
-void c140_device::c140_w(offs_t offset, u8 data)
+WRITE8_MEMBER( c140_device::c140_w )
 {
 	m_stream->update();
 

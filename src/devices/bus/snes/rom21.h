@@ -18,8 +18,8 @@ public:
 	sns_rom21_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual uint8_t read_l(offs_t offset) override;
-	virtual uint8_t read_h(offs_t offset) override;
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_READ8_MEMBER(read_h) override;
 
 protected:
 	sns_rom21_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -38,8 +38,8 @@ public:
 	sns_rom21_srtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual uint8_t chip_read(offs_t offset) override;
-	virtual void chip_write(offs_t offset, uint8_t data) override;
+	virtual DECLARE_READ8_MEMBER(chip_read) override;
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
 
 protected:
 	// S-RTC specific variables

@@ -46,12 +46,11 @@ void by68701_state::init_by68701()
 {
 }
 
-void by68701_state::by68701(machine_config &config)
-{
+MACHINE_CONFIG_START(by68701_state::by68701)
 	/* basic machine hardware */
-	M6803(config, m_maincpu, 3579545/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &by68701_state::by68701_map);
-}
+	MCFG_DEVICE_ADD("maincpu", M6803, 3579545/4)
+	MCFG_DEVICE_PROGRAM_MAP(by68701_map)
+MACHINE_CONFIG_END
 
 /*------------------
 / Flash Gordon

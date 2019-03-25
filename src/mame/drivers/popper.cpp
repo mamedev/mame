@@ -479,7 +479,7 @@ WRITE8_MEMBER( popper_state::ay1_w )
 		m_ay[1]->reset();
 	}
 
-	m_ay[0]->write_bc1_bc2(offset, data);
+	m_ay[0]->write_bc1_bc2(space, offset, data);
 }
 
 
@@ -534,21 +534,20 @@ void popper_state::machine_reset()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-void popper_state::popper(machine_config &config)
-{
-	Z80(config, m_maincpu, XTAL(18'432'000)/3/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &popper_state::main_map);
+MACHINE_CONFIG_START(popper_state::popper)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	Z80(config, m_subcpu, XTAL(18'432'000)/3/2);
-	m_subcpu->set_addrmap(AS_PROGRAM, &popper_state::sub_map);
+	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(18'432'000)/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(18'432'000)/3, 384, 48, 328, 264, 16, 240);
-	m_screen->set_screen_update(FUNC(popper_state::screen_update));
-	m_screen->set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/3, 384, 48, 328, 264, 16, 240)
+	MCFG_SCREEN_UPDATE_DRIVER(popper_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_popper);
 
@@ -560,7 +559,7 @@ void popper_state::popper(machine_config &config)
 	AY8910(config, m_ay[0], XTAL(18'432'000)/3/2/2).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	AY8910(config, m_ay[1], XTAL(18'432'000)/3/2/2).add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+MACHINE_CONFIG_END
 
 
 //**************************************************************************

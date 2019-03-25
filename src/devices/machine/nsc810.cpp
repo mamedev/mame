@@ -118,7 +118,7 @@ void nsc810_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-uint8_t nsc810_device::read(offs_t offset)
+READ8_MEMBER(nsc810_device::read)
 {
 	uint8_t res = 0xff;
 
@@ -191,7 +191,7 @@ uint8_t nsc810_device::read(offs_t offset)
 	return res;
 }
 
-void nsc810_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nsc810_device::write)
 {
 	uint32_t rate;
 

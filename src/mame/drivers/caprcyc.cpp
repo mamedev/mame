@@ -63,17 +63,17 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-void caprcyc_state::caprcyc(machine_config &config)
-{
+MACHINE_CONFIG_START(caprcyc_state::caprcyc)
+
 	/* basic machine hardware */
-	VR4300BE(config, m_maincpu, 100000000); // cpu configuration is unknown
-	m_maincpu->set_addrmap(AS_PROGRAM, &caprcyc_state::caprcyc_map);
+	MCFG_DEVICE_ADD("maincpu", VR4300BE, 100000000) // cpu configuration is unknown
+	MCFG_DEVICE_PROGRAM_MAP(caprcyc_map)
 
 	/* no video! */
 
 	/* sound hardware */
 	//..
-}
+MACHINE_CONFIG_END
 
 
 

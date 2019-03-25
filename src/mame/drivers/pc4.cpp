@@ -217,20 +217,19 @@ void pc4_state::machine_start()
 	m_blink = 0;
 }
 
-void pc4_state::pc4(machine_config &config)
-{
+MACHINE_CONFIG_START(pc4_state::pc4)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc4_state::pc4_mem);
-	m_maincpu->set_addrmap(AS_IO, &pc4_state::pc4_io);
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pc4_mem)
+	MCFG_DEVICE_IO_MAP(pc4_io)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(72);
-	screen.set_screen_update(FUNC(pc4_state::screen_update));
-	screen.set_size(240, 36);
-	screen.set_visarea(0, 240-1, 0, 36-1);
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(72)
+	MCFG_SCREEN_UPDATE_DRIVER(pc4_state, screen_update)
+	MCFG_SCREEN_SIZE(240, 36)
+	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 36-1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", FUNC(pc4_state::pc4_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_pc4);
@@ -240,7 +239,7 @@ void pc4_state::pc4(machine_config &config)
 	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	RP5C01(config, "rtc", XTAL(32'768));
-}
+MACHINE_CONFIG_END
 
 ROM_START( pc4 )
 	ROM_REGION( 0x20000, "maincpu", 0 )

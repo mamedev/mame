@@ -51,13 +51,12 @@ static INPUT_PORTS_START( extrema )
 INPUT_PORTS_END
 
 
-void extrema_state::extrema(machine_config &config)
-{
+MACHINE_CONFIG_START(extrema_state::extrema)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 6000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &extrema_state::extrema_map);
-	m_maincpu->set_addrmap(AS_IO, &extrema_state::extrema_portmap);
-}
+	MCFG_DEVICE_ADD("maincpu", Z80, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(extrema_map)
+	MCFG_DEVICE_IO_MAP(extrema_portmap)
+MACHINE_CONFIG_END
 
 
 

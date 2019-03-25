@@ -121,9 +121,9 @@ public:
 	void set_video_waitstates(bool wait);
 	void set_extra_waitstates(bool wait);
 
-	uint8_t readm(offs_t offset);
-	void writem(offs_t offset, uint8_t data);
-	uint8_t setoffset(offs_t offset);
+	DECLARE_READ8_MEMBER( readm );
+	DECLARE_WRITE8_MEMBER( writem );
+	DECLARE_READ8_MEMBER( setoffset );
 
 	DECLARE_INPUT_CHANGED_MEMBER( settings_changed );
 
@@ -147,8 +147,8 @@ protected:
 	bool    m_gromwaddr_LSB;
 	bool    m_gromraddr_LSB;
 	int     m_grom_address;
-	uint8_t read_grom(offs_t offset);
-	void write_grom(offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER( read_grom );
+	DECLARE_WRITE8_MEMBER( write_grom );
 
 	// wait states
 	void    set_wait(int min);
@@ -256,8 +256,8 @@ protected:
 	virtual void decode_mod(decdata* dec) { };
 
 	// PFM mod (0 = none, 1 = AT29C040, 2 = AT29C040A)
-	uint8_t boot_rom(offs_t offset);
-	void write_to_pfm(offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER( boot_rom );
+	DECLARE_WRITE8_MEMBER( write_to_pfm );
 	int     m_boot_rom;
 	int     m_pfm_bank;
 	bool    m_pfm_output_enable;

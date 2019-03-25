@@ -144,14 +144,14 @@ void nes_jy_typea_device::pcb_reset()
  -------------------------------------------------*/
 
 
-uint8_t nes_jy_typea_device::nt_r(offs_t offset)
+READ8_MEMBER(nes_jy_typea_device::nt_r)
 {
 	int page = ((offset & 0xc00) >> 10);
 	irq_clock(0, 2);
 	return m_nt_access[page][offset & 0x3ff];
 }
 
-uint8_t nes_jy_typea_device::chr_r(offs_t offset)
+READ8_MEMBER(nes_jy_typea_device::chr_r)
 {
 	int bank = offset >> 10;
 	irq_clock(0, 2);
@@ -241,7 +241,7 @@ void nes_jy_typea_device::scanline_irq(int scanline, int vblank, int blanked)
 
 
 // 0x5000-0x5fff : sort of protection?
-uint8_t nes_jy_typea_device::read_l(offs_t offset)
+READ8_MEMBER(nes_jy_typea_device::read_l)
 {
 	LOG_MMC(("JY Company write_m, offset: %04x\n", offset));
 	offset += 0x100;
@@ -249,7 +249,7 @@ uint8_t nes_jy_typea_device::read_l(offs_t offset)
 	if (offset >= 0x1000 && offset < 0x1800)
 	{
 		// bit6/bit7 DSW read
-		return get_open_bus() & 0x3f;
+		return m_open_bus & 0x3f;
 	}
 
 	if (offset >= 0x1800)
@@ -262,10 +262,10 @@ uint8_t nes_jy_typea_device::read_l(offs_t offset)
 			return m_latch;
 	}
 
-	return get_open_bus();   // open bus
+	return m_open_bus;   // open bus
 }
 
-void nes_jy_typea_device::write_l(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_jy_typea_device::write_l)
 {
 	LOG_MMC(("JY Company write_m, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -282,14 +282,14 @@ void nes_jy_typea_device::write_l(offs_t offset, uint8_t data)
 }
 
 // 0x6000-0x7fff : WRAM or open bus
-uint8_t nes_jy_typea_device::read_m(offs_t offset)
+READ8_MEMBER(nes_jy_typea_device::read_m)
 {
 	LOG_MMC(("JY Company write_m, offset: %04x\n", offset));
 
 	if (m_reg[0] & 0x80)
 		return m_prg[(m_bank_6000 & m_prg_mask) * 0x2000 + (offset & 0x1fff)];
 
-	return get_open_bus();   // open bus
+	return m_open_bus;   // open bus
 }
 
 
@@ -425,7 +425,7 @@ void nes_jy_typea_device::update_banks(int reg)
 }
 
 
-void nes_jy_typea_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_jy_typea_device::write_h)
 {
 	LOG_MMC(("JY Company write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -569,7 +569,7 @@ void nes_jy_typec_device::update_mirror_typec()
 		update_mirror_typea();
 }
 
-uint8_t nes_jy_typec_device::chr_r(offs_t offset)
+READ8_MEMBER(nes_jy_typec_device::chr_r)
 {
 	int bank = offset >> 10;
 

@@ -81,27 +81,26 @@ void inteladv_state::machine_reset()
 {
 }
 
-void inteladv_state::inteladv(machine_config &config)
-{
+MACHINE_CONFIG_START(inteladv_state::inteladv)
 	/* basic machine hardware */
-	R65C02(config, m_maincpu, XTAL(1'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &inteladv_state::inteladv_main);
+	MCFG_DEVICE_ADD("maincpu", R65C02, XTAL(1'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(inteladv_main)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.62);  /* verified on pcb */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(40, 400-1, 16, 240-1);
-	screen.set_screen_update(FUNC(inteladv_state::screen_update_inteladv));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(40, 400-1, 16, 240-1)
+	MCFG_SCREEN_UPDATE_DRIVER(inteladv_state, screen_update_inteladv)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_888, 256).enable_shadows();
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-}
+MACHINE_CONFIG_END
 
 ROM_START( inteladv )
 	ROM_REGION( 0x800000, "maincpu", 0 ) /* main program */

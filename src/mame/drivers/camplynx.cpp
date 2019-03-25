@@ -856,7 +856,8 @@ void camplynx_state::lynx_common(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_6BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.375); // unknown DAC
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT).add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
+	VOLTAGE_REGULATOR(config, "vref").set_output(5.0)
+			.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT).add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.02);
 }
 
@@ -867,8 +868,7 @@ void camplynx_state::lynx_disk(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy1, camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats).enable_sound(true);
 }
 
-void camplynx_state::lynx48k(machine_config &config)
-{
+MACHINE_CONFIG_START(camplynx_state::lynx48k)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 24_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &camplynx_state::lynx48k_mem);
@@ -877,19 +877,19 @@ void camplynx_state::lynx48k(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(camplynx_state, lynx48k)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(512, 480);
-	screen.set_visarea_full();
-	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(512, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	lynx_common(config);
 
-	CASSETTE(config, m_cass);
-	m_cass->set_formats(lynx48k_cassette_formats);
-	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
-	m_cass->set_interface("camplynx_cass");
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(lynx48k_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
+	MCFG_CASSETTE_INTERFACE("camplynx_cass")
 
 	/* devices */
 	MC6845(config, m_crtc, 12_MHz_XTAL / 8);
@@ -901,7 +901,7 @@ void camplynx_state::lynx48k(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_list").set_original("camplynx_cass");
-}
+MACHINE_CONFIG_END
 
 void camplynx_state::lynx96k(machine_config &config)
 {
@@ -915,8 +915,7 @@ void camplynx_state::lynx96k(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("camplynx_flop").set_filter("96K");
 }
 
-void camplynx_state::lynx128k(machine_config &config)
-{
+MACHINE_CONFIG_START(camplynx_state::lynx128k)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 24_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &camplynx_state::lynx128k_mem);
@@ -925,19 +924,19 @@ void camplynx_state::lynx128k(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(camplynx_state, lynx128k)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(512, 480);
-	screen.set_visarea_full();
-	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(512, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	lynx_common(config);
 
-	CASSETTE(config, m_cass);
-	m_cass->set_formats(lynx128k_cassette_formats);
-	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
-	m_cass->set_interface("camplynx_cass");
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(lynx128k_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
+	MCFG_CASSETTE_INTERFACE("camplynx_cass")
 
 	/* devices */
 	MC6845(config, m_crtc, 12_MHz_XTAL / 8);
@@ -952,7 +951,7 @@ void camplynx_state::lynx128k(machine_config &config)
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_list").set_original("camplynx_cass");
 	SOFTWARE_LIST(config, "flop_list").set_original("camplynx_flop").set_filter("128K");
-}
+MACHINE_CONFIG_END
 
 void camplynx_state::init_lynx48k()
 {

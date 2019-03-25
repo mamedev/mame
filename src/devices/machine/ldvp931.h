@@ -18,11 +18,19 @@
 
 
 //**************************************************************************
+//  DEVICE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_LASERDISC_22VP931_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, PHILLIPS_22VP931, 0)
+
+
+//**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
 // device type definition
-DECLARE_DEVICE_TYPE(PHILIPS_22VP931, philips_22vp931_device)
+DECLARE_DEVICE_TYPE(PHILLIPS_22VP931, phillips_22vp931_device)
 
 
 
@@ -30,17 +38,17 @@ DECLARE_DEVICE_TYPE(PHILIPS_22VP931, philips_22vp931_device)
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> philips_22vp931_device
+// ======================> phillips_22vp931_device
 
 // base _22vp931 class
-class philips_22vp931_device : public laserdisc_device
+class phillips_22vp931_device : public laserdisc_device
 {
 public:
 	// types
-	typedef delegate<void (philips_22vp931_device &, int)> data_ready_delegate;
+	typedef delegate<void (phillips_22vp931_device &, int)> data_ready_delegate;
 
 	// construction/destruction
-	philips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	phillips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// input and output
 	void data_w(uint8_t data) { synchronize(TID_DEFERRED_DATA, data); }

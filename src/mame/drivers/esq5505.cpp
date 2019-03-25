@@ -222,8 +222,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
 	DECLARE_WRITE8_MEMBER(duart_output);
 
-	void es5505_clock_changed(u32 data);
-
 	int m_system_type;
 	uint8_t m_duart_io;
 	uint8_t otis_irq_state;
@@ -272,6 +270,8 @@ IRQ_CALLBACK_MEMBER(esq5505_state::maincpu_irq_acknowledge_callback)
 void esq5505_state::machine_start()
 {
 	driver_device::machine_start();
+	// tell the pump about the ESP chips
+	m_pump->set_esp(m_esp);
 
 	m_rom = (uint16_t *)(void *)memregion("osrom")->base();
 	m_ram = (uint16_t *)(void *)memshare("osram")->ptr();
@@ -433,11 +433,6 @@ WRITE_LINE_MEMBER(esq5505_state::esq5505_otis_irq)
 {
 	otis_irq_state = (state != 0);
 	update_irq_to_maincpu();
-}
-
-void esq5505_state::es5505_clock_changed(u32 data)
-{
-	m_pump->set_unscaled_clock(data);
 }
 
 WRITE16_MEMBER(esq5505_state::analog_w)
@@ -649,12 +644,10 @@ void esq5505_state::vfx(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	ESQ_5505_5510_PUMP(config, m_pump, 10_MHz_XTAL / (16 * 21));
-	m_pump->set_esp(m_esp);
 	m_pump->add_route(0, "lspeaker", 1.0);
 	m_pump->add_route(1, "rspeaker", 1.0);
 
 	auto &es5505(ES5505(config, "otis", 10_MHz_XTAL));
-	es5505.sample_rate_changed().set(FUNC(esq5505_state::es5505_clock_changed));
 	es5505.set_region0("waverom");  /* Bank 0 */
 	es5505.set_region1("waverom2"); /* Bank 1 */
 	es5505.set_channels(4);          /* channels */
@@ -740,12 +733,10 @@ void esq5505_state::vfx32(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	ESQ_5505_5510_PUMP(config, m_pump, 30.4761_MHz_XTAL / (2 * 16 * 32));
-	m_pump->set_esp(m_esp);
 	m_pump->add_route(0, "lspeaker", 1.0);
 	m_pump->add_route(1, "rspeaker", 1.0);
 
 	auto &es5505(ES5505(config, "otis", 30.4761_MHz_XTAL / 2));
-	es5505.sample_rate_changed().set(FUNC(esq5505_state::es5505_clock_changed));
 	es5505.set_region0("waverom");  /* Bank 0 */
 	es5505.set_region1("waverom2"); /* Bank 1 */
 	es5505.set_channels(4);          /* channels */

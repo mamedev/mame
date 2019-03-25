@@ -118,29 +118,30 @@ void magreel_state::machine_reset()
 }
 
 
-void magreel_state::magreel(machine_config &config)
-{
+MACHINE_CONFIG_START(magreel_state::magreel)
+
 	/* basic machine hardware - all information unknown */
-//  m68000_device &maincpu(M68000(config, "maincpu", MAIN_CLOCK/12));
-//  maincpu.set_addrmap(AS_PROGRAM, &magreel_state::magreel_map);
+//  MCFG_DEVICE_ADD("maincpu",m68000,MAIN_CLOCK/12)
+//  MCFG_DEVICE_PROGRAM_MAP(magreel_map)
 
 	/* video hardware */
-//  screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-//  screen.set_screen_update(FUNC(magreel_state::screen_update));
-//  screen.set_size(32*8, 32*8);
-//  screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
-//  screen.set_raw(MAIN_CLOCK/2, 442, 0, 320, 264, 0, 240);          /* generic NTSC video timing at 320x240 */
-//  screen.set_palette("palette");
+//  MCFG_SCREEN_ADD("screen", RASTER)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+//  MCFG_SCREEN_UPDATE_DRIVER(magreel_state, screen_update)
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+//  MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 442, 0, 320, 264, 0, 240)          /* generic NTSC video timing at 320x240 */
+//  MCFG_SCREEN_PALETTE("palette")
 
-//  GFXDECODE(config, "gfxdecode", "palette", gfx_magreel);
+//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_magreel)
 
-//  PALETTE(config, "palette", FUNC(magreel_state::magreel), 8)
+//  MCFG_PALETTE_ADD("palette", 8)
+//  MCFG_PALETTE_INIT_OWNER(magreel_state, magreel)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-}
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

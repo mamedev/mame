@@ -95,11 +95,11 @@ void bw2_expansion_slot_device::device_reset()
 //  cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t bw2_expansion_slot_device::cd_r(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6)
+uint8_t bw2_expansion_slot_device::cd_r(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6)
 {
 	if (m_cart != nullptr)
 	{
-		data = m_cart->bw2_cd_r(offset, data, ram2, ram3, ram4, ram5, ram6);
+		data = m_cart->bw2_cd_r(space, offset, data, ram2, ram3, ram4, ram5, ram6);
 	}
 
 	return data;
@@ -110,11 +110,11 @@ uint8_t bw2_expansion_slot_device::cd_r(offs_t offset, uint8_t data, int ram2, i
 //  cd_w - cartridge data write
 //-------------------------------------------------
 
-void bw2_expansion_slot_device::cd_w(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6)
+void bw2_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6)
 {
 	if (m_cart != nullptr)
 	{
-		m_cart->bw2_cd_w(offset, data, ram2, ram3, ram4, ram5, ram6);
+		m_cart->bw2_cd_w(space, offset, data, ram2, ram3, ram4, ram5, ram6);
 	}
 }
 
@@ -123,13 +123,13 @@ void bw2_expansion_slot_device::cd_w(offs_t offset, uint8_t data, int ram2, int 
 //  slot_r - slot read
 //-------------------------------------------------
 
-uint8_t bw2_expansion_slot_device::slot_r(offs_t offset)
+READ8_MEMBER( bw2_expansion_slot_device::slot_r )
 {
 	uint8_t data = 0xff;
 
 	if (m_cart != nullptr)
 	{
-		data = m_cart->bw2_slot_r(offset);
+		data = m_cart->bw2_slot_r(space, offset);
 	}
 
 	return data;
@@ -140,11 +140,11 @@ uint8_t bw2_expansion_slot_device::slot_r(offs_t offset)
 //  slot_w - slot write
 //-------------------------------------------------
 
-void bw2_expansion_slot_device::slot_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( bw2_expansion_slot_device::slot_w )
 {
 	if (m_cart != nullptr)
 	{
-		m_cart->bw2_slot_w(offset, data);
+		m_cart->bw2_slot_w(space, offset, data);
 	}
 }
 
@@ -153,13 +153,13 @@ void bw2_expansion_slot_device::slot_w(offs_t offset, uint8_t data)
 //  modsel_r - modsel read
 //-------------------------------------------------
 
-uint8_t bw2_expansion_slot_device::modsel_r(offs_t offset)
+READ8_MEMBER( bw2_expansion_slot_device::modsel_r )
 {
 	uint8_t data = 0xff;
 
 	if (m_cart != nullptr)
 	{
-		data = m_cart->bw2_modsel_r(offset);
+		data = m_cart->bw2_modsel_r(space, offset);
 	}
 
 	return data;
@@ -170,11 +170,11 @@ uint8_t bw2_expansion_slot_device::modsel_r(offs_t offset)
 //  modsel_w - modsel write
 //-------------------------------------------------
 
-void bw2_expansion_slot_device::modsel_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( bw2_expansion_slot_device::modsel_w )
 {
 	if (m_cart != nullptr)
 	{
-		m_cart->bw2_modsel_w(offset, data);
+		m_cart->bw2_modsel_w(space, offset, data);
 	}
 }
 

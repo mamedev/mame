@@ -208,14 +208,14 @@ uint32_t cninja_state::screen_update_robocop2(screen_device &screen, bitmap_ind1
 	/* One of the tilemap chips can switch between 2 tilemaps at 4bpp, or 1 at 8bpp */
 	if (priority & 4)
 	{
-		m_deco_tilegen[1]->set_tilemap_colour_mask(0, 0);
-		m_deco_tilegen[1]->set_tilemap_colour_mask(1, 0);
+		m_deco_tilegen[0]->set_tilemap_colour_mask(2, 0);
+		m_deco_tilegen[0]->set_tilemap_colour_mask(3, 0);
 		m_deco_tilegen[1]->pf12_set_gfxbank(0, 4);
 	}
 	else
 	{
-		m_deco_tilegen[1]->set_tilemap_colour_mask(0, 0xf);
-		m_deco_tilegen[1]->set_tilemap_colour_mask(1, 0xf);
+		m_deco_tilegen[0]->set_tilemap_colour_mask(2, 0xf);
+		m_deco_tilegen[0]->set_tilemap_colour_mask(3, 0xf);
 		m_deco_tilegen[1]->pf12_set_gfxbank(0, 2);
 	}
 

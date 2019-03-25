@@ -1482,31 +1482,31 @@ GFXDECODE_END
  *
  *************************************/
 
-void williams_state::williams(machine_config &config)
-{
-	/* basic machine hardware */
-	MC6809E(config, m_maincpu, MASTER_CLOCK/3/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &williams_state::williams_map);
+MACHINE_CONFIG_START(williams_state::williams)
 
-	M6808(config, m_soundcpu, SOUND_CLOCK); // internal clock divider of 4, effective frequency is 894.886kHz
-	m_soundcpu->set_addrmap(AS_PROGRAM, &williams_state::sound_map);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
+	MCFG_DEVICE_PROGRAM_MAP(williams_map)
+
+	MCFG_DEVICE_ADD("soundcpu", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5101 (Defender), 5114 or 6514 (later games) + battery
 
 	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
-	TIMER(config, "scan_timer").configure_scanline(FUNC(williams_state::williams_va11_callback), "screen", 0, 32);
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams_state, williams_va11_callback, "screen", 0, 32)
 
 	// also set a timer to go off on scanline 240
-	TIMER(config, "240_timer").configure_scanline(FUNC(williams_state::williams_count240_callback), "screen", 0, 240);
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("240_timer", williams_state, williams_count240_callback, "screen", 0, 240)
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE);
-	m_screen->set_raw(MASTER_CLOCK*2/3, 512, 6, 298, 260, 7, 247);
-	m_screen->set_screen_update(FUNC(williams_state::screen_update_williams));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 6, 298, 260, 7, 247)
+	MCFG_SCREEN_UPDATE_DRIVER(williams_state, screen_update_williams)
 
 	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
 
@@ -1514,15 +1514,16 @@ void williams_state::williams(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // mc1408.ic6
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // mc1408.ic6
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
-	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6808_IRQ_LINE);
+	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu", M6808_IRQ_LINE))
 
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set_ioport("IN0");
@@ -1538,38 +1539,39 @@ void williams_state::williams(machine_config &config)
 	m_pia[2]->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia[2]->irqa_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[2]->irqb_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
-}
+MACHINE_CONFIG_END
 
 
-void williams_state::defender(machine_config &config)
-{
+MACHINE_CONFIG_START(williams_state::defender)
 	williams(config);
 
 	/* basic machine hardware */
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &williams_state::defender_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(defender_map)
 
-	m_soundcpu->set_addrmap(AS_PROGRAM, &williams_state::defender_sound_map);
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(defender_sound_map)
 
 	ADDRESS_MAP_BANK(config, "bankc000").set_map(&williams_state::defender_bankc000_map).set_options(ENDIANNESS_BIG, 8, 16, 0x1000);
 
 	MCFG_MACHINE_START_OVERRIDE(williams_state,defender)
 	MCFG_MACHINE_RESET_OVERRIDE(williams_state,defender)
 
-	m_screen->set_visarea(12, 304-1, 7, 247-1);
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(12, 304-1, 7, 247-1)
+MACHINE_CONFIG_END
 
 
-void williams_state::jin(machine_config &config)  // needs a different screen size or the credit text is clipped
-{
+MACHINE_CONFIG_START(williams_state::jin) // needs a different screen size or the credit text is clipped
 	defender(config);
 	/* basic machine hardware */
-	m_screen->set_visarea(0, 315, 7, 247-1);
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 315, 7, 247-1)
+MACHINE_CONFIG_END
 
 
-void williams_state::williams_muxed(machine_config &config)
-{
+MACHINE_CONFIG_START(williams_state::williams_muxed)
 	williams(config);
 
 	/* basic machine hardware */
@@ -1590,25 +1592,24 @@ void williams_state::williams_muxed(machine_config &config)
 	LS157(config, m_mux1, 0); // IC4 on interface board (actually LS257 with OC tied low)
 	m_mux1->a_in_callback().set_ioport("INP2A");
 	m_mux1->b_in_callback().set_ioport("INP1A");
-}
+MACHINE_CONFIG_END
 
 
-void spdball_state::spdball(machine_config &config)
-{
+MACHINE_CONFIG_START(spdball_state::spdball)
 	williams(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &spdball_state::spdball_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spdball_map)
 
 	/* pia */
 	PIA6821(config, m_pia[3], 0);
 	m_pia[3]->readpa_handler().set_ioport("IN3");
 	m_pia[3]->readpb_handler().set_ioport("IN4");
-}
+MACHINE_CONFIG_END
 
 
-void williams_state::lottofun(machine_config &config)
-{
+MACHINE_CONFIG_START(williams_state::lottofun)
 	williams(config);
 
 	/* basic machine hardware */
@@ -1617,60 +1618,63 @@ void williams_state::lottofun(machine_config &config)
 	m_pia[0]->writepa_handler().set("ticket", FUNC(ticket_dispenser_device::motor_w)).bit(7);
 	m_pia[0]->ca2_handler().set(FUNC(williams_state::lottofun_coin_lock_w));
 
-	TICKET_DISPENSER(config, "ticket", attotime::from_msec(70), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
-}
+	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(70), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
+MACHINE_CONFIG_END
 
 
-void williams_state::sinistar(machine_config &config)
-{
+MACHINE_CONFIG_START(williams_state::sinistar)
 	williams(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &williams_state::sinistar_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sinistar_map)
 
 	/* sound hardware */
-	HC55516(config, "cvsd", 0).add_route(ALL_OUTPUTS, "speaker", 0.8);
+	MCFG_DEVICE_ADD("cvsd", HC55516, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8)
 
 	/* pia */
 	m_pia[0]->readpa_handler().set(FUNC(williams_state::williams_49way_port_0_r));
 
 	m_pia[2]->ca2_handler().set("cvsd", FUNC(hc55516_device::digit_w));
 	m_pia[2]->cb2_handler().set("cvsd", FUNC(hc55516_device::clock_w));
-}
+MACHINE_CONFIG_END
 
 
-void williams_state::playball(machine_config &config)
-{
+MACHINE_CONFIG_START(williams_state::playball)
 	williams(config);
 
 	/* basic machine hardware */
 
 	/* video hardware */
-	m_screen->set_visarea(6, 298-1, 8, 240-1);
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(6, 298-1, 8, 240-1)
 
 	/* sound hardware */
-	HC55516(config, "cvsd", 0).add_route(ALL_OUTPUTS, "speaker", 0.8);
+	MCFG_DEVICE_ADD("cvsd", HC55516, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8)
 
 	/* pia */
 	m_pia[1]->writepb_handler().set(FUNC(williams_state::playball_snd_cmd_w));
 
 	m_pia[2]->ca2_handler().set("cvsd", FUNC(hc55516_device::digit_w));
 	m_pia[2]->cb2_handler().set("cvsd", FUNC(hc55516_device::clock_w));
-}
+MACHINE_CONFIG_END
 
 
-void blaster_state::blastkit(machine_config &config)
-{
+MACHINE_CONFIG_START(blaster_state::blastkit)
 	williams(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &blaster_state::blaster_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(blaster_map)
 
 	MCFG_MACHINE_START_OVERRIDE(blaster_state,blaster)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(blaster_state,blaster)
-	m_screen->set_screen_update(FUNC(blaster_state::screen_update_blaster));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(blaster_state, screen_update_blaster)
 
 	/* pia */
 	m_pia[0]->readpa_handler().set("mux_a", FUNC(ls157_x2_device::output_r));
@@ -1681,16 +1685,15 @@ void blaster_state::blastkit(machine_config &config)
 	LS157_X2(config, m_muxa, 0);
 	m_muxa->a_in_callback().set_ioport("IN3");
 	m_muxa->b_in_callback().set(FUNC(williams_state::williams_49way_port_0_r));
-}
+MACHINE_CONFIG_END
 
 
-void blaster_state::blaster(machine_config &config)
-{
+MACHINE_CONFIG_START(blaster_state::blaster)
 	blastkit(config);
 
 	/* basic machine hardware */
-	M6808(config, m_soundcpu_b, SOUND_CLOCK); // internal clock divider of 4, effective frequency is 894.886kHz
-	m_soundcpu_b->set_addrmap(AS_PROGRAM, &blaster_state::sound_map_b);
+	MCFG_DEVICE_ADD("soundcpu_b", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_map_b)
 
 	/* pia */
 	m_pia[0]->readpb_handler().set("mux_b", FUNC(ls157_device::output_r)).mask(0x0f);
@@ -1706,7 +1709,8 @@ void blaster_state::blaster(machine_config &config)
 	m_muxb->a_in_callback().set_ioport("INP1");
 	m_muxb->b_in_callback().set_ioport("INP2");
 
-	INPUT_MERGER_ANY_HIGH(config, "soundirq_b").output_handler().set_inputline(m_soundcpu_b, M6808_IRQ_LINE);
+	MCFG_INPUT_MERGER_ANY_HIGH("soundirq_b")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu_b", M6808_IRQ_LINE))
 
 	m_pia[1]->writepb_handler().set(FUNC(blaster_state::blaster_snd_cmd_w));
 
@@ -1718,28 +1722,28 @@ void blaster_state::blaster(machine_config &config)
 	m_pia[3]->irqb_handler().set("soundirq_b", FUNC(input_merger_any_high_device::in_w<1>));
 
 	/* sound hardware */
-	config.device_remove("speaker");
-	config.device_remove("dac");
-	config.device_remove("vref");
+	MCFG_DEVICE_REMOVE("speaker")
+	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MC1408(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
-	MC1408(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
-}
+	MCFG_DEVICE_ADD("ldac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+MACHINE_CONFIG_END
 
 
-void williams2_state::williams2(machine_config &config)
-{
+MACHINE_CONFIG_START(williams2_state::williams2)
+
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, MASTER_CLOCK/3/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &williams2_state::williams2_d000_ram_map);
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
+	MCFG_DEVICE_PROGRAM_MAP(williams2_d000_ram_map)
 
-	M6808(config, m_soundcpu, MASTER_CLOCK/3); /* yes, this is different from the older games */
-	m_soundcpu->set_addrmap(AS_PROGRAM, &williams2_state::williams2_sound_map);
+	MCFG_DEVICE_ADD("soundcpu", M6808, MASTER_CLOCK/3) /* yes, this is different from the older games */
+	MCFG_DEVICE_PROGRAM_MAP(williams2_sound_map)
 
 	ADDRESS_MAP_BANK(config, "bank8000").set_map(&williams2_state::williams2_bank8000_map).set_options(ENDIANNESS_BIG, 8, 12, 0x800);
 
@@ -1748,10 +1752,10 @@ void williams2_state::williams2(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5114 + battery
 
 	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
-	TIMER(config, "scan_timer").configure_scanline(FUNC(williams2_state::williams2_va11_callback), "screen", 0, 32);
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams2_state, williams2_va11_callback, "screen", 0, 32)
 
 	// also set a timer to go off on scanline 254
-	TIMER(config, "254_timer").configure_scanline(FUNC(williams2_state::williams2_endscreen_callback), "screen", 8, 246);
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("254_timer", williams2_state, williams2_endscreen_callback, "screen", 8, 246)
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -1759,24 +1763,25 @@ void williams2_state::williams2(machine_config &config)
 	PALETTE(config, m_palette).set_entries(1024);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_williams2);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE);
-	m_screen->set_raw(MASTER_CLOCK*2/3, 512, 8, 284, 260, 8, 248);
-	m_screen->set_screen_update(FUNC(williams2_state::screen_update_williams2));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 8, 284, 260, 8, 248)
+	MCFG_SCREEN_UPDATE_DRIVER(williams2_state, screen_update_williams2)
 
 	MCFG_VIDEO_START_OVERRIDE(williams2_state,williams2)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
-	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6808_IRQ_LINE);
+	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu", M6808_IRQ_LINE))
 
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set_ioport("IN0");
@@ -1795,11 +1800,10 @@ void williams2_state::williams2(machine_config &config)
 	m_pia[2]->ca2_handler().set(m_pia[1], FUNC(pia6821_device::cb1_w));
 	m_pia[2]->irqa_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[2]->irqb_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
-}
+MACHINE_CONFIG_END
 
 
-void williams2_state::inferno(machine_config &config)
-{
+MACHINE_CONFIG_START(williams2_state::inferno)
 	williams2(config);
 	m_pia[0]->readpa_handler().set("mux", FUNC(ls157_x2_device::output_r));
 	m_pia[0]->ca2_handler().set("mux", FUNC(ls157_x2_device::select_w));
@@ -1807,11 +1811,10 @@ void williams2_state::inferno(machine_config &config)
 	LS157_X2(config, m_mux, 0); // IC45 (for PA4-PA7) + IC46 (for PA0-PA3) on CPU board
 	m_mux->a_in_callback().set_ioport("INP1");
 	m_mux->b_in_callback().set_ioport("INP2");
-}
+MACHINE_CONFIG_END
 
 
-void williams2_state::mysticm(machine_config &config)
-{
+MACHINE_CONFIG_START(williams2_state::mysticm)
 	williams2(config);
 
 	/* basic machine hardware */
@@ -1822,15 +1825,15 @@ void williams2_state::mysticm(machine_config &config)
 
 	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<2>));
-}
+MACHINE_CONFIG_END
 
 
-void tshoot_state::tshoot(machine_config &config)
-{
+MACHINE_CONFIG_START(tshoot_state::tshoot)
 	williams2(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &tshoot_state::williams2_d000_rom_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(williams2_d000_rom_map)
 
 	MCFG_MACHINE_START_OVERRIDE(tshoot_state,tshoot)
 
@@ -1844,22 +1847,24 @@ void tshoot_state::tshoot(machine_config &config)
 	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<2>));
 	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<3>));
 
+	MCFG_DEVICE_MODIFY("pia_2")
 	m_pia[2]->cb2_handler().set(FUNC(tshoot_state::maxvol_w));
 
 	LS157_X2(config, m_mux, 0); // U2 + U3 on interface board
 	m_mux->a_in_callback().set_ioport("INP1");
 	m_mux->b_in_callback().set_ioport("INP2");
-}
+MACHINE_CONFIG_END
 
 
-void joust2_state::joust2(machine_config &config)
-{
+MACHINE_CONFIG_START(joust2_state::joust2)
 	williams2(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &joust2_state::williams2_d000_rom_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(williams2_d000_rom_map)
 
-	WILLIAMS_CVSD_SOUND(config, m_cvsd_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_MACHINE_START_OVERRIDE(joust2_state,joust2)
 	MCFG_MACHINE_RESET_OVERRIDE(joust2_state,joust2)
@@ -1879,7 +1884,7 @@ void joust2_state::joust2(machine_config &config)
 	LS157(config, m_mux, 0);
 	m_mux->a_in_callback().set_ioport("INP1");
 	m_mux->b_in_callback().set_ioport("INP2");
-}
+MACHINE_CONFIG_END
 
 
 

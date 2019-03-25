@@ -217,28 +217,28 @@ void funybubl_state::machine_start()
 }
 
 
-void funybubl_state::funybubl(machine_config &config)
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 12000000/2);      /* 6 MHz?? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &funybubl_state::funybubl_map);
-	m_maincpu->set_addrmap(AS_IO, &funybubl_state::io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(funybubl_state::irq0_line_hold));
+MACHINE_CONFIG_START(funybubl_state::funybubl)
 
-	Z80(config, m_audiocpu, 8000000/2);      /* 4 MHz?? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &funybubl_state::sound_map);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)      /* 6 MHz?? */
+	MCFG_DEVICE_PROGRAM_MAP(funybubl_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", funybubl_state,  irq0_line_hold)
+
+	MCFG_DEVICE_ADD("audiocpu", Z80,8000000/2)      /* 4 MHz?? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	ADDRESS_MAP_BANK(config, m_vrambank).set_map(&funybubl_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 13, 0x1000);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
-	screen.set_visarea(12*8, 512-12*8-1, 16, 256-16-1);
-//  screen.set_visarea(0*8, 512-1, 0, 256-1);
-	screen.set_screen_update(FUNC(funybubl_state::screen_update));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(12*8, 512-12*8-1, 16, 256-16-1)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE_DRIVER(funybubl_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_funybubl);
 	PALETTE(config, m_palette).set_format(4, &funybubl_state::funybubl_R6B6G6, 0xc00/4);
@@ -249,10 +249,10 @@ void funybubl_state::funybubl(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	OKIM6295(config, m_oki, 8000000/8, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki->set_addrmap(0, &funybubl_state::oki_map);
-	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 

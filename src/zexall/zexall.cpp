@@ -141,12 +141,11 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
-void zexall_state::zexall(machine_config &config)
-{
+MACHINE_CONFIG_START(zexall_state::zexall)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(3'579'545));
-	m_maincpu->set_addrmap(AS_PROGRAM, &zexall_state::z80_mem);
-}
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
+MACHINE_CONFIG_END
 
 
 /******************************************************************************

@@ -37,7 +37,7 @@ void k051649_device::scc_map(address_map &map)
 	map(0x80, 0x89).w(FUNC(k051649_device::k051649_frequency_w));
 	map(0x8a, 0x8e).w(FUNC(k051649_device::k051649_volume_w));
 	map(0x8f, 0x8f).w(FUNC(k051649_device::k051649_keyonoff_w));
-	map(0xe0, 0xe0).mirror(0x1f).rw(FUNC(k051649_device::k051649_test_r), FUNC(k051649_device::k051649_test_w));
+	map(0xe0, 0xff).rw(FUNC(k051649_device::k051649_test_r), FUNC(k051649_device::k051649_test_w));
 }
 
 // device type definition
@@ -177,7 +177,7 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 /********************************************************************************/
 
 
-void k051649_device::k051649_waveform_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( k051649_device::k051649_waveform_w )
 {
 	// waveram is read-only?
 	if (m_test & 0x40 || (m_test & 0x80 && offset >= 0x60))
@@ -196,7 +196,7 @@ void k051649_device::k051649_waveform_w(offs_t offset, uint8_t data)
 }
 
 
-uint8_t k051649_device::k051649_waveform_r(offs_t offset)
+READ8_MEMBER ( k051649_device::k051649_waveform_r )
 {
 	// test-register bits 6/7 expose the internal counter
 	if (m_test & 0xc0)
@@ -212,7 +212,7 @@ uint8_t k051649_device::k051649_waveform_r(offs_t offset)
 }
 
 
-void k051649_device::k052539_waveform_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( k051649_device::k052539_waveform_w )
 {
 	// waveram is read-only?
 	if (m_test & 0x40)
@@ -223,7 +223,7 @@ void k051649_device::k052539_waveform_w(offs_t offset, uint8_t data)
 }
 
 
-uint8_t k051649_device::k052539_waveform_r(offs_t offset)
+READ8_MEMBER ( k051649_device::k052539_waveform_r )
 {
 	// test-register bit 6 exposes the internal counter
 	if (m_test & 0x40)
@@ -235,14 +235,14 @@ uint8_t k051649_device::k052539_waveform_r(offs_t offset)
 }
 
 
-void k051649_device::k051649_volume_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( k051649_device::k051649_volume_w )
 {
 	m_stream->update();
 	m_channel_list[offset&0x7].volume=data&0xf;
 }
 
 
-void k051649_device::k051649_frequency_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( k051649_device::k051649_frequency_w )
 {
 	int freq_hi = offset & 1;
 	offset >>= 1;
@@ -263,7 +263,7 @@ void k051649_device::k051649_frequency_w(offs_t offset, uint8_t data)
 }
 
 
-void k051649_device::k051649_keyonoff_w(uint8_t data)
+WRITE8_MEMBER( k051649_device::k051649_keyonoff_w )
 {
 	int i;
 	m_stream->update();
@@ -276,17 +276,16 @@ void k051649_device::k051649_keyonoff_w(uint8_t data)
 }
 
 
-void k051649_device::k051649_test_w(uint8_t data)
+WRITE8_MEMBER( k051649_device::k051649_test_w )
 {
 	m_test = data;
 }
 
 
-uint8_t k051649_device::k051649_test_r()
+READ8_MEMBER ( k051649_device::k051649_test_r )
 {
 	// reading the test register sets it to $ff!
-	if (!machine().side_effects_disabled())
-		k051649_test_w(0xff);
+	k051649_test_w(space, offset, 0xff);
 	return 0xff;
 }
 

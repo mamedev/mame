@@ -3,15 +3,17 @@
 #include "emu.h"
 #include "ibm6580_fdc.h"
 
+#define VERBOSE_DBG 2       /* general debug messages */
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_DEBUG     (1U <<  1)
-
-//#define VERBOSE (LOG_GENERAL | LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC printf
-#include "logmacro.h"
-
-#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
+#define DBG_LOG(N,M,A) \
+	do { \
+	if(VERBOSE_DBG>=N) \
+		{ \
+			if( M ) \
+				logerror("%11.6f at %s: %-10s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
+			logerror A; \
+		} \
+	} while (0)
 
 
 DEFINE_DEVICE_TYPE(DW_FDC, dw_fdc_device, "dw_fdc", "IBM Displaywriter Floppy")
@@ -42,8 +44,8 @@ void dw_fdc_device::device_add_mconfig(machine_config &config)
 	UPD765A(config, "upd765", 24_MHz_XTAL / 3, false, false);
 //  m_upd_fdc->intrq_wr_callback().set("pic8259", FUNC(pic8259_device::ir4_w));
 //  m_upd_fdc->drq_wr_callback().set("dma8257", FUNC(dma8257_device::XXX));
-//  FLOPPY_CONNECTOR(config, UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats);
-//  FLOPPY_CONNECTOR(config, UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats);
+//  MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
+//  MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 }
 
 
@@ -78,35 +80,35 @@ WRITE8_MEMBER( dw_fdc_device::p1_w )
 {
 	m_p1 = data;
 
-	LOGDBG("p1 <- %02x\n", data, m_p1);
+	DBG_LOG(2,"p1",( "<- %02x\n", data, m_p1));
 }
 
 WRITE8_MEMBER( dw_fdc_device::p2_w )
 {
 	m_p2 = data;
 
-	LOGDBG("p2 <- %02x\n", data);
+	DBG_LOG(2,"p2",( "<- %02x\n", data));
 }
 
 READ8_MEMBER( dw_fdc_device::p2_r )
 {
 	uint8_t data = m_p2;
 
-	LOGDBG("p2 == %02x\n", data);
+	DBG_LOG(2,"p2",( "== %02x\n", data));
 
 	return data;
 }
 
 READ_LINE_MEMBER( dw_fdc_device::t0_r )
 {
-	LOGDBG("t0 == %d\n", m_t0);
+	DBG_LOG(2,"t0",( "== %d\n", m_t0));
 
 	return m_t0;
 }
 
 READ_LINE_MEMBER( dw_fdc_device::t1_r )
 {
-	LOGDBG("t1 == %d\n", m_t1);
+	DBG_LOG(2,"t1",( "== %d\n", m_t1));
 
 	return m_t1;
 }

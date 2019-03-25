@@ -80,7 +80,7 @@ void nes_zemina_device::pcb_reset()
     write
 -------------------------------------------------*/
 
-void nes_zemina_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_zemina_device::write_h)
 {
 	LOG_MMC("zemina write_h, offset: %04x, data: %02x\n", offset, data);
 

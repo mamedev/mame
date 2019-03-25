@@ -20,7 +20,6 @@
 #include <vector>
 
 namespace ui {
-
 class menu_keyboard_mode : public menu
 {
 public:
@@ -135,12 +134,7 @@ private:
 class menu_machine_configure : public menu
 {
 public:
-	menu_machine_configure(
-			mame_ui_manager &mui,
-			render_container &container,
-			game_driver const &drv,
-			std::function<void (bool, bool)> &&handler = nullptr,
-			float x0 = 0.0f, float y0 = 0.0f);
+	menu_machine_configure(mame_ui_manager &mui, render_container &container, const game_driver *prev, float x0 = 0.0f, float y0 = 0.0f);
 	virtual ~menu_machine_configure();
 
 protected:
@@ -164,17 +158,13 @@ private:
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
-	void setup_bios();
-
-	std::function<void (bool, bool)> const m_handler;
-	game_driver const &m_drv;
+	const game_driver *m_drv;
 	emu_options m_opts;
-	float const m_x0;
-	float const m_y0;
+	float x0, y0;
 	s_bios m_bios;
 	std::size_t m_curbios;
-	bool const m_was_favorite;
-	bool m_want_favorite;
+	void setup_bios();
+	bool m_fav_reset;
 };
 
 //-------------------------------------------------
@@ -196,4 +186,4 @@ protected:
 
 } // namespace ui
 
-#endif // MAME_FRONTEND_UI_MISCMENU_H
+#endif  /* MAME_FRONTEND_UI_MISCMENU_H */

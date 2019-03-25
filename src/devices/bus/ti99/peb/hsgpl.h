@@ -29,10 +29,10 @@ class snug_high_speed_gpl_device : public device_t, public device_ti99_peribox_c
 public:
 	snug_high_speed_gpl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
-	void write(offs_t offset, uint8_t data) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	void cruwrite(offs_t offset, uint8_t data) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
 protected:
 	virtual void device_start() override;
@@ -51,12 +51,12 @@ private:
 	required_device<ram_device>      m_ram6_memory;
 	required_device<ram_device>      m_gram_memory;
 
-	void            dsrspace_readz(offs_t offset, uint8_t* value);
-	void            cartspace_readz(offs_t offset, uint8_t* value);
-	void            grom_readz(offs_t offset, uint8_t* value);
+	void            dsrspace_readz(address_space& space, offs_t offset, uint8_t* value, uint8_t mem_mask);
+	void            cartspace_readz(address_space& space, offs_t offset, uint8_t* value, uint8_t mem_mask);
+	void            grom_readz(address_space& space, offs_t offset, uint8_t* value, uint8_t mem_mask);
 
-	void            cartspace_write(offs_t offset, uint8_t data);
-	void            grom_write(offs_t offset, uint8_t data);
+	void            cartspace_write(address_space& space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	void            grom_write(address_space& space, offs_t offset, uint8_t data, uint8_t mem_mask);
 
 	bool            m_dsr_enabled;
 	bool            m_gram_enabled;

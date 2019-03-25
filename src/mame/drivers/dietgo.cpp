@@ -205,30 +205,30 @@ DECO16IC_BANK_CB_MEMBER(dietgo_state::bank_callback)
 	return (bank & 0x70) << 8;
 }
 
-void dietgo_state::dietgo(machine_config &config)
-{
+MACHINE_CONFIG_START(dietgo_state::dietgo)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(28'000'000)/2); /* DE102 (verified on pcb) */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dietgo_state::dietgo_map);
-	m_maincpu->set_addrmap(AS_OPCODES, &dietgo_state::decrypted_opcodes_map);
-	m_maincpu->set_vblank_int("screen", FUNC(dietgo_state::irq6_line_hold));
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000)/2) /* DE102 (verified on pcb) */
+	MCFG_DEVICE_PROGRAM_MAP(dietgo_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dietgo_state,  irq6_line_hold)
 
 	H6280(config, m_audiocpu, XTAL(32'220'000)/4/3);  /* Custom chip 45; XIN is 32.220MHZ/4, verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dietgo_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(58);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(dietgo_state::screen_update));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(dietgo_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_888, 1024);
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_dietgo);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dietgo)
 
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_split(0);
@@ -265,8 +265,9 @@ void dietgo_state::dietgo(machine_config &config)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.45);
 
-	OKIM6295(config, "oki", XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60); /* verified on pcb */
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+MACHINE_CONFIG_END
 
 
 /* Diet Go Go */

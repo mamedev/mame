@@ -168,7 +168,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t<!ATTLIST driver cocktail (good|imperfect|preliminary) #IMPLIED>\n"
 "\t\t\t<!ATTLIST driver savestate (supported|unsupported) #REQUIRED>\n"
 "\t\t<!ELEMENT feature EMPTY>\n"
-"\t\t\t<!ATTLIST feature type (protection|timing|graphics|palette|sound|capture|camera|microphone|controls|keyboard|mouse|media|disk|printer|tape|punch|drum|rom|comms|lan|wan) #REQUIRED>\n"
+"\t\t\t<!ATTLIST feature type (protection|palette|graphics|sound|controls|keyboard|mouse|microphone|camera|disk|printer|lan|wan|timing) #REQUIRED>\n"
 "\t\t\t<!ATTLIST feature status (unemulated|imperfect) #IMPLIED>\n"
 "\t\t\t<!ATTLIST feature overall (unemulated|imperfect) #IMPLIED>\n"
 "\t\t<!ELEMENT device (instance?, extension*)>\n"
@@ -1639,26 +1639,19 @@ void info_xml_creator::output_features(device_type type, device_t::feature_type 
 {
 	static constexpr std::pair<device_t::feature_type, char const *> features[] = {
 			{ device_t::feature::PROTECTION,    "protection"    },
-			{ device_t::feature::TIMING,        "timing"        },
-			{ device_t::feature::GRAPHICS,      "graphics"      },
 			{ device_t::feature::PALETTE,       "palette"       },
+			{ device_t::feature::GRAPHICS,      "graphics"      },
 			{ device_t::feature::SOUND,         "sound"         },
-			{ device_t::feature::CAPTURE,       "capture"       },
-			{ device_t::feature::CAMERA,        "camera"        },
-			{ device_t::feature::MICROPHONE,    "microphone"    },
 			{ device_t::feature::CONTROLS,      "controls"      },
 			{ device_t::feature::KEYBOARD,      "keyboard"      },
 			{ device_t::feature::MOUSE,         "mouse"         },
-			{ device_t::feature::MEDIA,         "media"         },
+			{ device_t::feature::MICROPHONE,    "microphone"    },
+			{ device_t::feature::CAMERA,        "camera"        },
 			{ device_t::feature::DISK,          "disk"          },
 			{ device_t::feature::PRINTER,       "printer"       },
-			{ device_t::feature::TAPE,          "tape"          },
-			{ device_t::feature::PUNCH,         "punch"         },
-			{ device_t::feature::DRUM,          "drum"          },
-			{ device_t::feature::ROM,           "rom"           },
-			{ device_t::feature::COMMS,         "comms"         },
 			{ device_t::feature::LAN,           "lan"           },
-			{ device_t::feature::WAN,           "wan"           } };
+			{ device_t::feature::WAN,           "wan"           },
+			{ device_t::feature::TIMING,        "timing"        } };
 
 	device_t::feature_type const flags(type.unemulated_features() | type.imperfect_features() | unemulated | imperfect);
 	for (auto const &feature : features)

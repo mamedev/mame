@@ -438,31 +438,32 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 10h */
 }
 
-void gundealr_state::gundealr(machine_config &config)
-{
+MACHINE_CONFIG_START(gundealr_state::gundealr)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/2);   /* 6 MHz verified for Yam! Yam!? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &gundealr_state::gundealr_main_map);
-	m_maincpu->set_addrmap(AS_IO, &gundealr_state::main_portmap);
-	TIMER(config, "scantimer").configure_scanline(FUNC(gundealr_state::scanline), "screen", 0, 1);
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)   /* 6 MHz verified for Yam! Yam!? */
+	MCFG_DEVICE_PROGRAM_MAP(gundealr_main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gundealr_state, scanline, "screen", 0, 1)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(gundealr_state::screen_update));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(gundealr_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gundealr);
-	PALETTE(config, m_palette).set_entries(512);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gundealr)
+	MCFG_PALETTE_ADD("palette", 512)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2203(config, "ymsnd", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.5Mhz verified for Yam! Yam!? */
-}
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* 1.5Mhz verified for Yam! Yam!? */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::yamyam_mcu_sim)
 {
@@ -528,19 +529,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::yamyam_mcu_sim)
 	m_rambase[0x006] = m_port_in[0]->read();
 }
 
-void gundealr_state::yamyam(machine_config &config)
-{
+MACHINE_CONFIG_START(gundealr_state::yamyam)
 	gundealr(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gundealr_state::yamyam_main_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(yamyam_main_map)
 
-	TIMER(config, "mcusim").configure_periodic(FUNC(gundealr_state::yamyam_mcu_sim), attotime::from_hz(6000000/60)); /* 6mhz confirmed */
-}
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", gundealr_state, yamyam_mcu_sim, attotime::from_hz(6000000/60)) /* 6mhz confirmed */
+MACHINE_CONFIG_END
 
-void gundealr_state::gundealrbl(machine_config &config)
-{
+MACHINE_CONFIG_START(gundealr_state::gundealrbl)
 	yamyam(config);
-	config.device_remove("mcusim");
-}
+	MCFG_DEVICE_REMOVE("mcusim")
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

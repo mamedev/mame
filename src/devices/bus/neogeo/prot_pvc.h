@@ -8,12 +8,15 @@
 
 DECLARE_DEVICE_TYPE(NG_PVC_PROT, pvc_prot_device)
 
+#define MCFG_PVC_PROT_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, NG_PVC_PROT, 0)
+
 
 class pvc_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	pvc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pvc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void pvc_write_unpack_color();
 	void pvc_write_pack_color();

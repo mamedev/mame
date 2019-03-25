@@ -79,8 +79,7 @@ static void sk_sub_cart(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void md_rom_sk_device::device_add_mconfig(machine_config &config)
-{
-	MD_CART_SLOT(config, m_exp, sk_sub_cart, nullptr);
-	m_exp->set_must_be_loaded(false);
-}
+MACHINE_CONFIG_START(md_rom_sk_device::device_add_mconfig)
+	MCFG_MD_CARTRIDGE_ADD("subslot", sk_sub_cart, nullptr)
+	MCFG_MD_CARTRIDGE_NOT_MANDATORY
+MACHINE_CONFIG_END

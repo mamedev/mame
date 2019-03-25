@@ -1154,14 +1154,13 @@ TIMER_DEVICE_CALLBACK_MEMBER( lc89510_temp_device::segacd_access_timer_callback 
 }
 
 
-void lc89510_temp_device::device_add_mconfig(machine_config &config)
-{
-	TIMER(config, "hock_timer").configure_periodic(FUNC(lc89510_temp_device::segacd_access_timer_callback), attotime::from_hz(75));
+MACHINE_CONFIG_START(lc89510_temp_device::device_add_mconfig)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("hock_timer", lc89510_temp_device, segacd_access_timer_callback, attotime::from_hz(75))
 
-	cdda_device &cdda(CDDA(config, "cdda"));
-	cdda.add_route(0, ":lspeaker", 0.50); // TODO: accurate volume balance
-	cdda.add_route(1, ":rspeaker", 0.50);
-}
+	MCFG_DEVICE_ADD( "cdda", CDDA )
+	MCFG_SOUND_ROUTE( 0, ":lspeaker", 0.50 ) // TODO: accurate volume balance
+	MCFG_SOUND_ROUTE( 1, ":rspeaker", 0.50 )
+MACHINE_CONFIG_END
 
 
 

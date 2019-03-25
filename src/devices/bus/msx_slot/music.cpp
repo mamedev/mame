@@ -32,17 +32,18 @@ void msx_slot_music_device::device_start()
 	}
 
 	// Install IO read/write handlers
-	io_space().install_write_handler(0x7c, 0x7d, write8sm_delegate(FUNC(msx_slot_music_device::write_ym2413), this));
+	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
+	space.install_write_handler(0x7c, 0x7d, write8_delegate(FUNC(msx_slot_music_device::write_ym2413), this));
 }
 
 
-uint8_t msx_slot_music_device::read(offs_t offset)
+READ8_MEMBER(msx_slot_music_device::read)
 {
-	return msx_slot_rom_device::read(offset);
+	return msx_slot_rom_device::read(space, offset);
 }
 
 
-void msx_slot_music_device::write_ym2413(offs_t offset, uint8_t data)
+WRITE8_MEMBER(msx_slot_music_device::write_ym2413)
 {
-	m_ym2413->write(offset & 1, data);
+	m_ym2413->write(space, offset & 1, data);
 }

@@ -503,23 +503,24 @@ void amstrad_pc_state::cfg_fdc(device_t *device)
 	fdc1->set_default_option("35dd");
 }
 
-void amstrad_pc_state::pc200(machine_config &config)
-{
+MACHINE_CONFIG_START(amstrad_pc_state::pc200)
 	/* basic machine hardware */
 	I8086(config, m_maincpu, 8000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &amstrad_pc_state::ppc640_map);
 	m_maincpu->set_addrmap(AS_IO, &amstrad_pc_state::pc200_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
+	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
 
 	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "aga", 0, "mb:isa", pc_isa8_cards, "aga_pc200", true);
-	ISA8_SLOT(config, "fdc", 0, "mb:isa", pc_isa8_cards, "fdc_xt", true).set_option_machine_config("fdc_xt", cfg_fdc);
-	ISA8_SLOT(config, "com", 0, "mb:isa", pc_isa8_cards, "com", true).set_option_machine_config("com", cfg_com);
+	MCFG_DEVICE_ADD("aga", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "aga_pc200", true)
+	MCFG_DEVICE_ADD("fdc", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_fdc)
+	MCFG_DEVICE_ADD("com", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("com", cfg_com)
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
 	/* printer */
 	pc_lpt_device &lpt0(PC_LPT(config, "lpt_0"));
@@ -533,12 +534,11 @@ void amstrad_pc_state::pc200(machine_config &config)
 
 	PC_JOY(config, "pc_joy");
 
-	PC_KEYB(config, m_keyboard);
-	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
+	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("512K");
-}
+MACHINE_CONFIG_END
 
 void amstrad_pc_state::pc2086(machine_config &config)
 {

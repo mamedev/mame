@@ -10,9 +10,9 @@
 #ifndef NLID_TRUTHTABLE_H_
 #define NLID_TRUTHTABLE_H_
 
-#include "netlist/nl_base.h"
-#include "netlist/nl_setup.h"
-#include "plib/putil.h"
+#include "../nl_setup.h"
+#include "../nl_base.h"
+#include "../plib/putil.h"
 
 #define NETLIB_TRUTHTABLE(cname, nIN, nOUT)                                    \
 	class NETLIB_NAME(cname) : public nld_truthtable_t<nIN, nOUT>              \
@@ -29,9 +29,17 @@
 
 namespace netlist
 {
-namespace devices
-{
+	namespace devices
+	{
 
+#if 0
+	template<unsigned bits> struct uint_for_size { typedef uint_least32_t type; };
+	template<unsigned bits>
+	struct need_bytes_for_bits
+	{
+		enum { value = 4 };
+	};
+#else
 	template<unsigned bits>
 	struct need_bytes_for_bits
 	{
@@ -44,35 +52,11 @@ namespace devices
 	};
 
 	template<unsigned bits> struct uint_for_size;
-	template<> struct uint_for_size<1> { using type = uint_least8_t; };
-	template<> struct uint_for_size<2> { using type = uint_least16_t; };
-	template<> struct uint_for_size<4> { using type = uint_least32_t; };
-	template<> struct uint_for_size<8> { using type = uint_least64_t; };
-
-	template<std::size_t NUM, typename R>
-	struct aa
-	{
-		template<typename T>
-		R f(T &arr, const R ign)
-		{
-			R r = aa<NUM-1, R>().f(arr, ign);
-			if (ign & (1 << (NUM-1)))
-				arr[NUM-1].activate();
-			return r | (arr[NUM-1]() << (NUM-1));
-		}
-	};
-
-	template<typename R>
-	struct aa<1, R>
-	{
-		template<typename T>
-		R f(T &arr, const R ign)
-		{
-			if ((ign & 1))
-				arr[0].activate();
-			return arr[0]();
-		}
-	};
+	template<> struct uint_for_size<1> { typedef uint_least8_t  type; };
+	template<> struct uint_for_size<2> { typedef uint_least16_t type; };
+	template<> struct uint_for_size<4> { typedef uint_least32_t type; };
+	template<> struct uint_for_size<8> { typedef uint_least64_t type; };
+#endif
 
 	template<std::size_t m_NI, std::size_t m_NO>
 	NETLIB_OBJECT(truthtable_t)
@@ -81,23 +65,22 @@ namespace devices
 		detail::family_setter_t m_fam;
 	public:
 
-		using type_t = typename uint_for_size<need_bytes_for_bits<m_NO + m_NI>::value>::type;
+		typedef typename uint_for_size<need_bytes_for_bits<m_NO + m_NI>::value>::type type_t;
 
 		static constexpr const std::size_t m_num_bits = m_NI;
 		static constexpr const std::size_t m_size = (1 << (m_num_bits));
 		static constexpr const type_t m_outmask = ((1 << m_NO) - 1);
+		static constexpr const std::size_t m_min_devices_for_deactivate = 2;
 
 		struct truthtable_t
 		{
 			truthtable_t()
-			: m_timing_index{0}
-			, m_initialized(false)
+			: m_initialized(false)
 			{}
-
-			std::array<type_t, m_size> m_out_state;
-			std::array<uint_least8_t, m_size * m_NO> m_timing_index;
-			std::array<netlist_time, 16> m_timing_nt;
 			bool m_initialized;
+			type_t m_outs[m_size];
+			uint_least8_t m_timing[m_size * m_NO];
+			netlist_time m_timing_nt[16];
 		};
 
 		template <class C>
@@ -107,6 +90,7 @@ namespace devices
 		: device_t(owner, name)
 		, m_fam(*this, fam)
 		, m_ign(*this, "m_ign", 0)
+		, m_active(*this, "m_active", 1)
 		, m_ttp(ttp)
 		{
 			init(desc);
@@ -116,14 +100,13 @@ namespace devices
 
 		NETLIB_RESETI()
 		{
-			int active_outputs = 0;
+			m_active = 0;
 			m_ign = 0;
 			for (auto &i : m_I)
 				i.activate();
 			for (auto &q : m_Q)
 				if (q.has_net() && q.net().num_cons() > 0)
-					active_outputs++;
-			set_active_outputs(active_outputs);
+					m_active++;
 		}
 
 		NETLIB_UPDATEI()
@@ -133,14 +116,28 @@ namespace devices
 
 		void inc_active() NL_NOEXCEPT override
 		{
-			process<false>();
+			if (m_NI >= m_min_devices_for_deactivate)
+				if (++m_active == 1)
+				{
+					process<false>();
+				}
 		}
 
 		void dec_active() NL_NOEXCEPT override
 		{
-			for (std::size_t i = 0; i< m_NI; i++)
-				m_I[i].inactivate();
-			m_ign = (1<<m_NI)-1;
+			/* FIXME:
+			 * Based on current measurements there is no point to disable
+			 * 1 input devices. This should actually be a parameter so that we
+			 * can decide for each individual gate whether it is beneficial to
+			 * ignore deactivation.
+			 */
+			if (m_NI >= m_min_devices_for_deactivate)
+				if (--m_active == 0)
+				{
+					for (std::size_t i = 0; i< m_NI; i++)
+						m_I[i].inactivate();
+					m_ign = (1<<m_NI)-1;
+				}
 		}
 
 		plib::uninitialised_array_t<logic_input_t, m_NI> m_I;
@@ -156,44 +153,46 @@ namespace devices
 			netlist_time mt(netlist_time::zero());
 
 			type_t nstate(0);
-			type_t ign(m_ign);
-#if 1
-			if (!doOUT)
-				for (std::size_t i = 0; i < m_NI; i++)
-				{
-					m_I[i].activate();
-					//nstate |= (m_I[i]() ? (1 << i) : 0);
-					nstate |= (m_I[i]() << i);
-					mt = std::max(this->m_I[i].net().next_scheduled_time(), mt);
-				}
-			else
-				for (std::size_t i = 0; i < m_NI; i++)
-				{
-					if ((ign & 1))
-						m_I[i].activate();
-					//nstate |= (m_I[i]() ? (1 << i) : 0);
-					nstate |= (m_I[i]() << i);
-					ign >>= 1;
-				}
-#else
-			if (!doOUT)
+			if (m_NI >= m_min_devices_for_deactivate)
 			{
-				nstate = aa<m_NI, type_t>().f(m_I, ~0);
-				for (std::size_t i = 0; i < m_NI; i++)
-					mt = std::max(this->m_I[i].net().time(), mt);
+				type_t ign(m_ign);
+				if (!doOUT)
+					for (std::size_t i = 0; i < m_NI; i++)
+					{
+						m_I[i].activate();
+						nstate |= (m_I[i]() ? (1 << i) : 0);
+						mt = std::max(this->m_I[i].net().time(), mt);
+					}
+				else
+					for (std::size_t i = 0; i < m_NI; i++)
+					{
+						if ((ign & 1))
+							m_I[i].activate();
+						nstate |= (m_I[i]() ? (1 << i) : 0);
+						ign >>= 1;
+					}
 			}
 			else
-				nstate = aa<m_NI, type_t>().f(m_I, ign);
-#endif
+			{
+				if (!doOUT)
+					for (std::size_t i = 0; i < m_NI; i++)
+					{
+						nstate |= (m_I[i]() ? (1 << i) : 0);
+						mt = std::max(this->m_I[i].net().time(), mt);
+					}
+				else
+					for (std::size_t i = 0; i < m_NI; i++)
+						nstate |= (m_I[i]() ? (1 << i) : 0);
+			}
 
-			const type_t outstate(m_ttp.m_out_state[nstate]);
+			const type_t outstate(m_ttp.m_outs[nstate]);
 			type_t out(outstate & m_outmask);
 
 			m_ign = outstate >> m_NO;
 
 			const std::size_t timebase(nstate * m_NO);
-			const auto *t(&m_ttp.m_timing_index[timebase]);
-			const auto *tim = m_ttp.m_timing_nt.data();
+			const auto *t(&m_ttp.m_timing[timebase]);
+			const auto *tim = m_ttp.m_timing_nt;
 
 			if (doOUT)
 				for (std::size_t i = 0; i < m_NO; out >>= 1, ++i)
@@ -202,14 +201,18 @@ namespace devices
 				for (std::size_t i = 0; i < m_NO; out >>= 1, ++i)
 					m_Q[i].set_Q_time(out & 1, mt + tim[t[i]]);
 
-			ign = m_ign;
-			for (auto I = m_I.begin(); ign != 0; ign >>= 1, ++I)
-				if (ign & 1)
-					I->inactivate();
+			if (m_NI >= m_min_devices_for_deactivate)
+			{
+				type_t ign(m_ign);
+				for (auto I = m_I.begin(); ign != 0; ign >>= 1, ++I)
+					if (ign & 1)
+						I->inactivate();
+			}
 		}
 
 		/* FIXME: check width */
 		state_var<type_t>   m_ign;
+		state_var_s32       m_active;
 		const truthtable_t &m_ttp;
 	};
 
@@ -219,15 +222,15 @@ namespace devices
 		netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
 				const pstring &def_param, const pstring &sourcefile);
 
+		virtual ~netlist_base_factory_truthtable_t();
+
 		std::vector<pstring> m_desc;
-		pstring m_family_name;
-		const logic_family_desc_t *m_family_desc;
+		const logic_family_desc_t *m_family;
 	};
 
-	/* the returned element is still missing a pointer to the family ... */
-	plib::unique_ptr<netlist_base_factory_truthtable_t> tt_factory_create(tt_desc &desc, const pstring &sourcefile);
+	void tt_factory_create(setup_t &setup, tt_desc &desc, const pstring &sourcefile);
 
-} //namespace devices
+	} //namespace devices
 } // namespace netlist
 
 

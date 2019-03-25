@@ -68,10 +68,10 @@ void nes_ntb_slot_device::device_start()
 	m_cart = dynamic_cast<ntb_cart_interface *>(get_card_device());
 }
 
-uint8_t nes_ntb_slot_device::read(offs_t offset)
+READ8_MEMBER(nes_ntb_slot_device::read)
 {
 	if (m_cart)
-		return m_cart->read(offset);
+		return m_cart->read(space, offset, mem_mask);
 
 	return 0xff;
 }
@@ -212,7 +212,7 @@ void nes_sunsoft_dcs_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_sunsoft_dcs_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_sunsoft_dcs_device::write_h)
 {
 	LOG_MMC(("Sunsoft DCS write_h, offset %04x, data: %02x\n", offset, data));
 
@@ -224,27 +224,27 @@ void nes_sunsoft_dcs_device::write_h(offs_t offset, uint8_t data)
 			m_wram_enable = BIT(data, 4);
 			break;
 		default:
-			sun4_write(offset, data);
+			sun4_write(space, offset, data, mem_mask);
 			break;
 	}
 }
 
-uint8_t nes_sunsoft_dcs_device::read_h(offs_t offset)
+READ8_MEMBER(nes_sunsoft_dcs_device::read_h)
 {
 	LOG_MMC(("Sunsoft DCS read_h, offset: %04x\n", offset));
 
 	if (m_exrom_enable && m_subslot->m_cart && offset < 0x4000)
 	{
 		if (m_timer_on)
-			return m_subslot->m_cart->read(offset);
+			return m_subslot->m_cart->read(space, offset, mem_mask);
 		else
-			return get_open_bus();   // after the timer is off, this returns open bus...
+			return m_open_bus;   // after the timer is off, this returns open bus...
 	}
 	else
 		return hi_access_rom(offset);
 }
 
-void nes_sunsoft_dcs_device::write_m(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_sunsoft_dcs_device::write_m)
 {
 	LOG_MMC(("Sunsoft DCS write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -260,7 +260,7 @@ void nes_sunsoft_dcs_device::write_m(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t nes_sunsoft_dcs_device::read_m(offs_t offset)
+READ8_MEMBER(nes_sunsoft_dcs_device::read_m)
 {
 	LOG_MMC(("Sunsoft DCS read_m, offset: %04x\n", offset));
 
@@ -269,7 +269,7 @@ uint8_t nes_sunsoft_dcs_device::read_m(offs_t offset)
 	if (!m_prgram.empty() && m_wram_enable)
 		return m_prgram[offset & (m_prgram.size() - 1)];
 
-	return get_open_bus();   // open bus
+	return m_open_bus;   // open bus
 }
 
 
@@ -285,10 +285,9 @@ static void ntb_cart(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void nes_sunsoft_dcs_device::device_add_mconfig(machine_config &config)
-{
-	NES_NTB_SLOT(config, m_subslot, ntb_cart);
-}
+MACHINE_CONFIG_START(nes_sunsoft_dcs_device::device_add_mconfig)
+	MCFG_NTB_MINICART_ADD("ntb_slot", ntb_cart)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------

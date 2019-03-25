@@ -44,8 +44,8 @@ public:
 		set_analog_callback(cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
 	}
 
-	void write(offs_t offset, u8 data);
-	u8 read(offs_t offset);
+	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8_MEMBER(read);
 
 	void init_flags(int flags);
 

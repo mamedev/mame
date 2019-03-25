@@ -43,7 +43,7 @@ msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconf
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 	, device_slot_interface(mconfig, *this)
-	, msx_internal_slot_interface(mconfig, *this)
+	, msx_internal_slot_interface()
 	, m_irq_handler(*this)
 	, m_cartridge(nullptr)
 {
@@ -90,17 +90,10 @@ static const char *msx_cart_get_slot_option(int type)
 }
 
 
-void msx_slot_cartridge_device::device_resolve_objects()
+void msx_slot_cartridge_device::device_start()
 {
 	m_irq_handler.resolve_safe();
 	m_cartridge = dynamic_cast<msx_cart_interface *>(get_card_device());
-	if (m_cartridge)
-		m_cartridge->m_exp = this;
-}
-
-
-void msx_slot_cartridge_device::device_start()
-{
 }
 
 
@@ -176,7 +169,7 @@ image_init_result msx_slot_cartridge_device::call_load()
 			}
 		}
 
-		m_cartridge->m_exp = this;
+		m_cartridge->set_out_irq_cb(DEVCB_WRITELINE(*this, msx_slot_cartridge_device, irq_out));
 		m_cartridge->initialize_cartridge();
 
 		if (m_cartridge->get_sram_size() > 0)
@@ -338,21 +331,21 @@ std::string msx_slot_cartridge_device::get_default_card_software(get_default_car
 }
 
 
-uint8_t msx_slot_cartridge_device::read(offs_t offset)
+READ8_MEMBER(msx_slot_cartridge_device::read)
 {
 	if ( m_cartridge )
 	{
-		return m_cartridge->read_cart(offset);
+		return m_cartridge->read_cart(space, offset);
 	}
 	return 0xFF;
 }
 
 
-void msx_slot_cartridge_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(msx_slot_cartridge_device::write)
 {
 	if ( m_cartridge )
 	{
-		m_cartridge->write_cart(offset, data);
+		m_cartridge->write_cart(space, offset, data);
 	}
 }
 
@@ -367,4 +360,8 @@ msx_slot_yamaha_expansion_device::msx_slot_yamaha_expansion_device(const machine
 
 void msx_slot_yamaha_expansion_device::device_start()
 {
+	m_irq_handler.resolve_safe();
+	m_cartridge = dynamic_cast<msx_cart_interface *>(get_card_device());
+	if (m_cartridge)
+		m_cartridge->set_out_irq_cb(DEVCB_WRITELINE(*this, msx_slot_cartridge_device, irq_out));
 }

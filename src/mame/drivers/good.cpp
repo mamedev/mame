@@ -291,31 +291,31 @@ static GFXDECODE_START( gfx_good )
 GFXDECODE_END
 
 
-void good_state::good(machine_config &config)
-{
-	M68000(config, m_maincpu, 16000000 /2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &good_state::good_map);
-	m_maincpu->set_vblank_int("screen", FUNC(good_state::irq2_line_hold));
+MACHINE_CONFIG_START(good_state::good)
+
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000 /2)
+	MCFG_DEVICE_PROGRAM_MAP(good_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", good_state,  irq2_line_hold)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_good);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*16, 32*16);
-	screen.set_visarea(1*16, 23*16-1, 0*16, 14*16-1);
-	screen.set_screen_update(FUNC(good_state::screen_update_good));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*16, 32*16)
+	MCFG_SCREEN_VISIBLE_AREA(1*16, 23*16-1, 0*16, 14*16-1)
+	MCFG_SCREEN_UPDATE_DRIVER(good_state, screen_update_good)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x400);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.47);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.47);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
+MACHINE_CONFIG_END
 
 
 ROM_START( good )

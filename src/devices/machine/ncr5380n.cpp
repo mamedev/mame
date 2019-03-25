@@ -288,12 +288,12 @@ void ncr5380n_device::delay_cycles(int cycles)
 	tm->adjust(clocks_to_attotime(cycles));
 }
 
-uint8_t ncr5380n_device::scsidata_r()
+READ8_MEMBER(ncr5380n_device::scsidata_r)
 {
 	return scsi_bus->data_r();
 }
 
-void ncr5380n_device::outdata_w(uint8_t data)
+WRITE8_MEMBER(ncr5380n_device::outdata_w)
 {
 	m_outdata = data;
 
@@ -304,12 +304,12 @@ void ncr5380n_device::outdata_w(uint8_t data)
 	}
 }
 
-uint8_t ncr5380n_device::icmd_r()
+READ8_MEMBER(ncr5380n_device::icmd_r)
 {
 	return m_icommand;
 }
 
-void ncr5380n_device::icmd_w(uint8_t data)
+WRITE8_MEMBER(ncr5380n_device::icmd_w)
 {
 	// asserting to drive the data bus?
 	if ((data & IC_DBUS) && !(m_icommand & IC_DBUS))
@@ -340,12 +340,12 @@ void ncr5380n_device::icmd_w(uint8_t data)
 	delay(2);
 }
 
-uint8_t ncr5380n_device::mode_r()
+READ8_MEMBER(ncr5380n_device::mode_r)
 {
 	return m_mode;
 }
 
-void ncr5380n_device::mode_w(uint8_t data)
+WRITE8_MEMBER(ncr5380n_device::mode_w)
 {
 //  logerror("%s: mode_w %02x (%s)\n", tag(), data, machine().describe_context());
 	// arbitration bit being set?
@@ -373,13 +373,13 @@ void ncr5380n_device::mode_w(uint8_t data)
 	m_mode = data;
 }
 
-uint8_t ncr5380n_device::command_r()
+READ8_MEMBER(ncr5380n_device::command_r)
 {
 //  logerror("%s: command_r %02x (%s)\n", tag(), m_tcommand, machine().describe_context());
 	return m_tcommand;
 }
 
-void ncr5380n_device::command_w(uint8_t data)
+WRITE8_MEMBER(ncr5380n_device::command_w)
 {
 //  logerror("%s: command_w %02x (%s)\n", tag(), data, machine().describe_context());
 	m_tcommand = data;
@@ -413,7 +413,7 @@ void ncr5380n_device::check_irq()
 	#endif
 }
 
-uint8_t ncr5380n_device::status_r()
+READ8_MEMBER(ncr5380n_device::status_r)
 {
 	uint32_t ctrl = scsi_bus->ctrl_r();
 	uint8_t res = status |
@@ -429,11 +429,11 @@ uint8_t ncr5380n_device::status_r()
 	return res;
 }
 
-void ncr5380n_device::selenable_w(uint8_t data)
+WRITE8_MEMBER(ncr5380n_device::selenable_w)
 {
 }
 
-uint8_t ncr5380n_device::busandstatus_r()
+READ8_MEMBER(ncr5380n_device::busandstatus_r)
 {
 	uint32_t ctrl = scsi_bus->ctrl_r();
 	uint8_t res = m_busstatus |
@@ -445,28 +445,28 @@ uint8_t ncr5380n_device::busandstatus_r()
 	return res;
 }
 
-void ncr5380n_device::startdmasend_w(uint8_t data)
+WRITE8_MEMBER(ncr5380n_device::startdmasend_w)
 {
 	logerror("%02x to start dma send\n", data);
 	drq_set();
 }
 
-uint8_t ncr5380n_device::indata_r()
+READ8_MEMBER(ncr5380n_device::indata_r)
 {
 	return dma_r();
 }
 
-void ncr5380n_device::startdmatargetrx_w(uint8_t data)
+WRITE8_MEMBER(ncr5380n_device::startdmatargetrx_w)
 {
 	logerror("%02x to start dma target Rx\n", data);
 }
 
-uint8_t ncr5380n_device::resetparityirq_r()
+READ8_MEMBER(ncr5380n_device::resetparityirq_r)
 {
 	return 0;
 }
 
-void ncr5380n_device::startdmainitrx_w(uint8_t data)
+WRITE8_MEMBER(ncr5380n_device::startdmainitrx_w)
 {
 //  logerror("%02x to start dma initiator Rx\n", data);
 	recv_byte();
@@ -518,73 +518,73 @@ void ncr5380n_device::drq_clear()
 	}
 }
 
-uint8_t ncr5380n_device::read(offs_t offset)
+READ8_MEMBER(ncr5380n_device::read)
 {
 	switch (offset & 7)
 	{
-	case 0:
-		return scsidata_r();
+		case 0:
+			return scsidata_r(space, offset);
 
-	case 1:
-		return icmd_r();
+		case 1:
+			return icmd_r(space, offset);
 
-	case 2:
-		return mode_r();
+		case 2:
+			return mode_r(space, offset);
 
-	case 3:
-		return command_r();
+		case 3:
+			return command_r(space, offset);
 
-	case 4:
-		return status_r();
+		case 4:
+			return status_r(space, offset);
 
-	case 5:
-		return busandstatus_r();
+		case 5:
+			return busandstatus_r(space, offset);
 
-	case 6:
-		return indata_r();
+		case 6:
+			return indata_r(space, offset);
 
-	case 7:
-		return resetparityirq_r();
+		case 7:
+			return resetparityirq_r(space, offset);
 	}
 
 	return 0xff;
 }
 
-void ncr5380n_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(ncr5380n_device::write)
 {
 //  logerror("%x to 5380 @ %x\n", data, offset);
 	switch (offset & 7)
 	{
-	case 0:
-		outdata_w(data);
-		break;
+		case 0:
+			outdata_w(space, offset, data);
+			break;
 
-	case 1:
-		icmd_w(data);
-		break;
+		case 1:
+			icmd_w(space, offset, data);
+			break;
 
-	case 2:
-		mode_w(data);
-		break;
+		case 2:
+			mode_w(space, offset, data);
+			break;
 
-	case 3:
-		command_w(data);
-		break;
+		case 3:
+			command_w(space, offset, data);
+			break;
 
-	case 4:
-		selenable_w(data);
-		break;
+		case 4:
+			selenable_w(space, offset, data);
+			break;
 
-	case 5:
-		startdmasend_w(data);
-		break;
+		case 5:
+			startdmasend_w(space, offset, data);
+			break;
 
-	case 6:
-		startdmatargetrx_w(data);
-		break;
+		case 6:
+			startdmatargetrx_w(space, offset, data);
+			break;
 
-	case 7:
-		startdmainitrx_w(data);
-		break;
+		case 7:
+			startdmainitrx_w(space, offset, data);
+			break;
 	}
 }

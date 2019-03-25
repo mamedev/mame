@@ -187,7 +187,7 @@ void kdt6_state::psi98_io(address_map &map)
 	map(0x19, 0x19).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x1c, 0x1c).w(FUNC(kdt6_state::status0_w));
 	map(0x1d, 0x1d).r(m_keyboard, FUNC(psi_keyboard_bus_device::key_data_r));
-	map(0x1e, 0x1e).rw(m_fdc, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
+	map(0x1e, 0x1e).rw(m_fdc, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
 	map(0x1f, 0x1f).w(FUNC(kdt6_state::fdc_tc_w));
 	map(0x20, 0x2f).rw(FUNC(kdt6_state::mapper_r), FUNC(kdt6_state::mapper_w));
 	map(0x30, 0x30).rw(FUNC(kdt6_state::video_data_r), FUNC(kdt6_state::video_data_w));
@@ -617,18 +617,16 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ nullptr }
 };
 
-void kdt6_state::psi98(machine_config &config)
-{
+MACHINE_CONFIG_START(kdt6_state::psi98)
 	Z80(config, m_cpu, XTAL(16'000'000) / 4);
 	m_cpu->set_addrmap(AS_PROGRAM, &kdt6_state::psi98_mem);
 	m_cpu->set_addrmap(AS_IO, &kdt6_state::psi98_io);
 	m_cpu->set_daisy_config(daisy_chain_intf);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_color(rgb_t::green());
-	screen.set_raw(XTAL(13'516'800), 824, 48, 688, 274, 0, 250);
-	screen.set_screen_update(FUNC(kdt6_state::screen_update));
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
+	MCFG_SCREEN_RAW_PARAMS(XTAL(13'516'800), 824, 48, 688, 274, 0, 250)
+	MCFG_SCREEN_UPDATE_DRIVER(kdt6_state, screen_update)
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	config.set_default_layout(layout_kdt6);
@@ -646,7 +644,7 @@ void kdt6_state::psi98(machine_config &config)
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	TIMER(config, m_beep_timer).configure_generic(FUNC(kdt6_state::beeper_off));
+	MCFG_TIMER_DRIVER_ADD("beep_timer", kdt6_state, beeper_off)
 
 	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
 	m_dma->out_busreq_callback().set(FUNC(kdt6_state::busreq_w));
@@ -707,25 +705,24 @@ void kdt6_state::psi98(machine_config &config)
 	m_centronics->select_handler().set("pio", FUNC(z80pio_device::pa5_w));
 
 	INPUT_BUFFER(config, "cent_data_in");
-	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
-	m_centronics->set_output_latch(latch);
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	UPD1990A(config, m_rtc);
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set("ctc1", FUNC(z80ctc_device::trg0));
 	m_fdc->drq_wr_callback().set(FUNC(kdt6_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", kdt6_floppies, "fd55f", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", kdt6_floppies, "fd55f", floppy_image_device::default_floppy_formats);
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kdt6_floppies, "fd55f", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kdt6_floppies, "fd55f", floppy_image_device::default_floppy_formats)
 
-	SOFTWARE_LIST(config, "floppy_list").set_original("psi98");
+	MCFG_SOFTWARE_LIST_ADD("floppy_list", "psi98")
 
-	PSI_KEYBOARD_INTERFACE(config, m_keyboard, "hle");
-	m_keyboard->rx().set(FUNC(kdt6_state::keyboard_rx_w));
-	m_keyboard->key_strobe().set("ctc2", FUNC(z80ctc_device::trg1));
+	MCFG_PSI_KEYBOARD_INTERFACE_ADD("kbd", "hle")
+	MCFG_PSI_KEYBOARD_RX_HANDLER(WRITELINE(*this, kdt6_state, keyboard_rx_w))
+	MCFG_PSI_KEYBOARD_KEY_STROBE_HANDLER(WRITELINE("ctc2", z80ctc_device, trg1))
 
 	// 6 ECB slots
-}
+MACHINE_CONFIG_END
 
 
 //**************************************************************************

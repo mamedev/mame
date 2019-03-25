@@ -26,9 +26,8 @@ private:
 static INPUT_PORTS_START( solbourne )
 INPUT_PORTS_END
 
-void solbourne_state::solbourne(machine_config &config)
-{
-}
+MACHINE_CONFIG_START(solbourne_state::solbourne)
+MACHINE_CONFIG_END
 
 ROM_START( sols5e )
 	ROM_REGION( 0x20000, "maincpu", 0 )

@@ -12,19 +12,22 @@
 #include "includes/toaplan1.h"
 
 
-void toaplan1_state::interrupt()
+void toaplan1_state::toaplan1_interrupt()
 {
 	if (m_intenable)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-void toaplan1_state::intenable_w(u8 data)
+WRITE16_MEMBER(toaplan1_state::toaplan1_intenable_w)
 {
-	m_intenable = data;
+	if (ACCESSING_BITS_0_7)
+	{
+		m_intenable = data & 0xff;
+	}
 }
 
 
-void toaplan1_demonwld_state::dsp_addrsel_w(u16 data)
+WRITE16_MEMBER(toaplan1_state::demonwld_dsp_addrsel_w)
 {
 	/* This sets the main CPU RAM address the DSP should */
 	/*  read/write, via the DSP IO port 0 */
@@ -39,14 +42,13 @@ void toaplan1_demonwld_state::dsp_addrsel_w(u16 data)
 	logerror("DSP PC:%04x IO write %04x (%08x) at port 0\n", m_dsp->pcbase(), data, m_main_ram_seg + m_dsp_addr_w);
 }
 
-u16 toaplan1_demonwld_state::dsp_r()
+READ16_MEMBER(toaplan1_state::demonwld_dsp_r)
 {
 	/* DSP can read data from main CPU RAM via DSP IO port 1 */
 
-	u16 input_data = 0;
+	uint16_t input_data = 0;
 
-	switch (m_main_ram_seg)
-	{
+	switch (m_main_ram_seg) {
 		case 0xc00000: {address_space &mainspace = m_maincpu->space(AS_PROGRAM);
 						input_data = mainspace.read_word(m_main_ram_seg + m_dsp_addr_w);
 						break;}
@@ -56,12 +58,11 @@ u16 toaplan1_demonwld_state::dsp_r()
 	return input_data;
 }
 
-void toaplan1_demonwld_state::dsp_w(u16 data)
+WRITE16_MEMBER(toaplan1_state::demonwld_dsp_w)
 {
 	/* Data written to main CPU RAM via DSP IO port 1 */
 	m_dsp_execute = 0;
-	switch (m_main_ram_seg)
-	{
+	switch (m_main_ram_seg) {
 		case 0xc00000: {if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = 1;
 						address_space &mainspace = m_maincpu->space(AS_PROGRAM);
 						mainspace.write_word(m_main_ram_seg + m_dsp_addr_w, data);
@@ -71,7 +72,7 @@ void toaplan1_demonwld_state::dsp_w(u16 data)
 	logerror("DSP PC:%04x IO write %04x at %08x (port 1)\n", m_dsp->pcbase(), data, m_main_ram_seg + m_dsp_addr_w);
 }
 
-void toaplan1_demonwld_state::dsp_bio_w(u16 data)
+WRITE16_MEMBER(toaplan1_state::demonwld_dsp_bio_w)
 {
 	/* data 0xffff  means inhibit BIO line to DSP and enable */
 	/*              communication to main processor */
@@ -81,13 +82,11 @@ void toaplan1_demonwld_state::dsp_bio_w(u16 data)
 
 
 	logerror("DSP PC:%04x IO write %04x at port 3\n", m_dsp->pcbase(), data);
-	if (data & 0x8000)
+	if (data & 0x8000) {
 		m_dsp_bio = CLEAR_LINE;
-
-	if (data == 0)
-	{
-		if (m_dsp_execute)
-		{
+	}
+	if (data == 0) {
+		if (m_dsp_execute) {
 			logerror("Turning 68000 on\n");
 			m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			m_dsp_execute = 0;
@@ -96,13 +95,13 @@ void toaplan1_demonwld_state::dsp_bio_w(u16 data)
 	}
 }
 
-READ_LINE_MEMBER(toaplan1_demonwld_state::bio_r)
+READ_LINE_MEMBER(toaplan1_state::demonwld_bio_r)
 {
 	return m_dsp_bio;
 }
 
 
-void toaplan1_demonwld_state::dsp_int_w(int enable)
+void toaplan1_state::demonwld_dsp(int enable)
 {
 	m_dsp_on = enable;
 	if (enable)
@@ -120,45 +119,55 @@ void toaplan1_demonwld_state::dsp_int_w(int enable)
 	}
 }
 
-void toaplan1_demonwld_state::device_post_load()
+void toaplan1_state::demonwld_restore_dsp()
 {
-	dsp_int_w(m_dsp_on);
+	demonwld_dsp(m_dsp_on);
 }
 
-void toaplan1_demonwld_state::dsp_ctrl_w(u8 data)
+WRITE16_MEMBER(toaplan1_state::demonwld_dsp_ctrl_w)
 {
 #if 0
-	logerror("68000:%08x  Writing %02x to $e0000b.\n",m_maincpu->pc() ,data);
+	logerror("68000:%08x  Writing %08x to %08x.\n",m_maincpu->pc() ,data ,0xe0000a + offset);
 #endif
 
-	switch (data)
+	if (ACCESSING_BITS_0_7)
 	{
-		case 0x00:  dsp_int_w(1); break;  /* Enable the INT line to the DSP */
-		case 0x01:  dsp_int_w(0); break;  /* Inhibit the INT line to the DSP */
-		default:    logerror("68000:%08x  Writing unknown command %02x to $e0000b\n",m_maincpu->pcbase() ,data); break;
+		switch (data)
+		{
+			case 0x00:  demonwld_dsp(1); break;  /* Enable the INT line to the DSP */
+			case 0x01:  demonwld_dsp(0); break;  /* Inhibit the INT line to the DSP */
+			default:    logerror("68000:%04x  Writing unknown command %08x to %08x\n",m_maincpu->pcbase() ,data ,0xe0000a + offset); break;
+		}
+	}
+	else
+	{
+		logerror("68000:%04x  Writing unknown command %08x to %08x\n",m_maincpu->pcbase() ,data ,0xe0000a + offset);
 	}
 }
 
 
-u8 toaplan1_samesame_state::port_6_word_r()
+READ16_MEMBER(toaplan1_state::samesame_port_6_word_r)
 {
 	/* Bit 0x80 is secondary CPU (HD647180) ready signal */
-	logerror("PC:%08x Warning !!! IO reading from $14000b\n",m_maincpu->pcbase());
-	return (0x80 | m_tjump_io->read()) & 0xff;
+	logerror("PC:%04x Warning !!! IO reading from $14000a\n",m_maincpu->pcbase());
+	return (0x80 | ioport("TJUMP")->read()) & 0xff;
 }
 
-u8 toaplan1_state::shared_r(offs_t offset)
+READ16_MEMBER(toaplan1_state::toaplan1_shared_r)
 {
-	return m_sharedram[offset];
+	return m_sharedram[offset] & 0xff;
 }
 
-void toaplan1_state::shared_w(offs_t offset, u8 data)
+WRITE16_MEMBER(toaplan1_state::toaplan1_shared_w)
 {
-	m_sharedram[offset] = data;
+	if (ACCESSING_BITS_0_7)
+	{
+		m_sharedram[offset] = data & 0xff;
+	}
 }
 
 
-void toaplan1_state::reset_sound()
+void toaplan1_state::toaplan1_reset_sound()
 {
 	/* Reset the secondary CPU and sound chip */
 	/* rallybik, truxton, hellfire, demonwld write to a port to cause a reset */
@@ -167,9 +176,9 @@ void toaplan1_state::reset_sound()
 	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
-void toaplan1_state::reset_sound_w(u8 data)
+WRITE16_MEMBER(toaplan1_state::toaplan1_reset_sound_w)
 {
-	if (data == 0) reset_sound();
+	if (ACCESSING_BITS_0_7 && (data == 0)) toaplan1_reset_sound();
 }
 
 
@@ -194,15 +203,14 @@ WRITE_LINE_MEMBER(toaplan1_rallybik_state::coin_lockout_2_w)
 }
 
 
-void toaplan1_state::coin_w(u8 data)
+WRITE8_MEMBER(toaplan1_state::toaplan1_coin_w)
 {
 	logerror("Z80 writing %02x to coin control\n",data);
 	/* This still isnt too clear yet. */
 	/* Coin C has no coin lock ? */
 	/* Are some outputs for lights ? (no space on JAMMA for it though) */
 
-	switch (data)
-	{
+	switch (data) {
 		case 0xee: machine().bookkeeping().coin_counter_w(1,1); machine().bookkeeping().coin_counter_w(1,0); break; /* Count slot B */
 		case 0xed: machine().bookkeeping().coin_counter_w(0,1); machine().bookkeeping().coin_counter_w(0,0); break; /* Count slot A */
 	/* The following are coin counts after coin-lock active (faulty coin-lock ?) */
@@ -225,12 +233,24 @@ void toaplan1_state::coin_w(u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER(toaplan1_state::reset_callback)
+WRITE16_MEMBER(toaplan1_state::samesame_coin_w)
 {
-	reset_sound();
+	if (ACCESSING_BITS_0_7)
+	{
+		toaplan1_coin_w(space, offset, data & 0xff);
+	}
+	if (ACCESSING_BITS_8_15 && (data&0xff00))
+	{
+		logerror("PC:%04x  Writing unknown MSB data (%04x) to coin count/lockout port\n",m_maincpu->pcbase(),data);
+	}
 }
 
-void toaplan1_state::machine_reset()
+WRITE_LINE_MEMBER(toaplan1_state::toaplan1_reset_callback)
+{
+	toaplan1_reset_sound();
+}
+
+MACHINE_RESET_MEMBER(toaplan1_state,toaplan1)
 {
 	m_intenable = 0;
 	machine().bookkeeping().coin_lockout_global_w(0);
@@ -239,37 +259,37 @@ void toaplan1_state::machine_reset()
 /* zerowing, fireshrk, outzone */
 MACHINE_RESET_MEMBER(toaplan1_state,zerowing)
 {
-	machine_reset();
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(toaplan1_state::reset_callback),this));
+	MACHINE_RESET_CALL_MEMBER(toaplan1);
+	m_maincpu->set_reset_callback(write_line_delegate(FUNC(toaplan1_state::toaplan1_reset_callback),this));
 }
 
-void toaplan1_demonwld_state::machine_reset()
+MACHINE_RESET_MEMBER(toaplan1_state,demonwld)
 {
-	toaplan1_state::machine_reset();
+	MACHINE_RESET_CALL_MEMBER(toaplan1);
 	m_dsp_addr_w = 0;
 	m_main_ram_seg = 0;
 	m_dsp_execute = 0;
 }
 
+MACHINE_RESET_MEMBER(toaplan1_state,vimana)
+{
+	MACHINE_RESET_CALL_MEMBER(toaplan1);
+	m_maincpu->set_reset_callback(write_line_delegate(FUNC(toaplan1_state::toaplan1_reset_callback),this));
+}
 
-void toaplan1_state::machine_start()
+
+void toaplan1_state::toaplan1_driver_savestate()
 {
 	save_item(NAME(m_intenable));
 }
 
-void toaplan1_demonwld_state::machine_start()
+void toaplan1_state::demonwld_driver_savestate()
 {
-	toaplan1_state::machine_start();
 	save_item(NAME(m_dsp_on));
 	save_item(NAME(m_dsp_addr_w));
 	save_item(NAME(m_main_ram_seg));
 	save_item(NAME(m_dsp_bio));
 	save_item(NAME(m_dsp_execute));
+	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan1_state::demonwld_restore_dsp), this));
 }
 
-void toaplan1_samesame_state::machine_start()
-{
-	toaplan1_state::machine_start();
-	save_item(NAME(m_to_mcu));
-	save_item(NAME(m_cmdavailable));
-}

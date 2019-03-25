@@ -200,29 +200,103 @@
 
 	<!-- diamond city -->
 
-		<repeat count="20">
-			<param name="x" start="15.4" increment="0.5" />
-			<param name="y" start="8.4" increment="0.5" />
-			<bezel element="disk_white"><bounds x="~x~" y="~y~" width="0.2" height="0.2" /></bezel>
-		</repeat>
+		<bezel element="disk_white"><bounds x="5.9" y="17.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="6.4" y="17.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="6.9" y="16.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="7.4" y="16.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="7.9" y="15.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="8.4" y="15.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="8.9" y="14.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="9.4" y="14.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="9.9"  y="13.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="10.4" y="13.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="10.9" y="12.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="11.4" y="12.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="11.9" y="11.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="12.4" y="11.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="12.9" y="10.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="13.4" y="10.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="13.9" y="9.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="14.4" y="9.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="14.9" y="8.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="15.4" y="8.4" width="0.2" height="0.2" /></bezel>
 
-		<repeat count="20">
-			<param name="x" start="15.4" increment="-0.5" />
-			<param name="y" start="8.4" increment="0.5" />
-			<bezel element="disk_white"><bounds x="~x~" y="~y~" width="0.2" height="0.2" /></bezel>
-		</repeat>
+		<bezel element="disk_white"><bounds x="15.9" y="8.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="16.4" y="9.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="16.9" y="9.9"  width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="17.4" y="10.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="17.9" y="10.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="18.4" y="11.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="18.9" y="11.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="19.4" y="12.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="19.9" y="12.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="20.4" y="13.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="20.9" y="13.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="21.4" y="14.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="21.9" y="14.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="22.4" y="15.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="22.9" y="15.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="23.4" y="16.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="23.9" y="16.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="24.4" y="17.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="24.9" y="17.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="25.4" y="18.4" width="0.2" height="0.2" /></bezel>
 
-		<repeat count="26">
-			<param name="x" start="15.4" increment="0.5" />
-			<param name="y" start="28.4" increment="-0.5" />
-			<bezel element="disk_white"><bounds x="~x~" y="~y~" width="0.2" height="0.2" /></bezel>
-		</repeat>
+		<bezel element="disk_white"><bounds x="24.9" y="18.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="24.4" y="19.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="23.9" y="19.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="23.4" y="20.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="22.9" y="20.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="22.4" y="21.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="21.9" y="21.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="21.4" y="22.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="20.9" y="22.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="20.4" y="23.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="19.9" y="23.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="19.4" y="24.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="18.9" y="24.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="18.4" y="25.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="17.9" y="25.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="17.4" y="26.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="16.9" y="26.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="16.4" y="27.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="15.9" y="27.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="15.4" y="28.4" width="0.2" height="0.2" /></bezel>
 
-		<repeat count="26">
-			<param name="x" start="15.4" increment="-0.5" />
-			<param name="y" start="28.4" increment="-0.5" />
-			<bezel element="disk_white"><bounds x="~x~" y="~y~" width="0.2" height="0.2" /></bezel>
-		</repeat>
+		<bezel element="disk_white"><bounds x="14.9" y="27.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="14.4" y="27.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="13.9" y="26.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="13.4" y="26.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="12.9" y="25.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="12.4" y="25.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="11.9" y="24.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="11.4" y="24.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="10.9" y="23.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="10.4" y="23.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="9.9" y="22.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="9.4" y="22.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="8.9" y="21.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="8.4" y="21.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="7.9" y="20.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="7.4" y="20.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="6.9" y="19.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="6.4" y="19.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="5.9" y="18.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="5.4" y="18.4" width="0.2" height="0.2" /></bezel>
+
+		<bezel element="disk_white"><bounds x="4.9" y="17.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="4.4" y="17.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="3.9" y="16.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="3.4" y="16.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="2.9" y="15.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="2.4" y="15.4" width="0.2" height="0.2" /></bezel>
+
+		<bezel element="disk_white"><bounds x="28.4" y="15.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="27.9" y="15.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="27.4" y="16.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="26.9" y="16.9" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="26.4" y="17.4" width="0.2" height="0.2" /></bezel>
+		<bezel element="disk_white"><bounds x="25.9" y="17.9" width="0.2" height="0.2" /></bezel>
 
 	<!-- field leds -->
 

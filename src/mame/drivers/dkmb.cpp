@@ -119,24 +119,24 @@ static INPUT_PORTS_START( dkmb )
 
 INPUT_PORTS_END
 
-void dkmb_state::dkmb(machine_config &config)
-{
-	PPC603R(config, m_maincpu, 75'000'000); // Actually MPC603RRX266LC
-	m_maincpu->set_addrmap(AS_PROGRAM, &dkmb_state::main_map);
+MACHINE_CONFIG_START(dkmb_state::dkmb)
 
-	PIC16C56(config, "pic", 4'000'000);  // Actually PIC12C508, clock not verified
+	MCFG_DEVICE_ADD("maincpu", PPC603R, 75'000'000) // Actually MPC603RRX266LC
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));  // wrong
-	screen.set_refresh_hz(60);
-	screen.set_screen_update(FUNC(dkmb_state::screen_update));
-	screen.set_size(1024, 256);
-	screen.set_visarea_full();
+	MCFG_DEVICE_ADD("pic", PIC16C56, 4'000'000)  // Actually PIC12C508, clock not verified
 
-	PALETTE(config, "palette").set_entries(65536);
+	MCFG_SCREEN_ADD("screen", RASTER)  // wrong
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE_DRIVER(dkmb_state, screen_update)
+	MCFG_SCREEN_SIZE(1024, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 256-1)
+
+	MCFG_PALETTE_ADD("palette", 65536)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-}
+MACHINE_CONFIG_END
 
 
 ROM_START( dkmb )

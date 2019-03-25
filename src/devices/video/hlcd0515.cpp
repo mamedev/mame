@@ -26,23 +26,27 @@ DEFINE_DEVICE_TYPE(HLCD0530, hlcd0530_device, "hlcd0530", "Hughes HLCD 0530 LCD 
 //  constructor
 //-------------------------------------------------
 
-hlcd0515_device::hlcd0515_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 colmax) :
-	device_t(mconfig, type, tag, owner, clock),
-	m_colmax(colmax),
-	m_write_cols(*this), m_write_data(*this)
-{ }
+hlcd0515_device::hlcd0515_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 colmax)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_colmax(colmax)
+	, m_write_cols(*this), m_write_data(*this)
+{
+}
 
-hlcd0515_device::hlcd0515_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	hlcd0515_device(mconfig, HLCD0515, tag, owner, clock, 25)
-{ }
+hlcd0515_device::hlcd0515_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: hlcd0515_device(mconfig, HLCD0515, tag, owner, clock, 25)
+{
+}
 
-hlcd0569_device::hlcd0569_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	hlcd0515_device(mconfig, HLCD0569, tag, owner, clock, 24)
-{ }
+hlcd0569_device::hlcd0569_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: hlcd0515_device(mconfig, HLCD0569, tag, owner, clock, 24)
+{
+}
 
-hlcd0530_device::hlcd0530_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	hlcd0515_device(mconfig, HLCD0530, tag, owner, clock, 24)
-{ }
+hlcd0530_device::hlcd0530_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: hlcd0515_device(mconfig, HLCD0530, tag, owner, clock, 24)
+{
+}
 
 
 
@@ -62,7 +66,7 @@ void hlcd0515_device::device_start()
 
 	// zerofill
 	m_cs = 0;
-	m_clk = 0;
+	m_pclock = 0;
 	m_data = 0;
 	m_count = 0;
 	m_control = 0;
@@ -75,7 +79,7 @@ void hlcd0515_device::device_start()
 
 	// register for savestates
 	save_item(NAME(m_cs));
-	save_item(NAME(m_clk));
+	save_item(NAME(m_pclock));
 	save_item(NAME(m_data));
 	save_item(NAME(m_count));
 	save_item(NAME(m_control));
@@ -153,12 +157,12 @@ void hlcd0515_device::clock_data(int col)
 }
 
 
-WRITE_LINE_MEMBER(hlcd0515_device::clock_w)
+WRITE_LINE_MEMBER(hlcd0515_device::write_clock)
 {
 	state = (state) ? 1 : 0;
 
 	// clock/shift data on falling edge
-	if (!m_cs && !state && m_clk)
+	if (!m_cs && !state && m_pclock)
 	{
 		if (m_count < 5)
 		{
@@ -175,11 +179,11 @@ WRITE_LINE_MEMBER(hlcd0515_device::clock_w)
 			m_count++;
 	}
 
-	m_clk = state;
+	m_pclock = state;
 }
 
 
-WRITE_LINE_MEMBER(hlcd0515_device::cs_w)
+WRITE_LINE_MEMBER(hlcd0515_device::write_cs)
 {
 	state = (state) ? 1 : 0;
 

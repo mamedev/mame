@@ -145,6 +145,9 @@ void nes_nrom_device::common_start()
 	save_item(NAME(m_nt_src));
 	save_item(NAME(m_nt_orig));
 	save_item(NAME(m_nt_writable));
+
+	// open bus
+	save_item(NAME(m_open_bus));
 }
 
 void nes_nrom_device::pcb_reset()
@@ -288,23 +291,23 @@ void nes_un1rom_device::pcb_reset()
 
  -------------------------------------------------*/
 
-uint8_t nes_nrom368_device::read_l(offs_t offset)
+READ8_MEMBER(nes_nrom368_device::read_l)
 {
 	LOG_MMC(("nrom368 read_l, offset: %04x\n", offset));
 	offset += 0x100;
 	if (offset >= 0x800)
 		return m_prg[offset - 0x800];
 	else
-		return get_open_bus();
+		return m_open_bus;
 }
 
-uint8_t nes_nrom368_device::read_m(offs_t offset)
+READ8_MEMBER(nes_nrom368_device::read_m)
 {
 	LOG_MMC(("nrom368 read_m, offset: %04x\n", offset));
 	return m_prg[0x1800 + (offset & 0x1fff)];
 }
 
-uint8_t nes_nrom368_device::read_h(offs_t offset)
+READ8_MEMBER(nes_nrom368_device::read_h)
 {
 	LOG_MMC(("nrom368 read_h, offset: %04x\n", offset));
 	return m_prg[0x3800 + (offset & 0x7fff)];
@@ -331,7 +334,7 @@ uint8_t nes_nrom368_device::read_h(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_axrom_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_axrom_device::write_h)
 {
 	LOG_MMC(("axrom write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -352,7 +355,7 @@ void nes_axrom_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_bxrom_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_bxrom_device::write_h)
 {
 	/* This portion of the mapper is nearly identical to Mapper 7, except no one-screen mirroring */
 	/* Deadly Towers is really a BxROM game - the demo screens look wrong using mapper 7. */
@@ -388,7 +391,7 @@ void nes_bxrom_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_cnrom_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_cnrom_device::write_h)
 {
 	LOG_MMC(("cxrom write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -409,7 +412,7 @@ void nes_cnrom_device::write_h(offs_t offset, uint8_t data)
 		chr8(data, CHRROM);
 }
 
-uint8_t nes_cnrom_device::chr_r(offs_t offset)
+READ8_MEMBER(nes_cnrom_device::chr_r)
 {
 	int bank = offset >> 10;
 
@@ -418,7 +421,7 @@ uint8_t nes_cnrom_device::chr_r(offs_t offset)
 	// give actual VROM content or open bus values.
 	// For most boards, chr_open_bus remains always zero.
 	if (m_chr_open_bus)
-		return get_open_bus();
+		return m_open_bus;
 
 	return m_chr_access[bank][offset & 0x3ff];
 }
@@ -438,7 +441,7 @@ uint8_t nes_cnrom_device::chr_r(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_cprom_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_cprom_device::write_h)
 {
 	LOG_MMC(("cprom write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -459,7 +462,7 @@ void nes_cprom_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_gxrom_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_gxrom_device::write_h)
 {
 	LOG_MMC(("gxrom write_h, offset %04x, data: %02x\n", offset, data));
 
@@ -485,7 +488,7 @@ void nes_gxrom_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_uxrom_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_uxrom_device::write_h)
 {
 	LOG_MMC(("uxrom write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -511,7 +514,7 @@ void nes_uxrom_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_uxrom_cc_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_uxrom_cc_device::write_h)
 {
 	LOG_MMC(("uxrom_cc write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -532,7 +535,7 @@ void nes_uxrom_cc_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_un1rom_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_un1rom_device::write_h)
 {
 	LOG_MMC(("un1rom write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -555,7 +558,7 @@ void nes_un1rom_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_nochr_device::chr_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_nochr_device::chr_w)
 {
 	int mirr = get_mirroring();
 	if (mirr == PPU_MIRROR_HIGH)
@@ -566,7 +569,7 @@ void nes_nochr_device::chr_w(offs_t offset, uint8_t data)
 		m_ciram[offset & 0x7ff] = data; // not sure here, since there is no software to test...
 }
 
-uint8_t nes_nochr_device::chr_r(offs_t offset)
+READ8_MEMBER(nes_nochr_device::chr_r)
 {
 	int mirr = get_mirroring();
 	if (mirr == PPU_MIRROR_HIGH)

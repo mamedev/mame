@@ -737,58 +737,59 @@ void px8_state::machine_reset()
     MACHINE DRIVERS
 ***************************************************************************/
 
-void px8_state::px8(machine_config &config)
-{
+MACHINE_CONFIG_START(px8_state::px8)
 	/* main cpu (uPD70008) */
-	Z80(config, m_maincpu, XTAL_CR1 / 4); /* 2.45 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &px8_state::px8_mem);
-	m_maincpu->set_addrmap(AS_IO, &px8_state::px8_io);
+	MCFG_DEVICE_ADD(UPD70008_TAG, Z80, XTAL_CR1 / 4) /* 2.45 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(px8_mem)
+	MCFG_DEVICE_IO_MAP(px8_io)
 
 	/* slave cpu (HD6303) */
-	m6803_cpu_device &slave(M6803(config, HD6303_TAG, XTAL_CR1 / 4)); /* 614 kHz */
-	slave.set_addrmap(AS_PROGRAM, &px8_state::px8_slave_mem);
-	slave.set_disable();
+	MCFG_DEVICE_ADD(HD6303_TAG, M6803, XTAL_CR1 / 4) /* 614 kHz */
+	MCFG_DEVICE_PROGRAM_MAP(px8_slave_mem)
+	MCFG_DEVICE_DISABLE()
 
 	/* sub CPU (uPD7508) */
-//  upd7508_device &sub(UPD7508(config, UPD7508_TAG, 200000)); /* 200 kHz */
-//  sub.set_addrmap(AS_IO, &px8_state::px8_sub_io);
-//  sub.set_disable();
+//  MCFG_DEVICE_ADD(UPD7508_TAG, UPD7508, 200000) /* 200 kHz */
+//  MCFG_DEVICE_IO_MAP(px8_sub_io)
+//  MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
 	config.set_default_layout(layout_px8);
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(72);
-	screen.set_screen_update(FUNC(px8_state::screen_update));
-	screen.set_size(480, 64);
-	screen.set_visarea(0, 479, 0, 63);
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
+	MCFG_SCREEN_REFRESH_RATE(72)
+	MCFG_SCREEN_UPDATE_DRIVER(px8_state, screen_update)
+	MCFG_SCREEN_SIZE(480, 64)
+	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 63)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_px8);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_px8)
 	PALETTE(config, "palette", FUNC(px8_state::px8_palette), 2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(0, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(0, "mono", 0.25);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, "capsule1", generic_plain_slot, "px8_cart", "bin,rom");
+	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, "px8_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
-	GENERIC_CARTSLOT(config, "capsule2", generic_plain_slot, "px8_cart", "bin,rom");
+	MCFG_GENERIC_CARTSLOT_ADD("capsule2", generic_plain_slot, "px8_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* devices */
-	I8251(config, I8251_TAG, 0);
+	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
 
-	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software
-	SOFTWARE_LIST(config, "cart_list").set_original("px8_cart");
-	SOFTWARE_LIST(config, "epson_cpm_list").set_original("epson_cpm");
-}
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "px8_cart")
+	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
+MACHINE_CONFIG_END
 
 /***************************************************************************
     ROMS

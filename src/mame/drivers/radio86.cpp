@@ -462,8 +462,7 @@ GFXDECODE_END
 
 
 /* Machine driver */
-void radio86_state::radio86(machine_config &config)
-{
+MACHINE_CONFIG_START(radio86_state::radio86)
 	/* basic machine hardware */
 	I8080(config, m_maincpu, XTAL(16'000'000) / 9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &radio86_state::radio86_mem);
@@ -481,9 +480,9 @@ void radio86_state::radio86(machine_config &config)
 	crtc.drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_screen_update("i8275", FUNC(i8275_device::screen_update));
-	screen.set_raw(XTAL(16'000'000) / 2, 516, 0, 78*6, 310, 0, 30*10);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000) / 2, 516, 0, 78*6, 310, 0, 30*10)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_radio86);
 	PALETTE(config, m_palette, FUNC(radio86_state::radio86_palette), 3);
 
@@ -497,13 +496,13 @@ void radio86_state::radio86(machine_config &config)
 	m_dma8257->out_iow_cb<2>().set("i8275", FUNC(i8275_device::dack_w));
 	m_dma8257->set_reverse_rw_mode(1);
 
-	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(rkr_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
-	m_cassette->set_interface("radio86_cass");
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(rkr_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	MCFG_CASSETTE_INTERFACE("radio86_cass")
 
-	SOFTWARE_LIST(config, "cass_list").set_original("radio86_cass");
-}
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "radio86_cass")
+MACHINE_CONFIG_END
 
 
 void radio86_state::kr03(machine_config &config)
@@ -517,80 +516,81 @@ void radio86_state::kr03(machine_config &config)
 	m_ppi8255_1->out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
 }
 
-void radio86_state::radio16(machine_config &config)
-{
+MACHINE_CONFIG_START(radio86_state::radio16)
 	radio86(config);
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &radio86_state::radio86_16_mem);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(radio86_16_mem)
+MACHINE_CONFIG_END
 
-void radio86_state::radiorom(machine_config &config)
-{
+MACHINE_CONFIG_START(radio86_state::radiorom)
 	radio86(config);
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &radio86_state::radio86rom_mem);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(radio86rom_mem)
 
 	I8255(config, m_ppi8255_2);
 	m_ppi8255_2->in_pa_callback().set(FUNC(radio86_state::radio86rom_romdisk_porta_r));
 	m_ppi8255_2->out_pb_callback().set(FUNC(radio86_state::radio86_romdisk_portb_w));
 	m_ppi8255_2->out_pc_callback().set(FUNC(radio86_state::radio86_romdisk_portc_w));
 
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "radio86_cart", "bin,rom");
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "radio86_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
-	SOFTWARE_LIST(config, "cart_list").set_original("radio86_cart");
-}
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "radio86_cart")
+MACHINE_CONFIG_END
 
-void radio86_state::radioram(machine_config &config)
-{
+MACHINE_CONFIG_START(radio86_state::radioram)
 	radio86(config);
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &radio86_state::radio86ram_mem);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(radio86ram_mem)
 
 	I8255(config, m_ppi8255_2);
 	m_ppi8255_2->in_pa_callback().set(FUNC(radio86_state::radio86ram_romdisk_porta_r));
 	m_ppi8255_2->out_pb_callback().set(FUNC(radio86_state::radio86_romdisk_portb_w));
 	m_ppi8255_2->out_pc_callback().set(FUNC(radio86_state::radio86_romdisk_portc_w));
-}
+MACHINE_CONFIG_END
 
-void radio86_state::rk7007(machine_config &config)
-{
+MACHINE_CONFIG_START(radio86_state::rk7007)
 	radio86(config);
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &radio86_state::rk7007_io);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(rk7007_io)
 
 	i8255_device &ms7007(I8255(config, "ms7007"));
 	ms7007.out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
 	ms7007.in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
 	ms7007.in_pc_callback().set(FUNC(radio86_state::rk7007_8255_portc_r));
 	ms7007.out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
-}
+MACHINE_CONFIG_END
 
-void radio86_state::rk700716(machine_config &config)
-{
+MACHINE_CONFIG_START(radio86_state::rk700716)
 	radio16(config);
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &radio86_state::rk7007_io);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(rk7007_io)
 
 	i8255_device &ms7007(I8255(config, "ms7007"));
 	ms7007.out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
 	ms7007.in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
 	ms7007.in_pc_callback().set(FUNC(radio86_state::rk7007_8255_portc_r));
 	ms7007.out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
-}
+MACHINE_CONFIG_END
 
-void radio86_state::mikron2(machine_config &config)
-{
+MACHINE_CONFIG_START(radio86_state::mikron2)
 	radio86(config);
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &radio86_state::mikron2_mem);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mikron2_mem)
+MACHINE_CONFIG_END
 
-void radio86_state::impuls03(machine_config &config)
-{
+MACHINE_CONFIG_START(radio86_state::impuls03)
 	radio86(config);
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &radio86_state::impuls03_mem);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(impuls03_mem)
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( radio86 )

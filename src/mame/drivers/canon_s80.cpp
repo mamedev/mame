@@ -39,12 +39,11 @@ void canons80_state::canons80_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-void canons80_state::canons80(machine_config &config)
-{
+MACHINE_CONFIG_START(canons80_state::canons80)
 	/* basic machine hardware */
-	hd6301_cpu_device &maincpu(HD6301(config, "maincpu", 5000000)); /* hd63a01xop 5 MHz guessed: TODO: check on PCB */
-	maincpu.set_addrmap(AS_PROGRAM, &canons80_state::canons80_map);
-}
+	MCFG_DEVICE_ADD("maincpu", HD6301, 5000000) /* hd63a01xop 5 MHz guessed: TODO: check on PCB */
+	MCFG_DEVICE_PROGRAM_MAP(canons80_map)
+MACHINE_CONFIG_END
 
 void canons80_state::init_canons80()
 {

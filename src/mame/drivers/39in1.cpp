@@ -286,11 +286,10 @@ void _39in1_state::_39in1(machine_config &config)
 	m_pxa_periphs->gpio0_in_cb().set(FUNC(_39in1_state::eeprom_r));
 }
 
-void _39in1_state::_60in1(machine_config &config)
-{
+MACHINE_CONFIG_START(_39in1_state::_60in1)
 	_39in1(config);
 	MCFG_MACHINE_START_OVERRIDE(_39in1_state,60in1)
-}
+MACHINE_CONFIG_END
 
 ROM_START( 39in1 )
 	// main program, encrypted

@@ -19,14 +19,11 @@ void msx_cart_superloderunner_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
 
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_superloderunner_device::restore_banks), this));
+
 	// Install evil memory write handler
-	memory_space().install_write_handler(0x0000, 0x0000, write8smo_delegate(FUNC(msx_cart_superloderunner_device::banking), this));
-}
-
-
-void msx_cart_superloderunner_device::device_post_load()
-{
-	restore_banks();
+	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_PROGRAM);
+	space.install_write_handler(0x0000, 0x0000, write8_delegate(FUNC(msx_cart_superloderunner_device::banking), this));
 }
 
 
@@ -47,7 +44,7 @@ void msx_cart_superloderunner_device::initialize_cartridge()
 }
 
 
-uint8_t msx_cart_superloderunner_device::read_cart(offs_t offset)
+READ8_MEMBER(msx_cart_superloderunner_device::read_cart)
 {
 	if (offset >= 0x8000 && offset < 0xc000)
 	{
@@ -58,7 +55,7 @@ uint8_t msx_cart_superloderunner_device::read_cart(offs_t offset)
 }
 
 
-void msx_cart_superloderunner_device::banking(uint8_t data)
+WRITE8_MEMBER(msx_cart_superloderunner_device::banking)
 {
 	m_selected_bank = data;
 	restore_banks();

@@ -172,34 +172,34 @@ private:
 	required_device<z80pio_device> m_ic48_pio;
 	required_device<z80pio_device> m_ic49_pio;
 
-	uint8_t ic48_pio_pa_r();
-	void ic48_pio_pa_w(uint8_t data);
+	DECLARE_READ8_MEMBER(ic48_pio_pa_r);
+	DECLARE_WRITE8_MEMBER(ic48_pio_pa_w);
 
-	uint8_t ic48_pio_pb_r();
-	void ic48_pio_pb_w(uint8_t data);
+	DECLARE_READ8_MEMBER(ic48_pio_pb_r);
+	DECLARE_WRITE8_MEMBER(ic48_pio_pb_w);
 
-	uint8_t ic49_pio_pb_r();
-	void ic49_pio_pb_w(uint8_t data);
+	DECLARE_READ8_MEMBER(ic49_pio_pb_r);
+	DECLARE_WRITE8_MEMBER(ic49_pio_pb_w);
 
 	// 1x range ports
-	void port18_w(uint8_t data);
-	void port19_w(uint8_t data);
-	void port1b_w(uint8_t data);
+	DECLARE_WRITE8_MEMBER(port18_w);
+	DECLARE_WRITE8_MEMBER(port19_w);
+	DECLARE_WRITE8_MEMBER(port1b_w);
 
-	uint8_t port18_r();
-	uint8_t port19_r();
-	uint8_t port1a_r();
+	DECLARE_READ8_MEMBER(port18_r);
+	DECLARE_READ8_MEMBER(port19_r);
+	DECLARE_READ8_MEMBER(port1a_r);
 
 	// 7x range ports
-	void rambank_palbank_w(uint8_t data);
-	void palupload_w(uint8_t data);
-	void paladdr_w(uint8_t data);
-	uint8_t watchdog_r();
-	uint8_t port7c_r();
+	DECLARE_WRITE8_MEMBER(rambank_palbank_w);
+	DECLARE_WRITE8_MEMBER(palupload_w);
+	DECLARE_WRITE8_MEMBER(paladdr_w);
+	DECLARE_READ8_MEMBER(watchdog_r);
+	DECLARE_READ8_MEMBER(port7c_r);
 
 	// other ports
-	uint8_t other_cpu_r(offs_t offset);
-	void other_cpu_w(offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER(other_cpu_r);
+	DECLARE_WRITE8_MEMBER(other_cpu_w);
 
 	uint8_t m_paladdr;
 	int m_palbank;
@@ -209,9 +209,9 @@ private:
 	uint8_t m_ic49_pio_pb_val;
 
 	void set_palette(int offset);
-	void palette_r_w(offs_t offset, uint8_t data);
-	void palette_g_w(offs_t offset, uint8_t data);
-	void palette_b_w(offs_t offset, uint8_t data);
+	DECLARE_WRITE8_MEMBER(palette_r_w);
+	DECLARE_WRITE8_MEMBER(palette_g_w);
+	DECLARE_WRITE8_MEMBER(palette_b_w);
 
 	void handle_sub_board_cpu_lines(cedar_magnet_board_interface &dev, int old_data, int data);
 	INTERRUPT_GEN_MEMBER(irq);
@@ -317,7 +317,7 @@ void cedar_magnet_state::cedar_bank0(address_map &map)
 
 ***********************/
 
-void cedar_magnet_state::rambank_palbank_w(uint8_t data)
+WRITE8_MEMBER(cedar_magnet_state::rambank_palbank_w)
 {
 	// ---- --xx
 	// xx = program bank
@@ -329,17 +329,17 @@ void cedar_magnet_state::rambank_palbank_w(uint8_t data)
 	m_sub_pal_bankdev->set_bank(palbank);
 }
 
-void cedar_magnet_state::palupload_w(uint8_t data)
+WRITE8_MEMBER(cedar_magnet_state::palupload_w)
 {
-	m_sub_pal_bankdev->write8(m_paladdr, data);
+	m_sub_pal_bankdev->write8(space, m_paladdr, data);
 }
 
-void cedar_magnet_state::paladdr_w(uint8_t data)
+WRITE8_MEMBER(cedar_magnet_state::paladdr_w)
 {
 	m_paladdr = data;
 }
 
-uint8_t cedar_magnet_state::watchdog_r()
+READ8_MEMBER(cedar_magnet_state::watchdog_r)
 {
 	// watchdog
 	return 0x00;
@@ -352,7 +352,7 @@ uint8_t cedar_magnet_state::watchdog_r()
 
 ***********************/
 
-uint8_t cedar_magnet_state::port7c_r()
+READ8_MEMBER(cedar_magnet_state::port7c_r)
 {
 	//logerror("%s: port7c_r\n", machine().describe_context());
 	return 0x01;
@@ -366,18 +366,18 @@ uint8_t cedar_magnet_state::port7c_r()
 
 ***********************/
 
-uint8_t cedar_magnet_state::port18_r()
+READ8_MEMBER(cedar_magnet_state::port18_r)
 {
 //  logerror("%s: port18_r\n", machine().describe_context());
 	return 0x00;
 }
 
-void cedar_magnet_state::port18_w(uint8_t data)
+WRITE8_MEMBER(cedar_magnet_state::port18_w)
 {
 //  logerror("%s: port18_w %02x\n", machine().describe_context(), data);
 }
 
-uint8_t cedar_magnet_state::port19_r()
+READ8_MEMBER(cedar_magnet_state::port19_r)
 {
 	uint8_t ret = 0x00;
 //  logerror("%s: port19_r\n", machine().describe_context());
@@ -390,19 +390,19 @@ uint8_t cedar_magnet_state::port19_r()
 	return ret;
 }
 
-uint8_t cedar_magnet_state::port1a_r()
+READ8_MEMBER(cedar_magnet_state::port1a_r)
 {
 //  logerror("%s: port1a_r\n", machine().describe_context());
 	return 0x00;
 }
 
 
-void cedar_magnet_state::port19_w(uint8_t data)
+WRITE8_MEMBER(cedar_magnet_state::port19_w)
 {
 //  logerror("%s: port19_w %02x\n", machine().describe_context(), data);
 }
 
-void cedar_magnet_state::port1b_w(uint8_t data)
+WRITE8_MEMBER(cedar_magnet_state::port1b_w)
 {
 //  logerror("%s: port1b_w %02x\n", machine().describe_context(), data);
 }
@@ -418,19 +418,19 @@ void cedar_magnet_state::set_palette(int offset)
 	m_palette->set_pen_color(offset^0xff, pal4bit(m_pal_r[offset]), pal4bit(m_pal_g[offset]), pal4bit(m_pal_b[offset]));
 }
 
-void cedar_magnet_state::palette_r_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(cedar_magnet_state::palette_r_w)
 {
 	m_pal_r[offset] = data;
 	set_palette(offset);
 }
 
-void cedar_magnet_state::palette_g_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(cedar_magnet_state::palette_g_w)
 {
 	m_pal_g[offset] = data;
 	set_palette(offset);
 }
 
-void cedar_magnet_state::palette_b_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(cedar_magnet_state::palette_b_w)
 {
 	m_pal_b[offset] = data;
 	set_palette(offset);
@@ -460,7 +460,7 @@ void cedar_magnet_state::video_start()
 
 ***********************/
 
-uint8_t cedar_magnet_state::other_cpu_r(offs_t offset)
+READ8_MEMBER(cedar_magnet_state::other_cpu_r)
 {
 	int bankbit0 = (m_ic48_pio_pa_val & 0x60) >> 5;
 	int plane0select = (m_ic48_pio_pa_val & 0x07) >> 0;
@@ -509,7 +509,7 @@ uint8_t cedar_magnet_state::other_cpu_r(offs_t offset)
 	return ret;
 }
 
-void cedar_magnet_state::other_cpu_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(cedar_magnet_state::other_cpu_w)
 {
 	int bankbit0 = (m_ic48_pio_pa_val & 0x60) >> 5;
 	int plane0select = (m_ic48_pio_pa_val & 0x07) >> 0;
@@ -579,7 +579,7 @@ void cedar_magnet_state::handle_sub_board_cpu_lines(cedar_magnet_board_interface
 
 ***********************/
 
-uint8_t cedar_magnet_state::ic48_pio_pa_r() // 0x20
+READ8_MEMBER( cedar_magnet_state::ic48_pio_pa_r ) // 0x20
 {
 	uint8_t ret = m_ic48_pio_pa_val & ~0x08;
 
@@ -593,7 +593,7 @@ uint8_t cedar_magnet_state::ic48_pio_pa_r() // 0x20
 	return ret;
 }
 
-void cedar_magnet_state::ic48_pio_pa_w(uint8_t data) // 0x20
+WRITE8_MEMBER( cedar_magnet_state::ic48_pio_pa_w ) // 0x20
 {
 	int oldplane0select = (m_ic48_pio_pa_val & 0x07) >> 0;
 
@@ -621,7 +621,7 @@ void cedar_magnet_state::ic48_pio_pa_w(uint8_t data) // 0x20
 }
 
 
-uint8_t cedar_magnet_state::ic48_pio_pb_r() // 0x22
+READ8_MEMBER( cedar_magnet_state::ic48_pio_pb_r ) // 0x22
 {
 	uint8_t ret = m_ic48_pio_pb_val & ~0x80;
 
@@ -634,7 +634,7 @@ uint8_t cedar_magnet_state::ic48_pio_pb_r() // 0x22
 	return ret;
 }
 
-void cedar_magnet_state::ic48_pio_pb_w(uint8_t data) // 0x22
+WRITE8_MEMBER(cedar_magnet_state::ic48_pio_pb_w) // 0x22
 {
 	int oldplane1select = (m_ic48_pio_pb_val & 0x07) >> 0;
 	int oldspriteselect = (m_ic48_pio_pb_val & 0x70) >> 4;
@@ -667,7 +667,7 @@ void cedar_magnet_state::ic48_pio_pb_w(uint8_t data) // 0x22
 
 ***********************/
 
-uint8_t cedar_magnet_state::ic49_pio_pb_r() // 0x42
+READ8_MEMBER( cedar_magnet_state::ic49_pio_pb_r ) // 0x42
 {
 	uint8_t ret = m_ic49_pio_pb_val;
 
@@ -677,7 +677,7 @@ uint8_t cedar_magnet_state::ic49_pio_pb_r() // 0x42
 	return ret;
 }
 
-void cedar_magnet_state::ic49_pio_pb_w(uint8_t data) // 0x42
+WRITE8_MEMBER( cedar_magnet_state::ic49_pio_pb_w ) // 0x42
 {
 	int oldsoundselect = (m_ic49_pio_pb_val & 0x70) >> 4;
 
@@ -767,13 +767,13 @@ INTERRUPT_GEN_MEMBER(cedar_magnet_state::irq)
 	m_cedsprite->irq_hold();
 }
 
-void cedar_magnet_state::cedar_magnet(machine_config &config)
-{
+MACHINE_CONFIG_START(cedar_magnet_state::cedar_magnet)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);         /* ? MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &cedar_magnet_state::cedar_magnet_map);
-	m_maincpu->set_addrmap(AS_IO, &cedar_magnet_state::cedar_magnet_io);
-	m_maincpu->set_vblank_int("screen", FUNC(cedar_magnet_state::irq));
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cedar_magnet_map)
+	MCFG_DEVICE_IO_MAP(cedar_magnet_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cedar_magnet_state,  irq)
 
 	ADDRESS_MAP_BANK(config, "bank0").set_map(&cedar_magnet_state::cedar_bank0).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 	ADDRESS_MAP_BANK(config, "mb_sub_ram").set_map(&cedar_magnet_state::cedar_magnet_mainboard_sub_ram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
@@ -794,15 +794,15 @@ void cedar_magnet_state::cedar_magnet(machine_config &config)
 	m_ic49_pio->out_pb_callback().set(FUNC(cedar_magnet_state::ic49_pio_pb_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(256, 256);
-	screen.set_visarea(0, 256-8-1, 0, 192-1);
-	screen.set_screen_update(FUNC(cedar_magnet_state::screen_update_cedar_magnet));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-8-1, 0, 192-1)
+	MCFG_SCREEN_UPDATE_DRIVER(cedar_magnet_state, screen_update_cedar_magnet)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette).set_entries(0x400);
+	MCFG_PALETTE_ADD("palette", 0x400)
 
 	CEDAR_MAGNET_SOUND(config, m_cedsound, 0);
 	CEDAR_MAGNET_PLANE(config, m_cedplane0, 0);
@@ -811,8 +811,8 @@ void cedar_magnet_state::cedar_magnet(machine_config &config)
 
 	CEDAR_MAGNET_FLOP(config, "flop", 0);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
-}
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+MACHINE_CONFIG_END
 
 
 #define BIOS_ROM \

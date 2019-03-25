@@ -317,18 +317,6 @@ void dc_cons_state::init_dcjp()
 	init_dc();
 }
 
-void dc_cons_state::init_tream()
-{
-	// Modchip connected to BIOS ROM chip changes 4 bytes (actually bits) as shown below, which allow to boot any region games.
-	u8 *rom = (u8 *)memregion("maincpu")->base();
-	rom[0x503] |= 0x40;
-	rom[0x50f] |= 0x40;
-	rom[0x523] |= 0x40;
-	rom[0x531] |= 0x40;
-
-	init_dcus();
-}
-
 READ64_MEMBER(dc_cons_state::dc_pdtra_r )
 {
 	uint64_t out = PCTRA<<32;
@@ -593,8 +581,7 @@ void dc_cons_state::gdrom_config(device_t *device)
 	MCFG_SOUND_ROUTE(1, "^^aica", 1.0)
 }
 
-void dc_cons_state::dc(machine_config &config)
-{
+MACHINE_CONFIG_START(dc_cons_state::dc)
 	/* basic machine hardware */
 	SH4LE(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_md(0, 1);
@@ -610,10 +597,10 @@ void dc_cons_state::dc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dc_cons_state::dc_map);
 	m_maincpu->set_addrmap(AS_IO, &dc_cons_state::dc_port);
 
-	TIMER(config, "scantimer").configure_scanline(FUNC(dc_state::dc_scanline), "screen", 0, 1);
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
 
-	ARM7(config, m_soundcpu, ((XTAL(33'868'800)*2)/3)/8);   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
-	m_soundcpu->set_addrmap(AS_PROGRAM, &dc_cons_state::dc_audio_map);
+	MCFG_DEVICE_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	MCFG_DEVICE_PROGRAM_MAP(dc_audio_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
 
@@ -659,10 +646,10 @@ void dc_cons_state::dc(machine_config &config)
 	dcctrl3.set_port_tag<7>("P4:A5");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(13458568*2, 857, 0, 640, 524, 0, 480); /* TODO: where pclk actually comes? */
-	screen.set_screen_update("powervr2", FUNC(powervr2_device::screen_update));
-	PALETTE(config, "palette").set_entries(0x1000);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(13458568*2, 857, 0, 640, 524, 0, 480) /* TODO: where pclk actually comes? */
+	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
+	MCFG_PALETTE_ADD("palette", 0x1000)
 	POWERVR2(config, m_powervr2, 0);
 	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
 
@@ -681,13 +668,13 @@ void dc_cons_state::dc(machine_config &config)
 	ATA_INTERFACE(config, m_ata, 0);
 	m_ata->irq_handler().set(FUNC(dc_cons_state::ata_interrupt));
 
-	ata_slot_device &ata_0(*subdevice<ata_slot_device>("ata:0"));
-	ata_0.option_add("gdrom", GDROM);
-	ata_0.set_option_machine_config("gdrom", gdrom_config);
-	ata_0.set_default_option("gdrom");
+	MCFG_DEVICE_MODIFY("ata:0")
+	MCFG_SLOT_OPTION_ADD("gdrom", GDROM)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("gdrom", gdrom_config)
+	MCFG_SLOT_DEFAULT_OPTION("gdrom")
 
-	SOFTWARE_LIST(config, "cd_list").set_original("dc");
-}
+	MCFG_SOFTWARE_LIST_ADD("cd_list","dc")
+MACHINE_CONFIG_END
 
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
@@ -778,15 +765,15 @@ ROM_END
 // unauthorised portable modification
 ROM_START( dctream )
 	ROM_REGION(0x200000, "maincpu", 0)
-	// uses regular mpr-21931 BIOS chip, have region-free mod-chip installed, see driver init.
-	ROM_LOAD( "mpr-21931.ic501", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )
+	// multi-region hack of mpr-21931/1.01d BIOS, hardware checksum protection passes OK due to algorithm weakness
+	ROM_LOAD( "dc_bios.bin", 0x000000, 0x200000, CRC(cff88d0d) SHA1(e3f84705b183ffded0a349ac7f2ab00be2ab74ee) ) // dumped in software way, ROM label unknown
 
 	ROM_REGION(0x020000, "dcflash", 0)
 	ROM_LOAD( "dc_flash.bin", 0x000000, 0x020000, CRC(9d5515c4) SHA1(78a86fd4e8b58fc9d3535eef6591178f1b97ecf9) ) // VA1 NTSC-US
 ROM_END
 
-// normally, with DIP switch 4 off, HKT-0100/0110/0120 AKA "Katana Set 5.xx", will be booted from flash ROM IC507 (first 2 dumps below)
-// otherwise it boots from EPROM which contain system checker software (last 2 dumps)
+// normally, with DIP switch 4 off, HKT-100/110/120 AKA "Katana Set 5.xx", will be booted from flash ROM IC507 (first 2 dumps below)
+// otherwise it boots from EPROM which contain system checker software (last dump)
 ROM_START( dcdev )
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "1011", "Katana Set5 v1.011 (World)")    // BOOT flash rom update from Katana SDK R9-R11, WinCE SDK v2.1
@@ -795,14 +782,11 @@ ROM_START( dcdev )
 	ROM_LOAD_BIOS(1, "set5v1.001.ic507", 0x000000, 0x200000, CRC(5702d38f) SHA1(ea7a3ae1de73683008dd795c252941a4fc81b42e) )
 
 	// 27C160 EPROM (DIP42) IC??? labeled
-	// SET5 7676
-	// V0.71 98/11/13
-	ROM_SYSTEM_BIOS(2, "071", "Katana Set5 Checker v0.71")
-	ROM_LOAD_BIOS(2, "set5v0.71.bin", 0x000000, 0x200000, CRC(52d01969) SHA1(28aec4a01419d2d2a664c540bef30ea289ca0644) )
 	// SET5 FC52
 	// V0.41 98/08/27
-	ROM_SYSTEM_BIOS(3, "041", "Katana Set5 Checker v0.41")
-	ROM_LOAD_BIOS(3, "set5v0.41.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) )
+	// also known to exists v0.71 98/11/13
+	ROM_SYSTEM_BIOS(2, "041", "Katana Set5 Checker v0.41")
+	ROM_LOAD_BIOS(2, "set5v0.41.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) )
 
 	ROM_REGION(0x020000, "dcflash", 0)
 	ROM_LOAD( "hkt-0120-flash.bin", 0x000000, 0x020000, CRC(7784c304) SHA1(31ef57f550d8cd13e40263cbc657253089e53034) ) // Dev.Boxes have empty (FF filled) flash ROM
@@ -812,5 +796,5 @@ ROM_END
 CONS( 1999, dc,      dcjp,   0,      dc,      dc,    dc_cons_state, init_dcus, "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1998, dcjp,    0,      0,      dc,      dc,    dc_cons_state, init_dcjp, "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1999, dceu,    dcjp,   0,      dc,      dc,    dc_cons_state, init_dcus, "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
-CONS( 200?, dctream, dcjp,   0,      dc,      dc,    dc_cons_state, init_tream,"<unknown>", "Treamcast", MACHINE_NOT_WORKING )
+CONS( 200?, dctream, dcjp,   0,      dc,      dc,    dc_cons_state, init_dcus, "<unknown>", "Treamcast", MACHINE_NOT_WORKING )
 CONS( 1998, dcdev,   0,      0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )

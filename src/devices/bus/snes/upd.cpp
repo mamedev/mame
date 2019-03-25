@@ -97,12 +97,12 @@ void sns_rom_setadsp_device::device_start()
 // Lo-ROM
 
 // DSP dump contains prg at offset 0 and data at offset 0x2000
-uint32_t sns_rom20_necdsp_device::necdsp_prg_r(offs_t offset)
+READ32_MEMBER( sns_rom20_necdsp_device::necdsp_prg_r )
 {
 	return get_prg(&m_bios[0], offset);
 }
 
-uint16_t sns_rom20_necdsp_device::necdsp_data_r(offs_t offset)
+READ16_MEMBER( sns_rom20_necdsp_device::necdsp_data_r )
 {
 	return get_data(&m_bios[0], offset + 0x2000/2);
 }
@@ -132,21 +132,20 @@ void sns_rom20_necdsp_device::dsp_data_map_lorom(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void sns_rom20_necdsp_device::device_add_mconfig(machine_config &config)
-{
-	UPD7725(config, m_upd7725, 8000000);
-	m_upd7725->set_addrmap(AS_PROGRAM, &sns_rom20_necdsp_device::dsp_prg_map_lorom);
-	m_upd7725->set_addrmap(AS_DATA, &sns_rom20_necdsp_device::dsp_data_map_lorom);
-}
+MACHINE_CONFIG_START(sns_rom20_necdsp_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map_lorom)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map_lorom)
+MACHINE_CONFIG_END
 
-uint8_t sns_rom20_necdsp_device::chip_read(offs_t offset)
+READ8_MEMBER( sns_rom20_necdsp_device::chip_read )
 {
 	offset &= 0x7fff;
 	return m_upd7725->snesdsp_read(offset < 0x4000);
 }
 
 
-void sns_rom20_necdsp_device::chip_write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( sns_rom20_necdsp_device::chip_write )
 {
 	offset &= 0x7fff;
 	m_upd7725->snesdsp_write(offset < 0x4000, data);
@@ -156,12 +155,12 @@ void sns_rom20_necdsp_device::chip_write(offs_t offset, uint8_t data)
 // Hi-ROM
 
 // DSP dump contains prg at offset 0 and data at offset 0x2000
-uint32_t sns_rom21_necdsp_device::necdsp_prg_r(offs_t offset)
+READ32_MEMBER( sns_rom21_necdsp_device::necdsp_prg_r )
 {
 	return get_prg(&m_bios[0], offset);
 }
 
-uint16_t sns_rom21_necdsp_device::necdsp_data_r(offs_t offset)
+READ16_MEMBER( sns_rom21_necdsp_device::necdsp_data_r )
 {
 	return get_data(&m_bios[0], offset + 0x2000/2);
 }
@@ -190,21 +189,20 @@ void sns_rom21_necdsp_device::dsp_data_map_hirom(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void sns_rom21_necdsp_device::device_add_mconfig(machine_config &config)
-{
-	UPD7725(config, m_upd7725, 8000000);
-	m_upd7725->set_addrmap(AS_PROGRAM, &sns_rom21_necdsp_device::dsp_prg_map_hirom);
-	m_upd7725->set_addrmap(AS_DATA, &sns_rom21_necdsp_device::dsp_data_map_hirom);
-}
+MACHINE_CONFIG_START(sns_rom21_necdsp_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map_hirom)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map_hirom)
+MACHINE_CONFIG_END
 
-uint8_t sns_rom21_necdsp_device::chip_read(offs_t offset)
+READ8_MEMBER( sns_rom21_necdsp_device::chip_read )
 {
 	offset &= 0x1fff;
 	return m_upd7725->snesdsp_read(offset < 0x1000);
 }
 
 
-void sns_rom21_necdsp_device::chip_write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( sns_rom21_necdsp_device::chip_write )
 {
 	offset &= 0x1fff;
 	m_upd7725->snesdsp_write(offset < 0x1000, data);
@@ -217,7 +215,7 @@ void sns_rom21_necdsp_device::chip_write(offs_t offset, uint8_t data)
 
 // same as above but additional read/write handling for the add-on chip
 
-uint8_t sns_rom_setadsp_device::chip_read(offs_t offset)
+READ8_MEMBER( sns_rom_setadsp_device::chip_read )
 {
 	if (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000)
 		m_upd96050->snesdsp_read((offset & 0x01) ? false : true);
@@ -236,7 +234,7 @@ uint8_t sns_rom_setadsp_device::chip_read(offs_t offset)
 }
 
 
-void sns_rom_setadsp_device::chip_write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( sns_rom_setadsp_device::chip_write )
 {
 	if (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000)
 	{
@@ -267,12 +265,12 @@ void sns_rom_setadsp_device::chip_write(offs_t offset, uint8_t data)
 
 
 // DSP dump contains prg at offset 0 and data at offset 0x10000
-uint32_t sns_rom_setadsp_device::setadsp_prg_r(offs_t offset)
+READ32_MEMBER( sns_rom_setadsp_device::setadsp_prg_r )
 {
 	return get_prg(&m_bios[0], offset);
 }
 
-uint16_t sns_rom_setadsp_device::setadsp_data_r(offs_t offset)
+READ16_MEMBER( sns_rom_setadsp_device::setadsp_data_r )
 {
 	return get_data(&m_bios[0], offset + 0x10000/2);
 }
@@ -302,20 +300,18 @@ void sns_rom_setadsp_device::st01x_data_map(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void sns_rom_seta10dsp_device::device_add_mconfig(machine_config &config)
-{
-	UPD96050(config, m_upd96050, 10000000);
-	m_upd96050->set_addrmap(AS_PROGRAM, &sns_rom_seta10dsp_device::st01x_prg_map);
-	m_upd96050->set_addrmap(AS_DATA, &sns_rom_seta10dsp_device::st01x_data_map);
-}
+MACHINE_CONFIG_START(sns_rom_seta10dsp_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("dsp", UPD96050, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(st01x_prg_map)
+	MCFG_DEVICE_DATA_MAP(st01x_data_map)
+MACHINE_CONFIG_END
 
 
-void sns_rom_seta11dsp_device::device_add_mconfig(machine_config &config)
-{
-	UPD96050(config, m_upd96050, 15000000);
-	m_upd96050->set_addrmap(AS_PROGRAM, &sns_rom_seta11dsp_device::st01x_prg_map);
-	m_upd96050->set_addrmap(AS_DATA, &sns_rom_seta11dsp_device::st01x_data_map);
-}
+MACHINE_CONFIG_START(sns_rom_seta11dsp_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("dsp", UPD96050, 15000000)
+	MCFG_DEVICE_PROGRAM_MAP(st01x_prg_map)
+	MCFG_DEVICE_DATA_MAP(st01x_data_map)
+MACHINE_CONFIG_END
 
 
 // To make faster DSP access to its internal rom, let's install read banks and map m_bios there with correct byte order
@@ -415,61 +411,53 @@ sns_rom_seta11dsp_legacy_device::sns_rom_seta11dsp_legacy_device(const machine_c
 }
 
 
-void sns_rom20_necdsp1_legacy_device::device_add_mconfig(machine_config &config)
-{
-	UPD7725(config, m_upd7725, 8000000);
-	m_upd7725->set_addrmap(AS_PROGRAM, &sns_rom20_necdsp1_legacy_device::dsp_prg_map_lorom);
-	m_upd7725->set_addrmap(AS_DATA, &sns_rom20_necdsp1_legacy_device::dsp_data_map_lorom);
-}
+MACHINE_CONFIG_START(sns_rom20_necdsp1_legacy_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map_lorom)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map_lorom)
+MACHINE_CONFIG_END
 
-void sns_rom20_necdsp1b_legacy_device::device_add_mconfig(machine_config &config)
-{
-	UPD7725(config, m_upd7725, 8000000);
-	m_upd7725->set_addrmap(AS_PROGRAM, &sns_rom20_necdsp1b_legacy_device::dsp_prg_map_lorom);
-	m_upd7725->set_addrmap(AS_DATA, &sns_rom20_necdsp1b_legacy_device::dsp_data_map_lorom);
-}
+MACHINE_CONFIG_START(sns_rom20_necdsp1b_legacy_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map_lorom)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map_lorom)
+MACHINE_CONFIG_END
 
-void sns_rom20_necdsp2_legacy_device::device_add_mconfig(machine_config &config)
-{
-	UPD7725(config, m_upd7725, 8000000);
-	m_upd7725->set_addrmap(AS_PROGRAM, &sns_rom20_necdsp2_legacy_device::dsp_prg_map_lorom);
-	m_upd7725->set_addrmap(AS_DATA, &sns_rom20_necdsp2_legacy_device::dsp_data_map_lorom);
-}
+MACHINE_CONFIG_START(sns_rom20_necdsp2_legacy_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map_lorom)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map_lorom)
+MACHINE_CONFIG_END
 
-void sns_rom20_necdsp3_legacy_device::device_add_mconfig(machine_config &config)
-{
-	UPD7725(config, m_upd7725, 8000000);
-	m_upd7725->set_addrmap(AS_PROGRAM, &sns_rom20_necdsp3_legacy_device::dsp_prg_map_lorom);
-	m_upd7725->set_addrmap(AS_DATA, &sns_rom20_necdsp3_legacy_device::dsp_data_map_lorom);
-}
+MACHINE_CONFIG_START(sns_rom20_necdsp3_legacy_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map_lorom)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map_lorom)
+MACHINE_CONFIG_END
 
-void sns_rom20_necdsp4_legacy_device::device_add_mconfig(machine_config &config)
-{
-	UPD7725(config, m_upd7725, 8000000);
-	m_upd7725->set_addrmap(AS_PROGRAM, &sns_rom20_necdsp4_legacy_device::dsp_prg_map_lorom);
-	m_upd7725->set_addrmap(AS_DATA, &sns_rom20_necdsp4_legacy_device::dsp_data_map_lorom);
-}
+MACHINE_CONFIG_START(sns_rom20_necdsp4_legacy_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map_lorom)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map_lorom)
+MACHINE_CONFIG_END
 
-void sns_rom21_necdsp1_legacy_device::device_add_mconfig(machine_config &config)
-{
-	UPD7725(config, m_upd7725, 8000000);
-	m_upd7725->set_addrmap(AS_PROGRAM, &sns_rom21_necdsp1_legacy_device::dsp_prg_map_hirom);
-	m_upd7725->set_addrmap(AS_DATA, &sns_rom21_necdsp1_legacy_device::dsp_data_map_hirom);
-}
+MACHINE_CONFIG_START(sns_rom21_necdsp1_legacy_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map_hirom)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map_hirom)
+MACHINE_CONFIG_END
 
-void sns_rom_seta10dsp_legacy_device::device_add_mconfig(machine_config &config)
-{
-	UPD96050(config, m_upd96050, 10000000);
-	m_upd96050->set_addrmap(AS_PROGRAM, &sns_rom_seta10dsp_legacy_device::st01x_prg_map);
-	m_upd96050->set_addrmap(AS_DATA, &sns_rom_seta10dsp_legacy_device::st01x_data_map);
-}
+MACHINE_CONFIG_START(sns_rom_seta10dsp_legacy_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("dsp", UPD96050, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(st01x_prg_map)
+	MCFG_DEVICE_DATA_MAP(st01x_data_map)
+MACHINE_CONFIG_END
 
-void sns_rom_seta11dsp_legacy_device::device_add_mconfig(machine_config &config)
-{
-	UPD96050(config, m_upd96050, 15000000);
-	m_upd96050->set_addrmap(AS_PROGRAM, &sns_rom_seta11dsp_legacy_device::st01x_prg_map);
-	m_upd96050->set_addrmap(AS_DATA, &sns_rom_seta11dsp_legacy_device::st01x_data_map);
-}
+MACHINE_CONFIG_START(sns_rom_seta11dsp_legacy_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("dsp", UPD96050, 15000000)
+	MCFG_DEVICE_PROGRAM_MAP(st01x_prg_map)
+	MCFG_DEVICE_DATA_MAP(st01x_data_map)
+MACHINE_CONFIG_END
 
 
 ROM_START( snes_dsp1 )

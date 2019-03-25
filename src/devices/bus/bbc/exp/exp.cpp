@@ -97,26 +97,26 @@ void bbc_exp_slot_device::device_reset()
 //  read
 //-------------------------------------------------
 
-uint8_t bbc_exp_slot_device::fred_r(offs_t offset)
+READ8_MEMBER(bbc_exp_slot_device::fred_r)
 {
 	if (m_card)
-		return m_card->fred_r(offset);
+		return m_card->fred_r(space, offset);
 	else
 		return 0xff;
 }
 
-uint8_t bbc_exp_slot_device::jim_r(offs_t offset)
+READ8_MEMBER(bbc_exp_slot_device::jim_r)
 {
 	if (m_card)
-		return m_card->jim_r(offset);
+		return m_card->jim_r(space, offset);
 	else
 		return 0xff;
 }
 
-uint8_t bbc_exp_slot_device::sheila_r(offs_t offset)
+READ8_MEMBER(bbc_exp_slot_device::sheila_r)
 {
 	if (m_card)
-		return m_card->sheila_r(offset);
+		return m_card->sheila_r(space, offset);
 	else
 		return 0xfe;
 }
@@ -125,32 +125,32 @@ uint8_t bbc_exp_slot_device::sheila_r(offs_t offset)
 //  write
 //-------------------------------------------------
 
-void bbc_exp_slot_device::fred_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(bbc_exp_slot_device::fred_w)
 {
 	if (m_card)
-		m_card->fred_w(offset, data);
+		m_card->fred_w(space, offset, data);
 }
 
-void bbc_exp_slot_device::jim_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(bbc_exp_slot_device::jim_w)
 {
 	if (m_card)
-		m_card->jim_w(offset, data);
+		m_card->jim_w(space, offset, data);
 }
 
-void bbc_exp_slot_device::sheila_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(bbc_exp_slot_device::sheila_w)
 {
 	if (m_card)
-		m_card->sheila_w(offset, data);
+		m_card->sheila_w(space, offset, data);
 }
 
 //-------------------------------------------------
 //  pb_r
 //-------------------------------------------------
 
-uint8_t bbc_exp_slot_device::pb_r()
+READ8_MEMBER(bbc_exp_slot_device::pb_r)
 {
 	if (m_card)
-		return 0x1f | m_card->pb_r();
+		return 0x1f | m_card->pb_r(space, 0);
 	else
 		return 0xff;
 }
@@ -160,10 +160,10 @@ uint8_t bbc_exp_slot_device::pb_r()
 //  pb_w
 //-------------------------------------------------
 
-void bbc_exp_slot_device::pb_w(uint8_t data)
+WRITE8_MEMBER(bbc_exp_slot_device::pb_w)
 {
 	if (m_card)
-		m_card->pb_w(data);
+		m_card->pb_w(space, 0, data);
 }
 
 //-------------------------------------------------

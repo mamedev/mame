@@ -332,13 +332,16 @@ READ8_MEMBER(coco_t4426_device::scs_read)
 	if ((offset >= 0x00) && (offset <= 0x07))
 	{
 		LOGPIA("- PIA\n");
-		result = m_pia->read(offset & 3);
+		result = m_pia->read(space, offset & 3);
 		LOGPIA("- Offs:%04x Data:%02x\n", offset - 0x04, result);
 	}
 	else if ((offset >= 0x08) && (offset <= 0x0f) && (offset & 2))
 	{
 		LOGACIA("- ACIA\n");
-		result = m_uart->read(offset & 1);
+		if (offset & 1)
+			result = m_uart->status_r(space, offset & 1);
+		else
+			result = m_uart->data_r(space, offset & 1);
 		LOGACIA("- Offs:%04x Data:%02x\n", offset - 0x04, result);
 	}
 	else
@@ -363,12 +366,15 @@ WRITE8_MEMBER(coco_t4426_device::scs_write)
 	if ((offset >= 0x00) && (offset <= 0x07))
 	{
 		LOG("- PIA\n");
-		m_pia->write(offset & 3, data);
+		m_pia->write(space, offset & 3, data);
 	}
 	else if ((offset >= 0x08) && (offset <= 0x0f) && (offset & 2))
 	{
 		LOGACIA("- ACIA");
-		m_uart->write(offset & 1, data);
+		if (offset & 1)
+		  m_uart->control_w(space, offset & 1, data);
+		else
+		  m_uart->data_w(space, offset & 1, data);
 		LOGACIA(" - Offs:%04x Data:%02x\n", offset & 1, data);
 	}
 	else

@@ -60,7 +60,6 @@ spectrum_usource_device::spectrum_usource_device(const machine_config &mconfig, 
 
 void spectrum_usource_device::device_start()
 {
-	save_item(NAME(m_romcs));
 }
 
 
@@ -83,15 +82,17 @@ READ_LINE_MEMBER(spectrum_usource_device::romcs)
 	return m_romcs;
 }
 
-void spectrum_usource_device::opcode_fetch(offs_t offset)
+
+READ8_MEMBER(spectrum_usource_device::mreq_r)
 {
+	uint8_t data;
+
 	if (!machine().side_effects_disabled() && (offset == 0x2bae))
 	{
 		m_romcs = !m_romcs;
 	}
-}
 
-uint8_t spectrum_usource_device::mreq_r(offs_t offset)
-{
-	return m_rom->base()[offset & 0x1fff];
+	data = m_rom->base()[offset & 0x1fff];
+
+	return data;
 }

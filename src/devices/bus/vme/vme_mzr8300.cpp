@@ -187,8 +187,8 @@ void vme_mzr8300_card_device::device_start()
 						  read8_delegate(FUNC(z80sio_device::ca_r),  subdevice<z80sio_device>("sio0")),
 						  write8_delegate(FUNC(z80sio_device::ca_w), subdevice<z80sio_device>("sio0")), 0x00ff);
 	m_vme->install_device(vme_device::A16_SC, base + 0x10, base + 0x13, // Am9513
-						  read8sm_delegate(FUNC(am9513_device::read8),   subdevice<am9513_device>("stc")),
-						  write8sm_delegate(FUNC(am9513_device::write8), subdevice<am9513_device>("stc")), 0x00ff);
+						  read8_delegate(FUNC(am9513_device::read8),   subdevice<am9513_device>("stc")),
+						  write8_delegate(FUNC(am9513_device::write8), subdevice<am9513_device>("stc")), 0x00ff);
 }
 
 void vme_mzr8300_card_device::device_reset()

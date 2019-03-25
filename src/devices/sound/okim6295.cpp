@@ -210,10 +210,10 @@ void okim6295_device::set_pin7(int pin7)
 
 
 //-------------------------------------------------
-//  read - read the status register
+//  read_status - read the status register
 //-------------------------------------------------
 
-uint8_t okim6295_device::read()
+uint8_t okim6295_device::read_status()
 {
 	uint8_t result = 0xf0;    // naname expects bits 4-7 to be 1
 
@@ -228,10 +228,20 @@ uint8_t okim6295_device::read()
 
 
 //-------------------------------------------------
-//  write - write to the command register
+//  read - memory interface for read
 //-------------------------------------------------
 
-void okim6295_device::write(uint8_t command)
+READ8_MEMBER( okim6295_device::read )
+{
+	return read_status();
+}
+
+
+//-------------------------------------------------
+//  write_command - write to the command register
+//-------------------------------------------------
+
+void okim6295_device::write_command(uint8_t command)
 {
 	// if a command is pending, process the second half
 	if (m_command != -1)
@@ -310,6 +320,16 @@ void okim6295_device::write(uint8_t command)
 			if (voicemask & 1)
 				m_voice[voicenum].m_playing = false;
 	}
+}
+
+
+//-------------------------------------------------
+//  write - memory interface for write
+//-------------------------------------------------
+
+WRITE8_MEMBER( okim6295_device::write )
+{
+	write_command(data);
 }
 
 

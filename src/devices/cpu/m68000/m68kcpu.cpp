@@ -2019,6 +2019,11 @@ std::unique_ptr<util::disasm_interface> m68000_device::create_disassembler()
 	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68000);
 }
 
+std::unique_ptr<util::disasm_interface> m68301_device::create_disassembler()
+{
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68000);
+}
+
 std::unique_ptr<util::disasm_interface> m68008_device::create_disassembler()
 {
 	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68008);
@@ -2357,6 +2362,7 @@ device_memory_interface::space_config_vector m68000_base_device::memory_space_co
 
 
 DEFINE_DEVICE_TYPE(M68000,      m68000_device,      "m68000",       "Motorola MC68000")
+DEFINE_DEVICE_TYPE(M68301,      m68301_device,      "m68301",       "Motorola MC68301")
 DEFINE_DEVICE_TYPE(M68008,      m68008_device,      "m68008",       "Motorola MC68008")
 DEFINE_DEVICE_TYPE(M68008PLCC,  m68008plcc_device,  "m68008plcc",   "Motorola MC68008PLCC")
 DEFINE_DEVICE_TYPE(M68010,      m68010_device,      "m68010",       "Motorola MC68010")
@@ -2393,6 +2399,21 @@ m68000_device::m68000_device(const machine_config &mconfig, const char *tag, dev
 										const device_type type, uint32_t prg_data_width, uint32_t prg_address_bits, address_map_constructor internal_map)
 	: m68000_base_device(mconfig, tag, owner, clock, type, prg_data_width, prg_address_bits, internal_map)
 {
+}
+
+
+
+
+
+m68301_device::m68301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m68000_base_device(mconfig, tag, owner, clock, M68301, 16,24)
+{
+}
+
+
+void m68301_device::device_start()
+{
+	init_cpu_m68000();
 }
 
 

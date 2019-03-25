@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /***************************************************************************
 
-  redclash.cpp
+  video.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -21,7 +21,7 @@
 
 ***************************************************************************/
 
-void redclash_state::palette(palette_device &palette) const
+void redclash_state::redclash_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -98,13 +98,13 @@ void redclash_state::palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER( redclash_state::videoram_w )
+WRITE8_MEMBER( redclash_state::redclash_videoram_w )
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( redclash_state::gfxbank_w )
+WRITE8_MEMBER( redclash_state::redclash_gfxbank_w )
 {
 	if (m_gfxbank != (data & 0x01))
 	{
@@ -113,12 +113,12 @@ WRITE8_MEMBER( redclash_state::gfxbank_w )
 	}
 }
 
-WRITE8_MEMBER( redclash_state::flipscreen_w )
+WRITE8_MEMBER( redclash_state::redclash_flipscreen_w )
 {
 	flip_screen_set(data & 0x01);
 }
 
-WRITE8_MEMBER( redclash_state::star_reset_w )
+WRITE8_MEMBER( redclash_state::redclash_star_reset_w )
 {
 	m_stars->set_enable(true);
 }
@@ -138,30 +138,33 @@ void redclash_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-void redclash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void redclash_state::redclash_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = m_spriteram.bytes() - 0x20; offs >= 0; offs -= 0x20)
+	uint8_t *spriteram = m_spriteram;
+	int i, offs;
+
+	for (offs = m_spriteram.bytes() - 0x20; offs >= 0; offs -= 0x20)
 	{
-		int i = 0;
-		while (i < 0x20 && m_spriteram[offs + i] != 0)
+		i = 0;
+		while (i < 0x20 && spriteram[offs + i] != 0)
 			i += 4;
 
 		while (i > 0)
 		{
 			i -= 4;
 
-			if (m_spriteram[offs + i] & 0x80)
+			if (spriteram[offs + i] & 0x80)
 			{
-				int color = m_spriteram[offs + i + 2] & 0x0f;
-				int sx = m_spriteram[offs + i + 3];
-				int sy = offs / 4 + (m_spriteram[offs + i] & 0x07);
+				int color = spriteram[offs + i + 2] & 0x0f;
+				int sx = spriteram[offs + i + 3];
+				int sy = offs / 4 + (spriteram[offs + i] & 0x07);
 
 
-				switch ((m_spriteram[offs + i] & 0x18) >> 3)
+				switch ((spriteram[offs + i] & 0x18) >> 3)
 				{
 					case 3: /* 24x24 */
 					{
-						int code = ((m_spriteram[offs + i + 1] & 0xf0) >> 4) + ((m_gfxbank & 1) << 4);
+						int code = ((spriteram[offs + i + 1] & 0xf0) >> 4) + ((m_gfxbank & 1) << 4);
 
 						m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 								code,
@@ -178,10 +181,10 @@ void redclash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 					}
 
 					case 2: /* 16x16 */
-						if (m_spriteram[offs + i] & 0x20) /* zero hour spaceships */
+						if (spriteram[offs + i] & 0x20) /* zero hour spaceships */
 						{
-							int code = ((m_spriteram[offs + i + 1] & 0xf8) >> 3) + ((m_gfxbank & 1) << 5);
-							int bank = (m_spriteram[offs + i + 1] & 0x02) >> 1;
+							int code = ((spriteram[offs + i + 1] & 0xf8) >> 3) + ((m_gfxbank & 1) << 5);
+							int bank = (spriteram[offs + i + 1] & 0x02) >> 1;
 
 							m_gfxdecode->gfx(4+bank)->transpen(bitmap,cliprect,
 									code,
@@ -191,7 +194,7 @@ void redclash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 						}
 						else
 						{
-							int code = ((m_spriteram[offs + i + 1] & 0xf0) >> 4) + ((m_gfxbank & 1) << 4);
+							int code = ((spriteram[offs + i + 1] & 0xf0) >> 4) + ((m_gfxbank & 1) << 4);
 
 							m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 									code,
@@ -203,7 +206,7 @@ void redclash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 					case 1: /* 8x8 */
 						m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-								m_spriteram[offs + i + 1],// + 4 * (m_spriteram[offs + i + 2] & 0x10),
+								spriteram[offs + i + 1],// + 4 * (spriteram[offs + i + 2] & 0x10),
 								color,
 								0,0,
 								sx,sy - 16,0);
@@ -218,9 +221,11 @@ void redclash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-void redclash_state::draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void redclash_state::redclash_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	for (int offs = 0; offs < 0x20; offs++)
+	int offs;
+
+	for (offs = 0; offs < 0x20; offs++)
 	{
 //      sx = m_videoramoffs];
 		int sx = 8 * offs + (m_videoram[offs] & 0x07);   /* ?? */
@@ -236,19 +241,19 @@ void redclash_state::draw_bullets( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-WRITE_LINE_MEMBER(redclash_state::screen_vblank)
+WRITE_LINE_MEMBER(redclash_state::screen_vblank_redclash)
 {
 	// falling edge
 	if (!state)
 		m_stars->update_state();
 }
 
-uint32_t redclash_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t redclash_state::screen_update_redclash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_stars->draw(bitmap, cliprect, 0x60, true, 0x00, 0xff);
-	draw_sprites(bitmap, cliprect);
-	draw_bullets(bitmap, cliprect);
+	redclash_draw_sprites(bitmap, cliprect);
+	redclash_draw_bullets(bitmap, cliprect);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

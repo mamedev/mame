@@ -53,34 +53,32 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( cicplay )
 INPUT_PORTS_END
 
-void macp_state::macp(machine_config &config)
-{
+MACHINE_CONFIG_START(macp_state::macp)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 2500000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &macp_state::macp_map);
-	m_maincpu->set_addrmap(AS_IO, &macp_state::macp_io);
+	MCFG_DEVICE_ADD("maincpu", Z80, 2500000)
+	MCFG_DEVICE_PROGRAM_MAP(macp_map)
+	MCFG_DEVICE_IO_MAP(macp_io)
 
 	/* video hardware */
-	//config.set_default_layout();
+	//MCFG_DEFAULT_LAYOUT()
 
 	//I8279
 
 	/* sound hardware */
 	//2x AY8910
 	genpin_audio(config);
-}
+MACHINE_CONFIG_END
 
-void macp_state::macp0(machine_config &config)
-{
+MACHINE_CONFIG_START(macp_state::macp0)
 	macp(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &macp_state::macp0_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(macp0_map)
+MACHINE_CONFIG_END
 
-void macp_state::macpmsm(machine_config &config)
-{
+MACHINE_CONFIG_START(macp_state::macpmsm)
 	macp(config);
 	// MSM5205
-}
+MACHINE_CONFIG_END
 
 ROM_START(macgalxy)
 	ROM_REGION(0x4000, "maincpu", 0)

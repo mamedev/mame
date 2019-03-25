@@ -317,27 +317,26 @@ static void dgnbeta_floppies(device_slot_interface &device)
 	device.option_add("dd", FLOPPY_35_DD);
 }
 
-void dgn_beta_state::dgnbeta(machine_config &config)
-{
+MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, DGNBETA_CPU_SPEED_HZ);        /* 2 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dgn_beta_state::dgnbeta_map);
-	m_maincpu->set_dasm_override(FUNC(dgn_beta_state::dgnbeta_dasm_override));
+	MCFG_DEVICE_ADD(MAINCPU_TAG, MC6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(dgnbeta_map)
+	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(dgn_beta_state, dgnbeta_dasm_override)
 
 	/* both cpus in the beta share the same address/data buses */
-	MC6809E(config, m_dmacpu, DGNBETA_CPU_SPEED_HZ);        /* 2 MHz */
-	m_dmacpu->set_addrmap(AS_PROGRAM, &dgn_beta_state::dgnbeta_map);
+	MCFG_DEVICE_ADD(DMACPU_TAG, MC6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(dgnbeta_map)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(DGNBETA_FRAMES_PER_SECOND);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(100));
-	screen.set_size(700,550);
-	screen.set_visarea(0, 699, 0, 549);
-	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(DGNBETA_FRAMES_PER_SECOND)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(100))
+	MCFG_SCREEN_SIZE(700,550)
+	MCFG_SCREEN_VISIBLE_AREA(0, 699, 0, 549)
+	MCFG_SCREEN_UPDATE_DEVICE( "crtc", hd6845_device, screen_update )
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_dgnbeta);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_dgnbeta)
 	PALETTE(config, m_palette, FUNC(dgn_beta_state::dgn_beta_palette), ARRAY_LENGTH(dgnbeta_pens));
 
 	/* PIA 0 at $FC20-$FC23 I46 */
@@ -374,10 +373,14 @@ void dgn_beta_state::dgnbeta(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(dgn_beta_state::dgnbeta_fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(dgn_beta_state::dgnbeta_fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, FDC_TAG ":0", dgnbeta_floppies, "dd", dgn_beta_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, FDC_TAG ":1", dgnbeta_floppies, "dd", dgn_beta_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, FDC_TAG ":2", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, FDC_TAG ":3", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats).enable_sound(true);
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", dgnbeta_floppies, "dd", dgn_beta_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":1", dgnbeta_floppies, "dd", dgn_beta_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":2", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":3", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	HD6845(config, m_mc6845, 12.288_MHz_XTAL / 16);    //XTAL is guessed
 	m_mc6845->set_screen("screen");
@@ -395,8 +398,8 @@ void dgn_beta_state::dgnbeta(machine_config &config)
 	/* in blocks of 128K up to this maximum.                                                    */
 
 	/* software lists */
-	SOFTWARE_LIST(config, "flop_list").set_original("dgnbeta_flop");
-}
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "dgnbeta_flop")
+MACHINE_CONFIG_END
 
 ROM_START(dgnbeta)
 	ROM_REGION(0x4000,MAINCPU_TAG,0)

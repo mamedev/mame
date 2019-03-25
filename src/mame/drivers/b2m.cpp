@@ -187,23 +187,22 @@ static void b2m_floppies(device_slot_interface &device)
 
 
 /* Machine driver */
-void b2m_state::b2m(machine_config &config)
-{
+MACHINE_CONFIG_START(b2m_state::b2m)
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 2000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &b2m_state::b2m_mem);
-	m_maincpu->set_addrmap(AS_IO, &b2m_state::b2m_io);
-	m_maincpu->set_vblank_int("screen", FUNC(b2m_state::b2m_vblank_interrupt));
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(b2m_mem)
+	MCFG_DEVICE_IO_MAP(b2m_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", b2m_state,  b2m_vblank_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(384, 256);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(b2m_state::screen_update_b2m));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(384, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE_DRIVER(b2m_state, screen_update_b2m)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	PALETTE(config, m_palette, FUNC(b2m_state::b2m_palette), 4);
 
@@ -234,27 +233,28 @@ void b2m_state::b2m(machine_config &config)
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* uart */
-	I8251(config, "uart", 0);
+	MCFG_DEVICE_ADD("uart", I8251, 0)
 
 	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->drq_wr_callback().set(FUNC(b2m_state::b2m_fdc_drq));
 
-	FLOPPY_CONNECTOR(config, "fd0", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fd1", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats);
-	SOFTWARE_LIST(config, "flop_list").set_original("b2m");
+	MCFG_FLOPPY_DRIVE_ADD("fd0", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","b2m")
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("128K").set_default_value(0x00);
-}
+MACHINE_CONFIG_END
 
-void b2m_state::b2mrom(machine_config &config)
-{
+MACHINE_CONFIG_START(b2m_state::b2mrom)
 	b2m(config);
-	m_maincpu->set_addrmap(AS_IO, &b2m_state::b2m_rom_io);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(b2m_rom_io)
+MACHINE_CONFIG_END
 
 /* ROM definition */
 

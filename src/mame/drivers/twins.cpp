@@ -418,23 +418,22 @@ static INPUT_PORTS_START(twins)
 INPUT_PORTS_END
 
 
-void twins_state::twinsed1(machine_config &config)
-{
+MACHINE_CONFIG_START(twins_state::twinsed1)
 	/* basic machine hardware */
-	V30(config, m_maincpu, 8000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &twins_state::twins_map);
-	m_maincpu->set_addrmap(AS_IO, &twins_state::twinsed1_io);
+	MCFG_DEVICE_ADD("maincpu", V30, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(twins_map)
+	MCFG_DEVICE_IO_MAP(twinsed1_io)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(8000000, 512, 0, 320, 312, 0, 200); // 15.625 kHz horizontal???
-	screen.set_screen_update(FUNC(twins_state::screen_update_twins));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(8000000, 512, 0, 320, 312, 0, 200) // 15.625 kHz horizontal???
+	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_twins)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	I2C_24C02(config, m_i2cmem);
+	MCFG_24C02_ADD("i2cmem")
 
-	PALETTE(config, m_palette).set_entries(0x100);
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -443,7 +442,7 @@ void twins_state::twinsed1(machine_config &config)
 	aysnd.port_a_read_callback().set_ioport("P1");
 	aysnd.port_b_read_callback().set_ioport("P2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+MACHINE_CONFIG_END
 
 
 /* The Ecogames set and the Electronic Devices second set has different palette hardware
@@ -466,26 +465,25 @@ void twins_state::ramdac_map(address_map &map)
 }
 
 
-void twins_state::twins(machine_config &config)
-{
+MACHINE_CONFIG_START(twins_state::twins)
 	/* basic machine hardware */
-	V30(config, m_maincpu, XTAL(16'000'000)/2); /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &twins_state::twins_map);
-	m_maincpu->set_addrmap(AS_IO, &twins_state::twins_io);
+	MCFG_DEVICE_ADD("maincpu", V30, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(twins_map)
+	MCFG_DEVICE_IO_MAP(twins_io)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(8000000, 512, 0, 320, 312, 0, 200); // 15.625 kHz horizontal???
-	screen.set_screen_update(FUNC(twins_state::screen_update_twins));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(8000000, 512, 0, 320, 312, 0, 200) // 15.625 kHz horizontal???
+	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_twins)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	PALETTE(config, m_palette).set_entries(256);
+	MCFG_PALETTE_ADD("palette", 256)
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &twins_state::ramdac_map);
 	ramdac.set_split_read(0);
 
-	I2C_24C02(config, m_i2cmem);
+	MCFG_24C02_ADD("i2cmem")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -494,7 +492,7 @@ void twins_state::twins(machine_config &config)
 	aysnd.port_a_read_callback().set_ioport("P1");
 	aysnd.port_b_read_callback().set_ioport("P2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+MACHINE_CONFIG_END
 
 WRITE16_MEMBER(twins_state::spider_pal_w)
 {
@@ -592,23 +590,22 @@ void twins_state::spider_io(address_map &map)
 }
 
 
-void twins_state::spider(machine_config &config)
-{
+MACHINE_CONFIG_START(twins_state::spider)
 	/* basic machine hardware */
-	V30(config, m_maincpu, 8000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &twins_state::twins_map);
-	m_maincpu->set_addrmap(AS_IO, &twins_state::spider_io);
+	MCFG_DEVICE_ADD("maincpu", V30, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(twins_map)
+	MCFG_DEVICE_IO_MAP(spider_io)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(8000000, 512, 0, 320, 312, 0, 200); // 15.625 kHz horizontal???
-	screen.set_screen_update(FUNC(twins_state::screen_update_spider));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(8000000, 512, 0, 320, 312, 0, 200) // 15.625 kHz horizontal???
+	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_spider)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	PALETTE(config, m_palette).set_entries(0x100);
+	MCFG_PALETTE_ADD("palette", 0x100)
 
-	I2C_24C02(config, m_i2cmem);
+	MCFG_24C02_ADD("i2cmem")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -617,7 +614,7 @@ void twins_state::spider(machine_config &config)
 	aysnd.port_a_read_callback().set_ioport("P1");
 	aysnd.port_b_read_callback().set_ioport("P2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+MACHINE_CONFIG_END
 
 
 /* ECOGAMES Twins */

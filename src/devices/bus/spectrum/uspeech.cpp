@@ -76,7 +76,6 @@ spectrum_uspeech_device::spectrum_uspeech_device(const machine_config &mconfig, 
 
 void spectrum_uspeech_device::device_start()
 {
-	save_item(NAME(m_romcs));
 }
 
 
@@ -99,59 +98,46 @@ READ_LINE_MEMBER(spectrum_uspeech_device::romcs)
 	return m_romcs;
 }
 
-void spectrum_uspeech_device::opcode_fetch(offs_t offset)
-{
-	if (!machine().side_effects_disabled() && (offset == 0x0038))
-	{
-		m_romcs = !m_romcs;
-	}
-}
 
-uint8_t spectrum_uspeech_device::iorq_r(offs_t offset)
+READ8_MEMBER(spectrum_uspeech_device::mreq_r)
 {
-	if (!machine().side_effects_disabled() && (offset == 0x0038))
+	uint8_t data;
+
+	if (!machine().side_effects_disabled() && (offset == 0x38))
 	{
 		m_romcs = !m_romcs;
 	}
 
-	return 0xff;
-}
-
-uint8_t spectrum_uspeech_device::mreq_r(offs_t offset)
-{
-	uint8_t data = 0xff;
-
-	switch (offset & 0xf000)
+	switch (offset)
 	{
-	case 0x0000:
-		data = m_rom->base()[offset & 0x7ff];
-		break;
 	case 0x1000:
-		data = !m_nsp->lrq_r();
+		data = !m_nsp->lrq_r(); // (m_nsp->lrq_r() && (m_nsp->sby_r() != 0)) ? 0x00 : 0x01;
+		break;
+	default:
+		data = m_rom->base()[offset & 0x7ff];
 		break;
 	}
 
 	return data;
 }
 
-void spectrum_uspeech_device::mreq_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(spectrum_uspeech_device::mreq_w)
 {
-	switch (offset & 0xf001)
+	switch (offset)
 	{
 	case 0x1000:
-	case 0x1001:
 		// allophone
 		m_nsp->ald_w(data & 0x3f);
 		break;
 
 	case 0x3000:
 		// intonation low
-		m_nsp->set_clock(3050000); // oscillator frequency read from hardware
+		m_nsp->set_clock(3500000); // CK / 4 ??
 		break;
 
 	case 0x3001:
 		// intonation high
-		m_nsp->set_clock(3260000); // oscillator frequency read from hardware
+		m_nsp->set_clock(3800000); // TODO: the exact frequency is unknown
 		break;
 	}
 }

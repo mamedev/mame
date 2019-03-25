@@ -10,8 +10,9 @@ DECLARE_DEVICE_TYPE(MSX_AUDIO_KBDC_PORT, msx_audio_kbdc_port_device)
 class msx_audio_kb_port_interface : public device_slot_card_interface
 {
 public:
-	virtual uint8_t read() { return 0xff; }
-	virtual void write(uint8_t data) { }
+
+	virtual DECLARE_READ8_MEMBER(read) { return 0xff; }
+	virtual DECLARE_WRITE8_MEMBER(write) { }
 
 protected:
 	// construction/destruction
@@ -38,8 +39,8 @@ public:
 	virtual void device_start() override;
 
 	// Physical connection simply consists of 8 input and 8 output lines split across 2 connectors
-	void write(uint8_t data);
-	uint8_t read();
+	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8_MEMBER(read);
 
 
 protected:

@@ -26,8 +26,8 @@ public:
 	// construction/destruction
 	sv803_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint8_t mreq_r(offs_t offset) override;
-	virtual void mreq_w(offs_t offset, uint8_t data) override;
+	virtual DECLARE_READ8_MEMBER( mreq_r ) override;
+	virtual DECLARE_WRITE8_MEMBER( mreq_w ) override;
 
 protected:
 	virtual void device_start() override;

@@ -246,7 +246,7 @@ void nes_namcot163_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_namcot3433_device::dxrom_write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_namcot3433_device::dxrom_write)
 {
 	LOG_MMC(("dxrom_write, offset: %04x, data: %02x\n", offset, data));
 
@@ -290,7 +290,7 @@ void nes_namcot3433_device::dxrom_write(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_namcot3446_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_namcot3446_device::write_h)
 {
 	LOG_MMC(("namcot3446 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -334,7 +334,7 @@ void nes_namcot3446_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_namcot3425_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_namcot3425_device::write_h)
 {
 	uint8_t mode;
 	LOG_MMC(("namcot3425 write_h, offset: %04x, data: %02x\n", offset, data));
@@ -407,7 +407,7 @@ void nes_namcot340_device::device_timer(emu_timer &timer, device_timer_id id, in
 	}
 }
 
-void nes_namcot340_device::n340_lowrite(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_namcot340_device::n340_lowrite)
 {
 	LOG_MMC(("n340_lowrite, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -426,7 +426,7 @@ void nes_namcot340_device::n340_lowrite(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t nes_namcot340_device::n340_loread(offs_t offset)
+READ8_MEMBER(nes_namcot340_device::n340_loread)
 {
 	LOG_MMC(("n340_loread, offset: %04x\n", offset));
 	offset += 0x100;
@@ -444,7 +444,7 @@ uint8_t nes_namcot340_device::n340_loread(offs_t offset)
 	}
 }
 
-void nes_namcot340_device::n340_hiwrite(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_namcot340_device::n340_hiwrite)
 {
 	LOG_MMC(("n340_hiwrite, offset: %04x, data: %02x\n", offset, data));
 
@@ -505,17 +505,17 @@ void nes_namcot340_device::n340_hiwrite(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-uint8_t nes_namcot175_device::read_m(offs_t offset)
+READ8_MEMBER(nes_namcot175_device::read_m)
 {
 	// the only game supporting this is Family Circuit '91, and it has 2KB of battery
 	// but it's mirrored up to 8KB (see Sprint Race -> Back Up menu breakage if not)
 	if (!m_battery.empty() && !m_wram_protect)
 		return m_battery[offset & (m_battery.size() - 1)];
 
-	return get_open_bus();   // open bus
+	return m_open_bus;   // open bus
 }
 
-void nes_namcot175_device::write_m(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_namcot175_device::write_m)
 {
 	// the only game supporting this is Family Circuit '91, and it has 2KB of battery
 	// but it's mirrored up to 8KB (see Sprint Race -> Back Up menu breakage if not)
@@ -523,7 +523,7 @@ void nes_namcot175_device::write_m(offs_t offset, uint8_t data)
 		m_battery[offset & (m_battery.size() - 1)] = data;
 }
 
-void nes_namcot175_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_namcot175_device::write_h)
 {
 	LOG_MMC(("namcot175 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -536,7 +536,7 @@ void nes_namcot175_device::write_h(offs_t offset, uint8_t data)
 			prg8_89(data & 0x3f);
 			break;
 		default:
-			n340_hiwrite(offset, data);
+			n340_hiwrite(space, offset, data, mem_mask);
 			break;
 	}
 }
@@ -560,7 +560,7 @@ void nes_namcot175_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_namcot163_device::chr_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_namcot163_device::chr_w)
 {
 	int bank = offset >> 10;
 
@@ -576,7 +576,7 @@ void nes_namcot163_device::chr_w(offs_t offset, uint8_t data)
 	// or ROM, so no write
 }
 
-uint8_t nes_namcot163_device::chr_r(offs_t offset)
+READ8_MEMBER(nes_namcot163_device::chr_r)
 {
 	int bank = offset >> 10;
 	if (!(m_latch & 0x40) && m_chr_bank >= 0xe0)
@@ -590,15 +590,15 @@ uint8_t nes_namcot163_device::chr_r(offs_t offset)
 }
 
 
-uint8_t nes_namcot163_device::read_m(offs_t offset)
+READ8_MEMBER(nes_namcot163_device::read_m)
 {
 	if (!m_battery.empty() && offset < m_battery.size())
 		return m_battery[offset & (m_battery.size() - 1)];
 
-	return get_open_bus();   // open bus
+	return m_open_bus;   // open bus
 }
 
-void nes_namcot163_device::write_m(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_namcot163_device::write_m)
 {
 	// the pcb can separately protect each 2KB chunk of the external wram from writes
 	int bank = (offset & 0x1800) >> 11;
@@ -606,7 +606,7 @@ void nes_namcot163_device::write_m(offs_t offset, uint8_t data)
 		m_battery[offset & (m_battery.size() - 1)] = data;
 }
 
-void nes_namcot163_device::write_l(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_namcot163_device::write_l)
 {
 	LOG_MMC(("namcot163 write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -617,12 +617,12 @@ void nes_namcot163_device::write_l(offs_t offset, uint8_t data)
 			LOG_MMC(("Namcot-163 sound reg write, data: %02x\n", data));
 			break;
 		default:
-			n340_lowrite(offset, data);
+			n340_lowrite(space, offset, data, mem_mask);
 			break;
 	}
 }
 
-uint8_t nes_namcot163_device::read_l(offs_t offset)
+READ8_MEMBER(nes_namcot163_device::read_l)
 {
 	LOG_MMC(("namcot163 read_l, offset: %04x\n", offset));
 	offset += 0x100;
@@ -633,7 +633,7 @@ uint8_t nes_namcot163_device::read_l(offs_t offset)
 			LOG_MMC(("Namcot-163 sound reg read\n"));
 			return 0;
 		default:
-			return n340_loread(offset);
+			return n340_loread(space, offset, mem_mask);
 	}
 }
 
@@ -645,7 +645,7 @@ void nes_namcot163_device::set_mirror(uint8_t page, uint8_t data)
 		set_nt_page(page, CIRAM, data & 0x01, 1);
 }
 
-void nes_namcot163_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_namcot163_device::write_h)
 {
 	int page;
 	LOG_MMC(("namcot163 write_h, offset: %04x, data: %02x\n", offset, data));
@@ -680,7 +680,7 @@ void nes_namcot163_device::write_h(offs_t offset, uint8_t data)
 			LOG_MMC(("Namcot-163 sound address write, data: %02x\n", data));
 			break;
 		default:
-			n340_hiwrite(offset, data);
+			n340_hiwrite(space, offset, data, mem_mask);
 			break;
 	}
 }

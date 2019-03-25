@@ -77,7 +77,7 @@ private:
 	int       m_gear[2];
 
 	/* devices */
-	required_device<discrete_sound_device> m_discrete;
+	required_device<discrete_device> m_discrete;
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;

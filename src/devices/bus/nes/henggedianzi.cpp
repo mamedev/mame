@@ -135,7 +135,7 @@ void nes_hengg_shjy3_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_hengg_srich_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_hengg_srich_device::write_h)
 {
 	LOG_MMC(("hengg_srich write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -162,7 +162,7 @@ void nes_hengg_srich_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_hengg_xhzs_device::write_l(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_hengg_xhzs_device::write_l)
 {
 	LOG_MMC(("hengg_xhzs write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x4100;
@@ -171,7 +171,7 @@ void nes_hengg_xhzs_device::write_l(offs_t offset, uint8_t data)
 		prg32(data >> 1);
 }
 
-void nes_hengg_xhzs_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_hengg_xhzs_device::write_h)
 {
 	LOG_MMC(("hengg_xhzs write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -225,7 +225,7 @@ void nes_hengg_shjy3_device::update_banks()
 	}
 }
 
-void nes_hengg_shjy3_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_hengg_shjy3_device::write_h)
 {
 	LOG_MMC(("shjy3 write_h, offset: %04x, data: %02x\n", offset, data));
 

@@ -1285,11 +1285,6 @@ void omti8621_device::dack_w(int line, uint8_t data)
 	return m_fdc->dma_w(data);
 }
 
-void omti8621_device::dack_line_w(int line, int state)
-{
-	//m_fdc->dack_w(state);
-}
-
 void omti8621_device::eop_w(int state)
 {
 	m_fdc->tc_w(state == ASSERT_LINE);

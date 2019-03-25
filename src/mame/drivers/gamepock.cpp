@@ -42,8 +42,7 @@ static INPUT_PORTS_START( gamepock )
 INPUT_PORTS_END
 
 
-void gamepock_state::gamepock(machine_config &config)
-{
+MACHINE_CONFIG_START(gamepock_state::gamepock)
 	upd78c06_device &upd(UPD78C06(config, m_maincpu, 6_MHz_XTAL)); // uPD78C06AG
 	upd.set_addrmap(AS_PROGRAM, &gamepock_state::gamepock_mem);
 	upd.pa_out_cb().set(FUNC(gamepock_state::port_a_w));
@@ -66,11 +65,11 @@ void gamepock_state::gamepock(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "gamepock_cart");
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "gamepock_cart")
 
 	/* Software lists */
-	SOFTWARE_LIST(config, "cart_list").set_original("gamepock");
-}
+	MCFG_SOFTWARE_LIST_ADD("cart_list","gamepock")
+MACHINE_CONFIG_END
 
 
 ROM_START( gamepock )

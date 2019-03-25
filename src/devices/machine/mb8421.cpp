@@ -129,14 +129,14 @@ void mb8421_master_device::update_intr(offs_t offset)
 //  (write to 7FF asserts INTR)
 //-------------------------------------------------
 
-void mb8421_device::left_w(offs_t offset, u8 data)
+WRITE8_MEMBER(mb8421_device::left_w)
 {
 	offset &= 0x7ff;
 	m_ram[offset] = data;
 	update_intr<read_or_write::WRITE, false>(offset);
 }
 
-void mb8421_mb8431_16_device::left_w(offs_t offset, u16 data, u16 mem_mask)
+WRITE16_MEMBER(mb8421_mb8431_16_device::left_w)
 {
 	offset &= 0x7ff;
 	COMBINE_DATA(&m_ram[offset]);
@@ -148,14 +148,14 @@ void mb8421_mb8431_16_device::left_w(offs_t offset, u16 data, u16 mem_mask)
 //  (read from 7FE acknowledges INTL)
 //-------------------------------------------------
 
-u8 mb8421_device::left_r(offs_t offset)
+READ8_MEMBER(mb8421_device::left_r)
 {
 	offset &= 0x7ff;
 	update_intr<read_or_write::READ, false>(offset);
 	return m_ram[offset];
 }
 
-u16 mb8421_mb8431_16_device::left_r(offs_t offset, u16 mem_mask)
+READ16_MEMBER(mb8421_mb8431_16_device::left_r)
 {
 	offset &= 0x7ff;
 	update_intr<read_or_write::READ, false>(offset);
@@ -167,14 +167,14 @@ u16 mb8421_mb8431_16_device::left_r(offs_t offset, u16 mem_mask)
 //  (write to 7FE asserts INTL)
 //-------------------------------------------------
 
-void mb8421_device::right_w(offs_t offset, u8 data)
+WRITE8_MEMBER(mb8421_device::right_w)
 {
 	offset &= 0x7ff;
 	m_ram[offset] = data;
 	update_intr<read_or_write::WRITE, true>(offset);
 }
 
-void mb8421_mb8431_16_device::right_w(offs_t offset, u16 data, u16 mem_mask)
+WRITE16_MEMBER(mb8421_mb8431_16_device::right_w)
 {
 	offset &= 0x7ff;
 	COMBINE_DATA(&m_ram[offset]);
@@ -186,14 +186,14 @@ void mb8421_mb8431_16_device::right_w(offs_t offset, u16 data, u16 mem_mask)
 //  (read from 7FF acknowledges INTR)
 //-------------------------------------------------
 
-u8 mb8421_device::right_r(offs_t offset)
+READ8_MEMBER(mb8421_device::right_r)
 {
 	offset &= 0x7ff;
 	update_intr<read_or_write::READ, true>(offset);
 	return m_ram[offset];
 }
 
-u16 mb8421_mb8431_16_device::right_r(offs_t offset, u16 mem_mask)
+READ16_MEMBER(mb8421_mb8431_16_device::right_r)
 {
 	offset &= 0x7ff;
 	update_intr<read_or_write::READ, true>(offset);

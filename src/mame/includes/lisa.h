@@ -24,6 +24,10 @@
 #include "emupal.h"
 #include "screen.h"
 
+#define COP421_TAG      "u9f"
+#define KB_COP421_TAG   "kbcop"
+#define SCREEN_TAG      "screen"
+
 /* lisa MMU segment regs */
 struct real_mmu_entry
 {
@@ -125,7 +129,7 @@ public:
 		m_io_mouse_x(*this, "MOUSE_X"),
 		m_io_mouse_y(*this, "MOUSE_Y"),
 		m_palette(*this, "palette"),
-		m_screen(*this, "screen")
+		m_screen(*this, SCREEN_TAG)
 	{ }
 
 	void lisa(machine_config &config);

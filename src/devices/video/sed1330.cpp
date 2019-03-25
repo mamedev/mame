@@ -68,8 +68,7 @@ DEFINE_DEVICE_TYPE(SED1330, sed1330_device, "sed1330", "Epson SED1330")
 // default address map
 void sed1330_device::sed1330(address_map &map)
 {
-	if (!has_configured_map(0))
-		map(0x0000, 0xffff).ram();
+	map(0x0000, 0xffff).ram();
 }
 
 
@@ -146,7 +145,7 @@ sed1330_device::sed1330_device(const machine_config &mconfig, const char *tag, d
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_bf(0),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(sed1330_device::sed1330), this))
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(sed1330_device::sed1330), this))
 {
 }
 

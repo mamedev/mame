@@ -219,11 +219,10 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-void et3400_state::et3400(machine_config &config)
-{
+MACHINE_CONFIG_START(et3400_state::et3400)
 	/* basic machine hardware */
-	M6800(config, m_maincpu, XTAL(4'000'000) / 4 ); // 1MHz with memory i/o accessory, or 500khz without it
-	m_maincpu->set_addrmap(AS_PROGRAM, &et3400_state::mem_map);
+	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(4'000'000) / 4 ) // 1MHz with memory i/o accessory, or 500khz without it
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
 	config.set_default_layout(layout_et3400);
@@ -248,11 +247,11 @@ void et3400_state::et3400(machine_config &config)
 	m_displatch[4]->parallel_out_cb().set(FUNC(et3400_state::led_w<5>));
 	m_displatch[5]->parallel_out_cb().set(FUNC(et3400_state::led_w<6>));
 
-	CASSETTE(config, m_cass);
-	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
-}
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( et3400 )

@@ -18,9 +18,8 @@ DECLARE_DEVICE_TYPE(MSX_CART_SFG05, msx_cart_sfg05_device)
 class msx_cart_sfg_device : public device_t, public msx_cart_interface
 {
 public:
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
-
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 protected:
 	msx_cart_sfg_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, uint32_t clock);
 

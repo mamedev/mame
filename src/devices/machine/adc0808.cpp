@@ -156,7 +156,7 @@ void adc0808_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  INTERFACE
 //**************************************************************************
 
-u8 adc0808_device::data_r()
+READ8_MEMBER( adc0808_device::data_r )
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -170,7 +170,7 @@ u8 adc0808_device::data_r()
 	return m_sar;
 }
 
-void adc0808_device::address_w(u8 data)
+WRITE8_MEMBER( adc0808_device::address_w )
 {
 	m_address = data & 7;
 }
@@ -198,22 +198,22 @@ READ_LINE_MEMBER( adc0808_device::eoc_r )
 	return m_eoc;
 }
 
-void adc0808_device::address_offset_start_w(offs_t offset, u8 data)
+WRITE8_MEMBER( adc0808_device::address_offset_start_w )
 {
 	if (VERBOSE)
 		logerror("address_offset_start_w %02x %02x\n", offset, data);
 
 	start_w(1);
-	address_w(offset);
+	address_w(space, 0, offset);
 	start_w(0);
 }
 
-void adc0808_device::address_data_start_w(u8 data)
+WRITE8_MEMBER( adc0808_device::address_data_start_w )
 {
 	if (VERBOSE)
-		logerror("address_data_start_w %02x\n", data);
+		logerror("address_data_start_w %02x %02x\n", offset, data);
 
 	start_w(1);
-	address_w(data);
+	address_w(space, 0, data);
 	start_w(0);
 }

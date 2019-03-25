@@ -1676,7 +1676,7 @@ ym2151_device::ym2151_device(const machine_config &mconfig, const char *tag, dev
 //  read - read from the device
 //-------------------------------------------------
 
-u8 ym2151_device::read(offs_t offset)
+READ8_MEMBER( ym2151_device::read )
 {
 	if (offset & 1)
 	{
@@ -1692,7 +1692,7 @@ u8 ym2151_device::read(offs_t offset)
 //  write - write from the device
 //-------------------------------------------------
 
-void ym2151_device::write(offs_t offset, u8 data)
+WRITE8_MEMBER( ym2151_device::write )
 {
 	if (offset & 1)
 	{
@@ -1707,19 +1707,19 @@ void ym2151_device::write(offs_t offset, u8 data)
 }
 
 
-u8 ym2151_device::status_r()
+READ8_MEMBER( ym2151_device::status_r )
 {
-	return read(1);
+	return read(space, 1);
 }
 
-void ym2151_device::register_w(u8 data)
+WRITE8_MEMBER( ym2151_device::register_w )
 {
-	write(0, data);
+	write(space, 0, data);
 }
 
-void ym2151_device::data_w(u8 data)
+WRITE8_MEMBER( ym2151_device::data_w )
 {
-	write(1, data);
+	write(space, 1, data);
 }
 
 

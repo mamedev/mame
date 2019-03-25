@@ -478,109 +478,48 @@ void tms9902_device::initiate_transmit()
     bit 13-15: not emulated, normally used for diagnostics
     bit 16: RBINT (RBRL&RIENB)
 */
-uint8_t tms9902_device::cruread(offs_t offset)
+READ8_MEMBER( tms9902_device::cruread )
 {
 	uint8_t answer = 0;
 
-	switch (offset & 31)
+	offset &= 0x0003;
+
+	switch (offset)
 	{
-	case 31:
-		answer = m_INT;
+	case 3: // Bits 31-24
+		if (m_INT) answer |= 0x80;
+		if (m_LDCTRL || m_LDIR || m_LRDR || m_LXDR || m_BRKON) answer |= 0x40;
+		if (m_DSCH) answer |= 0x20;
+		if (m_CTSin) answer |= 0x10;
+		if (m_DSRin) answer |= 0x08;
+		if (m_RTSout) answer |= 0x04;
+		if (m_TIMELP)  answer |= 0x02;
+		if (m_TIMERR)  answer |= 0x01;
 		break;
 
-	case 30:
-		answer = (m_LDCTRL || m_LDIR || m_LRDR || m_LXDR || m_BRKON);
+	case 2: // Bits 23-16
+		if (m_XSRE) answer |= 0x80;
+		if (m_XBRE) answer |= 0x40;
+		if (m_RBRL) answer |= 0x20;
+		if (m_DSCH && m_DSCENB) answer |= 0x10;
+		if (m_TIMELP && m_TIMENB) answer |= 0x08;
+		if (m_XBRE && m_XBIENB) answer |= 0x02;
+		if (m_RBRL && m_RIENB) answer |= 0x01;
 		break;
 
-	case 29:
-		answer = m_DSCH;
+	case 1: // Bits 15-8
+		if (m_RIN) answer |= 0x80;
+		if (m_RSBD) answer |= 0x40;
+		if (m_RFBD) answer |= 0x20;
+		if (m_RFER) answer |= 0x10;
+		if (m_ROVER) answer |= 0x08;
+		if (m_RPER) answer |= 0x04;
+		if (m_RPER || m_RFER || m_ROVER) answer |= 0x02;
 		break;
 
-	case 28:
-		answer = m_CTSin;
-		break;
-
-	case 27:
-		answer = m_DSRin;
-		break;
-
-	case 26:
-		answer = m_RTSout;
-		break;
-
-	case 25:
-		answer = m_TIMELP;
-		break;
-
-	case 24:
-		answer = m_TIMERR;
-		break;
-
-	case 23:
-		answer = m_XSRE;
-		break;
-
-	case 22:
-		answer = m_XBRE;
-		break;
-
-	case 21:
-		answer = m_RBRL;
-		break;
-
-	case 20:
-		answer = (m_DSCH && m_DSCENB);
-		break;
-
-	case 19:
-		answer = (m_TIMELP && m_TIMENB);
-		break;
-
-	case 17:
-		answer = (m_XBRE && m_XBIENB);
-		break;
-
-	case 16:
-		answer = (m_RBRL && m_RIENB);
-		break;
-
-	case 15:
-		answer = m_RIN;
-		break;
-
-	case 14:
-		answer = m_RSBD;
-		break;
-
-	case 13:
-		answer = m_RFBD;
-		break;
-
-	case 12:
-		answer = m_RFER;
-		break;
-
-	case 11:
-		answer = m_ROVER;
-		break;
-
-	case 10:
-		answer = m_RPER;
-		break;
-
-	case 9:
-		answer = (m_RPER || m_RFER || m_ROVER);
-		break;
-
-	case 7:
-	case 6:
-	case 5:
-	case 4:
-	case 3:
-	case 2:
-	case 1:
-	case 0:
-		answer = BIT(m_RBR, offset & 31);
+	case 0: // Bits 7-0
+		LOGCRU("Reading received byte = %02x\n", m_RBR);
+		answer = m_RBR;
 		break;
 	}
 	if (VERBOSE & LOG_DETAIL) LOGCRU("Reading flag bits %d - %d = %02x\n", ((offset+1)*8-1), offset*8, answer);
@@ -658,7 +597,7 @@ void tms9902_device::reset_uart()
 /*
     TMS9902 CRU write
 */
-void tms9902_device::cruwrite(offs_t offset, uint8_t data)
+WRITE8_MEMBER( tms9902_device::cruwrite )
 {
 	data &= 1;  /* clear extra bits */
 

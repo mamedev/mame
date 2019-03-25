@@ -71,16 +71,14 @@ ioport_constructor a2bus_pic_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void a2bus_pic_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(a2bus_pic_device::device_add_mconfig)
 	CENTRONICS(config, m_ctx, centronics_devices, "printer");
 	m_ctx->set_data_input_buffer(m_ctx_data_in);
 	m_ctx->ack_handler().set(FUNC(a2bus_pic_device::ack_w));
 
 	INPUT_BUFFER(config, m_ctx_data_in);
-	OUTPUT_LATCH(config, m_ctx_data_out);
-	m_ctx->set_output_latch(*m_ctx_data_out);
-}
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", PIC_CENTRONICS_TAG)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

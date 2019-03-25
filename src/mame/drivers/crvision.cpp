@@ -146,8 +146,10 @@ void crvision_state::crvision_map(address_map &map)
 {
 	map(0x0000, 0x03ff).mirror(0x0c00).ram();
 	map(0x1000, 0x1003).mirror(0x0ffc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x2000, 0x2001).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::read));
-	map(0x3000, 0x3001).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::write));
+	map(0x2000, 0x2000).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::vram_r));
+	map(0x2001, 0x2001).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::register_r));
+	map(0x3000, 0x3000).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::vram_w));
+	map(0x3001, 0x3001).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::register_w));
 	map(0x4000, 0x7fff).bankr(BANK_ROM2);
 	map(0x8000, 0xbfff).bankr(BANK_ROM1);
 //  AM_RANGE(0xc000, 0xe7ff) AM_RAMBANK(3)
@@ -166,8 +168,10 @@ void laser2001_state::lasr2001_map(address_map &map)
 {
 	map(0x0000, 0x03ff).mirror(0x0c00).ram();
 	map(0x1000, 0x1003).mirror(0x0ffc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x2000, 0x2001).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::read));
-	map(0x3000, 0x3001).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::write));
+	map(0x2000, 0x2000).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::vram_r));
+	map(0x2001, 0x2001).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::register_r));
+	map(0x3000, 0x3000).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::vram_w));
+	map(0x3001, 0x3001).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::register_w));
 	map(0x4000, 0x7fff).bankrw(BANK_ROM2);
 	map(0x8000, 0xbfff).bankrw(BANK_ROM1);
 	map(0xc000, 0xffff).rom().region(M6502_TAG, 0);
@@ -744,7 +748,7 @@ void crvision_state::creativision(machine_config &config)
 	m_pia->readpa_handler().set(FUNC(crvision_state::pia_pa_r));
 	m_pia->readpb_handler().set(FUNC(crvision_state::pia_pb_r));
 	m_pia->writepa_handler().set(FUNC(crvision_state::pia_pa_w));
-	m_pia->writepb_handler().set(SN76489_TAG, FUNC(sn76496_base_device::write));
+	m_pia->writepb_handler().set(SN76489_TAG, FUNC(sn76496_base_device::command_w));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
@@ -780,7 +784,7 @@ void crvision_state::creativision(machine_config &config)
 }
 
 /*-------------------------------------------------
-    machine_config( ntsc )
+    MACHINE_CONFIG_START( ntsc )
 -------------------------------------------------*/
 
 void crvision_state::ntsc(machine_config &config)
@@ -795,7 +799,7 @@ void crvision_state::ntsc(machine_config &config)
 }
 
 /*-------------------------------------------------
-    machine_config( pal )
+    MACHINE_CONFIG_START( pal )
 -------------------------------------------------*/
 
 void crvision_pal_state::pal(machine_config &config)
@@ -810,7 +814,7 @@ void crvision_pal_state::pal(machine_config &config)
 }
 
 /*-------------------------------------------------
-    machine_config( lasr2001 )
+    MACHINE_CONFIG_START( lasr2001 )
 -------------------------------------------------*/
 
 void laser2001_state::lasr2001(machine_config &config)

@@ -22,9 +22,10 @@ DEFINE_DEVICE_TYPE(VIC20_MEGACART, vic20_megacart_device, "vic20_megacart", "VIC
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void vic20_megacart_device::device_add_mconfig(machine_config &config)
-{
-}
+MACHINE_CONFIG_START(vic20_megacart_device::device_add_mconfig)
+
+MACHINE_CONFIG_END
+
 
 
 //**************************************************************************
@@ -70,7 +71,7 @@ void vic20_megacart_device::device_reset()
 //  vic20_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t vic20_megacart_device::vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+uint8_t vic20_megacart_device::vic20_cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	if (!ram1 || !ram2 || !ram3 || !io2 || !io3)
 	{
@@ -94,7 +95,7 @@ uint8_t vic20_megacart_device::vic20_cd_r(offs_t offset, uint8_t data, int ram1,
 //  vic20_cd_w - cartridge data write
 //-------------------------------------------------
 
-void vic20_megacart_device::vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+void vic20_megacart_device::vic20_cd_w(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	if (!ram1 || !ram2 || !ram3 || !io2)
 	{

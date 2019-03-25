@@ -1379,25 +1379,25 @@ void djmain_state::machine_reset()
  *
  *************************************/
 
-void djmain_state::djmainj(machine_config &config)
-{
+MACHINE_CONFIG_START(djmain_state::djmainj)
+
 	/* basic machine hardware */
 	// popn3 works 9.6 MHz or slower in some songs */
-	//M68EC020(config, m_maincpu, 18432000/2);    /*  9.216 MHz!? */
-	M68EC020(config, m_maincpu, 32000000/4);   /*  8.000 MHz!? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &djmain_state::maincpu_djmainj);
-	m_maincpu->set_vblank_int("screen", FUNC(djmain_state::vb_interrupt));
+	//MCFG_DEVICE_ADD("maincpu", M68EC020, 18432000/2)    /*  9.216 MHz!? */
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 32000000/4)   /*  8.000 MHz!? */
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_djmainj)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", djmain_state,  vb_interrupt)
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 	m_ata->irq_handler().set(FUNC(djmain_state::ide_interrupt));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(58);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 64*8);
-	screen.set_visarea(12, 512-12-1, 0, 384-1);
-	screen.set_screen_update(FUNC(djmain_state::screen_update_djmain));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(12, 512-12-1, 0, 384-1)
+	MCFG_SCREEN_UPDATE_DRIVER(djmain_state, screen_update_djmain)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0x4440 / 4);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_djmain);
@@ -1413,28 +1413,28 @@ void djmain_state::djmainj(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	k054539_device &k054539_1(K054539(config, "k054539_1", XTAL(18'432'000)));
-	k054539_1.set_addrmap(0, &djmain_state::k054539_map);
-	k054539_1.add_route(0, "lspeaker", 1.0);
-	k054539_1.add_route(1, "rspeaker", 1.0);
+	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
+	MCFG_DEVICE_ADDRESS_MAP(0, k054539_map)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	k054539_device &k054539_2(K054539(config, "k054539_2", XTAL(18'432'000)));
-	k054539_2.set_addrmap(0, &djmain_state::k054539_map);
-	k054539_2.add_route(0, "lspeaker", 1.0);
-	k054539_2.add_route(1, "rspeaker", 1.0);
-}
+	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL(18'432'000))
+	MCFG_DEVICE_ADDRESS_MAP(0, k054539_map)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
 
-void djmain_state::djmainu(machine_config &config)
-{
+MACHINE_CONFIG_START(djmain_state::djmainu)
 	djmainj(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &djmain_state::maincpu_djmainu);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_djmainu)
+MACHINE_CONFIG_END
 
-void djmain_state::djmaina(machine_config &config)
-{
+MACHINE_CONFIG_START(djmain_state::djmaina)
 	djmainj(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &djmain_state::maincpu_djmaina);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_djmaina)
+MACHINE_CONFIG_END
 
 
 

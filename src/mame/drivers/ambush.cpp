@@ -724,22 +724,21 @@ WRITE8_MEMBER(ambush_state::output_latches_w)
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-void ambush_state::ambush_base(machine_config &config)
-{
-	z80_device &maincpu(Z80(config, "maincpu", XTAL(18'432'000)/6));
-	maincpu.set_addrmap(AS_PROGRAM, &ambush_state::main_map);
-	maincpu.set_addrmap(AS_IO, &ambush_state::main_portmap);
-	maincpu.set_vblank_int("screen", FUNC(ambush_state::irq0_line_hold));
+MACHINE_CONFIG_START(ambush_state::ambush_base)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ambush_state, irq0_line_hold)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, ambush)
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(18'432'000)/3, 384, 0, 256, 264, 16, 240);
-	screen.set_screen_update(FUNC(ambush_state::screen_update));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/3, 384, 0, 256, 264, 16, 240)
+	MCFG_SCREEN_UPDATE_DRIVER(ambush_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_ambush);
 
@@ -754,7 +753,7 @@ void ambush_state::ambush_base(machine_config &config)
 	ay8912_device &ay2(AY8912(config, "ay2", XTAL(18'432'000)/6/2));
 	ay2.port_a_read_callback().set_ioport("joystick");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.33);
-}
+MACHINE_CONFIG_END
 
 void ambush_state::ambush(machine_config &config)
 {
@@ -771,10 +770,10 @@ void ambush_state::ambush(machine_config &config)
 	m_outlatch[1]->q_out_cb<7>().set(FUNC(ambush_state::coin_counter_2_w));
 }
 
-void ambush_state::mariobl(machine_config &config)
-{
+MACHINE_CONFIG_START(ambush_state::mariobl)
 	ambush_base(config);
-	subdevice<z80_device>("maincpu")->set_addrmap(AS_PROGRAM, &ambush_state::bootleg_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 
 	// To be verified: do these bootlegs only have one LS259?
 	ls259_device &outlatch(LS259(config, "outlatch"));
@@ -783,9 +782,10 @@ void ambush_state::mariobl(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, mariobl)
 
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(ambush_state::screen_update_bootleg));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(ambush_state, screen_update_bootleg)
 
-	m_gfxdecode->set_info(gfx_mariobl);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mariobl)
 
 	subdevice<palette_device>("palette")->set_init(FUNC(ambush_state::mario_palette));
 
@@ -796,10 +796,9 @@ void ambush_state::mariobl(machine_config &config)
 	ay8910_device &ay2(AY8910(config.replace(), "ay2", XTAL(18'432'000)/6/2));
 	ay2.port_a_read_callback().set_ioport("joystick");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.33);
-}
+MACHINE_CONFIG_END
 
-void ambush_state::mariobla(machine_config &config)
-{
+MACHINE_CONFIG_START(ambush_state::mariobla)
 	mariobl(config);
 
 	subdevice<palette_device>("palette")->set_init(FUNC(ambush_state::mariobla_palette));
@@ -807,18 +806,17 @@ void ambush_state::mariobla(machine_config &config)
 	auto &outlatch(*subdevice<ls259_device>("outlatch"));
 	outlatch.q_out_cb<5>().set(FUNC(ambush_state::color_bank_1_w));
 	outlatch.q_out_cb<6>().set_nop();
-}
+MACHINE_CONFIG_END
 
-void ambush_state::dkong3abl(machine_config &config)
-{
+MACHINE_CONFIG_START(ambush_state::dkong3abl)
 	mariobl(config);
 
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, dkong3abl)
 
-	m_gfxdecode->set_info(gfx_dkong3abl);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_dkong3abl)
 
 	subdevice<palette_device>("palette")->set_init(FUNC(ambush_state::dkong3_palette));
-}
+MACHINE_CONFIG_END
 
 
 //**************************************************************************

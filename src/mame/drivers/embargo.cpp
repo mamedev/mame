@@ -266,21 +266,22 @@ void embargo_state::machine_reset()
  *
  *************************************/
 
-void embargo_state::embargo(machine_config &config)
-{
+MACHINE_CONFIG_START(embargo_state::embargo)
+
 	/* basic machine hardware */
-	S2650(config, m_maincpu, 625000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &embargo_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &embargo_state::main_io_map);
-	m_maincpu->set_addrmap(AS_DATA, &embargo_state::main_data_map);
+	MCFG_DEVICE_ADD("maincpu", S2650, 625000)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
+	MCFG_DEVICE_DATA_MAP(main_data_map)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_size(256, 256);
-	screen.set_visarea(0, 255, 0, 239);
-	screen.set_refresh_hz(60);
-	screen.set_screen_update(FUNC(embargo_state::screen_update_embargo));
-}
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE_DRIVER(embargo_state, screen_update_embargo)
+
+MACHINE_CONFIG_END
 
 
 

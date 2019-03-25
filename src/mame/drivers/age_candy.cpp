@@ -13,7 +13,6 @@ Device is a 27c256   location U3
 */
 
 #include "emu.h"
-#include "cpu/hpc/hpc.h"
 #include "speaker.h"
 
 
@@ -22,7 +21,7 @@ class age_candy_state : public driver_device
 public:
 	age_candy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
+	//  ,m_maincpu(*this, "maincpu")
 	{ }
 
 	void age_candy(machine_config &config);
@@ -32,7 +31,7 @@ private:
 	virtual void machine_reset() override;
 
 	void age_candy_map(address_map &map);
-	required_device<hpc_device> m_maincpu;
+//  required_device<mcs51_cpu_device> m_maincpu;
 };
 
 static INPUT_PORTS_START( age_candy )
@@ -49,19 +48,24 @@ void age_candy_state::machine_reset()
 }
 
 
+#ifdef UNUSED_DEFINITION
 void age_candy_state::age_candy_map(address_map &map)
 {
-	map(0x8000, 0xffff).rom().region("maincpu", 0);
+	map(0xc000, 0xffff).rom().region("maincpu", 0x4000);
 }
+#endif
 
-void age_candy_state::age_candy(machine_config &config)
-{
-	HPC46104(config, m_maincpu, 16_MHz_XTAL); // HPC still not actually emulated
-	m_maincpu->set_addrmap(AS_PROGRAM, &age_candy_state::age_candy_map);
+MACHINE_CONFIG_START(age_candy_state::age_candy)
+
+	/* basic machine hardware */
+//  MCFG_DEVICE_ADD("maincpu", HPC46104, 8000000) // unknown clock; HPC emulation needed
+//  MCFG_DEVICE_PROGRAM_MAP(age_candy_map)
+//  MCFG_DEVICE_IO_MAP(age_candy_io)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-}
+MACHINE_CONFIG_END
+
 
 
 ROM_START( age_cand )

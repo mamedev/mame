@@ -79,7 +79,7 @@ void tube_device::update_interrupts()
 	m_drq_handler(!BIT(m_r1stat, 4) && ((m_hp3pos > BIT(m_r1stat, 4)) || (m_ph3pos == 0)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-uint8_t tube_device::host_r(offs_t offset)
+READ8_MEMBER(tube_device::host_r)
 {
 	uint8_t data = 0xfe;
 
@@ -143,7 +143,7 @@ uint8_t tube_device::host_r(offs_t offset)
 	return data;
 }
 
-void tube_device::host_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(tube_device::host_w)
 {
 	switch (offset & 0x07)
 	{
@@ -197,7 +197,7 @@ void tube_device::host_w(offs_t offset, uint8_t data)
 	update_interrupts();
 }
 
-uint8_t tube_device::parasite_r(offs_t offset)
+READ8_MEMBER(tube_device::parasite_r)
 {
 	uint8_t data = 0x00;
 
@@ -265,7 +265,7 @@ uint8_t tube_device::parasite_r(offs_t offset)
 	return data;
 }
 
-void tube_device::parasite_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(tube_device::parasite_w)
 {
 	switch (offset & 0x07)
 	{

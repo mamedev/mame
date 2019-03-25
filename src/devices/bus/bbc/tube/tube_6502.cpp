@@ -168,27 +168,27 @@ void bbc_tube_6502_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-uint8_t bbc_tube_6502_device::host_r(offs_t offset)
+READ8_MEMBER(bbc_tube_6502_device::host_r)
 {
-	return m_ula->host_r(offset);
+	return m_ula->host_r(space, offset);
 }
 
-void bbc_tube_6502_device::host_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(bbc_tube_6502_device::host_w)
 {
-	m_ula->host_w(offset, data);
+	m_ula->host_w(space, offset, data);
 }
 
 
-uint8_t bbc_tube_6502_device::tube_r(offs_t offset)
+READ8_MEMBER(bbc_tube_6502_device::tube_r)
 {
 	// Disable ROM on first access
 	if (!machine().side_effects_disabled())
 		m_bankdev->set_bank(1);
 
-	return m_ula->parasite_r(offset);
+	return m_ula->parasite_r(space, offset);
 }
 
-void bbc_tube_6502_device::tube_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(bbc_tube_6502_device::tube_w)
 {
-	m_ula->parasite_w(offset, data);
+	m_ula->parasite_w(space, offset, data);
 }

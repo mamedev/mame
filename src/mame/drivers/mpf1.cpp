@@ -355,8 +355,8 @@ void mpf1_state::machine_reset()
 
 /* Machine Drivers */
 
-void mpf1_state::mpf1(machine_config &config)
-{
+MACHINE_CONFIG_START(mpf1_state::mpf1)
+
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(3'579'545)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpf1_state::mpf1_map);
@@ -376,21 +376,21 @@ void mpf1_state::mpf1(machine_config &config)
 	ppi.out_pb_callback().set(FUNC(mpf1_state::ppi_pb_w));
 	ppi.out_pc_callback().set(FUNC(mpf1_state::ppi_pc_w));
 
-	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 
 	/* video hardware */
 	config.set_default_layout(layout_mpf1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	TIMER(config, "halt_timer").configure_periodic(FUNC(mpf1_state::check_halt_callback), attotime::from_hz(1));
-}
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
+MACHINE_CONFIG_END
 
-void mpf1_state::mpf1b(machine_config &config)
-{
+MACHINE_CONFIG_START(mpf1_state::mpf1b)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(3'579'545)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpf1_state::mpf1b_map);
@@ -410,23 +410,24 @@ void mpf1_state::mpf1b(machine_config &config)
 	ppi.out_pb_callback().set(FUNC(mpf1_state::ppi_pb_w));
 	ppi.out_pc_callback().set(FUNC(mpf1_state::ppi_pc_w));
 
-	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 
 	/* video hardware */
 	config.set_default_layout(layout_mpf1b);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	TMS5220(config, TMS5220_TAG, 680000L).add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD(TMS5220_TAG, TMS5220, 680000L)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	TIMER(config, "halt_timer").configure_periodic(FUNC(mpf1_state::check_halt_callback), attotime::from_hz(1));
-}
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
+MACHINE_CONFIG_END
 
-void mpf1_state::mpf1p(machine_config &config)
-{
+MACHINE_CONFIG_START(mpf1_state::mpf1p)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 2500000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpf1_state::mpf1p_map);
@@ -449,15 +450,16 @@ void mpf1_state::mpf1p(machine_config &config)
 	ppi.out_pb_callback().set(FUNC(mpf1_state::ppi_pb_w));
 	ppi.out_pc_callback().set(FUNC(mpf1_state::ppi_pc_w));
 
-	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	TIMER(config, "halt_timer").configure_periodic(FUNC(mpf1_state::check_halt_callback), attotime::from_hz(1));
-}
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
+MACHINE_CONFIG_END
 
 /* ROMs */
 

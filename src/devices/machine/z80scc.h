@@ -467,7 +467,6 @@ protected:
 
 	devcb_write_line    m_out_int_cb;
 
-	int m_out_int_state;
 	int m_int_state[6]; // interrupt state
 	int m_int_source[6]; // interrupt source
 

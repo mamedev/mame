@@ -50,12 +50,11 @@ void digijet_state::io_map(address_map &map)
 static INPUT_PORTS_START( digijet )
 INPUT_PORTS_END
 
-void digijet_state::digijet(machine_config &config)
-{
+MACHINE_CONFIG_START(digijet_state::digijet)
 	/* basic machine hardware */
-	I8049(config, m_maincpu, XTAL(11'000'000));
-	m_maincpu->set_addrmap(AS_IO, &digijet_state::io_map);
-}
+	MCFG_DEVICE_ADD(I8049_TAG, I8049, XTAL(11'000'000))
+	MCFG_DEVICE_IO_MAP(io_map)
+MACHINE_CONFIG_END
 
 ROM_START( digijet )
 	ROM_REGION( 0x800, I8049_TAG, 0 )

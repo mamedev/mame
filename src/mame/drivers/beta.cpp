@@ -347,23 +347,24 @@ void beta_state::machine_start()
 
 MACHINE_CONFIG_START(beta_state::beta)
 	/* basic machine hardware */
-	M6502(config, m_maincpu, XTAL(4'000'000)/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &beta_state::beta_mem);
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(4'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(beta_mem)
 
 	/* video hardware */
 	config.set_default_layout(layout_beta);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	mos6532_new_device &m6532(MOS6532_NEW(config, M6532_TAG, XTAL(4'000'000)/4));
-	m6532.pa_rd_callback().set(FUNC(beta_state::riot_pa_r));
-	m6532.pa_wr_callback().set(FUNC(beta_state::riot_pa_w));
-	m6532.pb_rd_callback().set(FUNC(beta_state::riot_pb_r));
-	m6532.pb_wr_callback().set(FUNC(beta_state::riot_pb_w));
-	m6532.irq_wr_callback().set_inputline(m_maincpu, M6502_IRQ_LINE);
+	MCFG_DEVICE_ADD(M6532_TAG, MOS6532_NEW, XTAL(4'000'000)/4)
+	MCFG_MOS6530n_IN_PA_CB(READ8(*this, beta_state, riot_pa_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, beta_state, riot_pa_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(*this, beta_state, riot_pb_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, beta_state, riot_pb_w))
+	MCFG_MOS6530n_IRQ_CB(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 
 	/* EPROM socket */
 	MCFG_GENERIC_CARTSLOT_ADD(EPROM_TAG, generic_plain_slot, nullptr)

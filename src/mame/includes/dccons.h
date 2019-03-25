@@ -28,7 +28,6 @@ public:
 	void init_dc();
 	void init_dcus();
 	void init_dcjp();
-	void init_tream();
 
 	DECLARE_READ64_MEMBER(dcus_idle_skip_r);
 	DECLARE_READ64_MEMBER(dcjp_idle_skip_r);

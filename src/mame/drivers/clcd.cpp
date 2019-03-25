@@ -657,11 +657,10 @@ static INPUT_PORTS_START( clcd )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // clears screen and goes into infinite loop
 INPUT_PORTS_END
 
-void clcd_state::clcd(machine_config &config)
-{
+MACHINE_CONFIG_START(clcd_state::clcd)
 	/* basic machine hardware */
-	M65C02(config, m_maincpu, 2000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &clcd_state::clcd_mem);
+	MCFG_DEVICE_ADD("maincpu", M65C02, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(clcd_mem)
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", m65c02_device::IRQ_LINE);
 
@@ -713,23 +712,24 @@ void clcd_state::clcd(machine_config &config)
 	m_rtc->set_default_24h(true);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(80);
-	screen.set_screen_update(FUNC(clcd_state::screen_update));
-	screen.set_size(480, 128);
-	screen.set_visarea_full();
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(80)
+	MCFG_SCREEN_UPDATE_DRIVER(clcd_state, screen_update)
+	MCFG_SCREEN_SIZE(480, 128)
+	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", FUNC(clcd_state::clcd_palette), 2);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	RAM(config, "ram").set_default_size("128K").set_extra_options("32K,64K").set_default_value(0);
 
 	NVRAM(config, "nvram").set_custom_handler(FUNC(clcd_state::nvram_init));
-}
+MACHINE_CONFIG_END
 
 
 ROM_START( clcd )

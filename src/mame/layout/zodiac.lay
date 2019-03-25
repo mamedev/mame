@@ -3,131 +3,40 @@
 
 <!-- define elements -->
 
-	<element name="static_white"><rect><color red="0.77" green="0.77" blue="0.77" /></rect></element>
+	<element name="static_black"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="disk_black"><disk><color red="0" green="0" blue="0" /></disk></element>
-	<element name="disk_red"><disk><color red="0.16" green="0.02" blue="0.05" /></disk></element>
+	<element name="disk_red"><disk><color red="0.2" green="0.02" blue="0.05" /></disk></element>
 
 	<element name="led" defstate="0">
-		<disk state="0"><color red="0.15" green="0.02" blue="0.01" /></disk>
-		<disk state="1"><color red="1.0" green="0.15" blue="0.08" /></disk>
+		<disk state="0"><color red="0.2" green="0.04" blue="0.046" /></disk>
+		<disk state="1"><color red="1.0" green="0.2" blue="0.23" /></disk>
 	</element>
 
 	<element name="digit" defstate="0">
 		<led7seg><color red="1.0" green="0.15" blue="0.08" /></led7seg>
 	</element>
 
-	<element name="hl" defstate="0">
-		<text string=" ">
-			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</text>
-		<rect state="1">
-			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</rect>
-	</element>
-
-	<element name="switch_mode" defstate="0">
-		<disk><color red="0.77" green="0.77" blue="0.77" /></disk>
-		<text state="0x01" string="H"><color red="0.07" green="0.07" blue="0.07" /></text>
-		<text state="0x02" string="P"><color red="0.07" green="0.07" blue="0.07" /></text>
-		<text state="0x00" string="A"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-
-	<element name="text_b1">
-		<rect><color red="0.77" green="0.77" blue="0.77" /></rect>
-		<text string="1"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-	<element name="text_b2">
-		<rect><color red="0.77" green="0.77" blue="0.77" /></rect>
-		<text string="2"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-	<element name="text_b3">
-		<rect><color red="0.77" green="0.77" blue="0.77" /></rect>
-		<text string="3"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-	<element name="text_b4">
-		<rect><color red="0.77" green="0.77" blue="0.77" /></rect>
-		<text string="4"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-	<element name="text_b5">
-		<rect><color red="0.77" green="0.77" blue="0.77" /></rect>
-		<text string="5"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-	<element name="text_b6">
-		<rect><color red="0.77" green="0.77" blue="0.77" /></rect>
-		<text string="6"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-	<element name="text_b7">
-		<rect><color red="0.77" green="0.77" blue="0.77" /></rect>
-		<text string="7"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-	<element name="text_b8">
-		<rect><color red="0.77" green="0.77" blue="0.77" /></rect>
-		<text string="8"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-	<element name="text_b9">
-		<rect><color red="0.77" green="0.77" blue="0.77" /></rect>
-		<text string="9"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-	<element name="text_b0">
-		<rect><color red="0.77" green="0.77" blue="0.77" /></rect>
-		<text string="0"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-	<element name="text_bent">
-		<rect><color red="0.77" green="0.77" blue="0.77" /></rect>
-		<text string="ENT"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-	<element name="text_bclr">
-		<rect><color red="0.77" green="0.77" blue="0.77" /></rect>
-		<text string="CLR"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-
-	<element name="text_bp">
-		<disk><color red="0.77" green="0.77" blue="0.77" /></disk>
-		<text string="P"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-	<element name="text_bl">
-		<disk><color red="0.77" green="0.77" blue="0.77" /></disk>
-		<text string="L"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-	<element name="text_bj">
-		<disk><color red="0.77" green="0.77" blue="0.77" /></disk>
-		<text string="J"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-	<element name="text_ba">
-		<disk><color red="0.77" green="0.77" blue="0.77" /></disk>
-		<text string="A"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-	<element name="text_bd">
-		<disk><color red="0.77" green="0.77" blue="0.77" /></disk>
-		<text string="D"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-	<element name="text_be">
-		<disk><color red="0.77" green="0.77" blue="0.77" /></disk>
-		<text string="E"><color red="0.07" green="0.07" blue="0.07" /></text>
-	</element>
-
-	<element name="text_z1"><text string="Aries" align="1"><color red="0.77" green="0.77" blue="0.77" /></text></element> <!-- ♈ "&#x2648;" -->
-	<element name="text_z2"><text string="Taurus" align="1"><color red="0.77" green="0.77" blue="0.77" /></text></element> <!-- ♉ "&#x2649;" -->
-	<element name="text_z3"><text string="Gemini" align="1"><color red="0.77" green="0.77" blue="0.77" /></text></element> <!-- ♊ "&#x264a;" -->
-	<element name="text_z4"><text string="Cancer" align="1"><color red="0.77" green="0.77" blue="0.77" /></text></element> <!-- ♋ "&#x264b;" -->
-	<element name="text_z5"><text string="Leo" align="1"><color red="0.77" green="0.77" blue="0.77" /></text></element> <!-- ♌ "&#x264c;" -->
-	<element name="text_z6"><text string="Virgo" align="1"><color red="0.77" green="0.77" blue="0.77" /></text></element> <!-- ♍ "&#x264d;" -->
-	<element name="text_z7"><text string="Libra" align="1"><color red="0.77" green="0.77" blue="0.77" /></text></element> <!-- ♎ "&#x264e;" -->
-	<element name="text_z8"><text string="Scorpio" align="1"><color red="0.77" green="0.77" blue="0.77" /></text></element> <!-- ♏ "&#x264f;" -->
-	<element name="text_z9"><text string="Sagittarius" align="1"><color red="0.77" green="0.77" blue="0.77" /></text></element> <!-- ♐ "&#x2650;" -->
-	<element name="text_z10"><text string="Capricorn" align="1"><color red="0.77" green="0.77" blue="0.77" /></text></element> <!-- ♑ "&#x2651;" -->
-	<element name="text_z11"><text string="Aquarius" align="1"><color red="0.77" green="0.77" blue="0.77" /></text></element> <!-- ♒ "&#x2652;" -->
-	<element name="text_z12"><text string="Pisces" align="1"><color red="0.77" green="0.77" blue="0.77" /></text></element> <!-- ♓ "&#x2653;" -->
-
-	<element name="text_mode"><text string="Mode (H-P-A)"><color red="0.77" green="0.77" blue="0.77" /></text></element>
+	<element name="text_z1"><text string="&#x2648;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z2"><text string="&#x2649;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z3"><text string="&#x264a;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z4"><text string="&#x264b;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z5"><text string="&#x264c;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z6"><text string="&#x264d;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z7"><text string="&#x264e;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z8"><text string="&#x264f;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z9"><text string="&#x2650;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z10"><text string="&#x2651;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z11"><text string="&#x2652;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z12"><text string="&#x2653;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 
 
 <!-- build screen -->
 
 	<view name="Internal Layout">
 		<bounds left="-35" right="158" top="5" bottom="198" />
+		<bezel element="static_black">
+			<bounds left="-35" right="158" top="5" bottom="198" />
+		</bezel>
 
 		<bezel element="disk_red"><bounds x="-40" y="0" width="203" height="203" /></bezel>
 		<bezel element="disk_black"><bounds x="-15" y="25" width="153" height="153" /></bezel>
@@ -140,8 +49,6 @@
 		<bezel name="digit2" element="digit"><bounds x="70" y="70" width="10" height="15" /></bezel>
 		<bezel name="digit1" element="digit"><bounds x="80" y="70" width="10" height="15" /></bezel>
 		<bezel name="digit0" element="digit"><bounds x="90" y="70" width="10" height="15" /></bezel>
-
-	<!-- edgy leds -->
 
 		<bezel name="9.7" element="led"><bounds x="15" y="145" width="3" height="3" /></bezel>
 		<bezel name="9.2" element="led"><bounds x="40" y="160" width="3" height="3" /></bezel>
@@ -157,66 +64,19 @@
 		<bezel name="8.1" element="led"><bounds x="0" y="80" width="3" height="3" /></bezel>
 		<bezel name="8.3" element="led"><bounds x="0" y="120" width="3" height="3" /></bezel>
 
-		<bezel element="text_z1"><bounds x="19" y="144" width="20" height="4" /></bezel>
-		<bezel element="text_z2"><bounds x="44" y="159" width="20" height="4" /></bezel>
-		<bezel element="text_z3"><bounds x="84" y="159" width="20" height="4" /></bezel>
-		<bezel element="text_z4"><bounds x="109" y="144" width="20" height="4" /></bezel>
-		<bezel element="text_z5"><bounds x="124" y="119" width="20" height="4" /></bezel>
-		<bezel element="text_z6"><bounds x="124" y="79" width="20" height="4" /></bezel>
+		<bezel element="text_z1"><bounds x="17" y="143" width="12" height="7" /></bezel>
+		<bezel element="text_z2"><bounds x="42" y="158" width="12" height="7" /></bezel>
+		<bezel element="text_z3"><bounds x="82" y="158" width="12" height="7" /></bezel>
+		<bezel element="text_z4"><bounds x="107" y="143" width="12" height="7" /></bezel>
+		<bezel element="text_z5"><bounds x="122" y="118" width="12" height="7" /></bezel>
+		<bezel element="text_z6"><bounds x="122" y="78" width="12" height="7" /></bezel>
 
-		<bezel element="text_z7"><bounds x="109" y="54" width="20" height="4" /></bezel>
-		<bezel element="text_z8"><bounds x="84" y="39" width="20" height="4" /></bezel>
-		<bezel element="text_z9"><bounds x="44" y="39" width="20" height="4" /></bezel>
-		<bezel element="text_z10"><bounds x="19" y="54" width="20" height="4" /></bezel>
-		<bezel element="text_z11"><bounds x="4" y="79" width="20" height="4" /></bezel>
-		<bezel element="text_z12"><bounds x="4" y="119" width="20" height="4" /></bezel>
-
-	<!-- buttons -->
-
-		<bezel element="text_b1"><bounds x="46.5" y="93"  width="7" height="7" /></bezel>
-		<bezel element="text_b4"><bounds x="46.5" y="103" width="7" height="7" /></bezel>
-		<bezel element="text_b7"><bounds x="46.5" y="113" width="7" height="7" /></bezel>
-		<bezel element="text_b0"><bounds x="46.5" y="123" width="7" height="7" /></bezel>
-		<bezel element="text_b2"><bounds x="56.5" y="93"  width="7" height="7" /></bezel>
-		<bezel element="text_b5"><bounds x="56.5" y="103" width="7" height="7" /></bezel>
-		<bezel element="text_b8"><bounds x="56.5" y="113" width="7" height="7" /></bezel>
-		<bezel element="static_white"><bounds x="56.5" y="123" width="7" height="7" /></bezel>
-		<bezel element="text_bent"><bounds x="56.6" y="124.3" width="6.8" height="4.1" /></bezel>
-		<bezel element="text_b3"><bounds x="66.5" y="93"  width="7" height="7" /></bezel>
-		<bezel element="text_b6"><bounds x="66.5" y="103" width="7" height="7" /></bezel>
-		<bezel element="text_b9"><bounds x="66.5" y="113" width="7" height="7" /></bezel>
-		<bezel element="static_white"><bounds x="66.5" y="123" width="7" height="7" /></bezel>
-		<bezel element="text_bclr"><bounds x="66.6" y="124.3" width="6.8" height="4.1" /></bezel>
-
-		<bezel element="text_bp"><bounds x="26.5" y="89.5" width="7" height="7" /></bezel>
-		<bezel element="text_bl"><bounds x="19.5" y="106.25" width="7" height="7" /></bezel>
-		<bezel element="text_bj"><bounds x="26.5" y="123" width="7" height="7" /></bezel>
-		<bezel element="text_ba"><bounds x="86.5" y="89.5" width="7" height="7" /></bezel>
-		<bezel element="text_bd"><bounds x="93.5" y="106.25" width="7" height="7" /></bezel>
-		<bezel element="text_be"><bounds x="86.5" y="123" width="7" height="7" /></bezel>
-
-		<bezel element="hl" inputtag="IN.0" inputmask="0x04"><bounds x="46.5" y="93"  width="7" height="7" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x08"><bounds x="46.5" y="103" width="7" height="7" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x01"><bounds x="46.5" y="113" width="7" height="7" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x08"><bounds x="46.5" y="123" width="7" height="7" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x02"><bounds x="56.5" y="93"  width="7" height="7" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x04"><bounds x="56.5" y="103" width="7" height="7" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.2" inputmask="0x08"><bounds x="56.5" y="113" width="7" height="7" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.4" inputmask="0x01"><bounds x="56.5" y="123" width="7" height="7" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x01"><bounds x="66.5" y="93"  width="7" height="7" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x02"><bounds x="66.5" y="103" width="7" height="7" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.2" inputmask="0x04"><bounds x="66.5" y="113" width="7" height="7" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.4" inputmask="0x08"><bounds x="66.5" y="123" width="7" height="7" /><color alpha="0.2" /></bezel>
-
-		<bezel element="hl" inputtag="IN.3" inputmask="0x01"><bounds x="26.5" y="89.5" width="7" height="7" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.3" inputmask="0x02"><bounds x="19.5" y="106.25" width="7" height="7" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.3" inputmask="0x04"><bounds x="26.5" y="123" width="7" height="7" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.2" inputmask="0x02"><bounds x="86.5" y="89.5" width="7" height="7" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.2" inputmask="0x01"><bounds x="93.5" y="106.25" width="7" height="7" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.3" inputmask="0x08"><bounds x="86.5" y="123" width="7" height="7" /><color alpha="0.2" /></bezel>
-
-		<bezel element="switch_mode" inputtag="IN.5" inputmask="0x03" inputraw="1"><bounds x="56.5" y="140" width="7" height="7" /></bezel>
-		<bezel element="text_mode"><bounds x="45" y="148" width="30" height="4" /></bezel>
+		<bezel element="text_z7"><bounds x="107" y="53" width="12" height="7" /></bezel>
+		<bezel element="text_z8"><bounds x="82" y="38" width="12" height="7" /></bezel>
+		<bezel element="text_z9"><bounds x="42" y="38" width="12" height="7" /></bezel>
+		<bezel element="text_z10"><bounds x="17" y="53" width="12" height="7" /></bezel>
+		<bezel element="text_z11"><bounds x="2" y="78" width="12" height="7" /></bezel>
+		<bezel element="text_z12"><bounds x="2" y="118" width="12" height="7" /></bezel>
 
 	</view>
 </mamelayout>

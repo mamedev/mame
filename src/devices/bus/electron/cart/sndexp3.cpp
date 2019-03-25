@@ -23,13 +23,12 @@ DEFINE_DEVICE_TYPE(ELECTRON_SNDEXP3, electron_sndexp3_device, "electron_sndexp3"
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void electron_sndexp3_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(electron_sndexp3_device::device_add_mconfig)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SN76489(config, m_sn, DERIVED_CLOCK(1, 4));
-	m_sn->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("sn76489", SN76489, 16_MHz_XTAL / 4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -62,11 +61,11 @@ void electron_sndexp3_device::device_start()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t electron_sndexp3_device::read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
+uint8_t electron_sndexp3_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa)
 {
 	uint8_t data = 0xff;
 
-	if (oe && romqa)
+	if (!infc && !infd && romqa)
 	{
 		if (offset < 0x2000)
 		{
@@ -85,7 +84,7 @@ uint8_t electron_sndexp3_device::read(offs_t offset, int infc, int infd, int rom
 //  write - cartridge data write
 //-------------------------------------------------
 
-void electron_sndexp3_device::write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
+void electron_sndexp3_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa)
 {
 	if (infc)
 	{
@@ -103,7 +102,8 @@ void electron_sndexp3_device::write(offs_t offset, uint8_t data, int infc, int i
 			break;
 		}
 	}
-	else if (oe && romqa)
+
+	if (!infc && !infd && romqa)
 	{
 		if (offset >= 0x2000)
 		{

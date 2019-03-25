@@ -31,8 +31,8 @@ public:
 	auto port_read_handler() { return m_port_read_handler.bind(); }
 	auto irq_handler() { return m_irq_handler.bind(); }
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
 
 	DECLARE_WRITE_LINE_MEMBER(write_rxd);
 	uint8_t get_irq_vector();

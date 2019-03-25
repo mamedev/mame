@@ -46,6 +46,7 @@ public:
 	sound_sdl() :
 		osd_module(OSD_SOUND_PROVIDER, "sdl"), sound_module(),
 		stream_in_initialized(0),
+		stream_loop(0),
 		attenuation(0), buf_locked(0), stream_buffer(nullptr), stream_buffer_size(0), buffer_underflows(0), buffer_overflows(0)
 {
 		sdl_xfer_samples = SDL_XFER_SAMPLES;
@@ -79,7 +80,7 @@ private:
 
 	static void sdl_callback(void *userdata, Uint8 *stream, int len);
 
-	void lock_buffer();
+	int lock_buffer();
 	void unlock_buffer();
 	void attenuate(int16_t *data, int bytes);
 	void copy_sample_data(bool is_throttled, const int16_t *data, int bytes_to_copy);
@@ -88,6 +89,7 @@ private:
 
 	int sdl_xfer_samples;
 	int stream_in_initialized;
+	int stream_loop;
 	int attenuation;
 
 	int              buf_locked;
@@ -177,7 +179,7 @@ int sound_sdl::ring_buffer::pop(void *data, size_t size)
 //============================================================
 //  lock_buffer
 //============================================================
-void sound_sdl::lock_buffer()
+int sound_sdl::lock_buffer()
 {
 	if (!buf_locked)
 		SDL_LockAudio();
@@ -185,6 +187,8 @@ void sound_sdl::lock_buffer()
 
 	if (LOG_SOUND)
 		*sound_log << "locking\n";
+
+	return 0;
 }
 
 //============================================================
@@ -355,6 +359,7 @@ int sound_sdl::init(const osd_options &options)
 
 		sdl_xfer_samples = SDL_XFER_SAMPLES;
 		stream_in_initialized = 0;
+		stream_loop = 0;
 
 		// set up the audio specs
 		aspec.freq = sample_rate();

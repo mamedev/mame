@@ -67,7 +67,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
-	required_device<beep_device> m_beeper;
+	optional_device<beep_device> m_beeper;
 	output_finder<6> m_lamps;
 };
 

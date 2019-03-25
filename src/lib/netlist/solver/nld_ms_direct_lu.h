@@ -8,10 +8,10 @@
 #ifndef NLD_MS_DIRECT_H_
 #define NLD_MS_DIRECT_H_
 
+#include <algorithm>
+
 #include "solver/nld_solver.h"
 #include "solver/nld_matrix_solver.h"
-
-#include <algorithm>
 
 //#define A(r, c) m_A[_r][_c]
 
@@ -36,9 +36,9 @@ public:
 	virtual void vsetup(analog_net_t::list_t &nets) override;
 	virtual void reset() override { matrix_solver_t::reset(); }
 
-	unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
+	inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
 
-	int vsolve_non_dynamic(const bool newton_raphson);
+	inline int vsolve_non_dynamic(const bool newton_raphson);
 
 protected:
 	virtual void add_term(int net_idx, terminal_t *term) override;
@@ -139,10 +139,12 @@ protected:
 	nl_double compute_next_timestep();
 
 	template <typename T1, typename T2>
-	nl_ext_double &A(const T1 r, const T2 c) { return m_A[r][c]; }
+	inline nl_ext_double &A(const T1 r, const T2 c) { return m_A[r][c]; }
 
 	//nl_double m_A[storage_N][((storage_N + 7) / 8) * 8];
 	nl_double m_RHS[storage_N];
+	nl_double m_last_RHS[storage_N]; // right hand side - contains currents
+	nl_double m_last_V[storage_N];
 
 	terms_for_net_t *m_rails_temp;
 
@@ -353,6 +355,7 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 	 * save states
 	 */
 	save(NLNAME(m_RHS));
+	save(NLNAME(m_last_RHS));
 	save(NLNAME(m_last_V));
 
 	for (unsigned k = 0; k < N(); k++)
@@ -587,10 +590,13 @@ unsigned matrix_solver_direct_t<m_N, storage_N>::solve_non_dynamic(const bool ne
 }
 
 template <unsigned m_N, unsigned storage_N>
-int matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+inline int matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	this->build_LE_A();
-	this->build_LE_RHS(m_RHS);
+	this->build_LE_RHS(m_last_RHS);
+
+	for (unsigned i=0, iN=N(); i < iN; i++)
+		m_RHS[i] = m_last_RHS[i];
 
 	return this->solve_non_dynamic(newton_raphson);
 }
@@ -602,6 +608,11 @@ matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(const solver_para
 , m_lp_fact(0)
 {
 	m_rails_temp = palloc_array(terms_for_net_t, N());
+
+	for (unsigned k = 0; k < N(); k++)
+	{
+		m_last_RHS[k] = 0.0;
+	}
 }
 
 template <unsigned m_N, unsigned storage_N>
@@ -615,6 +626,7 @@ matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(const eSolverType
 	for (unsigned k = 0; k < N(); k++)
 	{
 		m_terms[k] = palloc(terms_for_net_t);
+		m_last_RHS[k] = 0.0;
 	}
 }
 

@@ -605,21 +605,21 @@ static INPUT_PORTS_START( enigma2a )
 INPUT_PORTS_END
 
 
-void enigma2_state::enigma2(machine_config &config)
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_main_cpu_map);
+MACHINE_CONFIG_START(enigma2_state::enigma2)
 
-	Z80(config, m_audiocpu, 2500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_audio_cpu_map);
-	m_audiocpu->set_periodic_int(FUNC(enigma2_state::irq0_line_hold), attotime::from_hz(8*52));
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(enigma2_main_cpu_map)
+
+	MCFG_DEVICE_ADD("audiocpu", Z80, 2500000)
+	MCFG_DEVICE_PROGRAM_MAP(enigma2_audio_cpu_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(enigma2_state, irq0_line_hold, 8*52)
 
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	m_screen->set_screen_update(FUNC(enigma2_state::screen_update_enigma2));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_UPDATE_DRIVER(enigma2_state, screen_update_enigma2)
 
 	PALETTE(config, m_palette, palette_device::BGR_3BIT);
 
@@ -630,25 +630,25 @@ void enigma2_state::enigma2(machine_config &config)
 	aysnd.port_a_read_callback().set(FUNC(enigma2_state::sound_latch_r));
 	aysnd.port_b_write_callback().set(FUNC(enigma2_state::protection_data_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+MACHINE_CONFIG_END
 
 
-void enigma2_state::enigma2a(machine_config &config)
-{
+MACHINE_CONFIG_START(enigma2_state::enigma2a)
+
 	/* basic machine hardware */
-	I8080(config, m_maincpu, CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2a_main_cpu_map);
-	m_maincpu->set_addrmap(AS_IO, &enigma2_state::enigma2a_main_cpu_io_map);
+	MCFG_DEVICE_ADD("maincpu", I8080, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(enigma2a_main_cpu_map)
+	MCFG_DEVICE_IO_MAP(enigma2a_main_cpu_io_map)
 
-	Z80(config, m_audiocpu, 2500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_audio_cpu_map);
-	m_audiocpu->set_periodic_int(FUNC(enigma2_state::irq0_line_hold), attotime::from_hz(8*52));
+	MCFG_DEVICE_ADD("audiocpu", Z80, 2500000)
+	MCFG_DEVICE_PROGRAM_MAP(enigma2_audio_cpu_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(enigma2_state, irq0_line_hold, 8*52)
 
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	m_screen->set_screen_update(FUNC(enigma2_state::screen_update_enigma2a));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_UPDATE_DRIVER(enigma2_state, screen_update_enigma2a)
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
@@ -657,7 +657,7 @@ void enigma2_state::enigma2a(machine_config &config)
 	aysnd.port_a_read_callback().set(FUNC(enigma2_state::sound_latch_r));
 	aysnd.port_b_write_callback().set(FUNC(enigma2_state::protection_data_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+MACHINE_CONFIG_END
 
 
 

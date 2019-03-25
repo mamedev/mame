@@ -53,43 +53,73 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 ***************************************************************************/
 
-template<unsigned Layer>
-TILE_GET_INFO_MEMBER(esd16_state::get_tile_info)
+TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_0)
 {
-	const u16 code = m_vram[Layer][tile_index];
+	uint16_t code = m_vram_0[tile_index];
 	SET_TILE_INFO_MEMBER(1,
 			code,
-			m_tilemap_color[Layer],
+			m_tilemap0_color,
 			0);
 }
 
-template<unsigned Layer>
-TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_16x16)
+TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_0_16x16)
 {
-	const u16 code = m_vram[Layer][tile_index];
+	uint16_t code = m_vram_0[tile_index];
 	SET_TILE_INFO_MEMBER(2,
 			code,
-			m_tilemap_color[Layer],
+			m_tilemap0_color,
 			0);
 }
 
 
-void esd16_state::tilemap0_color_w(u16 data)
+TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_1)
 {
-	m_tilemap_color[0] = data & 0x03;
-	m_tilemap[0]->mark_all_dirty();
-	m_tilemap_16x16[0]->mark_all_dirty();
+	uint16_t code = m_vram_1[tile_index];
+	SET_TILE_INFO_MEMBER(1,
+			code,
+			m_tilemap1_color,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_1_16x16)
+{
+	uint16_t code = m_vram_1[tile_index];
+	SET_TILE_INFO_MEMBER(2,
+			code,
+			m_tilemap1_color,
+			0);
+}
+
+WRITE16_MEMBER(esd16_state::esd16_vram_0_w)
+{
+	COMBINE_DATA(&m_vram_0[offset]);
+	m_tilemap_0->mark_tile_dirty(offset);
+	m_tilemap_0_16x16->mark_tile_dirty(offset);
+}
+
+WRITE16_MEMBER(esd16_state::esd16_vram_1_w)
+{
+	COMBINE_DATA(&m_vram_1[offset]);
+	m_tilemap_1->mark_tile_dirty(offset);
+	m_tilemap_1_16x16->mark_tile_dirty(offset);
+}
+
+WRITE16_MEMBER(esd16_state::esd16_tilemap0_color_w)
+{
+	m_tilemap0_color = data & 0x03;
+	m_tilemap_0->mark_all_dirty();
+	m_tilemap_0_16x16->mark_all_dirty();
 
 	bool flip = BIT(data, 7);
 	flip_screen_set(flip);
 	m_sprgen->set_flip_screen(flip);
 }
 
-void esd16_state::tilemap0_color_jumppop_w(u16 data)
+WRITE16_MEMBER(esd16_state::esd16_tilemap0_color_jumppop_w)
 {
 	// todo
-	m_tilemap_color[0] = 2;
-	m_tilemap_color[1] = 1;
+	m_tilemap0_color = 2;
+	m_tilemap1_color = 1;
 
 	bool flip = BIT(data, 7);
 	flip_screen_set(flip);
@@ -108,22 +138,22 @@ void esd16_state::tilemap0_color_jumppop_w(u16 data)
 
 void esd16_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
+	m_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
+	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
 
 	/* swatpolc changes tilemap 0 to 16x16 at various times */
-	m_tilemap_16x16[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_16x16<0>),this), TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
+	m_tilemap_0_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_0_16x16),this), TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
 
 	/* hedpanic changes tilemap 1 to 16x16 at various times */
-	m_tilemap_16x16[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_16x16<1>),this), TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
+	m_tilemap_1_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_1_16x16),this), TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
 
-	m_tilemap[0]->set_scrolldx(-0x60 + 2, -0x60);
-	m_tilemap[1]->set_scrolldx(-0x60, -0x60 + 2);
-	m_tilemap_16x16[0]->set_scrolldx(-0x60 + 2, -0x60);
-	m_tilemap_16x16[1]->set_scrolldx(-0x60, -0x60 + 2);
+	m_tilemap_0->set_scrolldx(-0x60 + 2, -0x60);
+	m_tilemap_1->set_scrolldx(-0x60, -0x60 + 2);
+	m_tilemap_0_16x16->set_scrolldx(-0x60 + 2, -0x60);
+	m_tilemap_1_16x16->set_scrolldx(-0x60, -0x60 + 2);
 
-	m_tilemap[1]->set_transparent_pen(0x00);
-	m_tilemap_16x16[1]->set_transparent_pen(0x00);
+	m_tilemap_1->set_transparent_pen(0x00);
+	m_tilemap_1_16x16->set_transparent_pen(0x00);
 }
 
 
@@ -135,7 +165,7 @@ void esd16_state::video_start()
 
 ***************************************************************************/
 
-u32 esd16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t esd16_state::screen_update_hedpanic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -156,15 +186,15 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	{
 		if (m_head_layersize[0] & 0x0001)
 		{
-			m_tilemap_16x16[0]->set_scrollx(0, m_scroll[0][0]);
-			m_tilemap_16x16[0]->set_scrolly(0, m_scroll[0][1]);
-			m_tilemap_16x16[0]->draw(screen, bitmap, cliprect, 0, 0);
+			m_tilemap_0_16x16->set_scrollx(0, m_scroll_0[0]);
+			m_tilemap_0_16x16->set_scrolly(0, m_scroll_0[1]);
+			m_tilemap_0_16x16->draw(screen, bitmap, cliprect, 0, 0);
 		}
 		else
 		{
-			m_tilemap[0]->set_scrollx(0, m_scroll[0][0]);
-			m_tilemap[0]->set_scrolly(0, m_scroll[0][1]);
-			m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+			m_tilemap_0->set_scrollx(0, m_scroll_0[0]);
+			m_tilemap_0->set_scrolly(0, m_scroll_0[1]);
+			m_tilemap_0->draw(screen, bitmap, cliprect, 0, 0);
 		}
 	}
 	else
@@ -177,15 +207,15 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	{
 		if (m_head_layersize[0] & 0x0002)
 		{
-			m_tilemap_16x16[1]->set_scrollx(0, m_scroll[1][0]);
-			m_tilemap_16x16[1]->set_scrolly(0, m_scroll[1][1]);
-			m_tilemap_16x16[1]->draw(screen, bitmap, cliprect, 0, 1);
+			m_tilemap_1_16x16->set_scrollx(0, m_scroll_1[0]);
+			m_tilemap_1_16x16->set_scrolly(0, m_scroll_1[1]);
+			m_tilemap_1_16x16->draw(screen, bitmap, cliprect, 0, 1);
 		}
 		else
 		{
-			m_tilemap[1]->set_scrollx(0, m_scroll[1][0]);
-			m_tilemap[1]->set_scrolly(0, m_scroll[1][1]);
-			m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 1);
+			m_tilemap_1->set_scrollx(0, m_scroll_1[0]);
+			m_tilemap_1->set_scrolly(0, m_scroll_1[1]);
+			m_tilemap_1->draw(screen, bitmap, cliprect, 0, 1);
 		}
 
 	}

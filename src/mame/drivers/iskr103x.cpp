@@ -25,6 +25,7 @@
 #include "machine/ram.h"
 #include "softlist.h"
 
+#define DBG_LOG(a,b,c)
 
 class iskr103x_state : public driver_device
 {
@@ -67,37 +68,36 @@ static DEVICE_INPUT_DEFAULTS_START(iskr1031)
 DEVICE_INPUT_DEFAULTS_END
 
 // XXX
-void iskr103x_state::iskr1030m(machine_config &config)
-{
+MACHINE_CONFIG_START(iskr103x_state::iskr1030m)
 	/* basic machine hardware */
-	I8086(config, m_maincpu, 4772720);
-	m_maincpu->set_addrmap(AS_PROGRAM, &iskr103x_state::iskr1031_map);
-	m_maincpu->set_addrmap(AS_IO, &iskr103x_state::iskr1031_io);
-	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
+	MCFG_DEVICE_ADD("maincpu",  I8086, 4772720)
+	MCFG_DEVICE_PROGRAM_MAP(iskr1031_map)
+	MCFG_DEVICE_IO_MAP(iskr1031_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
-	mb.set_cputag(m_maincpu);
-	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(iskr1030m));
+	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
+	MCFG_DEVICE_INPUT_DEFAULTS(iskr1030m)
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", iskr103x_isa8_cards, "cga_iskr1030m", false); // FIXME: determine IS bus clock
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", iskr103x_isa8_cards, "fdc_xt", false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", iskr103x_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", iskr103x_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa5", 0, "mb:isa", iskr103x_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa6", 0, "mb:isa", iskr103x_isa8_cards, nullptr, false);
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, "cga_iskr1030m", false) // FIXME: determine IS bus clock
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, "fdc_xt", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, nullptr, false)
 
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_EC_1841).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
-//  PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_ISKR_1030).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
+//  MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_ISKR_1030)
 
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
-}
+MACHINE_CONFIG_END
 
-void iskr103x_state::iskr1031(machine_config &config)
-{
+MACHINE_CONFIG_START(iskr103x_state::iskr1031)
 	iskr1030m(config);
-	subdevice<ibm5160_mb_device>("mb")->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(iskr1031));
-	subdevice<isa8_slot_device>("isa1")->set_default_option("cga_iskr1031");
-}
+	MCFG_DEVICE_MODIFY("mb")
+	MCFG_DEVICE_INPUT_DEFAULTS(iskr1031)
+	MCFG_DEVICE_MODIFY("isa1")
+	MCFG_DEVICE_SLOT_INTERFACE(iskr103x_isa8_cards, "cga_iskr1031", false)
+MACHINE_CONFIG_END
 
 ROM_START( iskr1030m )
 	ROM_REGION16_LE(0x10000,"bios", 0)

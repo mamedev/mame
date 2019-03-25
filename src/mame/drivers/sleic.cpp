@@ -67,12 +67,11 @@ void sleic_state::init_sleic()
 {
 }
 
-void sleic_state::sleic(machine_config &config)
-{
+MACHINE_CONFIG_START(sleic_state::sleic)
 	/* basic machine hardware */
-	I8088(config, m_maincpu, 8000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &sleic_state::sleic_map);
-}
+	MCFG_DEVICE_ADD("maincpu", I8088, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(sleic_map)
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
 / Bike Race (1992)

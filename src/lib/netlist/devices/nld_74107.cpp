@@ -6,15 +6,15 @@
  */
 
 #include "nld_74107.h"
-#include "netlist/nl_base.h"
+#include "../nl_base.h"
 
 namespace netlist
 {
 	namespace devices
 	{
 
-	static constexpr const netlist_time delay_107[2] = { NLTIME_FROM_NS(16), NLTIME_FROM_NS(25) };
-	static constexpr const netlist_time delay_107A[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(15) };
+	static constexpr netlist_time delay_107[2] = { NLTIME_FROM_NS(16), NLTIME_FROM_NS(25) };
+	static constexpr netlist_time delay_107A[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(15) };
 
 	NETLIB_OBJECT(74107A)
 	{
@@ -22,12 +22,11 @@ namespace netlist
 		, m_clk(*this, "CLK", NETLIB_DELEGATE(74107A, clk))
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
+		, m_delay(delay_107A)
 		, m_J(*this, "J")
 		, m_K(*this, "K")
 		, m_clrQ(*this, "CLRQ")
 		{
-			m_delay[0] = delay_107A[0];
-			m_delay[1] = delay_107A[1];
 		}
 
 		friend class NETLIB_NAME(74107_dip);
@@ -44,7 +43,7 @@ namespace netlist
 		logic_output_t m_Q;
 		logic_output_t m_QQ;
 
-		netlist_time m_delay[2];
+		const netlist_time *m_delay;
 
 		logic_input_t m_J;
 		logic_input_t m_K;
@@ -62,8 +61,7 @@ namespace netlist
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(74107, 74107A)
 		{
-			m_delay[0] = delay_107[0];
-			m_delay[1] = delay_107[1];
+			m_delay = delay_107;
 		}
 	};
 
@@ -139,9 +137,9 @@ namespace netlist
 			m_clk.activate_hl();
 	}
 
-	NETLIB_DEVICE_IMPL(74107,       "TTL_74107",    "+CLK,+J,+K,+CLRQ")
-	NETLIB_DEVICE_IMPL(74107A,      "TTL_74107A",   "+CLK,+J,+K,+CLRQ")
-	NETLIB_DEVICE_IMPL(74107_dip,   "TTL_74107_DIP", "")
+	NETLIB_DEVICE_IMPL(74107)
+	NETLIB_DEVICE_IMPL(74107A)
+	NETLIB_DEVICE_IMPL(74107_dip)
 
 	} //namespace devices
 } // namespace netlist

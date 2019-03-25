@@ -295,21 +295,21 @@ void giclassicsvr_state::machine_reset()
 {
 }
 
-void giclassic_state::giclassic(machine_config &config)
-{
+MACHINE_CONFIG_START(giclassic_state::giclassic)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(20'000'000) / 2); // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &giclassic_state::satellite_main);
-	m_maincpu->set_vblank_int("screen", FUNC(giclassic_state::giclassic_interrupt));
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000) / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
+	MCFG_DEVICE_PROGRAM_MAP(satellite_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", giclassic_state, giclassic_interrupt)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.62);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(600, 384);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(giclassic_state::screen_update_giclassic));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.62)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(600, 384)
+	MCFG_SCREEN_VISIBLE_AREA(0, 599, 0, 383)
+	MCFG_SCREEN_UPDATE_DRIVER(giclassic_state, screen_update_giclassic)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 256);
 	m_palette->enable_shadows();
@@ -318,22 +318,23 @@ void giclassic_state::giclassic(machine_config &config)
 	m_k056832->set_tile_callback(FUNC(giclassic_state::tile_callback), this);
 	m_k056832->set_config("gfx1", K056832_BPP_4PIRATESH, 1, 0);
 	m_k056832->set_palette(m_palette);
-}
+MACHINE_CONFIG_END
 
-void giclassicsvr_state::giclassvr(machine_config &config)
-{
+MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(16'000'000)); // unknown speed
-	m_maincpu->set_addrmap(AS_PROGRAM, &giclassicsvr_state::server_main);
-	m_maincpu->set_vblank_int("screen", FUNC(giclassicsvr_state::giclassicsvr_interrupt));
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // unknown speed
+	MCFG_DEVICE_PROGRAM_MAP(server_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", giclassicsvr_state, giclassicsvr_interrupt)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.62);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(giclassicsvr_state::screen_update_giclassicsvr));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.62)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(600, 384)
+	MCFG_SCREEN_VISIBLE_AREA(0, 599, 0, 383)
+	MCFG_SCREEN_UPDATE_DRIVER(giclassicsvr_state, screen_update_giclassicsvr)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 16384);
 	m_palette->enable_shadows();
@@ -350,7 +351,7 @@ void giclassicsvr_state::giclassvr(machine_config &config)
 
 	K053252(config, "k053252a", XTAL(32'000'000)/4).set_offsets(40, 16); // TODO
 	K053252(config, "k053252b", XTAL(32'000'000)/4).set_offsets(40, 16); // TODO
-}
+MACHINE_CONFIG_END
 
 ROM_START( giclasex )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* main program */

@@ -288,17 +288,17 @@ INTERRUPT_GEN_MEMBER(gameking_state::gameking_frame_int) // guess to get over bi
 
 MACHINE_CONFIG_START(gameking_state::gameking)
 	/* basic machine hardware */
-	R65C02(config, m_maincpu, 6000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gameking_state::gameking_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(gameking_state::gameking_frame_int));
+	MCFG_DEVICE_ADD("maincpu", R65C02, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(gameking_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gameking_state,  gameking_frame_int)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(60);
-	screen.set_size(48, 32);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(gameking_state::screen_update_gameking));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(48, 32)
+	MCFG_SCREEN_VISIBLE_AREA(0, 48-1, 0, 32-1)
+	MCFG_SCREEN_UPDATE_DRIVER(gameking_state, screen_update_gameking)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	PALETTE(config, m_palette, FUNC(gameking_state::gameking_palette), ARRAY_LENGTH(gameking_pens));
 
@@ -308,18 +308,16 @@ MACHINE_CONFIG_START(gameking_state::gameking)
 	MCFG_GENERIC_LOAD(gameking_state, gameking_cart)
 MACHINE_CONFIG_END
 
-void gameking_state::gameking1(machine_config &config)
-{
+MACHINE_CONFIG_START(gameking_state::gameking1)
 	gameking(config);
-	SOFTWARE_LIST(config, "cart_list").set_original("gameking");
-}
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
+MACHINE_CONFIG_END
 
-void gameking_state::gameking3(machine_config &config)
-{
+MACHINE_CONFIG_START(gameking_state::gameking3)
 	gameking(config);
-	SOFTWARE_LIST(config, "cart_list").set_original("gameking");
-	SOFTWARE_LIST(config, "cart_list_3").set_original("gameking3");
-}
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
+	MCFG_SOFTWARE_LIST_ADD("cart_list_3", "gameking3")
+MACHINE_CONFIG_END
 
 
 ROM_START(gameking)

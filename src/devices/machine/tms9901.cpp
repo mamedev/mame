@@ -53,16 +53,6 @@ Pins:
       (This is mostly obvious, but it implies that you cannot trigger an
       interrupt by setting the output state of a pin, which is not SO obvious.)
 
-Clock mode:
-    The "clock mode" is entered by setting bit 0 to 1. This means that the
-    clock register becomes accessible to changes and inspection. The clock
-    itself runs in the interrupt mode. Accordingly, the typical setup
-    involves first setting bit 0 to 1, then loading some or all of the
-    clock register bits, and then switching to interrupt mode again. From then
-    on, INT3 is asserted whenever the clock reaches 0, and is cleared by
-    writing 0 or 1 to bit 3. The clock can only be stopped by setting the
-    register to 0 or by a reset.
-
 Interrupt handling:
     After each clock cycle, TMS9901 latches the state of INT1*-INT15* (except
     pins which are set as output pins).  If the clock is enabled, it replaces
@@ -115,9 +105,6 @@ MZ: According to the description in
 
 MZ: Turned to class (January 2012)
 
-MZ: Added a synchronous clock input (Phi line) as an alternative to the
-    emu_timer.
-
 TODO: Tests on a real machine
 - Set an interrupt input (e.g. keyboard for Geneve), trigger RST2*, check whether
   interrupt mask has been reset
@@ -137,23 +124,24 @@ TODO: Tests on a real machine
 
 #include <math.h>
 
-#define LOG_GENERAL  (1U << 0)
-#define LOG_PINS     (1U << 1)
-#define LOG_CONFIG   (1U << 2)
-#define LOG_MODE     (1U << 3)
-#define LOG_INT      (1U << 4)
-#define LOG_DECVALUE (1U << 5)
+#define LOG_GENERAL (1U << 0)
+#define LOG_PINS    (1U << 1)
+#define LOG_CLOCK   (1U << 2)
+#define LOG_MODE    (1U << 3)
 
-#define VERBOSE ( 0 )
+//#define VERBOSE (LOG_PINS | LOG_CLOCK | LOG_MODE)
 #include "logmacro.h"
+
+#define LOGPINS(...)    LOGMASKED(LOG_PINS, __VA_ARGS__)
+#define LOGCLOCK(...)   LOGMASKED(LOG_CLOCK, __VA_ARGS__)
+#define LOGMODE(...)    LOGMASKED(LOG_MODE, __VA_ARGS__)
+
 
 /*
     Constructor
 */
 tms9901_device::tms9901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : device_t(mconfig, TMS9901, tag, owner, clock),
-	m_clock_active(false),
-	m_clockdiv(0),
 	m_read_block(*this),
 	m_write_p{{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this}},
 	m_interrupt(*this)
@@ -174,12 +162,12 @@ void tms9901_device::field_interrupts()
 		// if timer is enabled, INT3 pin is overridden by timer
 		if (m_timer_int_pending)
 		{
-			LOGMASKED(LOG_INT, "INT3 (timer) asserted\n");
+			LOGCLOCK("timer fires\n");
 			current_ints |= INT3;
 		}
 		else
 		{
-			LOGMASKED(LOG_INT, "INT3 (timer) cleared\n");
+			LOGCLOCK("timer clear\n");
 			current_ints &= ~INT3;
 		}
 	}
@@ -209,7 +197,6 @@ void tms9901_device::field_interrupts()
 			current_ints >>= 1; /* try next bit */
 			level++;
 		}
-		LOGMASKED(LOG_INT, "Triggering interrupt, level %d\n", level);
 		m_int_pending = true;
 		if (!m_interrupt.isnull())
 			m_interrupt(level, 1, 0xff);  // the offset carries the IC0-3 level
@@ -250,11 +237,11 @@ void tms9901_device::timer_reload()
 	if (m_clock_register != 0)
 	{   /* reset clock interval */
 		m_decrementer_value = m_clock_register;
-		m_clock_active = true;
+		m_decrementer->enable(true);
 	}
 	else
 	{   /* clock interval == 0 -> no timer */
-		m_clock_active = false;
+		m_decrementer->enable(false);
 	}
 }
 
@@ -275,13 +262,13 @@ void tms9901_device::timer_reload()
 
     bit 16-31: current status of the P0-P15 pins (quits timer mode, too...)
 */
-uint8_t tms9901_device::read(offs_t offset)
+READ8_MEMBER( tms9901_device::read )
 {
 	int answer = 0;
 
-	offset &= 0x01f;
+	offset &= 0x003;
 
-	switch (offset >> 3)
+	switch (offset)
 	{
 	case 0:
 		if (m_clock_mode)
@@ -304,7 +291,7 @@ uint8_t tms9901_device::read(offs_t offset)
 			// Set those bits here
 			answer |= (m_pio_output_mirror & m_pio_direction_mirror) & 0xFF;
 		}
-		LOGMASKED(LOG_PINS, "Input on lines INT7..CB = %02x\n", answer);
+		LOGPINS("input on lines INT7..CB = %02x\n", answer);
 		break;
 	case 1:
 		if (m_clock_mode)
@@ -324,7 +311,7 @@ uint8_t tms9901_device::read(offs_t offset)
 			answer &= ~(m_pio_direction_mirror >> 8);
 			answer |= (m_pio_output_mirror & m_pio_direction_mirror) >> 8;
 		}
-		LOGMASKED(LOG_PINS, "Input on lines INT15..INT8 = %02x\n", answer);
+		LOGPINS("input on lines INT15..INT8 = %02x\n", answer);
 		break;
 	case 2:
 		/* exit timer mode */
@@ -338,7 +325,7 @@ uint8_t tms9901_device::read(offs_t offset)
 
 		answer &= ~m_pio_direction;
 		answer |= (m_pio_output & m_pio_direction) & 0xFF;
-		LOGMASKED(LOG_PINS, "Input on lines P7..P0 = %02x\n", answer);
+		LOGPINS("input on lines P7..P0 = %02x\n", answer);
 
 		break;
 	case 3:
@@ -351,12 +338,12 @@ uint8_t tms9901_device::read(offs_t offset)
 
 		answer &= ~(m_pio_direction >> 8);
 		answer |= (m_pio_output & m_pio_direction) >> 8;
-		LOGMASKED(LOG_PINS, "Input on lines P15..P8 = %02x\n", answer);
+		LOGPINS("input on lines P15..P8 = %02x\n", answer);
 
 		break;
 	}
 
-	return BIT(answer, offset & 7);
+	return answer;
 }
 
 /*
@@ -372,7 +359,7 @@ uint8_t tms9901_device::read(offs_t offset)
 
     bit 16-31: set output state of P0-P15 (and set them as output pin) (quit timer mode, too...)
 */
-void tms9901_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER ( tms9901_device::write )
 {
 	data &= 1;  /* clear extra bits */
 	offset &= 0x01F;
@@ -380,7 +367,7 @@ void tms9901_device::write(offs_t offset, uint8_t data)
 	if (offset >= 0x10)
 	{
 		int pin = offset & 0x0F;
-		LOGMASKED(LOG_PINS, "Output on P%d = %d\n", pin, data);
+		LOGPINS("output on P%d = %d\n", pin, data);
 
 		int bit = (1 << pin);
 
@@ -421,20 +408,18 @@ void tms9901_device::write(offs_t offset, uint8_t data)
 		{
 			// Switch to interrupt mode; quit clock mode
 			m_clock_mode = false;
-			LOGMASKED(LOG_MODE, "Enter interrupt mode\n");
+			LOGMODE("int mode\n");
 		}
 		else
 		{
 			m_clock_mode = true;
-			LOGMASKED(LOG_MODE, "Enter clock mode\n");
+			LOGMODE("clock mode\n");
 			// we are switching to clock mode: latch the current value of
 			// the decrementer register
 			if (m_clock_register != 0)
 				m_clock_read_register = m_decrementer_value;
 			else
 				m_clock_read_register = 0;      /* timer inactive... */
-
-			LOGMASKED(LOG_CONFIG, "Clock setting = %d\n", m_clock_read_register);
 		}
 	}
 	else if (offset == 0x0f)
@@ -452,7 +437,7 @@ void tms9901_device::write(offs_t offset, uint8_t data)
 				// Spec is not clear on whether the mask bits are also reset by RST2*
 				// TODO: Check on a real machine. (I'd guess from the text they are not touched)
 				m_enabled_ints = 0;
-				LOGMASKED(LOG_MODE, "Soft reset (RST2*)\n");
+				LOGMODE("Soft reset (RST2*)\n");
 			}
 		}
 		else
@@ -462,7 +447,7 @@ void tms9901_device::write(offs_t offset, uint8_t data)
 			else
 				m_enabled_ints &= ~0x4000;      /* unset bit */
 
-			LOGMASKED(LOG_CONFIG, "Enabled interrupts = %04x\n", m_enabled_ints);
+			LOGMODE("interrupts = %04x\n", m_enabled_ints);
 			field_interrupts();     /* changed interrupt state */
 		}
 	}
@@ -484,7 +469,7 @@ void tms9901_device::write(offs_t offset, uint8_t data)
 				m_clock_register &= ~bit;      /* clear bit */
 
 			/* reset clock timer (page 8) */
-			LOGMASKED(LOG_CONFIG, "Clock register = %04x\n", m_clock_register);
+			LOGCLOCK("clock register = %04x\n", m_clock_register);
 			timer_reload();
 		}
 		else
@@ -499,7 +484,7 @@ void tms9901_device::write(offs_t offset, uint8_t data)
 			if (offset == 3)
 				m_timer_int_pending = false;    /* SBO 3 clears pending timer interrupt (??) */
 
-			LOGMASKED(LOG_CONFIG, "Enabled interrupts = %04x\n", m_enabled_ints);
+			LOGMODE("enabled interrupts = %04x\n");
 			field_interrupts();     /* changed interrupt state */
 		}
 	}
@@ -515,40 +500,15 @@ void tms9901_device::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	if (id==DECREMENTER) // we have only that one
 	{
-		clock_in(ASSERT_LINE);
-		clock_in(CLEAR_LINE);
-	}
-}
-
-void tms9901_device::clock_in(line_state clk)
-{
-	if (m_clock_active && clk == ASSERT_LINE)
-	{
 		m_decrementer_value--;
-		LOGMASKED(LOG_DECVALUE, "Decrementer = %d\n", m_decrementer_value);
+		LOGCLOCK("decrementer = %d\n", m_decrementer_value);
 		if (m_decrementer_value<=0)
 		{
-			LOGMASKED(LOG_INT, "Timer expired\n");
 			m_timer_int_pending = true;         // decrementer interrupt requested
 			field_interrupts();
 			m_decrementer_value = m_clock_register;
 		}
 	}
-}
-
-/*
-    Synchronous clock input. This may be used for systems which have
-    a CLK line controlled by the CPU, like the TMS99xx systems.
-    In that case, clock is set to 0.
-*/
-WRITE_LINE_MEMBER( tms9901_device::phi_line )
-{
-	// Divider by 64
-	if (state==ASSERT_LINE)
-		m_clockdiv = (m_clockdiv+1) % 0x40;
-
-	if (m_clockdiv==0)
-		clock_in((line_state)state);
 }
 
 /*-------------------------------------------------
@@ -605,12 +565,9 @@ void tms9901_device::do_reset()
 
 void tms9901_device::device_start()
 {
-	// Allow for using asynchronous and synchronous clocks
-	if (clock() != 0)
-	{
-		m_decrementer = timer_alloc(DECREMENTER);
-		m_decrementer->adjust(attotime::from_hz(clock() / 64.), 0, attotime::from_hz(clock() / 64.));
-	}
+	m_decrementer = timer_alloc(DECREMENTER);
+	m_decrementer->adjust(attotime::from_hz(clock() / 64.), 0, attotime::from_hz(clock() / 64.));
+	m_decrementer->enable(false);
 
 	m_read_block.resolve();
 	for (auto &cb : m_write_p)

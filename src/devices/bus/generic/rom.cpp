@@ -61,7 +61,7 @@ generic_romram_plain_device::generic_romram_plain_device(const machine_config &m
  mapper specific handlers
  -------------------------------------------------*/
 
-uint8_t generic_rom_plain_device::read_rom(offs_t offset)
+READ8_MEMBER(generic_rom_plain_device::read_rom)
 {
 	if (offset < m_rom_size)
 		return m_rom[offset];
@@ -69,7 +69,7 @@ uint8_t generic_rom_plain_device::read_rom(offs_t offset)
 		return 0xff;
 }
 
-uint16_t generic_rom_plain_device::read16_rom(offs_t offset, uint16_t mem_mask)
+READ16_MEMBER(generic_rom_plain_device::read16_rom)
 {
 	uint16_t *ROM = (uint16_t *)m_rom;
 	if (offset < m_rom_size/2)
@@ -78,7 +78,7 @@ uint16_t generic_rom_plain_device::read16_rom(offs_t offset, uint16_t mem_mask)
 		return 0xffff;
 }
 
-uint32_t generic_rom_plain_device::read32_rom(offs_t offset, uint32_t mem_mask)
+READ32_MEMBER(generic_rom_plain_device::read32_rom)
 {
 	uint32_t *ROM = (uint32_t *)m_rom;
 	if (offset < m_rom_size/4)
@@ -88,25 +88,25 @@ uint32_t generic_rom_plain_device::read32_rom(offs_t offset, uint32_t mem_mask)
 }
 
 
-uint8_t generic_rom_linear_device::read_rom(offs_t offset)
+READ8_MEMBER(generic_rom_linear_device::read_rom)
 {
 	return m_rom[offset % m_rom_size];
 }
 
-uint16_t generic_rom_linear_device::read16_rom(offs_t offset, uint16_t mem_mask)
+READ16_MEMBER(generic_rom_linear_device::read16_rom)
 {
 	uint16_t *ROM = (uint16_t *)m_rom;
 	return ROM[offset % (m_rom_size/2)];
 }
 
-uint32_t generic_rom_linear_device::read32_rom(offs_t offset, uint32_t mem_mask)
+READ32_MEMBER(generic_rom_linear_device::read32_rom)
 {
 	uint32_t *ROM = (uint32_t *)m_rom;
 	return ROM[offset % (m_rom_size/4)];
 }
 
 
-uint8_t generic_romram_plain_device::read_ram(offs_t offset)
+READ8_MEMBER(generic_romram_plain_device::read_ram)
 {
 	if (offset < m_ram.size())
 		return m_ram[offset];
@@ -114,7 +114,7 @@ uint8_t generic_romram_plain_device::read_ram(offs_t offset)
 		return 0xff;
 }
 
-void generic_romram_plain_device::write_ram(offs_t offset, uint8_t data)
+WRITE8_MEMBER(generic_romram_plain_device::write_ram)
 {
 	if (offset < m_ram.size())
 		m_ram[offset] = data;

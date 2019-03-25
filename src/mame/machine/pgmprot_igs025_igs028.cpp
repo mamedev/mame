@@ -186,11 +186,11 @@ void pgm_028_025_state::igs025_to_igs028_callback( void )
 }
 
 
-void pgm_028_025_state::pgm_028_025_ol(machine_config &config)
-{
+MACHINE_CONFIG_START(pgm_028_025_state::pgm_028_025_ol)
 	pgmbase(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_028_025_state::olds_mem);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(olds_mem)
 
 	IGS025(config, m_igs025, 0);
 	m_igs025->set_external_cb(FUNC(pgm_028_025_state::igs025_to_igs028_callback), this);
@@ -198,7 +198,7 @@ void pgm_028_025_state::pgm_028_025_ol(machine_config &config)
 	IGS028(config, m_igs028, 0);
 
 	MCFG_MACHINE_RESET_OVERRIDE(pgm_028_025_state,olds)
-}
+MACHINE_CONFIG_END
 
 
 INPUT_PORTS_START( olds )

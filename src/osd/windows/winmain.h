@@ -312,7 +312,7 @@ protected:
 
 private:
 	virtual void osd_exit() override;
-	static void output_oslog(const char *buffer);
+	void output_oslog(const char *buffer);
 
 	windows_options &   m_options;
 

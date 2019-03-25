@@ -102,6 +102,22 @@
 
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_NASBUS_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, NASBUS, 0)
+
+#define MCFG_NASBUS_SLOT_ADD(_tag, _slot_intf, _def_slot) \
+	MCFG_DEVICE_ADD(_tag, NASBUS_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
+	downcast<nasbus_slot_device &>(*device).set_nasbus_slot(this, NASBUS_TAG);
+
+#define MCFG_NASBUS_RAM_DISABLE_HANDLER(_devcb) \
+	downcast<nasbus_device &>(*device).set_ram_disable_handler(DEVCB_##_devcb);
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -114,22 +130,18 @@ class nasbus_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	template <typename T>
-	nasbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: nasbus_slot_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
-	}
 	nasbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// inline configuration
+	void set_nasbus_slot(device_t *owner, const char *nasbus_tag) { m_owner = owner; m_nasbus_tag = nasbus_tag; }
 
 protected:
 	nasbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
+
+	// configuration
+	const char *m_nasbus_tag;
 };
 
 // device type definition
@@ -142,15 +154,15 @@ class nasbus_device : public device_t
 	friend class device_nasbus_card_interface;
 public:
 	// construction/destruction
-	nasbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	nasbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nasbus_device();
 
-	auto ram_disable() { return m_ram_disable_handler.bind(); }
+	template <class Object> devcb_base &set_ram_disable_handler(Object &&cb) { return m_ram_disable_handler.set_callback(std::forward<Object>(cb)); }
 
 	void add_card(device_nasbus_card_interface *card);
 
-	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program.set_tag(std::forward<T>(tag), spacenum); }
-	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io.set_tag(std::forward<T>(tag), spacenum); }
+	void set_program_space(address_space *program);
+	void set_io_space(address_space *io);
 
 	// from cards
 	DECLARE_WRITE_LINE_MEMBER( ram_disable_w );
@@ -161,8 +173,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	required_address_space m_program;
-	required_address_space m_io;
+	address_space *m_program;
+	address_space *m_io;
 
 	simple_list<device_nasbus_card_interface> m_dev;
 

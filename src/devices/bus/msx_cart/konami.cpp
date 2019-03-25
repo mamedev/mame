@@ -35,12 +35,8 @@ msx_cart_konami_device::msx_cart_konami_device(const machine_config &mconfig, co
 void msx_cart_konami_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
-}
 
-
-void msx_cart_konami_device::device_post_load()
-{
-	restore_banks();
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_konami_device::restore_banks), this));
 }
 
 
@@ -88,13 +84,13 @@ void msx_cart_konami_device::initialize_cartridge()
 }
 
 
-uint8_t msx_cart_konami_device::read_cart(offs_t offset)
+READ8_MEMBER(msx_cart_konami_device::read_cart)
 {
 	return m_bank_base[offset >> 13][offset & 0x1fff];
 }
 
 
-void msx_cart_konami_device::write_cart(offs_t offset, uint8_t data)
+WRITE8_MEMBER(msx_cart_konami_device::write_cart)
 {
 	switch (offset & 0xe000)
 	{
@@ -145,24 +141,20 @@ msx_cart_konami_scc_device::msx_cart_konami_scc_device(const machine_config &mco
 }
 
 
-void msx_cart_konami_scc_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(msx_cart_konami_scc_device::device_add_mconfig)
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	SPEAKER(config, "mono").front_center();
-	K051649(config, m_k051649, XTAL(10'738'635)/3/2).add_route(ALL_OUTPUTS, "mono", 0.15);
-}
+	MCFG_DEVICE_ADD("k051649", K051649, XTAL(10'738'635)/3/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+MACHINE_CONFIG_END
 
 
 void msx_cart_konami_scc_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
 	save_item(NAME(m_scc_active));
-}
 
-
-void msx_cart_konami_scc_device::device_post_load()
-{
-	restore_banks();
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_konami_scc_device::restore_banks), this));
 }
 
 
@@ -211,7 +203,7 @@ void msx_cart_konami_scc_device::initialize_cartridge()
 }
 
 
-uint8_t msx_cart_konami_scc_device::read_cart(offs_t offset)
+READ8_MEMBER(msx_cart_konami_scc_device::read_cart)
 {
 	if ( m_scc_active && offset >= 0x9800 && offset < 0xa000 )
 	{
@@ -219,13 +211,13 @@ uint8_t msx_cart_konami_scc_device::read_cart(offs_t offset)
 		{
 			if ((offset & 0xff) >= 0xe0)
 			{
-				return m_k051649->k051649_test_r();
+				return m_k051649->k051649_test_r(space, offset & 0xff);
 			}
 			return 0xff;
 		}
 		else
 		{
-			return m_k051649->k051649_waveform_r(offset & 0x7f);
+			return m_k051649->k051649_waveform_r(space, offset & 0x7f);
 		}
 	}
 
@@ -233,7 +225,7 @@ uint8_t msx_cart_konami_scc_device::read_cart(offs_t offset)
 }
 
 
-void msx_cart_konami_scc_device::write_cart(offs_t offset, uint8_t data)
+WRITE8_MEMBER(msx_cart_konami_scc_device::write_cart)
 {
 	switch (offset & 0xf800)
 	{
@@ -263,27 +255,27 @@ void msx_cart_konami_scc_device::write_cart(offs_t offset, uint8_t data)
 
 				if (offset < 0x80)
 				{
-					m_k051649->k051649_waveform_w(offset, data);
+					m_k051649->k051649_waveform_w(space, offset, data);
 				}
 				else if (offset < 0xa0)
 				{
 					offset &= 0x0f;
 					if (offset < 0x0a)
 					{
-						m_k051649->k051649_frequency_w(offset, data);
+						m_k051649->k051649_frequency_w(space, offset, data);
 					}
 					else if (offset < 0x0f)
 					{
-						m_k051649->k051649_volume_w(offset - 0xa, data);
+						m_k051649->k051649_volume_w(space, offset - 0xa, data);
 					}
 					else
 					{
-						m_k051649->k051649_keyonoff_w(data);
+						m_k051649->k051649_keyonoff_w(space, 0, data);
 					}
 				}
 				else if (offset >= 0xe0)
 				{
-					m_k051649->k051649_test_w(data);
+					m_k051649->k051649_test_w(space, offset, data);
 				}
 			}
 			break;
@@ -319,12 +311,8 @@ msx_cart_gamemaster2_device::msx_cart_gamemaster2_device(const machine_config &m
 void msx_cart_gamemaster2_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
-}
 
-
-void msx_cart_gamemaster2_device::device_post_load()
-{
-	restore_banks();
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_gamemaster2_device::restore_banks), this));
 }
 
 
@@ -409,7 +397,7 @@ void msx_cart_gamemaster2_device::initialize_cartridge()
 }
 
 
-uint8_t msx_cart_gamemaster2_device::read_cart(offs_t offset)
+READ8_MEMBER(msx_cart_gamemaster2_device::read_cart)
 {
 	uint8_t bank = offset >> 13;
 
@@ -443,7 +431,7 @@ uint8_t msx_cart_gamemaster2_device::read_cart(offs_t offset)
 }
 
 
-void msx_cart_gamemaster2_device::write_cart(offs_t offset, uint8_t data)
+WRITE8_MEMBER(msx_cart_gamemaster2_device::write_cart)
 {
 	switch (offset & 0xf000)
 	{
@@ -484,15 +472,13 @@ msx_cart_synthesizer_device::msx_cart_synthesizer_device(const machine_config &m
 }
 
 
-void msx_cart_synthesizer_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(msx_cart_synthesizer_device::device_add_mconfig)
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-}
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+MACHINE_CONFIG_END
 
 
 void msx_cart_synthesizer_device::device_start()
@@ -511,7 +497,7 @@ void msx_cart_synthesizer_device::initialize_cartridge()
 }
 
 
-uint8_t msx_cart_synthesizer_device::read_cart(offs_t offset)
+READ8_MEMBER(msx_cart_synthesizer_device::read_cart)
 {
 	if (offset >= 0x4000 && offset < 0xc000 )
 	{
@@ -521,7 +507,7 @@ uint8_t msx_cart_synthesizer_device::read_cart(offs_t offset)
 }
 
 
-void msx_cart_synthesizer_device::write_cart(offs_t offset, uint8_t data)
+WRITE8_MEMBER(msx_cart_synthesizer_device::write_cart)
 {
 	if ((offset & 0xc010) == 0x4000)
 	{
@@ -559,12 +545,12 @@ msx_cart_konami_sound_device::msx_cart_konami_sound_device(const machine_config 
 }
 
 
-void msx_cart_konami_sound_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(msx_cart_konami_sound_device::device_add_mconfig)
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	SPEAKER(config, "mono").front_center();
-	K051649(config, m_k052539, XTAL(10'738'635)/3/2).add_route(ALL_OUTPUTS, "mono", 0.15);
-}
+	MCFG_DEVICE_ADD("k052539", K051649, XTAL(10'738'635)/3/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+MACHINE_CONFIG_END
 
 
 void msx_cart_konami_sound_device::device_start()
@@ -573,12 +559,8 @@ void msx_cart_konami_sound_device::device_start()
 	save_item(NAME(m_scc_active));
 	save_item(NAME(m_sccplus_active));
 	save_item(NAME(m_ram_enabled));
-}
 
-
-void msx_cart_konami_sound_device::device_post_load()
-{
-	restore_banks();
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_konami_sound_device::restore_banks), this));
 }
 
 
@@ -636,14 +618,14 @@ void msx_cart_konami_sound_device::initialize_cartridge()
 }
 
 
-uint8_t msx_cart_konami_sound_device::read_cart(offs_t offset)
+READ8_MEMBER(msx_cart_konami_sound_device::read_cart)
 {
 	if ( m_scc_active && offset >= 0x9800 && offset < 0x9fe0 )
 	{
 		offset &= 0xff;
 		if (offset < 0x80)
 		{
-			return m_k052539->k051649_waveform_r(offset);
+			return m_k052539->k051649_waveform_r(space, offset);
 		}
 		if (offset < 0xa0)
 		{
@@ -651,11 +633,11 @@ uint8_t msx_cart_konami_sound_device::read_cart(offs_t offset)
 		}
 		if (offset < 0xc0)
 		{
-			return m_k052539->k051649_waveform_r(offset & 0x9f);
+			return m_k052539->k051649_waveform_r(space, offset & 0x9f);
 		}
 		if (offset < 0xe0)
 		{
-			return m_k052539->k051649_test_r();
+			return m_k052539->k051649_test_r(space, offset & 0xff);
 		}
 		return 0xff;
 	}
@@ -665,11 +647,11 @@ uint8_t msx_cart_konami_sound_device::read_cart(offs_t offset)
 
 		if (offset < 0xa0)
 		{
-			return m_k052539->k052539_waveform_r(offset);
+			return m_k052539->k052539_waveform_r(space, offset);
 		}
 		if (offset >= 0xc0 && offset < 0xe0)
 		{
-			return m_k052539->k051649_test_r();
+			return m_k052539->k051649_test_r(space, offset);
 		}
 		return 0xff;
 	}
@@ -684,7 +666,7 @@ uint8_t msx_cart_konami_sound_device::read_cart(offs_t offset)
 }
 
 
-void msx_cart_konami_sound_device::write_cart(offs_t offset, uint8_t data)
+WRITE8_MEMBER(msx_cart_konami_sound_device::write_cart)
 {
 	switch (offset & 0xe000)
 	{
@@ -732,27 +714,27 @@ void msx_cart_konami_sound_device::write_cart(offs_t offset, uint8_t data)
 
 						if (offset < 0x80)
 						{
-							m_k052539->k051649_waveform_w(offset, data);
+							m_k052539->k051649_waveform_w(space, offset, data);
 						}
 						else if (offset < 0xa0)
 						{
 							offset &= 0x0f;
 							if (offset < 0x0a)
 							{
-								m_k052539->k051649_frequency_w(offset, data);
+								m_k052539->k051649_frequency_w(space, offset, data);
 							}
 							else if (offset < 0x0f)
 							{
-								m_k052539->k051649_volume_w(offset - 0xa, data);
+								m_k052539->k051649_volume_w(space, offset - 0xa, data);
 							}
 							else
 							{
-								m_k052539->k051649_keyonoff_w(data);
+								m_k052539->k051649_keyonoff_w(space, 0, data);
 							}
 						}
 						else if (offset >= 0xe0)
 						{
-							m_k052539->k051649_test_w(data);
+							m_k052539->k051649_test_w(space, offset, data);
 						}
 					}
 					break;
@@ -795,27 +777,27 @@ void msx_cart_konami_sound_device::write_cart(offs_t offset, uint8_t data)
 							offset &= 0xff;
 							if (offset < 0xa0)
 							{
-								m_k052539->k052539_waveform_w(offset, data);
+								m_k052539->k052539_waveform_w(space, offset, data);
 							}
 							else if (offset < 0xc0)
 							{
 								offset &= 0x0f;
 								if (offset < 0x0a)
 								{
-									m_k052539->k051649_frequency_w(offset, data);
+									m_k052539->k051649_frequency_w(space, offset, data);
 								}
 								else if (offset < 0x0f)
 								{
-									m_k052539->k051649_volume_w(offset - 0x0a, data);
+									m_k052539->k051649_volume_w(space, offset - 0x0a, data);
 								}
 								else if (offset == 0x0f)
 								{
-									m_k052539->k051649_keyonoff_w(data);
+									m_k052539->k051649_keyonoff_w(space, 0, data);
 								}
 							}
 							else if (offset < 0xe0)
 							{
-								m_k052539->k051649_test_w(data);
+								m_k052539->k051649_test_w(space, offset, data);
 							}
 						}
 					}
@@ -890,22 +872,22 @@ void msx_cart_keyboard_master_device::vlm_map(address_map &map)
 }
 
 
-void msx_cart_keyboard_master_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(msx_cart_keyboard_master_device::device_add_mconfig)
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	SPEAKER(config, "mono").front_center();
-	VLM5030(config, m_vlm5030, XTAL(3'579'545));
-	m_vlm5030->add_route(ALL_OUTPUTS, "mono", 0.40);
-	m_vlm5030->set_addrmap(0, &msx_cart_keyboard_master_device::vlm_map);
-}
+	MCFG_DEVICE_ADD("vlm5030", VLM5030, XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
+MACHINE_CONFIG_END
 
 
 void msx_cart_keyboard_master_device::device_start()
 {
 	// Install IO read/write handlers
-	io_space().install_write_handler(0x00, 0x00, write8smo_delegate(FUNC(vlm5030_device::data_w), m_vlm5030.target()));
-	io_space().install_write_handler(0x20, 0x20, write8smo_delegate(FUNC(msx_cart_keyboard_master_device::io_20_w), this));
-	io_space().install_read_handler(0x00, 0x00, read8smo_delegate(FUNC(msx_cart_keyboard_master_device::io_00_r), this));
+	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
+	space.install_write_handler(0x00, 0x00, write8_delegate(FUNC(vlm5030_device::data_w), m_vlm5030.target()));
+	space.install_write_handler(0x20, 0x20, write8_delegate(FUNC(msx_cart_keyboard_master_device::io_20_w), this));
+	space.install_read_handler(0x00, 0x00, read8_delegate(FUNC(msx_cart_keyboard_master_device::io_00_r), this));
 }
 
 
@@ -918,7 +900,7 @@ void msx_cart_keyboard_master_device::initialize_cartridge()
 }
 
 
-uint8_t msx_cart_keyboard_master_device::read_cart(offs_t offset)
+READ8_MEMBER(msx_cart_keyboard_master_device::read_cart)
 {
 	if (offset >= 0x4000 && offset < 0x8000)
 	{
@@ -928,13 +910,13 @@ uint8_t msx_cart_keyboard_master_device::read_cart(offs_t offset)
 }
 
 
-uint8_t msx_cart_keyboard_master_device::read_vlm(offs_t offset)
+READ8_MEMBER(msx_cart_keyboard_master_device::read_vlm)
 {
 	return m_rom_vlm5030[offset];
 }
 
 
-void msx_cart_keyboard_master_device::io_20_w(uint8_t data)
+WRITE8_MEMBER(msx_cart_keyboard_master_device::io_20_w)
 {
 	m_vlm5030->rst((data & 0x01) ? 1 : 0);
 	m_vlm5030->vcu((data & 0x04) ? 1 : 0);
@@ -942,7 +924,7 @@ void msx_cart_keyboard_master_device::io_20_w(uint8_t data)
 }
 
 
-uint8_t msx_cart_keyboard_master_device::io_00_r()
+READ8_MEMBER(msx_cart_keyboard_master_device::io_00_r)
 {
 	return m_vlm5030->bsy() ? 0x10 : 0x00;
 }

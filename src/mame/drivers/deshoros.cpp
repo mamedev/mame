@@ -266,21 +266,21 @@ void destiny_state::machine_reset()
 	bank_select_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
-void destiny_state::destiny(machine_config &config)
-{
+MACHINE_CONFIG_START(destiny_state::destiny)
+
 	/* basic machine hardware */
-	M6809(config, m_maincpu, XTAL(4'000'000)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &destiny_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(destiny_state::irq0_line_hold), attotime::from_hz(50)); // timer irq controls update speed, frequency needs to be determined yet (2MHz through three 74LS390)
+	MCFG_DEVICE_ADD("maincpu", M6809, XTAL(4'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(destiny_state, irq0_line_hold, 50) // timer irq controls update speed, frequency needs to be determined yet (2MHz through three 74LS390)
 
 	/* video hardware (dummy) */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(6*16, 9*2);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(destiny_state::screen_update_destiny));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(6*16, 9*2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
+	MCFG_SCREEN_UPDATE_DRIVER(destiny_state, screen_update_destiny)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -288,7 +288,7 @@ void destiny_state::destiny(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 800); // TODO: determine exact frequency thru schematics
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+MACHINE_CONFIG_END
 
 
 

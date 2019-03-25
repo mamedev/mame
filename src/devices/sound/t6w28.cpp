@@ -39,7 +39,7 @@ Offset 0:
 
 #define STEP 0x10000
 
-void t6w28_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( t6w28_device::write )
 {
 	int n, r, c;
 

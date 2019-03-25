@@ -157,7 +157,7 @@ uint8_t pc_fdc_family_device::do_dir_r()
 
 WRITE8_MEMBER( pc_fdc_xt_device::dor_fifo_w)
 {
-	fdc->fifo_w(data);
+	fdc->fifo_w(space, 0, data, mem_mask);
 	dor_w(space, 0, data, mem_mask);
 }
 

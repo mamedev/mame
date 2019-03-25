@@ -459,22 +459,21 @@ GFXDECODE_END
 
 /* Sound Interfaces */
 
-void lvcards_state::lvcards(machine_config &config)
-{
+MACHINE_CONFIG_START(lvcards_state::lvcards)
 	// basic machine hardware
-	Z80(config, m_maincpu, 18432000/4); // unknown frequency, assume same as tehkanwc.cpp
-	m_maincpu->set_addrmap(AS_PROGRAM, &lvcards_state::lvcards_map);
-	m_maincpu->set_addrmap(AS_IO, &lvcards_state::lvcards_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(lvcards_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu",Z80, 18432000/4) // unknown frequency, assume same as tehkanwc.cpp
+	MCFG_DEVICE_PROGRAM_MAP(lvcards_map)
+	MCFG_DEVICE_IO_MAP(lvcards_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lvcards_state,  irq0_line_hold)
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(8*0, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(lvcards_state::screen_update_lvcards));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*0, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(lvcards_state, screen_update_lvcards)
+	MCFG_SCREEN_PALETTE("palette")
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_lvcards);
 	PALETTE(config, "palette", FUNC(lvcards_state::lvcards_palette), 256);
@@ -486,28 +485,28 @@ void lvcards_state::lvcards(machine_config &config)
 	aysnd.port_a_read_callback().set_ioport("DSW0");
 	aysnd.port_b_read_callback().set_ioport("DSW1");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+MACHINE_CONFIG_END
 
-void lvpoker_state::lvpoker(machine_config &config)
-{
+MACHINE_CONFIG_START(lvpoker_state::lvpoker)
 	lvcards(config);
 
 	// basic machine hardware
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-	m_maincpu->set_addrmap(AS_PROGRAM, &lvpoker_state::lvpoker_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(lvpoker_map)
+MACHINE_CONFIG_END
 
-void lvpoker_state::ponttehk(machine_config &config)
-{
+MACHINE_CONFIG_START(lvpoker_state::ponttehk)
 	lvcards(config);
 
 	// basic machine hardware
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-	m_maincpu->set_addrmap(AS_PROGRAM, &lvpoker_state::ponttehk_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ponttehk_map)
 
 	// video hardware
 	PALETTE(config.replace(), "palette", palette_device::RGB_444_PROMS, "proms", 256);
-}
+MACHINE_CONFIG_END
 
 ROM_START( lvpoker )
 	ROM_REGION( 0x10000, "maincpu", 0 )

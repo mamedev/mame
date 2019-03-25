@@ -12,14 +12,12 @@
 ***********************************************************************************************************************************/
 
 #include "emu.h"
-#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/com8116.h"
 #include "machine/er1400.h"
 #include "machine/i8214.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/input_merger.h"
 #include "video/tms9927.h"
 #include "screen.h"
 
@@ -37,7 +35,6 @@ public:
 		, m_usart(*this, "usart%u", 1)
 		, m_earom(*this, "earom")
 		, m_picu(*this, "picu")
-		, m_modem(*this, "modem")
 		, m_p_chargen(*this, "chargen")
 		, m_videoram(*this, "videoram")
 		, m_key_row(*this, "ROW%u", 0)
@@ -46,7 +43,7 @@ public:
 	void v100(machine_config &config);
 
 private:
-	u8 status_r();
+	DECLARE_READ8_MEMBER(earom_r);
 	DECLARE_WRITE8_MEMBER(port30_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(key_row_w);
@@ -54,7 +51,7 @@ private:
 	DECLARE_WRITE8_MEMBER(picu_w);
 	template<int N> DECLARE_WRITE_LINE_MEMBER(picu_r_w);
 	IRQ_CALLBACK_MEMBER(irq_ack);
-	void ppi_porta_w(u8 data);
+	DECLARE_WRITE8_MEMBER(ppi_porta_w);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -69,18 +66,16 @@ private:
 	required_device_array<i8251_device, 2> m_usart;
 	required_device<er1400_device> m_earom;
 	required_device<i8214_device> m_picu;
-	required_device<rs232_port_device> m_modem;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_videoram;
 	optional_ioport_array<16> m_key_row;
 
 	u8 m_active_row;
-	bool m_video_enable;
 };
 
 u32 v100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_vtac->screen_reset() || !m_video_enable)
+	if (m_vtac->screen_reset())
 	{
 		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
@@ -150,22 +145,17 @@ void v100_state::machine_start()
 {
 	m_picu->inte_w(1);
 	m_picu->etlg_w(1);
+
+	m_usart[0]->write_cts(0);
 	m_usart[1]->write_cts(0);
 
 	m_active_row = 0;
-	m_video_enable = false;
 	save_item(NAME(m_active_row));
-	save_item(NAME(m_video_enable));
 }
 
-u8 v100_state::status_r()
+READ8_MEMBER(v100_state::earom_r)
 {
-	u8 status = 0xc0;
-	status |= m_earom->data_r();
-	status |= m_modem->dcd_r() << 1;
-	status |= m_modem->si_r() << 2; // SCCD (pin 12)
-	status |= m_modem->ri_r() << 3;
-	return status;
+	return m_earom->data_r();
 }
 
 WRITE8_MEMBER(v100_state::port30_w)
@@ -208,12 +198,10 @@ IRQ_CALLBACK_MEMBER(v100_state::irq_ack)
 	return (m_picu->a_r() << 1) | 0xf0;
 }
 
-void v100_state::ppi_porta_w(u8 data)
+WRITE8_MEMBER(v100_state::ppi_porta_w)
 {
 	m_vtac->set_clock_scale(BIT(data, 5) ? 0.5 : 1.0);
 	m_screen->set_clock_scale(BIT(data, 5) ? 0.5 : 1.0);
-
-	m_video_enable = !BIT(data, 7);
 
 	//logerror("Writing %02X to PPI port A\n", data);
 }
@@ -233,7 +221,7 @@ void v100_state::io_map(address_map &map)
 	map(0x12, 0x13).rw("usart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x14, 0x15).rw("usart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x16, 0x16).w("brg2", FUNC(com8116_device::stt_str_w));
-	map(0x20, 0x20).r(FUNC(v100_state::status_r));
+	map(0x20, 0x20).r(FUNC(v100_state::earom_r));
 	map(0x30, 0x30).w(FUNC(v100_state::port30_w));
 	map(0x40, 0x40).rw(FUNC(v100_state::keyboard_r), FUNC(v100_state::key_row_w));
 	map(0x48, 0x48).w(FUNC(v100_state::port48_w));
@@ -355,47 +343,36 @@ static INPUT_PORTS_START( v100 )
 INPUT_PORTS_END
 
 
-void v100_state::v100(machine_config &config)
-{
-	Z80(config, m_maincpu, 47.736_MHz_XTAL / 20); // 2.387 MHz PCLOCK
-	m_maincpu->set_addrmap(AS_PROGRAM, &v100_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &v100_state::io_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(v100_state::irq_ack));
+MACHINE_CONFIG_START(v100_state::v100)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(47'736'000) / 12) // divider not verified
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(v100_state, irq_ack)
 
-	I8251(config, m_usart[0], 47.736_MHz_XTAL / 20);
-	m_usart[0]->txd_handler().set(m_modem, FUNC(rs232_port_device::write_txd));
-	m_usart[0]->dtr_handler().set(m_modem, FUNC(rs232_port_device::write_dtr));
-	m_usart[0]->rts_handler().set(m_modem, FUNC(rs232_port_device::write_rts));
-	//m_usart[0]->rxrdy_handler().set(FUNC(v100_state::picu_r_w<4>)).invert();
+	I8251(config, m_usart[0], XTAL(47'736'000) / 12); // divider not verified
 
-	input_merger_device &acts(INPUT_MERGER_ALL_HIGH(config, "acts"));
-	acts.output_handler().set(m_usart[0], FUNC(i8251_device::write_cts));
-
-	com8116_device &brg1(COM8116_020(config, "brg1", 1.8432_MHz_XTAL));
+	com8116_device &brg1(COM8116(config, "brg1", 5068800)); // TODO: clock and divisors for this customized variant
 	brg1.fr_handler().set(m_usart[0], FUNC(i8251_device::write_rxc));
 	brg1.ft_handler().set(m_usart[0], FUNC(i8251_device::write_txc));
 
-	I8251(config, m_usart[1], 47.736_MHz_XTAL / 20);
-	m_usart[1]->txd_handler().set("aux", FUNC(rs232_port_device::write_txd));
-	m_usart[1]->dtr_handler().set("aux", FUNC(rs232_port_device::write_dtr));
-	//m_usart[1]->txrdy_handler().set(FUNC(v100_state::picu_r_w<2>)).invert();
+	I8251(config, m_usart[1], XTAL(47'736'000) / 12);
 
-	com8116_device &brg2(COM8116_020(config, "brg2", 1.8432_MHz_XTAL));
+	com8116_device &brg2(COM8116(config, "brg2", 5068800));
 	brg2.fr_handler().set(m_usart[1], FUNC(i8251_device::write_rxc));
 	brg2.ft_handler().set(m_usart[1], FUNC(i8251_device::write_txc));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	//m_screen->set_raw(47.736_MHz_XTAL / 2, 102 * V100_CH_WIDTH, 0, 80 * V100_CH_WIDTH, 260, 0, 240);
-	m_screen->set_raw(47.736_MHz_XTAL, 170 * V100_CH_WIDTH, 0, 132 * V100_CH_WIDTH, 312, 0, 240);
-	m_screen->set_screen_update(FUNC(v100_state::screen_update));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	//MCFG_SCREEN_RAW_PARAMS(XTAL(47'736'000) / 2, 102 * V100_CH_WIDTH, 0, 80 * V100_CH_WIDTH, 260, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(47'736'000), 170 * V100_CH_WIDTH, 0, 132 * V100_CH_WIDTH, 312, 0, 240)
+	MCFG_SCREEN_UPDATE_DRIVER(v100_state, screen_update)
 
-	CRT5037(config, m_vtac, 47.736_MHz_XTAL / V100_CH_WIDTH);
+	CRT5037(config, m_vtac, XTAL(47'736'000) / V100_CH_WIDTH);
 	m_vtac->set_char_width(V100_CH_WIDTH);
 	m_vtac->set_screen("screen");
 	m_vtac->hsyn_callback().set(FUNC(v100_state::picu_r_w<7>)).invert();
 	m_vtac->vsyn_callback().set(FUNC(v100_state::picu_r_w<6>)).invert();
 
-	I8214(config, m_picu, 47.736_MHz_XTAL / 20);
+	I8214(config, m_picu, XTAL(47'736'000) / 12);
 	m_picu->int_wr_callback().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
 	i8255_device &ppi(I8255(config, "ppi", 0));
@@ -405,20 +382,9 @@ void v100_state::v100(machine_config &config)
 	ppi.out_pb_callback().append(m_earom, FUNC(er1400_device::c1_w)).bit(4).invert();
 	ppi.out_pc_callback().set(m_earom, FUNC(er1400_device::data_w)).bit(6).invert();
 	ppi.out_pc_callback().append(m_earom, FUNC(er1400_device::clock_w)).bit(0).invert();
-	ppi.out_pc_callback().append(m_modem, FUNC(rs232_port_device::write_spds)).bit(4);
-	ppi.out_pc_callback().append("acts", FUNC(input_merger_device::in_w<1>)).bit(7);
 
 	ER1400(config, m_earom);
-
-	RS232_PORT(config, m_modem, default_rs232_devices, "loopback"); // EIA port
-	m_modem->rxd_handler().set(m_usart[0], FUNC(i8251_device::write_rxd));
-	m_modem->cts_handler().set("acts", FUNC(input_merger_device::in_w<0>));
-	m_modem->dcd_handler().set(m_usart[0], FUNC(i8251_device::write_dsr));
-
-	rs232_port_device &aux(RS232_PORT(config, "aux", default_rs232_devices, nullptr)); // optional printer port
-	aux.rxd_handler().set(m_usart[1], FUNC(i8251_device::write_rxd));
-	aux.dcd_handler().set(m_usart[1], FUNC(i8251_device::write_dsr)); // printer busy
-}
+MACHINE_CONFIG_END
 
 
 

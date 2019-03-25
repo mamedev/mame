@@ -103,13 +103,12 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-void seattle_comp_state::seattle(machine_config &config)
-{
+MACHINE_CONFIG_START(seattle_comp_state::seattle)
 	/* basic machine hardware */
-	I8086(config, m_maincpu, XTAL(24'000'000) / 3); // 8 MHz or 4 MHz selectable
-	m_maincpu->set_addrmap(AS_PROGRAM, &seattle_comp_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &seattle_comp_state::io_map);
-	m_maincpu->set_irq_acknowledge_callback("pic1", FUNC(pic8259_device::inta_cb));
+	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(24'000'000) / 3) // 8 MHz or 4 MHz selectable
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic1", pic8259_device, inta_cb)
 
 	PIC8259(config, m_pic[0], 0);
 	m_pic[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_INT0);
@@ -139,7 +138,7 @@ void seattle_comp_state::seattle(machine_config &config)
 	rs232.dsr_handler().set("uart", FUNC(i8251_device::write_dsr));
 	rs232.cts_handler().set("uart", FUNC(i8251_device::write_cts));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
-}
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( scp300f )

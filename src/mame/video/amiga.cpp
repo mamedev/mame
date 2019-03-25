@@ -1094,28 +1094,26 @@ void amiga_state::update_screenmode()
 //  MACHINE DRIVER FRAGMENTS
 //**************************************************************************
 
-void amiga_state::pal_video(machine_config &config)
-{
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw
+MACHINE_CONFIG_START(amiga_state::pal_video)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS
 	(
 		(amiga_state::CLK_28M_PAL / 4) * 2 * 2,
 		amiga_state::SCREEN_WIDTH, amiga_state::HBLANK, amiga_state::SCREEN_WIDTH,
 		amiga_state::SCREEN_HEIGHT_PAL, amiga_state::VBLANK_PAL, amiga_state::SCREEN_HEIGHT_PAL
-	);
-	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga));
-	m_screen->set_palette(m_palette);
-}
+	)
+	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga)
+	MCFG_SCREEN_PALETTE("palette")
+MACHINE_CONFIG_END
 
-void amiga_state::ntsc_video(machine_config &config)
-{
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw
+MACHINE_CONFIG_START(amiga_state::ntsc_video)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS
 	(
 		(amiga_state::CLK_28M_NTSC / 4) * 2 * 2,
 		amiga_state::SCREEN_WIDTH, amiga_state::HBLANK, amiga_state::SCREEN_WIDTH,
 		amiga_state::SCREEN_HEIGHT_NTSC, amiga_state::VBLANK_NTSC, amiga_state::SCREEN_HEIGHT_NTSC
-	);
-	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga));
-	m_screen->set_palette(m_palette);
-}
+	)
+	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga)
+	MCFG_SCREEN_PALETTE("palette")
+MACHINE_CONFIG_END

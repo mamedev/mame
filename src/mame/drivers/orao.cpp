@@ -171,20 +171,19 @@ static INPUT_PORTS_START( orao )
 INPUT_PORTS_END
 
 /* Machine driver */
-void orao_state::orao(machine_config &config)
-{
+MACHINE_CONFIG_START(orao_state::orao)
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &orao_state::orao_mem);
+	MCFG_DEVICE_ADD("maincpu", M6502, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(orao_mem)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(256, 256);
-	screen.set_visarea(0, 256-1, 0, 256-1);
-	screen.set_screen_update(FUNC(orao_state::screen_update_orao));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE_DRIVER(orao_state, screen_update_orao)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -194,13 +193,13 @@ void orao_state::orao(machine_config &config)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(orao_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
-	m_cassette->set_interface("orao_cass");
+	MCFG_CASSETTE_ADD( "cassette")
+	MCFG_CASSETTE_FORMATS(orao_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	MCFG_CASSETTE_INTERFACE("orao_cass")
 
-	SOFTWARE_LIST(config, "cass_list").set_original("orao");
-}
+	MCFG_SOFTWARE_LIST_ADD("cass_list","orao")
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( orao )

@@ -157,9 +157,4 @@ mc68340_serial_module_device::mc68340_serial_module_device(const machine_config 
 {
 }
 
-void mc68340_serial_module_device::module_reset()
-{
-	mc68340_duart_device::device_reset();
-}
-
 DEFINE_DEVICE_TYPE(MC68340_SERIAL_MODULE, mc68340_serial_module_device, "mc68340sermod", "MC68340 Serial Module")

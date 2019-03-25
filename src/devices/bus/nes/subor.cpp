@@ -183,7 +183,7 @@ void nes_subor2_device::ppu_latch(offs_t offset)
     nt
 -------------------------------------------------*/
 
-uint8_t nes_subor2_device::nt_r(offs_t offset)
+READ8_MEMBER(nes_subor2_device::nt_r)
 {
 	int page = ((offset & 0xc00) >> 10);
 
@@ -234,7 +234,7 @@ void nes_subor2_device::update_banks()
     read
 -------------------------------------------------*/
 
-uint8_t nes_subor2_device::read_l(offs_t offset)
+READ8_MEMBER(nes_subor2_device::read_l)
 {
 	LOG_MMC("subor2 read_l, offset: %04x\n", offset);
 
@@ -242,14 +242,14 @@ uint8_t nes_subor2_device::read_l(offs_t offset)
 	{
 		return 0x8F;
 	}
-	return get_open_bus();
+	return m_open_bus;
 }
 
 /*-------------------------------------------------
     write
 -------------------------------------------------*/
 
-void nes_subor0_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_subor0_device::write_h)
 {
 	uint8_t subor_helper1, subor_helper2;
 	LOG_MMC("subor0 write_h, offset: %04x, data: %02x\n", offset, data);
@@ -279,7 +279,7 @@ void nes_subor0_device::write_h(offs_t offset, uint8_t data)
 	prg16_cdef(subor_helper2);
 }
 
-void nes_subor1_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_subor1_device::write_h)
 {
 	uint8_t subor_helper1, subor_helper2;
 	LOG_MMC("subor1 write_h, offset: %04x, data: %02x\n", offset, data);
@@ -309,7 +309,7 @@ void nes_subor1_device::write_h(offs_t offset, uint8_t data)
 	prg16_cdef(subor_helper2);
 }
 
-void nes_subor2_device::write_l(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_subor2_device::write_l)
 {
 	LOG_MMC("subor2 write_l, offset: %04x, data: %02x\n", offset, data);
 

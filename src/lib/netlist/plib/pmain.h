@@ -10,21 +10,20 @@
 #ifndef PMAIN_H_
 #define PMAIN_H_
 
-#include "palloc.h"
 #include "poptions.h"
-#include "pstream.h"
 #include "pstring.h"
 #include "putil.h"
+#include "pstream.h"
 
-#include <cwchar>
 #include <memory>
+#include <cwchar>
 
 #ifdef _WIN32
 #define PMAIN(appclass) \
 extern "C" int wmain(int argc, wchar_t *argv[]) { return plib::app::mainrun<appclass, wchar_t>(argc, argv); }
 #else
 #define PMAIN(appclass) \
-int main(int argc, char **argv) { return plib::app::mainrun<appclass, char>(argc, argv); }
+int main(int argc, char *argv[]) { return plib::app::mainrun<appclass, char>(argc, argv); }
 #endif
 
 
@@ -37,10 +36,7 @@ namespace plib {
 	{
 	public:
 		app();
-
-		COPYASSIGNMOVE(app, delete)
-
-		virtual ~app() = default;
+		virtual ~app();
 
 		virtual pstring usage() = 0;
 		virtual int execute() = 0;
@@ -52,21 +48,21 @@ namespace plib {
 		plib::putf8_fmt_writer perr;
 
 		template <class C, typename T>
-		static int mainrun(int argc, T **argv)
+		static int mainrun(int argc, T *argv[])
 		{
-			auto a = plib::make_unique<C>();
+			auto a = std::unique_ptr<C>(new C);
 			return a->main_utfX(argc, argv);
 		}
 
 	private:
-		int main_utfX(int argc, char **argv);
+		int main_utfX(int argc, char *argv[]);
 #ifdef _WIN32
 		int main_utfX(int argc, wchar_t *argv[]);
 #endif
 
 	};
 
-} // namespace plib
+}
 
 
 

@@ -337,11 +337,10 @@ static void hk68_vme_cards(device_slot_interface &device)
 /*
  * Machine configuration
  */
-void hk68v10_state::hk68v10(machine_config &config)
-{
+MACHINE_CONFIG_START(hk68v10_state::hk68v10)
 	/* basic machine hardware */
-	M68010(config, m_maincpu, 10_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &hk68v10_state::hk68v10_mem);
+	MCFG_DEVICE_ADD("maincpu", M68010, 10_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP (hk68v10_mem)
 
 	Z8536(config, "cio", SCC_CLOCK);
 
@@ -355,9 +354,9 @@ void hk68v10_state::hk68v10(machine_config &config)
 	rs232trm.rxd_handler().set(m_sccterm, FUNC(scc8530_device::rxa_w));
 	rs232trm.cts_handler().set(m_sccterm, FUNC(scc8530_device::ctsa_w));
 
-	VME(config, "vme", 0);
-	VME_SLOT(config, "slot1", hk68_vme_cards, nullptr, 1, "vme");
-}
+	MCFG_VME_DEVICE_ADD("vme")
+	MCFG_VME_SLOT_ADD("vme", 1, hk68_vme_cards, nullptr)
+MACHINE_CONFIG_END
 
 /* ROM definitions */
 ROM_START (hk68v10)

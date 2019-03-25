@@ -820,25 +820,25 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void tubep_state::tubep(machine_config &config)
-{
+MACHINE_CONFIG_START(tubep_state::tubep)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 16000000 / 4);    /* 4 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &tubep_state::tubep_main_map);
-	m_maincpu->set_addrmap(AS_IO, &tubep_state::tubep_main_portmap);
+	MCFG_DEVICE_ADD("maincpu",Z80,16000000 / 4)    /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(tubep_main_map)
+	MCFG_DEVICE_IO_MAP(tubep_main_portmap)
 
-	Z80(config, m_slave, 16000000 / 4);     /* 4 MHz */
-	m_slave->set_addrmap(AS_PROGRAM, &tubep_state::tubep_second_map);
-	m_slave->set_addrmap(AS_IO, &tubep_state::tubep_second_portmap);
+	MCFG_DEVICE_ADD("slave",Z80,16000000 / 4)  /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(tubep_second_map)
+	MCFG_DEVICE_IO_MAP(tubep_second_portmap)
 
-	Z80(config, m_soundcpu, 19968000 / 8);  /* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
-	m_soundcpu->set_addrmap(AS_PROGRAM, &tubep_state::tubep_sound_map);
-	m_soundcpu->set_addrmap(AS_IO, &tubep_state::tubep_sound_portmap);
+	MCFG_DEVICE_ADD("soundcpu",Z80,19968000 / 8)   /* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
+	MCFG_DEVICE_PROGRAM_MAP(tubep_sound_map)
+	MCFG_DEVICE_IO_MAP(tubep_sound_portmap)
 
-	NSC8105(config, m_mcu, 6000000);        /* 6 MHz Xtal - divided internally ??? */
-	m_mcu->set_addrmap(AS_PROGRAM, &tubep_state::nsc_map);
+	MCFG_DEVICE_ADD("mcu",NSC8105,6000000) /* 6 MHz Xtal - divided internally ??? */
+	MCFG_DEVICE_PROGRAM_MAP(nsc_map)
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(tubep_state::coin1_counter_w));
@@ -852,12 +852,12 @@ void tubep_state::tubep(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(tubep_state,tubep)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(256, 264);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(tubep_state::screen_update_tubep));
-	m_screen->set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(256, 264)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(tubep_state, screen_update_tubep)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", FUNC(tubep_state::tubep_palette), 32 + 256*64);
 
@@ -878,37 +878,39 @@ void tubep_state::tubep(machine_config &config)
 	ay3.port_a_write_callback().set(FUNC(tubep_state::ay8910_portA_2_w));
 	ay3.port_b_write_callback().set(FUNC(tubep_state::ay8910_portB_2_w));
 	ay3.add_route(ALL_OUTPUTS, "mono", 0.10);
-}
+MACHINE_CONFIG_END
 
-void tubep_state::tubepb(machine_config &config)
-{
+
+MACHINE_CONFIG_START(tubep_state::tubepb)
 	tubep(config);
 
-	M6802(config.replace(), m_mcu, 6000000); /* ? MHz Xtal */
-	m_mcu->set_addrmap(AS_PROGRAM, &tubep_state::nsc_map);
+	MCFG_DEVICE_REPLACE("mcu", M6802,6000000) /* ? MHz Xtal */
+	MCFG_DEVICE_PROGRAM_MAP(nsc_map)
 
-	//m_screen->screen_vblank().set_inputline(m_mcu, INPUT_LINE_NMI);
-}
+	//MCFG_SCREEN_MODIFY("screen")
+	//MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", INPUT_LINE_NMI))
+MACHINE_CONFIG_END
 
-void tubep_state::rjammer(machine_config &config)
-{
+
+MACHINE_CONFIG_START(tubep_state::rjammer)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 16000000 / 4);   /* 4 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &tubep_state::rjammer_main_map);
-	m_maincpu->set_addrmap(AS_IO, &tubep_state::rjammer_main_portmap);
+	MCFG_DEVICE_ADD("maincpu",Z80,16000000 / 4)    /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(rjammer_main_map)
+	MCFG_DEVICE_IO_MAP(rjammer_main_portmap)
 
-	Z80(config, m_slave, 16000000 / 4);     /* 4 MHz */
-	m_slave->set_addrmap(AS_PROGRAM, &tubep_state::rjammer_second_map);
-	m_slave->set_addrmap(AS_IO, &tubep_state::rjammer_second_portmap);
+	MCFG_DEVICE_ADD("slave",Z80,16000000 / 4)  /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(rjammer_second_map)
+	MCFG_DEVICE_IO_MAP(rjammer_second_portmap)
 
-	Z80(config, m_soundcpu, 19968000 / 8);  /* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
-	m_soundcpu->set_addrmap(AS_PROGRAM, &tubep_state::rjammer_sound_map);
-	m_soundcpu->set_addrmap(AS_IO, &tubep_state::rjammer_sound_portmap);
+	MCFG_DEVICE_ADD("soundcpu",Z80,19968000 / 8)   /* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
+	MCFG_DEVICE_PROGRAM_MAP(rjammer_sound_map)
+	MCFG_DEVICE_IO_MAP(rjammer_sound_portmap)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	NSC8105(config, m_mcu, 6000000);    /* 6 MHz Xtal - divided internally ??? */
-	m_mcu->set_addrmap(AS_PROGRAM, &tubep_state::nsc_map);
+	MCFG_DEVICE_ADD("mcu",NSC8105,6000000) /* 6 MHz Xtal - divided internally ??? */
+	MCFG_DEVICE_PROGRAM_MAP(nsc_map)
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 3A
 	mainlatch.q_out_cb<0>().set(FUNC(tubep_state::coin1_counter_w));
@@ -918,13 +920,14 @@ void tubep_state::rjammer(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(tubep_state,rjammer)
 	MCFG_MACHINE_RESET_OVERRIDE(tubep_state,rjammer)
 
+
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(256, 264);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(tubep_state::screen_update_rjammer));
-	m_screen->set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(256, 264)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(tubep_state, screen_update_rjammer)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", FUNC(tubep_state::rjammer_palette), 64);
 
@@ -946,11 +949,12 @@ void tubep_state::rjammer(machine_config &config)
 	ay3.port_b_write_callback().set(FUNC(tubep_state::ay8910_portB_2_w));
 	ay3.add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(tubep_state::rjammer_adpcm_vck));     /* VCK function */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz (changes at run time) */
-	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tubep_state, rjammer_adpcm_vck))          /* VCK function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz (changes at run time) */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+MACHINE_CONFIG_END
 
 
 

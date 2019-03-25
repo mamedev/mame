@@ -1,10 +1,7 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
 
-<!-- luascript (demo for plugin -layout) -->
-<!-- this adds support for placing wall pieces by clicking between buttons -->
-
-<script>
+	<script>
 	local layout = {}
 	local walls = { { 7.5, {0, 10, 20, 30, 40, 50, 60, 70}},
 					{17.5, {0, 10, 20, 30, 40, 50, 60, 70}},
@@ -90,8 +87,7 @@
 		end
 	end
 	return layout, "mdndclab"
-</script>
-
+	</script>
 
 <!-- define elements -->
 
@@ -218,7 +214,6 @@
 		<rect state="1"><color red="0.55" green="0.1" blue="0.05" /></rect>
 	</element>
 
-
 <!-- build screen -->
 
 	<view name="Internal Layout">
@@ -300,8 +295,6 @@
 		<bezel element="hlr" inputtag="IN.5" inputmask="0x08"><bounds x="50" y="70" width="7.5" height="7.5" /></bezel>
 		<bezel element="hlr" inputtag="IN.6" inputmask="0x08"><bounds x="60" y="70" width="7.5" height="7.5" /></bezel>
 		<bezel element="hlr" inputtag="IN.7" inputmask="0x08"><bounds x="70" y="70" width="7.5" height="7.5" /></bezel>
-
-	<!-- wall pieces -->
 
 		<bezel name="colwall11" element="wall"><bounds x= "7.5" y= "0" width="2.5" height="7.5" /></bezel>
 		<bezel name="colwall12" element="wall"><bounds x= "7.5" y="10" width="2.5" height="7.5" /></bezel>
@@ -417,7 +410,7 @@
 		<bezel name="rowwall77" element="wall"><bounds x="60" y="67.5" width="7.5" height="2.5" /></bezel>
 		<bezel name="rowwall78" element="wall"><bounds x="70" y="67.5" width="7.5" height="2.5" /></bezel>
 
-	<!-- left side -->
+		<!-- left side -->
 
 		<bezel element="static_red"><bounds x="-12.5" y="0" width="7.5" height="7.5" /></bezel>
 		<bezel element="static_red"><bounds x="-12.5" y="10" width="7.5" height="7.5" /></bezel>

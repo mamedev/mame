@@ -21,7 +21,8 @@
 class sns_rom_sgb_device : public sns_rom_device
 {
 public:
-	void gb_timer_callback(uint8_t data);
+
+	virtual DECLARE_WRITE8_MEMBER(gb_timer_callback);
 
 protected:
 	// construction/destruction
@@ -32,21 +33,21 @@ protected:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual uint8_t read_l(offs_t offset) override;
-	virtual uint8_t read_h(offs_t offset) override;
-	virtual uint8_t chip_read(offs_t offset) override;
-	virtual void chip_write(offs_t offset, uint8_t data) override;
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_READ8_MEMBER(read_h) override;
+	virtual DECLARE_READ8_MEMBER(chip_read) override;
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
 
-	uint8_t gb_cart_r(offs_t offset);
-	void gb_bank_w(offs_t offset, uint8_t data);
-	uint8_t gb_ram_r(offs_t offset);
-	void gb_ram_w(offs_t offset, uint8_t data);
-	uint8_t gb_echo_r(offs_t offset);
-	void gb_echo_w(offs_t offset, uint8_t data);
-	uint8_t gb_io_r(offs_t offset);
-	void gb_io_w(offs_t offset, uint8_t data);
-	uint8_t gb_ie_r(offs_t offset);
-	void gb_ie_w(offs_t offset, uint8_t data);
+	virtual DECLARE_READ8_MEMBER(gb_cart_r);
+	virtual DECLARE_WRITE8_MEMBER(gb_bank_w);
+	virtual DECLARE_READ8_MEMBER(gb_ram_r);
+	virtual DECLARE_WRITE8_MEMBER(gb_ram_w);
+	virtual DECLARE_READ8_MEMBER(gb_echo_r);
+	virtual DECLARE_WRITE8_MEMBER(gb_echo_w);
+	virtual DECLARE_READ8_MEMBER(gb_io_r);
+	virtual DECLARE_WRITE8_MEMBER(gb_io_w);
+	virtual DECLARE_READ8_MEMBER(gb_ie_r);
+	virtual DECLARE_WRITE8_MEMBER(gb_ie_w);
 
 	void supergb_map(address_map &map);
 

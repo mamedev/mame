@@ -144,15 +144,14 @@ static INPUT_PORTS_START( elekscmp )
 	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-void elekscmp_state::elekscmp(machine_config &config)
-{
+MACHINE_CONFIG_START(elekscmp_state::elekscmp)
 	/* basic machine hardware */
-	INS8060(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &elekscmp_state::mem_map);
+	MCFG_DEVICE_ADD("maincpu",INS8060, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
 	config.set_default_layout(layout_elekscmp);
-}
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( elekscmp )

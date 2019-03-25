@@ -84,7 +84,7 @@ votrax_sc01_device::votrax_sc01_device(const machine_config &mconfig, const char
 {
 }
 
-void votrax_sc01_device::write(uint8_t data)
+WRITE8_MEMBER( votrax_sc01_device::write )
 {
 	// flush out anything currently processing
 	m_stream->update();
@@ -114,7 +114,7 @@ void votrax_sc01_device::write(uint8_t data)
 //  inflection bits
 //-------------------------------------------------
 
-void votrax_sc01_device::inflection_w(uint8_t data)
+WRITE8_MEMBER( votrax_sc01_device::inflection_w )
 {
 	// only 2 bits matter
 	data &= 3;

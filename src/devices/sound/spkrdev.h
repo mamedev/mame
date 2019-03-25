@@ -21,9 +21,9 @@ public:
 	~speaker_sound_device() {}
 
 	// configuration
-	void set_levels(int num_levels, const int16_t *levels) { m_num_levels = num_levels; m_levels = levels; }
+	void set_levels(int num_levels, const int16_t *levels) { m_num_levels = num_levels; m_levels = levels;}
 
-	void level_w(int new_level); // can use as writeline
+	void level_w(int new_level);
 
 protected:
 	// device-level overrides

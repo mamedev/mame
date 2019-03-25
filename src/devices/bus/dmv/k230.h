@@ -51,7 +51,8 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	optional_memory_region      m_rom;
-	required_device<dmvcart_slot_device> m_bus;
+	dmvcart_slot_device *       m_bus;
+	address_space *             m_io;
 	int                         m_switch16;
 	int                         m_hold;
 

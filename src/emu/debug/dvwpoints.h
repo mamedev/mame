@@ -43,7 +43,7 @@ private:
 
 
 	// internal state
-	bool (*m_sortType)(const device_debug::watchpoint *, const device_debug::watchpoint *);
+	int (*m_sortType)(void const *, void const *);
 	std::vector<device_debug::watchpoint *> m_buffer;
 };
 

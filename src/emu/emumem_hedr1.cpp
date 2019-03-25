@@ -4,23 +4,6 @@
 #include "emu.h"
 #include "emumem_hedr.ipp"
 
-template class handler_entry_read_dispatch< 9, 0,  1, ENDIANNESS_LITTLE>;
-template class handler_entry_read_dispatch< 9, 0,  1, ENDIANNESS_BIG>;
-template class handler_entry_read_dispatch<10, 0,  1, ENDIANNESS_LITTLE>;
-template class handler_entry_read_dispatch<10, 0,  1, ENDIANNESS_BIG>;
-template class handler_entry_read_dispatch<11, 0,  1, ENDIANNESS_LITTLE>;
-template class handler_entry_read_dispatch<11, 0,  1, ENDIANNESS_BIG>;
-template class handler_entry_read_dispatch<12, 0,  1, ENDIANNESS_LITTLE>;
-template class handler_entry_read_dispatch<12, 0,  1, ENDIANNESS_BIG>;
-template class handler_entry_read_dispatch<13, 0,  1, ENDIANNESS_LITTLE>;
-template class handler_entry_read_dispatch<13, 0,  1, ENDIANNESS_BIG>;
-template class handler_entry_read_dispatch<14, 0,  1, ENDIANNESS_LITTLE>;
-template class handler_entry_read_dispatch<14, 0,  1, ENDIANNESS_BIG>;
-template class handler_entry_read_dispatch<15, 0,  1, ENDIANNESS_LITTLE>;
-template class handler_entry_read_dispatch<15, 0,  1, ENDIANNESS_BIG>;
-template class handler_entry_read_dispatch<16, 0,  1, ENDIANNESS_LITTLE>;
-template class handler_entry_read_dispatch<16, 0,  1, ENDIANNESS_BIG>;
-
 template class handler_entry_read_dispatch< 9, 0,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_read_dispatch< 9, 0,  0, ENDIANNESS_BIG>;
 template class handler_entry_read_dispatch<10, 0,  0, ENDIANNESS_LITTLE>;

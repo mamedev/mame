@@ -35,8 +35,8 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
-	virtual uint8_t mreq_r(offs_t offset) override;
-	virtual uint8_t iorq_r(offs_t offset) override;
+	virtual DECLARE_READ8_MEMBER(mreq_r) override;
+	virtual DECLARE_READ8_MEMBER(port_fe_r) override;
 
 private:
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);

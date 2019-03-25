@@ -94,12 +94,11 @@ void msbc1_state::machine_reset()
 	m_maincpu->reset();
 }
 
-void msbc1_state::msbc1(machine_config &config)
-{
+MACHINE_CONFIG_START(msbc1_state::msbc1)
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(12'500'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &msbc1_state::msbc1_mem);
-}
+	MCFG_DEVICE_ADD(MC68000R12_TAG, M68000, XTAL(12'500'000))
+	MCFG_DEVICE_PROGRAM_MAP(msbc1_mem)
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( msbc1 )

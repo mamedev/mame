@@ -15,7 +15,6 @@
 #define VERBOSE 0
 
 #include "machine/apollo_kbd.h"
-#include "speaker.h"
 
 
 #define LOG(x)  { m_device->logerror ("%s apollo_kbd: ", m_device->cpu_context()); m_device->logerror x; m_device->logerror ("\n"); }
@@ -189,24 +188,11 @@ DEFINE_DEVICE_TYPE(APOLLO_KBD, apollo_kbd_device, "apollo_kbd", "Apollo Keyboard
 apollo_kbd_device::apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, APOLLO_KBD, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
-	, m_beep(*this, "beep")
 	, m_io_keyboard(*this, "keyboard%u", 1U)
 	, m_io_mouse(*this, "mouse%u", 1U)
 	, m_tx_w(*this)
 	, m_german_r(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_add_mconfig - add device-specific
-//  machine configuration
-//-------------------------------------------------
-
-void apollo_kbd_device::device_add_mconfig(machine_config &config)
-{
-	/* keyboard beeper */
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 1000).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 //-------------------------------------------------
@@ -314,7 +300,7 @@ void apollo_kbd_device::beeper::start(apollo_kbd_device *device)
 {
 	m_device = device;
 	LOG2(("start apollo_kbd::beeper"));
-	m_beeper = m_device->m_beep.target();
+	m_beeper = m_device->machine().device<beep_device>("beep");
 	m_timer = m_device->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apollo_kbd_device::beeper::beeper_callback), this));
 }
 
@@ -381,10 +367,15 @@ void apollo_kbd_device::mouse::read_mouse()
 	}
 	else
 	{
-		char b = m_device->m_io_mouse[0]->read();
-		char x = m_device->m_io_mouse[1]->read();
-		char y = m_device->m_io_mouse[2]->read();
+		int b = m_device->m_io_mouse[0]->read();
+		int x = m_device->m_io_mouse[1]->read();
+		int y = m_device->m_io_mouse[2]->read();
 
+		/* sign extend values < 0 */
+		if (x & 0x80)
+			x |= 0xffffff00;
+		if (y & 0x80)
+			y |= 0xffffff00;
 		y = -y;
 
 		if (m_last_b < 0)
@@ -431,9 +422,9 @@ void apollo_kbd_device::mouse::read_mouse()
 
 			// mouse data submitted; update current mouse state
 			m_last_b = b;
-			m_last_x = x;
-			m_last_y = y;
-			m_tx_pending = 50; // mouse data packet will take 40 ms
+			m_last_x += dx;
+			m_last_y += dy;
+			m_tx_pending = 100; // mouse data packet will take 40 ms
 		}
 	}
 }

@@ -96,9 +96,9 @@ namespace netlist
 			m_sub.m_IP.activate_hl();
 	}
 
-	NETLIB_FUNC_VOID(CD4020_sub, update_outputs, (const unsigned cnt))
+	inline NETLIB_FUNC_VOID(CD4020_sub, update_outputs, (const unsigned cnt))
 	{
-		static constexpr const std::array<netlist_time, 14> out_delayQn = {
+		/* static */ const netlist_time out_delayQn[14] = {
 				NLTIME_FROM_NS(180), NLTIME_FROM_NS(280),
 				NLTIME_FROM_NS(380), NLTIME_FROM_NS(480),
 				NLTIME_FROM_NS(580), NLTIME_FROM_NS(680),
@@ -113,8 +113,7 @@ namespace netlist
 			m_Q[i].push((cnt >> i) & 1, out_delayQn[i]);
 	}
 
-	NETLIB_DEVICE_IMPL(CD4020,         "CD4020", "")
-	NETLIB_DEVICE_IMPL_ALIAS(CD4020_WI, CD4020, "CD4020_WI", "+IP,+RESET,+VDD,+VSS")
+	NETLIB_DEVICE_IMPL(CD4020)
 
 	} //namespace devices
 } // namespace netlist

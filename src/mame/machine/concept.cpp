@@ -73,11 +73,6 @@ uint32_t concept_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-WRITE_LINE_MEMBER(concept_state::ioc_interrupt)
-{
-	concept_set_interrupt(IOCINT_level, state);
-}
-
 void concept_state::concept_set_interrupt(int level, int state)
 {
 	int interrupt_mask;
@@ -169,8 +164,11 @@ WRITE_LINE_MEMBER(concept_state::via_irq_func)
 	concept_set_interrupt(TIMINT_level, state);
 }
 
-READ8_MEMBER(concept_state::io_r)
+READ16_MEMBER(concept_state::concept_io_r)
 {
+	if (! ACCESSING_BITS_0_7)
+		return 0;
+
 	switch ((offset >> 8) & 7)
 	{
 	case 0:
@@ -218,13 +216,13 @@ READ8_MEMBER(concept_state::io_r)
 	case 5:
 		/* slot status */
 		LOG(("concept_io_r: Slot status read at address 0x03%4.4x\n", offset << 1));
-		return (~m_a2bus->get_a2bus_nmi_mask() & 0x0f) | (~m_a2bus->get_a2bus_irq_mask() & 0x0f) << 4;
+		break;
 
 	case 6:
 		/* calendar R/W */
 		VLOG(("concept_io_r: Calendar read at address 0x03%4.4x\n", offset << 1));
 		if (!m_clock_enable)
-			return m_mm58274->read(m_clock_address);
+			return m_mm58274->read(space, m_clock_address);
 		break;
 
 	case 7:
@@ -233,15 +231,15 @@ READ8_MEMBER(concept_state::io_r)
 		{
 		case 0:
 			/* NKBP keyboard */
-			return m_kbdacia->read(offset & 3);
+			return m_kbdacia->read(space, (offset & 3));
 
 		case 1:
 			/* NSR0 data comm port 0 */
-			return m_acia0->read(offset & 3);
+			return m_acia0->read(space, (offset & 3));
 
 		case 2:
 			/* NSR1 data comm port 1 */
-			return m_acia1->read(offset & 3);
+			return m_acia1->read(space, (offset & 3));
 
 		case 3:
 			/* NVIA versatile system interface */
@@ -277,8 +275,13 @@ READ8_MEMBER(concept_state::io_r)
 	return 0;
 }
 
-WRITE8_MEMBER(concept_state::io_w)
+WRITE16_MEMBER(concept_state::concept_io_w)
 {
+	if (! ACCESSING_BITS_0_7)
+		return;
+
+	data &= 0xff;
+
 	switch ((offset >> 8) & 7)
 	{
 	case 0:
@@ -330,7 +333,7 @@ WRITE8_MEMBER(concept_state::io_w)
 		/* calendar R/W */
 		LOG(("concept_io_w: Calendar written to at address 0x03%4.4x, data: 0x%4.4x\n", offset << 1, data));
 		if (!m_clock_enable)
-			m_mm58274->write(m_clock_address, data & 0xf);
+			m_mm58274->write(space, m_clock_address, data & 0xf);
 		break;
 
 	case 7:
@@ -339,17 +342,17 @@ WRITE8_MEMBER(concept_state::io_w)
 		{
 		case 0:
 			/* NKBP keyboard */
-			m_kbdacia->write(offset & 3, data);
+			m_kbdacia->write(space, (offset & 3), data);
 			break;
 
 		case 1:
 			/* NSR0 data comm port 0 */
-			m_acia0->write(offset & 3, data);
+			m_acia0->write(space, (offset & 3), data);
 			break;
 
 		case 2:
 			/* NSR1 data comm port 1 */
-			m_acia1->write(offset & 3, data);
+			m_acia1->write(space, (offset & 3), data);
 			break;
 
 		case 3:

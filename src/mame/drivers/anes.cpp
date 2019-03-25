@@ -156,29 +156,29 @@ void anes_state::machine_start()
 
 
 
-void anes_state::anes(machine_config &config)
-{
+MACHINE_CONFIG_START(anes_state::anes)
 	/* basic machine hardware */
-	z80_device &maincpu(Z80(config, "maincpu", XTAL(16'000'000) / 2)); // Z0840008PSC
-	maincpu.set_addrmap(AS_PROGRAM, &anes_state::prg_map);
-	maincpu.set_addrmap(AS_IO, &anes_state::io_map);
-	maincpu.set_vblank_int("screen", FUNC(anes_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 2) // Z0840008PSC
+	MCFG_DEVICE_PROGRAM_MAP(prg_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", anes_state, irq0_line_hold)
 
 	// all wrong
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(anes_state::screen_update));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(anes_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette").set_entries(0x100);
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	YM2413(config, "ym", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.30);
-}
+	MCFG_DEVICE_ADD("ym", YM2413, XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+MACHINE_CONFIG_END
 
 
 ROM_START( tonpuu )

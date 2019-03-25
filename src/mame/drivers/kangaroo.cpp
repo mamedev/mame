@@ -418,24 +418,24 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void kangaroo_state::nomcu(machine_config &config)
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &kangaroo_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(kangaroo_state::irq0_line_hold));
+MACHINE_CONFIG_START(kangaroo_state::nomcu)
 
-	z80_device &audiocpu(Z80(config, "audiocpu", MASTER_CLOCK/8));
-	audiocpu.set_addrmap(AS_PROGRAM, &kangaroo_state::sound_map);
-	audiocpu.set_addrmap(AS_IO, &kangaroo_state::sound_map); // yes, this is identical
-	audiocpu.set_vblank_int("screen", FUNC(kangaroo_state::irq0_line_hold));
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kangaroo_state,  irq0_line_hold)
+
+	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_map) // yes, this is identical
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kangaroo_state,  irq0_line_hold)
 
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
-	screen.set_raw(MASTER_CLOCK, 320*2, 0*2, 256*2, 260, 8, 248);
-	screen.set_screen_update(FUNC(kangaroo_state::screen_update_kangaroo));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 320*2, 0*2, 256*2, 260, 8, 248)
+	MCFG_SCREEN_UPDATE_DRIVER(kangaroo_state, screen_update_kangaroo)
 
 	PALETTE(config, m_palette, palette_device::BGR_3BIT);
 
@@ -445,17 +445,17 @@ void kangaroo_state::nomcu(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	AY8910(config, "aysnd", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+MACHINE_CONFIG_END
 
 
-void kangaroo_state::mcu(machine_config &config)
-{
+MACHINE_CONFIG_START(kangaroo_state::mcu)
 	nomcu(config);
 
 	MCFG_MACHINE_START_OVERRIDE(kangaroo_state,kangaroo_mcu)
 
-	MB8841(config, "mcu", MASTER_CLOCK/4/2).set_disable();
-}
+	MCFG_DEVICE_ADD("mcu", MB8841, MASTER_CLOCK/4/2)
+	MCFG_DEVICE_DISABLE()
+MACHINE_CONFIG_END
 
 
 

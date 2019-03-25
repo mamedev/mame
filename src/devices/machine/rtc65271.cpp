@@ -346,12 +346,12 @@ uint8_t rtc65271_device::read(int xramsel, offs_t offset)
 	return reply;
 }
 
-uint8_t rtc65271_device::rtc_r(offs_t offset)
+READ8_MEMBER( rtc65271_device::rtc_r )
 {
 	return read(0, offset );
 }
 
-uint8_t rtc65271_device::xram_r(offs_t offset)
+READ8_MEMBER( rtc65271_device::xram_r )
 {
 	return read(1, offset );
 }
@@ -436,12 +436,12 @@ void rtc65271_device::write(int xramsel, offs_t offset, uint8_t data)
 	}
 }
 
-void rtc65271_device::rtc_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( rtc65271_device::rtc_w )
 {
 	write(0, offset, data );
 }
 
-void rtc65271_device::xram_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( rtc65271_device::xram_w )
 {
 	write(1, offset, data );
 }

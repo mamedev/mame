@@ -846,12 +846,11 @@ void amaticmg_state::machine_reset()
 *          Machine Drivers          *
 ************************************/
 
-void amaticmg_state::amaticmg(machine_config &config)
-{
+MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, CPU_CLOCK);     /* WRONG! */
-	m_maincpu->set_addrmap(AS_PROGRAM, &amaticmg_state::amaticmg_map);
-	m_maincpu->set_addrmap(AS_IO, &amaticmg_state::amaticmg_portmap);
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)     /* WRONG! */
+	MCFG_DEVICE_PROGRAM_MAP(amaticmg_map)
+	MCFG_DEVICE_IO_MAP(amaticmg_portmap)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -867,13 +866,13 @@ void amaticmg_state::amaticmg(machine_config &config)
 	ppi1.out_pc_callback().set(FUNC(amaticmg_state::out_c_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(amaticmg_state::screen_update_amaticmg));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
 	crtc.set_screen("screen");
@@ -887,8 +886,9 @@ void amaticmg_state::amaticmg(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	YM3812(config, "ymsnd", SND_CLOCK).add_route(ALL_OUTPUTS, "speaker", 0.5); /* Y3014B DAC */
-}
+	MCFG_DEVICE_ADD("ymsnd", YM3812, SND_CLOCK) /* Y3014B DAC */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+MACHINE_CONFIG_END
 
 
 WRITE_LINE_MEMBER(amaticmg_state::amaticmg2_irq)
@@ -898,40 +898,42 @@ WRITE_LINE_MEMBER(amaticmg_state::amaticmg2_irq)
 }
 
 
-void amaticmg_state::amaticmg2(machine_config &config)
-{
+MACHINE_CONFIG_START(amaticmg_state::amaticmg2)
 	amaticmg(config);
 
-	m_maincpu->set_addrmap(AS_IO, &amaticmg_state::amaticmg2_portmap);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(amaticmg2_portmap)
 
 	I8255A(config, "ppi8255_2"); // MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
 
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(amaticmg_state::screen_update_amaticmg2));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
 
 	subdevice<mc6845_device>("crtc")->out_vsync_callback().set(FUNC(amaticmg_state::amaticmg2_irq));
 
-	m_gfxdecode->set_info(gfx_amaticmg2);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_amaticmg2)
 	m_palette->set_init(FUNC(amaticmg_state::amaticmg2_palette));
 	m_palette->set_entries(0x10000);
-}
+MACHINE_CONFIG_END
 
 
-void amaticmg_state::amaticmg4(machine_config &config)
-{
+MACHINE_CONFIG_START(amaticmg_state::amaticmg4)
 	amaticmg(config);
 
-	m_maincpu->set_addrmap(AS_IO, &amaticmg_state::amaticmg4_portmap);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(amaticmg4_portmap)
 
 	I8255A(config, "ppi8255_2"); // MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
 
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(amaticmg_state::screen_update_amaticmg2));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
 
 	subdevice<mc6845_device>("crtc")->out_vsync_callback().set(FUNC(amaticmg_state::amaticmg2_irq));
 
-	m_gfxdecode->set_info(gfx_amaticmg2);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_amaticmg2)
 	m_palette->set_init(FUNC(amaticmg_state::amaticmg2_palette));
 	m_palette->set_entries(0x10000);
-}
+MACHINE_CONFIG_END
 
 
 /************************************

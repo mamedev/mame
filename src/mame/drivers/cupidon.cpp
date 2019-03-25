@@ -103,25 +103,24 @@ static INPUT_PORTS_START(  cupidon )
 INPUT_PORTS_END
 
 
-void cupidon_state::cupidon(machine_config &config)
-{
+MACHINE_CONFIG_START(cupidon_state::cupidon)
 	M68340(config, m_maincpu, 16000000);    // The access to 3FF00 at the start would suggest this is a 68340 so probably 16 or 25 mhz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &cupidon_state::cupidon_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
-	screen.set_screen_update(FUNC(cupidon_state::screen_update_cupidon));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(cupidon_state, screen_update_cupidon)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette").set_entries(0x10000);
+	MCFG_PALETTE_ADD("palette", 0x10000)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound, probably DAC driven using 68340 DMA */
-}
+MACHINE_CONFIG_END
 
 
 

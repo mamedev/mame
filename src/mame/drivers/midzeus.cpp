@@ -187,13 +187,13 @@ WRITE32_MEMBER(midzeus_state::cmos_protect_w)
 
 READ32_MEMBER(midzeus2_state::zeus2_timekeeper_r)
 {
-	return m_m48t35->read(offset) | 0xffffff00;
+	return m_m48t35->read(space, offset, 0xff) | 0xffffff00;
 }
 
 WRITE32_MEMBER(midzeus2_state::zeus2_timekeeper_w)
 {
 	if (disk_asic_jr[2] && !cmos_protected)
-		m_m48t35->write(offset, data);
+		m_m48t35->write(space, offset, data, 0xff);
 	else
 		logerror("%s:zeus2_timekeeper_w with disk_asic_jr[2] = %d, cmos_protected = %d\n", machine().describe_context(), disk_asic_jr[2], cmos_protected);
 	cmos_protected = true;
@@ -1255,8 +1255,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void midzeus_state::midzeus(machine_config &config)
-{
+MACHINE_CONFIG_START(midzeus_state::midzeus)
+
 	/* basic machine hardware */
 	TMS32032(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midzeus_state::zeus_map);
@@ -1282,24 +1282,22 @@ void midzeus_state::midzeus(machine_config &config)
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
 	m_ioasic->set_yearoffs(94);
-}
+MACHINE_CONFIG_END
 
-void midzeus_state::mk4(machine_config &config)
-{
+MACHINE_CONFIG_START(midzeus_state::mk4)
 	midzeus(config);
 	m_ioasic->set_upper(461/* or 474 */);
 	m_ioasic->set_shuffle_default(1);
-}
+MACHINE_CONFIG_END
 
-void midzeus_state::invasn(machine_config &config)
-{
+MACHINE_CONFIG_START(midzeus_state::invasn)
 	midzeus(config);
 	PIC16C57(config, "pic", 8000000);  /* ? */
 	m_ioasic->set_upper(468/* or 488 */);
-}
+MACHINE_CONFIG_END
 
-void midzeus2_state::midzeus2(machine_config &config)
-{
+MACHINE_CONFIG_START(midzeus2_state::midzeus2)
+
 	/* basic machine hardware */
 	TMS32032(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midzeus2_state::zeus2_map);
@@ -1325,19 +1323,17 @@ void midzeus2_state::midzeus2(machine_config &config)
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
 	m_ioasic->set_yearoffs(99);
 	m_ioasic->set_upper(474);
-}
+MACHINE_CONFIG_END
 
-void midzeus2_state::crusnexo(machine_config &config)
-{
+MACHINE_CONFIG_START(midzeus2_state::crusnexo)
 	midzeus2(config);
 	m_ioasic->set_upper(472/* or 476,477,478,110 */);
-}
+MACHINE_CONFIG_END
 
-void midzeus2_state::thegrid(machine_config &config)
-{
+MACHINE_CONFIG_START(midzeus2_state::thegrid)
 	midzeus2(config);
 	m_ioasic->set_upper(474/* or 491 */);
-}
+MACHINE_CONFIG_END
 
 
 /*************************************

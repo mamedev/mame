@@ -338,7 +338,7 @@ void k054539_device::init_chip()
 	save_item(NAME(m_timer_state));
 }
 
-void k054539_device::write(offs_t offset, u8 data)
+WRITE8_MEMBER(k054539_device::write)
 {
 	if(0) {
 		int voice, reg;
@@ -476,7 +476,7 @@ void k054539_device::device_post_load()
 	cur_limit = rom_addr == 0x80 ? 0x4000 : 0x20000;
 }
 
-u8 k054539_device::read(offs_t offset)
+READ8_MEMBER(k054539_device::read)
 {
 	switch(offset) {
 	case 0x22d:

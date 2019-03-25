@@ -18,12 +18,8 @@ msx_cart_msxdos2_device::msx_cart_msxdos2_device(const machine_config &mconfig, 
 void msx_cart_msxdos2_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
-}
 
-
-void msx_cart_msxdos2_device::device_post_load()
-{
-	restore_banks();
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_msxdos2_device::restore_banks), this));
 }
 
 
@@ -50,7 +46,7 @@ void msx_cart_msxdos2_device::initialize_cartridge()
 }
 
 
-uint8_t msx_cart_msxdos2_device::read_cart(offs_t offset)
+READ8_MEMBER(msx_cart_msxdos2_device::read_cart)
 {
 	if (offset >= 0x4000 && offset < 0x8000)
 	{
@@ -61,7 +57,7 @@ uint8_t msx_cart_msxdos2_device::read_cart(offs_t offset)
 }
 
 
-void msx_cart_msxdos2_device::write_cart(offs_t offset, uint8_t data)
+WRITE8_MEMBER(msx_cart_msxdos2_device::write_cart)
 {
 	if (offset == 0x6000)
 	{

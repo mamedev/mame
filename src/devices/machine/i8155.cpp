@@ -406,7 +406,7 @@ void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 //  io_r - register read
 //-------------------------------------------------
 
-uint8_t i8155_device::io_r(offs_t offset)
+READ8_MEMBER( i8155_device::io_r )
 {
 	uint8_t data = 0;
 
@@ -539,7 +539,7 @@ void i8155_device::register_w(int offset, uint8_t data)
 //  io_w - register write
 //-------------------------------------------------
 
-void i8155_device::io_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( i8155_device::io_w )
 {
 	register_w(offset, data);
 }
@@ -549,7 +549,7 @@ void i8155_device::io_w(offs_t offset, uint8_t data)
 //  memory_r - internal RAM read
 //-------------------------------------------------
 
-uint8_t i8155_device::memory_r(offs_t offset)
+READ8_MEMBER( i8155_device::memory_r )
 {
 	return m_ram[offset & 0xff];
 }
@@ -559,7 +559,7 @@ uint8_t i8155_device::memory_r(offs_t offset)
 //  memory_w - internal RAM write
 //-------------------------------------------------
 
-void i8155_device::memory_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( i8155_device::memory_w )
 {
 	m_ram[offset & 0xff] = data;
 }
@@ -569,7 +569,7 @@ void i8155_device::memory_w(offs_t offset, uint8_t data)
 //  ale_w - address latch write
 //-------------------------------------------------
 
-void i8155_device::ale_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER( i8155_device::ale_w )
 {
 	// I/O / memory select
 	m_io_m = BIT(offset, 0);
@@ -580,21 +580,21 @@ void i8155_device::ale_w(offs_t offset, uint8_t data)
 
 
 //-------------------------------------------------
-//  data_r - memory or I/O read
+//  read - memory or I/O read
 //-------------------------------------------------
 
-uint8_t i8155_device::data_r()
+READ8_MEMBER( i8155_device::read )
 {
 	uint8_t data = 0;
 
 	switch (m_io_m)
 	{
 	case MEMORY:
-		data = memory_r(m_ad);
+		data = memory_r(space, m_ad);
 		break;
 
 	case IO:
-		data = io_r(m_ad);
+		data = io_r(space, m_ad);
 		break;
 	}
 
@@ -603,19 +603,19 @@ uint8_t i8155_device::data_r()
 
 
 //-------------------------------------------------
-//  data_w - memory or I/O write
+//  write - memory or I/O write
 //-------------------------------------------------
 
-void i8155_device::data_w(uint8_t data)
+WRITE8_MEMBER( i8155_device::write )
 {
 	switch (m_io_m)
 	{
 	case MEMORY:
-		memory_w(m_ad, data);
+		memory_w(space, m_ad, data);
 		break;
 
 	case IO:
-		io_w(m_ad, data);
+		io_w(space, m_ad, data);
 		break;
 	}
 }

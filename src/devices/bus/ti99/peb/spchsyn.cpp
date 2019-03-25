@@ -67,14 +67,14 @@ READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 		// lines by setting the address bus to a different value, but the
 		// Geneve may behave differently. This may not 100% reflect the real
 		// situation, but it ensures a safe processing.
-		m_vsp->combined_rsq_wsq_w(machine().dummy_space(), 0, ~0);
+		m_vsp->combined_rsq_wsq_w(space, 0, ~0);
 	}
 }
 
 /*
     Memory write
 */
-void ti_speech_synthesizer_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( ti_speech_synthesizer_device::write )
 {
 	if (machine().side_effects_disabled()) return;
 
@@ -92,6 +92,7 @@ SETADDRESS_DBIN_MEMBER( ti_speech_synthesizer_device::setaddress_dbin )
 	// 1001 00xx xxxx xxx0   DBIN=1
 	// 1001 01xx xxxx xxx0   DBIN=0
 	// 1111 1000 0000 0001    mask
+	m_space = &space;
 	m_reading = (state==ASSERT_LINE);
 
 	bool valid = (((offset & 0x0400)==0) == m_reading);
@@ -106,11 +107,11 @@ SETADDRESS_DBIN_MEMBER( ti_speech_synthesizer_device::setaddress_dbin )
 		// both RS* and WS* are active, which is illegal.
 		// Alternatively, we'll use the combined settings method
 
-		m_vsp->combined_rsq_wsq_w(machine().dummy_space(), 0, m_reading ? ~tms5220_device::RS : ~tms5220_device::WS);
+		m_vsp->combined_rsq_wsq_w(space, 0, m_reading ? ~tms5220_device::RS : ~tms5220_device::WS);
 	}
 	else
 		// If other address, turn off RS* and WS* (negative logic!)
-		m_vsp->combined_rsq_wsq_w(machine().dummy_space(), 0, ~0);
+		m_vsp->combined_rsq_wsq_w(space, 0, ~0);
 }
 
 /****************************************************************************/
@@ -125,11 +126,13 @@ WRITE_LINE_MEMBER( ti_speech_synthesizer_device::speech_ready )
 
 	if ((state==0) && !m_reading)
 		// Clear the lines only when we are done with writing.
-		m_vsp->combined_rsq_wsq_w(machine().dummy_space(), 0, ~0);
+		m_vsp->combined_rsq_wsq_w(*m_space, 0, ~0);
 }
 
 void ti_speech_synthesizer_device::device_start()
 {
+	// We don't need to save m_space because the calling method
+	// combined_rsq_wsq_w only needs the address space formally.
 	save_item(NAME(m_reading));
 	save_item(NAME(m_sbe));
 }

@@ -590,10 +590,9 @@ void midway_sounds_good_device::soundsgood_map(address_map &map)
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void midway_sounds_good_device::device_add_mconfig(machine_config &config)
-{
-	M68000(config, m_cpu, DERIVED_CLOCK(1, 2));
-	m_cpu->set_addrmap(AS_PROGRAM, &midway_sounds_good_device::soundsgood_map);
+MACHINE_CONFIG_START(midway_sounds_good_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("cpu", M68000, DERIVED_CLOCK(1, 2))
+	MCFG_DEVICE_PROGRAM_MAP(soundsgood_map)
 
 	PIA6821(config, m_pia, 0);
 	m_pia->writepa_handler().set(FUNC(midway_sounds_good_device::porta_w));
@@ -601,11 +600,10 @@ void midway_sounds_good_device::device_add_mconfig(machine_config &config)
 	m_pia->irqa_handler().set(FUNC(midway_sounds_good_device::irq_w));
 	m_pia->irqb_handler().set(FUNC(midway_sounds_good_device::irq_w));
 
-	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, *this, 1.0); /// ad7533jn.u10
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-}
+	MCFG_DEVICE_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 1.0) /// ad7533jn.u10
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -747,10 +745,9 @@ void midway_turbo_cheap_squeak_device::turbocs_map(address_map &map)
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void midway_turbo_cheap_squeak_device::device_add_mconfig(machine_config &config)
-{
-	MC6809E(config, m_cpu, DERIVED_CLOCK(1, 4));
-	m_cpu->set_addrmap(AS_PROGRAM, &midway_turbo_cheap_squeak_device::turbocs_map);
+MACHINE_CONFIG_START(midway_turbo_cheap_squeak_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("cpu", MC6809E, DERIVED_CLOCK(1, 4))
+	MCFG_DEVICE_PROGRAM_MAP(turbocs_map)
 
 	PIA6821(config, m_pia, 0);
 	m_pia->writepa_handler().set(FUNC(midway_turbo_cheap_squeak_device::porta_w));
@@ -758,11 +755,10 @@ void midway_turbo_cheap_squeak_device::device_add_mconfig(machine_config &config
 	m_pia->irqa_handler().set(FUNC(midway_turbo_cheap_squeak_device::irq_w));
 	m_pia->irqb_handler().set(FUNC(midway_turbo_cheap_squeak_device::irq_w));
 
-	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, *this, 1.0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-}
+	MCFG_DEVICE_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -953,10 +949,9 @@ void midway_squawk_n_talk_device::squawkntalk_alt_map(address_map &map)
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void midway_squawk_n_talk_device::device_add_mconfig(machine_config &config)
-{
-	M6802(config, m_cpu, DERIVED_CLOCK(1, 1));
-	m_cpu->set_addrmap(AS_PROGRAM, &midway_squawk_n_talk_device::squawkntalk_map);
+MACHINE_CONFIG_START(midway_squawk_n_talk_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("cpu", M6802, DERIVED_CLOCK(1, 1))
+	MCFG_DEVICE_PROGRAM_MAP(squawkntalk_map)
 
 	PIA6821(config, m_pia0, 0);
 	m_pia0->writepa_handler().set(FUNC(midway_squawk_n_talk_device::porta1_w));
@@ -970,11 +965,12 @@ void midway_squawk_n_talk_device::device_add_mconfig(machine_config &config)
 	m_pia1->irqb_handler().set(FUNC(midway_squawk_n_talk_device::irq_w));
 
 	// only used on Discs of Tron, which is stereo
-	TMS5200(config, m_tms5200, 640000).add_route(ALL_OUTPUTS, *this, 0.60);
+	MCFG_DEVICE_ADD("tms5200", TMS5200, 640000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.60)
 
 	// the board also supports an AY-8912 and/or an 8-bit DAC, neither of
 	// which are populated on the Discs of Tron board
-}
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------

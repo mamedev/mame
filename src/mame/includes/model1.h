@@ -512,7 +512,6 @@ private:
 	DECLARE_WRITE8_MEMBER(wingwar_outputs_w);
 	DECLARE_WRITE8_MEMBER(wingwar360_outputs_w);
 	DECLARE_WRITE8_MEMBER(netmerc_outputs_w);
-	DECLARE_WRITE8_MEMBER(drive_board_w);
 };
 
 

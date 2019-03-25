@@ -150,27 +150,24 @@ void acia6850_device::device_reset()
 	output_irq(1);
 }
 
-uint8_t acia6850_device::status_r()
+READ8_MEMBER( acia6850_device::status_r )
 {
 	uint8_t status = m_status;
 
-	if (!machine().side_effects_disabled())
+	if (status & SR_CTS)
 	{
-		if (status & SR_CTS)
-		{
-			status &= ~SR_TDRE;
-		}
+		status &= ~SR_TDRE;
+	}
 
-		if (m_dcd_irq_pending == DCD_IRQ_READ_STATUS)
-		{
-			m_dcd_irq_pending = DCD_IRQ_READ_DATA;
-		}
+	if (m_dcd_irq_pending == DCD_IRQ_READ_STATUS)
+	{
+		m_dcd_irq_pending = DCD_IRQ_READ_DATA;
 	}
 
 	return status;
 }
 
-void acia6850_device::control_w(uint8_t data)
+WRITE8_MEMBER( acia6850_device::control_w )
 {
 	LOG("MC6850 '%s' Control: %02x\n", tag(), data);
 
@@ -240,7 +237,7 @@ void acia6850_device::update_irq()
 	output_irq(calculate_txirq() && calculate_rxirq());
 }
 
-void acia6850_device::data_w(uint8_t data)
+WRITE8_MEMBER( acia6850_device::data_w )
 {
 	LOG("MC6850 '%s' Data: %02x\n", tag(), data);
 
@@ -257,43 +254,40 @@ void acia6850_device::data_w(uint8_t data)
 	update_irq();
 }
 
-uint8_t acia6850_device::data_r()
+READ8_MEMBER( acia6850_device::data_r )
 {
-	if (!machine().side_effects_disabled())
+	if (m_overrun_pending)
 	{
-		if (m_overrun_pending)
-		{
-			m_status |= SR_OVRN;
-			m_overrun_pending = false;
-		}
-		else
-		{
-			m_status &= ~SR_OVRN;
-			m_status &= ~SR_RDRF;
-		}
-
-		if (m_dcd_irq_pending == DCD_IRQ_READ_DATA)
-		{
-			m_dcd_irq_pending = DCD_IRQ_NONE;
-		}
-
-		update_irq();
+		m_status |= SR_OVRN;
+		m_overrun_pending = false;
 	}
+	else
+	{
+		m_status &= ~SR_OVRN;
+		m_status &= ~SR_RDRF;
+	}
+
+	if (m_dcd_irq_pending == DCD_IRQ_READ_DATA)
+	{
+		m_dcd_irq_pending = DCD_IRQ_NONE;
+	}
+
+	update_irq();
 
 	return m_rdr;
 }
 
-void acia6850_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( acia6850_device::write )
 {
 	if (BIT(offset, 0))
-		data_w(data);
+		data_w(space, 0, data);
 	else
-		control_w(data);
+		control_w(space, 0, data);
 }
 
-uint8_t acia6850_device::read(offs_t offset)
+READ8_MEMBER( acia6850_device::read )
 {
-	return BIT(offset, 0) ? data_r() : status_r();
+	return BIT(offset, 0) ? data_r(space, 0) : status_r(space, 0);
 }
 
 DECLARE_WRITE_LINE_MEMBER( acia6850_device::write_cts )

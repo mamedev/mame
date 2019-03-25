@@ -83,9 +83,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(atn_w);
 	DECLARE_WRITE_LINE_MEMBER(ren_w);
 
-	// Register access
-	void write(offs_t offset, uint8_t data);
-	uint8_t read(offs_t offset);
+	DECLARE_WRITE8_MEMBER(reg8_w);
+	DECLARE_READ8_MEMBER(reg8_r);
 
 	// CONT output: true when 9914 is current controller-in-charge
 	DECLARE_READ_LINE_MEMBER(cont_r);

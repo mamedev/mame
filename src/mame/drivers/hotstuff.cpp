@@ -88,11 +88,11 @@ void hotstuff_state::hotstuff_map(address_map &map)
 	map(0x600000, 0x600003).rw("scc1", FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w));
 	map(0x620000, 0x620003).rw("scc2", FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w));
 	map(0x680000, 0x680001).lrw8("rtc_rw",
-								 [this](offs_t offset) {
-									 return m_rtc->read(offset^1);
+								 [this](address_space &space, offs_t offset, u8 mem_mask) {
+									 return m_rtc->read(space, offset^1, mem_mask);
 								 },
-								 [this](offs_t offset, u8 data) {
-									 m_rtc->write(offset^1, data);
+								 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+									 m_rtc->write(space, offset^1, data, mem_mask);
 								 });
 
 	map(0x980000, 0x9bffff).ram().share("bitmapram");
@@ -101,19 +101,19 @@ void hotstuff_state::hotstuff_map(address_map &map)
 static INPUT_PORTS_START( hotstuff )
 INPUT_PORTS_END
 
-void hotstuff_state::hotstuff(machine_config &config)
-{
-	M68000(config, m_maincpu, 16000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &hotstuff_state::hotstuff_map);
+MACHINE_CONFIG_START(hotstuff_state::hotstuff)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(128*8, 64*8);
-	screen.set_visarea((0x10*4)+8, 101*8-1, 0*8, 33*8-1);
-	screen.set_screen_update(FUNC(hotstuff_state::screen_update_hotstuff));
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(hotstuff_map)
 
-	PALETTE(config, "palette").set_entries(0x200);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(128*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA((0x10*4)+8, 101*8-1, 0*8, 33*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(hotstuff_state, screen_update_hotstuff)
+
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 	scc8530_device& scc1(SCC8530N(config, "scc1", 4915200));
 	scc1.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_4);
@@ -123,7 +123,7 @@ void hotstuff_state::hotstuff(machine_config &config)
 
 	MC146818(config, m_rtc, XTAL(32'768));
 	m_rtc->irq().set_inputline("maincpu", M68K_IRQ_1);
-}
+MACHINE_CONFIG_END
 
 
 

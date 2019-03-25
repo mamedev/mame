@@ -75,7 +75,6 @@ public:
 	DECLARE_WRITE8_MEMBER(dac_w);
 	DECLARE_READ8_MEMBER(cosmica_pixel_clock_r);
 	DECLARE_READ8_MEMBER(cosmicg_port_0_r);
-	DECLARE_READ8_MEMBER(cosmicg_port_1_r);
 	DECLARE_READ8_MEMBER(magspot_coinage_dip_r);
 	DECLARE_READ8_MEMBER(nomnlnd_port_0_1_r);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);

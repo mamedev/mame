@@ -742,21 +742,20 @@ static GFXDECODE_START( gfx_ltcasino )
 GFXDECODE_END
 
 
-void ltcasino_state::ltcasino(machine_config &config)
-{
+MACHINE_CONFIG_START(ltcasino_state::ltcasino)
 	/* basic machine hardware */
-	M6502(config, m_maincpu, XTAL(18'432'000)/9); /* 2.048MHz ?? (or 18.432MHz/8 = 2.304MHz) - not verified */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ltcasino_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(ltcasino_state::irq0_line_hold));
+	MCFG_DEVICE_ADD(m_maincpu, M6502, XTAL(18'432'000)/9) /* 2.048MHz ?? (or 18.432MHz/8 = 2.304MHz) - not verified */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ltcasino_state,  irq0_line_hold)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(6*8, 58*8-1, 0, 32*8-1);
-	screen.set_screen_update(FUNC(ltcasino_state::screen_update));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(6*8, 58*8-1, 0, 32*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(ltcasino_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_ltcasino);
 	PALETTE(config, "palette", FUNC(ltcasino_state::ltcasino_palette), 2*64);
@@ -769,7 +768,7 @@ void ltcasino_state::ltcasino(machine_config &config)
 	aysnd.port_b_read_callback().set_ioport("IN6");
 	//ltcasino -> pc: F3F3 (A in service) and F3FD (B in service)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.4);
-}
+MACHINE_CONFIG_END
 
 
 ROM_START( ltcasino )

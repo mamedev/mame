@@ -170,6 +170,7 @@ private:
 	DECLARE_WRITE16_MEMBER(fashion_output_w);
 	DECLARE_WRITE16_MEMBER(tv_oki6376_w);
 	DECLARE_READ8_MEMBER(tv_oki6376_r);
+	DECLARE_WRITE16_MEMBER(tv_ncf_oki6376_w);
 	DECLARE_WRITE16_MEMBER(tv_ncf_oki6376_st_w);
 	DECLARE_READ8_MEMBER(nmi_clear_r);
 	DECLARE_WRITE8_MEMBER(nmi_clear_w);
@@ -298,7 +299,7 @@ WRITE16_MEMBER(highvdeo_state::tv_oki6376_w)
 	if (ACCESSING_BITS_0_7 && okidata != data)
 	{
 		okidata = data;
-		m_okim6376->write(data & ~0x80);
+		m_okim6376->write(space, 0, data & ~0x80);
 		m_okim6376->st_w(data & 0x80);
 	}
 }
@@ -379,6 +380,15 @@ READ16_MEMBER(highvdeo_state::tv_ncf_read1_r)
 	return (m_inputs[1]->read() & 0xbf) | resetpulse;
 }
 
+WRITE16_MEMBER(highvdeo_state::tv_ncf_oki6376_w)
+{
+	static int okidata;
+	if (ACCESSING_BITS_0_7 && okidata != data) {
+		okidata = data;
+		m_okim6376->write( space, 0, data );
+	}
+}
+
 WRITE16_MEMBER(highvdeo_state::tv_ncf_oki6376_st_w)
 {
 	if (ACCESSING_BITS_0_7)
@@ -398,7 +408,7 @@ void highvdeo_state::tv_ncf_map(address_map &map)
 void highvdeo_state::tv_ncf_io(address_map &map)
 {
 	map(0x0000, 0x0001).w(FUNC(highvdeo_state::write1_w)); // lamps
-	map(0x0008, 0x0008).w(m_okim6376, FUNC(okim6376_device::write));
+	map(0x0008, 0x0009).w(FUNC(highvdeo_state::tv_ncf_oki6376_w));
 	map(0x000a, 0x000b).w(FUNC(highvdeo_state::tv_ncf_oki6376_st_w));
 	map(0x000c, 0x000d).r(FUNC(highvdeo_state::read0_r));
 	map(0x0010, 0x0011).r(FUNC(highvdeo_state::tv_ncf_read1_r));
@@ -424,7 +434,7 @@ void highvdeo_state::nyjoker_io(address_map &map)
 	map(0x0002, 0x0003).nopw();            // alternate coin counter (bits 0 and 2)
 	map(0x0004, 0x0005).w(FUNC(highvdeo_state::nyj_write2_w)); // coin and note counter
 //  AM_RANGE(0x0006, 0x0007) AM_WRITENOP
-	map(0x0008, 0x0008).w(m_okim6376, FUNC(okim6376_device::write));
+	map(0x0008, 0x0009).w(FUNC(highvdeo_state::tv_ncf_oki6376_w));
 	map(0x000a, 0x000b).w(FUNC(highvdeo_state::tv_ncf_oki6376_st_w));
 	map(0x000c, 0x000d).portr("IN0");
 	map(0x000e, 0x000f).portr("DSW");
@@ -1219,21 +1229,20 @@ void highvdeo_state::ramdac_map(address_map &map)
 }
 
 
-void highvdeo_state::tv_vcf(machine_config &config)
-{
-	V30(config, m_maincpu, XTAL(12'000'000)/2); // ?
-	m_maincpu->set_addrmap(AS_PROGRAM, &highvdeo_state::tv_vcf_map);
-	m_maincpu->set_addrmap(AS_IO, &highvdeo_state::tv_vcf_io);
+MACHINE_CONFIG_START(highvdeo_state::tv_vcf)
+	MCFG_DEVICE_ADD("maincpu", V30, XTAL(12'000'000)/2 ) // ?
+	MCFG_DEVICE_PROGRAM_MAP(tv_vcf_map)
+	MCFG_DEVICE_IO_MAP(tv_vcf_io)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(400, 300);
-	screen.set_visarea(0, 320-1, 0, 200-1);
-	screen.set_screen_update(FUNC(highvdeo_state::screen_update_tourvisn));
-	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE_DRIVER(highvdeo_state, screen_update_tourvisn)
+	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", INPUT_LINE_NMI))
 
 	PALETTE(config, m_palette).set_entries(0x100);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
@@ -1243,141 +1252,144 @@ void highvdeo_state::tv_vcf(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	//OkiM6376
-	OKIM6376(config, m_okim6376, XTAL(12'000'000)/2/2/20).add_route(ALL_OUTPUTS, "mono", 1.0); //Guess, gives approx. same sample rate as previous emulation
-}
+	MCFG_DEVICE_ADD("oki", OKIM6376, XTAL(12'000'000)/2/2/20)//Guess, gives approx. same sample rate as previous emulation
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
-void highvdeo_state::tv_ncf(machine_config &config)
-{
+MACHINE_CONFIG_START(highvdeo_state::tv_ncf)
 	tv_vcf(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &highvdeo_state::tv_ncf_map);
-	m_maincpu->set_addrmap(AS_IO, &highvdeo_state::tv_ncf_io);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tv_ncf_map)
+	MCFG_DEVICE_IO_MAP(tv_ncf_io)
+MACHINE_CONFIG_END
 
-void highvdeo_state::nyjoker(machine_config &config)
-{
+MACHINE_CONFIG_START(highvdeo_state::nyjoker)
 	tv_vcf(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &highvdeo_state::nyjoker_map);
-	m_maincpu->set_addrmap(AS_IO, &highvdeo_state::nyjoker_io);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nyjoker_map)
+	MCFG_DEVICE_IO_MAP(nyjoker_io)
+MACHINE_CONFIG_END
 
-void highvdeo_state::tv_tcf(machine_config &config)
-{
+MACHINE_CONFIG_START(highvdeo_state::tv_tcf)
 	tv_vcf(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &highvdeo_state::tv_tcf_map);
-	m_maincpu->set_addrmap(AS_IO, &highvdeo_state::tv_tcf_io);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tv_tcf_map)
+	MCFG_DEVICE_IO_MAP(tv_tcf_io)
 
-	subdevice<screen_device>("screen")->set_visarea(0, 400-1, 0, 300-1);
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
 
 	m_palette->set_format(palette_device::RGB_565, 0x100);
-}
+MACHINE_CONFIG_END
 
-void highvdeo_state::newmcard(machine_config &config)
-{
+MACHINE_CONFIG_START(highvdeo_state::newmcard)
 	tv_tcf(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &highvdeo_state::newmcard_map);
-	m_maincpu->set_addrmap(AS_IO, &highvdeo_state::newmcard_io);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(newmcard_map)
+	MCFG_DEVICE_IO_MAP(newmcard_io)
 
-	subdevice<screen_device>("screen")->set_visarea(0, 320-1, 0, 200-1);
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+MACHINE_CONFIG_END
 
-void highvdeo_state::record(machine_config &config)
-{
+MACHINE_CONFIG_START(highvdeo_state::record)
 	newmcard(config);
 
-	m_maincpu->set_addrmap(AS_IO, &highvdeo_state::record_io);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(record_io)
+MACHINE_CONFIG_END
 
-void highvdeo_state::ciclone(machine_config &config)
-{
+MACHINE_CONFIG_START(highvdeo_state::ciclone)
 	tv_tcf(config);
 
-	I80186(config.replace(), m_maincpu, 20000000);    // ?
-	m_maincpu->set_addrmap(AS_PROGRAM, &highvdeo_state::tv_tcf_map);
-	m_maincpu->set_addrmap(AS_IO, &highvdeo_state::ciclone_io);
-}
+	MCFG_DEVICE_REMOVE("maincpu")
 
-void highvdeo_state::brasil(machine_config &config)
-{
-	I80186(config, m_maincpu, 20000000);  // fashion doesn't like 20/2 Mhz
-	m_maincpu->set_addrmap(AS_PROGRAM, &highvdeo_state::brasil_map);
-	m_maincpu->set_addrmap(AS_IO, &highvdeo_state::brasil_io);
+	MCFG_DEVICE_ADD("maincpu", I80186, 20000000 )    // ?
+	MCFG_DEVICE_PROGRAM_MAP(tv_tcf_map)
+	MCFG_DEVICE_IO_MAP(ciclone_io)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(highvdeo_state::brasil)
+	MCFG_DEVICE_ADD("maincpu", I80186, 20000000 )  // fashion doesn't like 20/2 Mhz
+	MCFG_DEVICE_PROGRAM_MAP(brasil_map)
+	MCFG_DEVICE_IO_MAP(brasil_io)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(400, 300);
-	screen.set_visarea(0, 400-1, 0, 300-1);
-	screen.set_screen_update(FUNC(highvdeo_state::screen_update_brasil));
-	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
+	MCFG_SCREEN_UPDATE_DRIVER(highvdeo_state, screen_update_brasil)
+	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", INPUT_LINE_NMI))
 
 	PALETTE(config, m_palette, palette_device::RGB_565);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6376(config, m_okim6376, XTAL(12'000'000)/2/2/20).add_route(ALL_OUTPUTS, "mono", 1.0); //Guess, gives same sample rate as previous emulation
-}
+	MCFG_DEVICE_ADD("oki", OKIM6376, XTAL(12'000'000)/2/2/20)//Guess, gives same sample rate as previous emulation
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
-void highvdeo_state::fashion(machine_config &config)
-{
+MACHINE_CONFIG_START(highvdeo_state::fashion)
 	brasil(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(fashion_io)
+MACHINE_CONFIG_END
 
-	m_maincpu->set_addrmap(AS_IO, &highvdeo_state::fashion_io);
-}
-
-void highvdeo_state::grancapi(machine_config &config)
-{
-	I80186(config, m_maincpu, 20000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &highvdeo_state::brasil_map);
-	m_maincpu->set_addrmap(AS_IO, &highvdeo_state::grancapi_io);
+MACHINE_CONFIG_START(highvdeo_state::grancapi)
+	MCFG_DEVICE_ADD("maincpu", I80186, 20000000 )
+	MCFG_DEVICE_PROGRAM_MAP(brasil_map)
+	MCFG_DEVICE_IO_MAP(grancapi_io)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(400, 300);
-	screen.set_visarea(0, 400-1, 0, 300-1);
-	screen.set_screen_update(FUNC(highvdeo_state::screen_update_brasil));
-	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
+	MCFG_SCREEN_UPDATE_DRIVER(highvdeo_state, screen_update_brasil)
+	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", INPUT_LINE_NMI))
 
 	PALETTE(config, m_palette, palette_device::RGB_565);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6376(config, m_okim6376, XTAL(12'000'000)/2/2/20).add_route(ALL_OUTPUTS, "mono", 1.0); //Guess, gives same sample rate as previous emulation
-}
+	MCFG_DEVICE_ADD("oki", OKIM6376, XTAL(12'000'000)/2/2/20)//Guess, gives same sample rate as previous emulation
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
-void highvdeo_state::magicbom(machine_config &config)
-{
-	I80186(config, m_maincpu, 20000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &highvdeo_state::brasil_map);
-	m_maincpu->set_addrmap(AS_IO, &highvdeo_state::magicbom_io);
+MACHINE_CONFIG_START(highvdeo_state::magicbom)
+	MCFG_DEVICE_ADD("maincpu", I80186, 20000000 )
+	MCFG_DEVICE_PROGRAM_MAP(brasil_map)
+	MCFG_DEVICE_IO_MAP(magicbom_io)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(400, 300);
-	screen.set_visarea(0, 400-1, 0, 300-1);
-	screen.set_screen_update(FUNC(highvdeo_state::screen_update_brasil));
-	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
+	MCFG_SCREEN_UPDATE_DRIVER(highvdeo_state, screen_update_brasil)
+	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", INPUT_LINE_NMI))
 
 	PALETTE(config, m_palette, palette_device::RGB_565);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6376(config, m_okim6376, XTAL(12'000'000)/2/2/20).add_route(ALL_OUTPUTS, "mono", 1.0); //Guess, gives same sample rate as previous emulation
-}
+	MCFG_DEVICE_ADD("oki", OKIM6376, XTAL(12'000'000)/2/2/20)//Guess, gives same sample rate as previous emulation
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 ROM_START( tour4000 )

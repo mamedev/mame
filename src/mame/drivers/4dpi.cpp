@@ -239,21 +239,23 @@ void sgi_ip6_state::sgi_ip6_map(address_map &map)
     MACHINE DRIVERS
 ***************************************************************************/
 
-void sgi_ip6_state::sgi_ip6(machine_config &config)
-{
+MACHINE_CONFIG_START(sgi_ip6_state::sgi_ip6)
 	R2000(config, m_maincpu, 25_MHz_XTAL / 2, 16384, 8192);
 	m_maincpu->set_endianness(ENDIANNESS_BIG);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sgi_ip6_state::sgi_ip6_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sgi_ip6_state::sgi_ip6_vbl));
 
+
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(sgi_ip6_state::screen_update_sgi_ip6));
-}
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE_DRIVER(sgi_ip6_state, screen_update_sgi_ip6)
+
+
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( sgi_ip6 )
 	PORT_START("UNUSED") // unused IN0

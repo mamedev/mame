@@ -7,7 +7,7 @@ DEFINE_DEVICE_TYPE(MSX_SLOT_RAM_MM, msx_slot_ram_mm_device, "msx_slot_ram_mm", "
 
 msx_slot_ram_mm_device::msx_slot_ram_mm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_SLOT_RAM_MM, tag, owner, clock)
-	, msx_internal_slot_interface(mconfig, *this)
+	, msx_internal_slot_interface()
 	, m_total_size(0)
 	, m_bank_mask(0)
 	, m_ramio_set_bits(0)
@@ -40,14 +40,12 @@ void msx_slot_ram_mm_device::device_start()
 	save_item(NAME(m_ram));
 	save_item(NAME(m_bank_selected));
 
-	// Install IO read/write handlers
-	io_space().install_read_handler(0xFC, 0xFF, read8sm_delegate(FUNC(msx_slot_ram_mm_device::read_mapper_bank), this));
-	io_space().install_write_handler(0xFC, 0xFF, write8sm_delegate(FUNC(msx_slot_ram_mm_device::write_mapper_bank), this));
-}
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_slot_ram_mm_device::restore_banks), this));
 
-void msx_slot_ram_mm_device::device_post_load()
-{
-	restore_banks();
+	// Install IO read/write handlers
+	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
+	space.install_read_handler(0xFC, 0xFF, read8_delegate(FUNC(msx_slot_ram_mm_device::read_mapper_bank), this));
+	space.install_write_handler(0xFC, 0xFF, write8_delegate(FUNC(msx_slot_ram_mm_device::write_mapper_bank), this));
 }
 
 void msx_slot_ram_mm_device::restore_banks()
@@ -58,22 +56,22 @@ void msx_slot_ram_mm_device::restore_banks()
 	}
 }
 
-uint8_t msx_slot_ram_mm_device::read(offs_t offset)
+READ8_MEMBER(msx_slot_ram_mm_device::read)
 {
 	return m_bank_base[offset >> 14][offset & 0x3fff];
 }
 
-void msx_slot_ram_mm_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(msx_slot_ram_mm_device::write)
 {
 	m_bank_base[offset >> 14][offset & 0x3fff] = data;
 }
 
-uint8_t msx_slot_ram_mm_device::read_mapper_bank(offs_t offset)
+READ8_MEMBER(msx_slot_ram_mm_device::read_mapper_bank)
 {
 	return m_bank_selected[offset & 3] | m_ramio_set_bits;
 }
 
-void msx_slot_ram_mm_device::write_mapper_bank(offs_t offset, uint8_t data)
+WRITE8_MEMBER(msx_slot_ram_mm_device::write_mapper_bank)
 {
 	offset &= 3;
 

@@ -1645,13 +1645,13 @@ INTERRUPT_GEN_MEMBER(skylncr_state::skylncr_vblank_interrupt)
 *           Machine Driver           *
 *************************************/
 
-void skylncr_state::skylncr(machine_config &config)
-{
+MACHINE_CONFIG_START(skylncr_state::skylncr)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &skylncr_state::mem_map_skylncr);
-	m_maincpu->set_addrmap(AS_IO, &skylncr_state::io_map_skylncr);
-	m_maincpu->set_vblank_int("screen", FUNC(skylncr_state::skylncr_vblank_interrupt));
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map_skylncr)
+	MCFG_DEVICE_IO_MAP(io_map_skylncr)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skylncr_state,  skylncr_vblank_interrupt)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1666,19 +1666,19 @@ void skylncr_state::skylncr(machine_config &config)
 	ppi1.in_pb_callback().set_ioport("IN3");
 	ppi1.in_pc_callback().set_ioport("IN4");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
-	screen.set_visarea(0, 512-1, 0, 256-1);
-	screen.set_screen_update(FUNC(skylncr_state::screen_update_skylncr));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE_DRIVER(skylncr_state, screen_update_skylncr)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skylncr);
-	PALETTE(config, m_palette).set_entries(0x200);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skylncr)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &skylncr_state::ramdac_map);
@@ -1694,42 +1694,44 @@ void skylncr_state::skylncr(machine_config &config)
 	aysnd.port_a_read_callback().set_ioport("DSW3");
 	aysnd.port_b_read_callback().set_ioport("DSW4");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+MACHINE_CONFIG_END
 
 
-void skylncr_state::mbutrfly(machine_config &config)
-{
+MACHINE_CONFIG_START(skylncr_state::mbutrfly)
 	skylncr(config);
 
-	m_maincpu->set_addrmap(AS_IO, &skylncr_state::io_map_mbutrfly);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(io_map_mbutrfly)
+MACHINE_CONFIG_END
 
 
-void skylncr_state::neraidou(machine_config &config)
-{
-	skylncr(config);
-
-	m_gfxdecode->set_info(gfx_neraidou);
-}
-
-
-void skylncr_state::sstar97(machine_config &config)
-{
-	skylncr(config);
-
-	m_gfxdecode->set_info(gfx_sstar97);
-}
-
-
-void skylncr_state::bdream97(machine_config &config)
-{
+MACHINE_CONFIG_START(skylncr_state::neraidou)
 	skylncr(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_OPCODES, &skylncr_state::bdream97_opcode_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_neraidou)
+MACHINE_CONFIG_END
 
-	m_gfxdecode->set_info(gfx_bdream97);
-}
+
+MACHINE_CONFIG_START(skylncr_state::sstar97)
+	skylncr(config);
+
+	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sstar97)
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_START(skylncr_state::bdream97)
+	skylncr(config);
+
+	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_OPCODES_MAP(bdream97_opcode_map)
+
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bdream97)
+MACHINE_CONFIG_END
 
 
 /**********************************

@@ -21,10 +21,10 @@
       switch and run it as a cartridge.  This is useful for cartridge development.
 
       Blue RAM -- available in 4K, 16K, and 32K.  These also use an INS8154 chip,
-      which has an additional $80 bytes of RAM mapped immediately after the end of
-      the expansion address space (not yet implemented).  This memory can't be write
-      protected.  The INS8154 has I/O features needed for loading tape programs into
-      Blue RAM BASIC, as well as running the Blue RAM Utility cart.
+      (not yet implemented) which has an additional $80 bytes of RAM mapped
+      immediately after the end of the expansion address space.  This memory
+      can't be write protected.  The INS8154 has I/O features needed for loading
+      tape programs into Blue RAM BASIC, as well as running the Blue RAM Utility cart.
       4K:  $6000 to $6FFF (can't run VIPERSoft BASIC, because this program needs memory
       past this range)
       16K:  $6000 to $9FFF
@@ -69,11 +69,9 @@ DEFINE_DEVICE_TYPE(ASTROCADE_RL64RAM,     astrocade_rl64ram_device,     "astroca
 
 
 astrocade_blueram_4k_device::astrocade_blueram_4k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_astrocade_card_interface(mconfig, *this)
-	, m_write_prot(*this, "RAM_PROTECT")
-	, m_ramio(*this, "ramio")
-	, m_cassette(*this, "cassette")
+	: device_t(mconfig, type, tag, owner, clock),
+		device_astrocade_card_interface(mconfig, *this),
+		m_write_prot(*this, "RAM_PROTECT")
 {
 }
 
@@ -165,35 +163,7 @@ WRITE8_MEMBER(astrocade_blueram_4k_device::write)
 		m_ram[offset - 0x1000] = data;
 }
 
-READ8_MEMBER(astrocade_blueram_4k_device::read_io)
-{
-	return m_ramio->read_io(offset & 0x7f);
-}
 
-WRITE8_MEMBER(astrocade_blueram_4k_device::write_io)
-{
-	logerror("write_io: %04x = %02x\n", offset, data);
-	m_ramio->write_io(offset & 0x7f, data);
-}
-
-uint8_t astrocade_blueram_4k_device::porta_r()
-{
-	return 0;
-}
-
-uint8_t astrocade_blueram_4k_device::portb_r()
-{
-	return m_cassette->input() > 0.0 ? 1 : 0;
-}
-
-void astrocade_blueram_4k_device::porta_w(uint8_t data)
-{
-}
-
-void astrocade_blueram_4k_device::portb_w(uint8_t data)
-{
-	m_cassette->output(BIT(data, 0) ? +1 : -1);
-}
 
 // Viper System 1 expansion has RAM in 0x6000-0x9fff
 READ8_MEMBER(astrocade_viper_sys1_device::read)
@@ -236,21 +206,4 @@ WRITE8_MEMBER(astrocade_rl64ram_device::write)
 {
 	if (!m_write_prot->read())
 		m_ram[offset] = data;
-}
-
-/*-------------------------------------------------
- machine configuration
- -------------------------------------------------*/
-
-void astrocade_blueram_4k_device::device_add_mconfig(machine_config &config)
-{
-	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED);
-	m_cassette->set_interface("astrocade_cass");
-
-	INS8154(config, m_ramio);
-	m_ramio->out_a().set(FUNC(astrocade_blueram_4k_device::porta_w));
-	m_ramio->out_b().set(FUNC(astrocade_blueram_4k_device::portb_w));
-	m_ramio->in_a().set(FUNC(astrocade_blueram_4k_device::porta_r));
-	m_ramio->in_b().set(FUNC(astrocade_blueram_4k_device::portb_r));
 }

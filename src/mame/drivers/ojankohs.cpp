@@ -712,26 +712,25 @@ void ojankohs_state::machine_reset()
 	m_screen_refresh = 0;
 }
 
-void ojankohs_state::ojankohs(machine_config &config)
-{
+MACHINE_CONFIG_START(ojankohs_state::ojankohs)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 12000000/2);     /* 6.00 MHz ? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ojankohs_state::ojankohs_map);
-	m_maincpu->set_addrmap(AS_IO, &ojankohs_state::ojankohs_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(ojankohs_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(ojankohs_map)
+	MCFG_DEVICE_IO_MAP(ojankohs_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankohs)
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(512, 512);
-	m_screen->set_visarea(0, 288-1, 0, 224-1);
-	m_screen->set_screen_update(FUNC(ojankohs_state::screen_update_ojankohs));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 512)
+	MCFG_SCREEN_VISIBLE_AREA(0, 288-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE_DRIVER(ojankohs_state, screen_update_ojankohs)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ojankohs);
 	PALETTE(config, m_palette).set_entries(1024);
@@ -748,32 +747,31 @@ void ojankohs_state::ojankohs(machine_config &config)
 	aysnd.port_b_read_callback().set(FUNC(ojankohs_state::ojankohs_dipsw2_r));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(ojankohs_state::ojankohs_adpcm_int));     /* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz */
-	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
-void ojankohs_state::ojankoy(machine_config &config)
-{
+MACHINE_CONFIG_START(ojankohs_state::ojankoy)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 12000000/2);     /* 6.00 MHz ? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ojankohs_state::ojankoy_map);
-	m_maincpu->set_addrmap(AS_IO, &ojankohs_state::ojankoy_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(ojankohs_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(ojankoy_map)
+	MCFG_DEVICE_IO_MAP(ojankoy_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankoy)
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(512, 512);
-	m_screen->set_visarea(0, 288-1, 0, 224-1);
-	m_screen->set_screen_update(FUNC(ojankohs_state::screen_update_ojankohs));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 512)
+	MCFG_SCREEN_VISIBLE_AREA(0, 288-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE_DRIVER(ojankohs_state, screen_update_ojankohs)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ojankohs);
 	PALETTE(config, m_palette, FUNC(ojankohs_state::ojankoy_palette), 1024);
@@ -788,32 +786,31 @@ void ojankohs_state::ojankoy(machine_config &config)
 	aysnd.port_b_read_callback().set_ioport("dsw2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(ojankohs_state::ojankohs_adpcm_int));     /* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz */
-	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
-void ojankohs_state::ccasino(machine_config &config)
-{
+MACHINE_CONFIG_START(ojankohs_state::ccasino)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 12000000/2);     /* 6.00 MHz ? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ojankohs_state::ojankoy_map);
-	m_maincpu->set_addrmap(AS_IO, &ojankohs_state::ccasino_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(ojankohs_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(ojankoy_map)
+	MCFG_DEVICE_IO_MAP(ccasino_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankohs)
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(512, 512);
-	m_screen->set_visarea(0, 288-1, 0, 224-1);
-	m_screen->set_screen_update(FUNC(ojankohs_state::screen_update_ojankohs));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 512)
+	MCFG_SCREEN_VISIBLE_AREA(0, 288-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE_DRIVER(ojankohs_state, screen_update_ojankohs)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ojankohs);
 	PALETTE(config, m_palette).set_entries(1024);
@@ -830,32 +827,31 @@ void ojankohs_state::ccasino(machine_config &config)
 	aysnd.port_b_read_callback().set_ioport("dsw2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(ojankohs_state::ojankohs_adpcm_int));     /* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz */
-	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
-void ojankohs_state::ojankoc(machine_config &config)
-{
+MACHINE_CONFIG_START(ojankohs_state::ojankoc)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 8000000/2);  /* 4.00 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ojankohs_state::ojankoc_map);
-	m_maincpu->set_addrmap(AS_IO, &ojankohs_state::ojankoc_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(ojankohs_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80,8000000/2)          /* 4.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ojankoc_map)
+	MCFG_DEVICE_IO_MAP(ojankoc_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankoc)
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0, 256-1, 8, 248-1);
-	m_screen->set_screen_update(FUNC(ojankohs_state::screen_update_ojankoc));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 8, 248-1)
+	MCFG_SCREEN_UPDATE_DRIVER(ojankohs_state, screen_update_ojankoc)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	PALETTE(config, m_palette).set_entries(16);
 
@@ -869,11 +865,11 @@ void ojankohs_state::ojankoc(machine_config &config)
 	aysnd.port_b_read_callback().set_ioport("dsw2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MSM5205(config, m_msm, 8000000/22);
-	m_msm->vck_legacy_callback().set(FUNC(ojankohs_state::ojankohs_adpcm_int));     /* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz */
-	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("msm", MSM5205, 8000000/22)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
 
 ROM_START( ojankohs )

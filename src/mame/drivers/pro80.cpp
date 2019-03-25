@@ -175,12 +175,11 @@ void pro80_state::machine_reset()
 	m_cass_in = 0;
 }
 
-void pro80_state::pro80(machine_config &config)
-{
+MACHINE_CONFIG_START(pro80_state::pro80)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000) / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pro80_state::pro80_mem);
-	m_maincpu->set_addrmap(AS_IO, &pro80_state::pro80_io);
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(pro80_mem)
+	MCFG_DEVICE_IO_MAP(pro80_io)
 
 	/* video hardware */
 	config.set_default_layout(layout_pro80);
@@ -190,10 +189,10 @@ void pro80_state::pro80(machine_config &config)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
-	CASSETTE(config, m_cass);
+	MCFG_CASSETTE_ADD( "cassette" )
 	Z80PIO(config, "pio", XTAL(4'000'000) / 2);
-	TIMER(config, "timer_p").configure_periodic(FUNC(pro80_state::timer_p), attotime::from_hz(40000)); // cass read
-}
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", pro80_state, timer_p, attotime::from_hz(40000)) // cass read
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pro80 )

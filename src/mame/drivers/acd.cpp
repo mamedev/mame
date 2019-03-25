@@ -26,9 +26,8 @@ private:
 static INPUT_PORTS_START( acd )
 INPUT_PORTS_END
 
-void acd_state::acd(machine_config &config)
-{
-}
+MACHINE_CONFIG_START(acd_state::acd)
+MACHINE_CONFIG_END
 
 ROM_START( acd )
 	ROM_REGION( 0x10000, "maincpu", 0 )

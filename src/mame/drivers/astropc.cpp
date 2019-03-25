@@ -51,13 +51,12 @@ INPUT_PORTS_END
 
 
 
-void astropc_state::astropc(machine_config &config)
-{
+MACHINE_CONFIG_START(astropc_state::astropc)
 	/* basic machine hardware */
-	I486(config, m_maincpu, 40000000 ); // ??
-	m_maincpu->set_addrmap(AS_PROGRAM, &astropc_state::astropc_map);
-	m_maincpu->set_addrmap(AS_IO, &astropc_state::astropc_io);
-}
+	MCFG_DEVICE_ADD("maincpu", I486, 40000000 ) // ??
+	MCFG_DEVICE_PROGRAM_MAP(astropc_map)
+	MCFG_DEVICE_IO_MAP(astropc_io)
+MACHINE_CONFIG_END
 
 
 ROM_START( blackbd )

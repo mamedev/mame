@@ -28,10 +28,10 @@ class sams_memory_expansion_device : public device_t, public device_ti99_peribox
 public:
 	sams_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
-	void write(offs_t offset, uint8_t data) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	void cruwrite(offs_t offset, uint8_t data) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
 protected:
 	void device_start() override;

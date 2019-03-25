@@ -17,7 +17,6 @@ Connector pinout:
 #include "emu.h"
 #include "machine/tv955kb.h"
 #include "machine/input_merger.h"
-#include "speaker.h"
 
 DEFINE_DEVICE_TYPE(TV955_KEYBOARD, tv955kb_device, "tv955kb", "TeleVideo 955 Keyboard")
 
@@ -26,9 +25,7 @@ tv955kb_device::tv955kb_device(const machine_config &mconfig, const char *tag, d
 	, m_txd_cb(*this)
 	, m_reset_cb(*this)
 	, m_mcu(*this, "mcu")
-	, m_bell(*this, "bell")
 	, m_keys(*this, "Y%u", 0U)
-	, m_bell_on(false)
 {
 }
 
@@ -40,32 +37,6 @@ void tv955kb_device::device_resolve_objects()
 
 void tv955kb_device::device_start()
 {
-	m_bell_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tv955kb_device::bell_q8), this));
-
-	save_item(NAME(m_bell_on));
-
-	// Hack to avoid starting up in wrong state
-	auto &resetctl = *subdevice<input_merger_device>("resetctl");
-	resetctl.in_w<0>(1);
-	resetctl.in_w<1>(1);
-}
-
-void tv955kb_device::device_reset()
-{
-	bell_reset();
-}
-
-TIMER_CALLBACK_MEMBER(tv955kb_device::bell_q8)
-{
-	m_bell_on = !m_bell_on;
-	m_bell->level_w(m_bell_on);
-}
-
-void tv955kb_device::bell_reset()
-{
-	m_bell_on = false;
-	m_bell->level_w(0);
-	m_bell_timer->enable(false);
 }
 
 WRITE_LINE_MEMBER(tv955kb_device::write_rxd)
@@ -88,14 +59,7 @@ u8 tv955kb_device::keys_r()
 
 WRITE_LINE_MEMBER(tv955kb_device::bell_w)
 {
-	if (state && m_bell_timer->enabled())
-		bell_reset();
-	else if (!state && !m_bell_timer->enabled())
-	{
-		// Speaker driven through 2N4401 from Q8 output of MC14040 clocked by ALE
-		attotime period = m_mcu->cycles_to_attotime(128);
-		m_bell_timer->adjust(period, 0, period);
-	}
+	// TODO
 }
 
 WRITE_LINE_MEMBER(tv955kb_device::txd_w)
@@ -105,9 +69,6 @@ WRITE_LINE_MEMBER(tv955kb_device::txd_w)
 
 WRITE_LINE_MEMBER(tv955kb_device::reset_w)
 {
-	m_mcu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
-	if (!state)
-		bell_reset();
 	m_reset_cb(state);
 }
 
@@ -121,11 +82,9 @@ void tv955kb_device::device_add_mconfig(machine_config &config)
 	m_mcu->t1_in_cb().set_ioport("FUNCT").bit(1);
 	m_mcu->bus_in_cb().set(FUNC(tv955kb_device::keys_r));
 
-	input_merger_device &resetctl(INPUT_MERGER_ALL_LOW(config, "resetctl"));
-	resetctl.output_handler().set(FUNC(tv955kb_device::reset_w)).invert();
+	INPUT_MERGER_ALL_LOW(config, "resetctl").output_handler().set(FUNC(tv955kb_device::reset_w));
 
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_bell).add_route(ALL_OUTPUTS, "mono", 0.05);
+	// TODO: bell (MC14040 clocked by ALE)
 }
 
 static INPUT_PORTS_START(tv955kb)

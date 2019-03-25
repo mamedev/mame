@@ -118,12 +118,9 @@ void pc_kbdc_device::update_clock_state()
 		// We first set our state to prevent possible endless loops
 		m_clock_state = new_clock_state;
 
-		// Send state to keyboard interface logic on mainboard
-		m_out_clock_cb(m_clock_state);
-
 		// Send state to keyboard
 		if (m_keyboard)
-			m_keyboard->clock_write(m_clock_state);
+			m_keyboard->clock_write( m_clock_state );
 	}
 }
 
@@ -136,9 +133,6 @@ void pc_kbdc_device::update_data_state()
 	{
 		// We first set our state to prevent possible endless loops
 		m_data_state = new_data_state;
-
-		// Send state to keyboard interface logic on mainboard
-		m_out_data_cb(m_data_state);
 
 		// Send state to keyboard
 		if (m_keyboard)
@@ -163,15 +157,23 @@ WRITE_LINE_MEMBER(pc_kbdc_device::data_write_from_mb)
 
 WRITE_LINE_MEMBER(pc_kbdc_device::clock_write_from_kb)
 {
-	m_kb_clock_state = state;
-	update_clock_state();
+	state = state ? 1 : 0;
+	if (state != m_kb_clock_state)
+	{
+		m_out_clock_cb(m_kb_clock_state = state);
+		update_clock_state();
+	}
 }
 
 
 WRITE_LINE_MEMBER(pc_kbdc_device::data_write_from_kb)
 {
-	m_kb_data_state = state;
-	update_data_state();
+	state = state ? 1 : 0;
+	if (state != m_kb_data_state)
+	{
+		m_out_data_cb(m_kb_data_state = state);
+		update_data_state();
+	}
 }
 
 

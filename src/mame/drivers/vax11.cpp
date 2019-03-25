@@ -97,7 +97,7 @@ private:
 
 WRITE16_MEMBER(vax11_state::term_w)
 {
-	m_terminal->write(data);
+	m_terminal->write(space, 0, data);
 }
 
 READ16_MEMBER(vax11_state::term_r)

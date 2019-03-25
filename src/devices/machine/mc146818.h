@@ -39,12 +39,12 @@ public:
 	void set_binary_year(int bin) { m_binyear = bin; }
 
 	// read/write access
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
 	// direct-mapped read/write access
-	uint8_t read_direct(offs_t offset);
-	void write_direct(offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER( read_direct );
+	DECLARE_WRITE8_MEMBER( write_direct );
 
 protected:
 	mc146818_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

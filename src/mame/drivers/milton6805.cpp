@@ -115,11 +115,11 @@ void milton_state::prg_map(address_map &map)
 static INPUT_PORTS_START( milton )
 INPUT_PORTS_END
 
-void milton_state::milton(machine_config &config)
-{
+MACHINE_CONFIG_START(milton_state::milton)
+
 	/* basic machine hardware */
-	M6805(config, m_maincpu, 3120000); // MC6805P2, needs a CPU core
-	m_maincpu->set_addrmap(AS_PROGRAM, &milton_state::prg_map);
+	MCFG_DEVICE_ADD("maincpu", M6805, 3120000) // MC6805P2, needs a CPU core
+	MCFG_DEVICE_PROGRAM_MAP(prg_map)
 
 	// GROMs. They still require a ready callback and external clock
 	// of 3120000/8 Hz, pulsing their glock_in line (see tmc0430.cpp and ti99_4x.cpp)
@@ -127,8 +127,9 @@ void milton_state::milton(machine_config &config)
 	TMC0430(config, "grom4", "groms", 0x2000, 1);
 
 	SPEAKER(config, "speaker").front_center();
-	SP0250(config, "sp0250", 3120000).add_route(ALL_OUTPUTS, "speaker", 1.0);
-}
+	MCFG_DEVICE_ADD("sp0250", SP0250, 3120000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

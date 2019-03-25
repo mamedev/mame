@@ -215,12 +215,12 @@ void avalnche_state::machine_start()
 	save_item(NAME(m_avalance_video_inverted));
 }
 
-void avalnche_state::avalnche_base(machine_config &config)
-{
+MACHINE_CONFIG_START(avalnche_state::avalnche_base)
+
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 12.096_MHz_XTAL / 16);     /* clock input is the "2H" signal divided by two */
-	m_maincpu->set_addrmap(AS_PROGRAM, &avalnche_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(avalnche_state::nmi_line_pulse), attotime::from_hz(8*60));
+	MCFG_DEVICE_ADD("maincpu", M6502, 12.096_MHz_XTAL / 16)     /* clock input is the "2H" signal divided by two */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(avalnche_state, nmi_line_pulse, 8*60)
 
 	F9334(config, m_latch); // F8
 	m_latch->q_out_cb<0>().set_output("led0"); // 1 CREDIT LAMP
@@ -232,28 +232,27 @@ void avalnche_state::avalnche_base(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 16, 256);
-	screen.set_screen_update(FUNC(avalnche_state::screen_update_avalnche));
-}
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 16, 256)
+	MCFG_SCREEN_UPDATE_DRIVER(avalnche_state, screen_update_avalnche)
+MACHINE_CONFIG_END
 
-void avalnche_state::avalnche(machine_config &config)
-{
+MACHINE_CONFIG_START(avalnche_state::avalnche)
 	avalnche_base(config);
 	/* sound hardware */
 	avalnche_sound(config);
-}
+MACHINE_CONFIG_END
 
-void avalnche_state::acatch(machine_config &config)
-{
+MACHINE_CONFIG_START(avalnche_state::acatch)
 	avalnche_base(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &avalnche_state::catch_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(catch_map)
 
 	/* sound hardware... */
 	acatch_sound(config);
-}
+MACHINE_CONFIG_END
 
 
 /*************************************

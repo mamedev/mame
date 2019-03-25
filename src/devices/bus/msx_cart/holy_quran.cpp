@@ -30,12 +30,8 @@ void msx_cart_holy_quran_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
 	save_item(NAME(m_decrypt));
-}
 
-
-void msx_cart_holy_quran_device::device_post_load()
-{
-	restore_banks();
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_holy_quran_device::restore_banks), this));
 }
 
 
@@ -68,7 +64,7 @@ void msx_cart_holy_quran_device::initialize_cartridge()
 }
 
 
-uint8_t msx_cart_holy_quran_device::read_cart(offs_t offset)
+READ8_MEMBER(msx_cart_holy_quran_device::read_cart)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -92,7 +88,7 @@ uint8_t msx_cart_holy_quran_device::read_cart(offs_t offset)
 }
 
 
-void msx_cart_holy_quran_device::write_cart(offs_t offset, uint8_t data)
+WRITE8_MEMBER(msx_cart_holy_quran_device::write_cart)
 {
 	switch (offset)
 	{

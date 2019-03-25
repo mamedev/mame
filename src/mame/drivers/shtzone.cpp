@@ -100,26 +100,27 @@ uint32_t shtzone_state::screen_update_shtzone(screen_device &screen, bitmap_ind1
 }
 
 
-void shtzone_state::shtzone(machine_config &config)
-{
+MACHINE_CONFIG_START(shtzone_state::shtzone)
+
 	/* basic machine hardware */
-	z80_device &timercpu(Z80(config, "timercpu", 10738000/4));
-	timercpu.set_addrmap(AS_PROGRAM, &shtzone_state::shtzone_map);
+	MCFG_DEVICE_ADD("timercpu", Z80,10738000/4)
+	MCFG_DEVICE_PROGRAM_MAP(shtzone_map)
 
 	/* + SMS CPU */
 
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(256, 256);
-	screen.set_visarea(0, 256-1, 0, 256-1);
-	screen.set_screen_update(FUNC(shtzone_state::screen_update_shtzone));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE_DRIVER(shtzone_state, screen_update_shtzone)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette").set_entries(0x100);
-}
+	MCFG_PALETTE_ADD("palette", 0x100)
+
+MACHINE_CONFIG_END
 
 
 ROM_START( shtzone )

@@ -256,7 +256,6 @@ cpzodiac.cpp
 crbaloon.cpp
 crgolf.cpp
 crimfght.cpp
-cromptons.cpp
 crospang.cpp
 crshrace.cpp
 crystal.cpp
@@ -400,7 +399,6 @@ foodf.cpp
 forte2.cpp
 fortecar.cpp
 freekick.cpp
-freeway.cpp
 fresh.cpp
 fromanc2.cpp
 fromance.cpp
@@ -749,7 +747,6 @@ minivideo.cpp
 mirage.cpp
 mirax.cpp
 missb2.cpp
-missbamby.cpp
 missile.cpp
 mitchell.cpp
 mjkjidai.cpp
@@ -1307,7 +1304,6 @@ unianapc.cpp
 unico.cpp
 unkfr.cpp
 unkhorse.cpp
-unkpoker.cpp
 upscope.cpp
 usbilliards.cpp
 usgames.cpp

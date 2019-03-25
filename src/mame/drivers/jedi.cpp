@@ -328,13 +328,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void jedi_state::jedi(machine_config &config)
-{
-	/* basic machine hardware */
-	M6502(config, m_maincpu, JEDI_MAIN_CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &jedi_state::main_map);
+MACHINE_CONFIG_START(jedi_state::jedi)
 
-	config.m_minimum_quantum = attotime::from_hz(240);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M6502, JEDI_MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(240))
 
 	X2212(config, "novram12b");
 	X2212(config, "novram12c");
@@ -361,7 +361,7 @@ void jedi_state::jedi(machine_config &config)
 
 	/* audio hardware */
 	jedi_audio(config);
-}
+MACHINE_CONFIG_END
 
 
 

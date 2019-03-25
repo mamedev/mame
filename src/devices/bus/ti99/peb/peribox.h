@@ -36,11 +36,11 @@ public:
 
 	// Next eight methods are called from the console
 	DECLARE_READ8Z_MEMBER(readz) override;
-	void write(offs_t offset, uint8_t data) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	void cruwrite(offs_t offset, uint8_t data) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
 	DECLARE_WRITE_LINE_MEMBER(senila);
 	DECLARE_WRITE_LINE_MEMBER(senilb);
@@ -176,9 +176,9 @@ class device_ti99_peribox_card_interface : public device_slot_card_interface
 
 public:
 	virtual DECLARE_READ8Z_MEMBER(readz) = 0;
-	virtual void write(offs_t offset, uint8_t data) = 0;
+	virtual DECLARE_WRITE8_MEMBER(write) = 0;
 	virtual DECLARE_READ8Z_MEMBER(crureadz) = 0;
-	virtual void cruwrite(offs_t offset, uint8_t data) = 0;
+	virtual DECLARE_WRITE8_MEMBER(cruwrite) = 0;
 	virtual DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) { };
 
 	virtual DECLARE_WRITE_LINE_MEMBER(clock_in) { }
@@ -231,7 +231,7 @@ public:
 
 	// Called from the box (direction to card)
 	DECLARE_READ8Z_MEMBER(readz);
-	void write(offs_t offset, uint8_t data);
+	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin);
 
 	DECLARE_WRITE_LINE_MEMBER(senila);
@@ -245,7 +245,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( set_ready );
 
 	DECLARE_READ8Z_MEMBER(crureadz);
-	void cruwrite(offs_t offset, uint8_t data);
+	DECLARE_WRITE8_MEMBER(cruwrite);
 
 	// called from the box itself
 	void set_genmod(bool set);

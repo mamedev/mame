@@ -12,6 +12,7 @@ Release data from the Sega Retro project:
 
 TODO:
 - SP-400 serial printer
+- Link between two Mark III's through keyboard, supported by F-16 Fighting Falcon
 
 
 **********************************************************************/
@@ -109,23 +110,23 @@ static INPUT_PORTS_START( sk1100_keys )
 
 	PORT_START("PB0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PB1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PB2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PB3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
-	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PB4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('^')
-	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PB5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xc2\xa5") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(0x00a5)
@@ -153,25 +154,24 @@ ioport_constructor sega_sk1100_device::device_input_ports() const
 }
 
 
-void sega_sk1100_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(sega_sk1100_device::device_add_mconfig)
 	/* devices */
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(sega_sk1100_device::ppi_pa_r));
 	m_ppi->in_pb_callback().set(FUNC(sega_sk1100_device::ppi_pb_r));
 	m_ppi->out_pc_callback().set(FUNC(sega_sk1100_device::ppi_pc_w));
 
-	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(sc3000_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette->set_interface("sc3000_cass");
+//  MCFG_PRINTER_ADD("sp400") /* serial printer */
 
-	SK1100_PRINTER_PORT(config, m_printer_port, sk1100_printer_port_devices, nullptr);
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(sc3000_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("sc3000_cass")
 
 	/* software lists */
-	SOFTWARE_LIST(config, "sc3k_cart_list").set_original("sc3000_cart");
-	SOFTWARE_LIST(config, "cass_list").set_original("sc3000_cass");
-}
+	MCFG_SOFTWARE_LIST_ADD("sc3k_cart_list","sc3000_cart")
+	MCFG_SOFTWARE_LIST_ADD("cass_list","sc3000_cass")
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -186,7 +186,6 @@ sega_sk1100_device::sega_sk1100_device(const machine_config &mconfig, const char
 	device_sg1000_expansion_slot_interface(mconfig, *this),
 	m_cassette(*this, "cassette"),
 	m_ppi(*this, UPD9255_0_TAG),
-	m_printer_port(*this, "printer"),
 	m_pa(*this, {"PA0", "PA1", "PA2", "PA3", "PA4", "PA5", "PA6", "PA7"}),
 	m_pb(*this, {"PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7"}),
 	m_keylatch(0)
@@ -263,7 +262,7 @@ READ8_MEMBER( sega_sk1100_device::ppi_pb_r )
 	    PB2     Keyboard input
 	    PB3     Keyboard input
 	    PB4     /CONT input from cartridge terminal B-11
-	    PB5     /FAULT input from printer
+	    PB5     FAULT input from printer
 	    PB6     BUSY input from printer
 	    PB7     Cassette tape input
 	*/
@@ -274,9 +273,8 @@ READ8_MEMBER( sega_sk1100_device::ppi_pb_r )
 	/* cartridge contact */
 	data |= 0x10;
 
-	/* printer port */
-	data |= m_printer_port->fault_r() << 5;
-	data |= m_printer_port->busy_r() << 6;
+	/* printer */
+	data |= 0x60;
 
 	/* tape input */
 	if (m_cassette->input() > +0.0) data |= 0x80;
@@ -303,10 +301,7 @@ WRITE8_MEMBER( sega_sk1100_device::ppi_pc_w )
 	m_keylatch = data & 0x07;
 
 	/* cassette */
-	m_cassette->output(BIT(data, 4) ? +1.0 : -1.0);
+	m_cassette->output( BIT(data, 4) ? +1.0 : -1.0);
 
-	/* printer port */
-	m_printer_port->data_w(BIT(data, 5));
-	m_printer_port->reset_w(BIT(data, 6));
-	m_printer_port->feed_w(BIT(data, 7));
+	/* TODO printer */
 }

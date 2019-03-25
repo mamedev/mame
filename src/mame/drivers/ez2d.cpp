@@ -87,20 +87,20 @@ void ez2d_state::machine_reset()
 {
 }
 
-void ez2d_state::ez2d(machine_config &config)
-{
+MACHINE_CONFIG_START(ez2d_state::ez2d)
+
 	/* basic machine hardware */
-	PENTIUM3(config, m_maincpu, 100000000); // actually a Celeron at 533 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &ez2d_state::ez2d_map);
+	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 100000000) // actually a Celeron at 533 MHz
+	MCFG_DEVICE_PROGRAM_MAP(ez2d_map)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(640, 480);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(ez2d_state::screen_update));
-}
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE_DRIVER(ez2d_state, screen_update)
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

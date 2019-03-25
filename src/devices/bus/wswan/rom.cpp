@@ -205,26 +205,26 @@ void ws_rom_device::device_timer(emu_timer &timer, device_timer_id id, int param
  mapper specific handlers
  -------------------------------------------------*/
 
-uint8_t ws_rom_device::read_rom20(offs_t offset)
+READ8_MEMBER(ws_rom_device::read_rom20)
 {
 	return m_rom[offset + m_base20];
 }
 
 
-uint8_t ws_rom_device::read_rom30(offs_t offset)
+READ8_MEMBER(ws_rom_device::read_rom30)
 {
 	return m_rom[offset + m_base30];
 }
 
 
-uint8_t ws_rom_device::read_rom40(offs_t offset)
+READ8_MEMBER(ws_rom_device::read_rom40)
 {
 	// we still need to mask in some cases, e.g. when game is 512K
 	return m_rom[(offset + m_base40) & (m_rom_size - 1)];
 }
 
 
-uint8_t ws_rom_device::read_io(offs_t offset)
+READ8_MEMBER(ws_rom_device::read_io)
 {
 	uint8_t value = m_io_regs[offset];
 
@@ -254,7 +254,7 @@ uint8_t ws_rom_device::read_io(offs_t offset)
 	return value;
 }
 
-void ws_rom_device::write_io(offs_t offset, uint8_t data)
+WRITE8_MEMBER(ws_rom_device::write_io)
 {
 	switch (offset)
 	{
@@ -344,30 +344,30 @@ void ws_rom_device::write_io(offs_t offset, uint8_t data)
 	m_io_regs[offset] = data;
 }
 
-uint8_t ws_rom_sram_device::read_ram(offs_t offset)
+READ8_MEMBER(ws_rom_sram_device::read_ram)
 {
 	return m_nvram[m_nvram_base + offset];
 }
 
-void ws_rom_sram_device::write_ram(offs_t offset, uint8_t data)
+WRITE8_MEMBER(ws_rom_sram_device::write_ram)
 {
 	m_nvram[m_nvram_base + offset] = data;
 }
 
-void ws_rom_sram_device::write_io(offs_t offset, uint8_t data)
+WRITE8_MEMBER(ws_rom_sram_device::write_io)
 {
 	switch (offset)
 	{
 		case 0x01:  // SRAM bank to select
 			m_nvram_base = (data * 0x10000) & (m_nvram.size() -  1);
 		default:
-			ws_rom_device::write_io(offset, data);
+			ws_rom_device::write_io(space, offset, data);
 			break;
 	}
 }
 
 
-uint8_t ws_rom_eeprom_device::read_io(offs_t offset)
+READ8_MEMBER(ws_rom_eeprom_device::read_io)
 {
 	uint8_t value = m_io_regs[offset];
 
@@ -381,14 +381,14 @@ uint8_t ws_rom_eeprom_device::read_io(offs_t offset)
 			// EEPROM reads, taken from regs
 			break;
 		default:
-			value = ws_rom_device::read_io(offset);
+			value = ws_rom_device::read_io(space, offset);
 			break;
 	}
 
 	return value;
 }
 
-void ws_rom_eeprom_device::write_io(offs_t offset, uint8_t data)
+WRITE8_MEMBER(ws_rom_eeprom_device::write_io)
 {
 	switch (offset)
 	{
@@ -530,7 +530,7 @@ void ws_rom_eeprom_device::write_io(offs_t offset, uint8_t data)
 			break;
 
 		default:
-			ws_rom_device::write_io(offset, data);
+			ws_rom_device::write_io(space, offset, data);
 			break;
 	}
 

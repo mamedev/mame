@@ -235,12 +235,12 @@ INTERRUPT_GEN_MEMBER(groundfx_state::interrupt)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-void groundfx_state::groundfx(machine_config &config)
-{
+MACHINE_CONFIG_START(groundfx_state::groundfx)
+
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, XTAL(40'000'000)/2); /* 20MHz - verified */
-	m_maincpu->set_addrmap(AS_PROGRAM, &groundfx_state::groundfx_map);
-	m_maincpu->set_vblank_int("screen", FUNC(groundfx_state::interrupt));
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20MHz - verified */
+	MCFG_DEVICE_PROGRAM_MAP(groundfx_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", groundfx_state, interrupt)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -262,13 +262,13 @@ void groundfx_state::groundfx(machine_config &config)
 	tc0510nio.read_7_callback().set_ioport("SYSTEM");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0, 40*8-1, 3*8, 32*8-1);
-	screen.set_screen_update(FUNC(groundfx_state::screen_update));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 3*8, 32*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(groundfx_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_groundfx);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 16384);
@@ -289,7 +289,7 @@ void groundfx_state::groundfx(machine_config &config)
 
 	/* sound hardware */
 	TAITO_EN(config, "taito_en", 0);
-}
+MACHINE_CONFIG_END
 
 /***************************************************************************
                     DRIVERS

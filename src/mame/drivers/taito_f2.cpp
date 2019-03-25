@@ -4815,9 +4815,7 @@ ROM_START( footchmp )
 
 	/* no Delta-T samples */
 
-	ROM_REGION( 0x400, "plds", 0 )
-	ROM_LOAD( "c80-08.ic45", 0x000, 0x104, CRC(6137dd15) SHA1(fb20df118da69b52767d5e6c81fa85174c50c5c5) ) // pal16l8bcn
-	ROM_LOAD( "c80-09.ic46", 0x200, 0x104, CRC(4ca48869) SHA1(8ba46ab625d3cbf3431ca2e6f3a9207d402202ef) ) // pal16l8bcn
+// Pals c80-08.45  c80-09.46
 ROM_END
 
 ROM_START( hthero )

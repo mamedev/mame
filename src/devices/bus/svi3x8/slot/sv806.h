@@ -28,10 +28,10 @@ public:
 	// construction/destruction
 	sv806_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint8_t mreq_r(offs_t offset) override;
-	virtual void mreq_w(offs_t offset, uint8_t data) override;
-	virtual uint8_t iorq_r(offs_t offset) override;
-	virtual void iorq_w(offs_t offset, uint8_t data) override;
+	virtual DECLARE_READ8_MEMBER( mreq_r ) override;
+	virtual DECLARE_WRITE8_MEMBER( mreq_w ) override;
+	virtual DECLARE_READ8_MEMBER( iorq_r ) override;
+	virtual DECLARE_WRITE8_MEMBER( iorq_w ) override;
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

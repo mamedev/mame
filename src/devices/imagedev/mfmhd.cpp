@@ -205,7 +205,7 @@
     This means that when we add a slot (the connector), we also have to
     pass the desired parameters for the drive.
 
-    MFM_HD_CONNECTOR(config, _tag, _slot_intf, _def_slot, _enc, _spinupms, _cache, _format);
+    MCFG_MFM_HARDDISK_CONN_ADD(_tag, _slot_intf, _def_slot, _enc, _spinupms, _cache, _format)
 
     Specific parameters:
 

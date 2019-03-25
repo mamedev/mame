@@ -446,10 +446,10 @@ static GFXDECODE_START( gfx_trckydoc )
 GFXDECODE_END
 
 
-void sauro_state::tecfri(machine_config &config)
-{
+MACHINE_CONFIG_START(sauro_state::tecfri)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(20'000'000)/4);       /* verified on pcb */
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(20'000'000)/4)       /* verified on pcb */
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<4>().set(FUNC(sauro_state::irq_reset_w));
@@ -459,44 +459,48 @@ void sauro_state::tecfri(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(55.72);   /* verified on pcb */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(5000));  // frames per second, vblank duration (otherwise sprites lag)
-	screen.set_size(32 * 8, 32 * 8);
-	screen.set_visarea(1 * 8, 31 * 8 - 1, 2 * 8, 30 * 8 - 1);
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(sauro_state::vblank_irq));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(55.72)   /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000))  // frames per second, vblank duration (otherwise sprites lag)
+	MCFG_SCREEN_SIZE(32 * 8, 32 * 8)
+	MCFG_SCREEN_VISIBLE_AREA(1 * 8, 31 * 8 - 1, 2 * 8, 30 * 8 - 1)
+	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sauro_state, vblank_irq))
 
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM3812(config, "ymsnd", XTAL(20'000'000)/8).add_route(ALL_OUTPUTS, "mono", 1.0);       /* verified on pcb */
-}
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(20'000'000)/8)       /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-void sauro_state::trckydoc(machine_config &config)
-{
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(sauro_state::trckydoc)
 	tecfri(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &sauro_state::trckydoc_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(trckydoc_map)
 
 	m_mainlatch->q_out_cb<1>().set(FUNC(sauro_state::flip_screen_w));
 	m_mainlatch->q_out_cb<2>().set(FUNC(sauro_state::coin1_w));
 	m_mainlatch->q_out_cb<3>().set(FUNC(sauro_state::coin2_w));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_trckydoc);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trckydoc)
 
 	MCFG_VIDEO_START_OVERRIDE(sauro_state,trckydoc)
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(sauro_state::screen_update_trckydoc));
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(sauro_state, screen_update_trckydoc)
 
-void sauro_state::sauro(machine_config &config)
-{
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(sauro_state::sauro)
 	tecfri(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &sauro_state::sauro_map);
-	m_maincpu->set_addrmap(AS_IO, &sauro_state::sauro_io_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sauro_map)
+	MCFG_DEVICE_IO_MAP(sauro_io_map)
 
 	// Z3
 	m_mainlatch->q_out_cb<0>().set(FUNC(sauro_state::flip_screen_w));
@@ -506,33 +510,36 @@ void sauro_state::sauro(machine_config &config)
 	m_mainlatch->q_out_cb<5>().set(FUNC(sauro_state::sauro_palette_bank0_w));
 	m_mainlatch->q_out_cb<6>().set(FUNC(sauro_state::sauro_palette_bank1_w));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(20'000'000) / 5));     /* verified on pcb */
-	audiocpu.set_addrmap(AS_PROGRAM, &sauro_state::sauro_sound_map);
-	audiocpu.set_periodic_int(FUNC(sauro_state::irq0_line_hold), attotime::from_hz(8 * 60)); // ?
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(20'000'000) / 5)     /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sauro_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(sauro_state, irq0_line_hold, 8 * 60) // ?
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sauro);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sauro)
 
 	MCFG_VIDEO_START_OVERRIDE(sauro_state, sauro)
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(sauro_state::screen_update_sauro));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(sauro_state, screen_update_sauro)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	subdevice<ym3812_device>("ymsnd")->set_clock(XTAL(20'000'000) / 5);     /* verified on pcb */
+	MCFG_DEVICE_MODIFY("ymsnd")
+	MCFG_DEVICE_CLOCK(XTAL(20'000'000) / 5)     /* verified on pcb */
 
 	SP0256(config, m_sp0256, XTAL(20'000'000) / 5);     /* verified on pcb */
 	m_sp0256->data_request_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
 	m_sp0256->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+MACHINE_CONFIG_END
 
-void sauro_state::saurob(machine_config &config)
-{
+MACHINE_CONFIG_START(sauro_state::saurob)
 	sauro(config);
 
-	subdevice<z80_device>("audiocpu")->set_addrmap(AS_PROGRAM, &sauro_state::saurob_sound_map);
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(saurob_sound_map)
 
 	/* sound hardware */
-	config.device_remove("speech");
-}
+	MCFG_DEVICE_REMOVE("speech")
+
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

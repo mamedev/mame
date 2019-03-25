@@ -337,25 +337,24 @@ void bmjr_state::machine_reset()
 	m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
-void bmjr_state::bmjr(machine_config &config)
-{
+MACHINE_CONFIG_START(bmjr_state::bmjr)
 	/* basic machine hardware */
-	M6800(config, m_maincpu, XTAL(4'000'000)/4); //unknown clock / divider
-	m_maincpu->set_addrmap(AS_PROGRAM, &bmjr_state::bmjr_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(bmjr_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu",M6800, XTAL(4'000'000)/4) //unknown clock / divider
+	MCFG_DEVICE_PROGRAM_MAP(bmjr_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bmjr_state,  irq0_line_hold)
 
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(256, 192);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(bmjr_state::screen_update_bmjr));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(256, 192)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
+	MCFG_SCREEN_UPDATE_DRIVER(bmjr_state, screen_update_bmjr)
+	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", palette_device::BRG_3BIT);
-	GFXDECODE(config, "gfxdecode", "palette", gfx_bmjr);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bmjr)
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
@@ -363,8 +362,8 @@ void bmjr_state::bmjr(machine_config &config)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
-	CASSETTE(config, m_cass);
-}
+	MCFG_CASSETTE_ADD( "cassette" )
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( bmjr )

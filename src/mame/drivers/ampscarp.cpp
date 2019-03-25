@@ -37,11 +37,10 @@ void ampscarp_state::mem_map(address_map &map)
 static INPUT_PORTS_START( ampscarp )
 INPUT_PORTS_END
 
-void ampscarp_state::ampscarp(machine_config &config)
-{
-	MC68HC11(config, m_maincpu, 8'000'000); // type and clock unknown
-	m_maincpu->set_addrmap(AS_PROGRAM, &ampscarp_state::mem_map);
-}
+MACHINE_CONFIG_START(ampscarp_state::ampscarp)
+	MCFG_DEVICE_ADD("maincpu", MC68HC11, 8'000'000) // type and clock unknown
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+MACHINE_CONFIG_END
 
 ROM_START( ampscarp )
 	ROM_REGION( 0x20000, "maincpu", 0 )

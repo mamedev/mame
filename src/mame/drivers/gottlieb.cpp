@@ -1892,14 +1892,14 @@ void gottlieb_state::cobram3(machine_config &config)
 
 ROM_START( reactor )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gv_100_rom7.rom7.c9-10",  0x8000, 0x1000, CRC(a62d86fd) SHA1(9ffce668c6f0155568ccb62a6f12a9513f3c513f) )
-	ROM_LOAD( "gv_100_rom6.rom6.c10-11", 0x9000, 0x1000, CRC(6ed841f3) SHA1(b94272457e6a2d0ec46b510d71d69b4ab92a44aa) )
-	ROM_LOAD( "gv_100_rom5.rom5.c11-12", 0xa000, 0x1000, CRC(d90576a3) SHA1(52af7164dc59b9f7d8a1b3ef9d4c1fc81496899f) )
-	ROM_LOAD( "gv_100_rom4.rom4.c12-13", 0xb000, 0x1000, CRC(0155daae) SHA1(3a94952c2830c7bea126cf39b84108936d96dc0e) )
-	ROM_LOAD( "gv_100_rom3.rom3.c13-14", 0xc000, 0x1000, CRC(f8881385) SHA1(baa7ef7309aab9b382442b25ede5d7ecd6e2c370) )
-	ROM_LOAD( "gv_100_rom2.rom2.c14-15", 0xd000, 0x1000, CRC(3caba35b) SHA1(4d3b894821a2cff0ef55cec2b1f62f2e33009b4d) )
-	ROM_LOAD( "gv_100_rom1.rom1.c16",    0xe000, 0x1000, CRC(944e1ddf) SHA1(6b487f1cb405e2ba9345190e8ab6022c790882c1) )
-	ROM_LOAD( "gv_100_rom0.rom0.c17",    0xf000, 0x1000, CRC(55930aed) SHA1(37ed60386935741e8cc0b8750bfcdf6f54c1bf9e) )
+	ROM_LOAD( "rom7",         0x8000, 0x1000, CRC(a62d86fd) SHA1(9ffce668c6f0155568ccb62a6f12a9513f3c513f) )
+	ROM_LOAD( "rom6",         0x9000, 0x1000, CRC(6ed841f3) SHA1(b94272457e6a2d0ec46b510d71d69b4ab92a44aa) )
+	ROM_LOAD( "rom5",         0xa000, 0x1000, CRC(d90576a3) SHA1(52af7164dc59b9f7d8a1b3ef9d4c1fc81496899f) )
+	ROM_LOAD( "rom4",         0xb000, 0x1000, CRC(0155daae) SHA1(3a94952c2830c7bea126cf39b84108936d96dc0e) )
+	ROM_LOAD( "rom3",         0xc000, 0x1000, CRC(f8881385) SHA1(baa7ef7309aab9b382442b25ede5d7ecd6e2c370) )
+	ROM_LOAD( "rom2",         0xd000, 0x1000, CRC(3caba35b) SHA1(4d3b894821a2cff0ef55cec2b1f62f2e33009b4d) )
+	ROM_LOAD( "rom1",         0xe000, 0x1000, CRC(944e1ddf) SHA1(6b487f1cb405e2ba9345190e8ab6022c790882c1) )
+	ROM_LOAD( "rom0",         0xf000, 0x1000, CRC(55930aed) SHA1(37ed60386935741e8cc0b8750bfcdf6f54c1bf9e) )
 
 	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "snd1",         0x7000, 0x800, CRC(d958a0fd) SHA1(3c383076c68a929f96d844e89b09f3075f331906) )
@@ -1909,10 +1909,10 @@ ROM_START( reactor )
 	/* no ROMs; RAM is used instead */
 
 	ROM_REGION( 0x8000, "sprites", 0 )
-	ROM_LOAD( "gv_100_fg_3.fg3.k7-8", 0x1000, 0x1000, CRC(8416ad53) SHA1(f868259b97675e58b6a7f1dc3c2a4ecf6aa0570e) )
-	ROM_LOAD( "gv_100_fg_2.fg2.k6-7", 0x3000, 0x1000, CRC(5489605a) SHA1(f4bbaaa8cd881dc164b118d1e516edeeea54c1d8) )
-	ROM_LOAD( "gv_100_fg_1.fg1.k5-6", 0x5000, 0x1000, CRC(18396c57) SHA1(39d90a842a03091414ed58d4128b524ecc20c9f1) )
-	ROM_LOAD( "gv_100_fg_0.fg0.k4-5", 0x7000, 0x1000, CRC(d1f20e15) SHA1(dba9aa0fec8b720a33d78b3dd1d7f74040048f7e) )
+	ROM_LOAD( "fg3",          0x1000, 0x1000, CRC(8416ad53) SHA1(f868259b97675e58b6a7f1dc3c2a4ecf6aa0570e) )
+	ROM_LOAD( "fg2",          0x3000, 0x1000, CRC(5489605a) SHA1(f4bbaaa8cd881dc164b118d1e516edeeea54c1d8) )
+	ROM_LOAD( "fg1",          0x5000, 0x1000, CRC(18396c57) SHA1(39d90a842a03091414ed58d4128b524ecc20c9f1) )
+	ROM_LOAD( "fg0",          0x7000, 0x1000, CRC(d1f20e15) SHA1(dba9aa0fec8b720a33d78b3dd1d7f74040048f7e) )
 ROM_END
 
 

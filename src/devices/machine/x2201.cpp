@@ -128,6 +128,17 @@ u8 x2201_device::read(offs_t offset)
 
 
 //-------------------------------------------------
+//  read_byte - read 8 bits of data from RAM
+//  (FIXME: remove once CRU reads are 1-bit)
+//-------------------------------------------------
+
+u8 x2201_device::read_byte(offs_t offset)
+{
+	return m_ram[offset & 127];
+}
+
+
+//-------------------------------------------------
 //  write - write one bit of data to RAM
 //-------------------------------------------------
 

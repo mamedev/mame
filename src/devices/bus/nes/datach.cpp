@@ -52,7 +52,7 @@ datach_cart_interface::~datach_cart_interface()
 {
 }
 
-uint8_t datach_cart_interface::read(offs_t offset)
+READ8_MEMBER(datach_cart_interface::read)
 {
 	if (offset < 0x4000)
 		return m_rom[(m_bank * 0x4000) + (offset & 0x3fff)];
@@ -84,10 +84,10 @@ void nes_datach_slot_device::device_start()
 	m_cart = dynamic_cast<datach_cart_interface *>(get_card_device());
 }
 
-uint8_t nes_datach_slot_device::read(offs_t offset)
+READ8_MEMBER(nes_datach_slot_device::read)
 {
 	if (m_cart)
-		return m_cart->read(offset);
+		return m_cart->read(space, offset, mem_mask);
 
 	return 0xff;
 }
@@ -201,10 +201,9 @@ uint8_t *nes_datach_rom_device::get_cart_base()
 }
 
 
-void nes_datach_24c01_device::device_add_mconfig(machine_config &config)
-{
-	I2C_24C01(config, m_i2cmem);
-}
+MACHINE_CONFIG_START(nes_datach_24c01_device::device_add_mconfig)
+	MCFG_24C01_ADD("i2cmem")
+MACHINE_CONFIG_END
 
 
 //---------------------------------
@@ -284,7 +283,7 @@ void nes_datach_device::pcb_reset()
  -------------------------------------------------*/
 
 
-uint8_t nes_datach_device::read_m(offs_t offset)
+READ8_MEMBER(nes_datach_device::read_m)
 {
 	LOG_MMC(("Datach read_m, offset: %04x\n", offset));
 	uint8_t i2c_val = 0;
@@ -301,19 +300,19 @@ uint8_t nes_datach_device::read_m(offs_t offset)
 }
 
 
-uint8_t nes_datach_device::read_h(offs_t offset)
+READ8_MEMBER(nes_datach_device::read_h)
 {
 	LOG_MMC(("Datach read_h, offset: %04x\n", offset));
 	// this shall be the proper code, but it's a bit slower, so we access directly the subcart below
-	//return m_subslot->read(offset);
+	//return m_subslot->read(space, offset, mem_mask);
 
 	if (m_subslot->m_cart)
-		return m_subslot->m_cart->read(offset);
+		return m_subslot->m_cart->read(space, offset, mem_mask);
 	else    // this is "fake" in the sense that we fill CPU space with 0xff if no Datach cart is loaded
 		return hi_access_rom(offset);
 }
 
-void nes_datach_device::write_h(offs_t offset, uint8_t data)
+WRITE8_MEMBER(nes_datach_device::write_h)
 {
 	LOG_MMC(("Datach write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -353,7 +352,7 @@ void nes_datach_device::write_h(offs_t offset, uint8_t data)
 #endif
 			break;
 		default:
-			fcg_write(offset & 0x0f, data);
+			fcg_write(space, offset & 0x0f, data, mem_mask);
 			break;
 	}
 }
@@ -369,12 +368,11 @@ static void datach_cart(device_slot_interface &device)
 }
 
 
-void nes_datach_device::device_add_mconfig(machine_config &config)
-{
-	BARCODE_READER(config, m_reader, 0);
-	NES_DATACH_SLOT(config, m_subslot, 0, datach_cart);
-	I2C_24C02(config, m_i2cmem);
-}
+MACHINE_CONFIG_START(nes_datach_device::device_add_mconfig)
+	BARCODE_READER(config, "datach", 0);
+	MCFG_DATACH_MINICART_ADD("datach_slot", datach_cart)
+	MCFG_24C02_ADD("i2cmem")
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------

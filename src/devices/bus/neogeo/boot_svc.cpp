@@ -30,11 +30,10 @@ void neogeo_svcboot_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_prot->svcboot_cx_decrypt(spr_region, spr_region_size);
 }
 
-void neogeo_svcboot_cart_device::device_add_mconfig(machine_config &config)
-{
-	NEOBOOT_PROT(config, m_prot);
-	NG_PVC_PROT(config, m_pvc_prot);
-}
+MACHINE_CONFIG_START(neogeo_svcboot_cart_device::device_add_mconfig)
+	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
+	MCFG_PVC_PROT_ADD("pvc_prot")
+MACHINE_CONFIG_END
 
 
 /*************************************************
@@ -97,8 +96,7 @@ void neogeo_svcsplus_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 }
 
 
-void neogeo_svcsplus_cart_device::device_add_mconfig(machine_config &config)
-{
-	NEOBOOT_PROT(config, m_prot);
-	NG_PVC_PROT(config, m_pvc_prot);
-}
+MACHINE_CONFIG_START(neogeo_svcsplus_cart_device::device_add_mconfig)
+	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
+	MCFG_PVC_PROT_ADD("pvc_prot")
+MACHINE_CONFIG_END

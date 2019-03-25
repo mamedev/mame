@@ -134,18 +134,18 @@ void bbc_tube_z80_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-uint8_t bbc_tube_z80_device::host_r(offs_t offset)
+READ8_MEMBER(bbc_tube_z80_device::host_r)
 {
-	return m_ula->host_r(offset);
+	return m_ula->host_r(space, offset);
 }
 
-void bbc_tube_z80_device::host_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(bbc_tube_z80_device::host_w)
 {
-	m_ula->host_w(offset, data);
+	m_ula->host_w(space, offset, data);
 }
 
 
-uint8_t bbc_tube_z80_device::opcode_r(offs_t offset)
+READ8_MEMBER(bbc_tube_z80_device::opcode_r)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -158,7 +158,7 @@ uint8_t bbc_tube_z80_device::opcode_r(offs_t offset)
 }
 
 
-uint8_t bbc_tube_z80_device::mem_r(offs_t offset)
+READ8_MEMBER(bbc_tube_z80_device::mem_r)
 {
 	uint8_t data;
 
@@ -170,7 +170,7 @@ uint8_t bbc_tube_z80_device::mem_r(offs_t offset)
 	return data;
 }
 
-void bbc_tube_z80_device::mem_w(offs_t offset, uint8_t data)
+WRITE8_MEMBER(bbc_tube_z80_device::mem_w)
 {
 	m_ram->pointer()[offset] = data;
 }

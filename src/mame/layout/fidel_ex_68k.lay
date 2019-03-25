@@ -192,27 +192,27 @@
 
 	<element name="text_tl7">
 		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
-		<text string="[K]"><color red="0.65" green="0.15" blue="0.14" /></text>
+		<text string="&#x265a;"><color red="0.65" green="0.15" blue="0.14" /></text>
 	</element>
 	<element name="text_tl6">
 		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
-		<text string="[Q]"><color red="0.65" green="0.15" blue="0.14" /></text>
+		<text string="&#x265b;"><color red="0.65" green="0.15" blue="0.14" /></text>
 	</element>
 	<element name="text_tl5">
 		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
-		<text string="[R]"><color red="0.65" green="0.15" blue="0.14" /></text>
+		<text string="&#x265c;"><color red="0.65" green="0.15" blue="0.14" /></text>
 	</element>
 	<element name="text_tl4">
 		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
-		<text string="[B]"><color red="0.65" green="0.15" blue="0.14" /></text>
+		<text string="&#x265d;"><color red="0.65" green="0.15" blue="0.14" /></text>
 	</element>
 	<element name="text_tl3">
 		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
-		<text string="[N]"><color red="0.65" green="0.15" blue="0.14" /></text>
+		<text string="&#x265e;"><color red="0.65" green="0.15" blue="0.14" /></text>
 	</element>
 	<element name="text_tl2">
 		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
-		<text string="[P]"><color red="0.65" green="0.15" blue="0.14" /></text>
+		<text string="&#x265f;"><color red="0.65" green="0.15" blue="0.14" /></text>
 	</element>
 
 
@@ -479,12 +479,12 @@
 
 		<bezel element="black"><bounds x="86" y="2" width="10" height="82" /></bezel>
 
-		<bezel element="text_tl7"><bounds x="87" y="16.2" width="8" height="2.5" /></bezel>
-		<bezel element="text_tl6"><bounds x="87" y="25.2" width="8" height="2.5" /></bezel>
-		<bezel element="text_tl5"><bounds x="87" y="34.2" width="8" height="2.5" /></bezel>
-		<bezel element="text_tl4"><bounds x="87" y="43.2" width="8" height="2.5" /></bezel>
-		<bezel element="text_tl3"><bounds x="87" y="52.2" width="8" height="2.5" /></bezel>
-		<bezel element="text_tl2"><bounds x="87" y="61.2" width="8" height="2.5" /></bezel>
+		<bezel element="text_tl7"><bounds x="87" y="16" width="8" height="3" /></bezel>
+		<bezel element="text_tl6"><bounds x="87" y="25" width="8" height="3" /></bezel>
+		<bezel element="text_tl5"><bounds x="87" y="34" width="8" height="3" /></bezel>
+		<bezel element="text_tl4"><bounds x="87" y="43" width="8" height="3" /></bezel>
+		<bezel element="text_tl3"><bounds x="87" y="52" width="8" height="3" /></bezel>
+		<bezel element="text_tl2"><bounds x="87" y="61" width="8" height="3" /></bezel>
 
 		<bezel element="redb"><bounds x="87" y="9" width="8" height="4" /></bezel>
 		<bezel element="redb"><bounds x="87" y="19" width="8" height="4" /></bezel>

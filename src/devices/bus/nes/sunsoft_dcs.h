@@ -24,7 +24,7 @@ public:
 	virtual ~ntb_cart_interface();
 
 	// reading and writing
-	virtual uint8_t read(offs_t offset) { return m_rom[offset]; }
+	virtual DECLARE_READ8_MEMBER(read) { return m_rom[offset]; }
 
 	uint8_t *get_cart_base() { return m_rom; }
 
@@ -46,16 +46,6 @@ class nes_ntb_slot_device : public device_t,
 	friend class nes_sunsoft_dcs_device;
 public:
 	// construction/destruction
-	template <typename T>
-	nes_ntb_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts)
-		: nes_ntb_slot_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		option_reset();
-		opts(*this);
-		set_default_option(nullptr);
-		set_fixed(false);
-	}
-
 	nes_ntb_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_ntb_slot_device();
 
@@ -78,7 +68,7 @@ public:
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
-	virtual uint8_t read(offs_t offset);
+	virtual DECLARE_READ8_MEMBER(read);
 
 protected:
 	ntb_cart_interface*      m_cart;
@@ -86,6 +76,11 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(NES_NTB_SLOT, nes_ntb_slot_device)
+
+
+#define MCFG_NTB_MINICART_ADD(_tag, _slot_intf) \
+		MCFG_DEVICE_ADD(_tag, NES_NTB_SLOT, 0) \
+		MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, nullptr, false)
 
 
 //-----------------------------------------------
@@ -133,10 +128,10 @@ public:
 	// construction/destruction
 	nes_sunsoft_dcs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint8_t read_m(offs_t offset) override;
-	virtual uint8_t read_h(offs_t offset) override;
-	virtual void write_m(offs_t offset, uint8_t data) override;
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual DECLARE_READ8_MEMBER(read_m) override;
+	virtual DECLARE_READ8_MEMBER(read_h) override;
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 

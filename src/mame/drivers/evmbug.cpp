@@ -59,8 +59,10 @@ void evmbug_state::mem_map(address_map &map)
 void evmbug_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	//map(0x0000, 0x003f).rw("uart1", FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
-	map(0x0000, 0x003f).rw(FUNC(evmbug_state::rs232_r), FUNC(evmbug_state::rs232_w));
+	//AM_RANGE(0x0000, 0x0003) AM_DEVREAD("uart1", tms9902_device, cruread)
+	//AM_RANGE(0x0000, 0x001f) AM_DEVWRITE("uart1", tms9902_device, cruwrite)
+	map(0x0000, 0x0003).r(FUNC(evmbug_state::rs232_r));
+	map(0x0000, 0x001f).w(FUNC(evmbug_state::rs232_w));
 }
 
 /* Input ports */
@@ -69,19 +71,16 @@ INPUT_PORTS_END
 
 READ8_MEMBER( evmbug_state::rs232_r )
 {
-	if (offset < 8)
-		return BIT(m_term_data, offset);
-	else if (offset == 21)
-		return m_rbrl;
-	else if (offset == 22 || offset == 23)
-		return 1;
-	else if (offset == 15)
+	if (offset == 0)
+		return m_term_data;
+	else
+	if (offset == 2)
+		return (m_rbrl ? 0x20 : 0) | 0xc0;
+	else
 	{
 		m_rin ^= 1;
-		return m_rin;
+		return m_rin << 7;
 	}
-	else
-		return 0;
 }
 
 WRITE8_MEMBER( evmbug_state::rs232_w )
@@ -94,7 +93,7 @@ WRITE8_MEMBER( evmbug_state::rs232_w )
 		m_term_out |= (data << offset);
 
 		if (offset == 7)
-			m_terminal->write(m_term_out & 0x7f);
+			m_terminal->write(space, 0, m_term_out & 0x7f);
 	}
 	else
 	if (offset == 18)

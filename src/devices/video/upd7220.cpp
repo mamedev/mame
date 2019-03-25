@@ -151,8 +151,7 @@ DEFINE_DEVICE_TYPE(UPD7220, upd7220_device, "upd7220", "NEC uPD7220")
 // default address map
 void upd7220_device::upd7220_vram(address_map &map)
 {
-	if (!has_configured_map(0))
-		map(0x00000, 0x3ffff).ram();
+	map(0x00000, 0x3ffff).ram();
 }
 
 
@@ -650,7 +649,7 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 	m_disp(0),
 	m_gchr(0),
 	m_bitmap_mod(0),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 16, 18, 0, address_map_constructor(FUNC(upd7220_device::upd7220_vram), this))
+	m_space_config("videoram", ENDIANNESS_LITTLE, 16, 18, 0, address_map_constructor(), address_map_constructor(FUNC(upd7220_device::upd7220_vram), this))
 {
 	for (int i = 0; i < 16; i++)
 	{
@@ -1448,7 +1447,7 @@ void upd7220_device::continue_command()
 //  read -
 //-------------------------------------------------
 
-uint8_t upd7220_device::read(offs_t offset)
+READ8_MEMBER( upd7220_device::read )
 {
 	uint8_t data;
 
@@ -1479,7 +1478,7 @@ uint8_t upd7220_device::read(offs_t offset)
 //  write -
 //-------------------------------------------------
 
-void upd7220_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( upd7220_device::write )
 {
 	if (offset & 1)
 	{
@@ -1502,7 +1501,7 @@ void upd7220_device::write(offs_t offset, uint8_t data)
 //  dack_r -
 //-------------------------------------------------
 
-uint8_t upd7220_device::dack_r()
+READ8_MEMBER( upd7220_device::dack_r )
 {
 	return 0;
 }
@@ -1512,7 +1511,7 @@ uint8_t upd7220_device::dack_r()
 //  dack_w -
 //-------------------------------------------------
 
-void upd7220_device::dack_w(uint8_t data)
+WRITE8_MEMBER( upd7220_device::dack_w )
 {
 }
 

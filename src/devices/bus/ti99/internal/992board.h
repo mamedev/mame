@@ -107,8 +107,8 @@ class io992_device : public bus::hexbus::hexbus_chained_device
 public:
 	io992_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t cruread(offs_t offset);
-	void cruwrite(offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER( cruread );
+	DECLARE_WRITE8_MEMBER( cruwrite );
 	void device_start() override;
 	ioport_constructor device_input_ports() const override;
 	auto rombank_cb() { return m_set_rom_bank.bind(); }

@@ -70,15 +70,14 @@ void belatra_state::belatra_map(address_map &map)
 static INPUT_PORTS_START( belatra )
 INPUT_PORTS_END
 
-void belatra_state::belatra(machine_config &config)
-{
-	ARM7(config, m_maincpu, 54000000); // guess...
-	m_maincpu->set_addrmap(AS_PROGRAM, &belatra_state::belatra_map);
+MACHINE_CONFIG_START(belatra_state::belatra)
+	MCFG_DEVICE_ADD("maincpu", ARM7, 54000000) // guess...
+	MCFG_DEVICE_PROGRAM_MAP(belatra_map)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound */
-}
+MACHINE_CONFIG_END
 
 
 ROM_START( merryjn )

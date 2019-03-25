@@ -346,8 +346,8 @@ void supertnk_state::supertnk_map(address_map &map)
 
 void supertnk_state::supertnk_io_map(address_map &map)
 {
-	map(0x0000, 0x0001).nopw();
-	map(0x0800, 0x080f).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0x0000, 0x0000).nopw();
+	map(0x0400, 0x0407).w("outlatch", FUNC(ls259_device::write_d0));
 }
 
 
