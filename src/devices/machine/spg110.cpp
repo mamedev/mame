@@ -17,13 +17,23 @@
 DEFINE_DEVICE_TYPE(SPG110, spg110_device, "spg110", "SPG110 System-on-a-Chip")
 
 spg110_device::spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-	device_memory_interface(mconfig, *this),
-	m_space_config("spg110", ENDIANNESS_BIG, 16, 32, 0, address_map_constructor(FUNC(spg110_device::map_video), this)),
-	m_cpu(*this, finder_base::DUMMY_TAG),
-	m_palette(*this, "palette"),
-	m_gfxdecode(*this, "gfxdecode"),
-	m_palram(*this, "palram")
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_space_config("spg110", ENDIANNESS_BIG, 16, 32, 0, address_map_constructor(FUNC(spg110_device::map_video), this))
+	, m_cpu(*this, finder_base::DUMMY_TAG)
+	, m_screen(*this, finder_base::DUMMY_TAG)
+	, m_palette(*this, "palette")
+	, m_gfxdecode(*this, "gfxdecode")
+	, m_palram(*this, "palram")
+	, m_spg_io(*this, "spg_io")
+	, m_porta_out(*this)
+	, m_portb_out(*this)
+	, m_portc_out(*this)
+	, m_porta_in(*this)
+	, m_portb_in(*this)
+	, m_portc_in(*this)
+	, m_adc_in{{*this}, {*this}}
+	, m_chip_sel(*this)
 {
 }
 
@@ -210,7 +220,24 @@ static GFXDECODE_START( gfx )
 	GFXDECODE_ENTRY( ":maincpu", 0, charlayout6, 0, 16 ) // correct for lots of the tiles inc. startup text
 GFXDECODE_END
 
-
+void spg110_device::configure_spg_io(spg2xx_io_device* io)
+{
+	io->porta_in().set(FUNC(spg110_device::porta_r));
+	io->portb_in().set(FUNC(spg110_device::portb_r));
+	io->portc_in().set(FUNC(spg110_device::portc_r));
+	io->porta_out().set(FUNC(spg110_device::porta_w));
+	io->portb_out().set(FUNC(spg110_device::portb_w));
+	io->portc_out().set(FUNC(spg110_device::portc_w));
+	io->adc_in<0>().set(FUNC(spg110_device::adc_r<0>));
+	io->adc_in<1>().set(FUNC(spg110_device::adc_r<1>));
+	io->chip_select().set(FUNC(spg110_device::cs_w));
+//	io->pal_read_callback().set(FUNC(spg110_device::get_pal_r));
+//	io->write_timer_irq_callback().set(FUNC(spg110_device::timerirq_w));
+//	io->write_uart_adc_irq_callback().set(FUNC(spg110_device::uartirq_w));
+//	io->write_external_irq_callback().set(FUNC(spg110_device::extirq_w));
+//	io->write_ffrq_tmr1_irq_callback().set(FUNC(spg110_device::ffreq1_w));
+//	io->write_ffrq_tmr2_irq_callback().set(FUNC(spg110_device::ffreq2_w));
+}
 
 void spg110_device::device_add_mconfig(machine_config &config)
 {
@@ -222,6 +249,10 @@ void spg110_device::device_add_mconfig(machine_config &config)
 	PALETTE(config, m_palette, palette_device::BLACK, 256);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
+
+	SPG24X_IO(config, m_spg_io, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
+	configure_spg_io(m_spg_io);
+
 }
 
 
@@ -249,25 +280,6 @@ WRITE16_MEMBER(spg110_device::spg110_2063_w)
 	// writes 0x28, probably clears the IRQ / IRQ sources? 0x63 is the same offset for this in spg2xx but bits used seem to be different
 	m_cpu->set_state_unsynced(UNSP_IRQ0_LINE, CLEAR_LINE);
 }
-
-READ16_MEMBER(spg110_device::datasegment_r)
-{
-	uint16_t val = m_cpu->get_ds();
-	return val;
-}
-
-WRITE16_MEMBER(spg110_device::datasegment_w)
-{
-	m_cpu->set_ds(data & 0x3f);
-}
-
-WRITE16_MEMBER(spg110_device::spg110_3221_w)
-{
-	/* first write on startup? */
-}
-
-WRITE16_MEMBER(spg110_device::spg110_3223_w) { }
-WRITE16_MEMBER(spg110_device::spg110_3225_w) { }
 
 
 WRITE16_MEMBER(spg110_device::spg110_201c_w) { }
@@ -351,17 +363,6 @@ READ16_MEMBER(spg110_device::dma_len_status_r)
 READ16_MEMBER(spg110_device::spg110_2037_r) { return 0x0000; }
 READ16_MEMBER(spg110_device::spg110_2042_r) { return 0x0000; }
 
-WRITE16_MEMBER(spg110_device::spg110_3200_w) { }
-WRITE16_MEMBER(spg110_device::spg110_3201_w) { }
-WRITE16_MEMBER(spg110_device::spg110_3203_w) { }
-WRITE16_MEMBER(spg110_device::spg110_3204_w) { }
-WRITE16_MEMBER(spg110_device::spg110_3206_w) { }
-WRITE16_MEMBER(spg110_device::spg110_3208_w) { }
-WRITE16_MEMBER(spg110_device::spg110_3209_w) { }
-
-READ16_MEMBER(spg110_device::spg110_3201_r) { return 0x0000; }
-READ16_MEMBER(spg110_device::spg110_3225_r) { return 0x0000; }
-READ16_MEMBER(spg110_device::spg110_322c_r) { return 0x0000; }
 
 WRITE16_MEMBER(spg110_device::spg110_3100_w) { }
 WRITE16_MEMBER(spg110_device::spg110_3101_w) { }
@@ -520,24 +521,7 @@ void spg110_device::map(address_map &map)
 	map(0x00310f, 0x00310f).r(FUNC(spg110_device::spg110_310f_r));
 
 	// 0032xx looks like it could be the same as 003d00 on spg2xx
-	map(0x003200, 0x003200).w(FUNC(spg110_device::spg110_3200_w));
-
-	map(0x003201, 0x003201).rw(FUNC(spg110_device::spg110_3201_r),FUNC(spg110_device::spg110_3201_w));
-
-	map(0x003203, 0x003203).w(FUNC(spg110_device::spg110_3203_w));
-	map(0x003204, 0x003204).w(FUNC(spg110_device::spg110_3204_w));
-
-	map(0x003206, 0x003206).w(FUNC(spg110_device::spg110_3206_w));
-
-	map(0x003208, 0x003208).w(FUNC(spg110_device::spg110_3208_w));
-	map(0x003209, 0x003209).w(FUNC(spg110_device::spg110_3209_w));
-
-	map(0x003221, 0x003221).w(FUNC(spg110_device::spg110_3221_w));
-	map(0x003223, 0x003223).w(FUNC(spg110_device::spg110_3223_w));
-	map(0x003225, 0x003225).rw(FUNC(spg110_device::spg110_3225_r),FUNC(spg110_device::spg110_3225_w));
-	map(0x00322c, 0x00322c).r(FUNC(spg110_device::spg110_322c_r));
-
-	map(0x00322f, 0x00322f).rw(FUNC(spg110_device::datasegment_r),FUNC(spg110_device::datasegment_w));
+	map(0x003200, 0x00322f).rw(m_spg_io, FUNC(spg2xx_io_device::io_r), FUNC(spg2xx_io_device::io_w));
 }
 
 // this seems to be a different, non-cpu mapped space only accessible via the DMA?
@@ -574,6 +558,17 @@ void spg110_device::device_start()
 	save_item(NAME(m_bg_scrollx));
 	save_item(NAME(m_bg_scrolly));
 	save_item(NAME(m_2036_scroll));
+
+	m_porta_out.resolve_safe();
+	m_portb_out.resolve_safe();
+	m_portc_out.resolve_safe();
+	m_porta_in.resolve_safe(0);
+	m_portb_in.resolve_safe(0);
+	m_portc_in.resolve_safe(0);
+	m_adc_in[0].resolve_safe(0x0fff);
+	m_adc_in[1].resolve_safe(0x0fff);
+	m_chip_sel.resolve_safe();
+
 }
 
 void spg110_device::device_reset()
