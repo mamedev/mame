@@ -33,9 +33,6 @@ spg110_device::spg110_device(const machine_config &mconfig, device_type type, co
 	, m_portb_in(*this)
 	, m_portc_in(*this)
 	, m_adc_in{{*this}, {*this}}
-	, m_eeprom_w(*this)
-	, m_eeprom_r(*this)
-	, m_uart_tx(*this)
 	, m_chip_sel(*this)
 {
 }
@@ -233,9 +230,6 @@ void spg110_device::configure_spg_io(spg2xx_io_device* io)
 	io->portc_out().set(FUNC(spg110_device::portc_w));
 	io->adc_in<0>().set(FUNC(spg110_device::adc_r<0>));
 	io->adc_in<1>().set(FUNC(spg110_device::adc_r<1>));
-	io->eeprom_w().set(FUNC(spg110_device::eepromx_w));
-	io->eeprom_r().set(FUNC(spg110_device::eepromx_r));
-	io->uart_tx().set(FUNC(spg110_device::tx_w));
 	io->chip_select().set(FUNC(spg110_device::cs_w));
 //	io->pal_read_callback().set(FUNC(spg110_device::get_pal_r));
 //	io->write_timer_irq_callback().set(FUNC(spg110_device::timerirq_w));

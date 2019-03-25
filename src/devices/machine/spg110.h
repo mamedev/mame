@@ -43,11 +43,6 @@ public:
 
 	template <size_t Line> auto adc_in() { return m_adc_in[Line].bind(); }
 
-	auto eeprom_w() { return m_eeprom_w.bind(); }
-	auto eeprom_r() { return m_eeprom_r.bind(); }
-
-	auto uart_tx() { return m_uart_tx.bind(); }
-
 	auto chip_select() { return m_chip_sel.bind(); }
 
 protected:
@@ -205,11 +200,6 @@ private:
 
 	devcb_read16 m_adc_in[2];
 
-	devcb_write8 m_eeprom_w;
-	devcb_read8 m_eeprom_r;
-
-	devcb_write8 m_uart_tx;
-
 	devcb_write8 m_chip_sel;
 
 	DECLARE_READ16_MEMBER(porta_r) { return m_porta_in(); };
@@ -219,11 +209,6 @@ private:
 	DECLARE_WRITE16_MEMBER(portb_w) { m_portb_out(offset, data, mem_mask); };
 	DECLARE_WRITE16_MEMBER(portc_w) { m_portc_out(offset, data, mem_mask); };
 	template <size_t Line> DECLARE_READ16_MEMBER(adc_r) { return m_adc_in[Line](); };
-
-	DECLARE_WRITE8_MEMBER(eepromx_w) { m_eeprom_w(offset, data, mem_mask); };
-	DECLARE_READ8_MEMBER(eepromx_r) { return m_eeprom_r(); };
-
-	DECLARE_WRITE8_MEMBER(tx_w) { m_uart_tx(offset, data, mem_mask); };
 	DECLARE_WRITE8_MEMBER(cs_w) { m_chip_sel(offset, data, mem_mask); };
 	DECLARE_READ16_MEMBER(get_pal_r) { return 0; /*m_pal_flag;*/ };
 	void configure_spg_io(spg2xx_io_device* io);
