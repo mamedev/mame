@@ -166,10 +166,10 @@ void tms9928a_device::write(offs_t offset, uint8_t data)
 
 u8 tms9928a_device::vram_read()
 {
-	// prevent debugger from changing the address base
-	if (machine().side_effects_disabled()) return 0;
-
 	uint8_t data = m_ReadAhead;
+
+	// prevent debugger from changing the address base
+	if (machine().side_effects_disabled()) return data;
 
 	m_ReadAhead = m_vram_space->read_byte(m_Addr);
 	m_Addr = (m_Addr + 1) & (m_vram_size - 1);
@@ -193,10 +193,10 @@ void tms9928a_device::vram_write(u8 data)
 
 u8 tms9928a_device::register_read()
 {
-	// prevent debugger from changing the internal state
-	if (machine().side_effects_disabled()) return 0;
-
 	uint8_t data = m_StatusReg;
+
+	// prevent debugger from changing the internal state
+	if (machine().side_effects_disabled()) return data;
 
 	m_StatusReg = m_FifthSprite;
 	check_interrupt();
