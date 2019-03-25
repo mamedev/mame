@@ -106,7 +106,8 @@ void spg2xx_device::map(address_map &map)
 	map(0x003000, 0x0031ff).rw(m_spg_audio, FUNC(spg2xx_audio_device::audio_r), FUNC(spg2xx_audio_device::audio_w));
 	map(0x003200, 0x0033ff).rw(m_spg_audio, FUNC(spg2xx_audio_device::audio_phase_r), FUNC(spg2xx_audio_device::audio_phase_w));
 	map(0x003400, 0x0037ff).rw(m_spg_audio, FUNC(spg2xx_audio_device::audio_ctrl_r), FUNC(spg2xx_audio_device::audio_ctrl_w));
-	map(0x003d00, 0x003eff).rw(FUNC(spg2xx_device::io_r), FUNC(spg2xx_device::io_w));
+	map(0x003d00, 0x003dff).rw(FUNC(spg2xx_device::io_r), FUNC(spg2xx_device::io_w));
+	map(0x003e00, 0x003e03).rw(FUNC(spg2xx_device::dma_r), FUNC(spg2xx_device::dma_w));
 }
 
 void spg2xx_device::device_start()
@@ -171,6 +172,8 @@ void spg2xx_device::device_start()
 	save_item(NAME(m_sprite_index_to_debug));
 
 	save_item(NAME(m_io_regs));
+	save_item(NAME(m_dma_regs));
+
 	save_item(NAME(m_uart_rx_fifo));
 	save_item(NAME(m_uart_rx_fifo_start));
 	save_item(NAME(m_uart_rx_fifo_end));
@@ -195,7 +198,8 @@ void spg2xx_device::device_start()
 void spg2xx_device::device_reset()
 {
 	memset(m_video_regs, 0, 0x100 * sizeof(uint16_t));
-	memset(m_io_regs, 0, 0x200 * sizeof(uint16_t));
+	memset(m_io_regs, 0, 0x100 * sizeof(uint16_t));
+	memset(m_dma_regs, 0, 0x4 * sizeof(uint16_t));
 
 	m_timer_a_preload = 0;
 	m_timer_b_preload = 0;
@@ -1140,23 +1144,6 @@ READ16_MEMBER(spg2xx_device::io_r)
 		LOGMASKED(LOG_I2C, "io_r: I2C Data In = %04x\n", val);
 		break;
 
-	case 0x100: // DMA Source (L)
-		LOGMASKED(LOG_DMA, "io_r: DMA Source (lo) = %04x\n", val);
-		break;
-
-	case 0x101: // DMA Source (H)
-		LOGMASKED(LOG_DMA, "io_r: DMA Source (hi) = %04x\n", val);
-		break;
-
-	case 0x102: // DMA Length
-		LOGMASKED(LOG_DMA, "io_r: DMA Length = %04x\n", 0);
-		val = 0;
-		break;
-
-	case 0x103: // DMA Destination
-		LOGMASKED(LOG_DMA, "io_r: DMA Dest = %04x\n", val);
-		break;
-
 	default:
 		LOGMASKED(LOG_UNKNOWN_IO, "io_r: Unknown register %04x\n", 0x3d00 + offset);
 		break;
@@ -1164,6 +1151,38 @@ READ16_MEMBER(spg2xx_device::io_r)
 
 	return val;
 }
+
+READ16_MEMBER(spg2xx_device::dma_r)
+{
+	uint16_t val = m_dma_regs[offset];
+	switch (offset)
+	{
+
+	case 0x000: // DMA Source (L)
+		LOGMASKED(LOG_DMA, "dma_r: DMA Source (lo) = %04x\n", val);
+		break;
+
+	case 0x001: // DMA Source (H)
+		LOGMASKED(LOG_DMA, "dma_r: DMA Source (hi) = %04x\n", val);
+		break;
+
+	case 0x002: // DMA Length
+		LOGMASKED(LOG_DMA, "dma_r: DMA Length = %04x\n", 0);
+		val = 0;
+		break;
+
+	case 0x003: // DMA Destination
+		LOGMASKED(LOG_DMA, "dma_r: DMA Dest = %04x\n", val);
+		break;
+
+	default:
+		LOGMASKED(LOG_UNKNOWN_IO, "dma_r: Unknown register %04x\n", 0x3d00 + offset);
+		break;
+	}
+
+	return val;
+}
+
 
 void spg2xx_device::update_porta_special_modes()
 {
@@ -1826,31 +1845,41 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		m_io_regs[offset] = data;
 		break;
 
-	case 0x100: // DMA Source (lo)
-		LOGMASKED(LOG_DMA, "io_w: DMA Source (lo) = %04x\n", data);
-		m_io_regs[offset] = data;
-		break;
-
-	case 0x101: // DMA Source (hi)
-		LOGMASKED(LOG_DMA, "io_w: DMA Source (hi) = %04x\n", data);
-		m_io_regs[offset] = data;
-		break;
-
-	case 0x103: // DMA Destination
-		LOGMASKED(LOG_DMA, "io_w: DMA Dest = %04x\n", data);
-		m_io_regs[offset] = data;
-		break;
-
-	case 0x102: // DMA Length
-		LOGMASKED(LOG_DMA, "io_w: DMA Length = %04x\n", data);
-		if (!(data & 0xc000))  // jak_dora writes 0xffff here which ends up trashing registers etc. why? such writes can't be valid
-			do_cpu_dma(data);
-
-		break;
-
 	default:
 		LOGMASKED(LOG_UNKNOWN_IO, "io_w: Unknown register %04x = %04x\n", 0x3d00 + offset, data);
 		m_io_regs[offset] = data;
+		break;
+	}
+}
+
+WRITE16_MEMBER(spg2xx_device::dma_w)
+{
+	switch (offset)
+	{
+	case 0x000: // DMA Source (lo)
+		LOGMASKED(LOG_DMA, "dma_w: DMA Source (lo) = %04x\n", data);
+		m_dma_regs[offset] = data;
+		break;
+
+	case 0x001: // DMA Source (hi)
+		LOGMASKED(LOG_DMA, "dma_w: DMA Source (hi) = %04x\n", data);
+		m_dma_regs[offset] = data;
+		break;
+
+	case 0x002: // DMA Length
+		LOGMASKED(LOG_DMA, "dma_w: DMA Length = %04x\n", data);
+		if (!(data & 0xc000))  // jak_dora writes 0xffff here which ends up trashing registers etc. why? such writes can't be valid
+			do_cpu_dma(data);
+		break;
+
+	case 0x003: // DMA Destination
+		LOGMASKED(LOG_DMA, "dma_w: DMA Dest = %04x\n", data);
+		m_dma_regs[offset] = data;
+		break;
+
+	default:
+		LOGMASKED(LOG_UNKNOWN_IO, "dma_w: Unknown register %04x = %04x\n", 0x3d00 + offset, data);
+		m_dma_regs[offset] = data;
 		break;
 	}
 }
@@ -2135,8 +2164,8 @@ void spg2xx_device::do_cpu_dma(uint32_t len)
 {
 	address_space &mem = m_cpu->space(AS_PROGRAM);
 
-	uint32_t src = ((m_io_regs[0x101] & 0x3f) << 16) | m_io_regs[0x100];
-	uint32_t dst = m_io_regs[0x103] & 0x3fff;
+	uint32_t src = ((m_dma_regs[0x001] & 0x3f) << 16) | m_dma_regs[0x000];
+	uint32_t dst = m_dma_regs[0x003] & 0x3fff;
 
 	for (uint32_t j = 0; j < len; j++)
 	{
@@ -2144,10 +2173,10 @@ void spg2xx_device::do_cpu_dma(uint32_t len)
 	}
 
 	src += len;
-	m_io_regs[0x100] = (uint16_t)src;
-	m_io_regs[0x101] = (src >> 16) & 0x3f;
-	m_io_regs[0x102] = 0;
-	m_io_regs[0x103] = (dst + len) & 0x3fff;
+	m_dma_regs[0x000] = (uint16_t)src;
+	m_dma_regs[0x001] = (src >> 16) & 0x3f;
+	m_dma_regs[0x002] = 0;
+	m_dma_regs[0x003] = (dst + len) & 0x3fff;
 }
 
 void spg2xx_device::device_add_mconfig(machine_config &config)
