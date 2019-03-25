@@ -4044,4 +4044,95 @@
 		</part>
 	</software>
 
+	<software name="apoichip">
+		<description>Apple-oids and Chipout</description>
+		<year>1981</year>
+		<publisher>California Pacific Computer</publisher>
+		<info name="release" value="2019-03-19"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="199464">
+				<rom name="apple-oids and chip out.woz" size="199464" crc="bc3840d1" sha1="e704efd1af6cf7d4cffce23087b413e283daf8f2" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrraid">
+		<description>Spider Raid</description>
+		<year>1982</year>
+		<publisher>InSoft</publisher>
+		<info name="release" value="2019-03-20"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327940">
+				<rom name="spider raid.woz" size="327940" crc="4cab2de3" sha1="f3f0f32ac6c65964d1b7473e2dc19d62366fac1b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lazrsilk">
+		<description>Lazer Silk</description>
+		<year>1982</year>
+		<publisher>Gebelli Software</publisher>
+		<info name="release" value="2019-03-21"/>
+		<sharedfeat name="compatibility" value="A2,A2P" />
+		<!-- It requires a 48K Apple II or ][+.
+		Due to compatibility issues created by the copy protection,
+		it will not run on later models. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="354556">
+				<rom name="lazer silk.woz" size="354556" crc="038984fb" sha1="a44ee87f2bef7c43edd4dbb8eea70f9fc930b051" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazecraz">
+		<description>Maze Craze Construction Set</description>
+		<year>1983</year>
+		<publisher>Data Trek</publisher>
+		<info name="release" value="2019-03-22"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="297232">
+				<rom name="maze craze construction set.woz" size="297232" crc="90ae1b9b" sha1="5f871f8000e1277a1b77ca9470cc53243721eee2" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="esrngstn">
+		<description>Escape From Rungistan</description>
+		<year>1982</year>
+		<publisher>Sirius Software</publisher>
+		<info name="release" value="2019-03-23"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241440">
+				<rom name="escape from rungistan.woz" size="241440" crc="1034b9db" sha1="1ee14eeb9c2b87e3571ce329c58ac4dba3c7c4c2" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zaxxon">
+		<description>Zaxxon</description>
+		<year>1983</year>
+		<publisher>DataSoft</publisher>
+		<info name="release" value="2019-03-24"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="224006">
+				<rom name="zaxxon.woz" size="224006" crc="ad57fc70" sha1="dca020bce30ce013b7e9b6b40356693a2a1a3d11" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
