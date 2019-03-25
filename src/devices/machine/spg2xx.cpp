@@ -150,15 +150,35 @@ void spg2xx_device::device_reset()
 
 WRITE_LINE_MEMBER(spg2xx_device::audioirq_w)
 {
-	if (state == ASSERT_LINE)
-	{
-		m_cpu->set_state_unsynced(UNSP_IRQ4_LINE, ASSERT_LINE);
-	}
-	else
-	{
-		m_cpu->set_state_unsynced(UNSP_IRQ4_LINE, CLEAR_LINE);
-	}
+	m_cpu->set_state_unsynced(UNSP_IRQ4_LINE, state);
 }
+
+WRITE_LINE_MEMBER(spg2xx_device::timerirq_w)
+{
+	m_cpu->set_state_unsynced(UNSP_IRQ2_LINE, state);
+}
+
+WRITE_LINE_MEMBER(spg2xx_device::uartirq_w)
+{
+	m_cpu->set_state_unsynced(UNSP_IRQ3_LINE, state);
+}
+
+WRITE_LINE_MEMBER(spg2xx_device::extirq_w)
+{
+	m_cpu->set_state_unsynced(UNSP_IRQ5_LINE, state);
+}
+
+WRITE_LINE_MEMBER(spg2xx_device::ffreq1_w)
+{
+	m_cpu->set_state_unsynced(UNSP_IRQ6_LINE, state);
+}
+
+WRITE_LINE_MEMBER(spg2xx_device::ffreq2_w)
+{
+	m_cpu->set_state_unsynced(UNSP_IRQ7_LINE, state);
+}
+
+
 
 READ16_MEMBER(spg2xx_device::space_r)
 {
@@ -999,6 +1019,11 @@ void spg2xx_device::configure_spg_io(spg2xx_io_device* io)
 	io->uart_tx().set(FUNC(spg2xx_device::tx_w));
 	io->chip_select().set(FUNC(spg2xx_device::cs_w));
 	io->pal_read_callback().set(FUNC(spg2xx_device::get_pal_r));
+	io->write_timer_irq_callback().set(FUNC(spg2xx_device::timerirq_w));
+	io->write_uart_adc_irq_callback().set(FUNC(spg2xx_device::uartirq_w));
+	io->write_external_irq_callback().set(FUNC(spg2xx_device::extirq_w));
+	io->write_ffrq_tmr1_irq_callback().set(FUNC(spg2xx_device::ffreq1_w));
+	io->write_ffrq_tmr2_irq_callback().set(FUNC(spg2xx_device::ffreq2_w));
 }
 
 void spg24x_device::device_add_mconfig(machine_config &config)

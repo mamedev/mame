@@ -48,6 +48,11 @@ spg2xx_io_device::spg2xx_io_device(const machine_config &mconfig, device_type ty
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_pal_read_cb(*this)
+	, m_timer_irq_cb(*this)
+	, m_uart_adc_irq_cb(*this)
+	, m_external_irq_cb(*this)
+	, m_ffreq_tmr1_irq_cb(*this)
+	, m_ffreq_tmr2_irq_cb(*this)
 {
 }
 
@@ -77,6 +82,12 @@ void spg2xx_io_device::device_start()
 	m_uart_tx.resolve_safe();
 	m_chip_sel.resolve_safe();
 	m_pal_read_cb.resolve_safe(0);
+
+	m_timer_irq_cb.resolve();
+	m_uart_adc_irq_cb.resolve();
+	m_external_irq_cb.resolve();
+	m_ffreq_tmr1_irq_cb.resolve();
+	m_ffreq_tmr2_irq_cb.resolve();
 
 	m_tmb1 = timer_alloc(TIMER_TMB1);
 	m_tmb2 = timer_alloc(TIMER_TMB2);
@@ -1150,31 +1161,31 @@ void spg2xx_io_device::check_irqs(const uint16_t changed)
 	if (changed & 0x0c00) // Timer A, Timer B IRQ
 	{
 		LOGMASKED(LOG_TIMERS, "%ssserting IRQ2 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00), changed);
-		m_cpu->set_state_unsynced(UNSP_IRQ2_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
+		m_timer_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	if (changed & 0x2100) // UART, ADC IRQ
 	{
 		LOGMASKED(LOG_UART, "%ssserting IRQ3 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100), changed);
-		m_cpu->set_state_unsynced(UNSP_IRQ3_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? ASSERT_LINE : CLEAR_LINE);
+		m_uart_adc_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	if (changed & 0x1200) // External IRQ
 	{
 		LOGMASKED(LOG_UART, "%ssserting IRQ5 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200), changed);
-		m_cpu->set_state_unsynced(UNSP_IRQ5_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? ASSERT_LINE : CLEAR_LINE);
+		m_external_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	if (changed & 0x0070) // 1024Hz, 2048Hz, 4096Hz IRQ
 	{
-		LOGMASKED(LOG_TIMERS, "%ssserting IRQ6 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070), changed);
-		m_cpu->set_state_unsynced(UNSP_IRQ6_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
+		LOGMASKED(LOG_TIMERS, "%ssserting IRQ6 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070), changed);		//m_cpu->set_state_unsynced(UNSP_IRQ6_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
+		m_ffreq_tmr1_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	if (changed & 0x008b) // TMB1, TMB2, 4Hz, key change IRQ
 	{
 		LOGMASKED(LOG_IRQS, "%ssserting IRQ7 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b), changed);
-		m_cpu->set_state_unsynced(UNSP_IRQ7_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? ASSERT_LINE : CLEAR_LINE);
+		m_ffreq_tmr2_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

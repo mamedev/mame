@@ -37,7 +37,13 @@ public:
 	virtual DECLARE_READ16_MEMBER(io_r);
 	virtual DECLARE_WRITE16_MEMBER(io_w);
 	
-	auto pal_read_callback() { return m_pal_read_cb.bind(); }
+	auto pal_read_callback() { return m_pal_read_cb.bind(); };
+
+	auto write_timer_irq_callback() { return m_timer_irq_cb.bind(); };
+	auto write_uart_adc_irq_callback() { return m_uart_adc_irq_cb.bind(); };
+	auto write_external_irq_callback() { return m_external_irq_cb.bind(); };
+	auto write_ffrq_tmr1_irq_callback() { return m_ffreq_tmr1_irq_cb.bind(); };
+	auto write_ffrq_tmr2_irq_callback() { return m_ffreq_tmr2_irq_cb.bind(); };
 
 protected:
 	spg2xx_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint32_t sprite_limit)
@@ -129,6 +135,12 @@ protected:
 	required_device<screen_device> m_screen;
 
 	devcb_read16 m_pal_read_cb;
+
+	devcb_write_line m_timer_irq_cb;
+	devcb_write_line m_uart_adc_irq_cb;
+	devcb_write_line m_external_irq_cb;
+	devcb_write_line m_ffreq_tmr1_irq_cb;
+	devcb_write_line m_ffreq_tmr2_irq_cb;
 };
 
 class spg24x_io_device : public spg2xx_io_device

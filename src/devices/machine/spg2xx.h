@@ -106,6 +106,12 @@ protected:
 	DECLARE_WRITE16_MEMBER(dma_w);
 
 	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
+	DECLARE_WRITE_LINE_MEMBER(timerirq_w);
+	DECLARE_WRITE_LINE_MEMBER(uartirq_w);
+	DECLARE_WRITE_LINE_MEMBER(extirq_w);
+	DECLARE_WRITE_LINE_MEMBER(ffreq1_w);
+	DECLARE_WRITE_LINE_MEMBER(ffreq2_w);
+
 	DECLARE_READ16_MEMBER(space_r);
 
 	inline void check_video_irq();
