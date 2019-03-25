@@ -34,9 +34,13 @@ public:
 
 	void extint_w(int channel, bool state);
 
-	virtual DECLARE_READ16_MEMBER(io_r);
-	virtual DECLARE_WRITE16_MEMBER(io_w);
+	DECLARE_READ16_MEMBER(io_r);
+	DECLARE_WRITE16_MEMBER(io_w);
 	
+	virtual DECLARE_READ16_MEMBER(io_extended_r);
+	virtual DECLARE_WRITE16_MEMBER(io_extended_w);
+
+
 	auto pal_read_callback() { return m_pal_read_cb.bind(); };
 
 	auto write_timer_irq_callback() { return m_timer_irq_cb.bind(); };
@@ -170,7 +174,7 @@ public:
 
 	spg28x_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE16_MEMBER(io_w) override;
+	virtual DECLARE_WRITE16_MEMBER(io_extended_w) override;
 };
 
 DECLARE_DEVICE_TYPE(SPG24X_IO, spg24x_io_device)

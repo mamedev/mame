@@ -81,7 +81,8 @@ void spg2xx_device::map(address_map &map)
 	map(0x003000, 0x0031ff).rw(m_spg_audio, FUNC(spg2xx_audio_device::audio_r), FUNC(spg2xx_audio_device::audio_w));
 	map(0x003200, 0x0033ff).rw(m_spg_audio, FUNC(spg2xx_audio_device::audio_phase_r), FUNC(spg2xx_audio_device::audio_phase_w));
 	map(0x003400, 0x0037ff).rw(m_spg_audio, FUNC(spg2xx_audio_device::audio_ctrl_r), FUNC(spg2xx_audio_device::audio_ctrl_w));
-	map(0x003d00, 0x003dff).rw(m_spg_io, FUNC(spg2xx_io_device::io_r), FUNC(spg2xx_io_device::io_w));
+	map(0x003d00, 0x003d2f).rw(m_spg_io, FUNC(spg2xx_io_device::io_r), FUNC(spg2xx_io_device::io_w));
+	map(0x003d30, 0x003dff).rw(m_spg_io, FUNC(spg2xx_io_device::io_extended_r), FUNC(spg2xx_io_device::io_extended_w));
 	map(0x003e00, 0x003e03).rw(FUNC(spg2xx_device::dma_r), FUNC(spg2xx_device::dma_w));
 }
 

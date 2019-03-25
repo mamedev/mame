@@ -1,6 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 
+/* this is used by the SPG110, SPG24x and SPG28x
+   basic I/O behavior is definitely the same on the SPG110 but
+   the rest needs verifying */
+
 #include "emu.h"
 #include "spg2xx_io.h"
 
@@ -272,7 +276,25 @@ READ16_MEMBER(spg2xx_io_device::io_r)
 		val = m_cpu->get_ds();
 		LOGMASKED(LOG_SEGMENT, "io_r: Data Segment = %04x\n", val);
 		break;
+	
+	default:
+		LOGMASKED(LOG_UNKNOWN_IO, "io_r: Unknown register %04x\n", 0x3d00 + offset);
+		break;
+	}
 
+	return val;
+}
+
+READ16_MEMBER(spg2xx_io_device::io_extended_r)
+{
+	// this set of registers might only be on the 24x not the 11x
+
+	offset += 0x30;
+
+	uint16_t val = m_io_regs[offset];
+
+	switch (offset)
+	{
 	case 0x30: // UART Control
 		LOGMASKED(LOG_UART, "%s: io_r: UART Control = %04x\n", machine().describe_context(), val);
 		break;
@@ -460,8 +482,10 @@ void spg2xx_io_device::update_timer_c_src()
 }
 
 
-WRITE16_MEMBER(spg28x_io_device::io_w)
+WRITE16_MEMBER(spg28x_io_device::io_extended_w)
 {
+	offset += 0x30;
+
 	if (offset == 0x33)
 	{
 		m_io_regs[offset] = data;
@@ -470,7 +494,7 @@ WRITE16_MEMBER(spg28x_io_device::io_w)
 	}
 	else
 	{
-		spg2xx_io_device::io_w(space, offset, data, mem_mask);
+		spg2xx_io_device::io_extended_w(space, offset-0x30, data, mem_mask);
 	}
 }
 
@@ -846,6 +870,25 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 		m_cpu->set_ds(data & 0x3f);
 		LOGMASKED(LOG_SEGMENT, "io_w: Data Segment = %04x\n", data);
 		break;
+
+	default:
+		LOGMASKED(LOG_UNKNOWN_IO, "io_w: Unknown register %04x = %04x\n", 0x3d00 + offset, data);
+		m_io_regs[offset] = data;
+		break;
+	}
+}
+
+
+
+
+WRITE16_MEMBER(spg2xx_io_device::io_extended_w)
+{
+	// this set of registers might only be on the 24x not the 11x
+
+	offset += 0x30;
+
+	switch (offset)
+	{
 
 	case 0x30: // UART Control
 	{
