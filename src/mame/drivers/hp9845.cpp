@@ -3532,35 +3532,37 @@ const uint8_t hp9845t_state::m_back_arrow_shape[] = {
 	0xf8, 0xf0, 0xe0, 0xc0, 0x80, 0x00, 0x00
 };
 
-MACHINE_CONFIG_START(hp9845_state::hp9845a)
-	//MCFG_DEVICE_ADD("lpu", HP_5061_3010, XTAL(11'400'000))
-	//MCFG_DEVICE_ADD("ppu", HP_5061_3011, XTAL(11'400'000))
+void hp9845_state::hp9845a(machine_config &config)
+{
+	//HP_5061_3010(config, m_lpu, XTAL(11'400'000));
+	//HP_5061_3011(config, m_ppu, XTAL(11'400'000));
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(hp9845_state, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(560, 455)
-	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, 455-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(hp9845_state::screen_update));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(560, 455);
+	screen.set_visarea(0, 560-1, 0, 455-1);
 
 	SOFTWARE_LIST(config, "optrom_list").set_original("hp9845a_rom");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hp9845_state::hp9835a)
-	//MCFG_DEVICE_ADD("lpu", HP_5061_3001, XTAL(11'400'000))
-	//MCFG_DEVICE_ADD("ppu", HP_5061_3001, XTAL(11'400'000))
+void hp9845_state::hp9835a(machine_config &config)
+{
+	//HP_5061_3001(config, m_lpu, XTAL(11'400'000));
+	//HP_5061_301(1config, m_ppu, XTAL(11'400'000));
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(hp9845_state, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(560, 455)
-	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, 455-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(hp9845_state::screen_update));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(560, 455);
+	screen.set_visarea(0, 560-1, 0, 455-1);
 
 	SOFTWARE_LIST(config, "optrom_list").set_original("hp9835a_rom");
-MACHINE_CONFIG_END
+}
 
 /*
     Global memory map in blocks of 32 kwords / 64 kbytes each:
@@ -3623,7 +3625,8 @@ void hp9845_base_state::ppu_io_map(address_map &map)
 	map(HP_MAKE_IOADDR(T15_PA, 0), HP_MAKE_IOADDR(T15_PA, 3)).rw(m_t15, FUNC(hp_taco_device::reg_r), FUNC(hp_taco_device::reg_w));
 }
 
-MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
+void hp9845_base_state::hp9845_base(machine_config &config)
+{
 	HP_5061_3001(config , m_lpu , 5700000);
 	m_lpu->set_addrmap(AS_PROGRAM , &hp9845_base_state::global_mem_map);
 	m_lpu->set_9845_boot_mode(true);
@@ -3655,8 +3658,7 @@ MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 
 	// Beeper
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper" , BEEP , KEY_SCAN_OSCILLATOR / 512)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 0.50)
+	BEEP(config, m_beeper , KEY_SCAN_OSCILLATOR / 512).add_route(ALL_OUTPUTS , "mono" , 0.50);
 
 	TIMER(config, m_beep_timer).configure_generic(FUNC(hp9845_base_state::beeper_off));
 
@@ -3674,22 +3676,14 @@ MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 	// right-hand side and left-hand side drawers, respectively.
 	// Here we do away with the distinction between LPU & PPU ROMs: in the end they
 	// are visible to both CPUs at the same addresses.
-	MCFG_DEVICE_ADD("drawer1", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
-	MCFG_DEVICE_ADD("drawer2", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
-	MCFG_DEVICE_ADD("drawer3", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
-	MCFG_DEVICE_ADD("drawer4", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
-	MCFG_DEVICE_ADD("drawer5", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
-	MCFG_DEVICE_ADD("drawer6", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
-	MCFG_DEVICE_ADD("drawer7", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
-	MCFG_DEVICE_ADD("drawer8", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
+	HP_OPTROM_SLOT(config, "drawer1", 0);
+	HP_OPTROM_SLOT(config, "drawer2", 0);
+	HP_OPTROM_SLOT(config, "drawer3", 0);
+	HP_OPTROM_SLOT(config, "drawer4", 0);
+	HP_OPTROM_SLOT(config, "drawer5", 0);
+	HP_OPTROM_SLOT(config, "drawer6", 0);
+	HP_OPTROM_SLOT(config, "drawer7", 0);
+	HP_OPTROM_SLOT(config, "drawer8", 0);
 
 	// I/O slots
 	for (unsigned slot = 0; slot < 4; slot++) {
@@ -3709,7 +3703,7 @@ MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 	prt.irq().set(FUNC(hp9845_base_state::prt_irl_w));
 	prt.flg().set([this](int state) { m_io_sys->set_flg(PRINTER_PA , state); });
 	prt.sts().set([this](int state) { m_io_sys->set_sts(PRINTER_PA , state); });
-MACHINE_CONFIG_END
+}
 
 void hp9845b_state::hp9845b(machine_config &config)
 {
@@ -3728,19 +3722,18 @@ void hp9845b_state::hp9845b(machine_config &config)
 	SOFTWARE_LIST(config, "optrom_list").set_original("hp9845b_rom");
 }
 
-MACHINE_CONFIG_START(hp9845c_state::hp9845c)
+void hp9845c_state::hp9845c(machine_config &config)
+{
 	hp9845_base(config);
 	// video hardware
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(hp9845c_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp9845c_state, vblank_w))
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_770_PIXEL_CLOCK , VIDEO_770_HTOTAL , VIDEO_770_HBEND , VIDEO_770_HBSTART , VIDEO_770_VTOTAL , VIDEO_770_VBEND , VIDEO_770_VBSTART)
-	MCFG_PALETTE_ADD("palette", 24)
+	m_screen->set_screen_update(FUNC(hp9845c_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(hp9845c_state::vblank_w));
+	m_screen->set_raw(VIDEO_770_PIXEL_CLOCK , VIDEO_770_HTOTAL , VIDEO_770_HBEND , VIDEO_770_HBSTART , VIDEO_770_VTOTAL , VIDEO_770_VBEND , VIDEO_770_VBSTART);
+	PALETTE(config, m_palette).set_entries(24);
 	TIMER(config, "scantimer").configure_scanline(FUNC(hp9845c_state::scanline_timer), "screen", 0, 1);
 
 	SOFTWARE_LIST(config, "optrom_list").set_original("hp9845b_rom");
-
-MACHINE_CONFIG_END
+}
 
 void hp9845t_state::hp9845t(machine_config &config)
 {

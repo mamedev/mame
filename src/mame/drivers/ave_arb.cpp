@@ -61,8 +61,9 @@ public:
 	{ }
 
 	// halt button is tied to NMI, reset button to RESET(but only if halt button is held)
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, (newval && m_inp_matrix[9]->read() & 2) ? ASSERT_LINE : CLEAR_LINE); }
-	DECLARE_INPUT_CHANGED_MEMBER(halt_button) { m_maincpu->set_input_line(M6502_NMI_LINE, newval ? ASSERT_LINE : CLEAR_LINE); }
+	void update_reset() { m_maincpu->set_input_line(INPUT_LINE_RESET, (m_inp_matrix[9]->read() == 3) ? ASSERT_LINE : CLEAR_LINE); }
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { update_reset(); }
+	DECLARE_INPUT_CHANGED_MEMBER(halt_button) { m_maincpu->set_input_line(M6502_NMI_LINE, newval ? ASSERT_LINE : CLEAR_LINE); update_reset(); }
 
 	// machine drivers
 	void arb(machine_config &config);
@@ -104,15 +105,15 @@ DEVICE_IMAGE_LOAD_MEMBER(arb_state, cartridge)
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
+	// extra ram (optional)
+	if (image.get_feature("ram"))
+		m_maincpu->space(AS_PROGRAM).install_ram(0x0800, 0x0fff, 0x1000, nullptr);
+
 	return image_init_result::PASS;
 }
 
 READ8_MEMBER(arb_state::cartridge_r)
 {
-	// range is 0x4000-0x7fff + 0xc000-0xffff
-	if (offset >= 0x8000)
-		offset -= 0x4000;
-
 	return m_cart->read_rom(offset & m_cart_mask);
 }
 
@@ -165,9 +166,10 @@ READ8_MEMBER(arb_state::input_r)
 
 void arb_state::main_map(address_map &map)
 {
-	map(0x0000, 0x07ff).mirror(0x3800).ram().share("nvram");
-	map(0x4000, 0xffff).r(FUNC(arb_state::cartridge_r)); // gap in 0x8000-0xbfff
-	map(0x8000, 0x800f).mirror(0x3ff0).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	// external slot is A0-A14, potential bus conflict with RAM/VIA
+	map(0x0000, 0x7fff).mirror(0x8000).r(FUNC(arb_state::cartridge_r));
+	map(0x0000, 0x07ff).mirror(0x1000).ram().share("nvram");
+	map(0x8000, 0x800f).mirror(0x1ff0).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
 }
 
 
@@ -190,8 +192,8 @@ static INPUT_PORTS_START( arb )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CODE(KEYCODE_0) PORT_NAME("New Game / Options / Pawn / 0")
 
 	PORT_START("IN.9")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, reset_button, nullptr)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Halt") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, halt_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_F2) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, reset_button, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_CODE(KEYCODE_F2) PORT_NAME("Halt") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, halt_button, nullptr)
 INPUT_PORTS_END
 
 

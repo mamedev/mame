@@ -1075,6 +1075,21 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 	else
 		str << _("Sound\tOK\n");
 
+	if (flags.unemulated_features() & device_t::feature::CAPTURE)
+		str << _("Capture\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::CAPTURE)
+		str << _("Capture\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::CAMERA)
+		str << _("Camera\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::CAMERA)
+		str << _("Camera\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::MICROPHONE)
+		str << _("Microphone\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::MICROPHONE)
+		str << _("Microphone\tImperfect\n");
+
 	if (flags.unemulated_features() & device_t::feature::CONTROLS)
 		str << _("Controls\tUnimplemented\n");
 	else if (flags.imperfect_features() & device_t::feature::CONTROLS)
@@ -1090,15 +1105,10 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 	else if (flags.imperfect_features() & device_t::feature::MOUSE)
 		str << _("Mouse\tImperfect\n");
 
-	if (flags.unemulated_features() & device_t::feature::MICROPHONE)
-		str << _("Microphone\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::MICROPHONE)
-		str << _("Microphone\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::CAMERA)
-		str << _("Camera\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::CAMERA)
-		str << _("Camera\tImperfect\n");
+	if (flags.unemulated_features() & device_t::feature::MEDIA)
+		str << _("Media\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::MEDIA)
+		str << _("Media\tImperfect\n");
 
 	if (flags.unemulated_features() & device_t::feature::DISK)
 		str << _("Disk\tUnimplemented\n");
@@ -1109,6 +1119,31 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 		str << _("Printer\tUnimplemented\n");
 	else if (flags.imperfect_features() & device_t::feature::PRINTER)
 		str << _("Printer\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::TAPE)
+		str << _("Mag. Tape\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::TAPE)
+		str << _("Mag. Tape\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::PUNCH)
+		str << _("Punch Tape\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::PUNCH)
+		str << _("Punch Tape\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::DRUM)
+		str << _("Mag. Drum\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::DRUM)
+		str << _("Mag. Drum\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::ROM)
+		str << _("(EP)ROM\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::ROM)
+		str << _("(EP)ROM\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::COMMS)
+		str << _("Communications\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::COMMS)
+		str << _("Communications\tImperfect\n");
 
 	if (flags.unemulated_features() & device_t::feature::LAN)
 		str << _("LAN\tUnimplemented\n");

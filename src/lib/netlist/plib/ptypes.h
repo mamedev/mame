@@ -8,11 +8,11 @@
 #ifndef PTYPES_H_
 #define PTYPES_H_
 
+#include "pconfig.h"
+
 #include <limits>
 #include <string>
 #include <type_traits>
-
-#include "pconfig.h"
 
 #define COPYASSIGNMOVE(name, def)  \
 		name(const name &) = def; \
@@ -120,8 +120,8 @@ namespace plib
 		static_assert(std::is_integral<N>::value, "gcd: N must be an integer");
 
 		return m == 0 ? plib::abs(n)
-		     : n == 0 ? plib::abs(m)
-		     : gcd(n, m % n);
+			 : n == 0 ? plib::abs(m)
+			 : gcd(n, m % n);
 	}
 
 	template<typename M, typename N>

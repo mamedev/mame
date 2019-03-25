@@ -10,10 +10,12 @@
 #ifndef NLLISTS_H_
 #define NLLISTS_H_
 
-#include "nl_config.h"
 #include "plib/pchrono.h"
 #include "plib/plists.h"
 #include "plib/ptypes.h"
+
+#include "nl_config.h"
+#include "nltypes.h"
 
 #include <algorithm>
 #include <atomic>
@@ -21,7 +23,6 @@
 #include <thread>
 #include <utility>
 
-#include "nltypes.h"
 
 // ----------------------------------------------------------------------------------------
 // timed queue
@@ -197,7 +198,8 @@ namespace netlist
 		mutex_type      m_lock;
 		PALIGNAS_CACHELINE()
 		T             * m_end;
-		std::vector<T>  m_list;
+		//std::vector<T>  m_list;
+		plib::aligned_vector<T>  m_list;
 
 	public:
 		// profiling

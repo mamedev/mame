@@ -625,14 +625,14 @@ void tool_app_t::listdevices()
 
 	nt.setup().prepare_to_run();
 
-	std::vector<netlist::poolptr<netlist::core_device_t>> devs;
+	std::vector<netlist::pool_owned_ptr<netlist::core_device_t>> devs;
 
 	for (auto & f : list)
 	{
 		pstring out = plib::pfmt("{1:-20} {2}(<id>")(f->classname())(f->name());
 
 		f->macro_actions(nt.setup(), f->name() + "_lc");
-		auto d = f->Create(nt.setup().netlist(), f->name() + "_lc");
+		auto d = f->Create(nt.nlstate(), f->name() + "_lc");
 		// get the list of terminals ...
 
 		std::vector<pstring> terms(nt.setup().get_terminals_for_device_name(d->name()));

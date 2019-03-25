@@ -182,6 +182,7 @@ namespace netlist
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		{
 			set_logic_family(setup().family_from_model(m_FAMILY()));
+			m_Q.set_logic_family(this->logic_family());
 		}
 
 		NETLIB_UPDATEI() { }
@@ -335,7 +336,7 @@ namespace netlist
 		param_int_t m_N;
 		param_str_t m_func;
 		analog_output_t m_Q;
-		std::vector<poolptr<analog_input_t>> m_I;
+		std::vector<pool_owned_ptr<analog_input_t>> m_I;
 
 		std::vector<double> m_vals;
 		plib::pfunction m_compiled;

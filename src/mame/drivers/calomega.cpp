@@ -2570,7 +2570,8 @@ WRITE_LINE_MEMBER(calomega_state::write_acia_clock)
 *                Machine Drivers                 *
 *************************************************/
 
-MACHINE_CONFIG_START(calomega_state::sys903)
+void calomega_state::sys903(machine_config &config)
+{
 	/* basic machine hardware */
 	M6502(config, m_maincpu, CPU_CLOCK);   /* confirmed */
 	m_maincpu->set_addrmap(AS_PROGRAM, &calomega_state::sys903_map);
@@ -2588,13 +2589,13 @@ MACHINE_CONFIG_START(calomega_state::sys903)
 	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s903_mux_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)                  /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 31*8-1)    /* Taken from MC6845 init, registers 01 & 06 */
-	MCFG_SCREEN_UPDATE_DRIVER(calomega_state, screen_update_calomega)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((39+1)*8, (31+1)*8);                  /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
+	screen.set_visarea(0*8, 32*8-1, 0*8, 31*8-1);    /* Taken from MC6845 init, registers 01 & 06 */
+	screen.set_screen_update(FUNC(calomega_state::screen_update_calomega));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_calomega);
 	PALETTE(config, m_palette, FUNC(calomega_state::calomega_palette), 256); // or 128? is the upper half of the PROMs really valid colors?
@@ -2616,7 +2617,7 @@ MACHINE_CONFIG_START(calomega_state::sys903)
 
 	clock_device &aciabaud(CLOCK(config, "aciabaud", UART_CLOCK));
 	aciabaud.signal_handler().set(FUNC(calomega_state::write_acia_clock));
-MACHINE_CONFIG_END
+}
 
 
 void calomega_state::s903mod(machine_config &config)

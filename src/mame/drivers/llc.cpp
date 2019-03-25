@@ -200,7 +200,8 @@ static GFXDECODE_START( gfx_llc2 )
 GFXDECODE_END
 
 /* Machine driver */
-MACHINE_CONFIG_START(llc_state::llc1)
+void llc_state::llc1(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(3'000'000));
 	m_maincpu->set_daisy_config(llc1_daisy_chain);
@@ -211,13 +212,13 @@ MACHINE_CONFIG_START(llc_state::llc1)
 	MCFG_MACHINE_RESET_OVERRIDE(llc_state, llc1 )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(64*8, 16*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(llc_state, screen_update_llc1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 16*8);
+	screen.set_visarea(0, 64*8-1, 0, 16*8-1);
+	screen.set_screen_update(FUNC(llc_state::screen_update_llc1));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_llc1);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -242,9 +243,10 @@ MACHINE_CONFIG_START(llc_state::llc1)
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(llc_state::kbd_put));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(llc_state::llc2)
+void llc_state::llc2(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(3'000'000));
 	m_maincpu->set_daisy_config(llc2_daisy_chain);
@@ -254,21 +256,20 @@ MACHINE_CONFIG_START(llc_state::llc2)
 	MCFG_MACHINE_RESET_OVERRIDE(llc_state, llc2 )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(llc_state, screen_update_llc2)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0, 64*8-1, 0, 32*8-1);
+	screen.set_screen_update(FUNC(llc_state::screen_update_llc2));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_llc2);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	z80pio_device& pio1(Z80PIO(config, "z80pio1", XTAL(3'000'000)));
 	pio1.in_pa_callback().set(K7659_KEYBOARD_TAG, FUNC(k7659_keyboard_device::read));
@@ -278,13 +279,13 @@ MACHINE_CONFIG_START(llc_state::llc2)
 	z80pio_device& pio2(Z80PIO(config, "z80pio2", XTAL(3'000'000)));
 	pio2.in_pa_callback().set(FUNC(llc_state::llc2_port2_a_r));
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(3'000'000))
+	Z80CTC(config, "z80ctc", XTAL(3'000'000));
 
 	K7659_KEYBOARD(config, K7659_KEYBOARD_TAG, 0);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 /* ROM definition */
 
 ROM_START( llc1 )

@@ -870,8 +870,8 @@ MACHINE_RESET_MEMBER(jangou_state,jngolady)
 }
 
 /* Note: All frequencies and dividers are unverified */
-MACHINE_CONFIG_START(jangou_state::jangou)
-
+void jangou_state::jangou(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_cpu_0, MASTER_CLOCK / 8);
 	m_cpu_0->set_addrmap(AS_PROGRAM, &jangou_state::cpu0_map);

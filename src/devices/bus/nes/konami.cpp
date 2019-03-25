@@ -81,7 +81,7 @@ nes_konami_vrc6_device::nes_konami_vrc6_device(const machine_config &mconfig, co
 }
 
 nes_konami_vrc7_device::nes_konami_vrc7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_konami_vrc4_device(mconfig, NES_VRC7, tag, owner, clock), m_ym2413(*this, "ym")
+	: nes_konami_vrc4_device(mconfig, NES_VRC7, tag, owner, clock), m_vrc7snd(*this, "vrc7snd")
 {
 }
 
@@ -681,11 +681,11 @@ void nes_konami_vrc7_device::write_h(offs_t offset, uint8_t data)
 
 		case 0x1010:
 		case 0x1018:
-			m_ym2413->register_port_w(data);
+			m_vrc7snd->register_port_w(data);
 			break;
 		case 0x1030:
 		case 0x1038:
-			m_ym2413->data_port_w(data);
+			m_vrc7snd->data_port_w(data);
 			break;
 
 		case 0x2000:
@@ -758,8 +758,6 @@ void nes_konami_vrc7_device::write_h(offs_t offset, uint8_t data)
 //   and has one output pin for audio, multiplexed for all 6 channels; OPLL has two output pins, one for
 //   FM and one for Rhythm, and has no special status pin.
 
-// FIXME: we currently emulate this as a base YM2413!
-
 void nes_konami_vrc7_device::device_add_mconfig(machine_config &config)
 {
 	// additional sound hardware
@@ -767,5 +765,5 @@ void nes_konami_vrc7_device::device_add_mconfig(machine_config &config)
 
 	// TODO: this is not how VRC7 clock signaling works!
 	// The board uses the CLK pin in reality, not hardcoded NTSC values!
-	YM2413(config, m_ym2413, XTAL(21'477'272)/12).add_route(ALL_OUTPUTS, "addon", 0.5);
+	VRC7(config, m_vrc7snd, XTAL(21'477'272)/6).add_route(0, "addon", 1.0).add_route(1, "addon", 0.0);
 }

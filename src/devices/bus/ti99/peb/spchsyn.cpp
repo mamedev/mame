@@ -74,7 +74,7 @@ READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 /*
     Memory write
 */
-WRITE8_MEMBER( ti_speech_synthesizer_device::write )
+void ti_speech_synthesizer_device::write(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled()) return;
 
@@ -92,7 +92,6 @@ SETADDRESS_DBIN_MEMBER( ti_speech_synthesizer_device::setaddress_dbin )
 	// 1001 00xx xxxx xxx0   DBIN=1
 	// 1001 01xx xxxx xxx0   DBIN=0
 	// 1111 1000 0000 0001    mask
-	m_space = &space;
 	m_reading = (state==ASSERT_LINE);
 
 	bool valid = (((offset & 0x0400)==0) == m_reading);
@@ -131,8 +130,6 @@ WRITE_LINE_MEMBER( ti_speech_synthesizer_device::speech_ready )
 
 void ti_speech_synthesizer_device::device_start()
 {
-	// We don't need to save m_space because the calling method
-	// combined_rsq_wsq_w only needs the address space formally.
 	save_item(NAME(m_reading));
 	save_item(NAME(m_sbe));
 }

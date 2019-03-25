@@ -2076,7 +2076,7 @@ PCB:
 Seta: P0-025-A
 Taito: K1100241A J1100107A
 
-The drtoppelj PCB has a sticker label which says "K1100269A // DR. ドツペル タンケン" (DoTuPeRu TaNKeN)
+The drtoppelj PCB has a sticker label which says "K1100269A // DR. トッペル タンケン" (To'PeRu TaNKeN)
 */
 ROM_START( drtoppel )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */

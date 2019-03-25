@@ -9231,6 +9231,24 @@
 		</part>
 	</software>
 
+	<software name="dstrike">
+		<description>Desert Strike: Return to the Gulf</description>
+		<year>1994</year>
+		<publisher>Gremlin Interactive</publisher>
+		<info name="developer" value="Electronic Arts" />
+		<info name="ported by" value="Speedlink Communications" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Desert Strike - Return To Gulf [Gremlin Interactive] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="3db7fd98" sha1="8d7f5a2bef303e8e6324ae038035e8e4375f4255" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Desert Strike - Return To Gulf [Gremlin Interactive] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="be380f9d" sha1="c77681b251da7636f24255442ad3cae563dc7f89" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="duke">
 		<!-- Dumped via Kryoflux from an original disk, all tracks show as modified - most likely not professionally duplicated -->
 		<!-- from a registered version ordered circa 2004 -->
@@ -10468,6 +10486,35 @@
 			<!-- Copy-protected key disk -->
 			<dataarea name="flop" size = "2181136">
 				<rom name="Lemmings [Psygnosis] [1991] [3.5DD] [Disk 1 of 1].mfm" size="2181136" crc="82b47a9b" sha1="7f0912d798c97a56ac8eea1f87caa20cc2044b94" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lemming3">
+		<description>All New World Of Lemmings</description>
+		<year>1994</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="DMA Design" />
+		<info name="version" value="v1.53" />
+		<info name="usage" value="Mouse and EMS Memory required" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="All New World Of Lemmings [Psygnosis] [1994] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="23259f9a" sha1="1d1b5e21d0bd9089ba0ac41be7ca1b3ffecf15af" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="All New World Of Lemmings [Psygnosis] [1994] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="3826e140" sha1="b33476065013e26315bd66c33abaa301d7f6edea" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="All New World Of Lemmings [Psygnosis] [1994] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="d9c345b4" sha1="b0645535d12920edb2b3c918d1fe19a0e7458366" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="All New World Of Lemmings [Psygnosis] [1994] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="96cf7c5d" sha1="a02d03b959b2c54ae1f1fbaf7e628b30812a56fb" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11849,6 +11896,34 @@
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Ultimate Doom #5.img" size="1474560" crc="5725506c" sha1="ab6dda5f642c5a5516e7b68803035b518337ffe9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ubodyblw">
+		<description>Ultimate Body Blows</description>
+		<year>1994</year>
+		<publisher>Team 17</publisher>
+		<info name="developer" value="Team 17" />
+		<info name="ported by" value="WJS Design" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ultimate Body Blows [Team 17] [1994] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="d6e03514" sha1="ce3d33e595eb674fae73f446bf0c352a59f5cf2a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ultimate Body Blows [Team 17] [1994] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="1a71cc01" sha1="aa8f3c528937cf1277f14bd1cb2ba5ba328703d6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ultimate Body Blows [Team 17] [1994] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="d2f52bf8" sha1="6fc50f366bd74b96d4ab599a94e5aec7526ed160" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ultimate Body Blows [Team 17] [1994] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="69452b37" sha1="656f7012ec9027dfe80b228bda9db003a544619b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

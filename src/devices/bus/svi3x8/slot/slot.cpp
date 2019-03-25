@@ -71,14 +71,14 @@ void svi_slot_bus_device::add_card(device_svi_slot_interface *card)
 //  mreq_r - memory read from slot
 //-------------------------------------------------
 
-READ8_MEMBER( svi_slot_bus_device::mreq_r )
+uint8_t svi_slot_bus_device::mreq_r(offs_t offset)
 {
 	device_svi_slot_interface *entry = m_dev.first();
 	uint8_t data = 0xff;
 
 	while (entry)
 	{
-		data &= entry->mreq_r(space, offset);
+		data &= entry->mreq_r(offset);
 		entry = entry->next();
 	}
 
@@ -89,13 +89,13 @@ READ8_MEMBER( svi_slot_bus_device::mreq_r )
 //  mreq_w - memory write to slot
 //-------------------------------------------------
 
-WRITE8_MEMBER( svi_slot_bus_device::mreq_w )
+void svi_slot_bus_device::mreq_w(offs_t offset, uint8_t data)
 {
 	device_svi_slot_interface *entry = m_dev.first();
 
 	while (entry)
 	{
-		entry->mreq_w(space, offset, data);
+		entry->mreq_w(offset, data);
 		entry = entry->next();
 	}
 }
@@ -104,14 +104,14 @@ WRITE8_MEMBER( svi_slot_bus_device::mreq_w )
 //  iorq_r - memory read from slot
 //-------------------------------------------------
 
-READ8_MEMBER( svi_slot_bus_device::iorq_r )
+uint8_t svi_slot_bus_device::iorq_r(offs_t offset)
 {
 	device_svi_slot_interface *entry = m_dev.first();
 	uint8_t data = 0xff;
 
 	while (entry)
 	{
-		data &= entry->iorq_r(space, offset);
+		data &= entry->iorq_r(offset);
 		entry = entry->next();
 	}
 
@@ -122,13 +122,13 @@ READ8_MEMBER( svi_slot_bus_device::iorq_r )
 //  iorq_w - memory write to slot
 //-------------------------------------------------
 
-WRITE8_MEMBER( svi_slot_bus_device::iorq_w )
+void svi_slot_bus_device::iorq_w(offs_t offset, uint8_t data)
 {
 	device_svi_slot_interface *entry = m_dev.first();
 
 	while (entry)
 	{
-		entry->iorq_w(space, offset, data);
+		entry->iorq_w(offset, data);
 		entry = entry->next();
 	}
 }

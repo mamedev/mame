@@ -130,8 +130,8 @@ void arachnid_state::arachnid_map(address_map &map)
 	map(0x2000, 0x2007).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x4004, 0x4007).rw(m_pia_u4, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x4008, 0x400b).rw(m_pia_u17, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x6000, 0x6000).w(TMS9118_TAG, FUNC(tms9928a_device::vram_w));
-	map(0x6002, 0x6002).w(TMS9118_TAG, FUNC(tms9928a_device::register_w));
+	map(0x6000, 0x6000).w(TMS9118_TAG, FUNC(tms9928a_device::vram_write));
+	map(0x6002, 0x6002).w(TMS9118_TAG, FUNC(tms9928a_device::register_write));
 	map(0x8000, 0xffff).rom().region(M6809_TAG, 0);
 }
 

@@ -34,6 +34,8 @@ public:
 	void dma16_w(u16 data);
 
 protected:
+	aic6250_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// standard device_interface overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -277,6 +279,13 @@ private:
 	util::fifo <u8, 8> m_fifo;
 };
 
+class aic6251a_device : public aic6250_device
+{
+public:
+	aic6251a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 DECLARE_DEVICE_TYPE(AIC6250, aic6250_device)
+DECLARE_DEVICE_TYPE(AIC6251A, aic6251a_device)
 
 #endif // MAME_MACHINE_AIC6250_H

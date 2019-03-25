@@ -617,7 +617,7 @@ WRITE8_MEMBER(ibm6580_state::floppy_w)
 		break;
 
 	case 5: // 815A
-		m_fdc->fifo_w(space, offset, data);
+		m_fdc->fifo_w(data);
 		if (m_floppy_idle)
 			m_floppy_idle = false;
 		break;
@@ -646,11 +646,11 @@ READ8_MEMBER(ibm6580_state::floppy_r)
 		break;
 
 	case 4: // 8158
-		data = m_fdc->msr_r(space, offset);
+		data = m_fdc->msr_r();
 		break;
 
 	case 5: // 815a
-		data = m_fdc->fifo_r(space, offset);
+		data = m_fdc->fifo_r();
 		break;
 
 	case 6: // 815c
@@ -878,19 +878,21 @@ static void dw_floppies(device_slot_interface &device)
 	device.option_add("8sssd", IBM_6360);
 }
 
-MACHINE_CONFIG_START(ibm6580_state::ibm6580)
-	MCFG_DEVICE_ADD("maincpu", I8086, 14.7456_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(ibm6580_mem)
-	MCFG_DEVICE_IO_MAP(ibm6580_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+void ibm6580_state::ibm6580(machine_config &config)
+{
+	I8086(config, m_maincpu, 14.7456_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ibm6580_state::ibm6580_mem);
+	m_maincpu->set_addrmap(AS_IO, &ibm6580_state::ibm6580_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("160K,192K,224K,256K,320K,384K");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(25_MHz_XTAL / 2, 833, 0, 640, 428, 0, 400)
-	MCFG_SCREEN_UPDATE_DRIVER(ibm6580_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ibm6580_state, vblank_w))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(25_MHz_XTAL / 2, 833, 0, 640, 428, 0, 400);
+	m_screen->set_screen_update(FUNC(ibm6580_state::screen_update));
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(ibm6580_state::vblank_w));
+
 	config.set_default_layout(layout_ibm6580);
 
 	PALETTE(config, "palette", FUNC(ibm6580_state::ibm6580_palette), 3);
@@ -904,7 +906,7 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	ppi.out_pc_callback().set(FUNC(ibm6580_state::ppi_c_w));
 	ppi.in_pc_callback().set(FUNC(ibm6580_state::ppi_c_r));
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	PIT8253(config, m_pit8253, 0);
 
 	DW_KEYBOARD(config, m_kbd, 0);
 	m_kbd->out_data_handler().set(FUNC(ibm6580_state::kb_data_w));
@@ -917,8 +919,8 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	m_dma8257->out_tc_cb().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 	m_dma8257->in_memr_cb().set(FUNC(ibm6580_state::memory_read_byte));
 	m_dma8257->out_memw_cb().set(FUNC(ibm6580_state::memory_write_byte));
-	m_dma8257->in_ior_cb<0>().set(m_fdc, FUNC(upd765a_device::mdma_r));
-	m_dma8257->out_iow_cb<0>().set(m_fdc, FUNC(upd765a_device::mdma_w));
+	m_dma8257->in_ior_cb<0>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_dma8257->out_iow_cb<0>().set(m_fdc, FUNC(upd765a_device::dma_w));
 
 	UPD765A(config, m_fdc, 24_MHz_XTAL / 3, false, false);
 	m_fdc->intrq_wr_callback().set(FUNC(ibm6580_state::floppy_intrq));
@@ -952,7 +954,7 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	rs232b.cts_handler().set("upd8251b", FUNC(i8251_device::write_cts));
 
 	SOFTWARE_LIST(config, "flop_list").set_original("ibm6580");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( ibm6580 )

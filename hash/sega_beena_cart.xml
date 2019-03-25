@@ -1,18 +1,29 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="sega_beena_cart" description="Sega Beena Cartridges">
-
-  <!-- you must byteswap ROMs to see text, due to endian? -->
-
-	<software name="fpc" supported="no">
-		<description>Fresh Pretty Cure</description> <!-- is this the correct title? -->
+	<!-- you must byteswap ROMs to see text, due to endian? -->
+	<software name="frpc" supported="no">
+		<description>Issho ni Henshin Fresh Pretty Cure</description>
 		<year>2009</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sega_beena_cart">
-			<dataarea name="rom" size="0x800000">
-				<rom name="beena.bin" size="0x800000" crc="afa3466c" sha1="b49914f97db95f611489487f558d13d7cceb3299" offset="0" />
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="beena.bin" size="0x800000" crc="afa3466c" sha1="b49914f97db95f611489487f558d13d7cceb3299" offset="0" />
+			</dataarea>
+			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1ca26ec" crc="d8e18a54" sha1="887a96931bf622cb673f2550323ad3923eff337e" offset="0" />
+				<rom name="0 - 0002.png" size="0x1e37a3d" crc="62ae3535" sha1="d8f6c19c466715df5a568ac7cac8dacb53f2e04a" offset="0" />
+				<rom name="0 - 0003.png" size="0x1ce4f16" crc="fe6c72d9" sha1="2c4412eb518fbac2e8519c87e53270d960ecab53" offset="0" />
+				<rom name="0 - 0004.png" size="0x19a864d" crc="edede3ea" sha1="81914894358c74064aa5f9e980ac37f7140f80c3" offset="0" />
+				<rom name="0 - 0005.png" size="0x18998f4" crc="16837cc0" sha1="eb86b2943cf603a63cd5b94faa0d06ee8a3139d6" offset="0" />
+				<rom name="0 - 0006.png" size="0x195b7e5" crc="3e307e6d" sha1="23ed9ab2a4122d7cb33d8d6174ca901b88647b4d" offset="0" />
+				<rom name="0 - 0007.png" size="0x195df07" crc="efccbb5b" sha1="83de26d52cb6578d8323551a289223c8a305e37d" offset="0" />
+				<rom name="0 - 0008.png" size="0x18a9dd8" crc="7455ebb2" sha1="34576eee067534535cda838a9e94794e2cfee585" offset="0" />
+				<rom name="0 - 0009.png" size="0x17a5c57" crc="59ead843" sha1="29c4cd7929cfd68f41d65024ee5ca3cc62fa4a8b" offset="0" />
+				<rom name="0 - 0010.png" size="0x186546b" crc="6d3d8c91" sha1="9909322c09277ddd306f10f9a04a897b0fe74961" offset="0" />
+				<rom name="0 - 0011.png" size="0x179d3a8" crc="c3911254" sha1="2d2932e97a0b20a9b5e5fd78a3bbad0f1e146813" offset="0" />
+				<rom name="0 - 0012.png" size="0x187a9df" crc="f1cdc95d" sha1="aa926c9360edcecdaa3a9ce1b5e17ee61048cee4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-
 </softwarelist>

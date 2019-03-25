@@ -117,8 +117,8 @@ uint8_t isbc_218a_device::mcs0_r(offs_t offset)
 
 	switch (BIT(offset, 0))
 	{
-	case 0: data = m_fdc->msr_r(machine().dummy_space(), 0); break;
-	case 1: data = m_fdc->fifo_r(machine().dummy_space(), 0); break;
+	case 0: data = m_fdc->msr_r(); break;
+	case 1: data = m_fdc->fifo_r(); break;
 	}
 
 	return data;
@@ -133,7 +133,7 @@ void isbc_218a_device::mcs0_w(offs_t offset, uint8_t data)
 {
 	switch (BIT(offset, 0))
 	{
-	case 1: m_fdc->fifo_w(machine().dummy_space(), 0, data); break;
+	case 1: m_fdc->fifo_w(data); break;
 	}
 }
 

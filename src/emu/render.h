@@ -852,6 +852,8 @@ public:
 		std::string         m_input_tag;        // input tag of this item
 		ioport_port *       m_input_port;       // input port of this item
 		ioport_value        m_input_mask;       // input mask of this item
+		u8                  m_input_shift;      // input mask rightshift for raw (trailing 0s)
+		bool                m_input_raw;        // get raw data from input port
 		screen_device *     m_screen;           // pointer to screen
 		int                 m_orientation;      // orientation of this item
 		render_bounds       m_bounds;           // bounds of the item

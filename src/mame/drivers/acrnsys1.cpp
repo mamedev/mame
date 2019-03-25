@@ -185,8 +185,8 @@ WRITE8_MEMBER( acrnsys1_state::acrnsys1_led_segment_w )
 void acrnsys1_state::acrnsys1_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0e00, 0x0e7f).mirror(0x100).rw("b1", FUNC(ins8154_device::ins8154_r), FUNC(ins8154_device::ins8154_w));
-	map(0x0e80, 0x0eff).mirror(0x100).ram();
+	map(0x0e00, 0x0e7f).mirror(0x100).rw("b1", FUNC(ins8154_device::read_io), FUNC(ins8154_device::write_io));
+	map(0x0e80, 0x0eff).mirror(0x100).rw("b1", FUNC(ins8154_device::read_ram), FUNC(ins8154_device::write_ram));
 	map(0xf800, 0xf9ff).mirror(0x600).rom();
 }
 

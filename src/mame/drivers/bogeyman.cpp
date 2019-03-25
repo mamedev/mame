@@ -229,24 +229,24 @@ WRITE8_MEMBER(bogeyman_state::colbank_w)
 	}
 }
 
-MACHINE_CONFIG_START(bogeyman_state::bogeyman)
-
+void bogeyman_state::bogeyman(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M6502, 1500000) /* Verified */
-	MCFG_DEVICE_PROGRAM_MAP(bogeyman_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(bogeyman_state, irq0_line_hold,  16*60) // Controls sound
+	M6502(config, m_maincpu, 1500000); /* Verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &bogeyman_state::bogeyman_map);
+	m_maincpu->set_periodic_int(FUNC(bogeyman_state::irq0_line_hold), attotime::from_hz(16*60)); // Controls sound
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+//  screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+//  screen.set_size(32*8, 32*8);
+//  screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	// DECO video CRTC, unverified
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,8,248)
-	MCFG_SCREEN_UPDATE_DRIVER(bogeyman_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen.set_raw(XTAL(12'000'000)/2,384,0,256,272,8,248);
+	screen.set_screen_update(FUNC(bogeyman_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bogeyman);
 	PALETTE(config, m_palette, FUNC(bogeyman_state::bogeyman_palette)).set_format(palette_device::BGR_233_inverted, 16 + 256);
@@ -260,7 +260,7 @@ MACHINE_CONFIG_START(bogeyman_state::bogeyman)
 	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	YM2149(config, m_ay2, 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);  /* Verified */
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

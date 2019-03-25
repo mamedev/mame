@@ -767,13 +767,13 @@ INTERRUPT_GEN_MEMBER(cedar_magnet_state::irq)
 	m_cedsprite->irq_hold();
 }
 
-MACHINE_CONFIG_START(cedar_magnet_state::cedar_magnet)
-
+void cedar_magnet_state::cedar_magnet(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(cedar_magnet_map)
-	MCFG_DEVICE_IO_MAP(cedar_magnet_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cedar_magnet_state,  irq)
+	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cedar_magnet_state::cedar_magnet_map);
+	m_maincpu->set_addrmap(AS_IO, &cedar_magnet_state::cedar_magnet_io);
+	m_maincpu->set_vblank_int("screen", FUNC(cedar_magnet_state::irq));
 
 	ADDRESS_MAP_BANK(config, "bank0").set_map(&cedar_magnet_state::cedar_bank0).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 	ADDRESS_MAP_BANK(config, "mb_sub_ram").set_map(&cedar_magnet_state::cedar_magnet_mainboard_sub_ram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
@@ -794,15 +794,15 @@ MACHINE_CONFIG_START(cedar_magnet_state::cedar_magnet)
 	m_ic49_pio->out_pb_callback().set(FUNC(cedar_magnet_state::ic49_pio_pb_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-8-1, 0, 192-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cedar_magnet_state, screen_update_cedar_magnet)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-8-1, 0, 192-1);
+	screen.set_screen_update(FUNC(cedar_magnet_state::screen_update_cedar_magnet));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x400)
+	PALETTE(config, m_palette).set_entries(0x400);
 
 	CEDAR_MAGNET_SOUND(config, m_cedsound, 0);
 	CEDAR_MAGNET_PLANE(config, m_cedplane0, 0);
@@ -812,7 +812,7 @@ MACHINE_CONFIG_START(cedar_magnet_state::cedar_magnet)
 	CEDAR_MAGNET_FLOP(config, "flop", 0);
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
-MACHINE_CONFIG_END
+}
 
 
 #define BIOS_ROM \

@@ -569,19 +569,19 @@ READ8_MEMBER(jubilee_state::mux_port_r)
 {
 	switch( mux_sel )
 	{
-		case 0x01: return ioport("IN0")->read();
-		case 0x02: return ioport("IN1")->read();    /* muxed credits input is here! */
-		case 0x03: return ioport("IN2")->read();
+		case 0x01: return BIT(ioport("IN0")->read(), offset);
+		case 0x02: return BIT(ioport("IN1")->read(), offset);    /* muxed credits input is here! */
+		case 0x03: return BIT(ioport("IN2")->read(), offset);
 	}
 
-	return 0xff;
+	return 1;
 }
 
 
 void jubilee_state::jubileep_cru_map(address_map &map)
 {
-	map(0x00c8, 0x00c8).r(FUNC(jubilee_state::mux_port_r));    /* multiplexed input port */
-	map(0x0000, 0x07ff).w(FUNC(jubilee_state::unk_w));
+	map(0x0c80, 0x0c8f).r(FUNC(jubilee_state::mux_port_r));    /* multiplexed input port */
+	map(0x0000, 0x0fff).w(FUNC(jubilee_state::unk_w));
 }
 
 /* I/O byte R/W
@@ -670,8 +670,8 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(jubilee_state::jubileep)
-
+void jubilee_state::jubileep(machine_config &config)
+{
 	// Main CPU TMS9980A, no line connections.
 	TMS9980A(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jubilee_state::jubileep_map);
@@ -681,22 +681,22 @@ MACHINE_CONFIG_START(jubilee_state::jubileep)
 	NVRAM(config, "videoworkram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)                         /* (47+1*8, 38+1*8) from CRTC settings */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)   /* (32*8, 32*8) from CRTC settings */
-	MCFG_SCREEN_UPDATE_DRIVER(jubilee_state, screen_update_jubileep)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);                         /* (47+1*8, 38+1*8) from CRTC settings */
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);   /* (32*8, 32*8) from CRTC settings */
+	screen.set_screen_update(FUNC(jubilee_state::screen_update_jubileep));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_jubileep);
-	MCFG_PALETTE_ADD("palette",8)
+	PALETTE(config, "palette").set_entries(8);
 
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-MACHINE_CONFIG_END
+}
 
 
 /*************************

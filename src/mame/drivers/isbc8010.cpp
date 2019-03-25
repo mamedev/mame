@@ -171,11 +171,12 @@ static DEVICE_INPUT_DEFAULTS_START( terminal ) // set up terminal to default to 
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(isbc8010_state::isbc8010)
+void isbc8010_state::isbc8010(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'432'000)/9)
-	MCFG_DEVICE_PROGRAM_MAP(isbc8010_mem)
-	MCFG_DEVICE_IO_MAP(isbc8010_io)
+	I8080A(config, m_maincpu, XTAL(18'432'000)/9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &isbc8010_state::isbc8010_mem);
+	m_maincpu->set_addrmap(AS_IO, &isbc8010_state::isbc8010_io);
 
 	I8251(config, m_usart, 0);
 	m_usart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
@@ -197,31 +198,35 @@ MACHINE_CONFIG_START(isbc8010_state::isbc8010)
 	/* video hardware */
 	// 96364 crt controller
 
-//  MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
+//  screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(60);
 	/* Video is blanked for 70 out of 262 scanlines per refresh cycle.
 	   Each scanline is composed of 65 character times, 40 of which
 	   are visible, and each character time is 7 dot times; a dot time
 	   is 2 cycles of the fundamental 14.31818 MHz oscillator.  The
 	   total blanking time is about 4450 microseconds. */
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((int) (70 * 65 * 7 * 2 / 14.31818)))
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC((int) (70 * 65 * 7 * 2 / 14.31818)));
 	/* It would be nice if we could implement some sort of display
 	   overscan here. */
-//  MCFG_SCREEN_SIZE(40 * 7, 24 * 8)
-//  MCFG_SCREEN_VISIBLE_AREA(0, 40 * 7 - 1, 0, 24 * 8 - 1)
-//  MCFG_SCREEN_UPDATE_DRIVER(sdk80_state, screen_update)
-//  MCFG_SCREEN_PALETTE("palette")
+//  screen.set_size(40 * 7, 24 * 8);
+//  screen.set_visarea(0, 40 * 7 - 1, 0, 24 * 8 - 1);
+//  screen.set_screen_update(FUNC(sdk80_state::screen_update));
+//  screen.set_palette("palette");
 
 //  GFXDECODE(config, "gfxdecode", "palette", gfx_sdk80);
 
-//  MCFG_PALETTE_ADD_MONOCHROME("palette")
+//  PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// Video board UART
-//  MCFG_DEVICE_ADD( "hd6402", AY31015, 0 )
+//  ay31015_device &hd6402(AY31015(config, "hd6402", 0));
 //  MCFG_AY31015_TX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
 //  MCFG_AY31015_RX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
-//  MCFG_AY51013_READ_SI_CB(READ8(*this, sdk80_state, nascom1_hd6402_si))
-//  MCFG_AY51013_WRITE_SO_CB(WRITE8(*this, sdk80_state, nascom1_hd6402_so))
+//  hd6402.read_si_callback().set(FUNC(sdk80_state::nascom1_hd6402_si));
+//  hd6402.write_so_callback().set(FUNC(sdk80_state::nascom1_hd6402_so));
+
+//  clock_device &uart_clock(CLOCK(config, "uart_clock", (XTAL(16'000'000) / 16) / 256));
+//  uart_clock.signal_handler().set("hd6402", FUNC(ay31015_device::write_tcp));
+//  uart_clock.signal_handler().append("hd6402", FUNC(ay31015_device::write_rcp));
 
 	/* Devices */
 //  i8279_device &kbdc(I8279(config, "i8279", 3100000)); // based on divider
@@ -231,22 +236,21 @@ MACHINE_CONFIG_START(isbc8010_state::isbc8010)
 //  kbdc.in_rl_callback().set(FUNC(sdk80_state::kbd_r));                // kbd RL lines
 //  kbdc.in_shift_callback().set_constant(1);                           // Shift key
 //  kbdc.in_ctrl_callback().set_constant(1);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(isbc8010_state::isbc8010a)
+void isbc8010_state::isbc8010a(machine_config &config)
+{
 	isbc8010(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(isbc8010a_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &isbc8010_state::isbc8010a_mem);
+}
 
-MACHINE_CONFIG_START(isbc8010_state::isbc8010b)
+void isbc8010_state::isbc8010b(machine_config &config)
+{
 	isbc8010(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(isbc8010b_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &isbc8010_state::isbc8010b_mem);
+}
 
 /* ROM definition */
 ROM_START( isbc8010 )

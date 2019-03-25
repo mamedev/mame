@@ -224,7 +224,7 @@ WRITE8_MEMBER( votrpss_state::ppi_pa_w )
 WRITE8_MEMBER( votrpss_state::ppi_pb_w )
 {
 	m_portb = data;
-	m_terminal->write(space, offset, data&0x7f);
+	m_terminal->write(data&0x7f);
 }
 
 WRITE8_MEMBER( votrpss_state::ppi_pc_w )

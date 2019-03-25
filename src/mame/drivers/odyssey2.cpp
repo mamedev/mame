@@ -724,6 +724,14 @@ void odyssey2_state::videopac(machine_config &config)
 	I8048(config, m_maincpu, (XTAL(17'734'470) / 3));
 	m_maincpu->set_addrmap(AS_PROGRAM, &odyssey2_state::odyssey2_mem);
 	m_maincpu->set_addrmap(AS_IO, &odyssey2_state::odyssey2_io);
+	m_maincpu->p1_in_cb().set(FUNC(odyssey2_state::p1_read));
+	m_maincpu->p1_out_cb().set(FUNC(odyssey2_state::p1_write));
+	m_maincpu->p2_in_cb().set(FUNC(odyssey2_state::p2_read));
+	m_maincpu->p2_out_cb().set(FUNC(odyssey2_state::p2_write));
+	m_maincpu->bus_in_cb().set(FUNC(odyssey2_state::bus_read));
+	m_maincpu->bus_out_cb().set(FUNC(odyssey2_state::bus_write));
+	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
+	m_maincpu->t1_in_cb().set(FUNC(odyssey2_state::t1_read));
 
 	config.m_minimum_quantum = attotime::from_hz(60);
 

@@ -446,10 +446,10 @@ void gamecstl_state::machine_reset()
 
 MACHINE_CONFIG_START(gamecstl_state::gamecstl)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 200000000)
-	MCFG_DEVICE_PROGRAM_MAP(gamecstl_map)
-	MCFG_DEVICE_IO_MAP(gamecstl_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	PENTIUM3(config, m_maincpu, 200000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gamecstl_state::gamecstl_map);
+	m_maincpu->set_addrmap(AS_IO, &gamecstl_state::gamecstl_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
@@ -461,18 +461,16 @@ MACHINE_CONFIG_START(gamecstl_state::gamecstl)
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
-	MCFG_SCREEN_UPDATE_DRIVER(gamecstl_state, screen_update_gamecstl)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 639, 0, 199);
+	screen.set_screen_update(FUNC(gamecstl_state::screen_update_gamecstl));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cga);
-	MCFG_PALETTE_ADD("palette", 16)
-
-
+	PALETTE(config, m_palette).set_entries(16);
 MACHINE_CONFIG_END
 
 void gamecstl_state::init_gamecstl()

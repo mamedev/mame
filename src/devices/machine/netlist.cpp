@@ -206,6 +206,7 @@ private:
 	netlist::state_var<netlist::netlist_sig_t> m_last;
 };
 
+
 // ----------------------------------------------------------------------------------------
 // Extensions to interface netlist with MAME code ....
 // ----------------------------------------------------------------------------------------
@@ -314,6 +315,16 @@ public:
 		}
 	}
 
+	ATTR_HOT void sound_update_fill(int samples)
+	{
+		if (samples > m_bufsize)
+			throw emu_fatalerror("sound %s: pos %d exceeded bufsize %d\n", name().c_str(), samples, m_bufsize);
+		while (m_last_pos < samples )
+		{
+			m_buffer[m_last_pos++] = (stream_sample_t) m_cur;
+		}
+	}
+
 	NETLIB_UPDATEI()
 	{
 		nl_double val = m_in() * m_mult() + m_offset();
@@ -333,7 +344,6 @@ public:
 	{
 		m_last_pos = 0;
 		m_last_buffer_time = upto;
-		m_cur = 0.0;
 	}
 
 	netlist::param_int_t m_channel;
@@ -422,11 +432,11 @@ public:
 
 	struct channel
 	{
-		netlist::poolptr<netlist::param_str_t> m_param_name;
+		netlist::pool_owned_ptr<netlist::param_str_t> m_param_name;
 		netlist::param_double_t *m_param;
 		stream_sample_t *m_buffer;
-		netlist::poolptr<netlist::param_double_t> m_param_mult;
-		netlist::poolptr<netlist::param_double_t> m_param_offset;
+		netlist::pool_owned_ptr<netlist::param_double_t> m_param_mult;
+		netlist::pool_owned_ptr<netlist::param_double_t> m_param_offset;
 	};
 	channel m_channels[MAX_INPUT_CHANNELS];
 	netlist::netlist_time m_inc;
@@ -583,17 +593,17 @@ void netlist_mame_analog_output_device::set_params(const char *in_name, output_d
 	m_delegate = std::move(adelegate);
 }
 
-void netlist_mame_analog_output_device::custom_netlist_additions(netlist::setup_t &setup)
+void netlist_mame_analog_output_device::custom_netlist_additions(netlist::netlist_state_t &nlstate)
 {
 	const pstring pin(m_in);
 	pstring dname = pstring("OUT_") + pin;
-	pstring dfqn = setup.build_fqn(dname);
+	pstring dfqn = nlstate.setup().build_fqn(dname);
 	m_delegate.bind_relative_to(owner()->machine().root_device());
 
-	auto dev = netlist::pool().make_poolptr<NETLIB_NAME(analog_callback)>(setup.netlist(), dfqn);
+	auto dev = netlist::pool().make_poolptr<NETLIB_NAME(analog_callback)>(nlstate, dfqn);
 	static_cast<NETLIB_NAME(analog_callback) *>(dev.get())->register_callback(std::move(m_delegate));
-	setup.netlist().add_dev(dfqn, std::move(dev));
-	setup.register_link(dname + ".IN", pin);
+	nlstate.add_dev(dfqn, std::move(dev));
+	nlstate.setup().register_link(dname + ".IN", pin);
 }
 
 void netlist_mame_analog_output_device::device_start()
@@ -619,18 +629,18 @@ void netlist_mame_logic_output_device::set_params(const char *in_name, output_de
 	m_delegate = std::move(adelegate);
 }
 
-void netlist_mame_logic_output_device::custom_netlist_additions(netlist::setup_t &setup)
+void netlist_mame_logic_output_device::custom_netlist_additions(netlist::netlist_state_t &nlstate)
 {
 	pstring pin(m_in);
 	pstring dname = "OUT_" + pin;
-	pstring dfqn = setup.build_fqn(dname);
+	pstring dfqn = nlstate.setup().build_fqn(dname);
 
 	m_delegate.bind_relative_to(owner()->machine().root_device());
 
-	auto dev = netlist::pool().make_poolptr<NETLIB_NAME(logic_callback)>(setup.netlist(), dfqn);
+	auto dev = netlist::pool().make_poolptr<NETLIB_NAME(logic_callback)>(nlstate, dfqn);
 	static_cast<NETLIB_NAME(logic_callback) *>(dev.get())->register_callback(std::move(m_delegate));
-	setup.netlist().add_dev(dfqn, std::move(dev));
-	setup.register_link(dname + ".IN", pin);
+	nlstate.add_dev(dfqn, std::move(dev));
+	nlstate.setup().register_link(dname + ".IN", pin);
 }
 
 void netlist_mame_logic_output_device::device_start()
@@ -759,17 +769,17 @@ void netlist_mame_stream_input_device::device_start()
 	LOGDEVCALLS("start\n");
 }
 
-void netlist_mame_stream_input_device::custom_netlist_additions(netlist::setup_t &setup)
+void netlist_mame_stream_input_device::custom_netlist_additions(netlist::netlist_state_t &nlstate)
 {
-	if (!setup.device_exists("STREAM_INPUT"))
-		setup.register_dev("NETDEV_SOUND_IN", "STREAM_INPUT");
+	if (!nlstate.setup().device_exists("STREAM_INPUT"))
+		nlstate.setup().register_dev("NETDEV_SOUND_IN", "STREAM_INPUT");
 
 	pstring sparam = plib::pfmt("STREAM_INPUT.CHAN{1}")(m_channel);
-	setup.register_param(sparam, pstring(m_param_name));
+	nlstate.setup().register_param(sparam, pstring(m_param_name));
 	sparam = plib::pfmt("STREAM_INPUT.MULT{1}")(m_channel);
-	setup.register_param(sparam, m_mult);
+	nlstate.setup().register_param(sparam, m_mult);
 	sparam = plib::pfmt("STREAM_INPUT.OFFSET{1}")(m_channel);
-	setup.register_param(sparam, m_offset);
+	nlstate.setup().register_param(sparam, m_offset);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -795,18 +805,18 @@ void netlist_mame_stream_output_device::device_start()
 	LOGDEVCALLS("start\n");
 }
 
-void netlist_mame_stream_output_device::custom_netlist_additions(netlist::setup_t &setup)
+void netlist_mame_stream_output_device::custom_netlist_additions(netlist::netlist_state_t &nlstate)
 {
 	//NETLIB_NAME(sound_out) *snd_out;
 	pstring sname = plib::pfmt("STREAM_OUT_{1}")(m_channel);
 
 	//snd_out = dynamic_cast<NETLIB_NAME(sound_out) *>(setup.register_dev("nld_sound_out", sname));
-	setup.register_dev("NETDEV_SOUND_OUT", sname);
+	nlstate.setup().register_dev("NETDEV_SOUND_OUT", sname);
 
-	setup.register_param(sname + ".CHAN" , m_channel);
-	setup.register_param(sname + ".MULT",  m_mult);
-	setup.register_param(sname + ".OFFSET",  m_offset);
-	setup.register_link(sname + ".IN", pstring(m_out_name));
+	nlstate.setup().register_param(sname + ".CHAN" , m_channel);
+	nlstate.setup().register_param(sname + ".MULT",  m_mult);
+	nlstate.setup().register_param(sname + ".OFFSET",  m_offset);
+	nlstate.setup().register_link(sname + ".IN", pstring(m_out_name));
 }
 
 
@@ -862,7 +872,7 @@ void netlist_mame_device::device_start()
 		if( sdev != nullptr )
 		{
 			LOGDEVCALLS("Preparse subdevice %s/%s\n", d.name(), d.shortname());
-			sdev->pre_parse_action(setup());
+			sdev->pre_parse_action(m_netlist->nlstate());
 		}
 	}
 
@@ -878,7 +888,7 @@ void netlist_mame_device::device_start()
 		if( sdev != nullptr )
 		{
 			LOGDEVCALLS("Found subdevice %s/%s\n", d.name(), d.shortname());
-			sdev->custom_netlist_additions(setup());
+			sdev->custom_netlist_additions(m_netlist->nlstate());
 		}
 	}
 
@@ -1193,7 +1203,7 @@ void netlist_mame_sound_device::sound_stream_update(sound_stream &stream, stream
 
 	for (auto &e : m_out)
 	{
-		e.second->sound_update(cur);
+		e.second->sound_update_fill(samples);
 		e.second->buffer_reset(cur);
 	}
 }

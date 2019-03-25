@@ -768,12 +768,15 @@ how digital displays may be connected to emulated outputs::
 
 If an element instantiating a layout element has ``inputtag`` and ``inputmask``
 attributes but lacks a ``name`` attribute, it will take its state from the value
-of the corresponding I/O port, masked with the ``inputmask`` value, and shifted
-to the right so that the least significant one bit of the mask aligns with the
-least significant bit of the value (for example a mask of 0x05 will result in no
-shift, while a mask of 0xb0 will result in the value being shifted four bits to
-the right).  This is often used to allow clickable buttons and toggle switches
-to provide visible feedback.
+of the corresponding I/O port, masked with the ``inputmask`` value and XORed
+with the I/O port default field value.  The latter is useful for inputs that are
+active-low.  If the result is non-zero, the state is 1, otherwise it's 0.  This
+is often used to allow clickable buttons and toggle switches to provide visible
+feedback.  By using ``inputraw="1"``, it's possible to obtain the raw data from
+the I/O port, masked with the ``inputmask`` and shifted to the right so that the
+least significant one bit of the mask aligns with the least significant bit of
+the value (for example a mask of 0x05 will result in no shift, while a mask of
+0xb0 will result in the value being shifted four bits to the right).
 
 When handling mouse input, MAME treats all layout elements as being rectangular,
 and only activates the frontmost element whose area includes the location of the

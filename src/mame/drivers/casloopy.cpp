@@ -520,24 +520,23 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 MACHINE_CONFIG_START(casloopy_state::casloopy)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",SH2A,8000000)
-	MCFG_DEVICE_PROGRAM_MAP(casloopy_map)
+	SH2A(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &casloopy_state::casloopy_map);
 
-//  MCFG_DEVICE_ADD("subcpu",V60,8000000)
-//  MCFG_DEVICE_PROGRAM_MAP(casloopy_sub_map)
+//  v60_device &subcpu(V60(config, "subcpu", 8000000));
+//  subcpu.set_addrmap(AS_PROGRAM, &casloopy_state::casloopy_sub_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(8000000, 444, 0, 256, 263, 0, 224)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(8000000, 444, 0, 256, 263, 0, 224);
+//  m_screen->set_refresh_hz(60);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+//  m_screen->set_size(444, 263);
+//  m_screen->set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	m_screen->set_screen_update(FUNC(casloopy_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-//  MCFG_SCREEN_SIZE(444, 263)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(casloopy_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 512)
+	PALETTE(config, m_palette).set_entries(512);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 

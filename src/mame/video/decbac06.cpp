@@ -63,7 +63,7 @@ Priority word (Midres):
     Bit 2
     Bit 3 set = ...
 
-	Note that priority mixing is handled outside of the BAC-06 chip.
+    Note that priority mixing is handled outside of the BAC-06 chip.
 
 */
 
@@ -146,7 +146,7 @@ TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape0_scan)
 {
 	if ((m_pf_control_0[0]&2)==0)
 	{
-		int col_mask = num_cols - 1;		
+		int col_mask = num_cols - 1;
 		return (row & 0xf) + ((col_mask - (col & col_mask)) << 4);
 	}
 	return (col & 0xf) + ((row & 0xf) << 4) + ((col & 0x1f0) << 4);
@@ -155,35 +155,35 @@ TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape0_scan)
 TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape1_scan)
 {
 	//if (m_pf_control_0[0]&2) // Needs testing on real hardware, not used by any game
-	//	return (row & 0xf) + ((col & 0x1f) << 4) + ((col & 0xf0) << 5);
+	//  return (row & 0xf) + ((col & 0x1f) << 4) + ((col & 0xf0) << 5);
 	return (col & 0xf) + ((row & 0x1f) << 4) + ((col & 0xf0) << 5);
 }
 
 TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape2_scan)
 {
 	//if (m_pf_control_0[0]&2)  // Needs testing on real hardware, not used by any game
-	//	return (col & 0xf) + ((row & 0x3f) << 4) + ((row & 0x70) << 6);
+	//  return (col & 0xf) + ((row & 0x3f) << 4) + ((row & 0x70) << 6);
 	return (col & 0xf) + ((row & 0x3f) << 4) + ((col & 0x70) << 6);
 }
 
 TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape0_8x8_scan)
 {
 	//if (m_pf_control_0[0]&2)   // Needs testing on real hardware, not used by any game
-	//	return (col & 0x1f) + ((row & 0x1f) << 5) + ((row & 0x60) << 5);
+	//  return (col & 0x1f) + ((row & 0x1f) << 5) + ((row & 0x60) << 5);
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x60) << 5);
 }
 
 TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape1_8x8_scan)
 {
 	//if (m_pf_control_0[0]&2)   // Needs testing on real hardware, not used by any game
-	//	return (row & 0x1f) + ((col & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
+	//  return (row & 0x1f) + ((col & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((row & 0x20) << 5) + ((col & 0x20) << 6);
 }
 
 TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape2_8x8_scan)
 {
 	//if (m_pf_control_0[0]&2)   // Needs testing on real hardware, not used by any game
-	//	return (row & 0x1f) + ((col & 0x7f) << 5);
+	//  return (row & 0x1f) + ((col & 0x7f) << 5);
 	return (col & 0x1f) + ((row & 0x7f) << 5);
 }
 

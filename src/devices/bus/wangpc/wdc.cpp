@@ -89,7 +89,7 @@ void wangpc_wdc_device::wangpc_wdc_io(address_map &map)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( wangpc_wdc )
+//  machine_config( wangpc_wdc )
 //-------------------------------------------------
 
 void wangpc_wdc_device::device_add_mconfig(machine_config &config)

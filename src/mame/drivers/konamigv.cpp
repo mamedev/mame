@@ -506,10 +506,10 @@ WRITE16_MEMBER(simpbowl_state::flash_w)
 	}
 }
 
-MACHINE_CONFIG_START(simpbowl_state::simpbowl)
+void simpbowl_state::simpbowl(machine_config &config)
+{
 	konamigv(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( simpbowl_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &simpbowl_state::simpbowl_map);
 
 	FUJITSU_29F016A(config, "flash0");
 	FUJITSU_29F016A(config, "flash1");
@@ -519,7 +519,7 @@ MACHINE_CONFIG_START(simpbowl_state::simpbowl)
 	upd4701_device &upd(UPD4701A(config, "upd"));
 	upd.set_portx_tag("TRACK0_X");
 	upd.set_porty_tag("TRACK0_Y");
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( simpbowl )
 	PORT_INCLUDE( konamigv )
@@ -546,10 +546,10 @@ WRITE16_MEMBER(konamigv_state::btc_trackball_w)
 	}
 }
 
-MACHINE_CONFIG_START(konamigv_state::btchamp)
+void konamigv_state::btchamp(machine_config &config)
+{
 	konamigv(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( btchamp_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &konamigv_state::btchamp_map);
 
 	SHARP_LH28F400(config, "flash");
 
@@ -560,7 +560,7 @@ MACHINE_CONFIG_START(konamigv_state::btchamp)
 	UPD4701A(config, m_btc_trackball[1]);
 	m_btc_trackball[1]->set_portx_tag("TRACK1_X");
 	m_btc_trackball[1]->set_porty_tag("TRACK1_Y");
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( btchamp )
 	PORT_INCLUDE( konamigv )
@@ -604,11 +604,11 @@ WRITE16_MEMBER(konamigv_state::tokimeki_serial_w)
 
 }
 
-MACHINE_CONFIG_START(konamigv_state::tmosh)
+void konamigv_state::tmosh(machine_config &config)
+{
 	konamigv(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( tmosh_map )
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &konamigv_state::tmosh_map);
+}
 
 /*
 Dead Eye
@@ -620,13 +620,13 @@ CD:
     A01
 */
 
-MACHINE_CONFIG_START(konamigv_state::kdeadeye)
+void konamigv_state::kdeadeye(machine_config &config)
+{
 	konamigv(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( kdeadeye_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &konamigv_state::kdeadeye_map);
 
 	SHARP_LH28F400(config, "flash");
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( kdeadeye )
 	PORT_INCLUDE( konamigv )

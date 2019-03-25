@@ -275,19 +275,19 @@ void itgambl2_state::itgambl2_palette(palette_device &palette) const
 *     Machine Drivers     *
 **************************/
 
-MACHINE_CONFIG_START(itgambl2_state::itgambl2)
-
+void itgambl2_state::itgambl2(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", H83337, MAIN_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(itgambl2_map)
+	H83337(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &itgambl2_state::itgambl2_map);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(itgambl2_state, screen_update_itgambl2)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(itgambl2_state::screen_update_itgambl2));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_itgambl2);
 	PALETTE(config, m_palette, FUNC(itgambl2_state::itgambl2_palette), 0x200);
@@ -295,7 +295,7 @@ MACHINE_CONFIG_START(itgambl2_state::itgambl2)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	UPD7759(config, "upd").add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 /*************************

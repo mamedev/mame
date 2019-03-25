@@ -23,21 +23,6 @@
 
 namespace plib {
 
-	template <typename P, typename T>
-	struct pool_deleter
-	{
-		constexpr pool_deleter() noexcept = default;
-
-		template<typename PU, typename U, typename = typename
-			   std::enable_if<std::is_convertible< U*, T*>::value>::type>
-		pool_deleter(const pool_deleter<PU, U>&) noexcept { }
-
-		void operator()(T *p) const
-		{
-			P::free(p);
-		}
-	};
-
 	//============================================================
 	//  Memory pool
 	//============================================================
@@ -100,8 +85,11 @@ namespace plib {
 		std::vector<block *> m_blocks;
 
 	public:
+		static constexpr const bool is_stateless = false;
+		template <class T, std::size_t ALIGN = alignof(T)>
+		using allocator_type = arena_allocator<mempool, T, ALIGN>;
 
-		mempool(size_t min_alloc, size_t min_align)
+		mempool(size_t min_alloc = (1<<21), size_t min_align = 16)
 		: m_min_alloc(min_alloc), m_min_align(min_align)
 		{
 		}
@@ -122,10 +110,8 @@ namespace plib {
 			}
 		}
 
-		template <std::size_t ALIGN>
-		void *alloc(size_t size)
+		void *allocate(size_t align, size_t size)
 		{
-			size_t align = ALIGN;
 			if (align < m_min_align)
 				align = m_min_align;
 
@@ -164,11 +150,8 @@ namespace plib {
 			}
 		}
 
-		template <typename T>
-		static void free(T *ptr)
+		static void deallocate(void *ptr)
 		{
-			/* call destructor */
-			ptr->~T();
 
 			auto it = sinfo().find(ptr);
 			if (it == sinfo().end())
@@ -188,68 +171,16 @@ namespace plib {
 		}
 
 		template <typename T>
-		using poolptr = plib::owned_ptr<T, pool_deleter<mempool, T>>;
+		using owned_pool_ptr = plib::owned_ptr<T, arena_deleter<mempool, T>>;
 
 		template<typename T, typename... Args>
-		poolptr<T> make_poolptr(Args&&... args)
+		owned_pool_ptr<T> make_poolptr(Args&&... args)
 		{
-			auto *mem = this->alloc<alignof(T)>(sizeof(T));
-			auto *obj = new (mem) T(std::forward<Args>(args)...);
-			poolptr<T> a(obj, true);
-			return std::move(a);
+			auto *mem = this->allocate(alignof(T), sizeof(T));
+			return owned_pool_ptr<T>(new (mem) T(std::forward<Args>(args)...), true, arena_deleter<mempool, T>(this));
 		}
 
 	};
-
-	class mempool_default
-	{
-	private:
-
-		size_t m_min_alloc;
-		size_t m_min_align;
-
-	public:
-
-		mempool_default(size_t min_alloc, size_t min_align)
-		: m_min_alloc(min_alloc), m_min_align(min_align)
-		{
-		}
-
-		COPYASSIGNMOVE(mempool_default, delete)
-
-		~mempool_default() = default;
-
-#if 0
-		void *alloc(size_t size)
-		{
-			plib::unused_var(m_min_alloc); // -Wunused-private-field fires without
-			plib::unused_var(m_min_align);
-
-			return ::operator new(size);
-		}
-
-#endif
-		template <typename T>
-		static void free(T *ptr)
-		{
-			plib::pdelete(ptr);
-		}
-
-		template <typename T>
-		using poolptr = plib::owned_ptr<T, pool_deleter<mempool_default, T>>;
-
-		template<typename T, typename... Args>
-		poolptr<T> make_poolptr(Args&&... args)
-		{
-			plib::unused_var(m_min_alloc); // -Wunused-private-field fires without
-			plib::unused_var(m_min_align);
-
-			auto *obj = plib::pnew<T>(std::forward<Args>(args)...);
-			poolptr<T> a(obj, true);
-			return std::move(a);
-		}
-	};
-
 
 } // namespace plib
 

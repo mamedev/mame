@@ -84,18 +84,18 @@ namespace netlist
 #if (USE_MEMPOOL)
 	using nlmempool = plib::mempool;
 #else
-	using nlmempool = plib::mempool_default;
+	using nlmempool = plib::aligned_arena;
 #endif
 
 	/*! Owned pointer type for pooled allocations.
 	 *
 	 */
 	template <typename T>
-	using poolptr = nlmempool::poolptr<T>;
+	using pool_owned_ptr = nlmempool::owned_pool_ptr<T>;
 
 	inline nlmempool &pool()
 	{
-		static nlmempool static_pool(655360, 16);
+		static nlmempool static_pool;
 		return static_pool;
 	}
 
@@ -107,11 +107,6 @@ namespace netlist
 			INPUT    = 1, /*!< object is an input */
 			OUTPUT   = 2, /*!< object is an output */
 		};
-
-		/*! Type of the model map used.
-		 *  This is used to hold all #Models in an unordered map
-		 */
-		using model_map_t = std::unordered_map<pstring, pstring>;
 
 	} // namespace detail
 

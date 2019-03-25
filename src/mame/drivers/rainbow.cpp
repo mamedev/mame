@@ -1548,16 +1548,16 @@ WRITE8_MEMBER(rainbow_state::rtc_w)
 		{
 		case 0x00: // Write to 0xED0FE
 			if (m_rtc->chip_enable())
-				m_rtc->write_data(space, offset & 0x01); // Transfer data to DS1315 (data = offset):
+				m_rtc->write_data(offset & 0x01); // Transfer data to DS1315 (data = offset):
 			else
-				m_rtc->read_0(space, 0); // (RTC ACTIVATION) read magic pattern 0
+				m_rtc->read_0(); // (RTC ACTIVATION) read magic pattern 0
 			break;
 
 		case 0x01: // Write to 0xED0FF
 			if (m_rtc->chip_enable())
-				m_rtc->write_data(space, offset & 0x01); // Transfer data to DS1315 (data = offset):
+				m_rtc->write_data(offset & 0x01); // Transfer data to DS1315 (data = offset):
 			else
-				m_rtc->read_1(space, 0); // (RTC ACTIVATION) read magic pattern 1
+				m_rtc->read_1(); // (RTC ACTIVATION) read magic pattern 1
 			break;
 		}
 	}
@@ -1576,7 +1576,7 @@ READ8_MEMBER(rainbow_state::rtc_r)
 #ifdef ASSUME_RAINBOW_A_HARDWARE
 		case 0x00: // read time/date from 0xED000 (ClikClok for 100-A)
 			if (m_rtc->chip_enable())
-				return m_rtc->read_data(space, 0) & 0x01;
+				return m_rtc->read_data() & 0x01;
 			 else
 				m_rtc->chip_reset();
 #else
@@ -1586,25 +1586,25 @@ READ8_MEMBER(rainbow_state::rtc_r)
 
 		case 0x0001:  // RTC_WRITE_DATA_1 0xFC001
 		case 0x2001:  // RTC_WRITE_DATA_1 0xFE001 (MIRROR)
-			m_rtc->write_data(space, offset & 0x01);
+			m_rtc->write_data(offset & 0x01);
 			break;
 
 		// Read actual time/date from ClikClok:
 		case 0x0004:  // 0xFC004
 		case 0x2004:  // 0xFE004 (MIRROR)
 			if (m_rtc->chip_enable())
-				return (m_rtc->read_data(space, 0) & 0x01);
+				return (m_rtc->read_data() & 0x01);
 
 		// (RTC ACTIVATION) read magic pattern 0
 		case 0x0100:  // 0xFC100
 		case 0x2100:  // 0xFE100 (MIRROR)
-			m_rtc->read_0(space, 0);
+			m_rtc->read_0();
 			break;
 
 		// (RTC ACTIVATION) read magic pattern 1
 		case 0x0101:  // 0xFC101
 		case 0x2101:  // 0xFE101 (MIRROR)
-			m_rtc->read_1(space, 0);
+			m_rtc->read_1();
 			break;
 
 		// RESET

@@ -213,7 +213,7 @@ READ8Z_MEMBER(snug_enhanced_video_device::readz)
 
 	if (m_video_accessed)
 	{
-		*value = m_video->read(space, m_address>>1);
+		*value = m_video->read(m_address>>1);
 	}
 }
 
@@ -223,7 +223,7 @@ READ8Z_MEMBER(snug_enhanced_video_device::readz)
     0x5f00 - 0x5fef   NOVRAM
     0x5ff0 - 0x5fff   Palette (5ff8, 5ffa, 5ffc, 5ffe)
 */
-WRITE8_MEMBER(snug_enhanced_video_device::write)
+void snug_enhanced_video_device::write(offs_t offset, uint8_t data)
 {
 	if (m_selected && m_inDsrArea)
 	{
@@ -296,7 +296,7 @@ WRITE8_MEMBER(snug_enhanced_video_device::write)
 
 	if (m_video_accessed)
 	{
-		m_video->write(space, m_address>>1, data);
+		m_video->write(m_address>>1, data);
 	}
 
 	if (m_sound_accessed)
@@ -323,8 +323,9 @@ READ8Z_MEMBER(snug_enhanced_video_device::crureadz)
 	{
 		if ((offset & 0x00f0)==0) // offset 0 delivers bits 0-7 (address 00-0f)
 		{
-			*value = ~(ioport("EVPC-SW1")->read() | (ioport("EVPC-SW3")->read()<<2)
+			uint8_t p = ~(ioport("EVPC-SW1")->read() | (ioport("EVPC-SW3")->read()<<2)
 				| (ioport("EVPC-SW4")->read()<<3) | (ioport("EVPC-SW8")->read()<<7));
+			*value = BIT(p, (offset >> 1) & 7);
 		}
 	}
 }
@@ -340,7 +341,7 @@ READ8Z_MEMBER(snug_enhanced_video_device::crureadz)
     Bit 6: -
     Bit 7: -
 */
-WRITE8_MEMBER(snug_enhanced_video_device::cruwrite)
+void snug_enhanced_video_device::cruwrite(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff00)==EVPC_CRU_BASE)
 	{

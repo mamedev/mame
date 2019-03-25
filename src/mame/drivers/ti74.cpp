@@ -280,7 +280,7 @@ void ti74_state::main_map(address_map &map)
 	map.unmap_value_high();
 	map(0x1000, 0x1001).rw("hd44780", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 	map(0x2000, 0x3fff).ram().share("sysram.ic3");
-	//AM_RANGE(0x4000, 0xbfff) // mapped by the cartslot
+	//map(0x4000, 0xbfff) // mapped by the cartslot
 	map(0xc000, 0xdfff).bankr("sysbank");
 }
 
@@ -534,7 +534,7 @@ MACHINE_CONFIG_START(ti74_state::ti74)
 	screen.set_refresh_hz(60); // arbitrary
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(6*31+1, 9*1+1+1);
-	screen.set_visarea(0, 6*31, 0, 9*1+1);
+	screen.set_visarea_full();
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
 	screen.set_palette("palette");
 
@@ -570,7 +570,7 @@ MACHINE_CONFIG_START(ti74_state::ti95)
 	screen.set_refresh_hz(60); // arbitrary
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(200, 20);
-	screen.set_visarea(0, 200-1, 0, 20-1);
+	screen.set_visarea_full();
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
 	screen.set_palette("palette");
 

@@ -221,7 +221,7 @@ READ8_MEMBER( sbc6510_state::a2_r )
 WRITE8_MEMBER( sbc6510_state::a2_w )
 {
 	m_2 = data;
-	m_terminal->write(space, 0, data);
+	m_terminal->write(data);
 }
 
 void sbc6510_state::machine_start()

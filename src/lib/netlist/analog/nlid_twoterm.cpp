@@ -156,7 +156,8 @@ NETLIB_UPDATE_PARAM(POT)
 	nl_double v = m_Dial();
 	if (m_DialIsLog())
 		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
-
+	if (m_Reverse())
+		v = 1.0 - v;
 	m_R1.set_R(std::max(m_R() * v, exec().gmin()));
 	m_R2.set_R(std::max(m_R() * (plib::constants<nl_double>::one() - v), exec().gmin()));
 

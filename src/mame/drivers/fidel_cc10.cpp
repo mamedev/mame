@@ -1,58 +1,26 @@
 // license:BSD-3-Clause
-// copyright-holders:Jonathan Gevaryahu,Sandro Ronco,hap
-// thanks-to:Berger
+// copyright-holders:Jonathan Gevaryahu, Sandro Ronco, hap
+// thanks-to:Berger, Sean Riddle
 /******************************************************************************
 *
 * fidel_cc10.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
+
+TODO:
+- What is cc10 8255 PB.7 for? When set, maximum levels is 3, like in CC3. But
+  there is no CC3 with 16 buttons, and things get glitchy in this mode.
 
 *******************************************************************************
 
 Fidelity Chess Challenger 10 (CCX)
 -------------------
-4 versions are known to exist: A,B,C,D. Strangely, version C(UCC10) has an 8080
-instead of Z80. Chess Challenger 1,3 and 7 also run on very similar hardware.
+3 versions are known to exist: A,B,C. Strangely, version C(UCC10) has an 8080
+instead of Z80 and no beeper, it's on CC1-based hardware.
 
-Z80A CPU @ 4MHz
+Z80A CPU @ 4MHz, NEC D8255C
 4KB ROM(NEC 2332A), 2*256 bytes RAM(4*NEC 2111AL-4)
-
-This is an earlier hardware upon which the VCC and UVC were based on;
-The hardware is nearly the same; in fact the only significant differences are
-the RAM being located in a different place, the lack of a speech chip, and
-the connections to ports A and B on the PPI:
-
-8255 connections:
------------------
-PA.0 - segment G (W)
-PA.1 - segment F (W)
-PA.2 - segment E (W)
-PA.3 - segment D (W)
-PA.4 - segment C (W)
-PA.5 - segment B (W)
-PA.6 - segment A (W)
-PA.7 - 'beeper' direct speaker output (W)
-
 The beeper is via a 556 timer, fixed-frequency at around 1300-1400Hz.
-Not all hardware configurations include the beeper.
 
-PB.0 - dot commons (W)
-PB.1 - NC
-PB.2 - digit 0, bottom dot (W)
-PB.3 - digit 1, top dot (W)
-PB.4 - digit 2 (W)
-PB.5 - digit 3 (W)
-PB.6 - NC
-PB.7 - Mode select? (cc3 vs cc10, R)
-
-Note: there is no CC3 with 16 buttons, and things get glitchy in this mode.
-
-PC.0 - button row 0 (R)
-PC.1 - button row 1 (R)
-PC.2 - button row 2 (R)
-PC.3 - button row 3 (R)
-PC.4 - button column A (W)
-PC.5 - button column B (W)
-PC.6 - button column C (W)
-PC.7 - button column D (W)
+Checker Challenger 4 (ACR) is on the same PCB, twice less RAM and the beeper gone.
 
 ******************************************************************************/
 
@@ -65,6 +33,7 @@ PC.7 - button column D (W)
 #include "speaker.h"
 
 // internal artwork
+#include "fidel_acr.lh" // clickable
 #include "fidel_cc10.lh" // clickable
 
 
@@ -81,19 +50,25 @@ public:
 	{ }
 
 	// machine drivers
+	void acr(machine_config &config);
 	void ccx(machine_config &config);
 
 private:
 	// devices/pointers
 	required_device<i8255_device> m_ppi8255;
-	required_device<timer_device> m_beeper_off;
-	required_device<beep_device> m_beeper;
+	optional_device<timer_device> m_beeper_off;
+	optional_device<beep_device> m_beeper;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off) { m_beeper->set_state(0); }
 
 	// address maps
-	void main_map(address_map &map);
+	void acr_map(address_map &map);
+	void ccx_map(address_map &map);
+	void main_trampoline(address_map &map);
 	void main_io(address_map &map);
+
+	u8 main_trampoline_r(offs_t offset);
+	void main_trampoline_w(offs_t offset, u8 data);
 
 	// I/O handlers
 	void prepare_display();
@@ -112,10 +87,9 @@ private:
 
 void ccx_state::prepare_display()
 {
-	// 4 7seg leds (note: sel d0 for extra leds)
-	u8 outdata = (m_7seg_data & 0x7f) | (m_led_select << 7 & 0x80);
+	// 4 7segs + 2 leds
 	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 4, outdata, m_led_select >> 2 & 0xf);
+	display_matrix(8, 6, m_7seg_data, m_led_select);
 }
 
 
@@ -123,8 +97,8 @@ void ccx_state::prepare_display()
 
 WRITE8_MEMBER(ccx_state::ppi_porta_w)
 {
-	// d7: enable beeper on falling edge (555 monostable)
-	if (~data & m_7seg_data & 0x80 && !m_beeper_off->enabled())
+	// d7: enable beeper on falling edge (556 monostable) (unpopulated on ACR)
+	if (m_beeper != nullptr && ~data & m_7seg_data & 0x80 && !m_beeper_off->enabled())
 	{
 		m_beeper->set_state(1);
 		m_beeper_off->adjust(attotime::from_msec(80)); // duration is approximate
@@ -137,8 +111,9 @@ WRITE8_MEMBER(ccx_state::ppi_porta_w)
 
 WRITE8_MEMBER(ccx_state::ppi_portb_w)
 {
-	// d0,d2-d5: digit/led select
-	m_led_select = data;
+	// d0: lose led, d1: check(win) led
+	// d2-d5: digit select
+	m_led_select = bitswap<6>(data,0,1,5,4,3,2);
 	prepare_display();
 }
 
@@ -160,13 +135,46 @@ WRITE8_MEMBER(ccx_state::ppi_portc_w)
     Address Maps
 ******************************************************************************/
 
-void ccx_state::main_map(address_map &map)
+void ccx_state::acr_map(address_map &map)
 {
 	map.unmap_value_high();
-	map.global_mask(0x3fff);
-	map(0x0000, 0x0fff).rom();
-	map(0x1000, 0x10ff).mirror(0x0f00).ram();
-	map(0x3000, 0x30ff).mirror(0x0f00).ram();
+	map(0x0000, 0x0fff).rom().region("maincpu", 0); // _A12
+	map(0x2000, 0x20ff).mirror(0x0f00).ram(); // A13
+}
+
+void ccx_state::ccx_map(address_map &map)
+{
+	acr_map(map);
+	map(0x4000, 0x40ff).mirror(0x0f00).ram(); // A14
+}
+
+// PCB design is prone to bus conflicts, but assuming software behaves fine,
+// it will access ROM at $0xxx, RAM at $3xxx and $5xxx
+void ccx_state::main_trampoline_w(offs_t offset, u8 data)
+{
+	if (offset & 0x2000)
+		m_mainmap->write8(offset & 0x2fff, data);
+	if (offset & 0x4000)
+		m_mainmap->write8(offset & 0x4fff, data);
+}
+
+u8 ccx_state::main_trampoline_r(offs_t offset)
+{
+	u8 data = 0xff;
+	if (~offset & 0x1000)
+		data &= m_mainmap->read8(offset & 0x0fff);
+	if (offset & 0x2000)
+		data &= m_mainmap->read8(offset & 0x2fff);
+	if (offset & 0x4000)
+		data &= m_mainmap->read8(offset & 0x4fff);
+
+	return data;
+}
+
+void ccx_state::main_trampoline(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x7fff).rw(FUNC(ccx_state::main_trampoline_r), FUNC(ccx_state::main_trampoline_w));
 }
 
 void ccx_state::main_io(address_map &map)
@@ -210,29 +218,69 @@ static INPUT_PORTS_START( ccx )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, ccx_state, reset_button, nullptr)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( acr )
+	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV") PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PV") PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD)
+
+	PORT_START("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)
+
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("TO") PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)
+
+	PORT_START("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD)
+
+	PORT_START("RESET") // is not on matrix IN.0 d0
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, ccx_state, reset_button, nullptr)
+INPUT_PORTS_END
+
 
 
 /******************************************************************************
     Machine Drivers
 ******************************************************************************/
 
-void ccx_state::ccx(machine_config &config)
+void ccx_state::acr(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ccx_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ccx_state::main_trampoline);
+	ADDRESS_MAP_BANK(config, m_mainmap).set_map(&ccx_state::acr_map).set_options(ENDIANNESS_LITTLE, 8, 16);
 	m_maincpu->set_addrmap(AS_IO, &ccx_state::main_io);
 
 	I8255(config, m_ppi8255);
 	m_ppi8255->out_pa_callback().set(FUNC(ccx_state::ppi_porta_w));
 	m_ppi8255->tri_pa_callback().set_constant(0);
-	m_ppi8255->in_pb_callback().set_constant(0); // 0x80 for '3 level mode'
+	m_ppi8255->in_pb_callback().set_constant(0);
 	m_ppi8255->out_pb_callback().set(FUNC(ccx_state::ppi_portb_w));
-	m_ppi8255->in_pc_callback().set(FUNC(ccx_state::ppi_portc_r));
 	m_ppi8255->tri_pb_callback().set_constant(0);
+	m_ppi8255->in_pc_callback().set(FUNC(ccx_state::ppi_portc_r));
 	m_ppi8255->out_pc_callback().set(FUNC(ccx_state::ppi_portc_w));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(ccx_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_fidel_acr);
+}
+
+void ccx_state::ccx(machine_config &config)
+{
+	acr(config);
+
+	/* basic machine hardware */
+	m_mainmap->set_addrmap(AS_PROGRAM, &ccx_state::ccx_map);
+
 	config.set_default_layout(layout_fidel_cc10);
 
 	/* sound hardware */
@@ -248,9 +296,15 @@ void ccx_state::ccx(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( cc10 ) // model CCX
+ROM_START( cc10 ) // model CCX, PCB label P241C-1
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cn19053n_cc10b", 0x0000, 0x1000, CRC(afd3ca99) SHA1(870d09b2b52ccb8572d69642c59b5215d5fb26ab) ) // 2332
+ROM_END
+
+
+ROM_START( checkc4 ) // model ACR, PCB label P241C
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "d2332c_043", 0x0000, 0x1000, CRC(4c251d90) SHA1(474d54b05971f2a3208bab56dc6e27f03781c541) ) // no custom label
 ROM_END
 
 } // anonymous namespace
@@ -261,5 +315,7 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME  PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1978, cc10, 0,      0, ccx,     ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger 10 (model CCX, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME     PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1978, cc10,    0,      0, ccx,     ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger 10 (model CCX, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1978, checkc4, 0,      0, acr,     acr,   ccx_state, empty_init, "Fidelity Electronics", "Checker Challenger 4", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )

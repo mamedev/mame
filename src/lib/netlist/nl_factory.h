@@ -9,11 +9,11 @@
 #ifndef NLFACTORY_H_
 #define NLFACTORY_H_
 
-#include <vector>
-
 #include "nltypes.h"
 #include "plib/palloc.h"
 #include "plib/ptypes.h"
+
+#include <vector>
 
 #define NETLIB_DEVICE_IMPL_ALIAS(p_alias, chip, p_name, p_def_param) \
 	NETLIB_DEVICE_IMPL_BASE(devices, p_alias, chip, p_name, p_def_param) \
@@ -55,7 +55,7 @@ namespace factory {
 
 		COPYASSIGNMOVE(element_t, default)
 
-		virtual poolptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) = 0;
+		virtual pool_owned_ptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) = 0;
 		virtual void macro_actions(nlparse_t &nparser, const pstring &name)
 		{
 			plib::unused_var(nparser);
@@ -85,7 +85,7 @@ namespace factory {
 				const pstring &def_param, const pstring &sourcefile)
 		: element_t(name, classname, def_param, sourcefile) { }
 
-		poolptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override
+		pool_owned_ptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override
 		{
 			return pool().make_poolptr<C>(anetlist, name);
 		}
@@ -147,7 +147,7 @@ namespace factory {
 		{
 		}
 
-		poolptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override;
+		pool_owned_ptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override;
 
 		void macro_actions(nlparse_t &nparser, const pstring &name) override;
 

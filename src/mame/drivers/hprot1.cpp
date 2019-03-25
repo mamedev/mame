@@ -245,7 +245,8 @@ HD44780_PIXEL_UPDATE(hprot1_state::hprot1_pixel_update)
 	}
 }
 
-MACHINE_CONFIG_START(hprot1_state::hprot1)
+void hprot1_state::hprot1(machine_config &config)
+{
 	/* basic machine hardware */
 	I80C31(config, m_maincpu, XTAL(10'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &hprot1_state::i80c31_prg);
@@ -255,13 +256,13 @@ MACHINE_CONFIG_START(hprot1_state::hprot1)
 	m_maincpu->port_out_cb<3>().set(FUNC(hprot1_state::henry_p3_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_SIZE(6*16, 9*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_size(6*16, 9*2);
+	screen.set_visarea(0, 6*16-1, 0, 9*2-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(hprot1_state::hprot1_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_hprot1);
@@ -273,40 +274,40 @@ MACHINE_CONFIG_START(hprot1_state::hprot1)
 	/* TODO: figure out which RTC chip is in use. */
 
 	/* TODO: emulate the ADM695AN chip (watchdog/brownout reset)*/
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hprot1_state::hprotr8a)
+void hprot1_state::hprotr8a(machine_config &config)
+{
 	hprot1(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
-	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
-	MCFG_DEVICE_IO_MAP(i80c31_io)
+	I80C31(config.replace(), m_maincpu, 11059200); // value of X1 crystal on the PCB
+	m_maincpu->set_addrmap(AS_PROGRAM, &hprot1_state::i80c31_prg);
+	m_maincpu->set_addrmap(AS_IO, &hprot1_state::i80c31_io);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* TODO: add an RS232 interface (emulate MAX232N chip)
 	(the board has GND/VCC/RX/TX pins available in a connector) */
 
 	/* TODO: add an I2C interface (the board has GND/VCC/SDA/SCL pins available in a connector) */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hprot1_state::hprot2r6)
+void hprot1_state::hprot2r6(machine_config &config)
+{
 	hprot1(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
-	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
-	MCFG_DEVICE_IO_MAP(i80c31_io)
+	I80C31(config.replace(), m_maincpu, 11059200); // value of X1 crystal on the PCB
+	m_maincpu->set_addrmap(AS_PROGRAM, &hprot1_state::i80c31_prg);
+	m_maincpu->set_addrmap(AS_IO, &hprot1_state::i80c31_io);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* TODO: add an RS232 interface (emulate MAX232N chip) */
-MACHINE_CONFIG_END
+}
 
 ROM_START( hprot1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )

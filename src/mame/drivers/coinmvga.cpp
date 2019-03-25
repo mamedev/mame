@@ -636,33 +636,33 @@ void coinmvga_state::ramdac2_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(coinmvga_state::coinmvga)
-
+void coinmvga_state::coinmvga(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", H83007, CPU_CLOCK)  /* xtal */
-	MCFG_DEVICE_PROGRAM_MAP(coinmvga_map)
-	MCFG_DEVICE_IO_MAP(coinmvga_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", coinmvga_state,  vblank_irq)   /* wrong, fix me */
+	H83007(config, m_maincpu, CPU_CLOCK);  /* xtal */
+	m_maincpu->set_addrmap(AS_PROGRAM, &coinmvga_state::coinmvga_map);
+	m_maincpu->set_addrmap(AS_IO, &coinmvga_state::coinmvga_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(coinmvga_state::vblank_irq));   /* wrong, fix me */
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640,480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(coinmvga_state, screen_update_coinmvga)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(640,480);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(coinmvga_state::screen_update_coinmvga));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_coinmvga);
 	GFXDECODE(config, "gfxdecode2", m_palette2, gfx_coinmvga2);
 
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, m_palette).set_entries(256);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &coinmvga_state::ramdac_map);
 
-	MCFG_PALETTE_ADD("palette2", 16)
+	PALETTE(config, m_palette2).set_entries(16);
 	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", 0, m_palette2));
 	ramdac2.set_addrmap(0, &coinmvga_state::ramdac2_map);
 
@@ -670,10 +670,10 @@ MACHINE_CONFIG_START(coinmvga_state::coinmvga)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, SND_CLOCK)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", SND_CLOCK));
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
+}
 
 
 /*************************

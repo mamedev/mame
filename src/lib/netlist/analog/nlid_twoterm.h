@@ -166,6 +166,7 @@ NETLIB_OBJECT(POT)
 	, m_R(*this, "R", 10000)
 	, m_Dial(*this, "DIAL", 0.5)
 	, m_DialIsLog(*this, "DIALLOG", false)
+	, m_Reverse(*this, "REVERSE", false)
 	{
 		register_subalias("1", m_R1.m_P);
 		register_subalias("2", m_R1.m_N);
@@ -186,6 +187,7 @@ private:
 	param_double_t m_R;
 	param_double_t m_Dial;
 	param_logic_t m_DialIsLog;
+	param_logic_t m_Reverse;
 };
 
 NETLIB_OBJECT(POT2)
