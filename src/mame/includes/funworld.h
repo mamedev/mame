@@ -33,8 +33,6 @@ public:
 	void fw_brick_2(machine_config &config);
 
 	void init_saloon();
-	void init_royalcdc();
-	void init_multiwin();
 	void init_mongolnw();
 	void init_soccernw();
 	void init_tabblue();
