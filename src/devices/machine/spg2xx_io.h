@@ -36,16 +36,14 @@ public:
 
 	virtual DECLARE_READ16_MEMBER(io_r);
 	virtual DECLARE_WRITE16_MEMBER(io_w);
+	
+	auto pal_read_callback() { return m_pal_read_cb.bind(); }
 
 protected:
 	spg2xx_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint32_t sprite_limit)
 		: spg2xx_io_device(mconfig, type, tag, owner, clock)
 	{
 	}
-
-
-	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
-	DECLARE_READ16_MEMBER(space_r);
 
 	void check_extint_irq(int channel);
 	void check_irqs(const uint16_t changed);
@@ -130,7 +128,7 @@ protected:
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
 
-	uint16_t m_pal_flag;
+	devcb_read16 m_pal_read_cb;
 };
 
 class spg24x_io_device : public spg2xx_io_device

@@ -17,48 +17,22 @@
 DEFINE_DEVICE_TYPE(SPG24X, spg24x_device, "spg24x", "SPG240-series System-on-a-Chip")
 DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-Chip")
 
-#define LOG_IO_READS        (1U << 1)
-#define LOG_IO_WRITES       (1U << 2)
 #define LOG_UNKNOWN_IO      (1U << 3)
 #define LOG_IRQS            (1U << 4)
 #define LOG_VLINES          (1U << 5)
-#define LOG_GPIO            (1U << 6)
-#define LOG_UART            (1U << 7)
-#define LOG_I2C             (1U << 8)
 #define LOG_DMA             (1U << 9)
-#define LOG_SEGMENT         (1U << 10)
-#define LOG_WATCHDOG        (1U << 11)
-#define LOG_TIMERS          (1U << 12)
-#define LOG_SPU_READS       (1U << 13)
-#define LOG_SPU_WRITES      (1U << 14)
-#define LOG_UNKNOWN_SPU     (1U << 15)
-#define LOG_CHANNEL_READS   (1U << 16)
-#define LOG_CHANNEL_WRITES  (1U << 17)
-#define LOG_ENVELOPES       (1U << 18)
-#define LOG_SAMPLES         (1U << 19)
-#define LOG_RAMPDOWN        (1U << 20)
-#define LOG_BEAT            (1U << 21)
 #define LOG_PPU_READS       (1U << 22)
 #define LOG_PPU_WRITES      (1U << 23)
 #define LOG_UNKNOWN_PPU     (1U << 24)
-#define LOG_FIQ             (1U << 25)
-#define LOG_SIO             (1U << 26)
-#define LOG_EXT_MEM         (1U << 27)
-#define LOG_EXTINT          (1U << 28)
-#define LOG_IO              (LOG_IO_READS | LOG_IO_WRITES | LOG_IRQS | LOG_GPIO | LOG_UART | LOG_I2C | LOG_DMA | LOG_TIMERS | LOG_EXTINT | LOG_UNKNOWN_IO)
-#define LOG_CHANNELS        (LOG_CHANNEL_READS | LOG_CHANNEL_WRITES)
-#define LOG_SPU             (LOG_SPU_READS | LOG_SPU_WRITES | LOG_UNKNOWN_SPU | LOG_CHANNEL_READS | LOG_CHANNEL_WRITES \
-							| LOG_ENVELOPES | LOG_SAMPLES | LOG_RAMPDOWN | LOG_BEAT)
+#define LOG_IO              (LOG_IRQS | LOG_DMA | LOG_UNKNOWN_IO)
 #define LOG_PPU             (LOG_PPU_READS | LOG_PPU_WRITES | LOG_UNKNOWN_PPU)
-#define LOG_ALL             (LOG_IO | LOG_SPU | LOG_PPU | LOG_VLINES | LOG_SEGMENT | LOG_FIQ)
+#define LOG_ALL             (LOG_IO | LOG_PPU | LOG_VLINES )
 
 #define VERBOSE             (0)
 #include "logmacro.h"
 
 #define SPG_DEBUG_VIDEO     (0)
 
-//#define IO_IRQ_ENABLE       m_io_regs[0x21]
-//#define IO_IRQ_STATUS       m_io_regs[0x22]
 #define VIDEO_IRQ_ENABLE    m_video_regs[0x62]
 #define VIDEO_IRQ_STATUS    m_video_regs[0x63]
 
@@ -152,38 +126,12 @@ void spg2xx_device::device_start()
 	save_item(NAME(m_video_regs));
 	save_item(NAME(m_sprite_limit));
 	save_item(NAME(m_pal_flag));
-
-//	save_item(NAME(m_2khz_divider));
-//	save_item(NAME(m_1khz_divider));
-//	save_item(NAME(m_4hz_divider));
-
-//	save_item(NAME(m_uart_baud_rate));
 }
 
 void spg2xx_device::device_reset()
 {
 	memset(m_video_regs, 0, 0x100 * sizeof(uint16_t));
-//	memset(m_io_regs, 0, 0x100 * sizeof(uint16_t));
 	memset(m_dma_regs, 0, 0x4 * sizeof(uint16_t));
-
-//	m_timer_a_preload = 0;
-//	m_timer_b_preload = 0;
-//	m_timer_b_divisor = 0;
-//	m_timer_b_tick_rate = 0;
-
-//	m_io_regs[0x23] = 0x0028;
-//	m_io_regs[0x2c] = 0x1418;
-//	m_io_regs[0x2d] = 0x1658;
-
-//	m_uart_rx_available = false;
-//	memset(m_uart_rx_fifo, 0, ARRAY_LENGTH(m_uart_rx_fifo));
-//	m_uart_rx_fifo_start = 0;
-//	m_uart_rx_fifo_end = 0;
-//	m_uart_rx_fifo_count = 0;
-//	m_uart_tx_irq = false;
-//	m_uart_rx_irq = false;
-
-//	memset(m_extint, 0, sizeof(bool) * 2);
 
 	m_video_regs[0x36] = 0xffff;
 	m_video_regs[0x37] = 0xffff;
@@ -197,23 +145,8 @@ void spg2xx_device::device_reset()
 	m_debug_blit = false;
 	m_debug_palette = false;
 	m_sprite_index_to_debug = 0;
-
-//	m_4khz_timer->adjust(attotime::from_hz(4096), 0, attotime::from_hz(4096));
-
-//	m_2khz_divider = 0;
-//	m_1khz_divider = 0;
-//	m_4hz_divider = 0;
 }
 
-void spg2xx_device::uart_rx(uint8_t data)
-{
-	// TODO trampoline
-}
-
-void spg2xx_device::extint_w(int channel, bool state)
-{
-	// TODO trampoline
-}
 
 WRITE_LINE_MEMBER(spg2xx_device::audioirq_w)
 {
@@ -1051,23 +984,45 @@ void spg2xx_device::do_cpu_dma(uint32_t len)
 	m_dma_regs[0x003] = (dst + len) & 0x3fff;
 }
 
-void spg2xx_device::device_add_mconfig(machine_config &config)
+void spg2xx_device::configure_spg_io(spg2xx_io_device* io)
+{
+	io->porta_in().set(FUNC(spg2xx_device::porta_r));
+	io->portb_in().set(FUNC(spg2xx_device::portb_r));
+	io->portc_in().set(FUNC(spg2xx_device::portc_r));
+	io->porta_out().set(FUNC(spg2xx_device::porta_w));
+	io->portb_out().set(FUNC(spg2xx_device::portb_w));
+	io->portc_out().set(FUNC(spg2xx_device::portc_w));
+	io->adc_in<0>().set(FUNC(spg2xx_device::adc_r<0>));
+	io->adc_in<1>().set(FUNC(spg2xx_device::adc_r<1>));
+	io->eeprom_w().set(FUNC(spg2xx_device::eepromx_w));
+	io->eeprom_r().set(FUNC(spg2xx_device::eepromx_r));
+	io->uart_tx().set(FUNC(spg2xx_device::tx_w));
+	io->chip_select().set(FUNC(spg2xx_device::cs_w));
+	io->pal_read_callback().set(FUNC(spg2xx_device::get_pal_r));
+}
+
+void spg24x_device::device_add_mconfig(machine_config &config)
 {
 	SPG2XX_AUDIO(config, m_spg_audio, DERIVED_CLOCK(1, 1));
-	m_spg_audio->write_irq_callback().set(FUNC(spg2xx_device::audioirq_w));
-	m_spg_audio->space_read_callback().set(FUNC(spg2xx_device::space_r));
+	m_spg_audio->write_irq_callback().set(FUNC(spg24x_device::audioirq_w));
+	m_spg_audio->space_read_callback().set(FUNC(spg24x_device::space_r));
 
 	m_spg_audio->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 	m_spg_audio->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
 
 	SPG24X_IO(config, m_spg_io, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
-	m_spg_io->porta_in().set(FUNC(spg2xx_device::porta_r));
-	m_spg_io->portb_in().set(FUNC(spg2xx_device::portb_r));
-	m_spg_io->portc_in().set(FUNC(spg2xx_device::portc_r));
-	m_spg_io->porta_out().set(FUNC(spg2xx_device::porta_w));
-	m_spg_io->portb_out().set(FUNC(spg2xx_device::portb_w));
-	m_spg_io->portc_out().set(FUNC(spg2xx_device::portc_w));
+	configure_spg_io(m_spg_io);
+}
 
+void spg28x_device::device_add_mconfig(machine_config &config)
+{
+	SPG2XX_AUDIO(config, m_spg_audio, DERIVED_CLOCK(1, 1));
+	m_spg_audio->write_irq_callback().set(FUNC(spg28x_device::audioirq_w));
+	m_spg_audio->space_read_callback().set(FUNC(spg28x_device::space_r));
 
+	m_spg_audio->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_spg_audio->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
 
+	SPG28X_IO(config, m_spg_io, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
+	configure_spg_io(m_spg_io);
 }

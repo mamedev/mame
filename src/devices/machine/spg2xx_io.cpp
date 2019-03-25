@@ -15,32 +15,15 @@ DEFINE_DEVICE_TYPE(SPG28X_IO, spg28x_io_device, "spg28x_io", "SPG280-series Syst
 #define LOG_GPIO            (1U << 6)
 #define LOG_UART            (1U << 7)
 #define LOG_I2C             (1U << 8)
-#define LOG_DMA             (1U << 9)
 #define LOG_SEGMENT         (1U << 10)
 #define LOG_WATCHDOG        (1U << 11)
 #define LOG_TIMERS          (1U << 12)
-#define LOG_SPU_READS       (1U << 13)
-#define LOG_SPU_WRITES      (1U << 14)
-#define LOG_UNKNOWN_SPU     (1U << 15)
-#define LOG_CHANNEL_READS   (1U << 16)
-#define LOG_CHANNEL_WRITES  (1U << 17)
-#define LOG_ENVELOPES       (1U << 18)
-#define LOG_SAMPLES         (1U << 19)
-#define LOG_RAMPDOWN        (1U << 20)
-#define LOG_BEAT            (1U << 21)
-#define LOG_PPU_READS       (1U << 22)
-#define LOG_PPU_WRITES      (1U << 23)
-#define LOG_UNKNOWN_PPU     (1U << 24)
 #define LOG_FIQ             (1U << 25)
 #define LOG_SIO             (1U << 26)
 #define LOG_EXT_MEM         (1U << 27)
 #define LOG_EXTINT          (1U << 28)
-#define LOG_IO              (LOG_IO_READS | LOG_IO_WRITES | LOG_IRQS | LOG_GPIO | LOG_UART | LOG_I2C | LOG_DMA | LOG_TIMERS | LOG_EXTINT | LOG_UNKNOWN_IO)
-#define LOG_CHANNELS        (LOG_CHANNEL_READS | LOG_CHANNEL_WRITES)
-#define LOG_SPU             (LOG_SPU_READS | LOG_SPU_WRITES | LOG_UNKNOWN_SPU | LOG_CHANNEL_READS | LOG_CHANNEL_WRITES \
-							| LOG_ENVELOPES | LOG_SAMPLES | LOG_RAMPDOWN | LOG_BEAT)
-#define LOG_PPU             (LOG_PPU_READS | LOG_PPU_WRITES | LOG_UNKNOWN_PPU)
-#define LOG_ALL             (LOG_IO | LOG_SPU | LOG_PPU | LOG_VLINES | LOG_SEGMENT | LOG_FIQ)
+#define LOG_IO              (LOG_IO_READS | LOG_IO_WRITES | LOG_IRQS | LOG_GPIO | LOG_UART | LOG_I2C | LOG_TIMERS | LOG_EXTINT | LOG_UNKNOWN_IO)
+#define LOG_ALL             (LOG_IO | LOG_VLINES | LOG_SEGMENT | LOG_FIQ)
 
 #define VERBOSE             (0)
 #include "logmacro.h"
@@ -64,6 +47,7 @@ spg2xx_io_device::spg2xx_io_device(const machine_config &mconfig, device_type ty
 	, m_chip_sel(*this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
+	, m_pal_read_cb(*this)
 {
 }
 
@@ -92,6 +76,7 @@ void spg2xx_io_device::device_start()
 	m_eeprom_r.resolve_safe(0);
 	m_uart_tx.resolve_safe();
 	m_chip_sel.resolve_safe();
+	m_pal_read_cb.resolve_safe(0);
 
 	m_tmb1 = timer_alloc(TIMER_TMB1);
 	m_tmb2 = timer_alloc(TIMER_TMB2);
@@ -127,6 +112,7 @@ void spg2xx_io_device::device_start()
 	save_item(NAME(m_4hz_divider));
 
 	save_item(NAME(m_uart_baud_rate));
+
 }
 
 void spg2xx_io_device::device_reset()
@@ -247,8 +233,11 @@ READ16_MEMBER(spg2xx_io_device::io_r)
 		break;
 
 	case 0x2b:
-		LOGMASKED(LOG_IO_READS, "io_r: NTSC/PAL = %04x\n", m_pal_flag);
-		return m_pal_flag;
+	{
+		uint16_t pal = m_pal_read_cb();
+		LOGMASKED(LOG_IO_READS, "io_r: NTSC/PAL = %04x\n", pal);
+		return pal;
+	}
 
 	case 0x2c: // PRNG 0
 	{

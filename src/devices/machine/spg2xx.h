@@ -65,15 +65,14 @@ public:
 
 	auto chip_select() { return m_chip_sel.bind(); }
 
-	void uart_rx(uint8_t data);
-
-	void extint_w(int channel, bool state);
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank);
 
 	required_device<spg2xx_audio_device> m_spg_audio;
 	required_device<spg2xx_io_device> m_spg_io;
+
+	void extint_w(int channel, bool state) { m_spg_io->extint_w(channel, state); };
+	void uart_rx(uint8_t data) { m_spg_io->uart_rx(data); };
 
 protected:
 	spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint32_t sprite_limit)
@@ -81,8 +80,6 @@ protected:
 	{
 		m_sprite_limit = sprite_limit;
 	}
-
-	virtual void device_add_mconfig(machine_config &config) override;
 
 	enum
 	{
@@ -111,7 +108,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
 	DECLARE_READ16_MEMBER(space_r);
 
-//	void check_extint_irq(int channel);
 	inline void check_video_irq();
 
 	void spg2xx_map(address_map &map);
@@ -199,12 +195,22 @@ protected:
 	required_shared_ptr<uint16_t> m_paletteram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
+	void configure_spg_io(spg2xx_io_device* io);
+
 	DECLARE_READ16_MEMBER(porta_r) { return m_porta_in(); };
 	DECLARE_READ16_MEMBER(portb_r) { return m_portb_in(); };
 	DECLARE_READ16_MEMBER(portc_r) { return m_portc_in(); };
 	DECLARE_WRITE16_MEMBER(porta_w) { m_porta_out(offset, data, mem_mask); };
 	DECLARE_WRITE16_MEMBER(portb_w) { m_portb_out(offset, data, mem_mask); };
 	DECLARE_WRITE16_MEMBER(portc_w) { m_portc_out(offset, data, mem_mask); };
+	template <size_t Line> DECLARE_READ16_MEMBER(adc_r) { return m_adc_in[Line](); };
+
+	DECLARE_WRITE8_MEMBER(eepromx_w) { m_eeprom_w(offset, data, mem_mask); };
+	DECLARE_READ8_MEMBER(eepromx_r) { return m_eeprom_r(); };
+
+	DECLARE_WRITE8_MEMBER(tx_w) { m_uart_tx(offset, data, mem_mask); };
+	DECLARE_WRITE8_MEMBER(cs_w) { m_chip_sel(offset, data, mem_mask); };
+	DECLARE_READ16_MEMBER(get_pal_r) { return m_pal_flag; };
 
 };
 
@@ -220,6 +226,9 @@ public:
 	}
 
 	spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_add_mconfig(machine_config &config) override;
+
 };
 
 class spg28x_device : public spg2xx_device
@@ -235,7 +244,8 @@ public:
 
 	spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	//virtual DECLARE_WRITE16_MEMBER(io_w) override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 };
 
 DECLARE_DEVICE_TYPE(SPG24X, spg24x_device)
