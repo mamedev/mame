@@ -424,9 +424,30 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 
 READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
 {
+	/*
+	*  a little bit of the "floating bus" behaviour,
+	*    cpu can peak at the video bus via odd i/o read,
+	*    some games use it for timing instead of vblank
+	*  
+	*  fixes a few games:
+	*    Arkanoid
+	*    Cobra
+	*    Sidewize
+	*    Short Circuit
+	*    ... probably others
+	*/
+	
+	uint8_t data = 0xff;
+	int hpos = m_screen->hpos();
 	int vpos = m_screen->vpos();
-
-	return vpos<193 ? m_video_ram[(vpos&0xf8)<<2]:0xff;
+	
+	// peak into attribute ram when beam is in display area
+	// ula always returns ff when in border area (or h/vblank)
+	
+	if ((hpos >= 48 && hpos < 304) && (vpos >= 48 && vpos < 240))
+		data = m_video_ram[0x1800 + (((vpos-48)/8)*32) + ((hpos-48)/8)];
+	
+	return data;
 }
 
 /* Memory Maps */
@@ -444,7 +465,7 @@ The function decodes the ports appropriately */
 void spectrum_state::spectrum_io(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
-	map(0x01, 0x01).r(FUNC(spectrum_state::spectrum_port_ula_r)).mirror(0xfffe);
+	map(0x01, 0x01).r(FUNC(spectrum_state::spectrum_port_ula_r)).mirror(0xfffe);  // floating bus reliant games need the mirror
 }
 
 /* Input ports */
@@ -553,7 +574,7 @@ INPUT_PORTS_START( spectrum )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("b    B    *      BIN      BRIGHT   BORDER") PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR('*')
 
 	PORT_START("NMI")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_F12)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME( 0x80, 0x00, "Hardware Version" )
