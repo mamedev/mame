@@ -170,4 +170,4 @@ ROM_START( unkpoker )
 	ROM_LOAD( "cd.3c", 0x0800, 0x0800, CRC(b61adb76) SHA1(9805593fc6d9b01e4a63bfc35e5442c4c547c103) )
 ROM_END
 
-GAME(198?, unkpoker, 0, unkpoker, unkpoker, unkpoker_state, empty_init, ROT0, "<unknown>", "unknown poker game", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME(1980?, unkpoker, 0, unkpoker, unkpoker, unkpoker_state, empty_init, ROT0, "<unknown>", "unknown 1980 poker game", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)

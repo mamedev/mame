@@ -415,11 +415,11 @@ void mephisto_state::init_mephisto()
 
 ***************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY             FULLNAME                              FLAGS */
-CONS( 1984, mm2,    mm4,    0,      mm2,      mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto MM2 Schachcomputer",        MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, rebel5, mm4,    0,      rebel5,   mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto Rebell 5,0 Schachcomputer", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, mm4,    0,      0,      mephisto, mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto 4 Schachcomputer",          MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, mm4tk,  mm4,    0,      mm4tk,    mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto 4 Schachcomputer Turbo Kit + HG440", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, mm5,    mm4,    0,      mephisto, mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto 5.1 Schachcomputer",        MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, mm50,   mm4,    0,      mephisto, mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto 5.0 Schachcomputer",        MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, mm5tk,  mm4,    0,      mm4tk,    mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto 5.1 Schachcomputer Turbo Kit + HG550", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY             FULLNAME, FLAGS */
+CONS( 1984, mm2,    mm4,    0,      mm2,      mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto MM II", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, rebel5, mm4,    0,      rebel5,   mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto Rebell 5.0", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, mm4,    0,      0,      mephisto, mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto MM IV", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, mm4tk,  mm4,    0,      mm4tk,    mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto MM IV (TurboKit + HG440)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, mm5,    mm4,    0,      mephisto, mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto MM V (V5.1)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, mm50,   mm4,    0,      mephisto, mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto MM V (V5.0)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, mm5tk,  mm4,    0,      mm4tk,    mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto MM V (V5.1) (TurboKit + HG550)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
