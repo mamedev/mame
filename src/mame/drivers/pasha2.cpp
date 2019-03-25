@@ -398,41 +398,39 @@ void pasha2_state::machine_reset()
 	m_vbuffer = 0;
 }
 
-MACHINE_CONFIG_START(pasha2_state::pasha2)
-
+void pasha2_state::pasha2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", E116XT, 20000000*4)     /* 4x internal multiplier */
-	MCFG_DEVICE_PROGRAM_MAP(pasha2_map)
-	MCFG_DEVICE_IO_MAP(pasha2_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pasha2_state,  irq0_line_hold)
+	E116XT(config, m_maincpu, 20000000*4);     /* 4x internal multiplier */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pasha2_state::pasha2_map);
+	m_maincpu->set_addrmap(AS_IO, &pasha2_state::pasha2_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pasha2_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", AT89C52, 12000000)     /* clock from docs */
+	AT89C52(config, m_audiocpu, 12000000);     /* clock from docs */
 	/* TODO : ports are unimplemented; P0,P1,P2,P3 and Serial Port Used */
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(pasha2_state, screen_update_pasha2)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 512);
+	screen.set_visarea(0, 383, 0, 239);
+	screen.set_screen_update(FUNC(pasha2_state::screen_update_pasha2));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(0x200);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	OKIM6295(config, m_oki[0], 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	OKIM6295(config, m_oki[1], 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	//and ATMEL DREAM SAM9773
-MACHINE_CONFIG_END
+}
 
 ROM_START( pasha2 )
 	ROM_REGION16_BE( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */

@@ -150,14 +150,14 @@ static INPUT_PORTS_START( madalien )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(madalien_state::madalien)
-
+void madalien_state::madalien(machine_config &config)
+{
 	/* main CPU */
-	MCFG_DEVICE_ADD("maincpu", M6502, MADALIEN_MAIN_CLOCK / 8) /* 1324kHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M6502(config, m_maincpu, MADALIEN_MAIN_CLOCK / 8); /* 1324kHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &madalien_state::main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, SOUND_CLOCK / 8)        /* 512kHz */
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	M6502(config, m_audiocpu, SOUND_CLOCK / 8);        /* 512kHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &madalien_state::audio_map);
 
 	/* video hardware */
 	madalien_video(config);
@@ -177,9 +177,8 @@ MACHINE_CONFIG_START(madalien_state::madalien)
 	aysnd.add_route(1, "discrete", 1.0, 1);
 	aysnd.add_route(2, "discrete", 1.0, 2);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, madalien_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, madalien_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 ROM_START( madalien )

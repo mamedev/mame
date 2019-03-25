@@ -274,11 +274,11 @@ void battlane_state::machine_reset()
 void battlane_state::battlane(machine_config &config)
 {
 	/* basic machine hardware */
-	M6809(config, m_maincpu, 1500000);		/* 1.5 MHz ? */
+	M6809(config, m_maincpu, 1500000);      /* 1.5 MHz ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &battlane_state::battlane_map);
 	m_maincpu->set_vblank_int("screen", FUNC(battlane_state::battlane_cpu1_interrupt));
 
-	M6809(config, m_subcpu, 1500000);		/* 1.5 MHz ? */
+	M6809(config, m_subcpu, 1500000);       /* 1.5 MHz ? */
 	m_subcpu->set_addrmap(AS_PROGRAM, &battlane_state::battlane_map);
 
 	config.m_minimum_quantum = attotime::from_hz(6000);

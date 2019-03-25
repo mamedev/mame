@@ -414,7 +414,7 @@ GFXDECODE_END
 
 WRITE8_MEMBER( zwackery_state::pia1_porta_w )
 {
-	m_cheap_squeak_deluxe->sr_w(space, 0, data >> 4);
+	m_cheap_squeak_deluxe->sr_w(data >> 4);
 }
 
 
@@ -479,7 +479,7 @@ READ8_MEMBER( zwackery_state::pia2_porta_r )
 READ8_MEMBER( zwackery_state::ptm_r )
 {
 	m_maincpu->adjust_icount(-14);
-	return m_ptm->read(space, offset);
+	return m_ptm->read(offset);
 }
 
 void zwackery_state::machine_start()

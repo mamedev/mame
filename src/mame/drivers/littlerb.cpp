@@ -287,25 +287,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_sound_step_cb)
 	m_soundframe++;
 }
 
-MACHINE_CONFIG_START(littlerb_state::littlerb)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) // 10MHz rated part, near 16Mhz XTAL
-	MCFG_DEVICE_PROGRAM_MAP(littlerb_main)
+void littlerb_state::littlerb(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(16'000'000)/2); // 10MHz rated part, near 16Mhz XTAL
+	m_maincpu->set_addrmap(AS_PROGRAM, &littlerb_state::littlerb_main);
 
 	INDER_VIDEO(config, m_indervid, 0); // XTAL(40'000'000)
 
 	// TODO: not accurate - driven by XTAL(6'000'000)?
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("step_timer", littlerb_state, littlerb_sound_step_cb,  attotime::from_hz(7500/150))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("sound_timer", littlerb_state, littlerb_sound_cb,  attotime::from_hz(7500))
+	TIMER(config, "step_timer").configure_periodic(FUNC(littlerb_state::littlerb_sound_step_cb), attotime::from_hz(7500/150));
+	TIMER(config, "sound_timer").configure_periodic(FUNC(littlerb_state::littlerb_sound_cb), attotime::from_hz(7500));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 ROM_START( littlerb )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */

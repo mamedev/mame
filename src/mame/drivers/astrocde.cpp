@@ -394,8 +394,8 @@ WRITE8_MEMBER(tenpindx_state::lights_w)
 
 WRITE8_MEMBER(astrocde_state::votrax_speech_w)
 {
-	m_votrax->inflection_w(space, 0, data >> 6);
-	m_votrax->write(space, 0, data);
+	m_votrax->inflection_w(data >> 6);
+	m_votrax->write(data & 0x3f);
 
 	/* Note : We should really also use volume in this as well as frequency */
 }
@@ -1475,8 +1475,8 @@ void demndrgn_state::demndrgn(machine_config &config)
 	outlatch.bit_handler<4>().set(FUNC(demndrgn_state::input_select_w));
 
 	m_astrocade_sound1->so_cb<4>().set("outlatch", FUNC(output_latch_device::bus_w));
-	m_astrocade_sound1->set_pot_tag<0>("FIREX");
-	m_astrocade_sound1->set_pot_tag<1>("FIREY");
+	m_astrocade_sound1->pot_cb<0>().set_ioport("FIREX");
+	m_astrocade_sound1->pot_cb<1>().set_ioport("FIREY");
 }
 
 void tenpindx_state::tenpindx(machine_config &config)

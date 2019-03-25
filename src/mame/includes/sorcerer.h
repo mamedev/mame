@@ -13,6 +13,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "machine/ram.h"
@@ -54,6 +55,7 @@ public:
 		, m_wave1(*this, "wave")
 		, m_wave2(*this, "wave2")
 		, m_uart(*this, "uart")
+		, m_uart_clock(*this, "uart_clock")
 		, m_rs232(*this, "rs232")
 		, m_centronics(*this, "centronics")
 		, m_cart(*this, "cartslot")
@@ -122,6 +124,7 @@ private:
 	required_device<wave_device> m_wave1;
 	required_device<wave_device> m_wave2;
 	required_device<ay31015_device> m_uart;
+	required_device<clock_device> m_uart_clock;
 	required_device<rs232_port_device> m_rs232;
 	required_device<centronics_device> m_centronics;
 	required_device<generic_slot_device> m_cart;

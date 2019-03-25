@@ -699,7 +699,7 @@ READ8_MEMBER(hng64_state::hng64_dualport_r)
 		}
 	}
 
-	return m_dt71321_dpram->right_r(space, offset);
+	return m_dt71321_dpram->right_r(offset);
 }
 
 /*
@@ -731,7 +731,7 @@ Beast Busters 2 outputs (all at offset == 0x1c):
 
 WRITE8_MEMBER(hng64_state::hng64_dualport_w)
 {
-	m_dt71321_dpram->right_w(space,offset, data);
+	m_dt71321_dpram->right_w(offset, data);
 	LOG("%s: dualport WRITE %04x %02x\n", machine().describe_context(), offset, data);
 }
 
@@ -2016,7 +2016,7 @@ WRITE8_MEMBER(hng64_state::ioport7_w)
 READ8_MEMBER(hng64_state::ioport0_r)
 {
 	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
-	uint8_t ret = m_dt71321_dpram->left_r(space, addr);
+	uint8_t ret = m_dt71321_dpram->left_r(addr);
 
 	LOG("%s: ioport0_r %02x (from address %04x)\n", machine().describe_context(), ret, addr);
 	return ret;
@@ -2025,7 +2025,7 @@ READ8_MEMBER(hng64_state::ioport0_r)
 WRITE8_MEMBER(hng64_state::ioport0_w)
 {
 	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
-	m_dt71321_dpram->left_w(space, addr, data);
+	m_dt71321_dpram->left_w(addr, data);
 
 	LOG("%s: ioport0_w %02x (to address %04x)\n", machine().describe_context(), data, addr);
 }
@@ -2106,7 +2106,8 @@ void hng64_state::init_io()
 	m_ex_ramaddr_upper = 0;
 }
 
-MACHINE_CONFIG_START(hng64_state::hng64)
+void hng64_state::hng64(machine_config &config)
+{
 	/* basic machine hardware */
 	VR4300BE(config, m_maincpu, HNG64_MASTER_CLOCK);     // actually R4300
 	m_maincpu->set_icache_size(16384);

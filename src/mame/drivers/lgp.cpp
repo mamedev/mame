@@ -412,21 +412,22 @@ void lgp_state::lgp_palette(palette_device &palette) const
 /* DRIVER */
 MACHINE_CONFIG_START(lgp_state::lgp)
 	/* main cpu */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_PCB_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(main_program_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lgp_state,  vblank_callback_lgp)
+	Z80(config, m_maincpu, CPU_PCB_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lgp_state::main_program_map);
+	m_maincpu->set_addrmap(AS_IO, &lgp_state::main_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lgp_state::vblank_callback_lgp));
 
 	/* sound cpu */
-	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_PCB_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(sound_program_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", SOUND_PCB_CLOCK));
+	audiocpu.set_addrmap(AS_PROGRAM, &lgp_state::sound_program_map);
+	audiocpu.set_addrmap(AS_IO, &lgp_state::sound_io_map);
 
-
-	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_LDV1000_COMMAND_STROBE_CB(WRITELINE(*this, lgp_state, ld_command_strobe_cb))
-	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, lgp_state, screen_update_lgp)
-	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
+	PIONEER_LDV1000(config, m_laserdisc, 0);
+	m_laserdisc->command_strobe_callback().set(FUNC(lgp_state::ld_command_strobe_cb));
+	m_laserdisc->set_overlay(256, 256, FUNC(lgp_state::screen_update_lgp));
+	m_laserdisc->set_overlay_palette(m_palette);
+	m_laserdisc->add_route(0, "lspeaker", 1.0);
+	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
@@ -438,10 +439,6 @@ MACHINE_CONFIG_START(lgp_state::lgp)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-
-	MCFG_DEVICE_MODIFY("laserdisc")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

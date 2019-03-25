@@ -36,7 +36,7 @@
 #ifndef NLD_74174_H_
 #define NLD_74174_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define TTL_74174(name, cCLK, cD1, cD2, cD3, cD4, cD5, cD6, cCLRQ)  \
 		NET_REGISTER_DEV(TTL_74174, name)   \

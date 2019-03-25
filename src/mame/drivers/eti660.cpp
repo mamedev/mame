@@ -48,7 +48,7 @@ READ8_MEMBER( eti660_state::pia_r )
 {
 	uint8_t pia_offset = m_maincpu->get_memory_address() & 0x03;
 
-	return m_pia->read(space, pia_offset);
+	return m_pia->read(pia_offset);
 }
 
 WRITE8_MEMBER( eti660_state::pia_w )
@@ -66,7 +66,7 @@ WRITE8_MEMBER( eti660_state::pia_w )
 			data = 0x24;
 	}
 
-	m_pia->write(space, pia_offset, data);
+	m_pia->write(pia_offset, data);
 }
 
 WRITE8_MEMBER( eti660_state::colorram_w )
@@ -342,14 +342,14 @@ MACHINE_CONFIG_START(eti660_state::eti660)
 	m_pia->irqa_handler().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT).invert(); // FIXME: use an input merger for these lines
 	m_pia->irqb_handler().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT).invert();
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("3K");
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", eti660_state, eti660, "bin,c8,ch8", 2)
+	MCFG_QUICKLOAD_ADD("quickload", eti660_state, eti660, "bin,c8,ch8", attotime::from_seconds(2))
 MACHINE_CONFIG_END
 
 /* ROMs */

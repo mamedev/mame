@@ -107,7 +107,7 @@ WRITE_LINE_MEMBER(midxunit_state::adc_int_w)
 READ16_MEMBER(midxunit_state::midxunit_status_r)
 {
 	/* low bit indicates whether the ADC is done reading the current input */
-	return (m_midway_serial_pic->status_r(space,0) << 1) | (m_adc_int ? 1 : 0);
+	return (m_midway_serial_pic->status_r() << 1) | (m_adc_int ? 1 : 0);
 }
 
 
@@ -280,7 +280,7 @@ void midxunit_state::machine_reset()
 
 READ16_MEMBER(midxunit_state::midxunit_security_r)
 {
-	return m_midway_serial_pic->read(space,0);
+	return m_midway_serial_pic->read();
 }
 
 WRITE16_MEMBER(midxunit_state::midxunit_security_w)
@@ -293,7 +293,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_security_w)
 WRITE16_MEMBER(midxunit_state::midxunit_security_clock_w)
 {
 	if (offset == 0 && ACCESSING_BITS_0_7)
-		m_midway_serial_pic->write(space, 0, ((~data & 2) << 3) | m_security_bits);
+		m_midway_serial_pic->write(((~data & 2) << 3) | m_security_bits);
 }
 
 

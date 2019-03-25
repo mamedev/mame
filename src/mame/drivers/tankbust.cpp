@@ -330,30 +330,30 @@ INTERRUPT_GEN_MEMBER(tankbust_state::vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(tankbust_state::tankbust)
-
+void tankbust_state::tankbust(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(14'318'181)/2)    /* Verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tankbust_state,  vblank_irq)
+	Z80(config, m_maincpu, XTAL(14'318'181)/2);    /* Verified on PCB */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tankbust_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tankbust_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("sub", Z80, XTAL(14'318'181)/4)        /* Verified on PCB */
-//  MCFG_DEVICE_ADD("sub", Z80, XTAL(14'318'181)/3)        /* Accurate to audio recording, but apparently incorrect clock */
-	MCFG_DEVICE_PROGRAM_MAP(map_cpu2)
-	MCFG_DEVICE_IO_MAP(port_map_cpu2)
+	Z80(config, m_subcpu, XTAL(14'318'181)/4);        /* Verified on PCB */
+//  Z80(config, m_subcpu, XTAL(14'318'181)/3);        /* Accurate to audio recording, but apparently incorrect clock */
+	m_subcpu->set_addrmap(AS_PROGRAM, &tankbust_state::map_cpu2);
+	m_subcpu->set_addrmap(AS_IO, &tankbust_state::port_map_cpu2);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE   ( 64*8, 32*8 )
-	MCFG_SCREEN_VISIBLE_AREA  ( 16*8, 56*8-1, 1*8, 31*8-1 )
-//  MCFG_SCREEN_VISIBLE_AREA  (  0*8, 64*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(tankbust_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size( 64*8, 32*8);
+	screen.set_visarea( 16*8, 56*8-1, 1*8, 31*8-1);
+//  screen.set_visarea(  0*8, 64*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(tankbust_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tankbust);
 	PALETTE(config, m_palette, FUNC(tankbust_state::tankbust_palette), 128);
@@ -367,7 +367,7 @@ MACHINE_CONFIG_START(tankbust_state::tankbust)
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	AY8910(config, "ay2", XTAL(14'318'181)/16).add_route(ALL_OUTPUTS, "mono", 0.10);  /* Verified on PCB */
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

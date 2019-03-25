@@ -65,7 +65,7 @@
 #ifndef NLD_DM9334_H_
 #define NLD_DM9334_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define TTL_9334(name, cCQ, cEQ, cD, cA0, cA1, cA2) \
 		NET_REGISTER_DEV(TTL_9334, name)    \

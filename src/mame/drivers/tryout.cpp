@@ -191,25 +191,26 @@ static GFXDECODE_START( gfx_tryout )
 	GFXDECODE_ENTRY( nullptr,   0, vramlayout,   0, 4 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(tryout_state::tryout)
+void tryout_state::tryout(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 2000000)     /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(main_cpu)
+	M6502(config, m_maincpu, 2000000);     /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tryout_state::main_cpu);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)    /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_cpu)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(tryout_state, nmi_line_pulse, 1000) /* controls BGM tempo, 1000 is an hand-tuned value to match a side-by-side video */
+	M6502(config, m_audiocpu, 1500000);    /* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tryout_state::sound_cpu);
+	m_audiocpu->set_periodic_int(FUNC(tryout_state::nmi_line_pulse), attotime::from_hz(1000)); /* controls BGM tempo, 1000 is an hand-tuned value to match a side-by-side video */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tryout_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(tryout_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_tryout)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tryout);
 	PALETTE(config, m_palette, FUNC(tryout_state::tryout_palette), 0x20);
 
 	/* sound hardware */
@@ -217,9 +218,8 @@ MACHINE_CONFIG_START(tryout_state::tryout)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	YM2203(config, "ymsnd", 1500000).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 ROM_START( tryout )
 	ROM_REGION( 0x14000, "maincpu", 0 )

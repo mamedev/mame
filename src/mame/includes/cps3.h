@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Andreas Naive, Tomasz Slanina, ElSemi
+#ifndef MAME_INCLUDES_CPS3_H
+#define MAME_INCLUDES_CPS3_H
+
+#pragma once
+
 /***************************************************************************
 
     Capcom CPS-3 Hardware
@@ -44,6 +49,33 @@ public:
 	{
 	}
 
+	void init_sfiii3();
+	void init_sfiii();
+	void init_redearth();
+	void init_jojo();
+	void init_jojoba();
+	void init_sfiii2();
+	void init_cps3boot();
+
+	void cps3(machine_config &config);
+	void jojo(machine_config &config);
+	void redearth(machine_config &config);
+	void sfiii2(machine_config &config);
+	void sfiii3(machine_config &config);
+	void sfiii(machine_config &config);
+	void jojoba(machine_config &config);
+	void simm1_64mbit(machine_config &config);
+	void simm2_64mbit(machine_config &config);
+	void simm3_128mbit(machine_config &config);
+	void simm4_128mbit(machine_config &config);
+	void simm5_128mbit(machine_config &config);
+	void simm5_32mbit(machine_config &config);
+	void simm6_128mbit(machine_config &config);
+
+protected:
+	virtual void device_post_load() override;
+	void copy_from_nvram();
+	uint32_t m_current_table_address;
 	required_device<sh2_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -65,6 +97,7 @@ public:
 	optional_memory_region      m_user4_region;
 	optional_memory_region      m_user5_region;
 
+private:
 	uint32_t m_cram_gfxflash_bank;
 	std::unique_ptr<uint32_t[]> m_char_ram;
 	std::unique_ptr<uint32_t[]> m_eeprom;
@@ -90,7 +123,6 @@ public:
 	uint32_t m_paldma_length;
 	uint32_t m_chardma_source;
 	uint32_t m_chardma_other;
-	uint32_t m_current_table_address;
 	int m_rle_length;
 	int m_last_normal_byte;
 	unsigned short m_lastb;
@@ -125,14 +157,8 @@ public:
 	DECLARE_WRITE32_MEMBER(cps3_unk_vidregs_w);
 	DECLARE_READ32_MEMBER(cps3_colourram_r);
 	DECLARE_WRITE32_MEMBER(cps3_colourram_w);
-	void init_sfiii3();
-	void init_sfiii();
-	void init_redearth();
-	void init_jojo();
-	void init_jojoba();
-	void init_sfiii2();
-	void init_cps3boot();
 	SH2_DMA_KLUDGE_CB(dma_callback);
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -143,7 +169,6 @@ public:
 	uint16_t rotxor(uint16_t val, uint16_t xorval);
 	uint32_t cps3_mask(uint32_t address, uint32_t key1, uint32_t key2);
 	void cps3_decrypt_bios();
-	void init_common(void);
 	void init_crypt(uint32_t key1, uint32_t key2, int altEncryption);
 	void cps3_set_mame_colours(int colournum, uint16_t data, uint32_t fadeval);
 	void cps3_draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect );
@@ -154,25 +179,12 @@ public:
 	uint32_t ProcessByte8(uint8_t b,uint32_t dst_offset);
 	void cps3_do_alt_char_dma( uint32_t src, uint32_t real_dest, uint32_t real_length );
 	void cps3_process_character_dma(uint32_t address);
-	void copy_from_nvram();
 	inline void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx,
 		unsigned int code, unsigned int color, int flipx, int flipy, int sx, int sy,
 		int transparency, int transparent_color,
 		int scalex, int scaley, bitmap_ind8 *pri_buffer, uint32_t pri_mask);
-	void cps3(machine_config &config);
-	void jojo(machine_config &config);
-	void redearth(machine_config &config);
-	void sfiii2(machine_config &config);
-	void sfiii3(machine_config &config);
-	void sfiii(machine_config &config);
-	void jojoba(machine_config &config);
-	void simm1_64mbit(machine_config &config);
-	void simm2_64mbit(machine_config &config);
-	void simm3_128mbit(machine_config &config);
-	void simm4_128mbit(machine_config &config);
-	void simm5_128mbit(machine_config &config);
-	void simm5_32mbit(machine_config &config);
-	void simm6_128mbit(machine_config &config);
 	void cps3_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CPS3_H

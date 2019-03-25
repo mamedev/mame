@@ -12,9 +12,6 @@
 #pragma once
 
 
-#define MCFG_NT7534_PIXEL_UPDATE_CB(_class, _method) \
-	downcast<nt7534_device &>(*device).set_pixel_update_cb(nt7534_device::pixel_update_delegate(&_class::_method, #_class "::" #_method, this));
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -32,7 +29,7 @@ public:
 	// construction/destruction
 	nt7534_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <typename Object> void set_pixel_update_cb(Object &&cb) { m_pixel_update_cb = std::forward<Object>(cb); }
+	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb = pixel_update_delegate(std::forward<T>(args)...); }
 
 	// device interface
 	virtual DECLARE_WRITE8_MEMBER(write);

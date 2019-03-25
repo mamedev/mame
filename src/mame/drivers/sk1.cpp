@@ -89,10 +89,11 @@ void sk1_state::sk1_memory(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(sk1_state::sk1)
+void sk1_state::sk1(machine_config &config)
+{
 	// just to attach the memory map to something until I can work out what the CPU core is
 	ADDRESS_MAP_BANK(config, "dummy").set_map(&sk1_state::sk1_memory).set_data_width(8).set_addr_width(16);
-MACHINE_CONFIG_END
+}
 
 
 INPUT_PORTS_START(sk1)

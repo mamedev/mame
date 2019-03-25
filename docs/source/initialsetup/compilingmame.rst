@@ -36,15 +36,79 @@ Rebuilding MAME on a dual-core (e.g. i3 or laptop i5) machine:
 Microsoft Windows
 -----------------
 
-Here are specific notes about compiling MAME for Microsoft Windows.
+MAME for Windows is built using the MSYS2 environment.  You will need Windows 7
+or later and a reasonably up-to-date MSYS2 installation.  We strongly recommend
+building MAME on a 64-bit system.  Instructions may need to be adjusted for
+32-bit systems.
 
-* Refer to `the MAME tools site <http://mamedev.org/tools/>`_ for the latest toolkit for getting MAME compiled on Windows.
+* A pre-packaged MSYS2 installation including the prerequisites for building
+  MAME can be downloaded from the `MAME Build Tools
+  <http://mamedev.org/tools/>`_ page.
+* After initial installation, you can update the MSYS2 environment using the
+  **pacman** (Arch package manage) command.
+* By default, MAME will be built using native Windows OS interfaces for
+  window management, audio/video output, font rendering, etc.  If you want to
+  use the portable SDL (Simple DirectMedia Layer) interfaces instead, you can
+  add **OSD=sdl** to the make options.  The main emulator binary will have an
+  ``sdl`` prefix prepended (e.g. ``sdlmame64.exe`` or ``sdlmame.exe``).  You
+  will need to install the MSYS2 packages for SDL 2 version 2.0.3 or later.
+* By default, MAME will include the native Windows debugger.  To also inculde
+  the portable Qt debugger, add **USE_QTDEBUG=1** to the make options.  You
+  will need to install the MSYS2 packages for Qt 5.
 
-* You will need to download the toolset from that link to begin. Periodically, these tools are updated and newer versions of MAME from that point on will **require** updated tools to compile.
+Using a standard MSYS2 installation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* You can do compilation on Visual Studio 2017 (if installed on your PC) by using **make vs2017**. This will always regenerate the settings, so **REGENIE=1** is *not* needed.
+You may also build MAME using a standard MSYS2 installation and adding the tools
+needed for building MAME.  These instructions assume you have some familiarity
+with MSYS2 and the **pacman** package manager.
 
-* Make sure you get SDL 2 2.0.3 or 2.0.4 as earlier versions are buggy.
+* Install the MSYS2 environment from  the `MSYS2 homepage
+  <https://www.msys2.org/>`_.
+* Download the latest version of the ``mame-essentials`` package from the
+  `MAME package repository <https://repo.mamedev.org/x86_64/>`_ and install it
+  using the **pacman** command.
+* Add the ``mame`` repository to ``/etc/pacman.conf`` using
+  ``/etc/pacman.d/mirrorlist.mame`` for locations.
+* Install packages necessary to build MAME.  At the very least, you'll need
+  ``bash``, ``git``, ``make``.
+* For 64-bit builds you'll need ``mingw-w64-x86_64-gcc`` and
+  ``mingw-w64-x86_64-python2``.
+* For 32-bit builds you'll need ``mingw-w64-i686-gcc`` and
+  ``mingw-w64-i686-python2``.
+* For debugging you may want to install ``gdb``.
+* To build against the portable SDL interfaces, you'll need
+  ``mingw-w64-x86_64-SDL2`` and ``mingw-w64-x86_64-SDL2_ttf`` for 64-bit builds,
+  or ``mingw-w64-i686-SDL2`` and ``mingw-w64-i686-SDL2_ttf`` for 32-bit builds.
+* To build the Qt debugger, you'll need ``mingw-w64-x86_64-qt5`` for 64-bit
+  builds, or ``mingw-w64-i686-qt5`` for 32-bit builds.
+* To generate API documentation from source, you'll need ``doxygen``.
+* For 64-bit builds, open **MSYS2 MinGW 64-bit** from the start menu, and set
+  up the environment variables ``MINGW64`` to ``/mingw64`` and ``MINGW32`` to an
+  empty string (e.g. using the command **export MINGW64=/mingw64 MINGW32=** in
+  the Bash shell).
+* For 32-bit builds, open **MSYS2 MinGW 32-bit** from the start menu, and set
+  up the environment variables ``MINGW32`` to ``/mingw32`` and ``MINGW64`` to an
+  empty string (e.g. using the command **export MINGW32=/mingw32 MINGW64=** in
+  the Bash shell).
+
+Building with Microsoft Visual Studio
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* You can generate Visual Studio 2017 projects using **make vs2017**.  The
+  solution and project files will be created in
+  ``build/projects/windows/mame/vs2017`` by default (the name of the ``build``
+  folder can be changed using the ``BUILDDIR`` option).  This will always
+  regenerate the settings, so **REGENIE=1** is *not* needed.
+* Adding **MSBUILD=1** to the make options will build build the solution using
+  the Microsoft Build Engine after generating the project files.  Note that this
+  requires paths and environment variables to be configured so the correct
+  Visual Studio tools can be located.
+* MAME can only be compiled with the Visual Studio 15.7.6 tools.  Bugs in newer
+  versions of the Microsoft Visual C/C++ compiler prevent it from compiling
+  MAME.
+* The MSYS2 environment is still required to generate the project files, convert
+  built-in layouts, compile UI translations, etc.
 
 
 .. _compiling-fedora:
@@ -188,15 +252,27 @@ IGNORE_GIT
    revision description in the version string.
 
 Tool locations
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 OVERRIDE_CC
-   Set the C/Objective-C compiler command.
+   Set the C/Objective-C compiler command.  (This sets the target C compiler
+   command when cross-compiling.)
 OVERRIDE_CXX
-   Set the C++/Objective-C++ compiler command.
+   Set the C++/Objective-C++ compiler command.  (This sets the target C++
+   compiler command when cross-compiling.)
+OVERRIDE_LD
+   Set the linker command.  This is often not necessary or useful because the C
+   or C++ compiler command is used to invoke the linker.  (This sets the target
+   linker command when cross-compiling.)
 PYTHON_EXECUTABLE
    Set the Python interpreter command.  You need Python 2.7 or Python 3 to build
    MAME.
+CROSS_BUILD
+   Set to **1** to use separate host and target compilers and linkers, as
+   required for cross-compilation.  In this case, **OVERRIDE_CC**,
+   **OVERRIDE_CXX** and **OVERRIDE_LD** set the target C compiler, C++ compiler
+   and linker commands, while **CC**, **CXX** and **LD** set the host C
+   compiler, C++ compiler and linker commands.
 
 Optional features
 ~~~~~~~~~~~~~~~~~
@@ -255,10 +331,10 @@ ARCHOPTS_CXX
    source files.
 ARCHOPTS_OBJC
    Additional command-line options to pass to the compiler when compiling
-   Objecive-C source files.
+   Objective-C source files.
 ARCHOPTS_OBJCXX
    Additional command-line options to pass to the compiler when compiling
-   Objecive-C++ source files.
+   Objective-C++ source files.
 
 Library/framework locations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -328,8 +404,8 @@ Issues with specific compiler versions
   Adding **DEPRECATED=0** to your build options works around this by disabling
   deprecation warnings.
 * MinGW GCC 7 for Windows i386 produces spurious out-of-bounds access warnings.
-  Adding **NOWERROR=1** to your build options works around this by disabling
-  deprecation warnings.
+  Adding **NOWERROR=1** to your build options works around this by not treating
+  warnings as errors.
 * Initial versions of GNU libstdc++ 6 have a broken ``std::unique_ptr``
   implementation.  If you encounter errors with ``std::unique_ptr`` you need to
   upgrade to a newer version of libstdc++ that fixes the issue.
@@ -362,7 +438,7 @@ a **CFLAGS** or **CXXFLAGS** environment variable).  You can check to see
 whether the ``_FORTIFY_SOURCE`` macro is a built-in macro with your version of
 GCC with a command like this:
 
-**gcc -dM -E - | grep _FORTIFY_SOURCE**
+**gcc -dM -E - < /dev/null | grep _FORTIFY_SOURCE**
 
 If ``_FORTIFY_SOURCE`` is defined to a non-zero value by default, you can work
 around it by adding **-U_FORTIFY_SOURCE** to the compiler flags (e.g. by using
@@ -374,6 +450,23 @@ variables.
 
 Unusual Build Configurations
 ----------------------------
+
+Cross-compiling MAME
+~~~~~~~~~~~~~~~~~~~~
+
+MAME's build system has basic support for cross-compilation.  Set
+**CROSS_BUILD=1** to enable separate host and target compilers, set
+**OVERRIDE_CC** and **OVERRIDE_CXX** to the target C/C++ compiler commands, and
+if necessary set **CC** and **CXX** to the host C/C++ compiler commands.  If the
+target OS is different to the host OS, set it with **TARGETOS**.  For example it
+may be possible to build a MinGW32 x64 build on a Linux host using a command
+like this:
+
+**make TARGETOS=windows PTR64=1 OVERRIDE_CC=x86_64-w64-mingw32-gcc OVERRIDE_CXX=x86_64-w64-mingw32-g++ OVERRIDE_LD=x86_64-w64-mingw32-ld MINGW64=/usr**
+
+(The additional packages required for producing a standard MinGW32 x64 build on
+a Fedora Linux host are ``mingw64-gcc-c++``, ``mingw64-winpthreads-static`` and
+their dependencies.  Non-standard builds may require additional packages.)
 
 Using libc++ on Linux
 ~~~~~~~~~~~~~~~~~~~~~

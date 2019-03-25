@@ -26,4 +26,9 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_dma_w )
 
 void m68340_dma::reset()
 {
+	module_reset();
+}
+
+void m68340_dma::module_reset()
+{
 }

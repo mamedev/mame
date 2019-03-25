@@ -121,8 +121,7 @@ void hx5102_device::memmap(address_map &map)
 */
 void hx5102_device::crumap(address_map &map)
 {
-	map(0x17e0>>4, 0x17fe>>4).r(FUNC(hx5102_device::cruread));
-	map(0x17e0>>1, 0x17fe>>1).w(FUNC(hx5102_device::cruwrite));
+	map(0x17e0, 0x17ff).rw(FUNC(hx5102_device::cruread), FUNC(hx5102_device::cruwrite));
 }
 
 hx5102_device::hx5102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
@@ -374,12 +373,12 @@ READ8_MEMBER(hx5102_device::fdc_read)
 	{
 	case 0:
 		// Main status register
-		val = m_floppy_ctrl->read_msr();
+		val = m_floppy_ctrl->msr_r();
 		LOGMASKED(LOG_STATUS, "i8272A.msr -> %02x\n", val);
 		break;
 	case 4:
 		// FIFO read
-		val = m_floppy_ctrl->read_fifo();
+		val = m_floppy_ctrl->fifo_r();
 		LOGMASKED(LOG_FIFO, "i8272A.fifo -> %02x\n", val);
 		break;
 	}
@@ -398,7 +397,7 @@ WRITE8_MEMBER(hx5102_device::fdc_write)
 	case 0x08:
 		// Command register (FIFO write)
 		LOGMASKED(LOG_STATUS, "i8272A.fifo <- %02x\n", data);
-		m_floppy_ctrl->write_fifo(data);
+		m_floppy_ctrl->fifo_w(data);
 		break;
 	case 0x0c:
 		// DMA lock
@@ -475,7 +474,7 @@ READ8_MEMBER(hx5102_device::cruread)
 
 	crubits |= ((ioport("HXDIP")->read())<<4);
 
-	return crubits;
+	return BIT(crubits, offset);
 }
 
 /*

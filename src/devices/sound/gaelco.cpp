@@ -131,7 +131,9 @@ void gaelco_gae1_device::sound_stream_update(sound_stream &stream, stream_sample
 					}
 				} else {
 					LOG_SOUND(("(GAE1) Playing unknown sample format in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", ch, type, bank, end_pos, m_sndregs[base_offset + 3]));
-					channel->active = 0;
+					//channel->active = 0;
+					// play2000 expects these to expire, are they valid? this is unrelated to the missing sounds in touchgo which never hits here
+					m_sndregs[base_offset + 3]--;
 				}
 
 				/* check if the current sample has finished playing */

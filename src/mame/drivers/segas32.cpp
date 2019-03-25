@@ -5326,7 +5326,30 @@ ROM_START( titlefj )
 	ROM_LOAD( "mpr-15385.ic1", 0x000000, 0x200000, CRC(5a9b0aa0) SHA1(d208aa165f9eea05e3b8c3f406ff44374e4f6887) )
 ROM_END
 
+/**************************************************************************************************************************
+ **************************************************************************************************************************
+ **************************************************************************************************************************
+    AS-1 - Multi-32
+    not protected?
+*/
+ROM_START( as1 )
+	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code */
+	ROM_LOAD32_WORD_x2( "epr15420.ic37", 0x000000, 0x20000, CRC(1f9747b0) SHA1(51d1fbccf6960967d4458ba26fad42ac51978c67) )
+	ROM_LOAD32_WORD_x2( "epr15421.ic40", 0x000002, 0x20000, CRC(aa96422a) SHA1(21cf327d102f5c7c4a4e41d889d9b4d10c44de35) )
 
+	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD_x4( "epr15367.ic31", 0x00000, 0x20000, CRC(0220f078) SHA1(9fab79fc91764ecf678bfa4d38d1b4054e258b76) )
+
+	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "epr15422.ic3",  0x000000, 0x080000, CRC(6c61ba6d) SHA1(b41237ced4a2e8741ae0339c333bea4221903690) )
+	ROM_LOAD16_BYTE( "epr15423.ic11", 0x000001, 0x080000, CRC(5178912a) SHA1(b637451c28877ddc93c9920bea356888b4c8eea3) )
+
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", ROMREGION_ERASEFF ) /* sprites */
+	// empty
+
+	ROM_REGION( 0x400000, "mainpcb:sega", ROMREGION_ERASEFF ) /* Sega PCM sound data */
+	// empty
+ROM_END
 
 /*************************************
  *
@@ -5921,3 +5944,5 @@ GAME( 1992, scrossu,   scross,   sega_multi32_analog,       scross,   segas32_ne
 GAME( 1992, titlef,    0,        sega_multi32,              titlef,   segas32_new_state, init_titlef,   ROT0, "Sega",   "Title Fight (World)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, titlefu,   titlef,   sega_multi32,              titlef,   segas32_new_state, init_titlef,   ROT0, "Sega",   "Title Fight (US)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, titlefj,   titlef,   sega_multi32,              titlef,   segas32_new_state, init_titlef,   ROT0, "Sega",   "Title Fight (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+
+GAME( 1993, as1,       0,        sega_multi32,              multi32_generic,  segas32_new_state, init_holo, ROT0, "Sega",   "AS-1 Controller", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // needs laserdisc emulation

@@ -142,8 +142,9 @@ void hng64_state::reset_net()
 	m_mmub[5] = 0; // rolls back to 0xffff
 }
 
-MACHINE_CONFIG_START(hng64_state::hng64_network)
-	MCFG_DEVICE_ADD("network", KL5C80A12, HNG64_MASTER_CLOCK / 4)        /* KL5C80A12CFP - binary compatible with Z80. */
-	MCFG_DEVICE_PROGRAM_MAP(hng_comm_map)
-	MCFG_DEVICE_IO_MAP(hng_comm_io_map)
-MACHINE_CONFIG_END
+void hng64_state::hng64_network(machine_config &config)
+{
+	KL5C80A12(config, m_comm, HNG64_MASTER_CLOCK / 4);        /* KL5C80A12CFP - binary compatible with Z80. */
+	m_comm->set_addrmap(AS_PROGRAM, &hng64_state::hng_comm_map);
+	m_comm->set_addrmap(AS_IO, &hng64_state::hng_comm_io_map);
+}

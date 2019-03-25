@@ -463,7 +463,7 @@ void ti990_hdc_device::store_registers()
 	if (! (m_w[1] & w1_transfer_inhibit))
 		for (i=0; i<real_word_count; i++)
 		{
-			machine().device("maincpu")->memory().space(AS_PROGRAM).write_word(dma_address, buffer[i]);
+			m_memory_space->write_word(dma_address, buffer[i]);
 			dma_address = (dma_address + 2) & 0x1ffffe;
 		}
 
@@ -618,7 +618,7 @@ void ti990_hdc_device::read_data()
 		if (! (m_w[1] & w1_transfer_inhibit))
 			for (i=0; i<bytes_read; i+=2)
 			{
-				machine().device("maincpu")->memory().space(AS_PROGRAM).write_word(dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
+				m_memory_space->write_word(dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
 				dma_address = (dma_address + 2) & 0x1ffffe;
 			}
 
@@ -714,7 +714,7 @@ void ti990_hdc_device::write_data()
 		/* DMA */
 		for (i=0; (i<byte_count) && (i<m_d[dsk_sel].bytes_per_sector); i+=2)
 		{
-			word = machine().device("maincpu")->memory().space(AS_PROGRAM).read_word(dma_address);
+			word = m_memory_space->read_word(dma_address);
 			buffer[i] = word >> 8;
 			buffer[i+1] = word & 0xff;
 
@@ -821,7 +821,7 @@ void ti990_hdc_device::unformatted_read()
 	if (! (m_w[1] & w1_transfer_inhibit))
 		for (i=0; i<real_word_count; i++)
 		{
-			machine().device("maincpu")->memory().space(AS_PROGRAM).write_word(dma_address, buffer[i]);
+			m_memory_space->write_word(dma_address, buffer[i]);
 			dma_address = (dma_address + 2) & 0x1ffffe;
 		}
 
@@ -962,7 +962,9 @@ WRITE16_MEMBER(ti990_hdc_device::write)
 DEFINE_DEVICE_TYPE(TI990_HDC, ti990_hdc_device, "ti990_hdc", "Generic TI-990 Hard Disk Controller")
 
 ti990_hdc_device::ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TI990_HDC, tag, owner, clock), m_interrupt_callback(*this)
+	: device_t(mconfig, TI990_HDC, tag, owner, clock)
+	, m_memory_space(*this, finder_base::DUMMY_TAG, -1)
+	, m_interrupt_callback(*this)
 {
 }
 

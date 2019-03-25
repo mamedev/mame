@@ -66,7 +66,7 @@ WRITE16_MEMBER(kickgoal_state::actionhw_snd_w)
 		case 0xfe:  m_okibank->set_entry(1); break;
 		case 0xff:  m_okibank->set_entry(3); break;
 		case 0x78:
-				m_oki->write_command(data);
+				m_oki->write(data);
 				m_snd_sam[0] = 00; m_snd_sam[1]= 00; m_snd_sam[2] = 00; m_snd_sam[3] = 00;
 				break;
 		default:
@@ -75,44 +75,44 @@ WRITE16_MEMBER(kickgoal_state::actionhw_snd_w)
 					if ((data & 0x80) && (m_snd_sam[3] != m_snd_new))
 					{
 						logerror("About to play sample %02x at vol %02x\n", m_snd_new, data);
-						if ((m_oki->read_status() & 0x08) != 0x08)
+						if ((m_oki->read() & 0x08) != 0x08)
 						{
 							logerror("Playing sample %02x at vol %02x\n", m_snd_new, data);
-							m_oki->write_command(m_snd_new);
-							m_oki->write_command(data);
+							m_oki->write(m_snd_new);
+							m_oki->write(data);
 						}
 						m_snd_new = 00;
 					}
 					if ((data & 0x40) && (m_snd_sam[2] != m_snd_new))
 					{
 						logerror("About to play sample %02x at vol %02x\n", m_snd_new, data);
-						if ((m_oki->read_status() & 0x04) != 0x04)
+						if ((m_oki->read() & 0x04) != 0x04)
 						{
 							logerror("Playing sample %02x at vol %02x\n", m_snd_new, data);
-							m_oki->write_command(m_snd_new);
-							m_oki->write_command(data);
+							m_oki->write(m_snd_new);
+							m_oki->write(data);
 						}
 						m_snd_new = 00;
 					}
 					if ((data & 0x20) && (m_snd_sam[1] != m_snd_new))
 					{
 						logerror("About to play sample %02x at vol %02x\n", m_snd_new, data);
-						if ((m_oki->read_status() & 0x02) != 0x02)
+						if ((m_oki->read() & 0x02) != 0x02)
 						{
 							logerror("Playing sample %02x at vol %02x\n", m_snd_new, data);
-							m_oki->write_command(m_snd_new);
-							m_oki->write_command(data);
+							m_oki->write(m_snd_new);
+							m_oki->write(data);
 						}
 						m_snd_new = 00;
 					}
 					if ((data & 0x10) && (m_snd_sam[0] != m_snd_new))
 					{
 						logerror("About to play sample %02x at vol %02x\n", m_snd_new, data);
-						if ((m_oki->read_status() & 0x01) != 0x01)
+						if ((m_oki->read() & 0x01) != 0x01)
 						{
 							logerror("Playing sample %02x at vol %02x\n", m_snd_new, data);
-							m_oki->write_command(m_snd_new);
-							m_oki->write_command(data);
+							m_oki->write(m_snd_new);
+							m_oki->write(data);
 						}
 						m_snd_new = 00;
 					}
@@ -127,7 +127,7 @@ WRITE16_MEMBER(kickgoal_state::actionhw_snd_w)
 				else /* Turn a channel off */
 				{
 					logerror("Turning channel %02x off\n", data);
-					m_oki->write_command(data);
+					m_oki->write(data);
 					if (data & 0x40) m_snd_sam[3] = 00;
 					if (data & 0x20) m_snd_sam[2] = 00;
 					if (data & 0x10) m_snd_sam[1] = 00;
@@ -394,7 +394,7 @@ WRITE8_MEMBER(kickgoal_state::soundio_port_c_w)
 	{
 		if (!(data & 0x01))
 		{
-			m_pic_portb = m_oki->read_status();
+			m_pic_portb = m_oki->read();
 		}
 	}
 
@@ -402,7 +402,7 @@ WRITE8_MEMBER(kickgoal_state::soundio_port_c_w)
 	{
 		if (!(data & 0x02))
 		{
-			m_oki->write_command(m_pic_portb);
+			m_oki->write(m_pic_portb);
 		}
 	}
 
@@ -418,12 +418,12 @@ WRITE16_MEMBER(kickgoal_state::to_pic_w)
 
 
 
-MACHINE_CONFIG_START(kickgoal_state::kickgoal)
-
+void kickgoal_state::kickgoal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(kickgoal_program_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(12'000'000));   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kickgoal_state::kickgoal_program_map);
+	m_maincpu->set_vblank_int("screen", FUNC(kickgoal_state::irq6_line_hold));
 
 	PIC16C57(config, m_audiocpu, XTAL(12'000'000)/3);  /* 4MHz ? */
 	m_audiocpu->write_a().set(FUNC(kickgoal_state::soundio_port_a_w));
@@ -437,13 +437,13 @@ MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 	EEPROM_93C46_16BIT(config, "eeprom").default_data(kickgoal_default_eeprom_type1, 128);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(9*8, 55*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kickgoal_state, screen_update_kickgoal)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(9*8, 55*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(kickgoal_state::screen_update_kickgoal));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kickgoal);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
@@ -455,32 +455,32 @@ MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_LOW)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(12'000'000)/12, okim6295_device::PIN7_LOW);
+	m_oki->set_addrmap(0, &kickgoal_state::oki_map);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
-MACHINE_CONFIG_START(kickgoal_state::actionhw)
-
+void kickgoal_state::actionhw(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(kickgoal_program_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(12'000'000)); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kickgoal_state::kickgoal_program_map);
+	m_maincpu->set_vblank_int("screen", FUNC(kickgoal_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(12'000'000)/3)    /* verified on pcb */
-	MCFG_DEVICE_DISABLE() /* Disabled since the internal rom isn't dumped */
+	PIC16C57(config, m_audiocpu, XTAL(12'000'000)/3);    /* verified on pcb */
+	m_audiocpu->set_disable(); /* Disabled since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_data(kickgoal_default_eeprom_type1, 128);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(10*8+2, 54*8-1+2, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kickgoal_state, screen_update_kickgoal)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(10*8+2, 54*8-1+2, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(kickgoal_state::screen_update_kickgoal));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_actionhw);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
@@ -492,10 +492,10 @@ MACHINE_CONFIG_START(kickgoal_state::actionhw)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH) /* verified on pcb */
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH); /* verified on pcb */
+	m_oki->set_addrmap(0, &kickgoal_state::oki_map);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
 

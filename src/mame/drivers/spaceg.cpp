@@ -164,10 +164,12 @@ Notes:
 **************************************************************************************/
 
 #include "emu.h"
-#include "includes/mw8080bw.h"
 
 #include "cpu/z80/z80.h"
+#include "sound/samples.h"
+#include "sound/sn76477.h"
 #include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 

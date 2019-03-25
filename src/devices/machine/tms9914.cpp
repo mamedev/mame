@@ -241,7 +241,7 @@ WRITE_LINE_MEMBER(tms9914_device::ren_w)
 }
 
 // Register I/O
-WRITE8_MEMBER(tms9914_device::reg8_w)
+void tms9914_device::write(offs_t offset, uint8_t data)
 {
 	LOG_REG("W %u=%02x\n" , offset , data);
 
@@ -323,7 +323,7 @@ WRITE8_MEMBER(tms9914_device::reg8_w)
 	}
 }
 
-READ8_MEMBER(tms9914_device::reg8_r)
+uint8_t tms9914_device::read(offs_t offset)
 {
 	uint8_t res;
 

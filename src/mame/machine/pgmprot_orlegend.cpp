@@ -220,6 +220,7 @@ INPUT_PORTS_START( orlegendk )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(pgm_asic3_state::pgm_asic3)
+void pgm_asic3_state::pgm_asic3(machine_config &config)
+{
 	pgmbase(config);
-MACHINE_CONFIG_END
+}

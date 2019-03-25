@@ -49,37 +49,6 @@
 #define PLUS4_EXPANSION_SLOT_TAG        "exp"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PLUS4_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, PLUS4_EXPANSION_SLOT, _clock) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_PLUS4_PASSTHRU_EXPANSION_SLOT_ADD() \
-	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, 0, plus4_expansion_cards, nullptr) \
-	MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, irq_w)) \
-	MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_r)) \
-	MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_w)) \
-	MCFG_PLUS4_EXPANSION_SLOT_AEC_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, aec_w))
-
-
-#define MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	downcast<plus4_expansion_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
-
-#define MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(_read) \
-	downcast<plus4_expansion_slot_device &>(*device).set_cd_rd_callback(DEVCB_##_read);
-
-#define MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(_write) \
-	downcast<plus4_expansion_slot_device &>(*device).set_cd_wr_callback(DEVCB_##_write);
-
-#define MCFG_PLUS4_EXPANSION_SLOT_AEC_CALLBACK(_write) \
-	downcast<plus4_expansion_slot_device &>(*device).set_aec_wr_callback(DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -111,12 +80,12 @@ public:
 	auto aec_wr_callback() { return m_write_aec.bind(); }
 
 	// computer interface
-	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
-	void cd_w(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
+	uint8_t cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
+	void cd_w(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
 
 	// cartridge interface
-	DECLARE_READ8_MEMBER( dma_cd_r ) { return m_read_dma_cd(offset); }
-	DECLARE_WRITE8_MEMBER( dma_cd_w ) { m_write_dma_cd(offset, data); }
+	uint8_t dma_cd_r(offs_t offset) { return m_read_dma_cd(offset); }
+	void dma_cd_w(offs_t offset, uint8_t data) { m_write_dma_cd(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 	DECLARE_WRITE_LINE_MEMBER( aec_w ) { m_write_aec(state); }
 	int phi2() { return clock(); }
@@ -164,8 +133,8 @@ public:
 	virtual ~device_plus4_expansion_card_interface();
 
 	// runtime
-	virtual uint8_t plus4_cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { return data; }
-	virtual void plus4_cd_w(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { }
+	virtual uint8_t plus4_cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { return data; }
+	virtual void plus4_cd_w(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { }
 
 protected:
 	device_plus4_expansion_card_interface(const machine_config &mconfig, device_t &device);

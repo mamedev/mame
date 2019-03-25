@@ -422,18 +422,19 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(ts803_state::ts803)
+void ts803_state::ts803(machine_config &config)
+{
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ts803_state::ts803_mem);
 	m_maincpu->set_addrmap(AS_IO, &ts803_state::ts803_io);
 	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(640,240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(60);
+	screen.set_size(640,240);
+	screen.set_visarea(0, 640-1, 0, 240-1);
+	screen.set_screen_update("crtc", FUNC(sy6545_1_device::screen_update));
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* crtc */
@@ -466,11 +467,9 @@ MACHINE_CONFIG_START(ts803_state::ts803)
 	/* floppy disk */
 	FD1793(config, m_fdc, 1_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set("sti", FUNC(z80sti_device::i7_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "fdc:0", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+}
 
 /* ROM definition */
 ROM_START( ts803h )

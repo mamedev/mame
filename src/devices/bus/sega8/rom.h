@@ -397,6 +397,60 @@ protected:
 };
 
 
+// ======================> sega8_multicart_device
+
+class sega8_multicart_device : public sega8_rom_device
+{
+public:
+	// construction/destruction
+	sega8_multicart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_io) override;
+
+	// has internal RAM which overwrites the system one!
+	virtual DECLARE_READ8_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	uint8_t m_block;
+};
+
+
+// ======================> sega8_megacart_device
+
+class sega8_megacart_device : public sega8_rom_device
+{
+public:
+	// construction/destruction
+	sega8_megacart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_io) override;
+
+	// has internal RAM which overwrites the system one!
+	virtual DECLARE_READ8_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	uint8_t m_block;
+};
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(SEGA8_ROM_STD,          sega8_rom_device)
 DECLARE_DEVICE_TYPE(SEGA8_ROM_OTHELLO,      sega8_othello_device)
@@ -416,5 +470,7 @@ DECLARE_DEVICE_TYPE(SEGA8_ROM_HICOM,        sega8_hicom_device)
 DECLARE_DEVICE_TYPE(SEGA8_ROM_KOREAN,       sega8_korean_device)
 DECLARE_DEVICE_TYPE(SEGA8_ROM_KOREAN_NB,    sega8_korean_nb_device)
 DECLARE_DEVICE_TYPE(SEGA8_ROM_SEOJIN,       sega8_seojin_device)
+DECLARE_DEVICE_TYPE(SEGA8_ROM_MULTICART,    sega8_multicart_device)
+DECLARE_DEVICE_TYPE(SEGA8_ROM_MEGACART,     sega8_megacart_device)
 
 #endif // MAME_BUS_SEGA8_ROM_H

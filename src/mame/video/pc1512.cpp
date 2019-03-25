@@ -137,7 +137,7 @@ READ8_MEMBER( pc1512_state::vdu_r )
 	switch (offset)
 	{
 	case 1: case 3: case 5: case 7:
-		data = m_vdu->register_r(space, 0);
+		data = m_vdu->register_r();
 		break;
 
 	case 0xa: // VDU Status
@@ -190,11 +190,11 @@ WRITE8_MEMBER( pc1512_state::vdu_w )
 	switch (offset)
 	{
 	case 0: case 2: case 4: case 6:
-		m_vdu->address_w(space, 0, data);
+		m_vdu->address_w(data);
 		break;
 
 	case 1: case 3: case 5: case 7:
-		m_vdu->register_w(space, 0, data);
+		m_vdu->register_w(data);
 		break;
 
 	case 8: // VDU Mode Control
@@ -590,7 +590,7 @@ uint32_t pc1512_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1512 )
+//  machine_config( pc1512 )
 //-------------------------------------------------
 
 void pc1512_state::pc1512_video(machine_config &config)

@@ -115,6 +115,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/crt9028.h,VIDEOS["CRT9028"] = true
+--------------------------------------------------
+
+if (VIDEOS["CRT9028"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/crt9028.cpp",
+		MAME_DIR .. "src/devices/video/crt9028.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/crt9212.h,VIDEOS["CRT9212"] = true
 --------------------------------------------------
 
@@ -588,6 +600,18 @@ if (VIDEOS["MC6847"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/mc6847.cpp",
 		MAME_DIR .. "src/devices/video/mc6847.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/mm5445.h,VIDEOS["MM5445"] = true
+--------------------------------------------------
+
+if (VIDEOS["MM5445"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/mm5445.cpp",
+		MAME_DIR .. "src/devices/video/mm5445.h",
 	}
 end
 
@@ -1148,3 +1172,15 @@ if (VIDEOS["PS2GS"]~=null) then
 		MAME_DIR .. "src/devices/video/ps2gs.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/decsfb.h,VIDEOS["DECSFB"] = true
+--------------------------------------------------
+if (VIDEOS["DECSFB"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/decsfb.cpp",
+		MAME_DIR .. "src/devices/video/decsfb.h",
+	}
+end
+

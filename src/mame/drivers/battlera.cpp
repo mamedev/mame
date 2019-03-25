@@ -108,6 +108,7 @@ void battlera_state::machine_reset()
 {
 	m_control_port_select = 0;
 	m_msm5205next = 0;
+	m_toggle = 0;
 }
 
 /******************************************************************************/
@@ -156,7 +157,8 @@ WRITE_LINE_MEMBER(battlera_state::adpcm_int)
 	m_msm->write_data(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
-	if (state)
+	m_toggle = 1 - m_toggle;
+	if (m_toggle)
 		m_audiocpu->set_input_line(1, HOLD_LINE);
 }
 
@@ -295,7 +297,7 @@ void battlera_state::battlera(machine_config &config)
 	YM2203(config, "ymsnd", 12000000 / 8).add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	MSM5205(config, m_msm, 384000);
-	m_msm->vck_callback().set(FUNC(battlera_state::adpcm_int));
+	m_msm->vck_legacy_callback().set(FUNC(battlera_state::adpcm_int));
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B); /* 8KHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.85);
 }

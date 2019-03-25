@@ -235,6 +235,7 @@ void mw8080bw_state::mw8080bw_root(machine_config &config)
 	/* basic machine hardware */
 	I8080(config, m_maincpu, MW8080BW_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mw8080bw_state::main_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(mw8080bw_state::interrupt_vector));
 
 	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,mw8080bw)
 	MCFG_MACHINE_RESET_OVERRIDE(mw8080bw_state,mw8080bw)

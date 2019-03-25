@@ -145,10 +145,11 @@ static void intvecs_controller(device_slot_interface &device)
 	device.option_add("handctrl", INTV_HANDCTRL);
 }
 
-MACHINE_CONFIG_START(intvecs_ctrls_device::device_add_mconfig)
-	MCFG_INTV_CONTROL_PORT_ADD("port1", intvecs_controller, "handctrl")
-	MCFG_INTV_CONTROL_PORT_ADD("port2", intvecs_controller, "handctrl")
-MACHINE_CONFIG_END
+void intvecs_ctrls_device::device_add_mconfig(machine_config &config)
+{
+	INTV_CONTROL_PORT(config, m_hand1, intvecs_controller, "handctrl");
+	INTV_CONTROL_PORT(config, m_hand2, intvecs_controller, "handctrl");
+}
 
 
 intvecs_ctrls_device::intvecs_ctrls_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

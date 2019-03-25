@@ -288,19 +288,19 @@ void palmz22_state::init_palmz22()
 {
 }
 
-MACHINE_CONFIG_START(palmz22_state::palmz22)
-	MCFG_DEVICE_ADD(m_maincpu, ARM920T, 266000000)
-	MCFG_DEVICE_PROGRAM_MAP(map)
+void palmz22_state::palmz22(machine_config &config)
+{
+	ARM920T(config, m_maincpu, 266000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &palmz22_state::map);
 
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, "palette").set_entries(32768);
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(160, 160)
-	MCFG_SCREEN_VISIBLE_AREA(0, 160 - 1, 0, 160 - 1)
-
-	MCFG_SCREEN_UPDATE_DEVICE("s3c2410", s3c2410_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(160, 160);
+	screen.set_visarea(0, 160 - 1, 0, 160 - 1);
+	screen.set_screen_update("s3c2410", FUNC(s3c2410_device::screen_update));
 
 	S3C2410(config, m_s3c2410, 12000000);
 	m_s3c2410->set_palette_tag("palette");
@@ -317,7 +317,7 @@ MACHINE_CONFIG_START(palmz22_state::palmz22)
 	NAND(config, m_nand, 0);
 	m_nand->set_nand_type(nand_device::chip::K9F5608U0D_J);
 	m_nand->rnb_wr_callback().set(m_s3c2410, FUNC(s3c2410_device::frnb_w));
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( palmz22 )
 	PORT_START( "PENB" )

@@ -528,7 +528,7 @@ void argus_state::argus(machine_config &config)
 void argus_state::valtric(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 5000000);	/* 5 MHz */
+	Z80(config, m_maincpu, 5000000);    /* 5 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &argus_state::valtric_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(argus_state::scanline), "screen", 0, 1);
 
@@ -576,7 +576,7 @@ void argus_state::valtric(machine_config &config)
 void argus_state::butasan(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 5000000);	/* 5 MHz */
+	Z80(config, m_maincpu, 5000000);    /* 5 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &argus_state::butasan_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(argus_state::butasan_scanline), "screen", 0, 1);
 

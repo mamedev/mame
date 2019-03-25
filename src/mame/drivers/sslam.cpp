@@ -219,7 +219,7 @@ static const uint8_t sslam_snd_loop[8][19] =
 TIMER_CALLBACK_MEMBER(sslam_state::music_playback)
 {
 	int pattern = 0;
-	if ((m_oki->read_status() & 0x08) == 0)
+	if ((m_oki->read() & 0x08) == 0)
 	{
 		m_bar += 1;
 		pattern = sslam_snd_loop[m_melody][m_bar];
@@ -230,8 +230,8 @@ TIMER_CALLBACK_MEMBER(sslam_state::music_playback)
 				pattern = sslam_snd_loop[m_melody][m_bar];
 			}
 			logerror("Changing bar in music track to pattern %02x\n",pattern);
-			m_oki->write_command(0x80 | pattern);
-			m_oki->write_command(0x81);
+			m_oki->write(0x80 | pattern);
+			m_oki->write(0x81);
 		}
 		else if (pattern == 0x00) {     /* Non-looped track. Stop playing it */
 			m_track = 0;
@@ -251,7 +251,7 @@ TIMER_CALLBACK_MEMBER(sslam_state::music_playback)
 
 void sslam_state::sslam_play(int track, int data)
 {
-	int status = m_oki->read_status();
+	int status = m_oki->read();
 
 	if (data < 0x80) {
 		if (track) {
@@ -259,24 +259,24 @@ void sslam_state::sslam_play(int track, int data)
 				m_track  = data;
 				m_bar = 0;
 				if (status & 0x08)
-					m_oki->write_command(0x40);
-				m_oki->write_command((0x80 | data));
-				m_oki->write_command(0x81);
+					m_oki->write(0x40);
+				m_oki->write((0x80 | data));
+				m_oki->write(0x81);
 				m_music_timer->adjust(attotime::from_msec(4), 0, attotime::from_hz(250));    /* 250Hz for smooth sequencing */
 			}
 		}
 		else {
 			if ((status & 0x01) == 0) {
-				m_oki->write_command((0x80 | data));
-				m_oki->write_command(0x11);
+				m_oki->write((0x80 | data));
+				m_oki->write(0x11);
 			}
 			else if ((status & 0x02) == 0) {
-				m_oki->write_command((0x80 | data));
-				m_oki->write_command(0x21);
+				m_oki->write((0x80 | data));
+				m_oki->write(0x21);
 			}
 			else if ((status & 0x04) == 0) {
-				m_oki->write_command((0x80 | data));
-				m_oki->write_command(0x41);
+				m_oki->write((0x80 | data));
+				m_oki->write(0x41);
 			}
 		}
 	}
@@ -288,7 +288,7 @@ void sslam_state::sslam_play(int track, int data)
 			m_bar = 0;
 		}
 		data &= 0x7f;
-		m_oki->write_command(data);
+		m_oki->write(data);
 	}
 }
 
@@ -430,7 +430,7 @@ READ8_MEMBER(sslam_state::playmark_snd_command_r)
 		data = m_soundlatch->read(space,0);
 	}
 	else if ((m_oki_control & 0x38) == 0x28) {
-		data = (m_oki->read(space,0) & 0x0f);
+		data = (m_oki->read() & 0x0f);
 	}
 
 	return data;
@@ -456,7 +456,7 @@ WRITE8_MEMBER(sslam_state::playmark_snd_control_w)
 
 	if ((data & 0x38) == 0x18)
 	{
-		m_oki->write(space, 0, m_oki_command);
+		m_oki->write(m_oki_command);
 	}
 
 //  !(data & 0x80) -> sound enable

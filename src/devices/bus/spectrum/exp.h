@@ -69,21 +69,19 @@ public:
 
 	spectrum_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 
-	void set_io_space(address_space *io);
-
 	// callbacks
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
-	DECLARE_READ8_MEMBER( mreq_r );
-	DECLARE_WRITE8_MEMBER( mreq_w );
-	DECLARE_READ8_MEMBER( port_fe_r );
+	void opcode_fetch(offs_t offset);
+	uint8_t mreq_r(offs_t offset);
+	void mreq_w(offs_t offset, uint8_t data);
+	uint8_t iorq_r(offs_t offset);
+	void iorq_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER( romcs );
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
-
-	address_space *m_io;
 
 protected:
 	// device-level overrides
@@ -108,14 +106,14 @@ public:
 	device_spectrum_expansion_interface(const machine_config &mconfig, device_t &device);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(mreq_r) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(mreq_w) { }
-	virtual DECLARE_READ8_MEMBER(port_fe_r) { return 0xff; }
+	virtual void opcode_fetch(offs_t offset) { };
+	virtual uint8_t mreq_r(offs_t offset) { return 0xff; }
+	virtual void mreq_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t iorq_r(offs_t offset) { return 0xff; }
+	virtual void iorq_w(offs_t offset, uint8_t data) { }
 	virtual DECLARE_READ_LINE_MEMBER(romcs) { return 0; }
 
 protected:
-	address_space &io_space() { return *m_slot->m_io; }
-
 	spectrum_expansion_slot_device *m_slot;
 };
 

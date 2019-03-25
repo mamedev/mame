@@ -188,7 +188,7 @@ void comx_fd_device::comx_q_w(int state)
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-uint8_t comx_fd_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
+uint8_t comx_fd_device::comx_mrd_r(offs_t offset, int *extrom)
 {
 	uint8_t data = 0xff;
 
@@ -210,7 +210,7 @@ uint8_t comx_fd_device::comx_mrd_r(address_space &space, offs_t offset, int *ext
 //  comx_io_r - I/O read
 //-------------------------------------------------
 
-uint8_t comx_fd_device::comx_io_r(address_space &space, offs_t offset)
+uint8_t comx_fd_device::comx_io_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -235,7 +235,7 @@ uint8_t comx_fd_device::comx_io_r(address_space &space, offs_t offset)
 //  comx_io_w - I/O write
 //-------------------------------------------------
 
-void comx_fd_device::comx_io_w(address_space &space, offs_t offset, uint8_t data)
+void comx_fd_device::comx_io_w(offs_t offset, uint8_t data)
 {
 	if (offset == 2)
 	{

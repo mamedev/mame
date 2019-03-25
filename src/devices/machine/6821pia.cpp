@@ -576,7 +576,7 @@ uint8_t pia6821_device::control_b_r()
 //  read
 //-------------------------------------------------
 
-uint8_t pia6821_device::reg_r(uint8_t offset)
+uint8_t pia6821_device::read(offs_t offset)
 {
 	uint8_t ret;
 
@@ -846,7 +846,7 @@ void pia6821_device::control_b_w(uint8_t data)
 //  write
 //-------------------------------------------------
 
-void pia6821_device::reg_w(uint8_t offset, uint8_t data)
+void pia6821_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x03)
 	{

@@ -43,8 +43,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	virtual DECLARE_READ8_MEMBER( host_r ) override;
-	virtual DECLARE_WRITE8_MEMBER( host_w ) override;
+	virtual uint8_t host_r(offs_t offset) override;
+	virtual void host_w(offs_t offset, uint8_t data) override;
 
 	bool m_rom_enabled;
 
@@ -57,14 +57,14 @@ private:
 
 	uint8_t m_port_b;
 
-	DECLARE_READ8_MEMBER( mem_r );
-	DECLARE_WRITE8_MEMBER( mem_w );
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	uint8_t mem_r(offs_t offset);
+	void mem_w(offs_t offset, uint8_t data);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( via_pb_w );
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	void via_pb_w(uint8_t data);
+	uint8_t ppi_pb_r();
+	void ppi_pc_w(uint8_t data);
 
 	void tube_zep100_io(address_map &map);
 	void tube_zep100_mem(address_map &map);

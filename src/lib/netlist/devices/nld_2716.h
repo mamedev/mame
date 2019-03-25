@@ -28,7 +28,7 @@
 #ifndef NLD_2716_H_
 #define NLD_2716_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define EPROM_2716(name, cGQ, cEPQ, cA0, cA1, cA2, cA3, cA4, cA5, cA6, cA7, cA8, cA9, cA10) \
 		NET_REGISTER_DEV(EPROM_2716, name) \

@@ -243,68 +243,70 @@ Touch & Tell modules:
 Touch & Tell/Vocaid overlay reference:
 
     tntell CD2610:
-    - 04: a - Colors
-    - 01: b - Objects
-    - 05: c - Shapes
-    - 09: d - Home Scene
+    - $04: a - Colors
+    - $01: b - Objects
+    - $05: c - Shapes
+    - $09: d - Home Scene
     tntelluk CD62170, tntellfr CD62171:
     - see tntell
     - see numfun(not A)
     - see animalfr
-    - 08: ? - Clown Face
-    - 0B: ? - Body Parts
+    - $08: ? - Clown Face
+    - $0B: ? - Body Parts
     vocaid CD2357:
-    - 1C: 1 - Leisure
-    - 1E: 2 - Telephone
-    - 1B: 3 - Bedside
-    - 1D: 4 - Alphabet
+    - $1C: 1 - Leisure
+    - $1E: 2 - Telephone
+    - $1B: 3 - Bedside
+    - $1D: 4 - Alphabet
     alphabet CD2611:
-    - 0E: 1a - Alphabet A-M
-    - 0D: 1b - Alphabet N-Z
-    - 0C: 1c - Letter Jumble A-M
-    - 0B: 1d - Letter Jumble N-Z
+    - $0E: 1a - Alphabet A-M
+    - $0D: 1b - Alphabet N-Z
+    - $0C: 1c - Letter Jumble A-M
+    - $0B: 1d - Letter Jumble N-Z
     animalfr CD2355:
-    - 0A: 2a - Farm Animals
-    - 0F: 2b - At The Farm
-    - 0E: 2c - Animal Babies
-    - 0D: 2d - In The Jungle
+    - $0A: 2a - Farm Animals
+    - $0F: 2b - At The Farm
+    - $0E: 2c - Animal Babies
+    - $0D: 2d - In The Jungle
     numfun CD2612:
-    - 02/0A(rev.A): 3a - Numbers 1-10
-    - 03/0F(rev.A): 3b - Numbers 11-30
-    - 07/0D(rev.A): 3c - How Many?
-    - 06/0E(rev.A): 3d - Hidden Numbers
+    - $02/$0A(rev.A): 3a - Numbers 1-10
+    - $03/$0F(rev.A): 3b - Numbers 11-30
+    - $07/$0D(rev.A): 3c - How Many?
+    - $06/$0E(rev.A): 3d - Hidden Numbers
     aboutme CD2613:
-    - 0E: 4a - Clown Face
-    - 0B: 4b - Body Parts
-    - 0D: 4c - Things to Wear
-    - 0C: 4d - Just For Me
+    - $0E: 4a - Clown Face
+    - $0B: 4b - Body Parts
+    - $0D: 4c - Things to Wear
+    - $0C: 4d - Just For Me
     wot CD2361:
-    - 0A: 5a - On Land
-    - 0B: 5b - In The Air
-    - 0C: 5c - On The Water
-    - 0D: 5d - In Space
-    - 10: 5e - What Belongs Here?
-    - 11: 5f - How It Used To Be
-    - 12: 5g - Word Fun
-    - 13: 5h - In the Surprise Garage
+    - $0A: 5a - On Land
+    - $0B: 5b - In The Air
+    - $0C: 5c - On The Water
+    - $0D: 5d - In Space
+    - $10: 5e - What Belongs Here?
+    - $11: 5f - How It Used To Be
+    - $12: 5g - Word Fun
+    - $13: 5h - In the Surprise Garage
     lilcreat CD2362:
-    - 14: 6a - In The Park
-    - 15: 6b - In The Sea
-    - 16: 6c - In The Woods
-    - 17: 6d - Whose House?
-    - 18: 6e - Hide & Seek
-    - 1A: 6f - Who Is It?
-    - 19: 6g - But It's Not
-    - 1B: 6h - Word Fun
+    - $14: 6a - In The Park
+    - $15: 6b - In The Sea
+    - $16: 6c - In The Woods
+    - $17: 6d - Whose House?
+    - $18: 6e - Hide & Seek
+    - $1A: 6f - Who Is It?
+    - $19: 6g - But It's Not
+    - $1B: 6h - Word Fun
     et CD2363:
-    - 0F: 7a - The Adventure On Earth I
-    - 10: 7b - The Adventure On Earth II
-    - 11: 7c - Fun And Friendship I
-    - 12: 7d - Fun And Friendship II
-    - 13: 7e - E.T. The Star I
-    - 14: 7f - E.T. The Star II
-    - 15: 7g - Do You Remember? I
-    - 16: 7h - Do You Remember? II
+    - $0F: 7a - The Adventure On Earth I
+    - $10: 7b - The Adventure On Earth II
+    - $11: 7c - Fun And Friendship I
+    - $12: 7d - Fun And Friendship II
+    - $13: 7e - E.T. The Star I
+    - $14: 7f - E.T. The Star II
+    - $15: 7g - Do You Remember? I
+    - $16: 7h - Do You Remember? II
+
+    $00: none inserted, and $1F is for diagnostics
 
 
 Magic Wand "Speaking Reader" or "Speak & Learn":
@@ -372,7 +374,7 @@ keyboard, VFD display, and use the SC-01 speech chip. --> driver k28.cpp
     - MCU: TMS1400 MP7324
     - TMS51xx: TMS5110A
     - VSM: 16KB CM62084
-    - LCD: unknown 8*16-seg
+    - LCD: SMOS SMC1112 MCU to 8*14-seg display
 
 K28 modules:
 
@@ -392,7 +394,7 @@ K28 modules:
 
   TODO:
   - why doesn't lantutor work?
-  - identify and emulate k28 LCD
+  - emulate k28 LCD
   - emulate other known devices
 
 
@@ -405,9 +407,9 @@ K28 modules:
 #include "bus/generic/slot.h"
 #include "machine/tms6100.h"
 #include "sound/tms5110.h"
-
 #include "softlist.h"
 #include "speaker.h"
+#include "render.h"
 
 // internal artwork
 #include "k28m2.lh"
@@ -482,6 +484,7 @@ private:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tispeak_cartridge);
 
+	u8 tntell_get_hexchar(const char c);
 	TIMER_DEVICE_CALLBACK_MEMBER(tntell_get_overlay);
 
 	void init_cartridge();
@@ -497,7 +500,7 @@ private:
 
 	// cartridge
 	u32 m_cart_max_size;
-	u8* m_cart_base;
+	u8 *m_cart_base;
 
 	u8 m_overlay;
 };
@@ -662,6 +665,7 @@ WRITE16_MEMBER(tispeak_state::snspellc_write_o)
 {
 	// O3210: TMS5100 CTL8124
 	m_tms5100->ctl_w(space, 0, bitswap<4>(data,3,0,1,2));
+	m_o = data;
 }
 
 READ8_MEMBER(tispeak_state::snspellc_read_k)
@@ -685,19 +689,40 @@ READ8_MEMBER(tispeak_state::tntell_read_k)
 	return k8 | snspellc_read_k(space, offset);
 }
 
+u8 tispeak_state::tntell_get_hexchar(const char c)
+{
+	if (c >= '0' && c <= '9') return c - '0';
+	if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+	if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+
+	return 0;
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 {
 	// Each keyboard overlay insert has 5 holes, used by the game to determine
 	// which one is active(if any). If it matches with the internal ROM or
 	// external module, the game continues.
-	// 00 for none, 1F for diagnostics, see comment section above for a list
 
-	// try to get overlay code from artwork file(in decimal), otherwise pick the
-	// one that was selected in machine configuration
-	m_overlay = output().get_value("overlay_code") & 0x1f;
-	if (m_overlay == 0)
-		m_overlay = m_inp_matrix[10]->read();
+	// pick overlay code from machine config, see comment section above for reference
+	m_overlay = m_inp_matrix[10]->read();
 
+	// try to get it from (external) layout
+	if (m_overlay == 0x20)
+	{
+		// as output value, eg. with defstate (in decimal)
+		m_overlay = output().get_value("overlay_code") & 0x1f;
+
+		// and from current view name ($ + 2 hex digits)
+		render_target *target = machine().render().first_target();
+		const char *name = target->view_name(target->view());
+
+		for (int i = 0; name && i < strlen(name); i++)
+			if (name[i] == '$' && strlen(&name[i]) > 2)
+				m_overlay = (tntell_get_hexchar(name[i + 1]) << 4 | tntell_get_hexchar(name[i + 2])) & 0x1f;
+	}
+
+	// overlay holes
 	for (int i = 0; i < 5; i++)
 		m_ol_out[i] = BIT(m_overlay, i);
 }
@@ -713,7 +738,8 @@ void tispeak_state::k28_prepare_display(u8 old, u8 data)
 WRITE16_MEMBER(tispeak_state::k28_write_r)
 {
 	// R1234: TMS5100 CTL8421
-	m_tms5100->ctl_w(space, 0, bitswap<4>(data,1,2,3,4));
+	u16 r = bitswap<5>(data,0,1,2,3,4) | (data & ~0x1f);
+	m_tms5100->ctl_w(space, 0, r & 0xf);
 
 	// R0: TMS5100 PDC pin
 	m_tms5100->pdc_w(data & 1);
@@ -727,7 +753,7 @@ WRITE16_MEMBER(tispeak_state::k28_write_r)
 
 	// R7-R10: LCD data
 	k28_prepare_display(m_r >> 7 & 0xf, data >> 7 & 0xf);
-	m_r = data;
+	m_r = r;
 }
 
 WRITE16_MEMBER(tispeak_state::k28_write_o)
@@ -738,8 +764,8 @@ WRITE16_MEMBER(tispeak_state::k28_write_o)
 
 READ8_MEMBER(tispeak_state::k28_read_k)
 {
-	// K: TMS5100 CTL, multiplexed inputs
-	return m_tms5100->ctl_r(space, 0) | read_inputs(9);
+	// K: TMS5100 CTL, multiplexed inputs (also tied to R1234)
+	return m_tms5100->ctl_r(space, 0) | read_inputs(9) | (m_r & 0xf);
 }
 
 
@@ -821,7 +847,7 @@ static INPUT_PORTS_START( snspell )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Secret Code")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Letter")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Say It")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( snspellfr ) // French button names
@@ -844,7 +870,7 @@ static INPUT_PORTS_START( snspellfr ) // French button names
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Code Secret")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Lettre")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Dis-le")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Epelle/Marche") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Epelle/Marche") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( snspellit ) // Italian button names
@@ -867,7 +893,7 @@ static INPUT_PORTS_START( snspellit ) // Italian button names
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Codice")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Alfabeto")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Ripeti")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Scrivi") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Scrivi") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( snspellsp ) // Spanish button names, different alphabet
@@ -928,7 +954,7 @@ static INPUT_PORTS_START( snspellsp ) // Spanish button names, different alphabe
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Palabra Secreta")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Dilo")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") // -> auto_power_off
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Deletrea/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Deletrea/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
 INPUT_PORTS_END
 
 
@@ -980,7 +1006,7 @@ static INPUT_PORTS_START( snmath )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("Write It")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Greater/Less")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Word Problems")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Solve It/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Solve It/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
 
 	PORT_START("IN.7")
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1002,7 +1028,7 @@ static INPUT_PORTS_START( snread )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Picture Read")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Letter Stumper")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Hear It")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Word Zap/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Word Zap/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
 INPUT_PORTS_END
 
 
@@ -1092,7 +1118,7 @@ static INPUT_PORTS_START( snspellc )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'')
 
 	PORT_START("IN.9") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) // speech chip data
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") // -> auto_power_off
@@ -1102,7 +1128,7 @@ static INPUT_PORTS_START( snspellcuk )
 	PORT_INCLUDE( snspellc )
 
 	PORT_MODIFY("IN.9")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Write/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true) // just the label changed from Spell to Write
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Write/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true) // just the label changed from Spell to Write
 INPUT_PORTS_END
 
 
@@ -1163,44 +1189,45 @@ static INPUT_PORTS_START( tntell )
 
 	PORT_START("IN.9") // Vss!
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Grid 6-6 (On)") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Grid 6-6 (On)") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) // speech chip data
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.10")
-	PORT_CONFNAME( 0x1f, 0x04, "Overlay Code" ) // only if not provided by external artwork
-	PORT_CONFSETTING(    0x00, "00 (None)" )
-	PORT_CONFSETTING(    0x01, "01" )
-	PORT_CONFSETTING(    0x02, "02" )
-	PORT_CONFSETTING(    0x03, "03" )
-	PORT_CONFSETTING(    0x04, "04" )
-	PORT_CONFSETTING(    0x05, "05" )
-	PORT_CONFSETTING(    0x06, "06" )
-	PORT_CONFSETTING(    0x07, "07" )
-	PORT_CONFSETTING(    0x08, "08" )
-	PORT_CONFSETTING(    0x09, "09" )
-	PORT_CONFSETTING(    0x0a, "0A" )
-	PORT_CONFSETTING(    0x0b, "0B" )
-	PORT_CONFSETTING(    0x0c, "0C" )
-	PORT_CONFSETTING(    0x0d, "0D" )
-	PORT_CONFSETTING(    0x0e, "0E" )
-	PORT_CONFSETTING(    0x0f, "0F" )
-	PORT_CONFSETTING(    0x10, "10" )
-	PORT_CONFSETTING(    0x11, "11" )
-	PORT_CONFSETTING(    0x12, "12" )
-	PORT_CONFSETTING(    0x13, "13" )
-	PORT_CONFSETTING(    0x14, "14" )
-	PORT_CONFSETTING(    0x15, "15" )
-	PORT_CONFSETTING(    0x16, "16" )
-	PORT_CONFSETTING(    0x17, "17" )
-	PORT_CONFSETTING(    0x18, "18" )
-	PORT_CONFSETTING(    0x19, "19" )
-	PORT_CONFSETTING(    0x1a, "1A" )
-	PORT_CONFSETTING(    0x1b, "1B" )
-	PORT_CONFSETTING(    0x1c, "1C" )
-	PORT_CONFSETTING(    0x1d, "1D" )
-	PORT_CONFSETTING(    0x1e, "1E" )
-	PORT_CONFSETTING(    0x1f, "1F (Diagnostic)" )
+	PORT_CONFNAME( 0x3f, 0x20, "Overlay Code" )
+	PORT_CONFSETTING(    0x20, "From Artwork View" )
+	PORT_CONFSETTING(    0x00, "$00 (None)" )
+	PORT_CONFSETTING(    0x01, "$01" )
+	PORT_CONFSETTING(    0x02, "$02" )
+	PORT_CONFSETTING(    0x03, "$03" )
+	PORT_CONFSETTING(    0x04, "$04" )
+	PORT_CONFSETTING(    0x05, "$05" )
+	PORT_CONFSETTING(    0x06, "$06" )
+	PORT_CONFSETTING(    0x07, "$07" )
+	PORT_CONFSETTING(    0x08, "$08" )
+	PORT_CONFSETTING(    0x09, "$09" )
+	PORT_CONFSETTING(    0x0a, "$0A" )
+	PORT_CONFSETTING(    0x0b, "$0B" )
+	PORT_CONFSETTING(    0x0c, "$0C" )
+	PORT_CONFSETTING(    0x0d, "$0D" )
+	PORT_CONFSETTING(    0x0e, "$0E" )
+	PORT_CONFSETTING(    0x0f, "$0F" )
+	PORT_CONFSETTING(    0x10, "$10" )
+	PORT_CONFSETTING(    0x11, "$11" )
+	PORT_CONFSETTING(    0x12, "$12" )
+	PORT_CONFSETTING(    0x13, "$13" )
+	PORT_CONFSETTING(    0x14, "$14" )
+	PORT_CONFSETTING(    0x15, "$15" )
+	PORT_CONFSETTING(    0x16, "$16" )
+	PORT_CONFSETTING(    0x17, "$17" )
+	PORT_CONFSETTING(    0x18, "$18" )
+	PORT_CONFSETTING(    0x19, "$19" )
+	PORT_CONFSETTING(    0x1a, "$1A" )
+	PORT_CONFSETTING(    0x1b, "$1B" )
+	PORT_CONFSETTING(    0x1c, "$1C" )
+	PORT_CONFSETTING(    0x1d, "$1D" )
+	PORT_CONFSETTING(    0x1e, "$1E" )
+	PORT_CONFSETTING(    0x1f, "$1F (Diagnostic)" )
 INPUT_PORTS_END
 
 
@@ -1212,7 +1239,7 @@ static INPUT_PORTS_START( k28m2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
 
 	PORT_START("IN.1") // O1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('B') PORT_NAME("B/2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('K') PORT_NAME("K/+")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
@@ -1282,14 +1309,14 @@ void tispeak_state::tms5110_route(machine_config &config)
 void tispeak_state::snmath(machine_config &config)
 {
 	/* basic machine hardware */
-	tms0270_cpu_device &tms(TMS0270(config, m_maincpu, MASTER_CLOCK/2));
-	tms.k().set(FUNC(tispeak_state::snspell_read_k));
-	tms.o().set(FUNC(tispeak_state::snmath_write_o));
-	tms.r().set(FUNC(tispeak_state::snspell_write_r));
+	TMS0270(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->k().set(FUNC(tispeak_state::snspell_read_k));
+	m_maincpu->o().set(FUNC(tispeak_state::snmath_write_o));
+	m_maincpu->r().set(FUNC(tispeak_state::snspell_write_r));
 
-	tms.read_ctl().set("tms5100", FUNC(tms5110_device::ctl_r));
-	tms.write_ctl().set("tms5100", FUNC(tms5110_device::ctl_w));
-	tms.write_pdc().set("tms5100", FUNC(tms5110_device::pdc_w));
+	m_maincpu->read_ctl().set("tms5100", FUNC(tms5110_device::ctl_r));
+	m_maincpu->write_ctl().set("tms5100", FUNC(tms5110_device::ctl_w));
+	m_maincpu->write_pdc().set("tms5100", FUNC(tms5110_device::pdc_w));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_snmath);

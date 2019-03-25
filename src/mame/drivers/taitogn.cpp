@@ -460,10 +460,10 @@ WRITE8_MEMBER(taitogn_state::control_w)
 			m_zoom->reset();
 
 			// assume that this also readys the sound flash chips
-			m_pgmflash->write(space, 0, 0xff);
-			m_sndflash[0]->write(space, 0, 0xff);
-			m_sndflash[1]->write(space, 0, 0xff);
-			m_sndflash[2]->write(space, 0, 0xff);
+			m_pgmflash->write(0, 0xff);
+			m_sndflash[0]->write(0, 0xff);
+			m_sndflash[1]->write(0, 0xff);
+			m_sndflash[2]->write(0, 0xff);
 		}
 	}
 
@@ -595,7 +595,7 @@ READ32_MEMBER(taitogn_state::zsg2_ext_r)
 	{
 		case 0x000000:
 		case 0x100000:
-		case 0x200000: return m_sndflash[offset >> 20]->read(space, offset & 0xfffff) | m_sndflash[offset >> 20]->read(space, (offset & 0xfffff) | 1) << 16;
+		case 0x200000: return m_sndflash[offset >> 20]->read(offset & 0xfffff) | m_sndflash[offset >> 20]->read((offset & 0xfffff) | 1) << 16;
 
 		default:
 			break;

@@ -97,7 +97,7 @@ uint8_t a2bus_arcboard_device::read_c0nx(uint8_t offset)
 			return m_tms->register_read();
 
 		case 6:
-			return m_ay->read_data();
+			return m_ay->data_r();
 	}
 
 	return 0xff;
@@ -118,11 +118,11 @@ void a2bus_arcboard_device::write_c0nx(uint8_t offset, uint8_t data)
 			break;
 
 		case 5:
-			m_ay->write_address(data);
+			m_ay->address_w(data);
 			break;
 
 		case 6:
-			m_ay->write_data(data);
+			m_ay->data_w(data);
 			break;
 	}
 }

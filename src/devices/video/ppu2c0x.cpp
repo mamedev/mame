@@ -89,9 +89,12 @@ DEFINE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device, "ppu2c05_04", "2C05_04 PPU")
 // default address map
 void ppu2c0x_device::ppu2c0x(address_map &map)
 {
-	map(0x0000, 0x3eff).ram();
-	map(0x3f00, 0x3fff).rw(FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
+	if (!has_configured_map(0))
+	{
+		map(0x0000, 0x3eff).ram();
+		map(0x3f00, 0x3fff).rw(FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
 //  AM_RANGE(0x0000, 0x3fff) AM_RAM
+	}
 }
 
 //-------------------------------------------------
@@ -125,7 +128,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(), address_map_constructor(FUNC(ppu2c0x_device::ppu2c0x), this))
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(FUNC(ppu2c0x_device::ppu2c0x), this))
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_scanline(0)  // reset the scanline count
 	, m_int_callback(*this)
@@ -229,7 +232,7 @@ void ppu2c0x_device::device_start()
 
 	/* initialize the scanline handling portion */
 	m_scanline_timer->adjust(screen().time_until_pos(1));
-	m_hblank_timer->adjust(m_cpu->cycles_to_attotime(86.67)); // ??? FIXME - hardcoding NTSC, need better calculation
+	m_hblank_timer->adjust(m_cpu->cycles_to_attotime(260) / 3); // ??? FIXME - hardcoding NTSC, need better calculation
 	m_nmi_timer->adjust(attotime::never);
 
 	/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
@@ -558,7 +561,7 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				next_scanline = 0;
 
 			// Call us back when the hblank starts for this scanline
-			m_hblank_timer->adjust(m_cpu->cycles_to_attotime(86.67)); // ??? FIXME - hardcoding NTSC, need better calculation
+			m_hblank_timer->adjust(m_cpu->cycles_to_attotime(260) / 3); // ??? FIXME - hardcoding NTSC, need better calculation
 
 			// trigger again at the start of the next scanline
 			m_scanline_timer->adjust(screen().time_until_pos(next_scanline * m_scan_scale));

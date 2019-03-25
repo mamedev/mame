@@ -12,19 +12,6 @@
 #pragma once
 
 
-
-
-///*************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-///*************************************************************************
-
-#define MCFG_HD44102_ADD(_tag, _screen_tag, _sx, _sy) \
-	MCFG_DEVICE_ADD(_tag, HD44102, 0) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	downcast<hd44102_device &>(*device).set_offsets(_sx, _sy);
-
-
-
 ///*************************************************************************
 //  TYPE DEFINITIONS
 ///*************************************************************************
@@ -36,6 +23,14 @@ class hd44102_device :  public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	hd44102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag, int sx, int sy)
+		:hd44102_device(mconfig, tag, owner, clock)
+	{
+		set_screen(std::forward<T>(screen_tag));
+		set_offsets(sx, sy);
+	}
+
 	hd44102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers

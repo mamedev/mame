@@ -113,7 +113,7 @@ READ16_MEMBER(skeetsht_state::ramdac_r)
 	if (offset & 8)
 		offset = (offset & ~8) | 4;
 
-	return m_tlc34076->read(space, offset);
+	return m_tlc34076->read(offset);
 }
 
 WRITE16_MEMBER(skeetsht_state::ramdac_w)
@@ -123,7 +123,7 @@ WRITE16_MEMBER(skeetsht_state::ramdac_w)
 	if (offset & 8)
 		offset = (offset & ~8) | 4;
 
-	m_tlc34076->write(space, offset, data);
+	m_tlc34076->write(offset, data);
 }
 
 
@@ -144,13 +144,13 @@ WRITE8_MEMBER(skeetsht_state::tms_w)
 	if ((offset & 1) == 0)
 		m_lastdataw = data;
 	else
-		m_tms->host_w(space, offset >> 1, (m_lastdataw << 8) | data, 0xffff);
+		m_tms->host_w(offset >> 1, (m_lastdataw << 8) | data);
 }
 
 READ8_MEMBER(skeetsht_state::tms_r)
 {
 	if ((offset & 1) == 0)
-		m_lastdatar = m_tms->host_r(space, offset >> 1, 0xffff);
+		m_lastdatar = m_tms->host_r(offset >> 1);
 
 	return m_lastdatar >> ((offset & 1) ? 0 : 8);
 }
@@ -178,9 +178,9 @@ WRITE8_MEMBER(skeetsht_state::hc11_porta_w)
 WRITE8_MEMBER(skeetsht_state::ay8910_w)
 {
 	if (m_ay_sel)
-		m_ay->data_w(space, 0, data);
+		m_ay->data_w(data);
 	else
-		m_ay->address_w(space, 0, data);
+		m_ay->address_w(data);
 }
 
 
@@ -214,7 +214,6 @@ void skeetsht_state::tms_program_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("tms_vram");
 	map(0x00440000, 0x004fffff).rw(FUNC(skeetsht_state::ramdac_r), FUNC(skeetsht_state::ramdac_w));
-	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff800000, 0xffbfffff).rom().mirror(0x00400000).region("tms", 0);
 }
 

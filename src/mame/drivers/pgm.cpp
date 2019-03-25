@@ -490,7 +490,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pgm_state::pgm_interrupt)
 {
 	int scanline = param;
 
-// already being generated  by MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pgm_state,  irq6_line_hold)
+// already being generated  by m_maincpu->set_vblank_int("screen", FUNC(pgm_state::irq6_line_hold));
 //  if(scanline == 224)
 //      m_maincpu->set_input_line(6, HOLD_LINE);
 

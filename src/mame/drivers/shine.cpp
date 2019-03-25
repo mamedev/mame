@@ -228,7 +228,8 @@ void shine_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(shine_state::shine)
+void shine_state::shine(machine_config &config)
+{
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 2000000); // 2MHz ??
 	m_maincpu->set_addrmap(AS_PROGRAM, &shine_state::shine_mem);
@@ -236,9 +237,10 @@ MACHINE_CONFIG_START(shine_state::shine)
 	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_PAL_ADD("screen", "vdg")
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MC6847_NTSC(config, m_vdg, 3.579545_MHz_XTAL);
+	MC6847_NTSC(config, m_vdg, 3.579545_MHz_XTAL); // or really PAL?
+	m_vdg->set_screen("screen");
 	m_vdg->input_callback().set(FUNC(shine_state::vdg_videoram_r));
 	m_vdg->set_black_and_white(true);
 
@@ -267,7 +269,7 @@ MACHINE_CONFIG_START(shine_state::shine)
 
 	auto &cassette(CASSETTE(config, "cassette"));
 	cassette.set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( shine )

@@ -16,6 +16,7 @@
 		vs2013 = "v120",
 		vs2015 = "v140",
 		vs2017 = "v141",
+		vsllvm = "llvm",
 	}
 	premake.vstudio.toolset = toolsets[_ACTION] or "unknown?"
 	premake.vstudio.splashpath = ''

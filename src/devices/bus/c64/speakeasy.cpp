@@ -31,12 +31,12 @@ DEFINE_DEVICE_TYPE(C64_SPEAKEASY, c64_speakeasy_cartridge_device, "c64_speakeasy
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_speakeasy_cartridge_device::device_add_mconfig)
+void c64_speakeasy_cartridge_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(SC01A_TAG, VOTRAX_SC01, 720000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
-MACHINE_CONFIG_END
+	VOTRAX_SC01(config, m_votrax, 720000).add_route(ALL_OUTPUTS, "mono", 0.85);
+}
 
 
 
@@ -69,7 +69,7 @@ void c64_speakeasy_cartridge_device::device_start()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_speakeasy_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_speakeasy_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{
@@ -84,11 +84,11 @@ uint8_t c64_speakeasy_cartridge_device::c64_cd_r(address_space &space, offs_t of
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_speakeasy_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_speakeasy_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{
-		m_votrax->write(space, 0, data & 0x3f);
-		m_votrax->inflection_w(space, 0, data >> 6);
+		m_votrax->write(data & 0x3f);
+		m_votrax->inflection_w(data >> 6);
 	}
 }

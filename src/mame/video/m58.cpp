@@ -42,9 +42,9 @@ void m58_state::m58_palette(palette_device &palette) const
 	for (int i = 0; i < 256; i++)
 	{
 		uint8_t const promval = (char_lopal[i] & 0x0f) | (char_hipal[i] << 4);
-		int const r = combine_2_weights(weights_r, BIT(promval,6), BIT(promval,7));
-		int const g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
-		int const b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
+		int const r = combine_weights(weights_r, BIT(promval,6), BIT(promval,7));
+		int const g = combine_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
+		int const b = combine_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -53,9 +53,9 @@ void m58_state::m58_palette(palette_device &palette) const
 	for (int i = 0; i < 256; i++)
 	{
 		uint8_t const promval = (radar_lopal[i] & 0x0f) | (radar_hipal[i] << 4);
-		int const r = combine_2_weights(weights_r, BIT(promval,6), BIT(promval,7));
-		int const g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
-		int const b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
+		int const r = combine_weights(weights_r, BIT(promval,6), BIT(promval,7));
+		int const g = combine_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
+		int const b = combine_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
 		palette.set_indirect_color(256 + i, rgb_t(r, g, b));
 	}
@@ -70,9 +70,9 @@ void m58_state::m58_palette(palette_device &palette) const
 	for (int i = 0; i < 16; i++)
 	{
 		uint8_t const promval = sprite_pal[i];
-		int const r = combine_2_weights(weights_r, BIT(promval,6), BIT(promval,7));
-		int const g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
-		int const b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
+		int const r = combine_weights(weights_r, BIT(promval,6), BIT(promval,7));
+		int const g = combine_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
+		int const b = combine_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
 		palette.set_indirect_color(256 + 256 + i, rgb_t(r, g, b));
 	}

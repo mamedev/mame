@@ -95,18 +95,18 @@ void segag80r_state::g80_set_palette_entry(int entry, uint8_t data)
 	bit0 = (r >> 0) & 0x01;
 	bit1 = (r >> 1) & 0x01;
 	bit2 = (r >> 2) & 0x01;
-	r = combine_3_weights(m_rweights, bit0, bit1, bit2);
+	r = combine_weights(m_rweights, bit0, bit1, bit2);
 
 	/* green component */
 	bit0 = (g >> 0) & 0x01;
 	bit1 = (g >> 1) & 0x01;
 	bit2 = (g >> 2) & 0x01;
-	g = combine_3_weights(m_gweights, bit0, bit1, bit2);
+	g = combine_weights(m_gweights, bit0, bit1, bit2);
 
 	/* blue component */
 	bit0 = (b >> 0) & 0x01;
 	bit1 = (b >> 1) & 0x01;
-	b = combine_2_weights(m_bweights, bit0, bit1);
+	b = combine_weights(m_bweights, bit0, bit1);
 
 	m_palette->set_pen_color(entry, rgb_t(r, g, b));
 }
@@ -138,17 +138,17 @@ void segag80r_state::spaceod_bg_init_palette()
 		/* red component */
 		bit0 = (r >> 0) & 0x01;
 		bit1 = (r >> 1) & 0x01;
-		r = combine_2_weights(trweights, bit0, bit1);
+		r = combine_weights(trweights, bit0, bit1);
 
 		/* green component */
 		bit0 = (g >> 0) & 0x01;
 		bit1 = (g >> 1) & 0x01;
-		g = combine_2_weights(tgweights, bit0, bit1);
+		g = combine_weights(tgweights, bit0, bit1);
 
 		/* blue component */
 		bit0 = (b >> 0) & 0x01;
 		bit1 = (b >> 1) & 0x01;
-		b = combine_2_weights(tbweights, bit0, bit1);
+		b = combine_weights(tbweights, bit0, bit1);
 
 		m_palette->set_pen_color(64 + i, rgb_t(r, g, b));
 	}

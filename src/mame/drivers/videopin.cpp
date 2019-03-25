@@ -97,8 +97,8 @@ void videopin_state::machine_reset()
 
 	/* both output latches are cleared on reset */
 
-	out1_w(machine().dummy_space(), 0, 0);
-	out2_w(machine().dummy_space(), 0, 0);
+	out1_w(0);
+	out2_w(0);
 }
 
 
@@ -108,7 +108,7 @@ double videopin_state::calc_plunger_pos()
 }
 
 
-READ8_MEMBER(videopin_state::misc_r)
+uint8_t videopin_state::misc_r()
 {
 	double plunger = calc_plunger_pos();
 
@@ -136,7 +136,7 @@ READ8_MEMBER(videopin_state::misc_r)
 }
 
 
-WRITE8_MEMBER(videopin_state::led_w)
+void videopin_state::led_w(uint8_t data)
 {
 	// LED matrix as seen in Video Pinball manual, fig. 4-14
 	// output to "LEDxx" where xx = 01 to 32, videopin START = LED30
@@ -162,7 +162,7 @@ WRITE8_MEMBER(videopin_state::led_w)
 }
 
 
-WRITE8_MEMBER(videopin_state::out1_w)
+void videopin_state::out1_w(uint8_t data)
 {
 	/* D0 => OCTAVE0  */
 	/* D1 => OCTACE1  */
@@ -185,7 +185,7 @@ WRITE8_MEMBER(videopin_state::out1_w)
 }
 
 
-WRITE8_MEMBER(videopin_state::out2_w)
+void videopin_state::out2_w(uint8_t data)
 {
 	/* D0 => VOL0      */
 	/* D1 => VOL1      */
@@ -205,7 +205,7 @@ WRITE8_MEMBER(videopin_state::out2_w)
 }
 
 
-WRITE8_MEMBER(videopin_state::note_dvsr_w)
+void videopin_state::note_dvsr_w(uint8_t data)
 {
 	/* note data */
 	m_discrete->write(VIDEOPIN_NOTE_DATA, ~data &0xff);
@@ -359,11 +359,11 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(videopin_state::videopin)
-
+void videopin_state::videopin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 16)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M6502(config, m_maincpu, 12096000 / 16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &videopin_state::main_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(videopin_state::videopin)
 	m_screen->set_screen_update(FUNC(videopin_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_videopin)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_videopin);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(videopin_state::videopin)
 	SPEAKER(config, "mono").front_center();
 
 	DISCRETE(config, m_discrete, videopin_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 

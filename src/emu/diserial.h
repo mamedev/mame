@@ -105,8 +105,8 @@ protected:
 
 	u8 serial_helper_get_parity(u8 data) { return m_serial_parity_table[data]; }
 
-	bool is_receive_register_full();
-	bool is_transmit_register_empty();
+	bool is_receive_register_full() const { return m_rcv_flags & RECEIVE_REGISTER_FULL; }
+	bool is_transmit_register_empty() const { return m_tra_flags & TRANSMIT_REGISTER_EMPTY; }
 	bool is_receive_register_synchronized() const { return m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED; }
 	bool is_receive_register_shifting() const { return m_rcv_bit_count_received > 0; }
 	bool is_receive_framing_error() const { return m_rcv_framing_error; }

@@ -283,10 +283,10 @@ void queen_state::machine_reset()
 
 
 MACHINE_CONFIG_START(queen_state::queen)
-	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 533000000/16) // Celeron or Pentium 3, 533 Mhz
-	MCFG_DEVICE_PROGRAM_MAP(queen_map)
-	MCFG_DEVICE_IO_MAP(queen_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	PENTIUM3(config, m_maincpu, 533000000/16); // Celeron or Pentium 3, 533 Mhz
+	m_maincpu->set_addrmap(AS_PROGRAM, &queen_state::queen_map);
+	m_maincpu->set_addrmap(AS_IO, &queen_state::queen_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 

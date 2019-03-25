@@ -21,8 +21,12 @@ msx_cart_korean_80in1_device::msx_cart_korean_80in1_device(const machine_config 
 void msx_cart_korean_80in1_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
+}
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_korean_80in1_device::restore_banks), this));
+
+void msx_cart_korean_80in1_device::device_post_load()
+{
+	restore_banks();
 }
 
 
@@ -72,7 +76,7 @@ void msx_cart_korean_80in1_device::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_korean_80in1_device::read_cart)
+uint8_t msx_cart_korean_80in1_device::read_cart(offs_t offset)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -83,7 +87,7 @@ READ8_MEMBER(msx_cart_korean_80in1_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_korean_80in1_device::write_cart)
+void msx_cart_korean_80in1_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x4000 && offset < 0x4004)
 	{
@@ -112,11 +116,14 @@ void msx_cart_korean_90in1_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_korean_90in1_device::restore_banks), this));
-
 	// Install IO read/write handlers
-	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
-	space.install_write_handler(0x77, 0x77, write8_delegate(FUNC(msx_cart_korean_90in1_device::banking), this));
+	io_space().install_write_handler(0x77, 0x77, write8smo_delegate(FUNC(msx_cart_korean_90in1_device::banking), this));
+}
+
+
+void msx_cart_korean_90in1_device::device_post_load()
+{
+	restore_banks();
 }
 
 
@@ -181,7 +188,7 @@ void msx_cart_korean_90in1_device::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_korean_90in1_device::read_cart)
+uint8_t msx_cart_korean_90in1_device::read_cart(offs_t offset)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -192,7 +199,7 @@ READ8_MEMBER(msx_cart_korean_90in1_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_korean_90in1_device::banking)
+void msx_cart_korean_90in1_device::banking(uint8_t data)
 {
 	m_selected_bank = data;
 	restore_banks();
@@ -215,8 +222,12 @@ msx_cart_korean_126in1_device::msx_cart_korean_126in1_device(const machine_confi
 void msx_cart_korean_126in1_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
+}
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_korean_126in1_device::restore_banks), this));
+
+void msx_cart_korean_126in1_device::device_post_load()
+{
+	restore_banks();
 }
 
 
@@ -266,7 +277,7 @@ void msx_cart_korean_126in1_device::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_korean_126in1_device::read_cart)
+uint8_t msx_cart_korean_126in1_device::read_cart(offs_t offset)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -277,7 +288,7 @@ READ8_MEMBER(msx_cart_korean_126in1_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_korean_126in1_device::write_cart)
+void msx_cart_korean_126in1_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x4000 && offset < 0x4002)
 	{

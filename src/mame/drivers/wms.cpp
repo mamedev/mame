@@ -178,28 +178,29 @@ static GFXDECODE_START( gfx_wms )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(wms_state::wms)
+void wms_state::wms(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80188, MAIN_CLOCK )    // AMD N80C188-20, ( 40 MHz. internally divided by 2)
-	MCFG_DEVICE_PROGRAM_MAP(wms_map)
-	MCFG_DEVICE_IO_MAP(wms_io)
+	I80188(config, m_maincpu, MAIN_CLOCK);    // AMD N80C188-20, ( 40 MHz. internally divided by 2)
+	m_maincpu->set_addrmap(AS_PROGRAM, &wms_state::wms_map);
+	m_maincpu->set_addrmap(AS_IO, &wms_state::wms_io);
 
-	MCFG_DEVICE_ADD("adsp", ADSP2105, MAIN_CLOCK / 2)  // ADSP-2105 could run either at 13.824 or 20 MHz...
-	MCFG_DEVICE_DISABLE()
-	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
-	MCFG_DEVICE_DATA_MAP(adsp_data_map)
+	adsp2105_device &adsp(ADSP2105(config, "adsp", MAIN_CLOCK / 2));  // ADSP-2105 could run either at 13.824 or 20 MHz...
+	adsp.set_disable();
+	adsp.set_addrmap(AS_PROGRAM, &wms_state::adsp_program_map);
+	adsp.set_addrmap(AS_DATA, &wms_state::adsp_data_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wms_state, screen_update_wms)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(wms_state::screen_update_wms));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wms)
-	MCFG_PALETTE_ADD("palette", 0x100)
-MACHINE_CONFIG_END
+	GFXDECODE(config, "gfxdecode", "palette", gfx_wms);
+	PALETTE(config, "palette").set_entries(0x100);
+}
 
 
 /*********************************************
