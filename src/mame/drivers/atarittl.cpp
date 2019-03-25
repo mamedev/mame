@@ -37,7 +37,6 @@
  TM-019                   Pursuit (1975)                                                  K8P-B 90128                        NO
  TM-012,029,034           Quadrapong (1974)                                               A000845                            NO
  TM-009                   Qwak!/Quack (1974)                                              A000937,A000953                    YES       72074/37-2530N (K9)
- TM-001,023,029,032       Rebound/Spike/Volleyball (1974)                                 A000517,A000846,SPIKE-(A or B)     NO
  TM-047                   Shark JAWS (1975)                                               A003806                            YES       004182, 004183
  TM-008,029               Space Race (1973)                                               A000803                            NO
  TM-046                   Steeplechase/Astroturf (1975)                                   A003750                            YES       003774 ROM Bugle (C8), 003773-01 "A" Horse (C4), 003773-02 "B" Horse (D4)
@@ -65,7 +64,6 @@
     7406  Hex Inverter Buffers/Drivers with O.C. H.V. Outputs (note: Might not be needed, could just clone from 7404)
     7414  Hex Schmitt-Trigger Inverters
     7417  Hex Buffers/Drivers
-    74164 8-bit Serial-In, Parallel-Out Shift Register
     9301  1-of-10 Decoder
     LM339 Quad Comparator
 
@@ -685,10 +683,6 @@ ROM_START( quadpong )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( rebound )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-ROM_END
-
 ROM_START( spacrace )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
@@ -744,7 +738,6 @@ GAME(1975,  tankii,    0,        atarikee,       0, atarikee_state, empty_init, 
 //GAME(1974,  pinpong,   0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Pin Pong [TTL]",         MACHINE_IS_SKELETON)
 //GAME(1975,  pursuit,   0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Pursuit [TTL]",          MACHINE_IS_SKELETON)
 //GAME(1974,  quadpong,  eliminat, atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Quadrapong [TTL]",       MACHINE_IS_SKELETON)
-//GAME(1974,  rebound,   0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Rebound/Spike/Volleyball [TTL]",   MACHINE_IS_SKELETON)
 //GAME(1973,  spacrace,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Space Race [TTL]",       MACHINE_IS_SKELETON)
 //GAME(1974,  touchme,   0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Touch-Me [TTL]",         MACHINE_IS_SKELETON) //?
 //GAME(1974,  worldcup,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "World Cup/World Cup Football [TTL]",   MACHINE_IS_SKELETON)
