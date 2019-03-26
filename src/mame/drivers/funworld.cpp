@@ -3241,7 +3241,552 @@ void funworld_state::fw_brick_2(machine_config &config)
 //  m_gfxdecode->set_info(gfx_fw2ndpal);
 }
 
+ 
+// TO-DO: clean up and relocate, when convenient, all the opcode-encryption stuff
 
+class royalcrdf_state : public funworld_state
+{
+public:
+	royalcrdf_state(const machine_config &mconfig, device_type type, const char* tag)
+	: funworld_state(mconfig, type, tag)
+	{
+	}
+	
+	void royalcrdf(machine_config& config);
+	
+	void driver_init() override;
+	
+private:
+	cpu_device* _maincpu {};
+	DECLARE_READ8_MEMBER(royalcrdf_opcode_r);
+	
+	void royalcrdf_opcodes_map(address_map& map);
+};
+
+READ8_MEMBER(royalcrdf_state::royalcrdf_opcode_r)
+{	
+	// address-based data bitswap; 4 address bits are involved, but only
+	// 5 different bitswaps exist, with clear regularities, so the
+	// hardware is probably selecting the appropiate one by 
+	// applying passive logic to the address bits; we encode it
+	// indexed by all the involved address bits instead. A notable fact is that
+	// all the permutations in royalcrdf & multiwin are odd-parity ones,
+	// so an intriguing possibility is that the hardware be applying
+	// a fixed odd number (3 would suffice) of address-dependent 
+	// 1-bit-to-1-bit bitswaps; furthermore, in both sets one of the
+	// bitswaps is equal to the one applied to all the data (but notice
+	// that, in those cases, we are applying it twice to opcodes here)
+	constexpr std::array<std::array<int,4>,16> bs{ // bitswaps for data bits 1,2,5 & 7, in that order
+		1,5,2,7,
+		1,5,2,7,
+		5,1,7,2,
+		7,2,5,1,
+		1,5,2,7,
+		1,5,2,7,
+		5,2,1,7,
+		7,2,5,1,
+		1,5,2,7,
+		1,5,2,7,
+		5,1,7,2,
+		1,7,5,2,
+		1,5,2,7,
+		1,5,2,7,
+		5,2,1,7,
+		1,7,5,2,
+	};
+	
+	// xor masks, dependent on the same address bits than the bitswaps,
+	// and with the same 5-values structure
+	constexpr std::array<uint8_t,16> xm {
+		0x02, 0x02, 0xa6, 0x82, 0x02, 0x02, 0x06, 0x82, 0x02, 0x02, 0xa6, 0x00, 0x02, 0x02, 0x06, 0x00
+	};
+	
+	uint8_t data {_maincpu->space(AS_PROGRAM).read_byte(offset)};
+	unsigned idx {bitswap<4>(offset, 8,5,2,1)};
+	
+	return bitswap<8>(data, bs[idx][3],6,bs[idx][2],4,3,bs[idx][1],bs[idx][0],0) ^ xm[idx];
+}
+
+void royalcrdf_state::royalcrdf_opcodes_map(address_map &map)
+{
+	map(0x8000, 0xffff).r(FUNC(royalcrdf_state::royalcrdf_opcode_r));
+}
+
+void royalcrdf_state::driver_init()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+	for (int x = 0x8000; x < 0x10000; x++)
+	{
+		ROM[x] = bitswap<8>(ROM[x]^0x22,2,6,7,4,3,1,5,0);
+	}
+}
+
+void royalcrdf_state::royalcrdf(machine_config &config)
+{
+	fw2ndpal(config);
+	
+	_maincpu = reinterpret_cast<cpu_device*>(config.device("maincpu"));
+	_maincpu->set_addrmap(AS_OPCODES, &royalcrdf_state::royalcrdf_opcodes_map);
+}
+
+class multiwin_state : public funworld_state
+{
+public:
+	multiwin_state(const machine_config &mconfig, device_type type, const char* tag)
+	: funworld_state(mconfig, type, tag)
+	{
+	}
+	
+	void multiwin(machine_config& config);
+	
+	void driver_init() override;
+	
+private:
+	cpu_device* _maincpu {};
+	DECLARE_READ8_MEMBER(multiwin_opcode_r);
+	
+	void multiwin_opcodes_map(address_map& map);
+};
+
+READ8_MEMBER(multiwin_state::multiwin_opcode_r)
+{	
+	// same general encryption scheme than the one used by the EVONA Royald Card set;
+	// 4 address bits determine which bitswap+xor is applied to the opcodes; in this case, 
+	// one of the address bits don't have effect on the bitswap, just on the xor;
+	// again, we have just five different bitswaps, and the hardware is probably using
+	// passive logic on the address bits to do the selection
+	constexpr std::array<std::array<int,5>,8> bs { // bitswaps for data bits 0,2,4,5 & 7, in that order
+		5,2,4,0,7,
+		4,0,2,7,5,
+		7,4,5,2,0,
+		4,0,2,7,5,
+		2,7,0,5,4,
+		4,0,2,7,5,
+		0,5,7,4,2,
+		4,0,2,7,5,
+	};
+	
+	// xor masks
+	constexpr std::array<uint8_t,16> xm {
+		0x00, 0x00, 0x10, 0x00, 0x20, 0x00, 0x30, 0x00, 0x00, 0xb5, 0x10, 0xb5, 0x20, 0xb5, 0x30, 0xb5
+	};
+	
+	uint8_t data {_maincpu->space(AS_PROGRAM).read_byte(offset)};
+	unsigned idx {bitswap<4>(offset, 6,9,5,3)};
+	
+	return bitswap<8>(data, bs[idx&7][4],6,bs[idx&7][3],bs[idx&7][2],3,bs[idx&7][1],1,bs[idx&7][0]) ^ xm[idx];
+}
+
+void multiwin_state::multiwin_opcodes_map(address_map &map)
+{
+	map(0x8000, 0xffff).r(FUNC(multiwin_state::multiwin_opcode_r));
+}
+
+void multiwin_state::driver_init()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+	for (int x = 0x8000; x < 0x10000; x++)
+	{
+		ROM[x] = bitswap<8>(ROM[x]^0x91,5,6,7,2,3,0,1,4);
+	}
+}
+
+void multiwin_state::multiwin(machine_config &config)
+{
+	fw2ndpal(config);
+	
+	_maincpu = reinterpret_cast<cpu_device*>(config.device("maincpu"));
+	_maincpu->set_addrmap(AS_OPCODES, &multiwin_state::multiwin_opcodes_map);
+}
+
+
+class powercrd_state : public funworld_state
+{
+public:
+	powercrd_state(const machine_config &mconfig, device_type type, const char* tag)
+	: funworld_state(mconfig, type, tag)
+	{
+	}
+	
+	void powercrd(machine_config& config);
+	
+private:
+	cpu_device* _maincpu {};
+	DECLARE_READ8_MEMBER(powercrd_opcode_r);
+	
+	void powercrd_opcodes_map(address_map& map);
+};
+
+READ8_MEMBER(powercrd_state::powercrd_opcode_r)
+{	
+	// encryption controlled by the lower two bits of the address; no clear structure is
+	// seen in the tables, so it looks like a lookup into randomly or pseudorandomly
+	// generated permutation tables; all opcodes in the [8da0, 9e0b) & [c000, ef80) are
+	// believed to be covered by these tables; errors could be lurking in the least used opcodes;
+	// this same encryption scheme (with different tables) is seen in megacard & jokercrd
+	
+	constexpr uint8_t UNKN {0xfc};
+	
+	constexpr std::array<std::array<uint8_t,256>,4> decryption_tables
+	{
+		//_0    _1    _2    _3    _4    _5    _6    _7    _8    _9    _a    _b    _c    _d    _e    _f
+		0xe8, 0x29, UNKN, UNKN, 0x85, UNKN, 0x18, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0xd5,  // 0_
+		UNKN, UNKN, 0xa6, 0x4c, UNKN, UNKN, 0x84, UNKN, UNKN, UNKN, 0x69, UNKN, 0x91, 0x38, 0xa8, UNKN,  // 1_
+		UNKN, 0x9d, 0xd8, 0x49, 0xc0, UNKN, 0x66, UNKN, UNKN, 0xe6, 0xb9, 0xad, UNKN, UNKN, UNKN, 0x10,  // 2_
+		UNKN, 0xd0, UNKN, 0x92, UNKN, UNKN, 0x74, UNKN, 0x9e, UNKN, UNKN, UNKN, UNKN, 0xb1, UNKN, 0x3d,  // 3_
+		0xa5, 0xc4, UNKN, UNKN, UNKN, 0xce, 0x6a, 0x3a, UNKN, UNKN, UNKN, UNKN, 0xa2, UNKN, UNKN, UNKN,  // 4_
+		0x9c, UNKN, UNKN, UNKN, UNKN, 0x79, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN,  // 5_
+		UNKN, 0xed, UNKN, UNKN, UNKN, UNKN, 0xc9, 0x99, UNKN, 0xa9, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN,  // 6_
+		UNKN, UNKN, 0xc8, UNKN, 0xe0, 0x2d, UNKN, 0x7d, UNKN, UNKN, 0x80, 0x64, 0xf0, UNKN, UNKN, UNKN,  // 7_
+		UNKN, UNKN, UNKN, UNKN, 0x98, UNKN, UNKN, UNKN, 0xbd, UNKN, UNKN, UNKN, 0x1a, UNKN, UNKN, UNKN,  // 8_
+		UNKN, 0x30, UNKN, UNKN, 0xc6, 0x90, UNKN, UNKN, UNKN, 0x6d, 0xee, UNKN, UNKN, UNKN, 0xe4, UNKN,  // 9_
+		UNKN, 0x68, UNKN, UNKN, UNKN, UNKN, UNKN, 0x0d, 0x95, UNKN, 0x8e, 0x40, UNKN, 0x20, 0xb2, UNKN,  // a_
+		UNKN, UNKN, UNKN, UNKN, UNKN, 0x65, UNKN, UNKN, UNKN, UNKN, UNKN, 0xa4, UNKN, UNKN, 0x05, UNKN,  // b_
+		UNKN, UNKN, 0xba, 0x8a, UNKN, UNKN, UNKN, 0x60, 0xf8, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN,  // c_
+		0xdd, UNKN, UNKN, UNKN, 0xaa, 0xe9, 0x8d, 0xa0, UNKN, 0xb5, UNKN, 0xca, UNKN, UNKN, 0x0a, UNKN,  // d_
+		0x2a, UNKN, UNKN, UNKN, 0xb0, UNKN, UNKN, 0x48, UNKN, UNKN, UNKN, UNKN, UNKN, 0x4a, 0xcd, 0x45,  // e_
+		UNKN, UNKN, UNKN, 0x09, UNKN, UNKN, 0xc5, UNKN, UNKN, 0x88, 0xae, UNKN, 0x86, UNKN, 0xda, 0x8c,  // f_
+
+		//_0    _1    _2    _3    _4    _5    _6    _7    _8    _9    _a    _b    _c    _d    _e    _f
+		UNKN, UNKN, UNKN, 0xae, UNKN, 0x4e, 0xda, UNKN, UNKN, UNKN, 0x60, UNKN, UNKN, UNKN, UNKN, 0x64,  // 0_
+		0xa0, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x86, 0x9c, 0x88, 0xe4, 0xc4, UNKN, UNKN, 0x95,  // 1_
+		0x2a, UNKN, 0xe0, UNKN, UNKN, 0x99, UNKN, UNKN, 0x90, UNKN, UNKN, UNKN, 0x6c, 0x49, UNKN, UNKN,  // 2_
+		0xf0, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x66, UNKN, 0x11, 0xee, UNKN, UNKN, 0x4c,  // 3_
+		0xb0, UNKN, UNKN, 0x45, 0xc6, UNKN, UNKN, UNKN, UNKN, 0xcd, UNKN, UNKN, 0xc8, 0x1a, UNKN, UNKN,  // 4_
+		UNKN, UNKN, 0x09, 0x91, UNKN, 0xc9, 0xf8, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x92, 0x20, 0xa4,  // 5_
+		UNKN, 0x65, UNKN, 0xe8, UNKN, 0xd8, 0x3d, UNKN, UNKN, UNKN, UNKN, UNKN, 0x80, 0xbd, 0x84, UNKN,  // 6_
+		UNKN, UNKN, UNKN, 0x68, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN,  // 7_
+		0xaa, UNKN, UNKN, UNKN, UNKN, UNKN, 0x0d, 0x18, UNKN, UNKN, UNKN, 0x8a, UNKN, UNKN, UNKN, 0x26,  // 8_
+		0xc0, UNKN, UNKN, UNKN, 0x3a, 0xc5, UNKN, 0x6d, 0xe9, UNKN, 0x4a, 0xb9, UNKN, 0x05, 0x0a, UNKN,  // 9_
+		UNKN, 0xfa, UNKN, UNKN, UNKN, 0xd5, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x48, UNKN,  // a_
+		0x10, UNKN, 0xf9, 0x5a, UNKN, 0xa2, UNKN, UNKN, UNKN, UNKN, UNKN, 0xa9, UNKN, 0xa6, UNKN, UNKN,  // b_
+		0xca, UNKN, UNKN, 0x85, UNKN, UNKN, UNKN, UNKN, UNKN, 0xb2, UNKN, UNKN, UNKN, 0x9d, UNKN, 0x7a,  // c_
+		UNKN, 0x79, 0xa5, UNKN, UNKN, 0xb1, UNKN, 0x8e, 0xad, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN,  // d_
+		UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x2d, UNKN, UNKN, UNKN, 0x8d, UNKN, UNKN, UNKN, 0xb5, 0xce,  // e_
+		UNKN, UNKN, 0x38, UNKN, 0xe6, UNKN, UNKN, 0xd0, 0x69, UNKN, UNKN, 0x29, UNKN, UNKN, UNKN, UNKN,  // f_
+
+		//_0    _1    _2    _3    _4    _5    _6    _7    _8    _9    _a    _b    _c    _d    _e    _f
+		UNKN, UNKN, 0x30, 0xb5, 0x49, 0xb0, UNKN, 0xc5, UNKN, 0x1a, UNKN, UNKN, UNKN, UNKN, 0x90, UNKN,  // 0_
+		UNKN, UNKN, UNKN, UNKN, 0xaa, UNKN, UNKN, 0x2d, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN,  // 1_
+		UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x4a, 0x9a, UNKN, 0xfa, UNKN, UNKN, 0x5a, UNKN, 0xae, UNKN,  // 2_
+		UNKN, UNKN, 0xe0, UNKN, UNKN, UNKN, 0x8d, 0x0a, UNKN, UNKN, 0xed, UNKN, 0x88, UNKN, UNKN, UNKN,  // 3_
+		UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0xee, UNKN, UNKN, UNKN, 0xb1, UNKN, 0x9c, UNKN, 0x0d,  // 4_
+		0x4c, UNKN, 0x69, UNKN, UNKN, 0xa9, UNKN, UNKN, 0x05, 0xa4, UNKN, 0x4e, UNKN, UNKN, UNKN, UNKN,  // 5_
+		0xc6, UNKN, UNKN, 0xbd, 0x09, UNKN, UNKN, UNKN, UNKN, 0x20, UNKN, 0x3a, 0xc0, UNKN, UNKN, UNKN,  // 6_
+		0xa0, UNKN, UNKN, UNKN, 0x80, UNKN, 0x95, UNKN, UNKN, UNKN, 0xe8, UNKN, 0xd0, UNKN, UNKN, UNKN,  // 7_
+		0x60, 0xe9, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x40, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN,  // 8_
+		UNKN, UNKN, 0x9d, UNKN, UNKN, UNKN, UNKN, 0xa5, UNKN, UNKN, 0xf0, UNKN, UNKN, UNKN, UNKN, UNKN,  // 9_
+		UNKN, 0x38, UNKN, 0xca, 0xa2, 0x8e, UNKN, 0xb9, UNKN, 0xa6, 0xcd, 0x2a, UNKN, UNKN, UNKN, UNKN,  // a_
+		UNKN, UNKN, 0xad, UNKN, UNKN, UNKN, UNKN, UNKN, 0xf8, UNKN, UNKN, 0x11, 0xce, UNKN, UNKN, UNKN,  // b_
+		UNKN, UNKN, 0xda, UNKN, UNKN, UNKN, 0x6c, UNKN, UNKN, UNKN, UNKN, 0x8a, UNKN, UNKN, UNKN, UNKN,  // c_
+		UNKN, UNKN, UNKN, 0x84, UNKN, UNKN, UNKN, UNKN, 0xc9, UNKN, 0x7a, UNKN, 0x48, 0xd8, UNKN, 0x18,  // d_
+		0xe6, UNKN, UNKN, 0x68, UNKN, 0x29, UNKN, UNKN, 0xc4, 0x65, UNKN, UNKN, 0xa8, UNKN, 0x85, UNKN,  // e_
+		UNKN, 0xc8, 0xd5, 0xe4, UNKN, 0x7d, 0x10, UNKN, UNKN, UNKN, 0x25, UNKN, UNKN, 0x1d, 0x64, UNKN,  // f_
+
+		//_0    _1    _2    _3    _4    _5    _6    _7    _8    _9    _a    _b    _c    _d    _e    _f
+		UNKN, 0x99, 0xf0, UNKN, UNKN, UNKN, 0xae, UNKN, UNKN, UNKN, UNKN, 0x64, UNKN, UNKN, 0x2a, UNKN,  // 0_
+		0xb5, UNKN, 0xa6, UNKN, UNKN, 0x65, UNKN, 0xf8, UNKN, UNKN, UNKN, 0x58, UNKN, UNKN, 0xc8, UNKN,  // 1_
+		0x1a, UNKN, UNKN, UNKN, 0x09, 0x91, UNKN, 0xe0, UNKN, UNKN, UNKN, 0xad, UNKN, UNKN, UNKN, UNKN,  // 2_
+		UNKN, 0xa4, 0xb0, UNKN, 0xd9, 0xe4, 0xd0, UNKN, UNKN, 0x5a, 0x2d, UNKN, UNKN, 0x4c, 0xa0, UNKN,  // 3_
+		0x85, UNKN, 0x49, UNKN, UNKN, UNKN, UNKN, UNKN, 0x88, UNKN, UNKN, 0xbd, 0x69, 0x95, UNKN, UNKN,  // 4_
+		UNKN, 0xe9, UNKN, UNKN, UNKN, UNKN, UNKN, 0x80, 0x0d, UNKN, UNKN, 0x30, UNKN, UNKN, UNKN, 0x9d,  // 5_
+		UNKN, UNKN, UNKN, 0x26, UNKN, 0xd5, 0x1d, UNKN, 0x4e, UNKN, 0xe8, UNKN, UNKN, UNKN, UNKN, 0x05,  // 6_
+		0xa5, UNKN, UNKN, UNKN, 0x68, UNKN, UNKN, 0xcd, UNKN, UNKN, UNKN, UNKN, UNKN, 0x25, UNKN, UNKN,  // 7_
+		UNKN, UNKN, UNKN, 0xc9, UNKN, UNKN, UNKN, 0xa2, UNKN, UNKN, 0x45, UNKN, UNKN, 0xa8, UNKN, UNKN,  // 8_
+		0x9a, UNKN, 0xca, UNKN, UNKN, UNKN, UNKN, UNKN, 0xe6, UNKN, UNKN, UNKN, UNKN, UNKN, 0x60, 0x8d,  // 9_
+		UNKN, UNKN, UNKN, UNKN, UNKN, 0xda, 0xee, 0xb2, 0x7d, UNKN, UNKN, 0x84, UNKN, UNKN, 0xaa, UNKN,  // a_
+		0x90, UNKN, UNKN, 0x6d, 0xb1, UNKN, UNKN, UNKN, UNKN, 0x78, UNKN, UNKN, 0x8e, UNKN, 0xc0, 0x40,  // b_
+		UNKN, UNKN, 0x38, 0xc6, UNKN, UNKN, UNKN, UNKN, UNKN, 0xd8, UNKN, UNKN, 0x0a, UNKN, UNKN, 0xb9,  // c_
+		UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0xfa, UNKN, UNKN, UNKN, UNKN, 0x10, 0x20,  // d_
+		UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0xa9, UNKN, UNKN, UNKN, UNKN, 0xc5, UNKN,  // e_
+		UNKN, 0x86, 0x29, 0x4a, UNKN, UNKN, 0x18, 0x98, UNKN, UNKN, UNKN, 0x9c, UNKN, 0x7a, UNKN, 0x48,  // f_
+	};
+	
+	uint8_t data {_maincpu->space(AS_PROGRAM).read_byte(offset)};
+	return decryption_tables[offset&3][data];
+}
+
+void powercrd_state::powercrd_opcodes_map(address_map &map)
+{
+	map(0x8000, 0xffff).r(FUNC(powercrd_state::powercrd_opcode_r));
+}
+
+void powercrd_state::powercrd(machine_config &config)
+{
+	fw2ndpal(config);
+	
+	_maincpu = reinterpret_cast<cpu_device*>(config.device("maincpu"));
+	_maincpu->set_addrmap(AS_OPCODES, &powercrd_state::powercrd_opcodes_map);
+}
+
+class megacard_state : public funworld_state
+{
+public:
+	megacard_state(const machine_config &mconfig, device_type type, const char* tag)
+	: funworld_state(mconfig, type, tag)
+	{
+	}
+	
+	void megacard(machine_config& config);
+	
+private:
+	cpu_device* _maincpu {};
+	DECLARE_READ8_MEMBER(megacard_opcode_r);
+	
+	void megacard_opcodes_map(address_map& map);
+};
+
+READ8_MEMBER(megacard_state::megacard_opcode_r)
+{	
+	// all opcodes in the [c000, fc80) range are believed to be covered by these tables; 
+	// errors could be lurking in the least used opcodes
+	
+	constexpr uint8_t UNKN {0xfc};
+	
+	constexpr std::array<std::array<uint8_t,256>,4> decryption_tables
+	{
+		//_0    _1    _2    _3    _4    _5    _6    _7    _8    _9    _a    _b    _c    _d    _e    _f
+		UNKN, 0x6c, UNKN, UNKN, UNKN, 0xfa, 0x38, UNKN, UNKN, 0x4c, 0xd8, UNKN, 0xe8, UNKN, 0xc5, UNKN,  // 0_
+		UNKN, 0xa6, 0x91, UNKN, UNKN, UNKN, UNKN, 0x58, 0xa0, 0xe0, 0xb9, 0x4e, UNKN, UNKN, UNKN, 0x78,  // 1_
+		0xe9, 0xee, UNKN, 0xca, 0x85, UNKN, 0xe6, UNKN, UNKN, UNKN, 0xcd, UNKN, UNKN, UNKN, UNKN, UNKN,  // 2_
+		UNKN, UNKN, UNKN, UNKN, 0x90, UNKN, UNKN, 0x64, UNKN, UNKN, 0x45, 0x60, UNKN, UNKN, 0x69, UNKN,  // 3_
+		UNKN, UNKN, 0xea, 0xf8, 0x7a, UNKN, UNKN, 0x1a, UNKN, UNKN, UNKN, UNKN, UNKN, 0xb1, UNKN, 0x80,  // 4_
+		UNKN, UNKN, 0x84, UNKN, UNKN, UNKN, UNKN, 0x49, UNKN, UNKN, 0x7c, UNKN, 0x20, 0x8a, 0xed, UNKN,  // 5_
+		0x8c, UNKN, UNKN, UNKN, 0x5a, UNKN, UNKN, UNKN, 0xa8, 0xa9, UNKN, 0x6d, 0xc9, 0x95, UNKN, 0xda,  // 6_
+		0xaa, 0xe4, UNKN, UNKN, UNKN, UNKN, 0x8e, 0xae, 0x3a, 0xc0, UNKN, 0xd5, 0x92, UNKN, UNKN, UNKN,  // 7_
+		0xc6, UNKN, UNKN, UNKN, UNKN, UNKN, 0x48, UNKN, UNKN, 0x86, 0x9c, UNKN, UNKN, 0xc8, UNKN, UNKN,  // 8_
+		UNKN, 0x68, UNKN, UNKN, UNKN, UNKN, UNKN, 0xd0, 0xa2, UNKN, UNKN, UNKN, UNKN, 0x25, UNKN, 0xa5,  // 9_
+		UNKN, 0x9d, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0xbd, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0xa4,  // a_
+		UNKN, UNKN, UNKN, 0xb2, UNKN, 0x29, UNKN, 0x09, UNKN, UNKN, UNKN, 0xb0, UNKN, UNKN, 0xb5, UNKN,  // b_
+		UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x0a, UNKN, UNKN, 0x7d, UNKN, 0xf0, UNKN, 0x00,  // c_
+		UNKN, UNKN, UNKN, UNKN, 0x2d, UNKN, UNKN, UNKN, 0x4a, 0x88, 0x05, UNKN, UNKN, 0x10, 0xce, UNKN,  // d_
+		UNKN, UNKN, 0xc4, UNKN, 0x18, UNKN, UNKN, UNKN, 0x99, 0xf9, UNKN, UNKN, UNKN, UNKN, UNKN, 0xdd,  // e_
+		0x11, UNKN, 0x26, UNKN, 0x65, 0x98, UNKN, 0xad, 0x2a, UNKN, UNKN, 0x8d, UNKN, UNKN, UNKN, UNKN,  // f_
+		
+		//_0    _1    _2    _3    _4    _5    _6    _7    _8    _9    _a    _b    _c    _d    _e    _f
+		UNKN, UNKN, UNKN, 0x18, UNKN, UNKN, UNKN, 0x8e, UNKN, UNKN, UNKN, UNKN, UNKN, 0xaa, 0xcd, 0x0a,  // 0_
+		0xe6, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0xad, UNKN, UNKN, UNKN, UNKN,  // 1_
+		UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x69, UNKN, 0xd0, UNKN, UNKN, UNKN, UNKN, UNKN, 0x2d, UNKN,  // 2_
+		UNKN, 0x88, UNKN, UNKN, UNKN, 0x98, UNKN, 0x99, UNKN, 0xb1, UNKN, UNKN, 0x9c, 0x1a, UNKN, UNKN,  // 3_
+		UNKN, 0x7a, 0xae, 0xa2, 0xca, 0xba, UNKN, 0x25, UNKN, UNKN, 0x10, UNKN, 0xea, 0x79, 0x8a, UNKN,  // 4_
+		UNKN, 0x60, UNKN, UNKN, UNKN, UNKN, 0x84, 0xd8, 0xa9, UNKN, UNKN, UNKN, 0xe9, UNKN, 0xda, UNKN,  // 5_
+		0xc0, UNKN, UNKN, 0x3d, 0x8d, UNKN, UNKN, UNKN, UNKN, 0x68, UNKN, 0x92, UNKN, 0x48, UNKN, UNKN,  // 6_
+		0x9d, 0x49, 0x95, 0xc6, 0xb0, UNKN, 0x40, UNKN, UNKN, UNKN, 0x05, UNKN, UNKN, UNKN, UNKN, UNKN,  // 7_
+		UNKN, 0x0d, UNKN, UNKN, UNKN, UNKN, 0xa4, UNKN, UNKN, 0x30, UNKN, 0x66, UNKN, UNKN, 0xa5, UNKN,  // 8_
+		0x64, UNKN, 0x29, UNKN, UNKN, 0x86, UNKN, 0xb2, UNKN, UNKN, UNKN, UNKN, UNKN, 0x2a, 0x6d, 0x3a,  // 9_
+		0x38, UNKN, UNKN, 0x91, UNKN, UNKN, UNKN, 0xbd, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0xd5, UNKN,  // a_
+		UNKN, UNKN, UNKN, UNKN, 0xb5, 0xf8, UNKN, UNKN, UNKN, 0xc5, UNKN, UNKN, UNKN, 0x09, UNKN, UNKN,  // b_
+		UNKN, UNKN, UNKN, UNKN, 0x11, 0x90, 0x4c, UNKN, 0x85, UNKN, UNKN, UNKN, 0x4a, UNKN, UNKN, UNKN,  // c_
+		UNKN, UNKN, 0x20, 0xb9, UNKN, UNKN, UNKN, UNKN, 0x00, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN,  // d_
+		UNKN, 0x80, 0x65, UNKN, UNKN, 0xe8, 0xc9, UNKN, UNKN, UNKN, UNKN, UNKN, 0xee, 0xf0, UNKN, UNKN,  // e_
+		UNKN, 0xa0, 0xc8, UNKN, UNKN, UNKN, 0xc4, UNKN, 0x4e, 0xe0, 0xa8, UNKN, 0x45, UNKN, UNKN, 0xa6,  // f_
+		
+		//_0    _1    _2    _3    _4    _5    _6    _7    _8    _9    _a    _b    _c    _d    _e    _f
+		UNKN, 0x86, UNKN, UNKN, 0xe6, 0xc9, UNKN, 0x1a, UNKN, 0xdd, 0x88, UNKN, UNKN, UNKN, UNKN, 0x8e,  // 0_
+		UNKN, 0xe0, UNKN, UNKN, 0x4c, 0xd0, UNKN, 0x64, UNKN, 0xa4, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN,  // 1_
+		UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0xee, UNKN, 0x74, UNKN, 0xa0, UNKN, 0xed, UNKN, 0xe9,  // 2_
+		UNKN, 0xd9, UNKN, UNKN, UNKN, UNKN, 0x0a, UNKN, 0x49, UNKN, 0x1d, 0xa2, UNKN, 0x8d, UNKN, 0x00,  // 3_
+		0xa9, UNKN, UNKN, 0xea, UNKN, UNKN, UNKN, UNKN, UNKN, 0xf0, 0xfa, UNKN, UNKN, UNKN, UNKN, 0x84,  // 4_
+		UNKN, UNKN, 0x38, UNKN, 0xbd, UNKN, 0x9d, 0x92, 0xb1, UNKN, 0x95, UNKN, 0xe8, 0x45, UNKN, UNKN,  // 5_
+		UNKN, UNKN, 0xb5, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x85, UNKN, UNKN,  // 6_
+		UNKN, UNKN, UNKN, UNKN, 0xa6, 0xa5, 0xe4, 0x09, UNKN, 0x29, UNKN, 0x5a, 0x90, UNKN, 0xc0, UNKN,  // 7_
+		0xca, UNKN, UNKN, UNKN, 0x18, UNKN, UNKN, UNKN, UNKN, 0x66, UNKN, UNKN, UNKN, 0x68, UNKN, UNKN,  // 8_
+		0x98, 0xb0, 0x26, 0xc4, UNKN, 0x2d, UNKN, UNKN, UNKN, UNKN, 0xc6, UNKN, UNKN, UNKN, 0xd8, UNKN,  // 9_
+		UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x3d, UNKN, UNKN, UNKN, UNKN, UNKN, 0xaa, UNKN, UNKN,  // a_
+		0xce, 0x10, UNKN, 0x05, 0x80, 0x48, UNKN, UNKN, UNKN, 0xf8, 0x0d, UNKN, UNKN, UNKN, UNKN, UNKN,  // b_
+		UNKN, UNKN, UNKN, UNKN, 0x91, 0xc5, UNKN, UNKN, UNKN, 0x9c, UNKN, 0x30, 0xc8, UNKN, UNKN, UNKN,  // c_
+		0x69, 0x60, 0x9a, 0xb2, UNKN, UNKN, 0x2a, UNKN, 0x65, UNKN, UNKN, UNKN, 0x25, UNKN, 0x79, 0x6a,  // d_
+		UNKN, 0x20, 0xb9, UNKN, 0x3a, 0xd5, UNKN, 0x4a, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x99, 0xa8,  // e_
+		UNKN, UNKN, UNKN, UNKN, 0xda, UNKN, UNKN, UNKN, UNKN, 0xcd, UNKN, 0x7a, 0xad, UNKN, UNKN, UNKN,  // f_
+		
+		//_0    _1    _2    _3    _4    _5    _6    _7    _8    _9    _a    _b    _c    _d    _e    _f
+		UNKN, UNKN, UNKN, 0x60, UNKN, UNKN, 0xb1, UNKN, UNKN, UNKN, 0x29, UNKN, 0x8e, 0x74, 0x9a, 0xea,  // 0_
+		UNKN, 0x6d, UNKN, 0x92, 0xb5, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x7d, 0xb9, 0xa2, UNKN, 0x6a,  // 1_
+		UNKN, UNKN, UNKN, 0xb0, 0xc4, UNKN, UNKN, 0x2d, UNKN, 0x79, 0x8a, UNKN, UNKN, UNKN, 0xa0, UNKN,  // 2_
+		UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0xa4, 0x1a, UNKN, 0xaa, 0x80, UNKN, UNKN,  // 3_
+		UNKN, UNKN, 0x10, UNKN, 0x3a, UNKN, UNKN, UNKN, 0x8d, UNKN, UNKN, UNKN, UNKN, 0xf8, UNKN, 0x25,  // 4_
+		UNKN, UNKN, 0x40, UNKN, 0x85, UNKN, 0x95, UNKN, UNKN, 0xcd, UNKN, UNKN, 0x4c, 0x98, UNKN, UNKN,  // 5_
+		UNKN, 0x68, UNKN, 0xe9, 0x9e, 0x09, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x5a, 0xee,  // 6_
+		UNKN, 0x86, UNKN, UNKN, UNKN, 0xd5, UNKN, 0xa5, 0x65, UNKN, UNKN, UNKN, UNKN, 0x4e, 0xe0, 0x90,  // 7_
+		UNKN, UNKN, 0xc0, 0xce, UNKN, UNKN, UNKN, 0xad, UNKN, UNKN, UNKN, 0x88, UNKN, UNKN, UNKN, UNKN,  // 8_
+		UNKN, 0xda, UNKN, UNKN, UNKN, 0xb2, UNKN, 0x7a, UNKN, UNKN, UNKN, UNKN, 0x91, UNKN, UNKN, 0xc5,  // 9_
+		UNKN, UNKN, 0x05, 0xe6, UNKN, UNKN, 0x49, UNKN, UNKN, 0x0d, 0x9d, 0x4a, UNKN, UNKN, 0xc8, UNKN,  // a_
+		UNKN, UNKN, UNKN, UNKN, 0x20, UNKN, 0x1d, UNKN, UNKN, 0xd0, UNKN, UNKN, 0xfa, UNKN, 0xbd, UNKN,  // b_
+		UNKN, UNKN, UNKN, UNKN, 0x2a, UNKN, UNKN, 0x0a, UNKN, UNKN, 0xca, UNKN, 0x9c, 0x69, UNKN, UNKN,  // c_
+		0x00, 0xd8, 0x38, UNKN, UNKN, UNKN, 0xa6, UNKN, UNKN, UNKN, 0xc6, UNKN, UNKN, UNKN, UNKN, UNKN,  // d_
+		UNKN, 0xc9, UNKN, UNKN, UNKN, UNKN, 0x64, 0x48, UNKN, UNKN, 0xa8, UNKN, 0xe8, UNKN, UNKN, UNKN,  // e_
+		UNKN, UNKN, 0xa9, UNKN, 0xf0, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x18, UNKN, UNKN, UNKN, UNKN,  // f_
+	};
+	
+	uint8_t data {_maincpu->space(AS_PROGRAM).read_byte(offset)};
+	return decryption_tables[offset&3][data];
+}
+
+void megacard_state::megacard_opcodes_map(address_map &map)
+{
+	map(0x8000, 0xffff).r(FUNC(megacard_state::megacard_opcode_r));
+}
+
+void megacard_state::megacard(machine_config &config)
+{
+	fw2ndpal(config);
+	
+	_maincpu = reinterpret_cast<cpu_device*>(config.device("maincpu"));
+	_maincpu->set_addrmap(AS_OPCODES, &megacard_state::megacard_opcodes_map);
+}
+
+class jokercrd_state : public funworld_state
+{
+public:
+	jokercrd_state(const machine_config &mconfig, device_type type, const char* tag)
+	: funworld_state(mconfig, type, tag)
+	{
+	}
+	
+	void jokercrd(machine_config& config);
+	
+private:
+	cpu_device* _maincpu {};
+	DECLARE_READ8_MEMBER(jokercrd_opcode_r);
+	
+	void jokercrd_opcodes_map(address_map& map);
+};
+
+READ8_MEMBER(jokercrd_state::jokercrd_opcode_r)
+{	
+	// even when errors could be lurking in the least used opcodes, 
+	// all of them in the [8050,b369) & [c000, f063) ranges are believed
+	// to be covered by these tables, with the exception of the one @c0f1:
+	
+	// 	c0da: a6 6a     ldx $6a
+	// 	c0dc: ad 5c 00  lda $005c
+	// 	c0df: 29 3f     and #$3f
+	// 	c0e1: 85 70     sta $70
+	// 	c0e3: 20 fa c0  jsr $c0fa
+	// 	c0e6: a5 70     lda $70
+	// 	c0e8: 9d 33 02  sta $0233, x
+	// 	c0eb: a2 00     ldx #$00
+	// 	c0ed: e4 6a     cpx $6a
+	// 	c0ef: f0 08     beq $c0f9
+	// 	c0f1: XX 33 02  nop #$33 #$02 [YYY $0233, x]
+	// 	c0f4: f0 e4     beq $c0da
+	// 	c0f6: e8        inx
+	// 	c0f7: 80 f4     bra $c0ed
+	// 	c0f9: 60        rts
+	// 	
+	// 	c0fa: ad 4b 07  lda $074b
+	// 	c0fd: 0d 4c 07  ora $074c
+	// 	c100: d0 01     bne $c103
+	// 	c102: 60        rts
+	// 	c103: a5 70     lda $70
+	// 	c105: 29 30     and #$30
+	// 	c107: 09 01     ora #$01
+	// 	c109: 85 70     sta $70
+	// 	c10b: 60        rts
+	
+	// it should be noted, however, that the subroutine @c0da seems to be called just from here:
+	// 	c044: 64 6a     stz $6a
+	// 	c046: 20 da c0  jsr $c0da
+	// and, if no interrupt is messing with the accesed data, the STZ @c044 should make the BEQ @c0ef
+	// become an inconditional jump, converting the opcode @c0f1 in dead code
+	
+	
+	constexpr uint8_t UNKN {0xfc};
+	
+	constexpr std::array<std::array<uint8_t,256>,4> decryption_tables
+	{
+		//_0    _1    _2    _3    _4    _5    _6    _7    _8    _9    _a    _b    _c    _d    _e    _f
+		UNKN, UNKN, UNKN, 0x3d, 0xe0, UNKN, UNKN, 0xb0, UNKN, 0xa0, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN,  // 0_
+		UNKN, UNKN, 0x4a, 0x65, 0x18, 0x64, 0xad, UNKN, 0x90, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN,  // 1_
+		UNKN, UNKN, 0x49, UNKN, 0xa8, 0x8c, 0x20, UNKN, UNKN, 0xf8, UNKN, UNKN, 0xe6, UNKN, 0x88, UNKN,  // 2_
+		UNKN, UNKN, UNKN, UNKN, 0xb2, UNKN, UNKN, UNKN, UNKN, 0x58, 0x38, 0x45, UNKN, UNKN, UNKN, UNKN,  // 3_
+		UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0xd5, 0xa5, 0xa9, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN,  // 4_
+		UNKN, UNKN, UNKN, UNKN, 0xda, 0xa2, UNKN, 0x4e, 0x1a, UNKN, 0xe4, UNKN, UNKN, UNKN, 0x0c, 0x98,  // 5_
+		0xa6, UNKN, UNKN, UNKN, 0x9c, 0xfa, UNKN, 0xbd, UNKN, 0xae, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN,  // 6_
+		UNKN, UNKN, 0xc0, 0xc5, UNKN, UNKN, UNKN, UNKN, UNKN, 0xcd, UNKN, UNKN, UNKN, 0x8a, UNKN, 0x80,  // 7_
+		UNKN, UNKN, 0x95, UNKN, UNKN, UNKN, UNKN, UNKN, 0x8e, UNKN, UNKN, UNKN, UNKN, 0x68, UNKN, UNKN,  // 8_
+		0xb1, UNKN, UNKN, UNKN, UNKN, 0xd0, 0x0d, 0xc9, UNKN, UNKN, UNKN, UNKN, 0x29, 0x3a, 0xc8, 0x8d,  // 9_
+		0xc6, 0xee, 0x25, UNKN, 0x05, 0x6e, UNKN, 0x2a, UNKN, 0x85, UNKN, UNKN, 0xd8, UNKN, 0xce, UNKN,  // a_
+		UNKN, UNKN, UNKN, 0xe9, 0xc4, 0xe8, UNKN, UNKN, 0x99, 0x6a, 0x0a, UNKN, 0x84, UNKN, UNKN, UNKN,  // b_
+		UNKN, UNKN, UNKN, 0x9d, 0x2d, 0x10, UNKN, UNKN, UNKN, UNKN, UNKN, 0xaa, UNKN, UNKN, 0x11, UNKN,  // c_
+		UNKN, 0xb9, 0x86, UNKN, 0xca, UNKN, UNKN, UNKN, UNKN, UNKN, 0x7a, UNKN, 0xf0, 0x09, 0x4c, UNKN,  // d_
+		0x60, 0x78, UNKN, UNKN, UNKN, 0x48, 0x5a, UNKN, UNKN, UNKN, 0x79, UNKN, UNKN, UNKN, UNKN, 0xba,  // e_
+		UNKN, UNKN, 0x6d, 0x92, UNKN, 0x26, UNKN, UNKN, 0xb5, UNKN, 0x69, UNKN, UNKN, 0xa4, UNKN, 0x1d,  // f_
+		
+		//_0    _1    _2    _3    _4    _5    _6    _7    _8    _9    _a    _b    _c    _d    _e    _f
+		UNKN, UNKN, UNKN, UNKN, 0x48, UNKN, UNKN, 0x0c, UNKN, 0x60, 0x6d, 0x20, 0xda, UNKN, 0xf0, UNKN,  // 0_
+		UNKN, 0xcd, 0x95, UNKN, UNKN, 0xae, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x8e, UNKN, 0x29, UNKN,  // 1_
+		0x90, UNKN, UNKN, UNKN, 0x69, 0xb5, UNKN, UNKN, UNKN, UNKN, 0xd0, 0xad, UNKN, UNKN, UNKN, 0x9a,  // 2_
+		0xb6, 0x40, UNKN, 0xd5, 0xfa, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0xa4, UNKN, 0x88, UNKN,  // 3_
+		UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x2a, UNKN, UNKN, UNKN, 0xa2, UNKN, UNKN, UNKN, UNKN, UNKN,  // 4_
+		0xee, UNKN, UNKN, UNKN, 0x64, UNKN, 0xb0, 0x9d, UNKN, UNKN, UNKN, 0x80, UNKN, 0xf8, 0xe8, UNKN,  // 5_
+		UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x91, UNKN, 0xb9, 0x8a, UNKN, UNKN, UNKN, 0x10, UNKN,  // 6_
+		0x4a, UNKN, UNKN, 0xc8, 0x9c, 0x4e, UNKN, UNKN, UNKN, UNKN, 0xb2, 0x85, 0x45, 0xc9, UNKN, UNKN,  // 7_
+		0x1a, UNKN, UNKN, 0xe9, UNKN, UNKN, UNKN, UNKN, UNKN, 0xca, UNKN, 0xc6, UNKN, 0xb1, UNKN, UNKN,  // 8_
+		0x1d, UNKN, 0xa8, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0xc5,  // 9_
+		0xe0, UNKN, 0xa0, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x30, UNKN, 0x0d, UNKN, 0x8d,  // a_
+		UNKN, 0x86, UNKN, UNKN, 0xd9, 0xbd, UNKN, UNKN, 0x05, 0xaa, UNKN, 0x38, UNKN, 0x18, 0xe4, UNKN,  // b_
+		UNKN, 0xa6, UNKN, 0xa5, 0xc0, 0x2d, UNKN, UNKN, UNKN, UNKN, UNKN, 0x4c, 0x84, UNKN, 0x6e, UNKN,  // c_
+		UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x19, 0x65, UNKN, UNKN, UNKN, 0xce, 0x7a, UNKN, 0x3a,  // d_
+		UNKN, 0x7d, UNKN, 0x0a, 0x49, UNKN, UNKN, UNKN, 0xe6, 0xd8, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN,  // e_
+		UNKN, UNKN, UNKN, UNKN, 0x09, 0xa9, 0x25, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x5a, UNKN, 0x68,  // f_
+		
+		//_0    _1    _2    _3    _4    _5    _6    _7    _8    _9    _a    _b    _c    _d    _e    _f
+		UNKN, 0x20, UNKN, UNKN, UNKN, 0x8e, UNKN, UNKN, UNKN, 0xb0, 0x85, 0x3d, UNKN, 0x86, UNKN, UNKN,  // 0_
+		0x18, UNKN, UNKN, UNKN, 0x8a, 0xad, 0x79, 0x98, UNKN, UNKN, 0xc0, UNKN, 0x30, UNKN, 0x10, UNKN,  // 1_
+		UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0xe4, UNKN, UNKN, UNKN, 0x29, UNKN, UNKN, UNKN, UNKN,  // 2_
+		0x9e, 0x6d, 0xa6, UNKN, 0xc9, 0x6e, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN,  // 3_
+		UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0xaa, UNKN, 0x9c, 0x09, UNKN, UNKN, UNKN, 0xfa, UNKN,  // 4_
+		UNKN, 0x69, UNKN, UNKN, 0x2d, UNKN, UNKN, UNKN, UNKN, UNKN, 0xc4, UNKN, 0x1a, 0x4c, 0x5a, UNKN,  // 5_
+		UNKN, UNKN, 0xe9, UNKN, 0xb1, UNKN, 0x0c, 0xee, 0xda, 0xb2, 0xce, UNKN, 0x74, UNKN, UNKN, UNKN,  // 6_
+		0x7d, 0x0d, 0x48, UNKN, UNKN, UNKN, 0xf8, 0xd8, UNKN, UNKN, 0x0a, UNKN, UNKN, 0x45, 0xc6, UNKN,  // 7_
+		UNKN, UNKN, UNKN, UNKN, UNKN, 0x26, UNKN, UNKN, UNKN, 0xc5, UNKN, UNKN, UNKN, 0xae, UNKN, UNKN,  // 8_
+		0xa9, UNKN, 0x90, 0x3a, UNKN, UNKN, 0x6c, UNKN, 0x64, UNKN, UNKN, 0xd5, UNKN, UNKN, UNKN, UNKN,  // 9_
+		UNKN, 0x7a, UNKN, 0x05, 0xa8, UNKN, UNKN, 0x60, UNKN, UNKN, 0xa4, 0x8d, 0x2a, UNKN, UNKN, UNKN,  // a_
+		UNKN, UNKN, UNKN, UNKN, 0xa0, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x92, 0x66,  // b_
+		UNKN, UNKN, 0xd0, 0xf0, UNKN, UNKN, 0x38, 0xbd, 0xa2, UNKN, 0xed, 0x9d, 0x80, UNKN, 0xa5, UNKN,  // c_
+		UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x99, UNKN, 0x88, UNKN, 0xcd, UNKN, 0xe8,  // d_
+		0xca, 0xb5, 0x49, 0x68, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0xe6, 0xe0, 0x4a, UNKN,  // e_
+		UNKN, UNKN, UNKN, 0xc8, UNKN, 0xb9, 0x91, UNKN, UNKN, UNKN, UNKN, 0x65, 0x95, UNKN, UNKN, UNKN,  // f_
+		
+		//_0    _1    _2    _3    _4    _5    _6    _7    _8    _9    _a    _b    _c    _d    _e    _f
+		0x65, UNKN, UNKN, UNKN, 0x30, UNKN, UNKN, UNKN, 0x8e, UNKN, UNKN, 0xda, 0x2d, 0xc4, UNKN, 0x68,  // 0_
+		UNKN, 0xa2, UNKN, UNKN, 0x2a, 0xa6, UNKN, UNKN, UNKN, 0x86, UNKN, UNKN, 0x60, UNKN, 0xe6, 0xa4,  // 1_
+		UNKN, 0x84, UNKN, UNKN, 0xbd, UNKN, UNKN, UNKN, UNKN, UNKN, 0xce, 0xe4, 0xf8, 0xa0, UNKN, 0x8d,  // 2_
+		UNKN, 0xcd, UNKN, UNKN, UNKN, 0x88, 0x4a, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN,  // 3_
+		0xd8, UNKN, UNKN, UNKN, 0x40, 0x11, UNKN, UNKN, 0xaa, 0x79, UNKN, 0x98, UNKN, 0x85, UNKN, UNKN,  // 4_
+		0x9a, 0xc6, UNKN, UNKN, 0x74, UNKN, UNKN, UNKN, UNKN, 0x95, 0xdd, UNKN, UNKN, 0x6d, UNKN, UNKN,  // 5_
+		0x8a, 0x6e, UNKN, UNKN, 0x18, 0xc5, UNKN, 0xf9, UNKN, 0xb0, 0x7a, UNKN, UNKN, UNKN, UNKN, 0xc0,  // 6_
+		0x99, UNKN, UNKN, 0x10, 0x90, 0x38, 0x09, UNKN, UNKN, UNKN, 0xe0, UNKN, UNKN, UNKN, UNKN, UNKN,  // 7_
+		UNKN, UNKN, UNKN, 0xb5, UNKN, 0x4c, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0xfa, UNKN, UNKN,  // 8_
+		UNKN, UNKN, 0x6a, 0x29, UNKN, UNKN, 0x5a, 0xae, UNKN, 0x3a, UNKN, 0x9c, UNKN, 0x0d, 0x49, 0xee,  // 9_
+		UNKN, UNKN, UNKN, UNKN, 0xa5, 0x69, 0xf0, UNKN, 0x80, UNKN, 0xc8, UNKN, UNKN, UNKN, 0xb9, UNKN,  // a_
+		0x1a, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x0c, UNKN, UNKN, UNKN, UNKN, UNKN,  // b_
+		UNKN, UNKN, UNKN, UNKN, 0x64, UNKN, UNKN, 0xb2, 0x9d, UNKN, UNKN, 0xca, UNKN, UNKN, 0x0a, 0x05,  // c_
+		UNKN, UNKN, UNKN, 0x91, UNKN, UNKN, UNKN, 0x92, UNKN, UNKN, UNKN, 0xed, UNKN, UNKN, UNKN, UNKN,  // d_
+		UNKN, 0xec, 0x20, UNKN, 0xad, 0xd0, UNKN, 0x3d, UNKN, 0xb1, 0x6c, 0x66, UNKN, 0x4e, UNKN, 0xd5,  // e_
+		0xe9, UNKN, UNKN, 0xa9, UNKN, UNKN, 0xe8, UNKN, UNKN, 0xc9, 0xa8, UNKN, UNKN, 0x48, UNKN, UNKN,  // f_
+	};
+	
+	uint8_t data {_maincpu->space(AS_PROGRAM).read_byte(offset)};
+	return decryption_tables[offset&3][data];
+}
+
+void jokercrd_state::jokercrd_opcodes_map(address_map &map)
+{
+	map(0x8000, 0xffff).r(FUNC(jokercrd_state::jokercrd_opcode_r));
+}
+
+void jokercrd_state::jokercrd(machine_config &config)
+{
+	fw2ndpal(config);
+	
+	_maincpu = reinterpret_cast<cpu_device*>(config.device("maincpu"));
+	_maincpu->set_addrmap(AS_OPCODES, &jokercrd_state::jokercrd_opcodes_map);
+}
+
+
+ 
 /*************************
 *        Rom Load        *
 *************************/
@@ -6719,75 +7264,6 @@ void funworld_state::init_saloon()
 	m_palette->update();
 }
 
-
-void funworld_state::init_multiwin()
-/*****************************************************
-
-  This only decrypt the text strings.
-  Need more work to get the opcodes properly decrypted
-
-******************************************************/
-{
-	uint8_t *ROM = memregion("maincpu")->base();
-	for (int x = 0x8000; x < 0x10000; x++)
-	{
-		ROM[x] = ROM[x] ^ 0x91;
-		ROM[x] = bitswap<8>(ROM[x],5,6,7,2,3,0,1,4);
-
-		uint8_t code = ROM[x];
-
-		/* decrypt code here */
-		ROM[x+0x10000] = code;
-	}
-}
-
-
-void funworld_state::init_royalcdc()
-{
-/*****************************************************
-
-  This only decrypt the text strings.
-  The opcode encryption seems to be conditional, and
-  bits of the XOR (and bitswap?) can be turned on and
-  off, possibly depending on the address
-
-******************************************************/
-
-	uint8_t *ROM = memregion("maincpu")->base();
-	for (int x = 0x8000; x < 0x10000; x++)
-	{
-		ROM[x] = ROM[x] ^ 0x22;
-		// this seems correct for the data, plaintext decrypts fine
-		ROM[x] = bitswap<8>(ROM[x],2,6,7,4,3,1,5,0);
-
-		// the code uses different encryption, there are conflicts here
-		// so it's probably address based
-		uint8_t code = ROM[x];
-		if      (code==0x12) code = 0x10; // ^0x02
-		else if (code==0x1a) code = 0x18; // ^0x02
-		else if (code==0x20) code = 0xa2; // ^0x82
-		else if (code==0x26) code = 0xa2; // ^0x84
-		else if (code==0x39) code = 0xbd; // ^0x84
-		else if (code==0x5a) code = 0x58; // ^0x02
-		else if (code==0x5c) code = 0xd8; // ^0x84
-		else if (code==0x84) code = 0xa2; // ^0x26
-		else if (code==0x8f) code = 0xa9; // ^0x26
-		else if (code==0xaf) code = 0xa9; // ^0x06
-		else if (code==0xa2) code = 0x80; // ^0x22
-		else if (code==0xa3) code = 0x85; // ^0x26
-		else if (code==0xa8) code = 0x8e; // ^0x26
-		else if (code==0xa9) code = 0x8d; // ^0x24
-		else if (code==0xbb) code = 0xbd; // ^0x06
-		else if (code==0xc8) code = 0xca; // ^0x02
-		else if (code==0xc6) code = 0xe0; // ^0x26
-		else if (code==0xce) code = 0xe8; // ^0x26
-		else if (code==0xf4) code = 0xd0; // ^0x24
-
-		ROM[x+0x10000] = code;
-	}
-}
-
-
 void funworld_state::init_dino4()
 /*****************************************************
 
@@ -7239,7 +7715,7 @@ GAMEL( 1991, royalcrdc, royalcrd, royalcd2, royalcrd,  funworld_state, empty_ini
 GAMEL( 1991, royalcrdd, royalcrd, royalcd1, royalcrd,  funworld_state, empty_init,    ROT0, "TAB Austria",     "Royal Card (Austrian, set 5)",                    0,                       layout_royalcrd )
 GAMEL( 1991, royalcrde, royalcrd, royalcd1, royalcrd,  funworld_state, empty_init,    ROT0, "TAB Austria",     "Royal Card (Austrian, set 6)",                    0,                       layout_jollycrd )
 GAMEL( 1991, royalcrdt, royalcrd, royalcd1, royalcrd,  funworld_state, empty_init,    ROT0, "TAB Austria",     "Royal Card (TAB original)",                       0,                       layout_jollycrd )
-GAME(  1991, royalcrdf, royalcrd, royalcd1, royalcrd,  funworld_state, init_royalcdc, ROT0, "Evona Electronic","Royal Card (Slovak, encrypted)",                  MACHINE_NOT_WORKING )
+GAME(  1991, royalcrdf, royalcrd, royalcrdf,royalcrd,  royalcrdf_state,driver_init,   ROT0, "Evona Electronic","Royal Card (Slovak, encrypted)",                  MACHINE_NOT_WORKING )
 GAMEL( 1990, royalcrdg, royalcrd, royalcd1, royalcrd,  funworld_state, empty_init,    ROT0, "bootleg",         "Royal Card (Austrian, set 7, CMC C1030 HW)",      0,                       layout_jollycrd ) // big CPLD
 GAMEL( 1991, royalcrdh, royalcrd, royalcd2, royalcrd,  funworld_state, empty_init,    ROT0, "TAB Austria",     "Royal Card (Austrian, set 8)",                    0,                       layout_jollycrd )
 GAMEL( 1991, royalcdfr, royalcrd, royalcd1, royalcrd,  funworld_state, empty_init,    ROT0, "TAB Austria",     "Royal Card (French)",                             0,                       layout_jollycrd )
@@ -7270,10 +7746,10 @@ GAMEL( 198?, jolyjokrb, jolyjokr, fw1stpal, funworld,  funworld_state, empty_ini
 GAMEL( 198?, jolyjokrc, jolyjokr, fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "Apple Time",      "Jolly Joker (Apple Time)",                        MACHINE_NOT_WORKING,     layout_jollycrd ) // bad program ROM...
 
 // Encrypted games...
-GAME(  1992, multiwin,  0,        fw1stpal, funworld,  funworld_state, init_multiwin, ROT0, "Fun World",       "Multi Win (Ver.0167, encrypted)",                 MACHINE_NOT_WORKING )
-GAME(  1993, powercrd,  0,        fw2ndpal, funworld,  funworld_state, empty_init,    ROT0, "Fun World",       "Power Card (Ver 0263, encrypted)",                MACHINE_NOT_WORKING )                      // clone of Bonus Card.
-GAME(  1993, megacard,  0,        fw2ndpal, funworld,  funworld_state, empty_init,    ROT0, "Fun World",       "Mega Card (Ver.0210, encrypted)",                 MACHINE_NOT_WORKING )
-GAME(  1993, jokercrd,  0,        fw2ndpal, funworld,  funworld_state, empty_init,    ROT0, "Vesely Svet",     "Joker Card (Ver.A267BC, encrypted)",              MACHINE_NOT_WORKING )
+GAME(  1992, multiwin,  0,        multiwin, funworld,  multiwin_state, driver_init,   ROT0, "Fun World",       "Multi Win (Ver.0167, encrypted)",                 MACHINE_NOT_WORKING)
+GAME(  1993, powercrd,  0,        powercrd, funworld,  powercrd_state, empty_init,    ROT0, "Fun World",       "Power Card (Ver 0263, encrypted)",                MACHINE_NOT_WORKING )                      // clone of Bonus Card.
+GAME(  1993, megacard,  0,        megacard, funworld,  megacard_state, empty_init,    ROT0, "Fun World",       "Mega Card (Ver.0210, encrypted)",                 MACHINE_NOT_WORKING )
+GAME(  1993, jokercrd,  0,        jokercrd, funworld,  jokercrd_state, empty_init,    ROT0, "Vesely Svet",     "Joker Card (Ver.A267BC, encrypted)",              MACHINE_NOT_WORKING )
 GAME(  198?, saloon,    0,        saloon,   saloon,    funworld_state, init_saloon,   ROT0, "<unknown>",       "Saloon (French, encrypted)",                      MACHINE_NOT_WORKING )
 
 // Encrypted TAB blue PCB...
