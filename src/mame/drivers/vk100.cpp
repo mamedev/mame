@@ -1031,16 +1031,17 @@ MC6845_UPDATE_ROW( vk100_state::crtc_update_row )
 }
 
 
-MACHINE_CONFIG_START(vk100_state::vk100)
+void vk100_state::vk100(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(5'068'800))
-	MCFG_DEVICE_PROGRAM_MAP(vk100_mem)
-	MCFG_DEVICE_IO_MAP(vk100_io)
+	I8085A(config, m_maincpu, XTAL(5'068'800));
+	m_maincpu->set_addrmap(AS_PROGRAM, &vk100_state::vk100_mem);
+	m_maincpu->set_addrmap(AS_IO, &vk100_state::vk100_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(45'619'200)/3, 882, 0, 720, 370, 0, 350 ) // fake screen timings for startup until 6845 sets real ones
-	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(45'619'200)/3, 882, 0, 720, 370, 0, 350 ); // fake screen timings for startup until 6845 sets real ones
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	H46505(config, m_crtc, 45.6192_MHz_XTAL/3/12);
 	m_crtc->set_screen("screen");
@@ -1069,7 +1070,7 @@ MACHINE_CONFIG_START(vk100_state::vk100)
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_speaker, 116).add_route(ALL_OUTPUTS, "mono", 0.25); // 116 hz (page 172 of TM), but duty cycle is wrong here!
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 /* according to http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf

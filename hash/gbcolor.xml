@@ -18312,7 +18312,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<description>San Francisco Rush 2049 (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="CGB-ASXE-USA, CGB-ASXP-EUU"/>
+		<info name="serial" value="CGB-ASXE-USA, CGB-ASXP-EUU, CGB-ASXP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A07-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
@@ -20153,7 +20153,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<description>Sylvester and Tweety - Breakfast on the Run (Euro)</description>
 		<year>1998</year>
 		<publisher>Infogrames</publisher>
-		<info name="serial" value="DMG-AYRP-(NOE/UKV)"/>
+		<info name="serial" value="DMG-AYRP-NOE, DMG-AYRP-UKV, DMG-AYRP-EUR)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">

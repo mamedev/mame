@@ -448,10 +448,10 @@ void fuuki16_state::machine_reset()
 void fuuki16_state::fuuki16(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(32'000'000) / 2);	/* 16 MHz */
+	M68000(config, m_maincpu, XTAL(32'000'000) / 2);    /* 16 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &fuuki16_state::fuuki16_map);
 
-	Z80(config, m_audiocpu, XTAL(12'000'000) / 2);		/* 6 MHz */
+	Z80(config, m_audiocpu, XTAL(12'000'000) / 2);      /* 6 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fuuki16_state::fuuki16_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &fuuki16_state::fuuki16_sound_io_map);
 

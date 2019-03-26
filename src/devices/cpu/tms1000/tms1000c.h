@@ -23,7 +23,6 @@ protected:
 	// overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual u32 decode_micro(u8 sel) override;
-	virtual void execute_run() override;
 
 	virtual void op_br() override { op_br3(); } // 3-level stack
 	virtual void op_call() override { op_call3(); } // "

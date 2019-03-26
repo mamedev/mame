@@ -21,20 +21,20 @@ void msx_audio_kbdc_port_device::device_start()
 }
 
 
-WRITE8_MEMBER(msx_audio_kbdc_port_device::write)
+void msx_audio_kbdc_port_device::write(uint8_t data)
 {
 	if (m_keyboard)
 	{
-		m_keyboard->write(space, offset, data);
+		m_keyboard->write(data);
 	}
 }
 
 
-READ8_MEMBER(msx_audio_kbdc_port_device::read)
+uint8_t msx_audio_kbdc_port_device::read()
 {
 	if (m_keyboard)
 	{
-		return m_keyboard->read(space, offset);
+		return m_keyboard->read();
 	}
 	return 0xff;
 }
@@ -57,7 +57,7 @@ public:
 
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual DECLARE_READ8_MEMBER(read) override
+	virtual uint8_t read() override
 	{
 		uint8_t result = 0xff;
 
@@ -71,7 +71,7 @@ public:
 		return result;
 	}
 
-	virtual DECLARE_WRITE8_MEMBER(write) override
+	virtual void write(uint8_t data) override
 	{
 		m_row = data;
 	}
@@ -187,7 +187,7 @@ public:
 
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual DECLARE_READ8_MEMBER(read) override
+	virtual uint8_t read() override
 	{
 		uint8_t result = 0xff;
 
@@ -201,7 +201,7 @@ public:
 		return result;
 	}
 
-	virtual DECLARE_WRITE8_MEMBER(write) override
+	virtual void write(uint8_t data) override
 	{
 		logerror("msx_nms1160::write %02x\n", data);
 		m_row = data;

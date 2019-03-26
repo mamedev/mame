@@ -177,7 +177,7 @@ READ8_MEMBER(radio86_state::radio86rom_romdisk_porta_r)
 {
 	uint16_t addr = (m_romdisk_msb << 8) | m_romdisk_lsb;
 	if (m_cart->exists() && addr < m_cart->get_rom_size())
-		return m_cart->read_rom(space, addr);
+		return m_cart->read_rom(addr);
 	else
 		return 0xff;
 }

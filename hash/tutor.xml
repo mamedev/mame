@@ -88,7 +88,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<info name="serial" value="021E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="0x4000">
-		<rom name="Yonnin Majan.bin" size="0x4000" crc="1c2eb2f0" sha1="4e9a0ce55f479c4b1a5fee9320561ce93765c4d7" offset="0" /> <!-- needs splitting into 2 files? there are 2 roms, marked 1 and 2 in the cart?? -->
+				<rom name="Yonnin Majan.bin" size="0x4000" crc="1c2eb2f0" sha1="4e9a0ce55f479c4b1a5fee9320561ce93765c4d7" offset="0" /> <!-- needs splitting into 2 files? there are 2 roms, marked 1 and 2 in the cart?? -->
 			</dataarea>
 		</part>
 	</software>

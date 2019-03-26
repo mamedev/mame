@@ -222,6 +222,7 @@ DEFINE_DEVICE_TYPE(BUS_MASTER_IDE_CONTROLLER, bus_master_ide_controller_device, 
 
 bus_master_ide_controller_device::bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ide_controller_32_device(mconfig, BUS_MASTER_IDE_CONTROLLER, tag, owner, clock),
+	m_dma_space(*this, finder_base::DUMMY_TAG, -1, 32),
 	m_dma_address(0),
 	m_dma_bytes_left(0),
 	m_dma_descriptor(0),
@@ -239,17 +240,7 @@ void bus_master_ide_controller_device::device_start()
 	ide_controller_32_device::device_start();
 
 	/* find the bus master space */
-	if (m_bmcpu != nullptr)
-	{
-		device_t *bmtarget = machine().device(m_bmcpu);
-		if (bmtarget == nullptr)
-			throw emu_fatalerror("IDE controller '%s' bus master target '%s' doesn't exist!", tag(), m_bmcpu);
-		device_memory_interface *memory;
-		if (!bmtarget->interface(memory))
-			throw emu_fatalerror("IDE controller '%s' bus master target '%s' has no memory!", tag(), m_bmcpu);
-		m_dma_space = &memory->space(m_bmspace);
-		m_dma_address_xor = (m_dma_space->endianness() == ENDIANNESS_LITTLE) ? 0 : 3;
-	}
+	m_dma_address_xor = (m_dma_space->endianness() == ENDIANNESS_LITTLE) ? 0 : 3;
 
 	save_item(NAME(m_dma_address));
 	save_item(NAME(m_dma_bytes_left));

@@ -165,8 +165,8 @@ public:
 		set_interrupt_callback(int_cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
 	}
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( sid_w ); // pin 24
 	void serin_ready(int after);
@@ -264,7 +264,7 @@ private:
 
 	static constexpr int POKEY_CHANNELS = 4;
 
-	uint32_t step_one_clock();
+	void step_one_clock();
 	void step_keyboard();
 	void step_pot();
 
@@ -284,10 +284,11 @@ private:
 
 	pokey_channel m_channel[POKEY_CHANNELS];
 
-	uint32_t m_output;        /* raw output */
-	double m_out_filter;    /* filtered output */
+	uint32_t m_out_raw;         /* raw output */
+	bool m_old_raw_inval;       /* true: recalc m_out_raw required */
+	double m_out_filter;        /* filtered output */
 
-	int32_t m_clock_cnt[3];       /* clock counters */
+	int32_t m_clock_cnt[3];     /* clock counters */
 	uint32_t m_p4;              /* poly4 index */
 	uint32_t m_p5;              /* poly5 index */
 	uint32_t m_p9;              /* poly9 index */

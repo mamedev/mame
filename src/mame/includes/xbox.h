@@ -84,6 +84,8 @@ public:
 		debug_irq_active(false),
 		debug_irq_number(0),
 		m_maincpu(*this, "maincpu"),
+		mcpxlpc(*this, ":pci:01.0"),
+		ide(*this, ":pci:09.0:ide"),
 		debugc_bios(nullptr) { }
 
 	void xbox_base(machine_config &config);
@@ -105,20 +107,13 @@ protected:
 	uint32_t screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
-	DECLARE_WRITE_LINE_MEMBER(xbox_pic8259_1_set_int_line);
-	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_WRITE_LINE_MEMBER(xbox_pit8254_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(xbox_pit8254_out2_changed);
-	DECLARE_WRITE_LINE_MEMBER(xbox_ohci_usb_interrupt_changed);
-	DECLARE_WRITE_LINE_MEMBER(xbox_smbus_interrupt_changed);
-	DECLARE_WRITE_LINE_MEMBER(xbox_nv2a_interrupt_changed);
+	DECLARE_WRITE_LINE_MEMBER(maincpu_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(ohci_usb_interrupt_changed);
+	DECLARE_WRITE_LINE_MEMBER(smbus_interrupt_changed);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt_changed);
+	DECLARE_WRITE_LINE_MEMBER(nv2a_interrupt_changed);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	struct xbox_devices {
-		pic8259_device    *pic8259_1;
-		pic8259_device    *pic8259_2;
-		bus_master_ide_controller_device    *ide;
-	} xbox_base_devs;
 	struct superio_state
 	{
 		bool configuration_mode;
@@ -130,6 +125,8 @@ protected:
 	bool debug_irq_active;
 	int debug_irq_number;
 	required_device<cpu_device> m_maincpu;
+	required_device<mcpx_isalpc_device> mcpxlpc;
+	required_device<bus_master_ide_controller_device> ide;
 	static const struct debugger_constants
 	{
 		uint32_t id;

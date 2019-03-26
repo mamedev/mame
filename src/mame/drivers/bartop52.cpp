@@ -118,7 +118,7 @@ void bartop52_state::machine_reset()
 {
 	atari_common_state::machine_reset();
 
-	m_pokey->write(machine().dummy_space(), 15, 0);
+	m_pokey->write(15, 0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( bartop52_state::bartop_interrupt )

@@ -276,9 +276,9 @@ void vsnes_state::vsnes_bootleg_z80_map(address_map &map)
 	map(0x6001, 0x6001).r(FUNC(vsnes_state::vsnes_bootleg_z80_address_r)); // ^
 
 
-	map(0x60FA, 0x60FA).w("sn1", FUNC(sn76489_device::command_w));
-	map(0x60F9, 0x60F9).w("sn2", FUNC(sn76489_device::command_w));
-	map(0x60FF, 0x60FF).w("sn3", FUNC(sn76489_device::command_w));
+	map(0x60FA, 0x60FA).w("sn1", FUNC(sn76489_device::write));
+	map(0x60F9, 0x60F9).w("sn2", FUNC(sn76489_device::write));
+	map(0x60FF, 0x60FF).w("sn3", FUNC(sn76489_device::write));
 
 }
 

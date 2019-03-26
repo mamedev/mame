@@ -3053,9 +3053,9 @@ uint8_t m2_te_device::alu_calc(uint16_t a, uint16_t b)
 			switch (j)
 			{
 				case 0: cinv |= (cntl & 1);         break;
-				case 1: cinv |= (cntl & 2) && 1;    break;
-				case 2: cinv |= (cntl & 4) && 1;    break;
-				case 3: cinv |= (cntl & 8) && 1;    break;
+				case 1: cinv |= ((cntl & 2) != 0);  break;
+				case 2: cinv |= ((cntl & 4) != 0);  break;
+				case 3: cinv |= ((cntl & 8) != 0);  break;
 			}
 
 			cinv <<= 1;

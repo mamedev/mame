@@ -840,12 +840,12 @@ READ16_MEMBER(itech8_state::rom_constant_r)
 
 READ8_MEMBER(itech8_state::ninclown_palette_r)
 {
-	return m_tlc34076->read(space, offset / 16);
+	return m_tlc34076->read(offset / 16);
 }
 
 WRITE8_MEMBER(itech8_state::ninclown_palette_w)
 {
-	m_tlc34076->write(space, offset / 16, data);
+	m_tlc34076->write(offset / 16, data);
 }
 
 

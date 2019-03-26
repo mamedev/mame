@@ -1200,7 +1200,7 @@ GFXDECODE_END
 void legionna_state::legionna(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 20000000/2);  /* ??? */
+	M68000(config, m_maincpu, 20_MHz_XTAL / 2);  /* ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &legionna_state::legionna_map);
 	m_maincpu->set_vblank_int("screen", FUNC(legionna_state::irq4_line_hold)); /* VBL */
 
@@ -1239,7 +1239,7 @@ void legionna_state::legionna(machine_config &config)
 	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, m_oki, 1320000, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
@@ -1253,7 +1253,7 @@ void legionna_state::legionna(machine_config &config)
 void legionna_state::heatbrl(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 20000000/2);  /* ??? */
+	M68000(config, m_maincpu, 20_MHz_XTAL / 2);  /* ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &legionna_state::heatbrl_map);
 	m_maincpu->set_vblank_int("screen", FUNC(legionna_state::irq4_line_hold)); /* VBL */
 
@@ -1292,7 +1292,7 @@ void legionna_state::heatbrl(machine_config &config)
 	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, m_oki, 1320000, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
@@ -1306,7 +1306,7 @@ void legionna_state::heatbrl(machine_config &config)
 void legionna_state::godzilla(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 20000000/2);
+	M68000(config, m_maincpu, 20_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &legionna_state::godzilla_map);
 	m_maincpu->set_vblank_int("screen", FUNC(legionna_state::irq4_line_hold));
 
@@ -1349,7 +1349,7 @@ void legionna_state::godzilla(machine_config &config)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	OKIM6295(config, m_oki, 1320000, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
@@ -1363,7 +1363,7 @@ void legionna_state::godzilla(machine_config &config)
 void legionna_state::denjinmk(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 20000000/2);
+	M68000(config, m_maincpu, 20_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &legionna_state::denjinmk_map);
 	m_maincpu->set_vblank_int("screen", FUNC(legionna_state::irq4_line_hold));
 
@@ -1379,7 +1379,7 @@ void legionna_state::denjinmk(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_size(42*8, 36*8);
-	screen.set_refresh_hz(61);
+	screen.set_refresh_hz(56); // <= 56 FPS, Value from doc
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_visarea(0*8, 40*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(legionna_state::screen_update_godzilla));
@@ -1403,7 +1403,7 @@ void legionna_state::denjinmk(machine_config &config)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	OKIM6295(config, m_oki, 1320000, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
@@ -1417,7 +1417,7 @@ void legionna_state::denjinmk(machine_config &config)
 void legionna_state::grainbow(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 20000000/2);
+	M68000(config, m_maincpu, 20_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &legionna_state::grainbow_map);
 	m_maincpu->set_vblank_int("screen", FUNC(legionna_state::irq4_line_hold));
 
@@ -1457,7 +1457,7 @@ void legionna_state::grainbow(machine_config &config)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	OKIM6295(config, m_oki, 1320000, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
@@ -1471,7 +1471,7 @@ void legionna_state::grainbow(machine_config &config)
 void legionna_state::cupsoc(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 20000000/2);
+	M68000(config, m_maincpu, 20_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &legionna_state::cupsoc_map);
 	m_maincpu->set_vblank_int("screen", FUNC(legionna_state::irq4_line_hold)); /* VBL */
 
@@ -1510,7 +1510,7 @@ void legionna_state::cupsoc(machine_config &config)
 	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, m_oki, 1320000, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);

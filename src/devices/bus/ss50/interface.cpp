@@ -139,22 +139,22 @@ void ss50_interface_port_device::device_start()
 //  read - interface read access (pre-decoded)
 //-------------------------------------------------
 
-READ8_MEMBER(ss50_interface_port_device::read)
+u8 ss50_interface_port_device::read(offs_t offset)
 {
 	if (m_card == nullptr)
 	{
 		logerror("%s: Read from unspecified interface (RS = %X)\n", machine().describe_context(), offset);
-		return space.unmap();
+		return 0xff;
 	}
 
-	return m_card->register_read(space, offset);
+	return m_card->register_read(offset);
 }
 
 //-------------------------------------------------
 //  write - interface write access (pre-decoded)
 //-------------------------------------------------
 
-WRITE8_MEMBER(ss50_interface_port_device::write)
+void ss50_interface_port_device::write(offs_t offset, u8 data)
 {
 	if (m_card == nullptr)
 	{
@@ -162,7 +162,7 @@ WRITE8_MEMBER(ss50_interface_port_device::write)
 		return;
 	}
 
-	m_card->register_write(space, offset, data);
+	m_card->register_write(offset, data);
 }
 
 //-------------------------------------------------

@@ -109,8 +109,8 @@ c0   8 data bits, Rx disabled
 #define DAC_TAG "macdac"
 #define SCC_TAG "scc"
 
-#define C7M (7833600)
-#define C3_7M (3916800)
+#define C7M (15.6672_MHz_XTAL / 2)
+#define C3_7M (15.6672_MHz_XTAL / 4).value()
 
 // uncomment to run i8021 keyboard in original Mac/512(e)/Plus
 //#define MAC_USE_EMULATED_KBD (1)
@@ -1350,7 +1350,7 @@ void mac128_state::mac512ke(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(C7M*2, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
+	m_screen->set_raw(15.6672_MHz_XTAL, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
 	m_screen->set_screen_update(FUNC(mac128_state::screen_update_mac));
 	m_screen->set_palette("palette");
 
@@ -1362,7 +1362,6 @@ void mac128_state::mac512ke(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_PWM(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 2 x ls161
 	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref"));
-	vreg.set_output(5.0);
 	vreg.add_route(0, DAC_TAG, 1.0, DAC_VREF_POS_INPUT);
 	vreg.add_route(0, DAC_TAG, -1.0, DAC_VREF_NEG_INPUT);
 

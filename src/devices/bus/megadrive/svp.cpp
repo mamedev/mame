@@ -347,11 +347,12 @@ void md_rom_svp_device::md_svp_ext_map(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(md_rom_svp_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
-	MCFG_DEVICE_PROGRAM_MAP(md_svp_ssp_map)
-	MCFG_DEVICE_IO_MAP(md_svp_ext_map)
-MACHINE_CONFIG_END
+void md_rom_svp_device::device_add_mconfig(machine_config &config)
+{
+	SSP1601(config, m_svp, MASTER_CLOCK_NTSC / 7 * 3); /* ~23 MHz (guessed) */
+	m_svp->set_addrmap(AS_PROGRAM, &md_rom_svp_device::md_svp_ssp_map);
+	m_svp->set_addrmap(AS_IO, &md_rom_svp_device::md_svp_ext_map);
+}
 
 ioport_constructor md_rom_svp_device::device_input_ports() const
 {

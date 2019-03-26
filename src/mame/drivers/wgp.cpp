@@ -915,14 +915,14 @@ void wgp_state::machine_start()
 void wgp_state::wgp(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);	/* 12 MHz ??? */
+	M68000(config, m_maincpu, 12000000);    /* 12 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &wgp_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(wgp_state::irq4_line_hold));
 
-	Z80(config, m_audiocpu, 16000000/4);	/* 4 MHz ??? */
+	Z80(config, m_audiocpu, 16000000/4);    /* 4 MHz ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &wgp_state::z80_sound_map);
 
-	M68000(config, m_subcpu, 12000000);		/* 12 MHz ??? */
+	M68000(config, m_subcpu, 12000000);     /* 12 MHz ??? */
 	m_subcpu->set_addrmap(AS_PROGRAM, &wgp_state::cpu2_map);
 	m_subcpu->set_vblank_int("screen", FUNC(wgp_state::cpub_interrupt));
 

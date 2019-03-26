@@ -42,8 +42,8 @@ protected:
 	virtual void device_start() override;
 
 	// interface-specific overrides
-	virtual DECLARE_READ8_MEMBER(register_read) override;
-	virtual DECLARE_WRITE8_MEMBER(register_write) override;
+	virtual u8 register_read(offs_t offset) override;
+	virtual void register_write(offs_t offset, u8 data) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(f110_w) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(f300_w) override;
 
@@ -100,7 +100,8 @@ DEVICE_INPUT_DEFAULTS_END
 //  machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ss50_mpc_device::device_add_mconfig)
+void ss50_mpc_device::device_add_mconfig(machine_config &config)
+{
 	PIA6821(config, m_pia, 0); // actually MC6820
 	m_pia->writepa_handler().set("outgate", FUNC(input_merger_device::in_w<0>)).bit(0);
 	m_pia->cb2_handler().set(FUNC(ss50_mpc_device::reader_control_w));
@@ -115,15 +116,13 @@ MACHINE_CONFIG_START(ss50_mpc_device::device_add_mconfig)
 	rs232.rxd_handler().set(FUNC(ss50_mpc_device::serial_input_w));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	MCFG_INPUT_MERGER_ALL_HIGH("outgate")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	INPUT_MERGER_ALL_HIGH(config, "outgate").output_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("loopback")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("outgate", input_merger_device, in_w<1>))
+	INPUT_MERGER_ANY_HIGH(config, m_loopback).output_handler().set("outgate", FUNC(input_merger_device::in_w<1>));
 
 	RIPPLE_COUNTER(config, m_counter); // CD4024AE (IC3)
 	m_counter->set_stages(7); // only Q5 (÷32) and Q4 (÷16) are actually used
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
@@ -162,18 +161,18 @@ WRITE_LINE_MEMBER(ss50_mpc_device::count_select_w)
 //  register_read - read from a port register
 //-------------------------------------------------
 
-READ8_MEMBER(ss50_mpc_device::register_read)
+u8 ss50_mpc_device::register_read(offs_t offset)
 {
-	return m_pia->read(space, offset & 3, 0);
+	return m_pia->read(offset & 3);
 }
 
 //-------------------------------------------------
 //  register_write - write to a port register
 //-------------------------------------------------
 
-WRITE8_MEMBER(ss50_mpc_device::register_write)
+void ss50_mpc_device::register_write(offs_t offset, u8 data)
 {
-	m_pia->write(space, offset & 3, data);
+	m_pia->write(offset & 3, data);
 }
 
 WRITE_LINE_MEMBER(ss50_mpc_device::f110_w)

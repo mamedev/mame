@@ -9,7 +9,7 @@
 #ifndef NLD_SYSTEM_H_
 #define NLD_SYSTEM_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 // -----------------------------------------------------------------------------
 // Macros

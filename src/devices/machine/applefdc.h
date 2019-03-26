@@ -124,6 +124,12 @@ private:
 class applefdc_device : public applefdc_base_device
 {
 public:
+	applefdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const applefdc_interface *intrf)
+		: applefdc_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_config(intrf);
+	}
+
 	applefdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
@@ -144,31 +150,5 @@ public:
 
 	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
-
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_APPLEFDC_CONFIG(_intrf) \
-	downcast<applefdc_base_device &>(*device).set_config(&(_intrf));
-
-#define MCFG_APPLEFDC_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, APPLEFDC, 0) \
-	MCFG_APPLEFDC_CONFIG(_intrf)
-
-#define MCFG_APPLEFDC_MODIFY(_tag, _intrf) \
-	MCFG_DEVICE_MODIFY(_tag)          \
-	MCFG_APPLEFDC_CONFIG(_intrf)
-
-#define MCFG_IWM_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, IWM, 0) \
-	MCFG_APPLEFDC_CONFIG(_intrf)
-
-#define MCFG_IWM_MODIFY(_tag, _intrf) \
-	MCFG_DEVICE_MODIFY(_tag)          \
-	MCFG_APPLEFDC_CONFIG(_intrf)
-
 
 #endif // MAME_MACHINE_APPLEFDC_H

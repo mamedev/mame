@@ -16,7 +16,7 @@ public:
 	// construction/destruction
 	nes_agci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -34,7 +34,7 @@ public:
 	// construction/destruction
 	nes_dreamtech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_l) override;
+	virtual void write_l(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -52,10 +52,10 @@ public:
 	// construction/destruction
 	nes_fukutake_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_l) override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual uint8_t read_l(offs_t offset) override;
+	virtual uint8_t read_m(offs_t offset) override;
+	virtual void write_l(offs_t offset, uint8_t data) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -77,7 +77,7 @@ public:
 	// construction/destruction
 	nes_futuremedia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;
@@ -101,7 +101,7 @@ public:
 	// construction/destruction
 	nes_magseries_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -119,7 +119,7 @@ public:
 	// construction/destruction
 	nes_daou306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -140,7 +140,7 @@ public:
 	// construction/destruction
 	nes_cc21_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -158,7 +158,7 @@ public:
 	// construction/destruction
 	nes_xiaozy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_l) override;
+	virtual void write_l(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -176,9 +176,9 @@ public:
 	// construction/destruction
 	nes_edu2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual uint8_t read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -199,7 +199,7 @@ public:
 	// construction/destruction
 	nes_t230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;
@@ -225,7 +225,7 @@ public:
 	// construction/destruction
 	nes_mk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
 
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;
@@ -249,7 +249,7 @@ public:
 	// construction/destruction
 	nes_whero_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;
@@ -276,8 +276,8 @@ public:
 	// construction/destruction
 	nes_43272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual uint8_t read_h(offs_t offset) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -298,7 +298,7 @@ public:
 	// construction/destruction
 	nes_tf1201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;
@@ -325,7 +325,7 @@ public:
 	// construction/destruction
 	nes_cityfight_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -359,8 +359,8 @@ public:
 	// construction/destruction
 	nes_fujiya_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(read_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual uint8_t read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 

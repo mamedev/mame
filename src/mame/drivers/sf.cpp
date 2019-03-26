@@ -530,32 +530,31 @@ void sf_state::machine_reset()
 	m_fgscroll = 0;
 }
 
-MACHINE_CONFIG_START(sf_state::sfan)
-
+void sf_state::sfan(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(sfan_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sf_state, irq1_line_hold)
+	M68000(config, m_maincpu, XTAL(8'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sf_state::sfan_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sf_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))  /* ? xtal is 3.579545MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545));   /* ? xtal is 3.579545MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sf_state::sound_map);
 
-	MCFG_DEVICE_ADD("audio2", Z80, XTAL(3'579'545))    /* ? xtal is 3.579545MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound2_map)
-	MCFG_DEVICE_IO_MAP(sound2_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(sf_state, irq0_line_hold, 8000) // ?
+	z80_device &audio2(Z80(config, "audio2", XTAL(3'579'545))); /* ? xtal is 3.579545MHz */
+	audio2.set_addrmap(AS_PROGRAM, &sf_state::sound2_map);
+	audio2.set_addrmap(AS_IO, &sf_state::sound2_io_map);
+	audio2.set_periodic_int(FUNC(sf_state::irq0_line_hold), attotime::from_hz(8000)); // ?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(sf_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(sf_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sf)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sf);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 1024);
 
 	/* sound hardware */
@@ -569,43 +568,34 @@ MACHINE_CONFIG_START(sf_state::sfan)
 	ymsnd.add_route(0, "lspeaker", 0.60);
 	ymsnd.add_route(1, "rspeaker", 0.60);
 
-	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* 8KHz playback ?    */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MSM5205(config, m_msm[0], 384000);
+	m_msm[0]->set_prescaler_selector(msm5205_device::SEX_4B);   /* 8KHz playback ? */
+	m_msm[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_msm[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* 8KHz playback ?    */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm[1], 384000);
+	m_msm[1]->set_prescaler_selector(msm5205_device::SEX_4B);   /* 8KHz playback ? */
+	m_msm[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_msm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(sf_state::sfus)
+void sf_state::sfus(machine_config &config)
+{
 	sfan(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sf_state::sfus_map);
+}
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sfus_map)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(sf_state::sfjp)
+void sf_state::sfjp(machine_config &config)
+{
 	sfan(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sf_state::sfjp_map);
+}
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sfjp_map)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(sf_state::sfp)
+void sf_state::sfp(machine_config &config)
+{
 	sfan(config);
-
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sf_state, irq6_line_hold)
-MACHINE_CONFIG_END
+	m_maincpu->set_vblank_int("screen", FUNC(sf_state::irq6_line_hold));
+}
 
 
 

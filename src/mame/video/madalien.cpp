@@ -116,10 +116,8 @@ WRITE8_MEMBER(madalien_state::madalien_videoram_w)
 }
 
 
-VIDEO_START_MEMBER(madalien_state,madalien)
+void madalien_state::video_start()
 {
-	int i;
-
 	static const tilemap_mapper_delegate scan_functions[4] =
 	{
 		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode0),this),
@@ -136,7 +134,7 @@ VIDEO_START_MEMBER(madalien_state,madalien)
 	m_tilemap_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_FG),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	m_tilemap_fg->set_transparent_pen(0);
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_tilemap_edge1[i] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_1),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
 
@@ -364,19 +362,19 @@ static GFXDECODE_START( gfx_madalien )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(madalien_state::madalien_video)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(madalien_state, screen_update_madalien)
-	MCFG_SCREEN_PALETTE(m_palette)
+void madalien_state::madalien_video(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256);
+	screen.set_screen_update(FUNC(madalien_state::screen_update_madalien));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_madalien)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_madalien);
 	PALETTE(config, m_palette, FUNC(madalien_state::madalien_palette), 0x30, 0x20);
-	MCFG_VIDEO_START_OVERRIDE(madalien_state,madalien)
 
 	mc6845_device &crtc(MC6845(config, "crtc", PIXEL_CLOCK / 8));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 	crtc.out_vsync_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
-MACHINE_CONFIG_END
+}

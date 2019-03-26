@@ -168,7 +168,7 @@ WRITE8_MEMBER( c64_magic_voice_cartridge_device::tpi_pb_w )
 
 	if (!BIT(m_tpi_pb, 4) && BIT(data, 4))
 	{
-		m_vslsi->write(space, 0, data & 0x0f);
+		m_vslsi->write(data & 0x0f);
 	}
 
 	m_tpi_pb = data;
@@ -303,12 +303,12 @@ void c64_magic_voice_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_magic_voice_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_magic_voice_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io2 && sphi2)
 	{
 		m_ca = offset;
-		data = m_tpi->read(space, offset & 0x07);
+		data = m_tpi->read(offset & 0x07);
 	}
 
 	if (PB6 && A13 && A15)
@@ -319,7 +319,7 @@ uint8_t c64_magic_voice_cartridge_device::c64_cd_r(address_space &space, offs_t 
 	int roml2 = !(!roml || (roml && !PB5 && A12 && A13 && !A14 && A15));
 	int romh2 = !((!romh && !PB6) || (!PB5 && A12 && A13 && !A14 && !A15));
 
-	data = m_exp->cd_r(space, get_offset(offset), data, sphi2, ba, roml2, romh2, io1, 1);
+	data = m_exp->cd_r(get_offset(offset), data, sphi2, ba, roml2, romh2, io1, 1);
 
 	return data;
 }
@@ -329,17 +329,17 @@ uint8_t c64_magic_voice_cartridge_device::c64_cd_r(address_space &space, offs_t 
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_magic_voice_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_magic_voice_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io2 && sphi2)
 	{
-		m_tpi->write(space, offset & 0x07, data);
+		m_tpi->write(offset & 0x07, data);
 	}
 
 	int roml2 = !(!roml || (roml && !PB5 && A12 && A13 && !A14 && A15));
 	int romh2 = !((!romh && !PB6) || (!PB5 && A12 && A13 && !A14 && !A15));
 
-	m_exp->cd_w(space, get_offset(offset), data, sphi2, ba, roml2, romh2, io1, 1);
+	m_exp->cd_w(get_offset(offset), data, sphi2, ba, roml2, romh2, io1, 1);
 }
 
 

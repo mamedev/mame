@@ -241,10 +241,12 @@ void zac_proto_state::machine_reset()
 	m_digits[10] = 0x3f; // units shows zero all the time
 }
 
-MACHINE_CONFIG_START(zac_proto_state::zac_proto)
+void zac_proto_state::zac_proto(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", INS8060, XTAL(4'000'000) / 2) // Using SC/MP II chip which has an internal /2 circuit.
-	MCFG_DEVICE_PROGRAM_MAP(zac_proto_map)
+	INS8060(config, m_maincpu, XTAL(4'000'000) / 2); // Using SC/MP II chip which has an internal /2 circuit.
+	m_maincpu->set_addrmap(AS_PROGRAM, &zac_proto_state::zac_proto_map);
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
@@ -252,7 +254,7 @@ MACHINE_CONFIG_START(zac_proto_state::zac_proto)
 
 	/* Sound */
 	genpin_audio(config);
-MACHINE_CONFIG_END
+}
 
 /*--------------------------------
 / Strike

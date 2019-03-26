@@ -910,11 +910,12 @@ static void ccs_floppies(device_slot_interface &device)
 
 	//device.option_add("525dd", FLOPPY_525_DD);
 
-MACHINE_CONFIG_START(ccs_state::ccs2810)
+void ccs_state::ccs2810(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(ccs2810_mem)
-	MCFG_DEVICE_IO_MAP(ccs2810_io)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ccs_state::ccs2810_mem);
+	m_maincpu->set_addrmap(AS_IO, &ccs_state::ccs2810_io);
 
 	RAM(config, RAM_TAG).set_default_size("64K");
 
@@ -931,13 +932,14 @@ MACHINE_CONFIG_START(ccs_state::ccs2810)
 	rs232.dcd_handler().set(m_ins8250, FUNC(ins8250_device::dcd_w));
 	rs232.dsr_handler().set(m_ins8250, FUNC(ins8250_device::dsr_w));
 	rs232.cts_handler().set(m_ins8250, FUNC(ins8250_device::cts_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ccs_state::ccs2422)
+void ccs_state::ccs2422(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(ccs2810_mem)
-	MCFG_DEVICE_IO_MAP(ccs2422_io)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ccs_state::ccs2810_mem);
+	m_maincpu->set_addrmap(AS_IO, &ccs_state::ccs2422_io);
 
 	RAM(config, RAM_TAG).set_default_size("64K");
 
@@ -956,9 +958,8 @@ MACHINE_CONFIG_START(ccs_state::ccs2422)
 	rs232.cts_handler().set(m_ins8250, FUNC(ins8250_device::cts_w));
 
 	MB8877(config, m_fdc, 16_MHz_XTAL / 8); // UB1793 or MB8877
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ccs_floppies, "8sssd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "fdc:0", ccs_floppies, "8sssd", floppy_image_device::default_floppy_formats).enable_sound(true);
+}
 
 /* ROM definition */
 ROM_START( ccs2810 )

@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-    vrc6.c
+    vrc6.cpp
     Konami VRC6 additional sound channels
 
     Emulation by R. Belmont
@@ -218,7 +218,7 @@ void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //  write - write to the chip's registers
 //---------------------------------------
 
-WRITE8_MEMBER( vrc6snd_device::write )
+void vrc6snd_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset >> 8)
 	{

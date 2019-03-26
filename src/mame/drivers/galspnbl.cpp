@@ -217,12 +217,12 @@ void galspnbl_state::machine_start()
 void galspnbl_state::galspnbl(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(12'000'000));	/* 12 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
+	M68000(config, m_maincpu, XTAL(12'000'000));    /* 12 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
 	m_maincpu->set_addrmap(AS_PROGRAM, &galspnbl_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(galspnbl_state::irq3_line_hold)); /* also has vector for 6, but it does nothing */
 
-	Z80(config, m_audiocpu, XTAL(4'000'000));		/* 4 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &galspnbl_state::audio_map);	/* NMI is caused by the main CPU */
+	Z80(config, m_audiocpu, XTAL(4'000'000));       /* 4 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &galspnbl_state::audio_map);    /* NMI is caused by the main CPU */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

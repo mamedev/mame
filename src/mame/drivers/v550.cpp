@@ -127,11 +127,11 @@ void v550_state::v550(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "mainint").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	com8116_device &brg1(COM8116(config, "brg1", 5068800)); // actually SMC COM8116T-020 (unknown clock)
+	com8116_device &brg1(COM8116_020(config, "brg1", 1.8432_MHz_XTAL)); // SMC COM8116T-020
 	brg1.ft_handler().set("mpsc", FUNC(upd7201_new_device::txca_w));
 	brg1.fr_handler().set("mpsc", FUNC(upd7201_new_device::rxca_w));
 
-	com8116_device &brg2(COM8116(config, "brg2", 5068800)); // actually SMC COM8116T-020
+	com8116_device &brg2(COM8116_020(config, "brg2", 1.8432_MHz_XTAL)); // SMC COM8116T-020
 	brg2.ft_handler().set("mpsc", FUNC(upd7201_new_device::txcb_w));
 	brg2.ft_handler().append("mpsc", FUNC(upd7201_new_device::rxcb_w));
 	brg2.fr_handler().set("usart", FUNC(i8251_device::write_txc));

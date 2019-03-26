@@ -17,6 +17,7 @@ using util::BIT;
 #include "cpu/8x300/8x300dasm.h"
 #include "cpu/adsp2100/2100dasm.h"
 #include "cpu/alph8201/8201dasm.h"
+#include "cpu/alpha/alphad.h"
 #include "cpu/alto2/alto2dsm.h"
 #include "cpu/am29000/am29dasm.h"
 #include "cpu/amis2000/amis2000d.h"
@@ -54,6 +55,7 @@ using util::BIT;
 #include "cpu/hcd62121/hcd62121d.h"
 #include "cpu/hd61700/hd61700d.h"
 #include "cpu/hmcs40/hmcs40d.h"
+#include "cpu/hpc/hpcdasm.h"
 #include "cpu/hphybrid/hphybrid_dasm.h"
 #include "cpu/i386/i386dasm.h"
 #include "cpu/i8008/8008dasm.h"
@@ -97,6 +99,7 @@ using util::BIT;
 #include "cpu/mn10200/mn102dis.h"
 #include "cpu/nanoprocessor/nanoprocessor_dasm.h"
 #include "cpu/nec/necdasm.h"
+#include "cpu/ns32000/ns32000dasm.h"
 #include "cpu/nuon/nuondasm.h"
 #include "cpu/patinhofeio/patinho_feio_dasm.h"
 #include "cpu/pdp1/pdp1dasm.h"
@@ -299,8 +302,12 @@ struct options
 
 static const dasm_table_entry dasm_table[] =
 {
-	{ "8x300",           be,  0, []() -> util::disasm_interface * { return new n8x300_disassembler; } },
+	{ "8x300",           be, -1, []() -> util::disasm_interface * { return new n8x300_disassembler; } },
 	{ "adsp21xx",        le, -2, []() -> util::disasm_interface * { return new adsp21xx_disassembler; } },
+	{ "alpha",           le,  0, []() -> util::disasm_interface * { return new alpha_disassembler; } },
+	{ "alpha_nt",        le,  0, []() -> util::disasm_interface * { return new alpha_disassembler(alpha_disassembler::TYPE_NT); } },
+	{ "alpha_unix",      le,  0, []() -> util::disasm_interface * { return new alpha_disassembler(alpha_disassembler::TYPE_UNIX); } },
+	{ "alpha_vms",       le,  0, []() -> util::disasm_interface * { return new alpha_disassembler(alpha_disassembler::TYPE_VMS); } },
 	{ "alpha8201",       le,  0, []() -> util::disasm_interface * { return new alpha8201_disassembler; } },
 	{ "alto2",           be, -2, []() -> util::disasm_interface * { return new alto2_disassembler; } },
 	{ "am29000",         be,  0, []() -> util::disasm_interface * { return new am29000_disassembler; } },
@@ -355,6 +362,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "hp_5061_3001",    be, -1, []() -> util::disasm_interface * { return new hp_5061_3001_disassembler; } },
 	{ "hp_5061_3011",    be, -1, []() -> util::disasm_interface * { return new hp_5061_3011_disassembler; } },
 	{ "hp_09825_67907",  be, -1, []() -> util::disasm_interface * { return new hp_09825_67907_disassembler; } },
+	{ "hpc16083",        le,  0, []() -> util::disasm_interface * { return new hpc16083_disassembler; } },
+	{ "hpc16164",        le,  0, []() -> util::disasm_interface * { return new hpc16164_disassembler; } },
 	{ "hyperstone",      be,  0, []() -> util::disasm_interface * { return new hyperstone_disassembler(&hyperstone_unidasm); } },
 	{ "i4004",           le,  0, []() -> util::disasm_interface * { return new i4004_disassembler; } },
 	{ "i4040",           le,  0, []() -> util::disasm_interface * { return new i4040_disassembler; } },
@@ -412,6 +421,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "mn10200",         le,  0, []() -> util::disasm_interface * { return new mn10200_disassembler; } },
 	{ "nanoprocessor",   le,  0, []() -> util::disasm_interface * { return new hp_nanoprocessor_disassembler; } },
 	{ "nec",             le,  0, []() -> util::disasm_interface * { return new nec_disassembler; } },
+	{ "ns32000",         le,  0, []() -> util::disasm_interface * { return new ns32000_disassembler; } },
 	{ "nuon",            be,  0, []() -> util::disasm_interface * { return new nuon_disassembler; } },
 	{ "nsc8105",         be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(8105); } },
 	{ "patinho_feio",    le,  0, []() -> util::disasm_interface * { return new patinho_feio_disassembler; } },
@@ -841,8 +851,6 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 
 		case 3:
 			lr8 = [](offs_t pc) -> u8 { abort(); };
-			lr32 = [](offs_t pc) -> u32 { abort(); };
-			lr64 = [](offs_t pc) -> u64 { abort(); };
 			lr16 = [this](offs_t pc) -> u16 {
 				if(pc < base_pc)
 					return 0x0000;
@@ -851,6 +859,31 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 					return 0x0000;
 				return reinterpret_cast<const u16 *>(&data[delta])[0];
 			};
+			switch(entry->endian) {
+			case le:
+				lr32 = [this](offs_t pc) -> u32 {
+					if(pc < base_pc)
+						return 0x00000000;
+					offs_t delta = (pc - base_pc) >> 3;
+					if(delta >= size + 2)
+						return 0x00000000;
+					auto p = reinterpret_cast<const u16 *>(&data[delta]);
+					return p[0] | (u32(p[1]) << 16);
+				};
+				break;
+			case be:
+				lr32 = [this](offs_t pc) -> u32 {
+					if(pc < base_pc)
+						return 0x00000000;
+					offs_t delta = (pc - base_pc) >> 3;
+					if(delta >= size + 2)
+						return 0x00000000;
+					auto p = reinterpret_cast<const u16 *>(&data[delta]);
+					return (u32(p[0]) << 16) | p[1];
+				};
+				break;
+			}
+			lr64 = [](offs_t pc) -> u64 { abort(); };
 			break;
 
 		default:

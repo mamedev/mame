@@ -92,9 +92,6 @@ struct chrn_id
 /* set if index has just occurred */
 #define FLOPPY_DRIVE_INDEX                      0x0020
 
-#define MCFG_LEGACY_FLOPPY_IDX_CB(_devcb) \
-	downcast<legacy_floppy_image_device &>(*device).set_out_idx_func(DEVCB_##_devcb);
-
 class legacy_floppy_image_device :  public device_t,
 									public device_image_interface
 {
@@ -110,7 +107,7 @@ public:
 	~legacy_floppy_image_device();
 
 	void set_floppy_config(const floppy_interface *config) { m_config = config; }
-	template<class Object> devcb_base &set_out_idx_func(Object &&cb) { return m_out_idx_func.set_callback(std::forward<Object>(cb)); }
+	auto out_idx_cb() { return m_out_idx_func.bind(); }
 
 	static void add_4drives(machine_config &mconfig, const floppy_interface *config)
 	{
@@ -118,6 +115,12 @@ public:
 		LEGACY_FLOPPY(mconfig, FLOPPY_1, 0, config);
 		LEGACY_FLOPPY(mconfig, FLOPPY_2, 0, config);
 		LEGACY_FLOPPY(mconfig, FLOPPY_3, 0, config);
+	}
+
+	static void add_2drives(machine_config &mconfig, const floppy_interface *config)
+	{
+		LEGACY_FLOPPY(mconfig, FLOPPY_0, 0, config);
+		LEGACY_FLOPPY(mconfig, FLOPPY_1, 0, config);
 	}
 
 	virtual image_init_result call_load() override;
@@ -249,34 +252,5 @@ legacy_floppy_image_device *floppy_get_device(running_machine &machine,int drive
 legacy_floppy_image_device *floppy_get_device_by_type(running_machine &machine,int ftype,int drive);
 int floppy_get_drive_by_type(legacy_floppy_image_device *image,int ftype);
 int floppy_get_count(running_machine &machine);
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-
-#define MCFG_LEGACY_FLOPPY_CONFIG(_config) \
-	downcast<legacy_floppy_image_device &>(*device).set_floppy_config(&(_config));
-
-#define MCFG_LEGACY_FLOPPY_DRIVE_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, LEGACY_FLOPPY, 0)         \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config)
-
-#define MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(_config)    \
-	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)     \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config) \
-	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)     \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config) \
-	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)     \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config) \
-	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)     \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config)
-
-#define MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(_config)    \
-	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)     \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config) \
-	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)     \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config)
 
 #endif // MAME_DEVICES_IMAGEDV_FLOPDRV_H

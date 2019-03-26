@@ -4,15 +4,8 @@
 
     Act Fancer (Japan)              FD (c) 1989 Data East Corporation
     Act Fancer (World)              FE (c) 1989 Data East Corporation
-    Trio The Punch (World)          FC (c) 1989 Data East Corporation
+    Trio The Punch (World)          FG (c) 1989 Data East Corporation
     Trio The Punch (Japan)          FF (c) 1989 Data East Corporation
-
-    The 'World' set has rom code FE, the 'Japan' set has rom code FD.
-
-    Most Data East games give the Japanese version the earlier code, though
-    there is no real difference between the sets.
-
-    I believe the USA version of Act Fancer is called 'Out Fencer'
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
 

@@ -601,12 +601,13 @@ void peyper_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(peyper_state::peyper)
+void peyper_state::peyper(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 2'500'000)
-	MCFG_DEVICE_PROGRAM_MAP(peyper_map)
-	MCFG_DEVICE_IO_MAP(peyper_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(peyper_state, irq0_line_hold,  1250)
+	Z80(config, m_maincpu, 2'500'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &peyper_state::peyper_map);
+	m_maincpu->set_addrmap(AS_IO, &peyper_state::peyper_io);
+	m_maincpu->set_periodic_int(FUNC(peyper_state::irq0_line_hold), attotime::from_hz(1250));
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
@@ -631,7 +632,7 @@ MACHINE_CONFIG_START(peyper_state::peyper)
 	kbdc.in_rl_callback().set(FUNC(peyper_state::sw_r));        // kbd RL lines
 	kbdc.in_shift_callback().set_constant(1);                   // Shift key
 	kbdc.in_ctrl_callback().set_constant(1);
-MACHINE_CONFIG_END
+}
 
 // Not allowed to set up an array all at once, so we have this mess
 void peyper_state::init_peyper()

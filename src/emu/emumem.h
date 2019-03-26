@@ -1137,8 +1137,8 @@ class address_space_config
 public:
 	// construction/destruction
 	address_space_config();
-	address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift = 0, address_map_constructor internal = address_map_constructor(), address_map_constructor defmap = address_map_constructor());
-	address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_constructor internal = address_map_constructor(), address_map_constructor defmap = address_map_constructor());
+	address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift = 0, address_map_constructor internal = address_map_constructor());
+	address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_constructor internal = address_map_constructor());
 
 	// getters
 	const char *name() const { return m_name; }
@@ -1172,7 +1172,6 @@ public:
 	bool                m_is_octal;                 // to determine if messages/debugger will show octal or hex
 
 	address_map_constructor m_internal_map;
-	address_map_constructor m_default_map;
 };
 
 

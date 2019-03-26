@@ -24,32 +24,32 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_EINSTEIN_USERPORT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EINSTEIN_USERPORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(einstein_userport_cards, nullptr, false)
-
-#define MCFG_EINSTEIN_USERPORT_BSTB_HANDLER(_devcb) \
-	downcast<einstein_userport_device &>(*device).set_bstb_handler(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 class device_einstein_userport_interface;
 
+// supported devices
+void einstein_userport_cards(device_slot_interface &device);
+
 class einstein_userport_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
+	einstein_userport_device(machine_config const &mconfig, char const *tag, device_t *owner)
+		: einstein_userport_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		einstein_userport_cards(*this);
+		set_default_option(nullptr);
+		set_fixed(false);
+	}
+
 	einstein_userport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~einstein_userport_device();
 
 	// callbacks
-	template <class Object> devcb_base &set_bstb_handler(Object &&cb) { return m_bstb_handler.set_callback(std::forward<Object>(cb)); }
+	auto bstb_handler() { return m_bstb_handler.bind(); }
 
 	// called from card device
 	DECLARE_WRITE_LINE_MEMBER( bstb_w ) { m_bstb_handler(state); }
@@ -88,8 +88,5 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(EINSTEIN_USERPORT, einstein_userport_device)
-
-// supported devices
-void einstein_userport_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_EINSTEIN_USERPORT_USERPORT_H

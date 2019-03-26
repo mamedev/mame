@@ -105,7 +105,7 @@ void dio16_98643_device::device_reset()
 
 		uint32_t baseaddr = 0x600000 + (code << 16);
 
-		program_space()->install_device(baseaddr, baseaddr + 0xffff,
+		program_space().install_device(baseaddr, baseaddr + 0xffff,
 			*this, &dio16_98643_device::addrmap);
 		m_installed_io = true;
 	}

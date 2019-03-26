@@ -514,14 +514,14 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(cocoloco_state::cocoloco)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(cocoloco_map)
+	M6502(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cocoloco_state::cocoloco_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(CPU_CLOCK * 4, 384, 0, 256, 262, 0, 256)  // TODO: not accurate, ~50 Hz
-	MCFG_SCREEN_UPDATE_DRIVER(cocoloco_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(CPU_CLOCK * 4, 384, 0, 256, 262, 0, 256);  // TODO: not accurate, ~50 Hz
+	screen.set_screen_update(FUNC(cocoloco_state::screen_update));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(cocoloco_state::cocoloco_palette), 0x10);
 

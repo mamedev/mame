@@ -93,6 +93,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_i2cmem(*this, "i2cmem")
 		, m_s3c2410(*this, "s3c2410")
+		, m_qs1000(*this, "qs1000")
 		, m_soundlatch(*this, "soundlatch")
 		, m_system_memory(*this, "systememory")
 		, m_flash(*this, "flash")
@@ -110,6 +111,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<s3c2410_device> m_s3c2410;
+	required_device<qs1000_device> m_qs1000;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_shared_ptr<uint32_t> m_system_memory;
 	required_region_ptr<uint8_t> m_flash;
@@ -592,7 +594,7 @@ READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 void ghosteo_state::machine_start()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
-	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
+	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
 	membank("qs1000:bank")->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
 }
 
@@ -640,17 +642,17 @@ void ghosteo_state::ghosteo(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set("qs1000", FUNC(qs1000_device::set_irq));
+	m_soundlatch->data_pending_callback().set(m_qs1000, FUNC(qs1000_device::set_irq));
 	m_soundlatch->set_separate_acknowledge(true);
 
-	qs1000_device &qs1000(QS1000(config, "qs1000", XTAL(24'000'000)));
-	qs1000.set_external_rom(true);
-	qs1000.p1_in().set("soundlatch", FUNC(generic_latch_8_device::read));
-	qs1000.p1_out().set(FUNC(ghosteo_state::qs1000_p1_w));
-	qs1000.p2_out().set(FUNC(ghosteo_state::qs1000_p2_w));
-	qs1000.p3_out().set(FUNC(ghosteo_state::qs1000_p3_w));
-	qs1000.add_route(0, "lspeaker", 1.0);
-	qs1000.add_route(1, "rspeaker", 1.0);
+	QS1000(config, m_qs1000, XTAL(24'000'000));
+	m_qs1000->set_external_rom(true);
+	m_qs1000->p1_in().set("soundlatch", FUNC(generic_latch_8_device::read));
+	m_qs1000->p1_out().set(FUNC(ghosteo_state::qs1000_p1_w));
+	m_qs1000->p2_out().set(FUNC(ghosteo_state::qs1000_p2_w));
+	m_qs1000->p3_out().set(FUNC(ghosteo_state::qs1000_p3_w));
+	m_qs1000->add_route(0, "lspeaker", 1.0);
+	m_qs1000->add_route(1, "rspeaker", 1.0);
 }
 
 void ghosteo_state::bballoon(machine_config &config)

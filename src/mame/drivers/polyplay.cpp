@@ -276,7 +276,8 @@ GFXDECODE_END
 
 
 /* the machine driver */
-MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
+void polyplay_state::polyplay_zre(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, POLYPLAY_MAIN_CLOCK / 4); /* UB880D */
 	m_maincpu->set_daisy_config(daisy_chain_zre);
@@ -299,12 +300,12 @@ MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
 	m_z80pio->out_pb_callback().set(FUNC(polyplay_state::pio_portb_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(polyplay_state, screen_update_polyplay)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(polyplay_state::screen_update_polyplay));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_polyplay);
 	PALETTE(config, m_palette, FUNC(polyplay_state::polyplay_palette), 10);
@@ -313,7 +314,7 @@ MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker1).add_route(ALL_OUTPUTS, "mono", 0.5);
 	SPEAKER_SOUND(config, m_speaker2).add_route(ALL_OUTPUTS, "mono", 0.5);
-MACHINE_CONFIG_END
+}
 
 void polyplay_state::polyplay_zrepp(machine_config &config)
 {

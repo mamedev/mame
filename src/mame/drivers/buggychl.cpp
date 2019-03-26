@@ -520,7 +520,7 @@ void buggychl_state::buggychl(machine_config &config)
 	Z80(config, m_audiocpu, 8_MHz_XTAL/2); /* 4 MHz according to schematics */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &buggychl_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(buggychl_state::irq0_line_hold), attotime::from_hz(8_MHz_XTAL/2/2/256/64)); // timer irq
-	//MCFG_TIMER_DEVICE_ADD_PERIODIC("soundirq", "audiocpu",  irq0_line_hold, 8_MHz_XTAL/2/2/256/64)
+	//TIMER(config, "soundirq").configure_periodic(m_audiocpu, FUNC(buggychl_state::irq0_line_hold), 8_MHz_XTAL/2/2/256/64);
 	// The schematics (which are at least partly for the wrong sound board) show a configurable timer with rates of
 	// 61.035Hz (8_MHz_XTAL/2/2/256/128)
 	// or 122.0Hz (8_MHz_XTAL/2/2/256/64)

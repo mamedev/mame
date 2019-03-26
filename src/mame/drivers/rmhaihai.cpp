@@ -71,7 +71,6 @@ protected:
 	void rmhaihai_io_map(address_map &map);
 	void rmhaihai_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -504,27 +503,26 @@ static GFXDECODE_START( gfx_themj )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(rmhaihai_state::rmhaihai)
-
+void rmhaihai_state::rmhaihai(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,20000000/4)  /* 5 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(rmhaihai_map)
-	MCFG_DEVICE_IO_MAP(rmhaihai_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rmhaihai_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 20000000/4);     /* 5 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rmhaihai_state::rmhaihai_map);
+	m_maincpu->set_addrmap(AS_IO, &rmhaihai_state::rmhaihai_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(rmhaihai_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(4*8, 60*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rmhaihai_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(4*8, 60*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(rmhaihai_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rmhaihai)
-
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_rmhaihai);
 	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 0x100);
 
 	/* sound hardware */
@@ -535,38 +533,34 @@ MACHINE_CONFIG_START(rmhaihai_state::rmhaihai)
 	aysnd.port_b_read_callback().set_ioport("DSW1");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 500000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 500000);
+	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(rmhaisei_state::rmhaisei)
+void rmhaisei_state::rmhaisei(machine_config &config)
+{
+	rmhaihai(config);
+
+	/* video hardware */
+	m_gfxdecode->set_info(gfx_themj);
+	subdevice<palette_device>("palette")->set_entries(0x200);
+}
+
+void themj_state::themj(machine_config &config)
+{
 	rmhaihai(config);
 
 	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &themj_state::themj_map);
+	m_maincpu->set_addrmap(AS_IO, &themj_state::themj_io_map);
+
+	config.device_remove("nvram");
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_themj)
-	MCFG_DEVICE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(0x200)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(themj_state::themj)
-	rmhaihai(config);
-
-	/* basic machine hardware */
-
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(themj_map)
-	MCFG_DEVICE_IO_MAP(themj_io_map)
-
-	MCFG_DEVICE_REMOVE("nvram")
-
-	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_themj)
-	MCFG_DEVICE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(0x200)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_themj);
+	subdevice<palette_device>("palette")->set_entries(0x200);
+}
 
 
 

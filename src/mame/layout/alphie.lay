@@ -10,19 +10,34 @@
 		<disk state="1"><color red="1.0" green="0.2" blue="0.23" /></disk>
 	</element>
 
+	<element name="nothing" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
+	</element>
+
+	<element name="switch_qa" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
+		<text state="0x01" string="1"><color red="0.95" green="0.95" blue="0.95" /></text>
+		<text state="0x02" string="2"><color red="0.95" green="0.95" blue="0.95" /></text>
+		<text state="0x04" string="3"><color red="0.95" green="0.95" blue="0.95" /></text>
+		<text state="0x08" string="4"><color red="0.95" green="0.95" blue="0.95" /></text>
+		<text state="0x10" string="5"><color red="0.95" green="0.95" blue="0.95" /></text>
+	</element>
+	<element name="switch_act" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
+		<text state="0x01" string="S"><color red="0.95" green="0.95" blue="0.95" /></text>
+		<text state="0x02" string="*"><color red="0.95" green="0.95" blue="0.95" /></text>
+		<text state="0x04" string="X"><color red="0.95" green="0.95" blue="0.95" /></text>
+		<text state="0x08" string="&#x266a;"><color red="0.95" green="0.95" blue="0.95" /></text> <!-- music note -->
+	</element>
+
 	<element name="text_1"><text string="1"><color red="0.75" green="0.75" blue="0.75" /></text></element>
 	<element name="text_2"><text string="2"><color red="0.75" green="0.75" blue="0.75" /></text></element>
 	<element name="text_3"><text string="3"><color red="0.75" green="0.75" blue="0.75" /></text></element>
 	<element name="text_4"><text string="4"><color red="0.75" green="0.75" blue="0.75" /></text></element>
 	<element name="text_5"><text string="5"><color red="0.75" green="0.75" blue="0.75" /></text></element>
 	<element name="text_q"><text string="Question:" align="1"><color red="0.75" green="0.75" blue="0.75" /></text></element>
-	<element name="text_a"><text string="Answer:" align="1"><color red="0.75" green="0.75" blue="0.75" /></text></element>
-
-	<element name="counter" defstate="1">
-		<simplecounter maxstate="9" digits="1">
-			<color red="0.95" green="0.95" blue="0.95" />
-		</simplecounter>
-	</element>
+	<element name="text_ans"><text string="Answer:" align="1"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_act"><text string="Activity:" align="1"><color red="0.75" green="0.75" blue="0.75" /></text></element>
 
 
 <!-- build screen -->
@@ -45,9 +60,12 @@
 		<bezel element="static_gray"><bounds x="6" y="0.5" width="0.2" height="13" /></bezel>
 
 		<bezel element="text_q"><bounds x="8" y="0" width="10" height="2" /></bezel>
-		<bezel element="text_a"><bounds x="8" y="3" width="10" height="2" /></bezel>
-		<bezel name="q_pos" element="counter"><bounds x="15" y="0" width="2" height="2" /></bezel>
-		<bezel name="a_pos" element="counter"><bounds x="15" y="3" width="2" height="2" /></bezel>
+		<bezel element="text_ans"><bounds x="8" y="3" width="10" height="2" /></bezel>
+		<bezel element="text_act"><bounds x="8" y="6" width="10" height="2" /></bezel>
+		<bezel element="nothing" inputtag="DUMMY" inputmask="0x01"><bounds x="14" y="-1" width="4" height="10" /></bezel>
+		<bezel element="switch_qa" inputtag="IN.1" inputmask="0x1f" inputraw="1"><bounds x="15" y="0" width="2" height="2" /></bezel>
+		<bezel element="switch_qa" inputtag="IN.2" inputmask="0x1f" inputraw="1"><bounds x="15" y="3" width="2" height="2" /></bezel>
+		<bezel element="switch_act" inputtag="IN.3" inputmask="0x0f" inputraw="1"><bounds x="15" y="6" width="2" height="2" /></bezel>
 
 	</view>
 </mamelayout>

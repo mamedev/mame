@@ -52,9 +52,10 @@ ps2_gs_device::~ps2_gs_device()
 {
 }
 
-MACHINE_CONFIG_START(ps2_gs_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(m_gif, SONYPS2_GIF, clock(), DEVICE_SELF, m_vu1)
-MACHINE_CONFIG_END
+void ps2_gs_device::device_add_mconfig(machine_config &config)
+{
+	SONYPS2_GIF(config, m_gif, clock(), DEVICE_SELF, m_vu1);
+}
 
 void ps2_gs_device::device_start()
 {

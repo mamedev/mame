@@ -279,7 +279,7 @@ seibu_crtc_device::seibu_crtc_device(const machine_config &mconfig, const char *
 		m_layer_scroll_cb(*this),
 		m_reg_1a_cb(*this),
 		m_layer_scroll_base_cb(*this),
-		m_space_config("vregs", ENDIANNESS_LITTLE, 16, 7, 0, address_map_constructor(), address_map_constructor(FUNC(seibu_crtc_device::seibu_crtc_vregs), this))
+		m_space_config("vregs", ENDIANNESS_LITTLE, 16, 7, 0, address_map_constructor(FUNC(seibu_crtc_device::seibu_crtc_vregs), this))
 {
 }
 

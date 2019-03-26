@@ -28,7 +28,7 @@
 #ifndef NLD_82S115_H_
 #define NLD_82S115_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define PROM_82S115(name, cCE1Q, cCE2, cA0, cA1, cA2, cA3, cA4, cA5, cA6, cA7, cA8, cSTROBE)    \
 		NET_REGISTER_DEV(PROM_82S115, name) \

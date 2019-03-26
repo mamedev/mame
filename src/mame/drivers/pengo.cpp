@@ -68,7 +68,9 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
+#include "machine/gen_latch.h"
 #include "machine/segacrpt_device.h"
+#include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -86,6 +88,7 @@ public:
 	void pengoe(machine_config &config);
 	void pengou(machine_config &config);
 	void pengo(machine_config &config);
+	void schick(machine_config &config);
 
 	void init_penta();
 
@@ -100,6 +103,9 @@ private:
 	void decrypted_opcodes_map(address_map &map);
 	void jrpacmbl_map(address_map &map);
 	void pengo_map(address_map &map);
+	void schick_map(address_map &map);
+	void schick_audio_map(address_map &map);
+	void schick_audio_io_map(address_map &map);
 };
 
 
@@ -189,7 +195,30 @@ void pengo_state::jrpacmbl_map(address_map &map)
 	map(0x90c0, 0x90ff).portr("P1");
 }
 
+void pengo_state::schick_map(address_map &map) // everything needs to be verified
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x83ff).ram().w(FUNC(pengo_state::pacman_videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).ram().w(FUNC(pengo_state::pacman_colorram_w)).share("colorram");
+	map(0x8800, 0x8fef).ram().share("mainram");
+	map(0x8ff0, 0x8fff).ram().share("spriteram");
+	map(0x9020, 0x902f).writeonly().share("spriteram2");
+}
 
+void pengo_state::schick_audio_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
+
+void pengo_state::schick_audio_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x10, 0x11).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x80, 0x81).w("ay3", FUNC(ay8910_device::address_data_w));
+}
 
 /*************************************
  *
@@ -283,6 +312,49 @@ static INPUT_PORTS_START( pengo )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_6C ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( schick )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SW1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+
+	PORT_START("SW2")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:8")
 INPUT_PORTS_END
 
 
@@ -452,7 +524,44 @@ void pengo_state::jrpacmbl(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(pengo_state,jrpacman)
 }
 
+void pengo_state::schick(machine_config &config) // all dividers unknown
+{
+	/* basic machine hardware */
+	Z80(config, m_maincpu, MASTER_CLOCK/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pengo_state::schick_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &pengo_state::decrypted_opcodes_map);
 
+	z80_device &audiocpu(Z80(config, "audiocpu", MASTER_CLOCK/6));
+	audiocpu.set_addrmap(AS_PROGRAM, &pengo_state::schick_audio_map);
+	audiocpu.set_addrmap(AS_IO, &pengo_state::schick_audio_io_map);
+
+	GENERIC_LATCH_8(config, "soundlatch");
+
+	WATCHDOG_TIMER(config, m_watchdog);
+
+	LS259(config, m_latch); // 3I
+
+	/* video hardware */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pengo);
+	PALETTE(config, m_palette).set_entries(128); // wrong
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // to be verified
+	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	screen.set_screen_update(FUNC(pengo_state::screen_update_pacman));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(pengo_state::vblank_irq));
+
+	MCFG_VIDEO_START_OVERRIDE(pengo_state, pengo)
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	AY8910(config, "ay1", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 0.13);
+
+	AY8910(config, "ay2", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 0.13);
+
+	AY8910(config, "ay3", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 0.13);
+}
 
 /*************************************
  *
@@ -671,6 +780,24 @@ ROM_START( penta )
 	ROM_LOAD( "pr1636.70",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) /* timing - not used */
 ROM_END
 
+// MH032288 PCB. LC ('lato componenti', components side in Italian) so maybe produced in Italy?
+// A plastic block in a corner covers probably the main CPU and the decryption logic.
+// Might fit better in a different driver once decrypted
+ROM_START( schick )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512.8d", 0x0000, 0x10000, CRC(38986329) SHA1(bfd62d6a49d25acc582e5f076833c3b22c1a7fd7) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "27c256.7m", 0x0000, 0x8000, CRC(694dadca) SHA1(65d436d6c8ebf6a9b5af286122e7391973d463e0) ) // identical to bombjack, but 4x
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "27c256.4e",    0x0000, 0x8000, CRC(edb4a243) SHA1(64f35b5142ffb3bfbd6a2899af9d1d719b83e2a1) )
+	ROM_LOAD( "4.27c256.4f",  0x8000, 0x8000, CRC(f666a52a) SHA1(877e1112c9c9a39b55934f6a382ad35fc9bf6859) ) // only labeled ROM
+
+	ROM_REGION( 0x0400, "proms", ROMREGION_ERASEFF )
+	// currently not dumped
+ROM_END
+
 
 ROM_START( jrpacmbl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -790,3 +917,4 @@ GAME( 1982, pengo5,   pengo,    pengoe,   pengo,    pengo_state, empty_init, ROT
 GAME( 1982, pengob,   pengo,    pengo,    pengo,    pengo_state, init_penta, ROT90, "bootleg",                  "Pengo (bootleg)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1982, penta,    pengo,    pengo,    pengo,    pengo_state, init_penta, ROT90, "bootleg (Grinbee Shouji)", "Penta",                        MACHINE_SUPPORTS_SAVE ) // Grinbee Shouji was a subsidiary of Orca
 GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, pengo_state, empty_init, ROT90, "bootleg",                  "Jr. Pac-Man (Pengo hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, schick,   0,        schick,   schick,   pengo_state, empty_init, ROT90, "Microhard",                "Super Chick",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // encrypted, scheme suspected similar to the Penta one

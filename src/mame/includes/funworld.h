@@ -12,10 +12,10 @@ class funworld_state : public driver_device
 public:
 	funworld_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
@@ -33,6 +33,8 @@ public:
 	void fw_brick_2(machine_config &config);
 
 	void init_saloon();
+	void init_royalcdc();
+	void init_multiwin();
 	void init_mongolnw();
 	void init_soccernw();
 	void init_tabblue();
@@ -53,6 +55,7 @@ protected:
 
 	void magicrd2_map(address_map &map);
 
+	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	tilemap_t *m_bg_tilemap = nullptr;
 
@@ -73,7 +76,6 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	output_finder<8> m_lamps;
 };

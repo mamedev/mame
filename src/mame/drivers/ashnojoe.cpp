@@ -279,7 +279,7 @@ WRITE8_MEMBER(ashnojoe_state::ym2203_write_b)
 
 WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
 {
-	if (state)
+	if (m_msm5205_vclk_toggle == 0)
 	{
 		m_msm->write_data(m_adpcm_byte >> 4);
 	}
@@ -288,16 +288,20 @@ WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
 		m_msm->write_data(m_adpcm_byte & 0xf);
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
+
+	m_msm5205_vclk_toggle ^= 1;
 }
 
 void ashnojoe_state::machine_start()
 {
 	save_item(NAME(m_adpcm_byte));
+	save_item(NAME(m_msm5205_vclk_toggle));
 }
 
 void ashnojoe_state::machine_reset()
 {
 	m_adpcm_byte = 0;
+	m_msm5205_vclk_toggle = 0;
 }
 
 
@@ -336,7 +340,7 @@ void ashnojoe_state::ashnojoe(machine_config &config)
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.1);
 
 	MSM5205(config, m_msm, 384000);
-	m_msm->vck_callback().set(FUNC(ashnojoe_state::ashnojoe_vclk_cb));
+	m_msm->vck_legacy_callback().set(FUNC(ashnojoe_state::ashnojoe_vclk_cb));
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }

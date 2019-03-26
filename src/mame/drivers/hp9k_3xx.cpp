@@ -258,7 +258,7 @@ WRITE16_MEMBER(hp9k3xx_state::led_w)
 void hp9k3xx_state::add_dio16_bus(machine_config &config)
 {
 	bus::hp_dio::dio16_device &dio16(DIO16(config, "diobus", 0));
-	dio16.set_cputag(m_maincpu);
+	dio16.set_program_space(m_maincpu, AS_PROGRAM);
 
 	dio16.irq1_out_cb().set(FUNC(hp9k3xx_state::dio_irq1_w));
 	dio16.irq2_out_cb().set(FUNC(hp9k3xx_state::dio_irq2_w));
@@ -272,7 +272,7 @@ void hp9k3xx_state::add_dio16_bus(machine_config &config)
 void hp9k3xx_state::add_dio32_bus(machine_config &config)
 {
 	bus::hp_dio::dio32_device &dio32(DIO32(config, "diobus", 0));
-	dio32.set_cputag(m_maincpu);
+	dio32.set_program_space(m_maincpu, AS_PROGRAM);
 
 	dio32.irq1_out_cb().set(FUNC(hp9k3xx_state::dio_irq1_w));
 	dio32.irq2_out_cb().set(FUNC(hp9k3xx_state::dio_irq2_w));
@@ -323,22 +323,23 @@ WRITE32_MEMBER(hp9k3xx_state::buserror_w)
 		set_bus_error(offset << 2, false, mem_mask);
 }
 
-MACHINE_CONFIG_START(hp9k3xx_state::hp9k300)
+void hp9k3xx_state::hp9k300(machine_config &config)
+{
 	ptm6840_device &ptm(PTM6840(config, PTM6840_TAG, 250000)); // from oscillator module next to the 6840
 	ptm.set_external_clocks(250000.0f, 0.0f, 250000.0f);
 	ptm.o3_callback().set(PTM6840_TAG, FUNC(ptm6840_device::set_c2));
 	ptm.irq_callback().set_inputline("maincpu", M68K_IRQ_6);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "hp9k3xx_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("hp9k3xx_flop");
 	config.set_default_layout(layout_hp9k_3xx);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
-
+void hp9k3xx_state::hp9k310(machine_config &config)
+{
 	hp9k300(config);
 
-	MCFG_DEVICE_ADD(m_maincpu, M68010, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(hp9k310_map)
+	M68010(config, m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp9k3xx_state::hp9k310_map);
 
 	add_dio16_bus(config);
 
@@ -348,12 +349,12 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 	DIO32_SLOT(config, "sl3", 0, "diobus", dio32_cards, "98643", false);
 	DIO16_SLOT(config, "sl4", 0, "diobus", dio16_cards, "98644", false);
 	DIO16_SLOT(config, "sl5", 0, "diobus", dio16_cards, nullptr, false);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
-	MCFG_DEVICE_ADD(m_maincpu, M68020FPU, 16670000)
-	MCFG_DEVICE_PROGRAM_MAP(hp9k320_map)
+void hp9k3xx_state::hp9k320(machine_config &config)
+{
+	M68020FPU(config, m_maincpu, 16670000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp9k3xx_state::hp9k320_map);
 
 	hp9k300(config);
 	add_dio32_bus(config);
@@ -365,11 +366,12 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	DIO32_SLOT(config, "sl4", 0, "diobus", dio32_cards, "98620", false);
 	DIO32_SLOT(config, "sl5", 0, "diobus", dio32_cards, "98265a", false);
 	DIO32_SLOT(config, "sl7", 0, "diobus", dio32_cards, nullptr, false);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hp9k3xx_state::hp9k330)
-	MCFG_DEVICE_ADD(m_maincpu, M68020PMMU, 16670000)
-	MCFG_DEVICE_PROGRAM_MAP(hp9k330_map)
+void hp9k3xx_state::hp9k330(machine_config &config)
+{
+	M68020PMMU(config, m_maincpu, 16670000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp9k3xx_state::hp9k330_map);
 
 	hp9k300(config);
 	add_dio32_bus(config);
@@ -379,11 +381,12 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k330)
 	DIO32_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98603b", false);
 	DIO32_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98644", false);
 	DIO32_SLOT(config, "sl4", 0, "diobus", dio16_cards, nullptr, false);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hp9k3xx_state::hp9k332)
-	MCFG_DEVICE_ADD(m_maincpu, M68020PMMU, 16670000)
-	MCFG_DEVICE_PROGRAM_MAP(hp9k332_map)
+void hp9k3xx_state::hp9k332(machine_config &config)
+{
+	M68020PMMU(config, m_maincpu, 16670000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp9k3xx_state::hp9k332_map);
 
 	hp9k300(config);
 	add_dio16_bus(config);
@@ -393,22 +396,22 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k332)
 	DIO16_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98644", false);
 	DIO16_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98543", false);
 	DIO16_SLOT(config, "sl4", 0, "diobus", dio16_cards, nullptr, false);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(hp9k3xx_state::hp9k340)
+void hp9k3xx_state::hp9k340(machine_config &config)
+{
 	hp9k320(config);
 
-	MCFG_DEVICE_REPLACE(m_maincpu, M68030, 16670000)
-	MCFG_DEVICE_PROGRAM_MAP(hp9k330_map)
-MACHINE_CONFIG_END
+	M68030(config.replace(), m_maincpu, 16670000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp9k3xx_state::hp9k330_map);
+}
 
-MACHINE_CONFIG_START(hp9k3xx_state::hp9k360)
-
+void hp9k3xx_state::hp9k360(machine_config &config)
+{
 	hp9k300(config);
 
-	MCFG_DEVICE_ADD(m_maincpu, M68030, 25000000)
-	MCFG_DEVICE_PROGRAM_MAP(hp9k360_map)
+	M68030(config, m_maincpu, 25000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp9k3xx_state::hp9k360_map);
 
 	add_dio32_bus(config);
 
@@ -418,30 +421,32 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k360)
 	DIO32_SLOT(config, "sl3", 0, "diobus", dio32_cards, "98620", false);
 	DIO32_SLOT(config, "sl4", 0, "diobus", dio32_cards, "98265a", false);
 	DIO32_SLOT(config, "sl5", 0, "diobus", dio32_cards, nullptr, false);
+}
 
-MACHINE_CONFIG_END
 
-
-MACHINE_CONFIG_START(hp9k3xx_state::hp9k370)
+void hp9k3xx_state::hp9k370(machine_config &config)
+{
 	hp9k360(config);
 
-	MCFG_DEVICE_REPLACE(m_maincpu, M68030, 33000000)
-	MCFG_DEVICE_PROGRAM_MAP(hp9k370_map)
-MACHINE_CONFIG_END
+	M68030(config.replace(), m_maincpu, 33000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp9k3xx_state::hp9k370_map);
+}
 
-MACHINE_CONFIG_START(hp9k3xx_state::hp9k380)
+void hp9k3xx_state::hp9k380(machine_config &config)
+{
 	hp9k360(config);
 
-	MCFG_DEVICE_REPLACE(m_maincpu, M68040, 25000000)
-	MCFG_DEVICE_PROGRAM_MAP(hp9k380_map)
-MACHINE_CONFIG_END
+	M68040(config.replace(), m_maincpu, 25000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp9k3xx_state::hp9k380_map);
+}
 
-MACHINE_CONFIG_START(hp9k3xx_state::hp9k382)
+void hp9k3xx_state::hp9k382(machine_config &config)
+{
 	hp9k360(config);
 
-	MCFG_DEVICE_REPLACE(m_maincpu, M68040, 25000000)
-	MCFG_DEVICE_PROGRAM_MAP(hp9k382_map)
-MACHINE_CONFIG_END
+	M68040(config.replace(), m_maincpu, 25000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp9k3xx_state::hp9k382_map);
+}
 
 ROM_START( hp9k310 )
 	ROM_REGION( 0x20000, MAINCPU_TAG, 0 )

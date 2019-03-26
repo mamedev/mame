@@ -900,16 +900,16 @@ MACHINE_RESET_MEMBER(fromance_state,fromance)
 	m_flipscreen = 0;
 }
 
-MACHINE_CONFIG_START(fromance_state::nekkyoku)
-
+void fromance_state::nekkyoku(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)     /* 6.00 Mhz ? */
-	MCFG_DEVICE_PROGRAM_MAP(nekkyoku_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 12000000/2); /* 6.00 Mhz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &fromance_state::nekkyoku_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fromance_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80,12000000/2)     /* 6.00 Mhz ? */
-	MCFG_DEVICE_PROGRAM_MAP(nekkyoku_sub_map)
-	MCFG_DEVICE_IO_MAP(nekkyoku_sub_io_map)
+	Z80(config, m_subcpu, 12000000/2);  /* 6.00 Mhz ? */
+	m_subcpu->set_addrmap(AS_PROGRAM, &fromance_state::nekkyoku_sub_map);
+	m_subcpu->set_addrmap(AS_IO, &fromance_state::nekkyoku_sub_io_map);
 
 	GENERIC_LATCH_8(config, m_sublatch);
 	m_sublatch->set_separate_acknowledge(true);
@@ -918,15 +918,15 @@ MACHINE_CONFIG_START(fromance_state::nekkyoku)
 	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromance_state, screen_update_fromance)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 352-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(fromance_state::screen_update_fromance));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fromance)
-	MCFG_PALETTE_ADD("palette", 1024)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fromance);
+	PALETTE(config, m_palette).set_entries(1024);
 
 	VSYSTEM_GGA(config, m_gga, 14318181 / 2); // clock not verified
 	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
@@ -938,23 +938,22 @@ MACHINE_CONFIG_START(fromance_state::nekkyoku)
 
 	AY8910(config, "aysnd", 12000000/6).add_route(ALL_OUTPUTS, "mono", 0.15); // type not verified
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fromance_state, fromance_adpcm_int)) /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(fromance_state::fromance_adpcm_int)); /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
-
-MACHINE_CONFIG_START(fromance_state::idolmj)
-
+void fromance_state::idolmj(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
-	MCFG_DEVICE_PROGRAM_MAP(fromance_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(12'000'000) / 2);   /* 6.00 Mhz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &fromance_state::fromance_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fromance_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
-	MCFG_DEVICE_PROGRAM_MAP(fromance_sub_map)
-	MCFG_DEVICE_IO_MAP(idolmj_sub_io_map)
+	Z80(config, m_subcpu, XTAL(12'000'000) / 2);    /* 6.00 Mhz ? */
+	m_subcpu->set_addrmap(AS_PROGRAM, &fromance_state::fromance_sub_map);
+	m_subcpu->set_addrmap(AS_IO, &fromance_state::idolmj_sub_io_map);
 
 	GENERIC_LATCH_8(config, m_sublatch);
 	m_sublatch->set_separate_acknowledge(true);
@@ -963,15 +962,15 @@ MACHINE_CONFIG_START(fromance_state::idolmj)
 	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromance_state, screen_update_fromance)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 352-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(fromance_state::screen_update_fromance));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fromance)
-	MCFG_PALETTE_ADD("palette", 2048)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fromance);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
 	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
@@ -983,23 +982,23 @@ MACHINE_CONFIG_START(fromance_state::idolmj)
 
 	YM2149(config, "aysnd", 12000000/6).add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fromance_state, fromance_adpcm_int)) /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(fromance_state::fromance_adpcm_int)); /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
-MACHINE_CONFIG_START(fromance_state::fromance)
-
+void fromance_state::fromance(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
-	MCFG_DEVICE_PROGRAM_MAP(fromance_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(12'000'000) / 2);   /* 6.00 Mhz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &fromance_state::fromance_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fromance_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
-	MCFG_DEVICE_PROGRAM_MAP(fromance_sub_map)
-	MCFG_DEVICE_IO_MAP(fromance_sub_io_map)
+	Z80(config, m_subcpu, XTAL(12'000'000) / 2);    /* 6.00 Mhz ? */
+	m_subcpu->set_addrmap(AS_PROGRAM, &fromance_state::fromance_sub_map);
+	m_subcpu->set_addrmap(AS_IO, &fromance_state::fromance_sub_io_map);
 
 	GENERIC_LATCH_8(config, m_sublatch);
 	m_sublatch->set_separate_acknowledge(true);
@@ -1008,15 +1007,15 @@ MACHINE_CONFIG_START(fromance_state::fromance)
 	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromance_state, screen_update_fromance)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 352-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(fromance_state::screen_update_fromance));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fromance)
-	MCFG_PALETTE_ADD("palette", 2048)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fromance);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
 	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
@@ -1026,14 +1025,13 @@ MACHINE_CONFIG_START(fromance_state::fromance)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	YM2413(config, "ymsnd", 3579545).add_route(ALL_OUTPUTS, "mono", 0.90);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fromance_state, fromance_adpcm_int)) /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(fromance_state::fromance_adpcm_int)); /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.10);
+}
 
 
 

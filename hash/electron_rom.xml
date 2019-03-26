@@ -58,17 +58,6 @@
 		</part>
 	</software>
 
-	<software name="abet" supported="no">
-		<description>Advanced BASIC Editor &amp; Toolkit v1.00</description>
-		<year>1990</year>
-		<publisher>P.R.E.S.</publisher>
-		<part name="rom" interface="electron_rom">
-			<dataarea name="rom" size="32768">
-				<rom name="AdvancedBASICEditorToolkit-1.00.rom" size="32768" crc="9dcf064e" sha1="80fb0c735a294b57e3fcc92614063a4ce319b41b" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="acp100" cloneof="acp">
 		<description>Advanced Control Panel v1.00</description>
 		<year>1986</year>
@@ -443,6 +432,41 @@
 		</part>
 	</software>
 
+	<software name="bet" supported="no">
+		<description>BASIC Editor &amp; Toolkit v1.00</description>
+		<year>1990</year>
+		<publisher>Ian Copestake Software</publisher>
+		<part name="rom" interface="electron_rom">
+			<dataarea name="rom" size="32768">
+				<rom name="BASICEditorToolkit-1.00.rom" size="32768" crc="9dcf064e" sha1="80fb0c735a294b57e3fcc92614063a4ce319b41b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commstar">
+		<description>Commstar</description>
+		<year>1985</year>
+		<publisher>PACE</publisher>
+		<part name="rom" interface="electron_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Commstar-E1.12.rom" size="16384" crc="61a1d49e" sha1="3776c972789cebacd1f92b6f3aa01c8b2c8bd505" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="e2p" supported="no">
+		<description>E2P Operating System (ROM)</description>
+		<year>1986</year>
+		<publisher>Permanent Memory Systems</publisher>
+		<info name="author" value="John Wike" />
+		<info name="usage" value="Requires E2P-6502" />
+		<part name="rom" interface="electron_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="PMSE2P-2.4.rom" size="8192" crc="05332a50" sha1="35c7dbf6119ab9770df4765d08382e3af7345aa9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="elkman14" cloneof="elkman">
 		<description>ElkMan v1.4</description>
 		<year>1985</year>
@@ -476,6 +500,17 @@
 		</part>
 	</software>
 
+	<software name="matrix">
+		<description>Matrix</description>
+		<year>1986</year>
+		<publisher>Vine Micros</publisher>
+		<part name="rom" interface="electron_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Matrix-1.01.rom" size="8192" crc="79beb2e0" sha1="3759f55e9f39b83eb96cb95ea4466ab72baca57f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mode7sim">
 		<description>Mode 7 Simulator v1.1</description>
 		<year>1988</year>
@@ -483,6 +518,18 @@
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Mode7Simulator-1.1.rom" size="16384" crc="3d4bbd16" sha1="22755882e39a6b5f92b9e29fb29d87cf4053c8e8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mforth83">
+		<description>Multi-Forth 83</description>
+		<year>1984</year>
+		<publisher>Skywave</publisher>
+		<info name="usage" value="*FORTH-83" />
+		<part name="rom" interface="electron_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Multi-Forth83.rom" size="16384" crc="c7de445f" sha1="9d26aecf96608504d091628ce1f15fb045e2874a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -825,6 +872,22 @@
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="T2SEDFS-2.02.rom" size="8192" crc="81dc4492" sha1="0a24c092757306264856a2a0a108e894a6112cc7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timetndr">
+		<description>Time-Tender</description>
+		<year>1986</year>
+		<publisher>Cheshire Micro Systems</publisher>
+		<part name="rom1" interface="electron_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Time1.rom" size="16384" crc="95aea1a3" sha1="ff90ce72badc5ffe10326cfb59cd199566f49a73" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="electron_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Time2.rom" size="16384" crc="c07b15c7" sha1="2236ab7a029cb9f399ba4d57e93fcef703e5cb61" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

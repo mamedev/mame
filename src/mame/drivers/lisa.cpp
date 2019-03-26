@@ -100,23 +100,26 @@ static const floppy_interface lisa_floppy_interface =
 void lisa_state::lisa(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 5093760);        /* 20.37504 MHz / 4 */
+	M68000(config, m_maincpu, 20.37504_MHz_XTAL / 4); // CPUCK is nominally 5 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &lisa_state::lisa_map);
-	m_maincpu->set_vblank_int(SCREEN_TAG, FUNC(lisa_state::lisa_interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(lisa_state::lisa_interrupt));
 
-	cop421_cpu_device &cop(COP421(config, COP421_TAG, 3900000));
-	cop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true);
+	cop421_cpu_device &iocop(COP421(config, "iocop", 3.93216_MHz_XTAL)); // U9F (I/O board)
+	iocop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true);
+	iocop.read_si().set_constant(1); // FIXME: actually tied to VIA CA2 but both pulled up to +5
+	iocop.read_g().set_constant(15);
 
-	cop421_cpu_device &kbcop(COP421(config, KB_COP421_TAG, 3900000)); // ?
+	cop421_cpu_device &kbcop(COP421(config, "kbcop", 3932160)); // same clock as other COP?
 	kbcop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true);
+	kbcop.read_si().set_constant(0);
+	kbcop.read_g().set_constant(15);
 
 	M6504(config, m_fdc_cpu, 2000000);        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
 	m_fdc_cpu->set_addrmap(AS_PROGRAM, &lisa_state::lisa_fdc_map);
 
 	config.m_minimum_quantum = attotime::from_hz(60);
 
-	LS259(config, m_latch, 0); // U4E
-
+	LS259(config, m_latch); // U4E (CPU board)
 	m_latch->q_out_cb<0>().set(FUNC(lisa_state::diag1_w));
 	m_latch->q_out_cb<1>().set(FUNC(lisa_state::diag2_w));
 	m_latch->q_out_cb<2>().set(FUNC(lisa_state::seg1_w));
@@ -127,11 +130,8 @@ void lisa_state::lisa(machine_config &config)
 	m_latch->q_out_cb<7>().set(FUNC(lisa_state::hdmsk_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(880, 380);
-	m_screen->set_visarea(0, 720-1, 0, 364-1);
+	m_screen->set_raw(20.37504_MHz_XTAL, 896, 0, 720, 379, 0, 364);
+	//m_screen->set_raw(20_MHz_XTAL, 896, 0, 720, 374, 0, 360); // according to Lisa Hardware Reference Manual
 	m_screen->set_screen_update(FUNC(lisa_state::screen_update_lisa));
 	m_screen->set_palette("palette");
 
@@ -154,14 +154,14 @@ void lisa_state::lisa(machine_config &config)
 	SOFTWARE_LIST(config, "disk_list").set_type("lisa", SOFTWARE_LIST_ORIGINAL_SYSTEM);
 
 	/* via */
-	VIA6522(config, m_via0, 500000);
+	VIA6522(config, m_via0, 20.37504_MHz_XTAL / 40); // CPU E clock (nominally 500 kHz)
 	m_via0->writepa_handler().set(FUNC(lisa_state::COPS_via_out_a));
 	m_via0->writepb_handler().set(FUNC(lisa_state::COPS_via_out_b));
 	m_via0->ca2_handler().set(FUNC(lisa_state::COPS_via_out_ca2));
 	m_via0->cb2_handler().set(FUNC(lisa_state::COPS_via_out_cb2));
 	m_via0->irq_handler().set(FUNC(lisa_state::COPS_via_irq_func));
 
-	VIA6522(config, m_via1, 500000);
+	VIA6522(config, m_via1, 20.37504_MHz_XTAL / 40); // CPU E clock (nominally 500 kHz)
 
 	SCC8530(config, m_scc, 7833600);
 }
@@ -363,10 +363,10 @@ ROM_START( lisa ) /* with twiggy drives, io40 i/o rom; technically any of the bo
 	ROMX_LOAD("341-0175-a", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(7)) // 341-0175-A LISA Bootrom Rev A (10/12/82?) (High)
 	ROMX_LOAD("341-0176-a", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(7)) // 341-0176-A LISA Bootrom Rev A (10/12/82?) (Low)
 
-	ROM_REGION( 0x400, COP421_TAG, 0 )
+	ROM_REGION( 0x400, "iocop", 0 )
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
-	ROM_REGION( 0x400, KB_COP421_TAG, 0 )
+	ROM_REGION( 0x400, "kbcop", 0 )
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
 	ROM_REGION(0x2000,"fdccpu",0)       // 6504 RAM and ROM
@@ -406,10 +406,10 @@ ROM_START( lisa2 ) /* internal apple codename was 'pepsi'; has one SSDD 400K dri
 	ROMX_LOAD("341-0175-3b", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(4)) // ?label? 341-0175-3b LISA Bootrom Rev 3B (9/8/83) (High)
 	ROMX_LOAD("341-0176-3b", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(4)) // ?label? 341-0176-3b LISA Bootrom Rev 3B (9/8/83) (Low)
 
-	ROM_REGION( 0x400, COP421_TAG, 0 )
+	ROM_REGION( 0x400, "iocop", 0 )
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
-	ROM_REGION( 0x400, KB_COP421_TAG, 0 )
+	ROM_REGION( 0x400, "kbcop", 0 )
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
 	ROM_REGION(0x2000,"fdccpu",0)       // 6504 RAM and ROM
@@ -439,10 +439,10 @@ ROM_START( lisa210 ) /* newer motherboard and i/o board; has io88 i/o rom, built
 	ROMX_LOAD("341-0175-f", 0x000000, 0x2000, CRC(701b9dab) SHA1(b116e5fada7b9a51f1b6e25757b2814d1b2737a5), ROM_SKIP(1) | ROM_BIOS(2)) // 341-0175-F LISA Bootrom Rev F (12/21/83) (High)
 	ROMX_LOAD("341-0176-f", 0x000001, 0x2000, CRC(036010b6) SHA1(ac93e6dbe4ce59396d7d191ee3e3e79a504e518f), ROM_SKIP(1) | ROM_BIOS(2)) // 341-0176-F LISA Bootrom Rev F (12/21/83) (Low)
 
-	ROM_REGION( 0x400, COP421_TAG, 0 )
+	ROM_REGION( 0x400, "iocop", 0 )
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
-	ROM_REGION( 0x400, KB_COP421_TAG, 0 )
+	ROM_REGION( 0x400, "kbcop", 0 )
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
 #if 1
@@ -467,10 +467,10 @@ ROM_START( macxl )
 	ROM_LOAD16_BYTE("341-0347-a", 0x000000, 0x2000, CRC(80add605) SHA1(82215688b778d8c712a8186235f7981e3dc4dd7f)) // 341-0347-A Mac XL '3A' Bootrom Hi (boot3a.hi)
 	ROM_LOAD16_BYTE("341-0346-a", 0x000001, 0x2000, CRC(edf5222f) SHA1(b0388ee8dbbc51a2d628473dc29b65ce913fcd76)) // 341-0346-A Mac XL '3A' Bootrom Lo (boot3a.lo)
 
-	ROM_REGION( 0x400, COP421_TAG, 0 )
+	ROM_REGION( 0x400, "iocop", 0 )
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
-	ROM_REGION( 0x400, KB_COP421_TAG, 0 )
+	ROM_REGION( 0x400, "kbcop", 0 )
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
 #if 1

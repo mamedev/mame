@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_AUDIO_RAD_EU3A05GPIO_H
-#define MAME_AUDIO_RAD_EU3A05GPIO_H
+#ifndef MAME_MACHINE_RAD_EU3A05GPIO_H
+#define MAME_MACHINE_RAD_EU3A05GPIO_H
 
 
 class radica6502_gpio_device : public device_t
@@ -40,4 +40,4 @@ private:
 
 DECLARE_DEVICE_TYPE(RADICA6502_GPIO, radica6502_gpio_device)
 
-#endif // MAME_AUDIO_RAD_EU3A05GPIO_H
+#endif // MAME_MACHINE_RAD_EU3A05GPIO_H

@@ -131,19 +131,19 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys16_paletteram_w)
 		int b4 = (newword >> 11) & 1;
 
 		/* Normal colors */
-		r = combine_6_weights(m_weights[0][0], r0, r1, r2, r3, r4, 0);
-		g = combine_6_weights(m_weights[0][1], g0, g1, g2, g3, g4, 0);
-		b = combine_6_weights(m_weights[0][2], b0, b1, b2, b3, b4, 0);
+		r = combine_weights(m_weights[0][0], r0, r1, r2, r3, r4, 0);
+		g = combine_weights(m_weights[0][1], g0, g1, g2, g3, g4, 0);
+		b = combine_weights(m_weights[0][2], b0, b1, b2, b3, b4, 0);
 
 		/* Shadow colors */
-		rs = combine_6_weights(m_weights[1][0], r0, r1, r2, r3, r4, 0);
-		gs = combine_6_weights(m_weights[1][1], g0, g1, g2, g3, g4, 0);
-		bs = combine_6_weights(m_weights[1][2], b0, b1, b2, b3, b4, 0);
+		rs = combine_weights(m_weights[1][0], r0, r1, r2, r3, r4, 0);
+		gs = combine_weights(m_weights[1][1], g0, g1, g2, g3, g4, 0);
+		bs = combine_weights(m_weights[1][2], b0, b1, b2, b3, b4, 0);
 
 		/* Highlight colors */
-		//rh = combine_6_weights(m_weights[1][0], r0, r1, r2, r3, r4, 1);
-		//gh = combine_6_weights(m_weights[1][1], g0, g1, g2, g3, g4, 1);
-		//bh = combine_6_weights(m_weights[1][2], b0, b1, b2, b3, b4, 1);
+		//rh = combine_weights(m_weights[1][0], r0, r1, r2, r3, r4, 1);
+		//gh = combine_weights(m_weights[1][1], g0, g1, g2, g3, g4, 1);
+		//bh = combine_weights(m_weights[1][2], b0, b1, b2, b3, b4, 1);
 
 		m_palette->set_pen_color(offset, rgb_t(r, g, b) );
 

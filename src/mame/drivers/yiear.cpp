@@ -278,24 +278,24 @@ void yiear_state::machine_reset()
 	m_yiear_nmi_enable = 0;
 }
 
-MACHINE_CONFIG_START(yiear_state::yiear)
-
+void yiear_state::yiear(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, MC6809E, XTAL(18'432'000)/12)   /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(yiear_state, yiear_nmi_interrupt, 480) /* music tempo (correct frequency unknown) */
+	MC6809E(config, m_maincpu, XTAL(18'432'000)/12);   /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &yiear_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(yiear_state::yiear_nmi_interrupt), attotime::from_hz(480)); /* music tempo (correct frequency unknown) */
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.58)   /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(yiear_state, screen_update_yiear)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, yiear_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60.58);   /* verified on pcb */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(yiear_state::screen_update_yiear));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(yiear_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_yiear);
 	PALETTE(config, m_palette, FUNC(yiear_state::yiear_palette), 32);
@@ -303,15 +303,14 @@ MACHINE_CONFIG_START(yiear_state::yiear)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(m_audio, TRACKFLD_AUDIO, 0, finder_base::DUMMY_TAG, m_vlm)
+	TRACKFLD_AUDIO(config, m_audio, 0, finder_base::DUMMY_TAG, m_vlm);
 
-	MCFG_DEVICE_ADD(m_sn, SN76489A, XTAL(18'432'000)/12)   /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SN76489A(config, m_sn, XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "mono", 1.0);   /* verified on pcb */
 
-	MCFG_DEVICE_ADD(m_vlm, VLM5030, XTAL(3'579'545))   /* verified on pcb */
-	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	VLM5030(config, m_vlm, XTAL(3'579'545));   /* verified on pcb */
+	m_vlm->set_addrmap(0, &yiear_state::vlm_map);
+	m_vlm->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************

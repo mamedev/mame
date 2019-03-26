@@ -88,7 +88,7 @@ void bw2_ramcard_device::device_reset()
 //  bw2_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t bw2_ramcard_device::bw2_cd_r(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6)
+uint8_t bw2_ramcard_device::bw2_cd_r(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6)
 {
 	if (!ram2)
 	{
@@ -107,7 +107,7 @@ uint8_t bw2_ramcard_device::bw2_cd_r(address_space &space, offs_t offset, uint8_
 //  bw2_cd_r - cartridge data write
 //-------------------------------------------------
 
-void bw2_ramcard_device::bw2_cd_w(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6)
+void bw2_ramcard_device::bw2_cd_w(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6)
 {
 	if (m_en && !ram5)
 	{
@@ -120,7 +120,7 @@ void bw2_ramcard_device::bw2_cd_w(address_space &space, offs_t offset, uint8_t d
 //  bw2_slot_w - slot write
 //-------------------------------------------------
 
-void bw2_ramcard_device::bw2_slot_w(address_space &space, offs_t offset, uint8_t data)
+void bw2_ramcard_device::bw2_slot_w(offs_t offset, uint8_t data)
 {
 	m_en = 1;
 	m_bank = data & 0x0f;

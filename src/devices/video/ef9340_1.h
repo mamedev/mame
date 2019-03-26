@@ -15,16 +15,18 @@
 #pragma once
 
 
-
-#define MCFG_EF9340_1_ADD(_tag, _clock, _screen_tag) \
-	MCFG_DEVICE_ADD(_tag, EF9340_1, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag)
-
 class ef9340_1_device : public device_t,
 						public device_video_interface
 {
 public:
 	// construction/destruction
+	template <typename T>
+	ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
+		: ef9340_1_device(mconfig, tag, owner, clock)
+	{
+		set_screen(std::forward<T>(screen_tag));
+	}
+
 	ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	inline bitmap_ind16 *get_bitmap() { return &m_tmp_bitmap; }

@@ -193,12 +193,12 @@ void bk_state::bk0010(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("bk0010");
 }
 
-MACHINE_CONFIG_START(bk_state::bk0010fd)
+void bk_state::bk0010fd(machine_config &config)
+{
 	bk0010(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bk0010fd_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &bk_state::bk0010fd_mem);
+}
 
 
 /* ROM definition */

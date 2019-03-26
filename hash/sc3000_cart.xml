@@ -321,4 +321,48 @@
 		</part>
 	</software>
 
+	<!-- SC-3000 Survivors carts -->
+
+	<software name="multcart228" cloneof="multcart">
+		<description>SC-3000 Survivors MkII Multicart v2.28</description>
+		<year>2013</year>
+		<publisher>SC-3000 Survivors</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="multicart" />
+			<dataarea name="rom" size="2097152">
+				<rom name="SC3000SurvivorsMkIIMulticart_v2_28b.bin" size="2097152" crc="f4e7f01b" sha1="4a75f6c24978a01cea70c068a3b0b3f8d60fe590" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multcart">
+		<description>SC-3000 Survivors MkII Multicart v2.31</description>
+		<year>2018</year>
+		<publisher>SC-3000 Survivors</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="multicart" />
+			<dataarea name="rom" size="2097152">
+				<rom name="SC3000SurvivorsMkIIMulticart_v2_31.bin" size="2097152" crc="0084b239" sha1="faff64ade6ef21e6673793d2d7b9603447bd5a01" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megacart">
+		<description>SC-3000 Survivors Megacart v2.31</description>
+		<year>2018</year>
+		<publisher>SC-3000 Survivors</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="megacart" />
+			<dataarea name="rom" size="4194304">
+				<rom name="SC3000SurvivorsMegacart_v2_31.bin" size="4194304" crc="76a3d2e2" sha1="17c226646d937845caa1af0dac356f0ee1fa9677" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
