@@ -83,6 +83,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_palram;
+	required_shared_ptr<uint16_t> m_palctrlram;
+	uint16_t m_palctrlswapped[0x10];
 	required_device<spg2xx_io_device> m_spg_io;
 
 	//TIMER_CALLBACK_MEMBER(test_timer);
@@ -114,22 +116,7 @@ private:
 
 	DECLARE_WRITE16_MEMBER(spg110_2045_w);
 
-	DECLARE_WRITE16_MEMBER(spg110_2050_w);
-	DECLARE_WRITE16_MEMBER(spg110_2051_w);
-	DECLARE_WRITE16_MEMBER(spg110_2052_w);
-	DECLARE_WRITE16_MEMBER(spg110_2053_w);
-	DECLARE_WRITE16_MEMBER(spg110_2054_w);
-	DECLARE_WRITE16_MEMBER(spg110_2055_w);
-	DECLARE_WRITE16_MEMBER(spg110_2056_w);
-	DECLARE_WRITE16_MEMBER(spg110_2057_w);
-	DECLARE_WRITE16_MEMBER(spg110_2058_w);
-	DECLARE_WRITE16_MEMBER(spg110_2059_w);
-	DECLARE_WRITE16_MEMBER(spg110_205a_w);
-	DECLARE_WRITE16_MEMBER(spg110_205b_w);
-	DECLARE_WRITE16_MEMBER(spg110_205c_w);
-	DECLARE_WRITE16_MEMBER(spg110_205d_w);
-	DECLARE_WRITE16_MEMBER(spg110_205e_w);
-	DECLARE_WRITE16_MEMBER(spg110_205f_w);
+	DECLARE_WRITE16_MEMBER(spg110_205x_w);
 
 
 	DECLARE_READ16_MEMBER(spg110_2037_r);
@@ -187,7 +174,7 @@ private:
 	void tilemap_write_regs(int which, uint16_t* regs, int regno, uint16_t data);
 
 	template<flipx_t FlipX>
-	void blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile);
+	void blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile, uint8_t pal);
 	void blit_page(const rectangle &cliprect, uint32_t scanline, int depth, uint32_t bitmap_addr, uint16_t *regs);
 	uint32_t m_screenbuf[320 * 240];
 

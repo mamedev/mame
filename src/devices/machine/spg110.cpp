@@ -25,6 +25,7 @@ spg110_device::spg110_device(const machine_config &mconfig, device_type type, co
 	, m_palette(*this, "palette")
 	, m_gfxdecode(*this, "gfxdecode")
 	, m_palram(*this, "palram")
+	, m_palctrlram(*this, "palctrlram")
 	, m_spg_io(*this, "spg_io")
 	, m_porta_out(*this)
 	, m_portb_out(*this)
@@ -38,7 +39,7 @@ spg110_device::spg110_device(const machine_config &mconfig, device_type type, co
 }
 
 template<spg110_device::flipx_t FlipX>
-void spg110_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile)
+void spg110_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile, uint8_t pal)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
 
@@ -49,9 +50,8 @@ void spg110_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff
 
 	uint32_t nc = ((attr & 0x0003) + 1) << 1;
 
-	uint32_t palette_offset = (attr & 0x0f00) >> 4;
+	uint32_t palette_offset = pal;
 
-	palette_offset >>= nc;
 	palette_offset <<= nc;
 
 	uint32_t bits_per_row = nc * w / 16;
@@ -96,11 +96,15 @@ void spg110_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff
 		{
 			// TODO, this is completely wrong for this palette system
 			int pix_index = xx + y_index;
-			uint16_t rawpal = m_palram[pal];
+			//uint16_t rawpal = m_palram[pal];
 			const pen_t *pens = m_palette->pens();
 			uint32_t paldata = pens[pal];
 
-			if (!(rawpal & 0x8000))
+			int penword = (pal >> 4) & 0xf;
+			int penbit = (pal & 0xf);
+			int trans = m_palctrlswapped[penword] & (1 << penbit);
+
+			if (!trans)
 			{
 				m_screenbuf[pix_index] = paldata;
 			}
@@ -143,24 +147,25 @@ void spg110_device::blit_page(const rectangle &cliprect, uint32_t scanline, int 
 		uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & 0xff) - 0x10;
 		uint32_t xx = (tile_w * x0 - xscroll) & 0x1ff;
 		uint16_t tile = (ctrl & PAGE_WALLPAPER_MASK) ? space2.read_word(tilemap*2) : space2.read_word((tilemap + tile_address)*2);
-		uint16_t palette = 0;
+		uint16_t extra_attribute = 0;
 
 		if (!tile)
 			continue;
 
-		palette = space2.read_word(palette_map + tile_address / 2);
+		extra_attribute = space2.read_word((palette_map*2) + tile_address);
 		if (x0 & 1)
-			palette = (palette & 0xff00) >> 8;
+			extra_attribute = (extra_attribute & 0xff00) >> 8;
 		else
-			palette = (palette & 0x00ff);
+			extra_attribute = (extra_attribute & 0x00ff);
 
+		uint8_t pal = extra_attribute & 0x0f;
 
 		bool flip_x = 0;//(tileattr & TILE_X_FLIP);
 
 		if (flip_x)
-			blit<FlipXOn>(cliprect, tile_scanline, xx, yy, attr, ctrl, bitmap_addr, tile);
+			blit<FlipXOn>(cliprect, tile_scanline, xx, yy, attr, ctrl, bitmap_addr, tile, pal);
 		else
-			blit<FlipXOff>(cliprect, tile_scanline, xx, yy, attr, ctrl, bitmap_addr, tile);
+			blit<FlipXOff>(cliprect, tile_scanline, xx, yy, attr, ctrl, bitmap_addr, tile, pal);
 
 	}
 }
@@ -305,22 +310,16 @@ READ16_MEMBER(spg110_device::spg110_2028_r) { return 0x0000; }
 READ16_MEMBER(spg110_device::spg110_2029_r) { return 0x0000; }
 
 
-WRITE16_MEMBER(spg110_device::spg110_2050_w) { }
-WRITE16_MEMBER(spg110_device::spg110_2051_w) { }
-WRITE16_MEMBER(spg110_device::spg110_2052_w) { }
-WRITE16_MEMBER(spg110_device::spg110_2053_w) { }
-WRITE16_MEMBER(spg110_device::spg110_2054_w) { }
-WRITE16_MEMBER(spg110_device::spg110_2055_w) { }
-WRITE16_MEMBER(spg110_device::spg110_2056_w) { }
-WRITE16_MEMBER(spg110_device::spg110_2057_w) { }
-WRITE16_MEMBER(spg110_device::spg110_2058_w) { }
-WRITE16_MEMBER(spg110_device::spg110_2059_w) { }
-WRITE16_MEMBER(spg110_device::spg110_205a_w) { }
-WRITE16_MEMBER(spg110_device::spg110_205b_w) { }
-WRITE16_MEMBER(spg110_device::spg110_205c_w) { }
-WRITE16_MEMBER(spg110_device::spg110_205d_w) { }
-WRITE16_MEMBER(spg110_device::spg110_205e_w) { }
-WRITE16_MEMBER(spg110_device::spg110_205f_w) { }
+WRITE16_MEMBER(spg110_device::spg110_205x_w)
+{
+	COMBINE_DATA(&m_palctrlram[offset]);
+
+	uint16_t temp = m_palctrlram[offset];
+
+	// 0x0010 to 0x0001  - complete guess that this could be pen transparency
+	m_palctrlswapped[offset] = bitswap<16>(temp, 11, 10, 9, 8, 15, 14, 13, 12, 3, 2, 1, 0, 7, 6, 5, 4);
+}
+
 
 WRITE16_MEMBER(spg110_device::dma_unk_2061_w) { COMBINE_DATA(&m_dma_unk_2061); }
 WRITE16_MEMBER(spg110_device::dma_dst_step_w) { COMBINE_DATA(&m_dma_dst_step); }
@@ -443,6 +442,8 @@ void spg110_device::map(address_map &map)
 	map(0x002010, 0x002015).rw(FUNC(spg110_device::tmap0_regs_r), FUNC(spg110_device::tmap0_regs_w));
 	map(0x002016, 0x00201b).rw(FUNC(spg110_device::tmap1_regs_r), FUNC(spg110_device::tmap1_regs_w));
 
+#if 0
+
 	map(0x00201c, 0x00201c).w(FUNC(spg110_device::spg110_201c_w));
 
 	map(0x002020, 0x002020).w(FUNC(spg110_device::spg110_2020_w));
@@ -467,26 +468,10 @@ void spg110_device::map(address_map &map)
 	map(0x002042, 0x002042).rw(FUNC(spg110_device::spg110_2042_r),FUNC(spg110_device::spg110_2042_w));
 
 	map(0x002045, 0x002045).w(FUNC(spg110_device::spg110_2045_w));
+#endif
 
-	// seems to be 16 entries for.. something?
-	map(0x002050, 0x002050).w(FUNC(spg110_device::spg110_2050_w));
-	map(0x002051, 0x002051).w(FUNC(spg110_device::spg110_2051_w));
-	map(0x002052, 0x002052).w(FUNC(spg110_device::spg110_2052_w));
-	map(0x002053, 0x002053).w(FUNC(spg110_device::spg110_2053_w));
-	map(0x002054, 0x002054).w(FUNC(spg110_device::spg110_2054_w));
-	map(0x002055, 0x002055).w(FUNC(spg110_device::spg110_2055_w));
-	map(0x002056, 0x002056).w(FUNC(spg110_device::spg110_2056_w));
-	map(0x002057, 0x002057).w(FUNC(spg110_device::spg110_2057_w));
-	map(0x002058, 0x002058).w(FUNC(spg110_device::spg110_2058_w));
-	map(0x002059, 0x002059).w(FUNC(spg110_device::spg110_2059_w));
-	map(0x00205a, 0x00205a).w(FUNC(spg110_device::spg110_205a_w));
-	map(0x00205b, 0x00205b).w(FUNC(spg110_device::spg110_205b_w));
-	map(0x00205c, 0x00205c).w(FUNC(spg110_device::spg110_205c_w));
-	map(0x00205d, 0x00205d).w(FUNC(spg110_device::spg110_205d_w));
-	map(0x00205e, 0x00205e).w(FUNC(spg110_device::spg110_205e_w));
-	map(0x00205f, 0x00205f).w(FUNC(spg110_device::spg110_205f_w));
-
-	//map(0x002010, 0x00205f).ram();
+	// seems to be 16 entries for.. something? on jak_capb these seem connected to the palette DMA operations, 0x2050 for 0x8000, 0x2051 for 0x8020, 0x2052 for 0x8040 etc. maybe 1 bit per pen?
+	map(0x002050, 0x00205f).ram().w(FUNC(spg110_device::spg110_205x_w)).share("palctrlram");
 
 	// everything (dma? and interrupt flag?!)
 	map(0x002060, 0x002060).w(FUNC(spg110_device::dma_dst_w));
