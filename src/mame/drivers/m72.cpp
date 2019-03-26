@@ -1876,11 +1876,19 @@ void m72_state::m72_8751(machine_config &config)
 	mculatch.data_pending_callback().set_inputline(m_mcu, MCS51_INT1_LINE);
 	mculatch.set_separate_acknowledge(true);
 
-	I8751(config, m_mcu, XTAL(8'000'000)); /* Uses its own XTAL */
-	m_mcu->set_addrmap(AS_IO, &m72_state::mcu_io_map);
-	m_mcu->port_out_cb<1>().set(FUNC(m72_state::mcu_port1_w));
+	i8751_device &mcu(I8751(config, m_mcu, XTAL(8'000'000))); /* Uses its own XTAL */
+	mcu.set_addrmap(AS_IO, &m72_state::mcu_io_map);
+	mcu.port_out_cb<1>().set(FUNC(m72_state::mcu_port1_w));
 }
 
+void m72_state::imgfightb(machine_config &config)
+{
+	m72_8751(config);
+
+	i80c31_device &mcu(I80C31(config.replace(), m_mcu, 8000000));
+	mcu.set_addrmap(AS_IO, &m72_state::mcu_io_map);
+	mcu.port_out_cb<1>().set(FUNC(m72_state::mcu_port1_w));
+}
 
 void m72_state::rtype(machine_config &config)
 {
@@ -2672,7 +2680,7 @@ ROM_START( imgfightj )
 	ROM_LOAD( "if-c-v1.bin",  0x10000, 0x10000, CRC(45b68bf5) SHA1(2fb28793019ca85b3b6d7c4c31eedff1d71f2d83) )
 ROM_END
 
-ROM_START( imgfightb ) // mostly identical to imgfightj
+ROM_START( imgfightb ) // mostly identical to imgfightj content-wise, it'a 4 PCB stack bootleg with flying wires
 	ROM_REGION( 0x100000, "maincpu", 0 ) // identical, but ic111.9e
 	ROM_LOAD16_BYTE( "ic108.9b",  0x00001, 0x10000, CRC(592d2d80) SHA1(d54916a9bfe4b65a972b62202af706135e73518d) )
 	ROM_LOAD16_BYTE( "ic89.7b",  0x00000, 0x10000, CRC(61f89056) SHA1(3e0724dbc2b00a30193ea6cfac8b4331055d4fd4) )
@@ -2686,7 +2694,7 @@ ROM_START( imgfightb ) // mostly identical to imgfightj
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "25.ic27.2l",  0x00000, 0x2000, CRC(3e66c629) SHA1(e1da7a85dd0a20c8692ceca188883c2abb5b816d) ) // i80c31 instead of i8751, FIXED BITS (xxxxxxxxxxxxxxx0)
+	ROM_LOAD( "25.ic27.2l",  0x00000, 0x2000, CRC(d83359a2) SHA1(2d486bf4a873abfe591e0d9383f9e230f47bc42a) ) // i80c31 instead of i8751, contents identical to imgfightj MCU, with second half padded with 0xff
 
 	ROM_REGION( 0x080000, "sprites", 0 ) // half size ROMs, but identical content
 	ROM_LOAD( "ic96.7k",  0x00000, 0x10000, CRC(d4febb03) SHA1(6fe53b198bdcef1708ff134c64af9c064e274e1b) )  /* sprites */
@@ -3873,7 +3881,7 @@ GAME( 1988, nspiritj,    nspirit,  m72_8751,     nspirit,      m72_state, init_m
 
 GAME( 1988, imgfight,    0,        m72,          imgfight,     m72_state, init_imgfight,   ROT270, "Irem", "Image Fight (World, revision A)", MACHINE_SUPPORTS_SAVE )             // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
 GAME( 1988, imgfightj,   imgfight, m72_8751,     imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )                         // waits for japan warning screen, works with our mcu dump, can't actually see warning screen due to priority / mixing errors, check tilemap viewer (Japan Version)
-GAME( 1988, imgfightb,   imgfight, m72,          imgfight,     m72_state, init_imgfight,   ROT270, "Irem", "Image Fight (Japan, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )                // uses an 80c31 MCU, which isn't hooked up yet
+GAME( 1988, imgfightb,   imgfight, imgfightb,    imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // uses an 80c31 MCU, which isn't hooked up correctly yet. Gives 'RAM NG 7' error
 
 GAME( 1989, loht,        0,        m72,          loht,         m72_state, init_loht,       ROT0,   "Irem", "Legend of Hero Tonma", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )         // fails rom check if used with Japan MCU rom (World version?)
 GAME( 1989, lohtj,       loht,     m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "Irem", "Legend of Hero Tonma (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // waits for japan warning screen, works with our mcu dump (Japan Version)
