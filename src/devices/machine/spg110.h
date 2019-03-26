@@ -84,6 +84,11 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_palram;
 	required_shared_ptr<uint16_t> m_palctrlram;
+	required_shared_ptr<uint16_t> m_sprtileno;
+	required_shared_ptr<uint16_t> m_sprattr1;
+	required_shared_ptr<uint16_t> m_sprattr2;
+
+
 	uint16_t m_palctrlswapped[0x10];
 	required_device<spg2xx_io_device> m_spg_io;
 
@@ -174,7 +179,7 @@ private:
 	void tilemap_write_regs(int which, uint16_t* regs, int regno, uint16_t data);
 
 	template<flipx_t FlipX>
-	void blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile, uint8_t pal);
+	void blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile, uint8_t pal, int32_t h, int32_t w);
 	void blit_page(const rectangle &cliprect, uint32_t scanline, int depth, uint32_t bitmap_addr, uint16_t *regs);
 	uint32_t m_screenbuf[320 * 240];
 

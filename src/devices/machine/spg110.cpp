@@ -26,6 +26,9 @@ spg110_device::spg110_device(const machine_config &mconfig, device_type type, co
 	, m_gfxdecode(*this, "gfxdecode")
 	, m_palram(*this, "palram")
 	, m_palctrlram(*this, "palctrlram")
+	, m_sprtileno(*this, "sprtileno")
+	, m_sprattr1(*this, "sprattr1")
+	, m_sprattr2(*this, "sprattr2")
 	, m_spg_io(*this, "spg_io")
 	, m_porta_out(*this)
 	, m_portb_out(*this)
@@ -39,12 +42,9 @@ spg110_device::spg110_device(const machine_config &mconfig, device_type type, co
 }
 
 template<spg110_device::flipx_t FlipX>
-void spg110_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile, uint8_t pal)
+void spg110_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile, uint8_t pal, int32_t h, int32_t w)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
-
-	int32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	int32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
 	uint32_t yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
 
@@ -166,9 +166,9 @@ void spg110_device::blit_page(const rectangle &cliprect, uint32_t scanline, int 
 			bool flip_x = 0;//(tileattr & TILE_X_FLIP);
 
 			if (flip_x)
-				blit<FlipXOn>(cliprect, tile_scanline, xx, yy, attr, ctrl, bitmap_addr, tile, pal);
+				blit<FlipXOn>(cliprect, tile_scanline, xx, yy, attr, ctrl, bitmap_addr, tile, pal, tile_h, tile_w);
 			else
-				blit<FlipXOff>(cliprect, tile_scanline, xx, yy, attr, ctrl, bitmap_addr, tile, pal);
+				blit<FlipXOff>(cliprect, tile_scanline, xx, yy, attr, ctrl, bitmap_addr, tile, pal, tile_h, tile_w);
 		}
 
 	}
@@ -446,8 +446,7 @@ void spg110_device::map(address_map &map)
 	map(0x002010, 0x002015).rw(FUNC(spg110_device::tmap0_regs_r), FUNC(spg110_device::tmap0_regs_w));
 	map(0x002016, 0x00201b).rw(FUNC(spg110_device::tmap1_regs_r), FUNC(spg110_device::tmap1_regs_w));
 
-#if 0
-
+#if 0 // more vregs?
 	map(0x00201c, 0x00201c).w(FUNC(spg110_device::spg110_201c_w));
 
 	map(0x002020, 0x002020).w(FUNC(spg110_device::spg110_2020_w));
@@ -481,15 +480,16 @@ void spg110_device::map(address_map &map)
 	map(0x002060, 0x002060).w(FUNC(spg110_device::dma_dst_w));
 	map(0x002061, 0x002061).w(FUNC(spg110_device::dma_unk_2061_w));
 	map(0x002062, 0x002062).rw(FUNC(spg110_device::dma_len_status_r),FUNC(spg110_device::dma_len_trigger_w));
-	map(0x002063, 0x002063).rw(FUNC(spg110_device::spg110_2063_r),FUNC(spg110_device::spg110_2063_w)); // this looks like interrupt stuff and is checked in the irq like an irq source, but why in the middle of what otherwise look like some kind of DMA?
+	map(0x002063, 0x002063).rw(FUNC(spg110_device::spg110_2063_r),FUNC(spg110_device::spg110_2063_w)); // Video IRQ source / ack (3 different things checked here instead of 2 on spg2xx?)
 	map(0x002064, 0x002064).w(FUNC(spg110_device::dma_dst_step_w));
 	map(0x002066, 0x002066).w(FUNC(spg110_device::dma_src_w));
 	map(0x002067, 0x002067).w(FUNC(spg110_device::dma_unk_2067_w));
 	map(0x002068, 0x002068).w(FUNC(spg110_device::dma_src_step_w));
 
-	map(0x002200, 0x0022ff).ram(); // looks like per-pen brightness or similar? strange because palette isn't memory mapped here
+	map(0x002200, 0x0022ff).ram(); // looks like per-pen brightness or similar? strange because palette isn't memory mapped here (maybe rowscroll?)
 
-	map(0x003000, 0x00307f).ram(); // sound registers? seems to be 8 long entries, only uses up to 0x7f?
+#if 1  // sound registers? seems to be 8 long entries, only uses up to 0x7f? (register mapping seems similar to spg2xx, maybe with less channels?)
+	map(0x003000, 0x00307f).ram();
 	map(0x003080, 0x0030ff).ram();
 
 	map(0x003100, 0x003100).w(FUNC(spg110_device::spg110_3100_w));
@@ -508,6 +508,7 @@ void spg110_device::map(address_map &map)
 	map(0x00310d, 0x00310d).w(FUNC(spg110_device::spg110_310d_w));
 
 	map(0x00310f, 0x00310f).r(FUNC(spg110_device::spg110_310f_r));
+#endif
 
 	// 0032xx looks like it could be the same as 003d00 on spg2xx
 	map(0x003200, 0x00322f).rw(m_spg_io, FUNC(spg2xx_io_device::io_r), FUNC(spg2xx_io_device::io_w));
@@ -519,10 +520,11 @@ void spg110_device::map_video(address_map &map)
 	// are these addresses hardcoded, or can they move (in which case tilemap system isn't really suitable)
 	map(0x00000, 0x03fff).ram(); // 2fff?
 
-	map(0x04000, 0x04fff).ram(); // seems to be 3 blocks, almost certainly spritelist
+	map(0x04000, 0x041ff).ram().share("sprtileno"); // seems to be 3 blocks, almost certainly spritelist
+	map(0x04200, 0x043ff).ram().share("sprattr1");
+	map(0x04400, 0x045ff).ram().share("sprattr2");
 
-//  map(0x08000, 0x081ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // probably? format unknown tho
-	map(0x08000, 0x081ff).ram().share("palram");
+	map(0x08000, 0x081ff).ram().share("palram"); // palette format unknown
 }
 
 
