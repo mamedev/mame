@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Sean Riddle, algestam
+// copyright-holders:hap, Sean Riddle, Henrik Algestam
 // thanks-to:Igor, ChoccyHobNob, RColtrane
 /***************************************************************************
 
@@ -1415,6 +1415,8 @@ ROM_END
   * PCB label PP-23 Y
   * Sharp SM5A label PP-23 52YD (no decap)
   * lcd screen with custom segments, 1-bit sound
+
+  This is the wide screen version, there's also tabletop and panorama versions.
 
 ***************************************************************************/
 
@@ -8960,7 +8962,7 @@ CONS( 1991, kgarfld,     0,          0, kgarfld,     kgarfld,     kgarfld_state,
 // Nintendo G&W: wide screen
 CONS( 1981, gnw_pchute,  0,          0, gnw_pchute,  gnw_pchute,  gnw_pchute_state,  empty_init, "Nintendo", "Game & Watch: Parachute", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_octopus, 0,          0, gnw_octopus, gnw_octopus, gnw_octopus_state, empty_init, "Nintendo", "Game & Watch: Octopus", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, gnw_popeye,  0,          0, gnw_popeye,  gnw_popeye,  gnw_popeye_state,  empty_init, "Nintendo", "Game & Watch: Popeye", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_popeye,  0,          0, gnw_popeye,  gnw_popeye,  gnw_popeye_state,  empty_init, "Nintendo", "Game & Watch: Popeye (wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_egg,     gnw_mmouse, 0, gnw_egg,     gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_state,  empty_init, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )
