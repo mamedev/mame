@@ -42,13 +42,13 @@ spg110_device::spg110_device(const machine_config &mconfig, device_type type, co
 }
 
 template<spg110_device::flipx_t FlipX>
-void spg110_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile, uint8_t pal, int32_t h, int32_t w)
+void spg110_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile, uint8_t pal, int32_t h, int32_t w, uint8_t bpp)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
 
-	uint32_t yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
+	uint32_t yflipmask = 0; //attr & TILE_Y_FLIP ? h - 1 : 0;
 
-	uint32_t nc = ((attr & 0x0003) + 1) << 1;
+	uint32_t nc = (bpp + 1) << 1;
 
 	uint32_t palette_offset = pal;
 
@@ -132,6 +132,8 @@ void spg110_device::blit_page(const rectangle &cliprect, uint32_t scanline, int 
 //		return;
 //	}
 
+	uint8_t bpp = attr & 0x03;
+
 	uint32_t tile_h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
 	uint32_t tile_w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
@@ -166,9 +168,9 @@ void spg110_device::blit_page(const rectangle &cliprect, uint32_t scanline, int 
 			bool flip_x = 0;//(tileattr & TILE_X_FLIP);
 
 			if (flip_x)
-				blit<FlipXOn>(cliprect, tile_scanline, xx, yy, attr, ctrl, bitmap_addr, tile, pal, tile_h, tile_w);
+				blit<FlipXOn>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, pal, tile_h, tile_w, bpp);
 			else
-				blit<FlipXOff>(cliprect, tile_scanline, xx, yy, attr, ctrl, bitmap_addr, tile, pal, tile_h, tile_w);
+				blit<FlipXOff>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, pal, tile_h, tile_w, bpp);
 		}
 
 	}
