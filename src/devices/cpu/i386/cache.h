@@ -222,37 +222,37 @@ u8 memory[memorysize];
 
 void readline(u8 *data, u32 address)
 {
-	for (int n = 0; n < 64; n++)
-		data[n] = memory[address + n];
+    for (int n = 0; n < 64; n++)
+        data[n] = memory[address + n];
 }
 
 void writeline(u8 *data, u32 address)
 {
-	for (int n = 0; n < 64; n++)
-		memory[address + n] = data[n];
+    for (int n = 0; n < 64; n++)
+        memory[address + n] = data[n];
 }
 
 void cache_tester()
 {
-	cpucache<18, 8, 6, 2> cache;
-	bool r;
-	u8 *data;
-	int address;
-	u8 value;
+    cpucache<18, 8, 6, 2> cache;
+    bool r;
+    u8 *data;
+    int address;
+    u8 value;
 
-	for (int n = 0; n < memorysize; n++)
-		memory[n] = 0xaa ^ n;
-	address = std::rand() & (memorysize - 1);
-	r = cache.search(address, &data);
-	if (r == false)
-	{
-		r = cache.allocate(address, &data);
-		if (r == true)
-			writeline(data, cache.base(address));
-		readline(data, cache.base(address));
-	}
-	value = data[address & 63];
-	if (value != memory[address])
-		printf("Error reading address %d\n\r", address);
+    for (int n = 0; n < memorysize; n++)
+        memory[n] = 0xaa ^ n;
+    address = std::rand() & (memorysize - 1);
+    r = cache.search(address, &data);
+    if (r == false)
+    {
+        r = cache.allocate(address, &data);
+        if (r == true)
+            writeline(data, cache.base(address));
+        readline(data, cache.base(address));
+    }
+    value = data[address & 63];
+    if (value != memory[address])
+        printf("Error reading address %d\n\r", address);
 }
 */

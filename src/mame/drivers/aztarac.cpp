@@ -149,17 +149,17 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(aztarac_state::aztarac)
-
+void aztarac_state::aztarac(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aztarac_state,  irq4_line_hold)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(aztarac_state, irq_callback)
+	M68000(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &aztarac_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(aztarac_state::irq4_line_hold));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(aztarac_state::irq_callback));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(aztarac_state, snd_timed_irq,  100)
+	Z80(config, m_audiocpu, 2000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aztarac_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(aztarac_state::snd_timed_irq), attotime::from_hz(100));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -167,11 +167,11 @@ MACHINE_CONFIG_START(aztarac_state::aztarac)
 
 	/* video hardware */
 	VECTOR(config, m_vector, 0);
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(40)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
+	m_screen->set_refresh_hz(40);
+	m_screen->set_size(400, 300);
+	m_screen->set_visarea(0, 1024-1, 0, 768-1);
+	m_screen->set_screen_update("vector", FUNC(vector_device::screen_update));
 
 
 	/* sound hardware */
@@ -186,7 +186,7 @@ MACHINE_CONFIG_START(aztarac_state::aztarac)
 	AY8910(config, "ay3", 2000000).add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	AY8910(config, "ay4", 2000000).add_route(ALL_OUTPUTS, "mono", 0.15);
-MACHINE_CONFIG_END
+}
 
 
 

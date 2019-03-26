@@ -307,7 +307,7 @@ namespace netlist
 		const models_t &models() const { return m_models; }
 
 	protected:
-		models_t							        m_models;
+		models_t                                    m_models;
 		std::stack<pstring>                         m_namespace_stack;
 		std::unordered_map<pstring, pstring>        m_alias;
 		std::vector<link_t>                         m_links;

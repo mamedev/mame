@@ -24,6 +24,7 @@ acvirus.cpp
 adam.cpp
 adm23.cpp
 adm31.cpp
+adm36.cpp
 advision.cpp
 agat.cpp
 aim65.cpp
@@ -786,6 +787,7 @@ ti990_10.cpp
 ti990_4.cpp
 ticalc1x.cpp
 tiki100.cpp
+titan_soc.cpp
 tim011.cpp
 tim100.cpp
 timex.cpp

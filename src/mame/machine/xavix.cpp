@@ -437,7 +437,7 @@ CUSTOM_INPUT_MEMBER(xavix_ekara_state::ekara_multi1_r)
 
 uint8_t xavix_state::read_io0(uint8_t direction)
 {
-//	LOG("%s: read_io0\n", machine().describe_context());
+//  LOG("%s: read_io0\n", machine().describe_context());
 
 	// no special handling
 	return m_in0->read();
@@ -445,7 +445,7 @@ uint8_t xavix_state::read_io0(uint8_t direction)
 
 uint8_t xavix_state::read_io1(uint8_t direction)
 {
-//	LOG("%s: read_io1\n", machine().describe_context());
+//  LOG("%s: read_io1\n", machine().describe_context());
 
 	// no special handling
 	return m_in1->read();

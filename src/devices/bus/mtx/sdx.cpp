@@ -268,15 +268,15 @@ void mtx_sdxcpm_device::device_reset()
 READ8_MEMBER(mtx_sdx_device::sdx_status_r)
 {
 	/*
-    bit     description
-    0       Head load: 1 - head load on drive
-    1       Double-sided: 1 if drive double-sided
-    2       TPI: 0 - 48 TPI drive. 1 - 96 TPI drive
-    3       Track stepping rate: 0 - 12ms, 1 - 6ms
-    4       No. of drives: 0 - 1 drive, 1 - 2 drives
-    5       Ready: 1 - drive ready
-    6       Interrupt: 1 - FDC interrupt request
-    7       Data request: 1 - FDC data request
+	bit     description
+	0       Head load: 1 - head load on drive
+	1       Double-sided: 1 if drive double-sided
+	2       TPI: 0 - 48 TPI drive. 1 - 96 TPI drive
+	3       Track stepping rate: 0 - 12ms, 1 - 6ms
+	4       No. of drives: 0 - 1 drive, 1 - 2 drives
+	5       Ready: 1 - drive ready
+	6       Interrupt: 1 - FDC interrupt request
+	7       Data request: 1 - FDC data request
 	*/
 
 	uint8_t data = 0x00;
@@ -297,12 +297,12 @@ READ8_MEMBER(mtx_sdx_device::sdx_status_r)
 WRITE8_MEMBER(mtx_sdx_device::sdx_control_w)
 {
 	/*
-    bit     description
-    0       Drive select: 0 - drive A, 1 - drive B
-    1       Side select: 0 - side 0, 1 - side 1
-    2       Motor on: 1 - turns drive motor on
-    3       Motor ready: 1 - drive motor ready
-    4       Density: 0 - FM, 1 - MFM
+	bit     description
+	0       Drive select: 0 - drive A, 1 - drive B
+	1       Side select: 0 - side 0, 1 - side 1
+	2       Motor on: 1 - turns drive motor on
+	3       Motor ready: 1 - drive motor ready
+	4       Density: 0 - FM, 1 - MFM
 	*/
 
 	m_control = data;

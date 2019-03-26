@@ -15,7 +15,7 @@
 // ======================> astrocade_lightpen_device
 
 class astrocade_lightpen_device : public device_t,
-                                  public device_astrocade_accessory_interface
+								  public device_astrocade_accessory_interface
 {
 public:
 	// construction/destruction

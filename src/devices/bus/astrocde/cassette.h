@@ -19,7 +19,7 @@
 // ======================> astrocade_cassette_device
 
 class astrocade_cassette_device : public device_t,
-                                  public device_astrocade_ctrl_interface
+								  public device_astrocade_ctrl_interface
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::TAPE; }

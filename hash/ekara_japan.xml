@@ -31,21 +31,21 @@
 	Some Japanese carts have a number starting with S  (S-x on case, SCxxxx-xxx part numbers) (see ekara_japan_s.xml)  (for e-kara - custom presentation)
 	                                                M  (M-x on case, MCxxxx-xxx part numbers) (see ekara_japan_m.xml)  (for e-kara - custom presentation)
 	                                                EN (EN-X on case, no part numbers)        (see ekara_japan_en.xml) (for e-kara - custom presentation)
- 	                                                BH (BG-XX on case, BH-xxxx on PCB)        (see ekara_japan_bh.xml) (for e-kara - custom presentation)
-													GK (GK-X on case)                         (see ekara_japan_gk.xml) (for e-kara / e-pitch - custom presentation)
+	                                                BH (BG-XX on case, BH-xxxx on PCB)        (see ekara_japan_bh.xml) (for e-kara - custom presentation)
+	                                                GK (GK-X on case)                         (see ekara_japan_gk.xml) (for e-kara / e-pitch - custom presentation)
 	                                                G  (G-x on case, GCxxxx-xxx part numbers) (see ekara_japan_g.xml)  (for e-kara, Popira / 2)
 	                                                P  (P-x on case, PCxxxx-xxx part numbers) (see ekara_japan_p.xml)  (for e-kara, Popira / 2, DDR Family Mat)
 	                                                D  (D-x on case, DCxxxx-xxx part numbers) (see ekara_japan_d.xml)  (for e-kara, Popira / 2, Taiko De Popira)
 	                                                SP (SP-x on case, no part numbers)        (see ekara_japan_sp.xml) (for e-kara, Popira / 2, Taiko de Popira, Jumping Popira)
-													A  (A-x on case, Pichi Pichi Pitch series)(see ekara_japan_a.xml)  (for e-kara / e-pitch)
-													JP (JP-x on case)                         (see ekara_japan_jp.xml) (for Jumping Popira Only)
-													
+	                                                A  (A-x on case, Pichi Pichi Pitch series)(see ekara_japan_a.xml)  (for e-kara / e-pitch)
+	                                                JP (JP-x on case)                         (see ekara_japan_jp.xml) (for Jumping Popira Only)
+
 	these exist but haven't got any
-	Some Japanese carts have a number starting with 	                                                
+	Some Japanese carts have a number starting with
 	                                                KE (for Kids Lyric book device Only?)
 	                                                KD (for e-kara?)
-													PR (seen a PR-02 AYY) (what is it?)
-													KR (seen a KR-1) (bundled with later units?)
+	                                                PR (seen a PR-02 AYY) (what is it?)
+	                                                KR (seen a KR-1) (bundled with later units?)
 
 	(there are others, need to document them)
 
@@ -64,7 +64,7 @@
 	The EC number is printed on the left side of the cart label, as well as in the serial code
 	early carts don't have a number printed on the box, only the title, after a certain point a number was added (when?)
 
-    Only known undumped carts in main series are 58, 64, 81, 83, 84, 85 (assuming highest number is 85)
+	Only known undumped carts in main series are 58, 64, 81, 83, 84, 85 (assuming highest number is 85)
 
 	..  *EC0001-JPM  J-Pop Mix Volume 1
 	..  *EC0002-JPM  J-Pop Mix Volume 2
@@ -366,7 +366,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ec0017">
 		<description>1973-75 Volume 1 (Japan) (EC0017-G73)</description>
 		<year>2000</year>
@@ -377,7 +377,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="ec0018">
 		<description>1982-84 Volume 1 (Japan) (EC0018-G82)</description>
 		<year>2000</year>
@@ -399,7 +399,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ec0020">
 		<description>Kid's Mix Volume 2 (Japan) (EC0020-KID)</description>
 		<year>2000</year>
@@ -410,7 +410,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ec0021">
 		<description>J-Pop Mix Volume 9 (Japan) (EC0021-JPM)</description>
 		<year>2000</year>
@@ -608,7 +608,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ec0039">
 		<description>Artist Selection Volume 7 (B'z) (Japan) (EC0039-ATS)</description>
 		<year>2000</year>
@@ -619,7 +619,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ec0040">
 		<description>J-Pop Mix Volume 18 (Japan) (EC0040-JPM)</description>
 		<year>2000</year>
@@ -743,8 +743,8 @@
 			</dataarea>
 		</part>
 	</software>
-	
-	
+
+
 	<software name="ec0051">
 		<description>J-Pop Mix Volume 21 (Japan) (EC0051-JPM)</description>
 		<year>2001</year>
@@ -799,7 +799,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="ec0056">
 		<description>J-Pop Mix Volume 24 (Japan) (EC0056-JPM)</description>
 		<year>2001</year>
@@ -809,8 +809,8 @@
 				<rom name="ec0056-jpm.u1" size="0x100000" crc="8c0b175b" sha1="697d7eb50a84001ddb66f50a50c682c63c21ed60" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-		
+	</software>
+
 	<software name="ec0057">
 		<description>Artist Selection Volume 14 (SMAP) (Japan) (EC0057-ATS)</description>
 		<year>2001</year>
@@ -821,7 +821,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- EC0058-ENK  ENK Volume 8 -->
 
 	<software name="ec0059">
@@ -834,7 +834,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ec0060">
 		<description>J-Pop Mix Volume 26 (Japan) (EC0060-JPM)</description>
 		<year>2001</year>

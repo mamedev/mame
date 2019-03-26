@@ -9,69 +9,69 @@
         die markings show
         "SunPlus QL8041" ( also known as Sunplus SPG240 & PAC300 )
 
-			(all GameKeyReady units?)
-			Disney Princess (GKR)
-			Wheel of Fortune (GKR)
-			JAKKS WWE (GKR)
-			Fantastic 4 (GKR)
-			Justice League (GKR)
-			Dora the Explorer Nursery Rhyme (GKR)
-			Dora the Explorer Play Park (GKR)
-			Spiderman 5-in-1 (GKR)
-			etc.
+            (all GameKeyReady units?)
+            Disney Princess (GKR)
+            Wheel of Fortune (GKR)
+            JAKKS WWE (GKR)
+            Fantastic 4 (GKR)
+            Justice League (GKR)
+            Dora the Explorer Nursery Rhyme (GKR)
+            Dora the Explorer Play Park (GKR)
+            Spiderman 5-in-1 (GKR)
+            etc.
 
-			(other non GKR JAKKS games)
-			X-Men (Wolverine pad)
-			Avatar: The Last Airbender
+            (other non GKR JAKKS games)
+            X-Men (Wolverine pad)
+            Avatar: The Last Airbender
 
-			(other games)
-			Mattel Classic Sports
+            (other games)
+            Mattel Classic Sports
 
         "SunPlus QL8041C" ( known as Sunplus SPG2??, seems to be compatible with above, so probably just a chip revision )
-	
-			Clickstart ( see clickstart.cpp instead)
-			Wheel of Fortune 2nd Edition
-			Spider-man - Villain Roundup
 
-		"SunPlus QU7074-P69A"
+            Clickstart ( see clickstart.cpp instead)
+            Wheel of Fortune 2nd Edition
+            Spider-man - Villain Roundup
 
-			The Batman
+        "SunPlus QU7074-P69A"
 
-		--- 
+            The Batman
+
+        ---
 
         It is unknown if the following are close to this architecture or not (no dumps yet)
 
         "SunPlus QU7073-P69A"
 
-			Mortal Kombat
-		
-		"Sunplus PU7799-P680?" (difficult to read)
+            Mortal Kombat
 
-			Mission Paintball
+        "Sunplus PU7799-P680?" (difficult to read)
+
+            Mission Paintball
 
         "Sunplus QL8167"
 
-			Disney Princess (newer?)
-			Go Diego Go
-			Shrek - Over the Hedge (this unit shows a GameKey Unlock More Games' on startup, but has no port, not even on the internal PCB)
-			Marvel Heroes (Spider-man)
-			Spiderman 3 (Movie - black)
+            Disney Princess Magical Adventure
+            Go Diego Go
+            Shrek - Over the Hedge (this unit shows a 'GameKey Unlock More Games' on startup, but has no port, not even on the internal PCB)
+            Marvel Heroes (Spider-man)
+            Spiderman 3 (Movie - black)
 
-		---
+        ---
 
-		These are definitely different
+        These are definitely different
 
         "SunPlus PA7801" ( known as Sunplus SPG110? ) see spg110.cpp instead
 
-			Classic Arcade Pinball
-			EA Sports (NHL95 + Madden 95)
-			Spiderman 5-in-1 (original release)
+            Classic Arcade Pinball
+            EA Sports (NHL95 + Madden 95)
+            Spiderman 5-in-1 (original release)
 
-		"GCM394" (this is clearly newer, has extra opcodes, different internal map etc.)
+        "GCM394" (this is clearly newer, has extra opcodes, different internal map etc.)
 
-			Smart Fit Park
+            Smart Fit Park
 
-	Status:
+    Status:
 
         Mostly working
 
@@ -89,10 +89,10 @@
         jak_pooh:
             In the 'Light Tag' minigame (select the rock) you can't move left with the DRC (ok with -nodrc)
             and the game usually softlocks when you find a friend (with or without DRC)
-		jak_disf:
-			shows corrupt logo on first boot with no valid nvram (possibly hardware does too, or layer disable?)
-		jak_nick:
-			channel chasers (first game) title screen background should be blue, not the current pattern (possible layer disable?)
+        jak_disf:
+            shows corrupt logo on first boot with no valid nvram (possibly hardware does too, or layer disable?)
+        jak_nick:
+            channel chasers (first game) title screen background should be blue, not the current pattern (possible layer disable?)
 
         vii:
             When loading a cart from file manager, sometimes MAME will crash.
@@ -114,11 +114,6 @@
 
     TODO:
         Work out how to access the hidden TEST menus for all games (most JAKKS games should have one at least)
-
-    Also on this hardware:
-
-        name                        PCB ID      ROM width   TSOP pads   ROM size        SEEPROM         die markings
-        Dream Life                  ?           x16         48          not dumped      no              Sunplus
 
 *******************************************************************************/
 
@@ -337,6 +332,20 @@ private:
 	optional_ioport_array<6> m_portc_in;
 
 };
+
+class dreamlif_state : public spg2xx_game_state
+{
+public:
+	dreamlif_state(const machine_config &mconfig, device_type type, const char *tag)
+		: spg2xx_game_state(mconfig, type, tag)
+	{ }
+
+	void dreamlif(machine_config &config);
+
+	DECLARE_READ16_MEMBER(portb_r);
+	DECLARE_WRITE16_MEMBER(portb_w);
+};
+
 
 
 /*************************
@@ -1031,6 +1040,24 @@ static INPUT_PORTS_START( rad_crik )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dreamlif )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("A")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("B")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("C")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Yes")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("No")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // must be low or the Tiger logo gets skipped, also must be low for service mode (hold pause while booting) to work
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Pause")
+	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 // there is a speaker volume for the 'guitar' mode, but it's presumably an analog feature, not read by the game.
 static INPUT_PORTS_START( icanguit )
 	PORT_START("P1")
@@ -1120,7 +1147,7 @@ static INPUT_PORTS_START( icanguit )
 
 	PORT_START("P3_1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) 
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0xfffc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("P3_2")
@@ -1130,7 +1157,7 @@ static INPUT_PORTS_START( icanguit )
 
 	PORT_START("P3_3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Pause")
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) 
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0xfffc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("P3_4")
@@ -1149,7 +1176,7 @@ INPUT_PORTS_END
 // this has an entire piano keyboard + extras
 // there is a volume dial for the internal speakers when used in non-TV mode, but presumably it is not CPU visible
 // there should be a metronome key, but nothing seems to have that effect, maybe due to incomplete sound emulation?
-static INPUT_PORTS_START( icanpian ) 
+static INPUT_PORTS_START( icanpian )
 	PORT_START("P1")
 	// uses multiplexed ports instead, see below
 
@@ -1207,7 +1234,7 @@ static INPUT_PORTS_START( icanpian )
 	PORT_START("P3_0")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Change Instrument")
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Cycle Hands")
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Display Mode 1")  
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Display Mode 1")
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Display Mode 2")
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Display Mode 3")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Display Mode 4")
@@ -1218,8 +1245,8 @@ static INPUT_PORTS_START( icanpian )
 	PORT_START("P3_1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD)  PORT_NAME("Tempo Up")
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK)  PORT_NAME("Tempo Default")
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("Tempo Down")  
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7_PAD)     PORT_NAME("Pause")  
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("Tempo Down")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7_PAD)     PORT_NAME("Pause")
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8_PAD)     PORT_NAME("Metronome")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED ) // will skip intro scenes etc. like other buttons but no more physical buttons on KB to map here
 	PORT_BIT( 0xffc0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1388,6 +1415,21 @@ static INPUT_PORTS_START( lexizeus ) // how many buttons does this have?  I acci
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
+
+
+READ16_MEMBER(dreamlif_state::portb_r)
+{
+	// some kind of EEPROM device?
+	logerror("%s: portb_r\n", machine().describe_context());
+	return 0x0000;
+}
+
+WRITE16_MEMBER(dreamlif_state::portb_w)
+{
+	// some kind of EEPROM device?
+	logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
+}
+
 
 
 READ16_MEMBER(icanguit_state::porta_r)
@@ -1916,6 +1958,17 @@ void spg2xx_game_state::rad_skat(machine_config &config)
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 }
 
+void dreamlif_state::dreamlif(machine_config &config)
+{
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	spg2xx_base(config);
+
+	m_spg->porta_in().set_ioport("P1");
+	m_spg->portb_in().set(FUNC(dreamlif_state::portb_r));
+	m_spg->portb_out().set(FUNC(dreamlif_state::portb_w));
+
+}
+
 void spg2xx_game_state::rad_skatp(machine_config &config)
 {
 	rad_skat(config);
@@ -2352,10 +2405,9 @@ CONS( 2007, rad_fb2,   0,        0, rad_skat, rad_fb2,    spg2xx_game_state, ini
 CONS( 2005, mattelcs,  0,        0, rad_skat, mattelcs,   spg2xx_game_state, empty_init, "Mattel", "Mattel Classic Sports",     MACHINE_IMPERFECT_SOUND )
 
 // Hasbro games
-CONS( 2007, dreamlif,  0,        0, rad_skat, rad_crik,   spg2xx_game_state, empty_init, "Hasbro", "Dream Life",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, dreamlif,  0,        0, dreamlif, dreamlif,   dreamlif_state, empty_init, "Hasbro", "Dream Life (Version 1.0, Feb 07 2005)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-
-
+// Fisher-Price games
 CONS( 2007, icanguit,  0,        0, icanguit, icanguit,   icanguit_state, empty_init, "Fisher-Price", "I Can Play Guitar",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2006, icanpian,  0,        0, icanpian, icanpian,   icanguit_state, empty_init, "Fisher-Price", "I Can Play Piano",  MACHINE_IMPERFECT_SOUND ) // 2006 date from Manual
 

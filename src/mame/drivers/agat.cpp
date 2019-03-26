@@ -1076,21 +1076,21 @@ static void agat7_cards(device_slot_interface &device)
 	// Nippel Co-processor (R65C02 clone + dual-ported RAM)
 }
 
-MACHINE_CONFIG_START(agat7_state::agat7)
-	MCFG_DEVICE_ADD(m_maincpu, M6502, XTAL(14'300'000) / 14)
-	MCFG_DEVICE_PROGRAM_MAP(agat7_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER(A7_VIDEO_TAG ":a7screen", agat7_state, agat_vblank)
+void agat7_state::agat7(machine_config &config)
+{
+	M6502(config, m_maincpu, XTAL(14'300'000) / 14);
+	m_maincpu->set_addrmap(AS_PROGRAM, &agat7_state::agat7_map);
+	m_maincpu->set_vblank_int(A7_VIDEO_TAG ":a7screen", FUNC(agat7_state::agat_vblank));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(agat7_state::timer_irq), A7_VIDEO_TAG ":a7screen", 0, 1);
 
-	MCFG_DEVICE_ADD(m_video, AGAT7VIDEO, RAM_TAG, "gfx1")
+	AGAT7VIDEO(config, m_video, RAM_TAG, "gfx1");
 
 	RAM(config, m_ram).set_default_size("32K").set_default_value(0);//.set_extra_options("64K,128K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(A7_SPEAKER_TAG, SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* /INH banking */
 	ADDRESS_MAP_BANK(config, m_upperbank).set_map(&agat7_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
@@ -1132,7 +1132,7 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 
 	CASSETTE(config,m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

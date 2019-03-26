@@ -4,7 +4,7 @@
  * The work herein is based on the "Rebound computer service manual"
  * available on archive.org:
  *
- * 	  https://archive.org/details/ArcadeGameManualRebound
+ *    https://archive.org/details/ArcadeGameManualRebound
  *
  * Changelog:
  *
@@ -19,7 +19,7 @@
  *      - Documented PCB connector (Couriersud)
  *
  * TODO:
- * 		- Add switch to pull Connector 3 (CON3) to GND
+ *      - Add switch to pull Connector 3 (CON3) to GND
  *
  * The MAME team has asked for and received written confirmation from the
  * author of DICE to use, modify and redistribute code under:

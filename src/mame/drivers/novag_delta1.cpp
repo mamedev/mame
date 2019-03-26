@@ -59,6 +59,10 @@ void delta1_state::machine_start()
 	// zerofill/register for savestates
 	m_blink = false;
 	save_item(NAME(m_blink));
+
+	// game reads from uninitialized RAM while it's thinking
+	for (int i = 0; i < 0x100; i++)
+		m_maincpu->space(AS_PROGRAM).write_byte(i + 0x2000, machine().rand());
 }
 
 
@@ -125,7 +129,7 @@ void delta1_state::main_io(address_map &map)
 
 static INPUT_PORTS_START( delta1 )
 	PORT_START("IN.0")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Time Set")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Time Set")
 	PORT_BIT(0x0d, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN.1")

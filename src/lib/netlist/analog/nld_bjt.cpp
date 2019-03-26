@@ -9,12 +9,14 @@
 #include "netlist/nl_setup.h"
 #include "nlid_twoterm.h"
 
+
 #include <cmath>
 
 namespace netlist
 {
 namespace analog
 {
+	using constants = plib::constants<nl_double>;
 
 	class diode
 	{
@@ -279,8 +281,8 @@ namespace analog
 		NETLIB_UPDATE_TERMINALSI();
 
 	private:
-		generic_diode m_gD_BC;
-		generic_diode m_gD_BE;
+		generic_diode<diode_e::BIPOLAR> m_gD_BC;
+		generic_diode<diode_e::BIPOLAR> m_gD_BE;
 
 		nld_twoterm m_D_CB;  // gcc, gce - gcc, gec - gcc, gcc - gce | Ic
 		nld_twoterm m_D_EB;  // gee, gec - gee, gce - gee, gee - gec | Ie
@@ -449,8 +451,8 @@ namespace analog
 		m_alpha_f = BF / (1.0 + BF);
 		m_alpha_r = BR / (1.0 + BR);
 
-		m_gD_BE.set_param(IS / m_alpha_f, NF, exec().gmin());
-		m_gD_BC.set_param(IS / m_alpha_r, NR, exec().gmin());
+		m_gD_BE.set_param(IS / m_alpha_f, NF, exec().gmin(), constants::T0());
+		m_gD_BC.set_param(IS / m_alpha_r, NR, exec().gmin(), constants::T0());
 	}
 
 } // namespace analog

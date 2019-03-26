@@ -70,6 +70,11 @@ namespace
 			return memregion("eprom")->base();
 		}
 
+		virtual memory_region* get_cart_memregion() override
+		{
+			return memregion("eprom");
+		}
+
 	private:
 		// internal state
 		required_device<mos6551_device> m_uart;

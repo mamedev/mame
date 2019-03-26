@@ -31,6 +31,13 @@ NETLIST_END()
  *  BJT Models
  * ---------------------------------------------------------------------------*/
 
+static NETLIST_START(mosfet_models)
+	//NET_MODEL("NMOS _(VTO=0.0 N=1.0 IS=1E-14 KP=2E-5 UO=600 PHI=0.6 LD=0.0 L=1.0 TOX=1E-7 W=1.0 NSUB=0.0 GAMMA=0.0 RD=0.0 RS=0.0 LAMBDA=0.0)")
+	//NET_MODEL("PMOS _(VTO=0.0 N=1.0 IS=1E-14 KP=2E-5 UO=600 PHI=0.6 LD=0.0 L=1.0 TOX=1E-7 W=1.0 NSUB=0.0 GAMMA=0.0 RD=0.0 RS=0.0 LAMBDA=0.0)")
+	NET_MODEL("NMOS _(VTO=0.0 N=1.0 IS=1E-14 KP=0.0 UO=600 PHI=0.0 LD=0.0 L=1.0 TOX=1E-7 W=1.0 NSUB=0.0 GAMMA=0.0 RD=0.0 RS=0.0 LAMBDA=0.0)")
+	NET_MODEL("PMOS _(VTO=0.0 N=1.0 IS=1E-14 KP=0.0 UO=600 PHI=0.0 LD=0.0 L=1.0 TOX=1E-7 W=1.0 NSUB=0.0 GAMMA=0.0 RD=0.0 RS=0.0 LAMBDA=0.0)")
+NETLIST_END()
+
 static NETLIST_START(bjt_models)
 	NET_MODEL("NPN _(IS=1e-15 BF=100 NF=1 BR=1 NR=1 CJE=0 CJC=0)")
 	NET_MODEL("PNP _(IS=1e-15 BF=100 NF=1 BR=1 NR=1 CJE=0 CJC=0)")
@@ -81,7 +88,9 @@ NETLIST_START(base)
 
 	LOCAL_SOURCE(diode_models)
 	LOCAL_SOURCE(bjt_models)
+	LOCAL_SOURCE(mosfet_models)
 	LOCAL_SOURCE(family_models)
+
 	LOCAL_SOURCE(TTL74XX_lib)
 	LOCAL_SOURCE(CD4XXX_lib)
 	LOCAL_SOURCE(OPAMP_lib)
@@ -89,6 +98,7 @@ NETLIST_START(base)
 
 	INCLUDE(diode_models)
 	INCLUDE(bjt_models)
+	INCLUDE(mosfet_models)
 	INCLUDE(family_models)
 	INCLUDE(TTL74XX_lib)
 	INCLUDE(CD4XXX_lib)

@@ -1,0 +1,809 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="spectrum_flop_opus" description="Sinclair ZX Spectrum Opus Discovery disk images">
+
+	<software name="007mspy">
+		<description>007 Multispy</description>
+		<year>1987</year>
+		<publisher>ZX-Guaranteed</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="007 Multispy.opd" size="184320" crc="017fa7e9" sha1="f25b77795db4204d282453184aa6c8363bd07c42" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrum10" cloneof="astrum11">
+		<description>Astrum+ v1.0</description>
+		<year>1988</year>
+		<publisher>Bradway Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Astrum+ v1.0.opd" size="184320" crc="e8f930e2" sha1="f72ae475ed76ec31c8401304664f1c77d79caac9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrum11">
+		<description>Astrum+ v1.1</description>
+		<year>1988</year>
+		<publisher>Bradway Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Astrum+ v1.1.opd" size="184320" crc="b25f2e47" sha1="327279451ed247aac75d5b221780ebc6d64a8c83" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blast37">
+		<description>Blast v3.7</description>
+		<year>1985</year>
+		<publisher>Oxford Computer Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Blast v3.7.opd" size="184320" crc="9488aaff" sha1="013b6a8afd948fed594b722c9a3aa752e905e59b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="datoncard">
+		<description>Daton Software Card Games</description>
+		<year>1990</year>
+		<publisher>Daton Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="Daton Software Card Games.opd" size="368640" crc="ab4ea8ad" sha1="403c5efd030bf4ab5793914bf3dd71eaf3f4eff1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbrewster">
+		<description>The Derek Brewster Collection</description>
+		<year>1985</year>
+		<publisher>Micromega</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Codename Mat &amp; Jasper &amp; Kentilla.opd" size="184320" crc="60270bc2" sha1="4b916e0ad11d55390caf20bd9146689bb8a8b022" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="discman">
+		<description>Disc Manager</description>
+		<year>1987</year>
+		<publisher>Bradway Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Disc Manager (Bradway Software).opd" size="184320" crc="1e6e2c65" sha1="f40cdf187227f66a11ab17c54d6463ae6817c080" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ggsmontr">
+		<description>Grumpy Gumphrey Supersleuth/Monty On The Run</description>
+		<year>1985</year>
+		<publisher>Gremlin Graphics Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Grumpy Gumphrey Supersleuth &amp; Monty On The Run.opd" size="184320" crc="010e4c1b" sha1="dcae37ae934e262c2e0052da07d694f7ead7b90f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mstrfl09">
+		<description>Masterfile v09</description>
+		<year>1982</year>
+		<publisher>Campbell Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Masterfile v0.9.opd" size="184320" crc="78c56191" sha1="564fde8c40bb7ef478b8c9b042a1f64bf53429b5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="omnicalc2">
+		<description>Omnicalc 2</description>
+		<year>1984</year>
+		<publisher>Microsphere</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Omnicalc 2.opd" size="184320" crc="ed80eeee" sha1="85ccdafa3cbc1b9bb76becede3e752b657d5efc5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quickdos">
+		<description>QuickDOS</description>
+		<year>1991</year>
+		<publisher>Mega-Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="quickdos.opd" size="184320" crc="e7a0e18d" sha1="0b44b57e59fbdf12815d2860292976f2747c525c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saleslinv">
+		<description>Sales/Purchase Ledger Invoicing</description>
+		<year>1984</year>
+		<publisher>Transform Ltd</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Sales &amp; Purchase Ledger &amp; Invoicing.opd" size="184320" crc="2ffce081" sha1="1803bf3b9b93cb45acd89b77de4c523bc89b0f2c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcld01">
+		<description>Spectrum Discovery Club Library Disc 01</description>
+		<year>198?</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Library Disc 01.opd" size="184320" crc="a3a931ff" sha1="420e7cdd0dc83484e95fe4bc50c4f3918f952556" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcld02">
+		<description>Spectrum Discovery Club Library Disc 02</description>
+		<year>198?</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Library Disc 02.opd" size="184320" crc="d1bdcbad" sha1="03dd0c55571caa7911d3b045451f09dc4e9730b8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcld03">
+		<description>Spectrum Discovery Club Library Disc 03</description>
+		<year>198?</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Library Disc 03.opd" size="184320" crc="2f012a16" sha1="5b05c092aa795a6155f1abaa1934bd43bff733f1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcld04">
+		<description>Spectrum Discovery Club Library Disc 04</description>
+		<year>198?</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Library Disc 04.opd" size="184320" crc="02eec8ac" sha1="5ab24d81c28f13183519280995e093ffb9f04340" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcld05">
+		<description>Spectrum Discovery Club Library Disc 05</description>
+		<year>198?</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Library Disc 05.opd" size="184320" crc="16d21812" sha1="0290747b9d7c9c19c6260f1afde25ba964a7c664" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcld06">
+		<description>Spectrum Discovery Club Library Disc 06</description>
+		<year>198?</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Library Disc 06.opd" size="184320" crc="b63303e5" sha1="1bcaa48a2f50ba3ca86b2d1f47ea4f099057f62a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcld07">
+		<description>Spectrum Discovery Club Library Disc 07</description>
+		<year>198?</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Library Disc 07.opd" size="184320" crc="5588a051" sha1="986c44e13dfbae54c0cf405b932b42237c5c8e0f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcld08">
+		<description>Spectrum Discovery Club Library Disc 08</description>
+		<year>198?</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Library Disc 08.opd" size="184320" crc="2f8878aa" sha1="e60b0aaf0256e4387d43b6edbb10501564ab53e5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcld09">
+		<description>Spectrum Discovery Club Library Disc 09</description>
+		<year>198?</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Library Disc 09.opd" size="184320" crc="2e4bea72" sha1="b4aa88f1ff391fbe91b80e99fb900d2e2773febc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcld10">
+		<description>Spectrum Discovery Club Library Disc 10</description>
+		<year>198?</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Library Disc 10.opd" size="184320" crc="0bcbd54c" sha1="b304ff212b7206f5f73c719bcebd2cb802325e1a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl0103">
+		<description>Spectrum Discovery Club Newsletter 01-03</description>
+		<year>1987</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 01-03.opd" size="184320" crc="24ff9ef7" sha1="36e69a33c1db09b01e45ae7042cfd080f583fc7d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl04">
+		<description>Spectrum Discovery Club Newsletter 04</description>
+		<year>1987</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 04.opd" size="184320" crc="2508538d" sha1="faaad4e9301e60d0a69f69961f74319b192d66f4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl05">
+		<description>Spectrum Discovery Club Newsletter 05</description>
+		<year>1988</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 05.opd" size="184320" crc="dd7338c9" sha1="d03f61a1fe93b84f3aa74e3cc6e33666dcdd5288" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl06">
+		<description>Spectrum Discovery Club Newsletter 06</description>
+		<year>1988</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 06.opd" size="184320" crc="6cc5bfc9" sha1="768684c0d39216a79193d04bbae8ff7d83f9fd49" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl07">
+		<description>Spectrum Discovery Club Newsletter 07</description>
+		<year>1988</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 07.opd" size="184320" crc="a80b29a6" sha1="5daed4507700fb3f7026d8778755d86fc2df463f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl08">
+		<description>Spectrum Discovery Club Newsletter 08</description>
+		<year>1988</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 08.opd" size="184320" crc="606ddad2" sha1="279d9853d0b83c4145b806cbc0a297fe5ba6384d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl09">
+		<description>Spectrum Discovery Club Newsletter 09</description>
+		<year>1988</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 09.opd" size="184320" crc="dcafc37a" sha1="918a9047ae1d56aeb0205ada64c616e64253f810" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl10">
+		<description>Spectrum Discovery Club Newsletter 10</description>
+		<year>1988</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 10.opd" size="184320" crc="c075e8a4" sha1="96ba0c5e54f3def3961c6baba9472951d6afeb62" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl11">
+		<description>Spectrum Discovery Club Newsletter 11</description>
+		<year>1989</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 11.opd" size="184320" crc="ea5e34d8" sha1="4de7aa77a657e49edddede8bf39d4e08fe68c279" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl12">
+		<description>Spectrum Discovery Club Newsletter 12</description>
+		<year>1989</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 12.opd" size="184320" crc="da60e7f6" sha1="966e64bcb12d11dab008fd306ed60de8fbd2011b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl13">
+		<description>Spectrum Discovery Club Newsletter 13</description>
+		<year>1989</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 13.opd" size="184320" crc="74121668" sha1="a78d7a5ae76645b00290d3bdf9abcc2d769e292a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl14">
+		<description>Spectrum Discovery Club Newsletter 14</description>
+		<year>1989</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 14.opd" size="184320" crc="575c433c" sha1="7243c9bd6a700f7e2f6a75ebde86ac9dc83b8fb6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl15">
+		<description>Spectrum Discovery Club Newsletter 15</description>
+		<year>1989</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 15.opd" size="184320" crc="dba572d3" sha1="f495a621d3f345fc127915805c11714147c548f7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl16">
+		<description>Spectrum Discovery Club Newsletter 16</description>
+		<year>1990</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 16.opd" size="184320" crc="c4b19a07" sha1="185986689767b7bc8359678382c383a143b4c675" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl17">
+		<description>Spectrum Discovery Club Newsletter 17</description>
+		<year>1990</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 17.opd" size="184320" crc="007e97b0" sha1="3cb7b1a6a17d8c22be59ca4c988441beec5bdf12" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl18">
+		<description>Spectrum Discovery Club Newsletter 18</description>
+		<year>1990</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 18.opd" size="184320" crc="bf735541" sha1="f1119e7f8e5a5dd4e3f77801430dd7e44834715a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl19">
+		<description>Spectrum Discovery Club Newsletter 19</description>
+		<year>1990</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 19.opd" size="184320" crc="65f48b91" sha1="a123641dc88e111b560a87a59c15f49874907a2b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl20">
+		<description>Spectrum Discovery Club Newsletter 20</description>
+		<year>1990</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 20.opd" size="184320" crc="4597ed55" sha1="ae4c3b3aecba932913bc23d911f19e96f726d8e3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl21">
+		<description>Spectrum Discovery Club Newsletter 21</description>
+		<year>1990</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 21.opd" size="184320" crc="85cae652" sha1="b062136f1bdacb17ca01ebe16c974554d3b6ccf7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl22">
+		<description>Spectrum Discovery Club Newsletter 22</description>
+		<year>1990</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 22.opd" size="184320" crc="321e6816" sha1="6f9fe9f5bb9b7cabb4fc005bdc4d0a8329212938" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl23">
+		<description>Spectrum Discovery Club Newsletter 23</description>
+		<year>1991</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 23.opd" size="184320" crc="fc466652" sha1="00b46efd1544b96ee71ef7b00c5732543a9f615d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl24">
+		<description>Spectrum Discovery Club Newsletter 24</description>
+		<year>1991</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 24.opd" size="184320" crc="06f0c50b" sha1="1e8f7f03db421624d7c6e68cc5d6d45c9e3b10f5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl25">
+		<description>Spectrum Discovery Club Newsletter 25</description>
+		<year>1991</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 25.opd" size="184320" crc="373b7a3f" sha1="0261f8709cf38f7aba0a9c885377ea6d888a64f9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl26">
+		<description>Spectrum Discovery Club Newsletter 26</description>
+		<year>1991</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 26.opd" size="184320" crc="7e9d0c63" sha1="27bbbbd9c9e5a3fd9a15473a59b2e65f9f2d5e12" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl27">
+		<description>Spectrum Discovery Club Newsletter 27</description>
+		<year>1991</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 27.opd" size="184320" crc="233a3078" sha1="f1b3c9e6997930d4e53a9680b4dccd7868377685" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl28">
+		<description>Spectrum Discovery Club Newsletter 28</description>
+		<year>1992</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 28.opd" size="184320" crc="b7ef253a" sha1="f3c71d7c49a3cd96fcaa4101ef998c2c5b4ac5b6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl29">
+		<description>Spectrum Discovery Club Newsletter 29</description>
+		<year>1992</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 29.opd" size="184320" crc="4bc6c85e" sha1="6146b7670956a72b65403b8387a7429acb8d6ac5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl30">
+		<description>Spectrum Discovery Club Newsletter 30</description>
+		<year>1992</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 30.opd" size="184320" crc="83e43ef8" sha1="80d58e25b1b21a7fea15899de382b110b880a03b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl31">
+		<description>Spectrum Discovery Club Newsletter 31</description>
+		<year>1992</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 31.opd" size="184320" crc="e4307809" sha1="de84ee339c42ef260964477ac6b9a8ef521c40d1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl32">
+		<description>Spectrum Discovery Club Newsletter 32</description>
+		<year>1992</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 32.opd" size="184320" crc="0c7880ad" sha1="525bc47dac9881de0732f606d81b7edfd45b89a2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl33">
+		<description>Spectrum Discovery Club Newsletter 33</description>
+		<year>1992</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 33.opd" size="184320" crc="ef534502" sha1="449235daad743cb523ba6746dfc0b0982e98d332" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl34">
+		<description>Spectrum Discovery Club Newsletter 34</description>
+		<year>1994</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 34.opd" size="184320" crc="ff270499" sha1="a96acb236435a63066672839fab6536ca65ad15d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl35">
+		<description>Spectrum Discovery Club Newsletter 35</description>
+		<year>1994</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 35.opd" size="184320" crc="c8cd6cb5" sha1="526d1dc0d8cd9fde5fcc93f7716eaa0bb6a35b01" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl36">
+		<description>Spectrum Discovery Club Newsletter 36</description>
+		<year>1994</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 36.opd" size="184320" crc="89986975" sha1="a5c4cdc5a5d998885931c712694350d251805247" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl37">
+		<description>Spectrum Discovery Club Newsletter 37</description>
+		<year>1994</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 37.opd" size="184320" crc="30a22ca9" sha1="df6d21249f263a52cfae2cfe6a4d3a9a7e183f5d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl38">
+		<description>Spectrum Discovery Club Newsletter 38</description>
+		<year>1994</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 38.opd" size="184320" crc="29a467f0" sha1="2aef48529cccf1e9a7fef25c9bfcceacb47e3bf2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl39">
+		<description>Spectrum Discovery Club Newsletter 39</description>
+		<year>1994</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 39.opd" size="184320" crc="ab7fb2c8" sha1="54e47a979ce757bdf3ba8b1d320441a29477afca" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl40">
+		<description>Spectrum Discovery Club Newsletter 40</description>
+		<year>1995</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 40.opd" size="184320" crc="0a6bf2f6" sha1="c7ffbdbd65e2567d5cbbcb76375c75bb035ddc2a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl41">
+		<description>Spectrum Discovery Club Newsletter 41</description>
+		<year>1995</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 41.opd" size="184320" crc="7a7e0214" sha1="ef31293e9ce76329e26e535b247af6a9d9df7c2a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcnl42">
+		<description>Spectrum Discovery Club Newsletter 42</description>
+		<year>1995</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter 42.opd" size="184320" crc="4cbf2e77" sha1="6f4836b31c51041dfa8758e7e02d4e6a910c05fb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcxmas89">
+		<description>Spectrum Discovery Club Newsletter Xmas Bonus December 1989</description>
+		<year>1989</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter Xmas Bonus December 1989.opd" size="184320" crc="9b42485f" sha1="fa53aea60153e3e0a3e3bb6fc8a1b14091385874" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcxmas90">
+		<description>Spectrum Discovery Club Newsletter Xmas Bonus December1990</description>
+		<year>1990</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter Xmas Bonus December 1990.opd" size="184320" crc="4cd2d987" sha1="e5fc208044fb8b0e24fea0136e89990132577afd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcxmas91">
+		<description>Spectrum Discovery Club Newsletter Xmas Bonus December 1991</description>
+		<year>1991</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter Xmas Bonus December 1991.opd" size="184320" crc="bced547d" sha1="eceb98a7b47cce899b5fd39487949f3815ffe2d3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcxmas92">
+		<description>Spectrum Discovery Club Newsletter Xmas Bonus December 1992</description>
+		<year>1992</year>
+		<publisher>Spectrum Discovery Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Spectrum Discovery Club Newsletter Xmas Bonus December 1992.opd" size="184320" crc="5551db6d" sha1="98fe69d80e6873e0cf0317c2f06609cfbbb3d082" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tascopy">
+		<description>Tascopy</description>
+		<year>1984</year>
+		<publisher>Tasman Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="TasCopy.opd" size="184320" crc="b1095939" sha1="13b6a9961f53085c279b61e341cab244b39ad8aa" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tasprnt">
+		<description>Tasprint</description>
+		<year>1983</year>
+		<publisher>Tasman Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="TasPrint.opd" size="184320" crc="3333f7cb" sha1="294096dd0ab8daa9cf16681ac9b164cd28442782" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tasword3">
+		<description>Tasword Three</description>
+		<year>1986</year>
+		<publisher>Tasman Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="TasWord 3.opd" size="184320" crc="8fb6c3f1" sha1="4a9b52de3c4c4b3911056823389370966eeee130" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="texp852">
+		<description>Trans-Express 85.2</description>
+		<year>1985</year>
+		<publisher>Romantic Robot</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Trans-Express 85.2.opd" size="184320" crc="21aec919" sha1="623d3b3674bbb7f2a70cf2abd9f8ec62e95844ef" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trandata">
+		<description>Transdata</description>
+		<year>1987</year>
+		<publisher>Transform Ltd</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="Transdata.opd" size="184320" crc="fbd63941" sha1="6a1aa3ead163e877a0aef870dcbf1ea10e93c11e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="udggen">
+		<description>UDG Generator</description>
+		<year>1985</year>
+		<publisher>Tom Collier</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="UDG Opus.opd" size="184320" crc="adef99c9" sha1="0180f4da6abd3769bfdef5328ad4e84dba89461f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="writer">
+		<description>The Writer</description>
+		<year>1985</year>
+		<publisher>Softechnics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="The Writer.opd" size="184320" crc="f446c7ef" sha1="032d097db4dc74da814f1e96c0786ece5c4c9295" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

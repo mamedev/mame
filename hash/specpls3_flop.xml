@@ -1668,23 +1668,23 @@
 	</software>
 
 <!--
-	Below is a selection of (most of) the DSK files featured in the TOSEC DAT files which, according to Lady Eklipse, include all files that were in TOSEC and all files from www.worldofspectrum.org which were never in TOSEC before. Which file and update they come from is commented for each entry, so that they can be consulted.
+    Below is a selection of (most of) the DSK files featured in the TOSEC DAT files which, according to Lady Eklipse, include all files that were in TOSEC and all files from www.worldofspectrum.org which were never in TOSEC before. Which file and update they come from is commented for each entry, so that they can be consulted.
 
-	Files removed:
-		- Files marked as "bad dumps" which already have a good parent set.
-		- Trained games, except for a "cheat version" of Neighbours which may have come from the original developers.
-		- 80-track (3.5'') disk images.
-		- Files generated with the ZXZVM interpreter.
-		- Games from the Crap Games Competition.
+    Files removed:
+        - Files marked as "bad dumps" which already have a good parent set.
+        - Trained games, except for a "cheat version" of Neighbours which may have come from the original developers.
+        - 80-track (3.5'') disk images.
+        - Files generated with the ZXZVM interpreter.
+        - Games from the Crap Games Competition.
 
-	All the DSK files which have a corresponding IPF have been labeled as "alt" clones until they're confirmed to come from the exact same release and can be safely removed (there's an added disclaimer about it in each of these entries, to make them easy to locate).
-	Other alt versions not in World of Spectrum have been kept for the same reason, since the exact source of each file doesn't seem to be properly documented anywhere, which means they'd need some research before a safe removal.
+    All the DSK files which have a corresponding IPF have been labeled as "alt" clones until they're confirmed to come from the exact same release and can be safely removed (there's an added disclaimer about it in each of these entries, to make them easy to locate).
+    Other alt versions not in World of Spectrum have been kept for the same reason, since the exact source of each file doesn't seem to be properly documented anywhere, which means they'd need some research before a safe removal.
 
-	Notes about the known DSK dumps:
-		Some dumps may come with an empty Side B, which is technically correct for games which were released with an empty side on purpose. These were usually labeled as "Sin grabar para tu uso" ("Unrecorded for your use") in many Spanish releases.
-		Some of the "master disks" from Zeppelin Games share the same file (same SHA-1) for their Side B. This has been verified against the downloads available in World of Spectrum.
-		A few releases had a version for a different system on the other side. These haven't been removed, as it was possible for the user to insert those sides and do anything they wanted with them.
-		
+    Notes about the known DSK dumps:
+        Some dumps may come with an empty Side B, which is technically correct for games which were released with an empty side on purpose. These were usually labeled as "Sin grabar para tu uso" ("Unrecorded for your use") in many Spanish releases.
+        Some of the "master disks" from Zeppelin Games share the same file (same SHA-1) for their Side B. This has been verified against the downloads available in World of Spectrum.
+        A few releases had a version for a different system on the other side. These haven't been removed, as it was possible for the user to insert those sides and do anything they wanted with them.
+
 -->
 
 <!-- From "Sinclair ZX Spectrum - Applications - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
@@ -4161,7 +4161,7 @@
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
-			<feature name="part_id" value="Side B: Dr. Jekyll and Mr. Hyde	"/>
+			<feature name="part_id" value="Side B: Dr. Jekyll and Mr. Hyde  "/>
 			<dataarea name="flop" size="194816">
 				<rom name="double classic (1988)(zenobi)(side b).dsk" size="194816" crc="a92e7e19" sha1="4e7aeebbe48f81534ac6e8e6d3d64b8e08500c7a" offset="0" />
 			</dataarea>
@@ -8150,7 +8150,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<!-- May be the same edition as the IPF -->
 	<software name="bhcopa" cloneof="bhcop">

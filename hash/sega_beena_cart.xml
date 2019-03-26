@@ -13,7 +13,7 @@
 			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
 				<rom name="0 - 0001.png" size="0x1ca26ec" crc="d8e18a54" sha1="887a96931bf622cb673f2550323ad3923eff337e" offset="0" />
 				<rom name="0 - 0002.png" size="0x1e37a3d" crc="62ae3535" sha1="d8f6c19c466715df5a568ac7cac8dacb53f2e04a" offset="0" />
-				<rom name="0 - 0003.png" size="0x1ce4f16" crc="fe6c72d9" sha1="2c4412eb518fbac2e8519c87e53270d960ecab53" offset="0" />		
+				<rom name="0 - 0003.png" size="0x1ce4f16" crc="fe6c72d9" sha1="2c4412eb518fbac2e8519c87e53270d960ecab53" offset="0" />
 				<rom name="0 - 0004.png" size="0x19a864d" crc="edede3ea" sha1="81914894358c74064aa5f9e980ac37f7140f80c3" offset="0" />
 				<rom name="0 - 0005.png" size="0x18998f4" crc="16837cc0" sha1="eb86b2943cf603a63cd5b94faa0d06ee8a3139d6" offset="0" />
 				<rom name="0 - 0006.png" size="0x195b7e5" crc="3e307e6d" sha1="23ed9ab2a4122d7cb33d8d6174ca901b88647b4d" offset="0" />
@@ -23,7 +23,7 @@
 				<rom name="0 - 0010.png" size="0x186546b" crc="6d3d8c91" sha1="9909322c09277ddd306f10f9a04a897b0fe74961" offset="0" />
 				<rom name="0 - 0011.png" size="0x179d3a8" crc="c3911254" sha1="2d2932e97a0b20a9b5e5fd78a3bbad0f1e146813" offset="0" />
 				<rom name="0 - 0012.png" size="0x187a9df" crc="f1cdc95d" sha1="aa926c9360edcecdaa3a9ce1b5e17ee61048cee4" offset="0" />
-			</dataarea> 
+			</dataarea>
 		</part>
 	</software>
 </softwarelist>

@@ -4,16 +4,16 @@
 
     Sega Beena
 
-	apbeena.cpp
+    apbeena.cpp
 
-	Skeleton driver for the Sega Advanced Pico BEENA
+    Skeleton driver for the Sega Advanced Pico BEENA
 
-	H/W is custom Sega SoC with ARM7TDMI core at 81 MHz.
+    H/W is custom Sega SoC with ARM7TDMI core at 81 MHz.
 
-	TODO:
-			Everything!
-			Needs the internal BIOS dumped.
-			Component list / PCB diagram
+    TODO:
+            Everything!
+            Needs the internal BIOS dumped.
+            Component list / PCB diagram
 
     cartridge ROM has 'edinburgh' in the header, maybe a system codename?
     ROM is also full of OGG files containing the string 'Encoded with Speex speex-1.0.4'

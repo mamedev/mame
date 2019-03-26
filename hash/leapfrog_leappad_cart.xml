@@ -587,4 +587,88 @@
 		</part>
 	</software>
 
+	<software name="sedsaber1" supported="no">
+		<description>Sed de Saber - English as a Second Language Edition - Book 1 - Getting Started (Spain)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13034 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2111"/>
+			<feature name="u1" value="JS28F320"/>
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-13034 UBL - Sed de Saber - English as a Second Language Edition - Book 1 - Getting Started.bin" size="0x400000" crc="6b9a4399" sha1="8559facabf94c6ffaf8a6e1868f0ab00fb28ce09" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sedsaber2" supported="no">
+		<description>Sed de Saber - English as a Second Language Edition - Book 2 - A New Job (Spain)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13035 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2111"/>
+			<feature name="u1" value="JS28F320"/>
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-13035 UBL - Sed de Saber - English as a Second Language Edition - Book 2 - A New Job.bin" size="0x400000" crc="95b1520c" sha1="25701bd15371cd463a801bd6ede7a9591c352680" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sedsaber3" supported="no">
+		<description>Sed de Saber - English as a Second Language Edition - Book 3 - Daily Activities (Spain)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13038 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2111"/>
+			<feature name="u1" value="JS28F320"/>
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-13038 UBL - Sed de Saber - English as a Second Language Edition - Book 3 - Daily Activities.bin" size="0x400000" crc="39f5b54b" sha1="eeb8849733bf856fe4f28503153d989a6a00cb11" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sedsaber4" supported="no">
+		<description>Sed de Saber - English as a Second Language Edition - Book 4 - Health and Safety (Spain)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13040 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2111"/>
+			<feature name="u1" value="JS28F320"/>
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-13040 UBL - Sed de Saber - English as a Second Language Edition - Book 4 - Health and Safety.bin" size="0x400000" crc="efd55310" sha1="bbde3bc75337f8cfac60dd5dfaab2de756cfd6de" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sedsaber5" supported="no">
+		<description>Sed de Saber - English as a Second Language Edition - Book 5 - Community Interactions (Spain)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13041 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2111"/>
+			<feature name="u1" value="JS28F320"/>
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-13041 UBL - Sed de Saber - English as a Second Language Edition - Book 5 - Community Interactions.bin" size="0x400000" crc="a3bb676b" sha1="ddab54976fd54b9ef140ee6b67414597a3a21ec9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sedsaber6" supported="no">
+		<description>Sed de Saber - English as a Second Language Edition - Book 6 - How do you say... (Spain)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13044 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2111"/>
+			<feature name="u1" value="JS28F320"/>
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-13044 UBL - Sed de Saber - English as a Second Language Edition - Book 6 - How do you say... .bin" size="0x400000" crc="5ed699f6" sha1="902c70e0437525de94a8febab794e46b8a55f5c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
