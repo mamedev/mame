@@ -181,6 +181,7 @@ SOUNDS["ASTROCADE"] = true
 --SOUNDS["NAMCO_CUS30"] = true
 --SOUNDS["NAMCO_52XX"] = true
 --SOUNDS["NAMCO_63701X"] = true
+SOUNDS["NAMCO_163"] = true
 SOUNDS["T6W28"] = true
 --SOUNDS["SNKWAVE"] = true
 --SOUNDS["C140"] = true
