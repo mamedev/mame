@@ -3,7 +3,7 @@
 /***************************************************************************
 
     Namco 163 internal sound emulation by cam900
-	4 bit wavetable (variable length), 1 ~ 8 channel
+    4 bit wavetable (variable length), 1 ~ 8 channel
     Reference : https://wiki.nesdev.com/w/index.php/Namco_163_audio
 
 ***************************************************************************/
