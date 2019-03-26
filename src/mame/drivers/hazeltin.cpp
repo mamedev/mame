@@ -695,20 +695,20 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(CPU_TAG, I8080, XTAL(18'000'000)/9) // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
-	MCFG_DEVICE_PROGRAM_MAP(hazl1500_mem)
-	MCFG_DEVICE_IO_MAP(hazl1500_io)
+	I8080(config, m_maincpu, XTAL(18'000'000)/9); // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
+	m_maincpu->set_addrmap(AS_PROGRAM, &hazl1500_state::hazl1500_mem);
+	m_maincpu->set_addrmap(AS_IO, &hazl1500_state::hazl1500_io);
 	config.m_perfect_cpu_quantum = subtag(CPU_TAG);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainint").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(hazl1500_state, screen_update_hazl1500)
-	//MCFG_SCREEN_RAW_PARAMS(XTAL(33'264'000) / 2,
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update(FUNC(hazl1500_state::screen_update_hazl1500));
+	//m_screen->set_raw(XTAL(33'264'000) / 2,
 	//    SCREEN_HTOTAL, SCREEN_HSTART, SCREEN_HSTART + SCREEN_HDISP,
 	//    SCREEN_VTOTAL, SCREEN_VSTART, SCREEN_VSTART + SCREEN_VDISP); // TODO: Figure out exact visibility
-	MCFG_SCREEN_RAW_PARAMS(XTAL(33'264'000) / 2,
+	m_screen->set_raw(XTAL(33'264'000) / 2,
 		SCREEN_HTOTAL, 0, SCREEN_HTOTAL,
 		SCREEN_VTOTAL, 0, SCREEN_VTOTAL);
 

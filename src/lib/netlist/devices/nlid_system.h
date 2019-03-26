@@ -182,6 +182,7 @@ namespace netlist
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		{
 			set_logic_family(setup().family_from_model(m_FAMILY()));
+			m_Q.set_logic_family(this->logic_family());
 		}
 
 		NETLIB_UPDATEI() { }

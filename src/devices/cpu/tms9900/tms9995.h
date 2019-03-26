@@ -245,8 +245,6 @@ private:
 	uint16_t  m_cru_address;
 	uint16_t  m_cru_value;
 	bool    m_cru_first_read;
-	int     m_cru_bits_left;
-	uint32_t  m_cru_read;
 
 	// CPU-internal CRU flags
 	bool    m_flag[16];

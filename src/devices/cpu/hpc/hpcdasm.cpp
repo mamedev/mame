@@ -16,6 +16,30 @@
 #include "util/strformat.h"
 #include <ctype.h>
 
+using osd::u32;
+using util::BIT;
+using offs_t = u32;
+
+const char *const hpc16083_disassembler::s_regs[128] =
+{
+	"psw", nullptr, "SP", "PC", "A", "K", "B", "X",
+	"enir", "irpd", "ircd", "sio", "porti", nullptr, "halten", nullptr,
+	"porta", "portb", nullptr, "upic", nullptr, nullptr, nullptr, nullptr,
+	"dira", "dirb", "bfun", nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, "portd", nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	"enu", "enui", "rbuf", "tbuf", "enur", nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	"t4", "r4", "t5", "r5", "t6", "r6", "t7", "r7",
+	"pwmode", "portp", nullptr, nullptr, nullptr, nullptr, "eicon", "eicr",
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	"i4cr", "i3cr", "i2cr", "r2", "t2", "r3", "t3", "divby",
+	"tmmode", "t0con", "watchdog", nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
+};
+
 const char *const hpc16164_disassembler::s_regs[128] =
 {
 	"psw", nullptr, "SP", "PC", "A", "K", "B", "X",
@@ -151,7 +175,7 @@ void hpc_disassembler::disassemble_bit_op(std::ostream &stream, const char *op, 
 		stream << "[";
 	format_register(stream, src);
 	if (indir)
-		stream << "]";
+		stream << "].b";
 }
 
 offs_t hpc_disassembler::disassemble(std::ostream &stream, offs_t pc, const hpc_disassembler::data_buffer &opcodes, const hpc_disassembler::data_buffer &params)
@@ -187,6 +211,10 @@ offs_t hpc_disassembler::disassemble(std::ostream &stream, offs_t pc, const hpc_
 		jmp = true;
 		src = pc - ((opcode & 0x03) << 8 | opcodes.r8(pc + 1));
 		bytes = 2;
+		break;
+
+	case 0x38: case 0x39: case 0x3a:
+		reg = REGISTER_X;
 		break;
 
 	case 0x3f:
@@ -483,18 +511,15 @@ offs_t hpc_disassembler::disassemble(std::ostream &stream, offs_t pc, const hpc_
 		break;
 
 	case 0x38:
-		util::stream_format(stream, "%-8sX,", "rbit");
-		format_register(stream, reg);
+		disassemble_op(stream, "rbit", reg, src, imm, indir, idx, false);
 		break;
 
 	case 0x39:
-		util::stream_format(stream, "%-8sX,", "sbit");
-		format_register(stream, reg);
+		disassemble_op(stream, "sbit", reg, src, imm, indir, idx, false);
 		break;
 
 	case 0x3a:
-		util::stream_format(stream, "%-8sX,", "ifbit");
-		format_register(stream, reg);
+		disassemble_op(stream, "ifbit", reg, src, imm, indir, idx, false);
 		break;
 
 	case 0x3b:

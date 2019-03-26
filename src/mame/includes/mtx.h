@@ -14,35 +14,29 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/mtx/exp.h"
 #include "cpu/z80/z80.h"
+#include "machine/z80daisy.h"
 #include "machine/z80dart.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 
-#define Z80_TAG         "z80"
-#define Z80CTC_TAG      "z80ctc"
-#define Z80DART_TAG     "z80dart"
-#define FD1793_TAG      "fd1793" // SDX
-#define FD1791_TAG      "fd1791" // FDX
-#define SN76489A_TAG    "sn76489a"
-#define MC6845_TAG      "mc6845"
-#define SCREEN_TAG      "screen"
-#define CENTRONICS_TAG  "centronics"
 
 class mtx_state : public driver_device
 {
 public:
 	mtx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, Z80_TAG)
-		, m_sn(*this, SN76489A_TAG)
-		, m_z80ctc(*this, Z80CTC_TAG)
-		, m_z80dart(*this, Z80DART_TAG)
+		, m_maincpu(*this, "z80")
+		, m_sn(*this, "sn76489a")
+		, m_z80ctc(*this, "z80ctc")
+		, m_z80dart(*this, "z80dart")
 		, m_cassette(*this, "cassette")
-		, m_centronics(*this, CENTRONICS_TAG)
+		, m_centronics(*this, "centronics")
 		, m_ram(*this, RAM_TAG)
+		, m_exp(*this, "exp")
 		, m_extrom(*this, "extrom")
 		, m_rompak(*this, "rompak")
 	{ }
@@ -50,6 +44,10 @@ public:
 	void rs128(machine_config &config);
 	void mtx500(machine_config &config);
 	void mtx512(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -59,6 +57,7 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
+	required_device<mtx_exp_slot_device> m_exp;
 	required_device<generic_slot_device> m_extrom;
 	required_device<generic_slot_device> m_rompak;
 
@@ -91,8 +90,6 @@ private:
 	DECLARE_WRITE8_MEMBER(hrx_data_w);
 	DECLARE_READ8_MEMBER(hrx_attr_r);
 	DECLARE_WRITE8_MEMBER(hrx_attr_w);
-	DECLARE_MACHINE_START(mtx512);
-	DECLARE_MACHINE_RESET(mtx512);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_tick);
 	DECLARE_WRITE_LINE_MEMBER(ctc_trg1_w);
@@ -110,7 +107,9 @@ private:
 	void bankswitch(uint8_t data);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(extrom_load);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rompak_load);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(mtx);
 	DECLARE_SNAPSHOT_LOAD_MEMBER(mtx);
+
 	void mtx_io(address_map &map);
 	void mtx_mem(address_map &map);
 	void rs128_io(address_map &map);

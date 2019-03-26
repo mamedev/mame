@@ -21,10 +21,10 @@ public:
 
 	auto interrupt_cb() { return m_interrupt_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( rtc_r );
-	DECLARE_READ8_MEMBER( xram_r );
-	DECLARE_WRITE8_MEMBER( rtc_w );
-	DECLARE_WRITE8_MEMBER( xram_w );
+	uint8_t rtc_r(offs_t offset);
+	uint8_t xram_r(offs_t offset);
+	void rtc_w(offs_t offset, uint8_t data);
+	void xram_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

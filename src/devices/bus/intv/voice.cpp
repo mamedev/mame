@@ -96,37 +96,33 @@ const tiny_rom_entry *intv_voice_device::device_rom_region() const
  read_audio
  -------------------------------------------------*/
 
-READ16_MEMBER(intv_voice_device::read_speech)
+uint16_t intv_voice_device::read_speech(offs_t offset)
 {
-	if (ACCESSING_BITS_0_7)
-		return m_speech->spb640_r(offset);
-	else
-		return 0xff;
+	return 0xff00 | m_speech->spb640_r(offset);
 }
 
 /*-------------------------------------------------
  write_audio
  -------------------------------------------------*/
 
-WRITE16_MEMBER(intv_voice_device::write_speech)
+void intv_voice_device::write_speech(offs_t offset, uint16_t data)
 {
-	if (ACCESSING_BITS_0_7)
-		return m_speech->spb640_w(offset, data);
+	m_speech->spb640_w(offset, data & 0x00ff);
 }
 
 
-READ16_MEMBER(intv_voice_device::read_rom80)
+uint16_t intv_voice_device::read_rom80(offs_t offset)
 {
 	if (m_ram88_enabled && offset >= 0x800)
-		return m_subslot->read_ram(space, offset & 0x7ff, mem_mask);
+		return m_subslot->read_ram(offset & 0x7ff);
 	else
-		return m_subslot->read_rom80(space, offset, mem_mask);
+		return m_subslot->read_rom80(offset);
 }
 
-READ16_MEMBER(intv_voice_device::read_romd0)
+uint16_t intv_voice_device::read_romd0(offs_t offset)
 {
 	if (m_ramd0_enabled && offset < 0x800)
-		return m_subslot->read_ram(space, offset, mem_mask);
+		return m_subslot->read_ram(offset);
 	else
-		return m_subslot->read_romd0(space, offset, mem_mask);
+		return m_subslot->read_romd0(offset);
 }

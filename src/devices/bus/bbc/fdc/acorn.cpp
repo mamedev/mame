@@ -166,30 +166,30 @@ void bbc_acorn1770_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_acorn8271_device::read)
+uint8_t bbc_acorn8271_device::read(offs_t offset)
 {
 	uint8_t data;
 
 	if (offset & 0x04)
 	{
-		data = m_fdc->data_r(space , 0);
+		data = m_fdc->data_r();
 	}
 	else
 	{
-		data = m_fdc->read(space, offset & 0x03);
+		data = m_fdc->read(offset & 0x03);
 	}
 	return data;
 }
 
-WRITE8_MEMBER(bbc_acorn8271_device::write)
+void bbc_acorn8271_device::write(offs_t offset, uint8_t data)
 {
 	if (offset & 0x04)
 	{
-		m_fdc->data_w(space, 0, data);
+		m_fdc->data_w(data);
 	}
 	else
 	{
-		m_fdc->write(space, offset & 0x03, data);
+		m_fdc->write(offset & 0x03, data);
 	}
 }
 
@@ -207,7 +207,7 @@ WRITE_LINE_MEMBER(bbc_acorn8271_device::side_w)
 }
 
 
-READ8_MEMBER(bbc_acorn1770_device::read)
+uint8_t bbc_acorn1770_device::read(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -222,7 +222,7 @@ READ8_MEMBER(bbc_acorn1770_device::read)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_acorn1770_device::write)
+void bbc_acorn1770_device::write(offs_t offset, uint8_t data)
 {
 	if (offset & 0x04)
 	{

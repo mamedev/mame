@@ -171,19 +171,19 @@ static GFXDECODE_START( gfx_ec65 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ec65_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(ec65_state::ec65)
-
+void ec65_state::ec65(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M6502, XTAL(4'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(ec65_mem)
+	M6502(config, m_maincpu, XTAL(4'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ec65_state::ec65_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 200);
+	screen.set_visarea_full();
+	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_ec65);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -208,21 +208,21 @@ MACHINE_CONFIG_START(ec65_state::ec65)
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
 	keyboard.set_keyboard_callback(FUNC(ec65_state::kbd_put));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ec65k_state::ec65k)
-
+void ec65k_state::ec65k(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",G65816, XTAL(4'000'000)) // can use 4,2 or 1 MHz
-	MCFG_DEVICE_PROGRAM_MAP(ec65k_mem)
+	g65816_device &maincpu(G65816(config, "maincpu", XTAL(4'000'000))); // can use 4,2 or 1 MHz
+	maincpu.set_addrmap(AS_PROGRAM, &ec65k_state::ec65k_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 200);
+	screen.set_visarea_full();
+	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_ec65);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -231,7 +231,7 @@ MACHINE_CONFIG_START(ec65k_state::ec65k)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8); /*?*/
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( ec65 )

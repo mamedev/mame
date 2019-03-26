@@ -196,7 +196,7 @@ void prof180x_state::prof180x_io(address_map &map)
 {
 	map(0x08, 0x08).mirror(0xff00).w(FUNC(prof180x_state::flr_w));
 	map(0x09, 0x09).select(0xff00).r(FUNC(prof180x_state::status_r));
-	map(0x0a, 0x0a).mirror(0xff00).rw(FDC9268_TAG, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
+	map(0x0a, 0x0a).mirror(0xff00).rw(FDC9268_TAG, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
 	map(0x0b, 0x0b).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0x0c, 0x0d).mirror(0xff00).m(FDC9268_TAG, FUNC(upd765a_device::map));
 }

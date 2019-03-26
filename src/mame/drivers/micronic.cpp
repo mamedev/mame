@@ -200,17 +200,17 @@ WRITE8_MEMBER( micronic_state::port_2c_w )
 
 WRITE8_MEMBER( micronic_state::rtc_address_w )
 {
-	m_rtc->write(space, 0, data);
+	m_rtc->write(0, data);
 }
 
 READ8_MEMBER( micronic_state::rtc_data_r )
 {
-	return m_rtc->read(space, 1);
+	return m_rtc->read(1);
 }
 
 WRITE8_MEMBER( micronic_state::rtc_data_w )
 {
-	m_rtc->write(space, 1, data);
+	m_rtc->write(1, data);
 }
 
 /***************************************************************************

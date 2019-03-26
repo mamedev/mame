@@ -569,19 +569,19 @@ READ8_MEMBER(jubilee_state::mux_port_r)
 {
 	switch( mux_sel )
 	{
-		case 0x01: return ioport("IN0")->read();
-		case 0x02: return ioport("IN1")->read();    /* muxed credits input is here! */
-		case 0x03: return ioport("IN2")->read();
+		case 0x01: return BIT(ioport("IN0")->read(), offset);
+		case 0x02: return BIT(ioport("IN1")->read(), offset);    /* muxed credits input is here! */
+		case 0x03: return BIT(ioport("IN2")->read(), offset);
 	}
 
-	return 0xff;
+	return 1;
 }
 
 
 void jubilee_state::jubileep_cru_map(address_map &map)
 {
-	map(0x00c8, 0x00c8).r(FUNC(jubilee_state::mux_port_r));    /* multiplexed input port */
-	map(0x0000, 0x07ff).w(FUNC(jubilee_state::unk_w));
+	map(0x0c80, 0x0c8f).r(FUNC(jubilee_state::mux_port_r));    /* multiplexed input port */
+	map(0x0000, 0x0fff).w(FUNC(jubilee_state::unk_w));
 }
 
 /* I/O byte R/W

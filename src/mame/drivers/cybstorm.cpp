@@ -222,11 +222,11 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(cybstorm_state::round2)
-
+void cybstorm_state::round2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68EC020(config, m_maincpu, ATARI_CLOCK_14MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cybstorm_state::main_map);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
@@ -245,15 +245,14 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_cybstorm);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 32768);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_palette("palette");
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-
-	MCFG_SCREEN_UPDATE_DRIVER(cybstorm_state, screen_update_cybstorm)
-MACHINE_CONFIG_END
+	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(cybstorm_state::screen_update_cybstorm));
+}
 
 
 void cybstorm_state::cybstorm(machine_config &config)

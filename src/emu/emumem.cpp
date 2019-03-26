@@ -742,6 +742,13 @@ void memory_manager::allocate(device_memory_interface &memory)
 			// allocate one of the appropriate type
 			switch (spaceconfig->data_width() | (spaceconfig->addr_shift() + 4))
 			{
+				case  8|(4+1):
+					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
+						memory.allocate<address_space_specific<0,  1, ENDIANNESS_LITTLE>>(*this, spacenum);
+					else
+						memory.allocate<address_space_specific<0,  1, ENDIANNESS_BIG   >>(*this, spacenum);
+					break;
+
 				case  8|(4-0):
 					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
 						memory.allocate<address_space_specific<0,  0, ENDIANNESS_LITTLE>>(*this, spacenum);
@@ -2643,6 +2650,8 @@ template<int Width, int AddrShift, int Endian> memory_access_cache<Width, AddrSh
 }
 
 
+template class memory_access_cache<0,  1, ENDIANNESS_LITTLE>;
+template class memory_access_cache<0,  1, ENDIANNESS_BIG>;
 template class memory_access_cache<0,  0, ENDIANNESS_LITTLE>;
 template class memory_access_cache<0,  0, ENDIANNESS_BIG>;
 template class memory_access_cache<1,  3, ENDIANNESS_LITTLE>;

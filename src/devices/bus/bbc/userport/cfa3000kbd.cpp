@@ -113,7 +113,7 @@ void cfa3000_kbd_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(cfa3000_kbd_device::pb_r)
+uint8_t cfa3000_kbd_device::pb_r()
 {
 	uint8_t data = 0x00;
 

@@ -52,6 +52,20 @@ private:
 	s32 m_icount;
 };
 
+class hpc46003_device : public hpc_device
+{
+public:
+	// construction/destruction
+	hpc46003_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device_disasm_interface overrides
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+private:
+	void internal_map(address_map &map);
+};
+
 class hpc46104_device : public hpc_device
 {
 public:
@@ -68,6 +82,7 @@ private:
 
 
 // device type declarations
+DECLARE_DEVICE_TYPE(HPC46003, hpc46003_device)
 DECLARE_DEVICE_TYPE(HPC46104, hpc46104_device)
 
 #endif // MAME_CPU_HPC_HPC_H

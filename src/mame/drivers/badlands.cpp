@@ -440,15 +440,15 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(badlands_state::badlands)
-
+void badlands_state::badlands(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", badlands_state,  vblank_int)
+	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &badlands_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(badlands_state::vblank_int));
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	M6502(config, m_audiocpu, ATARI_CLOCK_14MHz/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &badlands_state::audio_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(badlands_state::sound_scanline), "screen", 0, 1);
 
 	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
@@ -464,18 +464,18 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 	palette.set_format(palette_device::IRGB_1555, 256);
 	palette.set_membits(8);
 
-	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, badlands_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)
+	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,32).set_info_callback(FUNC(badlands_state::get_playfield_tile_info));
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, badlands_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(badlands_state, screen_update_badlands)
-	MCFG_SCREEN_PALETTE("palette")
+	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(badlands_state::screen_update_badlands));
+	m_screen->set_palette("palette");
 
 	MCFG_VIDEO_START_OVERRIDE(badlands_state,badlands)
 
@@ -485,7 +485,7 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 	SPEAKER(config, "mono").front_center();
 
 	YM2151(config, "ymsnd", ATARI_CLOCK_14MHz/4).add_route(0, "mono", 0.30).add_route(1, "mono", 0.30);
-MACHINE_CONFIG_END
+}
 
 
 

@@ -86,8 +86,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(nascom1_hd6402_so);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nascom1_cassette );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_cassette );
-	DECLARE_SNAPSHOT_LOAD_MEMBER( nascom1 );
-	DECLARE_SNAPSHOT_LOAD_MEMBER( charrom );
+	template<int Dest> DECLARE_SNAPSHOT_LOAD_MEMBER( nascom );
 };
 
 class nascom1_state : public nascom_state
@@ -231,7 +230,8 @@ DEVICE_IMAGE_UNLOAD_MEMBER( nascom_state, nascom1_cassette )
 //  SNAPSHOTS
 //**************************************************************************
 
-SNAPSHOT_LOAD_MEMBER( nascom_state, nascom1 )
+template<int Dest>
+SNAPSHOT_LOAD_MEMBER( nascom_state, nascom )
 {
 	uint8_t line[29];
 
@@ -244,38 +244,15 @@ SNAPSHOT_LOAD_MEMBER( nascom_state, nascom1 )
 		{
 			for (int i = 0; i < 8; i++)
 			{
-				m_maincpu->space(AS_PROGRAM).write_byte(addr++, b[i]);
-			}
-		}
-		else
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported file format");
-			return image_init_result::FAIL;
-		}
-		dummy = 0x00;
-		while (!image.image_feof() && dummy != 0x0a && dummy != 0x1f)
-		{
-			image.fread(&dummy, 1);
-		}
-	}
-
-	return image_init_result::PASS;
-}
-
-SNAPSHOT_LOAD_MEMBER(nascom_state, charrom)
-{
-	uint8_t line[29];
-
-	while (image.fread(&line, sizeof(line)) == sizeof(line))
-	{
-		unsigned int addr, b[8], dummy;
-
-		if (sscanf((char *)line, "%4x %x %x %x %x %x %x %x %x",
-			&addr, &b[0], &b[1], &b[2], &b[3], &b[4], &b[5], &b[6], &b[7]) == 9)
-		{
-			for (int i = 0; i < 8; i++)
-			{
-				m_gfx1_region->base()[addr++] = b[i];
+				switch (Dest)
+				{
+				case 0: // snapshot
+					m_maincpu->space(AS_PROGRAM).write_byte(addr++, b[i]);
+					break;
+				case 1: // character rom
+					m_gfx1_region->base()[addr++] = b[i];
+					break;
+				}
 			}
 		}
 		else
@@ -707,10 +684,10 @@ void nascom_state::nascom(machine_config &config)
 
 	// devices
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot"));
-	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, nascom1), this), "nas", attotime::from_msec(500));
+	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, nascom<0>), this), "nas", attotime::from_msec(500));
 	snapshot.set_interface("nascom_snap");
 	snapshot_image_device &snapchar(SNAPSHOT(config, "snapchar"));
-	snapchar.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, charrom), this), "chr", attotime::from_msec(500));
+	snapchar.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, nascom<1>), this), "chr", attotime::from_msec(500));
 	snapchar.set_interface("nascom_char");
 }
 

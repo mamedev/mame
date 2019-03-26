@@ -81,14 +81,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ctrl1_w ) { m_ctrl1_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( ctrl2_w ) { m_ctrl2_handler(state); }
 
-	DECLARE_READ8_MEMBER( excs_r ) { return m_excsr_handler(space, offset); }
-	DECLARE_WRITE8_MEMBER( excs_w ) { m_excsw_handler(space, offset, data); }
+	uint8_t excs_r(offs_t offset) { return m_excsr_handler(offset); }
+	void excs_w(offs_t offset, uint8_t data) { m_excsw_handler(offset, data); }
 
 	// called from host
-	DECLARE_READ8_MEMBER( mreq_r );
-	DECLARE_WRITE8_MEMBER( mreq_w );
-	DECLARE_READ8_MEMBER( iorq_r );
-	DECLARE_WRITE8_MEMBER( iorq_w );
+	uint8_t mreq_r(offs_t offset);
+	void mreq_w(offs_t offset, uint8_t data);
+	uint8_t iorq_r(offs_t offset);
+	void iorq_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( bk21_w );
 	DECLARE_WRITE_LINE_MEMBER( bk22_w );
@@ -121,10 +121,10 @@ public:
 	// construction/destruction
 	virtual ~device_svi_expander_interface();
 
-	virtual DECLARE_READ8_MEMBER( mreq_r ) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER( mreq_w ) { }
-	virtual DECLARE_READ8_MEMBER( iorq_r ) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER( iorq_w ) { }
+	virtual uint8_t mreq_r(offs_t offset) { return 0xff; }
+	virtual void mreq_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t iorq_r(offs_t offset) { return 0xff; }
+	virtual void iorq_w(offs_t offset, uint8_t data) { }
 
 	virtual void bk21_w(int state) { }
 	virtual void bk22_w(int state) { }

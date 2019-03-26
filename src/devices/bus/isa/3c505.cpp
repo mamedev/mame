@@ -1644,7 +1644,9 @@ READ16_MEMBER(threecom3c505_device::read)
 		// omit excessive logging
 		if (data == last_data)
 		{
-			uint32_t pc = space.device().state().pcbase();
+			// FIXME: space.device().state().pcbase() will crash mame with SIGSEGV (since mame0197)
+			uint32_t pc = 0; // space.device().state().pcbase();
+
 			if (pc == last_pc)
 			{
 				return data;

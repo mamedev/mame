@@ -54,9 +54,9 @@ EXPRO-02
 |    GP-U27             PAL  41464  |---------|                           |
 |J   PAL   GP-U41            41464  |KANEKO   |                           |
 |A MC-8282  PAL              41464  |VU-002   | PM006E.U83     PM018E.U94 |
-|M                     6116  41464  |         |                           |
+|M                   D42101C 41464  |         |                           |
 |M                                  |         |          PM019U_U93-01.U93|
-|A                     6116         |---------| PM206E.U82                |
+|A                   D42101C        |---------| PM206E.U82                |
 |            HM53461                                                      |
 |    PAL     HM53461   PAL    |-------|         CALC1-CHIP                |
 |            HM53461   PAL    |KANEKO |                      PM016E.U92   |
@@ -82,6 +82,7 @@ EXPRO-02
     CALC1-CHIP clock - 16.0MHz
     GP-U41 clocks - pins 21 & 22 - 12.0MHz, pins 1 & 2 - 6.0MHz, pins 8 & 9 - 15.6249kHz (HSync?)
     GP-U27 clock - none (so it's not an MCU)
+    D42101C - Line buffer for NTSC TV
 
     (TODO: which is correct?)
     OKI M6295 clock - 2.0MHz (12/6). pin7 = low
@@ -107,7 +108,7 @@ M6100575A GALS PANIC (PCB manufactured by Taito)
 CPU: MC68000
 Sound: M6295
 OSC: 12.0000MHz, 16.0000MHz
-Custom: VU-002, VIEW2, CACL1
+Custom: VU-002, VIEW2, CALC1
 
 ROMs:
 PM109J.U88 (OKI M271000ZB) - Main programs
@@ -899,23 +900,23 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(expro02_state::expro02)
-
+void expro02_state::expro02(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(expro02_map)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &expro02_state::expro02_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(expro02_state::scanline), "screen", 0, 1);
 
 	/* CALC01 MCU @ 16Mhz (unknown type, simulated) */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(expro02_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0, 256-32-1);
+	m_screen->set_screen_update(FUNC(expro02_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_expro02);
 	PALETTE(config, m_palette, FUNC(expro02_state::expro02_palette)).set_format(palette_device::GRBx_555, 2048 + 32768);
@@ -938,19 +939,18 @@ MACHINE_CONFIG_START(expro02_state::expro02)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 12000000/6, okim6295_device::PIN7_LOW)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	okim6295_device &oki(OKIM6295(config, "oki", 12000000/6, okim6295_device::PIN7_LOW));
+	oki.set_addrmap(0, &expro02_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_END
 
-
-MACHINE_CONFIG_START(expro02_state::comad)
+void expro02_state::comad(machine_config &config)
+{
 	expro02(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(fantasia_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &expro02_state::fantasia_map);
 
 	config.device_remove("calc1_mcu");
 
@@ -959,7 +959,7 @@ MACHINE_CONFIG_START(expro02_state::comad)
 	m_view2_0->set_offset(-256, -216, 256, 224);
 
 	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(0));  /* a guess, and certainly wrong */
-MACHINE_CONFIG_END
+}
 
 void expro02_state::comad_noview2(machine_config &config)
 {
@@ -971,63 +971,64 @@ void expro02_state::comad_noview2(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(expro02_state::fantasia)
+void expro02_state::fantasia(machine_config &config)
+{
 	comad_noview2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_DEVICE_PROGRAM_MAP(comad_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &expro02_state::comad_map);
+}
 
-MACHINE_CONFIG_START(expro02_state::supmodel)
-	comad_noview2(config);
-
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(supmodel_map)
-	MCFG_DEVICE_REPLACE("oki", OKIM6295, 1584000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(expro02_state::smissw) // 951127 PCB, 12 & 16 clocks
+void expro02_state::supmodel(machine_config &config)
+{
 	comad_noview2(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(smissw_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &expro02_state::supmodel_map);
 
-MACHINE_CONFIG_START(expro02_state::fantsia2)
+	okim6295_device &oki(OKIM6295(config.replace(), "oki", 1584000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.set_addrmap(0, &expro02_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void expro02_state::smissw(machine_config &config) // 951127 PCB, 12 & 16 clocks
+{
 	comad_noview2(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(fantsia2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &expro02_state::smissw_map);
+}
 
-MACHINE_CONFIG_START(expro02_state::galhustl)
+void expro02_state::fantsia2(machine_config &config)
+{
 	comad_noview2(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(galhustl_map)
-	MCFG_DEVICE_REPLACE("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	m_maincpu->set_addrmap(AS_PROGRAM, &expro02_state::fantsia2_map);
+}
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(expro02_state, screen_update_zipzap)
-MACHINE_CONFIG_END
+void expro02_state::galhustl(machine_config &config)
+{
+	comad_noview2(config);
 
-MACHINE_CONFIG_START(expro02_state::zipzap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &expro02_state::galhustl_map);
+
+	okim6295_device &oki(OKIM6295(config.replace(), "oki", 1056000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.set_addrmap(0, &expro02_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	m_screen->set_screen_update(FUNC(expro02_state::screen_update_zipzap));
+}
+
+void expro02_state::zipzap(machine_config &config)
+{
 	comad_noview2(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(zipzap_map)
-	MCFG_DEVICE_REPLACE("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	m_maincpu->set_addrmap(AS_PROGRAM, &expro02_state::zipzap_map);
 
-	MCFG_SCREEN_MODIFY("screen") // doesn't work with original kaneko_spr implementation
-	MCFG_SCREEN_UPDATE_DRIVER(expro02_state, screen_update_zipzap)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config.replace(), "oki", 1056000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.set_addrmap(0, &expro02_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	m_screen->set_screen_update(FUNC(expro02_state::screen_update_zipzap)); // doesn't work with original kaneko_spr implementation
+}
 
 /*************************************
  *

@@ -19,7 +19,7 @@
 
     TODO:
 
-    - m6800.c rewrite
+    - m6800.cpp rewrite
     - keyboard interrupt
     - LCD controller
     - serial
@@ -833,7 +833,7 @@ void hx20_state::machine_start()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( hx20 )
+//  machine_config( hx20 )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(hx20_state::hx20)
@@ -859,13 +859,13 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 	m_subcpu->out_p4_cb().set(FUNC(hx20_state::slave_p4_w));
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(120, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hx20_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(120, 32);
+	screen.set_visarea(0, 120-1, 0, 32-1);
+	screen.set_screen_update(FUNC(hx20_state::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(hx20_state::hx20_palette), 2);
 
@@ -903,7 +903,7 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( hx20 )
+//  machine_config( hx20 )
 //-------------------------------------------------
 
 void hx20_state::cm6000(machine_config &config)

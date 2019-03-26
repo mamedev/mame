@@ -56,7 +56,7 @@ void age_candy_state::age_candy_map(address_map &map)
 
 void age_candy_state::age_candy(machine_config &config)
 {
-	HPC46104(config, m_maincpu, 8000000); // unknown clock; HPC still not actually emulated
+	HPC46104(config, m_maincpu, 16_MHz_XTAL); // HPC still not actually emulated
 	m_maincpu->set_addrmap(AS_PROGRAM, &age_candy_state::age_candy_map);
 
 	/* sound hardware */

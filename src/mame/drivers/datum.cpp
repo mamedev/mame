@@ -182,10 +182,11 @@ WRITE8_MEMBER( datum_state::pb_w )
 }
 
 
-MACHINE_CONFIG_START(datum_state::datum)
+void datum_state::datum(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M6802, XTAL(4'000'000)) // internally divided to 1 MHz
-	MCFG_DEVICE_PROGRAM_MAP(datum_mem)
+	M6802(config, m_maincpu, XTAL(4'000'000)); // internally divided to 1 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &datum_state::datum_mem);
 
 	/* video hardware */
 	config.set_default_layout(layout_datum);
@@ -202,8 +203,8 @@ MACHINE_CONFIG_START(datum_state::datum)
 	pia2.irqa_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 	pia2.irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0) // rs232
-MACHINE_CONFIG_END
+	ACIA6850(config, "acia", 0); // rs232
+}
 
 
 /* ROM definition */

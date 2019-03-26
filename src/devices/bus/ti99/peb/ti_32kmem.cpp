@@ -82,7 +82,7 @@ READ8Z_MEMBER(ti_32k_expcard_device::readz)
 	}
 }
 
-WRITE8_MEMBER(ti_32k_expcard_device::write)
+void ti_32k_expcard_device::write(offs_t offset, uint8_t data)
 {
 	bool select = ((offset & 0xfc000)==0x7c000) | ((offset & 0xf6000)==0x72000); // PAL output pin 14 [1]
 

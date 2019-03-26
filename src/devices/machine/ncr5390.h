@@ -18,29 +18,29 @@ public:
 
 	virtual void map(address_map &map);
 
-	DECLARE_READ8_MEMBER(tcounter_lo_r);
-	DECLARE_WRITE8_MEMBER(tcount_lo_w);
-	DECLARE_READ8_MEMBER(tcounter_hi_r);
-	DECLARE_WRITE8_MEMBER(tcount_hi_w);
-	DECLARE_READ8_MEMBER(fifo_r);
-	DECLARE_WRITE8_MEMBER(fifo_w);
-	DECLARE_READ8_MEMBER(command_r);
-	DECLARE_WRITE8_MEMBER(command_w);
-	virtual DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(bus_id_w);
-	DECLARE_READ8_MEMBER(istatus_r);
-	DECLARE_WRITE8_MEMBER(timeout_w);
-	DECLARE_READ8_MEMBER(seq_step_r);
-	DECLARE_WRITE8_MEMBER(sync_period_w);
-	DECLARE_READ8_MEMBER(fifo_flags_r);
-	DECLARE_WRITE8_MEMBER(sync_offset_w);
-	DECLARE_READ8_MEMBER(conf_r);
-	DECLARE_WRITE8_MEMBER(conf_w);
-	DECLARE_WRITE8_MEMBER(test_w);
-	DECLARE_WRITE8_MEMBER(clock_w);
+	uint8_t tcounter_lo_r();
+	void tcount_lo_w(uint8_t data);
+	uint8_t tcounter_hi_r();
+	void tcount_hi_w(uint8_t data);
+	uint8_t fifo_r();
+	void fifo_w(uint8_t data);
+	uint8_t command_r();
+	void command_w(uint8_t data);
+	virtual uint8_t status_r();
+	void bus_id_w(uint8_t data);
+	uint8_t istatus_r();
+	void timeout_w(uint8_t data);
+	uint8_t seq_step_r();
+	void sync_period_w(uint8_t data);
+	uint8_t fifo_flags_r();
+	void sync_offset_w(uint8_t data);
+	uint8_t conf_r();
+	void conf_w(uint8_t data);
+	void test_w(uint8_t data);
+	void clock_w(uint8_t data);
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual uint8_t read(offs_t offset);
+	virtual void write(offs_t offset, uint8_t data);
 
 	virtual void scsi_ctrl_changed() override;
 
@@ -243,13 +243,13 @@ public:
 
 	virtual void map(address_map &map) override;
 
-	virtual DECLARE_READ8_MEMBER(status_r) override;
+	virtual uint8_t status_r() override;
 
-	DECLARE_READ8_MEMBER(conf2_r) { return config2; };
-	DECLARE_WRITE8_MEMBER(conf2_w) { config2 = data; };
+	uint8_t conf2_r() { return config2; };
+	void conf2_w(uint8_t data) { config2 = data; };
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
 	ncr53c90a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -296,17 +296,19 @@ public:
 
 	virtual void map(address_map &map) override;
 
-	DECLARE_READ8_MEMBER(conf3_r) { return config3; };
-	DECLARE_WRITE8_MEMBER(conf3_w) { config3 = data; };
-	DECLARE_WRITE8_MEMBER(fifo_align_w) { fifo_align = data; };
+	uint8_t conf3_r() { return config3; };
+	void conf3_w(uint8_t data) { config3 = data; };
+	void fifo_align_w(uint8_t data) { fifo_align = data; };
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 	u16 dma16_r();
 	void dma16_w(u16 data);
 
 protected:
+	ncr53c94_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	enum conf3_mask : u8
 	{
 		BS8  = 0x01, // burst size 8
@@ -324,8 +326,15 @@ private:
 	busmd_t m_busmd;
 };
 
+class ncr53cf94_device : public ncr53c94_device
+{
+public:
+	ncr53cf94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 DECLARE_DEVICE_TYPE(NCR5390, ncr5390_device)
 DECLARE_DEVICE_TYPE(NCR53C90A, ncr53c90a_device)
 DECLARE_DEVICE_TYPE(NCR53C94, ncr53c94_device)
+DECLARE_DEVICE_TYPE(NCR53CF94, ncr53cf94_device)
 
 #endif // MAME_MACHINE_NCR5390_H

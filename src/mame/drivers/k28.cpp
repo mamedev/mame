@@ -1,34 +1,35 @@
 // license:BSD-3-Clause
 // copyright-holders:hap, Kevin Horton
-/***************************************************************************
+/******************************************************************************
 
-  Tiger Electronics K28: Talking Learning Computer (model 7-230/7-231)
-  * PCB marked PB-123 WIZARD, TIGER
-  * Intel P8021 MCU with 1KB internal ROM
-  * MM5445N VFD driver, 9-digit alphanumeric display same as snmath
-  * 2*TMS6100 (32KB VSM)
-  * SC-01-A speech chip
+Tiger Electronics K28: Talking Learning Computer (model 7-230/7-231)
+* PCB marked PB-123 WIZARD, TIGER
+* Intel P8021 MCU with 1KB internal ROM
+* MM5445N VFD driver, 9-digit alphanumeric display same as snmath
+* 2*TMS6100 (32KB VSM)
+* SC-01-A speech chip
 
-  3 models exist:
-  - 7-230: darkblue case, toy-ish looks
-  - 7-231: gray case, hardware is the same
-  - 7-232: this one is completely different hw --> driver tispeak.cpp
+3 models exist:
+- 7-230: darkblue case, toy-ish looks
+- 7-231: gray case, hardware is the same
+- 7-232: this one is completely different hw --> driver tispeak.cpp
 
-  TODO:
-  - external module support (no dumps yet)
-  - make MM5445N a device
+TODO:
+- external module support (no dumps yet)
 
-***************************************************************************/
+******************************************************************************/
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/timer.h"
 #include "machine/tms6100.h"
 #include "sound/votrax.h"
+#include "video/mm5445.h"
 #include "speaker.h"
 
 #include "k28.lh"
 
+namespace {
 
 class k28_state : public driver_device
 {
@@ -38,67 +39,49 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_tms6100(*this, "tms6100"),
 		m_speech(*this, "speech"),
+		m_vfd(*this, "vfd"),
+		m_vfd_delay(*this, "led_delay_%u", 0),
 		m_onbutton_timer(*this, "on_button"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_out_x(*this, "%u.%u", 0U, 0U),
-		m_out_a(*this, "%u.a", 0U),
-		m_out_digit(*this, "digit%u", 0U),
-		m_display_wait(33),
-		m_display_maxy(1),
-		m_display_maxx(0)
+		m_out_digit(*this, "digit%u", 0U)
 	{ }
 
 	void k28(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_on);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	// devices
+	// devices/pointers
 	required_device<i8021_device> m_maincpu;
 	required_device<tms6100_device> m_tms6100;
 	required_device<votrax_sc01_device> m_speech;
+	required_device<mm5445_device> m_vfd;
+	required_device_array<timer_device, 9> m_vfd_delay;
 	required_device<timer_device> m_onbutton_timer;
 	required_ioport_array<7> m_inp_matrix;
-	output_finder<0x20, 0x20> m_out_x;
-	output_finder<0x20> m_out_a;
-	output_finder<0x20> m_out_digit;
+	output_finder<9, 16> m_out_x;
+	output_finder<9> m_out_digit;
 
-	// display common
-	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
-	int m_display_maxy;             // display matrix number of rows
-	int m_display_maxx;             // display matrix number of columns (max 31 for now)
-
-	u32 m_display_state[0x20];      // display matrix rows data (last bit is used for always-on)
-	u16 m_display_segmask[0x20];    // if not 0, display matrix row is a digit, mask indicates connected segments
-	u8 m_display_decay[0x20][0x20]; // (internal use)
-
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
-	void display_update();
-	void set_display_size(int maxx, int maxy);
-	void set_display_segmask(u32 digits, u32 mask);
-	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
+	TIMER_DEVICE_CALLBACK_MEMBER(vfd_delay_off);
 
 	bool m_power_on;
 	u8 m_inp_mux;
 	u8 m_phoneme;
 	int m_speech_strobe;
-	int m_vfd_data_enable;
-	int m_vfd_data_in;
-	int m_vfd_clock;
-	u64 m_vfd_shiftreg;
-	u64 m_vfd_shiftreg_out;
-	int m_vfd_shiftcount;
+	u64 m_vfd_data;
 
+	DECLARE_WRITE64_MEMBER(vfd_output_w);
 	DECLARE_WRITE8_MEMBER(mcu_p0_w);
 	DECLARE_READ8_MEMBER(mcu_p1_r);
 	DECLARE_READ8_MEMBER(mcu_p2_r);
 	DECLARE_WRITE8_MEMBER(mcu_p2_w);
-	DECLARE_WRITE_LINE_MEMBER(mcu_prog_w);
 
 	void power_off();
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 };
 
 
@@ -108,44 +91,21 @@ void k28_state::machine_start()
 {
 	// resolve handlers
 	m_out_x.resolve();
-	m_out_a.resolve();
 	m_out_digit.resolve();
 
 	// zerofill
-	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_decay, 0, sizeof(m_display_decay));
-	memset(m_display_segmask, 0, sizeof(m_display_segmask));
-
 	m_power_on = false;
 	m_inp_mux = 0;
 	m_phoneme = 0x3f;
 	m_speech_strobe = 0;
-	m_vfd_data_enable = 0;
-	m_vfd_data_in = 0;
-	m_vfd_clock = 0;
-	m_vfd_shiftreg = 0;
-	m_vfd_shiftreg_out = 0;
-	m_vfd_shiftcount = 0;
+	m_vfd_data = 0;
 
 	// register for savestates
-	save_item(NAME(m_display_maxy));
-	save_item(NAME(m_display_maxx));
-	save_item(NAME(m_display_wait));
-
-	save_item(NAME(m_display_state));
-	save_item(NAME(m_display_decay));
-	save_item(NAME(m_display_segmask));
-
 	save_item(NAME(m_power_on));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_phoneme));
 	save_item(NAME(m_speech_strobe));
-	save_item(NAME(m_vfd_data_enable));
-	save_item(NAME(m_vfd_data_in));
-	save_item(NAME(m_vfd_clock));
-	save_item(NAME(m_vfd_shiftreg));
-	save_item(NAME(m_vfd_shiftreg_out));
-	save_item(NAME(m_vfd_shiftcount));
+	save_item(NAME(m_vfd_data));
 }
 
 void k28_state::machine_reset()
@@ -170,91 +130,55 @@ void k28_state::power_off()
 }
 
 
-/***************************************************************************
 
-  Helper Functions
+/******************************************************************************
+    Devices, I/O
+******************************************************************************/
 
-***************************************************************************/
+// VFD handling
 
-// The device may strobe the outputs very fast, it is unnoticeable to the user.
-// To prevent flickering here, we need to simulate a decay.
-
-void k28_state::display_update()
+TIMER_DEVICE_CALLBACK_MEMBER(k28_state::vfd_delay_off)
 {
-	for (int y = 0; y < m_display_maxy; y++)
+	// clear VFD outputs
+	if (!BIT(m_vfd_data, param+16))
 	{
-		u32 active_state = 0;
+		m_out_digit[param] = 0;
 
-		for (int x = 0; x <= m_display_maxx; x++)
+		for (int i = 0; i < 16; i++)
+			m_out_x[param][i] = 0;
+	}
+}
+
+WRITE64_MEMBER(k28_state::vfd_output_w)
+{
+	// O1-O16: digit segment data
+	u16 seg_data = bitswap<16>(data,15,14,2,6,5,3,1,7,12,11,10,13,0,4,9,8);
+
+	// O17-O25: digit select
+	for (int i = 0; i < 9; i++)
+	{
+		if (BIT(data, i+16))
 		{
-			// turn on powered segments
-			if (m_power_on && m_display_state[y] >> x & 1)
-				m_display_decay[y][x] = m_display_wait;
+			m_out_digit[i] = seg_data & 0x3fff;
 
-			// determine active state
-			u32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
-			active_state |= (ds << x);
-
-			// output to y.x, or y.a when always-on
-			if (x != m_display_maxx)
-				m_out_x[y][x] = ds;
-			else
-				m_out_a[y] = ds;
+			// output individual segments (2 of them are not in MAME's 16seg)
+			for (int j = 0; j < 16; j++)
+				m_out_x[i][j] = seg_data >> j & 1;
 		}
 
-		// output to digity
-		if (m_display_segmask[y] != 0)
-			m_out_digit[y] = active_state & m_display_segmask[y];
+		// they're strobed, so on falling edge, delay them going off to prevent flicker
+		else if (BIT(m_vfd_data, i+16))
+			m_vfd_delay[i]->adjust(attotime::from_msec(50), i);
 	}
-}
 
-TIMER_DEVICE_CALLBACK_MEMBER(k28_state::display_decay_tick)
-{
-	// slowly turn off unpowered segments
-	for (int y = 0; y < m_display_maxy; y++)
-		for (int x = 0; x <= m_display_maxx; x++)
-			if (m_display_decay[y][x] != 0)
-				m_display_decay[y][x]--;
-
-	display_update();
-}
-
-void k28_state::set_display_size(int maxx, int maxy)
-{
-	m_display_maxx = maxx;
-	m_display_maxy = maxy;
-}
-
-void k28_state::set_display_segmask(u32 digits, u32 mask)
-{
-	// set a segment mask per selected digit, but leave unselected ones alone
-	for (int i = 0; i < 0x20; i++)
-	{
-		if (digits & 1)
-			m_display_segmask[i] = mask;
-		digits >>= 1;
-	}
-}
-
-void k28_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update)
-{
-	set_display_size(maxx, maxy);
-
-	// update current state
-	u32 mask = (1 << maxx) - 1;
-	for (int y = 0; y < maxy; y++)
-		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
-
-	display_update();
+	// O26: power-off request on falling edge
+	if (~data & m_vfd_data & 0x2000000)
+		power_off();
+	m_vfd_data = data;
 }
 
 
-
-/***************************************************************************
-
-  I/O, Address Map(s)
-
-***************************************************************************/
+// I8021 ports
 
 WRITE8_MEMBER(k28_state::mcu_p0_w)
 {
@@ -270,9 +194,7 @@ WRITE8_MEMBER(k28_state::mcu_p0_w)
 	m_speech_strobe = strobe;
 
 	// d5: VFD driver data enable
-	m_vfd_data_enable = ~data >> 5 & 1;
-	if (m_vfd_data_enable)
-		m_vfd_shiftreg = (m_vfd_shiftreg & ~u64(1)) | m_vfd_data_in;
+	m_vfd->enable_w(data >> 5 & 1);
 
 	// d4: VSM chip enable
 	// d6: VSM M0
@@ -311,9 +233,7 @@ READ8_MEMBER(k28_state::mcu_p2_r)
 WRITE8_MEMBER(k28_state::mcu_p2_w)
 {
 	// d0: VFD driver serial data
-	m_vfd_data_in = data & 1;
-	if (m_vfd_data_enable)
-		m_vfd_shiftreg = (m_vfd_shiftreg & ~u64(1)) | m_vfd_data_in;
+	m_vfd->data_w(data & 1);
 
 	// d0-d3: VSM data, input mux and SC-01 phoneme lower nibble
 	m_tms6100->add_w(space, 0, data);
@@ -321,53 +241,11 @@ WRITE8_MEMBER(k28_state::mcu_p2_w)
 	m_phoneme = (m_phoneme & ~0xf) | (data & 0xf);
 }
 
-WRITE_LINE_MEMBER(k28_state::mcu_prog_w)
-{
-	// 8021 PROG: clock VFD driver
-	bool rise = state == 1 && !m_vfd_clock;
-	m_vfd_clock = state;
-
-	// on rising edge
-	if (rise)
-	{
-		// leading 1 triggers shift start
-		if (m_vfd_shiftcount == 0 && ~m_vfd_shiftreg & 1)
-			return;
-
-		// output shiftreg on 35th clock
-		if (m_vfd_shiftcount == 35)
-		{
-			m_vfd_shiftcount = 0;
-
-			// output 0-15: digit segment data
-			u16 seg_data = (u16)(m_vfd_shiftreg >> 19);
-			seg_data = bitswap<16>(seg_data,0,1,13,9,10,12,14,8,3,4,5,2,15,11,6,7);
-
-			// output 16-24: digit select
-			u16 digit_sel = (u16)(m_vfd_shiftreg >> 10) & 0x1ff;
-			set_display_segmask(0x1ff, 0x3fff);
-			display_matrix(16, 9, seg_data, digit_sel);
-
-			// output 25: power-off request on falling edge
-			if (~m_vfd_shiftreg & m_vfd_shiftreg_out & 0x200)
-				power_off();
-			m_vfd_shiftreg_out = m_vfd_shiftreg;
-		}
-		else
-		{
-			m_vfd_shiftreg <<= 1;
-			m_vfd_shiftcount++;
-		}
-	}
-}
 
 
-
-/***************************************************************************
-
-  Inputs
-
-***************************************************************************/
+/******************************************************************************
+    Input Ports
+******************************************************************************/
 
 static INPUT_PORTS_START( k28 )
 	PORT_START("IN.0")
@@ -443,11 +321,9 @@ INPUT_PORTS_END
 
 
 
-/***************************************************************************
-
-  Machine Config
-
-***************************************************************************/
+/******************************************************************************
+    Machine Configs
+******************************************************************************/
 
 void k28_state::k28(machine_config &config)
 {
@@ -457,14 +333,19 @@ void k28_state::k28(machine_config &config)
 	m_maincpu->p1_in_cb().set(FUNC(k28_state::mcu_p1_r));
 	m_maincpu->p2_in_cb().set(FUNC(k28_state::mcu_p2_r));
 	m_maincpu->p2_out_cb().set(FUNC(k28_state::mcu_p2_w));
-	m_maincpu->prog_out_cb().set(FUNC(k28_state::mcu_prog_w));
-	m_maincpu->t1_in_cb().set("speech", FUNC(votrax_sc01_device::request)); // SC-01 A/R pin
+	m_maincpu->prog_out_cb().set("vfd", FUNC(mm5445_device::clock_w));
+	m_maincpu->t1_in_cb().set("speech", FUNC(votrax_sc01_device::request));
 
-	TMS6100(config, m_tms6100, 3.579545_MHz_XTAL); // CLK tied to 8021 ALE pin
+	TMS6100(config, m_tms6100, 3.579545_MHz_XTAL / 15); // CLK tied to 8021 ALE pin
 
 	TIMER(config, "on_button").configure_generic(timer_device::expired_delegate());
-	TIMER(config, "display_decay").configure_periodic(FUNC(k28_state::display_decay_tick), attotime::from_msec(1));
+
+	/* video hardware */
+	MM5445(config, m_vfd).output_cb().set(FUNC(k28_state::vfd_output_w));
 	config.set_default_layout(layout_k28);
+
+	for (int i = 0; i < 9; i++)
+		TIMER(config, m_vfd_delay[i]).configure_generic(FUNC(k28_state::vfd_delay_off));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -473,11 +354,9 @@ void k28_state::k28(machine_config &config)
 
 
 
-/***************************************************************************
-
-  ROM Defs, Game driver(s)
-
-***************************************************************************/
+/******************************************************************************
+    ROM Definitions
+******************************************************************************/
 
 ROM_START( k28 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -488,7 +367,13 @@ ROM_START( k28 )
 	ROM_LOAD( "cm62051.vsm", 0x4000, 0x4000, CRC(0fa61baa) SHA1(831be669423ba60c7f85a896b4b09a1295478bd9) )
 ROM_END
 
+} // anonymous namespace
 
+
+
+/******************************************************************************
+    Drivers
+******************************************************************************/
 
 //    YEAR  NAME  PARENT CMP MACHINE  INPUT  CLASS      INIT        COMPANY              FULLNAME                                        FLAGS
 COMP( 1981, k28,  0,      0, k28,     k28,   k28_state, empty_init, "Tiger Electronics", "K28: Talking Learning Computer (model 7-230)", MACHINE_SUPPORTS_SAVE )

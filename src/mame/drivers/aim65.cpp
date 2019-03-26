@@ -188,8 +188,8 @@ image_init_result aim65_state::load_cart(device_image_interface &image, generic_
 
 MACHINE_CONFIG_START(aim65_state::aim65)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(aim65_mem)
+	M6502(config, m_maincpu, AIM65_CLOCK); /* 1 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &aim65_state::aim65_mem);
 
 	config.set_default_layout(layout_aim65);
 

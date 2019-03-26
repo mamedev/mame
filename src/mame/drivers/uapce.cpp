@@ -33,6 +33,24 @@
  -x1 Victory Run standardd Hucard
  -x1 Plexiglass control panel overlay (used)
 
+In the August 1989 issue of Vending Times magazine:
+https://archive.org/details/VendingTimesVOL29NO10August1989Clearscan/page/n69
+https://archive.org/details/VendingTimesVOL29NO10August1989Clearscan/page/n99
+there was a list of all of the available UA produced HU-Cards about to be released.
+- Legendary Axe
+- Victory Run
+- Keith Courage in the Alpha Zones
+- World Class Baseball
+- Power Golf
+- Blazing Lazers
+- Dungeon Explorer
+- Alien Crush
+- China Warrior
+- Military Madness
+- JJ and Jeff
+and said that six to ten more new game cards would be available by the end of the year.
+It also shows game marquees for Victory Run and Power League.
+
 In the February 1990 issue of Video Games & Computer Entertainment magazine, there was a list of
 all of the available UA produced Hu-Cards (at the current time of the article was published).
 The article mentions that the UA Hu-Cards were not compatible with the TG-16 gaming console.

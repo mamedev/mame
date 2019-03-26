@@ -6,6 +6,25 @@
 
     Currently this device is just a stub with no actual execution core.
 
+****************************************************************************
+
+    HPC feature options by part number
+
+    HPC16xxx    Military temperature range (-55°C to +125°C)
+    HPC26xxx    Automotive temperature range (-40°C to +105°C)
+    HPC36xxx    Industrial temperature range (-40°C to +85°C)
+    HPC46xxx    Commercial temperature range (0°C to +75°C)
+
+    HPCxx1xx    8-channel A/D converter
+    HPCxx0xx    No A/D converter
+
+    HPCxxx6x    16k bytes of on-chip ROM
+    HPCxxx8x    8k bytes of on-chip ROM
+    HPCxxx0x    No on-chip ROM
+
+    HPCxxxx4    512 bytes of on-chip RAM
+    HPCxxxx3    256 bytes of on-chip RAM
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -13,8 +32,18 @@
 #include "hpcdasm.h"
 
 // device type definitions
+DEFINE_DEVICE_TYPE(HPC46003, hpc46003_device, "hpc46003", "HPC46003")
 DEFINE_DEVICE_TYPE(HPC46104, hpc46104_device, "hpc46104", "HPC46104")
 
+
+void hpc46003_device::internal_map(address_map &map)
+{
+	map(0x0000, 0x00bf).ram();
+	map(0x00c0, 0x00c0).rw(FUNC(hpc46003_device::psw_r), FUNC(hpc46003_device::psw_w));
+	map(0x00c4, 0x00cf).ram().share("core_regs");
+	// TODO: many other internal registers
+	map(0x01c0, 0x01ff).ram();
+}
 
 void hpc46104_device::internal_map(address_map &map)
 {
@@ -23,6 +52,11 @@ void hpc46104_device::internal_map(address_map &map)
 	map(0x00c4, 0x00cf).ram().share("core_regs");
 	// TODO: many other internal registers
 	map(0x01c0, 0x02ff).ram();
+}
+
+std::unique_ptr<util::disasm_interface> hpc46003_device::create_disassembler()
+{
+	return std::make_unique<hpc16083_disassembler>();
 }
 
 std::unique_ptr<util::disasm_interface> hpc46104_device::create_disassembler()
@@ -38,6 +72,11 @@ hpc_device::hpc_device(const machine_config &mconfig, device_type type, const ch
 	, m_core_regs(*this, "core_regs")
 	, m_psw(0)
 	, m_icount(0)
+{
+}
+
+hpc46003_device::hpc46003_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: hpc_device(mconfig, HPC46003, tag, owner, clock, address_map_constructor(FUNC(hpc46003_device::internal_map), this))
 {
 }
 

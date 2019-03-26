@@ -714,9 +714,10 @@ void can09t_state::can09t(machine_config &config)
 
 #define CAN09_X1_CLOCK 22.1184_MHz_XTAL        /* UKI 22118.40 Khz */
 #define CAN09_CPU_CLOCK (CAN09_X1_CLOCK / 16) /* ~1.38MHz Divider needs to be check but is the most likelly */
-MACHINE_CONFIG_START(can09_state::can09)
-	MCFG_DEVICE_ADD("maincpu", MC6809E, CAN09_CPU_CLOCK) // MC68A09EP
-	MCFG_DEVICE_PROGRAM_MAP(can09_map)
+void can09_state::can09(machine_config &config)
+{
+	MC6809E(config, m_maincpu, CAN09_CPU_CLOCK); // MC68A09EP
+	m_maincpu->set_addrmap(AS_PROGRAM, &can09_state::can09_map);
 
 	/* RAM banks */
 	RAM(config, RAM_TAG).set_default_size("768K");
@@ -752,11 +753,11 @@ MACHINE_CONFIG_START(can09_state::can09)
 
 
 	/* screen - totally faked value for now */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_RAW_PARAMS(4_MHz_XTAL / 2, 512, 0, 512, 576, 0, 576)
-	MCFG_SCREEN_UPDATE_DRIVER(can09_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_raw(4_MHz_XTAL / 2, 512, 0, 512, 576, 0, 576);
+	screen.set_screen_update(FUNC(can09_state::screen_update));
+	screen.set_palette("palette");
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Floppy */
@@ -782,11 +783,11 @@ MACHINE_CONFIG_START(can09_state::can09)
 	/* 0xFF93 0xE034 (PIA1 Port B)    = 0x18 - Write Data on Port B */
 
 #if 1
-	MCFG_DEVICE_ADD(PIA2_TAG, PIA6821, 0) // CPU board
-	MCFG_DEVICE_ADD("acia1", ACIA6850, 0) // CPU board
-	MCFG_DEVICE_ADD("acia2", ACIA6850, 0) // CPU board
+	PIA6821(config, PIA2_TAG, 0); // CPU board
+	ACIA6850(config, "acia1", 0); // CPU board
+	ACIA6850(config, "acia2", 0); // CPU board
 #endif
-MACHINE_CONFIG_END
+}
 
 ROM_START( can09t ) /* The smaller grey computer */
 	ROM_REGION(0x10000, "roms", 0)

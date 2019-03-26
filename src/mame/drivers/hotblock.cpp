@@ -199,8 +199,8 @@ void hotblock_state::hotblock(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(24_MHz_XTAL / 3, 512, 0, 320, 312, 0, 200); // 15.625 kHz horizontal???
 	screen.set_screen_update(FUNC(hotblock_state::screen_update));
-	screen.set_palette("palette");
-	screen.screen_vblank().set_inputline("maincpu", INPUT_LINE_NMI); // right?
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI); // right?
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x200/2);
 

@@ -1295,61 +1295,62 @@ MACHINE_START_MEMBER(cps2_state,cps2)
 }
 
 
-MACHINE_CONFIG_START(cps2_state::cps2)
-
+void cps2_state::cps2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(cps2_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	M68000(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &cps2_state::cps2_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &cps2_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(cps2_state::cps2_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(qsound_sub_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(cps2_state, irq0_line_hold, 250) // measured
+	Z80(config, m_audiocpu, XTAL(8'000'000));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cps2_state::qsound_sub_map);
+	m_audiocpu->set_periodic_int(FUNC(cps2_state::irq0_line_hold), attotime::from_hz(250)); // measured
 
 	MCFG_MACHINE_START_OVERRIDE(cps2_state, cps2)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(cps2_state, screen_update_cps2)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps2_state, screen_vblank_cps1))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
+	m_screen->set_screen_update(FUNC(cps2_state::screen_update_cps2));
+	m_screen->screen_vblank().set(FUNC(cps2_state::screen_vblank_cps1));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	MCFG_PALETTE_ADD("palette", 0xc00)
+	PALETTE(config, m_palette).set_entries(0xc00);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("qsound", QSOUND)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	QSOUND(config, m_qsound);
+	m_qsound->add_route(0, "lspeaker", 1.0);
+	m_qsound->add_route(1, "rspeaker", 1.0);
+}
 
 
-MACHINE_CONFIG_START(cps2_state::dead_cps2)
+void cps2_state::dead_cps2(machine_config &config)
+{
 	cps2(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(dead_cps2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &cps2_state::dead_cps2_map);
+}
 
-MACHINE_CONFIG_START(cps2_state::gigaman2)
+void cps2_state::gigaman2(machine_config &config)
+{
 	cps2(config);
 
 	config.device_remove("audiocpu");
 	// gigaman2 has an AT89C4051 (8051) MCU as an audio cpu, no qsound.
 	config.device_remove("qsound");
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.47);
+	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.47);
+}
 
 /*************************************
  *

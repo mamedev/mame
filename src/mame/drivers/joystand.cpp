@@ -106,7 +106,6 @@ public:
 	joystand_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_tmp68301(*this, "tmp68301"),
 		m_palette(*this, "palette"),
 		m_bg15_palette(*this, "bg15_palette"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -142,8 +141,7 @@ protected:
 
 private:
 	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<tmp68301_device> m_tmp68301;
+	required_device<tmp68301_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<palette_device> m_bg15_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -479,8 +477,6 @@ void joystand_state::joystand_map(address_map &map)
 	map(0xe00020, 0xe00021).r(FUNC(joystand_state::e00020_r)); // master slot
 
 	map(0xe80040, 0xe8005f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-
-	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
 
 
@@ -584,21 +580,17 @@ void joystand_state::machine_reset()
 INTERRUPT_GEN_MEMBER(joystand_state::joystand_interrupt)
 {
 	// VBlank is connected to INT1 (external interrupts pin 1)
-	m_tmp68301->external_interrupt_1();
+	m_maincpu->external_interrupt_1();
 }
 
 void joystand_state::joystand(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, XTAL(16'000'000)); // !! TMP68301 !!
+	TMP68301(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &joystand_state::joystand_map);
 	m_maincpu->set_vblank_int("screen", FUNC(joystand_state::joystand_interrupt));
-	m_maincpu->set_irq_acknowledge_callback("tmp68301", FUNC(tmp68301_device::irq_callback));
-
-	TMP68301(config, m_tmp68301, 0);
-	m_tmp68301->set_cputag(m_maincpu);
-	m_tmp68301->in_parallel_callback().set(FUNC(joystand_state::eeprom_r));
-	m_tmp68301->out_parallel_callback().set(FUNC(joystand_state::eeprom_w));
+	m_maincpu->in_parallel_callback().set(FUNC(joystand_state::eeprom_r));
+	m_maincpu->out_parallel_callback().set(FUNC(joystand_state::eeprom_w));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

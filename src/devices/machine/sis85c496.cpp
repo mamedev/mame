@@ -544,19 +544,19 @@ WRITE8_MEMBER( sis85c496_host_device::at_portb_w )
 
 READ8_MEMBER( sis85c496_host_device::at_dma8237_2_r )
 {
-	return m_dma8237_2->read( space, offset / 2);
+	return m_dma8237_2->read( offset / 2);
 }
 
 WRITE8_MEMBER( sis85c496_host_device::at_dma8237_2_w )
 {
-	m_dma8237_2->write( space, offset / 2, data);
+	m_dma8237_2->write( offset / 2, data);
 }
 
 READ8_MEMBER( sis85c496_host_device::at_keybc_r )
 {
 	switch (offset)
 	{
-	case 0: return m_keybc->data_r(space, 0);
+	case 0: return m_keybc->data_r();
 	case 1: return at_portb_r(space, 0);
 	}
 
@@ -567,7 +567,7 @@ WRITE8_MEMBER( sis85c496_host_device::at_keybc_w )
 {
 	switch (offset)
 	{
-	case 0: m_keybc->data_w(space, 0, data); break;
+	case 0: m_keybc->data_w(data); break;
 	case 1: at_portb_w(space, 0, data); break;
 	}
 }
@@ -578,10 +578,10 @@ WRITE8_MEMBER( sis85c496_host_device::write_rtc )
 	if (offset==0) {
 		m_nmi_enabled = BIT(data,7);
 		//m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
-		m_ds12885->write(space,0,data);
+		m_ds12885->write(0,data);
 	}
 	else {
-		m_ds12885->write(space,offset,data);
+		m_ds12885->write(offset,data);
 	}
 }
 

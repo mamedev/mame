@@ -680,7 +680,7 @@ READ8_MEMBER(aristmk4_state::mkiv_pia_ina)
 {
 	/* uncomment this code once RTC is fixed */
 
-	//return m_rtc->read(space,1);
+	//return m_rtc->read(1);
 	return 0;   // OK for now, the aussie version has no RTC on the MB so this is valid.
 }
 
@@ -689,12 +689,12 @@ WRITE8_MEMBER(aristmk4_state::mkiv_pia_outa)
 {
 	if(m_rtc_data_strobe)
 	{
-		m_rtc->write(space,1,data);
+		m_rtc->write(1,data);
 		//logerror("rtc protocol write data: %02X\n",data);
 	}
 	else
 	{
-		m_rtc->write(space,0,data);
+		m_rtc->write(0,data);
 		//logerror("rtc protocol write address: %02X\n",data);
 	}
 }

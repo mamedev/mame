@@ -457,39 +457,39 @@ MACHINE_START_MEMBER(epos_state,dealer)
 	MACHINE_START_CALL_MEMBER(epos);
 }
 
-MACHINE_CONFIG_START(epos_state::epos) /* EPOS TRISTAR 8000 PCB */
-
+void epos_state::epos(machine_config &config) /* EPOS TRISTAR 8000 PCB */
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(11'000'000)/4)    /* 2.75 MHz schematics confirm 11MHz XTAL (see notes) */
-	MCFG_DEVICE_PROGRAM_MAP(epos_map)
-	MCFG_DEVICE_IO_MAP(epos_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(11'000'000)/4);    /* 2.75 MHz schematics confirm 11MHz XTAL (see notes) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &epos_state::epos_map);
+	m_maincpu->set_addrmap(AS_IO, &epos_state::epos_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(epos_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(272, 241)
-	MCFG_SCREEN_VISIBLE_AREA(0, 271, 0, 235)
-	MCFG_SCREEN_UPDATE_DRIVER(epos_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(272, 241);
+	screen.set_visarea(0, 271, 0, 235);
+	screen.set_screen_update(FUNC(epos_state::screen_update));
 
 	PALETTE(config, m_palette, FUNC(epos_state::epos_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, "aysnd", XTAL(11'000'000)/16).add_route(ALL_OUTPUTS, "mono", 1.0); /*  0.6875 MHz, confirmed from schematics */
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(epos_state::dealer) /* EPOS TRISTAR 9000 PCB */
-
+void epos_state::dealer(machine_config &config) /* EPOS TRISTAR 9000 PCB */
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(22'118'400)/8)    /* 2.7648 MHz (measured) */
-	MCFG_DEVICE_PROGRAM_MAP(dealer_map)
-	MCFG_DEVICE_IO_MAP(dealer_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(22'118'400)/8);    /* 2.7648 MHz (measured) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &epos_state::dealer_map);
+	m_maincpu->set_addrmap(AS_IO, &epos_state::dealer_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(epos_state::irq0_line_hold));
 
 	i8255_device &ppi(I8255A(config, "ppi8255"));
 	ppi.in_pa_callback().set(FUNC(epos_state::i8255_porta_r));
@@ -505,12 +505,12 @@ MACHINE_CONFIG_START(epos_state::dealer) /* EPOS TRISTAR 9000 PCB */
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(272, 241)
-	MCFG_SCREEN_VISIBLE_AREA(0, 271, 0, 235)
-	MCFG_SCREEN_UPDATE_DRIVER(epos_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(272, 241);
+	screen.set_visarea(0, 271, 0, 235);
+	screen.set_screen_update(FUNC(epos_state::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -519,7 +519,7 @@ MACHINE_CONFIG_START(epos_state::dealer) /* EPOS TRISTAR 9000 PCB */
 	aysnd.port_a_read_callback().set(FUNC(epos_state::ay_porta_mpx_r));
 	// port a writes?
 	aysnd.port_b_write_callback().set(FUNC(epos_state::flip_screen_w)); // flipscreen and ay port a multiplex control
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

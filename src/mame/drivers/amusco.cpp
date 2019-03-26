@@ -532,8 +532,8 @@ void amusco_state::amusco_palette(palette_device &palette) const
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(amusco_state::amusco)
-
+void amusco_state::amusco(machine_config &config)
+{
 	/* basic machine hardware */
 	I8088(config, m_maincpu, CPU_CLOCK);        // 5 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &amusco_state::mem_map);
@@ -574,12 +574,12 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(30), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(88*8, 27*10)                           // screen size: 88*8 27*10
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 74*8-1, 0*10, 24*10-1)    // visible scr: 74*8 24*10
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(88*8, 27*10);                           // screen size: 88*8 27*10
+	m_screen->set_visarea(0*8, 74*8-1, 0*10, 24*10-1);    // visible scr: 74*8 24*10
+	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_amusco);
 	PALETTE(config, "palette", FUNC(amusco_state::amusco_palette), 8*8);
@@ -595,9 +595,8 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("sn", SN76489A, SND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	SN76489A(config, "sn", SND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 void amusco_state::draw88pkr(machine_config &config)
 {

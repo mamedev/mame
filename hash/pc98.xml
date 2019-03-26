@@ -9321,7 +9321,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Crashes MAME on PC-9801UX, "Packed file is corrupt" on anything else -->
 	<software name="centurioa" cloneof="centurio" supported="no">
 		<!-- Origin: Neo Kobe Collection -->
@@ -10032,10 +10032,10 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- 
-		The Cherry Jam sets are completely different. The parent set is self-booting (MEGDOS-based), while the alternate set runs from standard DOS and requires HDD installation.
-		The alternate set has files dated in the year 2000, so it's either a late reprint or an unofficial repack.
-	-->	
+	<!--
+	    The Cherry Jam sets are completely different. The parent set is self-booting (MEGDOS-based), while the alternate set runs from standard DOS and requires HDD installation.
+	    The alternate set has files dated in the year 2000, so it's either a late reprint or an unofficial repack.
+	-->
 	<software name="chrryjam">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Cherry Jam - Kanojo ga Hadaka ni Kigaetara</description>
@@ -47620,7 +47620,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="コンピュータエコノミクス" />
-		<info name="usage" value="Run CAE.EXE from DOS" /> 
+		<info name="usage" value="Run CAE.EXE from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="computer_aided_economics.hdm" size="1261568" crc="4d5c369c" sha1="7d9dc63be2eb97fc5107aeab5cd68466a014963e" offset="0" />

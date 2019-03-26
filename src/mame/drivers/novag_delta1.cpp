@@ -5,13 +5,8 @@
 *
 * novag_delta1.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
-TODO:
-- ccdelta1 doesn't work, goes bonkers when you press Enter. CPU core bug?
-  I suspect related to interrupts
+Novag Delta-1, the chess engine seems similar to Boris (see aci_boris.cpp)
 
-*******************************************************************************
-
-Novag Delta-1 overview:
 - 3850PK CPU at ~2MHz, 3853PK memory interface
 - 4KB ROM(2332A), 256 bytes RAM(2*2111A-4)
 - 4-digit 7seg panel, no sound, no chessboard
@@ -25,7 +20,7 @@ Novag Delta-1 overview:
 #include "machine/f3853.h"
 
 // internal artwork
-#include "novag_delta1.lh"
+#include "novag_delta1.lh" // clickable
 
 
 namespace {
@@ -49,12 +44,12 @@ private:
 	void main_io(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(io0_w);
-	DECLARE_WRITE8_MEMBER(io1_w);
-	DECLARE_READ8_MEMBER(io0_r);
-	DECLARE_READ8_MEMBER(io1_r);
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_WRITE8_MEMBER(digit_w);
+	DECLARE_READ8_MEMBER(input_r);
 
-	u8 m_io[2]; // F8 CPU I/O ports
+	TIMER_DEVICE_CALLBACK_MEMBER(blink) { m_blink = !m_blink; }
+	bool m_blink;
 };
 
 void delta1_state::machine_start()
@@ -62,8 +57,12 @@ void delta1_state::machine_start()
 	novagbase_state::machine_start();
 
 	// zerofill/register for savestates
-	memset(m_io, 0, sizeof(m_io));
-	save_item(NAME(m_io));
+	m_blink = false;
+	save_item(NAME(m_blink));
+
+	// game reads from uninitialized RAM while it's thinking
+	for (int i = 0; i < 0x100; i++)
+		m_maincpu->space(AS_PROGRAM).write_byte(i + 0x2000, machine().rand());
 }
 
 
@@ -73,10 +72,8 @@ void delta1_state::machine_start()
 
 // CPU I/O ports
 
-WRITE8_MEMBER(delta1_state::io0_w)
+WRITE8_MEMBER(delta1_state::mux_w)
 {
-	m_io[0] = data;
-
 	// IO00-02: MC14028B A-C (IO03: GND)
 	// MC14028B Q3-Q7: input mux
 	// MC14028B Q4-Q7: digit select through 75492
@@ -86,28 +83,22 @@ WRITE8_MEMBER(delta1_state::io0_w)
 	// update display here
 	set_display_segmask(0xf, 0x7f);
 	display_matrix(7, 4, m_7seg_data, sel >> 4);
+
+	m_led_select = data;
 }
 
-READ8_MEMBER(delta1_state::io0_r)
+READ8_MEMBER(delta1_state::input_r)
 {
 	// IO04-07: multiplexed inputs
-	return read_inputs(5) << 4 | m_io[0];
+	return read_inputs(5) << 4 | m_led_select;
 }
 
-WRITE8_MEMBER(delta1_state::io1_w)
+WRITE8_MEMBER(delta1_state::digit_w)
 {
-	m_io[1] = data;
-
-	// IO17: segment commons, active low (always 0?)
+	// IO17: R/C circuit to segment commons (for automated blinking)
 	// IO10-16: digit segments A-G
-	data = (data & 0x80) ? 0 : (data & 0x7f);
+	data = (data & 0x80 && m_blink) ? 0 : (data & 0x7f);
 	m_7seg_data = bitswap<7>(data, 0,1,2,3,4,5,6);
-}
-
-READ8_MEMBER(delta1_state::io1_r)
-{
-	// unused?
-	return m_io[1];
 }
 
 
@@ -125,9 +116,9 @@ void delta1_state::main_map(address_map &map)
 
 void delta1_state::main_io(address_map &map)
 {
-	map(0x0, 0x0).rw(FUNC(delta1_state::io0_r), FUNC(delta1_state::io0_w));
-	map(0x1, 0x1).rw(FUNC(delta1_state::io1_r), FUNC(delta1_state::io1_w));
-	map(0xc, 0xf).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
+	map(0x00, 0x00).rw(FUNC(delta1_state::input_r), FUNC(delta1_state::mux_w));
+	map(0x01, 0x01).w(FUNC(delta1_state::digit_w));
+	map(0x0c, 0x0f).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
 
@@ -138,7 +129,7 @@ void delta1_state::main_io(address_map &map)
 
 static INPUT_PORTS_START( delta1 )
 	PORT_START("IN.0")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Time Set")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Time Set")
 	PORT_BIT(0x0d, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN.1")
@@ -162,7 +153,7 @@ static INPUT_PORTS_START( delta1 )
 	PORT_START("IN.4")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("FP / Black Bishop") // find position
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("EP / Black Knight") // enter position
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Color / Black Pawn")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Change Color / Black Pawn")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
 
 	PORT_START("RESET") // not on matrix
@@ -186,6 +177,7 @@ void delta1_state::delta1(machine_config &config)
 	f3853_device &f3853(F3853(config, "f3853", 2000000));
 	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
+	TIMER(config, "display_blink").configure_periodic(FUNC(delta1_state::blink), attotime::from_msec(250)); // approximation
 	TIMER(config, "display_decay").configure_periodic(FUNC(delta1_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_novag_delta1);
 }
@@ -210,4 +202,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, ccdelta1, 0,      0, delta1,  delta1, delta1_state, empty_init, "Novag", "Chess Champion: Delta-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+CONS( 1979, ccdelta1, 0,      0, delta1,  delta1, delta1_state, empty_init, "Novag", "Chess Champion: Delta-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )

@@ -54,6 +54,7 @@
 
 #include "emu.h"
 #include "video/apple2.h"
+#include "machine/apple2common.h"
 
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/ramcard16k.h"
@@ -84,6 +85,7 @@
 #include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/mouse.h"
 #include "bus/a2bus/ezcgi.h"
+#include "bus/a2bus/a2vulcan.h"
 //#include "bus/a2bus/pc_xporter.h"
 
 // various timing standards
@@ -157,6 +159,7 @@ public:
 		m_nvram(*this, "nvram"),
 		m_video(*this, A2GS_VIDEO_TAG),
 		m_a2bus(*this, A2GS_BUS_TAG),
+		m_a2common(*this, "a2common"),
 		m_joy1x(*this, "joystick_1_x"),
 		m_joy1y(*this, "joystick_1_y"),
 		m_joy2x(*this, "joystick_2_x"),
@@ -214,6 +217,7 @@ public:
 	required_device<nvram_device> m_nvram;
 	required_device<a2_video_device> m_video;
 	required_device<a2bus_device> m_a2bus;
+	required_device<apple2_common_device> m_a2common;
 	required_ioport m_joy1x, m_joy1y, m_joy2x, m_joy2y, m_joybuttons;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<address_map_bank_device> m_upperbank, m_upperaux, m_upper00, m_upper01;
@@ -491,6 +495,8 @@ private:
 	DECLARE_WRITE8_MEMBER(adbmicro_p2_out);
 	DECLARE_WRITE8_MEMBER(adbmicro_p3_out);
 
+	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
+
 private:
 	bool m_is_rom3;
 	int m_speaker_state;
@@ -632,6 +638,11 @@ private:
 #define JOYSTICK_DELTA          80
 #define JOYSTICK_SENSITIVITY    50
 #define JOYSTICK_AUTOCENTER     80
+
+offs_t apple2gs_state::dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
+{
+	return m_a2common->dasm_override_GS(stream, pc, opcodes, params);
+}
 
 WRITE_LINE_MEMBER(apple2gs_state::a2bus_irq_w)
 {
@@ -3499,7 +3510,7 @@ WRITE8_MEMBER(apple2gs_state::bank1_0000_sh_w)
 void apple2gs_state::apple2gs_map(address_map &map)
 {
 	/* "fast side" - runs 2.8 MHz minus RAM refresh, banks 00 and 01 usually have writes shadowed to E0/E1 where I/O lives */
-	/* Banks 00 and 01 also have their own independent language cards if shadowing is disabled */
+	/* Banks 00 and 01 also have their own independent language cards which are NOT shadowed. */
 	map(0x000000, 0x0001ff).m(m_b0_0000bank, FUNC(address_map_bank_device::amap8));
 	map(0x000200, 0x0003ff).m(m_b0_0200bank, FUNC(address_map_bank_device::amap8));
 	map(0x000400, 0x0007ff).m(m_b0_0400bank, FUNC(address_map_bank_device::amap8));
@@ -4512,6 +4523,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("arcbd", A2BUS_ARCADEBOARD);    /* Third Millenium Engineering Arcade Board */
 	device.option_add("midi", A2BUS_MIDI);  /* Generic 6840+6850 MIDI board */
 	device.option_add("zipdrive", A2BUS_ZIPDRIVE);  /* ZIP Technologies IDE card */
+	device.option_add("focusdrive", A2BUS_FOCUSDRIVE);  /* Focus Drive IDE card */
 	device.option_add("echoiiplus", A2BUS_ECHOPLUS);    /* Street Electronics Echo Plus (Echo II + Mockingboard clone) */
 	device.option_add("scsi", A2BUS_SCSI);  /* Apple II SCSI Card */
 	device.option_add("applicard", A2BUS_APPLICARD);    /* PCPI Applicard */
@@ -4529,6 +4541,8 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("ezcgi", A2BUS_EZCGI);    /* E-Z Color Graphics Interface */
 	device.option_add("ezcgi9938", A2BUS_EZCGI_9938);   /* E-Z Color Graphics Interface (TMS9938) */
 	device.option_add("ezcgi9958", A2BUS_EZCGI_9958);   /* E-Z Color Graphics Interface (TMS9958) */
+	device.option_add("vulcan", A2BUS_VULCAN); /* Applied Engineering Vulcan IDE drive */
+	device.option_add("vulcangold", A2BUS_VULCANGOLD); /* Applied Engineering Vulcan Gold IDE drive */
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
 //  device.option_add("pcxport", A2BUS_PCXPORTER); /* Applied Engineering PC Transporter */
 }
@@ -4539,6 +4553,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	G65816(config, m_maincpu, A2GS_MASTER_CLOCK/10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2gs_state::apple2gs_map);
 	m_maincpu->set_addrmap(g65816_device::AS_VECTORS, &apple2gs_state::vectors_map);
+	m_maincpu->set_dasm_override(FUNC(apple2gs_state::dasm_trampoline));
 	TIMER(config, m_scantimer, 0);
 	m_scantimer->configure_scanline(FUNC(apple2gs_state::apple2_interrupt), "screen", 0, 1);
 	config.m_minimum_quantum = attotime::from_hz(60);
@@ -4577,6 +4592,9 @@ void apple2gs_state::apple2gs(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	APPLE2_VIDEO(config, m_video, A2GS_14M);
+
+	APPLE2_COMMON(config, m_a2common, A2GS_14M);
+	m_a2common->set_GS_cputag(m_maincpu);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);

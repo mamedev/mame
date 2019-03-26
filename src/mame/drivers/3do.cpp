@@ -154,40 +154,40 @@ void _3do_state::machine_reset()
 	m_clio.cstatbits = 0x01; /* bit 0 = reset of clio caused by power on */
 }
 
-MACHINE_CONFIG_START(_3do_state::_3do)
-
+void _3do_state::_3do(machine_config &config)
+{
 	/* Basic machine hardware */
-	MCFG_DEVICE_ADD( m_maincpu, ARM7_BE, XTAL(50'000'000)/4 )
-	MCFG_DEVICE_PROGRAM_MAP( main_mem)
+	ARM7_BE(config, m_maincpu, XTAL(50'000'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &_3do_state::main_mem);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	TIMER(config, "timer_x16").configure_periodic(FUNC(_3do_state::timer_x16_cb), attotime::from_hz(12000)); // TODO: timing
 
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS( X2_CLOCK_NTSC / 2, 1592, 254, 1534, 263, 22, 262 )
-	MCFG_SCREEN_UPDATE_DRIVER(_3do_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(X2_CLOCK_NTSC / 2, 1592, 254, 1534, 263, 22, 262);
+	m_screen->set_screen_update(FUNC(_3do_state::screen_update));
 
 	CDROM(config, "cdrom");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(_3do_state::_3do_pal)
-
+void _3do_state::_3do_pal(machine_config &config)
+{
 	/* Basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, ARM7_BE, XTAL(50'000'000)/4 )
-	MCFG_DEVICE_PROGRAM_MAP( main_mem)
+	ARM7_BE(config, m_maincpu, XTAL(50'000'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &_3do_state::main_mem);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	TIMER(config, "timer_x16").configure_periodic(FUNC(_3do_state::timer_x16_cb), attotime::from_hz(12000)); // TODO: timing
 
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS( X2_CLOCK_PAL / 2, 1592, 254, 1534, 263, 22, 262 ) // TODO: proper params
-	MCFG_SCREEN_UPDATE_DRIVER(_3do_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(X2_CLOCK_PAL / 2, 1592, 254, 1534, 263, 22, 262); // TODO: proper params
+	m_screen->set_screen_update(FUNC(_3do_state::screen_update));
 
 	CDROM(config, "cdrom");
-MACHINE_CONFIG_END
+}
 
 #if 0
 #define NTSC_BIOS \

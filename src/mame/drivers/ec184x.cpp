@@ -225,75 +225,78 @@ void ec184x_state::ec1847_io(address_map &map)
 
 
 // XXX verify everything
-MACHINE_CONFIG_START(ec184x_state::ec1840)
-	MCFG_DEVICE_ADD("maincpu", I8088, 4096000)
-	MCFG_DEVICE_PROGRAM_MAP(ec1840_map)
-	MCFG_DEVICE_IO_MAP(ec1840_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+void ec184x_state::ec1840(machine_config &config)
+{
+	I8088(config, m_maincpu, 4096000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ec184x_state::ec1840_map);
+	m_maincpu->set_addrmap(AS_IO, &ec184x_state::ec1840_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
 	IBM5150_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1840.0002", false)
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1840.0003", false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", ec184x_isa8_cards, "ec1840.0002", false);
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", ec184x_isa8_cards, "ec1840.0003", false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", ec184x_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", ec184x_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", ec184x_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", 0, "mb:isa", ec184x_isa8_cards, nullptr, false);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("ec1841");
 
 	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_EC_1841).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	RAM(config, m_ram).set_default_size("512K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ec184x_state::ec1841)
-	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(12'288'000) / 3)
-	MCFG_DEVICE_PROGRAM_MAP(ec1841_map)
-	MCFG_DEVICE_IO_MAP(ec1841_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+void ec184x_state::ec1841(machine_config &config)
+{
+	I8086(config, m_maincpu, XTAL(12'288'000) / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ec184x_state::ec1841_map);
+	m_maincpu->set_addrmap(AS_IO, &ec184x_state::ec1841_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
 	MCFG_MACHINE_RESET_OVERRIDE(ec184x_state, ec1841)
 
 	EC1841_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1841.0002", false)   // cga
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1841.0003", false)   // fdc (IRQ6) + mouse port (IRQ2..5)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1841.0004", false)   // lpt (IRQ7||5) [+ serial (IRQx)]
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "hdc", false)
-	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", ec184x_isa8_cards, "ec1841.0002", false);   // cga
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", ec184x_isa8_cards, "ec1841.0003", false);   // fdc (IRQ6) + mouse port (IRQ2..5)
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", ec184x_isa8_cards, "ec1841.0004", false);   // lpt (IRQ7||5) [+ serial (IRQx)]
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", ec184x_isa8_cards, "hdc", false);
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", ec184x_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", 0, "mb:isa", ec184x_isa8_cards, nullptr, false);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("ec1841");
 
 	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_EC_1841).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("512K,1024K,1576K,2048K");
-MACHINE_CONFIG_END
+}
 
 // XXX verify everything
-MACHINE_CONFIG_START(ec184x_state::ec1847)
-	MCFG_DEVICE_ADD("maincpu", I8088, 4772720)
-	MCFG_DEVICE_PROGRAM_MAP(ec1847_map)
-	MCFG_DEVICE_IO_MAP(ec1847_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+void ec184x_state::ec1847(machine_config &config)
+{
+	I8088(config, m_maincpu, 4772720);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ec184x_state::ec1847_map);
+	m_maincpu->set_addrmap(AS_IO, &ec184x_state::ec1847_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
 	IBM5160_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "hercules", false)  // cga, ega and vga(?) are options too
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)    // native variant (wd1010 + z80) not emulated
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)    // native serial (2x8251) not emulated
-	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "hercules", false);  // cga, ega and vga(?) are options too
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, nullptr, false);    // native variant (wd1010 + z80) not emulated
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, nullptr, false);    // native serial (2x8251) not emulated
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 
 	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	RAM(config, m_ram).set_default_size("640K");
-MACHINE_CONFIG_END
+}
 
 ROM_START( ec1840 )
 	ROM_REGION16_LE(0x10000,"bios", 0)

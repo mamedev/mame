@@ -119,22 +119,7 @@ screen_device::svg_renderer::svg_renderer(memory_region *region)
 	m_sx = m_sy = 0;
 	m_scale = 1.0;
 
-#if 0
-	double ar = m_image->width / m_image->height;
-	int w,h;
-	if (ar < (16.0/9.0))
-	{
-		h = 1080;
-		w = (h * ar) + 0.5;
-	}
-	else
-	{
-		w = 1920;
-		h = (w / ar) + 0.5;
-	}
-
-	printf("\n\nMCFG_SCREEN_SIZE(%d, %d)\nMCFG_SCREEN_VISIBLE_AREA(0, %d-1, 0, %d-1)\n", w, h, w, h);
-#endif
+	osd_printf_verbose("Parsed SVG '%s', aspect ratio %f\n", region->name(), (m_image->height == 0.0f) ? 0 : m_image->width / m_image->height);
 }
 
 screen_device::svg_renderer::~svg_renderer()
@@ -730,6 +715,10 @@ void screen_device::device_resolve_objects()
 
 void screen_device::device_start()
 {
+	// if we have a palette and it's not started, wait for it
+	if (m_palette && !m_palette->device().started())
+		throw device_missing_dependencies();
+
 	if (m_type == SCREEN_TYPE_SVG)
 	{
 		memory_region *reg = owner()->memregion(m_svg_region);
@@ -748,10 +737,6 @@ void screen_device::device_start()
 			m_visarea.set(0, m_width - 1, 0, m_height - 1);
 		}
 	}
-
-	// if we have a palette and it's not started, wait for it
-	if (m_palette && !m_palette->device().started())
-		throw device_missing_dependencies();
 
 	// configure bitmap formats and allocate screen bitmaps
 	// svg is RGB32 too, and doesn't have any update method

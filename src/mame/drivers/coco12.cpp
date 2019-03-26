@@ -378,7 +378,7 @@ void t4426_cart(device_slot_interface &device)
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( coco_sound )
+//  machine_config( coco_sound )
 //-------------------------------------------------
 
 void coco_state::coco_sound(machine_config &config)
@@ -399,7 +399,7 @@ void coco_state::coco_sound(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG ( coco_floating )
+//  machine_config ( coco_floating )
 //-------------------------------------------------
 
 void coco_state::coco_floating_map(address_map &map)
@@ -427,12 +427,12 @@ static DEVICE_INPUT_DEFAULTS_START( printer )
 DEVICE_INPUT_DEFAULTS_END
 
 //-------------------------------------------------
-//  MACHINE_CONFIG
+//  machine_config
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(coco12_state::coco)
-	MCFG_DEVICE_MODIFY(":")
-	MCFG_DEVICE_CLOCK(XTAL(14'318'181) / 16)
+void coco12_state::coco(machine_config &config)
+{
+	this->set_clock(XTAL(14'318'181) / 16);
 
 	// basic machine hardware
 	MC6809E(config, m_maincpu, DERIVED_CLOCK(1, 1));
@@ -499,7 +499,7 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	SOFTWARE_LIST(config, "coco_cart_list").set_original("coco_cart").set_filter("COCO");
 	SOFTWARE_LIST(config, "coco_flop_list").set_original("coco_flop").set_filter("COCO");
 	SOFTWARE_LIST(config, "dragon_cart_list").set_compatible("dragon_cart");
-MACHINE_CONFIG_END
+}
 
 void coco12_state::cocoh(machine_config &config)
 {

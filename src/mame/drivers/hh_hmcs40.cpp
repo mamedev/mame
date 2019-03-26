@@ -25,7 +25,7 @@
  *41      HD38800A  1982, Gakken Puck Monster
  *51      HD38800A  1981, Actronics(Hanzawa) Twinvader (larger white version)
  @70      HD38800A  1982, Coleco Galaxian
- @73      HD38800A  1982, Bandai(Mattel) Star Hawk (PT-317B)
+ @73      HD38800A  1982, Mattel Star Hawk (PT-317B)
  @77      HD38800A  1982, Bandai Frisky Tom (PT-327A)
  @88      HD38800A  1984, Tomy Tron (THN-02)
 
@@ -70,7 +70,6 @@
 
 
   TODO:
-  - cdkong discrete sound (simple volume decay, simulated for now)
   - cgalaxn discrete sound (alien attacking sound effect)
   - gckong random lockups (tap the jump button repeatedly): mcu stack overflow,
     works ok if stack levels is increased, 38800 B rev. has more stack levels?
@@ -447,7 +446,7 @@ void bambball_state::bambball(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 478);
-	screen.set_visarea(0, 1920-1, 0, 478-1);
+	screen.set_visarea_full();
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_bambball);
@@ -596,7 +595,8 @@ void bmboxing_state::bmboxing(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 529);
-	screen.set_visarea(0, 1920-1, 0, 529-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -725,7 +725,8 @@ void bfriskyt_state::bfriskyt(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 675);
-	screen.set_visarea(0, 1920-1, 0, 675-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -846,7 +847,7 @@ void packmon_state::packmon(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 680);
-	screen.set_visarea(0, 1920-1, 0, 680-1);
+	screen.set_visarea_full();
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_packmon);
@@ -865,147 +866,6 @@ ROM_START( packmon )
 
 	ROM_REGION( 224386, "svg", 0)
 	ROM_LOAD( "packmon.svg", 0, 224386, CRC(b2ee5b6b) SHA1(e53b4d5a4118cc5fbec4656580c2aab76af8f8d7) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Bandai/Mattel Star Hawk (manufactured in Japan)
-  * PCB label Kaken, PT-317B
-  * Hitachi HD38800A73 MCU
-  * cyan/red VFD display Futaba DM-41ZK, with partial color overlay + bezel
-
-  Kaken was a subsidiary of Bandai. The original Japanese release is unknown,
-  was it canceled and only released in the USA?
-
-  known releases:
-  - Japan: ?
-  - USA: Star Hawk, published by Mattel
-
-***************************************************************************/
-
-class msthawk_state : public hh_hmcs40_state
-{
-public:
-	msthawk_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_hmcs40_state(mconfig, type, tag)
-	{ }
-
-	void prepare_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-
-	void update_int0();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
-	void msthawk(machine_config &config);
-};
-
-// handlers
-
-void msthawk_state::prepare_display()
-{
-	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	u32 plate = bitswap<24>(m_plate,23,22,21,19,20,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
-	display_matrix(21, 10, plate, grid);
-}
-
-WRITE8_MEMBER(msthawk_state::plate_w)
-{
-	// R0x-R3x: vfd plate
-	int shift = offset * 4;
-	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
-}
-
-WRITE16_MEMBER(msthawk_state::grid_w)
-{
-	// D5: speaker out
-	m_speaker->level_w(data >> 5 & 1);
-
-	// D10-D15: input mux
-	u8 inp_mux = data >> 10 & 0x3f;
-	if (inp_mux != m_inp_mux)
-	{
-		m_inp_mux = inp_mux;
-		update_int0();
-	}
-
-	// D6-D15: vfd grid
-	m_grid = data >> 6 & 0x3ff;
-
-	// D0-D4: more plates
-	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x1f0000);
-	prepare_display();
-}
-
-void msthawk_state::update_int0()
-{
-	// INT0 on multiplexed inputs
-	set_interrupt(0, read_inputs(6));
-}
-
-// config
-
-static INPUT_PORTS_START( msthawk )
-	PORT_START("IN.0") // D10 INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr) PORT_NAME("Score")
-
-	PORT_START("IN.1") // D11 INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr) PORT_NAME("Land")
-
-	PORT_START("IN.2") // D12 INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr)
-
-	PORT_START("IN.3") // D13 INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr)
-
-	PORT_START("IN.4") // D14 INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr)
-
-	PORT_START("IN.5") // D15 INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr)
-
-	PORT_START("IN.6") // INT1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1) PORT_NAME("Fire")
-INPUT_PORTS_END
-
-void msthawk_state::msthawk(machine_config &config)
-{
-	/* basic machine hardware */
-	HD38800(config, m_maincpu, 400000); // approximation
-	m_maincpu->write_r<0>().set(FUNC(msthawk_state::plate_w));
-	m_maincpu->write_r<1>().set(FUNC(msthawk_state::plate_w));
-	m_maincpu->write_r<2>().set(FUNC(msthawk_state::plate_w));
-	m_maincpu->write_r<3>().set(FUNC(msthawk_state::plate_w));
-	m_maincpu->write_d().set(FUNC(msthawk_state::grid_w));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
-	screen.set_size(1920, 696);
-	screen.set_visarea(0, 1920-1, 0, 696-1);
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_msthawk);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( msthawk )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "hd38800a73", 0x0000, 0x1000, CRC(a4f9a523) SHA1(465f06b02e2e7d2277218fd447830725790a816c) )
-	ROM_CONTINUE(           0x1e80, 0x0100 )
-
-	ROM_REGION( 191888, "svg", 0)
-	ROM_LOAD( "msthawk.svg", 0, 191888, CRC(a607fc0f) SHA1(282a412f6462128e09ee8bd18d682dda01297611) )
 ROM_END
 
 
@@ -1116,7 +976,8 @@ void bzaxxon_state::bzaxxon(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(613, 1080);
-	screen.set_visarea(0, 613-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1239,7 +1100,8 @@ void zackman_state::zackman(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(487, 1080);
-	screen.set_visarea(0, 487-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1372,7 +1234,8 @@ void bpengo_state::bpengo(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 759);
-	screen.set_visarea(0, 1920-1, 0, 759-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1501,7 +1364,8 @@ void bbtime_state::bbtime(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(379, 1080);
-	screen.set_visarea(0, 379-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1610,7 +1474,8 @@ void bdoramon_state::bdoramon(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 668);
-	screen.set_visarea(0, 1920-1, 0, 668-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1712,7 +1577,8 @@ void bultrman_state::bultrman(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 673);
-	screen.set_visarea(0, 1920-1, 0, 673-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1812,7 +1678,8 @@ void machiman_state::machiman(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1534, 1080);
-	screen.set_visarea(0, 1534-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2105,7 +1972,8 @@ void alnattck_state::alnattck(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 700);
-	screen.set_visarea(0, 1920-1, 0, 700-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2149,7 +2017,7 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
-	void speaker_decay_reset();
+	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
 	double m_speaker_volume;
 	void cdkong(machine_config &config);
@@ -2169,19 +2037,20 @@ void cdkong_state::machine_start()
 
 // handlers
 
-void cdkong_state::speaker_decay_reset()
+void cdkong_state::speaker_update()
 {
 	if (m_r[1] & 8)
 		m_speaker_volume = 1.0;
 
-	m_speaker->set_output_gain(0, m_speaker_volume);
+	int level = (m_d & 8) ? 0x7fff : 0;
+	m_speaker->level_w(level * m_speaker_volume);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
 {
 	// volume decays when speaker is off (divisor and timer period determine duration)
-	speaker_decay_reset();
-	m_speaker_volume /= 1.015;
+	speaker_update();
+	m_speaker_volume /= 1.02;
 }
 
 void cdkong_state::prepare_display()
@@ -2194,7 +2063,7 @@ WRITE8_MEMBER(cdkong_state::plate_w)
 {
 	// R13: speaker on
 	m_r[offset] = data;
-	speaker_decay_reset();
+	speaker_update();
 
 	// R0x-R6x: vfd plate
 	int shift = offset * 4;
@@ -2205,7 +2074,8 @@ WRITE8_MEMBER(cdkong_state::plate_w)
 WRITE16_MEMBER(cdkong_state::grid_w)
 {
 	// D3: speaker out
-	m_speaker->level_w(data >> 3 & 1);
+	m_d = data;
+	speaker_update();
 
 	// D4-D14: vfd grid
 	m_grid = data >> 4 & 0x7ff;
@@ -2226,6 +2096,8 @@ static INPUT_PORTS_START( cdkong )
 	PORT_BIT( 0x7ff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static s16 cdkong_speaker_levels[0x8000];
+
 void cdkong_state::cdkong(machine_config &config)
 {
 	/* basic machine hardware */
@@ -2245,13 +2117,20 @@ void cdkong_state::cdkong(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(605, 1080);
-	screen.set_visarea(0, 605-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+
 	TIMER(config, "speaker_decay").configure_periodic(FUNC(cdkong_state::speaker_decay_sim), attotime::from_msec(1));
+
+	// set volume levels (set_output_gain is too slow for sub-frame intervals)
+	for (int i = 0; i < 0x8000; i++)
+		cdkong_speaker_levels[i] = i;
+	m_speaker->set_levels(0x8000, cdkong_speaker_levels);
 }
 
 // roms
@@ -2384,7 +2263,8 @@ void cgalaxn_state::cgalaxn(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(526, 1080);
-	screen.set_visarea(0, 526-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2516,7 +2396,8 @@ void cpacman_state::cpacman(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(484, 1080);
-	screen.set_visarea(0, 484-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2652,7 +2533,8 @@ void cmspacmn_state::cmspacmn(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(481, 1080);
-	screen.set_visarea(0, 481-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2943,7 +2825,8 @@ void egalaxn2_state::egalaxn2(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(505, 1080);
-	screen.set_visarea(0, 505-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -3028,7 +2911,7 @@ void epacman2_state::epacman2(machine_config &config)
 	/* video hardware */
 	screen_device *screen = subdevice<screen_device>("screen");
 	screen->set_size(505, 1080);
-	screen->set_visarea(0, 505-1, 0, 1080-1);
+	screen->set_visarea_full();
 }
 
 // roms
@@ -3232,7 +3115,8 @@ void eturtles_state::eturtles(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(484, 1080);
-	screen.set_visarea(0, 484-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -3354,7 +3238,8 @@ void estargte_state::estargte(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 854);
-	screen.set_visarea(0, 1920-1, 0, 854-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -3483,7 +3368,8 @@ void ghalien_state::ghalien(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 699);
-	screen.set_visarea(0, 1920-1, 0, 699-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -3615,7 +3501,7 @@ void gckong_state::gckong(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(479, 1080);
-	screen.set_visarea(0, 479-1, 0, 1080-1);
+	screen.set_visarea_full();
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_gckong);
@@ -3743,7 +3629,8 @@ void gdigdug_state::gdigdug(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(476, 1080);
-	screen.set_visarea(0, 476-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -3914,7 +3801,7 @@ void mwcbaseb_state::mwcbaseb(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 478);
-	screen.set_visarea(0, 1920-1, 0, 478-1);
+	screen.set_visarea_full();
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_mwcbaseb);
@@ -3934,6 +3821,145 @@ ROM_START( mwcbaseb )
 
 	ROM_REGION( 178441, "svg", 0)
 	ROM_LOAD( "mwcbaseb.svg", 0, 178441, CRC(0f631190) SHA1(74a10ad0630af5516f76d5bf5628483d21f6b7be) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Mattel Star Hawk (manufactured in Japan)
+  * PCB label Kaken, PT-317B
+  * Hitachi HD38800A73 MCU
+  * cyan/red VFD display Futaba DM-41ZK, with partial color overlay + bezel
+
+  Before release, it was advertised as "Space Battle"(a Mattel Intellivision game).
+  Kaken was a subsidiary of Bandai. Star Hawk shell design is the same as Bandai's
+  games from the same era. It's likely that this was made under contract exclusively
+  for Mattel. There is no indication that this game was released in Japan by Bandai.
+
+***************************************************************************/
+
+class msthawk_state : public hh_hmcs40_state
+{
+public:
+	msthawk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+
+	void update_int0();
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
+	void msthawk(machine_config &config);
+};
+
+// handlers
+
+void msthawk_state::prepare_display()
+{
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	u32 plate = bitswap<24>(m_plate,23,22,21,19,20,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
+	display_matrix(21, 10, plate, grid);
+}
+
+WRITE8_MEMBER(msthawk_state::plate_w)
+{
+	// R0x-R3x: vfd plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	prepare_display();
+}
+
+WRITE16_MEMBER(msthawk_state::grid_w)
+{
+	// D5: speaker out
+	m_speaker->level_w(data >> 5 & 1);
+
+	// D10-D15: input mux
+	u8 inp_mux = data >> 10 & 0x3f;
+	if (inp_mux != m_inp_mux)
+	{
+		m_inp_mux = inp_mux;
+		update_int0();
+	}
+
+	// D6-D15: vfd grid
+	m_grid = data >> 6 & 0x3ff;
+
+	// D0-D4: more plates
+	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x1f0000);
+	prepare_display();
+}
+
+void msthawk_state::update_int0()
+{
+	// INT0 on multiplexed inputs
+	set_interrupt(0, read_inputs(6));
+}
+
+// config
+
+static INPUT_PORTS_START( msthawk )
+	PORT_START("IN.0") // D10 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr) PORT_NAME("Score")
+
+	PORT_START("IN.1") // D11 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr) PORT_NAME("Land")
+
+	PORT_START("IN.2") // D12 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr)
+
+	PORT_START("IN.3") // D13 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr)
+
+	PORT_START("IN.4") // D14 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr)
+
+	PORT_START("IN.5") // D15 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, msthawk_state, input_changed, nullptr)
+
+	PORT_START("IN.6") // INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1) PORT_NAME("Fire")
+INPUT_PORTS_END
+
+void msthawk_state::msthawk(machine_config &config)
+{
+	/* basic machine hardware */
+	HD38800(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(msthawk_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(msthawk_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(msthawk_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(msthawk_state::plate_w));
+	m_maincpu->write_d().set(FUNC(msthawk_state::grid_w));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 696);
+	screen.set_visarea_full();
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_msthawk);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( msthawk )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38800a73", 0x0000, 0x1000, CRC(a4f9a523) SHA1(465f06b02e2e7d2277218fd447830725790a816c) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+
+	ROM_REGION( 191888, "svg", 0)
+	ROM_LOAD( "msthawk.svg", 0, 191888, CRC(a607fc0f) SHA1(282a412f6462128e09ee8bd18d682dda01297611) )
 ROM_END
 
 
@@ -4016,7 +4042,8 @@ void pbqbert_state::pbqbert(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(603, 1080);
-	screen.set_visarea(0, 603-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -4142,7 +4169,8 @@ void kingman_state::kingman(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(374, 1080);
-	screen.set_visarea(0, 374-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -4268,7 +4296,8 @@ void tmtron_state::tmtron(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 662);
-	screen.set_visarea(0, 1920-1, 0, 662-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -4373,7 +4402,8 @@ void vinvader_state::vinvader(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(233, 1080);
-	screen.set_visarea(0, 233-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -4408,7 +4438,6 @@ CONS( 1979, bmboxing,  0,        0, bmboxing, bmboxing, bmboxing_state, empty_in
 
 CONS( 1982, bfriskyt,  0,        0, bfriskyt, bfriskyt, bfriskyt_state, empty_init, "Bandai", "Frisky Tom (Bandai)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, packmon,   0,        0, packmon,  packmon,  packmon_state,  empty_init, "Bandai", "Packri Monster", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  msthawk_state,  empty_init, "Bandai (Mattel license)", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, bzaxxon,   0,        0, bzaxxon,  bzaxxon,  bzaxxon_state,  empty_init, "Bandai", "Zaxxon (Bandai)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, zackman,   0,        0, zackman,  zackman,  zackman_state,  empty_init, "Bandai", "Zackman", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, bpengo,    0,        0, bpengo,   bpengo,   bpengo_state,   empty_init, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE )
@@ -4419,7 +4448,7 @@ CONS( 1984, machiman,  0,        0, machiman, machiman, machiman_state, empty_in
 CONS( 1984, pairmtch,  0,        0, pairmtch, pairmtch, pairmtch_state, empty_init, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1981, alnattck,  0,        0, alnattck, alnattck, alnattck_state, empty_init, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   cdkong_state,   empty_init, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   cdkong_state,   empty_init, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  cgalaxn_state,  empty_init, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  cpacman_state,  empty_init, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  cpacman_state,  empty_init, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )
@@ -4439,6 +4468,7 @@ CONS( 1982, gckong,    0,        0, gckong,   gckong,   gckong_state,   empty_in
 CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  gdigdug_state,  empty_init, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, mwcbaseb_state, empty_init, "Mattel", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  msthawk_state,  empty_init, "Mattel", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  pbqbert_state,  empty_init, "Parker Brothers", "Q*Bert (Parker Brothers)", MACHINE_SUPPORTS_SAVE )
 
