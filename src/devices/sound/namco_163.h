@@ -23,7 +23,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_clock_changed() override;
 
-	/* global sound parameters */
+	// global sound parameters
 	std::unique_ptr<u8[]> m_ram;
 	s32                   m_output;
 	s32                   m_output_buffer;
@@ -33,7 +33,7 @@ protected:
 	bool                  m_disable;
 	sound_stream          *m_stream;
 
-	/* internals */
+	// internals
 	s8 get_sample(u16 addr);
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
