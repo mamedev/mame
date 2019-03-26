@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Sean Riddle, algestam
+// copyright-holders:hap, Sean Riddle, Henrik Algestam
 // thanks-to:Igor, ChoccyHobNob, RColtrane
 /***************************************************************************
 
@@ -28,8 +28,9 @@ Trivia: Most of the Nintendo G&W have built-in cheats, likely kept in by
 Nintendo to test the game. These were not accessible to users of course,
 but for the sake of fun they're (usually) available on MAME.
 
-BTANB: On some of the earlier G&W games, eg. gnw_mmouse, gnw_pchute, gnw_fire,
-the controls still work after game over, this happens on the real thing too.
+BTANB: On some of the earlier G&W games, eg. gnw_fire, gnw_mmouse, gnw_pchute,
+gnw_popeye, the controls still work after game over, this happens on the real
+thing too.
 
 Game list (* denotes not emulated yet)
 
@@ -45,7 +46,7 @@ CN-07*    g    ?       Helmet (aka Headache)
 LN-08*    g    ?       Lion
 PR-21     ws   SM5A    Parachute
 OC-22     ws   SM5A    Octopus
-PP-23*    ws   SM5A?   Popeye
+PP-23     ws   SM5A    Popeye
 FP-24*    ws   SM5A    Chef
 MC-25     ws   SM5A    Mickey Mouse
 EG-26     ws   SM5A    Egg (near-certainly same ROM as MC-25, but LCD differs)
@@ -1402,6 +1403,97 @@ ROM_START( gnw_octopus )
 
 	ROM_REGION( 119681, "svg", 0)
 	ROM_LOAD( "gnw_octopus.svg", 0, 119681, CRC(39900430) SHA1(61b71c475365966257f5479eab992538ec235c11) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Popeye (model PP-23)
+  * PCB label PP-23 Y
+  * Sharp SM5A label PP-23 52YD (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+  This is the wide screen version, there's also tabletop and panorama versions.
+
+***************************************************************************/
+
+class gnw_popeye_state : public hh_sm510_state
+{
+public:
+	gnw_popeye_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_popeye(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_popeye )
+	PORT_START("IN.0") // R2
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // when cheat is activated, not all segments are lit on the ACL reset screen
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // reset?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // alarm test?
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void gnw_popeye_state::gnw_popeye(machine_config &config)
+{
+	/* basic machine hardware */
+	SM5A(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1604, 1080);
+	screen.set_visarea_full();
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( gnw_popeye )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "pp-23", 0x0000, 0x0740, CRC(49987769) SHA1(ad90659a3ce7169a4df16367c5307435d9f9d956) )
+
+	ROM_REGION( 218428, "svg", 0)
+	ROM_LOAD( "gnw_popeye.svg", 0, 218428, CRC(b2c3fdf2) SHA1(5e782f25f9ff432a292e67efc7f5653cf2a81b60) )
 ROM_END
 
 
@@ -8870,6 +8962,7 @@ CONS( 1991, kgarfld,     0,          0, kgarfld,     kgarfld,     kgarfld_state,
 // Nintendo G&W: wide screen
 CONS( 1981, gnw_pchute,  0,          0, gnw_pchute,  gnw_pchute,  gnw_pchute_state,  empty_init, "Nintendo", "Game & Watch: Parachute", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_octopus, 0,          0, gnw_octopus, gnw_octopus, gnw_octopus_state, empty_init, "Nintendo", "Game & Watch: Octopus", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_popeye,  0,          0, gnw_popeye,  gnw_popeye,  gnw_popeye_state,  empty_init, "Nintendo", "Game & Watch: Popeye (wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_egg,     gnw_mmouse, 0, gnw_egg,     gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_state,  empty_init, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )
