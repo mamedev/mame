@@ -127,10 +127,10 @@ void spg110_device::blit_page(const rectangle &cliprect, uint32_t scanline, int 
 		return;
 	}
 
-	if (((attr & PAGE_DEPTH_FLAG_MASK) >> PAGE_DEPTH_FLAG_SHIFT) != depth)
-	{
-		return;
-	}
+//	if (((attr & PAGE_DEPTH_FLAG_MASK) >> PAGE_DEPTH_FLAG_SHIFT) != depth)
+//	{
+//		return;
+//	}
 
 	uint32_t tile_h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
 	uint32_t tile_w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
@@ -159,13 +159,17 @@ void spg110_device::blit_page(const rectangle &cliprect, uint32_t scanline, int 
 			extra_attribute = (extra_attribute & 0x00ff);
 
 		uint8_t pal = extra_attribute & 0x0f;
+		uint8_t pri = (extra_attribute & 0x30)>>4;
 
-		bool flip_x = 0;//(tileattr & TILE_X_FLIP);
+		if (pri == depth)
+		{
+			bool flip_x = 0;//(tileattr & TILE_X_FLIP);
 
-		if (flip_x)
-			blit<FlipXOn>(cliprect, tile_scanline, xx, yy, attr, ctrl, bitmap_addr, tile, pal);
-		else
-			blit<FlipXOff>(cliprect, tile_scanline, xx, yy, attr, ctrl, bitmap_addr, tile, pal);
+			if (flip_x)
+				blit<FlipXOn>(cliprect, tile_scanline, xx, yy, attr, ctrl, bitmap_addr, tile, pal);
+			else
+				blit<FlipXOff>(cliprect, tile_scanline, xx, yy, attr, ctrl, bitmap_addr, tile, pal);
+		}
 
 	}
 }
