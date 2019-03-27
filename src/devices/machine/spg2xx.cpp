@@ -17,20 +17,6 @@
 DEFINE_DEVICE_TYPE(SPG24X, spg24x_device, "spg24x", "SPG240-series System-on-a-Chip")
 DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-Chip")
 
-#define LOG_UNKNOWN_IO      (1U << 3)
-#define LOG_IRQS            (1U << 4)
-#define LOG_VLINES          (1U << 5)
-#define LOG_DMA             (1U << 9)
-#define LOG_PPU_READS       (1U << 22)
-#define LOG_PPU_WRITES      (1U << 23)
-#define LOG_UNKNOWN_PPU     (1U << 24)
-#define LOG_IO              (LOG_IRQS | LOG_DMA | LOG_UNKNOWN_IO)
-#define LOG_PPU             (LOG_PPU_READS | LOG_PPU_WRITES | LOG_UNKNOWN_PPU)
-#define LOG_ALL             (LOG_IO | LOG_PPU | LOG_VLINES )
-
-#define VERBOSE             (0)
-#include "logmacro.h"
-
 
 spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
