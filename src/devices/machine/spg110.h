@@ -194,15 +194,15 @@ private:
 
 	devcb_write8 m_chip_sel;
 
-	DECLARE_READ16_MEMBER(porta_r) { return m_porta_in(); };
-	DECLARE_READ16_MEMBER(portb_r) { return m_portb_in(); };
-	DECLARE_READ16_MEMBER(portc_r) { return m_portc_in(); };
-	DECLARE_WRITE16_MEMBER(porta_w) { m_porta_out(offset, data, mem_mask); };
-	DECLARE_WRITE16_MEMBER(portb_w) { m_portb_out(offset, data, mem_mask); };
-	DECLARE_WRITE16_MEMBER(portc_w) { m_portc_out(offset, data, mem_mask); };
-	template <size_t Line> DECLARE_READ16_MEMBER(adc_r) { return m_adc_in[Line](); };
-	DECLARE_WRITE8_MEMBER(cs_w) { m_chip_sel(offset, data, mem_mask); };
-	DECLARE_READ16_MEMBER(get_pal_r) { return 0; /*m_pal_flag;*/ };
+	DECLARE_READ16_MEMBER(porta_r) { return m_porta_in(); }
+	DECLARE_READ16_MEMBER(portb_r) { return m_portb_in(); }
+	DECLARE_READ16_MEMBER(portc_r) { return m_portc_in(); }
+	DECLARE_WRITE16_MEMBER(porta_w) { m_porta_out(offset, data, mem_mask); }
+	DECLARE_WRITE16_MEMBER(portb_w) { m_portb_out(offset, data, mem_mask); }
+	DECLARE_WRITE16_MEMBER(portc_w) { m_portc_out(offset, data, mem_mask); }
+	template <size_t Line> DECLARE_READ16_MEMBER(adc_r) { return m_adc_in[Line](); }
+	DECLARE_WRITE8_MEMBER(cs_w) { m_chip_sel(offset, data, mem_mask); }
+	DECLARE_READ16_MEMBER(get_pal_r) { return 0; /*m_pal_flag;*/ }
 	void configure_spg_io(spg2xx_io_device* io);
 
 };
