@@ -41,6 +41,7 @@
 #include "cl_sh260.h"
 #include "bt54x.h"
 #include "dcb.h"
+#include "ultra12f.h"
 
 // sound
 #include "adlib.h"
@@ -187,4 +188,5 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("bt542bh", BT542BH);
 	device.option_add("bt545s", BT545S);
 	device.option_add("dcb", NOVELL_DCB);
+	device.option_add("ultra12f", ULTRA12F);
 }
