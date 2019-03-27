@@ -41,6 +41,7 @@ spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, co
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_spg_audio(*this, "spgaudio")
 	, m_spg_io(*this, "spgio")
+	, m_spg_sysdma(*this, "spgsysdma")
 	, m_rowscrolloffset(15)
 	, m_porta_out(*this)
 	, m_portb_out(*this)
@@ -83,7 +84,7 @@ void spg2xx_device::map(address_map &map)
 	map(0x003400, 0x0037ff).rw(m_spg_audio, FUNC(spg2xx_audio_device::audio_ctrl_r), FUNC(spg2xx_audio_device::audio_ctrl_w));
 	map(0x003d00, 0x003d2f).rw(m_spg_io, FUNC(spg2xx_io_device::io_r), FUNC(spg2xx_io_device::io_w));
 	map(0x003d30, 0x003dff).rw(m_spg_io, FUNC(spg2xx_io_device::io_extended_r), FUNC(spg2xx_io_device::io_extended_w));
-	map(0x003e00, 0x003e03).rw(FUNC(spg2xx_device::dma_r), FUNC(spg2xx_device::dma_w));
+	map(0x003e00, 0x003e03).rw(m_spg_sysdma, FUNC(spg2xx_sysdma_device::dma_r), FUNC(spg2xx_sysdma_device::dma_w));
 }
 
 void spg2xx_device::device_start()
@@ -122,8 +123,6 @@ void spg2xx_device::device_start()
 	save_item(NAME(m_debug_palette));
 	save_item(NAME(m_sprite_index_to_debug));
 
-	save_item(NAME(m_dma_regs));
-
 	save_item(NAME(m_video_regs));
 	save_item(NAME(m_sprite_limit));
 	save_item(NAME(m_pal_flag));
@@ -132,7 +131,6 @@ void spg2xx_device::device_start()
 void spg2xx_device::device_reset()
 {
 	memset(m_video_regs, 0, 0x100 * sizeof(uint16_t));
-	memset(m_dma_regs, 0, 0x4 * sizeof(uint16_t));
 
 	m_video_regs[0x36] = 0xffff;
 	m_video_regs[0x37] = 0xffff;
@@ -896,75 +894,6 @@ void spg2xx_device::check_video_irq()
 	m_cpu->set_state_unsynced(UNSP_IRQ0_LINE, (VIDEO_IRQ_STATUS & VIDEO_IRQ_ENABLE) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
-/*************************
-*    Machine Hardware    *
-*************************/
-
-READ16_MEMBER(spg2xx_device::dma_r)
-{
-	uint16_t val = m_dma_regs[offset];
-	switch (offset)
-	{
-
-	case 0x000: // DMA Source (L)
-		LOGMASKED(LOG_DMA, "dma_r: DMA Source (lo) = %04x\n", val);
-		break;
-
-	case 0x001: // DMA Source (H)
-		LOGMASKED(LOG_DMA, "dma_r: DMA Source (hi) = %04x\n", val);
-		break;
-
-	case 0x002: // DMA Length
-		LOGMASKED(LOG_DMA, "dma_r: DMA Length = %04x\n", 0);
-		val = 0;
-		break;
-
-	case 0x003: // DMA Destination
-		LOGMASKED(LOG_DMA, "dma_r: DMA Dest = %04x\n", val);
-		break;
-
-	default:
-		LOGMASKED(LOG_UNKNOWN_IO, "dma_r: Unknown register %04x\n", 0x3d00 + offset);
-		break;
-	}
-
-	return val;
-}
-
-
-WRITE16_MEMBER(spg2xx_device::dma_w)
-{
-	switch (offset)
-	{
-	case 0x000: // DMA Source (lo)
-		LOGMASKED(LOG_DMA, "dma_w: DMA Source (lo) = %04x\n", data);
-		m_dma_regs[offset] = data;
-		break;
-
-	case 0x001: // DMA Source (hi)
-		LOGMASKED(LOG_DMA, "dma_w: DMA Source (hi) = %04x\n", data);
-		m_dma_regs[offset] = data;
-		break;
-
-	case 0x002: // DMA Length
-		LOGMASKED(LOG_DMA, "dma_w: DMA Length = %04x\n", data);
-		if (!(data & 0xc000))  // jak_dora writes 0xffff here which ends up trashing registers etc. why? such writes can't be valid
-			do_cpu_dma(data);
-		break;
-
-	case 0x003: // DMA Destination
-		LOGMASKED(LOG_DMA, "dma_w: DMA Dest = %04x\n", data);
-		m_dma_regs[offset] = data;
-		break;
-
-	default:
-		LOGMASKED(LOG_UNKNOWN_IO, "dma_w: Unknown register %04x = %04x\n", 0x3d00 + offset, data);
-		m_dma_regs[offset] = data;
-		break;
-	}
-}
-
 void spg2xx_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
@@ -983,26 +912,6 @@ void spg2xx_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			break;
 		}
 	}
-}
-
-
-void spg2xx_device::do_cpu_dma(uint32_t len)
-{
-	address_space &mem = m_cpu->space(AS_PROGRAM);
-
-	uint32_t src = ((m_dma_regs[0x001] & 0x3f) << 16) | m_dma_regs[0x000];
-	uint32_t dst = m_dma_regs[0x003] & 0x3fff;
-
-	for (uint32_t j = 0; j < len; j++)
-	{
-		mem.write_word((dst + j) & 0x3fff, mem.read_word(src + j));
-	}
-
-	src += len;
-	m_dma_regs[0x000] = (uint16_t)src;
-	m_dma_regs[0x001] = (src >> 16) & 0x3f;
-	m_dma_regs[0x002] = 0;
-	m_dma_regs[0x003] = (dst + len) & 0x3fff;
 }
 
 void spg2xx_device::configure_spg_io(spg2xx_io_device* io)
@@ -1038,6 +947,8 @@ void spg24x_device::device_add_mconfig(machine_config &config)
 
 	SPG24X_IO(config, m_spg_io, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
 	configure_spg_io(m_spg_io);
+
+	SPG2XX_SYSDMA(config, m_spg_sysdma, DERIVED_CLOCK(1, 1), m_cpu);
 }
 
 void spg28x_device::device_add_mconfig(machine_config &config)
@@ -1051,4 +962,6 @@ void spg28x_device::device_add_mconfig(machine_config &config)
 
 	SPG28X_IO(config, m_spg_io, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
 	configure_spg_io(m_spg_io);
+
+	SPG2XX_SYSDMA(config, m_spg_sysdma, DERIVED_CLOCK(1, 1), m_cpu);
 }

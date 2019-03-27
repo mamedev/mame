@@ -37,6 +37,7 @@
 #include "cpu/unsp/unsp.h"
 #include "spg2xx_audio.h"
 #include "spg2xx_io.h"
+#include "spg2xx_sysdma.h"
 #include "screen.h"
 
 class spg2xx_device : public device_t, public device_mixer_interface
@@ -70,6 +71,7 @@ public:
 
 	required_device<spg2xx_audio_device> m_spg_audio;
 	required_device<spg2xx_io_device> m_spg_io;
+	required_device<spg2xx_sysdma_device> m_spg_sysdma;
 
 	void extint_w(int channel, bool state) { m_spg_io->extint_w(channel, state); };
 	void uart_rx(uint8_t data) { m_spg_io->uart_rx(data); };
@@ -102,9 +104,6 @@ protected:
 	DECLARE_READ16_MEMBER(video_r);
 	DECLARE_WRITE16_MEMBER(video_w);
 
-	DECLARE_READ16_MEMBER(dma_r);
-	DECLARE_WRITE16_MEMBER(dma_w);
-
 	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
 	DECLARE_WRITE_LINE_MEMBER(timerirq_w);
 	DECLARE_WRITE_LINE_MEMBER(uartirq_w);
@@ -124,8 +123,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	void do_cpu_dma(uint32_t len);
 
 	void do_sprite_dma(uint32_t len);
 
@@ -169,8 +166,6 @@ protected:
 	bool m_debug_blit;
 	bool m_debug_palette;
 	uint8_t m_sprite_index_to_debug;
-
-	uint16_t m_dma_regs[0x4];
 
 	uint16_t m_video_regs[0x100];
 	uint32_t m_sprite_limit;
