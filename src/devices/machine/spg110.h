@@ -181,6 +181,9 @@ private:
 	template<flipx_t FlipX>
 	void blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile, uint8_t pal, int32_t h, int32_t w, uint8_t bpp);
 	void blit_page(const rectangle &cliprect, uint32_t scanline, int depth, uint32_t bitmap_addr, uint16_t *regs);
+	void draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr);
+	void draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority);
+
 	uint32_t m_screenbuf[320 * 240];
 
 	devcb_write16 m_porta_out;
