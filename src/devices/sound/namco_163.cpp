@@ -18,7 +18,6 @@ namco_163_sound_device::namco_163_sound_device(const machine_config &mconfig, co
 	: device_t(mconfig, NAMCO_163, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_ram(nullptr)
-	, m_output(0)
 	, m_reg_addr(0x78)
 	, m_addr(0)
 	, m_inc(false)
@@ -38,7 +37,6 @@ void namco_163_sound_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / 15);
 
 	save_pointer(NAME(m_ram), 0x80);
-	save_item(NAME(m_output));
 	save_item(NAME(m_reg_addr));
 	save_item(NAME(m_addr));
 	save_item(NAME(m_inc));
@@ -162,7 +160,7 @@ void namco_163_sound_device::sound_stream_update(sound_stream &stream, stream_sa
 		const u8 vol = m_ram[m_reg_addr + 7] & 0xf;
 
 		phase = (phase + freq) % (length << 16);
-		m_output = get_sample(((phase >> 16) + offset) & 0xff) * vol;
+		s32 output = get_sample(((phase >> 16) + offset) & 0xff) * vol;
 
 		m_ram[m_reg_addr + 1] = phase & 0xff;
 		m_ram[m_reg_addr + 3] = phase >> 8;
@@ -173,6 +171,6 @@ void namco_163_sound_device::sound_stream_update(sound_stream &stream, stream_sa
 		{
 			m_reg_addr = 0x78 - ((m_ram[0x7f] & 0x70) >> 1);
 		}
-		outputs[0][s] = (m_output << 8);
+		outputs[0][s] = (output << 8);
 	}
 }

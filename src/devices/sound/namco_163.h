@@ -25,7 +25,6 @@ protected:
 
 	// global sound parameters
 	std::unique_ptr<u8[]> m_ram;
-	s32                   m_output;
 	u8                    m_reg_addr;
 	u8                    m_addr;
 	bool                  m_inc;
