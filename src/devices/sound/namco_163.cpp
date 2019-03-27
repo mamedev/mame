@@ -150,7 +150,7 @@ void namco_163_sound_device::sound_stream_update(sound_stream &stream, stream_sa
 	if (m_disable)
 		return;
 
-	// NOT internally mixed in real hardware
+	// Slightly noisy but closer to real hardware behavior
 	for (int s = 0; s < samples; s++)
 	{
 		u32 phase = (m_ram[m_reg_addr + 5] << 16) | (m_ram[m_reg_addr + 3] << 8) | m_ram[m_reg_addr + 1];
