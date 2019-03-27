@@ -6,7 +6,7 @@
 	<element name="disk_grey"><disk><color red="0.6" green="0.6" blue="0.6" /></disk></element>
 
 	<element name="mask" defstate="0"><disk state="0"><color red="0" green="0" blue="0" /></disk></element>
-	<element name="dummy"><text string=" "></text></element>
+	<element name="nothing"><text string=" "></text></element>
 
 	<element name="disk_1"><disk><color red="0.9" green="0.3" blue="1.0" /></disk></element>
 	<element name="disk_2"><disk><color red="1.0" green="0.4" blue="0.4" /></disk></element>
@@ -52,13 +52,13 @@
 		<text state="0x03" string="4" align="1"><color red="0.02" green="0.02" blue="0.02" /></text>
 	</element>
 
-	<element name="text_yb">
+	<element name="text_ry">
 		<disk><color red="0.0" green="0.0" blue="0.0" /></disk>
 		<text string="&#x25ba;">
 			<color red="0.8" green="0.77" blue="0.1" />
 		</text>
 	</element>
-	<element name="text_ob">
+	<element name="text_ro">
 		<disk><color red="0.0" green="0.0" blue="0.0" /></disk>
 		<text string="&#x25ba;">
 			<color red="0.8" green="0.5" blue="0.1" />
@@ -152,16 +152,16 @@
 		<bezel element="text_skill"><bounds x="9" y="9.6" width="2" height="0.29" /></bezel>
 		<bezel element="text_game"><bounds x="9" y="10.0" width="2" height="0.29" /></bezel>
 
-		<bezel element="text_yb"><bounds x="9.825" y="8.77" width="0.35" height="0.35" /></bezel>
-		<bezel element="text_yb"><bounds x="9.825" y="9.17" width="0.35" height="0.35" /></bezel>
-		<bezel element="text_ob"><bounds x="9.825" y="9.57" width="0.35" height="0.35" /></bezel>
-		<bezel element="text_ob"><bounds x="9.825" y="9.97" width="0.35" height="0.35" /></bezel>
-		<bezel element="dummy" inputtag="FAKE" inputmask="0x02" inputraw="1"><bounds x="9.805" y="8.75" width="0.39" height="0.39" /></bezel>
-		<bezel element="dummy" inputtag="IN.4" inputmask="0x01" inputraw="1"><bounds x="9.805" y="9.15" width="0.39" height="0.39" /></bezel>
-		<bezel element="dummy" inputtag="IN.3" inputmask="0x08" inputraw="1"><bounds x="9.805" y="9.55" width="0.39" height="0.39" /></bezel>
-		<bezel element="dummy" inputtag="IN.3" inputmask="0x07" inputraw="1"><bounds x="9.805" y="9.95" width="0.39" height="0.39" /></bezel>
+		<bezel element="text_ry"><bounds x="9.825" y="8.77" width="0.35" height="0.35" /></bezel>
+		<bezel element="text_ry"><bounds x="9.825" y="9.17" width="0.35" height="0.35" /></bezel>
+		<bezel element="text_ro"><bounds x="9.825" y="9.57" width="0.35" height="0.35" /></bezel>
+		<bezel element="text_ro"><bounds x="9.825" y="9.97" width="0.35" height="0.35" /></bezel>
+		<bezel element="nothing" inputtag="FAKE" inputmask="0x02" inputraw="1"><bounds x="9.805" y="8.75" width="0.39" height="0.39" /></bezel>
+		<bezel element="nothing" inputtag="IN.4" inputmask="0x01" inputraw="1"><bounds x="9.805" y="9.15" width="0.39" height="0.39" /></bezel>
+		<bezel element="nothing" inputtag="IN.3" inputmask="0x08" inputraw="1"><bounds x="9.805" y="9.55" width="0.39" height="0.39" /></bezel>
+		<bezel element="nothing" inputtag="IN.3" inputmask="0x07" inputraw="1"><bounds x="9.805" y="9.95" width="0.39" height="0.39" /></bezel>
 
-		<bezel element="dummy" inputtag="DUMMY" inputmask="0x01"><bounds x="10.2" y="8.7" width="1.1" height="1.8" /></bezel>
+		<bezel element="nothing" inputtag="DUMMY" inputmask="0x01"><bounds x="10.2" y="8.7" width="1.1" height="1.8" /></bezel>
 		<bezel element="switch_music" inputtag="FAKE" inputmask="0x02" inputraw="1"><bounds x="10.25" y="8.8" width="1" height="0.29" /></bezel>
 		<bezel element="switch_speed" inputtag="IN.4" inputmask="0x01" inputraw="1"><bounds x="10.25" y="9.2" width="1" height="0.29" /></bezel>
 		<bezel element="switch_skill" inputtag="IN.3" inputmask="0x08" inputraw="1"><bounds x="10.25" y="9.6" width="1" height="0.29" /></bezel>
@@ -186,14 +186,14 @@
 		<bezel element="disk_7"><bounds x="13.3694" y="10.6634" width="2.5" height="2.5" /></bezel>
 		<bezel element="disk_8"><bounds x="10.6634" y="13.3694" width="2.5" height="2.5" /></bezel>
 
-		<bezel element="dummy" inputtag="IN.0" inputmask="0x01"><bounds x="6.8366" y="13.3694" width="2.5" height="2.5" /></bezel>
-		<bezel element="dummy" inputtag="IN.0" inputmask="0x02"><bounds x="4.1306" y="10.6634" width="2.5" height="2.5" /></bezel>
-		<bezel element="dummy" inputtag="IN.0" inputmask="0x04"><bounds x="4.1306" y="6.8366" width="2.5" height="2.5" /></bezel>
-		<bezel element="dummy" inputtag="IN.0" inputmask="0x08"><bounds x="6.8366" y="4.1306" width="2.5" height="2.5" /></bezel>
-		<bezel element="dummy" inputtag="IN.1" inputmask="0x01"><bounds x="10.6634" y="4.1306" width="2.5" height="2.5" /></bezel>
-		<bezel element="dummy" inputtag="IN.1" inputmask="0x02"><bounds x="13.3694" y="6.8366" width="2.5" height="2.5" /></bezel>
-		<bezel element="dummy" inputtag="IN.1" inputmask="0x04"><bounds x="13.3694" y="10.6634" width="2.5" height="2.5" /></bezel>
-		<bezel element="dummy" inputtag="IN.1" inputmask="0x08"><bounds x="10.6634" y="13.3694" width="2.5" height="2.5" /></bezel>
+		<bezel element="nothing" inputtag="IN.0" inputmask="0x01"><bounds x="6.8366" y="13.3694" width="2.5" height="2.5" /></bezel>
+		<bezel element="nothing" inputtag="IN.0" inputmask="0x02"><bounds x="4.1306" y="10.6634" width="2.5" height="2.5" /></bezel>
+		<bezel element="nothing" inputtag="IN.0" inputmask="0x04"><bounds x="4.1306" y="6.8366" width="2.5" height="2.5" /></bezel>
+		<bezel element="nothing" inputtag="IN.0" inputmask="0x08"><bounds x="6.8366" y="4.1306" width="2.5" height="2.5" /></bezel>
+		<bezel element="nothing" inputtag="IN.1" inputmask="0x01"><bounds x="10.6634" y="4.1306" width="2.5" height="2.5" /></bezel>
+		<bezel element="nothing" inputtag="IN.1" inputmask="0x02"><bounds x="13.3694" y="6.8366" width="2.5" height="2.5" /></bezel>
+		<bezel element="nothing" inputtag="IN.1" inputmask="0x04"><bounds x="13.3694" y="10.6634" width="2.5" height="2.5" /></bezel>
+		<bezel element="nothing" inputtag="IN.1" inputmask="0x08"><bounds x="10.6634" y="13.3694" width="2.5" height="2.5" /></bezel>
 
 		<bezel name="0.0" element="mask"><bounds x="6.8366" y="13.3694" width="2.5" height="2.5" /><color alpha="0.5" /></bezel>
 		<bezel name="0.1" element="mask"><bounds x="4.1306" y="10.6634" width="2.5" height="2.5" /><color alpha="0.5" /></bezel>
