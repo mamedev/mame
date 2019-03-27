@@ -177,6 +177,79 @@ void spg110_device::blit_page(const rectangle &cliprect, uint32_t scanline, int 
 }
 
 
+void spg110_device::draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr)
+{
+	uint32_t bitmap_addr = 0;//0x40 * m_video_regs[0x22];
+	uint16_t tile = m_sprtileno[base_addr + 0];
+	uint16_t attr1 = m_sprattr1[base_addr + 0];
+	//uint16_t attr2 = m_sprattr2[base_addr + 0];
+	//uint16_t attr = m_spriteram[base_addr + 3];
+
+	int x = (attr1>>8) & 0xff;
+	int y = (attr1) & 0xff;
+
+	if (!tile)
+	{
+		return;
+	}
+
+//	if ((priority==0) && (scanline==128)) printf("%02x, drawing sprite %04x %04x %04x\n", base_addr, tile, attr1, attr2);
+
+//	if (((attr & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
+//	{
+//		return;
+//	}
+
+	const uint32_t h = 8 << 3;//((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+	const uint32_t w = 8 << 3;//((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+
+//	if (!(m_video_regs[0x42] & SPRITE_COORD_TL_MASK))
+//	{
+//		x = (160 + x) - w / 2;
+//		y = (120 - y) - (h / 2) + 8;
+//	}
+
+	x &= 0x01ff;
+	y &= 0x01ff;
+
+	uint32_t tile_line = ((scanline - y)) % h;
+	int16_t test_y = (y + tile_line) & 0x1ff;
+	if (test_y >= 0x01c0)
+		test_y -= 0x0200;
+
+	if (test_y != scanline)
+	{
+		return;
+	}
+
+	//bool blend = (attr & 0x4000);
+	bool flip_x = 0;//(attr & TILE_X_FLIP);
+	const uint8_t bpp = 4;//attr & 0x0003;
+	//const uint32_t yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
+	const uint32_t palette_offset = 0;//(attr & 0x0f00) >> 4;
+
+	if (flip_x)
+		blit<FlipXOn>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, 0, palette_offset);
+	else
+		blit<FlipXOff>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, 0, palette_offset);
+}
+
+
+
+void spg110_device::draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority)
+{
+	//if (!(m_video_regs[0x42] & SPRITE_ENABLE_MASK))
+	//{
+	//	return;
+	//}
+
+	for (uint32_t n = 0; n < 256; n++)
+	{
+		draw_sprite(cliprect, scanline, priority, n);
+	}
+}
+
+
 /* correct, 4bpp gfxs */
 static const gfx_layout charlayout =
 {
@@ -636,7 +709,7 @@ uint32_t spg110_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		{
 			blit_page(cliprect, scanline, i, page2_addr, page2_regs);
 			blit_page(cliprect, scanline, i, page1_addr, page1_regs);
-			//blit_sprites(cliprect, scanline, i);
+			draw_sprites(cliprect, scanline, i);
 		}
 	}
 
