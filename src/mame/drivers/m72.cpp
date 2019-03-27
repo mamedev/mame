@@ -1080,6 +1080,11 @@ void m72_state::poundfor_sound_portmap(address_map &map)
 	map(0x42, 0x42).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 }
 
+void m72_state::i80c31_mem_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("mcu", 0);
+}
+
 void m72_state::mcu_io_map(address_map &map)
 {
 	/* External access */
@@ -1884,10 +1889,12 @@ void m72_state::m72_8751(machine_config &config)
 void m72_state::imgfightb(machine_config &config)
 {
 	m72_8751(config);
-
-	i80c31_device &mcu(I80C31(config.replace(), m_mcu, 8000000));
+	i80c31_device &mcu(I80C31(config.replace(), m_mcu, XTAL(7'200'000)));
+	mcu.set_addrmap(AS_PROGRAM, &m72_state::i80c31_mem_map);
 	mcu.set_addrmap(AS_IO, &m72_state::mcu_io_map);
 	mcu.port_out_cb<1>().set(FUNC(m72_state::mcu_port1_w));
+
+	// TODO: uses 6116 type RAM instead of MB8421 and MB8431
 }
 
 void m72_state::rtype(machine_config &config)
@@ -2680,18 +2687,18 @@ ROM_START( imgfightj )
 	ROM_LOAD( "if-c-v1.bin",  0x10000, 0x10000, CRC(45b68bf5) SHA1(2fb28793019ca85b3b6d7c4c31eedff1d71f2d83) )
 ROM_END
 
-ROM_START( imgfightb ) // mostly identical to imgfightj content-wise, it'a 4 PCB stack bootleg with flying wires
+ROM_START( imgfightb ) // mostly identical to imgfightj content-wise, it's a 4 PCB stack bootleg with flying wires
 	ROM_REGION( 0x100000, "maincpu", 0 ) // identical, but ic111.9e
-	ROM_LOAD16_BYTE( "ic108.9b",  0x00001, 0x10000, CRC(592d2d80) SHA1(d54916a9bfe4b65a972b62202af706135e73518d) )
+	ROM_LOAD16_BYTE( "ic108.9b", 0x00001, 0x10000, CRC(592d2d80) SHA1(d54916a9bfe4b65a972b62202af706135e73518d) )
 	ROM_LOAD16_BYTE( "ic89.7b",  0x00000, 0x10000, CRC(61f89056) SHA1(3e0724dbc2b00a30193ea6cfac8b4331055d4fd4) )
-	ROM_LOAD16_BYTE( "ic111.9e",  0x40001, 0x10000, CRC(da50622e) SHA1(32c75b6270d401a6825632c66f3026cae7b5b81f) ) // slight difference: 99.998474%: 0x1116 from 0x09 to 0x0d
-	ROM_RELOAD(                      0xc0001, 0x10000 )
-	ROM_LOAD16_BYTE( "ic110.9d",  0x60001, 0x10000, CRC(0e0aefcd) SHA1(f5056a2d0612d912aff1e0eccb1182de7ae16990) )
-	ROM_RELOAD(                      0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "ic111.9e", 0x40001, 0x10000, CRC(da50622e) SHA1(32c75b6270d401a6825632c66f3026cae7b5b81f) ) // slight difference: 99.998474%: 0x1116 from 0x09 to 0x0d
+	ROM_RELOAD(                  0xc0001, 0x10000 )
+	ROM_LOAD16_BYTE( "ic110.9d", 0x60001, 0x10000, CRC(0e0aefcd) SHA1(f5056a2d0612d912aff1e0eccb1182de7ae16990) )
+	ROM_RELOAD(                  0xe0001, 0x10000 )
 	ROM_LOAD16_BYTE( "ic92.7e",  0x40000, 0x10000, CRC(38fce272) SHA1(4fe4d0838d21f3022b440a32ec69b25e936e62dd) )
-	ROM_RELOAD(                      0xc0000, 0x10000 )
+	ROM_RELOAD(                  0xc0000, 0x10000 )
 	ROM_LOAD16_BYTE( "ic91.7d",  0x60000, 0x10000, CRC(d69c0722) SHA1(ef18e7b7057f19caaa61d0b8c07d2d0c6e0a555e) )
-	ROM_RELOAD(                      0xe0000, 0x10000 )
+	ROM_RELOAD(                  0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "25.ic27.2l",  0x00000, 0x2000, CRC(d83359a2) SHA1(2d486bf4a873abfe591e0d9383f9e230f47bc42a) ) // i80c31 instead of i8751, contents identical to imgfightj MCU, with second half padded with 0xff
@@ -2699,12 +2706,12 @@ ROM_START( imgfightb ) // mostly identical to imgfightj content-wise, it'a 4 PCB
 	ROM_REGION( 0x080000, "sprites", 0 ) // half size ROMs, but identical content
 	ROM_LOAD( "ic96.7k",  0x00000, 0x10000, CRC(d4febb03) SHA1(6fe53b198bdcef1708ff134c64af9c064e274e1b) )  /* sprites */
 	ROM_LOAD( "ic97.7l",  0x10000, 0x10000, CRC(973d7bbc) SHA1(409242ddc7eb90564a15b222641e53d11ab1e04a) )
-	ROM_LOAD( "ic115.9k",  0x20000, 0x10000, CRC(2328880b) SHA1(a35c77a7d04614dbfbca4c79bb3e729115129ee4) )
-	ROM_LOAD( "ic116.9l",  0x30000, 0x10000, CRC(6da001ea) SHA1(473ed89b77809b3b76bfa9f5ca4008c9534cdbb4) )
+	ROM_LOAD( "ic115.9k", 0x20000, 0x10000, CRC(2328880b) SHA1(a35c77a7d04614dbfbca4c79bb3e729115129ee4) )
+	ROM_LOAD( "ic116.9l", 0x30000, 0x10000, CRC(6da001ea) SHA1(473ed89b77809b3b76bfa9f5ca4008c9534cdbb4) )
 	ROM_LOAD( "ic94.7h",  0x40000, 0x10000, CRC(92bc7fda) SHA1(521d4a29e06eb8790fdeeba968f99a389f50a24e) )
 	ROM_LOAD( "ic95.7j",  0x50000, 0x10000, CRC(e63a5918) SHA1(fd3374866f922cef72c0678aa751ad1e6f95a12a) )
-	ROM_LOAD( "ic113.9h",  0x60000, 0x10000, CRC(27caec8e) SHA1(cc1943ba9548715425e799f418750cd70c3f88da) )
-	ROM_LOAD( "ic114.9j",  0x70000, 0x10000, CRC(1933eb65) SHA1(4c24cfd059c11875f53b57cc020fbdbac903bd4a) )
+	ROM_LOAD( "ic113.9h", 0x60000, 0x10000, CRC(27caec8e) SHA1(cc1943ba9548715425e799f418750cd70c3f88da) )
+	ROM_LOAD( "ic114.9j", 0x70000, 0x10000, CRC(1933eb65) SHA1(4c24cfd059c11875f53b57cc020fbdbac903bd4a) )
 
 	ROM_REGION( 0x040000, "gfx2", 0 ) // identical
 	ROM_LOAD( "ic30.3d",  0x00000, 0x10000, CRC(34ee2d77) SHA1(38826e0318aa8da893fa4c93f217288c015df606) )  /* tiles #1 */
