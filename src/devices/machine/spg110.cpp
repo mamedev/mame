@@ -115,7 +115,7 @@ void spg110_device::map(address_map &map)
 
 	map(0x002042, 0x002042).rw(m_spg_video, FUNC(spg110_video_device::spg110_2042_r),FUNC(spg110_video_device::spg110_2042_w));
 
-	map(0x002045, 0x002045).w(FUNC(m_spg_video, spg110_video_device::spg110_2045_w));
+	map(0x002045, 0x002045).w(m_spg_video, FUNC(spg110_video_device::spg110_2045_w));
 #endif
 
 	// seems to be 16 entries for.. something? on jak_capb these seem connected to the palette DMA operations, 0x2050 for 0x8000, 0x2051 for 0x8020, 0x2052 for 0x8040 etc. maybe 1 bit per pen?
