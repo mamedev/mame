@@ -16,7 +16,6 @@
  * Namcot 340 [mapper 210]
 
  TODO:
- - add sound feature of Namcot-163
  - Quinty is not working (same issue of Mendel Palace on TxROM boards, of course)
 
  ***********************************************************************************************************/
@@ -552,13 +551,11 @@ void nes_namcot175_device::write_h(offs_t offset, uint8_t data)
 
  Compared to Namcot-175 here we have mapper controlled
  mirroring, NTRAM mapping to VRAM and additional
- sound hw inside the chip (currently unemulated) and
- some internal RAM.
+ sound hw inside the chip and some internal RAM.
 
  iNES: mapper 19
 
- In MESS: Supported (with no emulation of the
- sound component)
+ In MESS: Supported
 
  -------------------------------------------------*/
 

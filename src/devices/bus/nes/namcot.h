@@ -165,7 +165,6 @@ private:
 
 	uint8_t m_wram_protect, m_latch, m_chr_bank;
 	required_device<namco_163_sound_device> m_namco163snd;
-	// TODO: add emulation of the sound part of the chip
 };
 
 

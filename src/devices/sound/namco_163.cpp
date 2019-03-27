@@ -19,7 +19,6 @@ namco_163_sound_device::namco_163_sound_device(const machine_config &mconfig, co
 	, device_sound_interface(mconfig, *this)
 	, m_ram(nullptr)
 	, m_output(0)
-	, m_output_buffer(0)
 	, m_reg_addr(0x78)
 	, m_addr(0)
 	, m_inc(false)
@@ -40,7 +39,6 @@ void namco_163_sound_device::device_start()
 
 	save_pointer(NAME(m_ram), 0x80);
 	save_item(NAME(m_output));
-	save_item(NAME(m_output_buffer));
 	save_item(NAME(m_reg_addr));
 	save_item(NAME(m_addr));
 	save_item(NAME(m_inc));
@@ -154,6 +152,7 @@ void namco_163_sound_device::sound_stream_update(sound_stream &stream, stream_sa
 	if (m_disable)
 		return;
 
+	// NOT mixed in real hardware
 	for (int s = 0; s < samples; s++)
 	{
 		u32 phase = (m_ram[m_reg_addr + 5] << 16) | (m_ram[m_reg_addr + 3] << 8) | m_ram[m_reg_addr + 1];
@@ -163,8 +162,7 @@ void namco_163_sound_device::sound_stream_update(sound_stream &stream, stream_sa
 		const u8 vol = m_ram[m_reg_addr + 7] & 0xf;
 
 		phase = (phase + freq) % (length << 16);
-		s8 l = get_sample(((phase >> 16) + offset) & 0xff) * vol;
-		m_output_buffer += l;
+		m_output = get_sample(((phase >> 16) + offset) & 0xff) * vol;
 
 		m_ram[m_reg_addr + 1] = phase & 0xff;
 		m_ram[m_reg_addr + 3] = phase >> 8;
@@ -173,10 +171,8 @@ void namco_163_sound_device::sound_stream_update(sound_stream &stream, stream_sa
 		m_reg_addr += 8;
 		if (m_reg_addr >= 0x80)
 		{
-			m_output = m_output_buffer;
 			m_reg_addr = 0x78 - ((m_ram[0x7f] & 0x70) >> 1);
-			m_output_buffer = 0;
 		}
-		outputs[0][s] = (m_output << 8) / (1 + ((m_ram[0x7f] & 0x70) >> 4));
+		outputs[0][s] = (m_output << 8);
 	}
 }
