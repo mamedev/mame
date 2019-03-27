@@ -261,12 +261,13 @@ DEFINE_DEVICE_TYPE(ISA8_CGA, isa8_cga_device, "cga", "IBM Color/Graphics Monitor
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa8_cga_device::device_add_mconfig)
-	MCFG_SCREEN_ADD(CGA_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181),912,0,640,262,0,200)
-	MCFG_SCREEN_UPDATE_DEVICE( DEVICE_SELF, isa8_cga_device, screen_update )
+void isa8_cga_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, CGA_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(14'318'181), 912, 0, 640, 262, 0, 200);
+	screen.set_screen_update(FUNC(isa8_cga_device::screen_update));
 
-	MCFG_PALETTE_ADD("palette", /* CGA_PALETTE_SETS * 16*/ 65536 )
+	PALETTE(config, m_palette).set_entries(/* CGA_PALETTE_SETS * 16*/ 65536);
 
 	MC6845(config, m_crtc, XTAL(14'318'181)/16);
 	m_crtc->set_screen(nullptr);
@@ -276,7 +277,7 @@ MACHINE_CONFIG_START(isa8_cga_device::device_add_mconfig)
 	m_crtc->out_hsync_callback().set(FUNC(isa8_cga_device::hsync_changed));
 	m_crtc->out_vsync_callback().set(FUNC(isa8_cga_device::vsync_changed));
 	m_crtc->set_reconfigure_callback(FUNC(isa8_cga_device::reconfigure), this);
-MACHINE_CONFIG_END
+}
 
 ioport_constructor isa8_cga_device::device_input_ports() const
 {
@@ -912,7 +913,7 @@ READ8_MEMBER( isa8_cga_device::io_read )
 			/* return last written mc6845 address value here? */
 			break;
 		case 1: case 3: case 5: case 7:
-			data = m_crtc->register_r( space, offset );
+			data = m_crtc->register_r();
 			break;
 		case 10:
 			data = m_vsync | ( ( data & 0x40 ) >> 4 ) | m_hsync;
@@ -927,10 +928,10 @@ WRITE8_MEMBER( isa8_cga_device::io_write )
 {
 	switch(offset) {
 	case 0: case 2: case 4: case 6:
-		m_crtc->address_w( space, offset, data );
+		m_crtc->address_w(data);
 		break;
 	case 1: case 3: case 5: case 7:
-		m_crtc->register_w( space, offset, data );
+		m_crtc->register_w(data);
 		break;
 	case 8:
 		mode_control_w(data);
@@ -1169,14 +1170,14 @@ WRITE8_MEMBER( isa8_cga_pc1512_device::io_write )
 	{
 	case 0: case 2: case 4: case 6:
 		data &= 0x1F;
-		m_crtc->address_w( space, offset, data );
+		m_crtc->address_w(data);
 		m_mc6845_address = data;
 		break;
 
 	case 1: case 3: case 5: case 7:
 		if ( ! m_mc6845_locked_register[m_mc6845_address] )
 		{
-			m_crtc->register_w( space, offset, data );
+			m_crtc->register_w(data);
 			if ( isa8_cga_pc1512_device::mc6845_writeonce_register[m_mc6845_address] )
 			{
 				m_mc6845_locked_register[m_mc6845_address] = 1;
@@ -1693,13 +1694,13 @@ const tiny_rom_entry *isa8_cga_mc1502_device::device_rom_region() const
 
 DEFINE_DEVICE_TYPE(ISA8_CGA_M24, isa8_cga_m24_device, "cga_m24", "Olivetti M24 CGA")
 
-MACHINE_CONFIG_START(isa8_cga_m24_device::device_add_mconfig)
+void isa8_cga_m24_device::device_add_mconfig(machine_config &config)
+{
 	isa8_cga_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY(CGA_SCREEN_NAME)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181),912,0,640,462,0,400)
+	subdevice<screen_device>(CGA_SCREEN_NAME)->set_raw(XTAL(14'318'181), 912, 0, 640, 462, 0, 400);
 	m_crtc->set_reconfigure_callback(FUNC(isa8_cga_m24_device::reconfigure), this);
-MACHINE_CONFIG_END
+}
 
 isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	isa8_cga_m24_device(mconfig, ISA8_CGA_M24, tag, owner, clock)
@@ -1746,7 +1747,7 @@ WRITE8_MEMBER( isa8_cga_m24_device::io_write )
 	{
 		case 0: case 2: case 4: case 6:
 			m_index = data;
-			m_crtc->address_w( space, offset, data );
+			m_crtc->address_w(data);
 			break;
 		case 1: case 3: case 5: case 7:
 			switch(m_index & 0x1f) // TODO: this is handled by a pal and prom
@@ -1765,7 +1766,7 @@ WRITE8_MEMBER( isa8_cga_m24_device::io_write )
 					data <<= 1;
 					break;
 			}
-			m_crtc->register_w( space, offset, data );
+			m_crtc->register_w(data);
 			break;
 		case 0x0e:
 			m_mode2 = data;
@@ -1886,12 +1887,12 @@ MC6845_UPDATE_ROW( isa8_cga_m24_device::m24_gfx_1bpp_m24_update_row )
 
 DEFINE_DEVICE_TYPE(ISA8_CGA_CPORTIII, isa8_cga_cportiii_device, "cga_cportiii", "Compaq Portable III CGA")
 
-MACHINE_CONFIG_START(isa8_cga_cportiii_device::device_add_mconfig)
+void isa8_cga_cportiii_device::device_add_mconfig(machine_config &config)
+{
 	isa8_cga_m24_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY(CGA_SCREEN_NAME)
-	MCFG_SCREEN_COLOR(rgb_t(255, 125, 0))
-MACHINE_CONFIG_END
+	subdevice<screen_device>(CGA_SCREEN_NAME)->set_color(rgb_t(255, 125, 0));
+}
 
 isa8_cga_cportiii_device::isa8_cga_cportiii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	isa8_cga_m24_device(mconfig, ISA8_CGA_CPORTIII, tag, owner, clock)

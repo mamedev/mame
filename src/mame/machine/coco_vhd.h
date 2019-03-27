@@ -24,6 +24,12 @@ class coco_vhd_image_device :   public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	coco_vhd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: coco_vhd_image_device(mconfig, tag, owner, clock)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu_tag));
+	}
 	coco_vhd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~coco_vhd_image_device();
 
@@ -52,11 +58,11 @@ protected:
 	void coco_vhd_readwrite(uint8_t data);
 
 private:
-	cpu_device *            m_cpu;
-	address_space *         m_cpu_space;
-	uint32_t                  m_logical_record_number;
-	uint32_t                  m_buffer_address;
-	uint8_t                   m_status;
+	required_device<cpu_device> m_cpu;
+	address_space *             m_cpu_space;
+	uint32_t                    m_logical_record_number;
+	uint32_t                    m_buffer_address;
+	uint8_t                     m_status;
 };
 
 // device type definition

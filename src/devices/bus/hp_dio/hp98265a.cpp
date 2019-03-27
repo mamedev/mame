@@ -168,12 +168,12 @@ void dio16_98265a_device::device_reset()
 	code &= REG_SW1_SELECT_CODE_MASK;
 
 	if (!m_installed_io) {
-		program_space()->install_readwrite_handler(
+		program_space().install_readwrite_handler(
 				0x600000 + (code * 0x10000),
 				0x6007ff + (code * 0x10000),
 				read16_delegate(FUNC(dio16_98265a_device::io_r), this),
 				write16_delegate(FUNC(dio16_98265a_device::io_w), this));
-		program_space()->install_device(0x6e0020, 0x6e003f, *m_spc, &mb87030_device::map, 0x00ff00ff);
+		program_space().install_device(0x6e0020, 0x6e003f, *m_spc, &mb87030_device::map, 0x00ff00ff);
 		m_installed_io = true;
 	}
 	m_control = 0;

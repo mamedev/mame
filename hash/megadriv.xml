@@ -3966,7 +3966,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="pcb" value="PWB SC40x1 REV B"/>
 			<feature name="u1" value="JAMES POND U1 JAM03"/>    <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="james pond u1 jam03.u1" size="524288" crc="d0e7b466" sha1="b4e1c945c3ccea2e76b296d6694c0931a1ec1310" offset="0x000000" loadflag="load16_word_swap"/>
+				<rom name="james pond u1 jam03.u1" size="524288" crc="d0e7b466" sha1="b4e1c945c3ccea2e76b296d6694c0931a1ec1310" offset="0x000000" />
 			</dataarea>
 		</part>
 <!-- LABEL(S)

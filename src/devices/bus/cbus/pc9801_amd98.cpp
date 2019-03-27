@@ -149,9 +149,9 @@ READ8_MEMBER(pc9801_amd98_device::read)
 	switch(offset)
 	{
 		case 2:
-			return m_ay1->data_r(space,0);
+			return m_ay1->data_r();
 		case 3:
-			return m_ay2->data_r(space,0);
+			return m_ay2->data_r();
 	}
 
 	printf("%02x\n",offset);
@@ -164,16 +164,16 @@ WRITE8_MEMBER(pc9801_amd98_device::write)
 	switch(offset)
 	{
 		case 0:
-			m_ay1->address_w(space,0,data);
+			m_ay1->address_w(data);
 			break;
 		case 1:
-			m_ay2->address_w(space,0,data);
+			m_ay2->address_w(data);
 			break;
 		case 2:
-			m_ay1->data_w(space,0,data);
+			m_ay1->data_w(data);
 			break;
 		case 3:
-			m_ay2->data_w(space,0,data);
+			m_ay2->data_w(data);
 			break;
 		default:
 			printf("%02x %02x\n",offset,data);
@@ -192,11 +192,11 @@ WRITE8_MEMBER(pc9801_amd98_device::ay3_data_latch_w)
 	{
 		case 0x47:
 			//printf("%02x addr\n",m_ay3_latch);
-			m_ay3->address_w(space,0,m_ay3_latch);
+			m_ay3->address_w(m_ay3_latch);
 			break;
 		case 0x43:
 			//printf("%02x data\n",m_ay3_latch);
-			m_ay3->data_w(space,0,m_ay3_latch);
+			m_ay3->data_w(m_ay3_latch);
 			break;
 	}
 }

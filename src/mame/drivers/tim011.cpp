@@ -132,36 +132,37 @@ static const floppy_format_type tim011_floppy_formats[] = {
 	nullptr
 };
 
-MACHINE_CONFIG_START(tim011_state::tim011)
+void tim011_state::tim011(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z180, XTAL(12'288'000) / 2) // location U17 HD64180
-	MCFG_DEVICE_PROGRAM_MAP(tim011_mem)
-	MCFG_DEVICE_IO_MAP(tim011_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tim011_state, irq0_line_hold)
+	Z180(config, m_maincpu, XTAL(12'288'000) / 2); // location U17 HD64180
+	m_maincpu->set_addrmap(AS_PROGRAM, &tim011_state::tim011_mem);
+	m_maincpu->set_addrmap(AS_IO, &tim011_state::tim011_io);
+	m_maincpu->set_vblank_int("screen", FUNC(tim011_state::irq0_line_hold));
 
-//  MCFG_DEVICE_ADD("keyboard",CDP1802, XTAL(1'750'000)) // CDP1802, unknown clock
+//  CDP1802(config, "keyboard", XTAL(1'750'000)); // CDP1802, unknown clock
 
 	// FDC9266 location U43
 	UPD765A(config, m_fdc, XTAL(8'000'000), true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 
 	/* floppy drives */
-	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":0", tim011_floppies, "35dd", tim011_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":1", tim011_floppies, "35dd", tim011_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":2", tim011_floppies, "35dd", tim011_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":3", tim011_floppies, "35dd", tim011_floppy_formats)
+	FLOPPY_CONNECTOR(config, FDC9266_TAG ":0", tim011_floppies, "35dd", tim011_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9266_TAG ":1", tim011_floppies, "35dd", tim011_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9266_TAG ":2", tim011_floppies, "35dd", tim011_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9266_TAG ":3", tim011_floppies, "35dd", tim011_floppy_formats);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tim011_state, screen_update_tim011)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(tim011_state::screen_update_tim011));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( tim011 )

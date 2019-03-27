@@ -41,6 +41,7 @@ public:
 	limenko_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_qs1000(*this, "qs1000")
 		, m_oki(*this, "oki")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
@@ -71,6 +72,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	optional_device<qs1000_device> m_qs1000;
 	optional_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -273,7 +275,7 @@ READ8_MEMBER(limenko_state::spotty_sound_r)
 	if(m_spotty_sound_cmd == 0xf7)
 		return m_soundlatch->read(space,0);
 	else
-		return m_oki->read(space,0);
+		return m_oki->read();
 }
 
 /*****************************************************************************************************
@@ -732,17 +734,17 @@ void limenko_state::limenko(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set("qs1000", FUNC(qs1000_device::set_irq));
+	m_soundlatch->data_pending_callback().set(m_qs1000, FUNC(qs1000_device::set_irq));
 	m_soundlatch->set_separate_acknowledge(true);
 
-	qs1000_device &qs1000(QS1000(config, "qs1000", XTAL(24'000'000)));
-	qs1000.set_external_rom(true);
-	qs1000.p1_in().set("soundlatch", FUNC(generic_latch_8_device::read));
-	qs1000.p1_out().set(FUNC(limenko_state::qs1000_p1_w));
-	qs1000.p2_out().set(FUNC(limenko_state::qs1000_p2_w));
-	qs1000.p3_out().set(FUNC(limenko_state::qs1000_p3_w));
-	qs1000.add_route(0, "lspeaker", 1.0);
-	qs1000.add_route(1, "rspeaker", 1.0);
+	QS1000(config, m_qs1000, XTAL(24'000'000));
+	m_qs1000->set_external_rom(true);
+	m_qs1000->p1_in().set("soundlatch", FUNC(generic_latch_8_device::read));
+	m_qs1000->p1_out().set(FUNC(limenko_state::qs1000_p1_w));
+	m_qs1000->p2_out().set(FUNC(limenko_state::qs1000_p2_w));
+	m_qs1000->p3_out().set(FUNC(limenko_state::qs1000_p3_w));
+	m_qs1000->add_route(0, "lspeaker", 1.0);
+	m_qs1000->add_route(1, "rspeaker", 1.0);
 }
 
 void limenko_state::spotty(machine_config &config)
@@ -1092,7 +1094,7 @@ READ32_MEMBER(limenko_state::spotty_speedup_r)
 void limenko_state::init_common()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
-	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
+	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
 	membank("qs1000:bank")->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
 
 	m_spriteram_bit = 1;

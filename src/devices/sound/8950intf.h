@@ -20,13 +20,13 @@ public:
 	auto io_read() { return m_io_read_handler.bind(); }
 	auto io_write() { return m_io_write_handler.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER( status_port_r );
-	DECLARE_READ8_MEMBER( read_port_r );
-	DECLARE_WRITE8_MEMBER( control_port_w );
-	DECLARE_WRITE8_MEMBER( write_port_w );
+	u8 status_port_r();
+	u8 read_port_r();
+	void control_port_w(u8 data);
+	void write_port_w(u8 data);
 
 protected:
 	// device-level overrides

@@ -25,19 +25,6 @@
 #include "sound/samples.h"
 #include "softlist_dev.h"
 
-#define MCFG_FLOPPY_DRIVE_ADD(_tag, _slot_intf, _def_slot, _formats)  \
-	MCFG_DEVICE_ADD(_tag, FLOPPY_CONNECTOR, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<floppy_connector *>(device)->set_formats(_formats);
-
-#define MCFG_FLOPPY_DRIVE_ADD_FIXED(_tag, _slot_intf, _def_slot, _formats)  \
-	MCFG_DEVICE_ADD(_tag, FLOPPY_CONNECTOR, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, true) \
-	static_cast<floppy_connector *>(device)->set_formats(_formats);
-
-#define MCFG_FLOPPY_DRIVE_SOUND(_doit) \
-	static_cast<floppy_connector *>(device)->enable_sound(_doit);
-
 #define DECLARE_FLOPPY_FORMATS(_name) \
 	static const floppy_format_type _name []
 

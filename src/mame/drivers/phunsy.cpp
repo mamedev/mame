@@ -373,8 +373,8 @@ void phunsy_state::phunsy(machine_config &config)
 	CASSETTE(config, m_cass);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(phunsy_state, phunsy), this), "bin", 2);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(phunsy_state, phunsy), this), "bin", attotime::from_seconds(2));
 }
 
 

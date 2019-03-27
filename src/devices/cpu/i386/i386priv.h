@@ -386,7 +386,7 @@ uint8_t i386_device::FETCH()
 	if(!translate_address(m_CPL,TRANSLATE_FETCH,&address,&error))
 		PF_THROW(error);
 
-	value = m_pr8(address & m_a20_mask);
+	value = mem_pr8(address & m_a20_mask);
 #ifdef DEBUG_MISSING_OPCODE
 	m_opcode_bytes[m_opcode_bytes_length] = value;
 	m_opcode_bytes_length = (m_opcode_bytes_length + 1) & 15;
@@ -407,7 +407,7 @@ uint16_t i386_device::FETCH16()
 		if(!translate_address(m_CPL,TRANSLATE_FETCH,&address,&error))
 			PF_THROW(error);
 		address &= m_a20_mask;
-		value = m_pr16(address);
+		value = mem_pr16(address);
 		m_eip += 2;
 		m_pc += 2;
 	}
@@ -428,7 +428,7 @@ uint32_t i386_device::FETCH32()
 			PF_THROW(error);
 
 		address &= m_a20_mask;
-		value = m_pr32(address);
+		value = mem_pr32(address);
 		m_eip += 4;
 		m_pc += 4;
 	}
@@ -443,7 +443,7 @@ uint8_t i386_device::READ8(uint32_t ea)
 		PF_THROW(error);
 
 	address &= m_a20_mask;
-	return m_program->read_byte(address);
+	return mem_prd8(address);
 }
 uint16_t i386_device::READ16(uint32_t ea)
 {
@@ -458,7 +458,7 @@ uint16_t i386_device::READ16(uint32_t ea)
 			PF_THROW(error);
 
 		address &= m_a20_mask;
-		value = m_program->read_word( address );
+		value = mem_prd16( address );
 	}
 	return value;
 }
@@ -477,7 +477,7 @@ uint32_t i386_device::READ32(uint32_t ea)
 			PF_THROW(error);
 
 		address &= m_a20_mask;
-		value = m_program->read_dword( address );
+		value = mem_prd32( address );
 	}
 	return value;
 }
@@ -501,8 +501,8 @@ uint64_t i386_device::READ64(uint32_t ea)
 			PF_THROW(error);
 
 		address &= m_a20_mask;
-		value = (((uint64_t) m_program->read_dword( address+0 )) << 0);
-		value |= (((uint64_t) m_program->read_dword( address+4 )) << 32);
+		value = (((uint64_t) mem_prd32( address+0 )) << 0);
+		value |= (((uint64_t) mem_prd32( address+4 )) << 32);
 	}
 	return value;
 }
@@ -514,7 +514,7 @@ uint8_t i386_device::READ8PL0(uint32_t ea)
 		PF_THROW(error);
 
 	address &= m_a20_mask;
-	return m_program->read_byte(address);
+	return mem_prd8(address);
 }
 uint16_t i386_device::READ16PL0(uint32_t ea)
 {
@@ -529,7 +529,7 @@ uint16_t i386_device::READ16PL0(uint32_t ea)
 			PF_THROW(error);
 
 		address &= m_a20_mask;
-		value = m_program->read_word( address );
+		value = mem_prd16( address );
 	}
 	return value;
 }
@@ -549,7 +549,7 @@ uint32_t i386_device::READ32PL0(uint32_t ea)
 			PF_THROW(error);
 
 		address &= m_a20_mask;
-		value = m_program->read_dword( address );
+		value = mem_prd32( address );
 	}
 	return value;
 }
@@ -569,7 +569,7 @@ void i386_device::WRITE8(uint32_t ea, uint8_t value)
 		PF_THROW(error);
 
 	address &= m_a20_mask;
-	m_program->write_byte(address, value);
+	mem_pwd8(address, value);
 }
 void i386_device::WRITE16(uint32_t ea, uint16_t value)
 {
@@ -583,7 +583,7 @@ void i386_device::WRITE16(uint32_t ea, uint16_t value)
 			PF_THROW(error);
 
 		address &= m_a20_mask;
-		m_program->write_word(address, value);
+		mem_pwd16(address, value);
 	}
 }
 void i386_device::WRITE32(uint32_t ea, uint32_t value)
@@ -600,7 +600,7 @@ void i386_device::WRITE32(uint32_t ea, uint32_t value)
 			PF_THROW(error);
 
 		ea &= m_a20_mask;
-		m_program->write_dword(address, value);
+		mem_pwd32(address, value);
 	}
 }
 
@@ -622,8 +622,8 @@ void i386_device::WRITE64(uint32_t ea, uint64_t value)
 			PF_THROW(error);
 
 		ea &= m_a20_mask;
-		m_program->write_dword(address+0, value & 0xffffffff);
-		m_program->write_dword(address+4, (value >> 32) & 0xffffffff);
+		mem_pwd32(address+0, value & 0xffffffff);
+		mem_pwd32(address+4, (value >> 32) & 0xffffffff);
 	}
 }
 

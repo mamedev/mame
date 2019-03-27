@@ -47,11 +47,8 @@ public:
 	// runtime configuration
 	void set_pin7(int pin7);
 
-	uint8_t read_status();
-	void write_command(uint8_t command);
-
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read();
+	void write(uint8_t command);
 
 protected:
 	// device-level overrides

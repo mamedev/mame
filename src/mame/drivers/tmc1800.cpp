@@ -735,9 +735,9 @@ MACHINE_CONFIG_START(tmc1800_state::tmc1800)
 	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("2K").set_extra_options("4K");
@@ -763,9 +763,9 @@ MACHINE_CONFIG_START(osc1000b_state::osc1000b)
 	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("2K").set_extra_options("4K");
@@ -787,9 +787,9 @@ MACHINE_CONFIG_START(tmc2000_state::tmc2000)
 	tmc2000_video(config);
 
 	// devices
-	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("16K,32K");
@@ -811,9 +811,9 @@ MACHINE_CONFIG_START(nano_state::nano)
 	nano_video(config);
 
 	// devices
-	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("4K");

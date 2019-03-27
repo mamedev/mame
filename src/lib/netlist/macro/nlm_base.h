@@ -10,7 +10,7 @@
 
 #ifndef __PLIB_PREPROCESSOR__
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 /* ----------------------------------------------------------------------------
  *  Netlist Macros

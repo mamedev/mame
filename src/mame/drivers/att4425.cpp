@@ -237,7 +237,8 @@ static const z80_daisy_config att4425_daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(att4425_state::att4425)
+void att4425_state::att4425(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(32'000'000)/8); // XXX
 	m_maincpu->set_addrmap(AS_PROGRAM, &att4425_state::att4425_mem);
@@ -245,14 +246,14 @@ MACHINE_CONFIG_START(att4425_state::att4425)
 	m_maincpu->set_daisy_config(att4425_daisy_chain);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(att4425_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_SIZE(720, 351)
-	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 351-1)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_att4425)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_screen_update(FUNC(att4425_state::screen_update));
+	m_screen->set_palette("palette");
+	m_screen->set_size(720, 351);
+	m_screen->set_visarea(0, 720-1, 0, 351-1);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_att4425);
 	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 
 	// ch.3 -- timer?
@@ -282,8 +283,8 @@ MACHINE_CONFIG_START(att4425_state::att4425)
 	rs232b.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
 
 	// XXX
-	MCFG_DEVICE_ADD("line_clock", CLOCK, 9600*64)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, att4425_state, write_line_clock))
+	clock_device &line_clock(CLOCK(config, "line_clock", 9600*64));
+	line_clock.signal_handler().set(FUNC(att4425_state::write_line_clock));
 
 	I8251(config, m_i8251, 0);
 	m_i8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -296,11 +297,11 @@ MACHINE_CONFIG_START(att4425_state::att4425)
 	rs232.dsr_handler().set(m_i8251, FUNC(i8251_device::write_dsr));
 
 	// XXX
-	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800*64)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, att4425_state, write_keyboard_clock))
+	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4800*64));
+	keyboard_clock.signal_handler().set(FUNC(att4425_state::write_keyboard_clock));
 
 	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0);
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

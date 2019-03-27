@@ -59,7 +59,7 @@ void upd7002_device::device_reset()
 *****************************************************************************/
 
 
-READ8_MEMBER( upd7002_device::eoc_r )
+READ_LINE_MEMBER( upd7002_device::eoc_r )
 {
 	return (m_status>>7)&0x01;
 }
@@ -94,7 +94,7 @@ void upd7002_device::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-READ8_MEMBER( upd7002_device::read )
+uint8_t upd7002_device::read(offs_t offset)
 {
 	switch(offset&0x03)
 	{
@@ -112,7 +112,7 @@ READ8_MEMBER( upd7002_device::read )
 
 
 
-WRITE8_MEMBER( upd7002_device::write )
+void upd7002_device::write(offs_t offset, uint8_t data)
 {
 	/* logerror("write to uPD7002 $%02X = $%02X\n",offset,data); */
 

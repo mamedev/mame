@@ -43,7 +43,6 @@ taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag,
 void taito_en_device::device_start()
 {
 	// tell the pump about the ESP chips
-	m_pump->set_esp(m_esp);
 	uint8_t *ROM = m_osrom->base();
 	uint32_t max = (m_osrom->bytes() - 0x100000) / 0x20000;
 	for (int i = 0; i < 3; i++)
@@ -136,6 +135,18 @@ WRITE8_MEMBER(taito_en_device::mb87078_gain_changed)
 
 /*************************************
  *
+ *  ES5510 callback
+ *
+ *************************************/
+
+void taito_en_device::es5505_clock_changed(u32 data)
+{
+	m_pump->set_unscaled_clock(data);
+}
+
+
+/*************************************
+ *
  *  M68681 callback
  *
  *************************************/
@@ -213,10 +224,12 @@ void taito_en_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	ESQ_5505_5510_PUMP(config, m_pump, XTAL(30'476'100) / (2 * 16 * 32));
+	m_pump->set_esp(m_esp);
 	m_pump->add_route(0, "lspeaker", 1.0);
 	m_pump->add_route(1, "rspeaker", 1.0);
 
 	ES5505(config, m_ensoniq, XTAL(30'476'100) / 2);
+	m_ensoniq->sample_rate_changed().set(FUNC(taito_en_device::es5505_clock_changed));
 	m_ensoniq->set_region0("ensoniq.0");
 	m_ensoniq->set_region1("ensoniq.0");
 	m_ensoniq->set_channels(4);

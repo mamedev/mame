@@ -340,22 +340,21 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(beaminv_state::beaminv)
-
+void beaminv_state::beaminv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 2000000)   /* 2 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
+	Z80(config, m_maincpu, 2000000);   /* 2 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &beaminv_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &beaminv_state::main_io_map);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 247, 16, 231)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(beaminv_state, screen_update_beaminv)
-
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 247, 16, 231);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_screen_update(FUNC(beaminv_state::screen_update_beaminv));
+}
 
 
 

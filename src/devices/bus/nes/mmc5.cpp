@@ -287,7 +287,7 @@ inline bool nes_exrom_device::in_split()
 	return false;
 }
 
-READ8_MEMBER(nes_exrom_device::nt_r)
+uint8_t nes_exrom_device::nt_r(offs_t offset)
 {
 	int page = ((offset & 0xc00) >> 10);
 
@@ -339,7 +339,7 @@ READ8_MEMBER(nes_exrom_device::nt_r)
 	}
 }
 
-WRITE8_MEMBER(nes_exrom_device::nt_w)
+void nes_exrom_device::nt_w(offs_t offset, uint8_t data)
 {
 	int page = ((offset & 0xc00) >> 10);
 
@@ -397,7 +397,7 @@ inline uint8_t nes_exrom_device::bg_ex1_chr_r(uint32_t offset)
 	return m_vrom[helper & (m_vrom_size - 1)];
 }
 
-READ8_MEMBER(nes_exrom_device::chr_r)
+uint8_t nes_exrom_device::chr_r(offs_t offset)
 {
 	int bank = offset >> 10;
 
@@ -425,7 +425,7 @@ READ8_MEMBER(nes_exrom_device::chr_r)
 }
 
 
-READ8_MEMBER(nes_exrom_device::read_l)
+uint8_t nes_exrom_device::read_l(offs_t offset)
 {
 	int value;
 	LOG_MMC(("exrom read_l, offset: %04x\n", offset));
@@ -437,7 +437,7 @@ READ8_MEMBER(nes_exrom_device::read_l)
 		if (BIT(m_exram_control, 1))    // Modes 2,3 = read
 			return m_exram[offset - 0x1c00];
 		else
-			return m_open_bus;   // Modes 0,1 = open bus
+			return get_open_bus();   // Modes 0,1 = open bus
 	}
 
 	switch (offset)
@@ -455,12 +455,12 @@ READ8_MEMBER(nes_exrom_device::read_l)
 
 		default:
 			logerror("MMC5 uncaught read, offset: %04x\n", offset + 0x4100);
-			return m_open_bus;
+			return get_open_bus();
 	}
 }
 
 
-WRITE8_MEMBER(nes_exrom_device::write_l)
+void nes_exrom_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("exrom write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -618,7 +618,7 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 // bit3 select the chip (2 of them can be accessed, each up to 32KB)
 // bit1 & bit2 select the 8KB banks inside the chip
 // same mechanism is used also when "WRAM" is mapped in higher banks
-READ8_MEMBER(nes_exrom_device::read_m)
+uint8_t nes_exrom_device::read_m(offs_t offset)
 {
 	LOG_MMC(("exrom read_m, offset: %04x\n", offset));
 	if (!m_battery.empty() && !m_prgram.empty())  // 2 chips present: first is BWRAM, second is WRAM
@@ -633,10 +633,10 @@ READ8_MEMBER(nes_exrom_device::read_m)
 	else if (!m_battery.empty()) // 1 chip, BWRAM
 		return m_battery[(offset + (m_wram_base & 0x03) * 0x2000) & (m_battery.size() - 1)];
 	else
-		return m_open_bus;
+		return get_open_bus();
 }
 
-WRITE8_MEMBER(nes_exrom_device::write_m)
+void nes_exrom_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("exrom write_m, offset: %04x, data: %02x\n", offset, data));
 	if (m_wram_protect_1 != 0x02 || m_wram_protect_2 != 0x01)
@@ -649,7 +649,7 @@ WRITE8_MEMBER(nes_exrom_device::write_m)
 }
 
 // some games (e.g. Bandit Kings of Ancient China) write to PRG-RAM through 0x8000-0xdfff
-READ8_MEMBER(nes_exrom_device::read_h)
+uint8_t nes_exrom_device::read_h(offs_t offset)
 {
 	LOG_MMC(("exrom read_h, offset: %04x\n", offset));
 	int bank = offset / 0x2000;
@@ -665,7 +665,7 @@ READ8_MEMBER(nes_exrom_device::read_h)
 	return hi_access_rom(offset);
 }
 
-WRITE8_MEMBER(nes_exrom_device::write_h)
+void nes_exrom_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("exrom write_h, offset: %04x, data: %02x\n", offset, data));
 	int bank = offset / 0x2000;

@@ -71,10 +71,11 @@ WRITE8_MEMBER(cedar_magnet_plane_device::plane_portcf_w)
 	m_cf_data = data;
 }
 
-MACHINE_CONFIG_START(cedar_magnet_plane_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("planecpu", Z80,4000000)
-	MCFG_DEVICE_PROGRAM_MAP(cedar_magnet_plane_map)
-	MCFG_DEVICE_IO_MAP(cedar_magnet_plane_io)
+void cedar_magnet_plane_device::device_add_mconfig(machine_config &config)
+{
+	z80_device &planecpu(Z80(config, "planecpu", 4000000));
+	planecpu.set_addrmap(AS_PROGRAM, &cedar_magnet_plane_device::cedar_magnet_plane_map);
+	planecpu.set_addrmap(AS_IO, &cedar_magnet_plane_device::cedar_magnet_plane_io);
 
 	z80pio_device& pio0(Z80PIO(config, "z80pio0", 4000000/2));
 //  pio0.out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
@@ -89,7 +90,7 @@ MACHINE_CONFIG_START(cedar_magnet_plane_device::device_add_mconfig)
 	pio1.out_pa_callback().set(FUNC(cedar_magnet_plane_device::pio1_pa_w));
 //  pio1.in_pb_callback().set(FUNC(cedar_magnet_plane_device::pio1_pb_r));
 	pio1.out_pb_callback().set(FUNC(cedar_magnet_plane_device::pio1_pb_w));
-MACHINE_CONFIG_END
+}
 
 
 READ8_MEMBER(cedar_magnet_plane_device::pio0_pa_r)

@@ -33,8 +33,8 @@ protected:
 	virtual void device_start() override;
 
 	// device_videobrain_expansion_card_interface overrides
-	virtual uint8_t videobrain_bo_r(address_space &space, offs_t offset, int cs1, int cs2) override;
-	virtual void videobrain_bo_w(address_space &space, offs_t offset, uint8_t data, int cs1, int cs2) override;
+	virtual uint8_t videobrain_bo_r(offs_t offset, int cs1, int cs2) override;
+	virtual void videobrain_bo_w(offs_t offset, uint8_t data, int cs1, int cs2) override;
 };
 
 

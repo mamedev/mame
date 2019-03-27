@@ -188,25 +188,25 @@ void a2232_device::autoconfig_base_address(offs_t address)
 		logerror("-> installing a2232\n");
 
 	// stop responding to default autoconfig
-	m_slot->m_space->unmap_readwrite(0xe80000, 0xe8007f);
+	m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
 
-	m_slot->m_space->install_readwrite_handler(address, address + 0x3fff,
+	m_slot->space().install_readwrite_handler(address, address + 0x3fff,
 		read16_delegate(FUNC(a2232_device::shared_ram_r), this),
 		write16_delegate(FUNC(a2232_device::shared_ram_w), this), 0xffff);
 
-	m_slot->m_space->install_readwrite_handler(address + 0x4000, address + 0x4001,
+	m_slot->space().install_readwrite_handler(address + 0x4000, address + 0x4001,
 		read16_delegate(FUNC(a2232_device::irq_ack_r), this),
 		write16_delegate(FUNC(a2232_device::irq_ack_w), this), 0xffff);
 
-	m_slot->m_space->install_readwrite_handler(address + 0x8000, address + 0x8001,
+	m_slot->space().install_readwrite_handler(address + 0x8000, address + 0x8001,
 		read16_delegate(FUNC(a2232_device::reset_low_r), this),
 		write16_delegate(FUNC(a2232_device::reset_low_w), this), 0xffff);
 
-	m_slot->m_space->install_readwrite_handler(address + 0xa000, address + 0xa001,
+	m_slot->space().install_readwrite_handler(address + 0xa000, address + 0xa001,
 		read16_delegate(FUNC(a2232_device::irq_r), this),
 		write16_delegate(FUNC(a2232_device::irq_w), this), 0xffff);
 
-	m_slot->m_space->install_readwrite_handler(address + 0xc000, address + 0xc001,
+	m_slot->space().install_readwrite_handler(address + 0xc000, address + 0xc001,
 		read16_delegate(FUNC(a2232_device::reset_high_r), this),
 		write16_delegate(FUNC(a2232_device::reset_high_w), this), 0xffff);
 
@@ -236,7 +236,7 @@ WRITE_LINE_MEMBER( a2232_device::cfgin_w )
 		autoconfig_can_shutup(true); // ?
 
 		// install autoconfig handler
-		m_slot->m_space->install_readwrite_handler(0xe80000, 0xe8007f,
+		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read16_delegate(FUNC(amiga_autoconfig::autoconfig_read), static_cast<amiga_autoconfig *>(this)),
 			write16_delegate(FUNC(amiga_autoconfig::autoconfig_write), static_cast<amiga_autoconfig *>(this)), 0xffff);
 	}
@@ -344,13 +344,13 @@ WRITE16_MEMBER( a2232_device::reset_high_w )
 template<int N>
 READ8_MEMBER( a2232_device::acia_r )
 {
-	return m_acia[N]->read(space, offset >> 1);
+	return m_acia[N]->read(offset >> 1);
 }
 
 template<int N>
 WRITE8_MEMBER( a2232_device::acia_w )
 {
-	m_acia[N]->write(space, offset >> 1, data);
+	m_acia[N]->write(offset >> 1, data);
 }
 
 
@@ -360,12 +360,12 @@ WRITE8_MEMBER( a2232_device::acia_w )
 
 READ8_MEMBER( a2232_device::cia_r )
 {
-	return m_cia->read(space, offset >> 1);
+	return m_cia->read(offset >> 1);
 }
 
 WRITE8_MEMBER( a2232_device::cia_w )
 {
-	m_cia->write(space, offset >> 1, data);
+	m_cia->write(offset >> 1, data);
 }
 
 READ8_MEMBER( a2232_device::cia_port_a_r )

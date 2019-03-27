@@ -237,7 +237,7 @@ void i7000_state::machine_start()
 	if (m_card->exists())
 	{
 		// 0x4000 - 0xbfff   32KB ROM
-		program.install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_card));
+		program.install_read_handler(0x4000, 0xbfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_card));
 	}
 }
 
@@ -344,18 +344,17 @@ MC6845_ON_UPDATE_ADDR_CHANGED(i7000_state::crtc_addr)
 MACHINE_CONFIG_START(i7000_state::i7000)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NSC800, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(i7000_mem)
-	MCFG_DEVICE_IO_MAP(i7000_io)
+	NSC800(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &i7000_state::i7000_mem);
+	m_maincpu->set_addrmap(AS_IO, &i7000_state::i7000_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(320, 200) /* 40x25 8x8 chars */
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-
-	MCFG_SCREEN_UPDATE_DRIVER(i7000_state, screen_update_i7000)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(320, 200); /* 40x25 8x8 chars */
+	screen.set_visarea(0, 320-1, 0, 200-1);
+	screen.set_screen_update(FUNC(i7000_state::screen_update_i7000));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_i7000);
 	PALETTE(config, "palette", FUNC(i7000_state::i7000_palette), 2);
@@ -392,7 +391,7 @@ MACHINE_CONFIG_START(i7000_state::i7000)
 	MCFG_GENERIC_LOAD(i7000_state, i7000_card)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("card_list", "i7000_card")
+	SOFTWARE_LIST(config, "card_list").set_original("i7000_card");
 MACHINE_CONFIG_END
 
 ROM_START( i7000 )

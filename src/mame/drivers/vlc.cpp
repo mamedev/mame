@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Yves
-/*     vlc.c
+/*     vlc.cpp
 Multi-games from VLC Nevada 1995
 CGA monitor 15Khz 60hz
 // CPU    CLOCK use Crystal 16.000MHZ
@@ -49,7 +49,7 @@ Boot Section is locate in NVRAM. Interrupts Pointers are changed on the fly.
 seem to check hardware WDT ,Power Failure , interrupt system,etc..  before game start.
 
 INT7 seem to control POWER FAILURE ,WDT.
-INT7 initialisation is needed to boot the game.
+INT7 initialization is needed to boot the game.
 
 ******************************************************
 ******************************************************
@@ -570,10 +570,11 @@ MACHINE_START_MEMBER(nevada_state, nevada)
 *     Machine Driver     *
 *************************/
 
-MACHINE_CONFIG_START(nevada_state::nevada)
+void nevada_state::nevada(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CPU)
-	MCFG_DEVICE_PROGRAM_MAP(nevada_map)
+	M68000(config, m_maincpu, MASTER_CPU);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nevada_state::nevada_map);
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(150));   /* 150ms Ds1232 TD to Ground */
 
@@ -582,13 +583,13 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 	NVRAM(config, "nvram").set_custom_handler(FUNC(nevada_state::nvram_init));
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((42+1)*8, (32+1)*8)                  /* From MC6845 init, registers 00 & 04 (programmed with value-1). */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 31*8-1)    /* From MC6845 init, registers 01 & 06. */
-	MCFG_SCREEN_UPDATE_DRIVER(nevada_state, screen_update_nevada)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((42+1)*8, (32+1)*8);                  /* From MC6845 init, registers 00 & 04 (programmed with value-1). */
+	screen.set_visarea(0*8, 31*8-1, 0*8, 31*8-1);    /* From MC6845 init, registers 01 & 06. */
+	screen.set_screen_update(FUNC(nevada_state::screen_update_nevada));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_nevada);
 	PALETTE(config, "palette", FUNC(nevada_state::nevada_palette), 256);
@@ -603,26 +604,25 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 
 	AY8912(config, "aysnd", SOUND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	MCFG_DEVICE_ADD("duart18", MC68681, XTAL(3'686'400))  // UARTA = Modem 1200Baud
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW1"))
+	MC68681(config, m_duart[0],  XTAL(3'686'400));  // UARTA = Modem 1200Baud
+	m_duart[0]->irq_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+	m_duart[0]->inport_cb().set_ioport("DSW1");
 
-	MCFG_DEVICE_ADD("duart39", MC68681, XTAL(3'686'400))  // UARTA = Printer
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_3))
-	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW2"))
+	MC68681(config, m_duart[1],  XTAL(3'686'400));  // UARTA = Printer
+	m_duart[1]->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
+	m_duart[1]->inport_cb().set_ioport("DSW2");
 
-	MCFG_DEVICE_ADD("duart40", MC68681, XTAL(3'686'400))  // UARTA = Touch , UARTB = Bill Acceptor
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_5))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("microtouch", microtouch_device, rx))
-	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW3"))
+	MC68681(config, m_duart[2],  XTAL(3'686'400));  // UARTA = Touch , UARTB = Bill Acceptor
+	m_duart[2]->irq_cb().set_inputline(m_maincpu, M68K_IRQ_5);
+	m_duart[2]->a_tx_cb().set(m_microtouch, FUNC(microtouch_device::rx));
+	m_duart[2]->inport_cb().set_ioport("DSW3");
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("duart40", mc68681_device, rx_a_w) )
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_duart[1], FUNC(mc68681_device::rx_a_w));
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_1))  // rtc interrupt on INT1
-
-MACHINE_CONFIG_END
+	MSM6242(config, m_rtc, XTAL(32'768));
+	m_rtc->out_int_handler().set_inputline(m_maincpu, M68K_IRQ_1);  // rtc interrupt on INT1
+}
 
 /***************************************************************************/
 ROM_START( nevada )

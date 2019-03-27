@@ -171,7 +171,7 @@ uint8_t mos8722_device::read(offs_t offset, uint8_t data)
 //  write - register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos8722_device::write )
+void mos8722_device::write(offs_t offset, uint8_t data)
 {
 	if (MCR_C64) return;
 

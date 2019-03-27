@@ -2,352 +2,396 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  Parker Brothers Wildfire, by Bob and Holly Doyle (prototype), and Garry Kitchen
-  * AMI S2150, labeled C10641
-
-  This is an electronic handheld pinball game. It has dozens of small leds
-  to create the illusion of a moving ball, and even the flippers are leds.
-  A drawing of a pinball table is added as overlay.
-
-  NOTE!: MAME external artwork is required
-
+  AMI S2000 series handhelds or other simple devices.
 
   TODO:
-  - driver needs a cleanup when another AMI S2000 handheld gets dumped/added
-
-  - sound emulation could still be improved
-  - when the game strobes a led faster, it should appear brighter, for example when
-    the ball hits one of the bumpers
-  - 7seg decoder is guessed
-  - MCU clock is unknown
+  - were any other handhelds with this MCU released?
+  - wildfire sound can be improved, volume decay should be more steep at the start,
+    and the pitch sounds wrong too (latter is an MCU emulation problem)
+  - leds are sometimes strobed faster/longer to appear at a different brightness,
+    eg. wildfire bumpers
 
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/amis2000/amis2000.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
-#include "wildfire.lh" // this is a test layout, use external artwork
+// internal artwork
+#include "wildfire.lh"
 
-// master clock is a single stage RC oscillator: R=?K, C=?pf,
-// S2000 default frequency is 850kHz
-#define MASTER_CLOCK (850000)
+//#include "hh_amis2k_test.lh" // common test-layout - use external artwork
 
 
-class wildfire_state : public driver_device
+class hh_amis2k_state : public driver_device
+{
+public:
+	hh_amis2k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_inp_matrix(*this, "IN.%u", 0),
+		m_out_x(*this, "%u.%u", 0U, 0U),
+		m_out_a(*this, "%u.a", 0U),
+		m_out_digit(*this, "digit%u", 0U),
+		m_speaker(*this, "speaker"),
+		m_display_wait(33),
+		m_display_maxy(1),
+		m_display_maxx(0)
+	{ }
+
+	// devices
+	required_device<amis2000_base_device> m_maincpu;
+	optional_ioport_array<4> m_inp_matrix; // max 4
+	output_finder<0x20, 0x20> m_out_x;
+	output_finder<0x20> m_out_a;
+	output_finder<0x20> m_out_digit;
+	optional_device<speaker_sound_device> m_speaker;
+
+	// misc common
+	u16 m_a;                        // MCU address bus
+	u8 m_d;                         // MCU data bus
+	int m_f;                        // MCU F_out pin
+	u16 m_inp_mux;                  // multiplexed inputs mask
+
+	u8 read_inputs(int columns);
+
+	// display common
+	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
+	int m_display_maxy;             // display matrix number of rows
+	int m_display_maxx;             // display matrix number of columns (max 31 for now)
+
+	u32 m_display_state[0x20];      // display matrix rows data (last bit is used for always-on)
+	u16 m_display_segmask[0x20];    // if not 0, display matrix row is a digit, mask indicates connected segments
+	u8 m_display_decay[0x20][0x20]; // (internal use)
+
+	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	void display_update();
+	void set_display_size(int maxx, int maxy);
+	void set_display_segmask(u32 digits, u32 mask);
+	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+};
+
+
+// machine start/reset
+
+void hh_amis2k_state::machine_start()
+{
+	// resolve handlers
+	m_out_x.resolve();
+	m_out_a.resolve();
+	m_out_digit.resolve();
+
+	// zerofill
+	memset(m_display_state, 0, sizeof(m_display_state));
+	memset(m_display_decay, 0, sizeof(m_display_decay));
+	memset(m_display_segmask, 0, sizeof(m_display_segmask));
+
+	m_a = 0;
+	m_d = 0;
+	m_f = 0;
+	m_inp_mux = 0;
+
+	// register for savestates
+	save_item(NAME(m_display_maxy));
+	save_item(NAME(m_display_maxx));
+	save_item(NAME(m_display_wait));
+
+	save_item(NAME(m_display_state));
+	save_item(NAME(m_display_decay));
+	save_item(NAME(m_display_segmask));
+
+	save_item(NAME(m_a));
+	save_item(NAME(m_d));
+	save_item(NAME(m_f));
+	save_item(NAME(m_inp_mux));
+}
+
+void hh_amis2k_state::machine_reset()
+{
+}
+
+
+
+/***************************************************************************
+
+  Helper Functions
+
+***************************************************************************/
+
+// The device may strobe the outputs very fast, it is unnoticeable to the user.
+// To prevent flickering here, we need to simulate a decay.
+
+void hh_amis2k_state::display_update()
+{
+	for (int y = 0; y < m_display_maxy; y++)
+	{
+		u32 active_state = 0;
+
+		for (int x = 0; x <= m_display_maxx; x++)
+		{
+			// turn on powered segments
+			if (m_display_state[y] >> x & 1)
+				m_display_decay[y][x] = m_display_wait;
+
+			// determine active state
+			u32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			active_state |= (ds << x);
+
+			// output to y.x, or y.a when always-on
+			if (x != m_display_maxx)
+				m_out_x[y][x] = ds;
+			else
+				m_out_a[y] = ds;
+		}
+
+		// output to digity
+		if (m_display_segmask[y] != 0)
+			m_out_digit[y] = active_state & m_display_segmask[y];
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(hh_amis2k_state::display_decay_tick)
+{
+	// slowly turn off unpowered segments
+	for (int y = 0; y < m_display_maxy; y++)
+		for (int x = 0; x <= m_display_maxx; x++)
+			if (m_display_decay[y][x] != 0)
+				m_display_decay[y][x]--;
+
+	display_update();
+}
+
+void hh_amis2k_state::set_display_size(int maxx, int maxy)
+{
+	m_display_maxx = maxx;
+	m_display_maxy = maxy;
+}
+
+void hh_amis2k_state::set_display_segmask(u32 digits, u32 mask)
+{
+	// set a segment mask per selected digit, but leave unselected ones alone
+	for (int i = 0; i < 0x20; i++)
+	{
+		if (digits & 1)
+			m_display_segmask[i] = mask;
+		digits >>= 1;
+	}
+}
+
+void hh_amis2k_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update)
+{
+	set_display_size(maxx, maxy);
+
+	// update current state
+	u32 mask = (1 << maxx) - 1;
+	for (int y = 0; y < maxy; y++)
+		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
+
+	if (update)
+		display_update();
+}
+
+
+// generic input handlers
+
+u8 hh_amis2k_state::read_inputs(int columns)
+{
+	u8 ret = 0;
+
+	// read selected input rows
+	for (int i = 0; i < columns; i++)
+		if (m_inp_mux >> i & 1)
+			ret |= m_inp_matrix[i]->read();
+
+	return ret;
+}
+
+
+
+/***************************************************************************
+
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
+***************************************************************************/
+
+namespace {
+
+/***************************************************************************
+
+  Parker Brothers Wildfire, by Bob and Holly Doyle (prototype), and Garry Kitchen
+  * AMI S2150, labeled C10641
+  * RC circuit for speaker volume decay (see patent US4334679 FIG.5,
+    the 2 resistors at A12 are 10K and the cap is 4.7uF)
+
+  This is an electronic handheld pinball game. It has dozens of small leds
+  to create the illusion of a moving ball, and even the flippers are leds.
+  A drawing of a pinball table is added as overlay.
+
+  led translation table: led Lzz from patent US4334679 FIG.4* = MAME y.x:
+  *note: 2 mistakes in it: L19 between L12 and L14 should be L13, and L84 should of course be L48
+
+    0 = -      10 = 6.6    20 = 4.5    30 = 5.3    40 = 5.7    50 = 11.6
+    1 = 10.7   11 = 5.6    21 = 4.4    31 = 4.3    41 = 6.0    51 = 11.5
+    2 = 10.0   12 = 6.5    22 = 5.4    32 = 5.2    42 = 7.0    52 = 11.4
+    3 = 10.1   13 = 7.5    23 = 6.3    33 = 5.1    43 = 8.0    53 = 11.3
+    4 = 10.2   14 = 8.5    24 = 7.3    34 = 11.7   44 = 9.0    60 = 3.6
+    5 = 10.3   15 = 9.4    25 = 11.1   35 = 7.1    45 = 6.7    61 = 3.6(!)
+    6 = 10.4   16 = 8.4    26 = 9.3    36 = 9.1    46 = 7.7    62 = 3.5
+    7 = 10.5   17 = 7.4    27 = 9.2    37 = 5.0    47 = 8.7    63 = 3.5(!)
+    8 = 8.6    18 = 11.2   28 = 8.2    38 = 6.1    48 = 9.7    70 = 3.3
+    9 = 7.6    19 = 5.5    29 = 11.0   39 = 8.1    49 = -
+
+  NOTE!: MAME external artwork is required
+
+***************************************************************************/
+
+class wildfire_state : public hh_amis2k_state
 {
 public:
 	wildfire_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker"),
-		m_a12_decay_timer(*this, "a12_decay"),
-		m_digits(*this, "digit%u", 0U),
-		m_lamps(*this, "lamp%u", 0U)
+		hh_amis2k_state(mconfig, type, tag)
 	{ }
 
-	void wildfire(machine_config &config);
-
-private:
-	virtual void machine_start() override;
-
+	void prepare_display();
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE16_MEMBER(write_a);
 	DECLARE_WRITE_LINE_MEMBER(write_f);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	void speaker_update();
+	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
+	double m_speaker_volume;
+	void wildfire(machine_config &config);
 
-	bool index_is_7segled(int index);
-	void display_update();
-
-	TIMER_DEVICE_CALLBACK_MEMBER(reset_q2);
-	void write_a12(int state);
-	void sound_update();
-
-	required_device<amis2152_cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<timer_device> m_a12_decay_timer;
-
-	output_finder<3> m_digits;
-	output_finder<16 * 10> m_lamps; // only ones ending in 0-7 are used, 8-9 are unused
-
-	u8 m_d;
-	u16 m_a;
-	u8 m_q2;
-	u8 m_q3;
-
-	u16 m_display_state[0x10];
-	u8 m_display_decay[0x100];
+protected:
+	virtual void machine_start() override;
 };
 
-
-
-/***************************************************************************
-
-  LED Display
-
-***************************************************************************/
-
-// The device strobes the outputs very fast, it is unnoticeable to the user.
-// To prevent flickering here, we need to simulate a decay.
-
-// decay time, in steps of 1ms
-#define DISPLAY_DECAY_TIME 40
-
-inline bool wildfire_state::index_is_7segled(int index)
+void wildfire_state::machine_start()
 {
-	// first 3 A are 7segleds
-	return (index < 3);
+	hh_amis2k_state::machine_start();
+
+	// zerofill/init
+	m_speaker_volume = 0;
+	save_item(NAME(m_speaker_volume));
 }
 
-// lamp translation table: Lzz from patent US4334679 FIG.4 = MAME lampxxy,
-// where xx is led column and y is led row, eg. lamp103 is output A10 D3
-// (note: 2 mistakes in the patent: the L19 between L12 and L14 should be L13, and L84 should of course be L48)
-/*
-    L0  = -         L10 = lamp60    L20 = lamp41    L30 = lamp53    L40 = lamp57    L50 = lamp110
-    L1  = lamp107   L11 = lamp50    L21 = lamp42    L31 = lamp43    L41 = lamp66    L51 = lamp111
-    L2  = lamp106   L12 = lamp61    L22 = lamp52    L32 = lamp54    L42 = lamp76    L52 = lamp112
-    L3  = lamp105   L13 = lamp71    L23 = lamp63    L33 = lamp55    L43 = lamp86    L53 = lamp113
-    L4  = lamp104   L14 = lamp81    L24 = lamp73    L34 = lamp117   L44 = lamp96    L60 = lamp30
-    L5  = lamp103   L15 = lamp92    L25 = lamp115   L35 = lamp75    L45 = lamp67    L61 = lamp30(!)
-    L6  = lamp102   L16 = lamp82    L26 = lamp93    L36 = lamp95    L46 = lamp77    L62 = lamp31
-    L7  = lamp101   L17 = lamp72    L27 = lamp94    L37 = lamp56    L47 = lamp87    L63 = lamp31(!)
-    L8  = lamp80    L18 = lamp114   L28 = lamp84    L38 = lamp65    L48 = lamp97    L70 = lamp33
-    L9  = lamp70    L19 = lamp51    L29 = lamp116   L39 = lamp85    L49 = -
-*/
+// handlers
 
-void wildfire_state::display_update()
+void wildfire_state::speaker_update()
 {
-	u16 active_state[0x10];
+	if (~m_a & 0x1000)
+		m_speaker_volume = 1.0;
 
-	for (int i = 0; i < 0x10; i++)
-	{
-		// update current state
-		m_display_state[i] = (m_a >> i & 1) ? m_d : 0;
-
-		active_state[i] = 0;
-
-		for (int j = 0; j < 0x10; j++)
-		{
-			int di = j << 4 | i;
-
-			// turn on powered segments
-			if (m_display_state[i] >> j & 1)
-				m_display_decay[di] = DISPLAY_DECAY_TIME;
-
-			// determine active state
-			int ds = (m_display_decay[di] != 0) ? 1 : 0;
-			active_state[i] |= (ds << j);
-		}
-	}
-
-	// on difference, send to output
-	for (int i = 0; i < 0x10; i++)
-	{
-		if (index_is_7segled(i))
-			m_digits[i] = bitswap<7>(active_state[i],0,1,2,3,4,5,6);
-
-		for (int j = 0; j < 8; j++)
-			m_lamps[(i * 10) + j] = BIT(active_state[i], j);
-	}
+	m_speaker->level_w(m_f * 0x7fff * m_speaker_volume);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::display_decay_tick)
+TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::speaker_decay_sim)
 {
-	// slowly turn off unpowered segments
-	for (int i = 0; i < 0x100; i++)
-		if (!(m_display_state[i & 0xf] >> (i>>4) & 1) && m_display_decay[i])
-			m_display_decay[i]--;
-
-	display_update();
+	// volume decays when speaker is off (divisor and timer period determine duration)
+	speaker_update();
+	m_speaker_volume /= 1.0025;
 }
 
-
-
-/***************************************************************************
-
-  Sound
-
-***************************************************************************/
-
-// Sound output is via a speaker between transistors Q2(from A12) and Q3(from F_out)
-// A12 to Q2 has a little electronic circuit going, causing a slight delay.
-// (see patent US4334679 FIG.5, the 2 resistors are 10K and the cap is a 4.7uF electrolytic)
-
-// decay time, in steps of 1ms
-#define A12_DECAY_TIME 5 /* a complete guess */
-
-void wildfire_state::sound_update()
+void wildfire_state::prepare_display()
 {
-	m_speaker->level_w(m_q2 & m_q3);
+	// A0-A2 are 7segs
+	set_display_segmask(7, 0x7f);
+	display_matrix(8, 12, m_d, ~m_a);
 }
-
-WRITE_LINE_MEMBER(wildfire_state::write_f)
-{
-	// F_out pin: speaker out
-	m_q3 = (state) ? 1 : 0;
-	sound_update();
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::reset_q2)
-{
-	m_q2 = 0;
-	sound_update();
-}
-
-void wildfire_state::write_a12(int state)
-{
-	if (state)
-	{
-		m_a12_decay_timer->adjust(attotime::never);
-		m_q2 = state;
-		sound_update();
-	}
-	else if (m_a >> 12 & 1)
-	{
-		// falling edge
-		m_a12_decay_timer->adjust(attotime::from_msec(A12_DECAY_TIME));
-	}
-}
-
-
-
-/***************************************************************************
-
-  I/O
-
-***************************************************************************/
 
 WRITE8_MEMBER(wildfire_state::write_d)
 {
-	// D0-D7: leds out
-	m_d = data;
-	display_update();
+	// D0-D7: led/7seg data
+	m_d = bitswap<8>(data,7,0,1,2,3,4,5,6);
+	prepare_display();
 }
 
 WRITE16_MEMBER(wildfire_state::write_a)
 {
-	data ^= 0x1fff; // active-low
-
-	// A12: enable speaker
-	write_a12(data >> 12 & 1);
-
-	// A0-A2: select 7segleds
-	// A3-A11: select other leds
+	// A0-A11: digit/led select
 	m_a = data;
-	display_update();
+	prepare_display();
+
+	// A12: speaker on
+	speaker_update();
 }
 
+WRITE_LINE_MEMBER(wildfire_state::write_f)
+{
+	// F: speaker out
+	m_f = state;
+	speaker_update();
+}
 
-
-/***************************************************************************
-
-  Inputs
-
-***************************************************************************/
+// config
 
 static INPUT_PORTS_START( wildfire )
-	PORT_START("IN1") // I
+	PORT_START("IN.0") // I
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shooter Button")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Flipper")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Flipper")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-
-
-/***************************************************************************
-
-  Machine Config
-
-***************************************************************************/
-
-void wildfire_state::machine_start()
-{
-	m_digits.resolve();
-	m_lamps.resolve();
-
-	// zerofill
-	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_decay, 0, sizeof(m_display_decay));
-
-	m_d = 0;
-	m_a = 0;
-	m_q2 = 0;
-	m_q3 = 0;
-
-	// register for savestates
-	save_item(NAME(m_display_state));
-	save_item(NAME(m_display_decay));
-
-	save_item(NAME(m_d));
-	save_item(NAME(m_a));
-	save_item(NAME(m_q2));
-	save_item(NAME(m_q3));
-}
-
-// LED segments A-G
-enum
-{
-	lA = 0x40,
-	lB = 0x20,
-	lC = 0x10,
-	lD = 0x08,
-	lE = 0x04,
-	lF = 0x02,
-	lG = 0x01
-};
-
+// 7seg decoder table differs from default, this one is made by hand
 static const u8 wildfire_7seg_table[0x10] =
 {
-	0x7e, 0x30, 0x6d, 0x79, 0x33, 0x5b, 0x5f, 0x70, 0x7f, 0x7b, // 0-9 unaltered
-	0x77,           // A -> unused?
-	lA+lB+lE+lF+lG, // b -> P
-	0x4e,           // C -> unused?
-	lD+lE+lF,       // d -> L
-	0x4f,           // E -> unused?
-	lG              // F -> -
+	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, // 0, 1, 2, 3, 4, 5, 6, 7
+	0x7f, 0x6f, 0x77, 0x73, 0x39, 0x38, 0x79, 0x40  // 8, 9, ?, P, ?, L, ?, -
 };
 
+static s16 wildfire_speaker_levels[0x8000];
 
 void wildfire_state::wildfire(machine_config &config)
 {
 	/* basic machine hardware */
-	AMI_S2152(config, m_maincpu, MASTER_CLOCK);
+	AMI_S2152(config, m_maincpu, 850000); // approximation - RC osc. R=?, C=?
 	m_maincpu->set_7seg_table(wildfire_7seg_table);
-	m_maincpu->read_i().set_ioport("IN1");
+	m_maincpu->read_i().set_ioport("IN.0");
 	m_maincpu->write_d().set(FUNC(wildfire_state::write_d));
 	m_maincpu->write_a().set(FUNC(wildfire_state::write_a));
 	m_maincpu->write_f().set(FUNC(wildfire_state::write_f));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(wildfire_state::display_decay_tick), attotime::from_msec(1));
-	TIMER(config, "a12_decay").configure_generic(FUNC(wildfire_state::reset_q2));
-
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_amis2k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_wildfire);
-
-	/* no video! */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	TIMER(config, "speaker_decay").configure_periodic(FUNC(wildfire_state::speaker_decay_sim), attotime::from_usec(100));
+
+	// set volume levels (set_output_gain is too slow for sub-frame intervals)
+	for (int i = 0; i < 0x8000; i++)
+		wildfire_speaker_levels[i] = i;
+	m_speaker->set_levels(0x8000, wildfire_speaker_levels);
 }
 
+// roms
 
+ROM_START( wildfire )
+	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
+	// Typed in from patent US4334679, data should be correct(it included checksums). 1st half was also dumped/verfied with release version.
+	ROM_LOAD( "us4341385", 0x0000, 0x0400, CRC(84ac0f1f) SHA1(1e00ddd402acfc2cc267c34eed4b89d863e2144f) )
+	ROM_CONTINUE(          0x0600, 0x0200 )
+ROM_END
+
+
+
+} // anonymous namespace
 
 /***************************************************************************
 
   Game driver(s)
 
 ***************************************************************************/
-
-ROM_START( wildfire )
-	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "us4341385", 0x0000, 0x0400, CRC(84ac0f1f) SHA1(1e00ddd402acfc2cc267c34eed4b89d863e2144f) ) // from patent US4334679, data should be correct (it included checksums). 1st half was dumped/verfied too.
-	ROM_CONTINUE(          0x0600, 0x0200 )
-ROM_END
-
 
 //    YEAR  NAME      PARENT CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1979, wildfire, 0,      0, wildfire, wildfire, wildfire_state, empty_init, "Parker Brothers", "Wildfire (patent)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: pretty sure that it matches the commercial release

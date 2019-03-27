@@ -523,27 +523,26 @@ WRITE_LINE_MEMBER(ms0515_state::irq11_w)
 	irq_encoder(11, state);
 }
 
-MACHINE_CONFIG_START(ms0515_state::ms0515)
+void ms0515_state::ms0515(machine_config &config)
+{
 	/* basic machine hardware */
 	T11(config, m_maincpu, XTAL(15'000'000) / 2); // actual CPU is T11 clone, KR1807VM1
 	m_maincpu->set_initial_mode(0xf2ff);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms0515_state::ms0515_mem);
 
 	/* video hardware -- 50 Hz refresh rate */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( XTAL(15'000'000), 958,0,640, 313,0,200 )
-	MCFG_SCREEN_UPDATE_DRIVER(ms0515_state, screen_update_ms0515)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ms0515_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw( XTAL(15'000'000), 958,0,640, 313,0,200 );
+	screen.set_screen_update(FUNC(ms0515_state::screen_update_ms0515));
+	screen.screen_vblank().set(FUNC(ms0515_state::screen_vblank));
+	screen.set_palette("palette");
 	config.set_default_layout(layout_ms0515);
 
 	PALETTE(config, "palette", FUNC(ms0515_state::ms0515_palette), 16);
 
 	KR1818VG93(config, m_fdc, 1000000);
-	MCFG_FLOPPY_DRIVE_ADD("vg93:0", ms0515_floppies, "525qd", ms0515_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("vg93:1", ms0515_floppies, "525qd", ms0515_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "vg93:0", ms0515_floppies, "525qd", ms0515_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "vg93:1", ms0515_floppies, "525qd", ms0515_state::floppy_formats).enable_sound(true);
 
 	i8255_device &ppi(I8255(config, "ppi8255_1"));
 	ppi.out_pa_callback().set(FUNC(ms0515_state::ms0515_porta_w));
@@ -561,8 +560,8 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 	m_rs232->cts_handler().set(m_i8251line, FUNC(i8251_device::write_cts));
 	m_rs232->dsr_handler().set(m_i8251line, FUNC(i8251_device::write_dsr));
 
-//  MCFG_DEVICE_ADD("line_clock", CLOCK, 4800*16) // 8251 is set to /16 on the clock input
-//  MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ms0515_state, write_line_clock))
+//  clock_device &line_clock(CLOCK(config, "line_clock", 4800*16)); // 8251 is set to /16 on the clock input
+//  line_clock.signal_handler().set(FUNC(ms0515_state::write_line_clock));
 
 	// serial connection to MS7004 keyboard
 	I8251(config, m_i8251kbd, 0);
@@ -574,8 +573,8 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 	m_ms7004->rts_handler().set(m_i8251kbd, FUNC(i8251_device::write_cts));
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
-	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4960*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ms0515_state, write_keyboard_clock))
+	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4960*16));
+	keyboard_clock.signal_handler().set(FUNC(ms0515_state::write_keyboard_clock));
 
 	PIT8253(config, m_pit8253, 0);
 	m_pit8253->set_clk<0>(XTAL(2'000'000));
@@ -590,7 +589,7 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("128K");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( ms0515 )

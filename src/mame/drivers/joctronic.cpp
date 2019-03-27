@@ -335,16 +335,17 @@ void joctronic_state::machine_reset()
 static INPUT_PORTS_START( joctronic )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(joctronic_state::joctronic)
+void joctronic_state::joctronic(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000)/4); // 3 MHz - uses WAIT
 	m_maincpu->set_addrmap(AS_PROGRAM, &joctronic_state::maincpu_map); // 139
 	m_maincpu->set_addrmap(AS_IO, &joctronic_state::maincpu_io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(12'000'000)/2) // 6 MHz - uses WAIT
-	MCFG_DEVICE_PROGRAM_MAP(joctronic_sound_map)
-	MCFG_DEVICE_IO_MAP(joctronic_sound_io_map)
+	Z80(config, m_soundcpu, XTAL(12'000'000)/2); // 6 MHz - uses WAIT
+	m_soundcpu->set_addrmap(AS_PROGRAM, &joctronic_state::joctronic_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &joctronic_state::joctronic_sound_io_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5516
 
@@ -357,10 +358,10 @@ MACHINE_CONFIG_START(joctronic_state::joctronic)
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	ctc.zc_callback<0>().set_inputline(m_soundcpu, INPUT_LINE_IRQ0); //SINT
 
-	MCFG_DEVICE_ADD("drivers1", LS259, 0) // IC4
-	MCFG_DEVICE_ADD("drivers2", LS259, 0) // IC3
-	MCFG_DEVICE_ADD("drivers3", LS259, 0) // IC2
-	MCFG_DEVICE_ADD("drivers4", LS259, 0) // IC1
+	LS259(config, "drivers1", 0); // IC4
+	LS259(config, "drivers2", 0); // IC3
+	LS259(config, "drivers3", 0); // IC2
+	LS259(config, "drivers4", 0); // IC1
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -373,23 +374,21 @@ MACHINE_CONFIG_START(joctronic_state::joctronic)
 
 	AY8910(config, "aysnd2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.40); // 1.5 MHz
 
-	MCFG_DEVICE_ADD("r2r1", DAC_8BIT_R2R, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	DAC_8BIT_R2R(config, "r2r1", 0).add_route(ALL_OUTPUTS, "mono", 0.30);
+	DAC_8BIT_R2R(config, "r2r2", 0).add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
-	MCFG_DEVICE_ADD("r2r2", DAC_8BIT_R2R, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(joctronic_state::slalom03)
+void joctronic_state::slalom03(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000)/2); // 6 MHz - uses WAIT
 	m_maincpu->set_addrmap(AS_PROGRAM, &joctronic_state::slalom03_maincpu_map); // 138, 368, 32
 	m_maincpu->set_addrmap(AS_IO, &joctronic_state::maincpu_io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(12'000'000)/2) // 6 MHz - uses WAIT
-	MCFG_DEVICE_PROGRAM_MAP(slalom03_sound_map)
-	MCFG_DEVICE_IO_MAP(slalom03_sound_io_map)
+	Z80(config, m_soundcpu, XTAL(12'000'000)/2); // 6 MHz - uses WAIT
+	m_soundcpu->set_addrmap(AS_PROGRAM, &joctronic_state::slalom03_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &joctronic_state::slalom03_sound_io_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5516
 
@@ -402,12 +401,12 @@ MACHINE_CONFIG_START(joctronic_state::slalom03)
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	//ctc.zc_callback<0>().set_inputline(m_soundcpu, INPUT_LINE_IRQ0); //SINT
 
-	MCFG_DEVICE_ADD("drivers1", HC259, 0) // IC1
-	MCFG_DEVICE_ADD("drivers2", HC259, 0) // IC2
-	MCFG_DEVICE_ADD("drivers3", HC259, 0) // IC3
-	MCFG_DEVICE_ADD("drivers4", HC259, 0) // IC4
-	MCFG_DEVICE_ADD("drivers5", HC259, 0) // IC5
-	MCFG_DEVICE_ADD("drivers6", HC259, 0) // IC6
+	HC259(config, "drivers1", 0); // IC1
+	HC259(config, "drivers2", 0); // IC2
+	HC259(config, "drivers3", 0); // IC3
+	HC259(config, "drivers4", 0); // IC4
+	HC259(config, "drivers5", 0); // IC5
+	HC259(config, "drivers6", 0); // IC6
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -421,17 +420,16 @@ MACHINE_CONFIG_START(joctronic_state::slalom03)
 	aysnd2.port_a_write_callback().set("r2r", FUNC(dac_8bit_r2r_device::data_w));
 	aysnd2.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("r2r", DAC_8BIT_R2R, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	DAC_8BIT_R2R(config, "r2r", 0).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	LS157(config, m_adpcm_select, 0);
 	m_adpcm_select->out_callback().set("oki", FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD("oki", MSM5205, XTAL(12'000'000)/2/16) // 375 kHz
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B) // frequency modifiable during operation
-	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(*this, joctronic_state, vck_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	MSM5205(config, m_oki, XTAL(12'000'000)/2/16); // 375 kHz
+	m_oki->vck_callback().set(FUNC(joctronic_state::vck_w));
+	m_oki->set_prescaler_selector(msm5205_device::S96_4B); // frequency modifiable during operation
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 void joctronic_state::bldyrolr(machine_config & config)
 {

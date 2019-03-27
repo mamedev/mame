@@ -436,8 +436,8 @@ void instruct_state::instruct(machine_config &config)
 	config.set_default_layout(layout_instruct);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(instruct_state, instruct), this), "pgm", 1);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(instruct_state, instruct), this), "pgm", attotime::from_seconds(1));
 
 	/* cassette */
 	CASSETTE(config, m_cass);

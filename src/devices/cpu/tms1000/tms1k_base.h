@@ -17,10 +17,6 @@
 #include "machine/pla.h"
 
 
-// HALT input pin on CMOS chips (use set_input_line)
-#define TMS1XXX_INPUT_LINE_HALT 0
-
-
 // pinout reference
 
 /*
@@ -78,6 +74,14 @@ public:
 	// OFF request on TMS0980 and up
 	auto power_off() { return m_power_off.bind(); }
 
+	// note: for HALT input pin on CMOS chips, use set_input_line with INPUT_LINE_HALT
+	// similarly with the INIT pin, simply use INPUT_LINE_RESET
+
+	// TMS0270 was designed to interface with TMS5100, set it up at driver level
+	auto read_ctl() { return m_read_ctl.bind(); }
+	auto write_ctl() { return m_write_ctl.bind(); }
+	auto write_pdc() { return m_write_pdc.bind(); }
+
 	// Use this if the output PLA is unknown:
 	// If the microinstructions (or other) PLA is unknown, try using one from another romset.
 	void set_output_pla(const u16 *output_pla) { m_output_pla_table = output_pla; }
@@ -95,8 +99,6 @@ protected:
 	// device_execute_interface overrides
 	virtual u32 execute_min_cycles() const override { return 1; }
 	virtual u32 execute_max_cycles() const override { return 1; }
-	virtual u32 execute_input_lines() const override { return 1; }
-	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_run() override;
 	virtual void execute_one();
 
@@ -245,7 +247,6 @@ protected:
 	int m_subcycle;
 	int m_icount;
 	u8 m_o_index;
-	bool m_halt_pin;
 
 	u8 m_o_pins;    // how many O pins
 	u8 m_r_pins;    // how many R pins
@@ -261,6 +262,9 @@ protected:
 	devcb_write16 m_write_o;
 	devcb_write16 m_write_r;
 	devcb_write_line m_power_off;
+	devcb_read8 m_read_ctl;
+	devcb_write8 m_write_ctl;
+	devcb_write_line m_write_pdc;
 
 	u32 m_o_mask;
 	u32 m_r_mask;

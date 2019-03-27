@@ -480,8 +480,8 @@ static GFXDECODE_START( gfx_seabattl )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout, 24, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(seabattl_state::seabattl)
-
+void seabattl_state::seabattl(machine_config &config)
+{
 	/* basic machine hardware */
 	S2650(config, m_maincpu, 14318180/4/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seabattl_state::seabattl_map);

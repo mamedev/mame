@@ -152,7 +152,8 @@ DEFINE_DEVICE_TYPE(COCOSSC_SAC, cocossc_sac_device, "cocossc_sac", "CoCo SSC Sou
 //  MACHINE FRAGMENTS AND ADDRESS MAPS
 //**************************************************************************
 
-MACHINE_CONFIG_START(coco_ssc_device::device_add_mconfig)
+void coco_ssc_device::device_add_mconfig(machine_config &config)
+{
 	TMS7040(config, m_tms7040, DERIVED_CLOCK(2, 1));
 	m_tms7040->in_porta().set(FUNC(coco_ssc_device::ssc_port_a_r));
 	m_tms7040->out_portb().set(FUNC(coco_ssc_device::ssc_port_b_w));
@@ -173,9 +174,9 @@ MACHINE_CONFIG_START(coco_ssc_device::device_add_mconfig)
 	m_ay->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay->add_route(ALL_OUTPUTS, "coco_sac_tag", AY8913_GAIN);
 
-	MCFG_DEVICE_ADD("coco_sac_tag", COCOSSC_SAC, DERIVED_CLOCK(2, 1))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_audio", 1.0)
-MACHINE_CONFIG_END
+	COCOSSC_SAC(config, m_sac, DERIVED_CLOCK(2, 1));
+	m_sac->add_route(ALL_OUTPUTS, "ssc_audio", 1.0);
+}
 
 ROM_START(coco_ssc)
 	ROM_REGION(0x1000, PIC_TAG, 0)
@@ -437,12 +438,12 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
 	{
 		if( (data & (C_BDR|C_BC1)) == (C_BDR|C_BC1) ) /* BDIR = 1, BC1 = 1: latch address */
 		{
-			m_ay->address_w(space, 0, m_tms7000_portd);
+			m_ay->address_w(m_tms7000_portd);
 		}
 
 		if( ((data & C_BDR) == C_BDR) && ((data & C_BC1) == 0) ) /* BDIR = 1, BC1 = 0: write data */
 		{
-			m_ay->data_w(space, 0, m_tms7000_portd);
+			m_ay->data_w(m_tms7000_portd);
 		}
 	}
 
@@ -492,7 +493,7 @@ READ8_MEMBER(coco_ssc_device::ssc_port_d_r)
 	{
 		if( ((m_tms7000_portc & C_BDR) == 0) && ((m_tms7000_portc & C_BC1) == C_BC1) ) /* psg read data */
 		{
-			m_tms7000_portd = m_ay->data_r(space, 0);
+			m_tms7000_portd = m_ay->data_r();
 		}
 	}
 

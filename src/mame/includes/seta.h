@@ -80,6 +80,7 @@ public:
 	void blandiap(machine_config &config);
 	void wits(machine_config &config);
 	void msgundam(machine_config &config);
+	void msgundamb(machine_config &config);
 	void extdwnhl(machine_config &config);
 	void pairlove(machine_config &config);
 	void zingzip(machine_config &config);
@@ -297,6 +298,7 @@ protected:
 	void magspeed_map(address_map &map);
 	void metafox_sub_map(address_map &map);
 	void msgundam_map(address_map &map);
+	void msgundamb_map(address_map &map);
 	void oisipuzl_map(address_map &map);
 	void orbs_map(address_map &map);
 	void pairlove_map(address_map &map);
@@ -362,7 +364,7 @@ class kiwame_state : public seta_state
 public:
 	kiwame_state(const machine_config &mconfig, device_type type, const char *tag) :
 		seta_state(mconfig, type, tag),
-		m_tmp68301(*this, "tmp68301"),
+		m_maincpu(*this, "maincpu"),
 		m_key(*this, "KEY%u", 0U)
 	{ }
 
@@ -375,7 +377,7 @@ private:
 
 	void kiwame_map(address_map &map);
 
-	required_device<tmp68301_device> m_tmp68301;
+	required_device<tmp68301_device> m_maincpu;
 	required_ioport_array<5> m_key;
 
 	uint16_t m_kiwame_row_select;

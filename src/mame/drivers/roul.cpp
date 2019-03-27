@@ -312,27 +312,28 @@ static INPUT_PORTS_START( roul )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(roul_state::roul)
+void roul_state::roul(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(roul_map)
-	MCFG_DEVICE_IO_MAP(roul_cpu_io_map)
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &roul_state::roul_map);
+	m_maincpu->set_addrmap(AS_IO, &roul_state::roul_cpu_io_map);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_cpu_io_map)
+	Z80(config, m_soundcpu, 4000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &roul_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &roul_state::sound_cpu_io_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(roul_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(roul_state::screen_update));
+	screen.set_palette("palette");
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	PALETTE(config, "palette", FUNC(roul_state::roul_palette), 0x100);
 
@@ -341,7 +342,7 @@ MACHINE_CONFIG_START(roul_state::roul)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	AY8910(config, "aysnd", 1000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 ROM_START(roul)
 	ROM_REGION( 0x10000, "maincpu", 0 )

@@ -295,15 +295,16 @@ void t4490_state::t4490_map(address_map &map)
 static INPUT_PORTS_START( t4490 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(t4490_state::t4490)
-	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(8'000'000)/4) // divided by a MC6875
-	MCFG_DEVICE_PROGRAM_MAP(t4490_map)
+void t4490_state::t4490(machine_config &config)
+{
+	M6800(config, m_maincpu, XTAL(8'000'000)/4); // divided by a MC6875
+	m_maincpu->set_addrmap(AS_PROGRAM, &t4490_state::t4490_map);
 
 	/* devices */
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-MACHINE_CONFIG_END
+	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia2, 0);
+	ACIA6850(config, "acia", 0);
+}
 
 ROM_START( t4490 )
 	ROM_REGION(0x10000, "maincpu", 0)

@@ -297,6 +297,7 @@ public:
 
 	void set_icache_size(size_t icache_size) { c_icache_size = icache_size; }
 	void set_dcache_size(size_t dcache_size) { c_dcache_size = dcache_size; }
+	void set_secondary_cache_line_size(uint8_t secondary_cache_line_size) { c_secondary_cache_line_size = secondary_cache_line_size; }
 	void set_system_clock(uint32_t system_clock) { c_system_clock = system_clock; }
 
 	TIMER_CALLBACK_MEMBER(compare_int_callback);
@@ -436,11 +437,13 @@ protected:
 	bool            m_bigendian;
 	uint32_t        m_byte_xor;
 	uint32_t        m_word_xor;
+	uint32_t        m_dword_xor;
 	data_accessors  m_memory;
 
 	/* cache memory */
 	size_t          c_icache_size;
 	size_t          c_dcache_size;
+	uint8_t         c_secondary_cache_line_size;
 
 	/* MMU */
 	mips3_tlb_entry m_tlb[MIPS3_MAX_TLB_ENTRIES];

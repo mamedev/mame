@@ -31,18 +31,6 @@
 #define PET_DATASSETTE_PORT2_TAG     "tape2"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PET_DATASSETTE_PORT_ADD(_tag, _slot_intf, _def_slot, _devcb) \
-	MCFG_DEVICE_ADD(_tag, PET_DATASSETTE_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	downcast<pet_datassette_port_device &>(*device).set_read_handler(DEVCB_##_devcb);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -68,7 +56,6 @@ public:
 	virtual ~pet_datassette_port_device();
 
 	// static configuration helpers
-	template <class Object> devcb_base &set_read_handler(Object &&cb) { return m_read_handler.set_callback(std::forward<Object>(cb)); }
 	auto read_handler() { return m_read_handler.bind(); }
 
 	// computer interface

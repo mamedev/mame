@@ -85,18 +85,18 @@ void gaelco2_state::mcu_hostmem_map(address_map &map)
 
 void gaelco2_state::maniacsq_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                                                     /* ROM */
-	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::gaelco2_vram_w)).share("spriteram");                         /* Video RAM */
+	map(0x000000, 0x03ffff).rom();                                                                                         /* ROM */
+	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::vram_w)).share("spriteram");                                       /* Video RAM */
 	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));    /* Sound Registers */
-	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");                     /* Palette */
-	map(0x218004, 0x218009).ram().share("vregs");                                                   /* Video Registers */
-	map(0x300000, 0x300001).portr("IN0");                                                        /* DSW #1 + Input 1P */
-	map(0x300002, 0x300003).portr("IN1");                                                        /* DSW #2 + Input 2P */
-	map(0x30004a, 0x30004b).nopw();                                                                /* Sound muting? */
-	map(0x320000, 0x320001).portr("COIN");                                                       /* COINSW + SERVICESW */
-	map(0x500000, 0x500001).w(FUNC(gaelco2_state::alighunt_coin_w));                                                  /* Coin lockout + counters */
-	map(0xfe0000, 0xfe7fff).ram();                                                                     /* Work RAM */
-	map(0xfe8000, 0xfeffff).ram().share("shareram");                                                /* Work RAM */
+	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::palette_w)).share("paletteram");                                   /* Palette */
+	map(0x218004, 0x218009).ram().w(FUNC(gaelco2_state::vregs_w)).share("vregs");                                          /* Video Registers */
+	map(0x300000, 0x300001).portr("IN0");                                                                                  /* DSW #1 + Input 1P */
+	map(0x300002, 0x300003).portr("IN1");                                                                                  /* DSW #2 + Input 2P */
+	map(0x30004a, 0x30004b).nopw();                                                                                        /* Sound muting? */
+	map(0x320000, 0x320001).portr("COIN");                                                                                 /* COINSW + SERVICESW */
+	map(0x500000, 0x500001).w(FUNC(gaelco2_state::alighunt_coin_w));                                                       /* Coin lockout + counters */
+	map(0xfe0000, 0xfe7fff).ram();                                                                                         /* Work RAM */
+	map(0xfe8000, 0xfeffff).ram().share("shareram");                                                                       /* Work RAM */
 }
 
 
@@ -193,7 +193,7 @@ void gaelco2_state::maniacsq(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
-	screen.set_screen_update(FUNC(gaelco2_state::screen_update_gaelco2));
+	screen.set_screen_update(FUNC(gaelco2_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
@@ -449,10 +449,10 @@ INPUT_PORTS_END
 void gaelco2_state::saltcrdi_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::gaelco2_vram_w)).share("spriteram");
+	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::vram_w)).share("spriteram");
 	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));
-	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");
-	map(0x218004, 0x218009).ram().share("vregs");
+	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::palette_w)).share("paletteram");
+	map(0x218004, 0x218009).ram().w(FUNC(gaelco2_state::vregs_w)).share("vregs");
 	map(0x300000, 0x300001).portr("IN0");
 	map(0x310000, 0x310001).portr("DSW");
 	map(0x320000, 0x320001).portr("COIN");
@@ -476,7 +476,7 @@ void gaelco2_state::saltcrdi(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*16, 32*16);
 	screen.set_visarea(0, 384-1, 16, 256-1);
-	screen.set_screen_update(FUNC(gaelco2_state::screen_update_gaelco2));
+	screen.set_screen_update(FUNC(gaelco2_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
@@ -513,11 +513,11 @@ ROM_START( saltcrdi ) // REF 970410
 	ROM_LOAD( "bi-41-bank1-27c1001.u41",   0x01a0000, 0x0020000, CRC(c4d24254) SHA1(e6ff7624e628dc6ace11a50b6ff89812844b52c5) )
 	ROM_FILL(                              0x0220000, 0x0020000, 0x00 )         /* to decode GFX as 5bpp */
 
-	ROM_REGION( 0x1000, "iomcu", 0 ) // on IO board
-	ROM_LOAD( "st62t15c6",   0x0000, 0x1000, NO_DUMP ) // size?
+	ROM_REGION( 0x0800, "iomcu", 0 ) // on IO board
+	ROM_LOAD( "st62t15c6", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
 
-	ROM_REGION( 0x100, "pals", 0 )
-	ROM_LOAD( "6.pal16l8.u12",   0x0000, 0x100, NO_DUMP ) // size?
+	ROM_REGION( 0x0104, "pals", 0 )
+	ROM_LOAD( "6.pal16l8.u12", 0x0000, 0x0104, NO_DUMP )
 ROM_END
 
 
@@ -554,100 +554,94 @@ Note    1x 28x2 edge connector
 1x trimmer (volume)
 1x battery 3V (bt1)
 
-see
-http://web.archive.org/web/20001206204300/http://luckysunshine.com/products/gameboards/play2000.html
-
 */
-
-
-READ16_MEMBER(gaelco2_state::play2000_shareram_68k_r)
-{
-	int pc = m_maincpu->pc();
-	uint16_t ret = m_shareram[offset];
-
-	// checks at 0x00814, 0x23504, 0x2340a after writing command?
-	if (offset * 2 == 0x4020)
-	{
-		if (pc == 0x00814) return 0x0900;
-		else return 0x0000;
-	}
-
-	// checks at 0x23310, 0x2334a
-	if (offset * 2 == 0x4008)
-	{
-		return 0x0000;
-	}
-
-	if (offset * 2 < 0x1000)
-	{
-		// It seems one of the commands puts a 0x1000 worth of data at the start of shared RAM
-		// the game checks various values in it before booting.  It's possible the game is primarily
-		// using the DS5002FP for the SRAM capabilities rather than protection.
-		if (offset * 2 == 0x42c) return 0x0000;
-		if (offset * 2 == 0x42e) return 0x00f0;
-		if (offset * 2 == 0xc04) return 0x7171;
-		//  return 0x0000;
-	}
-
-	logerror("%04x read from shareram %04x %04x %04x\n", pc, offset * 2, mem_mask, ret & mem_mask);
-	return ret;
-}
-
-WRITE16_MEMBER(gaelco2_state::play2000_shareram_68k_w)
-{
-	int pc = m_maincpu->pc();
-
-	COMBINE_DATA(&m_shareram[offset]);
-
-	if (pc == 0x00552) return; // initial RAM check
-	if (pc == 0x232f4) return; // 'updating board'
-
-	logerror("%04x write to shareram %04x %04x %04x\n", pc, offset * 2, mem_mask, data & mem_mask);
-}
-
 
 void gaelco2_state::play2000_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                                                     /* ROM */
-	map(0x100000, 0x100001).portr("IN0");                                                        /* Coins + other buttons? */
-	// AM_RANGE(0x110000, 0x110001) ?
-	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::gaelco2_vram_w)).share("spriteram");                         /* Video RAM */
+	map(0x000000, 0x03ffff).rom();                                                                                         /* ROM */
+	map(0x100000, 0x100001).portr("IN0");                                                                                  /* Coins + other buttons? */
+	map(0x110000, 0x110001).portr("IN1");
+	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::vram_w)).share("spriteram");                                       /* Video RAM */
 	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));    /* Sound Registers */
-	map(0x214000, 0x214fff).ram().w(FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");                     /* Palette */
-	map(0x215000, 0x217fff).ram();                                                                     /* Written to, but unused? */
-	map(0x218000, 0x218003).ram();                                                                     /* Written to, but unused? */
-	map(0x218004, 0x218009).ram().share("vregs");                                                   /* Video Registers */
-	map(0x21800a, 0x218fff).ram();                                                                     /* Written to, but unused? */
+	map(0x214000, 0x214fff).ram().w(FUNC(gaelco2_state::palette_w)).share("paletteram");                                   /* Palette */
+	map(0x215000, 0x217fff).ram();                                                                                         /* Written to, but unused? */
+	map(0x218000, 0x218003).ram();                                                                                         /* Written to, but unused? */
+	map(0x218004, 0x218009).ram().w(FUNC(gaelco2_state::vregs_w)).share("vregs");                                          /* Video Registers */
+	map(0x21800a, 0x218fff).ram();                                                                                         /* Written to, but unused? */
 	// AM_RANGE(0x843100, 0x84315e)  ?
-	map(0xfe0000, 0xfe7fff).ram();                                                                     /* Work RAM */
-	map(0xfe8000, 0xfeffff).rw(FUNC(gaelco2_state::play2000_shareram_68k_r), FUNC(gaelco2_state::play2000_shareram_68k_w)).share("shareram");                                                /* Work RAM */
+	map(0xfe0000, 0xfe7fff).ram();                                                                                         /* Work RAM */
+	map(0xfe8000, 0xfeffff).ram().share("shareram");                                                                       /* Work RAM */
 }
 
 static INPUT_PORTS_START( play2000 )
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) // cycles through games in attract?
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) // shows odds if coins are present?
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON7 )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) // Coin1
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) // NoteA
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) // cycles through games in attract?
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) // shows odds if coins are present?
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN3 ) // NoteB
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN4 ) // NoteC
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN5 ) // NoteD
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Incassa") PORT_CODE(KEYCODE_H) // what standard button would this be?
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) // "Play"
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_SERVICE_NO_TOGGLE( 0x0040, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Collect") PORT_CODE(KEYCODE_G) // what standard button would this be?
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-ROM_START( play2000 ) /* there are version 4.0 and version 1.0 strings in this, go with the higher one */
+
+void gaelco2_state::init_play2000()
+{
+	m_global_spritexoff = 1; // aligns flashing sprites with backgrounds
+}
+
+ROM_START( play2000 )
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "tms27c010a.2",    0x000000, 0x020000, CRC(598102f9) SHA1(66fb6d321c886099b99d048d1f9f13cf016b9c43) )
+	ROM_LOAD16_BYTE( "tms27c010a.1",    0x000001, 0x020000, CRC(e2b5d79a) SHA1(f004352ddb9bc92aab126627689b45b2ef8583b1) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code - had 7.0 sticker on too */
+	// This has only been dumped from a single MCU, so there is potential for bad bits as there is risk in the dumping process.  The majority of the ROM is data and thus difficult to verify.
+	ROM_LOAD( "ds5002fp_70i.mcu", 0x00000, 0x8000, BAD_DUMP CRC(b51ad3da) SHA1(4a730238b4b875c74dd2e4df6e7880d03659b7d5) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	DS5002FP_SET_MON( 0x79 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x0a00000, "gfx1", 0 ) /* GFX + Sound */
+	ROM_LOAD( "6.u51", 0x0000000, 0x0100000, CRC(6dafc11c) SHA1(2aa3d6318418578433b3060bda6e27adf794dea4) ) /* GFX + Sound*/
+	ROM_LOAD( "4.u53", 0x0200000, 0x0080000, CRC(94dc37a7) SHA1(28f9832b61541b292682a6e2d2264abccd138a2e) ) /* GFX only */
+	ROM_LOAD( "7.u50", 0x0400000, 0x0080000, CRC(e80c6d39) SHA1(b3ae5d66c48c2ba6665a181e311b0c834384258a) ) /* GFX only */
+	ROM_LOAD( "5.u52", 0x0600000, 0x0080000, CRC(19b939f4) SHA1(7281709aa3ab1decb84bf7ab10492fb6ec197c80) ) /* GFX only */
+	ROM_LOAD( "3.u54", 0x0800000, 0x0080000, CRC(085008ed) SHA1(06eb4f972d79eab13b1b3b6829ef280e079abdb6) ) /* GFX only */
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "palce16v8h.u29",  0x0000, 0x0117, BAD_DUMP CRC(4a0a6f39) SHA1(57351e471649391c9abf110828fe2f128fe84eee) )
+ROM_END
+
+
+ROM_START( play2000_40i ) /* there are version 4.0 and version 1.0 strings in this, go with the higher one */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "2.u39_v4",    0x000000, 0x020000, CRC(fff16141) SHA1(8493c3e58a231c03b152b336f43422a9a2d2618c) )
 	ROM_LOAD16_BYTE( "1.u40_v4",    0x000001, 0x020000, CRC(39f9d58e) SHA1(1cbdae2adc570f2a2e10a707075312ef717e2643) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+	// this is the same dump as from the play7000 MCU but with valid default data for this set
+	ROM_LOAD( "ds5002fp_40i.mcu", 0x00000, 0x8000, BAD_DUMP CRC(7c45cdf2) SHA1(64aee4d77e0715342634e6eadb83dae4a2db9dfd) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
-	//DS5002FP_SET_MON( x )
-	//DS5002FP_SET_RPCTL( x )
-	//DS5002FP_SET_CRCR( x )
+	DS5002FP_SET_MON( 0x79 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
 
 	ROM_REGION( 0x0a00000, "gfx1", 0 ) /* GFX + Sound */
 	ROM_LOAD( "6.u51", 0x0000000, 0x0100000, CRC(6dafc11c) SHA1(2aa3d6318418578433b3060bda6e27adf794dea4) ) /* GFX + Sound*/
@@ -695,19 +689,20 @@ REF: 990315
 |             |------------|                                                 |
 -----------------------------------------------------------------------------|
 */
-ROM_START( play2000a )
+ROM_START( play2000_50i )
 	/*at least 1.u40 is bad, on every 0x40 bytes the first four are always 0xff.*/
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "2.u39",   0x000000, 0x020000, BAD_DUMP CRC(9939299e) SHA1(55303a2adf199f4b5a60f57be7480b0e119f8624) )
 	ROM_LOAD16_BYTE( "1.u40",   0x000001, 0x020000, BAD_DUMP CRC(311c2f94) SHA1(963d6b5f479598145146fcb8b7c6ce77fbc92b07) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+	// can't create an initialized default for this one as the main program is bad
+	ROM_LOAD( "ds5002fp_50i.mcu", 0x00000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
-	//DS5002FP_SET_MON( x )
-	//DS5002FP_SET_RPCTL( x )
-	//DS5002FP_SET_CRCR( x )
+	DS5002FP_SET_MON( 0x79 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
 
 	ROM_REGION( 0x0a00000, "gfx1", 0 ) /* GFX + Sound */
 	ROM_LOAD( "6.u51", 0x0000000, 0x0100000, CRC(6dafc11c) SHA1(2aa3d6318418578433b3060bda6e27adf794dea4) ) /* GFX + Sound*/
@@ -727,8 +722,7 @@ void gaelco2_state::play2000(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco2_state::play2000_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaelco2_state::irq6_line_hold));
 
-	// MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(11'059'200)) /* 11.0592MHz */
-	// MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
+	GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(32'000'000) / 2).set_addrmap(0, &gaelco2_state::mcu_hostmem_map); /* 16 MHz */
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
@@ -738,7 +732,7 @@ void gaelco2_state::play2000(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*16, 32*16);
 	screen.set_visarea(0, 384-1, 16, 256-1);
-	screen.set_screen_update(FUNC(gaelco2_state::screen_update_gaelco2));
+	screen.set_screen_update(FUNC(gaelco2_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
@@ -751,9 +745,9 @@ void gaelco2_state::play2000(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco")); /* unused? ROMs contain no sound data */
+	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco"));
 	gaelco.set_snd_data_tag("gfx1");
-	gaelco.set_bank_offsets(1 * 0x0080000, 1 * 0x0080000, 1 * 0x0080000, 1 * 0x0080000); // ?
+	gaelco.set_bank_offsets(0 * 0x080000, 0 * 0x080000, 0 * 0x080000, 0 * 0x080000);
 	gaelco.add_route(0, "lspeaker", 1.0);
 	gaelco.add_route(1, "rspeaker", 1.0);
 }
@@ -763,30 +757,30 @@ void gaelco2_state::play2000(machine_config &config)
                                 BANG
   ============================================================================*/
 
-READ16_MEMBER(bang_state::p1_gun_x){return (m_light0_x->read() * 320 / 0x100) + 1;}
-READ16_MEMBER(bang_state::p1_gun_y){return (m_light0_y->read() * 240 / 0x100) - 4;}
-READ16_MEMBER(bang_state::p2_gun_x){return (m_light1_x->read() * 320 / 0x100) + 1;}
-READ16_MEMBER(bang_state::p2_gun_y){return (m_light1_y->read() * 240 / 0x100) - 4;}
+u16 bang_state::p1_gun_x(){return (m_light0_x->read() * 320 / 0x100) + 1;}
+u16 bang_state::p1_gun_y(){return (m_light0_y->read() * 240 / 0x100) - 4;}
+u16 bang_state::p2_gun_x(){return (m_light1_x->read() * 320 / 0x100) + 1;}
+u16 bang_state::p2_gun_y(){return (m_light1_y->read() * 240 / 0x100) - 4;}
 
 void bang_state::bang_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                                     /* ROM */
-	map(0x200000, 0x20ffff).ram().w(FUNC(bang_state::gaelco2_vram_w)).share("spriteram");                         /* Video RAM */
+	map(0x000000, 0x0fffff).rom();                                                                                         /* ROM */
+	map(0x200000, 0x20ffff).ram().w(FUNC(bang_state::vram_w)).share("spriteram");                                          /* Video RAM */
 	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_cg1v_device::gaelcosnd_r), FUNC(gaelco_cg1v_device::gaelcosnd_w));    /* Sound Registers */
-	map(0x210000, 0x211fff).ram().w(FUNC(bang_state::gaelco2_palette_w)).share("paletteram");                     /* Palette */
-	map(0x218004, 0x218009).readonly();                                                                /* Video Registers */
-	map(0x218004, 0x218007).writeonly().share("vregs");                                             /* Video Registers */
-	map(0x218008, 0x218009).nopw();                                                                /* CLR INT Video */
+	map(0x210000, 0x211fff).ram().w(FUNC(bang_state::palette_w)).share("paletteram");                                      /* Palette */
+	map(0x218004, 0x218009).readonly();                                                                                    /* Video Registers */
+	map(0x218004, 0x218007).w(FUNC(bang_state::vregs_w)).share("vregs");                                                   /* Video Registers */
+	map(0x218008, 0x218009).nopw();                                                                                        /* CLR INT Video */
 	map(0x300000, 0x300001).portr("P1");
-	map(0x300002, 0x300003).nopr();                                                                 /* Random number generator? */
-	map(0x300000, 0x30000f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);                  /* Coin Counters & serial EEPROM */
+	map(0x300002, 0x300003).nopr();                                                                                        /* Random number generator? */
+	map(0x300000, 0x30000f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);                                  /* Coin Counters & serial EEPROM */
 	map(0x300010, 0x300011).portr("P2");
 	map(0x300020, 0x300021).portr("COIN");
-	map(0x310000, 0x310001).r(FUNC(bang_state::p1_gun_x)).w(FUNC(bang_state::bang_clr_gun_int_w));                             /* Gun 1P X */ /* CLR INT Gun */
-	map(0x310002, 0x310003).r(FUNC(bang_state::p2_gun_x));                                                          /* Gun 2P X */
-	map(0x310004, 0x310005).r(FUNC(bang_state::p1_gun_y));                                                          /* Gun 1P Y */
-	map(0x310006, 0x310007).r(FUNC(bang_state::p2_gun_y));                                                          /* Gun 2P Y */
-	map(0xfe0000, 0xfeffff).ram();                                                                     /* Work RAM */
+	map(0x310000, 0x310001).r(FUNC(bang_state::p1_gun_x)).w(FUNC(bang_state::bang_clr_gun_int_w));                         /* Gun 1P X */ /* CLR INT Gun */
+	map(0x310002, 0x310003).r(FUNC(bang_state::p2_gun_x));                                                                 /* Gun 2P X */
+	map(0x310004, 0x310005).r(FUNC(bang_state::p1_gun_y));                                                                 /* Gun 1P Y */
+	map(0x310006, 0x310007).r(FUNC(bang_state::p2_gun_y));                                                                 /* Gun 2P Y */
+	map(0xfe0000, 0xfeffff).ram();                                                                                         /* Work RAM */
 }
 
 
@@ -844,7 +838,7 @@ void bang_state::bang(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
-	screen.set_screen_update(FUNC(gaelco2_state::screen_update_gaelco2));
+	screen.set_screen_update(FUNC(gaelco2_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
@@ -976,18 +970,18 @@ ROM_END
 
 void gaelco2_state::alighunt_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                                         /* ROM */
-	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::gaelco2_vram_w)).share("spriteram");                             /* Video RAM */
-	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));        /* Sound Registers */
-	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");                         /* Palette */
-	map(0x218004, 0x218009).ram().share("vregs");                                                       /* Video Registers */
-	map(0x300000, 0x300001).portr("IN0");                                                            /* DSW #1 + Input 1P */
-	map(0x300002, 0x300003).portr("IN1");                                                            /* DSW #2 + Input 2P */
-	map(0x320000, 0x320001).portr("COIN");                                                           /* COINSW + SERVICESW */
-	map(0x500000, 0x500001).w(FUNC(gaelco2_state::alighunt_coin_w));                                                      /* Coin lockout + counters */
-	map(0x500006, 0x500007).nopw();                                                                    /* ??? */
-	map(0xfe0000, 0xfe7fff).ram();                                                                         /* Work RAM */
-	map(0xfe8000, 0xfeffff).ram().share("shareram");                                                    /* Work RAM (shared with D5002FP) */
+	map(0x000000, 0x0fffff).rom();                                                                                         /* ROM */
+	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::vram_w)).share("spriteram");                                       /* Video RAM */
+	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));    /* Sound Registers */
+	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::palette_w)).share("paletteram");                                   /* Palette */
+	map(0x218004, 0x218009).ram().w(FUNC(gaelco2_state::vregs_w)).share("vregs");                                          /* Video Registers */
+	map(0x300000, 0x300001).portr("IN0");                                                                                  /* DSW #1 + Input 1P */
+	map(0x300002, 0x300003).portr("IN1");                                                                                  /* DSW #2 + Input 2P */
+	map(0x320000, 0x320001).portr("COIN");                                                                                 /* COINSW + SERVICESW */
+	map(0x500000, 0x500001).w(FUNC(gaelco2_state::alighunt_coin_w));                                                       /* Coin lockout + counters */
+	map(0x500006, 0x500007).nopw();                                                                                        /* ??? */
+	map(0xfe0000, 0xfe7fff).ram();                                                                                         /* Work RAM */
+	map(0xfe8000, 0xfeffff).ram().share("shareram");                                                                       /* Work RAM (shared with D5002FP) */
 }
 
 
@@ -1083,7 +1077,7 @@ void gaelco2_state::alighunt(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
-	screen.set_screen_update(FUNC(gaelco2_state::screen_update_gaelco2));
+	screen.set_screen_update(FUNC(gaelco2_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
@@ -1246,18 +1240,18 @@ ROM_END
 
 void gaelco2_state::touchgo_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                                         /* ROM */
-	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::gaelco2_vram_w)).share("spriteram");                             /* Video RAM */
-	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));        /* Sound Registers */
-	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");                         /* Palette */
-	map(0x218004, 0x218009).ram().share("vregs");                                                       /* Video Registers */
-	map(0x300000, 0x300001).portr("IN0");                                                            /* DSW #1 + Input 1P */
-	map(0x300002, 0x300003).portr("IN1");                                                            /* DSW #2 + Input 2P */
-	map(0x300004, 0x300005).portr("IN2");                                                            /* COINSW + Input 3P */
-	map(0x300006, 0x300007).portr("IN3");                                                            /* SERVICESW + Input 4P */
-	map(0x500000, 0x500001).select(0x0038).w(FUNC(gaelco2_state::wrally2_latch_w));                                    /* Coin counters */
-	map(0xfe0000, 0xfe7fff).ram();                                                                         /* Work RAM */
-	map(0xfe8000, 0xfeffff).ram().share("shareram");                                                    /* Work RAM (shared with D5002FP) */
+	map(0x000000, 0x0fffff).rom();                                                                                         /* ROM */
+	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::vram_w)).share("spriteram");                                       /* Video RAM */
+	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));    /* Sound Registers */
+	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::palette_w)).share("paletteram");                                   /* Palette */
+	map(0x218004, 0x218009).ram().w(FUNC(gaelco2_state::vregs_w)).share("vregs");                                          /* Video Registers */
+	map(0x300000, 0x300001).portr("IN0");                                                                                  /* DSW #1 + Input 1P */
+	map(0x300002, 0x300003).portr("IN1");                                                                                  /* DSW #2 + Input 2P */
+	map(0x300004, 0x300005).portr("IN2");                                                                                  /* COINSW + Input 3P */
+	map(0x300006, 0x300007).portr("IN3");                                                                                  /* SERVICESW + Input 4P */
+	map(0x500000, 0x500001).select(0x0038).w(FUNC(gaelco2_state::wrally2_latch_w));                                        /* Coin counters */
+	map(0xfe0000, 0xfe7fff).ram();                                                                                         /* Work RAM */
+	map(0xfe8000, 0xfeffff).ram().share("shareram");                                                                       /* Work RAM (shared with D5002FP) */
 }
 
 
@@ -1392,7 +1386,7 @@ void gaelco2_state::touchgo(machine_config &config)
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	lscreen.set_size(64*16, 32*16);
 	lscreen.set_visarea(0, 480-1, 16, 256-1);
-	lscreen.set_screen_update(FUNC(gaelco2_state::screen_update_gaelco2_left));
+	lscreen.set_screen_update(FUNC(gaelco2_state::screen_update_left));
 	lscreen.set_palette(m_palette);
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
@@ -1400,7 +1394,7 @@ void gaelco2_state::touchgo(machine_config &config)
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	rscreen.set_size(64*16, 32*16);
 	rscreen.set_visarea(0, 480-1, 16, 256-1);
-	rscreen.set_screen_update(FUNC(gaelco2_state::screen_update_gaelco2_right));
+	rscreen.set_screen_update(FUNC(gaelco2_state::screen_update_right));
 	rscreen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	rscreen.set_palette(m_palette);
 
@@ -1626,18 +1620,18 @@ ROM_END
 
 void gaelco2_state::snowboar_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                                         /* ROM */
-	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::gaelco2_vram_w)).share("spriteram");                             /* Video RAM */
-	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_cg1v_device::gaelcosnd_r), FUNC(gaelco_cg1v_device::gaelcosnd_w));        /* Sound Registers */
-	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");                         /* Palette */
-	map(0x212000, 0x213fff).ram();                                                                         /* Extra RAM */
-	map(0x218004, 0x218009).ram().share("vregs");                                                       /* Video Registers */
+	map(0x000000, 0x0fffff).rom();                                                                                                                /* ROM */
+	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::vram_w)).share("spriteram");                                                              /* Video RAM */
+	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_cg1v_device::gaelcosnd_r), FUNC(gaelco_cg1v_device::gaelcosnd_w));                           /* Sound Registers */
+	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::palette_w)).share("paletteram");                                                          /* Palette */
+	map(0x212000, 0x213fff).ram();                                                                                                                /* Extra RAM */
+	map(0x218004, 0x218009).ram().w(FUNC(gaelco2_state::vregs_w)).share("vregs");                                                                 /* Video Registers */
 	map(0x300000, 0x300001).portr("P1");
-	map(0x300000, 0x30000f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);                      /* Coin Counters & serial EEPROM */
+	map(0x300000, 0x30000f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);                                                         /* Coin Counters & serial EEPROM */
 	map(0x300010, 0x300011).portr("P2");
 	map(0x300020, 0x300021).portr("COIN");
 	map(0x310000, 0x31ffff).rw(FUNC(gaelco2_state::snowboar_protection_r), FUNC(gaelco2_state::snowboar_protection_w)).share("snowboar_prot");    /* Protection */
-	map(0xfe0000, 0xfeffff).ram();                                                                                 /* Work RAM */
+	map(0xfe0000, 0xfeffff).ram();                                                                                                                /* Work RAM */
 }
 
 
@@ -1697,7 +1691,7 @@ void gaelco2_state::snowboar(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*16, 32*16);
 	screen.set_visarea(0, 384-1, 16, 256-1);
-	screen.set_screen_update(FUNC(gaelco2_state::screen_update_gaelco2));
+	screen.set_screen_update(FUNC(gaelco2_state::screen_update));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
@@ -1741,7 +1735,7 @@ void gaelco2_state::maniacsqs(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
-	screen.set_screen_update(FUNC(gaelco2_state::screen_update_gaelco2));
+	screen.set_screen_update(FUNC(gaelco2_state::screen_update));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
@@ -1859,19 +1853,19 @@ ROM_END
 
 void wrally2_state::wrally2_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                                     /* ROM */
-	map(0x200000, 0x20ffff).ram().w(FUNC(wrally2_state::gaelco2_vram_w)).share("spriteram");                         /* Video RAM */
+	map(0x000000, 0x0fffff).rom();                                                                                         /* ROM */
+	map(0x200000, 0x20ffff).ram().w(FUNC(wrally2_state::vram_w)).share("spriteram");                                       /* Video RAM */
 	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));    /* Sound Registers */
-	map(0x210000, 0x211fff).ram().w(FUNC(wrally2_state::gaelco2_palette_w)).share("paletteram");                     /* Palette */
-	map(0x212000, 0x213fff).ram();                                                                     /* Extra RAM */
-	map(0x218004, 0x218009).ram().share("vregs");                                                   /* Video Registers */
-	map(0x300000, 0x300001).portr("IN0");                                                        /* DIPSW #2 + Inputs 1P */
-	map(0x300002, 0x300003).portr("IN1");                                                        /* DIPSW #1 */
-	map(0x300004, 0x300005).portr("IN2");                                                        /* Inputs 2P + COINSW */
-	map(0x300006, 0x300007).portr("IN3");                                                        /* SERVICESW */
-	map(0x400000, 0x400001).select(0x0038).w(FUNC(wrally2_state::wrally2_latch_w));                                /* Coin counters, etc. */
-	map(0xfe0000, 0xfe7fff).ram();                                                                     /* Work RAM */
-	map(0xfe8000, 0xfeffff).ram().share("shareram");                                                /* Work RAM (shared with D5002FP) */
+	map(0x210000, 0x211fff).ram().w(FUNC(wrally2_state::palette_w)).share("paletteram");                                   /* Palette */
+	map(0x212000, 0x213fff).ram();                                                                                         /* Extra RAM */
+	map(0x218004, 0x218009).ram().w(FUNC(wrally2_state::vregs_w)).share("vregs");                                          /* Video Registers */
+	map(0x300000, 0x300001).portr("IN0");                                                                                  /* DIPSW #2 + Inputs 1P */
+	map(0x300002, 0x300003).portr("IN1");                                                                                  /* DIPSW #1 */
+	map(0x300004, 0x300005).portr("IN2");                                                                                  /* Inputs 2P + COINSW */
+	map(0x300006, 0x300007).portr("IN3");                                                                                  /* SERVICESW */
+	map(0x400000, 0x400001).select(0x0038).w(FUNC(wrally2_state::wrally2_latch_w));                                        /* Coin counters, etc. */
+	map(0xfe0000, 0xfe7fff).ram();                                                                                         /* Work RAM */
+	map(0xfe8000, 0xfeffff).ram().share("shareram");                                                                       /* Work RAM (shared with D5002FP) */
 }
 
 
@@ -1990,7 +1984,7 @@ void wrally2_state::wrally2(machine_config &config)
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	lscreen.set_size(384, 32*16);
 	lscreen.set_visarea(0, 384-1, 16, 256-1);
-	lscreen.set_screen_update(FUNC(gaelco2_state::screen_update_gaelco2_left));
+	lscreen.set_screen_update(FUNC(gaelco2_state::screen_update_left));
 	lscreen.set_palette(m_palette);
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
@@ -1998,7 +1992,7 @@ void wrally2_state::wrally2(machine_config &config)
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	rscreen.set_size(384, 32*16);
 	rscreen.set_visarea(0, 384-1, 16, 256-1);
-	rscreen.set_screen_update(FUNC(gaelco2_state::screen_update_gaelco2_right));
+	rscreen.set_screen_update(FUNC(gaelco2_state::screen_update_right));
 	rscreen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	rscreen.set_palette(m_palette);
 
@@ -2304,34 +2298,36 @@ ROM_END
 
 
 
-GAME( 1994, aligator,    0,         alighunt_d5002fp, alighunt, gaelco2_state, init_alighunt, ROT0, "Gaelco", "Alligator Hunt (World, protected)", 0 )
-GAME( 1994, aligators,   aligator,  alighunt_d5002fp, alighunt, gaelco2_state, init_alighunt, ROT0, "Gaelco", "Alligator Hunt (Spain, protected)", 0 )
-GAME( 1994, aligatorun,  aligator,  alighunt,         alighunt, gaelco2_state, init_alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected, set 1)", 0 )
-GAME( 1994, aligatoruna, aligator,  alighunt,         alighunt, gaelco2_state, init_alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected, set 2)", 0 ) // strange version, starts on space stages, but clearly a recompile not a trivial hack of the above, show version maybe?
+GAME( 1994, aligator,    0,         alighunt_d5002fp, alighunt, gaelco2_state, init_alighunt,  ROT0, "Gaelco", "Alligator Hunt (World, protected)", 0 )
+GAME( 1994, aligators,   aligator,  alighunt_d5002fp, alighunt, gaelco2_state, init_alighunt,  ROT0, "Gaelco", "Alligator Hunt (Spain, protected)", 0 )
+GAME( 1994, aligatorun,  aligator,  alighunt,         alighunt, gaelco2_state, init_alighunt,  ROT0, "Gaelco", "Alligator Hunt (unprotected, set 1)", 0 )
+GAME( 1994, aligatoruna, aligator,  alighunt,         alighunt, gaelco2_state, init_alighunt,  ROT0, "Gaelco", "Alligator Hunt (unprotected, set 2)", 0 ) // strange version, starts on space stages, but clearly a recompile not a trivial hack of the above, show version maybe?
 
-GAME( 1995, touchgo,     0,         touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,  ROT0, "Gaelco", "Touch & Go (World)", MACHINE_IMPERFECT_SOUND )
-GAME( 1995, touchgon,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,  ROT0, "Gaelco", "Touch & Go (Non North America)", MACHINE_IMPERFECT_SOUND )
-GAME( 1995, touchgoe,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,  ROT0, "Gaelco", "Touch & Go (earlier revision)",  MACHINE_IMPERFECT_SOUND )
-GAME( 1995, touchgok,    touchgo,   touchgo,          touchgo,  gaelco2_state, init_touchgo,  ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_SOUND ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
+GAME( 1995, touchgo,     0,         touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,   ROT0, "Gaelco", "Touch & Go (World)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, touchgon,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,   ROT0, "Gaelco", "Touch & Go (Non North America)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, touchgoe,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,   ROT0, "Gaelco", "Touch & Go (earlier revision)",  MACHINE_IMPERFECT_SOUND )
+GAME( 1995, touchgok,    touchgo,   touchgo,          touchgo,  gaelco2_state, init_touchgo,   ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_SOUND ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
 
-GAME( 1995, wrally2,     0,         wrally2,          wrally2,  wrally2_state, init_wrally2,  ROT0, "Gaelco", "World Rally 2: Twin Racing (mask ROM version)", 0 )
-GAME( 1995, wrally2a,    wrally2,   wrally2,          wrally2,  wrally2_state, empty_init,    ROT0, "Gaelco", "World Rally 2: Twin Racing (EPROM version)", 0 )
+GAME( 1995, wrally2,     0,         wrally2,          wrally2,  wrally2_state, init_wrally2,   ROT0, "Gaelco", "World Rally 2: Twin Racing (mask ROM version)", 0 )
+GAME( 1995, wrally2a,    wrally2,   wrally2,          wrally2,  wrally2_state, empty_init,     ROT0, "Gaelco", "World Rally 2: Twin Racing (EPROM version)", 0 )
 
 // All sets identify as Version 1.0, but are clearly different revisions
-GAME( 1996, maniacsq,    0,         maniacsq_d5002fp, maniacsq, gaelco2_state, empty_init,    ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum DEEE)", 0 )
-GAME( 1996, maniacsqa,   maniacsq,  maniacsq_d5002fp, maniacsq, gaelco2_state, empty_init,    ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum CF2D)", 0 )
-GAME( 1996, maniacsqu,   maniacsq,  maniacsq,         maniacsq, gaelco2_state, empty_init,    ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum BB73)", 0 )
-GAME( 1996, maniacsqs,   maniacsq,  maniacsqs,        snowboar, gaelco2_state, empty_init,    ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum 66B1, 960419/1 PCB)", 0 ) // Official version on Snow Board Championship PCB, doesn't use the protection
+GAME( 1996, maniacsq,    0,         maniacsq_d5002fp, maniacsq, gaelco2_state, empty_init,     ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum DEEE)", 0 )
+GAME( 1996, maniacsqa,   maniacsq,  maniacsq_d5002fp, maniacsq, gaelco2_state, empty_init,     ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum CF2D)", 0 )
+GAME( 1996, maniacsqu,   maniacsq,  maniacsq,         maniacsq, gaelco2_state, empty_init,     ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum BB73)", 0 )
+GAME( 1996, maniacsqs,   maniacsq,  maniacsqs,        snowboar, gaelco2_state, empty_init,     ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum 66B1, 960419/1 PCB)", 0 ) // Official version on Snow Board Championship PCB, doesn't use the protection
 
-GAME( 1996, snowboar,    0,         snowboar,         snowboar, gaelco2_state, empty_init,    ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", 0 )
-GAME( 1996, snowboara,   snowboar,  snowboar,         snowboar, gaelco2_state, init_snowboar, ROT0, "Gaelco", "Snow Board Championship (Version 2.0)", 0 )
+GAME( 1996, snowboar,    0,         snowboar,         snowboar, gaelco2_state, init_snowboar,  ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", 0 )
+GAME( 1996, snowboara,   snowboar,  snowboar,         snowboar, gaelco2_state, init_snowboara, ROT0, "Gaelco", "Snow Board Championship (Version 2.0)", 0 )
 
-GAME( 1998, bang,        0,         bang,             bang,     bang_state,    init_bang,     ROT0, "Gaelco", "Bang!", 0 )
-GAME( 1998, bangj,       bang,      bang,             bang,     bang_state,    init_bang,     ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
+GAME( 1998, bang,        0,         bang,             bang,     bang_state,    init_bang,      ROT0, "Gaelco", "Bang!", 0 )
+GAME( 1998, bangj,       bang,      bang,             bang,     bang_state,    init_bang,      ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
 
 // 2-in-1 gambling game, appears to be cloned Gaelco hardware complete with DS5002FP, or possibly manufactured by Gaelco for Nova Desitec but without any Gaelco branding.
-GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state, empty_init,    ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0) (Italy)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1999, play2000a,   play2000,  play2000,         play2000, gaelco2_state, empty_init,    ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.01) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // bad dump
+// these are Italian versions, English versions also exist
+GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state, init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v7.0i) (Italy)",  0 )
+GAME( 1999, play2000_50i,play2000,  play2000,         play2000, gaelco2_state, empty_init,     ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.0i) (Italy)",  MACHINE_NOT_WORKING ) // bad dump
+GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state, init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0i) (Italy)",  0 )
 
 // Gym exercise bike
-GAME( 1997, saltcrdi,   0,          saltcrdi,         saltcrdi, gaelco2_state, empty_init,    ROT0, "Salter Fitness / Gaelco", "Pro Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", MACHINE_NOT_WORKING ) // there are other machines in the Cardioline series, without TV displays
+GAME( 1997, saltcrdi,   0,          saltcrdi,         saltcrdi, gaelco2_state, empty_init,     ROT0, "Salter Fitness / Gaelco", "Pro Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", MACHINE_NOT_WORKING ) // there are other machines in the Cardioline series, without TV displays

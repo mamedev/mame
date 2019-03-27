@@ -178,28 +178,29 @@ uint32_t modellot_state::screen_update_modellot(screen_device &screen, bitmap_in
 	return 0;
 }
 
-MACHINE_CONFIG_START(modellot_state::modellot)
+void modellot_state::modellot(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &modellot_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &modellot_state::io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(64*8, 16*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(modellot_state, screen_update_modellot)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 16*16);
+	screen.set_visarea(0, 64*8-1, 0, 16*16-1);
+	screen.set_screen_update(FUNC(modellot_state::screen_update_modellot));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_modellot)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_modellot);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Devices */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(modellot_state::kbd_put));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( modellot )

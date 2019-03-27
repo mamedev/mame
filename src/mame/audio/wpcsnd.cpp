@@ -69,22 +69,23 @@ uint8_t wpcsnd_device::data_r()
 	return m_reply;
 }
 
-MACHINE_CONFIG_START(wpcsnd_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("bgcpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
-	MCFG_DEVICE_PROGRAM_MAP(wpcsnd_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
+void wpcsnd_device::device_add_mconfig(machine_config &config)
+{
+	MC6809E(config, m_cpu, XTAL(8'000'000) / 4); // MC68B09E
+	m_cpu->set_addrmap(AS_PROGRAM, &wpcsnd_device::wpcsnd_map);
+	config.m_minimum_quantum = attotime::from_hz(50);
 
 	YM2151(config, m_ym2151, 3580000);
 	m_ym2151->irq_handler().set(FUNC(wpcsnd_device::ym2151_irq_w));
 	m_ym2151->add_route(ALL_OUTPUTS, *this, 0.25);
 
-	MCFG_DEVICE_ADD("dac", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	AD7524(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_DEVICE_ADD("hc55516", HC55516, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.5)
-MACHINE_CONFIG_END
+	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, *this, 0.5);
+}
 
 
 void wpcsnd_device::device_start()

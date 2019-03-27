@@ -150,7 +150,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros_irq)
 
 TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros3_irq)
 {
-	int status = m_oki->read_status();
+	int status = m_oki->read();
 	int scanline = param;
 
 	if(scanline == 240)
@@ -166,8 +166,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros3_irq)
 	{
 		if ((status&0x08)==0x00)
 		{
-			m_oki->write_command(0x80|m_sb3_music);
-			m_oki->write_command(0x00|0x82);
+			m_oki->write(0x80|m_sb3_music);
+			m_oki->write(0x00|0x82);
 		}
 
 	}
@@ -175,7 +175,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros3_irq)
 	{
 		if ((status&0x08)==0x08)
 		{
-			m_oki->write_command(0x40);     /* Stop playing music */
+			m_oki->write(0x40);     /* Stop playing music */
 		}
 	}
 
@@ -424,22 +424,22 @@ void snowbros_state::sb3_play_music(int data)
 
 void snowbros_state::sb3_play_sound (int data)
 {
-	int status = m_oki->read_status();
+	int status = m_oki->read();
 
 	if ((status&0x01)==0x00)
 	{
-		m_oki->write_command(0x80|data);
-		m_oki->write_command(0x00|0x12);
+		m_oki->write(0x80|data);
+		m_oki->write(0x00|0x12);
 	}
 	else if ((status&0x02)==0x00)
 	{
-		m_oki->write_command(0x80|data);
-		m_oki->write_command(0x00|0x22);
+		m_oki->write(0x80|data);
+		m_oki->write(0x00|0x22);
 	}
 	else if ((status&0x04)==0x00)
 	{
-		m_oki->write_command(0x80|data);
-		m_oki->write_command(0x00|0x42);
+		m_oki->write(0x80|data);
+		m_oki->write(0x00|0x42);
 	}
 
 
@@ -450,7 +450,7 @@ WRITE16_MEMBER(snowbros_state::sb3_sound_w)
 	if (data == 0x00fe)
 	{
 		m_sb3_music_is_playing = 0;
-		m_oki->write_command(0x78);       /* Stop sounds */
+		m_oki->write(0x78);       /* Stop sounds */
 	}
 	else /* the alternating 0x00-0x2f or 0x30-0x5f might be something to do with the channels */
 	{
@@ -2034,7 +2034,7 @@ void snowbros_state::yutnori(machine_config &config)
 
 	okim6295_device &oki2(OKIM6295(config, "oki2", XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki2.add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

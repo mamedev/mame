@@ -262,3 +262,12 @@ void m68340_cpu_device::device_start()
 
 	m_int_ack_callback = device_irq_acknowledge_delegate(FUNC(m68340_cpu_device::int_ack), this);
 }
+
+void m68340_cpu_device::m68k_reset_peripherals()
+{
+	m_m68340SIM->module_reset();
+	m_m68340DMA->module_reset();
+	m_serial->module_reset();
+	m_timer[0]->module_reset();
+	m_timer[1]->module_reset();
+}

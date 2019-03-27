@@ -523,13 +523,13 @@ TIMER_CALLBACK_MEMBER(joust2_state::joust2_deferred_snd_cmd_w)
 WRITE_LINE_MEMBER(joust2_state::joust2_pia_3_cb1_w)
 {
 	m_joust2_current_sound_data = (m_joust2_current_sound_data & ~0x100) | ((state << 8) & 0x100);
-	m_cvsd_sound->write(machine().dummy_space(), 0, m_joust2_current_sound_data);
+	m_cvsd_sound->write(m_joust2_current_sound_data);
 }
 
 
 WRITE8_MEMBER(joust2_state::joust2_snd_cmd_w)
 {
 	m_joust2_current_sound_data = (m_joust2_current_sound_data & ~0xff) | (data & 0xff);
-	m_cvsd_sound->write(machine().dummy_space(), 0, m_joust2_current_sound_data);
+	m_cvsd_sound->write(m_joust2_current_sound_data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(joust2_state::joust2_deferred_snd_cmd_w),this), m_joust2_current_sound_data);
 }

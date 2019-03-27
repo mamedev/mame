@@ -51,8 +51,8 @@ public:
 	auto irq() { return m_write_irq.bind(); }
 
 	// computer interface
-	uint8_t bd_r(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2);
-	void bd_w(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2);
+	uint8_t bd_r(offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2);
+	void bd_w(offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2);
 
 	// cartridge interface
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
@@ -96,8 +96,8 @@ protected:
 	device_adam_expansion_slot_card_interface(const machine_config &mconfig, device_t &device);
 
 	// runtime
-	virtual uint8_t adam_bd_r(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) { return data; }
-	virtual void adam_bd_w(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) { }
+	virtual uint8_t adam_bd_r(offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) { return data; }
+	virtual void adam_bd_w(offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) { }
 
 	adam_expansion_slot_device *m_slot;
 

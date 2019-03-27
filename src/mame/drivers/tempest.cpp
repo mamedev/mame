@@ -472,7 +472,7 @@ WRITE8_MEMBER(tempest_state::earom_control_w)
 READ8_MEMBER(tempest_state::rom_ae1f_r)
 {
 	// This is needed to ensure that the routine starting at ae1c passes checks and does not corrupt data;
-	// MCFG_QUANTUM_PERFECT_CPU("maincpu") would be very taxing on this driver.
+	// config.m_perfect_cpu_quantum = subtag("maincpu"); would be very taxing on this driver.
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 	machine().scheduler().abort_timeslice();
 

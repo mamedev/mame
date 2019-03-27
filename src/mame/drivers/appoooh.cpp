@@ -240,9 +240,9 @@ void appoooh_state::decrypted_opcodes_map(address_map &map)
 void appoooh_state::main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76489_device::command_w));
-	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76489_device::command_w));
-	map(0x02, 0x02).w("sn3", FUNC(sn76489_device::command_w));
+	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76489_device::write));
+	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76489_device::write));
+	map(0x02, 0x02).w("sn3", FUNC(sn76489_device::write));
 	map(0x03, 0x03).portr("DSW1").w(FUNC(appoooh_state::adpcm_w));
 	map(0x04, 0x04).portr("BUTTON3").w(FUNC(appoooh_state::out_w));
 	map(0x05, 0x05).w(FUNC(appoooh_state::scroll_w)); /* unknown */

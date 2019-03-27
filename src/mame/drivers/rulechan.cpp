@@ -727,8 +727,8 @@ INPUT_PORTS_END
 *           Machine Driver            *
 **************************************/
 
-MACHINE_CONFIG_START(rulechan_state::rulechan)
-
+void rulechan_state::rulechan(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rulechan_state::main_map);
@@ -741,8 +741,8 @@ MACHINE_CONFIG_START(rulechan_state::rulechan)
 	/* eeprom */
 	EEPROM_93C46_8BIT(config, "eeprom");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ball_speed", rulechan_state, ball_speed, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("wheel_speed", rulechan_state, wheel_speed, attotime::from_hz(60))
+	TIMER(config, "ball_speed").configure_periodic(FUNC(rulechan_state::ball_speed), attotime::from_hz(60));
+	TIMER(config, "wheel_speed").configure_periodic(FUNC(rulechan_state::wheel_speed), attotime::from_hz(60));
 
 	/* video hardware */
 	v9938_device &v9938(V9938(config, "v9938", VID_CLOCK));
@@ -757,8 +757,7 @@ MACHINE_CONFIG_START(rulechan_state::rulechan)
 	ay_re900.port_a_read_callback().set(FUNC(rulechan_state::psg_portA_r));
 	ay_re900.port_b_read_callback().set(FUNC(rulechan_state::psg_portB_r));
 	ay_re900.add_route(ALL_OUTPUTS, "mono", 0.5);
-
-MACHINE_CONFIG_END
+}
 
 
 /**************************************

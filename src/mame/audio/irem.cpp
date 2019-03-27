@@ -123,17 +123,17 @@ WRITE8_MEMBER( irem_audio_device::m6803_port2_w )
 		{
 			/* PSG 0 or 1? */
 			if (m_port2 & 0x08)
-				m_ay_45M->address_w(space, 0, m_port1);
+				m_ay_45M->address_w(m_port1);
 			if (m_port2 & 0x10)
-				m_ay_45L->address_w(space, 0, m_port1);
+				m_ay_45L->address_w(m_port1);
 		}
 		else
 		{
 			/* PSG 0 or 1? */
 			if (m_port2 & 0x08)
-				m_ay_45M->data_w(space, 0, m_port1);
+				m_ay_45M->data_w(m_port1);
 			if (m_port2 & 0x10)
-				m_ay_45L->data_w(space, 0, m_port1);
+				m_ay_45L->data_w(m_port1);
 		}
 	}
 	m_port2 = data;
@@ -151,9 +151,9 @@ READ8_MEMBER( irem_audio_device::m6803_port1_r )
 {
 	/* PSG 0 or 1? */
 	if (m_port2 & 0x08)
-		return m_ay_45M->data_r(space, 0);
+		return m_ay_45M->data_r();
 	if (m_port2 & 0x10)
-		return m_ay_45L->data_r(space, 0);
+		return m_ay_45L->data_r();
 	return 0xff;
 }
 

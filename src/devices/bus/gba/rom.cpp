@@ -417,13 +417,13 @@ READ32_MEMBER(gba_rom_flash_device::read_ram)
 	offset &= m_flash_mask;
 
 	if (mem_mask & 0xff)
-		rv |= m_flash->read(space, offset * 4);
+		rv |= m_flash->read(offset * 4);
 	if (mem_mask & 0xff00)
-		rv |= m_flash->read(space, (offset * 4) + 1) << 8;
+		rv |= m_flash->read((offset * 4) + 1) << 8;
 	if (mem_mask & 0xff0000)
-		rv |= m_flash->read(space, (offset * 4) + 2) << 16;
+		rv |= m_flash->read((offset * 4) + 2) << 16;
 	if (mem_mask & 0xff000000)
-		rv |= m_flash->read(space, (offset * 4) + 3) << 24;
+		rv |= m_flash->read((offset * 4) + 3) << 24;
 
 	return rv;
 }
@@ -435,16 +435,16 @@ WRITE32_MEMBER(gba_rom_flash_device::write_ram)
 	switch (mem_mask)
 	{
 		case 0xff:
-			m_flash->write(space, offset * 4, data & 0xff);
+			m_flash->write(offset * 4, data & 0xff);
 			break;
 		case 0xff00:
-			m_flash->write(space, (offset * 4) + 1, (data >> 8) & 0xff);
+			m_flash->write((offset * 4) + 1, (data >> 8) & 0xff);
 			break;
 		case 0xff0000:
-			m_flash->write(space, (offset * 4) + 2, (data >> 16) & 0xff);
+			m_flash->write((offset * 4) + 2, (data >> 16) & 0xff);
 			break;
 		case 0xff000000:
-			m_flash->write(space, (offset * 4) + 3, (data >> 24) & 0xff);
+			m_flash->write((offset * 4) + 3, (data >> 24) & 0xff);
 			break;
 		default:
 			fatalerror("Unknown mem_mask for GBA flash write %x\n", mem_mask);
@@ -464,13 +464,13 @@ READ32_MEMBER(gba_rom_flash1m_device::read_ram)
 	offset &= m_flash_mask;
 
 	if (mem_mask & 0xff)
-		rv |= m_flash->read(space, offset * 4);
+		rv |= m_flash->read(offset * 4);
 	if (mem_mask & 0xff00)
-		rv |= m_flash->read(space, (offset * 4) + 1) << 8;
+		rv |= m_flash->read((offset * 4) + 1) << 8;
 	if (mem_mask & 0xff0000)
-		rv |= m_flash->read(space, (offset * 4) + 2) << 16;
+		rv |= m_flash->read((offset * 4) + 2) << 16;
 	if (mem_mask & 0xff000000)
-		rv |= m_flash->read(space, (offset * 4) + 3) << 24;
+		rv |= m_flash->read((offset * 4) + 3) << 24;
 
 	return rv;
 }
@@ -482,16 +482,16 @@ WRITE32_MEMBER(gba_rom_flash1m_device::write_ram)
 	switch (mem_mask)
 	{
 		case 0xff:
-			m_flash->write(space, offset * 4, data & 0xff);
+			m_flash->write(offset * 4, data & 0xff);
 			break;
 		case 0xff00:
-			m_flash->write(space, (offset * 4) + 1, (data >> 8) & 0xff);
+			m_flash->write((offset * 4) + 1, (data >> 8) & 0xff);
 			break;
 		case 0xff0000:
-			m_flash->write(space, (offset * 4) + 2, (data >> 16) & 0xff);
+			m_flash->write((offset * 4) + 2, (data >> 16) & 0xff);
 			break;
 		case 0xff000000:
-			m_flash->write(space, (offset * 4) + 3, (data >> 24) & 0xff);
+			m_flash->write((offset * 4) + 3, (data >> 24) & 0xff);
 			break;
 		default:
 			fatalerror("Unknown mem_mask for GBA flash write %x\n", mem_mask);

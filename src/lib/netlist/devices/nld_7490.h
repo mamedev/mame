@@ -55,7 +55,7 @@
 #ifndef NLD_7490_H_
 #define NLD_7490_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define TTL_7490(name, cA, cB, cR1, cR2, cR91, cR92)                               \
 		NET_REGISTER_DEV(TTL_7490, name)                                               \

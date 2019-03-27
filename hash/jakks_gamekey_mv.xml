@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="jakks_gamekey_mv" description="JAKKS Pacific 'MV' Game Keys">
+
+	<!-- This list is for the 'MV' coded Game Keys, for Marvel (Spider-Man) -->
+
+	<software name="bcatdoc">
+		<description>Black Cat &amp; Doc Ock</description>
+		<year>2005</year>
+		<publisher>JAKKS Pacific / Digital Eclipse</publisher>
+		<part name="cart" interface="jakks_gamekey">
+			<feature name="slot" value="rom_24lc04"/>
+			<dataarea name="rom" size="0x800000">
+				<rom name="jakksspidermanblackcatdocockgk.bin" size="0x200000" crc="34645c17" sha1="0112a0c16350ac02204486492d8cae7b7df5e011" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

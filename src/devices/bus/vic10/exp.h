@@ -79,8 +79,8 @@ public:
 	auto sp_callback() { return m_write_sp.bind(); }
 
 	// computer interface
-	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram);
-	void cd_w(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram);
+	uint8_t cd_r(offs_t offset, uint8_t data, int lorom, int uprom, int exram);
+	void cd_w(offs_t offset, uint8_t data, int lorom, int uprom, int exram);
 	DECLARE_READ_LINE_MEMBER( p0_r );
 	DECLARE_WRITE_LINE_MEMBER( p0_w );
 
@@ -133,8 +133,8 @@ public:
 	// construction/destruction
 	virtual ~device_vic10_expansion_card_interface();
 
-	virtual uint8_t vic10_cd_r(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram) { return data; }
-	virtual void vic10_cd_w(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram) { }
+	virtual uint8_t vic10_cd_r(offs_t offset, uint8_t data, int lorom, int uprom, int exram) { return data; }
+	virtual void vic10_cd_w(offs_t offset, uint8_t data, int lorom, int uprom, int exram) { }
 	virtual int vic10_p0_r() { return 0; }
 	virtual void vic10_p0_w(int state) { }
 	virtual void vic10_sp_w(int state) { }

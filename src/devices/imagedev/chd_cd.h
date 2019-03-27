@@ -67,15 +67,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(CDROM, cdrom_image_device)
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-
-#define MCFG_CDROM_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, CDROM, 0)
-
-#define MCFG_CDROM_INTERFACE(_interface)                         \
-	downcast<cdrom_image_device &>(*device).set_interface(_interface);
-
 #endif // MAME_DEVICES_IMAGEDEV_CHD_CD_H

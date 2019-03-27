@@ -13,7 +13,7 @@
       LAN port (seems more or less similar to AppleTalk)
     * 4 expansion ports enable to add expansion cards, namely floppy disk
       and hard disk controllers (the expansion ports are partially compatible
-      with Apple 2 expansion ports)
+      with Apple 2 expansion ports; DMA is not supported)
 
     Video: monochrome bitmapped display, 720*560 visible area (bitmaps are 768
       pixels wide in memory).  One interesting feature is the fact that the
@@ -39,6 +39,7 @@
 #include "bus/a2bus/corvfdc01.h"
 #include "bus/a2bus/corvfdc02.h"
 #include "bus/rs232/rs232.h"
+#include "machine/input_merger.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -49,7 +50,7 @@ void concept_state::concept_memmap(address_map &map)
 	map(0x000008, 0x000fff).ram();                                     /* static RAM */
 	map(0x010000, 0x011fff).rom().region("maincpu", 0x010000);  /* boot ROM */
 	map(0x020000, 0x021fff).rom().region("macsbug", 0x0);       /* macsbugs ROM (optional) */
-	map(0x030000, 0x03ffff).rw(FUNC(concept_state::concept_io_r), FUNC(concept_state::concept_io_w));    /* I/O space */
+	map(0x030000, 0x03ffff).rw(FUNC(concept_state::io_r), FUNC(concept_state::io_w)).umask16(0x00ff);    /* I/O space */
 
 	map(0x080000, 0x0fffff).ram().share("videoram");/* AM_RAMBANK(2) */ /* DRAM */
 }
@@ -209,7 +210,7 @@ void concept_a2_cards(device_slot_interface &device)
 void concept_state::concept(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 8182000);        /* 16.364 MHz / 2 */
+	M68000(config, m_maincpu, 16.364_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &concept_state::concept_memmap);
 
 	config.m_minimum_quantum = attotime::from_hz(60);
@@ -232,12 +233,12 @@ void concept_state::concept(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* rtc */
-	MM58274C(config, m_mm58274, 0);
+	MM58274C(config, m_mm58274, 32.768_kHz_XTAL);
 	m_mm58274->set_mode24(0); // 12 hour
 	m_mm58274->set_day1(1);   // monday
 
 	/* via */
-	VIA6522(config, m_via0, 1022750);
+	VIA6522(config, m_via0, 16.364_MHz_XTAL / 16);
 	m_via0->readpa_handler().set(FUNC(concept_state::via_in_a));
 	m_via0->readpb_handler().set(FUNC(concept_state::via_in_b));
 	m_via0->writepa_handler().set(FUNC(concept_state::via_out_a));
@@ -246,23 +247,27 @@ void concept_state::concept(machine_config &config)
 	m_via0->irq_handler().set(FUNC(concept_state::via_irq_func));
 
 	/* ACIAs */
-	MOS6551(config, m_acia0, 0);
-	m_acia0->set_xtal(XTAL(1'843'200));
+	MOS6551(config, m_acia0, 16.364_MHz_XTAL / 16);
+	m_acia0->set_xtal(16.364_MHz_XTAL / 9);
 	m_acia0->txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 
-	MOS6551(config, m_acia1, 0);
-	m_acia1->set_xtal(XTAL(1'843'200));
+	MOS6551(config, m_acia1, 16.364_MHz_XTAL / 16);
+	m_acia1->set_xtal(16.364_MHz_XTAL / 9);
 	m_acia1->txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 
-	MOS6551(config, m_kbdacia, 0);
-	m_kbdacia->set_xtal(XTAL(1'843'200));
+	MOS6551(config, m_kbdacia, 16.364_MHz_XTAL / 16);
+	m_kbdacia->set_xtal(16.364_MHz_XTAL / 9);
 
 	/* Apple II bus */
-	A2BUS(config, m_a2bus, 0).set_cputag(m_maincpu);
+	A2BUS(config, m_a2bus, 0).set_space(m_maincpu, AS_PROGRAM);
+	m_a2bus->nmi_w().set("iocint", FUNC(input_merger_device::in_w<0>));
+	m_a2bus->irq_w().set("iocint", FUNC(input_merger_device::in_w<1>));
 	A2BUS_SLOT(config, "sl1", m_a2bus, concept_a2_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", m_a2bus, concept_a2_cards, nullptr);
 	A2BUS_SLOT(config, "sl3", m_a2bus, concept_a2_cards, nullptr);
 	A2BUS_SLOT(config, "sl4", m_a2bus, concept_a2_cards, "fdc01");
+
+	INPUT_MERGER_ANY_HIGH(config, "iocint").output_handler().set(FUNC(concept_state::ioc_interrupt));
 
 	/* 2x RS232 ports */
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));

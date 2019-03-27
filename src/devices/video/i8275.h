@@ -44,26 +44,6 @@
 #define I8275_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint8_t lineattr, uint8_t lten, uint8_t rvv, uint8_t vsp, uint8_t gpa, uint8_t hlgt)
 
 
-#define MCFG_I8275_CHARACTER_WIDTH(_value) \
-	downcast<i8275_device &>(*device).set_character_width(_value);
-
-#define MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
-	downcast<i8275_device &>(*device).set_display_callback(&_class::_method, #_class "::" #_method, this);
-
-#define MCFG_I8275_DRQ_CALLBACK(_write) \
-	downcast<i8275_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
-
-#define MCFG_I8275_IRQ_CALLBACK(_write) \
-	downcast<i8275_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
-
-#define MCFG_I8275_HRTC_CALLBACK(_write) \
-	downcast<i8275_device &>(*device).set_hrtc_wr_callback(DEVCB_##_write);
-
-#define MCFG_I8275_VRTC_CALLBACK(_write) \
-	downcast<i8275_device &>(*device).set_vrtc_wr_callback(DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -96,10 +76,6 @@ public:
 		set_display_callback(draw_character_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
 	}
 
-	template <class Object> devcb_base &set_drq_wr_callback(Object &&cb) { return m_write_drq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_hrtc_wr_callback(Object &&cb) { return m_write_hrtc.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vrtc_wr_callback(Object &&cb) { return m_write_vrtc.set_callback(std::forward<Object>(cb)); }
 	auto drq_wr_callback() { return m_write_drq.bind(); }
 	auto irq_wr_callback() { return m_write_irq.bind(); }
 	auto hrtc_wr_callback() { return m_write_hrtc.bind(); }

@@ -179,21 +179,21 @@ void pangofun_state::machine_start()
 {
 }
 
-MACHINE_CONFIG_START(pangofun_state::pangofun)
+void pangofun_state::pangofun(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I486, 25000000 )    /* I486 ?? Mhz (25 according to POST) */
-	MCFG_DEVICE_PROGRAM_MAP(pcat_map)
-	MCFG_DEVICE_IO_MAP(pcat_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	I486(config, m_maincpu, 25000000);    /* I486 ?? Mhz (25 according to POST) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pangofun_state::pcat_map);
+	m_maincpu->set_addrmap(AS_IO, &pangofun_state::pcat_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
 	pcvideo_vga(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	subdevice<screen_device>("screen")->set_refresh_hz(60);
+	subdevice<screen_device>("screen")->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 
 	pcat_common(config);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(pangofun)

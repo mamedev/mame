@@ -263,27 +263,27 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(speedbal_state::speedbal)
-
+void speedbal_state::speedbal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000)) // 4 MHz
-	MCFG_DEVICE_PROGRAM_MAP(main_cpu_map)
-	MCFG_DEVICE_IO_MAP(main_cpu_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speedbal_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(4'000'000)); // 4 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &speedbal_state::main_cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &speedbal_state::main_cpu_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(speedbal_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000)) // 4 MHz
-	MCFG_DEVICE_PROGRAM_MAP(sound_cpu_map)
-	MCFG_DEVICE_IO_MAP(sound_cpu_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(speedbal_state, irq0_line_hold, 1000/2) // approximate?
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(4'000'000))); // 4 MHz
+	audiocpu.set_addrmap(AS_PROGRAM, &speedbal_state::sound_cpu_map);
+	audiocpu.set_addrmap(AS_IO, &speedbal_state::sound_cpu_io_map);
+	audiocpu.set_periodic_int(FUNC(speedbal_state::irq0_line_hold), attotime::from_hz(1000/2)); // approximate?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(56.4) // measured
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(speedbal_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(56.4); // measured
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(speedbal_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_speedbal);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 768).set_endianness(ENDIANNESS_BIG);
@@ -291,9 +291,8 @@ MACHINE_CONFIG_START(speedbal_state::speedbal)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000)) // 4 MHz(?)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM3812(config, "ymsnd", XTAL(4'000'000)).add_route(ALL_OUTPUTS, "mono", 1.0); // 4 MHz(?)
+}
 
 
 void speedbal_state::init_speedbal()

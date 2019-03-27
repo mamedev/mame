@@ -167,7 +167,7 @@ void ql_trump_card_device::device_reset()
 //  read -
 //-------------------------------------------------
 
-uint8_t ql_trump_card_device::read(address_space &space, offs_t offset, uint8_t data)
+uint8_t ql_trump_card_device::read(offs_t offset, uint8_t data)
 {
 	if (offset >= 0xc000 && offset < 0x10000)
 	{
@@ -220,7 +220,7 @@ uint8_t ql_trump_card_device::read(address_space &space, offs_t offset, uint8_t 
 //  write -
 //-------------------------------------------------
 
-void ql_trump_card_device::write(address_space &space, offs_t offset, uint8_t data)
+void ql_trump_card_device::write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x1c000 && offset <= 0x1c003)
 	{

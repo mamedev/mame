@@ -38,8 +38,9 @@ DEFINE_DEVICE_TYPE(AKIKO, akiko_device, "akiko", "CBM AKIKO")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(akiko_device::device_add_mconfig)
-MACHINE_CONFIG_END
+void akiko_device::device_add_mconfig(machine_config &config)
+{
+}
 
 
 //**************************************************************************

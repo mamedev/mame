@@ -177,9 +177,10 @@ static INPUT_PORTS_START( sc499_port )
 
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(sc499_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(SC499_CTAPE_TAG, SC499_CTAPE, 0)
-MACHINE_CONFIG_END
+void sc499_device::device_add_mconfig(machine_config &config)
+{
+	SC499_CTAPE(config, m_image, 0);
+}
 
 
 //**************************************************************************

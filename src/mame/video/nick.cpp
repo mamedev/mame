@@ -335,9 +335,9 @@ void nick_device::initialize_palette()
 		int ba = BIT(i, 2);
 		int bb = BIT(i, 5);
 
-		uint8_t r = combine_3_weights(color_weights_rg, rc, rb, ra);
-		uint8_t g = combine_3_weights(color_weights_rg, gc, gb, ga);
-		uint8_t b = combine_2_weights(color_weights_b, bb, ba);
+		uint8_t r = combine_weights(color_weights_rg, rc, rb, ra);
+		uint8_t g = combine_weights(color_weights_rg, gc, gb, ga);
+		uint8_t b = combine_weights(color_weights_b, bb, ba);
 
 		m_palette[i] = rgb_t(r, g, b);
 	}

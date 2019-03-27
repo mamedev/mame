@@ -55,16 +55,19 @@ const tiny_rom_entry *comx_prn_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(comx_prn_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit0))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit2))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit3))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+void comx_prn_device::device_add_mconfig(machine_config &config)
+{
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit0));
+	m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit1));
+	m_centronics->perror_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit2));
+	m_centronics->select_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit3));
 
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
-MACHINE_CONFIG_END
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
+
+	INPUT_BUFFER(config, m_cent_status_in);
+}
 
 
 
@@ -109,7 +112,7 @@ void comx_prn_device::device_reset()
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-uint8_t comx_prn_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
+uint8_t comx_prn_device::comx_mrd_r(offs_t offset, int *extrom)
 {
 	uint8_t data = 0;
 
@@ -126,7 +129,7 @@ uint8_t comx_prn_device::comx_mrd_r(address_space &space, offs_t offset, int *ex
 //  comx_io_r - I/O read
 //-------------------------------------------------
 
-uint8_t comx_prn_device::comx_io_r(address_space &space, offs_t offset)
+uint8_t comx_prn_device::comx_io_r(offs_t offset)
 {
 	/*
 	    Parallel:
@@ -165,7 +168,7 @@ uint8_t comx_prn_device::comx_io_r(address_space &space, offs_t offset)
 //  comx_io_w - I/O write
 //-------------------------------------------------
 
-void comx_prn_device::comx_io_w(address_space &space, offs_t offset, uint8_t data)
+void comx_prn_device::comx_io_w(offs_t offset, uint8_t data)
 {
 	/*
 	    Parallel:

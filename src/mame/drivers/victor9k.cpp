@@ -676,7 +676,7 @@ void victor9k_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( victor9k )
+//  machine_config( victor9k )
 //-------------------------------------------------
 
 void victor9k_state::victor9k(machine_config &config)

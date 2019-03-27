@@ -44,4 +44,94 @@ private:
 
 DECLARE_DEVICE_TYPE(CRUSH11, crush11_host_device)
 
+// device connected to SMBus
+
+class smbus_logger_device : public device_t, public smbus_interface
+{
+public:
+	smbus_logger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual int execute_command(int command, int rw, int data) override;
+	uint8_t *get_buffer() { return buffer; }
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	uint8_t buffer[0xff];
+};
+
+DECLARE_DEVICE_TYPE(SMBUS_LOGGER, smbus_logger_device)
+
+// Simple smbus rom used as a placeholder for the serial presence detect chip in a ddr dimm
+
+class smbus_rom_device : public device_t, public smbus_interface
+{
+public:
+	smbus_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const uint8_t *data, int size);
+	smbus_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual int execute_command(int command, int rw, int data) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	const uint8_t *buffer;
+	int buffer_size;
+};
+
+DECLARE_DEVICE_TYPE(SMBUS_ROM, smbus_rom_device)
+
+// Asus AS99127F chip
+// It answerst to three smbus addresses, by default 0x2d 0x48 0x49
+
+class as99127f_device : public device_t, public smbus_interface
+{
+public:
+	as99127f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual int execute_command(int command, int rw, int data) override;
+	uint8_t *get_buffer() { return buffer; }
+
+protected:
+	virtual void device_start() override;
+
+private:
+	uint8_t buffer[0xff];
+};
+
+DECLARE_DEVICE_TYPE(AS99127F, as99127f_device)
+
+class as99127f_sensor2_device : public device_t, public smbus_interface
+{
+public:
+	as99127f_sensor2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual int execute_command(int command, int rw, int data) override;
+	uint8_t *get_buffer() { return buffer; }
+
+protected:
+	virtual void device_start() override;
+
+private:
+	uint8_t buffer[0xff];
+};
+
+DECLARE_DEVICE_TYPE(AS99127F_SENSOR2, as99127f_sensor2_device)
+
+class as99127f_sensor3_device : public device_t, public smbus_interface
+{
+public:
+	as99127f_sensor3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual int execute_command(int command, int rw, int data) override;
+	uint8_t *get_buffer() { return buffer; }
+
+protected:
+	virtual void device_start() override;
+
+private:
+	uint8_t buffer[0xff];
+};
+
+DECLARE_DEVICE_TYPE(AS99127F_SENSOR3, as99127f_sensor3_device)
+
 #endif

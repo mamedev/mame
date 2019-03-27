@@ -47,11 +47,12 @@ void whitestar_mod_state::init_whitestar_mod()
 {
 }
 
-MACHINE_CONFIG_START(whitestar_mod_state::whitestar_mod)
+void whitestar_mod_state::whitestar_mod(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(whitestar_mod_map)
-MACHINE_CONFIG_END
+	MC6809E(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &whitestar_mod_state::whitestar_mod_map);
+}
 
 /*-------------------------------------------------------------------
 / Elvis

@@ -34,9 +34,10 @@ protected:
 
 	void timeplt_sound_map(address_map &map);
 
+	required_device<cpu_device> m_soundcpu;
+
 private:
 	// internal state
-	required_device<cpu_device> m_soundcpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device_array<filter_rc_device, 3> m_filter_0;
 	required_device_array<filter_rc_device, 3> m_filter_1;

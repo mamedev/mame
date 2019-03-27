@@ -288,18 +288,20 @@ void techno_state::machine_reset()
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
-MACHINE_CONFIG_START(techno_state::techno)
+void techno_state::techno(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(techno_map)
+	M68000(config, m_maincpu, XTAL(8'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &techno_state::techno_map);
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	//MCFG_DEVICE_ADD("cpu2", TMS7000, XTAL(4'000'000))
-	//MCFG_DEVICE_PROGRAM_MAP(techno_sub_map)
+	//tms7000_device &cpu2(TMS7000(config, "cpu2", XTAL(4'000'000)));
+	//cpu2.set_addrmap(AS_PROGRAM, &techno_state::techno_sub_map);
 
 	/* Video */
 	config.set_default_layout(layout_techno);
-MACHINE_CONFIG_END
+}
 
 ROM_START(xforce)
 	ROM_REGION(0x10000, "maincpu", 0)

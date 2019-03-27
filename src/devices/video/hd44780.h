@@ -12,18 +12,6 @@
 #pragma once
 
 
-#define MCFG_HD44780_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, HD44780, 0 )
-
-#define MCFG_KS0066_F05_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, KS0066_F05, 0 )
-
-#define MCFG_HD44780_LCD_SIZE(_lines, _chars) \
-	downcast<hd44780_device &>(*device).set_lcd_size(_lines, _chars);
-
-#define MCFG_HD44780_PIXEL_UPDATE_CB(_class, _method) \
-	downcast<hd44780_device &>(*device).set_pixel_update_cb(&_class::_method, #_class "::" #_method, this);
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************

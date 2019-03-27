@@ -236,6 +236,7 @@ public:
 	DECLARE_WRITE16_MEMBER(punipic_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2mdt_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2mdta_layer_w);
+	DECLARE_WRITE16_MEMBER(sf2b_layer_w);
 	DECLARE_WRITE16_MEMBER(slampic_layer_w);
 	DECLARE_WRITE16_MEMBER(fcrash_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(fcrash_snd_bankswitch_w);

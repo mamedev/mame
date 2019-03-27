@@ -7,14 +7,7 @@
 *  Known Issues:
 *  - The proper hookup for the MAC address is unknown, requiring
 *    a fake MAC to be set up before any IRIX installers will proceed.
-*  - The IRIX 6.5.x installer kernel-panics on startup.
-*  - The IRIX 5.3 installer hangs after loading.
 *  - The Gentoo Linux live CD hangs on starting the kernel.
-*  - The disk formatting/partitioning utility for IRIX, fx, has
-*    various issues, from the disk formatting too quickly to hanging
-*    when exercising the disk.
-*  - Disk accesses frequently result in a "SYNC negotiation error"
-*    message.
 *
 *  Memory map:
 *
@@ -60,13 +53,13 @@
 \*********************************************************************/
 
 #include "emu.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsicd.h"
-#include "bus/scsi/scsihd.h"
 
-#include "cpu/mips/mips3.h"
+#include "cpu/mips/r4000.h"
 
 #include "machine/hpc3.h"
+#include "machine/nscsi_bus.h"
+#include "machine/nscsi_cd.h"
+#include "machine/nscsi_hd.h"
 #include "machine/sgi.h"
 
 #include "sound/cdda.h"
@@ -84,7 +77,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_mainram(*this, "mainram")
 		, m_mem_ctrl(*this, "memctrl")
-		, m_scsi_ctrl(*this, "wd33c93")
+		, m_scsi_ctrl(*this, "scsibus:0:wd33c93")
 		, m_newport(*this, "newport")
 		, m_hpc3(*this, "hpc3")
 	{
@@ -103,12 +96,14 @@ protected:
 
 	void ip22_map(address_map &map);
 
-	static void cdrom_config(device_t *device);
+	void wd33c93(device_t *device);
 
-	required_device<mips3_device> m_maincpu;
+	static void scsi_devices(device_slot_interface &device);
+
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint64_t> m_mainram;
 	required_device<sgi_mc_device> m_mem_ctrl;
-	required_device<wd33c93_device> m_scsi_ctrl;
+	required_device<wd33c93b_device> m_scsi_ctrl;
 	required_device<newport_video_device> m_newport;
 	required_device<hpc3_device> m_hpc3;
 };
@@ -118,14 +113,16 @@ class ip24_state : public ip22_state
 public:
 	ip24_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ip22_state(mconfig, type, tag)
-		, m_scsi_ctrl2(*this, "wd33c93_2")
+		, m_scsi_ctrl2(*this, "scsibus2:0:wd33c93")
 	{
 	}
 
 	void ip244415(machine_config &config);
 
 private:
-	required_device<wd33c93_device> m_scsi_ctrl2;
+	void wd33c93_2(device_t *device);
+
+	required_device<wd33c93b_device> m_scsi_ctrl2;
 };
 
 READ32_MEMBER(ip22_state::eisa_io_r)
@@ -169,7 +166,7 @@ void ip22_state::machine_reset()
 	// set up low RAM mirror
 	membank("bank1")->set_base(m_mainram);
 
-	m_maincpu->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
+	//m_maincpu->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
 }
 
 static INPUT_PORTS_START( ip225015 )
@@ -180,11 +177,25 @@ static INPUT_PORTS_START( ip225015 )
 	PORT_INCLUDE( at_keyboard )     /* IN4 - IN11 */
 INPUT_PORTS_END
 
-void ip22_state::cdrom_config(device_t *device)
+//static void cdrom_config(device_t *device)
+//{
+//  cdda_device *cdda = device->subdevice<cdda_device>("cdda");
+//  cdda->add_route(0, ":hpc3:lspeaker", 1.0);
+//  cdda->add_route(1, ":hpc3:rspeaker", 1.0);
+//}
+
+void ip22_state::wd33c93(device_t *device)
 {
-	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
-	cdda->add_route(0, ":hpc3:lspeaker", 1.0);
-	cdda->add_route(1, ":hpc3:rspeaker", 1.0);
+	device->set_clock(10000000);
+	downcast<wd33c93b_device *>(device)->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_irq));
+	downcast<wd33c93b_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_drq));
+}
+
+void ip22_state::scsi_devices(device_slot_interface &device)
+{
+	device.option_add("cdrom", NSCSI_CDROM_SGI);
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	//device.set_option_machine_config("cdrom", cdrom_config);
 }
 
 void ip22_state::ip22_base(machine_config &config)
@@ -202,26 +213,27 @@ void ip22_state::ip22_base(machine_config &config)
 
 	NEWPORT_VIDEO(config, m_newport, m_maincpu, m_hpc3);
 
-	SGI_MC(config, m_mem_ctrl, m_maincpu, ":hpc3:eeprom");
+	SGI_MC(config, m_mem_ctrl, m_maincpu, ":hpc3:eeprom", m_hpc3);
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
-	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
-	scsi.set_slot_device(2, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
-	scsi.slot(2).set_option_machine_config("cdrom", cdrom_config);
-
-	WD33C93(config, m_scsi_ctrl);
-	m_scsi_ctrl->set_scsi_port("scsi");
-	m_scsi_ctrl->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_irq));
-	//m_scsi_ctrl->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_drq));
+	NSCSI_BUS(config, "scsibus", 0);
+	NSCSI_CONNECTOR(config, "scsibus:0").option_set("wd33c93", WD33C93B)
+		.machine_config([this](device_t *device) { wd33c93(device); });
+	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom", false);
+	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, nullptr, false);
 }
 
 void ip22_state::ip225015(machine_config &config)
 {
 	ip22_base(config);
 
-	R5000BE(config, m_maincpu, 50000000*3);
-	m_maincpu->set_icache_size(32768);
-	m_maincpu->set_dcache_size(32768);
+	R4000(config, m_maincpu, 50000000*3);
+	//m_maincpu->set_icache_size(32768);
+	//m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
 	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl);
@@ -231,29 +243,40 @@ void ip22_state::ip224613(machine_config &config)
 {
 	ip22_base(config);
 
-	R4600BE(config, m_maincpu, 33333333*4);
-	m_maincpu->set_icache_size(32768);
-	m_maincpu->set_dcache_size(32768);
+	R4600(config, m_maincpu, 33333333*4);
+	//m_maincpu->set_icache_size(32768);
+	//m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
 	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl);
+}
+
+void ip24_state::wd33c93_2(device_t *device)
+{
+	device->set_clock(10000000);
+	downcast<wd33c93b_device *>(device)->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_irq));
+	downcast<wd33c93b_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_drq));
 }
 
 void ip24_state::ip244415(machine_config &config)
 {
 	ip22_base(config);
 
-	R4400BE(config, m_maincpu, 50000000*3);
-	m_maincpu->set_icache_size(32768);
-	m_maincpu->set_dcache_size(32768);
+	R4400(config, m_maincpu, 50000000*3);
+	//m_maincpu->set_icache_size(32768);
+	//m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip22_map);
 
-	SCSI_PORT(config, "scsi2");
-
-	WD33C93(config, m_scsi_ctrl2);
-	m_scsi_ctrl2->set_scsi_port("scsi2");
-	m_scsi_ctrl->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_irq));
-	//m_scsi_ctrl->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_drq));
+	NSCSI_BUS(config, "scsibus2", 0);
+	NSCSI_CONNECTOR(config, "scsibus2:0").option_set("wd33c93", WD33C93B)
+		.machine_config([this](device_t *device) { wd33c93_2(device); });
+	NSCSI_CONNECTOR(config, "scsibus2:1", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus2:2", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus2:3", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus2:4", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus2:5", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus2:6", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus2:7", scsi_devices, nullptr, false);
 
 	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl, m_scsi_ctrl2);
 }

@@ -21,7 +21,7 @@
 #ifndef NLD_9322_H_
 #define NLD_9322_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define TTL_9322(name, cSELECT, cA1, cB1, cA2, cB2, cA3, cB3, cA4, cB4, cSTROBE)    \
 		NET_REGISTER_DEV(TTL_9322, name)    \
