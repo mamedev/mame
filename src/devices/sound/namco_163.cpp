@@ -55,9 +55,9 @@ void namco_163_sound_device::device_clock_changed()
 }
 
 
-s8 namco_163_sound_device::get_sample(u16 addr)
+inline s8 namco_163_sound_device::get_sample(u16 addr)
 {
-	return ((m_ram[addr >> 1] >> ((addr & 1) << 2)) & 0xf) - 8;
+	return ((m_ram[(addr >> 1) & 0x7f] >> ((addr & 1) << 2)) & 0xf) - 8;
 }
 
 
@@ -160,7 +160,7 @@ void namco_163_sound_device::sound_stream_update(sound_stream &stream, stream_sa
 		const u8 vol = m_ram[m_reg_addr + 7] & 0xf;
 
 		phase = (phase + freq) % (length << 16);
-		s32 output = get_sample(((phase >> 16) + offset) & 0xff) * vol;
+		s32 output = get_sample((phase >> 16) + offset) * vol;
 
 		m_ram[m_reg_addr + 1] = phase & 0xff;
 		m_ram[m_reg_addr + 3] = phase >> 8;

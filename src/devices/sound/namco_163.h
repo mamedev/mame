@@ -32,7 +32,7 @@ protected:
 	sound_stream          *m_stream;
 
 	// internals
-	s8 get_sample(u16 addr);
+	inline s8 get_sample(u16 addr);
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
