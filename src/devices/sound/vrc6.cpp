@@ -233,7 +233,7 @@ void vrc6snd_device::write(offs_t offset, u8 data)
 					// if disabling channel, reset phase
 					if (!(data & 0x80))
 					{
-						m_pulseduty[0] = 0;
+						m_pulseduty[0] = 15;
 						m_ticks[0] = (m_pulsefrql[0] | ((m_pulsefrqh[0] & 0xf) << 8)) >> m_master_freq;
 					}
 					break;
@@ -284,7 +284,7 @@ void vrc6snd_device::write(offs_t offset, u8 data)
 					// if disabling channel, reset phase
 					if (!(data & 0x80))
 					{
-						m_pulseduty[1] = 0;
+						m_pulseduty[1] = 15;
 						m_ticks[1] = (m_pulsefrql[1] | ((m_pulsefrqh[1] & 0xf) << 8)) >> m_master_freq;
 					}
 					break;
