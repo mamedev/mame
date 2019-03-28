@@ -165,8 +165,14 @@ void spg110_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 
 void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr)
 {
-	uint32_t bitmap_addr = 0;//0x40 * m_video_regs[0x22];
 	uint16_t tile = m_sprtileno[base_addr];
+
+	if (!tile)
+	{
+		return;
+	}
+
+	uint32_t bitmap_addr = 0;//0x40 * m_video_regs[0x22];
 	uint16_t attr1 = m_sprattr1[base_addr];
 	uint16_t attr2 = m_sprattr2[base_addr];
 
@@ -176,23 +182,14 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 
 	// m_sprtileno  tttt tttt tttt tttt    t =  tile number (all bits?)
 	// m_sprattr1   xxxx xxxx yyyy yyyy    x = low x bits, y = low y bits
-	// m_sprattr2   -Xzz pppp hhww --bb    X = high x bit z = priority, p = palette h = height w = width b = bpp
+	// m_sprattr2   YXzz pppp hhww --bb    X = high x bit, z = priority, p = palette, h = height, w = width. b = bpp, Y = high y bit
 
 
 	if (!(attr2 & 0x4000))
 		x+= 0x100;
 
-	if (!tile)
-	{
-		return;
-	}
-
-	//	if ((priority==0) && (scanline==128)) printf("%02x, drawing sprite %04x %04x %04x\n", base_addr, tile, attr1, attr2);
-
-	//	if (((attr & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
-	//	{
-	//		return;
-	//	}
+	if (!(attr2 & 0x8000))
+		y+= 0x100;
 
 	const uint32_t h = 8 << ((attr2 & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
 	const uint32_t w = 8 << ((attr2 & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
@@ -203,8 +200,11 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 //		y = (120 - y) - (h / 2) + 8;
 //	}
 
-	y = 0xff - y;
-	x = x - 128;
+	y = 0x1ff - y - 128 + 1;
+	x = x - 128 + 32;
+
+	x -= (w / 2);
+	y -= (h / 2);
 
 	x &= 0x01ff;
 	y &= 0x01ff;
