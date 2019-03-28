@@ -62,7 +62,6 @@
 
  TM-055 (Indy 4)
     7406  Hex Inverter Buffers/Drivers with O.C. H.V. Outputs (note: Might not be needed, could just clone from 7404)
-    7414  Hex Schmitt-Trigger Inverters
     7417  Hex Buffers/Drivers
     9301  1-of-10 Decoder
     LM339 Quad Comparator
