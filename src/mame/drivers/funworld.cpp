@@ -3341,7 +3341,7 @@ READ8_MEMBER(royalcrdf_state::royalcrdf_opcode_r)
 
 void royalcrdf_state::royalcrdf_opcodes_map(address_map &map)
 {
-	map(0x8000, 0xffff).r(FUNC(royalcrdf_state::royalcrdf_opcode_r));
+	map(0x0000, 0xffff).r(FUNC(royalcrdf_state::royalcrdf_opcode_r));
 }
 
 void royalcrdf_state::driver_init()
@@ -3411,7 +3411,7 @@ READ8_MEMBER(multiwin_state::multiwin_opcode_r)
 
 void multiwin_state::multiwin_opcodes_map(address_map &map)
 {
-	map(0x8000, 0xffff).r(FUNC(multiwin_state::multiwin_opcode_r));
+	map(0x0000, 0xffff).r(FUNC(multiwin_state::multiwin_opcode_r));
 }
 
 void multiwin_state::driver_init()
@@ -3540,7 +3540,7 @@ READ8_MEMBER(powercrd_state::powercrd_opcode_r)
 
 void powercrd_state::powercrd_opcodes_map(address_map &map)
 {
-	map(0x8000, 0xffff).r(FUNC(powercrd_state::powercrd_opcode_r));
+	map(0x0000, 0xffff).r(FUNC(powercrd_state::powercrd_opcode_r));
 }
 
 void powercrd_state::powercrd(machine_config &config)
@@ -3656,7 +3656,7 @@ READ8_MEMBER(megacard_state::megacard_opcode_r)
 
 void megacard_state::megacard_opcodes_map(address_map &map)
 {
-	map(0x8000, 0xffff).r(FUNC(megacard_state::megacard_opcode_r));
+	map(0x0000, 0xffff).r(FUNC(megacard_state::megacard_opcode_r));
 }
 
 void megacard_state::megacard(machine_config &config)
@@ -3806,7 +3806,7 @@ READ8_MEMBER(jokercrd_state::jokercrd_opcode_r)
 
 void jokercrd_state::jokercrd_opcodes_map(address_map &map)
 {
-	map(0x8000, 0xffff).r(FUNC(jokercrd_state::jokercrd_opcode_r));
+	map(0x0000, 0xffff).r(FUNC(jokercrd_state::jokercrd_opcode_r));
 }
 
 void jokercrd_state::jokercrd(machine_config &config)
