@@ -171,7 +171,7 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 	//uint16_t attr2 = m_sprattr2[base_addr + 0];
 	//uint16_t attr = m_spriteram[base_addr + 3];
 
-	int x = (attr1>>8) & 0xff;
+	int x = (attr1 >> 8) & 0xff;
 	int y = (attr1) & 0xff;
 
 	if (!tile)
@@ -179,15 +179,15 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 		return;
 	}
 
-//	if ((priority==0) && (scanline==128)) printf("%02x, drawing sprite %04x %04x %04x\n", base_addr, tile, attr1, attr2);
+	//	if ((priority==0) && (scanline==128)) printf("%02x, drawing sprite %04x %04x %04x\n", base_addr, tile, attr1, attr2);
 
-//	if (((attr & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
-//	{
-//		return;
-//	}
+	//	if (((attr & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
+	//	{
+	//		return;
+	//	}
 
-	const uint32_t h = 8 << 3;//((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	const uint32_t w = 8 << 3;//((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+	const uint32_t h = 8 << 2;//((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+	const uint32_t w = 8 << 2;//((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
 //	if (!(m_video_regs[0x42] & SPRITE_COORD_TL_MASK))
 //	{
@@ -215,9 +215,9 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 	const uint32_t palette_offset = 0;//(attr & 0x0f00) >> 4;
 
 	if (flip_x)
-		draw<FlipXOn>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, 0, palette_offset);
+		draw<FlipXOn>(cliprect, tile_line, x, y, 0, bitmap_addr, tile, palette_offset, h, w, bpp);
 	else
-		draw<FlipXOff>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, 0, palette_offset);
+		draw<FlipXOff>(cliprect, tile_line, x, y, 0, bitmap_addr, tile, palette_offset, h, w, bpp);
 }
 
 

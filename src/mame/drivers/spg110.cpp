@@ -47,7 +47,7 @@ protected:
 
 void spg110_game_state::mem_map(address_map &map)
 {
-	map(0x004000, 0x0fffff).rom().region("maincpu", 0x8000);
+	map(0x004000, 0x3fffff).rom().region("maincpu", 0x8000);
 	map(0x000000, 0x003fff).m(m_spg, FUNC(spg110_device::map));
 }
 
@@ -384,7 +384,7 @@ void spg110_game_state::spg110_base(machine_config &config)
 }
 
 ROM_START( jak_capb )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "classicarcadepinball.bin", 0x000000, 0x200000, CRC(b643dab0) SHA1(f57d546758ba442e28b5f0f48b3819b2fc2eb7f7) )
 ROM_END
 
