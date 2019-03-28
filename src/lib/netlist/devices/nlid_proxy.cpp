@@ -122,7 +122,7 @@ namespace netlist
 		m_last_state = -1;
 		m_RV.reset();
 		m_is_timestep = m_RV.m_P.net().solver()->has_timestep_devices();
-		m_RV.set(plib::constants<nl_double>::one() / logic_family()->R_low(),
+		m_RV.set_G_V_I(plib::constants<nl_double>::one() / logic_family()->R_low(),
 				logic_family()->low_V(0.0, supply_V), 0.0);
 	}
 
@@ -143,7 +143,7 @@ namespace netlist
 			{
 				m_RV.update();
 			}
-			m_RV.set(plib::constants<nl_double>::one() / R, V, 0.0);
+			m_RV.set_G_V_I(plib::constants<nl_double>::one() / R, V, 0.0);
 			m_RV.solve_later();
 		}
 	}

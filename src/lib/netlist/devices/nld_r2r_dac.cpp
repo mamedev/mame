@@ -44,7 +44,7 @@ namespace netlist
 		double V = m_VIN() / static_cast<double>(1 << m_num())
 				* static_cast<double>(m_val());
 
-		this->set(1.0 / m_R(), V, 0.0);
+		this->set_G_V_I(1.0 / m_R(), V, 0.0);
 	}
 	} //namespace analog
 

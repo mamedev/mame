@@ -390,10 +390,6 @@ void einstein_state::machine_start()
 	m_bank1->configure_entry(1, m_bios->base());
 	m_bank2->set_base(m_ram->pointer());
 	m_bank3->set_base(m_ram->pointer() + 0x8000);
-
-	// setup expansion slot
-	m_pipe->set_program_space(&m_maincpu->space(AS_PROGRAM));
-	m_pipe->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 void einstein_state::machine_reset()
@@ -428,8 +424,7 @@ void einstein_state::einstein_io(address_map &map)
 	map(0x00, 0x00).mirror(0xff04).rw(FUNC(einstein_state::reset_r), FUNC(einstein_state::reset_w));
 	map(0x02, 0x02).mirror(0xff04).rw(m_psg, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0x03, 0x03).mirror(0xff04).w(m_psg, FUNC(ay8910_device::data_w));
-	map(0x08, 0x08).mirror(0xff06).rw("vdp", FUNC(tms9129_device::vram_r), FUNC(tms9129_device::vram_w));
-	map(0x09, 0x09).mirror(0xff06).rw("vdp", FUNC(tms9129_device::register_r), FUNC(tms9129_device::register_w));
+	map(0x08, 0x09).mirror(0xff06).rw("vdp", FUNC(tms9129_device::read), FUNC(tms9129_device::write));
 	map(0x10, 0x11).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x18, 0x1b).mirror(0xff04).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
 	map(0x20, 0x20).mirror(0xff00).rw(FUNC(einstein_state::kybint_msk_r), FUNC(einstein_state::kybint_msk_w));
@@ -674,6 +669,8 @@ void einstein_state::einstein(machine_config &config)
 
 	// tatung pipe connector
 	TATUNG_PIPE(config, m_pipe, XTAL_X002 / 2, tatung_pipe_cards, nullptr);
+	m_pipe->set_program_space(m_maincpu, AS_PROGRAM);
+	m_pipe->set_io_space(m_maincpu, AS_IO);
 	m_pipe->nmi_handler().set_inputline(IC_I001, INPUT_LINE_NMI);
 
 	// user port

@@ -82,8 +82,7 @@ void bbcbc_state::io_map(address_map &map)
 						 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 							 m_z80pio->write(space, offset >> 5, data, mem_mask);
 						 });
-	map(0x80, 0x80).rw("tms9129", FUNC(tms9129_device::vram_r), FUNC(tms9129_device::vram_w));
-	map(0x81, 0x81).rw("tms9129", FUNC(tms9129_device::register_r), FUNC(tms9129_device::register_w));
+	map(0x80, 0x81).rw("tms9129", FUNC(tms9129_device::read), FUNC(tms9129_device::write));
 }
 
 // Input bits are read through the PIO four at a time, then stored individually in RAM at E030-E03B

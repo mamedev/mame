@@ -68,8 +68,6 @@ dinopic2: no sound, one bad graphics ROM. Copying 8.bin from dinopic fixes it.
 
 fcrash, kodb: old sprites show on next screen. Patch used.
 
-knightsb: sprites are entangled with the front layer.
-
 punipic, punipic2: no sound. Problems in Central Park. Patches used.
 
 punipic3: same as punipic, and doors are missing.
@@ -322,6 +320,8 @@ WRITE16_MEMBER(cps_state::mtwinsb_layer_w)
 
 WRITE16_MEMBER(cps_state::punipic_layer_w)
 {
+	m_cps_a_regs[0x08/2] = 0;
+
 	switch (offset)
 	{
 	case 0x00:
@@ -360,14 +360,12 @@ WRITE16_MEMBER(cps_state::punipic_layer_w)
 				break;
 			}
 
-			m_cps_a_regs[0x08 / 2] = m_mainram[0xdb90 / 2]; // fixes split objects
 			break;
 	case 0x07:
 		// unknown
 		break;
 	default:
 		logerror("%s: Unknown layer cmd %X %X\n",machine().describe_context(),offset<<1,data);
-
 	}
 }
 
@@ -481,7 +479,6 @@ WRITE16_MEMBER(cps_state::sf2mdta_layer_w)
 	case 0x09:
 		m_cps_a_regs[0x12 / 2] = data; /* scroll 2y */
 		m_cps_a_regs[CPS1_ROWSCROLL_OFFS] = data; /* row scroll start */
-		m_cps_a_regs[0x08 / 2] = m_mainram[0x802e / 2];
 		break;
 	case 0x0a:
 		m_cps_a_regs[0x10 / 2] = 0xffce; /* scroll 2x */
@@ -2297,42 +2294,40 @@ MACHINE_START_MEMBER(cps_state, dinopic)
 	m_sprite_x_offset = 0;
 }
 
-MACHINE_CONFIG_START(cps_state::dinopic)
-
+void cps_state::dinopic(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(dinopic_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cps_state, cps1_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cps_state, cps1_int_ack)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::dinopic_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(cps_state::cps1_int_ack));
 
-	//MCFG_DEVICE_ADD("audiocpu", PIC16C57, 12000000)
-	//MCFG_DEVICE_DISABLE() /* no valid dumps .. */
+	//PIC16C57(config, m_audiocpu, 12000000).set_disable(); /* no valid dumps .. */
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, dinopic)
 
 	EEPROM_93C46_8BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps_state, screen_vblank_cps1))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
+	m_screen->set_screen_update(FUNC(cps_state::screen_update_fcrash));
+	m_screen->screen_vblank().set(FUNC(cps_state::screen_vblank_cps1));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	MCFG_PALETTE_ADD("palette", 0xc00)
+	PALETTE(config, m_palette).set_entries(0xc00);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 /*
 
@@ -2488,29 +2483,30 @@ void cps_state::init_mtwinsb()
 // sound cpu is (239 V 249521 VC5006 KABUKI DL-030P-110V) - recycled Kabuki Z80 from genuine Capcom HW?
 // 3x8 dsws
 
-MACHINE_CONFIG_START(cps_state::sgyxz)
+void cps_state::sgyxz(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(sgyxz_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cps_state,  cps1_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cps_state, cps1_int_ack)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::sgyxz_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(cps_state::cps1_int_ack));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
-	MCFG_DEVICE_PROGRAM_MAP(sgyxz_sound_map)
+	Z80(config, m_audiocpu, 3579545);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cps_state::sgyxz_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state,sgyxz)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps_state, screen_vblank_cps1))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
+	m_screen->set_screen_update(FUNC(cps_state::screen_update_fcrash));
+	m_screen->screen_vblank().set(FUNC(cps_state::screen_vblank_cps1));
+	m_screen->set_palette(m_palette);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	MCFG_PALETTE_ADD("palette", 0xc00)
+	PALETTE(config, m_palette).set_entries(0xc00);
 
 	EEPROM_93C46_8BIT(config, "eeprom");
 
@@ -2526,9 +2522,8 @@ MACHINE_CONFIG_START(cps_state::sgyxz)
 	ym2151.add_route(1, "mono", 0.35);
 
 	/* CPS PPU is fed by a 16mhz clock,pin 117 outputs a 4mhz clock which is divided by 4 using 2 74ls74 */
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/4/4, okim6295_device::PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(16'000'000)/4/4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30); // pin 7 can be changed by the game code, see f006 on z80
+}
 
 ROM_START( sgyxz )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68000 Code */
@@ -2563,12 +2558,12 @@ ROM_START( sgyxz )
 	ROM_LOAD( "sgyxz_snd1.bin", 0x00000, 0x40000,  CRC(c15ac0f2) SHA1(8d9e5519d9820e4ac4f70555088c80e64d052c9d) )
 ROM_END
 
-MACHINE_CONFIG_START(cps_state::wofabl)
+void cps_state::wofabl(machine_config &config)
+{
 	sgyxz(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(wofabl_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::wofabl_map);
+}
 
 ROM_START( wofabl )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68000 Code */
@@ -2611,42 +2606,40 @@ MACHINE_START_MEMBER(cps_state, punipic)
 	m_sprite_x_offset = 0;
 }
 
-MACHINE_CONFIG_START(cps_state::punipic)
-
+void cps_state::punipic(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(punipic_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cps_state, cps1_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cps_state, cps1_int_ack)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::punipic_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(cps_state::cps1_int_ack));
 
-	//MCFG_DEVICE_ADD("audiocpu", PIC16C57, 12000000)
-	//MCFG_DEVICE_DISABLE() /* no valid dumps .. */
+	//PIC16C57(config, m_audiocpu, 12000000).set_disable(); /* no valid dumps .. */
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, punipic)
 
 	EEPROM_93C46_8BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps_state, screen_vblank_cps1))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
+	m_screen->set_screen_update(FUNC(cps_state::screen_update_fcrash));
+	m_screen->screen_vblank().set(FUNC(cps_state::screen_vblank_cps1));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	MCFG_PALETTE_ADD("palette", 0xc00)
+	PALETTE(config, m_palette).set_entries(0xc00);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 /* bootleg with pic, like dinopic / dinopic2 */
 ROM_START( punipic )
@@ -2805,28 +2798,28 @@ void cps_state::init_punipic3()
 
 // ************************************************************************* SF2M1
 
-MACHINE_CONFIG_START(cps_state::sf2m1)
-
+void cps_state::sf2m1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000) )
-	MCFG_DEVICE_PROGRAM_MAP(sf2m1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cps_state, cps1_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cps_state, cps1_int_ack)
+	M68000(config, m_maincpu, XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::sf2m1_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(cps_state::cps1_int_ack));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(sgyxz_sound_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cps_state::sgyxz_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state,sf2m1)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps_state, screen_vblank_cps1))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
+	m_screen->set_screen_update(FUNC(cps_state::screen_update_fcrash));
+	m_screen->screen_vblank().set(FUNC(cps_state::screen_vblank_cps1));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	MCFG_PALETTE_ADD("palette", 0xc00)
+	PALETTE(config, m_palette).set_entries(0xc00);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2836,9 +2829,8 @@ MACHINE_CONFIG_START(cps_state::sf2m1)
 	ym2151.irq_handler().set_inputline(m_audiocpu, 0);
 	ym2151.add_route(0, "mono", 0.35);
 	ym2151.add_route(1, "mono", 0.35);
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/4/4, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(16'000'000)/4/4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 ROM_START( sf2m1 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -3181,40 +3173,38 @@ MACHINE_START_MEMBER(cps_state, slampic)
 	m_sprite_x_offset = 0;
 }
 
-MACHINE_CONFIG_START(cps_state::slampic)
-
+void cps_state::slampic(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(slampic_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cps_state, cps1_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cps_state, cps1_int_ack)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::slampic_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(cps_state::cps1_int_ack));
 
-	//MCFG_DEVICE_ADD("audiocpu", PIC16C57, 12000000)
-	//MCFG_DEVICE_DISABLE() /* no valid dumps .. */
+	//PIC16C57(config, m_audiocpu, 12000000).set_disable(); /* no valid dumps .. */
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, slampic)
 
 	EEPROM_93C46_8BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps_state, screen_vblank_cps1))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
+	m_screen->set_screen_update(FUNC(cps_state::screen_update_fcrash));
+	m_screen->screen_vblank().set(FUNC(cps_state::screen_vblank_cps1));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	MCFG_PALETTE_ADD("palette", 0xc00)
+	PALETTE(config, m_palette).set_entries(0xc00);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 ROM_START( slampic )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -3282,31 +3272,31 @@ void cps_state::varthb_map(address_map &map)
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
-MACHINE_CONFIG_START(cps_state::varthb)
-
+void cps_state::varthb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(varthb_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cps_state,  cps1_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cps_state, cps1_int_ack)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::varthb_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(cps_state::cps1_int_ack));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
-	MCFG_DEVICE_PROGRAM_MAP(sgyxz_sound_map)
+	Z80(config, m_audiocpu, 3579545);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cps_state::sgyxz_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state,cps1)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_cps1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps_state, screen_vblank_cps1))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
+	m_screen->set_screen_update(FUNC(cps_state::screen_update_cps1));
+	m_screen->screen_vblank().set(FUNC(cps_state::screen_vblank_cps1));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	MCFG_PALETTE_ADD("palette", 0xc00)
+	PALETTE(config, m_palette).set_entries(0xc00);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3319,9 +3309,8 @@ MACHINE_CONFIG_START(cps_state::varthb)
 	ym2151.add_route(0, "mono", 0.35);
 	ym2151.add_route(1, "mono", 0.35);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/4/4, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(16'000'000)/4/4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 ROM_START( varthb )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -3375,8 +3364,8 @@ GAME( 1991, knightsb,  knights,  knightsb,  knights,  cps_state, init_dinopic,  
 
 GAME( 1993, mtwinsb,   mtwins,   mtwinsb,   mtwins,   cps_state, init_mtwinsb,  ROT0,   "David Inc. (bootleg)", "Twins (Mega Twins bootleg)", MACHINE_SUPPORTS_SAVE ) // based on World version
 
-GAME( 1993, punipic,   punisher, punipic,   punisher, cps_state, init_punipic,  ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
-GAME( 1993, punipic2,  punisher, punipic,   punisher, cps_state, init_punipic,  ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
+GAME( 1993, punipic,   punisher, punipic,   punisher, cps_state, init_punipic,  ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
+GAME( 1993, punipic2,  punisher, punipic,   punisher, cps_state, init_punipic,  ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
 GAME( 1993, punipic3,  punisher, punipic,   punisher, cps_state, init_punipic3, ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
 
 GAME( 1992, sf2m1,     sf2ce,    sf2m1,     sf2,      cps_state, init_sf2m1,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (M1, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC

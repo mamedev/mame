@@ -634,7 +634,8 @@ static INPUT_PORTS_START( poisk1 )
 	PORT_INCLUDE( poisk1_keyboard_v91 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(p1_state::poisk1)
+void p1_state::poisk1(machine_config &config)
+{
 	/* basic machine hardware */
 	I8088(config, m_maincpu, 5000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &p1_state::poisk1_map);
@@ -673,10 +674,10 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	m_isabus->irq5_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
 	m_isabus->irq7_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", p1_isa8_cards, "fdc", false) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
+	ISA8_SLOT(config, "isa1", 0, m_isabus, p1_isa8_cards, "fdc", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, m_isabus, p1_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 0, m_isabus, p1_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", 0, m_isabus, p1_isa8_cards, nullptr, false);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
@@ -685,19 +686,18 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 //  SOFTWARE_LIST(config, "cass_list").set_original("poisk1_cass");
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "speaker", SPEAKER_SOUND )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS( XTAL(15'000'000), 912,0,640, 262,0,200 )
-	MCFG_SCREEN_UPDATE_DRIVER( p1_state, screen_update )
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(15'000'000), 912,0,640, 262,0,200);
+	m_screen->set_screen_update(FUNC(p1_state::screen_update));
 
 	/* XXX verify palette */
 	PALETTE(config, m_palette, FUNC(p1_state::p1_palette), CGA_PALETTE_SETS * 16);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("512K");
-MACHINE_CONFIG_END
+}
 
 ROM_START( poisk1 )
 	ROM_REGION16_LE(0x10000,"bios", 0)

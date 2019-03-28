@@ -762,10 +762,10 @@ READ8_MEMBER(maygay1b_state::mcu_port2_r)
 
 // machine driver for maygay m1 board /////////////////////////////////
 
-MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
-
-	MCFG_DEVICE_ADD("maincpu", MC6809, M1_MASTER_CLOCK/2) // claimed to be 4 MHz
-	MCFG_DEVICE_PROGRAM_MAP(m1_memmap)
+void maygay1b_state::maygay_m1(machine_config &config)
+{
+	MC6809(config, m_maincpu, M1_MASTER_CLOCK/2); // claimed to be 4 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &maygay1b_state::m1_memmap);
 
 	I80C51(config, m_mcu, 2000000); //  EP840034.A-P-80C51AVW
 	m_mcu->port_in_cb<0>().set(FUNC(maygay1b_state::mcu_port0_r));
@@ -801,13 +801,13 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	m_ay->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_ay->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, M1_MASTER_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	ym2413_device &ymsnd(YM2413(config, "ymsnd", M1_MASTER_CLOCK/4));
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("msm6376", OKIM6376, 102400) //? Seems to work well with samples, but unconfirmed
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6376(config, m_msm6376, 102400); //? Seems to work well with samples, but unconfirmed
+	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	TIMER(config, "nmitimer").configure_periodic(FUNC(maygay1b_state::maygay1b_nmitimer_callback), attotime::from_hz(75)); // freq?
 
@@ -841,7 +841,7 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	config.set_default_layout(layout_maygay1b);
-MACHINE_CONFIG_END
+}
 
 void maygay1b_state::maygay_m1_no_oki(machine_config &config)
 {
@@ -849,17 +849,17 @@ void maygay1b_state::maygay_m1_no_oki(machine_config &config)
 	config.device_remove("msm6376");
 }
 
-MACHINE_CONFIG_START(maygay1b_state::maygay_m1_nec)
+void maygay1b_state::maygay_m1_nec(machine_config &config)
+{
 	maygay_m1(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(m1_nec_memmap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &maygay1b_state::m1_nec_memmap);
 
 	config.device_remove("msm6376");
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 WRITE8_MEMBER(maygay1b_state::m1ab_no_oki_w)
 {

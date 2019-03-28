@@ -1055,8 +1055,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(midvunit_state::midvcommon)
-
+void midvunit_state::midvcommon(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS32031(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midvunit_state::midvunit_map);
@@ -1069,13 +1069,13 @@ MACHINE_CONFIG_START(midvunit_state::midvcommon)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, m_palette).set_entries(32768);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MIDVUNIT_VIDEO_CLOCK/2, 666, 0, 512, 432, 0, 400)
-	MCFG_SCREEN_UPDATE_DRIVER(midvunit_state, screen_update_midvunit)
-	MCFG_SCREEN_PALETTE("palette")
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MIDVUNIT_VIDEO_CLOCK/2, 666, 0, 512, 432, 0, 400);
+	m_screen->set_screen_update(FUNC(midvunit_state::screen_update_midvunit));
+	m_screen->set_palette(m_palette);
+}
 
 
 void midvunit_state::midvunit(machine_config &config)
@@ -1110,7 +1110,8 @@ void midvunit_state::offroadc(machine_config &config)
 	m_midway_serial_pic2->set_yearoffs(94);
 }
 
-MACHINE_CONFIG_START(midvunit_state::midvplus)
+void midvunit_state::midvplus(machine_config &config)
+{
 	midvcommon(config);
 
 	/* basic machine hardware */
@@ -1131,7 +1132,7 @@ MACHINE_CONFIG_START(midvunit_state::midvplus)
 	DCS2_AUDIO_2115(config, m_dcs, 0);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x3839);
-MACHINE_CONFIG_END
+}
 
 
 

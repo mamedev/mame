@@ -14,19 +14,14 @@ VSBUILD = $(SRC)/buildVS
 DOC = $(SRC)/documentation
 TIDY_DB = ../compile_commands.json
 
-TIDY_FLAGSX = -checks=*,google*,-hicpp*,-readability*,-fuchsia*,cert-*,-android-*,
+TIDY_FLAGSX = -checks=*,-google*,-hicpp*,-readability*,-fuchsia*,cert-*,-android-*,
 TIDY_FLAGSX += -llvm-header-guard,-cppcoreguidelines-pro-type-reinterpret-cast,
 TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-owning-memory, 
 TIDY_FLAGSX += -modernize-use-default-member-init,-cppcoreguidelines-pro-bounds-constant-array-index,
 TIDY_FLAGSX += -modernize-pass-by-value,-cppcoreguidelines-pro-type-static-cast-downcast,
-#TIDY_FLAGSX += -cppcoreguidelines-special-member-functions,
-#TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
-TIDY_FLAGSX += performance-unnecessary-value-param,-cppcoreguidelines-avoid-magic-numbers,
+TIDY_FLAGSX += -cppcoreguidelines-avoid-magic-numbers,
 TIDY_FLAGSX += -cppcoreguidelines-macro-usage,
 TIDY_FLAGSX += -cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes,
-#TIDY_FLAGSX += -cppcoreguidelines-avoid-c-arrays,-modernize-avoid-c-arrays,
-#TIDY_FLAGSX += -modernize-use-using,
-TIDY_FLAGSX += performance-unnecessary-copy-initialization,
 TIDY_FLAGSX += -bugprone-macro-parentheses,-misc-macro-parentheses
 
 space := 
@@ -232,10 +227,10 @@ maketree: $(sort $(OBJDIRS))
 .PHONY: clang clang-5 mingw doc native
 
 native: 
-	$(MAKE) CEXTRAFLAGS="-march=native -Wall -Wpedantic -Wsign-compare -Wextra "
+	$(MAKE) CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra "
 
 clang:
-	$(MAKE) CC=clang++-9 LD=clang++-9 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-unused-template -Wno-non-virtual-dtor -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wweak-template-vtables -Wno-exit-time-destructors"
+	$(MAKE) CC=clang++-9 LD=clang++-9 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-padded -Wno-weak-vtables -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
 
 clang-5:
 	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-inconsistent-missing-destructor-override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
@@ -252,6 +247,10 @@ tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix
 # FIXME:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-exit-time-destructors
 # FIXME: -Winconsistent-missing-destructor-override : c++ community has diverging opinions on this https://github.com/isocpp/CppCoreGuidelines/issues/721
 # FIXME: -Wunreachable-code : False warnings, this a documented clang bug: https://llvm.org/bugs/show_bug.cgi?id=28994
+# -Wweak-template-vtables 
+#
+# These have to be given:
+# -Wno-missing-variable-declarations : Device factory code, on purpose 
 
 mingw:
 	$(MAKE) CEXTRAFLAGS="-DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0501 -DWIN32_LEAN_AND_MEAN" \

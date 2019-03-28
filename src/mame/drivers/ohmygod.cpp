@@ -320,24 +320,24 @@ void ohmygod_state::machine_reset()
 	m_scrolly = 0;
 }
 
-MACHINE_CONFIG_START(ohmygod_state::ohmygod)
-
+void ohmygod_state::ohmygod(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(ohmygod_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ohmygod_state,  irq1_line_hold)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ohmygod_state::ohmygod_map);
+	m_maincpu->set_vblank_int("screen", FUNC(ohmygod_state::irq1_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 0*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(ohmygod_state, screen_update_ohmygod)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(12*8, (64-12)*8-1, 0*8, 30*8-1 );
+	screen.set_screen_update(FUNC(ohmygod_state::screen_update_ohmygod));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ohmygod);
 
@@ -346,10 +346,10 @@ MACHINE_CONFIG_START(ohmygod_state::ohmygod)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 14000000/8, okim6295_device::PIN7_HIGH)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 14000000/8, okim6295_device::PIN7_HIGH));
+	oki.set_addrmap(0, &ohmygod_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************

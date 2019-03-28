@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco,hap
+// copyright-holders:Kevin Horton, Jonathan Gevaryahu, Sandro Ronco, hap
 /******************************************************************************
 *
 * fidel_vsc.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
@@ -247,7 +247,7 @@ READ8_MEMBER(vsc_state::pio_porta_r)
 {
 	// d0-d7: multiplexed inputs
 	// also language switches(hardwired with 2 diodes)
-	u8 lan = (m_inp_mux & 0x400) ? m_language : 0;
+	u8 lan = (m_inp_mux & 0x400) ? *m_language : 0;
 	return read_inputs(10) | lan;
 }
 
@@ -397,39 +397,25 @@ ROM_START( vsc )
 	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
 	ROM_LOAD("101-32024", 0x4000, 0x1000, CRC(2a078676) SHA1(db2f0aba7e8ac0f84a17bae7155210cdf0813afb) )
 
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) )
-	ROM_RELOAD(           0x1000, 0x1000)
-ROM_END
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
 
-ROM_START( vscg )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64018", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626) )
-	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
-	ROM_LOAD("101-32024", 0x4000, 0x1000, CRC(2a078676) SHA1(db2f0aba7e8ac0f84a17bae7155210cdf0813afb) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("101-64101", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv, assume correct
-ROM_END
-
-ROM_START( vscsp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64018", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626) )
-	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
-	ROM_LOAD("101-32024", 0x4000, 0x1000, CRC(2a078676) SHA1(db2f0aba7e8ac0f84a17bae7155210cdf0813afb) )
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(3) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("101-64106", 0x0000, 0x2000, BAD_DUMP CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) ) // taken from vcc/fexcelv, assume correct
-ROM_END
-
-ROM_START( vscfr )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64018", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626) )
-	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
-	ROM_LOAD("101-32024", 0x4000, 0x1000, CRC(2a078676) SHA1(db2f0aba7e8ac0f84a17bae7155210cdf0813afb) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("101-64105", 0x0000, 0x2000, BAD_DUMP CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3) ) // taken from fexcelv, assume correct
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
 ROM_END
 
 } // anonymous namespace
@@ -440,8 +426,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME   PARENT CMP MACHINE  INPUT  STATE      INIT              COMPANY, FULLNAME, FLAGS
-CONS( 1980, vsc,   0,      0, vsc,     vsc,   vsc_state, init_language<0>, "Fidelity Electronics", "Voice Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1980, vscg,  vsc,    0, vsc,     vsc,   vsc_state, init_language<1>, "Fidelity Electronics", "Voice Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1980, vscsp, vsc,    0, vsc,     vsc,   vsc_state, init_language<3>, "Fidelity Electronics", "Voice Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1980, vscfr, vsc,    0, vsc,     vsc,   vsc_state, init_language<2>, "Fidelity Electronics", "Voice Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME  PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1980, vsc,  0,      0, vsc,     vsc,   vsc_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

@@ -678,6 +678,48 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="dlair">
+		<description>Dragon's Lair</description>
+		<year>1989</year>
+		<publisher>Merit Software</publisher>
+		<info name="developer" value="Sullivan Bluth Interactive Media" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dragon's Lair [Merit Software] [1989] [3.5DD] [Disk 1 of 7].img" size="737280" crc="427a0228" sha1="1dc55efd9e29cf40cf7fb3d8f18c7bd638463767" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dragon's Lair [Merit Software] [1989] [3.5DD] [Disk 2 of 7].img" size="737280" crc="edd53e3f" sha1="0e3a92ef40d34625ca7bbf0659f92426a87f7d7d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dragon's Lair [Merit Software] [1989] [3.5DD] [Disk 3 of 7].img" size="737280" crc="abce5854" sha1="1c5fb429a82c333e80c97dacc643a53f75d697a9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dragon's Lair [Merit Software] [1989] [3.5DD] [Disk 4 of 7].img" size="737280" crc="4b18e231" sha1="77956cf326c656040623ea18e6e29855198b4a43" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dragon's Lair [Merit Software] [1989] [3.5DD] [Disk 5 of 7].img" size="737280" crc="8472352b" sha1="951ada228f6b503590240a0826638a44767eb15a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dragon's Lair [Merit Software] [1989] [3.5DD] [Disk 6 of 7].img" size="737280" crc="32eb9f17" sha1="c04ee5b1f011d57382ad91ea39462339795cc2ef" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dragon's Lair [Merit Software] [1989] [3.5DD] [Disk 7 of 7].img" size="737280" crc="3454a916" sha1="88fcfc7b9f653951023ee3b7cd9955eff9083ddc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="donald">
 		<description>Donald Duck's Playground</description>
 		<year>1986</year>
@@ -8146,6 +8188,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="goldnaxe35" cloneof="goldnaxe">
+		<description>Golden Axe (3.5")</description>
+		<year>1990</year>
+		<publisher>Virgin Games</publisher>
+		<info name="developer" value="Sega" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Golden Axe [Virgin Games] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="174e89c7" sha1="25464172fedb6e3fa7d3626be5dae591a1aa6fb9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gryzor">
 		<!-- Dumped from a copied disk -->
 		<description>Gryzor</description>
@@ -8273,6 +8327,20 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="indycrus">
+		<!-- Dumped via Kryoflux -->
+		<description>Indiana Jones And The Last Crusade - The Action Game (Kixx release)</description>
+		<year>1989</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="developer" value="LucasFilm Games" />
+		<part name="flop1" interface="floppy_3_5">
+			<!-- Copy-protected key disk -->
+			<dataarea name="flop" size = "2157701">
+				<rom name="Indiana Jones And The Last Crusade - The Action Game (Kixx release) [US Gold] [1989] [3.5DD] [Disk 1 of 1].mfm" size="2157701" crc="6f298760" sha1="36b0d48fd1a2e881a59971da2734d65feb2497c2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="indytod">
 		<description>Indiana Jones and the Temple of Doom</description>
 		<year>1989</year>
@@ -8331,7 +8399,7 @@ has been replaced with an all-zero block. -->
 	<software name="ironmnso">
 		<description>Ivan "Ironman" Stewart's Super Off Road (5.25")</description>
 		<year>1990</year>
-		<publisher>Virgin Games, Inc.</publisher>
+		<publisher>Virgin Mastertronic</publisher>
 		<info name="developer" value="Leland Corporation" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -8348,7 +8416,7 @@ has been replaced with an all-zero block. -->
 	<software name="ironmnso35" cloneof="ironmnso">
 		<description>Ivan "Ironman" Stewart's Super Off Road (16 Blitz release) (3.5")</description>
 		<year>1992</year>
-		<publisher>Virgin Mastertronic</publisher>
+		<publisher>Virgin Games</publisher>
 		<info name="developer" value="Leland Corporation" />
 		<info name="ported by" value="Graftgold" />
 		<part name="flop1" interface="floppy_3_5">
@@ -9555,6 +9623,26 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="panzakic">
+		<!-- Dumped via Kryoflux -->
+		<description>Panza Kick Boxing (Kixx budget release)</description>
+		<year>1991</year>
+		<publisher>Loriciels</publisher>
+		<info name="developer" value="Futura" />
+		<part name="flop1" interface="floppy_3_5">
+			<!-- Copy-protected key disk -->
+			<dataarea name="flop" size = "2162128">
+				<rom name="Panza Kick Boxing (Kixx release) [Futura] [1991] [3.5DD] [Disk A].mfm" size="2162128" crc="4ff178d8" sha1="d3a71ffba548b815bc94f36df7f99ba81b4ad0f3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<!-- Copy-protected key disk -->
+			<dataarea name="flop" size = "2160072">
+				<rom name="Panza Kick Boxing (Kixx release) [Futura] [1991] [3.5DD] [Disk B].mfm" size="2160072" crc="a67217d5" sha1="cccb0efae1431796f3c35b57b69b608ee6804e25" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pcgames3">
 		<description>PC Games #3</description>
 		<year>1988</year>
@@ -10267,7 +10355,7 @@ has been replaced with an all-zero block. -->
 		<description>The Simpsons - Bart vs. the Space Mutants</description>
 		<year>1991</year>
 		<publisher>Acclaim / Ocean</publisher>
-		<info name="developer" value="Imagineering Inc." />
+		<info name="developer" value="Imagineering" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="The Simpsons - Bart vs. the Space Mutants [Acclaim] [1991] [3.5DD] [Disk A].img" size="737280" crc="d1af2bbc" sha1="a3fc285f27158654497030c71a7e5a28481fc012" offset="0"/>
@@ -10284,7 +10372,7 @@ has been replaced with an all-zero block. -->
 		<description>The Simpsons - Bart vs. the Space Mutants (Hit-Squad release)</description>
 		<year>1991</year>
 		<publisher>Acclaim / Ocean</publisher>
-		<info name="developer" value="Imagineering Inc." />
+		<info name="developer" value="Imagineering" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="The Simpsons - Bart vs. the Space Mutants (Hit-Squad release) [Acclaim] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="06caf370" sha1="a32d288c62f47b574a2e17da5d5173de6f77b15b" offset="0"/>

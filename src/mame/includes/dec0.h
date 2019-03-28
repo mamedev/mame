@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "machine/74157.h"
 #include "cpu/h6280/h6280.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/74157.h"
@@ -39,8 +38,7 @@ public:
 		m_sndprotect(*this, "sndprotect"),
 		m_ram(*this, "ram"),
 		m_robocop_shared_ram(*this, "robocop_shared"),
-		m_hippodrm_shared_ram(*this, "hippodrm_shared"),
-		m_in_trackball(*this, "track_%u", 0)
+		m_hippodrm_shared_ram(*this, "hippodrm_shared")
 	{ }
 
 	void dec0_base(machine_config &config);
@@ -105,7 +103,6 @@ private:
 	required_shared_ptr<uint16_t> m_ram;
 	optional_shared_ptr<uint8_t> m_robocop_shared_ram;
 	optional_shared_ptr<uint8_t> m_hippodrm_shared_ram;
-	optional_ioport_array<4> m_in_trackball;
 
 	mcu_type m_game;
 	uint16_t m_i8751_return;
@@ -116,7 +113,6 @@ private:
 	int m_hippodrm_lsb;
 	uint8_t m_i8751_ports[4];
 
-	DECLARE_READ8_MEMBER(trackball_r);
 	DECLARE_WRITE16_MEMBER(dec0_control_w);
 	DECLARE_WRITE16_MEMBER(midres_sound_w);
 	DECLARE_READ16_MEMBER(slyspy_protection_r);
@@ -159,6 +155,7 @@ private:
 	void dec0_i8751_reset();
 	void h6280_decrypt(const char *cputag);
 	void dec0_map(address_map &map);
+	void dec0_tb_map(address_map &map);
 	void dec0_s_map(address_map &map);
 	void hippodrm_map(address_map &map);
 	void hippodrm_sub_map(address_map &map);

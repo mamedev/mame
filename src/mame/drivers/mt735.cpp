@@ -64,10 +64,11 @@ void mt735_state::mt735_map(address_map &map)
 static INPUT_PORTS_START( mt735 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(mt735_state::mt735)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(48'000'000)/6)
-	MCFG_DEVICE_PROGRAM_MAP(mt735_map)
-MACHINE_CONFIG_END
+void mt735_state::mt735(machine_config &config)
+{
+	M68000(config, m_cpu, XTAL(48'000'000)/6);
+	m_cpu->set_addrmap(AS_PROGRAM, &mt735_state::mt735_map);
+}
 
 ROM_START( mt735 )
 	ROM_REGION( 0x40000, "maincpu", 0 )

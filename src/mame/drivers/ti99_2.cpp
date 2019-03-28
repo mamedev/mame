@@ -275,18 +275,13 @@ void ti99_2_state::memmap(address_map &map)
 
 /*
     CRU map - see description above
-    Note that the CRU address space has only even numbers, and the
-    read addresses in the emulation gather 8 bits in one go, so the address
-    is the bit number times 16.
 */
 void ti99_2_state::crumap(address_map &map)
 {
-	map(0x0000, 0x0fff).r(m_io992, FUNC(bus::ti99::internal::io992_device::cruread));
-	map(0x0000, 0x7fff).w(m_io992, FUNC(bus::ti99::internal::io992_device::cruwrite));
+	map(0x0000, 0xffff).rw(m_io992, FUNC(bus::ti99::internal::io992_device::cruread), FUNC(bus::ti99::internal::io992_device::cruwrite));
 
 	// Mirror of CPU-internal flags (1ee0-1efe). Don't read. Write is OK.
-	map(0x01ee, 0x01ef).nopr();
-	map(0x0f70, 0x0f7f).w(FUNC(ti99_2_state::intflag_write));
+	map(0x1ee0, 0x1eff).nopr().w(FUNC(ti99_2_state::intflag_write));
 }
 
 /*

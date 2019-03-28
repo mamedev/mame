@@ -429,18 +429,18 @@ MACHINE_RESET_MEMBER(galivan_state,ninjemak)
 	m_ninjemak_dispdisable = 0;
 }
 
-MACHINE_CONFIG_START(galivan_state::galivan)
-
+void galivan_state::galivan(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)      /* 6 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(galivan_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galivan_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2);      /* 6 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &galivan_state::galivan_map);
+	m_maincpu->set_addrmap(AS_IO, &galivan_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(galivan_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2)      /* 4 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(galivan_state, irq0_line_hold,  XTAL(8'000'000)/2/512)   // ?
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(8'000'000)/2));      /* 4 MHz? */
+	audiocpu.set_addrmap(AS_PROGRAM, &galivan_state::sound_map);
+	audiocpu.set_addrmap(AS_IO, &galivan_state::sound_io_map);
+	audiocpu.set_periodic_int(FUNC(galivan_state::irq0_line_hold), attotime::from_hz(XTAL(8'000'000)/2/512));   // ?
 
 	MCFG_MACHINE_START_OVERRIDE(galivan_state,galivan)
 	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,galivan)
@@ -448,14 +448,14 @@ MACHINE_CONFIG_START(galivan_state::galivan)
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(galivan_state, screen_update_galivan)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(galivan_state::screen_update_galivan));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galivan);
 	PALETTE(config, m_palette, FUNC(galivan_state::galivan_palette), 8*16+16*16+256*16, 256);
@@ -467,53 +467,52 @@ MACHINE_CONFIG_START(galivan_state::galivan)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(8'000'000)/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	YM3526(config, "ymsnd", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dangarj_state::dangarj)
+void dangarj_state::dangarj(machine_config &config)
+{
 	galivan(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(dangarj_io_map)
+	m_maincpu->set_addrmap(AS_IO, &dangarj_state::dangarj_io_map);
 
 	NB1412M2(config, m_prot, XTAL(8'000'000)); // divided by 2 maybe
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(galivan_state::ninjemak)
-
+void galivan_state::ninjemak(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)      /* 6 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(ninjemak_map)
-	MCFG_DEVICE_IO_MAP(ninjemak_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galivan_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2);      /* 6 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &galivan_state::ninjemak_map);
+	m_maincpu->set_addrmap(AS_IO, &galivan_state::ninjemak_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(galivan_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2)      /* 4 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(galivan_state, irq0_line_hold,  XTAL(8'000'000)/2/512)   // ?
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(8'000'000)/2));      /* 4 MHz? */
+	audiocpu.set_addrmap(AS_PROGRAM, &galivan_state::sound_map);
+	audiocpu.set_addrmap(AS_IO, &galivan_state::sound_io_map);
+	audiocpu.set_periodic_int(FUNC(galivan_state::irq0_line_hold), attotime::from_hz(XTAL(8'000'000)/2/512));   // ?
 
 	MCFG_MACHINE_START_OVERRIDE(galivan_state,ninjemak)
 	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,ninjemak)
 
-	MCFG_DEVICE_ADD("nb1414m4", NB1414M4, 0)
+	NB1414M4(config, m_nb1414m4, 0);
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(galivan_state, screen_update_ninjemak)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(galivan_state::screen_update_ninjemak));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galivan);
 	PALETTE(config, m_palette, FUNC(galivan_state::galivan_palette), 8*16+16*16+256*16, 256);
@@ -525,15 +524,14 @@ MACHINE_CONFIG_START(galivan_state::ninjemak)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(8'000'000)/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	YM3526(config, "ymsnd", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 
 void galivan_state::youmab(machine_config &config)

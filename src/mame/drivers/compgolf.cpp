@@ -222,21 +222,21 @@ void compgolf_state::machine_reset()
 	m_scrolly_hi = 0;
 }
 
-MACHINE_CONFIG_START(compgolf_state::compgolf)
-
+void compgolf_state::compgolf(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000) // HD68B09EP
-	MCFG_DEVICE_PROGRAM_MAP(compgolf_map)
+	MC6809E(config, m_maincpu, 2000000); // HD68B09EP
+	m_maincpu->set_addrmap(AS_PROGRAM, &compgolf_state::compgolf_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(compgolf_state, screen_update_compgolf)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(256, 256);
+	screen.set_visarea(1*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(compgolf_state::screen_update_compgolf));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	PALETTE(config, m_palette, FUNC(compgolf_state::compgolf_palette), 0x100);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_compgolf);
@@ -249,7 +249,7 @@ MACHINE_CONFIG_START(compgolf_state::compgolf)
 	ymsnd.port_a_write_callback().set(FUNC(compgolf_state::compgolf_scrollx_lo_w));
 	ymsnd.port_b_write_callback().set(FUNC(compgolf_state::compgolf_scrolly_lo_w));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

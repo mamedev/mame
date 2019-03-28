@@ -966,11 +966,12 @@ void hp2645_state::cpu_io_map(address_map &map)
 	map(0x00, 0xff).w(FUNC(hp2645_state::mode_byte_w));
 }
 
-MACHINE_CONFIG_START(hp2645_state::hp2645)
-	MCFG_DEVICE_ADD("cpu" , I8080A , SYS_CLOCK / 2)
-	MCFG_DEVICE_PROGRAM_MAP(cpu_mem_map)
-	MCFG_DEVICE_IO_MAP(cpu_io_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(hp2645_state , irq_callback)
+void hp2645_state::hp2645(machine_config &config)
+{
+	I8080A(config, m_cpu, SYS_CLOCK / 2);
+	m_cpu->set_addrmap(AS_PROGRAM, &hp2645_state::cpu_mem_map);
+	m_cpu->set_addrmap(AS_IO, &hp2645_state::cpu_io_map);
+	m_cpu->set_irq_acknowledge_callback(FUNC(hp2645_state::irq_callback));
 
 	TIMER(config, m_timer_10ms).configure_generic(FUNC(hp2645_state::timer_10ms_exp));
 	TIMER(config, m_timer_cursor_blink_inh).configure_generic(FUNC(hp2645_state::timer_cursor_blink_inh));
@@ -1005,8 +1006,7 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, BEEP_FREQUENCY).add_route(ALL_OUTPUTS, "mono", 1.00);
 	TIMER(config, m_timer_beep).configure_generic(FUNC(hp2645_state::timer_beep_exp));
-
-MACHINE_CONFIG_END
+}
 
 ROM_START(hp2645)
 	ROM_REGION(0x5800 , "cpu" , 0)

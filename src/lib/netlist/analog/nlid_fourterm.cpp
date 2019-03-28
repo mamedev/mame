@@ -26,14 +26,14 @@ NETLIB_RESET(VCCS)
 	const nl_double m_mult = m_G() * m_gfac; // 1.0 ==> 1V ==> 1A
 	const nl_double GI = plib::constants<nl_double>::one() / m_RI();
 
-	m_IP.set(GI);
-	m_IN.set(GI);
+	m_IP.set_conductivity(GI);
+	m_IN.set_conductivity(GI);
 
-	m_OP.set(m_mult, plib::constants<nl_double>::zero());
-	m_OP1.set(-m_mult, plib::constants<nl_double>::zero());
+	m_OP.set_go_gt(-m_mult, plib::constants<nl_double>::zero());
+	m_OP1.set_go_gt(m_mult, plib::constants<nl_double>::zero());
 
-	m_ON.set(-m_mult, plib::constants<nl_double>::zero());
-	m_ON1.set(m_mult, plib::constants<nl_double>::zero());
+	m_ON.set_go_gt(m_mult, plib::constants<nl_double>::zero());
+	m_ON1.set_go_gt(-m_mult, plib::constants<nl_double>::zero());
 }
 
 NETLIB_UPDATE(VCCS)
@@ -79,11 +79,11 @@ NETLIB_UPDATE_TERMINALS(LVCCS)
 	const nl_double beta = m_mult * (1.0 - X*X);
 	const nl_double I = m_cur_limit() * X - beta * m_vi;
 
-	m_OP.set(beta, plib::constants<nl_double>::zero(), I);
-	m_OP1.set(-beta, plib::constants<nl_double>::zero());
+	m_OP.set_go_gt_I(-beta, plib::constants<nl_double>::zero(), I);
+	m_OP1.set_go_gt(beta, plib::constants<nl_double>::zero());
 
-	m_ON.set(-beta, plib::constants<nl_double>::zero(), -I);
-	m_ON1.set(beta, plib::constants<nl_double>::zero());
+	m_ON.set_go_gt_I(beta, plib::constants<nl_double>::zero(), -I);
+	m_ON1.set_go_gt(-beta, plib::constants<nl_double>::zero());
 }
 
 // ----------------------------------------------------------------------------------------
@@ -109,8 +109,8 @@ NETLIB_RESET(VCVS)
 	m_gfac = plib::constants<nl_double>::one() / m_RO();
 	NETLIB_NAME(VCCS)::reset();
 
-	m_OP2.set(plib::constants<nl_double>::one() / m_RO());
-	m_ON2.set(plib::constants<nl_double>::one() / m_RO());
+	m_OP2.set_conductivity(plib::constants<nl_double>::one() / m_RO());
+	m_ON2.set_conductivity(plib::constants<nl_double>::one() / m_RO());
 }
 
 	} //namespace analog

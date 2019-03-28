@@ -23,7 +23,8 @@ DEFINE_DEVICE_TYPE(TMP68301, tmp68301_device, "tmp68301", "Toshiba TMP68301")
 
 void tmp68301_device::tmp68301_regs(address_map &map)
 {
-//  AM_RANGE(0x000,0x3ff) AM_RAM
+	map(0x000, 0x3ff).rw(FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));
+
 	map(0x080, 0x093).rw(FUNC(tmp68301_device::icr_r), FUNC(tmp68301_device::icr_w)).umask16(0x00ff);
 
 	map(0x094, 0x095).rw(FUNC(tmp68301_device::imr_r), FUNC(tmp68301_device::imr_w));
@@ -134,9 +135,7 @@ WRITE8_MEMBER(tmp68301_device::icr_w)
 }
 
 tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TMP68301, tag, owner, clock),
-		device_memory_interface(mconfig, *this),
-		m_cpu(*this, finder_base::DUMMY_TAG),
+	: m68000_device(mconfig, TMP68301, tag, owner, clock),
 		m_in_parallel_cb(*this),
 		m_out_parallel_cb(*this),
 		m_ipl(0),
@@ -145,8 +144,7 @@ tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag,
 		m_iisr(0),
 		m_scr(0),
 		m_pdir(0),
-		m_pdr(0),
-	  m_space_config("regs", ENDIANNESS_LITTLE, 16, 10, 0, address_map_constructor(FUNC(tmp68301_device::tmp68301_regs), this))
+		m_pdr(0)
 {
 	memset(m_regs, 0, sizeof(m_regs));
 	memset(m_icr, 0, sizeof(m_icr));
@@ -159,12 +157,16 @@ tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag,
 
 void tmp68301_device::device_start()
 {
-	int i;
-	for (i = 0; i < 3; i++)
+	m68000_device::device_start();
+
+	for (int i = 0; i < 3; i++)
 		m_tmp68301_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tmp68301_device::timer_callback), this));
 
 	m_in_parallel_cb.resolve_safe(0);
 	m_out_parallel_cb.resolve_safe();
+
+	m_program->install_device(0xfffc00, 0xffffff, *this, &tmp68301_device::tmp68301_regs);
+	m_int_ack_callback = device_irq_acknowledge_delegate(FUNC(tmp68301_device::irq_callback), this);
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_icr));
@@ -183,6 +185,8 @@ void tmp68301_device::device_start()
 
 void tmp68301_device::device_reset()
 {
+	m68000_device::device_reset();
+
 	m_ipr = 0;
 	m_iisr = 0;
 	m_imr = 0x7f7; // mask all irqs
@@ -190,39 +194,9 @@ void tmp68301_device::device_reset()
 	update_ipl();
 }
 
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-device_memory_interface::space_config_vector tmp68301_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(0, &m_space_config)
-	};
-}
-
 //**************************************************************************
 //  INLINE HELPERS
 //**************************************************************************
-
-//-------------------------------------------------
-//  read_byte - read a byte at the given address
-//-------------------------------------------------
-
-inline uint16_t tmp68301_device::read_word(offs_t address)
-{
-	return space(0).read_word(address << 1);
-}
-
-//-------------------------------------------------
-//  write_byte - write a byte at the given address
-//-------------------------------------------------
-
-inline void tmp68301_device::write_word(offs_t address, uint16_t data)
-{
-	space(0).write_word(address << 1, data);
-}
 
 IRQ_CALLBACK_MEMBER(tmp68301_device::irq_callback)
 {
@@ -312,7 +286,7 @@ void tmp68301_device::update_timer(int i)
 		{
 			int scale = (TCR & 0x3c00)>>10;         // P4..1
 			if (scale > 8) scale = 8;
-			duration = attotime::from_hz(m_cpu->unscaled_clock()) * ((1 << scale) * max);
+			duration = attotime::from_hz(unscaled_clock()) * ((1 << scale) * max);
 		}
 		break;
 	}
@@ -343,9 +317,9 @@ void tmp68301_device::update_ipl()
 	if (new_ipl != m_ipl)
 	{
 		if (m_ipl != 0)
-			m_cpu->set_input_line(m_ipl, CLEAR_LINE);
+			set_input_line(m_ipl, CLEAR_LINE);
 		if (new_ipl != 0)
-			m_cpu->set_input_line(new_ipl, ASSERT_LINE);
+			set_input_line(new_ipl, ASSERT_LINE);
 
 		m_ipl = new_ipl;
 	}
@@ -366,18 +340,16 @@ uint8_t tmp68301_device::serial_interrupt_cause(int channel)
 
 READ16_MEMBER( tmp68301_device::regs_r )
 {
-	return read_word(offset);
+	return m_regs[offset];
 }
 
 WRITE16_MEMBER( tmp68301_device::regs_w )
 {
 	COMBINE_DATA(&m_regs[offset]);
 
-	write_word(offset,m_regs[offset]);
-
 	if (!ACCESSING_BITS_0_7)    return;
 
-//  logerror("CPU #0 PC %06X: TMP68301 Reg %04X<-%04X & %04X\n", m_cpu->pc(),offset*2,data,mem_mask^0xffff);
+//  logerror("CPU #0 PC %06X: TMP68301 Reg %04X<-%04X & %04X\n", >pc(),offset*2,data,mem_mask^0xffff);
 
 	switch( offset * 2 )
 	{

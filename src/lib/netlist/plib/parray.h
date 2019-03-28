@@ -60,6 +60,7 @@ namespace plib {
 		using size_type = typename base_type::size_type;
 		using reference = typename base_type::reference;
 		using const_reference = typename base_type::const_reference;
+		using value_type = typename base_type::value_type;
 
 		template <int X = SIZE >
 		parray(size_type size, typename std::enable_if<X==0, int>::type = 0)
@@ -103,7 +104,7 @@ namespace plib {
 			return m_a[i];
 		}
 #else
-		reference operator[](size_type i) noexcept
+		C14CONSTEXPR reference operator[](size_type i) noexcept
 		{
 			return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(&m_a[0])[i];
 		}

@@ -189,22 +189,23 @@ static void pk8020_floppies(device_slot_interface &device)
  * 7    floppy
  */
 /* Machine driver */
-MACHINE_CONFIG_START(pk8020_state::pk8020)
+void pk8020_state::pk8020(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 20_MHz_XTAL / 8)
-	MCFG_DEVICE_PROGRAM_MAP(pk8020_mem)
-	MCFG_DEVICE_IO_MAP(pk8020_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pk8020_state,  pk8020_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	I8080(config, m_maincpu, 20_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pk8020_state::pk8020_mem);
+	m_maincpu->set_addrmap(AS_IO, &pk8020_state::pk8020_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pk8020_state::pk8020_interrupt));
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pk8020_state, screen_update_pk8020)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(pk8020_state::screen_update_pk8020));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pk8020);
 	PALETTE(config, m_palette, FUNC(pk8020_state::pk8020_palette), 16);
@@ -262,7 +263,7 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("258K").set_default_value(0x00); // 64 + 4*48 + 2 = 258
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 

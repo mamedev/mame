@@ -1255,8 +1255,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(midzeus_state::midzeus)
-
+void midzeus_state::midzeus(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS32032(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midzeus_state::zeus_map);
@@ -1282,22 +1282,24 @@ MACHINE_CONFIG_START(midzeus_state::midzeus)
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
 	m_ioasic->set_yearoffs(94);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(midzeus_state::mk4)
+void midzeus_state::mk4(machine_config &config)
+{
 	midzeus(config);
 	m_ioasic->set_upper(461/* or 474 */);
 	m_ioasic->set_shuffle_default(1);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(midzeus_state::invasn)
+void midzeus_state::invasn(machine_config &config)
+{
 	midzeus(config);
 	PIC16C57(config, "pic", 8000000);  /* ? */
 	m_ioasic->set_upper(468/* or 488 */);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(midzeus2_state::midzeus2)
-
+void midzeus2_state::midzeus2(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS32032(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midzeus2_state::zeus2_map);
@@ -1323,17 +1325,19 @@ MACHINE_CONFIG_START(midzeus2_state::midzeus2)
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
 	m_ioasic->set_yearoffs(99);
 	m_ioasic->set_upper(474);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(midzeus2_state::crusnexo)
+void midzeus2_state::crusnexo(machine_config &config)
+{
 	midzeus2(config);
 	m_ioasic->set_upper(472/* or 476,477,478,110 */);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(midzeus2_state::thegrid)
+void midzeus2_state::thegrid(machine_config &config)
+{
 	midzeus2(config);
 	m_ioasic->set_upper(474/* or 491 */);
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

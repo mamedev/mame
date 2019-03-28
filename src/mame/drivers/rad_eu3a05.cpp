@@ -1146,25 +1146,25 @@ INTERRUPT_GEN_MEMBER(radica_eu3a05_state::interrupt)
 	*/
 }
 
-MACHINE_CONFIG_START(radica_eu3a05_state::radicasi)
-
+void radica_eu3a05_state::radicasi(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M6502,XTAL(21'281'370)/2) // Tetris has a XTAL(21'281'370), not confirmed on Space Invaders, actual CPU clock unknown.
-	MCFG_DEVICE_PROGRAM_MAP(radicasi_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", radica_eu3a05_state,  interrupt)
+	M6502(config, m_maincpu, XTAL(21'281'370)/2); // Tetris has a XTAL(21'281'370), not confirmed on Space Invaders, actual CPU clock unknown.
+	m_maincpu->set_addrmap(AS_PROGRAM, &radica_eu3a05_state::radicasi_map);
+	m_maincpu->set_vblank_int("screen", FUNC(radica_eu3a05_state::interrupt));
 
 	ADDRESS_MAP_BANK(config, "bank").set_map(&radica_eu3a05_state::radicasi_bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(radica_eu3a05_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(radica_eu3a05_state::screen_update));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, m_palette).set_entries(256);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_radicasi_fake);
 
@@ -1176,7 +1176,7 @@ MACHINE_CONFIG_START(radica_eu3a05_state::radicasi)
 	radica6502_sound_device &sound(RADICA6502_SOUND(config, "6ch_sound", 8000));
 	sound.space_read_callback().set(FUNC(radica_eu3a05_state::read_full_space));
 	sound.add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( rad_tetr )

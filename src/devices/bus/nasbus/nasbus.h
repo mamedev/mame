@@ -149,8 +149,8 @@ public:
 
 	void add_card(device_nasbus_card_interface *card);
 
-	void set_program_space(address_space *program);
-	void set_io_space(address_space *io);
+	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io.set_tag(std::forward<T>(tag), spacenum); }
 
 	// from cards
 	DECLARE_WRITE_LINE_MEMBER( ram_disable_w );
@@ -161,8 +161,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	address_space *m_program;
-	address_space *m_io;
+	required_address_space m_program;
+	required_address_space m_io;
 
 	simple_list<device_nasbus_card_interface> m_dev;
 

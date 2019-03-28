@@ -237,7 +237,7 @@ READ8_MEMBER(electron_state::electron_paged_r)
 
 	default:
 		/* ROM in extension devices */
-		data = m_exp->expbus_r(space, 0x8000 + offset);
+		data = m_exp->expbus_r(0x8000 + offset);
 		break;
 	}
 	return data;
@@ -248,7 +248,7 @@ WRITE8_MEMBER(electron_state::electron_paged_w)
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
 
-	m_exp->expbus_w(space, 0x8000 + offset, data);
+	m_exp->expbus_w(0x8000 + offset, data);
 }
 
 READ8_MEMBER(electron_state::electron_mos_r)
@@ -265,7 +265,7 @@ WRITE8_MEMBER(electron_state::electron_mos_w)
 	m_maincpu->set_clock_scale(1.0f);
 
 	logerror("MOS: write %04x %02x\n", offset + 0xc000, data);
-	m_exp->expbus_w(space, 0xc000 + offset, data);
+	m_exp->expbus_w(0xc000 + offset, data);
 }
 
 READ8_MEMBER(electron_state::electron_fred_r)
@@ -275,7 +275,7 @@ READ8_MEMBER(electron_state::electron_fred_r)
 
 	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xff */
 	//logerror("FRED: read fc%02x\n", offset);
-	return m_exp->expbus_r(space, 0xfc00 + offset);
+	return m_exp->expbus_r(0xfc00 + offset);
 }
 
 WRITE8_MEMBER(electron_state::electron_fred_w)
@@ -287,7 +287,7 @@ WRITE8_MEMBER(electron_state::electron_fred_w)
 	if (offset == 0x7f) m_mrb_mapped = !(data & 0x80);
 
 	//logerror("FRED: write fc%02x\n", offset);
-	m_exp->expbus_w(space, 0xfc00 + offset, data);
+	m_exp->expbus_w(0xfc00 + offset, data);
 }
 
 READ8_MEMBER(electron_state::electron_jim_r)
@@ -297,7 +297,7 @@ READ8_MEMBER(electron_state::electron_jim_r)
 
 	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xff */
 	//logerror("JIM: read fd%02x\n", offset);
-	return m_exp->expbus_r(space, 0xfd00 + offset);
+	return m_exp->expbus_r(0xfd00 + offset);
 }
 
 WRITE8_MEMBER(electron_state::electron_jim_w)
@@ -306,7 +306,7 @@ WRITE8_MEMBER(electron_state::electron_jim_w)
 	m_maincpu->set_clock_scale(1.0f);
 
 	//logerror("JIM: write fd%02x\n", offset);
-	m_exp->expbus_w(space, 0xfd00 + offset, data);
+	m_exp->expbus_w(0xfd00 + offset, data);
 }
 
 READ8_MEMBER(electron_state::electron_sheila_r)
@@ -343,7 +343,7 @@ WRITE8_MEMBER(electron_state::electron_sheila_w)
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
 
-	m_exp->expbus_w(space, 0xfe00 + offset, data);
+	m_exp->expbus_w(0xfe00 + offset, data);
 
 	int i = electron_palette_offset[(( offset >> 1 ) & 0x03)];
 	//logerror( "ULA: write fe%02x <- %02x\n", offset & 0x0f, data );

@@ -275,19 +275,19 @@ WRITE_LINE_MEMBER(istellar_state::vblank_irq)
 /* DRIVER */
 MACHINE_CONFIG_START(istellar_state::istellar)
 	/* main cpu */
-	MCFG_DEVICE_ADD("maincpu", Z80, GUESSED_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(z80_0_mem)
-	MCFG_DEVICE_IO_MAP(z80_0_io)
+	Z80(config, m_maincpu, GUESSED_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &istellar_state::z80_0_mem);
+	m_maincpu->set_addrmap(AS_IO, &istellar_state::z80_0_io);
 
 	/* sound cpu */
-	MCFG_DEVICE_ADD("audiocpu", Z80, GUESSED_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(z80_1_mem)
-	MCFG_DEVICE_IO_MAP(z80_1_io)
+	z80_device &audiocpu(Z80(config, "audiocpu", GUESSED_CLOCK));
+	audiocpu.set_addrmap(AS_PROGRAM, &istellar_state::z80_1_mem);
+	audiocpu.set_addrmap(AS_IO, &istellar_state::z80_1_io);
 
 	/* ldp comm cpu */
-	MCFG_DEVICE_ADD("sub", Z80, GUESSED_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(z80_2_mem)
-	MCFG_DEVICE_IO_MAP(z80_2_io)
+	Z80(config, m_subcpu, GUESSED_CLOCK);
+	m_subcpu->set_addrmap(AS_PROGRAM, &istellar_state::z80_2_mem);
+	m_subcpu->set_addrmap(AS_IO, &istellar_state::z80_2_io);
 
 	GENERIC_LATCH_8(config, "latch1");
 
@@ -295,9 +295,11 @@ MACHINE_CONFIG_START(istellar_state::istellar)
 	latch2.data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 	latch2.set_separate_acknowledge(true);
 
-	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, istellar_state, screen_update_istellar)
-	MCFG_LASERDISC_OVERLAY_PALETTE(m_palette)
+	PIONEER_LDV1000(config, m_laserdisc, 0);
+	m_laserdisc->set_overlay(256, 256, FUNC(istellar_state::screen_update_istellar));
+	m_laserdisc->set_overlay_palette(m_palette);
+	m_laserdisc->add_route(0, "lspeaker", 1.0);
+	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
@@ -311,10 +313,6 @@ MACHINE_CONFIG_START(istellar_state::istellar)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-
-	MCFG_DEVICE_MODIFY("laserdisc")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

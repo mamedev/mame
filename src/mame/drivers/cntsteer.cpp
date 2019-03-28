@@ -919,19 +919,19 @@ MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
 	MACHINE_RESET_CALL_MEMBER(zerotrgt);
 }
 
-MACHINE_CONFIG_START(cntsteer_state::cntsteer)
-
+void cntsteer_state::cntsteer(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)      /* MC68B09E */
-	MCFG_DEVICE_PROGRAM_MAP(cntsteer_cpu1_map)
+	MC6809E(config, m_maincpu, 2000000);      /* MC68B09E */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cntsteer_state::cntsteer_cpu1_map);
 
-	MCFG_DEVICE_ADD("subcpu", MC6809E, 2000000)       /* MC68B09E */
-	MCFG_DEVICE_PROGRAM_MAP(cntsteer_cpu2_map)
-//  MCFG_DEVICE_DISABLE()
+	MC6809E(config, m_subcpu, 2000000);       /* MC68B09E */
+	m_subcpu->set_addrmap(AS_PROGRAM, &cntsteer_state::cntsteer_cpu2_map);
+//  m_subcpu->set_disable();
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)        /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(cntsteer_state, sound_interrupt,  480)
+	M6502(config, m_audiocpu, 1500000);        /* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cntsteer_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(cntsteer_state::sound_interrupt), attotime::from_hz(480));
 
 	MCFG_MACHINE_START_OVERRIDE(cntsteer_state,cntsteer)
 	MCFG_MACHINE_RESET_OVERRIDE(cntsteer_state,cntsteer)
@@ -971,20 +971,20 @@ MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
-
+void cntsteer_state::zerotrgt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)      /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(gekitsui_cpu1_map)
+	MC6809E(config, m_maincpu, 2000000);      /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cntsteer_state::gekitsui_cpu1_map);
 
-	MCFG_DEVICE_ADD("subcpu", MC6809E, 2000000)       /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(gekitsui_cpu2_map)
+	MC6809E(config, m_subcpu, 2000000);       /* ? */
+	m_subcpu->set_addrmap(AS_PROGRAM, &cntsteer_state::gekitsui_cpu2_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)        /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(cntsteer_state, sound_interrupt,  480)
+	M6502(config, m_audiocpu, 1500000);        /* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cntsteer_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(cntsteer_state::sound_interrupt), attotime::from_hz(480));
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
@@ -992,14 +992,14 @@ MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 	MCFG_MACHINE_RESET_OVERRIDE(cntsteer_state,zerotrgt)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cntsteer_state, screen_update_zerotrgt)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI)) // ?
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(cntsteer_state::screen_update_zerotrgt));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI); // ?
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zerotrgt);
 	PALETTE(config, m_palette, FUNC(cntsteer_state::zerotrgt_palette), 256);
@@ -1014,7 +1014,7 @@ MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************/
 

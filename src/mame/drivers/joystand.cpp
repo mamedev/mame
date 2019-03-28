@@ -106,7 +106,6 @@ public:
 	joystand_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_tmp68301(*this, "tmp68301"),
 		m_palette(*this, "palette"),
 		m_bg15_palette(*this, "bg15_palette"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -142,8 +141,7 @@ protected:
 
 private:
 	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<tmp68301_device> m_tmp68301;
+	required_device<tmp68301_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<palette_device> m_bg15_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -479,8 +477,6 @@ void joystand_state::joystand_map(address_map &map)
 	map(0xe00020, 0xe00021).r(FUNC(joystand_state::e00020_r)); // master slot
 
 	map(0xe80040, 0xe8005f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-
-	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
 
 
@@ -584,28 +580,24 @@ void joystand_state::machine_reset()
 INTERRUPT_GEN_MEMBER(joystand_state::joystand_interrupt)
 {
 	// VBlank is connected to INT1 (external interrupts pin 1)
-	m_tmp68301->external_interrupt_1();
+	m_maincpu->external_interrupt_1();
 }
 
-MACHINE_CONFIG_START(joystand_state::joystand)
-
+void joystand_state::joystand(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(16'000'000)) // !! TMP68301 !!
-	MCFG_DEVICE_PROGRAM_MAP(joystand_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", joystand_state, joystand_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
-
-	TMP68301(config, m_tmp68301, 0);
-	m_tmp68301->set_cputag(m_maincpu);
-	m_tmp68301->in_parallel_callback().set(FUNC(joystand_state::eeprom_r));
-	m_tmp68301->out_parallel_callback().set(FUNC(joystand_state::eeprom_w));
+	TMP68301(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &joystand_state::joystand_map);
+	m_maincpu->set_vblank_int("screen", FUNC(joystand_state::joystand_interrupt));
+	m_maincpu->in_parallel_callback().set(FUNC(joystand_state::eeprom_r));
+	m_maincpu->out_parallel_callback().set(FUNC(joystand_state::eeprom_w));
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(joystand_state, screen_update)
-	MCFG_SCREEN_SIZE(0x200, 0x100)
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x40+0x178-1, 0x10, 0x100-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(FUNC(joystand_state::screen_update));
+	screen.set_size(0x200, 0x100);
+	screen.set_visarea(0x40, 0x40+0x178-1, 0x10, 0x100-1);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_joystand);
@@ -615,11 +607,9 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	OKIM6295(config, m_oki, XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // pin 7 not verified
 
 	// cart
 	TMS_29F040(config, "cart.u1");
@@ -638,7 +628,7 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 	// devices
 	EEPROM_93C46_16BIT(config, "eeprom");
 	MSM6242(config, "rtc", XTAL(32'768));
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

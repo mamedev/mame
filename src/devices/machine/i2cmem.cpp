@@ -98,7 +98,10 @@ i2cmem_device::i2cmem_device(
 	m_sdar(1),
 	m_state(STATE_IDLE),
 	m_shift(0),
-	m_byteaddr(0)
+	m_byteaddr(0),
+	m_page_offset(0),
+	m_page_written_size(0),
+	m_in_write(false)
 {
 	// these memories work off the I2C clock only
 	assert(!clock);
@@ -165,6 +168,9 @@ void i2cmem_device::device_start()
 	save_item( NAME(m_shift) );
 	save_item( NAME(m_devsel) );
 	save_item( NAME(m_byteaddr) );
+	save_item( NAME(m_in_write) );
+	save_item( NAME(m_page_offset) );
+	save_item( NAME(m_page_written_size) );
 	save_pointer( &m_data[0], "m_data", m_data_size );
 	if ( m_page_size > 0 )
 	{
@@ -179,6 +185,7 @@ void i2cmem_device::device_start()
 
 void i2cmem_device::device_reset()
 {
+	m_in_write = false;
 }
 
 
@@ -280,6 +287,15 @@ WRITE_LINE_MEMBER( i2cmem_device::write_sda )
 		{
 			if( m_sdaw )
 			{
+				if( m_in_write )
+				{
+					int base = data_offset();
+					int root = base & ~( m_page_size - 1);
+					for( int i=0; i < m_page_written_size; i++)
+						m_data[root | ((base + i) & (m_page_size - 1))] = m_page[i];
+					m_in_write = false;
+					verboselog( this, 1, "data[ %04x to %04x ] = %x bytes\n", base, root | ((base + m_page_written_size - 1) & (m_page_size - 1)), m_page_written_size );
+				}
 				verboselog( this, 1, "stop\n" );
 				m_state = STATE_IDLE;
 			}
@@ -344,6 +360,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 					case STATE_BYTEADDR:
 						m_byteaddr = m_shift;
 						m_page_offset = 0;
+						m_page_written_size = 0;
 
 						verboselog( this, 1, "byteaddr %02x\n", m_byteaddr );
 
@@ -358,23 +375,16 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 						}
 						else if( m_page_size > 0 )
 						{
+							m_in_write = true;
 							m_page[ m_page_offset ] = m_shift;
 							verboselog( this, 1, "page[ %04x ] <- %02x\n", m_page_offset, m_page[ m_page_offset ] );
 
 							m_page_offset++;
 							if( m_page_offset == m_page_size )
-							{
-								int offset = data_offset() & ~( m_page_size - 1 );
-
-								verboselog( this, 1, "data[ %04x to %04x ] = page\n", offset, offset + m_page_size - 1 );
-
-								for( int i = 0; i < m_page_size; i++ )
-								{
-									m_data[offset + i] = m_page[ i ];
-								}
-
 								m_page_offset = 0;
-							}
+							m_page_written_size++;
+							if( m_page_written_size > m_page_size)
+								m_page_written_size = m_page_size;
 						}
 						else
 						{

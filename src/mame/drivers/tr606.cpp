@@ -23,8 +23,8 @@
 class tr606_state : public hh_ucom4_state
 {
 public:
-	tr606_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	tr606_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	void tr606(machine_config &config);

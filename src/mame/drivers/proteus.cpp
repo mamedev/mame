@@ -321,14 +321,15 @@ static void proteus_floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(proteus_state::proteus)
+void proteus_state::proteus(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(proteus_6809_mem)
+	MC6809(config, m_maincpu, 4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &proteus_state::proteus_6809_mem);
 
-	MCFG_DEVICE_ADD("z80", Z80, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(proteus_z80_mem)
-	MCFG_DEVICE_IO_MAP(proteus_z80_io)
+	Z80(config, m_z80, 4_MHz_XTAL);
+	m_z80->set_addrmap(AS_PROGRAM, &proteus_state::proteus_z80_mem);
+	m_z80->set_addrmap(AS_IO, &proteus_state::proteus_z80_io);
 
 	INPUT_MERGER_ANY_HIGH(config, m_irqs);
 	m_irqs->output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
@@ -413,7 +414,7 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_list").set_original("poly_flop").set_filter("PROTEUS");
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(proteus)

@@ -25,6 +25,7 @@ public:
 	{ }
 
 	void maddonna(machine_config &config);
+	void komocomo(machine_config &config);
 	void oneshot(machine_config &config);
 
 protected:
@@ -74,6 +75,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_oneshot_fg_tile_info);
 	uint32_t screen_update_oneshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_maddonna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_komocomo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_crosshairs( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void oneshot_map(address_map &map);

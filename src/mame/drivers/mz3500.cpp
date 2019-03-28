@@ -809,16 +809,16 @@ static void mz3500_floppies(device_slot_interface &device)
 }
 
 /* TODO: clocks */
-MACHINE_CONFIG_START(mz3500_state::mz3500)
-
+void mz3500_state::mz3500(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("master",Z80,MAIN_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(mz3500_master_map)
-	MCFG_DEVICE_IO_MAP(mz3500_master_io)
+	Z80(config, m_master, MAIN_CLOCK/2);
+	m_master->set_addrmap(AS_PROGRAM, &mz3500_state::mz3500_master_map);
+	m_master->set_addrmap(AS_IO, &mz3500_state::mz3500_master_io);
 
-	MCFG_DEVICE_ADD("slave",Z80,MAIN_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(mz3500_slave_map)
-	MCFG_DEVICE_IO_MAP(mz3500_slave_io)
+	Z80(config, m_slave, MAIN_CLOCK/2);
+	m_slave->set_addrmap(AS_PROGRAM, &mz3500_state::mz3500_slave_map);
+	m_slave->set_addrmap(AS_IO, &mz3500_state::mz3500_slave_io);
 
 	config.m_perfect_cpu_quantum = subtag("master");
 
@@ -844,12 +844,12 @@ MACHINE_CONFIG_START(mz3500_state::mz3500)
 	m_hgdc2->set_display_pixels(FUNC(mz3500_state::hgdc_display_pixels));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(mz3500_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(mz3500_state::screen_update));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mz3500);
 
@@ -859,7 +859,7 @@ MACHINE_CONFIG_START(mz3500_state::mz3500)
 	SPEAKER(config, "mono").front_center();
 
 	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.15);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

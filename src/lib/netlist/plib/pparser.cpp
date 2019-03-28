@@ -285,9 +285,9 @@ ppreprocessor::ppreprocessor(defines_map_type *defines)
 	m_expr_sep.emplace_back(" ");
 	m_expr_sep.emplace_back("\t");
 
-	m_defines.insert({"__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1")});
 	if (defines != nullptr)
 		m_defines = *defines;
+	m_defines.insert({"__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1")});
 }
 
 void ppreprocessor::error(const pstring &err)
@@ -381,7 +381,7 @@ pstring ppreprocessor::replace_macros(const pstring &line)
 	return ret;
 }
 
-static pstring catremainder(const std::vector<pstring> &elems, std::size_t start, pstring sep)
+static pstring catremainder(const std::vector<pstring> &elems, std::size_t start, const pstring &sep)
 {
 	pstring ret("");
 	for (std::size_t i = start; i < elems.size(); i++)

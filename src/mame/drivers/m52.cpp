@@ -398,13 +398,13 @@ void m52_state::machine_reset()
 	m_bgcontrol = 0;
 }
 
-MACHINE_CONFIG_START(m52_state::m52)
-
+void m52_state::m52(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK / 6)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m52_state, irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m52_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &m52_state::main_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(m52_state::irq0_line_hold));
 
 	/* video hardware */
 	PALETTE(config, m_sp_palette).set_entries(256, 32);
@@ -416,27 +416,24 @@ MACHINE_CONFIG_START(m52_state::m52)
 	PALETTE(config, m_bg_palette).set_entries(3 * 4, 32);
 	GFXDECODE(config, m_bg_gfxdecode, m_bg_palette, gfx_m52_bg);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK / 3, 384, 136, 376, 282, 22, 274)
-	MCFG_SCREEN_UPDATE_DRIVER(m52_state, screen_update_m52)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK / 3, 384, 136, 376, 282, 22, 274);
+	m_screen->set_screen_update(FUNC(m52_state::screen_update_m52));
 
 	/* sound hardware */
 	//m52_sound_c_audio(config);
-	MCFG_DEVICE_ADD("irem_audio", IREM_M52_SOUNDC_AUDIO, 0)
+	IREM_M52_SOUNDC_AUDIO(config, "irem_audio", 0);
+}
 
-MACHINE_CONFIG_END
 
-
-MACHINE_CONFIG_START(m52_alpha1v_state::alpha1v)
+void m52_alpha1v_state::alpha1v(machine_config &config)
+{
 	m52(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(alpha1v_map)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK / 3, 384, 136, 376, 282, 16, 272)
-
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &m52_alpha1v_state::alpha1v_map);
+	m_screen->set_raw(MASTER_CLOCK / 3, 384, 136, 376, 282, 16, 272);
+}
 
 
 

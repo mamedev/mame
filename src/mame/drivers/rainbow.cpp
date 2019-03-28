@@ -1548,16 +1548,16 @@ WRITE8_MEMBER(rainbow_state::rtc_w)
 		{
 		case 0x00: // Write to 0xED0FE
 			if (m_rtc->chip_enable())
-				m_rtc->write_data(space, offset & 0x01); // Transfer data to DS1315 (data = offset):
+				m_rtc->write_data(offset & 0x01); // Transfer data to DS1315 (data = offset):
 			else
-				m_rtc->read_0(space, 0); // (RTC ACTIVATION) read magic pattern 0
+				m_rtc->read_0(); // (RTC ACTIVATION) read magic pattern 0
 			break;
 
 		case 0x01: // Write to 0xED0FF
 			if (m_rtc->chip_enable())
-				m_rtc->write_data(space, offset & 0x01); // Transfer data to DS1315 (data = offset):
+				m_rtc->write_data(offset & 0x01); // Transfer data to DS1315 (data = offset):
 			else
-				m_rtc->read_1(space, 0); // (RTC ACTIVATION) read magic pattern 1
+				m_rtc->read_1(); // (RTC ACTIVATION) read magic pattern 1
 			break;
 		}
 	}
@@ -1576,7 +1576,7 @@ READ8_MEMBER(rainbow_state::rtc_r)
 #ifdef ASSUME_RAINBOW_A_HARDWARE
 		case 0x00: // read time/date from 0xED000 (ClikClok for 100-A)
 			if (m_rtc->chip_enable())
-				return m_rtc->read_data(space, 0) & 0x01;
+				return m_rtc->read_data() & 0x01;
 			 else
 				m_rtc->chip_reset();
 #else
@@ -1586,25 +1586,25 @@ READ8_MEMBER(rainbow_state::rtc_r)
 
 		case 0x0001:  // RTC_WRITE_DATA_1 0xFC001
 		case 0x2001:  // RTC_WRITE_DATA_1 0xFE001 (MIRROR)
-			m_rtc->write_data(space, offset & 0x01);
+			m_rtc->write_data(offset & 0x01);
 			break;
 
 		// Read actual time/date from ClikClok:
 		case 0x0004:  // 0xFC004
 		case 0x2004:  // 0xFE004 (MIRROR)
 			if (m_rtc->chip_enable())
-				return (m_rtc->read_data(space, 0) & 0x01);
+				return (m_rtc->read_data() & 0x01);
 
 		// (RTC ACTIVATION) read magic pattern 0
 		case 0x0100:  // 0xFC100
 		case 0x2100:  // 0xFE100 (MIRROR)
-			m_rtc->read_0(space, 0);
+			m_rtc->read_0();
 			break;
 
 		// (RTC ACTIVATION) read magic pattern 1
 		case 0x0101:  // 0xFC101
 		case 0x2101:  // 0xFE101 (MIRROR)
-			m_rtc->read_1(space, 0);
+			m_rtc->read_1();
 			break;
 
 		// RESET
@@ -2947,11 +2947,8 @@ READ8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_r)
 		break;
 
 	case 6:
-		data = m_hgdc->read(space, offset & 0x00);
-		break;
-
 	case 7:
-		data = m_hgdc->read(space, offset & 0x01);
+		data = m_hgdc->read(offset & 0x01);
 		break;
 
 	default:
@@ -3169,7 +3166,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 
 	case 6:
 	case 7:
-		m_hgdc->write(space, offset & 0x01, data);
+		m_hgdc->write(offset & 0x01, data);
 		break;
 	} // switch
 
@@ -3200,25 +3197,25 @@ void rainbow_state::upd7220_map(address_map &map)
 	map(0x00000, 0x3ffff).rw(FUNC(rainbow_state::vram_r), FUNC(rainbow_state::vram_w)).share("vram");
 }
 
-MACHINE_CONFIG_START(rainbow_state::rainbow)
+void rainbow_state::rainbow(machine_config &config)
+{
 	config.set_default_layout(layout_rainbow);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8088, 24.0734_MHz_XTAL / 5) // approximately 4.815 MHz
-	MCFG_DEVICE_PROGRAM_MAP(rainbow8088_map)
-	MCFG_DEVICE_IO_MAP(rainbow8088_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(rainbow_state, irq_callback)
+	I8088(config, m_i8088, 24.0734_MHz_XTAL / 5); // approximately 4.815 MHz
+	m_i8088->set_addrmap(AS_PROGRAM, &rainbow_state::rainbow8088_map);
+	m_i8088->set_addrmap(AS_IO, &rainbow_state::rainbow8088_io);
+	m_i8088->set_irq_acknowledge_callback(FUNC(rainbow_state::irq_callback));
 
-	MCFG_DEVICE_ADD("subcpu", Z80, 24.0734_MHz_XTAL / 6)
-	MCFG_DEVICE_PROGRAM_MAP(rainbowz80_mem)
-	MCFG_DEVICE_IO_MAP(rainbowz80_io)
+	Z80(config, m_z80, 24.0734_MHz_XTAL / 6);
+	m_z80->set_addrmap(AS_PROGRAM, &rainbow_state::rainbowz80_mem);
+	m_z80->set_addrmap(AS_IO, &rainbow_state::rainbowz80_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(24.0734_MHz_XTAL / 6, 442, 0, 400, 264, 0, 240) // ~NTSC compatible video timing (?)
-
-	MCFG_SCREEN_UPDATE_DRIVER(rainbow_state, screen_update_rainbow)
-	MCFG_SCREEN_PALETTE("vt100_video:palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(24.0734_MHz_XTAL / 6, 442, 0, 400, 264, 0, 240); // ~NTSC compatible video timing (?)
+	screen.set_screen_update(FUNC(rainbow_state::screen_update_rainbow));
+	screen.set_palette("vt100_video:palette");
 	GFXDECODE(config, "gfxdecode", "vt100_video:palette", gfx_rainbow);
 
 	RAINBOW_VIDEO(config, m_crtc, 24.0734_MHz_XTAL);
@@ -3236,19 +3233,19 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	m_hgdc->set_display_pixels(FUNC(rainbow_state::hgdc_display_pixels));
 	m_hgdc->set_screen(m_screen2); // set_screen needs to be added after 7720 device in the machine config, not after the screen.
 
-	MCFG_PALETTE_ADD("palette2", 32)
+	PALETTE(config, m_palette2).set_entries(32);
 
-	MCFG_SCREEN_ADD("screen2", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
+	SCREEN(config, m_screen2, SCREEN_TYPE_RASTER);
+	m_screen2->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE);
 
 	// VR241 color monitor is specified for 20 MHz bandwidth ( 60 Hz / 15.72 kHz horizontal rate )
 	// - sufficient for 800 x 240 non-interlaced at 60 Hz (non interlaced).
-	//MCFG_SCREEN_RAW_PARAMS(31188000 / 2 , 992, 0, 800, 262, 0, 240)
+	//m_screen2->set_raw(31188000 / 2 , 992, 0, 800, 262, 0, 240);
 
 	// Alternate configuration:
-	MCFG_SCREEN_RAW_PARAMS(31188000 / 4 , 496, 0, 400, 262, 0, 240)
+	m_screen2->set_raw(31188000 / 4 , 496, 0, 400, 262, 0, 240);
 
-	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
+	m_screen2->set_screen_update("upd7220", FUNC(upd7220_device::screen_update));
 
 	FD1793(config, m_fdc, 24.0734_MHz_XTAL / 24); // no separate 1 Mhz quartz
 	FLOPPY_CONNECTOR(config, FD1793_TAG ":0", rainbow_floppies, "525qd", rainbow_state::floppy_formats);
@@ -3280,18 +3277,14 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	m_hdc->in_sc_callback().set_constant(1);                             // SEEK COMPLETE (VCC = complete)
 	m_hdc->in_tk000_callback().set_constant(1);                  // TRACK 00 signal (= from drive)
 
-	MCFG_HARDDISK_ADD("decharddisk1")
+	HARDDISK(config, "decharddisk1");
 	/// ******************************** / HARD DISK CONTROLLER ****************************************
 
-	MCFG_DEVICE_ADD("corvus", CORVUS_HDC, 0)
-	MCFG_HARDDISK_ADD("harddisk1")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	MCFG_HARDDISK_ADD("harddisk2")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	MCFG_HARDDISK_ADD("harddisk3")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	MCFG_HARDDISK_ADD("harddisk4")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
+	CORVUS_HDC(config, m_corvus_hdc, 0);
+	HARDDISK(config, "harddisk1", "corvus_hdd");
+	HARDDISK(config, "harddisk2", "corvus_hdd");
+	HARDDISK(config, "harddisk3", "corvus_hdd");
+	HARDDISK(config, "harddisk4", "corvus_hdd");
 
 	DS1315(config, m_rtc, 0); // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 
@@ -3338,7 +3331,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	TIMER(config, "motor").configure_periodic(FUNC(rainbow_state::hd_motor_tick), attotime::from_hz(60));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 //----------------------------------------------------------------------------------------
 // 'Rainbow 100-A' (system module 70-19974-00, PSU H7842-A)

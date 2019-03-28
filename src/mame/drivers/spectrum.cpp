@@ -292,19 +292,27 @@ SamRam
 /****************************************************************************************************/
 /* Spectrum 48k functions */
 
+READ8_MEMBER(spectrum_state::opcode_fetch_r)
+{
+	/* this allows expansion devices to act upon opcode fetches from MEM addresses */
+	m_exp->opcode_fetch(offset);
+
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
 WRITE8_MEMBER(spectrum_state::spectrum_rom_w)
 {
 	if (m_exp->romcs())
-		m_exp->mreq_w(space, offset, data);
+		m_exp->mreq_w(offset, data);
 }
 
 READ8_MEMBER(spectrum_state::spectrum_rom_r)
 {
 	uint8_t data;
 
-	data = m_exp->mreq_r(space, offset);
-
-	if (!m_exp->romcs())
+	if (m_exp->romcs())
+		data = m_exp->mreq_r(offset);
+	else
 		data = memregion("maincpu")->base()[offset];
 
 	return data;
@@ -360,6 +368,10 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 	int joy1 = m_io_joy1.read_safe(0x1f) & 0x1f;
 	int joy2 = m_io_joy2.read_safe(0x1f) & 0x1f;
 
+	/* expansion port */
+	if (m_exp)
+		data = m_exp->iorq_r(offset);
+
 	/* Caps - V */
 	if ((lines & 1) == 0)
 	{
@@ -410,13 +422,9 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 		data &= ~0x40;
 	}
 
-	/* expansion port */
-	if (m_exp)
-		data &= m_exp->port_fe_r(space, offset);
-
 	/* Issue 2 Spectrums default to having bits 5, 6 & 7 set.
 	Issue 3 Spectrums default to having bits 5 & 7 set and bit 6 reset. */
-	if (m_io_config->read() & 0x80)
+	if ((m_io_config->read() & 0x80) == 0)
 		data ^= (0x40);
 
 	return data;
@@ -435,16 +443,22 @@ void spectrum_state::spectrum_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rw(FUNC(spectrum_state::spectrum_rom_r), FUNC(spectrum_state::spectrum_rom_w));
 	map(0x4000, 0x5aff).ram().share("video_ram");
-	//  AM_RANGE(0x5b00, 0x7fff) AM_RAM
-	//  AM_RANGE(0x8000, 0xffff) AM_RAM
+	//map(0x5b00, 0x7fff).ram();
+	//map(0x8000, 0xffff).ram();
+}
+
+void spectrum_state::spectrum_fetch(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(spectrum_state::opcode_fetch_r));
 }
 
 /* ports are not decoded full.
 The function decodes the ports appropriately */
 void spectrum_state::spectrum_io(address_map &map)
 {
+	map(0x0000, 0xffff).rw(m_exp, FUNC(spectrum_expansion_slot_device::iorq_r), FUNC(spectrum_expansion_slot_device::iorq_w));
 	map(0x00, 0x00).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
-	map(0x01, 0x01).r(FUNC(spectrum_state::spectrum_port_ula_r)).mirror(0xfffe);
+	map(0x01, 0x01).r(FUNC(spectrum_state::spectrum_port_ula_r)); // .mirror(0xfffe);
 }
 
 /* Input ports */
@@ -617,9 +631,6 @@ void spectrum_state::init_spectrum()
 		case 16*1024:
 			space.install_ram(0x5b00, 0x7fff, nullptr);
 	}
-
-	// setup expansion slot
-	m_exp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum)
@@ -674,6 +685,7 @@ void spectrum_state::spectrum_common(machine_config &config)
 	Z80(config, m_maincpu, X1 / 4);        /* This is verified only for the ZX Spectrum. Other clones are reported to have different clocks */
 	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_state::spectrum_mem);
 	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_io);
+	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_state::spectrum_fetch);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
 
 	config.m_minimum_quantum = attotime::from_hz(60);

@@ -153,6 +153,7 @@ Address bus A0-A11 is Y0-Y11
 #include "bus/a2bus/ssprite.h"
 #include "bus/a2bus/ssbapple.h"
 #include "bus/a2bus/transwarp.h"
+#include "bus/a2bus/a2vulcan.h"
 
 #include "bus/rs232/rs232.h"
 
@@ -467,7 +468,7 @@ private:
 	uint8_t *m_exp_ram;
 	int m_exp_wptr, m_exp_liveptr;
 
-	void do_io(address_space &space, int offset, bool is_iic);
+	void do_io(int offset, bool is_iic);
 	uint8_t read_floatingbus();
 	void update_slotrom_banks();
 	void lc_update(int offset, bool writing);
@@ -1397,7 +1398,7 @@ void apple2e_state::cec_lcrom_update()
 }
 
 // most softswitches don't care about read vs write, so handle them here
-void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
+void apple2e_state::do_io(int offset, bool is_iic)
 {
 	if(machine().side_effects_disabled()) return;
 
@@ -1724,7 +1725,7 @@ READ8_MEMBER(apple2e_state::c000_r)
 			return (m_video->m_dhires ? 0x00 : 0x80) | uFloatingBus7;
 
 		default:
-			do_io(space, offset, false);
+			do_io(offset, false);
 			break;
 	}
 
@@ -1839,12 +1840,12 @@ WRITE8_MEMBER(apple2e_state::c000_w)
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d:
 			if (m_auxslotdevice)
 			{
-				m_auxslotdevice->write_c07x(space, offset & 0xf, data);
+				m_auxslotdevice->write_c07x(offset & 0xf, data);
 
 				// card may have banked auxram; get a new bank pointer
 				m_aux_bank_ptr = m_auxslotdevice->get_auxbank_ptr();
 			}
-			do_io(space, offset, false);    // make sure it also side-effect resets the paddles as documented
+			do_io(offset, false);    // make sure it also side-effect resets the paddles as documented
 			break;
 
 		case 0x7e:  // SETIOUDIS
@@ -1854,7 +1855,7 @@ WRITE8_MEMBER(apple2e_state::c000_w)
 			m_ioudis = false; break;
 
 		default:
-			do_io(space, offset, false);
+			do_io(offset, false);
 			break;
 	}
 }
@@ -1977,7 +1978,7 @@ READ8_MEMBER(apple2e_state::c000_iic_r)
 			return (m_video->m_dhires ? 0x00 : 0x80) | uFloatingBus7;
 
 		default:
-			do_io(space, offset, true);
+			do_io(offset, true);
 			break;
 	}
 
@@ -2115,7 +2116,7 @@ WRITE8_MEMBER(apple2e_state::c000_iic_w)
 			break;
 
 		default:
-			do_io(space, offset, true);
+			do_io(offset, true);
 			break;
 	}
 }
@@ -2333,7 +2334,7 @@ void apple2e_state::write_slot_rom(int slotbias, int offset, uint8_t data)
 uint8_t apple2e_state::read_int_rom(int slotbias, int offset)
 {
 	//return m_rom_ptr[slotbias + offset];
-	return m_ds1315->read(machine().dummy_space(), slotbias + offset);
+	return m_ds1315->read(slotbias + offset);
 }
 
 READ8_MEMBER(apple2e_state::nsc_backing_r) { return m_rom_ptr[offset]; }
@@ -3955,6 +3956,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("arcbd", A2BUS_ARCADEBOARD);    /* Third Millenium Engineering Arcade Board */
 	device.option_add("midi", A2BUS_MIDI);  /* Generic 6840+6850 MIDI board */
 	device.option_add("zipdrive", A2BUS_ZIPDRIVE);  /* ZIP Technologies IDE card */
+	device.option_add("focusdrive", A2BUS_FOCUSDRIVE);  /* Focus Drive IDE card */
 	device.option_add("echoiiplus", A2BUS_ECHOPLUS);    /* Street Electronics Echo Plus (Echo II + Mockingboard clone) */
 	device.option_add("scsi", A2BUS_SCSI);  /* Apple II SCSI Card */
 	device.option_add("applicard", A2BUS_APPLICARD);    /* PCPI Applicard */
@@ -3977,6 +3979,8 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("ssprite", A2BUS_SSPRITE);    /* Synetix SuperSprite Board */
 	device.option_add("ssbapple", A2BUS_SSBAPPLE);  /* SSB Apple speech board */
 	device.option_add("twarp", A2BUS_TRANSWARP);    /* AE TransWarp accelerator */
+	device.option_add("vulcan", A2BUS_VULCAN); /* Applied Engineering Vulcan IDE drive */
+	device.option_add("vulcangold", A2BUS_VULCANGOLD); /* Applied Engineering Vulcan Gold IDE drive */
 }
 
 static void apple2eaux_cards(device_slot_interface &device)
@@ -4087,10 +4091,10 @@ void apple2e_state::apple2e(machine_config &config)
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
 	A2EAUXSLOT(config, m_a2eauxslot, 0);
-	m_a2eauxslot->set_cputag(m_maincpu);
+	m_a2eauxslot->set_space(m_maincpu, AS_PROGRAM);
 	m_a2eauxslot->out_irq_callback().set(FUNC(apple2e_state::a2bus_irq_w));
 	m_a2eauxslot->out_nmi_callback().set(FUNC(apple2e_state::a2bus_nmi_w));
-	A2EAUXSLOT_SLOT(config, "aux", apple2eaux_cards, "ext80", A2_AUXSLOT_TAG);
+	A2EAUXSLOT_SLOT(config, "aux", m_a2eauxslot, apple2eaux_cards, "ext80");
 
 	/* softlist config for baseline A2E
 	By default, filter lists where possible to compatible disks for A2E */

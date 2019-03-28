@@ -233,7 +233,8 @@ void d110_state::d110_map(address_map &map)
 	map(0xc000, 0xffff).bankrw("fixed");
 }
 
-MACHINE_CONFIG_START(d110_state::d110)
+void d110_state::d110(machine_config &config)
+{
 	P8098(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &d110_state::d110_map);
 	m_maincpu->serial_tx_cb().set(FUNC(d110_state::midi_w));
@@ -247,13 +248,13 @@ MACHINE_CONFIG_START(d110_state::d110)
 	RAM( config, m_memc ).set_default_size( "32K" );
 	NVRAM( config, m_memcs, nvram_device::DEFAULT_ALL_0 );
 
-	MCFG_SCREEN_ADD( "screen", LCD )
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DRIVER(d110_state, screen_update)
-//  MCFG_SCREEN_SIZE(20*6-1, 2*9-1)
-	MCFG_SCREEN_SIZE(16*6-1, (16*6-1)*3/4)
-	MCFG_SCREEN_VISIBLE_AREA(0, 16*6-2, 0, (16*6-1)*3/4-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_screen_update(FUNC(d110_state::screen_update));
+//  screen.set_size(20*6-1, 2*9-1);
+	screen.set_size(16*6-1, (16*6-1)*3/4);
+	screen.set_visarea(0, 16*6-2, 0, (16*6-1)*3/4-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(d110_state::d110_palette), 2);
 
@@ -262,7 +263,7 @@ MACHINE_CONFIG_START(d110_state::d110)
 	TIMER(config, m_midi_timer).configure_generic(FUNC(d110_state::midi_timer_cb));
 
 	TIMER(config,  "samples_timer").configure_periodic(FUNC(d110_state::samples_timer_cb), attotime::from_hz(32000*2) );
-MACHINE_CONFIG_END
+}
 
 ROM_START( d110 )
 	ROM_REGION( 0x10000, "maincpu", 0 )

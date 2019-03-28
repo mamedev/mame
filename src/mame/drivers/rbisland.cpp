@@ -653,15 +653,15 @@ WRITE8_MEMBER(rbisland_state::counters_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 }
 
-MACHINE_CONFIG_START(rbisland_state::rbisland)
-
+void rbisland_state::rbisland(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(rbisland_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbisland_state,  interrupt)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rbisland_state::rbisland_map);
+	m_maincpu->set_vblank_int("screen", FUNC(rbisland_state::interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(rbisland_sound_map)
+	Z80(config, m_audiocpu, XTAL(16'000'000)/4); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rbisland_state::rbisland_sound_map);
 
 	TAITO_CCHIP(config, m_cchip, 12_MHz_XTAL); // 12MHz OSC next to C-Chip
 	m_cchip->in_pa_callback().set_ioport("800007");
@@ -675,13 +675,13 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rbisland_state, screen_update_rainbow)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(rbisland_state::screen_update_rainbow));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rbisland);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
@@ -706,31 +706,31 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 
 /* Jumping: The PCB has 2 Xtals, 18.432MHz and 24MHz */
-MACHINE_CONFIG_START(rbisland_state::jumping)
-
+void rbisland_state::jumping(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(18'432'000)/2)  /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(jumping_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
+	M68000(config, m_maincpu, XTAL(18'432'000)/2);  /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rbisland_state::jumping_map);
+	m_maincpu->set_vblank_int("screen", FUNC(rbisland_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(jumping_sound_map)
+	Z80(config, m_audiocpu, XTAL(24'000'000)/4); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rbisland_state::jumping_sound_map);
 
 	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame - enough unless otherwise */
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rbisland_state, screen_update_jumping)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(rbisland_state::screen_update_jumping));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jumping);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
@@ -745,21 +745,18 @@ MACHINE_CONFIG_START(rbisland_state::jumping)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(24'000'000)/8) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	YM2203(config, "ym1", XTAL(24'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.30); /* verified on pcb */
 
-	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(24'000'000)/8) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	YM2203(config, "ym2", XTAL(24'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.30); /* verified on pcb */
+}
 
 /* Imnoe PCB uses 16MHz CPU crystal instead of 18.432 for CPU */
-MACHINE_CONFIG_START(rbisland_state::jumpingi)
+void rbisland_state::jumpingi(machine_config &config)
+{
 	jumping(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(16'000'000)/2)  /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(jumping_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(XTAL(16'000'000)/2);  /* verified on pcb */
+}
 
 /***************************************************************************
                                   DRIVERS

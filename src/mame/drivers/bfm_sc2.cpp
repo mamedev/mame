@@ -201,9 +201,9 @@ public:
 		, m_upd7759(*this, "upd")
 		, m_vfd0(*this, "vfd0")
 		, m_vfd1(*this, "vfd1")
+		, m_ym2413(*this, "ymsnd")
 		, m_strobein(*this, "STROBE%u", 0)
 		, m_rombank1(*this, "bank1")
-		, m_ym2413(*this, "ymsnd")
 		, m_meters(*this, "meters")
 		, m_lamps(*this, "lamp%u", 0U)
 	{
@@ -272,6 +272,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7759_device> m_upd7759;
 	optional_device<bfm_bd1_device> m_vfd0, m_vfd1;
+	optional_device<ym2413_device> m_ym2413;
 
 	int m_sc2_show_door;
 	int m_sc2_door_state;
@@ -287,7 +288,6 @@ protected:
 private:
 	required_ioport_array<12> m_strobein;
 	optional_memory_bank m_rombank1;
-	optional_device<ym2413_device> m_ym2413;
 
 	optional_device<meters_device> m_meters; // scorpion2_vid doesn't use this (scorpion2_vidm does)
 
@@ -2277,11 +2277,12 @@ void bfm_sc2_state::machine_start()
 	save_state();
 }
 
-MACHINE_CONFIG_START(bfm_sc2_vid_state::scorpion2_vid)
-	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/4 ) // 6809 CPU at 2 Mhz
-	MCFG_DEVICE_PROGRAM_MAP(memmap_vid)                    // setup scorpion2 board memorymap
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc2_vid_state, timer_irq,  1000)           // generate 1000 IRQ's per second
-	config.m_minimum_quantum = attotime::from_hz(960);                                   // needed for serial communication !!
+void bfm_sc2_vid_state::scorpion2_vid(machine_config &config)
+{
+	M6809(config, m_maincpu, MASTER_CLOCK/4); // 6809 CPU at 2 Mhz
+	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_sc2_vid_state::memmap_vid);                       // setup scorpion2 board memorymap
+	m_maincpu->set_periodic_int(FUNC(bfm_sc2_vid_state::timer_irq), attotime::from_hz(1000)); // generate 1000 IRQ's per second
+	config.m_minimum_quantum = attotime::from_hz(960);                                        // needed for serial communication !!
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
@@ -2295,18 +2296,17 @@ MACHINE_CONFIG_START(bfm_sc2_vid_state::scorpion2_vid)
 	BFM_ADDER2(config, "adder2", 0);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM2413(config, m_ym2413, XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /* machine driver for scorpion2_vid board with meters (i.e. quintoon uk). Are we really sure the other games don't?*/
-MACHINE_CONFIG_START(bfm_sc2_vid_state::scorpion2_vidm)
+void bfm_sc2_vid_state::scorpion2_vidm(machine_config &config)
+{
 	scorpion2_vid(config);
 	_8meters(config);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -3747,10 +3747,11 @@ void bfm_sc2_dmd_state::machine_start()
 
 /* machine driver for scorpion2 board */
 
-MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
-	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/4 )
-	MCFG_DEVICE_PROGRAM_MAP(memmap_no_vid)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc2_awp_state, timer_irq,  1000)
+void bfm_sc2_awp_state::scorpion2(machine_config &config)
+{
+	M6809(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_sc2_awp_state::memmap_no_vid);
+	m_maincpu->set_periodic_int(FUNC(bfm_sc2_awp_state::timer_irq), attotime::from_hz(1000));
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
@@ -3758,11 +3759,9 @@ MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
 	BFM_BD1(config, m_vfd1, 60, 1);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("upd",UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ymsnd",YM2413, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM2413(config, m_ym2413, XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "e2ram").set_custom_handler(FUNC(bfm_sc2_awp_state::e2ram_init));
@@ -3784,7 +3783,7 @@ MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
 	m_reel[5]->optic_handler().set(FUNC(bfm_sc2_awp_state::reel_optic_cb<5>));
 
 	_8meters(config);
-MACHINE_CONFIG_END
+}
 
 #if 0
 void bfm_sc2_awp_state::scorpion2_3m(machine_config &config)
@@ -3807,20 +3806,19 @@ void bfm_sc2_awp_state::scorpion3(machine_config &config)
 
 
 /* machine driver for scorpion2 board + matrix board */
-MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01)
+void bfm_sc2_dmd_state::scorpion2_dm01(machine_config &config)
+{
 	config.m_minimum_quantum = attotime::from_hz(960);                                   // needed for serial communication !!
-	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/4 )
-	MCFG_DEVICE_PROGRAM_MAP(memmap_no_vid)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc2_dmd_state, timer_irq,  1000)
+	M6809(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_sc2_dmd_state::memmap_no_vid);
+	m_maincpu->set_periodic_int(FUNC(bfm_sc2_dmd_state::timer_irq), attotime::from_hz(1000));
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ymsnd",YM2413, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM2413(config, m_ym2413, XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("upd",UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "e2ram").set_custom_handler(FUNC(bfm_sc2_dmd_state::e2ram_init));
@@ -3844,7 +3842,7 @@ MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01)
 	m_reel[5]->optic_handler().set(FUNC(bfm_sc2_dmd_state::reel_optic_cb<5>));
 
 	_8meters(config);
-MACHINE_CONFIG_END
+}
 
 void bfm_sc2_dmd_state::scorpion2_dm01_3m(machine_config &config)
 {

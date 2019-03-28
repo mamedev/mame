@@ -16,7 +16,7 @@ public:
 	// construction/destruction
 	nes_ffe3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -34,10 +34,10 @@ public:
 	// construction/destruction
 	nes_ffe4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_l) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
-	virtual DECLARE_READ8_MEMBER(chr_r) override;
-	virtual DECLARE_WRITE8_MEMBER(chr_w) override;
+	virtual void write_l(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual uint8_t chr_r(offs_t offset) override;
+	virtual void chr_w(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -71,8 +71,8 @@ public:
 	nes_ffe8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual DECLARE_WRITE8_MEMBER(write_l) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override {}
+	virtual void write_l(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, uint8_t data) override {}
 
 	virtual void pcb_reset() override;
 };

@@ -177,7 +177,7 @@ READ16_MEMBER( compis_state::pcs6_0_1_r )
 	}
 	else
 	{
-		return m_graphics->dma_ack_r(space, offset);
+		return m_graphics->dma_ack_r(offset);
 	}
 }
 
@@ -191,7 +191,7 @@ WRITE16_MEMBER( compis_state::pcs6_0_1_w )
 	}
 	else
 	{
-		m_graphics->dma_ack_w(space, offset, data);
+		m_graphics->dma_ack_w(offset, data);
 	}
 }
 
@@ -250,7 +250,7 @@ READ16_MEMBER( compis_state::pcs6_6_7_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return m_graphics->pcs6_6_r(space, offset);
+		return m_graphics->pcs6_6_r(offset);
 	}
 	else
 	{
@@ -265,7 +265,7 @@ WRITE16_MEMBER( compis_state::pcs6_6_7_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_graphics->pcs6_6_w(space, offset, data);
+		m_graphics->pcs6_6_w(offset, data);
 	}
 	else
 	{
@@ -278,11 +278,11 @@ READ16_MEMBER( compis_state::pcs6_8_9_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return m_isbx0->mcs0_r(space, offset);
+		return m_isbx0->mcs0_r(offset);
 	}
 	else
 	{
-		return m_isbx0->mcs1_r(space, offset) << 8;
+		return m_isbx0->mcs1_r(offset) << 8;
 	}
 }
 
@@ -290,11 +290,11 @@ WRITE16_MEMBER( compis_state::pcs6_8_9_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_isbx0->mcs0_w(space, offset, data);
+		m_isbx0->mcs0_w(offset, data);
 	}
 	else
 	{
-		m_isbx0->mcs1_w(space, offset, data >> 8);
+		m_isbx0->mcs1_w(offset, data >> 8);
 	}
 }
 
@@ -302,11 +302,11 @@ READ16_MEMBER( compis_state::pcs6_10_11_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return m_isbx0->mcs1_r(space, offset);
+		return m_isbx0->mcs1_r(offset);
 	}
 	else
 	{
-		return m_isbx0->mdack_r(space, offset) << 8;
+		return m_isbx0->mdack_r(offset) << 8;
 	}
 }
 
@@ -314,11 +314,11 @@ WRITE16_MEMBER( compis_state::pcs6_10_11_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_isbx0->mcs1_w(space, offset, data);
+		m_isbx0->mcs1_w(offset, data);
 	}
 	else
 	{
-		m_isbx0->mdack_w(space, offset, data >> 8);
+		m_isbx0->mdack_w(offset, data >> 8);
 	}
 }
 
@@ -326,11 +326,11 @@ READ16_MEMBER( compis_state::pcs6_12_13_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return m_isbx1->mcs0_r(space, offset);
+		return m_isbx1->mcs0_r(offset);
 	}
 	else
 	{
-		return m_isbx1->mcs1_r(space, offset) << 8;
+		return m_isbx1->mcs1_r(offset) << 8;
 	}
 }
 
@@ -338,11 +338,11 @@ WRITE16_MEMBER( compis_state::pcs6_12_13_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_isbx1->mcs0_w(space, offset, data);
+		m_isbx1->mcs0_w(offset, data);
 	}
 	else
 	{
-		m_isbx1->mcs1_w(space, offset, data >> 8);
+		m_isbx1->mcs1_w(offset, data >> 8);
 	}
 }
 
@@ -350,11 +350,11 @@ READ16_MEMBER( compis_state::pcs6_14_15_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return m_isbx1->mcs1_r(space, offset);
+		return m_isbx1->mcs1_r(offset);
 	}
 	else
 	{
-		return m_isbx1->mdack_r(space, offset) << 8;
+		return m_isbx1->mdack_r(offset) << 8;
 	}
 }
 
@@ -362,11 +362,11 @@ WRITE16_MEMBER( compis_state::pcs6_14_15_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_isbx1->mcs1_w(space, offset, data);
+		m_isbx1->mcs1_w(offset, data);
 	}
 	else
 	{
-		m_isbx1->mdack_w(space, offset, data >> 8);
+		m_isbx1->mdack_w(offset, data >> 8);
 	}
 }
 
@@ -734,7 +734,7 @@ void compis_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( compis )
+//  machine_config( compis )
 //-------------------------------------------------
 
 void compis_state::compis(machine_config &config)
@@ -829,7 +829,7 @@ void compis_state::compis(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( compis2 )
+//  machine_config( compis2 )
 //-------------------------------------------------
 
 void compis_state::compis2(machine_config &config)

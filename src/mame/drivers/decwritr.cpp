@@ -408,25 +408,25 @@ void decwriter_state::machine_reset()
 //  MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(decwriter_state::la120)
-
-	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // 18Mhz xtal on schematics, using an i8224 clock divider/reset sanitizer IC
-	MCFG_DEVICE_PROGRAM_MAP(la120_mem)
-	MCFG_DEVICE_IO_MAP(la120_io)
-	//MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("prtlsi", dc305_device, inta_cb)
+void decwriter_state::la120(machine_config &config)
+{
+	I8080A(config, m_maincpu, XTAL(18'000'000) / 9); // 18Mhz xtal on schematics, using an i8224 clock divider/reset sanitizer IC
+	m_maincpu->set_addrmap(AS_PROGRAM, &decwriter_state::la120_mem);
+	m_maincpu->set_addrmap(AS_IO, &decwriter_state::la120_io);
+	//m_maincpu->set_irq_acknowledge_callback("prtlsi", FUNC(dc305_device::inta_cb));
 
 	/* video hardware */
 	//TODO: no actual screen! has 8 leds above the keyboard (similar to vt100/vk100) and has 4 7segment leds for showing an error code.
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(decwriter_state, screen_update)
-	MCFG_SCREEN_SIZE(640,480)
-	MCFG_SCREEN_VISIBLE_AREA(0,639, 0,479)
-	MCFG_SCREEN_REFRESH_RATE(30)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(decwriter_state::screen_update));
+	screen.set_size(640,480);
+	screen.set_visarea_full();
+	screen.set_refresh_hz(30);
 
-	//MCFG_DEVICE_ADD("prtlsi", DC305, XTAL(18'000'000) / 9)
-	//MCFG_DC305_OUT_RXC_CB(WRITELINE("usart", i8251_device, write_rxc))
-	//MCFG_DC305_OUT_TXC_CB(WRITELINE("usart", i8251_device, write_txc))
-	//MCFG_DC305_OUT_INT_CB(WRITELINE("mainint", input_merger_device, in_w<0>))
+	//dc305_device &prtlsi(DC305(config, "prtlsi", XTAL(18'000'000) / 9));
+	//prtlsi.out_rxc_cb().set("usart", FUNC(i8251_device, write_rxc));
+	//prtlsi.out_txc_cb().set("usart", FUNC(i8251_device, write_txc));
+	//prtlsi.out_int_cb().set("mainint", FUNC(input_merger_device::in_w<0>));
 
 	LS259(config, m_ledlatch); // E2 on keyboard
 	m_ledlatch->q_out_cb<0>().set_output("led1").invert(); // ON LINE
@@ -442,8 +442,7 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 786) // TODO: LA120 speaker is controlled by asic; VT100 has: 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	BEEP(config, m_speaker, 786).add_route(ALL_OUTPUTS, "mono", 0.50); // TODO: LA120 speaker is controlled by asic; VT100 has: 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
 
 	/* i8251 */
 	I8251(config, "usart", XTAL(18'000'000) / 9);
@@ -461,7 +460,7 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 	*/
 
 	ER1400(config, m_nvm);
-MACHINE_CONFIG_END
+}
 
 
 

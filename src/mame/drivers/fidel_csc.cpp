@@ -1,14 +1,19 @@
 // license:BSD-3-Clause
-// copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco,hap
-// thanks-to:Berger,yoyo_chessboard
+// copyright-holders:Kevin Horton, Jonathan Gevaryahu, Sandro Ronco, hap
+// thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
 *
 * fidel_csc.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 Fidelity CSC(and derived) hardware
 - Champion Sensory Chess Challenger
+- Elite Champion Challenger
 - Super 9 Sensory Chess Challenger
 - Reversi Sensory Challenger
+
+TODO:
+- verify csce original roms (current set came from an overclock mod)
+- hook up csce I/O properly, it doesn't have PIAs
 
 *******************************************************************************
 
@@ -150,6 +155,18 @@ All three of the above are called "segment H".
 
 *******************************************************************************
 
+Elite Champion Challenger
+This is a limited-release chess computer based on the CSC. They removed the PIAs
+and did the I/O with TTL instead (PIAs will still work from software point of view).
+---------------------------------
+R6502B? CPU @ 4MHz
+32KB ROMs total size, 4KB RAM(8*HM6147P)
+
+In the 90s, Wilfried Bucke provided an upgrade to make it more similar to the one
+that won the 1981 Travemünde contest. CPU was changed to R65C02 or UM6502C at 5MHz.
+
+*******************************************************************************
+
 Super 9 Sensory Chess Challenger (SU9/DS9)
 This is basically the Fidelity Elite A/S program on CSC hardware.
 Model DS9(Deluxe) has a 5MHz XTAL, but is otherwise same.
@@ -185,7 +202,7 @@ PCB label 510-1035A01
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_csc.lh" // clickable, with preliminary boardpieces simulation
+#include "fidel_csc.lh" // clickable
 #include "fidel_rsc_v2.lh" // clickable
 #include "fidel_su9.lh" // clickable
 
@@ -202,6 +219,7 @@ public:
 
 	// machine drivers
 	void csc(machine_config &config);
+	void csce(machine_config &config);
 	void su9(machine_config &config);
 	void rsc(machine_config &config);
 
@@ -254,7 +272,7 @@ void su9_state::su9_set_cpu_freq()
 {
 	// SU9 CPU is clocked 1.95MHz, DS9 is 2.5MHz, SCC is 3MHz
 	u8 inp = ioport("FAKE")->read();
-	m_maincpu->set_unscaled_clock((inp & 2) ? (6_MHz_XTAL/2) : ((inp & 1) ? (5_MHz_XTAL/2) : (3.9_MHz_XTAL/2)));
+	m_maincpu->set_unscaled_clock((inp & 2) ? (3_MHz_XTAL) : ((inp & 1) ? (5_MHz_XTAL/2) : (3.9_MHz_XTAL/2)));
 }
 
 
@@ -368,7 +386,7 @@ READ8_MEMBER(csc_state::pia1_pb_r)
 
 	// d5: button row 8 (active low)
 	// d6,d7: language switches(hardwired with 2 resistors/jumpers)
-	data |= (~read_inputs(9) >> 3 & 0x20) | (~m_language << 6 & 0xc0);
+	data |= (~read_inputs(9) >> 3 & 0x20) | (*m_language << 6 & 0xc0);
 
 	return data;
 }
@@ -402,8 +420,7 @@ void csc_state::su9_map(address_map &map)
 	map(0x1000, 0x1003).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1800, 0x1803).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x2000, 0x3fff).rom();
-	map(0xa000, 0xa7ff).rom();
-	map(0xc000, 0xffff).rom();
+	map(0xa000, 0xffff).rom();
 }
 
 void csc_state::rsc_map(address_map &map)
@@ -465,9 +482,9 @@ static INPUT_PORTS_START( su9 )
 
 	PORT_START("FAKE")
 	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, su9_state, su9_cpu_freq, nullptr) // factory set
-	PORT_CONFSETTING(    0x00, "1.95MHz (SU9)" )
-	PORT_CONFSETTING(    0x01, "2.5MHz (DS9)" )
-	PORT_CONFSETTING(    0x02, "3MHz (SCC)" )
+	PORT_CONFSETTING(    0x00, "1.95MHz (original)" )
+	PORT_CONFSETTING(    0x01, "2.5MHz (Deluxe)" )
+	PORT_CONFSETTING(    0x02, "3MHz (Septennial)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rsc )
@@ -529,10 +546,20 @@ void csc_state::csc(machine_config &config)
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
+void csc_state::csce(machine_config &config)
+{
+	csc(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_clock(4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::su9_map);
+}
+
 void csc_state::su9(machine_config &config)
 {
 	csc(config);
 
+	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::su9_map);
 	config.set_default_layout(layout_fidel_su9);
 }
@@ -580,91 +607,86 @@ ROM_START( csc )
 	ROM_LOAD("1025a01",   0xe000, 0x2000, CRC(57f068c3) SHA1(7d2ac4b9a2fba19556782863bdd89e2d2d94e97b) )
 	ROM_LOAD("74s474",    0xfe00, 0x0200, CRC(4511ba31) SHA1(e275b1739f8c3aa445cccb6a2b597475f507e456) )
 
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
 	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) )
-	ROM_RELOAD(           0x1000, 0x1000)
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
 ROM_END
 
-ROM_START( cscg )
+ROM_START( csce )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
-	ROM_LOAD("1025a03",   0xa000, 0x2000, CRC(63982c07) SHA1(5ed4356323d5c80df216da55994abe94ba4aa94c) )
-	ROM_LOAD("1025a02",   0xc000, 0x2000, CRC(9e6e7c69) SHA1(4f1ed9141b6596f4d2b1217d7a4ba48229f3f1b0) )
-	ROM_LOAD("1025a01",   0xe000, 0x2000, CRC(57f068c3) SHA1(7d2ac4b9a2fba19556782863bdd89e2d2d94e97b) )
-	ROM_LOAD("74s474",    0xfe00, 0x0200, CRC(4511ba31) SHA1(e275b1739f8c3aa445cccb6a2b597475f507e456) )
+	ROM_LOAD("03", 0x2000, 0x2000, CRC(22e43531) SHA1(696dc019bea3812ae6cf9c2b2c4d3a7b9017807d) )
+	ROM_LOAD("02", 0xa000, 0x2000, CRC(e593f114) SHA1(4dc5a2456a87c128235958f046cee9502cb3ac65) )
+	ROM_LOAD("06", 0xc000, 0x0800, CRC(5d41b1e5) SHA1(fe95d8811d8894688336b798212c397bdb216956) )
+	ROM_LOAD("07", 0xc800, 0x0800, CRC(9078d40a) SHA1(4ffd36a4fcde1988e42543652e29463bc6ad5a8f) )
+	ROM_LOAD("08", 0xd000, 0x0800, CRC(c9472cc1) SHA1(ef4b1ae99e81689efeae323fe6ed58cf2c773fd6) )
+	ROM_LOAD("09", 0xd800, 0x0800, CRC(255c94a0) SHA1(d8e79213b69710e9d94c698492ec7b7420c9c7d8) )
+	ROM_LOAD("04", 0xe000, 0x1000, CRC(098873bd) SHA1(86001129a57db390e565f59a5677ec0b34b41d99) )
+	ROM_LOAD("05", 0xf000, 0x1000, CRC(1a516bfe) SHA1(2a2b252ca5d425fdf162cbc53077aee448b94437) )
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("101-64101", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv, assume correct
-ROM_END
-
-ROM_START( cscsp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
-	ROM_LOAD("1025a03",   0xa000, 0x2000, CRC(63982c07) SHA1(5ed4356323d5c80df216da55994abe94ba4aa94c) )
-	ROM_LOAD("1025a02",   0xc000, 0x2000, CRC(9e6e7c69) SHA1(4f1ed9141b6596f4d2b1217d7a4ba48229f3f1b0) )
-	ROM_LOAD("1025a01",   0xe000, 0x2000, CRC(57f068c3) SHA1(7d2ac4b9a2fba19556782863bdd89e2d2d94e97b) )
-	ROM_LOAD("74s474",    0xfe00, 0x0200, CRC(4511ba31) SHA1(e275b1739f8c3aa445cccb6a2b597475f507e456) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("101-64106", 0x0000, 0x2000, BAD_DUMP CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) ) // taken from vcc/fexcelv, assume correct
-ROM_END
-
-ROM_START( cscfr )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
-	ROM_LOAD("1025a03",   0xa000, 0x2000, CRC(63982c07) SHA1(5ed4356323d5c80df216da55994abe94ba4aa94c) )
-	ROM_LOAD("1025a02",   0xc000, 0x2000, CRC(9e6e7c69) SHA1(4f1ed9141b6596f4d2b1217d7a4ba48229f3f1b0) )
-	ROM_LOAD("1025a01",   0xe000, 0x2000, CRC(57f068c3) SHA1(7d2ac4b9a2fba19556782863bdd89e2d2d94e97b) )
-	ROM_LOAD("74s474",    0xfe00, 0x0200, CRC(4511ba31) SHA1(e275b1739f8c3aa445cccb6a2b597475f507e456) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("101-64105", 0x0000, 0x2000, BAD_DUMP CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3) ) // taken from fexcelv, assume correct
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
 ROM_END
 
 
 ROM_START( super9cc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("101-1050a01", 0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
 	ROM_LOAD("101-1024b03", 0xa000, 0x0800, CRC(e8c97455) SHA1(ed2958fc5474253ee8c2eaf27fc64226e12f80ea) )
 	ROM_LOAD("101-1024b02", 0xc000, 0x2000, CRC(95004699) SHA1(ea79f43da73267344545df8ad61730f613876c2e) )
 	ROM_LOAD("101-1024c01", 0xe000, 0x2000, CRC(03904e86) SHA1(bfa0dd9d8541e3ec359a247a3eba543501f727bc) )
 
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("101-32107", 0x0000, 0x1000, BAD_DUMP CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // taken from csc, assume correct
-	ROM_RELOAD(           0x1000, 0x1000)
-ROM_END
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
 
-ROM_START( super9ccg )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-1050a01", 0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
-	ROM_LOAD("101-1024b03", 0xa000, 0x0800, CRC(e8c97455) SHA1(ed2958fc5474253ee8c2eaf27fc64226e12f80ea) )
-	ROM_LOAD("101-1024b02", 0xc000, 0x2000, CRC(95004699) SHA1(ea79f43da73267344545df8ad61730f613876c2e) )
-	ROM_LOAD("101-1024c01", 0xe000, 0x2000, CRC(03904e86) SHA1(bfa0dd9d8541e3ec359a247a3eba543501f727bc) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("101-64101", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv, assume correct
-ROM_END
-
-ROM_START( super9ccsp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-1050a01", 0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
-	ROM_LOAD("101-1024b03", 0xa000, 0x0800, CRC(e8c97455) SHA1(ed2958fc5474253ee8c2eaf27fc64226e12f80ea) )
-	ROM_LOAD("101-1024b02", 0xc000, 0x2000, CRC(95004699) SHA1(ea79f43da73267344545df8ad61730f613876c2e) )
-	ROM_LOAD("101-1024c01", 0xe000, 0x2000, CRC(03904e86) SHA1(bfa0dd9d8541e3ec359a247a3eba543501f727bc) )
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("101-64106", 0x0000, 0x2000, BAD_DUMP CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) ) // taken from vcc/fexcelv, assume correct
-ROM_END
-
-ROM_START( super9ccfr )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-1050a01", 0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
-	ROM_LOAD("101-1024b03", 0xa000, 0x0800, CRC(e8c97455) SHA1(ed2958fc5474253ee8c2eaf27fc64226e12f80ea) )
-	ROM_LOAD("101-1024b02", 0xc000, 0x2000, CRC(95004699) SHA1(ea79f43da73267344545df8ad61730f613876c2e) )
-	ROM_LOAD("101-1024c01", 0xe000, 0x2000, CRC(03904e86) SHA1(bfa0dd9d8541e3ec359a247a3eba543501f727bc) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("101-64105", 0x0000, 0x2000, BAD_DUMP CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3) ) // taken from fexcelv, assume correct
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
 ROM_END
 
 
@@ -681,15 +703,10 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME        PARENT    CMP MACHINE  INPUT  STATE      INIT              COMPANY, FULLNAME, FLAGS
-CONS( 1981, csc,        0,        0, csc,      csc,   csc_state, init_language<0>, "Fidelity Electronics", "Champion Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1981, cscg,       csc,      0, csc,      csc,   csc_state, init_language<1>, "Fidelity Electronics", "Champion Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1981, cscsp,      csc,      0, csc,      csc,   csc_state, init_language<3>, "Fidelity Electronics", "Champion Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1981, cscfr,      csc,      0, csc,      csc,   csc_state, init_language<2>, "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME      PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1981, csc,      0,      0, csc,      csc,  csc_state, empty_init, "Fidelity Electronics", "Champion Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1981, csce,     0,      0, csce,     csc,  csc_state, empty_init, "Fidelity Electronics", "Elite Champion Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1983, super9cc,   0,        0, su9,      su9,   su9_state, init_language<0>, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, super9ccg,  super9cc, 0, su9,      su9,   su9_state, init_language<1>, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, super9ccsp, super9cc, 0, su9,      su9,   su9_state, init_language<3>, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, super9ccfr, super9cc, 0, su9,      su9,   su9_state, init_language<2>, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, super9cc, 0,      0, su9,      su9,  su9_state, empty_init, "Fidelity Electronics", "Super 9 Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1981, reversic,   0,        0, rsc,      rsc,   csc_state, empty_init,       "Fidelity Electronics", "Reversi Sensory Challenger (green version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1981, reversic, 0,      0, rsc,      rsc,  csc_state, empty_init, "Fidelity Electronics", "Reversi Sensory Challenger (green version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

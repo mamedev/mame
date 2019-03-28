@@ -751,21 +751,21 @@ void ace_state::machine_start()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ace )
+//  machine_config( ace )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(ace_state::ace)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(6'500'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(ace_mem)
-	MCFG_DEVICE_IO_MAP(ace_io)
+	Z80(config, m_maincpu, XTAL(6'500'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ace_state::ace_mem);
+	m_maincpu->set_addrmap(AS_IO, &ace_state::ace_io);
 	config.m_minimum_quantum = attotime::from_hz(60);
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(ace_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(6'500'000), 416, 0, 336, 312, 0, 304)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(ace_state::screen_update));
+	screen.set_raw(XTAL(6'500'000), 416, 0, 336, 312, 0, 304);
+	screen.set_palette("palette");
 
 	TIMER(config, "set_irq").configure_scanline(FUNC(ace_state::set_irq), SCREEN_TAG, 31*8, 264);
 	TIMER(config, "clear_irq").configure_scanline(FUNC(ace_state::clear_irq), SCREEN_TAG, 32*8, 264);

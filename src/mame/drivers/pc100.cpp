@@ -634,7 +634,8 @@ static void pc100_floppies(device_slot_interface &device)
 
 #define MASTER_CLOCK 6988800
 
-MACHINE_CONFIG_START(pc100_state::pc100)
+void pc100_state::pc100(machine_config &config)
+{
 	/* basic machine hardware */
 	I8086(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc100_state::pc100_map);
@@ -681,11 +682,11 @@ MACHINE_CONFIG_START(pc100_state::pc100)
 	FLOPPY_CONNECTOR(config, "upd765:1", pc100_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	/* TODO: Unknown Pixel Clock and CRTC is dynamic */
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*4, 1024, 0, 768, 264*2, 0, 512)
-	MCFG_SCREEN_UPDATE_DRIVER(pc100_state, screen_update_pc100)
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_raw(MASTER_CLOCK*4, 1024, 0, 768, 264*2, 0, 512);
+	screen.set_screen_update(FUNC(pc100_state::screen_update_pc100));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc100);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_333, 16);
@@ -693,7 +694,7 @@ MACHINE_CONFIG_START(pc100_state::pc100)
 	SPEAKER(config, "mono").front_center();
 
 	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( pc100 )

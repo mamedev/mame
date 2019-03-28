@@ -472,24 +472,23 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(rx78_state::rx78)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, MASTER_CLOCK/7) // unknown divider
-	MCFG_DEVICE_PROGRAM_MAP(rx78_mem)
-	MCFG_DEVICE_IO_MAP(rx78_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rx78_state, irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK/7); // unknown divider
+	m_maincpu->set_addrmap(AS_PROGRAM, &rx78_state::rx78_mem);
+	m_maincpu->set_addrmap(AS_IO, &rx78_state::rx78_io);
+	m_maincpu->set_vblank_int("screen", FUNC(rx78_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-//  MCFG_SCREEN_SIZE(192, 184)
-//  MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 184-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+//  screen.set_size(192, 184);
+//  screen.set_visarea(0, 192-1, 0, 184-1);
 	/* guess: generic NTSC video timing at 256x224, system runs at 192x184, suppose with some border area to compensate */
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 442, 0, 256, 263, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(rx78_state, screen_update)
+	screen.set_raw(MASTER_CLOCK/4, 442, 0, 256, 263, 0, 224);
+	screen.set_screen_update(FUNC(rx78_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 16+1) //+1 for the background color
+	PALETTE(config, m_palette).set_entries(16+1); //+1 for the background color
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_rx78);
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "rx78_cart")
@@ -504,8 +503,7 @@ MACHINE_CONFIG_START(rx78_state::rx78)
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(28'636'363)/8) // unknown divider
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SN76489A(config, "sn1", XTAL(28'636'363)/8).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown divider
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("rx78");

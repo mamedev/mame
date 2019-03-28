@@ -741,16 +741,16 @@ MACHINE_RESET_MEMBER(liberate_state,liberate)
 	m_bank = 0;
 }
 
-MACHINE_CONFIG_START(liberate_state::liberate_base)
-
+void liberate_state::liberate_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",DECO16, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(liberate_map)
-	MCFG_DEVICE_IO_MAP(deco16_io_map)
+	DECO16(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &liberate_state::liberate_map);
+	m_maincpu->set_addrmap(AS_IO, &liberate_state::deco16_io_map);
 
-	MCFG_DEVICE_ADD("audiocpu",DECO_222, 1500000) /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
-	MCFG_DEVICE_PROGRAM_MAP(liberate_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
+	DECO_222(config, m_audiocpu, 1500000); /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &liberate_state::liberate_sound_map);
+	m_audiocpu->set_periodic_int(FUNC(liberate_state::nmi_line_pulse), attotime::from_hz(16*60)); /* ??? */
 
 	config.m_minimum_quantum = attotime::from_hz(12000);
 
@@ -758,14 +758,14 @@ MACHINE_CONFIG_START(liberate_state::liberate_base)
 	MCFG_MACHINE_RESET_OVERRIDE(liberate_state,liberate)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 529ms Vblank duration?? */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_liberate)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, liberate_state, deco16_interrupt))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529) /* 529ms Vblank duration?? */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(liberate_state::screen_update_liberate));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(liberate_state::deco16_interrupt));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_liberate);
 	PALETTE(config, m_palette, FUNC(liberate_state::liberate_palette), 33);
@@ -780,64 +780,63 @@ MACHINE_CONFIG_START(liberate_state::liberate_base)
 	AY8912(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	AY8912(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(liberate_state::liberate)
+void liberate_state::liberate(machine_config &config)
+{
 	liberate_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_OPCODES, &liberate_state::decrypted_opcodes_map);
+}
 
-MACHINE_CONFIG_START(liberate_state::liberatb)
+void liberate_state::liberatb(machine_config &config)
+{
 	liberate_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", M6502, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(liberatb_map)
-MACHINE_CONFIG_END
+	M6502(config.replace(), m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &liberate_state::liberatb_map);
+}
 
-MACHINE_CONFIG_START(liberate_state::boomrang)
+void liberate_state::boomrang(machine_config &config)
+{
 	liberate_base(config);
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,boomrang)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_boomrang)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(liberate_state::screen_update_boomrang));
+}
 
-MACHINE_CONFIG_START(liberate_state::prosoccr)
+void liberate_state::prosoccr(machine_config &config)
+{
 	liberate_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(10000000/8) //xtal is unknown?
-	MCFG_DEVICE_PROGRAM_MAP(prosoccr_map)
-	MCFG_DEVICE_IO_MAP(prosoccr_io_map)
+	m_maincpu->set_clock(10000000/8); //xtal is unknown?
+	m_maincpu->set_addrmap(AS_PROGRAM, &liberate_state::prosoccr_map);
+	m_maincpu->set_addrmap(AS_IO, &liberate_state::prosoccr_io_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_CLOCK(10000000/8) //xtal is 12 Mhz, divider is unknown
-	MCFG_DEVICE_PROGRAM_MAP(prosoccr_sound_map)
+	m_audiocpu->set_clock(10000000/8); //xtal is 12 Mhz, divider is unknown
+	m_audiocpu->set_addrmap(AS_PROGRAM, &liberate_state::prosoccr_sound_map);
 
 	config.m_minimum_quantum = attotime::from_hz(12000);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_prosoccr)
+	subdevice<screen_device>("screen")->set_visarea(1*8, 31*8-1, 0*8, 32*8-1);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(liberate_state::screen_update_prosoccr));
 
 	m_gfxdecode->set_info(gfx_prosoccr);
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosoccr)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(liberate_state::prosport)
-
+void liberate_state::prosport(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", DECO16, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(prosport_map)
-	MCFG_DEVICE_IO_MAP(deco16_io_map)
+	DECO16(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &liberate_state::prosport_map);
+	m_maincpu->set_addrmap(AS_IO, &liberate_state::deco16_io_map);
 
-	MCFG_DEVICE_ADD("audiocpu", DECO_222, 1500000/2) /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
-	MCFG_DEVICE_PROGRAM_MAP(liberate_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
+	DECO_222(config, m_audiocpu, 1500000/2); /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &liberate_state::liberate_sound_map);
+	m_audiocpu->set_periodic_int(FUNC(liberate_state::nmi_line_pulse), attotime::from_hz(16*60)); /* ??? */
 
 //  config.m_minimum_quantum = attotime::from_hz(12000);
 
@@ -845,14 +844,14 @@ MACHINE_CONFIG_START(liberate_state::prosport)
 	MCFG_MACHINE_RESET_OVERRIDE(liberate_state,liberate)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1529) /* 529ms Vblank duration?? */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_prosport)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, liberate_state, deco16_interrupt))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1529) /* 529ms Vblank duration?? */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(liberate_state::screen_update_prosport));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(liberate_state::deco16_interrupt));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_prosport);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 256);
@@ -867,7 +866,7 @@ MACHINE_CONFIG_START(liberate_state::prosport)
 	AY8912(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	AY8912(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

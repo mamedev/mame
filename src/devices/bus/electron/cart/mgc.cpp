@@ -65,7 +65,7 @@ void electron_mgc_device::device_reset()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t electron_mgc_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
+uint8_t electron_mgc_device::read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
 {
 	uint8_t data = 0xff;
 
@@ -82,7 +82,7 @@ uint8_t electron_mgc_device::read(address_space &space, offs_t offset, int infc,
 //  write - cartridge data write
 //-------------------------------------------------
 
-void electron_mgc_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
+void electron_mgc_device::write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
 {
 	if (infc)
 	{

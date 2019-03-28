@@ -465,28 +465,28 @@ void calorie_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(calorie_state::calorie)
-
+void calorie_state::calorie(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(calorie_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 4000000);         /* 4 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &calorie_state::calorie_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &calorie_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(calorie_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,3000000)        /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(calorie_sound_map)
-	MCFG_DEVICE_IO_MAP(calorie_sound_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(calorie_state, irq0_line_hold,  64)
+	z80_device &audiocpu(Z80(config, "audiocpu", 3000000));        /* 3 MHz */
+	audiocpu.set_addrmap(AS_PROGRAM, &calorie_state::calorie_sound_map);
+	audiocpu.set_addrmap(AS_IO, &calorie_state::calorie_sound_io_map);
+	audiocpu.set_periodic_int(FUNC(calorie_state::irq0_line_hold), attotime::from_hz(64));
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(calorie_state, screen_update_calorie)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(calorie_state::screen_update_calorie));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_calorie);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x100);
@@ -501,7 +501,7 @@ MACHINE_CONFIG_START(calorie_state::calorie)
 	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
 
 	YM2149(config, "ay3", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
-MACHINE_CONFIG_END
+}
 
 void calorie_state::caloriee(machine_config &config)
 {

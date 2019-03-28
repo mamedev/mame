@@ -57,10 +57,6 @@
 
 #define VME_BUS_TAG        "vme"
 
-// Callbacks to the board from the VME bus comes through here
-#define MCFG_VME_J1_CB(_devcb) \
-	downcast<vme_slot_device &>(*device).set_vme_j1_callback(DEVCB_##_devcb);
-
 //void vme_slot1(device_slot_interface &device); // Disabled until we know how to combine a board driver and a slot device.
 void vme_slots(device_slot_interface &device);
 
@@ -89,9 +85,22 @@ public:
 	};
 
 	// construction/destruction
+	template <typename T>
+	vme_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, uint32_t slot_nbr, char const *bus_tag)
+		: vme_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+		set_vme_slot(bus_tag, tag);
+		update_vme_chains(slot_nbr);
+	}
+
 	vme_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_vme_j1_callback(Object &&cb)  { return m_vme_j1_callback.set_callback(std::forward<Object>(cb)); }
+	// Callbacks to the board from the VME bus comes through here
+	auto vme_j1_callback()  { return m_vme_j1_callback.bind(); }
 
 	void set_vme_slot(const char *tag, const char *slottag);
 	void update_vme_chains(uint32_t slot_nbr);
@@ -116,18 +125,6 @@ protected:
 
 DECLARE_DEVICE_TYPE(VME, vme_device)
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_VME_DEVICE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, VME, 0)
-
-#define MCFG_VME_CPU(_cputag) \
-	downcast<vme_device &>(*device).set_cputag(_cputag);
-
-#define MCFG_VME_BUS_OWNER_SPACES() \
-	downcast<vme_device &>(*device).use_owner_spaces();
 
 class vme_card_interface;
 
@@ -185,6 +182,7 @@ public:
 		AMOD_STANDARD_SUPERVIS_BLK  = 0x3F
 	};
 	void install_device(vme_amod_t amod, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, uint32_t mask);
+	void install_device(vme_amod_t amod, offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler, uint32_t mask);
 	//  void install_device(vme_amod_t amod, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 	void install_device(vme_amod_t amod, offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask);
 	void install_device(vme_amod_t amod, offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler, uint32_t mask);
@@ -240,13 +238,5 @@ protected:
 private:
 	device_vme_card_interface *m_next;
 };
-
-#define MCFG_VME_SLOT_ADD(_tag, _slotnbr, _slot_intf,_def_slot)            \
-	{   std::string stag = "slot" + std::to_string(_slotnbr);              \
-		MCFG_DEVICE_ADD(stag.c_str(), VME_SLOT, 0);                        \
-		MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false);          \
-		downcast<vme_slot_device &>(*device).set_vme_slot(_tag, stag.c_str()); \
-		downcast<vme_slot_device &>(*device).update_vme_chains(_slotnbr);      \
-	}
 
 #endif // MAME_BUS_VME_VME_H

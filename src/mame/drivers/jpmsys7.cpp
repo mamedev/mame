@@ -56,15 +56,16 @@ void jpmsys7_state::jpmsys7_map(address_map &map)
 static INPUT_PORTS_START(  jpmsys7 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(jpmsys7_state::jpmsys7)
-	MCFG_DEVICE_ADD("maincpu", MCF5206E, 40000000)  // seems to be a Coldfire of some kind
-	MCFG_DEVICE_PROGRAM_MAP(jpmsys7_map)
+void jpmsys7_state::jpmsys7(machine_config &config)
+{
+	MCF5206E(config, m_maincpu, 40000000);  // seems to be a Coldfire of some kind
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys7_state::jpmsys7_map);
 	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound (probably DMA driven DAC) */
-MACHINE_CONFIG_END
+}
 
 
 

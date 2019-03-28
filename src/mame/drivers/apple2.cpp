@@ -367,7 +367,7 @@ void apple2_state::machine_start()
 
 void apple2_state::machine_reset()
 {
-	m_inh_slot = -1;
+	m_inh_slot = 0;
 	m_cnxx_slot = -1;
 	m_page2 = false;
 	m_an0 = m_an1 = m_an2 = m_an3 = false;

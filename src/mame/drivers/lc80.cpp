@@ -330,19 +330,19 @@ void lc80_state::machine_start()
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(lc80_state::lc80)
+void lc80_state::lc80(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 900000) /* UD880D */
-	MCFG_DEVICE_PROGRAM_MAP(lc80_mem)
-	MCFG_DEVICE_IO_MAP(lc80_io)
+	Z80(config, m_maincpu, 900000); /* UD880D */
+	m_maincpu->set_addrmap(AS_PROGRAM, &lc80_state::lc80_mem);
+	m_maincpu->set_addrmap(AS_IO, &lc80_state::lc80_io);
 
 	/* video hardware */
 	config.set_default_layout(layout_lc80);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, 900000));
@@ -365,21 +365,21 @@ MACHINE_CONFIG_START(lc80_state::lc80)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	RAM(config, RAM_TAG).set_default_size("1K").set_extra_options("2K,3K,4K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(lc80_state::lc80_2)
+void lc80_state::lc80_2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 1800000) /* UD880D */
-	MCFG_DEVICE_PROGRAM_MAP(lc80_mem)
-	MCFG_DEVICE_IO_MAP(lc80_io)
+	Z80(config, m_maincpu, 1800000); /* UD880D */
+	m_maincpu->set_addrmap(AS_PROGRAM, &lc80_state::lc80_mem);
+	m_maincpu->set_addrmap(AS_IO, &lc80_state::lc80_io);
 
 	/* video hardware */
 	config.set_default_layout(layout_lc80);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, 900000));
@@ -403,16 +403,16 @@ MACHINE_CONFIG_START(lc80_state::lc80_2)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("4K");
-MACHINE_CONFIG_END
+}
 
 #if 0
-static MACHINE_CONFIG_START( sc80 )
+void lc80_state::sc80(machine_config &config)
+{
 	lc80_2(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY(Z80_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(sc80_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &lc80_state::sc80_mem);
+}
 #endif
 
 /* ROMs */

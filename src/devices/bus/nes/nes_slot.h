@@ -166,19 +166,19 @@ public:
 	virtual ~device_nes_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_m);
-	virtual DECLARE_READ8_MEMBER(read_h) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_ex) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_m);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
-	virtual DECLARE_WRITE8_MEMBER(write_ex) { }
+	virtual uint8_t read_l(offs_t offset);
+	virtual uint8_t read_m(offs_t offset);
+	virtual uint8_t read_h(offs_t offset) { return 0xff; }
+	virtual uint8_t read_ex(offs_t offset) { return 0xff; }
+	virtual void write_l(offs_t offset, uint8_t data);
+	virtual void write_m(offs_t offset, uint8_t data);
+	virtual void write_h(offs_t offset, uint8_t data);
+	virtual void write_ex(offs_t offset, uint8_t data) { }
 
-	virtual DECLARE_READ8_MEMBER(chr_r);
-	virtual DECLARE_WRITE8_MEMBER(chr_w);
-	virtual DECLARE_READ8_MEMBER(nt_r);
-	virtual DECLARE_WRITE8_MEMBER(nt_w);
+	virtual uint8_t chr_r(offs_t offset);
+	virtual void chr_w(offs_t offset, uint8_t data);
+	virtual uint8_t nt_r(offs_t offset);
+	virtual void nt_w(offs_t offset, uint8_t data);
 
 	// hack until disk system is made modern!
 	virtual void disk_flip_side() { }
@@ -202,6 +202,7 @@ public:
 	void set_vrc_lines(int PRG_A, int PRG_B, int CHR) { m_vrc_ls_prg_a = PRG_A; m_vrc_ls_prg_b = PRG_B; m_vrc_ls_chr = CHR; }
 	void set_x1_005_alt(bool val) { m_x1_005_alt_mirroring = val; }
 	void set_bus_conflict(bool val) { m_bus_conflict = val; }
+	uint8_t get_open_bus() { return m_open_bus; }
 	void set_open_bus(uint8_t val) { m_open_bus = val; }
 
 	uint8_t *get_prg_base() { return m_prg; }
@@ -237,6 +238,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(set_irq_line);
 	void hold_irq_line();
 	void reset_cpu();
+	void poke(offs_t offset, uint8_t data);
 
 	// internal state
 	uint8_t *m_prg;
@@ -270,8 +272,10 @@ protected:
 	bool m_pcb_ctrl_mirror, m_four_screen_vram, m_has_trainer;
 	bool m_x1_005_alt_mirroring;    // temp hack for two kind of mirroring in Taito X1-005 boards (to be replaced with pin checking)
 	bool m_bus_conflict;
+private:
 	uint8_t m_open_bus;
 
+public:
 	// PRG
 	inline int prg_8k_bank_num(int bank);
 	inline void update_prg_banks(int prg_bank_start, int prg_bank_end);
@@ -388,14 +392,14 @@ public:
 	int nes_get_pcb_id(const char *slot);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_m);
-	virtual DECLARE_READ8_MEMBER(read_h);
-	virtual DECLARE_READ8_MEMBER(read_ex);
-	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_m);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
-	virtual DECLARE_WRITE8_MEMBER(write_ex);
+	virtual uint8_t read_l(offs_t offset);
+	virtual uint8_t read_m(offs_t offset);
+	virtual uint8_t read_h(offs_t offset);
+	virtual uint8_t read_ex(offs_t offset);
+	virtual void write_l(offs_t offset, uint8_t data);
+	virtual void write_m(offs_t offset, uint8_t data);
+	virtual void write_h(offs_t offset, uint8_t data);
+	virtual void write_ex(offs_t offset, uint8_t data);
 
 	// hack until disk system is made modern!
 	virtual void disk_flip_side() { if (m_cart) m_cart->disk_flip_side(); }

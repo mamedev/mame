@@ -30,7 +30,7 @@ public:
 
 	// devices
 	required_device<sm510_base_device> m_maincpu;
-	optional_ioport_array<8> m_inp_matrix; // max 8
+	optional_ioport_array<8+1> m_inp_matrix; // max 8
 	output_finder<16, 16, 4> m_out_x;
 	optional_device<speaker_sound_device> m_speaker;
 
@@ -42,6 +42,7 @@ public:
 	u8 m_s;                         // MCU S output pins
 	u8 m_r;                         // MCU R output pins
 
+	void inp_fixed_last() { m_inp_fixed = -2; } // last input line to GND
 	u8 read_inputs(int columns, int fixed = -1);
 
 	virtual void update_k_line();

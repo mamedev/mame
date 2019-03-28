@@ -752,9 +752,9 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 /* Machine driver */
 MACHINE_CONFIG_START(homelab_state::homelab)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(homelab2_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homelab_state,  homelab_frame)
+	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &homelab_state::homelab2_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(homelab_state::homelab_frame));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
@@ -784,9 +784,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(homelab_state::homelab3)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(homelab3_mem)
-	MCFG_DEVICE_IO_MAP(homelab3_io)
+	Z80(config, m_maincpu, XTAL(12'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &homelab_state::homelab3_mem);
+	m_maincpu->set_addrmap(AS_IO, &homelab_state::homelab3_io);
 	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,homelab3)
 
 	/* video hardware */
@@ -817,9 +817,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(homelab_state::brailab4)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(brailab4_mem)
-	MCFG_DEVICE_IO_MAP(brailab4_io)
+	Z80(config, m_maincpu, XTAL(12'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &homelab_state::brailab4_mem);
+	m_maincpu->set_addrmap(AS_IO, &homelab_state::brailab4_io);
 	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,brailab4)
 
 	/* video hardware */
@@ -844,8 +844,7 @@ MACHINE_CONFIG_START(homelab_state::brailab4)
 
 	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("mea8000", MEA8000, 3840000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	MEA8000(config, "mea8000", 3840000).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	CASSETTE(config, m_cass);
 	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", attotime::from_seconds(18))

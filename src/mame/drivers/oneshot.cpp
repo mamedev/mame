@@ -401,6 +401,13 @@ void oneshot_state::maddonna(machine_config &config)
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(oneshot_state::screen_update_maddonna));
 }
 
+void oneshot_state::komocomo(machine_config &config)
+{
+	oneshot(config);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(oneshot_state::screen_update_komocomo));
+}
+
+
 
 ROM_START( oneshot )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
@@ -425,7 +432,7 @@ ROM_START( oneshot )
 	ROM_LOAD( "1shot.u14", 0x080000, 0x080000, CRC(222e33f8) SHA1(2665afdf4cb1a29325df62efc1843a4b2cf34a4e) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "1shot.mb", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, zooming?
+	ROM_LOAD( "1shot.mb", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, unknown purpose
 ROM_END
 
 ROM_START( maddonna )
@@ -450,19 +457,45 @@ ROM_START( maddonna )
 	/* no samples for this game */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x1", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, zooming?
+	ROM_LOAD( "x1", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, unknown purpose
 ROM_END
 
-// The tiles containing the copyright string (tiles 0x3979 onwards) differ in this set.
-// Both versions have tiles containing the 'Tuning - Germany' copyright messages, but
-// the parent set has additional tiles containing the '(c)Copyright 1995' which is shown
-// on the title screen.
-//
-// The lack of these tiles in this set causes all subsequent tiles to be shifted.  It is
-// likely that the correct program roms for this set either don't show '(c)Copyright 1995'
-// or display it using the regular font instead.
+ROM_START( komocomo ) // ROM PCB marked : GAME B/D TOPnew1 002
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "11.ua24", 0x00000, 0x10000, CRC(31c18579) SHA1(da97207afced0cf844b111752e9f634a49bc7115) )
+	ROM_LOAD16_BYTE( "10.ua22", 0x00001, 0x10000, CRC(fa839c0f) SHA1(53aee489e694e5777bd5ac20aa2b51c2c9e5493a) )
 
-ROM_START( maddonnb )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "9.ua2", 0x00000, 0x010000, CRC(f2080071) SHA1(68cbae9559879b2dc19c41a7efbd13ab4a569d3f) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
+	ROM_LOAD( "8.ui16a",  0x000000, 0x080000, CRC(11ac04ab) SHA1(321a7af3bdf47fa0ec1f7bbd758dd1023b409a06) )
+	ROM_LOAD( "6.ui13a",  0x080000, 0x080000, CRC(bb498592) SHA1(f7946a40d35ae0726860dd65f1aaf1c145d51afd) )
+	ROM_LOAD( "4.ui11a",  0x100000, 0x080000, CRC(d22dd6d8) SHA1(f466167d088275cdc973535401895272d48c8079) )
+	ROM_LOAD( "2.ui8a",   0x180000, 0x080000, CRC(cc5360f8) SHA1(61670b970a71af8f008052a98c10127f8b412a85) )
+	ROM_LOAD( "7.ui16",   0x200000, 0x080000, CRC(dc71de75) SHA1(adc8f51acf34e41b94a740dc2b7a66b23a7ffcf5) )
+	ROM_LOAD( "5.ui13",   0x280000, 0x080000, CRC(56bc3719) SHA1(947d7fe45273052fbd666ad8e9bef9818c6e3104) )
+	ROM_LOAD( "3.ui11",   0x300000, 0x080000, CRC(646073d1) SHA1(87593ccbe9419da2ea70763784acc12221b5bed8) )
+	ROM_LOAD( "1.ui8",    0x380000, 0x080000, CRC(58ba6622) SHA1(ee5a759ab22a663da5bba1db5fec23958bfee771) )
+
+	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	/* no samples for this game */
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "12.bin", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, unknown purpose
+ROM_END
+
+
+/* The tiles containing the copyright string (tiles 0x3979 onwards) differ in this set.
+   Both versions have tiles containing the 'Tuning - Germany' copyright messages, but
+   the parent set has additional tiles containing the '(c)Copyright 1995' which is shown
+   on the title screen.
+
+   The lack of these tiles in this set causes all subsequent tiles to be shifted.  It is
+   likely that the correct program roms for this set either don't show '(c)Copyright 1995'
+   or display it using the regular font instead. */
+
+ROM_START( maddonnab )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
 	/* program roms missing in this dump, gfx don't seem 100% correct for other ones */
 	ROM_LOAD16_BYTE( "maddonnb.b16", 0x00000, 0x20000, NO_DUMP )
@@ -485,11 +518,13 @@ ROM_START( maddonnb )
 	/* no samples for this game */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x1", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, zooming?
+	ROM_LOAD( "x1", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, unknown purpose
 ROM_END
 
 
+// all sets have a large (unused) PROMAT logo in them
+GAME( 1995, maddonna, 0,        maddonna, maddonna, oneshot_state, empty_init, ROT0, "Promat (Tuning license)",  "Mad Donna (Tuning, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, maddonnab,maddonna, maddonna, maddonna, oneshot_state, empty_init, ROT0, "Promat (Tuning license)",  "Mad Donna (Tuning, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, komocomo, maddonna, komocomo, maddonna, oneshot_state, empty_init, ROT0, "bootleg", "Komo Como (Topmar, bootleg?)", MACHINE_SUPPORTS_SAVE ) // shows TOPMAR (an anagram of PROMAT) on the side, possibly a hack of the original PROMAT version
 
-GAME( 1995, maddonna, 0,        maddonna, maddonna, oneshot_state, empty_init, ROT0, "Tuning",  "Mad Donna (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, maddonnb, maddonna, maddonna, maddonna, oneshot_state, empty_init, ROT0, "Tuning",  "Mad Donna (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, oneshot,  0,        oneshot,  oneshot , oneshot_state, empty_init, ROT0, "Promat",  "One Shot One Kill", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

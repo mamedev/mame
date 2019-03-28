@@ -196,7 +196,7 @@ void prof180x_state::prof180x_io(address_map &map)
 {
 	map(0x08, 0x08).mirror(0xff00).w(FUNC(prof180x_state::flr_w));
 	map(0x09, 0x09).select(0xff00).r(FUNC(prof180x_state::status_r));
-	map(0x0a, 0x0a).mirror(0xff00).rw(FDC9268_TAG, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
+	map(0x0a, 0x0a).mirror(0xff00).rw(FDC9268_TAG, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
 	map(0x0b, 0x0b).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0x0c, 0x0d).mirror(0xff00).m(FDC9268_TAG, FUNC(upd765a_device::map));
 }
@@ -238,19 +238,20 @@ void prof180x_state::machine_reset()
 	}
 }
 
-MACHINE_CONFIG_START(prof180x_state::prof180x)
+void prof180x_state::prof180x(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(HD64180_TAG, Z80, XTAL(9'216'000))
-	MCFG_DEVICE_PROGRAM_MAP(prof180x_mem)
-	MCFG_DEVICE_IO_MAP(prof180x_io)
+	z80_device &maincpu(Z80(config, HD64180_TAG, XTAL(9'216'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &prof180x_state::prof180x_mem);
+	maincpu.set_addrmap(AS_IO, &prof180x_state::prof180x_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(prof180x_state, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(prof180x_state::screen_update));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
 
 	/* devices */
 	UPD765A(config, FDC9268_TAG, 8'000'000, false, true);
@@ -271,7 +272,7 @@ MACHINE_CONFIG_START(prof180x_state::prof180x)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_list").set_original("prof180");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 

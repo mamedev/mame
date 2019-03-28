@@ -517,14 +517,15 @@ void pturn_state::machine_reset()
 	m_nmi_sub = false;
 }
 
-MACHINE_CONFIG_START(pturn_state::pturn)
-	MCFG_DEVICE_ADD("maincpu", Z80, 12000000/3)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pturn_state,  main_intgen)
+void pturn_state::pturn(machine_config &config)
+{
+	Z80(config, m_maincpu, 12000000/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pturn_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(pturn_state::main_intgen));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/3)
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(pturn_state, sub_intgen, 3*60)
+	Z80(config, m_audiocpu, 12000000/3);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &pturn_state::sub_map);
+	m_audiocpu->set_periodic_int(FUNC(pturn_state::sub_intgen), attotime::from_hz(3*60));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(pturn_state::flip_w));
@@ -535,13 +536,13 @@ MACHINE_CONFIG_START(pturn_state::pturn)
 	mainlatch.q_out_cb<5>().set(FUNC(pturn_state::fgbank_w));
 	mainlatch.q_out_cb<6>().set_nop(); // toggles frequently during gameplay
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pturn_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(pturn_state::screen_update));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x100);
 
@@ -555,7 +556,7 @@ MACHINE_CONFIG_START(pturn_state::pturn)
 	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( pturn )

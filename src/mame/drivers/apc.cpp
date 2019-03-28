@@ -344,9 +344,9 @@ READ8_MEMBER(apc_state::apc_gdc_r)
 	uint8_t res;
 
 	if(offset & 1)
-		res = m_hgdc2->read(space, (offset & 2) >> 1); // upd7220 bitmap port
+		res = m_hgdc2->read((offset & 2) >> 1); // upd7220 bitmap port
 	else
-		res = m_hgdc1->read(space, (offset & 2) >> 1); // upd7220 character port
+		res = m_hgdc1->read((offset & 2) >> 1); // upd7220 character port
 
 	return res;
 }
@@ -354,9 +354,9 @@ READ8_MEMBER(apc_state::apc_gdc_r)
 WRITE8_MEMBER(apc_state::apc_gdc_w)
 {
 	if(offset & 1)
-		m_hgdc2->write(space, (offset & 2) >> 1,data); // upd7220 bitmap port
+		m_hgdc2->write((offset & 2) >> 1,data); // upd7220 bitmap port
 	else
-		m_hgdc1->write(space, (offset & 2) >> 1,data); // upd7220 character port
+		m_hgdc1->write((offset & 2) >> 1,data); // upd7220 character port
 }
 
 READ8_MEMBER(apc_state::apc_kbd_r)
@@ -416,12 +416,12 @@ CH3_EXA ==      0X3E                      ; CH-3 extended address (W)
 
 READ8_MEMBER(apc_state::apc_dma_r)
 {
-	return m_dmac->read(space, bitswap<8>(offset,7,6,5,4,2,1,0,3), 0xff);
+	return m_dmac->read(bitswap<4>(offset,2,1,0,3));
 }
 
 WRITE8_MEMBER(apc_state::apc_dma_w)
 {
-	m_dmac->write(space, bitswap<8>(offset,7,6,5,4,2,1,0,3), data, 0xff);
+	m_dmac->write(bitswap<4>(offset,2,1,0,3), data);
 }
 
 WRITE8_MEMBER(apc_state::apc_irq_ack_w)

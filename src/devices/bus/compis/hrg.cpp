@@ -165,12 +165,12 @@ void compis_hrg_device::device_reset()
 //  pcs6_6_r -
 //-------------------------------------------------
 
-uint8_t compis_hrg_device::pcs6_6_r(address_space &space, offs_t offset)
+uint8_t compis_hrg_device::pcs6_6_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
 	if (offset < 2)
-		data = m_crtc->read(space, offset & 0x01);
+		data = m_crtc->read(offset & 0x01);
 	else
 		// monochrome only, hblank? vblank?
 		if(offset == 2)
@@ -202,10 +202,10 @@ uint8_t compis_hrg_device::pcs6_6_r(address_space &space, offs_t offset)
 //  pcs6_6_w -
 //-------------------------------------------------
 
-void compis_hrg_device::pcs6_6_w(address_space &space, offs_t offset, uint8_t data)
+void compis_hrg_device::pcs6_6_w(offs_t offset, uint8_t data)
 {
 	//logerror("%s PCS 6:6 write %04x : %02x\n", machine().describe_context(), offset, data);
 
 	// 0x336 is likely the color plane register
-	if (offset < 2) m_crtc->write(space, offset & 0x01, data);
+	if (offset < 2) m_crtc->write(offset & 0x01, data);
 }

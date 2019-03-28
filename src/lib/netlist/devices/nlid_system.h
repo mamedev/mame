@@ -139,12 +139,13 @@ namespace netlist
 					total += pati[i];
 				}
 				netlist_time ttotal = netlist_time::zero();
-				for (unsigned i=0; i<m_size - 1; i++)
+				auto sm1 = static_cast<uint8_t>(m_size - 1);
+				for (unsigned i=0; i < sm1; i++)
 				{
 					m_inc[i] = base * pati[i];
 					ttotal += m_inc[i];
 				}
-				m_inc[m_size - 1] = base * total - ttotal;
+				m_inc[sm1] = base * total - ttotal;
 			}
 		}
 		NETLIB_UPDATEI();
@@ -181,6 +182,7 @@ namespace netlist
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		{
 			set_logic_family(setup().family_from_model(m_FAMILY()));
+			m_Q.set_logic_family(this->logic_family());
 		}
 
 		NETLIB_UPDATEI() { }
@@ -279,8 +281,8 @@ namespace netlist
 
 		NETLIB_RESETI()
 		{
-			m_RIN.set(1.0 / m_p_RIN(),0,0);
-			m_ROUT.set(1.0 / m_p_ROUT(),0,0);
+			m_RIN.set_G_V_I(1.0 / m_p_RIN(),0,0);
+			m_ROUT.set_G_V_I(1.0 / m_p_ROUT(),0,0);
 		}
 
 		NETLIB_UPDATEI()
@@ -334,7 +336,7 @@ namespace netlist
 		param_int_t m_N;
 		param_str_t m_func;
 		analog_output_t m_Q;
-		std::vector<poolptr<analog_input_t>> m_I;
+		std::vector<pool_owned_ptr<analog_input_t>> m_I;
 
 		std::vector<double> m_vals;
 		plib::pfunction m_compiled;

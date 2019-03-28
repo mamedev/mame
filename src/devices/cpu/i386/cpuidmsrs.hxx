@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde, Barry Rodewald, Carl, Philip Bennett, Samuele Zannoli
 
 uint64_t pentium_device::opcode_rdmsr(bool &valid_msr)
 {
@@ -253,8 +255,10 @@ void athlonxp_device::opcode_cpuid()
 
 uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 {
+	uint64_t ret;
 	uint32_t offset = REG32(ECX);
 
+	ret = 0;
 	switch (offset)
 	{
 		case 0x10: // TSC
@@ -265,6 +269,7 @@ uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 			// 7-0   MTRRCapVCnt - Number of variable range MTRRs (8)
 			// 8     MtrrCapFix  - Fixed range MTRRs available (1)
 			// 10    MtrrCapWc   - Write combining memory type available (1)
+			ret = 0x508;
 			break;
 		case 0x17b: // MCG_CTL
 			break;
@@ -309,12 +314,15 @@ uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 			break;
 		case 0x250: // MTRRfix64K_00000
 			// 8 bits for each 64k block starting at address 0
+			ret = m_msr_mtrrfix[0];
 			break;
 		case 0x258: // MTRRfix16K_80000
 			// 8 bits for each 16k block starting at address 0x80000
+			ret = m_msr_mtrrfix[1];
 			break;
 		case 0x259: // MTRRfix16K_A0000
 			// 8 bits for each 16k block starting at address 0xa0000
+			ret = m_msr_mtrrfix[2];
 			break;
 		case 0x268: // MTRRfix4K_C0000
 		case 0x269: // MTRRfix4K_C8000
@@ -325,6 +333,7 @@ uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 		case 0x26e: // MTRRfix4K_F0000
 		case 0x26f: // MTRRfix4K_F8000
 			// 8 bits for each 4k block
+			ret = m_msr_mtrrfix[3 + offset - 0x268];
 			break;
 		case 0x400: // MC0_CTL
 			break;
@@ -361,7 +370,7 @@ uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 			break;
 	}
 	valid_msr = true;
-	return 0;
+	return ret;
 }
 
 void athlonxp_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
@@ -394,10 +403,16 @@ void athlonxp_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 		case 0x2ff: // MTRRdefType
 			break;
 		case 0x250: // MTRRfix64K_00000
+			m_msr_mtrrfix[0] = data;
+			parse_mtrrfix(data, 0, 64);
 			break;
 		case 0x258: // MTRRfix16K_80000
+			m_msr_mtrrfix[1] = data;
+			parse_mtrrfix(data, 0x80000, 16);
 			break;
 		case 0x259: // MTRRfix16K_A0000
+			m_msr_mtrrfix[2] = data;
+			parse_mtrrfix(data, 0xa0000, 16);
 			break;
 		case 0x268: // MTRRfix4K_C0000-F8000
 		case 0x269:
@@ -407,6 +422,8 @@ void athlonxp_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 		case 0x26d:
 		case 0x26e:
 		case 0x26f:
+			m_msr_mtrrfix[3 + offset - 0x268] = data;
+			parse_mtrrfix(data, 0xc0000 + (offset - 0x268) * 0x8000, 4);
 			break;
 		case 0x400: // MC0_CTL
 			break;

@@ -1720,24 +1720,25 @@ void blitz68k_state::ramdac_config(machine_config &config)
 	ramdac.set_addrmap(0, &blitz68k_state::ramdac_map);
 }
 
-MACHINE_CONFIG_START(blitz68k_state::ilpag)
-	MCFG_DEVICE_ADD(m_maincpu, M68000, 11059200 )  // ?
-	MCFG_DEVICE_PROGRAM_MAP(ilpag_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state, irq4_line_hold) //3 & 6 used, mcu comms?
+void blitz68k_state::ilpag(machine_config &config)
+{
+	M68000(config, m_maincpu, 11059200 );  // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::ilpag_map);
+	m_maincpu->set_vblank_int("screen", FUNC(blitz68k_state::irq4_line_hold)); //3 & 6 used, mcu comms?
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-MACHINE_CONFIG_END
+}
 
 /*
 20089f = 1 -> menu
@@ -1777,29 +1778,30 @@ TIMER_DEVICE_CALLBACK_MEMBER(blitz68k_state::steaser_mcu_sim)
 }
 
 
-MACHINE_CONFIG_START(blitz68k_state::steaser)
+void blitz68k_state::steaser(machine_config &config)
+{
 	ilpag(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(steaser_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state, irq5_line_hold) //3, 4 & 6 used, mcu comms?
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::steaser_map);
+	m_maincpu->set_vblank_int("screen", FUNC(blitz68k_state::irq5_line_hold)); //3, 4 & 6 used, mcu comms?
 
 	TIMER(config, "coinsim").configure_periodic(FUNC(blitz68k_state::steaser_mcu_sim), attotime::from_hz(10000));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(blitz68k_state::cjffruit)
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(22'118'400)/2)
-	MCFG_DEVICE_PROGRAM_MAP(cjffruit_map)
+void blitz68k_state::cjffruit(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(22'118'400)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::cjffruit_map);
 
 	// MC68HC705C8P (Sound MCU)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-8-1);
+	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
 
 	R6545_1(config, m_crtc, XTAL(22'118'400)/8);
 	m_crtc->set_screen("screen");
@@ -1811,13 +1813,14 @@ MACHINE_CONFIG_START(blitz68k_state::cjffruit)
 	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(blitz68k_state::bankrob)
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200))
-	MCFG_DEVICE_PROGRAM_MAP(bankrob_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
+void blitz68k_state::bankrob(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(11'059'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::bankrob_map);
+	m_maincpu->set_vblank_int("screen", FUNC(blitz68k_state::irq3_line_hold));   // protection prevents correct irq frequency by crtc
 	// irq 2 reads from MCUs
 
 	// MC68HC705C8P (MCU1)
@@ -1826,12 +1829,12 @@ MACHINE_CONFIG_START(blitz68k_state::bankrob)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
-	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0+4, 256-1-4);
+	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
 
 	H46505(config, m_crtc, XTAL(11'059'200)/4);
 	m_crtc->set_screen("screen");
@@ -1843,25 +1846,26 @@ MACHINE_CONFIG_START(blitz68k_state::bankrob)
 	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(blitz68k_state::bankroba)
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200) )
-	MCFG_DEVICE_PROGRAM_MAP(bankroba_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq5_line_hold)   // protection prevents correct irq frequency by crtc
+void blitz68k_state::bankroba(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(11'059'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::bankroba_map);
+	m_maincpu->set_vblank_int("screen", FUNC(blitz68k_state::irq5_line_hold));   // protection prevents correct irq frequency by crtc
 	// irq 3,4 read from MCUs
 
 	// MC68HC705C8P (MCU)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+7, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0+7, 256-1);
+	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
 
 	H46505(config, m_crtc, XTAL(11'059'200)/4);
 	m_crtc->set_screen("screen");
@@ -1873,24 +1877,25 @@ MACHINE_CONFIG_START(blitz68k_state::bankroba)
 	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k_addr_factor1)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(blitz68k_state::deucesw2)
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(22'118'400) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(deucesw2_map)
+void blitz68k_state::deucesw2(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(22'118'400) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::deucesw2_map);
 	// irq 2 reads from MCUs
 
 	// MC68HC705C8P (MCU)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
 
 	R6545_1(config, m_crtc, XTAL(22'118'400)/8);
 	m_crtc->set_screen("screen");
@@ -1902,13 +1907,14 @@ MACHINE_CONFIG_START(blitz68k_state::deucesw2)
 	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(blitz68k_state::dualgame)
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200) )
-	MCFG_DEVICE_PROGRAM_MAP(dualgame_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq2_line_hold) // lev 2 = MCUs, lev 3 = vblank
+void blitz68k_state::dualgame(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(11'059'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::dualgame_map);
+	m_maincpu->set_vblank_int("screen", FUNC(blitz68k_state::irq2_line_hold)); // lev 2 = MCUs, lev 3 = vblank
 
 	// MC68HC705C8P (MCU1)
 
@@ -1916,12 +1922,12 @@ MACHINE_CONFIG_START(blitz68k_state::dualgame)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
-	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0+4, 256-1-4);
+	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
 
 	H46505(config, m_crtc, XTAL(11'059'200)/4);
 	m_crtc->set_screen("screen");
@@ -1933,24 +1939,25 @@ MACHINE_CONFIG_START(blitz68k_state::dualgame)
 	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(blitz68k_state::hermit)
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(22'118'400)/2 )
-	MCFG_DEVICE_PROGRAM_MAP(hermit_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq1_line_hold)   // protection prevents correct irq frequency by crtc
+void blitz68k_state::hermit(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(22'118'400)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::hermit_map);
+	m_maincpu->set_vblank_int("screen", FUNC(blitz68k_state::irq1_line_hold));   // protection prevents correct irq frequency by crtc
 
 	// MC68HC705C8P (MCU)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
-	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0+4, 256-1-4);
+	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
 
 	H46505(config, m_crtc, XTAL(22'118'400)/8);
 	m_crtc->set_screen("screen");
@@ -1962,12 +1969,13 @@ MACHINE_CONFIG_START(blitz68k_state::hermit)
 	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(blitz68k_state::maxidbl)
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200))
-	MCFG_DEVICE_PROGRAM_MAP(maxidbl_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
+void blitz68k_state::maxidbl(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(11'059'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::maxidbl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(blitz68k_state::irq3_line_hold));   // protection prevents correct irq frequency by crtc
 	// irq 2 reads from MCUs
 
 	// MC68HC705C8P (MCU1)
@@ -1978,12 +1986,12 @@ MACHINE_CONFIG_START(blitz68k_state::maxidbl)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k_noblit)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k_noblit));
 
 	H46505(config, m_crtc, XTAL(11'059'200)/4);
 	m_crtc->set_screen("screen");

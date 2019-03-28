@@ -156,7 +156,8 @@ NETLIB_UPDATE_PARAM(POT)
 	nl_double v = m_Dial();
 	if (m_DialIsLog())
 		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
-
+	if (m_Reverse())
+		v = 1.0 - v;
 	m_R1.set_R(std::max(m_R() * v, exec().gmin()));
 	m_R2.set_R(std::max(m_R() * (plib::constants<nl_double>::one() - v), exec().gmin()));
 
@@ -198,7 +199,7 @@ NETLIB_UPDATE_PARAM(POT2)
 NETLIB_RESET(C)
 {
 	// FIXME: Startup conditions
-	set(exec().gmin(), 0.0, -5.0 / exec().gmin());
+	set_G_V_I(exec().gmin(), 0.0, -5.0 / exec().gmin());
 	//set(exec().gmin(), 0.0, 0.0);
 }
 
@@ -255,7 +256,7 @@ NETLIB_RESET(D)
 	nl_double n = m_model.m_N;
 
 	m_D.set_param(Is, n, exec().gmin());
-	set(m_D.G(), 0.0, m_D.Ieq());
+	set_G_V_I(m_D.G(), 0.0, m_D.Ieq());
 }
 
 NETLIB_UPDATE_PARAM(D)

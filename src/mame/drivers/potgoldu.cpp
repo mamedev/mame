@@ -78,8 +78,8 @@ static INPUT_PORTS_START( potgold )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(potgold_state::potgold)
-
+void potgold_state::potgold(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS34010(config, m_maincpu, XTAL(40'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &potgold_state::potgold_map);
@@ -88,13 +88,13 @@ MACHINE_CONFIG_START(potgold_state::potgold)
 	m_maincpu->set_pixels_per_clock(1);
 	m_maincpu->set_scanline_rgb32_callback(FUNC(potgold_state::scanline_update));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200);
+	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_rgb32));
 
 	/* sound hardware */
 	/* YM2413 */
-MACHINE_CONFIG_END
+}
 
 ROM_START( potgoldu )
 	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* 34010 code */

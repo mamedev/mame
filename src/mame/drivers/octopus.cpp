@@ -524,9 +524,9 @@ READ8_MEMBER(octopus_state::rtc_r)
 	uint8_t ret = 0xff;
 
 	if(m_rtc_data)
-		ret = m_rtc->read(space,1);
+		ret = m_rtc->read(1);
 	else if(m_rtc_address)
-		ret = m_rtc->read(space,0);
+		ret = m_rtc->read(0);
 
 	return ret;
 }
@@ -534,9 +534,9 @@ READ8_MEMBER(octopus_state::rtc_r)
 WRITE8_MEMBER(octopus_state::rtc_w)
 {
 	if(m_rtc_data)
-		m_rtc->write(space,1,data);
+		m_rtc->write(1,data);
 	else if(m_rtc_address)
-		m_rtc->write(space,0,data);
+		m_rtc->write(0,data);
 }
 
 // RTC/FDC control - PPI port B
@@ -895,16 +895,17 @@ void octopus_centronics_devices(device_slot_interface &device)
 	device.option_add("printer", CENTRONICS_PRINTER);
 }
 
-MACHINE_CONFIG_START(octopus_state::octopus)
+void octopus_state::octopus(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8088, 24_MHz_XTAL / 3)  // 8MHz
-	MCFG_DEVICE_PROGRAM_MAP(octopus_mem)
-	MCFG_DEVICE_IO_MAP(octopus_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(octopus_state, x86_irq_cb)
+	I8088(config, m_maincpu, 24_MHz_XTAL / 3);  // 8MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &octopus_state::octopus_mem);
+	m_maincpu->set_addrmap(AS_IO, &octopus_state::octopus_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(octopus_state::x86_irq_cb));
 
-	MCFG_DEVICE_ADD("subcpu",Z80, 24_MHz_XTAL / 4) // 6MHz
-	MCFG_DEVICE_PROGRAM_MAP(octopus_sub_mem)
-	MCFG_DEVICE_IO_MAP(octopus_sub_io)
+	Z80(config, m_subcpu, 24_MHz_XTAL / 4); // 6MHz
+	m_subcpu->set_addrmap(AS_PROGRAM, &octopus_state::octopus_sub_mem);
+	m_subcpu->set_addrmap(AS_IO, &octopus_state::octopus_sub_io);
 
 	AM9517A(config, m_dma1, 24_MHz_XTAL / 6);  // 4MHz
 	m_dma1->out_hreq_callback().set(m_dma2, FUNC(am9517a_device::dreq0_w));
@@ -989,8 +990,7 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	m_pit->out_handler<2>().set(FUNC(octopus_state::spk_freq_w));
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	Z80SIO(config, m_serial, 16_MHz_XTAL / 4); // clock rate not mentioned in tech manual
 	m_serial->out_int_callback().set(m_pic1, FUNC(pic8259_device::ir1_w));
@@ -1029,8 +1029,7 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	ADDRESS_MAP_BANK(config, "z80_bank").set_map(&octopus_state::octopus_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
 
 	RAM(config, "ram").set_default_size("256K").set_extra_options("128K,512K,768K");
-
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( octopus )

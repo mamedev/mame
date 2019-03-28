@@ -117,21 +117,20 @@ void monon_color_state::monon_color_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(monon_color_state::monon_color)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", AX208, 96000000) // (8051 / MCS51 derived) incomplete core!
-	MCFG_DEVICE_PROGRAM_MAP(monon_color_map)
+	AX208(config, m_maincpu, 96000000); // (8051 / MCS51 derived) incomplete core!
+	m_maincpu->set_addrmap(AS_PROGRAM, &monon_color_state::monon_color_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(monon_color_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_screen_update(FUNC(monon_color_state::screen_update));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, m_palette).set_entries(256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

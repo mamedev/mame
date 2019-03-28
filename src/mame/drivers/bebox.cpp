@@ -28,8 +28,8 @@
 #include "formats/pc_dsk.h"
 #include "machine/8042kbdc.h"
 
-READ8_MEMBER(bebox_state::at_dma8237_1_r)  { return m_dma8237[1]->read(space, offset / 2); }
-WRITE8_MEMBER(bebox_state::at_dma8237_1_w) { m_dma8237[1]->write(space, offset / 2, data); }
+READ8_MEMBER(bebox_state::at_dma8237_1_r)  { return m_dma8237[1]->read(offset / 2); }
+WRITE8_MEMBER(bebox_state::at_dma8237_1_w) { m_dma8237[1]->write(offset / 2, data); }
 
 void bebox_state::main_mem(address_map &map)
 {

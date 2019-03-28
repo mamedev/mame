@@ -96,9 +96,8 @@ void msx_cart_msx_audio_hxmu900_device::device_add_mconfig(machine_config &confi
 void msx_cart_msx_audio_hxmu900_device::device_start()
 {
 	// Install IO read/write handlers
-	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
-	space.install_write_handler(0xc0, 0xc1, write8sm_delegate(FUNC(y8950_device::write), m_y8950.target()));
-	space.install_read_handler(0xc0, 0xc1, read8sm_delegate(FUNC(y8950_device::read), m_y8950.target()));
+	io_space().install_write_handler(0xc0, 0xc1, write8sm_delegate(FUNC(y8950_device::write), m_y8950.target()));
+	io_space().install_read_handler(0xc0, 0xc1, read8sm_delegate(FUNC(y8950_device::read), m_y8950.target()));
 }
 
 
@@ -111,7 +110,7 @@ void msx_cart_msx_audio_hxmu900_device::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_msx_audio_hxmu900_device::read_cart)
+uint8_t msx_cart_msx_audio_hxmu900_device::read_cart(offs_t offset)
 {
 	if (offset >= 0x4000 && offset < 0xC000)
 	{
@@ -201,11 +200,10 @@ WRITE_LINE_MEMBER(msx_cart_msx_audio_nms1205_device::midi_in)
 void msx_cart_msx_audio_nms1205_device::device_start()
 {
 	// Install IO read/write handlers
-	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
-	space.install_write_handler(0xc0, 0xc1, write8sm_delegate(FUNC(y8950_device::write), m_y8950.target()));
-	space.install_read_handler(0xc0, 0xc1, read8sm_delegate(FUNC(y8950_device::read), m_y8950.target()));
-	space.install_write_handler(0x00, 0x01, write8sm_delegate(FUNC(acia6850_device::write), m_acia6850.target()));
-	space.install_read_handler(0x04, 0x05, read8sm_delegate(FUNC(acia6850_device::read), m_acia6850.target()));
+	io_space().install_write_handler(0xc0, 0xc1, write8sm_delegate(FUNC(y8950_device::write), m_y8950.target()));
+	io_space().install_read_handler(0xc0, 0xc1, read8sm_delegate(FUNC(y8950_device::read), m_y8950.target()));
+	io_space().install_write_handler(0x00, 0x01, write8sm_delegate(FUNC(acia6850_device::write), m_acia6850.target()));
+	io_space().install_read_handler(0x04, 0x05, read8sm_delegate(FUNC(acia6850_device::read), m_acia6850.target()));
 }
 
 
@@ -218,7 +216,7 @@ void msx_cart_msx_audio_nms1205_device::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_msx_audio_nms1205_device::read_cart)
+uint8_t msx_cart_msx_audio_nms1205_device::read_cart(offs_t offset)
 {
 	if (offset >= 0x4000 && offset < 0xC000)
 	{
@@ -289,9 +287,8 @@ const tiny_rom_entry *msx_cart_msx_audio_fsca1_device::device_rom_region() const
 void msx_cart_msx_audio_fsca1_device::device_start()
 {
 	// Install IO read/write handlers
-	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
-	space.install_write_handler(0xc0, 0xc3, write8_delegate(FUNC(msx_cart_msx_audio_fsca1_device::write_y8950), this));
-	space.install_read_handler(0xc0, 0xc3, read8_delegate(FUNC(msx_cart_msx_audio_fsca1_device::read_y8950), this));
+	io_space().install_write_handler(0xc0, 0xc3, write8sm_delegate(FUNC(msx_cart_msx_audio_fsca1_device::write_y8950), this));
+	io_space().install_read_handler(0xc0, 0xc3, read8sm_delegate(FUNC(msx_cart_msx_audio_fsca1_device::read_y8950), this));
 }
 
 
@@ -304,7 +301,7 @@ void msx_cart_msx_audio_fsca1_device::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_msx_audio_fsca1_device::read_cart)
+uint8_t msx_cart_msx_audio_fsca1_device::read_cart(offs_t offset)
 {
 	if (m_7ffe == 0 && (offset & 0xB000) == 0x3000)
 	{
@@ -314,7 +311,7 @@ READ8_MEMBER(msx_cart_msx_audio_fsca1_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_msx_audio_fsca1_device::write_cart)
+void msx_cart_msx_audio_fsca1_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (offset == 0x7ffe)
 	{
@@ -338,7 +335,7 @@ WRITE8_MEMBER(msx_cart_msx_audio_fsca1_device::write_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_msx_audio_fsca1_device::write_y8950)
+void msx_cart_msx_audio_fsca1_device::write_y8950(offs_t offset, uint8_t data)
 {
 	if (offset & 2)
 	{
@@ -357,7 +354,7 @@ WRITE8_MEMBER(msx_cart_msx_audio_fsca1_device::write_y8950)
 }
 
 
-READ8_MEMBER(msx_cart_msx_audio_fsca1_device::read_y8950)
+uint8_t msx_cart_msx_audio_fsca1_device::read_y8950(offs_t offset)
 {
 	if (offset & 2)
 	{
@@ -370,13 +367,13 @@ READ8_MEMBER(msx_cart_msx_audio_fsca1_device::read_y8950)
 }
 
 
-WRITE8_MEMBER(msx_cart_msx_audio_fsca1_device::y8950_io_w)
+void msx_cart_msx_audio_fsca1_device::y8950_io_w(uint8_t data)
 {
 	logerror("msx_fsca1::y8950_io_w: %02x\n", data);
 }
 
 
-READ8_MEMBER(msx_cart_msx_audio_fsca1_device::y8950_io_r)
+uint8_t msx_cart_msx_audio_fsca1_device::y8950_io_r()
 {
 	return m_io_config->read();
 }

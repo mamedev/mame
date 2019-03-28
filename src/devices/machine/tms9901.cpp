@@ -275,13 +275,13 @@ void tms9901_device::timer_reload()
 
     bit 16-31: current status of the P0-P15 pins (quits timer mode, too...)
 */
-READ8_MEMBER( tms9901_device::read )
+uint8_t tms9901_device::read(offs_t offset)
 {
 	int answer = 0;
 
-	offset &= 0x003;
+	offset &= 0x01f;
 
-	switch (offset)
+	switch (offset >> 3)
 	{
 	case 0:
 		if (m_clock_mode)
@@ -356,7 +356,7 @@ READ8_MEMBER( tms9901_device::read )
 		break;
 	}
 
-	return answer;
+	return BIT(answer, offset & 7);
 }
 
 /*
@@ -372,7 +372,7 @@ READ8_MEMBER( tms9901_device::read )
 
     bit 16-31: set output state of P0-P15 (and set them as output pin) (quit timer mode, too...)
 */
-WRITE8_MEMBER ( tms9901_device::write )
+void tms9901_device::write(offs_t offset, uint8_t data)
 {
 	data &= 1;  /* clear extra bits */
 	offset &= 0x01F;

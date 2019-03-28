@@ -196,24 +196,24 @@ void mastboyo_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(mastboyo_state::mastboyo)
-
+void mastboyo_state::mastboyo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 20_MHz_XTAL / 6)
-	MCFG_DEVICE_PROGRAM_MAP(mastboyo_map)
-	MCFG_DEVICE_IO_MAP(mastboyo_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mastboyo_state, irq0_line_hold, 256.244f)  // not sure, INT0 pin was measured at 256.244Hz
+	Z80(config, m_maincpu, 20_MHz_XTAL / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mastboyo_state::mastboyo_map);
+	m_maincpu->set_addrmap(AS_IO, &mastboyo_state::mastboyo_portmap);
+	m_maincpu->set_periodic_int(FUNC(mastboyo_state::irq0_line_hold), attotime::from_hz(256.244f));  // not sure, INT0 pin was measured at 256.244Hz
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 2*8, 256-2*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mastboyo_state, screen_update_mastboyo)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 2*8, 256-2*8-1);
+	screen.set_screen_update(FUNC(mastboyo_state::screen_update_mastboyo));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mastboyo);
 
@@ -226,8 +226,7 @@ MACHINE_CONFIG_START(mastboyo_state::mastboyo)
 	aysnd.port_a_read_callback().set_ioport("DSW"); // DSW
 	aysnd.port_b_read_callback().set_ioport("IN0"); // player inputs
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-
-MACHINE_CONFIG_END
+}
 
 
 /*

@@ -33,9 +33,9 @@
 #ifndef NLID_TWOTERM_H_
 #define NLID_TWOTERM_H_
 
-#include "plib/pfunction.h"
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
+#include "plib/pfunction.h"
 
 // -----------------------------------------------------------------------------
 // Implementation
@@ -86,11 +86,11 @@ public:
 
 	void solve_later(netlist_time delay = netlist_time::from_nsec(1));
 
-	void set(const nl_double G, const nl_double V, const nl_double I)
+	void set_G_V_I(const nl_double G, const nl_double V, const nl_double I)
 	{
 		/*      GO, GT, I                */
-		m_P.set( G,  G, (  V) * G - I);
-		m_N.set( G,  G, ( -V) * G + I);
+		m_P.set_go_gt_I( -G,  G, (  V) * G - I);
+		m_N.set_go_gt_I( -G,  G, ( -V) * G + I);
 	}
 
 	nl_double deltaV() const
@@ -98,12 +98,12 @@ public:
 		return m_P.net().Q_Analog() - m_N.net().Q_Analog();
 	}
 
-	void set_mat(const nl_double a11, const nl_double a12, const nl_double r1,
-				 const nl_double a21, const nl_double a22, const nl_double r2)
+	void set_mat(const nl_double a11, const nl_double a12, const nl_double rhs1,
+				 const nl_double a21, const nl_double a22, const nl_double rhs2)
 	{
 		/*      GO, GT, I                */
-		m_P.set(-a12, a11, r1);
-		m_N.set(-a21, a22, r2);
+		m_P.set_go_gt_I(a12, a11, rhs1);
+		m_N.set_go_gt_I(a21, a22, rhs2);
 	}
 
 private:
@@ -166,6 +166,7 @@ NETLIB_OBJECT(POT)
 	, m_R(*this, "R", 10000)
 	, m_Dial(*this, "DIAL", 0.5)
 	, m_DialIsLog(*this, "DIALLOG", false)
+	, m_Reverse(*this, "REVERSE", false)
 	{
 		register_subalias("1", m_R1.m_P);
 		register_subalias("2", m_R1.m_N);
@@ -186,6 +187,7 @@ private:
 	param_double_t m_R;
 	param_double_t m_Dial;
 	param_logic_t m_DialIsLog;
+	param_logic_t m_Reverse;
 };
 
 NETLIB_OBJECT(POT2)
@@ -420,7 +422,7 @@ public:
 	NETLIB_TIMESTEPI()
 	{
 		m_t += step;
-		this->set(1.0 / m_R(),
+		this->set_G_V_I(1.0 / m_R(),
 				m_compiled.evaluate(std::vector<double>({m_t})),
 				0.0);
 	}
@@ -431,7 +433,7 @@ protected:
 	NETLIB_RESETI()
 	{
 		NETLIB_NAME(twoterm)::reset();
-		this->set(1.0 / m_R(), m_V(), 0.0);
+		this->set_G_V_I(1.0 / m_R(), m_V(), 0.0);
 	}
 
 private:

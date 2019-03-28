@@ -82,15 +82,15 @@ public:
 		m_R_low = 1.0;
 		m_R_high = 130.0;
 	}
-	poolptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
-	poolptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
+	pool_owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
+	pool_owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
 };
 
-poolptr<devices::nld_base_d_to_a_proxy> logic_family_ttl_t::create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const
+pool_owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_ttl_t::create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const
 {
 	return pool().make_poolptr<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 }
-poolptr<devices::nld_base_a_to_d_proxy> logic_family_ttl_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
+pool_owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_ttl_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
 {
 	return pool().make_poolptr<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 }
@@ -109,16 +109,16 @@ public:
 		m_R_low = 10.0;
 		m_R_high = 10.0;
 	}
-	poolptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
-	poolptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
+	pool_owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
+	pool_owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
 };
 
-poolptr<devices::nld_base_d_to_a_proxy> logic_family_cd4xxx_t::create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const
+pool_owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_cd4xxx_t::create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const
 {
 	return pool().make_poolptr<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 }
 
-poolptr<devices::nld_base_a_to_d_proxy> logic_family_cd4xxx_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
+pool_owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_cd4xxx_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
 {
 	return pool().make_poolptr<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 }
@@ -185,7 +185,7 @@ void detail::queue_t::on_post_load(plib::state_manager_t &manager)
 // ----------------------------------------------------------------------------------------
 
 detail::netlist_ref::netlist_ref(netlist_state_t &nl)
-: m_netlist(nl.setup().exec()) { }
+: m_netlist(nl.exec()) { }
 
 // ----------------------------------------------------------------------------------------
 // object_t
@@ -237,9 +237,7 @@ detail::terminal_type detail::core_terminal_t::type() const
 // ----------------------------------------------------------------------------------------
 
 netlist_t::netlist_t(const pstring &aname, plib::unique_ptr<callbacks_t> callbacks)
-	: m_state(plib::make_unique<netlist_state_t>(aname,
-		std::move(callbacks),
-		plib::make_unique<setup_t>(*this))) // FIXME, ugly but needed to have netlist_state_t constructed first
+	: m_state(plib::make_unique<netlist_state_t>(aname, *this, std::move(callbacks)))
 	, m_solver(nullptr)
 	, m_time(netlist_time::zero())
 	, m_mainclock(nullptr)
@@ -256,13 +254,14 @@ netlist_t::netlist_t(const pstring &aname, plib::unique_ptr<callbacks_t> callbac
 // ----------------------------------------------------------------------------------------
 
 netlist_state_t::netlist_state_t(const pstring &aname,
-	plib::unique_ptr<callbacks_t> &&callbacks,
-	plib::unique_ptr<setup_t> &&setup)
+	netlist_t & anetlist,
+	plib::unique_ptr<callbacks_t> &&callbacks)
 : m_name(aname)
+, m_netlist(anetlist)
 , m_state()
 , m_callbacks(std::move(callbacks)) // Order is important here
 , m_log(*m_callbacks)
-, m_setup(std::move(setup))
+, m_setup(plib::make_unique<setup_t>(*this))
 {
 	pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
 	m_lib = plib::make_unique<plib::dynlib>(libpath);
@@ -578,7 +577,7 @@ core_device_t::core_device_t(core_device_t &owner, const pstring &name)
 	set_logic_family(owner.logic_family());
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
-	state().add_dev(this->name(), poolptr<core_device_t>(this, false));
+	state().add_dev(this->name(), pool_owned_ptr<core_device_t>(this, false));
 }
 
 void core_device_t::set_default_delegate(detail::core_terminal_t &term)
@@ -856,7 +855,7 @@ terminal_t::terminal_t(core_device_t &dev, const pstring &aname, terminal_t *oth
 , m_Idr1(nullptr)
 , m_go1(nullptr)
 , m_gt1(nullptr)
-, m_otherterm(otherterm)
+, m_connected_terminal(otherterm)
 {
 	state().setup().register_term(*this);
 }
@@ -894,7 +893,7 @@ logic_output_t::logic_output_t(core_device_t &dev, const pstring &aname)
 	, m_my_net(dev.state(), name() + ".net", this)
 {
 	this->set_net(&m_my_net);
-	state().register_net(poolptr<logic_net_t>(&m_my_net, false));
+	state().register_net(pool_owned_ptr<logic_net_t>(&m_my_net, false));
 	set_logic_family(dev.logic_family());
 	state().setup().register_term(*this);
 }
@@ -923,7 +922,7 @@ analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
 	: analog_t(dev, aname, STATE_OUT)
 	, m_my_net(dev.state(), name() + ".net", this)
 {
-	state().register_net(poolptr<analog_net_t>(&m_my_net, false));
+	state().register_net(pool_owned_ptr<analog_net_t>(&m_my_net, false));
 	this->set_net(&m_my_net);
 
 	//net().m_cur_Analog = NL_FCONST(0.0);
@@ -989,12 +988,9 @@ pstring param_t::get_initial(const device_t &dev, bool *found)
 	return res;
 }
 
-
 const pstring param_model_t::model_type()
 {
-	if (m_map.size() == 0)
-		state().setup().model_parse(this->Value(), m_map);
-	return m_map["COREMODEL"];
+	return state().setup().models().model_type(value());
 }
 
 param_str_t::param_str_t(device_t &device, const pstring &name, const pstring &val)
@@ -1017,27 +1013,22 @@ param_ptr_t::param_ptr_t(device_t &device, const pstring &name, uint8_t * val)
 void param_model_t::changed()
 {
 	state().log().fatal(MF_1_MODEL_1_CAN_NOT_BE_CHANGED_AT_RUNTIME, name());
-	m_map.clear();
 }
 
 const pstring param_model_t::model_value_str(const pstring &entity)
 {
-	if (m_map.size() == 0)
-		state().setup().model_parse(this->Value(), m_map);
-	return state().setup().model_value_str(m_map, entity);
+	return state().setup().models().model_value_str(value(), entity);
 }
 
 nl_double param_model_t::model_value(const pstring &entity)
 {
-	if (m_map.size() == 0)
-		state().setup().model_parse(this->Value(), m_map);
-	return state().setup().model_value(m_map, entity);
+	return state().setup().models().model_value(value(), entity);
 }
 
 
 plib::unique_ptr<plib::pistream> param_data_t::stream()
 {
-	return device().setup().get_data_stream(Value());
+	return device().setup().get_data_stream(value());
 }
 
 	bool detail::core_terminal_t::is_logic() const NL_NOEXCEPT

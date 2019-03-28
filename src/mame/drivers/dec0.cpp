@@ -340,6 +340,7 @@ Notes:
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m68705.h"
+#include "machine/upd4701.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
@@ -389,17 +390,6 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",m_maincpu->pc(),data,0x30c010+(offset<<1));
 			break;
 	}
-}
-
-// Bandit tests P1 Y axis only
-// Hookup comes from Birdie Try service mode
-READ8_MEMBER(dec0_state::trackball_r)
-{
-	uint8_t port_num = offset >> 1;
-	if (offset & 1)
-		return m_in_trackball[port_num]->read() >> 8;
-
-	return m_in_trackball[port_num]->read() & 0xff;
 }
 
 WRITE16_MEMBER(dec0_automat_state::automat_control_w)
@@ -464,7 +454,6 @@ void dec0_state::dec0_map(address_map &map)
 
 	map(0x300000, 0x300001).portr("AN0");
 	map(0x300008, 0x300009).portr("AN1");
-	map(0x300010, 0x30001f).r(FUNC(dec0_state::trackball_r)).umask16(0x00ff);
 	map(0x30c000, 0x30c00b).r(FUNC(dec0_state::dec0_controls_r));
 	map(0x30c010, 0x30c01f).w(FUNC(dec0_state::dec0_control_w));                                   /* Priority, sound, etc. */
 	map(0x30c012, 0x30c013).nopr(); // clr.w for sprite DMA
@@ -477,6 +466,17 @@ void dec0_state::dec0_map(address_map &map)
 
 	map(0xff8000, 0xffbfff).ram().share("ram");                                 /* Main ram */
 	map(0xffc000, 0xffc7ff).ram().share("spriteram");
+}
+
+void dec0_state::dec0_tb_map(address_map &map)
+{
+	dec0_map(map);
+	map(0x300010, 0x300017).r("tb0", FUNC(upd4701_device::read_xy)).umask16(0x00ff);
+	map(0x300018, 0x30001f).r("tb1", FUNC(upd4701_device::read_xy)).umask16(0x00ff);
+	map(0x300001, 0x300001).w("tb0", FUNC(upd4701_device::reset_x_w));
+	map(0x300009, 0x300009).w("tb0", FUNC(upd4701_device::reset_y_w));
+	map(0x300011, 0x300011).w("tb1", FUNC(upd4701_device::reset_x_w));
+	map(0x300019, 0x300019).w("tb1", FUNC(upd4701_device::reset_y_w));
 }
 
 void dec0_state::robocop_map(address_map &map)
@@ -986,16 +986,16 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( trackball_ports )
 	PORT_START("track_0")
-	PORT_BIT( 0x0fff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(24) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(24) PORT_RESET PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_START("track_1")
-	PORT_BIT( 0x0fff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(24) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(24) PORT_RESET PORT_PLAYER(1)
 
 	PORT_START("track_2")
-	PORT_BIT( 0x0fff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(24) PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0x0fff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(24) PORT_RESET PORT_REVERSE PORT_PLAYER(2)
 
 	PORT_START("track_3")
-	PORT_BIT( 0x0fff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(24) PORT_PLAYER(2)
+	PORT_BIT( 0x0fff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(24) PORT_RESET PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rotary_null )
@@ -1006,20 +1006,6 @@ static INPUT_PORTS_START( rotary_null )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-
-static INPUT_PORTS_START( trackball_null )
-	PORT_START("P1_TRACKX")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P1_TRACKY")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P2_TRACKX")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P2_TRACKY")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( hbarrel )
 	PORT_INCLUDE( dec0 )
@@ -1076,7 +1062,6 @@ static INPUT_PORTS_START( hbarrel )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW1:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_ports )
-	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bandit )
@@ -1287,7 +1272,6 @@ static INPUT_PORTS_START( baddudes )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_null )
-	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( drgninja )
@@ -1355,7 +1339,6 @@ static INPUT_PORTS_START( robocop )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_null )
-	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hippodrm )
@@ -1404,7 +1387,6 @@ static INPUT_PORTS_START( hippodrm )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_null )
-	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ffantasy )
@@ -1474,7 +1456,6 @@ static INPUT_PORTS_START( slyspy )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_null )
-	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( midres )
@@ -1521,7 +1502,6 @@ static INPUT_PORTS_START( midres )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_ports )
-	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( midresu )
@@ -1578,7 +1558,6 @@ static INPUT_PORTS_START( midresb )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_ports )
-	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bouldash )
@@ -1655,7 +1634,6 @@ static INPUT_PORTS_START( bouldash )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_INCLUDE( rotary_null )
-	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 /******************************************************************************/
@@ -2055,6 +2033,16 @@ void dec0_state::bandit(machine_config &config)
 {
 	dec0(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &dec0_state::dec0_tb_map);
+
+	upd4701_device &tb0(UPD4701A(config, "tb0"));
+	tb0.set_portx_tag("track_0");
+	tb0.set_porty_tag("track_1");
+
+	upd4701_device &tb1(UPD4701A(config, "tb1"));
+	tb1.set_portx_tag("track_2");
+	tb1.set_porty_tag("track_3");
+
 	i8751_device &mcu(I8751(config, m_mcu, XTAL(8'000'000)));
 	mcu.port_in_cb<0>().set(FUNC(dec0_state::dec0_mcu_port0_r));
 	mcu.port_out_cb<0>().set(FUNC(dec0_state::dec0_mcu_port0_w));
@@ -2092,6 +2080,16 @@ void dec0_state::drgninjab(machine_config &config)
 void dec0_state::birdtry(machine_config &config)
 {
 	dec0(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &dec0_state::dec0_tb_map);
+
+	upd4701_device &tb0(UPD4701A(config, "tb0"));
+	tb0.set_portx_tag("track_0");
+	tb0.set_porty_tag("track_1");
+
+	upd4701_device &tb1(UPD4701A(config, "tb1"));
+	tb1.set_portx_tag("track_2");
+	tb1.set_porty_tag("track_3");
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_birdtry));

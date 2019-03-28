@@ -98,7 +98,7 @@ namespace netlist
 
 	NETLIB_FUNC_VOID(CD4020_sub, update_outputs, (const unsigned cnt))
 	{
-		static const std::array<netlist_time, 14> out_delayQn = {
+		static constexpr const std::array<netlist_time, 14> out_delayQn = {
 				NLTIME_FROM_NS(180), NLTIME_FROM_NS(280),
 				NLTIME_FROM_NS(380), NLTIME_FROM_NS(480),
 				NLTIME_FROM_NS(580), NLTIME_FROM_NS(680),

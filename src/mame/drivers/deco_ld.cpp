@@ -465,20 +465,22 @@ void deco_ld_state::machine_start()
 MACHINE_CONFIG_START(deco_ld_state::rblaster)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M6502,8000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(rblaster_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco_ld_state, irq0_line_hold)
+	M6502(config, m_maincpu, 8000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &deco_ld_state::rblaster_map);
+	m_maincpu->set_vblank_int("screen", FUNC(deco_ld_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu",M6502,8000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(rblaster_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(deco_ld_state, sound_interrupt,  640)
+	M6502(config, m_audiocpu, 8000000/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &deco_ld_state::rblaster_sound_map);
+	m_audiocpu->set_periodic_int(FUNC(deco_ld_state::sound_interrupt), attotime::from_hz(640));
 
 //  config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_LASERDISC_LDP1000_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, deco_ld_state, screen_update_rblaster)
-	//MCFG_LASERDISC_OVERLAY_CLIP(0, 256-1, 8, 240-1)
-	MCFG_LASERDISC_OVERLAY_PALETTE(m_palette)
+	SONY_LDP1000(config, m_laserdisc, 0);
+	m_laserdisc->set_overlay(256, 256, FUNC(deco_ld_state::screen_update_rblaster));
+	//m_laserdisc->set_overlay_clip(0, 256-1, 8, 240-1);
+	m_laserdisc->set_overlay_palette(m_palette);
+	m_laserdisc->add_route(0, "lspeaker", 1.0);
+	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
@@ -500,10 +502,6 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
 	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25);
-
-	MCFG_DEVICE_MODIFY("laserdisc")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************

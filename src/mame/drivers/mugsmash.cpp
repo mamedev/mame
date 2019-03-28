@@ -398,23 +398,23 @@ void mugsmash_state::machine_start()
 {
 }
 
-MACHINE_CONFIG_START(mugsmash_state::mugsmash)
+void mugsmash_state::mugsmash(machine_config &config)
+{
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mugsmash_state::mugsmash_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mugsmash_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(mugsmash_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mugsmash_state,  irq6_line_hold)
-
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* Guess */
-	MCFG_DEVICE_PROGRAM_MAP(mugsmash_sound_map)
+	Z80(config, m_audiocpu, 4000000);  /* Guess */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &mugsmash_state::mugsmash_sound_map);
 
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mugsmash_state, screen_update_mugsmash)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(mugsmash_state::screen_update_mugsmash));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mugsmash);
 
@@ -431,10 +431,10 @@ MACHINE_CONFIG_START(mugsmash_state::mugsmash)
 	ymsnd.add_route(0, "lspeaker", 1.00);   /* music */
 	ymsnd.add_route(1, "rspeaker", 1.00);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1122000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50) /* sound fx */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1122000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50); /* sound fx */
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+}
 
 ROM_START( mugsmash )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */

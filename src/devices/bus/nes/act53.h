@@ -14,8 +14,8 @@ public:
 	// construction/destruction
 	nes_action53_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_l) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_l(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
