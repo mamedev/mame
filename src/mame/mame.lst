@@ -2723,6 +2723,7 @@ catchp                          // 008837 prototype 1977/?? [6502]
 
 @source:ave_arb.cpp
 arb                             //
+arbv2                           //
 
 @source:avigo.cpp
 avigo                           // 1997 Avigo
@@ -12910,7 +12911,7 @@ fdes2325                        //
 feagv10                         //
 feagv11                         //
 feagv2                          //
-feagv3                         //
+feagv3                          //
 feagv5                          //
 feagv7                          //
 feagv7a                         //
