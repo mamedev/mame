@@ -55,13 +55,17 @@ void fidelbase_state::machine_start()
 	save_item(NAME(m_speech_data));
 	save_item(NAME(m_speech_bank));
 	save_item(NAME(m_div_status));
+	save_item(NAME(m_div_config));
 }
 
 void fidelbase_state::machine_reset()
 {
 	chessbase_state::machine_reset();
 
-	m_div_status = ~0;
+	// init cpu divider (optional)
+	ioport_port *inp = ioport("div_config");
+	if (inp != nullptr)
+		div_changed(*inp->field(0x03), nullptr, 0, inp->read());
 }
 
 
@@ -101,30 +105,28 @@ READ8_MEMBER(fidelbase_state::cartridge_r)
 
 void fidelbase_state::div_set_cpu_freq(offs_t offset)
 {
-	static const u16 mask = 0x6000;
-	u16 status = (offset & mask) | m_div_config->read();
-
-	if (status != m_div_status && status & 2)
+	if (offset != m_div_status)
 	{
 		// when a13/a14 is high, XTAL goes through divider(s)
 		// (depending on factory-set jumper, either one or two 7474)
-		float div = (status & 1) ? 0.25 : 0.5;
-		m_maincpu->set_clock_scale((offset & mask) ? div : 1.0);
-	}
+		m_maincpu->set_clock_scale(offset ? ((m_div_config & 1) ? 0.25 : 0.5) : 1.0);
 
-	m_div_status = status;
+		m_div_status = offset;
+	}
 }
 
 void fidelbase_state::div_trampoline_w(offs_t offset, u8 data)
 {
-	div_set_cpu_freq(offset);
+	if (m_div_config)
+		div_set_cpu_freq(offset & 0x6000);
+
 	m_mainmap->write8(offset, data);
 }
 
 u8 fidelbase_state::div_trampoline_r(offs_t offset)
 {
-	if (!machine().side_effects_disabled())
-		div_set_cpu_freq(offset);
+	if (m_div_config && !machine().side_effects_disabled())
+		div_set_cpu_freq(offset & 0x6000);
 
 	return m_mainmap->read8(offset);
 }
@@ -134,9 +136,19 @@ void fidelbase_state::div_trampoline(address_map &map)
 	map(0x0000, 0xffff).rw(FUNC(fidelbase_state::div_trampoline_r), FUNC(fidelbase_state::div_trampoline_w));
 }
 
+INPUT_CHANGED_MEMBER(fidelbase_state::div_changed)
+{
+	// stop high frequency background timer if cpu divider is disabled
+	subdevice<timer_device>("dummy_timer")->enable(bool(newval));
+
+	m_maincpu->set_clock_scale(1.0);
+	m_div_status = ~0;
+	m_div_config = newval;
+}
+
 INPUT_PORTS_START( fidel_cpu_div_2 )
 	PORT_START("div_config") // hardwired, default to /2
-	PORT_CONFNAME( 0x03, 0x02, "CPU Divider" )
+	PORT_CONFNAME( 0x03, 0x02, "CPU Divider" ) PORT_CHANGED_MEMBER(DEVICE_SELF, fidelbase_state, div_changed, nullptr)
 	PORT_CONFSETTING(    0x00, "Disabled" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_CONFSETTING(    0x03, "4" )
@@ -144,7 +156,7 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( fidel_cpu_div_4 )
 	PORT_START("div_config") // hardwired, default to /4
-	PORT_CONFNAME( 0x03, 0x03, "CPU Divider" )
+	PORT_CONFNAME( 0x03, 0x03, "CPU Divider" ) PORT_CHANGED_MEMBER(DEVICE_SELF, fidelbase_state, div_changed, nullptr)
 	PORT_CONFSETTING(    0x00, "Disabled" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_CONFSETTING(    0x03, "4" )
