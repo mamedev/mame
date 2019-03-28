@@ -74,8 +74,9 @@ int renderer_retro::draw(const int update)
 	// compute width/height/pitch of target
 	int width = nd.width();
 	int height = nd.height();
-	int pitch = (width + 3) & ~3;
 /*
+	int pitch = (width + 3) & ~3;
+
 	// make sure our temporary bitmap is big enough
 	if (pitch * height * 4 > m_bmsize)
 	{
