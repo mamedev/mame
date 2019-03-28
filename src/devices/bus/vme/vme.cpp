@@ -359,6 +359,36 @@ void vme_device::install_device(vme_amod_t amod, offs_t start, offs_t end, read8
 	}
 }
 
+void vme_device::install_device(vme_amod_t amod, offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler, uint32_t mask)
+{
+	LOG("%s %s AM%d D%02x\n", tag(), FUNCNAME, amod, m_prgwidth);
+
+	LOG(" - width:%d\n", m_prgwidth);
+
+	// TODO: support address modifiers and buscycles other than single access cycles
+	switch(amod)
+	{
+	case A16_SC: break;
+	case A24_SC: break;
+	case A32_SC: break;
+	default: fatalerror("VME D8: Non supported Address modifier: AM%02x\n", amod);
+	}
+
+	switch(m_prgwidth)
+	{
+	case 16:
+		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, (uint16_t)(mask & 0x0000ffff));
+		break;
+	case 24:
+		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, (uint32_t)(mask & 0x00ffffff));
+		break;
+	case 32:
+		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, mask);
+		break;
+	default: fatalerror("VME D8: Bus width %d not supported\n", m_prgwidth);
+	}
+}
+
 // D16 bit devices in A16, A24 and A32
 void vme_device::install_device(vme_amod_t amod, offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask)
 {

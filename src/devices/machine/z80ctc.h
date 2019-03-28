@@ -88,8 +88,8 @@ public:
 	template <int Channel> void set_clk(const XTAL &xtal) { channel_config(Channel).set_clock(xtal); }
 
 	// read/write handlers
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( trg0 );
 	DECLARE_WRITE_LINE_MEMBER( trg1 );
 	DECLARE_WRITE_LINE_MEMBER( trg2 );
