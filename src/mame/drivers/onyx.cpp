@@ -103,7 +103,7 @@ void onyx_state::c8002_io(address_map &map)
 	map(0xff10, 0xff17).lrw8("sio3_rw", [this](offs_t offset) { return m_sio[2]->cd_ba_r(offset >> 1); }, [this](offs_t offset, u8 data) { m_sio[2]->cd_ba_w(offset >> 1, data); });
 	map(0xff18, 0xff1f).lrw8("sio4_rw", [this](offs_t offset) { return m_sio[3]->cd_ba_r(offset >> 1); }, [this](offs_t offset, u8 data) { m_sio[3]->cd_ba_w(offset >> 1, data); });
 	map(0xff20, 0xff27).lrw8("sio5_rw", [this](offs_t offset) { return m_sio[4]->cd_ba_r(offset >> 1); }, [this](offs_t offset, u8 data) { m_sio[4]->cd_ba_w(offset >> 1, data); });
-	map(0xff30, 0xff37).lrw8("ctc1_rw", [this](offs_t offset, u8 mem_mask) { return m_ctc[0]->read(offset >> 1); }, [this](offs_t offset, u8 data) { m_ctc[0]->write(offset >> 1, data); });
+	map(0xff30, 0xff37).lrw8("ctc1_rw", [this](offs_t offset) { return m_ctc[0]->read(offset >> 1); }, [this](offs_t offset, u8 data) { m_ctc[0]->write(offset >> 1, data); });
 	map(0xff38, 0xff3f).lrw8("ctc2_rw", [this](offs_t offset) { return m_ctc[1]->read(offset >> 1); }, [this](offs_t offset, u8 data) { m_ctc[1]->write(offset >> 1, data); });
 	map(0xff40, 0xff47).lrw8("ctc3_rw", [this](offs_t offset) { return m_ctc[2]->read(offset >> 1); }, [this](offs_t offset, u8 data) { m_ctc[2]->write(offset >> 1, data); });
 	map(0xff50, 0xff57).lrw8("pio1_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_pio[0]->read(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_pio[0]->write(space, offset >> 1, data, mem_mask); });
