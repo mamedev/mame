@@ -166,17 +166,17 @@ void spg110_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr)
 {
 	uint32_t bitmap_addr = 0;//0x40 * m_video_regs[0x22];
-	uint16_t tile = m_sprtileno[base_addr + 0];
-	uint16_t attr1 = m_sprattr1[base_addr + 0];
-	uint16_t attr2 = m_sprattr2[base_addr + 0];
-	//uint16_t attr = m_spriteram[base_addr + 3];
+	uint16_t tile = m_sprtileno[base_addr];
+	uint16_t attr1 = m_sprattr1[base_addr];
+	uint16_t attr2 = m_sprattr2[base_addr];
 
 	int x = (attr1 >> 8) & 0xff;
 	int y = (attr1) & 0xff;
+	uint8_t pri = (attr2 & 0x3000)>>12;
 
 	// m_sprtileno  tttt tttt tttt tttt    t =  tile number (all bits?)
 	// m_sprattr1   xxxx xxxx yyyy yyyy    x = low x bits, y = low y bits
-	// m_sprattr2   -X-- ---- ---- ----    X = high x bit
+	// m_sprattr2   -Xzz pppp hhww --bb    X = high x bit z = priority, p = palette h = height w = width b = bpp
 
 
 	if (!(attr2 & 0x4000))
@@ -194,8 +194,8 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 	//		return;
 	//	}
 
-	const uint32_t h = 8;// << 2;//((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	const uint32_t w = 8;// << 2;//((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+	const uint32_t h = 8 << ((attr2 & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+	const uint32_t w = 8 << ((attr2 & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
 //	if (!(m_video_regs[0x42] & SPRITE_COORD_TL_MASK))
 //	{
@@ -221,14 +221,17 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 
 	//bool blend = (attr & 0x4000);
 	bool flip_x = 0;//(attr & TILE_X_FLIP);
-	const uint8_t bpp = 1;//attr & 0x0003;
+	const uint8_t bpp = attr2 & 0x0003;
 	//const uint32_t yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
-	const uint32_t palette_offset = 0;//(attr & 0x0f00) >> 4;
+	const uint32_t palette_offset = (attr2 & 0x0f00) >> 8;
 
-	if (flip_x)
-		draw<FlipXOn>(cliprect, tile_line, x, y, 0, bitmap_addr, tile, palette_offset, h, w, bpp);
-	else
-		draw<FlipXOff>(cliprect, tile_line, x, y, 0, bitmap_addr, tile, palette_offset, h, w, bpp);
+	if (pri == priority)
+	{
+		if (flip_x)
+			draw<FlipXOn>(cliprect, tile_line, x, y, 0, bitmap_addr, tile, palette_offset, h, w, bpp);
+		else
+			draw<FlipXOff>(cliprect, tile_line, x, y, 0, bitmap_addr, tile, palette_offset, h, w, bpp);
+	}
 }
 
 
