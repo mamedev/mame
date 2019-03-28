@@ -1214,20 +1214,23 @@ void funworld_state::saloon_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x0800, 0x0800).portr("IN0");
+	map(0x0801, 0x0801).portr("IN1");
+	map(0x0802, 0x0802).portr("IN2"); // maybe
 	map(0x0808, 0x0808).portr("IN3"); // maybe
-	map(0x0802, 0x0802).portr("IN4"); // maybe
-	map(0x0a01, 0x0a01).portr("IN1");
+	map(0x0810, 0x0810).nopw();
+	map(0x0a00, 0x0a00).portr("IN4");
+	map(0x0a01, 0x0a01).portr("IN5");
+	map(0x081b, 0x081b).portw("I2C_CK");
 	map(0x081c, 0x081c).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x081d, 0x081d).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x1000, 0x1000).portr("IN2");
+	map(0x1000, 0x1000).portr("I2C_DI").portw("I2C_DO");
 	map(0x1800, 0x1800).r("ay8910", FUNC(ay8910_device::data_r));
 	map(0x1800, 0x1801).w("ay8910", FUNC(ay8910_device::address_data_w));
-//  AM_RANGE(0x2000, 0x2000) AM_READNOP /* some unknown reads... maybe a DSW */
+	map(0x2000, 0x2003).nopr();  // check for extra ROM in $2000. if exist just jump to $2100
 	map(0x6000, 0x6fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram");
 	map(0x7000, 0x7fff).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram");
 	map(0x8000, 0xffff).rom();
 }
-
 /*
     Unknown R/W
     -----------
@@ -2479,91 +2482,95 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( saloon )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-1") PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-2") PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-3") PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-4") PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-5") PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-6") PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-7") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-8") PORT_CODE(KEYCODE_8)
+	PORT_START("IN0")  // 0800h
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )       PORT_NAME("Play / Start / Enter")        // ok
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("0-2")        PORT_CODE(KEYCODE_2) // funcion aun no detectada 
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Stop 4 / High / Menu Dwn")    // ok
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel / Take / Autohold / Exit")        // ok
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )     PORT_NAME("Menu")                // ok
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Menu-Up")    PORT_CODE(KEYCODE_6) // ok  -> revisar otra funcionalidad
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Stop 1")               // ok
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Stop 5 / Bet")         // ok
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-1") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-2") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-3") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-4") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-5") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-6") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-7") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-8") PORT_CODE(KEYCODE_I)
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-1") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-2") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-3") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-4") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-5") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-6") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-7") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-8") PORT_CODE(KEYCODE_K)
-
-	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN4")
+	PORT_START("IN1")  // 0801h
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("1-1") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("1-2") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("1-3") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("1-4") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("1-5") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("1-6") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("1-7") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("1-8") PORT_CODE(KEYCODE_K)
+	
+	PORT_START("IN2")  // 0802h
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_POKER_HOLD2 ) PORT_NAME("Stop 2 / Low") // ok
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_POKER_HOLD3 )  // ok
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	
+	PORT_START("IN3")  // 0808h
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )             // ok
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )           // PROBADO: NO HACE NADA
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )           // PROBADO: NO HACE NADA
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )      PORT_NAME("Credits IN/OUT")  // ok
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )           // PROBADO: NO HACE NADA
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Keyout (Scarico Coin)")  // ok
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )           // PROBADO: NO HACE NADA 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Warm Reset") PORT_CODE(KEYCODE_R)// OK
 
-	PORT_START("DSW")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-1") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-2") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-4") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-5") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-6") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-7") PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-8") PORT_CODE(KEYCODE_L)
+	PORT_START("IN4")  // 0A00h
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4-1") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4-2") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4-3") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4-4") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4-5") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4-6") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4-7") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4-8") PORT_CODE(KEYCODE_8_PAD)
 
-	PORT_START("SW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("IN5")  // 0A01h
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5-1") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5-2") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5-3") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5-4") PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5-5") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5-6") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5-7") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5-8") PORT_CODE(KEYCODE_I)
+
+	PORT_START("I2C_CK")  // 081Bh
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("i2cmem" , i2cmem_device, write_scl)    // Serial Clock
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("I2C_DI")  // 1000h Input
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)      // Serial Data In
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("I2C_DO")  // 1000h Output
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, write_sda)   // Serial Data Out
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( funquiz )
@@ -3127,6 +3134,11 @@ void funworld_state::fw1stpal(machine_config &config)
 	ay8910.port_a_write_callback().set(FUNC(funworld_state::funworld_lamp_a_w));
 	ay8910.port_b_write_callback().set(FUNC(funworld_state::funworld_lamp_b_w));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 2.5);  /* analyzed to avoid clips */
+	
+	/* Serial Memory */
+	i2cmem_device &m_i2cmem(I2CMEM(config, "i2cmem", 0));
+	m_i2cmem.set_data_size(256);
+	m_i2cmem.set_e0(1);
 }
 
 
@@ -3198,6 +3210,8 @@ void funworld_state::saloon(machine_config &config)
 	fw1stpal(config);
 	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::saloon_map);
+	config.device_remove("pia0");
+	config.device_remove("pia1");
 }
 
 
@@ -6627,14 +6641,32 @@ ROM_START( saloon )
 	ROM_LOAD( "1s.bin", 0x8000, 0x8000, CRC(66938330) SHA1(09118d607eff7121472db7d2cc24079e063dc7cf) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "2s.bin", 0x0000, 0x8000, CRC(39a792d5) SHA1(45c956a4a33587238a24eed602039115db1bb4b6) )
-	ROM_LOAD( "3s.bin", 0x8000, 0x8000, CRC(babc0964) SHA1(f084465cc34ea7ac19091d3e75ef7d55c48273ae) )
+	ROM_LOAD( "3s.bin", 0x0000, 0x8000, CRC(babc0964) SHA1(f084465cc34ea7ac19091d3e75ef7d55c48273ae) )
+	ROM_LOAD( "2s.bin", 0x8000, 0x8000, CRC(39a792d5) SHA1(45c956a4a33587238a24eed602039115db1bb4b6) )
 
 	/* looks strange */
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147_saloon.bin", 0x0000, 0x0200, CRC(f424ccc1) SHA1(6df1215f58cca786e9f0ea4bf35407cf7fe21d83) )
+	
+	ROM_REGION( 0x0100, "i2cmem", 0 )
+	ROM_LOAD( "saloon_i2c.bin", 0x0000, 0x0100, CRC(57e9ce5a) SHA1(3a8420a8ed50faf31a30c01f9438f1df95e5789a) )
 ROM_END
 
+ROM_START( nevadafw )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1s.bin", 0x8000, 0x8000, CRC(66938330) SHA1(09118d607eff7121472db7d2cc24079e063dc7cf) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "3s.bin", 0x0000, 0x8000, CRC(babc0964) SHA1(f084465cc34ea7ac19091d3e75ef7d55c48273ae) )
+	ROM_LOAD( "2s.bin", 0x8000, 0x8000, CRC(39a792d5) SHA1(45c956a4a33587238a24eed602039115db1bb4b6) )
+
+	/* looks strange */
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147_saloon.bin", 0x0000, 0x0200, CRC(f424ccc1) SHA1(6df1215f58cca786e9f0ea4bf35407cf7fe21d83) )
+
+	ROM_REGION( 0x0100, "i2cmem", 0 )
+	ROM_LOAD( "nevada_i2c.bin", 0x0000, 0x0100, CRC(cdb519db) SHA1(b7781cebee3c8f788a78f8fec9314ae5af513514) )
+ROM_END
 
 /**** Fun World Quiz ****
 
@@ -7230,8 +7262,8 @@ void funworld_state::init_saloon()
     Low 11 bits of address are scrambled.
 
     Color:
-    Still trying....
-
+	Data has bits 2-3-5-6-7 scrambled.
+	Address has the 8 lower bits scrambled.
 
 *************************************************/
 {
@@ -7244,6 +7276,9 @@ void funworld_state::init_saloon()
 
 	uint8_t *prom = memregion("proms")->base();
 	int sizep = memregion("proms")->bytes();
+
+	popmessage(" Please: Start with <2> and <Z> buttons pressed to run system properly");
+
 
 	/*****************************
 	*   Program ROM decryption   *
@@ -7267,6 +7302,7 @@ void funworld_state::init_saloon()
 			int a = ((i & 0xff00) | bitswap<8>(i & 0xff, 2, 0, 1, 3, 4, 5, 6, 7));
 			rom[a] = buffer[i];
 		}
+
 	}
 
 
@@ -7310,7 +7346,14 @@ void funworld_state::init_saloon()
 	}
 
 	m_palette->update();
+
+
+	// inversion for i2c clock generation in i2c_rx routine
+	rom[0xbf23] = 0x60; // ex 70h
+	rom[0xbf2a] = 0x70; // ex 60h
+
 }
+
 
 void funworld_state::init_dino4()
 /*****************************************************
@@ -7798,7 +7841,8 @@ GAME(  1992, multiwin,  0,        multiwin, funworld,  multiwin_state, driver_in
 GAME(  1993, powercrd,  0,        powercrd, funworld,  powercrd_state, empty_init,    ROT0, "Fun World",       "Power Card (Ver 0263, encrypted)",                MACHINE_NOT_WORKING )                      // clone of Bonus Card.
 GAME(  1993, megacard,  0,        megacard, funworld,  megacard_state, empty_init,    ROT0, "Fun World",       "Mega Card (Ver.0210, encrypted)",                 MACHINE_NOT_WORKING )
 GAME(  1993, jokercrd,  0,        jokercrd, funworld,  jokercrd_state, empty_init,    ROT0, "Vesely Svet",     "Joker Card (Ver.A267BC, encrypted)",              MACHINE_NOT_WORKING )
-GAME(  198?, saloon,    0,        saloon,   saloon,    funworld_state, init_saloon,   ROT0, "<unknown>",       "Saloon (French, encrypted)",                      MACHINE_NOT_WORKING )
+GAME(  198?, saloon,    0,        saloon,   saloon,    funworld_state, init_saloon,   ROT0, "<unknown>",       "Saloon (French, encrypted)",                      0)
+GAME(  198?, nevadafw,  0,        saloon,   saloon,    funworld_state, init_saloon,   ROT0, "<unknown>",       "Nevada (French, encrypted)",                      0)
 
 // Encrypted TAB blue PCB...
 GAMEL( 199?, jolycdit,  jollycrd, cuoreuno, jolycdit,  funworld_state, init_tabblue,  ROT0, "bootleg",         "Jolly Card (Italian, blue TAB board, encrypted)", 0,                       layout_royalcrd )
@@ -7826,4 +7870,3 @@ GAMEL( 1991, jokcrdep,  0,        fw_brick_2, fw_brick1, funworld_state, empty_i
 // These are 2-in-1 stealth boards, they can run the Poker game, or, using completely separate hardware on the same PCB, a NES / MSX Multigames!
 GAMEL( 1991, royalcrd_nes,  royalcrd, royalcd2, royalcrd, funworld_state, empty_init, ROT0, "bootleg",         "Royal Card (stealth with NES multigame)",         MACHINE_NOT_WORKING,     layout_jollycrd )
 GAMEL( 1991, royalcrd_msx,  royalcrd, royalcd2, royalcrd, funworld_state, empty_init, ROT0, "bootleg",         "Royal Card (stealth with MSX multigame)",         MACHINE_NOT_WORKING,     layout_jollycrd )
-
