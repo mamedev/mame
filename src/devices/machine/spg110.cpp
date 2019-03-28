@@ -39,7 +39,10 @@ spg110_device::spg110_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-
+WRITE_LINE_MEMBER(spg110_device::videoirq_w)
+{
+	m_cpu->set_state_unsynced(UNSP_IRQ0_LINE, state);
+}
 
 void spg110_device::configure_spg_io(spg2xx_io_device* io)
 {
@@ -66,6 +69,7 @@ void spg110_device::device_add_mconfig(machine_config &config)
 	configure_spg_io(m_spg_io);
 
 	SPG110_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
+	m_spg_video->write_video_irq_callback().set(FUNC(spg110_device::videoirq_w));
 }
 
 WRITE16_MEMBER(spg110_device::spg110_3100_w) { }

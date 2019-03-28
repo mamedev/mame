@@ -80,6 +80,8 @@ public:
 	DECLARE_WRITE16_MEMBER(tmap0_regs_w);
 	DECLARE_WRITE16_MEMBER(tmap1_regs_w);
 
+	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -152,6 +154,8 @@ private:
 	void draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority);
 
 	uint32_t m_screenbuf[320 * 240];
+
+	devcb_write_line m_video_irq_cb;
 };
 
 DECLARE_DEVICE_TYPE(SPG110_VIDEO, spg110_video_device)

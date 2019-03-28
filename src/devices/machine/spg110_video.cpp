@@ -19,6 +19,7 @@ spg110_video_device::spg110_video_device(const machine_config &mconfig, device_t
 	, m_sprtileno(*this, "sprtileno")
 	, m_sprattr1(*this, "sprattr1")
 	, m_sprattr2(*this, "sprattr2")
+	, m_video_irq_cb(*this)
 {
 }
 
@@ -331,7 +332,7 @@ READ16_MEMBER(spg110_video_device::spg110_2063_r)
 WRITE16_MEMBER(spg110_video_device::spg110_2063_w)
 {
 	// writes 0x28, probably clears the IRQ / IRQ sources? 0x63 is the same offset for this in spg2xx but bits used seem to be different
-	m_cpu->set_state_unsynced(UNSP_IRQ0_LINE, CLEAR_LINE);
+	m_video_irq_cb(CLEAR_LINE);
 }
 
 
@@ -489,6 +490,8 @@ void spg110_video_device::device_start()
 	save_item(NAME(m_bg_scrollx));
 	save_item(NAME(m_bg_scrolly));
 	save_item(NAME(m_2036_scroll));
+
+	m_video_irq_cb.resolve();
 }
 
 void spg110_video_device::device_reset()
@@ -581,7 +584,7 @@ WRITE_LINE_MEMBER(spg110_video_device::vblank)
 {
 	if (!state)
 	{
-		m_cpu->set_state_unsynced(UNSP_IRQ0_LINE, ASSERT_LINE);
+		m_video_irq_cb(ASSERT_LINE);
 	}
 	return;
 }
