@@ -73,6 +73,7 @@ void np600a3_device::device_add_mconfig(machine_config &config)
 
 	I82586(config, m_lcc, 20_MHz_XTAL);
 	m_lcc->set_addrmap(0, &np600a3_device::lcc_map);
+	m_lcc->out_irq_cb().set(m_npcpu, FUNC(i80186_cpu_device::tmrin1_w));
 }
 
 ROM_START(np600a3)
