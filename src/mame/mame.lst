@@ -12885,6 +12885,7 @@ checkc4                         //
 @source:fidel_cc7.cpp
 backgamc                        //
 cc7                             //
+cc7o                            //
 
 @source:fidel_chesster.cpp
 chesster                        //
