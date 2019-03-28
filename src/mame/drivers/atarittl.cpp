@@ -52,7 +52,7 @@
  TM-018                   Dodgeball/Dodgem (Not Produced/Released) (1975)
  TM-024                   Qwakers (Not Produced/Released) (1974?) (Kee Games clone of Qwak!?)
 
- - Information (current as of 21 Dec. 2016) on what logic chips (and some analog parts) are still needed to be emulated in the
+ - Information (current as of 27 Mar. 2019) on what logic chips (and some analog parts) are still needed to be emulated in the
    netlist system per-game:
 
  TM-057 (Stunt Cycle)
