@@ -101,7 +101,7 @@
   * Unknown Fun World A7-11 game 1,                             Fun World,          1985.
   * Unknown Fun World A7-11 game 2,                             Fun World,          1985.
   * Unknown Fun World A0-1 game,                                Fun World,          1991.
-  * Joker Card (Epoxy brick CPU),                               Fun World,          1991.
+  * Joker Card / Multi Card (Epoxy brick CPU),                  Fun World,          1991.
 
 *****************************************************************************************
 
@@ -472,6 +472,17 @@
   The only visible changes are in the NVRAM, where the $0000 offset hasn't the JMP $C210 instruction
   injected at the start...
 
+
+  * Joker Card / Multi Card (Epoxy brick CPU)
+
+  These series are running in a derivative hardware with epoxy CPU brick.
+  CPU is RP65C02A, with 2x Toshiba TC5565APL-10 RAMs. 1x Intel D27128A ROM.
+  and 1x PAL16L8B.
+  
+  The main program is inside the battery backed RAM, and need to be dumped.
+  See more notes below in the ROM loading.
+
+  
 *****************************************************************************************
 
   Memory Map (generic)
@@ -1259,7 +1270,7 @@ void funworld_state::intergames_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-void funworld_state::fw_a7_11_map(address_map &map)
+void funworld_state::fw_brick_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -1270,11 +1281,10 @@ void funworld_state::fw_a7_11_map(address_map &map)
 	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x2000, 0x2fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram");
 	map(0x3000, 0x3fff).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram");
-	map(0x4000, 0x4000).nopr();
-	map(0x8000, 0xbfff).ram();
+	map(0x4000, 0x7fff).nopr();    // check for the brick RAM programming ROM. 
+	map(0x8000, 0xbfff).ram().share("nvram1");
 	map(0xc000, 0xffff).rom();
 }
-
 
 /*************************
 *      Input ports       *
@@ -2936,6 +2946,13 @@ static INPUT_PORTS_START( royal )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( fw_brick1 )
+	PORT_INCLUDE( novoplay )
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x20, 0x00, "Game Type" )         PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x20, "Multi Card (without Jokers)" )
+	PORT_DIPSETTING(    0x00, "Joker Card (with Jokers)" )
+INPUT_PORTS_END
 
 /*************************
 *    Graphics Layouts    *
@@ -3228,7 +3245,8 @@ void funworld_state::fw_brick_1(machine_config &config)
 {
 	fw1stpal(config);
 	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::fw_a7_11_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::fw_brick_map);
+	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
 //  m_gfxdecode->set_info(gfx_fw2ndpal);
 }
 
@@ -3237,7 +3255,8 @@ void funworld_state::fw_brick_2(machine_config &config)
 {
 	fw2ndpal(config);
 	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::fw_a7_11_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::fw_brick_map);
+	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
 //  m_gfxdecode->set_info(gfx_fw2ndpal);
 }
 
@@ -4973,9 +4992,9 @@ ROM_START( pool10e )
 	ROM_LOAD( "am27s29.u25", 0x0000, 0x0200, CRC(2c315cbf) SHA1(f3f91329f2b8388decf26a050f8fb7da38694218) )
 
 	ROM_REGION( 0x3000, "plds", 0 )
-	ROM_LOAD( "palce16v8h.u5",  0x0000, 0x0892, NO_DUMP ) /* read protected */
-	ROM_LOAD( "palce20v8h.u22", 0x1000, 0x0a92, NO_DUMP ) /* read protected */
-	ROM_LOAD( "palce20v8h.u23", 0x2000, 0x0a92, NO_DUMP ) /* read protected */
+	  ROM_LOAD( "palce16v8h.u5",  0x0000, 0x0892, BAD_DUMP CRC(123d539a) SHA1(cccf0cbae3175b091a998eedf4aa44a55b679400) ) /* read protected */
+	  ROM_LOAD( "palce20v8h.u22", 0x1000, 0x0a92, BAD_DUMP CRC(ba2a021f) SHA1(e9c5970f80c7446c91282d53cfe97c92353dce7d) ) /* read protected */
+	  ROM_LOAD( "palce20v8h.u23", 0x2000, 0x0a92, BAD_DUMP CRC(ba2a021f) SHA1(e9c5970f80c7446c91282d53cfe97c92353dce7d) ) /* read protected */
 ROM_END
 
 
@@ -7024,8 +7043,31 @@ ROM_START( fw_a0_1 )
 ROM_END
 
 /*
-  Joker Card
+  Joker Card / Multi Card
   Funworld.
+
+  This game is running in a derivative hardware with epoxy CPU brick.
+  CPU is a 65C02, with two 5565 RAMs and one 27128 ROM.
+  Also there are present some PLD and logic. (see above).
+  
+  The main program is inside the battery backed RAM, and need to be dumped.
+  These RAMs are connected to the mainboard battery, so once the Brick is unplugged,
+  the battery stops to feed the RAM and the program just vanish.
+
+  From factory, they used the central connector to plug a module with the game program,
+  and then the code inside the ROM check for offset $4000 onward if the module is
+  present through some sort of checksum. If the module is present, the code will
+  copy the range 4000-7fff (the game program inside the external module) to the
+  8000-bfff location, where is the battery backed RAM inside the brick.
+
+  We need to find a new working board and reverse the central connector, to construct
+  some interface that allows us to dump the content of the internal battery backed RAM. 
+
+  For debug purposes, we plugged an external game code from another similar game, that 
+  matches all calls from the original ROM code. We suspect is the same code with different
+  language (English instead German). With this external code the game is completely playable. 
+
+  ----
 
   CPU epoxy brick marked "76AF".
 
@@ -7039,6 +7081,7 @@ ROM_END
   - LOGIC: 1x HD74HC241P.
            1x M74LS245P.
            1x SN74LS139N.
+
 */
 ROM_START( jokcrdep )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7047,6 +7090,12 @@ ROM_START( jokcrdep )
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "200_zg_2.bin", 0x0000, 0x8000, CRC(ba994fc3) SHA1(95d2a802c38d7249f10eb2bbe46edfb9b14b6faa) )
 	ROM_LOAD( "200_zg_1.bin", 0x8000, 0x8000, CRC(367db105) SHA1(400b82dc9e0be4c17a02add009aab3c43dd901f8) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )
+	ROM_LOAD( "joker_nvram.bin", 0x0000, 0x0800, CRC(92019972) SHA1(E6D1E231CD2CE27E718ED9482DBE9DDC8612EB67) )	    // Default NVRAM.
+	
+	ROM_REGION( 0x4000, "nvram1", 0 )
+	ROM_LOAD( "e-0.bin", 0x0000, 0x4000, BAD_DUMP CRC(8FD42F3B) SHA1(208209761DE046189070B88AD4340C8D7FF55F1F) )    // Internal suicide program. Taken from Novo Play.
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "sn82s147n.bin", 0x0000, 0x0200, CRC(f990a9ae) SHA1(f7133798b5f20dd5b8dbe5d1a6876341710d93a8) )
@@ -7766,13 +7815,13 @@ GAME(  199?, mongolnw,  0,        royalcd1, royalcrd,  funworld_state, init_mong
 GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  funworld_state, init_soccernw, ROT0, "<unknown>",       "Soccer New (Italian)",                            MACHINE_UNEMULATED_PROTECTION )
 
 // Other games...
-GAME(  198?, funquiz,   0,        funquiz,  funquiz,   funworld_state, empty_init,    ROT0, "Fun World",       "Fun World Quiz (Austrian)",                       0 )
-GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,  funworld_state, empty_init,    ROT0, "Admiral/Novomatic","Novo Play Multi Card / Club Card",               0,                       layout_novoplay )
-GAME(  1991, intrgmes,  0,        intrgmes, funworld,  funworld_state, empty_init,    ROT0, "Inter Games",     "unknown Inter Games poker",                       MACHINE_NOT_WORKING )
-GAMEL( 1985, fw_a7_11,  0,        fw_brick_2, funworld, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A7-11 game 1",                  MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1985, fw_a7_11a, fw_a7_11, fw_brick_1, funworld, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A7-11 game 2",                  MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1991, fw_a0_1,   0,        fw_brick_2, funworld, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A0-1 game",                     MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1991, jokcrdep,  0,        fw_brick_2, funworld, funworld_state, empty_init,   ROT0, "Fun World",       "Joker Card (Epoxy brick CPU)" ,                   MACHINE_NOT_WORKING,     layout_jollycrd )
+GAME(  198?, funquiz,   0,        funquiz,  funquiz,     funworld_state, empty_init,   ROT0, "Fun World",       "Fun World Quiz (Austrian)",                       0 )
+GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,    funworld_state, empty_init,   ROT0, "Admiral/Novomatic","Novo Play Multi Card / Club Card",               0,                       layout_novoplay )
+GAME(  1991, intrgmes,  0,        intrgmes, funworld,    funworld_state, empty_init,   ROT0, "Inter Games",     "unknown Inter Games poker",                       MACHINE_NOT_WORKING )
+GAMEL( 1985, fw_a7_11,  0,        fw_brick_2, fw_brick1, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A7-11 game 1",                  MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1985, fw_a7_11a, fw_a7_11, fw_brick_2, fw_brick1, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A7-11 game 2",                  MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, fw_a0_1,   0,        fw_brick_2, fw_brick1, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A0-1 game",                     MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, jokcrdep,  0,        fw_brick_2, fw_brick1, funworld_state, empty_init,   ROT0, "Fun World",       "Joker Card / Multi Card (Epoxy brick CPU)",       MACHINE_NOT_WORKING,     layout_jollycrd )
 
 // These are 2-in-1 stealth boards, they can run the Poker game, or, using completely separate hardware on the same PCB, a NES / MSX Multigames!
 GAMEL( 1991, royalcrd_nes,  royalcrd, royalcd2, royalcrd, funworld_state, empty_init, ROT0, "bootleg",         "Royal Card (stealth with NES multigame)",         MACHINE_NOT_WORKING,     layout_jollycrd )

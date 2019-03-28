@@ -67,7 +67,7 @@ private:
 	void cuoreuno_map(address_map &map);
 	void funquiz_map(address_map &map);
 	void funworld_map(address_map &map);
-	void fw_a7_11_map(address_map &map);
+	void fw_brick_map(address_map &map);
 	void intergames_map(address_map &map);
 	void saloon_map(address_map &map);
 	void witchryl_map(address_map &map);
