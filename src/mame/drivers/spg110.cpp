@@ -47,7 +47,7 @@ protected:
 
 void spg110_game_state::mem_map(address_map &map)
 {
-	map(0x004000, 0x0fffff).rom().region("maincpu", 0x8000);
+	map(0x004000, 0x3fffff).rom().region("maincpu", 0x8000);
 	map(0x000000, 0x003fff).m(m_spg, FUNC(spg110_device::map));
 }
 
@@ -198,7 +198,7 @@ static INPUT_PORTS_START( jak_capb )
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("JOYY")
-	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff) PORT_NAME("Plunger")
+	PORT_BIT(0x0fff, 0x0000, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff) PORT_NAME("Plunger")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jak_spdmo )
@@ -384,7 +384,7 @@ void spg110_game_state::spg110_base(machine_config &config)
 }
 
 ROM_START( jak_capb )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "classicarcadepinball.bin", 0x000000, 0x200000, CRC(b643dab0) SHA1(f57d546758ba442e28b5f0f48b3819b2fc2eb7f7) )
 ROM_END
 
