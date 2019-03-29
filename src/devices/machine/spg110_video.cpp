@@ -326,13 +326,17 @@ device_memory_interface::space_config_vector spg110_video_device::memory_space_c
 READ16_MEMBER(spg110_video_device::spg110_2063_r)
 {
 	// checks for bits 0x20 and 0x08 in the IRQ function (all IRQs point to the same place)
-	return 0x0008;
+	return m_video_irq_status;
 }
 
 WRITE16_MEMBER(spg110_video_device::spg110_2063_w)
 {
 	// writes 0x28, probably clears the IRQ / IRQ sources? 0x63 is the same offset for this in spg2xx but bits used seem to be different
-	m_video_irq_cb(CLEAR_LINE);
+	const uint16_t old = m_video_irq_enable & m_video_irq_status;
+	m_video_irq_status &= ~data;
+	const uint16_t changed = old ^ (m_video_irq_enable & m_video_irq_status);
+	if (changed)
+		check_video_irq();
 }
 
 
@@ -511,6 +515,10 @@ void spg110_video_device::device_reset()
 	m_bg_scrollx = 0;
 	m_bg_scrolly = 0;
 	m_2036_scroll = 0;
+
+	// is there actually an enable register here?
+	m_video_irq_enable = 0xffff;
+	m_video_irq_status = 0x0000;
 }
 
 double spg110_video_device::hue2rgb(double p, double q, double t)
@@ -591,7 +599,19 @@ WRITE_LINE_MEMBER(spg110_video_device::vblank)
 {
 	if (!state)
 	{
-		m_video_irq_cb(ASSERT_LINE);
+		m_video_irq_status &= ~0x0008;
+		check_video_irq();
+		return;
 	}
-	return;
+
+	if (m_video_irq_enable & 1)
+	{
+		m_video_irq_status |= 0x0008;
+		check_video_irq();
+	}
+}
+
+void spg110_video_device::check_video_irq()
+{
+	m_video_irq_cb((m_video_irq_status & m_video_irq_enable) ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -145,6 +145,10 @@ private:
 	uint16_t m_bg_scrolly;
 	uint16_t m_2036_scroll;
 
+	uint16_t m_video_irq_enable;
+	uint16_t m_video_irq_status;
+	void check_video_irq();
+
 	void tilemap_write_regs(int which, uint16_t* regs, int regno, uint16_t data);
 
 	template<flipx_t FlipX>
