@@ -3,29 +3,11 @@
 <!--
 license: CC0
 copyright-holders: Dirk Best
-Simple layout for Little Casino (monochrome)
+Simple layout for Little Casino (color) and clones
 -->
 
 <mamelayout version="2">
 	<element name="background">
-	</element>
-	<element name="overlay">
-		<rect>
-			<bounds left="0" top="0" right="640" bottom="70" />
-			<color red="0.18" green="0.85" blue="0.33" />
-		</rect>
-		<rect>
-			<bounds left="0" top="75" right="640" bottom="240" />
-			<color red="0.10" green="0.44" blue="0.72" />
-		</rect>
-		<rect>
-			<bounds left="0" top="240" right="640" bottom="410" />
-			<color red="0.77" green="0.14" blue="0.14" />
-		</rect>
-		<rect>
-			<bounds left="0" top="415" right="640" bottom="480" />
-			<color red="0.18" green="0.85" blue="0.33" />
-		</rect>
 	</element>
 	<element name="button" defstate="0">
 		<rect state="0">
@@ -42,9 +24,6 @@ Simple layout for Little Casino (monochrome)
 		<screen index="0">
 			<bounds left="0" top="0" right="640" bottom="480" />
 		</screen>
-		<overlay name="overlay" element="overlay">
-			<bounds x="0" y="0" width="640" height="480" />
-		</overlay>
 		<cpanel name="button_0" element="button" inputtag="Q" inputmask="0x01">
 			<bounds x="80" y="505" width="70" height="35" />
 		</cpanel>
