@@ -128,7 +128,7 @@ private:
 
 	uint16_t m_palctrlswapped[0x10];
 
-	
+	DECLARE_WRITE16_MEMBER(palette_w);
 
 	uint16_t tmap0_regs[0x6];
 	uint16_t tmap1_regs[0x6];

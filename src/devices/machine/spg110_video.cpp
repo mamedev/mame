@@ -308,7 +308,7 @@ GFXDECODE_END
 
 void spg110_video_device::device_add_mconfig(machine_config &config)
 {
-	PALETTE(config, m_palette, palette_device::BLACK, 256);
+	PALETTE(config, m_palette).set_entries(0x200);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
 }
@@ -336,27 +336,35 @@ WRITE16_MEMBER(spg110_video_device::spg110_2063_w)
 }
 
 
-WRITE16_MEMBER(spg110_video_device::spg110_201c_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2020_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2042_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2031_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2032_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2033_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2034_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2035_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2036_w) { COMBINE_DATA(&m_2036_scroll); }
-WRITE16_MEMBER(spg110_video_device::spg110_2039_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2037_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_203c_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_203d_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2045_w) { }
+WRITE16_MEMBER(spg110_video_device::spg110_201c_w) { logerror("%s: 201c: %04x\n", machine().describe_context(), data); } // during startup text only
+WRITE16_MEMBER(spg110_video_device::spg110_2020_w) { logerror("%s: 2020: %04x\n", machine().describe_context(), data); } // writes 0000 between scene changes
 
-
-WRITE16_MEMBER(spg110_video_device::spg110_2028_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2029_w) { }
-
+WRITE16_MEMBER(spg110_video_device::spg110_2028_w) { logerror("%s: 2028: %04x\n", machine().describe_context(), data); } // startup
 READ16_MEMBER(spg110_video_device::spg110_2028_r) { return 0x0000; }
+
+WRITE16_MEMBER(spg110_video_device::spg110_2029_w) { logerror("%s: 2029: %04x\n", machine().describe_context(), data); } // 0006, 0008 on startup
 READ16_MEMBER(spg110_video_device::spg110_2029_r) { return 0x0000; }
+
+WRITE16_MEMBER(spg110_video_device::spg110_2031_w) { logerror("%s: 2031: %04x\n", machine().describe_context(), data); } // 014a or 0000 when ball is in trap
+WRITE16_MEMBER(spg110_video_device::spg110_2032_w) { logerror("%s: 2032: %04x\n", machine().describe_context(), data); } // 014a most of the time, 0000 very rarely
+WRITE16_MEMBER(spg110_video_device::spg110_2033_w) { logerror("%s: 2033: %04x\n", machine().describe_context(), data); } // changes, situational, eg when pausing
+WRITE16_MEMBER(spg110_video_device::spg110_2034_w) { logerror("%s: 2034: %04x\n", machine().describe_context(), data); } // 0141 on every scene transition
+WRITE16_MEMBER(spg110_video_device::spg110_2035_w) { logerror("%s: 2035: %04x\n", machine().describe_context(), data); } // 0141 on every scene transition
+WRITE16_MEMBER(spg110_video_device::spg110_2036_w) { logerror("%s: 2036: %04x\n", machine().describe_context(), data); COMBINE_DATA(&m_2036_scroll); } // seems related to ball y position, not scrolling (possibly shadow sprite related?)
+
+READ16_MEMBER(spg110_video_device::spg110_2037_r) { return 0x0000; } // added to something from the PRNG
+WRITE16_MEMBER(spg110_video_device::spg110_2037_w) { logerror("%s: 2037: %04x\n", machine().describe_context(), data); } // 0126 (always?)
+
+WRITE16_MEMBER(spg110_video_device::spg110_2039_w) { logerror("%s: 2039: %04x\n", machine().describe_context(), data); } // 0803 on every scene transition
+
+WRITE16_MEMBER(spg110_video_device::spg110_203c_w) { logerror("%s: 203c: %04x\n", machine().describe_context(), data); } // 0006 on startup, twice
+
+WRITE16_MEMBER(spg110_video_device::spg110_203d_w) { logerror("%s: 203d: %04x\n", machine().describe_context(), data); } // changes, usually between scenes
+
+READ16_MEMBER(spg110_video_device::spg110_2042_r) { return 0x0000; }
+WRITE16_MEMBER(spg110_video_device::spg110_2042_w) { logerror("%s: 2042: %04x\n", machine().describe_context(), data);  } // sets bit 0x0004, masks with 0xfffb etc.
+
+WRITE16_MEMBER(spg110_video_device::spg110_2045_w) { logerror("%s: 2045: %04x\n", machine().describe_context(), data);  } // 0006 on startup, once
 
 
 WRITE16_MEMBER(spg110_video_device::spg110_205x_w)
@@ -408,8 +416,6 @@ READ16_MEMBER(spg110_video_device::dma_len_status_r)
 	return 0x1fff; // DMA related?
 }
 
-READ16_MEMBER(spg110_video_device::spg110_2037_r) { return 0x0000; }
-READ16_MEMBER(spg110_video_device::spg110_2042_r) { return 0x0000; }
 
 READ16_MEMBER(spg110_video_device::tmap0_regs_r) { return tmap0_regs[offset]; }
 READ16_MEMBER(spg110_video_device::tmap1_regs_r) { return tmap1_regs[offset]; }
@@ -476,7 +482,7 @@ void spg110_video_device::map_video(address_map &map)
 	map(0x04200, 0x043ff).ram().share("sprattr1");
 	map(0x04400, 0x045ff).ram().share("sprattr2");
 
-	map(0x08000, 0x081ff).ram().share("palram"); // palette format unknown
+	map(0x08000, 0x081ff).ram().w(FUNC(spg110_video_device::palette_w)).share("palram"); // palette format unknown
 }
 
 void spg110_video_device::device_start()
@@ -517,42 +523,43 @@ double spg110_video_device::hue2rgb(double p, double q, double t)
 	return p;
 }
 
-uint32_t spg110_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+// wrong format!
+WRITE16_MEMBER(spg110_video_device::palette_w)
 {
-	// Palette, this is still wrong!
-	int offs = 0;
-	for (int index = 0;index < 256; index++)
-	{
-		uint16_t dat = m_palram[offs++];
+	COMBINE_DATA(&m_palram[offset]);
 
-		// llll lsss sshh hhhh
-		int l_raw =  (dat & 0xf800) >> 11;
-		int sl_raw = (dat & 0x07c0) >> 6;
-		int h_raw =  (dat & 0x003f) >> 0;
+	uint16_t dat = m_palram[offset];
 
-		double l = (double)l_raw / 31.0f;
-		double s = (double)sl_raw / 31.0f;
-		double h = (double)h_raw / 47.0f;
+	// llll lsss sshh hhhh
+	int l_raw =  (dat & 0xf800) >> 11;
+	int sl_raw = (dat & 0x07c0) >> 6;
+	int h_raw =  (dat & 0x003f) >> 0;
 
-		double r, g, b;
+	double l = (double)l_raw / 31.0f;
+	double s = (double)sl_raw / 31.0f;
+	double h = (double)h_raw / 47.0f;
 
-		if (s == 0) {
-			r = g = b = l; // greyscale
-		} else {
-			double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
-			double p = 2 * l - q;
-			r = hue2rgb(p, q, h + 1/3.0f);
-			g = hue2rgb(p, q, h);
-			b = hue2rgb(p, q, h - 1/3.0f);
-		}
+	double r, g, b;
 
-		int r_real = r * 255.0f;
-		int g_real = g * 255.0f;
-		int b_real = b * 255.0f;
-
-		m_palette->set_pen_color(index, r_real, g_real, b_real);
+	if (s == 0) {
+		r = g = b = l; // greyscale
+	} else {
+		double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
+		double p = 2 * l - q;
+		r = hue2rgb(p, q, h + 1/3.0f);
+		g = hue2rgb(p, q, h);
+		b = hue2rgb(p, q, h - 1/3.0f);
 	}
 
+	int r_real = r * 255.0f;
+	int g_real = g * 255.0f;
+	int b_real = b * 255.0f;
+
+	m_palette->set_pen_color(offset, r_real, g_real, b_real);
+}
+
+uint32_t spg110_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
 	memset(&m_screenbuf[320 * cliprect.min_y], 0, 4 * 320 * ((cliprect.max_y - cliprect.min_y) + 1));
 
 	const uint32_t page1_addr = 0;//0x40 * m_video_regs[0x20];
