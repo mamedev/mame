@@ -62,7 +62,7 @@ Main board:
 +---------------------------------------------+
 
   CPU: 68000, Z80A
-Sound: YM2812/YM3014 + OKI M6295 (badged as K-666/K-664 + AD-65)
+Sound: YM3812/YM3014 + OKI M6295 (badged as K-666/K-664 + AD-65)
   OSC: 27MHz, 12MHz & 5MHz
   RAM: Samsung KM681000LP-10 128Kx8 Low power SRAM x 4
        Samsung KM6264AL-10 8Kx8 Low power SRAM x 2
@@ -462,7 +462,7 @@ void oneshot_state::oneshot(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 5_MHz_XTAL/2)); // 2.5MHz or 3MHz (12MHz/4)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 5_MHz_XTAL/2)); // 2.5MHz or 3MHz (12MHz/4) - clock frequency not verified
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
