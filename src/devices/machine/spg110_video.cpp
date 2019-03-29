@@ -29,11 +29,9 @@ spg110_video_device::spg110_video_device(const machine_config &mconfig, const ch
 }
 
 template<spg110_video_device::flipx_t FlipX>
-void spg110_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile, uint8_t pal, int32_t h, int32_t w, uint8_t bpp)
+void spg110_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile, uint8_t yflipmask, uint8_t pal, int32_t h, int32_t w, uint8_t bpp)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
-
-	uint32_t yflipmask = 0; //attr & TILE_Y_FLIP ? h - 1 : 0;
 
 	uint32_t nc = (bpp + 1) << 1;
 
@@ -157,9 +155,9 @@ void spg110_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 		{
 
 			if (flip_x)
-				draw<FlipXOn>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, pal, tile_h, tile_w, bpp);
+				draw<FlipXOn>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, 0, pal, tile_h, tile_w, bpp);
 			else
-				draw<FlipXOff>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, pal, tile_h, tile_w, bpp);
+				draw<FlipXOff>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, 0, pal, tile_h, tile_w, bpp);
 		}
 
 	}
@@ -171,7 +169,7 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 
 	// m_sprtileno  tttt tttt tttt tttt    t =  tile number (all bits?)
 	// m_sprattr1   xxxx xxxx yyyy yyyy    x = low x bits, y = low y bits
-	// m_sprattr2   YXzz pppp hhww -Fbb    X = high x bit, z = priority, p = palette, h = height, w = width. F = flipx, b = bpp, Y = high y bit
+	// m_sprattr2   YXzz pppp hhww fFbb    X = high x bit, z = priority, p = palette, h = height, w = width, f = flipy,  F = flipx, b = bpp, Y = high y bit
 
 	uint16_t tile = m_sprtileno[base_addr];
 
@@ -188,6 +186,7 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 	int y = (attr1) & 0xff;
 	uint8_t pri = (attr2 & 0x3000)>>12;
 	bool flip_x = (attr2 & 0x0004)>>2;
+	bool flip_y = (attr2 & 0x0008)>>3;
 
 	if (!(attr2 & 0x4000))
 		x+= 0x100;
@@ -225,15 +224,15 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 
 	//bool blend = (attr & 0x4000);
 	const uint8_t bpp = attr2 & 0x0003;
-	//const uint32_t yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
+	const uint32_t yflipmask = flip_y ? h - 1 : 0;
 	const uint32_t palette_offset = (attr2 & 0x0f00) >> 8;
 
 	if (pri == priority)
 	{
 		if (flip_x)
-			draw<FlipXOn>(cliprect, tile_line, x, y, 0, bitmap_addr, tile, palette_offset, h, w, bpp);
+			draw<FlipXOn>(cliprect, tile_line, x, y, 0, bitmap_addr, tile, yflipmask, palette_offset, h, w, bpp);
 		else
-			draw<FlipXOff>(cliprect, tile_line, x, y, 0, bitmap_addr, tile, palette_offset, h, w, bpp);
+			draw<FlipXOff>(cliprect, tile_line, x, y, 0, bitmap_addr, tile, yflipmask, palette_offset, h, w, bpp);
 	}
 }
 
