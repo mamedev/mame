@@ -341,7 +341,7 @@ WRITE16_MEMBER(spg110_video_device::spg110_2063_w)
 
 
 WRITE16_MEMBER(spg110_video_device::spg110_201c_w) { logerror("%s: 201c: %04x\n", machine().describe_context(), data); } // during startup text only
-WRITE16_MEMBER(spg110_video_device::spg110_2020_w) { logerror("%s: 2020: %04x\n", machine().describe_context(), data); } // writes 0000 between scene changes
+WRITE16_MEMBER(spg110_video_device::spg110_2020_w) { COMBINE_DATA(&m_tilebase); logerror("%s: 2020: %04x\n", machine().describe_context(), data); } // writes 0000 between scene changes
 
 WRITE16_MEMBER(spg110_video_device::spg110_2028_w) { logerror("%s: 2028: %04x\n", machine().describe_context(), data); } // startup
 READ16_MEMBER(spg110_video_device::spg110_2028_r) { return 0x0000; }
@@ -384,7 +384,7 @@ WRITE16_MEMBER(spg110_video_device::spg110_205x_w)
 
 WRITE16_MEMBER(spg110_video_device::dma_unk_2061_w) { COMBINE_DATA(&m_dma_unk_2061); }
 WRITE16_MEMBER(spg110_video_device::dma_dst_step_w) { COMBINE_DATA(&m_dma_dst_step); }
-WRITE16_MEMBER(spg110_video_device::dma_unk_2067_w) { COMBINE_DATA(&m_dma_unk_2067); }
+WRITE16_MEMBER(spg110_video_device::dma_unk_2067_w) { COMBINE_DATA(&m_dma_src_high); }
 WRITE16_MEMBER(spg110_video_device::dma_src_step_w) { COMBINE_DATA(&m_dma_src_step); }
 
 WRITE16_MEMBER(spg110_video_device::dma_dst_w) { COMBINE_DATA(&m_dma_dst); }
@@ -395,12 +395,14 @@ WRITE16_MEMBER(spg110_video_device::dma_len_trigger_w)
 	int length = data & 0x1fff;
 
 	// this is presumably a counter that underflows to 0x1fff, because that's what the wait loop waits for?
-	logerror("%s: (trigger len) %04x with values (unk) %04x (dststep) %04x (unk) %04x (src step) %04x | (dst) %04x (src) %04x\n", machine().describe_context(), data, m_dma_unk_2061, m_dma_dst_step, m_dma_unk_2067, m_dma_src_step, m_dma_dst, m_dma_src);
+	logerror("%s: (trigger len) %04x with values (unk) %04x (dststep) %04x (unk) %04x (src step) %04x | (dst) %04x (src) %04x\n", machine().describe_context(), data, m_dma_unk_2061, m_dma_dst_step, m_dma_src_high, m_dma_src_step, m_dma_dst, m_dma_src);
 
-	if ((m_dma_unk_2061!=0x0000) || (m_dma_unk_2067 != 0x0000))
-		fatalerror("unknown DMA params are not zero!\n");
+	if (m_dma_src_high != 0x0000)
+	{
+		logerror("unknown DMA params are not zero!\n");
+	}
 
-	int source = m_dma_src;
+	int source = m_dma_src | m_dma_src_high << 16;
 	int dest = m_dma_dst;
 
 	for (int i = 0; i < length; i++)
@@ -413,6 +415,14 @@ WRITE16_MEMBER(spg110_video_device::dma_len_trigger_w)
 		source+=m_dma_src_step;
 		dest+=m_dma_dst_step;
 	}
+
+	// not sure, spiderman would suggest that some of these need to reset (unless a missing IRQ clears them)
+	m_dma_unk_2061 = 0;
+	m_dma_dst_step = 0;
+	m_dma_src_high = 0;
+	m_dma_src_step = 0;
+	m_dma_dst = 0;
+	m_dma_src = 0;
 }
 
 READ16_MEMBER(spg110_video_device::dma_len_status_r)
@@ -494,7 +504,7 @@ void spg110_video_device::device_start()
 	save_item(NAME(m_dma_src_step));
 	save_item(NAME(m_dma_dst_step));
 	save_item(NAME(m_dma_unk_2061));
-	save_item(NAME(m_dma_unk_2067));
+	save_item(NAME(m_dma_src_high));
 	save_item(NAME(m_dma_dst));
 	save_item(NAME(m_dma_src));
 	save_item(NAME(m_bg_scrollx));
@@ -509,7 +519,7 @@ void spg110_video_device::device_reset()
 	m_dma_src_step = 0;
 	m_dma_dst_step = 0;
 	m_dma_unk_2061 = 0;
-	m_dma_unk_2067 = 0;
+	m_dma_src_high = 0;
 	m_dma_dst = 0;
 	m_dma_src = 0;
 	m_bg_scrollx = 0;
@@ -570,8 +580,8 @@ uint32_t spg110_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 {
 	memset(&m_screenbuf[320 * cliprect.min_y], 0, 4 * 320 * ((cliprect.max_y - cliprect.min_y) + 1));
 
-	const uint32_t page1_addr = 0;//0x40 * m_video_regs[0x20];
-	const uint32_t page2_addr = 0;//0x40 * m_video_regs[0x21];
+	const uint32_t page1_addr = 0x40 * m_tilebase;//0x40 * m_video_regs[0x20];
+	const uint32_t page2_addr = 0x40 * m_tilebase;//0x40 * m_video_regs[0x21];
 	uint16_t *page1_regs = tmap0_regs;
 	uint16_t *page2_regs = tmap1_regs;
 
@@ -597,16 +607,23 @@ uint32_t spg110_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 WRITE_LINE_MEMBER(spg110_video_device::vblank)
 {
+// hacks to make spiderman do something
+//	static int i = 0x008;
+	const int i = 0x0008;
+
 	if (!state)
 	{
-		m_video_irq_status &= ~0x0008;
+// hacks to make spiderman do something
+//		i ^= 0x000a;
+
+		m_video_irq_status &= ~i;
 		check_video_irq();
 		return;
 	}
 
 	if (m_video_irq_enable & 1)
 	{
-		m_video_irq_status |= 0x0008;
+		m_video_irq_status |= i;
 		check_video_irq();
 	}
 }

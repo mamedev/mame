@@ -136,7 +136,7 @@ private:
 	uint16_t m_dma_src_step;
 	uint16_t m_dma_dst_step;
 	uint16_t m_dma_unk_2061;
-	uint16_t m_dma_unk_2067;
+	uint16_t m_dma_src_high;
 
 	uint16_t m_dma_dst;
 	uint16_t m_dma_src;
@@ -144,6 +144,8 @@ private:
 	uint16_t m_bg_scrollx;
 	uint16_t m_bg_scrolly;
 	uint16_t m_2036_scroll;
+
+	uint16_t m_tilebase;
 
 	uint16_t m_video_irq_enable;
 	uint16_t m_video_irq_status;
