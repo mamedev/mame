@@ -41,7 +41,7 @@ public:
 	// in case reset button is directly tied to maincpu reset pin
 	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
-	DECLARE_INPUT_CHANGED_MEMBER(div_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(div_changed) { div_refresh(newval); }
 
 protected:
 	// devices/pointers
@@ -71,6 +71,7 @@ protected:
 	u8 div_trampoline_r(offs_t offset);
 	void div_set_cpu_freq(offs_t offset);
 	void div_trampoline(address_map &map);
+	void div_refresh(ioport_value val = 0xff);
 	u16 m_div_status;
 	ioport_value m_div_config;
 	emu_timer *m_div_timer;

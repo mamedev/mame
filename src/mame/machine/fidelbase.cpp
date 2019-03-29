@@ -66,9 +66,7 @@ void fidelbase_state::machine_reset()
 	chessbase_state::machine_reset();
 
 	// init cpu divider (optional)
-	ioport_port *inp = ioport("div_config");
-	if (inp != nullptr)
-		div_changed(*inp->field(0x03), nullptr, 0, inp->read());
+	div_refresh();
 }
 
 
@@ -139,14 +137,24 @@ void fidelbase_state::div_trampoline(address_map &map)
 	map(0x0000, 0xffff).rw(FUNC(fidelbase_state::div_trampoline_r), FUNC(fidelbase_state::div_trampoline_w));
 }
 
-INPUT_CHANGED_MEMBER(fidelbase_state::div_changed)
+void fidelbase_state::div_refresh(ioport_value val)
 {
+	if (val == 0xff)
+	{
+		// bail out if there is no cpu divider
+		ioport_port *inp = ioport("div_config");
+		if (inp == nullptr)
+			return;
+
+		val = inp->read();
+	}
+
 	m_maincpu->set_clock_scale(1.0);
 	m_div_status = ~0;
-	m_div_config = newval;
+	m_div_config = val;
 
 	// stop high frequency background timer if cpu divider is disabled
-	attotime period = (newval) ? attotime::from_hz(m_maincpu->clock()) : attotime::never;
+	attotime period = (val) ? attotime::from_hz(m_maincpu->clock()) : attotime::never;
 	m_div_timer->adjust(period, 0, period);
 }
 
