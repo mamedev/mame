@@ -166,6 +166,11 @@ void spg110_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 
 void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr)
 {
+
+	// m_sprtileno  tttt tttt tttt tttt    t =  tile number (all bits?)
+	// m_sprattr1   xxxx xxxx yyyy yyyy    x = low x bits, y = low y bits
+	// m_sprattr2   YXzz pppp hhww -Fbb    X = high x bit, z = priority, p = palette, h = height, w = width. F = flipx, b = bpp, Y = high y bit
+
 	uint16_t tile = m_sprtileno[base_addr];
 
 	if (!tile)
@@ -173,18 +178,14 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 		return;
 	}
 
-	uint32_t bitmap_addr = 0;//0x40 * m_video_regs[0x22];
+	uint32_t bitmap_addr = 0x40 * m_tilebase;
 	uint16_t attr1 = m_sprattr1[base_addr];
 	uint16_t attr2 = m_sprattr2[base_addr];
 
 	int x = (attr1 >> 8) & 0xff;
 	int y = (attr1) & 0xff;
 	uint8_t pri = (attr2 & 0x3000)>>12;
-
-	// m_sprtileno  tttt tttt tttt tttt    t =  tile number (all bits?)
-	// m_sprattr1   xxxx xxxx yyyy yyyy    x = low x bits, y = low y bits
-	// m_sprattr2   YXzz pppp hhww --bb    X = high x bit, z = priority, p = palette, h = height, w = width. b = bpp, Y = high y bit
-
+	bool flip_x = (attr2 & 0x0004)>>2;
 
 	if (!(attr2 & 0x4000))
 		x+= 0x100;
@@ -221,7 +222,6 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 	}
 
 	//bool blend = (attr & 0x4000);
-	bool flip_x = 0;//(attr & TILE_X_FLIP);
 	const uint8_t bpp = attr2 & 0x0003;
 	//const uint32_t yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
 	const uint32_t palette_offset = (attr2 & 0x0f00) >> 8;
@@ -341,7 +341,7 @@ WRITE16_MEMBER(spg110_video_device::spg110_2063_w)
 
 
 WRITE16_MEMBER(spg110_video_device::spg110_201c_w) { logerror("%s: 201c: %04x\n", machine().describe_context(), data); } // during startup text only
-WRITE16_MEMBER(spg110_video_device::spg110_2020_w) { COMBINE_DATA(&m_tilebase); logerror("%s: 2020: %04x\n", machine().describe_context(), data); } // writes 0000 between scene changes
+WRITE16_MEMBER(spg110_video_device::spg110_2020_w) { COMBINE_DATA(&m_tilebase); logerror("%s: 2020: %04x\n", machine().describe_context(), data); } // confirmed as tile base, seems to apply to both layers and sprites, unlike spg2xx which has separate registers
 
 WRITE16_MEMBER(spg110_video_device::spg110_2028_w) { logerror("%s: 2028: %04x\n", machine().describe_context(), data); } // startup
 READ16_MEMBER(spg110_video_device::spg110_2028_r) { return 0x0000; }
@@ -378,6 +378,7 @@ WRITE16_MEMBER(spg110_video_device::spg110_205x_w)
 	uint16_t temp = m_palctrlram[offset];
 
 	// 0x0010 to 0x0001  - complete guess that this could be pen transparency
+	// spiderman indicates this is not correct
 	m_palctrlswapped[offset] = bitswap<16>(temp, 11, 10, 9, 8, 15, 14, 13, 12, 3, 2, 1, 0, 7, 6, 5, 4);
 }
 
