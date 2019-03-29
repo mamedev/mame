@@ -2549,8 +2549,8 @@ ROM_START( funkyjetb )
 	ROM_LOAD16_BYTE( "4-27c020.bin", 0x00000, 0x40000, CRC(4e5bfda3) SHA1(b1bcc4ad1343d379de9a143a72a84db9830c8fa0) )
 	ROM_LOAD16_BYTE( "3-27c020.bin", 0x00001, 0x40000, CRC(e253e20c) SHA1(6fe1704872bf807ed24f500c997f62c880f6c5c1) )
 
-	ROM_REGION( 0x2000, "pic", 0 )    /* Sound CPU */
-	ROM_LOAD( "1-pic16c57-xt.bin",   0x00000, 0x2000, NO_DUMP ) // protected
+	ROM_REGION( 0x1000, "pic", 0 )    /* Sound CPU */
+	ROM_LOAD( "1-pic16c57-xt.bin",   0x00000,  0x1000, CRC(653ed006) SHA1(38b7c7b3f40d73e2e7c4361c918eaf4bba2bdc3c) ) // From decap
 
 	ROM_REGION( 0x080000, "tilegfx", 0 )
 	ROM_LOAD16_BYTE( "5-27c020.bin", 0x000000, 0x40000, CRC(f75ff923) SHA1(4177e94ba1e3a82861d0277ba5d0abc24482ffe2) )
