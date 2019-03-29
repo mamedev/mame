@@ -308,7 +308,7 @@ GFXDECODE_END
 
 void spg110_video_device::device_add_mconfig(machine_config &config)
 {
-	PALETTE(config, m_palette).set_entries(0x200);
+	PALETTE(config, m_palette).set_entries(0x100);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
 }
