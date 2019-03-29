@@ -57,9 +57,9 @@ namespace analog
 	 * |  Y  |Is    | Bulk junction saturation current                                      |A|0.00000000000001|1E-015|
 	 * |  Y  |N     | Bulk diode emission coefficient                                       |-|1|*
 	 * |     |Pb    | Bulk junction potential                                               |V|0.8|0.87|8|
-	 * |     |Cgso  | Gate-source overlap capacitance per meter channel width               |F/m|0|0.00000000004|
-	 * |     |Cgdo  | Gate-drain overlap capacitance per meter channel width                |F/m|0|0.00000000004|*
-	 * |     |Cgbo  | Gate-bulk overlap capacitance per meter channel width                 |F/m|0|0.0000000002|*
+	 * |  Y  |Cgso  | Gate-source overlap capacitance per meter channel width               |F/m|0|0.00000000004|
+	 * |  Y  |Cgdo  | Gate-drain overlap capacitance per meter channel width                |F/m|0|0.00000000004|*
+	 * |  Y  |Cgbo  | Gate-bulk overlap capacitance per meter channel width                 |F/m|0|0.0000000002|*
 	 * |     |Rsh   | Drain and source diffusion sheet resistance                           |W|0|10|*
 	 * |     |Cj    | Zero-bias bulk junction bottom capacitance per square meter of junction area|F/m²|0|0.0002|*
 	 * |     |Mj    | Bulk junction bottom grading coefficient                              |-|0.5|0.5|*
@@ -87,8 +87,8 @@ namespace analog
 	 * |     |Eta   | Static feedback (level 3 only)                                        |-|0|1|
 	 * |     |Kappa | Saturation field (level 3 only)                                       |0.2|0.5|
 	 * |     |Tnom  | Parameter measurement temperature                                     |ºC|27|50||
-	 * |  Y  |L     | Length scaling                                                        |-|1.0||
-	 * |  Y  |W     | Width scaling                                                         |-|1.0||
+	 * |  Y  |L     | Length scaling                                                        |-|100e-6||
+	 * |  Y  |W     | Width scaling                                                         |-|100e-6||
 	 * */
 
 	class fet_model_t : public param_model_t
@@ -112,24 +112,30 @@ namespace analog
 		, m_LAMBDA(*this, "LAMBDA")
 		, m_RD(*this, "RD")
 		, m_RS(*this, "RS")
+		, m_CGSO(*this, "CGSO")
+		, m_CGDO(*this, "CGDO")
+		, m_CGBO(*this, "CGBO")
 		{}
 
-		value_t m_VTO; //!< Threshold voltage [V]
-		value_t m_N;   //!< Bulk diode emission coefficient
-		value_t m_ISS;  //!< Body diode saturation current
-		value_t m_ISD;  //!< Body diode saturation current
-		value_t m_LD;  //!< Lateral diffusion [m]
-		value_t m_L;   //!< Length scaling
-		value_t m_W;   //!< Width scaling
-		value_t m_TOX; //!< Oxide thickness
-		value_t m_KP;  //!< Transconductance parameter [A/V²]
-		value_t m_UO;  //!< Surface mobility [cm²/V/s]
-		value_t m_PHI; //!< Surface inversion potential [V]
-		value_t m_NSUB;//!< Substrate doping [1/cm³]
-		value_t m_GAMMA; //!< Bulk threshold parameter [V^½]
-		value_t m_LAMBDA; //!< Channel-length modulation [1/V]
-		value_t m_RD;  //!< Drain ohmic resistance
-		value_t m_RS;  //!< Source ohmic resistance
+		value_t m_VTO;		//!< Threshold voltage [V]
+		value_t m_N;		//!< Bulk diode emission coefficient
+		value_t m_ISS;		//!< Body diode saturation current
+		value_t m_ISD;		//!< Body diode saturation current
+		value_t m_LD;		//!< Lateral diffusion [m]
+		value_t m_L;		//!< Length scaling
+		value_t m_W;   		//!< Width scaling
+		value_t m_TOX; 		//!< Oxide thickness
+		value_t m_KP;  		//!< Transconductance parameter [A/V²]
+		value_t m_UO;  		//!< Surface mobility [cm²/V/s]
+		value_t m_PHI; 		//!< Surface inversion potential [V]
+		value_t m_NSUB;		//!< Substrate doping [1/cm³]
+		value_t m_GAMMA;	//!< Bulk threshold parameter [V^½]
+		value_t m_LAMBDA;	//!< Channel-length modulation [1/V]
+		value_t m_RD;  		//!< Drain ohmic resistance
+		value_t m_RS;		//!< Source ohmic resistance
+		value_t m_CGSO;		//!< Gate-source overlap capacitance per meter channel width
+		value_t m_CGDO;		//!< Gate-drain overlap capacitance per meter channel width
+		value_t m_CGBO;		//!< Gate-bulk overlap capacitance per meter channel width
 	};
 
 	// Have a common start for mosfets
@@ -167,7 +173,6 @@ namespace analog
 	// nld_QBJT_EB
 	// -----------------------------------------------------------------------------
 
-
 	NETLIB_OBJECT_DERIVED(MOSFET, FET)
 	{
 	public:
@@ -179,13 +184,21 @@ namespace analog
 #if (!BODY_CONNECTED_TO_SOURCE)
 		, m_D_BS(*this, "m_D_BS")
 #endif
+		, m_cap_gb(*this, "m_cap_gb")
+		, m_cap_gs(*this, "m_cap_gs")
+		, m_cap_gd(*this, "m_cap_gd")
 		, m_phi(0.0)
 		, m_gamma(0.0)
 		, m_vto(0.0)
 		, m_beta(0.0)
 		, m_lambda(0.0)
 		, m_Leff(0.0)
-		, m_Cox(0.0)
+		, m_CoxWL(0.0)
+		, m_polarity(qtype() == FET_NMOS ? 1.0 : -1.0)
+		, m_Cgb(0.0)
+		, m_Cgs(0.0)
+		, m_Cgd(0.0)
+
 	{
 			register_subalias("S", m_SG.m_P);   // Source
 			register_subalias("G", m_SG.m_N);   // Gate
@@ -212,6 +225,20 @@ namespace analog
 #endif
 		}
 
+		NETLIB_IS_TIMESTEP(true)
+
+		NETLIB_TIMESTEPI()
+		{
+			const nl_double Ugd = -m_DG.deltaV() * m_polarity; // Gate - Drain
+			const nl_double Ugs = -m_SG.deltaV() * m_polarity; // Gate - Source
+			const nl_double Ubs = 0.0;                         // Bulk - Source == 0 if connected
+			const nl_double Ugb = Ugs - Ubs;
+
+			m_cap_gb.timestep(m_Cgb, Ugb, step);
+			m_cap_gs.timestep(m_Cgs, Ugs, step);
+			m_cap_gd.timestep(m_Cgd, Ugd, step);
+		}
+
 	protected:
 
 		NETLIB_RESETI();
@@ -230,6 +257,11 @@ namespace analog
 		generic_diode<diode_e::MOS> m_D_BS;
 #endif
 
+		generic_capacitor<capacitor_e::VARIABLE_CAPACITY> m_cap_gb;
+		generic_capacitor<capacitor_e::VARIABLE_CAPACITY> m_cap_gs;
+		generic_capacitor<capacitor_e::VARIABLE_CAPACITY> m_cap_gd;
+
+
 		nl_double m_phi;
 		nl_double m_gamma;
 		nl_double m_vto;
@@ -238,18 +270,79 @@ namespace analog
 
 		/* used in capacitance calculation */
 		nl_double m_Leff;
-		nl_double m_Cox;
+		nl_double m_CoxWL;
+		nl_double m_polarity;
 
-		//NETLIB_SUBXX(analog, C) m_CJE;
-		//NETLIB_SUBXX(analog, C) m_CJC;
+		/* capacitance values */
+
+		nl_double m_Cgb;
+		nl_double m_Cgs;
+		nl_double m_Cgd;
+
+		void set_cap(generic_capacitor<capacitor_e::VARIABLE_CAPACITY> cap,
+			nl_double capval, nl_double V,
+			nl_double &g11, nl_double &g12, nl_double &g21, nl_double &g22,
+			nl_double &I1, nl_double &I2)
+		{
+			const nl_double I = cap.Ieq(capval, V) * m_polarity;
+			const nl_double G = cap.G(capval);
+			g11 += G; g12 -= G; g21 -= G; g22 += G;
+			I1 -= I; I2 += I;
+			//printf("Cap: %g\n", capval);
+		}
+
+		void calculate_caps(nl_double Vgs, nl_double Vgd, nl_double Vth,
+			nl_double &Cgs, nl_double &Cgd, nl_double &Cgb)
+		{
+			nl_double Vctrl = Vgs - Vth * m_polarity;
+			// Cut off - now further differentiated into 3 different formulas
+			// Accumulation
+			if (Vctrl <= -m_phi)
+			{
+				Cgb = m_CoxWL;
+				Cgs = 0.0;
+				Cgd = 0.0;
+			}
+			else if (Vctrl <= -m_phi / 2.0)
+			{
+				Cgb = -Vctrl * m_CoxWL / m_phi;
+				Cgs = 0.0;
+				Cgd = 0.0;
+			}
+			// Depletion
+			else if (Vctrl <= 0)
+			{
+				Cgb = -Vctrl * m_CoxWL / m_phi;
+				Cgs = (Vctrl * m_CoxWL * (4.0 / 3.0) / m_phi + (2.0 / 3.0) * m_CoxWL);
+				Cgd = 0.0;
+			}
+			else
+			{
+				const nl_double Vdsat = Vctrl;
+			    const nl_double Vds = Vgs - Vgd;
+				// saturation
+				if (Vdsat <= Vds)
+				{
+					Cgb = 0;
+					Cgs = (2.0 / 3.0) * m_CoxWL;
+					Cgd = 0;
+				}
+				else
+				{
+					// linear
+					const nl_double Sqr1 = std::pow(Vdsat - Vds, 2);
+					const nl_double Sqr2 = std::pow(2.0 * Vdsat - Vds, 2);
+					Cgb = 0;
+					Cgs = m_CoxWL * (1.0 - Sqr1 / Sqr2) * (2.0 / 3.0);
+					Cgd = m_CoxWL * (1.0 - Vdsat * Vdsat / Sqr2) * (2.0 / 3.0);
+				}
+			}
+		}
 	};
-
-
 
 	// ----------------------------------------------------------------------------------------
 	// nld_Q - Ebers Moll
 	// ----------------------------------------------------------------------------------------
-
 
 	NETLIB_UPDATE(MOSFET)
 	{
@@ -264,46 +357,34 @@ namespace analog
 	NETLIB_RESET(MOSFET)
 	{
 		NETLIB_NAME(FET)::reset();
-#if 0
-		if (m_CJE)
-		{
-			m_CJE->reset();
-			m_CJE->m_C.setTo(m_model.m_CJE);
-		}
-		if (m_CJC)
-		{
-			m_CJC->reset();
-			m_CJC->m_C.setTo(m_model.m_CJC);
-		}
-#endif
 	}
 
 	NETLIB_UPDATE_TERMINALS(MOSFET)
 	{
-		const nl_double polarity = (qtype() == FET_NMOS ? 1.0 : -1.0);
-
-		const nl_double Ugd = -m_DG.deltaV() * polarity; // Gate - Drain
-		const nl_double Ugs = -m_SG.deltaV() * polarity; // Gate - Source
-		const nl_double Ubs = 0.0;                       // Bulk - Source == 0 if connected
-		const nl_double Ubd = m_SD.deltaV() * polarity;  // Bulk - Drain = Source  - Drain
-		const nl_double Uds = Ugs - Ugd;
+		const nl_double Vgd = -m_DG.deltaV() * m_polarity; // Gate - Drain
+		const nl_double Vgs = -m_SG.deltaV() * m_polarity; // Gate - Source
+		const nl_double Vbs = 0.0;                       // Bulk - Source == 0 if connected
+		const nl_double Vbd = m_SD.deltaV() * m_polarity;  // Bulk - Drain = Source  - Drain
+		const nl_double Vds = Vgs - Vgd;
 
 #if (!BODY_CONNECTED_TO_SOURCE)
-		m_D_BS.update_diode(Ubs);
+		m_D_BS.update_diode(Vbs);
 #endif
-		m_D_BD.update_diode(Ubd);
+		m_D_BD.update_diode(Vbd);
 
 		// Are we in forward mode ?
-		const bool is_forward = Uds >= 0;
+		// in backward mode, just swap source and drain
+		const bool is_forward = Vds >= 0;
 
 		// calculate Vth
-		const nl_double Vbulk = is_forward ? Ubs : Ubd;
+		const nl_double Vbulk = is_forward ? Vbs : Vbd;
 		const nl_double phi_m_Vbulk = (m_phi > Vbulk) ? std::sqrt(m_phi - Vbulk) : 0.0;
-		const nl_double Vth = m_vto * polarity + m_gamma * (phi_m_Vbulk - std::sqrt(m_phi));
+		const nl_double Vth = m_vto * m_polarity + m_gamma * (phi_m_Vbulk - std::sqrt(m_phi));
 
-		const nl_double Vctrl = (is_forward ? Ugs : Ugd) - Vth;
+		const nl_double Vctrl = (is_forward ? Vgs : Vgd) - Vth;
 
 		nl_double Ids, gm, gds, gmb;
+		const nl_double absVds = std::abs(Vds);
 
 		if (Vctrl <= 0.0)
 		{
@@ -315,21 +396,20 @@ namespace analog
 		}
 		else
 		{
-			const nl_double Vds = std::abs(Uds);
-		    const nl_double b   = m_beta * (1.0 + m_lambda * Vds);
-		    if (Vctrl <= Vds)
+		    const nl_double beta = m_beta * (1.0 + m_lambda * absVds);
+		    if (Vctrl <= absVds)
 		    {
 			    // saturation region
-		    	Ids = b * Vctrl * Vctrl / 2.0;
-		    	gm  = b * Vctrl;
+		    	Ids = beta * Vctrl * Vctrl / 2.0;
+		    	gm  = beta * Vctrl;
 		    	gds = m_lambda * m_beta * Vctrl * Vctrl / 2.0;
 		    }
 		    else
 		    {
 			    // linear region
-		    	Ids = b * Vds * (Vctrl - Vds / 2);
-		    	gm  = b * Vds;
-		    	gds = b * (Vctrl - Vds) + m_lambda * m_beta * Vds * (Vctrl - Vds / 2.0);
+		    	Ids = beta * absVds * (Vctrl - absVds / 2);
+		    	gm  = beta * absVds;
+		    	gds = beta * (Vctrl - absVds) + m_lambda * m_beta * absVds * (Vctrl - absVds / 2.0);
 		    }
 
 			// backgate transconductance
@@ -345,7 +425,7 @@ namespace analog
 
 		const nl_double IeqBD = m_D_BD.Ieq();
 		const nl_double gbd = m_D_BD.G();
-#if 0
+#if (!BODY_CONNECTED_TO_SOURCE)
 		const nl_double IeqBS = m_D_BS.Ieq();
 		const nl_double gbs = m_D_BS.G();
 #else
@@ -357,34 +437,45 @@ namespace analog
 		const nl_double gdrain  = is_forward ?   0.0 : (gm + gmb);
 
 		const nl_double IeqDS = (is_forward) ?
-			   Ids - gm * Ugs - gmb * Ubs - gds * Uds
-			: -Ids - gm * Ugd - gmb * Ubd - gds * Uds;
+			   Ids - gm * Vgs - gmb * Vbs - gds * Vds
+			: -Ids - gm * Vgd - gmb * Vbd - gds * Vds;
 
 		// IG = 0
-		const nl_double IG = 0.0;
-		const nl_double ID = (+IeqBD - IeqDS) * polarity;
-		const nl_double IS = (+IeqBS + IeqDS) * polarity;
-		const nl_double IB = (-IeqBD - IeqBS) * polarity;
+		nl_double IG = 0.0;
+		nl_double ID = (+IeqBD - IeqDS) * m_polarity;
+		nl_double IS = (+IeqBS + IeqDS) * m_polarity;
+		nl_double IB = (-IeqBD - IeqBS) * m_polarity;
 
-		const nl_double gGG = 0.0; // ok
-		const nl_double gGD = 0.0; // ok
-		const nl_double gGS = 0.0; // ok
-		const nl_double gGB = 0.0; // ok
+		nl_double gGG = 0.0;
+		nl_double gGD = 0.0;
+		nl_double gGS = 0.0;
+		nl_double gGB = 0.0;
 
-		const nl_double gDG =  gm; // ok
-		const nl_double gDD =  gds + gbd - gdrain; // ok
-		const nl_double gDS = -gds - gsource; // ok
-		const nl_double gDB =  gmb - gbd; // ok
+		nl_double gDG =  gm;
+		nl_double gDD =  gds + gbd - gdrain;
+		const nl_double gDS = -gds - gsource;
+		const nl_double gDB =  gmb - gbd;
 
-		const nl_double gSG = -gm; // ok
-		const nl_double gSD = -gds + gdrain; // ok
-		const nl_double gSS =  gbs + gds + gsource;  // ok
+		nl_double gSG = -gm;
+		const nl_double gSD = -gds + gdrain;
+		nl_double gSS =  gbs + gds + gsource;
 		const nl_double gSB = -gbs - gmb;
 
-		const nl_double gBG =  0.0; // ok
-		const nl_double gBD = -gbd; // ok
+		nl_double gBG =  0.0;
+		const nl_double gBD = -gbd;
 		const nl_double gBS = -gbs;
-		const nl_double gBB =  gbs + gbd; // ok
+		nl_double gBB =  gbs + gbd;
+
+		const nl_double Vgb = Vgs - Vbs;
+
+		if (is_forward)
+			calculate_caps(Vgs, Vgd, Vth, m_Cgs, m_Cgd, m_Cgb);
+		else
+			calculate_caps(Vgd, Vgs, Vth, m_Cgd, m_Cgs, m_Cgb);
+
+		set_cap(m_cap_gb, m_Cgb + m_model.m_CGBO * m_Leff, Vgb, gGG, gGB, gBG, gBB, IG, IB);
+		set_cap(m_cap_gs, m_Cgs + m_model.m_CGSO * m_model.m_W, Vgs, gGG, gGS, gSG, gSS, IG, IS);
+		set_cap(m_cap_gd, m_Cgd + m_model.m_CGDO * m_model.m_W, Vgd, gGG, gGD, gDG, gDD, IG, ID);
 
 		// Source connected to body, Diode S-B shorted!
 		const nl_double gSSBB = gSS + gBB + gBS + gSB;
@@ -398,13 +489,12 @@ namespace analog
 		//                 S          D
 		m_SD.set_mat(     0.0,    gSD + gBD,  0.0,             // S
 					   gDS + gDB,    0.0,     0.0);            // D
-
 	}
-
 
 	NETLIB_UPDATE_PARAM(MOSFET)
 	{
 		set_qtype((m_model.model_type() == "NMOS") ? FET_NMOS : FET_PMOS);
+		m_polarity = qtype() == FET_NMOS ? 1.0 : -1.0;
 
 		/*
 		 * From http://ltwiki.org/LTspiceHelp/LTspiceHelp/M_MOSFET.htm :
@@ -422,16 +512,14 @@ namespace analog
 		// calculate effective channel length
 		m_Leff = m_model.m_L - 2 * m_model.m_LD;
 		nl_assert_always(m_Leff > 0.0, "Effective Lateral diffusion would be negative for model " + m_model.name());
-		if (m_model.m_TOX > 0.0)
-			m_Cox = (constants::eps_SiO2() * constants::eps_0() / m_model.m_TOX);
-		else
-			m_Cox = 0.0;
+
+		nl_double Cox = (m_model.m_TOX > 0.0) ? (constants::eps_SiO2() * constants::eps_0() / m_model.m_TOX) : 0.0;
 
 		// calculate DC transconductance coefficient
 		if (m_model.m_KP > 0)
 			m_beta = m_model.m_KP * m_model.m_W / m_Leff;
-		else if (m_Cox > 0 && m_model.m_UO > 0)
-			m_beta = m_model.m_UO * 1e-4 * m_Cox * m_model.m_W / m_Leff;
+		else if (Cox > 0 && m_model.m_UO > 0)
+			m_beta = m_model.m_UO * 1e-4 * Cox * m_model.m_W / m_Leff;
 		else
 			m_beta = 2e-5 * m_model.m_W / m_Leff;
 
@@ -462,8 +550,8 @@ namespace analog
 			m_gamma = m_model.m_GAMMA;
 		else
 		{
-			if (m_Cox > 0 && m_model.m_NSUB > 0)
-				m_gamma = std::sqrt (2.0 * constants::Q_e() * constants::eps_Si() * constants::eps_0() * m_model.m_NSUB * 1e6) / m_Cox;
+			if (Cox > 0.0 && m_model.m_NSUB > 0)
+				m_gamma = std::sqrt (2.0 * constants::Q_e() * constants::eps_Si() * constants::eps_0() * m_model.m_NSUB * 1e6) / Cox;
 			else
 				m_gamma = 0.0;
 		}
@@ -475,7 +563,9 @@ namespace analog
 		 * specify VTO so skip this here.
 		 */
 
-		m_Cox = m_Cox * m_model.m_W * m_Leff;
+		m_CoxWL = Cox * m_model.m_W * m_Leff;
+
+		//printf("Cox: %g\n", m_Cox);
 
 	}
 

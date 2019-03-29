@@ -1710,7 +1710,7 @@ namespace netlist
 		if (newQ != m_my_net.Q_Analog())
 		{
 			m_my_net.set_Q_Analog(newQ);
-			m_my_net.toggle_and_push_to_queue(NLTIME_FROM_NS(1));
+			m_my_net.toggle_and_push_to_queue(netlist_time::quantum());
 		}
 	}
 

@@ -9,13 +9,15 @@
 #include "netlist/devices/net_lib.h"
 #include "netlist/analog/nld_twoterm.h"
 
-NETLIST_START(bjt)
+NETLIST_START(nmos)
     /* Standard stuff */
 
     CLOCK(clk, 100) // 100 Hz
     SOLVER(Solver, 48000)
-    PARAM(Solver.ACCURACY, 1e-7)
-	PARAM(Solver.NR_LOOPS, 5000)
+    PARAM(Solver.ACCURACY, 1e-9)
+	PARAM(Solver.NR_LOOPS, 50000)
+	PARAM(Solver.DYNAMIC_TS, 1)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-9)
     ANALOG_INPUT(V5, 5)
     ANALOG_INPUT(V3, 3.5)
 
@@ -40,7 +42,7 @@ NETLIST_START(bjt)
     NET_C(RCE.1, M.D)
     NET_C(RCE.2, GND)
 
-	// capacitance over D - S
+	// capacitance over G - S
 
 	CAP(C, CAP_N(1))
 	NET_C(M.D, C.1)

@@ -87,7 +87,7 @@ public:
 
 	void solve_now();
 
-	void solve_later(netlist_time delay = netlist_time::from_nsec(1));
+	void solve_later(netlist_time delay = netlist_time::quantum());
 
 	void set_G_V_I(const nl_double G, const nl_double V, const nl_double I)
 	{
@@ -226,7 +226,7 @@ private:
 
 enum class capacitor_e
 {
-	CHARGE_CONSERVING,
+	VARIABLE_CAPACITY,
 	CONSTANT_CAPACITY
 };
 
@@ -235,19 +235,63 @@ class generic_capacitor
 {
 };
 
-
+#if 1
 template <>
-class generic_capacitor<capacitor_e::CHARGE_CONSERVING>
+class generic_capacitor<capacitor_e::VARIABLE_CAPACITY>
+{
+public:
+	generic_capacitor(device_t &dev, const pstring &name)
+	: m_h(dev, name + ".m_h", 0.0)
+	, m_c(dev, name + ".m_c", 0.0)
+	, m_v(dev, name + ".m_v", 0.0)
+	, m_gmin(0.0)
+	{
+	}
+
+	capacitor_e type() const { return capacitor_e::VARIABLE_CAPACITY; }
+
+	nl_double G(nl_double cap) const
+	{
+		//return m_h * (2.0 * cap - m_c) +  m_gmin;
+		return m_h * 0.5 * (cap + m_c) +  m_gmin;
+	}
+
+	nl_double Ieq(nl_double cap, nl_double v) const
+	{
+		plib::unused_var(v);
+//		return m_h * (cap * v - m_charge) - G(cap) * v;
+		return -m_h * 0.5 * (cap + m_c) * m_v;
+	}
+
+	void timestep(nl_double cap, nl_double v, nl_double step)
+	{
+		m_h = 1.0 / step;
+		m_c = cap;
+		m_v = v;
+	}
+
+	void setparams(nl_double gmin) { m_gmin = gmin; }
+
+private:
+	state_var<double> m_h;
+	state_var<double> m_c;
+	state_var<double> m_v;
+	nl_double m_gmin;
+};
+#else
+template <>
+class generic_capacitor<capacitor_e::VARIABLE_CAPACITY>
 {
 public:
 	generic_capacitor(device_t &dev, const pstring &name)
 	: m_h(dev, name + ".m_h", 0.0)
 	, m_charge(dev, name + ".m_charge", 0.0)
+	, m_v(dev, name + ".m_v", 0.0)
 	, m_gmin(0.0)
 	{
 	}
 
-	constexpr capacitor_e type() const { return capacitor_e::CHARGE_CONSERVING; }
+	constexpr capacitor_e type() const { return capacitor_e::VARIABLE_CAPACITY; }
 
 	constexpr nl_double G(nl_double cap) const
 	{
@@ -256,13 +300,16 @@ public:
 
 	constexpr nl_double Ieq(nl_double cap, nl_double v) const
 	{
-		return m_h * (cap * v - m_charge) - G(cap) * v;
+//		return m_h * (cap * v - m_charge) - G(cap) * v;
+//		return m_h * (cap * (v - m_v)) - G(cap) * v;
+		return -m_h * cap * m_v;
 	}
 
 	void timestep(nl_double cap, nl_double v, nl_double step)
 	{
 		m_h = 1.0 / step;
-		m_charge = cap * v;
+		m_charge = m_charge + cap * (v - m_v);
+		m_v = v;
 	}
 
 	void setparams(nl_double gmin) { m_gmin = gmin; }
@@ -270,9 +317,10 @@ public:
 private:
 	state_var<double> m_h;
 	state_var<double> m_charge;
+	state_var<double> m_v;
 	nl_double m_gmin;
 };
-
+#endif
 template <>
 class generic_capacitor<capacitor_e::CONSTANT_CAPACITY>
 {
@@ -283,9 +331,9 @@ public:
 	{
 	}
 
-	constexpr capacitor_e type() const { return capacitor_e::CONSTANT_CAPACITY; }
-	constexpr nl_double G(nl_double cap) const { return cap * m_h +  m_gmin; }
-	constexpr nl_double Ieq(nl_double cap, nl_double v) const { return - G(cap) * v; }
+	capacitor_e type() const { return capacitor_e::CONSTANT_CAPACITY; }
+	nl_double G(nl_double cap) const { return cap * m_h +  m_gmin; }
+	nl_double Ieq(nl_double cap, nl_double v) const { return - G(cap) * v; }
 
 	void timestep(nl_double cap, nl_double v, nl_double step)
 	{
@@ -324,7 +372,7 @@ public:
 		}
 	}
 
-	NETLIB_IS_DYNAMIC(m_cap.type() == capacitor_e::CHARGE_CONSERVING)
+	NETLIB_IS_DYNAMIC(m_cap.type() == capacitor_e::VARIABLE_CAPACITY)
 	NETLIB_UPDATE_TERMINALSI()
 	{
 		const nl_double I = m_cap.Ieq(m_C(), deltaV());
@@ -344,8 +392,8 @@ protected:
 	NETLIB_UPDATE_PARAMI() { }
 
 private:
-	generic_capacitor<capacitor_e::CHARGE_CONSERVING> m_cap;
-	//generic_capacitor<capacitor_e::CONSTANT_CAPACITY> m_cap;
+	//generic_capacitor<capacitor_e::VARIABLE_CAPACITY> m_cap;
+	generic_capacitor<capacitor_e::CONSTANT_CAPACITY> m_cap;
 };
 
 // -----------------------------------------------------------------------------
@@ -429,7 +477,7 @@ public:
 		else if (TYPE == diode_e::MOS || nVd < m_Vcrit)
 		{
 			m_Vd = nVd;
-			const double IseVDVt = std::exp(std::min(700.0, m_logIs + m_Vd * m_VtInv));
+			const double IseVDVt = std::exp(std::min(300.0, m_logIs + m_Vd * m_VtInv));
 			m_Id = IseVDVt - m_Is;
 			m_G = IseVDVt * m_VtInv + m_gmin;
 		}

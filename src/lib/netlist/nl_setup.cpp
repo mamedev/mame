@@ -737,6 +737,7 @@ void setup_t::resolve_inputs()
 			detail::core_terminal_t *t1 = find_terminal(t1s);
 			detail::core_terminal_t *t2 = find_terminal(t2s);
 
+			//printf("%s %s\n", t1s.c_str(), t2s.c_str());
 			if (connect(*t1, *t2))
 				li = m_links.erase(li);
 			else
