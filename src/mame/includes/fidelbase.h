@@ -73,6 +73,7 @@ protected:
 	void div_trampoline(address_map &map);
 	u16 m_div_status;
 	ioport_value m_div_config;
+	emu_timer *m_div_timer;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

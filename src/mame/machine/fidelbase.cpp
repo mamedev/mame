@@ -56,6 +56,9 @@ void fidelbase_state::machine_start()
 	save_item(NAME(m_speech_bank));
 	save_item(NAME(m_div_status));
 	save_item(NAME(m_div_config));
+
+	// dummy timer for cpu divider
+	m_div_timer = machine().scheduler().timer_alloc(timer_expired_delegate(), this);
 }
 
 void fidelbase_state::machine_reset()
@@ -138,12 +141,13 @@ void fidelbase_state::div_trampoline(address_map &map)
 
 INPUT_CHANGED_MEMBER(fidelbase_state::div_changed)
 {
-	// stop high frequency background timer if cpu divider is disabled
-	subdevice<timer_device>("dummy_timer")->enable(bool(newval));
-
 	m_maincpu->set_clock_scale(1.0);
 	m_div_status = ~0;
 	m_div_config = newval;
+
+	// stop high frequency background timer if cpu divider is disabled
+	attotime period = (newval) ? attotime::from_hz(m_maincpu->clock()) : attotime::never;
+	m_div_timer->adjust(period, 0, period);
 }
 
 INPUT_PORTS_START( fidel_cpu_div_2 )
