@@ -442,7 +442,8 @@ void supduck_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(supduck_state::supduck)
+void supduck_state::supduck(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(8'000'000)); /* Verified on PCB */
 	m_maincpu->set_addrmap(AS_PROGRAM, &supduck_state::main_map);
@@ -477,7 +478,7 @@ MACHINE_CONFIG_START(supduck_state::supduck)
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(8'000'000)/8, okim6295_device::PIN7_HIGH)); // 1MHz - Verified on PCB, pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 	oki.set_addrmap(0, &supduck_state::oki_map);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
