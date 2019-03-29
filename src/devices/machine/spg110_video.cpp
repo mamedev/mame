@@ -81,15 +81,17 @@ void spg110_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_
 
 		if (xx >= 0 && xx < 320)
 		{
-			// TODO, this is completely wrong for this palette system
 			int pix_index = xx + y_index;
-			//uint16_t rawpal = m_palram[pal];
 			const pen_t *pens = m_palette->pens();
 			uint32_t paldata = pens[pal];
 
-			int penword = (pal >> 4) & 0xf;
-			int penbit = (pal & 0xf);
-			int trans = m_palctrlswapped[penword] & (1 << penbit);
+			int transmap = m_palctrlram[(pal & 0xf0)>>4];
+
+			bool trans = false;
+
+			if (transmap & 0x10) // maybe values other than 0x010 have other meanings, like blending?
+				if ((pal & 0x0f) == (transmap & 0xf))
+					trans = true;
 
 			if (!trans)
 			{
@@ -376,12 +378,6 @@ WRITE16_MEMBER(spg110_video_device::spg110_2045_w) { logerror("%s: 2045: %04x\n"
 WRITE16_MEMBER(spg110_video_device::spg110_205x_w)
 {
 	COMBINE_DATA(&m_palctrlram[offset]);
-
-	uint16_t temp = m_palctrlram[offset];
-
-	// 0x0010 to 0x0001  - complete guess that this could be pen transparency
-	// spiderman indicates this is not correct
-	m_palctrlswapped[offset] = bitswap<16>(temp, 11, 10, 9, 8, 15, 14, 13, 12, 3, 2, 1, 0, 7, 6, 5, 4);
 }
 
 
