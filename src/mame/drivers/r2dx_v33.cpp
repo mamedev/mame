@@ -376,7 +376,7 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_paldma_w)
 	{
 		uint16_t palval = space.read_word(src);
 		src += 2;
-		m_palette->write16(space, i, palval, 0xffff);
+		m_palette->write16(i, palval);
 	}
 }
 

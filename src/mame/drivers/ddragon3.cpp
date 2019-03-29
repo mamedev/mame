@@ -255,7 +255,7 @@ READ16_MEMBER(wwfwfest_state::wwfwfest_paletteram_r)
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_paletteram_w)
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
-	m_palette->write16(space, offset, data, mem_mask);
+	m_palette->write16(offset, data, mem_mask);
 }
 
 /*- Priority Control -*/

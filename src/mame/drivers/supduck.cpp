@@ -467,8 +467,7 @@ MACHINE_CONFIG_START(supduck_state::supduck)
 
 	TIGEROAD_SPRITE(config, m_spritegen, 0);
 
-	MCFG_PALETTE_ADD("palette", 0x800/2)
-	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit4)
+	PALETTE(config, m_palette).set_format(palette_device::xRGBRRRRGGGGBBBB_bit4, 0x800/2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
