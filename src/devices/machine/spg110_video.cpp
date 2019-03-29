@@ -143,16 +143,16 @@ void spg110_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 
 		extra_attribute = space2.read_word((palette_map*2) + tile_address);
 		if (x0 & 1)
-			extra_attribute = (extra_attribute & 0xff00) >> 8;
-		else
 			extra_attribute = (extra_attribute & 0x00ff);
+		else
+			extra_attribute = (extra_attribute & 0xff00) >> 8;
 
 		uint8_t pal = extra_attribute & 0x0f;
-		uint8_t pri = (extra_attribute & 0x30)>>4;
+		uint8_t pri = (extra_attribute & 0x30) >> 4;
+		bool flip_x = extra_attribute & 0x40;
 
 		if (pri == priority)
 		{
-			bool flip_x = 0;//(tileattr & TILE_X_FLIP);
 
 			if (flip_x)
 				draw<FlipXOn>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, pal, tile_h, tile_w, bpp);
@@ -428,7 +428,7 @@ WRITE16_MEMBER(spg110_video_device::dma_len_trigger_w)
 	m_dma_src = 0;
 
 	// HACK: it really seems this interrupt status is related to the DMA, but jak_capb doesn't ack it, so must also be a way to disable it?
-	if (!strcmp(machine().system().name, "jak_spdmo"))
+	if (m_is_spiderman)
 	{
 		const int i = 0x0002;
 
@@ -527,6 +527,11 @@ void spg110_video_device::device_start()
 	save_item(NAME(m_2036_scroll));
 
 	m_video_irq_cb.resolve();
+
+	if (!strcmp(machine().system().name, "jak_spdmo"))
+		m_is_spiderman = true;
+	else
+		m_is_spiderman = false;
 }
 
 void spg110_video_device::device_reset()

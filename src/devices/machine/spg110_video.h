@@ -161,6 +161,7 @@ private:
 	void draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority);
 
 	uint32_t m_screenbuf[320 * 240];
+	bool m_is_spiderman;
 
 	devcb_write_line m_video_irq_cb;
 };
