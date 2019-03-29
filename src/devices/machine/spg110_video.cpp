@@ -326,7 +326,9 @@ device_memory_interface::space_config_vector spg110_video_device::memory_space_c
 READ16_MEMBER(spg110_video_device::spg110_2063_r)
 {
 	// checks for bits 0x20 and 0x08 in the IRQ function (all IRQs point to the same place)
-	return m_video_irq_status;
+
+	// HACK! jak_spdo checks for 0x400 or 0x200 starting some of the games
+	return m_video_irq_status | 0x600;
 }
 
 WRITE16_MEMBER(spg110_video_device::spg110_2063_w)
@@ -424,6 +426,18 @@ WRITE16_MEMBER(spg110_video_device::dma_len_trigger_w)
 	m_dma_src_step = 0;
 	m_dma_dst = 0;
 	m_dma_src = 0;
+
+	// HACK: it really seems this interrupt status is related to the DMA, but jak_capb doesn't ack it, so must also be a way to disable it?
+	if (!strcmp(machine().system().name, "jak_spdmo"))
+	{
+		const int i = 0x0002;
+
+		if (m_video_irq_enable & 1)
+		{
+			m_video_irq_status |= i;
+			check_video_irq();
+		}
+	}
 }
 
 READ16_MEMBER(spg110_video_device::dma_len_status_r)
@@ -608,15 +622,10 @@ uint32_t spg110_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 WRITE_LINE_MEMBER(spg110_video_device::vblank)
 {
-// hacks to make spiderman do something
-//	static int i = 0x008;
 	const int i = 0x0008;
 
 	if (!state)
 	{
-// hacks to make spiderman do something
-//		i ^= 0x000a;
-
 		m_video_irq_status &= ~i;
 		check_video_irq();
 		return;

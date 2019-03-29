@@ -9,6 +9,7 @@
 #include "cpu/unsp/unsp.h"
 #include "emupal.h"
 #include "screen.h"
+//#include "machine/timer.h"
 
 
 class spg110_video_device : public device_t, public device_memory_interface
