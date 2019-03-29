@@ -4135,4 +4135,92 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="starblzr">
+		<description>Star Blazer</description>
+		<year>1982</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2019-03-25"/>
+		<sharedfeat name="compatibility" value="A2,A2P" />
+		<!-- It requires a 48K Apple II or ][+.
+		Due to compatibility issues created by the copy protection,
+		it will not run on later models. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="354545">
+				<rom name="star blazer.woz" size="354545" crc="7895bdd6" sha1="848f6cdfa94f5942775e4cf133d589552fe22a86" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rboots40">
+		<description>Rocky's Boots (version 4.0)</description>
+		<year>1985</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2019-03-27"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234747">
+				<rom name="rocky's boots v4.0.woz" size="234747" crc="638f1d4f" sha1="67dc599a7b8f0b84cdfdcd7c29f910dbea5f9f0c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flocklnd">
+		<description>The Flockland Island Crisis</description>
+		<year>1982</year>
+		<publisher>Vital Information</publisher>
+		<info name="release" value="2019-03-27"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later.-->
+		<!--"The Flockland Island Crisis" is a 1982 action game developed by Kevin Bagley, Roland Love, and Garald Van Viver, and published by Vital Information. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234816">
+				<rom name="the flockland island crisis.woz" size="234816" crc="d646ca55" sha1="075fffe06051adaa1487f49e51d74704624be01a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prntshpc">
+		<description>The Print Shop Color</description>
+		<year>1986</year>
+		<publisher>Broderbund software</publisher>
+		<info name="release" value="2019-03-29"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234757">
+				<rom name="the print shop color side a.woz" size="234757" crc="3ca8da35" sha1="300e6725237ab5e24b93570d834cb6c416e17056" offset="0x0000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234757">
+				<rom name="the print shop color side b.woz" size="234757" crc="22f1470b" sha1="a05e1a69a7bb9282b547ff91e45aa07fcb980467" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starwrrr">
+		<description>Star Warrior</description>
+		<year>1980</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2019-03-29"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 13-sector drive but otherwise
+		runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234793">
+				<rom name="star warrior.woz" size="234793" crc="2f8c4fa6" sha1="0cea6128cc971cc5606a80a7594fcc4749a177ed" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
