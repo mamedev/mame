@@ -118,22 +118,29 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 			}
 			else
 			{
-				if ((m_lfo_control & 3) && (~m_lfo_control & 0x80) && (ch < 2))
+				if ((m_lfo_control & 3) && (ch < 2))
 				{
 					if (ch == 0) // CH 0 only, CH 1 is muted
 					{
 						/* Waveform mode with LFO */
-						uint32_t step = m_channel[0].m_frequency;
+						int32_t step = m_channel[0].m_frequency;
 						uint16_t lfo_step = m_channel[1].m_frequency;
 						for (int i = 0; i < samples; i += 1)
 						{
 							int offset, lfooffset;
 							int16_t data, lfo_data;
-							lfooffset = (m_channel[1].m_counter >> 12) & 0x1F;
-							m_channel[1].m_counter += m_wave_freq_tab[(lfo_step * m_lfo_frequency) & 0xfff]; // TODO : multiply? verify this from real hardware.
-							m_channel[1].m_counter &= 0x1FFFF;
-							lfo_data = m_channel[1].m_waveform[lfooffset];
-							step += ((lfo_data - 16) << (((m_lfo_control & 3)-1)<<1)); // verified from patent, TODO : same in real hardware?
+							if (m_lfo_control & 0x80) // reset LFO
+							{
+								m_channel[1].m_counter = 0;
+							}
+							else
+							{
+								lfooffset = (m_channel[1].m_counter >> 12) & 0x1F;
+								m_channel[1].m_counter += m_wave_freq_tab[(lfo_step * m_lfo_frequency) & 0xfff]; // TODO : multiply? verify this from real hardware.
+								m_channel[1].m_counter &= 0x1FFFF;
+								lfo_data = m_channel[1].m_waveform[lfooffset];
+								step += ((lfo_data - 16) << (((m_lfo_control & 3)-1)<<1)); // verified from patent, TODO : same in real hardware?
+							}
 							offset = (m_channel[0].m_counter >> 12) & 0x1F;
 							m_channel[0].m_counter += m_wave_freq_tab[step & 0xfff];
 							m_channel[0].m_counter &= 0x1FFFF;
