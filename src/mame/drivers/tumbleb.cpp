@@ -304,6 +304,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
 #include "cpu/mcs51/mcs51.h" // for semicom mcu
+#include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/decocrpt.h"
 #include "sound/ym2151.h"
 #include "sound/3812intf.h"
@@ -667,7 +668,7 @@ void tumbleb_state::tumblepopba_main_map(address_map &map)
 	map(0x322000, 0x322fff).w(FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
 }
 
-void tumbleb_state::funkyjetb_map(address_map &map)
+void tumbleb_pic_state::funkyjetb_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x120000, 0x1207ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -676,11 +677,17 @@ void tumbleb_state::funkyjetb_map(address_map &map)
 	map(0x1d0382, 0x1d0383).portr("DSW");
 	map(0x242102, 0x242103).portr("SYSTEM");
 	map(0x200000, 0x2007ff).ram(); // writes 0x180
-	map(0x300000, 0x30000f).w(FUNC(tumbleb_state::tumblepb_control_0_w));
-	map(0x320000, 0x320fff).w(FUNC(tumbleb_state::tumblepb_pf1_data_w)).share("pf1_data");
-	map(0x322000, 0x322fff).w(FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
-	//map(0x340000, 0x340bff).ram().share("pf1_rowscroll");
+	map(0x300000, 0x30000f).w(FUNC(tumbleb_pic_state::tumblepb_control_0_w));
+	map(0x320000, 0x320fff).ram().w(FUNC(tumbleb_pic_state::tumblepb_pf1_data_w)).share("pf1_data");
+	map(0x322000, 0x322fff).ram().w(FUNC(tumbleb_pic_state::tumblepb_pf2_data_w)).share("pf2_data");
+	map(0x340000, 0x340bff).ram().share("pf1_rowscroll");
 	//map(0x342000, 0x342bff).ram().share("pf2_rowscroll");
+}
+
+void tumbleb_pic_state::funkyjetb_oki_map(address_map &map)
+{
+	map(0x00000, 0x37fff).rom().region("oki", 0);
+	map(0x38000, 0x3ffff).bankr("okibank");
 }
 
 void tumbleb_state::unico_base_map(address_map &map)
@@ -783,6 +790,50 @@ void tumbleb_state::pangpang_main_map(address_map &map)
 	map(0x340000, 0x341fff).ram().w(FUNC(tumbleb_state::pangpang_pf2_data_w)).share("pf2_data");
 }
 
+
+/******************************************************************************/
+
+void tumbleb_pic_state::oki_bank_w(uint8_t data)
+{
+	m_okibank->set_entry(data & 0x0f);
+}
+
+uint8_t tumbleb_pic_state::pic_data_r()
+{
+	return m_pic_data;
+}
+
+void tumbleb_pic_state::pic_data_w(uint8_t data)
+{
+	m_pic_data = data;
+}
+
+void tumbleb_pic_state::pic_ctrl_w(uint8_t data)
+{
+	if (!BIT(data, 2))
+	{
+		if (!BIT(data, 0))
+			m_pic_data = m_oki->read();
+		else if (!BIT(data, 1))
+		{
+			logerror("OKI write: %02X\n", m_pic_data);
+			m_oki->write(m_pic_data);
+		}
+	}
+
+	if (!BIT(data, 4))
+		m_pic_data = m_soundlatch->read(machine().dummy_space(), 0);
+	if (!BIT(data, 5))
+		m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
+}
+
+void tumbleb_pic_state::driver_start()
+{
+	m_pic_data = 0xff;
+	save_item(NAME(m_pic_data));
+
+	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x8000);
+}
 
 /******************************************************************************/
 
@@ -2141,12 +2192,24 @@ void tumbleb_state::tumbleb2(machine_config &config)
 	OKIM6295(config, m_oki, 8000000/10, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.70);
 }
 
-void tumbleb_state::funkyjetb(machine_config &config)
+void tumbleb_pic_state::funkyjetb(machine_config &config)
 {
 	tumbleb2(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::funkyjetb_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::irq6_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_pic_state::funkyjetb_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_pic_state::irq6_line_hold));
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->set_separate_acknowledge(true);
+
+	pic16c57_device &pic(PIC16C57(config, "pic", 4'000'000)); // unknown clock
+	pic.write_a().set(FUNC(tumbleb_pic_state::oki_bank_w));
+	pic.read_b().set(FUNC(tumbleb_pic_state::pic_data_r));
+	pic.write_b().set(FUNC(tumbleb_pic_state::pic_data_w));
+	pic.read_c().set(m_soundlatch, FUNC(generic_latch_8_device::pending_r)).bit(6);
+	pic.write_c().set(FUNC(tumbleb_pic_state::pic_ctrl_w));
+
+	m_oki->set_addrmap(0, &tumbleb_pic_state::funkyjetb_oki_map);
 }
 
 void tumbleb_state::jumpkids(machine_config &config)
@@ -3756,7 +3819,7 @@ GAME( 1991, tumbleb,  tumblep, tumblepb,    tumblepb, tumbleb_state, init_tumble
 GAME( 1991, tumbleb2, tumblep, tumbleb2,    tumblepb, tumbleb_state, init_tumbleb2, ROT0, "bootleg", "Tumble Pop (bootleg with PIC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE  ) // PIC is protected, sound simulation not 100%
 GAME( 1991, tumblepba,tumblep, tumblepba,   tumblepb, tumbleb_state, init_tumblepba,ROT0, "bootleg (Playmark)", "Tumble Pop (Playmark bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING  ) // Playmark stickers on ROMs, offset pf1_alt tilemap, OKI not hooked up
 
-GAME( 1992, funkyjetb,funkyjet,funkyjetb,   tumblepb, tumbleb_state, init_tumblepb, ROT0, "bootleg", "Funky Jet (bootleg)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong palette, inputs not working, undumped PIC driving an OKI
+GAME( 1992, funkyjetb,funkyjet,funkyjetb,   tumblepb, tumbleb_pic_state, init_tumblepb, ROT0, "bootleg", "Funky Jet (bootleg)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong palette, inputs not working, undumped PIC driving an OKI
 
 GAME( 1993, jumpkids, 0,       jumpkids,    tumblepb, tumbleb_state, init_jumpkids, ROT0, "Comad",    "Jump Kids", MACHINE_SUPPORTS_SAVE )
 
