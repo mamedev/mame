@@ -561,21 +561,32 @@ double spg110_video_device::hue2rgb(double p, double q, double t)
 	return p;
 }
 
+
 // wrong format!
 WRITE16_MEMBER(spg110_video_device::palette_w)
 {
+	// probably not
+	const double h_add = 0.65f;
+	const double h_divide = 43.2f;
+
 	COMBINE_DATA(&m_palram[offset]);
 
 	uint16_t dat = m_palram[offset];
 
 	// llll lsss sshh hhhh
-	int l_raw =  (dat & 0xf800) >> 11;
-	int sl_raw = (dat & 0x07c0) >> 6;
+	int l_raw =  (dat & 0xfe00) >> 10;
+	int sl_raw = (dat & 0x03c0) >> 6;
 	int h_raw =  (dat & 0x003f) >> 0;
 
-	double l = (double)l_raw / 31.0f;
-	double s = (double)sl_raw / 31.0f;
-	double h = (double)h_raw / 47.0f;
+	double l = (double)l_raw / 63.0f;
+	double s = (double)sl_raw / 15.0f;
+	double h = (double)h_raw / h_divide;
+
+	// probably not
+	h += h_add;
+
+	if (h>1.0f)
+		h-= 1.0f;
 
 	double r, g, b;
 
