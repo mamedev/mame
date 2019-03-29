@@ -24,7 +24,7 @@ WRITE16_MEMBER(goal92_state::goal92_sound_command_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		m_soundlatch->write(space, 0, (data >> 8) & 0xff);
+		m_soundlatch->write((data >> 8) & 0xff);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }

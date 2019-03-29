@@ -108,7 +108,7 @@ WRITE8_MEMBER(bionicc_state::mcu_shared_w)
 
 WRITE8_MEMBER(bionicc_state::out1_w)
 {
-	m_soundlatch->write(space,0,data);
+	m_soundlatch->write(data);
 }
 
 WRITE8_MEMBER(bionicc_state::out3_w)

@@ -250,8 +250,8 @@ WRITE8_MEMBER(calorie_state::calorie_flipscreen_w)
 
 READ8_MEMBER(calorie_state::calorie_soundlatch_r)
 {
-	uint8_t latch = m_soundlatch->read(space, 0);
-	m_soundlatch->clear_w(space, 0, 0);
+	uint8_t latch = m_soundlatch->read();
+	m_soundlatch->clear_w();
 	return latch;
 }
 

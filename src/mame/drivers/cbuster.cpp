@@ -64,7 +64,7 @@ WRITE16_MEMBER(cbuster_state::twocrude_control_w)
 		return;
 
 	case 2: /* Sound CPU write */
-		m_soundlatch->write(space, 0, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 		return;
 
 	case 4: /* Protection, maybe this is a PAL on the board?

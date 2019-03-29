@@ -198,7 +198,7 @@ WRITE8_MEMBER(capbowl_state::track_reset_w)
 WRITE8_MEMBER(capbowl_state::sndcmd_w)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 }
 
 

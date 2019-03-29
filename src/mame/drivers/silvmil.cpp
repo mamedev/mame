@@ -80,7 +80,7 @@ private:
 
 	void fg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void bg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	DECLARE_WRITE8_MEMBER(soundcmd_w);
+	void soundcmd_w(u8 data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -183,9 +183,9 @@ u32 silvmil_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 }
 
 
-WRITE8_MEMBER(silvmil_state::soundcmd_w)
+void silvmil_state::soundcmd_w(u8 data)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 }
 

@@ -592,7 +592,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_sound_w)
 				break;
 
 			case SOUND_YAWDIM:
-				m_soundlatch->write(space, 0, data);
+				m_soundlatch->write(data);
 				m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 				break;
 		}

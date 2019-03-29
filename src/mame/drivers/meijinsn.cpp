@@ -118,7 +118,7 @@ private:
 WRITE16_MEMBER(meijinsn_state::sound_w)
 {
 	if (ACCESSING_BITS_0_7)
-		m_soundlatch->write(space, 0, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 }
 
 READ16_MEMBER(meijinsn_state::alpha_mcu_r)

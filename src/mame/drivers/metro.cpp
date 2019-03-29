@@ -292,10 +292,9 @@ WRITE_LINE_MEMBER(metro_state::puzzlet_vblank_irq)
 
 READ_LINE_MEMBER(metro_state::rxd_r)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint8_t data = m_soundlatch->read(space, 0);
+	uint8_t data = m_soundlatch->read();
 
-	m_soundlatch->write(space, 0, data >> 1);
+	m_soundlatch->write(data >> 1);
 
 	return data & 1;
 
@@ -303,7 +302,7 @@ READ_LINE_MEMBER(metro_state::rxd_r)
 
 WRITE8_MEMBER(metro_state::soundlatch_w)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // seen rxd_r
 	m_maincpu->spin_until_interrupt();
 	m_busy_sndcpu = 1;

@@ -220,7 +220,7 @@ WRITE16_MEMBER(supduck_state::supduck_4002_w)
 {
 	data &= mem_mask;
 
-	m_soundlatch->write(space, 0, (data>>8));
+	m_soundlatch->write((data>>8));
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 
 }

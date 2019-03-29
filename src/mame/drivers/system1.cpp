@@ -529,7 +529,7 @@ READ8_MEMBER(system1_state::sound_data_r)
 	{
 		m_ppi8255->pc6_w(0);
 		m_ppi8255->pc6_w(1);
-		return m_soundlatch->read(space, offset);
+		return m_soundlatch->read();
 	}
 
 	/* if we have a Z80 PIO, get the data from the port and toggle the strobe */
@@ -548,7 +548,7 @@ READ8_MEMBER(system1_state::sound_data_r)
 WRITE8_MEMBER(system1_state::soundport_w)
 {
 	/* boost interleave when communicating with the sound CPU */
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 

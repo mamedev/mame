@@ -85,9 +85,9 @@ ToDo:
 
 ***************************************************************************/
 
-WRITE8_MEMBER(esd16_state::sound_command_w)
+void esd16_state::sound_command_w(u8 data)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_maincpu->spin_until_time(attotime::from_usec(50));  // Allow the other CPU to reply
 }
 

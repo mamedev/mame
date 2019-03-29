@@ -966,7 +966,7 @@ void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t 
 WRITE16_MEMBER( segas16b_state::sound_w16 )
 {
 	if (m_soundlatch != nullptr)
-		m_soundlatch->write(space, 0, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 	if (m_soundcpu != nullptr)
 		m_soundcpu->set_input_line(0, HOLD_LINE);
 }

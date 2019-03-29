@@ -1579,11 +1579,11 @@ WRITE16_MEMBER(seta_state::sub_ctrl_w)
 			break;
 
 		case 4/2:   // not sure
-			if (ACCESSING_BITS_0_7) if(m_soundlatch[0] != nullptr) m_soundlatch[0]->write(space, 0, data & 0xff);
+			if (ACCESSING_BITS_0_7) if(m_soundlatch[0] != nullptr) m_soundlatch[0]->write(data & 0xff);
 			break;
 
 		case 6/2:   // not sure
-			if (ACCESSING_BITS_0_7) if(m_soundlatch[1] != nullptr) m_soundlatch[1]->write(space, 0, data & 0xff);
+			if (ACCESSING_BITS_0_7) if(m_soundlatch[1] != nullptr) m_soundlatch[1]->write(data & 0xff);
 			break;
 	}
 
@@ -3062,7 +3062,7 @@ void seta_state::umanclub_map(address_map &map)
 WRITE8_MEMBER(seta_state::utoukond_sound_control_w)
 {
 	if (!BIT(data, 6))
-		m_soundlatch[0]->acknowledge_w(space, 0, 0);
+		m_soundlatch[0]->acknowledge_w();
 
 	// other bits used for banking? (low nibble seems to always be 2)
 }
@@ -3558,7 +3558,7 @@ WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 
 	// Bit 3: NMICLR
 	if (!BIT(data, 3))
-		m_soundlatch[0]->acknowledge_w(space, 0, 0);
+		m_soundlatch[0]->acknowledge_w();
 
 	// Bit 2: IRQCLR
 	if (!BIT(data, 2))
@@ -3570,7 +3570,7 @@ WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 
 WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
 {
-	m_soundlatch[1]->write(space,0,data);
+	m_soundlatch[1]->write(data);
 	m_subcpu->spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 }
 

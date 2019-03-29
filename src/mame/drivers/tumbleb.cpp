@@ -757,7 +757,7 @@ void tumbleb_state::htchctch_main_map(address_map &map)
 
 WRITE16_MEMBER(tumbleb_state::jumpkids_sound_w)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -822,9 +822,9 @@ void tumbleb_pic_state::pic_ctrl_w(uint8_t data)
 	}
 
 	if (!BIT(data, 4))
-		m_pic_data = m_soundlatch->read(machine().dummy_space(), 0);
+		m_pic_data = m_soundlatch->read();
 	if (!BIT(data, 5))
-		m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
+		m_soundlatch->acknowledge_w();
 }
 
 void tumbleb_pic_state::driver_start()
@@ -841,7 +841,7 @@ WRITE16_MEMBER(tumbleb_state::semicom_soundcmd_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_soundlatch->write(space, 0, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 		// needed for Super Trio which reads the sound with polling
 		// m_maincpu->spin_until_time(attotime::from_usec(100));
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));

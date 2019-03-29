@@ -115,7 +115,7 @@ private:
 
 WRITE8_MEMBER(dmndrby_state::dderby_sound_w)
 {
-	m_soundlatch->write(space,0,data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
