@@ -34,6 +34,31 @@
 		<rect><color red="0.7" green="0.72" blue="0.75" /></rect>
 		<text string="SKILL"><color red="0.02" green="0.02" blue="0.02" /></text>
 	</element>
+	<element name="text_s1">
+		<rect><color red="0.7" green="0.72" blue="0.75" /></rect>
+		<text string="1"><color red="0.02" green="0.02" blue="0.02" /></text>
+	</element>
+	<element name="text_s2">
+		<rect><color red="0.7" green="0.72" blue="0.75" /></rect>
+		<text string="2"><color red="0.02" green="0.02" blue="0.02" /></text>
+	</element>
+	<element name="text_s3">
+		<rect><color red="0.7" green="0.72" blue="0.75" /></rect>
+		<text string="3"><color red="0.02" green="0.02" blue="0.02" /></text>
+	</element>
+
+	<element name="switch1" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
+		<disk state="0x06"><color red="0.45" green="0.45" blue="0.45" /></disk>
+	</element>
+	<element name="switch2" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
+		<disk state="0x05"><color red="0.45" green="0.45" blue="0.45" /></disk>
+	</element>
+	<element name="switch3" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
+		<disk state="0x03"><color red="0.45" green="0.45" blue="0.45" /></disk>
+	</element>
 
 	<element name="hl" defstate="0">
 		<text string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
@@ -53,14 +78,14 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="1.41" right="10.89" top="5" bottom="19.3" />
+		<bounds left="1.41" right="10.89" top="5" bottom="20" />
 
 		<bezel name="digit0" element="digit"><bounds x="5.15" y="5.6" width="1" height="1.5" /></bezel>
 		<bezel name="digit1" element="digit"><bounds x="6.15" y="5.6" width="1" height="1.5" /></bezel>
 
 	<!-- bezel (also allow clicking it) -->
 
-		<bezel element="static_gray"><bounds x="1.4" y="7.7" width="9.5" height="12" /></bezel>
+		<bezel element="static_gray"><bounds x="1.4" y="7.7" width="9.5" height="12.4" /></bezel>
 		<bezel element="static_black"><bounds x="1.7" y="9.7" width="8.9" height="8.9" /></bezel>
 
 		<bezel element="static_blue"><bounds x="2" y="10" width="4" height="4" /></bezel>
@@ -75,37 +100,45 @@
 
 	<!-- smooth edges -->
 
-		<bezel element="static_gray"><bounds x="1.5" y="9.5" width="1.3" height="1.3" /></bezel>
-		<bezel element="disk_black"><bounds x="1.7" y="9.7" width="2" height="2" /></bezel>
-		<bezel element="disk_blue"><bounds x="2" y="10" width="2" height="2" /></bezel>
-		<bezel element="disk_blue"><bounds x="2.15" y="10" width="2" height="2" /></bezel>
-		<bezel element="disk_blue"><bounds x="2.3" y="10" width="2" height="2" /></bezel>
-		<bezel element="disk_blue"><bounds x="2" y="10.15" width="2" height="2" /></bezel>
-		<bezel element="disk_blue"><bounds x="2" y="10.3" width="2" height="2" /></bezel>
+		<bezel element="static_gray"><bounds x="1.5" y="9.3" width="1.55" height="1.55" /></bezel>
+		<bezel element="disk_black"><bounds x="1.7" y="9.7" width="2.6" height="2.6" /></bezel>
+		<repeat count="10">
+			<param name="x" start="2.0" increment="0.1" />
+			<param name="y" start="10.0" increment="0.1" />
+			<bezel element="disk_blue"><bounds x="2.0" y="~y~" width="2" height="2" /></bezel>
+			<bezel element="disk_blue"><bounds x="~x~" y="10.0" width="2" height="2" /></bezel>
+			<bezel element="disk_blue"><bounds x="~x~" y="~y~" width="2" height="2" /></bezel>
+		</repeat>
 
-		<bezel element="static_gray"><bounds x="9.5" y="9.5" width="1.3" height="1.3" /></bezel>
-		<bezel element="disk_black"><bounds x="8.6" y="9.7" width="2" height="2" /></bezel>
-		<bezel element="disk_yellow"><bounds x="8.3" y="10" width="2" height="2" /></bezel>
-		<bezel element="disk_yellow"><bounds x="8.15" y="10" width="2" height="2" /></bezel>
-		<bezel element="disk_yellow"><bounds x="8.0" y="10" width="2" height="2" /></bezel>
-		<bezel element="disk_yellow"><bounds x="8.3" y="10.15" width="2" height="2" /></bezel>
-		<bezel element="disk_yellow"><bounds x="8.3" y="10.3" width="2" height="2" /></bezel>
+		<bezel element="static_gray"><bounds x="9.25" y="9.3" width="1.55" height="1.55" /></bezel>
+		<bezel element="disk_black"><bounds x="8.0" y="9.7" width="2.6" height="2.6" /></bezel>
+		<repeat count="10">
+			<param name="x" start="8.31" increment="-0.1" />
+			<param name="y" start="10.0" increment="0.1" />
+			<bezel element="disk_yellow"><bounds x="8.31" y="~y~" width="2" height="2" /></bezel>
+			<bezel element="disk_yellow"><bounds x="~x~" y="10.0" width="2" height="2" /></bezel>
+			<bezel element="disk_yellow"><bounds x="~x~" y="~y~" width="2" height="2" /></bezel>
+		</repeat>
 
-		<bezel element="static_gray"><bounds x="1.5" y="17.5" width="1.3" height="1.3" /></bezel>
-		<bezel element="disk_black"><bounds x="1.7" y="16.6" width="2" height="2" /></bezel>
-		<bezel element="disk_red"><bounds x="2" y="16.3" width="2" height="2" /></bezel>
-		<bezel element="disk_red"><bounds x="2.15" y="16.3" width="2" height="2" /></bezel>
-		<bezel element="disk_red"><bounds x="2.3" y="16.3" width="2" height="2" /></bezel>
-		<bezel element="disk_red"><bounds x="2" y="16.15" width="2" height="2" /></bezel>
-		<bezel element="disk_red"><bounds x="2" y="16.0" width="2" height="2" /></bezel>
+		<bezel element="static_gray"><bounds x="1.5" y="17.25" width="1.55" height="1.55" /></bezel>
+		<bezel element="disk_black"><bounds x="1.7" y="16.0" width="2.6" height="2.6" /></bezel>
+		<repeat count="10">
+			<param name="x" start="2.0" increment="0.1" />
+			<param name="y" start="16.31" increment="-0.1" />
+			<bezel element="disk_red"><bounds x="2.0" y="~y~" width="2" height="2" /></bezel>
+			<bezel element="disk_red"><bounds x="~x~" y="16.31" width="2" height="2" /></bezel>
+			<bezel element="disk_red"><bounds x="~x~" y="~y~" width="2" height="2" /></bezel>
+		</repeat>
 
-		<bezel element="static_gray"><bounds x="9.5" y="17.5" width="1.3" height="1.3" /></bezel>
-		<bezel element="disk_black"><bounds x="8.6" y="16.6" width="2" height="2" /></bezel>
-		<bezel element="disk_green"><bounds x="8.3" y="16.3" width="2" height="2" /></bezel>
-		<bezel element="disk_green"><bounds x="8.15" y="16.3" width="2" height="2" /></bezel>
-		<bezel element="disk_green"><bounds x="8.0" y="16.3" width="2" height="2" /></bezel>
-		<bezel element="disk_green"><bounds x="8.3" y="16.15" width="2" height="2" /></bezel>
-		<bezel element="disk_green"><bounds x="8.3" y="16.0" width="2" height="2" /></bezel>
+		<bezel element="static_gray"><bounds x="9.25" y="17.25" width="1.55" height="1.55" /></bezel>
+		<bezel element="disk_black"><bounds x="8.0" y="16.0" width="2.6" height="2.6" /></bezel>
+		<repeat count="10">
+			<param name="x" start="8.31" increment="-0.1" />
+			<param name="y" start="16.31" increment="-0.1" />
+			<bezel element="disk_green"><bounds x="8.31" y="~y~" width="2" height="2" /></bezel>
+			<bezel element="disk_green"><bounds x="~x~" y="16.31" width="2" height="2" /></bezel>
+			<bezel element="disk_green"><bounds x="~x~" y="~y~" width="2" height="2" /></bezel>
+		</repeat>
 
 	<!-- middle buttons, leds -->
 
@@ -150,6 +183,22 @@
 		<bezel element="hl" inputtag="IN.0" inputmask="0x02"><bounds x="4.2" y="8.4" width="1.5" height="1" /><color alpha="0.25" /></bezel>
 		<bezel element="hl" inputtag="IN.0" inputmask="0x04"><bounds x="6.6" y="8.4" width="1.5" height="1" /><color alpha="0.25" /></bezel>
 		<bezel element="hl" inputtag="IN.0" inputmask="0x08"><bounds x="9.0" y="8.4" width="1.5" height="1" /><color alpha="0.25" /></bezel>
+
+	<!-- bottom switch -->
+
+		<bezel element="text_s1"><bounds x="7.55" y="19.45" width="0.6" height="0.5" /></bezel>
+		<bezel element="text_s2"><bounds x="8.00" y="19.45" width="0.6" height="0.5" /></bezel>
+		<bezel element="text_s3"><bounds x="8.45" y="19.45" width="0.6" height="0.5" /></bezel>
+		<bezel element="disk_black"><bounds x="8.00" y="19.67" width="0.1" height="0.1" /></bezel>
+		<bezel element="disk_black"><bounds x="8.45" y="19.67" width="0.1" height="0.1" /></bezel>
+
+		<bezel element="disk_black"><bounds x="7.6" y="18.9" width="0.5" height="0.5" /></bezel>
+		<bezel element="disk_black"><bounds x="8.5" y="18.9" width="0.5" height="0.5" /></bezel>
+		<bezel element="static_black"><bounds x="7.8" y="18.9" width="1.0" height="0.5" /></bezel>
+
+		<bezel element="switch1" inputtag="IN.2" inputmask="0x07" inputraw="1"><bounds x="7.55" y="18.85" width="0.6" height="0.6" /></bezel>
+		<bezel element="switch2" inputtag="IN.2" inputmask="0x07" inputraw="1"><bounds x="8.00" y="18.85" width="0.6" height="0.6" /></bezel>
+		<bezel element="switch3" inputtag="IN.2" inputmask="0x07" inputraw="1"><bounds x="8.45" y="18.85" width="0.6" height="0.6" /></bezel>
 
 	</view>
 </mamelayout>

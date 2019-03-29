@@ -6,17 +6,19 @@
 #pragma once
 
 #include "emupal.h"
+#include "machine/i2cmem.h"
 
 class funworld_state : public driver_device
 {
 public:
 	funworld_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
+		m_i2cmem(*this, "i2cmem"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -33,8 +35,6 @@ public:
 	void fw_brick_2(machine_config &config);
 
 	void init_saloon();
-	void init_royalcdc();
-	void init_multiwin();
 	void init_mongolnw();
 	void init_soccernw();
 	void init_tabblue();
@@ -55,6 +55,7 @@ protected:
 
 	void magicrd2_map(address_map &map);
 
+	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	tilemap_t *m_bg_tilemap = nullptr;
 
@@ -68,15 +69,15 @@ private:
 	void cuoreuno_map(address_map &map);
 	void funquiz_map(address_map &map);
 	void funworld_map(address_map &map);
-	void fw_a7_11_map(address_map &map);
+	void fw_brick_map(address_map &map);
 	void intergames_map(address_map &map);
 	void saloon_map(address_map &map);
 	void witchryl_map(address_map &map);
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	required_device<i2cmem_device> m_i2cmem;
 	output_finder<8> m_lamps;
 };
 

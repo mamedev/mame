@@ -413,13 +413,13 @@ uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-MACHINE_CONFIG_START(speglsht_state::speglsht)
+void speglsht_state::speglsht(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",ST0016_CPU, 8000000) /* 8 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(st0016_mem)
-	MCFG_DEVICE_IO_MAP(st0016_io)
-
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speglsht_state,  irq0_line_hold)
+	ST0016_CPU(config, m_maincpu, 8000000); /* 8 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &speglsht_state::st0016_mem);
+	m_maincpu->set_addrmap(AS_IO, &speglsht_state::st0016_io);
+	m_maincpu->set_vblank_int("screen", FUNC(speglsht_state::irq0_line_hold));
 
 	R3051(config, m_subcpu, 25000000);
 	m_subcpu->set_endianness(ENDIANNESS_LITTLE);
@@ -430,18 +430,18 @@ MACHINE_CONFIG_START(speglsht_state::speglsht)
 	MCFG_MACHINE_RESET_OVERRIDE(speglsht_state,speglsht)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 8, 239-8)
-	MCFG_SCREEN_UPDATE_DRIVER(speglsht_state, screen_update_speglsht)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 512);
+	screen.set_visarea(0, 319, 8, 239-8);
+	screen.set_screen_update(FUNC(speglsht_state::screen_update_speglsht));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_speglsht);
-	MCFG_PALETTE_ADD("palette", 16*16*4+1)
+	PALETTE(config, m_palette).set_entries(16*16*4+1);
 
 	MCFG_VIDEO_START_OVERRIDE(speglsht_state,speglsht)
-MACHINE_CONFIG_END
+}
 
 ROM_START( speglsht )
 	ROM_REGION( 0x400000, "maincpu", 0 )

@@ -7,9 +7,6 @@
 #ifndef PSTREAM_H_
 #define PSTREAM_H_
 
-#include <array>
-#include <type_traits>
-#include <vector>
 
 #include "palloc.h"
 #include "pconfig.h"
@@ -19,13 +16,15 @@
 
 #define USE_CSTREAM (0)
 
+#include <array>
+#include <type_traits>
+#include <vector>
 
 #if USE_CSTREAM
 #include <fstream>
 //#include <strstream>
 #include <sstream>
 #endif
-
 
 namespace plib {
 
@@ -180,18 +179,15 @@ public:
 	pomemstream(pomemstream &&src) noexcept
 	: postream(std::move(src))
 	, m_pos(src.m_pos)
-	, m_capacity(src.m_capacity)
-	, m_size(src.m_size)
-	, m_mem(src.m_mem)
+	, m_mem(std::move(src.m_mem))
 	{
-		src.m_mem = nullptr;
 	}
 	pomemstream &operator=(pomemstream &&src) = delete;
 
-	~pomemstream() override;
+	~pomemstream() override = default;
 
-	char *memory() const { return m_mem; }
-	pos_type size() const { return m_size; }
+	const char *memory() const { return m_mem.data(); }
+	pos_type size() const { return m_mem.size(); }
 
 protected:
 	/* write n bytes to stream */
@@ -201,9 +197,7 @@ protected:
 
 private:
 	pos_type m_pos;
-	pos_type m_capacity;
-	pos_type m_size;
-	char *m_mem;
+	std::vector<char> m_mem;
 };
 
 class postringstream : public postream
@@ -447,7 +441,7 @@ private:
 template <typename T>
 struct constructor_helper
 {
-	std::unique_ptr<pistream> operator()(T &&s) { return std::move(plib::make_unique<T>(std::move(s))); }
+	plib::unique_ptr<pistream> operator()(T &&s) { return std::move(plib::make_unique<T>(std::move(s))); }
 };
 
 // NOLINTNEXTLINE(cppcoreguidelines-special-member-functions)
@@ -489,20 +483,20 @@ public:
 	}
 
 private:
-	std::unique_ptr<pistream> m_strm;
+	plib::unique_ptr<pistream> m_strm;
 	putf8string m_linebuf;
 };
 
 template <>
 struct constructor_helper<putf8_reader>
 {
-	std::unique_ptr<pistream> operator()(putf8_reader &&s) { return std::move(s.m_strm); }
+	plib::unique_ptr<pistream> operator()(putf8_reader &&s) { return std::move(s.m_strm); }
 };
 
 template <>
-struct constructor_helper<std::unique_ptr<pistream>>
+struct constructor_helper<plib::unique_ptr<pistream>>
 {
-	std::unique_ptr<pistream> operator()(std::unique_ptr<pistream> &&s) { return std::move(s); }
+	plib::unique_ptr<pistream> operator()(plib::unique_ptr<pistream> &&s) { return std::move(s); }
 };
 
 
@@ -530,7 +524,8 @@ public:
 
 	void write(const pstring &text) const
 	{
-		putf8string conv_utf8(text);
+		// NOLINTNEXTLINE(performance-unnecessary-copy-initialization)
+		const putf8string conv_utf8(text);
 		m_strm->write(reinterpret_cast<const pistream::value_type *>(conv_utf8.c_str()), conv_utf8.mem_t_size());
 	}
 
@@ -626,11 +621,10 @@ public:
 	{
 		std::size_t sz = 0;
 		read(sz);
-		auto buf = plib::palloc_array<plib::string_info<pstring>::mem_t>(sz+1);
-		m_strm.read(reinterpret_cast<pistream::value_type *>(buf), sz);
+		std::vector<plib::string_info<pstring>::mem_t> buf(sz+1);
+		m_strm.read(buf.data(), sz);
 		buf[sz] = 0;
-		s = pstring(buf);
-		plib::pfree_array(buf);
+		s = pstring(buf.data());
 	}
 
 	template <typename T>
@@ -657,7 +651,7 @@ inline void copystream(postream &dest, pistream &src)
 struct perrlogger
 {
 	template <typename ... Args>
-	perrlogger(Args&& ... args)
+	explicit perrlogger(Args&& ... args)
 	{
 		h()(std::forward<Args>(args)...);
 	}

@@ -541,13 +541,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(mc1000_state::ne555_tick)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, param);
 }
 
-MACHINE_CONFIG_START(mc1000_state::mc1000)
-
+void mc1000_state::mc1000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 3579545)
-	MCFG_DEVICE_PROGRAM_MAP(mc1000_mem)
-	MCFG_DEVICE_OPCODES_MAP(mc1000_banking_mem)
-	MCFG_DEVICE_IO_MAP(mc1000_io)
+	Z80(config, m_maincpu, 3579545);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mc1000_state::mc1000_mem);
+	m_maincpu->set_addrmap(AS_OPCODES, &mc1000_state::mc1000_banking_mem);
+	m_maincpu->set_addrmap(AS_IO, &mc1000_state::mc1000_io);
 
 	/* timers */
 	timer_device &ne555clear(TIMER(config, "ne555clear"));
@@ -592,7 +592,7 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("48K");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

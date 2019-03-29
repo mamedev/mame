@@ -75,13 +75,13 @@ void electron_expansion_slot_device::device_reset()
 //  expbus_r - expansion data read
 //-------------------------------------------------
 
-uint8_t electron_expansion_slot_device::expbus_r(address_space &space, offs_t offset)
+uint8_t electron_expansion_slot_device::expbus_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
 	if (m_card != nullptr)
 	{
-		data = m_card->expbus_r(space, offset);
+		data = m_card->expbus_r(offset);
 	}
 
 	return data;
@@ -91,11 +91,11 @@ uint8_t electron_expansion_slot_device::expbus_r(address_space &space, offs_t of
 //  expbus_w - expansion data write
 //-------------------------------------------------
 
-void electron_expansion_slot_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
+void electron_expansion_slot_device::expbus_w(offs_t offset, uint8_t data)
 {
 	if (m_card != nullptr)
 	{
-		m_card->expbus_w(space, offset, data);
+		m_card->expbus_w(offset, data);
 	}
 }
 

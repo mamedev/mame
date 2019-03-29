@@ -471,12 +471,12 @@ WRITE8_MEMBER(qx10_state::memory_write_byte)
 
 WRITE8_MEMBER(qx10_state::mc146818_w)
 {
-	m_rtc->write(space, !offset, data);
+	m_rtc->write(!offset, data);
 }
 
 READ8_MEMBER(qx10_state::mc146818_r)
 {
-	return m_rtc->read(space, !offset);
+	return m_rtc->read(!offset);
 }
 
 WRITE_LINE_MEMBER(qx10_state::keyboard_irq)
@@ -723,10 +723,10 @@ static void keyboard(device_slot_interface &device)
 
 MACHINE_CONFIG_START(qx10_state::qx10)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, MAIN_CLK / 4)
-	MCFG_DEVICE_PROGRAM_MAP(qx10_mem)
-	MCFG_DEVICE_IO_MAP(qx10_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	Z80(config, m_maincpu, MAIN_CLK / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &qx10_state::qx10_mem);
+	m_maincpu->set_addrmap(AS_IO, &qx10_state::qx10_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

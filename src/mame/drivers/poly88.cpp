@@ -197,20 +197,20 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(poly88_state::poly88)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(16'588'800) / 9) // uses 8224 clock generator
-	MCFG_DEVICE_PROGRAM_MAP(poly88_mem)
-	MCFG_DEVICE_IO_MAP(poly88_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", poly88_state,  poly88_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(poly88_state,poly88_irq_callback)
+	I8080A(config, m_maincpu, XTAL(16'588'800) / 9); // uses 8224 clock generator
+	m_maincpu->set_addrmap(AS_PROGRAM, &poly88_state::poly88_mem);
+	m_maincpu->set_addrmap(AS_IO, &poly88_state::poly88_io);
+	m_maincpu->set_vblank_int("screen", FUNC(poly88_state::poly88_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(poly88_state::poly88_irq_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(64*10, 16*15)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*10-1, 0, 16*15-1)
-	MCFG_SCREEN_UPDATE_DRIVER(poly88_state, screen_update_poly88)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*10, 16*15);
+	screen.set_visarea(0, 64*10-1, 0, 16*15-1);
+	screen.set_screen_update(FUNC(poly88_state::screen_update_poly88));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_poly88);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -234,12 +234,12 @@ MACHINE_CONFIG_START(poly88_state::poly88)
 	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", attotime::from_seconds(2))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(poly88_state::poly8813)
+void poly88_state::poly8813(machine_config &config)
+{
 	poly88(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(poly8813_mem)
-	MCFG_DEVICE_IO_MAP(poly8813_io)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &poly88_state::poly8813_mem);
+	m_maincpu->set_addrmap(AS_IO, &poly88_state::poly8813_io);
+}
 
 /* ROM definition */
 ROM_START( poly88 )

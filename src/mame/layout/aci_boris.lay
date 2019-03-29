@@ -1,0 +1,172 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="black"><rect><color red="0.16" green="0.16" blue="0.16" /></rect></element>
+	<element name="disk_white"><disk><color red="0.8" green="0.8" blue="0.8" /></disk></element>
+	<element name="disk_white2"><disk><color red="0.73" green="0.73" blue="0.73" /></disk></element>
+
+	<element name="button" defstate="0">
+		<rect state="0"><color red="0.55" green="0.55" blue="0.55" /></rect>
+		<rect state="1"><color red="0.4" green="0.4" blue="0.4" /></rect>
+	</element>
+
+	<element name="reset" defstate="0">
+		<text string=" ">
+			<bounds x="0.0" y="0.0" width="1.8" height="3.7" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<disk state="0">
+			<bounds x="0.0" y="1.9" width="1.8" height="1.8" />
+			<color red="0.55" green="0.55" blue="0.55" />
+		</disk>
+		<disk state="1">
+			<bounds x="0.0" y="0.0" width="1.8" height="1.8" />
+			<color red="0.55" green="0.55" blue="0.55" />
+		</disk>
+	</element>
+
+	<element name="digit" defstate="0"><led16seg><color red="1.0" green="0.1" blue="0.15" /></led16seg></element>
+
+	<element name="digitp" defstate="36912"><led16seg><color red="0.8" green="0.35" blue="0.05" /></led16seg></element>
+	<element name="digitn" defstate="12984"><led16seg><color red="0.8" green="0.35" blue="0.05" /></led16seg></element>
+	<element name="digitb" defstate="57596"><led16seg><color red="0.8" green="0.35" blue="0.05" /></led16seg></element>
+	<element name="digitr" defstate="2044"> <led16seg><color red="0.8" green="0.35" blue="0.05" /></led16seg></element>
+	<element name="digitq" defstate="28536"><led16seg><color red="0.8" green="0.35" blue="0.05" /></led16seg></element>
+	<element name="digitk" defstate="28668"><led16seg><color red="0.8" green="0.35" blue="0.05" /></led16seg></element>
+
+	<element name="text_u1"><text string="from" align="1"><color red="0.72" green="0.72" blue="0.72" /></text></element>
+	<element name="text_u2"><text string="to" align="1"><color red="0.72" green="0.72" blue="0.72" /></text></element>
+	<element name="text_u3"><text string="hrs" align="1"><color red="0.72" green="0.72" blue="0.72" /></text></element>
+	<element name="text_u4"><text string="min" align="1"><color red="0.72" green="0.72" blue="0.72" /></text></element>
+	<element name="text_u5"><text string="sec" align="1"><color red="0.72" green="0.72" blue="0.72" /></text></element>
+
+	<element name="text_l01a"><text string="G" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l01b"><text string="7" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l02a"><text string="H" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l02b"><text string="8" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l05a"><text string="D" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l05b"><text string="4" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l06a"><text string="E" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l06b"><text string="5" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l07a"><text string="F" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l07b"><text string="6" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l09a"><text string="A" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l09b"><text string="1" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l10a"><text string="B" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l10b"><text string="2" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l11a"><text string="C" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l11b"><text string="3" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="text_l03"><text string="SET / 9"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l04"><text string="CE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l08"><text string="TIME"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l12"><text string="RANK"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l13"><text string="0"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l14"><text string="-"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l15"><text string="B/W"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l16"><text string="ENTER"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_r1"><text string="RESET"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_r2"><text string="ON"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-1.5" right="29" top="15.4" bottom="53.5" />
+
+	<!-- display -->
+
+		<bezel element="black"><bounds x="-1.5" y="27" width="30.5" height="0.6" /></bezel>
+
+		<bezel name="digit7" element="digit"><bounds x="0.00"  y="18.3" width="2.75" height="4.125" /></bezel>
+		<bezel name="digit6" element="digit"><bounds x="2.75"  y="18.3" width="2.75" height="4.125" /></bezel>
+		<bezel name="digit5" element="digit"><bounds x="5.50"  y="18.3" width="2.75" height="4.125" /></bezel>
+		<bezel name="digit4" element="digit"><bounds x="8.25"  y="18.3" width="2.75" height="4.125" /></bezel>
+		<bezel name="digit3" element="digit"><bounds x="11.00" y="18.3" width="2.75" height="4.125" /></bezel>
+		<bezel name="digit2" element="digit"><bounds x="13.75" y="18.3" width="2.75" height="4.125" /></bezel>
+		<bezel name="digit1" element="digit"><bounds x="16.50" y="18.3" width="2.75" height="4.125" /></bezel>
+		<bezel name="digit0" element="digit"><bounds x="19.25" y="18.3" width="2.75" height="4.125" /></bezel>
+
+		<bezel element="disk_white2"><bounds x="1.125"  y="23" width="0.5" height="0.5" /></bezel>
+		<bezel element="disk_white2"><bounds x="3.875"  y="23" width="0.5" height="0.5" /></bezel>
+		<bezel element="disk_white2"><bounds x="6.625"  y="23" width="0.5" height="0.5" /></bezel>
+		<bezel element="disk_white2"><bounds x="9.375"  y="23" width="0.5" height="0.5" /></bezel>
+		<bezel element="disk_white2"><bounds x="12.125" y="23" width="0.5" height="0.5" /></bezel>
+		<bezel element="disk_white2"><bounds x="14.875" y="23" width="0.5" height="0.5" /></bezel>
+		<bezel element="disk_white2"><bounds x="17.625" y="23" width="0.5" height="0.5" /></bezel>
+		<bezel element="disk_white2"><bounds x="20.375" y="23" width="0.5" height="0.5" /></bezel>
+
+		<bezel element="text_u1"><bounds x="1.125" y="15.8" width="6" height="1.8" /></bezel>
+		<bezel element="text_u2"><bounds x="9.375" y="15.8" width="6" height="1.8" /></bezel>
+		<bezel element="text_u3"><bounds x="1.125" y="23.8" width="6" height="1.8" /></bezel>
+		<bezel element="text_u4"><bounds x="9.375" y="23.8" width="6" height="1.8" /></bezel>
+		<bezel element="text_u5"><bounds x="17.625" y="23.8" width="6" height="1.8" /></bezel>
+
+	<!-- buttons -->
+
+		<bezel element="black"><bounds x="25.5" y="30" width="1" height="2.5" /></bezel>
+		<bezel element="text_r1"><bounds x="23" y="28" width="6" height="1.8" /></bezel>
+		<bezel element="text_r2"><bounds x="23" y="32.6" width="6" height="1.8" /></bezel>
+		<bezel element="reset" inputtag="RESET" inputmask="0x01"><bounds x="25.345" y="29.9" width="1.31" height="2.7" /></bezel>
+
+		<bezel element="disk_white"><bounds x="1.75" y="33.3" width="0.5" height="0.5" /></bezel>
+		<bezel element="disk_white"><bounds x="7.75" y="33.3" width="0.5" height="0.5" /></bezel>
+		<bezel name="digitr" element="digitr"><bounds x="1.25" y="38.6" width="1.5" height="1.8" /></bezel>
+		<bezel name="digitq" element="digitq"><bounds x="7.25" y="38.6" width="1.5" height="1.8" /></bezel>
+		<bezel name="digitk" element="digitk"><bounds x="13.25" y="38.6" width="1.5" height="1.8" /></bezel>
+		<bezel name="digitp" element="digitp"><bounds x="1.25" y="43.5" width="1.5" height="2.6" /></bezel>
+		<bezel name="digitn" element="digitn"><bounds x="7.25" y="44.6" width="1.5" height="1.8" /></bezel>
+		<bezel name="digitb" element="digitb"><bounds x="13.25" y="44.6" width="1.5" height="1.8" /></bezel>
+
+		<bezel element="button" inputtag="IN.0" inputmask="0x01"><bounds x="0" y="30" width="4" height="2.5" /></bezel>
+		<bezel element="button" inputtag="IN.0" inputmask="0x02"><bounds x="6" y="30" width="4" height="2.5" /></bezel>
+		<bezel element="button" inputtag="IN.0" inputmask="0x04"><bounds x="12" y="30" width="4" height="2.5" /></bezel>
+		<bezel element="button" inputtag="IN.0" inputmask="0x08"><bounds x="18" y="30" width="4" height="2.5" /></bezel>
+
+		<bezel element="button" inputtag="IN.1" inputmask="0x01"><bounds x="0" y="36" width="4" height="2.5" /></bezel>
+		<bezel element="button" inputtag="IN.1" inputmask="0x02"><bounds x="6" y="36" width="4" height="2.5" /></bezel>
+		<bezel element="button" inputtag="IN.1" inputmask="0x04"><bounds x="12" y="36" width="4" height="2.5" /></bezel>
+		<bezel element="button" inputtag="IN.1" inputmask="0x08"><bounds x="18" y="36" width="4" height="2.5" /></bezel>
+
+		<bezel element="button" inputtag="IN.2" inputmask="0x01"><bounds x="0" y="42" width="4" height="2.5" /></bezel>
+		<bezel element="button" inputtag="IN.2" inputmask="0x02"><bounds x="6" y="42" width="4" height="2.5" /></bezel>
+		<bezel element="button" inputtag="IN.2" inputmask="0x04"><bounds x="12" y="42" width="4" height="2.5" /></bezel>
+		<bezel element="button" inputtag="IN.2" inputmask="0x08"><bounds x="18" y="42" width="4" height="2.5" /></bezel>
+
+		<bezel element="button" inputtag="IN.3" inputmask="0x01"><bounds x="0" y="48" width="4" height="2.5" /></bezel>
+		<bezel element="button" inputtag="IN.3" inputmask="0x02"><bounds x="6" y="48" width="4" height="2.5" /></bezel>
+		<bezel element="button" inputtag="IN.3" inputmask="0x04"><bounds x="12" y="48" width="4" height="2.5" /></bezel>
+		<bezel element="button" inputtag="IN.3" inputmask="0x08"><bounds x="18" y="48" width="4" height="2.5" /></bezel>
+
+		<bezel element="text_l01a"><bounds x="0" y="32.6" width="4" height="1.8" /></bezel>
+		<bezel element="text_l01b"><bounds x="0" y="32.6" width="4" height="1.8" /></bezel>
+		<bezel element="text_l02a"><bounds x="6" y="32.6" width="4" height="1.8" /></bezel>
+		<bezel element="text_l02b"><bounds x="6" y="32.6" width="4" height="1.8" /></bezel>
+		<bezel element="text_l03"><bounds x="11.3" y="32.6" width="6" height="1.8" /></bezel>
+		<bezel element="text_l04"><bounds x="17" y="32.6" width="6" height="1.8" /></bezel>
+
+		<bezel element="text_l05a"><bounds x="0" y="38.6" width="4" height="1.8" /></bezel>
+		<bezel element="text_l05b"><bounds x="0" y="38.6" width="4" height="1.8" /></bezel>
+		<bezel element="text_l06a"><bounds x="6" y="38.6" width="4" height="1.8" /></bezel>
+		<bezel element="text_l06b"><bounds x="6" y="38.6" width="4" height="1.8" /></bezel>
+		<bezel element="text_l07a"><bounds x="12" y="38.6" width="4" height="1.8" /></bezel>
+		<bezel element="text_l07b"><bounds x="12" y="38.6" width="4" height="1.8" /></bezel>
+		<bezel element="text_l08"><bounds x="17" y="38.6" width="6" height="1.8" /></bezel>
+
+		<bezel element="text_l09a"><bounds x="0" y="44.6" width="4" height="1.8" /></bezel>
+		<bezel element="text_l09b"><bounds x="0" y="44.6" width="4" height="1.8" /></bezel>
+		<bezel element="text_l10a"><bounds x="6" y="44.6" width="4" height="1.8" /></bezel>
+		<bezel element="text_l10b"><bounds x="6" y="44.6" width="4" height="1.8" /></bezel>
+		<bezel element="text_l11a"><bounds x="12" y="44.6" width="4" height="1.8" /></bezel>
+		<bezel element="text_l11b"><bounds x="12" y="44.6" width="4" height="1.8" /></bezel>
+		<bezel element="text_l12"><bounds x="17" y="44.6" width="6" height="1.8" /></bezel>
+
+		<bezel element="text_l13"><bounds x="-1" y="50.6" width="6" height="1.8" /></bezel>
+		<bezel element="text_l14"><bounds x="5" y="50.3" width="6" height="2.2" /></bezel>
+		<bezel element="text_l15"><bounds x="11" y="50.6" width="6" height="1.8" /></bezel>
+		<bezel element="text_l16"><bounds x="17.1" y="50.6" width="6" height="1.8" /></bezel>
+
+	</view>
+</mamelayout>

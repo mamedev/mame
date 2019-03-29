@@ -743,23 +743,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(prestige_state::irq_timer)
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(prestige_state::prestige_base)
+void prestige_state::prestige_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(8'000'000))  // Z84C008
-	MCFG_DEVICE_PROGRAM_MAP(prestige_mem)
-	MCFG_DEVICE_IO_MAP(prestige_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(prestige_state,prestige_int_ack)
+	Z80(config, m_maincpu, XTAL(8'000'000));  // Z84C008
+	m_maincpu->set_addrmap(AS_PROGRAM, &prestige_state::prestige_mem);
+	m_maincpu->set_addrmap(AS_IO, &prestige_state::prestige_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(prestige_state::prestige_int_ack));
 
 	TIMER(config, "irq_timer").configure_periodic(FUNC(prestige_state::irq_timer), attotime::from_hz(200));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(prestige_state, screen_update_1bpp)
-	MCFG_SCREEN_SIZE( 240, 100 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 240-1, 0, 100-1 )
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(prestige_state::screen_update_1bpp));
+	screen.set_size(240, 100);
+	screen.set_visarea(0, 240-1, 0, 100-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(prestige_state::prestige_palette), 2);
 
@@ -768,32 +769,32 @@ MACHINE_CONFIG_START(prestige_state::prestige_base)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("64K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(prestige_state::glcolor)
+void prestige_state::glcolor(machine_config &config)
+{
 	prestige_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(glcolor_io)
+	m_maincpu->set_addrmap(AS_IO, &prestige_state::glcolor_io);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(prestige_state, screen_update_2bpp)
-	MCFG_SCREEN_SIZE( 160, 80 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 160-1, 0, 80-1 )
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_screen_update(FUNC(prestige_state::screen_update_2bpp));
+	screen.set_size(160, 80);
+	screen.set_visarea(0, 160-1, 0, 80-1);
 
 	subdevice<palette_device>("palette")->set_entries(4).set_init(FUNC(prestige_state::glcolor_palette));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("glcolor");
 	SOFTWARE_LIST(config, "snotec_cart").set_compatible("snotec");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(prestige_state::glmcolor)
+void prestige_state::glmcolor(machine_config &config)
+{
 	glcolor(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(prestige_io)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &prestige_state::prestige_io);
+}
 
 void prestige_state::snotec(machine_config &config)
 {

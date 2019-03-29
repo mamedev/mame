@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /******************************************************************************
 *
-* novag_presto.cpp, subdriver of novagbase.cpp
+* novag_presto.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
 TODO:
 - is led handling correct? mux data needs to be auto cleared
@@ -11,15 +11,11 @@ TODO:
 
 *******************************************************************************
 
-Presto
-----------
-NEC D80C49C MCU(serial 186), OSC from LC circuit measured ~6MHz
-buzzer, 16+4 LEDs, 8*8 chessboard buttons
+Novag Presto overview:
+- NEC D80C49C MCU(serial 186), OSC from LC circuit measured ~6MHz
+- buzzer, 16+4 LEDs, 8*8 chessboard buttons
 
-Octo
-----------
-NEC D80C49HC MCU(serial 111), OSC from LC circuit measured ~12MHz
-
+Octo has a NEC D80C49HC MCU(serial 111), OSC from LC circuit measured ~12MHz
 The buzzer has a little electronic circuit going on, not sure whatfor.
 Otherwise, it's identical to Presto. The MCU internal ROM is same too.
 
@@ -126,7 +122,7 @@ READ8_MEMBER(presto_state::input_r)
 ******************************************************************************/
 
 static INPUT_PORTS_START( presto )
-	PORT_INCLUDE( novag_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Black/White") // Octo calls it "Change Color"
@@ -167,7 +163,7 @@ void presto_state::presto(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 

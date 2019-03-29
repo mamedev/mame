@@ -6,9 +6,9 @@
  */
 
 #include  "nlid_truthtable.h"
-#include "../nl_setup.h"
-#include "../plib/palloc.h"
-#include "../plib/plists.h"
+#include "netlist/nl_setup.h"
+#include "plib/palloc.h"
+#include "plib/plists.h"
 
 #include <bitset>
 
@@ -77,8 +77,8 @@ namespace netlist
 			return ret;
 		}
 
-		static constexpr sbitset all_bits() { return sbitset(~static_cast<T>(0)); }
-		static constexpr sbitset no_bits() { return sbitset(static_cast<T>(0)); }
+		static constexpr const sbitset all_bits() noexcept { return sbitset(~static_cast<T>(0)); }
+		static constexpr const sbitset no_bits() noexcept{ return sbitset(static_cast<T>(0)); }
 	private:
 		T m_bs;
 	};
@@ -224,7 +224,7 @@ namespace netlist
 		: netlist_base_factory_truthtable_t(name, classname, def_param, sourcefile)
 		{ }
 
-		poolptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override
+		pool_owned_ptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override
 		{
 			using tt_type = nld_truthtable_t<m_NI, m_NO>;
 			truthtable_parser desc_s(m_NO, m_NI, &m_ttbl.m_initialized,
@@ -399,7 +399,7 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 			else
 				nl_assert_always(outs == "0", "Unknown value (not 0 or 1");
 			// FIXME: error handling
-			netlist_time t = netlist_time::from_nsec(plib::pstonum<netlist_time::internal_type>(plib::trim(times[j])));
+			netlist_time t = netlist_time::from_nsec(plib::pstonum<std::int64_t>(plib::trim(times[j])));
 			uint_least8_t k=0;
 			while (m_timing_nt[k] != netlist_time::zero() && m_timing_nt[k] != t)
 				k++;
@@ -464,9 +464,9 @@ netlist_base_factory_truthtable_t::netlist_base_factory_truthtable_t(const pstri
 					ENTRYY(n, 4, s); ENTRYY(n, 5, s); ENTRYY(n, 6, s); \
 					ENTRYY(n, 7, s); ENTRYY(n, 8, s)
 
-std::unique_ptr<netlist_base_factory_truthtable_t> tt_factory_create(tt_desc &desc, const pstring &sourcefile)
+plib::unique_ptr<netlist_base_factory_truthtable_t> tt_factory_create(tt_desc &desc, const pstring &sourcefile)
 {
-	std::unique_ptr<netlist_base_factory_truthtable_t> ret;
+	plib::unique_ptr<netlist_base_factory_truthtable_t> ret;
 
 	switch (desc.ni * 100 + desc.no)
 	{

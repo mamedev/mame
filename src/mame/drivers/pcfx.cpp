@@ -417,14 +417,15 @@ uint32_t pcfx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 }
 
 
-MACHINE_CONFIG_START(pcfx_state::pcfx)
-	MCFG_DEVICE_ADD( "maincpu", V810, XTAL(21'477'272) )
-	MCFG_DEVICE_PROGRAM_MAP( pcfx_mem)
-	MCFG_DEVICE_IO_MAP( pcfx_io)
+void pcfx_state::pcfx(machine_config &config)
+{
+	V810(config, m_maincpu, XTAL(21'477'272));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcfx_state::pcfx_mem);
+	m_maincpu->set_addrmap(AS_IO, &pcfx_state::pcfx_io);
 
-	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_UPDATE_DRIVER(pcfx_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(21'477'272), huc6261_device::WPF, 64, 64 + 1024 + 64, huc6261_device::LPF, 18, 18 + 242)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(pcfx_state::screen_update));
+	screen.set_raw(XTAL(21'477'272), huc6261_device::WPF, 64, 64 + 1024 + 64, huc6261_device::LPF, 18, 18 + 242);
 
 	huc6270_device &huc6270_a(HUC6270(config, "huc6270_a", 0));
 	huc6270_a.set_vram_size(0x20000);
@@ -457,7 +458,7 @@ MACHINE_CONFIG_START(pcfx_state::pcfx)
 	huc6230.cdda_cb().set("huc6272", FUNC(huc6272_device::cdda_update));
 	huc6230.add_route(0, "lspeaker", 1.0);
 	huc6230.add_route(1, "rspeaker", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( pcfx )

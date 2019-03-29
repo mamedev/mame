@@ -871,12 +871,12 @@ DECOSPR_COLOUR_CB_MEMBER(rohga_state::schmeisr_col_callback)
 	return colour;
 }
 
-MACHINE_CONFIG_START(rohga_state::rohga)
-
+void rohga_state::rohga(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 14000000)
-	MCFG_DEVICE_PROGRAM_MAP(rohga_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
+	M68000(config, m_maincpu, 14000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rohga_state::rohga_map);
+	m_maincpu->set_vblank_int("screen", FUNC(rohga_state::irq6_line_assert));
 
 	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
@@ -884,18 +884,18 @@ MACHINE_CONFIG_START(rohga_state::rohga)
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rohga_state, screen_update_rohga)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(rohga_state::screen_update_rohga));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_rohga);
-	MCFG_PALETTE_ADD("palette", 2048)
+	PALETTE(config, m_palette).set_entries(2048);
 
 	DECOCOMN(config, m_decocomn, 0);
 	m_decocomn->set_palette_tag(m_palette);
@@ -954,21 +954,21 @@ MACHINE_CONFIG_START(rohga_state::rohga)
 	ymsnd.add_route(0, "lspeaker", 0.78);
 	ymsnd.add_route(1, "rspeaker", 0.78);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.40);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+}
 
-MACHINE_CONFIG_START(rohga_state::wizdfire)
-
+void rohga_state::wizdfire(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 14000000)
-	MCFG_DEVICE_PROGRAM_MAP(wizdfire_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
+	M68000(config, m_maincpu, 14000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rohga_state::wizdfire_map);
+	m_maincpu->set_vblank_int("screen", FUNC(rohga_state::irq6_line_assert));
 
 	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
@@ -976,18 +976,18 @@ MACHINE_CONFIG_START(rohga_state::wizdfire)
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
-	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
+	BUFFERED_SPRITERAM16(config, m_spriteram[1]);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rohga_state, screen_update_wizdfire)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(rohga_state::screen_update_wizdfire));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_wizdfire);
-	MCFG_PALETTE_ADD("palette", 2048)
+	PALETTE(config, m_palette).set_entries(2048);
 
 	DECOCOMN(config, m_decocomn, 0);
 	m_decocomn->set_palette_tag(m_palette);
@@ -1051,21 +1051,21 @@ MACHINE_CONFIG_START(rohga_state::wizdfire)
 	ymsnd.add_route(0, "lspeaker", 0.80);
 	ymsnd.add_route(1, "rspeaker", 0.80);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.40);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+}
 
-MACHINE_CONFIG_START(rohga_state::nitrobal)
-
+void rohga_state::nitrobal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 14000000)
-	MCFG_DEVICE_PROGRAM_MAP(nitrobal_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
+	M68000(config, m_maincpu, 14000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rohga_state::nitrobal_map);
+	m_maincpu->set_vblank_int("screen", FUNC(rohga_state::irq6_line_assert));
 
 	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
@@ -1073,18 +1073,18 @@ MACHINE_CONFIG_START(rohga_state::nitrobal)
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
-	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
+	BUFFERED_SPRITERAM16(config, m_spriteram[1]);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rohga_state, screen_update_nitrobal)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(rohga_state::screen_update_nitrobal));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_wizdfire);
-	MCFG_PALETTE_ADD("palette", 2048)
+	PALETTE(config, m_palette).set_entries(2048);
 
 	DECOCOMN(config, m_decocomn, 0);
 	m_decocomn->set_palette_tag(m_palette);
@@ -1149,21 +1149,21 @@ MACHINE_CONFIG_START(rohga_state::nitrobal)
 	ymsnd.add_route(0, "lspeaker", 0.80);
 	ymsnd.add_route(1, "rspeaker", 0.80);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.40);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+}
 
-MACHINE_CONFIG_START(rohga_state::schmeisr)
-
+void rohga_state::schmeisr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 14000000)
-	MCFG_DEVICE_PROGRAM_MAP(schmeisr_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
+	M68000(config, m_maincpu, 14000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rohga_state::schmeisr_map);
+	m_maincpu->set_vblank_int("screen", FUNC(rohga_state::irq6_line_assert));
 
 	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
@@ -1171,18 +1171,18 @@ MACHINE_CONFIG_START(rohga_state::schmeisr)
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rohga_state, screen_update_rohga)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(rohga_state::screen_update_rohga));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_schmeisr);
-	MCFG_PALETTE_ADD("palette", 2048)
+	PALETTE(config, m_palette).set_entries(2048);
 
 	DECOCOMN(config, m_decocomn, 0);
 	m_decocomn->set_palette_tag(m_palette);
@@ -1241,24 +1241,24 @@ MACHINE_CONFIG_START(rohga_state::schmeisr)
 	ymsnd.add_route(0, "lspeaker", 0.80);
 	ymsnd.add_route(1, "rspeaker", 0.80);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.40);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+}
 
 
 
-MACHINE_CONFIG_START(rohga_state::hangzo)
+void rohga_state::hangzo(machine_config &config)
+{
 	schmeisr(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hangzo_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &rohga_state::hangzo_map);
+}
 
 
 /**********************************************************************************/

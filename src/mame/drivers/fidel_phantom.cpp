@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /******************************************************************************
 *
-* fidel_phantom.cpp, subdriver of fidelbase.cpp
+* fidel_phantom.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 TODO:
 - everything, this is a skeleton driver
@@ -14,14 +14,13 @@ their own version. It has a small LCD panel added, the rest looks nearly the sam
 the outside. After Fidelity was taken over by H&G, it was rereleased in 1990 as the
 Mephisto Phantom. This is assumed to be identical.
 
-Phantom (model 6100)
-----------------
-R65C02P4, XTAL marked 4.91?200
-2*32KB ROM 27C256-15, 8KB RAM MS6264L-10
-LCD driver, display panel for digits
-magnetized x/y motor under chessboard, chesspieces have magnet underneath
-piezo speaker, LEDs, 8*8 chessboard buttons
-PCB label 510.1128A01
+Fidelity Phantom (model 6100) overview:
+- R65C02P4, XTAL marked 4.91?200
+- 2*32KB ROM 27C256-15, 8KB RAM MS6264L-10
+- LCD driver, display panel for digits
+- magnetized x/y motor under chessboard, chesspieces have magnet underneath
+- piezo speaker, LEDs, 8*8 chessboard buttons
+- PCB label 510.1128A01
 
 ******************************************************************************/
 
@@ -93,7 +92,7 @@ void phantom_state::main_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( fphantom )
-	PORT_INCLUDE( fidel_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 INPUT_PORTS_END
 
 
@@ -109,12 +108,12 @@ void phantom_state::fphantom(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(phantom_state::irq0_line_hold), attotime::from_hz(600)); // guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &phantom_state::main_map);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(phantom_state::display_decay_tick), attotime::from_msec(1));
 	//config.set_default_layout(layout_fidel_phantom);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 

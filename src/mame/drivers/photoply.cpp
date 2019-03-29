@@ -302,10 +302,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(photoply_state::photoply)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I486DX4, 75000000) /* I486DX4, 75 or 100 Mhz */
-	MCFG_DEVICE_PROGRAM_MAP(photoply_map)
-	MCFG_DEVICE_IO_MAP(photoply_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	I486DX4(config, m_maincpu, 75000000); /* I486DX4, 75 or 100 Mhz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &photoply_state::photoply_map);
+	m_maincpu->set_addrmap(AS_IO, &photoply_state::photoply_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
@@ -320,12 +320,11 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(5, DEVICE_SELF, photoply_state, sis_pcm_r, sis_pcm_w)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5446_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
+	screen.set_screen_update("vga", FUNC(cirrus_gd5446_device::screen_update));
 
-	MCFG_DEVICE_ADD("vga", CIRRUS_GD5446, 0)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CIRRUS_GD5446(config, "vga", 0).set_screen("screen");
 
 	EEPROM_93C46_16BIT(config, "eeprom")
 		.write_time(attotime::from_usec(1))

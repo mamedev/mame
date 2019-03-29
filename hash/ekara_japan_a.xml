@@ -8,7 +8,7 @@
 	Japanese cart listing (by A code)  (A-x on cartridge)
 
 	These are for use with e-pitch / e-kara (e-pitch internal ROM is the same as e-kara Japan, just button layout is changed)
-  
+
   https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q10109392860
 
 	A-1   Pichi Pichi Pitch vol.1 / ぴちぴちピッチvol.1
@@ -33,7 +33,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="a4" supported="no">
 		<description>A-4 Pichi Pichi Pitch Pure Chapter 1 (Japan)</description>
 		<year>2004</year>
@@ -44,7 +44,7 @@
 				<rom name="ekaraa4.bin" size="0x200000" crc="03dcc45a" sha1="ae884128c09b4fc7521f0010bbe9624419a3d0b8" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="a5">
 		<description>A-5 Pichi Pichi Pitch Karaoke Party (Japan)</description>
@@ -67,6 +67,6 @@
 				<rom name="ekaraa7.bin" size="0x200000" crc="5b59900e" sha1="fdb8148211f00d0119b9ad082bf8fd348d509800" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 </softwarelist>

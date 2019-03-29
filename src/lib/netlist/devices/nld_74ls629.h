@@ -28,7 +28,7 @@
 #ifndef NLD_74LS629_H_
 #define NLD_74LS629_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define SN74LS629(name, p_cap)                                                  \
 		NET_REGISTER_DEV(SN74LS629, name)                                       \

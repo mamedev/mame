@@ -3,16 +3,15 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 *
-* fidel_sc8.cpp, subdriver of fidelbase.cpp
+* fidel_sc8.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 *******************************************************************************
 
-Fidelity Sensory Chess Challenger 8
----------------
-Z80A CPU @ 3.9MHz
-4KB ROM(MOS 2732), 256 bytes RAM(35391CP)
-chessboard buttons, 8*8+1 leds
-PCB label 510-1011 REV.2
+Fidelity Sensory Chess Challenger 8 overview:
+- Z80A CPU @ 3.9MHz
+- 4KB ROM(MOS 2732), 256 bytes RAM(35391CP)
+- chessboard buttons, 8*8+1 leds
+- PCB label 510-1011 REV.2
 
 ******************************************************************************/
 
@@ -100,7 +99,7 @@ void scc_state::main_io(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( scc )
-	PORT_INCLUDE( fidel_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Pawn")
@@ -126,12 +125,12 @@ void scc_state::scc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &scc_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &scc_state::main_io);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(scc_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_sc8);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 

@@ -273,7 +273,8 @@ void smsbootleg_state::sms_supergame_io(address_map &map)
 
 
 
-MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
+void smsbootleg_state::sms_supergame(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(10'738'635)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &smsbootleg_state::sms_supergame_map);
@@ -284,12 +285,12 @@ MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \
+	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	m_main_scr->set_raw(XTAL(10'738'635)/2, \
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10, \
-			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224)
-	MCFG_SCREEN_REFRESH_RATE(XTAL(10'738'635)/2 / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
+			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
+	m_main_scr->set_refresh_hz(XTAL(10'738'635)/2 / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC));
+	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
 
 	SEGA315_5246(config, m_vdp, XTAL(10'738'635));
 	m_vdp->set_screen(m_main_scr);
@@ -297,8 +298,7 @@ MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 	m_vdp->irq().set_inputline(m_maincpu, 0);
 	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
-
-MACHINE_CONFIG_END
+}
 
 
 

@@ -7,7 +7,7 @@
  */
 
 #include "nld_7475.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 
 namespace netlist
 {

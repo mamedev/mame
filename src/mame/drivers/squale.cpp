@@ -783,8 +783,8 @@ void squale_state::machine_reset()
 
 MACHINE_CONFIG_START(squale_state::squale)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(squale_mem)
+	MC6809(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &squale_state::squale_mem);
 
 	/* Cartridge pia */
 	PIA6821(config, m_pia_u72, 0);
@@ -813,16 +813,16 @@ MACHINE_CONFIG_START(squale_state::squale)
 	m_ay8910->port_b_write_callback().set(FUNC(squale_state::ay_portb_w));
 	m_ay8910->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD ("ef6850", ACIA6850, 0)
+	ACIA6850(config, m_acia, 0);
 
 	/* screen */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DEVICE("ef9365", ef9365_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_screen_update("ef9365", FUNC(ef9365_device::screen_update));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0, 256-1);
 
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, "palette").set_entries(16);
 
 	EF9365(config, m_ef9365, VIDEO_CLOCK);
 	m_ef9365->set_palette_tag("palette");

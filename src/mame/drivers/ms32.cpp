@@ -1700,28 +1700,28 @@ void ms32_state::machine_reset()
 
 /********** MACHINE DRIVER **********/
 
-MACHINE_CONFIG_START(ms32_state::ms32)
-
+void ms32_state::ms32(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V70, 20000000) // D70632GD-20 20MHz
-	MCFG_DEVICE_PROGRAM_MAP(ms32_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ms32_state,irq_callback)
+	V70(config, m_maincpu, 20000000); // D70632GD-20 20MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(ms32_state::irq_callback));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(ms32_state::ms32_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000) // Z0840008PSC, Clock from notes
-	MCFG_DEVICE_PROGRAM_MAP(ms32_sound_map)
+	Z80(config, m_audiocpu, 8000000); // Z0840008PSC, Clock from notes
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_sound_map);
 
 	config.m_minimum_quantum = attotime::from_hz(60000);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ms32_state, screen_update_ms32)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(40*8, 28*8);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(ms32_state::screen_update_ms32));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ms32);
 	PALETTE(config, m_palette).set_entries(0x10000);
@@ -1734,24 +1734,23 @@ MACHINE_CONFIG_START(ms32_state::ms32)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymf", YMF271, 16934400)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-//  MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?
-//  MCFG_SOUND_ROUTE(3, "rspeaker", 1.0)
+	ymf271_device &ymf(YMF271(config, "ymf", 16934400));
+	ymf.add_route(0, "lspeaker", 1.0);
+	ymf.add_route(1, "rspeaker", 1.0);
+//  ymf.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
+//  ymf.add_route(3, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(ms32_state::f1superb)
+void ms32_state::f1superb(machine_config &config)
+{
 	ms32(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(f1superb_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_state::f1superb_map);
 
 	m_gfxdecode->set_info(gfx_f1superb);
 
 	MCFG_VIDEO_START_OVERRIDE(ms32_state,f1superb)
-MACHINE_CONFIG_END
+}
 
 
 

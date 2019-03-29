@@ -91,7 +91,7 @@ z80ctc_device::z80ctc_device(const machine_config &mconfig, const char *tag, dev
 //  read - standard handler for reading
 //-------------------------------------------------
 
-READ8_MEMBER( z80ctc_device::read )
+uint8_t z80ctc_device::read(offs_t offset)
 {
 	return m_channel[offset & 3]->read();
 }
@@ -101,7 +101,7 @@ READ8_MEMBER( z80ctc_device::read )
 //  write - standard handler for writing
 //-------------------------------------------------
 
-WRITE8_MEMBER( z80ctc_device::write )
+void z80ctc_device::write(offs_t offset, uint8_t data)
 {
 	m_channel[offset & 3]->write(data);
 }

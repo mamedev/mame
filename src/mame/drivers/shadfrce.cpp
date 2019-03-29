@@ -535,22 +535,22 @@ GFXDECODE_END
 
 /* Machine Driver Bits */
 
-MACHINE_CONFIG_START(shadfrce_state::shadfrce)
-
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000) / 2)          /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(shadfrce_map)
+void shadfrce_state::shadfrce(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(28'000'000) / 2);          /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &shadfrce_state::shadfrce_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(shadfrce_state::scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))         /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(shadfrce_sound_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545));         /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &shadfrce_state::shadfrce_sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
-	MCFG_SCREEN_UPDATE_DRIVER(shadfrce_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, shadfrce_state, screen_vblank))
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(28'000'000) / 4, 448, 0, 320, 272, 8, 248);   /* HTOTAL and VTOTAL are guessed */
+	m_screen->set_screen_update(FUNC(shadfrce_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(shadfrce_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shadfrce);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x4000);
@@ -567,10 +567,10 @@ MACHINE_CONFIG_START(shadfrce_state::shadfrce)
 	ymsnd.add_route(0, "lspeaker", 0.50);
 	ymsnd.add_route(1, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(13'495'200)/8, okim6295_device::PIN7_HIGH) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(13'495'200)/8, okim6295_device::PIN7_HIGH); /* verified on pcb */
+	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+}
 
 /* Rom Defs. */
 

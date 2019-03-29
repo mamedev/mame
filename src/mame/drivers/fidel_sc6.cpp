@@ -3,11 +3,11 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 *
-* fidel_sc6.cpp, subdriver of fidelbase.cpp
+* fidel_sc6.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 *******************************************************************************
 
-Fidelity Sensory Chess Challenger 6 (model SC6):
+Fidelity Sensory Chess Challenger 6 (model SC6) overview:
 - PCB label 510-1045B01
 - INS8040N-11 MCU, 11MHz XTAL
 - external 4KB ROM 2332 101-1035A01, in module slot
@@ -155,7 +155,7 @@ void sc6_state::main_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( sc6 )
-	PORT_INCLUDE( fidel_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("RV / Pawn")
@@ -185,18 +185,18 @@ void sc6_state::sc6(machine_config &config)
 	m_maincpu->t0_in_cb().set(FUNC(sc6_state::input6_r));
 	m_maincpu->t1_in_cb().set(FUNC(sc6_state::input7_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(sc6_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_sc6);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_sc6", "bin"));
-	cartslot.set_device_load(device_image_load_delegate(&sc6_state::device_image_load_cartridge, this));
-	cartslot.set_must_be_loaded(true);
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fidel_sc6", "bin");
+	m_cart->set_device_load(device_image_load_delegate(&sc6_state::device_image_load_cartridge, this));
+	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_sc6");
 }

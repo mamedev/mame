@@ -33,9 +33,9 @@ class datamux_device : public device_t
 {
 public:
 	datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
-	DECLARE_READ8_MEMBER( setoffset );
+	uint16_t read(offs_t offset);
+	void write(offs_t offset, uint16_t data);
+	uint8_t setoffset(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
 	DECLARE_WRITE_LINE_MEMBER( dbin_in );
@@ -75,9 +75,6 @@ private:
 	// Link to the CPU
 	required_device<cpu_device> m_cpu;
 
-	// Keeps the address space pointer
-	address_space* m_spacep;
-
 	// Console ROM
 	uint16_t* m_consolerom;
 
@@ -85,17 +82,17 @@ private:
 	tmc0430_device* m_grom[3];
 
 	// Common read routine
-	void read_all(address_space& space, uint16_t addr, uint8_t *target);
+	void read_all(uint16_t addr, uint8_t *target);
 
 	// Common write routine
-	void write_all(address_space& space, uint16_t addr, uint8_t value);
+	void write_all(uint16_t addr, uint8_t value);
 
 	// Common set address method
-	void setaddress_all(address_space& space, uint16_t addr);
+	void setaddress_all(uint16_t addr);
 
 	// Debugger access
-	uint16_t debugger_read(address_space& space, uint16_t addr);
-	void debugger_write(address_space& space, uint16_t addr, uint16_t data);
+	uint16_t debugger_read(uint16_t addr);
+	void debugger_write(uint16_t addr, uint16_t data);
 
 	// Join own READY and external READY
 	void ready_join();

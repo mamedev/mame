@@ -225,16 +225,16 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(sonson_state::sonson)
-
+void sonson_state::sonson(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(12'000'000)/2) // HD68B09P (/4 internally)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sonson_state,  irq0_line_hold)
+	MC6809(config, m_maincpu, XTAL(12'000'000)/2); // HD68B09P (/4 internally)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sonson_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sonson_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809, XTAL(12'000'000)/2) // HD68B09P (/4 internally)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(sonson_state, irq0_line_hold, 4*60)    /* FIRQs are triggered by the main CPU */
+	MC6809(config, m_audiocpu, XTAL(12'000'000)/2); // HD68B09P (/4 internally)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sonson_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(sonson_state::irq0_line_hold), attotime::from_hz(4*60));    /* FIRQs are triggered by the main CPU */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // A9
 	mainlatch.q_out_cb<0>().set(FUNC(sonson_state::flipscreen_w));
@@ -243,12 +243,12 @@ MACHINE_CONFIG_START(sonson_state::sonson)
 	mainlatch.q_out_cb<7>().set(FUNC(sonson_state::coin1_counter_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.37)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sonson_state, screen_update_sonson)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.37);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(1*8, 31*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(sonson_state::screen_update_sonson));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sonson);
 
@@ -262,7 +262,7 @@ MACHINE_CONFIG_START(sonson_state::sonson)
 	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.30);   /* 1.5 MHz */
 
 	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.30);   /* 1.5 MHz */
-MACHINE_CONFIG_END
+}
 
 
 

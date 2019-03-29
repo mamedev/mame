@@ -50,6 +50,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "machine/kb3600.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
+#include "machine/apple2common.h"
 
 #include "sound/spkrdev.h"
 
@@ -111,6 +112,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_ay3600(*this, A2_KBDC_TAG),
 		m_video(*this, A2_VIDEO_TAG),
+		m_a2common(*this, "a2common"),
 		m_a2bus(*this, "a2bus"),
 		m_joy1x(*this, "joystick_1_x"),
 		m_joy1y(*this, "joystick_1_y"),
@@ -133,6 +135,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<ay3600_device> m_ay3600;
 	required_device<a2_video_device> m_video;
+	required_device<apple2_common_device> m_a2common;
 	required_device<a2bus_device> m_a2bus;
 	required_ioport m_joy1x, m_joy1y, m_joy2x, m_joy2y, m_joybuttons;
 	required_ioport m_kbspecial;
@@ -228,6 +231,8 @@ private:
 	device_a2bus_card_interface *m_slotdevice[8];
 
 	uint8_t read_floatingbus();
+
+	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
 
 /***************************************************************************
@@ -237,6 +242,11 @@ private:
 #define JOYSTICK_DELTA          80
 #define JOYSTICK_SENSITIVITY    50
 #define JOYSTICK_AUTOCENTER     80
+
+offs_t apple2_state::dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
+{
+	return m_a2common->dasm_override(stream, pc, opcodes, params);
+}
 
 WRITE_LINE_MEMBER(apple2_state::a2bus_irq_w)
 {
@@ -357,7 +367,7 @@ void apple2_state::machine_start()
 
 void apple2_state::machine_reset()
 {
-	m_inh_slot = -1;
+	m_inh_slot = 0;
 	m_cnxx_slot = -1;
 	m_page2 = false;
 	m_an0 = m_an1 = m_an2 = m_an3 = false;
@@ -1382,11 +1392,14 @@ void apple2_state::apple2_common(machine_config &config)
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2_state::apple2_map);
+	m_maincpu->set_dasm_override(FUNC(apple2_state::dasm_trampoline));
+
 	TIMER(config, m_scantimer, 0);
 	m_scantimer->configure_scanline(FUNC(apple2_state::apple2_interrupt), "screen", 0, 1);
 	config.m_minimum_quantum = attotime::from_hz(60);
 
 	APPLE2_VIDEO(config, m_video, XTAL(14'318'181));
+	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
@@ -1479,14 +1492,15 @@ void apple2_state::space84(machine_config &config)
 	apple2p(config);
 }
 
-MACHINE_CONFIG_START(apple2_state::apple2jp)
+void apple2_state::apple2jp(machine_config &config)
+{
 	apple2p(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(apple2_state, screen_update_jp)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(apple2_state::screen_update_jp));
+}
 
 #if 0
-static MACHINE_CONFIG_START( laba2p )
+void apple2_state::laba2p(machine_config &config)
+{
 	apple2p(config);
 	MCFG_MACHINE_START_OVERRIDE(apple2_state,laba2p)
 
@@ -1496,8 +1510,7 @@ static MACHINE_CONFIG_START( laba2p )
 
 //  A2BUS_LAB_80COL("sl3", A2BUS_LAB_80COL).set_onboard(m_a2bus);
 	A2BUS_IWM_FDC("sl6", A2BUS_IWM_FDC).set_onboard(m_a2bus);
-
-MACHINE_CONFIG_END
+}
 #endif
 
 /***************************************************************************

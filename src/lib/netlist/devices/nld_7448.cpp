@@ -137,7 +137,7 @@ namespace netlist
 
 #define BITS7(b6,b5,b4,b3,b2,b1,b0) ((b6)<<6) | ((b5)<<5) | ((b4)<<4) | ((b3)<<3) | ((b2)<<2) | ((b1)<<1) | ((b0)<<0)
 
-	static constexpr std::array<uint8_t, 16> tab7448 =
+	static constexpr const std::array<uint8_t, 16> tab7448 =
 	{
 			BITS7(   1, 1, 1, 1, 1, 1, 0 ),  /* 00 - not blanked ! */
 			BITS7(   0, 1, 1, 0, 0, 0, 0 ),  /* 01 */

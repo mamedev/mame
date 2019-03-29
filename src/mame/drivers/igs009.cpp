@@ -828,11 +828,12 @@ WRITE_LINE_MEMBER(igs009_state::vblank_irq)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(igs009_state::jingbell)
+void igs009_state::jingbell(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'000'000) / 2)   /* HD64180RP8, 8 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(jingbell_map)
-	MCFG_DEVICE_IO_MAP(jingbell_portmap)
+	Z180(config, m_maincpu, XTAL(12'000'000) / 2);   /* HD64180RP8, 8 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs009_state::jingbell_map);
+	m_maincpu->set_addrmap(AS_IO, &igs009_state::jingbell_portmap);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -847,38 +848,36 @@ MACHINE_CONFIG_START(igs009_state::jingbell)
 	ppi1.out_pc_callback().set(FUNC(igs009_state::leds_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs009_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs009_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
+	m_screen->set_screen_update(FUNC(igs009_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(igs009_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jingbell);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000) / 12, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", XTAL(12'000'000) / 12, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(igs009_state::gp98)
+void igs009_state::gp98(machine_config &config)
+{
 	jingbell(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(gp98_portmap)
+	m_maincpu->set_addrmap(AS_IO, &igs009_state::gp98_portmap);
 
 	m_gfxdecode->set_info(gfx_gp98);
 
 	MCFG_VIDEO_START_OVERRIDE(igs009_state,gp98)
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

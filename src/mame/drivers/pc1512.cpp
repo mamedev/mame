@@ -558,16 +558,16 @@ READ8_MEMBER( pc1640_state::io_r )
 	offs_t addr = offset & 0x3ff;
 	bool decoded = false;
 
-	if      (                 addr <= 0x00f) { data = m_dmac->read(space, offset & 0x0f); decoded = true; }
+	if      (                 addr <= 0x00f) { data = m_dmac->read(offset & 0x0f); decoded = true; }
 	else if (addr >= 0x020 && addr <= 0x021) { data = m_pic->read(offset & 0x01); decoded = true; }
 	else if (addr >= 0x040 && addr <= 0x043) { data = m_pit->read(offset & 0x03); decoded = true; }
 	else if (addr >= 0x060 && addr <= 0x06f) { data = system_r(space, offset & 0x0f); decoded = true; }
-	else if (addr >= 0x070 && addr <= 0x073) { data = m_rtc->read(space, offset & 0x01); decoded = true; }
+	else if (addr >= 0x070 && addr <= 0x073) { data = m_rtc->read(offset & 0x01); decoded = true; }
 	else if (addr >= 0x078 && addr <= 0x07f) { data = mouse_r(space, offset & 0x07); decoded = true; }
 	else if (addr >= 0x378 && addr <= 0x37b) { data = printer_r(space, offset & 0x03); decoded = true; }
 	else if (addr >= 0x3b0 && addr <= 0x3df) { decoded = true; }
-	else if (addr >= 0x3f4 && addr <= 0x3f4) { data = m_fdc->fdc->msr_r(space, offset & 0x01); decoded = true; }
-	else if (addr >= 0x3f5 && addr <= 0x3f5) { data = m_fdc->fdc->fifo_r(space, offset & 0x01); decoded = true; }
+	else if (addr >= 0x3f4 && addr <= 0x3f4) { data = m_fdc->fdc->msr_r(); decoded = true; }
+	else if (addr >= 0x3f5 && addr <= 0x3f5) { data = m_fdc->fdc->fifo_r(); decoded = true; }
 	else if (addr >= 0x3f8 && addr <= 0x3ff) { data = m_uart->ins8250_r(space, offset & 0x07); decoded = true; }
 
 	if (decoded)
@@ -1152,14 +1152,15 @@ void pc1640_state::machine_start()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1512 )
+//  machine_config( pc1512 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1512_state::pc1512)
-	MCFG_DEVICE_ADD(I8086_TAG, I8086, 24_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(pc1512_mem)
-	MCFG_DEVICE_IO_MAP(pc1512_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(I8259A2_TAG, pic8259_device, inta_cb)
+void pc1512_state::pc1512(machine_config &config)
+{
+	I8086(config, m_maincpu, 24_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc1512_state::pc1512_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc1512_state::pc1512_io);
+	m_maincpu->set_irq_acknowledge_callback(I8259A2_TAG, FUNC(pic8259_device::inta_cb));
 
 	// video
 	pc1512_video(config);
@@ -1252,9 +1253,9 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	isa.drq1_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq1_w));
 	isa.drq2_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq2_w));
 	isa.drq3_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq3_w));
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false) // FIXME: determine ISA clock
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
+	ISA8_SLOT(config, "isa1", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false); // FIXME: determine ISA clock
+	ISA8_SLOT(config, "isa2", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("544K,576K,608K,640K");
@@ -1262,41 +1263,42 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("pc1512_flop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("pc1512_hdd");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1512dd )
+//  machine_config( pc1512dd )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1512_state::pc1512dd)
+void pc1512_state::pc1512dd(machine_config &config)
+{
 	pc1512(config);
-	MCFG_DEVICE_MODIFY(PC_FDC_XT_TAG ":1")
-	MCFG_SLOT_DEFAULT_OPTION("525dd")
-MACHINE_CONFIG_END
+	subdevice<floppy_connector>(PC_FDC_XT_TAG ":1")->set_default_option("525dd");
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1512hd )
+//  machine_config( pc1512hd )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1512_state::pc1512hd)
+void pc1512_state::pc1512hd(machine_config &config)
+{
 	pc1512(config);
-	MCFG_DEVICE_MODIFY("isa1")
-	//MCFG_SLOT_DEFAULT_OPTION("wdxt_gen")
-	MCFG_SLOT_DEFAULT_OPTION("hdc")
-MACHINE_CONFIG_END
+	//subdevice<isa8_slot_device>("isa1")->set_default_option("wdxt_gen");
+	subdevice<isa8_slot_device>("isa1")->set_default_option("hdc");
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1640 )
+//  machine_config( pc1640 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1640_state::pc1640)
-	MCFG_DEVICE_ADD(I8086_TAG, I8086, 24_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(pc1640_mem)
-	MCFG_DEVICE_IO_MAP(pc1640_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(I8259A2_TAG, pic8259_device, inta_cb)
+void pc1640_state::pc1640(machine_config &config)
+{
+	I8086(config, m_maincpu, 24_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc1640_state::pc1640_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc1640_state::pc1640_io);
+	m_maincpu->set_irq_acknowledge_callback(I8259A2_TAG, FUNC(pic8259_device::inta_cb));
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -1386,11 +1388,11 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	isa.drq1_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq1_w));
 	isa.drq2_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq2_w));
 	isa.drq3_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq3_w));
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, ISA_BUS_TAG, pc1640_isa8_cards, "iga", false)
+	ISA8_SLOT(config, "isa1", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa5", 0, ISA_BUS_TAG, pc1640_isa8_cards, "iga", false);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("640K");
@@ -1398,30 +1400,30 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("pc1640_flop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("pc1640_hdd");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1640dd )
+//  machine_config( pc1640dd )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1640_state::pc1640dd)
+void pc1640_state::pc1640dd(machine_config &config)
+{
 	pc1640(config);
-	MCFG_DEVICE_MODIFY(PC_FDC_XT_TAG ":1")
-	MCFG_SLOT_DEFAULT_OPTION("525dd")
-MACHINE_CONFIG_END
+	subdevice<floppy_connector>(PC_FDC_XT_TAG ":1")->set_default_option("525dd");
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1640hd )
+//  machine_config( pc1640hd )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1640_state::pc1640hd)
+void pc1640_state::pc1640hd(machine_config &config)
+{
 	pc1640(config);
-	MCFG_DEVICE_MODIFY("isa1")
-	//MCFG_SLOT_DEFAULT_OPTION("wdxt_gen")
-	MCFG_SLOT_DEFAULT_OPTION("hdc")
-MACHINE_CONFIG_END
+	//subdevice<isa8_slot_device>("isa1")->set_default_option("wdxt_gen");
+	subdevice<isa8_slot_device>("isa1")->set_default_option("hdc");
+}
 
 
 

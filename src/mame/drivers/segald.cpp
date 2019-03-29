@@ -378,31 +378,27 @@ void segald_state::machine_start()
 
 /* DRIVER */
 MACHINE_CONFIG_START(segald_state::astron)
-
 	/* main cpu */
-	MCFG_DEVICE_ADD("maincpu", Z80, SCHEMATIC_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(mainmem)
-	MCFG_DEVICE_IO_MAP(mainport)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(segald_state, nmi_line_pulse,  1000.0/59.94)
+	Z80(config, m_maincpu, SCHEMATIC_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segald_state::mainmem);
+	m_maincpu->set_addrmap(AS_IO, &segald_state::mainport);
+	m_maincpu->set_periodic_int(FUNC(segald_state::nmi_line_pulse), attotime::from_hz(1000.0/59.94));
 
-
-	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, segald_state, screen_update_astron)
-	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
+	PIONEER_LDV1000(config, m_laserdisc, 0);
+	m_laserdisc->set_overlay(256, 256, FUNC(segald_state::screen_update_astron));
+	m_laserdisc->set_overlay_palette(m_palette);
+	m_laserdisc->add_route(0, "lspeaker", 1.0);
+	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segald);
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, m_palette).set_entries(256);
 
 	/* sound hardare */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-
-	MCFG_DEVICE_MODIFY("laserdisc")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

@@ -60,7 +60,7 @@ kstudio_cart_interface::~kstudio_cart_interface()
 {
 }
 
-READ8_MEMBER(kstudio_cart_interface::read)
+uint8_t kstudio_cart_interface::read(offs_t offset)
 {
 	return m_rom[(m_bank * 0x4000) + (offset & 0x3fff)];
 }
@@ -89,10 +89,10 @@ void nes_kstudio_slot_device::device_start()
 	m_cart = dynamic_cast<kstudio_cart_interface *>(get_card_device());
 }
 
-READ8_MEMBER(nes_kstudio_slot_device::read)
+uint8_t nes_kstudio_slot_device::read(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read(space, offset, mem_mask);
+		return m_cart->read(offset);
 
 	return 0xff;
 }
@@ -225,29 +225,29 @@ void nes_karaokestudio_device::pcb_reset()
 
  -------------------------------------------------*/
 
-READ8_MEMBER(nes_karaokestudio_device::read_m)
+uint8_t nes_karaokestudio_device::read_m(offs_t offset)
 {
 	LOG_MMC(("karaoke studio read_m, offset: %04x\n", offset));
 	return m_mic_ipt->read();
 }
 
-READ8_MEMBER(nes_karaokestudio_device::read_h)
+uint8_t nes_karaokestudio_device::read_h(offs_t offset)
 {
 	LOG_MMC(("karaoke studio read_h, offset: %04x\n", offset));
 	// this shall be the proper code, but it's a bit slower, so we access directly the subcart below
-	//return m_subslot->read(space, offset, mem_mask);
+	//return m_subslot->read(offset);
 
 	// access expansion cart only if all of the followings are verified
 	// * we are in $8000-$bfff range
 	// * there has been a bankswitch write to map the expansion to such range
 	// * there actually is an expansion cart mounted
 	if (offset < 0x4000 && m_exp_active && m_subslot->m_cart)
-		return m_subslot->m_cart->read(space, offset, mem_mask);
+		return m_subslot->m_cart->read(offset);
 	else
 		return hi_access_rom(offset);
 }
 
-WRITE8_MEMBER(nes_karaokestudio_device::write_h)
+void nes_karaokestudio_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("karaoke studio write_h, offset: %04x, data: %02x\n", offset, data));
 	// bit3 1 = M ROM (main unit), 0=E ROM (expansion)

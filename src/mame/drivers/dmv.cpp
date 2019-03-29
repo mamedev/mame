@@ -127,21 +127,21 @@ private:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_QUICKLOAD_LOAD_MEMBER(dmv);
 
-	uint8_t program_read(address_space &space, int cas, offs_t offset);
-	void program_write(address_space &space, int cas, offs_t offset, uint8_t data);
+	uint8_t program_read(int cas, offs_t offset);
+	void program_write(int cas, offs_t offset, uint8_t data);
 
-	void ifsel_r(address_space &space, int ifsel, offs_t offset, uint8_t &data);
-	void ifsel_w(address_space &space, int ifsel, offs_t offset, uint8_t data);
-	DECLARE_READ8_MEMBER(ifsel0_r)  { uint8_t data = 0xff;   ifsel_r(space, 0, offset, data);   return data; }
-	DECLARE_READ8_MEMBER(ifsel1_r)  { uint8_t data = 0xff;   ifsel_r(space, 1, offset, data);   return data; }
-	DECLARE_READ8_MEMBER(ifsel2_r)  { uint8_t data = 0xff;   ifsel_r(space, 2, offset, data);   return data; }
-	DECLARE_READ8_MEMBER(ifsel3_r)  { uint8_t data = 0xff;   ifsel_r(space, 3, offset, data);   return data; }
-	DECLARE_READ8_MEMBER(ifsel4_r)  { uint8_t data = 0xff;   ifsel_r(space, 4, offset, data);   return data; }
-	DECLARE_WRITE8_MEMBER(ifsel0_w) { ifsel_w(space, 0, offset, data); }
-	DECLARE_WRITE8_MEMBER(ifsel1_w) { ifsel_w(space, 1, offset, data); }
-	DECLARE_WRITE8_MEMBER(ifsel2_w) { ifsel_w(space, 2, offset, data); }
-	DECLARE_WRITE8_MEMBER(ifsel3_w) { ifsel_w(space, 3, offset, data); }
-	DECLARE_WRITE8_MEMBER(ifsel4_w) { ifsel_w(space, 4, offset, data); }
+	void ifsel_r(int ifsel, offs_t offset, uint8_t &data);
+	void ifsel_w(int ifsel, offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER(ifsel0_r)  { uint8_t data = 0xff;   ifsel_r(0, offset, data);   return data; }
+	DECLARE_READ8_MEMBER(ifsel1_r)  { uint8_t data = 0xff;   ifsel_r(1, offset, data);   return data; }
+	DECLARE_READ8_MEMBER(ifsel2_r)  { uint8_t data = 0xff;   ifsel_r(2, offset, data);   return data; }
+	DECLARE_READ8_MEMBER(ifsel3_r)  { uint8_t data = 0xff;   ifsel_r(3, offset, data);   return data; }
+	DECLARE_READ8_MEMBER(ifsel4_r)  { uint8_t data = 0xff;   ifsel_r(4, offset, data);   return data; }
+	DECLARE_WRITE8_MEMBER(ifsel0_w) { ifsel_w(0, offset, data); }
+	DECLARE_WRITE8_MEMBER(ifsel1_w) { ifsel_w(1, offset, data); }
+	DECLARE_WRITE8_MEMBER(ifsel2_w) { ifsel_w(2, offset, data); }
+	DECLARE_WRITE8_MEMBER(ifsel3_w) { ifsel_w(3, offset, data); }
+	DECLARE_WRITE8_MEMBER(ifsel4_w) { ifsel_w(4, offset, data); }
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
@@ -426,38 +426,36 @@ static void dmv_floppies(device_slot_interface &device)
 }
 
 
-void dmv_state::ifsel_r(address_space &space, int ifsel, offs_t offset, uint8_t &data)
+void dmv_state::ifsel_r(int ifsel, offs_t offset, uint8_t &data)
 {
-	dmvcart_slot_device *slots[] = { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a };
-	for(auto & slot : slots)
-		slot->io_read(space, ifsel, offset, data);
+	for (auto &slot : { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a })
+		slot->io_read(ifsel, offset, data);
 }
 
-void dmv_state::ifsel_w(address_space &space, int ifsel, offs_t offset, uint8_t data)
+void dmv_state::ifsel_w(int ifsel, offs_t offset, uint8_t data)
 {
-	dmvcart_slot_device *slots[] = { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a };
-	for(auto & slot : slots)
-		slot->io_write(space, ifsel, offset, data);
+	for(auto &slot : { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a })
+		slot->io_write(ifsel, offset, data);
 }
 
 WRITE8_MEMBER(dmv_state::exp_program_w)
 {
-	program_write(space, (offset >> 16) & 0x07, offset, data);
+	program_write((offset >> 16) & 0x07, offset, data);
 }
 
 READ8_MEMBER(dmv_state::exp_program_r)
 {
-	return program_read(space, (offset >> 16) & 0x07, offset);
+	return program_read((offset >> 16) & 0x07, offset);
 }
 
 WRITE8_MEMBER(dmv_state::program_w)
 {
-	program_write(space, m_ram_bank, offset, data);
+	program_write(m_ram_bank, offset, data);
 }
 
 READ8_MEMBER(dmv_state::program_r)
 {
-	return program_read(space, m_ram_bank, offset);
+	return program_read(m_ram_bank, offset);
 }
 
 WRITE_LINE_MEMBER( dmv_state::thold7_w )
@@ -519,7 +517,7 @@ void dmv_state::update_irqs(int slot, int state)
 	}
 }
 
-void dmv_state::program_write(address_space &space, int cas, offs_t offset, uint8_t data)
+void dmv_state::program_write(int cas, offs_t offset, uint8_t data)
 {
 	bool tramd = false;
 	dmvcart_slot_device *slots[] = { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a };
@@ -535,7 +533,7 @@ void dmv_state::program_write(address_space &space, int cas, offs_t offset, uint
 	}
 }
 
-uint8_t dmv_state::program_read(address_space &space, int cas, offs_t offset)
+uint8_t dmv_state::program_read(int cas, offs_t offset)
 {
 	uint8_t data = 0xff;
 	if (m_ramoutdis && offset < 0x2000)
@@ -819,8 +817,8 @@ void dmv_state::dmv(machine_config &config)
 	m_dmac->out_iow_callback<1>().set_log("Write DMA CH2");
 	m_dmac->in_ior_callback<2>().set(m_hgdc, FUNC(upd7220_device::dack_r));
 	m_dmac->out_iow_callback<2>().set(m_hgdc, FUNC(upd7220_device::dack_w));
-	m_dmac->in_ior_callback<3>().set(m_fdc, FUNC(i8272a_device::mdma_r));
-	m_dmac->out_iow_callback<3>().set(m_fdc, FUNC(i8272a_device::mdma_w));
+	m_dmac->in_ior_callback<3>().set(m_fdc, FUNC(i8272a_device::dma_r));
+	m_dmac->out_iow_callback<3>().set(m_fdc, FUNC(i8272a_device::dma_w));
 	m_dmac->out_dack_callback<3>().set(FUNC(dmv_state::dmac_dack3));
 
 	I8272A(config, m_fdc, 8'000'000, true);

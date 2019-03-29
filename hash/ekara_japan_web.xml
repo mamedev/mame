@@ -28,4 +28,17 @@
 		</part>
 	</software>
 
+	<!-- this one has some songs programmed into it (TODO, list them here for reference) -->
+
+	<software name="ekaraweb12a">
+		<description>e-kara Web cartridge 12M (used, with 7 Songs) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb3.bin" size="0x100000" crc="a6a095b9" sha1="709d7edb5799b97127502408bec698663b902462" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

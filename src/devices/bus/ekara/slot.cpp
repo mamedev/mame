@@ -257,4 +257,21 @@ bool ekara_cart_slot_device::is_write_access_not_rom(void)
 	return m_cart->is_write_access_not_rom();
 }
 
+/*-------------------------------------------------
+ direct seeprom access (popira2, gc0010)
+ -------------------------------------------------*/
 
+WRITE_LINE_MEMBER(ekara_cart_slot_device::write_sda)
+{
+	m_cart->write_sda(state);
+}
+
+WRITE_LINE_MEMBER(ekara_cart_slot_device::write_scl)
+{
+	m_cart->write_scl(state);
+}
+
+READ_LINE_MEMBER(ekara_cart_slot_device::read_sda )
+{
+	return  m_cart->read_sda();
+}

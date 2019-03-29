@@ -1106,32 +1106,31 @@ static GFXDECODE_START( gfx_pinkiri8 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x100 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(pinkiri8_state::pinkiri8)
-	MCFG_DEVICE_ADD("maincpu",Z180,XTAL(32'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(pinkiri8_map)
-	MCFG_DEVICE_IO_MAP(pinkiri8_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pinkiri8_state, nmi_line_assert)
+void pinkiri8_state::pinkiri8(machine_config &config)
+{
+	Z180(config, m_maincpu, XTAL(32'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pinkiri8_state::pinkiri8_map);
+	m_maincpu->set_addrmap(AS_IO, &pinkiri8_state::pinkiri8_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pinkiri8_state::nmi_line_assert));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pinkiri8_state, screen_update_pinkiri8)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 62*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(pinkiri8_state::screen_update_pinkiri8));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pinkiri8);
-	MCFG_PALETTE_ADD("palette", 0x2000)
+	PALETTE(config, m_palette).set_entries(0x2000);
 
-
-	MCFG_DEVICE_ADD("janshivdp", JANSHIVDP, 0)
+	JANSHIVDP(config, m_vdp, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // clock frequency & pin 7 not verified
+}
 
 /***************************************************************************
 

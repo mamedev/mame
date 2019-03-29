@@ -847,14 +847,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(applix_state::cass_timer)
 	}
 }
 
-MACHINE_CONFIG_START(applix_state::applix)
+void applix_state::applix(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 30_MHz_XTAL / 4) // MC68000-P10 @ 7.5 MHz
-	MCFG_DEVICE_PROGRAM_MAP(applix_mem)
+	M68000(config, m_maincpu, 30_MHz_XTAL / 4); // MC68000-P10 @ 7.5 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &applix_state::applix_mem);
 
-	MCFG_DEVICE_ADD("subcpu", Z80, 16_MHz_XTAL / 2) // Z80H
-	MCFG_DEVICE_PROGRAM_MAP(subcpu_mem)
-	MCFG_DEVICE_IO_MAP(subcpu_io)
+	z80_device &subcpu(Z80(config, "subcpu", 16_MHz_XTAL / 2)); // Z80H
+	subcpu.set_addrmap(AS_PROGRAM, &applix_state::subcpu_mem);
+	subcpu.set_addrmap(AS_IO, &applix_state::subcpu_io);
 
 	i8051_device &kbdcpu(I8051(config, "kbdcpu", 11060250));
 	kbdcpu.set_addrmap(AS_PROGRAM, &applix_state::keytronic_pc3270_program);
@@ -867,12 +868,12 @@ MACHINE_CONFIG_START(applix_state::applix)
 	kbdcpu.port_out_cb<3>().set(FUNC(applix_state::p3_write));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 200);
+	screen.set_visarea_full();
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	PALETTE(config, m_palette, FUNC(applix_state::applix_palette), 16);
 
 	/* sound hardware */
@@ -918,7 +919,7 @@ MACHINE_CONFIG_START(applix_state::applix)
 	FLOPPY_CONNECTOR(config, "fdc:0", applix_floppies, "35dd", applix_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", applix_floppies, "35dd", applix_state::floppy_formats).enable_sound(true);
 	TIMER(config, "applix_c").configure_periodic(FUNC(applix_state::cass_timer), attotime::from_hz(100000));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( applix )

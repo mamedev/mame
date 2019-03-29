@@ -78,6 +78,7 @@ public:
 	void rtype2(machine_config &config);
 	void m82(machine_config &config);
 	void rtype(machine_config &config);
+	void imgfightb(machine_config &config);
 
 	void init_dkgenm72();
 	void init_bchopper();
@@ -92,7 +93,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	optional_device<i8751_device> m_mcu;
+	optional_device<cpu_device> m_mcu;
 	optional_device<mb8421_mb8431_16_device> m_dpram;
 	optional_device<dac_byte_interface> m_dac;
 	optional_device<m72_audio_device> m_audio;
@@ -238,6 +239,7 @@ private:
 	void m84_cpu1_common_map(address_map &map);
 	void m84_portmap(address_map &map);
 	void m84_v33_portmap(address_map &map);
+	void i80c31_mem_map(address_map &map);
 	void mcu_io_map(address_map &map);
 	void poundfor_portmap(address_map &map);
 	void poundfor_sound_portmap(address_map &map);

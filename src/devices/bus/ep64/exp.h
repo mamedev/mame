@@ -47,17 +47,8 @@
 
 #pragma once
 
-#include "sound/dave.h"
-
 
 void ep64_expansion_bus_cards(device_slot_interface &device);
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define EP64_EXPANSION_BUS_TAG  "exp"
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -84,7 +75,8 @@ public:
 	}
 	ep64_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename T> void set_dave_tag(T &&dave_tag) { m_dave.set_tag(std::forward<T>(dave_tag)); }
+	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program_space.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io_space.set_tag(std::forward<T>(tag), spacenum); }
 	auto irq_wr() { return m_write_irq.bind(); }
 	auto nmi_wr() { return m_write_nmi.bind(); }
 	auto wait_wr() { return m_write_wait.bind(); }
@@ -93,8 +85,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
 	DECLARE_WRITE_LINE_MEMBER( wait_w ) { m_write_wait(state); }
 
-	address_space& program() { return m_dave->space(AS_PROGRAM); }
-	address_space& io() { return m_dave->space(AS_IO); }
+	address_space &program() { return *m_program_space; }
+	address_space &io() { return *m_io_space; }
 
 protected:
 	// device-level overrides
@@ -107,7 +99,8 @@ private:
 	devcb_write_line m_write_nmi;
 	devcb_write_line m_write_wait;
 
-	required_device<dave_device> m_dave;
+	required_address_space m_program_space;
+	required_address_space m_io_space;
 
 	device_ep64_expansion_bus_card_interface *m_card;
 };

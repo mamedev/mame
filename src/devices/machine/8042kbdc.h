@@ -115,7 +115,7 @@ private:
 	uint16_t            m_mouse_y;
 	uint8_t             m_mouse_btn;
 
-	emu_timer *			m_update_timer;
+	emu_timer *         m_update_timer;
 
 	DECLARE_WRITE_LINE_MEMBER( keyboard_w );
 };

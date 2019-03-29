@@ -304,49 +304,48 @@ INPUT_PORTS_END
 
 
 
-MACHINE_CONFIG_START(nbmj8900_state::ohpaipee)
-
+void nbmj8900_state::ohpaipee(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 20000000/4)    /* 5.00 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(ohpaipee_map)
-	MCFG_DEVICE_IO_MAP(ohpaipee_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nbmj8900_state, irq0_line_hold)
+	Z80(config, m_maincpu, 20000000/4);    /* 5.00 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8900_state::ohpaipee_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8900_state::ohpaipee_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(nbmj8900_state::irq0_line_hold));
 
 	NB1413M3(config, m_nb1413m3, 0, NB1413M3_OHPAIPEE);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 8, 248-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nbmj8900_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 8, 248-1);
+	m_screen->set_screen_update(FUNC(nbmj8900_state::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, "palette").set_entries(256);
 
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 2500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
+	YM3812(config, "ymsnd", 2500000).add_route(ALL_OUTPUTS, "speaker", 0.7);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.42); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nbmj8900_state::togenkyo)
+void nbmj8900_state::togenkyo(machine_config &config)
+{
 	ohpaipee(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(togenkyo_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8900_state::togenkyo_map);
 
 	m_nb1413m3->set_type(NB1413M3_TOGENKYO);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( ohpaipee )

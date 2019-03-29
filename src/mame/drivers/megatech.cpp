@@ -681,7 +681,8 @@ uint32_t mtech_state::screen_update_menu(screen_device &screen, bitmap_rgb32 &bi
 }
 
 
-MACHINE_CONFIG_START(mtech_state::megatech)
+void mtech_state::megatech(machine_config &config)
+{
 	/* basic machine hardware */
 	md_ntsc(config);
 
@@ -707,21 +708,21 @@ MACHINE_CONFIG_START(mtech_state::megatech)
 
 	config.set_default_layout(layout_dualhovu);
 
-	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \
+	screen_device &screen(*subdevice<screen_device>("megadriv"));
+	screen.set_raw(XTAL(10'738'635)/2, \
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
-			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224)
-	MCFG_SCREEN_UPDATE_DRIVER(mtech_state, screen_update_main)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mtech_state, screen_vblank_main))
+			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
+	screen.set_screen_update(FUNC(mtech_state::screen_update_main));
+	screen.screen_vblank().set(FUNC(mtech_state::screen_vblank_main));
 
 	m_vdp->irq().set_inputline(m_z80snd, 0);
 
-	MCFG_SCREEN_ADD("menu", RASTER)
+	screen_device &menu(SCREEN(config, "menu", SCREEN_TYPE_RASTER));
 	// check frq
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \
+	menu.set_raw(XTAL(10'738'635)/2, \
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
-			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224)
-	MCFG_SCREEN_UPDATE_DRIVER(mtech_state, screen_update_menu)
+			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
+	menu.set_screen_update(FUNC(mtech_state::screen_update_menu));
 
 	SEGA315_5246(config, m_vdp1, MASTER_CLOCK / 5); /* ?? */
 	m_vdp1->set_screen("menu");
@@ -729,7 +730,7 @@ MACHINE_CONFIG_START(mtech_state::megatech)
 	m_vdp1->irq().set_inputline(m_bioscpu, 0);
 	m_vdp1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
 	m_vdp1->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
-MACHINE_CONFIG_END
+}
 
 
 image_init_result mtech_state::load_cart(device_image_interface &image, generic_slot_device *slot, int gameno)

@@ -52,7 +52,7 @@ READ8_MEMBER(bbc_state::bbc_paged_r)
 
 	if (m_rom[m_swrbank] && memregion(region_tag.assign(m_rom[m_swrbank]->tag()).append(BBC_ROM_REGION_TAG).c_str()))
 	{
-		data = m_rom[m_swrbank]->read(space, offset);
+		data = m_rom[m_swrbank]->read(offset);
 	}
 	else
 	{
@@ -75,7 +75,7 @@ WRITE8_MEMBER(bbc_state::bbc_paged_w)
 
 	if (m_rom[m_swrbank] && memregion(region_tag.assign(m_rom[m_swrbank]->tag()).append(BBC_ROM_REGION_TAG).c_str()))
 	{
-		m_rom[m_swrbank]->write(space, offset, data);
+		m_rom[m_swrbank]->write(offset, data);
 	}
 	else if (swramtype[m_swramtype][m_swrbank])
 	{
@@ -156,7 +156,7 @@ READ8_MEMBER(bbc_state::bbcbp_paged_r)
 	{
 		if (m_rom[m_swrbank] && memregion(region_tag.assign(m_rom[m_swrbank]->tag()).append(BBC_ROM_REGION_TAG).c_str()))
 		{
-			data = m_rom[m_swrbank]->read(space, offset);
+			data = m_rom[m_swrbank]->read(offset);
 		}
 		else
 		{
@@ -181,7 +181,7 @@ WRITE8_MEMBER(bbc_state::bbcbp_paged_w)
 	{
 		if (m_rom[m_swrbank] && memregion(region_tag.assign(m_rom[m_swrbank]->tag()).append(BBC_ROM_REGION_TAG).c_str()))
 		{
-			m_rom[m_swrbank]->write(space, offset, data);
+			m_rom[m_swrbank]->write(offset, data);
 		}
 		else if (m_ram->size() == 128 * 1024 && swram_banks[m_swrbank])
 		{
@@ -297,7 +297,7 @@ READ8_MEMBER(bbc_state::bbcm_paged_r)
 	{
 		if (m_rom[m_swrbank] && memregion(region_tag.assign(m_rom[m_swrbank]->tag()).append(BBC_ROM_REGION_TAG).c_str()))
 		{
-			data = m_rom[m_swrbank]->read(space, offset);
+			data = m_rom[m_swrbank]->read(offset);
 		}
 		else
 		{
@@ -320,7 +320,7 @@ WRITE8_MEMBER(bbc_state::bbcm_paged_w)
 	{
 		if (m_rom[m_swrbank] && memregion(region_tag.assign(m_rom[m_swrbank]->tag()).append(BBC_ROM_REGION_TAG).c_str()))
 		{
-			m_rom[m_swrbank]->write(space, offset, data);
+			m_rom[m_swrbank]->write(offset, data);
 		}
 		else if ((!m_lk19_ic37_paged_rom && (m_swrbank == 4 || m_swrbank == 5)) || (!m_lk18_ic41_paged_rom && (m_swrbank == 6 || m_swrbank == 7)))
 		{
@@ -360,12 +360,12 @@ READ8_MEMBER(bbc_state::bbcm_tube_r)
 	if (m_acccon_itu)
 	{
 		/* internal Tube */
-		if (m_intube) data = m_intube->host_r(space, offset);
+		if (m_intube) data = m_intube->host_r(offset);
 	}
 	else
 	{
 		/* external Tube */
-		if (m_extube) data = m_extube->host_r(space, offset);
+		if (m_extube) data = m_extube->host_r(offset);
 	}
 
 	return data;
@@ -376,12 +376,12 @@ WRITE8_MEMBER(bbc_state::bbcm_tube_w)
 	if (m_acccon_itu)
 	{
 		/* internal Tube */
-		if (m_intube) m_intube->host_w(space, offset, data);
+		if (m_intube) m_intube->host_w(offset, data);
 	}
 	else
 	{
 		/* external Tube */
-		if (m_extube) m_extube->host_w(space, offset, data);
+		if (m_extube) m_extube->host_w(offset, data);
 	}
 }
 
@@ -613,7 +613,7 @@ WRITE_LINE_MEMBER(bbc_state::shiftlock_led_w)
 }
 
 
-void bbc_state::mc146818_set(address_space &space)
+void bbc_state::mc146818_set()
 {
 	/* if chip enabled */
 	if (m_mc146818_ce)
@@ -623,18 +623,18 @@ void bbc_state::mc146818_set(address_space &space)
 		{
 			if (m_latch->q1_r()) // WR
 			{
-				m_via_system_porta = m_rtc->read(space, 1);
+				m_via_system_porta = m_rtc->read(1);
 			}
 			else
 			{
-				m_rtc->write(space, 1, m_via_system_porta);
+				m_rtc->write(1, m_via_system_porta);
 			}
 		}
 
 		/* if address select is set then set the address in the 146818 */
 		if (m_mc146818_as)
 		{
-			m_rtc->write(space, 0, m_via_system_porta);
+			m_rtc->write(0, m_via_system_porta);
 		}
 	}
 }
@@ -662,7 +662,7 @@ WRITE8_MEMBER(bbc_state::via_system_porta_w)
 
 	if (m_rtc)
 	{
-		mc146818_set(space);
+		mc146818_set();
 	}
 }
 
@@ -707,7 +707,7 @@ WRITE8_MEMBER(bbc_state::via_system_portb_w)
 		/* set Chip Enable and Address Strobe lines */
 		m_mc146818_ce = BIT(data, 6);
 		m_mc146818_as = BIT(data, 7);
-		mc146818_set(space);
+		mc146818_set();
 	}
 
 	/* Master Compact only */

@@ -481,12 +481,12 @@ void shangkid_state::dynamski_portmap(address_map &map)
 	map(0x00, 0x01).w(m_aysnd, FUNC(ay8910_device::data_address_w));
 }
 
-MACHINE_CONFIG_START(shangkid_state::dynamski)
-
+void shangkid_state::dynamski(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3000000) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(dynamski_map)
-	MCFG_DEVICE_IO_MAP(dynamski_portmap)
+	Z80(config, m_maincpu, 3000000); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &shangkid_state::dynamski_map);
+	m_maincpu->set_addrmap(AS_IO, &shangkid_state::dynamski_portmap);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(shangkid_state::int_enable_1_w));
@@ -494,14 +494,14 @@ MACHINE_CONFIG_START(shangkid_state::dynamski)
 	mainlatch.q_out_cb<2>().set_nop(); // screen flip?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256+32, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255+32, 16, 255-16)
-	MCFG_SCREEN_UPDATE_DRIVER(shangkid_state, screen_update_dynamski)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, shangkid_state, irq_1_w))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(256+32, 256);
+	screen.set_visarea(0, 255+32, 16, 255-16);
+	screen.set_screen_update(FUNC(shangkid_state::screen_update_dynamski));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(shangkid_state::irq_1_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dynamski);
 	PALETTE(config, m_palette, FUNC(shangkid_state::dynamski_palette), 16*4 + 16*4, 32);
@@ -510,7 +510,7 @@ MACHINE_CONFIG_START(shangkid_state::dynamski)
 	SPEAKER(config, "speaker").front_center();
 
 	AY8910(config, m_aysnd, 2000000).add_route(ALL_OUTPUTS, "speaker", 0.1);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************************/
 

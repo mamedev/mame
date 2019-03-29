@@ -357,27 +357,27 @@ void meijinsn_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(meijinsn_state::meijinsn)
-
+void meijinsn_state::meijinsn(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 9000000 )
-	MCFG_DEVICE_PROGRAM_MAP(meijinsn_map)
+	M68000(config, m_maincpu, 9000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &meijinsn_state::meijinsn_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(meijinsn_state::meijinsn_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(meijinsn_sound_map)
-	MCFG_DEVICE_IO_MAP(meijinsn_sound_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(meijinsn_state, irq0_line_hold,  160*60)
+	z80_device &audiocpu(Z80(config, "audiocpu", 4000000));
+	audiocpu.set_addrmap(AS_PROGRAM, &meijinsn_state::meijinsn_sound_map);
+	audiocpu.set_addrmap(AS_IO, &meijinsn_state::meijinsn_sound_io_map);
+	audiocpu.set_periodic_int(FUNC(meijinsn_state::irq0_line_hold), attotime::from_hz(160*60));
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(12, 243, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(meijinsn_state, screen_update_meijinsn)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(12, 243, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(meijinsn_state::screen_update_meijinsn));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(meijinsn_state::meijinsn_palette), 32);
 
@@ -389,7 +389,7 @@ MACHINE_CONFIG_START(meijinsn_state::meijinsn)
 	ay8910_device &aysnd(AY8910(config, "aysnd", 2000000));
 	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.75);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( meijinsn )

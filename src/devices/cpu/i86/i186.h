@@ -46,7 +46,12 @@ protected:
 		I80186_T_COUNT = I80186_DMA_CR + 2,
 		I80186_T_MAX_A = I80186_T_COUNT + 3,
 		I80186_T_MAX_B = I80186_T_MAX_A + 3,
-		I80186_T_CONTROL = I80186_T_MAX_B + 2
+		I80186_T_CONTROL = I80186_T_MAX_B + 2,
+		I80186_ISR = I80186_T_CONTROL + 3,
+		I80186_IRR, I80186_PMR, I80186_ICSR,
+		I80186_TMRCR, I80186_D0CR, I80186_D1CR,
+		I80186_I0CR, I80186_I1CR, I80186_I2CR, I80186_I3CR,
+		I80186_POLL
 	};
 
 	i80186_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size);
@@ -132,7 +137,7 @@ private:
 	dma_state       m_dma[2];
 	intr_state      m_intr;
 	mem_state       m_mem;
-	bool		m_last_dma;
+	bool            m_last_dma;
 
 	static const device_timer_id TIMER_INT0 = 0;
 	static const device_timer_id TIMER_INT1 = 1;

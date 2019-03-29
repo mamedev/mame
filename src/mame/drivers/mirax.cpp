@@ -482,13 +482,14 @@ WRITE_LINE_MEMBER(mirax_state::vblank_irq)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(mirax_state::mirax)
-	MCFG_DEVICE_ADD("maincpu", Z80, 12000000/4) // ceramic potted module, encrypted z80
-	MCFG_DEVICE_PROGRAM_MAP(mirax_main_map)
+void mirax_state::mirax(machine_config &config)
+{
+	Z80(config, m_maincpu, 12000000/4); // ceramic potted module, encrypted z80
+	m_maincpu->set_addrmap(AS_PROGRAM, &mirax_state::mirax_main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/4)
-	MCFG_DEVICE_PROGRAM_MAP(mirax_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mirax_state, irq0_line_hold,  4*60)
+	Z80(config, m_audiocpu, 12000000/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &mirax_state::mirax_sound_map);
+	m_audiocpu->set_periodic_int(FUNC(mirax_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // R10
 	mainlatch.q_out_cb<0>().set(FUNC(mirax_state::coin_counter0_w));
@@ -500,14 +501,14 @@ MACHINE_CONFIG_START(mirax_state::mirax)
 	mainlatch.q_out_cb<7>().set(FUNC(mirax_state::flip_screen_y_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mirax_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mirax_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(mirax_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(mirax_state::vblank_irq));
 
 	PALETTE(config, m_palette, FUNC(mirax_state::mirax_palette), 0x40);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mirax);
@@ -518,7 +519,7 @@ MACHINE_CONFIG_START(mirax_state::mirax)
 
 	AY8912(config, m_ay[0], 12000000/4).add_route(ALL_OUTPUTS, "mono", 0.80);
 	AY8912(config, m_ay[1], 12000000/4).add_route(ALL_OUTPUTS, "mono", 0.80);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( mirax )

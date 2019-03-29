@@ -281,25 +281,25 @@ void speedspn_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(speedspn_state::speedspn)
-
+void speedspn_state::speedspn(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,6000000)      /* 6 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(program_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speedspn_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 6000000);      /* 6 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &speedspn_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &speedspn_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(speedspn_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,6000000)        /* 6 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 6000000);        /* 6 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &speedspn_state::sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(speedspn_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, 56*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(speedspn_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_speedspn);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x400);
@@ -309,10 +309,10 @@ MACHINE_CONFIG_START(speedspn_state::speedspn)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1122000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1122000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki->set_addrmap(0, &speedspn_state::oki_map);
+}
 
 /*** ROM LOADING *************************************************************/
 

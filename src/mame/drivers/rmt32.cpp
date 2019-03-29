@@ -349,22 +349,23 @@ void mt32_state::mt32_map(address_map &map)
 	map(0xc000, 0xffff).bankrw("fixed");
 }
 
-MACHINE_CONFIG_START(mt32_state::mt32)
-	i8x9x_device &maincpu(P8098(config, "maincpu", 12_MHz_XTAL));
+void mt32_state::mt32(machine_config &config)
+{
+	i8x9x_device &maincpu(P8098(config, cpu, 12_MHz_XTAL));
 	maincpu.set_addrmap(AS_PROGRAM, &mt32_state::mt32_map);
 	maincpu.ach7_cb().set_ioport("A7");
 	maincpu.serial_tx_cb().set(FUNC(mt32_state::midi_w));
 	maincpu.in_p0_cb().set(FUNC(mt32_state::port0_r));
 
-	RAM( config, "ram" ).set_default_size( "32K" );
+	RAM(config, ram).set_default_size("32K");
 
-	MCFG_SCREEN_ADD( "screen", LCD )
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DRIVER(mt32_state, screen_update)
-//  MCFG_SCREEN_SIZE(20*6-1, 9)
-	MCFG_SCREEN_SIZE(20*6-1, (20*6-1)*3/4)
-	MCFG_SCREEN_VISIBLE_AREA(0, 20*6-2, 0, (20*6-1)*3/4-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_screen_update(FUNC(mt32_state::screen_update));
+//  screen.set_size(20*6-1, 9);
+	screen.set_size(20*6-1, (20*6-1)*3/4);
+	screen.set_visarea(0, 20*6-2, 0, (20*6-1)*3/4-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(mt32_state::mt32_palette), 2);
 
@@ -373,7 +374,7 @@ MACHINE_CONFIG_START(mt32_state::mt32)
 	TIMER(config, midi_timer).configure_generic(FUNC(mt32_state::midi_timer_cb));
 
 	TIMER(config, "samples_timer").configure_periodic(FUNC(mt32_state::samples_timer_cb), attotime::from_hz(32000*2));
-MACHINE_CONFIG_END
+}
 
 ROM_START( mt32 )
 	ROM_REGION( 0x10000, "maincpu", 0 )

@@ -184,8 +184,7 @@ void pv2000_state::pv2000_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 
-	map(0x4000, 0x4000).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0x4001, 0x4001).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x4000, 0x4001).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 
 	map(0x7000, 0x7fff).ram();
 	//AM_RANGE(0x8000, 0xbfff) ext ram?
@@ -387,11 +386,10 @@ DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
 
 /* Machine Drivers */
 MACHINE_CONFIG_START(pv2000_state::pv2000)
-
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(7'159'090)/2) // 3.579545 MHz
-	MCFG_DEVICE_PROGRAM_MAP(pv2000_map)
-	MCFG_DEVICE_IO_MAP(pv2000_io_map)
+	Z80(config, m_maincpu, XTAL(7'159'090)/2); // 3.579545 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &pv2000_state::pv2000_map);
+	m_maincpu->set_addrmap(AS_IO, &pv2000_state::pv2000_io_map);
 
 	// video hardware
 	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
@@ -403,8 +401,7 @@ MACHINE_CONFIG_START(pv2000_state::pv2000)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn76489a", SN76489A, XTAL(7'159'090)/2) /* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489A(config, "sn76489a", XTAL(7'159'090)/2).add_route(ALL_OUTPUTS, "mono", 1.00); /* 3.579545 MHz */
 
 	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 

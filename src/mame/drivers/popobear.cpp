@@ -642,22 +642,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(popobear_state::irq)
 		m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(popobear_state::popobear)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(42'000'000)/4)  // XTAL CORRECT, DIVISOR GUESSED
-	MCFG_DEVICE_PROGRAM_MAP(popobear_mem)
+void popobear_state::popobear(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(42'000'000)/4);  // XTAL CORRECT, DIVISOR GUESSED
+	m_maincpu->set_addrmap(AS_PROGRAM, &popobear_state::popobear_mem);
 	// levels 2,3,5 look interesting
-	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", popobear_state, irq5_line_assert)
-	//MCFG_DEVICE_PERIODIC_INT_DRIVER(popobear_state, irq2_line_assert, 120)
+	//->set_vblank_int("screen", popobear_state, irq5_line_assert)
+	//->set_periodic_int(FUNC(popobear_state, irq2_line_assert, 120)
 	TIMER(config, "scantimer").configure_scanline(FUNC(popobear_state::irq), "screen", 0, 1);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(popobear_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-
-	MCFG_SCREEN_SIZE(128*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 239)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(popobear_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.set_size(128*8, 32*8);
+	screen.set_visarea(0, 479, 0, 239);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 256*2);
 
@@ -665,12 +665,10 @@ MACHINE_CONFIG_START(popobear_state::popobear)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_popobear);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(42'000'000)/16)  // XTAL CORRECT, DIVISOR GUESSED
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM2413(config, "ymsnd", XTAL(42'000'000)/16).add_route(ALL_OUTPUTS, "mono", 1.0);  // XTAL CORRECT, DIVISOR GUESSED
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(42'000'000)/32, okim6295_device::PIN7_LOW)  // XTAL CORRECT, DIVISOR GUESSED
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", XTAL(42'000'000)/32, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);  // XTAL CORRECT, DIVISOR GUESSED
+}
 
 
 ROM_START( popobear )

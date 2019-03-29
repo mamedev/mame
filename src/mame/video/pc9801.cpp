@@ -321,7 +321,7 @@ READ8_MEMBER(pc9801_state::pc9801_a0_r)
 		{
 			case 0x00:
 			case 0x02:
-				return m_hgdc2->read(space, (offset & 2) >> 1);
+				return m_hgdc2->read((offset & 2) >> 1);
 			/* TODO: double check these two */
 			case 0x04:
 				return m_vram_disp & 1;
@@ -366,7 +366,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 		{
 			case 0x00:
 			case 0x02:
-				m_hgdc2->write(space, (offset & 2) >> 1,data);
+				m_hgdc2->write((offset & 2) >> 1,data);
 				return;
 			case 0x04:
 				m_vram_disp = data & 1;

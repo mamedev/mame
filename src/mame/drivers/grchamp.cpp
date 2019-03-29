@@ -735,25 +735,25 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(grchamp_state::grchamp)
-
+void grchamp_state::grchamp(machine_config &config)
+{
 	/* basic machine hardware */
 	/* CPU BOARD */
-	MCFG_DEVICE_ADD("maincpu", Z80, PIXEL_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", grchamp_state,  cpu0_interrupt)
+	Z80(config, m_maincpu, PIXEL_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &grchamp_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &grchamp_state::main_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(grchamp_state::cpu0_interrupt));
 
 	/* GAME BOARD */
-	MCFG_DEVICE_ADD("sub", Z80, PIXEL_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
-	MCFG_DEVICE_IO_MAP(sub_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", grchamp_state,  cpu1_interrupt)
+	Z80(config, m_subcpu, PIXEL_CLOCK/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &grchamp_state::sub_map);
+	m_subcpu->set_addrmap(AS_IO, &grchamp_state::sub_portmap);
+	m_subcpu->set_vblank_int("screen", FUNC(grchamp_state::cpu1_interrupt));
 
 	/* SOUND BOARD */
-	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(grchamp_state, irq0_line_hold,  (double)SOUND_CLOCK/4/16/16/10/16)
+	Z80(config, m_audiocpu, SOUND_CLOCK/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &grchamp_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(grchamp_state::irq0_line_hold), attotime::from_hz((double)SOUND_CLOCK/4/16/16/10/16));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 	config.m_minimum_quantum = attotime::from_hz(6000);
@@ -762,10 +762,10 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_grchamp);
 	PALETTE(config, m_palette, FUNC(grchamp_state::grchamp_palette), 32);
 
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(grchamp_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(grchamp_state::screen_update));
 
 
 	/* sound hardware */
@@ -785,9 +785,8 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 	ay3.port_b_write_callback().set(FUNC(grchamp_state::portB_2_w));
 	ay3.add_route(ALL_OUTPUTS, "mono", 0.2);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, grchamp_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, grchamp_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

@@ -33,7 +33,7 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual uint8_t expbus_r(address_space &space, offs_t offset) override;
+	virtual uint8_t expbus_r(offs_t offset) override;
 
 protected:
 	// device-level overrides

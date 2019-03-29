@@ -401,23 +401,23 @@ DECOSPR_PRIORITY_CB_MEMBER(simpl156_state::pri_callback)
 }
 
 
-MACHINE_CONFIG_START(simpl156_state::chainrec)
-
+void simpl156_state::chainrec(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM, 28000000 /* /4 */) /*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
-	MCFG_DEVICE_PROGRAM_MAP(chainrec_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", simpl156_state,  simpl156_vbl_interrupt)
+	ARM(config, m_maincpu, 28000000 /* /4 */); /*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &simpl156_state::chainrec_map);
+	m_maincpu->set_vblank_int("screen", FUNC(simpl156_state::simpl156_vbl_interrupt));
 
 	EEPROM_93C46_16BIT(config, "eeprom");  // 93C45
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(800))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(simpl156_state, screen_update_simpl156)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(800));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(simpl156_state::screen_update_simpl156));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette);
 	m_palette->set_format(palette_device::xBGR_555, 4096);
@@ -449,50 +449,48 @@ MACHINE_CONFIG_START(simpl156_state::chainrec)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("okisfx", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
+	okim6295_device &okisfx(OKIM6295(config, "okisfx", 32220000/32, okim6295_device::PIN7_HIGH));
+	okisfx.add_route(ALL_OUTPUTS, "lspeaker", 0.6);
+	okisfx.add_route(ALL_OUTPUTS, "rspeaker", 0.6);
 
-	MCFG_DEVICE_ADD("okimusic", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_okimusic, 32220000/16, okim6295_device::PIN7_HIGH);
+	m_okimusic->add_route(ALL_OUTPUTS, "lspeaker", 0.2);
+	m_okimusic->add_route(ALL_OUTPUTS, "rspeaker", 0.2);
+}
 
-MACHINE_CONFIG_START(simpl156_state::magdrop)
+void simpl156_state::magdrop(machine_config &config)
+{
 	chainrec(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(magdrop_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &simpl156_state::magdrop_map);
+}
 
-MACHINE_CONFIG_START(simpl156_state::magdropp)
+void simpl156_state::magdropp(machine_config &config)
+{
 	chainrec(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(magdropp_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &simpl156_state::magdropp_map);
+}
 
-MACHINE_CONFIG_START(simpl156_state::joemacr)
+void simpl156_state::joemacr(machine_config &config)
+{
 	chainrec(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(joemacr_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &simpl156_state::joemacr_map);
+}
 
-MACHINE_CONFIG_START(simpl156_state::mitchell156)
+void simpl156_state::mitchell156(machine_config &config)
+{
 	chainrec(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mitchell156_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &simpl156_state::mitchell156_map);
 
-	MCFG_DEVICE_REPLACE("okimusic", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
-MACHINE_CONFIG_END
+	m_okimusic->set_clock(32220000/32);
+}
 
 
 /*

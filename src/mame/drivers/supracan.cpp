@@ -1883,23 +1883,23 @@ INTERRUPT_GEN_MEMBER(supracan_state::supracan_sound_irq)
 
 MACHINE_CONFIG_START(supracan_state::supracan)
 
-	MCFG_DEVICE_ADD( "maincpu", M68000, XTAL(10'738'635) )        /* Correct frequency unknown */
-	MCFG_DEVICE_PROGRAM_MAP( supracan_mem )
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_irq)
+	M68000(config, m_maincpu, XTAL(10'738'635));        /* Correct frequency unknown */
+	m_maincpu->set_addrmap(AS_PROGRAM, &supracan_state::supracan_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(supracan_state::supracan_irq));
 
-	MCFG_DEVICE_ADD( "soundcpu", M6502, XTAL(3'579'545) )     /* TODO: Verify actual clock */
-	MCFG_DEVICE_PROGRAM_MAP( supracan_sound_mem )
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_sound_irq)
+	M6502(config, m_soundcpu, XTAL(3'579'545));     /* TODO: Verify actual clock */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &supracan_state::supracan_sound_mem);
+	m_soundcpu->set_vblank_int("screen", FUNC(supracan_state::supracan_sound_irq));
 
 #if !(SOUNDCPU_BOOT_HACK)
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 	config.m_perfect_cpu_quantum = subtag("soundcpu");
 #endif
 
-	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, 348, 0, 256, 256, 0, 240 )  /* No idea if this is correct */
-	MCFG_SCREEN_UPDATE_DRIVER(supracan_state, screen_update_supracan)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(10'738'635)/2, 348, 0, 256, 256, 0, 240 );  /* No idea if this is correct */
+	m_screen->set_screen_update(FUNC(supracan_state::screen_update_supracan));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(supracan_state::supracan_palette)).set_format(palette_device::xBGR_555, 32768);
 

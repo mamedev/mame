@@ -2,19 +2,18 @@
 // copyright-holders:hap
 /******************************************************************************
 *
-* novag_scon.cpp, subdriver of novagbase.cpp
+* novag_scon.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
 TODO:
 - verify IRQ and beeper frequency
 
 *******************************************************************************
 
-Novag Super Constellation Chess Computer (model 844)
---------------------
-UMC UM6502C @ 4 MHz (8MHz XTAL), 600Hz? IRQ(source unknown?)
-2*2KB RAM TC5516APL-2 battery-backed, 2*32KB ROM custom label
-TTL, buzzer, 24 LEDs, 8*8 chessboard buttons
-external ports for clock and printer, not emulated here
+Novag Super Constellation Chess Computer (model 844) overview:
+- UMC UM6502C @ 4 MHz (8MHz XTAL), 600Hz? IRQ(source unknown?)
+- 2*2KB RAM TC5516APL-2 battery-backed, 2*32KB ROM custom label
+- TTL, buzzer, 24 LEDs, 8*8 chessboard buttons
+- external ports for clock and printer, not emulated here
 
 ******************************************************************************/
 
@@ -113,7 +112,7 @@ void scon_state::main_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( scon )
-	PORT_INCLUDE( novag_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("New Game")

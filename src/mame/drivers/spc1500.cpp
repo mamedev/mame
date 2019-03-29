@@ -877,22 +877,23 @@ READ8_MEMBER( spc1500_state::porta_r )
 	return data;
 }
 
-MACHINE_CONFIG_START(spc1500_state::spc1500)
+void spc1500_state::spc1500(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(spc1500_mem)
-	//MCFG_DEVICE_IO_MAP(spc1500_io)
-	MCFG_DEVICE_IO_MAP(spc1500_double_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(spc1500_state, irq0_line_hold,  60)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &spc1500_state::spc1500_mem);
+	//m_maincpu->set_addrmap(AS_IO, &spc1500_state::spc1500_io);
+	m_maincpu->set_addrmap(AS_IO, &spc1500_state::spc1500_double_io);
+	m_maincpu->set_periodic_int(FUNC(spc1500_state::irq0_line_hold), attotime::from_hz(60));
 
 	/* video hardware */
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0,640-1,0,400-1)
-	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update )
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 400);
+	screen.set_visarea(0,640-1,0,400-1);
+	screen.set_screen_update("mc6845", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(spc1500_state::spc_palette), 8);
 
@@ -938,7 +939,7 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+	}
 
 /* ROM definition */
 ROM_START( spc1500 )

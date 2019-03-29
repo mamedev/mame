@@ -950,14 +950,14 @@ void decocass_state::decocass_palette(palette_device &palette) const
 }
 
 
-MACHINE_CONFIG_START(decocass_state::decocass)
-
+void decocass_state::decocass(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", DECO_222, HCLK4) /* the earlier revision board doesn't have the 222 but must have the same thing implemented in logic for the M6502 */
-	MCFG_DEVICE_PROGRAM_MAP(decocass_map)
+	DECO_222(config, m_maincpu, HCLK4); /* the earlier revision board doesn't have the 222 but must have the same thing implemented in logic for the M6502 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &decocass_state::decocass_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, HCLK1/3/2)
-	MCFG_DEVICE_PROGRAM_MAP(decocass_sound_map)
+	M6502(config, m_audiocpu, HCLK1/3/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &decocass_state::decocass_sound_map);
 	TIMER(config, "audionmi").configure_scanline(FUNC(decocass_state::decocass_audio_nmi_gen), "screen", 0, 8);
 
 	I8041(config, m_mcu, HCLK);
@@ -973,10 +973,10 @@ MACHINE_CONFIG_START(decocass_state::decocass)
 	DECOCASS_TAPE(config, m_cassette, 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 0*8, 256, 272, 1*8, 248)
-	MCFG_SCREEN_UPDATE_DRIVER(decocass_state, screen_update_decocass)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(HCLK, 384, 0*8, 256, 272, 1*8, 248);
+	m_screen->set_screen_update(FUNC(decocass_state::screen_update_decocass));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_decocass);
 	PALETTE(config, m_palette, FUNC(decocass_state::decocass_palette), 64, 32);
@@ -990,249 +990,280 @@ MACHINE_CONFIG_START(decocass_state::decocass)
 	AY8910(config, "ay1", HCLK2).add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	AY8910(config, "ay2", HCLK2).add_route(ALL_OUTPUTS, "mono", 0.40);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type1_state::ctsttape)
+void decocass_type1_state::ctsttape(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctsttape)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(decocass_type1_state::cprogolfj)
+void decocass_type1_state::cprogolfj(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cprogolfj)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(decocass_type1_state::cdsteljn)
+void decocass_type1_state::cdsteljn(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cdsteljn)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(decocass_type1_state::cmanhat)
+void decocass_type1_state::cmanhat(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cmanhat)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(decocass_type3_state::cfishing)
+void decocass_type3_state::cfishing(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cfishing)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type1_state::chwy)
+void decocass_type1_state::chwy(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,chwy)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type1_state::cterrani)
+void decocass_type1_state::cterrani(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cterrani)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type1_state::castfant)
+void decocass_type1_state::castfant(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,castfant)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type1_state::csuperas)
+void decocass_type1_state::csuperas(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,csuperas)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type1_state::cocean1a) /* 10 */
+void decocass_type1_state::cocean1a(machine_config &config) /* 10 */
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cocean1a)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type1_state::clocknch)
+void decocass_type1_state::clocknch(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,clocknch)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(decocass_type1_state::clocknchj)
+void decocass_type1_state::clocknchj(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,clocknchj)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(decocass_type1_state::cfboy0a1) /* 12 */
+void decocass_type1_state::cfboy0a1(machine_config &config) /* 12 */
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cfboy0a1)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type1_state::cprogolf)
+void decocass_type1_state::cprogolf(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cprogolf)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type1_state::cluckypo)
+void decocass_type1_state::cluckypo(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cluckypo)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type1_state::ctisland)
+void decocass_type1_state::ctisland(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctisland)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(decocass_type1_state::ctisland3)
+void decocass_type1_state::ctisland3(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctisland3)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(decocass_type1_state::cexplore)
+void decocass_type1_state::cexplore(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cexplore)
-MACHINE_CONFIG_END
+}
 
 
 
 
-MACHINE_CONFIG_START(decocass_type3_state::cbtime)
+void decocass_type3_state::cbtime(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cbtime)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type3_state::cburnrub)
+void decocass_type3_state::cburnrub(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cburnrub)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type3_state::cgraplop)
+void decocass_type3_state::cgraplop(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cgraplop)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type3_state::cgraplop2)
+void decocass_type3_state::cgraplop2(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cgraplop2)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type3_state::clapapa)
+void decocass_type3_state::clapapa(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,clapapa)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type3_state::cskater)
+void decocass_type3_state::cskater(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cskater)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type3_state::cprobowl)
+void decocass_type3_state::cprobowl(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cprobowl)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type3_state::cnightst)
+void decocass_type3_state::cnightst(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cnightst)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type3_state::cpsoccer)
+void decocass_type3_state::cpsoccer(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cpsoccer)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type3_state::csdtenis)
+void decocass_type3_state::csdtenis(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,csdtenis)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type3_state::czeroize)
+void decocass_type3_state::czeroize(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,czeroize)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type3_state::cppicf)
+void decocass_type3_state::cppicf(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cppicf)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(decocass_type3_state::cfghtice)
+void decocass_type3_state::cfghtice(machine_config &config)
+{
 	decocass(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cfghtice)
-MACHINE_CONFIG_END
+}
 
 
 

@@ -6,7 +6,7 @@
  */
 
 #include "nlid_system.h"
-#include "../analog/nlid_twoterm.h"
+#include "netlist/analog/nlid_twoterm.h"
 
 #include <cmath>
 

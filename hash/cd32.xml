@@ -16,10 +16,13 @@
 		</part>
 	</software>
 
+	<!-- Freezes at main menu -->
+	<!-- http://redump.org/disc/3200/ -->
 	<software name="abseqwak" supported="no">
 		<description>Alien Breed - Special Edition + Qwak</description>
 		<year>1994</year>
 		<publisher>Team 17</publisher>
+		<info name="alt_title" value="Team 17 CD32 Double Pack" /> <!-- In-game title -->
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="alien breed special edition and qwak (europe) (en,fr,de,it,da)" sha1="499614c9a89026cbd748af7afd65445c50dd6167"/>
@@ -194,6 +197,7 @@
 	</software>
 
 	<!-- Doesn't boot -->
+	<!-- http://redump.org/disc/3219/ -->
 	<software name="chuckrck" supported="no">
 		<description>Chuck Rock</description>
 		<year>1994</year>
@@ -385,7 +389,8 @@
 		</part>
 	</software>
 
-	<!-- Glitchy graphics, freezes at title screen? -->
+	<!-- Glitchy graphics, freezes at title screen -->
+	<!-- http://redump.org/disc/3428/ -->
 	<software name="gloom" supported="no">
 		<description>Gloom</description>
 		<year>1995</year>
@@ -453,6 +458,19 @@
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="marvins marvellous adventure (europe) (en,fr,de,es,it)" sha1="37ad971a24da23a15d45735737d396e0dec7a44f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Input is not working, graphics partially broken -->
+	<!-- http://redump.org/disc/3076/ -->
+	<software name="mean" supported="no">
+		<description>Mean Arenas</description>
+		<year>1994</year>
+		<publisher>I.C.E.</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mean arenas (europe)" sha1="0a48eceb7d86ab776b91657c3e9a1af1b7a06a13"/>
 			</diskarea>
 		</part>
 	</software>
@@ -601,7 +619,8 @@
 		</part>
 	</software>
 
-	<!-- Doesn't work -->
+	<!-- Crashes with "DSKDAT W 0000" -->
+	<!-- http://redump.org/disc/3049/ -->
 	<software name="totcarn" supported="no">
 		<description>Total Carnage</description>
 		<year>1994</year>

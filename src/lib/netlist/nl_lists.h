@@ -10,17 +10,19 @@
 #ifndef NLLISTS_H_
 #define NLLISTS_H_
 
-#include "netlist_types.h"
-#include "nl_config.h"
 #include "plib/pchrono.h"
 #include "plib/plists.h"
 #include "plib/ptypes.h"
+
+#include "nl_config.h"
+#include "nltypes.h"
 
 #include <algorithm>
 #include <atomic>
 #include <mutex>
 #include <thread>
 #include <utility>
+
 
 // ----------------------------------------------------------------------------------------
 // timed queue
@@ -54,6 +56,7 @@ namespace netlist
 	{
 		constexpr pqentry_t() noexcept : m_exec_time(), m_object(nullptr) { }
 		constexpr pqentry_t(const Time t, const Element o) noexcept : m_exec_time(t), m_object(o) { }
+#if 0
 		~pqentry_t() = default;
 		constexpr pqentry_t(const pqentry_t &e) noexcept = default;
 		constexpr pqentry_t(pqentry_t &&e) noexcept = default;
@@ -65,7 +68,7 @@ namespace netlist
 			std::swap(m_exec_time, other.m_exec_time);
 			std::swap(m_object, other.m_object);
 		}
-
+#endif
 		struct QueueOp
 		{
 			inline static constexpr bool less(const pqentry_t &lhs, const pqentry_t &rhs) noexcept
@@ -110,7 +113,7 @@ namespace netlist
 		std::size_t capacity() const noexcept { return m_list.capacity() - 1; }
 		bool empty() const noexcept { return (m_end == &m_list[1]); }
 
-		void push(T e) noexcept
+		void push(T && e) noexcept
 		{
 			/* Lock */
 			lock_guard_type lck(m_lock);
@@ -120,7 +123,7 @@ namespace netlist
 				*(i+1) = *(i);
 				m_prof_sortmove.inc();
 			}
-			*(i+1) = e;
+			*(i+1) = std::move(e);
 			++m_end;
 			m_prof_call.inc();
 		}
@@ -129,7 +132,7 @@ namespace netlist
 		const T &top() const noexcept { return *(m_end-1); }
 
 		template <class R>
-		void remove(const R elem) noexcept
+		void remove(const R &elem) noexcept
 		{
 			/* Lock */
 			lock_guard_type lck(m_lock);
@@ -145,7 +148,7 @@ namespace netlist
 			}
 		}
 
-		void retime(T elem) noexcept
+		void retime(T && elem) noexcept
 		{
 			/* Lock */
 			lock_guard_type lck(m_lock);
@@ -155,7 +158,7 @@ namespace netlist
 			{
 				if (QueueOp::equal(*i, elem)) // partial equal!
 				{
-					*i = elem;
+					*i = std::move(elem);
 					while (QueueOp::less(*(i-1), *i))
 					{
 						std::swap(*(i-1), *i);
@@ -195,7 +198,8 @@ namespace netlist
 		mutex_type      m_lock;
 		PALIGNAS_CACHELINE()
 		T             * m_end;
-		std::vector<T>  m_list;
+		//std::vector<T>  m_list;
+		plib::aligned_vector<T>  m_list;
 
 	public:
 		// profiling

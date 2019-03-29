@@ -209,27 +209,27 @@ INTERRUPT_GEN_MEMBER(solomon_state::vblank_irq)
 
 
 
-MACHINE_CONFIG_START(solomon_state::solomon)
-
+void solomon_state::solomon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4.0 MHz (?????) */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", solomon_state,  vblank_irq)
+	Z80(config, m_maincpu, 4000000);   /* 4.0 MHz (?????) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &solomon_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(solomon_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3072000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(solomon_state, irq0_line_hold, 2*60)   /* ??? */
+	Z80(config, m_audiocpu, 3072000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &solomon_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &solomon_state::sound_portmap);
+	m_audiocpu->set_periodic_int(FUNC(solomon_state::irq0_line_hold), attotime::from_hz(2*60));   /* ??? */
 						/* NMIs are caused by the main CPU */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(solomon_state, screen_update_solomon)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(solomon_state::screen_update_solomon));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_solomon);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 256);
@@ -242,7 +242,7 @@ MACHINE_CONFIG_START(solomon_state::solomon)
 	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
 	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
 	AY8910(config, "ay3", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

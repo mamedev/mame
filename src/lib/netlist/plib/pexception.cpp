@@ -23,7 +23,7 @@ namespace plib {
 	// terminate
 	//============================================================
 
-	void terminate(pstring msg) noexcept
+	void terminate(const pstring &msg) noexcept
 	{
 		std::cerr << msg.c_str() << "\n";
 		std::terminate();

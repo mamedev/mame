@@ -29,7 +29,7 @@ namespace netlist
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
-	public:
+	private:
 		NETLIB_SUB(vdd_vss)        m_supply;
 		analog::NETLIB_SUB(R_base) m_R;
 

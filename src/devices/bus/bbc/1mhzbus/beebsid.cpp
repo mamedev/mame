@@ -65,7 +65,7 @@ void bbc_beebsid_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_beebsid_device::fred_r)
+uint8_t bbc_beebsid_device::fred_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -74,31 +74,31 @@ READ8_MEMBER(bbc_beebsid_device::fred_r)
 		data = m_sid->read(offset);
 	}
 
-	data &= m_1mhzbus->fred_r(space, offset);
+	data &= m_1mhzbus->fred_r(offset);
 
 	return data;
 }
 
-WRITE8_MEMBER(bbc_beebsid_device::fred_w)
+void bbc_beebsid_device::fred_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x20 && offset < 0x40)
 	{
 		m_sid->write(offset, data);
 	}
 
-	m_1mhzbus->fred_w(space, offset, data);
+	m_1mhzbus->fred_w(offset, data);
 }
 
-READ8_MEMBER(bbc_beebsid_device::jim_r)
+uint8_t bbc_beebsid_device::jim_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	data &= m_1mhzbus->jim_r(space, offset);
+	data &= m_1mhzbus->jim_r(offset);
 
 	return data;
 }
 
-WRITE8_MEMBER(bbc_beebsid_device::jim_w)
+void bbc_beebsid_device::jim_w(offs_t offset, uint8_t data)
 {
-	m_1mhzbus->jim_w(space, offset, data);
+	m_1mhzbus->jim_w(offset, data);
 }

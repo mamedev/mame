@@ -287,6 +287,8 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	util::stream_format(std::wcout, L"%8i File(s)        %8i bytes", total_count, total_size);
 	if (!freespace_err)
 		util::stream_format(std::wcout, L"                        %8u bytes free\n", (unsigned int)freespace);
+	else
+		util::stream_format(std::wcout, L"\n");
 
 done:
 	if (err)

@@ -61,9 +61,9 @@ public:
 private:
 	template <unsigned N> DECLARE_WRITE8_MEMBER( ay_w ) { m_ay->address_data_w(N, data); }
 
-	template <unsigned N> DECLARE_WRITE8_MEMBER( ctc_w ) { m_z80ctc->write(space, N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( ctc_w ) { m_z80ctc->write(N, data); }
 
-	template <unsigned N> DECLARE_WRITE8_MEMBER( sio_w ) { m_z80sio->cd_ba_w(space, N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( sio_w ) { m_z80sio->cd_ba_w(N, data); }
 
 	template <unsigned N> DECLARE_WRITE8_MEMBER( pio1_w ) { m_z80pio[0]->write(space, N, data); }
 	template <unsigned N> DECLARE_WRITE8_MEMBER( pio2_w ) { m_z80pio[1]->write(space, N, data); }
@@ -71,9 +71,9 @@ private:
 	template <unsigned N> DECLARE_WRITE8_MEMBER( pio4_w ) { m_z80pio[3]->write(space, N, data); }
 	template <unsigned N> DECLARE_WRITE8_MEMBER( pio5_w ) { m_z80pio[4]->write(space, N, data); }
 
-	template <unsigned N> DECLARE_READ8_MEMBER( ctc_r ) { return m_z80ctc->read(space, N); }
+	template <unsigned N> DECLARE_READ8_MEMBER( ctc_r ) { return m_z80ctc->read(N); }
 
-	template <unsigned N> DECLARE_READ8_MEMBER( sio_r ) { return m_z80sio->cd_ba_r(space, N); }
+	template <unsigned N> DECLARE_READ8_MEMBER( sio_r ) { return m_z80sio->cd_ba_r(N); }
 
 	template <unsigned N> DECLARE_READ8_MEMBER( pio1_r ) { return m_z80pio[0]->read(space, N); }
 	template <unsigned N> DECLARE_READ8_MEMBER( pio2_r ) { return m_z80pio[1]->read(space, N); }

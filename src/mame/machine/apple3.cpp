@@ -47,8 +47,8 @@
 #include "emu.h"
 #include "includes/apple3.h"
 
-#define LOG_MEMORY      1
-#define LOG_INDXADDR    1
+#define LOG_MEMORY      0
+#define LOG_INDXADDR    0
 
 #define ENV_SLOWSPEED   (0x80)
 #define ENV_IOENABLE    (0x40)
@@ -63,7 +63,7 @@
 // 2 MHz mode probably has every 33rd cycle stretched but this is currently unproven.
 static constexpr XTAL APPLE2_CLOCK(1'021'800);
 
-READ8_MEMBER(apple3_state::apple3_c0xx_r)
+uint8_t apple3_state::apple3_c0xx_r(offs_t offset)
 {
 	uint8_t result = 0xFF;
 	device_a2bus_card_interface *slotdevice;
@@ -195,7 +195,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 		case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7A: case 0x7B:
 		case 0x7C: case 0x7D: case 0x7E: case 0x7F:
-			result = m_rtc->read(space, m_via_0_b);
+			result = m_rtc->read(m_via_0_b);
 			break;
 
 		case 0x90: case 0x91: case 0x92: case 0x93:
@@ -312,7 +312,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 
 
 
-WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
+void apple3_state::apple3_c0xx_w(offs_t offset, uint8_t data)
 {
 	device_a2bus_card_interface *slotdevice;
 
@@ -375,7 +375,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 		case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7A: case 0x7B:
 		case 0x7C: case 0x7D: case 0x7E: case 0x7F:
-			m_rtc->write(space, m_via_0_b, data);
+			m_rtc->write(m_via_0_b, data);
 			break;
 
 
@@ -606,23 +606,23 @@ void apple3_state::apple3_via_out(uint8_t *var, uint8_t data)
 }
 
 
-WRITE8_MEMBER(apple3_state::apple3_via_0_out_a)
+void apple3_state::apple3_via_0_out_a(uint8_t data)
 {
 	apple3_via_out(&m_via_0_a, data);
 }
 
-WRITE8_MEMBER(apple3_state::apple3_via_0_out_b)
+void apple3_state::apple3_via_0_out_b(uint8_t data)
 {
 //  printf("ZP to %02x\n", data);
 	apple3_via_out(&m_via_0_b, data);
 }
 
-WRITE8_MEMBER(apple3_state::apple3_via_1_out_a)
+void apple3_state::apple3_via_1_out_a(uint8_t data)
 {
 	apple3_via_out(&m_via_1_a, data);
 }
 
-WRITE8_MEMBER(apple3_state::apple3_via_1_out_b)
+void apple3_state::apple3_via_1_out_b(uint8_t data)
 {
 	m_dac->write(data);
 	apple3_via_out(&m_via_1_b, data);
@@ -746,7 +746,7 @@ void apple3_state::device_post_load()
 	apple3_update_memory();
 }
 
-READ8_MEMBER(apple3_state::apple3_memory_r)
+uint8_t apple3_state::apple3_memory_r(offs_t offset)
 {
 	uint8_t rv = 0xff;
 
@@ -797,7 +797,7 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 		{
 			if (!machine().side_effects_disabled())
 			{
-				rv = apple3_c0xx_r(space, offset-0xc000);
+				rv = apple3_c0xx_r(offset-0xc000);
 			}
 		}
 		else
@@ -882,7 +882,7 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 	return rv;
 }
 
-WRITE8_MEMBER(apple3_state::apple3_memory_w)
+void apple3_state::apple3_memory_w(offs_t offset, uint8_t data)
 {
 	if ((m_indir_bank & 0x80) && (offset >= 0x100))
 	{
@@ -922,7 +922,7 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 		{
 			if (!machine().side_effects_disabled())
 			{
-				apple3_c0xx_w(space, offset-0xc000, data);
+				apple3_c0xx_w(offset-0xc000, data);
 			}
 		}
 		else

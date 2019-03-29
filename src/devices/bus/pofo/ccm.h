@@ -75,8 +75,8 @@ class device_portfolio_memory_card_slot_interface : public device_slot_card_inte
 public:
 	virtual bool cdet() { return 1; }
 
-	virtual uint8_t nrdi_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void nwri_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t nrdi_r(offs_t offset) { return 0xff; }
+	virtual void nwri_w(offs_t offset, uint8_t data) { }
 
 protected:
 	// construction/destruction
@@ -112,8 +112,8 @@ public:
 	// computer interface
 	bool cdet_r() { return (m_card != nullptr) ? m_card->cdet() : 1; }
 
-	DECLARE_READ8_MEMBER( nrdi_r ) { return (m_card != nullptr) ? m_card->nrdi_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( nwri_w ) { if (m_card != nullptr) m_card->nwri_w(space, offset, data); }
+	uint8_t nrdi_r(offs_t offset) { return (m_card != nullptr) ? m_card->nrdi_r(offset) : 0xff; }
+	void nwri_w(offs_t offset, uint8_t data) { if (m_card != nullptr) m_card->nwri_w(offset, data); }
 
 protected:
 	// device-level overrides

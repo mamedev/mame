@@ -10,9 +10,9 @@
 #ifndef NLID_TRUTHTABLE_H_
 #define NLID_TRUTHTABLE_H_
 
-#include "../nl_base.h"
-#include "../nl_setup.h"
-#include "../plib/putil.h"
+#include "netlist/nl_base.h"
+#include "netlist/nl_setup.h"
+#include "plib/putil.h"
 
 #define NETLIB_TRUTHTABLE(cname, nIN, nOUT)                                    \
 	class NETLIB_NAME(cname) : public nld_truthtable_t<nIN, nOUT>              \
@@ -225,7 +225,7 @@ namespace devices
 	};
 
 	/* the returned element is still missing a pointer to the family ... */
-	std::unique_ptr<netlist_base_factory_truthtable_t> tt_factory_create(tt_desc &desc, const pstring &sourcefile);
+	plib::unique_ptr<netlist_base_factory_truthtable_t> tt_factory_create(tt_desc &desc, const pstring &sourcefile);
 
 } //namespace devices
 } // namespace netlist

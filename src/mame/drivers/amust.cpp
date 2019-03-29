@@ -433,11 +433,12 @@ void amust_state::init_amust()
 	membank("bankw0")->configure_entry(0, &main[0xf800]);
 }
 
-MACHINE_CONFIG_START(amust_state::amust)
+void amust_state::amust(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(16'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, XTAL(16'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &amust_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &amust_state::io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
@@ -451,8 +452,7 @@ MACHINE_CONFIG_START(amust_state::amust)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 800)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
 	h46505_device &crtc(H46505(config, "crtc", XTAL(14'318'181) / 8));
@@ -503,7 +503,7 @@ MACHINE_CONFIG_START(amust_state::amust)
 	ppi2.in_pb_callback().set(FUNC(amust_state::port09_r));
 	ppi2.in_pc_callback().set(FUNC(amust_state::port0a_r));
 	ppi2.out_pc_callback().set(FUNC(amust_state::port0a_w));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( amust )

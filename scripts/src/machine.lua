@@ -2622,8 +2622,18 @@ if (MACHINES["SPG2XX"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/spg2xx.cpp",
 		MAME_DIR .. "src/devices/machine/spg2xx.h",
+		MAME_DIR .. "src/devices/machine/spg2xx_audio.cpp",
+		MAME_DIR .. "src/devices/machine/spg2xx_audio.h",
+		MAME_DIR .. "src/devices/machine/spg2xx_io.cpp",
+		MAME_DIR .. "src/devices/machine/spg2xx_io.h",
+		MAME_DIR .. "src/devices/machine/spg2xx_sysdma.cpp",
+		MAME_DIR .. "src/devices/machine/spg2xx_sysdma.h",
+		MAME_DIR .. "src/devices/machine/spg2xx_video.cpp",
+		MAME_DIR .. "src/devices/machine/spg2xx_video.h",
 		MAME_DIR .. "src/devices/machine/spg110.cpp",
 		MAME_DIR .. "src/devices/machine/spg110.h",
+		MAME_DIR .. "src/devices/machine/spg110_video.cpp",
+		MAME_DIR .. "src/devices/machine/spg110_video.h",
 	}
 end
 
@@ -2909,6 +2919,18 @@ if (MACHINES["WD_FDC"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/wd_fdc.cpp",
 		MAME_DIR .. "src/devices/machine/wd_fdc.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/wd1010.h,MACHINES["WD1010"] = true
+---------------------------------------------------
+
+if (MACHINES["WD1010"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/wd1010.cpp",
+		MAME_DIR .. "src/devices/machine/wd1010.h",
 	}
 end
 

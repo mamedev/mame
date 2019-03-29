@@ -395,16 +395,16 @@ INTERRUPT_GEN_MEMBER(seicross_state::vblank_irq)
 }
 
 
-MACHINE_CONFIG_START(seicross_state::no_nvram)
-
+void seicross_state::no_nvram(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000) / 6)   /* D780C, 3.072 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seicross_state,  vblank_irq)
+	Z80(config, m_maincpu, XTAL(18'432'000) / 6);   /* D780C, 3.072 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seicross_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &seicross_state::main_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(seicross_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("mcu", NSC8105, XTAL(18'432'000) / 6)   /* ??? */
-	MCFG_DEVICE_PROGRAM_MAP(mcu_no_nvram_map)
+	NSC8105(config, m_mcu, XTAL(18'432'000) / 6);   /* ??? */
+	m_mcu->set_addrmap(AS_PROGRAM, &seicross_state::mcu_no_nvram_map);
 
 	config.m_minimum_quantum = attotime::from_hz(1200);  /* 20 CPU slices per frame - a high value to ensure proper */
 						/* synchronization of the CPUs */
@@ -412,13 +412,13 @@ MACHINE_CONFIG_START(seicross_state::no_nvram)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */    /* frames per second, vblank duration */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seicross_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */    /* frames per second, vblank duration */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(seicross_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seicross);
 	PALETTE(config, m_palette, FUNC(seicross_state::seicross_palette), 64);
@@ -435,24 +435,24 @@ MACHINE_CONFIG_START(seicross_state::no_nvram)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(seicross_state::nvram)
+void seicross_state::nvram(machine_config &config)
+{
 	no_nvram(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("mcu")
-	MCFG_DEVICE_PROGRAM_MAP(mcu_nvram_map)
+	m_mcu->set_addrmap(AS_PROGRAM, &seicross_state::mcu_nvram_map);
 
 	NVRAM(config, "nvram").set_custom_handler(FUNC(seicross_state::nvram_init));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(seicross_state::friskytb)
+void seicross_state::friskytb(machine_config &config)
+{
 	nvram(config);
-	MCFG_DEVICE_MODIFY("mcu")
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_mcu->set_addrmap(AS_OPCODES, &seicross_state::decrypted_opcodes_map);
+}
 
 
 /***************************************************************************

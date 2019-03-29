@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+
+<!--
+license: CC0
+copyright-holders: Dirk Best
+Simple layout for Little Casino and clones
+-->
+
+<mamelayout version="2">
+	<element name="background">
+	</element>
+	<element name="button" defstate="0">
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+	</element>
+	<view name="Buttons">
+		<backdrop element="background">
+			<bounds x="0" y="0" width="416" height="300" />
+		</backdrop>
+		<screen index="0">
+			<bounds left="0" top="0" right="416" bottom="256" />
+		</screen>
+		<cpanel name="button_0" element="button" inputtag="Q" inputmask="0x01">
+			<bounds x="25" y="280" width="50" height="25" />
+		</cpanel>
+		<cpanel name="button_1" element="button" inputtag="Q" inputmask="0x02">
+			<bounds x="100" y="280" width="50" height="25" />
+		</cpanel>
+		<cpanel name="button_2" element="button" inputtag="Q" inputmask="0x04">
+			<bounds x="175" y="280" width="50" height="25" />
+		</cpanel>
+		<cpanel name="button_3" element="button" inputtag="Q" inputmask="0x08">
+			<bounds x="250" y="280" width="50" height="25" />
+		</cpanel>
+		<cpanel name="button_4" element="button" inputtag="Q" inputmask="0x10">
+			<bounds x="325" y="280" width="50" height="25" />
+		</cpanel>
+	</view>
+</mamelayout>

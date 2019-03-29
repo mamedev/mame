@@ -467,41 +467,45 @@ uint32_t st0016_state::screen_update_st0016(screen_device &screen, bitmap_ind16 
 }
 
 
-MACHINE_CONFIG_START(st0016_state::st0016)
+void st0016_state::st0016(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",ST0016_CPU,8000000) /* 8 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(st0016_mem)
-	MCFG_DEVICE_IO_MAP(st0016_io)
+	ST0016_CPU(config, m_maincpu, 8000000); /* 8 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &st0016_state::st0016_mem);
+	m_maincpu->set_addrmap(AS_IO, &st0016_state::st0016_io);
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(st0016_state::st0016_int), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(48*8, 48*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 48*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(st0016_state, screen_update_st0016)
-	MCFG_SCREEN_PALETTE("maincpu:palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(48*8, 48*8);
+	m_screen->set_visarea(0*8, 48*8-1, 0*8, 48*8-1);
+	m_screen->set_screen_update(FUNC(st0016_state::screen_update_st0016));
+	m_screen->set_palette("maincpu:palette");
 
 
 //  MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(st0016_state::mayjinsn)
+void st0016_state::mayjinsn(machine_config &config)
+{
 	st0016(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(st0016_m2_io)
-	MCFG_DEVICE_ADD("sub", V810, 10000000)//25 Mhz ?
-	MCFG_DEVICE_PROGRAM_MAP(v810_mem)
+
+	m_maincpu->set_addrmap(AS_IO, &st0016_state::st0016_m2_io);
+
+	V810(config, m_subcpu, 10000000); //25 Mhz ?
+	m_subcpu->set_addrmap(AS_PROGRAM, &st0016_state::v810_mem);
+
 	config.m_minimum_quantum = attotime::from_hz(60);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(st0016_state::renju)
+void st0016_state::renju(machine_config &config)
+{
 	st0016(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(renju_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &st0016_state::renju_mem);
+}
 
 /*************************************
  *

@@ -168,12 +168,12 @@ private:
 	emu_timer* m_seconds_timer;
 
 	struct {
-		int     present;
+		int       present;
 		uint8_t   manufacturer_id;
 		uint8_t   device_id;
 		uint8_t   *data;
 		uint8_t   org_data[16];
-		int     state;
+		int       state;
 		uint8_t   command[2];
 	} m_flash_chip[2];
 
@@ -186,27 +186,27 @@ private:
 	required_shared_ptr<uint8_t> m_mainram;
 	required_device<k1ge_device> m_k1ge;
 
-	DECLARE_READ8_MEMBER( ngp_io_r );
-	DECLARE_WRITE8_MEMBER( ngp_io_w );
+	uint8_t ngp_io_r(offs_t offset);
+	void ngp_io_w(offs_t offset, uint8_t data);
 
-	void flash_w( int which, offs_t offset, uint8_t data );
-	DECLARE_WRITE8_MEMBER( flash0_w );
-	DECLARE_WRITE8_MEMBER( flash1_w );
+	template <int Which> void flash_w(offs_t offset, uint8_t data);
+	void flash0_w(offs_t offset, uint8_t data);
+	void flash1_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( ngp_z80_comm_r );
-	DECLARE_WRITE8_MEMBER( ngp_z80_comm_w );
-	DECLARE_WRITE8_MEMBER( ngp_z80_signal_main_w );
+	uint8_t ngp_z80_comm_r();
+	void ngp_z80_comm_w(uint8_t data);
+	void ngp_z80_signal_main_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( ngp_z80_clear_irq );
+	void ngp_z80_clear_irq(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( ngp_vblank_pin_w );
-	DECLARE_WRITE_LINE_MEMBER( ngp_hblank_pin_w );
-	DECLARE_WRITE8_MEMBER( ngp_tlcs900_porta );
+	DECLARE_WRITE_LINE_MEMBER(ngp_vblank_pin_w);
+	DECLARE_WRITE_LINE_MEMBER(ngp_hblank_pin_w);
+	void  ngp_tlcs900_porta(offs_t offset, uint8_t data);
 	uint32_t screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(ngp_seconds_callback);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( ngp_cart);
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( ngp_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ngp_cart);
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(ngp_cart);
 
 	void ngp_mem(address_map &map);
 	void z80_io(address_map &map);
@@ -225,28 +225,28 @@ private:
 TIMER_CALLBACK_MEMBER(ngp_state::ngp_seconds_callback)
 {
 	m_io_reg[0x16] += 1;
-	if ( ( m_io_reg[0x16] & 0x0f ) == 0x0a )
+	if ((m_io_reg[0x16] & 0x0f) == 0x0a)
 	{
 		m_io_reg[0x16] += 0x06;
 	}
 
-	if ( m_io_reg[0x16] >= 0x60 )
+	if (m_io_reg[0x16] >= 0x60)
 	{
 		m_io_reg[0x16] = 0;
 		m_io_reg[0x15] += 1;
-		if ( ( m_io_reg[0x15] & 0x0f ) == 0x0a ) {
+		if ((m_io_reg[0x15] & 0x0f) == 0x0a) {
 			m_io_reg[0x15] += 0x06;
 		}
 
-		if ( m_io_reg[0x15] >= 0x60 )
+		if (m_io_reg[0x15] >= 0x60)
 		{
 			m_io_reg[0x15] = 0;
 			m_io_reg[0x14] += 1;
-			if ( ( m_io_reg[0x14] & 0x0f ) == 0x0a ) {
+			if ((m_io_reg[0x14] & 0x0f) == 0x0a) {
 				m_io_reg[0x14] += 0x06;
 			}
 
-			if ( m_io_reg[0x14] == 0x24 )
+			if (m_io_reg[0x14] == 0x24)
 			{
 				m_io_reg[0x14] = 0;
 			}
@@ -255,11 +255,11 @@ TIMER_CALLBACK_MEMBER(ngp_state::ngp_seconds_callback)
 }
 
 
-READ8_MEMBER( ngp_state::ngp_io_r )
+uint8_t ngp_state::ngp_io_r(offs_t offset)
 {
 	uint8_t data = m_io_reg[offset];
 
-	switch( offset )
+	switch (offset)
 	{
 	case 0x30:  /* Read controls */
 		data = m_io_controls->read();
@@ -274,15 +274,15 @@ READ8_MEMBER( ngp_state::ngp_io_r )
 }
 
 
-WRITE8_MEMBER( ngp_state::ngp_io_w )
+void ngp_state::ngp_io_w(offs_t offset, uint8_t data)
 {
-	switch( offset )
+	switch (offset)
 	{
 	case 0x20:      /* t6w28 "right" */
 	case 0x21:      /* t6w28 "left" */
-		if ( m_io_reg[0x38] == 0x55 && m_io_reg[0x39] == 0xAA )
+		if (m_io_reg[0x38] == 0x55 && m_io_reg[0x39] == 0xAA)
 		{
-			m_t6w28->write( space, 0, data );
+			m_t6w28->write(0, data);
 		}
 		break;
 
@@ -298,27 +298,27 @@ WRITE8_MEMBER( ngp_state::ngp_io_w )
 	case 0x37:
 		break;
 	case 0x38:  /* Sound enable/disable. */
-		switch( data )
+		switch (data)
 		{
 		case 0x55:      /* Enabled sound */
-			m_t6w28->set_enable( true );
+			m_t6w28->set_enable(true);
 			break;
 		case 0xAA:      /* Disable sound */
-			m_t6w28->set_enable( false );
+			m_t6w28->set_enable(false);
 			break;
 		}
 		break;
 
 	case 0x39:  /* Z80 enable/disable. */
-		switch( data )
+		switch (data)
 		{
 		case 0x55:      /* Enable Z80 */
-			m_z80->resume(SUSPEND_REASON_HALT );
+			m_z80->resume(SUSPEND_REASON_HALT);
 			m_z80->reset();
-			m_z80->set_input_line(0, CLEAR_LINE );
+			m_z80->set_input_line(0, CLEAR_LINE);
 			break;
 		case 0xAA:      /* Disable Z80 */
-			m_z80->suspend(SUSPEND_REASON_HALT, 1 );
+			m_z80->suspend(SUSPEND_REASON_HALT, 1);
 			break;
 		}
 		break;
@@ -331,226 +331,226 @@ WRITE8_MEMBER( ngp_state::ngp_io_w )
 }
 
 
-void ngp_state::flash_w( int which, offs_t offset, uint8_t data )
+template <int Which> void ngp_state::flash_w(offs_t offset, uint8_t data)
 {
-	if ( ! m_flash_chip[which].present )
+	if (!m_flash_chip[Which].present)
 		return;
 
-	switch( m_flash_chip[which].state )
+	switch (m_flash_chip[Which].state)
 	{
 	case F_READ:
-		if ( offset == 0x5555 && data == 0xaa )
-			m_flash_chip[which].state = F_PROG1;
-		m_flash_chip[which].command[0] = 0;
+		if (offset == 0x5555 && data == 0xaa)
+			m_flash_chip[Which].state = F_PROG1;
+		m_flash_chip[Which].command[0] = 0;
 		break;
 	case F_PROG1:
-		if ( offset == 0x2aaa && data == 0x55 )
-			m_flash_chip[which].state = F_PROG2;
+		if (offset == 0x2aaa && data == 0x55)
+			m_flash_chip[Which].state = F_PROG2;
 		else
-			m_flash_chip[which].state = F_READ;
+			m_flash_chip[Which].state = F_READ;
 		break;
 	case F_PROG2:
-		if ( data == 0x30 )
+		if (data == 0x30)
 		{
-			if ( m_flash_chip[which].command[0] == 0x80 )
+			if (m_flash_chip[Which].command[0] == 0x80)
 			{
 				int size = 0x10000;
-				uint8_t *block = m_flash_chip[which].data;
+				uint8_t *block = m_flash_chip[Which].data;
 
-				m_flash_chip[which].state = F_AUTO_BLOCK_ERASE;
-				switch( m_flash_chip[which].device_id )
+				m_flash_chip[Which].state = F_AUTO_BLOCK_ERASE;
+				switch (m_flash_chip[Which].device_id)
 				{
 				case 0xab:
-					if ( offset < 0x70000 )
-						block = m_flash_chip[which].data + ( offset & 0x70000 );
+					if (offset < 0x70000)
+						block = m_flash_chip[Which].data + (offset & 0x70000);
 					else
 					{
-						if ( offset & 0x8000 )
+						if (offset & 0x8000)
 						{
-							if ( offset & 0x4000 )
+							if (offset & 0x4000)
 							{
-								block = m_flash_chip[which].data + ( offset & 0x7c000 );
+								block = m_flash_chip[Which].data + (offset & 0x7c000);
 								size = 0x4000;
 							}
 							else
 							{
-								block = m_flash_chip[which].data + ( offset & 0x7e000 );
+								block = m_flash_chip[Which].data + (offset & 0x7e000);
 								size = 0x2000;
 							}
 						}
 						else
 						{
-							block = m_flash_chip[which].data + ( offset & 0x78000 );
+							block = m_flash_chip[Which].data + (offset & 0x78000);
 							size = 0x8000;
 						}
 					}
 					break;
 				case 0x2c:
-					if ( offset < 0xf0000 )
-						block = m_flash_chip[which].data + ( offset & 0xf0000 );
+					if (offset < 0xf0000)
+						block = m_flash_chip[Which].data + (offset & 0xf0000);
 					else
 					{
-						if ( offset & 0x8000 )
+						if (offset & 0x8000)
 						{
-							if ( offset & 0x4000 )
+							if (offset & 0x4000)
 							{
-								block = m_flash_chip[which].data + ( offset & 0xfc000 );
+								block = m_flash_chip[Which].data + (offset & 0xfc000);
 								size = 0x4000;
 							}
 							else
 							{
-								block = m_flash_chip[which].data + ( offset & 0xfe000 );
+								block = m_flash_chip[Which].data + (offset & 0xfe000);
 								size = 0x2000;
 							}
 						}
 						else
 						{
-							block = m_flash_chip[which].data + ( offset & 0xf8000 );
+							block = m_flash_chip[Which].data + (offset & 0xf8000);
 							size = 0x8000;
 						}
 					}
 					break;
 				case 0x2f:
-					if ( offset < 0x1f0000 )
-						block = m_flash_chip[which].data + ( offset & 0x1f0000 );
+					if (offset < 0x1f0000)
+						block = m_flash_chip[Which].data + (offset & 0x1f0000);
 					else
 					{
-						if ( offset & 0x8000 )
+						if (offset & 0x8000)
 						{
-							if ( offset & 0x4000 )
+							if (offset & 0x4000)
 							{
-								block = m_flash_chip[which].data + ( offset & 0x1fc000 );
+								block = m_flash_chip[Which].data + (offset & 0x1fc000);
 								size = 0x4000;
 							}
 							else
 							{
-								block = m_flash_chip[which].data + ( offset & 0x1fe000 );
+								block = m_flash_chip[Which].data + (offset & 0x1fe000);
 								size = 0x2000;
 							}
 						}
 						else
 						{
-							block = m_flash_chip[which].data + ( offset & 0x1f8000 );
+							block = m_flash_chip[Which].data + (offset & 0x1f8000);
 							size = 0x8000;
 						}
 					}
 					break;
 				}
-				memset( block, 0xFF, size );
+				memset(block, 0xFF, size);
 			}
 			else
-				m_flash_chip[which].state = F_READ;
+				m_flash_chip[Which].state = F_READ;
 		}
-		else if ( offset == 0x5555 )
+		else if (offset == 0x5555)
 		{
-			switch( data )
+			switch (data)
 			{
 			case 0x80:
-				m_flash_chip[which].command[0] = 0x80;
-				m_flash_chip[which].state = F_COMMAND;
+				m_flash_chip[Which].command[0] = 0x80;
+				m_flash_chip[Which].state = F_COMMAND;
 				break;
 			case 0x90:
-				m_flash_chip[which].data[0x1fc000] = m_flash_chip[which].manufacturer_id;
-				m_flash_chip[which].data[0xfc000] = m_flash_chip[which].manufacturer_id;
-				m_flash_chip[which].data[0x7c000] = m_flash_chip[which].manufacturer_id;
-				m_flash_chip[which].data[0] = m_flash_chip[which].manufacturer_id;
-				m_flash_chip[which].data[0x1fc001] = m_flash_chip[which].device_id;
-				m_flash_chip[which].data[0xfc001] = m_flash_chip[which].device_id;
-				m_flash_chip[which].data[0x7c001] = m_flash_chip[which].device_id;
-				m_flash_chip[which].data[1] = m_flash_chip[which].device_id;
-				m_flash_chip[which].data[0x1fc002] = 0x02;
-				m_flash_chip[which].data[0xfc002] = 0x02;
-				m_flash_chip[which].data[0x7c002] = 0x02;
-				m_flash_chip[which].data[2] = 0x02;
-				m_flash_chip[which].data[0x1fc003] = 0x80;
-				m_flash_chip[which].data[0xfc003] = 0x80;
-				m_flash_chip[which].data[0x7c003] = 0x80;
-				m_flash_chip[which].data[3] = 0x80;
-				m_flash_chip[which].state = F_ID_READ;
+				m_flash_chip[Which].data[0x1fc000] = m_flash_chip[Which].manufacturer_id;
+				m_flash_chip[Which].data[0xfc000] = m_flash_chip[Which].manufacturer_id;
+				m_flash_chip[Which].data[0x7c000] = m_flash_chip[Which].manufacturer_id;
+				m_flash_chip[Which].data[0] = m_flash_chip[Which].manufacturer_id;
+				m_flash_chip[Which].data[0x1fc001] = m_flash_chip[Which].device_id;
+				m_flash_chip[Which].data[0xfc001] = m_flash_chip[Which].device_id;
+				m_flash_chip[Which].data[0x7c001] = m_flash_chip[Which].device_id;
+				m_flash_chip[Which].data[1] = m_flash_chip[Which].device_id;
+				m_flash_chip[Which].data[0x1fc002] = 0x02;
+				m_flash_chip[Which].data[0xfc002] = 0x02;
+				m_flash_chip[Which].data[0x7c002] = 0x02;
+				m_flash_chip[Which].data[2] = 0x02;
+				m_flash_chip[Which].data[0x1fc003] = 0x80;
+				m_flash_chip[Which].data[0xfc003] = 0x80;
+				m_flash_chip[Which].data[0x7c003] = 0x80;
+				m_flash_chip[Which].data[3] = 0x80;
+				m_flash_chip[Which].state = F_ID_READ;
 				break;
 			case 0x9a:
-				if ( m_flash_chip[which].command[0] == 0x9a )
-					m_flash_chip[which].state = F_BLOCK_PROTECT;
+				if (m_flash_chip[Which].command[0] == 0x9a)
+					m_flash_chip[Which].state = F_BLOCK_PROTECT;
 				else
 				{
-					m_flash_chip[which].command[0] = 0x9a;
-					m_flash_chip[which].state = F_COMMAND;
+					m_flash_chip[Which].command[0] = 0x9a;
+					m_flash_chip[Which].state = F_COMMAND;
 				}
 				break;
 			case 0xa0:
-				m_flash_chip[which].state = F_AUTO_PROGRAM;
+				m_flash_chip[Which].state = F_AUTO_PROGRAM;
 				break;
 			case 0xf0:
 			default:
-				m_flash_chip[which].state = F_READ;
+				m_flash_chip[Which].state = F_READ;
 				break;
 			}
 		}
 		else
-			m_flash_chip[which].state = F_READ;
+			m_flash_chip[Which].state = F_READ;
 		break;
 	case F_COMMAND:
-		if ( offset == 0x5555 && data == 0xaa )
-			m_flash_chip[which].state = F_PROG1;
+		if (offset == 0x5555 && data == 0xaa)
+			m_flash_chip[Which].state = F_PROG1;
 		else
-			m_flash_chip[which].state = F_READ;
+			m_flash_chip[Which].state = F_READ;
 		break;
 	case F_ID_READ:
-		if ( offset == 0x5555 && data == 0xaa )
-			m_flash_chip[which].state = F_PROG1;
+		if (offset == 0x5555 && data == 0xaa)
+			m_flash_chip[Which].state = F_PROG1;
 		else
-			m_flash_chip[which].state = F_READ;
-		m_flash_chip[which].command[0] = 0;
+			m_flash_chip[Which].state = F_READ;
+		m_flash_chip[Which].command[0] = 0;
 		break;
 	case F_AUTO_PROGRAM:
 		/* Only 1 -> 0 changes can be programmed */
-		m_flash_chip[which].data[offset] = m_flash_chip[which].data[offset] & data;
-		m_flash_chip[which].state = F_READ;
+		m_flash_chip[Which].data[offset] = m_flash_chip[Which].data[offset] & data;
+		m_flash_chip[Which].state = F_READ;
 		break;
 	case F_AUTO_CHIP_ERASE:
-		m_flash_chip[which].state = F_READ;
+		m_flash_chip[Which].state = F_READ;
 		break;
 	case F_AUTO_BLOCK_ERASE:
-		m_flash_chip[which].state = F_READ;
+		m_flash_chip[Which].state = F_READ;
 		break;
 	case F_BLOCK_PROTECT:
-		m_flash_chip[which].state = F_READ;
+		m_flash_chip[Which].state = F_READ;
 		break;
 	}
 
-	if ( m_flash_chip[which].state == F_READ )
+	if (m_flash_chip[Which].state == F_READ)
 	{
 		/* Exit command/back to normal operation*/
-		m_flash_chip[which].data[0] = m_flash_chip[which].org_data[0];
-		m_flash_chip[which].data[1] = m_flash_chip[which].org_data[1];
-		m_flash_chip[which].data[2] = m_flash_chip[which].org_data[2];
-		m_flash_chip[which].data[3] = m_flash_chip[which].org_data[3];
-		m_flash_chip[which].data[0x7c000] = m_flash_chip[which].org_data[4];
-		m_flash_chip[which].data[0x7c001] = m_flash_chip[which].org_data[5];
-		m_flash_chip[which].data[0x7c002] = m_flash_chip[which].org_data[6];
-		m_flash_chip[which].data[0x7c003] = m_flash_chip[which].org_data[7];
-		m_flash_chip[which].data[0xfc000] = m_flash_chip[which].org_data[8];
-		m_flash_chip[which].data[0xfc001] = m_flash_chip[which].org_data[9];
-		m_flash_chip[which].data[0xfc002] = m_flash_chip[which].org_data[10];
-		m_flash_chip[which].data[0xfc003] = m_flash_chip[which].org_data[11];
-		m_flash_chip[which].data[0x1fc000] = m_flash_chip[which].org_data[12];
-		m_flash_chip[which].data[0x1fc001] = m_flash_chip[which].org_data[13];
-		m_flash_chip[which].data[0x1fc002] = m_flash_chip[which].org_data[14];
-		m_flash_chip[which].data[0x1fc003] = m_flash_chip[which].org_data[15];
-		m_flash_chip[which].command[0] = 0;
+		m_flash_chip[Which].data[0] = m_flash_chip[Which].org_data[0];
+		m_flash_chip[Which].data[1] = m_flash_chip[Which].org_data[1];
+		m_flash_chip[Which].data[2] = m_flash_chip[Which].org_data[2];
+		m_flash_chip[Which].data[3] = m_flash_chip[Which].org_data[3];
+		m_flash_chip[Which].data[0x7c000] = m_flash_chip[Which].org_data[4];
+		m_flash_chip[Which].data[0x7c001] = m_flash_chip[Which].org_data[5];
+		m_flash_chip[Which].data[0x7c002] = m_flash_chip[Which].org_data[6];
+		m_flash_chip[Which].data[0x7c003] = m_flash_chip[Which].org_data[7];
+		m_flash_chip[Which].data[0xfc000] = m_flash_chip[Which].org_data[8];
+		m_flash_chip[Which].data[0xfc001] = m_flash_chip[Which].org_data[9];
+		m_flash_chip[Which].data[0xfc002] = m_flash_chip[Which].org_data[10];
+		m_flash_chip[Which].data[0xfc003] = m_flash_chip[Which].org_data[11];
+		m_flash_chip[Which].data[0x1fc000] = m_flash_chip[Which].org_data[12];
+		m_flash_chip[Which].data[0x1fc001] = m_flash_chip[Which].org_data[13];
+		m_flash_chip[Which].data[0x1fc002] = m_flash_chip[Which].org_data[14];
+		m_flash_chip[Which].data[0x1fc003] = m_flash_chip[Which].org_data[15];
+		m_flash_chip[Which].command[0] = 0;
 	}
 }
 
 
-WRITE8_MEMBER( ngp_state::flash0_w )
+void ngp_state::flash0_w(offs_t offset, uint8_t data)
 {
-	flash_w( 0, offset, data );
+	flash_w<0>(offset, data);
 }
 
 
-WRITE8_MEMBER( ngp_state::flash1_w )
+void ngp_state::flash1_w(offs_t offset, uint8_t data)
 {
-	flash_w( 1, offset, data );
+	flash_w<1>(offset, data);
 }
 
 
@@ -566,21 +566,21 @@ void ngp_state::ngp_mem(address_map &map)
 }
 
 
-READ8_MEMBER( ngp_state::ngp_z80_comm_r )
+uint8_t ngp_state::ngp_z80_comm_r()
 {
 	return m_io_reg[0x3c];
 }
 
 
-WRITE8_MEMBER( ngp_state::ngp_z80_comm_w )
+void ngp_state::ngp_z80_comm_w(uint8_t data)
 {
 	m_io_reg[0x3c] = data;
 }
 
 
-WRITE8_MEMBER( ngp_state::ngp_z80_signal_main_w )
+void ngp_state::ngp_z80_signal_main_w(uint8_t data)
 {
-	m_maincpu->set_input_line(TLCS900_INT5, ASSERT_LINE );
+	m_maincpu->set_input_line(TLCS900_INT5, ASSERT_LINE);
 }
 
 
@@ -593,12 +593,12 @@ void ngp_state::z80_mem(address_map &map)
 }
 
 
-WRITE8_MEMBER( ngp_state::ngp_z80_clear_irq )
+void ngp_state::ngp_z80_clear_irq(uint8_t data)
 {
-	m_z80->set_input_line(0, CLEAR_LINE );
+	m_z80->set_input_line(0, CLEAR_LINE);
 
 	/* I am not exactly sure what causes the maincpu INT5 signal to be cleared. This will do for now. */
-	m_maincpu->set_input_line(TLCS900_INT5, CLEAR_LINE );
+	m_maincpu->set_input_line(TLCS900_INT5, CLEAR_LINE);
 }
 
 
@@ -610,46 +610,46 @@ void ngp_state::z80_io(address_map &map)
 
 INPUT_CHANGED_MEMBER(ngp_state::power_callback)
 {
-	if ( m_io_reg[0x33] & 0x04 )
+	if (m_io_reg[0x33] & 0x04)
 	{
-		m_maincpu->set_input_line(TLCS900_NMI, (m_io_power->read() & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
+		m_maincpu->set_input_line(TLCS900_NMI, (m_io_power->read() & 0x01 ) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
 
-static INPUT_PORTS_START( ngp )
+static INPUT_PORTS_START(ngp)
 	PORT_START("Controls")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Up")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Down")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Left")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Right")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Button A")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Button B")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SELECT) PORT_NAME("Option")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_NAME("Up")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_NAME("Down")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_NAME("Left")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_NAME("Right")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Button A")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Button B")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SELECT) PORT_NAME("Option")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("Power")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, ngp_state, power_callback, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON) PORT_CHANGED_MEMBER(DEVICE_SELF, ngp_state, power_callback, nullptr)
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER( ngp_state::ngp_vblank_pin_w )
+WRITE_LINE_MEMBER(ngp_state::ngp_vblank_pin_w)
 {
-	m_maincpu->set_input_line(TLCS900_INT4, state ? ASSERT_LINE : CLEAR_LINE );
+	m_maincpu->set_input_line(TLCS900_INT4, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-WRITE_LINE_MEMBER( ngp_state::ngp_hblank_pin_w )
+WRITE_LINE_MEMBER(ngp_state::ngp_hblank_pin_w)
 {
-	m_maincpu->set_input_line(TLCS900_TIO, state ? ASSERT_LINE : CLEAR_LINE );
+	m_maincpu->set_input_line(TLCS900_TIO, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER( ngp_state::ngp_tlcs900_porta )
+void ngp_state::ngp_tlcs900_porta(offs_t offset, uint8_t data)
 {
 	int to3 = BIT(data,3);
-	if ( to3 && ! m_old_to3 )
-		m_z80->set_input_line(0, ASSERT_LINE );
+	if (to3 && ! m_old_to3)
+		m_z80->set_input_line(0, ASSERT_LINE);
 
 	m_old_to3 = to3;
 }
@@ -710,7 +710,7 @@ void ngp_state::machine_start()
 	}
 
 	m_seconds_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ngp_state::ngp_seconds_callback),this));
-	m_seconds_timer->adjust( attotime::from_seconds(1), 0, attotime::from_seconds(1) );
+	m_seconds_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
 	save_item(NAME(m_io_reg));
 	save_item(NAME(m_old_to3));
@@ -737,7 +737,7 @@ void ngp_state::machine_reset()
 	m_z80->suspend(SUSPEND_REASON_HALT, 1);
 	m_z80->set_input_line(0, CLEAR_LINE);
 
-	if ( m_nvram_loaded )
+	if (m_nvram_loaded)
 	{
 		m_maincpu->set_state_int(TLCS900_PC, 0xFF1800);
 	}
@@ -746,12 +746,12 @@ void ngp_state::machine_reset()
 
 uint32_t ngp_state::screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k1ge->update( bitmap, cliprect );
+	m_k1ge->update(bitmap, cliprect);
 	return 0;
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER( ngp_state, ngp_cart )
+DEVICE_IMAGE_LOAD_MEMBER(ngp_state, ngp_cart)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -798,7 +798,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ngp_state, ngp_cart )
 }
 
 
-DEVICE_IMAGE_UNLOAD_MEMBER( ngp_state, ngp_cart )
+DEVICE_IMAGE_UNLOAD_MEMBER(ngp_state, ngp_cart)
 {
 	m_flash_chip[0].present = 0;
 	m_flash_chip[0].state = F_READ;
@@ -860,12 +860,11 @@ void ngp_state::ngp_common(machine_config &config)
 MACHINE_CONFIG_START(ngp_state::ngp)
 	ngp_common(config);
 
-	K1GE(config , m_k1ge, 6.144_MHz_XTAL, "screen");
+	K1GE(config, m_k1ge, 6.144_MHz_XTAL, "screen");
 	m_k1ge->vblank_callback().set(FUNC(ngp_state::ngp_vblank_pin_w));
 	m_k1ge->hblank_callback().set(FUNC(ngp_state::ngp_hblank_pin_w));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_PALETTE("k1ge:palette")
+	subdevice<screen_device>("screen")->set_palette("k1ge:palette");
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ngp_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,ngp,npc,ngc")
@@ -880,12 +879,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ngp_state::ngpc)
 	ngp_common(config);
-	K2GE(config , m_k1ge, 6.144_MHz_XTAL, "screen");
+	K2GE(config, m_k1ge, 6.144_MHz_XTAL, "screen");
 	m_k1ge->vblank_callback().set(FUNC(ngp_state::ngp_vblank_pin_w));
 	m_k1ge->hblank_callback().set(FUNC(ngp_state::ngp_hblank_pin_w));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_PALETTE("k1ge:palette")
+	subdevice<screen_device>("screen")->set_palette("k1ge:palette");
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ngp_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,ngp,npc,ngc")
@@ -898,18 +896,18 @@ MACHINE_CONFIG_START(ngp_state::ngpc)
 MACHINE_CONFIG_END
 
 
-ROM_START( ngp )
-	ROM_REGION( 0x10000, "maincpu" , 0 )
-	ROM_LOAD( "ngp_bios.ngp", 0x0000, 0x10000, CRC(6232df8d) SHA1(2f6429b68446536d8b03f35d02f1e98beb6460a0) )
+ROM_START(ngp)
+	ROM_REGION(0x10000, "maincpu" , 0)
+	ROM_LOAD("ngp_bios.ngp", 0x0000, 0x10000, CRC(6232df8d) SHA1(2f6429b68446536d8b03f35d02f1e98beb6460a0))
 ROM_END
 
 
-ROM_START( ngpc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ngpcbios.rom", 0x0000, 0x10000, CRC(6eeb6f40) SHA1(edc13192054a59be49c6d55f83b70e2510968e86) )
+ROM_START(ngpc)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("ngpcbios.rom", 0x0000, 0x10000, CRC(6eeb6f40) SHA1(edc13192054a59be49c6d55f83b70e2510968e86))
 ROM_END
 
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE      INIT        COMPANY  FULLNAME               FLAGS
-CONS( 1998, ngp,  0,      0,      ngp,     ngp,   ngp_state, empty_init, "SNK",   "NeoGeo Pocket",       MACHINE_SUPPORTS_SAVE )
-CONS( 1999, ngpc, ngp,    0,      ngpc,    ngp,   ngp_state, empty_init, "SNK",   "NeoGeo Pocket Color", MACHINE_SUPPORTS_SAVE )
+//   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE      INIT        COMPANY  FULLNAME               FLAGS
+CONS(1998, ngp,  0,      0,      ngp,     ngp,   ngp_state, empty_init, "SNK",   "NeoGeo Pocket",       MACHINE_SUPPORTS_SAVE)
+CONS(1999, ngpc, ngp,    0,      ngpc,    ngp,   ngp_state, empty_init, "SNK",   "NeoGeo Pocket Color", MACHINE_SUPPORTS_SAVE)

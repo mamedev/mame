@@ -3,17 +3,17 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 *
-* fidel_dames.cpp, subdriver of fidelbase.cpp
+* fidel_dames.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 *******************************************************************************
 
-Fidelity Dame Sensory Challenger (DSC)
+Fidelity Dame Sensory Challenger (DSC) overview:
+- Z80A CPU @ 3.9MHz
+- 8KB ROM(MOS 2364), 1KB RAM(2*TMM314APL)
+- 4-digit 7seg panel, sensory board with 50 buttons
+- PCB label 510-1030A01
+
 It's a checkers game for once instead of chess
----------------
-Z80A CPU @ 3.9MHz
-8KB ROM(MOS 2364), 1KB RAM(2*TMM314APL)
-4-digit 7seg panel, sensory board with 50 buttons
-PCB label 510-1030A01
 
 ******************************************************************************/
 
@@ -112,7 +112,7 @@ void dsc_state::main_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( dsc )
-	PORT_INCLUDE( fidel_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 
 	PORT_MODIFY("IN.4")
 	PORT_BIT(0x8f, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -148,12 +148,12 @@ void dsc_state::dsc(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_usec(41)); // active for 41us
 	TIMER(config, "irq_off").configure_periodic(FUNC(dsc_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(dsc_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_dsc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 

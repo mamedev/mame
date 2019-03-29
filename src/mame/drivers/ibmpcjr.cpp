@@ -638,17 +638,14 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	serport.cts_handler().set("ins8250", FUNC(ins8250_uart_device::cts_w));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("pcvideo_pcjr", PCVIDEO_PCJR, 0)
-	MCFG_VIDEO_SET_SCREEN("pcvideo_pcjr:screen")
+	PCVIDEO_PCJR(config, "pcvideo_pcjr", 0).set_screen("pcvideo_pcjr:screen");
 
 	GFXDECODE(config, "gfxdecode", "pcvideo_pcjr:palette", gfx_pcjr);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-	MCFG_DEVICE_ADD("sn76496", SN76496, XTAL(14'318'181)/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.80);
+	SN76496(config, "sn76496", XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* printer */
 	pc_lpt_device &lpt0(PC_LPT(config, "lpt_0"));

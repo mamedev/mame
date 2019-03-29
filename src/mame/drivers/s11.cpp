@@ -382,10 +382,11 @@ void s11_state::init_s11()
 	m_irq_active = false;
 }
 
-MACHINE_CONFIG_START(s11_state::s11)
+void s11_state::s11(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(s11_main_map)
+	M6802(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &s11_state::s11_main_map);
 	MCFG_MACHINE_RESET_OVERRIDE(s11_state, s11)
 
 	/* Video */
@@ -443,8 +444,8 @@ MACHINE_CONFIG_START(s11_state::s11)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Add the soundcard */
-	MCFG_DEVICE_ADD("audiocpu", M6808, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(s11_audio_map)
+	M6808(config, m_audiocpu, XTAL(4'000'000));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &s11_state::s11_audio_map);
 
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
@@ -453,21 +454,20 @@ MACHINE_CONFIG_START(s11_state::s11)
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 
 	SPEAKER(config, "speech").front_center();
-	MCFG_DEVICE_ADD("hc55516", HC55516, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 1.00)
+	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, "speech", 1.00);
 
 	PIA6821(config, m_pias, 0);
 	m_pias->readpa_handler().set(FUNC(s11_state::sound_r));
 	m_pias->writepa_handler().set(FUNC(s11_state::sound_w));
 	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
-	m_pias->ca2_handler().set("hc55516", FUNC(hc55516_device::clock_w));
-	m_pias->cb2_handler().set("hc55516", FUNC(hc55516_device::digit_w));
-	m_pias->irqa_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
-	m_pias->irqa_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
+	m_pias->ca2_handler().set(m_hc55516, FUNC(hc55516_device::clock_w));
+	m_pias->cb2_handler().set(m_hc55516, FUNC(hc55516_device::digit_w));
+	m_pias->irqa_handler().set_inputline(m_audiocpu, M6808_IRQ_LINE);
+	m_pias->irqa_handler().set_inputline(m_audiocpu, M6808_IRQ_LINE);
 
 	/* Add the background music card */
-	MCFG_DEVICE_ADD("bgcpu", MC6809E, 8000000 / 4) // MC68B09E
-	MCFG_DEVICE_PROGRAM_MAP(s11_bg_map)
+	MC6809E(config, m_bgcpu, 8000000 / 4); // MC68B09E
+	m_bgcpu->set_addrmap(AS_PROGRAM, &s11_state::s11_bg_map);
 
 	SPEAKER(config, "bg").front_center();
 	YM2151(config, m_ym, 3580000);
@@ -480,9 +480,9 @@ MACHINE_CONFIG_START(s11_state::s11)
 	m_pia40->writepa_handler().set("dac1", FUNC(dac_byte_interface::data_w));
 	m_pia40->writepb_handler().set(FUNC(s11_state::pia40_pb_w));
 	m_pia40->cb2_handler().set(FUNC(s11_state::pia40_cb2_w));
-	m_pia40->irqa_handler().set_inputline("bgcpu", M6809_FIRQ_LINE);
-	m_pia40->irqb_handler().set_inputline("bgcpu", INPUT_LINE_NMI);
-MACHINE_CONFIG_END
+	m_pia40->irqa_handler().set_inputline(m_bgcpu, M6809_FIRQ_LINE);
+	m_pia40->irqb_handler().set_inputline(m_bgcpu, INPUT_LINE_NMI);
+}
 
 
 /*----------------------------

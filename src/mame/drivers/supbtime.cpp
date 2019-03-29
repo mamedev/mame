@@ -337,20 +337,21 @@ GFXDECODE_END
 //  MACHINE DEFINITIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(supbtime_state::supbtime)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(supbtime_map)
+void supbtime_state::supbtime(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(28'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &supbtime_state::supbtime_map);
 
 	H6280(config, m_audiocpu, XTAL(32'220'000) / 8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &supbtime_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, supbtime_state, vblank_w))
-	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_supbtime)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248);
+	screen.screen_vblank().set(FUNC(supbtime_state::vblank_w));
+	screen.set_screen_update(FUNC(supbtime_state::screen_update_supbtime));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_supbtime);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
@@ -383,27 +384,24 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 	ymsnd.add_route(0, "mono", 0.45);
 	ymsnd.add_route(1, "mono", 0.45);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(21'477'272) / 20, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", XTAL(21'477'272) / 20, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
+}
 
-MACHINE_CONFIG_START(supbtime_state::chinatwn)
+void supbtime_state::chinatwn(machine_config &config)
+{
 	supbtime(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(chinatwn_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &supbtime_state::chinatwn_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_chinatwn)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(supbtime_state::screen_update_chinatwn));
+}
 
-MACHINE_CONFIG_START(supbtime_state::tumblep)
+void supbtime_state::tumblep(machine_config &config)
+{
 	supbtime(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tumblep_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &supbtime_state::tumblep_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_tumblep)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(supbtime_state::screen_update_tumblep));
+}
 
 
 //**************************************************************************

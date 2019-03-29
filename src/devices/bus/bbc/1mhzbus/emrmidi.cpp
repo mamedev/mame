@@ -81,7 +81,7 @@ void bbc_emrmidi_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_emrmidi_device::fred_r)
+uint8_t bbc_emrmidi_device::fred_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -93,7 +93,7 @@ READ8_MEMBER(bbc_emrmidi_device::fred_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_emrmidi_device::fred_w)
+void bbc_emrmidi_device::fred_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0xf0 && offset < 0xf2)
 	{

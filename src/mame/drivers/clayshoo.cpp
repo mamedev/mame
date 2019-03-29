@@ -322,30 +322,30 @@ void clayshoo_state::machine_reset()
 	m_analog_port_val = 0;
 }
 
-MACHINE_CONFIG_START(clayshoo_state::clayshoo)
-
+void clayshoo_state::clayshoo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,5068000/4)      /* 5.068/4 Mhz (divider is a guess) */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", clayshoo_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 5068000/4);      /* 5.068/4 Mhz (divider is a guess) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &clayshoo_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &clayshoo_state::main_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(clayshoo_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 64, 255)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_UPDATE_DRIVER(clayshoo_state, screen_update_clayshoo)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 255, 64, 255);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_screen_update(FUNC(clayshoo_state::screen_update_clayshoo));
 
 	I8255A(config, "ppi8255_0");
 
 	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
 	ppi1.out_pa_callback().set(FUNC(clayshoo_state::input_port_select_w));
 	ppi1.in_pb_callback().set(FUNC(clayshoo_state::input_port_r));
-MACHINE_CONFIG_END
+}
 
 
 

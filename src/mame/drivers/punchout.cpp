@@ -622,15 +622,15 @@ MACHINE_RESET_MEMBER(punchout_state, spnchout)
 }
 
 
-MACHINE_CONFIG_START(punchout_state::punchout)
-
+void punchout_state::punchout(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(punchout_map)
-	MCFG_DEVICE_IO_MAP(punchout_io_map)
+	Z80(config, m_maincpu, XTAL(8'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &punchout_state::punchout_map);
+	m_maincpu->set_addrmap(AS_IO, &punchout_state::punchout_io_map);
 
-	MCFG_DEVICE_ADD("audiocpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(punchout_sound_map)
+	N2A03(config, m_audiocpu, NTSC_APU_CLOCK);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &punchout_state::punchout_sound_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -659,13 +659,13 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	top.screen_vblank().set(FUNC(punchout_state::vblank_irq));
 	top.screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_SCREEN_ADD("bottom", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(punchout_state, screen_update_punchout_bottom)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &bottom(SCREEN(config, "bottom", SCREEN_TYPE_RASTER));
+	bottom.set_refresh_hz(60);
+	bottom.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	bottom.set_size(32*8, 32*8);
+	bottom.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	bottom.set_screen_update(FUNC(punchout_state::screen_update_punchout_bottom));
+	bottom.set_palette(m_palette);
 
 	/* sound hardware */
 	// FIXME: this makes no sense - "lspeaker" on left and "mono" on right, with nothing routed to "mono"
@@ -675,43 +675,41 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	GENERIC_LATCH_8(config, "soundlatch");
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_DEVICE_ADD("vlm", VLM5030, N2A03_NTSC_XTAL/6)
-	MCFG_DEVICE_ADDRESS_MAP(0, punchout_vlm_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-MACHINE_CONFIG_END
+	VLM5030(config, m_vlm, N2A03_NTSC_XTAL/6);
+	m_vlm->set_addrmap(0, &punchout_state::punchout_vlm_map);
+	m_vlm->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+}
 
 
-MACHINE_CONFIG_START(punchout_state::spnchout)
+void punchout_state::spnchout(machine_config &config)
+{
 	punchout(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(spnchout_io_map)
+	m_maincpu->set_addrmap(AS_IO, &punchout_state::spnchout_io_map);
 
 	RP5C01(config, m_rtc, 0); // OSCIN -> Vcc
 	m_rtc->remove_battery();
 	RP5H01(config, m_rp5h01, 0);
 
 	MCFG_MACHINE_RESET_OVERRIDE(punchout_state, spnchout)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(punchout_state::armwrest)
+void punchout_state::armwrest(machine_config &config)
+{
 	punchout(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(armwrest_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &punchout_state::armwrest_map);
 
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_armwrest);
 
 	MCFG_VIDEO_START_OVERRIDE(punchout_state, armwrest)
-	MCFG_SCREEN_MODIFY("top")
-	MCFG_SCREEN_UPDATE_DRIVER(punchout_state, screen_update_armwrest_top)
-	MCFG_SCREEN_MODIFY("bottom")
-	MCFG_SCREEN_UPDATE_DRIVER(punchout_state, screen_update_armwrest_bottom)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("top")->set_screen_update(FUNC(punchout_state::screen_update_armwrest_top));
+	subdevice<screen_device>("bottom")->set_screen_update(FUNC(punchout_state::screen_update_armwrest_bottom));
+}
 
 
 

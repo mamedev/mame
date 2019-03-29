@@ -36,7 +36,7 @@ public:
 	}
 	void set_keyboard_callback(generic_keyboard_device::output_delegate callback) { m_keyboard_cb = callback; }
 
-	DECLARE_WRITE8_MEMBER(write) { term_write(data); }
+	void write(u8 data) { term_write(data); }
 
 	void kbd_put(u8 data);
 

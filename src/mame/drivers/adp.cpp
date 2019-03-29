@@ -540,11 +540,11 @@ void adp_state::fstation_hd63484_map(address_map &map)
 	map(0x80000, 0xfffff).ram();
 }
 
-MACHINE_CONFIG_START(adp_state::quickjac)
-
-	MCFG_DEVICE_ADD(m_maincpu, M68000, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(quickjac_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(adp_state, duart_iack_handler)
+void adp_state::quickjac(machine_config &config)
+{
+	M68000(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::quickjac_mem);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(adp_state::duart_iack_handler));
 
 	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
 	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
@@ -561,13 +561,13 @@ MACHINE_CONFIG_START(adp_state::quickjac)
 	MSM6242(config, "rtc", XTAL(32'768));
 	//rtc.out_int_handler().set(FUNC(adp_state::rtc_irq));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(384, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
-	MCFG_SCREEN_UPDATE_DEVICE("acrtc", hd63484_device, update_screen)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(384, 280);
+	screen.set_visarea_full();
+	screen.set_screen_update("acrtc", FUNC(hd63484_device::update_screen));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(adp_state::adp_palette), 0x10);
 
@@ -577,8 +577,7 @@ MACHINE_CONFIG_START(adp_state::quickjac)
 	ym2149_device &aysnd(YM2149(config, "aysnd", 3686400/2));
 	aysnd.port_a_read_callback().set_ioport("PA");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.10);
-
-MACHINE_CONFIG_END
+}
 
 void adp_state::skattv(machine_config &config)
 {
@@ -617,18 +616,18 @@ void adp_state::funland(machine_config &config)
 	m_acrtc->set_addrmap(0, &adp_state::fstation_hd63484_map);
 }
 
-MACHINE_CONFIG_START(adp_state::fstation)
+void adp_state::fstation(machine_config &config)
+{
 	funland(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(fstation_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::fstation_mem);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_size(640, 480);
+	screen.set_visarea_full();
 
 	m_palette->set_init(FUNC(adp_state::fstation_palette));
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( quickjac )

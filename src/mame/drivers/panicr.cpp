@@ -602,22 +602,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(panicr_state::scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
 }
 
-MACHINE_CONFIG_START(panicr_state::panicr)
-	MCFG_DEVICE_ADD("maincpu", V20,MASTER_CLOCK/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
-	MCFG_DEVICE_PROGRAM_MAP(panicr_map)
+void panicr_state::panicr(machine_config &config)
+{
+	V20(config, m_maincpu, MASTER_CLOCK/2); /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &panicr_state::panicr_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(panicr_state::scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("t5182", T5182, 0)
+	T5182(config, m_t5182, 0);
 
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(panicr_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(32*8, 32*8);
+//  m_screen->set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(panicr_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_panicr);
 	PALETTE(config, m_palette, FUNC(panicr_state::panicr_palette), 256 * 4, 256);
@@ -629,7 +629,7 @@ MACHINE_CONFIG_START(panicr_state::panicr)
 	ymsnd.irq_handler().set(m_t5182, FUNC(t5182_device::ym2151_irq_handler));
 	ymsnd.add_route(0, "mono", 1.0);
 	ymsnd.add_route(1, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( panicr )

@@ -459,27 +459,27 @@ TIMER_DEVICE_CALLBACK_MEMBER(olibochu_state::olibochu_scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* RST 08h */
 }
 
-MACHINE_CONFIG_START(olibochu_state::olibochu)
-
+void olibochu_state::olibochu(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz ?? */
-	MCFG_DEVICE_PROGRAM_MAP(olibochu_map)
+	Z80(config, m_maincpu, 4000000);   /* 4 MHz ?? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &olibochu_state::olibochu_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(olibochu_state::olibochu_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* 4 MHz ?? */
-	MCFG_DEVICE_PROGRAM_MAP(olibochu_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(olibochu_state, irq0_line_hold, 60) //???
+	z80_device &audiocpu(Z80(config, "audiocpu", 4000000));  /* 4 MHz ?? */
+	audiocpu.set_addrmap(AS_PROGRAM, &olibochu_state::olibochu_sound_map);
+	audiocpu.set_periodic_int(FUNC(olibochu_state::irq0_line_hold), attotime::from_hz(60)); //???
 
 //  config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(olibochu_state, screen_update_olibochu)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(olibochu_state::screen_update_olibochu));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_olibochu);
 	PALETTE(config, m_palette, FUNC(olibochu_state::olibochu_palette), 512);
@@ -490,7 +490,7 @@ MACHINE_CONFIG_START(olibochu_state::olibochu)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	AY8910(config, "aysnd", 2'000'000).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 

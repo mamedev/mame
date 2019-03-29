@@ -33,10 +33,11 @@ void lg_dvd_state::lg_dvd_map(address_map &map)
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 }
 
-MACHINE_CONFIG_START(lg_dvd_state::lg)
-	MCFG_DEVICE_ADD( "maincpu", I80C52, XTAL(16'000'000) )
-	MCFG_DEVICE_PROGRAM_MAP( lg_dvd_map )
-MACHINE_CONFIG_END
+void lg_dvd_state::lg(machine_config &config)
+{
+	I80C52(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &lg_dvd_state::lg_dvd_map);
+}
 
 ROM_START( lggp40 )
 	ROM_REGION( 0x100000, "maincpu", 0 )

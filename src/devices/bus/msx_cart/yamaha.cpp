@@ -131,16 +131,16 @@ void msx_cart_sfg_device::check_irq()
 {
 	if (m_ym2151_irq_state != CLEAR_LINE || m_ym2148_irq_state != CLEAR_LINE)
 	{
-		m_out_irq_cb(ASSERT_LINE);
+		irq_out(ASSERT_LINE);
 	}
 	else
 	{
-		m_out_irq_cb(CLEAR_LINE);
+		irq_out(CLEAR_LINE);
 	}
 }
 
 
-READ8_MEMBER(msx_cart_sfg_device::read_cart)
+uint8_t msx_cart_sfg_device::read_cart(offs_t offset)
 {
 	switch (offset & 0x3fff)
 	{
@@ -155,7 +155,7 @@ READ8_MEMBER(msx_cart_sfg_device::read_cart)
 		case 0x3ff6:     // YM-2148 MIDI UART status register
 							// ------x- - 1 = received a byte/receive buffer full?
 							// -------x - 1 = ready to send next byte/send buffer empty?
-			return m_ym2148->read(space, offset & 7);
+			return m_ym2148->read(offset & 7);
 	}
 
 	if (offset < 0x8000)
@@ -167,7 +167,7 @@ READ8_MEMBER(msx_cart_sfg_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_sfg_device::write_cart)
+void msx_cart_sfg_device::write_cart(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x3fff)
 	{
@@ -191,7 +191,7 @@ WRITE8_MEMBER(msx_cart_sfg_device::write_cart)
 						// x------- - 1 = reset
 						// -----x-- - 1 = enable receiving / sending midi data
 						// -------x - 1 = enable receiving / sending midi data
-			m_ym2148->write(space, offset & 7, data);
+			m_ym2148->write(offset & 7, data);
 			break;
 
 		default:

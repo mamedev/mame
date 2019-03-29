@@ -16,12 +16,15 @@ ac1.cpp
 accomm.cpp
 acd.cpp
 aceex.cpp
+aci_boris.cpp
+aci_borisdpl.cpp
 acrnsys1.cpp
 acrnsys.cpp
 acvirus.cpp
 adam.cpp
 adm23.cpp
 adm31.cpp
+adm36.cpp
 advision.cpp
 agat.cpp
 aim65.cpp
@@ -80,6 +83,7 @@ att4425.cpp
 att630.cpp
 attache.cpp
 aussiebyte.cpp
+ave_arb.cpp
 avigo.cpp
 ax20.cpp
 b16.cpp
@@ -139,7 +143,6 @@ chesstrv.cpp
 cit101.cpp
 cit220.cpp
 cking_master.cpp
-ckingbase.cpp
 clcd.cpp
 clickstart.cpp
 cm1800.cpp
@@ -165,7 +168,6 @@ crvision.cpp
 ct486.cpp
 cvicny.cpp
 cxg_ch2001.cpp
-cxgbase.cpp
 cxhumax.cpp
 cybiko.cpp
 cz101.cpp
@@ -243,6 +245,7 @@ fccpu20.cpp
 fccpu30.cpp
 fidel_as12.cpp
 fidel_card.cpp
+fidel_cc1.cpp
 fidel_cc10.cpp
 fidel_cc7.cpp
 fidel_chesster.cpp
@@ -259,7 +262,6 @@ fidel_sc8.cpp
 fidel_sc9.cpp
 fidel_vcc.cpp
 fidel_vsc.cpp
-fidelbase.cpp
 fk1.cpp
 fm7.cpp
 fmtowns.cpp
@@ -276,6 +278,7 @@ gamate.cpp
 gamecom.cpp
 gamecube.cpp
 gameking.cpp
+gamemachine.cpp
 gamepock.cpp
 gb.cpp
 gba.cpp
@@ -352,6 +355,7 @@ indy_indigo2.cpp
 instruct.cpp
 inteladv.cpp
 intellec4.cpp
+intellect02.cpp
 interact.cpp
 interpro.cpp
 intv.cpp
@@ -445,6 +449,7 @@ micral.cpp
 micro20.cpp
 microdec.cpp
 microkit.cpp
+micromon.cpp
 micronic.cpp
 microtan.cpp
 microterm.cpp
@@ -529,7 +534,6 @@ novag_diablo.cpp
 novag_presto.cpp
 novag_scon.cpp
 novag_sexpert.cpp
-novagbase.cpp
 o2.cpp
 ob68k1a.cpp
 octane.cpp
@@ -682,7 +686,6 @@ saturn.cpp
 savia84.cpp
 sbc6510.cpp
 sbrain.cpp
-sc1.cpp
 sc2.cpp
 scopus.cpp
 scorpion.cpp
@@ -704,6 +707,7 @@ si5500.cpp
 sitcom.cpp
 sk1.cpp
 slc1.cpp
+slc1a.cpp
 slicer.cpp
 sm1800.cpp
 sm7238.cpp
@@ -783,6 +787,7 @@ ti990_10.cpp
 ti990_4.cpp
 ticalc1x.cpp
 tiki100.cpp
+titan_soc.cpp
 tim011.cpp
 tim100.cpp
 timex.cpp
@@ -879,8 +884,9 @@ wy100.cpp
 wy150.cpp
 wy30p.cpp
 wy50.cpp
+wy55.cpp
+wy60.cpp
 wy85.cpp
-wyse.cpp
 x07.cpp
 x1.cpp
 x1twin.cpp

@@ -93,7 +93,7 @@ void wy30p_state::wy30p(machine_config &config)
 	EEPROM_ER5911_8BIT(config, m_eeprom);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(31.2795_MHz_XTAL * 2 / 3, 1050, 0, 800, 331, 0, 300); // divider and dimensions guessed
+	m_screen->set_raw(31.2795_MHz_XTAL * 2 / 3, 1050, 0, 800, 331, 0, 312); // divider and dimensions guessed
 	m_screen->set_screen_update(FUNC(wy30p_state::screen_update));
 }
 

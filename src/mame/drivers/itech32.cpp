@@ -1668,7 +1668,7 @@ INPUT_PORTS_END
 
 void itech32_state::base_devices(machine_config &config)
 {
-	MC6809(config, m_soundcpu, SOUND_CLOCK/2);
+	MC6809E(config, m_soundcpu, SOUND_CLOCK/8); // EF68B09EP
 	m_soundcpu->set_addrmap(AS_PROGRAM, &itech32_state::sound_map);
 
 	nvram_device &nvram(NVRAM(config, "nvram"));
@@ -4559,7 +4559,7 @@ void itech32_state::init_wcbowln()
 
 void itech32_state::install_timekeeper()
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x681000, 0x6817ff, read8_delegate(FUNC(timekeeper_device::read), &(*m_timekeeper)), write8_delegate(FUNC(timekeeper_device::write), &(*m_timekeeper)), 0xffffffff);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x681000, 0x6817ff, read8sm_delegate(FUNC(timekeeper_device::read), &(*m_timekeeper)), write8sm_delegate(FUNC(timekeeper_device::write), &(*m_timekeeper)), 0xffffffff);
 }
 
 void itech32_state::init_wcbowlt()

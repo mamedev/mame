@@ -293,15 +293,15 @@ WRITE_LINE_MEMBER(megazone_state::vblank_irq)
 }
 
 
-MACHINE_CONFIG_START(megazone_state::megazone)
-
+void megazone_state::megazone(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", KONAMI1, XTAL(18'432'000)/9)        /* 2.048 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(megazone_map)
+	KONAMI1(config, m_maincpu, XTAL(18'432'000)/9);        /* 2.048 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &megazone_state::megazone_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'432'000)/6)     /* Z80 Clock is derived from the H1 signal */
-	MCFG_DEVICE_PROGRAM_MAP(megazone_sound_map)
-	MCFG_DEVICE_IO_MAP(megazone_sound_io_map)
+	Z80(config, m_audiocpu, XTAL(18'432'000)/6);     /* Z80 Clock is derived from the H1 signal */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &megazone_state::megazone_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &megazone_state::megazone_sound_io_map);
 
 	I8039(config, m_daccpu, XTAL(14'318'181)/2);    /* 7.15909MHz */
 	m_daccpu->set_addrmap(AS_PROGRAM, &megazone_state::megazone_i8039_map);
@@ -320,14 +320,14 @@ MACHINE_CONFIG_START(megazone_state::megazone)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(megazone_state, screen_update_megazone)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, megazone_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(36*8, 32*8);
+	screen.set_visarea(0*8, 36*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(megazone_state::screen_update_megazone));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(megazone_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_megazone);
 	PALETTE(config, m_palette, FUNC(megazone_state::megazone_palette), 16*16+16*16, 32);
@@ -349,13 +349,10 @@ MACHINE_CONFIG_START(megazone_state::megazone)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_DEVICE_ADD("filter.0.0", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_DEVICE_ADD("filter.0.1", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_DEVICE_ADD("filter.0.2", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	FILTER_RC(config, m_filter[0]).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_RC(config, m_filter[1]).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_RC(config, m_filter[2]).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 
 

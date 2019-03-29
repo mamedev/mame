@@ -561,37 +561,37 @@ static GFXDECODE_START( gfx_mil4000 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(mil4000_state::mil4000)
-	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(mil4000_map)
+void mil4000_state::mil4000(machine_config &config)
+{
+	M68000(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mil4000_state::mil4000_map);
 	// irq 2/4/5 point to the same place, others invalid
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)
+	m_maincpu->set_vblank_int("screen", FUNC(mil4000_state::irq5_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mil4000_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(320, 240);
+	screen.set_visarea(0, 320-1, 0, 240-1);
+	screen.set_screen_update(FUNC(mil4000_state::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::BLACK).set_format(palette_device::RGBx_555, 0x800);
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mil4000);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // frequency from 1000 kHz resonator. pin 7 high not verified.
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // frequency from 1000 kHz resonator. pin 7 high not verified.
+}
 
 
-MACHINE_CONFIG_START(mil4000_state::chewheel)
+void mil4000_state::chewheel(machine_config &config)
+{
 	mil4000(config);
-	MCFG_DEVICE_REPLACE("maincpu", M68000, CPU_CLOCK) /* 2MHz */
-	MCFG_DEVICE_PROGRAM_MAP(chewheel_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)
-MACHINE_CONFIG_END
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mil4000_state::chewheel_map); /* 2MHz */
+}
 
 
 ROM_START( mil4000 )

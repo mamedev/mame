@@ -20,13 +20,15 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "imagedev/floppy.h"
+#include "imagedev/harddriv.h"
 #include "machine/6850acia.h"
 #include "machine/74259.h"
 #include "machine/bankdev.h"
+#include "machine/input_merger.h"
 #include "machine/output_latch.h"
 #include "machine/ram.h"
 //#include "machine/tc8250.h"
-//#include "machine/wd1010.h"
+#include "machine/wd1010.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80sio.h"
 #include "emupal.h"
@@ -47,9 +49,12 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gcr(*this, "gcr"),
 		m_tcr(*this, "tcr"),
+		m_int02(*this, "int02"),
 		m_ram(*this, RAM_TAG),
 		m_wd2797(*this, "wd2797"),
 		m_floppy(*this, "wd2797:0:525dd"),
+		m_hdc(*this, "hdc"),
+		m_hdr0(*this, "hdc:0"),
 		m_ramrombank(*this, "ramrombank"),
 		m_mapram(*this, "mapram"),
 		m_videoram(*this, "videoram")
@@ -84,6 +89,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(wd2797_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(wd2797_drq_w);
 
+	DECLARE_WRITE_LINE_MEMBER(wd1010_intrq_w);
+
 	void ramrombank_map(address_map &map);
 	void unixpc_mem(address_map &map);
 
@@ -91,9 +98,12 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_gcr;
 	required_device<ls259_device> m_tcr;
+	required_device<input_merger_device> m_int02;
 	required_device<ram_device> m_ram;
 	required_device<wd2797_device> m_wd2797;
 	required_device<floppy_image_device> m_floppy;
+	required_device<wd1010_device> m_hdc;
+	required_device<harddisk_image_device> m_hdr0;
 	required_device<address_map_bank_device> m_ramrombank;
 
 	required_shared_ptr<uint16_t> m_mapram;
@@ -104,6 +114,7 @@ private:
 	uint16_t m_diskdmasize;
 	uint32_t m_diskdmaptr;
 	bool m_fdc_intrq;
+	bool m_hdc_intrq;
 };
 
 
@@ -205,7 +216,7 @@ READ16_MEMBER(unixpc_state::line_printer_r)
 
 	data |= 1; // no dial tone detected
 	data |= 1 << 1; // no parity error
-	data |= 0 << 2; // hdc intrq
+	data |= m_hdc_intrq ? 1<<2 : 0<<2;
 	data |= m_fdc_intrq ? 1<<3 : 0<<3;
 
 	//logerror("line_printer_r: %04x\n", data);
@@ -253,6 +264,13 @@ WRITE16_MEMBER(unixpc_state::disk_control_w)
 {
 	logerror("disk_control_w: %04x\n", data);
 
+	// TODO: bits 0-2 = head select
+
+	m_hdc->drdy_w(BIT(data, 3) && m_hdr0->exists());
+
+	if (!BIT(data, 4))
+		m_hdc->reset();
+
 	m_floppy->mon_w(!BIT(data, 5));
 
 	// bit 6 = floppy selected / not selected
@@ -266,6 +284,7 @@ WRITE_LINE_MEMBER(unixpc_state::wd2797_intrq_w)
 {
 	logerror("wd2797_intrq_w: %d\n", state);
 	m_fdc_intrq = state;
+	m_int02->in_w<1>(state);
 }
 
 WRITE_LINE_MEMBER(unixpc_state::wd2797_drq_w)
@@ -273,6 +292,15 @@ WRITE_LINE_MEMBER(unixpc_state::wd2797_drq_w)
 	logerror("wd2797_drq_w: %d\n", state);
 }
 
+/***************************************************************************
+    HARD DISK
+***************************************************************************/
+
+WRITE_LINE_MEMBER(unixpc_state::wd1010_intrq_w)
+{
+	m_hdc_intrq = state;
+	m_int02->in_w<0>(state);
+}
 
 /***************************************************************************
     VIDEO
@@ -308,7 +336,7 @@ void unixpc_state::unixpc_mem(address_map &map)
 	map(0x4d0000, 0x4d7fff).w(FUNC(unixpc_state::diskdma_ptr_w));
 	map(0x4e0000, 0x4e0001).w(FUNC(unixpc_state::disk_control_w));
 	map(0x4f0001, 0x4f0001).w("printlatch", FUNC(output_latch_device::bus_w));
-	//map(0xe00000, 0xe0000f).rw("hdc", FUNC(wd1010_device::read), FUNC(wd1010_device::write)).umask16(0x00ff);
+	map(0xe00000, 0xe0000f).rw(m_hdc, FUNC(wd1010_device::read), FUNC(wd1010_device::write)).umask16(0x00ff);
 	map(0xe10000, 0xe10007).rw(m_wd2797, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write)).umask16(0x00ff);
 	map(0xe30000, 0xe30001).r(FUNC(unixpc_state::rtc_r));
 	map(0xe40000, 0xe40001).select(0x7000).w(FUNC(unixpc_state::gcr_w));
@@ -354,6 +382,9 @@ void unixpc_state::unixpc(machine_config &config)
 
 	LS259(config, m_tcr); // 10K
 
+	INPUT_MERGER_ANY_HIGH(config, m_int02); // 26H pins 3-6
+	m_int02->output_handler().set_inputline(m_maincpu, M68K_IRQ_2);
+
 	output_latch_device &mreg(OUTPUT_LATCH(config, "mreg"));
 	mreg.bit_handler<0>().set_output("led_0").invert();
 	mreg.bit_handler<1>().set_output("led_1").invert();
@@ -387,15 +418,18 @@ void unixpc_state::unixpc(machine_config &config)
 	m_wd2797->drq_wr_callback().set(FUNC(unixpc_state::wd2797_drq_w));
 	FLOPPY_CONNECTOR(config, "wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
-	upd7201_new_device& mpsc(UPD7201_NEW(config, "mpsc", 19.6608_MHz_XTAL / 8));
+	WD1010(config, m_hdc, 40_MHz_XTAL / 8);
+	m_hdc->out_intrq_callback().set(FUNC(unixpc_state::wd1010_intrq_w));
+	HARDDISK(config, m_hdr0, 0);
+
+	upd7201_new_device &mpsc(UPD7201_NEW(config, "mpsc", 19.6608_MHz_XTAL / 8));
 	mpsc.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	mpsc.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	mpsc.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	mpsc.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	ACIA6850(config, "kbc", 0);
-
-	// TODO: HDC
-	//WD1010(config, "hdc", 40_MHz_XTAL / 8);
+	acia6850_device &kbc(ACIA6850(config, "kbc", 0));
+	kbc.irq_handler().set_inputline(m_maincpu, M68K_IRQ_3);
 
 	// TODO: RTC
 	//TC8250(config, "rtc", 32.768_kHz_XTAL);

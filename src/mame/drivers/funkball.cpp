@@ -764,10 +764,10 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(funkball_state::funkball)
-	MCFG_DEVICE_ADD("maincpu", MEDIAGX, 66666666*3.5) // 66,6 MHz x 3.5
-	MCFG_DEVICE_PROGRAM_MAP(funkball_map)
-	MCFG_DEVICE_IO_MAP(funkball_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MEDIAGX(config, m_maincpu, 66666666*3.5); // 66,6 MHz x 3.5
+	m_maincpu->set_addrmap(AS_PROGRAM, &funkball_state::funkball_map);
+	m_maincpu->set_addrmap(AS_IO, &funkball_state::funkball_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
@@ -787,12 +787,12 @@ MACHINE_CONFIG_START(funkball_state::funkball)
 	m_voodoo->set_screen_tag("screen");
 	m_voodoo->set_cpu_tag(m_maincpu);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(funkball_state, screen_update)
-	MCFG_SCREEN_SIZE(1024, 1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 447)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update(FUNC(funkball_state::screen_update));
+	screen.set_size(1024, 1024);
+	screen.set_visarea(0, 511, 16, 447);
 
 	ns16550_device &uart(NS16550(config, "uart", 1843200)); // exact type unknown
 	uart.out_tx_callback().set("rs232", FUNC(rs232_port_device::write_txd));

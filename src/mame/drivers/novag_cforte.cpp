@@ -3,19 +3,18 @@
 // thanks-to:Berger
 /******************************************************************************
 *
-* novag_cforte.cpp, subdriver of novagbase.cpp
+* novag_cforte.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
 TODO:
 - RS232 port?
 
 *******************************************************************************
 
-Novag Constellation Forte
--------------------------
-R65C02P4 @ 5MHz (10MHz XTAL)
-2*2KB RAM(NEC D449C-3), 2*32KB ROM(27C256)
-HLCD0538P, 10-digit 7seg LCD display
-TTL, 18 LEDs, 8*8 chessboard buttons
+Novag Constellation Forte overview:
+- R65C02P4 @ 5MHz (10MHz XTAL)
+- 2*2KB RAM(NEC D449C-3), 2*32KB ROM(27C256)
+- HLCD0538P, 10-digit 7seg LCD display
+- TTL, 18 LEDs, 8*8 chessboard buttons
 
 I/O is similar to supercon
 
@@ -112,9 +111,9 @@ WRITE8_MEMBER(cforte_state::control_w)
 	// d0: HLCD0538 data in
 	// d1: HLCD0538 clk
 	// d2: HLCD0538 lcd
-	m_hlcd0538->write_data(data & 1);
-	m_hlcd0538->write_clk(data >> 1 & 1);
-	m_hlcd0538->write_lcd(data >> 2 & 1);
+	m_hlcd0538->data_w(data & 1);
+	m_hlcd0538->clk_w(data >> 1 & 1);
+	m_hlcd0538->lcd_w(data >> 2 & 1);
 
 	// d3: unused?
 
@@ -162,7 +161,7 @@ void cforte_state::main_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( cforte )
-	PORT_INCLUDE( novag_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("New Game")
@@ -217,8 +216,8 @@ void cforte_state::cforte(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	HLCD0538(config, m_hlcd0538, 0);
-	m_hlcd0538->write_cols_callback().set(FUNC(cforte_state::lcd_output_w));
+	HLCD0538(config, m_hlcd0538);
+	m_hlcd0538->write_cols().set(FUNC(cforte_state::lcd_output_w));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(cforte_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_novag_cforte);

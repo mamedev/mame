@@ -546,11 +546,11 @@ READ8_MEMBER(mac_state::mac_5396_r)
 {
 	if (offset < 0x100)
 	{
-		return m_539x_1->read(space, offset>>4);
+		return m_539x_1->read(offset>>4);
 	}
 	else    // pseudo-DMA: read from the FIFO
 	{
-		return m_539x_1->read(space, 2);
+		return m_539x_1->read(2);
 	}
 
 	// never executed
@@ -561,11 +561,11 @@ WRITE8_MEMBER(mac_state::mac_5396_w)
 {
 	if (offset < 0x100)
 	{
-		m_539x_1->write(space, offset>>4, data);
+		m_539x_1->write(offset>>4, data);
 	}
 	else    // pseudo-DMA: write to the FIFO
 	{
-		m_539x_1->write(space, 2, data);
+		m_539x_1->write(2, data);
 	}
 }
 
@@ -1095,7 +1095,7 @@ void mac_state::add_macplus_additions(machine_config &config)
 void mac_state::add_nubus(machine_config &config, bool bank1, bool bank2)
 {
 	nubus_device &nubus(NUBUS(config, "nubus", 0));
-	nubus.set_cputag("maincpu");
+	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irq9_callback().set(FUNC(mac_state::nubus_irq_9_w));
 	nubus.out_irqa_callback().set(FUNC(mac_state::nubus_irq_a_w));
 	nubus.out_irqb_callback().set(FUNC(mac_state::nubus_irq_b_w));
@@ -1119,7 +1119,7 @@ void mac_state::add_nubus(machine_config &config, bool bank1, bool bank2)
 template <typename T> void mac_state::add_nubus_pds(machine_config &config, const char *slot_tag, T &&opts)
 {
 	nubus_device &nubus(NUBUS(config, "pds", 0));
-	nubus.set_cputag("maincpu");
+	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irq9_callback().set(FUNC(mac_state::nubus_irq_9_w));
 	nubus.out_irqa_callback().set(FUNC(mac_state::nubus_irq_a_w));
 	nubus.out_irqb_callback().set(FUNC(mac_state::nubus_irq_b_w));

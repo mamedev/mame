@@ -414,7 +414,8 @@ HD44780_PIXEL_UPDATE(alesis_state::sr16_pixel_update)
 		bitmap.pix16(line*9 + y, pos*6 + x) = state;
 }
 
-MACHINE_CONFIG_START(alesis_state::hr16)
+void alesis_state::hr16(machine_config &config)
+{
 	/* basic machine hardware */
 	I8031(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &alesis_state::hr16_mem);
@@ -424,13 +425,13 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 	m_maincpu->port_out_cb<3>().set(FUNC(alesis_state::p3_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(6*16, 9*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(6*16, 9*2);
+	screen.set_visarea_full();
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(alesis_state::alesis_palette), 2);
 
@@ -445,9 +446,10 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 	ALESIS_DM3AG(config, "dm3ag", 12_MHz_XTAL/2);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(alesis_state::sr16)
+void alesis_state::sr16(machine_config &config)
+{
 	hr16(config);
 
 	/* basic machine hardware */
@@ -456,14 +458,15 @@ MACHINE_CONFIG_START(alesis_state::sr16)
 	m_maincpu->port_in_cb<1>().set_constant(0);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(6*8, 9*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*8-1, 0, 9*2-1)
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_size(6*8, 9*2);
+	screen.set_visarea_full();
+
 	config.set_default_layout(layout_sr16);
 
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(alesis_state::sr16_pixel_update), this);
-MACHINE_CONFIG_END
+}
 
 void alesis_state::mmt8(machine_config &config)
 {

@@ -159,9 +159,6 @@ void tk02_device::device_start()
 
 void tk02_device::device_reset()
 {
-	m_pipe->set_io_space(&io_space());
-	m_pipe->set_program_space(&program_space());
-
 	io_space().install_device(0x40, 0x4f, *this, &tk02_device::map);
 	io_space().install_readwrite_handler(0x40, 0x47, 0, 0, 0xff00, read8_delegate(FUNC(tk02_device::ram_r), this), write8_delegate(FUNC(tk02_device::ram_w), this));
 }

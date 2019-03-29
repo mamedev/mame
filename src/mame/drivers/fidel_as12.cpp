@@ -3,15 +3,14 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 *
-* fidel_as12.cpp, subdriver of fidelbase.cpp
+* fidel_as12.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 *******************************************************************************
 
-Fidelity Elegance Chess Challenger (AS12)
-----------------
-R65C02P4 CPU @ 4MHz
-3*8KB ROM(TMM2764), 2*2KB RAM(HM6116)
-PCB label 510-1084B01
+Fidelity Elegance Chess Challenger (AS12) overview:
+- R65C02P4 CPU @ 4MHz
+- 3*8KB ROM(TMM2764), 2*2KB RAM(HM6116)
+- PCB label 510-1084B01
 
 This is on the SC12B board, with enough modifications to support more leds and
 magnetic chess board sensors. See fidel_sc12.cpp for a more technical description.
@@ -120,7 +119,7 @@ void as12_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( as12 )
 	PORT_INCLUDE( fidel_cpu_div_4 )
-	PORT_INCLUDE( fidel_cb_magnets )
+	PORT_INCLUDE( generic_cb_magnets )
 
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("RV / Pawn")
@@ -153,17 +152,17 @@ void as12_state::as12(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
 	TIMER(config, "irq_off").configure_periodic(FUNC(as12_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(as12_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_as12);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_scc", "bin,dat"));
-	cartslot.set_device_load(device_image_load_delegate(&fidelbase_state::device_image_load_scc_cartridge, this));
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fidel_scc", "bin,dat");
+	m_cart->set_device_load(device_image_load_delegate(&as12_state::device_image_load_scc_cartridge, this));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }

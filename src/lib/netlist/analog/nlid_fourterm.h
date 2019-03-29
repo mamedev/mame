@@ -8,8 +8,8 @@
 #ifndef NLID_FOURTERM_H_
 #define NLID_FOURTERM_H_
 
-#include "../nl_base.h"
-#include "../plib/putil.h"
+#include "netlist/nl_base.h"
+#include "plib/putil.h"
 
 namespace netlist {
 	namespace analog {
@@ -44,7 +44,7 @@ namespace netlist {
 		, m_OP(*this, "OP", &m_IP)
 		, m_ON(*this, "ON", &m_IP)
 		, m_IP(*this, "IP", &m_IN)   // <= this should be NULL and terminal be filtered out prior to solving...
-		, m_IN(*this, "IN", &m_IP)	 // <= this should be NULL and terminal be filtered out prior to solving...
+		, m_IN(*this, "IN", &m_IP)   // <= this should be NULL and terminal be filtered out prior to solving...
 		, m_OP1(*this, "_OP1", &m_IN)
 		, m_ON1(*this, "_ON1", &m_IN)
 		, m_gfac(1.0)
@@ -65,6 +65,7 @@ namespace netlist {
 		{
 			NETLIB_NAME(VCCS)::reset();
 		}
+
 
 		terminal_t m_OP;
 		terminal_t m_ON;
@@ -91,14 +92,14 @@ namespace netlist {
 
 		NETLIB_IS_DYNAMIC(true)
 
-		param_double_t m_cur_limit; /* current limit */
-
 	protected:
 		//NETLIB_UPDATEI();
 		NETLIB_RESETI();
 		NETLIB_UPDATE_PARAMI();
 		NETLIB_UPDATE_TERMINALSI();
 
+	private:
+		param_double_t m_cur_limit; /* current limit */
 		nl_double m_vi;
 	};
 
@@ -185,12 +186,13 @@ namespace netlist {
 
 		param_double_t m_RO;
 
-	protected:
+	private:
 		//NETLIB_UPDATEI();
 		//NETLIB_UPDATE_PARAMI();
 
 		terminal_t m_OP2;
 		terminal_t m_ON2;
+
 
 	};
 

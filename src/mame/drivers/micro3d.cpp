@@ -298,11 +298,11 @@ void micro3d_state::soundmem_io(address_map &map)
  *
  *************************************/
 
-MACHINE_CONFIG_START(micro3d_state::micro3d)
-
-	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(hostmem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", micro3d_state,  micro3d_vblank)
+void micro3d_state::micro3d(machine_config &config)
+{
+	M68000(config, m_maincpu, 32_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &micro3d_state::hostmem);
+	m_maincpu->set_vblank_int("screen", FUNC(micro3d_state::micro3d_vblank));
 
 	TMS34010(config, m_vgb, 40_MHz_XTAL);
 	m_vgb->set_addrmap(AS_PROGRAM, &micro3d_state::vgbmem);
@@ -313,9 +313,9 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	m_vgb->output_int().set(FUNC(micro3d_state::tms_interrupt));
 	m_vgb->set_screen("screen");
 
-	MCFG_DEVICE_ADD("drmath", AM29000, 32_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(drmath_prg)
-	MCFG_DEVICE_DATA_MAP(drmath_data)
+	AM29000(config, m_drmath, 32_MHz_XTAL / 2);
+	m_drmath->set_addrmap(AS_PROGRAM, &micro3d_state::drmath_prg);
+	m_drmath->set_addrmap(AS_DATA, &micro3d_state::drmath_data);
 
 	scc8530_device &scc(SCC8530N(config, "scc", 32_MHz_XTAL / 2 / 2));
 	scc.out_txdb_callback().set("monitor_drmath", FUNC(rs232_port_device::write_txd));
@@ -351,10 +351,10 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 
 	PALETTE(config, m_palette).set_format(palette_device::BRGx_555, 4096);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(40_MHz_XTAL/8*4, 192*4, 0, 144*4, 434, 0, 400)
-	MCFG_SCREEN_UPDATE_DEVICE("vgb", tms34010_device, tms340x0_ind16)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(40_MHz_XTAL/8*4, 192*4, 0, 144*4, 434, 0, 400);
+	screen.set_screen_update("vgb", FUNC(tms34010_device::tms340x0_ind16));
+	screen.set_palette(m_palette);
 
 	MC2661(config, m_vgb_uart, 40_MHz_XTAL / 8); // actually SCN2651
 	m_vgb_uart->txd_handler().set("monitor_vgb", FUNC(rs232_port_device::write_txd));
@@ -393,7 +393,7 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MICRO3D_SOUND(config, m_noise_2);
 	m_noise_2->add_route(0, "lspeaker", 1.0);
 	m_noise_2->add_route(1, "rspeaker", 1.0);
-MACHINE_CONFIG_END
+}
 
 void micro3d_state::botss11(machine_config &config)
 {
@@ -465,10 +465,10 @@ ROM_END
 ROM_START( f15se21 )
 	/* Host PCB (MPG DW-00011C-0011-01) */
 	ROM_REGION( 0x180000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "500.hst", 0x000001, 0x20000, CRC(6c26806d) SHA1(7cfd2b3b92b0fc6627c92a2013a317ca5abc66a0) )
-	ROM_LOAD16_BYTE( "501.hst", 0x000000, 0x20000, CRC(81f02bf7) SHA1(09976746fe4d9c88bd8840f6e7addb09226aa54b) )
-	ROM_LOAD16_BYTE( "502.hst", 0x040001, 0x20000, CRC(1eb945e5) SHA1(aba3ff038f2ca0f1200be5710073825ce80e3656) )
-	ROM_LOAD16_BYTE( "503.hst", 0x040000, 0x20000, CRC(21fcb974) SHA1(56f78ce652e2bf432fbba8cda8c800f02dad84bb) )
+	ROM_LOAD16_BYTE( "110-00001-500.u67", 0x000001, 0x20000, CRC(6c26806d) SHA1(7cfd2b3b92b0fc6627c92a2013a317ca5abc66a0) )
+	ROM_LOAD16_BYTE( "110-00001-501.u91", 0x000000, 0x20000, CRC(81f02bf7) SHA1(09976746fe4d9c88bd8840f6e7addb09226aa54b) )
+	ROM_LOAD16_BYTE( "110-00001-502.u68", 0x040001, 0x20000, CRC(1eb945e5) SHA1(aba3ff038f2ca0f1200be5710073825ce80e3656) )
+	ROM_LOAD16_BYTE( "110-00001-503.u92", 0x040000, 0x20000, CRC(21fcb974) SHA1(56f78ce652e2bf432fbba8cda8c800f02dad84bb) )
 
 	ROM_LOAD16_BYTE( "004.hst", 0x080001, 0x20000, CRC(81671ce1) SHA1(51ff641ccbc9dea640a62944910abe73d796b062) )
 	ROM_LOAD16_BYTE( "005.hst", 0x080000, 0x20000, CRC(bdaa7db5) SHA1(52cd832cdd44e609e8cd269469b806e2cd27d63d) )

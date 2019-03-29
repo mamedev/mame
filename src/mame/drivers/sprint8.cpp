@@ -456,28 +456,28 @@ static GFXDECODE_START( gfx_sprint8 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(sprint8_state::sprint8)
-
+void sprint8_state::sprint8(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 11055000 / 11) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(sprint8_map)
+	M6800(config, m_maincpu, 11055000 / 11); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sprint8_state::sprint8_map);
 
 	TIMER(config, "input_timer").configure_periodic(FUNC(sprint8_state::input_callback), attotime::from_hz(60));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 261)
-	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 231)
-	MCFG_SCREEN_UPDATE_DRIVER(sprint8_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint8_state, screen_vblank))
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(512, 261);
+	m_screen->set_visarea(0, 495, 0, 231);
+	m_screen->set_screen_update(FUNC(sprint8_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(sprint8_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sprint8);
 	PALETTE(config, m_palette, FUNC(sprint8_state::sprint8_palette), 36, 18);
 
 	sprint8_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( sprint8 )

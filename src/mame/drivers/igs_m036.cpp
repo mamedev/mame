@@ -252,42 +252,40 @@ void igs_m036_state::pgm_create_dummy_internal_arm_region(void)
 
 #define IGS036_CPU ARM7
 
-MACHINE_CONFIG_START(igs_m036_state::igs_m036)
-	MCFG_DEVICE_ADD("maincpu",IGS036_CPU, 20000000)
+void igs_m036_state::igs_m036(machine_config &config)
+{
+	IGS036_CPU(config, m_maincpu, 20000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m036_state::igs_m036_map);
 
-	MCFG_DEVICE_PROGRAM_MAP(igs_m036_map)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(igs_m036_state::screen_update_igs_m036));
+	screen.set_palette("palette");
 
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs_m036_state, screen_update_igs_m036)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 0x200)
+	PALETTE(config, "palette").set_entries(0x200);
 	/* sound hardware (OKI) */
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(igs_m036_state::igs_m036_tt)
-	MCFG_DEVICE_ADD("maincpu",IGS036_CPU, 20000000)
+void igs_m036_state::igs_m036_tt(machine_config &config)
+{
+	IGS036_CPU(config, m_maincpu, 20000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m036_state::igs_m036_map);
 
-	MCFG_DEVICE_PROGRAM_MAP(igs_m036_map)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(igs_m036_state::screen_update_igs_m036));
+	screen.set_palette("palette");
 
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs_m036_state, screen_update_igs_m036)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 0x200)
+	PALETTE(config, "palette").set_entries(0x200);
 	/* sound hardware (TT5665) */
-MACHINE_CONFIG_END
+}
 
 
 

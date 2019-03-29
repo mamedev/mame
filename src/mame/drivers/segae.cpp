@@ -886,7 +886,8 @@ uint32_t systeme_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-MACHINE_CONFIG_START(systeme_state::systeme)
+void systeme_state::systeme(machine_config &config)
+{
 	Z80(config, m_maincpu, XTAL(10'738'635)/2); /* Z80B @ 5.3693Mhz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &systeme_state::systeme_map);
 	m_maincpu->set_addrmap(AS_IO, &systeme_state::io_map);
@@ -895,11 +896,11 @@ MACHINE_CONFIG_START(systeme_state::systeme)
 	m_ppi->out_pb_callback().set(FUNC(systeme_state::coin_counters_write));
 	m_ppi->tri_pb_callback().set_constant(0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(10'738'635)/2, \
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
-			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 192)
-	MCFG_SCREEN_UPDATE_DRIVER(systeme_state, screen_update)
+			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 192);
+	screen.set_screen_update(FUNC(systeme_state::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -914,7 +915,7 @@ MACHINE_CONFIG_START(systeme_state::systeme)
 	m_vdp2->irq().set_inputline(m_maincpu, 0);
 	m_vdp2->set_addrmap(0, &systeme_state::vdp2_map);
 	m_vdp2->add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 void systeme_state::hangonjr(machine_config &config)
 {

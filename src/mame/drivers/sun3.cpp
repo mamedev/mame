@@ -1008,16 +1008,17 @@ void sun3_state::machine_reset()
 }
 
 // The base Sun 3004 CPU board
-MACHINE_CONFIG_START(sun3_state::sun3)
+void sun3_state::sun3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68020, 16670000)
-	MCFG_DEVICE_PROGRAM_MAP(sun3_mem)
+	M68020(config, m_maincpu, 16670000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun3_state::sun3_mem);
 
-	MCFG_SCREEN_ADD("bwtwo", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(sun3_state, bw2_update)
-	MCFG_SCREEN_SIZE(1600,1100)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
-	MCFG_SCREEN_REFRESH_RATE(72)
+	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
+	bwtwo.set_screen_update(FUNC(sun3_state::bw2_update));
+	bwtwo.set_size(1600,1100);
+	bwtwo.set_visarea(0, 1152-1, 0, 900-1);
+	bwtwo.set_refresh_hz(72);
 
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("6M,8M,12M,16M,20M,24M,28M,32M").set_default_value(0x00);
 
@@ -1070,56 +1071,60 @@ MACHINE_CONFIG_START(sun3_state::sun3)
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
 	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", [this] (device_t *device) { ncr5380(device); });
-MACHINE_CONFIG_END
+}
 
 // Sun 3/60
-MACHINE_CONFIG_START(sun3_state::sun3_60)
+void sun3_state::sun3_60(machine_config &config)
+{
 	sun3(config);
-	MCFG_DEVICE_REPLACE("maincpu", M68020, 20000000)
-	MCFG_DEVICE_PROGRAM_MAP(sun3_mem)
+	M68020(config.replace(), m_maincpu, 20000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun3_state::sun3_mem);
 
-	MCFG_SCREEN_MODIFY("bwtwo")
-	MCFG_SCREEN_UPDATE_DRIVER(sun3_state, bw2_16x11_update)
-	MCFG_SCREEN_SIZE(1600,1100)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1600-1, 0, 1100-1)
-	MCFG_SCREEN_REFRESH_RATE(72)
-MACHINE_CONFIG_END
+	screen_device &bwtwo(*subdevice<screen_device>("bwtwo"));
+	bwtwo.set_screen_update(FUNC(sun3_state::bw2_16x11_update));
+	bwtwo.set_size(1600,1100);
+	bwtwo.set_visarea(0, 1600-1, 0, 1100-1);
+	bwtwo.set_refresh_hz(72);
+}
 
 // Sun 3/E
-MACHINE_CONFIG_START(sun3_state::sun3e)
+void sun3_state::sun3e(machine_config &config)
+{
 	sun3(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", M68020, 20000000)
-	MCFG_DEVICE_PROGRAM_MAP(sun3_mem)
-MACHINE_CONFIG_END
+	M68020(config.replace(), m_maincpu, 20000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun3_state::sun3_mem);
+}
 
 // 3/260 and 3/280 (the Sun 3200 board)
-MACHINE_CONFIG_START(sun3_state::sun3200)
+void sun3_state::sun3200(machine_config &config)
+{
 	sun3(config);
-	MCFG_DEVICE_REPLACE("maincpu", M68020, 25000000)
-	MCFG_DEVICE_PROGRAM_MAP(sun3_mem)
+	M68020(config.replace(), m_maincpu, 25000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun3_state::sun3_mem);
 
-	MCFG_SCREEN_MODIFY("bwtwo")
-	MCFG_SCREEN_UPDATE_DRIVER(sun3_state, bw2_16x11_update)
-	MCFG_SCREEN_SIZE(1600,1100)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1600-1, 0, 1100-1)
-	MCFG_SCREEN_REFRESH_RATE(72)
+	screen_device &bwtwo(*subdevice<screen_device>("bwtwo"));
+	bwtwo.set_screen_update(FUNC(sun3_state::bw2_16x11_update));
+	bwtwo.set_size(1600,1100);
+	bwtwo.set_visarea(0, 1600-1, 0, 1100-1);
+	bwtwo.set_refresh_hz(72);
 
 	m_ram->set_default_size("32M").set_extra_options("64M,96M,128M");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sun3_state::sun3_50)
+void sun3_state::sun3_50(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68020, 15700000)
-	MCFG_DEVICE_PROGRAM_MAP(sun3_mem)
+	M68020(config, m_maincpu, 15700000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun3_state::sun3_mem);
 
 	AM79C90(config, m_lance, 10'000'000); // clock is a guess
 
-	MCFG_SCREEN_ADD("bwtwo", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(sun3_state, bw2_350_update)
-	MCFG_SCREEN_SIZE(1600,1100)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
-	MCFG_SCREEN_REFRESH_RATE(72)
+	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
+	bwtwo.set_screen_update(FUNC(sun3_state::bw2_350_update));
+	bwtwo.set_size(1600,1100);
+	bwtwo.set_visarea(0, 1152-1, 0, 900-1);
+	bwtwo.set_refresh_hz(72);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1170,7 +1175,7 @@ MACHINE_CONFIG_START(sun3_state::sun3_50)
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
 	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", [this] (device_t *device) { ncr5380(device); });
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 

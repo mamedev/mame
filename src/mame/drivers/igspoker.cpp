@@ -1921,12 +1921,12 @@ static GFXDECODE_START( gfx_cpokerpk )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, charlayout2,  0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(igspoker_state::igspoker)
-
+void igspoker_state::igspoker(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, 3579545)
-	MCFG_DEVICE_PROGRAM_MAP(igspoker_prg_map)
-	MCFG_DEVICE_IO_MAP(igspoker_io_map)
+	Z80(config, m_maincpu, 3579545);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igspoker_state::igspoker_prg_map);
+	m_maincpu->set_addrmap(AS_IO, &igspoker_state::igspoker_io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igspoker_state::igs_interrupt), "screen", 0, 1);
 
 	i8255_device &ppi(I8255A(config, "ppi"));
@@ -1935,68 +1935,65 @@ MACHINE_CONFIG_START(igspoker_state::igspoker)
 	ppi.in_pc_callback().set_ioport("COINS");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8) // TODO: wrong screen size!
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_igs_video)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(57);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8); // TODO: wrong screen size!
+	m_screen->set_visarea(0*8, 64*8-1, 0, 32*8-1);
+	m_screen->set_screen_update(FUNC(igspoker_state::screen_update_igs_video));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_igspoker);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM2413(config, "ymsnd", 3579545).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_END
+void igspoker_state::csk227it(machine_config &config)
+{
+	igspoker(config);
+}
 
-MACHINE_CONFIG_START(igspoker_state::csk227it)
+void igspoker_state::csk234it(machine_config &config)
+{
+	igspoker(config);
+}
+
+void igspoker_state::igs_ncs(machine_config &config)
+{
+	igspoker(config);
+}
+
+void igspoker_state::number10(machine_config &config)
+{
 	igspoker(config);
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(igspoker_state::csk234it)
-	igspoker(config);
-
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(igspoker_state::igs_ncs)
-	igspoker(config);
-
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(igspoker_state::number10)
-	igspoker(config);
-
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(number10_io_map)
+	m_maincpu->set_addrmap(AS_IO, &igspoker_state::number10_io_map);
 
 	config.device_remove("ppi");
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_cpokerpk)
+	m_screen->set_screen_update(FUNC(igspoker_state::screen_update_cpokerpk));
+
 	MCFG_VIDEO_START_OVERRIDE(igspoker_state,cpokerpk)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000) / 12, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", XTAL(12'000'000) / 12, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(igspoker_state::cpokerpk)
+void igspoker_state::cpokerpk(machine_config &config)
+{
 	number10(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(cpokerpk_io_map)
+	m_maincpu->set_addrmap(AS_IO, &igspoker_state::cpokerpk_io_map);
 	m_gfxdecode->set_info(gfx_cpokerpk);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(igspoker_state::pktetris)
+void igspoker_state::pktetris(machine_config &config)
+{
 	igspoker(config);
-
-MACHINE_CONFIG_END
+}
 
 
 

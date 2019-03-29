@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, Tyson Smith
 /*
-		Silicon Graphics LG1 "Light" graphics board used as
-		entry level graphics in the Indigo and IRIS Crimson.
+        Silicon Graphics LG1 "Light" graphics board used as
+        entry level graphics in the Indigo and IRIS Crimson.
 */
 
 #include "emu.h"
 #include "video/light.h"
 #include "screen.h"
 
-#define LOG_REX	(1 << 0)
-#define LOG_ALL	(LOG_REX)
+#define LOG_REX (1 << 0)
+#define LOG_ALL (LOG_REX)
 
 #define VERBOSE (0)
 #include "logmacro.h"

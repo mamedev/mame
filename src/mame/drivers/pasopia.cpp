@@ -286,7 +286,8 @@ We preset all banks here, so that bankswitching will incur no speed penalty.
 	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 }
 
-MACHINE_CONFIG_START(pasopia_state::pasopia)
+void pasopia_state::pasopia(machine_config &config)
+{
 	/* basic machine hardware */
 
 	Z80(config, m_maincpu, 4000000);
@@ -295,14 +296,14 @@ MACHINE_CONFIG_START(pasopia_state::pasopia)
 	m_maincpu->set_daisy_config(pasopia_daisy);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update("crtc", FUNC(h46505_device::screen_update));
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pasopia);
-	MCFG_PALETTE_ADD("palette", 8)
+	PALETTE(config, m_palette).set_entries(8);
 
 	/* Devices */
 	H46505(config, m_crtc, XTAL(4'000'000)/4);   /* unknown clock, hand tuned to get ~60 fps */
@@ -334,7 +335,7 @@ MACHINE_CONFIG_START(pasopia_state::pasopia)
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio->out_pa_callback().set(FUNC(pasopia_state::mux_w));
 	m_pio->in_pb_callback().set(FUNC(pasopia_state::keyb_r));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( pasopia )

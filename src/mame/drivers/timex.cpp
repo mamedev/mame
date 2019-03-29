@@ -583,12 +583,6 @@ void spectrum_state::tc2048_mem(address_map &map)
 	map(0x4000, 0xffff).bankr("bank1").bankw("bank2");
 }
 
-void spectrum_state::init_timex()
-{
-	// setup expansion slot
-	m_exp->set_io_space(&m_maincpu->space(AS_IO));
-}
-
 MACHINE_RESET_MEMBER(spectrum_state,tc2048)
 {
 	uint8_t *messram = m_ram->pointer();
@@ -784,6 +778,6 @@ ROM_START(uk2086)
 ROM_END
 
 //    YEAR  NAME    PARENT    COMPAT  MACHINE  INPUT     CLASS           INIT        COMPANY              FULLNAME             FLAGS
-COMP( 1984, tc2048, spectrum, 0,      tc2048,  spectrum, spectrum_state, init_timex, "Timex of Portugal", "TC-2048" ,          0 )
-COMP( 1983, ts2068, spectrum, 0,      ts2068,  spectrum, spectrum_state, init_timex, "Timex Sinclair",    "TS-2068" ,          0 )
-COMP( 1986, uk2086, spectrum, 0,      uk2086,  spectrum, spectrum_state, init_timex, "Unipolbrit",        "UK-2086 ver. 1.2" , 0 )
+COMP( 1984, tc2048, spectrum, 0,      tc2048,  spectrum, spectrum_state, empty_init, "Timex of Portugal", "TC-2048" ,          0 )
+COMP( 1983, ts2068, spectrum, 0,      ts2068,  spectrum, spectrum_state, empty_init, "Timex Sinclair",    "TS-2068" ,          0 )
+COMP( 1986, uk2086, spectrum, 0,      uk2086,  spectrum, spectrum_state, empty_init, "Unipolbrit",        "UK-2086 ver. 1.2" , 0 )

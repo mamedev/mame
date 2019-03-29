@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:Berger,yoyo_chessboard
+// thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
 *
-* fidel_vsc.cpp, subdriver of fidelbase.cpp
+* fidel_vsc.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 Fidelity Excellence series hardware
 (for Excel 68000, see fidel_eag68k.cpp)
@@ -162,7 +162,7 @@ public:
 	void fdes2100(machine_config &config);
 	void fdes2000(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(lan_bankswitch);
+	DECLARE_INPUT_CHANGED_MEMBER(speech_bankswitch);
 
 private:
 	// address maps
@@ -182,7 +182,7 @@ private:
 
 // misc handlers
 
-INPUT_CHANGED_MEMBER(excel_state::lan_bankswitch)
+INPUT_CHANGED_MEMBER(excel_state::speech_bankswitch)
 {
 	// tied to speech ROM highest bits
 	m_speech->force_update();
@@ -289,7 +289,7 @@ void excel_state::fexcelb_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( fexcelb )
-	PORT_INCLUDE( fidel_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
@@ -306,7 +306,7 @@ static INPUT_PORTS_START( fexcelv )
 	PORT_INCLUDE( fexcelb )
 
 	PORT_START("IN.9")
-	PORT_CONFNAME( 0x03, 0x00, DEF_STR( Language ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, excel_state, lan_bankswitch, 0)
+	PORT_CONFNAME( 0x03, 0x00, DEF_STR( Language ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, excel_state, speech_bankswitch, 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( German ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( French ) )
@@ -348,12 +348,12 @@ void excel_state::fexcel(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
 	TIMER(config, "irq_off").configure_periodic(FUNC(excel_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(excel_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_ex);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
@@ -388,7 +388,7 @@ void excel_state::granits(machine_config &config)
 	fexcelp(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(8_MHz_XTAL); // overclocked
+	m_maincpu->set_clock(8_MHz_XTAL/2);
 }
 
 void excel_state::fdes2100(machine_config &config)
@@ -518,6 +518,6 @@ CONS( 1985, fexcela,    fexcel,   0, fexcel,    fexcel,    excel_state, empty_in
 
 CONS( 1986, fexcelp,    0,        0, fexcelp,   fexcel,    excel_state, empty_init, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1986, fexcelpb,   fexcelp,  0, fexcelp,   fexcel,    excel_state, empty_init, "Fidelity Electronics", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1986, granits,    fexcelp,  0, granits,   fexcel,    excel_state, empty_init, "hack (RCS)", "Granit 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, granits,    fexcelp,  0, granits,   fexcel,    excel_state, empty_init, "hack (RCS)", "Granit S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1988, fdes2000,   fexcelp,  0, fdes2000,  fdes,      excel_state, empty_init, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1988, fdes2100,   fexcelp,  0, fdes2100,  fdes,      excel_state, empty_init, "Fidelity Electronics", "Designer 2100", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
