@@ -19,6 +19,7 @@ spg110_video_device::spg110_video_device(const machine_config &mconfig, device_t
 	, m_sprtileno(*this, "sprtileno")
 	, m_sprattr1(*this, "sprattr1")
 	, m_sprattr2(*this, "sprattr2")
+	, m_video_irq_cb(*this)
 {
 }
 
@@ -28,11 +29,9 @@ spg110_video_device::spg110_video_device(const machine_config &mconfig, const ch
 }
 
 template<spg110_video_device::flipx_t FlipX>
-void spg110_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile, uint8_t pal, int32_t h, int32_t w, uint8_t bpp)
+void spg110_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile, uint8_t yflipmask, uint8_t pal, int32_t h, int32_t w, uint8_t bpp)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
-
-	uint32_t yflipmask = 0; //attr & TILE_Y_FLIP ? h - 1 : 0;
 
 	uint32_t nc = (bpp + 1) << 1;
 
@@ -80,15 +79,17 @@ void spg110_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_
 
 		if (xx >= 0 && xx < 320)
 		{
-			// TODO, this is completely wrong for this palette system
 			int pix_index = xx + y_index;
-			//uint16_t rawpal = m_palram[pal];
 			const pen_t *pens = m_palette->pens();
 			uint32_t paldata = pens[pal];
 
-			int penword = (pal >> 4) & 0xf;
-			int penbit = (pal & 0xf);
-			int trans = m_palctrlswapped[penword] & (1 << penbit);
+			int transmap = m_palctrlram[(pal & 0xf0)>>4];
+
+			bool trans = false;
+
+			if (transmap & 0x10) // maybe values other than 0x010 have other meanings, like blending?
+				if ((pal & 0x0f) == (transmap & 0xf))
+					trans = true;
 
 			if (!trans)
 			{
@@ -142,21 +143,21 @@ void spg110_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 
 		extra_attribute = space2.read_word((palette_map*2) + tile_address);
 		if (x0 & 1)
-			extra_attribute = (extra_attribute & 0xff00) >> 8;
-		else
 			extra_attribute = (extra_attribute & 0x00ff);
+		else
+			extra_attribute = (extra_attribute & 0xff00) >> 8;
 
 		uint8_t pal = extra_attribute & 0x0f;
-		uint8_t pri = (extra_attribute & 0x30)>>4;
+		uint8_t pri = (extra_attribute & 0x30) >> 4;
+		bool flip_x = extra_attribute & 0x40;
 
 		if (pri == priority)
 		{
-			bool flip_x = 0;//(tileattr & TILE_X_FLIP);
 
 			if (flip_x)
-				draw<FlipXOn>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, pal, tile_h, tile_w, bpp);
+				draw<FlipXOn>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, 0, pal, tile_h, tile_w, bpp);
 			else
-				draw<FlipXOff>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, pal, tile_h, tile_w, bpp);
+				draw<FlipXOff>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, 0, pal, tile_h, tile_w, bpp);
 		}
 
 	}
@@ -165,34 +166,33 @@ void spg110_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 
 void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr)
 {
-	uint32_t bitmap_addr = 0;//0x40 * m_video_regs[0x22];
-	uint16_t tile = m_sprtileno[base_addr];
-	uint16_t attr1 = m_sprattr1[base_addr];
-	uint16_t attr2 = m_sprattr2[base_addr];
-
-	int x = (attr1 >> 8) & 0xff;
-	int y = (attr1) & 0xff;
-	uint8_t pri = (attr2 & 0x3000)>>12;
 
 	// m_sprtileno  tttt tttt tttt tttt    t =  tile number (all bits?)
 	// m_sprattr1   xxxx xxxx yyyy yyyy    x = low x bits, y = low y bits
-	// m_sprattr2   -Xzz pppp hhww --bb    X = high x bit z = priority, p = palette h = height w = width b = bpp
+	// m_sprattr2   YXzz pppp hhww fFbb    X = high x bit, z = priority, p = palette, h = height, w = width, f = flipy,  F = flipx, b = bpp, Y = high y bit
 
-
-	if (!(attr2 & 0x4000))
-		x+= 0x100;
+	uint16_t tile = m_sprtileno[base_addr];
 
 	if (!tile)
 	{
 		return;
 	}
 
-	//	if ((priority==0) && (scanline==128)) printf("%02x, drawing sprite %04x %04x %04x\n", base_addr, tile, attr1, attr2);
+	uint32_t bitmap_addr = 0x40 * m_tilebase;
+	uint16_t attr1 = m_sprattr1[base_addr];
+	uint16_t attr2 = m_sprattr2[base_addr];
 
-	//	if (((attr & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
-	//	{
-	//		return;
-	//	}
+	int x = (attr1 >> 8) & 0xff;
+	int y = (attr1) & 0xff;
+	uint8_t pri = (attr2 & 0x3000)>>12;
+	bool flip_x = (attr2 & 0x0004)>>2;
+	bool flip_y = (attr2 & 0x0008)>>3;
+
+	if (!(attr2 & 0x4000))
+		x+= 0x100;
+
+	if (!(attr2 & 0x8000))
+		y+= 0x100;
 
 	const uint32_t h = 8 << ((attr2 & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
 	const uint32_t w = 8 << ((attr2 & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
@@ -203,8 +203,11 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 //		y = (120 - y) - (h / 2) + 8;
 //	}
 
-	y = 0xff - y;
-	x = x - 128;
+	y = 0x1ff - y - 128 + 1;
+	x = x - 128 + 32;
+
+	x -= (w / 2);
+	y -= (h / 2);
 
 	x &= 0x01ff;
 	y &= 0x01ff;
@@ -220,17 +223,16 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 	}
 
 	//bool blend = (attr & 0x4000);
-	bool flip_x = 0;//(attr & TILE_X_FLIP);
 	const uint8_t bpp = attr2 & 0x0003;
-	//const uint32_t yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
+	const uint32_t yflipmask = flip_y ? h - 1 : 0;
 	const uint32_t palette_offset = (attr2 & 0x0f00) >> 8;
 
 	if (pri == priority)
 	{
 		if (flip_x)
-			draw<FlipXOn>(cliprect, tile_line, x, y, 0, bitmap_addr, tile, palette_offset, h, w, bpp);
+			draw<FlipXOn>(cliprect, tile_line, x, y, 0, bitmap_addr, tile, yflipmask, palette_offset, h, w, bpp);
 		else
-			draw<FlipXOff>(cliprect, tile_line, x, y, 0, bitmap_addr, tile, palette_offset, h, w, bpp);
+			draw<FlipXOff>(cliprect, tile_line, x, y, 0, bitmap_addr, tile, yflipmask, palette_offset, h, w, bpp);
 	}
 }
 
@@ -307,7 +309,7 @@ GFXDECODE_END
 
 void spg110_video_device::device_add_mconfig(machine_config &config)
 {
-	PALETTE(config, m_palette, palette_device::BLACK, 256);
+	PALETTE(config, m_palette).set_entries(0x100);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
 }
@@ -325,53 +327,62 @@ device_memory_interface::space_config_vector spg110_video_device::memory_space_c
 READ16_MEMBER(spg110_video_device::spg110_2063_r)
 {
 	// checks for bits 0x20 and 0x08 in the IRQ function (all IRQs point to the same place)
-	return 0x0008;
+
+	// HACK! jak_spdo checks for 0x400 or 0x200 starting some of the games
+	return m_video_irq_status | 0x600;
 }
 
 WRITE16_MEMBER(spg110_video_device::spg110_2063_w)
 {
 	// writes 0x28, probably clears the IRQ / IRQ sources? 0x63 is the same offset for this in spg2xx but bits used seem to be different
-	m_cpu->set_state_unsynced(UNSP_IRQ0_LINE, CLEAR_LINE);
+	const uint16_t old = m_video_irq_enable & m_video_irq_status;
+	m_video_irq_status &= ~data;
+	const uint16_t changed = old ^ (m_video_irq_enable & m_video_irq_status);
+	if (changed)
+		check_video_irq();
 }
 
 
-WRITE16_MEMBER(spg110_video_device::spg110_201c_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2020_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2042_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2031_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2032_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2033_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2034_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2035_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2036_w) { COMBINE_DATA(&m_2036_scroll); }
-WRITE16_MEMBER(spg110_video_device::spg110_2039_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2037_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_203c_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_203d_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2045_w) { }
+WRITE16_MEMBER(spg110_video_device::spg110_201c_w) { logerror("%s: 201c: %04x\n", machine().describe_context(), data); } // during startup text only
+WRITE16_MEMBER(spg110_video_device::spg110_2020_w) { COMBINE_DATA(&m_tilebase); logerror("%s: 2020: %04x\n", machine().describe_context(), data); } // confirmed as tile base, seems to apply to both layers and sprites, unlike spg2xx which has separate registers
 
-
-WRITE16_MEMBER(spg110_video_device::spg110_2028_w) { }
-WRITE16_MEMBER(spg110_video_device::spg110_2029_w) { }
-
+WRITE16_MEMBER(spg110_video_device::spg110_2028_w) { logerror("%s: 2028: %04x\n", machine().describe_context(), data); } // startup
 READ16_MEMBER(spg110_video_device::spg110_2028_r) { return 0x0000; }
+
+WRITE16_MEMBER(spg110_video_device::spg110_2029_w) { logerror("%s: 2029: %04x\n", machine().describe_context(), data); } // 0006, 0008 on startup
 READ16_MEMBER(spg110_video_device::spg110_2029_r) { return 0x0000; }
+
+WRITE16_MEMBER(spg110_video_device::spg110_2031_w) { logerror("%s: 2031: %04x\n", machine().describe_context(), data); } // 014a or 0000 when ball is in trap
+WRITE16_MEMBER(spg110_video_device::spg110_2032_w) { logerror("%s: 2032: %04x\n", machine().describe_context(), data); } // 014a most of the time, 0000 very rarely
+WRITE16_MEMBER(spg110_video_device::spg110_2033_w) { logerror("%s: 2033: %04x\n", machine().describe_context(), data); } // changes, situational, eg when pausing
+WRITE16_MEMBER(spg110_video_device::spg110_2034_w) { logerror("%s: 2034: %04x\n", machine().describe_context(), data); } // 0141 on every scene transition
+WRITE16_MEMBER(spg110_video_device::spg110_2035_w) { logerror("%s: 2035: %04x\n", machine().describe_context(), data); } // 0141 on every scene transition
+WRITE16_MEMBER(spg110_video_device::spg110_2036_w) { logerror("%s: 2036: %04x\n", machine().describe_context(), data); COMBINE_DATA(&m_2036_scroll); } // seems related to ball y position, not scrolling (possibly shadow sprite related?)
+
+READ16_MEMBER(spg110_video_device::spg110_2037_r) { return 0x0000; } // added to something from the PRNG
+WRITE16_MEMBER(spg110_video_device::spg110_2037_w) { logerror("%s: 2037: %04x\n", machine().describe_context(), data); } // 0126 (always?)
+
+WRITE16_MEMBER(spg110_video_device::spg110_2039_w) { logerror("%s: 2039: %04x\n", machine().describe_context(), data); } // 0803 on every scene transition
+
+WRITE16_MEMBER(spg110_video_device::spg110_203c_w) { logerror("%s: 203c: %04x\n", machine().describe_context(), data); } // 0006 on startup, twice
+
+WRITE16_MEMBER(spg110_video_device::spg110_203d_w) { logerror("%s: 203d: %04x\n", machine().describe_context(), data); } // changes, usually between scenes
+
+READ16_MEMBER(spg110_video_device::spg110_2042_r) { return 0x0000; }
+WRITE16_MEMBER(spg110_video_device::spg110_2042_w) { logerror("%s: 2042: %04x\n", machine().describe_context(), data);  } // sets bit 0x0004, masks with 0xfffb etc.
+
+WRITE16_MEMBER(spg110_video_device::spg110_2045_w) { logerror("%s: 2045: %04x\n", machine().describe_context(), data);  } // 0006 on startup, once
 
 
 WRITE16_MEMBER(spg110_video_device::spg110_205x_w)
 {
 	COMBINE_DATA(&m_palctrlram[offset]);
-
-	uint16_t temp = m_palctrlram[offset];
-
-	// 0x0010 to 0x0001  - complete guess that this could be pen transparency
-	m_palctrlswapped[offset] = bitswap<16>(temp, 11, 10, 9, 8, 15, 14, 13, 12, 3, 2, 1, 0, 7, 6, 5, 4);
 }
 
 
 WRITE16_MEMBER(spg110_video_device::dma_unk_2061_w) { COMBINE_DATA(&m_dma_unk_2061); }
 WRITE16_MEMBER(spg110_video_device::dma_dst_step_w) { COMBINE_DATA(&m_dma_dst_step); }
-WRITE16_MEMBER(spg110_video_device::dma_unk_2067_w) { COMBINE_DATA(&m_dma_unk_2067); }
+WRITE16_MEMBER(spg110_video_device::dma_unk_2067_w) { COMBINE_DATA(&m_dma_src_high); }
 WRITE16_MEMBER(spg110_video_device::dma_src_step_w) { COMBINE_DATA(&m_dma_src_step); }
 
 WRITE16_MEMBER(spg110_video_device::dma_dst_w) { COMBINE_DATA(&m_dma_dst); }
@@ -382,12 +393,14 @@ WRITE16_MEMBER(spg110_video_device::dma_len_trigger_w)
 	int length = data & 0x1fff;
 
 	// this is presumably a counter that underflows to 0x1fff, because that's what the wait loop waits for?
-	logerror("%s: (trigger len) %04x with values (unk) %04x (dststep) %04x (unk) %04x (src step) %04x | (dst) %04x (src) %04x\n", machine().describe_context(), data, m_dma_unk_2061, m_dma_dst_step, m_dma_unk_2067, m_dma_src_step, m_dma_dst, m_dma_src);
+	logerror("%s: (trigger len) %04x with values (unk) %04x (dststep) %04x (unk) %04x (src step) %04x | (dst) %04x (src) %04x\n", machine().describe_context(), data, m_dma_unk_2061, m_dma_dst_step, m_dma_src_high, m_dma_src_step, m_dma_dst, m_dma_src);
 
-	if ((m_dma_unk_2061!=0x0000) || (m_dma_unk_2067 != 0x0000))
-		fatalerror("unknown DMA params are not zero!\n");
+	if (m_dma_src_high != 0x0000)
+	{
+		logerror("unknown DMA params are not zero!\n");
+	}
 
-	int source = m_dma_src;
+	int source = m_dma_src | m_dma_src_high << 16;
 	int dest = m_dma_dst;
 
 	for (int i = 0; i < length; i++)
@@ -400,6 +413,26 @@ WRITE16_MEMBER(spg110_video_device::dma_len_trigger_w)
 		source+=m_dma_src_step;
 		dest+=m_dma_dst_step;
 	}
+
+	// not sure, spiderman would suggest that some of these need to reset (unless a missing IRQ clears them)
+	m_dma_unk_2061 = 0;
+	m_dma_dst_step = 0;
+	m_dma_src_high = 0;
+	m_dma_src_step = 0;
+	m_dma_dst = 0;
+	m_dma_src = 0;
+
+	// HACK: it really seems this interrupt status is related to the DMA, but jak_capb doesn't ack it, so must also be a way to disable it?
+	if (m_is_spiderman)
+	{
+		const int i = 0x0002;
+
+		if (m_video_irq_enable & 1)
+		{
+			m_video_irq_status |= i;
+			check_video_irq();
+		}
+	}
 }
 
 READ16_MEMBER(spg110_video_device::dma_len_status_r)
@@ -407,8 +440,6 @@ READ16_MEMBER(spg110_video_device::dma_len_status_r)
 	return 0x1fff; // DMA related?
 }
 
-READ16_MEMBER(spg110_video_device::spg110_2037_r) { return 0x0000; }
-READ16_MEMBER(spg110_video_device::spg110_2042_r) { return 0x0000; }
 
 READ16_MEMBER(spg110_video_device::tmap0_regs_r) { return tmap0_regs[offset]; }
 READ16_MEMBER(spg110_video_device::tmap1_regs_r) { return tmap1_regs[offset]; }
@@ -475,7 +506,7 @@ void spg110_video_device::map_video(address_map &map)
 	map(0x04200, 0x043ff).ram().share("sprattr1");
 	map(0x04400, 0x045ff).ram().share("sprattr2");
 
-	map(0x08000, 0x081ff).ram().share("palram"); // palette format unknown
+	map(0x08000, 0x081ff).ram().w(FUNC(spg110_video_device::palette_w)).share("palram"); // palette format unknown
 }
 
 void spg110_video_device::device_start()
@@ -483,12 +514,19 @@ void spg110_video_device::device_start()
 	save_item(NAME(m_dma_src_step));
 	save_item(NAME(m_dma_dst_step));
 	save_item(NAME(m_dma_unk_2061));
-	save_item(NAME(m_dma_unk_2067));
+	save_item(NAME(m_dma_src_high));
 	save_item(NAME(m_dma_dst));
 	save_item(NAME(m_dma_src));
 	save_item(NAME(m_bg_scrollx));
 	save_item(NAME(m_bg_scrolly));
 	save_item(NAME(m_2036_scroll));
+
+	m_video_irq_cb.resolve();
+
+	if (!strcmp(machine().system().name, "jak_spdmo"))
+		m_is_spiderman = true;
+	else
+		m_is_spiderman = false;
 }
 
 void spg110_video_device::device_reset()
@@ -496,12 +534,16 @@ void spg110_video_device::device_reset()
 	m_dma_src_step = 0;
 	m_dma_dst_step = 0;
 	m_dma_unk_2061 = 0;
-	m_dma_unk_2067 = 0;
+	m_dma_src_high = 0;
 	m_dma_dst = 0;
 	m_dma_src = 0;
 	m_bg_scrollx = 0;
 	m_bg_scrolly = 0;
 	m_2036_scroll = 0;
+
+	// is there actually an enable register here?
+	m_video_irq_enable = 0xffff;
+	m_video_irq_status = 0x0000;
 }
 
 double spg110_video_device::hue2rgb(double p, double q, double t)
@@ -514,46 +556,58 @@ double spg110_video_device::hue2rgb(double p, double q, double t)
 	return p;
 }
 
-uint32_t spg110_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+
+// wrong format!
+WRITE16_MEMBER(spg110_video_device::palette_w)
 {
-	// Palette, this is still wrong!
-	int offs = 0;
-	for (int index = 0;index < 256; index++)
-	{
-		uint16_t dat = m_palram[offs++];
+	// probably not
+	const double h_add = 0.65f;
+	const double h_divide = 43.2f;
 
-		// llll lsss sshh hhhh
-		int l_raw =  (dat & 0xf800) >> 11;
-		int sl_raw = (dat & 0x07c0) >> 6;
-		int h_raw =  (dat & 0x003f) >> 0;
+	COMBINE_DATA(&m_palram[offset]);
 
-		double l = (double)l_raw / 31.0f;
-		double s = (double)sl_raw / 31.0f;
-		double h = (double)h_raw / 47.0f;
+	uint16_t dat = m_palram[offset];
 
-		double r, g, b;
+	// llll lsss sshh hhhh
+	int l_raw =  (dat & 0xfe00) >> 10;
+	int sl_raw = (dat & 0x03c0) >> 6;
+	int h_raw =  (dat & 0x003f) >> 0;
 
-		if (s == 0) {
-			r = g = b = l; // greyscale
-		} else {
-			double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
-			double p = 2 * l - q;
-			r = hue2rgb(p, q, h + 1/3.0f);
-			g = hue2rgb(p, q, h);
-			b = hue2rgb(p, q, h - 1/3.0f);
-		}
+	double l = (double)l_raw / 63.0f;
+	double s = (double)sl_raw / 15.0f;
+	double h = (double)h_raw / h_divide;
 
-		int r_real = r * 255.0f;
-		int g_real = g * 255.0f;
-		int b_real = b * 255.0f;
+	// probably not
+	h += h_add;
 
-		m_palette->set_pen_color(index, r_real, g_real, b_real);
+	if (h>1.0f)
+		h-= 1.0f;
+
+	double r, g, b;
+
+	if (s == 0) {
+		r = g = b = l; // greyscale
+	} else {
+		double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
+		double p = 2 * l - q;
+		r = hue2rgb(p, q, h + 1/3.0f);
+		g = hue2rgb(p, q, h);
+		b = hue2rgb(p, q, h - 1/3.0f);
 	}
 
+	int r_real = r * 255.0f;
+	int g_real = g * 255.0f;
+	int b_real = b * 255.0f;
+
+	m_palette->set_pen_color(offset, r_real, g_real, b_real);
+}
+
+uint32_t spg110_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
 	memset(&m_screenbuf[320 * cliprect.min_y], 0, 4 * 320 * ((cliprect.max_y - cliprect.min_y) + 1));
 
-	const uint32_t page1_addr = 0;//0x40 * m_video_regs[0x20];
-	const uint32_t page2_addr = 0;//0x40 * m_video_regs[0x21];
+	const uint32_t page1_addr = 0x40 * m_tilebase;//0x40 * m_video_regs[0x20];
+	const uint32_t page2_addr = 0x40 * m_tilebase;//0x40 * m_video_regs[0x21];
 	uint16_t *page1_regs = tmap0_regs;
 	uint16_t *page2_regs = tmap1_regs;
 
@@ -579,9 +633,23 @@ uint32_t spg110_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 WRITE_LINE_MEMBER(spg110_video_device::vblank)
 {
+	const int i = 0x0008;
+
 	if (!state)
 	{
-		m_cpu->set_state_unsynced(UNSP_IRQ0_LINE, ASSERT_LINE);
+		m_video_irq_status &= ~i;
+		check_video_irq();
+		return;
 	}
-	return;
+
+	if (m_video_irq_enable & 1)
+	{
+		m_video_irq_status |= i;
+		check_video_irq();
+	}
+}
+
+void spg110_video_device::check_video_irq()
+{
+	m_video_irq_cb((m_video_irq_status & m_video_irq_enable) ? ASSERT_LINE : CLEAR_LINE);
 }

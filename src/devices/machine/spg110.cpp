@@ -39,7 +39,10 @@ spg110_device::spg110_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-
+WRITE_LINE_MEMBER(spg110_device::videoirq_w)
+{
+	m_cpu->set_state_unsynced(UNSP_IRQ0_LINE, state);
+}
 
 void spg110_device::configure_spg_io(spg2xx_io_device* io)
 {
@@ -66,6 +69,7 @@ void spg110_device::device_add_mconfig(machine_config &config)
 	configure_spg_io(m_spg_io);
 
 	SPG110_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
+	m_spg_video->write_video_irq_callback().set(FUNC(spg110_device::videoirq_w));
 }
 
 WRITE16_MEMBER(spg110_device::spg110_3100_w) { }
@@ -91,7 +95,7 @@ void spg110_device::map(address_map &map)
 	map(0x002010, 0x002015).rw(m_spg_video, FUNC(spg110_video_device::tmap0_regs_r), FUNC(spg110_video_device::tmap0_regs_w));
 	map(0x002016, 0x00201b).rw(m_spg_video, FUNC(spg110_video_device::tmap1_regs_r), FUNC(spg110_video_device::tmap1_regs_w));
 
-#if 0 // more vregs?
+#if 1 // more vregs?
 	map(0x00201c, 0x00201c).w(m_spg_video, FUNC(spg110_video_device::spg110_201c_w));
 
 	map(0x002020, 0x002020).w(m_spg_video, FUNC(spg110_video_device::spg110_2020_w));
@@ -131,6 +135,7 @@ void spg110_device::map(address_map &map)
 	map(0x002067, 0x002067).w(m_spg_video, FUNC(spg110_video_device::dma_unk_2067_w));
 	map(0x002068, 0x002068).w(m_spg_video, FUNC(spg110_video_device::dma_src_step_w));
 
+	map(0x002100, 0x0021ff).ram(); // jak_spdmo only
 	map(0x002200, 0x0022ff).ram(); // looks like per-pen brightness or similar? strange because palette isn't memory mapped here (maybe rowscroll?)
 
 #if 1  // sound registers? seems to be 8 long entries, only uses up to 0x7f? (register mapping seems similar to spg2xx, maybe with less channels?)

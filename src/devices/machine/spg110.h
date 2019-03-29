@@ -96,6 +96,7 @@ private:
 	DECLARE_READ16_MEMBER(get_pal_r) { return 0; /*m_pal_flag;*/ }
 	void configure_spg_io(spg2xx_io_device* io);
 
+	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
 };
 
 DECLARE_DEVICE_TYPE(SPG110, spg110_device)

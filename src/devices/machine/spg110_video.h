@@ -9,6 +9,7 @@
 #include "cpu/unsp/unsp.h"
 #include "emupal.h"
 #include "screen.h"
+//#include "machine/timer.h"
 
 
 class spg110_video_device : public device_t, public device_memory_interface
@@ -80,6 +81,8 @@ public:
 	DECLARE_WRITE16_MEMBER(tmap0_regs_w);
 	DECLARE_WRITE16_MEMBER(tmap1_regs_w);
 
+	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -123,10 +126,7 @@ private:
 	required_shared_ptr<uint16_t> m_sprattr1;
 	required_shared_ptr<uint16_t> m_sprattr2;
 
-
-	uint16_t m_palctrlswapped[0x10];
-
-	
+	DECLARE_WRITE16_MEMBER(palette_w);
 
 	uint16_t tmap0_regs[0x6];
 	uint16_t tmap1_regs[0x6];
@@ -134,7 +134,7 @@ private:
 	uint16_t m_dma_src_step;
 	uint16_t m_dma_dst_step;
 	uint16_t m_dma_unk_2061;
-	uint16_t m_dma_unk_2067;
+	uint16_t m_dma_src_high;
 
 	uint16_t m_dma_dst;
 	uint16_t m_dma_src;
@@ -143,15 +143,24 @@ private:
 	uint16_t m_bg_scrolly;
 	uint16_t m_2036_scroll;
 
+	uint16_t m_tilebase;
+
+	uint16_t m_video_irq_enable;
+	uint16_t m_video_irq_status;
+	void check_video_irq();
+
 	void tilemap_write_regs(int which, uint16_t* regs, int regno, uint16_t data);
 
 	template<flipx_t FlipX>
-	void draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile, uint8_t pal, int32_t h, int32_t w, uint8_t bpp);
+	void draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile, uint8_t yflipmask, uint8_t pal, int32_t h, int32_t w, uint8_t bpp);
 	void draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs);
 	void draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr);
 	void draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority);
 
 	uint32_t m_screenbuf[320 * 240];
+	bool m_is_spiderman;
+
+	devcb_write_line m_video_irq_cb;
 };
 
 DECLARE_DEVICE_TYPE(SPG110_VIDEO, spg110_video_device)
