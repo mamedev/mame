@@ -6,6 +6,7 @@
 #pragma once
 
 #include "nxrom.h"
+#include "sound/namco_163.h"
 
 
 // ======================> nes_namcot3433_device
@@ -157,11 +158,13 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
 	void set_mirror(uint8_t page, uint8_t data);
 
 	uint8_t m_wram_protect, m_latch, m_chr_bank;
-	// TODO: add emulation of the sound part of the chip
+	required_device<namco_163_sound_device> m_namco163snd;
 };
 
 
