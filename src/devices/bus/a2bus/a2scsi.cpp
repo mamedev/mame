@@ -74,7 +74,7 @@ void a2bus_scsi_device::device_add_mconfig(machine_config &config)
 {
 	NSCSI_BUS(config, m_scsibus);
 	NSCSI_CONNECTOR(config, "scsibus:0", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "cdrom", false);
 	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr, false);
