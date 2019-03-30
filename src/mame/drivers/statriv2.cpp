@@ -1696,7 +1696,7 @@ GAME( 1981, statusbj,   0,        statusbj,  statusbj, statriv2_state, empty_ini
 GAME( 1981, funcsino,   0,        funcsino,  funcsino, statriv2_state, empty_init,     ROT0,  "Status Games",       "Status Fun Casino (V1.3s)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, tripdraw,   0,        tripdraw,  tripdraw, statriv2_state, empty_init,     ROT0,  "Status Games",       "Tripple Draw (V3.1 s)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1984, bigcsino,   0,        statusbj,  bigcsino, statriv2_state, empty_init,     ROT0,  "Status Games",       "Big Casino",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1984, hangman,    0,        statusbj,  hangman,  statriv2_state, init_addr_lmh,  ROT0,  "Status Games",       "Hangman",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hangman,    0,        statriv2,  hangman,  statriv2_state, init_addr_lmh,  ROT0,  "Status Games",       "Hangman",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1984, trivquiz,   0,        statriv2,  statriv2, statriv2_state, init_addr_lhx,  ROT0,  "Status Games",       "Triv Quiz",                             MACHINE_SUPPORTS_SAVE )
 GAME( 1984, statriv2,   0,        statriv2,  statriv2, statriv2_state, init_addr_xlh,  ROT0,  "Status Games",       "Triv Two",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1985, statriv2v,  statriv2, statriv2v, statriv2, statriv2_state, init_addr_xlh,  ROT90, "Status Games",       "Triv Two (Vertical)",                   MACHINE_SUPPORTS_SAVE )
