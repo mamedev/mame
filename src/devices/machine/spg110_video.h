@@ -76,6 +76,9 @@ public:
 	DECLARE_READ16_MEMBER(dma_len_status_r);
 	DECLARE_READ16_MEMBER(spg110_2063_r);
 
+	DECLARE_READ16_MEMBER(dma_manual_r);
+	DECLARE_WRITE16_MEMBER(dma_manual_w);
+
 	DECLARE_READ16_MEMBER(tmap0_regs_r);
 	DECLARE_READ16_MEMBER(tmap1_regs_r);
 	DECLARE_WRITE16_MEMBER(tmap0_regs_w);

@@ -131,6 +131,7 @@ void spg110_device::map(address_map &map)
 	map(0x002062, 0x002062).rw(m_spg_video, FUNC(spg110_video_device::dma_len_status_r),FUNC(spg110_video_device::dma_len_trigger_w));
 	map(0x002063, 0x002063).rw(m_spg_video, FUNC(spg110_video_device::spg110_2063_r),FUNC(spg110_video_device::spg110_2063_w)); // Video IRQ source / ack (3 different things checked here instead of 2 on spg2xx?)
 	map(0x002064, 0x002064).w(m_spg_video, FUNC(spg110_video_device::dma_dst_step_w));
+	map(0x002065, 0x002065).rw(m_spg_video, FUNC(spg110_video_device::dma_manual_r), FUNC(spg110_video_device::dma_manual_w));
 	map(0x002066, 0x002066).w(m_spg_video, FUNC(spg110_video_device::dma_src_w));
 	map(0x002067, 0x002067).w(m_spg_video, FUNC(spg110_video_device::dma_unk_2067_w));
 	map(0x002068, 0x002068).w(m_spg_video, FUNC(spg110_video_device::dma_src_step_w));

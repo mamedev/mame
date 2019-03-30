@@ -435,6 +435,17 @@ WRITE16_MEMBER(spg110_video_device::dma_len_trigger_w)
 	}
 }
 
+WRITE16_MEMBER(spg110_video_device::dma_manual_w)
+{
+	this->space(0).write_word(m_dma_dst * 2, data, 0xffff);
+}
+
+READ16_MEMBER(spg110_video_device::dma_manual_r)
+{
+	uint16_t val = this->space(0).read_word(m_dma_dst * 2);
+	return val;
+}
+
 READ16_MEMBER(spg110_video_device::dma_len_status_r)
 {
 	return 0x1fff; // DMA related?
