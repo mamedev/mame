@@ -141,6 +141,7 @@ CPUS["NS32000"] = true
 --CPUS["DSPP"] = true
 CPUS["HPC"] = true
 CPUS["MEG"] = true
+CPUS["DSPV"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -284,6 +285,7 @@ SOUNDS["DAVE"] = true
 --SOUNDS["LC7535"] = true
 SOUNDS["UPD934G"] = true
 SOUNDS["IOPSPU"] = true
+SOUNDS["SWP20"] = true
 SOUNDS["SWP30"] = true
 
 --------------------------------------------------
