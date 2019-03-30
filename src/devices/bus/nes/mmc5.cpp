@@ -18,6 +18,7 @@
 #include "emu.h"
 #include "mmc5.h"
 
+#include "speaker.h"
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -46,7 +47,7 @@ nes_exrom_device::nes_exrom_device(const machine_config &mconfig, const char *ta
 	, m_prg_mode(0), m_chr_mode(0), m_wram_protect_1(0), m_wram_protect_2(0), m_exram_control(0), m_wram_base(0), m_last_chr(0), m_ex1_chr(0)
 	, m_split_chr(0), m_ex1_bank(0), m_high_chr(0), m_split_scr(0), m_split_rev(0), m_split_ctrl(0), m_split_yst(0), m_split_bank(0), m_vcount(0)
 	, m_ppu(*this, ":ppu") // FIXME: this dependency should not exist
-	, m_sound(*this, ":maincpu:nesapu") // FIXME: this is a hack, it should have extra channels, not pass to the existing APU!!!
+	, m_sound(*this, "mmc5snd") // FIXME: this is a hack, it should be separated device, similar not same as NES APU!!!
 {
 }
 
@@ -676,4 +677,17 @@ void nes_exrom_device::write_h(offs_t offset, uint8_t data)
 		m_battery[((m_ram_hi_banks[bank] * 0x2000) + (offset & 0x1fff)) & (m_battery.size() - 1)] = data;
 	else if (!m_prgram.empty())
 		m_prgram[(((m_ram_hi_banks[bank] & 3) * 0x2000) + (offset & 0x1fff)) & (m_prgram.size() - 1)] = data;
+}
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void nes_exrom_device::device_add_mconfig(machine_config &config)
+{
+	// additional sound hardware
+	SPEAKER(config, "addon").front_center();
+
+	// TODO: temporary; will be separated device
+	NES_APU(config, m_sound, XTAL(21'477'272)/12).add_route(ALL_OUTPUTS, "addon", 0.50);
 }
