@@ -504,11 +504,9 @@ void sms_state::sms_base(machine_config &config)
 
 	SMS_CONTROL_PORT(config, m_port_ctrl1, sms_control_port_devices, "joypad");
 	m_port_ctrl1->th_input_handler().set(FUNC(sms_state::sms_ctrl1_th_input));
-	m_port_ctrl1->pixel_handler().set(FUNC(sms_state::sms_pixel_color));
 
 	SMS_CONTROL_PORT(config, m_port_ctrl2, sms_control_port_devices, "joypad");
 	m_port_ctrl2->th_input_handler().set(FUNC(sms_state::sms_ctrl2_th_input));
-	m_port_ctrl2->pixel_handler().set(FUNC(sms_state::sms_pixel_color));
 }
 
 void sms_state::sms_ntsc_base(machine_config &config)
@@ -977,8 +975,6 @@ MACHINE_CONFIG_START(sms_state::gamegear)
 
 	GG_EXT_PORT(config, m_port_gg_ext, gg_ext_port_devices, nullptr);
 	m_port_gg_ext->th_input_handler().set(FUNC(sms_state::gg_ext_th_input));
-	// only for GG-TV mod (may be simulated with a driver modified with SMS screen settings)
-	//m_port_gg_ext->pixel_handler().set(FUNC(sms_state::sms_pixel_color));
 
 	m_is_gamegear = true;
 	m_has_bios_0400 = true;
