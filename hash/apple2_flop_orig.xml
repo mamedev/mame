@@ -4223,4 +4223,34 @@
 		</part>
 	</software>
 
+	<software name="warpdstr">
+		<description>Warp Destroyer</description>
+		<year>1982</year>
+		<publisher>Piccadilly Software</publisher>
+		<info name="release" value="2019-03-30"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241436">
+				<rom name="warp destroyer.woz" size="241436" crc="836c145c" sha1="5c53cb95de5f668cba9a960224f5050880abdbba" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprbnny">
+		<description>Super Bunny</description>
+		<year>1983</year>
+		<publisher>Datamost</publisher>
+		<info name="release" value="2019-03-30"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234736">
+				<rom name="super bunny.woz" size="234736" crc="ba11fb03" sha1="20b41e813f7612b334ca07f09dc6d593fe9e4cf6" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
