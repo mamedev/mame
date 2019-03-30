@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-03-17 13:37+1100\n"
-"PO-Revision-Date: 2018-04-29 16:16+0300\n"
+"PO-Revision-Date: 2019-03-19 23:30+0200\n"
 "Last-Translator: Mame.gr\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -1597,11 +1597,11 @@ msgstr "Ήχος\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1079
 msgid "Capture\tUnimplemented\n"
-msgstr ""
+msgstr "Καταγραφή\tΜη υλοποιημένη\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1081
 msgid "Capture\tImperfect\n"
-msgstr ""
+msgstr "Καταγραφή\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1084
 msgid "Camera\tUnimplemented\n"
@@ -1645,11 +1645,11 @@ msgstr "Ποντίκι\tΑτελές\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1109
 msgid "Media\tUnimplemented\n"
-msgstr ""
+msgstr "Μέσα\tΜη υλοποιημένα\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1111
 msgid "Media\tImperfect\n"
-msgstr ""
+msgstr "Μέσα\tΑτελή\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1114
 msgid "Disk\tUnimplemented\n"
@@ -1669,43 +1669,43 @@ msgstr "Εκτυπωτής\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1124
 msgid "Mag. Tape\tUnimplemented\n"
-msgstr ""
+msgstr "Μαγ. Ταινία\tΜη υλοποιημένη\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1126
 msgid "Mag. Tape\tImperfect\n"
-msgstr ""
+msgstr "Μαγ. Ταινία\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1129
 msgid "Punch Tape\tUnimplemented\n"
-msgstr ""
+msgstr "Διάτρητη Ταινία\tΜη υλοποιημένη\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1131
 msgid "Punch Tape\tImperfect\n"
-msgstr ""
+msgstr "Διάτρητη Ταινία\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1134
 msgid "Mag. Drum\tUnimplemented\n"
-msgstr ""
+msgstr "Μαγ. Τύμπανο\tΜη υλοποιημένο\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1136
 msgid "Mag. Drum\tImperfect\n"
-msgstr ""
+msgstr "Μαγ. Τύμπανο\tΑτελές\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1139
 msgid "(EP)ROM\tUnimplemented\n"
-msgstr ""
+msgstr "(EP)ROM\tΜη υλοποιημένη\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1141
 msgid "(EP)ROM\tImperfect\n"
-msgstr ""
+msgstr "(EP)ROM\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1144
 msgid "Communications\tUnimplemented\n"
-msgstr ""
+msgstr "Επικοινωνίες\tΜη υλοποιημένες\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1146
 msgid "Communications\tImperfect\n"
-msgstr ""
+msgstr "Επικοινωνίες\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1149
 msgid "LAN\tUnimplemented\n"
@@ -2398,7 +2398,7 @@ msgstr "ήχος"
 
 #: src/frontend/mame/ui/info.cpp:36
 msgid "capture hardware"
-msgstr ""
+msgstr "υλικό καταγραφής"
 
 #: src/frontend/mame/ui/info.cpp:37
 msgid "camera"
@@ -2422,7 +2422,7 @@ msgstr "ποντίκι"
 
 #: src/frontend/mame/ui/info.cpp:42
 msgid "media"
-msgstr ""
+msgstr "μέσα"
 
 #: src/frontend/mame/ui/info.cpp:43
 msgid "disk"
@@ -2434,23 +2434,23 @@ msgstr "εκτυπωτής"
 
 #: src/frontend/mame/ui/info.cpp:45
 msgid "magnetic tape"
-msgstr ""
+msgstr "μαγνητική ταινία"
 
 #: src/frontend/mame/ui/info.cpp:46
 msgid "punch tape"
-msgstr ""
+msgstr "διάτρητη ταινία"
 
 #: src/frontend/mame/ui/info.cpp:47
 msgid "magnetic drum"
-msgstr ""
+msgstr "μαγνητικό τύμπανο"
 
 #: src/frontend/mame/ui/info.cpp:48
 msgid "solid state storage"
-msgstr ""
+msgstr "αποθήκευση στερεάς κατάστασης"
 
 #: src/frontend/mame/ui/info.cpp:49
 msgid "communications"
-msgstr ""
+msgstr "επικοινωνίες"
 
 #: src/frontend/mame/ui/info.cpp:50
 msgid "LAN"
@@ -2925,15 +2925,18 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:504
 msgid "Pause Mode"
-msgstr ""
+msgstr "Λειτουργία Παύσης"
 
 #: plugins/cheatfind/init.lua:511
 msgid "Manually pause & unpause the game when needed with the pause hotkey"
 msgstr ""
+"Μη αυτόματη παύση & συνέχιση του παιχνιδιού όταν χρειάζεται με το πλήκτρο "
+"παύσης"
 
 #: plugins/cheatfind/init.lua:536
 msgid "All slots cleared and current state saved to Slot 1"
 msgstr ""
+"Όλες οι θέσεις αδειάσαν και η τρέχουσα κατάσταση αποθηκεύτηκε στη θέση 1"
 
 #: plugins/cheatfind/init.lua:551
 msgid "Start new search"
@@ -2942,11 +2945,11 @@ msgstr "Έναρξη νέας αναζήτησης"
 #: plugins/cheatfind/init.lua:564
 #, lua-format
 msgid "Memory State saved to Slot %d"
-msgstr ""
+msgstr "Η Κατάσταση Μνήμης αποθηκεύτηκε στη θέση %d"
 
 #: plugins/cheatfind/init.lua:583
 msgid "Save Current Memory State to Slot "
-msgstr ""
+msgstr "Αποθήκευση Τρέχουσας Κατάστασης Μνήμης στη Θέση "
 
 #: plugins/cheatfind/init.lua:614
 #, lua-format
@@ -2955,15 +2958,15 @@ msgstr "Βρέθηκαν συνολικά %d αντιστοιχίες"
 
 #: plugins/cheatfind/init.lua:655
 msgid "Perform Compare  :  "
-msgstr ""
+msgstr "Εκτέλεση Σύγκρισης  :  "
 
 #: plugins/cheatfind/init.lua:672
 msgid "Left less than right"
-msgstr ""
+msgstr "Αριστερά είναι λιγότερη από τη δεξιά"
 
 #: plugins/cheatfind/init.lua:674
 msgid "Left greater than right"
-msgstr ""
+msgstr "Αριστερά είναι περισσότερη από τη δεξιά"
 
 #: plugins/cheatfind/init.lua:676
 msgid "Left equal to right"
@@ -2971,7 +2974,7 @@ msgstr "Αριστερά είναι ίση με τη δεξιά"
 
 #: plugins/cheatfind/init.lua:678
 msgid "Left not equal to right"
-msgstr ""
+msgstr "Αριστερά όχι ίση με τη δεξιά"
 
 #: plugins/cheatfind/init.lua:680
 msgid "Left equal to right with bitmask"
@@ -2983,15 +2986,15 @@ msgstr "Αριστερά δεν είναι ίση με τη δεξιά με bitm
 
 #: plugins/cheatfind/init.lua:684
 msgid "Left less than value"
-msgstr "Αριστερά λιγότερη από την αξία"
+msgstr "Αριστερά είναι λιγότερη από την αξία"
 
 #: plugins/cheatfind/init.lua:686
 msgid "Left greater than value"
-msgstr "Αριστερά περισσότερη από την αξία"
+msgstr "Αριστερά είναι περισσότερη από την αξία"
 
 #: plugins/cheatfind/init.lua:688
 msgid "Left equal to value"
-msgstr "Αριστερά ίση με την αξία"
+msgstr "Αριστερά είναι ίση με την αξία"
 
 #: plugins/cheatfind/init.lua:690
 msgid "Left not equal to value"
@@ -3003,7 +3006,7 @@ msgstr "Αξία"
 
 #: plugins/cheatfind/init.lua:714
 msgid "Difference"
-msgstr ""
+msgstr "Διαφορά"
 
 #: plugins/cheatfind/init.lua:719
 msgid "Any"
@@ -3015,91 +3018,95 @@ msgstr "Μορφή Δεδομένων"
 
 #: plugins/cheatfind/init.lua:731
 msgid "Test/Write Poke Value"
-msgstr ""
+msgstr "Δοκιμή/Εγγραφή Αξίας Poke"
 
 #: plugins/cheatfind/init.lua:738
 msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
 msgstr ""
+"Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke την αξία της θέσης 1 (πχ. Ξεκίνησες με "
+"κάτι αλλά το έχασες)"
 
 #: plugins/cheatfind/init.lua:740
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
 msgstr ""
+"Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke την αξία της τελευταίας θέσης (πχ. "
+"Ξεκίνησες χωρίς κάποιο αντικείμενο αλλά τελικά το βρήκες)"
 
 #: plugins/cheatfind/init.lua:742
 msgid "Use this if you want to poke 0x00"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x00"
 
 #: plugins/cheatfind/init.lua:744
 msgid "Use this if you want to poke 0x01"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x01"
 
 #: plugins/cheatfind/init.lua:746
 msgid "Use this if you want to poke 0x02"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x02"
 
 #: plugins/cheatfind/init.lua:748
 msgid "Use this if you want to poke 0x03"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x03"
 
 #: plugins/cheatfind/init.lua:750
 msgid "Use this if you want to poke 0x04"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x04"
 
 #: plugins/cheatfind/init.lua:752
 msgid "Use this if you want to poke 0x05"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x05"
 
 #: plugins/cheatfind/init.lua:754
 msgid "Use this if you want to poke 0x06"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x06"
 
 #: plugins/cheatfind/init.lua:756
 msgid "Use this if you want to poke 0x07"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x07"
 
 #: plugins/cheatfind/init.lua:758
 msgid "Use this if you want to poke 0x08"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x08"
 
 #: plugins/cheatfind/init.lua:760
 msgid "Use this if you want to poke 0x09"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x09"
 
 #: plugins/cheatfind/init.lua:762
 msgid "Use this if you want to poke 0x63 (Decimal 99)"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x63 (Δεκαδικό 99)"
 
 #: plugins/cheatfind/init.lua:764
 msgid "Use this if you want to poke 0x99 (BCD 99)"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x99 (BCD 99)"
 
 #: plugins/cheatfind/init.lua:766
 msgid "Use this if you want to poke 0xFF (Decimal 255)"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0xFF (Δεκαδικό 255)"
 
 #: plugins/cheatfind/init.lua:768
 msgid "Use this if you want to poke 0x3E7 (Decimal 999)"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x3E7 (Δεκαδικό 999)"
 
 #: plugins/cheatfind/init.lua:770
 msgid "Use this if you want to poke 0x999 (BCD 999)"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x999 (BCD 999)"
 
 #: plugins/cheatfind/init.lua:772
 msgid "Use this if you want to poke 0x270F (Decimal 9999)"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x270F (Δεκαδικό 9999)"
 
 #: plugins/cheatfind/init.lua:774
 msgid "Use this if you want to poke 0x9999 (BCD 9999)"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x9999 (BCD 9999)"
 
 #: plugins/cheatfind/init.lua:776
 msgid "Use this if you want to poke 0xFFFF (Decimal 65535)"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0xFFFF (Δεκαδικό 65535)"
 
 #: plugins/cheatfind/init.lua:816
 msgid "Undo last search -- #"
@@ -3116,7 +3123,7 @@ msgstr "Όλα"
 #: plugins/cheatfind/init.lua:934
 #, lua-format
 msgid "Test Cheat %08X:%02X"
-msgstr ""
+msgstr "Δοκιμή Cheat %08X:%02X"
 
 #: plugins/cheatfind/init.lua:974
 msgid "Cheat engine not available"
@@ -3163,40 +3170,3 @@ msgstr "Το όνομα της θύρας εισόδου αποθηκεύτηκ�
 #: plugins/portname/init.lua:172
 msgid "Input ports"
 msgstr "Θύρες εισόδου"
-
-#~ msgid "Data cleared and current state saved"
-#~ msgstr ""
-#~ "Τα δεδομένα έχουν διαγραφεί και η τρέχουσα κατάσταση έχει αποθηκευτεί"
-
-#~ msgid "Current state saved"
-#~ msgstr "Η τρέχουσα κατάσταση έχει αποθηκευτεί"
-
-#~ msgid "Save current -- #"
-#~ msgstr "Αποθήκευση τρέχουσας -- #"
-
-#~ msgid "Compare"
-#~ msgstr "Συγκρίση"
-
-#~ msgid "Left operand"
-#~ msgstr "Αριστερός όρος"
-
-#~ msgid "Current"
-#~ msgstr "Τρέχων"
-
-#~ msgid "Operator"
-#~ msgstr "Τελεστής"
-
-#~ msgid "Left less than right, value is difference"
-#~ msgstr "Αριστερά μικρότερη από τη δεξιά, η τιμή είναι η διαφορά"
-
-#~ msgid "Left greater than right, value is difference"
-#~ msgstr "Αριστερά μεγαλύτερη από τη δεξιά, η τιμή είναι η διαφορά"
-
-#~ msgid "Left not equal to right, value is difference"
-#~ msgstr "Αριστερά δεν είναι ίση με τη δεξιά, η τιμή είναι η διαφορά"
-
-#~ msgid "Right operand"
-#~ msgstr "Δεξιός όρος"
-
-#~ msgid "Test cheat at addr %08X"
-#~ msgstr "Δοκιμή cheat στην addr %08X"
