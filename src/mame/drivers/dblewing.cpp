@@ -382,7 +382,6 @@ void dblewing_state::dblewing(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_dblewing);
 
 	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_split(0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_trans_mask(0x0f);

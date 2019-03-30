@@ -11,6 +11,11 @@
 
 /******************************************************************************/
 
+VIDEO_START_MEMBER(cninja_state,cninja)
+{
+	m_deco_tilegen[0]->set_transmask(1, 0, 0x00ff, 0xff01);
+}
+
 VIDEO_START_MEMBER(cninja_state,stoneage)
 {
 	/* The bootleg has broken scroll registers */

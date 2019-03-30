@@ -901,7 +901,6 @@ void rohga_state::rohga(machine_config &config)
 	m_decocomn->set_palette_tag(m_palette);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_split(0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x64);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
@@ -917,7 +916,6 @@ void rohga_state::rohga(machine_config &config)
 	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
 	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_split(0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
@@ -993,7 +991,6 @@ void rohga_state::wizdfire(machine_config &config)
 	m_decocomn->set_palette_tag(m_palette);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_split(0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
@@ -1009,7 +1006,6 @@ void rohga_state::wizdfire(machine_config &config)
 	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
 	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_split(0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
@@ -1090,7 +1086,6 @@ void rohga_state::nitrobal(machine_config &config)
 	m_decocomn->set_palette_tag(m_palette);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_split(0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_32x32);
 	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
@@ -1106,7 +1101,6 @@ void rohga_state::nitrobal(machine_config &config)
 	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
 	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_split(0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_32x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_32x32);
 	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
@@ -1188,7 +1182,6 @@ void rohga_state::schmeisr(machine_config &config)
 	m_decocomn->set_palette_tag(m_palette);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_split(0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x64);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
@@ -1204,7 +1197,6 @@ void rohga_state::schmeisr(machine_config &config)
 	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
 	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_split(0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);

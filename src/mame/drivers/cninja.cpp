@@ -819,7 +819,6 @@ void cninja_state::cninja(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_split(1);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
@@ -833,7 +832,6 @@ void cninja_state::cninja(machine_config &config)
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_split(0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
@@ -892,6 +890,8 @@ void cninja_state::stoneage(machine_config &config)
 	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
 	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
 
+	MCFG_VIDEO_START_OVERRIDE(cninja_state,cninja)
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(24'000'000) / 4, 376, 0, 256, 274, 8, 248);
@@ -906,7 +906,6 @@ void cninja_state::stoneage(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_split(1);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
@@ -920,7 +919,6 @@ void cninja_state::stoneage(machine_config &config)
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_split(0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
@@ -1001,7 +999,6 @@ void cninja_state::cninjabl(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_split(1);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
@@ -1015,7 +1012,6 @@ void cninja_state::cninjabl(machine_config &config)
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_split(0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
@@ -1073,7 +1069,6 @@ void cninja_state::edrandy(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_split(0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
@@ -1087,7 +1082,6 @@ void cninja_state::edrandy(machine_config &config)
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_split(0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
@@ -1162,7 +1156,6 @@ void cninja_state::robocop2(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_split(0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
@@ -1177,7 +1170,6 @@ void cninja_state::robocop2(machine_config &config)
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_split(0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
@@ -1256,7 +1248,6 @@ void cninja_state::mutantf(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram[1]);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_split(0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
@@ -1272,7 +1263,6 @@ void cninja_state::mutantf(machine_config &config)
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_split(0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);

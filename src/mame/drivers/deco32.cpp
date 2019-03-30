@@ -1881,7 +1881,6 @@ void captaven_state::captaven(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_split(0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
@@ -1895,7 +1894,6 @@ void captaven_state::captaven(machine_config &config)
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO16IC(config, m_deco_tilegen[1], 0);    // pf3 is in 8bpp mode, pf4 is not used
-	m_deco_tilegen[1]->set_split(0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_32x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_32x32);
 	m_deco_tilegen[1]->set_pf1_trans_mask(0xff);
@@ -1962,7 +1960,6 @@ void fghthist_state::fghthist(machine_config &config)
 	PALETTE(config, m_palette).set_entries(2048);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_split(0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
@@ -1978,7 +1975,6 @@ void fghthist_state::fghthist(machine_config &config)
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_split(0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
@@ -2087,7 +2083,6 @@ void dragngun_state::dragngun(machine_config &config)
 	BUFFERED_SPRITERAM32(config, m_spriteram);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_split(0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
@@ -2103,7 +2098,6 @@ void dragngun_state::dragngun(machine_config &config)
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_split(0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_trans_mask(0xff);
@@ -2215,7 +2209,6 @@ void dragngun_state::lockload(machine_config &config)
 	PALETTE(config, m_palette).set_entries(2048);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_split(0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
@@ -2231,7 +2224,6 @@ void dragngun_state::lockload(machine_config &config)
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_split(0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_32x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_32x32);    // lockload definitely wants pf34 half width..
 	m_deco_tilegen[1]->set_pf1_trans_mask(0xff);
@@ -2295,7 +2287,6 @@ void nslasher_state::tattass(machine_config &config)
 	DECO_ACE(config, m_deco_ace, 0);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_split(0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
@@ -2311,7 +2302,6 @@ void nslasher_state::tattass(machine_config &config)
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_split(0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
@@ -2371,7 +2361,6 @@ void nslasher_state::nslasher(machine_config &config)
 	DECO_ACE(config, m_deco_ace, 0);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_split(0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
@@ -2387,7 +2376,6 @@ void nslasher_state::nslasher(machine_config &config)
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_split(0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);

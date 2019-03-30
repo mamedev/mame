@@ -360,7 +360,6 @@ void pktgaldx_state::pktgaldx(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pktgaldx);
 
 	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_split(0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_trans_mask(0x0f);

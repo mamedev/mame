@@ -434,7 +434,6 @@ void sshangha_state::sshangha(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0x4000);
 
 	DECO16IC(config, m_tilegen, 0);
-	m_tilegen->set_split(0);
 	m_tilegen->set_pf1_size(DECO_64x32);
 	m_tilegen->set_pf2_size(DECO_64x32);
 	m_tilegen->set_pf1_trans_mask(0x0f);
