@@ -77,7 +77,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_device<palette_device> m_palette;
-	required_device<i2cmem_device> m_i2cmem;
+	optional_device<i2cmem_device> m_i2cmem;
 	output_finder<8> m_lamps;
 };
 
