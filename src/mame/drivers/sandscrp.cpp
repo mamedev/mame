@@ -146,11 +146,11 @@ uint32_t sandscrp_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	screen.priority().fill(0, cliprect);
 
-	m_view2->kaneko16_prepare(bitmap, cliprect);
+	m_view2->prepare(bitmap, cliprect);
 
 	for ( int l = 0; l < 4; l++ )
 	{
-		m_view2->render_tilemap_chip(screen,bitmap,cliprect,l);
+		m_view2->render_tilemap(screen,bitmap,cliprect,l);
 	}
 
 	// copy sprite bitmap to screen
@@ -158,7 +158,7 @@ uint32_t sandscrp_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	for ( int h = 4; h < 8; h++ ) // high bit of tile priority : above sprites
 	{
-		m_view2->render_tilemap_chip(screen,bitmap,cliprect,h);
+		m_view2->render_tilemap(screen,bitmap,cliprect,h);
 	}
 
 	return 0;
@@ -285,8 +285,8 @@ void sandscrp_state::sandscrp_mem(address_map &map)
 
 	map(0x700000, 0x70ffff).ram();     // RAM
 	map(0x200000, 0x20001f).rw("calc1_mcu", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
-	map(0x300000, 0x30001f).rw(m_view2, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
-	map(0x400000, 0x403fff).rw(m_view2, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x300000, 0x30001f).rw(m_view2, FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
+	map(0x400000, 0x403fff).m(m_view2, FUNC(kaneko_view2_tilemap_device::vram_map));
 	map(0x500000, 0x501fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w)); // sprites
 	map(0x600000, 0x600fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0xa00000, 0xa00001).w(FUNC(sandscrp_state::coincounter_w));  // Coin Counters (Lockout unused)
