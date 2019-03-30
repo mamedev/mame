@@ -77,7 +77,7 @@ public:
 	ltcasino_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_pia{ { *this, "pia0" }, { *this, "pia1" } },
+		m_pia(*this, "pia%u", 0U),
 		m_vtc(*this, "vtc"),
 		m_video_ram(*this, "video_ram"),
 		m_attribute_ram(*this, "attribute_ram"),
@@ -93,7 +93,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<pia6821_device> m_pia[2];
+	required_device_array<pia6821_device, 2> m_pia;
 	required_device<crt5037_device> m_vtc;
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_shared_ptr<uint8_t> m_attribute_ram;
