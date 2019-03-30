@@ -388,15 +388,15 @@ uint8_t s100_wunderbus_device::s100_sinp_r(offs_t offset)
 			break;
 
 		case 1:
-			data = m_ace1->ins8250_r(machine().dummy_space(), offset & 0x07);
+			data = m_ace1->ins8250_r(offset & 0x07);
 			break;
 
 		case 2:
-			data = m_ace2->ins8250_r(machine().dummy_space(), offset & 0x07);
+			data = m_ace2->ins8250_r(offset & 0x07);
 			break;
 
 		case 3:
-			data = m_ace3->ins8250_r(machine().dummy_space(), offset & 0x07);
+			data = m_ace3->ins8250_r(offset & 0x07);
 			break;
 		}
 	}
@@ -511,15 +511,15 @@ void s100_wunderbus_device::s100_sout_w(offs_t offset, uint8_t data)
 			break;
 
 		case 1:
-			m_ace1->ins8250_w(machine().dummy_space(), offset & 0x07, data);
+			m_ace1->ins8250_w(offset & 0x07, data);
 			break;
 
 		case 2:
-			m_ace2->ins8250_w(machine().dummy_space(), offset & 0x07, data);
+			m_ace2->ins8250_w(offset & 0x07, data);
 			break;
 
 		case 3:
-			m_ace3->ins8250_w(machine().dummy_space(), offset & 0x07, data);
+			m_ace3->ins8250_w(offset & 0x07, data);
 			break;
 		}
 	}
