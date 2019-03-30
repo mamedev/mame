@@ -37,6 +37,7 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
+	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
@@ -48,6 +49,7 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
+	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
