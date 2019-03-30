@@ -163,7 +163,7 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 					uint32_t step = m_channel[ch].m_frequency ? m_channel[ch].m_frequency : 0x1000;
 					for (int i = 0; i < samples; i += 1)
 					{
-						int offset = m_channel[0].m_counter;
+						int offset = m_channel[ch].m_counter;
 						m_channel[ch].m_tick--;
 						if (m_channel[ch].m_tick <= 0)
 						{
