@@ -77,7 +77,7 @@ WRITE16_MEMBER( cninja_state::cninja_protection_region_0_104_w )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	m_ioprot->write_data( space, deco146_addr, data, mem_mask, cs );
+	m_ioprot->write_data( deco146_addr, data, mem_mask, cs );
 }
 
 READ16_MEMBER(cninja_state::cninjabl2_sprite_dma_r)
@@ -159,7 +159,7 @@ WRITE16_MEMBER( cninja_state::edrandy_protection_region_8_146_w )
 	int real_address = 0x1a0000 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	m_ioprot->write_data( space, deco146_addr, data, mem_mask, cs );
+	m_ioprot->write_data( deco146_addr, data, mem_mask, cs );
 }
 
 READ16_MEMBER( cninja_state::edrandy_protection_region_6_146_r )
@@ -186,7 +186,7 @@ WRITE16_MEMBER( cninja_state::edrandy_protection_region_6_146_w )
 	int real_address = 0x198000 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	m_ioprot->write_data( space, deco146_addr, data, mem_mask, cs );
+	m_ioprot->write_data( deco146_addr, data, mem_mask, cs );
 }
 
 void cninja_state::edrandy_map(address_map &map)
@@ -268,7 +268,7 @@ WRITE16_MEMBER( cninja_state::mutantf_protection_region_0_146_w )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	m_ioprot->write_data( space, deco146_addr, data, mem_mask, cs );
+	m_ioprot->write_data( deco146_addr, data, mem_mask, cs );
 }
 
 READ16_MEMBER( cninja_state::mutantf_71_r )
