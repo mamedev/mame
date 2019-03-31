@@ -8,9 +8,14 @@
     Non-Payout 'Gambling' style games.
 
     TODO:
-    - color version of the first version is undumped?
-    - figure out the rest of the dipswitches
-    - keyboard
+    - Clocks need to be verified
+    - Figure out the rest of the dipswitches
+    - Keyboard
+
+    Notes:
+    - Color version of the first version is undumped (flyer exists)?
+    - At least one other version of ltcasinn is undumped. It shows
+      'PLEASE MAKE SELECTION!' instead of 'PLEASE PICK YOUR POSION!'
 
 
 Mini Vegas
@@ -79,6 +84,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_pia(*this, "pia%u", 0U),
 		m_vtc(*this, "vtc"),
+		m_screen(*this, "screen"),
+		m_ay(*this, "ay"),
 		m_video_ram(*this, "video_ram"),
 		m_attribute_ram(*this, "attribute_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -90,11 +97,14 @@ public:
 
 	void ltcasino(machine_config &config);
 	void ltcasinn(machine_config &config);
+	void mv4in1(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<pia6821_device, 2> m_pia;
 	required_device<crt5037_device> m_vtc;
+	required_device<screen_device> m_screen;
+	required_device<ay8910_device> m_ay;
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_shared_ptr<uint8_t> m_attribute_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -128,11 +138,11 @@ void ltcasino_state::main_map(address_map &map)
 	map(0x8000, 0xcfff).rom();
 	map(0xd000, 0xd7ff).ram().share(m_video_ram);
 	map(0xe000, 0xe7ff).ram().share(m_attribute_ram);
-	map(0xec00, 0xec03).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xec10, 0xec13).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xec20, 0xec21).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0xec20, 0xec21).w("aysnd", FUNC(ay8910_device::data_address_w));
-	map(0xec30, 0xec3f).rw("vtc", FUNC(crt5037_device::read), FUNC(crt5037_device::write));
+	map(0xec00, 0xec03).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xec10, 0xec13).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xec20, 0xec21).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0xec20, 0xec21).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0xec30, 0xec3f).rw(m_vtc, FUNC(crt5037_device::read), FUNC(crt5037_device::write));
 	map(0xf000, 0xffff).rom();
 }
 
@@ -396,7 +406,7 @@ WRITE8_MEMBER(ltcasino_state::output_t_w)
 
 void ltcasino_state::ltcasino(machine_config &config)
 {
-	M6502(config, m_maincpu, 18.432_MHz_XTAL/16); // clock unknown
+	M6502(config, m_maincpu, 18_MHz_XTAL/16); // clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &ltcasino_state::main_map);
 
 	PIA6821(config, m_pia[0], 0);
@@ -410,17 +420,17 @@ void ltcasino_state::ltcasino(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(ltcasino_state, ltcasino)
 
 	// video hardware
-	CRT5037(config, m_vtc, 18.432_MHz_XTAL/16); // this clock gives about 61/51 hz
+	CRT5037(config, m_vtc, 18_MHz_XTAL/16); // this clock gives about 60/50 hz
 	m_vtc->set_char_width(8);
 	m_vtc->set_screen("screen");
 	m_vtc->set_visarea(48, 463, 0, 255);
 	m_vtc->vsyn_callback().set_inputline("maincpu", 0); // ?
 	m_vtc->vsyn_callback().append(m_pia[0], FUNC(pia6821_device::cb2_w)); // ?
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(18.432_MHz_XTAL/2, 560, 48, 464, 268, 0, 256);
-	screen.set_screen_update(FUNC(ltcasino_state::screen_update));
-	screen.set_palette("palette");
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(18_MHz_XTAL/2, 560, 48, 464, 268, 0, 256);
+	m_screen->set_screen_update(FUNC(ltcasino_state::screen_update));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_ltcasino);
 
@@ -429,10 +439,10 @@ void ltcasino_state::ltcasino(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 18.432_MHz_XTAL/16)); // clock unknown
-	aysnd.port_a_read_callback().set_ioport("A");
-	aysnd.port_b_read_callback().set_ioport("B");
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.4);
+	AY8910(config, m_ay, 18_MHz_XTAL/16); // clock unknown
+	m_ay->port_a_read_callback().set_ioport("A");
+	m_ay->port_b_read_callback().set_ioport("B");
+	m_ay->add_route(ALL_OUTPUTS, "mono", 0.4);
 }
 
 void ltcasino_state::ltcasinn(machine_config &config)
@@ -445,6 +455,17 @@ void ltcasino_state::ltcasinn(machine_config &config)
 	PALETTE(config, "palette", FUNC(ltcasino_state::ltcasinn_palette), 128, 8);
 
 	m_gfxdecode->set_info(gfx_ltcasinn);
+}
+
+void ltcasino_state::mv4in1(machine_config &config)
+{
+	ltcasinn(config);
+
+	// different XTAL
+	m_maincpu->set_clock(18.432_MHz_XTAL/16);
+	m_vtc->set_clock(18.432_MHz_XTAL/16);
+	m_screen->set_raw(18.432_MHz_XTAL/2, 560, 48, 464, 268, 0, 256);
+	m_ay->set_clock(18.432_MHz_XTAL/16);
 }
 
 
@@ -467,15 +488,15 @@ ROM_END
 
 ROM_START( ltcasinn )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lc2_ra.bin", 0x8000, 0x1000, CRC(1a595442) SHA1(b8fe3e5ed2024a57187c0ce547c1bbef2429ed63) )
-	ROM_LOAD( "lc2_rb.bin", 0x9000, 0x1000, CRC(4f5502c1) SHA1(cd1b7c08d26fed71c45e44ebd208bd18dc262e8f) )
-	ROM_LOAD( "lc2_rc.bin", 0xa000, 0x1000, CRC(990283b8) SHA1(8a3fe5be8381894b8e8dd14c7d42190e60a25600) )
-	ROM_LOAD( "lc2_rd.bin", 0xb000, 0x1000, CRC(884f39dc) SHA1(fe149faf118279205e82760c5052cefb88a2f5be) )
-	ROM_LOAD( "lc2_re.bin", 0xc000, 0x1000, CRC(fae38204) SHA1(e5908734cee0a89d873ab3761ded285f8ae138d3) )
-	ROM_LOAD( "lc2_rf.bin", 0xf000, 0x1000, CRC(7e8ad9d3) SHA1(8cbe342af7d9f32b2214664db318edd3d2e75630) )
+	ROM_LOAD( "v17_00_ra.bin", 0x8000, 0x1000, CRC(1a595442) SHA1(b8fe3e5ed2024a57187c0ce547c1bbef2429ed63) )
+	ROM_LOAD( "v17_00_rb.bin", 0x9000, 0x1000, CRC(4f5502c1) SHA1(cd1b7c08d26fed71c45e44ebd208bd18dc262e8f) )
+	ROM_LOAD( "v17_00_rc.bin", 0xa000, 0x1000, CRC(990283b8) SHA1(8a3fe5be8381894b8e8dd14c7d42190e60a25600) )
+	ROM_LOAD( "v17_00_rd.bin", 0xb000, 0x1000, CRC(884f39dc) SHA1(fe149faf118279205e82760c5052cefb88a2f5be) )
+	ROM_LOAD( "v17_00_re.bin", 0xc000, 0x1000, CRC(fae38204) SHA1(e5908734cee0a89d873ab3761ded285f8ae138d3) )
+	ROM_LOAD( "v17_00_rf.bin", 0xf000, 0x1000, CRC(7e8ad9d3) SHA1(8cbe342af7d9f32b2214664db318edd3d2e75630) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "lc2_rv.bin", 0x0000, 0x1000, CRC(84cbee7b) SHA1(742831d5ae0db6c7c644a18a837831ee0474d472) )
+	ROM_LOAD( "v17_00_rv.bin", 0x0000, 0x1000, CRC(84cbee7b) SHA1(742831d5ae0db6c7c644a18a837831ee0474d472) )
 ROM_END
 
 ROM_START( mv4in1 )
@@ -498,5 +519,5 @@ ROM_END
 
 //     YEAR  NAME      PARENT    MACHINE   INPUT     CLASS           INIT         ROTATION  COMPANY                            FULLNAME                 FLAGS
 GAMEL( 1982, ltcasino, 0,        ltcasino, ltcasino, ltcasino_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino (older)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_ltcasino )
-GAMEL( 1983, mv4in1,   ltcasino, ltcasinn, mv4in1,   ltcasino_state, init_mv4in1, ROT0,     "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1",       MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_ltcasinn )
+GAMEL( 1983, mv4in1,   ltcasino, mv4in1,   mv4in1,   ltcasino_state, init_mv4in1, ROT0,     "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1",       MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_ltcasinn )
 GAMEL( 1984, ltcasinn, 0,        ltcasinn, ltcasinn, ltcasino_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino (newer)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_ltcasinn )
