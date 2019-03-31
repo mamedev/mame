@@ -151,7 +151,7 @@ enum
 
 #include "logmacro.h"
 
-constexpr int tms9995_device::AS_SETOFFSET;
+constexpr int tms9995_device::AS_SETADDRESS;
 
 /****************************************************************************
     Constructor
@@ -169,10 +169,10 @@ tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, 
 		PC(0),
 		PC_debug(0),
 		m_program_config("program", ENDIANNESS_BIG, 8, 16),
-		m_setoffset_config("setoffset", ENDIANNESS_BIG, 8, 16),
+		m_setaddress_config("setaddress", ENDIANNESS_BIG, 16, 16),  // data = address
 		m_io_config("cru", ENDIANNESS_LITTLE, 8, 16, 1),
 		m_prgspace(nullptr),
-		m_sospace(nullptr),
+		m_setaddr(nullptr),
 		m_cru(nullptr),
 		m_external_operation(*this),
 		m_iaq_line(*this),
@@ -198,7 +198,7 @@ void tms9995_device::device_start()
 	// TODO: Restore save state suport
 
 	m_prgspace = &space(AS_PROGRAM);
-	m_sospace = has_space(AS_SETOFFSET) ? &space(AS_SETOFFSET) : nullptr;
+	m_setaddr = has_space(AS_SETADDRESS) ? &space(AS_SETADDRESS) : nullptr;
 	m_cru = &space(AS_IO);
 
 	// Resolve our external connections
@@ -443,10 +443,10 @@ void tms9995_device::write_workspace_register_debug(int reg, uint16_t data)
 
 device_memory_interface::space_config_vector tms9995_device::memory_space_config() const
 {
-	if (has_configured_map(AS_SETOFFSET))
+	if (has_configured_map(AS_SETADDRESS))
 		return space_config_vector {
 			std::make_pair(AS_PROGRAM,   &m_program_config),
-			std::make_pair(AS_SETOFFSET, &m_setoffset_config),
+			std::make_pair(AS_SETADDRESS, &m_setaddress_config),
 			std::make_pair(AS_IO,        &m_io_config)
 		};
 	else
@@ -1856,8 +1856,8 @@ void tms9995_device::mem_read()
 
 			m_check_hold = false;
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address & ~1);
-			if (m_sospace)
-				m_sospace->read_byte(address);
+			if (m_setaddr)
+				m_setaddr->write_word(ASSERT_LINE, address);
 			m_request_auto_wait_state = m_auto_wait;
 			pulse_clock(1);
 			break;
@@ -1871,8 +1871,8 @@ void tms9995_device::mem_read()
 		case 3:
 			// Set address + 1 (unless byte command)
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address | 1);
-			if (m_sospace)
-				m_sospace->read_byte(m_address | 1);
+			if (m_setaddr)
+				m_setaddr->write_word(ASSERT_LINE, m_address | 1);
 			m_request_auto_wait_state = m_auto_wait;
 			pulse_clock(1);
 			break;
@@ -1990,8 +1990,8 @@ void tms9995_device::mem_write()
 
 			m_check_hold = false;
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", address);
-			if (m_sospace)
-				m_sospace->read_byte(address);
+			if (m_setaddr)
+				m_setaddr->write_word(CLEAR_LINE, address);
 			LOGMASKED(LOG_MEM, "memory write byte %04x <- %02x\n", address, (m_current_value >> 8)&0xff);
 			m_prgspace->write_byte(address, (m_current_value >> 8)&0xff);
 			m_request_auto_wait_state = m_auto_wait;
@@ -2004,8 +2004,8 @@ void tms9995_device::mem_write()
 		case 3:
 			// Set address + 1 (unless byte command)
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address | 1);
-			if (m_sospace)
-				m_sospace->read_byte(m_address | 1);
+			if (m_setaddr)
+				m_setaddr->write_word(CLEAR_LINE, m_address | 1);
 			LOGMASKED(LOG_MEM, "memory write byte %04x <- %02x\n", m_address | 1, m_current_value & 0xff);
 			m_prgspace->write_byte(m_address | 1, m_current_value & 0xff);
 			m_request_auto_wait_state = m_auto_wait;
