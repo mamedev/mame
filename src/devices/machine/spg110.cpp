@@ -18,10 +18,12 @@ DEFINE_DEVICE_TYPE(SPG110, spg110_device, "spg110", "SPG110 System-on-a-Chip")
 
 spg110_device::spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this, 2)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_spg_io(*this, "spg_io")
 	, m_spg_video(*this, "spg_video")
+	, m_spg_audio(*this, "spgaudio")
 	, m_porta_out(*this)
 	, m_portb_out(*this)
 	, m_portc_out(*this)
@@ -63,6 +65,18 @@ void spg110_device::configure_spg_io(spg2xx_io_device* io)
 //	io->write_ffrq_tmr2_irq_callback().set(FUNC(spg110_device::ffreq2_w));
 }
 
+READ16_MEMBER(spg110_device::space_r)
+{
+	address_space &cpuspace = m_cpu->space(AS_PROGRAM);
+	return cpuspace.read_word(offset);
+}
+
+WRITE_LINE_MEMBER(spg110_device::audioirq_w)
+{
+	m_cpu->set_state_unsynced(UNSP_FIQ_LINE, state);
+}
+
+
 void spg110_device::device_add_mconfig(machine_config &config)
 {
 	SPG24X_IO(config, m_spg_io, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
@@ -70,22 +84,15 @@ void spg110_device::device_add_mconfig(machine_config &config)
 
 	SPG110_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
 	m_spg_video->write_video_irq_callback().set(FUNC(spg110_device::videoirq_w));
+
+	SPG110_AUDIO(config, m_spg_audio, DERIVED_CLOCK(1, 1));
+	m_spg_audio->write_irq_callback().set(FUNC(spg110_device::audioirq_w));
+	m_spg_audio->space_read_callback().set(FUNC(spg110_device::space_r));
+
+	m_spg_audio->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_spg_audio->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+
 }
-
-WRITE16_MEMBER(spg110_device::spg110_3100_w) { }
-WRITE16_MEMBER(spg110_device::spg110_3101_w) { }
-WRITE16_MEMBER(spg110_device::spg110_3102_w) { }
-WRITE16_MEMBER(spg110_device::spg110_3104_w) { }
-WRITE16_MEMBER(spg110_device::spg110_3105_w) { }
-WRITE16_MEMBER(spg110_device::spg110_3106_w) { }
-WRITE16_MEMBER(spg110_device::spg110_3107_w) { }
-WRITE16_MEMBER(spg110_device::spg110_3108_w) { }
-WRITE16_MEMBER(spg110_device::spg110_3109_w) { }
-WRITE16_MEMBER(spg110_device::spg110_310b_w) { }
-WRITE16_MEMBER(spg110_device::spg110_310c_w) { }
-WRITE16_MEMBER(spg110_device::spg110_310d_w) { }
-
-READ16_MEMBER(spg110_device::spg110_310f_r) { return 0x0000; }
 
 void spg110_device::map(address_map &map)
 {
@@ -139,27 +146,12 @@ void spg110_device::map(address_map &map)
 	map(0x002100, 0x0021ff).ram(); // jak_spdmo only
 	map(0x002200, 0x0022ff).ram(); // looks like per-pen brightness or similar? strange because palette isn't memory mapped here (maybe rowscroll?)
 
-#if 1  // sound registers? seems to be 8 long entries, only uses up to 0x7f? (register mapping seems similar to spg2xx, maybe with less channels?)
-	map(0x003000, 0x00307f).ram();
-	map(0x003080, 0x0030ff).ram();
+	/// sound registers? seems to be 8 long entries, only uses up to 0x7f? (register mapping seems similar to spg2xx, maybe with less channels?)
+	map(0x003000, 0x00307f).rw(m_spg_audio, FUNC(spg110_audio_device::audio_r), FUNC(spg110_audio_device::audio_w));
+	map(0x003080, 0x0030ff).ram(); // extra ram? doesn't seem to be phase, and there only appear to be 8 channels on SPG110
 
-	map(0x003100, 0x003100).w(FUNC(spg110_device::spg110_3100_w));
-	map(0x003101, 0x003101).w(FUNC(spg110_device::spg110_3101_w));
-	map(0x003102, 0x003102).w(FUNC(spg110_device::spg110_3102_w));
+	map(0x003100, 0x00310f).rw(m_spg_audio, FUNC(spg110_audio_device::audio_ctrl_r), FUNC(spg2xx_audio_device::audio_ctrl_w));
 
-	map(0x003104, 0x003104).w(FUNC(spg110_device::spg110_3104_w));
-	map(0x003105, 0x003105).w(FUNC(spg110_device::spg110_3105_w));
-	map(0x003106, 0x003106).w(FUNC(spg110_device::spg110_3106_w));
-	map(0x003107, 0x003107).w(FUNC(spg110_device::spg110_3107_w));
-	map(0x003108, 0x003108).w(FUNC(spg110_device::spg110_3108_w));
-	map(0x003109, 0x003109).w(FUNC(spg110_device::spg110_3109_w));
-
-	map(0x00310b, 0x00310b).w(FUNC(spg110_device::spg110_310b_w));
-	map(0x00310c, 0x00310c).w(FUNC(spg110_device::spg110_310c_w));
-	map(0x00310d, 0x00310d).w(FUNC(spg110_device::spg110_310d_w));
-
-	map(0x00310f, 0x00310f).r(FUNC(spg110_device::spg110_310f_r));
-#endif
 
 	// 0032xx looks like it could be the same as 003d00 on spg2xx
 	map(0x003200, 0x00322f).rw(m_spg_io, FUNC(spg2xx_io_device::io_r), FUNC(spg2xx_io_device::io_w));

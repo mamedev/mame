@@ -4,12 +4,21 @@
 
     SunPlus SPG2xx-series SoC peripheral emulation (Audio)
 
+	This is also used for SPG110, although that should be limited to
+	just 8 channels and has some things shifted around (phase appears
+	to be in the regular register set instead, formats might be fixed
+	or at least not per-channel)
+
+	SPG110 Beat interrupt frequency might be different too, seems to
+	trigger an FIQ, but music is very slow in jak_spdmo
+
 **********************************************************************/
 
 #include "emu.h"
 #include "spg2xx_audio.h"
 
-DEFINE_DEVICE_TYPE(SPG2XX_AUDIO, spg2xx_audio_device, "spg2xx", "SPG2xx-series System-on-a-Chip Audio")
+DEFINE_DEVICE_TYPE(SPG2XX_AUDIO, spg2xx_audio_device, "spg2xx_audio", "SPG2xx-series System-on-a-Chip Audio")
+DEFINE_DEVICE_TYPE(SPG110_AUDIO, spg110_audio_device, "spg110_audio", "SPG110-series System-on-a-Chip Audio")
 
 #define LOG_SPU_READS       (1U << 0)
 #define LOG_SPU_WRITES      (1U << 1)
@@ -42,6 +51,12 @@ spg2xx_audio_device::spg2xx_audio_device(const machine_config &mconfig, const ch
 	: spg2xx_audio_device(mconfig, SPG2XX_AUDIO, tag, owner, clock)
 {
 }
+
+spg110_audio_device::spg110_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: spg2xx_audio_device(mconfig, SPG110_AUDIO, tag, owner, clock)
+{
+}
+
 
 
 void spg2xx_audio_device::device_start()
@@ -1255,4 +1270,23 @@ bool spg2xx_audio_device::audio_envelope_tick(const uint32_t channel)
 	}
 	LOGMASKED(LOG_ENVELOPES, "envelope %d post-tick, count is now %04x, register is %04x\n", channel, new_count, m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_DATA]);
 	return edd_changed;
+}
+
+
+
+WRITE16_MEMBER(spg110_audio_device::audio_w)
+{
+	const uint16_t channel = (offset & 0x00f0) >> 4;
+
+	switch (offset & AUDIO_CHAN_OFFSET_MASK)
+	{
+	case 0x0e:
+		m_audio_regs[offset] = data;
+		m_channel_rate[channel] = ((double)get_phase(channel) * 140625.0 * 2.0) / (double)(1 << 19);
+		m_channel_rate_accum[channel] = 0.0;
+		LOGMASKED(LOG_CHANNEL_WRITES, "spg110_audio_device::audio_w: Channel %d: Phase: %04x (rate: %f)\n", channel, data, m_channel_rate[channel]);
+		return;
+	}
+
+	spg2xx_audio_device::audio_w(space,offset,data,mem_mask);
 }

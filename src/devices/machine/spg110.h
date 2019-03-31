@@ -11,8 +11,9 @@
 #include "emupal.h"
 #include "spg2xx_io.h"
 #include "spg110_video.h"
+#include "spg2xx_audio.h"
 
-class spg110_device : public device_t
+class spg110_device : public device_t, public device_mixer_interface
 
 {
 public:
@@ -35,7 +36,7 @@ public:
 	auto porta_in() { return m_porta_in.bind(); }
 	auto portb_in() { return m_portb_in.bind(); }
 	auto portc_in() { return m_portc_in.bind(); }
-
+	
 	template <size_t Line> auto adc_in() { return m_adc_in[Line].bind(); }
 
 	auto chip_select() { return m_chip_sel.bind(); }
@@ -56,23 +57,10 @@ private:
 
 	required_device<spg2xx_io_device> m_spg_io;
 	required_device<spg110_video_device> m_spg_video;
+	required_device<spg110_audio_device> m_spg_audio;
 
-	DECLARE_WRITE16_MEMBER(spg110_3100_w);
-
-	DECLARE_WRITE16_MEMBER(spg110_3101_w);
-	DECLARE_WRITE16_MEMBER(spg110_3102_w);
-	DECLARE_WRITE16_MEMBER(spg110_3104_w);
-	DECLARE_WRITE16_MEMBER(spg110_3105_w);
-	DECLARE_WRITE16_MEMBER(spg110_3106_w);
-	DECLARE_WRITE16_MEMBER(spg110_3107_w);
-	DECLARE_WRITE16_MEMBER(spg110_3108_w);
-	DECLARE_WRITE16_MEMBER(spg110_3109_w);
-
-	DECLARE_WRITE16_MEMBER(spg110_310b_w);
-	DECLARE_WRITE16_MEMBER(spg110_310c_w);
-	DECLARE_WRITE16_MEMBER(spg110_310d_w);
-
-	DECLARE_READ16_MEMBER(spg110_310f_r);
+	DECLARE_READ16_MEMBER(space_r);
+	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
 
 	devcb_write16 m_porta_out;
 	devcb_write16 m_portb_out;
