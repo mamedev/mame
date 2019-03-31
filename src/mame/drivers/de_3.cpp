@@ -174,7 +174,7 @@ WRITE8_MEMBER( de_3_state::sound_w )
 {
 	m_sound_data = data;
 	if(m_sound_data != 0xfe)
-		m_decobsmt->bsmt_comms_w(space,offset,m_sound_data);
+		m_decobsmt->bsmt_comms_w(m_sound_data);
 }
 
 WRITE_LINE_MEMBER( de_3_state::pia21_ca2_w )
