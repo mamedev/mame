@@ -25206,9 +25206,9 @@
 		<publisher>Majesco</publisher>
 		<info name="serial" value="AGB-APFE-USA, AGB-APFP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-10" />
+			<feature name="u1" value="U1 32M MROM" />
 			<dataarea name="rom" size="4194304">
-				<feature name="pcb" value="AGB-E01-10" />
-				<feature name="u1" value="U1 32M MROM" />
 				<rom name="agb-apfp-0.u1" size="4194304" crc="2cedbb31" sha1="0de39e1cf6b199721069e8750e94abccc2e4b97d" offset="000000" />
 			</dataarea>
 		</part>
