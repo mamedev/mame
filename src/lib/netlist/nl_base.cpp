@@ -988,9 +988,9 @@ pstring param_t::get_initial(const device_t &dev, bool *found)
 	return res;
 }
 
-const pstring param_model_t::model_type()
+const pstring param_model_t::type()
 {
-	return state().setup().models().model_type(value());
+	return state().setup().models().type(str());
 }
 
 param_str_t::param_str_t(device_t &device, const pstring &name, const pstring &val)
@@ -1015,20 +1015,20 @@ void param_model_t::changed()
 	state().log().fatal(MF_1_MODEL_1_CAN_NOT_BE_CHANGED_AT_RUNTIME, name());
 }
 
-const pstring param_model_t::model_value_str(const pstring &entity)
+const pstring param_model_t::value_str(const pstring &entity)
 {
-	return state().setup().models().model_value_str(value(), entity);
+	return state().setup().models().value_str(str(), entity);
 }
 
-nl_double param_model_t::model_value(const pstring &entity)
+nl_double param_model_t::value(const pstring &entity)
 {
-	return state().setup().models().model_value(value(), entity);
+	return state().setup().models().value(str(), entity);
 }
 
 
 plib::unique_ptr<plib::pistream> param_data_t::stream()
 {
-	return device().setup().get_data_stream(value());
+	return device().setup().get_data_stream(str());
 }
 
 	bool detail::core_terminal_t::is_logic() const NL_NOEXCEPT

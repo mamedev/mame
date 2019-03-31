@@ -213,11 +213,11 @@ namespace netlist
 		void register_model(pstring model_in);
 		/* model / family related */
 
-		pstring model_value_str(pstring model, pstring entity);
+		pstring value_str(pstring model, pstring entity);
 
-		double model_value(pstring model, pstring entity);
+		nl_double value(pstring model, pstring entity);
 
-		pstring model_type(pstring model) { return model_value_str(model, "COREMODEL"); }
+		pstring type(pstring model) { return value_str(model, "COREMODEL"); }
 
 	private:
 		using model_map_t = std::unordered_map<pstring, pstring>;

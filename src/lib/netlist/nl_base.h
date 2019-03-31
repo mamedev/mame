@@ -1010,7 +1010,7 @@ namespace netlist
 	public:
 		param_str_t(device_t &device, const pstring &name, const pstring &val);
 
-		const pstring &operator()() const NL_NOEXCEPT { return value(); }
+		const pstring &operator()() const NL_NOEXCEPT { return str(); }
 		void setTo(const pstring &param) NL_NOEXCEPT
 		{
 			if (m_param != param)
@@ -1022,7 +1022,7 @@ namespace netlist
 		}
 	protected:
 		virtual void changed();
-		const pstring &value() const NL_NOEXCEPT { return m_param; }
+		const pstring &str() const NL_NOEXCEPT { return m_param; }
 	private:
 		PALIGNAS_CACHELINE()
 		pstring m_param;
@@ -1041,7 +1041,7 @@ namespace netlist
 		{
 		public:
 			value_base_t(param_model_t &param, const pstring &name)
-			: m_value(static_cast<T>(param.model_value(name)))
+			: m_value(static_cast<T>(param.value(name)))
 			{
 			}
 			T operator()() const noexcept { return m_value; }
@@ -1058,13 +1058,13 @@ namespace netlist
 		param_model_t(device_t &device, const pstring &name, const pstring &val)
 		: param_str_t(device, name, val) { }
 
-		const pstring model_value_str(const pstring &entity) /*const*/;
-		const pstring model_type() /*const*/;
+		const pstring value_str(const pstring &entity) /*const*/;
+		nl_double value(const pstring &entity) /*const*/;
+		const pstring type() /*const*/;
 		/* hide this */
 		void setTo(const pstring &param) = delete;
 	protected:
 		void changed() override;
-		nl_double model_value(const pstring &entity) /*const*/;
 	private:
 };
 
@@ -1562,7 +1562,7 @@ namespace netlist
 		if (f != nullptr)
 			f->read(reinterpret_cast<plib::pistream::value_type *>(&m_data[0]),1<<AW);
 		else
-			device.state().log().warning("Rom {1} not found", value());
+			device.state().log().warning("Rom {1} not found", str());
 	}
 
 	inline void logic_input_t::inactivate() NL_NOEXCEPT

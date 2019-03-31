@@ -877,7 +877,7 @@ pstring models_t::model_string(model_map_t &map)
 	return ret + ")";
 }
 
-pstring models_t::model_value_str(pstring model, pstring entity)
+pstring models_t::value_str(pstring model, pstring entity)
 {
 	model_map_t &map = m_cache[model];
 
@@ -897,14 +897,14 @@ pstring models_t::model_value_str(pstring model, pstring entity)
 	return ret;
 }
 
-nl_double models_t::model_value(pstring model, pstring entity)
+nl_double models_t::value(pstring model, pstring entity)
 {
 	model_map_t &map = m_cache[model];
 
 	if (map.size() == 0)
 		model_parse(model , map);
 
-	pstring tmp = model_value_str(model, entity);
+	pstring tmp = value_str(model, entity);
 
 	nl_double factor = plib::constants<nl_double>::one();
 	auto p = std::next(tmp.begin(), static_cast<pstring::difference_type>(tmp.size() - 1));
@@ -952,9 +952,9 @@ pool_owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_
 const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 {
 
-	if (m_models.model_value_str(model, "TYPE") == "TTL")
+	if (m_models.value_str(model, "TYPE") == "TTL")
 		return family_TTL();
-	if (m_models.model_value_str(model, "TYPE") == "CD4XXX")
+	if (m_models.value_str(model, "TYPE") == "CD4XXX")
 		return family_CD4XXX();
 
 	for (auto & e : m_nlstate.m_family_cache)
@@ -963,13 +963,13 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 
 	auto ret = plib::make_unique<logic_family_std_proxy_t>();
 
-	ret->m_fixed_V = m_models.model_value(model, "FV");
-	ret->m_low_thresh_PCNT = m_models.model_value(model, "IVL");
-	ret->m_high_thresh_PCNT = m_models.model_value(model, "IVH");
-	ret->m_low_VO = m_models.model_value(model, "OVL");
-	ret->m_high_VO = m_models. model_value(model, "OVH");
-	ret->m_R_low = m_models.model_value(model, "ORL");
-	ret->m_R_high = m_models.model_value(model, "ORH");
+	ret->m_fixed_V = m_models.value(model, "FV");
+	ret->m_low_thresh_PCNT = m_models.value(model, "IVL");
+	ret->m_high_thresh_PCNT = m_models.value(model, "IVH");
+	ret->m_low_VO = m_models.value(model, "OVL");
+	ret->m_high_VO = m_models. value(model, "OVH");
+	ret->m_R_low = m_models.value(model, "ORL");
+	ret->m_R_high = m_models.value(model, "ORH");
 
 	auto retp = ret.get();
 

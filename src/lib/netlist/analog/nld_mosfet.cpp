@@ -219,14 +219,76 @@ namespace analog
 			connect(m_SG.m_N, m_DG.m_N);
 			connect(m_DG.m_P, m_SD.m_N);
 
-			set_qtype((m_model.model_type() == "NMOS_DEFAULT") ? FET_NMOS : FET_PMOS);
+			set_qtype((m_model.type() == "NMOS_DEFAULT") ? FET_NMOS : FET_PMOS);
 			m_polarity = qtype() == FET_NMOS ? 1.0 : -1.0;
 
 			m_capmod = m_model.m_CAPMOD;
 			// printf("capmod %d %g %g\n", m_capmod, (double)m_model.m_VTO, m_polarity);
 			nl_assert_always(m_capmod == 0 || m_capmod == 2, "Error: CAPMODEL invalid value for " + m_model.name());
 
-			//printf("%g\n", exec().solver()->gmin());
+			/*
+			 * From http://ltwiki.org/LTspiceHelp/LTspiceHelp/M_MOSFET.htm :
+			 *
+			 *		VTO, KP, LAMBDA, PHI and GAMMA. These parameters are computed
+			 *		if the process parameters(NSUB, TOX,...) are given, but
+			 *		user-specified values always override.
+			 *
+			 *	But couldn't find a formula for lambda anywhere
+			 *
+			 */
+
+			m_lambda = m_model.m_LAMBDA; // FIXME: m_lambda only set once
+
+			// calculate effective channel length
+			m_Leff = m_model.m_L - 2 * m_model.m_LD;
+			nl_assert_always(m_Leff > 0.0, "Effective Lateral diffusion would be negative for model " + m_model.name());
+
+			nl_double Cox = (m_model.m_TOX > 0.0) ? (constants::eps_SiO2() * constants::eps_0() / m_model.m_TOX) : 0.0;
+
+			// calculate DC transconductance coefficient
+			if (m_model.m_KP > 0)
+				m_beta = m_model.m_KP * m_model.m_W / m_Leff;
+			else if (Cox > 0 && m_model.m_UO > 0)
+				m_beta = m_model.m_UO * 1e-4 * Cox * m_model.m_W / m_Leff;
+			else
+				m_beta = 2e-5 * m_model.m_W / m_Leff;
+
+			//FIXME::UT can disappear
+			const double Vt = constants::T0() * constants::k_b() / constants::Q_e();
+
+			// calculate surface potential if not given
+
+			if (m_model.m_PHI > 0.0)
+				m_phi = m_model.m_PHI;
+			else if (m_model.m_NSUB > 0.0)
+			{
+				nl_assert_always(m_model.m_NSUB * 1e6 >= constants::NiSi(), "Error calculating phi for model " + m_model.name());
+				m_phi = 2 * Vt * std::log (m_model.m_NSUB * 1e6 / constants::NiSi());
+			}
+			else
+				m_phi = 0.6;
+
+			// calculate bulk threshold if not given
+			if (m_model.m_GAMMA > 0.0)
+				m_gamma = m_model.m_GAMMA;
+			else
+			{
+				if (Cox > 0.0 && m_model.m_NSUB > 0)
+					m_gamma = std::sqrt (2.0 * constants::Q_e() * constants::eps_Si() * constants::eps_0() * m_model.m_NSUB * 1e6) / Cox;
+				else
+					m_gamma = 0.0;
+			}
+
+			m_vto = m_model.m_VTO;
+			nl_assert_always(m_vto != 0.0, "Threshold voltage not specified for " + m_model.name());
+
+			/* FIXME: VTO if missing may be calculated from TPG, NSS and temperature. Usually models
+			 * specify VTO so skip this here.
+			 */
+
+			m_CoxWL = Cox * m_model.m_W * m_Leff;
+
+			//printf("Cox: %g\n", m_Cox);
 		}
 
 		NETLIB_IS_TIMESTEP(true || m_capmod != 0)
@@ -250,7 +312,17 @@ namespace analog
 
 	protected:
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			NETLIB_NAME(FET)::reset();
+			// Bulk diodes
+
+			m_D_BD.set_param(m_model.m_ISD, m_model.m_N, exec().gmin(), constants::T0());
+			#if (!BODY_CONNECTED_TO_SOURCE)
+				m_D_BS.set_param(m_model.m_ISS, m_model.m_N, exec().gmin(), constants::T0());
+			#endif
+		}
+
 		NETLIB_UPDATEI();
 		NETLIB_UPDATE_PARAMI();
 		NETLIB_UPDATE_TERMINALSI();
@@ -353,7 +425,7 @@ namespace analog
 	};
 
 	// ----------------------------------------------------------------------------------------
-	// nld_Q - Ebers Moll
+	// MOSFET
 	// ----------------------------------------------------------------------------------------
 
 	NETLIB_UPDATE(MOSFET)
@@ -364,11 +436,6 @@ namespace analog
 			m_SG.m_N.solve_now();   // Emitter
 		else
 			m_DG.m_N.solve_now();   // Collector
-	}
-
-	NETLIB_RESET(MOSFET)
-	{
-		NETLIB_NAME(FET)::reset();
 	}
 
 	NETLIB_UPDATE_TERMINALS(MOSFET)
@@ -522,77 +589,6 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(MOSFET)
 	{
-		/*
-		 * From http://ltwiki.org/LTspiceHelp/LTspiceHelp/M_MOSFET.htm :
-		 *
-		 *		VTO, KP, LAMBDA, PHI and GAMMA. These parameters are computed
-		 *		if the process parameters(NSUB, TOX,...) are given, but
-		 *		user-specified values always override.
-		 *
-		 *	But couldn't find a formula for lambda anywhere
-		 *
-		 */
-
-		m_lambda = m_model.m_LAMBDA; // FIXME: m_lambda only set once
-
-		// calculate effective channel length
-		m_Leff = m_model.m_L - 2 * m_model.m_LD;
-		nl_assert_always(m_Leff > 0.0, "Effective Lateral diffusion would be negative for model " + m_model.name());
-
-		nl_double Cox = (m_model.m_TOX > 0.0) ? (constants::eps_SiO2() * constants::eps_0() / m_model.m_TOX) : 0.0;
-
-		// calculate DC transconductance coefficient
-		if (m_model.m_KP > 0)
-			m_beta = m_model.m_KP * m_model.m_W / m_Leff;
-		else if (Cox > 0 && m_model.m_UO > 0)
-			m_beta = m_model.m_UO * 1e-4 * Cox * m_model.m_W / m_Leff;
-		else
-			m_beta = 2e-5 * m_model.m_W / m_Leff;
-
-		// Bulk diodes
-
-		m_D_BD.set_param(m_model.m_ISD, m_model.m_N, exec().gmin(), constants::T0());
-#if (!BODY_CONNECTED_TO_SOURCE)
-		m_D_BS.set_param(m_model.m_ISS, m_model.m_N, exec().gmin(), constants::T0());
-#endif
-
-		//FIXME::UT can disappear
-		const double Vt = constants::T0() * constants::k_b() / constants::Q_e();
-
-		// calculate surface potential if not given
-
-		if (m_model.m_PHI > 0.0)
-			m_phi = m_model.m_PHI;
-		else if (m_model.m_NSUB > 0.0)
-		{
-			nl_assert_always(m_model.m_NSUB * 1e6 >= constants::NiSi(), "Error calculating phi for model " + m_model.name());
-			m_phi = 2 * Vt * std::log (m_model.m_NSUB * 1e6 / constants::NiSi());
-		}
-		else
-			m_phi = 0.6;
-
-		// calculate bulk threshold if not given
-		if (m_model.m_GAMMA > 0.0)
-			m_gamma = m_model.m_GAMMA;
-		else
-		{
-			if (Cox > 0.0 && m_model.m_NSUB > 0)
-				m_gamma = std::sqrt (2.0 * constants::Q_e() * constants::eps_Si() * constants::eps_0() * m_model.m_NSUB * 1e6) / Cox;
-			else
-				m_gamma = 0.0;
-		}
-
-		m_vto = m_model.m_VTO;
-		nl_assert_always(m_vto != 0.0, "Threshold voltage not specified for " + m_model.name());
-
-		/* FIXME: VTO if missing may be calculated from TPG, NSS and temperature. Usually models
-		 * specify VTO so skip this here.
-		 */
-
-		m_CoxWL = Cox * m_model.m_W * m_Leff;
-
-		//printf("Cox: %g\n", m_Cox);
-
 	}
 
 } // namespace analog
