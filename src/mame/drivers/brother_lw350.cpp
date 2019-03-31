@@ -2,6 +2,7 @@
 // copyright-holders:Bartman/Abyss
 
 #include "emu.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/timer.h"
@@ -15,6 +16,9 @@
 // if updating project, c:\msys64\win32env.bat
 // cd \schreibmaschine\mame_src
 // make SUBTARGET=schreibmaschine NO_USE_MIDI=1 NO_USE_PORTAUDIO=1 vs2017
+
+// see https://devblogs.microsoft.com/cppblog/side-by-side-minor-version-msvc-toolsets-in-visual-studio-2017/
+// needs 14.14 toolset..
 
 // command line parameters:
 // -log -debug -window -intscalex 2 -intscaley 2 lw350 -resolution 960x256 -flop roms\lw350\Brother_LW-200-300_GW-24-45_Ver1.0_SpreadsheetProgramAndDataStorageDisk.img
@@ -190,25 +194,13 @@ void lw350_floppy_image_device::call_unload()
 // FDC high-level emulation (not timing accurate) based on "Hitachi 8-Bit Microcomputer HD63265 FDC Floppy Disk Controller User's Manual"
 // https://archive.org/details/bitsavers_hitachidatDiskControllerUsersManual2edMar89_3858532
 
-#define MCFG_HD63266F_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, HD63266F, _clock)
-
-#define MCFG_HD63266F_IRQ_CALLBACK(_write) \
-	devcb = &hd63266f_t::set_irq_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_HD63266F_DREQ_CALLBACK(_write) \
-	devcb = &hd63266f_t::set_dreq_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_HD63266F_DEND_CALLBACK(_read) \
-	devcb = &hd63266f_t::set_dend_rd_callback(*device, DEVCB_##_read);
-
 class hd63266f_t : public device_t {
 public:
 	hd63266f_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<hd63266f_t&>(device).irq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_dreq_wr_callback(device_t &device, _Object object) { return downcast<hd63266f_t&>(device).dreq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_dend_rd_callback(device_t &device, _Object object) { return downcast<hd63266f_t&>(device).dend_cb.set_callback(object); }
+	auto irq_wr_cb() { return irq_cb.bind(); }
+	auto dreq_wr_cb() { return dreq_cb.bind(); }
+	auto dend_rd_cb() { return dend_cb.bind(); }
 
 	void set_floppy(lw350_floppy_image_device* floppy) { this->floppy = floppy; }
 
@@ -877,11 +869,11 @@ public:
 	lw350_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		maincpu(*this, "maincpu"),
-		palette(*this, "palette"),
-		io_kbrow(*this, "kbrow.%u", 0),
-		fdc(*this, "fdc"),
+		screen(*this, "screen"),
 		floppy(*this, "floppy"),
-		beeper(*this, "beeper")
+		fdc(*this, "fdc"),
+		beeper(*this, "beeper"),
+		io_kbrow(*this, "kbrow.%u", 0)
 	{ }
 
 	// helpers
@@ -891,7 +883,7 @@ public:
 
 	// devices
 	required_device<z180_device> maincpu;
-	required_device<palette_device> palette;
+	required_device<screen_device> screen;
 	required_device<lw350_floppy_connector> floppy;
 	required_device<hd63266f_t> fdc;
 	required_device<beep_device> beeper;
@@ -936,6 +928,8 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(int1_timer_callback);
 
+	void lw350(machine_config& config);
+
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -943,45 +937,45 @@ protected:
 
 	virtual void video_start() override;
 
+	void map_program(address_map& map) {
+		map(0x00000, 0x01fff).rom();
+		map(0x02000, 0x05fff).ram();
+		map(0x06000, 0x3ffff).rom();
+		map(0x40000, 0x5ffff).r(FUNC(lw350_state::rom40000_r)); // => ROM 0x40000 or 0x60000 or ??? (bank switching IO E0)
+		map(0x60000, 0x617ff).ram();
+		map(0x61800, 0x63fff).rw(FUNC(lw350_state::vram_r), FUNC(lw350_state::vram_w));
+		map(0x64000, 0x71fff).ram();
+		map(0x72000, 0x75fff).r(FUNC(lw350_state::rom72000_r)); // => ROM 0x02000-0x05fff
+		map(0x76000, 0x7ffff).ram();
+	}
+
+	void map_io(address_map& map) {
+		map.global_mask(0xff);
+		map(0x00, 0x3f).noprw(); // Z180 internal registers
+		map(0x70, 0x70).w(FUNC(lw350_state::io_70_w));
+		map(0x74, 0x74).r(FUNC(lw350_state::io_74_r));
+
+		// floppy
+		map(0x78, 0x78).rw("fdc", FUNC(hd63266f_t::status_r), FUNC(hd63266f_t::abort_w));
+		map(0x79, 0x79).r("fdc", FUNC(hd63266f_t::data_r)).w(FUNC(lw350_state::fdc_dtr_w));
+		map(0x7a, 0x7a).r(FUNC(lw350_state::io_7a_r));
+		map(0x7e, 0x7e).rw(FUNC(lw350_state::io_7e_r), FUNC(lw350_state::io_7e_w));
+		map(0x90, 0x90).r(FUNC(lw350_state::io_90_r));
+
+		// printer
+		map(0xa8, 0xa8).r(FUNC(lw350_state::io_a8_r));
+
+		map(0xb8, 0xb8).rw(FUNC(lw350_state::io_b8_r), FUNC(lw350_state::io_b8_w));
+		map(0xe0, 0xe0).w(FUNC(lw350_state::rombank_w));
+		map(0xf0, 0xf0).w(FUNC(lw350_state::beeper_w));
+		map(0xf8, 0xf8).w(FUNC(lw350_state::irqack_w));
+
+		//map(0x40, 0xff).rw(FUNC(lw350_state::illegal_io_r), FUNC(lw350_state::illegal_io_w));
+	}
+
 	uint8_t* rom{};
 	std::map<uint32_t, std::string> symbols;
 };
-
-static ADDRESS_MAP_START( lw350_map, AS_PROGRAM, 8, lw350_state )
-	AM_RANGE(0x00000, 0x01fff) AM_ROM
-	AM_RANGE(0x02000, 0x05fff) AM_RAM
-	AM_RANGE(0x06000, 0x3ffff) AM_ROM
-	AM_RANGE(0x40000, 0x5ffff) AM_READ(rom40000_r) // => ROM 0x40000 or 0x60000 or ??? (bank switching IO E0)
-	AM_RANGE(0x60000, 0x617ff) AM_RAM
-	AM_RANGE(0x61800, 0x63fff) AM_READWRITE(vram_r, vram_w)
-	AM_RANGE(0x64000, 0x71fff) AM_RAM
-	AM_RANGE(0x72000, 0x75fff) AM_READ(rom72000_r) // => ROM 0x02000-0x05fff
-	AM_RANGE(0x76000, 0x7ffff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( lw350_io, AS_IO, 8, lw350_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x3f) AM_NOP // Z180 internal registers
-	AM_RANGE(0x70, 0x70) AM_WRITE(io_70_w)
-	AM_RANGE(0x74, 0x74) AM_READ(io_74_r)
-
-	// floppy
-	AM_RANGE(0x78, 0x78) AM_DEVREADWRITE("fdc", hd63266f_t, status_r, abort_w)
-	AM_RANGE(0x79, 0x79) AM_DEVREAD("fdc", hd63266f_t, data_r) AM_WRITE(fdc_dtr_w)
-	AM_RANGE(0x7a, 0x7a) AM_READ(io_7a_r)
-	AM_RANGE(0x7e, 0x7e) AM_READWRITE(io_7e_r, io_7e_w)
-	AM_RANGE(0x90, 0x90) AM_READ(io_90_r)
-
-	// printer
-	AM_RANGE(0xa8, 0xa8) AM_READ(io_a8_r)
-
-	AM_RANGE(0xb8, 0xb8) AM_READWRITE(io_b8_r, io_b8_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(rombank_w)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(beeper_w)
-	AM_RANGE(0xf8, 0xf8) AM_WRITE(irqack_w)
-
-	AM_RANGE(0x40, 0xff) AM_READWRITE(illegal_io_r, illegal_io_w)
-ADDRESS_MAP_END
 
 void lw350_state::video_start()
 {
@@ -989,7 +983,7 @@ void lw350_state::video_start()
 
 std::string lw350_state::pc()
 {
-	class z180_friend : z180_device { friend class lw350_state; };
+	class z180_friend : public z180_device { public: using z180_device::memory_translate; friend class lw350_state; };
 	auto cpu = static_cast<z180_friend*>(dynamic_cast<z180_device*>(&machine().scheduler().currently_executing()->device()));
 	offs_t phys = cpu->pc();
 	cpu->memory_translate(AS_PROGRAM, 0, phys);
@@ -1013,7 +1007,7 @@ std::string lw350_state::symbolize(uint32_t adr)
 
 std::string lw350_state::callstack()
 {
-	class z180_friend : z180_device { friend class lw350_state; };
+	class z180_friend : public z180_device { public: using z180_device::memory_translate; friend class lw350_state; };
 	auto cpu = static_cast<z180_friend*>(dynamic_cast<z180_device*>(&machine().scheduler().currently_executing()->device()));
 	offs_t pc = cpu->pc();
 	cpu->memory_translate(AS_PROGRAM, 0, pc);
@@ -1055,7 +1049,10 @@ uint32_t lw350_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap,
 		//...
 
 
-	const rgb_t *palette = this->palette->palette()->entry_list_raw();
+	const rgb_t palette[]{
+		0xffffffff,
+		0xff000000,
+	};
 
 	for(auto y = 0; y < 128; y++) {
 		uint32_t* p = &bitmap.pix32(y);
@@ -1328,6 +1325,8 @@ READ8_MEMBER(lw350_state::io_b8_r)
 
 void lw350_state::machine_start()
 {
+	screen->set_visible_area(0, 480-1, 0, 128-1);
+
 	// try to load map file
 	FILE* f;
 	if(fopen_s(&f, "lw350.map", "rt") == 0) {
@@ -1395,42 +1394,41 @@ void lw350_state::machine_reset()
 	fdc->reset();
 }
 
-static SLOT_INTERFACE_START(lw350_floppies)
-	SLOT_INTERFACE("35hd", LW350_FLOPPY)
-SLOT_INTERFACE_END
-
-static MACHINE_CONFIG_START( lw350 )
+void lw350_state::lw350(machine_config& config) {
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz/2)
-	MCFG_CPU_PROGRAM_MAP(lw350_map)
-	MCFG_CPU_IO_MAP(lw350_io)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("1khz", lw350_state, int1_timer_callback, attotime::from_hz(1000))
+	Z180(config, maincpu, 8'000'000);
+	maincpu->set_addrmap(AS_PROGRAM, &lw350_state::map_program);
+	maincpu->set_addrmap(AS_IO, &lw350_state::map_io);
+
+	TIMER(config, "1khz").configure_periodic(FUNC(lw350_state::int1_timer_callback), attotime::from_hz(1000));
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t(6, 245, 206))
-	MCFG_SCREEN_REFRESH_RATE(78.1)
-	MCFG_SCREEN_UPDATE_DRIVER(lw350_state, screen_update)
-	MCFG_SCREEN_SIZE(480, 128)
-	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
-	MCFG_PALETTE_ADD_MONOCHROME_INVERTED("palette")
+	SCREEN(config, screen, SCREEN_TYPE_RASTER);
+	screen->set_color(rgb_t(6, 245, 206));
+	screen->set_physical_aspect(480, 128);
+	screen->set_refresh_hz(78.1);
+	screen->set_screen_update(FUNC(lw350_state::screen_update));
+	screen->set_size(480, 128);
 
 	// floppy disk
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("io_90", lw350_state, io_90_timer_callback, attotime::from_msec(160))
-	MCFG_DEVICE_ADD("floppy", LW350_FLOPPY_CONNECTOR, 0);
-	MCFG_DEVICE_SLOT_INTERFACE(lw350_floppies, "35hd", false);
-	MCFG_HD63266F_ADD("fdc", XTAL_16MHz);
-	MCFG_HD63266F_IRQ_CALLBACK(WRITELINE(lw350_state, fdc_irq_w))
-	MCFG_HD63266F_DREQ_CALLBACK(WRITELINE(lw350_state, fdc_dreq_w))
-	MCFG_HD63266F_DEND_CALLBACK(READLINE(lw350_state, fdc_dend_r))
+	TIMER(config, "io_90").configure_periodic(FUNC(lw350_state::io_90_timer_callback), attotime::from_msec(160));
+	LW350_FLOPPY_CONNECTOR(config, floppy, 0);
+	floppy->option_add("35hd", LW350_FLOPPY);
+	floppy->set_default_option("35hd");
+
+	HD63266F(config, fdc, XTAL(16'000'000));
+	fdc->irq_wr_cb().set(FUNC(lw350_state::fdc_irq_w));
+	fdc->dreq_wr_cb().set(FUNC(lw350_state::fdc_dreq_w));
+	fdc->dend_rd_cb().set(FUNC(lw350_state::fdc_dend_r));
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 4000) // 4.0 kHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 4'000).add_route(ALL_OUTPUTS, "mono", 1.0); // 4.0 kHz
+}
 
 #pragma endregion
 
+#if 0
 #pragma region(LW-450)
 
 //////////////////////////////////////////////////////////////////////////
@@ -2019,14 +2017,14 @@ static MACHINE_CONFIG_START( lw450 )
 	MCFG_MC6845_CHAR_WIDTH(9)
 	MCFG_MC6845_ADDR_CHANGED_CB(lw450_state, crtc_addr)
 	MCFG_MC6845_UPDATE_ROW_CB(lw450_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(lw450_state, crtc_vsync))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, lw450_state, crtc_vsync))
 
 	MCFG_DEVICE_ADD("floppy", LW350_FLOPPY_CONNECTOR, 0);
 	MCFG_DEVICE_SLOT_INTERFACE(lw450_floppies, "35dd", false);
 	MCFG_HD63266F_ADD("fdc", XTAL_16MHz);
-	MCFG_HD63266F_IRQ_CALLBACK(WRITELINE(lw450_state, fdc_irq_w))
-	MCFG_HD63266F_DREQ_CALLBACK(WRITELINE(lw450_state, fdc_dreq_w))
-	MCFG_HD63266F_DEND_CALLBACK(READLINE(lw450_state, fdc_dend_r))
+	MCFG_HD63266F_IRQ_CALLBACK(WRITELINE(*this, lw450_state, fdc_irq_w))
+	MCFG_HD63266F_DREQ_CALLBACK(WRITELINE(*this, lw450_state, fdc_dreq_w))
+	MCFG_HD63266F_DEND_CALLBACK(READLINE(*this, lw450_state, fdc_dend_r))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2035,7 +2033,7 @@ static MACHINE_CONFIG_START( lw450 )
 MACHINE_CONFIG_END
 
 #pragma endregion
-
+#endif
 /***************************************************************************
   Machine driver(s)
 ***************************************************************************/
@@ -2046,13 +2044,17 @@ ROM_START( lw350 )
 //	ROM_LOAD("patched", 0x00000, 0x80000, CRC(5E85D1EC) SHA1(4ca68186fc70f30ccac95429604c88db4f0c34d2))
 ROM_END
 
+#if 0
 ROM_START( lw450 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD("2bc04", 0x00000, 0x40000, CRC(96C2A6F1) SHA1(eb47e37ea46e3becc1b4453286f120682a0a1ddc))
 	ROM_REGION(0x80000, "dictionary", 0)
 	ROM_LOAD("ua2849-a", 0x00000, 0x80000, CRC(FA8712EB) SHA1(2d3454138c79e75604b30229c05ed8fb8e7d15fe))
 ROM_END
+#endif
 
 //    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS           INIT     COMPANY         FULLNAME          FLAGS
-COMP( 1995, lw350,  0,   0,       lw350,  lw350, lw350_state,    0,       "Brother",      "Brother LW-350", MACHINE_NODEVICE_PRINTER )
-COMP( 1992, lw450,  0,   0,       lw450,  lw350, lw450_state,    0,       "Brother",      "Brother LW-450", MACHINE_NODEVICE_PRINTER )
+COMP( 1995, lw350,  0,   0,       lw350,  lw350, lw350_state,    empty_init,       "Brother",      "Brother LW-350", MACHINE_NODEVICE_PRINTER )
+#if 0
+COMP( 1992, lw450,  0,   0,       lw450,  lw350, lw450_state,    empty_init,       "Brother",      "Brother LW-450", MACHINE_NODEVICE_PRINTER )
+#endif

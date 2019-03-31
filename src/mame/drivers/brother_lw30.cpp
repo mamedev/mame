@@ -1,7 +1,9 @@
+ï»¿#if 0
 // license:BSD-3-Clause
 // copyright-holders:Bartman/Abyss
 
 #include "emu.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/timer.h"
@@ -493,9 +495,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
-		m_io_kbrow(*this, "kbrow.%u", 0),
 		floppy(*this, "floppy"),
-		m_speaker(*this, "beeper")
+		m_speaker(*this, "beeper"),
+		m_io_kbrow(*this, "kbrow.%u", 0)
 	{ }
 
 	// helpers
@@ -617,7 +619,7 @@ void lw30_state::video_start()
 
 std::string lw30_state::pc()
 {
-	class z180_friend : z180_device { friend class lw30_state; };
+	class z180_friend : public z180_device { friend class lw30_state; };
 	auto cpu = static_cast<z180_friend*>(dynamic_cast<z180_device*>(&machine().scheduler().currently_executing()->device()));
 	offs_t phys = cpu->pc();
 	cpu->memory_translate(AS_PROGRAM, 0, phys);
@@ -1241,13 +1243,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(lw30_state::int1_timer_callback)
 // Tetris Game Over Melody:
 // according to oscilloscope:
 // - total length 2.630s, wavosaur shows 2.043s
-// - last note: 600µs on, 600µs off, on-to-on: 1260µs, wavosaur shows 1083µs
+// - last note: 600Âµs on, 600Âµs off, on-to-on: 1260Âµs, wavosaur shows 1083Âµs
 // according to MAME
-// - 11µs between writes to beeper
-// - 476µs (value=0x310=784) => 0.6071x between writes of 01 and 81 to beeper
-// - 713µs
-// - 724µs
-// - last note: 543µs (value=0x2ba=698) => 0.7779x
+// - 11Âµs between writes to beeper
+// - 476Âµs (value=0x310=784) => 0.6071x between writes of 01 and 81 to beeper
+// - 713Âµs
+// - 724Âµs
+// - last note: 543Âµs (value=0x2ba=698) => 0.7779x
 
 WRITE8_MEMBER(lw30_state::beeper_w)
 {
@@ -1257,7 +1259,7 @@ WRITE8_MEMBER(lw30_state::beeper_w)
 	static attotime lastDifferent{};
 	attotime cur{ m_maincpu->local_time() };
 
-	logerror("beeper_w(%02X) @ %s (delta=%sµs diff_delta=%sµs)\n", data, cur.as_string(), ((cur - last) * 1000000).as_string(0), ((cur - lastDifferent) * 1000000).as_string(0));
+	logerror("beeper_w(%02X) @ %s (delta=%sÂµs diff_delta=%sÂµs)\n", data, cur.as_string(), ((cur - last) * 1000000).as_string(0), ((cur - lastDifferent) * 1000000).as_string(0));
 	if(data != lastData)
 		lastDifferent = cur;
 	last = cur;
@@ -1415,7 +1417,7 @@ static INPUT_PORTS_START(lw30)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
 	PORT_START("kbrow.5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(L'ß') PORT_CHAR('?')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(L'ÃŸ') PORT_CHAR('?')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_0)          PORT_CHAR('0')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_P)          PORT_CHAR('p')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_O)          PORT_CHAR('o')
@@ -1426,9 +1428,9 @@ static INPUT_PORTS_START(lw30)
 
 	PORT_START("kbrow.6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Inhalt")                PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(L'ö') PORT_CHAR(L'Ö')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(L'Ã¶') PORT_CHAR(L'Ã–')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+') PORT_CHAR('*')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(L'ü') PORT_CHAR(L'Ü')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(L'Ã¼') PORT_CHAR(L'Ãœ')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
@@ -1445,13 +1447,13 @@ static INPUT_PORTS_START(lw30)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_MAMEKEY(LSHIFT))
 
 	PORT_START("kbrow.8")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(L'´') PORT_CHAR('`')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(L'Â´') PORT_CHAR('`')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_L)          PORT_CHAR('l')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('\'')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_K)          PORT_CHAR('k')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR(':')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(L'ä') PORT_CHAR(L'Ä')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(L'Ã¤') PORT_CHAR(L'Ã„')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -1504,3 +1506,4 @@ ROM_END
 
 //    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS           INIT     COMPANY         FULLNAME          FLAGS
 COMP( 1991, lw30,   0,   0,       lw30,   lw30,  lw30_state,     0,       "Brother",      "Brother LW-30",  MACHINE_NODEVICE_PRINTER )
+#endif

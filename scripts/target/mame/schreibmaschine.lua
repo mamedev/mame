@@ -16,6 +16,7 @@ CPUS["Z180"] = true
 CPUS["H8"] = true
 VIDEOS["MC6845"] = true
 SOUNDS["BEEP"] = true
+MACHINES["Z80DAISY"] = true
 MACHINES["UPD765"] = true
 MACHINES["FDC_PLL"] = true
 FORMATS["UPD765_DSK"] = true
