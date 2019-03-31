@@ -86,7 +86,10 @@ void amerihok_state::p2_w(u8 data)
 		m_digits[3] = bitswap<7>(m_outputs[0], 8, 11, 12, 13, 9, 7, 10);
 		m_digits[4] = bitswap<7>(m_outputs[1], 5, 1, 2, 7, 6, 3, 0);
 		m_digits[5] = bitswap<7>(m_outputs[1], 28, 27, 23, 22, 21, 24, 26);
-		//m_colon = bitswap<2>(m_outputs[0], 17, 16);
+
+		// These outputs are inactive during gameplay
+		//m_dots[0] = BIT(m_outputs[0], 16);
+		//m_dots[1] = BIT(m_outputs[0], 17);
 
 		//logerror("Outputs = %08X%08X\n", m_outputs[1], m_outputs[0]);
 	}
@@ -140,12 +143,13 @@ INPUT_PORTS_END
 void amerihok_state::machine_start()
 {
 	m_digits.resolve();
-	//m_colon.resolve();
 	m_lamp.resolve();
 
 	std::fill(std::begin(m_outputs), std::end(m_outputs), 0);
+	m_old_p2 = 0xff;
 
 	save_item(NAME(m_outputs));
+	save_item(NAME(m_old_p2));
 }
 
 void amerihok_state::machine_reset()
