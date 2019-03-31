@@ -18422,7 +18422,8 @@ lsasquad                        // A64 (c) 1986 Taito Corporation / Taito Americ
 storming                        // A64 (c) 1986 Taito Corporation
 
 @source:ltcasino.cpp
-ltcasinn                        // (c) 1984 Digital Controls Inc
+ltcasin2                        // (c) 1984 Digital Controls Inc
+ltcasin2a                       // (c) 1984 Digital Controls Inc
 ltcasino                        // (c) 1982 Digital Controls Inc
 mv4in1                          // (c) 1983 Entertainment Enterprises
 
