@@ -1036,20 +1036,24 @@ namespace netlist
 	{
 	public:
 
-		class value_t
+		template <typename T>
+		class value_base_t
 		{
 		public:
-			value_t(param_model_t &param, const pstring &name)
-			: m_value(param.model_value(name))
+			value_base_t(param_model_t &param, const pstring &name)
+			: m_value(static_cast<T>(param.model_value(name)))
 			{
 			}
-			double operator()() const noexcept { return m_value; }
-			operator double() const noexcept { return m_value; }
+			T operator()() const noexcept { return m_value; }
+			operator T() const noexcept { return m_value; }
 		private:
-			const double m_value;
+			const T m_value;
 		};
 
-		friend class value_t;
+		using value_t = value_base_t<nl_double>;
+
+		template <typename T>
+		friend class value_base_t;
 
 		param_model_t(device_t &device, const pstring &name, const pstring &val)
 		: param_str_t(device, name, val) { }

@@ -459,6 +459,7 @@ public:
 		set_param(1e-15, 1, 1e-15, 300.0);
 	}
 
+#if 0
 	void update_diode(const double nVd)
 	{
 		if (TYPE == diode_e::BIPOLAR && nVd < m_Vmin)
@@ -491,11 +492,48 @@ public:
 			m_G = IseVDVt * m_VtInv + m_gmin;
 		}
 	}
-
-
-	void set_param(const double Is, const double n, double gmin, double temp)
+#else
+	void update_diode(const nl_double nVd)
 	{
-		static constexpr double csqrt2 = 1.414213562373095048801688724209; //std::sqrt(2.0);
+		nl_double IseVDVt(0.0);
+
+		if (TYPE == diode_e::BIPOLAR && nVd < m_Vmin)
+		{
+			m_Vd = nVd;
+			m_G = m_gmin;
+			m_Id = - m_Is;
+		}
+		else if (TYPE == diode_e::MOS && nVd < constants::zero())
+		{
+			m_Vd = nVd;
+			m_G = m_Is * m_VtInv + m_gmin;
+			m_Id = m_G * m_Vd;
+		}
+		else if (/*TYPE == diode_e::MOS || */nVd < m_Vcrit)
+		{
+			m_Vd = nVd;
+			IseVDVt = std::exp(std::min(300.0, m_logIs + m_Vd * m_VtInv));
+			m_Id = IseVDVt - m_Is;
+			m_G = IseVDVt * m_VtInv + m_gmin;
+		}
+		else
+		{
+			if (TYPE == diode_e::MOS && m_Vd < constants::zero())
+				m_Vd = std::min(m_Vmin, nVd);
+
+			const nl_double d = (nVd - m_Vd);
+			const nl_double a = std::abs(nVd - m_Vd) * m_VtInv;
+			m_Vd = m_Vd + (d < 0 ? -1.0 : 1.0) * std::log1p(a) * m_Vt;
+			IseVDVt = std::exp(m_logIs + m_Vd * m_VtInv);
+			//const double IseVDVt = m_Is * std::exp(m_Vd * m_VtInv);
+			m_Id = IseVDVt - m_Is;
+			m_G = IseVDVt * m_VtInv + m_gmin;
+		}
+	}
+#endif
+
+	void set_param(const nl_double Is, const nl_double n, nl_double gmin, nl_double temp)
+	{
 		m_Is = Is;
 		m_logIs = std::log(Is);
 		m_n = n;
@@ -505,32 +543,33 @@ public:
 
 		m_Vmin = -5.0 * m_Vt;
 
-		m_Vcrit = m_Vt * std::log(m_Vt / m_Is / csqrt2);
-		m_VtInv = 1.0 / m_Vt;
+		m_Vcrit = m_Vt * std::log(m_Vt / m_Is / constants::sqrt2());
+		m_VtInv = constants::one() / m_Vt;
+		//printf("%g %g\n", m_Vmin, m_Vcrit);
 	}
 
 
-	double I() const { return m_Id; }
-	double G() const { return m_G; }
-	double Ieq() const { return (m_Id - m_Vd * m_G); }
-	double Vd() const { return m_Vd; }
+	nl_double I() const { return m_Id; }
+	nl_double G() const { return m_G; }
+	nl_double Ieq() const { return (m_Id - m_Vd * m_G); }
+	nl_double Vd() const { return m_Vd; }
 
 	/* owning object must save those ... */
 
 private:
-	state_var<double> m_Vd;
-	state_var<double> m_Id;
-	state_var<double> m_G;
+	state_var<nl_double> m_Vd;
+	state_var<nl_double> m_Id;
+	state_var<nl_double> m_G;
 
-	double m_Vt;
-	double m_Vmin;
-	double m_Is;
-	double m_logIs;
-	double m_n;
-	double m_gmin;
+	nl_double m_Vt;
+	nl_double m_Vmin;
+	nl_double m_Is;
+	nl_double m_logIs;
+	nl_double m_n;
+	nl_double m_gmin;
 
-	double m_VtInv;
-	double m_Vcrit;
+	nl_double m_VtInv;
+	nl_double m_Vcrit;
 };
 
 /*! Class representing the diode model paramers.

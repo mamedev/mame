@@ -19,7 +19,7 @@ NETLIST_START(cmos_inverter_clk)
 	//SOLVER(Solver, 100000000000)
 	PARAM(Solver.ACCURACY, 1e-7	)
 	PARAM(Solver.NR_LOOPS, 500000)
-	PARAM(Solver.DYNAMIC_TS, 1)
+	PARAM(Solver.DYNAMIC_TS, 0)
 	PARAM(Solver.DYNAMIC_LTE, 1e-5)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-8)
     ANALOG_INPUT(V5, 5)
@@ -28,6 +28,7 @@ NETLIST_START(cmos_inverter_clk)
 
 #if (USE_CLOCK)
 	CLOCK(V, 5000)
+	PARAM(NETLIST.DEFAULT_MOS_CAPMODEL, 0) // Disable capacitance modeling
 	//CLOCK(V, 500000)
 #else
 	VS(V, 5)

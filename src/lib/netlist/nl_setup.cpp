@@ -1043,6 +1043,11 @@ void setup_t::prepare_to_run()
 	auto solver = m_nlstate.get_single_device<devices::NETLIB_NAME(solver)>("solver");
 	m_netlist_params = m_nlstate.get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
 
+	/* set default model parameters */
+
+	m_models.register_model(plib::pfmt("NMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_capmodel()));
+	m_models.register_model(plib::pfmt("PMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_capmodel()));
+
 	/* create devices */
 
 	log().debug("Creating devices ...\n");

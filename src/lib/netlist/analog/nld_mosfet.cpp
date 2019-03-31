@@ -37,11 +37,17 @@ namespace analog
 	// nld_FET - Base classes
 	// -----------------------------------------------------------------------------
 
-	/*! Class representing the nmos model paramers.
+	/*! Class representing the nmos/pmos model paramers.
 	 *
-	 *  This is the model representation of the nmos model. Typically, SPICE uses
-	 *  the following parameters. A "Y" in the first column indicates that the
-	 *  parameter is actually used in netlist.
+	 *  This is the model representation of the nmos model.
+	 *
+	 *  Netlist has an additional parameter caller CAPMOD:
+	 *
+	 *  CAPMOD=0: Capacitance model disabled
+	 *  CAPMOD=2: Meyer capacitance model
+	 *
+	 *  Typically, SPICE uses the following parameters. A "Y" in the first
+	 *  column indicates that the parameter is actually used in netlist.
 	 *
 	 * | NL? |Name  |                                                            Description|Units  |Default   |Example          |
 	 * |:---:|------|-----------------------------------------------------------------------|-------|---------:|----------------:|
@@ -115,6 +121,7 @@ namespace analog
 		, m_CGSO(*this, "CGSO")
 		, m_CGDO(*this, "CGDO")
 		, m_CGBO(*this, "CGBO")
+		, m_CAPMOD(*this, "CAPMOD")
 		{}
 
 		value_t m_VTO;		//!< Threshold voltage [V]
@@ -136,6 +143,7 @@ namespace analog
 		value_t m_CGSO;		//!< Gate-source overlap capacitance per meter channel width
 		value_t m_CGDO;		//!< Gate-drain overlap capacitance per meter channel width
 		value_t m_CGBO;		//!< Gate-bulk overlap capacitance per meter channel width
+		value_base_t<int> m_CAPMOD; //!< Capacitance model (0=no model 2=Meyer)
 	};
 
 	// Have a common start for mosfets
@@ -198,7 +206,9 @@ namespace analog
 		, m_Cgb(0.0)
 		, m_Cgs(0.0)
 		, m_Cgd(0.0)
-
+		, m_capmod(2)
+		, m_Vgs(*this, "m_Vgs", 0.0)
+		, m_Vgd(*this, "m_Vgd", 0.0)
 	{
 			register_subalias("S", m_SG.m_P);   // Source
 			register_subalias("G", m_SG.m_N);   // Gate
@@ -209,34 +219,33 @@ namespace analog
 			connect(m_SG.m_N, m_DG.m_N);
 			connect(m_DG.m_P, m_SD.m_N);
 
-#if 0
-			if (m_model.m_CJE > 0.0)
-			{
-				create_and_register_subdevice("m_CJE", m_CJE);
-				connect("B", "m_CJE.1");
-				connect("E", "m_CJE.2");
-			}
-			if (m_model.m_CJC > 0.0)
-			{
-				create_and_register_subdevice("m_CJC", m_CJC);
-				connect("B", "m_CJC.1");
-				connect("C", "m_CJC.2");
-			}
-#endif
+			set_qtype((m_model.model_type() == "NMOS_DEFAULT") ? FET_NMOS : FET_PMOS);
+			m_polarity = qtype() == FET_NMOS ? 1.0 : -1.0;
+
+			m_capmod = m_model.m_CAPMOD;
+			// printf("capmod %d %g %g\n", m_capmod, (double)m_model.m_VTO, m_polarity);
+			nl_assert_always(m_capmod == 0 || m_capmod == 2, "Error: CAPMODEL invalid value for " + m_model.name());
+
+			//printf("%g\n", exec().solver()->gmin());
 		}
 
-		NETLIB_IS_TIMESTEP(true)
+		NETLIB_IS_TIMESTEP(true || m_capmod != 0)
 
 		NETLIB_TIMESTEPI()
 		{
-			const nl_double Ugd = -m_DG.deltaV() * m_polarity; // Gate - Drain
-			const nl_double Ugs = -m_SG.deltaV() * m_polarity; // Gate - Source
-			const nl_double Ubs = 0.0;                         // Bulk - Source == 0 if connected
-			const nl_double Ugb = Ugs - Ubs;
+			if (m_capmod != 0)
+			{
+				//const nl_double Ugd = -m_DG.deltaV() * m_polarity; // Gate - Drain
+				//const nl_double Ugs = -m_SG.deltaV() * m_polarity; // Gate - Source
+				const nl_double Ugd = m_Vgd; // Gate - Drain
+				const nl_double Ugs = m_Vgs; // Gate - Source
+				const nl_double Ubs = 0.0;                         // Bulk - Source == 0 if connected
+				const nl_double Ugb = Ugs - Ubs;
 
-			m_cap_gb.timestep(m_Cgb, Ugb, step);
-			m_cap_gs.timestep(m_Cgs, Ugs, step);
-			m_cap_gd.timestep(m_Cgd, Ugd, step);
+				m_cap_gb.timestep(m_Cgb, Ugb, step);
+				m_cap_gs.timestep(m_Cgs, Ugs, step);
+				m_cap_gd.timestep(m_Cgd, Ugd, step);
+			}
 		}
 
 	protected:
@@ -261,7 +270,6 @@ namespace analog
 		generic_capacitor<capacitor_e::VARIABLE_CAPACITY> m_cap_gs;
 		generic_capacitor<capacitor_e::VARIABLE_CAPACITY> m_cap_gd;
 
-
 		nl_double m_phi;
 		nl_double m_gamma;
 		nl_double m_vto;
@@ -278,6 +286,10 @@ namespace analog
 		nl_double m_Cgb;
 		nl_double m_Cgs;
 		nl_double m_Cgd;
+
+		int m_capmod;
+		state_var<nl_double> m_Vgs;
+		state_var<nl_double> m_Vgd;
 
 		void set_cap(generic_capacitor<capacitor_e::VARIABLE_CAPACITY> cap,
 			nl_double capval, nl_double V,
@@ -313,7 +325,7 @@ namespace analog
 			else if (Vctrl <= 0)
 			{
 				Cgb = -Vctrl * m_CoxWL / m_phi;
-				Cgs = (Vctrl * m_CoxWL * (4.0 / 3.0) / m_phi + (2.0 / 3.0) * m_CoxWL);
+				Cgs = Vctrl * m_CoxWL * (4.0 / 3.0) / m_phi + (2.0 / 3.0) * m_CoxWL;
 				Cgd = 0.0;
 			}
 			else
@@ -361,11 +373,24 @@ namespace analog
 
 	NETLIB_UPDATE_TERMINALS(MOSFET)
 	{
-		const nl_double Vgd = -m_DG.deltaV() * m_polarity; // Gate - Drain
-		const nl_double Vgs = -m_SG.deltaV() * m_polarity; // Gate - Source
+		nl_double Vgd = -m_DG.deltaV() * m_polarity; // Gate - Drain
+		nl_double Vgs = -m_SG.deltaV() * m_polarity; // Gate - Source
+
+		// limit step sizes
+
+		const nl_double k = 3.5; // see "Circuit Simulation", page 185
+		nl_double d = (Vgs - m_Vgs);
+		Vgs = m_Vgs + 1.0/k * (d < 0 ? -1.0 : 1.0) * std::log1p(k * std::abs(d));
+		d = (Vgd - m_Vgd);
+		Vgd = m_Vgd + 1.0/k * (d < 0 ? -1.0 : 1.0) * std::log1p(k * std::abs(d));
+
+		m_Vgs = Vgs;
+		m_Vgd = Vgd;
+
 		const nl_double Vbs = 0.0;                       // Bulk - Source == 0 if connected
-		const nl_double Vbd = m_SD.deltaV() * m_polarity;  // Bulk - Drain = Source  - Drain
+		//const nl_double Vbd = m_SD.deltaV() * m_polarity;  // Bulk - Drain = Source  - Drain
 		const nl_double Vds = Vgs - Vgd;
+		const nl_double Vbd = -Vds;  // Bulk - Drain = Source  - Drain
 
 #if (!BODY_CONNECTED_TO_SOURCE)
 		m_D_BS.update_diode(Vbs);
@@ -425,6 +450,7 @@ namespace analog
 
 		const nl_double IeqBD = m_D_BD.Ieq();
 		const nl_double gbd = m_D_BD.G();
+
 #if (!BODY_CONNECTED_TO_SOURCE)
 		const nl_double IeqBS = m_D_BS.Ieq();
 		const nl_double gbs = m_D_BS.G();
@@ -466,16 +492,19 @@ namespace analog
 		const nl_double gBS = -gbs;
 		nl_double gBB =  gbs + gbd;
 
-		const nl_double Vgb = Vgs - Vbs;
+		if (m_capmod != 0)
+		{
+			const nl_double Vgb = Vgs - Vbs;
 
-		if (is_forward)
-			calculate_caps(Vgs, Vgd, Vth, m_Cgs, m_Cgd, m_Cgb);
-		else
-			calculate_caps(Vgd, Vgs, Vth, m_Cgd, m_Cgs, m_Cgb);
+			if (is_forward)
+				calculate_caps(Vgs, Vgd, Vth, m_Cgs, m_Cgd, m_Cgb);
+			else
+				calculate_caps(Vgd, Vgs, Vth, m_Cgd, m_Cgs, m_Cgb);
 
-		set_cap(m_cap_gb, m_Cgb + m_model.m_CGBO * m_Leff, Vgb, gGG, gGB, gBG, gBB, IG, IB);
-		set_cap(m_cap_gs, m_Cgs + m_model.m_CGSO * m_model.m_W, Vgs, gGG, gGS, gSG, gSS, IG, IS);
-		set_cap(m_cap_gd, m_Cgd + m_model.m_CGDO * m_model.m_W, Vgd, gGG, gGD, gDG, gDD, IG, ID);
+			set_cap(m_cap_gb, m_Cgb + m_model.m_CGBO * m_Leff, Vgb, gGG, gGB, gBG, gBB, IG, IB);
+			set_cap(m_cap_gs, m_Cgs + m_model.m_CGSO * m_model.m_W, Vgs, gGG, gGS, gSG, gSS, IG, IS);
+			set_cap(m_cap_gd, m_Cgd + m_model.m_CGDO * m_model.m_W, Vgd, gGG, gGD, gDG, gDD, IG, ID);
+		}
 
 		// Source connected to body, Diode S-B shorted!
 		const nl_double gSSBB = gSS + gBB + gBS + gSB;
@@ -493,9 +522,6 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(MOSFET)
 	{
-		set_qtype((m_model.model_type() == "NMOS") ? FET_NMOS : FET_PMOS);
-		m_polarity = qtype() == FET_NMOS ? 1.0 : -1.0;
-
 		/*
 		 * From http://ltwiki.org/LTspiceHelp/LTspiceHelp/M_MOSFET.htm :
 		 *
