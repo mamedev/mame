@@ -112,6 +112,7 @@ Read/Write Amplifier for FDD
 Emulation Status:
 Printer not working
 Floppy Disk writing not working
+Floppy Disk Sync not implemented (reading works)
 Dictionary ROM not working
 Different beeper frequencies not working (Tetris)
 Cursor shapes not implemented except block cursor
