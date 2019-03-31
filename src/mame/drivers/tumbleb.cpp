@@ -2202,7 +2202,7 @@ void tumbleb_pic_state::funkyjetb(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	pic16c57_device &pic(PIC16C57(config, "pic", 4'000'000)); // unknown clock
+	pic16c57_device &pic(PIC16C57(config, "pic", XTAL(8'000'000)/2)); // 8MHz xtal on the PCB, divider unconfirmed
 	pic.write_a().set(FUNC(tumbleb_pic_state::oki_bank_w));
 	pic.read_b().set(FUNC(tumbleb_pic_state::pic_data_r));
 	pic.write_b().set(FUNC(tumbleb_pic_state::pic_data_w));
@@ -3819,7 +3819,7 @@ GAME( 1991, tumbleb,  tumblep, tumblepb,    tumblepb, tumbleb_state, init_tumble
 GAME( 1991, tumbleb2, tumblep, tumbleb2,    tumblepb, tumbleb_state, init_tumbleb2, ROT0, "bootleg", "Tumble Pop (bootleg with PIC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE  ) // PIC is protected, sound simulation not 100%
 GAME( 1991, tumblepba,tumblep, tumblepba,   tumblepb, tumbleb_state, init_tumblepba,ROT0, "bootleg (Playmark)", "Tumble Pop (Playmark bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING  ) // Playmark stickers on ROMs, offset pf1_alt tilemap, OKI not hooked up
 
-GAME( 1992, funkyjetb,funkyjet,funkyjetb,   tumblepb, tumbleb_pic_state, init_tumblepb, ROT0, "bootleg", "Funky Jet (bootleg)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong palette, inputs not working, undumped PIC driving an OKI
+GAME( 1992, funkyjetb,funkyjet,funkyjetb,   tumblepb, tumbleb_pic_state, init_tumblepb, ROT0, "bootleg", "Funky Jet (bootleg)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong palette, inputs not working, PIC driving an OKI
 
 GAME( 1993, jumpkids, 0,       jumpkids,    tumblepb, tumbleb_state, init_jumpkids, ROT0, "Comad",    "Jump Kids", MACHINE_SUPPORTS_SAVE )
 
