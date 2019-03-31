@@ -140,7 +140,7 @@ WRITE8_MEMBER(ajax_state::ls138_f10_w)
 	{
 		case 0x00:  /* NSFIRQ + AFR */
 			if (offset)
-				m_watchdog->reset_w(space, 0, data);
+				m_watchdog->watchdog_reset();
 			else{
 				if (m_firq_enable)  /* Cause interrupt on slave CPU */
 					m_subcpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);

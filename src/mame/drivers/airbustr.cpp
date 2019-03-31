@@ -238,7 +238,7 @@ READ8_MEMBER(airbustr_state::devram_r)
 		   that would reset the main cpu. We avoid this and patch
 		   the rom instead (main cpu has to be reset once at startup) */
 		case 0xfe0:
-			return m_watchdog->reset_r(space, 0);
+			return m_watchdog->reset_r(space);
 
 		/* Reading a word at eff2 probably yelds the product
 		   of the words written to eff0 and eff2 */

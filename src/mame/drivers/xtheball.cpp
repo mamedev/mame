@@ -175,7 +175,7 @@ READ16_MEMBER(xtheball_state::analogx_r)
 READ16_MEMBER(xtheball_state::analogy_watchdog_r)
 {
 	/* doubles as a watchdog address */
-	m_watchdog->reset_w(space,0,0);
+	m_watchdog->watchdog_reset();
 	return (m_analog_y->read() << 8) | 0x00ff;
 }
 
