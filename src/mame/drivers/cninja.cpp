@@ -59,7 +59,7 @@ template<int Chip>
 WRITE16_MEMBER(cninja_state::cninja_pf_control_w)
 {
 	m_screen->update_partial(m_screen->vpos());
-	m_deco_tilegen[Chip]->pf_control_w(space, offset, data, mem_mask);
+	m_deco_tilegen[Chip]->pf_control_w(offset, data, mem_mask);
 }
 
 

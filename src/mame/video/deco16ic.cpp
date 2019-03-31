@@ -602,7 +602,7 @@ void deco16ic_device::set_enable( int tmap, int enable )
 
 /******************************************************************************/
 
-WRITE16_MEMBER( deco16ic_device::pf1_data_w )
+void deco16ic_device::pf1_data_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_pf1_data[offset]);
 
@@ -611,7 +611,7 @@ WRITE16_MEMBER( deco16ic_device::pf1_data_w )
 		m_pf1_tilemap_16x16->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( deco16ic_device::pf2_data_w )
+void deco16ic_device::pf2_data_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_pf2_data[offset]);
 
@@ -620,17 +620,17 @@ WRITE16_MEMBER( deco16ic_device::pf2_data_w )
 		m_pf2_tilemap_16x16->mark_tile_dirty(offset);
 }
 
-READ16_MEMBER( deco16ic_device::pf1_data_r )
+u16 deco16ic_device::pf1_data_r(offs_t offset)
 {
 	return m_pf1_data[offset];
 }
 
-READ16_MEMBER( deco16ic_device::pf2_data_r )
+u16 deco16ic_device::pf2_data_r(offs_t offset)
 {
 	return m_pf2_data[offset];
 }
 
-WRITE16_MEMBER( deco16ic_device::pf_control_w )
+void deco16ic_device::pf_control_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// update until current scanline (inclusive if we're in hblank)
 	int ydelta = (screen().hpos() > screen().visible_area().right()) ? 0 : 1;
@@ -639,40 +639,40 @@ WRITE16_MEMBER( deco16ic_device::pf_control_w )
 	COMBINE_DATA(&m_pf12_control[offset]);
 }
 
-READ16_MEMBER( deco16ic_device::pf_control_r )
+u16 deco16ic_device::pf_control_r(offs_t offset)
 {
 	return m_pf12_control[offset];
 }
 
 
-READ32_MEMBER( deco16ic_device::pf_control_dword_r )
+u32 deco16ic_device::pf_control_dword_r(offs_t offset)
 {
-	return pf_control_r(space, offset, 0xffff)^0xffff0000;
+	return pf_control_r(offset) ^ 0xffff0000;
 }
 
-WRITE32_MEMBER( deco16ic_device::pf_control_dword_w )
+void deco16ic_device::pf_control_dword_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	pf_control_w(space, offset, data & 0xffff, mem_mask & 0xffff);
+	pf_control_w(offset, data & 0xffff, mem_mask & 0xffff);
 }
 
-READ32_MEMBER( deco16ic_device::pf1_data_dword_r )
+u32 deco16ic_device::pf1_data_dword_r(offs_t offset)
 {
-	return pf1_data_r(space, offset, 0xffff)^0xffff0000;
+	return pf1_data_r(offset) ^ 0xffff0000;
 }
 
-WRITE32_MEMBER( deco16ic_device::pf1_data_dword_w )
+void deco16ic_device::pf1_data_dword_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	pf1_data_w(space, offset, data & 0xffff, mem_mask & 0xffff);
+	pf1_data_w(offset, data & 0xffff, mem_mask & 0xffff);
 }
 
-READ32_MEMBER( deco16ic_device::pf2_data_dword_r )
+u32 deco16ic_device::pf2_data_dword_r(offs_t offset)
 {
-	return pf2_data_r(space, offset, 0xffff)^0xffff0000;
+	return pf2_data_r(offset) ^ 0xffff0000;
 }
 
-WRITE32_MEMBER( deco16ic_device::pf2_data_dword_w )
+void deco16ic_device::pf2_data_dword_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	pf2_data_w(space, offset, data & 0xffff, mem_mask & 0xffff);
+	pf2_data_w(offset, data & 0xffff, mem_mask & 0xffff);
 }
 
 
