@@ -300,9 +300,7 @@ void device_nubus_card_interface::install_bank(offs_t start, offs_t end, const c
 	char bank[256];
 
 	// append an underscore and the slot name to the bank so it's guaranteed unique
-	strcpy(bank, tag);
-	strcat(bank, "_");
-	strcat(bank, m_nubus_slottag);
+	snprintf(bank, sizeof(bank), "%s_%s", tag, m_nubus_slottag);
 
 	nubus().install_bank(start, end, bank, data);
 }
@@ -444,8 +442,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 	// now install the ROM
 	uint32_t addr = get_slotspace() + 0x01000000;
 	char bankname[128];
-	strcpy(bankname, "rom_");
-	strcat(bankname, m_nubus_slottag);
+	snprintf(bankname, sizeof(bankname), "rom_%s", m_nubus_slottag);
 	addr -= romlen;
 //  printf("Installing ROM at %x, length %x\n", addr, romlen);
 	if (mirror_all_mb)  // mirror the declaration ROM across all 16 megs of the slot space

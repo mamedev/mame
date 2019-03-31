@@ -162,9 +162,7 @@ void device_macpds_card_interface::install_bank(offs_t start, offs_t end, const 
 	char bank[256];
 
 	// append an underscore and the slot name to the bank so it's guaranteed unique
-	strcpy(bank, tag);
-	strcat(bank, "_");
-	strcat(bank, m_macpds_slottag);
+	snprintf(bank, sizeof(bank), "%s_%s", tag, m_macpds_slottag);
 
 	m_macpds->install_bank(start, end, bank, data);
 }
