@@ -1,7 +1,9 @@
+ï»¿#if 0
 // license:BSD-3-Clause
 // copyright-holders:Bartman/Abyss
 
 #include "emu.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/timer.h"
@@ -83,20 +85,18 @@ class gm82c765b_device : public upd765_family_device {
 public:
 	gm82c765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map& map) override {
+		map(0x0, 0x0).r(FUNC(gm82c765b_device::msr_r));
+		map(0x1, 0x1).rw(FUNC(gm82c765b_device::fifo_r), FUNC(gm82c765b_device::fifo_w));
+		map(0x2, 0x2).w(FUNC(gm82c765b_device::dor_w));
+		map(0x6, 0x6).rw(FUNC(gm82c765b_device::dma_r), FUNC(gm82c765b_device::dma_w));
+	}
 };
 
 DEFINE_DEVICE_TYPE(GM82C765B, gm82c765b_device, "gm82c765b", "GM82C765B")
 
 #define MCFG_GM82C765B_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, GM82C765B, 0)
-
-DEVICE_ADDRESS_MAP_START(map, 8, gm82c765b_device)
-	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
-	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
-	AM_RANGE(0x2, 0x2) AM_WRITE(dor_w)
-	AM_RANGE(0x6, 0x6) AM_READWRITE(mdma_r, mdma_w)
-ADDRESS_MAP_END
 
 gm82c765b_device::gm82c765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : 
 	upd765_family_device(mconfig, GM82C765B, tag, owner, clock)
@@ -115,10 +115,10 @@ public:
 		: driver_device(mconfig, type, tag),
 		maincpu(*this, "maincpu"),
 		palette(*this, "palette"),
-		io_kbrow(*this, "kbrow.%u", 0),
 		fdc(*this, "fdc"),
+		beeper(*this, "beeper"),
+		io_kbrow(*this, "kbrow.%u", 0)
 		//floppy(*this, "floppy"),
-		beeper(*this, "beeper")
 	{ }
 
 	// helpers
@@ -191,15 +191,16 @@ protected:
 	std::map<uint32_t, std::string> symbols;
 };
 
-static ADDRESS_MAP_START(lw840_map, AS_PROGRAM, 16, lw840_state)
- 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x5f8000, 0x5fffff) AM_RAM AM_SHARE("sram") // SRAM
-	AM_RANGE(0x600000, 0x67ffff) AM_RAM // DRAM
-	AM_RANGE(0xe00000, 0xe00007) AM_DEVICE8("fdc", gm82c765b_device, map, 0xff)
-	AM_RANGE(0xe00030, 0xe00041) AM_NOP // just to shut up the error.log
-	AM_RANGE(0xec0000, 0xec0001) AM_READWRITE(keyboard_r, keyboard_w)
-	AM_RANGE(0xec0004, 0xec0005) AM_READ(disk_inserted_r)
-ADDRESS_MAP_END
+void lw840_map(address_map& map)
+{
+	map(0x000000, 0x3fffff).rom();
+	map(0x5f8000, 0x5fffff).ram().share("sram"); // SRAM
+	map(0x600000, 0x67ffff).ram(); // DRAM
+	//map(0xe00000, 0xe00007).AM_DEVICE8("fdc", gm82c765b_device, map, 0xff) //??
+	map(0xe00030, 0xe00041).nop(); // just to shut up the error.log
+	map(0xec0000, 0xec0001).rw(FUNC(keyboard_r), FUNC(keyboard_w));
+	map(0xec0004, 0xec0005).r(FUNC(disk_inserted_r));
+}
 
 static ADDRESS_MAP_START(lw840_io_map, AS_IO, 16, lw840_state)
 	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ(port7_r)
@@ -345,7 +346,7 @@ static INPUT_PORTS_START(lw840)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) //works
 
 	PORT_START("kbrow.5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(L'ß') PORT_CHAR('?')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(L'ÃŸ') PORT_CHAR('?')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_0)          PORT_CHAR('0')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_P)          PORT_CHAR('p')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_O)          PORT_CHAR('o')
@@ -356,9 +357,9 @@ static INPUT_PORTS_START(lw840)
 
 	PORT_START("kbrow.6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Inhalt")                PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(HOME)) //works
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(L'ö') PORT_CHAR(L'Ö') //works
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(L'Ã¶') PORT_CHAR(L'Ã–') //works
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+') PORT_CHAR('*') //works
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(L'ü') PORT_CHAR(L'Ü') //works
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(L'Ã¼') PORT_CHAR(L'Ãœ') //works
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT)) //works
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN)) //works
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
@@ -375,13 +376,13 @@ static INPUT_PORTS_START(lw840)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_MAMEKEY(LSHIFT)) //works
 
 	PORT_START("kbrow.8")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(L'´') PORT_CHAR('`') //works
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(L'Â´') PORT_CHAR('`') //works
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_L)          PORT_CHAR('l') //works
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('\'')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_K)          PORT_CHAR('k') //works
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR(':') //works
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('-') PORT_CHAR('_') //works
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(L'ä') PORT_CHAR(L'Ä')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(L'Ã¤') PORT_CHAR(L'Ã„')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -411,8 +412,8 @@ static MACHINE_CONFIG_START( lw840 )
 
 	// floppy
 	MCFG_GM82C765B_ADD("fdc")
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(lw840_state, fdc_interrupt))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(lw840_state, fdc_drq))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, lw840_state, fdc_interrupt))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, lw840_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", lw840_floppies, "35hd", lw840_state::floppy_formats)
 
 	// sound hardware - dummy
@@ -428,3 +429,4 @@ ROM_END
 
 //    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS           INIT     COMPANY         FULLNAME            FLAGS
 COMP( 1997, lw840,  0,   0,       lw840,  lw840, lw840_state,    0,       "Brother",      "Brother LW-840ic", MACHINE_NODEVICE_PRINTER )
+#endif
