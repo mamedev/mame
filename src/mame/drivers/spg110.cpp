@@ -346,17 +346,17 @@ void spg110_game_state::spg110_base(machine_config &config)
 	m_screen->set_screen_update("spg", FUNC(spg110_device::screen_update));
 	m_screen->screen_vblank().set(m_spg, FUNC(spg110_device::vblank));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-//  m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-//  m_spg->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-
 	SPG110(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 	m_spg->porta_in().set_ioport("PA");
 	m_spg->portb_in().set_ioport("PB");
 	m_spg->portc_in().set_ioport("PC");
 	m_spg->adc_in<0>().set_ioport("JOYX");
 	m_spg->adc_in<1>().set_ioport("JOYY");
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_spg->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 }
 
 ROM_START( jak_capb )
