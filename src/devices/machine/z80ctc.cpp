@@ -373,7 +373,10 @@ u8 z80ctc_channel_device::read()
 
 		LOG("CTC clock %f\n", period.as_hz());
 
-		return u8((m_timer->remaining().as_double() / period.as_double()) + 1.0);
+		if(!m_timer->remaining().is_never())
+			return u8((m_timer->remaining().as_double() / period.as_double()) + 1.0);
+		else
+			return 0;
 	}
 }
 
