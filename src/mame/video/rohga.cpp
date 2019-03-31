@@ -22,8 +22,7 @@ WRITE16_MEMBER(rohga_state::rohga_buffer_spriteram16_w)
 
 uint32_t rohga_state::screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().dummy_space();
-	uint16_t flip = m_deco_tilegen[0]->pf_control_r(space, 0, 0xffff);
+	uint16_t flip = m_deco_tilegen[0]->pf_control_r(0);
 	uint16_t priority = m_decocomn->priority_r();
 
 	// sprites are flipped relative to tilemaps
@@ -128,8 +127,7 @@ void rohga_state::mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 uint32_t rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().dummy_space();
-	uint16_t flip = m_deco_tilegen[0]->pf_control_r(space, 0, 0xffff);
+	uint16_t flip = m_deco_tilegen[0]->pf_control_r(0);
 	uint16_t priority = m_decocomn->priority_r();
 
 	// sprites are flipped relative to tilemaps
@@ -331,8 +329,7 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 uint32_t rohga_state::screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().dummy_space();
-	uint16_t flip = m_deco_tilegen[0]->pf_control_r(space, 0, 0xffff);
+	uint16_t flip = m_deco_tilegen[0]->pf_control_r(0);
 	uint16_t priority = m_decocomn->priority_r();
 
 	flip_screen_set(BIT(flip, 7));

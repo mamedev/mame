@@ -49,25 +49,23 @@ public:
 	void set_pf12_16x16_bank(int bank) { m_pf12_16x16_gfx_bank = bank; }
 
 
-	DECLARE_WRITE16_MEMBER( pf1_data_w );
-	DECLARE_WRITE16_MEMBER( pf2_data_w );
+	void pf1_data_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void pf2_data_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER( pf1_data_r );
-	DECLARE_READ16_MEMBER( pf2_data_r );
+	u16 pf1_data_r(offs_t offset);
+	u16 pf2_data_r(offs_t offset);
 
-	DECLARE_WRITE16_MEMBER( pf_control_w );
+	void pf_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 pf_control_r(offs_t offset);
 
-	DECLARE_READ16_MEMBER( pf_control_r );
+	void pf1_data_dword_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void pf2_data_dword_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER( pf1_data_dword_w );
-	DECLARE_WRITE32_MEMBER( pf2_data_dword_w );
+	u32 pf1_data_dword_r(offs_t offset);
+	u32 pf2_data_dword_r(offs_t offset);
 
-	DECLARE_READ32_MEMBER( pf1_data_dword_r );
-	DECLARE_READ32_MEMBER( pf2_data_dword_r );
-
-	DECLARE_WRITE32_MEMBER( pf_control_dword_w );
-
-	DECLARE_READ32_MEMBER( pf_control_dword_r );
+	void pf_control_dword_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 pf_control_dword_r(offs_t offset);
 
 	void print_debug_info(bitmap_ind16 &bitmap);
 
