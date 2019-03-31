@@ -230,7 +230,7 @@ void aic6250_device::device_reset()
 	m_offset_cntrl = 0;
 	m_dma_cntrl = 0;
 	m_port_a_latch = 0;
-	m_port_a_latch = 0;
+	m_port_b_latch = 0;
 
 	// registers 05, 09
 	m_offset_count_zero = true;
@@ -551,9 +551,9 @@ void aic6250_device::memory_data_w(u8 data)
 
 u8 aic6250_device::port_a_r()
 {
-	// FIXME: not sure if port A can be read in differential mode
+	// FIXME: not sure if port A bits 2 and 7 can be read as GPIO in 8-bit differential mode
 	u8 const data = (m_control_reg_0 & R07W_SCSI_INTERFACE_MODE)
-		|| (m_control_reg_0 & R07W_EN_PORT_A_INP_OR_OUT) ? m_port_a_latch : m_port_a_r_cb();
+		|| (m_control_reg_0 & R07W_EN_PORT_A_INP_OR_OUT) ? (m_port_a_latch ^ 0xff) : m_port_a_r_cb();
 
 	LOGMASKED(LOG_REG, "port_a_r 0x%02x\n", data);
 
@@ -564,8 +564,9 @@ void aic6250_device::port_a_w(u8 data)
 {
 	LOGMASKED(LOG_REG, "port_a_w 0x%02x\n", data);
 
+	// Port A outputs are the inverse of data written to this register
 	if (!(m_control_reg_0 & R07W_SCSI_INTERFACE_MODE) && (m_control_reg_0 & R07W_EN_PORT_A_INP_OR_OUT))
-		m_port_a_w_cb(data);
+		m_port_a_w_cb(data ^ 0xff);
 
 	m_port_a_latch = data;
 }
@@ -1078,7 +1079,7 @@ u16 aic6250_device::dma16_r()
 
 		data |= u16(m_fifo.dequeue()) << 8;
 
-		LOGMASKED(LOG_DMA, "dma16_r 0x%04x\n", data);
+		LOGMASKED(LOG_DMA, "DMA 0x%04x from FIFO\n", data);
 
 		return data;
 	}
