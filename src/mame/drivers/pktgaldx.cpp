@@ -88,7 +88,7 @@ WRITE16_MEMBER( pktgaldx_state::pktgaldx_protection_region_f_104_w )
 {
 	int real_address = 0 + (offset *2);
 	uint8_t cs = 0;
-	m_deco104->write_data( space, real_address&0x7fff, data, mem_mask, cs );
+	m_deco104->write_data( real_address&0x7fff, data, mem_mask, cs );
 }
 
 WRITE_LINE_MEMBER( pktgaldx_state::vblank_w )
