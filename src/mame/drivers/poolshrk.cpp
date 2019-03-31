@@ -68,7 +68,7 @@ WRITE8_MEMBER(poolshrk_state::watchdog_w)
 {
 	if ((offset & 3) == 3)
 	{
-		m_watchdog->reset_w(space, 0, 0);
+		m_watchdog->watchdog_reset();
 	}
 }
 
@@ -86,7 +86,7 @@ READ8_MEMBER(poolshrk_state::input_r)
 
 	if ((offset & 3) == 3)
 	{
-		m_watchdog->reset_r(space, 0);
+		m_watchdog->watchdog_reset();
 	}
 
 	return val;

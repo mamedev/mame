@@ -253,7 +253,7 @@ WRITE8_MEMBER(williams_state::williams_watchdog_reset_w)
 {
 	/* yes, the data bits are checked for this specific value */
 	if (data == 0x39)
-		m_watchdog->reset_w(space,0,0);
+		m_watchdog->watchdog_reset();
 }
 
 
@@ -261,7 +261,7 @@ WRITE8_MEMBER(williams2_state::williams2_watchdog_reset_w)
 {
 	/* yes, the data bits are checked for this specific value */
 	if ((data & 0x3f) == 0x14)
-		m_watchdog->reset_w(space,0,0);
+		m_watchdog->watchdog_reset();
 }
 
 

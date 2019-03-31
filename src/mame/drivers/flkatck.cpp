@@ -75,7 +75,7 @@ WRITE8_MEMBER(flkatck_state::flkatck_ls138_w)
 			m_audiocpu->set_input_line(0, HOLD_LINE);
 			break;
 		case 0x07:  /* watchdog reset */
-			m_watchdog->reset_w(space, 0, data);
+			m_watchdog->watchdog_reset();
 			break;
 	}
 }

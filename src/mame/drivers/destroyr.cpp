@@ -240,7 +240,7 @@ WRITE8_MEMBER(destroyr_state::misc_w)
 WRITE8_MEMBER(destroyr_state::cursor_load_w)
 {
 	m_cursor = data;
-	m_watchdog->reset_w(space, offset, data);
+	m_watchdog->watchdog_reset();
 }
 
 
