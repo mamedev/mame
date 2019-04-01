@@ -82,7 +82,7 @@ TILEMAP_MAPPER_MEMBER(ataxx_state::ataxx_scan)
 
 TILE_GET_INFO_MEMBER(ataxx_state::ataxx_get_tile_info)
 {
-	uint16_t tile = m_ataxx_qram[tile_index] | ((m_ataxx_qram[0x4000 | tile_index] & 0x7f) << 8);
+	u16 tile = m_ataxx_qram[tile_index] | ((m_ataxx_qram[0x4000 | tile_index] & 0x7f) << 8);
 	SET_TILE_INFO_MEMBER(0, tile, 0, 0);
 }
 
@@ -99,7 +99,7 @@ void leland_state::video_start()
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(leland_state::leland_get_tile_info),this), tilemap_mapper_delegate(FUNC(leland_state::leland_scan),this), 8, 8, 256, 256);
 
 	/* allocate memory */
-	m_video_ram = make_unique_clear<uint8_t[]>(VRAM_SIZE);
+	m_video_ram = make_unique_clear<u8[]>(VRAM_SIZE);
 
 	/* scanline timer */
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(leland_state::scanline_callback),this));
@@ -111,7 +111,7 @@ void leland_state::video_start()
 	save_item(NAME(m_yscroll));
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_last_scanline));
-	for (uint8_t i = 0; i < 2; i++)
+	for (u8 i = 0; i < 2; i++)
 	{
 		save_item(NAME(m_vram_state[i].m_addr), i);
 		save_item(NAME(m_vram_state[i].m_latch), i);
@@ -125,16 +125,16 @@ void ataxx_state::video_start()
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ataxx_state::ataxx_get_tile_info),this), tilemap_mapper_delegate(FUNC(ataxx_state::ataxx_scan),this), 8, 8, 256, 128);
 
 	/* first do the standard stuff */
-	m_video_ram = make_unique_clear<uint8_t[]>(VRAM_SIZE);
+	m_video_ram = make_unique_clear<u8[]>(VRAM_SIZE);
 
 	/* allocate memory */
-	m_ataxx_qram = make_unique_clear<uint8_t[]>(QRAM_SIZE);
+	m_ataxx_qram = make_unique_clear<u8[]>(QRAM_SIZE);
 
 	save_pointer(NAME(m_video_ram), VRAM_SIZE);
 	save_pointer(NAME(m_ataxx_qram), QRAM_SIZE);
 	save_item(NAME(m_xscroll));
 	save_item(NAME(m_yscroll));
-	for (uint8_t i = 0; i < 2; i++)
+	for (u8 i = 0; i < 2; i++)
 	{
 		save_item(NAME(m_vram_state[i].m_addr), i);
 		save_item(NAME(m_vram_state[i].m_latch), i);
@@ -148,7 +148,7 @@ void ataxx_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(leland_state::leland_scroll_w)
+void leland_state::scroll_w(offs_t offset, u8 data)
 {
 	int scanline = m_screen->vpos();
 	if (scanline > 0)
@@ -174,12 +174,12 @@ WRITE8_MEMBER(leland_state::leland_scroll_w)
 			break;
 
 		default:
-			fatalerror("Unexpected leland_gfx_port_w\n");
+			fatalerror("Unexpected scroll_w\n");
 	}
 }
 
 
-WRITE8_MEMBER(leland_state::leland_gfx_port_w)
+void leland_state::gfx_port_w(u8 data)
 {
 	int scanline = m_screen->vpos();
 	if (scanline > 0)
@@ -199,7 +199,7 @@ WRITE8_MEMBER(leland_state::leland_gfx_port_w)
  *
  *************************************/
 
-void leland_state::leland_video_addr_w(address_space &space, int offset, int data, int num)
+void leland_state::video_addr_w(offs_t offset, u8 data, int num)
 {
 	struct vram_state_data &state = m_vram_state[num];
 
@@ -216,7 +216,7 @@ void leland_state::leland_video_addr_w(address_space &space, int offset, int dat
  *
  *************************************/
 
-int leland_state::leland_vram_port_r(address_space &space, int offset, int num)
+int leland_state::vram_port_r(offs_t offset, int num)
 {
 	struct vram_state_data *state = m_vram_state + num;
 	int addr = state->m_addr;
@@ -262,9 +262,9 @@ int leland_state::leland_vram_port_r(address_space &space, int offset, int num)
  *
  *************************************/
 
-void leland_state::leland_vram_port_w(address_space &space, int offset, int data, int num)
+void leland_state::vram_port_w(offs_t offset, u8 data, int num)
 {
-	uint8_t *video_ram = m_video_ram.get();
+	u8 *video_ram = m_video_ram.get();
 	struct vram_state_data *state = m_vram_state + num;
 	int addr = state->m_addr;
 	int inc = (offset >> 2) & 2;
@@ -344,32 +344,30 @@ void leland_state::leland_vram_port_w(address_space &space, int offset, int data
  *
  *************************************/
 
-WRITE8_MEMBER(leland_state::leland_master_video_addr_w)
+void leland_state::master_video_addr_w(offs_t offset, u8 data)
 {
-	leland_video_addr_w(space, offset, data, 0);
+	video_addr_w(offset, data, 0);
 }
 
 
 TIMER_CALLBACK_MEMBER(leland_state::leland_delayed_mvram_w)
 {
-	address_space &space = m_master->space(AS_PROGRAM);
-
 	int num = (param >> 16) & 1;
 	int offset = (param >> 8) & 0xff;
 	int data = param & 0xff;
-	leland_vram_port_w(space, offset, data, num);
+	vram_port_w(offset, data, num);
 }
 
 
-WRITE8_MEMBER(leland_state::leland_mvram_port_w)
+void leland_state::leland_mvram_port_w(offs_t offset, u8 data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(leland_state::leland_delayed_mvram_w),this), 0x00000 | (offset << 8) | data);
 }
 
 
-READ8_MEMBER(leland_state::leland_mvram_port_r)
+u8 leland_state::leland_mvram_port_r(offs_t offset)
 {
-	return leland_vram_port_r(space, offset, 0);
+	return vram_port_r(offset, 0);
 }
 
 
@@ -379,21 +377,21 @@ READ8_MEMBER(leland_state::leland_mvram_port_r)
  *
  *************************************/
 
-WRITE8_MEMBER(leland_state::leland_slave_video_addr_w)
+void leland_state::slave_video_addr_w(offs_t offset, u8 data)
 {
-	leland_video_addr_w(space, offset, data, 1);
+	video_addr_w(offset, data, 1);
 }
 
 
-WRITE8_MEMBER(leland_state::leland_svram_port_w)
+void leland_state::leland_svram_port_w(offs_t offset, u8 data)
 {
-	leland_vram_port_w(space, offset, data, 1);
+	vram_port_w(offset, data, 1);
 }
 
 
-READ8_MEMBER(leland_state::leland_svram_port_r)
+u8 leland_state::leland_svram_port_r(offs_t offset)
 {
-	return leland_vram_port_r(space, offset, 1);
+	return vram_port_r(offset, 1);
 }
 
 
@@ -403,17 +401,17 @@ READ8_MEMBER(leland_state::leland_svram_port_r)
  *
  *************************************/
 
-WRITE8_MEMBER(ataxx_state::ataxx_mvram_port_w)
+void ataxx_state::ataxx_mvram_port_w(offs_t offset, u8 data)
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(ataxx_state::leland_delayed_mvram_w),this), 0x00000 | (offset << 8) | data);
 }
 
 
-WRITE8_MEMBER(ataxx_state::ataxx_svram_port_w)
+void ataxx_state::ataxx_svram_port_w(offs_t offset, u8 data)
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
-	leland_vram_port_w(space, offset, data, 1);
+	vram_port_w(offset, data, 1);
 }
 
 
@@ -423,17 +421,17 @@ WRITE8_MEMBER(ataxx_state::ataxx_svram_port_w)
  *
  *************************************/
 
-READ8_MEMBER(ataxx_state::ataxx_mvram_port_r)
+u8 ataxx_state::ataxx_mvram_port_r(offs_t offset)
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
-	return leland_vram_port_r(space, offset, 0);
+	return vram_port_r(offset, 0);
 }
 
 
-READ8_MEMBER(ataxx_state::ataxx_svram_port_r)
+u8 ataxx_state::ataxx_svram_port_r(offs_t offset)
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
-	return leland_vram_port_r(space, offset, 1);
+	return vram_port_r(offset, 1);
 }
 
 
@@ -443,7 +441,7 @@ READ8_MEMBER(ataxx_state::ataxx_svram_port_r)
  *
  *************************************/
 
-uint32_t leland_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 leland_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->set_scrollx(0, m_xscroll);
 	m_tilemap->set_scrolly(0, m_yscroll);
@@ -452,8 +450,8 @@ uint32_t leland_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	/* for each scanline in the visible region */
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint16_t *const dst = &bitmap.pix16(y);
-		uint8_t const *const fg_src = &m_video_ram[y << 8];
+		u16 *const dst = &bitmap.pix16(y);
+		u8 const *const fg_src = &m_video_ram[y << 8];
 
 		/* for each pixel on the scanline */
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
