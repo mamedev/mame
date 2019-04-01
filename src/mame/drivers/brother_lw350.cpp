@@ -2061,9 +2061,3 @@ ROM_END
 //    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS           INIT     COMPANY         FULLNAME          FLAGS
 COMP( 1995, lw350,  0,   0,       lw350,  lw350, lw350_state,    empty_init,       "Brother",      "Brother LW-350", MACHINE_NODEVICE_PRINTER )
 COMP( 1992, lw450,  0,   0,       lw450,  lw350, lw450_state,    empty_init,       "Brother",      "Brother LW-450", MACHINE_NODEVICE_PRINTER )
-
-// test
-ROM_START(lw840)
-ROM_END
-
-COMP(1995, lw840, 0, 0, lw350, lw350, lw350_state, empty_init, "Brother", "Brother LW-350", MACHINE_NODEVICE_PRINTER)
