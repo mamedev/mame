@@ -310,14 +310,14 @@ static GFXDECODE_START( gfx_psikyosh )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x000, 0x100 ) // 8bpp tiles
 GFXDECODE_END
 
-WRITE8_MEMBER(psikyosh_state::eeprom_w)
+void psikyosh_state::eeprom_w(u8 data)
 {
-	m_eeprom->di_write((data & 0x20) ? 1 : 0);
-	m_eeprom->cs_write((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->clk_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write(BIT(data, 5));
+	m_eeprom->cs_write(BIT(data, 7));
+	m_eeprom->clk_write(BIT(data, 6));
 
 	if (data & ~0xe0)
-		logerror("Unk EEPROM write %x mask %x\n", data, mem_mask);
+		logerror("Unk EEPROM write %x\n", data);
 }
 
 INTERRUPT_GEN_MEMBER(psikyosh_state::interrupt)
@@ -327,7 +327,7 @@ INTERRUPT_GEN_MEMBER(psikyosh_state::interrupt)
 
 // VBL handler writes 0x00 on entry, 0xc0 on exit
 // bit 0 controls game speed on readback, mechanism is a little weird
-WRITE32_MEMBER(psikyosh_state::irqctrl_w)
+void psikyosh_state::irqctrl_w(u32 data)
 {
 	if (!(data & 0x00c00000))
 	{
@@ -336,9 +336,9 @@ WRITE32_MEMBER(psikyosh_state::irqctrl_w)
 }
 
 
-WRITE32_MEMBER(psikyosh_state::vidregs_w)
+void psikyosh_state::vidregs_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	uint32_t const old = m_vidregs[offset];
+	u32 const old = m_vidregs[offset];
 	data = COMBINE_DATA(&m_vidregs[offset]);
 
 	if (offset == 4) /* Configure bank for gfx test */
@@ -349,7 +349,7 @@ WRITE32_MEMBER(psikyosh_state::vidregs_w)
 }
 
 /* Mahjong Panel */
-READ32_MEMBER(psikyosh_state::mjgtaste_input_r)
+u32 psikyosh_state::mjgtaste_input_r()
 {
 /*
 Mahjong keyboard encoder -> JAMMA adapter (SK-G001). Created to allow the use of a Mahjong panel with the existing, recycled Dragon Blaze boards.
@@ -401,8 +401,8 @@ P1KEY11  29|30  P2KEY11
     GND  55|56  GND
 */
 
-	uint32_t const controls = m_controller_io->read();
-	uint32_t value = m_inputs->read();
+	u32 const controls = m_controller_io->read();
+	u32 value = m_inputs->read();
 
 	if (controls)
 	{
@@ -425,7 +425,7 @@ P1KEY11  29|30  P2KEY11
 			KEY11 = 0x0800  // JAMMA P1 Button 1
 		}; // Mahjong->JAMMA mapping specific to this game pcb
 
-		uint16_t key_codes[] = { // treated as IP_ACTIVE_LOW, game inverts them upon reading
+		u16 key_codes[] = { // treated as IP_ACTIVE_LOW, game inverts them upon reading
 //          ROW (distinct pins for P1 or P2) | COLUMN (shared for P1+P2)
 			KEY4 | KEY3,  // A
 			KEY4 | KEY2,  // B
@@ -448,12 +448,12 @@ P1KEY11  29|30  P2KEY11
 			KEY11 | KEY6, // Ron
 			KEY1 | KEY3   // Start
 		}; // generic Mahjong keyboard encoder, corresponds to ordering in input port
-		uint32_t keys = m_mahjong_io->read();
-		uint32_t which_key = 0x1;
+		u32 keys = m_mahjong_io->read();
+		u32 which_key = 0x1;
 		int count = 0;
 
 		// HACK: read IPT_START1 from "INPUTS" to avoid listing it twice or having two independent STARTs listed
-		uint32_t const start_depressed = ~value & 0x01000000;
+		u32 const start_depressed = ~value & 0x01000000;
 		keys |= start_depressed ? 1 << (ARRAY_LENGTH(key_codes) - 1) : 0; // and bung it in at the end
 
 		value |= 0xFFFF0000; // set top word
@@ -461,12 +461,12 @@ P1KEY11  29|30  P2KEY11
 			// since we can't handle multiple keys, just return the first one depressed
 			if((keys & which_key) && (count < ARRAY_LENGTH(key_codes)))
 			{
-				value &= ~((uint32_t)(key_codes[count]) << 16); // mask in selected word as IP_ACTIVE_LOW
+				value &= ~((u32)(key_codes[count]) << 16); // mask in selected word as IP_ACTIVE_LOW
 				break;
 			}
 			which_key <<= 1;
 			count++;
-		} while(which_key);
+		} while (which_key);
 	}
 
 	return value;
@@ -784,14 +784,12 @@ void psikyosh_state::psikyo3v1(machine_config &config)
 	EEPROM_93C56_8BIT(config, m_eeprom).default_value(0);
 
 	/* video hardware */
-	BUFFERED_SPRITERAM32(config, m_spriteram); /* If using alpha */
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0, 40*8-1, 0, 28*8-1);
 	m_screen->set_screen_update(FUNC(psikyosh_state::screen_update));
-	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram32_device::vblank_copy_rising));
+	m_screen->screen_vblank().set(FUNC(psikyosh_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyosh);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_888, 0x5000 / 4);
@@ -1233,7 +1231,7 @@ ROM_END
 void psikyosh_state::init_ps3()
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
-	m_maincpu->sh2drc_add_fastram(0x03000000, 0x0300ffff, 0, &m_spriteram->live()[0]);
+	m_maincpu->sh2drc_add_fastram(0x03000000, 0x0300ffff, 0, &m_spriteram[0]);
 	m_maincpu->sh2drc_add_fastram(0x03050000, 0x030501ff, 0, &m_zoomram[0]);
 	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_ram[0]);
 }
@@ -1241,7 +1239,7 @@ void psikyosh_state::init_ps3()
 void psikyosh_state::init_ps5()
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
-	m_maincpu->sh2drc_add_fastram(0x04000000, 0x0400ffff, 0, &m_spriteram->live()[0]);
+	m_maincpu->sh2drc_add_fastram(0x04000000, 0x0400ffff, 0, &m_spriteram[0]);
 	m_maincpu->sh2drc_add_fastram(0x04050000, 0x040501ff, 0, &m_zoomram[0]);
 	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_ram[0]);
 }

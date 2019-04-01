@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "video/bufsprite.h"
 #include "machine/eepromser.h"
 #include "cpu/sh/sh2.h"
 #include "emupal.h"
@@ -48,10 +47,10 @@ public:
 
 private:
 	/* memory pointers */
-	required_device<buffered_spriteram32_device> m_spriteram;
-	required_shared_ptr<uint32_t> m_zoomram;
-	required_shared_ptr<uint32_t> m_vidregs;
-	required_shared_ptr<uint32_t> m_ram;
+	required_shared_ptr<u32> m_spriteram;
+	required_shared_ptr<u32> m_zoomram;
+	required_shared_ptr<u32> m_vidregs;
+	required_shared_ptr<u32> m_ram;
 
 	required_memory_bank m_gfxrombank;
 
@@ -60,11 +59,26 @@ private:
 	optional_ioport m_mahjong_io;
 
 	/* video-related */
+	struct sprite_t
+	{
+		s32 ypos, xpos;
+		u8 high, wide;
+		u8 flpy, flpx;
+		u8 spr_pri, bg_pri;
+		u8 zoomy, zoomx;
+		u32 tnum;
+		u16 colr;
+		u8 dpth;
+		s16 alpha;
+	};
+
 	bitmap_ind8                 m_zoom_bitmap;
 	bitmap_ind16                m_z_bitmap;
 	bitmap_rgb32                m_bg_bitmap;
-	std::unique_ptr<uint16_t[]> m_bg_zoom;
-	std::unique_ptr<uint8_t[]>  m_alphatable;
+	std::unique_ptr<u16[]>      m_bg_zoom;
+	std::unique_ptr<u8[]>       m_alphatable;
+	std::unique_ptr<struct sprite_t []> m_spritelist;
+	const struct sprite_t *m_sprite_end;
 
 	/* devices */
 	required_device<sh2_device> m_maincpu;
@@ -75,36 +89,38 @@ private:
 
 	bool const FLIPSCREEN() { return ((m_vidregs[3] & 0x0000c000) == 0x0000c000); } // currently ignored
 
-	bool const BG_LARGE(uint8_t const n)        { return ((m_vidregs[7] << (4 * n)) & 0x00001000); }
-	bool const BG_DEPTH_8BPP(uint8_t const n)   { return ((m_vidregs[7] << (4 * n)) & 0x00004000); }
-	bool const BG_LAYER_ENABLE(uint8_t const n) { return ((m_vidregs[7] << (4 * n)) & 0x00008000); }
+	bool const BG_LARGE(u8 const n)        { return ((m_vidregs[7] << (4 * n)) & 0x00001000); }
+	bool const BG_DEPTH_8BPP(u8 const n)   { return ((m_vidregs[7] << (4 * n)) & 0x00004000); }
+	bool const BG_LAYER_ENABLE(u8 const n) { return ((m_vidregs[7] << (4 * n)) & 0x00008000); }
 
-	uint8_t const BG_TYPE(uint8_t const n) { return ((m_vidregs[6] << (8 * n)) & 0x7f000000) >> 24; }
-	bool const BG_LINE(uint8_t const n)    { return ((m_vidregs[6] << (8 * n)) & 0x80000000); }
+	u8 const BG_TYPE(u8 const n) { return ((m_vidregs[6] << (8 * n)) & 0x7f000000) >> 24; }
+	bool const BG_LINE(u8 const n)    { return ((m_vidregs[6] << (8 * n)) & 0x80000000); }
 
-	uint8_t const SPRITE_PRI(uint8_t const n) { return ((m_vidregs[2] << (4 * n)) & 0xf0000000) >> 28; }
+	u8 const SPRITE_PRI(u8 const n) { return ((m_vidregs[2] << (4 * n)) & 0xf0000000) >> 28; }
 
-	DECLARE_WRITE32_MEMBER(irqctrl_w);
-	DECLARE_WRITE32_MEMBER(vidregs_w);
-	DECLARE_READ32_MEMBER(mjgtaste_input_r);
-	DECLARE_WRITE8_MEMBER(eeprom_w);
+	void irqctrl_w(u32 data);
+	void vidregs_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 mjgtaste_input_r();
+	void eeprom_w(u8 data);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	INTERRUPT_GEN_MEMBER(interrupt);
-	void draw_scanline32_alpha(bitmap_rgb32 &bitmap, int32_t destx, int32_t desty, int32_t length, const uint32_t *srcptr, int alpha);
-	void draw_scanline32_argb(bitmap_rgb32 &bitmap, int32_t destx, int32_t desty, int32_t length, const uint32_t *srcptr);
-	void draw_scanline32_transpen(bitmap_rgb32 &bitmap, int32_t destx, int32_t desty, int32_t length, const uint32_t *srcptr);
-	void draw_bglayer(uint8_t const layer, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t const req_pri);
-	void cache_bitmap(int16_t const scanline, gfx_element *gfx, uint8_t const size, uint8_t const tilebank, int16_t const alpha, uint8_t *last_bank);
-	void draw_bglayerscroll(uint8_t const layer, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t const req_pri);
-	void draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t const req_pri);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t const req_pri);
+	void draw_scanline32_alpha(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr, int alpha);
+	void draw_scanline32_argb(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr);
+	void draw_scanline32_transpen(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr);
+	void draw_bglayer(u8 const layer, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 const req_pri);
+	void cache_bitmap(s16 const scanline, gfx_element *gfx, u8 const size, u8 const tilebank, s16 const alpha, u8 *last_bank);
+	void draw_bglayerscroll(u8 const layer, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 const req_pri);
+	void draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 const req_pri);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 const req_pri);
+	void get_sprites();
 	void prelineblend(bitmap_rgb32 &bitmap, const rectangle &cliprect );
-	void postlineblend(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t const req_pri);
+	void postlineblend(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 const req_pri);
 	void psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx,
-	uint32_t const code, uint16_t const color, uint8_t const flipx, uint8_t const flipy, int16_t const offsx, int16_t const offsy,
-	int16_t const alpha, uint32_t const zoomx, uint32_t const zoomy, uint8_t const wide, uint8_t const high, uint16_t const z);
+	u32 const code, u16 const color, u8 const flipx, u8 const flipy, s32 const offsx, s32 const offsy,
+	s16 const alpha, u32 const zoomx, u32 const zoomy, u8 const wide, u8 const high, u16 const z);
 	void ps3v1_map(address_map &map);
 	void ps5_map(address_map &map);
 	void ps5_mahjong_map(address_map &map);
