@@ -827,8 +827,8 @@ void ataxx_state::eeprom_w(u8 data)
 	if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", machine().describe_context(),
 			(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
 	m_eeprom->di_write (BIT(data, 4));
-	m_eeprom->clk_write(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->cs_write (BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write(BIT(data, 5));
+	m_eeprom->cs_write (BIT(data, 6));
 }
 
 
@@ -1126,16 +1126,16 @@ void leland_state::leland_master_output_w(offs_t offset, u8 data)
 	switch (offset)
 	{
 		case 0x09:  /* /MCONT */
-			m_slave->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-			m_wcol_enable = (data & 0x02);
-			m_slave->set_input_line(INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
-			m_slave->set_input_line(0, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+			m_slave->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+			m_wcol_enable = BIT(data, 1);
+			m_slave->set_input_line(INPUT_LINE_NMI, BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
+			m_slave->set_input_line(0, BIT(data, 3) ? CLEAR_LINE : ASSERT_LINE);
 
 			if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", machine().describe_context(),
 					(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
 			m_eeprom->di_write (BIT(data, 4));
-			m_eeprom->clk_write(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
-			m_eeprom->cs_write (BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
+			m_eeprom->clk_write(BIT(data, 5));
+			m_eeprom->cs_write (BIT(data, 6));
 			break;
 
 		case 0x0a:  /* /OGIA */
