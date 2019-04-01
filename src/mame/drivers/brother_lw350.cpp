@@ -1048,7 +1048,6 @@ uint32_t lw350_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap,
 	//if(BIT(io_70, 7))
 		//...
 
-
 	const rgb_t palette[]{
 		0xffffffff,
 		0xff000000,
@@ -2064,10 +2063,7 @@ COMP( 1995, lw350,  0,   0,       lw350,  lw350, lw350_state,    empty_init,    
 COMP( 1992, lw450,  0,   0,       lw450,  lw350, lw450_state,    empty_init,       "Brother",      "Brother LW-450", MACHINE_NODEVICE_PRINTER )
 
 // test
-ROM_START(lw30)
-ROM_END
 ROM_START(lw840)
 ROM_END
 
-COMP(1995, lw30, 0, 0, lw350, lw350, lw350_state, empty_init, "Brother", "Brother LW-350", MACHINE_NODEVICE_PRINTER)
 COMP(1995, lw840, 0, 0, lw350, lw350, lw350_state, empty_init, "Brother", "Brother LW-350", MACHINE_NODEVICE_PRINTER)

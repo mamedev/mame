@@ -1,5 +1,4 @@
-﻿#if 0
-// license:BSD-3-Clause
+﻿// license:BSD-3-Clause
 // copyright-holders:Bartman/Abyss
 
 #include "emu.h"
@@ -493,12 +492,14 @@ class lw30_state : public driver_device
 public:
 	lw30_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette"),
+		maincpu(*this, "maincpu"),
+		screen(*this, "screen"),
 		floppy(*this, "floppy"),
-		m_speaker(*this, "beeper"),
+		beeper(*this, "beeper"),
 		m_io_kbrow(*this, "kbrow.%u", 0)
 	{ }
+
+	void lw30(machine_config& config);
 
 	// helpers
 	std::string pc();
@@ -506,10 +507,11 @@ public:
 	std::string callstack();
 
 	// devices
-	required_device<z180_device> m_maincpu;
-	required_device<palette_device> m_palette;
+	required_device<z180_device> maincpu;
+	required_device<screen_device> screen;
+
 	required_device<lw30_floppy_connector> floppy;
-	required_device<brother_beep_device> m_speaker;
+	required_device<brother_beep_device> beeper;
 	optional_ioport_array<9> m_io_kbrow;
 
 	// screen updates
@@ -609,6 +611,45 @@ protected:
 
 	virtual void video_start() override;
 
+	void map_program(address_map& map) {
+		map(0x00000, 0x01fff).rom();
+		map(0x02000, 0x05fff).ram();
+		map(0x06000, 0x3ffff).rom();
+		map(0x50000, 0x51fff).ram(); // ???
+		map(0x61000, 0x61fff).ram();
+		map(0x42000, 0x45fff).rw(FUNC(lw30_state::rom42000_r), FUNC(lw30_state::illegal_w)); // => ROM 0x02000-0x05fff
+		map(0x65000, 0x70fff).ram();
+	}
+
+	void map_io(address_map& map) {
+		map.global_mask(0xff);
+		map(0x00, 0x3f).noprw(); // Z180 internal registers
+
+		map(0x70, 0x70).w(FUNC(lw30_state::video_cursor_x_w));
+		map(0x71, 0x71).w(FUNC(lw30_state::video_cursor_y_w));
+		map(0x72, 0x72).w(FUNC(lw30_state::video_pos_x_w));
+		map(0x73, 0x73).w(FUNC(lw30_state::video_pos_y_w));
+		map(0x74, 0x74).rw(FUNC(lw30_state::video_data_r), FUNC(lw30_state::video_data_w));
+		map(0x75, 0x75).w(FUNC(lw30_state::video_control_w));
+		map(0x76, 0x76).noprw(); // NOP just to shut up the log
+		map(0x77, 0x77).r(FUNC(lw30_state::io_77_r)).nopw(); // NOP just to shut up the log
+
+		// floppy
+		map(0x80, 0x80).r(FUNC(lw30_state::io_80_r));
+		map(0x88, 0x88).noprw(); // NOP just to shut up the log
+		map(0x90, 0x90).rw(FUNC(lw30_state::io_90_r), FUNC(lw30_state::io_90_w));
+		map(0x98, 0x98).noprw(); // NOP just to shut up the log
+
+		map(0xa8, 0xa8).noprw(); // NOP just to shut up the log
+		map(0xb0, 0xb0).noprw(); // NOP just to shut up the log
+		map(0xb8, 0xb8).rw(FUNC(lw30_state::io_b8_r), FUNC(lw30_state::io_b8_w));
+		map(0xd8, 0xd8).noprw(); // NOP just to shut up the log
+		map(0xf0, 0xf0).w(FUNC(lw30_state::beeper_w));
+		map(0xf8, 0xf8).w(FUNC(lw30_state::irqack_w));
+
+		//map(0x40, 0xff).rw(FUNC(lw30_state::illegal_io_r), FUNC(lw30_state::illegal_io_w));
+	}
+
 	uint8_t* rom{};
 	std::map<uint32_t, std::string> symbols;
 };
@@ -619,7 +660,7 @@ void lw30_state::video_start()
 
 std::string lw30_state::pc()
 {
-	class z180_friend : public z180_device { friend class lw30_state; };
+	class z180_friend : public z180_device { public: using z180_device::memory_translate; friend class lw350_state; };
 	auto cpu = static_cast<z180_friend*>(dynamic_cast<z180_device*>(&machine().scheduler().currently_executing()->device()));
 	offs_t phys = cpu->pc();
 	cpu->memory_translate(AS_PROGRAM, 0, phys);
@@ -643,7 +684,7 @@ std::string lw30_state::symbolize(uint32_t adr)
 
 std::string lw30_state::callstack()
 {
-	class z180_friend : z180_device { friend class lw30_state; };
+	class z180_friend : public z180_device { public: using z180_device::memory_translate; friend class lw350_state; };
 	auto cpu = static_cast<z180_friend*>(dynamic_cast<z180_device*>(&machine().scheduler().currently_executing()->device()));
 	offs_t pc = cpu->pc();
 	cpu->memory_translate(AS_PROGRAM, 0, pc);
@@ -1020,7 +1061,10 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 		invert_lower_half	= 0b01000000
 	};
 
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	const rgb_t palette[]{
+		0xffffffff,
+		0xff000000,
+	};
 
 	enum control : uint8_t {
 		display_on          = 0b00000001,
@@ -1169,45 +1213,6 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 	return 0;
 }
 
-static ADDRESS_MAP_START( lw30_map, AS_PROGRAM, 8, lw30_state )
-	AM_RANGE(0x00000, 0x01fff) AM_ROM
-	AM_RANGE(0x02000, 0x05fff) AM_RAM
-	AM_RANGE(0x06000, 0x3ffff) AM_ROM
-	AM_RANGE(0x50000, 0x51fff) AM_RAM // ???
-	AM_RANGE(0x61000, 0x61fff) AM_RAM
-	AM_RANGE(0x42000, 0x45fff) AM_READWRITE(rom42000_r, illegal_w) // => ROM 0x02000-0x05fff
-	AM_RANGE(0x65000, 0x70fff) AM_RAM
-	ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( lw30_io, AS_IO, 8, lw30_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x3f) AM_NOP // Z180 internal registers
-
-	AM_RANGE(0x70, 0x70) AM_WRITE(video_cursor_x_w)
-	AM_RANGE(0x71, 0x71) AM_WRITE(video_cursor_y_w)
-	AM_RANGE(0x72, 0x72) AM_WRITE(video_pos_x_w)
-	AM_RANGE(0x73, 0x73) AM_WRITE(video_pos_y_w)
-	AM_RANGE(0x74, 0x74) AM_READWRITE(video_data_r, video_data_w)
-	AM_RANGE(0x75, 0x75) AM_WRITE(video_control_w)
-	AM_RANGE(0x76, 0x76) AM_NOP // NOP just to shut up the log
-	AM_RANGE(0x77, 0x77) AM_READ(io_77_r) AM_WRITENOP // NOP just to shut up the log
-
-	// floppy
-	AM_RANGE(0x80, 0x80) AM_READ(io_80_r)
-	AM_RANGE(0x88, 0x88) AM_NOP // NOP just to shut up the log
-	AM_RANGE(0x90, 0x90) AM_READWRITE(io_90_r, io_90_w)
-	AM_RANGE(0x98, 0x98) AM_NOP // NOP just to shut up the log
-
-	AM_RANGE(0xa8, 0xa8) AM_NOP // NOP just to shut up the log
-	AM_RANGE(0xb0, 0xb0) AM_NOP // NOP just to shut up the log
-	AM_RANGE(0xb8, 0xb8) AM_READWRITE(io_b8_r, io_b8_w)
-	AM_RANGE(0xd8, 0xd8) AM_NOP // NOP just to shut up the log
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(beeper_w)
-	AM_RANGE(0xf8, 0xf8) AM_WRITE(irqack_w)
-
-	AM_RANGE(0x40, 0xff) AM_READWRITE(illegal_io_r, illegal_io_w)
-ADDRESS_MAP_END
-
 READ8_MEMBER(lw30_state::rom42000_r)
 {
 	return rom[0x02000 + offset] & mem_mask;
@@ -1237,7 +1242,7 @@ WRITE8_MEMBER(lw30_state::illegal_io_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(lw30_state::int1_timer_callback)
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+	maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 // Tetris Game Over Melody:
@@ -1257,7 +1262,7 @@ WRITE8_MEMBER(lw30_state::beeper_w)
 	static uint8_t lastData{};
 	static attotime last{};
 	static attotime lastDifferent{};
-	attotime cur{ m_maincpu->local_time() };
+	attotime cur{ maincpu->local_time() };
 
 	logerror("beeper_w(%02X) @ %s (delta=%sµs diff_delta=%sµs)\n", data, cur.as_string(), ((cur - last) * 1000000).as_string(0), ((cur - lastDifferent) * 1000000).as_string(0));
 	if(data != lastData)
@@ -1266,12 +1271,12 @@ WRITE8_MEMBER(lw30_state::beeper_w)
 	lastData = data;
 #endif
 
-	m_speaker->set_state(data);
+	beeper->set_state(data);
 }
 
 WRITE8_MEMBER(lw30_state::irqack_w)
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+	maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(lw30_state::video_data_w)
@@ -1327,6 +1332,8 @@ READ8_MEMBER(lw30_state::io_b8_r)
 
 void lw30_state::machine_start()
 {
+	screen->set_visible_area(0, 480 - 1, 0, 128 - 1);
+
 	// try to load map file
 	FILE* f;
 	if(fopen_s(&f, "lw30.map", "rt") == 0) {
@@ -1459,36 +1466,32 @@ INPUT_PORTS_END
 
 #pragma endregion
 
-static SLOT_INTERFACE_START(lw30_floppies)
-	SLOT_INTERFACE("35dd", LW30_FLOPPY)
-SLOT_INTERFACE_END
-
-static MACHINE_CONFIG_START( lw30 )
+void lw30_state::lw30(machine_config& config) {
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz/2 /* 10314285/2 */)
-	MCFG_CPU_PROGRAM_MAP(lw30_map)
-	MCFG_CPU_IO_MAP(lw30_io)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("1khz", lw30_state, int1_timer_callback, attotime::from_hz(1000))
+	Z180(config, maincpu, 12'000'000 / 2);
+	maincpu->set_addrmap(AS_PROGRAM, &lw30_state::map_program);
+	maincpu->set_addrmap(AS_IO, &lw30_state::map_io);
+	TIMER(config, "1khz").configure_periodic(FUNC(lw30_state::int1_timer_callback), attotime::from_hz(1000));
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t(6, 245, 206))
-	MCFG_SCREEN_REFRESH_RATE(78.1)
-	MCFG_SCREEN_UPDATE_DRIVER(lw30_state, screen_update)
-	MCFG_SCREEN_SIZE(480, 128)
-	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
-	MCFG_PALETTE_ADD_MONOCHROME_INVERTED("palette")
+	SCREEN(config, screen, SCREEN_TYPE_RASTER);
+	screen->set_color(rgb_t(6, 245, 206));
+	screen->set_physical_aspect(480, 128);
+	screen->set_refresh_hz(78.1);
+	screen->set_screen_update(FUNC(lw30_state::screen_update));
+	screen->set_size(480, 128);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("cursor", lw30_state, cursor_timer_callback, attotime::from_msec(512))
+	TIMER(config, "cursor").configure_periodic(FUNC(lw30_state::cursor_timer_callback), attotime::from_msec(512));
 
 	// floppy disk
- 	MCFG_DEVICE_ADD("floppy", LW30_FLOPPY_CONNECTOR, 0);
- 	MCFG_DEVICE_SLOT_INTERFACE(lw30_floppies, "35dd", false);
+	LW30_FLOPPY_CONNECTOR(config, floppy, 0);
+	floppy->option_add("35dd", LW30_FLOPPY);
+	floppy->set_default_option("35dd");
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BROTHER_BEEP, 4000) // 4.0 kHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	BROTHER_BEEP(config, beeper, 4'000).add_route(ALL_OUTPUTS, "mono", 1.0); // 4.0 kHz
+}
 
 #pragma endregion
 
@@ -1505,5 +1508,4 @@ ROM_START( lw30 )
 ROM_END
 
 //    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS           INIT     COMPANY         FULLNAME          FLAGS
-COMP( 1991, lw30,   0,   0,       lw30,   lw30,  lw30_state,     0,       "Brother",      "Brother LW-30",  MACHINE_NODEVICE_PRINTER )
-#endif
+COMP( 1991, lw30,   0,   0,       lw30,   lw30,  lw30_state,     empty_init,       "Brother",      "Brother LW-30",  MACHINE_NODEVICE_PRINTER )
