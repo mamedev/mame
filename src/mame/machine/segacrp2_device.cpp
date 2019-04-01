@@ -5,7 +5,7 @@
   Sega encryption emulation                                 by Nicola Salmoria
 
 
-  This encryption is an evolution of the one implemented in segacrpt.c.
+  This encryption is an evolution of the one implemented in segacrpt.cpp.
   It works on more data and address bits but apart from that it's essentially
   the same.
 
@@ -87,7 +87,7 @@ static void decode(uint8_t *rom, uint8_t *decrypted,
 DEFINE_DEVICE_TYPE(SEGA_315_5179, sega_315_5179_device, "sega_315_5179", "Sega 315-5179")
 DEFINE_DEVICE_TYPE(SEGA_315_5178, sega_315_5178_device, "sega_315_5178", "Sega 315-5178")
 DEFINE_DEVICE_TYPE(SEGA_315_5177, sega_315_5177_device, "sega_315_5177", "Sega 315-5177") // also seen as 317-5000
-DEFINE_DEVICE_TYPE(SEGA_315_5176, sega_315_5176_device, "sega_315_5176", "Sega 315-5176") // TODO!
+DEFINE_DEVICE_TYPE(SEGA_315_5176, sega_315_5176_device, "sega_315_5176", "Sega 315-5176")
 DEFINE_DEVICE_TYPE(SEGA_315_5162, sega_315_5162_device, "sega_315_5162", "Sega 315-5162")
 
 DEFINE_DEVICE_TYPE(SEGA_317_0004, sega_317_0004_device, "sega_317_0004", "Sega 317-0004")
