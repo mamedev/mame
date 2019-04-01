@@ -1,5 +1,4 @@
-﻿#if 0
-// license:BSD-3-Clause
+﻿// license:BSD-3-Clause
 // copyright-holders:Bartman/Abyss
 
 #include "emu.h"
@@ -11,6 +10,7 @@
 #include "debug/debugcpu.h"
 #include "sound/beep.h"
 #include "machine/upd765.h"
+#include "imagedev/floppy.h"
 #include "formats/pc_dsk.h"
 
 // fixed eepmov.b instruction in h8.lst
@@ -95,9 +95,6 @@ public:
 
 DEFINE_DEVICE_TYPE(GM82C765B, gm82c765b_device, "gm82c765b", "GM82C765B")
 
-#define MCFG_GM82C765B_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, GM82C765B, 0)
-
 gm82c765b_device::gm82c765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : 
 	upd765_family_device(mconfig, GM82C765B, tag, owner, clock)
 {
@@ -114,12 +111,14 @@ public:
 	lw840_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		maincpu(*this, "maincpu"),
-		palette(*this, "palette"),
+		screen(*this, "screen"),
 		fdc(*this, "fdc"),
 		beeper(*this, "beeper"),
 		io_kbrow(*this, "kbrow.%u", 0)
 		//floppy(*this, "floppy"),
 	{ }
+
+	void lw840(machine_config& config);
 
 	// helpers
 	std::string pc();
@@ -128,7 +127,7 @@ public:
 
 	// devices
 	required_device<h83002_device> maincpu;
-	required_device<palette_device> palette;
+	required_device<screen_device> screen;
 	//required_device<lw840_floppy_connector> floppy;
 	required_device<gm82c765b_device> fdc;
 	required_device<beep_device> beeper;
@@ -183,6 +182,20 @@ protected:
 
 	virtual void video_start() override;
 
+	void map_program(address_map& map) {
+		map(0x000000, 0x3fffff).rom();
+		map(0x5f8000, 0x5fffff).ram().share("sram"); // SRAM
+		map(0x600000, 0x67ffff).ram(); // DRAM
+		map(0xe00000, 0xe00007).m(fdc, FUNC(gm82c765b_device::map));
+		map(0xe00030, 0xe00041).noprw(); // just to shut up the error.log
+		map(0xec0000, 0xec0001).rw(FUNC(lw840_state::keyboard_r), FUNC(lw840_state::keyboard_w));
+		map(0xec0004, 0xec0005).r(FUNC(lw840_state::disk_inserted_r));
+	}
+
+	void map_io(address_map& map) {
+		map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(lw840_state::port7_r));
+	}
+
 	uint8_t keyboard{};
 	uint8_t irq_toggle{};
 
@@ -191,28 +204,13 @@ protected:
 	std::map<uint32_t, std::string> symbols;
 };
 
-void lw840_map(address_map& map)
-{
-	map(0x000000, 0x3fffff).rom();
-	map(0x5f8000, 0x5fffff).ram().share("sram"); // SRAM
-	map(0x600000, 0x67ffff).ram(); // DRAM
-	//map(0xe00000, 0xe00007).AM_DEVICE8("fdc", gm82c765b_device, map, 0xff) //??
-	map(0xe00030, 0xe00041).nop(); // just to shut up the error.log
-	map(0xec0000, 0xec0001).rw(FUNC(keyboard_r), FUNC(keyboard_w));
-	map(0xec0004, 0xec0005).r(FUNC(disk_inserted_r));
-}
-
-static ADDRESS_MAP_START(lw840_io_map, AS_IO, 16, lw840_state)
-	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ(port7_r)
-ADDRESS_MAP_END
-
 void lw840_state::video_start()
 {
 }
 
 std::string lw840_state::pc()
 {
-	auto pc = machine().scheduler().currently_executing()->device().safe_pc();
+	auto pc = machine().device<cpu_device>("maincpu")->pc();
  	return symbolize(pc);
 }
 
@@ -234,7 +232,10 @@ std::string lw840_state::callstack()
 
 uint32_t lw840_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
-	const rgb_t *palette = this->palette->palette()->entry_list_raw();
+	const rgb_t palette[]{
+		0xffffffff,
+		0xff000000,
+	};
 
 	for(auto y = 0; y < 400; y++) {
 		uint32_t* p = &bitmap.pix32(y);
@@ -260,6 +261,8 @@ WRITE8_MEMBER(lw840_state::illegal_w)
 
 void lw840_state::machine_start()
 {
+	screen->set_visible_area(0, 640 - 1, 0, 400 - 1);
+
 	// try to load map file
 	FILE* f;
 	if(fopen_s(&f, "lw840.map", "rt") == 0) {
@@ -390,43 +393,41 @@ FLOPPY_FORMATS_MEMBER(lw840_state::floppy_formats)
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( lw840_floppies )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
-SLOT_INTERFACE_END
+static void lw840_floppies(device_slot_interface& device) {
+	device.option_add("35hd", FLOPPY_35_HD);
+}
 
-static MACHINE_CONFIG_START( lw840 )
+void lw840_state::lw840(machine_config& config) {
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", H83002, XTAL_14_7456MHz)
-	MCFG_CPU_PROGRAM_MAP(lw840_map)
-	MCFG_CPU_IO_MAP(lw840_io_map)
-	MCFG_H83002_TEND0_CALLBACK(DEVWRITELINE("fdc", gm82c765b_device, tc_line_w))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("1khz", lw840_state, int2_timer_callback, attotime::from_hz(2*1000))
+	H83002(config, maincpu, 14'745'600);
+	maincpu->set_addrmap(AS_PROGRAM, &lw840_state::map_program);
+	maincpu->set_addrmap(AS_IO, &lw840_state::map_io);
+	maincpu->tend0().set("fdc", FUNC(gm82c765b_device::tc_line_w));
+	TIMER(config, "2khz").configure_periodic(FUNC(lw840_state::int2_timer_callback), attotime::from_hz(2*1000));
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white())
-	MCFG_SCREEN_REFRESH_RATE(78.1) // TODO: measure!
-	MCFG_SCREEN_UPDATE_DRIVER(lw840_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MCFG_PALETTE_ADD_MONOCHROME_INVERTED("palette")
+	SCREEN(config, screen, SCREEN_TYPE_RASTER);
+	screen->set_color(rgb_t::white());
+	screen->set_physical_aspect(640, 400);
+	screen->set_screen_update(FUNC(lw840_state::screen_update));
+	screen->set_refresh_hz(78.1); // TODO: measure!
+	screen->set_size(640, 400);
 
 	// floppy
-	MCFG_GM82C765B_ADD("fdc")
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, lw840_state, fdc_interrupt))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, lw840_state, fdc_drq))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", lw840_floppies, "35hd", lw840_state::floppy_formats)
+	GM82C765B(config, fdc, 0);
+	fdc->intrq_wr_callback().set(FUNC(lw840_state::fdc_interrupt));
+	fdc->drq_wr_callback().set(FUNC(lw840_state::fdc_drq));
+	FLOPPY_CONNECTOR(config, "fdc:0", lw840_floppies, "35hd", lw840_state::floppy_formats);
 
-	// sound hardware - dummy
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 4000) // 4.0 kHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 4'000).add_route(ALL_OUTPUTS, "mono", 1.0); // 4.0 kHz
+}
 
 ROM_START( lw840 )
 	ROM_REGION(0x400000, "maincpu", 0)
 	ROM_LOAD("us3122-a", 0x00000, 0x400000, CRC(70A3A4A6) SHA1(11e32c7da58800d69af29089f7e7deeab513b1ae))
 ROM_END
 
-//    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS           INIT     COMPANY         FULLNAME            FLAGS
-COMP( 1997, lw840,  0,   0,       lw840,  lw840, lw840_state,    0,       "Brother",      "Brother LW-840ic", MACHINE_NODEVICE_PRINTER )
-#endif
+//    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS         INIT        COMPANY         FULLNAME            FLAGS
+COMP( 1997, lw840,  0,   0,       lw840,  lw840, lw840_state,  empty_init, "Brother",      "Brother LW-840ic", MACHINE_NODEVICE_PRINTER )
