@@ -459,7 +459,7 @@ void deco_bac06_device::pf_control_0_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
-u16 deco_bac06_device::pf_control_1_r(offs_t offset, u16 mem_mask)
+u16 deco_bac06_device::pf_control_1_r(offs_t offset)
 {
 	offset &= 7;
 	return m_pf_control_1[offset];
@@ -484,7 +484,7 @@ void deco_bac06_device::pf_data_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
-u16 deco_bac06_device::pf_data_r(offs_t offset, u16 mem_mask)
+u16 deco_bac06_device::pf_data_r(offs_t offset)
 {
 	if (m_rambank&1) offset+=0x1000;
 
@@ -502,9 +502,9 @@ void deco_bac06_device::pf_data_8bit_w(offs_t offset, u8 data)
 u8 deco_bac06_device::pf_data_8bit_r(offs_t offset)
 {
 	if (offset&1) /* MSB */
-		return pf_data_r(offset/2,0x00ff);
+		return pf_data_r(offset/2);
 	else
-		return pf_data_r(offset/2,0xff00)>>8;
+		return pf_data_r(offset/2)>>8;
 }
 
 void deco_bac06_device::pf_rowscroll_w(offs_t offset, u16 data, u16 mem_mask)
@@ -517,12 +517,12 @@ void deco_bac06_device::pf_colscroll_w(offs_t offset, u16 data, u16 mem_mask)
 	COMBINE_DATA(&m_pf_colscroll[offset]);
 }
 
-u16 deco_bac06_device::pf_rowscroll_r(offs_t offset, u16 mem_mask)
+u16 deco_bac06_device::pf_rowscroll_r(offs_t offset)
 {
 	return m_pf_rowscroll[offset];
 }
 
-u16 deco_bac06_device::pf_colscroll_r(offs_t offset, u16 mem_mask)
+u16 deco_bac06_device::pf_colscroll_r(offs_t offset)
 {
 	return m_pf_colscroll[offset];
 }
@@ -540,9 +540,9 @@ void deco_bac06_device::pf_control0_8bit_w(offs_t offset, u8 data)
 u8 deco_bac06_device::pf_control1_8bit_r(offs_t offset)
 {
 	if (offset&1)
-		return pf_control_1_r(offset/2,0x00ff);
+		return pf_control_1_r(offset/2);
 	else
-		return pf_control_1_r(offset/2,0xff00)>>8;
+		return pf_control_1_r(offset/2)>>8;
 }
 
 /* used by dec8.cpp */
@@ -567,9 +567,9 @@ void deco_bac06_device::pf_control1_8bit_w(offs_t offset, u8 data)
 u8 deco_bac06_device::pf_rowscroll_8bit_r(offs_t offset)
 {
 	if (offset&1)
-		return pf_rowscroll_r(offset/2,0x00ff);
+		return pf_rowscroll_r(offset/2);
 	else
-		return pf_rowscroll_r(offset/2,0xff00)>>8;
+		return pf_rowscroll_r(offset/2)>>8;
 }
 
 
@@ -584,9 +584,9 @@ void deco_bac06_device::pf_rowscroll_8bit_w(offs_t offset, u8 data)
 u8 deco_bac06_device::pf_rowscroll_8bit_swap_r(offs_t offset)
 {
 	if (offset&1)
-		return pf_rowscroll_r(offset/2,0xff00)>>8;
+		return pf_rowscroll_r(offset/2)>>8;
 	else
-		return pf_rowscroll_r(offset/2,0x00ff);
+		return pf_rowscroll_r(offset/2);
 }
 
 void deco_bac06_device::pf_rowscroll_8bit_swap_w(offs_t offset, u8 data)

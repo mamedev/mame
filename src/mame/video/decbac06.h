@@ -69,16 +69,16 @@ public:
 
 	/* 16-bit accessors */
 
-	void pf_control_0_w(offs_t offset, u16 data, u16 mem_mask);
-	u16 pf_control_1_r(offs_t offset, u16 mem_mask);
-	void pf_control_1_w(offs_t offset, u16 data, u16 mem_mask);
+	void pf_control_0_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 pf_control_1_r(offs_t offset);
+	void pf_control_1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	void pf_data_w(offs_t offset, u16 data, u16 mem_mask);
-	u16 pf_data_r(offs_t offset, u16 mem_mask);
-	void pf_rowscroll_w(offs_t offset, u16 data, u16 mem_mask);
-	u16 pf_rowscroll_r(offs_t offset, u16 mem_mask);
-	void pf_colscroll_w(offs_t offset, u16 data, u16 mem_mask);
-	u16 pf_colscroll_r(offs_t offset, u16 mem_mask);
+	void pf_data_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 pf_data_r(offs_t offset);
+	void pf_rowscroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 pf_rowscroll_r(offs_t offset);
+	void pf_colscroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 pf_colscroll_r(offs_t offset);
 
 	/* 8-bit accessors */
 
