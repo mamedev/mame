@@ -18,29 +18,29 @@ WRITE16_MEMBER(raiden2_state::m_videoram_private_w)
 
 	if (offset < 0x800 / 2)
 	{
-		background_w(space, offset, data, 0xffff);
+		background_w(offset, data, 0xffff);
 	}
 	else if (offset < 0x1000 /2)
 	{
 		offset -= 0x800 / 2;
-		foreground_w(space, offset, data, 0xffff);
+		foreground_w(offset, data, 0xffff);
 	}
 	else if (offset < 0x1800/2)
 	{
 		offset -= 0x1000 / 2;
-		midground_w(space, offset, data, 0xffff);
+		midground_w(offset, data, 0xffff);
 	}
 	else if (offset < 0x2800/2)
 	{
 		offset -= 0x1800 / 2;
-		text_w(space, offset, data, 0xffff);
+		text_w(offset, data, 0xffff);
 	}
 }
 
 
 void raiden2_state::draw_sprites(const rectangle &cliprect)
 {
-	uint16_t *source = m_spriteram + (0x1000/2)-4;
+	u16 *source = m_spriteram + (0x1000/2)-4;
 	m_sprite_bitmap.fill(0xf, cliprect);
 
 	gfx_element *gfx = m_gfxdecode->gfx(2);
@@ -52,7 +52,8 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 	  06 yyyy yyyy yyyy yyyy   y = ypos
 	 */
 
-	while( source >= m_spriteram ){
+	while (source >= m_spriteram)
+	{
 		int tile_number = source[1];
 		int sx = source[2];
 		int sy = source[3];
@@ -149,39 +150,40 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 
 }
 
-WRITE16_MEMBER(raiden2_state::background_w)
+void raiden2_state::background_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_back_data[offset]);
 	m_background_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(raiden2_state::midground_w)
+void raiden2_state::midground_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_mid_data[offset]);
 	m_midground_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(raiden2_state::foreground_w)
+void raiden2_state::foreground_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_fore_data[offset]);
 	m_foreground_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(raiden2_state::text_w)
+void raiden2_state::text_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_text_data[offset]);
 	m_text_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(raiden2_state::tilemap_enable_w)
+void raiden2_state::tilemap_enable_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_tilemap_enable);
 }
 
-WRITE16_MEMBER(raiden2_state::tile_scroll_w)
+void raiden2_state::tile_scroll_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	tilemap_t *tm = nullptr;
-	switch(offset/2) {
+	switch (offset/2)
+	{
 	case 0: tm = m_background_layer; break;
 	case 1: tm = m_midground_layer; break;
 	case 2: tm = m_foreground_layer; break;
@@ -191,52 +193,57 @@ WRITE16_MEMBER(raiden2_state::tile_scroll_w)
 	COMBINE_DATA(&m_scrollvals[offset]);
 	data = m_scrollvals[offset];
 
-	if(offset & 1)
+	if (offset & 1)
 		tm->set_scrolly(0, data);
 	else
 		tm->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(raiden2_state::tile_bank_01_w)
+void raiden2_state::tile_bank_01_w(u8 data)
 {
 	int new_bank;
 	new_bank = 0 | ((data & 1)<<1);
-	if(new_bank != m_bg_bank) {
+	if (new_bank != m_bg_bank)
+	{
 		m_bg_bank = new_bank;
 		m_background_layer->mark_all_dirty();
 	}
 
 	new_bank = 1 | (data & 2);
-	if(new_bank != m_mid_bank) {
+	if (new_bank != m_mid_bank)
+	{
 		m_mid_bank = new_bank;
 		m_midground_layer->mark_all_dirty();
 	}
 }
 
-READ16_MEMBER(raiden2_state::cop_tile_bank_2_r)
+u16 raiden2_state::cop_tile_bank_2_r()
 {
 	return m_cop_bank;
 }
 
-WRITE16_MEMBER(raiden2_state::cop_tile_bank_2_w)
+void raiden2_state::cop_tile_bank_2_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_cop_bank);
 
-	if(ACCESSING_BITS_8_15) {
+	if (ACCESSING_BITS_8_15)
+	{
 		int new_bank = 4 | (data >> 14);
-		if(new_bank != m_fg_bank) {
+		if (new_bank != m_fg_bank)
+		{
 			m_fg_bank = new_bank;
 			m_foreground_layer->mark_all_dirty();
 		}
 	}
 }
 
-WRITE16_MEMBER(raiden2_state::raidendx_cop_bank_2_w)
+void raiden2_state::raidendx_cop_bank_2_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_cop_bank);
 
 	int new_bank = 4 | ((m_cop_bank >> 4) & 3);
-	if(new_bank != m_fg_bank) {
+	if (new_bank != m_fg_bank)
+	{
 		m_fg_bank = new_bank;
 		m_foreground_layer->mark_all_dirty();
 	}
@@ -293,12 +300,12 @@ void raiden2_state::video_start()
 	m_screen->register_screen_bitmap(m_tile_bitmap);
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
-	m_back_data = make_unique_clear<uint16_t[]>(0x800/2);
-	m_fore_data = make_unique_clear<uint16_t[]>(0x800/2);
-	m_mid_data = make_unique_clear<uint16_t[]>(0x800/2);
-	m_text_data = make_unique_clear<uint16_t[]>(0x1000/2);
-	m_palette_data = make_unique_clear<uint16_t[]>(0x1000/2);
-	m_palette->basemem().set(m_palette_data.get(), 0x1000/2 * sizeof(uint16_t), 16, ENDIANNESS_LITTLE, 2);
+	m_back_data = make_unique_clear<u16[]>(0x800/2);
+	m_fore_data = make_unique_clear<u16[]>(0x800/2);
+	m_mid_data = make_unique_clear<u16[]>(0x800/2);
+	m_text_data = make_unique_clear<u16[]>(0x1000/2);
+	m_palette_data = make_unique_clear<u16[]>(0x1000/2);
+	m_palette->basemem().set(m_palette_data.get(), 0x1000/2 * sizeof(u16), 16, ENDIANNESS_LITTLE, 2);
 
 	save_pointer(NAME(m_back_data), 0x800/2);
 	save_pointer(NAME(m_fore_data), 0x800/2);
@@ -314,20 +321,23 @@ void raiden2_state::video_start()
 
 void raiden2_state::blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind16 &source, int layer)
 {
-	if(layer == -1)
+	if (layer == -1)
 		return;
 
 	const pen_t *pens = &m_palette->pen(0);
 	layer <<= 14;
-	for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
-		const uint16_t *src = &source.pix16(y, cliprect.min_x);
-		uint32_t *dst = &bitmap.pix32(y, cliprect.min_x);
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x++) {
-			uint16_t val = *src++;
-			if((val & 0xc000) == layer && (val & 0x000f) != 0x000f) {
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		const u16 *src = &source.pix16(y, cliprect.min_x);
+		u32 *dst = &bitmap.pix32(y, cliprect.min_x);
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			u16 val = *src++;
+			if ((val & 0xc000) == layer && (val & 0x000f) != 0x000f)
+			{
 				val &= 0x07ff;
 
-				if(m_blend_active[val])
+				if (m_blend_active[val])
 					*dst = alpha_blend_r32(*dst, pens[val], 0x7f);
 				else
 					*dst = pens[val];
@@ -343,10 +353,11 @@ void raiden2_state::tilemap_draw_and_blend(screen_device &screen, bitmap_rgb32 &
 	blend_layer(bitmap, cliprect, m_tile_bitmap, 0);
 }
 
-uint32_t raiden2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 raiden2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	if (!(m_tilemap_enable & 16)) {
+	if (!(m_tilemap_enable & 16))
+	{
 		draw_sprites(cliprect);
 
 		blend_layer(bitmap, cliprect, m_sprite_bitmap, m_cur_spri[0]);

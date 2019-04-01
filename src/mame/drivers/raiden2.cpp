@@ -220,21 +220,21 @@ void raiden2_state::machine_start()
 }
 
 /*
-uint16_t raiden2_state::rps()
+u16 raiden2_state::rps()
 {
     return m_maincpu->state_int(NEC_CS);
 }
 
-uint16_t raiden2_state::rpc()
+u16 raiden2_state::rpc()
 {
     return m_maincpu->state_int(NEC_IP);
 }
 */
 
 
-void raiden2_state::combine32(uint32_t *val, int offset, uint16_t data, uint16_t mem_mask)
+void raiden2_state::combine32(u32 *val, offs_t offset, u16 data, u16 mem_mask)
 {
-	uint16_t *dest = (uint16_t *)val + BYTE_XOR_LE(offset);
+	u16 *dest = (u16 *)val + BYTE_XOR_LE(offset);
 	COMBINE_DATA(dest);
 }
 
@@ -265,73 +265,80 @@ void raiden2_state::sprcpt_init()
 }
 
 
-WRITE16_MEMBER(raiden2_state::sprcpt_adr_w)
+void raiden2_state::sprcpt_adr_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	combine32(&m_sprcpt_adr, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_data_1_w)
+void raiden2_state::sprcpt_data_1_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	combine32(m_sprcpt_data_1+m_sprcpt_adr, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_data_2_w)
+void raiden2_state::sprcpt_data_2_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	combine32(m_sprcpt_data_2+m_sprcpt_adr, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_data_3_w)
+void raiden2_state::sprcpt_data_3_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	combine32(m_sprcpt_data_3+m_sprcpt_idx, offset, data, mem_mask);
-	if(offset == 1) {
+	if (offset == 1)
+	{
 		m_sprcpt_idx ++;
-		if(m_sprcpt_idx == 6)
+		if (m_sprcpt_idx == 6)
 			m_sprcpt_idx = 0;
 	}
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_data_4_w)
+void raiden2_state::sprcpt_data_4_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	combine32(m_sprcpt_data_4+m_sprcpt_idx, offset, data, mem_mask);
-	if(offset == 1) {
+	if (offset == 1)
+	{
 		m_sprcpt_idx ++;
-		if(m_sprcpt_idx == 4)
+		if (m_sprcpt_idx == 4)
 			m_sprcpt_idx = 0;
 	}
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_val_1_w)
+void raiden2_state::sprcpt_val_1_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	combine32(m_sprcpt_val+0, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_val_2_w)
+void raiden2_state::sprcpt_val_2_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	combine32(m_sprcpt_val+1, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_flags_1_w)
+void raiden2_state::sprcpt_flags_1_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	combine32(&m_sprcpt_flags1, offset, data, mem_mask);
-	if(offset == 1) {
+	if (offset == 1)
+	{
 		// bit 31: 1 = allow write on sprcpt data
 
-		if(!(m_sprcpt_flags1 & 0x80000000U)) {
+		if (!(m_sprcpt_flags1 & 0x80000000U))
+		{
 			// Upload finished
-			if(1) {
+			if (1)
+			{
 				int i;
 				logerror("sprcpt_val 1: %08x\n", m_sprcpt_val[0]);
 				logerror("sprcpt_val 2: %08x\n", m_sprcpt_val[1]);
 				logerror("sprcpt_data 1:\n");
-				for(i=0; i<0x100; i++) {
+				for (i=0; i<0x100; i++)
+				{
 					logerror(" %08x", m_sprcpt_data_1[i]);
-					if(!((i+1) & 7))
+					if (!((i+1) & 7))
 						logerror("\n");
 				}
 				logerror("sprcpt_data 2:\n");
-				for(i=0; i<0x40; i++) {
+				for (i=0; i<0x40; i++)
+				{
 					logerror(" %08x", m_sprcpt_data_2[i]);
-					if(!((i+1) & 7))
+					if (!((i+1) & 7))
 						logerror("\n");
 				}
 			}
@@ -339,11 +346,13 @@ WRITE16_MEMBER(raiden2_state::sprcpt_flags_1_w)
 	}
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_flags_2_w)
+void raiden2_state::sprcpt_flags_2_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_sprcpt_flags2);
-	if(offset == 0) {
-		if(m_sprcpt_flags2 & 0x8000) {
+	if (offset == 0)
+	{
+		if (m_sprcpt_flags2 & 0x8000)
+		{
 			// Reset decryption -> redo it
 		}
 	}
@@ -401,7 +410,7 @@ MACHINE_RESET_MEMBER(raiden2_state,xsedae)
 	sprcpt_init();
 }
 
-WRITE8_MEMBER(raiden2_state::raiden2_bank_w)
+void raiden2_state::raiden2_bank_w(u8 data)
 {
 	int bb = (~data >> 7) & 1;
 	logerror("select bank %d %04x\n", (data >> 7) & 1, data);
@@ -411,48 +420,48 @@ WRITE8_MEMBER(raiden2_state::raiden2_bank_w)
 }
 
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_x_w)
+void raiden2_state::sprite_prot_x_w(u16 data)
 {
 	m_sprite_prot_x = data;
 	//popmessage("%04x %04x",m_sprite_prot_x,m_sprite_prot_y);
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_y_w)
+void raiden2_state::sprite_prot_y_w(u16 data)
 {
 	m_sprite_prot_y = data;
 	//popmessage("%04x %04x",m_sprite_prot_x,m_sprite_prot_y);
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_src_seg_w)
+void raiden2_state::sprite_prot_src_seg_w(u16 data)
 {
 	m_sprite_prot_src_addr[0] = data;
 }
 
-READ16_MEMBER(raiden2_state::sprite_prot_src_seg_r)
+u16 raiden2_state::sprite_prot_src_seg_r()
 {
 	return m_sprite_prot_src_addr[0];
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
+void raiden2_state::sprite_prot_src_w(address_space &space, u16 data)
 {
 	m_sprite_prot_src_addr[1] = data;
-	uint32_t src = (m_sprite_prot_src_addr[0]<<4)+m_sprite_prot_src_addr[1];
+	u32 src = (m_sprite_prot_src_addr[0]<<4)+m_sprite_prot_src_addr[1];
 
 	int x = int16_t((space.read_dword(src+0x08) >> 16) - (m_sprite_prot_x));
 	int y = int16_t((space.read_dword(src+0x04) >> 16) - (m_sprite_prot_y));
 
-	uint16_t head1 = space.read_word(src+m_cop_spr_off);
-	uint16_t head2 = space.read_word(src+m_cop_spr_off+2);
+	u16 head1 = space.read_word(src+m_cop_spr_off);
+	u16 head2 = space.read_word(src+m_cop_spr_off+2);
 
 	int w = (((head1 >> 8 ) & 7) + 1) << 4;
 	int h = (((head1 >> 12) & 7) + 1) << 4;
 
-	uint16_t flag = x-w/2 > -w && x-w/2 < m_cop_spr_maxx+w && y-h/2 > -h && y-h/2 < 256+h ? 1 : 0;
+	u16 flag = x-w/2 > -w && x-w/2 < m_cop_spr_maxx+w && y-h/2 > -h && y-h/2 < 256+h ? 1 : 0;
 
 	flag = (space.read_word(src) & 0xfffe) | flag;
 	space.write_word(src, flag);
 
-	if(flag & 1)
+	if (flag & 1)
 	{
 		space.write_word(m_dst1,   head1);
 		space.write_word(m_dst1+2, head2);
@@ -465,32 +474,32 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 	//machine().debug_break();
 }
 
-READ16_MEMBER(raiden2_state::sprite_prot_dst1_r)
+u16 raiden2_state::sprite_prot_dst1_r()
 {
 	return m_dst1;
 }
 
-READ16_MEMBER(raiden2_state::sprite_prot_maxx_r)
+u16 raiden2_state::sprite_prot_maxx_r()
 {
 	return m_cop_spr_maxx;
 }
 
-READ16_MEMBER(raiden2_state::sprite_prot_off_r)
+u16 raiden2_state::sprite_prot_off_r()
 {
 	return m_cop_spr_off;
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_dst1_w)
+void raiden2_state::sprite_prot_dst1_w(u16 data)
 {
 	m_dst1 = data;
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_maxx_w)
+void raiden2_state::sprite_prot_maxx_w(u16 data)
 {
 	m_cop_spr_maxx = data;
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_off_w)
+void raiden2_state::sprite_prot_off_w(u16 data)
 {
 	m_cop_spr_off = data;
 }
@@ -2804,7 +2813,7 @@ ROM_START( xsedae )
 	ROM_LOAD( "9.u105.4a", 0x00000, 0x40000, CRC(a7a0c5f9) SHA1(7882681ac152642aa4f859071f195842068b214b) )
 ROM_END
 
-const uint16_t raiden2_state::raiden_blended_colors[] = {
+const u16 raiden2_state::raiden_blended_colors[] = {
 	// bridge tunnel entrance shadow
 	0x380,
 
@@ -2852,11 +2861,11 @@ const uint16_t raiden2_state::raiden_blended_colors[] = {
 	0xffff,
 };
 
-void raiden2_state::init_blending(const uint16_t *table)
+void raiden2_state::init_blending(const u16 *table)
 {
-	for(auto & elem : m_blend_active)
+	for (auto & elem : m_blend_active)
 		elem = false;
-	while(*table != 0xffff)
+	while (*table != 0xffff)
 		m_blend_active[*table++] = true;
 }
 
@@ -2880,7 +2889,7 @@ void raiden2_state::init_raidendx()
 	raiden2_decrypt_sprites(machine());
 }
 
-const uint16_t raiden2_state::xsedae_blended_colors[] = {
+const u16 raiden2_state::xsedae_blended_colors[] = {
 	0xffff,
 };
 
@@ -2892,7 +2901,7 @@ void raiden2_state::init_xsedae()
 	/* doesn't have banking */
 }
 
-const uint16_t raiden2_state::zeroteam_blended_colors[] = {
+const u16 raiden2_state::zeroteam_blended_colors[] = {
 	// Player selection
 	0x37e,
 	// Boss spear shadow

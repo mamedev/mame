@@ -99,32 +99,32 @@ public:
 
 private:
 
-	DECLARE_WRITE16_MEMBER(angle_w);
-	DECLARE_WRITE16_MEMBER(dx_w);
-	DECLARE_WRITE16_MEMBER(dy_w);
-	DECLARE_WRITE16_MEMBER(sdistl_w);
-	DECLARE_WRITE16_MEMBER(sdisth_w);
-	DECLARE_READ16_MEMBER(angle_r);
-	DECLARE_READ16_MEMBER(dist_r);
-	DECLARE_READ16_MEMBER(sin_r);
-	DECLARE_READ16_MEMBER(cos_r);
+	void angle_w(offs_t offset, u16 data, u16 mem_mask);
+	void dx_w(offs_t offset, u16 data, u16 mem_mask);
+	void dy_w(offs_t offset, u16 data, u16 mem_mask);
+	void sdistl_w(offs_t offset, u16 data, u16 mem_mask);
+	void sdisth_w(offs_t offset, u16 data, u16 mem_mask);
+	u16 angle_r();
+	u16 dist_r();
+	u16 sin_r();
+	u16 cos_r();
 
-	DECLARE_WRITE8_MEMBER(tile_bank_w);
-	DECLARE_READ16_MEMBER(rdx_v33_unknown_r);
-	DECLARE_WRITE16_MEMBER(mcu_xval_w);
-	DECLARE_WRITE16_MEMBER(mcu_yval_w);
-	DECLARE_WRITE16_MEMBER(mcu_table_w);
-	DECLARE_WRITE16_MEMBER(mcu_table2_w);
-	DECLARE_WRITE16_MEMBER(mcu_prog_w);
-	DECLARE_WRITE16_MEMBER(mcu_prog_w2);
-	DECLARE_WRITE16_MEMBER(mcu_prog_offs_w);
-	DECLARE_WRITE16_MEMBER(rdx_v33_eeprom_w);
-	DECLARE_WRITE16_MEMBER(zerotm2k_eeprom_w);
-	DECLARE_WRITE16_MEMBER(r2dx_rom_bank_w);
+	void tile_bank_w(u8 data);
+	u16 rdx_v33_unknown_r();
+	void mcu_xval_w(u16 data);
+	void mcu_yval_w(u16 data);
+	void mcu_table_w(offs_t offset, u16 data);
+	void mcu_table2_w(offs_t offset, u16 data);
+	void mcu_prog_w(u16 data);
+	void mcu_prog_w2(u16 data);
+	void mcu_prog_offs_w(u16 data);
+	void rdx_v33_eeprom_w(u8 data);
+	void zerotm2k_eeprom_w(u16 data);
+	void r2dx_rom_bank_w(u16 data);
 
-	DECLARE_WRITE16_MEMBER(tilemapdma_w);
-	DECLARE_WRITE16_MEMBER(paldma_w);
-	DECLARE_READ16_MEMBER(r2dx_debug_r);
+	void tilemapdma_w(address_space &space, u16 data);
+	void paldma_w(address_space &space, u16 data);
+	u16 r2dx_debug_r();
 
 	DECLARE_MACHINE_RESET(r2dx_v33);
 	DECLARE_MACHINE_RESET(nzeroteam);
@@ -142,15 +142,15 @@ private:
 	int m_r2dxbank;
 	int m_r2dxgameselect;
 
-	uint16_t m_dx, m_dy, m_angle;
-	uint32_t m_sdist;
-	uint16_t m_mcu_prog[0x800];
+	u16 m_dx, m_dy, m_angle;
+	u32 m_sdist;
+	u16 m_mcu_prog[0x800];
 	int m_mcu_prog_offs;
-	uint16_t m_mcu_xval, m_mcu_yval;
-	uint16_t m_mcu_data[9];
+	u16 m_mcu_xval, m_mcu_yval;
+	u16 m_mcu_data[9];
 
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_region_ptr<uint8_t> m_math;
+	required_region_ptr<u8> m_math;
 
 	optional_memory_bank m_okibank;
 };
@@ -172,23 +172,26 @@ void r2dx_v33_state::machine_start()
 	save_item(NAME(m_mcu_data));
 }
 
-WRITE8_MEMBER(r2dx_v33_state::tile_bank_w)
+void r2dx_v33_state::tile_bank_w(u8 data)
 {
 	int new_bank;
 	new_bank = ((data & 0x10)>>4);
-	if(new_bank != m_bg_bank) {
+	if (new_bank != m_bg_bank)
+	{
 		m_bg_bank = new_bank;
 		m_background_layer->mark_all_dirty();
 	}
 
 	new_bank = 2 + ((data & 0x20)>>5);
-	if(new_bank != m_mid_bank) {
+	if (new_bank != m_mid_bank)
+	{
 		m_mid_bank = new_bank;
 		m_midground_layer->mark_all_dirty();
 	}
 
 	new_bank = 4 | (data & 3);
-	if(new_bank != m_fg_bank) {
+	if (new_bank != m_fg_bank)
+	{
 		m_fg_bank = new_bank;
 		m_foreground_layer->mark_all_dirty();
 	}
@@ -200,43 +203,35 @@ void r2dx_v33_state::r2dx_setbanking()
 	m_mainbank[1]->set_entry(m_r2dxgameselect);
 }
 
-WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
+void r2dx_v33_state::rdx_v33_eeprom_w(u8 data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_eeprom->clk_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->di_write((data & 0x20) >> 5);
-		m_eeprom->cs_write((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write((data & 0x20) >> 5);
+	m_eeprom->cs_write((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
-		// 0x40 - coin counter 1?
-		// 0x80 - coin counter 2?
+	// 0x40 - coin counter 1?
+	// 0x80 - coin counter 2?
 
-		// 0x04 is active in Raiden DX mode, it could be part of the rom bank (which half of the rom to use) or the FG tile bank (or both?)
-		// the bit gets set if it reads RAIDENDX from the EEPROM
-		m_r2dxgameselect = (data & 0x04) >> 2;
+	// 0x04 is active in Raiden DX mode, it could be part of the rom bank (which half of the rom to use) or the FG tile bank (or both?)
+	// the bit gets set if it reads RAIDENDX from the EEPROM
+	m_r2dxgameselect = (data & 0x04) >> 2;
 
-		m_tx_bank = m_r2dxgameselect;
-		m_text_layer->mark_all_dirty();
+	m_tx_bank = m_r2dxgameselect;
+	m_text_layer->mark_all_dirty();
 
-		r2dx_setbanking();
+	r2dx_setbanking();
 
-		m_okibank->set_entry(data&3);
-
-	}
-	else
-	{
-		logerror("eeprom_w MSB used %04x",data);
-	}
+	m_okibank->set_entry(data&3);
 }
 
 /* new zero team uses the copd3 protection... and uploads a 0x400 byte table, probably the mcu code, encrypted */
 
-WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w)
+void r2dx_v33_state::mcu_prog_w(u16 data)
 {
 	m_mcu_prog[m_mcu_prog_offs*2] = data;
 }
 
-WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w2)
+void r2dx_v33_state::mcu_prog_w2(u16 data)
 {
 	m_mcu_prog[m_mcu_prog_offs*2+1] = data;
 
@@ -257,25 +252,25 @@ WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w2)
 #endif
 }
 
-WRITE16_MEMBER(r2dx_v33_state::mcu_prog_offs_w)
+void r2dx_v33_state::mcu_prog_offs_w(u16 data)
 {
 	m_mcu_prog_offs = data;
 }
 
-READ16_MEMBER(r2dx_v33_state::rdx_v33_unknown_r)
+u16 r2dx_v33_state::rdx_v33_unknown_r()
 {
 	return machine().rand();
 }
 
 
 /* something sent to the MCU for X/Y global screen calculating ... */
-WRITE16_MEMBER(r2dx_v33_state::mcu_xval_w)
+void r2dx_v33_state::mcu_xval_w(u16 data)
 {
 	m_mcu_xval = data;
 	//popmessage("%04x %04x",m_mcu_xval,m_mcu_yval);
 }
 
-WRITE16_MEMBER(r2dx_v33_state::mcu_yval_w)
+void r2dx_v33_state::mcu_yval_w(u16 data)
 {
 	m_mcu_yval = data;
 	//popmessage("%04x %04x",m_mcu_xval,m_mcu_yval);
@@ -283,103 +278,103 @@ WRITE16_MEMBER(r2dx_v33_state::mcu_yval_w)
 
 
 /* 0x400-0x407 seems some DMA hook-up, 0x420-0x427 looks like some x/y sprite calculation routine */
-WRITE16_MEMBER(r2dx_v33_state::mcu_table_w)
+void r2dx_v33_state::mcu_table_w(offs_t offset, u16 data)
 {
 	m_mcu_data[offset] = data;
 
 	//popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x",m_mcu_data[0/2],m_mcu_data[2/2],m_mcu_data[4/2],m_mcu_data[6/2],m_mcu_data[8/2],m_mcu_data[0xa/2],m_mcu_data[0xc/2],m_mcu_data[0xe/2]);
 }
 
-WRITE16_MEMBER(r2dx_v33_state::mcu_table2_w)
+void r2dx_v33_state::mcu_table2_w(offs_t offset, u16 data)
 {
-//  printf("mcu_table2_w %04x %04x\n", data, mem_mask);
+//  printf("mcu_table2_w %04x\n", data);
 
 	m_mcu_data[offset+4] = data;
 
 	//popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x",m_mcu_data[0/2],m_mcu_data[2/2],m_mcu_data[4/2],m_mcu_data[6/2],m_mcu_data[8/2],m_mcu_data[0xa/2],m_mcu_data[0xc/2],m_mcu_data[0xe/2]);
 }
 
-WRITE16_MEMBER(r2dx_v33_state::r2dx_rom_bank_w)
+void r2dx_v33_state::r2dx_rom_bank_w(u16 data)
 {
-	//printf("rom bank %04x %04x\n", data, mem_mask);
+	//printf("rom bank %04x\n", data);
 	m_r2dxbank = data & 0xf;
 	r2dx_setbanking();
 
 }
 
-WRITE16_MEMBER(r2dx_v33_state::angle_w)
+void r2dx_v33_state::angle_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_angle);
 }
 
-WRITE16_MEMBER(r2dx_v33_state::dx_w)
+void r2dx_v33_state::dx_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_dx);
 }
 
-WRITE16_MEMBER(r2dx_v33_state::dy_w)
+void r2dx_v33_state::dy_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_dy);
 }
 
-READ16_MEMBER(r2dx_v33_state::angle_r)
+u16 r2dx_v33_state::angle_r()
 {
 	return m_math[((m_dy & 0xff) << 8) | (m_dx & 0xff)];
 }
 
-READ16_MEMBER(r2dx_v33_state::dist_r)
+u16 r2dx_v33_state::dist_r()
 {
 	return sqrt(double(m_sdist));
 }
 
-READ16_MEMBER(r2dx_v33_state::sin_r)
+u16 r2dx_v33_state::sin_r()
 {
 	int off = 65536 + (m_angle & 0xff)*4;
 	return (m_math[off+0]) | (m_math[off+1] << 8);
 }
 
-READ16_MEMBER(r2dx_v33_state::cos_r)
+u16 r2dx_v33_state::cos_r()
 {
 	int off = 65536 + (m_angle & 0xff)*4;
 	return (m_math[off+2]) | (m_math[off+3] << 8);
 }
 
-WRITE16_MEMBER(r2dx_v33_state::sdistl_w)
+void r2dx_v33_state::sdistl_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_sdist = (m_sdist & (0xffff0000 | uint16_t(~mem_mask))) | (data & mem_mask);
+	m_sdist = (m_sdist & (0xffff0000 | u16(~mem_mask))) | (data & mem_mask);
 }
 
-WRITE16_MEMBER(r2dx_v33_state::sdisth_w)
+void r2dx_v33_state::sdisth_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_sdist = (m_sdist & (0x0000ffff | (uint16_t(~mem_mask)) << 16)) | ((data & mem_mask) << 16);
+	m_sdist = (m_sdist & (0x0000ffff | (u16(~mem_mask)) << 16)) | ((data & mem_mask) << 16);
 }
 
 // these DMA operations seem to use hardcoded addresses on this hardware
-WRITE16_MEMBER(r2dx_v33_state::tilemapdma_w)
+void r2dx_v33_state::tilemapdma_w(address_space &space, u16 data)
 {
 	int src = 0xd000;
 
 	for (int i = 0; i < 0x2800 / 2; i++)
 	{
-		uint16_t tileval = space.read_word(src);
+		u16 tileval = space.read_word(src);
 		src += 2;
 		m_videoram_private_w(space, i, tileval, 0xffff);
 	}
 }
 
-WRITE16_MEMBER(r2dx_v33_state::paldma_w)
+void r2dx_v33_state::paldma_w(address_space &space, u16 data)
 {
 	int src = 0x1f000;
 
 	for (int i = 0; i < 0x1000 / 2; i++)
 	{
-		uint16_t palval = space.read_word(src);
+		u16 palval = space.read_word(src);
 		src += 2;
 		m_palette->write16(i, palval);
 	}
 }
 
-READ16_MEMBER(r2dx_v33_state::r2dx_debug_r)
+u16 r2dx_v33_state::r2dx_debug_r()
 {
 	// read once on startup, needed for player collisions to work
 	return 0xffff;
@@ -407,14 +402,14 @@ void r2dx_v33_state::rdx_v33_map(address_map &map)
 	map(0x00436, 0x00437).r(FUNC(r2dx_v33_state::cos_r));
 
 	map(0x00600, 0x0063f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
-	//AM_RANGE(0x00640, 0x006bf) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write)
+	//map(0x00640, 0x006bf).rw("obj", FUNC(seibu_encrypted_sprite_device::read), FUNC(seibu_encrypted_sprite_device::write));
 	map(0x0068e, 0x0068f).nopw(); // sprite buffering
 	map(0x006b0, 0x006b1).w(FUNC(r2dx_v33_state::mcu_prog_w)); // could be encryption key uploads just like raiden2.cpp ?
 	map(0x006b2, 0x006b3).w(FUNC(r2dx_v33_state::mcu_prog_w2));
-//  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
-//  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
+//  map(0x006b4, 0x006b5).nopw();
+//  map(0x006b6, 0x006b7).nopw();
 	map(0x006bc, 0x006bd).w(FUNC(r2dx_v33_state::mcu_prog_offs_w));
-//  AM_RANGE(0x006be, 0x006bf) AM_WRITENOP
+//  map(0x006be, 0x006bf).nopw();
 
 	// sprite protection not 100% verified as the same
 	map(0x006c0, 0x006c1).rw(FUNC(r2dx_v33_state::sprite_prot_off_r), FUNC(r2dx_v33_state::sprite_prot_off_w));
@@ -426,7 +421,7 @@ void r2dx_v33_state::rdx_v33_map(address_map &map)
 	map(0x006dc, 0x006dd).rw(FUNC(r2dx_v33_state::sprite_prot_maxx_r), FUNC(r2dx_v33_state::sprite_prot_maxx_w));
 	map(0x006de, 0x006df).w(FUNC(r2dx_v33_state::sprite_prot_src_w));
 
-	map(0x00700, 0x00701).w(FUNC(r2dx_v33_state::rdx_v33_eeprom_w));
+	map(0x00700, 0x00700).w(FUNC(r2dx_v33_state::rdx_v33_eeprom_w));
 	map(0x00740, 0x00741).r(FUNC(r2dx_v33_state::r2dx_debug_r));
 	map(0x00744, 0x00745).portr("INPUT");
 	map(0x0074c, 0x0074d).portr("SYSTEM");
@@ -439,13 +434,13 @@ void r2dx_v33_state::rdx_v33_map(address_map &map)
 
 	map(0x0c000, 0x0c7ff).ram().share("spriteram");
 	map(0x0c800, 0x0cfff).ram();
-	map(0x0d000, 0x0d7ff).ram(); //_WRITE(background_w) AM_SHARE("back_data")
-	map(0x0d800, 0x0dfff).ram(); //_WRITE(foreground_w) AM_SHARE("fore_data")
-	map(0x0e000, 0x0e7ff).ram(); //_WRITE(midground_w)  AM_SHARE("mid_data")
-	map(0x0e800, 0x0f7ff).ram(); //_WRITE(text_w) AM_SHARE("text_data")
+	map(0x0d000, 0x0d7ff).ram(); //.w(FUNC(r2dx_v33_state::background_w)).share("back_data");
+	map(0x0d800, 0x0dfff).ram(); //.w(FUNC(r2dx_v33_state::foreground_w).share("fore_data");
+	map(0x0e000, 0x0e7ff).ram(); //.w(FUNC(r2dx_v33_state::midground_w).share("mid_data");
+	map(0x0e800, 0x0f7ff).ram(); //.w(FUNC(r2dx_v33_state::text_w).share("text_data");
 	map(0x0f800, 0x0ffff).ram(); /* Stack area */
 	map(0x10000, 0x1efff).ram();
-	map(0x1f000, 0x1ffff).ram(); //_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	map(0x1f000, 0x1ffff).ram(); //.w(m_palette, FUNC(palette_device::write16)).share("palette");
 
 	map(0x20000, 0x2ffff).bankr("mainbank1").nopw();
 	map(0x30000, 0xfffff).bankr("mainbank2").nopw();
@@ -459,7 +454,7 @@ void r2dx_v33_state::nzeroteam_base_map(address_map &map)
 	map(0x00400, 0x00401).w(FUNC(r2dx_v33_state::tilemapdma_w)); // tilemaps to private buffer
 	map(0x00402, 0x00403).w(FUNC(r2dx_v33_state::paldma_w));  // palettes to private buffer
 	// 0x404 is bank on r2dx, this doesn't need it
-	// AM_RANGE(0x00406, 0x00406) AM_WRITE(tile_bank_w) // not the same?
+	// map(0x00406, 0x00406).w(FUNC(r2dx_v33_state::tile_bank_w)); // not the same?
 
 	map(0x00406, 0x00407).noprw(); // always 6022, supposed to be the tile bank but ignores the actual value???
 
@@ -485,7 +480,7 @@ void r2dx_v33_state::nzeroteam_base_map(address_map &map)
 //  map(0x006d8, 0x006d9).w(FUNC(r2dx_v33_state::bbbbll_w)); // scroll?
 //  map(0x006dc, 0x006dd).r(FUNC(r2dx_v33_state::nzerotea_unknown_r));
 //  map(0x006de, 0x006df).w(FUNC(r2dx_v33_state::mcu_unkaa_w)); // mcu command related?
-//  map(0x00700, 0x00701).w(FUNC(r2dx_v33_state::rdx_v33_eeprom_w));
+//  map(0x00700, 0x00700).w(FUNC(r2dx_v33_state::rdx_v33_eeprom_w));
 
 //  map(0x00762, 0x00763).r(FUNC(r2dx_v33_state::nzerotea_unknown_r));
 
@@ -517,9 +512,9 @@ void r2dx_v33_state::nzerotea_map(address_map &map)
 	map(0x0074c, 0x0074d).portr("SYSTEM");
 }
 
-WRITE16_MEMBER(r2dx_v33_state::zerotm2k_eeprom_w)
+void r2dx_v33_state::zerotm2k_eeprom_w(u16 data)
 {
-//  printf("zerotm2k_eeprom_w %04x %04x\n", data, mem_mask);
+//  printf("zerotm2k_eeprom_w %04x\n", data);
 
 	m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->di_write((data & 0x04) >> 2);
@@ -853,10 +848,10 @@ void r2dx_v33_state::init_zerotm2k()
 	// no sprite encryption(!)
 
 	// BG tile rom has 2 lines swapped
-	uint8_t *src = memregion("gfx2")->base()+0x100000;
+	u8 *src = memregion("gfx2")->base()+0x100000;
 	const int len = 0x080000;
 
-	std::vector<uint8_t> buffer(len);
+	std::vector<u8> buffer(len);
 	for (int i = 0; i < len; i ++)
 		buffer[i] = src[bitswap<32>(i,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,5,6,4,3,2,1,0)];
 	memcpy(src, &buffer[0], len);
@@ -964,7 +959,6 @@ ROM_START( r2dx_v33_r2 )
 	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
 	ROM_LOAD32_WORD( "obj1.724", 0x000000, 0x400000, CRC(7d218985) SHA1(777241a533defcbea3d7e735f309478d260bad52) )
 	ROM_LOAD32_WORD( "obj2.725", 0x000002, 0x400000, CRC(891b24d6) SHA1(74f89b47b1ba6b84ddd96d1fae92fddad0ace342) )
-
 
 	ROM_REGION( 0x100000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "pcm.099", 0x00000, 0x100000, CRC(97ca2907) SHA1(bfe8189300cf72089d0beaeab8b1a0a1a4f0a5b6) )
