@@ -14,9 +14,9 @@
     - Battery backed RAM for High Scores & Keyboard message
 
     Notes:
-    - The color versions are commonly called Little Casino II (as stickered on cabinet) - This is NOT refected on the title screen
+    - The color versions are commonly called Little Casino II (as stickered on cabinet) - This is NOT reflected on the title screen
     - Color version of the first version is undumped (flyer exists)?
-    - In v18_10_rf.ic18, around 0x600 is text showing a service mode screen / dipswitch settings
+    - In v18_10_rf.bin, around 0x600 is text showing a service mode screen / dipswitch settings
       How do you activate it?
 
 
@@ -59,6 +59,37 @@ Other: Hitachi HD46821P 1MHz NMOS Peripheral Interface Adapter (PIA) x 2
        D1 - Power On Diode
        44 pin edge connector
 
+
+Additional notes about Little Casino II v18.1 included with ROMs:
+
+DIP 1:
+^^^^^^
+1 ON = ??
+2 ON = ??
+3 ON = 2 coins 1 credit
+4 ON = 1 coin 2 credit 
+5 ON = hard
+6 ON = very easy
+7 ON = no display of high scores
+8 ON = ??
+
+
+DIP 2:
+^^^^^^
+1 ON = 3 hands a credit
+
+8 = ON = starts playing by itself
+
+
+DIP 3:
+^^^^^^
+All off = game hangs after coinup. **
+
+** Same result as disabling all selectable games, that’s why it’s suggested below
+   that some of port “Q” is mapped to DSW3.
+
+ Notice that many dip explanations above don't match effects below, so ports and
+   dipswitches might not be linearly mapped.
 
 ***************************************************************************/
 
@@ -212,10 +243,7 @@ static INPUT_PORTS_START( ltcasino )
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x10, DEF_STR( On )) // limits to 15 coins
 	PORT_DIPLOCATION("A:5")
-	PORT_DIPNAME(0x20, 0x00, DEF_STR( Unknown )) // needs to be 0 or ltcasinn can reset on coin-up
-	PORT_DIPSETTING(   0x00, DEF_STR( On ))
-	PORT_DIPSETTING(   0x20, DEF_STR( Off ))
-	PORT_DIPLOCATION("A:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, IP_ACTIVE_LOW, "A:6") // If this is LOW Little Casino II sets can reset on coin-up
 	PORT_DIPUNKNOWN_DIPLOC(0x40, IP_ACTIVE_LOW, "A:7")
 	PORT_DIPNAME(0x80, 0x80, "Screen Mode")
 	PORT_DIPSETTING(   0x80, "60 Hz")
@@ -253,7 +281,7 @@ static INPUT_PORTS_START( ltcasinn )
 	PORT_DIPSETTING(   0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x00, DEF_STR( On ))
 	PORT_DIPLOCATION("DSW3:1")
-	PORT_DIPNAME(0x20, 0x00, "Enable Enable Horse")
+	PORT_DIPNAME(0x20, 0x00, "Enable Horse")
 	PORT_DIPSETTING(   0x20, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x00, DEF_STR( On ))
 	PORT_DIPLOCATION("DSW3:6")
@@ -264,9 +292,8 @@ static INPUT_PORTS_START( ltcasinn )
 
 	PORT_MODIFY("A")
 	PORT_DIPUNKNOWN_DIPLOC(0x10, IP_ACTIVE_LOW, "A:5") // Coin Limit for other sets, v18.1 always locked to 15 coins?
-	PORT_DIPUNKNOWN_DIPLOC(0x20, IP_ACTIVE_LOW, "A:6") // for v17.0 this one needs to be 0x00, but not here???
-	PORT_DIPNAME(0x40, 0x00, DEF_STR( Unknown ))
-	PORT_DIPSETTING(   0x00, DEF_STR( On )) // needs to be 0x00 or ltcasinn can reset on coin-up - But controls Hi-scores display??????
+	PORT_DIPNAME(0x40, 0x00, "Leave On") // needs to be 0x00 or can reset on coin-up - But controls Hi-scores display??????
+	PORT_DIPSETTING(   0x00, DEF_STR( On ))
 	PORT_DIPSETTING(   0x40, DEF_STR( Off ))
 	PORT_DIPLOCATION("A:7")
 
@@ -289,17 +316,16 @@ static INPUT_PORTS_START( ltcasinna )
 	PORT_DIPSETTING(   0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x00, DEF_STR( On ))
 	PORT_DIPLOCATION("DSW3:1")
-	PORT_DIPNAME(0x20, 0x00, "Enable Enable Horse")
+	PORT_DIPNAME(0x20, 0x00, "Enable Horse")
 	PORT_DIPSETTING(   0x20, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x00, DEF_STR( On ))
 	PORT_DIPLOCATION("DSW3:6")
 
 	PORT_MODIFY("A")
-	PORT_DIPNAME(0x20, 0x00, DEF_STR( Unknown )) // needs to be 0x00 or v17.0 will reset on coin-up - different then v18.1
+	PORT_DIPNAME(0x40, 0x00, "Leave On") // needs to be 0x00 or can reset on coin-up
 	PORT_DIPSETTING(   0x00, DEF_STR( On ))
-	PORT_DIPSETTING(   0x20, DEF_STR( Off ))
-	PORT_DIPLOCATION("A:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, IP_ACTIVE_LOW, "A:7") // for v18.1 this one needs to be 0x00, but not here???
+	PORT_DIPSETTING(   0x40, DEF_STR( Off ))
+	PORT_DIPLOCATION("A:7")
 
 	PORT_MODIFY("B")
 	PORT_DIPNAME(0x02, 0x02, "Memory Test") // tests d000 to d7ff
@@ -324,7 +350,7 @@ static INPUT_PORTS_START( mv4in1 )
 	PORT_DIPSETTING(   0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x00, DEF_STR( On ))
 	PORT_DIPLOCATION("DSW3:1")
-	PORT_DIPNAME(0x40, 0x00, "Red-Dog") // must be off to enter service
+	PORT_DIPNAME(0x40, 0x00, "Enable Red-Dog") // must be off to enter service
 	PORT_DIPSETTING(   0x40, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x00, DEF_STR( On ))
 	PORT_DIPLOCATION("DSW3:7")
@@ -529,8 +555,8 @@ void ltcasino_state::mv4in1(machine_config &config)
 
 ROM_START( ltcasino )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a", 0x8000, 0x1000, CRC(14909fee) SHA1(bf53fa65da7f013ea1ac6b4942cdfdb34ef16252) )
-	ROM_LOAD( "b", 0x9800, 0x0800, CRC(1473f854) SHA1(eadaec1f6d653e61458bc262945c20140f4530eb) )
+	ROM_LOAD( "a", 0x8000, 0x1000, CRC(14909fee) SHA1(bf53fa65da7f013ea1ac6b4942cdfdb34ef16252) ) // Selection text: Select Game Desired!
+	ROM_LOAD( "b", 0x9800, 0x0800, CRC(1473f854) SHA1(eadaec1f6d653e61458bc262945c20140f4530eb) ) // Games: Black Jack, Draw Poker, Craps & Hi-Lo
 	ROM_LOAD( "c", 0xa800, 0x0800, CRC(7a07004b) SHA1(62bd0f3d12b7eada6fc271abea60569aca7262b0) )
 	ROM_LOAD( "d", 0xb800, 0x0800, CRC(5148cafc) SHA1(124039f48784bf032f612714db73fb67a216a1e7) )
 	ROM_LOAD( "e", 0xc800, 0x0800, CRC(5f9e103a) SHA1(b0e9ace4c3962c06e5250fac16a245dca711350f) )
@@ -542,8 +568,8 @@ ROM_END
 
 ROM_START( mv4in1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "g.ic13", 0x8000, 0x1000, CRC(ac33bd85) SHA1(fd555f70d0a7040473d35ec38e19185671a471ea) )
-	ROM_LOAD( "f.ic14", 0x9000, 0x1000, CRC(f95c87d1) SHA1(df5ed53722ec55a97eabe10b0ed3f1ba32cbe55f) )
+	ROM_LOAD( "g.ic13", 0x8000, 0x1000, CRC(ac33bd85) SHA1(fd555f70d0a7040473d35ec38e19185671a471ea) ) // Selection text: Play Your Favorites
+	ROM_LOAD( "f.ic14", 0x9000, 0x1000, CRC(f95c87d1) SHA1(df5ed53722ec55a97eabe10b0ed3f1ba32cbe55f) ) // Games: 21, Draw Poker, Dice & Red-Dog
 	ROM_LOAD( "e.ic15", 0xa000, 0x1000, CRC(e525fcf2) SHA1(f1ec0c514e25ec4a1caf737ff8a962c81fb2706a) )
 	ROM_LOAD( "d.ic16", 0xb000, 0x1000, CRC(ab34673f) SHA1(520a173a342a27b5f9d995e6f53c3a2f0f359f9e) )
 	ROM_LOAD( "c.ic17", 0xc000, 0x1000, CRC(e384edf4) SHA1(99042528ce2b35191248d90162ca06a1a585667c) )
@@ -553,10 +579,10 @@ ROM_START( mv4in1 )
 	ROM_LOAD( "a.ic19", 0x0000, 0x1000, CRC(a25c125e) SHA1(e0ba83ccddbd82a2bf52585ae0accb9192cbb00e) )
 ROM_END
 
-ROM_START( ltcasin2 )
+ROM_START( ltcasin2 ) // board was marked version 18.1 (C)1984
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "v18_10_ra.bin", 0x8000, 0x1000, CRC(f0c5cc96) SHA1(ec50918ba2a2487df70694f9e1a52d4b8d1bc7e2) ) // board was marked version 18.1 (C)1984
-	ROM_LOAD( "v18_10_rb.bin", 0x9000, 0x1000, CRC(2ece16e4) SHA1(ef6adc45be2ecc510cd8b2e9682635066013a5e4) )
+	ROM_LOAD( "v18_10_ra.bin", 0x8000, 0x1000, CRC(f0c5cc96) SHA1(ec50918ba2a2487df70694f9e1a52d4b8d1bc7e2) ) // Selection text: Please Make Selection!
+	ROM_LOAD( "v18_10_rb.bin", 0x9000, 0x1000, CRC(2ece16e4) SHA1(ef6adc45be2ecc510cd8b2e9682635066013a5e4) ) // Games: Black Jack, Draw Poker, Craps, Slots & Horse
 	ROM_LOAD( "v18_10_rc.bin", 0xa000, 0x1000, CRC(16bae5c9) SHA1(e5cb61d9dcae3c46c7139f3494d1bf981ec8821f) )
 	ROM_LOAD( "v18_10_rd.bin", 0xb000, 0x1000, CRC(d12f2d6b) SHA1(e3544bf6b778c21b704a01f1ed06d6517ca01604) )
 	ROM_LOAD( "v18_10_re.bin", 0xc000, 0x1000, CRC(2acdad10) SHA1(2732b791fea0a9d1c6e4c174739381466f2b0270) )
@@ -568,8 +594,8 @@ ROM_END
 
 ROM_START( ltcasin2a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "v17_00_ra.bin", 0x8000, 0x1000, CRC(1a595442) SHA1(b8fe3e5ed2024a57187c0ce547c1bbef2429ed63) )
-	ROM_LOAD( "v17_00_rb.bin", 0x9000, 0x1000, CRC(4f5502c1) SHA1(cd1b7c08d26fed71c45e44ebd208bd18dc262e8f) )
+	ROM_LOAD( "v17_00_ra.bin", 0x8000, 0x1000, CRC(1a595442) SHA1(b8fe3e5ed2024a57187c0ce547c1bbef2429ed63) ) // Selection text: Please Pick Your Poison!
+	ROM_LOAD( "v17_00_rb.bin", 0x9000, 0x1000, CRC(4f5502c1) SHA1(cd1b7c08d26fed71c45e44ebd208bd18dc262e8f) ) // Games: Black Jack, Draw Poker, Craps, Hi-Lo & Horse
 	ROM_LOAD( "v17_00_rc.bin", 0xa000, 0x1000, CRC(990283b8) SHA1(8a3fe5be8381894b8e8dd14c7d42190e60a25600) )
 	ROM_LOAD( "v17_00_rd.bin", 0xb000, 0x1000, CRC(884f39dc) SHA1(fe149faf118279205e82760c5052cefb88a2f5be) )
 	ROM_LOAD( "v17_00_re.bin", 0xc000, 0x1000, CRC(fae38204) SHA1(e5908734cee0a89d873ab3761ded285f8ae138d3) )
