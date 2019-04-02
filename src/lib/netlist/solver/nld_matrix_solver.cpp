@@ -570,9 +570,12 @@ namespace devices
 				analog_net_t *n = m_nets[k];
 				terms_for_net_t *t = m_terms[k].get();
 
-				const nl_double DD_n = (n->Q_Analog() - t->m_last_V);
+				//const nl_double DD_n = (n->Q_Analog() - t->m_last_V);
+				// avoid floating point exceptions
+				const nl_double DD_n = std::max(-1e100, std::min(1e100,(n->Q_Analog() - t->m_last_V)));
 				const nl_double hn = cur_ts;
 
+				//printf("%g %g %g %g\n", DD_n, hn, t->m_DD_n_m_1, t->m_h_n_m_1);
 				nl_double DD2 = (DD_n / hn - t->m_DD_n_m_1 / t->m_h_n_m_1) / (hn + t->m_h_n_m_1);
 				nl_double new_net_timestep;
 

@@ -313,7 +313,7 @@ namespace analog
 	 *   |NL? |name  |parameter                        |units|default| example|area  |
 	 *   |:--:|:-----|:--------------------------------|:----|------:|-------:|:----:|
 	 *   | Y  |IS    |saturation current               |A    |1.0e-14| 1.0e-14|   *  |
-	 *   |    |RS    |ohmic resistanc                  |Ohm  |      0|      10|   *  |
+	 *   |    |RS    |ohmic resistance                 |Ohm  |      0|      10|   *  |
 	 *   | Y  |N     |emission coefficient             |-    |      1|       1|      |
 	 *   |    |TT    |transit-time                     |sec  |      0|   0.1ns|      |
 	 *   |    |CJO   |zero-bias junction capacitance   |F    |      0|     2pF|   *  |
@@ -359,6 +359,7 @@ namespace analog
 			register_subalias("K", m_N);
 		}
 
+		/* needed by nld_opamp ... */
 		template <class CLASS>
 		NETLIB_NAME(D)(CLASS &owner, const pstring &name, const pstring &model)
 		: NETLIB_NAME(twoterm)(owner, name)
