@@ -57,12 +57,12 @@ public:
 	void init_raiden2();
 
 protected:
-	std::unique_ptr<uint16_t[]> m_back_data;
-	std::unique_ptr<uint16_t[]> m_fore_data;
-	std::unique_ptr<uint16_t[]> m_mid_data;
-	std::unique_ptr<uint16_t[]> m_text_data; // private buffers, allocated in init
-	std::unique_ptr<uint16_t[]> m_palette_data;
-	required_shared_ptr<uint16_t> m_spriteram;
+	std::unique_ptr<u16[]> m_back_data;
+	std::unique_ptr<u16[]> m_fore_data;
+	std::unique_ptr<u16[]> m_mid_data;
+	std::unique_ptr<u16[]> m_text_data; // private buffers, allocated in init
+	std::unique_ptr<u16[]> m_palette_data;
+	required_shared_ptr<u16> m_spriteram;
 	required_device<cpu_device> m_maincpu;
 	optional_device<seibu_sound_device> m_seibu_sound;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -71,47 +71,47 @@ protected:
 	optional_memory_bank_array<2> m_mainbank;
 	optional_device<raiden2cop_device> m_raiden2cop;
 
-	DECLARE_WRITE16_MEMBER(sprite_prot_x_w);
-	DECLARE_WRITE16_MEMBER(sprite_prot_y_w);
-	DECLARE_WRITE16_MEMBER(sprite_prot_src_seg_w);
-	DECLARE_WRITE16_MEMBER(sprite_prot_src_w);
-	DECLARE_READ16_MEMBER(sprite_prot_src_seg_r);
-	DECLARE_READ16_MEMBER(sprite_prot_dst1_r);
-	DECLARE_READ16_MEMBER(sprite_prot_maxx_r);
-	DECLARE_READ16_MEMBER(sprite_prot_off_r);
-	DECLARE_WRITE16_MEMBER(sprite_prot_dst1_w);
-	DECLARE_WRITE16_MEMBER(sprite_prot_maxx_w);
-	DECLARE_WRITE16_MEMBER(sprite_prot_off_w);
+	void sprite_prot_x_w(u16 data);
+	void sprite_prot_y_w(u16 data);
+	void sprite_prot_src_seg_w(u16 data);
+	void sprite_prot_src_w(address_space &space, u16 data);
+	u16 sprite_prot_src_seg_r();
+	u16 sprite_prot_dst1_r();
+	u16 sprite_prot_maxx_r();
+	u16 sprite_prot_off_r();
+	void sprite_prot_dst1_w(u16 data);
+	void sprite_prot_maxx_w(u16 data);
+	void sprite_prot_off_w(u16 data);
 
-	uint16_t m_sprite_prot_x,m_sprite_prot_y,m_dst1,m_cop_spr_maxx,m_cop_spr_off;
-	uint16_t m_sprite_prot_src_addr[2];
+	u16 m_sprite_prot_x,m_sprite_prot_y,m_dst1,m_cop_spr_maxx,m_cop_spr_off;
+	u16 m_sprite_prot_src_addr[2];
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void common_save_state();
 	virtual void video_start() override;
 
-	DECLARE_WRITE16_MEMBER(tilemap_enable_w);
-	DECLARE_WRITE16_MEMBER(tile_scroll_w);
-	DECLARE_WRITE16_MEMBER(background_w);
-	DECLARE_WRITE16_MEMBER(foreground_w);
-	DECLARE_WRITE16_MEMBER(midground_w);
-	DECLARE_WRITE16_MEMBER(text_w);
+	void tilemap_enable_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void tile_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void background_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void foreground_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void midground_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void text_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	DECLARE_WRITE16_MEMBER(m_videoram_private_w);
 
 	void bank_reset(int bgbank, int fgbank, int midbank, int txbank);
 
-	static uint16_t const raiden_blended_colors[];
-	static uint16_t const xsedae_blended_colors[];
-	static uint16_t const zeroteam_blended_colors[];
+	static u16 const raiden_blended_colors[];
+	static u16 const xsedae_blended_colors[];
+	static u16 const zeroteam_blended_colors[];
 
 	bool m_blend_active[0x800]; // cfg
 
 	tilemap_t *m_background_layer,*m_midground_layer,*m_foreground_layer,*m_text_layer;
 
 	int m_bg_bank, m_fg_bank, m_mid_bank, m_tx_bank;
-	uint16_t m_tilemap_enable;
+	u16 m_tilemap_enable;
 
-	uint16_t m_scrollvals[6];
+	u16 m_scrollvals[6];
 
 	void draw_sprites(const rectangle &cliprect);
 
@@ -122,42 +122,42 @@ protected:
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind16 &source, int layer);
 	void tilemap_draw_and_blend(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tilemap);
 
-	void init_blending(const uint16_t *table);
+	void init_blending(const u16 *table);
 
 	bitmap_ind16 m_tile_bitmap, m_sprite_bitmap;
 
 	void zeroteam_sound_map(address_map &map);
 
 private:
-	DECLARE_WRITE8_MEMBER(raiden2_bank_w);
-	DECLARE_WRITE8_MEMBER(tile_bank_01_w);
-	DECLARE_READ16_MEMBER(cop_tile_bank_2_r);
-	DECLARE_WRITE16_MEMBER(cop_tile_bank_2_w);
-	DECLARE_WRITE16_MEMBER(raidendx_cop_bank_2_w);
+	void raiden2_bank_w(u8 data);
+	void tile_bank_01_w(u8 data);
+	u16 cop_tile_bank_2_r();
+	void cop_tile_bank_2_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void raidendx_cop_bank_2_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	uint8_t m_prg_bank;
-	uint16_t m_cop_bank;
+	u16 m_cop_bank;
 
-	DECLARE_WRITE16_MEMBER(sprcpt_val_1_w);
-	DECLARE_WRITE16_MEMBER(sprcpt_val_2_w);
-	DECLARE_WRITE16_MEMBER(sprcpt_data_1_w);
-	DECLARE_WRITE16_MEMBER(sprcpt_data_2_w);
-	DECLARE_WRITE16_MEMBER(sprcpt_data_3_w);
-	DECLARE_WRITE16_MEMBER(sprcpt_data_4_w);
-	DECLARE_WRITE16_MEMBER(sprcpt_adr_w);
-	DECLARE_WRITE16_MEMBER(sprcpt_flags_1_w);
-	DECLARE_WRITE16_MEMBER(sprcpt_flags_2_w);
+	void sprcpt_val_1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sprcpt_val_2_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sprcpt_data_1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sprcpt_data_2_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sprcpt_data_3_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sprcpt_data_4_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sprcpt_adr_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sprcpt_flags_1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sprcpt_flags_2_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	uint32_t m_sprcpt_adr, m_sprcpt_idx;
+	u32 m_sprcpt_adr, m_sprcpt_idx;
 
-	uint32_t m_sprcpt_val[2], m_sprcpt_flags1;
-	uint16_t m_sprcpt_flags2;
-	uint32_t m_sprcpt_data_1[0x100], m_sprcpt_data_2[0x40], m_sprcpt_data_3[6], m_sprcpt_data_4[4];
+	u32 m_sprcpt_val[2], m_sprcpt_flags1;
+	u16 m_sprcpt_flags2;
+	u32 m_sprcpt_data_1[0x100], m_sprcpt_data_2[0x40], m_sprcpt_data_3[6], m_sprcpt_data_4[4];
 
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(raiden2);
@@ -165,7 +165,7 @@ private:
 	DECLARE_MACHINE_RESET(xsedae);
 	DECLARE_MACHINE_RESET(raidendx);
 
-	void combine32(uint32_t *val, int offset, uint16_t data, uint16_t mem_mask);
+	void combine32(u32 *val, offs_t offset, u16 data, u16 mem_mask);
 	void sprcpt_init();
 	void raiden2_cop_mem(address_map &map);
 	void raiden2_mem(address_map &map);
