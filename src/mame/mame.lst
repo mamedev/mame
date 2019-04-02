@@ -31359,10 +31359,11 @@ pcm                             // PC/M Mugler
 
 @source:pcw.cpp
 pcw10                           // 198? PCW10
-pcw8256                         // 198? PCW8256
-pcw8512                         // 198? PCW8512
-pcw9256                         // 198? PCW9256
-pcw9512                         // 198? PCW9512 (+)
+pcw8256                         // 1985 PCW8256
+pcw8512                         // 1985 PCW8512
+pcw9256                         // 1993 PCW9256
+pcw9512                         // 1987 PCW9512
+pcw9512p                        // 1991 PCW9512+
 
 @source:pcw16.cpp
 pcw16                           // 1995 PCW16

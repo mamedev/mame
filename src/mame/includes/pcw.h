@@ -150,6 +150,9 @@ public:
 	void pcw8256(machine_config &config);
 	void pcw8512(machine_config &config);
 	void pcw9512(machine_config &config);
+	void pcw9256(machine_config &config);
+	void pcw9512p(machine_config &config);
+	void pcw10(machine_config &config);
 	void pcw9512_io(address_map &map);
 	void pcw_io(address_map &map);
 	void pcw_map(address_map &map);
