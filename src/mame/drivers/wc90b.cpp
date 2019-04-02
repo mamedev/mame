@@ -273,7 +273,7 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 characters */
-	RGN_FRAC(1,1),   /* 2048 characters */
+	RGN_FRAC(1,4),   /* 2048 characters */
 	4,  /* 4 bits per pixel */
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },    /* the bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -284,7 +284,7 @@ static const gfx_layout charlayout =
 static const gfx_layout spritelayout =
 {
 	16,16,  /* 32*32 characters */
-	RGN_FRAC(1,1),
+	RGN_FRAC(1,4),
 	4,  /* 4 bits per pixel */
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) }, /* the bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
