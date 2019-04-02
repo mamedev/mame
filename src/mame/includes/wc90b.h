@@ -34,6 +34,8 @@ public:
 
 	void wc90b(machine_config &config);
 
+	void init_wc90b();
+
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
