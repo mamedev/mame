@@ -33,6 +33,7 @@ public:
 	{ }
 
 	void wc90b(machine_config &config);
+	void eurogael(machine_config &config);
 
 	void init_wc90b();
 

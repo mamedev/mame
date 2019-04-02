@@ -366,6 +366,13 @@ void wc90b_state::wc90b(machine_config &config)
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.20);
 }
 
+void wc90b_state::eurogael(machine_config &config)
+{
+	wc90b(config);
+
+	m_palette->set_format(palette_device::xBRG_444, 1024).set_endianness(ENDIANNESS_BIG);
+}
+
 ROM_START( twcup90b1 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "a02.bin",      0x00000, 0x10000, CRC(192a03dd) SHA1(ab98d370bba5437f956631b0199b173be55f1c27) )  /* c000-ffff is not used */
@@ -556,6 +563,60 @@ ROM_START( twcup90bb )
 	ROM_LOAD( "el_ic143_gal16v8_4.bin", 0x0800, 0x0117, NO_DUMP SHA1(fbe632437eac2418da7a3c3e947cfd36f6211407) )  // from another set
 ROM_END
 
+// Modular System is a stack of boards in a cage, there are apparently other games on this 'system' that wouldn't even share any hardware with this apart from the metal cage itself.
+ROM_START( eurogael )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "3z-1_fu301.ic17",      0x00000, 0x10000, CRC(74acc161) SHA1(d8660dd6d05164df4a66125c68627e955b35bef3) )  /* c000-ffff is not used */
+	ROM_LOAD( "3z-1_fu302.ic15",      0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )  /* banked at f000-f7ff */
+
+	ROM_REGION( 0x20000, "sub", 0 )  /* Second CPU */
+	ROM_LOAD( "3z-1_fu303.ic19",      0x00000, 0x10000, CRC(348195fa) SHA1(41c59e38ec4ba4f3c2185dd32dbf4ea0318ab375) )  /* c000-ffff is not used */
+	ROM_LOAD( "3z-1_fu304.ic16",      0x10000, 0x10000, CRC(9e421c4b) SHA1(e23a1f1d5d1e960696f45df653869712eb889839) )  /* banked at f000-f7ff */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "system2_fu101.ic6",      0x00000, 0x10000, CRC(712566ca) SHA1(9e46f9d449ff549b7a6d82283d8f903189b058e7) )
+
+	ROM_REGION( 0x20000, "chargfx", ROMREGION_INVERT ) // 1ST AND 2ND HALF IDENTICAL (all ROMs in this region)
+	ROM_LOAD( "r1_fu404.ic14",      0x00000, 0x8000, CRC(1659529a) SHA1(ad7a2bab43922871ce7081d46efdeefa9db5e45f) )
+	ROM_LOAD( "r1_fu403.ic15",      0x08000, 0x8000, CRC(f1effd53) SHA1(0299678e1716a92cd6ecc67d28dd95422f84d15d) )
+	ROM_LOAD( "r1_fu402.ic16",      0x10000, 0x8000, CRC(da7f3ce3) SHA1(80ae95208a807e3866560ad5f192951d33f1da34) )
+	ROM_LOAD( "r1_fu401.ic17",      0x18000, 0x8000, CRC(b93201e0) SHA1(edc8dbab15d901aab678244811d8e08d4cb974f2) )
+
+	ROM_REGION( 0x080000, "tilegfx", ROMREGION_INVERT )
+	ROM_LOAD( "r2_fu4a01.ic17",      0x060000, 0x10000, CRC(1bcdd99d) SHA1(e37a8308eff79b04ce3da75fec2fffe4021c70d3) )  // fg layer
+	ROM_LOAD( "r2_fu4a02.ic16",      0x040000, 0x10000, CRC(e625de0c) SHA1(ca5a00ea27a5107d2957a1637b260d5aa1ff5563) )
+	ROM_LOAD( "r2_fu4a03.ic15",      0x020000, 0x10000, CRC(995df90d) SHA1(121874c807001bf65a9cec90dd30212f1889a398) )
+	ROM_LOAD( "r2_fu4a04.ic14",      0x000000, 0x10000, CRC(44031f34) SHA1(0b417c6cc1ed029394bcdce80e81262d776105b7) )		
+	ROM_LOAD( "r3_fu4b01.ic17",      0x070000, 0x10000, CRC(adc7feda) SHA1(ff82e973599f13c76ecaf3c027a2967468cd9e72) )  // bg layer
+	ROM_LOAD( "r3_fu4b02.ic16",      0x050000, 0x10000, CRC(1e5c0fda) SHA1(74163098810ff079467bad77796898426acbfac5) )
+	ROM_LOAD( "r3_fu4b03.ic15",      0x030000, 0x10000, CRC(cc9dab0b) SHA1(7e5735e57b45de1b344455fa5a047ae17933de27) )
+	ROM_LOAD( "r3_fu4b04.ic14",      0x010000, 0x10000, CRC(d54704d2) SHA1(7d4ec0120c3516a88abbe687e8916b44bffb7bcd) )		
+
+	ROM_REGION( 0x080000, "spritegfx", ROMREGION_INVERT )
+	ROM_LOAD( "r4_fu501.bin",  0x000000, 0x10000, CRC(d5a60096) SHA1(a8e351a4b020b4fc2b2cb7d3f0fdfb43fc44d7d9) )
+	ROM_LOAD( "r4_fu5a01.bin", 0x010000, 0x10000, CRC(36bbf467) SHA1(627b5847ffb098c92edfd58c25391799f3b209e0) )
+	ROM_LOAD( "r4_fu502.bin",  0x020000, 0x10000, CRC(26371c18) SHA1(0887041d86dc9f19dad264ae27dc56fb89ac3265) )
+	ROM_LOAD( "r4_fu5a02.bin", 0x030000, 0x10000, CRC(75aa9b86) SHA1(0c221bd2e8a5472bb0e515f27fb72b0c8e8c0ca4) )
+	ROM_LOAD( "r4_fu503.bin",  0x040000, 0x10000, CRC(0da825f9) SHA1(cfba0c85fc767726c1d63f87468335d1c2f1eed8) )
+	ROM_LOAD( "r4_fu5a03.bin", 0x050000, 0x10000, CRC(228429d8) SHA1(3b2dbea53807929c24d593c469a83172f7747f66) )
+	ROM_LOAD( "r4_fu504.bin",  0x060000, 0x10000, CRC(516b6c09) SHA1(9d02514dece864b087f67886009ce54bd51b5575) )
+	ROM_LOAD( "r4_fu5a04.bin", 0x070000, 0x10000, CRC(f36390a9) SHA1(e5ea36e91b3ced068281524ee79d0432f489715c) )
+
+	ROM_REGION( 0x100, "prom", ROMREGION_ERASEFF )
+	ROM_LOAD( "r4_p0502_82s129.ic10",      0x000, 0x100, CRC(15085e44) SHA1(646e7100fcb112594023cf02be036bd3d42cc13c) )
+
+	ROM_REGION( 0x1000, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "r2_p0403_pal16r8a.ic29",      0x000, 0x104, CRC(506156cc) SHA1(5560671fc2c9872ed28620491af5dc486909fc6e) )
+	ROM_LOAD( "r3_p0403_pal16r8a.ic29",      0x000, 0x104, CRC(d8c6ac25) SHA1(d6184e491313ff8da5b1ce60ffe8ef517716807c) )
+	ROM_LOAD( "r4_p0503_pal16r6.ic46",       0x000, 0x104, CRC(07eb86d2) SHA1(482eb325df5bc60353bac85412cf45429cd03c6d) )
+	// these were read protected
+	ROM_LOAD( "3z-1_3138_gal16v8.ic22",      0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "3z-1_3238_gal16v8.ic24",      0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "r1_403_gal16v8.ic29",         0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "system2_9138_gal16v8.ic42",   0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "system2_9238_gal20v8.ic18",   0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "system2_9338_gal16v8.ic10",   0x0, 0x1, NO_DUMP )
+ROM_END
 
 
 void wc90b_state::init_wc90b()
@@ -585,3 +646,6 @@ GAME( 1989, twcup90b1, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bo
 GAME( 1989, twcup90ba, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, twcup90b2, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bootleg", "Worldcup '90 (hack)",                                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, twcup90bb, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bootleg", "World Cup '90 (European hack, different title)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+ // not sure if it best fits here, in wc90.cpp, or in a new driver, it shares the weird tile decoding with the bootlegs tho
+GAME( 1989, eurogael,  twcup90, eurogael, wc90b, wc90b_state, init_wc90b, ROT0, "bootleg (Gaelco / Ervisa)", "Euro League (Gaelco bootleg, Modular System)", MACHINE_NOT_WORKING )
+
