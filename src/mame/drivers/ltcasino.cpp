@@ -3,25 +3,25 @@
 /***************************************************************************
 
     Little Casino
-	Little Casino II
+    Little Casino II
     Mini Vegas 4in1
 
     Non-Payout 'Gambling' style games
 
     TODO:
     - Clocks need to be verified
-	- Timing is probably wrong, IRQ sources need to be verified
+    - Timing is probably wrong, IRQ sources need to be verified
     - Figure out the rest of the dipswitches
     - Keyboard
 
     Notes:
-	- To enter service mode, press buttons 2 and 4 then reset. Let go
-	  of the buttons once the video test finishes. Some games also
-	  enter service mode if you disable all games via the dipswitches.
-	  Once in service mode, press both buttons 2 and 4 to advance to
-	  next screen.
-	- The name "Little Casino II" is just reflected by a sticker on the
-	  cabinet - the title screen is still "Little Casino"
+    - To enter service mode, press buttons 2 and 4 then reset. Let go
+      of the buttons once the video test finishes. Some games also
+      enter service mode if you disable all games via the dipswitches.
+      Once in service mode, press both buttons 2 and 4 to advance to
+      next screen.
+    - The name "Little Casino II" is just reflected by a sticker on the
+      cabinet - the title screen is still "Little Casino"
     - Color version of "Little Casino" is undumped (flyer exists)?
 
 
@@ -70,6 +70,7 @@ Other: Hitachi HD46821P 1MHz NMOS Peripheral Interface Adapter (PIA) x 2
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
+#include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/tms9927.h"
@@ -494,13 +495,18 @@ void ltcasino_state::ltcasino(machine_config &config)
 	M6502(config, m_maincpu, 18_MHz_XTAL/16); // clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &ltcasino_state::main_map);
 
+	input_merger_device &mainirq(INPUT_MERGER_ANY_HIGH(config, "mainirq"));
+	mainirq.output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
+
 	NVRAM(config, "nvram");
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(ltcasino_state::input_q_r));
 	m_pia[0]->writepb_handler().set(FUNC(ltcasino_state::output_r_w));
+	m_pia[0]->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_pia[0]->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set(FUNC(ltcasino_state::input_s_r));
 	m_pia[1]->writepb_handler().set(FUNC(ltcasino_state::output_t_w));
 
@@ -511,8 +517,7 @@ void ltcasino_state::ltcasino(machine_config &config)
 	m_vtc->set_char_width(8);
 	m_vtc->set_screen("screen");
 	m_vtc->set_visarea(48, 463, 0, 255);
-	m_vtc->vsyn_callback().set_inputline("maincpu", 0); // ?
-	m_vtc->vsyn_callback().append(m_pia[0], FUNC(pia6821_device::cb2_w)); // ?
+	m_vtc->vsyn_callback().set(m_pia[0], FUNC(pia6821_device::cb2_w)).invert(); // ? (CA1, CA2 also enabled)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(18_MHz_XTAL/2, 560, 48, 464, 268, 0, 256);
