@@ -689,5 +689,5 @@ void nes_exrom_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "addon").front_center();
 
 	// TODO: temporary; will be separated device
-	NES_APU(config, m_sound, XTAL(21'477'272)/12).add_route(ALL_OUTPUTS, "addon", 0.50);
+	NES_APU(config, m_sound, XTAL(21'477'272)/12).add_route(ALL_OUTPUTS, "addon", 0.90);
 }
