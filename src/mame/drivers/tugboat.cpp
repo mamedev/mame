@@ -359,9 +359,10 @@ static GFXDECODE_START( gfx_tugboat )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(tugboat_state::tugboat)
-	MCFG_DEVICE_ADD("maincpu", M6502, 2000000) /* 2 MHz ???? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+void tugboat_state::tugboat(machine_config &config)
+{
+	M6502(config, m_maincpu, 2000000); /* 2 MHz ???? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tugboat_state::main_map);
 
 	pia6821_device &pia0(PIA6821(config, "pia0", 0));
 	pia0.readpa_handler().set(FUNC(tugboat_state::input_r));
@@ -370,13 +371,13 @@ MACHINE_CONFIG_START(tugboat_state::tugboat)
 	pia1.readpa_handler().set_ioport("DSW");
 	pia1.writepb_handler().set(FUNC(tugboat_state::ctrl_w));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8,32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8,31*8-1,2*8,30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tugboat_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(32*8,32*8);
+	m_screen->set_visarea(1*8,31*8-1,2*8,30*8-1);
+	m_screen->set_screen_update(FUNC(tugboat_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tugboat);
 	PALETTE(config, m_palette, FUNC(tugboat_state::tugboat_palette), 256);
@@ -385,7 +386,7 @@ MACHINE_CONFIG_START(tugboat_state::tugboat)
 	SPEAKER(config, "mono").front_center();
 
 	AY8912(config, "aysnd", XTAL(10'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.35);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( tugboat )

@@ -24,12 +24,13 @@ DEFINE_DEVICE_TYPE(C1531, c1531_device, "c1531", "Commodore 1531 Datassette")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c2n_device::device_add_mconfig)
-	MCFG_CASSETTE_ADD("cassette" )
-	MCFG_CASSETTE_FORMATS(cbm_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
-	MCFG_CASSETTE_INTERFACE("cbm_cass")
-MACHINE_CONFIG_END
+void c2n_device::device_add_mconfig(machine_config &config)
+{
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(cbm_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_interface("cbm_cass");
+}
 
 
 

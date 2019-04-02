@@ -1807,11 +1807,12 @@ void gba_lcd_device::device_reset()
 	m_hbl_timer->adjust(attotime::never);
 }
 
-MACHINE_CONFIG_START(gba_lcd_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(16'777'216) / 4, 308, 0, 240, 228, 0, 160)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, gba_lcd_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+void gba_lcd_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_raw(XTAL(16'777'216) / 4, 308, 0, 240, 228, 0, 160);
+	screen.set_screen_update(FUNC(gba_lcd_device::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(gba_lcd_device::gba_palette), 32768);
-MACHINE_CONFIG_END
+}

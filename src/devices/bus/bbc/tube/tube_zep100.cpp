@@ -146,12 +146,12 @@ void bbc_tube_zep100_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_tube_zep100_device::host_r)
+uint8_t bbc_tube_zep100_device::host_r(offs_t offset)
 {
 	return m_via->read(offset & 0x0f);
 }
 
-WRITE8_MEMBER(bbc_tube_zep100_device::host_w)
+void bbc_tube_zep100_device::host_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x10)
 		m_z80->reset();
@@ -160,7 +160,7 @@ WRITE8_MEMBER(bbc_tube_zep100_device::host_w)
 }
 
 
-READ8_MEMBER(bbc_tube_zep100_device::mem_r)
+uint8_t bbc_tube_zep100_device::mem_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -172,13 +172,13 @@ READ8_MEMBER(bbc_tube_zep100_device::mem_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_tube_zep100_device::mem_w)
+void bbc_tube_zep100_device::mem_w(offs_t offset, uint8_t data)
 {
 	m_ram->pointer()[offset] = data;
 }
 
 
-READ8_MEMBER(bbc_tube_zep100_device::io_r)
+uint8_t bbc_tube_zep100_device::io_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -190,23 +190,23 @@ READ8_MEMBER(bbc_tube_zep100_device::io_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_tube_zep100_device::io_w)
+void bbc_tube_zep100_device::io_w(offs_t offset, uint8_t data)
 {
 	m_ppi->write(offset & 0x03, data);
 }
 
 
-WRITE8_MEMBER(bbc_tube_zep100_device::via_pb_w)
+void bbc_tube_zep100_device::via_pb_w(uint8_t data)
 {
 	m_port_b = data;
 }
 
-READ8_MEMBER(bbc_tube_zep100_device::ppi_pb_r)
+uint8_t bbc_tube_zep100_device::ppi_pb_r()
 {
 	return m_port_b;
 }
 
-WRITE8_MEMBER(bbc_tube_zep100_device::ppi_pc_w)
+void bbc_tube_zep100_device::ppi_pc_w(uint8_t data)
 {
 	m_via->write_ca1(BIT(data, 7));
 	m_via->write_cb1(BIT(data, 1));

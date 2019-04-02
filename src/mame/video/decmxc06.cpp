@@ -61,7 +61,7 @@ void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 	offs = 0;
 	while (offs < m_ramsize / 2)
 	{
-		int sx, sy, code, color, w, h, flipx, flipy, incy, flash, mult, x, y;
+		int sx, sy, code, color, w, h, flipx, flipy, incy, flash, mult, x, y, parentFlipY;
 
 		sy = spriteram[offs];
 		sx = spriteram[offs + 2];
@@ -70,12 +70,9 @@ void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 		flash = sx & 0x800;
 
 		flipx = sy & 0x2000;
-		flipy = sy & 0x4000;
+		parentFlipY = flipy = sy & 0x4000;
 		h = (1 << ((sy & 0x1800) >> 11));   /* 1x, 2x, 4x, 8x height */
 		w = (1 << ((sy & 0x0600) >>  9));   /* 1x, 2x, 4x, 8x width */
-		/* multi width used only on the title screen? */
-
-
 
 		sx = sx & 0x01ff;
 		sy = sy & 0x01ff;
@@ -112,7 +109,7 @@ void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 			code &= ~(h - 1);
 
 			// not affected by flipscreen
-			if (spriteram[offs] & 0x4000)
+			if (parentFlipY) // in the case of multi-width sprites the y flip bit is set by the parent
 				incy = -1;
 			else
 			{

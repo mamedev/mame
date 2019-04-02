@@ -285,16 +285,16 @@ INTERRUPT_GEN_MEMBER(wiping_state::sound_timer_irq)
 
 
 
-MACHINE_CONFIG_START(wiping_state::wiping)
-
+void wiping_state::wiping(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wiping_state,  vblank_irq)
+	Z80(config, m_maincpu, 18432000/6); /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wiping_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(wiping_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,18432000/6)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(wiping_state, sound_timer_irq, 120)    /* periodic interrupt, don't know about the frequency */
+	Z80(config, m_audiocpu, 18432000/6);    /* 3.072 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &wiping_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(wiping_state::sound_timer_irq), attotime::from_hz(120));    /* periodic interrupt, don't know about the frequency */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 5A
 	mainlatch.q_out_cb<0>().set(FUNC(wiping_state::main_irq_mask_w)); // INT1
@@ -305,13 +305,13 @@ MACHINE_CONFIG_START(wiping_state::wiping)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wiping_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(36*8, 28*8);
+	screen.set_visarea(0*8, 36*8-1, 0*8, 28*8-1);
+	screen.set_screen_update(FUNC(wiping_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wiping);
 	PALETTE(config, m_palette, FUNC(wiping_state::wiping_palette), 64*4+64*4, 32);
@@ -320,7 +320,7 @@ MACHINE_CONFIG_START(wiping_state::wiping)
 	SPEAKER(config, "mono").front_center();
 
 	WIPING_CUSTOM(config, "wiping", 96000).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 

@@ -33,7 +33,7 @@
 class mos6551_device : public device_t
 {
 public:
-	mos6551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos6551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto txd_handler() { return m_txd_handler.bind(); }
@@ -41,8 +41,8 @@ public:
 	auto rts_handler() { return m_rts_handler.bind(); }
 	auto dtr_handler() { return m_dtr_handler.bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(write_xtal1); // txc
 	DECLARE_WRITE_LINE_MEMBER(write_rxd);

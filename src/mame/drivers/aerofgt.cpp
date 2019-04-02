@@ -76,7 +76,7 @@ Verification still needed for the other PCBs.
 
 WRITE8_MEMBER(aerofgt_state::karatblzbl_soundlatch_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -1861,7 +1861,7 @@ void aerofgt_state::turbofrc(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(61.31);	/* verified on pcb */
+	screen.set_refresh_hz(61.31);   /* verified on pcb */
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 44*8-1, 0*8, 30*8-1);

@@ -72,20 +72,20 @@ void unianapc_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(unianapc_state::unianapc)
-
+void unianapc_state::unianapc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 100000000) // actually a Celeron at 1.70 GHz
-	MCFG_DEVICE_PROGRAM_MAP(unianapc_map)
+	PENTIUM3(config, m_maincpu, 100000000); // actually a Celeron at 1.70 GHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &unianapc_state::unianapc_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(unianapc_state, screen_update)
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(unianapc_state::screen_update));
+}
 
 /***************************************************************************
 

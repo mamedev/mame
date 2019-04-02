@@ -814,7 +814,7 @@ WRITE8_MEMBER(itech8_state::gtg2_sound_data_w)
 			((data & 0x5d) << 1) |
 			((data & 0x20) >> 3) |
 			((data & 0x02) << 5);
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 }
 
 
@@ -840,12 +840,12 @@ READ16_MEMBER(itech8_state::rom_constant_r)
 
 READ8_MEMBER(itech8_state::ninclown_palette_r)
 {
-	return m_tlc34076->read(space, offset / 16);
+	return m_tlc34076->read(offset / 16);
 }
 
 WRITE8_MEMBER(itech8_state::ninclown_palette_w)
 {
-	m_tlc34076->write(space, offset / 16, data);
+	m_tlc34076->write(offset / 16, data);
 }
 
 

@@ -292,17 +292,17 @@ void ladybug_base_state::palette_init_common(palette_device &palette, const uint
 		// red component
 		bit0 = BIT(~color_prom[i], r_bit0);
 		bit1 = BIT(~color_prom[i], r_bit1);
-		int const r = combine_2_weights(rweights, bit0, bit1);
+		int const r = combine_weights(rweights, bit0, bit1);
 
 		// green component
 		bit0 = BIT(~color_prom[i], g_bit0);
 		bit1 = BIT(~color_prom[i], g_bit1);
-		int const g = combine_2_weights(gweights, bit0, bit1);
+		int const g = combine_weights(gweights, bit0, bit1);
 
 		// blue component
 		bit0 = BIT(~color_prom[i], b_bit0);
 		bit1 = BIT(~color_prom[i], b_bit1);
-		int const b = combine_2_weights(bweights, bit0, bit1);
+		int const b = combine_weights(bweights, bit0, bit1);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}

@@ -88,7 +88,8 @@ void cdp1869_device::page_map(address_map &map)
 // default address map
 void cdp1869_device::cdp1869(address_map &map)
 {
-	map(0x000, 0x7ff).ram();
+	if (!has_configured_map(0))
+		map(0x000, 0x7ff).ram();
 }
 
 
@@ -359,7 +360,7 @@ cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, d
 	m_color_clock(0),
 	m_stream(nullptr),
 	m_palette(*this, "palette"),
-	m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, address_map_constructor(), address_map_constructor(FUNC(cdp1869_device::cdp1869), this))
+	m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, address_map_constructor(FUNC(cdp1869_device::cdp1869), this))
 {
 }
 

@@ -13,16 +13,15 @@
 #include "speaker.h"
 
 
-#define VERBOSE_DBG 1       /* general debug messages */
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_DEBUG     (1U <<  1)
 
-#define DBG_LOG(N,M,A) \
-	do { \
-	if(VERBOSE_DBG>=N) \
-		{ \
-			logerror("%11.6f at %s: ",machine().time().as_double(),machine().describe_context()); \
-			logerror A; \
-		} \
-	} while (0)
+//#define VERBOSE (LOG_GENERAL | LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -406,7 +405,7 @@ WRITE8_MEMBER( ms7004_device::p1_w )
 	    6
 	    7       Serial TX
 	*/
-	DBG_LOG(2,0,( "%s: p1_w %02x = send %d\n", tag(), data, BIT(data, 7)));
+	LOGDBG("p1_w %02x = send %d\n", data, BIT(data, 7));
 
 	m_p1 = data;
 	m_tx_handler(BIT(data, 7));
@@ -431,7 +430,7 @@ WRITE8_MEMBER( ms7004_device::p2_w )
 	    6       LED "Caps"
 	    7       LED "Hold"
 	*/
-	DBG_LOG(2,0,( "p2_w %02x = col %d\n", data, data&15));
+	LOGDBG("p2_w %02x = col %d\n", data, data&15);
 
 	m_p2 = data;
 	m_i8243->p2_w(data);
@@ -447,7 +446,7 @@ void ms7004_device::i8243_port_w(uint8_t data)
 {
 	int sense = 0;
 
-	DBG_LOG(2,0,( "8243 port %d data %02xH\n", P + 4, data));
+	LOGDBG("8243 port %d data %02xH\n", P + 4, data);
 
 	if (data) {
 		switch(data) {
@@ -458,8 +457,8 @@ void ms7004_device::i8243_port_w(uint8_t data)
 		}
 		m_keylatch = BIT(sense, (m_p1 & 7));
 		if (m_keylatch)
-		DBG_LOG(1,0,( "row %d col %02x t1 %d\n",
-			(m_p1 & 7), (P << 4 | data), m_keylatch));
+		LOG("row %d col %02x t1 %d\n",
+			(m_p1 & 7), (P << 4 | data), m_keylatch);
 	}
 }
 

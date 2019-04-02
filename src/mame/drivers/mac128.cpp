@@ -109,8 +109,8 @@ c0   8 data bits, Rx disabled
 #define DAC_TAG "macdac"
 #define SCC_TAG "scc"
 
-#define C7M (7833600)
-#define C3_7M (3916800)
+#define C7M (15.6672_MHz_XTAL / 2)
+#define C3_7M (15.6672_MHz_XTAL / 4).value()
 
 // uncomment to run i8021 keyboard in original Mac/512(e)/Plus
 //#define MAC_USE_EMULATED_KBD (1)
@@ -1350,7 +1350,7 @@ void mac128_state::mac512ke(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(C7M*2, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
+	m_screen->set_raw(15.6672_MHz_XTAL, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
 	m_screen->set_screen_update(FUNC(mac128_state::screen_update_mac));
 	m_screen->set_palette("palette");
 
@@ -1362,7 +1362,6 @@ void mac128_state::mac512ke(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_PWM(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 2 x ls161
 	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref"));
-	vreg.set_output(5.0);
 	vreg.add_route(0, DAC_TAG, 1.0, DAC_VREF_POS_INPUT);
 	vreg.add_route(0, DAC_TAG, -1.0, DAC_VREF_NEG_INPUT);
 
@@ -1725,7 +1724,7 @@ ROM_END
 //COMP( 1983, mactw,    0,       0,      mac128k,  macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
 COMP( 1984, mac128k,  0,       0,      mac128k,  macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh 128k",  MACHINE_NOT_WORKING )
 COMP( 1984, mac512k,  mac128k, 0,      mac512ke, macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh 512k",  MACHINE_NOT_WORKING )
-COMP( 1986, mac512ke, macplus, 0,      mac512ke, macplus, mac128_state, init_mac512ke,    "Apple Computer",    "Macintosh 512ke", 0 )
+COMP( 1986, mac512ke, macplus, 0,      mac512ke, macplus, mac128_state, init_mac512ke,    "Apple Computer",    "Macintosh 512ke", MACHINE_NOT_WORKING )
 COMP( 1985, unitron,  macplus, 0,      mac512ke, macplus, mac128_state, init_mac512ke,    "bootleg (Unitron)", "Mac 512",  MACHINE_NOT_WORKING )
-COMP( 1986, macplus,  0,       0,      macplus,  macplus, mac128_state, init_macplus,     "Apple Computer",    "Macintosh Plus",  0 )
-COMP( 1985, utrn1024, macplus, 0,      macplus,  macplus, mac128_state, init_macplus,     "bootleg (Unitron)", "Unitron 1024",  0 )
+COMP( 1986, macplus,  0,       0,      macplus,  macplus, mac128_state, init_macplus,     "Apple Computer",    "Macintosh Plus",  MACHINE_NOT_WORKING )
+COMP( 1985, utrn1024, macplus, 0,      macplus,  macplus, mac128_state, init_macplus,     "bootleg (Unitron)", "Unitron 1024",  MACHINE_NOT_WORKING )

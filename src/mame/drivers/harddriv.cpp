@@ -565,7 +565,6 @@ void harddriv_state::driver_gsp_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x0000200f).noprw();                 /* hit during self-test */
 	map(0x02000000, 0x0207ffff).rw(FUNC(harddriv_state::hdgsp_vram_2bpp_r), FUNC(harddriv_state::hdgsp_vram_1bpp_w));
-	map(0xc0000000, 0xc00001ff).rw("gsp", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xf4000000, 0xf40000ff).rw(FUNC(harddriv_state::hdgsp_control_lo_r), FUNC(harddriv_state::hdgsp_control_lo_w)).share("gsp_control_lo");
 	map(0xf4800000, 0xf48000ff).rw(FUNC(harddriv_state::hdgsp_control_hi_r), FUNC(harddriv_state::hdgsp_control_hi_w)).share("gsp_control_hi");
 	map(0xf5000000, 0xf5000fff).rw(FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w)).share("gsp_palram_lo");
@@ -579,7 +578,6 @@ void harddriv_state::driver_msp_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x000fffff).ram().share("msp_ram");
 	map(0x00700000, 0x007fffff).ram().share("msp_ram");
-	map(0xc0000000, 0xc00001ff).rw("msp", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xfff00000, 0xffffffff).ram().share("msp_ram");
 }
 
@@ -616,7 +614,6 @@ void harddriv_state::multisync_gsp_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x0000200f).noprw();                 /* hit during self-test */
 	map(0x02000000, 0x020fffff).rw(FUNC(harddriv_state::hdgsp_vram_2bpp_r), FUNC(harddriv_state::hdgsp_vram_2bpp_w));
-	map(0xc0000000, 0xc00001ff).r("gsp", FUNC(tms34010_device::io_register_r)).w(FUNC(harddriv_state::hdgsp_io_w));
 	map(0xf4000000, 0xf40000ff).rw(FUNC(harddriv_state::hdgsp_control_lo_r), FUNC(harddriv_state::hdgsp_control_lo_w)).share("gsp_control_lo");
 	map(0xf4800000, 0xf48000ff).rw(FUNC(harddriv_state::hdgsp_control_hi_r), FUNC(harddriv_state::hdgsp_control_hi_w)).share("gsp_control_hi");
 	map(0xf5000000, 0xf5000fff).rw(FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w)).share("gsp_palram_lo");
@@ -658,7 +655,6 @@ void harddriv_state::multisync2_gsp_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x0000200f).noprw();                 /* hit during self-test */
 	map(0x02000000, 0x020fffff).rw(FUNC(harddriv_state::hdgsp_vram_2bpp_r), FUNC(harddriv_state::hdgsp_vram_2bpp_w));
-	map(0xc0000000, 0xc00001ff).r("gsp", FUNC(tms34010_device::io_register_r)).w(FUNC(harddriv_state::hdgsp_io_w));
 	map(0xf4000000, 0xf40000ff).rw(FUNC(harddriv_state::hdgsp_control_lo_r), FUNC(harddriv_state::hdgsp_control_lo_w)).share("gsp_control_lo");
 	map(0xf4800000, 0xf48000ff).rw(FUNC(harddriv_state::hdgsp_control_hi_r), FUNC(harddriv_state::hdgsp_control_hi_w)).share("gsp_control_hi");
 	map(0xf5000000, 0xf5000fff).rw(FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w)).share("gsp_palram_lo");
@@ -1540,6 +1536,7 @@ void harddriv_state::multisync_nomsp(machine_config &config)
 	m_gsp->set_addrmap(AS_PROGRAM, &harddriv_state::multisync_gsp_map);
 	m_gsp->set_pixel_clock(6000000);
 	m_gsp->set_pixels_per_clock(2);
+	m_gsp->ioreg_pre_write().set(FUNC(harddriv_state::hdgsp_io_w));
 	m_gsp->set_scanline_ind16_callback(FUNC(harddriv_state::scanline_multisync));
 
 	/* video hardware */
@@ -1627,7 +1624,6 @@ void harddriv_state::ds3(machine_config &config)
 	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
 	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
@@ -2093,14 +2089,14 @@ void harddriv_new_state::racedriv_panorama_machine(machine_config &config)
 	RACEDRIVC_PANORAMA_SIDE_BOARD(config, "leftpcb", 0);
 	RACEDRIVC_PANORAMA_SIDE_BOARD(config, "rightpcb", 0);
 
-//  MCFG_QUANTUM_TIME(attotime::from_hz(100000))
+//  config.m_minimum_quantum = attotime::from_hz(100000);
 	subdevice<mc68681_device>("mainpcb:duartn68681")->a_tx_cb().set(FUNC(harddriv_new_state::tx_a));
 
 	// boots with 'PROGRAM OK' when using standard Hard Drivin' board type (needs 137412-115 slapstic)
 	subdevice<atari_slapstic_device>("mainpcb:slapstic")->set_chipnum(115);
 
 	TIMER(config, "hack_timer").configure_periodic(FUNC(harddriv_new_state::hack_timer), attotime::from_hz(60));
-//  MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+//  config.m_minimum_quantum = attotime::from_hz(60000);
 }
 
 // this is an ugly hack, otherwise MAME's core can't seem to handle partial updates if you have multiple screens with different update frequencies.

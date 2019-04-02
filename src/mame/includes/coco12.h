@@ -72,6 +72,7 @@ protected:
 private:
 	void configure_sam(void);
 
+protected:
 	required_device<mc6847_base_device> m_vdg;
 };
 

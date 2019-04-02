@@ -6,7 +6,7 @@ bpl_rel     xavora_idy  phx_imp     orapa_imp  asr_zpx     ora_zpx     asl_zpx  
 jsr_adr     xavand_idx  callf_xa3   andj_imp   bit_zpg     and_zpg     rol_zpg     andk_imp   plp_imp     and_imm     rol_acc     andl_imp   bit_aba     and_aba     rol_aba     andm_imp
 bmi_rel     xavand_idy  plx_imp     andpa_imp  bit_zpx     and_zpx     rol_zpx     andpb_imp  sec_imp     and_aby     bit_imm     lpa0_imp   bit_abx     and_abx     rol_abx     lpb0_imp
 rti_xav_imp xaveor_idx  nop_imp     eorj_imp   nop_imp     eor_zpg     lsr_zpg     eork_imp   pha_imp     eor_imm     lsr_acc     eorl_imp   jmp_adr     eor_aba     lsr_aba     eorm_imp
-bvc_rel     xaveor_idy  phy_imp     eorpa_imp  nop_imp     eor_zpx     lsr_zpx     eorpb_imp  cli_imp     eor_aby     nop_imp     spa1_imp   callf_aba   eor_abx     lsr_abx     spb1_imp
+bvc_rel     xaveor_idy  phy_imp     eorpa_imp  nop_imp     eor_zpx     lsr_zpx     eorpb_imp  cli_imp     eor_aby     nop_imp     spa1_imp   jmp_xa3     eor_abx     lsr_abx     spb1_imp
 rts_imp     xavadc_idx  nop_imp     adcj_imp   nop_imp     adc_zpg     ror_zpg     adck_imp   pla_imp     adc_imm     ror_acc     adcl_imp   jmp_ind     adc_aba     ror_aba     adcm_imp
 bvs_rel     xavadc_idy  ply_imp     adcpa_imp  nop_imp     adc_zpx     ror_zpx     adcpb_imp  sei_imp     adc_aby     nop_imp     lpa1_imp   jmpf_ind    adc_abx     ror_abx     lpb1_imp
 retf_imp    xavsta_idx  stz_zpg     staj_imp   sty_zpg     sta_zpg     stx_zpg     stak_imp   dey_imp     sev_imp     txa_imp     stal_imp   sty_aba     sta_aba     stx_aba     stam_imp

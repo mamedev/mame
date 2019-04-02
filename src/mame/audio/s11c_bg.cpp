@@ -58,30 +58,31 @@ void s11c_bg_device::data_w(uint8_t data)
 	m_pia40->write_portb(data);
 }
 
-MACHINE_CONFIG_START(s11c_bg_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("bgcpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
-	MCFG_DEVICE_PROGRAM_MAP(s11c_bg_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
+void s11c_bg_device::device_add_mconfig(machine_config &config)
+{
+	MC6809E(config, m_cpu, XTAL(8'000'000) / 4); // MC68B09E
+	m_cpu->set_addrmap(AS_PROGRAM, &s11c_bg_device::s11c_bg_map);
+	config.m_minimum_quantum = attotime::from_hz(50);
 
 	YM2151(config, m_ym2151, XTAL(3'579'545)); // "3.58 MHz" on schematics and parts list
 	m_ym2151->irq_handler().set(FUNC(s11c_bg_device::ym2151_irq_w));
 	m_ym2151->add_route(ALL_OUTPUTS, *this, 0.25);
 
-	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_DEVICE_ADD("hc55516_bg", HC55516, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.5)
+	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, *this, 0.5);
 
 	PIA6821(config, m_pia40, 0);
 	m_pia40->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia40->writepb_handler().set(FUNC(s11c_bg_device::pia40_pb_w));
 	m_pia40->ca2_handler().set(m_ym2151, FUNC(ym2151_device::reset_w));
 	m_pia40->cb2_handler().set(FUNC(s11c_bg_device::pia40_cb2_w));
-	m_pia40->irqa_handler().set_inputline("bgcpu", M6809_FIRQ_LINE);
-	m_pia40->irqb_handler().set_inputline("bgcpu", INPUT_LINE_NMI);
-MACHINE_CONFIG_END
+	m_pia40->irqa_handler().set_inputline(m_cpu, M6809_FIRQ_LINE);
+	m_pia40->irqb_handler().set_inputline(m_cpu, INPUT_LINE_NMI);
+}
 
 void s11c_bg_device::device_start()
 {

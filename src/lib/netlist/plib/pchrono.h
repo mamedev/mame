@@ -9,16 +9,17 @@
 #define PCHRONO_H_
 
 #include "pconfig.h"
+#include "ptypes.h"
 
-#include <cstdint>
 #include <chrono>
+#include <cstdint>
 
 namespace plib {
 namespace chrono {
 	template <typename T>
 	struct sys_ticks
 	{
-		typedef typename T::rep type;
+		using type = typename T::rep;
 		static inline type start() { return T::now().time_since_epoch().count(); }
 		static inline type stop() { return T::now().time_since_epoch().count(); }
 		static inline constexpr type per_second() { return T::period::den / T::period::num; }
@@ -145,7 +146,7 @@ namespace chrono {
 	struct counter
 	{
 		counter() : m_count(0) { }
-		typedef uint_least64_t type;
+		using type = uint_least64_t;
 		type operator()() const { return m_count; }
 		void inc() { ++m_count; }
 		void reset() { m_count = 0; }
@@ -157,7 +158,7 @@ namespace chrono {
 	template<>
 	struct counter<false>
 	{
-		typedef uint_least64_t type;
+		using type = uint_least64_t;
 		constexpr type operator()() const { return 0; }
 		void inc() const { }
 		void reset() const { }
@@ -168,15 +169,28 @@ namespace chrono {
 	template< typename T, bool enabled_ = true>
 	struct timer
 	{
-		typedef typename T::type type;
-		typedef uint_least64_t   ctype;
+		using type = typename T::type;
+		using ctype = uint_least64_t;
+		constexpr static bool enabled = enabled_;
+
+		struct guard_t
+		{
+			guard_t() = delete;
+			guard_t(timer &m) noexcept : m_m(m) { m_m.m_time -= T::start(); }
+			~guard_t() { m_m.m_time += T::stop(); ++m_m.m_count; }
+
+			COPYASSIGNMOVE(guard_t, default)
+
+		private:
+			timer &m_m;
+		};
+
+		friend struct guard_t;
 
 		timer() : m_time(0), m_count(0) { }
 
 		type operator()() const { return m_time; }
 
-		void start() { m_time -= T::start(); }
-		void stop() { m_time += T::stop(); ++m_count; }
 		void reset() { m_time = 0; m_count = 0; }
 		type average() const { return (m_count == 0) ? 0 : m_time / m_count; }
 		type total() const { return m_time; }
@@ -185,7 +199,7 @@ namespace chrono {
 		double as_seconds() const { return static_cast<double>(total())
 				/ static_cast<double>(T::per_second()); }
 
-		constexpr static bool enabled = enabled_;
+		guard_t guard() { return guard_t(*this); }
 	private:
 		type m_time;
 		ctype m_count;
@@ -194,18 +208,30 @@ namespace chrono {
 	template<typename T>
 	struct timer<T, false>
 	{
-		typedef typename T::type type;
-		typedef uint_least64_t   ctype;
+		using type = typename T::type;
+		using ctype = uint_least64_t;
+
+		struct guard_t
+		{
+			guard_t() = default;
+			COPYASSIGNMOVE(guard_t, default)
+			/* using default constructor will trigger warning on
+			 * unused local variable.
+			 */
+			// NOLINTNEXTLINE(modernize-use-equals-default)
+			~guard_t() { }
+		};
+
 		constexpr type operator()() const { return 0; }
-		void start()  const { }
-		void stop() const { }
 		void reset() const { }
 		constexpr type average() const { return 0; }
 		constexpr type total() const { return 0; }
 		constexpr ctype count() const { return 0; }
 		constexpr double as_seconds() const { return 0.0; }
 		constexpr static bool enabled = false;
+		guard_t guard() { return guard_t(); }
 	};
+
 
 	} // namespace chrono
 } // namespace plib

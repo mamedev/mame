@@ -182,14 +182,14 @@ void adc0848_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  INTERFACE
 //**************************************************************************
 
-READ8_MEMBER( adc0844_device::read )
+u8 adc0844_device::read()
 {
 	m_intr_cb(CLEAR_LINE);
 
 	return m_result;
 }
 
-WRITE8_MEMBER( adc0844_device::write )
+void adc0844_device::write(u8 data)
 {
 	m_intr_cb(CLEAR_LINE);
 
@@ -198,7 +198,7 @@ WRITE8_MEMBER( adc0844_device::write )
 	m_conversion_timer->adjust(attotime::from_usec(40));
 }
 
-WRITE8_MEMBER( adc0848_device::write )
+void adc0848_device::write(u8 data)
 {
 	m_intr_cb(CLEAR_LINE);
 

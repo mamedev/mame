@@ -106,7 +106,7 @@ void electron_state::electron64_opcodes(address_map &map)
 INPUT_CHANGED_MEMBER(electron_state::trigger_reset)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-	if (newval)
+	if (!newval)
 	{
 		m_exp->reset();
 	}
@@ -211,7 +211,8 @@ static INPUT_PORTS_START( electron64 )
 	PORT_CONFSETTING(0x02, "64K")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(electron_state::electron)
+void electron_state::electron(machine_config &config)
+{
 	M6502(config, m_maincpu, 16_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &electron_state::electron_mem);
 
@@ -222,7 +223,7 @@ MACHINE_CONFIG_START(electron_state::electron)
 	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(electron_state::electron_colours), 16);
+	PALETTE(config, "palette", FUNC(electron_state::electron_colours), 8);
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 300).add_route(ALL_OUTPUTS, "mono", 1.00);
@@ -235,33 +236,34 @@ MACHINE_CONFIG_START(electron_state::electron)
 	m_cassette->set_interface("electron_cass");
 
 	/* expansion port */
-	MCFG_ELECTRON_EXPANSION_SLOT_ADD("exp", electron_expansion_devices, "plus3", false)
-	MCFG_ELECTRON_EXPANSION_SLOT_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
-	MCFG_ELECTRON_EXPANSION_SLOT_NMI_HANDLER(INPUTLINE("maincpu", M6502_NMI_LINE))
+	ELECTRON_EXPANSION_SLOT(config, m_exp, 16_MHz_XTAL, electron_expansion_devices, "plus3");
+	m_exp->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
+	m_exp->nmi_handler().set_inputline(m_maincpu, M6502_NMI_LINE);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_list").set_original("electron_cass");
 	SOFTWARE_LIST(config, "cart_list").set_original("electron_cart");
 	SOFTWARE_LIST(config, "flop_list").set_original("electron_flop");
 	SOFTWARE_LIST(config, "rom_list").set_original("electron_rom");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(electron_state::btm2105)
+void electron_state::btm2105(machine_config &config)
+{
 	electron(config);
 
 	m_screen->set_color(rgb_t::amber());
 
 	/* expansion port */
-	MCFG_DEVICE_MODIFY("exp")
-	MCFG_DEVICE_SLOT_INTERFACE(electron_expansion_devices, "m2105", true)
+	m_exp->set_default_option("m2105");
+	m_exp->set_fixed(true);
 
 	/* software lists */
 	config.device_remove("cass_list");
 	config.device_remove("cart_list");
 	config.device_remove("flop_list");
 	config.device_remove("rom_list");
-MACHINE_CONFIG_END
+}
 
 
 void electron_state::electron64(machine_config &config)
@@ -275,7 +277,6 @@ void electron_state::electron64(machine_config &config)
 }
 
 
-/* Electron Rom Load */
 ROM_START(electron)
 	ROM_REGION( 0x4000, "mos", 0 )
 	ROM_LOAD( "b02_acornos-1.rom", 0x0000, 0x4000, CRC(a0c2cf43) SHA1(a27ce645472cc5497690e4bfab43710efbb0792d) )

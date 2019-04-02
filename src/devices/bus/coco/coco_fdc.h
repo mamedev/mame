@@ -46,6 +46,7 @@ protected:
 	// FDC overrides
 	virtual void update_lines() = 0;
 	virtual uint8_t* get_cart_base() override;
+	virtual memory_region* get_cart_memregion() override;
 
 	// accessors
 	uint8_t dskreg() const { return m_dskreg; }

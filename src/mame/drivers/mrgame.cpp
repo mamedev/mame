@@ -468,18 +468,18 @@ void mrgame_state::mrgame_palette(palette_device &palette) const
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		uint8_t const r = combine_3_weights(rweights, bit0, bit1, bit2);
+		uint8_t const r = combine_weights(rweights, bit0, bit1, bit2);
 
 		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		uint8_t const g = combine_3_weights(gweights, bit0, bit1, bit2);
+		uint8_t const g = combine_weights(gweights, bit0, bit1, bit2);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		uint8_t const b = combine_2_weights(bweights, bit0, bit1);
+		uint8_t const b = combine_weights(bweights, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 		palette.set_pen_color(i + 32, rgb_t(r, g, b));
@@ -591,7 +591,6 @@ void mrgame_state::mrgame(machine_config &config)
 	dacvol.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dacvol", -1.0, DAC_VREF_NEG_INPUT);
 

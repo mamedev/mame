@@ -116,14 +116,10 @@ ay31015_device::ay31015_device(const machine_config &mconfig, device_type type, 
 	m_rx_bit_count(0),
 	m_rx_parity(0),
 	m_rx_pulses(0),
-	m_rx_clock(0),
-	m_rx_timer(nullptr),
 	m_tx_data(0),
 	m_tx_buffer(0),
 	m_tx_parity(0),
 	m_tx_pulses(0),
-	m_tx_clock(0),
-	m_tx_timer(nullptr),
 	m_read_si_cb(*this),
 	m_write_so_cb(*this),
 	m_write_pe_cb(*this),
@@ -173,14 +169,6 @@ void ay31015_device::device_resolve_objects()
 
 void ay31015_device::device_start()
 {
-	m_rx_timer = timer_alloc(TIMER_RX);
-	m_rx_timer->adjust(attotime::never);
-	update_rx_timer();
-
-	m_tx_timer = timer_alloc(TIMER_TX);
-	m_tx_timer->adjust(attotime::never);
-	update_tx_timer();
-
 	save_item(NAME(m_pins));
 	save_item(NAME(m_control_reg));
 	save_item(NAME(m_status_reg));
@@ -194,14 +182,12 @@ void ay31015_device::device_start()
 	save_item(NAME(m_rx_bit_count));
 	save_item(NAME(m_rx_parity));
 	save_item(NAME(m_rx_pulses));
-	save_item(NAME(m_rx_clock));
 
 	save_item(NAME(m_tx_state));
 	save_item(NAME(m_tx_data));
 	save_item(NAME(m_tx_buffer));
 	save_item(NAME(m_tx_parity));
 	save_item(NAME(m_tx_pulses));
-	save_item(NAME(m_tx_clock));
 }
 
 //-------------------------------------------------
@@ -268,14 +254,6 @@ void ay31015_device::update_status_pins()
 	}
 
 	update_status_pin(STATUS_EOC, EOC, m_write_eoc_cb);
-}
-
-void ay31015_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	if (id == TIMER_RX)
-		rx_process();
-	else if(id == TIMER_TX)
-		tx_process();
 }
 
 /*************************************************** RECEIVE CONTROLS *************************************************/
@@ -729,54 +707,6 @@ void ay31015_device::set_input_pin( ay31015_device::input_pin pin, int data )
 int ay31015_device::get_output_pin( ay31015_device::output_pin pin )
 {
 	return m_pins[pin];
-}
-
-
-inline void ay31015_device::update_rx_timer()
-{
-	if (m_rx_clock > 0.0)
-	{
-		m_rx_timer->adjust(attotime::from_hz(m_rx_clock), 0, attotime::from_hz(m_rx_clock));
-	}
-	else
-	{
-		m_rx_timer->enable(0);
-	}
-}
-
-
-inline void ay31015_device::update_tx_timer()
-{
-	if (m_tx_clock > 0.0)
-	{
-		m_tx_timer->adjust(attotime::from_hz(m_tx_clock), 0, attotime::from_hz(m_tx_clock));
-	}
-	else
-	{
-		m_tx_timer->enable(0);
-	}
-}
-
-
-/*-------------------------------------------------
- ay31015_set_receiver_clock - set receive clock
--------------------------------------------------*/
-
-void ay31015_device::set_receiver_clock( double new_clock )
-{
-	m_rx_clock = new_clock;
-	update_rx_timer();
-}
-
-
-/*-------------------------------------------------
- ay31015_set_transmitter_clock - set transmit clock
--------------------------------------------------*/
-
-void ay31015_device::set_transmitter_clock( double new_clock )
-{
-	m_tx_clock = new_clock;
-	update_tx_timer();
 }
 
 

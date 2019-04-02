@@ -55,14 +55,14 @@ void nmkmedal_state::mem_map(address_map &map)
 static INPUT_PORTS_START( trocana )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(nmkmedal_state::trocana)
-	MCFG_DEVICE_ADD("maincpu", TMP90841, 16500000 / 2) // actually TMP90C041AN
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+void nmkmedal_state::trocana(machine_config &config)
+{
+	TMP90841(config, m_maincpu, 16500000 / 2); // actually TMP90C041AN
+	m_maincpu->set_addrmap(AS_PROGRAM, &nmkmedal_state::mem_map);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6376, 16500000 / 16) // actually MSM6650
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6376(config, "oki", 16500000 / 16).add_route(ALL_OUTPUTS, "mono", 1.0); // actually MSM6650
+}
 
 ROM_START( trocana)
 	ROM_REGION(0x10000, "maincpu", 0)

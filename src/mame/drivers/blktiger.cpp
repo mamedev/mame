@@ -292,12 +292,12 @@ void blktiger_state::machine_reset()
 void blktiger_state::blktiger(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(24'000'000)/4);	/* verified on pcb */
+	Z80(config, m_maincpu, XTAL(24'000'000)/4); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &blktiger_state::blktiger_map);
 	m_maincpu->set_addrmap(AS_IO, &blktiger_state::blktiger_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(blktiger_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));	/* verified on pcb */
+	Z80(config, m_audiocpu, XTAL(3'579'545));   /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &blktiger_state::blktiger_sound_map);
 
 	I8751(config, m_mcu, XTAL(24'000'000)/4); /* ??? */

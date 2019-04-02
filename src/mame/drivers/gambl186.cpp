@@ -472,26 +472,25 @@ INPUT_PORTS_END
 
 
 
-MACHINE_CONFIG_START(gambl186_state::gambl186)
-	MCFG_DEVICE_ADD("maincpu", I80186, XTAL(40'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(gambl186_map)
-	MCFG_DEVICE_IO_MAP(gambl186_io)
+void gambl186_state::gambl186(machine_config &config)
+{
+	I80186(config, m_maincpu, XTAL(40'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &gambl186_state::gambl186_map);
+	m_maincpu->set_addrmap(AS_IO, &gambl186_state::gambl186_io);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
+	screen.set_screen_update("vga", FUNC(cirrus_gd5428_device::screen_update));
 
-	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CIRRUS_GD5428(config, "vga", 0).set_screen("screen");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("7759", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.75);
+}
 
 
 

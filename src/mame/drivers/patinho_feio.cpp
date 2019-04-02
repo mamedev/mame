@@ -85,7 +85,7 @@ void patinho_feio_state::update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_d
 
 WRITE8_MEMBER(patinho_feio_state::decwriter_data_w)
 {
-	m_decwriter->write(space, 0, data);
+	m_decwriter->write(data);
 
 	m_maincpu->set_iodev_status(0xA, IODEV_BUSY);
 
@@ -113,7 +113,7 @@ void patinho_feio_state::decwriter_kbd_input(u8 data)
 
 WRITE8_MEMBER(patinho_feio_state::teletype_data_w)
 {
-	m_tty->write(space, 0, data);
+	m_tty->write(data);
 
 	m_maincpu->set_iodev_status(0xB, IODEV_READY);
 	m_teletype_timer->adjust(attotime::from_hz(10)); //10 characters per second

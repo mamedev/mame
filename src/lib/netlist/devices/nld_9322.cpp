@@ -6,7 +6,7 @@
  */
 
 #include "nld_9322.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 
 namespace netlist
 {
@@ -105,14 +105,14 @@ namespace netlist
 
 	NETLIB_UPDATE(9322)
 	{
-		m_1.update_dev();
-		m_2.update_dev();
-		m_3.update_dev();
-		m_4.update_dev();
+		m_1.update();
+		m_2.update();
+		m_3.update();
+		m_4.update();
 	}
 
-	NETLIB_DEVICE_IMPL(9322)
-	NETLIB_DEVICE_IMPL(9322_dip)
+	NETLIB_DEVICE_IMPL(9322,     "TTL_9322",     "+SELECT,+A1,+B1,+A2,+B2,+A3,+B3,+A4,+B4,+STROBE")
+	NETLIB_DEVICE_IMPL(9322_dip, "TTL_9322_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

@@ -43,26 +43,6 @@
 #define UPD3301_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)
 
 
-#define MCFG_UPD3301_CHARACTER_WIDTH(_value) \
-	downcast<upd3301_device &>(*device).set_character_width(_value);
-
-#define MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
-	downcast<upd3301_device &>(*device).set_display_callback(&_class::_method, #_class "::" #_method, this);
-
-#define MCFG_UPD3301_DRQ_CALLBACK(_write) \
-	downcast<upd3301_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
-
-#define MCFG_UPD3301_INT_CALLBACK(_write) \
-	downcast<upd3301_device &>(*device).set_int_wr_callback(DEVCB_##_write);
-
-#define MCFG_UPD3301_HRTC_CALLBACK(_write) \
-	downcast<upd3301_device &>(*device).set_hrtc_wr_callback(DEVCB_##_write);
-
-#define MCFG_UPD3301_VRTC_CALLBACK(_write) \
-	downcast<upd3301_device &>(*device).set_vrtc_wr_callback(DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -93,10 +73,6 @@ public:
 		set_display_callback(draw_character_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
 	}
 
-	template <class Object> devcb_base &set_drq_wr_callback(Object &&cb) { return m_write_drq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_int_wr_callback(Object &&cb) { return m_write_int.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_hrtc_wr_callback(Object &&cb) { return m_write_hrtc.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vrtc_wr_callback(Object &&cb) { return m_write_vrtc.set_callback(std::forward<Object>(cb)); }
 	auto drq_wr_callback() { return m_write_drq.bind(); }
 	auto int_wr_callback() { return m_write_int.bind(); }
 	auto hrtc_wr_callback() { return m_write_hrtc.bind(); }

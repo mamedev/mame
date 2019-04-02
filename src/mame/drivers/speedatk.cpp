@@ -306,23 +306,23 @@ WRITE8_MEMBER(speedatk_state::output_w)
 		logerror("%02x\n",data);
 }
 
-MACHINE_CONFIG_START(speedatk_state::speedatk)
-
-	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK/2) //divider is unknown
-	MCFG_DEVICE_PROGRAM_MAP(speedatk_mem)
-	MCFG_DEVICE_IO_MAP(speedatk_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speedatk_state,  irq0_line_hold)
+void speedatk_state::speedatk(machine_config &config)
+{
+	Z80(config, m_maincpu, MASTER_CLOCK/2); //divider is unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &speedatk_state::speedatk_mem);
+	m_maincpu->set_addrmap(AS_IO, &speedatk_state::speedatk_io);
+	m_maincpu->set_vblank_int("screen", FUNC(speedatk_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8); // timing is unknown
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(speedatk_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(320, 256);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(speedatk_state::screen_update));
+	screen.set_palette(m_palette);
 
 	H46505(config, m_crtc, MASTER_CLOCK/16);   /* hand tuned to get ~60 fps */
 	m_crtc->set_screen("screen");
@@ -339,7 +339,7 @@ MACHINE_CONFIG_START(speedatk_state::speedatk)
 	aysnd.port_b_read_callback().set_ioport("DSW");
 	aysnd.port_a_write_callback().set(FUNC(speedatk_state::output_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.5);
-MACHINE_CONFIG_END
+}
 
 ROM_START( speedatk )
 	ROM_REGION( 0x10000, "maincpu", 0 )

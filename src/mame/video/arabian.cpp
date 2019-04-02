@@ -128,12 +128,12 @@ void arabian_state::arabian_palette(palette_device &palette) const
 		/* convert an RGB color -
 		   there are effectively 6 bits of color: 2 red, 2 green, 2 blue */
 		int const r = ( rhi * (int)(((153.0 * 192) / 255) + 0.5)) +
-			          ( rlo * int(((102.0 * 192) / 255) + 0.5)) +
-			          ((rhi | rlo) ? 63 : 0);
+					  ( rlo * int(((102.0 * 192) / 255) + 0.5)) +
+					  ((rhi | rlo) ? 63 : 0);
 
 		int const g = ( ghi * (int)(((156.0 * 192) / 255) + 0.5)) +
-			          ( glo * int((( 99.0 * 192) / 255) + 0.5)) +
-			          ((ghi | glo) ? 63 : 0);
+					  ( glo * int((( 99.0 * 192) / 255) + 0.5)) +
+					  ((ghi | glo) ? 63 : 0);
 
 		int const b = (bhi * 192) + (bbase * 63);
 

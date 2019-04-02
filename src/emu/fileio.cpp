@@ -96,7 +96,7 @@ bool path_iterator::next(std::string &buffer, const char *name)
 	if (name)
 	{
 		// compute the full pathname
-		if (!buffer.empty() && (*buffer.rbegin() != *PATH_SEPARATOR))
+		if (!buffer.empty() && !util::is_directory_separator(buffer.back()))
 			buffer.append(PATH_SEPARATOR);
 		buffer.append(name);
 	}

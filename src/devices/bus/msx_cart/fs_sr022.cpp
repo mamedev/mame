@@ -38,7 +38,7 @@ void msx_cart_fs_sr022_device::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_fs_sr022_device::read_cart)
+uint8_t msx_cart_fs_sr022_device::read_cart(offs_t offset)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -52,7 +52,7 @@ READ8_MEMBER(msx_cart_fs_sr022_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_fs_sr022_device::write_cart)
+void msx_cart_fs_sr022_device::write_cart(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

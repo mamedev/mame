@@ -256,12 +256,6 @@ void rungun_state::rungun_sound_map(address_map &map)
 }
 
 
-void rungun_state::k054539_map(address_map &map)
-{
-	map(0x000000, 0x3fffff).rom().region("k054539", 0);
-}
-
-
 static INPUT_PORTS_START( rng )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -449,14 +443,14 @@ void rungun_state::rng(machine_config &config)
 
 	// SFX
 	K054539(config, m_k054539_1, 18.432_MHz_XTAL);
-	m_k054539_1->set_addrmap(0, &rungun_state::k054539_map);
+	m_k054539_1->set_device_rom_tag("k054539");
 	m_k054539_1->timer_handler().set(FUNC(rungun_state::k054539_nmi_gen));
 	m_k054539_1->add_route(0, "rspeaker", 1.0);
 	m_k054539_1->add_route(1, "lspeaker", 1.0);
 
 	// BGM, volumes handtuned to make SFXs audible (still not 100% right tho)
 	K054539(config, m_k054539_2, 18.432_MHz_XTAL);
-	m_k054539_2->set_addrmap(0, &rungun_state::k054539_map);
+	m_k054539_2->set_device_rom_tag("k054539");
 	m_k054539_2->add_route(0, "rspeaker", 0.6);
 	m_k054539_2->add_route(1, "lspeaker", 0.6);
 }

@@ -15,14 +15,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MM58167_IRQ_CALLBACK(_cb) \
-	downcast<mm58167_device &>(*device).set_irq_cb(DEVCB_##_cb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -35,10 +27,9 @@ public:
 	// construction/destruction
 	mm58167_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	template <class Object> devcb_base &set_irq_cb(Object &&wr) { return m_irq_w.set_callback(std::forward<Object>(wr)); }
 	auto irq() { return m_irq_w.bind(); }
 
 	devcb_write_line m_irq_w;

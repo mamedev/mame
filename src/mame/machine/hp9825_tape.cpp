@@ -99,7 +99,8 @@ hp9825_tape_device::hp9825_tape_device(const machine_config &mconfig, const char
 {
 }
 
-MACHINE_CONFIG_START(hp9825_tape_device::device_add_mconfig)
+void hp9825_tape_device::device_add_mconfig(machine_config &config)
+{
 	TTL74123(config , m_short_gap_timer , 0);
 	m_short_gap_timer->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
 	m_short_gap_timer->set_resistor_value(RES_K(37.9));
@@ -114,7 +115,7 @@ MACHINE_CONFIG_START(hp9825_tape_device::device_add_mconfig)
 	m_long_gap_timer->set_capacitor_value(CAP_U(0.22));
 	m_long_gap_timer->set_clear_pin_value(1);
 	m_long_gap_timer->out_cb().set(FUNC(hp9825_tape_device::long_gap_w));
-MACHINE_CONFIG_END
+}
 
 void hp9825_tape_device::device_start()
 {

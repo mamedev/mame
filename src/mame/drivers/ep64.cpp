@@ -174,6 +174,7 @@ Notes: (All IC's shown)
 #define CASSETTE1_TAG   "cassette1"
 #define CASSETTE2_TAG   "cassette2"
 #define SCREEN_TAG      "screen"
+#define EP64_EXPANSION_BUS_TAG  "exp"
 
 class ep64_state : public driver_device
 {
@@ -543,7 +544,7 @@ INPUT_PORTS_END
 void ep64_state::machine_start()
 {
 	if (m_cart->exists())
-		m_dave->space(AS_PROGRAM).install_read_handler(0x010000, 0x01ffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_dave->space(AS_PROGRAM).install_read_handler(0x010000, 0x01ffff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
 	// state saving
 	save_item(NAME(m_key));
@@ -569,7 +570,7 @@ void ep64_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ep64 )
+//  machine_config( ep64 )
 //-------------------------------------------------
 
 void ep64_state::ep64(machine_config &config)
@@ -602,7 +603,8 @@ void ep64_state::ep64(machine_config &config)
 
 	// devices
 	EP64_EXPANSION_BUS_SLOT(config, m_exp, nullptr);
-	m_exp->set_dave_tag(m_dave);
+	m_exp->set_program_space(m_dave, AS_PROGRAM);
+	m_exp->set_io_space(m_dave, AS_IO);
 	m_exp->irq_wr().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_wr().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_exp->wait_wr().set_inputline(m_maincpu, Z80_INPUT_LINE_BOGUSWAIT);
@@ -637,7 +639,7 @@ void ep64_state::ep64(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ep128 )
+//  machine_config( ep128 )
 //-------------------------------------------------
 
 void ep64_state::ep128(machine_config &config)

@@ -160,24 +160,25 @@ static GFXDECODE_START( gfx_sm1800 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(sm1800_state::sm1800)
+void sm1800_state::sm1800(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(2'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(sm1800_mem)
-	MCFG_DEVICE_IO_MAP(sm1800_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sm1800_state,  sm1800_vblank_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(sm1800_state,sm1800_irq_callback)
+	I8080(config, m_maincpu, XTAL(2'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sm1800_state::sm1800_mem);
+	m_maincpu->set_addrmap(AS_IO, &sm1800_state::sm1800_io);
+	m_maincpu->set_vblank_int("screen", FUNC(sm1800_state::sm1800_vblank_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(sm1800_state::sm1800_irq_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update("i8275", FUNC(i8275_device::screen_update));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
 	PALETTE(config, m_palette, FUNC(sm1800_state::sm1800_palette), 3);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_sm1800)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_sm1800);
 
 	/* Devices */
 	I8255(config, m_ppi);
@@ -186,12 +187,12 @@ MACHINE_CONFIG_START(sm1800_state::sm1800)
 	m_ppi->in_pc_callback().set(FUNC(sm1800_state::sm1800_8255_portc_r));
 	m_ppi->out_pc_callback().set(FUNC(sm1800_state::sm1800_8255_portc_w));
 
-	MCFG_DEVICE_ADD("i8275", I8275, 2000000)
-	MCFG_I8275_CHARACTER_WIDTH(8)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(sm1800_state, crtc_display_pixels)
+	I8275(config, m_crtc, 2000000);
+	m_crtc->set_character_width(8);
+	m_crtc->set_display_callback(FUNC(sm1800_state::crtc_display_pixels), this);
 
-	MCFG_DEVICE_ADD("i8251", I8251, 0)
-MACHINE_CONFIG_END
+	I8251(config, m_uart, 0);
+}
 
 /* ROM definition */
 ROM_START( sm1800 )

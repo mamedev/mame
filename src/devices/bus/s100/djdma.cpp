@@ -146,7 +146,7 @@ void s100_djdma_device::device_reset()
 //  s100_sout_w - I/O write
 //-------------------------------------------------
 
-void s100_djdma_device::s100_sout_w(address_space &space, offs_t offset, uint8_t data)
+void s100_djdma_device::s100_sout_w(offs_t offset, uint8_t data)
 {
 	// O4 = /ATTN (responds to address EF only)
 	if (!BIT(m_cmdaddr[offset & 0xff], 3))

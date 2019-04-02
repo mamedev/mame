@@ -25,13 +25,17 @@ DEFINE_DEVICE_TYPE(HUC6272, huc6272_device, "huc6272", "Hudson HuC6272 \"King\""
 
 void huc6272_device::microprg_map(address_map &map)
 {
-	map(0x00, 0x0f).ram().share("microprg_ram");
+	if (!has_configured_map(0))
+		map(0x00, 0x0f).ram().share("microprg_ram");
 }
 
 void huc6272_device::kram_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).ram().share("kram_page0");
-	map(0x100000, 0x1fffff).ram().share("kram_page1");
+	if (!has_configured_map(1))
+	{
+		map(0x000000, 0x0fffff).ram().share("kram_page0");
+		map(0x100000, 0x1fffff).ram().share("kram_page1");
+	}
 }
 
 
@@ -49,8 +53,8 @@ huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, d
 		m_huc6271(*this, finder_base::DUMMY_TAG),
 		m_cdda_l(*this, "cdda_l"),
 		m_cdda_r(*this, "cdda_r"),
-		m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, address_map_constructor(), address_map_constructor(FUNC(huc6272_device::microprg_map), this)),
-		m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, 0, address_map_constructor(), address_map_constructor(FUNC(huc6272_device::kram_map), this)),
+		m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, address_map_constructor(FUNC(huc6272_device::microprg_map), this)),
+		m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, 0, address_map_constructor(FUNC(huc6272_device::kram_map), this)),
 		m_microprg_ram(*this, "microprg_ram"),
 		m_kram_page0(*this, "kram_page0"),
 		m_kram_page1(*this, "kram_page1"),

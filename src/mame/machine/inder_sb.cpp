@@ -150,7 +150,8 @@ void inder_sb_device::sound_io(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(inder_sb_device::device_add_mconfig)
+void inder_sb_device::device_add_mconfig(machine_config &config)
+{
 	Z80(config, m_audiocpu, 8000000); // unk freq
 	m_audiocpu->set_daisy_config(daisy_chain);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &inder_sb_device::sound_map);
@@ -161,20 +162,20 @@ MACHINE_CONFIG_START(inder_sb_device::device_add_mconfig)
 	m_ctc->intr_callback().set_inputline(m_audiocpu, 0);
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac0", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("dac1", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("dac2", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("dac3", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("dac0vol", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac0", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
-	MCFG_DEVICE_ADD("dac1vol", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
-	MCFG_DEVICE_ADD("dac2vol", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
-	MCFG_DEVICE_ADD("dac3vol", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac3", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac0vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac0", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac3", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, "dac0vol", 0).add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac0", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
+	DAC_8BIT_R2R(config, "dac1vol", 0).add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
+	DAC_8BIT_R2R(config, "dac2vol", 0).add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
+	DAC_8BIT_R2R(config, "dac3vol", 0).add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac3", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac0vol", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT);
+}
 
 
 void inder_sb_device::device_start()

@@ -444,7 +444,7 @@ WRITE8_MEMBER(equites_state::equites_c0f8_w)
 
 		case 7: // c0ff: sound command latch clear
 			// Note: solder pad CP1 on the pcb would allow to disable this
-			m_soundlatch->clear_w(space, 0, 0);
+			m_soundlatch->clear_w();
 			break;
 	}
 }
@@ -1079,7 +1079,6 @@ void equites_state::common_sound(machine_config &config)
 	DAC_6BIT_R2R(config, m_dac_1, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 	DAC_6BIT_R2R(config, m_dac_2, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);

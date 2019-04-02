@@ -24,7 +24,7 @@ WRITE16_MEMBER(goal92_state::goal92_sound_command_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		m_soundlatch->write(space, 0, (data >> 8) & 0xff);
+		m_soundlatch->write((data >> 8) & 0xff);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
@@ -304,7 +304,7 @@ void goal92_state::goal92(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(goal92_state::irq6_line_hold)); /* VBL */
 
 	Z80(config, m_audiocpu, 2500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &goal92_state::sound_cpu);	/* IRQs are triggered by the main CPU */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &goal92_state::sound_cpu);  /* IRQs are triggered by the main CPU */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

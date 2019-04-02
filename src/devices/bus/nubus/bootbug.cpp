@@ -115,10 +115,10 @@ void nubus_bootbug_device::device_reset()
 
 WRITE32_MEMBER( nubus_bootbug_device::dev_w )
 {
-	m_uart->ins8250_w(space, offset, data & 0xff);
+	m_uart->ins8250_w(offset, data & 0xff);
 }
 
 READ32_MEMBER( nubus_bootbug_device::dev_r )
 {
-	return m_uart->ins8250_r(space, offset);
+	return m_uart->ins8250_r(offset);
 }

@@ -1136,11 +1136,10 @@ inline uint16_t reorder(uint16_t input, uint8_t const *weights)
 }
 
 
-
 /* there are probably less dumb ways of doing the CS logic, it could be hooked up
    more like the system16 mapper chips */
 
-void deco_146_base_device::write_data(address_space &space, uint16_t address, uint16_t data, uint16_t mem_mask, uint8_t &csflags)
+void deco_146_base_device::write_data(uint16_t address, uint16_t data, uint16_t mem_mask, uint8_t &csflags)
 {
 	address = bitswap<16>(address>>1, 15,14,13,12,11,10, m_external_addrswap[9],m_external_addrswap[8] ,m_external_addrswap[7],m_external_addrswap[6],m_external_addrswap[5],m_external_addrswap[4],m_external_addrswap[3],m_external_addrswap[2],m_external_addrswap[1],m_external_addrswap[0]) << 1;
 
@@ -1177,7 +1176,7 @@ void deco_146_base_device::write_data(address_space &space, uint16_t address, ui
 			if (i==0) // the first cs is our internal protection area
 			{
 //              logerror("write matches cs table (protection) %01x %04x %04x %04x\n", i, real_address, data, mem_mask);
-				write_protport(space, real_address, data, mem_mask);
+				write_protport(real_address, data, mem_mask);
 			}
 			else
 			{
@@ -1191,10 +1190,6 @@ void deco_146_base_device::write_data(address_space &space, uint16_t address, ui
 		logerror("write not in cs table\n");
 	}
 }
-
-
-
-
 
 
 uint16_t deco_146_base_device::read_protport(uint16_t address, uint16_t mem_mask)
@@ -1213,11 +1208,6 @@ uint16_t deco_146_base_device::read_protport(uint16_t address, uint16_t mem_mask
 
 	int location = 0;
 	uint16_t realret = read_data_getloc(address, location);
-
-
-
-
-
 
 	if (location == m_bankswitch_swap_read_address) // this has a special meaning
 	{
@@ -1239,7 +1229,7 @@ TIMER_CALLBACK_MEMBER(deco_146_base_device::write_soundlatch)
 	m_soundlatch_irq_cb(ASSERT_LINE);
 }
 
-void deco_146_base_device::write_protport(address_space &space, uint16_t address, uint16_t data, uint16_t mem_mask)
+void deco_146_base_device::write_protport(uint16_t address, uint16_t data, uint16_t mem_mask)
 {
 	m_latchaddr = address;
 	m_latchdata = data;
@@ -1268,7 +1258,6 @@ void deco_146_base_device::write_protport(address_space &space, uint16_t address
 		COMBINE_DATA(&m_rambank1[(address&0xff)>>1]);
 
 }
-
 
 
 uint16_t deco_146_base_device::read_data(uint16_t address, uint16_t mem_mask, uint8_t &csflags)
@@ -1316,7 +1305,7 @@ uint16_t deco_146_base_device::read_data(uint16_t address, uint16_t mem_mask, ui
 	return retdata;
 }
 
-READ8_MEMBER( deco_146_base_device::soundlatch_r )
+u8 deco_146_base_device::soundlatch_r()
 {
 	m_soundlatch_irq_cb(CLEAR_LINE);
 	return m_soundlatch;
@@ -1428,7 +1417,6 @@ uint16_t deco_146_base_device::read_data_getloc(uint16_t address, int& location)
 
 	return realret;
 }
-
 
 
 DEFINE_DEVICE_TYPE(DECO146PROT, deco146_device, "deco146", "DECO 146 Protection")

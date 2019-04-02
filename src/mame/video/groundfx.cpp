@@ -241,7 +241,7 @@ uint32_t groundfx_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	*/
 	if (m_tc0100scn->long_r(space, 0x4090 / 4, 0xffffffff) ||
-			m_tc0480scp->long_r(space, 0x20 / 4, 0xffffffff) == 0x240866)  /* Anything in text layer - really stupid hack */
+			((m_tc0480scp->ram_r(0x20 / 2) == 0x24) && (m_tc0480scp->ram_r(0x22 / 2) == 0x0866)))  /* Anything in text layer - really stupid hack */
 	{
 		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
 		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
@@ -249,7 +249,7 @@ uint32_t groundfx_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 		//m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, 0, scclayer[2], 0, 0);
 
-		if (m_tc0480scp->long_r(space, 0x20 / 4, 0xffffffff) != 0x240866) /* Stupid hack for start of race */
+		if ((m_tc0480scp->ram_r(0x20 / 2) != 0x24) && (m_tc0480scp->ram_r(0x22 / 2) != 0x0866)) /* Stupid hack for start of race */
 			m_tc0480scp->tilemap_draw(screen, bitmap, m_hack_cliprect, layer[0], 0, 0);
 		draw_sprites(screen, bitmap, cliprect, 1, 44, -574);
 	}

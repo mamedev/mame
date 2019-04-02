@@ -15,27 +15,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_INPUT_MERGER_ANY_HIGH(_tag) \
-	MCFG_DEVICE_ADD(_tag, INPUT_MERGER_ANY_HIGH, 0)
-
-#define MCFG_INPUT_MERGER_ALL_HIGH(_tag) \
-	MCFG_DEVICE_ADD(_tag, INPUT_MERGER_ALL_HIGH, 0)
-
-#define MCFG_INPUT_MERGER_ANY_LOW(_tag) \
-	MCFG_DEVICE_ADD(_tag, INPUT_MERGER_ANY_LOW, 0)
-
-#define MCFG_INPUT_MERGER_ALL_LOW(_tag) \
-	MCFG_DEVICE_ADD(_tag, INPUT_MERGER_ALL_LOW, 0)
-
-#define MCFG_INPUT_MERGER_OUTPUT_HANDLER(_devcb) \
-	downcast<input_merger_device &>(*device).set_output_handler(DEVCB_##_devcb);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -44,7 +23,6 @@ class input_merger_device : public device_t
 {
 public:
 	// callback
-	template <class Object> devcb_base &set_output_handler(Object &&cb) { return m_output_handler.set_callback(std::forward<Object>(cb)); }
 	auto output_handler() { return m_output_handler.bind(); }
 
 	// input lines

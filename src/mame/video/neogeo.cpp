@@ -59,10 +59,10 @@ void neogeo_base_state::create_rgb_lookups()
 		int i2 = (i >> 2) & 1;
 		int i1 = (i >> 1) & 1;
 		int i0 = (i >> 0) & 1;
-		m_palette_lookup[i][0] = combine_5_weights(weights_normal, i0, i1, i2, i3, i4);
-		m_palette_lookup[i][1] = combine_5_weights(weights_dark, i0, i1, i2, i3, i4);
-		m_palette_lookup[i][2] = combine_5_weights(weights_shadow, i0, i1, i2, i3, i4);
-		m_palette_lookup[i][3] = combine_5_weights(weights_dark_shadow, i0, i1, i2, i3, i4);
+		m_palette_lookup[i][0] = combine_weights(weights_normal, i0, i1, i2, i3, i4);
+		m_palette_lookup[i][1] = combine_weights(weights_dark, i0, i1, i2, i3, i4);
+		m_palette_lookup[i][2] = combine_weights(weights_shadow, i0, i1, i2, i3, i4);
+		m_palette_lookup[i][3] = combine_weights(weights_dark_shadow, i0, i1, i2, i3, i4);
 	}
 }
 

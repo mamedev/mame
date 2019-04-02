@@ -25,6 +25,7 @@ public:
 
 	auto irq_cb() { return m_irq_cb.bind(); }
 	auto read_port_cb() { return m_read_port_cb.bind(); }
+	auto sample_rate_changed() { return m_sample_rate_changed_cb.bind(); }
 
 protected:
 	// struct describing a single playing voice
@@ -114,6 +115,7 @@ protected:
 	int m_channels;                               /* number of output channels: 1 .. 6 */
 	devcb_write_line m_irq_cb;  /* irq callback */
 	devcb_read16 m_read_port_cb;          /* input port read */
+	devcb_write32 m_sample_rate_changed_cb;          /* callback for when sample rate is changed */
 };
 
 

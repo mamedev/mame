@@ -141,7 +141,7 @@ void pc9801_118_device::device_reset()
 READ8_MEMBER(pc9801_118_device::opn3_r)
 {
 	if(((offset & 5) == 0) || m_ext_reg)
-		return m_opn3->read(space, offset >> 1);
+		return m_opn3->read(offset >> 1);
 	else // odd
 	{
 		//printf("PC9801-118: Read to undefined port [%02x]\n",offset+0x188);
@@ -153,7 +153,7 @@ READ8_MEMBER(pc9801_118_device::opn3_r)
 WRITE8_MEMBER(pc9801_118_device::opn3_w)
 {
 	if(((offset & 5) == 0) || m_ext_reg)
-		m_opn3->write(space, offset >> 1,data);
+		m_opn3->write(offset >> 1,data);
 	//else // odd
 	//  printf("PC9801-118: Write to undefined port [%02x] %02x\n",offset+0x188,data);
 }

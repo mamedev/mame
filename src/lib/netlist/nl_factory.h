@@ -9,46 +9,58 @@
 #ifndef NLFACTORY_H_
 #define NLFACTORY_H_
 
+#include "nltypes.h"
 #include "plib/palloc.h"
 #include "plib/ptypes.h"
 
-#define NETLIB_DEVICE_IMPL(chip) \
-	static std::unique_ptr<factory::element_t> NETLIB_NAME(chip ## _c)( \
-			const pstring &name, const pstring &classname, const pstring &def_param) \
-	{ \
-		return std::unique_ptr<factory::element_t>(plib::palloc<factory::device_element_t<NETLIB_NAME(chip)>>(name, classname, def_param, pstring(__FILE__))); \
-	} \
-	factory::constructor_ptr_t decl_ ## chip = NETLIB_NAME(chip ## _c);
+#include <vector>
 
-#define NETLIB_DEVICE_IMPL_NS(ns, chip) \
-	static std::unique_ptr<factory::element_t> NETLIB_NAME(chip ## _c)( \
-			const pstring &name, const pstring &classname, const pstring &def_param) \
+#define NETLIB_DEVICE_IMPL_ALIAS(p_alias, chip, p_name, p_def_param) \
+	NETLIB_DEVICE_IMPL_BASE(devices, p_alias, chip, p_name, p_def_param) \
+
+#define NETLIB_DEVICE_IMPL(chip, p_name, p_def_param) \
+	NETLIB_DEVICE_IMPL_NS(devices, chip, p_name, p_def_param)
+
+#define NETLIB_DEVICE_IMPL_NS(ns, chip, p_name, p_def_param) \
+	NETLIB_DEVICE_IMPL_BASE(ns, chip, chip, p_name, p_def_param) \
+
+#define NETLIB_DEVICE_IMPL_BASE(ns, p_alias, chip, p_name, p_def_param) \
+	static plib::unique_ptr<factory::element_t> NETLIB_NAME(p_alias ## _c) \
+			(const pstring &classname) \
 	{ \
-		return std::unique_ptr<factory::element_t>(plib::palloc<factory::device_element_t<ns :: NETLIB_NAME(chip)>>(name, classname, def_param, pstring(__FILE__))); \
+		return plib::make_unique<factory::device_element_t<ns :: NETLIB_NAME(chip)>>(p_name, classname, p_def_param, pstring(__FILE__)); \
 	} \
-	factory::constructor_ptr_t decl_ ## chip = NETLIB_NAME(chip ## _c);
+	\
+	factory::constructor_ptr_t decl_ ## p_alias = NETLIB_NAME(p_alias ## _c);
 
 namespace netlist {
-	class netlist_t;
 	class device_t;
+	class nlparse_t;
 	class setup_t;
+	class netlist_state_t;
 
 namespace factory {
 	// -----------------------------------------------------------------------------
 	// net_dev class factory
 	// -----------------------------------------------------------------------------
 
-	class element_t : plib::nocopyassignmove
+	class element_t
 	{
 	public:
 		element_t(const pstring &name, const pstring &classname,
 				const pstring &def_param);
 		element_t(const pstring &name, const pstring &classname,
 				const pstring &def_param, const pstring &sourcefile);
-		virtual ~element_t();
+		virtual ~element_t() = default;
 
-		virtual plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) = 0;
-		virtual void macro_actions(netlist_t &anetlist, const pstring &name) {}
+		COPYASSIGNMOVE(element_t, default)
+
+		virtual pool_owned_ptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) = 0;
+		virtual void macro_actions(nlparse_t &nparser, const pstring &name)
+		{
+			plib::unused_var(nparser);
+			plib::unused_var(name);
+		}
 
 		const pstring &name() const { return m_name; }
 		const pstring &classname() const { return m_classname; }
@@ -73,26 +85,28 @@ namespace factory {
 				const pstring &def_param, const pstring &sourcefile)
 		: element_t(name, classname, def_param, sourcefile) { }
 
-		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
+		pool_owned_ptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override
 		{
-			return plib::owned_ptr<device_t>::Create<C>(anetlist, name);
+			return pool().make_poolptr<C>(anetlist, name);
 		}
 	};
 
-	class list_t : public std::vector<std::unique_ptr<element_t>>
+	class list_t : public std::vector<plib::unique_ptr<element_t>>
 	{
 	public:
-		explicit list_t(setup_t &m_setup);
-		~list_t();
+		explicit list_t(log_type &alog);
+		~list_t() = default;
+
+		COPYASSIGNMOVE(list_t, delete)
 
 		template<class device_class>
 		void register_device(const pstring &name, const pstring &classname,
 			const pstring &def_param)
 		{
-			register_device(std::unique_ptr<element_t>(plib::palloc<device_element_t<device_class>>(name, classname, def_param)));
+			register_device(plib::make_unique<device_element_t<device_class>>(name, classname, def_param));
 		}
 
-		void register_device(std::unique_ptr<element_t> &&factory);
+		void register_device(plib::unique_ptr<element_t> &&factory);
 
 		element_t * factory_by_name(const pstring &devname);
 
@@ -103,21 +117,20 @@ namespace factory {
 		}
 
 	private:
-		setup_t &m_setup;
+		log_type &m_log;
 	};
 
 	// -----------------------------------------------------------------------------
 	// factory_creator_ptr_t
 	// -----------------------------------------------------------------------------
 
-	using constructor_ptr_t = std::unique_ptr<element_t> (*)(const pstring &name, const pstring &classname,
-			const pstring &def_param);
+	using constructor_ptr_t = plib::unique_ptr<element_t> (*)(const pstring &classname);
 
 	template <typename T>
-	std::unique_ptr<element_t> constructor_t(const pstring &name, const pstring &classname,
+	plib::unique_ptr<element_t> constructor_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
 	{
-		return std::unique_ptr<element_t>(plib::palloc<device_element_t<T>>(name, classname, def_param));
+		return plib::make_unique<device_element_t<T>>(name, classname, def_param);
 	}
 
 	// -----------------------------------------------------------------------------
@@ -128,22 +141,24 @@ namespace factory {
 	{
 	public:
 
-		library_element_t(setup_t &setup, const pstring &name, const pstring &classname,
+		library_element_t(const pstring &name, const pstring &classname,
 				const pstring &def_param, const pstring &source)
-		: element_t(name, classname, def_param, source) {  }
+		: element_t(name, classname, def_param, source)
+		{
+		}
 
-		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override;
+		pool_owned_ptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override;
 
-		void macro_actions(netlist_t &anetlist, const pstring &name) override;
+		void macro_actions(nlparse_t &nparser, const pstring &name) override;
 
 	private:
 	};
 
-	}
+	} // namespace factory
 
 	namespace devices {
 		void initialize_factory(factory::list_t &factory);
-	}
-}
+	} // namespace devices
+} // namespace netlist
 
 #endif /* NLFACTORY_H_ */

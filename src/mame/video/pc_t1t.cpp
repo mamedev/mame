@@ -875,10 +875,10 @@ WRITE8_MEMBER( pcvideo_t1000_device::write )
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
-			m_mc6845->address_w( space, offset, data );
+			m_mc6845->address_w(data);
 			break;
 		case 1: case 3: case 5: case 7:
-			m_mc6845->register_w( space, offset, data );
+			m_mc6845->register_w(data);
 			break;
 		case 8:
 			mode_control_w(data);
@@ -913,10 +913,10 @@ WRITE8_MEMBER( pcvideo_pcjr_device::write )
 	switch( offset )
 	{
 		case 0: case 4:
-			m_mc6845->address_w( space, offset, data );
+			m_mc6845->address_w(data);
 			break;
 		case 1: case 5:
-			m_mc6845->register_w( space, offset, data );
+			m_mc6845->register_w(data);
 			break;
 		case 10:
 			if ( m_address_data_ff & 0x01 )
@@ -958,7 +958,7 @@ READ8_MEMBER( pc_t1t_device::read )
 			break;
 
 		case 1: case 3: case 5: case 7:
-			data = m_mc6845->register_r( space, offset );
+			data = m_mc6845->register_r();
 			break;
 
 		case 8:

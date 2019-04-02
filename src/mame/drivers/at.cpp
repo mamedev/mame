@@ -657,7 +657,8 @@ void megapc_state::megapc(machine_config &config)
 
 	// on board devices
 	ISA16(config, m_isabus, 0);
-	m_isabus->set_cputag("maincpu");
+	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
+	m_isabus->set_iospace(m_maincpu, AS_IO);
 	m_isabus->iochck_callback().set(m_wd7600, FUNC(wd7600_device::iochck_w));
 	m_isabus->irq2_callback().set(m_wd7600, FUNC(wd7600_device::irq09_w));
 	m_isabus->irq3_callback().set(m_wd7600, FUNC(wd7600_device::irq03_w));

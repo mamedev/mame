@@ -53,6 +53,7 @@ static void sg1000_card(device_slot_interface &device)
 	device.option_add_internal("rom",  SEGA8_ROM_STD);
 }
 
-MACHINE_CONFIG_START(sega8_cardcatch_device::device_add_mconfig)
-	MCFG_SG1000_CARD_ADD("cardslot", sg1000_card, nullptr)
-MACHINE_CONFIG_END
+void sega8_cardcatch_device::device_add_mconfig(machine_config &config)
+{
+	SG1000_CARD_SLOT(config, "cardslot", sg1000_card, nullptr);
+}

@@ -51,13 +51,12 @@ static const floppy_interface agat840k_hle_floppy_interface =
 	"floppy_5_25"
 };
 
-MACHINE_CONFIG_START(a2bus_agat840k_hle_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
-	MCFG_LEGACY_FLOPPY_CONFIG(agat840k_hle_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, a2bus_agat840k_hle_device, index_0_w))
-	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
-	MCFG_LEGACY_FLOPPY_CONFIG(agat840k_hle_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, a2bus_agat840k_hle_device, index_1_w))
+void a2bus_agat840k_hle_device::device_add_mconfig(machine_config &config)
+{
+	legacy_floppy_image_device &floppy0(LEGACY_FLOPPY(config, FLOPPY_0, 0, &agat840k_hle_floppy_interface));
+	floppy0.out_idx_cb().set(FUNC(a2bus_agat840k_hle_device::index_0_w));
+	legacy_floppy_image_device &floppy1(LEGACY_FLOPPY(config, FLOPPY_1, 0, &agat840k_hle_floppy_interface));
+	floppy1.out_idx_cb().set(FUNC(a2bus_agat840k_hle_device::index_1_w));
 
 	I8255(config, m_d14);
 	// PA not connected
@@ -69,7 +68,7 @@ MACHINE_CONFIG_START(a2bus_agat840k_hle_device::device_add_mconfig)
 //  m_d15->out_pb_callback().set(FUNC(a2bus_agat840k_hle_device::d15_o_b)); // write data
 	m_d15->in_pc_callback().set(FUNC(a2bus_agat840k_hle_device::d15_i_c));
 	m_d15->out_pc_callback().set(FUNC(a2bus_agat840k_hle_device::d15_o_c));
-MACHINE_CONFIG_END
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

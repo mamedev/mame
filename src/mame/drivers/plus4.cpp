@@ -295,7 +295,7 @@ uint8_t plus4_state::read_memory(address_space &space, offs_t offset, int ba, in
 	}
 	else if (!_6551 && m_acia)
 	{
-		data = m_acia->read(space, offset & 0x03);
+		data = m_acia->read(offset & 0x03);
 	}
 	else if (!keyport)
 	{
@@ -371,7 +371,7 @@ uint8_t plus4_state::read_memory(address_space &space, offs_t offset, int ba, in
 		data = m_ram->pointer()[offset & m_ram->mask()];
 	}
 
-	return m_exp->cd_r(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+	return m_exp->cd_r(offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
 }
 
 
@@ -416,7 +416,7 @@ WRITE8_MEMBER( plus4_state::write )
 	}
 	else if (!_6551 && m_acia)
 	{
-		m_acia->write(space, offset & 0x03, data);
+		m_acia->write(offset & 0x03, data);
 	}
 	else if (!addr_clk)
 	{
@@ -431,7 +431,7 @@ WRITE8_MEMBER( plus4_state::write )
 		m_ram->pointer()[offset & m_ram->mask()] = data;
 	}
 
-	m_exp->cd_w(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+	m_exp->cd_w(offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
 }
 
 
@@ -837,7 +837,7 @@ void plus4_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( plus4 )
+//  machine_config( plus4 )
 //-------------------------------------------------
 
 void plus4_state::plus4(machine_config &config)
@@ -930,8 +930,8 @@ void plus4_state::plus4(machine_config &config)
 	m_exp->cd_wr_callback().set(FUNC(plus4_state::write));
 	m_exp->aec_wr_callback().set_inputline(MOS7501_TAG, INPUT_LINE_HALT);
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(plus4_state, cbm_c16), this), "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(plus4_state, cbm_c16), this), "p00,prg", CBM_QUICKLOAD_DELAY);
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("64K");
@@ -939,7 +939,7 @@ void plus4_state::plus4(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( plus4p )
+//  machine_config( plus4p )
 //-------------------------------------------------
 
 void c16_state::plus4p(machine_config &config)
@@ -958,7 +958,7 @@ void c16_state::plus4p(machine_config &config)
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( plus4n )
+//  machine_config( plus4n )
 //-------------------------------------------------
 
 void c16_state::plus4n(machine_config &config)
@@ -978,7 +978,7 @@ void c16_state::plus4n(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( c16n )
+//  machine_config( c16n )
 //-------------------------------------------------
 
 void c16_state::c16n(machine_config &config)
@@ -999,7 +999,7 @@ void c16_state::c16n(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( c16p )
+//  machine_config( c16p )
 //-------------------------------------------------
 
 void c16_state::c16p(machine_config &config)
@@ -1027,7 +1027,7 @@ void c16_state::c232(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( v364 )
+//  machine_config( v364 )
 //-------------------------------------------------
 
 void c16_state::v364(machine_config &config)

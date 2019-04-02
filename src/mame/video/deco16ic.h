@@ -37,7 +37,6 @@ public:
 //  void set_palette_tag(const char *tag);
 	template <typename... T> void set_bank1_callback(T &&... args) { m_bank1_cb = deco16_bank_cb_delegate(std::forward<T>(args)...); }
 	template <typename... T> void set_bank2_callback(T &&... args) { m_bank2_cb = deco16_bank_cb_delegate(std::forward<T>(args)...); }
-	void set_split(int split) { m_split = split; }
 	void set_pf1_size(int size) { m_pf1_size = size; }
 	void set_pf2_size(int size) { m_pf2_size = size; }
 	void set_pf1_trans_mask(int mask) { m_pf1_trans_mask = mask; }
@@ -50,25 +49,23 @@ public:
 	void set_pf12_16x16_bank(int bank) { m_pf12_16x16_gfx_bank = bank; }
 
 
-	DECLARE_WRITE16_MEMBER( pf1_data_w );
-	DECLARE_WRITE16_MEMBER( pf2_data_w );
+	void pf1_data_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void pf2_data_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER( pf1_data_r );
-	DECLARE_READ16_MEMBER( pf2_data_r );
+	u16 pf1_data_r(offs_t offset);
+	u16 pf2_data_r(offs_t offset);
 
-	DECLARE_WRITE16_MEMBER( pf_control_w );
+	void pf_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 pf_control_r(offs_t offset);
 
-	DECLARE_READ16_MEMBER( pf_control_r );
+	void pf1_data_dword_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void pf2_data_dword_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER( pf1_data_dword_w );
-	DECLARE_WRITE32_MEMBER( pf2_data_dword_w );
+	u32 pf1_data_dword_r(offs_t offset);
+	u32 pf2_data_dword_r(offs_t offset);
 
-	DECLARE_READ32_MEMBER( pf1_data_dword_r );
-	DECLARE_READ32_MEMBER( pf2_data_dword_r );
-
-	DECLARE_WRITE32_MEMBER( pf_control_dword_w );
-
-	DECLARE_READ32_MEMBER( pf_control_dword_r );
+	void pf_control_dword_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 pf_control_dword_r(offs_t offset);
 
 	void print_debug_info(bitmap_ind16 &bitmap);
 
@@ -93,6 +90,9 @@ public:
 
 	/* used by captaven */
 	void set_pf1_8bpp_mode(int mode);
+
+	/* used by cninja */
+	void set_transmask(int tmap, int group, u32 fgmask, u32 bgmask);
 
 	/* used by stoneage */
 	void set_scrolldx(int tmap, int size, int dx, int dx_if_flipped);
@@ -146,7 +146,6 @@ private:
 	int m_pf12_last_small, m_pf12_last_big;
 	int m_pf1_8bpp_mode;
 
-	int m_split;
 	int m_pf1_size;
 	int m_pf2_size;
 	int m_pf1_trans_mask, m_pf2_trans_mask;

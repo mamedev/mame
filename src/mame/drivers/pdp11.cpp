@@ -156,7 +156,7 @@ WRITE16_MEMBER(pdp11_state::teletype_ctrl_w)
 	switch(offset)
 	{
 		case 3:
-			m_terminal->write(space, 0, data);
+			m_terminal->write(data);
 			break;
 	}
 }
@@ -367,18 +367,20 @@ void pdp11_state::pdp11(machine_config &config)
 	RX01(config, "rx01", 0);
 }
 
-MACHINE_CONFIG_START(pdp11_state::pdp11ub2)
+void pdp11_state::pdp11ub2(machine_config &config)
+{
 	pdp11(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pdp11_state,pdp11ub2)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pdp11_state::pdp11qb)
+void pdp11_state::pdp11qb(machine_config &config)
+{
 	pdp11(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pdp11_state,pdp11qb)
 
 	m_maincpu->set_initial_mode(0 << 13);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pdp11_state::pdp11qb_mem);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( pdp11ub )

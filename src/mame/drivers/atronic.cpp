@@ -65,24 +65,24 @@ static INPUT_PORTS_START( atronic )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(atronic_state::atronic)
+void atronic_state::atronic(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z180, 6000000)
-	MCFG_DEVICE_PROGRAM_MAP(atronic_map)
-	MCFG_DEVICE_IO_MAP(atronic_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atronic_state,  irq0_line_hold)
+	Z180(config, m_maincpu, 6000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atronic_state::atronic_map);
+	m_maincpu->set_addrmap(AS_IO, &atronic_state::atronic_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(atronic_state::irq0_line_hold));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(atronic_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(atronic_state::screen_update));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea_full();
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 8)
-
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(8);
+}
 
 
 ROM_START( atronic )

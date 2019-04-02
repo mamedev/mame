@@ -670,6 +670,10 @@ void device_image_interface::battery_load(void *buffer, int length, void *def_bu
 void device_image_interface::battery_save(const void *buffer, int length)
 {
 	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+
+	if (!device().machine().options().nvram_save())
+		return;
+
 	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
 
 	// try to open the battery file and write it out, if possible

@@ -306,7 +306,7 @@ void tc0480scp_device::device_reset()
 *****************************************************************************/
 
 
-void tc0480scp_device::common_get_tc0480bg_tile_info( tile_data &tileinfo, int tile_index, uint16_t *ram, int gfxnum )
+void tc0480scp_device::common_get_tc0480bg_tile_info( tile_data &tileinfo, int tile_index, u16 *ram, int gfxnum )
 {
 	int code = ram[2 * tile_index + 1] & 0x7fff;
 	int attr = ram[2 * tile_index];
@@ -316,7 +316,7 @@ void tc0480scp_device::common_get_tc0480bg_tile_info( tile_data &tileinfo, int t
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-void tc0480scp_device::common_get_tc0480tx_tile_info( tile_data &tileinfo, int tile_index, uint16_t *ram, int gfxnum )
+void tc0480scp_device::common_get_tc0480tx_tile_info( tile_data &tileinfo, int tile_index, u16 *ram, int gfxnum )
 {
 	int attr = ram[tile_index];
 	SET_TILE_INFO_MEMBER(gfxnum,
@@ -398,12 +398,12 @@ void tc0480scp_device::set_layer_ptrs()
 	}
 }
 
-READ16_MEMBER( tc0480scp_device::word_r )
+u16 tc0480scp_device::ram_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER( tc0480scp_device::word_w )
+void tc0480scp_device::ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
 
@@ -445,12 +445,12 @@ WRITE16_MEMBER( tc0480scp_device::word_w )
 	}
 }
 
-READ16_MEMBER( tc0480scp_device::ctrl_word_r )
+u16 tc0480scp_device::ctrl_r(offs_t offset)
 {
 	return m_ctrl[offset];
 }
 
-WRITE16_MEMBER( tc0480scp_device::ctrl_word_w )
+void tc0480scp_device::ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	int flip = m_pri_reg & 0x40;
 
@@ -568,51 +568,6 @@ WRITE16_MEMBER( tc0480scp_device::ctrl_word_w )
 }
 
 
-READ32_MEMBER( tc0480scp_device::ctrl_long_r )
-{
-	return (ctrl_word_r(space, offset * 2, 0xffff) << 16) | ctrl_word_r(space, offset * 2 + 1, 0xffff);
-}
-
-/* TODO: byte access ? */
-
-WRITE32_MEMBER( tc0480scp_device::ctrl_long_w )
-{
-	if (ACCESSING_BITS_16_31)
-		ctrl_word_w(space, offset * 2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_BITS_0_15)
-		ctrl_word_w(space, (offset * 2) + 1, data & 0xffff, mem_mask & 0xffff);
-}
-
-READ32_MEMBER( tc0480scp_device::long_r )
-{
-	return (word_r(space, offset * 2, 0xffff) << 16) | word_r(space, offset * 2 + 1, 0xffff);
-}
-
-WRITE32_MEMBER( tc0480scp_device::long_w )
-{
-	if (ACCESSING_BITS_16_31)
-	{
-		int oldword = word_r(space, offset * 2, 0xffff);
-		int newword = data >> 16;
-		if (!ACCESSING_BITS_16_23)
-			newword |= (oldword & 0x00ff);
-		if (!ACCESSING_BITS_24_31)
-			newword |= (oldword & 0xff00);
-		word_w(space, offset * 2, newword, 0xffff);
-	}
-	if (ACCESSING_BITS_0_15)
-	{
-		int oldword = word_r(space, (offset * 2) + 1, 0xffff);
-		int newword = data & 0xffff;
-		if (!ACCESSING_BITS_0_7)
-			newword |= (oldword & 0x00ff);
-		if (!ACCESSING_BITS_8_15)
-			newword |= (oldword & 0xff00);
-		word_w(space, (offset * 2) + 1, newword, 0xffff);
-	}
-}
-
-
 void tc0480scp_device::tilemap_update()
 {
 	int layer, zoom, i, j;
@@ -691,9 +646,9 @@ void tc0480scp_device::bg01_draw( screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 	else    /* zoom */
 	{
-		uint16_t *dst16, *src16;
+		u16 *dst16, *src16;
 		uint8_t *tsrc;
-		uint16_t scanline[512];
+		u16 scanline[512];
 		uint32_t sx;
 		bitmap_ind16 &srcbitmap = m_tilemap[layer][m_dblwidth]->pixmap();
 		bitmap_ind8 &flagsbitmap = m_tilemap[layer][m_dblwidth]->flagsmap();
@@ -701,9 +656,9 @@ void tc0480scp_device::bg01_draw( screen_device &screen, bitmap_ind16 &bitmap, c
 		int y_index, src_y_index, row_index;
 		int x_index, x_step;
 
-		uint16_t screen_width = 512; //cliprect.width();
-		uint16_t min_y = cliprect.min_y;
-		uint16_t max_y = cliprect.max_y;
+		u16 screen_width = 512; //cliprect.width();
+		u16 min_y = cliprect.min_y;
+		u16 max_y = cliprect.max_y;
 
 		int width_mask = 0x1ff;
 		if (m_dblwidth)
@@ -812,17 +767,17 @@ void tc0480scp_device::bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 	bitmap_ind16 &srcbitmap = m_tilemap[layer][m_dblwidth]->pixmap();
 	bitmap_ind8 &flagsbitmap = m_tilemap[layer][m_dblwidth]->flagsmap();
 
-	uint16_t *dst16, *src16;
+	u16 *dst16, *src16;
 	uint8_t *tsrc;
 	int y_index, src_y_index, row_index, row_zoom;
 	int sx, x_index, x_step;
 	uint32_t zoomx, zoomy;
-	uint16_t scanline[512];
+	u16 scanline[512];
 	int flipscreen = m_pri_reg & 0x40;
 
-	uint16_t screen_width = 512; //cliprect.width();
-	uint16_t min_y = cliprect.min_y;
-	uint16_t max_y = cliprect.max_y;
+	u16 screen_width = 512; //cliprect.width();
+	u16 min_y = cliprect.min_y;
+	u16 max_y = cliprect.max_y;
 
 	int width_mask = 0x1ff;
 	if (m_dblwidth)
@@ -941,7 +896,7 @@ void tc0480scp_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap
 
 /* For evidence table of TC0480SCP bg layer priorities, refer to mame55 source */
 
-static const uint16_t tc0480scp_bg_pri_lookup[8] =
+static const u16 tc0480scp_bg_pri_lookup[8] =
 {
 	0x0123,
 	0x1230,
@@ -958,8 +913,8 @@ int tc0480scp_device::get_bg_priority()
 	return tc0480scp_bg_pri_lookup[(m_pri_reg & 0x1c) >> 2];
 }
 
-// undrfire.c also needs to directly access the priority reg
-READ8_MEMBER( tc0480scp_device::pri_reg_r )
+// undrfire.cpp also needs to directly access the priority reg
+u8 tc0480scp_device::pri_reg_r()
 {
 	return m_pri_reg;
 }

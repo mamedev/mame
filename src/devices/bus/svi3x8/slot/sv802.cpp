@@ -20,12 +20,14 @@ DEFINE_DEVICE_TYPE(SV802, sv802_device, "sv802", "SV-802 Centronics Printer Inte
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sv802_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, sv802_device, busy_w))
+void sv802_device::device_add_mconfig(machine_config &config)
+{
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(sv802_device::busy_w));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-MACHINE_CONFIG_END
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
+}
 
 
 //**************************************************************************
@@ -60,7 +62,7 @@ void sv802_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER( sv802_device::iorq_r )
+uint8_t sv802_device::iorq_r(offs_t offset)
 {
 	if (offset == 0x12)
 		return 0xfe | m_busy;
@@ -68,7 +70,7 @@ READ8_MEMBER( sv802_device::iorq_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( sv802_device::iorq_w )
+void sv802_device::iorq_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

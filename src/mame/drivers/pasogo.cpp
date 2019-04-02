@@ -141,12 +141,12 @@ private:
 	required_shared_ptr<uint16_t> m_vram;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ16_MEMBER(ems_r);
-	DECLARE_WRITE16_MEMBER(ems_w);
-	DECLARE_READ16_MEMBER(emsram_r);
-	DECLARE_WRITE16_MEMBER(emsram_w);
-	DECLARE_READ8_MEMBER(vg230_io_r);
-	DECLARE_WRITE8_MEMBER(vg230_io_w);
+	uint16_t ems_r(offs_t offset, uint16_t mem_mask);
+	void ems_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t emsram_r(offs_t offset, uint16_t mem_mask);
+	void emsram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint8_t vg230_io_r(offs_t offset);
+	void vg230_io_w(offs_t offset, uint8_t data);
 
 	struct
 	{
@@ -229,7 +229,7 @@ void pasogo_state::machine_start()
 	m_vg230.bios_timer.data=0x7200; // HACK
 }
 
-READ8_MEMBER( pasogo_state::vg230_io_r )
+uint8_t pasogo_state::vg230_io_r(offs_t offset)
 {
 	int log = true;
 	uint8_t data = 0;
@@ -315,7 +315,7 @@ READ8_MEMBER( pasogo_state::vg230_io_r )
 }
 
 
-WRITE8_MEMBER( pasogo_state::vg230_io_w )
+void pasogo_state::vg230_io_w(offs_t offset, uint8_t data)
 {
 	int log = true;
 
@@ -387,7 +387,7 @@ WRITE8_MEMBER( pasogo_state::vg230_io_w )
 }
 
 
-READ16_MEMBER( pasogo_state::ems_r )
+uint16_t pasogo_state::ems_r(offs_t offset, uint16_t mem_mask)
 {
 	uint8_t data = 0;
 	uint8_t index;
@@ -407,7 +407,7 @@ READ16_MEMBER( pasogo_state::ems_r )
 }
 
 
-WRITE16_MEMBER( pasogo_state::ems_w )
+void pasogo_state::ems_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t index;
 
@@ -434,16 +434,16 @@ WRITE16_MEMBER( pasogo_state::ems_w )
 	}
 }
 
-READ16_MEMBER( pasogo_state::emsram_r )
+uint16_t pasogo_state::emsram_r(offs_t offset, uint16_t mem_mask)
 {
 	m_ems->set_bank(m_ems_bank[(offset >> 13) & 0x1f] & 0x7fff);
-	return m_ems->read16(space, offset & 0x1fff, mem_mask);
+	return m_ems->read16(offset & 0x1fff, mem_mask);
 }
 
-WRITE16_MEMBER( pasogo_state::emsram_w )
+void pasogo_state::emsram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_ems->set_bank(m_ems_bank[(offset >> 13) & 0x1f] & 0x7fff);
-	m_ems->write16(space, offset & 0x1fff, data, mem_mask);
+	m_ems->write16(offset & 0x1fff, data, mem_mask);
 }
 
 void pasogo_state::emsbank_map(address_map &map)
@@ -544,38 +544,38 @@ void pasogo_state::machine_reset()
 	contrast(*color->fields().first(), nullptr, 0, color->read());
 }
 
-MACHINE_CONFIG_START(pasogo_state::pasogo)
-
-	MCFG_DEVICE_ADD("maincpu", V30, XTAL(32'220'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(pasogo_mem)
-	MCFG_DEVICE_IO_MAP(pasogo_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pasogo_state,  pasogo_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+void pasogo_state::pasogo(machine_config &config)
+{
+	V30(config, m_maincpu, XTAL(32'220'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pasogo_state::pasogo_mem);
+	m_maincpu->set_addrmap(AS_IO, &pasogo_state::pasogo_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pasogo_state::pasogo_interrupt));
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
 	ADDRESS_MAP_BANK(config, "ems").set_map(&pasogo_state::emsbank_map).set_options(ENDIANNESS_LITTLE, 16, 32, 0x4000);
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
+	IBM5160_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
 	RAM(config, RAM_TAG).set_default_size("512K");
 
 	// It's a CGA device right so lets use isa_cga!  Well, not so much.
 	// The carts use vg230 specific registers and mostly ignore the mc6845.
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pasogo_state, screen_update_pasogo)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD("palette", 2)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_size(320, 240);
+	screen.set_visarea(0, 320-1, 0, 240-1);
+	screen.set_screen_update(FUNC(pasogo_state::screen_update_pasogo));
+	screen.set_palette(m_palette);
+	PALETTE(config, m_palette).set_entries(2);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pasogo_cart")
-	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
-	MCFG_GENERIC_MANDATORY
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pasogo_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_must_be_loaded(true);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","pasogo")
+	SOFTWARE_LIST(config, "cart_list").set_original("pasogo");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("vg230_timer", pasogo_state, vg230_timer, attotime::from_hz(1))
-MACHINE_CONFIG_END
+	TIMER(config, "vg230_timer").configure_periodic(FUNC(pasogo_state::vg230_timer), attotime::from_hz(1));
+}
 
 ROM_START( pasogo )
 	ROM_REGION( 0x10000, "empty", ROMREGION_ERASEFF )

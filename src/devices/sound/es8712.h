@@ -23,7 +23,7 @@ public:
 	es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_msm_tag(const char *tag) { m_msm.set_tag(tag); }
+	template <typename T> void set_msm_tag(T &&tag) { m_msm.set_tag(std::forward<T>(tag)); }
 	auto reset_handler() { return m_reset_handler.bind(); }
 	auto msm_write_handler() { return m_msm_write_cb.bind(); }
 

@@ -31,6 +31,10 @@ Sound: YM2203C
        MCM2018ANS45 (x2)
        HY6264P-15
 
+Actual Measured Clocks     Derived
+     Z180 - 6.14522MHz  (12.288000MHz/2)
+  YM2203C - 3.57543MHz  (14.318181MHz/4)
+
 Unknown 28 pin protection chip (possibly a PIC) at 5A (UC02 as silkscreened on PCB)
 
 ***************************************************************************/
@@ -277,23 +281,23 @@ void mosaic_state::machine_reset()
 	m_prot_val = 0;
 }
 
-MACHINE_CONFIG_START(mosaic_state::mosaic)
-
+void mosaic_state::mosaic(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'288'000)/2)  /* 6.144MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mosaic_map)
-	MCFG_DEVICE_IO_MAP(mosaic_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mosaic_state,  irq0_line_hold)
+	Z180(config, m_maincpu, XTAL(12'288'000)/2);  /* 6.144MHz - Verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mosaic_state::mosaic_map);
+	m_maincpu->set_addrmap(AS_IO, &mosaic_state::mosaic_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mosaic_state::irq0_line_hold));
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mosaic_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, 48*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(mosaic_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mosaic);
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 256);
@@ -302,18 +306,18 @@ MACHINE_CONFIG_START(mosaic_state::mosaic)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'288'000)/4)); /* 3.072MHz or 3.579545MHz (14.31818MHz/4)? */
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(14'318'181)/4)); /* 3.579545MHz - Verified */
 	ymsnd.port_a_read_callback().set_ioport("DSW");
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mosaic_state::gfire2)
+void mosaic_state::gfire2(machine_config &config)
+{
 	mosaic(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(gfire2_map)
-	MCFG_DEVICE_IO_MAP(gfire2_io_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &mosaic_state::gfire2_map);
+	m_maincpu->set_addrmap(AS_IO, &mosaic_state::gfire2_io_map);
+}
 
 
 
