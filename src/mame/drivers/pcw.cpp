@@ -246,7 +246,7 @@ void pcw_state::pcw_update_read_memory_block(int block, int bank)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	char block_name[10];
 
-	sprintf(block_name,"bank%d",block+1);
+	snprintf(block_name, sizeof(block_name), "bank%d", block + 1);
 	/* bank 3? */
 	if (bank == 3)
 	{
@@ -262,8 +262,6 @@ void pcw_state::pcw_update_read_memory_block(int block, int bank)
 	}
 	membank(block_name)->set_base(m_ram->pointer() + ((bank * 0x4000) % m_ram->size()));
 }
-
-
 
 void pcw_state::pcw_update_write_memory_block(int block, int bank)
 {
@@ -378,7 +376,7 @@ READ8_MEMBER(pcw_state::pcw_interrupt_counter_r)
 	/* check interrupts */
 	pcw_update_irqs();
 	/* return data */
-	LOGIRQ("SYS: IRQ counter read, returning %02x\n", data);
+	LOGIRQ("IRQ counter read, returning %02x\n", data);
 	return data;
 }
 
@@ -389,7 +387,7 @@ WRITE8_MEMBER(pcw_state::pcw_bank_select_w)
 	m_banks[offset] = data;
 
 	pcw_update_mem(offset, data);
-//  popmessage("RAM Banks: %02x %02x %02x %02x Lock:%02x",m_banks[0],m_banks[1],m_banks[2],m_banks[3],m_bank_force);
+	LOGBANK("RAM Banks: %02x %02x %02x %02x Lock:%02x",m_banks[0],m_banks[1],m_banks[2],m_banks[3],m_bank_force);
 }
 
 WRITE8_MEMBER(pcw_state::pcw_bank_force_selection_w)
@@ -443,7 +441,7 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 		case 1:
 		{
 			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-			popmessage("SYS: Reboot");
+			LOGSYS("SYS: Reboot");
 		}
 		break;
 
@@ -1255,7 +1253,7 @@ static void pcw_35floppies(device_slot_interface &device)
 void pcw_state::pcw(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);       /* clock supplied to chip, but in reality it is 3.4 MHz */
+	Z80(config, m_maincpu, XTAL(32'000'000) / 8); /* clock supplied to chip, but in reality it is 3.4 MHz due to z80 wait cycles*/
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcw_state::pcw_map);
 	m_maincpu->set_addrmap(AS_IO, &pcw_state::pcw_io);
 
