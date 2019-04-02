@@ -216,11 +216,11 @@ void lemmings_state::machine_start()
 void lemmings_state::lemmings(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 14000000);
+	M68000(config, m_maincpu, 28_MHz_XTAL / 2); // Data East 59
 	m_maincpu->set_addrmap(AS_PROGRAM, &lemmings_state::lemmings_map);
 	m_maincpu->set_vblank_int("screen", FUNC(lemmings_state::irq6_line_hold));
 
-	MC6809(config, m_audiocpu, 32220000/8); // type and clock need verification
+	MC6809E(config, m_audiocpu, 32.22_MHz_XTAL / 24); // MC68B09EP; clock not verified
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lemmings_state::sound_map);
 
 	/* video hardware */
@@ -259,7 +259,7 @@ void lemmings_state::lemmings(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32220000/9));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32.22_MHz_XTAL / 9)); // clock likely wrong
 	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 	ymsnd.add_route(0, "lspeaker", 0.45);
 	ymsnd.add_route(1, "rspeaker", 0.45);
