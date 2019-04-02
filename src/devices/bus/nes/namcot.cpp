@@ -209,6 +209,24 @@ void nes_namcot163_device::device_start()
 
 	m_mapper_sram_size = 0x2000;
 	m_mapper_sram = m_n163_ram;
+
+	// TODO : Measure actual volume
+	if (m_n163_vol == 2) // Submapper 2 - No expansion sound
+	{
+		m_namco163snd->set_output_gain(ALL_OUTPUTS, 0.0);
+	}
+	else if (m_n163_vol == 3) // Submapper 3 - N163 expansion sound: 11.0-13.0 dB louder than NES APU
+	{
+		m_namco163snd->set_output_gain(ALL_OUTPUTS, 1.125);
+	}
+	else if (m_n163_vol == 4) // Submapper 4 - N163 expansion sound: 16.0-17.0 dB louder than NES APU
+	{
+		m_namco163snd->set_output_gain(ALL_OUTPUTS, 1.17);
+	}
+	else if (m_n163_vol == 5) // Submapper 5 - N163 expansion sound: 18.0-19.5 dB louder than NES APU
+	{
+		m_namco163snd->set_output_gain(ALL_OUTPUTS, 1.19);
+	}
 }
 
 void nes_namcot163_device::pcb_reset()
