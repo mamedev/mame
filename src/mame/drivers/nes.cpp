@@ -51,8 +51,8 @@ INPUT_PORTS_END
 void nes_state::nes(machine_config &config)
 {
 	/* basic machine hardware */
-	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_state::nes_map);
+	n2a03_device &maincpu(N2A03(config, m_maincpu, NTSC_APU_CLOCK));
+	maincpu.set_addrmap(AS_PROGRAM, &nes_state::nes_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.0988);
@@ -72,8 +72,7 @@ void nes_state::nes(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	// note APU sound level here was specified as 0.90, not 0.50 like the others
-	// not sure how to adjust it when it's inside the CPU?
+	maincpu.add_route(ALL_OUTPUTS, "mono", 0.90);
 
 	NES_CONTROL_PORT(config, m_ctrl1, nes_control_port1_devices, "joypad");
 	NES_CONTROL_PORT(config, m_ctrl2, nes_control_port2_devices, "joypad");

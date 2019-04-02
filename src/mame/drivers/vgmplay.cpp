@@ -3654,20 +3654,14 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	N2A03(config, m_nescpu[0], 0);
 	m_nescpu[0]->set_addrmap(AS_PROGRAM, &vgmplay_state::nescpu_map<0>);
 	m_nescpu[0]->set_disable();
-
-	auto *nesapu_0(dynamic_cast<device_sound_interface *>(config.device_find(m_nescpu[0], "nesapu")));
-	nesapu_0->reset_routes();
-	nesapu_0->add_route(ALL_OUTPUTS, ":lspeaker", 0.50);
-	nesapu_0->add_route(ALL_OUTPUTS, ":rspeaker", 0.50);
+	m_nescpu[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_nescpu[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	N2A03(config, m_nescpu[1], 0);
 	m_nescpu[1]->set_addrmap(AS_PROGRAM, &vgmplay_state::nescpu_map<1>);
 	m_nescpu[1]->set_disable();
-
-	auto *nesapu_1(dynamic_cast<device_sound_interface *>(config.device_find(m_nescpu[1], "nesapu")));
-	nesapu_1->reset_routes();
-	nesapu_1->add_route(ALL_OUTPUTS, ":lspeaker", 0.50);
-	nesapu_1->add_route(ALL_OUTPUTS, ":rspeaker", 0.50);
+	m_nescpu[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_nescpu[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	MULTIPCM(config, m_multipcm[0], 0);
 	m_multipcm[0]->set_addrmap(0, &vgmplay_state::multipcm_map<0>);
