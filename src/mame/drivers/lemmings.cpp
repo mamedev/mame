@@ -220,7 +220,7 @@ void lemmings_state::lemmings(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &lemmings_state::lemmings_map);
 	m_maincpu->set_vblank_int("screen", FUNC(lemmings_state::irq6_line_hold));
 
-	M6809(config, m_audiocpu, 32220000/8);
+	MC6809(config, m_audiocpu, 32220000/8); // type and clock need verification
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lemmings_state::sound_map);
 
 	/* video hardware */
@@ -251,7 +251,7 @@ void lemmings_state::lemmings(machine_config &config)
 	m_deco146->port_b_cb().set_ioport("SYSTEM");
 	m_deco146->port_c_cb().set_ioport("DSW");
 	m_deco146->set_use_magic_read_address_xor(true);
-	m_deco146->soundlatch_irq_cb().set_inputline(m_audiocpu, 1);
+	m_deco146->soundlatch_irq_cb().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -260,7 +260,7 @@ void lemmings_state::lemmings(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32220000/9));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 	ymsnd.add_route(0, "lspeaker", 0.45);
 	ymsnd.add_route(1, "rspeaker", 0.45);
 
