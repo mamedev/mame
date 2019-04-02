@@ -299,6 +299,7 @@ constexpr unsigned threecom3c505_device::ETH_BUFFER_SIZE;
 
 // device type definition
 DEFINE_DEVICE_TYPE(ISA16_3C505, threecom3c505_device, "3c505", "3Com 3C505 Network Adaptor")
+DEFINE_DEVICE_TYPE(ISA16_3C505_LLE, isa16_3c505_device, "3c505_lle", "3Com EtherLink Plus")
 
 //-------------------------------------------------
 // threecom3c505_device - constructor
@@ -1685,4 +1686,653 @@ int threecom3c505_device::tx_data(device_t *device, const uint8_t data[], int le
 int threecom3c505_device::setfilter(device_t *device, int node_id)
 {
 	return 0;
+}
+
+/*
+ * The following device is a low-level reimplementation of the 3c505, which
+ * should entirely replace the HLE one above when it's been tested and proven
+ * working.
+ *
+ * TODO
+ *   - testing (unable to install Domain/OS on Apollo, and not yet able to get
+ *     3c505.exe diagnostic program running on MS-DOS)
+ *   - data DMA functionality unimplemented
+ *   - externalize mac address
+ *   - 8 bit isa slot support
+ *   - revision 1.0 and 2.0 hardware/firmware variants
+ *   - 8023 loopback mode
+ */
+
+#undef LOG
+#undef VERBOSE
+
+#define LOG_GENERAL (1U << 0)
+#define LOG_REG     (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+ROM_START(3c505)
+	ROM_REGION16_LE(0x04000, "system", 0)
+	// TODO: probably a revision 3.0 firmware dump
+	ROMX_LOAD("0729-12_a.3h", 0x00000, 0x02000, CRC(5415fccd) SHA1(6a42d7f3acdb3e0213e1037fee1864819ac33991), ROM_SKIP(1))
+	ROMX_LOAD("0729-62_a.3f", 0x00001, 0x02000, CRC(4240bd9d) SHA1(015d2f7282def85681bcf1a7c5a7f501a16d5a6c), ROM_SKIP(1))
+
+	ROM_REGION(0x02000, "host", 0)
+	ROM_SYSTEM_BIOS(0, "unused", "Unused")
+
+	ROM_SYSTEM_BIOS(1, "apollo", "Apollo")
+	ROMX_LOAD("3000_3c505_010728-00.bin", 0x00000, 0x02000, CRC(69b77ec6) SHA1(7ac36cc6fc90b90ddfc56c45303b514cbe18ae58), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(2, "netware", "3C505-NW EtherLink Plus NetWare Boot PROM")
+	ROMX_LOAD("3c505-nw.bin", 0x00000, 0x02000, NO_DUMP, ROM_BIOS(2))
+ROM_END
+
+static INPUT_PORTS_START(3c505)
+	PORT_START("IO_BASE")
+	PORT_DIPNAME(0x3f0, 0x300, "I/O Base")
+	PORT_DIPSETTING(    0x010, "010h")
+	PORT_DIPSETTING(    0x020, "020h")
+	PORT_DIPSETTING(    0x030, "030h")
+	PORT_DIPSETTING(    0x040, "040h")
+	PORT_DIPSETTING(    0x050, "050h")
+	PORT_DIPSETTING(    0x060, "060h")
+	PORT_DIPSETTING(    0x070, "070h")
+	PORT_DIPSETTING(    0x080, "080h")
+	PORT_DIPSETTING(    0x090, "090h")
+	PORT_DIPSETTING(    0x0a0, "0a0h")
+	PORT_DIPSETTING(    0x0b0, "0b0h")
+	PORT_DIPSETTING(    0x0c0, "0c0h")
+	PORT_DIPSETTING(    0x0d0, "0d0h")
+	PORT_DIPSETTING(    0x0e0, "0e0h")
+	PORT_DIPSETTING(    0x0f0, "0f0h")
+	PORT_DIPSETTING(    0x100, "0100h")
+	PORT_DIPSETTING(    0x110, "0110h")
+	PORT_DIPSETTING(    0x120, "0120h")
+	PORT_DIPSETTING(    0x130, "0130h")
+	PORT_DIPSETTING(    0x140, "0140h")
+	PORT_DIPSETTING(    0x150, "0150h")
+	PORT_DIPSETTING(    0x160, "0160h")
+	PORT_DIPSETTING(    0x170, "0170h")
+	PORT_DIPSETTING(    0x180, "0180h")
+	PORT_DIPSETTING(    0x190, "0190h")
+	PORT_DIPSETTING(    0x1a0, "01a0h")
+	PORT_DIPSETTING(    0x1b0, "01b0h")
+	PORT_DIPSETTING(    0x1c0, "01c0h")
+	PORT_DIPSETTING(    0x1d0, "01d0h")
+	PORT_DIPSETTING(    0x1e0, "01e0h")
+	PORT_DIPSETTING(    0x1f0, "01f0h")
+	PORT_DIPSETTING(    0x200, "0200h")
+	PORT_DIPSETTING(    0x210, "0210h")
+	PORT_DIPSETTING(    0x220, "0220h")
+	PORT_DIPSETTING(    0x230, "0230h")
+	PORT_DIPSETTING(    0x240, "0240h")
+	PORT_DIPSETTING(    0x250, "0250h")
+	PORT_DIPSETTING(    0x260, "0260h")
+	PORT_DIPSETTING(    0x270, "0270h")
+	PORT_DIPSETTING(    0x280, "0280h")
+	PORT_DIPSETTING(    0x290, "0290h")
+	PORT_DIPSETTING(    0x2a0, "02a0h")
+	PORT_DIPSETTING(    0x2b0, "02b0h")
+	PORT_DIPSETTING(    0x2c0, "02c0h")
+	PORT_DIPSETTING(    0x2d0, "02d0h")
+	PORT_DIPSETTING(    0x2e0, "02e0h")
+	PORT_DIPSETTING(    0x2f0, "02f0h")
+	PORT_DIPSETTING(    0x300, "0300h")
+	PORT_DIPSETTING(    0x310, "0310h")
+	PORT_DIPSETTING(    0x320, "0320h")
+	PORT_DIPSETTING(    0x330, "0330h")
+	PORT_DIPSETTING(    0x340, "0340h")
+	PORT_DIPSETTING(    0x350, "0350h")
+	PORT_DIPSETTING(    0x360, "0360h")
+	PORT_DIPSETTING(    0x370, "0370h")
+	PORT_DIPSETTING(    0x380, "0380h")
+	PORT_DIPSETTING(    0x390, "0390h")
+	PORT_DIPSETTING(    0x3a0, "03a0h")
+	PORT_DIPSETTING(    0x3b0, "03b0h")
+	PORT_DIPSETTING(    0x3c0, "03c0h")
+	PORT_DIPSETTING(    0x3d0, "03d0h")
+	PORT_DIPSETTING(    0x3e0, "03e0h")
+	PORT_DIPSETTING(    0x3f0, "03f0h")
+
+	PORT_START("IRQ_DRQ")
+	PORT_DIPNAME(0x0f, 0x0a, "IRQ")
+	// 8 or 16 bit slots
+	PORT_DIPSETTING(   0x03, "IRQ 3")
+	PORT_DIPSETTING(   0x04, "IRQ 4")
+	PORT_DIPSETTING(   0x05, "IRQ 5")
+	PORT_DIPSETTING(   0x06, "IRQ 6")
+	PORT_DIPSETTING(   0x07, "IRQ 7")
+	PORT_DIPSETTING(   0x09, "IRQ 9")
+	// 16 bit slots only
+	PORT_DIPSETTING(   0x0a, "IRQ 10")
+	PORT_DIPSETTING(   0x0b, "IRQ 11")
+	PORT_DIPSETTING(   0x0c, "IRQ 12")
+	PORT_DIPSETTING(   0x0e, "IRQ 14")
+	PORT_DIPSETTING(   0x0f, "IRQ 15")
+
+	// TODO: dma channel uses two jumpers for each channel: mode selection?
+	PORT_DIPNAME(0x70, 0x60, "DRQ")
+	PORT_DIPSETTING(   0x00, "none")
+	// 8 or 16 bit slots
+	PORT_DIPSETTING(   0x10, "DRQ 1")
+	PORT_DIPSETTING(   0x30, "DRQ 3")
+	// 16 bit slots only
+	PORT_DIPSETTING(   0x50, "DRQ 5")
+	PORT_DIPSETTING(   0x60, "DRQ 6")
+	PORT_DIPSETTING(   0x70, "DRQ 7")
+
+	// 8-position jumper block marked EN,13-19 corresponds to address line decode
+	PORT_START("ROM_OPTS")
+	PORT_DIPNAME(0x01, 0x01, "ROM Enable")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x01, DEF_STR(On))
+	PORT_DIPNAME(0xfe, 0x00, "ROM Base")
+	PORT_DIPSETTING(   0x00, "0000h")
+	PORT_DIPSETTING(   0x02, "2000h")
+	PORT_DIPSETTING(   0x04, "4000h")
+	PORT_DIPSETTING(   0x06, "6000h")
+	// TODO: additional addresses
+
+	PORT_START("TEST")
+	PORT_DIPNAME(0x01, 0x00, "TEST Mode")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x01, DEF_STR(On))
+INPUT_PORTS_END
+
+isa16_3c505_device::isa16_3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, ISA16_3C505_LLE, tag, owner, clock)
+	, device_isa16_card_interface(mconfig, *this)
+	, m_cpu(*this, "cpu")
+	, m_net(*this, "net")
+	, m_ram(*this, "ram")
+	, m_led(*this, "led%u", 0U)
+	, m_iobase(*this, "IO_BASE")
+	, m_irqdrq(*this, "IRQ_DRQ")
+	, m_romopts(*this, "ROM_OPTS")
+	, m_test(*this, "TEST")
+	, m_installed(false)
+{
+}
+
+const tiny_rom_entry *isa16_3c505_device::device_rom_region() const
+{
+	return ROM_NAME(3c505);
+}
+
+void isa16_3c505_device::device_add_mconfig(machine_config &config)
+{
+	I80186(config, m_cpu, 16_MHz_XTAL);
+	m_cpu->set_addrmap(AS_PROGRAM, &isa16_3c505_device::map_main);
+	m_cpu->set_addrmap(AS_IO, &isa16_3c505_device::map_io);
+
+	I82586(config, m_net, 8_MHz_XTAL);
+	m_net->set_addrmap(0, &isa16_3c505_device::map_main);
+	m_net->out_irq_cb().set(m_cpu, FUNC(i80186_cpu_device::int1_w));
+
+	// 1986 document indicates 128KiB is default, but 1988 document does not
+	// include it as an option
+	RAM(config, m_ram);
+	m_ram->set_default_size("256KiB");
+	m_ram->set_extra_options("128KiB,256KiB,384KiB,512KiB");
+}
+
+ioport_constructor isa16_3c505_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(3c505);
+}
+
+void isa16_3c505_device::device_start()
+{
+	set_isa_device();
+
+	// install ram in both i80186 and i82586 address spaces
+	if (!m_ram->started())
+		throw device_missing_dependencies();
+
+	m_cpu->space(0).install_ram(0x00000, m_ram->mask() & 0xfffff, m_ram->pointer());
+	m_net->space(0).install_ram(0x00000, m_ram->mask() & 0xfffff, m_ram->pointer());
+
+	m_led.resolve();
+
+	save_item(NAME(m_acmdr));
+	save_item(NAME(m_acr));
+	save_item(NAME(m_asr));
+
+	save_item(NAME(m_hcmdr));
+	save_item(NAME(m_hcr));
+	save_item(NAME(m_hsr));
+	save_item(NAME(m_hdr));
+
+	//save_item(NAME(m_data);
+
+	save_item(NAME(m_cpu_irq_asserted));
+	save_item(NAME(m_isa_irq_asserted));
+}
+
+void isa16_3c505_device::device_reset()
+{
+	if (!m_installed)
+	{
+		u16 const base = m_iobase->read();
+		m_isa->install16_device(base, base | 0xf,
+			read16_delegate(FUNC(isa16_3c505_device::host_r), this),
+			write16_delegate(FUNC(isa16_3c505_device::host_w), this));
+
+		m_isa_irq = m_irqdrq->read() & 0xf;
+		m_isa_drq = (m_irqdrq->read() >> 4) & 0x7;
+
+		if (m_romopts->read() & 1)
+		{
+			offs_t const rom_base = (m_romopts->read() & 0xfe) << 12;
+
+			m_isa->install_rom(this, rom_base, rom_base | 0x01fff, "host", "host");
+		}
+
+		m_installed = true;
+	}
+
+	m_cpu->reset();
+
+	// adapter registers
+	m_acmdr = 0;
+	m_acr = 0;
+	m_asr = ASR_ACRE | ASR_8_16;
+	if (m_test->read())
+		m_asr |= ASR_SWTC;
+
+	// host registers
+	m_hcmdr = 0;
+	m_hcr = 0;
+	m_hsr = HSR_HCRE;
+	m_hdr = 0;
+
+	m_data.clear();
+	update_rdy(m_acr, m_hcr);
+
+	m_cpu_irq_asserted = false;
+	m_isa_irq_asserted = false;
+}
+
+void isa16_3c505_device::map_main(address_map &map)
+{
+	// i82586 upper 4 address lines are ignored
+	map.global_mask(0x0fffff);
+
+	map(0xfc000, 0xfffff).rom().region("system", 0);
+}
+
+void isa16_3c505_device::map_io(address_map &map)
+{
+	/*
+	 * A read or write to I/O location 00H will cause an active transition on
+	 * the CA input.
+	 */
+	map(0x0000, 0x0000).lrw8("ca",
+		[this]()
+		{
+			m_net->ca(1);
+			m_net->ca(0);
+
+			return 0;
+		},
+		[this](u8 data)
+		{
+			m_net->ca(1);
+			m_net->ca(0);
+		});
+
+	/*
+	 * A read or write to I/O location 80H will produce a CAS before RAS cycle
+	 * in all banks simultaneously.
+	 */
+	map(0x0080, 0x0081).noprw();
+
+	map(0x0100, 0x0100).rw(FUNC(isa16_3c505_device::acmd_r), FUNC(isa16_3c505_device::acmd_w));
+	map(0x0102, 0x0102).r(FUNC(isa16_3c505_device::acr_r));
+	map(0x0103, 0x0103).rw(FUNC(isa16_3c505_device::asr_r), FUNC(isa16_3c505_device::acr_w));
+	map(0x0104, 0x0105).rw(FUNC(isa16_3c505_device::adata_r), FUNC(isa16_3c505_device::adata_w));
+
+	map(0x0180, 0x018f).lr16("mac",
+		[](offs_t offset)
+		{
+			// TODO: hard-code to Apollo Computer Inc. dummy address for now
+			static const u8 mac[] = { 0x08, 0x00, 0x1e, 0x12, 0x34, 0x56, 0xff, 0xff};
+
+			return mac[offset];
+		});
+}
+
+u8 isa16_3c505_device::acmd_r()
+{
+	u8 const data = m_hcmdr;
+
+	m_asr &= ~ASR_HCRF;
+	m_hsr |= HSR_HCRE;
+
+	if (m_cpu_irq_asserted)
+	{
+		m_cpu_irq_asserted = false;
+		m_cpu->int0_w(0);
+	}
+
+	return data;
+}
+
+void isa16_3c505_device::acmd_w(u8 data)
+{
+	LOGMASKED(LOG_REG, "acmd_w 0x%02x (%s)\n", data, machine().describe_context());
+
+	m_asr &= ~ASR_ACRE;
+	m_hsr |= HSR_ACRF;
+
+	m_acmdr = data;
+
+	if (m_hcr & HCR_CMDE)
+		update_irq(1);
+}
+
+void isa16_3c505_device::acr_w(u8 data)
+{
+	LOGMASKED(LOG_REG, "acr_w 0x%02x (%s)\n", data, machine().describe_context());
+
+	// update adapter status flags
+	if ((data ^ m_acr) & ACR_ASF)
+		m_hsr = (m_hsr & ~HSR_ASF) | (data & ACR_ASF);
+
+	if ((data ^ m_acr) & ACR_LED1)
+	{
+		LOGMASKED(LOG_REG, "led #1 %s\n", (data & ACR_LED1) ? "on" : "off");
+		m_led[0] = !!(data & ACR_LED1);
+	}
+
+	if ((data ^ m_acr) & ACR_LED2)
+	{
+		LOGMASKED(LOG_REG, "led #2 %d\n", (data & ACR_LED2) ? "on" : "off");
+		m_led[1] = !!(data & ACR_LED2);
+	}
+
+	if (!(m_acr & ACR_R586) && (data & ACR_R586))
+	{
+		LOGMASKED(LOG_REG, "i82586 reset\n");
+		m_net->reset();
+	}
+
+	if ((data ^ m_acr) & ACR_FLSH)
+	{
+		if (data & ACR_FLSH)
+		{
+			LOGMASKED(LOG_REG, "adapter flushed data fifo (%d bytes)\n", m_data.queue_length());
+			m_data.clear();
+		}
+
+		update_rdy(data, m_hcr);
+	}
+
+	// loopback is active low
+	if ((m_acr & ACR_LPBK) && !(data & ACR_LPBK))
+	{
+		LOGMASKED(LOG_REG, "loopback enabled\n", m_data.queue_length());
+
+		// TODO: enable loopback on 8023
+	}
+
+	m_acr = data;
+}
+
+u16 isa16_3c505_device::adata_r()
+{
+	if (!(m_asr & ASR_DIR) && !m_data.empty())
+	{
+		u16 const data = m_data.dequeue();
+
+		update_rdy(m_acr, m_hcr);
+
+		return data;
+	}
+	else
+		fatalerror("%s: adata_r read fifo while %s (%s)\n",
+			tag(), m_data.empty() ? "empty" : "write-only", machine().describe_context().c_str());
+}
+
+void isa16_3c505_device::adata_w(u16 data)
+{
+	if ((m_asr & ASR_DIR) && !m_data.full())
+	{
+		m_data.enqueue(data);
+
+		update_rdy(m_acr, m_hcr);
+	}
+	else
+		fatalerror("%s: adata_w write fifo while %s (%s)\n",
+			tag(), m_data.full() ? "full" : "read-only", machine().describe_context().c_str());
+}
+
+READ16_MEMBER(isa16_3c505_device::host_r)
+{
+	switch (offset)
+	{
+	case 0: return hcmd_r();
+	case 1: return m_hsr;
+	case 2: return hdata_r();
+	case 3: return m_hcr;
+	}
+
+	logerror("host_r unknown register %d (%s)\n", offset, machine().describe_context());
+	return space.unmap();
+}
+
+WRITE16_MEMBER(isa16_3c505_device::host_w)
+{
+	switch (offset)
+	{
+	case 0:
+		hcmd_w(data);
+		break;
+
+	case 1:
+		m_hdr = data & HDR_BRST;
+		break;
+
+	case 2:
+		hdata_w(data);
+		break;
+
+	case 3:
+		hcr_w(data);
+		break;
+
+	default:
+		logerror("host_w unknown register %d data 0x%04x (%s)\n", offset, data, machine().describe_context());
+		break;
+	}
+}
+
+u8 isa16_3c505_device::hcmd_r()
+{
+	u8 const data = m_acmdr;
+
+	m_asr |= ASR_ACRE;
+	m_hsr &= ~HSR_ACRF;
+
+	update_irq(0);
+
+	return data;
+}
+
+void isa16_3c505_device::hcmd_w(u8 data)
+{
+	LOGMASKED(LOG_REG, "hcmd_w 0x%02x (%s)\n", data, machine().describe_context());
+
+	m_asr |= ASR_HCRF;
+	m_hsr &= ~HSR_HCRE;
+
+	m_hcmdr = data;
+
+	if (!m_cpu_irq_asserted)
+	{
+		m_cpu_irq_asserted = true;
+		m_cpu->int0_w(1);
+	}
+}
+
+void isa16_3c505_device::hcr_w(u8 data)
+{
+	LOGMASKED(LOG_REG, "hcr_w 0x%02x (%s)\n", data, machine().describe_context());
+
+	// update host status flags
+	if ((data ^ m_hcr) & HCR_HSF)
+		m_asr = (m_asr & ~ASR_HSF) | (data & HCR_HSF);
+
+	// update direction flag
+	if ((data ^ m_hcr) & HCR_DIR)
+	{
+		if (data & HCR_DIR)
+		{
+			LOGMASKED(LOG_REG, "transfer from host to adapter\n");
+
+			// transfer from host to adapter
+			m_hsr |= HSR_DIR;
+			m_asr |= ASR_DIR;
+
+			update_rdy(m_acr, data);
+		}
+		else
+		{
+			LOGMASKED(LOG_REG, "transfer from adapter to host\n");
+
+			// transfer from adapter to host
+			m_hsr &= ~HSR_DIR;
+			m_asr &= ~ASR_DIR;
+
+			update_rdy(m_acr, data);
+		}
+	}
+
+	if ((data ^ m_hcr) & HCR_FLSH)
+	{
+		if (data & HCR_FLSH)
+		{
+			LOGMASKED(LOG_REG, "host flushed data fifo (%d bytes)\n", m_data.queue_length());
+			m_data.clear();
+		}
+
+		update_rdy(m_acr, data);
+	}
+
+	// attention condition
+	if (!(m_hcr & HCR_ATTN) && (data & HCR_ATTN))
+	{
+		if (!(data & HCR_FLSH))
+		{
+			LOGMASKED(LOG_REG, "soft reset\n");
+
+			// soft reset
+			m_cpu->set_input_line(INPUT_LINE_NMI, 1);
+			m_cpu->set_input_line(INPUT_LINE_NMI, 0);
+		}
+		else
+		{
+			LOGMASKED(LOG_REG, "hard reset\n");
+
+			// hard reset
+			reset();
+		}
+	}
+
+	m_hcr = data;
+}
+
+u16 isa16_3c505_device::hdata_r()
+{
+	if ((m_hsr & HSR_DIR) && !m_data.empty())
+	{
+		u16 const data = m_data.dequeue();
+
+		update_rdy(m_acr, m_hcr);
+
+		return data;
+	}
+	else
+		fatalerror("%s: hdata_r read fifo while %s (%s)\n",
+			tag(), m_data.empty() ? "empty" : "write-only", machine().describe_context().c_str());
+}
+
+void isa16_3c505_device::hdata_w(u16 data)
+{
+	if (!(m_hsr & HSR_DIR) && !m_data.full())
+	{
+		m_data.enqueue(data);
+
+		update_rdy(m_acr, m_hcr);
+	}
+	else
+		fatalerror("%s: hdata_w write fifo while %s (%s)\n",
+			tag(), m_data.full() ? "full" : "read-only", machine().describe_context().c_str());
+}
+
+void isa16_3c505_device::update_rdy(u8 const acr, u8 const hcr)
+{
+	if (!(acr & ACR_FLSH) && !(hcr & HCR_FLSH))
+	{
+		if (hcr & HCR_DIR)
+		{
+			// adapter to host
+			if (m_data.empty())
+				m_hsr &= ~HSR_HRDY;
+			else
+				m_hsr |= HSR_HRDY;
+
+			if (m_data.full())
+				m_asr &= ~ASR_ARDY;
+			else
+				m_asr |= ASR_ARDY;
+		}
+		else
+		{
+			// host to adapter
+			if (m_data.empty())
+				m_asr &= ~ASR_ARDY;
+			else
+				m_asr |= ASR_ARDY;
+
+			if (m_data.full())
+				m_hsr &= ~HSR_HRDY;
+			else
+				m_hsr |= HSR_HRDY;
+		}
+	}
+	else
+	{
+		m_asr &= ~ASR_ARDY;
+		m_hsr &= ~HSR_HRDY;
+	}
+}
+
+void isa16_3c505_device::update_irq(int state)
+{
+	if (bool(state) != m_isa_irq_asserted)
+	{
+		LOG("isa irq %d\n", state);
+
+		switch (m_isa_irq)
+		{
+		case 3: m_isa->irq3_w(state); break;
+		case 4: m_isa->irq4_w(state); break;
+		case 5: m_isa->irq5_w(state); break;
+		case 6: m_isa->irq6_w(state); break;
+		case 7: m_isa->irq7_w(state); break;
+		case 9: m_isa->irq2_w(state); break;
+		case 10: m_isa->irq10_w(state); break;
+		case 11: m_isa->irq11_w(state); break;
+		case 12: m_isa->irq12_w(state); break;
+		case 14: m_isa->irq14_w(state); break;
+		case 15: m_isa->irq15_w(state); break;
+
+		default:
+			fatalerror("%s: invalid isa irq %d\n", tag(), m_isa_irq);
+		}
+
+		m_isa_irq_asserted = bool(state);
+	}
 }
