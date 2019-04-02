@@ -109,8 +109,29 @@
 
 #include "pcw.lh"
 
-#define VERBOSE 1
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOG_PRN      (1U <<  1)
+#define LOG_STROBE   (1U <<  2)
+#define LOG_PAR      (1U <<  3)
+#define LOG_EXP      (1U <<  4)
+#define LOG_MEM      (1U <<  5)
+#define LOG_SYS      (1U <<  6)
+#define LOG_BANK     (1U <<  7)
+#define LOG_RRAM     (1U <<  8)
+#define LOG_IRQ      (1U <<  9)
+
+//#define VERBOSE (LOG_SYS)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGPRN(...)     LOGMASKED(LOG_PRN,      __VA_ARGS__)
+#define LOGSTROBE(...)  LOGMASKED(LOG_STROBE,   __VA_ARGS__)
+#define LOGPAR(...)     LOGMASKED(LOG_PAR,      __VA_ARGS__)
+#define LOGEXP(...)     LOGMASKED(LOG_EXP,      __VA_ARGS__)
+#define LOGMEM(...)     LOGMASKED(LOG_MEM,      __VA_ARGS__)
+#define LOGSYS(...)     LOGMASKED(LOG_SYS,      __VA_ARGS__)
+#define LOGBANK(...)    LOGMASKED(LOG_BANK,     __VA_ARGS__)
+#define LOGRRAM(...)    LOGMASKED(LOG_RRAM,     __VA_ARGS__)
+#define LOGIRQ(...)     LOGMASKED(LOG_IRQ,      __VA_ARGS__)
 
 static const uint8_t half_step_table[4] = { 0x01, 0x02, 0x04, 0x08 };
 static const uint8_t full_step_table[4] = { 0x03, 0x06, 0x0c, 0x09 };
@@ -229,17 +250,15 @@ void pcw_state::pcw_update_read_memory_block(int block, int bank)
 	/* bank 3? */
 	if (bank == 3)
 	{
-		/* when upper 16 bytes are accessed use keyboard read
-		   handler */
-		space.install_read_handler(
-			block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, read8_delegate(FUNC(pcw_state::pcw_keyboard_data_r),this));
-//      LOG(("MEM: read block %i -> bank %i\n",block,bank));
+		/* when upper 16 bytes are accessed use keyboard read handler */
+		space.install_read_handler( block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, read8_delegate(FUNC(pcw_state::pcw_keyboard_data_r),this));
+		LOGMEM("MEM: read block %i -> bank %i\n", block, bank);
 	}
 	else
 	{
 		/* restore bank handler across entire block */
 		space.install_read_bank(block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff,block_name);
-//      LOG(("MEM: read block %i -> bank %i\n",block,bank));
+		LOGMEM("MEM: read block %i -> bank %i\n", block, bank);
 	}
 	membank(block_name)->set_base(m_ram->pointer() + ((bank * 0x4000) % m_ram->size()));
 }
@@ -252,7 +271,7 @@ void pcw_state::pcw_update_write_memory_block(int block, int bank)
 
 	sprintf(block_name,"bank%d",block+5);
 	membank(block_name)->set_base(m_ram->pointer() + ((bank * 0x4000) % m_ram->size()));
-//  LOG(("MEM: write block %i -> bank %i\n",block,bank));
+	LOGMEM("MEM: write block %i -> bank %i\n", block, bank);
 }
 
 
@@ -359,14 +378,14 @@ READ8_MEMBER(pcw_state::pcw_interrupt_counter_r)
 	/* check interrupts */
 	pcw_update_irqs();
 	/* return data */
-	//LOG(("SYS: IRQ counter read, returning %02x\n",data));
+	LOGIRQ("SYS: IRQ counter read, returning %02x\n", data);
 	return data;
 }
 
 
 WRITE8_MEMBER(pcw_state::pcw_bank_select_w)
 {
-	//LOG(("BANK: %2x %x\n",offset, data));
+	LOGBANK("BANK: %2x %x\n", offset, data);
 	m_banks[offset] = data;
 
 	pcw_update_mem(offset, data);
@@ -391,24 +410,24 @@ WRITE8_MEMBER(pcw_state::pcw_roller_ram_addr_w)
 
 	m_roller_ram_addr = (((data>>5) & 0x07)<<14) |
 							((data & 0x01f)<<9);
-	LOG(("Roller-RAM: Address set to 0x%05x\n",m_roller_ram_addr));
+	LOGRRAM("Roller-RAM: Address set to 0x%05x\n", m_roller_ram_addr);
 }
 
 WRITE8_MEMBER(pcw_state::pcw_pointer_table_top_scan_w)
 {
 	m_roller_ram_offset = data;
-	LOG(("Roller-RAM: offset set to 0x%05x\n",m_roller_ram_offset));
+	LOGRRAM("Roller-RAM: offset set to 0x%05x\n", m_roller_ram_offset);
 }
 
 WRITE8_MEMBER(pcw_state::pcw_vdu_video_control_register_w)
 {
 	m_vdu_video_control_register = data;
-	LOG(("Roller-RAM: control reg set to 0x%02x\n",data));
+	LOGRRAM("Roller-RAM: control reg set to 0x%02x\n", data);
 }
 
 WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 {
-	LOG(("SYSTEM CONTROL: %d\n",data));
+	LOGSYS("SYSTEM CONTROL: %d\n", data);
 
 	switch (data)
 	{
@@ -571,7 +590,7 @@ READ8_MEMBER(pcw_state::pcw_system_status_r)
 the PCW custom ASIC */
 READ8_MEMBER(pcw_state::pcw_expansion_r)
 {
-	logerror("pcw expansion r: %04x\n",offset+0x080);
+	LOGEXP("pcw expansion r: %04x\n", offset+0x080);
 
 	switch (offset+0x080)
 	{
@@ -620,7 +639,7 @@ READ8_MEMBER(pcw_state::pcw_expansion_r)
 the PCW custom ASIC */
 WRITE8_MEMBER(pcw_state::pcw_expansion_w)
 {
-	logerror("pcw expansion w: %04x %02x\n",offset+0x080, data);
+	LOGEXP("pcw expansion w: %04x %02x\n", offset+0x080, data);
 }
 
 void pcw_state::pcw_printer_fire_pins(uint16_t pins)
@@ -676,7 +695,12 @@ void pcw_state::pcw_printer_fire_pins(uint16_t pins)
  */
 TIMER_CALLBACK_MEMBER(pcw_state::pcw_stepper_callback)
 {
-	//popmessage("PRN: P2 bits %s %s %s\nSerial: %02x\nHeadpos: %i",m_printer_p2 & 0x40 ? " " : "6",m_printer_p2 & 0x20 ? " " : "5",m_printer_p2 & 0x10 ? " " : "4",m_printer_shift_output,m_printer_headpos);
+	LOGPRN("PRN: P2 bits %s %s %s\nSerial: %02x\nHeadpos: %i",
+	       m_printer_p2 & 0x40 ? " " : "6",
+	       m_printer_p2 & 0x20 ? " " : "5",
+	       m_printer_p2 & 0x10 ? " " : "4",
+	       m_printer_shift_output,m_printer_headpos);
+
 	if((m_printer_p2 & 0x10) == 0)  // print head motor active
 	{
 		uint8_t stepper_state = (m_printer_shift_output >> 4) & 0x0f;
@@ -684,25 +708,25 @@ TIMER_CALLBACK_MEMBER(pcw_state::pcw_stepper_callback)
 		{
 			m_printer_headpos += 2;
 			m_head_motor_state++;
-			logerror("Printer head moved forward by 2 to %i\n",m_printer_headpos);
+			LOGPRN("Printer head moved forward by 2 to %i\n", m_printer_headpos);
 		}
 		if(stepper_state == half_step_table[(m_head_motor_state + 1) & 0x03])
 		{
 			m_printer_headpos += 1;
 			m_head_motor_state++;
-			logerror("Printer head moved forward by 1 to %i\n",m_printer_headpos);
+			LOGPRN("Printer head moved forward by 1 to %i\n", m_printer_headpos);
 		}
 		if(stepper_state == full_step_table[(m_head_motor_state - 1) & 0x03])
 		{
 			m_printer_headpos -= 2;
 			m_head_motor_state--;
-			logerror("Printer head moved back by 2 to %i\n",m_printer_headpos);
+			LOGPRN("Printer head moved back by 2 to %i\n", m_printer_headpos);
 		}
 		if(stepper_state == half_step_table[(m_head_motor_state - 1) & 0x03])
 		{
 			m_printer_headpos -= 1;
 			m_head_motor_state--;
-			logerror("Printer head moved back by 1 to %i\n",m_printer_headpos);
+			LOGPRN("Printer head moved back by 1 to %i\n", m_printer_headpos);
 		}
 		if(m_printer_headpos < 0)
 			m_printer_headpos = 0;
@@ -741,21 +765,21 @@ TIMER_CALLBACK_MEMBER(pcw_state::pcw_pins_callback)
 
 READ8_MEMBER(pcw_state::mcu_printer_p1_r)
 {
-//  logerror("PRN: MCU reading data from P1\n");
+	LOGPRN("PRN: MCU reading data from P1\n");
 	return m_printer_pins & 0x00ff;
 }
 
 WRITE8_MEMBER(pcw_state::mcu_printer_p1_w)
 {
 	m_printer_pins = (m_printer_pins & 0x0100) | data;
-	//popmessage("PRN: Print head position = %i",m_printer_headpos);
-	logerror("PRN: MCU writing %02x to P1 [%03x/%03x]\n",data,m_printer_pins,~m_printer_pins & 0x1ff);
+	LOGPRN("PRN: Print head position = %i", m_printer_headpos);
+	LOGPRN("PRN: MCU writing %02x to P1 [%03x/%03x]\n", data,m_printer_pins, ~m_printer_pins & 0x1ff);
 }
 
 READ8_MEMBER(pcw_state::mcu_printer_p2_r)
 {
 	uint8_t ret = 0x00;
-//  logerror("PRN: MCU reading data from P2\n");
+	LOGPRN("PRN: MCU reading data from P2\n");
 	ret |= 0x80;  // make sure bail bar is in
 	ret |= (m_printer_p2 & 0x70);
 	ret |= (m_printer_pins & 0x100) ? 0x01 : 0x00;  // ninth pin
@@ -765,7 +789,7 @@ READ8_MEMBER(pcw_state::mcu_printer_p2_r)
 
 WRITE8_MEMBER(pcw_state::mcu_printer_p2_w)
 {
-	//logerror("PRN: MCU writing %02x to P2\n",data);
+	LOGPRN("PRN: MCU writing %02x to P2\n", data);
 	m_printer_p2 = data & 0x70;
 
 	// handle shift/store
@@ -780,7 +804,7 @@ WRITE8_MEMBER(pcw_state::mcu_printer_p2_w)
 	}
 	if((data & 0x08) != 0)  // strobe
 	{
-		logerror("Strobe active [%02x]\n",m_printer_shift);
+		LOGSTROBE("Strobe active [%02x]\n",m_printer_shift);
 		m_printer_shift_output = m_printer_shift;
 		m_prn_stepper->adjust(PERIOD_OF_555_MONOSTABLE(22000,0.00000001));
 	}
@@ -915,14 +939,14 @@ READ8_MEMBER(pcw_state::pcw9512_parallel_r)
 		return 0xff^0x020;
 	}
 
-	logerror("pcw9512 parallel r: offs: %04x\n", (int) offset);
+	LOGPAR("pcw9512 parallel r: offs: %04x\n", (int) offset);
 	return 0x00;
 }
 
 /* TODO: Implement parallel port! */
 WRITE8_MEMBER(pcw_state::pcw9512_parallel_w)
 {
-	logerror("pcw9512 parallel w: offs: %04x data: %02x\n",offset,data);
+	LOGPAR("pcw9512 parallel w: offs: %04x data: %02x\n", offset, data);
 }
 
 void pcw_state::pcw_io(address_map &map)
