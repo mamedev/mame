@@ -719,7 +719,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="donald">
 		<description>Donald Duck's Playground</description>
 		<year>1986</year>
@@ -8199,7 +8199,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="gryzor">
 		<!-- Dumped from a copied disk -->
 		<description>Gryzor</description>
@@ -8340,7 +8340,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="indytod">
 		<description>Indiana Jones and the Temple of Doom</description>
 		<year>1989</year>
@@ -9642,7 +9642,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pcgames3">
 		<description>PC Games #3</description>
 		<year>1988</year>

@@ -85,7 +85,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 READ8_MEMBER(funkybee_state::funkybee_input_port_0_r)
 {
-	m_watchdog->reset_r(space, 0);
+	m_watchdog->watchdog_reset();
 	return ioport("IN0")->read();
 }
 

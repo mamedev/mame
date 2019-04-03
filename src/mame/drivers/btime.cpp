@@ -1277,23 +1277,23 @@ MACHINE_RESET_MEMBER(btime_state,mmonkey)
 	m_protection_ret = 0;
 }
 
-MACHINE_CONFIG_START(btime_state::btime)
-
+void btime_state::btime(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", DECO_CPU7, HCLK2)   /* seletable between H2/H4 via jumper */
-	MCFG_DEVICE_PROGRAM_MAP(btime_map)
+	DECO_CPU7(config, m_maincpu, HCLK2);   /* selectable between H2/H4 via jumper */
+	m_maincpu->set_addrmap(AS_PROGRAM, &btime_state::btime_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, HCLK1/3/2)
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	M6502(config, m_audiocpu, HCLK1/3/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &btime_state::audio_map);
 	TIMER(config, "8vck").configure_scanline(FUNC(btime_state::audio_nmi_gen), "screen", 0, 8);
 
 	INPUT_MERGER_ALL_HIGH(config, "audionmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 8, 248, 272, 8, 248)
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_btime)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(HCLK, 384, 8, 248, 272, 8, 248);
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_btime));
+	m_screen->set_palette(m_palette);
 
 	MCFG_MACHINE_START_OVERRIDE(btime_state,btime)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,btime)
@@ -1322,33 +1322,33 @@ MACHINE_CONFIG_START(btime_state::btime)
 	ay2.add_route(1, "discrete", 1.0, 4);
 	ay2.add_route(2, "discrete", 1.0, 5);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, btime_sound_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, "discrete", btime_sound_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(btime_state::cookrace)
+void btime_state::cookrace(machine_config &config)
+{
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", DECO_C10707, HCLK2)
-	MCFG_DEVICE_PROGRAM_MAP(cookrace_map)
+	DECO_C10707(config.replace(), m_maincpu, HCLK2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &btime_state::cookrace_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &btime_state::audio_map);
 
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_cookrace);
 	m_screen->set_screen_update(FUNC(btime_state::screen_update_cookrace));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(btime_state::lnc)
+void btime_state::lnc(machine_config &config)
+{
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", DECO_C10707, HCLK2)
-	MCFG_DEVICE_PROGRAM_MAP(lnc_map)
+	DECO_C10707(config.replace(), m_maincpu, HCLK2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &btime_state::lnc_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,lnc)
 
@@ -1359,7 +1359,7 @@ MACHINE_CONFIG_START(btime_state::lnc)
 	m_palette->set_init(FUNC(btime_state::lnc_palette));
 
 	m_screen->set_screen_update(FUNC(btime_state::screen_update_lnc));
-MACHINE_CONFIG_END
+}
 
 
 void btime_state::wtennis(machine_config &config)
@@ -1371,24 +1371,24 @@ void btime_state::wtennis(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(btime_state::mmonkey)
+void btime_state::mmonkey(machine_config &config)
+{
 	wtennis(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mmonkey_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &btime_state::mmonkey_map);
 
 	MCFG_MACHINE_START_OVERRIDE(btime_state,mmonkey)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,mmonkey)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(btime_state::bnj)
+void btime_state::bnj(machine_config &config)
+{
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", DECO_C10707, HCLK4)
-	MCFG_DEVICE_CLOCK(HCLK4)
-	MCFG_DEVICE_PROGRAM_MAP(bnj_map)
+	DECO_C10707(config.replace(), m_maincpu, HCLK4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &btime_state::bnj_map);
 
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_bnj);
@@ -1397,24 +1397,25 @@ MACHINE_CONFIG_START(btime_state::bnj)
 
 	m_screen->set_screen_update(FUNC(btime_state::screen_update_bnj));
 	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1); // 256 * 240, confirmed
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(btime_state::sdtennis)
+void btime_state::sdtennis(machine_config &config)
+{
 	bnj(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("audiocpu", DECO_C10707, HCLK1/3/2)
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
-MACHINE_CONFIG_END
+	DECO_C10707(config.replace(), m_audiocpu, HCLK1/3/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &btime_state::audio_map);
+}
 
 
-MACHINE_CONFIG_START(btime_state::zoar)
+void btime_state::zoar(machine_config &config)
+{
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(zoar_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &btime_state::zoar_map);
 
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_zoar);
@@ -1433,19 +1434,18 @@ MACHINE_CONFIG_START(btime_state::zoar)
 
 	ay8910_device &ay2(AY8910(config.replace(), "ay2", HCLK1));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.23);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(btime_state::disco)
+void btime_state::disco(machine_config &config)
+{
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(HCLK4)
-	MCFG_DEVICE_PROGRAM_MAP(disco_map)
+	m_maincpu->set_clock(HCLK4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &btime_state::disco_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(disco_audio_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &btime_state::disco_audio_map);
 
 	m_soundlatch->set_separate_acknowledge(true);
 
@@ -1456,19 +1456,19 @@ MACHINE_CONFIG_START(btime_state::disco)
 	MCFG_VIDEO_START_OVERRIDE(btime_state,disco)
 
 	m_screen->set_screen_update(FUNC(btime_state::screen_update_disco));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(btime_state::tisland)
+void btime_state::tisland(machine_config &config)
+{
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tisland_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &btime_state::tisland_map);
 
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_zoar);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

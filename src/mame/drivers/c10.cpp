@@ -159,23 +159,24 @@ static GFXDECODE_START( gfx_c10 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(c10_state::c10)
+void c10_state::c10(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(c10_mem)
-	MCFG_DEVICE_IO_MAP(c10_io)
+	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c10_state::c10_mem);
+	m_maincpu->set_addrmap(AS_IO, &c10_state::c10_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(c10_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 250)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(c10_state::screen_update));
+	screen.set_size(640, 250);
+	screen.set_visarea_full();
+	screen.set_palette("palette");
 	GFXDECODE(config, "gfxdecode", "palette", gfx_c10);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-MACHINE_CONFIG_END
+}
 
 void c10_state::init_c10()
 {

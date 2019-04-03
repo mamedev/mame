@@ -522,7 +522,7 @@ READ32_MEMBER(ms32_state::ms32_read_inputs3)
 
 WRITE32_MEMBER(ms32_state::ms32_sound_w)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 
 	// give the Z80 time to respond
 	m_maincpu->spin_until_time(attotime::from_usec(40));
@@ -1657,7 +1657,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ms32_state::ms32_interrupt)
 
 READ8_MEMBER(ms32_state::latch_r)
 {
-	return m_soundlatch->read(space,0)^0xff;
+	return m_soundlatch->read()^0xff;
 }
 
 WRITE8_MEMBER(ms32_state::ms32_snd_bank_w)

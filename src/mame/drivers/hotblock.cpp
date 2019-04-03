@@ -92,7 +92,7 @@ READ8_MEMBER(hotblock_state::video_read)
 	if (m_port0 & 0x20) // port 0 = a8 e8 -- palette
 	{
 		if (offset < 0x200)
-			return m_palette->read8(space, offset);
+			return m_palette->read8(offset);
 
 		return 0;
 	}
@@ -130,7 +130,7 @@ WRITE8_MEMBER(hotblock_state::video_write)
 	if (m_port0 & 0x20) // port 0 = a8 e8 -- palette
 	{
 		if (offset < 0x200)
-			m_palette->write8(space, offset, data);
+			m_palette->write8(offset, data);
 	}
 	else // port 0 = 88 c8
 	{

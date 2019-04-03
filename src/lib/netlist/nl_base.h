@@ -162,7 +162,7 @@ class NETLIB_NAME(name) : public device_t
 #define nl_assert(x)    do { if (0) if (!(x)) { /*throw nl_exception(plib::pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); */} } while (0)
 #define NL_NOEXCEPT     noexcept
 #endif
-#define nl_assert_always(x, msg)    do { if (!(x)) throw nl_exception(plib::pfmt("Fatal error: {1}\nCaused by assert: {2}:{3}: {4}")(msg)(__FILE__)(__LINE__)(#x)); } while (0)
+#define nl_assert_always(x, msg)    do { if (!(x)) throw nl_exception("Fatal error: {1}\nCaused by assert: {2}:{3}: {4}", msg, __FILE__, __LINE__, #x); } while (0)
 
 //============================================================
 // Namespace starts
@@ -223,6 +223,12 @@ namespace netlist
 		explicit nl_exception(const pstring &text //!< text to be passed
 				)
 		: plib::pexception(text) { }
+
+		template<typename... Args>
+		explicit nl_exception(const pstring &fmt //!< format to be used
+			, Args&&... args //!< arguments to be passed
+			)
+		: plib::pexception(plib::pfmt(fmt)(std::forward<Args>(args)...)) { }
 	};
 
 	/*! Logic families descriptors are used to create proxy devices.
@@ -702,7 +708,7 @@ namespace netlist
 			template <typename T>
 			void process(const T mask, netlist_sig_t sig);
 		};
-	} // detail
+	} // namespace detail
 
 	// -----------------------------------------------------------------------------
 	// analog_t
@@ -1004,7 +1010,7 @@ namespace netlist
 	public:
 		param_str_t(device_t &device, const pstring &name, const pstring &val);
 
-		const pstring &operator()() const NL_NOEXCEPT { return Value(); }
+		const pstring &operator()() const NL_NOEXCEPT { return str(); }
 		void setTo(const pstring &param) NL_NOEXCEPT
 		{
 			if (m_param != param)
@@ -1016,8 +1022,9 @@ namespace netlist
 		}
 	protected:
 		virtual void changed();
-		const pstring &Value() const NL_NOEXCEPT { return m_param; }
+		const pstring &str() const NL_NOEXCEPT { return m_param; }
 	private:
+		PALIGNAS_CACHELINE()
 		pstring m_param;
 	};
 
@@ -1029,33 +1036,36 @@ namespace netlist
 	{
 	public:
 
-		class value_t
+		template <typename T>
+		class value_base_t
 		{
 		public:
-			value_t(param_model_t &param, const pstring &name)
-			: m_value(param.model_value(name))
+			value_base_t(param_model_t &param, const pstring &name)
+			: m_value(static_cast<T>(param.value(name)))
 			{
 			}
-			const double &operator()() const noexcept { return m_value; }
-			operator const double&() const noexcept { return m_value; }
+			T operator()() const noexcept { return m_value; }
+			operator T() const noexcept { return m_value; }
 		private:
-			const double m_value;
+			const T m_value;
 		};
 
-		friend class value_t;
+		using value_t = value_base_t<nl_double>;
+
+		template <typename T>
+		friend class value_base_t;
 
 		param_model_t(device_t &device, const pstring &name, const pstring &val)
 		: param_str_t(device, name, val) { }
 
-		const pstring model_value_str(const pstring &entity) /*const*/;
-		const pstring model_type() /*const*/;
+		const pstring value_str(const pstring &entity) /*const*/;
+		nl_double value(const pstring &entity) /*const*/;
+		const pstring type() /*const*/;
 		/* hide this */
 		void setTo(const pstring &param) = delete;
 	protected:
 		void changed() override;
-		nl_double model_value(const pstring &entity) /*const*/;
 	private:
-		detail::model_map_t m_map;
 };
 
 	// -----------------------------------------------------------------------------
@@ -1086,7 +1096,7 @@ namespace netlist
 
 		param_rom_t(device_t &device, const pstring &name);
 
-		const ST & operator[] (std::size_t n) NL_NOEXCEPT { return m_data[n]; }
+		ST operator[] (std::size_t n) const NL_NOEXCEPT { return m_data[n]; }
 	protected:
 		void changed() override
 		{
@@ -1189,10 +1199,9 @@ namespace netlist
 		const setup_t &setup() const;
 
 		template<class C, typename... Args>
-		void register_sub(const pstring &name, pool_owned_ptr<C> &dev, const Args&... args)
+		void create_and_register_subdevice(const pstring &name, pool_owned_ptr<C> &dev, Args&&... args)
 		{
-			//dev.reset(plib::palloc<C>(*this, name, args...));
-			dev = pool().make_poolptr<C>(*this, name, args...);
+			dev = pool().make_poolptr<C>(*this, name, std::forward<Args>(args)...);
 		}
 
 		void register_subalias(const pstring &name, detail::core_terminal_t &term);
@@ -1396,7 +1405,7 @@ namespace netlist
 		void reset();
 
 		pstring                             m_name;
-		netlist_t							&m_netlist;
+		netlist_t                           &m_netlist;
 		plib::unique_ptr<plib::dynlib>      m_lib; // external lib needs to be loaded as long as netlist exists
 		plib::state_manager_t               m_state;
 		plib::unique_ptr<callbacks_t>       m_callbacks;
@@ -1553,7 +1562,7 @@ namespace netlist
 		if (f != nullptr)
 			f->read(reinterpret_cast<plib::pistream::value_type *>(&m_data[0]),1<<AW);
 		else
-			device.state().log().warning("Rom {1} not found", Value());
+			device.state().log().warning("Rom {1} not found", str());
 	}
 
 	inline void logic_input_t::inactivate() NL_NOEXCEPT
@@ -1705,7 +1714,7 @@ namespace netlist
 		if (newQ != m_my_net.Q_Analog())
 		{
 			m_my_net.set_Q_Analog(newQ);
-			m_my_net.toggle_and_push_to_queue(NLTIME_FROM_NS(1));
+			m_my_net.toggle_and_push_to_queue(netlist_time::quantum());
 		}
 	}
 

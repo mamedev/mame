@@ -21,7 +21,8 @@ your move"(same as Boris Master) instead of "Boris plays black".
 #include "machine/f3853.h"
 #include "machine/timer.h"
 
-#include "aci_boris.lh"
+// internal artwork
+#include "aci_boris.lh" // clickable
 
 
 namespace {
@@ -32,15 +33,14 @@ public:
 	boris_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_delay_display(*this, "delay_display_%u", 0),
 		m_inp_matrix(*this, "IN.%u", 0),
+		m_delay_display(*this, "delay_display_%u", 0),
 		m_out_digit(*this, "digit%u", 0U)
 	{ }
 
 	void boris(machine_config &config);
 
-	// reset switch is tied to MK3850 RESET pin
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
+	DECLARE_INPUT_CHANGED_MEMBER(reset_switch);
 
 protected:
 	virtual void machine_start() override;
@@ -48,8 +48,8 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device_array<timer_device, 8> m_delay_display;
 	required_ioport_array<4> m_inp_matrix;
+	required_device_array<timer_device, 8> m_delay_display;
 	output_finder<8> m_out_digit;
 
 	void main_map(address_map &map);
@@ -81,6 +81,19 @@ void boris_state::machine_start()
 	save_item(NAME(m_4042));
 }
 
+INPUT_CHANGED_MEMBER(boris_state::reset_switch)
+{
+	// reset switch is tied to MK3850 RESET pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+
+	// clear display
+	if (newval)
+	{
+		for (int i = 0; i < 8; i++)
+			m_delay_display[i]->adjust(attotime::zero, i);
+	}
+}
+
 
 
 /******************************************************************************
@@ -92,7 +105,7 @@ void boris_state::machine_start()
 TIMER_DEVICE_CALLBACK_MEMBER(boris_state::delay_display)
 {
 	// 16 segments via port 1 and 4042 output (latched port 1)
-	u16 mask = (param & 0x10) ? 0xffff : 0;
+	u16 mask = (param & 8) ? 0xffff : 0;
 	m_out_digit[param & 7] = ~(m_4042 << 8 | m_io[1]) & mask;
 }
 
@@ -111,12 +124,12 @@ WRITE8_MEMBER(boris_state::mux_w)
 	u8 sel = ~data & 7;
 	if (sel != prev)
 	{
-		// digits are strobed, so on falling edge, delay them going off to prevent flicker
+		// digits are strobed, so on falling edge, delay them going off to prevent flicker or stuck display
 		m_delay_display[prev]->adjust(attotime::from_msec(50), prev);
 
 		// need a short delay on rising edge too, while boris sets up digit segments
 		// (it writes port 1, increments digit, latches port 1, writes port 1 again)
-		m_delay_display[sel]->adjust(attotime::from_usec(50), sel | 0x10);
+		m_delay_display[sel]->adjust(attotime::from_usec(50), sel | 8);
 	}
 
 	// IO03: clock 4042
@@ -157,9 +170,9 @@ void boris_state::main_map(address_map &map)
 
 void boris_state::main_io(address_map &map)
 {
-	map(0x0, 0x0).rw(FUNC(boris_state::input_r), FUNC(boris_state::mux_w));
-	map(0x1, 0x1).w(FUNC(boris_state::digit_w));
-	map(0xc, 0xf).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
+	map(0x00, 0x00).rw(FUNC(boris_state::input_r), FUNC(boris_state::mux_w));
+	map(0x01, 0x01).w(FUNC(boris_state::digit_w));
+	map(0x0c, 0x0f).rw("smi", FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
 
@@ -172,7 +185,7 @@ static INPUT_PORTS_START( boris )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("G.7")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("H.8")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Set / 9")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Set / 9") // labeled just "SET" on 1st version
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE") // clear entry
 
 	PORT_START("IN.1")
@@ -194,7 +207,7 @@ static INPUT_PORTS_START( boris )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_R) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, boris_state, reset_button, nullptr) PORT_NAME("Reset Switch")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_R) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, boris_state, reset_switch, nullptr) PORT_NAME("Reset Switch")
 INPUT_PORTS_END
 
 
@@ -206,13 +219,13 @@ INPUT_PORTS_END
 void boris_state::boris(machine_config &config)
 {
 	/* basic machine hardware */
-	F8(config, m_maincpu, 2_MHz_XTAL);
+	F8(config, m_maincpu, 2_MHz_XTAL); // MK3850, 2MHz XTAL according to schematics
 	m_maincpu->set_addrmap(AS_PROGRAM, &boris_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &boris_state::main_io);
-	m_maincpu->set_irq_acknowledge_callback("f3853", FUNC(f3853_device::int_acknowledge));
+	m_maincpu->set_irq_acknowledge_callback("smi", FUNC(f3853_device::int_acknowledge));
 
-	f3853_device &f3853(F3853(config, "f3853", 2_MHz_XTAL));
-	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
+	f3853_device &smi(F3853(config, "smi", 2_MHz_XTAL));
+	smi.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	/* video hardware */
 	for (int i = 0; i < 8; i++)
@@ -242,4 +255,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME   PARENT CMP MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1978, boris, 0,      0, boris,   boris, boris_state, empty_init, "Applied Concepts", "Boris", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1978, boris, 0,      0, boris,   boris, boris_state, empty_init, "Applied Concepts", "Boris", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )

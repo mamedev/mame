@@ -238,6 +238,8 @@ public:
 	void mgames(machine_config &config);
 
 private:
+	tilemap_t *m_tilemap;
+
 	DECLARE_READ8_MEMBER(mixport_r);
 	DECLARE_WRITE8_MEMBER(outport0_w);
 	DECLARE_WRITE8_MEMBER(outport1_w);
@@ -247,12 +249,14 @@ private:
 	DECLARE_WRITE8_MEMBER(outport5_w);
 	DECLARE_WRITE8_MEMBER(outport6_w);
 	DECLARE_WRITE8_MEMBER(outport7_w);
+
 	void mgames_palette(palette_device &palette) const;
 	uint32_t screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TILE_GET_INFO_MEMBER(tile_info);
+
 	void main_map(address_map &map);
 
-	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void machine_start() override;
 
 	uint8_t m_output[8];
 	required_shared_ptr<uint8_t> m_video;
@@ -263,41 +267,40 @@ private:
 	output_finder<9> m_lamps;
 };
 
-
-void mgames_state::video_start()
+TILE_GET_INFO_MEMBER( mgames_state::tile_info )
 {
+	uint8_t code = m_video[tile_index];
+	uint8_t color = m_video[tile_index + 0x400] & 0x3f;
+
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
+}
+
+void mgames_state::machine_start()
+{
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mgames_state::tile_info), this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+
+	m_lamps.resolve();
 }
 
 uint32_t mgames_state::screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *const gfx = m_gfxdecode->gfx(0);
+	m_tilemap->mark_all_dirty();
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	int count = 0;
-	for (int y = 0; y < 32; y++)
-	{
-		for (int x = 0; x < 32; x++)
-		{
-			uint16_t const dat = m_video[count];
-			uint16_t const col = m_video[count + 0x400] & 0x7f;
-			gfx->opaque(bitmap, cliprect, dat, col, 0, 0, x * 16, y * 16);
-			count++;
-		}
-	}
 	return 0;
 }
 
 void mgames_state::mgames_palette(palette_device &palette) const
 {
-	for (int i = 0; i < 0x100; i++)
+	for (int i = 0; i < 64; i++)
 	{
-		rgb_t color;
-
-		if (i & 0x01)
-			color = rgb_t(pal2bit((i & 0x6) >> 1), pal2bit((i & 0x18) >> 3), pal2bit((i & 0x60) >> 5));
-		else
-			color = rgb_t::black();
-
-		palette.set_pen_color(i, color);
+		palette.set_indirect_color(i, rgb_t(
+			pal2bit((i >> 0) & 3),
+			pal2bit((i >> 2) & 3),
+			pal2bit((i >> 4) & 3)
+		));
+		palette.set_pen_indirect(i * 2 + 0, 0); // all tiles black background
+		palette.set_pen_indirect(i * 2 + 1, i);
 	}
 }
 
@@ -622,20 +625,19 @@ static INPUT_PORTS_START( mgames )
 INPUT_PORTS_END
 
 
-static const gfx_layout tiles16x16_layout =
+static const gfx_layout gfx_16x16x1 =
 {
 	16,16,
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16},
+	{ STEP16(0,1) },
+	{ STEP16(0,16) },
 	16*16
 };
 
 static GFXDECODE_START( gfx_mgames )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 0x100 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x1, 0, 64 )
 GFXDECODE_END
 
 
@@ -658,7 +660,7 @@ void mgames_state::mgames(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mgames);
-	PALETTE(config, m_palette, FUNC(mgames_state::mgames_palette), 0x200);
+	PALETTE(config, m_palette, FUNC(mgames_state::mgames_palette), 128, 64);
 
 	/* sound hardware */
 	//  to do...

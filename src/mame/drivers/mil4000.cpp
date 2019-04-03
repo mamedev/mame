@@ -589,7 +589,7 @@ void mil4000_state::mil4000(machine_config &config)
 void mil4000_state::chewheel(machine_config &config)
 {
 	mil4000(config);
-	 
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &mil4000_state::chewheel_map); /* 2MHz */
 }
 

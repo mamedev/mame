@@ -54,6 +54,7 @@
 
 #include "emu.h"
 #include "includes/mikromik.h"
+#include "machine/74259.h"
 #include "softlist.h"
 
 //#define VERBOSE 1
@@ -89,43 +90,7 @@ READ8_MEMBER( mm1_state::read )
 
 	if (mmu & MMU_IOEN)
 	{
-		switch ((offset >> 4) & 0x07)
-		{
-		case 0:
-			data = m_dmac->read(offset & 0x0f);
-			break;
-
-		case 1:
-			data = m_mpsc->cd_ba_r(space, offset & 0x03);
-			break;
-
-		case 2:
-			data = m_crtc->read(space, offset & 0x01);
-			break;
-
-		case 3:
-			data = m_pit->read(offset & 0x03);
-			break;
-
-		case 4:
-			data = m_iop->read(space, 0);
-			break;
-
-		case 5:
-			if (BIT(offset, 0))
-			{
-				data = m_fdc->fifo_r();
-			}
-			else
-			{
-				data = m_fdc->msr_r();
-			}
-			break;
-
-		case 7:
-			data = m_hgdc->read(offset & 0x01);
-			break;
-		}
+		data = m_io->read8(offset & 0x7f);
 	}
 	else
 	{
@@ -158,43 +123,7 @@ WRITE8_MEMBER( mm1_state::write )
 
 	if (mmu & MMU_IOEN)
 	{
-		switch ((offset >> 4) & 0x07)
-		{
-		case 0:
-			m_dmac->write(offset & 0x0f, data);
-			break;
-
-		case 1:
-			m_mpsc->cd_ba_w(space, offset & 0x03, data);
-			break;
-
-		case 2:
-			m_crtc->write(space, offset & 0x01, data);
-			break;
-
-		case 3:
-			m_pit->write(offset & 0x03, data);
-			break;
-
-		case 4:
-			m_iop->write(space, 0, data);
-			break;
-
-		case 5:
-			if (BIT(offset, 0))
-			{
-				m_fdc->fifo_w(data);
-			}
-			break;
-
-		case 6:
-			ls259_w(space, offset & 0x07, data);
-			break;
-
-		case 7:
-			m_hgdc->write(offset & 0x01, data);
-			break;
-		}
+		m_io->write8(offset & 0x7f, data);
 	}
 	else
 	{
@@ -207,53 +136,88 @@ WRITE8_MEMBER( mm1_state::write )
 
 
 //-------------------------------------------------
-//  ls259_w -
+//  a8_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mm1_state::ls259_w )
+WRITE_LINE_MEMBER( mm1_state::a8_w )
 {
-	int d = BIT(data, 0);
+	LOG("IC24 A8 %u\n", state);
+	m_a8 = state;
+}
 
-	switch (offset)
-	{
-	case 0: // IC24 A8
-		LOG("IC24 A8 %u\n", d);
-		m_a8 = d;
-		break;
 
-	case 1: // RECALL
-		LOG("RECALL %u\n", d);
-		m_recall = d;
-		if (d) m_fdc->soft_reset();
-		break;
+//-------------------------------------------------
+//  recall_w -
+//-------------------------------------------------
 
-	case 2: // _RV28/RX21
-		m_rx21 = d;
-		break;
+WRITE_LINE_MEMBER( mm1_state::recall_w )
+{
+	LOG("RECALL %u\n", state);
+	m_recall = state;
+	if (state) m_fdc->soft_reset();
+}
 
-	case 3: // _TX21
-		m_tx21 = d;
-		break;
 
-	case 4: // _RCL
-		m_rcl = d;
-		break;
+//-------------------------------------------------
+//  rx21_w -
+//-------------------------------------------------
 
-	case 5: // _INTC
-		m_intc = d;
-		break;
+WRITE_LINE_MEMBER( mm1_state::rx21_w )
+{
+	m_rx21 = state;
+}
 
-	case 6: // LLEN
-		LOG("LLEN %u\n", d);
-		m_llen = d;
-		break;
 
-	case 7: // MOTOR ON
-		LOG("MOTOR %u\n", d);
-		m_floppy0->mon_w(!d);
-		m_floppy1->mon_w(!d);
-		break;
-	}
+//-------------------------------------------------
+//  tx21_w -
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( mm1_state::tx21_w )
+{
+	m_tx21 = state;
+}
+
+
+//-------------------------------------------------
+//  rcl_w -
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( mm1_state::rcl_w )
+{
+	m_rcl = state;
+}
+
+
+//-------------------------------------------------
+//  intc_w -
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( mm1_state::intc_w )
+{
+	m_intc = state;
+}
+
+
+//-------------------------------------------------
+//  llen_w -
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( mm1_state::llen_w )
+{
+	LOG("LLEN %u\n", state);
+	m_llen = state;
+}
+
+
+//-------------------------------------------------
+//  motor_on_w -
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( mm1_state::motor_on_w )
+{
+	LOG("MOTOR %u\n", state);
+	m_floppy0->mon_w(!state);
+	m_floppy1->mon_w(!state);
 }
 
 
@@ -269,6 +233,18 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 void mm1_state::mm1_map(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(mm1_state::read), FUNC(mm1_state::write));
+}
+
+void mm1_state::mmu_io_map(address_map &map)
+{
+	map(0x00, 0x0f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x10, 0x13).mirror(0x0c).rw(m_mpsc, FUNC(upd7201_device::cd_ba_r), FUNC(upd7201_device::cd_ba_w));
+	map(0x20, 0x21).mirror(0x0e).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
+	map(0x30, 0x33).mirror(0x0c).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x40, 0x40).mirror(0x0f).rw(m_iop, FUNC(i8212_device::read), FUNC(i8212_device::write));
+	map(0x50, 0x51).mirror(0x0e).m(m_fdc, FUNC(upd765a_device::map));
+	map(0x60, 0x67).mirror(0x08).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0x70, 0x71).mirror(0x0e).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 }
 
 
@@ -437,14 +413,6 @@ void mm1_state::machine_start()
 
 void mm1_state::machine_reset()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	// reset LS259
-	for (int i = 0; i < 8; i++)
-	{
-		ls259_w(program, i, 0);
-	}
-
 	// reset FDC
 	m_fdc->reset();
 }
@@ -470,9 +438,24 @@ void mm1_state::mm1(machine_config &config)
 	config.m_perfect_cpu_quantum = subtag(I8085A_TAG);
 
 	// peripheral hardware
+	ADDRESS_MAP_BANK(config, m_io);
+	m_io->set_addrmap(0, &mm1_state::mmu_io_map);
+	m_io->set_data_width(8);
+	m_io->set_addr_width(7);
+
 	I8212(config, m_iop, 0);
 	m_iop->int_wr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 	m_iop->di_rd_callback().set(KB_TAG, FUNC(mm1_keyboard_device::read));
+
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(mm1_state::a8_w)); // IC24 A8
+	outlatch.q_out_cb<1>().set(FUNC(mm1_state::recall_w)); // RECALL
+	outlatch.q_out_cb<2>().set(FUNC(mm1_state::rx21_w)); // _RV28/RX21
+	outlatch.q_out_cb<3>().set(FUNC(mm1_state::tx21_w)); // _TX21
+	outlatch.q_out_cb<4>().set(FUNC(mm1_state::rcl_w)); // _RCL
+	outlatch.q_out_cb<5>().set(FUNC(mm1_state::intc_w)); // _INTC
+	outlatch.q_out_cb<6>().set(FUNC(mm1_state::llen_w)); // LLEN
+	outlatch.q_out_cb<7>().set(FUNC(mm1_state::motor_on_w)); // MOTOR ON
 
 	AM9517A(config, m_dmac, 6.144_MHz_XTAL/2);
 	m_dmac->out_hreq_callback().set(FUNC(mm1_state::dma_hrq_w));

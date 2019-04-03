@@ -201,7 +201,7 @@ void mpu4dealem_state::dealem(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(mpu4dealem_state,mod2)                          /* main mpu4 board initialisation */
 	MCFG_MACHINE_RESET_OVERRIDE(mpu4dealem_state,dealem_vid)
 
-	M6809(config, m_maincpu, MPU4_MASTER_CLOCK/4);
+	MC6809(config, m_maincpu, MPU4_MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4dealem_state::dealem_memmap);
 
 	mpu4_common(config);

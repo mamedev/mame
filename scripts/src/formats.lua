@@ -1231,6 +1231,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/opd_dsk.h,FORMATS["OPD_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["OPD_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/opd_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/opd_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/orao_cas.h,FORMATS["ORAO_CAS"] = true
 --------------------------------------------------
 

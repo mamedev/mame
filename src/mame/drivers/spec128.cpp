@@ -165,9 +165,18 @@ resulting mess can be seen in the F4 viewer display.
 /****************************************************************************************************/
 /* Spectrum 128 specific functions */
 
+READ8_MEMBER(spectrum_state::spectrum_128_opcode_fetch_r)
+{
+	/* this allows expansion devices to act upon opcode fetches from MEM addresses */
+	if (BIT(m_port_7ffd_data, 4))
+		m_exp->opcode_fetch(offset);
+
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
 WRITE8_MEMBER( spectrum_state::spectrum_128_bank1_w )
 {
-	if (m_exp->romcs())
+	if (m_exp->romcs() && BIT(m_port_7ffd_data, 4))
 		m_exp->mreq_w(offset, data);
 }
 
@@ -175,7 +184,7 @@ READ8_MEMBER( spectrum_state::spectrum_128_bank1_r )
 {
 	uint8_t data;
 
-	if (m_exp->romcs())
+	if (m_exp->romcs() && BIT(m_port_7ffd_data, 4))
 	{
 		data = m_exp->mreq_r(offset);
 	}
@@ -251,6 +260,11 @@ void spectrum_state::spectrum_128_mem(address_map &map)
 	map(0xc000, 0xffff).bankrw("bank4");
 }
 
+void spectrum_state::spectrum_128_fetch(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(spectrum_state::spectrum_128_opcode_fetch_r));
+}
+
 MACHINE_RESET_MEMBER(spectrum_state,spectrum_128)
 {
 	uint8_t *messram = m_ram->pointer();
@@ -298,7 +312,7 @@ void spectrum_state::spectrum_128(machine_config &config)
 	Z80(config.replace(), m_maincpu, X1_128_SINCLAIR / 5);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_state::spectrum_128_mem);
 	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_128_io);
-	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_state::spectrum_fetch);
+	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_state::spectrum_128_fetch);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
 	config.m_minimum_quantum = attotime::from_hz(60);
 

@@ -62,11 +62,12 @@ namespace netlist
 		, m_R1(*this, "R1")
 		, m_R2(*this, "R2")
 		, m_R3(*this, "R3")
+		, m_ROUT(*this, "ROUT")
 		, m_RDIS(*this, "RDIS")
 		, m_RESET(*this, "RESET")     // Pin 4
 		, m_THRES(*this, "THRESH")    // Pin 6
 		, m_TRIG(*this, "TRIG")       // Pin 2
-		, m_OUT(*this, "OUT")         // Pin 3
+		, m_OUT(*this, "_OUT")        // to Pin 3 via ROUT
 		, m_last_out(*this, "m_last_out", false)
 		, m_ff(*this, "m_ff", false)
 		, m_last_reset(*this, "m_last_reset", false)
@@ -75,10 +76,13 @@ namespace netlist
 			register_subalias("CONT", m_R1.m_N);    // Pin 5
 			register_subalias("DISCH", m_RDIS.m_P); // Pin 7
 			register_subalias("VCC",  m_R1.m_P);    // Pin 8
+			register_subalias("OUT",  m_ROUT.m_P);  // Pin 3
 
+			connect(m_R1.m_N, m_R2.m_P);
 			connect(m_R1.m_N, m_R2.m_P);
 			connect(m_R2.m_N, m_R3.m_P);
 			connect(m_RDIS.m_N, m_R3.m_N);
+			connect(m_OUT, m_ROUT.m_N);
 		}
 
 		NETLIB_UPDATEI();
@@ -88,6 +92,7 @@ namespace netlist
 		analog::NETLIB_SUB(R_base) m_R1;
 		analog::NETLIB_SUB(R_base) m_R2;
 		analog::NETLIB_SUB(R_base) m_R3;
+		analog::NETLIB_SUB(R_base) m_ROUT;
 		analog::NETLIB_SUB(R_base) m_RDIS;
 
 		logic_input_t m_RESET;
@@ -132,12 +137,14 @@ namespace netlist
 		m_R1.reset();
 		m_R2.reset();
 		m_R3.reset();
+		m_ROUT.reset();
 		m_RDIS.reset();
 
-		/* FIXME make resistance a parameter, properly model other variants */
+		/* FIXME make resistances a parameter, properly model other variants */
 		m_R1.set_R(5000);
 		m_R2.set_R(5000);
 		m_R3.set_R(5000);
+		m_ROUT.set_R(20);
 		m_RDIS.set_R(R_OFF);
 
 		m_last_out = true;
@@ -147,7 +154,9 @@ namespace netlist
 	{
 		// FIXME: assumes GND is connected to 0V.
 
-		if (!m_RESET() && m_last_reset)
+		const auto reset = m_RESET();
+
+		if (!reset && m_last_reset)
 		{
 			m_ff = false;
 		}
@@ -163,7 +172,7 @@ namespace netlist
 				m_ff = false;
 		}
 
-		const bool out = (!m_RESET() ? false : m_ff);
+		const bool out = (!reset ? false : m_ff);
 
 		if (m_last_out && !out)
 		{
@@ -178,12 +187,14 @@ namespace netlist
 			m_OUT.push(m_R1.m_P());
 			m_RDIS.set_R(R_OFF);
 		}
-		m_last_reset = m_RESET();
+		m_last_reset = reset;
 		m_last_out = out;
 	}
 
 	NETLIB_DEVICE_IMPL(NE555,     "NE555", "")
 	NETLIB_DEVICE_IMPL(NE555_dip, "NE555_DIP", "")
 
+	NETLIB_DEVICE_IMPL_ALIAS(MC1455P, NE555,     "MC1455P", "")
+	NETLIB_DEVICE_IMPL_ALIAS(MC1455P_dip, NE555_dip, "MC1455P_DIP", "")
 	} //namespace devices
 } // namespace netlist

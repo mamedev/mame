@@ -55,7 +55,7 @@
 
     Dreamcast BIOS code verify only 1st result byte, if it's 5th bit (0x10) == 1.
     Naomi DIMM firmware verify if result byte equal to 0x1f.
-    
+
  SYS_CHG_COMD (72h) ??? Authentication for next command ?
     Parameters: 1byte, probably key/password, in retail Dreamcast - 5th byte of unit SN# (located in flash ROM at 1A05Ah), 0 in Dev.box checker BIOS.
     Result: none

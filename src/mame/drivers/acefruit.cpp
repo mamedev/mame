@@ -626,33 +626,33 @@ static GFXDECODE_START( gfx_acefruit )
 	GFXDECODE_ENTRY( "gfx1", 0x1800, charlayout, 8, 4 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(acefruit_state::acefruit)
-
+void acefruit_state::acefruit(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 2500000) /* 2.5MHz */
-	MCFG_DEVICE_PROGRAM_MAP(acefruit_map)
-	MCFG_DEVICE_IO_MAP(acefruit_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", acefruit_state,  acefruit_vblank)
+	Z80(config, m_maincpu, 2500000); /* 2.5MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &acefruit_state::acefruit_map);
+	m_maincpu->set_addrmap(AS_IO, &acefruit_state::acefruit_io);
+	m_maincpu->set_vblank_int("screen", FUNC(acefruit_state::acefruit_vblank));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_acefruit);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
-	MCFG_SCREEN_UPDATE_DRIVER(acefruit_state, screen_update_acefruit)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea_full();
+	m_screen->set_screen_update(FUNC(acefruit_state::screen_update_acefruit));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(acefruit_state::acefruit_palette), 16);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
-MACHINE_CONFIG_END
+}
 
 void acefruit_state::init_sidewndr()
 {

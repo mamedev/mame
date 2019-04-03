@@ -114,7 +114,7 @@
 
 #define NOPRG -1
 
-constexpr int tms99xx_device::AS_SETOFFSET;
+constexpr int tms99xx_device::AS_SETADDRESS;
 
 /* tms9900 ST register bits. */
 enum
@@ -181,7 +181,7 @@ enum
 tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type, const char *tag, int data_width, int prg_addr_bits, int cru_addr_bits, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, data_width, prg_addr_bits),
-		m_setoffset_config("setoffset", ENDIANNESS_BIG, data_width, prg_addr_bits),
+		m_setaddress_config("setaddress", ENDIANNESS_BIG, prg_addr_bits, prg_addr_bits), // data = address
 		m_io_config("cru", ENDIANNESS_LITTLE, 8, cru_addr_bits + 1, 1),
 		m_prgspace(nullptr),
 		m_cru(nullptr),
@@ -226,7 +226,7 @@ void tms99xx_device::device_start()
 	// TODO: Restore state save feature
 	resolve_lines();
 	m_prgspace = &space(AS_PROGRAM);
-	m_sospace = has_space(AS_SETOFFSET) ? &space(AS_SETOFFSET) : nullptr;
+	m_setaddr = has_space(AS_SETADDRESS) ? &space(AS_SETADDRESS) : nullptr;
 	m_cru = &space(AS_IO);
 
 	// set our instruction counter
@@ -441,10 +441,10 @@ void tms99xx_device::write_workspace_register_debug(int reg, uint16_t data)
 
 device_memory_interface::space_config_vector tms99xx_device::memory_space_config() const
 {
-	if (has_configured_map(AS_SETOFFSET))
+	if (has_configured_map(AS_SETADDRESS))
 		return space_config_vector {
 			std::make_pair(AS_PROGRAM,   &m_program_config),
-			std::make_pair(AS_SETOFFSET, &m_setoffset_config),
+			std::make_pair(AS_SETADDRESS, &m_setaddress_config),
 			std::make_pair(AS_IO,        &m_io_config)
 		};
 	else
@@ -1534,8 +1534,8 @@ void tms99xx_device::mem_read()
 	if (m_mem_phase==1)
 	{
 		if (!m_dbin_line.isnull()) m_dbin_line(ASSERT_LINE);
-		if (m_sospace)
-			m_sospace->read_byte(m_address & m_prgaddr_mask & 0xfffe);
+		if (m_setaddr)
+			m_setaddr->write_word(ASSERT_LINE, m_address & m_prgaddr_mask & 0xfffe);
 		m_check_ready = true;
 		m_mem_phase = 2;
 		m_pass = 2;
@@ -1562,8 +1562,8 @@ void tms99xx_device::mem_write()
 		if (!m_dbin_line.isnull()) m_dbin_line(CLEAR_LINE);
 		// When writing, the data bus is asserted immediately after the address bus
 		if (TRACE_ADDRESSBUS) logerror("set address (w) %04x\n", m_address);
-		if (m_sospace)
-			m_sospace->read_byte(m_address & m_prgaddr_mask & 0xfffe);
+		if (m_setaddr)
+			m_setaddr->write_word(CLEAR_LINE, m_address & m_prgaddr_mask & 0xfffe);
 		if (TRACE_MEM) logerror("mem w %04x <- %04x\n",  m_address, m_current_value);
 		m_prgspace->write_word(m_address & m_prgaddr_mask & 0xfffe, m_current_value);
 		m_check_ready = true;
@@ -2167,6 +2167,7 @@ void tms99xx_device::alu_clr_swpb()
 
 	bool setstatus = true;
 	bool check_ov = true;
+	bool check_c = true;
 
 	switch (m_command)
 	{
@@ -2184,6 +2185,7 @@ void tms99xx_device::alu_clr_swpb()
 		// LAE
 		dest_new = ~src_val & 0xffff;
 		check_ov = false;
+		check_c = false;
 		break;
 	case NEG:
 		// LAECO
@@ -2226,7 +2228,7 @@ void tms99xx_device::alu_clr_swpb()
 	if (setstatus)
 	{
 		if (check_ov) set_status_bit(ST_OV, ((src_val & 0x8000)==sign) && ((dest_new & 0x8000)!=sign));
-		set_status_bit(ST_C, (dest_new & 0x10000) != 0);
+		if (check_c) set_status_bit(ST_C, (dest_new & 0x10000) != 0);
 		m_current_value = dest_new & 0xffff;
 		compare_and_set_lae(m_current_value, 0);
 	}
@@ -2518,6 +2520,7 @@ void tms99xx_device::alu_shift()
 	uint16_t sign = 0;
 	uint32_t value;
 	int count;
+	bool check_ov = false;
 
 	switch (m_state)
 	{
@@ -2575,6 +2578,7 @@ void tms99xx_device::alu_shift()
 			case SLA:
 				carry = ((value & 0x8000)!=0);
 				value <<= 1;
+				check_ov = true;
 				if (carry != ((value&0x8000)!=0)) overflow = true;
 				break;
 			case SRC:
@@ -2587,7 +2591,7 @@ void tms99xx_device::alu_shift()
 
 		m_current_value = value & 0xffff;
 		set_status_bit(ST_C, carry);
-		set_status_bit(ST_OV, overflow);
+		if (check_ov) set_status_bit(ST_OV, overflow); // only SLA
 		compare_and_set_lae(m_current_value, 0);
 		m_address = m_address_saved;        // Register address
 		if (TRACE_STATUS) logerror("ST = %04x (val=%04x)\n", ST, m_current_value);

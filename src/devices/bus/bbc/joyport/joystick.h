@@ -36,7 +36,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(pb_r) override;
+	virtual uint8_t pb_r() override;
 
 private:
 	required_ioport m_joy;

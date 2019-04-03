@@ -244,24 +244,24 @@ void aeroboto_state::machine_reset()
 	m_sy = 0;
 }
 
-MACHINE_CONFIG_START(aeroboto_state::formatz)
-
+void aeroboto_state::formatz(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(10'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MC6809(config, m_maincpu, XTAL(10'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &aeroboto_state::main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809, XTAL(10'000'000)/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MC6809(config, m_audiocpu, XTAL(10'000'000)/4); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aeroboto_state::sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(aeroboto_state, screen_update_aeroboto)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, aeroboto_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 31*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(aeroboto_state::screen_update_aeroboto));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(aeroboto_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aeroboto);
 
@@ -279,7 +279,7 @@ MACHINE_CONFIG_START(aeroboto_state::formatz)
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	AY8910(config, "ay2", XTAL(10'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.25); /* verified on pcb */
-MACHINE_CONFIG_END
+}
 
 
 

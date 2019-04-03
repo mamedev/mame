@@ -630,7 +630,7 @@ READ8_MEMBER( pasopia7_state::pasopia7_io_r )
 	}
 	else
 	if(io_port >= 0x28 && io_port <= 0x2b)
-		return m_ctc->read(space,io_port & 3);
+		return m_ctc->read(io_port & 3);
 	else
 	if(io_port >= 0x30 && io_port <= 0x33)
 		return m_pio->read(space, io_port & 3);
@@ -681,7 +681,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 	}
 	else
 	if(io_port >= 0x28 && io_port <= 0x2b)
-		m_ctc->write(space, io_port & 3, data);
+		m_ctc->write(io_port & 3, data);
 	else
 	if(io_port >= 0x30 && io_port <= 0x33)
 		m_pio->write(space, io_port & 3, data);

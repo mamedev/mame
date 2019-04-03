@@ -218,7 +218,7 @@ WRITE8_MEMBER(supdrapo_state::wdog8000_w)
 
 	if (m_wdog == data)
 	{
-		m_watchdog->reset_w(space, 0, 0);  /* Reset */
+		m_watchdog->watchdog_reset();  /* Reset */
 	}
 
 	m_wdog = data;

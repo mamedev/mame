@@ -427,21 +427,21 @@ void datamux_device::write(offs_t offset, uint16_t data)
     Called when the memory access starts by setting the address bus. From that
     point on, we suspend the CPU until all operations are done.
 */
-uint8_t datamux_device::setoffset(offs_t offset)
+void datamux_device::setaddress(offs_t mode, uint16_t addr)
 {
-	m_addr_buf = offset;
+	m_addr_buf = addr;
 	m_waitcount = 0;
 
 	LOGMASKED(LOG_ADDRESS, "Set address %04x\n", m_addr_buf);
 
 	if ((m_addr_buf & 0xe000) == 0x0000)
 	{
-		return 0; // console ROM
+		return; // console ROM
 	}
 
 	if ((m_addr_buf & 0xfc00) == 0x8000)
 	{
-		return 0; // console RAM
+		return; // console RAM
 	}
 
 	// Initialize counter
@@ -468,8 +468,6 @@ uint8_t datamux_device::setoffset(offs_t offset)
 		ready_join();
 	}
 	else m_waitcount = 0;
-
-	return 0;
 }
 
 /*

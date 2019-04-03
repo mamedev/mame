@@ -2674,7 +2674,7 @@ void dcs2_audio_dsio_device::device_add_mconfig(machine_config &config)
 
 	TIMER(config, "dcs_reg_timer").configure_generic(FUNC(dcs_audio_device::dcs_irq));
 	TIMER(config, "dcs_int_timer").configure_generic(FUNC(dcs_audio_device::internal_timer_callback));
-	TIMER(config, "dcs_sport0_timer").configure_generic(FUNC(dcs_audio_device::sport0_irq)); // roadburn needs this to pass harware test
+	TIMER(config, "dcs_sport0_timer").configure_generic(FUNC(dcs_audio_device::sport0_irq)); // roadburn needs this to pass hardware test
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

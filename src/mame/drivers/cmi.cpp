@@ -2158,29 +2158,30 @@ static void cmi2x_floppies(device_slot_interface &device)
 	device.option_add("8dssd", FLOPPY_8_DSSD);
 }
 
-MACHINE_CONFIG_START(cmi_state::cmi2x)
-	MCFG_DEVICE_ADD("maincpu1", MC6809E, Q209_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(maincpu1_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu1_interrupt_callback)
+void cmi_state::cmi2x(machine_config &config)
+{
+	MC6809E(config, m_maincpu1, Q209_CPU_CLOCK);
+	m_maincpu1->set_addrmap(AS_PROGRAM, &cmi_state::maincpu1_map);
+	m_maincpu1->set_irq_acknowledge_callback(FUNC(cmi_state::cpu1_interrupt_callback));
 	config.m_perfect_cpu_quantum = subtag("maincpu1");
 
-	MCFG_DEVICE_ADD("maincpu2", MC6809E, Q209_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(maincpu2_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu2_interrupt_callback)
+	MC6809E(config, m_maincpu2, Q209_CPU_CLOCK);
+	m_maincpu2->set_addrmap(AS_PROGRAM, &cmi_state::maincpu2_map);
+	m_maincpu2->set_irq_acknowledge_callback(FUNC(cmi_state::cpu2_interrupt_callback));
 	config.m_perfect_cpu_quantum = subtag("maincpu2");
 
-	MCFG_DEVICE_ADD("muskeys", M6802, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(muskeys_map)
+	M6802(config, m_muskeyscpu, 4_MHz_XTAL);
+	m_muskeyscpu->set_addrmap(AS_PROGRAM, &cmi_state::muskeys_map);
 
-	MCFG_DEVICE_ADD("alphakeys", M6802, 3.84_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(alphakeys_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(cmi_state, irq0_line_hold, 3.84_MHz_XTAL / 400) // TODO: PIA controls this
+	M6802(config, m_alphakeyscpu, 3.84_MHz_XTAL);
+	m_alphakeyscpu->set_addrmap(AS_PROGRAM, &cmi_state::alphakeys_map);
+	m_alphakeyscpu->set_periodic_int(FUNC(cmi_state::irq0_line_hold), attotime::from_hz(3.84_MHz_XTAL / 400)); // TODO: PIA controls this
 
-	MCFG_DEVICE_ADD("smptemidi", M68000, 20_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(midicpu_map)
+	M68000(config, m_midicpu, 20_MHz_XTAL / 2);
+	m_midicpu->set_addrmap(AS_PROGRAM, &cmi_state::midicpu_map);
 
-	MCFG_DEVICE_ADD("cmi07cpu", MC6809E, Q209_CPU_CLOCK) // ?
-	MCFG_DEVICE_PROGRAM_MAP(cmi07cpu_map)
+	MC6809E(config, m_cmi07cpu, Q209_CPU_CLOCK); // ?
+	m_cmi07cpu->set_addrmap(AS_PROGRAM, &cmi_state::cmi07cpu_map);
 
 	/* alpha-numeric display */
 	DL1416T(config, m_dp1, u32(0));
@@ -2324,7 +2325,7 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	cmi01a_device &cmi01a_7(CMI01A_CHANNEL_CARD(config, "cmi01a_7", 0));
 	cmi01a_7.add_route(ALL_OUTPUTS, "mono", 0.25);
 	cmi01a_7.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
-MACHINE_CONFIG_END
+}
 
 ROM_START( cmi2x )
 	/* Q133 Processor control card */

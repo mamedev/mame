@@ -15,7 +15,7 @@
 #include "m6502.h"
 #include "sound/nes_apu.h"
 
-class n2a03_device : public m6502_device {
+class n2a03_device : public m6502_device, public device_mixer_interface {
 public:
 	n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

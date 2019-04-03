@@ -29,6 +29,7 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(netlistparams)
 		, m_use_deactivate(*this, "USE_DEACTIVATE", false)
 		, m_startup_strategy(*this, "STARTUP_STRATEGY", 1)
+		, m_mos_capmodel(*this, "DEFAULT_MOS_CAPMODEL", 2)
 		{
 		}
 		NETLIB_UPDATEI() { }
@@ -37,6 +38,7 @@ namespace netlist
 	public:
 		param_logic_t m_use_deactivate;
 		param_int_t   m_startup_strategy;
+		param_int_t   m_mos_capmodel;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -182,6 +184,7 @@ namespace netlist
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		{
 			set_logic_family(setup().family_from_model(m_FAMILY()));
+			m_Q.set_logic_family(this->logic_family());
 		}
 
 		NETLIB_UPDATEI() { }

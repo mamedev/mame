@@ -681,17 +681,15 @@ WRITE_LINE_MEMBER(galaxian_state::vblank_interrupt_w)
 		m_maincpu->set_input_line(m_irq_line, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(galaxian_state::tenspot_interrupt_w)
+INPUT_CHANGED_MEMBER(galaxian_state::tenspot_fake)
 {
-	vblank_interrupt_w(state);
-
-	if (m_fake_select.read_safe(0x00))
+	if (newval)
 	{
 		m_tenspot_current_game++;
 		m_tenspot_current_game%=10;
 		tenspot_set_game_bank(m_tenspot_current_game, 1);
-		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(galaxian_state::irq_enable_w)
@@ -957,7 +955,7 @@ WRITE8_MEMBER(galaxian_state::explorer_sound_control_w)
 READ8_MEMBER(galaxian_state::explorer_sound_latch_r)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return m_soundlatch->read(m_audiocpu->space(AS_PROGRAM), 0);
+	return m_soundlatch->read();
 }
 
 
@@ -1351,7 +1349,7 @@ WRITE8_MEMBER(galaxian_state::kingball_sound1_w)
 WRITE8_MEMBER(galaxian_state::kingball_sound2_w)
 {
 	m_kingball_sound = (m_kingball_sound & ~0x02) | (data << 1);
-	m_soundlatch->write(space, 0, m_kingball_sound | 0xf0);
+	m_soundlatch->write(m_kingball_sound | 0xf0);
 }
 
 
@@ -1427,7 +1425,7 @@ READ8_MEMBER(galaxian_state::jumpbug_protection_r)
 
 WRITE8_MEMBER(galaxian_state::checkman_sound_command_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -3254,7 +3252,7 @@ static INPUT_PORTS_START( tenspot )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("FAKE_SELECT") /* fake button to move onto next game - until select rom is understood! */
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Next Game (Fake)") PORT_IMPULSE(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Next Game (Fake)") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, galaxian_state, tenspot_fake, nullptr)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -6165,9 +6163,6 @@ void galaxian_state::tenspot(machine_config &config)
 
 	/* separate tile/sprite ROMs */
 	m_gfxdecode->set_info(gfx_tenspot);
-
-	/* video hardware */
-	m_screen->screen_vblank().set(FUNC(galaxian_state::tenspot_interrupt_w));
 }
 
 void galaxian_state::zigzag(machine_config &config)
@@ -7040,6 +7035,12 @@ void galaxian_state::init_nolock()
 	space.unmap_write(0x6002, 0x6002, 0x7f8);
 }
 
+// The first rom loads at 0800, then 1800, 2800?, 3800 and 4800.
+// Unfortunately the 3rd rom appears to be total garbage.
+// Each block of 256 bytes is in reverse order. Some code
+// is missing: 00xx, 4Axx, 10xx, 11xx at least. The game
+// uses 0200-05FF as RAM. It also accesses 6000, 6800, 700x, 7800.
+// Perhaps the missing code was stored in battery-backed RAM?
 void galaxian_state::init_warofbugg()
 {
 	uint8_t* romdata = memregion("maincpu")->base();
@@ -7047,9 +7048,10 @@ void galaxian_state::init_warofbugg()
 	uint8_t buf[0x4000];
 	memcpy(buf, romdata, 0x4000);
 
-	// the rom data is at the very least, backwards, but there still seems to be missing code
-	for (int i = 0; i < 0x4000; i++)
-		romdata[i] = buf[i^0x7ff];
+	// unscramble each block
+	for (int i = 0; i < 0x40; i++)
+		for (int j = 0; j < 0x100; j++)
+			romdata[i*256+j] = buf[i*256+(j^0xff)];
 
 	init_nolock();
 
@@ -7578,7 +7580,7 @@ void galaxian_state::init_mandinga()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	watchdog_timer_device *wdog = subdevice<watchdog_timer_device>("watchdog");
 	space.unmap_read(0x7000, 0x7000, 0x7ff);
-	space.install_read_handler(0x6800, 0x6800, 0, 0x7ff, 0, read8_delegate(FUNC(watchdog_timer_device::reset_r), wdog));
+	space.install_read_handler(0x6800, 0x6800, 0, 0x7ff, 0, read8mo_delegate(FUNC(watchdog_timer_device::reset_r), wdog));
 }
 
 void galaxian_state::init_sfx()
@@ -7603,7 +7605,7 @@ void galaxian_state::init_atlantis()
 	/* watchdog is at $7800? (or is it just disabled?) */
 	watchdog_timer_device *wdog = subdevice<watchdog_timer_device>("watchdog");
 	space.unmap_read(0x7000, 0x77ff);
-	space.install_read_handler(0x7800, 0x7800, 0, 0x7ff, 0, read8_delegate(FUNC(watchdog_timer_device::reset_r), wdog));
+	space.install_read_handler(0x7800, 0x7800, 0, 0x7ff, 0, read8mo_delegate(FUNC(watchdog_timer_device::reset_r), wdog));
 }
 
 
@@ -8465,11 +8467,11 @@ ROM_END
 
 ROM_START( warofbugg )
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD( "wotbg-u-1.bin",   0x0000, 0x0800, CRC(f43ff0a8) SHA1(b87abeb8af9105fa8fba78f9a68363bd89066e7f) )
-	ROM_LOAD( "wotbg-v-2.bin",   0x0800, 0x0800, CRC(eb7a028b) SHA1(8c822ae11d3cc04f749a7cd639d15b9fc830ab35) )
-	ROM_LOAD( "wotbg-w-3.bin",   0x1000, 0x0800, CRC(693e0e50) SHA1(00b19969cee0f95bfb8251c2df133ff2c9ae3b00) )
-	ROM_LOAD( "wotbg-y-4.bin",   0x1800, 0x0800, CRC(885d4982) SHA1(4aeaf514a9413a9cb9a971fd258c6cf46ca66fc4) )
-	ROM_LOAD( "wotbg-z-5.bin",   0x2000, 0x0800, CRC(60041ef2) SHA1(cced5837a037ac5cd8fa6260d69d8e33de5ecd48) )
+	ROM_LOAD( "wotbg-u-1.bin",   0x0000, 0x0800, CRC(f43ff0a8) SHA1(b87abeb8af9105fa8fba78f9a68363bd89066e7f) ) // -> 0800
+	ROM_LOAD( "wotbg-v-2.bin",   0x0800, 0x0800, CRC(eb7a028b) SHA1(8c822ae11d3cc04f749a7cd639d15b9fc830ab35) ) // -> 1800
+	ROM_LOAD( "wotbg-w-3.bin",   0x1000, 0x0800, CRC(693e0e50) SHA1(00b19969cee0f95bfb8251c2df133ff2c9ae3b00) ) // -> ???? garbage
+	ROM_LOAD( "wotbg-y-4.bin",   0x1800, 0x0800, CRC(885d4982) SHA1(4aeaf514a9413a9cb9a971fd258c6cf46ca66fc4) ) // -> 3800
+	ROM_LOAD( "wotbg-z-5.bin",   0x2000, 0x0800, CRC(60041ef2) SHA1(cced5837a037ac5cd8fa6260d69d8e33de5ecd48) ) // -> 4800
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "warofbug.1k",  0x0000, 0x0800, CRC(8100fa85) SHA1(06641c431cace36dec98b87555f62e72f3e53a31) )

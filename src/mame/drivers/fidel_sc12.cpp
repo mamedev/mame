@@ -174,8 +174,6 @@ void sc12_state::sc12(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc12_state::div_trampoline);
 	ADDRESS_MAP_BANK(config, m_mainmap).set_map(&sc12_state::main_map).set_options(ENDIANNESS_LITTLE, 8, 16);
 
-	TIMER(config, "dummy_timer").configure_periodic(timer_device::expired_delegate(), attotime::from_hz(3_MHz_XTAL));
-
 	const attotime irq_period = attotime::from_hz(630); // from 556 timer (22nF, 102K, 1K)
 	TIMER(config, m_irq_on).configure_periodic(FUNC(sc12_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
@@ -202,7 +200,6 @@ void sc12_state::sc12b(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(4_MHz_XTAL); // R65C02P4
-	TIMER(config.replace(), "dummy_timer").configure_periodic(timer_device::expired_delegate(), attotime::from_hz(4_MHz_XTAL));
 
 	// change irq timer frequency
 	const attotime irq_period = attotime::from_hz(596); // from 556 timer (22nF, 82K+26K, 1K)

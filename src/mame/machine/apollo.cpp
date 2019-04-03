@@ -106,7 +106,7 @@ INPUT_PORTS_START( apollo_config )
 //      PORT_CONFNAME(APOLLO_CONF_IDLE_SLEEP, 0x00, "Idle Sleep")
 //      PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 //      PORT_CONFSETTING(APOLLO_CONF_IDLE_SLEEP, DEF_STR ( On ) )
-
+#ifdef APOLLO_XXL
 		PORT_CONFNAME(APOLLO_CONF_TRAP_TRACE, 0x00, "Trap Trace")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_TRAP_TRACE, DEF_STR ( On ) )
@@ -114,7 +114,7 @@ INPUT_PORTS_START( apollo_config )
 		PORT_CONFNAME(APOLLO_CONF_FPU_TRACE, 0x00, "FPU Trace")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_FPU_TRACE, DEF_STR ( On ) )
-#ifdef APOLLO_XXL
+
 		PORT_CONFNAME(APOLLO_CONF_DISK_TRACE, 0x00, "Disk Trace")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_DISK_TRACE, DEF_STR ( On ) )
@@ -256,11 +256,11 @@ WRITE16_MEMBER(apollo_state::apollo_csr_control_register_w)
 		// disable FPU (i.e. FPU opcodes in CPU)
 		apollo_set_cpu_has_fpu(m_maincpu, 0);
 
-		if (!apollo_is_dn3000())
+		if (!apollo_is_dn3000() && !m_maincpu->get_pmmu_enable())
 		{
 			// hack: set APOLLO_CSR_SR_FP_TRAP in cpu status register for /sau7/self_test
 			// APOLLO_CSR_SR_FP_TRAP in status register should be set by next fmove instruction
-			// cpu_status_register |= APOLLO_CSR_SR_FP_TRAP;
+			cpu_status_register |= APOLLO_CSR_SR_FP_TRAP;
 		}
 	}
 

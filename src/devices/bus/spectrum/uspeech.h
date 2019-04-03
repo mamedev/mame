@@ -44,6 +44,7 @@ protected:
 	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t iorq_r(offs_t offset) override;
 
 private:
 	required_device<sp0256_device> m_nsp;

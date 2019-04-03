@@ -86,9 +86,9 @@ WRITE8_MEMBER(nycaptor_state::nycaptor_videoram_w)
 WRITE8_MEMBER(nycaptor_state::nycaptor_palette_w)
 {
 	if (offset & 0x100)
-		m_palette->write8_ext(space, (offset & 0xff) + (m_palette_bank << 8), data);
+		m_palette->write8_ext((offset & 0xff) + (m_palette_bank << 8), data);
 	else
-		m_palette->write8(space, (offset & 0xff) + (m_palette_bank << 8), data);
+		m_palette->write8((offset & 0xff) + (m_palette_bank << 8), data);
 }
 
 READ8_MEMBER(nycaptor_state::nycaptor_palette_r)

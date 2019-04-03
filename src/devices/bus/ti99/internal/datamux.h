@@ -35,7 +35,7 @@ public:
 	datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	uint16_t read(offs_t offset);
 	void write(offs_t offset, uint16_t data);
-	uint8_t setoffset(offs_t offset);
+	void setaddress(offs_t mode, uint16_t address);
 
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
 	DECLARE_WRITE_LINE_MEMBER( dbin_in );

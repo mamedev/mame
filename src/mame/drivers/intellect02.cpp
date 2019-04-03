@@ -197,7 +197,7 @@ WRITE8_MEMBER(intel02_state::control_w)
 		if (BIT(data, i))
 			m_led_active |= 1 << i;
 
-		// they're strobed, so on falling edge, delay them going off to prevent flicker
+		// they're strobed, so on falling edge, delay them going off to prevent flicker or stuck display
 		else if (BIT(m_led_select, i))
 			m_delay_display[i]->adjust(attotime::from_msec(10), i);
 	}

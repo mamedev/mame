@@ -858,7 +858,7 @@ static INPUT_PORTS_START( matchme )
 	PORT_CONFSETTING(    0x02^0x07, "3" )
 	PORT_CONFSETTING(    0x04^0x07, "4" )
 	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(    0x08, "Amateur" ) // AMR
+	PORT_CONFSETTING(    0x08, "Amateur" ) // AM
 	PORT_CONFSETTING(    0x00, "Professional" ) // PRO
 
 	PORT_START("IN.4") // another fake

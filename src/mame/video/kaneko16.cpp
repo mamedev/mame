@@ -61,19 +61,17 @@ void kaneko16_state::kaneko16_fill_bitmap(_BitmapClass &bitmap, const rectangle 
 template<class _BitmapClass>
 uint32_t kaneko16_state::screen_update_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect)
 {
-	int i;
-
 	screen.priority().fill(0, cliprect);
 
-	if (m_view2[0].found()) m_view2[0]->kaneko16_prepare(bitmap, cliprect);
-	if (m_view2[1].found()) m_view2[1]->kaneko16_prepare(bitmap, cliprect);
+	if (m_view2[0].found()) m_view2[0]->prepare(bitmap, cliprect);
+	if (m_view2[1].found()) m_view2[1]->prepare(bitmap, cliprect);
 
-	for ( i = 0; i < 8; i++ )
+	for (int i = 0; i < 8; i++)
 	{
 		if (m_view2[0].found())
-			m_view2[0]->render_tilemap_chip(screen,bitmap,cliprect,i);
+			m_view2[0]->render_tilemap(screen,bitmap,cliprect,i);
 		if (m_view2[1].found())
-			m_view2[1]->render_tilemap_chip_alt(screen,bitmap,cliprect,i, m_VIEW2_2_pri);
+			m_view2[1]->render_tilemap_alt(screen,bitmap,cliprect,i, m_VIEW2_2_pri);
 	}
 
 	return 0;
@@ -100,7 +98,7 @@ uint32_t kaneko16_state::screen_update_kaneko16(screen_device &screen, bitmap_in
 
 
 
-/* Berlwall and Gals Panic have an additional hi-color layers */
+/* berlwall have an additional hi-color layers */
 
 VIDEO_START_MEMBER(kaneko16_berlwall_state,berlwall)
 {
@@ -124,11 +122,10 @@ VIDEO_START_MEMBER(kaneko16_berlwall_state,berlwall)
 			{
 				int addr  = screen * (256 * 256) + x + y * 256;
 				int data = RAM[addr * 2 + 0] * 256 + RAM[addr * 2 + 1];
-				int r,g,b;
 
-				r = (data & 0x07c0) >>  6;
-				g = (data & 0xf800) >> 11;
-				b = (data & 0x003e) >>  1;
+				int r = (data & 0x07c0) >>  6;
+				int g = (data & 0xf800) >> 11;
+				int b = (data & 0x003e) >>  1;
 
 				/* apply a simple decryption */
 				r ^= 0x09;

@@ -424,7 +424,7 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 
 	/* Issue 2 Spectrums default to having bits 5, 6 & 7 set.
 	Issue 3 Spectrums default to having bits 5 & 7 set and bit 6 reset. */
-	if (m_io_config->read() & 0x80)
+	if ((m_io_config->read() & 0x80) == 0)
 		data ^= (0x40);
 
 	return data;
@@ -443,8 +443,8 @@ void spectrum_state::spectrum_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rw(FUNC(spectrum_state::spectrum_rom_r), FUNC(spectrum_state::spectrum_rom_w));
 	map(0x4000, 0x5aff).ram().share("video_ram");
-	//  AM_RANGE(0x5b00, 0x7fff) AM_RAM
-	//  AM_RANGE(0x8000, 0xffff) AM_RAM
+	//map(0x5b00, 0x7fff).ram();
+	//map(0x8000, 0xffff).ram();
 }
 
 void spectrum_state::spectrum_fetch(address_map &map)

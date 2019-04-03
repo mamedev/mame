@@ -1579,11 +1579,11 @@ WRITE16_MEMBER(seta_state::sub_ctrl_w)
 			break;
 
 		case 4/2:   // not sure
-			if (ACCESSING_BITS_0_7) if(m_soundlatch[0] != nullptr) m_soundlatch[0]->write(space, 0, data & 0xff);
+			if (ACCESSING_BITS_0_7) if(m_soundlatch[0] != nullptr) m_soundlatch[0]->write(data & 0xff);
 			break;
 
 		case 6/2:   // not sure
-			if (ACCESSING_BITS_0_7) if(m_soundlatch[1] != nullptr) m_soundlatch[1]->write(space, 0, data & 0xff);
+			if (ACCESSING_BITS_0_7) if(m_soundlatch[1] != nullptr) m_soundlatch[1]->write(data & 0xff);
 			break;
 	}
 
@@ -2923,7 +2923,6 @@ void kiwame_state::kiwame_map(address_map &map)
 	map(0xc00000, 0xc03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xd00000, 0xd00009).r(FUNC(kiwame_state::input_r));                 // mahjong panel
 	map(0xe00000, 0xe00003).r(FUNC(kiwame_state::seta_dsw_r));              // DSW
-	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));
 }
 
 
@@ -3063,7 +3062,7 @@ void seta_state::umanclub_map(address_map &map)
 WRITE8_MEMBER(seta_state::utoukond_sound_control_w)
 {
 	if (!BIT(data, 6))
-		m_soundlatch[0]->acknowledge_w(space, 0, 0);
+		m_soundlatch[0]->acknowledge_w();
 
 	// other bits used for banking? (low nibble seems to always be 2)
 }
@@ -3559,7 +3558,7 @@ WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 
 	// Bit 3: NMICLR
 	if (!BIT(data, 3))
-		m_soundlatch[0]->acknowledge_w(space, 0, 0);
+		m_soundlatch[0]->acknowledge_w();
 
 	// Bit 2: IRQCLR
 	if (!BIT(data, 2))
@@ -3571,7 +3570,7 @@ WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 
 WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
 {
-	m_soundlatch[1]->write(space,0,data);
+	m_soundlatch[1]->write(data);
 	m_subcpu->spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 }
 
@@ -8039,7 +8038,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::calibr50_interrupt)
 
 void usclssic_state::machine_start()
 {
-	m_buttonmux->write_ab(0xff);
+	m_buttonmux->ab_w(0xff);
 }
 
 
@@ -9275,19 +9274,15 @@ void seta_state::triplfun(machine_config &config)
 WRITE_LINE_MEMBER(kiwame_state::kiwame_vblank)
 {
 	if (state)
-		m_tmp68301->external_interrupt_0();
+		m_maincpu->external_interrupt_0();
 }
 
 void kiwame_state::kiwame(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	TMP68301(config, m_maincpu, 16000000);   /* 16 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &kiwame_state::kiwame_map);
-	m_maincpu->set_irq_acknowledge_callback("tmp68301", FUNC(tmp68301_device::irq_callback));
-
-	tmp68301_device &tmp68301(TMP68301(config, "tmp68301", 0));
-	tmp68301.set_cputag(m_maincpu);
-	tmp68301.out_parallel_callback().set(FUNC(kiwame_state::row_select_w));
+	m_maincpu->out_parallel_callback().set(FUNC(kiwame_state::row_select_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

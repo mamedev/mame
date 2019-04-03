@@ -188,6 +188,7 @@
 	[super restoreConfigurationFromNode:node];
 	int const region = node->get_attribute_int("memoryregion", [memoryView selectedSubviewIndex]);
 	[memoryView selectSubviewAtIndex:region];
+	[window setTitle:[NSString stringWithFormat:@"Memory: %@", [memoryView selectedSubviewName]]];
 	[subviewButton selectItemAtIndex:[subviewButton indexOfItemWithTag:[memoryView selectedSubviewIndex]]];
 	[memoryView restoreConfigurationFromNode:node];
 }

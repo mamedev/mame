@@ -13,8 +13,8 @@
 
 #include "expander.h"
 #include "sound/sn76496.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#include "bus/coleco/cartridge/exp.h"
+#include "bus/coleco/controller/ctrl.h"
 
 
 //**************************************************************************
@@ -35,7 +35,7 @@ public:
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	template<int N> DECLARE_WRITE_LINE_MEMBER( joy_irq_w );
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -46,7 +46,8 @@ protected:
 private:
 	required_memory_region m_bios;
 	required_device<sn76489a_device> m_snd;
-	required_device<generic_slot_device> m_cart_rom;
+	required_device<colecovision_control_port_device> m_joy[2];
+	required_device<colecovision_cartridge_slot_device> m_cart;
 };
 
 // device type definition

@@ -36,6 +36,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 	void set_mirror(int page, int src);
