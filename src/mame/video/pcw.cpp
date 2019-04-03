@@ -94,6 +94,10 @@ uint32_t pcw_state::screen_update_pcw(screen_device &screen, bitmap_ind16 &bitma
 			unsigned short line_data;
 			unsigned char *line_ptr;
 
+			// The PCWs are reportedly slowed 15% by the video circuits inserting WAIT states while accessing the vram
+			// steal clock cycles from the CPU: (4.000.000 * 0.15) / 50Hz / 256 scanlines == ~47 (46.88)
+			m_maincpu->adjust_icount(-47);
+
 			x = PCW_BORDER_WIDTH;
 
 			roller_ram_ptr = m_ram->pointer() + m_roller_ram_addr + roller_ram_offs;
