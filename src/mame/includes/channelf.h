@@ -45,7 +45,7 @@ public:
 	uint8_t port_read_with_latch(uint8_t ext, uint8_t latch_state);
 	virtual void video_start() override;
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(channelf);
+	void channelf_palette(palette_device &palette) const;
 	uint32_t screen_update_channelf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<channelf_sound_device> m_custom;

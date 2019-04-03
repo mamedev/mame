@@ -105,7 +105,7 @@ private:
 	DECLARE_WRITE16_MEMBER(dsp_0008_hack_w);
 	DECLARE_READ16_MEMBER(dma_memr_cb);
 	DECLARE_WRITE16_MEMBER(dma_memw_cb);
-	DECLARE_PALETTE_INIT(mpc3000);
+	void mpc3000_palette(palette_device &palette) const;
 };
 
 void mpc3000_state::machine_start()
@@ -168,7 +168,7 @@ WRITE16_MEMBER(mpc3000_state::dma_memw_cb)
 	m_maincpu->space(AS_PROGRAM).write_word(offset, data);
 }
 
-PALETTE_INIT_MEMBER(mpc3000_state, mpc3000)
+void mpc3000_state::mpc3000_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -205,18 +205,16 @@ void mpc3000_state::mpc3000(machine_config &config)
 	hiledlatch.q_out_cb<6>().set_output("led14").invert(); // 16 Levels
 	hiledlatch.q_out_cb<7>().set_output("led15").invert(); // After
 
-	device_t *device = nullptr;
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(80)
-	MCFG_SCREEN_UPDATE_DEVICE("lcdc", hd61830_device, screen_update)
-	MCFG_SCREEN_SIZE(240, 64)   //6x20, 8x8
-	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(80);
+	screen.set_screen_update("lcdc", FUNC(hd61830_device::screen_update));
+	screen.set_size(240, 64);   //6x20, 8x8
+	screen.set_visarea(0, 240-1, 0, 64-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(mpc3000_state, mpc3000)
+	PALETTE(config, "palette", FUNC(mpc3000_state::mpc3000_palette), 2);
 
-	UPD72065(config, m_fdc, 0, true, true); // TODO: upd72068 supports motor control
+	UPD72065(config, m_fdc, 16_MHz_XTAL, true, true); // clocked by V53 CLKOUT (TODO: upd72068 supports motor control)
 	//m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(v53a_device::ir?_w));
 	//m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v53a_device::drq?_w));
 

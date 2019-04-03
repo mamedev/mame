@@ -38,10 +38,10 @@ protected:
 private:
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
 
-	DECLARE_READ8_MEMBER(pvtc_r);
-	DECLARE_WRITE8_MEMBER(pvtc_w);
-	DECLARE_READ8_MEMBER(duart_r);
-	DECLARE_WRITE8_MEMBER(duart_w);
+	u8 pvtc_r(offs_t offset);
+	void pvtc_w(offs_t offset, u8 data);
+	u8 duart_r(offs_t offset);
+	void duart_w(offs_t offset, u8 data);
 	void earom_w(u8 data);
 	u8 misc_r();
 	u8 p1_r();
@@ -72,24 +72,24 @@ SCN2672_DRAW_CHARACTER_MEMBER(wy85_state::draw_character)
 {
 }
 
-READ8_MEMBER(wy85_state::pvtc_r)
+u8 wy85_state::pvtc_r(offs_t offset)
 {
-	return m_pvtc->read(space, offset >> 8);
+	return m_pvtc->read(offset >> 8);
 }
 
-WRITE8_MEMBER(wy85_state::pvtc_w)
+void wy85_state::pvtc_w(offs_t offset, u8 data)
 {
-	m_pvtc->write(space, offset >> 8, data);
+	m_pvtc->write(offset >> 8, data);
 }
 
-READ8_MEMBER(wy85_state::duart_r)
+u8 wy85_state::duart_r(offs_t offset)
 {
-	return m_duart->read(space, offset >> 8);
+	return m_duart->read(offset >> 8);
 }
 
-WRITE8_MEMBER(wy85_state::duart_w)
+void wy85_state::duart_w(offs_t offset, u8 data)
 {
-	m_duart->write(space, offset >> 8, data);
+	m_duart->write(offset >> 8, data);
 }
 
 void wy85_state::earom_w(u8 data)

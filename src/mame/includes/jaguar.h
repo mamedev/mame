@@ -54,6 +54,7 @@ public:
 		, m_config_io(*this, "CONFIG")
 		, m_joy(*this, "JOY%u", 0U)
 		, m_buttons(*this, "BUTTONS%u", 0U)
+		, m_system(*this, "SYSTEM")
 		, m_is_r3000(false)
 		, m_is_cojag(false)
 		, m_hacks_enabled(false)
@@ -128,6 +129,7 @@ private:
 	optional_ioport m_config_io;
 	optional_ioport_array<8> m_joy;
 	optional_ioport_array<8> m_buttons;
+	optional_ioport m_system;
 
 	// configuration
 	bool m_is_r3000;

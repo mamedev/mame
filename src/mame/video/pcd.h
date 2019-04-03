@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-
 #ifndef MAME_VIDEO_PCD_H
 #define MAME_VIDEO_PCD_H
 
@@ -20,10 +19,11 @@ public:
 	virtual void map(address_map &map) = 0;
 	DECLARE_READ8_MEMBER(detect_r);
 	DECLARE_WRITE8_MEMBER(detect_w);
-	DECLARE_PALETTE_INIT(pcdx);
 
 protected:
 	pcdx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	void pcdx_palette(palette_device &palette) const;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;

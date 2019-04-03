@@ -11,10 +11,11 @@
 #pragma once
 
 #include "audio/m72.h"
-#include "sound/dac.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/mb8421.h"
 #include "machine/pic8259.h"
 #include "machine/upd4701.h"
+#include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -77,6 +78,7 @@ public:
 	void rtype2(machine_config &config);
 	void m82(machine_config &config);
 	void rtype(machine_config &config);
+	void imgfightb(machine_config &config);
 
 	void init_dkgenm72();
 	void init_bchopper();
@@ -237,6 +239,7 @@ private:
 	void m84_cpu1_common_map(address_map &map);
 	void m84_portmap(address_map &map);
 	void m84_v33_portmap(address_map &map);
+	void i80c31_mem_map(address_map &map);
 	void mcu_io_map(address_map &map);
 	void poundfor_portmap(address_map &map);
 	void poundfor_sound_portmap(address_map &map);

@@ -74,9 +74,9 @@
     and sprites is right, judging from gameplay.  I'm not sure about
     alignment with the effect layers.
 
-    There are definitely alignment problems with the PVI opjects, but
+    There are definitely alignment problems with the PVI objects, but
     that may be a bug in the S2636 implementation.  I need to check it
-    more detail
+    in more detail.
 */
 
 #include "emu.h"
@@ -326,7 +326,7 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 }
 
 
-PALETTE_INIT_MEMBER(laserbat_state, laserbat)
+void laserbat_state::laserbat_palette(palette_device &palette) const
 {
 	/*
 	    Uses GRBGRBGR pixel format.  The two topmost bist are the LSBs
@@ -378,7 +378,7 @@ PALETTE_INIT_MEMBER(laserbat_state, laserbat)
 }
 
 
-PALETTE_INIT_MEMBER(catnmous_state, catnmous)
+void catnmous_state::catnmous_palette(palette_device &palette) const
 {
 	/*
 	    Uses GRBGRBGR pixel format.  The two topmost bist are the LSBs

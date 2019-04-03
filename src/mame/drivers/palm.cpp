@@ -48,29 +48,31 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(pen_check);
 	DECLARE_INPUT_CHANGED_MEMBER(button_check);
 
-private:
-	required_device<cpu_device> m_maincpu;
-	required_device<mc68328_device> m_lsi;
-	required_device<ram_device> m_ram;
-	uint8_t m_port_f_latch;
-	uint16_t m_spim_data;
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+private:
 	DECLARE_WRITE8_MEMBER(palm_port_f_out);
 	DECLARE_READ8_MEMBER(palm_port_c_in);
 	DECLARE_READ8_MEMBER(palm_port_f_in);
 	DECLARE_WRITE16_MEMBER(palm_spim_out);
 	DECLARE_READ16_MEMBER(palm_spim_in);
 	DECLARE_WRITE_LINE_MEMBER(palm_spim_exchange);
-	DECLARE_PALETTE_INIT(palm);
+	void palm_palette(palette_device &palette) const;
 
+	offs_t palm_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
+	void palm_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<mc68328_device> m_lsi;
+	required_device<ram_device> m_ram;
+	uint8_t m_port_f_latch;
+	uint16_t m_spim_data;
 	required_ioport m_io_penx;
 	required_ioport m_io_peny;
 	required_ioport m_io_penb;
 	required_ioport m_io_portd;
-
-	offs_t palm_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
-	void palm_map(address_map &map);
 };
 
 
@@ -158,7 +160,7 @@ void palm_state::machine_reset()
 }
 
 /* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
-PALETTE_INIT_MEMBER(palm_state, palm)
+void palm_state::palm_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0x7b, 0x8c, 0x5a);
 	palette.set_pen_color(1, 0x00, 0x00, 0x00);
@@ -180,32 +182,32 @@ void palm_state::palm_map(address_map &map)
     MACHINE DRIVERS
 ***************************************************************************/
 
-MACHINE_CONFIG_START(palm_state::palm)
+void palm_state::palm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", M68000, 32768*506 )        /* 16.580608 MHz */
-	MCFG_DEVICE_PROGRAM_MAP( palm_map)
-	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(palm_state, palm_dasm_override)
+	M68000(config, m_maincpu, 32768*506);        /* 16.580608 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &palm_state::palm_map);
+	m_maincpu->set_dasm_override(FUNC(palm_state::palm_dasm_override));
 
-	MCFG_QUANTUM_TIME( attotime::from_hz(60) )
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_SCREEN_ADD( "screen", LCD )
-	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_VBLANK_TIME( ATTOSECONDS_IN_USEC(1260) )
 	/* video hardware */
-	MCFG_SCREEN_VIDEO_ATTRIBUTES( VIDEO_UPDATE_BEFORE_VBLANK )
-	MCFG_SCREEN_SIZE( 160, 220 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 159, 0, 219 )
-	MCFG_SCREEN_UPDATE_DEVICE(MC68328_TAG, mc68328_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1260));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_size(160, 220);
+	screen.set_visarea(0, 159, 0, 219);
+	screen.set_screen_update(MC68328_TAG, FUNC(mc68328_device::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD( "palette", 2 )
-	MCFG_PALETTE_INIT_OWNER(palm_state, palm)
+	PALETTE(config, "palette", FUNC(palm_state::palm_palette), 2);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	MC68328(config, m_lsi, 0, "maincpu"); // on-board peripherals
 	m_lsi->out_port_f().set(FUNC(palm_state::palm_port_f_out));
@@ -215,7 +217,7 @@ MACHINE_CONFIG_START(palm_state::palm)
 	m_lsi->out_spim().set(FUNC(palm_state::palm_spim_out));
 	m_lsi->in_spim().set(FUNC(palm_state::palm_spim_in));
 	m_lsi->spim_xch_trigger().set(FUNC(palm_state::palm_spim_exchange));
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( palm )
 	PORT_START( "PENX" )

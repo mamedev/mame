@@ -61,7 +61,7 @@ ROM_END
 
 void bbc_cumana1_device::device_add_mconfig(machine_config &config)
 {
-	MB8877(config, m_fdc, 16_MHz_XTAL / 16);
+	MB8877(config, m_fdc, DERIVED_CLOCK(1, 8));
 	m_fdc->intrq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_drq_w));
 	m_fdc->hld_wr_callback().set(FUNC(bbc_cumanafdc_device::motor_w));
@@ -72,7 +72,7 @@ void bbc_cumana1_device::device_add_mconfig(machine_config &config)
 
 void bbc_cumana2_device::device_add_mconfig(machine_config &config)
 {
-	MB8877(config, m_fdc, 16_MHz_XTAL / 16);
+	MB8877(config, m_fdc, DERIVED_CLOCK(1, 8));
 	m_fdc->intrq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_drq_w));
 	m_fdc->hld_wr_callback().set(FUNC(bbc_cumanafdc_device::motor_w));
@@ -137,7 +137,7 @@ void bbc_cumanafdc_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_cumanafdc_device::read)
+uint8_t bbc_cumanafdc_device::read(offs_t offset)
 {
 	uint8_t data;
 
@@ -152,7 +152,7 @@ READ8_MEMBER(bbc_cumanafdc_device::read)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_cumanafdc_device::write)
+void bbc_cumanafdc_device::write(offs_t offset, uint8_t data)
 {
 	if (offset & 0x04)
 	{

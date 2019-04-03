@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
  */
 
 #include "nvtt.h"
@@ -50,9 +50,9 @@ namespace nvtt
 					for (uint32_t blockX = 0; blockX < ZOH::Tile::TILE_W; ++blockX)
 					{
 						nv::Vector4 color = srcRgba[blockY*srcRgbaStride + blockX];
-						zohTile.data[blockY][blockX].x = float(int16_t(bx::halfFromFloat(color.x) ) );
-						zohTile.data[blockY][blockX].y = float(int16_t(bx::halfFromFloat(color.y) ) );
-						zohTile.data[blockY][blockX].z = float(int16_t(bx::halfFromFloat(color.z) ) );
+						zohTile.data[blockY][blockX].x = float(int16_t(bx::halfFromFloat(bx::max(color.x, 0.0f) ) ) );
+						zohTile.data[blockY][blockX].y = float(int16_t(bx::halfFromFloat(bx::max(color.y, 0.0f) ) ) );
+						zohTile.data[blockY][blockX].z = float(int16_t(bx::halfFromFloat(bx::max(color.z, 0.0f) ) ) );
 					}
 				}
 

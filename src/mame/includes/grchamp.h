@@ -77,7 +77,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_center_tile_info);
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
 
-	DECLARE_PALETTE_INIT(grchamp);
+	void grchamp_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(cpu0_interrupt);
 	INTERRUPT_GEN_MEMBER(cpu1_interrupt);
 	TIMER_CALLBACK_MEMBER(main_to_sub_comm_sync_w);

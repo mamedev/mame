@@ -32,7 +32,6 @@
 #include "emu.h"
 #include "includes/exp85.h"
 
-#include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
 #include "machine/i8355.h"
 #include "machine/ram.h"
@@ -180,18 +179,18 @@ void exp85_state::machine_start()
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(exp85_state::exp85)
+void exp85_state::exp85(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(I8085A_TAG, I8085A, 6.144_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(exp85_mem)
-	MCFG_DEVICE_IO_MAP(exp85_io)
-	MCFG_I8085A_SID(READLINE(*this, exp85_state, sid_r))
-	MCFG_I8085A_SOD(WRITELINE(*this, exp85_state, sod_w))
+	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &exp85_state::exp85_mem);
+	m_maincpu->set_addrmap(AS_IO, &exp85_state::exp85_io);
+	m_maincpu->in_sid_func().set(FUNC(exp85_state::sid_r));
+	m_maincpu->out_sod_func().set(FUNC(exp85_state::sod_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	I8155(config, I8155_TAG, 6.144_MHz_XTAL/2);
@@ -200,14 +199,14 @@ MACHINE_CONFIG_START(exp85_state::exp85)
 	i8355.in_pa().set(FUNC(exp85_state::i8355_a_r));
 	i8355.out_pa().set(FUNC(exp85_state::i8355_a_w));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED));
 
 	RS232_PORT(config, "rs232", default_rs232_devices, "terminal").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256").set_extra_options("4K");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

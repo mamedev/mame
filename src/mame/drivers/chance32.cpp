@@ -41,6 +41,14 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void chance32(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	DECLARE_WRITE8_MEMBER(chance32_fgram_w)
 	{
 		m_fgram[offset] = data;
@@ -60,14 +68,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void chance32(machine_config &config);
 	void chance32_map(address_map &map);
 	void chance32_portmap(address_map &map);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
@@ -178,7 +180,6 @@ WRITE8_MEMBER(chance32_state::muxout_w)
 
 */
 	if (data & 1)   // bit 0 is the mux selector.
-
 	{
 		m_lamps[0] = BIT(data, 1);  /* Lamp 0 - Small / Big */
 		m_lamps[1] = BIT(data, 2);  /* Lamp 1 - Big / Small */
@@ -457,40 +458,38 @@ void chance32_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(chance32_state::chance32)
-
+void chance32_state::chance32(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(chance32_map)
-	MCFG_DEVICE_IO_MAP(chance32_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chance32_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 12000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &chance32_state::chance32_map);
+	m_maincpu->set_addrmap(AS_IO, &chance32_state::chance32_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(chance32_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(52.786)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*16, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 35*16-1, 0, 29*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(chance32_state, screen_update_chance32)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(52.786);
+//  screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*16, 32*8);
+	screen.set_visarea(0, 35*16-1, 0, 29*8-1);
+	screen.set_screen_update(FUNC(chance32_state::screen_update_chance32));
+	screen.set_palette("palette");
 
 	h46505_device &crtc(H46505(config, "crtc", 12000000/16));   /* 52.786 Hz (similar to Major Poker) */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(16);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chance32)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_chance32);
+	PALETTE(config, "palette").set_format(palette_device::xGRB_555, 0x800);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	/* clock at 1050 kHz match the 8000 Hz samples stored inside the ROM */
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+}
 
 
 ROM_START( chance32 )

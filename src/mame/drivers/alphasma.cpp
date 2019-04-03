@@ -41,7 +41,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
 
 protected:
-	required_device<cpu_device> m_maincpu;
+	required_device<mc68hc11_cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc0;
 	required_device<hd44780_device> m_lcdc1;
 	required_device<nvram_device> m_nvram;
@@ -52,7 +52,7 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(alphasmart);
+	void alphasmart_palette(palette_device &palette) const;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(kb_r);
@@ -398,7 +398,7 @@ static INPUT_PORTS_START( alphasmart )
 	PORT_CONFSETTING (0x01, DEF_STR(Normal))
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(alphasmart_state, alphasmart)
+void alphasmart_state::alphasmart_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -431,40 +431,40 @@ void alphasmart_state::machine_reset()
 	m_port_d = 0;
 }
 
-MACHINE_CONFIG_START(alphasmart_state::alphasmart)
+void alphasmart_state::alphasmart(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC68HC11, XTAL(8'000'000)/2)  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
-	MCFG_DEVICE_PROGRAM_MAP(alphasmart_mem)
-	MCFG_DEVICE_IO_MAP(alphasmart_io)
-	MCFG_MC68HC11_CONFIG(0, 192, 0x00)
+	MC68HC11(config, m_maincpu, XTAL(8'000'000)/2);  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
+	m_maincpu->set_addrmap(AS_PROGRAM, &alphasmart_state::alphasmart_mem);
+	m_maincpu->set_addrmap(AS_IO, &alphasmart_state::alphasmart_io);
+	m_maincpu->set_config(0, 192, 0x00);
 
-	MCFG_KS0066_F05_ADD("ks0066_0")
-	MCFG_HD44780_LCD_SIZE(2, 40)
-	MCFG_KS0066_F05_ADD("ks0066_1")
-	MCFG_HD44780_LCD_SIZE(2, 40)
+	KS0066_F05(config, m_lcdc0, 0);
+	m_lcdc0->set_lcd_size(2, 40);
+	KS0066_F05(config, m_lcdc1, 0);
+	m_lcdc1->set_lcd_size(2, 40);
 
 	RAM(config, RAM_TAG).set_default_size("128K");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(alphasmart_state, screen_update)
-	MCFG_SCREEN_SIZE(6*40, 9*4)
-	MCFG_SCREEN_VISIBLE_AREA(0, (6*40)-1, 0, (9*4)-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(alphasmart_state::screen_update));
+	screen.set_size(6*40, 9*4);
+	screen.set_visarea_full();
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(alphasmart_state, alphasmart)
+	PALETTE(config, "palette", FUNC(alphasmart_state::alphasmart_palette), 2);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(asma2k_state::asma2k)
+void asma2k_state::asma2k(machine_config &config)
+{
 	alphasmart(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(asma2k_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &asma2k_state::asma2k_mem);
+}
 
 /* ROM definition */
 ROM_START( asmapro )

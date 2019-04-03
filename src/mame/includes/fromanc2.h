@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi, Uki
+#ifndef MAME_INCLUDES_FROMANC2_H
+#define MAME_INCLUDES_FROMANC2_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/eepromser.h"
@@ -20,7 +24,8 @@ public:
 		m_rpalette(*this, "rpalette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_uart(*this, "uart") { }
+		m_uart(*this, "uart")
+	{ }
 
 	void fromanc2(machine_config &config);
 	void fromancr(machine_config &config);
@@ -122,3 +127,5 @@ private:
 	void fromanc4_main_map(address_map &map);
 	void fromancr_main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_FROMANC2_H

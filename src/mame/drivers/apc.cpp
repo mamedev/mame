@@ -74,8 +74,8 @@
 class apc_state : public driver_device
 {
 public:
-	apc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	apc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_hgdc1(*this, "upd7220_chr"),
 		m_hgdc2(*this, "upd7220_btm"),
@@ -344,9 +344,9 @@ READ8_MEMBER(apc_state::apc_gdc_r)
 	uint8_t res;
 
 	if(offset & 1)
-		res = m_hgdc2->read(space, (offset & 2) >> 1); // upd7220 bitmap port
+		res = m_hgdc2->read((offset & 2) >> 1); // upd7220 bitmap port
 	else
-		res = m_hgdc1->read(space, (offset & 2) >> 1); // upd7220 character port
+		res = m_hgdc1->read((offset & 2) >> 1); // upd7220 character port
 
 	return res;
 }
@@ -354,9 +354,9 @@ READ8_MEMBER(apc_state::apc_gdc_r)
 WRITE8_MEMBER(apc_state::apc_gdc_w)
 {
 	if(offset & 1)
-		m_hgdc2->write(space, (offset & 2) >> 1,data); // upd7220 bitmap port
+		m_hgdc2->write((offset & 2) >> 1,data); // upd7220 bitmap port
 	else
-		m_hgdc1->write(space, (offset & 2) >> 1,data); // upd7220 character port
+		m_hgdc1->write((offset & 2) >> 1,data); // upd7220 character port
 }
 
 READ8_MEMBER(apc_state::apc_kbd_r)
@@ -416,12 +416,12 @@ CH3_EXA ==      0X3E                      ; CH-3 extended address (W)
 
 READ8_MEMBER(apc_state::apc_dma_r)
 {
-	return m_dmac->read(space, bitswap<8>(offset,7,6,5,4,2,1,0,3), 0xff);
+	return m_dmac->read(bitswap<4>(offset,2,1,0,3));
 }
 
 WRITE8_MEMBER(apc_state::apc_dma_w)
 {
-	m_dmac->write(space, bitswap<8>(offset,7,6,5,4,2,1,0,3), data, 0xff);
+	m_dmac->write(bitswap<4>(offset,2,1,0,3), data);
 }
 
 WRITE8_MEMBER(apc_state::apc_irq_ack_w)
@@ -936,13 +936,13 @@ static void apc_floppies(device_slot_interface &device)
 	device.option_add("8", FLOPPY_8_DSDD);
 }
 
-MACHINE_CONFIG_START(apc_state::apc)
-
+void apc_state::apc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu,I8086,MAIN_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(apc_map)
-	MCFG_DEVICE_IO_MAP(apc_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	I8086(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apc_state::apc_map);
+	m_maincpu->set_addrmap(AS_IO, &apc_state::apc_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(MAIN_CLOCK); // heartbeat IRQ
@@ -974,12 +974,12 @@ MACHINE_CONFIG_START(apc_state::apc)
 	NVRAM(config, m_cmos, nvram_device::DEFAULT_ALL_1);
 	UPD1990A(config, m_rtc);
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(m_i8259_s, FUNC(pic8259_device::ir4_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
-	MCFG_FLOPPY_DRIVE_ADD(m_fdc_connector[0], apc_floppies, "8", apc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(m_fdc_connector[1], apc_floppies, "8", apc_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("disk_list","apc")
+	FLOPPY_CONNECTOR(config, m_fdc_connector[0], apc_floppies, "8", apc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fdc_connector[1], apc_floppies, "8", apc_floppy_formats);
+	SOFTWARE_LIST(config, "disk_list").set_original("apc");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -989,23 +989,22 @@ MACHINE_CONFIG_START(apc_state::apc)
 	m_screen->set_size(640, 494);
 	m_screen->set_visarea(0*8, 640-1, 0*8, 494-1);
 
-	MCFG_PALETTE_ADD_3BIT_BRG(m_palette)
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_apc)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apc);
 
 	UPD7220(config, m_hgdc1, 3579545); // unk clock
 	m_hgdc1->set_addrmap(0, &apc_state::upd7220_1_map);
-	m_hgdc1->set_draw_text_callback(FUNC(apc_state::hgdc_draw_text), this);
+	m_hgdc1->set_draw_text(FUNC(apc_state::hgdc_draw_text));
 
 	UPD7220(config, m_hgdc2, 3579545); // unk clock
 	m_hgdc2->set_addrmap(0, &apc_state::upd7220_2_map);
-	m_hgdc2->set_display_pixels_callback(FUNC(apc_state::hgdc_display_pixels), this);
+	m_hgdc2->set_display_pixels(FUNC(apc_state::hgdc_display_pixels));
 
 	/* sound hardware */
 	SPEAKER(config, m_speaker).front_center();
-	MCFG_DEVICE_ADD(m_sound, UPD1771C, MAIN_CLOCK) //uPD1771C-006
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	UPD1771C(config, m_sound, MAIN_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.00); //uPD1771C-006
+}
 
 
 /***************************************************************************

@@ -264,16 +264,6 @@ struct mips3_tlb_entry {
 
 #define MIPS3_MAX_TLB_ENTRIES       48
 
-#define MCFG_MIPS3_ICACHE_SIZE(_size) \
-	downcast<mips3_device &>(*device).set_icache_size(_size);
-
-#define MCFG_MIPS3_DCACHE_SIZE(_size) \
-	downcast<mips3_device &>(*device).set_dcache_size(_size);
-
-#define MCFG_MIPS3_SYSTEM_CLOCK(_clock) \
-	downcast<mips3_device &>(*device).set_system_clock(_clock);
-
-
 class mips3_frontend;
 
 class mips3_device : public cpu_device, public device_vtlb_interface {
@@ -307,6 +297,7 @@ public:
 
 	void set_icache_size(size_t icache_size) { c_icache_size = icache_size; }
 	void set_dcache_size(size_t dcache_size) { c_dcache_size = dcache_size; }
+	void set_secondary_cache_line_size(uint8_t secondary_cache_line_size) { c_secondary_cache_line_size = secondary_cache_line_size; }
 	void set_system_clock(uint32_t system_clock) { c_system_clock = system_clock; }
 
 	TIMER_CALLBACK_MEMBER(compare_int_callback);
@@ -446,11 +437,13 @@ protected:
 	bool            m_bigendian;
 	uint32_t        m_byte_xor;
 	uint32_t        m_word_xor;
+	uint32_t        m_dword_xor;
 	data_accessors  m_memory;
 
 	/* cache memory */
 	size_t          c_icache_size;
 	size_t          c_dcache_size;
+	uint8_t         c_secondary_cache_line_size;
 
 	/* MMU */
 	mips3_tlb_entry m_tlb[MIPS3_MAX_TLB_ENTRIES];

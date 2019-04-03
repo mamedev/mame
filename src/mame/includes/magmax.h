@@ -67,7 +67,7 @@ private:
 	DECLARE_WRITE8_MEMBER(ay8910_portB_0_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portA_0_w);
 
-	DECLARE_PALETTE_INIT(magmax);
+	void magmax_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 

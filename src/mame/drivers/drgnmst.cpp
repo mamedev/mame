@@ -23,7 +23,7 @@ PCB Layout
                                      TPC1020
 DSW1 62256   62256                   (PLCC84)
     DM1000A DM1000B
-DSW2    68000      TPC1020           62256
+DSW2  MC68000P12   TPC1020           62256
                    (PLCC84)          62256
 12MHz 32MHz
 
@@ -32,7 +32,7 @@ Notes:
           *: Unknown PLCC84 chip (surface scratched)
       VSync: 60Hz
       HSync: 15.625kHz
-  68K clock: 16MHz
+  68K clock: 12MHz
 
 */
 
@@ -77,8 +77,8 @@ READ8_MEMBER(drgnmst_state::snd_command_r)
 
 	switch (m_oki_control & 0x1f)
 	{
-		case 0x12:  data = (m_oki[1]->read(space, 0) & 0x0f); break;
-		case 0x16:  data = (m_oki[0]->read(space, 0) & 0x0f); break;
+		case 0x12:  data = (m_oki[1]->read() & 0x0f); break;
+		case 0x16:  data = (m_oki[0]->read() & 0x0f); break;
 		case 0x0b:
 		case 0x0f:  data = m_snd_command; break;
 		default:    break;
@@ -160,17 +160,17 @@ WRITE8_MEMBER(drgnmst_state::snd_control_w)
 
 	switch (m_oki_control & 0x1f)
 	{
-		case 0x11:
+	case 0x11:
 //                  logerror("Writing %02x to OKI1", m_oki_command);
 //                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n", m_oki_control, m_snd_command, m_oki_bank[0], m_oki_bank[1]);
-					m_oki[1]->write(space, 0, m_oki_command);
-					break;
-		case 0x15:
+		m_oki[1]->write(m_oki_command);
+		break;
+	case 0x15:
 //                  logerror("Writing %02x to OKI0", m_oki_command);
 //                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n", m_oki_control, m_snd_command, m_oki_bank[0], m_oki_bank[1]);
-					m_oki[0]->write(space, 0, m_oki_command);
-					break;
-		default:    break;
+		m_oki[0]->write(m_oki_command);
+		break;
+	default:    break;
 	}
 }
 
@@ -373,43 +373,42 @@ void drgnmst_state::machine_reset()
 	m_oki_bank[0] = 0;
 }
 
-MACHINE_CONFIG_START(drgnmst_state::drgnmst)
+void drgnmst_state::drgnmst(machine_config &config)
+{
+	M68000(config, m_maincpu, 12_MHz_XTAL); /* Confirmed */
+	m_maincpu->set_addrmap(AS_PROGRAM, &drgnmst_state::drgnmst_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(drgnmst_state::irq2_line_hold));
 
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000) /* Confirmed */
-	MCFG_DEVICE_PROGRAM_MAP(drgnmst_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", drgnmst_state,  irq2_line_hold)
+	PIC16C55(config, m_audiocpu, 32_MHz_XTAL / 8);  /* 4MHz - Confirmed */
+	m_audiocpu->read_a().set(FUNC(drgnmst_state::pic16c5x_port0_r));
+	m_audiocpu->write_a().set(FUNC(drgnmst_state::pcm_banksel_w));
+	m_audiocpu->read_b().set(FUNC(drgnmst_state::snd_command_r));
+	m_audiocpu->write_b().set(FUNC(drgnmst_state::oki_w));
+	m_audiocpu->read_c().set(FUNC(drgnmst_state::snd_flag_r));
+	m_audiocpu->write_c().set(FUNC(drgnmst_state::snd_control_w));
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C55, 32000000/8)  /* Confirmed */
-	MCFG_PIC16C5x_READ_A_CB(READ8(*this, drgnmst_state, pic16c5x_port0_r))
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, drgnmst_state, pcm_banksel_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(*this, drgnmst_state, snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, drgnmst_state, oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(*this, drgnmst_state, snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, drgnmst_state, snd_control_w))
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_drgnmst);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drgnmst)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, 56*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(drgnmst_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(drgnmst_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_FORMAT_CLASS(2, drgnmst_state, drgnmst_IIIIRRRRGGGGBBBB)
+	PALETTE(config, m_palette).set_format(2, &drgnmst_state::drgnmst_IIIIRRRRGGGGBBBB, 0x2000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32000000/32, okim6295_device::PIN7_HIGH)
-	MCFG_DEVICE_ADDRESS_MAP(0, drgnmst_oki1_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	OKIM6295(config, m_oki[0], 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH);
+	m_oki[0]->set_addrmap(0, &drgnmst_state::drgnmst_oki1_map);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 32000000/32, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
 ROM_START( drgnmst )
@@ -558,7 +557,7 @@ void drgnmst_state::init_drgnmst()
 			data_lo = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + 3]));
 			data |= (data_hi << 12) | (data_lo << 8);
 
-			m_audiocpu->pic16c5x_set_config(data);
+			m_audiocpu->set_config(data);
 
 			src_pos = 0x7fff;       /* Force Exit */
 		}

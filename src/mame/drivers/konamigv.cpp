@@ -349,35 +349,33 @@ void simpbowl_state::machine_start()
 
 void konamigv_state::cdrom_config(device_t *device)
 {
+	device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
+	device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
 }
 
-MACHINE_CONFIG_START(konamigv_state::konamigv)
+void konamigv_state::konamigv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", CXD8530BQ, XTAL(67'737'600) )
-	MCFG_DEVICE_PROGRAM_MAP( konamigv_map )
+	CXD8530BQ(config, m_maincpu, XTAL(67'737'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &konamigv_state::konamigv_map);
+	m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&konamigv_state::scsi_dma_read, this));
+	m_maincpu->subdevice<psxdma_device>("dma")->install_write_handler(5, psxdma_device::write_delegate(&konamigv_state::scsi_dma_write, this));
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("2M");
 
-	subdevice<ram_device>("maincpu:ram")->set_default_size("2M");
-
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&konamigv_state::scsi_dma_read, this ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&konamigv_state::scsi_dma_write, this ) )
-
-	MCFG_DEVICE_ADD("mb89371", MB89371, 0)
+	MB89371(config, "mb89371", 0);
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_4)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
+	scsi.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
+	scsi.slot(1).set_option_machine_config("cdrom", cdrom_config);
 
 	AM53CF96(config, m_am53cf96, 0);
 	m_am53cf96->set_scsi_port("scsi");
 	m_am53cf96->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8514Q, 0x100000, XTAL(53'693'175) )
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CXD8514Q(config, "gpu", XTAL(53'693'175), 0x100000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
@@ -385,10 +383,10 @@ MACHINE_CONFIG_START(konamigv_state::konamigv)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.75 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.75 )
-MACHINE_CONFIG_END
+	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu")));
+	spu.add_route(0, "lspeaker", 0.75);
+	spu.add_route(1, "rspeaker", 0.75);
+}
 
 
 static INPUT_PORTS_START( konamigv )
@@ -468,8 +466,8 @@ READ16_MEMBER(simpbowl_state::flash_r)
 	{
 		int chip = (m_flash_address >= 0x200000) ? 2 : 0;
 
-		int ret = ( m_flash8[chip]->read(space, m_flash_address & 0x1fffff) & 0xff ) |
-			( m_flash8[chip+1]->read(space, m_flash_address & 0x1fffff) << 8 );
+		int ret = ( m_flash8[chip]->read(m_flash_address & 0x1fffff) & 0xff ) |
+			( m_flash8[chip+1]->read(m_flash_address & 0x1fffff) << 8 );
 
 		m_flash_address++;
 
@@ -487,8 +485,8 @@ WRITE16_MEMBER(simpbowl_state::flash_w)
 	{
 		case 0:
 			chip = (m_flash_address >= 0x200000) ? 2 : 0;
-			m_flash8[chip]->write(space, m_flash_address & 0x1fffff, data&0xff);
-			m_flash8[chip+1]->write(space, m_flash_address & 0x1fffff, (data>>8)&0xff);
+			m_flash8[chip]->write(m_flash_address & 0x1fffff, data&0xff);
+			m_flash8[chip+1]->write(m_flash_address & 0x1fffff, (data>>8)&0xff);
 			break;
 
 		case 1:
@@ -508,10 +506,10 @@ WRITE16_MEMBER(simpbowl_state::flash_w)
 	}
 }
 
-MACHINE_CONFIG_START(simpbowl_state::simpbowl)
+void simpbowl_state::simpbowl(machine_config &config)
+{
 	konamigv(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( simpbowl_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &simpbowl_state::simpbowl_map);
 
 	FUJITSU_29F016A(config, "flash0");
 	FUJITSU_29F016A(config, "flash1");
@@ -521,7 +519,7 @@ MACHINE_CONFIG_START(simpbowl_state::simpbowl)
 	upd4701_device &upd(UPD4701A(config, "upd"));
 	upd.set_portx_tag("TRACK0_X");
 	upd.set_porty_tag("TRACK0_Y");
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( simpbowl )
 	PORT_INCLUDE( konamigv )
@@ -548,10 +546,10 @@ WRITE16_MEMBER(konamigv_state::btc_trackball_w)
 	}
 }
 
-MACHINE_CONFIG_START(konamigv_state::btchamp)
+void konamigv_state::btchamp(machine_config &config)
+{
 	konamigv(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( btchamp_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &konamigv_state::btchamp_map);
 
 	SHARP_LH28F400(config, "flash");
 
@@ -562,7 +560,7 @@ MACHINE_CONFIG_START(konamigv_state::btchamp)
 	UPD4701A(config, m_btc_trackball[1]);
 	m_btc_trackball[1]->set_portx_tag("TRACK1_X");
 	m_btc_trackball[1]->set_porty_tag("TRACK1_Y");
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( btchamp )
 	PORT_INCLUDE( konamigv )
@@ -606,11 +604,11 @@ WRITE16_MEMBER(konamigv_state::tokimeki_serial_w)
 
 }
 
-MACHINE_CONFIG_START(konamigv_state::tmosh)
+void konamigv_state::tmosh(machine_config &config)
+{
 	konamigv(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( tmosh_map )
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &konamigv_state::tmosh_map);
+}
 
 /*
 Dead Eye
@@ -622,13 +620,13 @@ CD:
     A01
 */
 
-MACHINE_CONFIG_START(konamigv_state::kdeadeye)
+void konamigv_state::kdeadeye(machine_config &config)
+{
 	konamigv(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( kdeadeye_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &konamigv_state::kdeadeye_map);
 
 	SHARP_LH28F400(config, "flash");
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( kdeadeye )
 	PORT_INCLUDE( konamigv )

@@ -2,6 +2,7 @@ version: 1.0.{build}
 image:
   - Visual Studio 2017
   - Visual Studio 2017 Preview
+  - Visual Studio 2019 Preview
   - Previous Visual Studio 2017
 
 shallow_clone: true

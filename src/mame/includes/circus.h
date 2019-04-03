@@ -35,7 +35,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
-	required_device<discrete_device> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 

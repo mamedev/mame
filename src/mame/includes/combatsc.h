@@ -111,10 +111,10 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(combatsc);
 	DECLARE_VIDEO_START(combatsc);
-	DECLARE_PALETTE_INIT(combatsc);
+	void combatsc_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(combatscb);
 	DECLARE_VIDEO_START(combatscb);
-	DECLARE_PALETTE_INIT(combatscb);
+	void combatscb_palette(palette_device &palette) const;
 	uint32_t screen_update_combatsc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_combatscb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int circuit, bitmap_ind8 &priority_bitmap, uint32_t pri_mask );

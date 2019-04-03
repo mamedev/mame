@@ -314,15 +314,6 @@ static INPUT_PORTS_START( pow3000 )
 INPUT_PORTS_END
 
 
-/* Palette Initialization */
-
-PALETTE_INIT_MEMBER(zx_state, zx)
-{
-	palette.set_pen_color(0, rgb_t::white());
-	palette.set_pen_color(1, rgb_t::black());
-}
-
-
 /* Machine Configs */
 
 void zx_state::zx80(machine_config &config)
@@ -341,8 +332,7 @@ void zx_state::zx80(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->set_screen_update(FUNC(zx_state::screen_update));
 
-	palette_device &palette(PALETTE(config, "palette", 2));
-	palette.set_init(palette_init_delegate(FUNC(zx_state::palette_init_zx), this));
+	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(zx80_o_format);

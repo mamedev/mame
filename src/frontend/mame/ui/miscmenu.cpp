@@ -663,25 +663,40 @@ void menu_export::populate(float &customtop, float &custombottom)
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_machine_configure::menu_machine_configure(mame_ui_manager &mui, render_container &container, const game_driver *prev, float _x0, float _y0)
+menu_machine_configure::menu_machine_configure(
+		mame_ui_manager &mui,
+		render_container &container,
+		game_driver const &drv,
+		std::function<void (bool, bool)> &&handler,
+		float x0, float y0)
 	: menu(mui, container)
-	, m_drv(prev)
-	, x0(_x0)
-	, y0(_y0)
+	, m_handler(std::move(handler))
+	, m_drv(drv)
+	, m_x0(x0)
+	, m_y0(y0)
 	, m_curbios(0)
-	, m_fav_reset(false)
+	, m_was_favorite(mame_machine_manager::instance()->favorite().is_favorite_system(drv))
+	, m_want_favorite(m_was_favorite)
 {
 	// parse the INI file
 	std::ostringstream error;
 	osd_setup_osd_specific_emu_options(m_opts);
-	mame_options::parse_standard_inis(m_opts, error, m_drv);
+	mame_options::parse_standard_inis(m_opts, error, &m_drv);
 	setup_bios();
 }
 
 menu_machine_configure::~menu_machine_configure()
 {
-	if (m_fav_reset)
-		reset_topmost(reset_options::SELECT_FIRST);
+	if (m_was_favorite != m_want_favorite)
+	{
+		if (m_want_favorite)
+			mame_machine_manager::instance()->favorite().add_favorite_system(m_drv);
+		else
+			mame_machine_manager::instance()->favorite().remove_favorite_system(m_drv);
+	}
+
+	if (m_handler)
+		m_handler(m_want_favorite, m_was_favorite != m_want_favorite);
 }
 
 //-------------------------------------------------
@@ -692,16 +707,16 @@ void menu_machine_configure::handle()
 {
 	// process the menu
 	process_parent();
-	const event *menu_event = process(PROCESS_NOIMAGE, x0, y0);
+	const event *menu_event = process(PROCESS_NOIMAGE, m_x0, m_y0);
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		if (menu_event->iptkey == IPT_UI_SELECT)
 		{
 			switch ((uintptr_t)menu_event->itemref)
 			{
-				case SAVE:
+			case SAVE:
 				{
-					std::string filename(m_drv->name);
+					std::string filename(m_drv.name);
 					emu_file file(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
 					osd_file::error filerr = file.open(filename.c_str(), ".ini");
 					if (filerr == osd_file::error::NONE)
@@ -710,36 +725,30 @@ void menu_machine_configure::handle()
 						file.puts(inistring.c_str());
 						ui().popup_time(2, "%s", _("\n    Configuration saved    \n\n"));
 					}
-					break;
 				}
-				case ADDFAV:
-					mame_machine_manager::instance()->favorite().add_favorite_game(m_drv);
-					reset(reset_options::REMEMBER_POSITION);
-					break;
-				case DELFAV:
-					mame_machine_manager::instance()->favorite().remove_favorite_game();
-					if (main_filters::actual == machine_filter::FAVORITE)
-					{
-						m_fav_reset = true;
-						menu::stack_pop();
-					}
-					else
-						reset(reset_options::REMEMBER_POSITION);
-					break;
-				case CONTROLLER:
-					if (menu_event->iptkey == IPT_UI_SELECT)
-						menu::stack_push<submenu>(ui(), container(), submenu::control_options, m_drv, &m_opts);
-					break;
-				case VIDEO:
-					if (menu_event->iptkey == IPT_UI_SELECT)
-						menu::stack_push<submenu>(ui(), container(), submenu::video_options, m_drv, &m_opts);
-					break;
-				case ADVANCED:
-					if (menu_event->iptkey == IPT_UI_SELECT)
-						menu::stack_push<submenu>(ui(), container(), submenu::advanced_options, m_drv, &m_opts);
-					break;
-				default:
-					break;
+				break;
+			case ADDFAV:
+				m_want_favorite = true;
+				reset(reset_options::REMEMBER_POSITION);
+				break;
+			case DELFAV:
+				m_want_favorite = false;
+				reset(reset_options::REMEMBER_POSITION);
+				break;
+			case CONTROLLER:
+				if (menu_event->iptkey == IPT_UI_SELECT)
+					menu::stack_push<submenu>(ui(), container(), submenu::control_options, &m_drv, &m_opts);
+				break;
+			case VIDEO:
+				if (menu_event->iptkey == IPT_UI_SELECT)
+					menu::stack_push<submenu>(ui(), container(), submenu::video_options, &m_drv, &m_opts);
+				break;
+			case ADVANCED:
+				if (menu_event->iptkey == IPT_UI_SELECT)
+					menu::stack_push<submenu>(ui(), container(), submenu::advanced_options, &m_drv, &m_opts);
+				break;
+			default:
+				break;
 			}
 		}
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
@@ -773,7 +782,7 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 	item_append(_(submenu::control_options[0].description), "", 0, (void *)(uintptr_t)CONTROLLER);
 	item_append(menu_item_type::SEPARATOR);
 
-	if (!mame_machine_manager::instance()->favorite().isgame_favorite(m_drv))
+	if (!m_want_favorite)
 		item_append(_("Add To Favorites"), "", 0, (void *)ADDFAV);
 	else
 		item_append(_("Remove From Favorites"), "", 0, (void *)DELFAV);
@@ -790,7 +799,7 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 
 void menu_machine_configure::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	char const *const text[] = { _("Configure machine:"), m_drv->type.fullname() };
+	char const *const text[] = { _("Configure machine:"), m_drv.type.fullname() };
 	draw_text_box(
 			std::begin(text), std::end(text),
 			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
@@ -800,19 +809,19 @@ void menu_machine_configure::custom_render(void *selectedref, float top, float b
 
 void menu_machine_configure::setup_bios()
 {
-	if (m_drv->rom == nullptr)
+	if (!m_drv.rom)
 		return;
 
 	std::string specbios(m_opts.bios());
 	char const *default_name(nullptr);
-	for (tiny_rom_entry const *rom = m_drv->rom; !ROMENTRY_ISEND(rom); ++rom)
+	for (tiny_rom_entry const *rom = m_drv.rom; !ROMENTRY_ISEND(rom); ++rom)
 	{
 		if (ROMENTRY_ISDEFAULT_BIOS(rom))
 			default_name = rom->name;
 	}
 
 	std::size_t bios_count = 0;
-	for (romload::system_bios const &bios : romload::entries(m_drv->rom).get_system_bioses())
+	for (romload::system_bios const &bios : romload::entries(m_drv.rom).get_system_bioses())
 	{
 		std::string name(bios.get_description());
 		u32 const bios_flags(bios.get_value());

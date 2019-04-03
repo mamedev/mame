@@ -122,7 +122,7 @@ private:
 	DECLARE_MACHINE_START(trackfld);
 	DECLARE_MACHINE_RESET(trackfld);
 	DECLARE_VIDEO_START(trackfld);
-	DECLARE_PALETTE_INIT(trackfld);
+	void trackfld_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(atlantol);
 	uint32_t screen_update_trackfld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);

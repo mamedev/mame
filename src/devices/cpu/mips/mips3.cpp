@@ -16,9 +16,10 @@
 #include "ps2vu.h"
 #include <cmath>
 
-#define ENABLE_OVERFLOWS        (0)
-#define ENABLE_EE_ELF_LOADER    (0)
-#define ENABLE_EE_DECI2         (0)
+#define ENABLE_OVERFLOWS            (0)
+#define ENABLE_EE_ELF_LOADER        (0)
+#define ENABLE_EE_DECI2             (0)
+#define DELAY_SLOT_EXCEPTION_HACK   (0)
 
 /***************************************************************************
     HELPER MACROS
@@ -160,13 +161,15 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	, m_pfnmask(flavor == MIPS3_TYPE_VR4300 ? 0x000fffff : 0x00ffffff)
 	, m_tlbentries(flavor == MIPS3_TYPE_VR4300 ? 32 : MIPS3_MAX_TLB_ENTRIES)
 	, m_bigendian(endianness == ENDIANNESS_BIG)
-	, m_byte_xor(m_bigendian ? BYTE4_XOR_BE(0) : BYTE4_XOR_LE(0))
-	, m_word_xor(m_bigendian ? WORD_XOR_BE(0) : WORD_XOR_LE(0))
+	, m_byte_xor(data_bits == 64 ? (m_bigendian ? BYTE8_XOR_BE(0) : BYTE8_XOR_LE(0)) : (m_bigendian ? BYTE4_XOR_BE(0) : BYTE4_XOR_LE(0)))
+	, m_word_xor(data_bits == 64 ? (m_bigendian ? WORD2_XOR_BE(0) : WORD2_XOR_LE(0)) : (m_bigendian ? WORD_XOR_BE(0) : WORD_XOR_LE(0)))
+	, m_dword_xor(data_bits == 64 ? (m_bigendian ? DWORD_XOR_BE(0) : DWORD_XOR_LE(0)) : 0)
 	, c_icache_size(0)
 	, c_dcache_size(0)
+	, c_secondary_cache_line_size(0)
 	, m_fastram_select(0)
 	, m_debugger_temp(0)
-	, m_drc_cache(DRC_CACHE_SIZE + sizeof(internal_mips3_state) + 0x80000)
+	, m_drc_cache(DRC_CACHE_SIZE + sizeof(internal_mips3_state) + 0x800000)
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
@@ -313,7 +316,11 @@ void mips3_device::generate_exception(int exception, int backup)
 	if (!(SR & SR_EXL))
 	{
 		/* if we were in a branch delay slot, adjust */
+#if DELAY_SLOT_EXCEPTION_HACK
+		if (((m_nextpc != ~0) || (m_delayslot)) && (m_ppc == m_core->pc - 4))
+#else
 		if ((m_nextpc != ~0) || (m_delayslot))
+#endif
 		{
 			m_delayslot = false;
 			m_nextpc = ~0;
@@ -336,6 +343,7 @@ void mips3_device::generate_exception(int exception, int backup)
     if ((CAUSE & 0x7f) == 0)
         logerror("Took interrupt -- Cause = %08X, PC =  %08X\n", (uint32_t)CAUSE, m_core->pc);
 */
+	debugger_exception_hook(exception);
 }
 
 
@@ -1233,7 +1241,7 @@ inline bool mips3_device::RWORD(offs_t address, uint32_t *result, bool insn)
 			{
 				continue;
 			}
-			*result = m_fastram[ramnum].offset_base32[tlbaddress >> 2];
+			*result = m_fastram[ramnum].offset_base32[(tlbaddress ^ m_dword_xor) >> 2];
 			return true;
 		}
 		*result = (*m_memory.read_dword)(*m_program, tlbaddress);
@@ -1403,7 +1411,7 @@ inline void mips3_device::WWORD(offs_t address, uint32_t data)
 			{
 				continue;
 			}
-			m_fastram[ramnum].offset_base32[tlbaddress >> 2] = data;
+			m_fastram[ramnum].offset_base32[(tlbaddress ^ m_dword_xor) >> 2] = data;
 			return;
 		}
 		(*m_memory.write_dword)(*m_program, tlbaddress, data);
@@ -1772,7 +1780,7 @@ inline void mips3_device::set_cop0_creg(int idx, uint64_t val)
 
 void mips3_device::handle_cop0(uint32_t op)
 {
-	if ((SR & SR_KSU_MASK) != SR_KSU_KERNEL && !(SR & SR_COP0))
+	if ((SR & SR_KSU_MASK) != SR_KSU_KERNEL && !(SR & SR_COP0) && !(SR & (SR_EXL | SR_ERL)))
 	{
 		m_badcop_value = 0;
 		generate_exception(EXCEPTION_BADCOP, 1);
@@ -1832,7 +1840,13 @@ void mips3_device::handle_cop0(uint32_t op)
 					break;
 
 				case 0x10:  /* RFE */   invalid_instruction(op);                            break;
-				case 0x18:  /* ERET */ m_core->pc = m_core->cpr[0][COP0_EPC]; SR &= ~SR_EXL; check_irqs(); m_lld_value ^= 0xffffffff; m_ll_value ^= 0xffffffff;  break;
+				case 0x18:  /* ERET */
+					m_core->pc = m_core->cpr[0][COP0_EPC];
+					SR &= ~SR_EXL;
+					check_irqs();
+					m_lld_value ^= 0xffffffff;
+					m_ll_value ^= 0xffffffff;
+					break;
 				case 0x20:  /* WAIT */                                                      break;
 				default:    handle_extra_cop0(op);                                          break;
 			}
@@ -3516,47 +3530,13 @@ void mips3_device::handle_special(uint32_t op)
 			m_core->icount -= 35;
 			break;
 		case 0x1c:  /* DMULT */
-		{
-			uint64_t a_hi = (uint32_t)(RSVAL64 >> 32);
-			uint64_t b_hi = (uint32_t)(RTVAL64 >> 32);
-			uint64_t a_lo = (uint32_t)RSVAL64;
-			uint64_t b_lo = (uint32_t)RTVAL64;
-			uint64_t p1 = a_lo * b_lo;
-			uint64_t p2 = a_hi * b_lo;
-			uint64_t p3 = a_lo * b_hi;
-			uint64_t p4 = a_hi * b_hi;
-			uint64_t carry = (uint32_t)(((p1 >> 32) + (uint32_t)p2 + (uint32_t)p3) >> 32);
-
-			LOVAL64 = p1 + (p2 << 32) + (p3 << 32);
-			HIVAL64 = p4 + (p2 >> 32) + (p3 >> 32) + carry;
-
-			// Adjust for sign
-			if (RSVAL64 < 0)
-				HIVAL64 -= RTVAL64;
-			if (RTVAL64 < 0)
-				HIVAL64 -= RSVAL64;
-
+			LOVAL64 = mul_64x64(RSVAL64, RTVAL64, reinterpret_cast<s64 *>(&HIVAL64));
 			m_core->icount -= 7;
 			break;
-		}
 		case 0x1d:  /* DMULTU */
-		{
-			uint64_t a_hi = (uint32_t)(RSVAL64 >> 32);
-			uint64_t b_hi = (uint32_t)(RTVAL64 >> 32);
-			uint64_t a_lo = (uint32_t)RSVAL64;
-			uint64_t b_lo = (uint32_t)RTVAL64;
-			uint64_t p1 = a_lo * b_lo;
-			uint64_t p2 = a_hi * b_lo;
-			uint64_t p3 = a_lo * b_hi;
-			uint64_t p4 = a_hi * b_hi;
-			uint64_t carry = (uint32_t)(((p1 >> 32) + (uint32_t)p2 + (uint32_t)p3) >> 32);
-
-			LOVAL64 = p1 + (p2 << 32) + (p3 << 32);
-			HIVAL64 = p4 + (p2 >> 32) + (p3 >> 32) + carry;
-
+			LOVAL64 = mulu_64x64(RSVAL64, RTVAL64, &HIVAL64);
 			m_core->icount -= 7;
 			break;
-		}
 		case 0x1e:  /* DDIV */
 			if (RTVAL64)
 			{
@@ -5500,7 +5480,7 @@ void mips3_device::load_elf()
 
 void r5000be_device::handle_cache(uint32_t op)
 {
-	if ((SR & SR_KSU_MASK) != SR_KSU_KERNEL && !(SR & SR_COP0))
+	if ((SR & SR_KSU_MASK) != SR_KSU_KERNEL && !(SR & SR_COP0) && !(SR & (SR_EXL | SR_ERL)))
 	{
 		m_badcop_value = 0;
 		generate_exception(EXCEPTION_BADCOP, 1);

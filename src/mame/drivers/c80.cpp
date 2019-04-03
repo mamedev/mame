@@ -254,7 +254,8 @@ void c80_state::machine_start()
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(c80_state::c80)
+void c80_state::c80(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 2500000); /* U880D */
 	m_maincpu->set_addrmap(AS_PROGRAM, &c80_state::c80_mem);
@@ -275,15 +276,15 @@ MACHINE_CONFIG_START(c80_state::c80)
 	z80pio_device& pio2(Z80PIO(config, Z80PIO2_TAG, XTAL(2500000)));
 	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED )
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("1K");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

@@ -608,142 +608,131 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_adc_cb)
 	m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(namcos11_state::coh110)
-	MCFG_DEVICE_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
-	MCFG_DEVICE_PROGRAM_MAP( namcos11_map )
-
-	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
+void namcos11_state::coh110(machine_config &config)
+{
+	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::namcos11_map);
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("c76", NAMCO_C76, 16934400)
-	MCFG_DEVICE_PROGRAM_MAP(c76_map)
-	MCFG_DEVICE_IO_MAP(c76_io_map)
-	/* TODO: irq generation for these */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq0", namcos11_state, mcu_irq0_cb, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namcos11_state, mcu_irq2_cb, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_adc", namcos11_state, mcu_adc_cb, attotime::from_hz(60))
+	NAMCO_C76(config, m_mcu, 16934400);
+	m_mcu->set_addrmap(AS_PROGRAM, &namcos11_state::c76_map);
+	m_mcu->set_addrmap(AS_IO, &namcos11_state::c76_io_map);
 
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
-	MCFG_VIDEO_SET_SCREEN("screen")
+	/* TODO: irq generation for these */
+	TIMER(config, "mcu_irq0").configure_periodic(FUNC(namcos11_state::mcu_irq0_cb), attotime::from_hz(60));
+	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namcos11_state::mcu_irq2_cb), attotime::from_hz(60));
+	TIMER(config, "mcu_adc").configure_periodic(FUNC(namcos11_state::mcu_adc_cb), attotime::from_hz(60));
+
+	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("c352", C352, 25401600, 288)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
-	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
+	c352_device &c352(C352(config, "c352", 25401600, 288));
+	c352.add_route(0, "lspeaker", 1.00);
+	c352.add_route(1, "rspeaker", 1.00);
+	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
+	//c352.add_route(3, "rspeaker", 1.00);
 
-	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
-MACHINE_CONFIG_END
+	AT28C16(config, "at28c16", 0);
+}
 
-MACHINE_CONFIG_START(namcos11_state::coh100)
+void namcos11_state::coh100(machine_config &config)
+{
 	coh110(config);
-	MCFG_DEVICE_REPLACE( "maincpu", CXD8530AQ, XTAL(67'737'600) )
-	MCFG_DEVICE_PROGRAM_MAP( namcos11_map )
+	CXD8530AQ(config.replace(), m_maincpu, XTAL(67'737'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::namcos11_map);
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
 
-	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
+	CXD8538Q(config.replace(), "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
+}
 
-	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8538Q, 0x200000, XTAL(53'693'175) )
-	MCFG_VIDEO_SET_SCREEN("screen")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::tekken)
+void namcos11_state::tekken(machine_config &config)
+{
 	coh100(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
-
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
 	// TODO: either allow optional devices in memory maps, add another memory map without keycus or add a dummy keycus for tekken
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
-MACHINE_CONFIG_END
+	KEYCUS_C406(config, "keycus", 0);
+}
 
-MACHINE_CONFIG_START(namcos11_state::tekken2o)
+void namcos11_state::tekken2o(machine_config &config)
+{
 	coh100(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
+	KEYCUS_C406(config, "keycus", 0);
+}
 
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::tekken2)
+void namcos11_state::tekken2(machine_config &config)
+{
 	coh110(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
+	KEYCUS_C406(config, "keycus", 0);
+}
 
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::souledge)
+void namcos11_state::souledge(machine_config &config)
+{
 	coh110(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
+	KEYCUS_C409(config, "keycus", 0);
+}
 
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C409, 0 )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::dunkmnia)
+void namcos11_state::dunkmnia(machine_config &config)
+{
 	coh110(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
+	KEYCUS_C410(config, "keycus", 0);
+}
 
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C410, 0 )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::primglex)
+void namcos11_state::primglex(machine_config &config)
+{
 	coh110(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
+	KEYCUS_C411(config, "keycus", 0);
+}
 
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C411, 0 )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::xevi3dg)
+void namcos11_state::xevi3dg(machine_config &config)
+{
 	coh110(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
+	KEYCUS_C430(config, "keycus", 0);
+}
 
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C430, 0 )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::danceyes)
+void namcos11_state::danceyes(machine_config &config)
+{
 	coh110(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
+	KEYCUS_C431(config, "keycus", 0);
+}
 
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C431, 0 )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::pocketrc)
+void namcos11_state::pocketrc(machine_config &config)
+{
 	coh110(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
+	KEYCUS_C432(config, "keycus", 0);
+}
 
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C432, 0 )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::starswep)
+void namcos11_state::starswep(machine_config &config)
+{
 	coh110(config);
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C442, 0 )
-MACHINE_CONFIG_END
+	KEYCUS_C442(config, "keycus", 0);
+}
 
-MACHINE_CONFIG_START(namcos11_state::myangel3)
+void namcos11_state::myangel3(machine_config &config)
+{
 	coh110(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( rom8_64_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_64_map);
+	KEYCUS_C443(config, "keycus", 0);
+}
 
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C443, 0 )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::ptblank2ua)
+void namcos11_state::ptblank2ua(machine_config &config)
+{
 	coh110(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( ptblank2ua_map )
-
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C443, 0 )
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::ptblank2ua_map);
+	KEYCUS_C443(config, "keycus", 0);
+}
 
 static INPUT_PORTS_START( namcos11 )
 	PORT_START( "SWITCH" )

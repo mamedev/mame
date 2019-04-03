@@ -56,7 +56,7 @@
 
 ***************************************************************************/
 
-static const res_net_decode_info skyfox_decode_info =
+static constexpr res_net_decode_info skyfox_decode_info =
 {
 	1,
 	0, 255, // start/end
@@ -66,7 +66,7 @@ static const res_net_decode_info skyfox_decode_info =
 	{  0xf,   0xf,   0xf,   }  // masks
 };
 
-static const res_net_info skyfox_net_info =
+static constexpr res_net_info skyfox_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_TTL_OUT,
 	{
@@ -76,19 +76,17 @@ static const res_net_info skyfox_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER(skyfox_state, skyfox)
+void skyfox_state::skyfox_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, skyfox_decode_info, skyfox_net_info);
 	palette.set_pen_colors(0, rgb);
 
-	/* Grey scale for the background??? is wrong */
+	// Grey scale for the background??? is wrong
 	for (int i = 0; i < 256; i++)
-	{
 		palette.set_pen_color(i + 256, rgb_t(i, i, i));
-	}
 }
 
 

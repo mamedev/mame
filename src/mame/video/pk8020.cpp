@@ -45,10 +45,8 @@ uint32_t pk8020_state::screen_update_pk8020(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(pk8020_state, pk8020)
+void pk8020_state::pk8020_palette(palette_device &palette) const
 {
-	int i;
-	for(i=0;i<16;i++) {
-		m_palette->set_pen_color( i, rgb_t(i*0x10,i*0x10,i*0x10) );
-	}
+	for (int i = 0; i < 16; i++)
+		palette.set_pen_color(i, rgb_t(i * 0x10, i * 0x10, i * 0x10)); // FIXME: if this is supposed to be a 4-bit ramp it should be 0x11, not 0x10
 }

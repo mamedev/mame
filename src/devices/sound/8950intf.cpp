@@ -138,20 +138,20 @@ void y8950_device::rom_bank_updated()
 }
 
 
-READ8_MEMBER( y8950_device::read )
+u8 y8950_device::read(offs_t offset)
 {
 	return y8950_read(m_chip, offset & 1);
 }
 
-WRITE8_MEMBER( y8950_device::write )
+void y8950_device::write(offs_t offset, u8 data)
 {
 	y8950_write(m_chip, offset & 1, data);
 }
 
-READ8_MEMBER( y8950_device::status_port_r ) { return read(space, 0); }
-READ8_MEMBER( y8950_device::read_port_r ) { return read(space, 1); }
-WRITE8_MEMBER( y8950_device::control_port_w ) { write(space, 0, data); }
-WRITE8_MEMBER( y8950_device::write_port_w ) { write(space, 1, data); }
+u8 y8950_device::status_port_r() { return read(0); }
+u8 y8950_device::read_port_r() { return read(1); }
+void y8950_device::control_port_w(u8 data) { write(0, data); }
+void y8950_device::write_port_w(u8 data) { write(1, data); }
 
 
 DEFINE_DEVICE_TYPE(Y8950, y8950_device, "y8950", "Y8950 MSX-Audio")

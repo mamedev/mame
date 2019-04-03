@@ -5,12 +5,16 @@
 
 #include "naomibd.h"
 
-#define MCFG_NAOMI_ROM_BOARD_ADD(_tag, _eeprom_tag, _irq_cb) \
-	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_ROM_BOARD, _eeprom_tag, _irq_cb)
-
 class naomi_rom_board : public naomi_board
 {
 public:
+	template <typename T>
+	naomi_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&eeprom_tag)
+		: naomi_rom_board(mconfig, tag, owner, clock)
+	{
+		eeprom.set_tag(std::forward<T>(eeprom_tag));
+	}
+
 	naomi_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:

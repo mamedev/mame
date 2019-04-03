@@ -5,9 +5,10 @@
  * includes/tx0.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_TX0_H
 #define MAME_INCLUDES_TX0_H
+
+#pragma once
 
 #include "video/crt.h"
 #include "cpu/pdp1/tx0.h"
@@ -133,8 +134,8 @@ struct magtape_t
 class tx0_state : public driver_device
 {
 public:
-	tx0_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tx0_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -171,7 +172,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(tx0);
+	void tx0_palette(palette_device &palette) const;
 	uint32_t screen_update_tx0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_tx0);
 	INTERRUPT_GEN_MEMBER(tx0_interrupt);

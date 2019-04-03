@@ -69,8 +69,8 @@
 class mmagic_state : public driver_device
 {
 public:
-	mmagic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mmagic_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -82,7 +82,7 @@ public:
 		m_ball_y(0x00),
 		m_color(0x00),
 		m_audio(0x00)
-	{}
+	{ }
 
 	void mmagic(machine_config &config);
 
@@ -306,27 +306,28 @@ void mmagic_state::machine_start()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(mmagic_state::mmagic)
+void mmagic_state::mmagic(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL) // NEC D8085A
-	MCFG_DEVICE_PROGRAM_MAP(mmagic_mem)
-	MCFG_DEVICE_IO_MAP(mmagic_io)
+	I8085A(config, m_maincpu, 6.144_MHz_XTAL); // NEC D8085A
+	m_maincpu->set_addrmap(AS_PROGRAM, &mmagic_state::mmagic_mem);
+	m_maincpu->set_addrmap(AS_IO, &mmagic_state::mmagic_io);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(6.144_MHz_XTAL, 384, 0, 256, 264, 0, 192)
-	MCFG_SCREEN_UPDATE_DRIVER(mmagic_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(6.144_MHz_XTAL, 384, 0, 256, 264, 0, 192);
+	m_screen->set_screen_update(FUNC(mmagic_state::screen_update));
 
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(mmagic_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(mmagic_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
 	// TODO: replace samples with SN76477 + discrete sound
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

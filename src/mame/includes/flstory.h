@@ -35,6 +35,7 @@ public:
 		m_soundnmi(*this, "soundnmi")
 	{ }
 
+	void common(machine_config &config);
 	void flstory(machine_config &config);
 	void rumba(machine_config &config);
 	void onna34ro(machine_config &config);

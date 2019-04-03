@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -8,280 +8,230 @@
 
 #include "bx.h"
 
-#if BX_COMPILER_MSVC
-#	if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
-#		include <intrin.h>
-#		pragma intrinsic(_BitScanForward)
-#		pragma intrinsic(_BitScanReverse)
-#		if BX_ARCH_64BIT
-#			pragma intrinsic(_BitScanForward64)
-#			pragma intrinsic(_BitScanReverse64)
-#		endif // BX_ARCH_64BIT
-#	endif // BX_PLATFORM_WINDOWS
-#endif // BX_COMPILER_MSVC
-
-#define BX_HALF_FLOAT_ZERO UINT16_C(0)
-#define BX_HALF_FLOAT_HALF UINT16_C(0x3800)
-#define BX_HALF_FLOAT_ONE  UINT16_C(0x3c00)
-#define BX_HALF_FLOAT_TWO  UINT16_C(0x4000)
-
 namespace bx
 {
-	///
-	uint32_t uint32_li(uint32_t _a);
+	constexpr uint16_t kHalfFloatZero = UINT16_C(0);
+	constexpr uint16_t kHalfFloatHalf = UINT16_C(0x3800);
+	constexpr uint16_t kHalfFloatOne  = UINT16_C(0x3c00);
+	constexpr uint16_t kHalfFloatTwo  = UINT16_C(0x4000);
 
 	///
-	uint32_t uint32_dec(uint32_t _a);
+	BX_CONSTEXPR_FUNC uint32_t uint32_li(uint32_t _a);
 
 	///
-	uint32_t uint32_inc(uint32_t _a);
+	BX_CONSTEXPR_FUNC uint32_t uint32_dec(uint32_t _a);
 
 	///
-	uint32_t uint32_not(uint32_t _a);
+	BX_CONSTEXPR_FUNC uint32_t uint32_inc(uint32_t _a);
 
 	///
-	uint32_t uint32_neg(uint32_t _a);
+	BX_CONSTEXPR_FUNC uint32_t uint32_not(uint32_t _a);
 
 	///
-	uint32_t uint32_ext(uint32_t _a);
+	BX_CONSTEXPR_FUNC uint32_t uint32_neg(uint32_t _a);
 
 	///
-	uint32_t uint32_and(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_ext(uint32_t _a);
 
 	///
-	uint32_t uint32_andc(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_and(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_xor(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_andc(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_xorl(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_xor(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_or(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_xorl(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_orc(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_or(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_sll(uint32_t _a, int _sa);
+	BX_CONSTEXPR_FUNC uint32_t uint32_orc(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_srl(uint32_t _a, int _sa);
+	BX_CONSTEXPR_FUNC uint32_t uint32_sll(uint32_t _a, int32_t _sa);
 
 	///
-	uint32_t uint32_sra(uint32_t _a, int _sa);
+	BX_CONSTEXPR_FUNC uint32_t uint32_srl(uint32_t _a, int32_t _sa);
 
 	///
-	uint32_t uint32_rol(uint32_t _a, int _sa);
+	BX_CONSTEXPR_FUNC uint32_t uint32_sra(uint32_t _a, int32_t _sa);
 
 	///
-	uint32_t uint32_ror(uint32_t _a, int _sa);
+	BX_CONSTEXPR_FUNC uint32_t uint32_rol(uint32_t _a, int32_t _sa);
 
 	///
-	uint32_t uint32_add(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_ror(uint32_t _a, int32_t _sa);
 
 	///
-	uint32_t uint32_sub(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_add(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_mul(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_sub(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_div(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_mul(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_mod(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_div(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_cmpeq(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_mod(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_cmpneq(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_cmpeq(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_cmplt(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_cmpneq(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_cmple(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_cmplt(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_cmpgt(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_cmple(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_cmpge(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_cmpgt(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_setnz(uint32_t _a);
+	BX_CONSTEXPR_FUNC uint32_t uint32_cmpge(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_satadd(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_setnz(uint32_t _a);
 
 	///
-	uint32_t uint32_satsub(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_satadd(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_satmul(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_satsub(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_sels(uint32_t test, uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_satmul(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_selb(uint32_t _mask, uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_sels(uint32_t test, uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_imin(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_selb(uint32_t _mask, uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_imax(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_imin(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_min(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_imax(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_min(uint32_t _a, uint32_t _b, uint32_t _c);
+	BX_CONSTEXPR_FUNC uint32_t uint32_min(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_max(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_min(uint32_t _a, uint32_t _b, uint32_t _c);
 
 	///
-	uint32_t uint32_max(uint32_t _a, uint32_t _b, uint32_t _c);
+	BX_CONSTEXPR_FUNC uint32_t uint32_max(uint32_t _a, uint32_t _b);
 
 	///
-	uint32_t uint32_clamp(uint32_t _a, uint32_t _min, uint32_t _max);
+	BX_CONSTEXPR_FUNC uint32_t uint32_max(uint32_t _a, uint32_t _b, uint32_t _c);
 
 	///
-	uint32_t uint32_iclamp(uint32_t _a, uint32_t _min, uint32_t _max);
+	BX_CONSTEXPR_FUNC uint32_t uint32_clamp(uint32_t _a, uint32_t _min, uint32_t _max);
 
 	///
-	uint32_t uint32_incwrap(uint32_t _val, uint32_t _min, uint32_t _max);
+	BX_CONSTEXPR_FUNC uint32_t uint32_iclamp(uint32_t _a, uint32_t _min, uint32_t _max);
 
 	///
-	uint32_t uint32_decwrap(uint32_t _val, uint32_t _min, uint32_t _max);
+	BX_CONSTEXPR_FUNC uint32_t uint32_incwrap(uint32_t _val, uint32_t _min, uint32_t _max);
 
 	///
-	uint32_t uint32_cntbits_ref(uint32_t _val);
-
-	/// Count number of bits set.
-	///
-	uint32_t uint32_cntbits(uint32_t _val);
-
-	///
-	uint32_t uint32_cntlz_ref(uint32_t _val);
-
-	/// Count number of leading zeros.
-	///
-	uint32_t uint32_cntlz(uint32_t _val);
-
-	///
-	uint32_t uint32_cnttz_ref(uint32_t _val);
-
-	///
-	uint32_t uint32_cnttz(uint32_t _val);
-
-	// shuffle:
-	// ---- ---- ---- ---- fedc ba98 7654 3210
-	// to:
-	// -f-e -d-c -b-a -9-8 -7-6 -5-4 -3-2 -1-0
-	uint32_t uint32_part1by1(uint32_t _a);
-
-	// shuffle:
-	// ---- ---- ---- ---- ---- --98 7654 3210
-	// to:
-	// ---- 9--8 --7- -6-- 5--4 --3- -2-- 1--0
-	///
-	uint32_t uint32_part1by2(uint32_t _a);
-
-	///
-	uint32_t uint32_testpow2(uint32_t _a);
-
-	///
-	uint32_t uint32_nextpow2(uint32_t _a);
-
-	///
-	uint16_t halfFromFloat(float _a);
-
-	///
-	float halfToFloat(uint16_t _a);
-
-	///
-	uint16_t uint16_min(uint16_t _a, uint16_t _b);
-
-	///
-	uint16_t uint16_max(uint16_t _a, uint16_t _b);
-
-	///
-	int64_t int64_min(int64_t _a, int64_t _b);
-
-	///
-	int64_t int64_max(int64_t _a, int64_t _b);
-
-	///
-	int64_t int64_clamp(int64_t _a, int64_t _min, int64_t _max);
-
-	///
-	uint32_t uint64_cntbits_ref(uint64_t _val);
+	BX_CONSTEXPR_FUNC uint32_t uint32_decwrap(uint32_t _val, uint32_t _min, uint32_t _max);
 
 	/// Count number of bits set.
 	///
-	uint32_t uint64_cntbits(uint64_t _val);
-
-	///
-	uint32_t uint64_cntlz_ref(uint64_t _val);
+	BX_CONSTEXPR_FUNC uint32_t uint32_cntbits(uint32_t _val);
 
 	/// Count number of leading zeros.
 	///
-	uint32_t uint64_cntlz(uint64_t _val);
+	BX_CONSTEXPR_FUNC uint32_t uint32_cntlz(uint32_t _val);
 
 	///
-	uint32_t uint64_cnttz_ref(uint64_t _val);
+	BX_CONSTEXPR_FUNC uint32_t uint32_cnttz(uint32_t _val);
 
 	///
-	uint32_t uint64_cnttz(uint64_t _val);
+	BX_CONSTEXPR_FUNC uint32_t uint32_part1by1(uint32_t _a);
 
 	///
-	uint64_t uint64_sll(uint64_t _a, int _sa);
+	BX_CONSTEXPR_FUNC uint32_t uint32_part1by2(uint32_t _a);
 
 	///
-	uint64_t uint64_srl(uint64_t _a, int _sa);
+	BX_CONSTEXPR_FUNC uint32_t uint32_testpow2(uint32_t _a);
 
 	///
-	uint64_t uint64_sra(uint64_t _a, int _sa);
+	BX_CONSTEXPR_FUNC uint32_t uint32_nextpow2(uint32_t _a);
+
+	/// Count number of bits set.
+	///
+	BX_CONSTEXPR_FUNC uint32_t uint64_cntbits(uint64_t _val);
+
+	/// Count number of leading zeros.
+	///
+	BX_CONSTEXPR_FUNC uint32_t uint64_cntlz(uint64_t _val);
 
 	///
-	uint64_t uint64_rol(uint64_t _a, int _sa);
+	BX_CONSTEXPR_FUNC uint32_t uint64_cnttz(uint64_t _val);
 
 	///
-	uint64_t uint64_ror(uint64_t _a, int _sa);
+	BX_CONSTEXPR_FUNC uint64_t uint64_sll(uint64_t _a, int32_t _sa);
 
 	///
-	uint64_t uint64_add(uint64_t _a, uint64_t _b);
+	BX_CONSTEXPR_FUNC uint64_t uint64_srl(uint64_t _a, int32_t _sa);
 
 	///
-	uint64_t uint64_sub(uint64_t _a, uint64_t _b);
+	BX_CONSTEXPR_FUNC uint64_t uint64_sra(uint64_t _a, int32_t _sa);
 
 	///
-	uint64_t uint64_mul(uint64_t _a, uint64_t _b);
+	BX_CONSTEXPR_FUNC uint64_t uint64_rol(uint64_t _a, int32_t _sa);
+
+	///
+	BX_CONSTEXPR_FUNC uint64_t uint64_ror(uint64_t _a, int32_t _sa);
+
+	///
+	BX_CONSTEXPR_FUNC uint64_t uint64_add(uint64_t _a, uint64_t _b);
+
+	///
+	BX_CONSTEXPR_FUNC uint64_t uint64_sub(uint64_t _a, uint64_t _b);
+
+	///
+	BX_CONSTEXPR_FUNC uint64_t uint64_mul(uint64_t _a, uint64_t _b);
 
 	/// Greatest common divisor.
 	///
-	uint32_t uint32_gcd(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_gcd(uint32_t _a, uint32_t _b);
 
 	/// Least common multiple.
 	///
-	uint32_t uint32_lcm(uint32_t _a, uint32_t _b);
+	BX_CONSTEXPR_FUNC uint32_t uint32_lcm(uint32_t _a, uint32_t _b);
 
 	/// Align to arbitrary stride.
 	///
-	uint32_t strideAlign(uint32_t _offset, uint32_t _stride);
+	BX_CONSTEXPR_FUNC uint32_t strideAlign(uint32_t _offset, uint32_t _stride);
 
 	/// Align to arbitrary stride and 16-bytes.
 	///
-	uint32_t strideAlign16(uint32_t _offset, uint32_t _stride);
+	BX_CONSTEXPR_FUNC uint32_t strideAlign16(uint32_t _offset, uint32_t _stride);
 
 	/// Align to arbitrary stride and 256-bytes.
 	///
-	uint32_t strideAlign256(uint32_t _offset, uint32_t _stride);
+	BX_CONSTEXPR_FUNC uint32_t strideAlign256(uint32_t _offset, uint32_t _stride);
+
+	/// Convert float to half-float.
+	///
+	BX_CONST_FUNC uint16_t halfFromFloat(float _a);
+
+	/// Convert half-float to float.
+	///
+	BX_CONST_FUNC float halfToFloat(uint16_t _a);
 
 } // namespace bx
 

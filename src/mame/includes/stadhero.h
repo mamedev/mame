@@ -17,7 +17,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_soundlatch(*this, "soundlatch"),
 		m_spriteram(*this, "spriteram"),
-		m_pf1_data(*this, "pf1_data") { }
+		m_pf1_data(*this, "pf1_data"),
+		m_coin(*this, "COIN")
+	{
+	}
 
 	void stadhero(machine_config &config);
 
@@ -31,6 +34,8 @@ private:
 
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_pf1_data;
+
+	required_ioport m_coin;
 
 	tilemap_t *m_pf1_tilemap;
 

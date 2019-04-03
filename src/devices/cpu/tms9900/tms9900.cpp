@@ -114,7 +114,7 @@
 
 #define NOPRG -1
 
-constexpr int tms99xx_device::AS_SETOFFSET;
+constexpr int tms99xx_device::AS_SETADDRESS;
 
 /* tms9900 ST register bits. */
 enum
@@ -181,12 +181,12 @@ enum
 tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type, const char *tag, int data_width, int prg_addr_bits, int cru_addr_bits, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, data_width, prg_addr_bits),
-		m_setoffset_config("setoffset", ENDIANNESS_BIG, data_width, prg_addr_bits),
-		m_io_config("cru", ENDIANNESS_BIG, 8, cru_addr_bits),
+		m_setaddress_config("setaddress", ENDIANNESS_BIG, prg_addr_bits, prg_addr_bits), // data = address
+		m_io_config("cru", ENDIANNESS_LITTLE, 8, cru_addr_bits + 1, 1),
 		m_prgspace(nullptr),
 		m_cru(nullptr),
 		m_prgaddr_mask((1<<prg_addr_bits)-1),
-		m_cruaddr_mask((1<<cru_addr_bits)-1),
+		m_cruaddr_mask((2<<cru_addr_bits)-2),
 		m_clock_out_line(*this),
 		m_wait_line(*this),
 		m_holda_line(*this),
@@ -226,7 +226,7 @@ void tms99xx_device::device_start()
 	// TODO: Restore state save feature
 	resolve_lines();
 	m_prgspace = &space(AS_PROGRAM);
-	m_sospace = has_space(AS_SETOFFSET) ? &space(AS_SETOFFSET) : nullptr;
+	m_setaddr = has_space(AS_SETADDRESS) ? &space(AS_SETADDRESS) : nullptr;
 	m_cru = &space(AS_IO);
 
 	// set our instruction counter
@@ -441,10 +441,10 @@ void tms99xx_device::write_workspace_register_debug(int reg, uint16_t data)
 
 device_memory_interface::space_config_vector tms99xx_device::memory_space_config() const
 {
-	if (has_configured_map(AS_SETOFFSET))
+	if (has_configured_map(AS_SETADDRESS))
 		return space_config_vector {
 			std::make_pair(AS_PROGRAM,   &m_program_config),
-			std::make_pair(AS_SETOFFSET, &m_setoffset_config),
+			std::make_pair(AS_SETADDRESS, &m_setaddress_config),
 			std::make_pair(AS_IO,        &m_io_config)
 		};
 	else
@@ -1534,8 +1534,8 @@ void tms99xx_device::mem_read()
 	if (m_mem_phase==1)
 	{
 		if (!m_dbin_line.isnull()) m_dbin_line(ASSERT_LINE);
-		if (m_sospace)
-			m_sospace->read_byte(m_address & m_prgaddr_mask & 0xfffe);
+		if (m_setaddr)
+			m_setaddr->write_word(ASSERT_LINE, m_address & m_prgaddr_mask & 0xfffe);
 		m_check_ready = true;
 		m_mem_phase = 2;
 		m_pass = 2;
@@ -1562,8 +1562,8 @@ void tms99xx_device::mem_write()
 		if (!m_dbin_line.isnull()) m_dbin_line(CLEAR_LINE);
 		// When writing, the data bus is asserted immediately after the address bus
 		if (TRACE_ADDRESSBUS) logerror("set address (w) %04x\n", m_address);
-		if (m_sospace)
-			m_sospace->read_byte(m_address & m_prgaddr_mask & 0xfffe);
+		if (m_setaddr)
+			m_setaddr->write_word(CLEAR_LINE, m_address & m_prgaddr_mask & 0xfffe);
 		if (TRACE_MEM) logerror("mem w %04x <- %04x\n",  m_address, m_current_value);
 		m_prgspace->write_word(m_address & m_prgaddr_mask & 0xfffe, m_current_value);
 		m_check_ready = true;
@@ -1625,11 +1625,24 @@ void tms99xx_device::register_write()
     idempotent (i.e. they must not change the state of the queried device).
 
     Read returns the number of consecutive CRU bits, with increasing CRU address
-    from the least significant to the most significant bit; right-aligned
+    from the least significant to the most significant bit; right-aligned (in
+    other words, little-endian as opposed to the big-endian order of memory words).
 
     There seems to be no handling of wait states during CRU operations on the
     TMS9900. The TMS9995, in contrast, respects wait states during the transmission
     of each single bit.
+
+    The current emulation of the CRU space involves a 1-bit address shift,
+    reflecting the one-to-one correspondence between CRU bits and words (not
+    bytes) in the lower part of the memory space. (On the TMS9980A and TMS9995,
+    CRUOUT is multiplexed with the least significant address line.) Thus, what
+    TI's documentation calls the software address (the R12 base value plus the
+    bit offset multiplied by 2) is used in address maps and CPU-side operations.
+    MAME's memory architecture automatically translates these to right-justified
+    hardware addresses in the process of decoding offsets for read/write handlers,
+    which is more typical of what peripheral devices expect. (Note also that
+    address spaces do not support data widths narrower than 8 bits, so these
+    handlers must specify 8-bit types despite only one bit being useful.)
 
     Usage of this method:
        CRU write: First bit is at rightmost position of m_value.
@@ -1637,55 +1650,45 @@ void tms99xx_device::register_write()
 
 void tms99xx_device::cru_input_operation()
 {
-	int value, value1;
-	int offset, location;
+	offs_t cruaddr = m_cru_address & m_cruaddr_mask;
+	uint16_t value = 0;
 
-	location = (m_cru_address >> 4) & (m_cruaddr_mask>>3);
-	offset   = (m_cru_address>>1) & 0x07;
-
-	// Read 8 bits (containing the desired bits)
-	value = m_cru->read_byte(location);
-
-	if ((offset + m_count) > 8) // spans two 8 bit cluster
+	for (int i = 0; i < m_count; i++)
 	{
-		// Read next 8 bits
-		location = (location + 1) & (m_cruaddr_mask>>3);
-		value1 = m_cru->read_byte(location);
-		value |= (value1 << 8);
+		// Poll one bit at a time
+		bool cruin = BIT(m_cru->read_byte(cruaddr), 0);
+		if (cruin)
+			value |= 1 << i;
 
-		if ((offset + m_count) > 16)    // spans three 8 bit cluster
-		{
-			// Read next 8 bits
-			location = (location + 1) & (m_cruaddr_mask>>3);
-			value1 = m_cru->read_byte(location);
-			value |= (value1 << 16);
-		}
+		if (TRACE_CRU) logerror("CRU input operation, address %04x, value %d\n", cruaddr, cruin ? 1 : 0);
+
+		// Increment the CRU address
+		cruaddr = (cruaddr + 2) & m_cruaddr_mask;
+
+		// On each machine cycle (2 clocks) only one CRU bit is transmitted
+		pulse_clock(2);
 	}
 
-	// On each machine cycle (2 clocks) only one CRU bit is transmitted
-	pulse_clock(m_count<<1);
-
-	// Shift back the bits so that the first bit is at the rightmost place
-	m_value = (value >> offset);
-
-	// Mask out what we want
-	m_value &= (0x0000ffff >> (16-m_count));
+	m_value = value;
 }
 
 void tms99xx_device::cru_output_operation()
 {
-	int value;
-	int location;
-	location = (m_cru_address >> 1) & m_cruaddr_mask;
-	value = m_value;
+	offs_t cruaddr = m_cru_address & m_cruaddr_mask;
+	uint16_t value = m_value;
 
 	// Write m_count bits from cru_address
-	for (int i=0; i < m_count; i++)
+	for (int i = 0; i < m_count; i++)
 	{
-		if (TRACE_CRU) logerror("CRU output operation, address %04x, value %d\n", location<<1, value & 0x01);
-		m_cru->write_byte(location, (value & 0x01));
+		if (TRACE_CRU) logerror("CRU output operation, address %04x, value %d\n", cruaddr, BIT(value, 0));
+
+		// Write one bit at a time
+		m_cru->write_byte(cruaddr, BIT(value, 0));
 		value >>= 1;
-		location = (location + 1) & m_cruaddr_mask;
+
+		// Increment the CRU address
+		cruaddr = (cruaddr + 2) & m_cruaddr_mask;
+
 		pulse_clock(2);
 	}
 }
@@ -2164,6 +2167,7 @@ void tms99xx_device::alu_clr_swpb()
 
 	bool setstatus = true;
 	bool check_ov = true;
+	bool check_c = true;
 
 	switch (m_command)
 	{
@@ -2181,6 +2185,7 @@ void tms99xx_device::alu_clr_swpb()
 		// LAE
 		dest_new = ~src_val & 0xffff;
 		check_ov = false;
+		check_c = false;
 		break;
 	case NEG:
 		// LAECO
@@ -2223,7 +2228,7 @@ void tms99xx_device::alu_clr_swpb()
 	if (setstatus)
 	{
 		if (check_ov) set_status_bit(ST_OV, ((src_val & 0x8000)==sign) && ((dest_new & 0x8000)!=sign));
-		set_status_bit(ST_C, (dest_new & 0x10000) != 0);
+		if (check_c) set_status_bit(ST_C, (dest_new & 0x10000) != 0);
 		m_current_value = dest_new & 0xffff;
 		compare_and_set_lae(m_current_value, 0);
 	}
@@ -2515,6 +2520,7 @@ void tms99xx_device::alu_shift()
 	uint16_t sign = 0;
 	uint32_t value;
 	int count;
+	bool check_ov = false;
 
 	switch (m_state)
 	{
@@ -2572,6 +2578,7 @@ void tms99xx_device::alu_shift()
 			case SLA:
 				carry = ((value & 0x8000)!=0);
 				value <<= 1;
+				check_ov = true;
 				if (carry != ((value&0x8000)!=0)) overflow = true;
 				break;
 			case SRC:
@@ -2584,7 +2591,7 @@ void tms99xx_device::alu_shift()
 
 		m_current_value = value & 0xffff;
 		set_status_bit(ST_C, carry);
-		set_status_bit(ST_OV, overflow);
+		if (check_ov) set_status_bit(ST_OV, overflow); // only SLA
 		compare_and_set_lae(m_current_value, 0);
 		m_address = m_address_saved;        // Register address
 		if (TRACE_STATUS) logerror("ST = %04x (val=%04x)\n", ST, m_current_value);

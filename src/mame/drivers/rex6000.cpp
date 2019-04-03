@@ -59,26 +59,26 @@ class rex6000_state : public driver_device
 {
 public:
 	rex6000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ram(*this, RAM_TAG),
-			m_beep(*this, "beeper"),
-			m_uart(*this, "ns16550"),
-			m_bankdev0(*this, "bank0"),
-			m_bankdev1(*this, "bank1"),
-			m_flash0a(*this, "flash0a"),
-			m_flash0b(*this, "flash0b"),
-			m_flash1a(*this, "flash1a"),
-			m_flash1b(*this, "flash1b"),
-			m_nvram(*this, "nvram"),
-			m_battery(*this, "BATTERY"),
-			m_pen_x(*this, "PENX"),
-			m_pen_y(*this, "PENY")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_beep(*this, "beeper")
+		, m_uart(*this, "ns16550")
+		, m_bankdev0(*this, "bank0")
+		, m_bankdev1(*this, "bank1")
+		, m_flash0a(*this, "flash0a")
+		, m_flash0b(*this, "flash0b")
+		, m_flash1a(*this, "flash1a")
+		, m_flash1b(*this, "flash1b")
+		, m_nvram(*this, "nvram")
+		, m_battery(*this, "BATTERY")
+		, m_pen_x(*this, "PENX")
+		, m_pen_y(*this, "PENY")
+	{ }
 
 	void rex6000(machine_config &config);
 
-	DECLARE_PALETTE_INIT(rex6000);
+	void rex6000_palettte(palette_device &palette) const;
 	DECLARE_QUICKLOAD_LOAD_MEMBER(rex6000);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
 	DECLARE_WRITE_LINE_MEMBER(serial_irq);
@@ -722,7 +722,7 @@ WRITE_LINE_MEMBER( rex6000_state::serial_irq )
 	}
 }
 
-PALETTE_INIT_MEMBER(rex6000_state, rex6000)
+void rex6000_state::rex6000_palettte(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -897,26 +897,25 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(rex6000_state::rex6000)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000)) //Toshiba microprocessor Z80 compatible at 4.3MHz
-	MCFG_DEVICE_PROGRAM_MAP(rex6000_mem)
-	MCFG_DEVICE_IO_MAP(rex6000_io)
+	Z80(config, m_maincpu, XTAL(4'000'000)); //Toshiba microprocessor Z80 compatible at 4.3MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &rex6000_state::rex6000_mem);
+	m_maincpu->set_addrmap(AS_IO, &rex6000_state::rex6000_io);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("sec_timer", rex6000_state, sec_timer, attotime::from_hz(1))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer1", rex6000_state, irq_timer1, attotime::from_hz(32))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer2", rex6000_state, irq_timer2, attotime::from_hz(4096))
+	TIMER(config, "sec_timer").configure_periodic(FUNC(rex6000_state::sec_timer), attotime::from_hz(1));
+	TIMER(config, "irq_timer1").configure_periodic(FUNC(rex6000_state::irq_timer1), attotime::from_hz(32));
+	TIMER(config, "irq_timer2").configure_periodic(FUNC(rex6000_state::irq_timer2), attotime::from_hz(4096));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(rex6000_state, screen_update)
-	MCFG_SCREEN_SIZE(240, 120)
-	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 120-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(rex6000_state::screen_update));
+	screen.set_size(240, 120);
+	screen.set_visarea(0, 240-1, 0, 120-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(rex6000_state, rex6000)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rex6000)
+	PALETTE(config, "palette", FUNC(rex6000_state::rex6000_palettte), 2);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_rex6000);
 
 	ADDRESS_MAP_BANK(config, "bank0").set_map(&rex6000_state::rex6000_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 	ADDRESS_MAP_BANK(config, "bank1").set_map(&rex6000_state::rex6000_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
@@ -935,7 +934,7 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	serport.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", rex6000_state, rex6000, "rex,ds2", 0)
+	MCFG_QUICKLOAD_ADD("quickload", rex6000_state, rex6000, "rex,ds2")
 
 	tc8521_device &rtc(TC8521(config, TC8521_TAG, XTAL(32'768)));
 	rtc.out_alarm_callback().set(FUNC(rex6000_state::alarm_irq));
@@ -957,19 +956,18 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	BEEP(config, m_beep, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(oz750_state::oz750)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(9'830'400)) //Toshiba microprocessor Z80 compatible at 9.8MHz
-	MCFG_DEVICE_PROGRAM_MAP(rex6000_mem)
-	MCFG_DEVICE_IO_MAP(oz750_io)
+	Z80(config, m_maincpu, XTAL(9'830'400)); //Toshiba microprocessor Z80 compatible at 9.8MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &oz750_state::rex6000_mem);
+	m_maincpu->set_addrmap(AS_IO, &oz750_state::oz750_io);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("sec_timer", rex6000_state, sec_timer, attotime::from_hz(1))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer1", rex6000_state, irq_timer1, attotime::from_hz(64))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer2", rex6000_state, irq_timer2, attotime::from_hz(8192))
+	TIMER(config, "sec_timer").configure_periodic(FUNC(rex6000_state::sec_timer), attotime::from_hz(1));
+	TIMER(config, "irq_timer1").configure_periodic(FUNC(rex6000_state::irq_timer1), attotime::from_hz(64));
+	TIMER(config, "irq_timer2").configure_periodic(FUNC(rex6000_state::irq_timer2), attotime::from_hz(8192));
 
 	NS16550(config, m_uart, XTAL(9'830'400) / 4);
 	m_uart->out_tx_callback().set("serport", FUNC(rs232_port_device::write_txd));
@@ -985,22 +983,21 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	//serport.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(oz750_state, screen_update_oz)
-	MCFG_SCREEN_SIZE(240, 80)
-	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 80-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(oz750_state::screen_update_oz));
+	screen.set_size(240, 80);
+	screen.set_visarea(0, 240-1, 0, 80-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(rex6000_state, rex6000)
+	PALETTE(config, "palette", FUNC(rex6000_state::rex6000_palettte), 2);
 
 	ADDRESS_MAP_BANK(config, "bank0").set_map(&oz750_state::oz750_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 	ADDRESS_MAP_BANK(config, "bank1").set_map(&oz750_state::oz750_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", oz750_state, oz750, "wzd", 0)
+	MCFG_QUICKLOAD_ADD("quickload", oz750_state, oz750, "wzd")
 
 	tc8521_device &rtc(TC8521(config, TC8521_TAG, XTAL(32'768)));
 	rtc.out_alarm_callback().set(FUNC(rex6000_state::alarm_irq));
@@ -1013,8 +1010,7 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	BEEP(config, m_beep, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
 MACHINE_CONFIG_END
 
 /* ROM definition */

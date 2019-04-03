@@ -44,7 +44,7 @@ WRITE16_MEMBER( zerozone_state::sound_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		m_soundlatch->write(space, offset, data >> 8);
+		m_soundlatch->write(data >> 8);
 		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 	}
 }
@@ -201,7 +201,7 @@ void zerozone_state::zerozone(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_zerozone);
 
-	PALETTE(config, "palette", 256).set_format(PALETTE_FORMAT_RRRRGGGGBBBBRGBx);
+	PALETTE(config, "palette").set_format(palette_device::RRRRGGGGBBBBRGBx, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

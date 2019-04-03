@@ -71,10 +71,11 @@ public:
 
 	void init_i7000();
 
-private:
+protected:
 	void video_start() override;
 	void machine_start() override;
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_card;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -85,7 +86,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
-	DECLARE_PALETTE_INIT(i7000);
+	void i7000_palette(palette_device &palette) const;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( i7000_card );
 
 	DECLARE_READ8_MEMBER(i7000_kbd_r);
@@ -236,11 +237,11 @@ void i7000_state::machine_start()
 	if (m_card->exists())
 	{
 		// 0x4000 - 0xbfff   32KB ROM
-		program.install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_card));
+		program.install_read_handler(0x4000, 0xbfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_card));
 	}
 }
 
-PALETTE_INIT_MEMBER(i7000_state, i7000)
+void i7000_state::i7000_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x33, 0x33, 0x33));
 	palette.set_pen_color(1, rgb_t(0xBB, 0xBB, 0xBB));
@@ -343,22 +344,20 @@ MC6845_ON_UPDATE_ADDR_CHANGED(i7000_state::crtc_addr)
 MACHINE_CONFIG_START(i7000_state::i7000)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NSC800, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(i7000_mem)
-	MCFG_DEVICE_IO_MAP(i7000_io)
+	NSC800(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &i7000_state::i7000_mem);
+	m_maincpu->set_addrmap(AS_IO, &i7000_state::i7000_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(320, 200) /* 40x25 8x8 chars */
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(320, 200); /* 40x25 8x8 chars */
+	screen.set_visarea(0, 320-1, 0, 200-1);
+	screen.set_screen_update(FUNC(i7000_state::screen_update_i7000));
+	screen.set_palette("palette");
 
-	MCFG_SCREEN_UPDATE_DRIVER(i7000_state, screen_update_i7000)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_i7000)
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(i7000_state, i7000)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_i7000);
+	PALETTE(config, "palette", FUNC(i7000_state::i7000_palette), 2);
 
 	r6545_1_device &crtc(R6545_1(config, "crtc", XTAL(20'000'000))); /* (?) */
 	crtc.set_screen("screen");
@@ -392,7 +391,7 @@ MACHINE_CONFIG_START(i7000_state::i7000)
 	MCFG_GENERIC_LOAD(i7000_state, i7000_card)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("card_list", "i7000_card")
+	SOFTWARE_LIST(config, "card_list").set_original("i7000_card");
 MACHINE_CONFIG_END
 
 ROM_START( i7000 )

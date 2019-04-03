@@ -101,10 +101,10 @@ private:
 	TILE_GET_INFO_MEMBER(firetrk_get_tile_info2);
 	TILE_GET_INFO_MEMBER(superbug_get_tile_info2);
 	TILE_GET_INFO_MEMBER(montecar_get_tile_info2);
-	DECLARE_PALETTE_INIT(firetrk);
+	void firetrk_palette(palette_device &palette);
 	DECLARE_VIDEO_START(superbug);
 	DECLARE_VIDEO_START(montecar);
-	DECLARE_PALETTE_INIT(montecar);
+	void montecar_palette(palette_device &palette);
 	uint32_t screen_update_firetrk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_superbug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_montecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

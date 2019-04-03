@@ -362,6 +362,12 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 		skip = 2;
 	}
 	int tracks  = header[0x30];
+
+	int img_tracks, img_heads;
+	image->get_maximal_geometry(img_tracks, img_heads);
+	if (tracks > img_tracks || heads > img_heads)
+		return false;
+
 	uint64_t track_offsets[84*2];
 	int cnt =0;
 	if (!extendformat) {
@@ -436,7 +442,8 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 				else
 					pos += 128 << tr.sector_size_code;
 			}
-			build_pc_track_mfm(track, side, image, 100000, tr.number_of_sector, sects, tr.gap3_length);
+			// larger cell count (was 100000) to allow for slightly out of spec images (theatre europe on einstein)
+			build_pc_track_mfm(track, side, image, 105000, tr.number_of_sector, sects, tr.gap3_length);
 			counter++;
 		}
 	}

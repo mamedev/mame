@@ -10,6 +10,7 @@
 #include "machine/adc0808.h"
 #include "machine/atarigen.h"
 #include "video/atarirle.h"
+#include "emupal.h"
 
 #define CRAM_ENTRIES        0x4000
 #define TRAM_ENTRIES        0x4000
@@ -22,6 +23,7 @@ class atarigt_state : public atarigen_state
 public:
 	atarigt_state(const machine_config &mconfig, device_type type, const char *tag) :
 		atarigen_state(mconfig, type, tag),
+		m_palette(*this, "palette"),
 		m_colorram(*this, "colorram", 32),
 		m_adc(*this, "adc"),
 		m_playfield_tilemap(*this, "playfield"),
@@ -35,6 +37,7 @@ public:
 	{ }
 
 	bool           m_is_primrage;
+	required_device<palette_device> m_palette;
 	required_shared_ptr<uint16_t> m_colorram;
 
 	optional_device<adc0808_device> m_adc;
@@ -70,6 +73,7 @@ public:
 	std::unique_ptr<uint8_t[]> m_protdata;
 
 	virtual void update_interrupts() override;
+	INTERRUPT_GEN_MEMBER(scanline_int_gen);
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_READ32_MEMBER(special_port2_r);
 	DECLARE_READ32_MEMBER(special_port3_r);

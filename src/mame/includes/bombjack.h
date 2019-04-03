@@ -27,6 +27,14 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void bombjack(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	DECLARE_READ8_MEMBER(soundlatch_read_and_clear);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_WRITE8_MEMBER(bombjack_videoram_w);
@@ -35,19 +43,15 @@ public:
 	DECLARE_WRITE8_MEMBER(bombjack_flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_bombjack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(soundlatch_callback);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void bombjack(machine_config &config);
 	void audio_io_map(address_map &map);
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
-private:
+
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;

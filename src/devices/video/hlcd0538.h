@@ -43,15 +43,15 @@
 class hlcd0538_device : public device_t
 {
 public:
-	hlcd0538_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hlcd0538_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration helpers
-	auto write_cols_callback() { return m_write_cols.bind(); }              // C/R pins (0538: d0-d7 for rows)
-	auto write_interrupt_callback() { return m_write_interrupt.bind(); }    // INTERRUPT pin
+	auto write_cols() { return m_write_cols.bind(); }              // C/R pins (0538: d0-d7 for rows)
+	auto write_interrupt() { return m_write_interrupt.bind(); }    // INTERRUPT pin
 
-	DECLARE_WRITE_LINE_MEMBER(write_clk);
-	DECLARE_WRITE_LINE_MEMBER(write_lcd);
-	DECLARE_WRITE_LINE_MEMBER(write_data) { m_data = (state) ? 1 : 0; }
+	DECLARE_WRITE_LINE_MEMBER(clk_w);
+	DECLARE_WRITE_LINE_MEMBER(lcd_w);
+	DECLARE_WRITE_LINE_MEMBER(data_w) { m_data = (state) ? 1 : 0; }
 
 protected:
 	hlcd0538_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);

@@ -40,8 +40,8 @@ Notes:
 class sealy_state : public driver_device
 {
 public:
-	sealy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sealy_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette")
 	{ }
@@ -54,16 +54,16 @@ private:
 	required_device<palette_device> m_palette;
 
 	// screen updates
-	DECLARE_PALETTE_INIT(sealy);
+	void sealy_palette(palette_device &palette) const;
 	uint32_t screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void sealy_map(address_map &map);
 };
 
 
-PALETTE_INIT_MEMBER(sealy_state,sealy)
+void sealy_state::sealy_palette(palette_device &palette) const
 {
 //  for (int i = 0; i < 32768; i++)
-//      palette.set_pen_color(i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+//      palette.set_pen_color(i, pal5bit(i >> 5), pal5bit(i >> 10), pal5bit(i >> 0));
 }
 
 uint32_t sealy_state::screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -101,29 +101,27 @@ static GFXDECODE_START( gfx_sealy )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(sealy_state::sealy)
-
+void sealy_state::sealy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */
-	MCFG_DEVICE_PROGRAM_MAP(sealy_map)
+	H83044(config, m_maincpu, MAIN_CLOCK); /* wrong CPU, but we have not a M16C core ATM */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sealy_state::sealy_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sealy_state, screen_update_sealy)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(sealy_state::screen_update_sealy));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sealy)
-	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_PALETTE_INIT_OWNER(sealy_state, sealy)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_sealy);
+	PALETTE(config, m_palette, FUNC(sealy_state::sealy_palette), 32768);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, MAIN_CLOCK/13, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", MAIN_CLOCK/13, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 ROM_START( crzyddz )

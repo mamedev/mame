@@ -50,7 +50,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(_1942_palette_bank_w);
 	DECLARE_WRITE8_MEMBER(_1942_scroll_w);
 	DECLARE_WRITE8_MEMBER(_1942_c804_w);
-	DECLARE_PALETTE_INIT(1942);
+	void _1942_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(_1942_scanline);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -71,7 +71,7 @@ protected:
 	tilemap_t *m_bg_tilemap;
 	int m_palette_bank;
 	uint8_t m_scroll[2];
-	void create_palette();
+	void create_palette(palette_device &palette) const;
 };
 
 class _1942p_state : public _1942_state
@@ -94,7 +94,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(_1942p_f600_w);
 	DECLARE_WRITE8_MEMBER(_1942p_palette_w);
 
-	DECLARE_PALETTE_INIT(1942p);
+	void _1942p_palette(palette_device &palette) const;
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 

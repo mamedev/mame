@@ -89,7 +89,7 @@ public:
 
 	// video state
 	optional_shared_ptr<uint8_t> m_video_ram;
-	DECLARE_PALETTE_INIT(bw2);
+	void bw2_palette(palette_device &palette) const;
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;

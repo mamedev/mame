@@ -226,7 +226,7 @@ void microdec_state::microdec(machine_config &config)
 	rs232b.dsr_handler().set("uart2", FUNC(i8251_device::write_dsr));
 	rs232b.cts_handler().set("uart2", FUNC(i8251_device::write_cts));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	FLOPPY_CONNECTOR(config, "fdc:0", microdec_floppies, "525hd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	//FLOPPY_CONNECTOR(config, "fdc:1", microdec_floppies, "525hd", floppy_image_device::default_floppy_formats).enable_sound(true);

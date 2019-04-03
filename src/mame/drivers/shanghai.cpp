@@ -34,11 +34,11 @@ displayed.
 class shanghai_state : public driver_device
 {
 public:
-	shanghai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	shanghai_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this,"screen")
-		{ }
+	{ }
 
 	void shanghai(machine_config &config);
 	void shangha2(machine_config &config);
@@ -46,7 +46,7 @@ public:
 
 private:
 	DECLARE_WRITE8_MEMBER(shanghai_coin_w);
-	DECLARE_PALETTE_INIT(shanghai);
+	void shanghai_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(half_vblank_irq);
 
 	void hd63484_map(address_map &map);
@@ -62,31 +62,31 @@ private:
 };
 
 
-PALETTE_INIT_MEMBER(shanghai_state,shanghai)
+void shanghai_state::shanghai_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = (i >> 2) & 0x01;
-		bit1 = (i >> 3) & 0x01;
-		bit2 = (i >> 4) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (i >> 5) & 0x01;
-		bit1 = (i >> 6) & 0x01;
-		bit2 = (i >> 7) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
+		// red component
+		bit0 = BIT(i, 2);
+		bit1 = BIT(i, 3);
+		bit2 = BIT(i, 4);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// green component
+		bit0 = BIT(i, 5);
+		bit1 = BIT(i, 6);
+		bit2 = BIT(i, 7);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// blue component
 		bit0 = 0;
-		bit1 = (i >> 0) & 0x01;
-		bit2 = (i >> 1) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(i, 0);
+		bit2 = BIT(i, 1);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -398,28 +398,26 @@ void shanghai_state::hd63484_map(address_map &map)
 	map(0x00000, 0x3ffff).ram();
 }
 
-MACHINE_CONFIG_START(shanghai_state::shanghai)
-
+void shanghai_state::shanghai(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V30, XTAL(16'000'000)/2) /* NEC D70116C-8 */
-	MCFG_DEVICE_PROGRAM_MAP(shanghai_map)
-	MCFG_DEVICE_IO_MAP(shanghai_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shanghai_state, half_vblank_irq)
+	V30(config, m_maincpu, XTAL(16'000'000)/2); /* NEC D70116C-8 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &shanghai_state::shanghai_map);
+	m_maincpu->set_addrmap(AS_IO, &shanghai_state::shanghai_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(shanghai_state::half_vblank_irq));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(384, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
-	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(57);
+	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(384, 280);
+	m_screen->set_visarea(0, 384-1, 0, 280-1);
+	m_screen->set_screen_update("hd63484", FUNC(hd63484_device::update_screen));
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-	MCFG_PALETTE_INIT_OWNER(shanghai_state,shanghai)
+	PALETTE(config, "palette", FUNC(shanghai_state::shanghai_palette)).set_format(palette_device::xBGR_444, 256);
 
-	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
+	HD63484(config, "hd63484", 0).set_addrmap(0, &shanghai_state::hd63484_map);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -431,30 +429,29 @@ MACHINE_CONFIG_START(shanghai_state::shanghai)
 	ymsnd.add_route(1, "mono", 0.15);
 	ymsnd.add_route(2, "mono", 0.15);
 	ymsnd.add_route(3, "mono", 0.80);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(shanghai_state::shangha2)
-
+void shanghai_state::shangha2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V30, XTAL(16'000'000)/2) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(shangha2_map)
-	MCFG_DEVICE_IO_MAP(shangha2_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shanghai_state, half_vblank_irq)
+	V30(config, m_maincpu, XTAL(16'000'000)/2); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &shanghai_state::shangha2_map);
+	m_maincpu->set_addrmap(AS_IO, &shanghai_state::shangha2_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(shanghai_state::half_vblank_irq));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(384, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
-	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(57);
+	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(384, 280);
+	m_screen->set_visarea(0, 384-1, 0, 280-1);
+	m_screen->set_screen_update("hd63484", FUNC(hd63484_device::update_screen));
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 256);
 
-	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
+	HD63484(config, "hd63484", 0).set_addrmap(0, &shanghai_state::hd63484_map);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -466,36 +463,36 @@ MACHINE_CONFIG_START(shanghai_state::shangha2)
 	ymsnd.add_route(1, "mono", 0.15);
 	ymsnd.add_route(2, "mono", 0.15);
 	ymsnd.add_route(3, "mono", 0.80);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(shanghai_state::kothello)
-
+void shanghai_state::kothello(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V30, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(kothello_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shanghai_state, half_vblank_irq)
+	V30(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &shanghai_state::kothello_map);
+	m_maincpu->set_vblank_int("screen", FUNC(shanghai_state::half_vblank_irq));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(kothello_sound_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(16'000'000)/4));
+	audiocpu.set_addrmap(AS_PROGRAM, &shanghai_state::kothello_sound_map);
+	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+	config.m_minimum_quantum = attotime::from_hz(12000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(384, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
-	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(57);
+	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(384, 280);
+	m_screen->set_visarea(0, 384-1, 0, 280-1);
+	m_screen->set_screen_update("hd63484", FUNC(hd63484_device::update_screen));
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 256);
 
-	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
-	MCFG_HD63484_EXTERNAL_SKEW(2)
+	hd63484_device &hd63484(HD63484(config, "hd63484", 0));
+	hd63484.set_addrmap(0, &shanghai_state::hd63484_map);
+	hd63484.set_external_skew(2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -515,7 +512,7 @@ MACHINE_CONFIG_START(shanghai_state::kothello)
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym2203_device::write));
 
 	SEIBU_ADPCM(config, "adpcm", 8000).add_route(ALL_OUTPUTS, "mono", 0.80); // actually MSM5205
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

@@ -42,42 +42,42 @@ WRITE_LINE_MEMBER(clshroad_state::flipscreen_w)
 }
 
 
-PALETTE_INIT_MEMBER(clshroad_state,clshroad)
+void clshroad_state::clshroad_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-	for (i = 0;i < 256;i++)
-		palette.set_pen_color(i,  pal4bit(color_prom[i + 256 * 0]),
-										pal4bit(color_prom[i + 256 * 1]),
-										pal4bit(color_prom[i + 256 * 2]));
+	for (int i = 0; i < 256; i++)
+	{
+		palette.set_pen_color(i,
+				pal4bit(color_prom[i | 0x000]),
+				pal4bit(color_prom[i | 0x100]),
+				pal4bit(color_prom[i | 0x200]));
+	}
 }
 
-PALETTE_INIT_MEMBER(clshroad_state,firebatl)
+void clshroad_state::firebatl_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x100; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x100; i++)
 	{
-		int r = pal4bit(color_prom[i + 0x000]);
-		int g = pal4bit(color_prom[i + 0x100]);
-		int b = pal4bit(color_prom[i + 0x200]);
+		int const r = pal4bit(color_prom[i | 0x000]);
+		int const g = pal4bit(color_prom[i | 0x100]);
+		int const b = pal4bit(color_prom[i | 0x200]);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x300;
 
-	for (i = 0; i < 0x200; i++)
+	for (int i = 0; i < 0x200; i++)
 		palette.set_pen_indirect(i, i & 0xff);
 
-	for (i = 0x200; i < 0x300; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t ctabentry = ((color_prom[(i - 0x200) + 0x000] & 0x0f) << 4) |
-							(color_prom[(i - 0x200) + 0x100] & 0x0f);
-		palette.set_pen_indirect(i, ctabentry);
+		uint8_t const ctabentry = ((color_prom[i | 0x000] & 0x0f) << 4) | (color_prom[i | 0x100] & 0x0f);
+		palette.set_pen_indirect(i | 0x200, ctabentry);
 	}
 }
 

@@ -29,13 +29,14 @@ DEFINE_DEVICE_TYPE(HUC6271, huc6271_device, "huc6271", "Hudson HuC6271 \"Rainbow
 
 void huc6271_device::data_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).ram();
+	if (!has_configured_map(0))
+		map(0x000000, 0x0fffff).ram();
 }
 
 huc6271_device::huc6271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HUC6271, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, m_data_space_config("data", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(), address_map_constructor(FUNC(huc6271_device::data_map), this))
+	, m_data_space_config("data", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(FUNC(huc6271_device::data_map), this))
 {
 }
 

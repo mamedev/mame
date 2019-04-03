@@ -44,6 +44,11 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -82,22 +87,19 @@ private:
 	TILE_GET_INFO_MEMBER(lasso_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wwjgtin_get_track_tile_info);
 	TILE_GET_INFO_MEMBER(pinbo_get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(lasso);
+	void lasso_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(wwjgtin);
 	DECLARE_MACHINE_RESET(wwjgtin);
 	DECLARE_VIDEO_START(wwjgtin);
-	DECLARE_PALETTE_INIT(wwjgtin);
+	void wwjgtin_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(pinbo);
 	uint32_t screen_update_lasso(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_chameleo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_wwjgtin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	rgb_t get_color( int data );
+	static rgb_t get_color(int data);
 	void wwjgtin_set_last_four_colors();
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int reverse );
-	void draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int reverse);
+	void draw_lasso(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void chameleo_audio_map(address_map &map);
 	void chameleo_main_map(address_map &map);
 	void lasso_audio_map(address_map &map);

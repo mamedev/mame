@@ -40,7 +40,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(bus_w);
 
 private:
-	required_device<cpu_device> m_mcu;
+	required_device<i8049_device> m_mcu;
 	required_device<address_map_bank_device> m_ext;
 	required_ioport_array<15> m_upper;
 	required_ioport_array<11> m_lower;

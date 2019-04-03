@@ -21,46 +21,6 @@
 #define CBM_IEC_TAG         "iec_bus"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CBM_IEC_BUS_ADD() \
-	MCFG_DEVICE_ADD(CBM_IEC_TAG, CBM_IEC, 0)
-
-
-#define MCFG_CBM_IEC_BUS_SRQ_CALLBACK(_write) \
-	downcast<cbm_iec_device *>(device)->set_srq_callback(DEVCB_##_write);
-
-#define MCFG_CBM_IEC_BUS_ATN_CALLBACK(_write) \
-	downcast<cbm_iec_device *>(device)->set_atn_callback(DEVCB_##_write);
-
-#define MCFG_CBM_IEC_BUS_CLK_CALLBACK(_write) \
-	downcast<cbm_iec_device *>(device)->set_clk_callback(DEVCB_##_write);
-
-#define MCFG_CBM_IEC_BUS_DATA_CALLBACK(_write) \
-	downcast<cbm_iec_device *>(device)->set_data_callback(DEVCB_##_write);
-
-#define MCFG_CBM_IEC_BUS_RESET_CALLBACK(_write) \
-	downcast<cbm_iec_device *>(device)->set_reset_callback(DEVCB_##_write);
-
-
-#define MCFG_CBM_IEC_SLOT_ADD(_tag, _address, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, CBM_IEC_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	downcast<cbm_iec_slot_device *>(device)->set_address(_address);
-
-
-#define MCFG_CBM_IEC_ADD(_default_drive) \
-	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, nullptr) \
-	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, cbm_iec_devices, _default_drive) \
-	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, nullptr) \
-	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, nullptr) \
-	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, nullptr) \
-	MCFG_CBM_IEC_BUS_ADD()
-
-
 void cbm_iec_devices(device_slot_interface &device);
 
 //**************************************************************************
@@ -78,11 +38,6 @@ public:
 	// construction/destruction
 	cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_srq_callback(Object &&wr) { return m_write_srq.set_callback(std::forward<Object>(wr)); }
-	template <class Object> devcb_base &set_atn_callback(Object &&wr) { return m_write_atn.set_callback(std::forward<Object>(wr)); }
-	template <class Object> devcb_base &set_clk_callback(Object &&wr) { return m_write_clk.set_callback(std::forward<Object>(wr)); }
-	template <class Object> devcb_base &set_data_callback(Object &&wr) { return m_write_data.set_callback(std::forward<Object>(wr)); }
-	template <class Object> devcb_base &set_reset_callback(Object &&wr) { return m_write_reset.set_callback(std::forward<Object>(wr)); }
 	auto srq_callback() { return m_write_srq.bind(); }
 	auto atn_callback() { return m_write_atn.bind(); }
 	auto clk_callback() { return m_write_clk.bind(); }
@@ -166,6 +121,15 @@ class cbm_iec_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	cbm_iec_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: cbm_iec_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	cbm_iec_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void add_slot(machine_config &config, const char *_tag, int _address, const char *_def_slot);

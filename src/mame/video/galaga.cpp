@@ -33,7 +33,7 @@ There are 63 stars in each set, 126 displayed at any one time
 
 */
 
-struct galaga_state::star const galaga_state::s_star_seed_tab[252]=
+galaga_state::star const galaga_state::s_star_seed_tab[252]=
 {
 /* also shared by Bosconian */
 
@@ -325,60 +325,55 @@ struct galaga_state::star const galaga_state::s_star_seed_tab[252]=
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(galaga_state,galaga)
+void galaga_state::galaga_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* core palette */
-	for (i = 0;i < 32;i++)
+	// core palette
+	for (int i = 0; i < 32; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
-		bit0 = ((*color_prom) >> 0) & 0x01;
-		bit1 = ((*color_prom) >> 1) & 0x01;
-		bit2 = ((*color_prom) >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = ((*color_prom) >> 3) & 0x01;
-		bit1 = ((*color_prom) >> 4) & 0x01;
-		bit2 = ((*color_prom) >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(*color_prom, 0);
+		bit1 = BIT(*color_prom, 1);
+		bit2 = BIT(*color_prom, 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(*color_prom, 3);
+		bit1 = BIT(*color_prom, 4);
+		bit2 = BIT(*color_prom, 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		bit0 = 0;
-		bit1 = ((*color_prom) >> 6) & 0x01;
-		bit2 = ((*color_prom) >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(*color_prom, 6);
+		bit2 = BIT(*color_prom, 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_indirect_color(i,rgb_t(r,g,b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 
-	/* palette for the stars */
-	for (i = 0;i < 64;i++)
+	// palette for the stars
+	for (int i = 0; i < 64; i++)
 	{
-		int bits,r,g,b;
-		static const int map[4] = { 0x00, 0x47, 0x97 ,0xde };
+		static constexpr int map[4] = { 0x00, 0x47, 0x97 ,0xde };
 
-		bits = (i >> 0) & 0x03;
-		r = map[bits];
-		bits = (i >> 2) & 0x03;
-		g = map[bits];
-		bits = (i >> 4) & 0x03;
-		b = map[bits];
+		int const r = map[(i >> 0) & 0x03];
+		int const g = map[(i >> 2) & 0x03];
+		int const b = map[(i >> 4) & 0x03];
 
-		palette.set_indirect_color(32 + i,rgb_t(r,g,b));
+		palette.set_indirect_color(32 + i, rgb_t(r, g, b));
 	}
 
-	/* characters */
-	for (i = 0;i < 64*4;i++)
-		palette.set_pen_indirect(i, (*(color_prom++) & 0x0f) + 0x10);   /* chars */
+	// characters
+	for (int i = 0; i < 64*4; i++)
+		palette.set_pen_indirect(i, (*color_prom++ & 0x0f) | 0x10);
 
-	/* sprites */
-	for (i = 0;i < 64*4;i++)
-		palette.set_pen_indirect(64*4+i, (*(color_prom++) & 0x0f));
+	// sprites
+	for (int i = 0; i < 64*4; i++)
+		palette.set_pen_indirect(64*4 + i, *color_prom++ & 0x0f);
 
-	/* now the stars */
-	for (i = 0;i < 64;i++)
-		palette.set_pen_indirect(64*4+64*4+i, 32 + i);
+	// now the stars
+	for (int i = 0; i < 64; i++)
+		palette.set_pen_indirect(64*4 + 64*4 + i, 32 + i);
 }
 
 

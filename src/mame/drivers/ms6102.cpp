@@ -304,12 +304,13 @@ void ms6102_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(ms6102_state::ms6102)
-	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(18'432'000) / 9)
-	MCFG_DEVICE_PROGRAM_MAP(ms6102_mem)
-	MCFG_DEVICE_IO_MAP(ms6102_io)
-	MCFG_I8085A_INTE(WRITELINE("i8214", i8214_device, inte_w))
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ms6102_state, ms6102_int_ack)
+void ms6102_state::ms6102(machine_config &config)
+{
+	I8080(config, m_maincpu, XTAL(18'432'000) / 9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ms6102_state::ms6102_mem);
+	m_maincpu->set_addrmap(AS_IO, &ms6102_state::ms6102_io);
+	m_maincpu->out_inte_func().set("i8214", FUNC(i8214_device::inte_w));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(ms6102_state::ms6102_int_ack));
 
 	I8214(config, m_pic, XTAL(18'432'000) / 9);
 	m_pic->int_wr_callback().set(FUNC(ms6102_state::irq_w));
@@ -317,28 +318,29 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	KR1601RR1(config, m_earom, 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("i8275_1", i8275_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(16'400'000), 784, 0, 80*8, 375, 0, 25*12)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ms6102)
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update("i8275_1", FUNC(i8275_device::screen_update));
+	m_screen->set_raw(XTAL(16'400'000), 784, 0, 80*8, 375, 0, 25*12);
+
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_ms6102);
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	I8257(config, m_dma8257, XTAL(18'432'000) / 9);
 	m_dma8257->out_hrq_cb().set(FUNC(ms6102_state::hrq_w));
 	m_dma8257->in_memr_cb().set(FUNC(ms6102_state::memory_read_byte));
 	m_dma8257->out_iow_cb<2>().set(FUNC(ms6102_state::vdack_w));
 
-	MCFG_DEVICE_ADD("i8275_1", I8275, XTAL(16'400'000) / 8) // XXX
-	MCFG_I8275_CHARACTER_WIDTH(8)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(ms6102_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma8257", i8257_device, dreq2_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	I8275(config, m_crtc1, XTAL(16'400'000) / 8); // XXX
+	m_crtc1->set_character_width(8);
+	m_crtc1->set_display_callback(FUNC(ms6102_state::display_pixels));
+	m_crtc1->drq_wr_callback().set("dma8257", FUNC(i8257_device::dreq2_w));
+	m_crtc1->set_screen(m_screen);
 
-	MCFG_DEVICE_ADD("i8275_2", I8275, XTAL(16'400'000) / 8) // XXX
-	MCFG_I8275_CHARACTER_WIDTH(8)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(ms6102_state, display_attr)
-	MCFG_I8275_IRQ_CALLBACK(WRITELINE(*this, ms6102_state, irq<5>))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	I8275(config, m_crtc2, XTAL(16'400'000) / 8); // XXX
+	m_crtc2->set_character_width(8);
+	m_crtc2->set_display_callback(FUNC(ms6102_state::display_attr));
+	m_crtc2->irq_wr_callback().set(FUNC(ms6102_state::irq<5>));
+	m_crtc2->set_screen(m_screen);
 
 	// keyboard
 	AY31015(config, m_kbd_uart);
@@ -364,7 +366,7 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	pit8253.out_handler<0>().set(m_i8251, FUNC(i8251_device::write_txc));
 	pit8253.set_clk<1>(XTAL(16'400'000) / 9);
 	pit8253.out_handler<1>().set(m_i8251, FUNC(i8251_device::write_rxc));
-MACHINE_CONFIG_END
+}
 
 ROM_START( ms6102 )
 	ROM_REGION(0x3000, "maincpu", 0)

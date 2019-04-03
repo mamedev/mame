@@ -742,7 +742,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 	else if (offset < 0x4800)
 	{
 		if (m_pokey.found())
-			m_pokey->write(space, offset, data, 0xff);
+			m_pokey->write(offset, data);
 	}
 
 	/* OUT0 */
@@ -804,7 +804,7 @@ READ8_MEMBER(missile_state::missile_r)
 	else if (offset < 0x4800)
 	{
 		if (m_pokey.found())
-			result = m_pokey->read(space, offset & 0x0f, 0xff);
+			result = m_pokey->read(offset & 0x0f);
 	}
 
 	/* IN0 */
@@ -1151,47 +1151,46 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(missile_state::missile)
-
+void missile_state::missile(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M6502(config, m_maincpu, MASTER_CLOCK/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &missile_state::main_map);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 8)
+	PALETTE(config, m_palette).set_entries(8);
 
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(missile_state, screen_update_missile)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(missile_state::screen_update_missile));
+	m_screen->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey", POKEY, MASTER_CLOCK/8)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("R8"))
-	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.1), 5.0)
+	POKEY(config, m_pokey, MASTER_CLOCK/8);
+	m_pokey->allpot_r().set_ioport("R8");
+	m_pokey->set_output_rc(RES_K(10), CAP_U(0.1), 5.0);
+	m_pokey->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(missile_state::missilea)
+void missile_state::missilea(machine_config &config)
+{
 	missile(config);
 
-	MCFG_DEVICE_REMOVE("pokey")
-MACHINE_CONFIG_END
+	config.device_remove("pokey");
+}
 
-MACHINE_CONFIG_START(missile_state::missileb)
+void missile_state::missileb(machine_config &config)
+{
 	missilea(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bootleg_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &missile_state::bootleg_main_map);
 
 	AY8912(config, "ay8912", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 0.75);
-
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

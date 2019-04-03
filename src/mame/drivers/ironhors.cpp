@@ -378,33 +378,30 @@ Hsync is 15,56khz
 These clocks make the emulation run too fast.
 */
 
-MACHINE_CONFIG_START(ironhors_state::ironhors)
-
+void ironhors_state::ironhors(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
-	MCFG_DEVICE_PROGRAM_MAP(master_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ironhors_state, ironhors_scanline_tick, "screen", 0, 1)
+	MC6809E(config, m_maincpu, 18432000/6);        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ironhors_state::master_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(ironhors_state::ironhors_scanline_tick), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 18432000/6)      /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(slave_map)
-	MCFG_DEVICE_IO_MAP(slave_io_map)
+	Z80(config, m_soundcpu, 18432000/6);      /* 3.072 MHz */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &ironhors_state::slave_map);
+	m_soundcpu->set_addrmap(AS_IO, &ironhors_state::slave_io_map);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(61)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_RAW_PARAMS(18432000/4,296,8,256-8,255,16,240) // pixel clock is a guesswork
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//  m_screen->set_refresh_hz(61);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  m_screen->set_size(32*8, 32*8);
+//  m_screen->set_visarea(1*8, 31*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(18432000/4,296,8,256-8,255,16,240); // pixel clock is a guesswork
+	m_screen->set_screen_update(FUNC(ironhors_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ironhors)
-	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(ironhors_state, ironhors)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ironhors);
+	PALETTE(config, m_palette, FUNC(ironhors_state::ironhors_palette), 16*8*16+16*8*16, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -418,10 +415,8 @@ MACHINE_CONFIG_START(ironhors_state::ironhors)
 	ym2203.add_route(2, "disc_ih", 1.0, 2);
 	ym2203.add_route(3, "disc_ih", 1.0, 3);
 
-	MCFG_DEVICE_ADD("disc_ih", DISCRETE, ironhors_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-MACHINE_CONFIG_END
+	DISCRETE(config, m_disc_ih, ironhors_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_scanline_tick)
 {
@@ -441,28 +436,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_scanline_tick)
 
 READ8_MEMBER(ironhors_state::farwest_soundlatch_r)
 {
-	return m_soundlatch->read(m_soundcpu->space(AS_PROGRAM), 0);
+	return m_soundlatch->read();
 }
 
-MACHINE_CONFIG_START(ironhors_state::farwest)
+void ironhors_state::farwest(machine_config &config)
+{
 	ironhors(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(farwest_master_map)
-	MCFG_DEVICE_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(ironhors_state, farwest_scanline_tick)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ironhors_state::farwest_master_map);
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(ironhors_state::farwest_scanline_tick));
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(farwest_slave_map)
-	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
+	Z80(config.replace(), m_soundcpu, 18432000/6);      /* 3.072 MHz */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &ironhors_state::farwest_slave_map);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_farwest)
+	m_gfxdecode->set_info(gfx_farwest);
 	MCFG_VIDEO_START_OVERRIDE(ironhors_state,farwest)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update_farwest)
+
+	m_screen->set_screen_update(FUNC(ironhors_state::screen_update_farwest));
 
 	subdevice<ym2203_device>("ym2203")->port_b_read_callback().set(FUNC(ironhors_state::farwest_soundlatch_r));
-MACHINE_CONFIG_END
+}
 
 
 

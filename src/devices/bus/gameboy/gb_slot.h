@@ -58,10 +58,10 @@ public:
 	virtual ~device_gb_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_bank) {}
-	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
+	virtual uint8_t read_rom(offs_t offset) { return 0xff; }
+	virtual void write_bank(offs_t offset, uint8_t data) {}
+	virtual uint8_t read_ram(offs_t offset) { return 0xff; }
+	virtual void write_ram(offs_t offset, uint8_t data) {}
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -145,10 +145,10 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	virtual uint8_t read_rom(offs_t offset);
+	virtual void write_bank(offs_t offset, uint8_t data);
+	virtual uint8_t read_ram(offs_t offset);
+	virtual void write_ram(offs_t offset, uint8_t data);
 
 
 protected:
@@ -164,6 +164,15 @@ class gb_cart_slot_device :  public gb_cart_slot_device_base
 {
 public:
 	// construction/destruction
+	template <typename T>
+	gb_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: gb_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	gb_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
@@ -174,6 +183,15 @@ class megaduck_cart_slot_device :  public gb_cart_slot_device_base
 {
 public:
 	// construction/destruction
+	template <typename T>
+	megaduck_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: megaduck_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	megaduck_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
@@ -192,20 +210,6 @@ public:
 DECLARE_DEVICE_TYPE(GB_CART_SLOT,       gb_cart_slot_device)
 DECLARE_DEVICE_TYPE(MEGADUCK_CART_SLOT, megaduck_cart_slot_device)
 
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
 #define GBSLOT_ROM_REGION_TAG ":cart:rom"
-
-#define MCFG_GB_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, GB_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_MEGADUCK_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, MEGADUCK_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
 
 #endif // MAME_BUS_GAMEBOY_GB_SLOT_H

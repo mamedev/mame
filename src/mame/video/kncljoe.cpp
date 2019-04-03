@@ -16,59 +16,57 @@ Knuckle Joe - (c) 1985 Taito Corporation
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(kncljoe_state, kncljoe)
+void kncljoe_state::kncljoe_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *color_prom = memregion("proms")->base();
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x80; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x80; i++)
 	{
-		int r = pal4bit(color_prom[i + 0x000]);
-		int g = pal4bit(color_prom[i + 0x100]);
-		int b = pal4bit(color_prom[i + 0x200]);
+		int const r = pal4bit(color_prom[i + 0x000]);
+		int const g = pal4bit(color_prom[i + 0x100]);
+		int const b = pal4bit(color_prom[i + 0x200]);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	for (i = 0x80; i < 0x90; i++)
+	for (int i = 0; i < 0x10; i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
-		/* red component */
+		// red component
 		bit0 = 0;
-		bit1 = (color_prom[(i - 0x80) + 0x300] >> 6) & 0x01;
-		bit2 = (color_prom[(i - 0x80) + 0x300] >> 7) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i + 0x300], 6);
+		bit2 = BIT(color_prom[i + 0x300], 7);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* green component */
-		bit0 = (color_prom[(i - 0x80) + 0x300] >> 3) & 0x01;
-		bit1 = (color_prom[(i - 0x80) + 0x300] >> 4) & 0x01;
-		bit2 = (color_prom[(i - 0x80) + 0x300] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(color_prom[i + 0x300], 3);
+		bit1 = BIT(color_prom[i + 0x300], 4);
+		bit2 = BIT(color_prom[i + 0x300], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* blue component */
-		bit0 = (color_prom[(i - 0x80) + 0x300] >> 0) & 0x01;
-		bit1 = (color_prom[(i - 0x80) + 0x300] >> 1) & 0x01;
-		bit2 = (color_prom[(i - 0x80) + 0x300] >> 2) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// blue component
+		bit0 = BIT(color_prom[i + 0x300], 0);
+		bit1 = BIT(color_prom[i + 0x300], 1);
+		bit2 = BIT(color_prom[i + 0x300], 2);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_indirect_color(i, rgb_t(r, g, b));
+		palette.set_indirect_color(i + 0x80, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x320;
 
-	/* chars */
-	for (i = 0; i < 0x80; i++)
+	// chars
+	for (int i = 0; i < 0x80; i++)
 		palette.set_pen_indirect(i, i);
 
-	/* sprite lookup table */
-	for (i = 0x80; i < 0x100; i++)
+	// sprite lookup table
+	for (int i = 0; i < 0x80; i++)
 	{
-		uint8_t ctabentry = (color_prom[i - 0x80] & 0x0f) | 0x80;
-		palette.set_pen_indirect(i, ctabentry);
+		uint8_t const ctabentry = (color_prom[i] & 0x0f) | 0x80;
+		palette.set_pen_indirect(i + 0x80, ctabentry);
 	}
 }
 

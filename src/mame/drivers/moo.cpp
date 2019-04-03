@@ -494,15 +494,15 @@ MACHINE_RESET_MEMBER(moo_state,moo)
 	m_sprite_colorbase = 0;
 }
 
-MACHINE_CONFIG_START(moo_state::moo)
-
+void moo_state::moo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) // 16MHz verified
-	MCFG_DEVICE_PROGRAM_MAP(moo_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", moo_state,  moo_interrupt)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2); // 16MHz verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &moo_state::moo_map);
+	m_maincpu->set_vblank_int("screen", FUNC(moo_state::moo_interrupt));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(32'000'000)/4) // 8MHz verified
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_soundcpu, XTAL(32'000'000)/4); // 8MHz verified
+	m_soundcpu->set_addrmap(AS_PROGRAM, &moo_state::sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
 	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
@@ -513,30 +513,29 @@ MACHINE_CONFIG_START(moo_state::moo)
 	m_k053252->set_offsets(40, 16);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1200))   // should give IRQ4 sufficient time to update scroll registers
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(moo_state, screen_update_moo)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1200));   // should give IRQ4 sufficient time to update scroll registers
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(40, 40+384-1, 16, 16+224-1);
+	m_screen->set_screen_update(FUNC(moo_state::screen_update_moo));
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XRGB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(moo_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48+1, 23)
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback), this);
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48+1, 23);
+	m_k053246->set_palette("palette");
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(moo_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(moo_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
+	m_k056832->set_palette("palette");
 
 	K053251(config, m_k053251, 0);
 
@@ -550,17 +549,17 @@ MACHINE_CONFIG_START(moo_state::moo)
 
 	YM2151(config, "ymsnd", XTAL(32'000'000)/8).add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50); // 4MHz verified
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.75)
-MACHINE_CONFIG_END
+	K054539(config, m_k054539, XTAL(18'432'000));
+	m_k054539->add_route(0, "rspeaker", 0.75);
+	m_k054539->add_route(1, "lspeaker", 0.75);
+}
 
-MACHINE_CONFIG_START(moo_state::moobl)
-
+void moo_state::moobl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16100000)
-	MCFG_DEVICE_PROGRAM_MAP(moobl_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", moo_state,  moobl_interrupt)
+	M68000(config, m_maincpu, 16100000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &moo_state::moobl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(moo_state::moobl_interrupt));
 
 	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
 	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
@@ -568,30 +567,29 @@ MACHINE_CONFIG_START(moo_state::moobl)
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1200)) // should give IRQ4 sufficient time to update scroll registers
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(moo_state, screen_update_moo)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1200)); // should give IRQ4 sufficient time to update scroll registers
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(40, 40+384-1, 16, 16+224-1);
+	m_screen->set_screen_update(FUNC(moo_state::screen_update_moo));
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XRGB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(moo_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48+1, 23)
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback), this);
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48+1, 23);
+	m_k053246->set_palette("palette");
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(moo_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(moo_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
+	m_k056832->set_palette("palette");
 
 	K053251(config, m_k053251, 0);
 
@@ -601,31 +599,26 @@ MACHINE_CONFIG_START(moo_state::moobl)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(moo_state::bucky)
+void moo_state::bucky(machine_config &config)
+{
 	moo(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bucky_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &moo_state::bucky_map);
 
-	MCFG_K054000_ADD("k054000")
+	K054000(config, "k054000", 0);
 
-	MCFG_DEVICE_MODIFY("k053246")
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48, 23)
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48, 23);
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(4096)
-	MCFG_PALETTE_FORMAT(XRGB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	m_palette->set_format(palette_device::xRGB_888, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,bucky)
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( moomesa ) /* Version EA */

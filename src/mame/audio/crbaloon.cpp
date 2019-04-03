@@ -138,26 +138,25 @@ static DISCRETE_SOUND_START(crbaloon_discrete)
 DISCRETE_SOUND_END
 
 
-MACHINE_CONFIG_START(crbaloon_state::crbaloon_audio)
-
+void crbaloon_state::crbaloon_audio(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("snsnd", SN76477)
-	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(470)) // noise + filter
-	MCFG_SN76477_DECAY_RES(RES_K(220))                   // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1.0), RES_K(4.7))   // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_M(1))                       // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(200))                // feedback_res
-	MCFG_SN76477_VCO_PARAMS(5.0, CAP_P(470), RES_K(330)) // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(5.0)                      // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_P(420), RES_K(20))       // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(1.0), RES_K(47))   // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 0, 1)                   // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                   // envelope 1, 2
-	MCFG_SN76477_ENABLE(0)                               // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(RES_K(47), RES_K(330), CAP_P(470));
+	m_sn->set_decay_res(RES_K(220));
+	m_sn->set_attack_params(CAP_U(1.0), RES_K(4.7));
+	m_sn->set_amp_res(RES_M(1));
+	m_sn->set_feedback_res(RES_K(200));
+	m_sn->set_vco_params(5.0, CAP_P(470), RES_K(330));
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_P(420), RES_K(20));
+	m_sn->set_oneshot_params(CAP_U(1.0), RES_K(47));
+	m_sn->set_vco_mode(0);
+	m_sn->set_mixer_params(0, 0, 1);
+	m_sn->set_envelope_params(1, 0);
+	m_sn->set_enable(0);
+	m_sn->add_route(ALL_OUTPUTS, "mono", 2.0);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, crbaloon_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, "discrete", crbaloon_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}

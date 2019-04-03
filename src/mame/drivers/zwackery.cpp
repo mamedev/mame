@@ -37,8 +37,8 @@
 class zwackery_state : public driver_device
 {
 public:
-	zwackery_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	zwackery_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pia0(*this, "pia0"),
 		m_pia1(*this, "pia1"),
@@ -414,7 +414,7 @@ GFXDECODE_END
 
 WRITE8_MEMBER( zwackery_state::pia1_porta_w )
 {
-	m_cheap_squeak_deluxe->sr_w(space, 0, data >> 4);
+	m_cheap_squeak_deluxe->sr_w(data >> 4);
 }
 
 
@@ -479,7 +479,7 @@ READ8_MEMBER( zwackery_state::pia2_porta_r )
 READ8_MEMBER( zwackery_state::ptm_r )
 {
 	m_maincpu->adjust_icount(-14);
-	return m_ptm->read(space, offset);
+	return m_ptm->read(offset);
 }
 
 void zwackery_state::machine_start()
@@ -533,10 +533,8 @@ void zwackery_state::zwackery(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->scanline().set(FUNC(zwackery_state::scanline_cb));
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_zwackery);
-
-	PALETTE(config, m_palette, 4096);
-	m_palette->set_format(PALETTE_FORMAT_xRRRRRBBBBBGGGGG_inverted);
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_zwackery);
+	PALETTE(config, "palette").set_format(palette_device::xRBG_555_inverted, 4096);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();

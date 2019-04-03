@@ -35,7 +35,8 @@ public:
 		m_k053936_1(*this, "k053936_1"),
 		m_k053936_2(*this, "k053936_2"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch"),
+		m_dsw2(*this, "DSW2")
 	{ }
 
 	void dbz(machine_config &config);
@@ -70,6 +71,8 @@ private:
 	required_device<k053936_device> m_k053936_2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
+
+	required_ioport m_dsw2;
 
 	DECLARE_WRITE16_MEMBER(dbzcontrol_w);
 	DECLARE_WRITE16_MEMBER(dbz_sound_command_w);

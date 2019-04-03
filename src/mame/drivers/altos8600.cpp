@@ -721,23 +721,24 @@ static void altos8600_floppies(device_slot_interface &device)
 	device.option_add("8dd", FLOPPY_8_DSDD);
 }
 
-MACHINE_CONFIG_START(altos8600_state::altos8600)
-	MCFG_DEVICE_ADD(m_maincpu, I8086, 5_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(cpu_mem)
-	MCFG_DEVICE_IO_MAP(cpu_io)
-	MCFG_DEVICE_OPCODES_MAP(code_mem)
-	MCFG_I8086_STACK_MAP(stack_mem)
-	MCFG_I8086_CODE_MAP(code_mem)
-	MCFG_I8086_EXTRA_MAP(extra_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(altos8600_state, inta)
-	MCFG_I8086_IF_HANDLER(WRITELINE(*this, altos8600_state, cpuif_w))
+void altos8600_state::altos8600(machine_config &config)
+{
+	I8086(config, m_maincpu, 5_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &altos8600_state::cpu_mem);
+	m_maincpu->set_addrmap(AS_IO, &altos8600_state::cpu_io);
+	m_maincpu->set_addrmap(AS_OPCODES, &altos8600_state::code_mem);
+	m_maincpu->set_addrmap(i8086_cpu_device::AS_STACK, &altos8600_state::stack_mem);
+	m_maincpu->set_addrmap(i8086_cpu_device::AS_CODE, &altos8600_state::code_mem);
+	m_maincpu->set_addrmap(i8086_cpu_device::AS_EXTRA, &altos8600_state::extra_mem);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(altos8600_state::inta));
+	m_maincpu->if_handler().set(FUNC(altos8600_state::cpuif_w));
 
-	MCFG_DEVICE_ADD(m_dmac, I8089, 5_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(dmac_mem)
-	MCFG_DEVICE_IO_MAP(dmac_io)
-	MCFG_I8089_DATA_WIDTH(16)
-	MCFG_I8089_SINTR1(WRITELINE(*this, altos8600_state, sintr1_w))
-	MCFG_I8089_SINTR2(WRITELINE(m_pic[1], pic8259_device, ir4_w))
+	I8089(config, m_dmac, 5_MHz_XTAL);
+	m_dmac->set_addrmap(AS_PROGRAM, &altos8600_state::dmac_mem);
+	m_dmac->set_addrmap(AS_IO, &altos8600_state::dmac_io);
+	m_dmac->set_data_width(16);
+	m_dmac->sintr1().set(FUNC(altos8600_state::sintr1_w));
+	m_dmac->sintr2().set(m_pic[1], FUNC(pic8259_device::ir4_w));
 
 	PIC8259(config, m_pic[0], 0);
 	m_pic[0]->out_int_callback().set_inputline(m_maincpu, 0);
@@ -787,18 +788,18 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	FD1797(config, m_fdc, 2000000);
 	m_fdc->intrq_wr_callback().set(m_pic[1], FUNC(pic8259_device::ir1_w));
 	m_fdc->drq_wr_callback().set(FUNC(altos8600_state::fddrq_w));
-	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1797:2", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1797:3", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "fd1797:0", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1797:1", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1797:2", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1797:3", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats);
 
 	ACS8600_ICS(config, m_ics, 0);
 	m_ics->set_host_space(m_dmac, AS_PROGRAM); // TODO: fixme
 	m_ics->irq1_callback().set(m_pic[0], FUNC(pic8259_device::ir5_w));
 	m_ics->irq2_callback().set(m_pic[0], FUNC(pic8259_device::ir6_w));
 
-	MCFG_HARDDISK_ADD("hdd")
-MACHINE_CONFIG_END
+	HARDDISK(config, "hdd", 0);
+}
 
 ROM_START(altos8600)
 	ROM_REGION(0x2000, "bios", 0)

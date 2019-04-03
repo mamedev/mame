@@ -46,13 +46,13 @@ const tiny_rom_entry *bbc_mertec_device::device_rom_region() const
 
 void bbc_mertec_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 16_MHz_XTAL / 16);
+	PIA6821(config, m_pia, DERIVED_CLOCK(1, 8));
 	//m_pia->readpb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_r));
 	//m_pia->writepb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_w));
 	//m_pia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 
 	/* adc */
-	UPD7002(config, m_upd7002, 0);
+	UPD7002(config, m_upd7002, DERIVED_CLOCK(1, 8));
 	m_upd7002->set_get_analogue_callback(FUNC(bbc_mertec_device::get_analogue_input), this);
 	m_upd7002->set_eoc_callback(FUNC(bbc_mertec_device::upd7002_eoc), this);
 
@@ -65,7 +65,7 @@ void bbc_mertec_device::device_add_mconfig(machine_config &config)
 	//m_userport->cb2_handler().set(m_pia, FUNC(via6522_device::write_cb2));
 
 	/* 2mhz bus port */
-	BBC_1MHZBUS_SLOT(config, m_2mhzbus, bbc_1mhzbus_devices, nullptr);
+	BBC_1MHZBUS_SLOT(config, m_2mhzbus, DERIVED_CLOCK(1, 4), bbc_1mhzbus_devices, nullptr);
 	m_2mhzbus->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_exp_slot_device::irq_w));
 	m_2mhzbus->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_exp_slot_device::nmi_w));
 }
@@ -114,52 +114,52 @@ void bbc_mertec_device::upd7002_eoc(int data)
 	//m_via6522_0->write_cb1(data);
 }
 
-READ8_MEMBER(bbc_mertec_device::fred_r)
+uint8_t bbc_mertec_device::fred_r(offs_t offset)
 {
-	return m_2mhzbus->fred_r(space, offset);
+	return m_2mhzbus->fred_r(offset);
 }
 
-WRITE8_MEMBER(bbc_mertec_device::fred_w)
+void bbc_mertec_device::fred_w(offs_t offset, uint8_t data)
 {
-	m_2mhzbus->fred_w(space, offset, data);
+	m_2mhzbus->fred_w(offset, data);
 }
 
-READ8_MEMBER(bbc_mertec_device::jim_r)
+uint8_t bbc_mertec_device::jim_r(offs_t offset)
 {
-	return m_2mhzbus->jim_r(space, offset);
+	return m_2mhzbus->jim_r(offset);
 }
 
-WRITE8_MEMBER(bbc_mertec_device::jim_w)
+void bbc_mertec_device::jim_w(offs_t offset, uint8_t data)
 {
-	m_2mhzbus->jim_w(space, offset, data);
+	m_2mhzbus->jim_w(offset, data);
 }
 
-READ8_MEMBER(bbc_mertec_device::sheila_r)
+uint8_t bbc_mertec_device::sheila_r(offs_t offset)
 {
 	uint8_t data = 0xfe;
 
 	if (offset >= 0x18 && offset < 0x20)
 	{
-		data = m_upd7002->read(space, offset & 0x03);
+		data = m_upd7002->read(offset & 0x03);
 	}
 
 	return data;
 }
 
-WRITE8_MEMBER(bbc_mertec_device::sheila_w)
+void bbc_mertec_device::sheila_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x18 && offset < 0x20)
 	{
-		m_upd7002->write(space, offset & 0x03, data);
+		m_upd7002->write(offset & 0x03, data);
 	}
 }
 
-READ8_MEMBER(bbc_mertec_device::pb_r)
+uint8_t bbc_mertec_device::pb_r()
 {
-	return m_userport->pb_r(space, 0);
+	return m_userport->pb_r();
 }
 
-WRITE8_MEMBER(bbc_mertec_device::pb_w)
+void bbc_mertec_device::pb_w(uint8_t data)
 {
-	m_userport->pb_w(space, 0, data);
+	m_userport->pb_w(data);
 }

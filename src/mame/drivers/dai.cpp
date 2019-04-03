@@ -187,13 +187,14 @@ static GFXDECODE_START( gfx_dai )
 GFXDECODE_END
 
 /* machine definition */
-MACHINE_CONFIG_START(dai_state::dai)
+void dai_state::dai(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(dai_mem)
-	MCFG_DEVICE_IO_MAP(dai_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(dai_state,int_ack)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	I8080(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dai_state::dai_mem);
+	m_maincpu->set_addrmap(AS_IO, &dai_state::dai_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(dai_state::int_ack));
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(2000000);
@@ -206,30 +207,29 @@ MACHINE_CONFIG_START(dai_state::dai)
 	I8255(config, "ppi8255");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1056, 542)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1056-1, 0, 302-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dai_state, screen_update_dai)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(1056, 542);
+	screen.set_visarea(0, 1056-1, 0, 302-1);
+	screen.set_screen_update(FUNC(dai_state::screen_update_dai));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dai)
-	MCFG_PALETTE_ADD("palette", sizeof (dai_palette) / 3)
-	MCFG_PALETTE_INIT_OWNER(dai_state, dai)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_dai);
+	PALETTE(config, m_palette, FUNC(dai_state::dai_palette), ARRAY_LENGTH(s_palette));
 
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	DAI_SOUND(config, m_sound).add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50);
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("dai_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("dai_cass");
 
 	/* tms5501 */
 	TMS5501(config, m_tms5501, 2000000);
@@ -241,8 +241,8 @@ MACHINE_CONFIG_START(dai_state::dai)
 	RAM(config, RAM_TAG).set_default_size("48K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "dai_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("dai_cass");
+}
 
 
 ROM_START(dai)

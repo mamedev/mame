@@ -24,45 +24,44 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(digdug_state,digdug)
+void digdug_state::digdug_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	for (i = 0;i < 32;i++)
+	for (int i = 0; i < 32; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(*color_prom, 0);
+		bit1 = BIT(*color_prom, 1);
+		bit2 = BIT(*color_prom, 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(*color_prom, 3);
+		bit1 = BIT(*color_prom, 4);
+		bit2 = BIT(*color_prom, 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		palette.set_indirect_color(i,rgb_t(r,g,b));
+		bit1 = BIT(*color_prom, 6);
+		bit2 = BIT(*color_prom, 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 
-	/* characters - direct mapping */
-	for (i = 0; i < 16; i++)
+	// characters - direct mapping
+	for (int i = 0; i < 16; i++)
 	{
-		palette.set_pen_indirect(i*2+0, 0);
-		palette.set_pen_indirect(i*2+1, i);
+		palette.set_pen_indirect((i << 1) | 0, 0);
+		palette.set_pen_indirect((i << 1) | 1, i);
 	}
 
-	/* sprites */
-	for (i = 0;i < 0x100;i++)
-		palette.set_pen_indirect(16*2+i, (*color_prom++ & 0x0f) + 0x10);
+	// sprites
+	for (int i = 0; i < 0x100; i++)
+		palette.set_pen_indirect(16*2 + i, (*color_prom++ & 0x0f) | 0x10);
 
-	/* bg_select */
-	for (i = 0;i < 0x100;i++)
-		palette.set_pen_indirect(16*2+256+i, *color_prom++ & 0x0f);
+	// bg_select
+	for (int i = 0; i < 0x100; i++)
+		palette.set_pen_indirect(16*2 + 256 + i, *color_prom++ & 0x0f);
 }
 
 

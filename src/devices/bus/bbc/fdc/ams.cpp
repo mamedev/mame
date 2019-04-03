@@ -43,7 +43,7 @@ ROM_END
 
 void bbc_ams3_device::device_add_mconfig(machine_config &config)
 {
-	I8271(config, m_fdc, 16_MHz_XTAL / 8);
+	I8271(config, m_fdc, DERIVED_CLOCK(1, 4));
 	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
 	m_fdc->hdl_wr_callback().set(FUNC(bbc_ams3_device::motor_w));
 	m_fdc->opt_wr_callback().set(FUNC(bbc_ams3_device::side_w));
@@ -89,30 +89,30 @@ void bbc_ams3_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_ams3_device::read)
+uint8_t bbc_ams3_device::read(offs_t offset)
 {
 	uint8_t data;
 
 	if (offset & 0x04)
 	{
-		data = m_fdc->data_r(space , 0);
+		data = m_fdc->data_r();
 	}
 	else
 	{
-		data = m_fdc->read(space, offset & 0x03);
+		data = m_fdc->read(offset & 0x03);
 	}
 	return data;
 }
 
-WRITE8_MEMBER(bbc_ams3_device::write)
+void bbc_ams3_device::write(offs_t offset, uint8_t data)
 {
 	if (offset & 0x04)
 	{
-		m_fdc->data_w(space, 0, data);
+		m_fdc->data_w(data);
 	}
 	else
 	{
-		m_fdc->write(space, offset & 0x03, data);
+		m_fdc->write(offset & 0x03, data);
 	}
 }
 

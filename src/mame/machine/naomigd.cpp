@@ -402,10 +402,10 @@ void naomi_gdrom_board::write_from_qword(uint8_t *region, uint64_t qword)
 }
 
 naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: naomi_board(mconfig, NAOMI_GDROM_BOARD, tag, owner, clock)
+	: naomi_board(mconfig, NAOMI_GDROM_BOARD, tag, owner, clock),
+	picdata(*this, finder_base::DUMMY_TAG)
 {
 	image_tag = nullptr;
-	pic_tag = nullptr;
 }
 
 void naomi_gdrom_board::find_file(const char *name, const uint8_t *dir_sector, uint32_t &file_start, uint32_t &file_size)
@@ -465,11 +465,9 @@ void naomi_gdrom_board::device_start()
 	uint64_t key;
 	uint8_t netpic = 0;
 
-	memory_region *mr = memregion(pic_tag);
-	const uint8_t *picdata = mr->base();
 
 	if(picdata) {
-		if(memregion(pic_tag)->bytes() >= 0x4000) {
+		if(picdata.length() >= 0x4000) {
 			printf("Real PIC binary found\n");
 			for(int i=0;i<7;i++)
 				name[i] = picdata[0x7c0+i*2];

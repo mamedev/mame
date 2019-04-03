@@ -34,6 +34,7 @@ public:
 		m_gdfs_tmapscroll(*this, "gdfs_tmapscroll"),
 		m_gdfs_st0020(*this, "st0020_spr"),
 		m_input_sel(*this, "input_sel"),
+		m_raster_interrupt_enabled(false),
 		m_io_key(*this, "KEY%u", 0U),
 		m_io_service(*this, "SERVICE"),
 		m_io_paddle(*this, "PADDLE"),
@@ -64,30 +65,16 @@ public:
 	void jsk(machine_config &config);
 	void hypreact(machine_config &config);
 	void keithlcy(machine_config &config);
+	void pastelis(machine_config &config);
 	void cairblad(machine_config &config);
 
-	void init_gdfs();
-	void init_sxyreac2();
-	void init_hypreac2();
-	void init_hypreact();
-	void init_dynagear();
+	void init_ssv();
+	void init_ssv_tilescram();
 	void init_eaglshot();
-	void init_srmp4();
-	void init_srmp7();
-	void init_keithlcy();
-	void init_meosism();
-	void init_vasara();
-	void init_cairblad();
-	void init_sxyreact();
-	void init_janjans1();
-	void init_ryorioh();
-	void init_drifto94();
-	void init_survarts();
-	void init_ultrax();
-	void init_stmblade();
+	void init_sexy();
+	void init_ssv_irq1();
 	void init_jsk();
-	void init_twineag2();
-	void init_mslider();
+	void init_pastelis();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -115,6 +102,7 @@ private:
 	std::unique_ptr<uint16_t[]> m_eaglshot_gfxram;
 	tilemap_t *m_gdfs_tmap;
 	int m_interrupt_ultrax;
+	bool m_raster_interrupt_enabled;
 	uint16_t m_sxyreact_serial;
 	int m_sxyreact_dial;
 	uint32_t m_latches[8];
@@ -176,14 +164,10 @@ private:
 	void get_tile(int x, int y, int size, int page, int& code, int& attr, int& flipx, int& flipy);
 	void draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &cliprect, int in_sy, int scroll);
 	void draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int  nr);
-	
+
 	void draw_sprites_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int code, int flipx, int flipy, int gfx, int shadow, int color, int sx, int sy, int xnum, int ynum);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void enable_video(int enable);
-	void init(int interrupt_ultrax);
-	void init_hypreac2_common();
-	void init_eaglshot_banking();
-
 
 	void drifto94_map(address_map &map);
 	void dsp_data_map(address_map &map);

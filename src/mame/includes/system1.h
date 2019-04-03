@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
 #include "machine/gen_latch.h"
@@ -166,6 +167,10 @@ private:
 	DECLARE_WRITE8_MEMBER(system1_paletteram_w);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
 
+	void encrypted_sys1ppi_maps(machine_config &config);
+	void encrypted_sys1pio_maps(machine_config &config);
+	void encrypted_sys2_mc8123_maps(machine_config &config);
+
 	TILE_GET_INFO_MEMBER(tile_get_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -188,7 +193,7 @@ private:
 	void dakkochn_custom_w(uint8_t data, uint8_t prevdata);
 	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<i8751_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

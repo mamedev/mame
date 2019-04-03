@@ -198,26 +198,25 @@ void citycon_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(citycon_state::citycon)
-
+void citycon_state::citycon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, CPU_CLOCK) // HD68B09P
-	MCFG_DEVICE_PROGRAM_MAP(citycon_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_assert)
+	MC6809(config, m_maincpu, CPU_CLOCK); // HD68B09P
+	m_maincpu->set_addrmap(AS_PROGRAM, &citycon_state::citycon_map);
+	m_maincpu->set_vblank_int("screen", FUNC(citycon_state::irq0_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, MASTER_CLOCK / 32) // schematics allow for either a 6809 or 6809E; HD68A09EP found on one actual PCB
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_hold) // actually unused, probably it was during development
+	mc6809e_device &audiocpu(MC6809E(config, "audiocpu", MASTER_CLOCK / 32)); // schematics allow for either a 6809 or 6809E; HD68A09EP found on one actual PCB
+	audiocpu.set_addrmap(AS_PROGRAM, &citycon_state::sound_map);
+	audiocpu.set_vblank_int("screen", FUNC(citycon_state::irq0_line_hold)); // actually unused, probably it was during development
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(citycon_state, screen_update_citycon)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	screen.set_screen_update(FUNC(citycon_state::screen_update_citycon));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_citycon)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 640+1024)   /* 640 real palette + 1024 virtual palette */
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_citycon);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RGBx_444, 640+1024);   // 640 real palette + 1024 virtual palette
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -234,7 +233,7 @@ MACHINE_CONFIG_START(citycon_state::citycon)
 	ymsnd.add_route(1, "mono", 0.40);
 	ymsnd.add_route(2, "mono", 0.40);
 	ymsnd.add_route(3, "mono", 0.20);
-MACHINE_CONFIG_END
+}
 
 
 

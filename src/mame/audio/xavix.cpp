@@ -382,12 +382,12 @@ WRITE8_MEMBER(xavix_state::sound_75f8_w)
 READ8_MEMBER(xavix_state::sound_75f9_r)
 {
 	LOG("%s: sound_75f9_r\n", machine().describe_context());
-	return m_unksnd75f9;
+	return m_unk_snd75f9;
 }
 
 WRITE8_MEMBER(xavix_state::sound_75f9_w)
 {
-	m_unksnd75f9 = data;
+	m_unk_snd75f9 = data;
 	LOG("%s: sound_75f9_w %02x\n", machine().describe_context().c_str(), data);
 }
 
@@ -483,8 +483,20 @@ WRITE8_MEMBER(xavix_state::sound_irqstatus_w)
 		{
 			if (data & bit)
 			{
-				// period should be based on m_sndtimer[t] at least, maybe also some other regs?
-				m_sound_timer[t]->adjust(attotime::from_usec(1000), t, attotime::from_usec(1000));
+				/* period should be based on m_sndtimer[t] at least, maybe also some other regs?
+
+				   rad_crdn : sound_timer0_w 06
+				   ddrfammt, popira etc. : sound_timer3_w 80
+				   so higher value definitely needs to be faster? (unless there's another multiplier elsewhere)
+
+				   11 is too fast (popira checked on various tracks, finish before getting to 100% then jump to 100%) where is this multiplier coming from? clock divided?
+				   10 seems close to correct for ddrfammt, popira, might need fine tuning.  seems too slow for rad_crdn / rad_bass?
+				   tweaked to 10.3f stay in time with the first song in https://www.youtube.com/watch?v=3x1C9bhC2rc
+
+				   the usual clock divided by 2 would be 10.738636 but that's too high
+				*/
+				attotime period = attotime::from_hz(10.3f * (m_sndtimer[t]));
+				m_sound_timer[t]->adjust(period, t, period);
 			}
 			else
 			{
@@ -504,7 +516,7 @@ WRITE8_MEMBER(xavix_state::sound_irqstatus_w)
 
 WRITE8_MEMBER(xavix_state::sound_75ff_w)
 {
-	m_unksnd75ff = data;
+	m_unk_snd75ff = data;
 	LOG("%s: sound_75ff_w %02x\n", machine().describe_context(), data);
 }
 

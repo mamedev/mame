@@ -49,14 +49,12 @@ public:
 	csplayh5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_tmp68301(*this, "tmp68301"),
 		m_nichisnd(*this, "nichisnd"),
 		m_key(*this, "KEY.%u", 0),
 		m_region_maincpu(*this, "maincpu")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<tmp68301_device> m_tmp68301;
+	required_device<tmp68301_device> m_maincpu;
 	required_device<nichisnd_device> m_nichisnd;
 	required_ioport_array<5> m_key;
 	required_memory_region m_region_maincpu;
@@ -142,8 +140,6 @@ void csplayh5_state::csplayh5_map(address_map &map)
 	map(0x800000, 0xbfffff).rom().region("blit_gfx", 0); // GFX ROM routes here
 
 	map(0xc00000, 0xc7ffff).ram().share("nvram").mirror(0x380000); // work RAM
-
-	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
 
 #if USE_H8
@@ -330,7 +326,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_state::csplayh5_irq)
 	int scanline = param;
 
 	if(scanline == 212*2)
-		m_tmp68301->external_interrupt_0();
+		m_maincpu->external_interrupt_0();
 }
 
 WRITE_LINE_MEMBER(csplayh5_state::csplayh5_vdp0_interrupt)
@@ -361,15 +357,11 @@ WRITE16_MEMBER(csplayh5_state::tmp68301_parallel_port_w)
 void csplayh5_state::csplayh5(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000); /* TMP68301-16 */
+	TMP68301(config, m_maincpu, 16000000); /* TMP68301-16 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &csplayh5_state::csplayh5_map);
-	m_maincpu->set_irq_acknowledge_callback("tmp68301", FUNC(tmp68301_device::irq_callback));
+	m_maincpu->out_parallel_callback().set(FUNC(csplayh5_state::tmp68301_parallel_port_w));
 
 	TIMER(config, "scantimer", 0).configure_scanline(timer_device::expired_delegate(FUNC(csplayh5_state::csplayh5_irq), this), "screen", 0, 1);
-
-	TMP68301(config, m_tmp68301, 0);
-	m_tmp68301->set_cputag(m_maincpu);
-	m_tmp68301->out_parallel_callback().set(FUNC(csplayh5_state::tmp68301_parallel_port_w));
 
 #if USE_H8
 	h830002_device &subcpu(H83002(config, "subcpu", DVD_CLOCK/2));    /* unknown divider */

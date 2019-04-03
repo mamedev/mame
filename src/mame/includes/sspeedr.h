@@ -38,7 +38,7 @@ private:
 	DECLARE_WRITE8_MEMBER(sspeedr_track_horz_2_w);
 	DECLARE_WRITE8_MEMBER(sspeedr_track_vert_w);
 	DECLARE_WRITE8_MEMBER(sspeedr_track_ice_w);
-	DECLARE_PALETTE_INIT(sspeedr);
+	void sspeedr_palette(palette_device &palette) const;
 	uint32_t screen_update_sspeedr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sspeedr);
 	void sspeedr_io_map(address_map &map);

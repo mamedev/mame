@@ -94,10 +94,20 @@ WRITE8_MEMBER(xavix_state::vector_enable_w)
 	m_vectorenable = data;
 }
 
+READ8_MEMBER(xavix_state::nmi_vector_lo_r)
+{
+	return m_nmi_vector_lo_data;
+}
+
 WRITE8_MEMBER(xavix_state::nmi_vector_lo_w)
 {
 	LOG("%s: nmi_vector_lo_w %02x\n", machine().describe_context(), data);
 	m_nmi_vector_lo_data = data;
+}
+
+READ8_MEMBER(xavix_state::nmi_vector_hi_r)
+{
+	return m_nmi_vector_hi_data;
 }
 
 WRITE8_MEMBER(xavix_state::nmi_vector_hi_w)
@@ -118,21 +128,35 @@ WRITE8_MEMBER(xavix_state::irq_vector_hi_w)
 	m_irq_vector_hi_data = data;
 }
 
-
-WRITE8_MEMBER(xavix_state::extintrf_7900_w)
+READ8_MEMBER(xavix_state::irq_vector_lo_r)
 {
-	LOG("%s: extintrf_7900_w %02x (---FIRST WRITE ON STARTUP---)\n", machine().describe_context(), data);
+	LOG("%s: irq_vector_lo_r\n", machine().describe_context());
+	return m_irq_vector_lo_data;
 }
 
-WRITE8_MEMBER(xavix_state::extintrf_7901_w)
+READ8_MEMBER(xavix_state::irq_vector_hi_r)
 {
-	LOG("%s: extintrf_7901_w %02x\n", machine().describe_context(), data);
+	LOG("%s: irq_vector_hi_r\n", machine().describe_context());
+	return m_irq_vector_hi_data;
 }
 
-WRITE8_MEMBER(xavix_state::extintrf_7902_w)
+
+// this is external bus control (access to ROM etc.)
+
+READ8_MEMBER(xavix_state::extintrf_790x_r)
 {
-	LOG("%s: extintrf_7902_w %02x\n", machine().describe_context(), data);
+	LOG("%s: extintrf_790x_r %02x\n", machine().describe_context(), offset);
+	return m_extbusctrl[offset];
 }
+
+WRITE8_MEMBER(xavix_state::extintrf_790x_w)
+{
+	// Popira, Taiko De Popira etc. games with SEEPROM cartridges uses this to swap between ROM and other peripherals in the cart for data bus access?
+	LOG("%s: extintrf_790x_w %02x %02x\n", machine().describe_context(), offset, data);
+	m_extbusctrl[offset] = data;
+}
+
+
 
 
 
@@ -223,42 +247,6 @@ WRITE8_MEMBER(xavix_state::ioevent_irqack_w)
 
 
 
-WRITE8_MEMBER(xavix_state::adc_7b00_w)
-{
-	LOG("%s: adc_7b00_w %02x\n", machine().describe_context(), data);
-}
-
-READ8_MEMBER(xavix_state::adc_7b80_r)
-{
-	LOG("%s: adc_7b80_r\n", machine().describe_context());
-	return 0x00;//0xff;
-}
-
-WRITE8_MEMBER(xavix_state::adc_7b80_w)
-{
-	LOG("%s: adc_7b80_w %02x\n", machine().describe_context(), data);
-}
-
-WRITE8_MEMBER(xavix_state::adc_7b81_w)
-{
-//  m_irqsource &= ~0x04;
-//  update_irqs();
-
-	LOG("%s: adc_7b81_w %02x\n", machine().describe_context(), data);
-	m_adc_control = data;
-
-//  m_adc_timer->adjust(attotime::from_usec(200));
-
-}
-
-READ8_MEMBER(xavix_state::adc_7b81_r)
-{
-//  has_wamg polls this if interrupt is enabled
-	return machine().rand();
-}
-
-
-
 WRITE8_MEMBER(xavix_state::slotreg_7810_w)
 {
 	LOG("%s: slotreg_7810_w %02x\n", machine().describe_context(), data);
@@ -326,7 +314,23 @@ WRITE8_MEMBER(xavix_state::dispctrl_6ff8_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 
+	uint8_t old_vid = m_video_ctrl;
+
 	m_video_ctrl = data & 0x3f;
+
+	// epo_guru needs something like this, otherwise raster IRQ ends up blocking all other IRQs forever
+	if ((old_vid & 0x10) != (m_video_ctrl & 0x10))
+	{
+		if (!(m_video_ctrl & 0x10))
+		{
+			//printf("callback on scanline %d %d with IRQ enabled\n", m_screen->vpos(), m_screen->hpos());
+			m_video_ctrl &= ~0x40;
+			m_irqsource &= ~0x40;
+			update_irqs();
+		}
+	}
+
+
 	//  printf("%s: dispctrl_6ff8_w %02x\n", machine().describe_context(), data);
 }
 
@@ -353,7 +357,8 @@ TIMER_CALLBACK_MEMBER(xavix_state::interrupt_gen)
 
 		m_screen->update_partial(m_screen->vpos());
 	}
-	m_interrupt_timer->adjust(attotime::never, 0);
+//  m_interrupt_timer->adjust(attotime::never, 0);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(m_posirq_y[0], m_posirq_x[0]), 0); // epo_dmon expects it to keep firing without being reloaded? check this doesn't break anything else!
 }
 
 
@@ -373,14 +378,75 @@ WRITE8_MEMBER(xavix_state::dispctrl_posirq_y_w)
 
 /* Per Game IO port callbacks */
 
+
+CUSTOM_INPUT_MEMBER(xavix_i2c_state::i2c_r)
+{
+	return m_i2cmem->read_sda();
+}
+
+CUSTOM_INPUT_MEMBER(xavix_i2c_cart_state::i2c_r)
+{
+	return m_i2cmem->read_sda();
+}
+
+CUSTOM_INPUT_MEMBER(xavix_i2c_lotr_state::camera_r) // seems to be some kind of camera status bits
+{
+	return machine().rand();
+}
+
+CUSTOM_INPUT_MEMBER(xavix_i2c_bowl_state::camera_r) // seems to be some kind of camera status bits
+{
+	return machine().rand();
+}
+
+CUSTOM_INPUT_MEMBER(xavix_ekara_state::ekara_multi0_r)
+{
+	switch (m_extraioselect & 0x7f)
+	{
+	case 0x01: return (m_extra0->read() & 0x01) >> 0; break;
+	case 0x02: return (m_extra0->read() & 0x04) >> 2; break;
+	case 0x04: return (m_extra0->read() & 0x10) >> 4; break;
+	case 0x08: return (m_extra0->read() & 0x40) >> 6; break;
+	case 0x10: return (m_extra1->read() & 0x01) >> 0; break;
+	case 0x20: return (m_extra1->read() & 0x04) >> 2; break;
+	case 0x40: return (m_extra1->read() & 0x10) >> 4; break;
+	default:
+		LOG("latching inputs with invalid m_extraioselect value of %02x\n", m_extraioselect);
+		return 0x00;
+	}
+	return 0x00;
+}
+
+CUSTOM_INPUT_MEMBER(xavix_ekara_state::ekara_multi1_r)
+{
+	switch (m_extraioselect & 0x7f)
+	{
+	case 0x01: return (m_extra0->read() & 0x02) >> 1;
+	case 0x02: return (m_extra0->read() & 0x08) >> 3;
+	case 0x04: return (m_extra0->read() & 0x20) >> 5;
+	case 0x08: return (m_extra0->read() & 0x80) >> 7;
+	case 0x10: return (m_extra1->read() & 0x02) >> 1;
+	case 0x20: return (m_extra1->read() & 0x08) >> 3;
+	case 0x40: return (m_extra1->read() & 0x20) >> 5;
+	default:
+		LOG("latching inputs with invalid m_extraioselect value of %02x\n", m_extraioselect);
+		return 0x00;
+	}
+	return 0x00;
+}
+
 uint8_t xavix_state::read_io0(uint8_t direction)
 {
+//  LOG("%s: read_io0\n", machine().describe_context());
+
 	// no special handling
 	return m_in0->read();
 }
 
 uint8_t xavix_state::read_io1(uint8_t direction)
 {
+//  LOG("%s: read_io1\n", machine().describe_context());
+
 	// no special handling
 	return m_in1->read();
 }
@@ -393,19 +459,6 @@ void xavix_state::write_io0(uint8_t data, uint8_t direction)
 void xavix_state::write_io1(uint8_t data, uint8_t direction)
 {
 	// no special handling
-}
-
-uint8_t xavix_i2c_state::read_io1(uint8_t direction)
-{
-	uint8_t ret = m_in1->read();
-
-	if (!(direction & 0x08))
-	{
-		ret &= ~0x08;
-		ret |= (m_i2cmem->read_sda() & 1) << 3;
-	}
-
-	return ret;
 }
 
 void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
@@ -428,68 +481,33 @@ void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 	}
 }
 
-uint8_t xavix_i2c_lotr_state::read_io1(uint8_t direction)
+// ltv_tam
+void xavix_i2c_ltv_tam_state::write_io1(uint8_t data, uint8_t direction)
 {
-	uint8_t ret = m_in1->read();
-
-	// some kind of comms with the IR sensor?
-	ret ^= (machine().rand() & 0x02);
-	ret ^= (machine().rand() & 0x04);
-
-	if (!(direction & 0x08))
+	if (direction & 0x08)
 	{
-		ret &= ~0x08;
-		ret |= (m_i2cmem->read_sda() & 1) << 3;
+		m_i2cmem->write_sda((data & 0x08) >> 3);
 	}
 
-	return ret;
+	if (direction & 0x04)
+	{
+		m_i2cmem->write_scl((data & 0x04) >> 2);
+	}
 }
 
-uint8_t xavix_ekara_state::read_io1(uint8_t direction)
-{
-	uint8_t extrainlatch0 = 0x00;
-	uint8_t extrainlatch1 = 0x00;
 
-	switch (m_extraioselect & 0x7f)
+// for taikodp
+void xavix_i2c_cart_state::write_io1(uint8_t data, uint8_t direction)
+{
+	if (direction & 0x08)
 	{
-	case 0x01:
-		extrainlatch0 = (m_extra0->read() & 0x01) >> 0;
-		extrainlatch1 = (m_extra0->read() & 0x02) >> 1;
-		break;
-	case 0x02:
-		extrainlatch0 = (m_extra0->read() & 0x04) >> 2;
-		extrainlatch1 = (m_extra0->read() & 0x08) >> 3;
-		break;
-	case 0x04:
-		extrainlatch0 = (m_extra0->read() & 0x10) >> 4;
-		extrainlatch1 = (m_extra0->read() & 0x20) >> 5;
-		break;
-	case 0x08:
-		extrainlatch0 = (m_extra0->read() & 0x40) >> 6;
-		extrainlatch1 = (m_extra0->read() & 0x80) >> 7;
-		break;
-	case 0x10:
-		extrainlatch0 = (m_extra1->read() & 0x01) >> 0;
-		extrainlatch1 = (m_extra1->read() & 0x02) >> 1;
-		break;
-	case 0x20:
-		extrainlatch0 = (m_extra1->read() & 0x04) >> 2;
-		extrainlatch1 = (m_extra1->read() & 0x08) >> 3;
-		break;
-	case 0x40:
-		extrainlatch0 = (m_extra1->read() & 0x10) >> 4;
-		extrainlatch1 = (m_extra1->read() & 0x20) >> 5;
-		break;
-	default:
-		LOG("latching inputs with invalid m_extraioselect value of %02x\n", m_extraioselect);
-		break;
+		m_i2cmem->write_sda((data & 0x08) >> 3);
 	}
 
-	uint8_t ret = m_in1->read();
-	ret &= 0xfc;
-	ret |= extrainlatch0 << 0;
-	ret |= extrainlatch1 << 1;
-	return ret;
+	if (direction & 0x10)
+	{
+		m_i2cmem->write_scl((data & 0x10) >> 4);
+	}
 }
 
 void xavix_ekara_state::write_io0(uint8_t data, uint8_t direction)
@@ -503,6 +521,68 @@ void xavix_ekara_state::write_io1(uint8_t data, uint8_t direction)
 	uint8_t extraiowrite = data & direction;
 	m_extraiowrite = extraiowrite;
 }
+
+/* SuperXavix IO port handliner (per game) */
+
+READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io0)
+{
+	LOG("%s: read_extended_io0\n", machine().describe_context());
+	return 0x00;
+}
+
+READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io1)
+{
+	LOG("%s: read_extended_io1\n", machine().describe_context());
+
+	// reads this by reading the byte, then shifting right 4 times to place value into carry flag
+	return m_i2cmem->read_sda() << 3;
+	//return 0x00;
+}
+
+READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io2)
+{
+	LOG("%s: read_extended_io2\n", machine().describe_context());
+	return 0x00;
+}
+
+WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io0)
+{
+	LOG("%s: io0_data_w %02x\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io1)
+{
+	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data);
+
+	m_i2cmem->write_sda((data & 0x08) >> 3);
+	m_i2cmem->write_scl((data & 0x10) >> 4);
+
+}
+
+WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io2)
+{
+	LOG("%s: io2_data_w %02x\n", machine().describe_context(), data);
+}
+
+// the cart pins Popira 2 uses for IO with cart gc0010 are not controllable by the CPU on other ekara systems
+
+CUSTOM_INPUT_MEMBER(xavix_popira2_cart_state::i2c_r)
+{
+	if (m_cartslot->has_cart())
+		return m_cartslot->read_sda();
+	else
+		return 0x0;
+}
+
+void xavix_popira2_cart_state::write_io1(uint8_t data, uint8_t direction)
+{
+	if (m_cartslot->has_cart())
+	{
+		m_cartslot->write_sda((data & 0x08) >> 3);
+		m_cartslot->write_scl((data & 0x10) >> 4);
+	}
+}
+
 
 /* General IO port handling */
 
@@ -534,14 +614,14 @@ READ8_MEMBER(xavix_state::io1_direction_r)
 WRITE8_MEMBER(xavix_state::io0_data_w)
 {
 	m_io0_data = data;
-	write_io0(data, m_io0_direction);
+	write_io0((data & m_io0_direction) | (read_io0(m_io0_direction) & ~m_io0_direction), m_io0_direction);
 	LOG("%s: io0_data_w %02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(xavix_state::io1_data_w)
 {
 	m_io1_data = data;
-	write_io1(data, m_io1_direction);
+	write_io1((data & m_io1_direction) | (read_io1(m_io1_direction) & ~m_io1_direction), m_io1_direction);
 	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data);
 }
 
@@ -725,79 +805,6 @@ TIMER_CALLBACK_MEMBER(xavix_state::freq_timer_done)
 	//m_freq_timer->adjust(attotime::from_usec(50000));
 }
 
-TIMER_CALLBACK_MEMBER(xavix_state::adc_timer_done)
-{
-	//m_irqsource |= 0x04;
-	//update_irqs();
-}
-
-
-
-READ8_MEMBER(xavix_state::mult_r)
-{
-	return m_multresults[offset];
-}
-
-WRITE8_MEMBER(xavix_state::mult_w)
-{
-	// rad_madf writes here to set the base value which the multiplication result gets added to
-	m_multresults[offset] = data;
-}
-
-READ8_MEMBER(xavix_state::mult_param_r)
-{
-	return m_multparams[offset];
-}
-
-WRITE8_MEMBER(xavix_state::mult_param_w)
-{
-	COMBINE_DATA(&m_multparams[offset]);
-	// there are NOPs after one of the writes, so presumably the operation is write triggerd and not intstant
-	// see test code at 0184a4 in monster truck
-
-	// offset0 is control
-
-	// mm-- --Ss
-	// mm = mode, S = sign for param1, s = sign for param2
-	// modes 00 = multiply (regular?) 11 = add to previous 01 / 10 unknown (maybe subtract?)
-
-	if (offset == 2)
-	{
-		// assume 0 is upper bits, might be 'mode' instead, check
-
-
-		int signmode = (m_multparams[0] & 0x3f);
-
-		uint16_t result = 0;
-
-		// rad_madf uses this mode (add to previous result)
-		if ((m_multparams[0] & 0xc0) == 0xc0)
-		{
-			const int param1 = signmode & 0x2 ? (int8_t)m_multparams[1] : (uint8_t)m_multparams[1];
-			const int param2 = signmode & 0x1 ? (int8_t)m_multparams[2] : (uint8_t)m_multparams[2];
-
-			result = param1 * param2;
-
-			uint16_t oldresult = (m_multresults[1] << 8) | m_multresults[0];
-			result = oldresult + result;
-		}
-		else if ((m_multparams[0] & 0xc0) == 0x00)
-		{
-			const int param1 = signmode & 0x2 ? (int8_t)m_multparams[1] : (uint8_t)m_multparams[1];
-			const int param2 = signmode & 0x1 ? (int8_t)m_multparams[2] : (uint8_t)m_multparams[2];
-
-			result = param1 * param2;
-		}
-		else
-		{
-			popmessage("unknown multiplier mode %02x", m_multparams[0] & 0xc0);
-		}
-
-		m_multresults[1] = (result >> 8) & 0xff;
-		m_multresults[0] = result & 0xff;
-	}
-}
-
 
 READ8_MEMBER(xavix_state::irq_source_r)
 {
@@ -828,18 +835,66 @@ WRITE8_MEMBER(xavix_state::irq_source_w)
 
 void xavix_state::machine_start()
 {
+	// at least some of the internal CPU RAM can be backed up, not sure how much
+	int nvram_size = 0x1000;
+
+	if (!m_nvram)
+		nvram_size = 0;
+
 	// card night expects RAM to be initialized to 0xff or it will show the pause menu over the startup graphics?!
 	// don't do this every reset or it breaks the baseball 2 secret mode toggle which flips a bit in RAM
-	std::fill_n(&m_mainram[0], 0x4000, 0xff);
+	std::fill_n(&m_mainram[0], 0x4000 - nvram_size, 0xff);
 
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::interrupt_gen), this));
 	m_freq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::freq_timer_done), this));
-	m_adc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::adc_timer_done), this));
 
 	for (int i = 0; i < 4; i++)
 	{
 		m_sound_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::sound_timer_done), this));
 	}
+
+	if (m_nvram)
+		m_nvram->set_base(&m_mainram[0x4000 - nvram_size], nvram_size);
+
+
+	save_item(NAME(m_extbusctrl));
+	save_item(NAME(m_ioevent_enable));
+	save_item(NAME(m_ioevent_active));
+	save_item(NAME(m_io0_data));
+	save_item(NAME(m_io1_data));
+	save_item(NAME(m_io0_direction));
+	save_item(NAME(m_io1_direction));
+	save_item(NAME(m_sound_irqstatus));
+	save_item(NAME(m_soundreg16_0));
+	save_item(NAME(m_soundreg16_1));
+	save_item(NAME(m_sound_regbase));
+	save_item(NAME(m_timer_control));
+	save_item(NAME(m_timer_freq));
+	save_item(NAME(m_txarray));
+	save_item(NAME(m_irqsource));
+	save_item(NAME(m_vectorenable));
+	save_item(NAME(m_nmi_vector_lo_data));
+	save_item(NAME(m_nmi_vector_hi_data));
+	save_item(NAME(m_irq_vector_lo_data));
+	save_item(NAME(m_irq_vector_hi_data));
+	save_item(NAME(m_spritefragment_dmaparam1));
+	save_item(NAME(m_spritefragment_dmaparam2));
+	save_item(NAME(m_tmap1_regs));
+	save_item(NAME(m_tmap2_regs));
+	save_item(NAME(m_arena_start));
+	save_item(NAME(m_arena_end));
+	save_item(NAME(m_arena_control));
+	save_item(NAME(m_6ff0));
+	save_item(NAME(m_video_ctrl));
+	save_item(NAME(m_mastervol));
+	save_item(NAME(m_unk_snd75f8));
+	save_item(NAME(m_unk_snd75f9));
+	save_item(NAME(m_unk_snd75ff));
+	save_item(NAME(m_sndtimer));
+	save_item(NAME(m_timer_baseval));
+	save_item(NAME(m_spritereg));
+
+	save_item(NAME(m_sx_extended_extbus));
 }
 
 void xavix_state::machine_reset()
@@ -870,16 +925,14 @@ void xavix_state::machine_reset()
 
 	m_mastervol = 0x00;
 	m_unk_snd75f8 = 0x00;
-	m_unksnd75f9 = 0x00;
-	m_unksnd75ff = 0x00;
+	m_unk_snd75f9 = 0x00;
+	m_unk_snd75ff = 0x00;
 
 	for (int i = 0; i < 4; i++)
 	{
 		m_sndtimer[i] = 0x00;
 	}
 
-	std::fill(std::begin(m_multparams), std::end(m_multparams), 0x00);
-	std::fill(std::begin(m_multresults), std::end(m_multresults), 0x00);
 	std::fill(std::begin(m_spritefragment_dmaparam1), std::end(m_spritefragment_dmaparam1), 0x00);
 	std::fill(std::begin(m_tmap1_regs), std::end(m_tmap1_regs), 0x00);
 	std::fill(std::begin(m_tmap2_regs), std::end(m_tmap2_regs), 0x00);
@@ -903,11 +956,24 @@ void xavix_state::machine_reset()
 
 	m_sound_irqstatus = 0x00;
 
-	m_sound_regbase = 0x00;
+	m_sound_regbase = 0x02; // rad_bb doesn't initialize this and expects it here.  It is possible the default is 0x00, but since 0x00 and 0x01 are special (zero page and stack) those values would also use bank 0x02
 
-	m_adc_control = 0x00;
 
 	m_sprite_xhigh_ignore_hack = true;
+
+	m_cpuspace = &m_maincpu->space(AS_PROGRAM);
+
+	m_extbusctrl[0] = 0x00;
+	m_extbusctrl[1] = 0x00;
+	m_extbusctrl[2] = 0x00;
+
+
+	// SuperXaviX
+
+	for (int i = 0; i < 3; i++)
+	{
+		m_sx_extended_extbus[i] = 0x00;
+	}
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;
@@ -935,3 +1001,22 @@ int16_t xavix_state::get_vectors(int which, int half)
 }
 
 
+// additional SuperXaviX / XaviX2002 stuff
+
+WRITE8_MEMBER(xavix_state::extended_extbus_reg0_w)
+{
+	LOG("%s: extended_extbus_reg0_w %02x\n", machine().describe_context(), data);
+	m_sx_extended_extbus[0] = data;
+}
+
+WRITE8_MEMBER(xavix_state::extended_extbus_reg1_w)
+{
+	LOG("%s: extended_extbus_reg1_w %02x\n", machine().describe_context(), data);
+	m_sx_extended_extbus[1] = data;
+}
+
+WRITE8_MEMBER(xavix_state::extended_extbus_reg2_w)
+{
+	LOG("%s: extended_extbus_reg2_w %02x\n", machine().describe_context(), data);
+	m_sx_extended_extbus[2] = data;
+}

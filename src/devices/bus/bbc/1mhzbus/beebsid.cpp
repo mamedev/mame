@@ -26,10 +26,10 @@ DEFINE_DEVICE_TYPE(BBC_BEEBSID, bbc_beebsid_device, "beebsid", "BeebSID")
 void bbc_beebsid_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "speaker").front_center();
-	MOS8580(config, m_sid, 16_MHz_XTAL / 16);
+	MOS8580(config, m_sid, DERIVED_CLOCK(1, 1));
 	m_sid->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	BBC_1MHZBUS_SLOT(config, m_1mhzbus, bbc_1mhzbus_devices, nullptr);
+	BBC_1MHZBUS_SLOT(config, m_1mhzbus, DERIVED_CLOCK(1, 1), bbc_1mhzbus_devices, nullptr);
 	m_1mhzbus->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
 	m_1mhzbus->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::nmi_w));
 }
@@ -65,40 +65,40 @@ void bbc_beebsid_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_beebsid_device::fred_r)
+uint8_t bbc_beebsid_device::fred_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
 	if (offset >= 0x20 && offset < 0x40)
 	{
-		data = m_sid->read(space, offset);
+		data = m_sid->read(offset);
 	}
 
-	data &= m_1mhzbus->fred_r(space, offset);
+	data &= m_1mhzbus->fred_r(offset);
 
 	return data;
 }
 
-WRITE8_MEMBER(bbc_beebsid_device::fred_w)
+void bbc_beebsid_device::fred_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x20 && offset < 0x40)
 	{
-		m_sid->write(space, offset, data);
+		m_sid->write(offset, data);
 	}
 
-	m_1mhzbus->fred_w(space, offset, data);
+	m_1mhzbus->fred_w(offset, data);
 }
 
-READ8_MEMBER(bbc_beebsid_device::jim_r)
+uint8_t bbc_beebsid_device::jim_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	data &= m_1mhzbus->jim_r(space, offset);
+	data &= m_1mhzbus->jim_r(offset);
 
 	return data;
 }
 
-WRITE8_MEMBER(bbc_beebsid_device::jim_w)
+void bbc_beebsid_device::jim_w(offs_t offset, uint8_t data)
 {
-	m_1mhzbus->jim_w(space, offset, data);
+	m_1mhzbus->jim_w(offset, data);
 }

@@ -56,8 +56,8 @@ class bbc_exp_slot_device : public device_t, public device_slot_interface
 public:
 	// construction/destruction
 	template <typename T>
-	bbc_exp_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, const char *default_option)
-		: bbc_exp_slot_device(mconfig, tag, owner)
+	bbc_exp_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&slot_options, const char *default_option)
+		: bbc_exp_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
 		slot_options(*this);
@@ -65,7 +65,7 @@ public:
 		set_fixed(false);
 	}
 
-	bbc_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	bbc_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
 	auto irq_handler() { return m_irq_handler.bind(); }
@@ -75,12 +75,12 @@ public:
 	auto cb1_handler() { return m_cb1_handler.bind(); }
 	auto cb2_handler() { return m_cb2_handler.bind(); }
 
-	virtual DECLARE_READ8_MEMBER(fred_r);
-	virtual DECLARE_WRITE8_MEMBER(fred_w);
-	virtual DECLARE_READ8_MEMBER(jim_r);
-	virtual DECLARE_WRITE8_MEMBER(jim_w);
-	virtual DECLARE_READ8_MEMBER(sheila_r);
-	virtual DECLARE_WRITE8_MEMBER(sheila_w);
+	uint8_t fred_r(offs_t offset);
+	void fred_w(offs_t offset, uint8_t data);
+	uint8_t jim_r(offs_t offset);
+	void jim_w(offs_t offset, uint8_t data);
+	uint8_t sheila_r(offs_t offset);
+	void sheila_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
@@ -89,8 +89,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cb1_w) { m_cb1_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER(cb2_w) { m_cb2_handler(state); }
 
-	DECLARE_READ8_MEMBER(pb_r);
-	DECLARE_WRITE8_MEMBER(pb_w);
+	uint8_t pb_r();
+	void pb_w(uint8_t data);
 
 protected:
 	// device-level overrides
@@ -114,15 +114,15 @@ private:
 class device_bbc_exp_interface : public device_slot_card_interface
 {
 public:
-	virtual DECLARE_READ8_MEMBER(fred_r) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(fred_w) { }
-	virtual DECLARE_READ8_MEMBER(jim_r) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(jim_w) { }
-	virtual DECLARE_READ8_MEMBER(sheila_r) { return 0xfe; }
-	virtual DECLARE_WRITE8_MEMBER(sheila_w) { }
+	virtual uint8_t fred_r(offs_t offset) { return 0xff; }
+	virtual void fred_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t jim_r(offs_t offset) { return 0xff; }
+	virtual void jim_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t sheila_r(offs_t offset) { return 0xfe; }
+	virtual void sheila_w(offs_t offset, uint8_t data) { }
 
-	virtual DECLARE_READ8_MEMBER(pb_r) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(pb_w) { }
+	virtual uint8_t pb_r() { return 0xff; }
+	virtual void pb_w(uint8_t data) { }
 
 protected:
 	device_bbc_exp_interface(const machine_config &mconfig, device_t &device);

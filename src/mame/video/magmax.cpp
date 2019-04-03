@@ -26,37 +26,37 @@ Additional tweaking by Jarek Burczynski
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(magmax_state, magmax)
+void magmax_state::magmax_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
-	/* create a lookup table for the palette */
+	// create a lookup table for the palette
 	for (int i = 0; i < 0x100; i++)
 	{
-		int r = pal4bit(color_prom[i + 0x000]);
-		int g = pal4bit(color_prom[i + 0x100]);
-		int b = pal4bit(color_prom[i + 0x200]);
+		int const r = pal4bit(color_prom[i + 0x000]);
+		int const g = pal4bit(color_prom[i + 0x100]);
+		int const b = pal4bit(color_prom[i + 0x200]);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x300;
 
-	/* characters use colors 0-0x0f */
+	// characters use colors 0-0x0f
 	for (int i = 0; i < 0x10; i++)
 		palette.set_pen_indirect(i, i);
 
-	/*sprites use colors 0x10-0x1f, color 0x1f being transparent*/
-	for (int i = 0x10; i < 0x110; i++)
+	// sprites use colors 0x10-0x1f, color 0x1f being transparen
+	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t ctabentry = (color_prom[i - 0x10] & 0x0f) | 0x10;
-		palette.set_pen_indirect(i, ctabentry);
+		uint8_t const ctabentry = (color_prom[i] & 0x0f) | 0x10;
+		palette.set_pen_indirect(i + 0x10, ctabentry);
 	}
 
-	/* background uses all colors (no lookup table) */
-	for (int i = 0x110; i < 0x210; i++)
-		palette.set_pen_indirect(i, i - 0x110);
+	// background uses all colors (no lookup table)
+	for (int i = 0; i < 0x100; i++)
+		palette.set_pen_indirect(i + 0x110, i);
 
 }
 

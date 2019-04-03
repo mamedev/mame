@@ -7,6 +7,7 @@
 
 #include "machine/k053252.h"
 #include "machine/timer.h"
+#include "emupal.h"
 
 class hexion_state : public driver_device
 {
@@ -15,7 +16,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_k053252(*this, "k053252"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 	{ }
 
 	void hexion(machine_config &config);
@@ -25,6 +27,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k053252_device> m_k053252;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	uint8_t *m_vram[2];
 	uint8_t *m_unkram;

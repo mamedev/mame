@@ -66,7 +66,7 @@ WRITE8_MEMBER(redalert_state::redalert_analog_w)
 WRITE8_MEMBER(redalert_state::redalert_audio_command_w)
 {
 	/* the byte is connected to port A of the AY8910 */
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 
 	/* D7 is also connected to the NMI input of the CPU -
 	   the NMI is actually toggled by a 74121 (R1=27K, C10=330p) */
@@ -86,7 +86,7 @@ WRITE8_MEMBER(redalert_state::redalert_AY8910_w)
 
 		/* BC1=1, BDIR=0 : read from PSG */
 		case 0x01:
-			m_ay8910_latch_1 = m_ay8910->data_r(space, 0);
+			m_ay8910_latch_1 = m_ay8910->data_r();
 			break;
 
 		/* BC1=0, BDIR=1 : write to PSG */
@@ -94,7 +94,7 @@ WRITE8_MEMBER(redalert_state::redalert_AY8910_w)
 		case 0x02:
 		case 0x03:
 		default:
-			m_ay8910->data_address_w(space, data, m_ay8910_latch_2);
+			m_ay8910->data_address_w(data, m_ay8910_latch_2);
 			break;
 	}
 }
@@ -142,7 +142,7 @@ void redalert_state::sound_start()
 
 WRITE8_MEMBER(redalert_state::redalert_voice_command_w)
 {
-	m_soundlatch2->write(space, 0, (data & 0x78) >> 3);
+	m_soundlatch2->write((data & 0x78) >> 3);
 	m_voicecpu->set_input_line(I8085_RST75_LINE, (~data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -197,18 +197,17 @@ void redalert_state::redalert_audio_m37b(machine_config &config)
  *
  *************************************/
 
-MACHINE_CONFIG_START(redalert_state::redalert_audio_voice)
-
-	MCFG_DEVICE_ADD("voice", I8085A, REDALERT_VOICE_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(redalert_voice_map)
-	MCFG_I8085A_SID(READLINE(*this, redalert_state,sid_callback))
-	MCFG_I8085A_SOD(WRITELINE(*this, redalert_state,sod_callback))
+void redalert_state::redalert_audio_voice(machine_config &config)
+{
+	I8085A(config, m_voicecpu, REDALERT_VOICE_CPU_CLOCK);
+	m_voicecpu->set_addrmap(AS_PROGRAM, &redalert_state::redalert_voice_map);
+	m_voicecpu->in_sid_func().set(FUNC(redalert_state::sid_callback));
+	m_voicecpu->out_sod_func().set(FUNC(redalert_state::sod_callback));
 
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("cvsd", HC55516, REDALERT_HC55516_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	HC55516(config, m_cvsd, REDALERT_HC55516_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 /*************************************
  *
@@ -247,7 +246,7 @@ void redalert_state::ww3_audio(machine_config &config)
 WRITE8_MEMBER(redalert_state::demoneye_audio_command_w)
 {
 	/* the byte is connected to port A of the AY8910 */
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -270,28 +269,28 @@ WRITE8_MEMBER(redalert_state::demoneye_ay8910_data_w)
 	{
 		case 0x00:
 			if (m_ay8910_latch_1 & 0x10)
-				m_ay[0]->data_w(space, 0, data);
+				m_ay[0]->data_w(data);
 
 			if (m_ay8910_latch_1 & 0x20)
-				m_ay[1]->data_w(space, 0, data);
+				m_ay[1]->data_w(data);
 
 			break;
 
 		case 0x01:
 			if (m_ay8910_latch_1 & 0x10)
-				m_ay8910_latch_2 = m_ay[0]->data_r(space, 0);
+				m_ay8910_latch_2 = m_ay[0]->data_r();
 
 			if (m_ay8910_latch_1 & 0x20)
-				m_ay8910_latch_2 = m_ay[1]->data_r(space, 0);
+				m_ay8910_latch_2 = m_ay[1]->data_r();
 
 			break;
 
 		case 0x03:
 			if (m_ay8910_latch_1 & 0x10)
-				m_ay[0]->address_w(space, 0, data);
+				m_ay[0]->address_w(data);
 
 			if (m_ay8910_latch_1 & 0x20)
-				m_ay[1]->address_w(space, 0, data);
+				m_ay[1]->address_w(data);
 
 			break;
 

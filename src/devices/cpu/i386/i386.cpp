@@ -3037,6 +3037,8 @@ void i386_device::report_invalid_modrm(const char* opcode, uint8_t modrm)
 #include "i486ops.hxx"
 #include "pentops.hxx"
 #include "x87ops.hxx"
+#include "cpuidmsrs.hxx"
+
 
 void i386_device::i386_decode_opcode()
 {
@@ -3365,15 +3367,10 @@ void i386_device::i386_common_init()
 
 	m_program = &space(AS_PROGRAM);
 	if(m_program->data_width() == 16) {
-		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
-		m_pr8  = [cache](offs_t address) -> u8  { return cache->read_byte(address);  };
-		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address);  };
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		// for the 386sx
+		macache16 = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
 	} else {
-		auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
-		m_pr8  = [cache](offs_t address) -> u8  { return cache->read_byte(address);  };
-		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address);  };
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		macache32 = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
 	}
 
 	m_io = &space(AS_IO);
@@ -4321,98 +4318,6 @@ void pentium_device::device_reset()
 	CHANGE_PC(m_eip);
 }
 
-uint64_t pentium_device::opcode_rdmsr(bool &valid_msr)
-{
-	uint32_t offset = REG32(ECX);
-
-	switch (offset)
-	{
-		// Machine Check Exception (TODO)
-	case 0x00:
-		valid_msr = true;
-		popmessage("RDMSR: Reading P5_MC_ADDR");
-		return 0;
-	case 0x01:
-		valid_msr = true;
-		popmessage("RDMSR: Reading P5_MC_TYPE");
-		return 0;
-		// Time Stamp Counter
-	case 0x10:
-		valid_msr = true;
-		popmessage("RDMSR: Reading TSC");
-		return m_tsc;
-		// Event Counters (TODO)
-	case 0x11:  // CESR
-		valid_msr = true;
-		popmessage("RDMSR: Reading CESR");
-		return 0;
-	case 0x12:  // CTR0
-		valid_msr = true;
-		return m_perfctr[0];
-	case 0x13:  // CTR1
-		valid_msr = true;
-		return m_perfctr[1];
-	default:
-		if (!(offset & ~0xf)) // 2-f are test registers
-		{
-			valid_msr = true;
-			logerror("RDMSR: Reading test MSR %x", offset);
-			return 0;
-		}
-		logerror("RDMSR: invalid P5 MSR read %08x at %08x\n", offset, m_pc - 2);
-		valid_msr = false;
-		return 0;
-	}
-	return -1;
-}
-
-void pentium_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
-{
-	uint32_t offset = REG32(ECX);
-
-	switch (offset)
-	{
-		// Machine Check Exception (TODO)
-	case 0x00:
-		popmessage("WRMSR: Writing P5_MC_ADDR");
-		valid_msr = true;
-		break;
-	case 0x01:
-		popmessage("WRMSR: Writing P5_MC_TYPE");
-		valid_msr = true;
-		break;
-		// Time Stamp Counter
-	case 0x10:
-		m_tsc = data;
-		popmessage("WRMSR: Writing to TSC");
-		valid_msr = true;
-		break;
-		// Event Counters (TODO)
-	case 0x11:  // CESR
-		popmessage("WRMSR: Writing to CESR");
-		valid_msr = true;
-		break;
-	case 0x12:  // CTR0
-		m_perfctr[0] = data;
-		valid_msr = true;
-		break;
-	case 0x13:  // CTR1
-		m_perfctr[1] = data;
-		valid_msr = true;
-		break;
-	default:
-		if (!(offset & ~0xf)) // 2-f are test registers
-		{
-			valid_msr = true;
-			logerror("WRMSR: Writing test MSR %x", offset);
-			break;
-		}
-		logerror("WRMSR: invalid MSR write %08x (%08x%08x) at %08x\n", offset, (uint32_t)(data >> 32), (uint32_t)data, m_pc - 2);
-		valid_msr = false;
-		break;
-	}
-}
-
 
 /*****************************************************************************/
 /* Cyrix MediaGX */
@@ -4548,69 +4453,6 @@ void pentium_pro_device::device_reset()
 	m_feature_flags = 0x000081bf;
 
 	CHANGE_PC(m_eip);
-}
-
-uint64_t pentium_pro_device::opcode_rdmsr(bool &valid_msr)
-{
-	uint32_t offset = REG32(ECX);
-
-	switch (offset)
-	{
-		// Machine Check Exception (TODO)
-	case 0x00:
-		valid_msr = true;
-		popmessage("RDMSR: Reading P5_MC_ADDR");
-		return 0;
-	case 0x01:
-		valid_msr = true;
-		popmessage("RDMSR: Reading P5_MC_TYPE");
-		return 0;
-		// Time Stamp Counter
-	case 0x10:
-		valid_msr = true;
-		popmessage("RDMSR: Reading TSC");
-		return m_tsc;
-		// Performance Counters (TODO)
-	case 0xc1:  // PerfCtr0
-		valid_msr = true;
-		return m_perfctr[0];
-	case 0xc2:  // PerfCtr1
-		valid_msr = true;
-		return m_perfctr[1];
-	default:
-		logerror("RDMSR: unimplemented register called %08x at %08x\n", offset, m_pc - 2);
-		valid_msr = true;
-		return 0;
-	}
-	return -1;
-}
-
-void pentium_pro_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
-{
-	uint32_t offset = REG32(ECX);
-
-	switch (offset)
-	{
-		// Time Stamp Counter
-	case 0x10:
-		m_tsc = data;
-		popmessage("WRMSR: Writing to TSC");
-		valid_msr = true;
-		break;
-		// Performance Counters (TODO)
-	case 0xc1:  // PerfCtr0
-		m_perfctr[0] = data;
-		valid_msr = true;
-		break;
-	case 0xc2:  // PerfCtr1
-		m_perfctr[1] = data;
-		valid_msr = true;
-		break;
-	default:
-		logerror("WRMSR: unimplemented register called %08x (%08x%08x) at %08x\n", offset, (uint32_t)(data >> 32), (uint32_t)data, m_pc - 2);
-		valid_msr = true;
-		break;
-	}
 }
 
 
@@ -4877,6 +4719,12 @@ void athlonxp_device::device_reset()
 	m_cpuid_id0 = ('h' << 24) | ('t' << 16) | ('u' << 8) | 'A';   // Auth
 	m_cpuid_id1 = ('i' << 24) | ('t' << 16) | ('n' << 8) | 'e';   // enti
 	m_cpuid_id2 = ('D' << 24) | ('M' << 16) | ('A' << 8) | 'c';   // cAMD
+	memset(m_processor_name_string, 0, 48);
+	strcpy((char *)m_processor_name_string, "AMD Athlon(tm) Processor");
+	for (int n = 0; n < 11; n++)
+		m_msr_mtrrfix[n] = 0;
+	for (int n = 0; n < (1024 / 4); n++)
+		m_memory_ranges_1m[n] = 0; // change the 0 to 6 to test the cache just after reset
 
 	m_cpuid_max_input_value_eax = 0x01;
 	m_cpu_version = REG32(EDX);
@@ -4886,6 +4734,227 @@ void athlonxp_device::device_reset()
 
 	CHANGE_PC(m_eip);
 }
+
+void athlonxp_device::parse_mtrrfix(u64 mtrr, offs_t base, int kblock)
+{
+	int nb = kblock / 4;
+	int range = (int)(base >> 12); // base must never be higher than 1 megabyte
+
+	for (int n = 0; n < 8; n++)
+	{
+		uint8_t type = mtrr & 0xff;
+
+		for (int b = 0; b < nb; b++)
+		{
+			m_memory_ranges_1m[range] = type;
+			range++;
+		}
+		mtrr = mtrr >> 8;
+	}
+}
+
+int athlonxp_device::check_cacheable(offs_t address)
+{
+	offs_t block;
+	int disabled;
+
+	disabled = 0;
+	if (m_cr[0] & (1 << 30))
+		disabled = 128;
+	if (address >= 0x100000)
+		return disabled;
+	block = address >> 12;
+	return m_memory_ranges_1m[block] | disabled;
+}
+
+template <class dt, offs_t xorle>
+dt athlonxp_device::opcode_read_cache(offs_t address)
+{
+	int mode = check_cacheable(address);
+	bool nocache = false;
+	u8 *data;
+
+	if ((mode & 7) == 0)
+		nocache = true;
+	if (mode & 1)
+		nocache = true;
+	if (nocache == false)
+	{
+		int offset = (address & 63) ^ xorle;
+		data = cache.search<CacheRead>(address);
+		if (data)
+			return *(dt *)(data + offset);
+		if (!(mode & 128))
+		{
+			bool dirty = cache.allocate<CacheRead>(address, &data);
+			address = cache.base(address);
+			if (dirty)
+			{
+				offs_t old_address = cache.old();
+
+				for (int w = 0; w < 64; w += 4)
+					macache32->write_dword(old_address + w, *(u32 *)(data + w));
+			}
+			for (int r = 0; r < 64; r += 4)
+				*(u32 *)(data + r) = macache32->read_dword(address + r);
+			return *(dt *)(data + offset);
+		}
+		else
+		{
+			if (sizeof(dt) == 1)
+				return macache32->read_byte(address);
+			else if (sizeof(dt) == 2)
+				return macache32->read_word(address);
+			else
+				return macache32->read_dword(address);
+		}
+	}
+	else
+	{
+		if (sizeof(dt) == 1)
+			return macache32->read_byte(address);
+		else if (sizeof(dt) == 2)
+			return macache32->read_word(address);
+		else
+			return macache32->read_dword(address);
+	}
+}
+
+template <class dt, offs_t xorle>
+dt athlonxp_device::program_read_cache(offs_t address)
+{
+	int mode = check_cacheable(address);
+	bool nocache = false;
+	u8 *data;
+
+	if ((mode & 7) == 0)
+		nocache = true;
+	if (mode & 1)
+		nocache = true;
+	if (nocache == false)
+	{
+		int offset = (address & 63) ^ xorle;
+		data = cache.search<CacheRead>(address);
+		if (data)
+			return *(dt *)(data + offset);
+		if (!(mode & 128))
+		{
+			bool dirty = cache.allocate<CacheRead>(address, &data);
+			address = cache.base(address);
+			if (dirty)
+			{
+				offs_t old_address = cache.old();
+
+				for (int w = 0; w < 64; w += 4)
+					m_program->write_dword(old_address + w, *(u32 *)(data + w));
+			}
+			for (int r = 0; r < 64; r += 4)
+				*(u32 *)(data + r) = m_program->read_dword(address + r);
+			return *(dt *)(data + offset);
+		}
+		else
+		{
+			if (sizeof(dt) == 1)
+				return m_program->read_byte(address);
+			else if (sizeof(dt) == 2)
+				return m_program->read_word(address);
+			else
+				return m_program->read_dword(address);
+		}
+	}
+	else
+	{
+		if (sizeof(dt) == 1)
+			return m_program->read_byte(address);
+		else if (sizeof(dt) == 2)
+			return m_program->read_word(address);
+		else
+			return m_program->read_dword(address);
+	}
+}
+
+template <class dt, offs_t xorle>
+void athlonxp_device::program_write_cache(offs_t address, dt data)
+{
+	int mode = check_cacheable(address);
+	bool nocache = false;
+	u8 *dataw;
+
+	if ((mode & 7) == 0)
+		nocache = true;
+	if (mode & 1)
+		nocache = true;
+	if (nocache == false)
+	{
+		int offset = (address & 63) ^ xorle;
+		dataw = cache.search<CacheWrite>(address);
+		if (dataw)
+		{
+			*(dt *)(dataw + offset) = data;
+			return;
+		}
+		if (!(mode & 128))
+		{
+			bool dirty = cache.allocate<CacheWrite>(address, &dataw);
+			address = cache.base(address);
+			if (dirty)
+			{
+				offs_t old_address = cache.old();
+
+				for (int w = 0; w < 64; w += 4)
+					m_program->write_dword(old_address + w, *(u32 *)(dataw + w));
+			}
+			for (int r = 0; r < 64; r += 4)
+				*(u32 *)(dataw + r) = m_program->read_dword(address + r);
+			*(dt *)(dataw + offset) = data;
+		}
+		else
+		{
+			if (sizeof(dt) == 1)
+				m_program->write_byte(address, data);
+			else if (sizeof(dt) == 2)
+				m_program->write_word(address, data);
+			else
+				m_program->write_dword(address, data);
+		}
+	}
+	else
+	{
+		if (sizeof(dt) == 1)
+			m_program->write_byte(address, data);
+		else if (sizeof(dt) == 2)
+			m_program->write_word(address, data);
+		else
+			m_program->write_dword(address, data);
+	}
+}
+
+void athlonxp_device::invalidate_cache(bool writeback)
+{
+	u32 base;
+	u8 *data;
+
+	data = cache.first_dirty(base, true);
+	while (data != nullptr)
+	{
+		if (writeback)
+			for (int w = 0; w < 64; w += 4)
+				m_program->write_dword(base + w, *(u32 *)(data + w));
+		data = cache.next_dirty(base, true);
+	}
+	cache.reset();
+}
+
+void athlonxp_device::opcode_invd()
+{
+	invalidate_cache(false);
+}
+
+void athlonxp_device::opcode_wbinvd()
+{
+	invalidate_cache(true);
+}
+
 
 /*****************************************************************************/
 /* Intel Pentium 4 */
@@ -4953,27 +5022,4 @@ void pentium4_device::device_reset()
 	m_feature_flags = 0x00000001;       // TODO: enable relevant flags here
 
 	CHANGE_PC(m_eip);
-}
-
-uint64_t pentium4_device::opcode_rdmsr(bool &valid_msr)
-{
-	switch (REG32(ECX))
-	{
-	default:
-		logerror("RDMSR: unimplemented register called %08x at %08x\n", REG32(ECX), m_pc - 2);
-		valid_msr = true;
-		return 0;
-	}
-	return -1;
-}
-
-void pentium4_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
-{
-	switch (REG32(ECX))
-	{
-	default:
-		logerror("WRMSR: unimplemented register called %08x (%08x%08x) at %08x\n", REG32(ECX), (uint32_t)(data >> 32), (uint32_t)data, m_pc - 2);
-		valid_msr = true;
-		break;
-	}
 }

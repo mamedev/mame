@@ -63,7 +63,7 @@ private:
 	template<int Layer> DECLARE_WRITE16_MEMBER(lastduel_vram_w);
 	DECLARE_WRITE16_MEMBER(txram_w);
 	template<int Layer> DECLARE_WRITE16_MEMBER(madgear_vram_w);
-	DECLARE_PALETTE_DECODER(lastduel_RRRRGGGGBBBBIIII);
+	static rgb_t lastduel_RRRRGGGGBBBBIIII(uint32_t raw);
 	TILE_GET_INFO_MEMBER(ld_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(ld_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

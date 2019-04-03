@@ -24,7 +24,7 @@
 #ifndef NLD_7448_H_
 #define NLD_7448_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #ifndef NL_AUTO_DEVICES
 

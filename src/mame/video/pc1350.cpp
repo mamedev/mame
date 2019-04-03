@@ -5,112 +5,76 @@
 #include "includes/pocketc.h"
 #include "includes/pc1350.h"
 
-static const POCKETC_FIGURE /*busy={
-    "11  1 1  11 1 1",
-    "1 1 1 1 1   1 1",
-    "11  1 1  1  1 1",
-    "1 1 1 1   1  1",
-    "11   1  11   1e"
-},*/ def={
+// TODO: Convert to SVG rendering or internal layout
+
+#define LOG_LCD (1 << 0)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+const char* const pc1350_state::s_def[5] =
+{
 	"11  111 111",
-	"1 1 1   1",
-	"1 1 111 11",
-	"1 1 1   1",
-	"11  111 1e"
-}, shift={
+	"1 1 1   1  ",
+	"1 1 111 11 ",
+	"1 1 1   1  ",
+	"11  111 1  "
+};
+const char* const pc1350_state::s_shift[5] =
+{
 	" 11 1 1 1 111 111",
-	"1   1 1 1 1    1",
-	" 1  111 1 11   1",
-	"  1 1 1 1 1    1",
-	"11  1 1 1 1    1e"
-}, /*hyp={
-    "1 1 1 1 11",
-    "1 1 1 1 1 1",
-    "111 1 1 11",
-    "1 1  1  1",
-    "1 1  1  1e"
-}, de={
-    "11  111",
-    "1 1 1",
-    "1 1 111",
-    "1 1 1",
-    "11  111e"
-}, g={
-    " 11",
-    "1",
-    "1 1",
-    "1 1",
-    " 11e"
-}, rad={
-    "11   1  11",
-    "1 1 1 1 1 1",
-    "11  111 1 1",
-    "1 1 1 1 1 1",
-    "1 1 1 1 11e"
-}, braces={
-    " 1 1",
-    "1   1",
-    "1   1",
-    "1   1",
-    " 1 1e"
-}, m={
-    "1   1",
-    "11 11",
-    "1 1 1",
-    "1   1",
-    "1   1e"
-}, e={
-    "111",
-    "1",
-    "111",
-    "1",
-    "111e"
-},*/ run={
+	"1   1 1 1 1    1 ",
+	" 1  111 1 11   1 ",
+	"  1 1 1 1 1    1 ",
+	"11  1 1 1 1    1 "
+};
+const char* const pc1350_state::s_run[5] =
+{
 	"11  1 1 1  1",
 	"1 1 1 1 11 1",
 	"11  1 1 1 11",
 	"1 1 1 1 1  1",
-	"1 1  1  1  1e"
-}, pro={
-	"11  11   1  ",
+	"1 1  1  1  1"
+};
+const char* const pc1350_state::s_pro[5] =
+{
+	"11  11   1 ",
 	"1 1 1 1 1 1",
 	"11  11  1 1",
 	"1   1 1 1 1",
-	"1   1 1  1e"
-}, japan={
+	"1   1 1  1 "
+};
+const char* const pc1350_state::s_japan[5] =
+{
 	"  1  1  11   1  1  1",
 	"  1 1 1 1 1 1 1 11 1",
 	"  1 111 11  111 1 11",
 	"1 1 1 1 1   1 1 1  1",
-	" 1  1 1 1   1 1 1  1e"
-}, sml={
-	" 11 1 1 1",
-	"1   111 1",
-	" 1  1 1 1",
-	"  1 1 1 1",
-	"11  1 1 111e"
-}/*, rsv={
-    "11   11 1   1",
-    "1 1 1   1   1",
-    "11   1   1 1",
-    "1 1   1  1 1",
-    "1 1 11    1e"
-}*/;
-
-READ8_MEMBER(pc1350_state::pc1350_lcd_read)
+	" 1  1 1 1   1 1 1  1"
+};
+const char* const pc1350_state::s_sml[5] =
 {
-	uint8_t data = m_reg[offset&0xfff];
-	logerror("pc1350 read %.3x %.2x\n",offset,data);
+	" 11 1 1 1  ",
+	"1   111 1  ",
+	" 1  1 1 1  ",
+	"  1 1 1 1  ",
+	"11  1 1 111"
+};
+
+READ8_MEMBER(pc1350_state::lcd_read)
+{
+	uint8_t data = m_reg[offset & 0xfff];
+	LOGMASKED(LOG_LCD, "pc1350 read %.3x %.2x\n",offset,data);
 	return data;
 }
 
-WRITE8_MEMBER(pc1350_state::pc1350_lcd_write)
+WRITE8_MEMBER(pc1350_state::lcd_write)
 {
-	logerror("pc1350 write %.3x %.2x\n",offset,data);
-	m_reg[offset&0xfff] = data;
+	LOGMASKED(LOG_LCD, "pc1350 write %.3x %.2x\n",offset,data);
+	m_reg[offset & 0xfff] = data;
 }
 
-READ8_MEMBER(pc1350_state::pc1350_keyboard_line_r)
+READ8_MEMBER(pc1350_state::keyboard_line_r)
 {
 	return m_reg[0xe00];
 }
@@ -127,39 +91,33 @@ static const int pc1350_addr[4]={ 0, 0x40, 0x1e, 0x5e };
 #define DOWN 45
 #define RIGHT 76
 
-uint32_t pc1350_state::screen_update_pc1350(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc1350_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y=DOWN, i, j, k=0, b;
-	int color[4];
+	const int contrast = m_dsw0->read() & 7;
+	int color[4] =
+	{
+		colortable[contrast][0],
+		colortable[contrast][1],
+		8,
+		7
+	};
+
 	bitmap.fill(11, cliprect);
 
-	/* HJB: we cannot initialize array with values from other arrays, thus... */
-	color[0] = pocketc_colortable[PC1350_CONTRAST][0];
-	color[1] = pocketc_colortable[PC1350_CONTRAST][1];
-	color[2] = 8;
-	color[3] = 7;
-
-	for (k=0, y=DOWN; k<4; y+=16, k++)
-		for (x=RIGHT, i=pc1350_addr[k]; i<0xa00; i+=0x200)
-			for (j=0; j<=0x1d; j++, x+=2)
-				for (b = 0; b < 8; b++)
-					bitmap.plot_box(x, y + b * 2, 2, 2, color[(m_reg[j+i] >> b) & 1]);
-
+	for (int k = 0, y = DOWN; k < 4; y += 16, k++)
+		for (int x = RIGHT, i = pc1350_addr[k]; i < 0xa00; i += 0x200)
+			for (int j = 0; j <= 0x1d; j++, x+=2)
+				for (int bit = 0; bit < 8; bit++)
+					bitmap.plot_box(x, y + bit * 2, 2, 2, color[BIT(m_reg[j+i], bit)]);
 
 	/* 783c: 0 SHIFT 1 DEF 4 RUN 5 PRO 6 JAPAN 7 SML */
-	/* I don't know how they really look like in the lcd */
-	pocketc_draw_special(bitmap, RIGHT-30, DOWN+45, shift,
-						m_reg[0x83c] & 0x01 ? color[2] : color[3]);
-	pocketc_draw_special(bitmap, RIGHT-30, DOWN+55, def,
-						m_reg[0x83c] & 0x02 ? color[2] : color[3]);
-	pocketc_draw_special(bitmap, RIGHT-30, DOWN+5, run,
-						m_reg[0x83c] & 0x10 ? color[2] : color[3]);
-	pocketc_draw_special(bitmap, RIGHT-30, DOWN+15, pro,
-						m_reg[0x83c] & 0x20 ? color[2] : color[3]);
-	pocketc_draw_special(bitmap, RIGHT-30, DOWN+25, japan,
-						m_reg[0x83c] & 0x40 ? color[2] : color[3]);
-	pocketc_draw_special(bitmap, RIGHT-30, DOWN+35, sml,
-						m_reg[0x83c] & 0x80 ? color[2] : color[3]);
+	/* I don't know how they really look like on the LCD */
+	pocketc_draw_special(bitmap, RIGHT-30, DOWN+45, s_shift, BIT(m_reg[0x83c], 0) ? color[2] : color[3]);
+	pocketc_draw_special(bitmap, RIGHT-30, DOWN+55, s_def,   BIT(m_reg[0x83c], 1) ? color[2] : color[3]);
+	pocketc_draw_special(bitmap, RIGHT-30, DOWN+5,  s_run,   BIT(m_reg[0x83c], 4) ? color[2] : color[3]);
+	pocketc_draw_special(bitmap, RIGHT-30, DOWN+15, s_pro,   BIT(m_reg[0x83c], 5) ? color[2] : color[3]);
+	pocketc_draw_special(bitmap, RIGHT-30, DOWN+25, s_japan, BIT(m_reg[0x83c], 6) ? color[2] : color[3]);
+	pocketc_draw_special(bitmap, RIGHT-30, DOWN+35, s_sml,   BIT(m_reg[0x83c], 7) ? color[2] : color[3]);
 
 	return 0;
 }

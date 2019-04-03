@@ -67,7 +67,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
-	optional_device<beep_device> m_beeper;
+	required_device<beep_device> m_beeper;
 	output_finder<6> m_lamps;
 };
 
@@ -274,7 +274,7 @@ void video21_state::video21(machine_config &config)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_video21);
-	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

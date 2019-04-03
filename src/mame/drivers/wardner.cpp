@@ -141,9 +141,9 @@ out:
 class wardner_state : public twincobr_state
 {
 public:
-	wardner_state(const machine_config &mconfig, device_type type, const char *tag) :
-		twincobr_state(mconfig, type, tag),
-		m_membank(*this, "membank")
+	wardner_state(const machine_config &mconfig, device_type type, const char *tag)
+		: twincobr_state(mconfig, type, tag)
+		, m_membank(*this, "membank")
 	{
 	}
 
@@ -160,8 +160,8 @@ private:
 
 	DECLARE_WRITE8_MEMBER(wardner_bank_w);
 
-	void DSP_io_map(address_map &map);
-	void DSP_program_map(address_map &map);
+	void dsp_io_map(address_map &map);
+	void dsp_program_map(address_map &map);
 	void main_bank_map(address_map &map);
 	void main_io_map(address_map &map);
 	void main_program_map(address_map &map);
@@ -181,14 +181,14 @@ void wardner_state::main_program_map(address_map &map)
 {
 	map(0x0000, 0x6fff).rom();
 	map(0x7000, 0x7fff).ram();
-	map(0x8000, 0x8fff).w(FUNC(wardner_state::wardner_sprite_w));                     // AM_SHARE("spriteram8")
-	map(0xa000, 0xafff).w(m_palette, FUNC(palette_device::write8));  // AM_SHARE("palette")
+	map(0x8000, 0x8fff).w(FUNC(wardner_state::wardner_sprite_w));                     // .share("spriteram8")
+	map(0xa000, 0xafff).w(m_palette, FUNC(palette_device::write8));  // .share("palette")
 	map(0xc000, 0xc7ff).writeonly().share("sharedram");
 	map(0x8000, 0xffff).r(m_membank, FUNC(address_map_bank_device::read8));
 }
 
 // Overlapped RAM/Banked ROM
-// Can't use AM_RANGE(0x00000, 0x3ffff) for ROM because the shared pointers get messed up somehow
+// Can't use map(0x00000, 0x3ffff) for ROM because the shared pointers get messed up somehow
 void wardner_state::main_bank_map(address_map &map)
 {
 	map(0x00000, 0x00fff).r(FUNC(wardner_state::wardner_sprite_r)).share("spriteram8");
@@ -242,14 +242,14 @@ void wardner_state::sound_io_map(address_map &map)
 
 /***************************** TMS32010 Memory Map **************************/
 
-void wardner_state::DSP_program_map(address_map &map)
+void wardner_state::dsp_program_map(address_map &map)
 {
 	map(0x000, 0x5ff).rom();
 }
 
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-void wardner_state::DSP_io_map(address_map &map)
+void wardner_state::dsp_io_map(address_map &map)
 {
 	map(0x00, 0x00).w(FUNC(wardner_state::wardner_dsp_addrsel_w));
 	map(0x01, 0x01).rw(FUNC(wardner_state::wardner_dsp_r), FUNC(wardner_state::wardner_dsp_w));
@@ -338,24 +338,24 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
-	2048,   /* 2048 characters */
-	3,      /* 3 bits per pixel */
-	{ 0*2048*8*8, 1*2048*8*8, 2*2048*8*8 }, /* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8     /* every char takes 8 consecutive bytes */
+	8,8,             /* 8*8 characters */
+	RGN_FRAC(1,3),   /* 2048 characters */
+	3,               /* 3 bits per pixel */
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) }, /* the bitplanes are separated */
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8              /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
 {
-	8,8,    /* 8*8 tiles */
-	4096,   /* 4096 tiles */
-	4,      /* 4 bits per pixel */
-	{ 0*4096*8*8, 1*4096*8*8, 2*4096*8*8, 3*4096*8*8 }, /* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8     /* every tile takes 8 consecutive bytes */
+	8,8,             /* 8*8 tiles */
+	RGN_FRAC(1,4),   /* 4096 tiles */
+	4,               /* 4 bits per pixel */
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) }, /* the bitplanes are separated */
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8              /* every tile takes 8 consecutive bytes */
 };
 
 
@@ -369,36 +369,36 @@ GFXDECODE_END
 void wardner_state::driver_start()
 {
 	/* Save-State stuff in src/machine/twincobr.cpp */
-	twincobr_driver_savestate();
+	driver_savestate();
 }
 
 void wardner_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(twincobr);
+	twincobr_state::machine_reset();
 
 	m_membank->set_bank(0);
 }
 
-MACHINE_CONFIG_START(wardner_state::wardner)
-
+void wardner_state::wardner(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4)      /* 6MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_program_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
+	Z80(config, m_maincpu, XTAL(24'000'000) / 4);   /* 6MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wardner_state::main_program_map);
+	m_maincpu->set_addrmap(AS_IO, &wardner_state::main_io_map);
 
 	ADDRESS_MAP_BANK(config, "membank").set_map(&wardner_state::main_bank_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x8000);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'000'000)/4)     /* 3.5MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_program_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'000'000) / 4));    /* 3.5MHz */
+	audiocpu.set_addrmap(AS_PROGRAM, &wardner_state::sound_program_map);
+	audiocpu.set_addrmap(AS_IO, &wardner_state::sound_io_map);
 
-	MCFG_DEVICE_ADD("dsp", TMS32010, XTAL(14'000'000))       /* 14MHz Crystal CLKin */
-	MCFG_DEVICE_PROGRAM_MAP(DSP_program_map)
+	TMS32010(config, m_dsp, XTAL(14'000'000));       /* 14MHz Crystal CLKin */
+	m_dsp->set_addrmap(AS_PROGRAM, &wardner_state::dsp_program_map);
 	/* Data Map is internal to the CPU */
-	MCFG_DEVICE_IO_MAP(DSP_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, wardner_state, twincobr_BIO_r))
+	m_dsp->set_addrmap(AS_IO, &wardner_state::dsp_io_map);
+	m_dsp->bio().set(FUNC(wardner_state::twincobr_bio_r));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))      /* 100 CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000); /* 100 CPU slices per frame */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<2>().set(FUNC(wardner_state::int_enable_w));
@@ -424,29 +424,26 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_xoffsets(32, 14);
 
-	MCFG_DEVICE_ADD("spriteram8", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_spriteram8);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(14_MHz_XTAL/2, 446, 0, 320, 286, 0, 240);
-	m_screen->set_screen_update(FUNC(wardner_state::screen_update_toaplan0));
+	m_screen->set_screen_update(FUNC(wardner_state::screen_update));
 	m_screen->screen_vblank().set(m_spriteram8, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	m_screen->screen_vblank().append(FUNC(wardner_state::wardner_vblank_irq));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wardner)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-
-	MCFG_VIDEO_START_OVERRIDE(wardner_state,toaplan0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wardner);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 4096);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'000'000)/4)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'000'000) / 4));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

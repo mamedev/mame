@@ -252,7 +252,7 @@ protected:
 	void mem_map(address_map &map);
 	void iop_map(address_map &map);
 
-	required_device<cpu_device>     m_maincpu;
+	required_device<r5900le_device> m_maincpu;
 	required_device<iop_device>     m_iop;
 	required_device_array<ps2_timer_device, 4> m_timer;
 	required_device<ps2_dmac_device> m_dmac;
@@ -734,54 +734,54 @@ void ps2sony_state::iop_map(address_map &map)
 static INPUT_PORTS_START( ps2sony )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(ps2sony_state::ps2sony)
-	MCFG_DEVICE_ADD(m_maincpu, R5900LE, 294'912'000, m_vu0)
-	MCFG_CPU_FORCE_NO_DRC()
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+void ps2sony_state::ps2sony(machine_config &config)
+{
+	R5900LE(config, m_maincpu, 294'912'000, m_vu0);
+	m_maincpu->set_force_no_drc(true);
+	m_maincpu->set_icache_size(16384);
+	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ps2sony_state::mem_map);
 
-	MCFG_DEVICE_ADD(m_vu0, SONYPS2_VU0, 294'912'000, m_vu1)
-	MCFG_DEVICE_ADD(m_vu1, SONYPS2_VU1, 294'912'000, m_gs)
+	SONYPS2_VU0(config, m_vu0, 294'912'000, m_vu1);
+	SONYPS2_VU1(config, m_vu1, 294'912'000, m_gs);
 
-	MCFG_DEVICE_ADD(m_timer[0], SONYPS2_TIMER, 294912000/2, true)
-	MCFG_DEVICE_ADD(m_timer[1], SONYPS2_TIMER, 294912000/2, true)
-	MCFG_DEVICE_ADD(m_timer[2], SONYPS2_TIMER, 294912000/2, false)
-	MCFG_DEVICE_ADD(m_timer[3], SONYPS2_TIMER, 294912000/2, false)
+	SONYPS2_TIMER(config, m_timer[0], 294912000/2, true);
+	SONYPS2_TIMER(config, m_timer[1], 294912000/2, true);
+	SONYPS2_TIMER(config, m_timer[2], 294912000/2, false);
+	SONYPS2_TIMER(config, m_timer[3], 294912000/2, false);
 
-	MCFG_DEVICE_ADD(m_intc, SONYPS2_INTC, m_maincpu)
-	MCFG_DEVICE_ADD(m_gs, SONYPS2_GS, 294912000/2, m_intc, m_vu1)
-	MCFG_DEVICE_ADD(m_dmac, SONYPS2_DMAC, 294912000/2, m_maincpu, m_ram, m_sif, m_gs, m_vu1)
-	MCFG_DEVICE_ADD(m_sif, SONYPS2_SIF, m_intc)
+	SONYPS2_INTC(config, m_intc, m_maincpu);
+	SONYPS2_GS(config, m_gs, 294912000/2, m_intc, m_vu1);
+	SONYPS2_DMAC(config, m_dmac, 294912000/2, m_maincpu, m_ram, m_sif, m_gs, m_vu1);
+	SONYPS2_SIF(config, m_sif, m_intc);
 
-	MCFG_DEVICE_ADD(m_iop, SONYPS2_IOP, XTAL(67'737'600)/2)
-	MCFG_DEVICE_PROGRAM_MAP(iop_map)
+	SONYPS2_IOP(config, m_iop, XTAL(67'737'600)/2);
+	m_iop->set_addrmap(AS_PROGRAM, &ps2sony_state::iop_map);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-	MCFG_QUANTUM_PERFECT_CPU("iop")
+	config.m_perfect_cpu_quantum = subtag("iop");
 
-	MCFG_DEVICE_ADD(m_pad[0], SONYPS2_PAD)
-	MCFG_DEVICE_ADD(m_pad[1], SONYPS2_PAD)
-	MCFG_DEVICE_ADD(m_mc, SONYPS2_MC)
+	SONYPS2_PAD(config, m_pad[0]);
+	SONYPS2_PAD(config, m_pad[1]);
+	SONYPS2_MC(config, m_mc);
 
-	MCFG_DEVICE_ADD(m_iop_intc, SONYIOP_INTC, m_iop)
-	MCFG_DEVICE_ADD(m_iop_sio2, SONYIOP_SIO2, m_iop_intc, m_pad[0], m_pad[1], m_mc)
-	MCFG_DEVICE_ADD(m_iop_cdvd, SONYIOP_CDVD, m_iop_intc)
-	MCFG_DEVICE_ADD(m_iop_timer, SONYIOP_TIMER, XTAL(67'737'600)/2)
-	MCFG_IOP_TIMER_IRQ_CALLBACK(WRITELINE(*this, ps2sony_state, iop_timer_irq))
-	MCFG_DEVICE_ADD(m_iop_spu, SONYIOP_SPU, XTAL(67'737'600)/2, m_iop, m_iop_intc)
+	SONYIOP_INTC(config, m_iop_intc, m_iop);
+	SONYIOP_SIO2(config, m_iop_sio2, m_iop_intc, m_pad[0], m_pad[1], m_mc);
+	SONYIOP_CDVD(config, m_iop_cdvd, m_iop_intc);
+	SONYIOP_TIMER(config, m_iop_timer, XTAL(67'737'600)/2);
+	m_iop_timer->irq().set(FUNC(ps2sony_state::iop_timer_irq));
+	SONYIOP_SPU(config, m_iop_spu, XTAL(67'737'600)/2, m_iop, m_iop_intc);
 
-	MCFG_DEVICE_ADD(m_iop_dma, SONYIOP_DMA, XTAL(67'737'600)/2, m_iop_intc, m_iop_ram, m_sif, m_iop_spu, m_iop_sio2)
+	SONYIOP_DMA(config, m_iop_dma, XTAL(67'737'600)/2, m_iop_intc, m_iop_ram, m_sif, m_iop_spu, m_iop_sio2);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(ps2sony_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 223)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(FUNC(ps2sony_state::screen_update));
+	screen.set_size(640, 256);
+	screen.set_visarea(0, 639, 0, 223);
 
-	MCFG_PALETTE_ADD("palette", 65536)
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(65536);
+}
 
 
 ROM_START( ps2 )

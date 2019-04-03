@@ -327,34 +327,31 @@ INTERRUPT_GEN_MEMBER(starfire_state::vblank_int)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-
-MACHINE_CONFIG_START(starfire_state::fireone)
-
+void starfire_state::fireone(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, STARFIRE_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", starfire_state, vblank_int)
+	Z80(config, m_maincpu, STARFIRE_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &starfire_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(starfire_state::vblank_int));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(STARFIRE_PIXEL_CLOCK, STARFIRE_HTOTAL, STARFIRE_HBEND, STARFIRE_HBSTART, STARFIRE_VTOTAL, STARFIRE_VBEND, STARFIRE_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(starfire_state, screen_update_starfire)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(STARFIRE_PIXEL_CLOCK, STARFIRE_HTOTAL, STARFIRE_HBEND, STARFIRE_HBSTART, STARFIRE_VTOTAL, STARFIRE_VBEND, STARFIRE_VBSTART);
+	m_screen->set_screen_update(FUNC(starfire_state::screen_update_starfire));
+}
 
-	/* sound hardware */
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(starfire_state::starfire)
+void starfire_state::starfire(machine_config &config)
+{
 	fireone(config);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(5)
-	MCFG_SAMPLES_NAMES(starfire_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(5);
+	m_samples->set_samples_names(starfire_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

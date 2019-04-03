@@ -19,10 +19,10 @@
 // Colors are 3bpp, but how they are generated is a mystery
 // there's no color prom on the pcb, nor palette ram
 
-PALETTE_INIT_MEMBER(galaxia_state,galaxia)
+void galaxia_state::galaxia_palette(palette_device &palette) const
 {
 	// estimated with video/photo references
-	const int lut_clr[0x18] = {
+	constexpr int lut_clr[0x18] = {
 		// background
 		0, 1, 4, 5,
 		0, 3, 6, 2,
@@ -41,10 +41,10 @@ PALETTE_INIT_MEMBER(galaxia_state,galaxia)
 	palette.set_pen_color(BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(0));
 }
 
-PALETTE_INIT_MEMBER(galaxia_state,astrowar)
+void galaxia_state::astrowar_palette(palette_device &palette) const
 {
 	// no reference material available(?), except for Data East astrof
-	const int lut_clr[8] = { 7, 3, 5, 1, 4, 2, 6, 7 };
+	constexpr int lut_clr[8] = { 7, 3, 5, 1, 4, 2, 6, 7 };
 
 	for (int i = 0; i < 8; i++)
 	{

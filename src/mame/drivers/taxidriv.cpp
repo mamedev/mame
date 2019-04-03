@@ -309,48 +309,46 @@ static GFXDECODE_START( gfx_taxidriv )
 	GFXDECODE_ENTRY( "gfx5", 0, charlayout2, 0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(taxidriv_state, taxidriv)
+void taxidriv_state::taxidriv_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int bit0, bit1, r, g, b;
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	/* TODO: resistors, 1k & 470*/
-
-	for (i = 0; i < 0x10; ++i)
+	// TODO: resistors, 1k & 470
+	for (int i = 0; i < 0x10; ++i)
 	{
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		r = 0x55 * bit0 + 0xaa * bit1;
-		bit0 = (color_prom[0] >> 2) & 0x01;
-		bit1 = (color_prom[0] >> 3) & 0x01;
-		g = 0x55 * bit0 + 0xaa * bit1;
-		bit0 = (color_prom[0] >> 4) & 0x01;
-		bit1 = (color_prom[0] >> 5) & 0x01;
-		b = 0x55 * bit0 + 0xaa * bit1;
+		int bit0, bit1;
+
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		int const r = 0x55 * bit0 + 0xaa * bit1;
+		bit0 = BIT(color_prom[i], 2);
+		bit1 = BIT(color_prom[i], 3);
+		int const g = 0x55 * bit0 + 0xaa * bit1;
+		bit0 = BIT(color_prom[i], 4);
+		bit1 = BIT(color_prom[i], 5);
+		int const b = 0x55 * bit0 + 0xaa * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
-		color_prom++;
 	}
 }
 
-MACHINE_CONFIG_START(taxidriv_state::taxidriv)
-
+void taxidriv_state::taxidriv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,4000000)    /* 4 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taxidriv_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 4000000);    /* 4 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taxidriv_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(taxidriv_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80,4000000)    /* 4 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taxidriv_state,  irq0_line_hold)   /* ??? */
+	z80_device &subcpu(Z80(config, "sub", 4000000));    /* 4 MHz ??? */
+	subcpu.set_addrmap(AS_PROGRAM, &taxidriv_state::cpu2_map);
+	subcpu.set_vblank_int("screen", FUNC(taxidriv_state::irq0_line_hold));   /* ??? */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)   /* 4 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(cpu3_map)
-	MCFG_DEVICE_IO_MAP(cpu3_port_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taxidriv_state,  irq0_line_hold)   /* ??? */
+	z80_device &audiocpu(Z80(config, "audiocpu", 4000000));   /* 4 MHz ??? */
+	audiocpu.set_addrmap(AS_PROGRAM, &taxidriv_state::cpu3_map);
+	audiocpu.set_addrmap(AS_IO, &taxidriv_state::cpu3_port_map);
+	audiocpu.set_vblank_int("screen", FUNC(taxidriv_state::irq0_line_hold));   /* ??? */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
@@ -381,17 +379,16 @@ MACHINE_CONFIG_START(taxidriv_state::taxidriv)
 	ppi4.out_pc_callback().set(FUNC(taxidriv_state::p4c_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 27*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taxidriv_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 27*8-1);
+	screen.set_screen_update(FUNC(taxidriv_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taxidriv)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(taxidriv_state, taxidriv)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taxidriv);
+	PALETTE(config, m_palette, FUNC(taxidriv_state::taxidriv_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -404,7 +401,7 @@ MACHINE_CONFIG_START(taxidriv_state::taxidriv)
 	ay8910_device &ay2(AY8910(config, "ay2", 1250000));
 	ay2.port_a_read_callback().set(FUNC(taxidriv_state::p8910_1a_r));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
 
 

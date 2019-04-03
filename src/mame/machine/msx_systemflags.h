@@ -11,18 +11,21 @@ value during a reset of the system.
 
 DECLARE_DEVICE_TYPE(MSX_SYSTEMFLAGS, msx_systemflags_device)
 
-
-#define MCFG_MSX_SYSTEMFLAGS_ADD(_tag, _initial_value) \
-	MCFG_DEVICE_ADD(_tag, MSX_SYSTEMFLAGS, 0) \
-	downcast<msx_systemflags_device &>(*device).set_initial_value(_initial_value);
-
-
 class msx_systemflags_device : public device_t
 {
 public:
+	template <typename T>
+	msx_systemflags_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&maincpu_tag, uint8_t initial_value)
+		:msx_systemflags_device(mconfig, tag, owner, 0)
+	{
+		set_maincpu_tag(std::forward<T>(maincpu_tag));
+		set_initial_value(initial_value);
+	}
+
 	msx_systemflags_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
+	template <typename T> void set_maincpu_tag(T &&maincpu_tag) { m_maincpu.set_tag(std::forward<T>(maincpu_tag)); }
 	void set_initial_value(uint8_t initial_value) { m_initial_value = initial_value; }
 
 	DECLARE_READ8_MEMBER(read);
@@ -34,6 +37,7 @@ protected:
 private:
 	uint8_t m_initial_value;
 	uint8_t m_system_flags;
+	required_device<cpu_device> m_maincpu;
 };
 
 #endif // MAME_MACHINE_MSX_SYSTEMFLAGS_H

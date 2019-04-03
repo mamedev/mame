@@ -91,7 +91,7 @@ private:
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(fastfred);
+	void fastfred_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(imago);
 	DECLARE_VIDEO_START(fastfred);
 	DECLARE_VIDEO_START(imago);

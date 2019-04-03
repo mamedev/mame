@@ -39,8 +39,9 @@ ROM_START(hp98603a)
 	ROM_LOAD16_BYTE("98603_80016.bin", 0x70000, 32768, CRC(d887acab) SHA1(a9cbbaa5f053f374d6cbda614b727df35a61ace1))
 ROM_END
 
-MACHINE_CONFIG_START(dio16_98603a_device::device_add_mconfig)
-MACHINE_CONFIG_END
+void dio16_98603a_device::device_add_mconfig(machine_config &config)
+{
+}
 
 const tiny_rom_entry *dio16_98603a_device::device_rom_region() const
 {

@@ -8,7 +8,7 @@
 #ifndef NLD_BJT_H_
 #define NLD_BJT_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 // -----------------------------------------------------------------------------
 // Macros

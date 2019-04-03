@@ -205,17 +205,6 @@ void eeprom_serial_base_device::device_start()
 	save_item(NAME(m_command));
 	save_item(NAME(m_address));
 	save_item(NAME(m_shift_register));
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void eeprom_serial_base_device::device_reset()
-{
-	// reset the base class
-	eeprom_base_device::device_reset();
 
 	// reset the state
 	set_state(STATE_IN_RESET);

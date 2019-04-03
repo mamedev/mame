@@ -69,7 +69,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<mc68hc11_cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	output_finder<72> m_digits;
 	output_finder<8> m_lamps;
@@ -253,23 +253,22 @@ void namco_30test_state::machine_start()
 	save_item(NAME(m_oki_bank));
 }
 
-MACHINE_CONFIG_START(namco_30test_state::_30test)
-
+void namco_30test_state::_30test(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC68HC11,MAIN_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(namco_30test_map)
-	MCFG_DEVICE_IO_MAP(namco_30test_io)
-	MCFG_MC68HC11_CONFIG( 0, 768, 0x00 )
+	MC68HC11(config, m_maincpu, MAIN_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namco_30test_state::namco_30test_map);
+	m_maincpu->set_addrmap(AS_IO, &namco_30test_state::namco_30test_io);
+	m_maincpu->set_config(0, 768, 0x00);
 
-
-	/* no video! */
+	/* no video hardware */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /***************************************************************************
 

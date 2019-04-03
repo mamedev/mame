@@ -2523,9 +2523,14 @@ static void OPL3_save_state(OPL3 *chip, device_t *device) {
 	device->save_item(NAME(chip->OPL3_mode));
 	device->save_item(NAME(chip->rhythm));
 
+	device->save_item(NAME(chip->T));
+	device->save_item(NAME(chip->st));
+
 	device->save_item(NAME(chip->address));
 	device->save_item(NAME(chip->status));
 	device->save_item(NAME(chip->statusmask));
+
+	device->save_item(NAME(chip->nts));
 }
 
 void * ymf262_init(device_t *device, int clock, int rate)

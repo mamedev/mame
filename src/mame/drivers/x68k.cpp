@@ -1045,12 +1045,12 @@ WRITE8_MEMBER(x68k_state::adpcm_w)
 {
 	switch(offset)
 	{
-		case 0x00:
-			m_okim6258->ctrl_w(space,0,data);
-			break;
-		case 0x01:
-			m_okim6258->data_w(space,0,data);
-			break;
+	case 0x00:
+		m_okim6258->ctrl_w(data);
+		break;
+	case 0x01:
+		m_okim6258->data_w(data);
+		break;
 	}
 }
 
@@ -1551,8 +1551,9 @@ static void keyboard_devices(device_slot_interface &device)
 	device.option_add("x68k", X68K_KEYBOARD);
 }
 
-MACHINE_CONFIG_START(x68k_state::x68000_base)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+void x68k_state::x68000_base(machine_config &config)
+{
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* device hardware */
 	MC68901(config, m_mfpdev, 16_MHz_XTAL / 4);
@@ -1577,8 +1578,8 @@ MACHINE_CONFIG_START(x68k_state::x68000_base)
 	m_hd63450->set_burst_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
 	m_hd63450->dma_end().set(FUNC(x68k_state::dma_end));
 	m_hd63450->dma_error().set(FUNC(x68k_state::dma_error));
-	m_hd63450->dma_read<0>().set("upd72065", FUNC(upd72065_device::mdma_r));
-	m_hd63450->dma_write<0>().set("upd72065", FUNC(upd72065_device::mdma_w));
+	m_hd63450->dma_read<0>().set("upd72065", FUNC(upd72065_device::dma_r));
+	m_hd63450->dma_write<0>().set("upd72065", FUNC(upd72065_device::dma_w));
 
 	SCC8530(config, m_scc, 40_MHz_XTAL / 8);
 
@@ -1592,8 +1593,8 @@ MACHINE_CONFIG_START(x68k_state::x68000_base)
 
 	GFXDECODE(config, m_gfxdecode, "pcgpalette", gfxdecode_device::empty);
 
-	PALETTE(config, m_gfxpalette, 256).set_format(raw_to_rgb_converter(2, &x68k_state::GGGGGRRRRRBBBBBI_decoder));
-	PALETTE(config, m_pcgpalette, 256).set_format(raw_to_rgb_converter(2, &x68k_state::GGGGGRRRRRBBBBBI_decoder));
+	PALETTE(config, m_gfxpalette).set_format(2, &x68k_state::GGGGGRRRRRBBBBBI, 256);
+	PALETTE(config, m_pcgpalette).set_format(2, &x68k_state::GGGGGRRRRRBBBBBI, 256);
 
 	config.set_default_layout(layout_x68000);
 
@@ -1616,7 +1617,7 @@ MACHINE_CONFIG_START(x68k_state::x68000_base)
 	FILTER_VOLUME(config, m_adpcm_out[0]).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, m_adpcm_out[1]).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	UPD72065(config, m_upd72065, 0, true, false);
+	UPD72065(config, m_upd72065, 16_MHz_XTAL / 2, true, false); // clocked through SED9420CAC
 	m_upd72065->intrq_wr_callback().set(FUNC(x68k_state::fdc_irq));
 	m_upd72065->drq_wr_callback().set(m_hd63450, FUNC(hd63450_device::drq0_w));
 	FLOPPY_CONNECTOR(config, "upd72065:0", x68k_floppies, "525hd", x68k_state::floppy_formats);
@@ -1626,17 +1627,17 @@ MACHINE_CONFIG_START(x68k_state::x68000_base)
 
 	SOFTWARE_LIST(config, "flop_list").set_original("x68k_flop");
 
-	MCFG_DEVICE_ADD("exp", X68K_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(x68000_exp_cards, nullptr, false)
-	MCFG_X68K_EXPANSION_SLOT_OUT_IRQ2_CB(WRITELINE(*this, x68k_state, irq2_line))
-	MCFG_X68K_EXPANSION_SLOT_OUT_IRQ4_CB(WRITELINE(*this, x68k_state, irq4_line))
-	MCFG_X68K_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", M68K_IRQ_7))
+	X68K_EXPANSION_SLOT(config, m_expansion, x68000_exp_cards, nullptr);
+	m_expansion->set_space(m_maincpu, AS_PROGRAM);
+	m_expansion->out_irq2_callback().set(FUNC(x68k_state::irq2_line));
+	m_expansion->out_irq4_callback().set(FUNC(x68k_state::irq4_line));
+	m_expansion->out_nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M,2M,3M,5M,6M,7M,8M,9M,10M,11M,12M");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 void x68k_state::x68000(machine_config &config)
 {

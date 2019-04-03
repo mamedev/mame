@@ -332,11 +332,13 @@ void jp_state::machine_reset()
 	m_digits[99] = 0x3f;
 }
 
-MACHINE_CONFIG_START(jp_state::jp)
+void jp_state::jp(machine_config &config)
+
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(jp_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(jp_state, irq0_line_hold, 8_MHz_XTAL / 8192) // 4020 divider
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jp_state::jp_map);
+	m_maincpu->set_periodic_int(FUNC(jp_state::irq0_line_hold), attotime::from_hz(8_MHz_XTAL / 8192)); // 4020 divider
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -378,7 +380,7 @@ MACHINE_CONFIG_START(jp_state::jp)
 	ay.port_a_read_callback().set(FUNC(jp_state::porta_r));
 	ay.port_b_read_callback().set(FUNC(jp_state::portb_r));
 	ay.add_route(ALL_OUTPUTS, "ayvol", 0.9);
-MACHINE_CONFIG_END
+}
 
 WRITE8_MEMBER(jp_state::sample_bank_w)
 {
@@ -407,23 +409,24 @@ IRQ_CALLBACK_MEMBER(jp_state::sound_int_cb)
 	return 0xff;
 }
 
-MACHINE_CONFIG_START(jp_state::jps)
+void jp_state::jps(machine_config &config)
+{
 	jp(config);
-	MCFG_DEVICE_ADD("soundcpu", Z80, 8_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(jp_sound_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(jp_state, sound_int_cb)
+	Z80(config, m_soundcpu, 8_MHz_XTAL / 2);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &jp_state::jp_sound_map);
+	m_soundcpu->set_irq_acknowledge_callback(FUNC(jp_state::sound_int_cb));
 
 	LS157(config, m_adpcm_select, 0); // not labeled in manual; might even be a CD4019
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	SPEAKER(config, "msmvol").front_center();
-	MCFG_DEVICE_ADD("msm", MSM5205, 384'000) // not labeled in manual; clock unknown
-	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(*this, jp_state, vck_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B) // unknown
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmvol", 1.0)
+	MSM5205(config, m_msm, 384'000); // not labeled in manual; clock unknown
+	m_msm->vck_callback().set(FUNC(jp_state::vck_w));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B); // unknown
+	m_msm->add_route(ALL_OUTPUTS, "msmvol", 1.0);
 
 	m_latch[9]->q_out_cb<5>().set_inputline("soundcpu", INPUT_LINE_NMI); // only external input for sound board
-MACHINE_CONFIG_END
+}
 
 /*-------------------------------------------------------------------
 / America 1492 #1107

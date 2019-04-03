@@ -235,13 +235,13 @@ static INPUT_PORTS_START( gamecom )
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_OTHER)
 	INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(gamecom_state, gamecom)
+void gamecom_state::gamecom_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, 0x00, 0x00, 0x00 ); // Black
-	palette.set_pen_color(1, 0x0F, 0x4F, 0x2F ); // Gray 1
-	palette.set_pen_color(2, 0x6F, 0x8F, 0x4F ); // Gray 2
-	palette.set_pen_color(3, 0x8F, 0xCF, 0x8F ); // Grey 3
-	palette.set_pen_color(4, 0xDF, 0xFF, 0x8F ); // White
+	palette.set_pen_color(0, 0x00, 0x00, 0x00); // Black
+	palette.set_pen_color(1, 0x0f, 0x4f, 0x2f); // Gray 1
+	palette.set_pen_color(2, 0x6f, 0x8f, 0x4f); // Gray 2
+	palette.set_pen_color(3, 0x8f, 0xcf, 0x8f); // Grey 3
+	palette.set_pen_color(4, 0xdf, 0xff, 0x8f); // White
 }
 
 uint32_t gamecom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -257,39 +257,38 @@ INTERRUPT_GEN_MEMBER(gamecom_state::gamecom_interrupt)
 
 MACHINE_CONFIG_START(gamecom_state::gamecom)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", SM8500, XTAL(11'059'200)/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
-	MCFG_DEVICE_PROGRAM_MAP( gamecom_mem_map)
-	MCFG_SM8500_DMA_CB( WRITE8( *this, gamecom_state, gamecom_handle_dma ) )
-	MCFG_SM8500_TIMER_CB( WRITE8( *this, gamecom_state, gamecom_update_timers ) )
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gamecom_state,  gamecom_interrupt)
+	SM8500(config, m_maincpu, XTAL(11'059'200)/2);   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gamecom_state::gamecom_mem_map);
+	m_maincpu->dma_cb().set(FUNC(gamecom_state::gamecom_handle_dma));
+	m_maincpu->timer_cb().set(FUNC(gamecom_state::gamecom_update_timers));
+	m_maincpu->set_vblank_int("screen", FUNC(gamecom_state::gamecom_interrupt));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE( 59.732155 )
-	MCFG_SCREEN_VBLANK_TIME(500)
-	MCFG_SCREEN_UPDATE_DRIVER(gamecom_state, screen_update)
-	MCFG_SCREEN_SIZE( 200, 160 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 199, 0, 159 )
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(59.732155);
+	m_screen->set_vblank_time(500);
+	m_screen->set_screen_update(FUNC(gamecom_state::screen_update));
+	m_screen->set_size(200, 160);
+	m_screen->set_visarea_full();
+	m_screen->set_palette("palette");
 
 	config.set_default_layout(layout_gamecom);
-	MCFG_PALETTE_ADD("palette", 5)
-	MCFG_PALETTE_INIT_OWNER(gamecom_state, gamecom)
+	PALETTE(config, "palette", FUNC(gamecom_state::gamecom_palette), 5);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	/* TODO: much more complex than this */
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC (Digital audio)
-	MCFG_DEVICE_ADD("dac0", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC (Frequency modulation)
-	MCFG_DEVICE_ADD("dac1", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC (Frequency modulation)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC (Digital audio)
+	DAC_4BIT_R2R(config, m_dac0, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC (Frequency modulation)
+	DAC_4BIT_R2R(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC (Frequency modulation)
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac0", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_linear_slot, "gamecom_cart")
@@ -300,7 +299,7 @@ MACHINE_CONFIG_START(gamecom_state::gamecom)
 	MCFG_GENERIC_EXTENSIONS("bin,tgc")
 	MCFG_GENERIC_LOAD(gamecom_state, gamecom_cart2)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","gamecom")
+	SOFTWARE_LIST(config, "cart_list").set_original("gamecom");
 MACHINE_CONFIG_END
 
 ROM_START( gamecom )
@@ -312,4 +311,4 @@ ROM_START( gamecom )
 ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY  FULLNAME    FLAGS
-CONS( 1997, gamecom, 0,      0,      gamecom, gamecom, gamecom_state, init_gamecom, "Tiger", "Game.com", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 1997, gamecom, 0,      0,      gamecom, gamecom, gamecom_state, init_gamecom, "Tiger", "Game.com", MACHINE_IMPERFECT_SOUND)

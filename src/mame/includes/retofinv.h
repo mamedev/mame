@@ -55,8 +55,8 @@ private:
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 
-	DECLARE_PALETTE_INIT(retofinv);
-	DECLARE_PALETTE_INIT(retofinv_bl);
+	void retofinv_palette(palette_device &palette) const;
+	void retofinv_bl_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -26,26 +26,30 @@ needs inputs, prom decode, sound, artwork (lamps), probably some irq masking and
 class summit_state : public driver_device
 {
 public:
-	summit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	summit_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_attr(*this, "attr"),
 		m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	void summit(machine_config &config);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	required_shared_ptr<uint8_t> m_attr;
 	required_shared_ptr<uint8_t> m_vram;
-	DECLARE_WRITE8_MEMBER(out_w);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(summit);
-	uint32_t screen_update_summit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	DECLARE_WRITE8_MEMBER(out_w);
+	void summit_palette(palette_device &palette) const;
+	uint32_t screen_update_summit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mainmap(address_map &map);
 };
 
@@ -306,30 +310,29 @@ static GFXDECODE_START( gfx_summit )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(summit_state, summit)
+void summit_state::summit_palette(palette_device &palette) const
 {
 }
 
-MACHINE_CONFIG_START(summit_state::summit)
+void summit_state::summit(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,4000000)
-	MCFG_DEVICE_PROGRAM_MAP(mainmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", summit_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &summit_state::mainmap);
+	m_maincpu->set_vblank_int("screen", FUNC(summit_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(summit_state, screen_update_summit)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(summit_state::screen_update_summit));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_summit)
-
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(summit_state, summit)
-MACHINE_CONFIG_END
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_summit);
+	PALETTE(config, m_palette, FUNC(summit_state::summit_palette), 256);
+}
 
 
 ROM_START( pushover )

@@ -199,10 +199,10 @@ private:
 	DECLARE_READ16_MEMBER(dipswitches_r);
 	DECLARE_MACHINE_RESET(tx1);
 	DECLARE_VIDEO_START(tx1);
-	DECLARE_PALETTE_INIT(tx1);
+	void tx1_palette(palette_device &palette) const;
 	DECLARE_MACHINE_RESET(buggyboy);
 	DECLARE_VIDEO_START(buggyboy);
-	DECLARE_PALETTE_INIT(buggyboy);
+	void buggyboy_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(buggybjr);
 
 	void tx1_draw_char(uint8_t *bitmap);

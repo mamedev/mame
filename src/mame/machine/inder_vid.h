@@ -18,9 +18,6 @@
 
 DECLARE_DEVICE_TYPE(INDER_VIDEO, inder_vid_device)
 
-#define MCFG_INDER_VIDEO_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, INDER_VIDEO, 0)
-
 
 class inder_vid_device : public device_t
 /*  public device_video_interface */

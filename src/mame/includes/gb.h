@@ -5,7 +5,6 @@
  * includes/gb.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_GB_H
 #define MAME_INCLUDES_GB_H
 
@@ -32,7 +31,8 @@ public:
 		m_inputs(*this, "INPUTS"),
 		m_bios_hack(*this, "SKIP_CHECK"),
 		m_ram(*this, RAM_TAG),
-		m_ppu(*this, "ppu")
+		m_ppu(*this, "ppu"),
+		m_palette(*this, "palette")
 	{ }
 
 	uint8_t       m_gb_io[0x10];
@@ -74,14 +74,14 @@ public:
 	DECLARE_WRITE8_MEMBER(gbc_io_w);
 	DECLARE_WRITE8_MEMBER(gbc_io2_w);
 	DECLARE_READ8_MEMBER(gbc_io2_r);
-	DECLARE_PALETTE_INIT(gb);
+	void gb_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(sgb);
 	DECLARE_MACHINE_RESET(sgb);
-	DECLARE_PALETTE_INIT(sgb);
-	DECLARE_PALETTE_INIT(gbp);
+	void sgb_palette(palette_device &palette) const;
+	void gbp_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(gbc);
 	DECLARE_MACHINE_RESET(gbc);
-	DECLARE_PALETTE_INIT(gbc);
+	void gbc_palette(palette_device &palette) const;
 	DECLARE_WRITE8_MEMBER(gb_timer_callback);
 
 	DECLARE_READ8_MEMBER(gb_cart_r);
@@ -101,6 +101,7 @@ public:
 	void gameboy_map(address_map &map);
 	void gbc_map(address_map &map);
 	void sgb_map(address_map &map);
+
 protected:
 	enum {
 		SIO_ENABLED = 0x80,
@@ -116,6 +117,7 @@ protected:
 	required_ioport m_bios_hack;
 	optional_device<ram_device> m_ram;
 	required_device<dmg_ppu_device> m_ppu;
+	required_device<palette_device> m_palette;
 
 	void gb_timer_increment();
 	void gb_timer_check_irq();
@@ -135,29 +137,31 @@ protected:
 class megaduck_state : public gb_state
 {
 public:
-	megaduck_state(const machine_config &mconfig, device_type type, const char *tag)
-		: gb_state(mconfig, type, tag)
-		, m_cartslot(*this, "duckslot")
+	megaduck_state(const machine_config &mconfig, device_type type, const char *tag) :
+		gb_state(mconfig, type, tag),
+		m_cartslot(*this, "duckslot")
 	{ }
 
+	void megaduck(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	DECLARE_READ8_MEMBER(megaduck_video_r);
 	DECLARE_WRITE8_MEMBER(megaduck_video_w);
 	DECLARE_WRITE8_MEMBER(megaduck_sound_w1);
 	DECLARE_READ8_MEMBER(megaduck_sound_r1);
 	DECLARE_WRITE8_MEMBER(megaduck_sound_w2);
 	DECLARE_READ8_MEMBER(megaduck_sound_r2);
-	DECLARE_MACHINE_START(megaduck);
-	DECLARE_MACHINE_RESET(megaduck);
-	DECLARE_PALETTE_INIT(megaduck);
+	void megaduck_palette(palette_device &palette) const;;
+	void megaduck_map(address_map &map);
 
 	DECLARE_READ8_MEMBER(cart_r);
 	DECLARE_WRITE8_MEMBER(bank1_w);
 	DECLARE_WRITE8_MEMBER(bank2_w);
-	optional_device<megaduck_cart_slot_device> m_cartslot;
-	void megaduck(machine_config &config);
-	void megaduck_map(address_map &map);
+	required_device<megaduck_cart_slot_device> m_cartslot;
 };
-
-
 
 #endif // MAME_INCLUDES_GB_H

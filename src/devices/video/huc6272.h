@@ -18,17 +18,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_HUC6272_IRQ_CHANGED_CB(cb) \
-		downcast<huc6272_device &>(*device).set_irq_changed_callback((DEVCB_##cb));
-
-#define MCFG_HUC6272_RAINBOW(tag) \
-		downcast<huc6272_device &>(*device).set_rainbow_tag((tag));
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -41,7 +30,7 @@ public:
 	// construction/destruction
 	huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_irq_changed_callback(Object &&cb) { return m_irq_changed_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq_changed_callback() { return m_irq_changed_cb.bind(); }
 	template <typename T> void set_rainbow_tag(T &&tag) { m_huc6271.set_tag(std::forward<T>(tag)); }
 
 	// I/O operations

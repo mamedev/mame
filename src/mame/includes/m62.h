@@ -123,10 +123,10 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(m62_spr);
-	DECLARE_PALETTE_INIT(m62_chr);
-	DECLARE_PALETTE_INIT(m62_lotlot_fg);
-	DECLARE_PALETTE_INIT(m62_battroad_fg);
+	void m62_spr(palette_device &palette) const;
+	void m62_chr(palette_device &palette) const;
+	void m62_lotlot_fg(palette_device &palette) const;
+	void m62_battroad_fg(palette_device &palette) const;
 	DECLARE_VIDEO_START(kungfum);
 	DECLARE_VIDEO_START(battroad);
 	DECLARE_VIDEO_START(ldrun2);
@@ -135,7 +135,7 @@ private:
 	DECLARE_VIDEO_START(kidniki);
 	DECLARE_VIDEO_START(spelunkr);
 	DECLARE_VIDEO_START(spelunk2);
-	DECLARE_PALETTE_INIT(spelunk2);
+	void spelunk2_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(youjyudn);
 	DECLARE_VIDEO_START(horizon);
 	uint32_t screen_update_ldrun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

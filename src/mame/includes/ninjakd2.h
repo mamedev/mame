@@ -5,9 +5,10 @@
     UPL "sprite framebuffer" hardware
 
 ******************************************************************************/
-
 #ifndef MAME_INCLUDES_NINJAKD2_H
 #define MAME_INCLUDES_NINJAKD2_H
+
+#pragma once
 
 #include "sound/samples.h"
 #include "emupal.h"
@@ -22,23 +23,23 @@ public:
 		m_palette(*this, "palette"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_soundcpu(*this, "soundcpu"),
 		m_pcm(*this, "pcm"),
 		m_pcm_region(*this, "pcm"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_screen(*this, "screen"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_mainbank(*this, "mainbank")
 	{ }
 
 	void ninjakd2b(machine_config &config);
 	void ninjakd2(machine_config &config);
-	void ninjakd2_core(machine_config &config);
 
 	void init_ninjakd2();
 	void init_bootleg();
 
+protected:
 	DECLARE_WRITE8_MEMBER(ninjakd2_bgvideoram_w);
 	DECLARE_WRITE8_MEMBER(ninjakd2_fgvideoram_w);
 	DECLARE_WRITE8_MEMBER(ninjakd2_bg_ctrl_w);
@@ -47,11 +48,12 @@ public:
 	DECLARE_WRITE8_MEMBER(ninjakd2_bankselect_w);
 	DECLARE_WRITE8_MEMBER(ninjakd2_soundreset_w);
 
-protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<uint8_t> m_bg_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<cpu_device> m_soundcpu;
 
 	uint8_t m_vram_bank_mask;
 	int m_robokid_sprites;
@@ -81,13 +83,13 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+	void ninjakd2_core(machine_config &config);
+
 private:
-	required_device<cpu_device> m_soundcpu;
 	optional_device<samples_device> m_pcm;
 	optional_memory_region m_pcm_region;
 	required_shared_ptr<uint8_t> m_fg_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	required_device<screen_device> m_screen;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	required_memory_bank m_mainbank;
@@ -134,7 +136,6 @@ public:
 	{ }
 
 	void robokid(machine_config &config);
-	void robokid_main_cpu(address_map &map);
 
 	void init_robokid();
 	void init_robokidj();
@@ -149,6 +150,8 @@ protected:
 	void video_init_banked(uint32_t vram_alloc_size);
 	TILEMAP_MAPPER_MEMBER(robokid_bg_scan);
 	template<int Layer> TILE_GET_INFO_MEMBER(robokid_get_bg_tile_info);
+
+	void robokid_main_cpu(address_map &map);
 
 private:
 	DECLARE_READ8_MEMBER(motion_error_verbose_r);
@@ -198,4 +201,4 @@ private:
 	int m_io_protection_tick;
 };
 
-#endif
+#endif // MAME_INCLUDES_NINJAKD2_H

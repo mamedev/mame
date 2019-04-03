@@ -10,10 +10,11 @@
 
 #pragma once
 
-#include "video/bufsprite.h"
-#include "sound/okim6295.h"
+#include "cpu/nec/v25.h"
 #include "machine/pic8259.h"
 #include "machine/timer.h"
+#include "sound/okim6295.h"
+#include "video/bufsprite.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -77,7 +78,7 @@ private:
 	required_shared_ptr<uint16_t> m_vram_data;
 	required_shared_ptr<uint16_t> m_spritecontrol;
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_soundcpu;
+	optional_device<v35_device> m_soundcpu;
 	optional_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

@@ -117,9 +117,9 @@ inline rgb_t bbc_state::out_rgb(rgb_t entry)
 	}
 }
 
-PALETTE_INIT_MEMBER(bbc_state, bbc)
+void bbc_state::bbc_colours(palette_device &palette) const
 {
-	palette.set_pen_colors(0, bbc_palette, ARRAY_LENGTH(bbc_palette));
+	palette.set_pen_colors(0, bbc_palette);
 }
 
 /************************************************************************

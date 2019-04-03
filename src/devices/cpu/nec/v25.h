@@ -21,33 +21,6 @@ enum
 	V25_PENDING
 };
 
-
-#define MCFG_V25_CONFIG(_table) \
-	downcast<v25_common_device &>(*device).set_decryption_table(_table);
-
-
-#define MCFG_V25_PORT_PT_READ_CB(_devcb) \
-	downcast<v25_common_device &>(*device).set_pt_in_cb(DEVCB_##_devcb);
-
-#define MCFG_V25_PORT_P0_READ_CB(_devcb) \
-	downcast<v25_common_device &>(*device).set_p0_in_cb(DEVCB_##_devcb);
-
-#define MCFG_V25_PORT_P1_READ_CB(_devcb) \
-	downcast<v25_common_device &>(*device).set_p1_in_cb(DEVCB_##_devcb);
-
-#define MCFG_V25_PORT_P2_READ_CB(_devcb) \
-	downcast<v25_common_device &>(*device).set_p2_in_cb(DEVCB_##_devcb);
-
-
-#define MCFG_V25_PORT_P0_WRITE_CB(_devcb) \
-	downcast<v25_common_device &>(*device).set_p0_out_cb(DEVCB_##_devcb);
-
-#define MCFG_V25_PORT_P1_WRITE_CB(_devcb) \
-	downcast<v25_common_device &>(*device).set_p1_out_cb(DEVCB_##_devcb);
-
-#define MCFG_V25_PORT_P2_WRITE_CB(_devcb) \
-	downcast<v25_common_device &>(*device).set_p2_out_cb(DEVCB_##_devcb);
-
 class v25_common_device : public cpu_device
 {
 public:

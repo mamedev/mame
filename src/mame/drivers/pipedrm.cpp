@@ -175,8 +175,8 @@ Added Multiple Coin Feature:
 class pipedrm_state : public fromance_state
 {
 public:
-	pipedrm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: fromance_state(mconfig, type, tag),
+	pipedrm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fromance_state(mconfig, type, tag),
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
@@ -579,33 +579,32 @@ MACHINE_RESET_MEMBER(pipedrm_state,pipedrm)
 	m_flipscreen = 0;
 }
 
-MACHINE_CONFIG_START(pipedrm_state::pipedrm)
-
+void pipedrm_state::pipedrm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pipedrm_state, irq0_line_hold)
+	Z80(config, m_maincpu, 12000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pipedrm_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &pipedrm_state::main_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(pipedrm_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80,14318000/4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
+	Z80(config, m_subcpu, 14318000/4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &pipedrm_state::sound_map);
+	m_subcpu->set_addrmap(AS_IO, &pipedrm_state::sound_portmap);
 
 	MCFG_MACHINE_START_OVERRIDE(pipedrm_state,pipedrm)
 	MCFG_MACHINE_RESET_OVERRIDE(pipedrm_state,pipedrm)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(44*8, 30*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pipedrm_state, screen_update_pipedrm)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(44*8, 30*8);
+	m_screen->set_visarea(0*8, 44*8-1, 0*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(pipedrm_state::screen_update_pipedrm));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pipedrm)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pipedrm);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
 	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
@@ -625,41 +624,39 @@ MACHINE_CONFIG_START(pipedrm_state::pipedrm)
 	m_soundlatch->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("sub", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline("sub", 0);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(pipedrm_state::hatris)
-
+void pipedrm_state::hatris(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pipedrm_state, irq0_line_hold)
+	Z80(config, m_maincpu, 12000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pipedrm_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &pipedrm_state::main_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(pipedrm_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80,14318000/4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(hatris_sound_portmap)
+	Z80(config, m_subcpu, 14318000/4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &pipedrm_state::sound_map);
+	m_subcpu->set_addrmap(AS_IO, &pipedrm_state::hatris_sound_portmap);
 
 	MCFG_MACHINE_START_OVERRIDE(pipedrm_state,pipedrm)
 	MCFG_MACHINE_RESET_OVERRIDE(pipedrm_state,pipedrm)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(44*8, 30*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pipedrm_state, screen_update_fromance)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(44*8, 30*8);
+	m_screen->set_visarea(0*8, 44*8-1, 0*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(pipedrm_state::screen_update_fromance));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hatris)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hatris);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
 	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
@@ -676,12 +673,12 @@ MACHINE_CONFIG_START(pipedrm_state::hatris)
 	// sound board.
 	//m_soundlatch->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2608, 8000000)
-	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("sub", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym2608_device &ym2608(YM2608(config, "ymsnd", 8000000));
+	ym2608.irq_handler().set_inputline("sub", 0);
+	ym2608.add_route(0, "mono", 0.50);
+	ym2608.add_route(1, "mono", 1.0);
+	ym2608.add_route(2, "mono", 1.0);
+}
 
 
 

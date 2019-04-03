@@ -252,13 +252,14 @@ void namco_50xx_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(namco_50xx_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("mcu", MB8842, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
-	MCFG_MB88XX_READ_K_CB(READ8(*this, namco_50xx_device, K_r))
-	MCFG_MB88XX_WRITE_O_CB(WRITE8(*this, namco_50xx_device, O_w))
-	MCFG_MB88XX_READ_R0_CB(READ8(*this, namco_50xx_device, R0_r))
-	MCFG_MB88XX_READ_R2_CB(READ8(*this, namco_50xx_device, R2_r))
-MACHINE_CONFIG_END
+void namco_50xx_device::device_add_mconfig(machine_config &config)
+{
+	MB8842(config, m_cpu, DERIVED_CLOCK(1,1)); /* parent clock, internally divided by 6 */
+	m_cpu->read_k().set(FUNC(namco_50xx_device::K_r));
+	m_cpu->write_o().set(FUNC(namco_50xx_device::O_w));
+	m_cpu->read_r<0>().set(FUNC(namco_50xx_device::R0_r));
+	m_cpu->read_r<2>().set(FUNC(namco_50xx_device::R2_r));
+}
 
 //-------------------------------------------------
 //  device_rom_region - return a pointer to the

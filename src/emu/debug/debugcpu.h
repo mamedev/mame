@@ -132,6 +132,7 @@ public:
 		offs_t               m_start_address[3];         // the start addresses of the checks to install
 		offs_t               m_end_address[3];           // the end addresses
 		u64                  m_masks[3];                 // the access masks
+		bool                 m_installing;               // prevent recursive multiple installs
 		void install(read_or_write mode);
 		void triggered(read_or_write type, offs_t address, u64 data, u64 mem_mask);
 	};

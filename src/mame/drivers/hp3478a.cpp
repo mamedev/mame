@@ -11,8 +11,11 @@
 *
 * Current status : runs, AD LINK ERROR on stock ROM due to unimplemented AD link
 * - patching the AD comms, we get to a mostly functional state (for patch examples,
-*	see https://github.com/fenugrec/hp3478a_rompatch )
+*   see https://github.com/fenugrec/hp3478a_rompatch )
 *
+* TODO
+* - split out LCD driver code. It seems common to other HP equipment of the
+*   era, such as the 3468, 3457, 3488?, 4263?, 6623?, and probably others.
 *
 * TODO next level
 * * do something for analog CPU serial link (not quite uart), or dump+emulate CPU
@@ -31,7 +34,7 @@ ROM : 2764 (64kbit, org 8kB)
 RAM : 5101 , 256 * 4bit (!), battery-backed calibration data
 GPIB:  i8291
 Display : unknown; similar protocol for HP 3457A documented on
-	http://www.eevblog.com/forum/projects/led-display-for-hp-3457a-multimeter-i-did-it-)/25/
+    http://www.eevblog.com/forum/projects/led-display-for-hp-3457a-multimeter-i-did-it-)/25/
 
 
 
@@ -44,7 +47,7 @@ P20 : disp.clk1
 P21 : !CS for GPIB, and disp.IWA
 P22 : !CS for DIPswitch; disp.ISA (for instructions)
 P23 = !OE for RAM ; disp.sync (enable instruction)
-P24 = disp.PWO	(enable)
+P24 = disp.PWO  (enable)
 P25 = disp.clk2
 P26 : address bit12 ! (0x1000) => hardware banking
 P27 : data out thru isol, to analog CPU
@@ -53,13 +56,27 @@ T1 : data in thru isol, from analog CPU (opcodes jt1 / jnt1)
 */
 
 #include "emu.h"
-#include "includes/hp3478a.h"
+#include "cpu/mcs48/mcs48.h"
+#include "machine/bankdev.h"
+#include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "hp3478a.lh"
-
 
 #define CPU_CLOCK       XTAL(5'856'000)
 
-#define A12_PIN	P26
+/* port pin/bit defs. Would be nice if mcs48.h had these */
+#define P20 (1 << 0)
+#define P21 (1 << 1)
+#define P22 (1 << 2)
+#define P23 (1 << 3)
+#define P24 (1 << 4)
+#define P25 (1 << 5)
+#define P26 (1 << 6)
+#define P27 (1 << 7)
+
+
+
+#define A12_PIN P26
 #define CALRAM_CS P23
 #define DIPSWITCH_CS P22
 #define GPIB_CS P21
@@ -70,7 +87,7 @@ T1 : data in thru isol, from analog CPU (opcodes jt1 / jnt1)
 #define DISP_IWA P21
 #define DISP_CK1 P20
 	//don't care about CK2 since it's supposed to be a delayed copy of CK1
-#define DISP_MASK (DISP_PWO | DISP_SYNC | DISP_ISA | DISP_IWA | DISP_CK1)	//used for edge detection
+#define DISP_MASK (DISP_PWO | DISP_SYNC | DISP_ISA | DISP_IWA | DISP_CK1)   //used for edge detection
 
 // IO banking : indexes of m_iobank maps
 #define CALRAM_ENTRY 0
@@ -80,15 +97,95 @@ T1 : data in thru isol, from analog CPU (opcodes jt1 / jnt1)
 /**** optional debug outputs, must be before #include logmacro.*/
 #define DEBUG_PORTS (LOG_GENERAL << 1)
 #define DEBUG_BANKING (LOG_GENERAL << 2)
-#define DEBUG_BUS (LOG_GENERAL << 3)	//not used after all
+#define DEBUG_BUS (LOG_GENERAL << 3)    //not used after all
 #define DEBUG_KEYPAD (LOG_GENERAL << 4)
-#define DEBUG_LCD (LOG_GENERAL << 5)	//low level
+#define DEBUG_LCD (LOG_GENERAL << 5)    //low level
 #define DEBUG_LCD2 (LOG_GENERAL << 6)
 #define DEBUG_CAL (LOG_GENERAL << 7)
 
-#define VERBOSE (DEBUG_BUS)	//can be combined, like (DEBUG_CAL | DEBUG_KEYPAD)
+#define VERBOSE (DEBUG_BUS) //can be combined, like (DEBUG_CAL | DEBUG_KEYPAD)
 
 #include "logmacro.h"
+
+/**** HP 3478A class **/
+
+
+class hp3478a_state : public driver_device
+{
+public:
+	hp3478a_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_nvram(*this, "nvram")
+		, m_nvram_raw(*this, "nvram")
+		, m_watchdog(*this, "watchdog")
+		, m_bank0(*this, "bank0")
+		, m_iobank(*this, "iobank")
+		, m_keypad(*this, "COL.%u", 0)
+		, m_calenable(*this, "CAL_EN")
+	{
+	}
+
+	void hp3478a(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	//virtual void machine_reset() override;    //not needed?
+
+	DECLARE_READ8_MEMBER(p1read);
+	DECLARE_WRITE8_MEMBER(p1write);
+	DECLARE_WRITE8_MEMBER(p2write);
+	DECLARE_WRITE8_MEMBER(nvwrite);
+
+	void io_bank(address_map &map);
+	void i8039_io(address_map &map);
+	void i8039_map(address_map &map);
+
+	required_device<i8039_device> m_maincpu;
+	required_device<nvram_device> m_nvram;
+	required_shared_ptr<uint8_t> m_nvram_raw;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_memory_bank m_bank0;
+	required_device<address_map_bank_device> m_iobank;
+	required_ioport_array<4> m_keypad;
+	required_ioport m_calenable;
+
+	/////////////// stuff for internal LCD emulation
+	// shoud be split to a separate driver
+	std::unique_ptr<output_finder<16> > m_outputs;
+
+	void lcd_interface(uint8_t p2new);
+	void lcd_update_hinib(uint64_t shiftreg);
+	void lcd_update_lonib(uint64_t shiftreg);
+	void lcd_map_chars();
+	static uint32_t lcd_set_display(uint32_t segin);
+
+	uint8_t m_lcd_bitcount;
+	uint8_t m_lcd_want;
+	uint64_t m_lcd_bitbuf;
+	enum class lcd_state : uint8_t {
+		IDLE,
+		SYNC_SKIP,
+		SELECTED_ISA,
+		SELECTED_IWA
+	} m_lcdstate;
+	enum class lcd_iwatype : uint8_t {
+		ANNUNS,
+		REG_A,
+		REG_B,
+		REG_C,
+		DISCARD
+	} m_lcdiwa;
+	uint8_t m_lcd_chrbuf[12];   //raw digits (not ASCII)
+	uint8_t m_lcd_text[13]; //mapped to ASCII, only for debug output
+	uint32_t m_lcd_segdata[12];
+	///////////////////////////
+
+
+	uint8_t m_p2_oldstate;  //used to detect edges on Port2 IO pins. Should be saveable ?
+	uint8_t m_p1_oldstate;  //for P17 edge detection (WDT reset)
+
+};
 
 
 
@@ -103,7 +200,7 @@ READ8_MEMBER( hp3478a_state::p1read )
 	// for each column, set Px=0 for pressed buttons (active low)
 	for (i = 0; i < 4; i++) {
 		if (!(data & (0x10 << i))) {
-			data &= (0xF0 | m_keypad[i]->read());	//not sure if the undefined upper bits will read as 1 ?
+			data &= (0xF0 | m_keypad[i]->read());   //not sure if the undefined upper bits will read as 1 ?
 		}
 	}
 	LOGMASKED(DEBUG_KEYPAD, "port1 read: 0x%02X\n", data);
@@ -113,11 +210,11 @@ READ8_MEMBER( hp3478a_state::p1read )
 /* pin P17 rising edges also reset the external WDT counter */
 WRITE8_MEMBER( hp3478a_state::p1write )
 {
-	if (~p1_oldstate & data & 0x80) {
+	if (~m_p1_oldstate & data & 0x80) {
 		//P17 rising edge
 		m_watchdog->watchdog_reset();
 	}
-	p1_oldstate = data;
+	m_p1_oldstate = data;
 }
 
 /** a lot of stuff multiplexed on the P2 pins.
@@ -142,7 +239,7 @@ WRITE8_MEMBER( hp3478a_state::p2write )
 		m_iobank->set_bank(GPIB_ENTRY);
 	}
 
-	if ((p2_oldstate ^ data) & A12_PIN) {
+	if ((m_p2_oldstate ^ data) & A12_PIN) {
 		/* A12 pin state changed */
 		if (data & A12_PIN) {
 			m_bank0->set_entry(1);
@@ -153,12 +250,12 @@ WRITE8_MEMBER( hp3478a_state::p2write )
 		}
 	}
 
-	if ((p2_oldstate ^ data) & DISP_MASK) {
+	if ((m_p2_oldstate ^ data) & DISP_MASK) {
 		/* display signals changed */
 		lcd_interface(data);
 	}
 
-	p2_oldstate = data;
+	m_p2_oldstate = data;
 }
 
 
@@ -255,24 +352,24 @@ static const uint16_t hpcharset[]=
 	0x1407, // 0001 0100 0000 0111 ?.
 };
 
-/** copy data in shiftreg to the high nibble of each digit in chrbuf */
-static void lcd_update_hinib(uint8_t *chrbuf, uint64_t shiftreg)
+/** copy data in shiftreg to the high nibble of each digit in m_lcd_chrbuf */
+void hp3478a_state::lcd_update_hinib(uint64_t shiftreg)
 {
 	int i;
 	for (i=11; i >= 0; i--) {
-		chrbuf[i] &= 0x0F;
-		chrbuf[i] |= (shiftreg & 0x0F) << 4;
+		m_lcd_chrbuf[i] &= 0x0F;
+		m_lcd_chrbuf[i] |= (shiftreg & 0x0F) << 4;
 		shiftreg >>= 4;
 	}
 }
 
-/** copy data in shiftreg to the low nibble of each digit in chrbuf */
-static void lcd_update_lonib(uint8_t *chrbuf, uint64_t shiftreg)
+/** copy data in shiftreg to the low nibble of each digit in m_lcd_chrbuf */
+void hp3478a_state::lcd_update_lonib(uint64_t shiftreg)
 {
 	int i;
 	for (i=11; i >= 0; i--) {
-		chrbuf[i] &= 0xF0;
-		chrbuf[i] |= (shiftreg & 0x0F);
+		m_lcd_chrbuf[i] &= 0xF0;
+		m_lcd_chrbuf[i] |= (shiftreg & 0x0F);
 		shiftreg >>= 4;
 	}
 }
@@ -286,26 +383,26 @@ void hp3478a_state::lcd_map_chars()
 	int i;
 	LOGMASKED(DEBUG_LCD2, "LCD : map ");
 	for (i=0; i < 12; i++) {
-		bool dp = lcd_chrbuf[i] & 0x40;	//check decimal point. Needs to be mapped to seg_bit16
-		bool comma = lcd_chrbuf[i] & 0x80;	//check comma, maps to seg17
-		lcd_text[i] = (lcd_chrbuf[i] & 0x3F) + 0x40;
-		lcd_segdata[i] = hpcharset[lcd_chrbuf[i] & 0x3F] | (dp << 16) | (comma << 17);
-		LOGMASKED(DEBUG_LCD2, "[%02X>%04X] ", lcd_chrbuf[i] & 0x3F, lcd_segdata[i]);
+		bool dp = m_lcd_chrbuf[i] & 0x40;   //check decimal point. Needs to be mapped to seg_bit16
+		bool comma = m_lcd_chrbuf[i] & 0x80;    //check comma, maps to seg17
+		m_lcd_text[i] = (m_lcd_chrbuf[i] & 0x3F) + 0x40;
+		m_lcd_segdata[i] = hpcharset[m_lcd_chrbuf[i] & 0x3F] | (dp << 16) | (comma << 17);
+		LOGMASKED(DEBUG_LCD2, "[%02X>%04X] ", m_lcd_chrbuf[i] & 0x3F, m_lcd_segdata[i]);
 	}
 	LOGMASKED(DEBUG_LCD2, "\n");
 }
 
 /** ?? from roc10937 */
-static uint32_t lcd_set_display(uint32_t segin)
+uint32_t hp3478a_state::lcd_set_display(uint32_t segin)
 {
 	return bitswap<32>(segin, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,11,9,15,13,12,8,10,14,7,6,5,4,3,2,1,0);
 }
 
 // ISA command bytes
-#define DISP_ISA_WANNUN 0xBC	//annunciators
-#define DISP_ISA_WA 0x0A	//low nibbles
-#define DISP_ISA_WB 0x1A	//hi nib
-#define DISP_ISA_WC 0x2A	// "extended bit" ?
+#define DISP_ISA_WANNUN 0xBC    //annunciators
+#define DISP_ISA_WA 0x0A    //low nibbles
+#define DISP_ISA_WB 0x1A    //hi nib
+#define DISP_ISA_WC 0x2A    // "extended bit" ?
 
 /** LCD serial interface state machine. I cheat and don't implement all commands.
  * Also, it's not clear when exactly the display should be updated. After each regA/regB write
@@ -316,14 +413,14 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 	bool pwo_state, sync_state, isa_state, iwa_state;
 
 	pwo_state = p2new & DISP_PWO;
-	sync_state = p2new	 & DISP_SYNC;
+	sync_state = p2new   & DISP_SYNC;
 	isa_state = p2new & DISP_ISA;
 	iwa_state = p2new & DISP_IWA;
 
-	if (!((p2new ^ p2_oldstate) & DISP_CK1)) {
+	if (!((p2new ^ m_p2_oldstate) & DISP_CK1)) {
 		// no clock edge : boring.
 		//LOGMASKED(DEBUG_LCD, "LCD : pwo(%d), sync(%d), isa(%d), iwa(%d)\n",
-		//		pwo_state, sync_state, isa_state, iwa_state);
+		//      pwo_state, sync_state, isa_state, iwa_state);
 		return;
 	}
 
@@ -335,126 +432,126 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 	// CK1 clock positive edge
 	if (!pwo_state) {
 		//not selected, reset everything
-		LOGMASKED(DEBUG_LCD, "LCD : state=IDLE, PWO deselected, %d stray bits(0x...%02X)\n",lcd_bitcount, lcd_bitbuf & 0xFF);
+		LOGMASKED(DEBUG_LCD, "LCD : state=IDLE, PWO deselected, %d stray bits(0x...%02X)\n",m_lcd_bitcount, m_lcd_bitbuf & 0xFF);
 		m_lcdstate = lcd_state::IDLE;
 		m_lcdiwa = lcd_iwatype::DISCARD;
-		std::transform(std::begin(lcd_segdata), std::end(lcd_segdata), std::begin(*m_outputs), lcd_set_display);
-		lcd_bitcount = 0;
-		lcd_bitbuf = 0;
+		std::transform(std::begin(m_lcd_segdata), std::end(m_lcd_segdata), std::begin(*m_outputs), lcd_set_display);
+		m_lcd_bitcount = 0;
+		m_lcd_bitbuf = 0;
 		return;
 	}
 	switch (m_lcdstate) {
 		case lcd_state::IDLE:
-			lcd_want = 8;
+			m_lcd_want = 8;
 			m_lcdstate = lcd_state::SYNC_SKIP;
 			break;
 		case lcd_state::SYNC_SKIP:
 			// if SYNC changed, we need to ignore two clock pulses.
-			lcd_bitcount++;
-			if (lcd_bitcount < 1) {
+			m_lcd_bitcount++;
+			if (m_lcd_bitcount < 1) {
 				break;
 			}
-			lcd_bitcount = 0;
-			lcd_bitbuf = 0;
+			m_lcd_bitcount = 0;
+			m_lcd_bitbuf = 0;
 			if (sync_state) {
 				m_lcdstate = lcd_state::SELECTED_ISA;
-				lcd_want = 8;
+				m_lcd_want = 8;
 				LOGMASKED(DEBUG_LCD, "LCD : state=SELECTED_ISA\n");
 			} else {
-				//don't touch lcd_want since it was possibly set in the ISA stage
+				//don't touch m_lcd_want since it was possibly set in the ISA stage
 				m_lcdstate = lcd_state::SELECTED_IWA;
-				LOGMASKED(DEBUG_LCD, "LCD : state=SELECTED_IWA, want %d\n", lcd_want);
+				LOGMASKED(DEBUG_LCD, "LCD : state=SELECTED_IWA, want %d\n", m_lcd_want);
 			}
 			break;
 		case lcd_state::SELECTED_ISA:
 			if (!sync_state) {
 				//changing to SELECTED_IWA
 				m_lcdstate = lcd_state::SYNC_SKIP;
-				if (lcd_bitcount) {
-					LOGMASKED(DEBUG_LCD, "LCD : ISA->IWA, %d stray bits (0x%0X)\n", lcd_bitcount, lcd_bitbuf);
+				if (m_lcd_bitcount) {
+					LOGMASKED(DEBUG_LCD, "LCD : ISA->IWA, %d stray bits (0x%0X)\n", m_lcd_bitcount, m_lcd_bitbuf);
 				} else {
 					LOGMASKED(DEBUG_LCD, "LCD : ISA->IWA\n");
 				}
-				lcd_bitcount = 0;
-				lcd_bitbuf = 0;
+				m_lcd_bitcount = 0;
+				m_lcd_bitbuf = 0;
 				break;
 			}
-			lcd_bitbuf |= (isa_state << lcd_bitcount);
-			lcd_bitcount++;
-			if (lcd_bitcount != lcd_want) {
+			m_lcd_bitbuf |= (isa_state << m_lcd_bitcount);
+			m_lcd_bitcount++;
+			if (m_lcd_bitcount != m_lcd_want) {
 				break;
 			}
-			LOGMASKED(DEBUG_LCD, "LCD : Instruction 0x%02X\n", lcd_bitbuf & 0xFF);
+			LOGMASKED(DEBUG_LCD, "LCD : Instruction 0x%02X\n", m_lcd_bitbuf & 0xFF);
 			//shouldn't get extra bits, but we have nothing better to do so just reset the shiftreg.
-			lcd_bitcount = 0;
-			switch (lcd_bitbuf & 0xFF) {
+			m_lcd_bitcount = 0;
+			switch (m_lcd_bitbuf & 0xFF) {
 			case DISP_ISA_WANNUN:
-				lcd_want = 44;
+				m_lcd_want = 44;
 				m_lcdiwa = lcd_iwatype::ANNUNS;
 				break;
 			case DISP_ISA_WA:
-				lcd_want = 100;	//no, doesn't fit in a uint64, but only the first 36 bits are significant.
+				m_lcd_want = 100;   //no, doesn't fit in a uint64, but only the first 36 bits are significant.
 				m_lcdiwa = lcd_iwatype::REG_A;
 				break;
 			case DISP_ISA_WB:
-				lcd_want = 100;
+				m_lcd_want = 100;
 				m_lcdiwa = lcd_iwatype::REG_B;
 				break;
 			case DISP_ISA_WC:
-				lcd_want = 44;
+				m_lcd_want = 44;
 				m_lcdiwa = lcd_iwatype::REG_C;
 				break;
 			default:
-				lcd_want = 44;
+				m_lcd_want = 44;
 				m_lcdiwa = lcd_iwatype::DISCARD;
 				break;
 			}
-			lcd_bitbuf = 0;
+			m_lcd_bitbuf = 0;
 			break;
 		case lcd_state::SELECTED_IWA:
 			if (sync_state) {
 				//changing to SELECTED_ISA
 				m_lcdstate = lcd_state::SYNC_SKIP;
-				if (lcd_bitcount) {
-					LOGMASKED(DEBUG_LCD, "LCD : IWA->ISA, %d stray bits (0x%I64X)\n", lcd_bitcount, lcd_bitbuf);
+				if (m_lcd_bitcount) {
+					LOGMASKED(DEBUG_LCD, "LCD : IWA->ISA, %d stray bits (0x%I64X)\n", m_lcd_bitcount, m_lcd_bitbuf);
 				} else {
 					LOGMASKED(DEBUG_LCD, "LCD : IWA->ISA\n");
 				}
-				lcd_bitcount = 0;
-				lcd_bitbuf = 0;
+				m_lcd_bitcount = 0;
+				m_lcd_bitbuf = 0;
 				break;
 			}
-			if (lcd_bitcount <= 0x3F) {
+			if (m_lcd_bitcount <= 0x3F) {
 				//clamp to bit 63;
-				lcd_bitbuf |= ((uint64_t) iwa_state << lcd_bitcount);
+				m_lcd_bitbuf |= ((uint64_t) iwa_state << m_lcd_bitcount);
 			}
-			lcd_bitcount++;
-			if (lcd_bitcount != lcd_want) {
+			m_lcd_bitcount++;
+			if (m_lcd_bitcount != m_lcd_want) {
 				break;
 			}
-			LOGMASKED(DEBUG_LCD, "LCD : data 0x%I64X\n", lcd_bitbuf);
+			LOGMASKED(DEBUG_LCD, "LCD : data 0x%I64X\n", m_lcd_bitbuf);
 			switch (m_lcdiwa) {
 			case lcd_iwatype::ANNUNS:
-				LOGMASKED(DEBUG_LCD2, "LCD : write annuns 0x%02X\n", lcd_bitbuf & 0xFF);
+				LOGMASKED(DEBUG_LCD2, "LCD : write annuns 0x%02X\n", m_lcd_bitbuf & 0xFF);
 				break;
 			case lcd_iwatype::REG_A:
-				lcd_update_lonib(lcd_chrbuf, lcd_bitbuf);
+				lcd_update_lonib(m_lcd_bitbuf);
 				lcd_map_chars();
-				LOGMASKED(DEBUG_LCD2, "LCD : write reg A (lonib) %I64X, text=%s\n", lcd_bitbuf, (char *) lcd_text);
+				LOGMASKED(DEBUG_LCD2, "LCD : write reg A (lonib) %I64X, text=%s\n", m_lcd_bitbuf, (char *) m_lcd_text);
 				break;
 			case lcd_iwatype::REG_B:
-				lcd_update_hinib(lcd_chrbuf, lcd_bitbuf);
+				lcd_update_hinib(m_lcd_bitbuf);
 				lcd_map_chars();
-				LOGMASKED(DEBUG_LCD2, "LCD : write reg B (lonib) %I64X, text=%s\n", lcd_bitbuf, (char *) lcd_text);
+				LOGMASKED(DEBUG_LCD2, "LCD : write reg B (lonib) %I64X, text=%s\n", m_lcd_bitbuf, (char *) m_lcd_text);
 				break;
 			default:
 				//discard
 				break;
 			}
 			//shouldn't get extra bits, but we have nothing better to do so just reset the shiftreg.
-			lcd_bitcount = 0;
-			lcd_bitbuf = 0;
-			break;	//case SELECTED_IWA
+			m_lcd_bitcount = 0;
+			m_lcd_bitbuf = 0;
+			break;  //case SELECTED_IWA
 	}
 
 	return;
@@ -481,7 +578,7 @@ void hp3478a_state::machine_start()
 
 void hp3478a_state::i8039_map(address_map &map)
 {
-	map(0x0000, 0x0fff).bankr("bank0");	// CPU address space (4kB), banked according to P26 pin
+	map(0x0000, 0x0fff).bankr("bank0"); // CPU address space (4kB), banked according to P26 pin
 }
 
 void hp3478a_state::i8039_io(address_map &map)
@@ -498,7 +595,7 @@ void hp3478a_state::io_bank(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000, 0x0ff).ram().region("nvram", 0).share("nvram").w(FUNC(hp3478a_state::nvwrite));
-	map(0x100, 0x107).ram().share("gpibregs");	//XXX TODO : connect to i8291.cpp
+	map(0x100, 0x107).ram().share("gpibregs");  //XXX TODO : connect to i8291.cpp
 	map(0x200, 0x2ff).portr("DIP");
 }
 
@@ -508,17 +605,17 @@ void hp3478a_state::io_bank(address_map &map)
 ******************************************************************************/
 static INPUT_PORTS_START( hp3478a )
 /* keypad bit matrix:
-			0x08|0x04|0x02|0x01
-	col.0 : (nc)|shift|ACA|DCA
-	col.1 : 4W|2W|ACV|DCV
-	col.2 : int|dn|up|auto
-	col.3 : (nc)|loc|srq|sgl
+            0x08|0x04|0x02|0x01
+    col.0 : (nc)|shift|ACA|DCA
+    col.1 : 4W|2W|ACV|DCV
+    col.2 : int|dn|up|auto
+    col.3 : (nc)|loc|srq|sgl
 */
 	PORT_START("COL.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("DCA")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("ACA")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("SHIFT")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )	//nothing on 0x08
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) //nothing on 0x08
 	PORT_START("COL.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("DCV")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("ACV")
@@ -533,7 +630,7 @@ static INPUT_PORTS_START( hp3478a )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("SGL")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("SRQ")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("LOC")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )	//nothing on 0x08
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) //nothing on 0x08
 
 	PORT_START("CAL_EN")
 	PORT_CONFNAME(1, 0, "CAL")
@@ -616,10 +713,10 @@ void hp3478a_state::hp3478a(machine_config &config)
 ******************************************************************************/
 ROM_START( hp3478a )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD("rom_dc118.bin", 0, 0x2000, CRC(10097ced) SHA1(bd665cf7e07e63f825b2353c8322ed8a4376b3bd))	//main CPU ROM, can match other datecodes too
+	ROM_LOAD("rom_dc118.bin", 0, 0x2000, CRC(10097ced) SHA1(bd665cf7e07e63f825b2353c8322ed8a4376b3bd))  //main CPU ROM, can match other datecodes too
 
-	ROM_REGION( 0x100, "nvram", 0 )	/* Calibration RAM, battery-backed */
-	ROM_LOAD_OPTIONAL( "calram.bin", 0, 0x100, CRC(0))
+	ROM_REGION( 0x100, "nvram", 0 ) /* Calibration RAM, battery-backed */
+	ROM_LOAD( "calram.bin", 0, 0x100, NO_DUMP)
 ROM_END
 
 /******************************************************************************
@@ -627,4 +724,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                        FULLNAME             FLAGS
-COMP( 1983, hp3478a,  0,      0,  hp3478a, hp3478a,hp3478a_state, empty_init, "HP", "HP 3478A Multimeter", MACHINE_IS_INCOMPLETE | MACHINE_NO_SOUND_HW | MACHINE_TYPE_OTHER)
+SYST( 1983, hp3478a,  0,      0,  hp3478a, hp3478a,hp3478a_state, empty_init, "HP", "HP 3478A Multimeter", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -34,17 +34,17 @@
 #include "emu.h"
 #include "ec1841.h"
 
-#define VERBOSE_DBG 0       /* general debug messages */
 
-#define DBG_LOG(N,M,A) \
-	do { \
-	if(VERBOSE_DBG>=N) \
-		{ \
-			logerror("%11.6f at %s: ",machine().time().as_double(),machine().describe_context()); \
-			logerror A; \
-		} \
-	} while (0)
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_KEYBOARD  (1U <<  1)
+#define LOG_DEBUG     (1U <<  2)
 
+//#define VERBOSE (LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
 //**************************************************************************
@@ -52,7 +52,6 @@
 //**************************************************************************
 
 #define I8048_TAG       "i8048"
-
 
 
 //**************************************************************************
@@ -86,14 +85,15 @@ const tiny_rom_entry *ec_1841_keyboard_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ec_1841_keyboard_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(I8048_TAG, I8048, XTAL(5'460'000))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, ec_1841_keyboard_device, bus_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, ec_1841_keyboard_device, p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, ec_1841_keyboard_device, p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, ec_1841_keyboard_device, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, ec_1841_keyboard_device, t1_r))
-MACHINE_CONFIG_END
+void ec_1841_keyboard_device::device_add_mconfig(machine_config &config)
+{
+	I8048(config, m_maincpu, XTAL(5'460'000));
+	m_maincpu->bus_out_cb().set(FUNC(ec_1841_keyboard_device::bus_w));
+	m_maincpu->p1_in_cb().set(FUNC(ec_1841_keyboard_device::p1_r));
+	m_maincpu->p1_out_cb().set(FUNC(ec_1841_keyboard_device::p1_w));
+	m_maincpu->p2_out_cb().set(FUNC(ec_1841_keyboard_device::p2_w));
+	m_maincpu->t1_in_cb().set(FUNC(ec_1841_keyboard_device::t1_r));
+}
 
 
 //-------------------------------------------------
@@ -326,7 +326,7 @@ void ec_1841_keyboard_device::device_reset()
 
 WRITE_LINE_MEMBER( ec_1841_keyboard_device::clock_write )
 {
-	DBG_LOG(1,0,( "%s: clock write %d\n", tag(), state));
+	LOG("clock write %d\n", state);
 }
 
 
@@ -336,7 +336,7 @@ WRITE_LINE_MEMBER( ec_1841_keyboard_device::clock_write )
 
 WRITE_LINE_MEMBER( ec_1841_keyboard_device::data_write )
 {
-	DBG_LOG(1,0,( "%s: data write %d\n", tag(), state));
+	LOG("data write %d\n", state);
 }
 
 
@@ -346,7 +346,7 @@ WRITE_LINE_MEMBER( ec_1841_keyboard_device::data_write )
 
 WRITE8_MEMBER( ec_1841_keyboard_device::bus_w )
 {
-	DBG_LOG(2,0,( "%s: bus_w %02x\n", tag(), data));
+	LOGDBG("bus_w %02x\n", data);
 
 	m_bus = data;
 }
@@ -378,7 +378,7 @@ READ8_MEMBER( ec_1841_keyboard_device::p1_r )
 	data |= clock_signal();
 	data |= data_signal() << 1;
 
-	DBG_LOG(1,0,( "%s: p1_r %02x\n", tag(), data));
+	LOG("p1_r %02x\n", data);
 
 	return data;
 }
@@ -402,7 +402,7 @@ WRITE8_MEMBER( ec_1841_keyboard_device::p1_w )
 	    6       LED XXX
 	    7       LED XXX
 	*/
-	DBG_LOG(1,0,( "%s: p1_w %02x\n", tag(), data));
+	LOG("p1_w %02x\n", data);
 
 	m_p1 = data;
 }
@@ -426,7 +426,7 @@ WRITE8_MEMBER( ec_1841_keyboard_device::p2_w )
 	    6       XXX CLOCK out 2?
 	    7       XXX
 	*/
-	DBG_LOG(1,0,( "%s: p2_w %02x\n", tag(), data));
+	LOG("p2_w %02x\n", data);
 
 	m_pc_kbdc->data_write_from_kb(BIT(data, 2));
 	m_pc_kbdc->clock_write_from_kb(BIT(data, 1));
@@ -449,7 +449,7 @@ READ_LINE_MEMBER( ec_1841_keyboard_device::t1_r )
 		m_q = BIT(sense, (m_bus >> 4) & 7);
 	}
 
-	DBG_LOG(1,0,( "%s: bus %02X t1_r %d\n", tag(), m_bus, m_q));
+	LOG("bus %02X t1_r %d\n", m_bus, m_q);
 
 	return m_q;
 }

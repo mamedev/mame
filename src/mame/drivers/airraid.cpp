@@ -389,24 +389,23 @@ INPUT_PORTS_END
 
 
 
-MACHINE_CONFIG_START(airraid_state::airraid)
-
+void airraid_state::airraid(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(12'000'000)/2)        /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(airraid_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", airraid_state, cshooter_scanline, "airraid_vid:screen", 0, 1)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2);        /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &airraid_state::airraid_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(airraid_state::cshooter_scanline), "airraid_vid:screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)      /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(airraid_sound_map)
-	MCFG_DEVICE_OPCODES_MAP(airraid_sound_decrypted_opcodes_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181)/4));      /* verified on pcb */
+	audiocpu.set_addrmap(AS_PROGRAM, &airraid_state::airraid_sound_map);
+	audiocpu.set_addrmap(AS_OPCODES, &airraid_state::airraid_sound_decrypted_opcodes_map);
+	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x100);
 
-	MCFG_AIRRAID_VIDEO_ADD("airraid_vid")
+	AIRRAID_VIDEO(config, m_airraid_video, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -423,14 +422,14 @@ MACHINE_CONFIG_START(airraid_state::airraid)
 	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
 
 	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("audiocpu");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(airraid_state::airraid_crypt)
+void airraid_state::airraid_crypt(machine_config &config)
+{
 	airraid(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_OPCODES, &airraid_state::decrypted_opcodes_map);
+}
 
 
 

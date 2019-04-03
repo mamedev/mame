@@ -90,7 +90,7 @@ READ8_MEMBER( micro3d_state::vgb_uart_r )
 	if (offset == 1 || offset == 2)
 		offset ^= 3;
 
-	return m_vgb_uart->read(space, offset);
+	return m_vgb_uart->read(offset);
 }
 
 WRITE8_MEMBER( micro3d_state::vgb_uart_w )
@@ -99,7 +99,7 @@ WRITE8_MEMBER( micro3d_state::vgb_uart_w )
 	if (offset == 1 || offset == 2)
 		offset ^= 3;
 
-	m_vgb_uart->write(space, offset, data);
+	m_vgb_uart->write(offset, data);
 }
 
 
@@ -109,12 +109,12 @@ WRITE8_MEMBER( micro3d_state::vgb_uart_w )
  *
  *************************************/
 
-static inline int64_t dot_product(micro3d_vtx *v1, micro3d_vtx *v2)
+inline constexpr int64_t micro3d_state::micro3d_vtx::dot_product(micro3d_vtx const &that) const
 {
-	int64_t result = ((int64_t)v1->x * (int64_t)v2->x) +
-					((int64_t)v1->y * (int64_t)v2->y) +
-					((int64_t)v1->z * (int64_t)v2->z);
-	return result;
+	return
+			(int64_t(x) * int64_t(that.x)) +
+			(int64_t(y) * int64_t(that.y)) +
+			(int64_t(z) * int64_t(that.z));
 }
 
 static inline int64_t normalised_multiply(int32_t a, int32_t b)
@@ -280,23 +280,19 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 		case 0x11: cnt += 0x100;
 		case 0x10:
 		{
-			int i;
 			micro3d_vtx v2;
-
 			v2.x = mac_sram[mrab11 + 0x7fc];
 			v2.y = mac_sram[mrab11 + 0x7fd];
 			v2.z = mac_sram[mrab11 + 0x7fe];
 
-			for (i = 0; i <= cnt; ++i)
+			for (int i = 0; i <= cnt; ++i)
 			{
 				micro3d_vtx v1;
-				int64_t dp;
-
 				v1.x = mac_sram[sram_r_addr++];
 				v1.y = mac_sram[sram_r_addr++];
 				v1.z = mac_sram[sram_r_addr++];
 
-				dp = dot_product(&v1, &v2);
+				int64_t const dp = v1.dot_product(v2);
 				mac_sram[sram_w_addr++] = dp >> 32;
 				mac_sram[sram_w_addr++] = dp & 0xffffffff;
 				mac_sram[sram_w_addr++] = 0;
@@ -310,23 +306,19 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 		case 0x15: cnt += 0x100;
 		case 0x14:
 		{
-			int i;
-
-			for (i = 0; i <= cnt; ++i)
+			for (int i = 0; i <= cnt; ++i)
 			{
 				micro3d_vtx v1;
-				micro3d_vtx v2;
-				int64_t dp;
-
 				v1.x = mac_sram[sram_r_addr++];
 				v1.y = mac_sram[sram_r_addr++];
 				v1.z = mac_sram[sram_r_addr++];
 
+				micro3d_vtx v2;
 				v2.x = mac_sram[vtx_addr++];
 				v2.y = mac_sram[vtx_addr++];
 				v2.z = mac_sram[vtx_addr++];
 
-				dp = dot_product(&v1, &v2);
+				int64_t const dp = v1.dot_product(v2);
 				mac_sram[sram_w_addr++] = dp >> 32;
 				mac_sram[sram_w_addr++] = dp & 0xffffffff;
 				mac_sram[sram_w_addr++] = 0;

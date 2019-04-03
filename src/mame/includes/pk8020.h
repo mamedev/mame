@@ -50,8 +50,36 @@ public:
 
 	void pk8020(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
+	DECLARE_READ8_MEMBER(keyboard_r);
+	DECLARE_READ8_MEMBER(sysreg_r);
+	DECLARE_WRITE8_MEMBER(sysreg_w);
+	DECLARE_READ8_MEMBER(text_r);
+	DECLARE_WRITE8_MEMBER(text_w);
+	DECLARE_READ8_MEMBER(gzu_r);
+	DECLARE_WRITE8_MEMBER(gzu_w);
+	DECLARE_READ8_MEMBER(devices_r);
+	DECLARE_WRITE8_MEMBER(devices_w);
+	void pk8020_palette(palette_device &palette) const;
+	uint32_t screen_update_pk8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(pk8020_interrupt);
+	DECLARE_READ8_MEMBER(pk8020_porta_r);
+	DECLARE_WRITE8_MEMBER(pk8020_portc_w);
+	DECLARE_WRITE8_MEMBER(pk8020_portb_w);
+	DECLARE_READ8_MEMBER(pk8020_portc_r);
+	DECLARE_WRITE8_MEMBER(pk8020_2_portc_w);
+	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out0);
+	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out1);
+	void pk8020_set_bank(uint8_t data);
+
+	void pk8020_io(address_map &map);
+	void pk8020_mem(address_map &map);
 
 	uint8_t m_color;
 	uint8_t m_video_page;
@@ -64,30 +92,6 @@ private:
 	uint8_t m_portc_data;
 	uint8_t m_sound_gate;
 	uint8_t m_sound_level;
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(sysreg_r);
-	DECLARE_WRITE8_MEMBER(sysreg_w);
-	DECLARE_READ8_MEMBER(text_r);
-	DECLARE_WRITE8_MEMBER(text_w);
-	DECLARE_READ8_MEMBER(gzu_r);
-	DECLARE_WRITE8_MEMBER(gzu_w);
-	DECLARE_READ8_MEMBER(devices_r);
-	DECLARE_WRITE8_MEMBER(devices_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(pk8020);
-	uint32_t screen_update_pk8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(pk8020_interrupt);
-	DECLARE_READ8_MEMBER(pk8020_porta_r);
-	DECLARE_WRITE8_MEMBER(pk8020_portc_w);
-	DECLARE_WRITE8_MEMBER(pk8020_portb_w);
-	DECLARE_READ8_MEMBER(pk8020_portc_r);
-	DECLARE_WRITE8_MEMBER(pk8020_2_portc_w);
-	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out0);
-	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out1);
-
-	void pk8020_io(address_map &map);
-	void pk8020_mem(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255_1;
@@ -108,7 +112,6 @@ private:
 	required_region_ptr<uint8_t> m_region_gfx1;
 	ioport_port *m_io_port[16];
 	required_device<palette_device> m_palette;
-	void pk8020_set_bank(uint8_t data);
 };
 
 #endif // MAME_INCLUDES_PK8020_H

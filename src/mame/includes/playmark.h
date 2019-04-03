@@ -22,6 +22,7 @@ public:
 		m_videoram3(*this, "videoram3"),
 		m_spriteram(*this, "spriteram"),
 		m_rowscroll(*this, "rowscroll"),
+		m_sprtranspen(0),
 		m_oki(*this, "oki"),
 		m_okibank(*this, "okibank"),
 		m_eeprom(*this, "eeprom"),
@@ -67,6 +68,7 @@ protected:
 	int         m_yoffset;
 	int         m_pri_masks[3];
 	uint16_t      m_scroll[7];
+	int         m_sprtranspen;
 
 	/* misc */
 	uint16_t      m_snd_command;

@@ -435,7 +435,8 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(gp_1_state::gp_1)
+void gp_1_state::gp_1(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 2457600);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gp_1_state::gp_1_map);
@@ -458,30 +459,31 @@ MACHINE_CONFIG_START(gp_1_state::gp_1)
 
 	Z80CTC(config, m_ctc, 2457600);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0); // Todo: absence of ints will cause a watchdog reset
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("gp1", gp_1_state, zero_timer, attotime::from_hz(120)) // mains freq*2
-MACHINE_CONFIG_END
+	TIMER(config, "gp1").configure_periodic(FUNC(gp_1_state::zero_timer), attotime::from_hz(120)); // mains freq*2
+}
 
-MACHINE_CONFIG_START(gp_1_state::gp_1s)
+void gp_1_state::gp_1s(machine_config &config)
+{
 	gp_1(config);
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("snsnd", SN76477)
-	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                // noise + filter: N/C
-	MCFG_SN76477_DECAY_RES(0)                         // decay_res: N/C
-	MCFG_SN76477_ATTACK_PARAMS(0, 0)                  // attack_decay_cap + attack_res: N/C
-	MCFG_SN76477_AMP_RES(RES_K(220))                  // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(47))              // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(56)) // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(5.0)                   // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(220))   // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                 // oneshot caps + res: N/C
-	MCFG_SN76477_VCO_MODE(0)                          // VCO mode: N/C
-	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                // mixer A, B, C: N/C
-	MCFG_SN76477_ENVELOPE_PARAMS(0, 1)                // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                            // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(0, 0, 0);
+	m_sn->set_decay_res(0);
+	m_sn->set_attack_params(0, 0);
+	m_sn->set_amp_res(RES_K(220));
+	m_sn->set_feedback_res(RES_K(47));
+	m_sn->set_vco_params(0, CAP_U(0.1), RES_K(56));
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_U(1.0), RES_K(220));
+	m_sn->set_oneshot_params(0, 0);
+	m_sn->set_vco_mode(0);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(0, 1);
+	m_sn->set_enable(1);
+	m_sn->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	m_ppi->out_pa_callback().set(FUNC(gp_1_state::portas_w));
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( gp_110 )

@@ -16,8 +16,8 @@ public:
 	// construction/destruction
 	nes_pxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(pxrom_write);
-	virtual DECLARE_WRITE8_MEMBER(write_h) override { pxrom_write(space, offset, data, mem_mask); }
+	virtual void pxrom_write(offs_t offset, uint8_t data);
+	virtual void write_h(offs_t offset, uint8_t data) override { pxrom_write(offset, data); }
 
 	virtual void ppu_latch(offs_t offset) override;
 	virtual void pcb_reset() override;
@@ -42,7 +42,7 @@ public:
 	nes_fxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 };

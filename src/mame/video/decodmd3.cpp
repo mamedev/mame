@@ -74,7 +74,7 @@ WRITE16_MEMBER( decodmd_type3_device::crtc_address_w )
 {
 	if(ACCESSING_BITS_8_15)
 	{
-		m_mc6845->address_w(space,offset,data >> 8);
+		m_mc6845->address_w(data >> 8);
 		m_crtc_index = data >> 8;
 	}
 }
@@ -82,7 +82,7 @@ WRITE16_MEMBER( decodmd_type3_device::crtc_address_w )
 READ16_MEMBER( decodmd_type3_device::crtc_status_r )
 {
 	if(ACCESSING_BITS_8_15)
-		return m_mc6845->register_r(space,offset);
+		return m_mc6845->register_r();
 	else
 		return 0xff;
 }
@@ -93,7 +93,7 @@ WRITE16_MEMBER( decodmd_type3_device::crtc_register_w )
 	{
 		if(m_crtc_index == 9)  // hack!!
 			data -= 0x100;
-		m_mc6845->register_w(space,offset,data >> 8);
+		m_mc6845->register_w(data >> 8);
 		m_crtc_reg[m_crtc_index] = data >> 8;
 	}
 }
@@ -164,6 +164,7 @@ decodmd_type3_device::decodmd_type3_device(const machine_config &mconfig, const 
 	, m_ram(*this,RAM_TAG)
 	, m_rambank(*this,"dmdram")
 	, m_rombank(*this,"dmdrom")
+	, m_rom(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -173,14 +174,11 @@ void decodmd_type3_device::device_start()
 
 void decodmd_type3_device::device_reset()
 {
-	uint8_t* ROM;
 	uint8_t* RAM = m_ram->pointer();
-	m_rom = memregion(m_gfxtag);
 
-	ROM = m_rom->base();
 	memset(RAM,0,0x10000);
 	m_rambank->configure_entry(0, &RAM[0]);
 	m_rambank->set_entry(0);
-	m_rombank->configure_entry(0, &ROM[0]);
+	m_rombank->configure_entry(0, &m_rom[0]);
 	m_rombank->set_entry(0);
 }

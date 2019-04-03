@@ -413,11 +413,11 @@ WRITE_LINE_MEMBER(pacland_state::vblank_irq)
 		m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(pacland_state::pacland)
-
+void pacland_state::pacland(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(49'152'000)/32) /* 1.536 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MC6809E(config, m_maincpu, XTAL(49'152'000)/32); /* 1.536 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pacland_state::main_map);
 
 	HD63701(config, m_mcu, XTAL(49'152'000)/8); /* 6.144 MHz? */
 	m_mcu->set_addrmap(AS_PROGRAM, &pacland_state::mcu_map);
@@ -426,29 +426,27 @@ MACHINE_CONFIG_START(pacland_state::pacland)
 	m_mcu->in_p2_cb().set_constant(0xff);  /* leds won't work otherwise */
 	m_mcu->out_p2_cb().set(FUNC(pacland_state::led_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* we need heavy synching between the MCU and the CPU */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* we need heavy synching between the MCU and the CPU */
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(49'152'000)/8, 384, 3*8, 39*8, 264, 2*8, 30*8)
-	MCFG_SCREEN_UPDATE_DRIVER(pacland_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pacland_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(49'152'000)/8, 384, 3*8, 39*8, 264, 2*8, 30*8);
+	m_screen->set_screen_update(FUNC(pacland_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(pacland_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pacland)
-	MCFG_PALETTE_ADD("palette", 256*4+256*4+64*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(pacland_state, pacland)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pacland);
+	PALETTE(config, m_palette, FUNC(pacland_state::pacland_palette), 256*4 + 256*4 + 64*16, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2/1024)
-	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	NAMCO_CUS30(config, m_cus30, XTAL(49'152'000)/2/1024);
+	m_cus30->set_voices(8);
+	m_cus30->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************

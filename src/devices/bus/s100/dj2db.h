@@ -42,10 +42,10 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_s100_card_interface overrides
-	virtual uint8_t s100_smemr_r(address_space &space, offs_t offset) override;
-	virtual void s100_mwrt_w(address_space &space, offs_t offset, uint8_t data) override;
-	virtual uint8_t s100_sinp_r(address_space &space, offs_t offset) override;
-	virtual void s100_sout_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t s100_smemr_r(offs_t offset) override;
+	virtual void s100_mwrt_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t s100_sinp_r(offs_t offset) override;
+	virtual void s100_sout_w(offs_t offset, uint8_t data) override;
 	virtual void s100_phantom_w(int state) override;
 
 private:

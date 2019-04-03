@@ -84,7 +84,7 @@ void vp570_device::device_start()
 //  vip_program_r - program read
 //-------------------------------------------------
 
-uint8_t vp570_device::vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh)
+uint8_t vp570_device::vip_program_r(offs_t offset, int cs, int cdef, int *minh)
 {
 	uint8_t data = 0xff;
 
@@ -105,7 +105,7 @@ uint8_t vp570_device::vip_program_r(address_space &space, offs_t offset, int cs,
 //  vip_program_w - program write
 //-------------------------------------------------
 
-void vp570_device::vip_program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh)
+void vp570_device::vip_program_w(offs_t offset, uint8_t data, int cdef, int *minh)
 {
 	offs_t base = m_base->read() << 12;
 

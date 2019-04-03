@@ -43,7 +43,7 @@ static const char opname[][5] =
 class tms99xx_device : public cpu_device
 {
 public:
-	static constexpr int AS_SETOFFSET = 4;
+	static constexpr int AS_SETADDRESS = 4;
 
 	~tms99xx_device();
 
@@ -95,10 +95,10 @@ protected:
 	void                decode(uint16_t inst);
 
 	const address_space_config  m_program_config;
-	const address_space_config  m_setoffset_config;
+	const address_space_config  m_setaddress_config;
 	const address_space_config  m_io_config;
 	address_space*          m_prgspace;
-	address_space*          m_sospace;
+	address_space*          m_setaddr;
 	address_space*          m_cru;
 
 	virtual uint16_t  read_workspace_register_debug(int reg);

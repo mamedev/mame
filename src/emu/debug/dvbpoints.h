@@ -48,7 +48,7 @@ private:
 
 
 	// internal state
-	int (*m_sortType)(void const *, void const *);
+	bool (*m_sortType)(const device_debug::breakpoint *, const device_debug::breakpoint *);
 	std::vector<device_debug::breakpoint *> m_buffer;
 };
 

@@ -136,7 +136,9 @@ void h83003_device::map(address_map &map)
 	map(0xffffd2, 0xffffd2).rw("port9", FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xffffd3, 0xffffd3).rw("porta", FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xffffd4, 0xffffd4).w("portb", FUNC(h8_port_device::ddr_w));
+	map(0xffffd5, 0xffffd5).w("portc", FUNC(h8_port_device::ddr_w));
 	map(0xffffd6, 0xffffd6).rw("portb", FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
+	map(0xffffd7, 0xffffd7).rw("portc", FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xffffda, 0xffffda).rw("port4", FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
 
 	map(0xffffe0, 0xffffe7).r("adc", FUNC(h8_adc_device::addr8_r));
@@ -150,32 +152,34 @@ void h83003_device::map(address_map &map)
 	map(0xfffff8, 0xfffff9).rw("intc", FUNC(h8h_intc_device::icr_r), FUNC(h8h_intc_device::icr_w));
 }
 
-MACHINE_CONFIG_START(h83003_device::device_add_mconfig)
-	MCFG_H8H_INTC_ADD("intc")
-	MCFG_H8_ADC_3337_ADD("adc", "intc", 60)
-	MCFG_H8_DMA_ADD("dma")
+void h83003_device::device_add_mconfig(machine_config &config)
+{
+	H8H_INTC(config, "intc");
+	H8_ADC_3337(config, "adc", "intc", 60);
+	H8_DMA(config, "dma");
 	// (H8/2002.pdf) Table 8-11 DMAC Activation Sources
-	MCFG_H8_DMA_CHANNEL_ADD("dma:0", "intc", 44, h8_dma_channel_device::NONE, 24, h8_dma_channel_device::DREQ_EDGE, h8_dma_channel_device::DREQ_LEVEL, 28, 32, 36, 54, 53, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE)
-	MCFG_H8_DMA_CHANNEL_ADD("dma:1", "intc", 46, h8_dma_channel_device::NONE, 24, h8_dma_channel_device::DREQ_EDGE, h8_dma_channel_device::DREQ_LEVEL, 28, 32, 36, 54, 53, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE)
-	MCFG_H8_DMA_CHANNEL_ADD("dma:2", "intc", 48, h8_dma_channel_device::NONE, 24, h8_dma_channel_device::DREQ_EDGE, h8_dma_channel_device::DREQ_LEVEL, 28, 32, 36, 54, 53, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE)
-	MCFG_H8_DMA_CHANNEL_ADD("dma:3", "intc", 50, h8_dma_channel_device::NONE, 24, h8_dma_channel_device::DREQ_EDGE, h8_dma_channel_device::DREQ_LEVEL, 28, 32, 36, 54, 53, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE)
-	MCFG_H8_PORT_ADD("port4", h8_device::PORT_4, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("port6", h8_device::PORT_6, 0x80, 0x80)
-	MCFG_H8_PORT_ADD("port7", h8_device::PORT_7, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("port8", h8_device::PORT_8, 0xf0, 0xe0)
-	MCFG_H8_PORT_ADD("port9", h8_device::PORT_9, 0x00, 0xc0)
-	MCFG_H8_PORT_ADD("porta", h8_device::PORT_A, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("portb", h8_device::PORT_B, 0x00, 0x00)
-	MCFG_H8_TIMER16_ADD("timer16", 5, 0xe0)
-	MCFG_H8H_TIMER16_CHANNEL_ADD("timer16:0", 2, 2, "intc", 24)
-	MCFG_H8H_TIMER16_CHANNEL_ADD("timer16:1", 2, 2, "intc", 28)
-	MCFG_H8H_TIMER16_CHANNEL_ADD("timer16:2", 2, 2, "intc", 32)
-	MCFG_H8H_TIMER16_CHANNEL_ADD("timer16:3", 2, 2, "intc", 36)
-	MCFG_H8H_TIMER16_CHANNEL_ADD("timer16:4", 2, 2, "intc", 40)
-	MCFG_H8_SCI_ADD("sci0", "intc", 52, 53, 54, 55)
-	MCFG_H8_SCI_ADD("sci1", "intc", 56, 57, 58, 59)
-	MCFG_H8_WATCHDOG_ADD("watchdog", "intc", 20, h8_watchdog_device::H)
-MACHINE_CONFIG_END
+	H8_DMA_CHANNEL(config, "dma:0", "intc", 44, h8_dma_channel_device::NONE, 24, h8_dma_channel_device::DREQ_EDGE, h8_dma_channel_device::DREQ_LEVEL, 28, 32, 36, 54, 53);
+	H8_DMA_CHANNEL(config, "dma:1", "intc", 46, h8_dma_channel_device::NONE, 24, h8_dma_channel_device::DREQ_EDGE, h8_dma_channel_device::DREQ_LEVEL, 28, 32, 36, 54, 53);
+	H8_DMA_CHANNEL(config, "dma:2", "intc", 48, h8_dma_channel_device::NONE, 24, h8_dma_channel_device::DREQ_EDGE, h8_dma_channel_device::DREQ_LEVEL, 28, 32, 36, 54, 53);
+	H8_DMA_CHANNEL(config, "dma:3", "intc", 50, h8_dma_channel_device::NONE, 24, h8_dma_channel_device::DREQ_EDGE, h8_dma_channel_device::DREQ_LEVEL, 28, 32, 36, 54, 53);
+	H8_PORT(config, "port4", h8_device::PORT_4, 0x00, 0x00);
+	H8_PORT(config, "port6", h8_device::PORT_6, 0x80, 0x80);
+	H8_PORT(config, "port7", h8_device::PORT_7, 0x00, 0x00);
+	H8_PORT(config, "port8", h8_device::PORT_8, 0xf0, 0xe0);
+	H8_PORT(config, "port9", h8_device::PORT_9, 0x00, 0xc0);
+	H8_PORT(config, "porta", h8_device::PORT_A, 0x00, 0x00);
+	H8_PORT(config, "portb", h8_device::PORT_B, 0x00, 0x00);
+	H8_PORT(config, "portc", h8_device::PORT_C, 0x00, 0x00);
+	H8_TIMER16(config, "timer16", 5, 0xe0);
+	H8H_TIMER16_CHANNEL(config, "timer16:0", 2, 2, "intc", 24);
+	H8H_TIMER16_CHANNEL(config, "timer16:1", 2, 2, "intc", 28);
+	H8H_TIMER16_CHANNEL(config, "timer16:2", 2, 2, "intc", 32);
+	H8H_TIMER16_CHANNEL(config, "timer16:3", 2, 2, "intc", 36);
+	H8H_TIMER16_CHANNEL(config, "timer16:4", 2, 2, "intc", 40);
+	H8_SCI(config, "sci0", "intc", 52, 53, 54, 55);
+	H8_SCI(config, "sci1", "intc", 56, 57, 58, 59);
+	H8_WATCHDOG(config, "watchdog", "intc", 20, h8_watchdog_device::H);
+}
 
 void h83003_device::execute_set_input(int inputnum, int state)
 {

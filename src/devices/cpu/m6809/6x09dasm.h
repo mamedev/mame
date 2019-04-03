@@ -101,7 +101,7 @@ protected:
 	static const char *const hd6309_tfmregs[16];
 	static const char *const tfm_s[];
 
-	virtual void indirect(std::ostream &stream, uint8_t pb, const data_buffer &params, offs_t &p) = 0;
+	virtual void indexed(std::ostream &stream, uint8_t pb, const data_buffer &params, offs_t &p) = 0;
 	virtual void register_register(std::ostream &stream, uint8_t pb) = 0;
 
 private:
@@ -123,7 +123,7 @@ public:
 	m6x09_disassembler(m6x09_instruction_level level, const char teregs[16][4]);
 
 protected:
-	virtual void indirect(std::ostream &stream, uint8_t pb, const data_buffer &params, offs_t &p) override;
+	virtual void indexed(std::ostream &stream, uint8_t pb, const data_buffer &params, offs_t &p) override;
 	virtual void register_register(std::ostream &stream, uint8_t pb) override;
 
 private:
@@ -138,7 +138,7 @@ public:
 	konami_disassembler();
 
 protected:
-	virtual void indirect(std::ostream &stream, uint8_t pb, const data_buffer &params, offs_t &p) override;
+	virtual void indexed(std::ostream &stream, uint8_t pb, const data_buffer &params, offs_t &p) override;
 	virtual void register_register(std::ostream &stream, uint8_t pb) override;
 
 private:

@@ -13,18 +13,6 @@
 #include "machine/68230pit.h"
 #include "machine/terminal.h"
 
-#define VERBOSE_DBG 1       /* general debug messages */
-
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f at %s: %-24s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
-
 
 class besta_state : public driver_device
 {
@@ -62,11 +50,6 @@ READ8_MEMBER( besta_state::mpcc_reg_r )
 {
 	uint8_t ret;
 
-	if (!(offset == 0 && !m_mpcc_regs[0])) {
-	DBG_LOG(1,"mpcc_reg_r",("(%d) = %02X at %s\n", offset,
-		(offset > 31 ? -1 : m_mpcc_regs[offset]), machine().describe_context()));
-	}
-
 	switch (offset) {
 		case 0: /* r_stat aka ... */
 			return (m_term_data) ? 0x80 : 0;
@@ -81,14 +64,12 @@ READ8_MEMBER( besta_state::mpcc_reg_r )
 
 WRITE8_MEMBER( besta_state::mpcc_reg_w )
 {
-	DBG_LOG(1,"mpcc_reg_w",("(%d) <- %02X at %s\n", offset, data, machine().describe_context()));
-
 	switch (offset) {
 		case 2:
 			kbd_put(data);
 			break;
 		case 10:
-			m_terminal->write(generic_space(), 0, data);
+			m_terminal->write(data);
 		default:
 			m_mpcc_regs[offset] = data;
 			break;
@@ -134,18 +115,19 @@ void besta_state::machine_reset()
 }
 
 /* CP31 processor board */
-MACHINE_CONFIG_START(besta_state::besta)
+void besta_state::besta(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68030, 2*16670000)
-	MCFG_DEVICE_PROGRAM_MAP(besta_mem)
+	M68030(config, m_maincpu, 2*16670000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &besta_state::besta_mem);
 
-	MCFG_DEVICE_ADD ("pit1", PIT68230, 16670000 / 2)    // XXX verify clock
+	PIT68230(config, m_pit1, 16670000 / 2);    // XXX verify clock
 
-	MCFG_DEVICE_ADD ("pit2", PIT68230, 16670000 / 2)    // XXX verify clock
+	PIT68230(config, m_pit2, 16670000 / 2);    // XXX verify clock
 
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(besta_state, kbd_put))
-MACHINE_CONFIG_END
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(besta_state::kbd_put));
+}
 
 /* ROM definition */
 

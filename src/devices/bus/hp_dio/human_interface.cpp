@@ -114,11 +114,11 @@ human_interface_device::human_interface_device(const machine_config &mconfig, de
 
 void human_interface_device::device_start()
 {
-	program_space()->install_readwrite_handler(0x420000, 0x420003, 0x0003, 0xfffc, 0,
+	program_space().install_readwrite_handler(0x420000, 0x420003, 0x0003, 0xfffc, 0,
 		read8_delegate(FUNC(upi41_cpu_device::upi41_master_r), &(*m_iocpu)),
 		write8_delegate(FUNC(upi41_cpu_device::upi41_master_w), &(*m_iocpu)), 0x00ff00ff);
 
-	program_space()->install_readwrite_handler(0x470000, 0x47001f, 0x1f, 0xffe0, 0,
+	program_space().install_readwrite_handler(0x470000, 0x47001f, 0x1f, 0xffe0, 0,
 		read8_delegate(FUNC(human_interface_device::gpib_r), this),
 		write8_delegate(FUNC(human_interface_device::gpib_w), this), 0x00ff00ff);
 
@@ -146,12 +146,13 @@ void human_interface_device::device_reset()
 	m_rtc->write_w(CLEAR_LINE);
 	m_rtc->read_w(CLEAR_LINE);
 	m_rtc->cs2_w(CLEAR_LINE);
+	m_iocpu->reset();
 }
 
 WRITE_LINE_MEMBER(human_interface_device::reset_in)
 {
 	if (state)
-		reset();
+		device_reset();
 }
 
 void human_interface_device::update_gpib_irq()
@@ -193,13 +194,13 @@ WRITE8_MEMBER(human_interface_device::ieee488_dio_w)
 WRITE8_MEMBER(human_interface_device::gpib_w)
 {
 	if (offset & 0x08) {
-		m_tms9914->reg8_w(space, offset & 0x07, data);
+		m_tms9914->write(offset & 0x07, data);
 		return;
 	}
 
 	switch (offset) {
 	case 0:
-		reset();
+		device_reset();
 		break;
 
 	case 1:
@@ -233,7 +234,7 @@ READ8_MEMBER(human_interface_device::gpib_r)
 	uint8_t data = 0xff;
 
 	if (offset & 0x8) {
-		data = m_tms9914->reg8_r(space, offset & 0x07);
+		data = m_tms9914->read(offset & 0x07);
 		return data;
 	}
 
@@ -359,14 +360,14 @@ void human_interface_device::dmack_w_in(int channel, uint8_t data)
 {
 	if (channel)
 		return;
-	m_tms9914->reg8_w(*program_space(), 7, data);
+	m_tms9914->write(7, data);
 }
 
 uint8_t human_interface_device::dmack_r_in(int channel)
 {
 	if (channel || !m_gpib_dma_enable)
 		return 0xff;
-	return m_tms9914->reg8_r(machine().dummy_space(), 7);
+	return m_tms9914->read(7);
 }
 
 } // namespace bus::hp_dio

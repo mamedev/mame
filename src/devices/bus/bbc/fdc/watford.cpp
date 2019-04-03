@@ -67,7 +67,7 @@ ROM_END
 
 void bbc_weddb2_device::device_add_mconfig(machine_config &config)
 {
-	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
+	WD1772(config, m_fdc, 8_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
 	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::drq_w));
 
@@ -77,7 +77,7 @@ void bbc_weddb2_device::device_add_mconfig(machine_config &config)
 
 void bbc_weddb3_device::device_add_mconfig(machine_config &config)
 {
-	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
+	WD1770(config, m_fdc, DERIVED_CLOCK(1, 1));
 	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
 	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::drq_w));
 
@@ -147,7 +147,7 @@ void bbc_weddb3_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_weddb2_device::read)
+uint8_t bbc_weddb2_device::read(offs_t offset)
 {
 	uint8_t data;
 
@@ -162,7 +162,7 @@ READ8_MEMBER(bbc_weddb2_device::read)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_weddb2_device::write)
+void bbc_weddb2_device::write(offs_t offset, uint8_t data)
 {
 	if (offset & 0x04)
 	{
@@ -192,7 +192,7 @@ WRITE8_MEMBER(bbc_weddb2_device::write)
 	}
 }
 
-READ8_MEMBER(bbc_weddb3_device::read)
+uint8_t bbc_weddb3_device::read(offs_t offset)
 {
 	uint8_t data;
 
@@ -207,7 +207,7 @@ READ8_MEMBER(bbc_weddb3_device::read)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_weddb3_device::write)
+void bbc_weddb3_device::write(offs_t offset, uint8_t data)
 {
 	if (offset & 0x04)
 	{

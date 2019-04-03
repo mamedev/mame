@@ -430,26 +430,28 @@ static void bosscd_floppies(device_slot_interface &device)
 //  MACHINE CONFIGURATION
 //**************************************************************************
 
-MACHINE_CONFIG_START( olyboss_state::olybossd )
-	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(olyboss_mem)
-	MCFG_DEVICE_IO_MAP(olyboss_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("uic", am9519_device, iack_cb)
+void olyboss_state::olybossd(machine_config &config)
+{
+	Z80(config, m_maincpu, 4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &olyboss_state::olyboss_mem);
+	m_maincpu->set_addrmap(AS_IO, &olyboss_state::olyboss_io);
+	m_maincpu->set_irq_acknowledge_callback("uic", FUNC(am9519_device::iack_cb));
 
 	/* video hardware */
 
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DEVICE(UPD3301_TAG, upd3301_device, screen_update)
-	MCFG_SCREEN_SIZE(80*8, 28*11)
-	MCFG_SCREEN_VISIBLE_AREA(0, (80*8)-1, 0, (28*11)-1)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green());
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
+	screen.set_size(80*8, 28*11);
+	screen.set_visarea(0, (80*8)-1, 0, (28*11)-1);
 
 	/* devices */
 
 	AM9519(config, m_uic, 0);
 	m_uic->out_int_callback().set_inputline("maincpu", 0);
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(m_uic, FUNC(am9519_device::ireq2_w)).invert();
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq0_w));
 	FLOPPY_CONNECTOR(config, m_fdd0, bosscd_floppies, "525qd", floppy_image_device::default_floppy_formats);
@@ -476,52 +478,50 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 	m_ppi->out_pc_callback().set(FUNC(olyboss_state::ppic_w));
 
 	/* keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(olyboss_state, keyboard_put))
-MACHINE_CONFIG_END
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(olyboss_state::keyboard_put));
+}
 
-MACHINE_CONFIG_START( olyboss_state::olybossb )
+void olyboss_state::olybossb(machine_config &config)
+{
 	olybossd(config);
-	MCFG_DEVICE_REMOVE("fdc:0")
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	config.device_remove("fdc:0");
+	FLOPPY_CONNECTOR(config, "fdc:0", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+}
 
-MACHINE_CONFIG_START( olyboss_state::olybossc )
+void olyboss_state::olybossc(machine_config &config)
+{
 	olybossd(config);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bosscd_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "fdc:1", bosscd_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+}
 
-MACHINE_CONFIG_START( olyboss_state::bossb85 )
-	MCFG_DEVICE_ADD("maincpu", I8085A, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(olyboss_mem)
-	MCFG_DEVICE_IO_MAP(olyboss85_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(olyboss_state, irq_cb)
-	MCFG_I8085A_SOD(WRITELINE(*this, olyboss_state, romdis_w))
+void olyboss_state::bossb85(machine_config &config)
+{
+	i8085a_cpu_device &maincpu(I8085A(config, m_maincpu, 4_MHz_XTAL));
+	maincpu.set_addrmap(AS_PROGRAM, &olyboss_state::olyboss_mem);
+	maincpu.set_addrmap(AS_IO, &olyboss_state::olyboss85_io);
+	maincpu.set_irq_acknowledge_callback(FUNC(olyboss_state::irq_cb));
+	maincpu.out_sod_func().set(FUNC(olyboss_state::romdis_w));
 
 	/* video hardware */
-
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DEVICE(UPD3301_TAG, upd3301_device, screen_update)
-	MCFG_SCREEN_SIZE(80*8, 28*11)
-	MCFG_SCREEN_VISIBLE_AREA(0, (80*8)-1, 0, (28*11)-1)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green());
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
+	screen.set_size(80*8, 28*11);
+	screen.set_visarea(0, (80*8)-1, 0, (28*11)-1);
 
 	/* devices */
 
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq0_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	I8257(config, m_dma, XTAL(4'000'000));
 	m_dma->out_hrq_cb().set(FUNC(olyboss_state::hrq_w));
@@ -532,27 +532,24 @@ MACHINE_CONFIG_START( olyboss_state::bossb85 )
 	m_dma->out_iow_cb<2>().set(FUNC(olyboss_state::crtcdma_w));
 	m_dma->out_tc_cb().set(FUNC(olyboss_state::tc_w));
 
-	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL(14'318'181))
-	MCFG_UPD3301_CHARACTER_WIDTH(8)
-	MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(olyboss_state, olyboss_display_pixels)
-	MCFG_UPD3301_DRQ_CALLBACK(WRITELINE(m_dma, i8257_device, dreq2_w))
-	MCFG_UPD3301_INT_CALLBACK(INPUTLINE("maincpu", I8085_RST75_LINE))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	UPD3301(config, m_crtc, XTAL(14'318'181));
+	m_crtc->set_character_width(8);
+	m_crtc->set_display_callback(FUNC(olyboss_state::olyboss_display_pixels));
+	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
+	m_crtc->int_wr_callback().set_inputline("maincpu", I8085_RST75_LINE);
+	m_crtc->set_screen(SCREEN_TAG);
 
 	/* keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(olyboss_state, keyboard85_put))
-MACHINE_CONFIG_END
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(olyboss_state::keyboard85_put));
+}
 
-MACHINE_CONFIG_START( olyboss_state::bossa85 )
+void olyboss_state::bossa85(machine_config &config)
+{
 	bossb85(config);
-	MCFG_DEVICE_REMOVE("fdc:0")
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bossa_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_DEVICE_REMOVE("fdc:1")
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bossa_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config.replace(), "fdc:0", bossa_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config.replace(), "fdc:1", bossa_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
+}
 
 //**************************************************************************
 //  ROM DEFINITIONS

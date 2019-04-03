@@ -147,7 +147,7 @@ void qvt102_state::qvt102(machine_config &config)
 	m_screen->set_raw(MASTER_CLOCK, 882, 9, 729, 315, 0, 300); // 80x24+1
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	PALETTE(config, m_palette, 3).set_init("palette", FUNC(palette_device::palette_init_monochrome_highlight));
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 	GFXDECODE(config, m_gfxdecode, m_palette, chars);
 
 	H46505(config, m_crtc, MASTER_CLOCK / 9);

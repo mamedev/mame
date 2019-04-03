@@ -10,12 +10,13 @@
 
 #pragma once
 
+#include "cpu/m6809/konami.h" // for the callback and the firq irq definition
 #include "machine/bankdev.h"
 #include "machine/k053252.h"
-#include "video/k053246_k053247_k055673.h"
-#include "video/k054000.h"
 #include "video/k052109.h"
+#include "video/k053246_k053247_k055673.h"
 #include "video/k053251.h"
+#include "video/k054000.h"
 #include "video/konami_helper.h"
 #include "emupal.h"
 
@@ -54,7 +55,7 @@ private:
 	int        m_irq_enabled;
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<konami_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k052109_device> m_k052109;
 	required_device<k053247_device> m_k053246;

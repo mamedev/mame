@@ -76,6 +76,8 @@
 
     Chase Bombers proto sports lots of gfx bugs;
 
+	Chase Bombers PCB has TC0360PRI but not hooked up
+
     Gun calibration
     ---------------
 
@@ -350,8 +352,8 @@ void undrfire_state::undrfire_map(address_map &map)
 	map(0x500000, 0x500007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
 	map(0x600000, 0x600007).noprw(); // space for ADC0809, not fitted on pcb
 	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
-	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));        /* tilemaps */
-	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
+	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));        /* tilemaps */
+	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0x900000, 0x90ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::long_r), FUNC(tc0100scn_device::long_w));        /* 6bpp tilemaps */
 	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_long_r), FUNC(tc0100scn_device::ctrl_long_w));
 	map(0xa00000, 0xa0ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
@@ -370,12 +372,12 @@ void undrfire_state::cbombers_cpua_map(address_map &map)
 	map(0x500000, 0x500007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
 	map(0x600000, 0x600007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask32(0xffffffff);
 	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
-	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));        /* tilemaps */
-	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
+	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));        /* tilemaps */
+	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0x900000, 0x90ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::long_r), FUNC(tc0100scn_device::long_w));        /* 6bpp tilemaps */
 	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_long_r), FUNC(tc0100scn_device::ctrl_long_w));
 	map(0xa00000, 0xa0ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0xb00000, 0xb0000f).ram(); /* ? */
+	map(0xb00000, 0xb0000f).ram(); /* TC0360PRI */
 	map(0xc00000, 0xc00007).ram(); /* LAN controller? */
 	map(0xd00000, 0xd00003).w(FUNC(undrfire_state::rotate_control_w));     /* perhaps port based rotate control? */
 	map(0xe00000, 0xe0ffff).ram().share("shared_ram");
@@ -385,9 +387,9 @@ void undrfire_state::cbombers_cpub_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x400000, 0x40ffff).ram(); /* local ram */
-//  AM_RANGE(0x600000, 0x60ffff) AM_DEVWRITE("tc0480scp", tc0480scp_device, word_w) /* Only written upon errors */
+//  map(0x600000, 0x60ffff).w(m_tc0480scp, FUNC(tc0480scp_device::ram_w)); /* Only written upon errors */
 	map(0x800000, 0x80ffff).rw(FUNC(undrfire_state::shared_ram_r), FUNC(undrfire_state::shared_ram_w));
-//  AM_RANGE(0xa00000, 0xa001ff) AM_RAM /* Extra road control?? */
+//  map(0xa00000, 0xa001ff).ram(); /* Extra road control?? */
 }
 
 
@@ -564,12 +566,12 @@ INTERRUPT_GEN_MEMBER(undrfire_state::undrfire_interrupt)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(undrfire_state::undrfire)
-
+void undrfire_state::undrfire(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20 MHz - NOT verified */
-	MCFG_DEVICE_PROGRAM_MAP(undrfire_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", undrfire_state,  undrfire_interrupt)
+	M68EC020(config, m_maincpu, XTAL(40'000'000)/2); /* 20 MHz - NOT verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &undrfire_state::undrfire_map);
+	m_maincpu->set_vblank_int("screen", FUNC(undrfire_state::undrfire_interrupt));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -586,17 +588,16 @@ MACHINE_CONFIG_START(undrfire_state::undrfire)
 	tc0510nio.read_7_callback().set_ioport("SYSTEM");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 3*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(undrfire_state, screen_update_undrfire)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0, 40*8-1, 3*8, 32*8-1);
+	screen.set_screen_update(FUNC(undrfire_state::screen_update_undrfire));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_undrfire)
-	MCFG_PALETTE_ADD("palette", 16384)
-	MCFG_PALETTE_FORMAT(XRGB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_undrfire);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 16384);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(2);
@@ -614,21 +615,21 @@ MACHINE_CONFIG_START(undrfire_state::undrfire)
 
 	/* sound hardware */
 	TAITO_EN(config, "taito_en", 0);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(undrfire_state::cbombers)
-
+void undrfire_state::cbombers(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20 MHz - NOT verified */
-	MCFG_DEVICE_PROGRAM_MAP(cbombers_cpua_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", undrfire_state,  irq4_line_hold)
+	M68EC020(config, m_maincpu, XTAL(40'000'000)/2); /* 20 MHz - NOT verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &undrfire_state::cbombers_cpua_map);
+	m_maincpu->set_vblank_int("screen", FUNC(undrfire_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("sub", M68000, XTAL(32'000'000)/2)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(cbombers_cpub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", undrfire_state,  irq4_line_hold)
+	M68000(config, m_subcpu, XTAL(32'000'000)/2);   /* 16 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &undrfire_state::cbombers_cpub_map);
+	m_subcpu->set_vblank_int("screen", FUNC(undrfire_state::irq4_line_hold));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(480))   /* CPU slices - Need to interleave Cpu's 1 & 3 */
+	config.m_minimum_quantum = attotime::from_hz(480);   /* CPU slices - Need to interleave Cpu's 1 & 3 */
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -649,17 +650,16 @@ MACHINE_CONFIG_START(undrfire_state::cbombers)
 	tc0510nio.read_7_callback().set_ioport("SYSTEM");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 3*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(undrfire_state, screen_update_cbombers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0, 40*8-1, 3*8, 32*8-1);
+	screen.set_screen_update(FUNC(undrfire_state::screen_update_cbombers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cbombers)
-	MCFG_PALETTE_ADD("palette", 16384)
-	MCFG_PALETTE_FORMAT(XRGB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cbombers);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 16384);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(2);
@@ -678,7 +678,7 @@ MACHINE_CONFIG_START(undrfire_state::cbombers)
 
 	/* sound hardware */
 	TAITO_EN(config, "taito_en", 0);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

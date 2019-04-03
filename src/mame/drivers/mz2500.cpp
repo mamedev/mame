@@ -42,7 +42,7 @@
 #define WRAM_RESET 0
 #define IPL_RESET 1
 
-static const uint8_t bank_reset_val[2][8] =
+static constexpr uint8_t bank_reset_val[2][8] =
 {
 	{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 },
 	{ 0x34, 0x35, 0x36, 0x37, 0x04, 0x05, 0x06, 0x07 }
@@ -1730,42 +1730,36 @@ WRITE8_MEMBER(mz2500_state::opn_porta_w)
 	m_ym_porta = data;
 }
 
-PALETTE_INIT_MEMBER(mz2500_state, mz2500)
+void mz2500_state::mz2500_palette(palette_device &palette) const
 {
-	int i;
-
-	for(i=0;i<0x200;i++)
+	for (int i = 0; i < 0x200; i++)
 		palette.set_pen_color(i,pal1bit(0),pal1bit(0),pal1bit(0));
 
-	/* set up 8 colors (PCG) */
-	for(i=0;i<8;i++)
-		m_palette->set_pen_color(i+8,pal1bit((i & 2)>>1),pal1bit((i & 4)>>2),pal1bit((i & 1)>>0));
+	// set up 8 colors (PCG)
+	for (int i = 0; i < 8; i++)
+		palette.set_pen_color(i+8,pal1bit((i & 2)>>1),pal1bit((i & 4)>>2),pal1bit((i & 1)>>0));
 
-	/* set up 16 colors (PCG / CG) */
+	// set up 16 colors (PCG / CG)
 
-	/* set up 256 colors (CG) */
+	// set up 256 colors (CG)
+	for (int i = 0; i < 0x100; i++)
 	{
-		int r,g,b;
+		int bit0, bit1, bit2;
 
-		for(i = 0;i < 0x100;i++)
-		{
-			int bit0,bit1,bit2;
+		bit0 = pal_256_param(i,0) ? 1 : 0;
+		bit1 = i & 0x01 ? 2 : 0;
+		bit2 = i & 0x10 ? 4 : 0;
+		int const b = bit0|bit1|bit2;
+		bit0 = pal_256_param(i,0) ? 1 : 0;
+		bit1 = i & 0x02 ? 2 : 0;
+		bit2 = i & 0x20 ? 4 : 0;
+		int const r = bit0|bit1|bit2;
+		bit0 = pal_256_param(i,0) ? 1 : 0;
+		bit1 = i & 0x04 ? 2 : 0;
+		bit2 = i & 0x40 ? 4 : 0;
+		int const g = bit0|bit1|bit2;
 
-			bit0 = pal_256_param(i,0) ? 1 : 0;
-			bit1 = i & 0x01 ? 2 : 0;
-			bit2 = i & 0x10 ? 4 : 0;
-			b = bit0|bit1|bit2;
-			bit0 = pal_256_param(i,0) ? 1 : 0;
-			bit1 = i & 0x02 ? 2 : 0;
-			bit2 = i & 0x20 ? 4 : 0;
-			r = bit0|bit1|bit2;
-			bit0 = pal_256_param(i,0) ? 1 : 0;
-			bit1 = i & 0x04 ? 2 : 0;
-			bit2 = i & 0x40 ? 4 : 0;
-			g = bit0|bit1|bit2;
-
-			m_palette->set_pen_color(i+0x100,pal3bit(r),pal3bit(g),pal3bit(b));
-		}
+		palette.set_pen_color(i + 0x100, pal3bit(r), pal3bit(g), pal3bit(b));
 	}
 }
 
@@ -1793,13 +1787,14 @@ static void mz2500_floppies(device_slot_interface &device)
 	device.option_add("dd", FLOPPY_35_DD);
 }
 
-MACHINE_CONFIG_START(mz2500_state::mz2500)
+void mz2500_state::mz2500(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 6000000)
-	MCFG_DEVICE_PROGRAM_MAP(mz2500_map)
-	MCFG_DEVICE_IO_MAP(mz2500_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mz2500_state,  mz2500_vbl)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mz2500_state,mz2500_irq_ack)
+	Z80(config, m_maincpu, 6000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mz2500_state::mz2500_map);
+	m_maincpu->set_addrmap(AS_IO, &mz2500_state::mz2500_io);
+	m_maincpu->set_vblank_int("screen", FUNC(mz2500_state::mz2500_vbl));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(mz2500_state::mz2500_irq_ack));
 
 	for (int bank = 0; bank < 8; bank++)
 	{
@@ -1834,23 +1829,22 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 
 	MB8877(config, m_fdc, 1_MHz_XTAL);
 
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:2", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:3", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "mb8877a:0", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877a:1", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877a:2", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877a:3", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "mz2500")
+	SOFTWARE_LIST(config, "flop_list").set_original("mz2500");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(21'477'272, 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
-	MCFG_SCREEN_UPDATE_DRIVER(mz2500_state, screen_update_mz2500)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(21'477'272, 640+108, 0, 640, 480, 0, 200); //unknown clock / divider
+	m_screen->set_screen_update(FUNC(mz2500_state::screen_update_mz2500));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(mz2500_state, mz2500)
+	PALETTE(config, m_palette, FUNC(mz2500_state::mz2500_palette), 0x200);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz2500)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mz2500);
 
 
 	SPEAKER(config, "mono").front_center();
@@ -1864,9 +1858,8 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 	ym.add_route(2, "mono", 0.50);
 	ym.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("beeper", BEEP, 4096)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-MACHINE_CONFIG_END
+	BEEP(config, m_beeper, 4096).add_route(ALL_OUTPUTS,"mono",0.50);
+}
 
 
 

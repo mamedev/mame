@@ -46,7 +46,8 @@ msx_cart_sfg05_device::msx_cart_sfg05_device(const machine_config &mconfig, cons
 }
 
 
-MACHINE_CONFIG_START(msx_cart_sfg_device::device_add_mconfig)
+void msx_cart_sfg_device::device_add_mconfig(machine_config &config)
+{
 	// YM2151 (OPM)
 	// YM3012 (DAC)
 	// YM2148 (MKS)
@@ -64,13 +65,11 @@ MACHINE_CONFIG_START(msx_cart_sfg_device::device_add_mconfig)
 	m_ym2148->port_read_handler().set("kbdc", FUNC(msx_audio_kbdc_port_device::read));
 	m_ym2148->irq_handler().set(FUNC(msx_cart_sfg_device::ym2148_irq_w));
 
-	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, nullptr)
+	MSX_AUDIO_KBDC_PORT(config, m_kbdc, msx_audio_keyboards, nullptr);
 
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE("ym2148", ym2148_device, write_rxd))
-MACHINE_CONFIG_END
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set("ym2148", FUNC(ym2148_device::write_rxd));
+}
 
 
 ROM_START( msx_sfg01 )
@@ -132,22 +131,22 @@ void msx_cart_sfg_device::check_irq()
 {
 	if (m_ym2151_irq_state != CLEAR_LINE || m_ym2148_irq_state != CLEAR_LINE)
 	{
-		m_out_irq_cb(ASSERT_LINE);
+		irq_out(ASSERT_LINE);
 	}
 	else
 	{
-		m_out_irq_cb(CLEAR_LINE);
+		irq_out(CLEAR_LINE);
 	}
 }
 
 
-READ8_MEMBER(msx_cart_sfg_device::read_cart)
+uint8_t msx_cart_sfg_device::read_cart(offs_t offset)
 {
 	switch (offset & 0x3fff)
 	{
 		case 0x3ff0:     // YM-2151 status read
 		case 0x3ff1:     // YM-2151 status read mirror?
-			return m_ym2151->status_r(space, 0);
+			return m_ym2151->status_r();
 
 		case 0x3ff2:     // YM-2148 keyboard column read
 		case 0x3ff3:     // YM-2148 --
@@ -156,7 +155,7 @@ READ8_MEMBER(msx_cart_sfg_device::read_cart)
 		case 0x3ff6:     // YM-2148 MIDI UART status register
 							// ------x- - 1 = received a byte/receive buffer full?
 							// -------x - 1 = ready to send next byte/send buffer empty?
-			return m_ym2148->read(space, offset & 7);
+			return m_ym2148->read(offset & 7);
 	}
 
 	if (offset < 0x8000)
@@ -168,16 +167,16 @@ READ8_MEMBER(msx_cart_sfg_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_sfg_device::write_cart)
+void msx_cart_sfg_device::write_cart(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x3fff)
 	{
 		case 0x3ff0:     // YM-2151 register
-			m_ym2151->register_w(space, 0, data);
+			m_ym2151->register_w(data);
 			break;
 
 		case 0x3ff1:    // YM-2151 data
-			m_ym2151->data_w(space, 0, data);
+			m_ym2151->data_w(data);
 			break;
 
 		case 0x3ff2:   // YM-2148 write keyboard row
@@ -192,7 +191,7 @@ WRITE8_MEMBER(msx_cart_sfg_device::write_cart)
 						// x------- - 1 = reset
 						// -----x-- - 1 = enable receiving / sending midi data
 						// -------x - 1 = enable receiving / sending midi data
-			m_ym2148->write(space, offset & 7, data);
+			m_ym2148->write(offset & 7, data);
 			break;
 
 		default:

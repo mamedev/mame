@@ -40,15 +40,15 @@
 
 /* main cpu */
 
-void crospang_state::crospang_base_map(address_map &map)
+void crospang_state::base_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom().nopw(); // writes to rom quite often
 
-	map(0x100000, 0x100001).w(FUNC(crospang_state::bestri_tilebank_select_w));
-	map(0x10000e, 0x10000f).w(FUNC(crospang_state::bestri_tilebank_data_w));
+	map(0x100000, 0x100001).w(FUNC(crospang_state::tilebank_select_w));
+	map(0x10000e, 0x10000f).w(FUNC(crospang_state::tilebank_data_w));
 
-	map(0x120000, 0x1207ff).ram().w(FUNC(crospang_state::crospang_fg_videoram_w)).share("fg_videoram");
-	map(0x122000, 0x1227ff).ram().w(FUNC(crospang_state::crospang_bg_videoram_w)).share("bg_videoram");
+	map(0x120000, 0x1207ff).ram().w(FUNC(crospang_state::fg_videoram_w)).share("fg_videoram");
+	map(0x122000, 0x1227ff).ram().w(FUNC(crospang_state::bg_videoram_w)).share("bg_videoram");
 	map(0x200000, 0x2005ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x210000, 0x2107ff).ram().share("spriteram");
 	map(0x270001, 0x270001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -62,31 +62,31 @@ void crospang_state::crospang_base_map(address_map &map)
 
 void crospang_state::crospang_map(address_map &map)
 {
-	crospang_base_map(map);
+	base_map(map);
 
-	map(0x100002, 0x100003).w(FUNC(crospang_state::crospang_fg_scrolly_w));
-	map(0x100004, 0x100005).w(FUNC(crospang_state::crospang_bg_scrollx_w));
-	map(0x100006, 0x100007).w(FUNC(crospang_state::crospang_bg_scrolly_w));
-	map(0x100008, 0x100009).w(FUNC(crospang_state::crospang_fg_scrollx_w));
+	map(0x100002, 0x100003).w(FUNC(crospang_state::fg_scrolly_w));
+	map(0x100004, 0x100005).w(FUNC(crospang_state::bg_scrollx_w));
+	map(0x100006, 0x100007).w(FUNC(crospang_state::bg_scrolly_w));
+	map(0x100008, 0x100009).w(FUNC(crospang_state::fg_scrollx_w));
 
 	map(0x320000, 0x32ffff).ram();
 }
 
 void crospang_state::pitapat_map(address_map &map)
 {
-	crospang_base_map(map);
+	base_map(map);
 
-	map(0x100002, 0x100003).w(FUNC(crospang_state::crospang_fg_scrolly_w));
-	map(0x100004, 0x100005).w(FUNC(crospang_state::crospang_bg_scrollx_w));
-	map(0x100006, 0x100007).w(FUNC(crospang_state::crospang_bg_scrolly_w));
-	map(0x100008, 0x100009).w(FUNC(crospang_state::crospang_fg_scrollx_w));
+	map(0x100002, 0x100003).w(FUNC(crospang_state::fg_scrolly_w));
+	map(0x100004, 0x100005).w(FUNC(crospang_state::bg_scrollx_w));
+	map(0x100006, 0x100007).w(FUNC(crospang_state::bg_scrolly_w));
+	map(0x100008, 0x100009).w(FUNC(crospang_state::fg_scrollx_w));
 
 	map(0x300000, 0x30ffff).ram();
 }
 
 void crospang_state::bestri_map(address_map &map)
 {
-	crospang_base_map(map);
+	base_map(map);
 
 	map(0x100004, 0x100005).w(FUNC(crospang_state::bestri_fg_scrollx_w));
 	map(0x100006, 0x100007).w(FUNC(crospang_state::bestri_fg_scrolly_w));
@@ -98,7 +98,7 @@ void crospang_state::bestri_map(address_map &map)
 
 void crospang_state::bestria_map(address_map &map)
 {
-	crospang_base_map(map);
+	base_map(map);
 
 	map(0x100006, 0x100007).w(FUNC(crospang_state::bestri_fg_scrollx_w));
 	map(0x100008, 0x100009).w(FUNC(crospang_state::bestri_fg_scrolly_w));
@@ -110,13 +110,13 @@ void crospang_state::bestria_map(address_map &map)
 
 /* sound cpu */
 
-void crospang_state::crospang_sound_map(address_map &map)
+void crospang_state::sound_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
 }
 
-void crospang_state::crospang_sound_io_map(address_map &map)
+void crospang_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
@@ -393,109 +393,114 @@ static const gfx_layout tlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0, 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(8*2*16,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
+	64*8
+};
+
+static const gfx_layout tlayout_alt =
+{
+	16,16,
+	RGN_FRAC(1,2),
+	4,
+	{ 8, 0, RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0 },
+	{ STEP8(0,1), STEP8(8*2*16,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
 
 static GFXDECODE_START( gfx_crospang )
-	GFXDECODE_ENTRY( "gfx2", 0, tlayout,       0, 64 )  /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx1", 0, tlayout,       0, 64 )  /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tlayout,       0, 64 )  /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, tlayout_alt,   0, 64 )  /* Tiles 16x16 */
 GFXDECODE_END
 
 void crospang_state::machine_start()
 {
-	save_item(NAME(m_bestri_tilebank));
-	save_item(NAME(m_bestri_tilebankselect));
+	save_item(NAME(m_tilebank));
+	save_item(NAME(m_tilebankselect));
 }
 
 void crospang_state::machine_reset()
 {
-	m_bestri_tilebank[0] = 0x00;
-	m_bestri_tilebank[1] = 0x01;
-	m_bestri_tilebank[2] = 0x02;
-	m_bestri_tilebank[3] = 0x03;
+	m_tilebank[0] = 0x00;
+	m_tilebank[1] = 0x01;
+	m_tilebank[2] = 0x02;
+	m_tilebank[3] = 0x03;
 
-	m_bestri_tilebankselect = 0;
+	m_tilebankselect = 0;
 }
 
-MACHINE_CONFIG_START(crospang_state::crospang)
-
+void crospang_state::crospang(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(14'318'181)/2) /* 68000P10 @ 7.15909MHz */
-	MCFG_DEVICE_PROGRAM_MAP(crospang_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crospang_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(14'318'181)/2); /* 68000P10 @ 7.15909MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &crospang_state::crospang_map);
+	m_maincpu->set_vblank_int("screen", FUNC(crospang_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4) /* 3.579545MHz */
-	MCFG_DEVICE_PROGRAM_MAP(crospang_sound_map)
-	MCFG_DEVICE_IO_MAP(crospang_sound_io_map)
-
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181)/4)); /* 3.579545MHz */
+	audiocpu.set_addrmap(AS_PROGRAM, &crospang_state::sound_map);
+	audiocpu.set_addrmap(AS_IO, &crospang_state::sound_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(crospang_state, screen_update_crospang)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0, 40*8-1, 0, 30*8-1);
+	screen.set_screen_update(FUNC(crospang_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 0x300)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crospang)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x300);
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_crospang);
 
-
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(0)
-	MCFG_DECO_SPRITE_ISBOOTLEG(true)
-	MCFG_DECO_SPRITE_OFFSETS(5, 7)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(0);
+	m_sprgen->set_is_bootleg(true);
+	m_sprgen->set_offsets(5, 7);
+	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545MHz */
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'318'181)/4)); /* 3.579545MHz */
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(14'318'181)/16, okim6295_device::PIN7_HIGH) // 1.789772MHz or 0.894886MHz?? & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(14'318'181)/16, okim6295_device::PIN7_HIGH)); // 1.789772MHz or 0.894886MHz?? & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(crospang_state::bestri)
+void crospang_state::bestri(machine_config &config)
+{
 	crospang(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bestri_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &crospang_state::bestri_map);
+}
 
-MACHINE_CONFIG_START(crospang_state::bestria)
+void crospang_state::bestria(machine_config &config)
+{
 	crospang(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bestria_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &crospang_state::bestria_map);
+}
 
-MACHINE_CONFIG_START(crospang_state::pitapat)
+void crospang_state::pitapat(machine_config &config)
+{
 	crospang(config);
 
 	// can't be 14'318'181 / 2 as the inputs barely respond and the background graphics glitch badly when the screen fills, doesn't appear to be a vblank bit anywhere to negate this either, P12 reated part
-	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(14'318'181))
-	MCFG_DEVICE_PROGRAM_MAP(pitapat_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crospang_state,  irq6_line_hold)
+	M68000(config.replace(), m_maincpu, XTAL(14'318'181));
+	m_maincpu->set_addrmap(AS_PROGRAM, &crospang_state::pitapat_map);
+	m_maincpu->set_vblank_int("screen", FUNC(crospang_state::irq6_line_hold));
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pitapat_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &crospang_state::pitapat_map);
+}
 
 ROM_START( crospang ) /* Developed April 1998 */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68k */
@@ -747,34 +752,9 @@ ROM_START( pitapat )
 	ROM_LOAD16_BYTE( "ud17", 0x080001, 0x40000, CRC(d4c67e2e) SHA1(e684b58333d64f5961983b42f56c61bb0bea2e5c) )
 ROM_END
 
-void crospang_state::tumblepb_gfx1_rearrange()
-{
-	uint8_t *rom = memregion("gfx1")->base();
-	int len = memregion("gfx1")->bytes();
-	int i;
 
-	/* gfx data is in the wrong order */
-	for (i = 0; i < len; i++)
-	{
-		if ((i & 0x20) == 0)
-		{
-			int t = rom[i]; rom[i] = rom[i + 0x20]; rom[i + 0x20] = t;
-		}
-	}
-	/* low/high half are also swapped */
-	for (i = 0; i < len / 2; i++)
-	{
-		int t = rom[i]; rom[i] = rom[i + len / 2]; rom[i + len / 2] = t;
-	}
-}
-
-void crospang_state::init_crospang()
-{
-	tumblepb_gfx1_rearrange();
-}
-
-GAME( 1998, crospang, 0,      crospang, crospang, crospang_state, init_crospang, ROT0, "F2 System",         "Cross Pang", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, heuksun,  0,      crospang, heuksun,  crospang_state, init_crospang, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bestri,   0,      bestri,   bestri,   crospang_state, init_crospang, ROT0, "F2 System",         "Bestri (Korea, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bestria,  bestri, bestria,  bestri,   crospang_state, init_crospang, ROT0, "F2 System",         "Bestri (Korea, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, pitapat,  0,      pitapat,  pitapat,  crospang_state, init_crospang, ROT0, "F2 System",         "Pitapat Puzzle", MACHINE_SUPPORTS_SAVE ) // Test Mode calls it 'Puzzle Ball'
+GAME( 1998, crospang, 0,      crospang, crospang, crospang_state, empty_init, ROT0, "F2 System",         "Cross Pang", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, heuksun,  0,      crospang, heuksun,  crospang_state, empty_init, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bestri,   0,      bestri,   bestri,   crospang_state, empty_init, ROT0, "F2 System",         "Bestri (Korea, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bestria,  bestri, bestria,  bestri,   crospang_state, empty_init, ROT0, "F2 System",         "Bestri (Korea, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, pitapat,  0,      pitapat,  pitapat,  crospang_state, empty_init, ROT0, "F2 System",         "Pitapat Puzzle", MACHINE_SUPPORTS_SAVE ) // Test Mode calls it 'Puzzle Ball'

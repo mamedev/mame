@@ -44,84 +44,83 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(mrdo_state, mrdo)
+void mrdo_state::mrdo_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	constexpr int R1 = 150;
+	constexpr int R2 = 120;
+	constexpr int R3 = 100;
+	constexpr int R4 = 75;
+	constexpr int pull = 220;
+	constexpr float potadjust = 0.7f;   /* diode voltage drop */
 
-	const int R1 = 150;
-	const int R2 = 120;
-	const int R3 = 100;
-	const int R4 = 75;
-	const int pull = 220;
 	float pot[16];
 	int weight[16];
-	const float potadjust = 0.7f;   /* diode voltage drop */
-
-	for (i = 0x0f; i >= 0; i--)
+	for (int i = 0x0f; i >= 0; i--)
 	{
 		float par = 0;
 
-		if (i & 1) par += 1.0f/(float)R1;
-		if (i & 2) par += 1.0f/(float)R2;
-		if (i & 4) par += 1.0f/(float)R3;
-		if (i & 8) par += 1.0f/(float)R4;
+		if (i & 1) par += 1.0f / float(R1);
+		if (i & 2) par += 1.0f / float(R2);
+		if (i & 4) par += 1.0f / float(R3);
+		if (i & 8) par += 1.0f / float(R4);
 		if (par)
 		{
-			par = 1/par;
+			par = 1 / par;
 			pot[i] = pull/(pull+par) - potadjust;
 		}
-		else pot[i] = 0;
+		else
+			pot[i] = 0;
 
 		weight[i] = 0xff * pot[i] / pot[0x0f];
-		if (weight[i] < 0) weight[i] = 0;
+		if (weight[i] < 0)
+			weight[i] = 0;
 	}
 
-	for (i = 0; i < 0x100; i++)
+	const uint8_t *color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < 0x100; i++)
 	{
-		int a1,a2;
 		int bits0, bits2;
-		int r, g, b;
 
-		a1 = ((i >> 3) & 0x1c) + (i & 0x03) + 0x20;
-		a2 = ((i >> 0) & 0x1c) + (i & 0x03);
+		int const a1 = ((i >> 3) & 0x1c) + (i & 0x03) + 0x20;
+		int const a2 = ((i >> 0) & 0x1c) + (i & 0x03);
 
-		/* red component */
+		// red component
 		bits0 = (color_prom[a1] >> 0) & 0x03;
 		bits2 = (color_prom[a2] >> 0) & 0x03;
-		r = weight[bits0 + (bits2 << 2)];
+		int const r = weight[bits0 + (bits2 << 2)];
 
-		/* green component */
+		// green component
 		bits0 = (color_prom[a1] >> 2) & 0x03;
 		bits2 = (color_prom[a2] >> 2) & 0x03;
-		g = weight[bits0 + (bits2 << 2)];
+		int const g = weight[bits0 + (bits2 << 2)];
 
-		/* blue component */
+		// blue component
 		bits0 = (color_prom[a1] >> 4) & 0x03;
 		bits2 = (color_prom[a2] >> 4) & 0x03;
-		b = weight[bits0 + (bits2 << 2)];
+		int const b = weight[bits0 + (bits2 << 2)];
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x40;
 
-	/* characters */
-	for (i = 0; i < 0x100; i++)
+	// characters
+	for (int i = 0; i < 0x100; i++)
 		palette.set_pen_indirect(i, i);
 
-	/* sprites */
-	for (i = 0x100; i < 0x140; i++)
+	// sprites
+	for (int i = 0; i < 0x40; i++)
 	{
-		uint8_t ctabentry = color_prom[(i - 0x100) & 0x1f];
+		uint8_t ctabentry = color_prom[i & 0x1f];
 
-		if ((i - 0x100) & 0x20)
-			ctabentry >>= 4;        /* high 4 bits are for sprite color n + 8 */
+		if (i & 0x20)
+			ctabentry >>= 4;    // high 4 bits are for sprite color n + 8
 		else
-			ctabentry &= 0x0f;  /* low 4 bits are for sprite color n */
+			ctabentry &= 0x0f;  // low 4 bits are for sprite color n
 
-		palette.set_pen_indirect(i, ctabentry + ((ctabentry & 0x0c) << 3));
+		palette.set_pen_indirect(i + 0x100, ctabentry + ((ctabentry & 0x0c) << 3));
 	}
 }
 

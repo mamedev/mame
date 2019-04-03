@@ -614,7 +614,7 @@ uint32_t norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind1
 }
 
 
-PALETTE_INIT_MEMBER(norautp_state, norautp)
+void norautp_state::norautp_palette(palette_device &palette) const
 {
 	/* 1st gfx bank */
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0xff));    /* blue */
@@ -1240,12 +1240,12 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(norautp_state::noraut_base)
-
+void norautp_state::noraut_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, NORAUT_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(norautp_map)
-	MCFG_DEVICE_IO_MAP(norautp_portmap)
+	Z80(config, m_maincpu, NORAUT_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::norautp_map);
+	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   /* doesn't work if placed at derivative drivers */
 
@@ -1271,198 +1271,181 @@ MACHINE_CONFIG_START(norautp_state::noraut_base)
 	 Port C as hshk regs, and P0-P2 as input (norautp, norautjp) or output (other sets). */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(2*16, 31*16-1, (0*16) + 8, 16*16-1)    /* the hardware clips the top 8 pixels */
-	MCFG_SCREEN_UPDATE_DRIVER(norautp_state, screen_update_norautp)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*16, 32*16);
+	m_screen->set_visarea(2*16, 31*16-1, (0*16) + 8, 16*16-1);    /* the hardware clips the top 8 pixels */
+	m_screen->set_screen_update(FUNC(norautp_state::screen_update_norautp));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_norautp)
-
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(norautp_state, norautp)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_norautp);
+	PALETTE(config, m_palette, FUNC(norautp_state::norautp_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("discrete", DISCRETE, norautp_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, norautp_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(norautp_state::norautp)
+void norautp_state::norautp(machine_config &config)
+{
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
-MACHINE_CONFIG_END
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+}
 
-
-MACHINE_CONFIG_START(norautp_state::norautpl)
+void norautp_state::norautpl(machine_config &config)
+{
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("discrete")
-	MCFG_DISCRETE_INTF(kimble_discrete)
-MACHINE_CONFIG_END
+	m_discrete->set_intf(kimble_discrete);
+}
 
-
-MACHINE_CONFIG_START(norautp_state::norautxp)
+void norautp_state::norautxp(machine_config &config)
+{
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(norautxp_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::norautxp_map);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+}
 
-
-MACHINE_CONFIG_START(norautp_state::nortest1)
+void norautp_state::nortest1(machine_config &config)
+{
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nortest1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::nortest1_map);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+}
 
-
-MACHINE_CONFIG_START(norautp_state::norautx4)
+void norautp_state::norautx4(machine_config &config)
+{
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(norautx4_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
-MACHINE_CONFIG_END
-
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::norautx4_map);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+}
 
 #ifdef UNUSED_CODE
-static MACHINE_CONFIG_START( norautx8 )
+void norautp_state::norautx8(machine_config &config)
+{
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(norautx8_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::norautx8_map);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+}
 #endif
 
-
-MACHINE_CONFIG_START(norautp_state::kimble)
+void norautp_state::kimble(machine_config &config)
+{
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(kimble_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::kimble_map);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("discrete")
-	MCFG_DISCRETE_INTF(kimble_discrete)
-MACHINE_CONFIG_END
+	m_discrete->set_intf(kimble_discrete);
+}
 
-MACHINE_CONFIG_START(norautp_state::newhilop)
+void norautp_state::newhilop(machine_config &config)
+{
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(newhilop_map)
-//  MCFG_DEVICE_IO_MAP(newhilop_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::newhilop_map);
+//  m_maincpu->set_addrmap(AS_IO, &norautp_state::newhilop_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+}
 
 /********** 8080 based **********/
 
-
-MACHINE_CONFIG_START(norautp_state::dphl)
+void norautp_state::dphl(machine_config &config)
+{
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(dphl_map)
-	MCFG_DEVICE_IO_MAP(norautp_portmap)
+	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::dphl_map);
+	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("discrete")
-	MCFG_DISCRETE_INTF(dphl_discrete)
-MACHINE_CONFIG_END
+	m_discrete->set_intf(dphl_discrete);
+}
 
-
-MACHINE_CONFIG_START(norautp_state::dphla)
+void norautp_state::dphla(machine_config &config)
+{
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(dphla_map)
-	MCFG_DEVICE_IO_MAP(norautp_portmap)
+	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::dphla_map);
+	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("discrete")
-	MCFG_DISCRETE_INTF(dphl_discrete)
-MACHINE_CONFIG_END
+	m_discrete->set_intf(dphl_discrete);
+}
 
-
-MACHINE_CONFIG_START(norautp_state::kimbldhl)
+void norautp_state::kimbldhl(machine_config &config)
+{
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(kimbldhl_map)
-	MCFG_DEVICE_IO_MAP(norautp_portmap)
+	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::kimbldhl_map);
+	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("discrete")
-	MCFG_DISCRETE_INTF(kimble_discrete)
-MACHINE_CONFIG_END
+	m_discrete->set_intf(kimble_discrete);
+}
 
-
-MACHINE_CONFIG_START(norautp_state::dphltest)
+void norautp_state::dphltest(machine_config &config)
+{
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(dphltest_map)
-	MCFG_DEVICE_IO_MAP(norautp_portmap)
+	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::dphltest_map);
+	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("discrete")
-	MCFG_DISCRETE_INTF(dphl_discrete)
-MACHINE_CONFIG_END
+	m_discrete->set_intf(dphl_discrete);
+}
 
-
-MACHINE_CONFIG_START(norautp_state::drhl)
+void norautp_state::drhl(machine_config &config)
+{
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(drhl_map)
-	MCFG_DEVICE_IO_MAP(norautp_portmap)
+	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::drhl_map);
+	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("discrete")
-	MCFG_DISCRETE_INTF(dphl_discrete)
-MACHINE_CONFIG_END
+	m_discrete->set_intf(dphl_discrete);
+}
 
-
-MACHINE_CONFIG_START(norautp_state::ssjkrpkr)
+void norautp_state::ssjkrpkr(machine_config &config)
+{
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(ssjkrpkr_map)
-	MCFG_DEVICE_IO_MAP(norautp_portmap)
+	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::ssjkrpkr_map);
+	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("discrete")
-	MCFG_DISCRETE_INTF(dphl_discrete)
-MACHINE_CONFIG_END
+	m_discrete->set_intf(dphl_discrete);
+}
 
 
 /*************************

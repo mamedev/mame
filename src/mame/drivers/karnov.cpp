@@ -766,34 +766,35 @@ void karnov_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(karnov_state::karnov)
-
+void karnov_state::karnov(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(karnov_map)
+	M68000(config, m_maincpu, 10000000);    /* 10 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)    /* Accurate */
-	MCFG_DEVICE_PROGRAM_MAP(karnov_sound_map)
-
+	M6502(config, m_audiocpu, 1500000);     /* Accurate */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_sound_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(karnov_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, karnov_state, vbint_w))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(karnov_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(karnov_state::vbint_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_karnov)
-	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_karnov);
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
+	m_palette->set_prom_region("proms");
+	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
 
-	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(2)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen, 0);
+	m_spritegen->set_gfx_region(2);
+	m_spritegen->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,karnov)
 
@@ -803,28 +804,27 @@ MACHINE_CONFIG_START(karnov_state::karnov)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
+	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
+	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(karnov_state::karnovjbl)
+void karnov_state::karnovjbl(machine_config &config)
+{
 	karnov(config);
 	/* X-TALs:
 	Top board next to #9 is 20.000 MHz
 	Top board next to the microcontroller is 6.000 MHz
 	Bottom board next to the ribbon cable is 12.000 MHz*/
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(karnovjbl_sound_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &karnov_state::karnovjbl_sound_map);
 
-	MCFG_DEVICE_REPLACE("ym2", YM3812, 3000000)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-MACHINE_CONFIG_END
+	ym3812_device &ym2(YM3812(config.replace(), "ym2", 3000000));
+	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
+	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 void karnov_state::chelnovjbl_mcu_map(address_map &map)
 {
@@ -832,45 +832,46 @@ void karnov_state::chelnovjbl_mcu_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(karnov_state::chelnovjbl)
+void karnov_state::chelnovjbl(machine_config &config)
+{
 	karnov(config);
-	MCFG_DEVICE_ADD("mcu", I8031, 2000000) // ??mhz
-	MCFG_DEVICE_PROGRAM_MAP(chelnovjbl_mcu_map)
-//  MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, karnov_state, p1_r))
-//  MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, karnov_state, p1_w))
-//  MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, karnov_state, p3_r))
-//  MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, karnov_state, p3_w))
-MACHINE_CONFIG_END
+	i8031_device &mcu(I8031(config, "mcu", 2000000)); // ??mhz
+	mcu.set_addrmap(AS_PROGRAM, &karnov_state::chelnovjbl_mcu_map);
+//  mcu.port_in_cb<1>().set(FUNC(karnov_state::p1_r));
+//  mcu.port_out_cb<1>().set(FUNC(karnov_state::p1_w));
+//  mcu.port_in_cb<3>().set(FUNC(karnov_state::p3_r));
+//  mcu.port_out_cb<3>().set(FUNC(karnov_state::p3_w));
+}
 
-
-
-MACHINE_CONFIG_START(karnov_state::wndrplnt)
-
+void karnov_state::wndrplnt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(karnov_map)
+	M68000(config, m_maincpu, 10000000);   /* 10 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)    /* Accurate */
-	MCFG_DEVICE_PROGRAM_MAP(karnov_sound_map)
+	M6502(config, m_audiocpu, 1500000);    /* Accurate */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_sound_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(karnov_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, karnov_state, vbint_w))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(karnov_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(karnov_state::vbint_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_karnov)
-	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_karnov);
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
+	m_palette->set_prom_region("proms");
+	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
 
-	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(2)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen, 0);
+	m_spritegen->set_gfx_region(2);
+	m_spritegen->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,wndrplnt)
 
@@ -880,13 +881,13 @@ MACHINE_CONFIG_START(karnov_state::wndrplnt)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
+	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
+	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*************************************

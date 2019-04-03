@@ -28,18 +28,18 @@ protected:
 	virtual void speedup_addon_bios_access() override;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
+	virtual uint8_t chip_read(offs_t offset) override;
+	virtual void chip_write(offs_t offset, uint8_t data) override;
 
-	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
-	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
+	uint32_t necdsp_prg_r(offs_t offset);
+	uint16_t necdsp_data_r(offs_t offset);
 
 	void dsp_data_map_lorom(address_map &map);
 	void dsp_prg_map_lorom(address_map &map);
 
-private:
 	required_device<upd7725_device> m_upd7725;
 
+private:
 	std::vector<uint32_t> m_dsp_prg;
 	std::vector<uint16_t> m_dsp_data;
 };
@@ -62,18 +62,18 @@ protected:
 	virtual void speedup_addon_bios_access() override;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
+	virtual uint8_t chip_read(offs_t offset) override;
+	virtual void chip_write(offs_t offset, uint8_t data) override;
 
-	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
-	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
+	uint32_t necdsp_prg_r(offs_t offset);
+	uint16_t necdsp_data_r(offs_t offset);
 
 	void dsp_data_map_hirom(address_map &map);
 	void dsp_prg_map_hirom(address_map &map);
 
-private:
 	required_device<upd7725_device> m_upd7725;
 
+private:
 	std::vector<uint32_t> m_dsp_prg;
 	std::vector<uint16_t> m_dsp_data;
 };
@@ -93,18 +93,18 @@ protected:
 	virtual void device_start() override;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
+	virtual uint8_t chip_read(offs_t offset) override;
+	virtual void chip_write(offs_t offset, uint8_t data) override;
 
-	virtual DECLARE_READ32_MEMBER(setadsp_prg_r);
-	virtual DECLARE_READ16_MEMBER(setadsp_data_r);
+	virtual uint32_t setadsp_prg_r(offs_t offset);
+	virtual uint16_t setadsp_data_r(offs_t offset);
 
 	void st01x_data_map(address_map &map);
 	void st01x_prg_map(address_map &map);
 
-private:
 	required_device<upd96050_device> m_upd96050;
 
+private:
 	std::vector<uint32_t> m_dsp_prg;
 	std::vector<uint16_t> m_dsp_data;
 };

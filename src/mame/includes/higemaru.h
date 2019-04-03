@@ -41,7 +41,7 @@ private:
 	DECLARE_WRITE8_MEMBER(higemaru_c800_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(higemaru);
+	void higemaru_palette(palette_device &palette) const;
 	uint32_t screen_update_higemaru(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(higemaru_scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

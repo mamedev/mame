@@ -85,7 +85,7 @@ private:
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(wiz);
+	void wiz_palette(palette_device &palette) const;
 	uint32_t screen_update_wiz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stinger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kungfut(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

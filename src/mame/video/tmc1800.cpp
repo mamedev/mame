@@ -46,13 +46,14 @@ void tmc1800_state::tmc1800_video(machine_config &config)
 	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 }
 
-MACHINE_CONFIG_START(osc1000b_state::osc1000b_video)
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(osc1000b_state, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(320, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 199)
-MACHINE_CONFIG_END
+void osc1000b_state::osc1000b_video(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(osc1000b_state::screen_update));
+	screen.set_refresh_hz(50);
+	screen.set_size(320, 200);
+	screen.set_visarea(0, 319, 0, 199);
+}
 
 void tmc2000_state::tmc2000_video(machine_config &config)
 {

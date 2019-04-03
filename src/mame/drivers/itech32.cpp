@@ -15,8 +15,8 @@
         * Pairs (4 sets)
         * Pairs Redemption (Child's version of pairs)
         * Driver's Edge (1 set)
-        * World Class Bowling (13 sets)
-        * Street Fighter: The Movie (4 sets)
+        * World Class Bowling (14 sets)
+        * Street Fighter: The Movie (5 sets)
         * Shuffleshot (3 sets)
         * Golden Tee 3D Golf (12 sets)
         * Golden Tee Golf '97 (7 sets)
@@ -403,7 +403,7 @@ WRITE_LINE_MEMBER(itech32_state::generate_int1)
 }
 
 
-WRITE16_MEMBER(itech32_state::int1_ack_w)
+void itech32_state::int1_ack_w(u16 data)
 {
 	update_interrupts(0, -1, -1);
 }
@@ -418,7 +418,7 @@ WRITE16_MEMBER(itech32_state::int1_ack_w)
 
 void itech32_state::machine_start()
 {
-	membank("soundbank")->configure_entries(0, 256, memregion("soundcpu")->base() + 0x10000, 0x4000);
+	m_soundbank->configure_entries(0, 256, memregion("soundcpu")->base() + 0x10000, 0x4000);
 	m_irq_base = 0;
 
 	save_item(NAME(m_vint_state));
@@ -461,14 +461,27 @@ void drivedge_state::machine_reset()
 {
 	itech32_state::machine_reset();
 
-	m_dsp1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp[0]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp[1]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	STOP_TMS_SPINNING(machine(), 0);
 	STOP_TMS_SPINNING(machine(), 1);
 
 	m_irq_base = 2;
 }
 
+
+/*************************************
+ *
+ *  Color latches
+ *
+ *************************************/
+
+
+template<unsigned Layer>
+void itech32_state::color_w(u8 data)
+{
+	m_color_latch[Layer] = (data & 0x7f) << 8;
+}
 
 
 /*************************************
@@ -486,7 +499,7 @@ CUSTOM_INPUT_MEMBER(itech32_state::special_port_r)
 	return m_special_result;
 }
 
-READ16_MEMBER(itech32_state::trackball_r)
+u8 itech32_state::trackball_r()
 {
 	int lower = ioport("TRACKX1")->read();
 	int upper = ioport("TRACKY1")->read();
@@ -494,7 +507,7 @@ READ16_MEMBER(itech32_state::trackball_r)
 	return (lower & 15) | ((upper & 15) << 4);
 }
 
-READ16_MEMBER(itech32_state::trackball_p2_r)
+u8 itech32_state::trackball_p2_r()
 {
 	int lower = ioport("TRACKX2")->read();
 	int upper = ioport("TRACKY2")->read();
@@ -503,7 +516,7 @@ READ16_MEMBER(itech32_state::trackball_p2_r)
 }
 
 
-READ32_MEMBER(itech32_state::trackball32_8bit_r)
+u16 itech32_state::trackball_8bit_r()
 {
 	int lower = ioport("TRACKX1")->read();
 	int upper = ioport("TRACKY1")->read();
@@ -512,7 +525,7 @@ READ32_MEMBER(itech32_state::trackball32_8bit_r)
 }
 
 
-READ32_MEMBER(itech32_state::trackball32_4bit_p1_r)
+u32 itech32_state::trackball32_4bit_p1_r()
 {
 	attotime curtime = machine().time();
 
@@ -548,7 +561,7 @@ READ32_MEMBER(itech32_state::trackball32_4bit_p1_r)
 }
 
 
-READ32_MEMBER(itech32_state::trackball32_4bit_p2_r)
+u32 itech32_state::trackball32_4bit_p2_r()
 {
 	attotime curtime = machine().time();
 
@@ -584,24 +597,24 @@ READ32_MEMBER(itech32_state::trackball32_4bit_p2_r)
 }
 
 
-READ32_MEMBER(itech32_state::trackball32_4bit_combined_r)
+u32 itech32_state::trackball32_4bit_combined_r()
 {
-	return trackball32_4bit_p1_r(space, offset, mem_mask) |
-			(trackball32_4bit_p2_r(space, offset, mem_mask) << 8);
+	return trackball32_4bit_p1_r() |
+			(trackball32_4bit_p2_r() << 8);
 }
 
 
-READ32_MEMBER(drivedge_state::steering_r)
+u16 drivedge_state::steering_r()
 {
 	int val = m_steer->read() * 2 - 0x100;
 	if (val < 0) val = 0x100 | (-val);
-	return val << 16;
+	return val;
 }
 
 
-READ32_MEMBER(drivedge_state::gas_r)
+u16 drivedge_state::gas_r()
 {
-	return m_gas->read() << 16;
+	return m_gas->read();
 }
 
 
@@ -611,27 +624,27 @@ READ32_MEMBER(drivedge_state::gas_r)
  *
  *************************************/
 
-READ16_MEMBER(itech32_state::wcbowl_prot_result_r)
+u16 itech32_state::wcbowl_prot_result_r()
 {
 	return m_main_ram[0x111d/2];
 }
 
 
-READ32_MEMBER(itech32_state::itech020_prot_result_r)
+u8 itech32_state::itech020_prot_result_r()
 {
-	uint32_t result = ((uint32_t *)m_main_ram.target())[m_itech020_prot_address >> 2];
+	u32 result = ((u32 *)m_main_ram.target())[m_itech020_prot_address >> 2];
 	result >>= (~m_itech020_prot_address & 3) * 8;
-	return (result & 0xff) << 8;
+	return result & 0xff;
 }
 
 
-READ32_MEMBER(itech32_state::gt2kp_prot_result_r)
+u32 itech32_state::gt2kp_prot_result_r()
 {
 	return 0x00010000;  /* 32 bit value at 680000 to 680003 will return the needed value of 0x01 */
 }
 
 
-READ32_MEMBER(itech32_state::gtclass_prot_result_r)
+u32 itech32_state::gtclass_prot_result_r()
 {
 	return 0x00008000;  /* 32 bit value at 680000 to 680003 will return the needed value of 0x80 */
 }
@@ -644,9 +657,9 @@ READ32_MEMBER(itech32_state::gtclass_prot_result_r)
  *
  *************************************/
 
-WRITE8_MEMBER(itech32_state::sound_bank_w)
+void itech32_state::sound_bank_w(u8 data)
 {
-	membank("soundbank")->set_entry(data);
+	m_soundbank->set_entry(data);
 }
 
 
@@ -665,27 +678,19 @@ TIMER_CALLBACK_MEMBER(itech32_state::delayed_sound_data_w)
 }
 
 
-WRITE16_MEMBER(itech32_state::sound_data_w)
+void itech32_state::sound_data_w(u8 data)
 {
-	if (ACCESSING_BITS_0_7)
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(itech32_state::delayed_sound_data_w),this), data & 0xff);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(itech32_state::delayed_sound_data_w),this), data & 0xff);
 }
 
 
-READ32_MEMBER(itech32_state::sound_data32_r)
+u8 itech32_state::sound_return_r()
 {
-	return m_sound_return << 16;
+	return m_sound_return;
 }
 
 
-WRITE32_MEMBER(itech32_state::sound_data32_w)
-{
-	if (ACCESSING_BITS_16_23)
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(itech32_state::delayed_sound_data_w),this), (data >> 16) & 0xff);
-}
-
-
-READ8_MEMBER(itech32_state::sound_data_r)
+u8 itech32_state::sound_data_r()
 {
 	m_soundcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	m_sound_int_state = 0;
@@ -693,13 +698,13 @@ READ8_MEMBER(itech32_state::sound_data_r)
 }
 
 
-WRITE8_MEMBER(itech32_state::sound_return_w)
+void itech32_state::sound_return_w(u8 data)
 {
 	m_sound_return = data;
 }
 
 
-READ8_MEMBER(itech32_state::sound_data_buffer_r)
+u8 itech32_state::sound_data_buffer_r()
 {
 	return 0;
 }
@@ -712,7 +717,7 @@ READ8_MEMBER(itech32_state::sound_data_buffer_r)
  *
  *************************************/
 
-WRITE8_MEMBER(drivedge_state::portb_out)
+void drivedge_state::portb_out(u8 data)
 {
 //  logerror("PIA port B write = %02x\n", data);
 
@@ -736,7 +741,7 @@ WRITE_LINE_MEMBER(drivedge_state::turbo_light)
 }
 
 
-WRITE8_MEMBER(itech32_state::pia_portb_out)
+void itech32_state::pia_portb_out(u8 data)
 {
 //  logerror("PIA port B write = %02x\n", data);
 
@@ -755,7 +760,7 @@ WRITE8_MEMBER(itech32_state::pia_portb_out)
  *
  *************************************/
 
-WRITE8_MEMBER(itech32_state::firq_clear_w)
+void itech32_state::firq_clear_w(u8 data)
 {
 	m_soundcpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
@@ -770,8 +775,8 @@ WRITE8_MEMBER(itech32_state::firq_clear_w)
 
 WRITE32_MEMBER(drivedge_state::tms_reset_assert_w)
 {
-	m_dsp1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp[0]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp[1]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -780,12 +785,12 @@ WRITE32_MEMBER(drivedge_state::tms_reset_clear_w)
 	/* kludge to prevent crash on first boot */
 	if ((m_tms1_ram[0] & 0xff000000) == 0)
 	{
-		m_dsp1->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_dsp[0]->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		STOP_TMS_SPINNING(machine(), 0);
 	}
 	if ((m_tms2_ram[0] & 0xff000000) == 0)
 	{
-		m_dsp2->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_dsp[1]->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		STOP_TMS_SPINNING(machine(), 1);
 	}
 }
@@ -826,30 +831,16 @@ WRITE32_MEMBER(drivedge_state::tms2_trigger_w)
 
 READ32_MEMBER(drivedge_state::tms1_speedup_r)
 {
-	if (m_tms1_ram[0x382] == 0 && m_dsp1->pc() == 0xee) START_TMS_SPINNING(0);
+	if (m_tms1_ram[0x382] == 0 && m_dsp[0]->pc() == 0xee) START_TMS_SPINNING(0);
 	return m_tms1_ram[0x382];
 }
 
 
 READ32_MEMBER(drivedge_state::tms2_speedup_r)
 {
-	if (m_tms2_ram[0x382] == 0 && m_dsp2->pc() == 0x809808) START_TMS_SPINNING(1);
+	if (m_tms2_ram[0x382] == 0 && m_dsp[1]->pc() == 0x809808) START_TMS_SPINNING(1);
 	return m_tms2_ram[0x382];
 }
-
-
-
-/*************************************
- *
- *  32-bit shunts
- *
- *************************************/
-
-WRITE32_MEMBER(itech32_state::int1_ack32_w)
-{
-	int1_ack_w(space, offset, data, mem_mask);
-}
-
 
 
 /*************************************
@@ -863,7 +854,7 @@ void itech32_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 	// if nvram is the main RAM, don't overwrite exception vectors
 	int start = (base == m_main_ram) ? 0x80 : 0x00;
 	for (int i = start; i < length; i++)
-		((uint8_t *)base)[i] = machine().rand();
+		((u8 *)base)[i] = machine().rand();
 }
 
 void drivedge_state::nvram_init(nvram_device &nvram, void *base, size_t length)
@@ -871,7 +862,7 @@ void drivedge_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 	itech32_state::nvram_init(nvram, base, length);
 
 	// due to accessing uninitialized RAM, we need this hack
-	((uint32_t *)m_main_ram.target())[0x2ce4/4] = 0x0000001e;
+	((u32 *)m_main_ram.target())[0x2ce4/4] = 0x0000001e;
 }
 
 /*************************************
@@ -886,13 +877,14 @@ void itech32_state::timekill_map(address_map &map)
 	map(0x000000, 0x003fff).ram().share("nvram");
 	map(0x040000, 0x040001).portr("P1");
 	map(0x048000, 0x048001).portr("P2");
-	map(0x050000, 0x050001).portr("SYSTEM").w(FUNC(itech32_state::timekill_intensity_w));
+	map(0x050000, 0x050001).portr("SYSTEM");
+	map(0x050001, 0x050001).w(FUNC(itech32_state::timekill_intensity_w));
 	map(0x058000, 0x058001).portr("DIPS").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x060000, 0x060001).w(FUNC(itech32_state::timekill_colora_w));
-	map(0x068000, 0x068001).w(FUNC(itech32_state::timekill_colorbc_w));
+	map(0x060001, 0x060001).w(FUNC(itech32_state::timekill_colora_w));
+	map(0x068001, 0x068001).w(FUNC(itech32_state::timekill_colorbc_w));
 	map(0x070000, 0x070001).nopw();    /* noisy */
-	map(0x078000, 0x078001).w(FUNC(itech32_state::sound_data_w));
-	map(0x080000, 0x08007f).rw(FUNC(itech32_state::itech32_video_r), FUNC(itech32_state::itech32_video_w)).share("video");
+	map(0x078001, 0x078001).w(FUNC(itech32_state::sound_data_w));
+	map(0x080000, 0x08007f).rw(FUNC(itech32_state::video_r), FUNC(itech32_state::video_w)).share("video");
 	map(0x0a0000, 0x0a0001).w(FUNC(itech32_state::int1_ack_w));
 	map(0x0c0000, 0x0c7fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x100000, 0x17ffff).rom().region("user1", 0).share("main_rom");
@@ -908,13 +900,13 @@ void itech32_state::bloodstm_map(address_map &map)
 	map(0x180000, 0x180001).portr("P3");
 	map(0x200000, 0x200001).portr("P4").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x280000, 0x280001).portr("DIPS");
-	map(0x300000, 0x300001).w(FUNC(itech32_state::bloodstm_color1_w));
-	map(0x380000, 0x380001).w(FUNC(itech32_state::bloodstm_color2_w));
+	map(0x300001, 0x300001).w(FUNC(itech32_state::color_w<0>));
+	map(0x380001, 0x380001).w(FUNC(itech32_state::color_w<1>));
 	map(0x400000, 0x400001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x480000, 0x480001).w(FUNC(itech32_state::sound_data_w));
+	map(0x480001, 0x480001).w(FUNC(itech32_state::sound_data_w));
 	map(0x500000, 0x5000ff).rw(FUNC(itech32_state::bloodstm_video_r), FUNC(itech32_state::bloodstm_video_w)).share("video");
 	map(0x580000, 0x59ffff).ram().w(FUNC(itech32_state::bloodstm_paletteram_w)).share("palette");
-	map(0x700000, 0x700001).w(FUNC(itech32_state::bloodstm_plane_w));
+	map(0x700001, 0x700001).w(FUNC(itech32_state::bloodstm_plane_w));
 	map(0x780000, 0x780001).portr("EXTRA");
 	map(0x800000, 0x87ffff).mirror(0x780000).rom().region("user1", 0).share("main_rom");
 }
@@ -930,7 +922,7 @@ READ32_MEMBER(itech32_state::test1_r)
 	if (ACCESSING_BITS_16_23 && !m_written[0x100 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+1);
 	if (ACCESSING_BITS_8_15 && !m_written[0x100 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+2);
 	if (ACCESSING_BITS_0_7 && !m_written[0x100 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+3);
-	return ((uint32_t *)m_main_ram)[0x100/4 + offset];
+	return ((u32 *)m_main_ram)[0x100/4 + offset];
 }
 
 WRITE32_MEMBER(itech32_state::test1_w)
@@ -939,7 +931,7 @@ WRITE32_MEMBER(itech32_state::test1_w)
 	if (ACCESSING_BITS_16_23) m_written[0x100 + offset*4+1] = 1;
 	if (ACCESSING_BITS_8_15) m_written[0x100 + offset*4+2] = 1;
 	if (ACCESSING_BITS_0_7) m_written[0x100 + offset*4+3] = 1;
-	COMBINE_DATA(&((uint32_t *)m_main_ram)[0x100/4 + offset]);
+	COMBINE_DATA(&((u32 *)m_main_ram)[0x100/4 + offset]);
 }
 
 READ32_MEMBER(itech32_state::test2_r)
@@ -948,7 +940,7 @@ READ32_MEMBER(itech32_state::test2_r)
 	if (ACCESSING_BITS_16_23 && !m_written[0xc00 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+1);
 	if (ACCESSING_BITS_8_15 && !m_written[0xc00 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+2);
 	if (ACCESSING_BITS_0_7 && !m_written[0xc00 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+3);
-	return ((uint32_t *)m_main_ram)[0xc00/4 + offset];
+	return ((u32 *)m_main_ram)[0xc00/4 + offset];
 }
 
 WRITE32_MEMBER(itech32_state::test2_w)
@@ -957,7 +949,7 @@ WRITE32_MEMBER(itech32_state::test2_w)
 	if (ACCESSING_BITS_16_23) m_written[0xc00 + offset*4+1] = 1;
 	if (ACCESSING_BITS_8_15) m_written[0xc00 + offset*4+2] = 1;
 	if (ACCESSING_BITS_0_7) m_written[0xc00 + offset*4+3] = 1;
-	COMBINE_DATA(&((uint32_t *)m_main_ram)[0xc00/4 + offset]);
+	COMBINE_DATA(&((u32 *)m_main_ram)[0xc00/4 + offset]);
 }
 #endif
 
@@ -970,17 +962,18 @@ map(0x000c00, 0x007fff).mirror(0x40000).rw(FUNC(itech32_state::test2_r), FUNC(it
 #endif
 	map(0x080000, 0x080003).portr("80000");
 	map(0x082000, 0x082003).portr("82000");
-	map(0x084000, 0x084003).rw(FUNC(drivedge_state::sound_data32_r), FUNC(drivedge_state::sound_data32_w));
+	map(0x084001, 0x084001).rw(FUNC(drivedge_state::sound_return_r), FUNC(drivedge_state::sound_data_w));
 //  AM_RANGE(0x086000, 0x08623f) AM_RAM -- networking -- first 0x40 bytes = our data, next 0x40*8 bytes = their data, r/w on IRQ2
-	map(0x088000, 0x088003).r(FUNC(drivedge_state::steering_r));
-	map(0x08a000, 0x08a003).r(FUNC(drivedge_state::gas_r)).nopw();
+	map(0x088000, 0x088001).r(FUNC(drivedge_state::steering_r));
+	map(0x08a000, 0x08a001).r(FUNC(drivedge_state::gas_r));
+	map(0x08a000, 0x08a003).nopw();
 	map(0x08c000, 0x08c003).portr("8c000");
 	map(0x08e000, 0x08e003).portr("8e000").nopw();
 	map(0x100000, 0x10000f).w(FUNC(drivedge_state::zbuf_control_w)).share("zctl");
-	map(0x180000, 0x180003).w(FUNC(drivedge_state::color0_w));
+	map(0x180001, 0x180001).w(FUNC(drivedge_state::color_w<0>));
 	map(0x1a0000, 0x1bffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x1c0000, 0x1c0003).nopw();
-	map(0x1e0000, 0x1e0113).rw(FUNC(drivedge_state::itech020_video_r), FUNC(drivedge_state::itech020_video_w)).share("video");
+	map(0x1e0000, 0x1e0113).rw(FUNC(drivedge_state::bloodstm_video_r), FUNC(drivedge_state::bloodstm_video_w)).share("video");
 	map(0x1e4000, 0x1e4003).w(FUNC(drivedge_state::tms_reset_assert_w));
 	map(0x1ec000, 0x1ec003).w(FUNC(drivedge_state::tms_reset_clear_w));
 	map(0x200000, 0x200003).portr("200000");
@@ -1008,23 +1001,24 @@ void drivedge_state::tms2_map(address_map &map)
 void itech32_state::itech020_map(address_map &map)
 {
 	map(0x000000, 0x007fff).ram().share("main_ram");
-	map(0x080000, 0x080003).portr("P1").w(FUNC(itech32_state::int1_ack32_w));
+	map(0x080000, 0x080003).portr("P1").w(FUNC(itech32_state::int1_ack_w));
 	map(0x100000, 0x100003).portr("P2");
 	map(0x180000, 0x180003).portr("P3");
 	map(0x200000, 0x200003).portr("P4");
 	map(0x280000, 0x280003).portr("DIPS");
-	map(0x300000, 0x300003).w(FUNC(itech32_state::itech020_color1_w));
-	map(0x380000, 0x380003).w(FUNC(itech32_state::itech020_color2_w));
+	map(0x300003, 0x300003).w(FUNC(itech32_state::color_w<1>));
+	map(0x380003, 0x380003).w(FUNC(itech32_state::color_w<0>));
 	map(0x400000, 0x400003).w("watchdog", FUNC(watchdog_timer_device::reset32_w));
-	map(0x480000, 0x480003).w(FUNC(itech32_state::sound_data32_w));
-	map(0x500000, 0x5000ff).rw(FUNC(itech32_state::itech020_video_r), FUNC(itech32_state::itech020_video_w)).share("video");
+	map(0x480001, 0x480001).w(FUNC(itech32_state::sound_data_w));
+	map(0x500000, 0x5000ff).rw(FUNC(itech32_state::bloodstm_video_r), FUNC(itech32_state::bloodstm_video_w)).share("video");
 	map(0x578000, 0x57ffff).nopr();             /* touched by protection */
 	map(0x580000, 0x59ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x600000, 0x603fff).ram().share("nvram");
 /* ? */ map(0x61ff00, 0x61ffff).nopw();            /* Unknown Writes */
-	map(0x680000, 0x680003).r(FUNC(itech32_state::itech020_prot_result_r)).nopw();
+	map(0x680002, 0x680002).r(FUNC(itech32_state::itech020_prot_result_r));
+	map(0x680000, 0x680003).nopw();
 /* ! */ map(0x680800, 0x68083f).readonly().nopw(); /* Serial DUART Channel A/B & Top LED sign - To Do! */
-	map(0x700000, 0x700003).w(FUNC(itech32_state::itech020_plane_w));
+	map(0x700002, 0x700002).w(FUNC(itech32_state::itech020_plane_w));
 	map(0x800000, 0xbfffff).rom().region("user1", 0).share("main_rom");
 }
 
@@ -1668,7 +1662,7 @@ INPUT_PORTS_END
 
 void itech32_state::base_devices(machine_config &config)
 {
-	MC6809(config, m_soundcpu, SOUND_CLOCK/2);
+	MC6809E(config, m_soundcpu, SOUND_CLOCK/8); // EF68B09EP
 	m_soundcpu->set_addrmap(AS_PROGRAM, &itech32_state::sound_map);
 
 	nvram_device &nvram(NVRAM(config, "nvram"));
@@ -1678,14 +1672,13 @@ void itech32_state::base_devices(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	PALETTE(config, m_palette, 8192);
-	m_palette->set_format(PALETTE_FORMAT_GRBX);
+	PALETTE(config, m_palette).set_format(palette_device::GRBx_888, 8192);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(VIDEO_CLOCK, 508, 0, 384, 262, 0, 240); // most games configure the screen this way
 //  m_screen->set_raw(VIDEO_CLOCK, 508, 0, 384, 286, 0, 256); // sftm, wcbowl and shufshot configure it this way
-	m_screen->set_screen_update(FUNC(itech32_state::screen_update_itech32));
+	m_screen->set_screen_update(FUNC(itech32_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(itech32_state::generate_int1));
 
@@ -1725,8 +1718,7 @@ void itech32_state::bloodstm(machine_config &config)
 
 	base_devices(config);
 
-	m_palette->set_entries(32768);
-	m_palette->set_format(PALETTE_FORMAT_XBGR);
+	m_palette->set_format(palette_device::xBGR_888, 32768);
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
 	via(config);
@@ -1740,14 +1732,13 @@ void drivedge_state::drivedge(machine_config &config)
 	M68EC020(config, m_maincpu, CPU020_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &drivedge_state::main_map);
 
-	TMS32031(config, m_dsp1, TMS_CLOCK);
-	m_dsp1->set_addrmap(AS_PROGRAM, &drivedge_state::tms1_map);
+	TMS32031(config, m_dsp[0], TMS_CLOCK);
+	m_dsp[0]->set_addrmap(AS_PROGRAM, &drivedge_state::tms1_map);
 
-	TMS32031(config, m_dsp2, TMS_CLOCK);
-	m_dsp2->set_addrmap(AS_PROGRAM, &drivedge_state::tms2_map);
+	TMS32031(config, m_dsp[1], TMS_CLOCK);
+	m_dsp[1]->set_addrmap(AS_PROGRAM, &drivedge_state::tms2_map);
 
-	m_palette->set_entries(32768);
-	m_palette->set_format(PALETTE_FORMAT_XBGR);
+	m_palette->set_format(palette_device::xBGR_888, 32768);
 
 	via(config);
 	m_via->writepb_handler().set(FUNC(drivedge_state::portb_out));
@@ -1777,8 +1768,7 @@ void itech32_state::sftm(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &itech32_state::sound_020_map);
 	m_soundcpu->set_periodic_int(FUNC(itech32_state::irq1_line_assert), attotime::from_hz(4*60));
 
-	m_palette->set_entries(32768);
-	m_palette->set_format(PALETTE_FORMAT_XRGB);
+	m_palette->set_format(palette_device::xRGB_888, 32768);
 }
 
 void itech32_state::tourny(machine_config &config)
@@ -2435,6 +2425,42 @@ ROM_START( wcbowl140 )  /* Version 1.40 Tournament (PCB P/N 1083 Rev 2) */
 ROM_END
 
 
+ROM_START( wcbowl130 )  /* Version 1.30 Tournament (PCB P/N 1083 Rev 2) */
+	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
+	ROM_LOAD32_BYTE( "wcb_prom0_v1.30t.prom0", 0x00000, 0x20000, NO_DUMP ) /* found as 3 loose chips missing WCB PROM0 V1.30T ROM */
+	ROM_LOAD32_BYTE( "wcb_prom1_v1.30t.prom1", 0x00001, 0x20000, CRC(f4b8e7c3) SHA1(29471a464e783e820d7cde356b49d26b9394f513) )
+	ROM_LOAD32_BYTE( "wcb_prom2_v1.30t.prom2", 0x00002, 0x20000, CRC(f441afae) SHA1(31d619e63f951cfb08481474f08d278aeaa15c46) )
+	ROM_LOAD32_BYTE( "wcb_prom3_v1.30t.prom3", 0x00003, 0x20000, CRC(47e26d4b) SHA1(44459daef1ffe19640b26adcf122dfcd4a327a68) )
+
+	ROM_REGION( 0x28000, "soundcpu", 0 )
+	ROM_LOAD( "wcbsnd_u88_4.01.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* actually labeled as "WCBSND(U88)4.01" but may be labeled v4.0 */
+	ROM_CONTINUE(                    0x08000, 0x08000 )
+
+	ROM_REGION( 0x880000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "wcb_grom0_0_s.grm0_0", 0x000000, 0x080000, CRC(6fcb4246) SHA1(91fb5d18ea9494b08251d1e611c80414df3aad66) )
+	ROM_LOAD32_BYTE( "wcb_grom0_1_s.grm0_1", 0x000001, 0x080000, CRC(2ae31f45) SHA1(85218aa9a7ca7c6870427ffbd08b78255813ff90) )
+	ROM_LOAD32_BYTE( "wcb_grom0_2_s.grm0_2", 0x000002, 0x080000, CRC(bccc0f35) SHA1(2389662e881e86f8cdb36eb2a082923d976676c8) )
+	ROM_LOAD32_BYTE( "wcb_grom0_3_s.grm0_3", 0x000003, 0x080000, CRC(ab1da462) SHA1(3f3a4a083483d2d95d5ef540eea077cad799fcb7) )
+	ROM_LOAD32_BYTE( "wcb_grom1_0_s.grm1_0", 0x200000, 0x080000, CRC(bdfafd1f) SHA1(bc0e6fe83d3f8e88c2e55ba3a436875d5470de5b) )
+	ROM_LOAD32_BYTE( "wcb_grom1_1_s.grm1_1", 0x200001, 0x080000, CRC(7d6baa2e) SHA1(c47854b064aa96d2581c23afe13cd05a36f9dae3) )
+	ROM_LOAD32_BYTE( "wcb_grom1_2_s.grm1_2", 0x200002, 0x080000, CRC(7513d3de) SHA1(b17650ed5210860c3bde53647a30f8fce67aaa38) )
+	ROM_LOAD32_BYTE( "wcb_grom1_3_s.grm1_3", 0x200003, 0x080000, CRC(e46877e6) SHA1(f50c904ec5b2b8cbc92f2b28641433c91ee17af5) )
+	ROM_LOAD32_BYTE( "wcbf_grom2_0.grm2_0",  0x400000, 0x040000, CRC(3b4c5a5c) SHA1(152cbc5d1aa84012f49fa13d91fd89a10f874508) )
+	ROM_LOAD32_BYTE( "wcbf_grom2_1.grm2_1",  0x400001, 0x040000, CRC(ed0b9b26) SHA1(5173e3936cae419255b3034e2b8a69f6bd136b93) )
+	ROM_LOAD32_BYTE( "wcbf_grom2_2.grm2_2",  0x400002, 0x040000, CRC(4b9e345e) SHA1(6842a8a6690db8478bdbb8e8119d3eef5e77439b) )
+	ROM_LOAD32_BYTE( "wcbf_grom2_3.grm2_3",  0x400003, 0x040000, CRC(4e13ee7a) SHA1(245ce87cd6839119a9a976b9a90cd1028aa3e291) )
+	ROM_FILL(                                0x500000, 0x380000, 0xff )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "wcb_srom0_s.srom0",  0x000000, 0x080000, CRC(d42dd283) SHA1(8ef75c398d1c51d2d7d299ac309a2352179864d9) ) /* Newer sound sample ROMs */
+	ROM_LOAD16_BYTE( "wcb_srom1_s.srom1",  0x200000, 0x080000, CRC(7a69ab54) SHA1(d1f9194446e235af69c6ff28af0dccc44ab9b5d3) ) /* Newer sound sample ROMs */
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "wcb_srom2_s.srom2",  0x000000, 0x080000, CRC(346530a2) SHA1(9951971ad6d368fb718027e18331d12f0a72970c) ) /* Newer sound sample ROMs */
+	ROM_LOAD16_BYTE( "wcb_srom3_s.srom3",  0x200000, 0x040000, CRC(1dfe3a31) SHA1(94947f495692288fbf14fc7796a84c5548a2e8a8) ) /* Newer sound sample ROMs, ROM is a 27C020 in this set */
+ROM_END
+
+
 ROM_START( wcbowl ) /* Version 1.66 (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "wcb_prom0_v1.66n.prom0", 0x00000, 0x20000, CRC(f6774112) SHA1(cb09bb3e40490b3cdc3a5f7d18168384b5b29d85) ) /* original labels also found without the "N" */
@@ -2886,7 +2912,7 @@ ROM_START( sftm )   /* Version 1.12, P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 RO
 ROM_END
 
 
-ROM_START( sftm111 )    /* Version 1.11, P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board */
+ROM_START( sftm111 )   /* Version 1.11, P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "sfm_0_v1.11.prom0", 0x00000, 0x40000, CRC(28187ddc) SHA1(7e4fa285be9389c913fca849098a7c0d9404df7a) ) /* CAPCOM labels */
 	ROM_LOAD32_BYTE( "sfm_1_v1.11.prom1", 0x00001, 0x40000, CRC(ec2ce6fa) SHA1(b79aebb73ba77c2ebe081142853e81473743ac46) )
@@ -2922,7 +2948,7 @@ ROM_START( sftm111 )    /* Version 1.11, P/N 1064 REV 1 Mainboard, P/N 1073 REV 
 ROM_END
 
 
-ROM_START( sftm110 )    /* Version 1.10, P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board */
+ROM_START( sftm110 )   /* Version 1.10, P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "sfm_0_v1.1.prom0", 0x00000, 0x40000, CRC(00c0c63c) SHA1(39f614cca51fe7843c2158b6d9abdc52dc1b0bef) ) /* CAPCOM labels */
 	ROM_LOAD32_BYTE( "sfm_1_v1.1.prom1", 0x00001, 0x40000, CRC(d4d2a67e) SHA1(88069caf171bb9c5602bc493f1f1dafa26d2fc78) )
@@ -2958,7 +2984,43 @@ ROM_START( sftm110 )    /* Version 1.10, P/N 1064 REV 1 Mainboard, P/N 1073 REV 
 ROM_END
 
 
-ROM_START( sftmj )  /* Version 1.12N (Japan), P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board  */
+ROM_START( sftmj114 )   /* Version 1.14N (Japan), P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board  */
+	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
+	ROM_LOAD32_BYTE( "sfmn_0_v1.14.prom0", 0x00000, 0x40000, CRC(2a0c0bb7) SHA1(5722a399ed5dff55d47e096fb04a5d5b16de2f9a) )
+	ROM_LOAD32_BYTE( "sfmn_1_v1.14.prom1", 0x00001, 0x40000, CRC(088aa12c) SHA1(3c488068edea7ee726b7b837fedeeb0374a7b1ac) )
+	ROM_LOAD32_BYTE( "sfmn_2_v1.14.prom2", 0x00002, 0x40000, CRC(7120836e) SHA1(219ca837d1396ec39bb08272d2d9060441e45daf) )
+	ROM_LOAD32_BYTE( "sfmn_3_v1.14.prom3", 0x00003, 0x40000, CRC(84eb200d) SHA1(84150d978bd0b9f6363adde35c74fc5c77af6cf1) )
+
+	ROM_REGION( 0x48000, "soundcpu", 0 )
+	ROM_LOAD( "sfm_snd_v1.11.u23", 0x10000, 0x38000, CRC(004854ed) SHA1(7ecb74dc3f45b038cc9904fea5c89d3e74fcbcf3) ) /* Labeled as "SFM SND V1.11 U23" */
+	ROM_CONTINUE(                  0x08000, 0x08000 )
+
+	ROM_REGION( 0x2080000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "rm0-0.grm0_0", 0x0000000, 0x400000, CRC(09ef29cb) SHA1(430da5b00554582391478849d5b1547fe12eedbe) ) /* KM 23C3200AG-12 mask ROMs */
+	ROM_LOAD32_BYTE( "rm0-1.grm0_1", 0x0000001, 0x400000, CRC(6f5910fa) SHA1(1979d19dd36a9118dfaf021e05302982be5dbe69) )
+	ROM_LOAD32_BYTE( "rm0-2.grm0_2", 0x0000002, 0x400000, CRC(b8a2add5) SHA1(62e5bef936f014ac836c0cd5322eaba7018496b4) )
+	ROM_LOAD32_BYTE( "rm0-3.grm0_3", 0x0000003, 0x400000, CRC(6b6ff867) SHA1(72bc95ef361f9238602f0e03aed0adac8b59d227) )
+	ROM_LOAD32_BYTE( "rm1-0.grm1_0", 0x1000000, 0x400000, CRC(d5d65f77) SHA1(0bbb83bb42a442ef157472f3243ab44efa0c0aa0) )
+	ROM_LOAD32_BYTE( "rm1-1.grm1_1", 0x1000001, 0x400000, CRC(90467e27) SHA1(217561664871c60b0193337e34020ddd336b8f15) )
+	ROM_LOAD32_BYTE( "rm1-2.grm1_2", 0x1000002, 0x400000, CRC(903e56c2) SHA1(843ed9855ffdf37b100b3c5614139d552fd9cd6d) )
+	ROM_LOAD32_BYTE( "rm1-3.grm1_3", 0x1000003, 0x400000, CRC(fac35686) SHA1(ba99ab265620575c14c46806dc543d1f9fd24462) )
+
+	/* GROM2_0 through GROM2_3 are unpopulated 23C32000 mask ROM locations */
+
+	ROM_LOAD32_BYTE( "sfm_grm3_0.grm3_0", 0x2000000, 0x020000, CRC(3e1f76f7) SHA1(8aefe376e7248a583a6af02e5f9b2a4b48cc91d7) )
+	ROM_LOAD32_BYTE( "sfm_grm3_1.grm3_1", 0x2000001, 0x020000, CRC(578054b6) SHA1(99201959de28dbfd7692cedea4485751d3d4788f) )
+	ROM_LOAD32_BYTE( "sfm_grm3_2.grm3_2", 0x2000002, 0x020000, CRC(9af2f698) SHA1(e679728d8eba9f09379e503fa380202cd9adfde1) )
+	ROM_LOAD32_BYTE( "sfm_grm3_3.grm3_3", 0x2000003, 0x020000, CRC(cd38d1d6) SHA1(0cea60d6897b34eeb13997030f6ee7e1dfb3c833) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "sfm_srom0.srom0", 0x000000, 0x200000, CRC(6ca1d3fc) SHA1(904f4c55a1bc83531a6d87ff706afd8cdfaee83b) ) /* Custom 42 Pin mask ROM sample set */
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.3", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "sfm_srom3.srom3", 0x000000, 0x080000, CRC(4f181534) SHA1(e858a33b22558665427146ec79dfba48edc20c2c) )
+ROM_END
+
+
+ROM_START( sftmj112 )   /* Version 1.12N (Japan), P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board  */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "sfmn_0_v1.12.prom0", 0x00000, 0x40000, CRC(640a04a8) SHA1(adc7f5880962cbcc5f9f28e72a84070da6e2ec36) ) /* CAPCOM labels */
 	ROM_LOAD32_BYTE( "sfmn_1_v1.12.prom1", 0x00001, 0x40000, CRC(2a27b690) SHA1(f63c3665ec030ecc2d7a10ead182941ade1c79d0) )
@@ -3029,7 +3091,7 @@ ROM_START( shufshot )   /* Version 1.40 (PCB P/N 1083 Rev 2) */
 ROM_END
 
 
-ROM_START( shufshot139 )    /* Version 1.39 (PCB P/N 1083 Rev 2) */
+ROM_START( shufshot139 )   /* Version 1.39 (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "shot_prom0_v1.39.prom0", 0x00000, 0x20000, CRC(e811fc4a) SHA1(9e1d8f64ac89ac865929f6a23f66d95eeeda3ac9) )
 	ROM_LOAD32_BYTE( "shot_prom1_v1.39.prom1", 0x00001, 0x20000, CRC(f9d120c5) SHA1(f94216f1fb6d810ddee98479e83f0719b30b768f) )
@@ -3064,7 +3126,7 @@ ROM_START( shufshot139 )    /* Version 1.39 (PCB P/N 1083 Rev 2) */
 ROM_END
 
 
-ROM_START( shufshot137 )    /* Version 1.37 (PCB P/N 1083 Rev 2) */
+ROM_START( shufshot137 )   /* Version 1.37 (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "shot_prom0_v1.37.prom0", 0x00000, 0x20000, CRC(6499c76f) SHA1(60fdaefb09088ac609addd40569bd7fab12593bc) )
 	ROM_LOAD32_BYTE( "shot_prom1_v1.37.prom1", 0x00001, 0x20000, CRC(64fb47a4) SHA1(32ce9d91b16b8aaf545c0a22842ad8d806727a17) )
@@ -4386,8 +4448,8 @@ void drivedge_state::driver_init()
 	m_vram_height = 1024;
 	m_planes = 1;
 
-	m_dsp1->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(drivedge_state::tms1_speedup_r),this));
-	m_dsp2->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(drivedge_state::tms2_speedup_r),this));
+	m_dsp[0]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(drivedge_state::tms1_speedup_r),this));
+	m_dsp[1]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(drivedge_state::tms2_speedup_r),this));
 }
 
 
@@ -4403,10 +4465,10 @@ void itech32_state::init_wcbowl()
 	m_vram_height = 1024;
 	m_planes = 1;
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680001, read16_delegate(FUNC(itech32_state::trackball_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680001, read8smo_delegate(FUNC(itech32_state::trackball_r),this), 0x00ff);
 
 	m_maincpu->space(AS_PROGRAM).nop_read(0x578000, 0x57ffff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680080, 0x680081, read16_delegate(FUNC(itech32_state::wcbowl_prot_result_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680080, 0x680081, read16smo_delegate(FUNC(itech32_state::wcbowl_prot_result_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x680080, 0x680081);
 }
 
@@ -4423,11 +4485,11 @@ void itech32_state::init_wcbowlj()
 	m_vram_height = 1024;
 	m_planes = 1;
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680001, read16_delegate(FUNC(itech32_state::trackball_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680040, 0x680041, read16_delegate(FUNC(itech32_state::trackball_p2_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680001, read8smo_delegate(FUNC(itech32_state::trackball_r),this), 0x00ff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680040, 0x680041, read8smo_delegate(FUNC(itech32_state::trackball_p2_r),this), 0x00ff);
 
 	m_maincpu->space(AS_PROGRAM).nop_read(0x578000, 0x57ffff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680080, 0x680081, read16_delegate(FUNC(itech32_state::wcbowl_prot_result_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680080, 0x680081, read16smo_delegate(FUNC(itech32_state::wcbowl_prot_result_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x680080, 0x680081);
 }
 
@@ -4440,8 +4502,8 @@ void itech32_state::init_sftm_common(int prot_addr)
 
 	m_itech020_prot_address = prot_addr;
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x300000, 0x300003, write32_delegate(FUNC(itech32_state::itech020_color2_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x380000, 0x380003, write32_delegate(FUNC(itech32_state::itech020_color1_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x300000, 0x300003, write8smo_delegate(FUNC(itech32_state::color_w<0>),this), 0x000000ff);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x380000, 0x380003, write8smo_delegate(FUNC(itech32_state::color_w<1>),this), 0x000000ff);
 }
 
 
@@ -4470,10 +4532,10 @@ void itech32_state::init_shuffle_bowl_common(int prot_addr)
 
 	m_itech020_prot_address = prot_addr;
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x300000, 0x300003, write32_delegate(FUNC(itech32_state::itech020_color2_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x380000, 0x380003, write32_delegate(FUNC(itech32_state::itech020_color1_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180800, 0x180803, read32_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x181000, 0x181003, read32_delegate(FUNC(itech32_state::trackball32_4bit_p2_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x300000, 0x300003, write8smo_delegate(FUNC(itech32_state::color_w<0>),this), 0x000000ff);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x380000, 0x380003, write8smo_delegate(FUNC(itech32_state::color_w<1>),this), 0x000000ff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180800, 0x180803, read32smo_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x181000, 0x181003, read32smo_delegate(FUNC(itech32_state::trackball32_4bit_p2_r),this));
 }
 
 
@@ -4491,7 +4553,7 @@ void itech32_state::init_wcbowln()
 
 void itech32_state::install_timekeeper()
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x681000, 0x6817ff, read8_delegate(FUNC(timekeeper_device::read), &(*m_timekeeper)), write8_delegate(FUNC(timekeeper_device::write), &(*m_timekeeper)), 0xffffffff);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x681000, 0x6817ff, read8sm_delegate(FUNC(timekeeper_device::read), &(*m_timekeeper)), write8sm_delegate(FUNC(timekeeper_device::write), &(*m_timekeeper)), 0xffffffff);
 }
 
 void itech32_state::init_wcbowlt()
@@ -4521,7 +4583,7 @@ void itech32_state::init_gt3d()
 	    Hacked versions of this PCB have been found with GT97
 	    through GTClassic. This is _NOT_ a factory modification
 	*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200003, read32_delegate(FUNC(itech32_state::trackball32_8bit_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200003, read16smo_delegate(FUNC(itech32_state::trackball_8bit_r),this), 0x0000ffff);
 	init_gt_common();
 }
 
@@ -4534,8 +4596,8 @@ void itech32_state::init_aama()
 	    board share the same sound CPU code and sample ROMs.
 	    This board has all versions of GT for it, GT3D through GTClassic
 	*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180800, 0x180803, read32_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x181000, 0x181003, read32_delegate(FUNC(itech32_state::trackball32_4bit_p2_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180800, 0x180803, read32smo_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x181000, 0x181003, read32smo_delegate(FUNC(itech32_state::trackball32_4bit_p2_r),this));
 	init_gt_common();
 }
 
@@ -4559,7 +4621,7 @@ void itech32_state::init_s_ver()
 	    board: GT97 v1.21S, GT98, GT99, GT2K & GT Classic Versions 1.00S
 	    Trackball info is read through 200202 (actually 200203).
 	*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200200, 0x200203, read32_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200200, 0x200203, read32smo_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
 	init_gt_common();
 }
 
@@ -4573,7 +4635,7 @@ void itech32_state::init_gt3dl()
 	    Player 1 trackball read through 200003
 	    Player 2 trackball read through 200002
 	*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200003, read32_delegate(FUNC(itech32_state::trackball32_4bit_combined_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200003, read32smo_delegate(FUNC(itech32_state::trackball32_4bit_combined_r),this));
 	init_gt_common();
 }
 
@@ -4581,7 +4643,7 @@ void itech32_state::init_gt3dl()
 void itech32_state::init_gt2kp()
 {
 	/* a little extra protection */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680003, read32_delegate(FUNC(itech32_state::gt2kp_prot_result_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680003, read32smo_delegate(FUNC(itech32_state::gt2kp_prot_result_r),this));
 	init_aama();
 
 	/* The protection code is:
@@ -4602,7 +4664,7 @@ Label1  bne.s       Label1          ; Infinite loop if result isn't 0x01
 void itech32_state::init_gtclasscp()
 {
 	/* a little extra protection */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680003, read32_delegate(FUNC(itech32_state::gtclass_prot_result_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680003, read32smo_delegate(FUNC(itech32_state::gtclass_prot_result_r),this));
 	init_aama();
 
 	/* The protection code is:
@@ -4660,10 +4722,12 @@ GAME( 1995, wcbowl10,     wcbowl,   bloodstm, wcbowl,   itech32_state,  init_wcb
 GAME( 1995, sftm,         0,        sftm,     sftm,     itech32_state,  init_sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
 GAME( 1995, sftm111,      sftm,     sftm,     sftm,     itech32_state,  init_sftm110,  ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.11)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
 GAME( 1995, sftm110,      sftm,     sftm,     sftm,     itech32_state,  init_sftm110,  ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.10)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
-GAME( 1995, sftmj,        sftm,     sftm,     sftm,     itech32_state,  init_sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12N, Japan)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
+GAME( 1995, sftmj114,     sftm,     sftm,     sftm,     itech32_state,  init_sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.14N, Japan)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
+GAME( 1995, sftmj112,     sftm,     sftm,     sftm,     itech32_state,  init_sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12N, Japan)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
 GAME( 1997, shufshot,     0,        sftm,     shufshot, itech32_state,  init_shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.40)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
 GAME( 1997, shufshot139,  shufshot, sftm,     shufshot, itech32_state,  init_shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.39)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
 GAME( 1997, shufshot137,  shufshot, sftm,     shufshto, itech32_state,  init_shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.37)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
+GAME( 1997, wcbowl130,    wcbowldx, tourny,   wcbowldx, itech32_state,  init_wcbowlt,  ROT0, "Incredible Technologies",          "World Class Bowling Tournament (v1.30)" , MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 *** missing program ROM PROM0 */
 GAME( 1997, wcbowl140,    wcbowldx, tourny,   wcbowldx, itech32_state,  init_wcbowlt,  ROT0, "Incredible Technologies",          "World Class Bowling Tournament (v1.40)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
 GAME( 1999, wcbowldx,     0,        sftm,     wcbowldx, itech32_state,  init_shufshot, ROT0, "Incredible Technologies",          "World Class Bowling Deluxe (v2.00)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-4 */
 

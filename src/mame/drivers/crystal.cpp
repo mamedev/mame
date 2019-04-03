@@ -1560,7 +1560,7 @@ void crystal_state::crystal(machine_config &config)
 
 	VIDEO_VRENDER0(config, m_vr0vid, 14318180, m_maincpu);
 
-	PALETTE(config, "palette", 65536).set_init("palette", FUNC(palette_device::palette_init_RRRRRGGGGGGBBBBB));
+	PALETTE(config, "palette", palette_device::RGB_565);
 
 	DS1302(config, m_ds1302, 32.768_kHz_XTAL);
 

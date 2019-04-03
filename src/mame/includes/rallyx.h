@@ -9,6 +9,7 @@
 #include "sound/namco.h"
 #include "sound/samples.h"
 #include "emupal.h"
+#include "screen.h"
 
 class rallyx_state : public driver_device
 {
@@ -29,7 +30,8 @@ public:
 		m_samples(*this, "samples"),
 		m_timeplt_audio(*this, "timeplt_audio"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen")
 	{ }
 
 	/* memory pointers */
@@ -59,6 +61,7 @@ public:
 	optional_device<timeplt_audio_device> m_timeplt_audio;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 
 	bool    m_main_irq_mask;
 	DECLARE_WRITE8_MEMBER(rallyx_interrupt_vector_w);
@@ -81,9 +84,9 @@ public:
 	TILE_GET_INFO_MEMBER(locomotn_fg_get_tile_info);
 	DECLARE_MACHINE_START(rallyx);
 	DECLARE_VIDEO_START(rallyx);
-	DECLARE_PALETTE_INIT(rallyx);
+	void rallyx_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(jungler);
-	DECLARE_PALETTE_INIT(jungler);
+	void jungler_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(locomotn);
 	DECLARE_VIDEO_START(commsega);
 	uint32_t screen_update_rallyx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

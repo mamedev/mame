@@ -61,7 +61,6 @@ public:
 
 	// static helpers
 	static bool matches(const char *wildstring, const char *string);
-	static int penalty_compare(const char *source, const char *target);
 
 protected:
 	static std::size_t const            s_driver_count;
@@ -120,7 +119,7 @@ public:
 
 	// general helpers
 	void set_current(std::size_t index) { assert(index < s_driver_count); m_current = index; }
-	void find_approximate_matches(const char *string, std::size_t count, int *results);
+	void find_approximate_matches(std::string const &string, std::size_t count, int *results);
 
 private:
 	static constexpr std::size_t CONFIG_CACHE_COUNT = 100;

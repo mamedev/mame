@@ -38,10 +38,11 @@ void mightyframe_state::mem_map(address_map &map)
 static INPUT_PORTS_START( mightyframe )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(mightyframe_state::mightyframe)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // no idea of clock
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-MACHINE_CONFIG_END
+void mightyframe_state::mightyframe(machine_config &config)
+{
+	m68000_device &maincpu(M68000(config, "maincpu", XTAL(16'000'000))); // no idea of clock
+	maincpu.set_addrmap(AS_PROGRAM, &mightyframe_state::mem_map);
+}
 
 ROM_START( mightyframe )
 	ROM_REGION( 0x8000, "maincpu", 0 )

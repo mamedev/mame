@@ -71,7 +71,7 @@ private:
 	DECLARE_READ8_MEMBER(sheila_r);
 	DECLARE_WRITE8_MEMBER(sheila_w);
 
-	DECLARE_PALETTE_INIT(accomm);
+	void accomm_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(vbl_int);
 
 	virtual void machine_reset() override;
@@ -145,9 +145,9 @@ static const rgb_t electron_palette[8]=
 	rgb_t(0x000,0x000,0x000)
 };
 
-PALETTE_INIT_MEMBER(accomm_state, accomm)
+void accomm_state::accomm_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, electron_palette, ARRAY_LENGTH(electron_palette));
+	palette.set_pen_colors(0, electron_palette);
 }
 
 READ8_MEMBER(accomm_state::read_keyboard1)
@@ -830,8 +830,7 @@ void accomm_state::accomm(machine_config &config)
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_palette("palette");
 
-	palette_device &palette(PALETTE(config, "palette", 16));
-	palette.set_init(palette_init_delegate(FUNC(accomm_state::palette_init_accomm), this));
+	PALETTE(config, "palette", FUNC(accomm_state::accomm_palette), 16);
 
 	config.set_default_layout(layout_accomm);
 

@@ -55,9 +55,9 @@ public:
 	void init_firebatl();
 	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(firebatl);
-	DECLARE_PALETTE_INIT(firebatl);
+	void firebatl_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(clshroad);
-	DECLARE_PALETTE_INIT(clshroad);
+	void clshroad_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -253,33 +253,36 @@ READ16_MEMBER(esqmr_state::esq5506_read_adc)
 	return 0;
 }
 
-MACHINE_CONFIG_START(esqmr_state::mr)
+void esqmr_state::mr(machine_config &config)
+{
 	M68340(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &esqmr_state::mr_map);
 
-	MCFG_ESQ2X40_SQ1_ADD("sq1vfd")
+	ESQ2X40_SQ1(config, m_sq1vfd, 60);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ensoniq", ES5506, XTAL(16'000'000))
-	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
-	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
-	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */
-	MCFG_ES5506_REGION3("waverom4") /* Bank 1 */
-	MCFG_ES5506_CHANNELS(1)          /* channels */
-	MCFG_ES5506_IRQ_CB(WRITELINE(*this, esqmr_state, esq5506_otto_irq)) /* irq */
-	MCFG_ES5506_READ_PORT_CB(READ16(*this, esqmr_state, esq5506_read_adc))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
-	MCFG_DEVICE_ADD("ensoniq2", ES5506, XTAL(16'000'000))
-	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
-	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
-	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */
-	MCFG_ES5506_REGION3("waverom4") /* Bank 1 */
-	MCFG_ES5506_CHANNELS(1)          /* channels */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
-MACHINE_CONFIG_END
+
+	es5506_device &ensoniq(ES5506(config, "ensoniq", XTAL(16'000'000)));
+	ensoniq.set_region0("waverom");  /* Bank 0 */
+	ensoniq.set_region1("waverom2"); /* Bank 1 */
+	ensoniq.set_region2("waverom3"); /* Bank 0 */
+	ensoniq.set_region3("waverom4"); /* Bank 1 */
+	ensoniq.set_channels(1);
+	ensoniq.irq_cb().set(FUNC(esqmr_state::esq5506_otto_irq)); /* irq */
+	ensoniq.read_port_cb().set(FUNC(esqmr_state::esq5506_read_adc));
+	ensoniq.add_route(0, "lspeaker", 0.5);
+	ensoniq.add_route(1, "rspeaker", 0.5);
+
+	es5506_device &ensoniq2(ES5506(config, "ensoniq2", XTAL(16'000'000)));
+	ensoniq2.set_region0("waverom");  /* Bank 0 */
+	ensoniq2.set_region1("waverom2"); /* Bank 1 */
+	ensoniq2.set_region2("waverom3"); /* Bank 0 */
+	ensoniq2.set_region3("waverom4"); /* Bank 1 */
+	ensoniq2.set_channels(1);
+	ensoniq2.add_route(0, "lspeaker", 0.5);
+	ensoniq2.add_route(1, "rspeaker", 0.5);
+}
 
 static INPUT_PORTS_START( mr )
 INPUT_PORTS_END

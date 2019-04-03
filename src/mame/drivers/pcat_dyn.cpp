@@ -163,18 +163,18 @@ void pcat_dyn_state::pcat_dyn_sb_conf(device_t *device)
 	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
 }
 
-MACHINE_CONFIG_START(pcat_dyn_state::pcat_dyn)
+void pcat_dyn_state::pcat_dyn(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I486, 40000000) /* Am486 DX-40 */
-	MCFG_DEVICE_PROGRAM_MAP(pcat_map)
-	MCFG_DEVICE_IO_MAP(pcat_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	I486(config, m_maincpu, 40000000); /* Am486 DX-40 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcat_dyn_state::pcat_map);
+	m_maincpu->set_addrmap(AS_IO, &pcat_dyn_state::pcat_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
 	pcvideo_trident_vga(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_DEVICE_REPLACE("vga", TVGA9000_VGA, 0)
+	subdevice<screen_device>("screen")->set_refresh_hz(60);
+	TVGA9000_VGA(config.replace(), "vga", 0);
 
 	pcat_common(config);
 
@@ -182,9 +182,9 @@ MACHINE_CONFIG_START(pcat_dyn_state::pcat_dyn)
 	m_mc146818->irq().set("pic8259_2", FUNC(pic8259_device::ir0_w));
 	m_mc146818->set_century_index(0x32);
 
-	MCFG_DEVICE_ADD("ad1848", AD1848, 0)
-	MCFG_AD1848_IRQ_CALLBACK(WRITELINE("pic8259_1", pic8259_device, ir5_w))
-	MCFG_AD1848_DRQ_CALLBACK(WRITELINE("dma8237_1", am9517a_device, dreq0_w))
+	ad1848_device &ad1848(AD1848(config, "ad1848", 0));
+	ad1848.irq().set("pic8259_1", FUNC(pic8259_device::ir5_w));
+	ad1848.drq().set("dma8237_1", FUNC(am9517a_device::dreq0_w));
 
 	m_dma8237_1->out_iow_callback<0>().set("ad1848", FUNC(ad1848_device::dack_w));
 	m_dma8237_1->out_iow_callback<1>().set(FUNC(pcat_dyn_state::dma8237_1_dack_w));
@@ -206,7 +206,8 @@ MACHINE_CONFIG_START(pcat_dyn_state::pcat_dyn)
 	serport.cts_handler().set("ns16550", FUNC(ins8250_uart_device::cts_w));
 
 	ISA8(config, m_isabus, 0);
-	m_isabus->set_cputag("maincpu");
+	m_isabus->set_memspace("maincpu", AS_PROGRAM);
+	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->irq2_callback().set("pic8259_2", FUNC(pic8259_device::ir2_w));
 	m_isabus->irq3_callback().set("pic8259_1", FUNC(pic8259_device::ir3_w));
 	//m_isabus->irq4_callback().set("pic8259_1", FUNC(pic8259_device::ir4_w));
@@ -218,10 +219,10 @@ MACHINE_CONFIG_START(pcat_dyn_state::pcat_dyn)
 	m_isabus->drq3_callback().set("dma8237_1", FUNC(am9517a_device::dreq3_w));
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", pcat_dyn_isa8_cards, "sb15", true)
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("sb15", pcat_dyn_sb_def)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("sb15", pcat_dyn_sb_conf)
-MACHINE_CONFIG_END
+	isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", 0, "isa", pcat_dyn_isa8_cards, "sb15", true));
+	isa1.set_option_device_input_defaults("sb15", DEVICE_INPUT_DEFAULTS_NAME(pcat_dyn_sb_def));
+	isa1.set_option_machine_config("sb15", pcat_dyn_sb_conf);
+}
 
 /***************************************
 *

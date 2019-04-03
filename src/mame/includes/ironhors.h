@@ -55,7 +55,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(ironhors_scanline_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(farwest_scanline_tick);
 
-	DECLARE_PALETTE_INIT(ironhors);
+	void ironhors_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(farwest);
 
 	void farwest_master_map(address_map &map);

@@ -17,11 +17,14 @@
 		<description>007 - Everything or Nothing (Euro, USA)</description>
 		<year>2003</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="AGB-BJBE-USA, AGB-BJBP-EUR"/>
+		<info name="serial" value="AGB-BJBE-USA, AGB-BJBP-EUR, AGB-BJBP-EUR-1"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="007 - everything or nothing (usa, europe) (en,fr,de).bin" size="8388608" crc="9d4f1e18" sha1="fc6163f99b71b05c10686a0d29010b31274e1dc4" offset="000000" />
+				<rom name="agb-bjbp-0.u1" size="8388608" crc="9d4f1e18" sha1="fc6163f99b71b05c10686a0d29010b31274e1dc4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -61,11 +64,14 @@
 		<description>2006 FIFA World Cup - Germany 2006 (Euro, USA)</description>
 		<year>2006</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="AGB-B6WE-USA, AGB-B6WP"/>
+		<info name="serial" value="AGB-B6WE-USA, AGB-B6WP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="2006 fifa world cup - germany 2006 (usa, europe) (en,fr,de,es,it).bin" size="8388608" crc="50ab4544" sha1="295580745787ba9593799213564484aaaa7fd463" offset="000000" />
+				<rom name="agb-b6wp-0.u1" size="8388608" crc="50ab4544" sha1="295580745787ba9593799213564484aaaa7fd463" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -804,7 +810,7 @@
 		</part>
 	</software>
 
-	<software name="akachan">
+	<software name="akachan1" cloneof="akachan">
 		<description>Aka-chan Doubutsuen (Jpn)</description>
 		<year>2004</year>
 		<publisher>TDK Core</publisher>
@@ -815,6 +821,24 @@
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="aka-chan doubutsuen (japan).bin" size="4194304" crc="b50cd166" sha1="9a0623a8680c4cf9b745f940b99da0a192764828" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akachan">
+		<description>Aka-chan Doubutsuen (Jpn, Rev. 1)</description>
+		<year>2004</year>
+		<publisher>TDK Core</publisher>
+		<info name="serial" value="AGB-BAZJ-JPN"/>
+		<info name="release" value="20040326"/>
+		<info name="alt_title" value="あかちゃんどうぶつ園 動物のあかちゃん飼育係育成ゲーム"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
+			<feature name="slot" value="gba_eeprom_64k" />
+			<dataarea name="rom" size="4194304">
+				<rom name="agb-bazj-1.u1" size="4194304" crc="c1072e26" sha1="634624c77c90a8ff40bec9046133c50041efc49b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -897,11 +921,14 @@
 		<description>Alex Rider - Stormbreaker (Euro)</description>
 		<year>2006</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="AGB-BAWP"/>
+		<info name="serial" value="AGB-BAWX-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="alex rider - stormbreaker (europe) (en,fr,de,es).bin" size="4194304" crc="25e8e2cd" sha1="659dbde917fc74d1cec3e41d1fb4cdd249ae04a0" offset="000000" />
+				<rom name="agb-bawx-0.u1" size="4194304" crc="25e8e2cd" sha1="659dbde917fc74d1cec3e41d1fb4cdd249ae04a0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3208,6 +3235,7 @@
 		</part>
 	</software>
 
+	<!-- This game has an integrated UV sensor (AGB-013). -->
 	<software name="boktai">
 		<description>Boktai - The Sun Is in Your Hand (Euro)</description>
 		<year>2004</year>
@@ -3218,7 +3246,7 @@
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
 			<feature name="u3" value="U3 RTC [S3511]" />
-			<feature name="u4" value="U4 74LV4040 [37C7E1K]" />
+			<feature name="u4" value="U4 74LV4040 [74LV4040A]" />
 			<feature name="u5" value="U5 TLV272" />
 			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_boktai" />
@@ -3228,6 +3256,7 @@
 		</part>
 	</software>
 
+	<!-- This game has an integrated UV sensor (AGB-013). -->
 	<software name="boktaiud" cloneof="boktai">
 		<description>Boktai - The Sun Is in Your Hand (USA, Demo)</description>
 		<year>2003</year>
@@ -3240,12 +3269,20 @@
 		</part>
 	</software>
 
+	<!-- This game has an integrated UV sensor (AGB-013). -->
 	<software name="boktaiu" cloneof="boktai">
 		<description>Boktai - The Sun Is in Your Hand (USA)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-U3IE-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E18-01" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
+			<feature name="u3" value="U3 RTC [S3511]" />
+			<feature name="u4" value="U4 74LV4040 [74LV4040A]" />
+			<feature name="u5" value="U5 TLV272 [T272C]" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_boktai" />
 			<dataarea name="rom" size="16777216">
 				<rom name="boktai - the sun is in your hand (usa).bin" size="16777216" crc="e715ac45" sha1="7164326283df46a3941ec7b6ceca889cbc40e660" offset="000000" />
@@ -3253,6 +3290,7 @@
 		</part>
 	</software>
 
+	<!-- This game has an integrated UV sensor (AGB-013). -->
 	<software name="boktai2">
 		<description>Boktai 2 - Solar Boy Django (Euro)</description>
 		<year>2005</year>
@@ -3266,12 +3304,20 @@
 		</part>
 	</software>
 
+	<!-- This game has an integrated UV sensor (AGB-013). -->
 	<software name="boktai2u" cloneof="boktai2">
 		<description>Boktai 2 - Solar Boy Django (USA)</description>
 		<year>2004</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-U32E-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E18-01" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
+			<feature name="u3" value="U3 RTC [S3511]" />
+			<feature name="u4" value="U4 74LV4040 [74LV4040A]" />
+			<feature name="u5" value="U5 TLV272 [T272C]" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_boktai" />
 			<dataarea name="rom" size="16777216">
 				<rom name="boktai 2 - solar boy django (usa).bin" size="16777216" crc="e1ffb2d1" sha1="cd10d8ed82f4daf4072774f70d015e39a5d32d0b" offset="000000" />
@@ -3466,9 +3512,15 @@
 		<info name="release" value="20010427"/>
 		<info name="alt_title" value="ボンバーマンストーリー"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [GM76V256CLLFW10]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="4194304">
-				<rom name="bomberman story (japan).bin" size="4194304" crc="38231bc2" sha1="1cd1b87df9cc51ccf024584a4885c6c7a3f42aa0" offset="000000" />
+				<rom name="agb-absj-0.u1" size="4194304" crc="f7f40189" sha1="ba093c5ef2c2bb57d0f6f6735e82c536c7e9ec45" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3505,6 +3557,8 @@
 		</part>
 	</software>
 
+	<!-- This game supports interacting with real toys (using a cradle/reader connected to the GBA accessories port). Each toy (a figurine)
+	    contains just press different switches on the cradle to be readed as a simple ID (the toys constains no electronics). -->
 	<software name="plustw">
 		<description>Bouken Yuuki Pluster World - Densetsu no Plust Gate (Jpn)</description>
 		<year>2003</year>
@@ -3513,6 +3567,12 @@
 		<info name="release" value="20030424"/>
 		<info name="alt_title" value="冒険遊記プラスターワールド 伝説のプラストゲート"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-20" />
+			<feature name="u1" value="U1 GPIO MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [BS62LV256SC-70]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="bouken yuuki pluster world - densetsu no plust gate (japan).bin" size="8388608" crc="57438e39" sha1="bb779de3aa9c08b82ffcb3cb2eb70f151a8a3b13" offset="000000" />
@@ -3520,6 +3580,8 @@
 		</part>
 	</software>
 
+	<!-- This game supports interacting with real toys (using a cradle/reader connected to the GBA accessories port). Each toy (a figurine)
+	    contains just press different switches on the cradle to be readed as a simple ID (the toys constains no electronics). -->
 	<software name="plustwex">
 		<description>Bouken Yuuki Pluster World - Densetsu no Plust Gate EX (Jpn)</description>
 		<year>2003</year>
@@ -3528,6 +3590,9 @@
 		<info name="release" value="20031204"/>
 		<info name="alt_title" value="冒険遊記プラスターワールド 伝説のプラストゲートEX"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E11-01" />
+			<feature name="u1" value="U1 MASK ROM AGB [MX23L12806-12C]" />
+			<feature name="u2" value="U2 256K FRAM [MB85R256A]" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
 				<rom name="bouken yuuki pluster world - densetsu no plust gate ex (japan).bin" size="16777216" crc="3f60bf6a" sha1="d660e16640897da847951937f7792724e133a642" offset="000000" />
@@ -3535,6 +3600,8 @@
 		</part>
 	</software>
 
+	<!-- This game supports interacting with real toys (using a cradle/reader connected to the GBA accessories port). Each toy (a figurine)
+	    contains just press different switches on the cradle to be readed as a simple ID (the toys constains no electronics). -->
 	<software name="plustwgp">
 		<description>Bouken Yuuki Pluster World - Pluston GP (Jpn)</description>
 		<year>2003</year>
@@ -3543,6 +3610,12 @@
 		<info name="release" value="20030424"/>
 		<info name="alt_title" value="冒険遊記プラスターワールド プラストオンGP"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-20" />
+			<feature name="u1" value="U1 GPIO MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [HY62WT081ED70C]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="bouken yuuki pluster world - pluston gp (japan).bin" size="8388608" crc="ce7a07f0" sha1="013301f82256ee6f574864455301f0e756974d6e" offset="000000" />
@@ -4243,11 +4316,14 @@
 		<description>Cabela's Big Game Hunter - 2005 Adventures (Euro, USA)</description>
 		<year>2004</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="AGB-BG5E-USA, AGB-BG5P"/>
+		<info name="serial" value="AGB-BG5E-USA, AGB-BG5P-UKV, AGB-BG5P-UKV-1"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="cabela's big game hunter - 2005 adventures (usa, europe).bin" size="4194304" crc="bd054567" sha1="aff3c5bc948c2c868be7da8a327aee25beaa027c" offset="000000" />
+				<rom name="agb-bg5p-0.u1" size="4194304" crc="bd054567" sha1="aff3c5bc948c2c868be7da8a327aee25beaa027c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4417,11 +4493,14 @@
 		<description>Care Bears - The Care Quests (Euro)</description>
 		<year>2005</year>
 		<publisher>The Game Factory</publisher>
-		<info name="serial" value="AGB-BEAP"/>
+		<info name="serial" value="AGB-BEAP-EUU"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="care bears - the care quests (europe) (en,fr,de,es,it,nl,pt,da).bin" size="4194304" crc="6111ed1e" sha1="606ad547286fdf14cc0fe60e5c34f9db83a059dc" offset="000000" />
+				<rom name="agb-beap-0.u1" size="4194304" crc="6111ed1e" sha1="606ad547286fdf14cc0fe60e5c34f9db83a059dc" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4456,13 +4535,17 @@
 	</software>
 
 	<software name="carsb" cloneof="cars">
-		<description>Cars (Euro, Spanish / Portuguese)</description>
+		<description>Disney/Pixar Cars (Euro, Spanish / Portuguese)</description>
 		<year>2006</year>
 		<publisher>THQ</publisher>
+		<info name="serial" value="AGB-BCAY-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="cars (europe) (es,pt).bin" size="8388608" crc="0b058db2" sha1="b7dbdf12678e0f36973ca660178f8978450f4a3e" offset="000000" />
+				<rom name="agb-bcay-0.u1" size="8388608" crc="0b058db2" sha1="b7dbdf12678e0f36973ca660178f8978450f4a3e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4532,12 +4615,15 @@
 	</software>
 
 	<software name="carschmp">
-		<description>Disney Pixar Cars - Mater-National Championship (Euro)</description>
+		<description>Disney/Pixar Cars - Mater-National Championship (Euro)</description>
 		<year>2007</year>
 		<publisher>THQ</publisher>
+		<info name="serial" value="AGB-BCPP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-41" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="cars - mater-national championship (europe) (en,fr,de,es,it,nl).bin" size="4194304" crc="d3db9787" sha1="16c666082db0e12384d342e5db4336ac66869d28" offset="000000" />
+				<rom name="agb-bcpp-0.u1" size="4194304" crc="d3db9787" sha1="16c666082db0e12384d342e5db4336ac66869d28" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6261,6 +6347,8 @@
 		</part>
 	</software>
 
+	<!-- This games uses the GBA IR adapter (Nintendo P/N AGB-006) to connect to real Zoids toys.
+	         Two toys supported: CDZ-01 (Diablotiger) and CDZ-02 (Cyclops). -->
 	<software name="cybzoids">
 		<description>Cyberdrive Zoids - Kijuu no Senshi Hyuu (Jpn)</description>
 		<year>2003</year>
@@ -6269,6 +6357,12 @@
 		<info name="release" value="20030718"/>
 		<info name="alt_title" value="サイバードライブゾイド 機獣の戦士ヒュウ"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-20" />
+			<feature name="u1" value="U1 GPIO MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [BS62LV256SC-70]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="cyberdrive zoids - kijuu no senshi hyuu (japan).bin" size="8388608" crc="0020a2ed" sha1="3c934188ca5c268dbd0459b0f4c04ffe1c9f3094" offset="000000" />
@@ -6507,11 +6601,14 @@
 		<description>Dave Mirra Freestyle BMX 2 (Euro)</description>
 		<year>2001</year>
 		<publisher>Acclaim</publisher>
-		<info name="serial" value="AGB-AX2P"/>
+		<info name="serial" value="AGB-AX2P-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="dave mirra freestyle bmx 2 (europe) (en,fr,de,es,it).bin" size="8388608" crc="69e89581" sha1="5d98b5179f4e9ae7ae72d6a43bed5f046f881a7b" offset="000000" />
+				<rom name="agb-ax2p-0.u1" size="8388608" crc="69e89581" sha1="5d98b5179f4e9ae7ae72d6a43bed5f046f881a7b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6749,11 +6846,14 @@
 		<description>Denki Blocks! (Euro)</description>
 		<year>2001</year>
 		<publisher>Rage Software</publisher>
-		<info name="serial" value="AGB-ADBP"/>
+		<info name="serial" value="AGB-ADBP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="denki blocks! (europe) (en,fr,de,es,it).bin" size="4194304" crc="6144ec15" sha1="fe9047dd7940e55a9d667824aeeeb7abbd025e59" offset="000000" />
+				<rom name="agb-adbp-0.u1" size="4194304" crc="6144ec15" sha1="fe9047dd7940e55a9d667824aeeeb7abbd025e59" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8498,13 +8598,18 @@
 		</part>
 	</software>
 
+	<!-- Rumble cart. -->
 	<software name="drilldoz">
 		<description>Drill Dozer (USA)</description>
 		<year>2006</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-V49E-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-ARC-01" />
+			<feature name="u1" value="U1 GPIO MASKROM [MX23L6407-12C1]" />
+			<feature name="u2" value="U2 256K FRAM [MB85R256S]" />
 			<feature name="slot" value="gba_drilldoz" />
+			<feature name="rumble" value="yes" />
 			<dataarea name="rom" size="8388608">
 				<rom name="drill dozer (usa).bin" size="8388608" crc="e60ec183" sha1="c1058cc2482b91204100cc8515da99aeb06773f5" offset="000000" />
 			</dataarea>
@@ -8952,7 +9057,7 @@
 		<description>Earthworm Jim (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Majesco</publisher>
-		<info name="serial" value="AGB-AEJE-USA, AGB-AEJP"/>
+		<info name="serial" value="AGB-AEJE-USA, AGB-AEJP-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="earthworm jim (usa, europe).bin" size="8388608" crc="c4991d13" sha1="8c3148c1c863a1e31b6f4c380c9390dc12fae9ac" offset="000000" />
@@ -9712,11 +9817,11 @@
 		<description>F-Zero - Maximum Velocity (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-AFZE-USA, AGB-AFZP-EUR"/>
+		<info name="serial" value="AGB-AFZE-USA, AGB-AFZP-EUR, AGB-AFZP-EUR-1"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="pcb" value="AGB-E06-01" />
+			<feature name="pcb" value="AGB-E06-01" /> <!-- Also with AGB-E06-10 -->
 			<feature name="u1" value="U1 MASK ROM" />
-			<feature name="u2" value="U2 256K SRAM [GM76V256CLLFW10]" />
+			<feature name="u2" value="U2 256K SRAM [GM76V256CLLFW10]" /> <!-- Also with HY62WT08081E -->
 			<feature name="u3" value="U3 9803F [LV2416]" />
 			<feature name="u4" value="U4 PST3425" />
 			<feature name="bt1" value="CR1616" />
@@ -9948,10 +10053,13 @@
 		<description>Famicom Mini 03 - Ice Climber (Jpn)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-FICJ-JPN"/>
+		<info name="serial" value="AGB-FICJ-JPN"/> <!-- HVC-IC -->
 		<info name="release" value="20040214"/>
 		<info name="alt_title" value="ファミコンミニ03 アイスクライマー"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM [R27V810F-019]" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="famicom mini 03 - ice climber (japan).bin" size="4194304" crc="5646f9d1" sha1="b82c00d059d9c38c3ea493032fa1d36d5185ef80" offset="000000" />
@@ -12520,6 +12628,8 @@
 		<publisher>Majesco</publisher>
 		<info name="serial" value="AGB-MF2E-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-40" />
+			<feature name="u1" value="U1 GPIO MASKROM [MX23L25607-12D]" />
 			<dataarea name="rom" size="33554432">
 				<rom name="game boy advance video - the fairly oddparents! - volume 2 (usa) (rev 1).bin" size="33554432" crc="bbcbc6fd" sha1="5b8a83410d8f9de12113e2974d65b5790aaf62fb" offset="000000" />
 			</dataarea>
@@ -13413,10 +13523,12 @@
 		<description>GT Advance - Championship Racing (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="AGB-ACAE-USA, AGB-ACAP"/>
+		<info name="serial" value="AGB-ACAE-USA, AGB-ACAP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-10" /> <!-- Also found with AGB-E01-01 -->
+			<feature name="u1" value="U1 32M MROM" />
 			<dataarea name="rom" size="8388608">
-				<rom name="gt advance - championship racing (usa, europe).bin" size="8388608" crc="8c411acc" sha1="3a85e462d002ff5577e4434110b17459fe6867d6" offset="000000" />
+				<rom name="agb-acap-0.u1" size="8388608" crc="8c411acc" sha1="3a85e462d002ff5577e4434110b17459fe6867d6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16307,10 +16419,12 @@
 		<description>Kao the Kangaroo (Euro)</description>
 		<year>2001</year>
 		<publisher>Titus</publisher>
-		<info name="serial" value="AGB-AKKP"/>
+		<info name="serial" value="AGB-AKKP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-10" />
+			<feature name="u1" value="U1 32M MROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="kao the kangaroo (europe) (en,fr,de,es,it,nl).bin" size="4194304" crc="51e7522c" sha1="5a337fcc321eaa0c350644c026767824add338f3" offset="000000" />
+				<rom name="agb-akkp-0.u1" size="4194304" crc="51e7522c" sha1="5a337fcc321eaa0c350644c026767824add338f3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16475,6 +16589,8 @@
 		</part>
 	</software>
 
+	<!-- Telefang 2 is compatible with an accessory called "Power Antenna" (just like the GBC version). The "Power Antenna" is just a led light connected
+	    to the GBA accessories port. -->
 	<software name="telfng2p">
 		<description>Keitai Denjuu Telefang 2 - Power (Jpn)</description>
 		<year>2002</year>
@@ -16483,6 +16599,9 @@
 		<info name="release" value="20020426"/>
 		<info name="alt_title" value="携帯電獣テレファング2 パワー"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E02-10" />
+			<feature name="u1" value="U1 MASKROM AGB [MX23L6406-12B]" />
+			<feature name="u2" value="U2 512K FLASH MEMORY [39VF512]" />
 			<feature name="slot" value="gba_flash" />
 			<dataarea name="rom" size="8388608">
 				<rom name="keitai denjuu telefang 2 - power (japan).bin" size="8388608" crc="44db280e" sha1="a03f5f27854984195ff110a46755eaaa4cc92763" offset="000000" />
@@ -16552,11 +16671,14 @@
 		<description>Kid Paddle (Euro)</description>
 		<year>2005</year>
 		<publisher>Atari</publisher>
-		<info name="serial" value="AGB-BYLP-EUR"/>
+		<info name="serial" value="AGB-BYLP-FRA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="kid paddle (europe) (fr,nl).bin" size="8388608" crc="69951aa9" sha1="4ce6021d930fe946c512b2e5584f31d0b6435256" offset="000000" />
+				<rom name="agb-bylp-0.u1" size="8388608" crc="69951aa9" sha1="4ce6021d930fe946c512b2e5584f31d0b6435256" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16706,10 +16828,12 @@
 		<description>Killer 3D Pool (Euro)</description>
 		<year>2005</year>
 		<publisher>Zoo Digital Publishing</publisher>
-		<info name="serial" value="AGB-B3LP"/>
+		<info name="serial" value="AGB-B3LP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-40" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="killer 3d pool (europe) (en,fr,de,es,it).bin" size="4194304" crc="e6fda065" sha1="a4e3107f0797d42ee8888488cf0f87af140b8652" offset="000000" />
+				<rom name="agb-b3lp-0.u1" size="4194304" crc="e6fda065" sha1="a4e3107f0797d42ee8888488cf0f87af140b8652" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -17333,11 +17457,17 @@
 		<description>Konami Krazy Racers (Euro)</description>
 		<year>2001</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="AGB-AKWP"/>
+		<info name="serial" value="AGB-AKWP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [GM76V256CLLFW10]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="4194304">
-				<rom name="konami krazy racers (europe).bin" size="4194304" crc="cfec0650" sha1="90a0035818ba0ab2a0c6ea45dc7eff2eb7296970" offset="000000" />
+				<rom name="agb-akwp-0.u1" size="4194304" crc="cfec0650" sha1="90a0035818ba0ab2a0c6ea45dc7eff2eb7296970" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -17562,6 +17692,7 @@
 		</part>
 	</software>
 
+	<!-- This game integrates an accelerometer for game control (AGB-013). -->
 	<software name="korokoro">
 		<description>Koro Koro Puzzle - Happy Panechu! (Jpn)</description>
 		<year>2002</year>
@@ -17570,6 +17701,11 @@
 		<info name="release" value="20020308"/>
 		<info name="alt_title" value="コロコロパズル ハッピィパネッチュ!"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E08-01" />
+			<feature name="u1" value="U1 ACC1 [BU3668K]" />
+			<feature name="u2" value="U2 AGB MASKROM [R26V3210F-046]" />
+			<feature name="u3" value="U3 4K/64K EEPROM [9853]" />
+			<feature name="u4" value="U4 ADXL202JQC [ADXL202JQC]" /> <!-- Analog Devices 2-axis accelerometer with digital output -->
 			<feature name="slot" value="gba_yoshiug" />
 			<dataarea name="rom" size="4194304">
 				<rom name="koro koro puzzle - happy panechu! (japan).bin" size="4194304" crc="0bfe46e9" sha1="40cb751d119a49be0cd44cf0491c93ebc8795ef0" offset="000000" />
@@ -18111,6 +18247,8 @@
 		</part>
 	</software>
 
+	<!-- This game supports interacting with real toys (using a cradle/reader connected to the GBA accessories port). Each toy (shaped like a crystal with a frozen monster inside)
+	    contains a serial EEPROM (probably with an ID and some data the game can read and write). -->
 	<software name="legendzs">
 		<description>Legendz - Sign of Nekuromu (Jpn)</description>
 		<year>2005</year>
@@ -18119,6 +18257,11 @@
 		<info name="release" value="20050217"/>
 		<info name="alt_title" value="レジェンズ サイン オブ ネクロム"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E05-01" />
+			<feature name="u1" value="U1 GPIO ROM" />
+			<feature name="u2" value="U2 1M/512K FLASH [39VF512]" />
+			<feature name="u3" value="U3 RTC [S3511]" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_flash_512" />
 			<dataarea name="rom" size="16777216">
 				<rom name="legendz - sign of nekuromu (japan).bin" size="16777216" crc="98432a11" sha1="0cf507f263991315dc6d9b1fa3783030a4ba5189" offset="000000" />
@@ -18126,6 +18269,8 @@
 		</part>
 	</software>
 
+	<!-- This game supports interacting with real toys (using a cradle/reader connected to the GBA accessories port). Each toy (shaped like a crystal with a frozen monster inside)
+	    contains a serial EEPROM (probably with an ID and some data the game can read and write). -->
 	<software name="legendzy">
 		<description>Legendz - Yomigaeru Shiren no Shima (Jpn)</description>
 		<year>2004</year>
@@ -18134,6 +18279,11 @@
 		<info name="release" value="20040729"/>
 		<info name="alt_title" value="レジェンズ 甦る試練の島"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E05-01" />
+			<feature name="u1" value="U1 GPIO ROM" />
+			<feature name="u2" value="U2 1M/512K FLASH [39VF512]" />
+			<feature name="u3" value="U3 RTC [S3511]" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_flash_512" />
 			<dataarea name="rom" size="8388608">
 				<rom name="legendz - yomigaeru shiren no shima (japan).bin" size="8388608" crc="33950228" sha1="ff1e05a2fa70933dcf58a8be4f82fa289647c28a" offset="000000" />
@@ -23083,9 +23233,10 @@
 		<info name="release" value="20010321"/>
 		<info name="alt_title" value="ナポレオン"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-01" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
-				<rom name="napoleon (japan).bin" size="8388608" crc="fa016764" sha1="06cf9df7445b7aa662050ad41dd946a09dbc0581" offset="000000" />
+				<rom name="agb-anpj-0.bin" size="8388608" crc="fa016764" sha1="06cf9df7445b7aa662050ad41dd946a09dbc0581" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -24925,7 +25076,7 @@
 		<description>Pinobee - Wings of Adventure (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="AGB-APBE-USA, AGB-APBP"/>
+		<info name="serial" value="AGB-APBE-USA, AGB-APBP-EUR, AGB-APBP-EUR-1"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
@@ -25053,10 +25204,12 @@
 		<description>Pitfall - The Mayan Adventure (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Majesco</publisher>
-		<info name="serial" value="AGB-APFE-USA, AGB-APFP"/>
+		<info name="serial" value="AGB-APFE-USA, AGB-APFP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-10" />
+			<feature name="u1" value="U1 32M MROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="pitfall - the mayan adventure (usa, europe).bin" size="4194304" crc="2cedbb31" sha1="0de39e1cf6b199721069e8750e94abccc2e4b97d" offset="000000" />
+				<rom name="agb-apfp-0.u1" size="4194304" crc="2cedbb31" sha1="0de39e1cf6b199721069e8750e94abccc2e4b97d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26136,9 +26289,15 @@
 		<info name="release" value="20010321"/>
 		<info name="alt_title" value="パワプロクンポケット3"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-Y06-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [BS62LV256SC-70]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
-				<rom name="power pro kun pocket 3 (japan).bin" size="8388608" crc="4314d8bc" sha1="c6d7317d945f96034699501ac33b1966c5d2c3de" offset="000000" />
+				<rom name="agb-ap3j-0.u1" size="8388608" crc="4314d8bc" sha1="c6d7317d945f96034699501ac33b1966c5d2c3de" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27099,11 +27258,14 @@
 		<description>Rayman Advance (Euro)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
-		<info name="serial" value="AGB-ARYP"/>
+		<info name="serial" value="AGB-ARYP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="rayman advance (europe) (en,fr,de,es,it).bin" size="8388608" crc="b43783b4" sha1="6a32d270848ae302a3e4fb873e53b663c2db4811" offset="000000" />
+				<rom name="agb-aryp-0.u1" size="8388608" crc="b43783b4" sha1="6a32d270848ae302a3e4fb873e53b663c2db4811" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27114,9 +27276,12 @@
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="AGB-ARYE-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="rayman advance (usa) (en,fr,de,es,it).bin" size="8388608" crc="8aba5ab8" sha1="ff8a41c781735d2b4fe6cde65e82fb5a68f77f8b" offset="000000" />
+				<rom name="agb-arye-0.u1" size="8388608" crc="8aba5ab8" sha1="ff8a41c781735d2b4fe6cde65e82fb5a68f77f8b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27182,7 +27347,7 @@
 		<description>Ready 2 Rumble Boxing - Round 2 (Euro)</description>
 		<year>2001</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="AGB-AR2P"/>
+		<info name="serial" value="AGB-AR2P-NOE-1"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="ready 2 rumble boxing - round 2 (europe) (en,fr,de).bin" size="4194304" crc="e418e962" sha1="57d06e405b281f68800b986bd9ff1257e4466939" offset="000000" />
@@ -27794,6 +27959,9 @@
 		</part>
 	</software>
 
+	<!-- Compatible with "Battle Chips" (using the "Battle Chip Gate" (バトルチップゲート) connected to the GBA accessories port).
+	    A Battle Chip looks like a memory card, but contains no memory, it's just an ID by shortcutting different pins on its edge connector.
+	    https://megaman.fandom.com/wiki/List_of_Advanced_PET_Battle_Chips -->
 	<software name="rockmx45">
 		<description>Rockman EXE 4.5 - Real Operation (Jpn)</description>
 		<year>2004</year>
@@ -27802,6 +27970,11 @@
 		<info name="release" value="20040806"/>
 		<info name="alt_title" value="ロックマン エグゼ4.5 リアルオペレーション"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E05-01" />
+			<feature name="u1" value="U1 GPIO ROM" />
+			<feature name="u2" value="U2 1M/512K FLASH [39VF512]" />
+			<feature name="u3" value="U3 RTC [S3516]" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_flash_rtc" />
 			<dataarea name="rom" size="8388608">
 				<rom name="rockman exe 4.5 - real operation (japan).bin" size="8388608" crc="a646601b" sha1="f89ef4ca8ec1823eb75fa184f2d0f9e66cc78a59" offset="000000" />
@@ -29194,6 +29367,7 @@
 		</part>
 	</software>
 
+	<!-- This game has an integrated UV sensor (AGB-013). -->
 	<software name="sboktai">
 		<description>Shin Bokura no Taiyou - Gyakushuu no Sabata (Jpn)</description>
 		<year>2005</year>
@@ -29202,6 +29376,13 @@
 		<info name="release" value="20050728"/>
 		<info name="alt_title" value="新ボクらの太陽 逆襲のサバタ"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E18-01" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
+			<feature name="u3" value="U3 RTC [S3511]" />
+			<feature name="u4" value="U4 74LV4040 [74LV4040A]" />
+			<feature name="u5" value="U5 TLV272 [T272C]" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_boktai" />
 			<dataarea name="rom" size="16777216">
 				<rom name="shin bokura no taiyou - gyakushuu no sabata (japan).bin" size="16777216" crc="af453162" sha1="2651c5e6875ac60abff734510d152166d211c87c" offset="000000" />
@@ -30417,8 +30598,8 @@
 		</part>
 	</software>
 
-<!-- This comes from a proto cart: it is mostly similar to the final release, with single byte differences
-The cart also contained a non-empty SRAM save which we currently include in the set, even if we don't load it. -->
+	<!-- This comes from a proto cart: it is mostly similar to the final release, with single byte differences
+	The cart also contained a non-empty SRAM save which we currently include in the set, even if we don't load it. -->
 	<software name="sonicup" cloneof="sonic" supported="partial">
 		<description>Sonic Advance (USA, Prototype)</description>
 		<year>2002</year>
@@ -32405,13 +32586,14 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<description>Super Mario Advance (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-AMAE-USA, AGB-AMAP"/>
+		<info name="serial" value="AGB-AMAE-USA, AGB-AMAP-EUR, AGB-AMAP-EUR-1"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="pcb" value="AGB-E03-01" />   <!-- Also found on AGB-E03-10 -->
+			<feature name="pcb" value="AGB-E03-01" />   <!-- Also found on AGB-E03-10, AGB-E03-20 and AGB-E03-21 -->
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
+				<!-- US cart has label AGB-AMAE-0 -->
 				<rom name="agb-amap-0.u1" size="4194304" crc="1e4c6d6a" sha1="f071d45d8f5cb05b48d7d2b804c6cb6a79ad96fb" offset="000000" />
 			</dataarea>
 		</part>
@@ -34644,9 +34826,12 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<publisher>Kemco</publisher>
 		<info name="serial" value="AGB-ATCP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="top gear gt championship (europe).bin" size="4194304" crc="391c0497" sha1="c5af760e0d1269db4d9799dda98666f881ef8e5e" offset="000000" />
+				<rom name="agb-atcp-0.u1" size="4194304" crc="391c0497" sha1="c5af760e0d1269db4d9799dda98666f881ef8e5e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -36156,6 +36341,8 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		</part>
 	</software>
 
+	<!-- Game with rumble and gyroscope (AGB-019A).
+	    Has a sub-board (AGB-MOG-01) with "U1 CG-L43" (miniature angular rate sensor: https://4donline.ihs.com/images/VipMasterIC/IC/TOKN/TOKND00194/TOKND00194-23.pdf) -->
 	<software name="wariotws">
 		<description>WarioWare - Twisted! (USA)</description>
 		<year>2005</year>
@@ -36163,12 +36350,13 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<info name="serial" value="AGB-RZWE-USA"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-MOM-01" />
-			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u1" value="U1 GPIO MASKROM [MX23L12807-12C]" />
 			<feature name="u2" value="U2 256K FRAM [MB85R256S]" />
 			<feature name="u3" value="U3 [X01A]" />
 			<feature name="u4" value="U4 [empty]" />
 			<feature name="p1" value="P1 [AGB-MOG-01]" />
 			<feature name="slot" value="gba_wariotws" />
+			<feature name="rumble" value="yes" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-rzwe-0.u1" size="16777216" crc="cb4e844b" sha1="f0102d0d6f7596fe853d5d0a94682718278e083a" offset="000000" />
 			</dataarea>
@@ -37067,6 +37255,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		</part>
 	</software>
 
+	<!-- This game integrates an accelerometer for game control (AGB-013). -->
 	<software name="yoshitt" cloneof="yoshiug">
 		<description>Yoshi - Topsy-Turvy (USA)</description>
 		<year>2005</year>
@@ -37080,6 +37269,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		</part>
 	</software>
 
+	<!-- This game integrates an accelerometer for game control (AGB-013). -->
 	<software name="yoshiban" cloneof="yoshiug">
 		<description>Yoshi no Banyuuinryoku (Jpn)</description>
 		<year>2004</year>
@@ -37088,6 +37278,11 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<info name="release" value="20041209"/>
 		<info name="alt_title" value="ヨッシーの万有引力"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E08-10" />
+			<feature name="u1" value="U1 ACC1 [BU3668K]" />
+			<feature name="u2" value="U2 GPIO MASKROM [MX23L6407-12C1]" />
+			<feature name="u3" value="U3 4K/64K EEPROM [9853]" />
+			<feature name="u4" value="U4 ADXL202JQC [ADXL202JQC]" /> <!-- Analog Devices 2-axis accelerometer with digital output -->
 			<feature name="slot" value="gba_yoshiug" />
 			<dataarea name="rom" size="8388608">
 				<rom name="yoshi no banyuuinryoku (japan).bin" size="8388608" crc="31594b7a" sha1="a3f2035ca2bdc2bc59e9e46efbb6187705ebe3d1" offset="000000" />
@@ -37095,6 +37290,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		</part>
 	</software>
 
+	<!-- This game integrates an accelerometer for game control (AGB-013). -->
 	<software name="yoshiug">
 		<description>Yoshi's Universal Gravitation (Euro)</description>
 		<year>2005</year>
@@ -37133,11 +37329,14 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<description>Yu Yu Hakusho - Ghostfiles - Spirit Detective (Euro)</description>
 		<year>2005</year>
 		<publisher>Atari</publisher>
-		<info name="serial" value="AGB-BYYP"/>
+		<info name="serial" value="AGB-BYYP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="yu yu hakusho - ghostfiles - spirit detective (europe) (en,fr,de,es,it).bin" size="8388608" crc="208d77ec" sha1="66dc426b71195c11761f7ce58ffef231e8e227b1" offset="000000" />
+				<rom name="agb-byyp-0.u1" size="8388608" crc="208d77ec" sha1="66dc426b71195c11761f7ce58ffef231e8e227b1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -37217,7 +37416,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E02-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-			<feature name="u2" value="U2 512K/1M FLASH" />
+			<feature name="u2" value="U2 512K/1M FLASH [39VF512]" />
 			<feature name="slot" value="gba_flash" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-aydp-0.u1" size="8388608" crc="ee317f69" sha1="3ded1227698fbdb2ba47f03025cd1934fc184b99" offset="000000" />
@@ -37287,11 +37486,12 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<description>Yu-Gi-Oh! - The Sacred Cards (Euro)</description>
 		<year>2004</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="AGB-AY7P-FRA"/>
+		<info name="serial" value="AGB-AY7P-FRA, AGB-AY7P-UKV"/>
+		<info name="alt_title" value="Yu-Gi-Oh! - Les Cartes Sacrées (Box)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E11-10" />
 			<feature name="u1" value="U1 MASK ROM AGB" />
-			<feature name="u2" value="U2 256K FRAM" />
+			<feature name="u2" value="U2 256K FRAM [MB85R256A]" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-ay7p-0.u1" size="16777216" crc="d19db37c" sha1="9a23ad34f67ac1f1343b7009f11ac95c77b782ef" offset="000000" />
@@ -37305,9 +37505,12 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-AY7E-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E11-01" />
+			<feature name="u1" value="U1 MASK ROM AGB" />
+			<feature name="u2" value="U2 256K FRAM [MB85R256A]" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
-				<rom name="yu-gi-oh! - the sacred cards (usa).bin" size="16777216" crc="141fb1cc" sha1="a06735f9c3d10be9339657026981aef77af34b27" offset="000000" />
+				<rom name="agb-ay7e-0.u1" size="16777216" crc="141fb1cc" sha1="a06735f9c3d10be9339657026981aef77af34b27" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -37318,9 +37521,12 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BYWP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E11-10" />
+			<feature name="u1" value="U1 MASK ROM AGB" />
+			<feature name="u2" value="U2 256K FRAM [MB85R256A]" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
-				<rom name="yu-gi-oh! - world championship tournament 2004 (europe) (en,ja,fr,de,es,it).bin" size="16777216" crc="31edef1b" sha1="97a2e7cf6613538216dc807ae5ed92eaa4b9d7a8" offset="000000" />
+				<rom name="agb-bywp-0.u1" size="16777216" crc="3c42e84c" sha1="b791ee3241caef0566bca56bb70c6d37ad3b8621" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -37406,7 +37612,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-AY5E-USA"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="pcb" value="AGB-E06-10" />
+			<feature name="pcb" value="AGB-E06-10" /> <!-- Also found with AGB-E06-20 -->
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 256K SRAM [B62LV256C-70]" />
 			<feature name="u3" value="U3 9803F [LV2416]" />
@@ -37423,11 +37629,15 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<description>Shonen Jump's Yu-Gi-Oh! - Ultimate Masters Edition - World Championship Tournament 2006 (Euro)</description>
 		<year>2006</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="AGB-BY6P"/>
+		<info name="serial" value="AGB-BY6P-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-Y11-02" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 256K SRAM [MB85R256S]" />
+			<feature name="u3" value="U3 [empty]" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="33554432">
-				<rom name="yu-gi-oh! - ultimate masters edition - world championship tournament 2006 (europe) (en,ja,fr,de,es,it).bin" size="33554432" crc="cede4060" sha1="0734be2fe17d9ef5ede88e0a14cd194656aa23d8" offset="000000" />
+				<rom name="agb-by6p-0.u1" size="33554432" crc="cede4060" sha1="0734be2fe17d9ef5ede88e0a14cd194656aa23d8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -37605,6 +37815,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BYGE-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-Y11-02" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="33554432">
 				<rom name="yu-gi-oh! gx - duel academy (usa).bin" size="33554432" crc="3b8a00fe" sha1="57d6bb789833b62b360072902982d5f1011b3640" offset="000000" />
@@ -37940,9 +38151,15 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<info name="release" value="20011130"/>
 		<info name="alt_title" value="ゾイドサーガ"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [HY62WT081ED70C]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
-				<rom name="zoids saga (japan).bin" size="8388608" crc="5975dda8" sha1="75d8c15ac281ea93c8ac7cc7641c490799557081" offset="000000" />
+				<rom name="agb-atzj-0.u1" size="8388608" crc="5975dda8" sha1="75d8c15ac281ea93c8ac7cc7641c490799557081" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -38010,7 +38227,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<description>Zone of the Enders - The Fist of Mars (Euro)</description>
 		<year>2002</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="AGB-AZEP"/>
+		<info name="serial" value="AGB-AZEP-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E02-10" />
 			<feature name="u1" value="U1 MASKROM AGB" />
@@ -38152,10 +38369,11 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		</part>
 	</software>
 
+	<!-- Tech demo compiled from source code. This is a later build from code marked "Copyright (C) 1999-2001 NINTENDO Co.,Ltd." -->
 	<software name="yoshi">
-		<description>Yoshi Demo</description>
-		<year>2001?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Sample Yoshi Game (Prototype, 20010214)</description>
+		<year>2001</year>
+		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="2273956">
 				<rom name="yoshi.bin" size="2273956" crc="954d2619" sha1="89fe5c0b5489a14f5f9bb1d4ebde998f07c4f939" offset="000000" />
@@ -38163,10 +38381,11 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		</part>
 	</software>
 
+	<!-- Tech demo compiled from source code. This is an earlier build from code marked "Copyright (C) 1999-2000 NINTENDO Co.,Ltd." -->
 	<software name="yoshia" cloneof="yoshi">
-		<description>Yoshi Demo (Alt?)</description>
-		<year>2001?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Sample Yoshi Game (Prototype, 20000601)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="1717944">
 				<rom name="yoshi sample (japan) (en).bin" size="1717944" crc="34f2ef47" sha1="71b87b9684babfe5751a9fb6642ace5a927f21e0" offset="000000" />
@@ -38480,13 +38699,17 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 	</software>
 
 	<software name="2disney">
-		<description>2 Disney Games: Disney's Peter Pan - Return to Neverland + Disney's Lilo &amp; Stitch 2 (Euro)</description>
-		<year>200?</year>
+		<description>2 Disney Games: Disney's Lilo &amp; Stitch 2 + Disney's Peter Pan - Return to Neverland (Euro)</description>
+		<year>2004</year>
 		<publisher>Disney Interactive</publisher>
+		<info name="serial" value="AGB-BLQP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
-				<rom name="2 disney games - lilo &amp; stitch 2 + peter pan - return to neverland (europe) (en,fr,de,es+en,fr,de,es,it,nl).bin" size="16777216" crc="75703943" sha1="4b0455173b592407db9460b7e38fb209fd549772" offset="000000" />
+				<rom name="agb-blqp-0.u1" size="16777216" crc="75703943" sha1="4b0455173b592407db9460b7e38fb209fd549772" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -38670,7 +38893,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<description>2 Game Pack!: Hot Wheels - Stunt Track Challenge + Hot Wheels - World Race (Euro, USA)</description>
 		<year>200?</year>
 		<publisher>DSI Games</publisher>
-		<info name="serial" value="AGB-BQJE-USA, AGB-BQJP"/>
+		<info name="serial" value="AGB-BQJE-USA, AGB-BQJP-UKV"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-41" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -39800,6 +40023,19 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 
 <!-- Misc Add-ons -->
 
+	<!-- "Tony Hawk's Motion" for Nintendo DS uses an accessory called "Motion Pack" (Activision Part No. 83493.133) in form of GBA cart.
+	    It serves as motion sensor. Its inside PCB is labeled "DS-2011 R1.2" and contains:
+	        * Kionix KXSC4 high-performance, low-power, analog output tri-axis accelerometer (http://kionixfs.kionix.com/en/datasheet/KXSC4-2050%20Specifications%20Rev%203.pdf).
+	        * Atmel TINY13V high Performance, Low Power AVR 8-Bit RISC Microcontroller [ROM not dumped] (http://ww1.microchip.com/downloads/en/devicedoc/doc2535.pdf) -->
+
+	<!-- "Daigasso Band Brothers" (大合奏!バンドブラザーズ) for Nintendo DS uses a GBA cart (NTR-A-ZBBJ-JPN) called "Daigasso Request Selection" for adding new songs to the game.
+	    Inside there is an standard "AGB-E01-41" GBA cart PCB with "U1=GPIO MASK ROM [R27V810F-064]". -->
+
+	<!-- AM3 did a Nintendo officially licensed video player for GBA in form of a GBA cart with a SmartMedia slot.
+	    There were lot of pre-recorded SmartMedia cards with videos (Pokémon, Detective Conan, etc.), but also kiosk machines to download new videos to an empty card.
+	    Inside this GBA cart the PCB is labeled "YGP2-AM1-01". The ROM and the video processor are behind the SmartMedia slot, but the label "U3 AM3-ASIC" is visible. -->
+
+
 	<software name="gbapo" supported="no">
 		<description>GBA Personal Organizer (USA)</description>
 		<year>19??</year>
@@ -39867,6 +40103,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 	</software>
 
 	<!-- this needs confirmation? -->
+	<!-- This cart supports downloadable video-based mini-games (called "Garage Games"), that can be downloaded here: https://www.nintendo.co.jp/n08/playan/garage/index.html -->
 	<software name="playyan">
 		<description>Play-Yan (Jpn)</description>
 		<year>2005</year>
@@ -39886,6 +40123,19 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		</part>
 	</software>
 
+	<!-- The video playback can be configured by placing a file named "play_yanmicro.ini" on the SD root folder, with the following content:
+	        Property        Value
+	        PLAY_YAN_Design     0 (default, pictogram mode) or 1 (Mario mode).
+	        PLAY_YAN_StartMode  0 (movie mode) or 1 (default, music mode).
+	        PLAY_YAN_VolumeAdd  Integer from -19 to 9 (default is 0).
+	        PLAY_YAN_AudioPlayMode  0 (default, ordered list without repeat), 1 (ordered list with repeat), 2 (random without repeat) or 3 (random with repeat).
+	        PLAY_YAN_AudioBass      0 (default) or 1 (bass boost).
+	        PLAY_YAN_AudioWide      Integer from 0 to 6 (being 0 no wide sound effect and 6 maximum wide sound efect).
+	        PLAY_YAN_VideoPlayMode  0 (default, single video playback), 1 (repeat over the selection video list), 2 (play all the stored video clips) or 3 (play all the stored video clips, with repeat).
+	        PLAY_YAN_VideoBright    Integer from 0 to 5 (being 0 the default brightness value, and 6 the maximum brightness).
+	    The game came bundled (on the deluxe edition) with Panasonic Media Stage 4.2 to allow users to encode their own videos.
+	    There was a free upgrade tp version V4.2L311 (https://panasonic.jp/support/software/mediastage/download/v42_nintendo.html).
+	    It supports SD cards up to 1GB (it won't recognize 2GB SD cards). -->
 	<software name="playyanm">
 		<description>Play-Yan Micro (Jpn)</description>
 		<year>2005</year>
@@ -39894,6 +40144,10 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<info name="release" value="20050913"/>
 		<info name="alt_title" value="プレイやん micro"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-MGM-X2A" /> <!-- also can be AGB-MGM-03 (03 has no visible interal markings, but X2A has the usual "U" labels -->
+			<feature name="u1" value="AGS-ZMBJ-0" />
+			<feature name="u2" value="AlphaMosaic VideoCore VC01PXX-ES2" />
+			<feature name="u3" value="AGB-MAGMA [L5028226Y0]" /> <!-- from EPSON -->
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="4194304">
 				<rom name="play-yan micro (japan).bin" size="4194304" crc="e24f6a15" sha1="41a0c7c7ac492ecf94a4270099c5371b851377c4" offset="000000" />

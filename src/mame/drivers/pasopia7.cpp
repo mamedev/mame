@@ -7,9 +7,6 @@
     preliminary driver by Angelo Salese
 
     TODO:
-    - fix problems with keyboard
-      - can't type the same character more than once
-      - shift key doesn't work
     - floppy support (but floppy images are unobtainable at current time)
     - cassette device;
     - beeper
@@ -18,6 +15,8 @@
 
     Reading fdc has been commented out, until the code can be modified to
     work with new upd765 (was causing a hang at boot).
+
+    Schematics: https://archive.org/details/Io19839/page/n331
 
 ***************************************************************************************************/
 
@@ -93,7 +92,7 @@ private:
 	DECLARE_READ8_MEMBER(nmi_portb_r);
 	TIMER_CALLBACK_MEMBER(pio_timer);
 	DECLARE_VIDEO_START(pasopia7);
-	DECLARE_PALETTE_INIT(p7_lcd);
+	void p7_lcd_palette(palette_device &palette) const;
 	uint32_t screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void pasopia7_io(address_map &map);
@@ -536,7 +535,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_6845_w )
 	if(offset == 0)
 	{
 		m_addr_latch = data;
-		m_crtc->address_w(space, offset, data);
+		m_crtc->address_w(data);
 	}
 	else
 	{
@@ -548,7 +547,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_6845_w )
 		else if(m_addr_latch == 0x0f)
 			m_cursor_addr = (m_cursor_addr & 0x3f00) | (data & 0xff);
 
-		m_crtc->register_w(space, offset, data);
+		m_crtc->register_w(data);
 
 		/* double pump the pixel clock if we are in 640 x 200 mode */
 		if(m_screen_type == 1) // raster
@@ -573,8 +572,8 @@ READ8_MEMBER( pasopia7_state::pasopia7_fdc_r )
 {
 	switch(offset)
 	{
-		case 4: return m_fdc->msr_r(space, 0, 0xff);
-		case 5: return m_fdc->fifo_r(space, 0, 0xff);
+		case 4: return m_fdc->msr_r();
+		case 5: return m_fdc->fifo_r();
 		//case 6: bit 7 interrupt bit
 	}
 
@@ -587,7 +586,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_fdc_w )
 	{
 		case 0: m_fdc->tc_w(false); break;
 		case 2: m_fdc->tc_w(true); break;
-		case 5: m_fdc->fifo_w(space, 0, data, 0xff); break;
+		case 5: m_fdc->fifo_w(data); break;
 		case 6:
 			if(data & 0x80)
 				m_fdc->reset();
@@ -631,7 +630,7 @@ READ8_MEMBER( pasopia7_state::pasopia7_io_r )
 	}
 	else
 	if(io_port >= 0x28 && io_port <= 0x2b)
-		return m_ctc->read(space,io_port & 3);
+		return m_ctc->read(io_port & 3);
 	else
 	if(io_port >= 0x30 && io_port <= 0x33)
 		return m_pio->read(space, io_port & 3);
@@ -682,7 +681,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 	}
 	else
 	if(io_port >= 0x28 && io_port <= 0x2b)
-		m_ctc->write(space, io_port & 3, data);
+		m_ctc->write(io_port & 3, data);
 	else
 	if(io_port >= 0x30 && io_port <= 0x33)
 		m_pio->write(space, io_port & 3, data);
@@ -901,14 +900,12 @@ void pasopia7_state::machine_reset()
 	m_nmi_reset |= 4;
 }
 
-/* TODO: palette values are mostly likely to be wrong in there */
-PALETTE_INIT_MEMBER(pasopia7_state,p7_lcd)
+// TODO: palette values are mostly likely to be wrong in there
+void pasopia7_state::p7_lcd_palette(palette_device &palette) const
 {
-	int i;
-
 	palette.set_pen_color(0, 0xa0, 0xa8, 0xa0);
 
-	for( i = 1; i < 8; i++)
+	for (int i = 1; i < 8; i++)
 		palette.set_pen_color(i, 0x30, 0x38, 0x10);
 }
 
@@ -922,7 +919,8 @@ static void pasopia7_floppies(device_slot_interface &device)
 	device.option_add("525hd", FLOPPY_525_HD);
 }
 
-MACHINE_CONFIG_START(pasopia7_state::p7_base)
+void pasopia7_state::p7_base(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pasopia7_state::pasopia7_mem);
@@ -932,11 +930,9 @@ MACHINE_CONFIG_START(pasopia7_state::p7_base)
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SN76489A(config, m_sn1, 1996800).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider
 
-	MCFG_DEVICE_ADD("sn2", SN76489A, 1996800) // unknown clock / divider
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SN76489A(config, m_sn2, 1996800).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider
 
 	/* Devices */
 	Z80CTC(config, m_ctc, XTAL(4'000'000));
@@ -967,52 +963,55 @@ MACHINE_CONFIG_START(pasopia7_state::p7_base)
 	m_ppi2->in_pc_callback().set(FUNC(pasopia7_state::nmi_reg_r));
 	m_ppi2->out_pc_callback().set(FUNC(pasopia7_state::nmi_reg_w));
 
-	UPD765A(config, m_fdc, true, true);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats)
-MACHINE_CONFIG_END
+	UPD765A(config, m_fdc, 8'000'000, true, true);
+	FLOPPY_CONNECTOR(config, "fdc:0", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats);
+}
 
-MACHINE_CONFIG_START(pasopia7_state::p7_raster)
+void pasopia7_state::p7_raster(machine_config &config)
+{
 	p7_base(config);
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 32-1)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 640-1, 0, 32-1);
+	m_screen->set_palette(m_palette);
+	m_screen->set_screen_update(FUNC(pasopia7_state::screen_update_pasopia7));
 
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
-	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pasopia7)
+
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pasopia7);
 
 	H46505(config, m_crtc, VDP_CLOCK); /* unknown clock, hand tuned to get ~60 fps */
-	m_crtc->set_screen("screen");
+	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(pasopia7_state::p7_lcd)
+void pasopia7_state::p7_lcd(machine_config &config)
+{
 	p7_base(config);
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
-	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 640-1, 0, 200-1);
+	m_screen->set_screen_update(FUNC(pasopia7_state::screen_update_pasopia7));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(pasopia7_state,p7_lcd)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pasopia7)
+	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
+
+	PALETTE(config, m_palette, FUNC(pasopia7_state::p7_lcd_palette), 8);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pasopia7);
 
 	H46505(config, m_crtc, LCD_CLOCK); /* unknown clock, hand tuned to get ~60 fps */
-	m_crtc->set_screen("screen");
+	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( pasopia7 )
@@ -1065,14 +1064,14 @@ void pasopia7_state::init_p7_raster()
 {
 	m_screen_type = 1;
 	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia7_state::pio_timer), this));
-	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
+	m_pio_timer->adjust(attotime::from_hz(5000), 0, attotime::from_hz(5000));
 }
 
 void pasopia7_state::init_p7_lcd()
 {
 	m_screen_type = 0;
 	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia7_state::pio_timer), this));
-	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
+	m_pio_timer->adjust(attotime::from_hz(5000), 0, attotime::from_hz(5000));
 }
 
 

@@ -98,7 +98,7 @@ public:
 		, m_view2(*this, "view2")
 		, m_soundlatch(*this, "soundlatch%u", 1)
 		, m_audiobank(*this, "audiobank")
-		{ }
+	{ }
 
 	void sandscrp(machine_config &config);
 
@@ -133,7 +133,7 @@ private:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void update_irq_state();
-	void sandscrp(address_map &map);
+	void sandscrp_mem(address_map &map);
 	void sandscrp_soundmem(address_map &map);
 	void sandscrp_soundport(address_map &map);
 };
@@ -146,11 +146,11 @@ uint32_t sandscrp_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	screen.priority().fill(0, cliprect);
 
-	m_view2->kaneko16_prepare(bitmap, cliprect);
+	m_view2->prepare(bitmap, cliprect);
 
 	for ( int l = 0; l < 4; l++ )
 	{
-		m_view2->render_tilemap_chip(screen,bitmap,cliprect,l);
+		m_view2->render_tilemap(screen,bitmap,cliprect,l);
 	}
 
 	// copy sprite bitmap to screen
@@ -158,7 +158,7 @@ uint32_t sandscrp_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	for ( int h = 4; h < 8; h++ ) // high bit of tile priority : above sprites
 	{
-		m_view2->render_tilemap_chip(screen,bitmap,cliprect,h);
+		m_view2->render_tilemap(screen,bitmap,cliprect,h);
 	}
 
 	return 0;
@@ -268,25 +268,25 @@ template<int Latch>
 READ8_MEMBER(sandscrp_state::soundlatch_r)
 {
 	m_latch_full[Latch] = 0;
-	return m_soundlatch[Latch]->read(space,0);
+	return m_soundlatch[Latch]->read();
 }
 
 template<int Latch>
 WRITE8_MEMBER(sandscrp_state::soundlatch_w)
 {
 	m_latch_full[Latch] = 1;
-	m_soundlatch[Latch]->write(space,0,data);
+	m_soundlatch[Latch]->write(data);
 }
 
-void sandscrp_state::sandscrp(address_map &map)
+void sandscrp_state::sandscrp_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();     // ROM
 	map(0x100000, 0x100001).w(FUNC(sandscrp_state::irq_cause_w)); // IRQ Ack
 
 	map(0x700000, 0x70ffff).ram();     // RAM
 	map(0x200000, 0x20001f).rw("calc1_mcu", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
-	map(0x300000, 0x30001f).rw(m_view2, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
-	map(0x400000, 0x403fff).rw(m_view2, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x300000, 0x30001f).rw(m_view2, FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
+	map(0x400000, 0x403fff).m(m_view2, FUNC(kaneko_view2_tilemap_device::vram_map));
 	map(0x500000, 0x501fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w)); // sprites
 	map(0x600000, 0x600fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0xa00000, 0xa00001).w(FUNC(sandscrp_state::coincounter_w));  // Coin Counters (Lockout unused)
@@ -467,40 +467,38 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-MACHINE_CONFIG_START(sandscrp_state::sandscrp)
-
+void sandscrp_state::sandscrp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,12000000)    /* TMP68HC000N-12 */
-	MCFG_DEVICE_PROGRAM_MAP(sandscrp)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sandscrp_state,  interrupt)
+	M68000(config, m_maincpu, 12000000);    /* TMP68HC000N-12 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sandscrp_state::sandscrp_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(sandscrp_state::interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)   /* Z8400AB1, Reads the DSWs: it can't be disabled */
-	MCFG_DEVICE_PROGRAM_MAP(sandscrp_soundmem)
-	MCFG_DEVICE_IO_MAP(sandscrp_soundport)
+	Z80(config, m_audiocpu, 4000000);   /* Z8400AB1, Reads the DSWs: it can't be disabled */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sandscrp_state::sandscrp_soundmem);
+	m_audiocpu->set_addrmap(AS_IO, &sandscrp_state::sandscrp_soundport);
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME( ATTOSECONDS_IN_USEC(2500) /* not accurate */ )
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sandscrp_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sandscrp_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time( ATTOSECONDS_IN_USEC(2500) /* not accurate */ );
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0+16, 256-16-1);
+	screen.set_screen_update(FUNC(sandscrp_state::screen_update));
+	screen.screen_vblank().set(FUNC(sandscrp_state::screen_vblank));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sandscrp)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_sandscrp);
+	PALETTE(config, "palette").set_format(palette_device::xGRB_555, 2048);
 
 	KANEKO_TMAP(config, m_view2);
 	m_view2->set_gfx_region(1);
 	m_view2->set_offset(0x5b, 0, 256, 224);
 	m_view2->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
-	MCFG_KANEKO_HIT_TYPE(0)
+	KANEKO_HIT(config, "calc1_mcu").set_type(0);
 
 	KANEKO_PANDORA(config, m_pandora, 0);
 	m_pandora->set_gfxdecode_tag("gfxdecode");
@@ -513,8 +511,7 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 12000000/6, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	OKIM6295(config, "oki", 12000000/6, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	/* YM3014B + YM2203C */
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", 4000000));
@@ -522,7 +519,7 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	ymsnd.port_a_read_callback().set_ioport("DSW1");
 	ymsnd.port_b_read_callback().set_ioport("DSW2");
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.5);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

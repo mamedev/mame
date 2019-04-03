@@ -114,7 +114,7 @@ public:
 	DECLARE_MACHINE_START(zerotrgt);
 	DECLARE_MACHINE_RESET(zerotrgt);
 	DECLARE_VIDEO_START(zerotrgt);
-	DECLARE_PALETTE_INIT(zerotrgt);
+	void zerotrgt_palette(palette_device &palette) const;
 	uint32_t screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(subcpu_vblank_irq);
@@ -132,31 +132,30 @@ public:
 };
 
 
-PALETTE_INIT_MEMBER(cntsteer_state,zerotrgt)
+void cntsteer_state::zerotrgt_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
-		/* red component */
+		// red component
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
-		g = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
-		/* green component */
+		int const g = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
+		// green component
 		bit0 = (color_prom[i] >> 4) & 0x01;
 		bit1 = (color_prom[i] >> 5) & 0x01;
 		bit2 = (color_prom[i] >> 6) & 0x01;
-		r = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
-		/* blue component */
+		int const r = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
+		// blue component
 		bit0 = (color_prom[i + 256] >> 0) & 0x01;
 		bit1 = (color_prom[i + 256] >> 1) & 0x01;
 		bit2 = (color_prom[i + 256] >> 2) & 0x01;
-		b = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
+		int const b = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
 
-		palette.set_pen_color(i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -513,7 +512,7 @@ WRITE8_MEMBER(cntsteer_state::gekitsui_sub_irq_ack)
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_sound_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -920,19 +919,19 @@ MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
 	MACHINE_RESET_CALL_MEMBER(zerotrgt);
 }
 
-MACHINE_CONFIG_START(cntsteer_state::cntsteer)
-
+void cntsteer_state::cntsteer(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)      /* MC68B09E */
-	MCFG_DEVICE_PROGRAM_MAP(cntsteer_cpu1_map)
+	MC6809E(config, m_maincpu, 2000000);      /* MC68B09E */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cntsteer_state::cntsteer_cpu1_map);
 
-	MCFG_DEVICE_ADD("subcpu", MC6809E, 2000000)       /* MC68B09E */
-	MCFG_DEVICE_PROGRAM_MAP(cntsteer_cpu2_map)
-//  MCFG_DEVICE_DISABLE()
+	MC6809E(config, m_subcpu, 2000000);       /* MC68B09E */
+	m_subcpu->set_addrmap(AS_PROGRAM, &cntsteer_state::cntsteer_cpu2_map);
+//  m_subcpu->set_disable();
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)        /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(cntsteer_state, sound_interrupt,  480)
+	M6502(config, m_audiocpu, 1500000);        /* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cntsteer_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(cntsteer_state::sound_interrupt), attotime::from_hz(480));
 
 	MCFG_MACHINE_START_OVERRIDE(cntsteer_state,cntsteer)
 	MCFG_MACHINE_RESET_OVERRIDE(cntsteer_state,cntsteer)
@@ -948,11 +947,11 @@ MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI); // ?
 	screen.screen_vblank().append(FUNC(cntsteer_state::subcpu_vblank_irq)); // ?
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-	MCFG_QUANTUM_PERFECT_CPU("subcpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.m_perfect_cpu_quantum = subtag("subcpu");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cntsteer)
-	MCFG_PALETTE_ADD("palette", 256)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cntsteer);
+	PALETTE(config, m_palette).set_entries(256);
 //  MCFG_PALETTE_INIT_OWNER(cntsteer_state,zerotrgt)
 
 	MCFG_VIDEO_START_OVERRIDE(cntsteer_state,cntsteer)
@@ -968,43 +967,43 @@ MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 
 	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
-
+void cntsteer_state::zerotrgt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)      /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(gekitsui_cpu1_map)
+	MC6809E(config, m_maincpu, 2000000);      /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cntsteer_state::gekitsui_cpu1_map);
 
-	MCFG_DEVICE_ADD("subcpu", MC6809E, 2000000)       /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(gekitsui_cpu2_map)
+	MC6809E(config, m_subcpu, 2000000);       /* ? */
+	m_subcpu->set_addrmap(AS_PROGRAM, &cntsteer_state::gekitsui_cpu2_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)        /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(cntsteer_state, sound_interrupt,  480)
+	M6502(config, m_audiocpu, 1500000);        /* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cntsteer_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(cntsteer_state::sound_interrupt), attotime::from_hz(480));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	MCFG_MACHINE_START_OVERRIDE(cntsteer_state,zerotrgt)
 	MCFG_MACHINE_RESET_OVERRIDE(cntsteer_state,zerotrgt)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cntsteer_state, screen_update_zerotrgt)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI)) // ?
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(cntsteer_state::screen_update_zerotrgt));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI); // ?
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zerotrgt)
-	MCFG_PALETTE_ADD("palette", 256)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zerotrgt);
+	PALETTE(config, m_palette, FUNC(cntsteer_state::zerotrgt_palette), 256);
 
-	MCFG_PALETTE_INIT_OWNER(cntsteer_state,zerotrgt)
 	MCFG_VIDEO_START_OVERRIDE(cntsteer_state,zerotrgt)
 
 	/* sound hardware */
@@ -1015,7 +1014,7 @@ MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************/
 

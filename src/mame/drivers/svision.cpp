@@ -301,62 +301,56 @@ static INPUT_PORTS_START( svisions )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START) PORT_NAME("2nd Start/Pause") PORT_PLAYER(2)
 INPUT_PORTS_END
 
-/* most games contain their graphics in roms, and have hardware to
-   draw complete rectangular objects */
+// most games contain their graphics in roms, and have hardware to draw complete rectangular objects
 
-/* palette in red, green, blue triples */
-static const unsigned char svision_palette[] =
+// palette in red, green, blue triples
+static constexpr rgb_t svision_pens[] =
 {
 #if 0
-	/* greens grabbed from a scan of a handheld
-	 * in its best adjustment for contrast
-	 */
-	86, 121, 86,
-	81, 115, 90,
-	74, 107, 101,
-	54, 78, 85
+	// greens grabbed from a scan of a handheld in its best adjustment for contrast
+	{ 86, 121,  86 },
+	{ 81, 115,  90 },
+	{ 74, 107, 101 },
+	{ 54,  78,  85 }
 #else
-	/* grabbed from chris covell's black white pics */
-	0xe0, 0xe0, 0xe0,
-	0xb9, 0xb9, 0xb9,
-	0x54, 0x54, 0x54,
-	0x12, 0x12, 0x12
+	// grabbed from chris covell's black white pics
+	{ 0xe0, 0xe0, 0xe0 },
+	{ 0xb9, 0xb9, 0xb9 },
+	{ 0x54, 0x54, 0x54 },
+	{ 0x12, 0x12, 0x12 }
 #endif
 };
 
-/* palette in RGB triplets */
-static const unsigned char svisionp_palette[] =
+// palette in RGB triplets
+static constexpr rgb_t svisionp_pens[] =
 {
 	// pal
-	1, 1, 3,
-	5, 18, 9,
-	48, 76, 100,
-	190, 190, 190
+	{   1,   1,   3 },
+	{   5,  18,   9 },
+	{  48,  76, 100 },
+	{ 190, 190, 190 }
 };
 
-/* palette in RGB triplets */
-static const unsigned char svisionn_palette[] =
+// palette in RGB triplets
+static constexpr rgb_t svisionn_pens[] =
 {
-	0, 0, 0,
-	188, 242, 244, // darker
-	129, 204, 255,
-	245, 249, 248
+	{   0,   0,   0 },
+	{ 188, 242, 244 }, // darker
+	{ 129, 204, 255 },
+	{ 245, 249, 248 }
 };
 
-PALETTE_INIT_MEMBER(svision_state, svision)
+void svision_state::svision_palette(palette_device &palette) const
 {
-	for (int i = 0; i < sizeof(svision_palette) / 3; i++)
-		palette.set_pen_color(i, svision_palette[i*3], svision_palette[i*3+1], svision_palette[i*3+2]);
+	palette.set_pen_colors(0, svision_pens);
 }
-PALETTE_INIT_MEMBER(svision_state,svisionn)
+void svision_state::svisionn_palette(palette_device &palette) const
 {
-	for (int i = 0; i < sizeof(svisionn_palette) / 3; i++)
-		palette.set_pen_color(i, svisionn_palette[i*3], svisionn_palette[i*3+1], svisionn_palette[i*3+2]);
+	palette.set_pen_colors(0, svisionn_pens);
 }
-PALETTE_INIT_MEMBER(svision_state,svisionp)
+void svision_state::svisionp_palette(palette_device &palette) const
 {
-	for (int i = 0; i < sizeof(svisionn_palette) / 3; i++)
-		palette.set_pen_color(i, svisionp_palette[i*3], svisionp_palette[i*3+1], svisionp_palette[i*3+2]);
+	palette.set_pen_colors(0, svisionp_pens);
 }
 
 uint32_t svision_state::screen_update_svision(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -494,10 +488,10 @@ MACHINE_RESET_MEMBER(svision_state,tvlink)
 	memset(m_reg + 0x800, 0xff, 0x40); // normally done from m_tvlink microcontroller
 	m_reg[0x82a] = 0xdf;
 
-	m_tvlink.palette[0] = MAKE24_RGB32(svisionp_palette[ 0], svisionp_palette[ 1], svisionp_palette[ 2]);
-	m_tvlink.palette[1] = MAKE24_RGB32(svisionp_palette[ 3], svisionp_palette[ 4], svisionp_palette[ 5]);
-	m_tvlink.palette[2] = MAKE24_RGB32(svisionp_palette[ 6], svisionp_palette[ 7], svisionp_palette[ 8]);
-	m_tvlink.palette[3] = MAKE24_RGB32(svisionp_palette[ 9], svisionp_palette[10], svisionp_palette[11]);
+	m_tvlink.palette[0] = MAKE24_RGB32(svisionp_pens[0].r(), svisionp_pens[0].g(), svisionp_pens[0].b());
+	m_tvlink.palette[1] = MAKE24_RGB32(svisionp_pens[1].r(), svisionp_pens[1].g(), svisionp_pens[1].b());
+	m_tvlink.palette[2] = MAKE24_RGB32(svisionp_pens[2].r(), svisionp_pens[2].g(), svisionp_pens[2].b());
+	m_tvlink.palette[3] = MAKE24_RGB32(svisionp_pens[3].r(), svisionp_pens[3].g(), svisionp_pens[3].b());
 }
 
 MACHINE_CONFIG_START(svision_state::svision_base)
@@ -515,48 +509,52 @@ MACHINE_CONFIG_START(svision_state::svision_base)
 	MCFG_GENERIC_MANDATORY
 	MCFG_GENERIC_LOAD(svision_state, svision_cart)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "svision")
+	SOFTWARE_LIST(config, "cart_list").set_original("svision");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(svision_state::svision)
+void svision_state::svision(machine_config &config)
+{
 	svision_base(config);
 
-	MCFG_DEVICE_ADD(m_maincpu, M65C02, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(svision_mem)
+	M65C02(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &svision_state::svision_mem);
 
-	MCFG_SCREEN_ADD(m_screen, LCD)
-	MCFG_SCREEN_REFRESH_RATE(61)
-	MCFG_SCREEN_SIZE(3+160+3, 160)
-	MCFG_SCREEN_VISIBLE_AREA(3+0, 3+160-1, 0, 160-1)
-	MCFG_SCREEN_UPDATE_DRIVER(svision_state, screen_update_svision)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, svision_state, frame_int_w))
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(61);
+	m_screen->set_size(3+160+3, 160);
+	m_screen->set_visarea(3+0, 3+160-1, 0, 160-1);
+	m_screen->set_screen_update(FUNC(svision_state::screen_update_svision));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(svision_state::frame_int_w));
 
-	MCFG_PALETTE_ADD(m_palette, ARRAY_LENGTH(svision_palette) * 3)
-	MCFG_PALETTE_INIT_OWNER(svision_state, svision )
-MACHINE_CONFIG_END
+	PALETTE(config, m_palette, FUNC(svision_state::svision_palette), ARRAY_LENGTH(svision_pens));
+}
 
-MACHINE_CONFIG_START(svision_state::svisions)
+void svision_state::svisions(machine_config &config)
+{
 	svision(config);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("pet_timer", svision_state, svision_pet_timer_dev, attotime::from_seconds(8))
-MACHINE_CONFIG_END
+	TIMER(config, "pet_timer").configure_periodic(FUNC(svision_state::svision_pet_timer_dev), attotime::from_seconds(8));
+}
 
-MACHINE_CONFIG_START(svision_state::svisionp)
+void svision_state::svisionp(machine_config &config)
+{
 	svision(config);
 
 	m_maincpu->set_clock(4430000);
 	m_screen->set_refresh(HZ_TO_ATTOSECONDS(50));
-	m_palette->set_init(palette_init_delegate(&svision_state::palette_init_svisionp, "svision_state::palette_init_svisionp", this));
-MACHINE_CONFIG_END
+	m_palette->set_init(FUNC(svision_state::svisionp_palette));
+}
 
-MACHINE_CONFIG_START(svision_state::svisionn)
+void svision_state::svisionn(machine_config &config)
+{
 	svision(config);
 	m_maincpu->set_clock(3560000/*?*/);
 	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
-	m_palette->set_init(palette_init_delegate(&svision_state::palette_init_svisionn, "svision_state::palette_init_svisionn", this));
-MACHINE_CONFIG_END
+	m_palette->set_init(FUNC(svision_state::svisionn_palette));
+}
 
-MACHINE_CONFIG_START(svision_state::tvlinkp)
+void svision_state::tvlinkp(machine_config &config)
+{
 	svisionp(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::tvlink_mem, tag(), this));
 
@@ -564,7 +562,7 @@ MACHINE_CONFIG_START(svision_state::tvlinkp)
 	m_screen->set_screen_update(FUNC(svision_state::screen_update_tvlink));
 
 	MCFG_MACHINE_RESET_OVERRIDE(svision_state, tvlink)
-MACHINE_CONFIG_END
+}
 
 ROM_START(svision)
 	ROM_REGION(0x80000, "maincpu", ROMREGION_ERASE00)

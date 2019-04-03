@@ -445,29 +445,26 @@ static GFXDECODE_START( gfx_shangha3 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(shangha3_state::shangha3)
-
+void shangha3_state::shangha3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 48_MHz_XTAL/3) // TMP68HC000N-16
-	MCFG_DEVICE_PROGRAM_MAP(shangha3_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
+	M68000(config, m_maincpu, 48_MHz_XTAL/3); // TMP68HC000N-16
+	m_maincpu->set_addrmap(AS_PROGRAM, &shangha3_state::shangha3_map);
+	m_maincpu->set_vblank_int("screen", FUNC(shangha3_state::irq4_line_assert));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-//  MCFG_SCREEN_SIZE(24*16, 16*16)
-//  MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 1*16, 15*16-1)
-	MCFG_SCREEN_RAW_PARAMS(48_MHz_XTAL/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//  m_screen->set_refresh_hz(60);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+//  m_screen->set_size(24*16, 16*16);
+//  m_screen->set_visarea(0*16, 24*16-1, 1*16, 15*16-1);
+	m_screen->set_raw(48_MHz_XTAL/6, 512, 0, 24*16, 263, 1*16, 15*16); /* refresh rate is unknown */
+	m_screen->set_screen_update(FUNC(shangha3_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shangha3);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shangha3)
-
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 2048).enable_shadows();
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -477,38 +474,34 @@ MACHINE_CONFIG_START(shangha3_state::shangha3)
 	aysnd.port_b_read_callback().set_ioport("DSW2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(shangha3_state::heberpop)
-
+void shangha3_state::heberpop(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 48_MHz_XTAL/3) // TMP68HC000N-16 like the others??
-	MCFG_DEVICE_PROGRAM_MAP(heberpop_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
+	M68000(config, m_maincpu, 48_MHz_XTAL/3); // TMP68HC000N-16 like the others??
+	m_maincpu->set_addrmap(AS_PROGRAM, &shangha3_state::heberpop_map);
+	m_maincpu->set_vblank_int("screen", FUNC(shangha3_state::irq4_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 48_MHz_XTAL/8)  /* 6 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(heberpop_sound_map)
-	MCFG_DEVICE_IO_MAP(heberpop_sound_io_map)  /* NMI triggered by YM3438 */
+	Z80(config, m_audiocpu, 48_MHz_XTAL/8);  /* 6 MHz ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &shangha3_state::heberpop_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &shangha3_state::heberpop_sound_io_map);  /* NMI triggered by YM3438 */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-//  MCFG_SCREEN_SIZE(24*16, 16*16)
-//  MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 1*16, 15*16-1)
-	MCFG_SCREEN_RAW_PARAMS(48_MHz_XTAL/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//  m_screen->set_refresh_hz(60);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+//  m_screen->set_size(24*16, 16*16);
+//  m_screen->set_visarea(0*16, 24*16-1, 1*16, 15*16-1);
+	m_screen->set_raw(48_MHz_XTAL/6, 512, 0, 24*16, 263, 1*16, 15*16); /* refresh rate is unknown */
+	m_screen->set_screen_update(FUNC(shangha3_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shangha3);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shangha3)
-
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 2048).enable_shadows();
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -516,43 +509,39 @@ MACHINE_CONFIG_START(shangha3_state::heberpop)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3438, 48_MHz_XTAL/6) /* 8 MHz? */
-	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
+	ym3438_device &ymsnd(YM3438(config, "ymsnd", 48_MHz_XTAL/6)); /* 8 MHz? */
+	ymsnd.irq_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
+	ymsnd.add_route(0, "mono", 0.40);
+	ymsnd.add_route(1, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(shangha3_state::blocken)
-
+void shangha3_state::blocken(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 48_MHz_XTAL/3) // TMP68HC000N-16
-	MCFG_DEVICE_PROGRAM_MAP(blocken_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
+	M68000(config, m_maincpu, 48_MHz_XTAL/3); // TMP68HC000N-16
+	m_maincpu->set_addrmap(AS_PROGRAM, &shangha3_state::blocken_map);
+	m_maincpu->set_vblank_int("screen", FUNC(shangha3_state::irq4_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 48_MHz_XTAL/8)   /* 6 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(heberpop_sound_map)
-	MCFG_DEVICE_IO_MAP(heberpop_sound_io_map)  /* NMI triggered by YM3438 */
+	Z80(config, m_audiocpu, 48_MHz_XTAL/8);   /* 6 MHz? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &shangha3_state::heberpop_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &shangha3_state::heberpop_sound_io_map);  /* NMI triggered by YM3438 */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-//  MCFG_SCREEN_SIZE(24*16, 16*16)
-//  MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 1*16, 15*16-1)
-	MCFG_SCREEN_RAW_PARAMS(48_MHz_XTAL/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//  m_screen->set_refresh_hz(60);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+//  m_screen->set_size(24*16, 16*16);
+//  m_screen->set_visarea(0*16, 24*16-1, 1*16, 15*16-1);
+	m_screen->set_raw(48_MHz_XTAL/6, 512, 0, 24*16, 263, 1*16, 15*16); /* refresh rate is unknown */
+	m_screen->set_screen_update(FUNC(shangha3_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shangha3);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shangha3)
-
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 2048).enable_shadows();
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -560,15 +549,15 @@ MACHINE_CONFIG_START(shangha3_state::blocken)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3438, 48_MHz_XTAL/6) /* 8 MHz? */
-	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
+	ym3438_device &ymsnd(YM3438(config, "ymsnd", 48_MHz_XTAL/6)); /* 8 MHz? */
+	ymsnd.irq_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
+	ymsnd.add_route(0, "mono", 0.40);
+	ymsnd.add_route(1, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, blocken_oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->set_addrmap(0, &shangha3_state::blocken_oki_map);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

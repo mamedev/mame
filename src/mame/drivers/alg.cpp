@@ -305,11 +305,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(alg_state::alg_r1)
-
+void alg_state::alg_r1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
-	MCFG_DEVICE_PROGRAM_MAP(main_map_r1)
+	M68000(config, m_maincpu, amiga_state::CLK_7M_NTSC);
+	m_maincpu->set_addrmap(AS_PROGRAM, &alg_state::main_map_r1);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&alg_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
@@ -318,14 +318,14 @@ MACHINE_CONFIG_START(alg_state::alg_r1)
 	/* video hardware */
 	ntsc_video(config);
 
-	MCFG_LASERDISC_LDP1450_ADD("laserdisc",9600)
-	MCFG_LASERDISC_SCREEN("screen")
-	MCFG_LASERDISC_OVERLAY_DRIVER(512*2, 262, amiga_state, screen_update_amiga)
-	MCFG_LASERDISC_OVERLAY_CLIP((129-8)*2, (449+8-1)*2, 44-8, 244+8-1)
-	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
+	SONY_LDP1450(config, m_laserdisc, 9600);
+	m_laserdisc->set_screen("screen");
+	m_laserdisc->set_overlay(512*2, 262, FUNC(amiga_state::screen_update_amiga));
+	m_laserdisc->set_overlay_clip((129-8)*2, (449+8-1)*2, 44-8, 244+8-1);
+	m_laserdisc->set_overlay_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4097)
-	MCFG_PALETTE_INIT_OWNER(alg_state,amiga)
+
+	PALETTE(config, m_palette, FUNC(alg_state::amiga_palette), 4097);
 
 	MCFG_VIDEO_START_OVERRIDE(alg_state,alg)
 
@@ -333,25 +333,25 @@ MACHINE_CONFIG_START(alg_state::alg_r1)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	paula_8364_device &paula(PAULA_8364(config, "amiga", amiga_state::CLK_C1_NTSC));
-	paula.add_route(0, "lspeaker", 0.25);
-	paula.add_route(1, "rspeaker", 0.25);
-	paula.add_route(2, "rspeaker", 0.25);
-	paula.add_route(3, "lspeaker", 0.25);
-	paula.mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
-	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
+	PAULA_8364(config, m_paula, amiga_state::CLK_C1_NTSC);
+	m_paula->add_route(0, "lspeaker", 0.25);
+	m_paula->add_route(1, "rspeaker", 0.25);
+	m_paula->add_route(2, "rspeaker", 0.25);
+	m_paula->add_route(3, "lspeaker", 0.25);
+	m_paula->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	m_paula->int_cb().set(FUNC(amiga_state::paula_int_w));
 
-	MCFG_DEVICE_MODIFY("laserdisc")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	m_laserdisc->add_route(0, "lspeaker", 1.0);
+	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* cia */
-	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_0_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(IOPORT("FIRE"))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, amiga_state, cia_0_port_a_write))
-	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_1_irq))
+	MOS8520(config, m_cia_0, amiga_state::CLK_E_NTSC);
+	m_cia_0->irq_wr_callback().set(FUNC(amiga_state::cia_0_irq));
+	m_cia_0->pa_rd_callback().set_ioport("FIRE");
+	m_cia_0->pa_wr_callback().set(FUNC(amiga_state::cia_0_port_a_write));
+
+	MOS8520(config, m_cia_1, amiga_state::CLK_E_NTSC);
+	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
 
 	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);
 	m_fdc->index_callback().set("cia_1", FUNC(mos8520_device::flag_w));
@@ -359,34 +359,31 @@ MACHINE_CONFIG_START(alg_state::alg_r1)
 	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));
 	m_fdc->dskblk_callback().set(FUNC(amiga_state::fdc_dskblk_w));
 	m_fdc->dsksyn_callback().set(FUNC(amiga_state::fdc_dsksyn_w));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(alg_state::alg_r2)
+void alg_state::alg_r2(machine_config &config)
+{
 	alg_r1(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(main_map_r2)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &alg_state::main_map_r2);
+}
 
 
-MACHINE_CONFIG_START(alg_state::picmatic)
+void alg_state::picmatic(machine_config &config)
+{
 	alg_r1(config);
 	/* adjust for PAL specs */
-	MCFG_DEVICE_REPLACE("maincpu", M68000, amiga_state::CLK_7M_PAL)
-	MCFG_DEVICE_PROGRAM_MAP(main_map_picmatic)
+	m_maincpu->set_clock(amiga_state::CLK_7M_PAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &alg_state::main_map_picmatic);
 
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	pal_video(config);
 
-	MCFG_DEVICE_MODIFY("amiga")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_PAL)
-	MCFG_DEVICE_MODIFY("cia_0")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_PAL)
-	MCFG_DEVICE_MODIFY("cia_1")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_PAL)
-	MCFG_DEVICE_MODIFY("fdc")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_PAL)
-MACHINE_CONFIG_END
+	m_paula->set_clock(amiga_state::CLK_C1_PAL);
+	m_cia_0->set_clock(amiga_state::CLK_E_PAL);
+	m_cia_1->set_clock(amiga_state::CLK_E_PAL);
+	m_fdc->set_clock(amiga_state::CLK_7M_PAL);
+}
 
 
 

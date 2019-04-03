@@ -1162,7 +1162,10 @@ void ppc_device::device_reset()
 
 	/* initialize the 602 HID0 register */
 	if (m_flavor == PPC_MODEL_602)
+	{
+		m_core->spr[SPR602_ESASRR] = 0;
 		m_core->spr[SPR603_HID0] = 1;
+	}
 
 	/* time base starts here */
 	m_tb_zero_cycles = total_cycles();
@@ -1325,6 +1328,15 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, offs_t &ad
 			}
 		}
 	}
+
+#if 1
+	/* 602-specific Protection-Only mode */
+	if (m_flavor == PPC_MODEL_602 && m_core->spr[SPR603_HID0] & 0x00000080)
+	{
+		// TODO
+		return 0x001;
+	}
+#endif
 
 	/* look up the segment register */
 	segreg = m_core->sr[address >> 28];
@@ -1508,6 +1520,9 @@ void ppc_device::ppccom_execute_tlbl()
 	vtlb_entry flags;
 	int entrynum;
 
+	if (m_flavor == PPC_MODEL_602) // TODO
+		return;
+
 	/* determine entry number; we use machine().rand() for associativity */
 	entrynum = ((address >> 12) & 0x1f) | (machine().rand() & 0x20) | (isitlb ? 0x40 : 0);
 
@@ -1585,6 +1600,23 @@ void ppc_device::ppccom_execute_mfspr()
 			/* decrementer */
 			case SPROEA_DEC:
 				m_core->param1 = get_decrementer();
+				return;
+		}
+	}
+
+	/* handle 602 SPRs */
+	if (m_flavor == PPC_MODEL_602)
+	{ // TODO: Which are read/write only?
+		switch (m_core->param0)
+		{
+			case SPR602_TCR:
+			case SPR602_IBR:
+			case SPR602_ESASRR:
+			case SPR602_SEBR:
+			case SPR602_SER:
+			case SPR602_SP:
+			case SPR602_LT:
+				m_core->param1 = m_core->spr[m_core->param0];
 				return;
 		}
 	}
@@ -1711,6 +1743,23 @@ void ppc_device::ppccom_execute_mtspr()
 			/* decrementer */
 			case SPROEA_DEC:
 				set_decrementer(m_core->param1);
+				return;
+		}
+	}
+
+	/* handle 602 SPRs */
+	if (m_flavor == PPC_MODEL_602)
+	{
+		switch (m_core->param0)
+		{ // TODO: Which are read/write only?
+			case SPR602_TCR:
+			case SPR602_IBR:
+			case SPR602_ESASRR:
+			case SPR602_SEBR:
+			case SPR602_SER:
+			case SPR602_SP:
+			case SPR602_LT:
+				m_core->spr[m_core->param0] = m_core->param1;
 				return;
 		}
 	}

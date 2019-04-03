@@ -9,9 +9,6 @@
 
 DECLARE_DEVICE_TYPE(NG_CMC_PROT, cmc_prot_device)
 
-#define MCFG_CMC_PROT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, NG_CMC_PROT, 0)
-
 // cmc42
 #define KOF99_GFX_KEY (0x00)
 #define GAROU_GFX_KEY (0x06)
@@ -44,7 +41,7 @@ class cmc_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	cmc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cmc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void decrypt(uint8_t *r0, uint8_t *r1,
 		uint8_t c0, uint8_t c1,

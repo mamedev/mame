@@ -54,6 +54,7 @@
 
 #include "emu.h"
 #include "video/apple2.h"
+#include "machine/apple2common.h"
 
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/ramcard16k.h"
@@ -84,6 +85,7 @@
 #include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/mouse.h"
 #include "bus/a2bus/ezcgi.h"
+#include "bus/a2bus/a2vulcan.h"
 //#include "bus/a2bus/pc_xporter.h"
 
 // various timing standards
@@ -157,6 +159,7 @@ public:
 		m_nvram(*this, "nvram"),
 		m_video(*this, A2GS_VIDEO_TAG),
 		m_a2bus(*this, A2GS_BUS_TAG),
+		m_a2common(*this, "a2common"),
 		m_joy1x(*this, "joystick_1_x"),
 		m_joy1y(*this, "joystick_1_y"),
 		m_joy2x(*this, "joystick_2_x"),
@@ -214,6 +217,7 @@ public:
 	required_device<nvram_device> m_nvram;
 	required_device<a2_video_device> m_video;
 	required_device<a2bus_device> m_a2bus;
+	required_device<apple2_common_device> m_a2common;
 	required_ioport m_joy1x, m_joy1y, m_joy2x, m_joy2y, m_joybuttons;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<address_map_bank_device> m_upperbank, m_upperaux, m_upper00, m_upper01;
@@ -357,7 +361,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_PALETTE_INIT(apple2gs);
+	void palette_init(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void apple2gs(machine_config &config);
@@ -490,6 +494,8 @@ private:
 	DECLARE_WRITE8_MEMBER(adbmicro_p1_out);
 	DECLARE_WRITE8_MEMBER(adbmicro_p2_out);
 	DECLARE_WRITE8_MEMBER(adbmicro_p3_out);
+
+	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
 private:
 	bool m_is_rom3;
@@ -632,6 +638,11 @@ private:
 #define JOYSTICK_DELTA          80
 #define JOYSTICK_SENSITIVITY    50
 #define JOYSTICK_AUTOCENTER     80
+
+offs_t apple2gs_state::dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
+{
+	return m_a2common->dasm_override_GS(stream, pc, opcodes, params);
+}
 
 WRITE_LINE_MEMBER(apple2gs_state::a2bus_irq_w)
 {
@@ -1212,8 +1223,8 @@ void apple2gs_state::machine_start()
 	m_speaker->set_levels(16, lvlTable);
 
 	// precalculate joystick time constants
-	m_x_calibration = attotime::from_usec(12).as_double();
-	m_y_calibration = attotime::from_usec(13).as_double();
+	m_x_calibration = attotime::from_nsec(10800).as_double();
+	m_y_calibration = attotime::from_nsec(10800).as_double();
 
 	// cache slot devices
 	for (int i = 0; i <= 7; i++)
@@ -1579,7 +1590,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	}
 }
 
-PALETTE_INIT_MEMBER(apple2gs_state, apple2gs)
+void apple2gs_state::palette_init(palette_device &palette)
 {
 	static const unsigned char apple2gs_palette[] =
 	{
@@ -2029,6 +2040,7 @@ READ8_MEMBER(apple2gs_state::c000_r)
 	}
 
 	slow_cycle();
+	u8 uFloatingBus7 = read_floatingbus();
 
 	switch (offset)
 	{
@@ -2272,28 +2284,28 @@ READ8_MEMBER(apple2gs_state::c000_r)
 			return (m_an3 ? INTFLAG_AN3 : 0x00) | m_intflag;
 
 		case 0x60: // button 3 on IIgs
-			return (m_joybuttons->read() & 0x80);
+			return (m_joybuttons->read() & 0x80) | uFloatingBus7;
 
 		case 0x61:  // button 0 or Open Apple
-			return ((m_joybuttons->read() & 0x10) || (m_kbspecial->read() & 0x10)) ? 0x80 : 0;
+			return (((m_joybuttons->read() & 0x10) || (m_kbspecial->read() & 0x10)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x62:  // button 1 or Solid Apple
-			return ((m_joybuttons->read() & 0x20) || (m_kbspecial->read() & 0x20)) ? 0x80 : 0;
+			return (((m_joybuttons->read() & 0x20) || (m_kbspecial->read() & 0x20)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x63:  // button 2 or SHIFT key
-			return ((m_joybuttons->read() & 0x40) || (m_kbspecial->read() & 0x06)) ? 0x80 : 0;
+			return (((m_joybuttons->read() & 0x40) || (m_kbspecial->read() & 0x06)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x64:  // joy 1 X axis
-			return (machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
+			return ((machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x65:  // joy 1 Y axis
-			return (machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
+			return ((machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x66: // joy 2 X axis
-			return (machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
+			return ((machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x67: // joy 2 Y axis
-			return (machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
+			return ((machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x68: // STATEREG, synthesizes all the IIe state regs
 			return  (m_altzp ? 0x80 : 0x00) |
@@ -3498,7 +3510,7 @@ WRITE8_MEMBER(apple2gs_state::bank1_0000_sh_w)
 void apple2gs_state::apple2gs_map(address_map &map)
 {
 	/* "fast side" - runs 2.8 MHz minus RAM refresh, banks 00 and 01 usually have writes shadowed to E0/E1 where I/O lives */
-	/* Banks 00 and 01 also have their own independent language cards if shadowing is disabled */
+	/* Banks 00 and 01 also have their own independent language cards which are NOT shadowed. */
 	map(0x000000, 0x0001ff).m(m_b0_0000bank, FUNC(address_map_bank_device::amap8));
 	map(0x000200, 0x0003ff).m(m_b0_0200bank, FUNC(address_map_bank_device::amap8));
 	map(0x000400, 0x0007ff).m(m_b0_0400bank, FUNC(address_map_bank_device::amap8));
@@ -4030,7 +4042,7 @@ READ8_MEMBER(apple2gs_state::doc_adc_read)
 
 int apple2gs_state::apple2_fdc_has_35()
 {
-	return (floppy_get_count(machine())); // - apple525_get_count(machine)) > 0;
+	return device_type_iterator<sonydriv_floppy_image_device>(*this).count(); // - apple525_get_count(machine)) > 0;
 }
 
 int apple2gs_state::apple2_fdc_has_525()
@@ -4511,6 +4523,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("arcbd", A2BUS_ARCADEBOARD);    /* Third Millenium Engineering Arcade Board */
 	device.option_add("midi", A2BUS_MIDI);  /* Generic 6840+6850 MIDI board */
 	device.option_add("zipdrive", A2BUS_ZIPDRIVE);  /* ZIP Technologies IDE card */
+	device.option_add("focusdrive", A2BUS_FOCUSDRIVE);  /* Focus Drive IDE card */
 	device.option_add("echoiiplus", A2BUS_ECHOPLUS);    /* Street Electronics Echo Plus (Echo II + Mockingboard clone) */
 	device.option_add("scsi", A2BUS_SCSI);  /* Apple II SCSI Card */
 	device.option_add("applicard", A2BUS_APPLICARD);    /* PCPI Applicard */
@@ -4528,28 +4541,32 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("ezcgi", A2BUS_EZCGI);    /* E-Z Color Graphics Interface */
 	device.option_add("ezcgi9938", A2BUS_EZCGI_9938);   /* E-Z Color Graphics Interface (TMS9938) */
 	device.option_add("ezcgi9958", A2BUS_EZCGI_9958);   /* E-Z Color Graphics Interface (TMS9958) */
+	device.option_add("vulcan", A2BUS_VULCAN); /* Applied Engineering Vulcan IDE drive */
+	device.option_add("vulcangold", A2BUS_VULCANGOLD); /* Applied Engineering Vulcan Gold IDE drive */
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
 //  device.option_add("pcxport", A2BUS_PCXPORTER); /* Applied Engineering PC Transporter */
 }
 
-MACHINE_CONFIG_START( apple2gs_state::apple2gs )
+void apple2gs_state::apple2gs(machine_config &config)
+{
 	/* basic machine hardware */
 	G65816(config, m_maincpu, A2GS_MASTER_CLOCK/10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2gs_state::apple2gs_map);
 	m_maincpu->set_addrmap(g65816_device::AS_VECTORS, &apple2gs_state::vectors_map);
+	m_maincpu->set_dasm_override(FUNC(apple2gs_state::dasm_trampoline));
 	TIMER(config, m_scantimer, 0);
 	m_scantimer->configure_scanline(FUNC(apple2gs_state::apple2_interrupt), "screen", 0, 1);
 	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_DEVICE_ADD(A2GS_ADBMCU_TAG, M50741, A2GS_MASTER_CLOCK/8)
-	MCFG_M5074X_PORT0_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p0_in))
-	MCFG_M5074X_PORT0_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p0_out))
-	MCFG_M5074X_PORT1_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p1_in))
-	MCFG_M5074X_PORT1_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p1_out))
-	MCFG_M5074X_PORT2_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p2_in))
-	MCFG_M5074X_PORT2_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p2_out))
-	MCFG_M5074X_PORT3_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p3_in))
-	MCFG_M5074X_PORT3_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p3_out))
+	M50741(config, m_adbmicro, A2GS_MASTER_CLOCK/8);
+	m_adbmicro->read_p<0>().set(FUNC(apple2gs_state::adbmicro_p0_in));
+	m_adbmicro->write_p<0>().set(FUNC(apple2gs_state::adbmicro_p0_out));
+	m_adbmicro->read_p<1>().set(FUNC(apple2gs_state::adbmicro_p1_in));
+	m_adbmicro->write_p<1>().set(FUNC(apple2gs_state::adbmicro_p1_out));
+	m_adbmicro->read_p<2>().set(FUNC(apple2gs_state::adbmicro_p2_in));
+	m_adbmicro->write_p<2>().set(FUNC(apple2gs_state::adbmicro_p2_out));
+	m_adbmicro->read_p<3>().set(FUNC(apple2gs_state::adbmicro_p3_in));
+	m_adbmicro->write_p<3>().set(FUNC(apple2gs_state::adbmicro_p3_out));
 
 #if !RUN_ADB_MICRO
 	/* keyboard controller */
@@ -4569,36 +4586,37 @@ MACHINE_CONFIG_START( apple2gs_state::apple2gs )
 	m_ay3600->ako().set(FUNC(apple2gs_state::ay3600_ako_w));
 
 	/* repeat timer.  15 Hz from page 7-15 of "Understanding the Apple IIe" */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", apple2gs_state, ay3600_repeat, attotime::from_hz(15))
+	TIMER(config, "repttmr").configure_periodic(FUNC(apple2gs_state::ay3600_repeat), attotime::from_hz(15));
 #endif
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	APPLE2_VIDEO(config, m_video, A2GS_14M);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(704, 262)  // 640+32+32 for the borders
-	MCFG_SCREEN_VISIBLE_AREA(0,703,0,230)
-	MCFG_SCREEN_UPDATE_DRIVER(apple2gs_state, screen_update)
+	APPLE2_COMMON(config, m_a2common, A2GS_14M);
+	m_a2common->set_GS_cputag(m_maincpu);
 
-	palette_device &palette(PALETTE(config, "palette", 256));
-	palette.set_init(DEVICE_SELF, FUNC(apple2gs_state::palette_init_apple2gs));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(704, 262);  // 640+32+32 for the borders
+	m_screen->set_visarea(0,703,0,230);
+	m_screen->set_screen_update(FUNC(apple2gs_state::screen_update));
+
+	PALETTE(config, "palette", FUNC(apple2gs_state::palette_init), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, A2GS_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_ES5503_ADD(A2GS_DOC_TAG, A2GS_7M)
-	MCFG_ES5503_OUTPUT_CHANNELS(2)
-	MCFG_DEVICE_ADDRESS_MAP(0, a2gs_es5503_map)
-	MCFG_ES5503_IRQ_FUNC(WRITELINE(*this, apple2gs_state, doc_irq_w))
-	MCFG_ES5503_ADC_FUNC(READ8(*this, apple2gs_state, doc_adc_read))
-
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ES5503(config, m_doc, A2GS_7M);
+	m_doc->set_channels(2);
+	m_doc->set_addrmap(0, &apple2gs_state::a2gs_es5503_map);
+	m_doc->irq_func().set(FUNC(apple2gs_state::doc_irq_w));
+	m_doc->adc_func().set(FUNC(apple2gs_state::doc_adc_read));
+	m_doc->add_route(0, "lspeaker", 1.0);
+	m_doc->add_route(1, "rspeaker", 1.0);
 
 	/* RAM */
 	RAM(config, m_ram).set_default_size("2M").set_extra_options("1M,3M,4M,5M,6M,7M,8M").set_default_value(0x00);
@@ -4684,10 +4702,11 @@ MACHINE_CONFIG_START( apple2gs_state::apple2gs )
 
 	/* slot devices */
 	A2BUS(config, m_a2bus, 0);
-	m_a2bus->set_cputag("maincpu");
+	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple2gs_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple2gs_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(apple2gs_state::a2bus_inh_w));
+	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	A2BUS_SLOT(config, "sl1", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl3", m_a2bus, apple2_cards, nullptr);
@@ -4696,29 +4715,38 @@ MACHINE_CONFIG_START( apple2gs_state::apple2gs )
 	A2BUS_SLOT(config, "sl6", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
-	MCFG_IWM_ADD(A2GS_IWM_TAG, apple2_fdc_interface)
-	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(apple2gs_floppy525_floppy_interface,15,16)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2gs_floppy35_floppy_interface)
-	MCFG_SOFTWARE_LIST_ADD("flop35_list","apple2gs")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop525_list", "apple2")
-MACHINE_CONFIG_END
+	IWM(config, m_iwm, &apple2_fdc_interface);
 
-MACHINE_CONFIG_START( apple2gs_state::apple2gsr1 )
+	FLOPPY_APPLE(config, FLOPPY_0, &apple2gs_floppy525_floppy_interface, 15, 16);
+	FLOPPY_APPLE(config, FLOPPY_1, &apple2gs_floppy525_floppy_interface, 15, 16);
+
+	FLOPPY_SONY(config, FLOPPY_2, &apple2gs_floppy35_floppy_interface);
+	FLOPPY_SONY(config, FLOPPY_3, &apple2gs_floppy35_floppy_interface);
+
+	SOFTWARE_LIST(config, "flop35_list").set_original("apple2gs");
+	SOFTWARE_LIST(config, "flop525_clean").set_compatible("apple2_flop_clcracked"); // No filter on clean cracks yet.
+	// As WOZ images won't load in the 2GS driver yet, comment out the softlist entry.
+	//SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2GS");  // Filter list to compatible disks for this machine.
+	SOFTWARE_LIST(config, "flop525_misc").set_compatible("apple2_misc");
+}
+
+void apple2gs_state::apple2gsr1(machine_config &config)
+{
 	apple2gs(config);
 
 	// 256K on board + 1M in the expansion slot was common for ROM 01
 	m_ram->set_default_size("1280K").set_extra_options("256K,512K,768K,1M,2M,3M,4M,5M,6M,7M,8M").set_default_value(0x00);
 
-	MCFG_DEVICE_REPLACE(A2GS_ADBMCU_TAG, M50740, A2GS_MASTER_CLOCK/8)
-	MCFG_M5074X_PORT0_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p0_in))
-	MCFG_M5074X_PORT0_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p0_out))
-	MCFG_M5074X_PORT1_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p1_in))
-	MCFG_M5074X_PORT1_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p1_out))
-	MCFG_M5074X_PORT2_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p2_in))
-	MCFG_M5074X_PORT2_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p2_out))
-	MCFG_M5074X_PORT3_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p3_in))
-	MCFG_M5074X_PORT3_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p3_out))
-MACHINE_CONFIG_END
+	M50740(config.replace(), m_adbmicro, A2GS_MASTER_CLOCK/8);
+	m_adbmicro->read_p<0>().set(FUNC(apple2gs_state::adbmicro_p0_in));
+	m_adbmicro->write_p<0>().set(FUNC(apple2gs_state::adbmicro_p0_out));
+	m_adbmicro->read_p<1>().set(FUNC(apple2gs_state::adbmicro_p1_in));
+	m_adbmicro->write_p<1>().set(FUNC(apple2gs_state::adbmicro_p1_out));
+	m_adbmicro->read_p<2>().set(FUNC(apple2gs_state::adbmicro_p2_in));
+	m_adbmicro->write_p<2>().set(FUNC(apple2gs_state::adbmicro_p2_out));
+	m_adbmicro->read_p<3>().set(FUNC(apple2gs_state::adbmicro_p3_in));
+	m_adbmicro->write_p<3>().set(FUNC(apple2gs_state::adbmicro_p3_out));
+}
 
 /***************************************************************************
 

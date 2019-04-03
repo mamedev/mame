@@ -31,7 +31,6 @@ Others
 M30624FG (M16C/62A family) needs CPU core and dumping of internal ROM
 */
 
-
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
@@ -43,8 +42,8 @@ class sanremmg_state : public driver_device
 {
 public:
 	sanremmg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void sanremmg(machine_config &config);
@@ -81,23 +80,22 @@ void sanremmg_state::sanremmg_map(address_map &map)
 static INPUT_PORTS_START( sanremmg )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(sanremmg_state::sanremmg)
-
+void sanremmg_state::sanremmg(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM7, 50000000) // wrong, this is an M30624FG (M16C/62A family) with 256K internal ROM, no CPU core available
-	MCFG_DEVICE_PROGRAM_MAP(sanremmg_map)
+	ARM7(config, m_maincpu, 50000000); // wrong, this is an M30624FG (M16C/62A family) with 256K internal ROM, no CPU core available
+	m_maincpu->set_addrmap(AS_PROGRAM, &sanremmg_state::sanremmg_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sanremmg_state, screen_update_sanremmg)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, 48*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(sanremmg_state::screen_update_sanremmg));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
+}
 
 /*
 PCB is marked: "ELSY CE" and "2-028B" and "San Remo Games - Via Val D'OLIVI 295 - 18038 SANREMO (IM)" on component side

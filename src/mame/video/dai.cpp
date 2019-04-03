@@ -21,40 +21,30 @@
 
 #define LOG_DAI_VIDEO_LINE(_mode, _unit, _resolution, _repeat, _scan) do { if (DEBUG_DAI_VIDEO) logerror ("Mode: %02x, Unit: %02x, Resolution: %02x, Repeat: %d, Current line: %d\n", _mode, _unit, _resolution, _repeat, _scan); } while (0)
 
-const unsigned char dai_palette[16*3] =
+const rgb_t dai_state::s_palette[16] =
 {
-	0x00, 0x00, 0x00,   /*  0 Black     */
-	0x00, 0x00, 0x8b,   /*  1 Dark Blue     */
-	0xb1, 0x00, 0x95,   /*  2 Purple Red    */
-	0xff, 0x00, 0x00,   /*  3 Red       */
-	0x75, 0x2e, 0x50,   /*  4 Purple Brown  */
-	0x00, 0xb2, 0x38,   /*  5 Emerald Green */
-	0x98, 0x62, 0x00,   /*  6 Kakhi Brown   */
-	0xae, 0x7a, 0x00,   /*  7 Mustard Brown */
-	0x89, 0x89, 0x89,   /*  8 Grey      */
-	0xa1, 0x6f, 0xff,   /*  9 Middle Blue   */
-	0xff, 0xa5, 0x00,   /* 10 Orange        */
-	0xff, 0x99, 0xff,   /* 11 Pink      */
-	0x9e, 0xf4, 0xff,   /* 12 Light Blue    */
-	0xb3, 0xff, 0xbb,   /* 13 Light Green   */
-	0xff, 0xff, 0x28,   /* 14 Light Yellow  */
-	0xff, 0xff, 0xff,   /* 15 White     */
+	{ 0x00, 0x00, 0x00 },   //  0 Black
+	{ 0x00, 0x00, 0x8b },   //  1 Dark Blue
+	{ 0xb1, 0x00, 0x95 },   //  2 Purple Red
+	{ 0xff, 0x00, 0x00 },   //  3 Red
+	{ 0x75, 0x2e, 0x50 },   //  4 Purple Brown
+	{ 0x00, 0xb2, 0x38 },   //  5 Emerald Green
+	{ 0x98, 0x62, 0x00 },   //  6 Kakhi Brown
+	{ 0xae, 0x7a, 0x00 },   //  7 Mustard Brown
+	{ 0x89, 0x89, 0x89 },   //  8 Grey
+	{ 0xa1, 0x6f, 0xff },   //  9 Middle Blue
+	{ 0xff, 0xa5, 0x00 },   // 10 Orange
+	{ 0xff, 0x99, 0xff },   // 11 Pink
+	{ 0x9e, 0xf4, 0xff },   // 12 Light Blue
+	{ 0xb3, 0xff, 0xbb },   // 13 Light Green
+	{ 0xff, 0xff, 0x28 },   // 14 Light Yellow
+	{ 0xff, 0xff, 0xff }    // 15 White
 };
 
 
-PALETTE_INIT_MEMBER(dai_state, dai)
+void dai_state::dai_palette(palette_device &palette) const
 {
-	int i;
-
-	for ( i = 0; i < sizeof(dai_palette) / 3; i++ )
-	{
-		m_palette->set_pen_color(i, dai_palette[i * 3], dai_palette[i * 3 + 1], dai_palette[i * 3 + 2]);
-	}
-}
-
-
-void dai_state::video_start()
-{
+	palette.set_pen_colors(0, s_palette);
 }
 
 uint32_t dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

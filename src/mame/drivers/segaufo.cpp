@@ -777,15 +777,15 @@ void ufo_state::machine_start()
 	save_item(NAME(m_stepper));
 }
 
-MACHINE_CONFIG_START(ufo_state::newufo)
-
+void ufo_state::newufo(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(16'000'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ufo_state::ufo_map);
 	m_maincpu->set_addrmap(AS_IO, &ufo_state::ufo_portmap);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("motor_timer", ufo_state, simulate_xyz, attotime::from_hz(MOTOR_SPEED))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("update_timer", ufo_state, update_info, attotime::from_hz(60))
+	TIMER(config, "motor_timer").configure_periodic(FUNC(ufo_state::simulate_xyz), attotime::from_hz(MOTOR_SPEED));
+	TIMER(config, "update_timer").configure_periodic(FUNC(ufo_state::update_info), attotime::from_hz(60));
 
 	SEGA_315_5296(config, m_io1, XTAL(16'000'000));
 	// all ports set to input
@@ -819,11 +819,11 @@ MACHINE_CONFIG_START(ufo_state::newufo)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym", YM3438, XTAL(16'000'000)/2)
-	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
-MACHINE_CONFIG_END
+	ym3438_device &ym(YM3438(config, "ym", XTAL(16'000'000)/2));
+	ym.irq_handler().set_inputline("maincpu", 0);
+	ym.add_route(0, "mono", 0.40);
+	ym.add_route(1, "mono", 0.40);
+}
 
 void ufo_state::ufomini(machine_config &config)
 {

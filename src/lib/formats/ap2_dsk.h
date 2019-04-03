@@ -117,6 +117,7 @@ public:
 
 private:
 		static const uint8_t signature[8];
+		static const uint8_t signature2[8];
 
 		static uint32_t r32(const std::vector<uint8_t> &data, uint32_t offset);
 		static uint16_t r16(const std::vector<uint8_t> &data, uint32_t offset);

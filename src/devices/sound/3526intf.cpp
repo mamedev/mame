@@ -130,20 +130,20 @@ void ym3526_device::device_reset()
 }
 
 
-READ8_MEMBER( ym3526_device::read )
+u8 ym3526_device::read(offs_t offset)
 {
 	return ym3526_read(m_chip, offset & 1);
 }
 
-WRITE8_MEMBER( ym3526_device::write )
+void ym3526_device::write(offs_t offset, u8 data)
 {
 	ym3526_write(m_chip, offset & 1, data);
 }
 
-READ8_MEMBER( ym3526_device::status_port_r ) { return read(space, 0); }
-READ8_MEMBER( ym3526_device::read_port_r ) { return read(space, 1); }
-WRITE8_MEMBER( ym3526_device::control_port_w ) { write(space, 0, data); }
-WRITE8_MEMBER( ym3526_device::write_port_w ) { write(space, 1, data); }
+u8 ym3526_device::status_port_r() { return read(0); }
+u8 ym3526_device::read_port_r() { return read(1); }
+void ym3526_device::control_port_w(u8 data) { write(0, data); }
+void ym3526_device::write_port_w(u8 data) { write(1, data); }
 
 
 DEFINE_DEVICE_TYPE(YM3526, ym3526_device, "ym3526", "YM3526 OPL")

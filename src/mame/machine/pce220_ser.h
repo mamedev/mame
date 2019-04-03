@@ -89,7 +89,4 @@ DECLARE_DEVICE_TYPE(PCE220SERIAL, pce220_serial_device)
 ***************************************************************************/
 #define PCE220SERIAL_TAG        "serial"
 
-#define MCFG_PCE220_SERIAL_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PCE220SERIAL, 0)
-
 #endif // MAME_MACHINE_PCE220_SER_H

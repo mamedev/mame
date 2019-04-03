@@ -1302,16 +1302,16 @@ GFXDECODE_END
 
 /**************************************************************************/
 
-MACHINE_CONFIG_START(scramble_state::scramble)
-
+void scramble_state::scramble(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(scramble_map)
+	Z80(config, m_maincpu, 18432000/6);    /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &scramble_state::scramble_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(scramble_sound_map)
-	MCFG_DEVICE_IO_MAP(scramble_sound_io_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
+	Z80(config, m_audiocpu, 14318000/8);   /* 1.78975 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &scramble_state::scramble_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &scramble_state::scramble_sound_io_map);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(scramble_state::scramble_sh_irq_callback));
 
 	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
 	ttl7474_9m_1.output_cb().set(FUNC(scramble_state::galaxold_7474_9m_1_callback));
@@ -1322,7 +1322,7 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
 	konami_7474.comp_output_cb().set(FUNC(scramble_state::scramble_sh_7474_q_callback));
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
+	TIMER(config, "int_timer").configure_generic(FUNC(scramble_state::galaxold_interrupt_timer));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -1338,18 +1338,17 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::scramble_sh_irqtrigger_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(16000.0/132/2)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(scramble_state, screen_update_galaxold)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(16000.0/132/2);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(scramble_state::screen_update_galaxold));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scramble)
-	MCFG_PALETTE_ADD("palette", 32+64+2+1)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_scramble);
+	PALETTE(config, m_palette, FUNC(scramble_state::scrambold_palette), 32+64+2+1); // 32 for characters, 64 for stars, 2 for bullets, 0/1 for background
 
-	MCFG_PALETTE_INIT_OWNER(scramble_state,scrambold)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,scrambold)
 
 	/* sound hardware */
@@ -1363,112 +1362,106 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 	ay2.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	ay2.port_b_read_callback().set(FUNC(scramble_state::scramble_portB_r));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.16);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(scramble_state::mars)
+void scramble_state::mars(machine_config &config)
+{
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mars_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &scramble_state::mars_map);
 
 	m_ppi8255_1->out_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::write));
 	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::scramble_sh_irqtrigger_w));
 	m_ppi8255_1->in_pc_callback().set_ioport("IN3");
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
-MACHINE_CONFIG_END
+	m_palette->set_entries(32+64+2+0); // 32 for characters, 64 for stars, 2 for bullets, 0/1 for background
+	m_palette->set_init(FUNC(scramble_state::galaxold_palette));
+}
 
-MACHINE_CONFIG_START(scramble_state::devilfsh)
+void scramble_state::devilfsh(machine_config &config)
+{
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mars_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &scramble_state::mars_map);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_devilfsh)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
-MACHINE_CONFIG_END
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_devilfsh);
+	m_palette->set_entries(32+64+2+0); // 32 for characters, 64 for stars, 2 for bullets, 0/1 for background
+	m_palette->set_init(FUNC(scramble_state::galaxold_palette));
+}
 
-MACHINE_CONFIG_START(scramble_state::newsin7)
+void scramble_state::newsin7(machine_config &config)
+{
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(newsin7_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", scramble_state,  irq0_line_hold) // newsin7a has a corrupt opcode at 0x67, the irq routine instead of NMI avoids it by jumping to 0x68 after doing some other things, probably intentional. newsin7 has this fixed, maybe a bootleg?
+	m_maincpu->set_addrmap(AS_PROGRAM, &scramble_state::newsin7_map);
+	m_maincpu->set_vblank_int("screen", FUNC(scramble_state::irq0_line_hold)); // newsin7a has a corrupt opcode at 0x67, the irq routine instead of NMI avoids it by jumping to 0x68 after doing some other things, probably intentional. newsin7 has this fixed, maybe a bootleg?
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_newsin7)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_newsin7);
+	m_palette->set_entries(32+64+2+0); // 32 for characters, 64 for stars, 2 for bullets, 0/1 for background
+	m_palette->set_init(FUNC(scramble_state::galaxold_palette));
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,newsin7)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(scramble_state::mrkougb)
+void scramble_state::mrkougb(machine_config &config)
+{
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mrkougar_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &scramble_state::mrkougar_map);
 
 	m_ppi8255_1->out_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::write));
 	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::mrkougar_sh_irqtrigger_w));
 	m_ppi8255_1->in_pc_callback().set_constant(0);
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
-MACHINE_CONFIG_END
+	m_palette->set_entries(32+64+2+0); // 32 for characters, 64 for stars, 2 for bullets, 0/1 for background
+	m_palette->set_init(FUNC(scramble_state::galaxold_palette));
+}
 
-MACHINE_CONFIG_START(scramble_state::mrkougar)
+void scramble_state::mrkougar(machine_config &config)
+{
 	mrkougb(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mrkougar)
-MACHINE_CONFIG_END
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_mrkougar);
+}
 
-MACHINE_CONFIG_START(scramble_state::ckongs)
+void scramble_state::ckongs(machine_config &config)
+{
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ckongs_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &scramble_state::ckongs_map);
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
+	m_palette->set_entries(32+64+2+0); // 32 for characters, 64 for stars, 2 for bullets, 0/1 for background
+	m_palette->set_init(FUNC(scramble_state::galaxold_palette));
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,ckongs)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(scramble_state::hotshock)
+void scramble_state::hotshock(machine_config &config)
+{
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hotshock_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &scramble_state::hotshock_map);
 
-	MCFG_DEVICE_REMOVE( "ppi8255_0" )
-	MCFG_DEVICE_REMOVE( "ppi8255_1" )
+	config.device_remove( "ppi8255_0" );
+	config.device_remove( "ppi8255_1" );
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_IO_MAP(hotshock_sound_io_map)
+	m_audiocpu->set_addrmap(AS_IO, &scramble_state::hotshock_sound_io_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,galaxold)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
+	m_palette->set_entries(32+64+2+0); // 32 for characters, 64 for stars, 2 for bullets, 0/1 for background
+	m_palette->set_init(FUNC(scramble_state::galaxold_palette));
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,pisces)
 
 	subdevice<ay8910_device>("8910.1")->reset_routes();
@@ -1477,108 +1470,101 @@ MACHINE_CONFIG_START(scramble_state::hotshock)
 	subdevice<ay8910_device>("8910.2")->port_a_read_callback().set(FUNC(scramble_state::hotshock_soundlatch_r));
 	subdevice<ay8910_device>("8910.2")->reset_routes();
 	subdevice<ay8910_device>("8910.2")->add_route(ALL_OUTPUTS, "mono", 0.33);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(scramble_state::cavelon)
+void scramble_state::cavelon(machine_config &config)
+{
 	scramble(config);
 
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
+	m_palette->set_entries(32+64+2+0); // 32 for characters, 64 for stars, 2 for bullets, 0/1 for background
+	m_palette->set_init(FUNC(scramble_state::galaxold_palette));
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,ckongs)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(scramble_state::mimonscr)
+void scramble_state::mimonscr(machine_config &config)
+{
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mimonscr_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &scramble_state::mimonscr_map);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,mimonkey)
-MACHINE_CONFIG_END
+}
 
 /* Triple Punch and Mariner are different - only one CPU, one 8910 */
-MACHINE_CONFIG_START(scramble_state::triplep)
+void scramble_state::triplep(machine_config &config)
+{
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(triplep_map)
-	MCFG_DEVICE_IO_MAP(triplep_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &scramble_state::triplep_map);
+	m_maincpu->set_addrmap(AS_IO, &scramble_state::triplep_io_map);
 
-	MCFG_DEVICE_REMOVE("audiocpu")
-	MCFG_DEVICE_REMOVE("ppi8255_1")
-	MCFG_DEVICE_REMOVE("konami_7474")
+	config.device_remove("audiocpu");
+	config.device_remove("ppi8255_1");
+	config.device_remove("konami_7474");
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets */
-	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
+	m_palette->set_entries(32+64+2+0); // 32 for characters, 64 for stars, 2 for bullets
+	m_palette->set_init(FUNC(scramble_state::galaxold_palette));
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("8910.1")
-	MCFG_DEVICE_CLOCK(18432000/12) // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
+	subdevice<ay8910_device>("8910.1")->set_clock(18432000/12); // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
+	subdevice<ay8910_device>("8910.1")->reset_routes();
+	subdevice<ay8910_device>("8910.1")->add_route(ALL_OUTPUTS, "mono", 1.0);
 
+	config.device_remove("8910.2");
+}
 
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_DEVICE_REMOVE("8910.2")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(scramble_state::mariner)
+void scramble_state::mariner(machine_config &config)
+{
 	triplep(config);
 
-	/* basic machine hardware */
-
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32+64+2+16) /* 32 for characters, 64 for stars, 2 for bullets, 16 for background */
+	m_palette->set_entries(32+64+2+16); // 32 for characters, 64 for stars, 2 for bullets, 16 for background
+	m_palette->set_init(FUNC(scramble_state::mariner_palette));
 
-	MCFG_PALETTE_INIT_OWNER(scramble_state,mariner)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,mariner)
-MACHINE_CONFIG_END
+}
 
 /* Hunchback replaces the Z80 with a S2650 CPU */
-MACHINE_CONFIG_START(scramble_state::hunchbks)
+void scramble_state::hunchbks(machine_config &config)
+{
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", S2650, 18432000/6)
-	MCFG_DEVICE_PROGRAM_MAP(hunchbks_map)
-	MCFG_DEVICE_IO_MAP(hunchbks_readport)
-	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", scramble_state,  hunchbks_vh_interrupt)
+	s2650_device &maincpu(S2650(config.replace(), m_maincpu, 18432000/6));
+	maincpu.set_addrmap(AS_PROGRAM, &scramble_state::hunchbks_map);
+	maincpu.set_addrmap(AS_IO, &scramble_state::hunchbks_readport);
+	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank));
+	maincpu.set_vblank_int("screen", FUNC(scramble_state::hunchbks_vh_interrupt));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets */
+	m_palette->set_entries(32+64+2+0); // 32 for characters, 64 for stars, 2 for bullets
+	m_palette->set_init(FUNC(scramble_state::galaxold_palette));
+}
 
-	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(scramble_state::hncholms)
+void scramble_state::hncholms(machine_config &config)
+{
 	hunchbks(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(18432000/6/2/2)
+	m_maincpu->set_clock(18432000/6/2/2);
 
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,scorpion)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(scramble_state::ad2083)
+void scramble_state::ad2083(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ad2083_map)
+	Z80(config, m_maincpu, 18432000/6);    /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &scramble_state::ad2083_map);
 
 	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
 	ttl7474_9m_1.output_cb().set(FUNC(scramble_state::galaxold_7474_9m_1_callback));
@@ -1589,45 +1575,43 @@ MACHINE_CONFIG_START(scramble_state::ad2083)
 	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
 	konami_7474.comp_output_cb().set(FUNC(scramble_state::scramble_sh_7474_q_callback));
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
+	TIMER(config, "int_timer").configure_generic(FUNC(scramble_state::galaxold_interrupt_timer));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,galaxold)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(16000.0/132/2)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(scramble_state, screen_update_galaxold)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(16000.0/132/2);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(scramble_state::screen_update_galaxold));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ad2083)
-	MCFG_PALETTE_ADD("palette", 32+64+2+8)  /* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_ad2083);
+	PALETTE(config, m_palette, FUNC(scramble_state::turtles_palette), 32+64+2+8); // 32 for characters, 64 for stars, 2 for bullets, 8 for background
 
-	MCFG_PALETTE_INIT_OWNER(scramble_state,turtles)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,ad2083)
 
 	/* sound hardware */
 
 	ad2083_audio(config);
 
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(scramble_state::harem)
+void scramble_state::harem(machine_config &config)
+{
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(harem_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &scramble_state::harem_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &scramble_state::decrypted_opcodes_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(harem_sound_map)
-	MCFG_DEVICE_IO_MAP(harem_sound_io_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &scramble_state::harem_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &scramble_state::harem_sound_io_map);
 
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,harem)
 
@@ -1638,7 +1622,7 @@ MACHINE_CONFIG_START(scramble_state::harem)
 	ay3.port_b_write_callback().set(FUNC(scramble_state::harem_digitalker_control_w));
 
 	DIGITALKER(config, m_digitalker, 4000000).add_route(ALL_OUTPUTS, "mono", 0.16);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

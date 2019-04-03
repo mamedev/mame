@@ -79,9 +79,9 @@ private:
 
 	virtual void machine_start() override;
 	DECLARE_MACHINE_START(srmp2);
-	DECLARE_PALETTE_INIT(srmp2);
+	void srmp2_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(srmp3);
-	DECLARE_PALETTE_INIT(srmp3);
+	void srmp3_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(rmgoldyh);
 	DECLARE_MACHINE_START(mjyuugi);
 

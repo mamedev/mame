@@ -59,7 +59,7 @@ private:
 	DECLARE_WRITE8_MEMBER(dummy3_w);
 	TILE_GET_INFO_MEMBER(get_ksayakyu_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
-	DECLARE_PALETTE_INIT(ksayakyu);
+	void ksayakyu_palette(palette_device &palette) const;
 	uint32_t screen_update_ksayakyu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;

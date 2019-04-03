@@ -115,9 +115,9 @@ public:
 	void init_lnc();
 	DECLARE_MACHINE_START(btime);
 	DECLARE_MACHINE_RESET(btime);
-	DECLARE_PALETTE_INIT(btime);
+	void btime_palette(palette_device &palette) const;
 	DECLARE_MACHINE_RESET(lnc);
-	DECLARE_PALETTE_INIT(lnc);
+	void lnc_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(mmonkey);
 	DECLARE_MACHINE_RESET(mmonkey);
 	DECLARE_VIDEO_START(bnj);

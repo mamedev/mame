@@ -25,8 +25,8 @@ class sega005_sound_device;
 class segag80r_state : public segag80snd_common
 {
 public:
-	segag80r_state(const machine_config &mconfig, device_type type, const char *tag)
-		: segag80snd_common(mconfig, type, tag),
+	segag80r_state(const machine_config &mconfig, device_type type, const char *tag) :
+		segag80snd_common(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_videoram(*this, "videoram"),
 		m_sn1(*this, "sn1"),
@@ -41,7 +41,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
 
 	void g80r_base(machine_config &config);
 	void monsterb(machine_config &config);

@@ -218,7 +218,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_PALETTE_INIT(tia_pal);
+	void tia_pal_palette(palette_device &palette) const;
 };
 
 class tia_ntsc_video_device : public tia_video_device
@@ -236,7 +236,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_PALETTE_INIT(tia_ntsc);
+	void tia_ntsc_palette(palette_device &palette) const;
 };
 
 

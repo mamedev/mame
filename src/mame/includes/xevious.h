@@ -44,7 +44,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_VIDEO_START(xevious);
-	DECLARE_PALETTE_INIT(xevious);
+	void xevious_palette(palette_device &palette) const;
 	DECLARE_MACHINE_RESET(xevios);
 	uint32_t screen_update_xevious(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);

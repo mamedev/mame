@@ -146,7 +146,7 @@ WRITE16_MEMBER(lastduel_state::txram_w)
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-PALETTE_DECODER_MEMBER(lastduel_state, lastduel_RRRRGGGGBBBBIIII)
+rgb_t lastduel_state::lastduel_RRRRGGGGBBBBIIII(uint32_t raw)
 {
 	// Brightness parameter interpreted same way as CPS1
 	int const bright = 0x10 + (raw & 0x0f);

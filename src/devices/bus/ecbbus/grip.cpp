@@ -405,7 +405,8 @@ void ecb_grip21_device::kb_w(uint8_t data)
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_START(ecb_grip21_device::device_add_mconfig)
+void ecb_grip21_device::device_add_mconfig(machine_config &config)
+{
 	// basic machine hardware
 	z80_device& z80(Z80(config, Z80_TAG, XTAL(16'000'000)/4));
 	z80.set_daisy_config(grip_daisy_chain);
@@ -413,20 +414,21 @@ MACHINE_CONFIG_START(ecb_grip21_device::device_add_mconfig)
 	z80.set_addrmap(AS_IO, &ecb_grip21_device::grip_io);
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::white())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::white());
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SPEAKER_LEVELS(4, speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(4, speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	MC6845(config, m_crtc, XTAL(16'000'000)/4);
@@ -452,15 +454,16 @@ MACHINE_CONFIG_START(ecb_grip21_device::device_add_mconfig)
 	m_sti->out_tco_cb().set(m_sti, FUNC(z80sti_device::tc_w));
 	m_sti->out_tdo_cb().set(m_sti, FUNC(z80sti_device::tc_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, ecb_grip21_device, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, ecb_grip21_device, write_centronics_fault))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(ecb_grip21_device::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(ecb_grip21_device::write_centronics_fault));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(ecb_grip21_device, kb_w))
-MACHINE_CONFIG_END
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(ecb_grip21_device::kb_w));
+}
 
 
 //**************************************************************************

@@ -48,7 +48,7 @@ public:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_VIDEO_START(galaga);
-	DECLARE_PALETTE_INIT(galaga);
+	void galaga_palette(palette_device &palette) const;
 	uint32_t screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_galaga);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);

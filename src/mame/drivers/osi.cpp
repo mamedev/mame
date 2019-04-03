@@ -681,7 +681,7 @@ void c1pmf_state::machine_start()
 
 	// drive select logic missing
 	if (m_floppy0->get_device())
-		m_floppy0->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&sb2m600_state::floppy_index_callback, this));
+		m_floppy0->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&c1pmf_state::floppy_index_callback, this));
 }
 
 // disk format: 1 head, 36 tracks (? - manual displays a directory listing with 40 tracks),
@@ -711,74 +711,78 @@ GFXDECODE_END
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START(sb2m600_state::osi600)
+void sb2m600_state::osi600(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, X1/4) // .98304 MHz
-	MCFG_DEVICE_PROGRAM_MAP(osi600_mem)
+	M6502(config, m_maincpu, X1/4); // .98304 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &sb2m600_state::osi600_mem);
 
 	/* video hardware */
 	osi600_video(config);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_osi);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE)
-	MCFG_DISCRETE_INTF(osi600_discrete_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	DISCRETE(config, m_discrete);
+	m_discrete->set_intf(osi600_discrete_interface);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* cassette ACIA */
 	ACIA6850(config, m_acia_0, 0);
 	m_acia_0->txd_handler().set(FUNC(sb2m600_state::cassette_tx));
 
-	MCFG_DEVICE_ADD("cassette_clock", CLOCK, X1/32)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, sb2m600_state, write_cassette_clock))
+	CLOCK(config, "cassette_clock", X1/32).signal_handler().set(FUNC(sb2m600_state::write_cassette_clock));
 
 	/* cassette */
-	MCFG_CASSETTE_ADD("cassette")
+	CASSETTE(config, m_cassette);
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("4K").set_extra_options("8K");
-MACHINE_CONFIG_END
+	RAM(config, m_ram);
+	m_ram->set_default_size("4K");
+	m_ram->set_extra_options("8K");
+}
 
-MACHINE_CONFIG_START(uk101_state::uk101)
+void uk101_state::uk101(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, UK101_X1/8) // 1 MHz
-	MCFG_DEVICE_PROGRAM_MAP(uk101_mem)
+	M6502(config, m_maincpu, UK101_X1/8); // 1 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &uk101_state::uk101_mem);
 
 	/* video hardware */
 	uk101_video(config);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_osi);
 
 	/* cassette ACIA */
 	ACIA6850(config, m_acia_0, 0);
-	m_acia_0->txd_handler().set(FUNC(sb2m600_state::cassette_tx));
+	m_acia_0->txd_handler().set(FUNC(uk101_state::cassette_tx));
 
-	MCFG_DEVICE_ADD("cassette_clock", CLOCK, 500000)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, sb2m600_state, write_cassette_clock))
+	CLOCK(config, "cassette_clock", 500000).signal_handler().set(FUNC(uk101_state::write_cassette_clock));
 
 	/* cassette */
-	MCFG_CASSETTE_ADD("cassette")
+	CASSETTE(config, m_cassette);
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("4K").set_extra_options("8K");
-MACHINE_CONFIG_END
+	RAM(config, m_ram);
+	m_ram->set_default_size("4K");
+	m_ram->set_extra_options("8K");
+}
 
-MACHINE_CONFIG_START(c1p_state::c1p)
+void c1p_state::c1p(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, X1/4) // .98304 MHz
-	MCFG_DEVICE_PROGRAM_MAP(c1p_mem)
+	M6502(config, m_maincpu, X1/4); // .98304 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &c1p_state::c1p_mem);
 
 	/* video hardware */
 	osi630_video(config);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_osi);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE)
-	MCFG_DISCRETE_INTF(osi600c_discrete_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_DEVICE_ADD("beeper", BEEP, 300)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	DISCRETE(config, m_discrete);
+	m_discrete->set_intf(osi600c_discrete_interface);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, "beeper", 300).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	PIA6821(config, "pia_1", 0);
 	PIA6821(config, "pia_2", 0);
@@ -786,22 +790,23 @@ MACHINE_CONFIG_START(c1p_state::c1p)
 
 	/* cassette ACIA */
 	ACIA6850(config, m_acia_0, 0);
-	m_acia_0->txd_handler().set(FUNC(sb2m600_state::cassette_tx));
+	m_acia_0->txd_handler().set(FUNC(c1p_state::cassette_tx));
 
-	MCFG_DEVICE_ADD("cassette_clock", CLOCK, X1/32)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, sb2m600_state, write_cassette_clock))
+	CLOCK(config, "cassette_clock", X1/32).signal_handler().set(FUNC(c1p_state::write_cassette_clock));
 
 	/* cassette */
-	MCFG_CASSETTE_ADD("cassette")
+	CASSETTE(config, m_cassette);
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("8K").set_extra_options("20K");
-MACHINE_CONFIG_END
+	RAM(config, m_ram);
+	m_ram->set_default_size("8K");
+	m_ram->set_extra_options("20K");
+}
 
-MACHINE_CONFIG_START(c1pmf_state::c1pmf)
+void c1pmf_state::c1pmf(machine_config &config)
+{
 	c1p(config);
-	MCFG_DEVICE_MODIFY(M6502_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(c1pmf_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &c1pmf_state::c1pmf_mem);
 
 	pia6821_device &pia0(PIA6821(config, "pia_0", 0));
 	pia0.readpa_handler().set(FUNC(c1pmf_state::osi470_pia_pa_r));
@@ -812,15 +817,14 @@ MACHINE_CONFIG_START(c1pmf_state::c1pmf)
 	/* floppy ACIA */
 	ACIA6850(config, "acia_1", 0);
 
-	MCFG_DEVICE_ADD("floppy_clock", CLOCK, XTAL(4'000'000)/8) // 250 kHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia_1", acia6850_device, write_txc))
+	CLOCK(config, "floppy_clock", XTAL(4'000'000)/8).signal_handler().set("acia_1", FUNC(acia6850_device::write_txc)); // 250 kHz
 
-	MCFG_FLOPPY_DRIVE_ADD("floppy0", osi_floppies, "ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("floppy1", osi_floppies, nullptr,   floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "floppy0", osi_floppies, "ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "floppy1", osi_floppies, nullptr,   floppy_image_device::default_floppy_formats);
 
 	/* internal ram */
 	m_ram->set_default_size("20K");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

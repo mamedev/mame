@@ -26,8 +26,8 @@ class bbc_fdc_slot_device : public device_t, public device_slot_interface
 public:
 	// construction/destruction
 	template <typename T>
-	bbc_fdc_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, const char *default_option)
-		: bbc_fdc_slot_device(mconfig, tag, owner)
+	bbc_fdc_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&slot_options, const char *default_option)
+		: bbc_fdc_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
 		slot_options(*this);
@@ -35,14 +35,14 @@ public:
 		set_fixed(false);
 	}
 
-	bbc_fdc_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+	bbc_fdc_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
 	auto intrq_wr_callback() { return m_intrq_cb.bind(); }
 	auto drq_wr_callback() { return m_drq_cb.bind(); }
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( intrq_w ) { m_intrq_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER( drq_w) { m_drq_cb(state); }
@@ -66,8 +66,8 @@ private:
 class device_bbc_fdc_interface : public device_slot_card_interface
 {
 public:
-	virtual DECLARE_READ8_MEMBER(read) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write) { }
+	virtual uint8_t read(offs_t offset) { return 0xff; }
+	virtual void write(offs_t offset, uint8_t data) { }
 
 protected:
 	device_bbc_fdc_interface(const machine_config &mconfig, device_t &device);

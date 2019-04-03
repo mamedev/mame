@@ -5,9 +5,10 @@
 
 #pragma once
 
+#include "cpu/m6800/m6801.h"
 #include "machine/watchdog.h"
-#include "sound/namco.h"
 #include "sound/n63701x.h"
+#include "sound/namco.h"
 #include "emupal.h"
 
 class namcos86_state : public driver_device
@@ -17,6 +18,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_cpu1(*this, "cpu1")
 		, m_cpu2(*this, "cpu2")
+		, m_mcu(*this, "mcu")
 		, m_watchdog(*this, "watchdog")
 		, m_cus30(*this, "namco")
 		, m_gfxdecode(*this, "gfxdecode")
@@ -65,7 +67,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	TILE_GET_INFO_MEMBER(get_tile_info3);
 
-	DECLARE_PALETTE_INIT(namcos86);
+	void namcos86_palette(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
@@ -90,6 +92,7 @@ private:
 
 	required_device<cpu_device> m_cpu1;
 	required_device<cpu_device> m_cpu2;
+	required_device<hd63701_cpu_device> m_mcu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<namco_cus30_device> m_cus30;
 	required_device<gfxdecode_device> m_gfxdecode;

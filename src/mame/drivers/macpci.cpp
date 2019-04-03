@@ -106,8 +106,7 @@ void macpci_state::pippin(machine_config &config)
 	screen.set_screen_update(FUNC(macpci_state::screen_update_pippin));
 	screen.set_palette("palette");
 
-	palette_device &palette(PALETTE(config, "palette", 2));
-	palette.set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -145,6 +145,10 @@ void i8251_device::receive_clock()
 		if (is_receive_register_full())
 		{
 			receive_register_extract();
+			if (is_receive_parity_error())
+				m_status |= I8251_STATUS_PARITY_ERROR;
+			if (is_receive_framing_error())
+				m_status |= I8251_STATUS_FRAMING_ERROR;
 			receive_character(get_received_char());
 		}
 	}
@@ -670,9 +674,11 @@ uint8_t i8251_device::data_r()
 {
 	LOG("read data: %02x, STATUS=%02x\n",m_rx_data,m_status);
 	/* reading clears */
-	m_status &= ~I8251_STATUS_RX_READY;
-
-	update_rx_ready();
+	if (!machine().side_effects_disabled())
+	{
+		m_status &= ~I8251_STATUS_RX_READY;
+		update_rx_ready();
+	}
 	return m_rx_data;
 }
 

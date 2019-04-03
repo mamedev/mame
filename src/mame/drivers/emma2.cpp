@@ -191,10 +191,11 @@ void emma2_state::machine_reset()
 	m_dig_change = 0;
 }
 
-MACHINE_CONFIG_START(emma2_state::emma2)
+void emma2_state::emma2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 1'000'000)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	M6502(config, m_maincpu, 1'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &emma2_state::mem_map);
 
 	/* video hardware */
 	config.set_default_layout(layout_emma2);
@@ -212,13 +213,13 @@ MACHINE_CONFIG_START(emma2_state::emma2)
 	m_pia->irqb_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
-MACHINE_CONFIG_END
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
+}
 
 
 /* ROM definition */

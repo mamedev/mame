@@ -528,23 +528,24 @@ DEFINE_DEVICE_TYPE(ISA8_EGA, isa8_ega_device, "ega", "IBM Enhanced Graphics Adap
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa8_ega_device::device_add_mconfig)
-	MCFG_SCREEN_ADD(EGA_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16257000,912,0,640,262,0,200)
-	MCFG_SCREEN_UPDATE_DEVICE(EGA_CRTC_NAME, crtc_ega_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+void isa8_ega_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, EGA_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_raw(16.257_MHz_XTAL, 912, 0, 640, 262, 0, 200);
+	screen.set_screen_update(EGA_CRTC_NAME, FUNC(crtc_ega_device::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD( "palette", 64 )
+	PALETTE(config, m_palette).set_entries(64);
 
-	MCFG_DEVICE_ADD(EGA_CRTC_NAME, CRTC_EGA, 16257000/8)
-	MCFG_CRTC_EGA_SET_SCREEN(EGA_SCREEN_NAME)
-	MCFG_CRTC_EGA_HPIXELS_PER_COLUMN(8)
-	MCFG_CRTC_EGA_ROW_UPDATE_CB(isa8_ega_device, ega_update_row)
-	MCFG_CRTC_EGA_RES_OUT_DE_CB(WRITELINE(*this, isa8_ega_device, de_changed))
-	MCFG_CRTC_EGA_RES_OUT_HSYNC_CB(WRITELINE(*this, isa8_ega_device, hsync_changed))
-	MCFG_CRTC_EGA_RES_OUT_VSYNC_CB(WRITELINE(*this, isa8_ega_device, vsync_changed))
-	MCFG_CRTC_EGA_RES_OUT_VBLANK_CB(WRITELINE(*this, isa8_ega_device, vblank_changed))
-MACHINE_CONFIG_END
+	CRTC_EGA(config, m_crtc_ega, 16.257_MHz_XTAL/8);
+	m_crtc_ega->set_screen(EGA_SCREEN_NAME);
+	m_crtc_ega->config_set_hpixels_per_column(8);
+	m_crtc_ega->set_row_update_callback(FUNC(isa8_ega_device::ega_update_row), this);
+	m_crtc_ega->res_out_de_callback().set(FUNC(isa8_ega_device::de_changed));
+	m_crtc_ega->res_out_hsync_callback().set(FUNC(isa8_ega_device::hsync_changed));
+	m_crtc_ega->res_out_vsync_callback().set(FUNC(isa8_ega_device::vsync_changed));
+	m_crtc_ega->res_out_vblank_callback().set(FUNC(isa8_ega_device::vblank_changed));
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -576,7 +577,7 @@ isa8_ega_device::isa8_ega_device(const machine_config &mconfig, const char *tag,
 isa8_ega_device::isa8_ega_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
-	m_crtc_ega(nullptr), m_videoram(nullptr), m_charA(nullptr), m_charB(nullptr),
+	m_crtc_ega(*this, EGA_CRTC_NAME), m_videoram(nullptr), m_charA(nullptr), m_charB(nullptr),
 	m_misc_output(0), m_feature_control(0), m_frame_cnt(0), m_hsync(0), m_vsync(0), m_vblank(0), m_display_enable(0), m_video_mode(0),
 	m_palette(*this, "palette")
 {
@@ -625,8 +626,6 @@ void isa8_ega_device::device_start()
 	m_plane[1] = m_videoram + 0x10000;
 	m_plane[2] = m_videoram + 0x20000;
 	m_plane[3] = m_videoram + 0x30000;
-
-	m_crtc_ega = subdevice<crtc_ega_device>(EGA_CRTC_NAME);
 
 	m_isa->install_rom(this, 0xc0000, 0xc3fff, "ega", "user2");
 	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_w), this));
@@ -1170,7 +1169,7 @@ READ8_MEMBER( isa8_ega_device::pc_ega8_3X0_r )
 
 	/* CRT Controller - data register */
 	case 1: case 3: case 5: case 7:
-		data = m_crtc_ega->register_r( space, offset );
+		data = m_crtc_ega->register_r();
 		break;
 
 	/* Input Status Register 1 */
@@ -1205,12 +1204,12 @@ WRITE8_MEMBER( isa8_ega_device::pc_ega8_3X0_w )
 	{
 	/* CRT Controller - address register */
 	case 0: case 2: case 4: case 6:
-		m_crtc_ega->address_w( space, offset, data );
+		m_crtc_ega->address_w(data);
 		break;
 
 	/* CRT Controller - data register */
 	case 1: case 3: case 5: case 7:
-		m_crtc_ega->register_w( space, offset, data );
+		m_crtc_ega->register_w(data);
 		break;
 
 	/* Set Light Pen Flip Flop */

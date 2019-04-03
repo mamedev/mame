@@ -17,8 +17,8 @@
 class hh_ucom4_state : public driver_device
 {
 public:
-	hh_ucom4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hh_ucom4_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_out_x(*this, "%u.%u", 0U, 0U),
@@ -31,7 +31,7 @@ public:
 	{ }
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<ucom4_cpu_device> m_maincpu;
 	optional_ioport_array<5> m_inp_matrix; // max 5
 	output_finder<0x20, 0x20> m_out_x;
 	output_finder<0x20> m_out_a;

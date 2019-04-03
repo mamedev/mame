@@ -12,8 +12,8 @@
 
 #pragma once
 
+#include "cpu/saturn/saturn.h"
 #include "machine/hp48_port.h"
-
 #include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -84,7 +84,7 @@ private:
 	virtual void machine_reset() override;
 	void base_machine_start(hp48_models model);
 
-	DECLARE_PALETTE_INIT(hp48);
+	void hp48_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(hp49g);
 	DECLARE_MACHINE_START(hp48gx);
 	DECLARE_MACHINE_START(hp48g);
@@ -127,7 +127,7 @@ private:
 	void hp48_common(machine_config &config);
 	void hp48(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<saturn_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;

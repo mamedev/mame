@@ -14,6 +14,9 @@
 #include "emu.h"
 #include "includes/advision.h"
 
+#include <algorithm>
+
+
 /***************************************************************************
 
   Start the video hardware emulation.
@@ -35,13 +38,11 @@ void advision_state::video_start()
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(advision_state, advision)
+void advision_state::advision_palette(palette_device &palette) const
 {
+	// 8 shades of RED
 	for (int i = 0; i < 8; i++)
-	{
-		/* 8 shades of RED */
-		m_palette->set_pen_color(i, i * 0x22, 0x00, 0x00);
-	}
+		m_palette->set_pen_color(i, pal3bit(i), 0x00, 0x00);
 }
 
 /***************************************************************************
@@ -53,9 +54,7 @@ PALETTE_INIT_MEMBER(advision_state, advision)
 void advision_state::vh_write(int data)
 {
 	if (m_video_bank >= 1 && m_video_bank <=5)
-	{
 		m_led_latch[m_video_bank] = data;
-	}
 }
 
 void advision_state::vh_update(int x)

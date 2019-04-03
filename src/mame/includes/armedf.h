@@ -25,7 +25,7 @@ public:
 		m_spr_pal_clut(*this, "spr_pal_clut"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram")
-		{ }
+	{ }
 
 	void init_cclimbr2();
 	void init_armedf();
@@ -55,7 +55,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	/* devices */
+	// devices
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_extra;
 	optional_device<nb1414m4_device> m_nb1414m4;

@@ -182,11 +182,11 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_VIDEO_START(turbo);
-	DECLARE_PALETTE_INIT(turbo);
-	DECLARE_PALETTE_INIT(subroc3d);
+	void turbo_palette(palette_device &palette) const;
+	void subroc3d_palette(palette_device &palette) const;
 	DECLARE_MACHINE_RESET(buckrog);
 	DECLARE_VIDEO_START(buckrog);
-	DECLARE_PALETTE_INIT(buckrog);
+	void buckrog_palette(palette_device &palette) const;
 	uint32_t screen_update_turbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_subroc3d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_buckrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

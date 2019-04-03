@@ -425,7 +425,7 @@ void policetr_state::policetr(machine_config &config)
 	m_screen->set_screen_update(FUNC(policetr_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(policetr_state::vblank));
 
-	PALETTE(config, m_palette, 256);
+	PALETTE(config, m_palette).set_entries(256);
 
 	/* sound hardware */
 	SPEAKER(config, m_lspeaker).front_left();

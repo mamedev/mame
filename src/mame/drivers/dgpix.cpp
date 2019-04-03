@@ -161,10 +161,11 @@ Notes:
 class dgpix_state : public driver_device
 {
 public:
-	dgpix_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dgpix_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_vblank(*this, "VBLANK") { }
+		m_vblank(*this, "VBLANK")
+	{ }
 
 	void dgpix(machine_config &config);
 
@@ -430,10 +431,11 @@ void dgpix_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(dgpix_state::dgpix)
-	MCFG_DEVICE_ADD("maincpu", E132XT, 20000000*4) /* 4x internal multiplier */
-	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+void dgpix_state::dgpix(machine_config &config)
+{
+	E132XT(config, m_maincpu, 20000000*4); /* 4x internal multiplier */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dgpix_state::cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &dgpix_state::io_map);
 
 /*
     unknown 16bit sound cpu, embedded inside the KS0164 sound chip
@@ -443,20 +445,19 @@ MACHINE_CONFIG_START(dgpix_state::dgpix)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(dgpix_state, screen_update_dgpix)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 319, 0, 239);
+	screen.set_screen_update(FUNC(dgpix_state::screen_update_dgpix));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_BBBBBGGGGGRRRRR("palette")
-
+	PALETTE(config, "palette", palette_device::BGR_555);
 
 	/* sound hardware */
 	// KS0164 sound chip
-MACHINE_CONFIG_END
+}
 
 
 /*

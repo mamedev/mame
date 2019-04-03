@@ -742,6 +742,13 @@ void memory_manager::allocate(device_memory_interface &memory)
 			// allocate one of the appropriate type
 			switch (spaceconfig->data_width() | (spaceconfig->addr_shift() + 4))
 			{
+				case  8|(4+1):
+					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
+						memory.allocate<address_space_specific<0,  1, ENDIANNESS_LITTLE>>(*this, spacenum);
+					else
+						memory.allocate<address_space_specific<0,  1, ENDIANNESS_BIG   >>(*this, spacenum);
+					break;
+
 				case  8|(4-0):
 					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
 						memory.allocate<address_space_specific<0,  0, ENDIANNESS_LITTLE>>(*this, spacenum);
@@ -962,8 +969,7 @@ address_space_config::address_space_config()
 		m_logaddr_width(0),
 		m_page_shift(0),
 		m_is_octal(false),
-		m_internal_map(address_map_constructor()),
-		m_default_map(address_map_constructor())
+		m_internal_map(address_map_constructor())
 {
 }
 
@@ -974,9 +980,8 @@ address_space_config::address_space_config()
  @param addrwidth address bits
  @param addrshift
  @param internal
- @param defmap
  */
-address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, address_map_constructor internal, address_map_constructor defmap)
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, address_map_constructor internal)
 	: m_name(name),
 		m_endianness(endian),
 		m_data_width(datawidth),
@@ -985,12 +990,11 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 		m_logaddr_width(addrwidth),
 		m_page_shift(0),
 		m_is_octal(false),
-		m_internal_map(internal),
-		m_default_map(defmap)
+		m_internal_map(internal)
 {
 }
 
-address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_constructor internal, address_map_constructor defmap)
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_constructor internal)
 	: m_name(name),
 		m_endianness(endian),
 		m_data_width(datawidth),
@@ -999,8 +1003,7 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 		m_logaddr_width(logwidth),
 		m_page_shift(pageshift),
 		m_is_octal(false),
-		m_internal_map(internal),
-		m_default_map(defmap)
+		m_internal_map(internal)
 {
 }
 
@@ -1301,7 +1304,7 @@ void address_space::prepare_map()
 			// find the region
 			memory_region *region = m_manager.machine().root_device().memregion(fulltag.c_str());
 			if (region == nullptr)
-				fatalerror("device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"\n", m_device.tag(), m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
+				fatalerror("device '%s' %s space memory map entry %X-%X references nonexistent region \"%s\"\n", m_device.tag(), m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
 
 			// validate the region
 			if (entry.m_rgnoffs + m_config.addr2byte(entry.m_addrend - entry.m_addrstart + 1) > region->bytes())
@@ -2647,6 +2650,8 @@ template<int Width, int AddrShift, int Endian> memory_access_cache<Width, AddrSh
 }
 
 
+template class memory_access_cache<0,  1, ENDIANNESS_LITTLE>;
+template class memory_access_cache<0,  1, ENDIANNESS_BIG>;
 template class memory_access_cache<0,  0, ENDIANNESS_LITTLE>;
 template class memory_access_cache<0,  0, ENDIANNESS_BIG>;
 template class memory_access_cache<1,  3, ENDIANNESS_LITTLE>;
@@ -2739,7 +2744,6 @@ memory_block::~memory_block()
 
 memory_bank::memory_bank(address_space &space, int index, offs_t addrstart, offs_t addrend, const char *tag)
 	: m_machine(space.m_manager.machine()),
-	  m_baseptr(nullptr),
 	  m_anonymous(tag == nullptr),
 	  m_addrstart(addrstart),
 	  m_addrend(addrend),
@@ -2815,7 +2819,7 @@ void memory_bank::set_base(void *base)
 		m_entries.resize(1);
 		m_curentry = 0;
 	}
-	m_baseptr = m_entries[m_curentry] = reinterpret_cast<u8 *>(base);
+	m_entries[m_curentry] = reinterpret_cast<u8 *>(base);
 	for(auto cb : m_alloc_notifier)
 		cb(base);
 	m_alloc_notifier.clear();
@@ -2846,7 +2850,6 @@ void memory_bank::set_entry(int entrynum)
 		throw emu_fatalerror("memory_bank::set_entry called for bank '%s' with invalid bank entry %d", m_tag.c_str(), entrynum);
 
 	m_curentry = entrynum;
-	m_baseptr = m_entries[entrynum];
 }
 
 
@@ -2866,10 +2869,6 @@ void memory_bank::configure_entry(int entrynum, void *base)
 
 	// set the entry
 	m_entries[entrynum] = reinterpret_cast<u8 *>(base);
-
-	// if the bank base is not configured, and we're the first entry, set us up
-	if (!m_baseptr && !entrynum)
-		m_baseptr = m_entries[0];
 }
 
 
@@ -2885,8 +2884,6 @@ void memory_bank::configure_entries(int startentry, int numentries, void *base, 
 	// fill in the requested bank entries
 	for (int entrynum = 0; entrynum < numentries; entrynum ++)
 		m_entries[entrynum + startentry] = reinterpret_cast<u8 *>(base) +  entrynum * stride ;
-	if(!m_baseptr && !startentry)
-		m_baseptr = reinterpret_cast<u8 *>(base);
 }
 
 

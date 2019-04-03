@@ -121,6 +121,7 @@ public:
 	void pc9801rs(machine_config &config);
 	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
 	void init_pc9801_kanji();
+	void init_pc9801vm_kanji();
 
 protected:
 	virtual void video_start() override;
@@ -277,7 +278,7 @@ private:
 	DECLARE_MACHINE_RESET(pc9801rs);
 	DECLARE_MACHINE_RESET(pc9821);
 
-	DECLARE_PALETTE_INIT(pc9801);
+	void pc9801_palette(palette_device &palette) const;
 	DECLARE_WRITE_LINE_MEMBER(vrtc_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
@@ -415,5 +416,4 @@ private:
 	uint16_t egc_shift(int plane, uint16_t val);
 };
 
-
-#endif
+#endif // MAME_INCLUDES_PC9801_H

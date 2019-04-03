@@ -16,9 +16,6 @@
 
 DECLARE_DEVICE_TYPE(INDER_AUDIO, inder_sb_device)
 
-#define MCFG_INDER_AUDIO_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, INDER_AUDIO, 0)
-
 
 class inder_sb_device :  public device_t,
 							public device_mixer_interface

@@ -67,7 +67,7 @@ void vp700_device::device_start()
 //  vip_program_r - program read
 //-------------------------------------------------
 
-uint8_t vp700_device::vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh)
+uint8_t vp700_device::vip_program_r(offs_t offset, int cs, int cdef, int *minh)
 {
 	uint8_t data = 0xff;
 

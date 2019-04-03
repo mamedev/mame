@@ -796,46 +796,45 @@ static INPUT_PORTS_START( tetfight )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(ssfindo_state::ssfindo)
-
+void ssfindo_state::ssfindo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM7, 54000000) // guess...
-	MCFG_DEVICE_PROGRAM_MAP(ssfindo_map)
+	ARM7(config, m_maincpu, 54000000); // guess...
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssfindo_state::ssfindo_map);
+	m_maincpu->set_vblank_int("screen", FUNC(ssfindo_state::interrupt));
 
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ssfindo_state,  interrupt)
+	I2C_24C01(config, m_i2cmem);
 
-	MCFG_24C01_ADD("i2cmem")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(320, 256);
+	screen.set_visarea(0, 319, 0, 239);
+	screen.set_screen_update(FUNC(ssfindo_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(ssfindo_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	PALETTE(config, m_palette).set_entries(256);
+}
 
-	MCFG_PALETTE_ADD("palette", 256)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(ssfindo_state::ppcar)
+void ssfindo_state::ppcar(machine_config &config)
+{
 	ssfindo(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ppcar_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssfindo_state::ppcar_map);
 
-	MCFG_DEVICE_REMOVE("i2cmem")
-MACHINE_CONFIG_END
+	config.device_remove("i2cmem");
+}
 
-MACHINE_CONFIG_START(ssfindo_state::tetfight)
+void ssfindo_state::tetfight(machine_config &config)
+{
 	ppcar(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tetfight_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssfindo_state::tetfight_map);
 
-	MCFG_24C02_ADD("i2cmem")
-MACHINE_CONFIG_END
+	I2C_24C02(config, m_i2cmem);
+}
 
 ROM_START( ssfindo )
 	ROM_REGION(0x100000, "maincpu", 0 ) /* ARM 32 bit code */

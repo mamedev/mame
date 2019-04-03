@@ -52,6 +52,10 @@ public:
 	void init_shadoww();
 	void init_wildfang();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	/* memory pointers */
 	required_shared_ptr_array<uint16_t, 3> m_videoram;
@@ -146,9 +150,6 @@ private:
 	void mastninj_map(address_map &map);
 	void mastninj_sound_map(address_map &map);
 	void sound_map(address_map &map);
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 };
 
 #endif // MAME_INCLUDES_GAIDEN_H

@@ -43,8 +43,10 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_pixram( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
-	void undoukai(machine_config &config);
+	void common(machine_config &config);
 	void _40love(machine_config &config);
+	void undoukai(machine_config &config);
+
 	void _40love_map(address_map &map);
 	void sound_map(address_map &map);
 	void undoukai_map(address_map &map);

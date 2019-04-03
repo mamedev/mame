@@ -297,7 +297,7 @@ imagetek_i4300_device::imagetek_i4300_device(const machine_config &mconfig, cons
 
 void imagetek_i4100_device::device_add_mconfig(machine_config &config)
 {
-	PALETTE(config, m_palette, 0x1000).set_format(PALETTE_FORMAT_GGGGGRRRRRBBBBBx);
+	PALETTE(config, m_palette).set_format(palette_device::GRBx_555, 0x1000);
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 }
 

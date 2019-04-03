@@ -36,7 +36,7 @@ private:
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
 	DECLARE_VIDEO_START(digdug);
-	DECLARE_PALETTE_INIT(digdug);
+	void digdug_palette(palette_device &palette) const;
 	uint32_t screen_update_digdug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(digdug_videoram_w);

@@ -85,7 +85,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(timeplt);
+	void timeplt_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(chkun);
 	DECLARE_VIDEO_START(psurge);
 

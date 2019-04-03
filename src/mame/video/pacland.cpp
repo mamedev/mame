@@ -89,7 +89,7 @@ void pacland_state::switch_palette()
 	}
 }
 
-PALETTE_INIT_MEMBER(pacland_state, pacland)
+void pacland_state::pacland_palette(palette_device &palette)
 {
 	uint8_t const *color_prom = &m_color_prom[0];
 
@@ -111,19 +111,19 @@ PALETTE_INIT_MEMBER(pacland_state, pacland)
 	m_palette_bank = 0;
 	switch_palette();
 
-	/* precalculate transparency masks for sprites */
+	// precalculate transparency masks for sprites
 	m_transmask[0] = std::make_unique<uint32_t[]>(64);
 	m_transmask[1] = std::make_unique<uint32_t[]>(64);
 	m_transmask[2] = std::make_unique<uint32_t[]>(64);
 	for (int i = 0; i < 64; i++)
 	{
-		/* start with no transparency */
+		// start with no transparency
 		m_transmask[0][i] = m_transmask[1][i] = m_transmask[2][i] = 0;
 
-		/* iterate over all palette entries except the last one */
+		// iterate over all palette entries except the last one
 		for (int palentry = 0; palentry < 0x100; palentry++)
 		{
-			uint32_t mask = palette.transpen_mask(*m_gfxdecode->gfx(2), i, palentry);
+			uint32_t const mask = palette.transpen_mask(*m_gfxdecode->gfx(2), i, palentry);
 
 			/* transmask[0] is a mask that is used to draw only high priority sprite pixels; thus, pens
 			   $00-$7F are opaque, and others are transparent */

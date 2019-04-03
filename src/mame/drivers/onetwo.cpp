@@ -63,7 +63,8 @@ public:
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void onetwo(machine_config &config);
 
@@ -92,7 +93,7 @@ private:
 	DECLARE_WRITE8_MEMBER(coin_counters_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_DECODER(BBBGGGGGxBBRRRRR);
+	static rgb_t BBBGGGGGxBBRRRRR(uint32_t raw);
 	void main_cpu(address_map &map);
 	void main_cpu_io(address_map &map);
 	void sound_cpu(address_map &map);
@@ -152,7 +153,7 @@ WRITE8_MEMBER(onetwo_state::coin_counters_w)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
 }
 
-PALETTE_DECODER_MEMBER(onetwo_state, BBBGGGGGxBBRRRRR)
+rgb_t onetwo_state::BBBGGGGGxBBRRRRR(uint32_t raw)
 {
 	uint8_t const r = pal5bit((raw >> 0) & 0x1f);
 	uint8_t const g = pal5bit((raw >> 8) & 0x1f);
@@ -363,7 +364,7 @@ void onetwo_state::onetwo(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_onetwo);
-	PALETTE(config, m_palette, 0x80).set_format(raw_to_rgb_converter(2, &onetwo_state::BBBGGGGGxBBRRRRR_decoder));
+	PALETTE(config, m_palette).set_format(2, &onetwo_state::BBBGGGGGxBBRRRRR, 0x80);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

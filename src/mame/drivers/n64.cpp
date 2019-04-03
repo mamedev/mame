@@ -427,81 +427,72 @@ INTERRUPT_GEN_MEMBER(n64_mess_state::n64_reset_poll)
 	m_rcp_periphs->poll_reset_button((ioport("RESET")->read() & 1) ? true : false);
 }
 
-MACHINE_CONFIG_START(n64_mess_state::n64)
-
+void n64_mess_state::n64(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", VR4300BE, 93750000)
-	MCFG_CPU_FORCE_NO_DRC()
-	//MCFG_MIPS3_ICACHE_SIZE(16384) /* ?? */
-	//MCFG_MIPS3_DCACHE_SIZE(8192) /* ?? */
-	//MCFG_MIPS3_SYSTEM_CLOCK(62500000) /* ?? */
-	MCFG_DEVICE_PROGRAM_MAP(n64_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", n64_mess_state, n64_reset_poll)
+	VR4300BE(config, m_vr4300, 93750000);
+	m_vr4300->set_force_no_drc(true);
+	//m_vr4300->set_icache_size(16384);
+	//m_vr4300->set_dcache_size(8192);
+	//m_vr4300->set_system_clock(62500000);
+	m_vr4300->set_addrmap(AS_PROGRAM, &n64_mess_state::n64_map);
+	m_vr4300->set_vblank_int("screen", FUNC(n64_mess_state::n64_reset_poll));
 
-	MCFG_DEVICE_ADD("rsp", RSP, 62500000)
-	MCFG_CPU_FORCE_NO_DRC()
-	MCFG_RSP_DP_REG_R_CB(READ32("rcp",n64_periphs, dp_reg_r))
-	MCFG_RSP_DP_REG_W_CB(WRITE32("rcp",n64_periphs, dp_reg_w))
-	MCFG_RSP_SP_REG_R_CB(READ32("rcp",n64_periphs, sp_reg_r))
-	MCFG_RSP_SP_REG_W_CB(WRITE32("rcp",n64_periphs, sp_reg_w))
-	MCFG_RSP_SP_SET_STATUS_CB(WRITE32("rcp",n64_periphs, sp_set_status))
-	MCFG_DEVICE_PROGRAM_MAP(rsp_map)
+	RSP(config, m_rsp, 62500000);
+	m_rsp->set_force_no_drc(true);
+	m_rsp->dp_reg_r().set(m_rcp_periphs, FUNC(n64_periphs::dp_reg_r));
+	m_rsp->dp_reg_w().set(m_rcp_periphs, FUNC(n64_periphs::dp_reg_w));
+	m_rsp->sp_reg_r().set(m_rcp_periphs, FUNC(n64_periphs::sp_reg_r));
+	m_rsp->sp_reg_w().set(m_rcp_periphs, FUNC(n64_periphs::sp_reg_w));
+	m_rsp->status_set().set(m_rcp_periphs, FUNC(n64_periphs::sp_set_status));
+	m_rsp->set_addrmap(AS_PROGRAM, &n64_mess_state::rsp_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(500000))
-	//MCFG_QUANTUM_TIME(attotime::from_hz(1200))
+	config.m_minimum_quantum = attotime::from_hz(500000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	/* Video DACRATE is for quarter pixels, so the horizontal is also given in quarter pixels.  However, the horizontal and vertical timing and sizing is adjustable by register and will be reset when the registers are written. */
-	MCFG_SCREEN_RAW_PARAMS(DACRATE_NTSC*2,3093,0,3093,525,0,525)
-	//MCFG_SCREEN_REFRESH_RATE(60)
-	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	//MCFG_SCREEN_SIZE(640, 525)
-	//MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DRIVER(n64_state, screen_update_n64)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, n64_state, screen_vblank_n64))
+	screen.set_raw(DACRATE_NTSC*2,3093,0,3093,525,0,525);
+	screen.set_screen_update(FUNC(n64_state::screen_update_n64));
+	screen.screen_vblank().set(FUNC(n64_state::screen_vblank_n64));
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
+	PALETTE(config, "palette").set_entries(0x1000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("dac2", DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_DEVICE_ADD("dac1", DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_N64_PERIPHS_ADD("rcp");
+	N64PERIPH(config, m_rcp_periphs, 0);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "n64_cart")
-	MCFG_GENERIC_EXTENSIONS("v64,z64,rom,n64,bin")
-	MCFG_GENERIC_MANDATORY
-	MCFG_GENERIC_LOAD(n64_mess_state, n64_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "n64_cart", "v64,z64,rom,n64,bin"));
+	cartslot.set_must_be_loaded(true);
+	cartslot.set_device_load(device_image_load_delegate(&n64_mess_state::device_image_load_n64_cart, this));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "n64")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("n64");
+}
 
-MACHINE_CONFIG_START(n64_mess_state::n64dd)
+void n64_mess_state::n64dd(machine_config &config)
+{
 	n64(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(n64dd_map)
+	m_vr4300->set_addrmap(AS_PROGRAM, &n64_mess_state::n64dd_map);
 
 	MCFG_MACHINE_START_OVERRIDE(n64_mess_state, n64dd)
 
-	MCFG_DEVICE_REMOVE("cartslot")
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "n64_cart")
-	MCFG_GENERIC_EXTENSIONS("v64,z64,rom,n64,bin")
-	MCFG_GENERIC_LOAD(n64_mess_state, n64_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config.replace(), "cartslot", generic_plain_slot, "n64_cart"));
+	cartslot.set_extensions("v64,z64,rom,n64,bin");
+	cartslot.set_device_load(device_image_load_delegate(&n64_mess_state::device_image_load_n64_cart, this));
 
-	MCFG_HARDDISK_ADD("n64disk")
-	MCFG_HARDDISK_LOAD(n64_mess_state,n64dd)
-	MCFG_HARDDISK_UNLOAD(n64_mess_state,n64dd)
-	MCFG_HARDDISK_INTERFACE("n64dd_disk")
+	harddisk_image_device &hdd(HARDDISK(config, "n64disk"));
+	hdd.set_device_load(device_image_load_delegate(&n64_mess_state::device_image_load_n64dd, this));
+	hdd.set_device_unload(device_image_func_delegate(&n64_mess_state::device_image_unload_n64dd, this));
+	hdd.set_interface("n64dd_disk");
 
-	MCFG_SOFTWARE_LIST_ADD("dd_list", "n64dd")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "dd_list").set_original("n64dd");
+}
 
 ROM_START( n64 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for R4300 */

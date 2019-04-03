@@ -374,10 +374,11 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa8_ibm_mfc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("ibm_mfc", Z80, XTAL(11'800'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(prg_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+void isa8_ibm_mfc_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_cpu, XTAL(11'800'000) / 2);
+	m_cpu->set_addrmap(AS_PROGRAM, &isa8_ibm_mfc_device::prg_map);
+	m_cpu->set_addrmap(AS_IO, &isa8_ibm_mfc_device::io_map);
 
 	I8255(config, m_d71055c_0);
 	m_d71055c_0->in_pa_callback().set(FUNC(isa8_ibm_mfc_device::ppi0_i_a));
@@ -390,10 +391,10 @@ MACHINE_CONFIG_START(isa8_ibm_mfc_device::device_add_mconfig)
 	m_d71055c_1->in_pb_callback().set(FUNC(isa8_ibm_mfc_device::ppi1_i_b));
 	m_d71055c_1->out_pc_callback().set(FUNC(isa8_ibm_mfc_device::ppi1_o_c));
 
-	I8251(config, "d71051", 0);
+	I8251(config, m_d71051, 0);
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(4'000'000) / 8) // 500KHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, isa8_ibm_mfc_device, write_usart_clock))
+	clock_device &usart_clock(CLOCK(config, "usart_clock", XTAL(4'000'000) / 8)); // 500KHz
+	usart_clock.signal_handler().set(FUNC(isa8_ibm_mfc_device::write_usart_clock));
 
 	PIT8253(config, m_d8253, 0);
 	m_d8253->set_clk<0>(XTAL(4'000'000) / 8);
@@ -409,7 +410,7 @@ MACHINE_CONFIG_START(isa8_ibm_mfc_device::device_add_mconfig)
 	m_ym2151->irq_handler().set(FUNC(isa8_ibm_mfc_device::ibm_mfc_ym_irq));
 	m_ym2151->add_route(0, "ymleft", 1.00);
 	m_ym2151->add_route(1, "ymright", 1.00);
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------

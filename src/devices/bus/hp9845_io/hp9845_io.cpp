@@ -4,15 +4,18 @@
 
     hp9845_io.cpp
 
-    I/O bus of HP9845 systems
+    I/O bus of HP9825/HP9845 systems
 
 *********************************************************************/
 
 #include "emu.h"
 #include "hp9845_io.h"
+#include "98032.h"
+#include "98035.h"
+#include "98034.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(HP9845_IO_SLOT, hp9845_io_slot_device, "hp9845_io_slot", "HP9845 I/O Slot")
+DEFINE_DEVICE_TYPE(HP9845_IO_SLOT, hp9845_io_slot_device, "hp98x5_io_slot", "HP98x5 I/O Slot")
 
 // +---------------------+
 // |hp9845_io_slot_device|
@@ -22,8 +25,15 @@ hp9845_io_slot_device::hp9845_io_slot_device(const machine_config &mconfig, cons
 	device_slot_interface(mconfig, *this),
 	m_irq_cb_func(*this),
 	m_sts_cb_func(*this),
-	m_flg_cb_func(*this)
+	m_flg_cb_func(*this),
+	m_dmar_cb_func(*this)
 {
+	option_reset();
+	option_add("98032_gpio" , HP98032_IO_CARD);
+	option_add("98034_hpib" , HP98034_IO_CARD);
+	option_add("98035_rtc" , HP98035_IO_CARD);
+	set_default_option(nullptr);
+	set_fixed(false);
 }
 
 hp9845_io_slot_device::~hp9845_io_slot_device()
@@ -35,6 +45,7 @@ void hp9845_io_slot_device::device_start()
 	m_irq_cb_func.resolve_safe();
 	m_sts_cb_func.resolve_safe();
 	m_flg_cb_func.resolve_safe();
+	m_dmar_cb_func.resolve_safe();
 
 	hp9845_io_card_device *card = dynamic_cast<hp9845_io_card_device*>(get_card_device());
 
@@ -43,19 +54,24 @@ void hp9845_io_slot_device::device_start()
 	}
 }
 
-void hp9845_io_slot_device::irq_w(uint8_t sc , int state)
+WRITE_LINE_MEMBER(hp9845_io_slot_device::irq_w)
 {
-	m_irq_cb_func(sc , state , 0xff);
+	m_irq_cb_func(state);
 }
 
-void hp9845_io_slot_device::sts_w(uint8_t sc , int state)
+WRITE_LINE_MEMBER(hp9845_io_slot_device::sts_w)
 {
-	m_sts_cb_func(sc , state , 0xff);
+	m_sts_cb_func(state);
 }
 
-void hp9845_io_slot_device::flg_w(uint8_t sc , int state)
+WRITE_LINE_MEMBER(hp9845_io_slot_device::flg_w)
 {
-	m_flg_cb_func(sc , state , 0xff);
+	m_flg_cb_func(state);
+}
+
+WRITE_LINE_MEMBER(hp9845_io_slot_device::dmar_w)
+{
+	m_dmar_cb_func(state);
 }
 
 int hp9845_io_slot_device::get_rw_handlers(read16_delegate& rhandler , write16_delegate& whandler)
@@ -88,8 +104,7 @@ hp9845_io_card_device::hp9845_io_card_device(const machine_config &mconfig, devi
 	device_t(mconfig, type, tag, owner, clock),
 	device_slot_card_interface(mconfig, *this),
 	m_slot_dev(nullptr),
-	m_select_code_port(*this , "SC"),
-	m_my_sc(0)
+	m_select_code_port(*this , "SC")
 {
 }
 
@@ -97,37 +112,30 @@ hp9845_io_card_device::~hp9845_io_card_device()
 {
 }
 
-void hp9845_io_card_device::device_reset()
-{
-	m_my_sc = get_sc();
-}
-
-void hp9845_io_card_device::irq_w(int state)
+WRITE_LINE_MEMBER(hp9845_io_card_device::irq_w)
 {
 	if (m_slot_dev) {
-		m_slot_dev->irq_w(m_my_sc , state);
+		m_slot_dev->irq_w(state);
 	}
 }
 
-void hp9845_io_card_device::sts_w(int state)
+WRITE_LINE_MEMBER(hp9845_io_card_device::sts_w)
 {
 	if (m_slot_dev) {
-		m_slot_dev->sts_w(m_my_sc , state);
+		m_slot_dev->sts_w(state);
 	}
 }
 
-void hp9845_io_card_device::flg_w(int state)
+WRITE_LINE_MEMBER(hp9845_io_card_device::flg_w)
 {
 	if (m_slot_dev) {
-		m_slot_dev->flg_w(m_my_sc , state);
+		m_slot_dev->flg_w(state);
 	}
 }
 
-#include "98035.h"
-#include "98034.h"
-
-void hp9845_io_slot_devices(device_slot_interface &device)
+WRITE_LINE_MEMBER(hp9845_io_card_device::dmar_w)
 {
-	device.option_add("98034_hpib" , HP98034_IO_CARD);
-	device.option_add("98035_rtc" , HP98035_IO_CARD);
+	if (m_slot_dev) {
+		m_slot_dev->dmar_w(state);
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -10,8 +10,7 @@
 
 #define BX_ERROR_SET(_ptr, _result, _msg) \
 			BX_MACRO_BLOCK_BEGIN \
-				BX_TRACE("Error %d: %s", _result.code, "" _msg); \
-				_ptr->setError(_result,  "" _msg); \
+				(_ptr)->setError(_result,  "" _msg); \
 			BX_MACRO_BLOCK_END
 
 #define BX_ERROR_USE_TEMP_WHEN_NULL(_ptr) \

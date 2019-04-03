@@ -18,10 +18,6 @@
 #include "screen.h"
 
 /**************** Machine stuff ******************/
-//#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
-
-// We encode priority with colour in the tilemaps, so need a larger palette
-#define T2PALETTE_LENGTH 0x10000
 
 class toaplan2_state : public driver_device
 {
@@ -92,6 +88,9 @@ protected:
 	virtual void device_post_load() override;
 
 private:
+	// We encode priority with colour in the tilemaps, so need a larger palette
+	static constexpr unsigned T2PALETTE_LENGTH = 0x10000;
+
 	optional_shared_ptr<uint8_t> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	optional_shared_ptr<uint16_t> m_tx_videoram;
 	optional_shared_ptr<uint16_t> m_tx_lineselect;
@@ -194,7 +193,6 @@ private:
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_lockout_w);
 
 	DECLARE_WRITE_LINE_MEMBER(toaplan2_reset);
-
 
 	void batrider_68k_mem(address_map &map);
 	void batrider_dma_mem(address_map &map);

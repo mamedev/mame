@@ -10,20 +10,20 @@
 //
 
 
-#define MCFG_K053250PS_ADD(_tag, _palette_tag, _screen_tag, offx, offy)  \
-	MCFG_DEVICE_ADD(_tag, K053250PS, 12000000) \
-	MCFG_GFX_PALETTE(_palette_tag) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	downcast<k053250ps_device &>(*device).set_offsets(offx, offy);
-
-#define MCFG_K053250PS_DMAIRQ_CB(_cb) \
-	downcast<k053250ps_device &>(*device).set_dmairq_cb(DEVCB_##_cb);
-
 class k053250ps_device :  public device_t,
 						public device_gfx_interface,
 						public device_video_interface
 {
 public:
+	template <typename T, typename U>
+	k053250ps_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, U &&screen_tag, int offx, int offy)
+		: k053250ps_device(mconfig, tag, owner, clock)
+	{
+		set_palette(std::forward<T>(palette_tag));
+		set_screen(std::forward<U>(screen_tag));
+		set_offsets(offx, offy);
+	}
+
 	k053250ps_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_offsets(int offx, int offy)
@@ -31,7 +31,7 @@ public:
 		m_offx = offx;
 		m_offy = offy;
 	}
-	template<class _cb> devcb_base &set_dmairq_cb(_cb cb) { return m_dmairq_cb.set_callback(cb); }
+	auto dmairq_cb() { return m_dmairq_cb.bind(); }
 
 	DECLARE_READ16_MEMBER(reg_r);
 	DECLARE_WRITE16_MEMBER(reg_w);

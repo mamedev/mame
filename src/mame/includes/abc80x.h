@@ -209,7 +209,7 @@ public:
 
 	DECLARE_READ8_MEMBER( m1_r ) override;
 	DECLARE_READ8_MEMBER( char_ram_r );
-	DECLARE_PALETTE_INIT( abc800c );
+	void abc800c_palette(palette_device &palette) const;
 	void abc800c(machine_config &config);
 	void abc800c_video(machine_config &config);
 	void abc800c_mem(address_map &map);
@@ -311,7 +311,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( keydtr_w );
 	DECLARE_WRITE_LINE_MEMBER( hs_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );
-	DECLARE_PALETTE_INIT( abc806 );
+	void abc806_palette(palette_device &palette) const;
 	MC6845_UPDATE_ROW( abc806_update_row );
 
 	// memory state

@@ -4,56 +4,49 @@
 #include "includes/mermaid.h"
 
 
-PALETTE_INIT_MEMBER(mermaid_state, mermaid)
+void mermaid_state::common_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-
-	for (i = 0; i < 0x40; i++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < 0x40; i++)
 	{
-		int r = 0x21 * BIT(color_prom[i], 0) + 0x47 * BIT(color_prom[i], 1) + 0x97 * BIT(color_prom[i], 2);
-		int g = 0x21 * BIT(color_prom[i], 3) + 0x47 * BIT(color_prom[i], 4) + 0x97 * BIT(color_prom[i], 5);
-		int b =                                0x47 * BIT(color_prom[i], 6) + 0x97 * BIT(color_prom[i], 7);
+		int const r = 0x21 * BIT(color_prom[i], 0) + 0x47 * BIT(color_prom[i], 1) + 0x97 * BIT(color_prom[i], 2);
+		int const g = 0x21 * BIT(color_prom[i], 3) + 0x47 * BIT(color_prom[i], 4) + 0x97 * BIT(color_prom[i], 5);
+		int const b =                                0x47 * BIT(color_prom[i], 6) + 0x97 * BIT(color_prom[i], 7);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
+}
 
-	/* blue background */
+void mermaid_state::mermaid_palette(palette_device &palette) const
+{
+	common_palette(palette);
+
+	// blue background
 	palette.set_indirect_color(0x40, rgb_t(0, 0, 0xff));
 
-	/* char/sprite palette */
-	for (i = 0; i < 0x40; i++)
+	// char/sprite palette
+	for (int i = 0; i < 0x40; i++)
 		palette.set_pen_indirect(i, i);
 
-	/* background palette */
+	// background palette
 	palette.set_pen_indirect(0x40, 0x20);
 	palette.set_pen_indirect(0x41, 0x21);
 	palette.set_pen_indirect(0x42, 0x40);
 	palette.set_pen_indirect(0x43, 0x21);
 }
 
-PALETTE_INIT_MEMBER(mermaid_state,rougien)
+void mermaid_state::rougien_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	common_palette(palette);
 
-	for (i = 0; i < 0x40; i++)
-	{
-		int r = 0x21 * BIT(color_prom[i], 0) + 0x47 * BIT(color_prom[i], 1) + 0x97 * BIT(color_prom[i], 2);
-		int g = 0x21 * BIT(color_prom[i], 3) + 0x47 * BIT(color_prom[i], 4) + 0x97 * BIT(color_prom[i], 5);
-		int b =                                0x47 * BIT(color_prom[i], 6) + 0x97 * BIT(color_prom[i], 7);
-
-		palette.set_indirect_color(i, rgb_t(r, g, b));
-	}
-
-	/* blue background */
+	// black background
 	palette.set_indirect_color(0x40, rgb_t(0, 0, 0));
 
-	/* char/sprite palette */
-	for (i = 0; i < 0x40; i++)
+	// char/sprite palette
+	for (int i = 0; i < 0x40; i++)
 		palette.set_pen_indirect(i, i);
 
-	/* background palette */
+	// background palette
 	palette.set_pen_indirect(0x40, 0x40);
 	palette.set_pen_indirect(0x41, 0x00);
 	palette.set_pen_indirect(0x42, 0x00);

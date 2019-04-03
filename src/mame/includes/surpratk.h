@@ -10,9 +10,10 @@
 
 #pragma once
 
+#include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/bankdev.h"
-#include "video/k053244_k053245.h"
 #include "video/k052109.h"
+#include "video/k053244_k053245.h"
 #include "video/k053251.h"
 #include "video/konami_helper.h"
 #include "emupal.h"
@@ -39,7 +40,7 @@ private:
 	int        m_layerpri[3];
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
+	required_device<konami_cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bank0000;
 	required_device<k052109_device> m_k052109;
 	required_device<k05324x_device> m_k053244;

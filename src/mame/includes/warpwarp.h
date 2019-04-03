@@ -101,11 +101,11 @@ private:
 	DECLARE_MACHINE_RESET(kaitei);
 
 	DECLARE_VIDEO_START(geebee);
-	DECLARE_PALETTE_INIT(geebee);
+	void geebee_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(warpwarp);
-	DECLARE_PALETTE_INIT(warpwarp);
+	void warpwarp_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(navarone);
-	DECLARE_PALETTE_INIT(navarone);
+	void navarone_palette(palette_device &palette) const;
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(geebee_get_tile_info);

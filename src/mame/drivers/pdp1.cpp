@@ -281,17 +281,17 @@ static const gfx_layout fontlayout =
     black.  Grey levels follow an exponential law, so that decrementing the
     color index periodically will simulate the remanence of a cathode ray tube.
 */
-static const uint8_t pdp1_colors[] =
+static constexpr rgb_t pdp1_colors[] =
 {
-	0x00,0x00,0x00, /* black */
-	0xFF,0xFF,0xFF, /* white */
-	0x00,0xFF,0x00, /* green */
-	0x00,0x40,0x00, /* dark green */
-	0xFF,0x00,0x00, /* red */
-	0x80,0x80,0x80  /* light gray */
+	{0x00, 0x00, 0x00 }, // black
+	{0xff, 0xff, 0xff }, // white
+	{0x00, 0xff, 0x00 }, // green
+	{0x00, 0x40, 0x00 }, // dark green
+	{0xff, 0x00, 0x00 }, // red
+	{0x80, 0x80, 0x80 }  // light gray
 };
 
-static const uint8_t pdp1_palette[] =
+static constexpr uint8_t pdp1_pens[] =
 {
 	pen_panel_bg, pen_panel_caption,
 	pen_typewriter_bg, pen_black,
@@ -305,55 +305,51 @@ static GFXDECODE_START( gfx_pdp1 )
 GFXDECODE_END
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(pdp1_state, pdp1)
+void pdp1_state::pdp1_palette(palette_device &palette) const
 {
-	/* rgb components for the two color emissions */
-	const double r1 = .1, g1 = .1, b1 = .924, r2 = .7, g2 = .7, b2 = .076;
-	/* half period in seconds for the two color emissions */
-	const double half_period_1 = .05, half_period_2 = .20;
-	/* refresh period in seconds */
-	const double update_period = 1./refresh_rate;
+	// rgb components for the two color emissions
+	constexpr double r1 = .1, g1 = .1, b1 = .924, r2 = .7, g2 = .7, b2 = .076;
+	// half period in seconds for the two color emissions
+	constexpr double half_period_1 = .05, half_period_2 = .20;
+	// refresh period in seconds
+	constexpr double update_period = 1./refresh_rate;
 	double decay_1, decay_2;
 	double cur_level_1, cur_level_2;
-	uint8_t i, r, g, b;
 
-	/* initialize CRT palette */
+	// initialize CRT palette
 
-	/* compute the decay factor per refresh frame */
+	// compute the decay factor per refresh frame
 	decay_1 = pow(.5, update_period / half_period_1);
 	decay_2 = pow(.5, update_period / half_period_2);
 
-	cur_level_1 = cur_level_2 = 255.;   /* start with maximum level */
+	cur_level_1 = cur_level_2 = 255.;   // start with maximum level
 
-	for (i=pen_crt_max_intensity; i>0; i--)
+	for (int i = pen_crt_max_intensity; i>0; i--)
 	{
-		/* compute the current color */
-		r = (int) ((r1*cur_level_1 + r2*cur_level_2) + .5);
-		g = (int) ((g1*cur_level_1 + g2*cur_level_2) + .5);
-		b = (int) ((b1*cur_level_1 + b2*cur_level_2) + .5);
-		/* write color in palette */
-		m_palette->set_indirect_color(i, rgb_t(r, g, b));
-		/* apply decay for next iteration */
+		// compute the current color
+		int const r = int((r1*cur_level_1 + r2*cur_level_2) + .5);
+		int const g = int((g1*cur_level_1 + g2*cur_level_2) + .5);
+		int const b = int((b1*cur_level_1 + b2*cur_level_2) + .5);
+		// write color in palette
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+		// apply decay for next iteration
 		cur_level_1 *= decay_1;
 		cur_level_2 *= decay_2;
 	}
 
-	m_palette->set_indirect_color(0, rgb_t(0, 0, 0));
+	palette.set_indirect_color(0, rgb_t(0, 0, 0));
 
-	/* load static palette */
-	for ( i = 0; i < 6; i++ )
-	{
-		r = pdp1_colors[i*3]; g = pdp1_colors[i*3+1]; b = pdp1_colors[i*3+2];
-		m_palette->set_indirect_color(pen_crt_num_levels + i, rgb_t(r, g, b));
-	}
+	// load static palette
+	for (int i = 0; i < 6; i++)
+		palette.set_indirect_color(pen_crt_num_levels + i, pdp1_colors[i]);
 
-	/* copy colortable to palette */
-	for( i = 0; i < total_colors_needed; i++ )
-		m_palette->set_pen_indirect(i, i);
+	// copy colortable to palette
+	for (int i = 0; i < total_colors_needed; i++)
+		palette.set_pen_indirect(i, i);
 
-	/* set up palette for text */
-	for( i = 0; i < 6; i++ )
-		m_palette->set_pen_indirect(total_colors_needed + i, pdp1_palette[i]);
+	// set up palette for text
+	for (int i = 0; i < 6; i++)
+		palette.set_pen_indirect(total_colors_needed + i, pdp1_pens[i]);
 }
 
 
@@ -1918,40 +1914,38 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 }
 
 
-MACHINE_CONFIG_START(pdp1_state::pdp1)
-
+void pdp1_state::pdp1(machine_config &config)
+{
 	/* basic machine hardware */
 	/* PDP1 CPU @ 200 kHz (no master clock, but the instruction and memory rate is 200 kHz) */
-	MCFG_DEVICE_ADD("maincpu", PDP1, 1000000/*the CPU core uses microsecond counts*/)
-	MCFG_PDP1_RESET_PARAM(pdp1_reset_param)
-	MCFG_DEVICE_PROGRAM_MAP(pdp1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pdp1_state,  pdp1_interrupt)   /* dummy interrupt: handles input */
+	PDP1(config, m_maincpu, 1000000); /* the CPU core uses microsecond counts */
+	m_maincpu->set_reset_param(&pdp1_reset_param);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pdp1_state::pdp1_map);
+	m_maincpu->set_vblank_int("screen", FUNC(pdp1_state::pdp1_interrupt));   /* dummy interrupt: handles input */
 
 	/* video hardware (includes the control panel and typewriter output) */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(refresh_rate)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(virtual_width, virtual_height)
-	MCFG_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pdp1_state, screen_update_pdp1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pdp1_state, screen_vblank_pdp1))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(refresh_rate);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(virtual_width, virtual_height);
+	screen.set_visarea(0, virtual_width-1, 0, virtual_height-1);
+	screen.set_screen_update(FUNC(pdp1_state::screen_update_pdp1));
+	screen.screen_vblank().set(FUNC(pdp1_state::screen_vblank_pdp1));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("crt", CRT, 0)
-	MCFG_CRT_NUM_LEVELS(pen_crt_num_levels)
-	MCFG_CRT_OFFSETS(crt_window_offset_x, crt_window_offset_y)
-	MCFG_CRT_SIZE(crt_window_width, crt_window_height)
+	CRT(config, m_crt, 0);
+	m_crt->set_num_levels(pen_crt_num_levels);
+	m_crt->set_offsets(crt_window_offset_x, crt_window_offset_y);
+	m_crt->set_size(crt_window_width, crt_window_height);
 
-	MCFG_DEVICE_ADD("readt", PDP1_READTAPE, 0)
-	MCFG_DEVICE_ADD("punch", PDP1_PUNCHTAPE, 0)
-	MCFG_DEVICE_ADD("typewriter", PDP1_PRINTER, 0)
-	MCFG_DEVICE_ADD("drum", PDP1_CYLINDER, 0)
+	PDP1_READTAPE(config, "readt", 0);
+	PDP1_PUNCHTAPE(config, "punch", 0);
+	PDP1_PRINTER(config, "typewriter", 0);
+	PDP1_CYLINDER(config, "drum", 0);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pdp1)
-	MCFG_PALETTE_ADD("palette", total_colors_needed + sizeof(pdp1_palette))
-	MCFG_PALETTE_INDIRECT_ENTRIES(total_colors_needed)
-	MCFG_PALETTE_INIT_OWNER(pdp1_state, pdp1)
-MACHINE_CONFIG_END
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pdp1);
+	PALETTE(config, m_palette, FUNC(pdp1_state::pdp1_palette), total_colors_needed + ARRAY_LENGTH(pdp1_pens), total_colors_needed);
+}
 
 /*
     pdp1 can address up to 65336 18 bit words when extended (4096 otherwise).

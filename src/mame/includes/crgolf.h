@@ -73,8 +73,8 @@ public:
 	void init_crgolfhi();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(crgolf);
-	DECLARE_PALETTE_INIT(mastrglf);
+	void crgolf_palette(palette_device &palette) const;
+	void mastrglf_palette(palette_device &palette) const;
 	uint32_t screen_update_crgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void get_pens( pen_t *pens );
 	DECLARE_WRITE_LINE_MEMBER(vck_callback);

@@ -49,6 +49,96 @@
     2008-07
     Dip locations verified with manual for brkthru (US conv. kit) and darwin
 
+Darwin 4078 PCB layout
+f205v
+
+Darwin 4078
+Data East, 1986
+----------
+|----------------------|
+| Fully boxed = socket |
+|----------------------|
+
+
+| separation = solder
+
+
+upper pcb - 3002A
+|-------------------------------------------------|
+|t                      |-------|                 |
+|o          |---------| |YM2203C|                 |
+|           |prom28s42| |-------|                 |
+|l          |---------| |YM3526                   |C
+|o                      |-----|                   |O
+|w   |-----|            |epr5 |                   |N
+|e   |epr8 |            |-----|                   |N
+|r   |-----|                                      |E
+|    |epr7 |            |HD68A09P                 |C
+|    |-----|                     |-----|          |T
+|t   |epr6 |                     |epr4 |          |O
+|o   |-----|                     |-----|          |R
+|                   |--------|   |epr3 |          |
+|l                  |HD6809EP|   |-----|          |
+|o                  |--------|   |epr2 |  dip 8x  |
+|w                               |-----|  dip 8x  |
+|e                               |epr1 |          |
+|r                               |-----|          |
+|-------------------------------------------------|
+Notes:
+
+      Chips:
+      HD68A09P : 3G1-UL-HD68A09P Japan (DIP40)
+      HD6809EP : 5M1-HD6809EP Japan (DIP40)
+       YM2203C : Yamaha YM2203C-5X-18-89-F (DIP40)
+        YM3526 : Yamaha YM3526-61-09-75-E (DIP40)
+
+      ROMs:
+    1,2,3,5,6,7,8 : Intel IP27256
+                4 : M27128Z-N
+             prom : TBP28S42N
+
+    Connectors:
+               2x flat cable to upper board
+               1x NON-JAMMA 22 contacts
+
+
+
+lower pcb - 3002B
+|-----------------------------------------------------|
+|t                   |-----|                          |
+|o          |------| |epr11|                          |
+|           |pal -a| |-----| |------|                 |
+|u          |------| |epr10| |pal -b|                 |
+|p                   |-----| |------| |------|        |
+|p                   |epr9 |          |pal -c|        |
+|e                   |-----|          |------|        |
+|r   |-----|                                          |
+|    |epr12|                                          |
+|    |-----|                                          |
+|t                                                    |
+|o                                                    |
+|                                                     |
+|u                                                    |
+|p                      12.0000MHz                    |
+|p                                                    |
+|e                                                    |
+|r                                                    |
+|-----------------------------------------------------|
+Notes:
+      ROMs:
+          9,10,11 : Intel IP27256
+               12 : TMS2764JL
+              pal : AmPAL16R4PC
+
+    Connectors:
+               2x flat cable to upper board
+
+
+brkthru, brkthruj and brkthrut have a Self Test Mode not mentioned anywhere
+in the manual. It is accessed by holding down both player 1 and player 2 start
+buttons while powering up the game. It can be accessed in MAME by holding the
+buttons down after the game has started then pressing F3 to reset the game.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -373,28 +463,25 @@ WRITE_LINE_MEMBER(brkthru_state::vblank_irq)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(brkthru_state::brkthru)
-
+void brkthru_state::brkthru(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/8)        /* 1.5 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(brkthru_map)
+	MC6809E(config, m_maincpu, MASTER_CLOCK/8);         /* 1.5 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &brkthru_state::brkthru_map);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809, MASTER_CLOCK/2)     /* 1.5 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-
+	MC6809(config, m_audiocpu, MASTER_CLOCK/2);         /* 1.5 MHz ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &brkthru_state::sound_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_brkthru)
-
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(brkthru_state, brkthru)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_brkthru);
+	PALETTE(config, m_palette, FUNC(brkthru_state::brkthru_palette), 256);
 
 	/* not sure; assuming to be the same as darwin */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248)
-	MCFG_SCREEN_UPDATE_DRIVER(brkthru_state, screen_update_brkthru)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, brkthru_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248);
+	screen.set_screen_update(FUNC(brkthru_state::screen_update_brkthru));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(brkthru_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -402,36 +489,33 @@ MACHINE_CONFIG_START(brkthru_state::brkthru)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, MASTER_CLOCK/8)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
-	MCFG_SOUND_ROUTE(1, "mono", 0.10)
-	MCFG_SOUND_ROUTE(2, "mono", 0.10)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ym1(YM2203(config, "ym1", MASTER_CLOCK/8));
+	ym1.add_route(0, "mono", 0.10);
+	ym1.add_route(1, "mono", 0.10);
+	ym1.add_route(2, "mono", 0.10);
+	ym1.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ym2", YM3526, MASTER_CLOCK/4)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3526_device &ym2(YM3526(config, "ym2", MASTER_CLOCK/4));
+	ym2.irq_handler().set_inputline(m_audiocpu, M6809_IRQ_LINE);
+	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(brkthru_state::darwin)
-
+void brkthru_state::darwin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/8)        /* 1.5 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(darwin_map)
+	MC6809E(config, m_maincpu, MASTER_CLOCK/8);         /* 1.5 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &brkthru_state::darwin_map);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809, MASTER_CLOCK/2)     /* 1.5 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-
+	MC6809(config, m_audiocpu, MASTER_CLOCK/2);         /* 1.5 MHz ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &brkthru_state::sound_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_brkthru)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_brkthru);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(brkthru_state, brkthru)
+	PALETTE(config, m_palette, FUNC(brkthru_state::brkthru_palette), 256);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248);
 	/* frames per second, vblank duration
 	    Horizontal video frequency:
 	        HSync = Dot Clock / Horizontal Frame Length
@@ -444,9 +528,9 @@ MACHINE_CONFIG_START(brkthru_state::darwin)
 	              = 15.625kHz / (240 + 32)
 	              = 57.444855Hz
 	    tuned by Shingo SUZUKI(VSyncMAME Project) 2000/10/19 */
-	MCFG_SCREEN_UPDATE_DRIVER(brkthru_state, screen_update_brkthru)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, brkthru_state, vblank_irq))
+	screen.set_screen_update(FUNC(brkthru_state::screen_update_brkthru));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(brkthru_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -454,16 +538,16 @@ MACHINE_CONFIG_START(brkthru_state::darwin)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, MASTER_CLOCK/8)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
-	MCFG_SOUND_ROUTE(1, "mono", 0.10)
-	MCFG_SOUND_ROUTE(2, "mono", 0.10)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ym1(YM2203(config, "ym1", MASTER_CLOCK/8));
+	ym1.add_route(0, "mono", 0.10);
+	ym1.add_route(1, "mono", 0.10);
+	ym1.add_route(2, "mono", 0.10);
+	ym1.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ym2", YM3526, MASTER_CLOCK/4)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3526_device &ym2(YM3526(config, "ym2", MASTER_CLOCK/4));
+	ym2.irq_handler().set_inputline(m_audiocpu, M6809_IRQ_LINE);
+	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 
@@ -586,11 +670,13 @@ ROM_START( brkthrut )
 	ROM_LOAD( "11_de-0231-2_27156.h4", 0x08000, 0x8000, CRC(fd156945) SHA1(a0575a4164217e63317886176ab7e59d255fc771) ) // Same as parent
 	ROM_LOAD( "12_de-0231-2_27156.h5", 0x10000, 0x8000, CRC(c152a99b) SHA1(f96133aa01219eda357b9e906bd9577dbfe359c0) ) // Same as parent
 
-	ROM_REGION( 0x0300, "proms", 0 ) // Truly dumped on the Tecfri PCB
-	/* The original 82s129 bipolar PROM for R/G was replaced with one 82s147
-	   that has twice the size, and apparently the A04 line disconnected...
+	ROM_REGION( 0x0300, "proms", 0 ) // Truly dumped on the Tecfri PCB.
+	/*
+	   The original 82s129 bipolar PROM for R/G was replaced with one 82s147
+	   that has twice the size. Seems that A05 line was disconnected, and the
+	   rest of bigger addressing lines were displaced covering the hole...
 	*/
-	ROM_LOAD( "6309.c2", 0x0000, 0x0040, CRC(cd9709be) SHA1(1d9c451c771a7b38680e2179aa22289ea7cb2720) ) // Red and green component (82S147N)
+	ROM_LOAD( "6309.c2", 0x0000, 0x0040, CRC(cd9709be) SHA1(1d9c451c771a7b38680e2179aa22289ea7cb2720) ) // Red and Green component (82S147N)
 	ROM_CONTINUE(        0x0020, 0x0040 )
 	ROM_CONTINUE(        0x0040, 0x0040 )
 	ROM_CONTINUE(        0x0060, 0x0040 )
@@ -678,12 +764,19 @@ ROM_START( darwin )
 	ROM_LOAD( "darw_11.rom",  0x08000, 0x8000, CRC(548ce2d1) SHA1(3b1757c70346ab4ee19ec85e7ae5137f8ccf446f) )
 	ROM_LOAD( "darw_12.rom",  0x10000, 0x8000, CRC(faba5fef) SHA1(848da4d4888f0218b737f1dc9b62944f68349a43) )
 
+	// A PCB has been found with the first PROM substituted with a TBP28S42 (4b56a744) SHA1(5fdc336d90c8a289c146c66f241dd217fc11bf35), see brkthrut ROM loading for how they did it.
+	// With that in mind, there's a one byte difference at 0x55 (0xf0 instead of 0x70). It is unknown if it's bitrot or if it's intended.
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "df.12",   0x0000, 0x0100, CRC(89b952ef) SHA1(77dc4020a2e25f81fae1182d58993cf09d13af00) ) /* red and green component */
 	ROM_LOAD( "df.13",   0x0100, 0x0100, CRC(d595e91d) SHA1(5e9793f6602455c79afdc855cd13183a7f48ab1e) ) /* blue component */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "darw_08.rom",  0x8000, 0x8000, CRC(6b580d58) SHA1(a70aebc6b4a291b4adddbb41d092b2682fc2d421) )
+
+	ROM_REGION( 0x600, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "1-pal16r4pc.bin",  0x000, 0x104, CRC(c859298c) SHA1(7db617fec6eecaf3f6043d7446bc1786bbc2b08c) )
+	ROM_LOAD( "2-pal16r4pc.bin",  0x200, 0x104, CRC(226629c3) SHA1(fd5704dfbb91a46665050b27b15bd22527a46a6e) )
+	ROM_LOAD( "3-pal16r4pc.bin",  0x400, 0x104, CRC(b3e980a0) SHA1(b1dbf01621d1053e641570fcac6618562d0721b4) )
 ROM_END
 
 

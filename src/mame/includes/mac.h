@@ -530,8 +530,7 @@ private:
 	emu_timer *m_scanline_timer;
 	emu_timer *m_adb_timer;
 
-	void palette_init_mac(palette_device &palette);
-	void palette_init_macgsc(palette_device &palette);
+	void macgsc_palette(palette_device &palette) const;
 
 	DECLARE_VIDEO_START(mac);
 	DECLARE_VIDEO_START(macprtb);

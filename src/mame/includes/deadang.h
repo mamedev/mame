@@ -9,6 +9,7 @@
 #include "machine/timer.h"
 #include "sound/ym2151.h"
 #include "emupal.h"
+#include "screen.h"
 
 class deadang_state : public driver_device
 {
@@ -20,10 +21,12 @@ public:
 		m_video_data(*this, "video_data"),
 		m_spriteram(*this, "spriteram"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_seibu_sound(*this, "seibu_sound"),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
+		m_audiocpu(*this, "audiocpu"),
 		m_adpcm1(*this, "adpcm1"),
 		m_adpcm2(*this, "adpcm2")
 	{ }
@@ -51,6 +54,7 @@ protected:
 	required_shared_ptr<uint16_t> m_video_data;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<seibu_sound_device> m_seibu_sound;
 
@@ -68,9 +72,9 @@ protected:
 	void sound_decrypted_opcodes_map(address_map &map);
 	void sound_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_audiocpu;
 	optional_device<seibu_adpcm_device> m_adpcm1;
 	optional_device<seibu_adpcm_device> m_adpcm2;
 

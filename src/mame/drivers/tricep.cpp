@@ -31,9 +31,9 @@ public:
 
 	void tricep(machine_config &config);
 private:
-	DECLARE_WRITE8_MEMBER(usart_select_w);
-	DECLARE_READ8_MEMBER(usart_r);
-	DECLARE_WRITE8_MEMBER(usart_w);
+	void usart_select_w(uint8_t data);
+	uint8_t usart_r(offs_t offset);
+	void usart_w(offs_t offset, uint8_t data);
 
 	void tricep_mem(address_map &map);
 
@@ -48,19 +48,19 @@ private:
 
 
 
-WRITE8_MEMBER(tricep_state::usart_select_w)
+void tricep_state::usart_select_w(uint8_t data)
 {
 	m_mux = data & 3;
 }
 
-READ8_MEMBER(tricep_state::usart_r)
+uint8_t tricep_state::usart_r(offs_t offset)
 {
-	return m_usart[m_mux]->read(space, offset);
+	return m_usart[m_mux]->read(offset);
 }
 
-WRITE8_MEMBER(tricep_state::usart_w)
+void tricep_state::usart_w(offs_t offset, uint8_t data)
 {
-	m_usart[m_mux]->write(space, offset, data);
+	m_usart[m_mux]->write(offset, data);
 }
 
 void tricep_state::tricep_mem(address_map &map)

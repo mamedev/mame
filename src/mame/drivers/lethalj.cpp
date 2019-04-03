@@ -223,7 +223,6 @@ void lethalj_state::lethalj_map(address_map &map)
 	map(0x04500010, 0x0450001f).portr("IN0");
 	map(0x04600000, 0x0460000f).portr("IN1");
 	map(0x04700000, 0x0470007f).w(FUNC(lethalj_state::blitter_w));
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xc0000240, 0xc000025f).nopw();    /* seems to be a bug in their code, one of many. */
 	map(0xff800000, 0xffffffff).rom().region("maincpu", 0);
 }
@@ -368,7 +367,7 @@ static INPUT_PORTS_START( eggvntdx )
 	PORT_INCLUDE(eggventr)
 
 	PORT_MODIFY("IN0")
-	PORT_DIPUNUSED_DIPLOC( 0x1000, IP_ACTIVE_LOW, "SW3:4" ) // Was "Slot Machine" - The slot machince is present in the code as a 'bonus stage'
+	PORT_DIPUNUSED_DIPLOC( 0x1000, IP_ACTIVE_LOW, "SW3:4" ) // Was "Slot Machine" - The slot machine is present in the code as a 'bonus stage'
 								//  (when the egg reaches Vegas?), but not actually called (EC).
 INPUT_PORTS_END
 
@@ -631,49 +630,45 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(lethalj_state::gameroom)
-
+void lethalj_state::gameroom(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS34010, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(lethalj_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(lethalj_state, scanline_update)     /* scanline updater (indexed16) */
+	TMS34010(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lethalj_state::lethalj_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(VIDEO_CLOCK);
+	m_maincpu->set_pixels_per_clock(1);
+	m_maincpu->set_scanline_ind16_callback(FUNC(lethalj_state::scanline_update));
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 701, 0, 512, 263, 0, 236)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(VIDEO_CLOCK, 701, 0, 512, 263, 0, 236);
+	m_screen->set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_ind16));
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, "palette", palette_device::RGB_555);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, SOUND_CLOCK, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	OKIM6295(config, "oki1", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, SOUND_CLOCK, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	OKIM6295(config, "oki2", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	MCFG_DEVICE_ADD("oki3", OKIM6295, SOUND_CLOCK, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki3", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.8);
+}
 
 
-MACHINE_CONFIG_START(lethalj_state::lethalj)
+void lethalj_state::lethalj(machine_config &config)
+{
 	gameroom(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK_LETHALJ) /* pixel clock */
+	m_maincpu->set_pixel_clock(VIDEO_CLOCK_LETHALJ);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK_LETHALJ, 689, 0, 512, 259, 0, 236)
-MACHINE_CONFIG_END
+	m_screen->set_raw(VIDEO_CLOCK_LETHALJ, 689, 0, 512, 259, 0, 236);
+}
 
 
 

@@ -528,7 +528,6 @@ void coolpool_state::amerdart_map(address_map &map)
 	map(0x04000000, 0x0400000f).w(FUNC(coolpool_state::amerdart_misc_w));
 	map(0x05000000, 0x0500000f).r(m_dsp2main, FUNC(generic_latch_16_device::read)).w(m_main2dsp, FUNC(generic_latch_16_device::write));
 	map(0x06000000, 0x06007fff).ram().w(FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffb00000, 0xffffffff).rom().region("maincpu", 0);
 }
 
@@ -541,7 +540,6 @@ void coolpool_state::coolpool_map(address_map &map)
 	map(0x03000000, 0x0300000f).w(FUNC(coolpool_state::coolpool_misc_w));
 	map(0x03000000, 0x03ffffff).rom().region("gfx1", 0);
 	map(0x06000000, 0x06007fff).ram().w(FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0);
 }
 
@@ -553,7 +551,6 @@ void coolpool_state::nballsht_map(address_map &map)
 	map(0x03000000, 0x0300000f).w(FUNC(coolpool_state::coolpool_misc_w));
 	map(0x04000000, 0x040000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);    // IMSG176P-40
 	map(0x06000000, 0x0601ffff).mirror(0x00020000).ram().w(FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff000000, 0xff7fffff).rom().region("gfx1", 0);
 	map(0xffc00000, 0xffffffff).rom().region("maincpu", 0);
 }
@@ -713,24 +710,25 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(coolpool_state::amerdart)
-
+void coolpool_state::amerdart(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(40'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(amerdart_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(XTAL(40'000'000)/12) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(coolpool_state, amerdart_scanline) /* scanline callback (rgb32) */
-	MCFG_TMS340X0_TO_SHIFTREG_CB(coolpool_state, to_shiftreg)  /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(coolpool_state, from_shiftreg) /* read from shiftreg function */
+	TMS34010(config, m_maincpu, XTAL(40'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &coolpool_state::amerdart_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(XTAL(40'000'000)/12);
+	m_maincpu->set_pixels_per_clock(2);
+	m_maincpu->set_scanline_rgb32_callback(FUNC(coolpool_state::amerdart_scanline));
+	m_maincpu->set_shiftreg_in_callback(FUNC(coolpool_state::to_shiftreg));
+	m_maincpu->set_shiftreg_out_callback(FUNC(coolpool_state::from_shiftreg));
 
-	MCFG_DEVICE_ADD("dsp", TMS32015, XTAL(40'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(amerdart_dsp_pgm_map)
+	tms32015_device &dsp(TMS32015(config, m_dsp, XTAL(40'000'000)/2));
+	dsp.set_addrmap(AS_PROGRAM, &coolpool_state::amerdart_dsp_pgm_map);
 	/* Data Map is internal to the CPU */
-	MCFG_DEVICE_IO_MAP(amerdart_dsp_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, coolpool_state, amerdart_dsp_bio_line_r))
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("audioint", coolpool_state, amerdart_audio_int_gen, "screen", 0, 1)
+	dsp.set_addrmap(AS_IO, &coolpool_state::amerdart_dsp_io_map);
+	dsp.bio().set(FUNC(coolpool_state::amerdart_dsp_bio_line_r));
+
+	TIMER(config, "audioint").configure_scanline(FUNC(coolpool_state::amerdart_audio_int_gen), "screen", 0, 1);
 
 	GENERIC_LATCH_16(config, m_main2dsp);
 	GENERIC_LATCH_16(config, m_dsp2main);
@@ -739,32 +737,33 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,amerdart)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TIMER_DRIVER_ADD(m_nvram_timer, coolpool_state, nvram_write_timeout)
+	TIMER(config, m_nvram_timer).configure_generic(FUNC(coolpool_state::nvram_write_timeout));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(40'000'000)/6, 212*2, 0, 161*2, 262, 0, 241)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(40'000'000)/6, 212*2, 0, 161*2, 262, 0, 241);
+	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_rgb32));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", MP1210, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	MP1210(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
-MACHINE_CONFIG_START(coolpool_state::coolpool)
-
+void coolpool_state::coolpool(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(40'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(coolpool_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(XTAL(40'000'000)/6) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(coolpool_state, coolpool_scanline) /* scanline callback (rgb32) */
-	MCFG_TMS340X0_TO_SHIFTREG_CB(coolpool_state, to_shiftreg)  /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(coolpool_state, from_shiftreg) /* read from shiftreg function */
+	TMS34010(config, m_maincpu, XTAL(40'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &coolpool_state::coolpool_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(XTAL(40'000'000)/6);
+	m_maincpu->set_pixels_per_clock(1);
+	m_maincpu->set_scanline_rgb32_callback(FUNC(coolpool_state::coolpool_scanline));
+	m_maincpu->set_shiftreg_in_callback(FUNC(coolpool_state::to_shiftreg));
+	m_maincpu->set_shiftreg_out_callback(FUNC(coolpool_state::from_shiftreg));
 
 	tms32026_device& dsp(TMS32026(config, m_dsp, XTAL(40'000'000)));
 	dsp.set_addrmap(AS_PROGRAM, &coolpool_state::coolpool_dsp_pgm_map);
@@ -784,31 +783,30 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,coolpool)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TIMER_DRIVER_ADD(m_nvram_timer, coolpool_state, nvram_write_timeout)
+	TIMER(config, m_nvram_timer).configure_generic(FUNC(coolpool_state::nvram_write_timeout));
 
 	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(40'000'000)/6, 424, 0, 320, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(40'000'000)/6, 424, 0, 320, 262, 0, 240);
+	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_rgb32));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", MP1210, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	MP1210(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
-MACHINE_CONFIG_START(coolpool_state::_9ballsht)
+void coolpool_state::_9ballsht(machine_config &config)
+{
 	coolpool(config);
-
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nballsht_map)
-
-	subdevice<tms32026_device>("dsp")->set_addrmap(AS_IO, &coolpool_state::nballsht_dsp_io_map);
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &coolpool_state::nballsht_map);
+	m_dsp->set_addrmap(AS_IO, &coolpool_state::nballsht_dsp_io_map);
+}
 
 
 

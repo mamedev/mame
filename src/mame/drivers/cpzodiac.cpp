@@ -168,7 +168,7 @@ void cpzodiac_state::cpzodiac(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &cpzodiac_state::main_io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
-	te7750_device &io(TE7750(config, "io", 0));
+	te7750_device &io(TE7750(config, "io"));
 	io.ios_cb().set_constant(4);
 	io.in_port1_cb().set_ioport("IN1");
 	io.in_port2_cb().set_ioport("IN2");

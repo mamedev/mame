@@ -133,29 +133,29 @@ MACHINE_RESET_MEMBER(megadriv_radica_state, megadriv_radica)
 	m_maincpu->reset();
 }
 
-MACHINE_CONFIG_START(megadriv_radica_state::megadriv_radica_3button_ntsc)
+void megadriv_radica_state::megadriv_radica_3button_ntsc(machine_config &config)
+{
 	md_ntsc(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(megadriv_radica_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_radica_state::megadriv_radica_map);
 	MCFG_MACHINE_START_OVERRIDE(megadriv_radica_state, megadriv_radica_3button)
 	MCFG_MACHINE_RESET_OVERRIDE(megadriv_radica_state, megadriv_radica)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(megadriv_radica_state::megadriv_radica_3button_pal)
+void megadriv_radica_state::megadriv_radica_3button_pal(machine_config &config)
+{
 	md_pal(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(megadriv_radica_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_radica_state::megadriv_radica_map);
 	MCFG_MACHINE_START_OVERRIDE(megadriv_radica_state, megadriv_radica_3button)
 	MCFG_MACHINE_RESET_OVERRIDE(megadriv_radica_state, megadriv_radica)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(megadriv_radica_state::megadriv_radica_6button_pal)
+void megadriv_radica_state::megadriv_radica_6button_pal(machine_config &config)
+{
 	md_pal(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(megadriv_radica_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_radica_state::megadriv_radica_map);
 	MCFG_MACHINE_START_OVERRIDE(megadriv_radica_state, megadriv_radica_6button)
 	MCFG_MACHINE_RESET_OVERRIDE(megadriv_radica_state, megadriv_radica)
-MACHINE_CONFIG_END
+}
 
 
 

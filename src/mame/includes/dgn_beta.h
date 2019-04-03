@@ -193,7 +193,7 @@ private:
 	int m_DrawInterlace;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(dgn);
+	void dgn_beta_palette(palette_device &palette) const;
 
 	DECLARE_READ8_MEMBER(d_pia0_pa_r);
 	DECLARE_WRITE8_MEMBER(d_pia0_pa_w);

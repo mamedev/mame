@@ -18,8 +18,8 @@
 class flkatck_state : public driver_device
 {
 public:
-	flkatck_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	flkatck_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),

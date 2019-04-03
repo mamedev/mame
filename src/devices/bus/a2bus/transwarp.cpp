@@ -121,10 +121,11 @@ ioport_constructor a2bus_transwarp_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_transwarp_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(CPU_TAG, M65C02, A2BUS_7M_CLOCK / 2)
-	MCFG_DEVICE_PROGRAM_MAP(m65c02_mem)
-MACHINE_CONFIG_END
+void a2bus_transwarp_device::device_add_mconfig(machine_config &config)
+{
+	M65C02(config, m_ourcpu, A2BUS_7M_CLOCK / 2);
+	m_ourcpu->set_addrmap(AS_PROGRAM, &a2bus_transwarp_device::m65c02_mem);
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -161,7 +162,7 @@ void a2bus_transwarp_device::device_reset()
 {
 	m_bEnabled = true;
 	m_bReadA2ROM = false;
-	set_maincpu_halt(ASSERT_LINE);
+	raise_slot_dma();
 	if (!(m_dsw2->read() & 0x80))
 	{
 		if (m_dsw1->read() & 0x80)
@@ -189,6 +190,11 @@ void a2bus_transwarp_device::device_timer(emu_timer &timer, device_timer_id id, 
 
 READ8_MEMBER( a2bus_transwarp_device::dma_r )
 {
+	if (offset == 0xc070)
+	{
+		hit_slot_joy();
+	}
+
 	if ((offset >= 0xc090) && (offset <= 0xc0ff))
 	{
 		hit_slot(((offset >> 4) & 0xf) - 8);
@@ -199,7 +205,7 @@ READ8_MEMBER( a2bus_transwarp_device::dma_r )
 		return m_rom[offset & 0xfff];
 	}
 
-	return slot_dma_read(space, offset);
+	return slot_dma_read(offset);
 }
 
 
@@ -211,6 +217,11 @@ WRITE8_MEMBER( a2bus_transwarp_device::dma_w )
 {
 	//if ((offset >= 0xc070) && (offset <= 0xc07f)) printf("%02x to %04x\n", data, offset);
 
+	if (offset == 0xc070)
+	{
+		hit_slot_joy();
+	}
+
 	if (offset == 0xc072)
 	{
 		m_bReadA2ROM = true;
@@ -221,7 +232,7 @@ WRITE8_MEMBER( a2bus_transwarp_device::dma_w )
 		hit_slot(((offset >> 4) & 0xf) - 8);
 	}
 
-	slot_dma_write(space, offset, data);
+	slot_dma_write(offset, data);
 }
 
 bool a2bus_transwarp_device::take_c800()
@@ -241,5 +252,17 @@ void a2bus_transwarp_device::hit_slot(int slot)
 			// slow down for 20 uSec, should be more than enough
 			m_timer->adjust(attotime::from_usec(20));
 		}
+	}
+}
+
+void a2bus_transwarp_device::hit_slot_joy()
+{
+	// only do slot slowdown if acceleration is enabled
+	if (!(m_dsw2->read() & 0x80))
+	{
+		// accleration's on
+		m_ourcpu->set_unscaled_clock(1021800);
+		// PREAD main loop counts up to 11*256 uSec, add 1 to cover the setup
+		m_timer->adjust(attotime::from_usec(11*257));
 	}
 }

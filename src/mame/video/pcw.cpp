@@ -38,17 +38,17 @@ static const unsigned short pcw_colour_table[PCW_NUM_COLOURS] =
 #endif
 
 /* black/white */
-static const rgb_t pcw_palette[PCW_NUM_COLOURS] =
+static constexpr rgb_t pcw_palette[PCW_NUM_COLOURS] =
 {
-	rgb_t(0x000, 0x000, 0x000),
-	rgb_t(0x0ff, 0x0ff, 0x0ff)
+	{ 0x000, 0x000, 0x000 },
+	{ 0x0ff, 0x0ff, 0x0ff }
 };
 
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(pcw_state, pcw)
+void pcw_state::pcw_colours(palette_device &palette) const
 {
-	palette.set_pen_colors(0, pcw_palette, ARRAY_LENGTH(pcw_palette));
+	palette.set_pen_colors(0, pcw_palette);
 }
 
 /***************************************************************************

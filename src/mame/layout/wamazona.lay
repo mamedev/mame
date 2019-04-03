@@ -20,7 +20,7 @@
 		<rect state="1">
 			<color red="0.5" green="0.5" blue="0.5" />
 		</rect>
-		<text string="BET 1">
+		<text string="BET 1/RED">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
@@ -72,7 +72,7 @@
 		<rect state="1">
 			<color red="0.5" green="0.5" blue="0.5" />
 		</rect>
-		<text string="BET 10">
+		<text string="BET 10/BLACK">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>

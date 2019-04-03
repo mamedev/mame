@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "includes/apexc.h"
 
-/*static*/ const rgb_t apexc_state::palette_table[] =
+const rgb_t apexc_state::palette_table[] =
 {
 	rgb_t::white(),
 	rgb_t::black(),
@@ -51,9 +51,9 @@ static const rectangle teletyper_scroll_clear_window(
 );
 //static const int var_teletyper_scroll_step = - teletyper_scroll_step;
 
-PALETTE_INIT_MEMBER(apexc_state, apexc)
+void apexc_state::apexc_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, palette_table, ARRAY_LENGTH(palette_table));
+	palette.set_pen_colors(0, palette_table);
 }
 
 void apexc_state::video_start()

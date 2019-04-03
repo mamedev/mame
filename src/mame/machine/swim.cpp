@@ -32,7 +32,7 @@ enum
     DEVICE
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE(SWIM, swim_device, "swim", "Apple SWIM (Steve Woz Integrated Machine")
+DEFINE_DEVICE_TYPE(SWIM, swim_device, "swim", "Apple SWIM (Steve Woz Integrated Machine)")
 
 //-------------------------------------------------
 //  ctor

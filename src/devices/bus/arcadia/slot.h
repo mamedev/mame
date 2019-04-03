@@ -5,11 +5,11 @@
 
 #include "softlist_dev.h"
 
+#define EA2001SLOT_ROM_REGION_TAG ":cart:rom"
 
 /***************************************************************************
  TYPE DEFINITIONS
  ***************************************************************************/
-
 
 /* PCB */
 enum
@@ -17,7 +17,6 @@ enum
 	ARCADIA_STD = 0,
 	ARCADIA_GOLF
 };
-
 
 // ======================> device_arcadia_cart_interface
 
@@ -51,6 +50,15 @@ class arcadia_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	arcadia_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: arcadia_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	arcadia_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~arcadia_cart_slot_device();
 
@@ -85,20 +93,6 @@ protected:
 	device_arcadia_cart_interface*       m_cart;
 };
 
-
-
-// device type definition
 DECLARE_DEVICE_TYPE(EA2001_CART_SLOT, arcadia_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define EA2001SLOT_ROM_REGION_TAG ":cart:rom"
-
-#define MCFG_ARCADIA_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, EA2001_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #endif // MAME_BUS_ARCADIA_SLOT_H

@@ -11,39 +11,6 @@
 
 #pragma once
 
-
-// I/O ports setup
-#define MCFG_UCOM4_READ_A_CB(_devcb) \
-	downcast<ucom4_cpu_device &>(*device).set_read_a_callback(DEVCB_##_devcb);
-
-#define MCFG_UCOM4_READ_B_CB(_devcb) \
-	downcast<ucom4_cpu_device &>(*device).set_read_b_callback(DEVCB_##_devcb);
-
-#define MCFG_UCOM4_READ_C_CB(_devcb) \
-	downcast<ucom4_cpu_device &>(*device).set_read_c_callback(DEVCB_##_devcb);
-#define MCFG_UCOM4_WRITE_C_CB(_devcb) \
-	downcast<ucom4_cpu_device &>(*device).set_write_c_callback(DEVCB_##_devcb);
-
-#define MCFG_UCOM4_READ_D_CB(_devcb) \
-	downcast<ucom4_cpu_device &>(*device).set_read_d_callback(DEVCB_##_devcb);
-#define MCFG_UCOM4_WRITE_D_CB(_devcb) \
-	downcast<ucom4_cpu_device &>(*device).set_write_d_callback(DEVCB_##_devcb);
-
-#define MCFG_UCOM4_WRITE_E_CB(_devcb) \
-	downcast<ucom4_cpu_device &>(*device).set_write_e_callback(DEVCB_##_devcb);
-
-#define MCFG_UCOM4_WRITE_F_CB(_devcb) \
-	downcast<ucom4_cpu_device &>(*device).set_write_f_callback(DEVCB_##_devcb);
-
-#define MCFG_UCOM4_WRITE_G_CB(_devcb) \
-	downcast<ucom4_cpu_device &>(*device).set_write_g_callback(DEVCB_##_devcb);
-
-#define MCFG_UCOM4_WRITE_H_CB(_devcb) \
-	downcast<ucom4_cpu_device &>(*device).set_write_h_callback(DEVCB_##_devcb);
-
-#define MCFG_UCOM4_WRITE_I_CB(_devcb) \
-	downcast<ucom4_cpu_device &>(*device).set_write_i_callback(DEVCB_##_devcb);
-
 enum
 {
 	NEC_UCOM4_PORTA = 0,
@@ -100,18 +67,18 @@ class ucom4_cpu_device : public cpu_device
 {
 public:
 	// configuration helpers
-	template <class Object> devcb_base &set_read_a_callback(Object &&cb) { return m_read_a.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_b_callback(Object &&cb) { return m_read_b.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_c_callback(Object &&cb) { return m_read_c.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_d_callback(Object &&cb) { return m_read_d.set_callback(std::forward<Object>(cb)); }
+	auto read_a() { return m_read_a.bind(); }
+	auto read_b() { return m_read_b.bind(); }
+	auto read_c() { return m_read_c.bind(); }
+	auto read_d() { return m_read_d.bind(); }
 
-	template <class Object> devcb_base &set_write_c_callback(Object &&cb) { return m_write_c.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_d_callback(Object &&cb) { return m_write_d.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_e_callback(Object &&cb) { return m_write_e.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_f_callback(Object &&cb) { return m_write_f.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_g_callback(Object &&cb) { return m_write_g.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_h_callback(Object &&cb) { return m_write_h.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_i_callback(Object &&cb) { return m_write_i.set_callback(std::forward<Object>(cb)); }
+	auto write_c() { return m_write_c.bind(); }
+	auto write_d() { return m_write_d.bind(); }
+	auto write_e() { return m_write_e.bind(); }
+	auto write_f() { return m_write_f.bind(); }
+	auto write_g() { return m_write_g.bind(); }
+	auto write_h() { return m_write_h.bind(); }
+	auto write_i() { return m_write_i.bind(); }
 
 protected:
 	// construction/destruction

@@ -94,8 +94,8 @@ Bprom dump by f205v
 class stuntair_state : public driver_device
 {
 public:
-	stuntair_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	stuntair_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_fgram(*this, "fgram"),
@@ -108,6 +108,11 @@ public:
 	{ }
 
 	void stuntair(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -141,12 +146,9 @@ private:
 	DECLARE_WRITE8_MEMBER(stuntair_sound_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
 	DECLARE_WRITE_LINE_MEMBER(stuntair_irq);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(stuntair);
+	void stuntair_palette(palette_device &palette) const;
 	void stuntair_map(address_map &map);
 	void stuntair_sound_map(address_map &map);
 	void stuntair_sound_portmap(address_map &map);
@@ -160,36 +162,36 @@ private:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(stuntair_state, stuntair)
+void stuntair_state::stuntair_palette(palette_device &palette) const
 {
-	/* need resistor weights etc. */
-	const uint8_t *color_prom = machine().root_device().memregion("proms")->base();
+	// need resistor weights etc
+	uint8_t const *const color_prom = machine().root_device().memregion("proms")->base();
 
 	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t data = color_prom[i];
+		uint8_t const data = color_prom[i];
 
-		int b = (data&0xc0)>>6;
-		int g = (data&0x38)>>3;
-		int r = (data&0x07)>>0;
+		int const b = (data >> 6) & 0x03;
+		int const g = (data >> 3) & 0x07;
+		int const r = (data >> 0) & 0x07;
 
-		palette.set_pen_color(i,rgb_t(r<<5,g<<5,b<<6));
+		palette.set_pen_color(i, rgb_t(pal3bit(r), pal3bit(g), pal2bit(b)));
 	}
 
 	// just set the FG layer to black and white
-	palette.set_pen_color(0x100,rgb_t(0x00,0x00,0x00));
-	palette.set_pen_color(0x101,rgb_t(0xff,0xff,0xff));
+	palette.set_pen_color(0x100, rgb_t::black());
+	palette.set_pen_color(0x101, rgb_t::white());
 }
 
 
 TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_fg_tile_info)
 {
-	int tileno = m_fgram[tile_index];
-	int opaque = tileno & 0x80;
+	int const tileno = m_fgram[tile_index];
+	int const opaque = tileno & 0x80;
 
 	// where does the FG palette come from? it's a 1bpp layer..
 
-	SET_TILE_INFO_MEMBER(0, tileno&0x7f, 0, opaque?TILE_FORCE_LAYER0 : TILE_FORCE_LAYER1);
+	SET_TILE_INFO_MEMBER(0, tileno & 0x7f, 0, opaque ? TILE_FORCE_LAYER0 : TILE_FORCE_LAYER1);
 }
 
 TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_bg_tile_info)
@@ -216,7 +218,7 @@ void stuntair_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 
 	/* there seem to be 2 spritelists with something else (fixed values) between them.. is that significant? */
-	for (int i=0;i<0x400;i+=16)
+	for (int i = 0; i < 0x400; i += 16)
 	{
 		// +2, +3, +4(high bits): always 00
 		// +6 to +15: unused
@@ -318,7 +320,7 @@ WRITE8_MEMBER(stuntair_state::stuntair_sound_w)
 {
 	// each command is written three times: with bit 7 set, then with bit 7 clear, then with bit 7 set again
 	// the 3 highest bits are ignored by the sound program
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -516,16 +518,16 @@ void stuntair_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(stuntair_state::stuntair)
-
+void stuntair_state::stuntair(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,  XTAL(18'432'000)/6)         /* 3 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(stuntair_map)
+	Z80(config, m_maincpu, XTAL(18'432'000)/6);         /* 3 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &stuntair_state::stuntair_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,  XTAL(18'432'000)/6)         /* 3 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(stuntair_sound_map)
-	MCFG_DEVICE_IO_MAP(stuntair_sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(stuntair_state, irq0_line_hold, 420) // drives music tempo, timing is approximate based on PCB audio recording.. and where is irq ack?
+	Z80(config, m_audiocpu, XTAL(18'432'000)/6);         /* 3 MHz? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &stuntair_state::stuntair_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &stuntair_state::stuntair_sound_portmap);
+	m_audiocpu->set_periodic_int(FUNC(stuntair_state::irq0_line_hold), attotime::from_hz(420)); // drives music tempo, timing is approximate based on PCB audio recording.. and where is irq ack?
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // type and location not verified
 	mainlatch.q_out_cb<0>().set_nop(); // set but never cleared
@@ -542,19 +544,17 @@ MACHINE_CONFIG_START(stuntair_state::stuntair)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60) // ?
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(stuntair_state, screen_update_stuntair)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, stuntair_state, stuntair_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60); // ?
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(stuntair_state::screen_update_stuntair));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(stuntair_state::stuntair_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stuntair)
-	MCFG_PALETTE_ADD("palette", 0x100+2)
-
-	MCFG_PALETTE_INIT_OWNER(stuntair_state, stuntair)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stuntair);
+	PALETTE(config, m_palette, FUNC(stuntair_state::stuntair_palette), 0x100 + 2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center(); // stereo?
@@ -567,7 +567,7 @@ MACHINE_CONFIG_START(stuntair_state::stuntair)
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	AY8910(config, "ay2", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 
