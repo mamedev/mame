@@ -85,19 +85,15 @@
 		</rect>
 		<text string="PLAY">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0.175" y="0.0" width="0.65" height="0.35" />
+			<bounds x="0.15" y="0.0" width="0.75" height="0.4" />
 		</text>
 		<text string="7">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0.35" y="0.25" width="0.3" height="0.35" />
+			<bounds x="0.4" y="0.3" width="0.2" height="0.4" />
 		</text>
 		<text string="LINES">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0.15" y="0.5" width="0.75" height="0.35" />
-		</text>
-		<text string="START FEATURE">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0.1" y="0.8" width="0.9" height="0.15" />
+			<bounds x="0.1" y="0.6" width="0.8" height="0.4" />
 		</text>
 	</element>
 
