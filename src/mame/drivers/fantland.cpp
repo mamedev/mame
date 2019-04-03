@@ -74,7 +74,7 @@ WRITE8_MEMBER(fantland_state::nmi_enable_w)
 
 WRITE8_MEMBER(fantland_state::soundlatch_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 

@@ -991,7 +991,7 @@ WRITE8_MEMBER(mvs_state::io_control_w)
 WRITE8_MEMBER(neogeo_base_state::audio_command_w)
 {
 	// glitches in s1945p without the boost_interleave here
-	m_soundlatch->write(space, offset, data, mem_mask);
+	m_soundlatch->write(data);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 }
 
@@ -1092,7 +1092,7 @@ WRITE16_MEMBER(neogeo_base_state::memcard_w)
 
 CUSTOM_INPUT_MEMBER(neogeo_base_state::get_audio_result)
 {
-	uint8_t ret = m_soundlatch2->read(m_audiocpu->space(AS_PROGRAM), 0);
+	uint8_t ret = m_soundlatch2->read();
 
 	return ret;
 }
@@ -1648,7 +1648,7 @@ void neogeo_base_state::machine_reset()
 {
 	// disable audiocpu NMI
 	m_audionmi->in_w<1>(0);
-	m_soundlatch->acknowledge_r(machine().dummy_space(), 0);
+	m_soundlatch->acknowledge_w();
 
 	m_maincpu->reset();
 

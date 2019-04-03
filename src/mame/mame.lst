@@ -2723,6 +2723,7 @@ catchp                          // 008837 prototype 1977/?? [6502]
 
 @source:ave_arb.cpp
 arb                             //
+arbv2                           //
 
 @source:avigo.cpp
 avigo                           // 1997 Avigo
@@ -2823,6 +2824,7 @@ triviag2                        // (c) 1984
 triviasp                        // (c) 1984
 triviayp                        // (c) 1984
 triviaes4                       // (c) 1988 (Maibesa hardware)
+triviaes5                       // (c) 19?? (Maibesa hardware)
 
 @source:banctec.cpp
 banctec                         // BancTec ESeries panel
@@ -12884,6 +12886,7 @@ checkc4                         //
 @source:fidel_cc7.cpp
 backgamc                        //
 cc7                             //
+cc7o                            //
 
 @source:fidel_chesster.cpp
 chesster                        //
@@ -12910,7 +12913,7 @@ fdes2325                        //
 feagv10                         //
 feagv11                         //
 feagv2                          //
-feagv3                         //
+feagv3                          //
 feagv5                          //
 feagv7                          //
 feagv7a                         //
@@ -13222,6 +13225,7 @@ magicrd2c                       // (c) 1996 Impera
 megacard                        // (c) 1993 Fun World
 mongolnw                        // 199? bootleg
 multiwin                        // (c) 1992 Fun World
+nevadafw                        // 199? unknown
 novoplay                        // (c) 1986 Novomatic
 pool10                          // (c) 1996 C.M.C.
 pool10b                         // (c) 1996 C.M.C.
@@ -15103,6 +15107,7 @@ gnw_mickdon                     // Nintendo
 gnw_octopus                     // Nintendo
 gnw_opanic                      // Nintendo
 gnw_pchute                      // Nintendo
+gnw_popeye                      // Nintendo
 gnw_rshower                     // Nintendo
 gnw_smb                         // Nintendo
 gnw_squish                      // Nintendo
@@ -18418,7 +18423,8 @@ lsasquad                        // A64 (c) 1986 Taito Corporation / Taito Americ
 storming                        // A64 (c) 1986 Taito Corporation
 
 @source:ltcasino.cpp
-ltcasinn                        // (c) 1984 Digital Controls Inc
+ltcasin2                        // (c) 1984 Digital Controls Inc
+ltcasin2a                       // (c) 1984 Digital Controls Inc
 ltcasino                        // (c) 1982 Digital Controls Inc
 mv4in1                          // (c) 1983 Entertainment Enterprises
 
@@ -36236,6 +36242,7 @@ st_vulkn                        //
 @source:stfight.cpp
 cshootert                       // (c) 1987 Taito
 empcity                         // (c) 1986 Seibu Kaihatsu (bootleg?)
+empcityfr                       // (c) 1986 Seibu Kaihatsu (Norad license)
 empcityi                        // (c) 1986 Seibu Kaihatsu (Eurobed license)
 empcityj                        // (c) 1986 Taito Corporation (Japan)
 empcityu                        // (c) 1986 Taito (Romstar License)
@@ -39088,6 +39095,7 @@ twcup90b1                          // bootleg
 twcup90b2                          // bootleg
 twcup90ba                          // bootleg
 twcup90bb                          // bootleg
+eurogael                           // bootleg
 
 @source:wecleman.cpp
 hotchase                        // GX763 (c) 1988
@@ -39719,6 +39727,7 @@ sttng_x7                        //
 gi_l3                           //
 gi_l4                           //
 gi_l6                           //
+gi_l8                           //
 gi_l9                           //
 hshot_p8                        //
 hurr_l2                         //

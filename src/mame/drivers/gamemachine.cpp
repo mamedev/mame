@@ -111,7 +111,7 @@ static NETLIST_START(nl_gamemachine)
 
 	CAP(C1, CAP_P(50))
 	CAP(C2, CAP_U(0.001))
-	CAP(C3, CAP_U(0.002))           // Schematics state this as 2pF, doesn't make sense, this looks like a ladder layout
+	CAP(C3, CAP_U(0.002))
 	CAP(C4, CAP_U(0.005))
 	CAP(C5, CAP_U(0.010))
 

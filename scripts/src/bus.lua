@@ -1320,6 +1320,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/bt54x.h",
 		MAME_DIR .. "src/devices/bus/isa/dcb.cpp",
 		MAME_DIR .. "src/devices/bus/isa/dcb.h",
+		MAME_DIR .. "src/devices/bus/isa/ultra12f.cpp",
+		MAME_DIR .. "src/devices/bus/isa/ultra12f.h",
 	}
 end
 

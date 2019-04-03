@@ -3512,9 +3512,15 @@
 		<info name="release" value="20010427"/>
 		<info name="alt_title" value="ボンバーマンストーリー"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [GM76V256CLLFW10]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="4194304">
-				<rom name="bomberman story (japan).bin" size="4194304" crc="38231bc2" sha1="1cd1b87df9cc51ccf024584a4885c6c7a3f42aa0" offset="000000" />
+				<rom name="agb-absj-0.u1" size="4194304" crc="f7f40189" sha1="ba093c5ef2c2bb57d0f6f6735e82c536c7e9ec45" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9051,7 +9057,7 @@
 		<description>Earthworm Jim (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Majesco</publisher>
-		<info name="serial" value="AGB-AEJE-USA, AGB-AEJP"/>
+		<info name="serial" value="AGB-AEJE-USA, AGB-AEJP-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="earthworm jim (usa, europe).bin" size="8388608" crc="c4991d13" sha1="8c3148c1c863a1e31b6f4c380c9390dc12fae9ac" offset="000000" />
@@ -9811,11 +9817,11 @@
 		<description>F-Zero - Maximum Velocity (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-AFZE-USA, AGB-AFZP-EUR"/>
+		<info name="serial" value="AGB-AFZE-USA, AGB-AFZP-EUR, AGB-AFZP-EUR-1"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="pcb" value="AGB-E06-01" />
+			<feature name="pcb" value="AGB-E06-01" /> <!-- Also with AGB-E06-10 -->
 			<feature name="u1" value="U1 MASK ROM" />
-			<feature name="u2" value="U2 256K SRAM [GM76V256CLLFW10]" />
+			<feature name="u2" value="U2 256K SRAM [GM76V256CLLFW10]" /> <!-- Also with HY62WT08081E -->
 			<feature name="u3" value="U3 9803F [LV2416]" />
 			<feature name="u4" value="U4 PST3425" />
 			<feature name="bt1" value="CR1616" />
@@ -13517,10 +13523,12 @@
 		<description>GT Advance - Championship Racing (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="AGB-ACAE-USA, AGB-ACAP"/>
+		<info name="serial" value="AGB-ACAE-USA, AGB-ACAP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-10" /> <!-- Also found with AGB-E01-01 -->
+			<feature name="u1" value="U1 32M MROM" />
 			<dataarea name="rom" size="8388608">
-				<rom name="gt advance - championship racing (usa, europe).bin" size="8388608" crc="8c411acc" sha1="3a85e462d002ff5577e4434110b17459fe6867d6" offset="000000" />
+				<rom name="agb-acap-0.u1" size="8388608" crc="8c411acc" sha1="3a85e462d002ff5577e4434110b17459fe6867d6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -17449,11 +17457,17 @@
 		<description>Konami Krazy Racers (Euro)</description>
 		<year>2001</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="AGB-AKWP"/>
+		<info name="serial" value="AGB-AKWP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [GM76V256CLLFW10]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="4194304">
-				<rom name="konami krazy racers (europe).bin" size="4194304" crc="cfec0650" sha1="90a0035818ba0ab2a0c6ea45dc7eff2eb7296970" offset="000000" />
+				<rom name="agb-akwp-0.u1" size="4194304" crc="cfec0650" sha1="90a0035818ba0ab2a0c6ea45dc7eff2eb7296970" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23219,9 +23233,10 @@
 		<info name="release" value="20010321"/>
 		<info name="alt_title" value="ナポレオン"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-01" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
-				<rom name="napoleon (japan).bin" size="8388608" crc="fa016764" sha1="06cf9df7445b7aa662050ad41dd946a09dbc0581" offset="000000" />
+				<rom name="agb-anpj-0.bin" size="8388608" crc="fa016764" sha1="06cf9df7445b7aa662050ad41dd946a09dbc0581" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25061,7 +25076,7 @@
 		<description>Pinobee - Wings of Adventure (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="AGB-APBE-USA, AGB-APBP"/>
+		<info name="serial" value="AGB-APBE-USA, AGB-APBP-EUR, AGB-APBP-EUR-1"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
@@ -25189,10 +25204,12 @@
 		<description>Pitfall - The Mayan Adventure (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Majesco</publisher>
-		<info name="serial" value="AGB-APFE-USA, AGB-APFP"/>
+		<info name="serial" value="AGB-APFE-USA, AGB-APFP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-10" />
+			<feature name="u1" value="U1 32M MROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="pitfall - the mayan adventure (usa, europe).bin" size="4194304" crc="2cedbb31" sha1="0de39e1cf6b199721069e8750e94abccc2e4b97d" offset="000000" />
+				<rom name="agb-apfp-0.u1" size="4194304" crc="2cedbb31" sha1="0de39e1cf6b199721069e8750e94abccc2e4b97d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26272,9 +26289,15 @@
 		<info name="release" value="20010321"/>
 		<info name="alt_title" value="パワプロクンポケット3"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-Y06-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [BS62LV256SC-70]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
-				<rom name="power pro kun pocket 3 (japan).bin" size="8388608" crc="4314d8bc" sha1="c6d7317d945f96034699501ac33b1966c5d2c3de" offset="000000" />
+				<rom name="agb-ap3j-0.u1" size="8388608" crc="4314d8bc" sha1="c6d7317d945f96034699501ac33b1966c5d2c3de" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27235,11 +27258,14 @@
 		<description>Rayman Advance (Euro)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
-		<info name="serial" value="AGB-ARYP"/>
+		<info name="serial" value="AGB-ARYP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="rayman advance (europe) (en,fr,de,es,it).bin" size="8388608" crc="b43783b4" sha1="6a32d270848ae302a3e4fb873e53b663c2db4811" offset="000000" />
+				<rom name="agb-aryp-0.u1" size="8388608" crc="b43783b4" sha1="6a32d270848ae302a3e4fb873e53b663c2db4811" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27250,9 +27276,12 @@
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="AGB-ARYE-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="rayman advance (usa) (en,fr,de,es,it).bin" size="8388608" crc="8aba5ab8" sha1="ff8a41c781735d2b4fe6cde65e82fb5a68f77f8b" offset="000000" />
+				<rom name="agb-arye-0.u1" size="8388608" crc="8aba5ab8" sha1="ff8a41c781735d2b4fe6cde65e82fb5a68f77f8b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27318,7 +27347,7 @@
 		<description>Ready 2 Rumble Boxing - Round 2 (Euro)</description>
 		<year>2001</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="AGB-AR2P"/>
+		<info name="serial" value="AGB-AR2P-NOE-1"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="ready 2 rumble boxing - round 2 (europe) (en,fr,de).bin" size="4194304" crc="e418e962" sha1="57d06e405b281f68800b986bd9ff1257e4466939" offset="000000" />
@@ -32557,13 +32586,14 @@
 		<description>Super Mario Advance (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-AMAE-USA, AGB-AMAP"/>
+		<info name="serial" value="AGB-AMAE-USA, AGB-AMAP-EUR, AGB-AMAP-EUR-1"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="pcb" value="AGB-E03-01" />   <!-- Also found on AGB-E03-10 -->
+			<feature name="pcb" value="AGB-E03-01" />   <!-- Also found on AGB-E03-10, AGB-E03-20 and AGB-E03-21 -->
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
+				<!-- US cart has label AGB-AMAE-0 -->
 				<rom name="agb-amap-0.u1" size="4194304" crc="1e4c6d6a" sha1="f071d45d8f5cb05b48d7d2b804c6cb6a79ad96fb" offset="000000" />
 			</dataarea>
 		</part>
@@ -34796,9 +34826,12 @@
 		<publisher>Kemco</publisher>
 		<info name="serial" value="AGB-ATCP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="top gear gt championship (europe).bin" size="4194304" crc="391c0497" sha1="c5af760e0d1269db4d9799dda98666f881ef8e5e" offset="000000" />
+				<rom name="agb-atcp-0.u1" size="4194304" crc="391c0497" sha1="c5af760e0d1269db4d9799dda98666f881ef8e5e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

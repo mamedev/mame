@@ -83,6 +83,8 @@ public:
 	void init_ssmissin();
 	void init_hachamf_prot();
 	void init_redhawk();
+	void init_redhawkg();
+	void init_redhawki();
 	void init_tdragon_prot();
 	void init_bubl2000();
 	void init_banked_audiocpu();

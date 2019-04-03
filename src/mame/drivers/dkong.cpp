@@ -624,7 +624,7 @@ READ8_MEMBER(dkong_state::dkong_in2_r)
 {
 	// 2 board DK and all DKjr has a watchdog
 	if (m_watchdog)
-		m_watchdog->reset_w(space, 0, 0);
+		m_watchdog->watchdog_reset();
 
 	uint8_t r = ioport("IN2")->read();
 	machine().bookkeeping().coin_counter_w(offset, r >> 7);

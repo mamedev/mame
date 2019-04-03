@@ -167,7 +167,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( notconnected );
 	uint8_t interrupt_level();
 
-	uint8_t setoffset(offs_t offset);
+	void setaddress(offs_t mode, uint16_t address);
 	uint16_t memread(offs_t offset);
 	void memwrite(offs_t offset, uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER( dbin_in );
@@ -193,7 +193,7 @@ private:
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
-	void memmap_setoffset(address_map &map);
+	void memmap_setaddress(address_map &map);
 
 	void    datamux_clock_in(int clock);
 
@@ -296,9 +296,9 @@ void ti99_4p_state::memmap(address_map &map)
 	map(0x0000, 0xffff).rw(FUNC(ti99_4p_state::memread), FUNC(ti99_4p_state::memwrite));
 }
 
-void ti99_4p_state::memmap_setoffset(address_map &map)
+void ti99_4p_state::memmap_setaddress(address_map &map)
 {
-	map(0x0000, 0xffff).r(FUNC(ti99_4p_state::setoffset));
+	map(0x0000, 0xffff).w(FUNC(ti99_4p_state::setaddress));
 }
 
 void ti99_4p_state::crumap(address_map &map)
@@ -431,9 +431,9 @@ int ti99_4p_state::decode_address(int address)
     Called when the memory access starts by setting the address bus. From that
     point on, we suspend the CPU until all operations are done.
 */
-uint8_t ti99_4p_state::setoffset(offs_t offset)
+void ti99_4p_state::setaddress(offs_t mode, uint16_t address)
 {
-	m_addr_buf = offset;
+	m_addr_buf = address;
 	m_waitcount = 0;
 
 	LOGMASKED(LOG_ADDRESS, "set address %04x\n", m_addr_buf);
@@ -456,8 +456,6 @@ uint8_t ti99_4p_state::setoffset(offs_t offset)
 	}
 
 	ready_join();
-
-	return 0;
 }
 
 uint16_t ti99_4p_state::memread(offs_t offset)
@@ -1004,7 +1002,7 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 	TMS9900(config, m_cpu, 3000000);
 	m_cpu->set_addrmap(AS_PROGRAM, &ti99_4p_state::memmap);
 	m_cpu->set_addrmap(AS_IO, &ti99_4p_state::crumap);
-	m_cpu->set_addrmap(tms99xx_device::AS_SETOFFSET, &ti99_4p_state::memmap_setoffset);
+	m_cpu->set_addrmap(tms99xx_device::AS_SETADDRESS, &ti99_4p_state::memmap_setaddress);
 	m_cpu->extop_cb().set(FUNC(ti99_4p_state::external_operation));
 	m_cpu->intlevel_cb().set(FUNC(ti99_4p_state::interrupt_level));
 	m_cpu->clkout_cb().set(FUNC(ti99_4p_state::clock_out));

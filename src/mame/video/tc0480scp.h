@@ -35,16 +35,10 @@ public:
 	then tweak them once you have the 4 bg layer positions correct. Col_base
 	may be needed when tilemaps use a palette area from sprites. */
 
-	DECLARE_READ16_MEMBER( word_r );
-	DECLARE_WRITE16_MEMBER( word_w );
-	DECLARE_READ16_MEMBER( ctrl_word_r );
-	DECLARE_WRITE16_MEMBER( ctrl_word_w );
-
-	/* Functions for use with 68020 (Super-Z system) */
-	DECLARE_READ32_MEMBER( long_r );
-	DECLARE_WRITE32_MEMBER( long_w );
-	DECLARE_READ32_MEMBER( ctrl_long_r );
-	DECLARE_WRITE32_MEMBER( ctrl_long_w );
+	u16 ram_r(offs_t offset);
+	void ram_w(offs_t offset, u16 data, u16 mem_mask);
+	u16 ctrl_r(offs_t offset);
+	void ctrl_w(offs_t offset, u16 data, u16 mem_mask);
 
 	void tilemap_update();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority);
@@ -55,7 +49,7 @@ public:
 	int get_bg_priority();
 
 	/* Undrfire needs to read this for a sprite/tile priority hack */
-	DECLARE_READ8_MEMBER( pri_reg_r );
+	u8 pri_reg_r();
 
 protected:
 	// device-level overrides
@@ -65,35 +59,35 @@ protected:
 
 private:
 	// internal state
-	uint16_t           m_ctrl[0x18];
+	u16                m_ctrl[0x18];
 
-	std::vector<uint16_t>   m_ram;
-	uint16_t *         m_bg_ram[4];
-	uint16_t *         m_tx_ram;
-	uint16_t *         m_char_ram;
-	uint16_t *         m_bgscroll_ram[4];
-	uint16_t *         m_rowzoom_ram[4];
-	uint16_t *         m_bgcolumn_ram[4];
-	int              m_bgscrollx[4];
-	int              m_bgscrolly[4];
-	int              m_pri_reg;
+	std::vector<u16>   m_ram;
+	u16 *              m_bg_ram[4];
+	u16 *              m_tx_ram;
+	u16 *              m_char_ram;
+	u16 *              m_bgscroll_ram[4];
+	u16 *              m_rowzoom_ram[4];
+	u16 *              m_bgcolumn_ram[4];
+	int                m_bgscrollx[4];
+	int                m_bgscrolly[4];
+	int                m_pri_reg;
 
 	/* We keep two tilemaps for each of the 5 actual tilemaps: one at standard width, one double */
-	tilemap_t        *m_tilemap[5][2];
+	tilemap_t          *m_tilemap[5][2];
 	int32_t            m_dblwidth;
 
-	int              m_gfxnum;
-	int              m_txnum;
-	int              m_x_offset, m_y_offset;
-	int              m_text_xoffs, m_text_yoffs;
-	int              m_flip_xoffs, m_flip_yoffs;
+	int                m_gfxnum;
+	int                m_txnum;
+	int                m_x_offset, m_y_offset;
+	int                m_text_xoffs, m_text_yoffs;
+	int                m_flip_xoffs, m_flip_yoffs;
 
-	int              m_col_base;
+	int                m_col_base;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	void common_get_tc0480bg_tile_info( tile_data &tileinfo, int tile_index, uint16_t *ram, int gfxnum );
-	void common_get_tc0480tx_tile_info( tile_data &tileinfo, int tile_index, uint16_t *ram, int gfxnum );
+	void common_get_tc0480bg_tile_info( tile_data &tileinfo, int tile_index, u16 *ram, int gfxnum );
+	void common_get_tc0480tx_tile_info( tile_data &tileinfo, int tile_index, u16 *ram, int gfxnum );
 
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);

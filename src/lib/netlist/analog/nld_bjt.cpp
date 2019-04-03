@@ -341,7 +341,7 @@ namespace analog
 		nl_double NF = m_model.m_NF;
 		//nl_double VJE = m_model.dValue("VJE", 0.75);
 
-		set_qtype((m_model.model_type() == "NPN") ? BJT_NPN : BJT_PNP);
+		set_qtype((m_model.type() == "NPN") ? BJT_NPN : BJT_PNP);
 
 		nl_double alpha = BF / (1.0 + BF);
 
@@ -446,7 +446,7 @@ namespace analog
 		nl_double NR = m_model.m_NR;
 		//nl_double VJE = m_model.dValue("VJE", 0.75);
 
-		set_qtype((m_model.model_type() == "NPN") ? BJT_NPN : BJT_PNP);
+		set_qtype((m_model.type() == "NPN") ? BJT_NPN : BJT_PNP);
 
 		m_alpha_f = BF / (1.0 + BF);
 		m_alpha_r = BR / (1.0 + BR);

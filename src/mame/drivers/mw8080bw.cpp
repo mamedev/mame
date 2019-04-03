@@ -916,7 +916,7 @@ WRITE8_MEMBER(mw8080bw_state::maze_io_w)
 {
 	if (offset & 0x01)  maze_coin_counter_w(space, 0, data);
 
-	if (offset & 0x02)  m_watchdog->reset_w(space, 0, data);
+	if (offset & 0x02)  m_watchdog->watchdog_reset();
 }
 
 
@@ -1082,7 +1082,7 @@ WRITE8_MEMBER(mw8080bw_state::checkmat_io_w)
 {
 	if (offset & 0x01)  checkmat_audio_w(space, 0, data);
 
-	if (offset & 0x02)  m_watchdog->reset_w(space, 0, data);
+	if (offset & 0x02)  m_watchdog->watchdog_reset();
 }
 
 
@@ -2170,7 +2170,7 @@ WRITE8_MEMBER(mw8080bw_state::spcenctr_io_w)
 {                                               /* A7 A6 A5 A4 A3 A2 A1 A0 */
 
 	if ((offset & 0x07) == 0x02)
-		m_watchdog->reset_w(space, 0, data);       /*  -  -  -  -  -  0  1  0 */
+		m_watchdog->watchdog_reset();       /*  -  -  -  -  -  0  1  0 */
 
 	else if ((offset & 0x5f) == 0x01)
 		spcenctr_audio_1_w(space, 0, data); /*  -  0  -  0  0  0  0  1 */

@@ -123,6 +123,7 @@ const double XTAL::known_xtals[] = {
 	  6'900'000, /* 6.9_MHz_XTAL           BBN BitGraph CPU */
 	  7'000'000, /* 7_MHz_XTAL             Jaleco Mega System PCBs */
 	  7'159'090, /* 7.15909_MHz_XTAL       Blood Bros (2x NTSC subcarrier) */
+	  7'200'000, /* 7.2_MHz_XTAL           Image Fight bootleg I80C031 MCU */
 	  7'372'800, /* 7.3728_MHz_XTAL        - */
 	  7'864'300, /* 7.8643_MHz_XTAL        Used on InterFlip games as video clock */
 	  7'987'000, /* 7.987_MHz_XTAL         PC9801-86 YM2608 clock */

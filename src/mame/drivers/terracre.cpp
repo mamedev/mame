@@ -95,12 +95,12 @@ AT-2
 
 WRITE16_MEMBER(terracre_state::amazon_sound_w)
 {
-	m_soundlatch->write(space,0,((data & 0x7f) << 1) | 1);
+	m_soundlatch->write(((data & 0x7f) << 1) | 1);
 }
 
 READ8_MEMBER(terracre_state::soundlatch_clear_r)
 {
-	m_soundlatch->clear_w(space,0,0);
+	m_soundlatch->clear_w();
 	return 0;
 }
 

@@ -212,7 +212,7 @@ READ8_MEMBER( apricot_state::sio_da_r )
 	if (m_bus_locked)
 		return m_sio->m1_r();
 
-	return m_sio->da_r(space, offset);
+	return m_sio->da_r();
 }
 
 READ8_MEMBER( apricot_state::sio_ca_r )
@@ -220,7 +220,7 @@ READ8_MEMBER( apricot_state::sio_ca_r )
 	if (m_bus_locked)
 		return m_sio->m1_r();
 
-	return m_sio->ca_r(space, offset);
+	return m_sio->ca_r();
 }
 
 READ8_MEMBER( apricot_state::sio_cb_r )
@@ -228,7 +228,7 @@ READ8_MEMBER( apricot_state::sio_cb_r )
 	if (m_bus_locked)
 		return m_sio->m1_r();
 
-	return m_sio->cb_r(space, offset);
+	return m_sio->cb_r();
 }
 
 READ8_MEMBER( apricot_state::sio_db_r )
@@ -236,7 +236,7 @@ READ8_MEMBER( apricot_state::sio_db_r )
 	if (m_bus_locked)
 		return m_sio->m1_r();
 
-	return m_sio->db_r(space, offset);
+	return m_sio->db_r();
 }
 
 

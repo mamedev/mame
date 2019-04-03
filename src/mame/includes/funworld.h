@@ -6,6 +6,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "machine/i2cmem.h"
 
 class funworld_state : public driver_device
 {
@@ -17,6 +18,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_palette(*this, "palette"),
+		m_i2cmem(*this, "i2cmem"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -67,7 +69,7 @@ private:
 	void cuoreuno_map(address_map &map);
 	void funquiz_map(address_map &map);
 	void funworld_map(address_map &map);
-	void fw_a7_11_map(address_map &map);
+	void fw_brick_map(address_map &map);
 	void intergames_map(address_map &map);
 	void saloon_map(address_map &map);
 	void witchryl_map(address_map &map);
@@ -75,6 +77,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_device<palette_device> m_palette;
+	optional_device<i2cmem_device> m_i2cmem;
 	output_finder<8> m_lamps;
 };
 

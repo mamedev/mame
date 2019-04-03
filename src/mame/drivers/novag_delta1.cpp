@@ -74,7 +74,7 @@ void delta1_state::machine_start()
 
 WRITE8_MEMBER(delta1_state::mux_w)
 {
-	// IO00-02: MC14028B A-C (IO03: GND)
+	// IO00-02: MC14028B A-C (D to GND)
 	// MC14028B Q3-Q7: input mux
 	// MC14028B Q4-Q7: digit select through 75492
 	u16 sel = 1 << (~data & 7);
@@ -90,7 +90,8 @@ WRITE8_MEMBER(delta1_state::mux_w)
 READ8_MEMBER(delta1_state::input_r)
 {
 	// IO04-07: multiplexed inputs
-	return read_inputs(5) << 4 | m_led_select;
+	// IO03: GND
+	return read_inputs(5) << 4 | m_led_select | 8;
 }
 
 WRITE8_MEMBER(delta1_state::digit_w)

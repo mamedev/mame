@@ -955,7 +955,7 @@ WRITE8_MEMBER(galaxian_state::explorer_sound_control_w)
 READ8_MEMBER(galaxian_state::explorer_sound_latch_r)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return m_soundlatch->read(m_audiocpu->space(AS_PROGRAM), 0);
+	return m_soundlatch->read();
 }
 
 
@@ -1349,7 +1349,7 @@ WRITE8_MEMBER(galaxian_state::kingball_sound1_w)
 WRITE8_MEMBER(galaxian_state::kingball_sound2_w)
 {
 	m_kingball_sound = (m_kingball_sound & ~0x02) | (data << 1);
-	m_soundlatch->write(space, 0, m_kingball_sound | 0xf0);
+	m_soundlatch->write(m_kingball_sound | 0xf0);
 }
 
 
@@ -1425,7 +1425,7 @@ READ8_MEMBER(galaxian_state::jumpbug_protection_r)
 
 WRITE8_MEMBER(galaxian_state::checkman_sound_command_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -7580,7 +7580,7 @@ void galaxian_state::init_mandinga()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	watchdog_timer_device *wdog = subdevice<watchdog_timer_device>("watchdog");
 	space.unmap_read(0x7000, 0x7000, 0x7ff);
-	space.install_read_handler(0x6800, 0x6800, 0, 0x7ff, 0, read8_delegate(FUNC(watchdog_timer_device::reset_r), wdog));
+	space.install_read_handler(0x6800, 0x6800, 0, 0x7ff, 0, read8mo_delegate(FUNC(watchdog_timer_device::reset_r), wdog));
 }
 
 void galaxian_state::init_sfx()
@@ -7605,7 +7605,7 @@ void galaxian_state::init_atlantis()
 	/* watchdog is at $7800? (or is it just disabled?) */
 	watchdog_timer_device *wdog = subdevice<watchdog_timer_device>("watchdog");
 	space.unmap_read(0x7000, 0x77ff);
-	space.install_read_handler(0x7800, 0x7800, 0, 0x7ff, 0, read8_delegate(FUNC(watchdog_timer_device::reset_r), wdog));
+	space.install_read_handler(0x7800, 0x7800, 0, 0x7ff, 0, read8mo_delegate(FUNC(watchdog_timer_device::reset_r), wdog));
 }
 
 

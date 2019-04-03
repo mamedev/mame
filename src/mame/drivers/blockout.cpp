@@ -324,7 +324,6 @@ void blockout_state::blockout(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(513);
 
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

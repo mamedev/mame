@@ -545,10 +545,12 @@ void fuuki32_state::fuuki32(machine_config &config)
 	ymf.irq_handler().set_inputline("soundcpu", 0);
 	ymf.add_route(0, "lspeaker", 0.50);
 	ymf.add_route(1, "rspeaker", 0.50);
-	ymf.add_route(2, "lspeaker", 0.40);
-	ymf.add_route(3, "rspeaker", 0.40);
+	ymf.add_route(2, "lspeaker", 0.50);
+	ymf.add_route(3, "rspeaker", 0.50);
 	ymf.add_route(4, "lspeaker", 0.40);
 	ymf.add_route(5, "rspeaker", 0.40);
+	ymf.add_route(6, "lspeaker", 0.40);
+	ymf.add_route(7, "rspeaker", 0.40);
 }
 
 /***************************************************************************

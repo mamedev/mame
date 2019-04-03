@@ -239,6 +239,7 @@ private:
 	void m84_cpu1_common_map(address_map &map);
 	void m84_portmap(address_map &map);
 	void m84_v33_portmap(address_map &map);
+	void i80c31_mem_map(address_map &map);
 	void mcu_io_map(address_map &map);
 	void poundfor_portmap(address_map &map);
 	void poundfor_sound_portmap(address_map &map);

@@ -65,6 +65,7 @@ namespace plib
 		static constexpr T zero() noexcept { return static_cast<T>(0); }
 		static constexpr T one()  noexcept { return static_cast<T>(1); }
 		static constexpr T two()  noexcept { return static_cast<T>(2); }
+		static constexpr T sqrt2()  noexcept { return static_cast<T>(1.414213562373095048801688724209); }
 
 		/*!
 		 * \brief Electric constant of vacuum

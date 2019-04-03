@@ -55,46 +55,52 @@ public:
 		m_tms(*this, "tms"),
 		m_blitter_regs(*this, "blitter_regs"),
 		m_fpga_ctrl(*this, "fpga_ctrl"),
-		m_fg_buffer(*this, "fg_buffer")
+		m_fg_buffer(*this, "fg_buffer"),
+		m_blitter_gfx(*this, "blitter"),
+		m_bgrambank(*this, "bgrambank")
 	{ }
 
 	void skimaxx(machine_config &config);
+
+protected:
+	virtual void device_post_load() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<tms34010_device> m_tms;
 
-	required_shared_ptr<uint32_t> m_blitter_regs;
-	required_shared_ptr<uint32_t> m_fpga_ctrl;
-	required_shared_ptr<uint16_t> m_fg_buffer;
+	required_shared_ptr<u32> m_blitter_regs;
+	required_shared_ptr<u32> m_fpga_ctrl;
+	required_shared_ptr<u16> m_fg_buffer;
+	required_region_ptr<u16> m_blitter_gfx;
 
-	std::unique_ptr<uint32_t[]> m_bg_buffer;
-	uint32_t *m_bg_buffer_front;
-	uint32_t *m_bg_buffer_back;
-	uint16_t *m_blitter_gfx;
-	uint32_t m_blitter_gfx_len;
-	uint32_t m_blitter_src_x;
-	uint32_t m_blitter_src_dx;
-	uint32_t m_blitter_src_y;
-	uint32_t m_blitter_src_dy;
+	required_memory_bank m_bgrambank;
 
-	DECLARE_WRITE32_MEMBER(skimaxx_blitter_w);
-	DECLARE_READ32_MEMBER(skimaxx_blitter_r);
-	DECLARE_WRITE32_MEMBER(skimaxx_fpga_ctrl_w);
+	std::unique_ptr<u32[]> m_bg_buffer;
+	u32 *m_bg_buffer_front;
+	u32 *m_bg_buffer_back;
+	u32 m_blitter_src_x;
+	u32 m_blitter_src_dx;
+	u32 m_blitter_src_y;
+	u32 m_blitter_src_dy;
+
+	DECLARE_WRITE32_MEMBER(blitter_w);
+	DECLARE_READ32_MEMBER(blitter_r);
+	DECLARE_WRITE32_MEMBER(fpga_ctrl_w);
 	DECLARE_READ32_MEMBER(unk_r);
-	DECLARE_READ32_MEMBER(skimaxx_unk1_r);
-	DECLARE_WRITE32_MEMBER(skimaxx_unk1_w);
-	DECLARE_WRITE32_MEMBER(skimaxx_sub_ctrl_w);
-	DECLARE_READ32_MEMBER(skimaxx_analog_r);
+	DECLARE_READ32_MEMBER(unk1_r);
+	DECLARE_WRITE32_MEMBER(unk1_w);
+	DECLARE_WRITE32_MEMBER(sub_ctrl_w);
+	DECLARE_READ32_MEMBER(analog_r);
 	DECLARE_WRITE_LINE_MEMBER(tms_irq);
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void m68030_1_map(address_map &map);
 	void m68030_2_map(address_map &map);
 	void tms_program_map(address_map &map);
@@ -108,9 +114,9 @@ private:
  *************************************/
 
 // Set up blit parameters
-WRITE32_MEMBER(skimaxx_state::skimaxx_blitter_w)
+WRITE32_MEMBER(skimaxx_state::blitter_w)
 {
-	uint32_t newdata = COMBINE_DATA( &m_blitter_regs[offset] );
+	u32 newdata = COMBINE_DATA( &m_blitter_regs[offset] );
 
 	switch (offset)
 	{
@@ -139,13 +145,13 @@ WRITE32_MEMBER(skimaxx_state::skimaxx_blitter_w)
 }
 
 // A read by the 68030 from this area blits one pixel to the back buffer (at the same offset)
-READ32_MEMBER(skimaxx_state::skimaxx_blitter_r)
+READ32_MEMBER(skimaxx_state::blitter_r)
 {
-	uint32_t penaddr = ((m_blitter_src_x >> 8) & 0x1ff) + ((m_blitter_src_y >> 8) << 9);
-	uint16_t *src = m_blitter_gfx + (penaddr % m_blitter_gfx_len);
-	uint32_t *dst = m_bg_buffer_back + offset;
+	u32 const penaddr = ((m_blitter_src_x >> 8) & 0x1ff) + ((m_blitter_src_y >> 8) << 9);
+	const u16 *src = m_blitter_gfx + (penaddr % m_blitter_gfx.length());
+	u32 *dst = m_bg_buffer_back + offset;
 
-	uint16_t pen = (*src) & 0x7fff;
+	u16 const pen = (*src) & 0x7fff;
 
 	if (pen)
 	{
@@ -164,14 +170,27 @@ READ32_MEMBER(skimaxx_state::skimaxx_blitter_r)
 
 void skimaxx_state::video_start()
 {
-	m_blitter_gfx = (uint16_t *) memregion( "blitter" )->base();
-	m_blitter_gfx_len = memregion( "blitter" )->bytes() / 2;
+	m_bg_buffer = std::make_unique<u32[]>(0x400 * 0x100 * sizeof(u16) / sizeof(u32) * 2); // 2 buffers
+	m_bg_buffer_back  = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(u16) / sizeof(u32) * 0;
+	m_bg_buffer_front = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(u16) / sizeof(u32) * 1;
+	m_bgrambank->configure_entry(0, m_bg_buffer_back);
+	m_bgrambank->configure_entry(1, m_bg_buffer_front);
 
-	m_bg_buffer = std::make_unique<uint32_t[]>(0x400 * 0x100 * sizeof(uint16_t) / sizeof(uint32_t) * 2); // 2 buffers
-	m_bg_buffer_back  = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(uint16_t) / sizeof(uint32_t) * 0;
-	m_bg_buffer_front = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(uint16_t) / sizeof(uint32_t) * 1;
-	membank("bank1")->configure_entry(0, m_bg_buffer_back);
-	membank("bank1")->configure_entry(1, m_bg_buffer_front);
+	save_item(NAME(m_blitter_src_x));
+	save_item(NAME(m_blitter_src_y));
+	save_item(NAME(m_blitter_src_dx));
+	save_item(NAME(m_blitter_src_dy));
+}
+
+void skimaxx_state::device_post_load()
+{
+	// double buffering
+	u8 const bank_bg_buffer = (*m_fpga_ctrl & 0x40) ? 1 : 0;
+
+	m_bg_buffer_back  = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(u16) / sizeof(u32) * bank_bg_buffer;
+	m_bg_buffer_front = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(u16) / sizeof(u32) * (1 - bank_bg_buffer);
+
+	m_bgrambank->set_entry(bank_bg_buffer);
 }
 
 /*************************************
@@ -183,12 +202,12 @@ void skimaxx_state::video_start()
 // TODO: Might not be used
 TMS340X0_TO_SHIFTREG_CB_MEMBER(skimaxx_state::to_shiftreg)
 {
-	memcpy(shiftreg, &m_fg_buffer[address >> 4], 512 * sizeof(uint16_t));
+	memcpy(shiftreg, &m_fg_buffer[address >> 4], 512 * sizeof(u16));
 }
 
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(skimaxx_state::from_shiftreg)
 {
-	memcpy(&m_fg_buffer[address >> 4], shiftreg, 512 * sizeof(uint16_t));
+	memcpy(&m_fg_buffer[address >> 4], shiftreg, 512 * sizeof(u16));
 }
 
 
@@ -204,19 +223,17 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(skimaxx_state::scanline_update)
 
 	if (params->rowaddr >= 0x220)
 	{
-		uint32_t rowaddr = (params->rowaddr - 0x220);
-		uint16_t *fg = &m_fg_buffer[rowaddr << 8];
-		uint32_t *bg = &m_bg_buffer_front[rowaddr/2 * 1024/2];
-		uint16_t *dest = &bitmap.pix16(scanline);
+		u32 const rowaddr = (params->rowaddr - 0x220);
+		u16 *fg = &m_fg_buffer[rowaddr << 8];
+		u32 *bg = &m_bg_buffer_front[rowaddr/2 * 1024/2];
+		u16 *dest = &bitmap.pix16(scanline);
 		//int coladdr = params->coladdr;
-		int x;
 		//coladdr = 0;
 
 		dest += params->heblnk;
-		for (x = params->heblnk; x < params->hsblnk; x+=2)
+		for (int x = params->heblnk; x < params->hsblnk; x+=2)
 		{
-			uint16_t tmspix;
-			tmspix = *fg & 0x7fff;
+			u16 const tmspix = *fg & 0x7fff;
 			if (tmspix)
 			{
 				*dest++ = tmspix;
@@ -224,7 +241,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(skimaxx_state::scanline_update)
 			}
 			else
 			{
-				uint32_t data = *bg & 0x7fff7fff;
+				u32 const data = *bg & 0x7fff7fff;
 				*dest++ = data >> 16;
 				*dest++ = data;
 			}
@@ -251,19 +268,19 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(skimaxx_state::scanline_update)
   bit 0: bit banging data
 */
 
-WRITE32_MEMBER(skimaxx_state::skimaxx_fpga_ctrl_w)
+WRITE32_MEMBER(skimaxx_state::fpga_ctrl_w)
 {
-	uint32_t newdata = COMBINE_DATA( m_fpga_ctrl );
+	u32 newdata = COMBINE_DATA( m_fpga_ctrl );
 
 	if (ACCESSING_BITS_0_7)
 	{
 		// double buffering
-		uint8_t bank_bg_buffer = (newdata & 0x40) ? 1 : 0;
+		u8 const bank_bg_buffer = (newdata & 0x40) ? 1 : 0;
 
-		m_bg_buffer_back  = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(uint16_t) / sizeof(uint32_t) * bank_bg_buffer;
-		m_bg_buffer_front = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(uint16_t) / sizeof(uint32_t) * (1 - bank_bg_buffer);
+		m_bg_buffer_back  = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(u16) / sizeof(u32) * bank_bg_buffer;
+		m_bg_buffer_front = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(u16) / sizeof(u32) * (1 - bank_bg_buffer);
 
-		membank("bank1")->set_entry(bank_bg_buffer);
+		m_bgrambank->set_entry(bank_bg_buffer);
 	}
 }
 
@@ -274,16 +291,16 @@ READ32_MEMBER(skimaxx_state::unk_r)
 }
 
 // 0x20000023
-READ32_MEMBER(skimaxx_state::skimaxx_unk1_r)
+READ32_MEMBER(skimaxx_state::unk1_r)
 {
 	return 0x80;
 }
 
-WRITE32_MEMBER(skimaxx_state::skimaxx_unk1_w)
+WRITE32_MEMBER(skimaxx_state::unk1_w)
 {
 }
 
-WRITE32_MEMBER(skimaxx_state::skimaxx_sub_ctrl_w)
+WRITE32_MEMBER(skimaxx_state::sub_ctrl_w)
 {
 	// 7e/7f at the start. 3f/7f, related to reads from 1018xxxx
 	if (ACCESSING_BITS_0_7)
@@ -302,7 +319,7 @@ WRITE32_MEMBER(skimaxx_state::skimaxx_sub_ctrl_w)
     ..
     1f      left max
 */
-READ32_MEMBER(skimaxx_state::skimaxx_analog_r)
+READ32_MEMBER(skimaxx_state::analog_r)
 {
 	return bitswap<8>(ioport(offset ? "Y" : "X")->read(), 0,1,2,3,4,5,6,7);
 }
@@ -316,7 +333,7 @@ READ32_MEMBER(skimaxx_state::skimaxx_analog_r)
 void skimaxx_state::m68030_1_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom();
-	map(0x10000000, 0x10000003).w(FUNC(skimaxx_state::skimaxx_sub_ctrl_w));
+	map(0x10000000, 0x10000003).w(FUNC(skimaxx_state::sub_ctrl_w));
 	map(0x10100000, 0x1010000f).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w)).umask32(0x0000ffff);
 //  AM_RANGE(0x10180000, 0x10187fff) AM_RAM AM_SHARE("share1")
 	map(0x10180000, 0x1018ffff).ram().share("share1");  // above 10188000 accessed at level end (game bug?)
@@ -327,15 +344,15 @@ void skimaxx_state::m68030_1_map(address_map &map)
 	map(0x2000001b, 0x2000001b).rw("oki3", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // right
 	map(0x2000001f, 0x2000001f).rw("oki4", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // right
 
-	map(0x20000020, 0x20000023).r(FUNC(skimaxx_state::skimaxx_unk1_r));   // units linking?
-	map(0x20000024, 0x20000027).w(FUNC(skimaxx_state::skimaxx_unk1_w));  // ""
+	map(0x20000020, 0x20000023).r(FUNC(skimaxx_state::unk1_r));   // units linking?
+	map(0x20000024, 0x20000027).w(FUNC(skimaxx_state::unk1_w));  // ""
 
 	map(0x20000040, 0x20000043).ram(); // write
 	map(0x20000044, 0x20000047).portr("DSW");
 	map(0x20000048, 0x2000004b).portr("COIN");
 	map(0x2000004c, 0x2000004f).r(FUNC(skimaxx_state::unk_r)); // bit 7, bit 0
 
-	map(0x20000050, 0x20000057).r(FUNC(skimaxx_state::skimaxx_analog_r)).nopw(); // read (0-1f), write motor?
+	map(0x20000050, 0x20000057).r(FUNC(skimaxx_state::analog_r)).nopw(); // read (0-1f), write motor?
 
 	map(0xfffc0000, 0xfffdffff).ram().mirror(0x00020000);
 }
@@ -351,12 +368,12 @@ void skimaxx_state::m68030_2_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).rom();
 
-	map(0x20000000, 0x2007ffff).r(FUNC(skimaxx_state::skimaxx_blitter_r));    // do blit
-	map(0x30000000, 0x3000000f).w(FUNC(skimaxx_state::skimaxx_blitter_w)).share("blitter_regs");
+	map(0x20000000, 0x2007ffff).r(FUNC(skimaxx_state::blitter_r));    // do blit
+	map(0x30000000, 0x3000000f).w(FUNC(skimaxx_state::blitter_w)).share("blitter_regs");
 
-	map(0x40000000, 0x40000003).w(FUNC(skimaxx_state::skimaxx_fpga_ctrl_w)).share("fpga_ctrl");
+	map(0x40000000, 0x40000003).w(FUNC(skimaxx_state::fpga_ctrl_w)).share("fpga_ctrl");
 
-	map(0x50000000, 0x5007ffff).bankrw("bank1");    // background ram allocated here at video_start (skimaxx_bg_buffer_back/front)
+	map(0x50000000, 0x5007ffff).bankrw("bgrambank");    // background ram allocated here at video_start (skimaxx_bg_buffer_back/front)
 //  AM_RANGE(0xfffc0000, 0xfffc7fff) AM_RAM AM_SHARE("share1")
 	map(0xfffc0000, 0xfffcffff).ram().share("share1");
 //  AM_RANGE(0xfffe0000, 0xffffffff) AM_RAM // I think this is banked with the shared RAM? (see CPU sync routines)
@@ -392,12 +409,12 @@ void skimaxx_state::tms_program_map(address_map &map)
 
 #if 0
 
-static const uint32_t texlayout_xoffset[512] =
+static const u32 texlayout_xoffset[512] =
 {
 	STEP512(0,16)
 };
 
-static const uint32_t texlayout_yoffset[128] =
+static const u32 texlayout_yoffset[128] =
 {
 	STEP128(0,512*16)
 };
@@ -510,7 +527,6 @@ void skimaxx_state::skimaxx(machine_config &config)
 
 	M68EC030(config, m_subcpu, XTAL(40'000'000));
 	m_subcpu->set_addrmap(AS_PROGRAM, &skimaxx_state::m68030_2_map);
-
 
 	/* video hardware */
 	TMS34010(config, m_tms, XTAL(50'000'000));

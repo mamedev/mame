@@ -145,8 +145,6 @@ void as12_state::as12(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &as12_state::div_trampoline);
 	ADDRESS_MAP_BANK(config, m_mainmap).set_map(&as12_state::main_map).set_options(ENDIANNESS_LITTLE, 8, 16);
 
-	TIMER(config, "dummy_timer").configure_periodic(timer_device::expired_delegate(), attotime::from_hz(4_MHz_XTAL));
-
 	const attotime irq_period = attotime::from_hz(585); // from 556 timer (22nF, 110K, 1K)
 	TIMER(config, m_irq_on).configure_periodic(FUNC(as12_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us

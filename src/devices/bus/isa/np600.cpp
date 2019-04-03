@@ -11,7 +11,6 @@
 
 #include "cpu/i86/i186.h"
 #include "machine/74259.h"
-//#include "machine/i82586.h"
 
 DEFINE_DEVICE_TYPE(NP600A3, np600a3_device, "np600a3", "InterLan NP600A-3 Intelligent Protocol Processor")
 
@@ -19,11 +18,24 @@ np600a3_device::np600a3_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, NP600A3, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_npcpu(*this, "npcpu")
+	, m_lcc(*this, "lcc")
 {
 }
 
 void np600a3_device::device_start()
 {
+}
+
+void np600a3_device::lcc_ca_w(u16 data)
+{
+	m_lcc->ca(0);
+	m_lcc->ca(1);
+}
+
+WRITE_LINE_MEMBER(np600a3_device::lcc_reset_w)
+{
+	if (!state)
+		m_lcc->reset();
 }
 
 u16 np600a3_device::status_r()
@@ -33,14 +45,21 @@ u16 np600a3_device::status_r()
 
 void np600a3_device::mem_map(address_map &map)
 {
-	map(0x00000, 0x7ffff).ram(); // GM71256-12 x16
+	map(0x00000, 0x7ffff).ram().share("netram"); // GM71256-12 x16
 	map(0xfc000, 0xfffff).rom().region("npcpu", 0);
 }
 
 void np600a3_device::io_map(address_map &map)
 {
-	map(0x0070, 0x007f).w("latch70", FUNC(ls259_device::write_a0));
+	map(0x0000, 0x0001).w(FUNC(np600a3_device::lcc_ca_w));
+	map(0x0070, 0x007f).w("bitlatch", FUNC(ls259_device::write_a0));
 	map(0x0080, 0x0081).r(FUNC(np600a3_device::status_r));
+}
+
+void np600a3_device::lcc_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).ram().share("netram");
+	map(0xf80000, 0xffffff).ram().share("netram");
 }
 
 void np600a3_device::device_add_mconfig(machine_config &config)
@@ -49,9 +68,12 @@ void np600a3_device::device_add_mconfig(machine_config &config)
 	m_npcpu->set_addrmap(AS_PROGRAM, &np600a3_device::mem_map);
 	m_npcpu->set_addrmap(AS_IO, &np600a3_device::io_map);
 
-	LS259(config, "latch70"); // U28
+	ls259_device &bitlatch(LS259(config, "bitlatch")); // U28
+	bitlatch.q_out_cb<4>().set(FUNC(np600a3_device::lcc_reset_w));
 
-	//I82586(config, "enet", 20_MHz_XTAL);
+	I82586(config, m_lcc, 20_MHz_XTAL);
+	m_lcc->set_addrmap(0, &np600a3_device::lcc_map);
+	m_lcc->out_irq_cb().set(m_npcpu, FUNC(i80186_cpu_device::tmrin1_w));
 }
 
 ROM_START(np600a3)

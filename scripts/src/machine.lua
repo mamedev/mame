@@ -2626,8 +2626,14 @@ if (MACHINES["SPG2XX"]~=null) then
 		MAME_DIR .. "src/devices/machine/spg2xx_audio.h",
 		MAME_DIR .. "src/devices/machine/spg2xx_io.cpp",
 		MAME_DIR .. "src/devices/machine/spg2xx_io.h",
+		MAME_DIR .. "src/devices/machine/spg2xx_sysdma.cpp",
+		MAME_DIR .. "src/devices/machine/spg2xx_sysdma.h",
+		MAME_DIR .. "src/devices/machine/spg2xx_video.cpp",
+		MAME_DIR .. "src/devices/machine/spg2xx_video.h",
 		MAME_DIR .. "src/devices/machine/spg110.cpp",
 		MAME_DIR .. "src/devices/machine/spg110.h",
+		MAME_DIR .. "src/devices/machine/spg110_video.cpp",
+		MAME_DIR .. "src/devices/machine/spg110_video.h",
 	}
 end
 

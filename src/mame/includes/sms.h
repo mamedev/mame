@@ -128,7 +128,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl1_th_input);
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl2_th_input);
 	DECLARE_WRITE_LINE_MEMBER(gg_ext_th_input);
-	DECLARE_READ32_MEMBER(sms_pixel_color);
 
 	DECLARE_VIDEO_START(gamegear);
 	DECLARE_VIDEO_RESET(gamegear);

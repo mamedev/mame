@@ -41,6 +41,7 @@
 #include "cl_sh260.h"
 #include "bt54x.h"
 #include "dcb.h"
+#include "ultra12f.h"
 
 // sound
 #include "adlib.h"
@@ -175,6 +176,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("gfxultrap", ISA16_SVGA_GFXULTRAPRO);
 	device.option_add("tgui9680",ISA16_SVGA_TGUI9680);
 	device.option_add("3c505", ISA16_3C505);
+	device.option_add("3c505_lle", ISA16_3C505_LLE);
 	device.option_add("mach64", ISA16_SVGA_MACH64);
 	device.option_add("sb16_lle", ISA16_SB16);
 	device.option_add("mcd", ISA16_MCD);
@@ -187,4 +189,5 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("bt542bh", BT542BH);
 	device.option_add("bt545s", BT545S);
 	device.option_add("dcb", NOVELL_DCB);
+	device.option_add("ultra12f", ULTRA12F);
 }

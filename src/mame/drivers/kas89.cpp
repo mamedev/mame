@@ -389,14 +389,14 @@ WRITE8_MEMBER(kas89_state::sound_comm_w)
 
 	else
 	{
-		m_soundlatch->write(space, 0, data);
-		m_audiocpu->set_input_line(0, ASSERT_LINE );
+		m_soundlatch->write(data);
+		m_audiocpu->set_input_line(0, ASSERT_LINE);
 	}
 }
 
 WRITE8_MEMBER(kas89_state::int_ack_w)
 {
-	m_audiocpu->set_input_line(0, CLEAR_LINE );
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
 

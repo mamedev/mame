@@ -258,7 +258,7 @@ WRITE8_MEMBER(namcos86_state::watchdog1_w)
 	if (m_wdog == 3)
 	{
 		m_wdog = 0;
-		m_watchdog->reset_w(space,0,0);
+		m_watchdog->watchdog_reset();
 	}
 }
 
@@ -268,7 +268,7 @@ WRITE8_MEMBER(namcos86_state::watchdog2_w)
 	if (m_wdog == 3)
 	{
 		m_wdog = 0;
-		m_watchdog->reset_w(space,0,0);
+		m_watchdog->watchdog_reset();
 	}
 }
 

@@ -582,7 +582,7 @@ READ16_MEMBER(stepstag_state::stepstag_pc2main_r)
 
 WRITE16_MEMBER(stepstag_state::stepstag_soundlatch_word_w)
 {
-	m_soundlatch->write(space, offset, data, mem_mask);
+	m_soundlatch->write(data);
 
 	m_subcpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 

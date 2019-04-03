@@ -58,9 +58,9 @@ namespace netlist
 		if (supply_V == 0.0) supply_V = 5.0;
 
 		if (m_I.Q_Analog() > logic_family()->high_thresh_V(0.0, supply_V))
-			out().push(1, NLTIME_FROM_NS(1));
+			out().push(1, netlist_time::quantum());
 		else if (m_I.Q_Analog() < logic_family()->low_thresh_V(0.0, supply_V))
-			out().push(0, NLTIME_FROM_NS(1));
+			out().push(0, netlist_time::quantum());
 		else
 		{
 			// do nothing

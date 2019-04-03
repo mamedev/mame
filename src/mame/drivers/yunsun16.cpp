@@ -159,7 +159,7 @@ WRITE8_MEMBER(magicbub_state::magicbub_sound_command_w)
 	// HACK: the game continuously sends this. It'll play the oki sample number 0 on each voice. That sample is 00000-00000.
 	if ((data & 0xff) != 0x3a)
 	{
-		m_soundlatch->write(space, 0, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }

@@ -151,7 +151,7 @@ WRITE16_MEMBER(diverboy_state::soundcmd_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_soundlatch->write(space, 0, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }

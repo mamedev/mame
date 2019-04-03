@@ -648,6 +648,8 @@ void psikyo4_state::ps4big(machine_config &config)
 	ymf.add_route(3, "lspeaker", 1.0);
 	ymf.add_route(4, "rspeaker", 1.0);
 	ymf.add_route(5, "lspeaker", 1.0);
+	ymf.add_route(6, "rspeaker", 1.0);
+	ymf.add_route(7, "lspeaker", 1.0);
 }
 
 void psikyo4_state::ps4small(machine_config &config)

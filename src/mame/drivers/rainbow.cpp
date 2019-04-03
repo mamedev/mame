@@ -2756,7 +2756,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 	// Install 8088 read / write handler once loopback test is over
 	if ( !(data & 32) && (m_diagnostic & 32) )
 	{
-			io.install_readwrite_handler(0x40, 0x43, READ8_DEVICE_DELEGATE(m_mpsc, upd7201_new_device,cd_ba_r), WRITE8_DEVICE_DELEGATE(m_mpsc, upd7201_new_device, cd_ba_w) );
+			io.install_readwrite_handler(0x40, 0x43, read8sm_delegate(FUNC(upd7201_new_device::cd_ba_r), &*m_mpsc), write8sm_delegate(FUNC(upd7201_new_device::cd_ba_w), &*m_mpsc));
 			logerror("\n **** COMM HANDLER INSTALLED **** ");
 			//popmessage("Autoboot from drive %c", m_p_nvram[0xab] ? (64 + m_p_nvram[0xab]) : 0x3F );
 	}

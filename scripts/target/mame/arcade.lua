@@ -173,6 +173,7 @@ SOUNDS["NAMCO_15XX"] = true
 SOUNDS["NAMCO_CUS30"] = true
 SOUNDS["NAMCO_52XX"] = true
 SOUNDS["NAMCO_63701X"] = true
+--SOUNDS["NAMCO_163"] = true
 SOUNDS["T6W28"] = true
 SOUNDS["SNKWAVE"] = true
 SOUNDS["C140"] = true
@@ -639,6 +640,7 @@ MACHINES["GENPC"] = true
 MACHINES["GEN_LATCH"] = true
 MACHINES["WATCHDOG"] = true
 MACHINES["SMARTMEDIA"] = true
+MACHINES["I82586"] = true
 MACHINES["INPUT_MERGER"] = true
 MACHINES["K054321"] = true
 MACHINES["ADC0844"] = true
@@ -3533,6 +3535,7 @@ files {
 	MAME_DIR .. "src/mame/video/raiden.cpp",
 	MAME_DIR .. "src/mame/drivers/raiden2.cpp",
 	MAME_DIR .. "src/mame/includes/raiden2.h",
+	MAME_DIR .. "src/mame/video/raiden2.cpp",
 	MAME_DIR .. "src/mame/machine/r2crypt.cpp",
 	MAME_DIR .. "src/mame/machine/r2crypt.h",
 	MAME_DIR .. "src/mame/machine/seibucop/seibucop.cpp",

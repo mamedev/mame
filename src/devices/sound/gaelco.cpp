@@ -64,8 +64,8 @@ gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, const char
 gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, device_rom_interface(mconfig, *this, 27) // Unknown address bits
 	, m_stream(nullptr)
-	, m_snd_data(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -78,26 +78,26 @@ gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_typ
 
 void gaelco_gae1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	int j, ch;
-
 	/* fill all data needed */
-	for(j = 0; j < samples; j++){
+	for (int j = 0; j < samples; j++)
+	{
 		int output_l = 0, output_r = 0;
 
 		/* for each channel */
-		for (ch = 0; ch < NUM_CHANNELS; ch ++){
+		for (int ch = 0; ch < NUM_CHANNELS; ch++)
+		{
 			int ch_data_l = 0, ch_data_r = 0;
 			sound_channel *channel = &m_channel[ch];
 
 			/* if the channel is playing */
-			if (channel->active == 1){
+			if (channel->active == 1)
+			{
 				int data, chunkNum = 0;
 				int base_offset, type, bank, vol_r, vol_l, end_pos;
 
 				/* if the channel is looping, get current chunk to play */
-				if (channel->loop == 1){
+				if (channel->loop == 1)
 					chunkNum = channel->chunkNum;
-				}
 
 				base_offset = ch*8 + chunkNum*4;
 
@@ -109,27 +109,31 @@ void gaelco_gae1_device::sound_stream_update(sound_stream &stream, stream_sample
 				end_pos = (m_sndregs[base_offset + 2] << 8) - 1;
 
 				/* generates output data (range 0x00000..0xffff) */
-				if (type == 0x08){
-					/* PCM, 8 bits mono */
-					data = m_snd_data[bank + end_pos + m_sndregs[base_offset + 3]];
+				if (type == 0x08) /* PCM, 8 bits mono */
+				{
+					data = read_byte(bank + end_pos + m_sndregs[base_offset + 3]);
 					ch_data_l = m_volume_table[vol_l][data];
 					ch_data_r = m_volume_table[vol_r][data];
 
 					m_sndregs[base_offset + 3]--;
-				} else if (type == 0x0c){
-					/* PCM, 8 bits stereo */
-					data = m_snd_data[bank + end_pos + m_sndregs[base_offset + 3]];
+				}
+				else if (type == 0x0c) /* PCM, 8 bits stereo */
+				{
+					data = read_byte(bank + end_pos + m_sndregs[base_offset + 3]);
 					ch_data_l = m_volume_table[vol_l][data];
 
 					m_sndregs[base_offset + 3]--;
 
-					if (m_sndregs[base_offset + 3] > 0){
-						data = m_snd_data[bank + end_pos + m_sndregs[base_offset + 3]];
+					if (m_sndregs[base_offset + 3] > 0)
+					{
+						data = read_byte(bank + end_pos + m_sndregs[base_offset + 3]);
 						ch_data_r = m_volume_table[vol_r][data];
 
 						m_sndregs[base_offset + 3]--;
 					}
-				} else {
+				}
+				else
+				{
 					LOG_SOUND(("(GAE1) Playing unknown sample format in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", ch, type, bank, end_pos, m_sndregs[base_offset + 3]));
 					//channel->active = 0;
 					// play2000 expects these to expire, are they valid? this is unrelated to the missing sounds in touchgo which never hits here
@@ -137,16 +141,20 @@ void gaelco_gae1_device::sound_stream_update(sound_stream &stream, stream_sample
 				}
 
 				/* check if the current sample has finished playing */
-				if (m_sndregs[base_offset + 3] == 0){
-					if (channel->loop == 0){    /* if no looping, we're done */
+				if (m_sndregs[base_offset + 3] == 0)
+				{
+					if (channel->loop == 0)    /* if no looping, we're done */
+					{
 						channel->active = 0;
-					} else {                    /* if we're looping, swap chunks */
+					}
+					else                    /* if we're looping, swap chunks */
+					{
 						channel->chunkNum = (channel->chunkNum + 1) & 0x01;
 
 						/* if the length of the next chunk is 0, we're done */
-						if (m_sndregs[ch*8 + channel->chunkNum*4 + 3] == 0){
+						if (m_sndregs[ch*8 + channel->chunkNum*4 + 3] == 0)
 							channel->active = 0;
-						}
+
 					}
 				}
 			}
@@ -206,29 +214,33 @@ WRITE16_MEMBER( gaelco_gae1_device::gaelcosnd_w )
 
 	COMBINE_DATA(&m_sndregs[offset]);
 
-	switch(offset & 0x07){
+	switch(offset & 0x07)
+	{
 		case 0x03:
 			/* trigger sound */
-			if ((m_sndregs[offset - 1] != 0) && (data != 0)){
-				if (!channel->active){
+			if ((m_sndregs[offset - 1] != 0) && (data != 0))
+			{
+				if (!channel->active)
+				{
 					channel->active = 1;
 					channel->chunkNum = 0;
 					channel->loop = 0;
 					LOG_SOUND(("(GAE1) Playing sample channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", offset >> 3, (m_sndregs[offset - 2] >> 4) & 0x0f, m_sndregs[offset - 2] & 0x03, m_sndregs[offset - 1] << 8, data));
 				}
-			} else {
-				channel->active = 0;
 			}
+			else
+				channel->active = 0;
 
 			break;
 
 		case 0x07: /* enable/disable looping */
-			if ((m_sndregs[offset - 1] != 0) && (data != 0)){
+			if ((m_sndregs[offset - 1] != 0) && (data != 0))
+			{
 				LOG_SOUND(("(GAE1) Looping in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", offset >> 3, (m_sndregs[offset - 2] >> 4) & 0x0f, m_sndregs[offset - 2] & 0x03, m_sndregs[offset - 1] << 8, data));
 				channel->loop = 1;
-			} else {
-				channel->loop = 0;
 			}
+			else
+				channel->loop = 0;
 
 			break;
 	}
@@ -240,17 +252,16 @@ WRITE16_MEMBER( gaelco_gae1_device::gaelcosnd_w )
 
 void gaelco_gae1_device::device_start()
 {
-	m_stream = stream_alloc(0, 2, 8000);
+	u32 rate = clock() / 128;
+	m_stream = stream_alloc(0, 2, rate);
 
 	/* init volume table */
-	for (int vol = 0; vol < VOLUME_LEVELS; vol++){
-		for (int j = -128; j <= 127; j++){
+	for (int vol = 0; vol < VOLUME_LEVELS; vol++)
+		for (int j = -128; j <= 127; j++)
 			m_volume_table[vol][(j ^ 0x80) & 0xff] = (vol*j*256)/(VOLUME_LEVELS - 1);
-		}
-	}
 
 	if (LOG_WAVE)
-		wavraw = wav_open("gae1_snd.wav", 8000, 2);
+		wavraw = wav_open("gae1_snd.wav", rate, 2);
 }
 
 
@@ -259,6 +270,30 @@ void gaelco_gae1_device::device_stop()
 	if (wavraw)
 		wav_close(wavraw);
 	wavraw = nullptr;
+}
+
+
+void gaelco_gae1_device::device_post_load()
+{
+	device_clock_changed();
+}
+
+
+void gaelco_gae1_device::device_clock_changed()
+{
+	u32 rate = clock() / 128;
+	m_stream->set_sample_rate(rate);
+	if (wavraw)
+		wav_close(wavraw);
+
+	if (LOG_WAVE)
+		wavraw = wav_open("gae1_snd.wav", rate, 2);
+}
+
+
+void gaelco_gae1_device::rom_bank_updated()
+{
+	m_stream->update();
 }
 
 

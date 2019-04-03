@@ -200,6 +200,7 @@ public:
 
 	void set_ce(int mask, int state) {  m_ce_mask = mask; m_ce_state = state; }
 	void set_vrc_lines(int PRG_A, int PRG_B, int CHR) { m_vrc_ls_prg_a = PRG_A; m_vrc_ls_prg_b = PRG_B; m_vrc_ls_chr = CHR; }
+	void set_n163_vol(int vol) { m_n163_vol = vol; }
 	void set_x1_005_alt(bool val) { m_x1_005_alt_mirroring = val; }
 	void set_bus_conflict(bool val) { m_bus_conflict = val; }
 	uint8_t get_open_bus() { return m_open_bus; }
@@ -267,6 +268,7 @@ protected:
 	int m_vrc_ls_prg_a;
 	int m_vrc_ls_prg_b;
 	int m_vrc_ls_chr;
+	int m_n163_vol;
 
 	int m_mirroring;
 	bool m_pcb_ctrl_mirror, m_four_screen_vram, m_has_trainer;

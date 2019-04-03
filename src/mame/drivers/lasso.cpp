@@ -52,7 +52,7 @@ INPUT_CHANGED_MEMBER(lasso_state::coin_inserted)
 /* Write to the sound latch and generate an IRQ on the sound CPU */
 WRITE8_MEMBER(lasso_state::sound_command_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 

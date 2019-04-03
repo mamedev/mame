@@ -2,7 +2,7 @@
 // copyright-holders:Tomasz Slanina, Peter Ferrie,Stephane Humbert
 /***************************************************************************
 
- Arcade games (hacks of console games) running on SNES harware.
+ Arcade games (hacks of console games) running on SNES hardware.
 
  Driver (based on nss.cpp) by Tomasz Slanina  analog[at]op.pl
 

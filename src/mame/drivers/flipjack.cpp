@@ -262,7 +262,7 @@ WRITE8_MEMBER(flipjack_state::layer_w)
 
 WRITE8_MEMBER(flipjack_state::soundlatch_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	if (BIT(data, 7))
 		m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
