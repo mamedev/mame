@@ -3807,7 +3807,7 @@ void taitoz_state::dblaxle(machine_config &config)
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_palette("palette");
 	m_tc0480scp->set_offsets(0x1f, 0x08);
 	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
@@ -3879,7 +3879,7 @@ void taitoz_state::racingb(machine_config &config)
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_palette("palette");
 	m_tc0480scp->set_offsets(0x1f, 0x08);
 	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 

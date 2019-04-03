@@ -282,7 +282,7 @@ void groundfx_state::groundfx(machine_config &config)
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(4);
+	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x24, 0);
 	m_tc0480scp->set_offsets_tx(-1, 0);
 	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);

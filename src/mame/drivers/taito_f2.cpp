@@ -3242,7 +3242,7 @@ void taitof2_state::footchmp(machine_config &config)
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x1d + 3, 0x08);
 	m_tc0480scp->set_offsets_tx(-1, 0);
 	m_tc0480scp->set_offsets_flip(-1, 0);
@@ -3276,7 +3276,7 @@ void taitof2_state::hthero(machine_config &config)
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x33 + 3, -0x04);
 	m_tc0480scp->set_offsets_tx(-1, 0);
 	m_tc0480scp->set_offsets_flip(-1, 0);
@@ -3442,7 +3442,7 @@ void taitof2_state::metalb(machine_config &config)
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x32 + 3, -0x04);
 	m_tc0480scp->set_offsets_tx(1, 0);
 	m_tc0480scp->set_offsets_flip(-1, 0);
@@ -3513,7 +3513,7 @@ void taitof2_state::deadconx(machine_config &config)
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x1e + 3, 0x08);
 	m_tc0480scp->set_offsets_tx(-1, 0);
 	m_tc0480scp->set_offsets_flip(-1, 0);
@@ -3536,7 +3536,7 @@ void taitof2_state::deadconxj(machine_config &config)
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x34 + 3, -0x05);
 	m_tc0480scp->set_offsets_tx(-1, 0);
 	m_tc0480scp->set_offsets_flip(-1, 0);
