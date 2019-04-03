@@ -512,8 +512,7 @@ void pturn_state::machine_start()
 
 void pturn_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	m_soundlatch->clear_w(space,0,0);
+	m_soundlatch->clear_w();
 	m_nmi_sub = false;
 }
 

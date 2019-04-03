@@ -301,7 +301,7 @@ void tms1k_base_device::read_opcode()
 {
 	debugger_instruction_hook(m_rom_address);
 	m_opcode = m_program->read_byte(m_rom_address);
-	m_c4 = bitswap<8>(m_opcode,7,6,5,4,0,1,2,3) & 0xf; // opcode operand is bitswapped for most opcodes
+	m_c4 = bitswap<4>(m_opcode,0,1,2,3); // opcode operand is bitswapped for most opcodes
 
 	m_fixed = m_fixed_decode[m_opcode];
 	m_micro = m_micro_decode[m_opcode];

@@ -242,10 +242,10 @@ READ8_MEMBER(atetris_mcu_state::mcu_bus_r)
 	switch (m_mcu->p2_r() & 0xf0)
 	{
 	case 0x40:
-		return m_soundlatch[1]->read(space, 0);
+		return m_soundlatch[1]->read();
 
 	case 0xf0:
-		return m_soundlatch[0]->read(space, 0);
+		return m_soundlatch[0]->read();
 
 	default:
 		return 0xff;
@@ -261,8 +261,8 @@ WRITE8_MEMBER(atetris_mcu_state::mcu_p2_w)
 WRITE8_MEMBER(atetris_mcu_state::mcu_reg_w)
 {
 	// FIXME: a lot of sound writes seem to get lost this way; why doesn't that hurt?
-	m_soundlatch[0]->write(space, 0, offset | 0x20);
-	m_soundlatch[1]->write(space, 0, data);
+	m_soundlatch[0]->write(offset | 0x20);
+	m_soundlatch[1]->write(data);
 }
 
 

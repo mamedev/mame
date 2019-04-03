@@ -279,7 +279,7 @@ private:
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
-	void memmap_setoffset(address_map &map);
+	void memmap_setaddress(address_map &map);
 };
 
 /*
@@ -291,9 +291,9 @@ void geneve_state::memmap(address_map &map)
 	map(0x0000, 0xffff).rw(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::readm), FUNC(bus::ti99::internal::geneve_mapper_device::writem));
 }
 
-void geneve_state::memmap_setoffset(address_map &map)
+void geneve_state::memmap_setaddress(address_map &map)
 {
-	map(0x0000, 0xffff).r(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::setoffset));
+	map(0x0000, 0xffff).w(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::setaddress));
 }
 
 /*
@@ -729,7 +729,7 @@ void geneve_state::geneve_common(machine_config &config)
 	TMS9995(config, m_cpu, 12000000);
 	m_cpu->set_addrmap(AS_PROGRAM, &geneve_state::memmap);
 	m_cpu->set_addrmap(AS_IO, &geneve_state::crumap);
-	m_cpu->set_addrmap(tms9995_device::AS_SETOFFSET, &geneve_state::memmap_setoffset);
+	m_cpu->set_addrmap(tms9995_device::AS_SETADDRESS, &geneve_state::memmap_setaddress);
 	m_cpu->extop_cb().set(FUNC(geneve_state::external_operation));
 	m_cpu->clkout_cb().set(FUNC(geneve_state::clock_out));
 	m_cpu->dbin_cb().set(FUNC(geneve_state::dbin_line));

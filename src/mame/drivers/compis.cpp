@@ -199,7 +199,7 @@ READ16_MEMBER( compis_state::pcs6_2_3_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return m_mpsc->inta_r(space, 0);
+		return m_mpsc->inta_r();
 	}
 	else
 	{
@@ -222,7 +222,7 @@ READ16_MEMBER( compis_state::pcs6_4_5_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return m_mpsc->cd_ba_r(space, offset & 0x03);
+		return m_mpsc->cd_ba_r(offset & 0x03);
 	}
 	else
 	{
@@ -237,7 +237,7 @@ WRITE16_MEMBER( compis_state::pcs6_4_5_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_mpsc->cd_ba_w(space, offset & 0x03, data);
+		m_mpsc->cd_ba_w(offset & 0x03, data);
 	}
 	else
 	{
@@ -734,7 +734,7 @@ void compis_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( compis )
+//  machine_config( compis )
 //-------------------------------------------------
 
 void compis_state::compis(machine_config &config)
@@ -829,7 +829,7 @@ void compis_state::compis(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( compis2 )
+//  machine_config( compis2 )
 //-------------------------------------------------
 
 void compis_state::compis2(machine_config &config)

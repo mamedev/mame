@@ -780,7 +780,7 @@ void crvision_state::creativision(machine_config &config)
 }
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( ntsc )
+    machine_config( ntsc )
 -------------------------------------------------*/
 
 void crvision_state::ntsc(machine_config &config)
@@ -795,7 +795,7 @@ void crvision_state::ntsc(machine_config &config)
 }
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( pal )
+    machine_config( pal )
 -------------------------------------------------*/
 
 void crvision_pal_state::pal(machine_config &config)
@@ -810,7 +810,7 @@ void crvision_pal_state::pal(machine_config &config)
 }
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( lasr2001 )
+    machine_config( lasr2001 )
 -------------------------------------------------*/
 
 void laser2001_state::lasr2001(machine_config &config)

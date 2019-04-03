@@ -60,17 +60,17 @@ WRITE8_MEMBER(shootout_state::bankswitch_w)
 
 READ8_MEMBER(shootout_state::sound_cpu_command_r)
 {
-	m_audiocpu->set_input_line (INPUT_LINE_NMI, CLEAR_LINE);
-	return (m_soundlatch->read (space, 0));
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	return m_soundlatch->read();
 }
 
 WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
 {
-	m_soundlatch->write( space, offset, data );
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	// Allow the other CPU to reply. This fixes the missing music on the title screen (parent set).
-	m_maincpu->spin_until_time (attotime :: from_usec (200));
+	m_maincpu->spin_until_time(attotime::from_usec(200));
 }
 
 WRITE8_MEMBER(shootout_state::flipscreen_w)

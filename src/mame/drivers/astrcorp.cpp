@@ -544,26 +544,26 @@ TODO: understand if later hardware uses different parameters (XTAL is almost sur
 #define ASTROCORP_VBEND 0
 #define ASTROCORP_VBSTART 240
 
-MACHINE_CONFIG_START(astrocorp_state::showhand)
-
+void astrocorp_state::showhand(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(showhand_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", astrocorp_state,  irq4_line_hold)
+	M68000(config, m_maincpu, XTAL(20'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrocorp_state::showhand_map);
+	m_maincpu->set_vblank_int("screen", FUNC(astrocorp_state::irq4_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_data(showhand_default_eeprom, sizeof(showhand_default_eeprom));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(58.846)    // measured on pcb
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-//  MCFG_SCREEN_SIZE(320, 240)
-//  MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_RAW_PARAMS(ASTROCORP_PIXEL_CLOCK,ASTROCORP_HTOTAL,ASTROCORP_HBEND,320,ASTROCORP_VTOTAL,ASTROCORP_VBEND,ASTROCORP_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(astrocorp_state, screen_update_astrocorp)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//  m_screen->set_refresh_hz(58.846);    // measured on pcb
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+//  m_screen->set_size(320, 240);
+//  m_screen->set_visarea_full();
+	m_screen->set_raw(ASTROCORP_PIXEL_CLOCK,ASTROCORP_HTOTAL,ASTROCORP_HBEND,320,ASTROCORP_VTOTAL,ASTROCORP_VBEND,ASTROCORP_VBSTART);
+	m_screen->set_screen_update(FUNC(astrocorp_state::screen_update_astrocorp));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_astrocorp);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_565, 0x100);
@@ -571,16 +571,15 @@ MACHINE_CONFIG_START(astrocorp_state::showhand)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000)/20, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(20'000'000)/20, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(astrocorp_state::showhanc)
+void astrocorp_state::showhanc(machine_config &config)
+{
 	showhand(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(showhanc_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrocorp_state::showhanc_map);
+}
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(astrocorp_state::skilldrp_scanline)
@@ -594,11 +593,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(astrocorp_state::skilldrp_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(astrocorp_state::skilldrp)
-
+void astrocorp_state::skilldrp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2) // JX-1689F1028N GRX586.V5
-	MCFG_DEVICE_PROGRAM_MAP(skilldrp_map)
+	M68000(config, m_maincpu, XTAL(24'000'000) / 2); // JX-1689F1028N GRX586.V5
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrocorp_state::skilldrp_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(astrocorp_state::skilldrp_scanline), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -608,14 +607,14 @@ MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW );
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(58.846)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-//  MCFG_SCREEN_SIZE(0x200, 0x100)
-//  MCFG_SCREEN_VISIBLE_AREA(0, 0x200-1, 0, 0xf0-1)
-	MCFG_SCREEN_RAW_PARAMS(ASTROCORP_PIXEL_CLOCK,ASTROCORP_HTOTAL,ASTROCORP_HBEND,512,ASTROCORP_VTOTAL,ASTROCORP_VBEND,ASTROCORP_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(astrocorp_state, screen_update_astrocorp)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//  m_screen->set_refresh_hz(58.846);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+//  m_screen->set_size(0x200, 0x100);
+//  m_screen->set_visarea(0, 0x200-1, 0, 0xf0-1);
+	m_screen->set_raw(ASTROCORP_PIXEL_CLOCK,ASTROCORP_HTOTAL,ASTROCORP_HBEND,512,ASTROCORP_VTOTAL,ASTROCORP_VBEND,ASTROCORP_VBSTART);
+	m_screen->set_screen_update(FUNC(astrocorp_state::screen_update_astrocorp));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_astrocorp);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_565, 0x100);
@@ -623,16 +622,15 @@ MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(24'000'000)/24, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(24'000'000)/24, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(astrocorp_state::speeddrp)
+void astrocorp_state::speeddrp(machine_config &config)
+{
 	skilldrp(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(speeddrp_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrocorp_state::speeddrp_map);
+}
 
 
 /***************************************************************************

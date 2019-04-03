@@ -322,27 +322,27 @@ void aceal_state::machine_reset()
 		elem = 0;
 }
 
-MACHINE_CONFIG_START(aceal_state::ace)
-
+void aceal_state::ace(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, MASTER_CLOCK/9) /* 2 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	I8080(config, m_maincpu, MASTER_CLOCK/9); /* 2 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &aceal_state::main_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(4*8, 32*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(aceal_state, screen_update_ace)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(4*8, 32*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(aceal_state::screen_update_ace));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ace);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	/* ???? */
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

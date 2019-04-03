@@ -191,6 +191,12 @@ public:
 		return format_element(ptype_traits<T *>::size_spec(), ptype_traits<T *>::fmt_spec(), ptype_traits<T *>::cast(x));
 	}
 
+	template<typename X, typename Y, typename... Args>
+	pfmt &operator()(X&& x, Y && y, Args&&... args)
+	{
+		return ((*this)(std::forward<X>(x)))(std::forward<Y>(y), std::forward<Args>(args)...);
+	}
+
 	template<typename T>
 	pfmt &x(const T &x)
 	{

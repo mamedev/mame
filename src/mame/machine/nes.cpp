@@ -190,16 +190,3 @@ void nes_state::init_famicom()
 	space.install_write_handler(0x4016, 0x4016, write8_delegate(FUNC(nes_state::fc_in0_w), this));
 	space.install_read_handler(0x4017, 0x4017, read8_delegate(FUNC(nes_state::fc_in1_r), this));
 }
-
-NESCTRL_BRIGHTPIXEL_CB(nes_state::bright_pixel)
-{
-	// get the pixel at the gun position
-	rgb_t pix = m_ppu->get_pixel(x, y);
-
-	// check if the cursor is over a bright pixel
-	// FIXME: still a gross hack
-	if (pix.r() == 0xff && pix.b() == 0xff && pix.g() > 0x90)
-		return true;
-	else
-		return false;
-}

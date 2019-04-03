@@ -2345,6 +2345,19 @@
 		</part>
 	</software>
 
+	<software name="dfs09h" cloneof="dnfs120">
+		<description>Acorn DFS 0.9H (Torch)</description>
+		<year>1983</year>
+		<publisher>Acorn</publisher>
+		<info name="usage" value="Requires Acorn 8271 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Acorn-DFS-0.9H.rom" size="8192" crc="ff2ad94f" sha1="a5548f339e31382898ff4fa74e2a806f18bac5b9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dnfs100" cloneof="dnfs120">
 		<description>Acorn DNFS 1.00</description>
 		<year>198?</year>
@@ -5839,12 +5852,23 @@
 	</software>
 
 	<software name="satpic3" supported="no">
-		<description>SatPic 3.0</description>
+		<description>SatPic 3.0 (Timestep)</description>
 		<year>1986</year>
+		<publisher>Timestep</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="SatPic-3.00-Timestep.rom" size="8192" crc="4af48cc2" sha1="ddbdea821582a205873b11968948a2007d0aad18" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="satpic3c" cloneof="satpic3" supported="no">
+		<description>SatPic 3.0 (Cirkit)</description>
+		<year>1987</year>
 		<publisher>Cirkit</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="SatPic-3.00.rom" size="8192" crc="4af48cc2" sha1="ddbdea821582a205873b11968948a2007d0aad18" offset="0"/>
+				<rom name="SatPic-3.00-Cirkit.rom" size="8192" crc="1488ef0e" sha1="6c77d3cb41d74f72c4169a73dd886f9520e373ec" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

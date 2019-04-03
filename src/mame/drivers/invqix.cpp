@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-    invqix.c
+    invqix.cpp
 
 Space Invaders / Qix Silver Anniversary Edition
 Taito/Namco America inc.

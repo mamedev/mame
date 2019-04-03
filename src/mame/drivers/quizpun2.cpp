@@ -326,7 +326,7 @@ WRITE8_MEMBER(quizpun2_state::irq_ack)
 
 WRITE8_MEMBER(quizpun2_state::soundlatch_w)
 {
-	m_soundlatch->write(space, 0, data ^ 0x80);
+	m_soundlatch->write(data ^ 0x80);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 

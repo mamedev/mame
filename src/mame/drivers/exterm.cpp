@@ -174,8 +174,8 @@ WRITE16_MEMBER(exterm_state::output_port_0_w)
 WRITE8_MEMBER(exterm_state::sound_latch_w)
 {
 	// data is latched independently for both sound CPUs
-	m_soundlatch[0]->write(space, 0, data);
-	m_soundlatch[1]->write(space, 0, data);
+	m_soundlatch[0]->write(data);
+	m_soundlatch[1]->write(data);
 }
 
 

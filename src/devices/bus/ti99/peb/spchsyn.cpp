@@ -67,7 +67,7 @@ READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 		// lines by setting the address bus to a different value, but the
 		// Geneve may behave differently. This may not 100% reflect the real
 		// situation, but it ensures a safe processing.
-		m_vsp->combined_rsq_wsq_w(machine().dummy_space(), 0, ~0);
+		m_vsp->combined_rsq_wsq_w(~0);
 	}
 }
 
@@ -106,11 +106,11 @@ SETADDRESS_DBIN_MEMBER( ti_speech_synthesizer_device::setaddress_dbin )
 		// both RS* and WS* are active, which is illegal.
 		// Alternatively, we'll use the combined settings method
 
-		m_vsp->combined_rsq_wsq_w(machine().dummy_space(), 0, m_reading ? ~tms5220_device::RS : ~tms5220_device::WS);
+		m_vsp->combined_rsq_wsq_w(m_reading ? ~tms5220_device::RS : ~tms5220_device::WS);
 	}
 	else
 		// If other address, turn off RS* and WS* (negative logic!)
-		m_vsp->combined_rsq_wsq_w(machine().dummy_space(), 0, ~0);
+		m_vsp->combined_rsq_wsq_w(~0);
 }
 
 /****************************************************************************/
@@ -125,7 +125,7 @@ WRITE_LINE_MEMBER( ti_speech_synthesizer_device::speech_ready )
 
 	if ((state==0) && !m_reading)
 		// Clear the lines only when we are done with writing.
-		m_vsp->combined_rsq_wsq_w(machine().dummy_space(), 0, ~0);
+		m_vsp->combined_rsq_wsq_w(~0);
 }
 
 void ti_speech_synthesizer_device::device_start()

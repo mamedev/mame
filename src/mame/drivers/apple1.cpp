@@ -595,14 +595,14 @@ static void apple1_cards(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(apple1_state::apple1)
-	MCFG_DEVICE_ADD(m_maincpu, M6502, 960000)        // effective CPU speed
-	MCFG_DEVICE_PROGRAM_MAP(apple1_map)
+	M6502(config, m_maincpu, 960000);        // effective CPU speed
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple1_state::apple1_map);
 
 	// video timings are identical to the Apple II, unsurprisingly
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181), (65*7)*2, 0, (40*7)*2, 262, 0, 192)
-	MCFG_SCREEN_UPDATE_DRIVER(apple1_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(14'318'181), (65*7)*2, 0, (40*7)*2, 262, 0, 192);
+	m_screen->set_screen_update(FUNC(apple1_state::screen_update));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 

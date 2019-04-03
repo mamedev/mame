@@ -678,10 +678,10 @@ void calchase_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(calchase_state::calchase)
-	MCFG_DEVICE_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
-	MCFG_DEVICE_PROGRAM_MAP(calchase_map)
-	MCFG_DEVICE_IO_MAP(calchase_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	PENTIUM(config, m_maincpu, 133000000); // Cyrix 686MX-PR200 CPU
+	m_maincpu->set_addrmap(AS_PROGRAM, &calchase_state::calchase_map);
+	m_maincpu->set_addrmap(AS_IO, &calchase_state::calchase_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
@@ -710,10 +710,10 @@ MACHINE_CONFIG_START(calchase_state::calchase)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(calchase_state::hostinv)
-	MCFG_DEVICE_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
-	MCFG_DEVICE_PROGRAM_MAP(calchase_map)
-	MCFG_DEVICE_IO_MAP(calchase_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	PENTIUM(config, m_maincpu, 133000000); // Cyrix 686MX-PR200 CPU
+	m_maincpu->set_addrmap(AS_PROGRAM, &calchase_state::calchase_map);
+	m_maincpu->set_addrmap(AS_IO, &calchase_state::calchase_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 

@@ -254,7 +254,7 @@ GFXDECODE_END
 
 void pirates_state::pirates(machine_config &config)
 {
-	M68000(config, m_maincpu, 16000000); /* 16mhz */
+	M68000(config, m_maincpu, 32_MHz_XTAL / 2); // 16MHz verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &pirates_state::pirates_map);
 	m_maincpu->set_vblank_int("screen", FUNC(pirates_state::irq1_line_hold));
 
@@ -274,10 +274,8 @@ void pirates_state::pirates(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, 1333333, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);
+	OKIM6295(config, m_oki, 24_MHz_XTAL / 18, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0); // 1.3333333MHz verified on PCB
 }
-
-
 
 
 /* Rom Loading */
@@ -325,27 +323,25 @@ ROM_START( piratesb )
 ROM_END
 
 
-
-
 ROM_START( genix )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code (encrypted) */
-	ROM_LOAD16_BYTE( "1.15",  0x00000, 0x80000, CRC(d26abfb0) SHA1(4a89ba7504f86cb612796c376f359ab61ec3d902) )
-	ROM_LOAD16_BYTE( "2.16",  0x00001, 0x80000, CRC(a14a25b4) SHA1(9fa64c6514bdee56b5654b001f8367283b461e8a) )
+	ROM_LOAD16_BYTE( "11.u15.15c",  0x00000, 0x80000, CRC(d26abfb0) SHA1(4a89ba7504f86cb612796c376f359ab61ec3d902) )
+	ROM_LOAD16_BYTE( "12.u16.16c",  0x00001, 0x80000, CRC(a14a25b4) SHA1(9fa64c6514bdee56b5654b001f8367283b461e8a) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* GFX (encrypted) */
-	ROM_LOAD( "7.34", 0x000000, 0x040000, CRC(58da8aac) SHA1(bfc8449ba842f8ceac62ebdf6005d8f19d96afa6) )
-	ROM_LOAD( "9.35", 0x080000, 0x040000, CRC(96bad9a8) SHA1(4e757cca0ab157f0c935087c9702c88741bf7a79) )
-	ROM_LOAD( "8.48", 0x100000, 0x040000, CRC(0ddc58b6) SHA1(d52437607695ddebfe8494fd214efd20ba72d549) )
-	ROM_LOAD( "10.49",0x180000, 0x040000, CRC(2be308c5) SHA1(22fc0991557643c22f6763f186b74900a33a39e0) )
+	ROM_LOAD( "17.u34.12g", 0x000000, 0x040000, CRC(58da8aac) SHA1(bfc8449ba842f8ceac62ebdf6005d8f19d96afa6) )
+	ROM_LOAD( "19.u35.12h", 0x080000, 0x040000, CRC(96bad9a8) SHA1(4e757cca0ab157f0c935087c9702c88741bf7a79) )
+	ROM_LOAD( "18.u48.13g", 0x100000, 0x040000, CRC(0ddc58b6) SHA1(d52437607695ddebfe8494fd214efd20ba72d549) )
+	ROM_LOAD( "20.u49.13h", 0x180000, 0x040000, CRC(2be308c5) SHA1(22fc0991557643c22f6763f186b74900a33a39e0) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) /* GFX (encrypted) */
-	ROM_LOAD( "6.69", 0x000000, 0x040000, CRC(b8422af7) SHA1(d3290fc6ea2670c445731e2b493205874dc4b319) )
-	ROM_LOAD( "5.70", 0x080000, 0x040000, CRC(e46125c5) SHA1(73d9a51f30a9c1a8397145d2a4397696ef37f4e5) )
-	ROM_LOAD( "4.71", 0x100000, 0x040000, CRC(7a8ed21b) SHA1(f380156c44de2fc316f390adee09b6a3cd404dec) )
-	ROM_LOAD( "3.72", 0x180000, 0x040000, CRC(f78bd6ca) SHA1(c70857b8053f9a6e3e15bbc9f7d13354b0966b30) )
+	ROM_LOAD( "16.u69.6g", 0x000000, 0x040000, CRC(b8422af7) SHA1(d3290fc6ea2670c445731e2b493205874dc4b319) )
+	ROM_LOAD( "15.u70.4g", 0x080000, 0x040000, CRC(e46125c5) SHA1(73d9a51f30a9c1a8397145d2a4397696ef37f4e5) )
+	ROM_LOAD( "14.u71.3g", 0x100000, 0x040000, CRC(7a8ed21b) SHA1(f380156c44de2fc316f390adee09b6a3cd404dec) )
+	ROM_LOAD( "13.u72.1g", 0x180000, 0x040000, CRC(f78bd6ca) SHA1(c70857b8053f9a6e3e15bbc9f7d13354b0966b30) )
 
 	ROM_REGION( 0x080000, "oki", 0) /* OKI samples (encrypted) */
-	ROM_LOAD( "0.31", 0x000000, 0x080000, CRC(80d087bc) SHA1(04d1aacc273c7ffa57b48bd043d55b5b3d993f74) )
+	ROM_LOAD( "10.u31.1b", 0x000000, 0x080000, CRC(80d087bc) SHA1(04d1aacc273c7ffa57b48bd043d55b5b3d993f74) )
 ROM_END
 
 /* Init */

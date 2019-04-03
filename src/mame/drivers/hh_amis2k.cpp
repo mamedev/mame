@@ -295,8 +295,8 @@ void wildfire_state::speaker_update()
 TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::speaker_decay_sim)
 {
 	// volume decays when speaker is off (divisor and timer period determine duration)
-	m_speaker_volume /= 1.001;
 	speaker_update();
+	m_speaker_volume /= 1.0025;
 }
 
 void wildfire_state::prepare_display()

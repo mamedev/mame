@@ -143,7 +143,7 @@ uint16_t wangpc_mcc_device::wangpcbus_iorc_r(offs_t offset, uint16_t mem_mask)
 		case 0x06/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				data = 0xff00 | m_sio->cd_ba_r(machine().dummy_space(), offset >> 1);
+				data = 0xff00 | m_sio->cd_ba_r(offset >> 1);
 			}
 			break;
 
@@ -153,7 +153,7 @@ uint16_t wangpc_mcc_device::wangpcbus_iorc_r(offs_t offset, uint16_t mem_mask)
 		case 0x0e/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				data = 0xff00 | m_dart->cd_ba_r(machine().dummy_space(), offset >> 1);
+				data = 0xff00 | m_dart->cd_ba_r(offset >> 1);
 			}
 			break;
 
@@ -208,14 +208,14 @@ void wangpc_mcc_device::wangpcbus_aiowc_w(offs_t offset, uint16_t mem_mask, uint
 		case 0x02/2:
 		case 0x04/2:
 		case 0x06/2:
-			m_sio->cd_ba_w(machine().dummy_space(), offset >> 1, data & 0xff);
+			m_sio->cd_ba_w(offset >> 1, data & 0xff);
 			break;
 
 		case 0x08/2:
 		case 0x0a/2:
 		case 0x0c/2:
 		case 0x0e/2:
-			m_dart->cd_ba_w(machine().dummy_space(), offset >> 1, data & 0xff);
+			m_dart->cd_ba_w(offset >> 1, data & 0xff);
 			break;
 
 		case 0x12/2:

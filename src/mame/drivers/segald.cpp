@@ -396,7 +396,7 @@ MACHINE_CONFIG_START(segald_state::astron)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segald);
 	PALETTE(config, m_palette).set_entries(256);
 
-	/* sound hardare */
+	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END

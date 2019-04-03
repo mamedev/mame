@@ -491,27 +491,27 @@ void boxer_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(boxer_state::boxer)
-
+void boxer_state::boxer(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16)
-	MCFG_DEVICE_PROGRAM_MAP(boxer_map)
+	M6502(config, m_maincpu, MASTER_CLOCK / 16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &boxer_state::boxer_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 262)
-	MCFG_SCREEN_VISIBLE_AREA(8, 247, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(boxer_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 262);
+	m_screen->set_visarea(8, 247, 0, 239);
+	m_screen->set_screen_update(FUNC(boxer_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_boxer);
 	PALETTE(config, m_palette, FUNC(boxer_state::boxer_palette), 4);
 
 	/* sound hardware */
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

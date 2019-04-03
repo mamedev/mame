@@ -139,7 +139,7 @@ WRITE8_MEMBER(lwings_state::avengers_protection_w)
 	else if (pc == 0x0445)
 	{
 		m_soundstate = 0x80;
-		m_soundlatch->write(space, 0, data);
+		m_soundlatch->write(data);
 	}
 }
 
@@ -1766,7 +1766,7 @@ ROM_END
 void lwings_state::init_avengersb()
 {
 	/* set up protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf80c, 0xf80c, write8_delegate(FUNC(generic_latch_8_device::write), (generic_latch_8_device*)m_soundlatch));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf80c, 0xf80c, write8smo_delegate(FUNC(generic_latch_8_device::write), (generic_latch_8_device*)m_soundlatch));
 }
 
 

@@ -71,7 +71,7 @@ WRITE8_MEMBER(cbasebal_state::bankedram_w)
 		break;
 	case 1:
 		if (offset < 0x800)
-			m_palette->write8(space, offset, data);
+			m_palette->write8(offset, data);
 		break;
 	default:
 		cbasebal_scrollram_w(space, offset, data);
@@ -261,26 +261,26 @@ void cbasebal_state::machine_reset()
 	m_scroll_y[1] = 0;
 }
 
-MACHINE_CONFIG_START(cbasebal_state::cbasebal)
-
+void cbasebal_state::cbasebal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 6000000)   /* ??? */
-	MCFG_DEVICE_PROGRAM_MAP(cbasebal_map)
-	MCFG_DEVICE_IO_MAP(cbasebal_portmap)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cbasebal_state,  irq0_line_hold)   /* ??? */
+	Z80(config, m_maincpu, 6000000);   /* ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cbasebal_state::cbasebal_map);
+	m_maincpu->set_addrmap(AS_IO, &cbasebal_state::cbasebal_portmap);
+	m_maincpu->set_addrmap(AS_OPCODES, &cbasebal_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cbasebal_state::irq0_line_hold));   /* ??? */
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(cbasebal_state, screen_update_cbasebal)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
+	screen.set_screen_update(FUNC(cbasebal_state::screen_update_cbasebal));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cbasebal);
 
@@ -289,12 +289,10 @@ MACHINE_CONFIG_START(cbasebal_state::cbasebal)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM2413(config, "ymsnd", 3579545).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

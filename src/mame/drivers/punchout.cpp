@@ -118,7 +118,6 @@ DIP locations verified for:
 #include "includes/punchout.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/m6502/n2a03.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
@@ -668,9 +667,8 @@ void punchout_state::punchout(machine_config &config)
 	bottom.set_palette(m_palette);
 
 	/* sound hardware */
-	// FIXME: this makes no sense - "lspeaker" on left and "mono" on right, with nothing routed to "mono"
 	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "mono").front_right();
+	SPEAKER(config, "rspeaker").front_right();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 	GENERIC_LATCH_8(config, "soundlatch2");
@@ -678,6 +676,7 @@ void punchout_state::punchout(machine_config &config)
 	VLM5030(config, m_vlm, N2A03_NTSC_XTAL/6);
 	m_vlm->set_addrmap(0, &punchout_state::punchout_vlm_map);
 	m_vlm->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 }
 
 

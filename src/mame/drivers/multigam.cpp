@@ -143,7 +143,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<n2a03_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 	required_ioport m_p1;
 	required_ioport m_p2;
@@ -1228,6 +1228,7 @@ void multigam_state::multigam(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void multigam_state::multigm3(machine_config &config)

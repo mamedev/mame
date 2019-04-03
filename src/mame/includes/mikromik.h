@@ -10,6 +10,7 @@
 #include "formats/mm_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/am9517a.h"
+#include "machine/bankdev.h"
 #include "machine/i8212.h"
 #include "machine/mm1kb.h"
 #include "machine/pit8253.h"
@@ -40,6 +41,7 @@ public:
 	mm1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, I8085A_TAG),
+		m_io(*this, "io"),
 		m_iop(*this, I8212_TAG),
 		m_dmac(*this, I8237_TAG),
 		m_pit(*this, I8253_TAG),
@@ -76,6 +78,7 @@ protected:
 
 private:
 	required_device<i8085a_cpu_device> m_maincpu;
+	required_device<address_map_bank_device> m_io;
 	required_device<i8212_device> m_iop;
 	required_device<am9517a_device> m_dmac;
 	required_device<pit8253_device> m_pit;
@@ -116,7 +119,14 @@ private:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( ls259_w );
+	DECLARE_WRITE_LINE_MEMBER( a8_w );
+	DECLARE_WRITE_LINE_MEMBER( recall_w );
+	DECLARE_WRITE_LINE_MEMBER( rx21_w );
+	DECLARE_WRITE_LINE_MEMBER( tx21_w );
+	DECLARE_WRITE_LINE_MEMBER( rcl_w );
+	DECLARE_WRITE_LINE_MEMBER( intc_w );
+	DECLARE_WRITE_LINE_MEMBER( llen_w );
+	DECLARE_WRITE_LINE_MEMBER( motor_on_w );
 	DECLARE_WRITE_LINE_MEMBER( dma_hrq_w );
 	DECLARE_READ8_MEMBER( mpsc_dack_r );
 	DECLARE_WRITE8_MEMBER( mpsc_dack_w );
@@ -136,6 +146,7 @@ private:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	void mm1_palette(palette_device &palette) const;
 	void mm1_map(address_map &map);
+	void mmu_io_map(address_map &map);
 	void mm1_upd7220_map(address_map &map);
 };
 
