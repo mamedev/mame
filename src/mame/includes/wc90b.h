@@ -99,7 +99,8 @@ class eurogael_state : public wc90b_state
 {
 public:
 	eurogael_state(const machine_config &mconfig, device_type type, const char *tag) :
-		wc90b_state(mconfig, type, tag)
+		wc90b_state(mconfig, type, tag),
+		m_bgscroll(*this, "bgscroll")
 	{ }
 
 	void eurogael(machine_config &config);
@@ -110,6 +111,7 @@ protected:
 
 private:
 	DECLARE_WRITE8_MEMBER(master_irq_ack_w);
+	required_shared_ptr<uint8_t> m_bgscroll;
 
 	void map1(address_map &map);
 };

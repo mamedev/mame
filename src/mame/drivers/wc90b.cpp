@@ -202,22 +202,17 @@ void eurogael_state::map1(address_map &map)
 	map(0x8000, 0x9fff).ram(); /* Main RAM */
 	map(0xa000, 0xafff).ram().w(FUNC(wc90b_state::fgvideoram_w)).share("fgvideoram");
 	map(0xc000, 0xcfff).ram().w(FUNC(wc90b_state::bgvideoram_w)).share("bgvideoram");
+	map(0xd000, 0xdfff).ram().share("bgscroll");; // there are a bunch of read / write accesses in here (is it meant to mirror the bgram? - bg scroll regs are at df00 - df03
 	map(0xe000, 0xefff).ram().w(FUNC(wc90b_state::txvideoram_w)).share("txvideoram");
 	map(0xf000, 0xf7ff).bankr("mainbank");
 	map(0xf800, 0xfbff).ram().share("share1");
 	map(0xfc00, 0xfc00).w(FUNC(wc90b_state::bankswitch_w));
-	map(0xfd0e, 0xfd0e).w(FUNC(wc90b_state::sound_command_w));
-//  some values are still written here, but the code mods seems to suggest that scroll is now at the end of vram
-//	map(0xfd04, 0xfd04).writeonly().share("scroll1y");
-//	map(0xfd06, 0xfd06).writeonly().share("scroll1x");
-//	map(0xfd08, 0xfd08).writeonly().share("scroll2y");
-//	map(0xfd0a, 0xfd0a).writeonly().share("scroll2x");
-//	map(0xfd0e, 0xfd0e).writeonly().share("scroll_x_lo");
 	map(0xfd00, 0xfd00).portr("P1");
 	map(0xfd02, 0xfd02).portr("P2");
 	map(0xfd06, 0xfd06).portr("DSW1");
 	map(0xfd08, 0xfd08).portr("DSW2");
 	map(0xfd0c, 0xfd0c).w(FUNC(eurogael_state::master_irq_ack_w));
+	map(0xfd0e, 0xfd0e).w(FUNC(wc90b_state::sound_command_w));
 }
 
 
@@ -680,5 +675,5 @@ GAME( 1989, twcup90ba, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bo
 GAME( 1989, twcup90b2, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bootleg", "Worldcup '90 (hack)",                                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, twcup90bb, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bootleg", "World Cup '90 (European hack, different title)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
  // not sure if it best fits here, in wc90.cpp, or in a new driver, it shares the weird tile decoding with the bootlegs tho
-GAME( 1989, eurogael,  twcup90, eurogael, wc90b, eurogael_state, init_wc90b, ROT0, "bootleg (Gaelco / Ervisa)", "Euro League (Gaelco bootleg, Modular System)", MACHINE_NOT_WORKING )
+GAME( 1989, eurogael,  twcup90, eurogael, wc90b, eurogael_state, init_wc90b, ROT0, "bootleg (Gaelco / Ervisa)", "Euro League (Gaelco bootleg, Modular System)", MACHINE_IMPERFECT_SOUND )
 

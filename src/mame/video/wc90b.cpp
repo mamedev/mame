@@ -172,7 +172,7 @@ void eurogael_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			int sy = 240 - m_spriteram[offs + 1];
 
 			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, tilehigh,
-					(flags & 0x7) | 8, /* color */
+					(flags & 0x7) | 8, /* color - palettes 0x0 - 0x7 never written? */
 					attr & 4,   /* flipx */
 					attr & 8,   /* flipy */
 					sx,
@@ -186,12 +186,10 @@ uint32_t eurogael_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	// the code to write / clear tilemaps for fb and tx layers has been specifically modified to avoid writing to the last 4 bytes
 	// and the game instead writes scroll values there instead, there is no code to copy from there, so it looks like these are the scroll regs
 	
-	// this setup scrolls the background away on the high score table tho, and bg after inserting a coin won't scroll
-	// is it correct or is the bg still using something from the old scroll regs?
 	int fg_scrollx = ((m_fgvideoram[0xffc]) | (m_fgvideoram[0xffd]<<8)) + 33;
 	int fg_scrolly = ((m_fgvideoram[0xffe]) | (m_fgvideoram[0xfff]<<8)) + 1;
-	int bg_scrollx = fg_scrollx; // assume same scroll as fg? (maybe not, see note above)
-	int bg_scrolly = fg_scrolly;
+	int bg_scrollx = ((m_bgscroll[0xf00]) | (m_bgscroll[0xf01]<<8)) + 33;
+	int bg_scrolly = ((m_bgscroll[0xf02]) | (m_bgscroll[0xf03]<<8)) + 1;
 	int tx_scrollx = ((m_txvideoram[0xffc]) | (m_txvideoram[0xffd]<<8)) + 33;
 	int tx_scrolly = ((m_txvideoram[0xffe]) | (m_txvideoram[0xfff]<<8)) + 1;
 
