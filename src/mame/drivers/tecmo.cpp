@@ -700,23 +700,23 @@ void tecmo_state::machine_reset()
 	m_adpcm_data = -1;
 }
 
-MACHINE_CONFIG_START(tecmo_state::rygar)
-
+void tecmo_state::rygar(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(rygar_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tecmo_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(24'000'000)/4); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo_state::rygar_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tecmo_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(4'000'000)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(rygar_sound_map)
+	Z80(config, m_soundcpu, XTAL(4'000'000)); /* verified on pcb */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &tecmo_state::rygar_sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 384,0,256,264,16,240) // 59.18 Hz
-	MCFG_SCREEN_UPDATE_DRIVER(tecmo_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(24'000'000)/4, 384,0,256,264,16,240); // 59.18 Hz
+	m_screen->set_screen_update(FUNC(tecmo_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tecmo);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024).set_endianness(ENDIANNESS_BIG);
@@ -730,67 +730,65 @@ MACHINE_CONFIG_START(tecmo_state::rygar)
 	soundlatch.data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 	soundlatch.set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(4'000'000)) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3526_device &ymsnd(YM3526(config, "ymsnd", XTAL(4'000'000))); /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb, even if schematics shows a 384khz resonator */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tecmo_state, adpcm_int))    /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, XTAL(400'000)); /* verified on pcb, even if schematics shows a 384khz resonator */
+	m_msm->vck_legacy_callback().set(FUNC(tecmo_state::adpcm_int));    /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      /* 8KHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-
-MACHINE_CONFIG_START(tecmo_state::gemini)
+void tecmo_state::gemini(machine_config &config)
+{
 	rygar(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
 	// xtal found on bootleg, to be confirmed on a real board
-	MCFG_DEVICE_CLOCK(XTAL(8'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(gemini_map)
+	m_maincpu->set_clock(XTAL(8'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo_state::gemini_map);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(tecmo_sound_map)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &tecmo_state::tecmo_sound_map);
 
-	MCFG_DEVICE_REPLACE("ymsnd", YM3812, XTAL(4'000'000))
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3812_device &ymsnd(YM3812(config.replace(), "ymsnd", XTAL(4'000'000)));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(tecmo_state::geminib)
+void tecmo_state::geminib(machine_config &config)
+{
 	gemini(config);
 	// 24.18 MHz OSC / 59.62 Hz, bootleg only?
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(24180000/4, 384,0,256,264,16,240)
-MACHINE_CONFIG_END
+	m_screen->set_raw(24180000/4, 384,0,256,264,16,240);
+}
 
-MACHINE_CONFIG_START(tecmo_state::silkworm)
+void tecmo_state::silkworm(machine_config &config)
+{
 	gemini(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(6000000)
-	MCFG_DEVICE_PROGRAM_MAP(silkworm_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(6000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo_state::silkworm_map);
+}
 
-MACHINE_CONFIG_START(tecmo_state::backfirt)
+void tecmo_state::backfirt(machine_config &config)
+{
 	gemini(config);
 
 	/* this pcb has no MSM5205 */
-	MCFG_DEVICE_REMOVE("msm")
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(backfirt_sound_map)
-MACHINE_CONFIG_END
+	config.device_remove("msm");
+	m_soundcpu->set_addrmap(AS_PROGRAM, &tecmo_state::backfirt_sound_map);
+}
 
-MACHINE_CONFIG_START(tecmo_state::silkwormp)
+void tecmo_state::silkwormp(machine_config &config)
+{
 	silkworm(config);
 
 	/* bootleg pcb doesn't have the MSM5205 populated */
-	MCFG_DEVICE_REMOVE("msm")
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(silkwormp_sound_map)
-MACHINE_CONFIG_END
+	config.device_remove("msm");
+	m_soundcpu->set_addrmap(AS_PROGRAM, &tecmo_state::silkwormp_sound_map);
+}
 
 
 /***************************************************************************
@@ -1223,6 +1221,39 @@ ROM_END
 
 ROM_START( gemini )
 	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "4-5s",  0x00000, 0x10000, CRC(ce71e27a) SHA1(5aac0434edd39e444687d9988c7f49e0752a4900) )  /* c000-ffff is not used */
+	ROM_LOAD( "5-6s",  0x10000, 0x10000, CRC(216784a9) SHA1(ec74a3753e5b6384b875125ec0db7beea0a6aa6d) )  /* banked at f000-f7ff */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "gw03-5h.rom",  0x0000, 0x8000, CRC(9bc79596) SHA1(61de9ddd45140e8ed88173294bd26147e2abfa21) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "gw02-3h.rom",  0x00000, 0x08000, CRC(7acc8d35) SHA1(05056e9f077e7571b314390b508c72d56ad0f43b) )  /* characters */
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "gw06-1c.rom",  0x00000, 0x10000, CRC(4ea51631) SHA1(9aee0f1ba210ac953dc193cfc739322966b6de8a) )  /* sprites */
+	ROM_LOAD( "gw07-1d.rom",  0x10000, 0x10000, CRC(da42637e) SHA1(9885c52823279f26871092c77bdbe027df08268f) )  /* sprites */
+	ROM_LOAD( "gw08-1f.rom",  0x20000, 0x10000, CRC(0b4e8d70) SHA1(55069f3df1c8db83f306d46b8262fd23585e6013) )  /* sprites */
+	ROM_LOAD( "gw09-1h.rom",  0x30000, 0x10000, CRC(b65c5e4c) SHA1(699e1a9e72b8d94edae7382ba119fe5da113514d) )  /* sprites */
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "gw10-1n.rom",  0x00000, 0x10000, CRC(5e84cd4f) SHA1(e85320291027a16619c87fc2365448367bda454a) )  /* tiles #1 */
+	ROM_LOAD( "gw11-2na.rom", 0x10000, 0x10000, CRC(08b458e1) SHA1(b3426faa57dca51dc053db44fa4968425d8bf3ee) )  /* tiles #1 */
+	ROM_LOAD( "gw12-2nb.rom", 0x20000, 0x10000, CRC(229c9714) SHA1(f4f47d6b379c973c22f9ae7d7bec7041cdf3f737) )  /* tiles #1 */
+	ROM_LOAD( "gw13-3n.rom",  0x30000, 0x10000, CRC(c5dfaf47) SHA1(c3202ca8c7f3c5c7dc9acdc09c1c894e168ef9fe) )  /* tiles #1 */
+
+	ROM_REGION( 0x40000, "gfx4", 0 )
+	ROM_LOAD( "gw14-1r.rom",  0x00000, 0x10000, CRC(9c10e5b5) SHA1(a81399b85d8f3ddca26883ec3535cb9044c35ada) )  /* tiles #2 */
+	ROM_LOAD( "gw15-2ra.rom", 0x10000, 0x10000, CRC(4cd18cfa) SHA1(c197a098a7c1e5220aad039383a40702fe7c4f21) )  /* tiles #2 */
+	ROM_LOAD( "gw16-2rb.rom", 0x20000, 0x10000, CRC(f911c7be) SHA1(3f49f6c4734f2b644d93c4a54249aae6ff080e1d) )  /* tiles #2 */
+	ROM_LOAD( "gw17-3r.rom",  0x30000, 0x10000, CRC(79a9ce25) SHA1(74e3917b8e7a920ceb2135d7ef8fb2f2c5176b21) )  /* tiles #2 */
+
+	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples */
+	ROM_LOAD( "gw01-6a.rom",  0x0000, 0x8000, CRC(d78afa05) SHA1(b02a739b045f5cddf943ce59226ef234463eeebe) )
+ROM_END
+
+ROM_START( geminij )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "gw04-5s.rom",  0x00000, 0x10000, CRC(ff9de855) SHA1(34167af8456a081f68b338f10d4319ce1e703fd4) )  /* c000-ffff is not used */
 	ROM_LOAD( "gw05-6s.rom",  0x10000, 0x10000, CRC(5a6947a9) SHA1(18b7aeb0f0e2c396bc759118dd7c45fd6070b804) )  /* banked at f000-f7ff */
 
@@ -1322,8 +1353,9 @@ GAME( 1986, rygar,     0,        rygar,     rygar,     tecmo_state, init_rygar, 
 GAME( 1986, rygar2,    rygar,    rygar,     rygar,     tecmo_state, init_rygar,    ROT0,  "Tecmo",   "Rygar (US set 2)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rygar3,    rygar,    rygar,     rygar,     tecmo_state, init_rygar,    ROT0,  "Tecmo",   "Rygar (US set 3 Old Version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rygarj,    rygar,    rygar,     rygar,     tecmo_state, init_rygar,    ROT0,  "Tecmo",   "Argus no Senshi (Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gemini,    0,        gemini,    gemini,    tecmo_state, init_gemini,   ROT90, "Tecmo",   "Gemini Wing (Japan)",          MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
-GAME( 1987, geminib,   gemini,   geminib,   gemini,    tecmo_state, init_gemini,   ROT90, "bootleg", "Gemini Wing (bootleg)",        MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
+GAME( 1987, gemini,    0,        gemini,    gemini,    tecmo_state, init_gemini,   ROT90, "Tecmo",   "Gemini Wing (World)",          MACHINE_SUPPORTS_SAVE ) // No regional "Warning, if you are playing ..." screen
+GAME( 1987, geminij,   gemini,   gemini,    gemini,    tecmo_state, init_gemini,   ROT90, "Tecmo",   "Gemini Wing (Japan)",          MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
+GAME( 1987, geminib,   gemini,   geminib,   gemini,    tecmo_state, init_gemini,   ROT90, "bootleg", "Gemini Wing (bootleg)",        MACHINE_SUPPORTS_SAVE ) // regional warning screen is blanked (still get a delay)
 GAME( 1988, silkworm,  0,        silkworm,  silkworm,  tecmo_state, init_silkworm, ROT0,  "Tecmo",   "Silk Worm (World)",            MACHINE_SUPPORTS_SAVE ) // No regional "Warning, if you are playing ..." screen
 GAME( 1988, silkwormj, silkworm, silkworm,  silkworm,  tecmo_state, init_silkworm, ROT0,  "Tecmo",   "Silk Worm (Japan)",            MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
 GAME( 1988, silkwormp, silkworm, silkwormp, silkwormp, tecmo_state, init_silkworm, ROT0,  "Tecmo",   "Silk Worm (prototype)",        MACHINE_SUPPORTS_SAVE ) // prototype

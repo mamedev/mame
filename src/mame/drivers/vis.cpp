@@ -57,7 +57,7 @@ void vis_audio_device::device_start()
 	set_isa_device();
 	m_isa->set_dma_channel(7, this, false);
 	m_isa->install_device(0x0220, 0x022f, read8_delegate(FUNC(vis_audio_device::pcm_r), this), write8_delegate(FUNC(vis_audio_device::pcm_w), this));
-	m_isa->install_device(0x0388, 0x038b, read8_delegate(FUNC(ymf262_device::read), subdevice<ymf262_device>("ymf262")), write8_delegate(FUNC(ymf262_device::write), subdevice<ymf262_device>("ymf262")));
+	m_isa->install_device(0x0388, 0x038b, read8sm_delegate(FUNC(ymf262_device::read), subdevice<ymf262_device>("ymf262")), write8sm_delegate(FUNC(ymf262_device::write), subdevice<ymf262_device>("ymf262")));
 	m_pcm = timer_alloc();
 	m_pcm->adjust(attotime::never);
 }
@@ -143,7 +143,6 @@ void vis_audio_device::device_add_mconfig(machine_config &config)
 	m_rdac->add_route(ALL_OUTPUTS, "rspeaker", 1.0); // sanyo lc7883k
 
 	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref"));
-	vreg.set_output(5.0);
 	vreg.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
 	vreg.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
 	vreg.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);

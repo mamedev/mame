@@ -8,11 +8,6 @@
     Phill Harvey-Smith
     2011-01-29.
 
-
-ToDo:
-- Fix the sound
-- Add serial uart
-
 */
 
 
@@ -22,26 +17,13 @@ ToDo:
 #include "bus/isa/isa_cards.h"
 //#include "bus/pc_joy/pc_joy.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/mcs48/mcs48.h"
 #include "machine/clock.h"
 #include "machine/i8087.h"
 #include "machine/input_merger.h"
+#include "machine/mbc55x_kbd.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
-
-static constexpr rgb_t mbc55x_pens[SCREEN_NO_COLOURS]
-{
-	// normal brightness
-	{ 0x00, 0x00, 0x00 }, // black
-	{ 0x00, 0x00, 0x80 }, // blue
-	{ 0x00, 0x80, 0x00 }, // green
-	{ 0x00, 0x80, 0x80 }, // cyan
-	{ 0x80, 0x00, 0x00 }, // red
-	{ 0x80, 0x00, 0x80 }, // magenta
-	{ 0x80, 0x80, 0x00 }, // yellow
-	{ 0x80, 0x80, 0x80 }  // light grey
-};
 
 
 void mbc55x_state::mbc55x_mem(address_map &map)
@@ -82,154 +64,144 @@ void mbc55x_state::mbc55x_iodecode(address_map &map)
 	map(0x14, 0x15).mirror(0x02).rw("sio", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x18, 0x18).mirror(0x02).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x19, 0x19).mirror(0x02).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x1c, 0x1d).mirror(0x02).r(FUNC(mbc55x_state::mbc55x_kb_usart_r)).w(m_kb_uart, FUNC(i8251_device::write));
+	map(0x1c, 0x1d).mirror(0x02).rw(m_kb_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
+
+uint8_t mbc55x_state::iodecode_r(offs_t offset)
+{
+	return m_iodecode->read8(offset >> 1);
+}
+
+void mbc55x_state::iodecode_w(offs_t offset, uint8_t data)
+{
+	m_iodecode->write8(offset >> 1, data);
+}
+
+/* 8255 Configuration */
+
+uint8_t mbc55x_state::game_io_r()
+{
+	return 0xff;
+}
+
+void mbc55x_state::game_io_w(uint8_t data)
+{
+}
+
+uint8_t mbc55x_state::printer_status_r()
+{
+	return m_printer_status;
+}
+
+void mbc55x_state::printer_data_w(uint8_t data)
+{
+	m_printer->write_data7(!BIT(data, 7));
+	m_printer->write_data6(!BIT(data, 6));
+	m_printer->write_data5(!BIT(data, 5));
+	m_printer->write_data4(!BIT(data, 4));
+	m_printer->write_data3(!BIT(data, 3));
+	m_printer->write_data2(!BIT(data, 2));
+	m_printer->write_data1(!BIT(data, 1));
+	m_printer->write_data0(!BIT(data, 0));
+}
+
+void mbc55x_state::disk_select_w(uint8_t data)
+{
+	floppy_image_device *floppy = nullptr;
+
+	switch (data & 0x03)
+	{
+	case 0: floppy = m_floppy[0]->get_device(); break;
+	case 1: floppy = m_floppy[1]->get_device(); break;
+	case 2: floppy = m_floppy[2]->get_device(); break;
+	case 3: floppy = m_floppy[3]->get_device(); break;
+	}
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+	{
+		floppy->mon_w(0);
+		floppy->ss_w(BIT(data, 2));
+	}
+
+	m_printer->write_strobe(!BIT(data, 3));
+}
+
+WRITE_LINE_MEMBER(mbc55x_state::printer_busy_w)
+{
+	m_printer_status = (m_printer_status & 0xef) | (state ? 0x10 : 0x00);
+}
+
+WRITE_LINE_MEMBER(mbc55x_state::printer_paper_end_w)
+{
+	m_printer_status = (m_printer_status & 0xdf) | (state ? 0x20 : 0x00);
+}
+
+WRITE_LINE_MEMBER(mbc55x_state::printer_select_w)
+{
+	m_printer_status = (m_printer_status & 0xbf) | (state ? 0x40 : 0x00);
+}
+
+
+void mbc55x_state::set_ram_size()
+{
+	address_space   &space      = m_maincpu->space( AS_PROGRAM );
+	int             ramsize     = m_ram->size();
+	int             nobanks     = ramsize / RAM_BANK_SIZE;
+	char            bank[10];
+	int             bankno;
+	uint8_t           *ram        = &m_ram->pointer()[0];
+	uint8_t           *map_base;
+	int             bank_base;
+
+
+	logerror("Ramsize is %d bytes\n",ramsize);
+	logerror("RAM_BANK_SIZE=%d, nobanks=%d\n",RAM_BANK_SIZE,nobanks);
+
+	// Main memory mapping
+
+	for(bankno=0; bankno<RAM_BANK_COUNT; bankno++)
+	{
+		sprintf(bank,"bank%x",bankno);
+		bank_base=bankno*RAM_BANK_SIZE;
+		map_base=&ram[bank_base];
+
+		if(bankno<nobanks)
+		{
+			membank(bank)->set_base(map_base);
+			space.install_readwrite_bank(bank_base, bank_base+(RAM_BANK_SIZE-1), bank);
+			logerror("Mapping bank %d at %05X to RAM\n",bankno,bank_base);
+		}
+		else
+		{
+			space.nop_readwrite(bank_base, bank_base+(RAM_BANK_SIZE-1));
+			logerror("Mapping bank %d at %05X to NOP\n",bankno,bank_base);
+		}
+	}
+
+	// Graphics red and blue plane memory mapping, green is in main memory
+	membank(RED_PLANE_TAG)->set_base(&m_video_mem[RED_PLANE_OFFSET]);
+	space.install_readwrite_bank(RED_PLANE_MEMBASE, RED_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), RED_PLANE_TAG);
+	membank(BLUE_PLANE_TAG)->set_base(&m_video_mem[BLUE_PLANE_OFFSET]);
+	space.install_readwrite_bank(BLUE_PLANE_MEMBASE, BLUE_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), BLUE_PLANE_TAG);
+}
+
+void mbc55x_state::machine_reset()
+{
+	set_ram_size();
+}
+
+void mbc55x_state::machine_start()
+{
+	m_printer_status = 0xff;
+
+	m_kb_uart->write_cts(0);
+}
+
 
 static INPUT_PORTS_START( mbc55x )
-	PORT_START("KEY0") /* Key row 0 scancodes 00..07 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1")      PORT_CODE(KEYCODE_1)            PORT_CHAR('1')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2")      PORT_CODE(KEYCODE_2)            PORT_CHAR('2')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3")      PORT_CODE(KEYCODE_3)            PORT_CHAR('3')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4")      PORT_CODE(KEYCODE_4)            PORT_CHAR('4')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5")      PORT_CODE(KEYCODE_5)            PORT_CHAR('5')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6")      PORT_CODE(KEYCODE_6)            PORT_CHAR('6')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7")      PORT_CODE(KEYCODE_7)            PORT_CHAR('7')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8")      PORT_CODE(KEYCODE_8)            PORT_CHAR('8')
-
-	PORT_START("KEY1") /* Key row 1 scancodes 08..0F */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9")      PORT_CODE(KEYCODE_9)            PORT_CHAR('9')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0")      PORT_CODE(KEYCODE_0)            PORT_CHAR('0')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-")      PORT_CODE(KEYCODE_MINUS)        PORT_CHAR('-')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("=")      PORT_CODE(KEYCODE_EQUALS)       PORT_CHAR('=')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BSLASH") PORT_CODE(KEYCODE_BACKSLASH)    PORT_CHAR('\\')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q")      PORT_CODE(KEYCODE_Q)            PORT_CHAR('Q')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W")      PORT_CODE(KEYCODE_W)            PORT_CHAR('W')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E")      PORT_CODE(KEYCODE_E)            PORT_CHAR('E')
-
-	PORT_START("KEY2") /* Key row 2 scancodes 10..17 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R")      PORT_CODE(KEYCODE_R)            PORT_CHAR('R')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T")      PORT_CODE(KEYCODE_T)            PORT_CHAR('T')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y")      PORT_CODE(KEYCODE_Y)            PORT_CHAR('Y')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U")      PORT_CODE(KEYCODE_U)            PORT_CHAR('U')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I")      PORT_CODE(KEYCODE_I)            PORT_CHAR('I')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O")      PORT_CODE(KEYCODE_O)            PORT_CHAR('O')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P")      PORT_CODE(KEYCODE_P)            PORT_CHAR('P')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[")      PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR('[')
-
-
-	PORT_START("KEY3") /* Key row 3 scancodes 18..1F */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("]")      PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR(']')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A")      PORT_CODE(KEYCODE_A)            PORT_CHAR('A')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S")      PORT_CODE(KEYCODE_S)            PORT_CHAR('S')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D")      PORT_CODE(KEYCODE_D)            PORT_CHAR('D')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F")      PORT_CODE(KEYCODE_F)            PORT_CHAR('F')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G")      PORT_CODE(KEYCODE_G)            PORT_CHAR('G')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H")      PORT_CODE(KEYCODE_H)            PORT_CHAR('H')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J")      PORT_CODE(KEYCODE_J)            PORT_CHAR('J')
-
-	PORT_START("KEY4") /* Key row 4 scancodes 20..27 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K")      PORT_CODE(KEYCODE_K)            PORT_CHAR('K')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L")      PORT_CODE(KEYCODE_L)            PORT_CHAR('L')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";")      PORT_CODE(KEYCODE_COLON)        PORT_CHAR(';')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TILDE")  PORT_CODE(KEYCODE_TILDE)        PORT_CHAR('`')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("#")      PORT_CODE(KEYCODE_QUOTE)        PORT_CHAR('#')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER")  PORT_CODE(KEYCODE_ENTER)        PORT_CHAR(0x0D)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z")      PORT_CODE(KEYCODE_Z)            PORT_CHAR('Z')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X")      PORT_CODE(KEYCODE_X)            PORT_CHAR('X')
-
-
-	PORT_START("KEY5") /* Key row 5 scancodes 28..2F */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C")      PORT_CODE(KEYCODE_C)            PORT_CHAR('C')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V")      PORT_CODE(KEYCODE_V)            PORT_CHAR('V')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B")      PORT_CODE(KEYCODE_B)            PORT_CHAR('B')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N")      PORT_CODE(KEYCODE_N)            PORT_CHAR('N')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M")      PORT_CODE(KEYCODE_M)            PORT_CHAR('M')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",")      PORT_CODE(KEYCODE_COMMA)        PORT_CHAR(',')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".")      PORT_CODE(KEYCODE_STOP)         PORT_CHAR('.')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/")      PORT_CODE(KEYCODE_SLASH)        PORT_CHAR('/')
-
-	PORT_START("KEY6") /* Key row 6 scancodes 30..37 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE")  PORT_CODE(KEYCODE_SPACE)        PORT_CHAR(' ')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                     PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(0x08)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-
-#if 0
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BACKSLASH") PORT_CODE(KEYCODE_BACKSLASH)    PORT_CHAR('\\')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LSHIFT") PORT_CODE(KEYCODE_LSHIFT)       PORT_CHAR(UCHAR_SHIFT_1)
-
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL")   PORT_CODE(KEYCODE_LCONTROL)     PORT_CODE(KEYCODE_RCONTROL) // Ether control
-
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RSHIFT") PORT_CODE(KEYCODE_RSHIFT)       PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PRSCR")  PORT_CODE(KEYCODE_ASTERISK)     PORT_CHAR('*')
-
-	PORT_START("KEY7") /* Key row 7 scancodes 38..3F */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ALT")    PORT_CODE(KEYCODE_LALT)         PORT_CODE(KEYCODE_RALT)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS")   PORT_CODE(KEYCODE_CAPSLOCK)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1")     PORT_CODE(KEYCODE_F1)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2")     PORT_CODE(KEYCODE_F2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3")     PORT_CODE(KEYCODE_F3)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4")     PORT_CODE(KEYCODE_F4)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5")     PORT_CODE(KEYCODE_F5)
-
-	PORT_START("KEY8") /* Key row 8 scancodes 40..47 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6")     PORT_CODE(KEYCODE_F6)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F7")     PORT_CODE(KEYCODE_F7)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F8")     PORT_CODE(KEYCODE_F8)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F9")     PORT_CODE(KEYCODE_F9)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F10")    PORT_CODE(KEYCODE_F10)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("NUMLK")  PORT_CODE(KEYCODE_NUMLOCK)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SCRLK")  PORT_CODE(KEYCODE_SCRLOCK)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP7")    PORT_CODE(KEYCODE_7_PAD)        PORT_CHAR('7')
-
-	PORT_START("KEY9") /* Key row 9 scancodes 48..4F */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP8")    PORT_CODE(KEYCODE_8_PAD)        //PORT_CHAR('8')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP9")    PORT_CODE(KEYCODE_9_PAD)        //PORT_CHAR('9')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-")    PORT_CODE(KEYCODE_MINUS_PAD)    //PORT_CHAR('-')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP4")    PORT_CODE(KEYCODE_4_PAD)        //PORT_CHAR('4')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP5")    PORT_CODE(KEYCODE_5_PAD)        //PORT_CHAR('5')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP6")    PORT_CODE(KEYCODE_6_PAD)        //PORT_CHAR('6')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP+")    PORT_CODE(KEYCODE_PLUS_PAD)     //PORT_CHAR('+')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP1")    PORT_CODE(KEYCODE_1_PAD)        //PORT_CHAR('1')
-
-	PORT_START("KEY10") /* Key row 10 scancodes 50..57 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP2")    PORT_CODE(KEYCODE_2_PAD)        //PORT_CHAR('2')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP3")    PORT_CODE(KEYCODE_3_PAD)        //PORT_CHAR('3')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP0")    PORT_CODE(KEYCODE_0_PAD)        //PORT_CHAR('0')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP.")    PORT_CODE(KEYCODE_DEL_PAD)      //PORT_CHAR('.')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-	//PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP5")    PORT_CODE(KEYCODE_5_PAD)        PORT_CHAR('5')
-	//PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP6")    PORT_CODE(KEYCODE_6_PAD)        PORT_CHAR('6')
-	//PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP+")    PORT_CODE(KEYCODE_PLUS_PAD)     PORT_CHAR('+')
-	//PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP1")    PORT_CODE(KEYCODE_1_PAD)        PORT_CHAR('1')
-#endif
-
-	PORT_START(KEY_SPECIAL_TAG)
-	PORT_BIT(KEY_BIT_LSHIFT,    IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LSHIFT") PORT_CODE(KEYCODE_LSHIFT)       PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(KEY_BIT_RSHIFT,    IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RSHIFT") PORT_CODE(KEYCODE_RSHIFT)       PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT(KEY_BIT_CTRL,      IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CTRL")   PORT_CODE(KEYCODE_LCONTROL)     PORT_CODE(KEYCODE_RCONTROL) // Ether control
-	PORT_BIT(KEY_BIT_GRAPH,     IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("GRAPH")  PORT_CODE(KEYCODE_LALT)         PORT_CODE(KEYCODE_RALT)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-
 INPUT_PORTS_END
-
-
-void mbc55x_state::mbc55x_palette(palette_device &palette) const
-{
-	logerror("initializing palette\n");
-
-	palette.set_pen_colors(0, mbc55x_pens);
-}
 
 
 FLOPPY_FORMATS_MEMBER( mbc55x_state::floppy_formats )
@@ -250,7 +222,8 @@ static void mbc55x_floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(mbc55x_state::mbc55x)
+void mbc55x_state::mbc55x(machine_config &config)
+{
 	/* basic machine hardware */
 	I8088(config, m_maincpu, 14.318181_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbc55x_state::mbc55x_mem);
@@ -260,8 +233,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	m_maincpu->esc_data_handler().set("coproc", FUNC(i8087_device::addr_w));
 
 	i8087_device &i8087(I8087(config, "coproc", 14.318181_MHz_XTAL / 4));
-	i8087.set_addrmap(AS_PROGRAM, &mbc55x_state::mbc55x_mem);
-	i8087.set_data_width(8);
+	i8087.set_space_88(m_maincpu, AS_PROGRAM);
 	i8087.irq().set(m_pic, FUNC(pic8259_device::ir6_w));
 	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
 
@@ -271,7 +243,8 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	m_iodecode->addr_width(5);
 	m_iodecode->set_addrmap(0, &mbc55x_state::mbc55x_iodecode);
 
-	I8049(config, "kbdc", 6_MHz_XTAL).set_disable();
+	mbc55x_keyboard_device &keyboard(MBC55X_KEYBOARD(config, "keyboard"));
+	keyboard.txd_callback().set(m_kb_uart, FUNC(i8251_device::write_rxd));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
@@ -292,7 +265,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	m_kb_uart->rts_handler().set(m_printer, FUNC(centronics_device::write_init)).invert();
 	m_kb_uart->rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir3_w));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_pit->out_handler<0>().append(m_pit, FUNC(pit8253_device::write_clk1));
 	m_pit->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir1_w));
@@ -306,7 +279,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	clk_78_6khz.signal_handler().append(m_kb_uart, FUNC(i8251_device::write_txc));
 	clk_78_6khz.signal_handler().append(m_kb_uart, FUNC(i8251_device::write_rxc));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	I8255(config, m_ppi);
@@ -328,18 +301,19 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	FD1793(config, m_fdc, 14.318181_MHz_XTAL / 14); // M5W1793-02P (clock is nominally 1 MHz)
 	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy[0], mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy[1], mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy[2], mbc55x_floppies, "", mbc55x_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy[3], mbc55x_floppies, "", mbc55x_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy[0], mbc55x_floppies, "qd", mbc55x_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], mbc55x_floppies, "qd", mbc55x_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[2], mbc55x_floppies, "", mbc55x_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[3], mbc55x_floppies, "", mbc55x_state::floppy_formats);
 
 	/* Software list */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","mbc55x")
+	SOFTWARE_LIST(config, "disk_list").set_original("mbc55x");
 
 	isa8_device &isa(ISA8(config, "isa", 14.318181_MHz_XTAL / 4));
-	isa.set_cputag(m_maincpu);
+	isa.set_memspace(m_maincpu, AS_PROGRAM);
+	isa.set_iospace(m_maincpu, AS_IO);
 	isa.irq7_callback().set(m_pic, FUNC(pic8259_device::ir7_w)); // all other IRQ and DRQ lines are NC
-	//isa.iochck_callback().set_inputline(m_maincpu, INPUT_LINE_NMI));
+	isa.iochck_callback().set_inputline(m_maincpu, INPUT_LINE_NMI).invert();
 
 	ISA8_SLOT(config, "external", 0, "isa", pc_isa8_cards, nullptr, false);
 
@@ -362,7 +336,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	m_printer->busy_handler().append(m_pic, FUNC(pic8259_device::ir4_w)).invert();
 	m_printer->perror_handler().set(FUNC(mbc55x_state::printer_paper_end_w));
 	m_printer->select_handler().set(FUNC(mbc55x_state::printer_select_w));
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( mbc55x )
@@ -370,11 +344,7 @@ ROM_START( mbc55x )
 
 	ROM_SYSTEM_BIOS(0, "v120", "mbc55x BIOS v1.20 (1983)")
 	ROMX_LOAD("mbc55x-v120.rom", 0x0000, 0x2000, CRC(b439b4b8) SHA1(6e8df0f3868e3fd0229a5c2720d6c01e46815cab), ROM_BIOS(0))
-
-	ROM_REGION(0x0800, "kbdc", 0)
-	ROM_LOAD("d8049hc.m1", 0x0000, 0x0800, NO_DUMP)
 ROM_END
-
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
 COMP( 1983, mbc55x, 0,      0,      mbc55x,  mbc55x, mbc55x_state, empty_init, "Sanyo", "MBC-55x", 0 )

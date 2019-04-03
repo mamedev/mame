@@ -2917,7 +2917,7 @@ static PaError StartStream( PaStream *s )
 {
     PaError          result = paNoError;
     PaWinDsStream   *stream = (PaWinDsStream*)s;
-    HRESULT          hr;
+    HRESULT          hr = -1;
         
     stream->callbackResult = paContinue;
     PaUtil_ResetBufferProcessor( &stream->bufferProcessor );

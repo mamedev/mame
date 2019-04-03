@@ -107,9 +107,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bml3_firq_mask_w);
 	DECLARE_READ8_MEMBER(bml3_firq_status_r);
 	DECLARE_WRITE8_MEMBER(relay_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3bus_firq_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_tx_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_rts_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_irq_w);
@@ -195,9 +192,9 @@ private:
 READ8_MEMBER( bml3_state::bml3_6845_r )
 {
 	if (offset)
-		return m_crtc->register_r(space, 0);
+		return m_crtc->register_r();
 	else
-		return m_crtc->status_r(space, 0);
+		return m_crtc->status_r();
 }
 
 WRITE8_MEMBER( bml3_state::bml3_6845_w )
@@ -205,12 +202,12 @@ WRITE8_MEMBER( bml3_state::bml3_6845_w )
 	if(offset == 0)
 	{
 		m_crtc_index = data;
-		m_crtc->address_w(space, 0, data);
+		m_crtc->address_w(data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
-		m_crtc->register_w(space, 0, data);
+		m_crtc->register_w(data);
 	}
 }
 
@@ -305,14 +302,14 @@ READ8_MEMBER(bml3_state::bml3_ym2203_r)
 {
 	u8 dev_offs = ((m_psg_latch & 3) != 3);
 
-	return m_ym2203->read(space, dev_offs);
+	return m_ym2203->read(dev_offs);
 }
 
 WRITE8_MEMBER(bml3_state::bml3_ym2203_w)
 {
 	u8 dev_offs = ((m_psg_latch & 3) != 3);
 
-	m_ym2203->write(space, dev_offs, data);
+	m_ym2203->write(dev_offs, data);
 }
 
 READ8_MEMBER( bml3_state::bml3_vram_attr_r)
@@ -384,21 +381,6 @@ READ8_MEMBER( bml3_state::bml3_firq_status_r )
 	m_firq_status = 0;
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	return res;
-}
-
-WRITE_LINE_MEMBER(bml3_state::bml3bus_nmi_w)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
-}
-
-WRITE_LINE_MEMBER(bml3_state::bml3bus_irq_w)
-{
-	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
-}
-
-WRITE_LINE_MEMBER(bml3_state::bml3bus_firq_w)
-{
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, state);
 }
 
 
@@ -957,21 +939,22 @@ static void bml3_cards(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(bml3_state::bml3_common)
+void bml3_state::bml3_common(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M6809, CPU_CLOCK)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bml3_state,  bml3_timer_firq)
-//  MCFG_DEVICE_PERIODIC_INT_DRIVER(bml3_state, bml3_firq, 45)
+	MC6809(config, m_maincpu, CPU_EXT_CLOCK);
+	m_maincpu->set_vblank_int("screen", FUNC(bml3_state::bml3_timer_firq));
+//  m_maincpu->set_periodic_int(FUNC(bml3_state::bml3_firq), attotime::fromhz(45));
 
 //  MCFG_MACHINE_RESET_OVERRIDE(bml3_state,bml3)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2400)) /* Service manual specifies "Raster return period" as 2.4 ms (p.64), although the total vertical non-displaying time seems to be 4 ms. */
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2400)); /* Service manual specifies "Raster return period" as 2.4 ms (p.64), although the total vertical non-displaying time seems to be 4 ms. */
+	screen.set_size(640, 400);
+	screen.set_visarea(0, 320-1, 0, 200-1);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	/* Devices */
@@ -984,9 +967,9 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 
 	// fire once per scan of an individual key
 	// According to the service manual (p.65), the keyboard timer is driven by the horizontal video sync clock.
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", bml3_state, keyboard_callback, attotime::from_hz(H_CLOCK/2))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_c", bml3_state, bml3_c, attotime::from_hz(4800))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_p", bml3_state, bml3_p, attotime::from_hz(40000))
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(bml3_state::keyboard_callback), attotime::from_hz(H_CLOCK/2));
+	TIMER(config, "bml3_c").configure_periodic(FUNC(bml3_state::bml3_c), attotime::from_hz(4800));
+	TIMER(config, "bml3_p").configure_periodic(FUNC(bml3_state::bml3_p), attotime::from_hz(40000));
 
 	pia6821_device &pia(PIA6821(config, "pia", 0));
 	pia.writepa_handler().set(FUNC(bml3_state::bml3_piaA_w));
@@ -1000,7 +983,7 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
@@ -1008,29 +991,28 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* slot devices */
-	MCFG_DEVICE_ADD("bml3bus", BML3BUS, 0)
-	MCFG_BML3BUS_CPU("maincpu")
-	MCFG_BML3BUS_OUT_NMI_CB(WRITELINE(*this, bml3_state, bml3bus_nmi_w))
-	MCFG_BML3BUS_OUT_IRQ_CB(WRITELINE(*this, bml3_state, bml3bus_irq_w))
-	MCFG_BML3BUS_OUT_FIRQ_CB(WRITELINE(*this, bml3_state, bml3bus_firq_w))
+	bml3bus_device &bus(BML3BUS(config, "bml3bus", 0));
+	bus.set_space(m_maincpu, AS_PROGRAM);
+	bus.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	bus.irq_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	bus.firq_callback().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 	/* Default to MP-1805 disk (3" or 5.25" SS/SD), as our MB-6892 ROM dump includes
 	   the MP-1805 ROM.
 	   User may want to switch this to MP-1802 (5.25" DS/DD).
 	   Note it isn't feasible to use both, as they each place boot ROM at F800.
 	 */
-	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl1", bml3_cards, "bml3mp1805")
-	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl2", bml3_cards, nullptr)
-	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl3", bml3_cards, nullptr)
-	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl4", bml3_cards, nullptr)
-	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl5", bml3_cards, nullptr)
-	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl6", bml3_cards, "bml3kanji")
+	BML3BUS_SLOT(config, "sl1", "bml3bus", bml3_cards, "bml3mp1805");
+	BML3BUS_SLOT(config, "sl2", "bml3bus", bml3_cards, nullptr);
+	BML3BUS_SLOT(config, "sl3", "bml3bus", bml3_cards, nullptr);
+	BML3BUS_SLOT(config, "sl4", "bml3bus", bml3_cards, nullptr);
+	BML3BUS_SLOT(config, "sl5", "bml3bus", bml3_cards, nullptr);
+	BML3BUS_SLOT(config, "sl6", "bml3bus", bml3_cards, "bml3kanji");
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(bml3_state::bml3)
+void bml3_state::bml3(machine_config &config)
+{
 	bml3_common(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(bml3_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bml3_state::bml3_mem);
 
 #if 0
 	// TODO: slot device for sound card
@@ -1042,23 +1024,23 @@ MACHINE_CONFIG_START(bml3_state::bml3)
 	m_ym2203->add_route(2, "mono", 0.50);
 	m_ym2203->add_route(3, "mono", 0.50);
 #endif
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(bml3_state::bml3mk2)
+void bml3_state::bml3mk2(machine_config &config)
+{
 	bml3_common(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(bml3mk2_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bml3_state::bml3mk2_mem);
 
 	// TODO: anything to add here?
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(bml3_state::bml3mk5)
+void bml3_state::bml3mk5(machine_config &config)
+{
 	bml3_common(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(bml3mk5_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bml3_state::bml3mk5_mem);
 
 	// TODO: anything to add here?
-MACHINE_CONFIG_END
+}
 
 
 

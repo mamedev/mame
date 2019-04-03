@@ -20,10 +20,6 @@ class ay31015_device : public device_t
 public:
 	ay31015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void set_tx_clock(double tx_clock) { m_tx_clock = tx_clock; }
-	void set_tx_clock(const XTAL &xtal) { set_tx_clock(xtal.dvalue()); }
-	void set_rx_clock(double rx_clock) { m_rx_clock = rx_clock; }
-	void set_rx_clock(const XTAL &xtal) { set_rx_clock(xtal.dvalue()); }
 	void set_auto_rdav(bool auto_rdav) { m_auto_rdav = auto_rdav; }
 
 	auto read_si_callback() { return m_read_si_cb.bind(); }
@@ -57,12 +53,6 @@ public:
 	DECLARE_READ_LINE_MEMBER(tbmt_r) { return get_output_pin(TBMT); }
 	DECLARE_READ_LINE_MEMBER(eoc_r) { return get_output_pin(EOC); }
 	DECLARE_READ_LINE_MEMBER(so_r) { return get_output_pin(SO); }
-
-	/* Set a new transmitter clock (new_clock is in Hz) */
-	void set_transmitter_clock( double new_clock );
-
-	/* Set a new receiver clock (new_clock is in Hz) */
-	void set_receiver_clock( double new_clock );
 
 	/* Reead the received data */
 	/* The received data is available on RD8-RD1 (pins 5-12) */
@@ -114,16 +104,12 @@ protected:
 		PREP_TIME
 	};
 
-	static constexpr device_timer_id TIMER_RX = 0;
-	static constexpr device_timer_id TIMER_TX = 1;
-
 	ay31015_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void rx_process();
 	void tx_process();
@@ -137,8 +123,6 @@ protected:
 	void transfer_control_pins();
 	void set_input_pin(input_pin pin, int data);
 	int get_output_pin(output_pin pin);
-	inline void update_rx_timer();
-	inline void update_tx_timer();
 
 	int m_pins[41];
 
@@ -154,16 +138,12 @@ protected:
 	uint8_t m_rx_bit_count;
 	uint8_t m_rx_parity;
 	uint16_t m_rx_pulses;   // total pulses left
-	double m_rx_clock;    /* RCP - pin 17 */
-	emu_timer *m_rx_timer;
 
 	state_t m_tx_state;
 	uint8_t m_tx_data;      // byte being sent
 	uint8_t m_tx_buffer;    // next byte to send
 	uint8_t m_tx_parity;
 	uint16_t m_tx_pulses;   // total pulses left
-	double m_tx_clock;    /* TCP - pin 40 */
-	emu_timer *m_tx_timer;
 
 	devcb_read_line m_read_si_cb;           // SI - pin 20 - This will be called whenever the SI pin is sampled. Optional
 	devcb_write_line m_write_so_cb;         // SO - pin 25 - This will be called whenever data is put on the SO pin. Optional

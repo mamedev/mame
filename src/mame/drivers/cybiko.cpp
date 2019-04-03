@@ -426,8 +426,8 @@ void cybiko_state::cybikov1_base(machine_config &config)
 	m_debug_serial->set_option_device_input_defaults("pty", DEVICE_INPUT_DEFAULTS_NAME(debug_serial));
 
 	// quickload
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(cybiko_state, cybiko), this), "bin,nv", 0);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(cybiko_state, cybiko), this), "bin,nv");
 }
 
 void cybiko_state::cybikov1_flash(machine_config &config)
@@ -498,8 +498,8 @@ void cybiko_state::cybikoxt(machine_config &config)
 	subdevice<h8_sci_device>("maincpu:sci2")->tx_handler().set("debug_serial", FUNC(rs232_port_device::write_txd));
 
 	// quickload
-	quickload_image_device &quickload(QUICKLOAD(config.replace(), "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(cybiko_state, cybikoxt), this), "bin,nv", 0);
+	quickload_image_device &quickload(QUICKLOAD(config.replace(), "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(cybiko_state, cybikoxt), this), "bin,nv");
 }
 
 /////////

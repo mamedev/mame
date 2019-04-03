@@ -101,32 +101,32 @@ uint32_t tvgame_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-MACHINE_CONFIG_START(tvgame_state::tvgame)
+void tvgame_state::tvgame(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tvgame_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &tvgame_state::io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(tvgame_state, screen_update)
-	MCFG_SCREEN_SIZE(216, 213)
-	MCFG_SCREEN_VISIBLE_AREA(0, 215, 0, 212)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(tvgame_state::screen_update));
+	screen.set_size(216, 213);
+	screen.set_visarea(0, 215, 0, 212);
+	screen.set_palette("palette");
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	// Devices
 	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.in_pa_callback().set_ioport("LINE0");
 	ppi.out_pc_callback().set(FUNC(tvgame_state::speaker_w));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( tvgame )

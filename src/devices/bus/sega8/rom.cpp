@@ -42,6 +42,9 @@ DEFINE_DEVICE_TYPE(SEGA8_ROM_KOREAN,       sega8_korean_device,       "sega8_kor
 DEFINE_DEVICE_TYPE(SEGA8_ROM_KOREAN_NB,    sega8_korean_nb_device,    "sega8_korean_nb",   "SMS Korean No-Bank Mapper Carts")
 DEFINE_DEVICE_TYPE(SEGA8_ROM_SEOJIN,       sega8_seojin_device,       "sega8_seojin",      "SMS Seo Jin Multi-cart")
 
+// Specific SC-3000 cart types
+DEFINE_DEVICE_TYPE(SEGA8_ROM_MULTICART,    sega8_multicart_device,    "sega8_multicart",   "SC-3000 MkII Multicart Cart")
+DEFINE_DEVICE_TYPE(SEGA8_ROM_MEGACART,     sega8_megacart_device,     "sega8_megacart",    "SC-3000 Megacart Cart")
 
 
 sega8_rom_device::sega8_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -185,6 +188,18 @@ sega8_seojin_device::sega8_seojin_device(const machine_config &mconfig, const ch
 }
 
 
+sega8_multicart_device::sega8_multicart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sega8_rom_device(mconfig, SEGA8_ROM_MULTICART, tag, owner, clock)
+{
+}
+
+
+sega8_megacart_device::sega8_megacart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sega8_rom_device(mconfig, SEGA8_ROM_MEGACART, tag, owner, clock)
+{
+}
+
+
 void sega8_rom_device::device_start()
 {
 	save_item(NAME(m_rom_bank_base));
@@ -265,6 +280,28 @@ void sega8_zemina_device::device_reset()
 {
 	m_ram_base = 0;
 	m_ram_enabled = 0;
+}
+
+
+void sega8_multicart_device::device_start()
+{
+	save_item(NAME(m_block));
+}
+
+void sega8_multicart_device::device_reset()
+{
+	m_block = 0xff;
+}
+
+
+void sega8_megacart_device::device_start()
+{
+	save_item(NAME(m_block));
+}
+
+void sega8_megacart_device::device_reset()
+{
+	m_block = 0xff;
 }
 
 
@@ -1023,3 +1060,78 @@ READ8_MEMBER(sega8_seojin_device::read_ram)
 	return m_ram[offset & 0x3fff];
 }
 
+/*-------------------------------------------------
+
+ SC-3000 Survivors MkII Multicart
+
+-------------------------------------------------*/
+
+READ8_MEMBER(sega8_multicart_device::read_cart)
+{
+	// 16K of RAM sits in 0x8000-0xbfff
+	if (offset >= 0x8000)
+		return m_ram[offset & 0x3fff];
+
+	return m_rom[(offset & 0x7fff) | (m_block << 15) % m_rom_size];
+}
+
+WRITE8_MEMBER(sega8_multicart_device::write_cart)
+{
+	// 16K of RAM sits in 0x8000-0xbfff
+	if (offset >= 0x8000)
+		m_ram[offset & 0x3fff] = data;
+}
+
+READ8_MEMBER(sega8_multicart_device::read_ram)
+{
+	return m_ram[0x4000 + (offset & 0x3fff)];
+}
+
+WRITE8_MEMBER(sega8_multicart_device::write_ram)
+{
+	m_ram[0x4000 + (offset & 0x3fff)] = data;
+}
+
+WRITE8_MEMBER(sega8_multicart_device::write_io)
+{
+	if ((offset & 0xe0) == 0xe0)
+		m_block = (data & 0x80) ? ((data & 0x1f) | ((data & 0x40) ? 0x20 : 0x00)) : 0x3f;
+}
+
+/*-------------------------------------------------
+
+ SC-3000 Survivors Megacart
+
+-------------------------------------------------*/
+
+READ8_MEMBER(sega8_megacart_device::read_cart)
+{
+	// 16K of RAM sits in 0x8000-0xbfff
+	if (offset >= 0x8000)
+		return m_ram[offset & 0x3fff];
+
+	return m_rom[(offset & 0x7fff) | (m_block << 15) % m_rom_size];
+}
+
+WRITE8_MEMBER(sega8_megacart_device::write_cart)
+{
+	// 16K of RAM sits in 0x8000-0xbfff
+	if (offset >= 0x8000)
+		m_ram[offset & 0x3fff] = data;
+}
+
+READ8_MEMBER(sega8_megacart_device::read_ram)
+{
+	return m_ram[0x4000 + (offset & 0x3fff)];
+}
+
+WRITE8_MEMBER(sega8_megacart_device::write_ram)
+{
+	m_ram[0x4000 + (offset & 0x3fff)] = data;
+}
+
+WRITE8_MEMBER(sega8_megacart_device::write_io)
+{
+	if ((offset & 0xe0) == 0xe0)
+		m_block = (data & 0x1f) | (data & 0xc0) >> 1;
+}

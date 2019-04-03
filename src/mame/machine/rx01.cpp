@@ -53,9 +53,10 @@ rx01_device::rx01_device(const machine_config &mconfig, const char *tag, device_
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(rx01_device::device_add_mconfig)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(rx01_floppy_interface)
-MACHINE_CONFIG_END
+void rx01_device::device_add_mconfig(machine_config &config)
+{
+	legacy_floppy_image_device::add_2drives(config, &rx01_floppy_interface);
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

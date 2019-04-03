@@ -96,14 +96,16 @@ GFXDECODE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(tk02_device::device_add_mconfig)
-	MCFG_SCREEN_ADD_MONOCHROME("mono", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL(8'000'000) * 2, 1024, 0, 640, 312, 0, 250)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+void tk02_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "mono", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green());
+	screen.set_raw(XTAL(8'000'000) * 2, 1024, 0, 640, 312, 0, 250);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tk02)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_tk02);
 
 	MC6845(config, m_crtc, XTAL(8'000'000) / 4);
 	m_crtc->set_screen("mono");
@@ -112,8 +114,8 @@ MACHINE_CONFIG_START(tk02_device::device_add_mconfig)
 	m_crtc->set_update_row_callback(FUNC(tk02_device::crtc_update_row), this);
 	m_crtc->out_de_callback().set(FUNC(tk02_device::de_w));
 
-	MCFG_TATUNG_PIPE_ADD("pipe")
-MACHINE_CONFIG_END
+	TATUNG_PIPE(config, m_pipe, DERIVED_CLOCK(1, 1), tatung_pipe_cards, nullptr);
+}
 
 
 //**************************************************************************
@@ -157,9 +159,6 @@ void tk02_device::device_start()
 
 void tk02_device::device_reset()
 {
-	m_pipe->set_io_space(&io_space());
-	m_pipe->set_program_space(&program_space());
-
 	io_space().install_device(0x40, 0x4f, *this, &tk02_device::map);
 	io_space().install_readwrite_handler(0x40, 0x47, 0, 0, 0xff00, read8_delegate(FUNC(tk02_device::ram_r), this), write8_delegate(FUNC(tk02_device::ram_w), this));
 }

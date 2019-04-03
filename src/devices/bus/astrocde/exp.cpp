@@ -74,6 +74,14 @@ READ8_MEMBER(astrocade_exp_device::read)
 		return 0xff;
 }
 
+READ8_MEMBER(astrocade_exp_device::read_io)
+{
+	if (m_card)
+		return m_card->read_io(space, offset);
+	else
+		return 0xff;
+}
+
 /*-------------------------------------------------
  write
  -------------------------------------------------*/
@@ -82,4 +90,10 @@ WRITE8_MEMBER(astrocade_exp_device::write)
 {
 	if (m_card)
 		m_card->write(space, offset, data);
+}
+
+WRITE8_MEMBER(astrocade_exp_device::write_io)
+{
+	if (m_card)
+		m_card->write_io(space, offset, data);
 }

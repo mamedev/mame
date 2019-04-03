@@ -40,12 +40,12 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_isbx_card_interface overrides
-	virtual uint8_t mcs0_r(address_space &space, offs_t offset) override;
-	virtual void mcs0_w(address_space &space, offs_t offset, uint8_t data) override;
-	virtual uint8_t mcs1_r(address_space &space, offs_t offset) override;
-	virtual void mcs1_w(address_space &space, offs_t offset, uint8_t data) override;
-	virtual uint8_t mdack_r(address_space &space, offs_t offset) override;
-	virtual void mdack_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t mcs0_r(offs_t offset) override;
+	virtual void mcs0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t mcs1_r(offs_t offset) override;
+	virtual void mcs1_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t mdack_r(offs_t offset) override;
+	virtual void mdack_w(offs_t offset, uint8_t data) override;
 	virtual void opt0_w(int state) override;
 
 private:

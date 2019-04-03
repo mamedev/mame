@@ -837,7 +837,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::u11_timer )
     -+                          +---+
 */
 
-	m_display_refresh_timer->adjust(attotime::from_msec(2.85));
+	m_display_refresh_timer->adjust(attotime::from_usec(2850));
 
 	m_u11_ca1 = true;
 	m_pia_u11->ca1_w(m_u11_ca1);
@@ -993,10 +993,11 @@ void by17_state::machine_reset()
 
 
 
-MACHINE_CONFIG_START(by17_state::by17)
+void by17_state::by17(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 530000)  // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
-	MCFG_DEVICE_PROGRAM_MAP(by17_map)
+	M6800(config, m_maincpu, 530000);  // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &by17_state::by17_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // 'F' filled causes Credit Display to be blank on first startup
 
@@ -1018,8 +1019,8 @@ MACHINE_CONFIG_START(by17_state::by17)
 	m_pia_u10->cb2_handler().set(FUNC(by17_state::u10_cb2_w));
 	m_pia_u10->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia_u10->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_z_freq", by17_state, timer_z_freq, attotime::from_hz(100)) // Mains Line Frequency * 2
-	MCFG_TIMER_DRIVER_ADD(m_zero_crossing_active_timer, by17_state, timer_z_pulse)  // Active pulse length from Zero Crossing detector
+	TIMER(config, "timer_z_freq").configure_periodic(FUNC(by17_state::timer_z_freq), attotime::from_hz(100)); // Mains Line Frequency * 2
+	TIMER(config, m_zero_crossing_active_timer).configure_generic(FUNC(by17_state::timer_z_pulse));  // Active pulse length from Zero Crossing detector
 
 	PIA6821(config, m_pia_u11, 0);
 	m_pia_u11->readpa_handler().set(FUNC(by17_state::u11_a_r));
@@ -1031,9 +1032,9 @@ MACHINE_CONFIG_START(by17_state::by17)
 	m_pia_u11->cb2_handler().set(FUNC(by17_state::u11_cb2_w));
 	m_pia_u11->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia_u11->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d_freq", by17_state, u11_timer, attotime::from_hz(317)) // 555 timer
-	MCFG_TIMER_DRIVER_ADD(m_display_refresh_timer, by17_state, timer_d_pulse)   // 555 Active pulse length
-MACHINE_CONFIG_END
+	TIMER(config, "timer_d_freq").configure_periodic(FUNC(by17_state::u11_timer), attotime::from_hz(317)); // 555 timer
+	TIMER(config, m_display_refresh_timer).configure_generic(FUNC(by17_state::timer_d_pulse));   // 555 Active pulse length
+}
 
 
 

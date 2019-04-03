@@ -51,7 +51,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	snes_control_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: snes_control_port_device(mconfig, tag, owner, (uint32_t)0)
+		: snes_control_port_device(mconfig, tag, owner, 0)
 	{
 		option_reset();
 		opts(*this);
@@ -61,8 +61,8 @@ public:
 	snes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~snes_control_port_device();
 
-	template <typename Object> void set_onscreen_callback(Object &&cb) { m_onscreen_cb = std::forward<Object>(cb); }
-	template <typename Object> void set_gunlatch_callback(Object &&cb) { m_gunlatch_cb = std::forward<Object>(cb); }
+	template <typename... T> void set_onscreen_callback(T &&... args) { m_onscreen_cb = snesctrl_onscreen_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_gunlatch_callback(T &&... args) { m_gunlatch_cb = snesctrl_gunlatch_delegate(std::forward<T>(args)...); }
 
 	uint8_t read_pin4();
 	uint8_t read_pin5();
@@ -86,22 +86,6 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(SNES_CONTROL_PORT, snes_control_port_device)
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SNES_CONTROL_PORT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, SNES_CONTROL_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_SNESCTRL_ONSCREEN_CB(_class, _method) \
-	downcast<snes_control_port_device &>(*device).set_onscreen_callback(snesctrl_onscreen_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_SNESCTRL_GUNLATCH_CB(_class, _method) \
-	downcast<snes_control_port_device &>(*device).set_gunlatch_callback(snesctrl_gunlatch_delegate(&_class::_method, #_class "::" #_method, this));
-
 
 void snes_control_port_devices(device_slot_interface &device);
 

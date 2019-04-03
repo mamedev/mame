@@ -117,10 +117,11 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_videx80_device::device_add_mconfig)
-	MCFG_SCREEN_ADD( VIDEOTERM_SCREEN_NAME, RASTER) // 560x216?  (80x24 7x9 characters)
-	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
-	MCFG_SCREEN_UPDATE_DEVICE( VIDEOTERM_MC6845_NAME, mc6845_device, screen_update )
+void a2bus_videx80_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, VIDEOTERM_SCREEN_NAME, SCREEN_TYPE_RASTER)); // 560x216?  (80x24 7x9 characters)
+	screen.set_raw(MDA_CLOCK, 882, 0, 720, 370, 0, 350);
+	screen.set_screen_update(VIDEOTERM_MC6845_NAME, FUNC(mc6845_device::screen_update));
 
 	MC6845(config, m_crtc, MDA_CLOCK/9);
 	m_crtc->set_screen(VIDEOTERM_SCREEN_NAME);
@@ -128,7 +129,7 @@ MACHINE_CONFIG_START(a2bus_videx80_device::device_add_mconfig)
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(a2bus_videx80_device::crtc_update_row), this);
 	m_crtc->out_vsync_callback().set(FUNC(a2bus_videx80_device::vsync_changed));
-MACHINE_CONFIG_END
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -240,7 +241,7 @@ uint8_t a2bus_videx80_device::read_c0nx(uint8_t offset)
 
 	if (offset == 1)
 	{
-		return m_crtc->read_register();   // status_r?
+		return m_crtc->register_r();   // status_r?
 	}
 
 	return 0xff;
@@ -255,11 +256,11 @@ void a2bus_videx80_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
-		m_crtc->write_address(data);
+		m_crtc->address_w(data);
 	}
 	else if (offset == 1)
 	{
-		m_crtc->write_register(data);
+		m_crtc->register_w(data);
 	}
 
 	m_rambank = ((offset>>2) & 3) * 512;

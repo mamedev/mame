@@ -49,12 +49,12 @@ void nec_p72_device::p72_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nec_p72_device::device_add_mconfig)
+void nec_p72_device::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V33, XTAL(16'000'000)/2) /* TODO it's actually a V40 */
-	MCFG_DEVICE_PROGRAM_MAP(p72_mem)
-
-MACHINE_CONFIG_END
+	V33(config, m_maincpu, XTAL(16'000'000)/2); /* TODO it's actually a V40 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nec_p72_device::p72_mem);
+}
 
 
 //-------------------------------------------------

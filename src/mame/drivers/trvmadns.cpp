@@ -387,31 +387,30 @@ void trvmadns_state::machine_reset()
 	m_old_data = -1;
 }
 
-MACHINE_CONFIG_START(trvmadns_state::trvmadns)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'000'000)/4) // Most likely 2.5MHz (less likely 5MHz (10MHz/2))
-	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-
+void trvmadns_state::trvmadns(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(10'000'000)/4); // Most likely 2.5MHz (less likely 5MHz (10MHz/2))
+	m_maincpu->set_addrmap(AS_PROGRAM, &trvmadns_state::cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &trvmadns_state::io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(trvmadns_state, screen_update_trvmadns)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 31*8-1, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(trvmadns_state::screen_update_trvmadns));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trvmadns)
-	MCFG_PALETTE_ADD("palette", 16)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_trvmadns);
+	PALETTE(config, m_palette).set_entries(16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, "aysnd", XTAL(10'000'000)/2/4).add_route(ALL_OUTPUTS, "mono", 1.0); //?
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( trvmadns )

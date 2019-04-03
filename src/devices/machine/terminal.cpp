@@ -326,21 +326,22 @@ void generic_terminal_device::kbd_put(u8 data)
     VIDEO HARDWARE
 ***************************************************************************/
 
-MACHINE_CONFIG_START(generic_terminal_device::device_add_mconfig)
-	MCFG_SCREEN_ADD(TERMINAL_SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(generic_terminal_device::TERMINAL_WIDTH*8, generic_terminal_device::TERMINAL_HEIGHT*10)
-	MCFG_SCREEN_VISIBLE_AREA(0, generic_terminal_device::TERMINAL_WIDTH*8-1, 0, generic_terminal_device::TERMINAL_HEIGHT*10-1)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, generic_terminal_device, update)
+void generic_terminal_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, TERMINAL_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(generic_terminal_device::TERMINAL_WIDTH*8, generic_terminal_device::TERMINAL_HEIGHT*10);
+	screen.set_visarea(0, generic_terminal_device::TERMINAL_WIDTH*8-1, 0, generic_terminal_device::TERMINAL_HEIGHT*10-1);
+	screen.set_screen_update(FUNC(generic_terminal_device::update));
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
 	keyboard.set_keyboard_callback(FUNC(generic_terminal_device::kbd_put));
 
 	SPEAKER(config, "bell").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 2'000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 0.25)
-MACHINE_CONFIG_END
+	BEEP(config, m_beeper, 2'000);
+	m_beeper->add_route(ALL_OUTPUTS, "bell", 0.25);
+}
 
 void generic_terminal_device::device_start()
 {

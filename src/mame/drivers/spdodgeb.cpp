@@ -405,21 +405,21 @@ void spdodgeb_state::machine_reset()
 	m_last_dash[0] = m_last_dash[1] = 0;
 }
 
-MACHINE_CONFIG_START(spdodgeb_state::spdodgeb)
-
+void spdodgeb_state::spdodgeb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'000'000)/6)   /* 2MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(spdodgeb_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", spdodgeb_state, interrupt, "screen", 0, 1) /* 1 IRQ every 8 visible scanlines, plus NMI for vblank */
+	M6502(config, m_maincpu, XTAL(12'000'000)/6);   /* 2MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &spdodgeb_state::spdodgeb_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(spdodgeb_state::interrupt), "screen", 0, 1); /* 1 IRQ every 8 visible scanlines, plus NMI for vblank */
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809, XTAL(12'000'000)/2) // HD68A09P (1.5MHz internally)
-	MCFG_DEVICE_PROGRAM_MAP(spdodgeb_sound_map)
+	MC6809(config, m_audiocpu, XTAL(12'000'000)/2); // HD68A09P (1.5MHz internally)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &spdodgeb_state::spdodgeb_sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 0, 256, 272, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(spdodgeb_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(12'000'000)/2, 384, 0, 256, 272, 0, 240);
+	m_screen->set_screen_update(FUNC(spdodgeb_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spdodgeb);
 	PALETTE(config, m_palette, FUNC(spdodgeb_state::spdodgeb_palette), 1024);
@@ -431,23 +431,23 @@ MACHINE_CONFIG_START(spdodgeb_state::spdodgeb)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(12'000'000)/4)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(12'000'000)/4));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, spdodgeb_state, spd_adpcm_int_1))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MSM5205(config, m_msm1, 384000);
+	m_msm1->vck_legacy_callback().set(FUNC(spdodgeb_state::spd_adpcm_int_1));  /* interrupt function */
+	m_msm1->set_prescaler_selector(msm5205_device::S48_4B);  /* 8kHz? */
+	m_msm1->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_msm1->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, spdodgeb_state, spd_adpcm_int_2))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm2, 384000);
+	m_msm2->vck_legacy_callback().set(FUNC(spdodgeb_state::spd_adpcm_int_2));  /* interrupt function */
+	m_msm2->set_prescaler_selector(msm5205_device::S48_4B);  /* 8kHz? */
+	m_msm2->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_msm2->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+}
 
 
 

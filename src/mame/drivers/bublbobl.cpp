@@ -350,8 +350,8 @@ void bublbobl_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
-	map(0x9000, 0x9001).mirror(0x0ffe).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0xa000, 0xa001).mirror(0x0ffe).rw("ym2", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
+	map(0x9000, 0x9001).mirror(0x0ffe).rw("ym2203", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xa000, 0xa001).mirror(0x0ffe).rw("ym3526", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
 	map(0xb000, 0xb000).mirror(0x0ffc).r(m_main_to_sound, FUNC(generic_latch_8_device::read)).w(m_sound_to_main, FUNC(generic_latch_8_device::write));
 	map(0xb001, 0xb001).mirror(0x0ffc).r(FUNC(bublbobl_state::common_sound_semaphores_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
 	map(0xb002, 0xb002).mirror(0x0ffc).w(m_soundnmi, FUNC(input_merger_device::in_clear<0>));
@@ -437,7 +437,7 @@ void bublbobl_state::tokio_sound_map(address_map &map)
 	map(0x9800, 0x9800).r(FUNC(bublbobl_state::common_sound_semaphores_r));
 	map(0xa000, 0xa000).w(m_soundnmi, FUNC(input_merger_device::in_clear<0>));
 	map(0xa800, 0xa800).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
-	map(0xb000, 0xb001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xb000, 0xb001).rw("ym2203", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xe000, 0xffff).rom(); // space for diagnostic ROM?
 }
 
@@ -847,23 +847,23 @@ MACHINE_RESET_MEMBER(bublbobl_state,tokio)
 	tokio_videoctrl_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // TODO: does /RESET clear this the same as above? probably yes, needs tracing...
 }
 
-MACHINE_CONFIG_START(bublbobl_state::tokio)
-
+void bublbobl_state::tokio(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_DEVICE_PROGRAM_MAP(tokio_map_mcu)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
+	Z80(config, m_maincpu, MAIN_XTAL/4); // 6 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &bublbobl_state::tokio_map_mcu);
+	m_maincpu->set_vblank_int("screen", FUNC(bublbobl_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_DEVICE_PROGRAM_MAP(tokio_subcpu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
+	Z80(config, m_subcpu, MAIN_XTAL/4); // 6 MHz
+	m_subcpu->set_addrmap(AS_PROGRAM, &bublbobl_state::tokio_subcpu_map);
+	m_subcpu->set_vblank_int("screen", FUNC(bublbobl_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, MAIN_XTAL/8) // 3 MHz
-	MCFG_DEVICE_PROGRAM_MAP(tokio_sound_map) // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
+	Z80(config, m_audiocpu, MAIN_XTAL/8); // 3 MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bublbobl_state::tokio_sound_map); // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MAIN_XTAL/8) // 3 Mhz
+	TAITO68705_MCU(config, "bmcu", MAIN_XTAL/8); // 3 Mhz
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu") // is this necessary?
+	config.m_perfect_cpu_quantum = subtag("maincpu"); // is this necessary?
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
 
@@ -871,10 +871,10 @@ MACHINE_CONFIG_START(bublbobl_state::tokio)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, tokio)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(bublbobl_state, screen_update_bublbobl)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(bublbobl_state::screen_update_bublbobl));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bublbobl);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 256).set_endianness(ENDIANNESS_BIG);
@@ -887,37 +887,39 @@ MACHINE_CONFIG_START(bublbobl_state::tokio)
 	GENERIC_LATCH_8(config, m_main_to_sound).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<1>));
 	GENERIC_LATCH_8(config, m_sound_to_main);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, MAIN_XTAL/8)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.08)
-	MCFG_SOUND_ROUTE(1, "mono", 0.08)
-	MCFG_SOUND_ROUTE(2, "mono", 0.08)
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM2203(config, m_ym2203, MAIN_XTAL/8);
+	m_ym2203->irq_handler().set_inputline(m_audiocpu, 0);
+	m_ym2203->add_route(0, "mono", 0.08);
+	m_ym2203->add_route(1, "mono", 0.08);
+	m_ym2203->add_route(2, "mono", 0.08);
+	m_ym2203->add_route(3, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(bublbobl_state::bublboblp)
+void bublbobl_state::bublboblp(machine_config &config)
+{
 	tokio(config);
-	MCFG_DEVICE_REMOVE("bmcu") // no mcu, socket is empty
+	config.device_remove("bmcu"); // no mcu, socket is empty
 
 	// watchdog circuit is actually present on the prototype pcb, but is either
 	// hooked up wrong in MAME for tokio in general, or is disabled with a wire
 	// jumper under the epoxy
-	MCFG_DEVICE_REMOVE("watchdog")
+	config.device_remove("watchdog");
 	WATCHDOG_TIMER(config, "watchdog"); // this adds back a watchdog, but due to the way MAME handles watchdogs, it will never fire unless it first gets at least one pulse, which it never will.
 
-	MCFG_DEVICE_REPLACE("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_DEVICE_PROGRAM_MAP(tokio_map) // no mcu or resistors at all
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
-MACHINE_CONFIG_END
+	Z80(config.replace(), m_maincpu, MAIN_XTAL/4); // 6 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &bublbobl_state::tokio_map); // no mcu or resistors at all
+	m_maincpu->set_vblank_int("screen", FUNC(bublbobl_state::irq0_line_hold));
+}
 
-MACHINE_CONFIG_START(bublbobl_state::tokiob)
+void bublbobl_state::tokiob(machine_config &config)
+{
 	tokio(config);
-	MCFG_DEVICE_REMOVE("bmcu") // no mcu, but see below...
+	config.device_remove("bmcu"); // no mcu, but see below...
 
-	MCFG_DEVICE_REPLACE("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_DEVICE_PROGRAM_MAP(tokio_map_bootleg) // resistor tying mcu's footprint PA6 pin low so mcu reads always return 0xBF
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
-MACHINE_CONFIG_END
+	Z80(config.replace(), m_maincpu, MAIN_XTAL/4); // 6 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &bublbobl_state::tokio_map_bootleg); // resistor tying mcu's footprint PA6 pin low so mcu reads always return 0xBF
+	m_maincpu->set_vblank_int("screen", FUNC(bublbobl_state::irq0_line_hold));
+}
 
 
 MACHINE_START_MEMBER(bublbobl_state,bublbobl)
@@ -957,20 +959,20 @@ MACHINE_RESET_MEMBER(bublbobl_state,bublbobl)
 	m_port4_out = 0;
 }
 
-MACHINE_CONFIG_START(bublbobl_state::bublbobl_nomcu)
-
+void bublbobl_state::bublbobl_nomcu(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_DEVICE_PROGRAM_MAP(bublbobl_maincpu_map)
+	Z80(config, m_maincpu, MAIN_XTAL/4); // 6 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &bublbobl_state::bublbobl_maincpu_map);
 
-	MCFG_DEVICE_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_DEVICE_PROGRAM_MAP(subcpu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
+	Z80(config, m_subcpu, MAIN_XTAL/4); // 6 MHz
+	m_subcpu->set_addrmap(AS_PROGRAM, &bublbobl_state::subcpu_map);
+	m_subcpu->set_vblank_int("screen", FUNC(bublbobl_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, MAIN_XTAL/8) // 3 MHz
-	MCFG_DEVICE_PROGRAM_MAP(sound_map) // IRQs are triggered by the YM2203
+	Z80(config, m_audiocpu, MAIN_XTAL/8); // 3 MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bublbobl_state::sound_map); // IRQs are triggered by the YM2203
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	config.m_minimum_quantum = attotime::from_hz(6000); // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
 
@@ -978,10 +980,10 @@ MACHINE_CONFIG_START(bublbobl_state::bublbobl_nomcu)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, bublbobl)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(bublbobl_state, screen_update_bublbobl)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(bublbobl_state::screen_update_bublbobl));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bublbobl);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 256).set_endianness(ENDIANNESS_BIG);
@@ -995,23 +997,23 @@ MACHINE_CONFIG_START(bublbobl_state::bublbobl_nomcu)
 	GENERIC_LATCH_8(config, m_main_to_sound).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<1>));
 	GENERIC_LATCH_8(config, m_sound_to_main);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, MAIN_XTAL/8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<0>))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	YM2203(config, m_ym2203, MAIN_XTAL/8);
+	m_ym2203->irq_handler().set("soundirq", FUNC(input_merger_device::in_w<0>));
+	m_ym2203->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ym2", YM3526, MAIN_XTAL/8)
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<1>))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	YM3526(config, m_ym3526, MAIN_XTAL/8);
+	m_ym3526->irq_handler().set("soundirq", FUNC(input_merger_device::in_w<1>));
+	m_ym3526->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(bublbobl_state::bublbobl)
+void bublbobl_state::bublbobl(machine_config &config)
+{
 	bublbobl_nomcu(config);
-	MCFG_DEVICE_ADD("mcu", M6801, XTAL(4'000'000)) // actually 6801U4 - xtal is 4MHz, divided by 4 internally
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	M6801(config, m_mcu, XTAL(4'000'000)); // actually 6801U4 - xtal is 4MHz, divided by 4 internally
+	m_mcu->set_addrmap(AS_PROGRAM, &bublbobl_state::mcu_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", M6801_IRQ_LINE)) // same clock latches the INT pin on the second Z80
-MACHINE_CONFIG_END
+	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ_LINE); // same clock latches the INT pin on the second Z80
+}
 
 MACHINE_START_MEMBER(bublbobl_state,boblbobl)
 {
@@ -1030,17 +1032,17 @@ MACHINE_RESET_MEMBER(bublbobl_state,boblbobl)
 	m_ic43_b = 0;
 }
 
-MACHINE_CONFIG_START(bublbobl_state::boblbobl)
+void bublbobl_state::boblbobl(machine_config &config)
+{
 	bublbobl_nomcu(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold) // interrupt mode 1, unlike Bubble Bobble
+	m_maincpu->set_addrmap(AS_PROGRAM, &bublbobl_state::bootleg_map);
+	m_maincpu->set_vblank_int("screen", FUNC(bublbobl_state::irq0_line_hold)); // interrupt mode 1, unlike Bubble Bobble
 
 	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, boblbobl)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, boblbobl)
-MACHINE_CONFIG_END
+}
 
 
 MACHINE_START_MEMBER(bub68705_state, bub68705)

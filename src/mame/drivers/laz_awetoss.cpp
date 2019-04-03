@@ -45,20 +45,19 @@ void awetoss_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(awetoss_state::awetoss)
-
+void awetoss_state::awetoss(machine_config &config)
+{
 	/* basic machine hardware */
-//  MCFG_DEVICE_ADD("maincpu", ??, 8000000) // unknown
-//  MCFG_DEVICE_PROGRAM_MAP(awetoss_map)
-//  MCFG_DEVICE_IO_MAP(awetoss_io)
-//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", awetoss_state,  irq0_line_hold)
+//  ??_device &maincpu(??(config, "maincpu", 8000000)); // unknown
+//  maincpu.set_addrmap(AS_PROGRAM, &awetoss_state::awetoss_map);
+//  maincpu.set_addrmap(AS_IO, &awetoss_state::awetoss_io);
+//  maincpu.set_vblank_int("screen", FUNC(awetoss_state::irq0_line_hold));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // maybe
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // maybe
+}
 
 
 

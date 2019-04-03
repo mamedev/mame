@@ -159,7 +159,7 @@ Colscroll effects?
 #include "speaker.h"
 
 
-WRITE8_MEMBER(warriorb_state::coin_control_w)
+void warriorb_state::coin_control_w(u8 data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -172,29 +172,13 @@ WRITE8_MEMBER(warriorb_state::coin_control_w)
                           SOUND
 ***********************************************************/
 
-WRITE8_MEMBER(warriorb_state::sound_bankswitch_w)
+void warriorb_state::sound_bankswitch_w(u8 data)
 {
 	m_z80bank->set_entry(data & 7);
 }
 
-WRITE16_MEMBER(warriorb_state::sound_w)
-{
-	if (offset == 0)
-		m_tc0140syt->master_port_w(space, 0, data & 0xff);
-	else if (offset == 1)
-		m_tc0140syt->master_comm_w(space, 0, data & 0xff);
-}
 
-READ16_MEMBER(warriorb_state::sound_r)
-{
-	if (offset == 1)
-		return ((m_tc0140syt->master_comm_r(space, 0) & 0xff));
-	else
-		return 0;
-}
-
-
-WRITE8_MEMBER(warriorb_state::pancontrol_w)
+void warriorb_state::pancontrol_w(offs_t offset, u8 data)
 {
 	filter_volume_device *flt = nullptr;
 	offset &= 3;
@@ -237,7 +221,8 @@ void warriorb_state::darius2d_map(address_map &map)
 	map(0x600000, 0x6013ff).ram().share("spriteram");
 	map(0x800000, 0x80000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ???
-	map(0x830000, 0x830003).rw(FUNC(warriorb_state::sound_r), FUNC(warriorb_state::sound_w));
+	map(0x830001, 0x830001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x830003, 0x830003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 }
 
 void warriorb_state::warriorb_map(address_map &map)
@@ -253,7 +238,8 @@ void warriorb_state::warriorb_map(address_map &map)
 	map(0x600000, 0x6013ff).ram().share("spriteram");
 	map(0x800000, 0x80000f).rw(m_tc0510nio, FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write)).umask16(0x00ff);
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ? uses bits 0,2,3
-	map(0x830000, 0x830003).rw(FUNC(warriorb_state::sound_r), FUNC(warriorb_state::sound_w));
+	map(0x830001, 0x830001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x830003, 0x830003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 }
 
 /***************************************************************************/
@@ -435,15 +421,15 @@ void warriorb_state::machine_reset()
 	machine().sound().system_enable(true);  /* mixer enabled */
 }
 
-MACHINE_CONFIG_START(warriorb_state::darius2d)
-
+void warriorb_state::darius2d(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? (Might well be 16!) */
-	MCFG_DEVICE_PROGRAM_MAP(darius2d_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", warriorb_state,  irq4_line_hold)
+	M68000(config, m_maincpu, 12000000);    /* 12 MHz ??? (Might well be 16!) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &warriorb_state::darius2d_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(warriorb_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", 16000000/4));  /* 4 MHz ? */
+	audiocpu.set_addrmap(AS_PROGRAM, &warriorb_state::z80_sound_map);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -454,19 +440,19 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_warriorb)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_ADD("palette2", 4096)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_warriorb);
+	PALETTE(config, m_palette).set_entries(4096);
+	PALETTE(config, "palette2").set_entries(4096);
 
 	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 3*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(40*8, 32*8);
+	lscreen.set_visarea(0*8, 40*8-1, 3*8, 32*8-1);
+	lscreen.set_screen_update(FUNC(warriorb_state::screen_update_left));
+	lscreen.set_palette(m_palette);
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_gfx_region(1);
@@ -477,13 +463,13 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 
 	TC0110PCR(config, m_tc0110pcr[0], 0, m_palette);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 3*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("palette2")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(40*8, 32*8);
+	rscreen.set_visarea(0*8, 40*8-1, 3*8, 32*8-1);
+	rscreen.set_screen_update(FUNC(warriorb_state::screen_update_right));
+	rscreen.set_palette("palette2");
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
 	m_tc0100scn[1]->set_gfx_region(2);
@@ -499,14 +485,14 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "2610.1.l", 1.0)
-	MCFG_SOUND_ROUTE(1, "2610.1.r", 1.0)
-	MCFG_SOUND_ROUTE(2, "2610.2.l", 1.0)
-	MCFG_SOUND_ROUTE(2, "2610.2.r", 1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "2610.1.l", 1.0);
+	ymsnd.add_route(1, "2610.1.r", 1.0);
+	ymsnd.add_route(2, "2610.2.l", 1.0);
+	ymsnd.add_route(2, "2610.2.r", 1.0);
 
 	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
@@ -516,18 +502,17 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->set_master_tag(m_maincpu);
 	m_tc0140syt->set_slave_tag("audiocpu");
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(warriorb_state::warriorb)
-
+void warriorb_state::warriorb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(warriorb_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", warriorb_state,  irq4_line_hold)
+	M68000(config, m_maincpu, 16000000);    /* 16 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &warriorb_state::warriorb_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(warriorb_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", 16000000/4));  /* 4 MHz ? */
+	audiocpu.set_addrmap(AS_PROGRAM, &warriorb_state::z80_sound_map);
 
 	TC0510NIO(config, m_tc0510nio, 0);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
@@ -538,19 +523,19 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 	m_tc0510nio->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_warriorb)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_ADD("palette2", 4096)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_warriorb);
+	PALETTE(config, m_palette).set_entries(4096);
+	PALETTE(config, "palette2").set_entries(4096);
 
 	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(40*8, 32*8);
+	lscreen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	lscreen.set_screen_update(FUNC(warriorb_state::screen_update_left));
+	lscreen.set_palette(m_palette);
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_gfx_region(1);
@@ -561,13 +546,13 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 
 	TC0110PCR(config, m_tc0110pcr[0], 0, m_palette);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("palette2")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(40*8, 32*8);
+	rscreen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	rscreen.set_screen_update(FUNC(warriorb_state::screen_update_right));
+	rscreen.set_palette("palette2");
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
 	m_tc0100scn[1]->set_gfx_region(2);
@@ -584,14 +569,14 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610B, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "2610.1.l", 1.0)
-	MCFG_SOUND_ROUTE(1, "2610.1.r", 1.0)
-	MCFG_SOUND_ROUTE(2, "2610.2.l", 1.0)
-	MCFG_SOUND_ROUTE(2, "2610.2.r", 1.0)
+	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 16000000/2));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "2610.1.l", 1.0);
+	ymsnd.add_route(1, "2610.1.r", 1.0);
+	ymsnd.add_route(2, "2610.2.l", 1.0);
+	ymsnd.add_route(2, "2610.2.r", 1.0);
 
 	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
@@ -601,7 +586,7 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->set_master_tag(m_maincpu);
 	m_tc0140syt->set_slave_tag("audiocpu");
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -776,8 +761,8 @@ ROM_START( warriorb )
 	ROM_REGION( 0x01000, "user1", 0 )   /* unknown roms */
 	ROM_LOAD( "d24-13.37", 0x00000, 0x400, CRC(3ca18eb3) SHA1(54560f02c2be67993940831222130e90cd171991) ) /* AM27S33A or compatible like N82HS137A */
 	ROM_LOAD( "d24-14.38", 0x00000, 0x400, CRC(baf2a193) SHA1(b7f103b5f5aab0702dd21fd7e3a82261ae1760e9) ) /* AM27S33A or compatible like N82HS137A */
-//  ROM_LOAD( "d24-15.78", 0x00000, 0xa??, NO_DUMP )    /* 20L8B Pal */
-//  ROM_LOAD( "d24-16.79", 0x00000, 0xa??, NO_DUMP )    /* 20L8B Pal */
+	ROM_LOAD( "d24-15.78", 0x00000, 0x144, CRC(04992a7d) SHA1(82ce7ab7e3e7045776b660c32dac4abc28cabfa5) ) // PAL20L8BCNS
+	ROM_LOAD( "d24-16.79", 0x00000, 0x144, CRC(92c59a8d) SHA1(a83eb70cdc47af688a33505f60e5cb9960f8ba9f) ) // PAL20L8BCNS
 ROM_END
 
 

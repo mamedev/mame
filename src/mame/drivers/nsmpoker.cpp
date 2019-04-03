@@ -175,7 +175,7 @@ INTERRUPT_GEN_MEMBER(nsmpoker_state::nsmpoker_interrupt)
 
 READ8_MEMBER(nsmpoker_state::debug_r)
 {
-	return machine().rand() & 0xff;
+	return BIT(machine().rand(), offset);
 }
 
 
@@ -194,8 +194,8 @@ void nsmpoker_state::nsmpoker_map(address_map &map)
 
 void nsmpoker_state::nsmpoker_portmap(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0xf0, 0xf0).r(FUNC(nsmpoker_state::debug_r));   // kind of trap at beginning
+	map.global_mask(0xfff);
+	map(0xf00, 0xf0f).r(FUNC(nsmpoker_state::debug_r));   // kind of trap at beginning
 }
 
 /* I/O byte R/W
@@ -419,8 +419,8 @@ void nsmpoker_state::machine_reset()
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(nsmpoker_state::nsmpoker)
-
+void nsmpoker_state::nsmpoker(machine_config &config)
+{
 	// CPU TMS9995, standard variant; no line connections
 	TMS9995(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nsmpoker_state::nsmpoker_map);
@@ -428,18 +428,17 @@ MACHINE_CONFIG_START(nsmpoker_state::nsmpoker)
 	m_maincpu->set_vblank_int("screen", FUNC(nsmpoker_state::nsmpoker_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nsmpoker_state, screen_update_nsmpoker)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(nsmpoker_state::screen_update_nsmpoker));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_nsmpoker);
 	PALETTE(config, "palette", FUNC(nsmpoker_state::nsmpoker_palette), 16);
-
-MACHINE_CONFIG_END
+}
 
 
 /*************************

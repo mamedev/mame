@@ -35,17 +35,19 @@
  @054     uPD552C  1980, Epoch Invader From Space
 
  @031     uPD553C  1979, Bambino Superstar Football (ET-03)
- @049     uPD553C  1979, Mego Mini-Vid Break Free
+ @049     uPD553C  1979, Mego Mini-Vid: Break Free
  @055     uPD553C  1980, Bambino Space Laser Fight (ET-12)
  *073     uPD553C  1980, Sony ST-J75 FM Stereo Tuner
  @080     uPD553C  1980, Epoch Electronic Football
  *102     uPD553C  1981, Bandai Block Out
  @153     uPD553C  1981, Epoch Galaxy II
  @160     uPD553C  1982, Tomy Pac Man (TN-08)
+ *167     uPD553C  1982, Sony SL models (betamax) (have dump)
  @170     uPD553C  1982, Bandai Crazy Climber
  @192     uPD553C  1982, Tomy Scramble (TN-10)
  @202     uPD553C  1982, Epoch Astro Command
  @206     uPD553C  1982, Epoch Dracula
+ *207     uPD553C  1982, Sony SL-J30 (tape/cd deck)
  @209     uPD553C  1982, Tomy Caveman (TN-12)
  @258     uPD553C  1984, Tomy Alien Chase (TN-16)
  *296     uPD553C  1984, Epoch Computer Beam Gun Professional
@@ -76,12 +78,15 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
-// internal artwork
+// internal artwork (complete)
 #include "efball.lh"
 #include "grobot9.lh" // clickable
 #include "mcompgin.lh"
 #include "mvbfree.lh"
 #include "tactix.lh" // clickable
+
+// internal artwork (bezel overlay)
+#include "tmtennis.lh"
 
 //#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
@@ -241,9 +246,11 @@ INPUT_CHANGED_MEMBER(hh_ucom4_state::single_interrupt_line)
 
 /***************************************************************************
 
-  Minidrivers (subclass, I/O, Inputs, Machine Config)
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
+
+namespace {
 
 /***************************************************************************
 
@@ -267,8 +274,8 @@ INPUT_CHANGED_MEMBER(hh_ucom4_state::single_interrupt_line)
 class ufombs_state : public hh_ucom4_state
 {
 public:
-	ufombs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	ufombs_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -347,7 +354,8 @@ void ufombs_state::ufombs(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(243, 1080);
-	screen.set_visarea(0, 243-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -356,6 +364,16 @@ void ufombs_state::ufombs(machine_config &config)
 	m_speaker->set_levels(4, ufombs_speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
+
+// roms
+
+ROM_START( ufombs )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "d552c-017", 0x0000, 0x0400, CRC(0e208cb3) SHA1(57db6566916c94325e2b67ccb94b4ea3b233487d) )
+
+	ROM_REGION( 222395, "svg", 0)
+	ROM_LOAD( "ufombs.svg", 0, 222395, CRC(ae9fb93f) SHA1(165ea78eee93c503dbd277a56c41e3c63c534e38) )
+ROM_END
 
 
 
@@ -380,8 +398,8 @@ void ufombs_state::ufombs(machine_config &config)
 class ssfball_state : public hh_ucom4_state
 {
 public:
-	ssfball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	ssfball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -494,7 +512,8 @@ void ssfball_state::ssfball(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 482);
-	screen.set_visarea(0, 1920-1, 0, 482-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -503,6 +522,24 @@ void ssfball_state::ssfball(machine_config &config)
 	m_speaker->set_levels(4, ssfball_speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
+
+// roms
+
+ROM_START( ssfball )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-031", 0x0000, 0x0800, CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
+
+	ROM_REGION( 331352, "svg", 0)
+	ROM_LOAD( "ssfball.svg", 0, 331352, CRC(10cffb85) SHA1(c875f73a323d976088ffa1bc19f7bc865d4aac62) )
+ROM_END
+
+ROM_START( bmcfball )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-031", 0x0000, 0x0800, CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
+
+	ROM_REGION( 331352, "svg", 0)
+	ROM_LOAD( "bmcfball.svg", 0, 331352, CRC(43fbed1e) SHA1(28160e14b0879cd4dd9dab770c52c98f316ab653) )
+ROM_END
 
 
 
@@ -524,8 +561,8 @@ void ssfball_state::ssfball(machine_config &config)
 class bmsoccer_state : public hh_ucom4_state
 {
 public:
-	bmsoccer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	bmsoccer_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -622,7 +659,8 @@ void bmsoccer_state::bmsoccer(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(271, 1080);
-	screen.set_visarea(0, 271-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -630,6 +668,16 @@ void bmsoccer_state::bmsoccer(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
+
+// roms
+
+ROM_START( bmsoccer )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "d552c-043", 0x0000, 0x0400, CRC(10c2a4ea) SHA1(6ebca7d406e22ff7a8cd529579b55a700da487b4) )
+
+	ROM_REGION( 273796, "svg", 0)
+	ROM_LOAD( "bmsoccer.svg", 0, 273796, CRC(4c88d9f8) SHA1(b4b82f26a09f54cd0b6a9d1c1a46796fbfcb578a) )
+ROM_END
 
 
 
@@ -647,8 +695,8 @@ void bmsoccer_state::bmsoccer(machine_config &config)
 class bmsafari_state : public hh_ucom4_state
 {
 public:
-	bmsafari_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	bmsafari_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -729,7 +777,8 @@ void bmsafari_state::bmsafari(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(248, 1080);
-	screen.set_visarea(0, 248-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -737,6 +786,16 @@ void bmsafari_state::bmsafari(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
+
+// roms
+
+ROM_START( bmsafari )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "d552c-049", 0x0000, 0x0400, CRC(82fa3cbe) SHA1(019e7ec784e977eba09997fc46af253054fb222c) )
+
+	ROM_REGION( 275386, "svg", 0)
+	ROM_LOAD( "bmsafari.svg", 0, 275386, CRC(c24badbc) SHA1(b191f34155d6d4e834e7c6fe715d4bb76198ad72) )
+ROM_END
 
 
 
@@ -757,8 +816,8 @@ void bmsafari_state::bmsafari(machine_config &config)
 class splasfgt_state : public hh_ucom4_state
 {
 public:
-	splasfgt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	splasfgt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -880,7 +939,8 @@ void splasfgt_state::splasfgt(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 476);
-	screen.set_visarea(0, 1920-1, 0, 476-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -889,6 +949,16 @@ void splasfgt_state::splasfgt(machine_config &config)
 	m_speaker->set_levels(4, splasfgt_speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
+
+// roms
+
+ROM_START( splasfgt )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-055", 0x0000, 0x0800, CRC(eb471fbd) SHA1(f06cfe567bf6f9ed4dcdc88acdcfad50cd370a02) )
+
+	ROM_REGION( 246609, "svg", 0)
+	ROM_LOAD( "splasfgt.svg", 0, 246609, CRC(365fae43) SHA1(344c120c2efa92ada9171047affac801a06cf303) )
+ROM_END
 
 
 
@@ -910,8 +980,8 @@ void splasfgt_state::splasfgt(machine_config &config)
 class bcclimbr_state : public hh_ucom4_state
 {
 public:
-	bcclimbr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	bcclimbr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -984,7 +1054,8 @@ void bcclimbr_state::bcclimbr(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(310, 1080);
-	screen.set_visarea(0, 310-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -992,6 +1063,16 @@ void bcclimbr_state::bcclimbr(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
+
+// roms
+
+ROM_START( bcclimbr )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-170", 0x0000, 0x0800, CRC(fc2eabdb) SHA1(0f5cc854be7fdf105d9bd2114659d40c65f9d782) )
+
+	ROM_REGION( 219971, "svg", 0)
+	ROM_LOAD( "bcclimbr.svg", 0, 219971, CRC(9c9102f4) SHA1(6a7e02fd1467a26c734b01724e23cef9e4917805) )
+ROM_END
 
 
 
@@ -1015,8 +1096,8 @@ void bcclimbr_state::bcclimbr(machine_config &config)
 class tactix_state : public hh_ucom4_state
 {
 public:
-	tactix_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	tactix_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(leds_w);
@@ -1108,6 +1189,13 @@ void tactix_state::tactix(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+// roms
+
+ROM_START( tactix )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d557lc-512", 0x0000, 0x0800, CRC(1df738cb) SHA1(15a5de28a3c03e6894d29c56b5b424983569ccf2) )
+ROM_END
+
 
 
 
@@ -1128,8 +1216,8 @@ void tactix_state::tactix(machine_config &config)
 class invspace_state : public hh_ucom4_state
 {
 public:
-	invspace_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	invspace_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1201,7 +1289,8 @@ void invspace_state::invspace(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(289, 1080);
-	screen.set_visarea(0, 289-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1209,6 +1298,16 @@ void invspace_state::invspace(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
+
+// roms
+
+ROM_START( invspace )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "d552c-054", 0x0000, 0x0400, CRC(913d9c13) SHA1(f20edb5458e54d2f6d4e45e5d59efd87e05a6f3f) )
+
+	ROM_REGION( 110899, "svg", 0)
+	ROM_LOAD( "invspace.svg", 0, 110899, CRC(ae794333) SHA1(3552215389f02e4ef1d608f7dfc84f0499a78ee2) )
+ROM_END
 
 
 
@@ -1230,8 +1329,8 @@ void invspace_state::invspace(machine_config &config)
 class efball_state : public hh_ucom4_state
 {
 public:
-	efball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	efball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1321,6 +1420,13 @@ void efball_state::efball(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+// roms
+
+ROM_START( efball )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-080", 0x0000, 0x0800, CRC(54c1027f) SHA1(6cc98074dae9361fa8c0ed6501b6a57ad325ccbd) )
+ROM_END
+
 
 
 
@@ -1343,8 +1449,8 @@ void efball_state::efball(machine_config &config)
 class galaxy2_state : public hh_ucom4_state
 {
 public:
-	galaxy2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	galaxy2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1417,7 +1523,8 @@ void galaxy2_state::galaxy2(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(304, 1080);
-	screen.set_visarea(0, 304-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1431,9 +1538,28 @@ void galaxy2_state::galaxy2b(machine_config &config)
 	galaxy2(config);
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_size(306, 1080);
-	subdevice<screen_device>("screen")->set_visarea(0, 306-1, 0, 1080-1);
+	screen_device *screen = subdevice<screen_device>("screen");
+	screen->set_size(306, 1080);
+	screen->set_visarea_full();
 }
+
+// roms
+
+ROM_START( galaxy2 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-153.s01", 0x0000, 0x0800, CRC(70d552b3) SHA1(72d50647701cb4bf85ea947a149a317aaec0f52c) )
+
+	ROM_REGION( 325057, "svg", 0)
+	ROM_LOAD( "galaxy2d.svg", 0, 325057, CRC(b2d27a0e) SHA1(502ec22c324903ffe8ff235b9a3b8898dce17a64) )
+ROM_END
+
+ROM_START( galaxy2b )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-153.s01", 0x0000, 0x0800, CRC(70d552b3) SHA1(72d50647701cb4bf85ea947a149a317aaec0f52c) )
+
+	ROM_REGION( 266377, "svg", 0)
+	ROM_LOAD( "galaxy2b.svg", 0, 266377, CRC(8633cebb) SHA1(6c41f5e918e1522eb55ef24270900a1b2477722b) )
+ROM_END
 
 
 
@@ -1456,8 +1582,8 @@ void galaxy2_state::galaxy2b(machine_config &config)
 class astrocmd_state : public hh_ucom4_state
 {
 public:
-	astrocmd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	astrocmd_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1536,7 +1662,8 @@ void astrocmd_state::astrocmd(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 525);
-	screen.set_visarea(0, 1920-1, 0, 525-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1544,6 +1671,16 @@ void astrocmd_state::astrocmd(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
+
+// roms
+
+ROM_START( astrocmd )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-202.s01", 0x0000, 0x0800, CRC(b4b34883) SHA1(6246d561c2df1f2124575d2ca671ef85b1819edd) )
+
+	ROM_REGION( 335362, "svg", 0)
+	ROM_LOAD( "astrocmd.svg", 0, 335362, CRC(fe2cd30f) SHA1(898a3d9afc5dca6c63ae28aed2c8530716ad1c45) )
+ROM_END
 
 
 
@@ -1566,8 +1703,8 @@ void astrocmd_state::astrocmd(machine_config &config)
 class edracula_state : public hh_ucom4_state
 {
 public:
-	edracula_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	edracula_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(grid_w);
@@ -1632,7 +1769,8 @@ void edracula_state::edracula(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 526);
-	screen.set_visarea(0, 1920-1, 0, 526-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1640,6 +1778,16 @@ void edracula_state::edracula(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
+
+// roms
+
+ROM_START( edracula )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-206.s01", 0x0000, 0x0800, CRC(b524857b) SHA1(c1c89ed5dd4bb1e6e98462dc8fa5af2aa48d8ede) )
+
+	ROM_REGION( 794532, "svg", 0)
+	ROM_LOAD( "edracula.svg", 0, 794532, CRC(d20e018c) SHA1(7f70f1d373c034ec8c93e27b7e3371578ddaf61b) )
+ROM_END
 
 
 
@@ -1656,8 +1804,8 @@ void edracula_state::edracula(machine_config &config)
 class mcompgin_state : public hh_ucom4_state
 {
 public:
-	mcompgin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag),
+	mcompgin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag),
 		m_lcd(*this, "lcd")
 	{ }
 
@@ -1681,9 +1829,9 @@ WRITE8_MEMBER(mcompgin_state::lcd_w)
 	// E0: HLCD0530 _CS
 	// E1: HLCD0530 clock
 	// E2: HLCD0530 data in
-	m_lcd->write_cs(data & 1);
-	m_lcd->write_data(data >> 2 & 1);
-	m_lcd->write_clock(data >> 1 & 1);
+	m_lcd->cs_w(data & 1);
+	m_lcd->data_w(data >> 2 & 1);
+	m_lcd->clock_w(data >> 1 & 1);
 }
 
 // config
@@ -1718,13 +1866,20 @@ void mcompgin_state::mcompgin(machine_config &config)
 	/* no sound! */
 }
 
+// roms
+
+ROM_START( mcompgin )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d650c-060", 0x0000, 0x0800, CRC(985e6da6) SHA1(ea4102a10a5741f06297c5426156e4b2f0d85a68) )
+ROM_END
+
 
 
 
 
 /***************************************************************************
 
-  Mego Mini-Vid Break Free (manufactured in Japan)
+  Mego Mini-Vid: Break Free (manufactured in Japan)
   * PCB label Mego 79 rev F
   * NEC uCOM-43 MCU, label D553C 049
   * cyan VFD display Futaba DM-4.5 91
@@ -1734,8 +1889,8 @@ void mcompgin_state::mcompgin(machine_config &config)
 class mvbfree_state : public hh_ucom4_state
 {
 public:
-	mvbfree_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	mvbfree_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1821,6 +1976,13 @@ void mvbfree_state::mvbfree(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+// roms
+
+ROM_START( mvbfree )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-049", 0x0000, 0x0800, CRC(d64a8399) SHA1(97887e486fa29b1fc4a5a40cacf3c960f67aacbf) )
+ROM_END
+
 
 
 
@@ -1845,8 +2007,8 @@ void mvbfree_state::mvbfree(machine_config &config)
 class grobot9_state : public hh_ucom4_state
 {
 public:
-	grobot9_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	grobot9_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(lamps_w);
@@ -1936,6 +2098,13 @@ void grobot9_state::grobot9(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+// roms
+
+ROM_START( grobot9 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "ttgr-511", 0x0000, 0x0800, CRC(1f25b2bb) SHA1(55ae7e23f6dd46cc6e1a65839327726678410c3a) )
+ROM_END
+
 
 
 
@@ -1956,8 +2125,8 @@ void grobot9_state::grobot9(machine_config &config)
 class tccombat_state : public hh_ucom4_state
 {
 public:
-	tccombat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	tccombat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -2025,7 +2194,8 @@ void tccombat_state::tccombat(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(300, 1080);
-	screen.set_visarea(0, 300-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2033,6 +2203,16 @@ void tccombat_state::tccombat(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
+
+// roms
+
+ROM_START( tccombat )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "d552c-042", 0x0000, 0x0400, CRC(d7b5cfeb) SHA1(a267be8e43b7740758eb0881b655b1cc8aec43da) )
+
+	ROM_REGION( 210960, "svg", 0)
+	ROM_LOAD( "tccombat.svg", 0, 210960, CRC(03e9eba6) SHA1(d558d3063da42dc7cc02b769bca06a3732418837) )
+ROM_END
 
 
 
@@ -2056,8 +2236,8 @@ void tccombat_state::tccombat(machine_config &config)
 class tmtennis_state : public hh_ucom4_state
 {
 public:
-	tmtennis_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	tmtennis_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(grid_w);
@@ -2066,14 +2246,28 @@ public:
 	DECLARE_READ8_MEMBER(input_r);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch);
+	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch) { set_clock(); }
 	void tmtennis(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
 };
 
+void tmtennis_state::machine_reset()
+{
+	hh_ucom4_state::machine_reset();
+	set_clock();
+}
+
 // handlers
+
+void tmtennis_state::set_clock()
+{
+	// MCU clock is from an LC circuit oscillating by default at ~360kHz,
+	// but on PRO1, the difficulty switch puts a capacitor across the LC circuit
+	// to slow it down to ~260kHz.
+	m_maincpu->set_unscaled_clock((m_inp_matrix[1]->read() & 0x100) ? 260000 : 360000);
+}
 
 WRITE8_MEMBER(tmtennis_state::grid_w)
 {
@@ -2145,25 +2339,6 @@ static INPUT_PORTS_START( tmtennis )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("P2 Button 6")
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(tmtennis_state::difficulty_switch)
-{
-	set_clock();
-}
-
-void tmtennis_state::set_clock()
-{
-	// MCU clock is from an LC circuit oscillating by default at ~360kHz,
-	// but on PRO1, the difficulty switch puts a capacitor across the LC circuit
-	// to slow it down to ~260kHz.
-	m_maincpu->set_unscaled_clock((m_inp_matrix[1]->read() & 0x100) ? 260000 : 360000);
-}
-
-void tmtennis_state::machine_reset()
-{
-	hh_ucom4_state::machine_reset();
-	set_clock();
-}
-
 void tmtennis_state::tmtennis(machine_config &config)
 {
 	/* basic machine hardware */
@@ -2183,14 +2358,26 @@ void tmtennis_state::tmtennis(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 417);
-	screen.set_visarea(0, 1920-1, 0, 417-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_tmtennis);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
+
+// roms
+
+ROM_START( tmtennis )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "d552c-048", 0x0000, 0x0400, CRC(78702003) SHA1(4d427d4dbeed901770c682338867f58c7b54eee3) )
+
+	ROM_REGION( 204490, "svg", 0)
+	ROM_LOAD( "tmtennis.svg", 0, 204490, CRC(ed0086e9) SHA1(26a5b2f0a9cd70401187146e1495aee80020658b) )
+ROM_END
 
 
 
@@ -2218,8 +2405,8 @@ void tmtennis_state::tmtennis(machine_config &config)
 class tmpacman_state : public hh_ucom4_state
 {
 public:
-	tmpacman_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	tmpacman_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -2292,7 +2479,8 @@ void tmpacman_state::tmpacman(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 508);
-	screen.set_visarea(0, 1920-1, 0, 508-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2300,6 +2488,16 @@ void tmpacman_state::tmpacman(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
+
+// roms
+
+ROM_START( tmpacman )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-160", 0x0000, 0x0800, CRC(b21a8af7) SHA1(e3122be1873ce76a4067386bf250802776f0c2f9) )
+
+	ROM_REGION( 230216, "svg", 0)
+	ROM_LOAD( "tmpacman.svg", 0, 230216, CRC(2ab5c0f1) SHA1(b2b6482b03c28515dc76fd3d6034c8b7e6bf6efc) )
+ROM_END
 
 
 
@@ -2323,8 +2521,8 @@ void tmpacman_state::tmpacman(machine_config &config)
 class tmscramb_state : public hh_ucom4_state
 {
 public:
-	tmscramb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	tmscramb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -2395,7 +2593,8 @@ void tmscramb_state::tmscramb(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 556);
-	screen.set_visarea(0, 1920-1, 0, 556-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2403,6 +2602,16 @@ void tmscramb_state::tmscramb(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
+
+// roms
+
+ROM_START( tmscramb )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-192", 0x0000, 0x0800, CRC(00fcc501) SHA1(a7771e934bf8268c83f38c7ec0acc668836e0939) )
+
+	ROM_REGION( 235601, "svg", 0)
+	ROM_LOAD( "tmscramb.svg", 0, 235601, CRC(9e76219a) SHA1(275273b98d378c9313dd73a3b86cc661a824b7af) )
+ROM_END
 
 
 
@@ -2425,8 +2634,8 @@ void tmscramb_state::tmscramb(machine_config &config)
 class tcaveman_state : public hh_ucom4_state
 {
 public:
-	tcaveman_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	tcaveman_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -2494,7 +2703,8 @@ void tcaveman_state::tcaveman(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 559);
-	screen.set_visarea(0, 1920-1, 0, 559-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2502,6 +2712,16 @@ void tcaveman_state::tcaveman(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
+
+// roms
+
+ROM_START( tcaveman )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-209", 0x0000, 0x0800, CRC(d230d4b7) SHA1(2fb12b60410f5567c5e3afab7b8f5aa855d283be) )
+
+	ROM_REGION( 306952, "svg", 0)
+	ROM_LOAD( "tcaveman.svg", 0, 306952, CRC(a0588b14) SHA1(f67edf579963fc19bc7f9d268329cbc0230712d8) )
+ROM_END
 
 
 
@@ -2525,8 +2745,8 @@ void tcaveman_state::tcaveman(machine_config &config)
 class alnchase_state : public hh_ucom4_state
 {
 public:
-	alnchase_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	alnchase_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(output_w);
@@ -2627,7 +2847,8 @@ void alnchase_state::alnchase(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(365, 1080);
-	screen.set_visarea(0, 365-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2636,196 +2857,7 @@ void alnchase_state::alnchase(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-
-
-
-
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
-
-ROM_START( ufombs )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "d552c-017", 0x0000, 0x0400, CRC(0e208cb3) SHA1(57db6566916c94325e2b67ccb94b4ea3b233487d) )
-
-	ROM_REGION( 222395, "svg", 0)
-	ROM_LOAD( "ufombs.svg", 0, 222395, CRC(ae9fb93f) SHA1(165ea78eee93c503dbd277a56c41e3c63c534e38) )
-ROM_END
-
-
-ROM_START( ssfball )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-031", 0x0000, 0x0800, CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
-
-	ROM_REGION( 331352, "svg", 0)
-	ROM_LOAD( "ssfball.svg", 0, 331352, CRC(10cffb85) SHA1(c875f73a323d976088ffa1bc19f7bc865d4aac62) )
-ROM_END
-
-ROM_START( bmcfball )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-031", 0x0000, 0x0800, CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
-
-	ROM_REGION( 331352, "svg", 0)
-	ROM_LOAD( "bmcfball.svg", 0, 331352, CRC(43fbed1e) SHA1(28160e14b0879cd4dd9dab770c52c98f316ab653) )
-ROM_END
-
-
-ROM_START( bmsoccer )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "d552c-043", 0x0000, 0x0400, CRC(10c2a4ea) SHA1(6ebca7d406e22ff7a8cd529579b55a700da487b4) )
-
-	ROM_REGION( 273796, "svg", 0)
-	ROM_LOAD( "bmsoccer.svg", 0, 273796, CRC(4c88d9f8) SHA1(b4b82f26a09f54cd0b6a9d1c1a46796fbfcb578a) )
-ROM_END
-
-
-ROM_START( bmsafari )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "d552c-049", 0x0000, 0x0400, CRC(82fa3cbe) SHA1(019e7ec784e977eba09997fc46af253054fb222c) )
-
-	ROM_REGION( 275386, "svg", 0)
-	ROM_LOAD( "bmsafari.svg", 0, 275386, CRC(c24badbc) SHA1(b191f34155d6d4e834e7c6fe715d4bb76198ad72) )
-ROM_END
-
-
-ROM_START( splasfgt )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-055", 0x0000, 0x0800, CRC(eb471fbd) SHA1(f06cfe567bf6f9ed4dcdc88acdcfad50cd370a02) )
-
-	ROM_REGION( 246609, "svg", 0)
-	ROM_LOAD( "splasfgt.svg", 0, 246609, CRC(365fae43) SHA1(344c120c2efa92ada9171047affac801a06cf303) )
-ROM_END
-
-
-ROM_START( bcclimbr )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-170", 0x0000, 0x0800, CRC(fc2eabdb) SHA1(0f5cc854be7fdf105d9bd2114659d40c65f9d782) )
-
-	ROM_REGION( 219971, "svg", 0)
-	ROM_LOAD( "bcclimbr.svg", 0, 219971, CRC(9c9102f4) SHA1(6a7e02fd1467a26c734b01724e23cef9e4917805) )
-ROM_END
-
-
-ROM_START( tactix )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d557lc-512", 0x0000, 0x0800, CRC(1df738cb) SHA1(15a5de28a3c03e6894d29c56b5b424983569ccf2) )
-ROM_END
-
-
-ROM_START( invspace )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "d552c-054", 0x0000, 0x0400, CRC(913d9c13) SHA1(f20edb5458e54d2f6d4e45e5d59efd87e05a6f3f) )
-
-	ROM_REGION( 110899, "svg", 0)
-	ROM_LOAD( "invspace.svg", 0, 110899, CRC(ae794333) SHA1(3552215389f02e4ef1d608f7dfc84f0499a78ee2) )
-ROM_END
-
-
-ROM_START( efball )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-080", 0x0000, 0x0800, CRC(54c1027f) SHA1(6cc98074dae9361fa8c0ed6501b6a57ad325ccbd) )
-ROM_END
-
-
-ROM_START( galaxy2 )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-153.s01", 0x0000, 0x0800, CRC(70d552b3) SHA1(72d50647701cb4bf85ea947a149a317aaec0f52c) )
-
-	ROM_REGION( 325057, "svg", 0)
-	ROM_LOAD( "galaxy2d.svg", 0, 325057, CRC(b2d27a0e) SHA1(502ec22c324903ffe8ff235b9a3b8898dce17a64) )
-ROM_END
-
-ROM_START( galaxy2b )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-153.s01", 0x0000, 0x0800, CRC(70d552b3) SHA1(72d50647701cb4bf85ea947a149a317aaec0f52c) )
-
-	ROM_REGION( 266377, "svg", 0)
-	ROM_LOAD( "galaxy2b.svg", 0, 266377, CRC(8633cebb) SHA1(6c41f5e918e1522eb55ef24270900a1b2477722b) )
-ROM_END
-
-
-ROM_START( astrocmd )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-202.s01", 0x0000, 0x0800, CRC(b4b34883) SHA1(6246d561c2df1f2124575d2ca671ef85b1819edd) )
-
-	ROM_REGION( 335362, "svg", 0)
-	ROM_LOAD( "astrocmd.svg", 0, 335362, CRC(fe2cd30f) SHA1(898a3d9afc5dca6c63ae28aed2c8530716ad1c45) )
-ROM_END
-
-
-ROM_START( edracula )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-206.s01", 0x0000, 0x0800, CRC(b524857b) SHA1(c1c89ed5dd4bb1e6e98462dc8fa5af2aa48d8ede) )
-
-	ROM_REGION( 794532, "svg", 0)
-	ROM_LOAD( "edracula.svg", 0, 794532, CRC(d20e018c) SHA1(7f70f1d373c034ec8c93e27b7e3371578ddaf61b) )
-ROM_END
-
-
-ROM_START( mcompgin )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d650c-060", 0x0000, 0x0800, CRC(985e6da6) SHA1(ea4102a10a5741f06297c5426156e4b2f0d85a68) )
-ROM_END
-
-
-ROM_START( mvbfree )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-049", 0x0000, 0x0800, CRC(d64a8399) SHA1(97887e486fa29b1fc4a5a40cacf3c960f67aacbf) )
-ROM_END
-
-
-ROM_START( grobot9 )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "ttgr-511", 0x0000, 0x0800, CRC(1f25b2bb) SHA1(55ae7e23f6dd46cc6e1a65839327726678410c3a) )
-ROM_END
-
-
-ROM_START( tccombat )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "d552c-042", 0x0000, 0x0400, CRC(d7b5cfeb) SHA1(a267be8e43b7740758eb0881b655b1cc8aec43da) )
-
-	ROM_REGION( 210960, "svg", 0)
-	ROM_LOAD( "tccombat.svg", 0, 210960, CRC(03e9eba6) SHA1(d558d3063da42dc7cc02b769bca06a3732418837) )
-ROM_END
-
-
-ROM_START( tmtennis )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "d552c-048", 0x0000, 0x0400, CRC(78702003) SHA1(4d427d4dbeed901770c682338867f58c7b54eee3) )
-
-	ROM_REGION( 204490, "svg", 0)
-	ROM_LOAD( "tmtennis.svg", 0, 204490, CRC(ed0086e9) SHA1(26a5b2f0a9cd70401187146e1495aee80020658b) )
-ROM_END
-
-
-ROM_START( tmpacman )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-160", 0x0000, 0x0800, CRC(b21a8af7) SHA1(e3122be1873ce76a4067386bf250802776f0c2f9) )
-
-	ROM_REGION( 230216, "svg", 0)
-	ROM_LOAD( "tmpacman.svg", 0, 230216, CRC(2ab5c0f1) SHA1(b2b6482b03c28515dc76fd3d6034c8b7e6bf6efc) )
-ROM_END
-
-
-ROM_START( tmscramb )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-192", 0x0000, 0x0800, CRC(00fcc501) SHA1(a7771e934bf8268c83f38c7ec0acc668836e0939) )
-
-	ROM_REGION( 235601, "svg", 0)
-	ROM_LOAD( "tmscramb.svg", 0, 235601, CRC(9e76219a) SHA1(275273b98d378c9313dd73a3b86cc661a824b7af) )
-ROM_END
-
-
-ROM_START( tcaveman )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-209", 0x0000, 0x0800, CRC(d230d4b7) SHA1(2fb12b60410f5567c5e3afab7b8f5aa855d283be) )
-
-	ROM_REGION( 306952, "svg", 0)
-	ROM_LOAD( "tcaveman.svg", 0, 306952, CRC(a0588b14) SHA1(f67edf579963fc19bc7f9d268329cbc0230712d8) )
-ROM_END
-
+// roms
 
 ROM_START( alnchase )
 	ROM_REGION( 0x0800, "maincpu", 0 )
@@ -2837,37 +2869,45 @@ ROM_END
 
 
 
-//    YEAR  NAME      PARENT   CMP MACHINE   INPUT     CLASS           INIT        COMPANY       FULLNAME                      FLAGS
-CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   ufombs_state,   empty_init, "Bambino",    "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  ssfball_state,  empty_init, "Bambino",    "Superstar Football (Bambino)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, bmcfball, ssfball,  0, ssfball,  ssfball,  ssfball_state,  empty_init, "Bambino",    "Classic Football (Bambino)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, bmsoccer_state, empty_init, "Bambino",    "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, bmsafari_state, empty_init, "Bambino",    "Safari (Bambino)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, splasfgt_state, empty_init, "Bambino",    "Space Laser Fight", MACHINE_SUPPORTS_SAVE )
+} // anonymous namespace
 
-CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, bcclimbr_state, empty_init, "Bandai",     "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE )
+/***************************************************************************
+
+  Game driver(s)
+
+***************************************************************************/
+
+//    YEAR  NAME      PARENT   CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   ufombs_state,   empty_init, "Bambino", "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  ssfball_state,  empty_init, "Bambino", "Superstar Football (Bambino)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, bmcfball, ssfball,  0, ssfball,  ssfball,  ssfball_state,  empty_init, "Bambino", "Classic Football (Bambino)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, bmsoccer_state, empty_init, "Bambino", "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, bmsafari_state, empty_init, "Bambino", "Safari (Bambino)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, splasfgt_state, empty_init, "Bambino", "Space Laser Fight", MACHINE_SUPPORTS_SAVE )
+
+CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, bcclimbr_state, empty_init, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, tactix,   0,        0, tactix,   tactix,   tactix_state,   empty_init, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, invspace, 0,        0, invspace, invspace, invspace_state, empty_init, "Epoch",      "Invader From Space", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, efball,   0,        0, efball,   efball,   efball_state,   empty_init, "Epoch",      "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  galaxy2_state,  empty_init, "Epoch",      "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  galaxy2_state,  empty_init, "Epoch",      "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, astrocmd_state, empty_init, "Epoch",      "Astro Command", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, edracula, 0,        0, edracula, edracula, edracula_state, empty_init, "Epoch",      "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, invspace, 0,        0, invspace, invspace, invspace_state, empty_init, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, efball,   0,        0, efball,   efball,   efball_state,   empty_init, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, astrocmd_state, empty_init, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, edracula, 0,        0, edracula, edracula, edracula_state, empty_init, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, empty_init, "Mattel",     "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, empty_init, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  mvbfree_state,  empty_init, "Mego",       "Mini-Vid Break Free", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  mvbfree_state,  empty_init, "Mego", "Mini-Vid: Break Free", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, grobot9,  0,        0, grobot9,  grobot9,  grobot9_state,  empty_init, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 
-CONS( 1980, tccombat, 0,        0, tccombat, tccombat, tccombat_state, empty_init, "Tomy",       "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, tmtennis_state, empty_init, "Tomy",       "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, tmpacman_state, empty_init, "Tomy",       "Pac Man (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, tmscramb_state, empty_init, "Tomy",       "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, tcaveman_state, empty_init, "Tomy",       "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, alnchase, 0,        0, alnchase, alnchase, alnchase_state, empty_init, "Tomy",       "Alien Chase", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tccombat, 0,        0, tccombat, tccombat, tccombat_state, empty_init, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, tmtennis_state, empty_init, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, tmpacman_state, empty_init, "Tomy", "Pac Man (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, tmscramb_state, empty_init, "Tomy", "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, tcaveman_state, empty_init, "Tomy", "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, alnchase, 0,        0, alnchase, alnchase, alnchase_state, empty_init, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

@@ -52,16 +52,16 @@ void vsmilpro_state::vsmilpro_map(address_map &map)
 static INPUT_PORTS_START( vsmilpro )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(vsmilpro_state::vsmilpro)
+void vsmilpro_state::vsmilpro(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM9, 150000000)
-	MCFG_DEVICE_PROGRAM_MAP(vsmilpro_map)
+	ARM9(config, m_maincpu, 150000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vsmilpro_state::vsmilpro_map);
 
-	MCFG_CDROM_ADD("cdrom")
-	MCFG_CDROM_INTERFACE("vsmile_vdisk")
+	CDROM(config, "cdrom").set_interface("vsmile_vdisk");
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","vsmile_cd")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cd_list").set_original("vsmile_cd");
+}
 
 /* ROM definition */
 ROM_START( vsmilpro )

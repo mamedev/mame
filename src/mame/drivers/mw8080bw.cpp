@@ -235,6 +235,7 @@ void mw8080bw_state::mw8080bw_root(machine_config &config)
 	/* basic machine hardware */
 	I8080(config, m_maincpu, MW8080BW_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mw8080bw_state::main_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(mw8080bw_state::interrupt_vector));
 
 	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,mw8080bw)
 	MCFG_MACHINE_RESET_OVERRIDE(mw8080bw_state,mw8080bw)
@@ -915,7 +916,7 @@ WRITE8_MEMBER(mw8080bw_state::maze_io_w)
 {
 	if (offset & 0x01)  maze_coin_counter_w(space, 0, data);
 
-	if (offset & 0x02)  m_watchdog->reset_w(space, 0, data);
+	if (offset & 0x02)  m_watchdog->watchdog_reset();
 }
 
 
@@ -1081,7 +1082,7 @@ WRITE8_MEMBER(mw8080bw_state::checkmat_io_w)
 {
 	if (offset & 0x01)  checkmat_audio_w(space, 0, data);
 
-	if (offset & 0x02)  m_watchdog->reset_w(space, 0, data);
+	if (offset & 0x02)  m_watchdog->watchdog_reset();
 }
 
 
@@ -2169,7 +2170,7 @@ WRITE8_MEMBER(mw8080bw_state::spcenctr_io_w)
 {                                               /* A7 A6 A5 A4 A3 A2 A1 A0 */
 
 	if ((offset & 0x07) == 0x02)
-		m_watchdog->reset_w(space, 0, data);       /*  -  -  -  -  -  0  1  0 */
+		m_watchdog->watchdog_reset();       /*  -  -  -  -  -  0  1  0 */
 
 	else if ((offset & 0x5f) == 0x01)
 		spcenctr_audio_1_w(space, 0, data); /*  -  0  -  0  0  0  0  1 */

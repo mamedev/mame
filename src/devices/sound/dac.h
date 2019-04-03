@@ -258,7 +258,7 @@ DECLARE_DEVICE_TYPE(_dac_type, _dac_class) \
 class _dac_class : public dac_generator<_dac_interface, _dac_coding> \
 {\
 public: \
-	_dac_class(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : \
+	_dac_class(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) : \
 		dac_generator(mconfig, _dac_type, tag, owner, clock, _dac_gain) {} \
 }; \
 DAC_GENERATOR_EPILOG(_dac_type, _dac_class, _dac_description, _dac_shortname)

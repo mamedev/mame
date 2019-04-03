@@ -146,7 +146,7 @@ READ8_MEMBER(pc9801_26_device::opn_r)
 {
 	if((offset & 1) == 0)
 	{
-		return offset & 4 ? 0xff : m_opn->read(space, offset >> 1);
+		return offset & 4 ? 0xff : m_opn->read(offset >> 1);
 	}
 	else // odd
 	{
@@ -159,7 +159,7 @@ READ8_MEMBER(pc9801_26_device::opn_r)
 WRITE8_MEMBER(pc9801_26_device::opn_w)
 {
 	if((offset & 5) == 0)
-		m_opn->write(space, offset >> 1, data);
+		m_opn->write(offset >> 1, data);
 	else // odd
 		printf("PC9801-26: Write to undefined port [%02x] %02x\n",offset+0x188,data);
 }

@@ -68,12 +68,12 @@ void comx_expansion_slot_device::device_start()
 //  mrd_r - memory read
 //-------------------------------------------------
 
-uint8_t comx_expansion_slot_device::mrd_r(address_space &space, offs_t offset, int *extrom)
+uint8_t comx_expansion_slot_device::mrd_r(offs_t offset, int *extrom)
 {
 	uint8_t data = 0;
 
 	if (m_card != nullptr)
-		data = m_card->comx_mrd_r(space, offset, extrom);
+		data = m_card->comx_mrd_r(offset, extrom);
 
 	return data;
 }
@@ -83,10 +83,10 @@ uint8_t comx_expansion_slot_device::mrd_r(address_space &space, offs_t offset, i
 //  mwr_w - memory write
 //-------------------------------------------------
 
-void comx_expansion_slot_device::mwr_w(address_space &space, offs_t offset, uint8_t data)
+void comx_expansion_slot_device::mwr_w(offs_t offset, uint8_t data)
 {
 	if (m_card != nullptr)
-		m_card->comx_mwr_w(space, offset, data);
+		m_card->comx_mwr_w(offset, data);
 }
 
 
@@ -94,12 +94,12 @@ void comx_expansion_slot_device::mwr_w(address_space &space, offs_t offset, uint
 //  io_r - I/O read
 //-------------------------------------------------
 
-uint8_t comx_expansion_slot_device::io_r(address_space &space, offs_t offset)
+uint8_t comx_expansion_slot_device::io_r(offs_t offset)
 {
 	uint8_t data = 0;
 
 	if (m_card != nullptr)
-		data = m_card->comx_io_r(space, offset);
+		data = m_card->comx_io_r(offset);
 
 	return data;
 }
@@ -109,10 +109,10 @@ uint8_t comx_expansion_slot_device::io_r(address_space &space, offs_t offset)
 //  sout_w - I/O write
 //-------------------------------------------------
 
-void comx_expansion_slot_device::io_w(address_space &space, offs_t offset, uint8_t data)
+void comx_expansion_slot_device::io_w(offs_t offset, uint8_t data)
 {
 	if (m_card != nullptr)
-		m_card->comx_io_w(space, offset, data);
+		m_card->comx_io_w(offset, data);
 }
 
 

@@ -235,10 +235,11 @@ public:
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	void galaxian_palette(palette_device &palette);
 	void moonwar_palette(palette_device &palette);
+	void eagle_palette(palette_device &palette);
 	void tenspot_set_game_bank(int bank, int from_game);
 	uint32_t screen_update_galaxian(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt_w);
-	DECLARE_WRITE_LINE_MEMBER(tenspot_interrupt_w);
+	DECLARE_INPUT_CHANGED_MEMBER(tenspot_fake);
 	TIMER_DEVICE_CALLBACK_MEMBER(checkmaj_irq0_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(scramble_stars_blink_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timefgtr_scanline);
@@ -334,6 +335,7 @@ public:
 	void takeoff(machine_config &config);
 	void sfx(machine_config &config);
 	void mooncrst(machine_config &config);
+	void eagle(machine_config &config);
 	void scorpion(machine_config &config);
 	void frogf(machine_config &config);
 	void amigo2(machine_config &config);
@@ -424,7 +426,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
-	optional_device<discrete_device> m_discrete;
+	optional_device<discrete_sound_device> m_discrete;
 
 	optional_ioport m_fake_select;
 	optional_ioport_array<10> m_tenspot_game_dsw;

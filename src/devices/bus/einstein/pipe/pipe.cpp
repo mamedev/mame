@@ -33,8 +33,8 @@ DEFINE_DEVICE_TYPE(TATUNG_PIPE, tatung_pipe_device, "tatung_pipe", "Tatung Pipe 
 tatung_pipe_device::tatung_pipe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TATUNG_PIPE, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
-	m_program(nullptr),
-	m_io(nullptr),
+	m_program(*this, finder_base::DUMMY_TAG, -1),
+	m_io(*this, finder_base::DUMMY_TAG, -1),
 	m_card(nullptr),
 	m_int_handler(*this),
 	m_nmi_handler(*this),
@@ -48,6 +48,28 @@ tatung_pipe_device::tatung_pipe_device(const machine_config &mconfig, const char
 
 tatung_pipe_device::~tatung_pipe_device()
 {
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tatung_pipe_device::device_config_complete()
+{
+	// for passthrough connectors, use the parent slot's spaces
+	if (dynamic_cast<device_tatung_pipe_interface *>(owner()) != nullptr)
+	{
+		auto parent = dynamic_cast<tatung_pipe_device *>(owner()->owner());
+		if (parent != nullptr)
+		{
+			if (m_program.finder_tag() == finder_base::DUMMY_TAG)
+				m_program.set_tag(parent->m_program, parent->m_program.spacenum());
+			if (m_io.finder_tag() == finder_base::DUMMY_TAG)
+				m_io.set_tag(parent->m_io, parent->m_io.spacenum());
+		}
+	}
 }
 
 //-------------------------------------------------
@@ -81,24 +103,6 @@ WRITE_LINE_MEMBER( tatung_pipe_device::host_int_w )
 {
 	if (m_card)
 		m_card->int_w(state);
-}
-
-//-------------------------------------------------
-//  set_program_space - set address space we are attached to
-//-------------------------------------------------
-
-void tatung_pipe_device::set_program_space(address_space *program)
-{
-	m_program = program;
-}
-
-//-------------------------------------------------
-//  set_io_space - set address space we are attached to
-//-------------------------------------------------
-
-void tatung_pipe_device::set_io_space(address_space *io)
-{
-	m_io = io;
 }
 
 

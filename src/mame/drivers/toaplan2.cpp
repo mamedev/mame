@@ -741,14 +741,14 @@ READ16_MEMBER(toaplan2_state::batrider_z80rom_r)
 // these two latches are always written together, via a single move.l instruction
 WRITE8_MEMBER(toaplan2_state::batrider_soundlatch_w)
 {
-	m_soundlatch->write(space, offset, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
 WRITE8_MEMBER(toaplan2_state::batrider_soundlatch2_w)
 {
-	m_soundlatch2->write(space, offset, data & 0xff);
+	m_soundlatch2->write(data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -3174,8 +3174,8 @@ static GFXDECODE_START( gfx_batrider )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(toaplan2_state::tekipaki)
-
+void toaplan2_state::tekipaki(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10_MHz_XTAL);         // 10MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::tekipaki_68k_mem);
@@ -3213,11 +3213,10 @@ MACHINE_CONFIG_START(toaplan2_state::tekipaki)
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", 27_MHz_XTAL/8));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(toaplan2_state::ghox)
-
+void toaplan2_state::ghox(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10_MHz_XTAL);         /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::ghox_68k_mem);
@@ -3250,7 +3249,7 @@ MACHINE_CONFIG_START(toaplan2_state::ghox)
 	SPEAKER(config, "mono").front_center();
 
 	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 1.0); // verified on pcb
-MACHINE_CONFIG_END
+}
 
 /* probably dogyuun, vfive and kbash use the same decryption table;
 those 3 games have been seen with the NITRO905 chip, other alias are
@@ -3419,8 +3418,8 @@ void toaplan2_state::kbash2(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(toaplan2_state::truxton2)
-
+void toaplan2_state::truxton2(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);         /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::truxton2_68k_mem);
@@ -3460,11 +3459,11 @@ MACHINE_CONFIG_START(toaplan2_state::truxton2)
 	OKIM6295(config, m_oki[0], 16_MHz_XTAL/4, okim6295_device::PIN7_LOW); // verified on PCB
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 #endif
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(toaplan2_state::pipibibs)
-
+void toaplan2_state::pipibibs(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10_MHz_XTAL);         // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibs_68k_mem);
@@ -3499,11 +3498,11 @@ MACHINE_CONFIG_START(toaplan2_state::pipibibs)
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", 27_MHz_XTAL/8)); // verified on PCB
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(toaplan2_state::pipibibsbl)
-
+void toaplan2_state::pipibibsbl(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12_MHz_XTAL); // ??? (position labeled "68000-12" but 10 MHz-rated parts used)
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibi_bootleg_68k_mem);
@@ -3536,7 +3535,7 @@ MACHINE_CONFIG_START(toaplan2_state::pipibibsbl)
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", 28.322_MHz_XTAL / 8)); // ???
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 /* x = modified to match batsugun 'unencrypted' code - '?' likewise, but not so sure about them */
@@ -3578,8 +3577,8 @@ static const uint8_t ts001turbo_decryption_table[256] = {
 };
 
 
-MACHINE_CONFIG_START(toaplan2_state::fixeight)
-
+void toaplan2_state::fixeight(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);         // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::fixeight_68k_mem);
@@ -3616,11 +3615,11 @@ MACHINE_CONFIG_START(toaplan2_state::fixeight)
 
 	OKIM6295(config, m_oki[0], 16_MHz_XTAL/16, okim6295_device::PIN7_HIGH); /* verified on pcb */
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(toaplan2_state::fixeightbl)
-
+void toaplan2_state::fixeightbl(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(10'000'000));         /* 10MHz Oscillator */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::fixeightbl_68k_mem);
@@ -3652,8 +3651,7 @@ MACHINE_CONFIG_START(toaplan2_state::fixeightbl)
 	OKIM6295(config, m_oki[0], 14_MHz_XTAL/16, okim6295_device::PIN7_LOW);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_oki[0]->set_addrmap(0, &toaplan2_state::fixeightbl_oki);
-MACHINE_CONFIG_END
-
+}
 
 void toaplan2_state::vfive(machine_config &config)
 {
@@ -3732,7 +3730,6 @@ void toaplan2_state::batsugun(machine_config &config)
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
-
 void toaplan2_state::pwrkick(machine_config &config)
 {
 	/* basic machine hardware */
@@ -3765,7 +3762,6 @@ void toaplan2_state::pwrkick(machine_config &config)
 	OKIM6295(config, m_oki[0], 27_MHz_XTAL/8, okim6295_device::PIN7_HIGH); // not confirmed
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
-
 
 void toaplan2_state::othldrby(machine_config &config)
 {
@@ -3829,7 +3825,6 @@ void toaplan2_state::enmadaio(machine_config &config)
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
-
 void toaplan2_state::snowbro2(machine_config &config)
 {
 	/* basic machine hardware */
@@ -3863,8 +3858,8 @@ void toaplan2_state::snowbro2(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(toaplan2_state::mahoudai)
-
+void toaplan2_state::mahoudai(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::mahoudai_68k_mem);
@@ -3903,8 +3898,7 @@ MACHINE_CONFIG_START(toaplan2_state::mahoudai)
 
 	OKIM6295(config, m_oki[0], 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
-
+}
 
 void toaplan2_state::shippumd(machine_config &config)
 {
@@ -3912,9 +3906,8 @@ void toaplan2_state::shippumd(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::shippumd_68k_mem);
 }
 
-
-MACHINE_CONFIG_START(toaplan2_state::bgaregga)
-
+void toaplan2_state::bgaregga(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::bgaregga_68k_mem);
@@ -3960,19 +3953,19 @@ MACHINE_CONFIG_START(toaplan2_state::bgaregga)
 
 	NMK112(config, m_nmk112, 0);
 	m_nmk112->set_rom0_tag("oki1");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(toaplan2_state::bgareggabl)
+void toaplan2_state::bgareggabl(machine_config &config)
+{
 	bgaregga(config);
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgareggabl)
 
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_bootleg));
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(toaplan2_state::batrider)
-
+void toaplan2_state::batrider(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator (verified)
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::batrider_68k_mem);
@@ -4032,19 +4025,19 @@ MACHINE_CONFIG_START(toaplan2_state::batrider)
 	NMK112(config, m_nmk112, 0);
 	m_nmk112->set_rom0_tag("oki1");
 	m_nmk112->set_rom1_tag("oki2");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(toaplan2_state::bbakraid)
-
+void toaplan2_state::bbakraid(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::bbakraid_68k_mem);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/6)     /* 5.3333MHz , 32MHz Oscillator */
-	MCFG_DEVICE_PROGRAM_MAP(bbakraid_sound_z80_mem)
-	MCFG_DEVICE_IO_MAP(bbakraid_sound_z80_port)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(toaplan2_state, bbakraid_snd_interrupt,  448)
+	Z80(config, m_audiocpu, XTAL(32'000'000)/6);     /* 5.3333MHz , 32MHz Oscillator */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::bbakraid_sound_z80_mem);
+	m_audiocpu->set_addrmap(AS_IO, &toaplan2_state::bbakraid_sound_z80_port);
+	m_audiocpu->set_periodic_int(FUNC(toaplan2_state::bbakraid_snd_interrupt), attotime::from_hz(448));
 
 	config.m_minimum_quantum = attotime::from_hz(600);
 
@@ -4090,7 +4083,7 @@ MACHINE_CONFIG_START(toaplan2_state::bbakraid)
 
 	YMZ280B(config, "ymz", 16.9344_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
 	// IRQ not used ???  Connected to a test pin (TP082)
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

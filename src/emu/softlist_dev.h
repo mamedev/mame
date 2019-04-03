@@ -40,37 +40,6 @@ enum software_compatibility
 
 
 //**************************************************************************
-//  MACROS
-//**************************************************************************
-
-#define MCFG_SOFTWARE_LIST_CONFIG(_list,_list_type) \
-	downcast<software_list_device &>(*device).set_type(_list, _list_type);
-
-#define MCFG_SOFTWARE_LIST_ADD( _tag, _list ) \
-	MCFG_DEVICE_ADD( _tag, SOFTWARE_LIST ) \
-	MCFG_SOFTWARE_LIST_CONFIG(_list, SOFTWARE_LIST_ORIGINAL_SYSTEM)
-
-#define MCFG_SOFTWARE_LIST_COMPATIBLE_ADD( _tag, _list ) \
-	MCFG_DEVICE_ADD( _tag, SOFTWARE_LIST ) \
-	MCFG_SOFTWARE_LIST_CONFIG(_list, SOFTWARE_LIST_COMPATIBLE_SYSTEM)
-
-#define MCFG_SOFTWARE_LIST_MODIFY( _tag, _list ) \
-	MCFG_DEVICE_MODIFY( _tag ) \
-	MCFG_SOFTWARE_LIST_CONFIG(_list, SOFTWARE_LIST_ORIGINAL_SYSTEM)
-
-#define MCFG_SOFTWARE_LIST_COMPATIBLE_MODIFY( _tag, _list ) \
-	MCFG_DEVICE_MODIFY( _tag ) \
-	MCFG_SOFTWARE_LIST_CONFIG(_list, SOFTWARE_LIST_COMPATIBLE_SYSTEM)
-
-#define MCFG_SOFTWARE_LIST_FILTER( _tag, _filter ) \
-	MCFG_DEVICE_MODIFY( _tag ) \
-	downcast<software_list_device &>(*device).set_filter(_filter);
-
-#define MCFG_SOFTWARE_LIST_REMOVE( _tag ) \
-	MCFG_DEVICE_REMOVE( _tag )
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

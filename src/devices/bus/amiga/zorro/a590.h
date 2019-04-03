@@ -15,7 +15,7 @@
 
 #include "zorro.h"
 #include "machine/dmac.h"
-#include "machine/wd33c93.h"
+#include "machine/wd33c9x.h"
 
 
 //**************************************************************************
@@ -51,7 +51,7 @@ protected:
 
 	// sub-devices
 	required_device<amiga_dmac_device> m_dmac;
-	required_device<wd33c93_device> m_wdc;
+	required_device<wd33c93a_device> m_wdc;
 
 	std::vector<uint8_t> m_ram;
 
@@ -61,6 +61,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( dmac_int_w );
 	DECLARE_WRITE_LINE_MEMBER( dmac_cfgout_w ) { cfgout_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( scsi_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( scsi_drq_w );
+
+	static void scsi_devices(device_slot_interface &device);
+	void wd33c93(device_t *device);
 };
 
 // ======================> a590_device

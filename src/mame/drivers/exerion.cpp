@@ -372,20 +372,20 @@ void exerion_state::machine_reset()
 		m_background_latches[i] = 0;
 }
 
-MACHINE_CONFIG_START(exerion_state::exerion)
+void exerion_state::exerion(machine_config &config)
+{
+	Z80(config, m_maincpu, EXERION_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &exerion_state::main_map);
 
-	MCFG_DEVICE_ADD("maincpu", Z80, EXERION_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-
-	MCFG_DEVICE_ADD("sub", Z80, EXERION_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	z80_device &sub(Z80(config, "sub", EXERION_CPU_CLOCK));
+	sub.set_addrmap(AS_PROGRAM, &exerion_state::sub_map);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(EXERION_PIXEL_CLOCK, EXERION_HTOTAL, EXERION_HBEND, EXERION_HBSTART, EXERION_VTOTAL, EXERION_VBEND, EXERION_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(exerion_state, screen_update_exerion)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(EXERION_PIXEL_CLOCK, EXERION_HTOTAL, EXERION_HBEND, EXERION_HBSTART, EXERION_VTOTAL, EXERION_VBEND, EXERION_VBSTART);
+	m_screen->set_screen_update(FUNC(exerion_state::screen_update_exerion));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exerion);
 	PALETTE(config, m_palette, FUNC(exerion_state::exerion_palette), 256*3, 32);
@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(exerion_state::exerion)
 	ay2.port_a_read_callback().set(FUNC(exerion_state::exerion_porta_r));
 	ay2.port_b_write_callback().set(FUNC(exerion_state::exerion_portb_w));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.30);
-MACHINE_CONFIG_END
+}
 
 void exerion_state::irion(machine_config &config)
 {

@@ -327,24 +327,25 @@ WRITE_LINE_MEMBER(igs_m027_state::vblank_irq)
 }
 
 
-MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
-	MCFG_DEVICE_ADD("maincpu", ARM7, 20000000)
-	MCFG_DEVICE_PROGRAM_MAP(igs_majhong_map)
+void igs_m027_state::igs_majhong(machine_config &config)
+{
+	ARM7(config, m_maincpu, 20000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_majhong_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs_m027_state, screen_update_igs_majhong)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs_m027_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(igs_m027_state::screen_update_igs_majhong));
+	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(igs_m027_state::vblank_irq));
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-//  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	PALETTE(config, "palette").set_entries(0x200);
+//  .set_format(palette_device::xGRB_555, 0x200);
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits();
@@ -354,31 +355,27 @@ MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
 
 	/* sound hardware */
 	// OK6295
-MACHINE_CONFIG_END
+}
 
 
-
-
-
-MACHINE_CONFIG_START(igs_m027_state::amazonia)
-	MCFG_DEVICE_ADD("maincpu", ARM7, 20000000)
-	MCFG_DEVICE_PROGRAM_MAP(igs_majhong_map)
+void igs_m027_state::amazonia(machine_config &config)
+{
+	ARM7(config, m_maincpu, 20000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_majhong_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(igs_m027_state::screen_update_igs_majhong));
+	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(igs_m027_state::vblank_irq));
 
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs_m027_state, screen_update_igs_majhong)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs_m027_state, vblank_irq))
-
-	MCFG_PALETTE_ADD("palette", 0x200)
-//  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	PALETTE(config, "palette").set_entries(0x200);
+//  .set_format(palette_device::xGRB_555, 0x200);
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits();
@@ -388,8 +385,7 @@ MACHINE_CONFIG_START(igs_m027_state::amazonia)
 
 	/* sound hardware */
 	// OK6295
-
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

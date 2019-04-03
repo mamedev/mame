@@ -147,42 +147,42 @@ void lucky74_state::lucky74_palette(palette_device &palette) const
 		bit1 = BIT(color_prom[0x000 + i], 1);
 		bit2 = BIT(color_prom[0x000 + i], 2);
 		bit3 = BIT(color_prom[0x000 + i], 3);
-		int const r1 = combine_4_weights(weights_r, bit0, bit1, bit2, bit3);
+		int const r1 = combine_weights(weights_r, bit0, bit1, bit2, bit3);
 
 		// red component (this 2, PROM E7)
 		bit0 = BIT(color_prom[0x100 + i], 0);
 		bit1 = BIT(color_prom[0x100 + i], 1);
 		bit2 = BIT(color_prom[0x100 + i], 2);
 		bit3 = BIT(color_prom[0x100 + i], 3);
-		int const r2 = combine_4_weights(weights_r, bit0, bit1, bit2, bit3);
+		int const r2 = combine_weights(weights_r, bit0, bit1, bit2, bit3);
 
 		// green component (this 1, PROM D6)
 		bit0 = BIT(color_prom[0x200 + i], 0);
 		bit1 = BIT(color_prom[0x200 + i], 1);
 		bit2 = BIT(color_prom[0x200 + i], 2);
 		bit3 = BIT(color_prom[0x200 + i], 3);
-		int const g1 = combine_4_weights(weights_g, bit0, bit1, bit2, bit3);
+		int const g1 = combine_weights(weights_g, bit0, bit1, bit2, bit3);
 
 		// green component (this 2, PROM D7)
 		bit0 = BIT(color_prom[0x300 + i], 0);
 		bit1 = BIT(color_prom[0x300 + i], 1);
 		bit2 = BIT(color_prom[0x300 + i], 2);
 		bit3 = BIT(color_prom[0x300 + i], 3);
-		int const g2 = combine_4_weights(weights_g, bit0, bit1, bit2, bit3);
+		int const g2 = combine_weights(weights_g, bit0, bit1, bit2, bit3);
 
 		// blue component (this 1, PROM C6)
 		bit0 = BIT(color_prom[0x400 + i], 0);
 		bit1 = BIT(color_prom[0x400 + i], 1);
 		bit2 = BIT(color_prom[0x400 + i], 2);
 		bit3 = BIT(color_prom[0x400 + i], 3);
-		int const b1 = combine_4_weights(weights_b, bit0, bit1, bit2, bit3);
+		int const b1 = combine_weights(weights_b, bit0, bit1, bit2, bit3);
 
 		// blue component (this 2, PROM C7)
 		bit0 = BIT(color_prom[0x500 + i], 0);
 		bit1 = BIT(color_prom[0x500 + i], 1);
 		bit2 = BIT(color_prom[0x500 + i], 2);
 		bit3 = BIT(color_prom[0x500 + i], 3);
-		int const b2 = combine_4_weights(weights_b, bit0, bit1, bit2, bit3);
+		int const b2 = combine_weights(weights_b, bit0, bit1, bit2, bit3);
 
 
 		// PROMs circuitry, 1st state

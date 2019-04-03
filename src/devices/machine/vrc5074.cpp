@@ -1008,7 +1008,7 @@ WRITE_LINE_MEMBER(vrc5074_device::uart_irq_callback)
 
 READ32_MEMBER(vrc5074_device::serial_r)
 {
-	uint32_t result = m_uart->ins8250_r(space, offset>>1);
+	uint32_t result = m_uart->ins8250_r(offset>>1);
 
 	if (0 && LOG_NILE)
 		logerror("%s serial_r offset %03X = %08X (%08x)\n", machine().describe_context(), offset>>1, result, offset*4);
@@ -1017,7 +1017,7 @@ READ32_MEMBER(vrc5074_device::serial_r)
 
 WRITE32_MEMBER(vrc5074_device::serial_w)
 {
-	m_uart->ins8250_w(space, offset>>1, data);
+	m_uart->ins8250_w(offset>>1, data);
 	if (PRINTF_SERIAL && offset == NREG_UARTTHR) {
 		static std::string debugStr;
 		printf("%c", data);

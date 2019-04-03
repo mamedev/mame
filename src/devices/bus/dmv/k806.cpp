@@ -128,19 +128,19 @@ const tiny_rom_entry *dmv_k806_device::device_rom_region() const
 	return ROM_NAME( dmv_k806 );
 }
 
-void dmv_k806_device::io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data)
+void dmv_k806_device::io_read(int ifsel, offs_t offset, uint8_t &data)
 {
 	uint8_t jumpers = m_jumpers->read();
 	if (BIT(jumpers, ifsel) && ((!BIT(offset, 3) && BIT(jumpers, 5)) || (BIT(offset, 3) && BIT(jumpers, 6))))
-		data = m_mcu->upi41_master_r(space, offset & 1);
+		data = m_mcu->upi41_master_r(machine().dummy_space(), offset & 1);
 }
 
-void dmv_k806_device::io_write(address_space &space, int ifsel, offs_t offset, uint8_t data)
+void dmv_k806_device::io_write(int ifsel, offs_t offset, uint8_t data)
 {
 	uint8_t jumpers = m_jumpers->read();
 	if (BIT(jumpers, ifsel) && ((!BIT(offset, 3) && BIT(jumpers, 5)) || (BIT(offset, 3) && BIT(jumpers, 6))))
 	{
-		m_mcu->upi41_master_w(space, offset & 1, data);
+		m_mcu->upi41_master_w(machine().dummy_space(), offset & 1, data);
 		m_bus->m_out_int_cb(CLEAR_LINE);
 	}
 }

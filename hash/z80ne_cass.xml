@@ -43,13 +43,13 @@ Loading Tape BASIC Programs
 		<info name="usage" value="See z80ne_cass.xml file for loading instructions"/>
 
 		<part name="cass1" interface="z80ne_cass">
-		<feature name="part_id" value="Tape 1 (Lettura)"/>
+			<feature name="part_id" value="Tape 1 (Lettura)"/>
 			<dataarea name="cass" size="1102980">
 				<rom name="basic 1' parte 1200bps.wav" size="1102980" crc="ce366f71" sha1="877c5ad33f6f5d502c950170bc1616f157526d43" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="z80ne_cass">
-		<feature name="part_id" value="Tape 2 (BASIC)"/>
+			<feature name="part_id" value="Tape 2 (BASIC)"/>
 			<dataarea name="cass" size="2908430">
 				<rom name="basic 2' parte 1200bps.wav" size="2908430" crc="5775a8a0" sha1="bc2a02739db5dfe2460c01ead167edb73a9cb921" offset="0" />
 			</dataarea>
@@ -63,13 +63,13 @@ Loading Tape BASIC Programs
 		<info name="usage" value="See z80ne_cass.xml file for loading instructions"/>
 
 		<part name="cass1" interface="z80ne_cass">
-		<feature name="part_id" value="Tape 1 (Lettura)"/>
+			<feature name="part_id" value="Tape 1 (Lettura)"/>
 			<dataarea name="cass" size="1566466">
 				<rom name="basic 1' parte 600bps.wav" size="1566466" crc="c323b144" sha1="961fe7cbd1dd80a706533f7f52c80582237fc7ed" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="z80ne_cass">
-		<feature name="part_id" value="Tape 2 (BASIC)"/>
+			<feature name="part_id" value="Tape 2 (BASIC)"/>
 			<dataarea name="cass" size="5177366">
 				<rom name="basic 2' parte 600bps.wav" size="5177366" crc="37eac04d" sha1="941d5d25253df6876e106e31bb5c76aae7540467" offset="0" />
 			</dataarea>
@@ -83,13 +83,13 @@ Loading Tape BASIC Programs
 		<info name="usage" value="See z80ne_cass.xml file for loading instructions"/>
 
 		<part name="cass1" interface="z80ne_cass">
-		<feature name="part_id" value="Tape 1 (Lettura)"/>
+			<feature name="part_id" value="Tape 1 (Lettura)"/>
 			<dataarea name="cass" size="2471412">
 				<rom name="basic 1' parte 300bps.wav" size="2471412" crc="4aa6746c" sha1="f4aa0edd0fe9397c51e21cf1ae1cdd166f8789c2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="z80ne_cass">
-		<feature name="part_id" value="Tape 2 (BASIC)"/>
+			<feature name="part_id" value="Tape 2 (BASIC)"/>
 			<dataarea name="cass" size="9693228">
 				<rom name="basic 2' parte 300bps.wav" size="9693228" crc="ffa4fe39" sha1="d7bc385bb84017d9453b26c944ca4a6c58bd8014" offset="0" />
 			</dataarea>
@@ -103,19 +103,19 @@ Loading Tape BASIC Programs
 		<info name="usage" value="Follow machine-language loading instructions (see z80ne_cass.xml file)"/>
 
 		<part name="cass1" interface="z80ne_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="1069906">
 				<rom name="bioritmi 1' parte 1200bps.wav" size="1069906" crc="2161f939" sha1="2e6a62d2aaaf718eed7cb1f9c6835a28b8650030" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="z80ne_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="1069906">
 				<rom name="bioritmi 2' parte 1200bps.wav" size="1069906" crc="e47265bb" sha1="d0140ff99e0a11b9a5bcb2273fe15ab85d106c65" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="z80ne_cass">
-		<feature name="part_id" value="Tape 3"/>
+			<feature name="part_id" value="Tape 3"/>
 			<dataarea name="cass" size="1069906">
 				<rom name="bioritmi 3' parte 1200bps.wav" size="1069906" crc="0ef56c4a" sha1="53a437c5c698833125869b2486dcaaeeb8fcb432" offset="0" />
 			</dataarea>
@@ -129,19 +129,19 @@ Loading Tape BASIC Programs
 		<info name="usage" value="Follow machine-language loading instructions (see z80ne_cass.xml file)"/>
 
 		<part name="cass1" interface="z80ne_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="1500316">
 				<rom name="bioritmi 1' parte 600bps.wav" size="1500316" crc="5a9fd253" sha1="3f7b4639b2bb0cc06bc3c5d5334f79990af7e00d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="z80ne_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="1500316">
 				<rom name="bioritmi 2' parte 600bps.wav" size="1500316" crc="44445b6a" sha1="5c2b48eecbb7c4c97e4b6a669b77e4344cfd1195" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="z80ne_cass">
-		<feature name="part_id" value="Tape 3"/>
+			<feature name="part_id" value="Tape 3"/>
 			<dataarea name="cass" size="1500316">
 				<rom name="bioritmi 3' parte 600bps.wav" size="1500316" crc="a7bcc270" sha1="4b87d322f77a5c4d77b9e474f22bc92d2316711e" offset="0" />
 			</dataarea>
@@ -155,19 +155,19 @@ Loading Tape BASIC Programs
 		<info name="usage" value="Follow machine-language loading instructions (see z80ne_cass.xml file)"/>
 
 		<part name="cass1" interface="z80ne_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="2339112">
 				<rom name="bioritmi 1' parte 300bps.wav" size="2339112" crc="b3f968fb" sha1="7ec33662d41d69bf6cf911ef893c4bc97e22fe5f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="z80ne_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="2339112">
 				<rom name="bioritmi 2' parte 300bps.wav" size="2339112" crc="fcabdd05" sha1="0306197e1bb49d6b71195744b9ebb876c140d667" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="z80ne_cass">
-		<feature name="part_id" value="Tape 3"/>
+			<feature name="part_id" value="Tape 3"/>
 			<dataarea name="cass" size="2339112">
 				<rom name="bioritmi 3' parte 300bps.wav" size="2339112" crc="ff1d19fc" sha1="014bb647159a323f9870a2b8bfb132a74d310777" offset="0" />
 			</dataarea>

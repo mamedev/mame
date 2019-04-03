@@ -13,11 +13,16 @@
 #include "machine/i2cmem.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/ekara/slot.h"
 #include "machine/nvram.h"
 
 #include "machine/xavix_mtrk_wheel.h"
 #include "machine/xavix_madfb_ball.h"
-
+#include "machine/xavix2002_io.h"
+#include "machine/xavix_io.h"
+#include "machine/xavix_adc.h"
+#include "machine/xavix_anport.h"
+#include "machine/xavix_math.h"
 
 class xavix_sound_device : public device_t, public device_sound_interface
 {
@@ -69,9 +74,15 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
+		m_an_in(*this, "AN%u", 0U),
+		m_mouse0x(*this, "MOUSE0X"),
+		m_mouse0y(*this, "MOUSE0Y"),
+		m_mouse1x(*this, "MOUSE1X"),
+		m_mouse1y(*this, "MOUSE1Y"),
 		m_maincpu(*this, "maincpu"),
 		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
+		m_lowbus(*this, "lowbus"),
 		m_sprite_xhigh_ignore_hack(true),
 		m_mainram(*this, "mainram"),
 		m_fragment_sprite(*this, "fragment_sprite"),
@@ -92,13 +103,23 @@ public:
 		m_palette(*this, "palette"),
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lowbus(*this, "lowbus"),
-		m_sound(*this, "xavix_sound")
+		m_sound(*this, "xavix_sound"),
+		m_adc(*this, "adc"),
+		m_anport(*this, "anport"),
+		m_math(*this, "math"),
+		m_xavix2002io(*this, "xavix2002io")
 	{ }
 
 	void xavix(machine_config &config);
+	void xavix_nv(machine_config &config);
+
 	void xavixp(machine_config &config);
+	void xavixp_nv(machine_config &config);
+
 	void xavix2000(machine_config &config);
+	void xavix2000_nv(machine_config &config);
+
+	void xavix2002(machine_config &config);
 
 	void init_xavix();
 
@@ -107,44 +128,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg04);
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg08);
 
-protected:
-
-	virtual uint8_t read_io0(uint8_t direction);
-	virtual uint8_t read_io1(uint8_t direction);
-	virtual void write_io0(uint8_t data, uint8_t direction);
-	virtual void write_io1(uint8_t data, uint8_t direction);
-	required_ioport m_in0;
-	required_ioport m_in1;
-	required_device<xavix_device> m_maincpu;
-	required_device<nvram_device> m_nvram;
-	required_device<screen_device> m_screen;
-
-private:
-
-	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void xavix_map(address_map &map);
-
-	void xavix_lowbus_map(address_map &map);
-	void xavix_extbus_map(address_map &map);
-	void superxavix_lowbus_map(address_map &map);
-
-	INTERRUPT_GEN_MEMBER(interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
-
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	virtual void video_start() override;
-
-	DECLARE_READ8_MEMBER(opcodes_000000_r);
-	DECLARE_READ8_MEMBER(opcodes_800000_r);
-
-	DECLARE_READ8_MEMBER(extbus_r) { return m_rgn[(offset) & (m_rgnlen - 1)]; }
-	DECLARE_WRITE8_MEMBER(extbus_w) { logerror("write to external bus %06x %02x\n", offset, data); }
-
+	int m_rgnlen;
+	uint8_t* m_rgn;
 
 	/* this is just a quick memory system bypass for video reads etc. because going through the
 	   memory system is slow and also pollutes logs significantly with unmapped reads if the games
@@ -192,12 +177,81 @@ private:
 		return 0x00;
 	}
 
-	DECLARE_READ8_MEMBER(sample_read)
+protected:
+
+	virtual uint8_t read_io0(uint8_t direction);
+	virtual uint8_t read_io1(uint8_t direction);
+	virtual void write_io0(uint8_t data, uint8_t direction);
+	virtual void write_io1(uint8_t data, uint8_t direction);
+	required_ioport m_in0;
+	required_ioport m_in1;
+	required_ioport_array<8> m_an_in;
+	optional_ioport m_mouse0x;
+	optional_ioport m_mouse0y;
+	optional_ioport m_mouse1x;
+	optional_ioport m_mouse1y;
+	required_device<xavix_device> m_maincpu;
+	optional_device<nvram_device> m_nvram;
+	required_device<screen_device> m_screen;
+	required_device<address_map_bank_device> m_lowbus;
+	address_space* m_cpuspace;
+
+private:
+
+	// screen updates
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void xavix_map(address_map &map);
+
+	void xavix_lowbus_map(address_map &map);
+	void xavix_extbus_map(address_map &map);
+	void superxavix_lowbus_map(address_map &map);
+
+	INTERRUPT_GEN_MEMBER(interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
+
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual void video_start() override;
+
+	DECLARE_WRITE8_MEMBER(debug_mem_w)
+	{
+		m_mainram[offset] = data;
+	};
+
+	virtual uint8_t opcodes_000000_r(offs_t offset)
+	{
+		if (offset & 0x8000)
+		{
+			return m_rgn[(offset) & (m_rgnlen - 1)];
+		}
+		else
+		{
+			return m_lowbus->read8(offset & 0x7fff);
+		}
+	}
+
+	virtual uint8_t opcodes_800000_r(offs_t offset)
+	{
+		// rad_fb, rad_madf confirm that for >0x800000 the CPU only sees ROM when executing opcodes
+		return m_rgn[(offset) & (m_rgnlen - 1)];
+	}
+
+	virtual uint8_t extbus_r(offs_t offset) { return m_rgn[(offset) & (m_rgnlen - 1)]; }
+	virtual void extbus_w(offs_t offset, uint8_t data)
+	{
+		logerror("%s: write to external bus %06x %02x\n", machine().describe_context(), offset, data);
+	}
+
+
+	uint8_t sample_read(offs_t offset)
 	{
 		return read_full_data_sp_bypass(offset);
 	};
 
-	inline uint8_t read_full_data_sp_bypass(uint32_t adr)
+	virtual inline uint8_t read_full_data_sp_bypass(uint32_t adr)
 	{
 		uint8_t databank = adr >> 16;
 
@@ -218,9 +272,6 @@ private:
 		}
 	}
 
-	DECLARE_WRITE8_MEMBER(extintrf_7900_w);
-	DECLARE_WRITE8_MEMBER(extintrf_7901_w);
-	DECLARE_WRITE8_MEMBER(extintrf_7902_w);
 
 	DECLARE_READ8_MEMBER(ioevent_enable_r);
 	DECLARE_WRITE8_MEMBER(ioevent_enable_w);
@@ -229,15 +280,6 @@ private:
 	uint8_t m_ioevent_enable;
 	uint8_t m_ioevent_active;
 	void process_ioevent(uint8_t bits);
-
-	DECLARE_WRITE8_MEMBER(adc_7b00_w);
-	DECLARE_READ8_MEMBER(adc_7b80_r);
-	DECLARE_WRITE8_MEMBER(adc_7b80_w);
-	DECLARE_READ8_MEMBER(adc_7b81_r);
-	DECLARE_WRITE8_MEMBER(adc_7b81_w);
-	TIMER_CALLBACK_MEMBER(adc_timer_done);
-	emu_timer *m_adc_timer;
-	uint8_t m_adc_control;
 
 	DECLARE_WRITE8_MEMBER(slotreg_7810_w);
 
@@ -268,6 +310,11 @@ private:
 	uint8_t m_io1_data;
 	uint8_t m_io0_direction;
 	uint8_t m_io1_direction;
+
+	DECLARE_READ8_MEMBER(nmi_vector_lo_r);
+	DECLARE_READ8_MEMBER(nmi_vector_hi_r);
+	DECLARE_READ8_MEMBER(irq_vector_lo_r);
+	DECLARE_READ8_MEMBER(irq_vector_hi_r);
 
 	DECLARE_WRITE8_MEMBER(vector_enable_w);
 	DECLARE_WRITE8_MEMBER(nmi_vector_lo_w);
@@ -405,10 +452,20 @@ private:
 		return 0xff;
 	}
 
-	DECLARE_READ8_MEMBER(mult_r);
-	DECLARE_WRITE8_MEMBER(mult_w);
-	DECLARE_READ8_MEMBER(mult_param_r);
-	DECLARE_WRITE8_MEMBER(mult_param_w);
+
+	DECLARE_READ8_MEMBER(adc0_r) { return m_an_in[0]->read(); };
+	DECLARE_READ8_MEMBER(adc1_r) { return m_an_in[1]->read(); };
+	DECLARE_READ8_MEMBER(adc2_r) { return m_an_in[2]->read(); };
+	DECLARE_READ8_MEMBER(adc3_r) { return m_an_in[3]->read(); };
+	DECLARE_READ8_MEMBER(adc4_r) { return m_an_in[4]->read(); };
+	DECLARE_READ8_MEMBER(adc5_r) { return m_an_in[5]->read(); };
+	DECLARE_READ8_MEMBER(adc6_r) { return m_an_in[6]->read(); };
+	DECLARE_READ8_MEMBER(adc7_r) { return m_an_in[7]->read(); };
+
+	DECLARE_READ8_MEMBER(anport0_r) { logerror("%s: unhandled anport0_r\n", machine().describe_context()); return 0xff; };
+	DECLARE_READ8_MEMBER(anport1_r) { logerror("%s: unhandled anport1_r\n", machine().describe_context()); return 0xff; };
+	DECLARE_READ8_MEMBER(anport2_r) { logerror("%s: unhandled anport2_r\n", machine().describe_context()); return 0xff; };
+	DECLARE_READ8_MEMBER(anport3_r) { logerror("%s: unhandled anport3_r\n", machine().describe_context()); return 0xff; };
 
 	void update_irqs();
 	uint8_t m_irqsource;
@@ -418,9 +475,6 @@ private:
 	uint8_t m_nmi_vector_hi_data;
 	uint8_t m_irq_vector_lo_data;
 	uint8_t m_irq_vector_hi_data;
-
-	uint8_t m_multparams[3];
-	uint8_t m_multresults[2];
 
 	uint8_t m_spritefragment_dmaparam1[2];
 	uint8_t m_spritefragment_dmaparam2[2];
@@ -437,8 +491,8 @@ private:
 
 	uint8_t m_mastervol;
 	uint8_t m_unk_snd75f8;
-	uint8_t m_unksnd75f9;
-	uint8_t m_unksnd75ff;
+	uint8_t m_unk_snd75f9;
+	uint8_t m_unk_snd75ff;
 	uint8_t m_sndtimer[4];
 
 	uint8_t m_timer_baseval;
@@ -480,7 +534,6 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	void update_pen(int pen, uint8_t shval, uint8_t lval);
-	double hue2rgb(double p, double q, double t);
 	void draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line);
 	void draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
 	void draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int line);
@@ -492,9 +545,6 @@ private:
 
 	uint8_t m_spritereg;
 
-	int m_rgnlen;
-	uint8_t* m_rgn;
-
 	// variables used by rendering
 	int m_tmp_dataaddress;
 	int m_tmp_databit;
@@ -505,11 +555,66 @@ private:
 	uint8_t get_next_byte();
 
 	int get_current_address_byte();
-	required_device<address_map_bank_device> m_lowbus;
 
 	required_device<xavix_sound_device> m_sound;
+
+
 	DECLARE_READ8_MEMBER(sound_regram_read_cb);
+
+protected:
+	required_device<xavix_adc_device> m_adc;
+	required_device<xavix_anport_device> m_anport;
+	required_device<xavix_math_device> m_math;
+	optional_device<xavix2002_io_device> m_xavix2002io;
+
+	uint8_t m_extbusctrl[3];
+
+	virtual DECLARE_READ8_MEMBER(extintrf_790x_r);
+	virtual DECLARE_WRITE8_MEMBER(extintrf_790x_w);
+
+	// additional SuperXaviX / XaviX2002 stuff
+	uint8_t m_sx_extended_extbus[3];
+
+	DECLARE_WRITE8_MEMBER(extended_extbus_reg0_w);
+	DECLARE_WRITE8_MEMBER(extended_extbus_reg1_w);
+	DECLARE_WRITE8_MEMBER(extended_extbus_reg2_w);
 };
+
+class xavix_guru_state : public xavix_state
+{
+public:
+	xavix_guru_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag)
+	{ }
+
+	void xavix_guru(machine_config &config);
+
+protected:
+
+private:
+	DECLARE_READ8_MEMBER(guru_anport2_r) { uint8_t ret = m_mouse1x->read()-0x10; return ret; }
+};
+
+
+class xavix_2000_nv_sdb_state : public xavix_state
+{
+public:
+	xavix_2000_nv_sdb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag)
+	{ }
+
+	void xavix2000_nv_sdb(machine_config &config);
+
+protected:
+
+private:
+	DECLARE_READ8_MEMBER(sdb_anport0_r) { return m_mouse0x->read()^0x7f; }
+	DECLARE_READ8_MEMBER(sdb_anport1_r) { return m_mouse0y->read()^0x7f; }
+	DECLARE_READ8_MEMBER(sdb_anport2_r) { return m_mouse1x->read()^0x7f; }
+	DECLARE_READ8_MEMBER(sdb_anport3_r) { return m_mouse1y->read()^0x7f; }
+
+};
+
 
 class xavix_i2c_state : public xavix_state
 {
@@ -523,10 +628,13 @@ public:
 
 	void xavix_i2c_24lc02(machine_config &config);
 	void xavix_i2c_24lc04(machine_config &config);
+	void xavix_i2c_24c02(machine_config &config);
 	void xavix_i2c_24c08(machine_config &config);
 
 	void xavix2000_i2c_24c04(machine_config &config);
 	void xavix2000_i2c_24c02(machine_config &config);
+
+	void xavix2002_i2c_24c04(machine_config &config);
 
 	void init_epo_efdx()
 	{
@@ -534,8 +642,10 @@ public:
 		hackaddress1 = 0x958a;
 		hackaddress2 = 0x8524;
 	}
+
+	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
+
 protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	required_device<i2cmem_device> m_i2cmem;
@@ -545,6 +655,45 @@ private:
 	int hackaddress2;
 };
 
+class xavix_i2c_ltv_tam_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_ltv_tam_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+	void xavix_i2c_24lc04_tam(machine_config &config);
+
+private:
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+
+private:
+	DECLARE_READ8_MEMBER(tam_anport0_r) { return m_mouse0x->read()^0x7f; }
+	DECLARE_READ8_MEMBER(tam_anport1_r) { return m_mouse0y->read()^0x7f; }
+	DECLARE_READ8_MEMBER(tam_anport2_r) { return m_mouse1x->read()^0x7f; }
+	DECLARE_READ8_MEMBER(tam_anport3_r) { return m_mouse1y->read()^0x7f; }
+};
+
+
+class xavix_i2c_jmat_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_jmat_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+	void xavix2002_i2c_jmat(machine_config &config);
+
+private:
+	READ8_MEMBER(read_extended_io0);
+	READ8_MEMBER(read_extended_io1);
+	READ8_MEMBER(read_extended_io2);
+	WRITE8_MEMBER(write_extended_io0);
+	WRITE8_MEMBER(write_extended_io1);
+	WRITE8_MEMBER(write_extended_io2);
+};
+
+
 class xavix_i2c_lotr_state : public xavix_i2c_state
 {
 public:
@@ -552,9 +701,20 @@ public:
 		: xavix_i2c_state(mconfig, type, tag)
 	{ }
 
+	DECLARE_CUSTOM_INPUT_MEMBER(camera_r);
+
 protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
 	//virtual void write_io1(uint8_t data, uint8_t direction) override;
+};
+
+class xavix_i2c_bowl_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_bowl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_CUSTOM_INPUT_MEMBER(camera_r);
 };
 
 
@@ -596,33 +756,217 @@ class xavix_cart_state : public xavix_state
 public:
 	xavix_cart_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix_state(mconfig, type, tag),
-		m_cart(*this, "cartslot")
+		m_cartslot(*this, "cartslot")
 	{ }
 
 	void xavix_cart(machine_config &config);
 	void xavix_cart_ekara(machine_config &config);
 	void xavix_cart_popira(machine_config &config);
+	void xavix_cart_ddrfammt(machine_config &config);
 
 protected:
-	required_device<generic_slot_device> m_cart;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ekara_cart);
-	//READ8_MEMBER(cart_r) { return m_cart->read_rom(space, offset); }
+
+	// for Cart cases this memory bypass becomes more complex
+
+	virtual uint8_t opcodes_000000_r(offs_t offset) override
+	{
+		if (offset & 0x8000)
+		{
+			if (offset & 0x400000)
+			{
+				return m_rgn[(offset) & (m_rgnlen - 1)];
+			}
+			else
+			{
+				if (m_cartslot->has_cart())
+				{
+					return m_cartslot->read_cart(*m_cpuspace, offset);
+				}
+				else
+				{
+					return m_rgn[(offset) & (m_rgnlen - 1)];
+				}
+			}
+		}
+		else
+		{
+			return m_lowbus->read8(offset & 0x7fff);
+		}
+	}
+
+	virtual uint8_t opcodes_800000_r(offs_t offset) override
+	{
+		if (offset & 0x400000)
+		{
+			return m_rgn[(offset) & (m_rgnlen - 1)];
+		}
+		else
+		{
+			if (m_cartslot->has_cart())
+			{
+				return m_cartslot->read_cart(*m_cpuspace, offset);
+			}
+			else
+			{
+				return m_rgn[(offset) & (m_rgnlen - 1)];
+			}
+		}
+	}
+
+	// TODO, use callbacks?
+	virtual DECLARE_READ8_MEMBER(extintrf_790x_r) override
+	{
+		return xavix_state::extintrf_790x_r(space,offset,mem_mask);
+	}
+
+	virtual DECLARE_WRITE8_MEMBER(extintrf_790x_w) override
+	{
+		xavix_state::extintrf_790x_w(space,offset,data, mem_mask);
+
+		if (offset < 3)
+		{
+			if (m_cartslot->has_cart())
+				m_cartslot->write_bus_control(space,offset,data,mem_mask);
+		}
+	};
+
+	virtual uint8_t extbus_r(offs_t offset) override
+	{
+		if (m_cartslot->has_cart() && m_cartslot->is_read_access_not_rom())
+		{
+			logerror("%s: read from external bus %06x (SEEPROM READ?)\n", machine().describe_context(), offset);
+			return m_cartslot->read_extra(*m_cpuspace, offset);
+		}
+		else
+		{
+			if (offset & 0x400000)
+			{
+				return m_rgn[(offset) & (m_rgnlen - 1)];
+			}
+			else
+			{
+				if (m_cartslot->has_cart())
+				{
+					return m_cartslot->read_cart(*m_cpuspace, offset);
+				}
+				else
+				{
+					return m_rgn[(offset) & (m_rgnlen - 1)];
+				}
+			}
+		}
+	}
+	virtual void extbus_w(offs_t offset, uint8_t data) override
+	{
+		if (m_cartslot->has_cart() && m_cartslot->is_write_access_not_rom())
+		{
+			logerror("%s: write to external bus %06x %02x (SEEPROM WRITE?)\n", machine().describe_context(), offset, data);
+			return m_cartslot->write_extra(*m_cpuspace, offset, data);
+		}
+		else
+		{
+			if (m_cartslot->has_cart())
+			{
+				return m_cartslot->write_cart(*m_cpuspace, offset, data);
+			}
+			else
+			{
+				logerror("%s: write to external bus %06x %02x\n", machine().describe_context(), offset, data);
+			}
+		}
+	}
+
+	virtual inline uint8_t read_full_data_sp_bypass(uint32_t offset) override
+	{
+		uint8_t databank = offset >> 16;
+
+		if (databank >= 0x80)
+		{
+			if (offset & 0x400000)
+			{
+				return m_rgn[(offset) & (m_rgnlen - 1)];
+			}
+			else
+			{
+				if (m_cartslot->has_cart())
+				{
+					return m_cartslot->read_cart(*m_cpuspace, offset);
+				}
+				else
+				{
+					return m_rgn[(offset) & (m_rgnlen - 1)];
+				}
+			}
+		}
+		else
+		{
+			if ((offset & 0xffff) >= 0x8000)
+			{
+				if (offset & 0x400000)
+				{
+					return m_rgn[(offset) & (m_rgnlen - 1)];
+				}
+				else
+				{
+					if (m_cartslot->has_cart())
+					{
+						return m_cartslot->read_cart(*m_cpuspace, offset);
+					}
+					else
+					{
+						return m_rgn[(offset) & (m_rgnlen - 1)];
+					}
+				}
+			}
+			else
+			{
+				return read_full_data_sp_lowbus_bypass(offset);
+			}
+		}
+	}
+
+	required_device<ekara_cart_slot_device> m_cartslot;
 };
 
-class xavix_i2c_cart_state : public xavix_i2c_state
+class xavix_i2c_cart_state : public xavix_cart_state
 {
 public:
 	xavix_i2c_cart_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_state(mconfig,type,tag),
-		m_cart(*this, "cartslot")
+		: xavix_cart_state(mconfig,type,tag),
+		m_i2cmem(*this, "i2cmem")
 	{ }
 
 	void xavix_i2c_taiko(machine_config &config);
+	void xavix_i2c_jpopira(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
 
 protected:
-	required_device<generic_slot_device> m_cart;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(taiko_cart);
-	//READ8_MEMBER(cart_r) { return m_cart->read_rom(space, offset); }
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+
+	required_device<i2cmem_device> m_i2cmem;
+};
+
+class xavix_popira2_cart_state : public xavix_cart_state
+{
+public:
+	xavix_popira2_cart_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_cart_state(mconfig,type,tag),
+		m_p2(*this, "P2")
+	{ }
+
+	void xavix_cart_popira2(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
+
+protected:
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+
+private:
+	DECLARE_READ8_MEMBER(popira2_adc0_r);
+	DECLARE_READ8_MEMBER(popira2_adc1_r);
+
+	required_ioport m_p2;
 };
 
 
@@ -637,14 +981,16 @@ public:
 		m_extraiowrite(0)
 	{ }
 
-//	void xavix_ekara(machine_config &config);
+	DECLARE_CUSTOM_INPUT_MEMBER(ekara_multi0_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ekara_multi1_r);
+
+//  void xavix_ekara(machine_config &config);
 
 protected:
 
 	required_ioport m_extra0;
 	required_ioport m_extra1;
 
-	virtual uint8_t read_io1(uint8_t direction) override;
 	virtual void write_io0(uint8_t data, uint8_t direction) override;
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 

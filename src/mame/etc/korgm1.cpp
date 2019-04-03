@@ -167,32 +167,32 @@ PALETTE_INIT_MEMBER(korgm1_state, korgm1)
 {
 }
 
-MACHINE_CONFIG_START(korgm1_state::korgm1)
-
+void korgm1_state::korgm1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",V30,MAIN_CLOCK) // V50 actually
-	MCFG_DEVICE_PROGRAM_MAP(korgm1_map)
-	MCFG_DEVICE_IO_MAP(korgm1_io)
+	V30(config, m_maincpu, MAIN_CLOCK); // V50 actually
+	m_maincpu->set_addrmap(AS_PROGRAM, &korgm1_state::korgm1_map);
+	m_maincpu->set_addrmap(AS_IO, &korgm1_state::korgm1_io);
 
-	MCFG_DEVICE_ADD("pio", CXD1095, 0)
+	CXD1095(config, "pio", 0);
 
 	/* video hardware */
 	/* TODO: LCD actually */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(korgm1_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(korgm1_state::screen_update));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_korgm1)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_korgm1);
 
-	MCFG_PALETTE_ADD("palette", 8)
+	PALETTE(config, "palette").set_entries(8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 //  AY8910(config, "aysnd", MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

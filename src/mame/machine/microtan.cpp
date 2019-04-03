@@ -770,15 +770,15 @@ void microtan_state::snapshot_copy(uint8_t *snapshot_buff, int snapshot_size)
 		/* first set of AY8910 registers */
 		for (int i = 0; i < 16; i++ )
 		{
-			m_ay8910[0]->address_w(generic_space(), 0, i);
-			m_ay8910[0]->data_w(generic_space(), 0, snapshot_buff[base++]);
+			m_ay8910[0]->address_w(i);
+			m_ay8910[0]->data_w(snapshot_buff[base++]);
 		}
 
 		/* second set of AY8910 registers */
 		for (int i = 0; i < 16; i++ )
 		{
-			m_ay8910[0]->address_w(generic_space(), 0, i);
-			m_ay8910[0]->data_w(generic_space(), 0, snapshot_buff[base++]);
+			m_ay8910[0]->address_w(i);
+			m_ay8910[0]->data_w(snapshot_buff[base++]);
 		}
 
 		for (int i = 0; i < 32*16; i++)

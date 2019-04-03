@@ -400,17 +400,19 @@ void bfmsys85_state::memmap(address_map &map)
 
 // machine driver for system85 board //////////////////////////////////////
 
-MACHINE_CONFIG_START(bfmsys85_state::bfmsys85)
-	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/4)          // 6809 CPU at 1 Mhz
-	MCFG_DEVICE_PROGRAM_MAP(memmap)                        // setup read and write memorymap
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfmsys85_state, timer_irq,  1000)              // generate 1000 IRQ's per second
+void bfmsys85_state::bfmsys85(machine_config &config)
+{
+	M6809(config, m_maincpu, MASTER_CLOCK/4);          // 6809 CPU at 1 Mhz
+	m_maincpu->set_addrmap(AS_PROGRAM, &bfmsys85_state::memmap);                        // setup read and write memorymap
+	m_maincpu->set_periodic_int(FUNC(bfmsys85_state::timer_irq), attotime::from_hz(1000));              // generate 1000 IRQ's per second
+
 	MSC1937(config, m_vfd);
 
 	ACIA6850(config, m_acia6850_0, 0);
 	m_acia6850_0->txd_handler().set(FUNC(bfmsys85_state::sys85_data_w));
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16) // What are the correct ACIA clocks ?
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bfmsys85_state, write_acia_clock))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16)); // What are the correct ACIA clocks ?
+	acia_clock.signal_handler().set(FUNC(bfmsys85_state::write_acia_clock));
 
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, "aysnd", MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -426,11 +428,10 @@ MACHINE_CONFIG_START(bfmsys85_state::bfmsys85)
 	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reel[3]->optic_handler().set(FUNC(bfmsys85_state::reel_optic_cb<3>));
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
+	METERS(config, m_meters, 0).set_number(8);
 
 	config.set_default_layout(layout_bfmsys85);
-MACHINE_CONFIG_END
+}
 
 // input ports for system85 board /////////////////////////////////////////
 

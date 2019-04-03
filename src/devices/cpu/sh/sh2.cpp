@@ -402,7 +402,7 @@ void sh2_device::execute_run()
 	{
 		debugger_instruction_hook(m_sh2_state->pc);
 
-		const uint16_t opcode = m_program->read_word(m_sh2_state->pc & SH12_AM);
+		const uint16_t opcode = m_decrypted_program->read_word(m_sh2_state->pc >= 0x40000000 ? m_sh2_state->pc : m_sh2_state->pc & SH12_AM);
 
 		if (m_sh2_state->m_delay)
 		{

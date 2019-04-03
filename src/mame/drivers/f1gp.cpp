@@ -393,22 +393,22 @@ uint32_t f1gp_state::tile_callback( uint32_t code )
 	return m_sprcgram[Chip][code & (m_sprcgram[Chip].mask()>>1)];
 }
 
-MACHINE_CONFIG_START(f1gp_state::f1gp)
-
+void f1gp_state::f1gp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000,XTAL(20'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(f1gp_cpu1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
+	M68000(config, m_maincpu, XTAL(20'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &f1gp_state::f1gp_cpu1_map);
+	m_maincpu->set_vblank_int("screen", FUNC(f1gp_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("sub", M68000,XTAL(20'000'000)/2)    /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(f1gp_cpu2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
+	m68000_device &sub(M68000(config, "sub", XTAL(20'000'000)/2));    /* verified on pcb */
+	sub.set_addrmap(AS_PROGRAM, &f1gp_state::f1gp_cpu2_map);
+	sub.set_vblank_int("screen", FUNC(f1gp_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(20'000'000)/4)  /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
+	Z80(config, m_audiocpu, XTAL(20'000'000)/4);  /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &f1gp_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &f1gp_state::sound_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000); /* 100 CPU slices per frame */
 
 	ACIA6850(config, m_acia, 0);
 	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
@@ -419,12 +419,12 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gp)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(f1gp_state::screen_update_f1gp));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_f1gp);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
@@ -455,28 +455,27 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(8'000'000))
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000)));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(f1gp_state::f1gpb)
-
+void f1gp_state::f1gpb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000,10000000) /* 10 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(f1gpb_cpu1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
+	M68000(config, m_maincpu, 10000000); /* 10 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &f1gp_state::f1gpb_cpu1_map);
+	m_maincpu->set_vblank_int("screen", FUNC(f1gp_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("sub", M68000,10000000)    /* 10 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(f1gpb_cpu2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
+	m68000_device &sub(M68000(config, "sub", 10000000));    /* 10 MHz ??? */
+	sub.set_addrmap(AS_PROGRAM, &f1gp_state::f1gpb_cpu2_map);
+	sub.set_vblank_int("screen", FUNC(f1gp_state::irq1_line_hold));
 
 	/* NO sound CPU */
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000); /* 100 CPU slices per frame */
 
 	ACIA6850(config, m_acia, 0);
 	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
@@ -487,12 +486,12 @@ MACHINE_CONFIG_START(f1gp_state::f1gpb)
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gpb)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(f1gp_state::screen_update_f1gpb));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_f1gp);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
@@ -502,23 +501,22 @@ MACHINE_CONFIG_START(f1gp_state::f1gpb)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
-
-MACHINE_CONFIG_START(f1gp2_state::f1gp2)
+void f1gp2_state::f1gp2(machine_config &config)
+{
 	f1gp_state::f1gp(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(f1gp2_cpu1_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &f1gp2_state::f1gp2_cpu1_map);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_f1gp2)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(f1gp2_state, screen_update)
+	m_gfxdecode->set_info(gfx_f1gp2);
+
+	subdevice<screen_device>("screen")->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(f1gp2_state::screen_update));
 
 	config.device_remove("gga");
 	config.device_remove("vsystem_spr_old1");
@@ -529,7 +527,7 @@ MACHINE_CONFIG_START(f1gp2_state::f1gp2)
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
 	m_k053936->set_offsets(-48, -21);
-MACHINE_CONFIG_END
+}
 
 
 

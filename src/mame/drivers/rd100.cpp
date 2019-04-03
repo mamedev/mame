@@ -101,27 +101,28 @@ MACHINE_RESET_MEMBER( rd100_state, rd100 )
 {
 }
 
-MACHINE_CONFIG_START(rd100_state::rd100)
+void rd100_state::rd100(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000)) // MC6809P???
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MC6809(config, m_maincpu, XTAL(4'000'000)); // MC6809P???
+	m_maincpu->set_addrmap(AS_PROGRAM, &rd100_state::mem_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(rd100_state, rd100)
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	PIA6821(config, "pia1", 0);
 
-	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
+	PIA6821(config, "pia2", 0);
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
-	MCFG_SCREEN_UPDATE_DRIVER(rd100_state, screen_update)
-	MCFG_SCREEN_SIZE(64*6, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(250));
+	screen.set_screen_update(FUNC(rd100_state::screen_update));
+	screen.set_size(64*6, 32*8);
+	screen.set_visarea(0, 64*6-1, 0, 32*8-1);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rd100)
-MACHINE_CONFIG_END
+	//GFXDECODE(config, "gfxdecode", "palette", gfx_rd100);
+}
 
 ROM_START( rd100 )
 	ROM_REGION( 0x8000, "roms", 0 )

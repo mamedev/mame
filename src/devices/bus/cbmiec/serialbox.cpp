@@ -69,10 +69,11 @@ void serial_box_device::serial_box_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(serial_box_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6502_TAG, M65C02, XTAL(4'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(serial_box_mem)
-MACHINE_CONFIG_END
+void serial_box_device::device_add_mconfig(machine_config &config)
+{
+	M65C02(config, m_maincpu, XTAL(4'000'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &serial_box_device::serial_box_mem);
+}
 
 
 

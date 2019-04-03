@@ -165,19 +165,20 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(micro20_state::micro20)
+void micro20_state::micro20(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(MAINCPU_TAG, M68020, 16.67_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(micro20_map)
+	M68020(config, m_maincpu, 16.67_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &micro20_state::micro20_map);
 
-	MCFG_DEVICE_ADD(DUART_A_TAG, MC68681, 3.6864_MHz_XTAL)
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
+	mc68681_device &duart_a(MC68681(config, DUART_A_TAG, 3.6864_MHz_XTAL));
+	duart_a.a_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set(DUART_A_TAG, FUNC(mc68681_device::rx_a_w));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	MCFG_DEVICE_ADD(DUART_B_TAG, MC68681, 3.6864_MHz_XTAL)
+	MC68681(config, DUART_B_TAG, 3.6864_MHz_XTAL);
 
 	WD1772(config, FDC_TAG, 16.67_MHz_XTAL / 2);
 
@@ -187,16 +188,16 @@ MACHINE_CONFIG_START(micro20_state::micro20)
 	m_pit->pb_out_callback().set(FUNC(micro20_state::portb_w));
 	m_pit->pc_out_callback().set(FUNC(micro20_state::portc_w));
 
-	MCFG_DEVICE_ADD(RTC_TAG, MSM58321, 32.768_kHz_XTAL)
-	MCFG_MSM58321_DEFAULT_24H(false)
-	MCFG_MSM58321_D0_HANDLER(WRITELINE(PIT_TAG, pit68230_device, pb0_w))
-	MCFG_MSM58321_D1_HANDLER(WRITELINE(PIT_TAG, pit68230_device, pb1_w))
-	MCFG_MSM58321_D2_HANDLER(WRITELINE(PIT_TAG, pit68230_device, pb2_w))
-	MCFG_MSM58321_D3_HANDLER(WRITELINE(PIT_TAG, pit68230_device, pb3_w))
-	MCFG_MSM58321_BUSY_HANDLER(WRITELINE(PIT_TAG, pit68230_device, pb7_w))
+	MSM58321(config, m_rtc, 32768_Hz_XTAL);
+	m_rtc->set_default_24h(false);
+	m_rtc->d0_handler().set(m_pit, FUNC(pit68230_device::pb0_w));
+	m_rtc->d1_handler().set(m_pit, FUNC(pit68230_device::pb1_w));
+	m_rtc->d2_handler().set(m_pit, FUNC(pit68230_device::pb2_w));
+	m_rtc->d3_handler().set(m_pit, FUNC(pit68230_device::pb3_w));
+	m_rtc->busy_handler().set(m_pit, FUNC(pit68230_device::pb7_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", micro20_state, micro20_timer, attotime::from_hz(200))
-MACHINE_CONFIG_END
+	TIMER(config, "timer").configure_periodic(FUNC(micro20_state::micro20_timer), attotime::from_hz(200));
+}
 
 static INPUT_PORTS_START( micro20 )
 INPUT_PORTS_END

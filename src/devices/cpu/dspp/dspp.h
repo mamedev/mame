@@ -67,10 +67,10 @@ public:
 	DECLARE_READ16_MEMBER( noise_r );
 
 	void update_fifo_dma();
-    void print_sums() { printf("%04x: %04x\n", (uint16_t)m_core->m_arg0, (uint16_t)m_core->m_arg1); }
-    void print_branches() { printf("Branch: %d %d %d %d %d\n", m_core->m_arg0 ? 1 : 0, m_core->m_arg1 ? 1 : 0, m_core->m_arg2 ? 1 : 0, m_core->m_arg3 ? 1 : 0, m_core->m_arg4 ? 1 : 0); }
-    void print_value() { printf("Value is %08x\n", m_core->m_arg0); }
-    void print_addr() { printf("New value is %08x from %08x\n", m_core->m_arg0, m_core->m_arg1); }
+	void print_sums() { printf("%04x: %04x\n", (uint16_t)m_core->m_arg0, (uint16_t)m_core->m_arg1); }
+	void print_branches() { printf("Branch: %d %d %d %d %d\n", m_core->m_arg0 ? 1 : 0, m_core->m_arg1 ? 1 : 0, m_core->m_arg2 ? 1 : 0, m_core->m_arg3 ? 1 : 0, m_core->m_arg4 ? 1 : 0); }
+	void print_value() { printf("Value is %08x\n", m_core->m_arg0); }
+	void print_addr() { printf("New value is %08x from %08x\n", m_core->m_arg0, m_core->m_arg1); }
 
 protected:
 	// device-level overrides
@@ -232,10 +232,10 @@ private:
 
 		const char *m_format;
 		uint32_t    m_arg0;
-        uint32_t    m_arg1;
-        uint32_t    m_arg2;
-        uint32_t    m_arg3;
-        uint32_t    m_arg4;
+		uint32_t    m_arg1;
+		uint32_t    m_arg2;
+		uint32_t    m_arg3;
+		uint32_t    m_arg4;
 
 		struct
 		{
@@ -316,7 +316,7 @@ private:
 		uint32_t         cycles;                     /* accumulated cycles */
 		uint8_t          checkints;                  /* need to check interrupts before next instruction */
 		uint8_t          checksoftints;              /* need to check software interrupts before next instruction */
-        uml::code_label  abortlabel;                 /* label to abort execution of this block */
+		uml::code_label  abortlabel;                 /* label to abort execution of this block */
 		uml::code_label  labelnum;                   /* index for local labels */
 	};
 
@@ -387,23 +387,6 @@ public: // TODO
 
 #define DSPPDRC_COMPATIBLE_OPTIONS (DSPPDRC_STRICT_VERIFY | DSPPDRC_FLUSH_PC)
 #define DSPPDRC_FASTEST_OPTIONS    (0)
-
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_DSPP_INT_HANDLER(_devcb) \
-	devcb = &dspp_device::set_int_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_DSPP_DMA_READ_HANDLER(_devcb) \
-	devcb = &dspp_device::set_dma_read_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_DSPP_DMA_WRITE_HANDLER(_devcb) \
-	devcb = &dspp_device::set_dma_write_handler(*device, DEVCB_##_devcb);
-
-
 
 // device type definition
 DECLARE_DEVICE_TYPE(DSPP, dspp_device);

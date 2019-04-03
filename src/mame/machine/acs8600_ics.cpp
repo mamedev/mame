@@ -16,8 +16,7 @@ acs8600_ics_device::acs8600_ics_device(const machine_config &mconfig, const char
 	m_icscpu(*this, "icscpu"),
 	m_out_irq1_func(*this),
 	m_out_irq2_func(*this),
-	m_host_space_device(*this, finder_base::DUMMY_TAG),
-	m_host_space_index(-1)
+	m_host_space(*this, finder_base::DUMMY_TAG, -1)
 {
 }
 
@@ -44,12 +43,12 @@ WRITE8_MEMBER(acs8600_ics_device::ctrl_w)
 
 READ8_MEMBER(acs8600_ics_device::hostram_r)
 {
-	return m_maincpu_mem->read_byte((m_hiaddr << 16) | (BIT(m_ctrl, 0) << 15) | (offset & 0x7fff));
+	return m_host_space->read_byte((m_hiaddr << 16) | (BIT(m_ctrl, 0) << 15) | (offset & 0x7fff));
 }
 
 WRITE8_MEMBER(acs8600_ics_device::hostram_w)
 {
-	m_maincpu_mem->write_byte((m_hiaddr << 16) | (BIT(m_ctrl, 0) << 15) | (offset & 0x7fff), data);
+	m_host_space->write_byte((m_hiaddr << 16) | (BIT(m_ctrl, 0) << 15) | (offset & 0x7fff), data);
 }
 
 WRITE_LINE_MEMBER(acs8600_ics_device::attn_w)
@@ -202,7 +201,6 @@ void acs8600_ics_device::device_add_mconfig(machine_config &config)
 
 void acs8600_ics_device::device_resolve_objects()
 {
-	m_maincpu_mem = &m_host_space_device->space(m_host_space_index);
 	m_out_irq1_func.resolve_safe();
 	m_out_irq2_func.resolve_safe();
 }

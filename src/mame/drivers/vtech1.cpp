@@ -83,7 +83,6 @@ public:
 	void laser110(machine_config &config);
 	void laser210(machine_config &config);
 
-	void init_vtech1();
 	void init_vtech1h();
 
 private:
@@ -280,18 +279,8 @@ READ8_MEMBER( vtech1_state::mc6847_videoram_r )
     DRIVER INIT
 ***************************************************************************/
 
-void vtech1_state::init_vtech1()
-{
-	// setup expansion slots
-	m_ioexp->set_io_space(&m_maincpu->space(AS_IO));
-	m_memexp->set_program_space(&m_maincpu->space(AS_PROGRAM));
-	m_memexp->set_io_space(&m_maincpu->space(AS_IO));
-}
-
 void vtech1_state::init_vtech1h()
 {
-	init_vtech1();
-
 	// the SHRG mod replaces the standard videoram chip with an 8k chip
 	m_videoram.allocate(0x2000);
 
@@ -445,13 +434,15 @@ void vtech1_state::laser110(machine_config &config)
 
 	// video hardware
 	MC6847_PAL(config, m_mc6847, XTAL(4'433'619));
+	m_mc6847->set_screen("screen");
 	m_mc6847->fsync_wr_callback().set_inputline(m_maincpu, 0).invert();
 	m_mc6847->input_callback().set(FUNC(vtech1_state::mc6847_videoram_r));
 	m_mc6847->set_black_and_white(true);
 	m_mc6847->set_get_fixed_mode(mc6847_pal_device::MODE_GM1);
-	mc6847_base_device::add_pal_screen(config, "screen", "mc6847");
 	// GM2 = GND, GM0 = GND, INTEXT = GND
 	// other lines not connected
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -461,11 +452,14 @@ void vtech1_state::laser110(machine_config &config)
 
 	// peripheral and memory expansion slots
 	VTECH_IOEXP_SLOT(config, m_ioexp);
+	m_ioexp->set_io_space(m_maincpu, AS_IO);
 	VTECH_MEMEXP_SLOT(config, m_memexp);
+	m_memexp->set_program_space(m_maincpu, AS_PROGRAM);
+	m_memexp->set_io_space(m_maincpu, AS_IO);
 
 	// snapshot
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", 0));
-	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(vtech1_state, vtech1), this), "vz", 1.5);
+	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(vtech1_state, vtech1), this), "vz", attotime::from_double(1.5));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(vtech1_cassette_formats);
@@ -479,6 +473,7 @@ void vtech1_state::laser200(machine_config &config)
 {
 	laser110(config);
 	MC6847_PAL(config.replace(), m_mc6847, XTAL(4'433'619));
+	m_mc6847->set_screen("screen");
 	m_mc6847->fsync_wr_callback().set_inputline(m_maincpu, 0).invert();
 	m_mc6847->input_callback().set(FUNC(vtech1_state::mc6847_videoram_r));
 	m_mc6847->set_get_fixed_mode(mc6847_pal_device::MODE_GM1);
@@ -506,6 +501,7 @@ void vtech1_state::laser310h(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &vtech1_state::vtech1_shrg_io);
 
 	MC6847_PAL(config.replace(), m_mc6847, XTAL(4'433'619));
+	m_mc6847->set_screen("screen");
 	m_mc6847->fsync_wr_callback().set_inputline(m_maincpu, 0).invert();
 	m_mc6847->input_callback().set(FUNC(vtech1_state::mc6847_videoram_r));
 	m_mc6847->set_get_fixed_mode(mc6847_pal_device::MODE_GM1);
@@ -570,13 +566,13 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT   CLASS         INIT          COMPANY                   FULLNAME                          FLAGS
-COMP( 1983, laser110,  0,        0,      laser110,  vtech1, vtech1_state, init_vtech1,  "Video Technology",       "Laser 110",                      0 )
-COMP( 1983, laser200,  0,        0,      laser200,  vtech1, vtech1_state, init_vtech1,  "Video Technology",       "Laser 200",                      0 )
-COMP( 1983, vz200de,   laser200, 0,      laser200,  vtech1, vtech1_state, init_vtech1,  "Video Technology",       "VZ-200 (Germany & Netherlands)", MACHINE_NOT_WORKING )
-COMP( 1983, fellow,    laser200, 0,      laser200,  vtech1, vtech1_state, init_vtech1,  "Salora",                 "Fellow (Finland)",               0 )
-COMP( 1983, tx8000,    laser200, 0,      laser200,  vtech1, vtech1_state, init_vtech1,  "Texet",                  "TX-8000 (UK)",                   0 )
-COMP( 1984, laser210,  0,        0,      laser210,  vtech1, vtech1_state, init_vtech1,  "Video Technology",       "Laser 210",                      0 )
-COMP( 1984, vz200,     laser210, 0,      laser210,  vtech1, vtech1_state, init_vtech1,  "Dick Smith Electronics", "VZ-200 (Oceania)",               0 )
-COMP( 1984, laser310,  0,        0,      laser310,  vtech1, vtech1_state, init_vtech1,  "Video Technology",       "Laser 310",                      0 )
-COMP( 1984, vz300,     laser310, 0,      laser310,  vtech1, vtech1_state, init_vtech1,  "Dick Smith Electronics", "VZ-300 (Oceania)",               0 )
+COMP( 1983, laser110,  0,        0,      laser110,  vtech1, vtech1_state, empty_init,   "Video Technology",       "Laser 110",                      0 )
+COMP( 1983, laser200,  0,        0,      laser200,  vtech1, vtech1_state, empty_init,   "Video Technology",       "Laser 200",                      0 )
+COMP( 1983, vz200de,   laser200, 0,      laser200,  vtech1, vtech1_state, empty_init,   "Video Technology",       "VZ-200 (Germany & Netherlands)", MACHINE_NOT_WORKING )
+COMP( 1983, fellow,    laser200, 0,      laser200,  vtech1, vtech1_state, empty_init,   "Salora",                 "Fellow (Finland)",               0 )
+COMP( 1983, tx8000,    laser200, 0,      laser200,  vtech1, vtech1_state, empty_init,   "Texet",                  "TX-8000 (UK)",                   0 )
+COMP( 1984, laser210,  0,        0,      laser210,  vtech1, vtech1_state, empty_init,   "Video Technology",       "Laser 210",                      0 )
+COMP( 1984, vz200,     laser210, 0,      laser210,  vtech1, vtech1_state, empty_init,   "Dick Smith Electronics", "VZ-200 (Oceania)",               0 )
+COMP( 1984, laser310,  0,        0,      laser310,  vtech1, vtech1_state, empty_init,   "Video Technology",       "Laser 310",                      0 )
+COMP( 1984, vz300,     laser310, 0,      laser310,  vtech1, vtech1_state, empty_init,   "Dick Smith Electronics", "VZ-300 (Oceania)",               0 )
 COMP( 1984, laser310h, laser310, 0,      laser310h, vtech1, vtech1_state, init_vtech1h, "Video Technology",       "Laser 310 (SHRG)",               MACHINE_UNOFFICIAL )

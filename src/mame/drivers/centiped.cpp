@@ -761,14 +761,14 @@ void centiped_state::caterplr_map(address_map &map)
 
 WRITE8_MEMBER(centiped_state::caterplr_AY8910_w)
 {
-	m_aysnd->address_w(space, 0, offset);
-	m_aysnd->data_w(space, 0, data);
+	m_aysnd->address_w(offset);
+	m_aysnd->data_w(data);
 }
 
 READ8_MEMBER(centiped_state::caterplr_AY8910_r)
 {
-	m_aysnd->address_w(space, 0, offset);
-	return m_aysnd->data_r(space, 0);
+	m_aysnd->address_w(offset);
+	return m_aysnd->data_r();
 }
 
 
@@ -985,7 +985,7 @@ void centiped_state::bullsdrt_port_map(address_map &map)
 
 void centiped_state::bullsdrt_data_map(address_map &map)
 {
-	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(centiped_state::bullsdrt_data_port_r)).w("snsnd", FUNC(sn76496_device::command_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(centiped_state::bullsdrt_data_port_r)).w("snsnd", FUNC(sn76496_device::write));
 }
 
 

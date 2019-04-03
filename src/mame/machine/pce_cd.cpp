@@ -241,23 +241,22 @@ void pce_cd_device::nvram_init(nvram_device &nvram, void *data, size_t size)
 }
 
 // TODO: left and right speaker tags should be passed from the parent config, instead of using the hard-coded ones below!?!
- MACHINE_CONFIG_START(pce_cd_device::device_add_mconfig)
-	NVRAM(config, "bram").set_custom_handler(FUNC(pce_cd_device::nvram_init));
+void pce_cd_device::device_add_mconfig(machine_config &config)
+{
+	NVRAM(config, m_nvram).set_custom_handler(FUNC(pce_cd_device::nvram_init));
 
-	MCFG_CDROM_ADD("cdrom")
-	MCFG_CDROM_INTERFACE("pce_cdrom")
+	CDROM(config, m_cdrom).set_interface("pce_cdrom");
 
-	MCFG_DEVICE_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, pce_cd_device, msm5205_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 1/48 prescaler, 4bit data */
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^lspeaker", 0.50 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^rspeaker", 0.50 )
+	MSM5205(config, m_msm, PCE_CD_CLOCK / 6);
+	m_msm->vck_legacy_callback().set(FUNC(pce_cd_device::msm5205_int)); /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 1/48 prescaler, 4bit data */
+	m_msm->add_route(ALL_OUTPUTS, "^lspeaker", 0.50);
+	m_msm->add_route(ALL_OUTPUTS, "^rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD( "cdda", CDDA )
-	MCFG_SOUND_ROUTE( 0, "^lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "^rspeaker", 1.00 )
-MACHINE_CONFIG_END
-
+	CDDA(config, m_cdda);
+	m_cdda->add_route(0, "^lspeaker", 1.00);
+	m_cdda->add_route(1, "^rspeaker", 1.00);
+}
 
 void pce_cd_device::adpcm_stop(uint8_t irq_flag)
 {

@@ -2533,7 +2533,7 @@ static PaError OpenStream( struct PaUtilHostApiRepresentation *hostApi,
     {
         framesPerBufferProcessorCall = framesPerHostInputBuffer;
     }
-    else if( outputParameters )
+    else //if( outputParameters )
     {
         framesPerBufferProcessorCall = framesPerHostOutputBuffer;
     }

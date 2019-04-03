@@ -742,6 +742,13 @@ void memory_manager::allocate(device_memory_interface &memory)
 			// allocate one of the appropriate type
 			switch (spaceconfig->data_width() | (spaceconfig->addr_shift() + 4))
 			{
+				case  8|(4+1):
+					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
+						memory.allocate<address_space_specific<0,  1, ENDIANNESS_LITTLE>>(*this, spacenum);
+					else
+						memory.allocate<address_space_specific<0,  1, ENDIANNESS_BIG   >>(*this, spacenum);
+					break;
+
 				case  8|(4-0):
 					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
 						memory.allocate<address_space_specific<0,  0, ENDIANNESS_LITTLE>>(*this, spacenum);
@@ -962,8 +969,7 @@ address_space_config::address_space_config()
 		m_logaddr_width(0),
 		m_page_shift(0),
 		m_is_octal(false),
-		m_internal_map(address_map_constructor()),
-		m_default_map(address_map_constructor())
+		m_internal_map(address_map_constructor())
 {
 }
 
@@ -974,9 +980,8 @@ address_space_config::address_space_config()
  @param addrwidth address bits
  @param addrshift
  @param internal
- @param defmap
  */
-address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, address_map_constructor internal, address_map_constructor defmap)
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, address_map_constructor internal)
 	: m_name(name),
 		m_endianness(endian),
 		m_data_width(datawidth),
@@ -985,12 +990,11 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 		m_logaddr_width(addrwidth),
 		m_page_shift(0),
 		m_is_octal(false),
-		m_internal_map(internal),
-		m_default_map(defmap)
+		m_internal_map(internal)
 {
 }
 
-address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_constructor internal, address_map_constructor defmap)
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_constructor internal)
 	: m_name(name),
 		m_endianness(endian),
 		m_data_width(datawidth),
@@ -999,8 +1003,7 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 		m_logaddr_width(logwidth),
 		m_page_shift(pageshift),
 		m_is_octal(false),
-		m_internal_map(internal),
-		m_default_map(defmap)
+		m_internal_map(internal)
 {
 }
 
@@ -2647,6 +2650,8 @@ template<int Width, int AddrShift, int Endian> memory_access_cache<Width, AddrSh
 }
 
 
+template class memory_access_cache<0,  1, ENDIANNESS_LITTLE>;
+template class memory_access_cache<0,  1, ENDIANNESS_BIG>;
 template class memory_access_cache<0,  0, ENDIANNESS_LITTLE>;
 template class memory_access_cache<0,  0, ENDIANNESS_BIG>;
 template class memory_access_cache<1,  3, ENDIANNESS_LITTLE>;

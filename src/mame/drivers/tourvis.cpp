@@ -401,25 +401,26 @@ MACHINE_CONFIG_START(tourvision_state::tourvision)
 	m_maincpu->add_route(0, "lspeaker", 1.00);
 	m_maincpu->add_route(1, "rspeaker", 1.00);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_DEVICE_ADD("subcpu", I8085A, 18000000/3 /*?*/)
-	MCFG_DEVICE_PROGRAM_MAP(tourvision_8085_map)
+	I8085A(config, m_subcpu, 18000000/3 /*?*/);
+	m_subcpu->set_addrmap(AS_PROGRAM, &tourvision_state::tourvision_8085_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
-	MCFG_SCREEN_UPDATE_DRIVER( pce_common_state, screen_update )
-	MCFG_SCREEN_PALETTE("huc6260")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
+	screen.set_screen_update(FUNC(pce_common_state::screen_update));
+	screen.set_palette(m_huc6260);
 
-	MCFG_DEVICE_ADD( "huc6260", HUC6260, PCE_MAIN_CLOCK )
-	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6270", huc6270_device, next_pixel))
-	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(READ16("huc6270", huc6270_device, time_until_next_event))
-	MCFG_HUC6260_VSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, vsync_changed))
-	MCFG_HUC6260_HSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, hsync_changed))
-	MCFG_DEVICE_ADD( "huc6270", HUC6270, 0 )
-	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
+	HUC6260(config, m_huc6260, PCE_MAIN_CLOCK);
+	m_huc6260->next_pixel_data().set("huc6270", FUNC(huc6270_device::next_pixel));
+	m_huc6260->time_til_next_event().set("huc6270", FUNC(huc6270_device::time_until_next_event));
+	m_huc6260->vsync_changed().set("huc6270", FUNC(huc6270_device::vsync_changed));
+	m_huc6260->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
+
+	huc6270_device &huc6270(HUC6270(config, "huc6270", 0));
+	huc6270.set_vram_size(0x10000);
+	huc6270.irq().set_inputline(m_maincpu, 0);
 
 	i8155_device &i8155(I8155(config, "i8155", 1000000 /*?*/));
 	i8155.out_pa_callback().set(FUNC(tourvision_state::tourvision_i8155_a_w));
@@ -435,9 +436,7 @@ MACHINE_CONFIG_START(tourvision_state::tourvision)
 	MCFG_GENERIC_LOAD(tourvision_state, tourvision_cart)
 	MCFG_GENERIC_MANDATORY
 
-	MCFG_SOFTWARE_LIST_ADD("tv_list","pce_tourvision")
-
-
+	SOFTWARE_LIST(config, "tv_list").set_original("pce_tourvision");
 MACHINE_CONFIG_END
 
 #define TOURVISION_BIOS \

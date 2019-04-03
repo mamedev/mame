@@ -54,6 +54,7 @@ tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, 
 	, m_selfload(*this, finder_base::DUMMY_TAG)
 	, m_reset(false)
 	, m_valid_config(false)
+	, m_custom_visarea(0, 0, 0, 0)
 {
 	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 }
@@ -81,7 +82,7 @@ crt5057_device::crt5057_device(const machine_config &mconfig, const char *tag, d
 void tms9927_device::device_start()
 {
 	assert(clock() > 0);
-	if (!(m_hpixels_per_column > 0)) fatalerror("TMS9927: number of pixels per column must be explicitly set using MCFG_TMS9927_CHAR_WIDTH()!\n");
+	if (!(m_hpixels_per_column > 0)) fatalerror("TMS9927: number of pixels per column must be explicitly set using set_char_width()!\n");
 
 	// resolve callbacks
 	m_write_vsyn.resolve_safe();
@@ -348,6 +349,9 @@ void tms9927_device::recompute_parameters(bool postload)
 	/* create a visible area */
 	rectangle visarea(0, m_overscan_left + m_visible_hpix + m_overscan_right - 1,
 				0, m_overscan_top + m_visible_vpix + m_overscan_bottom - 1);
+
+	if (m_custom_visarea.width() > 1 && m_custom_visarea.height() > 1)
+		visarea = m_custom_visarea;
 
 	attotime refresh = clocks_to_attotime(HCOUNT * m_total_vpix);
 

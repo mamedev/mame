@@ -25,7 +25,8 @@ DEFINE_DEVICE_TYPE(EINSTEIN_SPECULATOR, einstein_speculator_device, "einstein_sp
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(einstein_speculator_device::device_add_mconfig)
+void einstein_speculator_device::device_add_mconfig(machine_config &config)
+{
 	TTL74123(config, m_ic5a, 0);
 	m_ic5a->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
 	m_ic5a->set_resistor_value(RES_K(47));
@@ -48,11 +49,11 @@ MACHINE_CONFIG_START(einstein_speculator_device::device_add_mconfig)
 	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_CASSETTE_ADD(m_cassette)
-	MCFG_CASSETTE_FORMATS(tzx_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("spectrum_cass")
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(tzx_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_interface("spectrum_cass");
+}
 
 
 //**************************************************************************

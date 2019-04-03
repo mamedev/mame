@@ -1790,7 +1790,8 @@ bool is_xml_extension(char const *ext)
 	return
 			!core_stricmp(ext, ".hsi") ||
 			!core_stricmp(ext, ".lay") ||
-			!core_stricmp(ext, ".xml");
+			!core_stricmp(ext, ".xml") ||
+			!core_stricmp(ext, ".xslt");
 }
 
 } // anonymous namespace

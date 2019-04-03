@@ -13,6 +13,7 @@
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "emupal.h"
+#include "screen.h"
 
 class alpha68k_state : public driver_device
 {
@@ -25,6 +26,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_outlatch(*this, "outlatch"),
 		m_soundlatch(*this, "soundlatch"),
@@ -137,6 +139,7 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<ls259_device> m_outlatch;
 	required_device<generic_latch_8_device> m_soundlatch;

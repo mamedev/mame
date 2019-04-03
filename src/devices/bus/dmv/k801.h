@@ -36,8 +36,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// dmvcart_interface overrides
-	virtual void io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data) override;
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, uint8_t data) override;
+	virtual void io_read(int ifsel, offs_t offset, uint8_t &data) override;
+	virtual void io_write(int ifsel, offs_t offset, uint8_t data) override;
 
 	required_device<mc2661_device> m_epci;
 	required_device<rs232_port_device> m_rs232;
@@ -67,8 +67,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// dmvcart_interface overrides
-	virtual void io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data) override;
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, uint8_t data) override;
+	virtual void io_read(int ifsel, offs_t offset, uint8_t &data) override;
+	virtual void io_write(int ifsel, offs_t offset, uint8_t data) override;
 };
 
 // ======================> dmv_k212_device

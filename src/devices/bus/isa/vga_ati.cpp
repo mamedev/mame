@@ -76,32 +76,33 @@ DEFINE_DEVICE_TYPE(ISA16_SVGA_MACH64,      isa16_vga_mach64_device,      "mach64
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa16_vga_gfxultra_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", ati_vga_device, screen_update)
+void isa16_vga_gfxultra_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
+	screen.set_screen_update("vga", FUNC(ati_vga_device::screen_update));
 
-	MCFG_DEVICE_ADD("vga", ATI_VGA, 0)
-	MCFG_VIDEO_SET_SCREEN("screen")
-MACHINE_CONFIG_END
+	ATI_VGA(config, "vga", 0).set_screen("screen");
+}
 
-MACHINE_CONFIG_START(isa16_vga_gfxultrapro_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", mach32_device, screen_update)
+void isa16_vga_gfxultrapro_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
+	screen.set_screen_update("vga", FUNC(mach32_device::screen_update));
 
-	MCFG_DEVICE_ADD("vga", ATIMACH32, 0)
-	MCFG_VIDEO_SET_SCREEN("screen")
-MACHINE_CONFIG_END
+	ATIMACH32(config, "vga", 0).set_screen("screen");
+}
 
-MACHINE_CONFIG_START(isa16_vga_mach64_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", mach64_device, screen_update)
+void isa16_vga_mach64_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
+	screen.set_screen_update("vga", FUNC(mach64_device::screen_update));
 
-	MCFG_DEVICE_ADD("vga", ATIMACH64, 0)
-	MCFG_VIDEO_SET_SCREEN("screen")
-MACHINE_CONFIG_END
+	ATIMACH64(config, "vga", 0).set_screen("screen");
+}
+
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
