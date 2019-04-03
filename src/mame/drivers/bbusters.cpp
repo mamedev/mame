@@ -244,7 +244,7 @@ void bbusters_state::machine_start()
 
 WRITE8_MEMBER(bbusters_state_base::sound_cpu_w)
 {
-	m_soundlatch[0]->write(space, 0, data&0xff);
+	m_soundlatch[0]->write(data&0xff);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 

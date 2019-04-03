@@ -7,6 +7,8 @@
 #ifndef PSTRING_H_
 #define PSTRING_H_
 
+#include "ptypes.h"
+
 #include <cstring>
 #include <exception>
 #include <iterator>
@@ -14,8 +16,6 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
-
-#include "ptypes.h"
 
 // ----------------------------------------------------------------------------------------
 // pstring: semi-immutable strings ...
@@ -42,14 +42,15 @@ public:
 	using string_type = typename T::string_type;
 	using traits_type = typename T::traits_type;
 
-	pstring_const_iterator() noexcept : p() { }
+	constexpr pstring_const_iterator() noexcept : p() { }
 	explicit constexpr pstring_const_iterator(const typename string_type::const_iterator &x) noexcept : p(x) { }
 
 	pstring_const_iterator& operator++() noexcept { p += static_cast<difference_type>(traits_type::codelen(&(*p))); return *this; }
-	const pstring_const_iterator operator++(int) noexcept { pstring_const_iterator tmp(*this); operator++(); return tmp; }
+	// NOLINTNEXTLINE(cert-dcl21-cpp)
+	pstring_const_iterator operator++(int) & noexcept { pstring_const_iterator tmp(*this); operator++(); return tmp; }
 
-	bool operator==(const pstring_const_iterator& rhs) const noexcept { return p == rhs.p; }
-	bool operator!=(const pstring_const_iterator& rhs) const noexcept { return p != rhs.p; }
+	constexpr bool operator==(const pstring_const_iterator& rhs) const noexcept { return p == rhs.p; }
+	constexpr bool operator!=(const pstring_const_iterator& rhs) const noexcept { return p != rhs.p; }
 
 	reference operator*() const noexcept { return *reinterpret_cast<pointer>(&(*p)); }
 	pointer operator->() const noexcept { return reinterpret_cast<pointer>(&(*p)); }
@@ -74,7 +75,7 @@ public:
 	using string_type = typename traits_type::string_type;
 
 	// FIXME: this is ugly
-	class ref_value_type final
+	struct ref_value_type final
 	{
 	public:
 		ref_value_type() = delete;
@@ -201,16 +202,12 @@ public:
 
 	size_type mem_t_size() const { return m_str.size(); }
 
-	pstring_t rpad(const pstring_t &ws, const size_type cnt) const;
-
 	const string_type &cpp_string() const { return m_str; }
 
-	static const size_type npos = static_cast<size_type>(-1);
-
-protected:
-	string_type m_str;
+	static constexpr const size_type npos = static_cast<size_type>(-1);
 
 private:
+	string_type m_str;
 };
 
 struct pu8_traits

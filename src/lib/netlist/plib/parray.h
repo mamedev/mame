@@ -8,6 +8,7 @@
 #ifndef PARRAY_H_
 #define PARRAY_H_
 
+#include "palloc.h"
 #include "pconfig.h"
 #include "pexception.h"
 
@@ -30,7 +31,7 @@ namespace plib {
 	struct sizeabs<FT, 0>
 	{
 		static constexpr const std::size_t ABS = 0;
-		using container = typename std::vector<FT> ;
+		using container = typename std::vector<FT, aligned_allocator<FT, PALIGN_VECTOROPT>>;
 	};
 
 	/**
@@ -59,6 +60,7 @@ namespace plib {
 		using size_type = typename base_type::size_type;
 		using reference = typename base_type::reference;
 		using const_reference = typename base_type::const_reference;
+		using value_type = typename base_type::value_type;
 
 		template <int X = SIZE >
 		parray(size_type size, typename std::enable_if<X==0, int>::type = 0)
@@ -66,11 +68,11 @@ namespace plib {
 		{
 		}
 
-#if 0
+#if 1
 		/* allow construction in fixed size arrays */
 		template <int X = SIZE >
-		parray(typename std::enable_if<X==0, int>::type = 0)
-		: m_size(0)
+		parray(typename std::enable_if<(X > 0), int>::type = 0)
+		: m_size(X)
 		{
 		}
 #endif
@@ -102,15 +104,22 @@ namespace plib {
 			return m_a[i];
 		}
 #else
-		reference operator[](size_type i) noexcept { return m_a[i]; }
-		constexpr const_reference operator[](size_type i) const noexcept { return m_a[i]; }
+		C14CONSTEXPR reference operator[](size_type i) noexcept
+		{
+			return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(&m_a[0])[i];
+		}
+		constexpr const_reference operator[](size_type i) const noexcept
+		{
+			return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(&m_a[0])[i];
+		}
 #endif
-		FT * data() noexcept { return m_a.data(); }
-		const FT * data() const noexcept { return m_a.data(); }
+		FT * data() noexcept { return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(m_a.data()); }
+		const FT * data() const noexcept { return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(m_a.data()); }
 
 	private:
-		base_type m_a;
-		size_type m_size;
+		PALIGNAS_VECTOROPT()
+		base_type               m_a;
+		size_type               m_size;
 	};
 } // namespace plib
 

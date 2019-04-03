@@ -141,7 +141,7 @@ private:
 	optional_device<palette_device> m_palette;
 	optional_device<pioneer_ldv1000_device> m_ldv1000;
 	optional_device<pioneer_pr7820_device> m_pr7820;
-	optional_device<phillips_22vp932_device> m_22vp932;
+	optional_device<philips_22vp932_device> m_22vp932;
 	optional_shared_ptr<uint8_t> m_videoram;
 	output_finder<16> m_digits;
 
@@ -744,18 +744,18 @@ void dlair_state::dlair_base(machine_config &config)
 
 MACHINE_CONFIG_START(dlair_state::dlair_pr7820)
 	dlair_base(config);
-	MCFG_LASERDISC_PR7820_ADD("ld_pr7820")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	PIONEER_PR7820(config, m_pr7820, 0);
+	m_pr7820->add_route(0, "lspeaker", 1.0);
+	m_pr7820->add_route(1, "rspeaker", 1.0);
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "ld_pr7820")
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(dlair_state::dlair_ldv1000)
 	dlair_base(config);
-	MCFG_LASERDISC_LDV1000_ADD("ld_ldv1000")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	PIONEER_LDV1000(config, m_ldv1000, 0);
+	m_ldv1000->add_route(0, "lspeaker", 1.0);
+	m_ldv1000->add_route(1, "rspeaker", 1.0);
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "ld_ldv1000")
 MACHINE_CONFIG_END
 
@@ -778,9 +778,11 @@ MACHINE_CONFIG_START(dlair_state::dleuro)
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_hz(MASTER_CLOCK_EURO/(16*16*16*16*16*8)));
 
-	MCFG_LASERDISC_22VP932_ADD("ld_22vp932")
-	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, dlair_state, screen_update_dleuro)
-	MCFG_LASERDISC_OVERLAY_PALETTE(m_palette)
+	PHILIPS_22VP932(config, m_22vp932, 0);
+	m_22vp932->set_overlay(256, 256, FUNC(dlair_state::screen_update_dleuro));
+	m_22vp932->set_overlay_palette(m_palette);
+	m_22vp932->add_route(0, "lspeaker", 1.0);
+	m_22vp932->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_PAL("screen", "ld_22vp932")
@@ -792,13 +794,9 @@ MACHINE_CONFIG_START(dlair_state::dleuro)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
-
-	MCFG_DEVICE_MODIFY("ld_22vp932")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "lspeaker", 0.33);
+	m_speaker->add_route(ALL_OUTPUTS, "rspeaker", 0.33);
 MACHINE_CONFIG_END
 
 

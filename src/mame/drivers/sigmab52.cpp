@@ -575,14 +575,14 @@ void sigmab52_state::machine_reset()
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(sigmab52_state::jwildb52)
-
+void sigmab52_state::jwildb52(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(8'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(jwildb52_map)
+	MC6809(config, m_maincpu, XTAL(8'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab52_state::jwildb52_map);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809, XTAL(8'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(sound_prog_map)
+	MC6809(config, m_audiocpu, XTAL(8'000'000));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sigmab52_state::sound_prog_map);
 
 	ptm6840_device &ptm1(PTM6840(config, "6840ptm_1", XTAL(8'000'000) / 8));  // FIXME
 	ptm1.irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
@@ -592,27 +592,25 @@ MACHINE_CONFIG_START(sigmab52_state::jwildb52)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(1024, 1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 544-1, 0, 436-1)
-	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(1024, 1024);
+	screen.set_visarea(0, 544-1, 0, 436-1);
+	screen.set_screen_update("hd63484", FUNC(hd63484_device::update_screen));
+	screen.set_palette(m_palette);
 
 	HD63484(config, "hd63484", XTAL(8'000'000)).set_addrmap(0, &sigmab52_state::jwildb52_hd63484_map);
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, m_palette).set_entries(16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-MACHINE_CONFIG_END
+	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*************************

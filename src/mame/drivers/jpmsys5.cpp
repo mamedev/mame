@@ -91,10 +91,10 @@ WRITE16_MEMBER(jpmsys5v_state::sys5_tms34061_w)
 	}
 
 	if (ACCESSING_BITS_8_15)
-		m_tms34061->write(space, col, row, func, data >> 8);
+		m_tms34061->write(col, row, func, data >> 8);
 
 	if (ACCESSING_BITS_0_7)
-		m_tms34061->write(space, col | 1, row, func, data & 0xff);
+		m_tms34061->write(col | 1, row, func, data & 0xff);
 }
 
 READ16_MEMBER(jpmsys5v_state::sys5_tms34061_r)
@@ -115,10 +115,10 @@ READ16_MEMBER(jpmsys5v_state::sys5_tms34061_r)
 	}
 
 	if (ACCESSING_BITS_8_15)
-		data |= m_tms34061->read(space, col, row, func) << 8;
+		data |= m_tms34061->read(col, row, func) << 8;
 
 	if (ACCESSING_BITS_0_7)
-		data |= m_tms34061->read(space, col | 1, row, func);
+		data |= m_tms34061->read(col | 1, row, func);
 
 	return data;
 }
@@ -583,7 +583,8 @@ void jpmsys5v_state::machine_reset()
  *
  *************************************/
 
-MACHINE_CONFIG_START(jpmsys5v_state::jpmsys5v)
+void jpmsys5v_state::jpmsys5v(machine_config &config)
+{
 	M68000(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys5v_state::m68000_map);
 
@@ -613,25 +614,23 @@ MACHINE_CONFIG_START(jpmsys5v_state::jpmsys5v)
 
 	S16LF01(config, m_vfd); //for debug ports
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(40'000'000) / 4, 676, 20*4, 147*4, 256, 0, 254)
-	MCFG_SCREEN_UPDATE_DRIVER(jpmsys5v_state, screen_update_jpmsys5v)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(40'000'000) / 4, 676, 20*4, 147*4, 256, 0, 254);
+	screen.set_screen_update(FUNC(jpmsys5v_state::screen_update_jpmsys5v));
 
 	TMS34061(config, m_tms34061, 0);
 	m_tms34061->set_rowshift(8);  /* VRAM address is (row << rowshift) | col */
 	m_tms34061->set_vram_size(0x40000);
 	m_tms34061->int_callback().set(FUNC(jpmsys5v_state::generate_tms34061_interrupt));
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, "palette").set_entries(16);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("upd7759", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	/* Earlier revisions use an SAA1099, but no video card games seem to (?) */
-	MCFG_DEVICE_ADD("ym2413", YM2413, 4000000 ) /* Unconfirmed */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	YM2413(config, "ym2413", 4000000).add_route(ALL_OUTPUTS, "mono", 1.00); /* Unconfirmed */
 
 	pia6821_device &pia(PIA6821(config, "6821pia", 0));
 	pia.readpa_handler().set(FUNC(jpmsys5v_state::u29_porta_r));
@@ -646,7 +645,7 @@ MACHINE_CONFIG_START(jpmsys5v_state::jpmsys5v)
 	ptm.set_external_clocks(0, 0, 0);
 	ptm.o1_callback().set(FUNC(jpmsys5v_state::u26_o1_callback));
 	ptm.irq_callback().set(FUNC(jpmsys5v_state::ptm_irq));
-MACHINE_CONFIG_END
+}
 
 READ16_MEMBER(jpmsys5_state::mux_awp_r)
 {

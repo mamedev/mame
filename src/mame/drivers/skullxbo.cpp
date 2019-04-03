@@ -226,11 +226,11 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(skullxbo_state::skullxbo)
-
+void skullxbo_state::skullxbo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &skullxbo_state::main_map);
 
 	TIMER(config, m_scanline_timer).configure_generic(FUNC(skullxbo_state::scanline_timer));
 
@@ -242,20 +242,20 @@ MACHINE_CONFIG_START(skullxbo_state::skullxbo)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_skullxbo);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
-	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, skullxbo_state, get_playfield_tile_info, 16,8, SCAN_COLS, 64,64)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, skullxbo_state, get_alpha_tile_info, 16,8, SCAN_ROWS, 64,32, 0)
+	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 16,8, TILEMAP_SCAN_COLS, 64,64).set_info_callback(FUNC(skullxbo_state::get_playfield_tile_info));
+	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 16,8, TILEMAP_SCAN_ROWS, 64,32, 0).set_info_callback(FUNC(skullxbo_state::get_alpha_tile_info));
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, skullxbo_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(skullxbo_state, screen_update_skullxbo)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, skullxbo_state, video_int_write_line))
+	m_screen->set_raw(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(skullxbo_state::screen_update_skullxbo));
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(skullxbo_state::video_int_write_line));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -264,7 +264,7 @@ MACHINE_CONFIG_START(skullxbo_state::skullxbo)
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 	m_jsa->test_read_cb().set_ioport("FF5802").bit(7);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 

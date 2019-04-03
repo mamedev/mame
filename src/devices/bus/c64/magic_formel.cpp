@@ -206,7 +206,7 @@ void c64_magic_formel_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_magic_formel_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_magic_formel_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!romh)
 	{
@@ -227,7 +227,7 @@ uint8_t c64_magic_formel_cartridge_device::c64_cd_r(address_space &space, offs_t
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_magic_formel_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_magic_formel_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1 && !m_ram_oe)
 	{
@@ -239,7 +239,7 @@ void c64_magic_formel_cartridge_device::c64_cd_w(address_space &space, offs_t of
 		offs_t addr = (offset >> 6) & 0x03;
 		uint8_t new_data = (BIT(data, 1) << 7) | (offset & 0x3f);
 
-		m_pia->write(space, addr, new_data);
+		m_pia->write(addr, new_data);
 	}
 	else if (offset == 0x0001)
 	{

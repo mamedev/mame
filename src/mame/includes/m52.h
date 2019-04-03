@@ -13,14 +13,14 @@ class m52_state : public driver_device
 public:
 	m52_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu"),
 		m_sp_gfxdecode(*this, "sp_gfxdecode"),
 		m_tx_gfxdecode(*this, "tx_gfxdecode"),
 		m_bg_gfxdecode(*this, "bg_gfxdecode"),
-		m_screen(*this, "screen"),
 		m_sp_palette(*this, "sp_palette"),
 		m_tx_palette(*this, "tx_palette"),
 		m_bg_palette(*this, "bg_palette")
@@ -43,6 +43,9 @@ protected:
 
 	tilemap_t*             m_tx_tilemap;
 
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+
 private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -56,11 +59,9 @@ private:
 	uint8_t                m_bg2ypos;
 	uint8_t                m_bgcontrol;
 
-	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_sp_gfxdecode;
 	required_device<gfxdecode_device> m_tx_gfxdecode;
 	required_device<gfxdecode_device> m_bg_gfxdecode;
-	required_device<screen_device> m_screen;
 	required_device<palette_device> m_sp_palette;
 	required_device<palette_device> m_tx_palette;
 	required_device<palette_device> m_bg_palette;

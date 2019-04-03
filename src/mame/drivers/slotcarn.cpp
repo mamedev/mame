@@ -543,12 +543,12 @@ void slotcarn_state::machine_start()
 *          Machine Driver          *
 ***********************************/
 
-MACHINE_CONFIG_START(slotcarn_state::slotcarn)
-
+void slotcarn_state::slotcarn(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK) // 2.5 Mhz?
-	MCFG_DEVICE_PROGRAM_MAP(slotcarn_map)
-	MCFG_DEVICE_IO_MAP(spielbud_io_map)
+	Z80(config, m_maincpu, CPU_CLOCK); // 2.5 Mhz?
+	m_maincpu->set_addrmap(AS_PROGRAM, &slotcarn_state::slotcarn_map);
+	m_maincpu->set_addrmap(AS_IO, &slotcarn_state::spielbud_io_map);
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	ppi0.in_pa_callback().set_ioport("IN0");
@@ -563,9 +563,9 @@ MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 	ppi2.in_pb_callback().set_ioport("IN4");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)   /* temporary, CRTC will configure screen */
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256);   /* temporary, CRTC will configure screen */
+	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
 	crtc.set_screen(m_screen);
@@ -577,7 +577,7 @@ MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_slotcarn);
-	MCFG_PALETTE_ADD("palette", 0x400)
+	PALETTE(config, "palette").set_entries(0x400);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -585,7 +585,7 @@ MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 	ay8910_device &aysnd(AY8910(config, "aysnd", SND_CLOCK));
 	aysnd.port_b_read_callback().set_ioport("DSW2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 /******************************

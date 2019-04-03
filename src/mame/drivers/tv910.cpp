@@ -68,13 +68,13 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
-	DECLARE_READ8_MEMBER(charset_r);
-	DECLARE_READ8_MEMBER(kbd_ascii_r);
-	DECLARE_READ8_MEMBER(kbd_flags_r);
+	uint8_t charset_r();
+	uint8_t kbd_ascii_r();
+	uint8_t kbd_flags_r();
 
-	DECLARE_WRITE8_MEMBER(vbl_ack_w);
-	DECLARE_WRITE8_MEMBER(nmi_ack_w);
-	DECLARE_WRITE8_MEMBER(control_w);
+	void vbl_ack_w(uint8_t data);
+	void nmi_ack_w(uint8_t data);
+	void control_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(vbl_w);
 
@@ -124,7 +124,7 @@ void tv910_state::tv910_mem(address_map &map)
 	map(0xf000, 0xffff).rom().region("maincpu", 0);
 }
 
-WRITE8_MEMBER(tv910_state::control_w)
+void tv910_state::control_w(uint8_t data)
 {
 	m_control = data;
 	#if 0
@@ -140,23 +140,23 @@ WRITE8_MEMBER(tv910_state::control_w)
 	m_beep->set_state(BIT(data, 0));
 }
 
-READ8_MEMBER(tv910_state::charset_r)
+uint8_t tv910_state::charset_r()
 {
 	return m_charset->read();
 }
 
-WRITE8_MEMBER(tv910_state::nmi_ack_w)
+void tv910_state::nmi_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6502_NMI_LINE, CLEAR_LINE);
 	m_strobe = 0;
 }
 
-READ8_MEMBER(tv910_state::kbd_ascii_r)
+uint8_t tv910_state::kbd_ascii_r()
 {
 	return m_transchar;
 }
 
-READ8_MEMBER(tv910_state::kbd_flags_r)
+uint8_t tv910_state::kbd_flags_r()
 {
 	uint8_t rv = 0;
 	ioport_value kbspecial = m_kbspecial->read();
@@ -444,7 +444,7 @@ void tv910_state::machine_start()
 
 void tv910_state::machine_reset()
 {
-	control_w(machine().dummy_space(), 0, 0);
+	control_w(0);
 }
 
 MC6845_ON_UPDATE_ADDR_CHANGED( tv910_state::crtc_update_addr )
@@ -458,7 +458,7 @@ WRITE_LINE_MEMBER(tv910_state::vbl_w)
 		m_mainirq->in_w<0>(1);
 }
 
-WRITE8_MEMBER(tv910_state::vbl_ack_w)
+void tv910_state::vbl_ack_w(uint8_t data)
 {
 	m_mainirq->in_w<0>(0);
 }

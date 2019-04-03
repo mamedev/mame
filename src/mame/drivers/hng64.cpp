@@ -2106,7 +2106,8 @@ void hng64_state::init_io()
 	m_ex_ramaddr_upper = 0;
 }
 
-MACHINE_CONFIG_START(hng64_state::hng64)
+void hng64_state::hng64(machine_config &config)
+{
 	/* basic machine hardware */
 	VR4300BE(config, m_maincpu, HNG64_MASTER_CLOCK);     // actually R4300
 	m_maincpu->set_icache_size(16384);

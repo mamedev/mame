@@ -99,13 +99,13 @@ void dmv_k210_device::device_add_mconfig(machine_config &config)
 	m_centronics->set_output_latch(*m_cent_data_out);
 }
 
-void dmv_k210_device::io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data)
+void dmv_k210_device::io_read(int ifsel, offs_t offset, uint8_t &data)
 {
 	if (ifsel == 0)
 		data = m_ppi->read(offset & 0x03);
 }
 
-void dmv_k210_device::io_write(address_space &space, int ifsel, offs_t offset, uint8_t data)
+void dmv_k210_device::io_write(int ifsel, offs_t offset, uint8_t data)
 {
 	if (ifsel == 0)
 		m_ppi->write(offset & 0x03, data);

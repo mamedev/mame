@@ -913,7 +913,7 @@ READ8_MEMBER( isa8_cga_device::io_read )
 			/* return last written mc6845 address value here? */
 			break;
 		case 1: case 3: case 5: case 7:
-			data = m_crtc->register_r( space, offset );
+			data = m_crtc->register_r();
 			break;
 		case 10:
 			data = m_vsync | ( ( data & 0x40 ) >> 4 ) | m_hsync;
@@ -928,10 +928,10 @@ WRITE8_MEMBER( isa8_cga_device::io_write )
 {
 	switch(offset) {
 	case 0: case 2: case 4: case 6:
-		m_crtc->address_w( space, offset, data );
+		m_crtc->address_w(data);
 		break;
 	case 1: case 3: case 5: case 7:
-		m_crtc->register_w( space, offset, data );
+		m_crtc->register_w(data);
 		break;
 	case 8:
 		mode_control_w(data);
@@ -1170,14 +1170,14 @@ WRITE8_MEMBER( isa8_cga_pc1512_device::io_write )
 	{
 	case 0: case 2: case 4: case 6:
 		data &= 0x1F;
-		m_crtc->address_w( space, offset, data );
+		m_crtc->address_w(data);
 		m_mc6845_address = data;
 		break;
 
 	case 1: case 3: case 5: case 7:
 		if ( ! m_mc6845_locked_register[m_mc6845_address] )
 		{
-			m_crtc->register_w( space, offset, data );
+			m_crtc->register_w(data);
 			if ( isa8_cga_pc1512_device::mc6845_writeonce_register[m_mc6845_address] )
 			{
 				m_mc6845_locked_register[m_mc6845_address] = 1;
@@ -1747,7 +1747,7 @@ WRITE8_MEMBER( isa8_cga_m24_device::io_write )
 	{
 		case 0: case 2: case 4: case 6:
 			m_index = data;
-			m_crtc->address_w( space, offset, data );
+			m_crtc->address_w(data);
 			break;
 		case 1: case 3: case 5: case 7:
 			switch(m_index & 0x1f) // TODO: this is handled by a pal and prom
@@ -1766,7 +1766,7 @@ WRITE8_MEMBER( isa8_cga_m24_device::io_write )
 					data <<= 1;
 					break;
 			}
-			m_crtc->register_w( space, offset, data );
+			m_crtc->register_w(data);
 			break;
 		case 0x0e:
 			m_mode2 = data;

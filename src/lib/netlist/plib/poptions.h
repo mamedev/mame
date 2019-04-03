@@ -24,7 +24,7 @@ class options;
 class option_base
 {
 public:
-	option_base(options &parent, pstring help);
+	option_base(options &parent, const pstring &help);
 	virtual ~option_base() = default;
 
 	COPYASSIGNMOVE(option_base, delete)
@@ -37,7 +37,7 @@ private:
 class option_group : public option_base
 {
 public:
-	option_group(options &parent, pstring group, pstring help)
+	option_group(options &parent, const pstring &group, const pstring &help)
 	: option_base(parent, help), m_group(group) { }
 
 	pstring group() const { return m_group; }
@@ -48,7 +48,7 @@ private:
 class option_example : public option_base
 {
 public:
-	option_example(options &parent, pstring group, pstring help)
+	option_example(options &parent, const pstring &group, const pstring &help)
 	: option_base(parent, help), m_example(group) { }
 
 	pstring example() const { return m_example; }
@@ -60,7 +60,7 @@ private:
 class option : public option_base
 {
 public:
-	option(options &parent, pstring ashort, pstring along, pstring help, bool has_argument);
+	option(options &parent, const pstring &ashort, const pstring &along, const pstring &help, bool has_argument);
 
 	/* no_argument options will be called with "" argument */
 
@@ -88,7 +88,7 @@ private:
 class option_str : public option
 {
 public:
-	option_str(options &parent, pstring ashort, pstring along, pstring defval, pstring help)
+	option_str(options &parent, const pstring &ashort, const pstring &along, const pstring &defval, const pstring &help)
 	: option(parent, ashort, along, help, true), m_val(defval)
 	{}
 
@@ -104,7 +104,7 @@ private:
 class option_str_limit_base : public option
 {
 public:
-	option_str_limit_base(options &parent, pstring ashort, pstring along, std::vector<pstring> &&limit, pstring help)
+	option_str_limit_base(options &parent, const pstring &ashort, const pstring &along, std::vector<pstring> &&limit, const pstring &help)
 	: option(parent, ashort, along, help, true)
 	, m_limit(limit)
 	{
@@ -122,7 +122,7 @@ template <typename T>
 class option_str_limit : public option_str_limit_base
 {
 public:
-	option_str_limit(options &parent, pstring ashort, pstring along, const T &defval, std::vector<pstring> &&limit, pstring help)
+	option_str_limit(options &parent, const pstring &ashort, const pstring &along, const T &defval, std::vector<pstring> &&limit, const pstring &help)
 	: option_str_limit_base(parent, ashort, along, std::move(limit), help), m_val(defval)
 	{
 	}
@@ -152,7 +152,7 @@ private:
 class option_bool : public option
 {
 public:
-	option_bool(options &parent, pstring ashort, pstring along, pstring help)
+	option_bool(options &parent, const pstring &ashort, const pstring &along, const pstring &help)
 	: option(parent, ashort, along, help, false), m_val(false)
 	{}
 
@@ -169,8 +169,8 @@ template <typename T>
 class option_num : public option
 {
 public:
-	option_num(options &parent, pstring ashort, pstring along, T defval,
-			pstring help,
+	option_num(options &parent, const pstring &ashort, const pstring &along, T defval,
+			const pstring &help,
 			T minval = std::numeric_limits<T>::min(),
 			T maxval = std::numeric_limits<T>::max() )
 	: option(parent, ashort, along, help, true)
@@ -198,7 +198,7 @@ private:
 class option_vec : public option
 {
 public:
-	option_vec(options &parent, pstring ashort, pstring along, pstring help)
+	option_vec(options &parent, const pstring &ashort, const pstring &along, const pstring &help)
 	: option(parent, ashort, along, help, true)
 	{}
 
@@ -214,7 +214,7 @@ private:
 class option_args : public option_vec
 {
 public:
-	option_args(options &parent, pstring help)
+	option_args(options &parent, const pstring &help)
 	: option_vec(parent, "", "", help)
 	{}
 };
@@ -229,13 +229,13 @@ public:
 	void register_option(option_base *opt);
 	int parse(int argc, char **argv);
 
-	pstring help(pstring description, pstring usage,
+	pstring help(const pstring &description, const pstring &usage,
 			unsigned width = 72, unsigned indent = 20) const;
 
 	pstring app() const { return m_app; }
 
 private:
-	static pstring split_paragraphs(pstring text, unsigned width, unsigned indent,
+	static pstring split_paragraphs(const pstring &text, unsigned width, unsigned indent,
 			unsigned firstline_indent);
 
 	void check_consistency();
@@ -251,8 +251,8 @@ private:
 		return nullptr;
 	}
 
-	option *getopt_short(pstring arg) const;
-	option *getopt_long(pstring arg) const;
+	option *getopt_short(const pstring &arg) const;
+	option *getopt_long(const pstring &arg) const;
 
 	std::vector<option_base *> m_opts;
 	pstring m_app;

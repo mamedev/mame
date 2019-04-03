@@ -517,81 +517,80 @@ void radio86_state::kr03(machine_config &config)
 	m_ppi8255_1->out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
 }
 
-MACHINE_CONFIG_START(radio86_state::radio16)
+void radio86_state::radio16(machine_config &config)
+{
 	radio86(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(radio86_16_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &radio86_state::radio86_16_mem);
+}
 
-MACHINE_CONFIG_START(radio86_state::radiorom)
+void radio86_state::radiorom(machine_config &config)
+{
 	radio86(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(radio86rom_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &radio86_state::radio86rom_mem);
 
 	I8255(config, m_ppi8255_2);
 	m_ppi8255_2->in_pa_callback().set(FUNC(radio86_state::radio86rom_romdisk_porta_r));
 	m_ppi8255_2->out_pb_callback().set(FUNC(radio86_state::radio86_romdisk_portb_w));
 	m_ppi8255_2->out_pc_callback().set(FUNC(radio86_state::radio86_romdisk_portc_w));
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "radio86_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "radio86_cart", "bin,rom");
 
 	SOFTWARE_LIST(config, "cart_list").set_original("radio86_cart");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(radio86_state::radioram)
+void radio86_state::radioram(machine_config &config)
+{
 	radio86(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(radio86ram_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &radio86_state::radio86ram_mem);
 
 	I8255(config, m_ppi8255_2);
 	m_ppi8255_2->in_pa_callback().set(FUNC(radio86_state::radio86ram_romdisk_porta_r));
 	m_ppi8255_2->out_pb_callback().set(FUNC(radio86_state::radio86_romdisk_portb_w));
 	m_ppi8255_2->out_pc_callback().set(FUNC(radio86_state::radio86_romdisk_portc_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(radio86_state::rk7007)
+void radio86_state::rk7007(machine_config &config)
+{
 	radio86(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(rk7007_io)
+	m_maincpu->set_addrmap(AS_IO, &radio86_state::rk7007_io);
 
 	i8255_device &ms7007(I8255(config, "ms7007"));
 	ms7007.out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
 	ms7007.in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
 	ms7007.in_pc_callback().set(FUNC(radio86_state::rk7007_8255_portc_r));
 	ms7007.out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(radio86_state::rk700716)
+void radio86_state::rk700716(machine_config &config)
+{
 	radio16(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(rk7007_io)
+	m_maincpu->set_addrmap(AS_IO, &radio86_state::rk7007_io);
 
 	i8255_device &ms7007(I8255(config, "ms7007"));
 	ms7007.out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
 	ms7007.in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
 	ms7007.in_pc_callback().set(FUNC(radio86_state::rk7007_8255_portc_r));
 	ms7007.out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(radio86_state::mikron2)
+void radio86_state::mikron2(machine_config &config)
+{
 	radio86(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mikron2_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &radio86_state::mikron2_mem);
+}
 
-MACHINE_CONFIG_START(radio86_state::impuls03)
+void radio86_state::impuls03(machine_config &config)
+{
 	radio86(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(impuls03_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &radio86_state::impuls03_mem);
+}
 
 /* ROM definition */
 ROM_START( radio86 )

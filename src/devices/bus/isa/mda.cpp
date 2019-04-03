@@ -463,10 +463,10 @@ WRITE8_MEMBER( isa8_mda_device::io_write)
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
-			m_crtc->address_w( space, offset, data );
+			m_crtc->address_w(data);
 			break;
 		case 1: case 3: case 5: case 7:
-			m_crtc->register_w( space, offset, data );
+			m_crtc->register_w(data);
 			break;
 		case 8:
 			mode_control_w(space, offset, data);
@@ -486,7 +486,7 @@ READ8_MEMBER( isa8_mda_device::io_read)
 			/* return last written mc6845 address value here? */
 			break;
 		case 1: case 3: case 5: case 7:
-			data = m_crtc->register_r( space, offset );
+			data = m_crtc->register_r();
 			break;
 		case 10:
 			data = status_r(space, offset);
@@ -679,10 +679,10 @@ WRITE8_MEMBER( isa8_hercules_device::io_write )
 	switch( offset )
 	{
 	case 0: case 2: case 4: case 6:
-		m_crtc->address_w( space, offset, data );
+		m_crtc->address_w(data);
 		break;
 	case 1: case 3: case 5: case 7:
-		m_crtc->register_w( space, offset, data );
+		m_crtc->register_w(data);
 		break;
 	case 8:
 		mode_control_w(space, offset, data);
@@ -726,7 +726,7 @@ READ8_MEMBER( isa8_hercules_device::io_read )
 		/* return last written mc6845 address value here? */
 		break;
 	case 1: case 3: case 5: case 7:
-		data = m_crtc->register_r( space, offset );
+		data = m_crtc->register_r();
 		break;
 	case 10:
 		data = status_r(space, offset);

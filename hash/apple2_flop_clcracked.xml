@@ -201,7 +201,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-			<rom name="a brand new view (4am crack).dsk" size="143360" crc="dcbee16d" sha1="1f5fba7748da446fb3c31845788e18905691baea" offset="0x0000" />
+				<rom name="a brand new view (4am crack).dsk" size="143360" crc="dcbee16d" sha1="1f5fba7748da446fb3c31845788e18905691baea" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2962,13 +2962,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 				<dataarea name="flop" size="143360">
-			<rom name="a treasure hunt of facts (4am crack) disk 1 - addition and subtraction.dsk" size="143360" crc="1549243e" sha1="60a8e419d93f1e7fb36ac3d6479a9c565d5fba18" offset="0x0000" />
+				<rom name="a treasure hunt of facts (4am crack) disk 1 - addition and subtraction.dsk" size="143360" crc="1549243e" sha1="60a8e419d93f1e7fb36ac3d6479a9c565d5fba18" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
 				<dataarea name="flop" size="143360">
-			<rom name="a treasure hunt of facts (4am crack) disk 2 - multiplication and division.dsk" size="143360" crc="74a85cc3" sha1="45ad62fff8e7c4110ab0ec0dbacf147b734ee848" offset="0x0000" />
+				<rom name="a treasure hunt of facts (4am crack) disk 2 - multiplication and division.dsk" size="143360" crc="74a85cc3" sha1="45ad62fff8e7c4110ab0ec0dbacf147b734ee848" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

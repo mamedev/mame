@@ -9,10 +9,9 @@
 #include "video/315_5124.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
-#include "sound/sn76496.h"
 
 
-class sega315_5313_device : public sega315_5313_mode4_device, public device_mixer_interface
+class sega315_5313_device : public sega315_5313_mode4_device
 {
 public:
 	template <typename T>
@@ -187,7 +186,6 @@ private:
 
 	address_space *m_space68k;
 	required_device<m68000_base_device> m_cpu68k;
-	required_device<sn76496_base_device> m_snsnd;
 };
 
 

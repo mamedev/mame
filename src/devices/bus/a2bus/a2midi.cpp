@@ -91,11 +91,11 @@ uint8_t a2bus_midi_device::read_c0nx(uint8_t offset)
 
 	if (offset < 8)
 	{
-		return m_ptm->read(machine().dummy_space(), offset & 7);
+		return m_ptm->read(offset & 7);
 	}
 	else if (offset == 8 || offset == 9)
 	{
-		return m_acia->read(machine().dummy_space(), offset & 1);
+		return m_acia->read(offset & 1);
 	}
 
 	return 0;
@@ -109,11 +109,11 @@ void a2bus_midi_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	if (offset < 8)
 	{
-		m_ptm->write(machine().dummy_space(), offset & 7, data);
+		m_ptm->write(offset & 7, data);
 	}
 	else if (offset == 8 || offset == 9)
 	{
-		m_acia->write(machine().dummy_space(), offset & 1, data);
+		m_acia->write(offset & 1, data);
 	}
 }
 

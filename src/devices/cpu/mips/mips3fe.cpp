@@ -316,13 +316,13 @@ bool mips3_frontend::describe_special(uint32_t op, opcode_desc &desc)
 			return true;
 
 		case 0x10:  // MFHI
-			desc.regin[0] |= REGFLAG_HI;
+			desc.regin[2] |= REGFLAG_HI;
 			desc.regout[0] |= REGFLAG_R(RDREG);
 			return true;
 
 		case 0x11:  // MTHI
 			desc.regin[0] |= REGFLAG_R(RSREG);
-			desc.regout[0] |= REGFLAG_HI;
+			desc.regout[2] |= REGFLAG_HI;
 			return true;
 
 		case 0x12:  // MFLO

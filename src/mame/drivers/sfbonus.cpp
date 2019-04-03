@@ -1376,27 +1376,28 @@ void sfbonus_state::ramdac_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(sfbonus_state::sfbonus)
-	MCFG_DEVICE_ADD("maincpu", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
-	MCFG_DEVICE_PROGRAM_MAP(sfbonus_map)
-	MCFG_DEVICE_IO_MAP(sfbonus_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sfbonus_state, irq0_line_hold)
-	//MCFG_DEVICE_PERIODIC_INT_DRIVER(sfbonus_state, nmi_line_pulse, 100)
+void sfbonus_state::sfbonus(machine_config &config)
+{
+	Z80(config, m_maincpu, 6000000); // custom packaged z80 CPU ?? Mhz
+	m_maincpu->set_addrmap(AS_PROGRAM, &sfbonus_state::sfbonus_map);
+	m_maincpu->set_addrmap(AS_IO, &sfbonus_state::sfbonus_io);
+	m_maincpu->set_vblank_int("screen", FUNC(sfbonus_state::irq0_line_hold));
+	//m_maincpu->set_periodic_int(FUNC(sfbonus_state::nmi_line_pulse), attotime::from_hz(100));
 
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_sfbonus);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sfbonus);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(128*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 288-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sfbonus_state, screen_update_sfbonus)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(128*8, 64*8);
+	screen.set_visarea(0*8, 512-1, 0*8, 288-1);
+	screen.set_screen_update(FUNC(sfbonus_state::screen_update_sfbonus));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x100*2) // *2 for priority workaraound / custom drawing
+	PALETTE(config, m_palette).set_entries(0x100*2); // *2 for priority workaraound / custom drawing
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &sfbonus_state::ramdac_map);
@@ -1404,9 +1405,8 @@ MACHINE_CONFIG_START(sfbonus_state::sfbonus)
 
 	/* Parrot 3 seems fine at 1 Mhz, but Double Challenge isn't? */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); // clock frequency & pin 7 not verified
+}
 
 /* Super Ball */
 ROM_START( suprball )

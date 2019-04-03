@@ -533,8 +533,7 @@ MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	CDP1864(config, m_cti, 1.75_MHz_XTAL).set_screen(SCREEN_TAG);
 	m_cti->inlace_cb().set_constant(0);

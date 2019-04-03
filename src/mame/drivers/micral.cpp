@@ -378,14 +378,15 @@ MACHINE_RESET_MEMBER( micral_state, micral )
 	m_uart->write_cs(0);
 }
 
-MACHINE_CONFIG_START(micral_state::micral)
+void micral_state::micral(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD( "maincpu", Z80, XTAL(4'000'000) )
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &micral_state::mem_map);
 	// no i/o ports on main cpu
-	MCFG_DEVICE_ADD( "keyboard", Z80, XTAL(1'000'000) ) // freq unknown
-	MCFG_DEVICE_PROGRAM_MAP(mem_kbd)
-	MCFG_DEVICE_IO_MAP(io_kbd)
+	z80_device &keyboard(Z80(config, "keyboard", XTAL(1'000'000))); // freq unknown
+	keyboard.set_addrmap(AS_PROGRAM, &micral_state::mem_kbd);
+	keyboard.set_addrmap(AS_IO, &micral_state::io_kbd);
 
 	MCFG_MACHINE_RESET_OVERRIDE(micral_state, micral)
 
@@ -406,9 +407,8 @@ MACHINE_CONFIG_START(micral_state::micral)
 	m_crtc->set_screen("screen");
 
 	/* sound hardware */
-	//MCFG_SPEAKER_STANDARD_MONO("mono")
-	//MCFG_DEVICE_ADD("beeper", BEEP, 2000)
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	//SPEAKER(config, "mono").front_center();
+	//BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	AY31015(config, m_uart); // CDP6402
 	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
@@ -419,7 +419,7 @@ MACHINE_CONFIG_START(micral_state::micral)
 	uart_clock.signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
 
 	RS232_PORT(config, "rs232", default_rs232_devices, "keyboard");
-MACHINE_CONFIG_END
+}
 
 ROM_START( micral )
 	ROM_REGION( 0x10000, "maincpu", 0 )

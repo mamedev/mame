@@ -1041,7 +1041,7 @@ spacezap:
 ;gorf:* resetting screws up 2 scores and top score
 gorf:
 gorfpgm1:
-@:maincpu,program,d010,22,00,00
+@:maincpu,:protected_ram/share,0010,22,00,00
 
 
 robby:

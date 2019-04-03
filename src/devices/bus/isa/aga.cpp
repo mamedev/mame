@@ -690,7 +690,7 @@ READ8_MEMBER ( isa8_aga_device::pc_aga_mda_r )
 			/* return last written mc6845 address value here? */
 			break;
 		case 1: case 3: case 5: case 7:
-			data = m_mc6845->register_r(space, offset);
+			data = m_mc6845->register_r();
 			break;
 		case 10:
 			data = m_vsync | 0x08 | m_hsync;
@@ -707,10 +707,10 @@ WRITE8_MEMBER ( isa8_aga_device::pc_aga_mda_w )
 		switch( offset )
 		{
 			case 0: case 2: case 4: case 6:
-				m_mc6845->address_w( space, offset, data );
+				m_mc6845->address_w(data);
 				break;
 			case 1: case 3: case 5: case 7:
-				m_mc6845->register_w( space, offset, data );
+				m_mc6845->register_w(data);
 				break;
 			case 8:
 				m_mda_mode_control = data;
@@ -741,7 +741,7 @@ READ8_MEMBER ( isa8_aga_device::pc_aga_cga_r )
 			/* return last written mc6845 address value here? */
 			break;
 		case 1: case 3: case 5: case 7:
-			data = m_mc6845->register_r( space, offset);
+			data = m_mc6845->register_r();
 			break;
 		case 10:
 			data = m_vsync | ( ( data & 0x40 ) >> 4 ) | m_hsync;
@@ -792,10 +792,10 @@ WRITE8_MEMBER (isa8_aga_device:: pc_aga_cga_w )
 	if ( m_mode == AGA_COLOR ) {
 		switch(offset) {
 		case 0: case 2: case 4: case 6:
-			m_mc6845->address_w( space, offset, data );
+			m_mc6845->address_w(data);
 			break;
 		case 1: case 3: case 5: case 7:
-			m_mc6845->register_w( space, offset, data );
+			m_mc6845->register_w(data);
 			break;
 		case 8:
 			m_cga_mode_control = data;

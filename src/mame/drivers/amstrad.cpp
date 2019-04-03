@@ -905,10 +905,10 @@ void amstrad_centronics_devices(device_slot_interface &device)
 
 MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	/* Machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(amstrad_mem)
-	MCFG_DEVICE_IO_MAP(amstrad_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(amstrad_state,amstrad_cpu_acknowledge_int)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &amstrad_state::amstrad_mem);
+	m_maincpu->set_addrmap(AS_IO, &amstrad_state::amstrad_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(amstrad_state::amstrad_cpu_acknowledge_int));
 
 	config.m_minimum_quantum = attotime::from_hz(60);
 
@@ -922,12 +922,12 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	ppi.out_pc_callback().set(FUNC(amstrad_state::amstrad_ppi_portc_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16_MHz_XTAL, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15)
-	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, amstrad_state, screen_vblank_amstrad))
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16_MHz_XTAL, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15);
+	m_screen->set_screen_update(FUNC(amstrad_state::screen_update_amstrad));
+	m_screen->screen_vblank().set(FUNC(amstrad_state::screen_vblank_amstrad));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(amstrad_state::amstrad_cpc_palette), 32);
 
@@ -965,7 +965,8 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(amstrad_state::cpc464)
+void amstrad_state::cpc464(machine_config &config)
+{
 	amstrad_base(config);
 
 	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", 16_MHz_XTAL / 4, cpc464_exp_cards, nullptr));
@@ -977,7 +978,7 @@ MACHINE_CONFIG_START(amstrad_state::cpc464)
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("128K,320K,576K");
-MACHINE_CONFIG_END
+}
 
 void amstrad_state::cpc664(machine_config &config)
 {
@@ -1018,21 +1019,22 @@ void amstrad_state::cpc6128(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(amstrad_state::kccomp)
+void amstrad_state::kccomp(machine_config &config)
+{
 	cpc6128(config);
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state,kccomp)
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state,kccomp)
 
 	m_palette->set_init(FUNC(amstrad_state::kccomp_palette));
-MACHINE_CONFIG_END
+}
 
 
 MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	/* Machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 40_MHz_XTAL / 10)
-	MCFG_DEVICE_PROGRAM_MAP(amstrad_mem)
-	MCFG_DEVICE_IO_MAP(amstrad_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(amstrad_state,amstrad_cpu_acknowledge_int)
+	Z80(config, m_maincpu, 40_MHz_XTAL / 10);
+	m_maincpu->set_addrmap(AS_PROGRAM, &amstrad_state::amstrad_mem);
+	m_maincpu->set_addrmap(AS_IO, &amstrad_state::amstrad_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(amstrad_state::amstrad_cpu_acknowledge_int));
 
 	config.m_minimum_quantum = attotime::from_hz(60);
 
@@ -1046,12 +1048,12 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	ppi.out_pc_callback().set(FUNC(amstrad_state::amstrad_ppi_portc_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS((40_MHz_XTAL * 2) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15)
-	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, amstrad_state, screen_vblank_amstrad))
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw((40_MHz_XTAL * 2) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15);
+	m_screen->set_screen_update(FUNC(amstrad_state::screen_update_amstrad));
+	m_screen->screen_vblank().set(FUNC(amstrad_state::screen_vblank_amstrad));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(amstrad_state::amstrad_plus_palette), 4096);
 
@@ -1105,12 +1107,13 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(amstrad_state::gx4000)
+void amstrad_state::gx4000(machine_config &config)
+{
 	/* Machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 40_MHz_XTAL / 10)
-	MCFG_DEVICE_PROGRAM_MAP(amstrad_mem)
-	MCFG_DEVICE_IO_MAP(amstrad_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(amstrad_state,amstrad_cpu_acknowledge_int)
+	Z80(config, m_maincpu, 40_MHz_XTAL / 10);
+	m_maincpu->set_addrmap(AS_PROGRAM, &amstrad_state::amstrad_mem);
+	m_maincpu->set_addrmap(AS_IO, &amstrad_state::amstrad_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(amstrad_state::amstrad_cpu_acknowledge_int));
 
 	config.m_minimum_quantum = attotime::from_hz(60);
 
@@ -1124,12 +1127,12 @@ MACHINE_CONFIG_START(amstrad_state::gx4000)
 	ppi.out_pc_callback().set(FUNC(amstrad_state::amstrad_ppi_portc_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS((40_MHz_XTAL * 2) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15)
-	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, amstrad_state, screen_vblank_amstrad))
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw((40_MHz_XTAL * 2) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15);
+	m_screen->set_screen_update(FUNC(amstrad_state::screen_update_amstrad));
+	m_screen->screen_vblank().set(FUNC(amstrad_state::screen_vblank_amstrad));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(amstrad_state::amstrad_plus_palette), 4096);
 
@@ -1153,10 +1156,11 @@ MACHINE_CONFIG_START(amstrad_state::gx4000)
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(amstrad_state::aleste)
+void amstrad_state::aleste(machine_config &config)
+{
 	cpc6128(config);
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state,aleste)
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state,aleste)
@@ -1187,7 +1191,7 @@ MACHINE_CONFIG_START(amstrad_state::aleste)
 
 	/* internal ram */
 	m_ram->set_default_size("2M");
-MACHINE_CONFIG_END
+}
 
 
 

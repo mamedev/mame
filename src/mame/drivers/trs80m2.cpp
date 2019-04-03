@@ -704,7 +704,7 @@ void trs80m2_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( trs80m2 )
+//  machine_config( trs80m2 )
 //-------------------------------------------------
 
 void trs80m2_state::trs80m2(machine_config &config)
@@ -791,7 +791,7 @@ void trs80m2_state::trs80m2(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( trs80m16 )
+//  machine_config( trs80m16 )
 //-------------------------------------------------
 
 void trs80m16_state::trs80m16(machine_config &config)

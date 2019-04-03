@@ -133,7 +133,7 @@ private:
 	uint32_t kn01_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	required_device<mips1core_device_base> m_maincpu;
+	required_device<mips1_device_base> m_maincpu;
 	required_device<screen_device> m_screen;
 	optional_device<timer_device> m_scantimer;
 	optional_device<decsfb_device> m_sfb;
@@ -543,10 +543,11 @@ static void dec_scsi_devices(device_slot_interface &device)
 	device.option_add_internal("asc", NCR53C94);
 }
 
-MACHINE_CONFIG_START(decstation_state::kn01)
+void decstation_state::kn01(machine_config &config)
+{
 	R2000(config, m_maincpu, 16.67_MHz_XTAL, 65536, 131072);
 	m_maincpu->set_endianness(ENDIANNESS_LITTLE);
-	m_maincpu->set_fpurev(0x340);
+	m_maincpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
 	m_maincpu->in_brcond<0>().set(FUNC(decstation_state::brcond0_r));
 	m_maincpu->set_addrmap(AS_PROGRAM, &decstation_state::kn01_map);
 
@@ -565,12 +566,13 @@ MACHINE_CONFIG_START(decstation_state::kn01)
 
 	MC146818(config, m_rtc, XTAL(32'768));
 	m_rtc->set_binary(true);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(decstation_state::kn02ba)
+void decstation_state::kn02ba(machine_config &config)
+{
 	R3000A(config, m_maincpu, 33.333_MHz_XTAL, 65536, 131072);
 	m_maincpu->set_endianness(ENDIANNESS_LITTLE);
-	m_maincpu->set_fpurev(0x340); // should be R3010A v4.0
+	m_maincpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
 	m_maincpu->in_brcond<0>().set(FUNC(decstation_state::brcond0_r));
 	m_maincpu->set_addrmap(AS_PROGRAM, &decstation_state::threemin_map);
 
@@ -626,7 +628,7 @@ MACHINE_CONFIG_START(decstation_state::kn02ba)
 	NSCSI_CONNECTOR(config, "scsibus:5", dec_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", dec_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:7", dec_scsi_devices, "asc", true).set_option_machine_config("asc", [this] (device_t *device) { ncr5394(device); });
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( decstation )
 	PORT_START("UNUSED") // unused IN0

@@ -156,30 +156,30 @@ uint32_t rcorsair_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-MACHINE_CONFIG_START(rcorsair_state::rcorsair)
-
+void rcorsair_state::rcorsair(machine_config &config)
+{
 	/* Main CPU is probably inside Custom Block with
 	   program code, unknown type */
 
-	MCFG_DEVICE_ADD("maincpu", Z80, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(rcorsair_main_map)
-	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rcorsair_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rcorsair_state::rcorsair_main_map);
+	//m_maincpu->set_vblank_int("screen", FUNC(rcorsair_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("subcpu", I8035, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(rcorsair_sub_map)
-	MCFG_DEVICE_IO_MAP(rcorsair_sub_io_map)
+	I8035(config, m_subcpu, 8000000);
+	m_subcpu->set_addrmap(AS_PROGRAM, &rcorsair_state::rcorsair_sub_map);
+	m_subcpu->set_addrmap(AS_IO, &rcorsair_state::rcorsair_sub_io_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(rcorsair_state, screen_update)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update(FUNC(rcorsair_state::screen_update));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0, 256-1);
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_rcorsair);
-	MCFG_PALETTE_ADD("palette", 0x100)
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(0x100);
+}
 
 ROM_START( rcorsair )
 	ROM_REGION( 0x6000, "maincpu", 0 )

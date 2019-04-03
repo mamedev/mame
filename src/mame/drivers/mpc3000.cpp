@@ -205,13 +205,12 @@ void mpc3000_state::mpc3000(machine_config &config)
 	hiledlatch.q_out_cb<6>().set_output("led14").invert(); // 16 Levels
 	hiledlatch.q_out_cb<7>().set_output("led15").invert(); // After
 
-	device_t *device = nullptr;
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(80)
-	MCFG_SCREEN_UPDATE_DEVICE("lcdc", hd61830_device, screen_update)
-	MCFG_SCREEN_SIZE(240, 64)   //6x20, 8x8
-	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(80);
+	screen.set_screen_update("lcdc", FUNC(hd61830_device::screen_update));
+	screen.set_size(240, 64);   //6x20, 8x8
+	screen.set_visarea(0, 240-1, 0, 64-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(mpc3000_state::mpc3000_palette), 2);
 

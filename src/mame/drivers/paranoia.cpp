@@ -165,7 +165,8 @@ WRITE_LINE_MEMBER(paranoia_state::i8155_timer_out)
 	//logerror("Timer out %d\n", state);
 }
 
-MACHINE_CONFIG_START(paranoia_state::paranoia)
+void paranoia_state::paranoia(machine_config &config)
+{
 	/* basic machine hardware */
 	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &paranoia_state::pce_mem);
@@ -177,13 +178,13 @@ MACHINE_CONFIG_START(paranoia_state::paranoia)
 
 	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_DEVICE_ADD("sub", I8085A, 18000000/3)
-	MCFG_DEVICE_PROGRAM_MAP(paranoia_8085_map)
-	MCFG_DEVICE_IO_MAP(paranoia_8085_io_map)
+	i8085a_cpu_device &sub(I8085A(config, "sub", 18000000/3));
+	sub.set_addrmap(AS_PROGRAM, &paranoia_state::paranoia_8085_map);
+	sub.set_addrmap(AS_IO, &paranoia_state::paranoia_8085_io_map);
 
-	MCFG_DEVICE_ADD("sub2", Z80, 18000000/6)
-	MCFG_DEVICE_PROGRAM_MAP(paranoia_z80_map)
-	MCFG_DEVICE_IO_MAP(paranoia_z80_io_map)
+	z80_device &sub2(Z80(config, "sub2", 18000000/6));
+	sub2.set_addrmap(AS_PROGRAM, &paranoia_state::paranoia_z80_map);
+	sub2.set_addrmap(AS_IO, &paranoia_state::paranoia_z80_io_map);
 
 	i8155_device &i8155(I8155(config, "i8155", 1000000 /*?*/));
 	i8155.out_pa_callback().set(FUNC(paranoia_state::i8155_a_w));
@@ -192,10 +193,10 @@ MACHINE_CONFIG_START(paranoia_state::paranoia)
 	i8155.out_to_callback().set(FUNC(paranoia_state::i8155_timer_out));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
-	MCFG_SCREEN_UPDATE_DRIVER( pce_common_state, screen_update )
-	MCFG_SCREEN_PALETTE("huc6260")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
+	screen.set_screen_update(FUNC(pce_common_state::screen_update));
+	screen.set_palette(m_huc6260);
 
 	HUC6260(config, m_huc6260, PCE_MAIN_CLOCK);
 	m_huc6260->next_pixel_data().set("huc6270", FUNC(huc6270_device::next_pixel));
@@ -209,7 +210,7 @@ MACHINE_CONFIG_START(paranoia_state::paranoia)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
 ROM_START(paranoia)
 	ROM_REGION( 0x40000, "maincpu", 0 )

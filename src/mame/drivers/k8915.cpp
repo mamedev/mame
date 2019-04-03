@@ -165,7 +165,7 @@ void k8915_state::k8915(machine_config &config)
 	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxb_w));
 	rs232.dcd_handler().set("sio", FUNC(z80sio_device::dcdb_w));
 	rs232.cts_handler().set("sio", FUNC(z80sio_device::ctsb_w));
-MACHINE_CONFIG_END
+}
 
 
 /* ROM definition */

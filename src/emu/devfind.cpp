@@ -314,23 +314,26 @@ bool finder_base::validate_addrspace(int spacenum, u8 width, bool required) cons
 
 bool finder_base::report_missing(bool found, const char *objname, bool required) const
 {
-	if (required && (strcmp(m_tag, DUMMY_TAG) == 0))
+	if (required && (DUMMY_TAG == m_tag))
 	{
 		osd_printf_error("Tag not defined for required %s\n", objname);
 		return false;
 	}
-
-	// just pass through in the found case
-	if (found)
+	else if (found)
+	{
+		// just pass through in the found case
 		return true;
-
-	// otherwise, report
-	std::string const region_fulltag(m_base.get().subtag(m_tag));
-	if (required)
-		osd_printf_error("Required %s '%s' not found\n", objname, region_fulltag.c_str());
+	}
 	else
-		osd_printf_verbose("Optional %s '%s' not found\n", objname, region_fulltag.c_str());
-	return !required;
+	{
+		// otherwise, report
+		std::string const region_fulltag(m_base.get().subtag(m_tag));
+		if (required)
+			osd_printf_error("Required %s '%s' not found\n", objname, region_fulltag.c_str());
+		else if (DUMMY_TAG != m_tag)
+			osd_printf_verbose("Optional %s '%s' not found\n", objname, region_fulltag.c_str());
+		return !required;
+	}
 }
 
 
@@ -339,7 +342,7 @@ void finder_base::printf_warning(const char *format, ...)
 	va_list argptr;
 	char buffer[1024];
 
-	/* do the output */
+	// do the output
 	va_start(argptr, format);
 	vsnprintf(buffer, 1024, format, argptr);
 	osd_printf_warning("%s", buffer);

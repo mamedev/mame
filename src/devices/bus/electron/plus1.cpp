@@ -163,7 +163,7 @@ void electron_plus1_device::device_start()
 //  expbus_r - expansion data read
 //-------------------------------------------------
 
-uint8_t electron_plus1_device::expbus_r(address_space &space, offs_t offset)
+uint8_t electron_plus1_device::expbus_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -177,18 +177,18 @@ uint8_t electron_plus1_device::expbus_r(address_space &space, offs_t offset)
 		{
 		case 0:
 		case 1:
-			data = m_cart_sk2->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01, 1, 0);
+			data = m_cart_sk2->read(offset & 0x3fff, 0, 0, m_romsel & 0x01, 1, 0);
 			break;
 		case 2:
 		case 3:
-			data = m_cart_sk1->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01, 1, 0);
+			data = m_cart_sk1->read(offset & 0x3fff, 0, 0, m_romsel & 0x01, 1, 0);
 			break;
 		case 12:
 			data = m_exp_rom->base()[offset & 0x1fff];
 			break;
 		case 13:
-			data &= m_cart_sk1->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
-			data &= m_cart_sk2->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
+			data &= m_cart_sk1->read(offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
+			data &= m_cart_sk2->read(offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
 			break;
 		}
 		break;
@@ -197,8 +197,8 @@ uint8_t electron_plus1_device::expbus_r(address_space &space, offs_t offset)
 		switch (offset >> 8)
 		{
 		case 0xfc:
-			data &= m_cart_sk1->read(space, offset & 0xff, 1, 0, m_romsel & 0x01, 0, 0);
-			data &= m_cart_sk2->read(space, offset & 0xff, 1, 0, m_romsel & 0x01, 0, 0);
+			data &= m_cart_sk1->read(offset & 0xff, 1, 0, m_romsel & 0x01, 0, 0);
+			data &= m_cart_sk2->read(offset & 0xff, 1, 0, m_romsel & 0x01, 0, 0);
 
 			if (offset == 0xfc70)
 			{
@@ -211,8 +211,8 @@ uint8_t electron_plus1_device::expbus_r(address_space &space, offs_t offset)
 			break;
 
 		case 0xfd:
-			data &= m_cart_sk1->read(space, offset & 0xff, 0, 1, m_romsel & 0x01, 0, 0);
-			data &= m_cart_sk2->read(space, offset & 0xff, 0, 1, m_romsel & 0x01, 0, 0);
+			data &= m_cart_sk1->read(offset & 0xff, 0, 1, m_romsel & 0x01, 0, 0);
+			data &= m_cart_sk2->read(offset & 0xff, 0, 1, m_romsel & 0x01, 0, 0);
 			break;
 		}
 	}
@@ -225,7 +225,7 @@ uint8_t electron_plus1_device::expbus_r(address_space &space, offs_t offset)
 //  expbus_w - expansion data write
 //-------------------------------------------------
 
-void electron_plus1_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
+void electron_plus1_device::expbus_w(offs_t offset, uint8_t data)
 {
 	switch (offset >> 12)
 	{
@@ -237,11 +237,11 @@ void electron_plus1_device::expbus_w(address_space &space, offs_t offset, uint8_
 		{
 		case 0:
 		case 1:
-			m_cart_sk2->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 1, 0);
+			m_cart_sk2->write(offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 1, 0);
 			break;
 		case 2:
 		case 3:
-			m_cart_sk1->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 1, 0);
+			m_cart_sk1->write(offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 1, 0);
 			break;
 		}
 		break;
@@ -250,8 +250,8 @@ void electron_plus1_device::expbus_w(address_space &space, offs_t offset, uint8_
 		switch (offset >> 8)
 		{
 		case 0xfc:
-			m_cart_sk1->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01, 0, 0);
-			m_cart_sk2->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01, 0, 0);
+			m_cart_sk1->write(offset & 0xff, data, 1, 0, m_romsel & 0x01, 0, 0);
+			m_cart_sk2->write(offset & 0xff, data, 1, 0, m_romsel & 0x01, 0, 0);
 
 			if (offset == 0xfc70)
 			{
@@ -264,8 +264,8 @@ void electron_plus1_device::expbus_w(address_space &space, offs_t offset, uint8_
 			break;
 
 		case 0xfd:
-			m_cart_sk1->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01, 0, 0);
-			m_cart_sk2->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01, 0, 0);
+			m_cart_sk1->write(offset & 0xff, data, 0, 1, m_romsel & 0x01, 0, 0);
+			m_cart_sk2->write(offset & 0xff, data, 0, 1, m_romsel & 0x01, 0, 0);
 			break;
 
 		case 0xfe:

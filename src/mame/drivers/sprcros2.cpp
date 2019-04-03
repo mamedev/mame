@@ -452,27 +452,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(sprcros2_state::master_scanline)
 		m_master_cpu->set_input_line(0, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(sprcros2_state::sprcros2)
-
+void sprcros2_state::sprcros2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("master_cpu",Z80,MAIN_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(master_map)
-	MCFG_DEVICE_IO_MAP(master_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sprcros2_state,  master_vblank_irq)
+	Z80(config, m_master_cpu, MAIN_CLOCK/4);
+	m_master_cpu->set_addrmap(AS_PROGRAM, &sprcros2_state::master_map);
+	m_master_cpu->set_addrmap(AS_IO, &sprcros2_state::master_io);
+	m_master_cpu->set_vblank_int("screen", FUNC(sprcros2_state::master_vblank_irq));
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(sprcros2_state::master_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("slave_cpu",Z80,MAIN_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(slave_map)
-	MCFG_DEVICE_IO_MAP(slave_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sprcros2_state,  slave_vblank_irq)
+	Z80(config, m_slave_cpu, MAIN_CLOCK/4);
+	m_slave_cpu->set_addrmap(AS_PROGRAM, &sprcros2_state::slave_map);
+	m_slave_cpu->set_addrmap(AS_IO, &sprcros2_state::slave_io);
+	m_slave_cpu->set_vblank_int("screen", FUNC(sprcros2_state::slave_vblank_irq));
 
 	config.m_perfect_cpu_quantum = subtag("master_cpu");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(sprcros2_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 343, 8, 256-8, 262, 16, 240) // TODO: Wrong screen parameters
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(sprcros2_state::screen_update));
+	screen.set_raw(MAIN_CLOCK/2, 343, 8, 256-8, 262, 16, 240); // TODO: Wrong screen parameters
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_sprcros2);
 
@@ -483,7 +484,7 @@ MACHINE_CONFIG_START(sprcros2_state::sprcros2)
 	SN76489(config, "sn1", 10000000/4).add_route(ALL_OUTPUTS, "mono", 0.50);
 	SN76489(config, "sn2", 10000000/4).add_route(ALL_OUTPUTS, "mono", 0.50);
 	SN76489(config, "sn3", 10000000/4).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

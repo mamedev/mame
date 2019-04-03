@@ -194,24 +194,23 @@ static INPUT_PORTS_START( sstrangr )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(sstrangr_state::sstrangr)
-
+void sstrangr_state::sstrangr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8080,1996800)   /* clock is a guess, taken from mw8080bw */
-	MCFG_DEVICE_PROGRAM_MAP(sstrangr_map)
-	MCFG_DEVICE_IO_MAP(sstrangr_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(sstrangr_state, irq0_line_hold, 2*60)
+	I8080(config, m_maincpu, 1996800);   /* clock is a guess, taken from mw8080bw */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sstrangr_state::sstrangr_map);
+	m_maincpu->set_addrmap(AS_IO, &sstrangr_state::sstrangr_io_map);
+	m_maincpu->set_periodic_int(FUNC(sstrangr_state::irq0_line_hold), attotime::from_hz(2*60));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(32*8, 262)     /* vert size is a guess, taken from mw8080bw */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(sstrangr_state, screen_update_sstrangr)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_size(32*8, 262);     /* vert size is a guess, taken from mw8080bw */
+	screen.set_visarea(0*8, 32*8-1, 4*8, 32*8-1);
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(FUNC(sstrangr_state::screen_update_sstrangr));
 
 	/* sound hardware */
-
-MACHINE_CONFIG_END
+}
 
 
 
@@ -264,17 +263,15 @@ static INPUT_PORTS_START( sstrngr2 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(sstrangr_state::sstrngr2)
+void sstrangr_state::sstrngr2(machine_config &config)
+{
 	sstrangr(config);
 
-	/* basic machine hardware */
-
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(sstrangr_state, screen_update_sstrngr2)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(sstrangr_state::screen_update_sstrngr2));
 
 	PALETTE(config, m_palette, palette_device::RBG_3BIT);
-MACHINE_CONFIG_END
+}
 
 
 

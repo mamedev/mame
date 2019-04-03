@@ -2340,18 +2340,19 @@ WRITE_LINE_MEMBER( pc8801_state::rxrdy_w )
 	// ...
 }
 
-MACHINE_CONFIG_START(pc8801_state::pc8801)
+void pc8801_state::pc8801(machine_config &config)
+{
 	/* main CPU */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)        /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(pc8801_mem)
-	MCFG_DEVICE_IO_MAP(pc8801_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc8801_state,  pc8801_vrtc_irq)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc8801_state,pc8801_irq_callback)
+	Z80(config, m_maincpu, MASTER_CLOCK);        /* 4 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8801_state::pc8801_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc8801_state::pc8801_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pc8801_state::pc8801_vrtc_irq));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pc8801_state::pc8801_irq_callback));
 
 	/* sub CPU(5 inch floppy drive) */
-	MCFG_DEVICE_ADD(m_fdccpu, Z80, MASTER_CLOCK)       /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(pc8801fdc_mem)
-	MCFG_DEVICE_IO_MAP(pc8801fdc_io)
+	Z80(config, m_fdccpu, MASTER_CLOCK);       /* 4 MHz */
+	m_fdccpu->set_addrmap(AS_PROGRAM, &pc8801_state::pc8801fdc_mem);
+	m_fdccpu->set_addrmap(AS_IO, &pc8801_state::pc8801fdc_io);
 
 	//config.m_minimum_quantum = attotime::from_hz(300000);
 	config.m_perfect_cpu_quantum = subtag("maincpu");
@@ -2390,10 +2391,10 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	SOFTWARE_LIST(config, "disk_list").set_original("pc8801_flop");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK_24KHz,848,0,640,448,0,400)
-	MCFG_SCREEN_UPDATE_DRIVER(pc8801_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK_24KHz,848,0,640,448,0,400);
+	m_screen->set_screen_update(FUNC(pc8801_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc8801);
 	PALETTE(config, m_palette, FUNC(pc8801_state::pc8801_palette), 0x10);
@@ -2414,26 +2415,28 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	m_opna->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
 	m_opna->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::pc8801_rtc_irq), attotime::from_hz(600));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pc8801_state::pc8801fh)
+void pc8801_state::pc8801fh(machine_config &config)
+{
 	pc8801(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_clock_speed )
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pc8801_state::pc8801ma)
+void pc8801_state::pc8801ma(machine_config &config)
+{
 	pc8801(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_dic )
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pc8801_state::pc8801mc)
+void pc8801_state::pc8801mc(machine_config &config)
+{
 	pc8801(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_cdrom )
-MACHINE_CONFIG_END
+}
 
 
 /* TODO: clean this up */

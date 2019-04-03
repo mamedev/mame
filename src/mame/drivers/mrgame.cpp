@@ -591,7 +591,6 @@ void mrgame_state::mrgame(machine_config &config)
 	dacvol.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dacvol", -1.0, DAC_VREF_NEG_INPUT);
 

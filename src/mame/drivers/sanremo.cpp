@@ -355,24 +355,24 @@ GFXDECODE_END
 *              Machine Drivers               *
 *********************************************/
 
-MACHINE_CONFIG_START(sanremo_state::sanremo)
-
+void sanremo_state::sanremo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(sanremo_map)
-	MCFG_DEVICE_IO_MAP(sanremo_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sanremo_state, irq0_line_hold)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sanremo_state::sanremo_map);
+	m_maincpu->set_addrmap(AS_IO, &sanremo_state::sanremo_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(sanremo_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(70*8, 41*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 48*8-1, 0, 38*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sanremo_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(70*8, 41*8);
+	screen.set_visarea(0, 48*8-1, 0, 38*8-1);
+	screen.set_screen_update(FUNC(sanremo_state::screen_update));
+	screen.set_palette("palette");
 
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
 	// *** MC6845 init ***
@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(sanremo_state::sanremo)
 	ay8910_device &ay8910(AY8910(config, "ay8910", SND_CLOCK));
 	ay8910.port_a_read_callback().set_ioport("DSW");
 	ay8910.add_route(ALL_OUTPUTS, "mono", 1.00);
-MACHINE_CONFIG_END
+}
 
 
 /*********************************************

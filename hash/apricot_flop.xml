@@ -130,7 +130,7 @@
 		</part>
 	</software>
 
-	<software name="lotus123">
+	<software name="lotus123" supported="no">
 		<description>Lotus 123 (Release 1A)</description>
 		<year>1985</year>
 		<publisher>Lotus Development Corporation</publisher>
@@ -177,7 +177,7 @@
 	</software>
 
 	<!-- MS-DOS 3.10 / Release 3.1.1 -->
-	<software name="msd">
+	<software name="msd" supported="no">
 		<description>MSD 2.7.0 (Winchester Test)</description>
 		<year>1986</year>
 		<publisher>ACT</publisher>
@@ -189,7 +189,7 @@
 	</software>
 
 	<!-- MS-DOS 3.10 / Release 3.1.1 -->
-	<software name="netf13">
+	<software name="netf13" supported="no">
 		<description>apricot Networks VR1.3 F-Series</description>
 		<year>1985</year>
 		<publisher>ACT</publisher>
@@ -226,7 +226,7 @@
 	</software>
 
 	<!-- MS-DOS 3.10 / Beta 3.1 -->
-	<software name="netf13b">
+	<software name="netf13b" supported="no">
 		<description>apricot Networks VB1.3 F-Series (Beta Release)</description>
 		<year>1985</year>
 		<publisher>ACT</publisher>
@@ -263,7 +263,7 @@
 	</software>
 
 	<!-- MS-DOS 2.11 / BIOS VR2.4 -->
-	<software name="netdiag">
+	<software name="netdiag" supported="no">
 		<description>POINT 32 Network Diagnostics</description>
 		<year>1985</year>
 		<publisher>ACT</publisher>
@@ -292,7 +292,7 @@
 	</software>
 
 	<!-- MS-DOS 3.10 / Release 3.1.1 -->
-	<software name="netxi13">
+	<software name="netxi13" supported="no">
 		<description>apricot Networks VR1.3 PC/Xi</description>
 		<year>1985</year>
 		<publisher>ACT</publisher>
@@ -329,7 +329,7 @@
 	</software>
 
 	<!-- MS-DOS 3.10 / Beta 3.1 -->
-	<software name="netxi13b">
+	<software name="netxi13b" supported="no">
 		<description>apricot Networks VB1.3 PC/Xi (Beta Release)</description>
 		<year>1985</year>
 		<publisher>ACT</publisher>
@@ -366,7 +366,7 @@
 	</software>
 
 	<!-- MS-DOS 3.06 / Version R2.6 -->
-	<software name="point32_11">
+	<software name="point32_11" supported="no">
 		<description>POINT 32 VR1.1</description>
 		<year>1984</year>
 		<publisher>ACT</publisher>
@@ -397,7 +397,7 @@
 	</software>
 
 	<!-- MS-DOS 3.10 / Release 2.7 -->
-	<software name="point32_12">
+	<software name="point32_12" supported="no">
 		<description>POINT 32 VR1.2</description>
 		<year>1985</year>
 		<publisher>ACT</publisher>
@@ -434,7 +434,7 @@
 	</software>
 
 	<!-- MS-DOS 3.10 / Release 2.7 -->
-	<software name="point32_12b">
+	<software name="point32_12b" supported="no">
 		<description>POINT 32 VB1.2 (Beta Release)</description>
 		<year>1985</year>
 		<publisher>ACT</publisher>
@@ -544,7 +544,7 @@
 	</software>
 
 	<!-- MS-DOS 2.11 / Release 2.7 -->
-	<software name="winformat">
+	<software name="winformat" supported="no">
 		<description>Winchester Factory Formatter 2.1 (TES004)</description>
 		<year>1985</year>
 		<publisher>ACT</publisher>
@@ -556,7 +556,7 @@
 	</software>
 
 	<!-- MS-DOS 2.11 / Release 2.7 -->
-	<software name="wintest">
+	<software name="wintest" supported="no">
 		<description>Winchester Data Integrity Test 4.0 (TES002)</description>
 		<year>1985</year>
 		<publisher>ACT</publisher>
@@ -568,7 +568,7 @@
 	</software>
 
 	<!-- MS-DOS 2.11 / BIOS VE2.0 -->
-	<software name="wincheck">
+	<software name="wincheck" supported="no">
 		<description>Winchester Data Integrity Check 1.1</description>
 		<year>1984</year>
 		<publisher>ACT</publisher>

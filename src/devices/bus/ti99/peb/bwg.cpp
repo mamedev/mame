@@ -228,7 +228,7 @@ READ8Z_MEMBER(snug_bwg_device::readz)
 				if (m_RTCsel)
 				{
 					// .... ..11 111x xxx0
-					*value = m_clock->read(space, (m_address & 0x001e) >> 1);
+					*value = m_clock->read((m_address & 0x001e) >> 1);
 					LOGMASKED(LOG_RW, "read RTC: %04x -> %02x\n", m_address & 0xffff, *value);
 				}
 				else
@@ -275,7 +275,7 @@ READ8Z_MEMBER(snug_bwg_device::readz)
     5c00 - 5fdf: RAM
     5fe0 - 5fff: Clock (even addr)
 */
-WRITE8_MEMBER(snug_bwg_device::write)
+void snug_bwg_device::write(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled())
 	{
@@ -293,7 +293,7 @@ WRITE8_MEMBER(snug_bwg_device::write)
 				{
 					// .... ..11 111x xxx0
 					LOGMASKED(LOG_RW, "write RTC: %04x <- %02x\n", m_address & 0xffff, data);
-					m_clock->write(space, (m_address & 0x001e) >> 1, data);
+					m_clock->write((m_address & 0x001e) >> 1, data);
 				}
 				else
 				{
@@ -338,7 +338,7 @@ READ8Z_MEMBER(snug_bwg_device::crureadz)
 
 	if ((offset & 0xff00)==m_cru_base)
 	{
-		if ((offset & 0x00ff)==0)
+		if ((offset & 0x00f0)==0)
 		{
 			// Check what drives are not connected
 			reply = ((m_floppy[0] != nullptr)? 0 : 0x02)       // DSK1
@@ -355,7 +355,7 @@ READ8Z_MEMBER(snug_bwg_device::crureadz)
 			reply |= (m_dip34 << 6);
 
 			// Invert all
-			*value = ~reply;
+			*value = ~BIT(reply, (offset >> 1) & 7);
 		}
 		else
 			*value = 0;
@@ -363,7 +363,7 @@ READ8Z_MEMBER(snug_bwg_device::crureadz)
 	}
 }
 
-WRITE8_MEMBER(snug_bwg_device::cruwrite)
+void snug_bwg_device::cruwrite(offs_t offset, uint8_t data)
 {
 //  int drive, drivebit;
 

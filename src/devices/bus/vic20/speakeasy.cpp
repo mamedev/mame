@@ -71,7 +71,7 @@ void vic20_speakeasy_device::device_start()
 //  vic20_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t vic20_speakeasy_device::vic20_cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+uint8_t vic20_speakeasy_device::vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	if (!io2)
 	{
@@ -86,11 +86,11 @@ uint8_t vic20_speakeasy_device::vic20_cd_r(address_space &space, offs_t offset, 
 //  vic20_cd_w - cartridge data write
 //-------------------------------------------------
 
-void vic20_speakeasy_device::vic20_cd_w(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+void vic20_speakeasy_device::vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	if (!io2)
 	{
-		m_votrax->write(space, 0, data & 0x3f);
-		m_votrax->inflection_w(space, 0, data >> 6);
+		m_votrax->write(data & 0x3f);
+		m_votrax->inflection_w(data >> 6);
 	}
 }

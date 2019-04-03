@@ -75,6 +75,18 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 private:
+	// register helpers
+	void chip_reset();
+	u8 status_r();
+	void filadd_w(u8 data);
+	void tosadd_w(u8 data);
+	void curlo_w(u8 data);
+	void curhi_w(u8 data);
+	void attdat_w(u8 data);
+	void mode_w(u8 data);
+	u8 character_r();
+	void character_w(u8 data);
+
 	// address space for display memory
 	const address_space_config m_space_config;
 	address_space *m_space;
@@ -106,6 +118,9 @@ private:
 	const u8 m_wide_gfx_pattern;
 	const u16 m_thin_gfx_seg[4];
 	const u8 m_thin_gfx_dots[4];
+
+	// internal state
+	u8 m_address_register;
 };
 
 // ======================> crt9028_000_device

@@ -32,14 +32,9 @@
 
 static osd_file::error common_process_file(emu_options &options, const char *location, const char *ext, const rom_entry *romp, emu_file &image_file)
 {
-	osd_file::error filerr;
-
-	if (location != nullptr && strcmp(location, "") != 0)
-		filerr = image_file.open(location, PATH_SEPARATOR, ROM_GETNAME(romp), ext);
-	else
-		filerr = image_file.open(ROM_GETNAME(romp), ext);
-
-	return filerr;
+	return (location && *location)
+			? image_file.open(location, PATH_SEPARATOR, ROM_GETNAME(romp), ext)
+			: image_file.open(ROM_GETNAME(romp), ext);
 }
 
 std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, u32 crc, const rom_entry *romp, osd_file::error &filerr)
@@ -860,29 +855,29 @@ void rom_load_manager::process_rom_entries(const char *regiontag, const rom_entr
 	/* loop until we hit the end of this region */
 	while (!ROMENTRY_ISREGIONEND(romp))
 	{
-		/* if this is a continue entry, it's invalid */
 		if (ROMENTRY_ISCONTINUE(romp))
 			fatalerror("Error in RomModule definition: ROM_CONTINUE not preceded by ROM_LOAD\n");
 
-		/* if this is an ignore entry, it's invalid */
 		if (ROMENTRY_ISIGNORE(romp))
 			fatalerror("Error in RomModule definition: ROM_IGNORE not preceded by ROM_LOAD\n");
 
-		/* if this is a reload entry, it's invalid */
 		if (ROMENTRY_ISRELOAD(romp))
 			fatalerror("Error in RomModule definition: ROM_RELOAD not preceded by ROM_LOAD\n");
 
-		/* handle fills */
 		if (ROMENTRY_ISFILL(romp))
-			fill_rom_data(romp++);
+		{
+			if (!ROM_GETBIOSFLAGS(romp) || ROM_GETBIOSFLAGS(romp) == device->system_bios())
+				fill_rom_data(romp);
 
-		/* handle copies */
+			romp++;
+		}
 		else if (ROMENTRY_ISCOPY(romp))
+		{
 			copy_rom_data(romp++);
-
-		/* handle files */
+		}
 		else if (ROMENTRY_ISFILE(romp))
 		{
+			/* handle files */
 			int irrelevantbios = (ROM_GETBIOSFLAGS(romp) != 0 && ROM_GETBIOSFLAGS(romp) != device->system_bios());
 			const rom_entry *baserom = romp;
 			int explength = 0;
@@ -941,7 +936,7 @@ void rom_load_manager::process_rom_entries(const char *regiontag, const rom_entr
 		}
 		else
 		{
-			romp++; /* something else; skip */
+			romp++; // something else - skip
 		}
 	}
 }

@@ -227,7 +227,7 @@ WRITE8_MEMBER(egghunt_state::egghunt_vidram_bank_w)
 
 WRITE8_MEMBER(egghunt_state::egghunt_soundlatch_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -428,26 +428,26 @@ void egghunt_state::machine_reset()
 	m_vidram_bank = 0;
 }
 
-MACHINE_CONFIG_START(egghunt_state::egghunt)
-
+void egghunt_state::egghunt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)      /* 6 MHz ?*/
-	MCFG_DEVICE_PROGRAM_MAP(egghunt_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", egghunt_state,  irq0_line_hold) // or 2 like mitchell.c?
+	Z80(config, m_maincpu, 12000000/2);      /* 6 MHz ?*/
+	m_maincpu->set_addrmap(AS_PROGRAM, &egghunt_state::egghunt_map);
+	m_maincpu->set_addrmap(AS_IO, &egghunt_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(egghunt_state::irq0_line_hold)); // or 2 like mitchell.cpp?
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,12000000/2)         /* 6 MHz ?*/
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 12000000/2);         /* 6 MHz ?*/
+	m_audiocpu->set_addrmap(AS_PROGRAM, &egghunt_state::sound_map);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(egghunt_state, screen_update_egghunt)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, 56*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(egghunt_state::screen_update_egghunt));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_egghunt);
 
@@ -458,9 +458,8 @@ MACHINE_CONFIG_START(egghunt_state::egghunt)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+}
 
 ROM_START( egghunt )
 	ROM_REGION( 0x20000, "maincpu", 0 )

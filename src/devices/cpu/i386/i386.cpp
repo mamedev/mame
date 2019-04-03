@@ -3367,15 +3367,10 @@ void i386_device::i386_common_init()
 
 	m_program = &space(AS_PROGRAM);
 	if(m_program->data_width() == 16) {
-		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
-		m_pr8  = [cache](offs_t address) -> u8  { return cache->read_byte(address);  };
-		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address);  };
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		// for the 386sx
+		macache16 = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
 	} else {
-		auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
-		m_pr8  = [cache](offs_t address) -> u8  { return cache->read_byte(address);  };
-		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address);  };
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		macache32 = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
 	}
 
 	m_io = &space(AS_IO);
@@ -4726,6 +4721,10 @@ void athlonxp_device::device_reset()
 	m_cpuid_id2 = ('D' << 24) | ('M' << 16) | ('A' << 8) | 'c';   // cAMD
 	memset(m_processor_name_string, 0, 48);
 	strcpy((char *)m_processor_name_string, "AMD Athlon(tm) Processor");
+	for (int n = 0; n < 11; n++)
+		m_msr_mtrrfix[n] = 0;
+	for (int n = 0; n < (1024 / 4); n++)
+		m_memory_ranges_1m[n] = 0; // change the 0 to 6 to test the cache just after reset
 
 	m_cpuid_max_input_value_eax = 0x01;
 	m_cpu_version = REG32(EDX);
@@ -4735,6 +4734,227 @@ void athlonxp_device::device_reset()
 
 	CHANGE_PC(m_eip);
 }
+
+void athlonxp_device::parse_mtrrfix(u64 mtrr, offs_t base, int kblock)
+{
+	int nb = kblock / 4;
+	int range = (int)(base >> 12); // base must never be higher than 1 megabyte
+
+	for (int n = 0; n < 8; n++)
+	{
+		uint8_t type = mtrr & 0xff;
+
+		for (int b = 0; b < nb; b++)
+		{
+			m_memory_ranges_1m[range] = type;
+			range++;
+		}
+		mtrr = mtrr >> 8;
+	}
+}
+
+int athlonxp_device::check_cacheable(offs_t address)
+{
+	offs_t block;
+	int disabled;
+
+	disabled = 0;
+	if (m_cr[0] & (1 << 30))
+		disabled = 128;
+	if (address >= 0x100000)
+		return disabled;
+	block = address >> 12;
+	return m_memory_ranges_1m[block] | disabled;
+}
+
+template <class dt, offs_t xorle>
+dt athlonxp_device::opcode_read_cache(offs_t address)
+{
+	int mode = check_cacheable(address);
+	bool nocache = false;
+	u8 *data;
+
+	if ((mode & 7) == 0)
+		nocache = true;
+	if (mode & 1)
+		nocache = true;
+	if (nocache == false)
+	{
+		int offset = (address & 63) ^ xorle;
+		data = cache.search<CacheRead>(address);
+		if (data)
+			return *(dt *)(data + offset);
+		if (!(mode & 128))
+		{
+			bool dirty = cache.allocate<CacheRead>(address, &data);
+			address = cache.base(address);
+			if (dirty)
+			{
+				offs_t old_address = cache.old();
+
+				for (int w = 0; w < 64; w += 4)
+					macache32->write_dword(old_address + w, *(u32 *)(data + w));
+			}
+			for (int r = 0; r < 64; r += 4)
+				*(u32 *)(data + r) = macache32->read_dword(address + r);
+			return *(dt *)(data + offset);
+		}
+		else
+		{
+			if (sizeof(dt) == 1)
+				return macache32->read_byte(address);
+			else if (sizeof(dt) == 2)
+				return macache32->read_word(address);
+			else
+				return macache32->read_dword(address);
+		}
+	}
+	else
+	{
+		if (sizeof(dt) == 1)
+			return macache32->read_byte(address);
+		else if (sizeof(dt) == 2)
+			return macache32->read_word(address);
+		else
+			return macache32->read_dword(address);
+	}
+}
+
+template <class dt, offs_t xorle>
+dt athlonxp_device::program_read_cache(offs_t address)
+{
+	int mode = check_cacheable(address);
+	bool nocache = false;
+	u8 *data;
+
+	if ((mode & 7) == 0)
+		nocache = true;
+	if (mode & 1)
+		nocache = true;
+	if (nocache == false)
+	{
+		int offset = (address & 63) ^ xorle;
+		data = cache.search<CacheRead>(address);
+		if (data)
+			return *(dt *)(data + offset);
+		if (!(mode & 128))
+		{
+			bool dirty = cache.allocate<CacheRead>(address, &data);
+			address = cache.base(address);
+			if (dirty)
+			{
+				offs_t old_address = cache.old();
+
+				for (int w = 0; w < 64; w += 4)
+					m_program->write_dword(old_address + w, *(u32 *)(data + w));
+			}
+			for (int r = 0; r < 64; r += 4)
+				*(u32 *)(data + r) = m_program->read_dword(address + r);
+			return *(dt *)(data + offset);
+		}
+		else
+		{
+			if (sizeof(dt) == 1)
+				return m_program->read_byte(address);
+			else if (sizeof(dt) == 2)
+				return m_program->read_word(address);
+			else
+				return m_program->read_dword(address);
+		}
+	}
+	else
+	{
+		if (sizeof(dt) == 1)
+			return m_program->read_byte(address);
+		else if (sizeof(dt) == 2)
+			return m_program->read_word(address);
+		else
+			return m_program->read_dword(address);
+	}
+}
+
+template <class dt, offs_t xorle>
+void athlonxp_device::program_write_cache(offs_t address, dt data)
+{
+	int mode = check_cacheable(address);
+	bool nocache = false;
+	u8 *dataw;
+
+	if ((mode & 7) == 0)
+		nocache = true;
+	if (mode & 1)
+		nocache = true;
+	if (nocache == false)
+	{
+		int offset = (address & 63) ^ xorle;
+		dataw = cache.search<CacheWrite>(address);
+		if (dataw)
+		{
+			*(dt *)(dataw + offset) = data;
+			return;
+		}
+		if (!(mode & 128))
+		{
+			bool dirty = cache.allocate<CacheWrite>(address, &dataw);
+			address = cache.base(address);
+			if (dirty)
+			{
+				offs_t old_address = cache.old();
+
+				for (int w = 0; w < 64; w += 4)
+					m_program->write_dword(old_address + w, *(u32 *)(dataw + w));
+			}
+			for (int r = 0; r < 64; r += 4)
+				*(u32 *)(dataw + r) = m_program->read_dword(address + r);
+			*(dt *)(dataw + offset) = data;
+		}
+		else
+		{
+			if (sizeof(dt) == 1)
+				m_program->write_byte(address, data);
+			else if (sizeof(dt) == 2)
+				m_program->write_word(address, data);
+			else
+				m_program->write_dword(address, data);
+		}
+	}
+	else
+	{
+		if (sizeof(dt) == 1)
+			m_program->write_byte(address, data);
+		else if (sizeof(dt) == 2)
+			m_program->write_word(address, data);
+		else
+			m_program->write_dword(address, data);
+	}
+}
+
+void athlonxp_device::invalidate_cache(bool writeback)
+{
+	u32 base;
+	u8 *data;
+
+	data = cache.first_dirty(base, true);
+	while (data != nullptr)
+	{
+		if (writeback)
+			for (int w = 0; w < 64; w += 4)
+				m_program->write_dword(base + w, *(u32 *)(data + w));
+		data = cache.next_dirty(base, true);
+	}
+	cache.reset();
+}
+
+void athlonxp_device::opcode_invd()
+{
+	invalidate_cache(false);
+}
+
+void athlonxp_device::opcode_wbinvd()
+{
+	invalidate_cache(true);
+}
+
 
 /*****************************************************************************/
 /* Intel Pentium 4 */

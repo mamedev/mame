@@ -32,10 +32,10 @@ public:
 	auto pirq_handler() { return m_pirq_handler.bind(); }
 	auto drq_handler() { return m_drq_handler.bind(); }
 
-	DECLARE_READ8_MEMBER(host_r);
-	DECLARE_WRITE8_MEMBER(host_w);
-	DECLARE_READ8_MEMBER(parasite_r);
-	DECLARE_WRITE8_MEMBER(parasite_w);
+	uint8_t host_r(offs_t offset);
+	void host_w(offs_t offset, uint8_t data);
+	uint8_t parasite_r(offs_t offset);
+	void parasite_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

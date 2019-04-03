@@ -117,7 +117,7 @@ void electron_rombox_device::device_reset()
 //  expbus_r - expansion data read
 //-------------------------------------------------
 
-uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset)
+uint8_t electron_rombox_device::expbus_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -131,7 +131,7 @@ uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset)
 		case 3:
 			if (m_rom_base == 0 && m_rom[m_romsel + 4]->exists())
 			{
-				data = m_rom[m_romsel + 4]->read_rom(space, offset & 0x3fff);
+				data = m_rom[m_romsel + 4]->read_rom(offset & 0x3fff);
 			}
 			break;
 		case 4:
@@ -140,7 +140,7 @@ uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset)
 		case 7:
 			if (m_rom[m_romsel - 4]->exists())
 			{
-				data = m_rom[m_romsel - 4]->read_rom(space, offset & 0x3fff);
+				data = m_rom[m_romsel - 4]->read_rom(offset & 0x3fff);
 			}
 			break;
 		case 12:
@@ -149,13 +149,13 @@ uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset)
 		case 15:
 			if (m_rom_base == 12 && m_rom[m_romsel - 8]->exists())
 			{
-				data = m_rom[m_romsel - 8]->read_rom(space, offset & 0x3fff);
+				data = m_rom[m_romsel - 8]->read_rom(offset & 0x3fff);
 			}
 			break;
 		}
 	}
 
-	data &= m_exp->expbus_r(space, offset);
+	data &= m_exp->expbus_r(offset);
 
 	return data;
 }
@@ -164,9 +164,9 @@ uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset)
 //  expbus_w - expansion data write
 //-------------------------------------------------
 
-void electron_rombox_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
+void electron_rombox_device::expbus_w(offs_t offset, uint8_t data)
 {
-	m_exp->expbus_w(space, offset, data);
+	m_exp->expbus_w(offset, data);
 
 	if (offset == 0xfe05)
 	{

@@ -25,8 +25,8 @@ public:
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto drq_handler() { return m_drq_handler.bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	uint8_t dma_r();
 	void dma_w(uint8_t val);
@@ -198,22 +198,22 @@ private:
 
 	void map(address_map &map);
 
-	DECLARE_READ8_MEMBER(scsidata_r);
-	DECLARE_WRITE8_MEMBER(outdata_w);
-	DECLARE_READ8_MEMBER(icmd_r);
-	DECLARE_WRITE8_MEMBER(icmd_w);
-	DECLARE_READ8_MEMBER(mode_r);
-	DECLARE_WRITE8_MEMBER(mode_w);
-	DECLARE_READ8_MEMBER(command_r);
-	DECLARE_WRITE8_MEMBER(command_w);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(selenable_w);
-	DECLARE_READ8_MEMBER(busandstatus_r);
-	DECLARE_WRITE8_MEMBER(startdmasend_w);
-	DECLARE_READ8_MEMBER(indata_r);
-	DECLARE_WRITE8_MEMBER(startdmatargetrx_w);
-	DECLARE_READ8_MEMBER(resetparityirq_r);
-	DECLARE_WRITE8_MEMBER(startdmainitrx_w);
+	uint8_t scsidata_r();
+	void outdata_w(uint8_t data);
+	uint8_t icmd_r();
+	void icmd_w(uint8_t data);
+	uint8_t mode_r();
+	void mode_w(uint8_t data);
+	uint8_t command_r();
+	void command_w(uint8_t data);
+	uint8_t status_r();
+	void selenable_w(uint8_t data);
+	uint8_t busandstatus_r();
+	void startdmasend_w(uint8_t data);
+	uint8_t indata_r();
+	void startdmatargetrx_w(uint8_t data);
+	uint8_t resetparityirq_r();
+	void startdmainitrx_w(uint8_t data);
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;

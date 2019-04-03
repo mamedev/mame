@@ -75,7 +75,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
-	void thedealr(address_map &map);
+	void thedealr_main(address_map &map);
 	void thedealr_sub(address_map &map);
 
 	virtual void machine_start() override;
@@ -282,7 +282,7 @@ WRITE8_MEMBER(thedealr_state::unk_w)
 //  popmessage("UNK %02x", data);
 }
 
-void thedealr_state::thedealr(address_map &map)
+void thedealr_state::thedealr_main(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
 
@@ -540,15 +540,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(thedealr_state::thedealr_interrupt)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(thedealr_state::thedealr)
-
+void thedealr_state::thedealr(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", R65C02, XTAL(16'000'000)/8)   // 2 MHz?
-	MCFG_DEVICE_PROGRAM_MAP(thedealr)
+	R65C02(config, m_maincpu, XTAL(16'000'000)/8);   // 2 MHz?
+	m_maincpu->set_addrmap(AS_PROGRAM, &thedealr_state::thedealr_main);
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(thedealr_state::thedealr_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("subcpu", R65C02, XTAL(16'000'000)/8)    // 2 MHz?
-	MCFG_DEVICE_PROGRAM_MAP(thedealr_sub)
+	R65C02(config, m_subcpu, XTAL(16'000'000)/8);    // 2 MHz?
+	m_subcpu->set_addrmap(AS_PROGRAM, &thedealr_state::thedealr_sub);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -577,7 +578,7 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 	aysnd.port_a_read_callback().set_ioport("DSW2");
 	aysnd.port_b_read_callback().set_ioport("DSW1");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

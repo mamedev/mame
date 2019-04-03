@@ -183,6 +183,12 @@ public:
 		set_type(type);
 		set_color(color);
 	}
+	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *region)
+		: screen_device(mconfig, tag, owner, u32(0))
+	{
+		set_type(SCREEN_TYPE_SVG);
+		set_svg_region(region);
+	}
 	~screen_device();
 
 	// configuration readers
@@ -223,6 +229,7 @@ public:
 	void set_vblank_time(attoseconds_t time) { m_vblank = time; m_oldstyle_vblank_supplied = true; }
 	void set_size(u16 width, u16 height) { m_width = width; m_height = height; }
 	void set_visarea(s16 minx, s16 maxx, s16 miny, s16 maxy) { m_visarea.set(minx, maxx, miny, maxy); }
+	void set_visarea_full() { m_visarea.set(0, m_width - 1, 0, m_height - 1); } // call after set_size
 	void set_default_position(double xscale, double xoffs, double yscale, double yoffs) {
 		m_xscale = xscale;
 		m_xoffset = xoffs;
@@ -532,11 +539,6 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
 #define MCFG_SCREEN_TYPE(_type) \
 	downcast<screen_device &>(*device).set_type(SCREEN_TYPE_##_type);
 
-#define MCFG_SCREEN_SVG_ADD(_tag, _region) \
-	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
-	MCFG_SCREEN_TYPE(SVG) \
-	downcast<screen_device &>(*device).set_svg_region(_region);
-
 #define MCFG_SCREEN_RAW_PARAMS(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart) \
 	downcast<screen_device &>(*device).set_raw(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart);
 
@@ -551,8 +553,6 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
 
 #define MCFG_SCREEN_VISIBLE_AREA(_minx, _maxx, _miny, _maxy) \
 	downcast<screen_device &>(*device).set_visarea(_minx, _maxx, _miny, _maxy);
-#define MCFG_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)  \
-	downcast<screen_device &>(*device).set_default_position(_xscale, _xoffs, _yscale, _yoffs);
 #define MCFG_SCREEN_UPDATE_DRIVER(_class, _method) \
 	downcast<screen_device &>(*device).set_screen_update(&_class::_method, #_class "::" #_method);
 #define MCFG_SCREEN_UPDATE_DEVICE(_device, _class, _method) \

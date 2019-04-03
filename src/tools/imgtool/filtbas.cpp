@@ -116,6 +116,8 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 		destf.printf("%u ", (unsigned) line_number);
 		shift = 0x00;
 
+		in_string = false; // in case the last line didn't terminate a string
+
 		while((mem_stream->read(&b, 1) > 0) && (b != 0x00))
 		{
 			if (b == 0x22)

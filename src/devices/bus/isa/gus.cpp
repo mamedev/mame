@@ -1384,9 +1384,9 @@ READ8_MEMBER(isa16_gus_device::synth_r)
 	switch(offset)
 	{
 	case 0x00:
-		return m_gf1->status_r(space,0);
+		return m_gf1->status_r();
 	case 0x01:
-		return m_gf1->data_r(space,0);
+		return m_gf1->data_r();
 	case 0x02:
 	case 0x03:
 		return m_gf1->global_reg_select_r(space,offset-2);
@@ -1407,10 +1407,10 @@ WRITE8_MEMBER(isa16_gus_device::synth_w)
 	switch(offset)
 	{
 	case 0x00:
-		m_gf1->control_w(space,0,data);
+		m_gf1->control_w(data);
 		break;
 	case 0x01:
-		m_gf1->data_w(space,0,data);
+		m_gf1->data_w(data);
 		break;
 	case 0x02:
 	case 0x03:

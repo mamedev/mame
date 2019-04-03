@@ -557,23 +557,23 @@ void atarifb_state::machine_reset()
 	m_counter_y_in2b = 0;
 }
 
-MACHINE_CONFIG_START(atarifb_state::atarifb)
-
+void atarifb_state::atarifb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 750000)
-	MCFG_DEVICE_PROGRAM_MAP(atarifb_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(atarifb_state, irq0_line_hold, 4*60)
+	M6502(config, m_maincpu, 750000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarifb_state::atarifb_map);
+	m_maincpu->set_periodic_int(FUNC(atarifb_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2037)   /* 16.3ms * 1/8 = 2037.5. Is it 1/8th or 3/32nds? (1528?) */)
-	MCFG_SCREEN_SIZE(38*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(atarifb_state, screen_update_atarifb)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2037)   /* 16.3ms * 1/8 = 2037.5. Is it 1/8th or 3/32nds? (1528?) */);
+	m_screen->set_size(38*8, 32*8);
+	m_screen->set_visarea(0*8, 38*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(atarifb_state::screen_update_atarifb));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_atarifb);
 	PALETTE(config, m_palette, FUNC(atarifb_state::atarifb_palette), 12);
@@ -581,50 +581,46 @@ MACHINE_CONFIG_START(atarifb_state::atarifb)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, atarifb_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.18)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, atarifb_discrete).add_route(ALL_OUTPUTS, "mono", 0.18);
+}
 
 
-MACHINE_CONFIG_START(atarifb_state::atarifb4)
+void atarifb_state::atarifb4(machine_config &config)
+{
 	atarifb(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(atarifb4_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarifb_state::atarifb4_map);
+}
 
 
-MACHINE_CONFIG_START(atarifb_state::abaseb)
+void atarifb_state::abaseb(machine_config &config)
+{
 	atarifb(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(abaseb_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarifb_state::abaseb_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(atarifb_state, screen_update_abaseb)
+	m_screen->set_screen_update(FUNC(atarifb_state::screen_update_abaseb));
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("discrete", DISCRETE, abaseb_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.24)
-MACHINE_CONFIG_END
+	DISCRETE(config.replace(), m_discrete, abaseb_discrete).add_route(ALL_OUTPUTS, "mono", 0.24);
+}
 
 
-MACHINE_CONFIG_START(atarifb_state::soccer)
+void atarifb_state::soccer(machine_config &config)
+{
 	atarifb(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(soccer_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarifb_state::soccer_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(atarifb_state, screen_update_soccer)
+	m_screen->set_visarea(0*8, 38*8-1, 2*8, 32*8-1);
+	m_screen->set_screen_update(FUNC(atarifb_state::screen_update_soccer));
 	m_gfxdecode->set_info(gfx_soccer);
-MACHINE_CONFIG_END
+}
 
 
 

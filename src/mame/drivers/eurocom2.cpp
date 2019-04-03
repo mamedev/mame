@@ -51,17 +51,16 @@
 #define VC_DISP_VERT  256
 
 
-#define VERBOSE_DBG 2       /* general debug messages */
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_KEYBOARD  (1U <<  1)
+#define LOG_DEBUG     (1U <<  2)
 
-#define DBG_LOG(N,M,A) \
-	do { \
-	if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f at %s: %-10s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
+//#define VERBOSE (LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
 class eurocom2_state : public driver_device
@@ -172,7 +171,7 @@ READ8_MEMBER(eurocom2_state::fdc_aux_r)
 	data |= (m_fdc->intrq_r() << 6);
 	data |= (m_fdc->drq_r() << 7);
 
-	DBG_LOG(3, "Floppy", ("%d == %02x\n", offset, data));
+	LOGDBG("Floppy %d == %02x\n", offset, data);
 
 	return data;
 }
@@ -212,12 +211,12 @@ WRITE8_MEMBER(eurocom2_state::fdc_aux_w)
 
 	m_fdc->dden_w(BIT(data, 5));
 
-	DBG_LOG(3, "Floppy", ("%d <- %02x\n", offset, data));
+	LOGDBG("Floppy %d <- %02x\n", offset, data);
 }
 
 WRITE8_MEMBER(eurocom2_state::vico_w)
 {
-	DBG_LOG(2, "VICO", ("%d <- %02x\n", offset, data));
+	LOG("VICO %d <- %02x\n", offset, data);
 
 	m_vico[offset & 1] = data;
 }
@@ -225,21 +224,21 @@ WRITE8_MEMBER(eurocom2_state::vico_w)
 
 READ_LINE_MEMBER(eurocom2_state::pia1_ca2_r)
 {
-	DBG_LOG(3, "PIA1", ("CA2 == %d (SST Q14)\n", m_sst_state));
+	LOGDBG("PIA1 CA2 == %d (SST Q14)\n", m_sst_state);
 
 	return m_sst_state;
 }
 
 READ_LINE_MEMBER(eurocom2_state::pia1_cb1_r)
 {
-	DBG_LOG(3, "PIA1", ("CB1 == %d (SST Q6)\n", m_sst_state));
+	LOGDBG("PIA1 CB1 == %d (SST Q6)\n", m_sst_state);
 
 	return m_sst_state;
 }
 
 WRITE_LINE_MEMBER(eurocom2_state::pia1_cb2_w)
 {
-	DBG_LOG(2, "PIA1", ("CB2 <- %d (SST reset)\n", state));
+	LOG("PIA1 CB2 <- %d (SST reset)\n", state);
 	// reset single-step timer
 }
 

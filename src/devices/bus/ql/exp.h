@@ -62,8 +62,8 @@ class device_ql_expansion_card_interface : public device_slot_card_interface
 
 public:
 	virtual void romoeh_w(int state) { m_romoeh = state; }
-	virtual uint8_t read(address_space &space, offs_t offset, uint8_t data) { return data; }
-	virtual void write(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t read(offs_t offset, uint8_t data) { return data; }
+	virtual void write(offs_t offset, uint8_t data) { }
 
 protected:
 	// construction/destruction
@@ -100,8 +100,8 @@ public:
 	auto extintl_wr_callback() { return m_write_extintl.bind(); }
 
 	// computer interface
-	uint8_t read(address_space &space, offs_t offset, uint8_t data) { if (m_card) data = m_card->read(space, offset, data); return data; }
-	void write(address_space &space, offs_t offset, uint8_t data) { if (m_card) m_card->write(space, offset, data); }
+	uint8_t read(offs_t offset, uint8_t data) { if (m_card) data = m_card->read(offset, data); return data; }
+	void write(offs_t offset, uint8_t data) { if (m_card) m_card->write(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( romoeh_w ) { if (m_card) m_card->romoeh_w(state); }
 
 	// card interface

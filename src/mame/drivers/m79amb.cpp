@@ -194,27 +194,26 @@ INTERRUPT_GEN_MEMBER(m79amb_state::m79amb_interrupt)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);  /* RST 08h */
 }
 
-MACHINE_CONFIG_START(m79amb_state::m79amb)
-
+void m79amb_state::m79amb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(19'660'800) / 10)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m79amb_state,  m79amb_interrupt)
+	I8080(config, m_maincpu, XTAL(19'660'800) / 10);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m79amb_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(m79amb_state::m79amb_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m79amb_state, screen_update_ramtek)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 4*8, 32*8-1);
+	screen.set_screen_update(FUNC(m79amb_state::screen_update_ramtek));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, m79amb_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, m79amb_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

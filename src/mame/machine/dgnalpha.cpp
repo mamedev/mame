@@ -138,7 +138,7 @@ READ8_MEMBER( dragon_alpha_state::ff20_read )
 			break;
 
 		case 4: case 5: case 6: case 7:
-			result = m_pia_2->read(space, offset, mem_mask);
+			result = m_pia_2->read(offset);
 			break;
 
 		case 8: case 9: case 10: case 11:
@@ -180,7 +180,7 @@ WRITE8_MEMBER( dragon_alpha_state::ff20_write )
 			break;
 
 		case 4: case 5: case 6: case 7:
-			m_pia_2->write(space, offset, data, mem_mask);
+			m_pia_2->write(offset, data);
 			break;
 
 		case 8: case 9: case 10: case 11:
@@ -239,13 +239,13 @@ WRITE8_MEMBER( dragon_alpha_state::pia2_pa_w )
 		case 0x00:      /* Inactive, do nothing */
 			break;
 		case 0x01:      /* Write to selected port */
-			m_ay8912->data_w(space, 0, m_pia_2->b_output());
+			m_ay8912->data_w(m_pia_2->b_output());
 			break;
 		case 0x02:      /* Read from selected port */
-			m_pia_2->write_portb(m_ay8912->data_r(space, 0));
+			m_pia_2->write_portb(m_ay8912->data_r());
 			break;
 		case 0x03:      /* Select port to write to */
-			m_ay8912->address_w(space, 0, m_pia_2->b_output());
+			m_ay8912->address_w(m_pia_2->b_output());
 			break;
 	}
 }

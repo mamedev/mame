@@ -438,12 +438,12 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
 	{
 		if( (data & (C_BDR|C_BC1)) == (C_BDR|C_BC1) ) /* BDIR = 1, BC1 = 1: latch address */
 		{
-			m_ay->address_w(space, 0, m_tms7000_portd);
+			m_ay->address_w(m_tms7000_portd);
 		}
 
 		if( ((data & C_BDR) == C_BDR) && ((data & C_BC1) == 0) ) /* BDIR = 1, BC1 = 0: write data */
 		{
-			m_ay->data_w(space, 0, m_tms7000_portd);
+			m_ay->data_w(m_tms7000_portd);
 		}
 	}
 
@@ -493,7 +493,7 @@ READ8_MEMBER(coco_ssc_device::ssc_port_d_r)
 	{
 		if( ((m_tms7000_portc & C_BDR) == 0) && ((m_tms7000_portc & C_BC1) == C_BC1) ) /* psg read data */
 		{
-			m_tms7000_portd = m_ay->data_r(space, 0);
+			m_tms7000_portd = m_ay->data_r();
 		}
 	}
 

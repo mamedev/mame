@@ -16,9 +16,9 @@
 
 	note BAT and BHT aren't the same series
 
-	 D-1   DC0001-BHT  BHT (Best Artists?) Volume 8 (most other BHT carts are in G series, or P series)
+	*D-1   DC0001-BHT  BHT (Best Artists?) Volume 8 (most other BHT carts are in G series, or P series)
 	*D-2   DC0002-BAT  BAT Volume 6
-	 D-3   DC0003-BHT  BHT (Best Artists?) Volume 9 
+	*D-3   DC0003-BHT  BHT (Best Artists?) Volume 9
 	 D-4   DC0004-TPJ  TV Pop Volume 8
 	*D-5   DC0005-TPJ  TV Pop Volume 9
 	 D-6   DC0006-BHT  BHT (Best Artists?) Volume 10
@@ -29,6 +29,18 @@
 
 	-->
 
+	<software name="dc0001">
+		<description>BHT Volume 8 (Japan) (DC0001-BHT)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="dc0001-bht.u1" size="0x100000" crc="bd0c4044" sha1="496f9270c0285480ad513c2628260a5ed629dfd6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dc0002">
 		<description>BAT Volume 6 (Japan) (DC0002-BAT)</description>
 		<year>2003</year>
@@ -37,6 +49,18 @@
 			<feature name="slot" value="rom_24lc02"/>
 			<dataarea name="rom" size="0x100000">
 				<rom name="dc0002-bat.u1" size="0x100000" crc="bb4e13a7" sha1="f9d3a669de1b7ad3080eb428575905ee2170458c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dc0003">
+		<description>BHT Volume 9 (Japan) (DC0003-BHT)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="dc0003-bht.u1" size="0x100000" crc="fd15d60f" sha1="c017d3fa1e10ad13cc130b92bd149a347d5c996c" offset="0" />
 			</dataarea>
 		</part>
 	</software>

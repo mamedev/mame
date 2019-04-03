@@ -164,24 +164,24 @@ void labyrunr_state::machine_start()
 	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 }
 
-MACHINE_CONFIG_START(labyrunr_state::labyrunr)
-
+void labyrunr_state::labyrunr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD6309, 3000000*4)      /* 24MHz/8? */
-	MCFG_DEVICE_PROGRAM_MAP(labyrunr_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(labyrunr_state, labyrunr_timer_interrupt,  4*60)
+	HD6309(config, m_maincpu, 3000000*4);      /* 24MHz/8? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &labyrunr_state::labyrunr_map);
+	m_maincpu->set_periodic_int(FUNC(labyrunr_state::labyrunr_timer_interrupt), attotime::from_hz(4*60));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(37*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(labyrunr_state, screen_update_labyrunr)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, labyrunr_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(37*8, 32*8);
+	screen.set_visarea(0*8, 35*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(labyrunr_state::screen_update_labyrunr));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(labyrunr_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_labyrunr);
 	PALETTE(config, m_palette, FUNC(labyrunr_state::labyrunr_palette));
@@ -209,7 +209,7 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	ym2.add_route(1, "mono", 0.40);
 	ym2.add_route(2, "mono", 0.40);
 	ym2.add_route(3, "mono", 0.80);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

@@ -466,11 +466,12 @@ void spc1000_exp(device_slot_interface &device)
 	device.option_add("vdp", SPC1000_VDP_EXP);
 }
 
-MACHINE_CONFIG_START(spc1000_state::spc1000)
+void spc1000_state::spc1000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(spc1000_mem)
-	MCFG_DEVICE_IO_MAP(spc1000_io)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &spc1000_state::spc1000_mem);
+	m_maincpu->set_addrmap(AS_IO, &spc1000_state::spc1000_io);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -491,8 +492,7 @@ MACHINE_CONFIG_START(spc1000_state::spc1000)
 	ay8910.add_route(ALL_OUTPUTS, "mono", 1.00);
 	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	MCFG_DEVICE_ADD("ext1", SPC1000_EXP_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(spc1000_exp, nullptr, false)
+	SPC1000_EXP_SLOT(config, "ext1", spc1000_exp);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(spc1000_state::centronics_busy_w));
@@ -511,7 +511,7 @@ MACHINE_CONFIG_START(spc1000_state::spc1000)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( spc1000 )

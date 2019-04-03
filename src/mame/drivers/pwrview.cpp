@@ -404,15 +404,16 @@ static void pwrview_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-MACHINE_CONFIG_START(pwrview_state::pwrview)
-	MCFG_DEVICE_ADD("maincpu", I80186, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(pwrview_map)
-	MCFG_DEVICE_OPCODES_MAP(pwrview_fetch_map)
-	MCFG_DEVICE_IO_MAP(pwrview_io)
+void pwrview_state::pwrview(machine_config &config)
+{
+	I80186(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pwrview_state::pwrview_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &pwrview_state::pwrview_fetch_map);
+	m_maincpu->set_addrmap(AS_IO, &pwrview_state::pwrview_io);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(64'000'000)/8, 480, 0, 384, 1040, 0, 960)  // clock unknown
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(64'000'000)/8, 480, 0, 384, 1040, 0, 960);  // clock unknown
+	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(XTAL(16'000'000)/16); // clocks unknown, fix above when found
@@ -435,7 +436,7 @@ MACHINE_CONFIG_START(pwrview_state::pwrview)
 	crtc.set_update_row_callback(FUNC(pwrview_state::update_row), this);
 
 	ADDRESS_MAP_BANK(config, "bios_bank").set_map(&pwrview_state::bios_bank).set_options(ENDIANNESS_LITTLE, 16, 17, 0x8000);
-MACHINE_CONFIG_END
+}
 
 ROM_START(pwrview)
 	ROM_REGION(0x8000, "bios", 0)

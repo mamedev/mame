@@ -698,8 +698,8 @@ WRITE8_MEMBER( atari_jsa_i_device::pokey_w )
 //-------------------------------------------------
 
 // Fully populated JSA-I, not used by anyone
-MACHINE_CONFIG_START(atari_jsa_i_device::device_add_mconfig)
-
+void atari_jsa_i_device::device_add_mconfig(machine_config &config)
+{
 	// basic machine hardware
 	M6502(config, m_jsacpu, JSA_MASTER_CLOCK/2);
 	m_jsacpu->set_addrmap(AS_PROGRAM, &atari_jsa_i_device::atarijsa1_map);
@@ -715,14 +715,14 @@ MACHINE_CONFIG_START(atari_jsa_i_device::device_add_mconfig)
 	m_ym2151->add_route(0, *this, 0.60, AUTO_ALLOC_INPUT, 0);
 	m_ym2151->add_route(1, *this, 0.60, AUTO_ALLOC_INPUT, 1);
 
-	MCFG_DEVICE_ADD("pokey", POKEY, JSA_MASTER_CLOCK/2)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.40, 0)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.40, 1)
+	POKEY(config, m_pokey, JSA_MASTER_CLOCK/2);
+	m_pokey->add_route(ALL_OUTPUTS, *this, 0.40, AUTO_ALLOC_INPUT, 0);
+	m_pokey->add_route(ALL_OUTPUTS, *this, 0.40, AUTO_ALLOC_INPUT, 1);
 
-	MCFG_DEVICE_ADD("tms", TMS5220C, JSA_MASTER_CLOCK*2/11) // potentially JSA_MASTER_CLOCK/9 as well
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 1.0, 0)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 1.0, 1)
-MACHINE_CONFIG_END
+	TMS5220C(config, m_tms5220, JSA_MASTER_CLOCK*2/11); // potentially JSA_MASTER_CLOCK/9 as well
+	m_tms5220->add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_tms5220->add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+}
 
 
 //-------------------------------------------------

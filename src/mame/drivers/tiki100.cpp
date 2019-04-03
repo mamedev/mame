@@ -36,7 +36,7 @@ READ8_MEMBER( tiki100_state::mrq_r )
 {
 	bool mdis = 1;
 
-	uint8_t data = m_exp->mrq_r(space, offset, 0xff, mdis);
+	uint8_t data = m_exp->mrq_r(offset, 0xff, mdis);
 
 	offs_t prom_addr = mdis << 5 | m_vire << 4 | m_rome << 3 | (offset >> 13);
 	uint8_t prom = m_prom->base()[prom_addr] ^ 0xff;
@@ -84,12 +84,12 @@ WRITE8_MEMBER( tiki100_state::mrq_w )
 		m_ram->pointer()[offset] = data;
 	}
 
-	m_exp->mrq_w(space, offset, data);
+	m_exp->mrq_w(offset, data);
 }
 
 READ8_MEMBER( tiki100_state::iorq_r )
 {
-	uint8_t data = m_exp->iorq_r(space, offset, 0xff);
+	uint8_t data = m_exp->iorq_r(offset, 0xff);
 
 	switch ((offset & 0xff) >> 2)
 	{
@@ -98,7 +98,7 @@ READ8_MEMBER( tiki100_state::iorq_r )
 		break;
 
 	case 0x01: // SERS
-		data = m_dart->cd_ba_r(space, offset & 0x03);
+		data = m_dart->cd_ba_r(offset & 0x03);
 		break;
 
 	case 0x02: // PARS
@@ -113,13 +113,13 @@ READ8_MEMBER( tiki100_state::iorq_r )
 		switch (offset & 0x03)
 		{
 		case 3:
-			data = m_psg->data_r(space, 0);
+			data = m_psg->data_r();
 			break;
 		}
 		break;
 
 	case 0x06: // TIMS
-		data = m_ctc->read(space, offset & 0x03);
+		data = m_ctc->read(offset & 0x03);
 		break;
 	}
 
@@ -128,7 +128,7 @@ READ8_MEMBER( tiki100_state::iorq_r )
 
 WRITE8_MEMBER( tiki100_state::iorq_w )
 {
-	m_exp->iorq_w(space, offset, data);
+	m_exp->iorq_w(offset, data);
 
 	switch ((offset & 0xff) >> 2)
 	{
@@ -137,7 +137,7 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 		break;
 
 	case 0x01: // SERS
-		m_dart->cd_ba_w(space, offset & 0x03, data);
+		m_dart->cd_ba_w(offset & 0x03, data);
 		break;
 
 	case 0x02: // PARS
@@ -160,17 +160,17 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 			break;
 
 		case 2:
-			m_psg->address_w(space, 0, data);
+			m_psg->address_w(data);
 			break;
 
 		case 3:
-			m_psg->data_w(space, 0, data);
+			m_psg->data_w(data);
 			break;
 		}
 		break;
 
 	case 0x06: // TIMS
-		m_ctc->write(space, offset & 0x03, data);
+		m_ctc->write(offset & 0x03, data);
 		break;
 
 	case 0x07: // SYL

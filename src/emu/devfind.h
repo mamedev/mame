@@ -911,6 +911,12 @@ public:
 	/// \param [in] width Data width in bits (0 = don't care).
 	void set_data_width(u8 width) { this->m_data_width = width; }
 
+	/// \brief Get space number
+	///
+	/// Returns the configured address space number.
+	/// \return The space number to be found.
+	int spacenum() const { return m_spacenum; }
+
 private:
 	/// \brief Find address space
 	///

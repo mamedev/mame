@@ -99,30 +99,29 @@ static GFXDECODE_START( gfx_neptunp2 )
 //  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(neptunp2_state::neptunp2)
-
+void neptunp2_state::neptunp2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I80188,20000000) // N80C188-20 AMD
-	MCFG_DEVICE_PROGRAM_MAP(neptunp2_map)
-	MCFG_DEVICE_IO_MAP(neptunp2_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", neptunp2_state, irq0_line_hold)
+	I80188(config, m_maincpu, 20000000); // N80C188-20 AMD
+	m_maincpu->set_addrmap(AS_PROGRAM, &neptunp2_state::neptunp2_map);
+	m_maincpu->set_addrmap(AS_IO, &neptunp2_state::neptunp2_io);
+	m_maincpu->set_vblank_int("screen", FUNC(neptunp2_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(neptunp2_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update(FUNC(neptunp2_state::screen_update));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_neptunp2);
-	MCFG_PALETTE_ADD("palette", 512)
+	PALETTE(config, "palette").set_entries(512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

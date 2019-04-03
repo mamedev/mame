@@ -11,8 +11,8 @@
 #ifndef NLID_PROXY_H_
 #define NLID_PROXY_H_
 
-#include "../analog/nlid_twoterm.h"
-#include "../nl_setup.h"
+#include "netlist/analog/nlid_twoterm.h"
+#include "netlist/nl_setup.h"
 
 namespace netlist
 {
@@ -90,8 +90,6 @@ namespace netlist
 				logic_output_t *out_proxied, detail::core_terminal_t &proxy_out);
 
 		logic_input_t m_I;
-
-	private:
 	};
 
 	NETLIB_OBJECT_DERIVED(d_to_a_proxy, base_d_to_a_proxy)

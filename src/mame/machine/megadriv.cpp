@@ -883,7 +883,8 @@ void md_base_state::megadriv_timers(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(md_base_state::md_ntsc)
+void md_base_state::md_ntsc(machine_config &config)
+{
 	M68000(config, m_maincpu, MASTER_CLOCK_NTSC / 7); /* 7.67 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(md_base_state::genesis_int_callback));
@@ -909,13 +910,13 @@ MACHINE_CONFIG_START(md_base_state::md_ntsc)
 	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	MCFG_SCREEN_ADD("megadriv", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
-	MCFG_SCREEN_SIZE(64*8, 620)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(md_base_state, screen_update_megadriv) /* Copies a bitmap */
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_base_state, screen_vblank_megadriv)) /* Used to Sync the timing */
+	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
+	screen.set_size(64*8, 620);
+	screen.set_visarea(0, 32*8-1, 0, 28*8-1);
+	screen.set_screen_update(FUNC(md_base_state::screen_update_megadriv)); /* Copies a bitmap */
+	screen.screen_vblank().set(FUNC(md_base_state::screen_vblank_megadriv)); /* Used to Sync the timing */
 
 	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
@@ -923,22 +924,22 @@ MACHINE_CONFIG_START(md_base_state::md_ntsc)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7) /* 7.67 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC/7); /* 7.67 MHz */
+	m_ymsnd->add_route(0, "lspeaker", 0.50);
+	m_ymsnd->add_route(1, "rspeaker", 0.50);
+}
 
-MACHINE_CONFIG_START(md_cons_state::dcat16_megadriv_base)
+void md_cons_state::dcat16_megadriv_base(machine_config &config)
+{
 	md_ntsc(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(dcat16_megadriv_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::dcat16_megadriv_map);
+}
 
 /************ PAL hardware has a different master clock *************/
 
-MACHINE_CONFIG_START(md_base_state::md_pal)
+void md_base_state::md_pal(machine_config &config)
+{
 	M68000(config, m_maincpu, MASTER_CLOCK_PAL / 7); /* 7.67 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(md_base_state::genesis_int_callback));
@@ -963,13 +964,13 @@ MACHINE_CONFIG_START(md_base_state::md_pal)
 	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	MCFG_SCREEN_ADD("megadriv", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
-	MCFG_SCREEN_SIZE(64*8, 620)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(md_base_state, screen_update_megadriv) /* Copies a bitmap */
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_base_state, screen_vblank_megadriv)) /* Used to Sync the timing */
+	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
+	screen.set_size(64*8, 620);
+	screen.set_visarea(0, 32*8-1, 0, 28*8-1);
+	screen.set_screen_update(FUNC(md_base_state::screen_update_megadriv)); /* Copies a bitmap */
+	screen.screen_vblank().set(FUNC(md_base_state::screen_vblank_megadriv)); /* Used to Sync the timing */
 
 	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
@@ -977,10 +978,10 @@ MACHINE_CONFIG_START(md_base_state::md_pal)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_PAL/7) /* 7.67 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC/7); /* 7.67 MHz */
+	m_ymsnd->add_route(0, "lspeaker", 0.50);
+	m_ymsnd->add_route(1, "rspeaker", 0.50);
+}
 
 
 WRITE8_MEMBER(md_base_state::megadriv_tas_callback)

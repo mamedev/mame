@@ -1092,10 +1092,11 @@ DISCRETE_SOUND_END
 
 
 
-MACHINE_CONFIG_START(by35_state::by35)
+void by35_state::by35(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 530000) // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
-	MCFG_DEVICE_PROGRAM_MAP(by35_map)
+	M6800(config, m_maincpu, 530000); // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &by35_state::by35_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // 'F' filled causes Credit Display to be blank on first startup
 
@@ -1132,34 +1133,35 @@ MACHINE_CONFIG_START(by35_state::by35)
 	m_pia_u11->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	TIMER(config, "timer_d_freq").configure_periodic(FUNC(by35_state::u11_timer), attotime::from_hz(317)); // 555 timer
 	TIMER(config, m_display_refresh_timer).configure_generic(FUNC(by35_state::timer_d_pulse));   // 555 Active pulse length
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(as2888_state::as2888_audio)
+void as2888_state::as2888_audio(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("discrete", DISCRETE, as2888_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	DISCRETE(config, m_discrete, as2888_discrete).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	m_pia_u11->writepb_handler().set(FUNC(as2888_state::u11_b_as2888_w));
 	m_pia_u11->cb2_handler().set(FUNC(as2888_state::u11_cb2_as2888_w));
 
 	TIMER(config, "timer_s_freq").configure_periodic(FUNC(as2888_state::timer_s), attotime::from_hz(353000));     // Inverter clock on AS-2888 sound board
 	TIMER(config, m_snd_sustain_timer).configure_generic(FUNC(as2888_state::timer_as2888));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(as2888_state::as2888)
+void as2888_state::as2888(machine_config &config)
+{
 	by35(config);
 	as2888_audio(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(by35_state::nuovo)
+void by35_state::nuovo(machine_config &config)
+{
 	by35(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", M6802, 2000000) // ? MHz ?  Large crystal next to CPU, schematics don't indicate speed.
-	MCFG_DEVICE_PROGRAM_MAP(nuovo_map)
-
-MACHINE_CONFIG_END
+	M6802(config.replace(), m_maincpu, 2000000); // ? MHz ?  Large crystal next to CPU, schematics don't indicate speed.
+	m_maincpu->set_addrmap(AS_PROGRAM, &by35_state::nuovo_map);
+}
 
 
 

@@ -1366,49 +1366,49 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14)
+void radica_eu3a14_state::radica_eu3a14(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M6502,XTAL(21'477'272)/2) // marked as 21'477'270
-	MCFG_DEVICE_PROGRAM_MAP(radica_eu3a14_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", radica_eu3a14_state,  interrupt)
+	M6502(config, m_maincpu, XTAL(21'477'272)/2); // marked as 21'477'270
+	m_maincpu->set_addrmap(AS_PROGRAM, &radica_eu3a14_state::radica_eu3a14_map);
+	m_maincpu->set_vblank_int("screen", FUNC(radica_eu3a14_state::interrupt));
 
 	ADDRESS_MAP_BANK(config, "bank").set_map(&radica_eu3a14_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_helper);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(radica_eu3a14_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(radica_eu3a14_state::screen_update));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	screen.set_palette(m_palette);
 
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 512)
+	PALETTE(config, m_palette).set_entries(512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	radica6502_sound_device &sound(RADICA6502_SOUND(config, "6ch_sound", 8000));
 	sound.space_read_callback().set(FUNC(radica_eu3a14_state::read_full_space));
 	sound.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14_adc)
+void radica_eu3a14_state::radica_eu3a14_adc(machine_config &config)
+{
 	radica_eu3a14(config);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(radica_eu3a14_state::scanline_cb), "screen", 0, 1);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14p) // TODO, clocks differ too, what are they on PAL?
+void radica_eu3a14_state::radica_eu3a14p(machine_config &config) // TODO, clocks differ too, what are they on PAL?
+{
 	radica_eu3a14(config);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_refresh_hz(50);
+}
 
 
 void radica_eu3a14_state::init_rad_gtg()

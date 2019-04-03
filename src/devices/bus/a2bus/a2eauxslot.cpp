@@ -33,20 +33,16 @@ a2eauxslot_slot_device::a2eauxslot_slot_device(const machine_config &mconfig, co
 a2eauxslot_slot_device::a2eauxslot_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
-	, m_a2eauxslot_tag(nullptr)
-	, m_a2eauxslot_slottag(nullptr)
+	, m_a2eauxslot(*this, finder_base::DUMMY_TAG)
 {
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void a2eauxslot_slot_device::device_start()
+void a2eauxslot_slot_device::device_resolve_objects()
 {
 	device_a2eauxslot_card_interface *dev = dynamic_cast<device_a2eauxslot_card_interface *>(get_card_device());
 
-	if (dev) dev->set_a2eauxslot_tag(m_a2eauxslot_tag, m_a2eauxslot_slottag);
+	if (dev)
+		dev->set_a2eauxslot_device(m_a2eauxslot.target());
 }
 
 //**************************************************************************
@@ -70,31 +66,31 @@ a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, const char *
 
 a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_maincpu(*this, finder_base::DUMMY_TAG)
+	, m_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_out_irq_cb(*this)
 	, m_out_nmi_cb(*this)
 	, m_device(nullptr)
 {
 }
+
+//-------------------------------------------------
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
+//-------------------------------------------------
+
+void a2eauxslot_device::device_resolve_objects()
+{
+	// resolve callbacks
+	m_out_irq_cb.resolve_safe();
+	m_out_nmi_cb.resolve_safe();
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void a2eauxslot_device::device_start()
-{
-	// resolve callbacks
-	m_out_irq_cb.resolve_safe();
-	m_out_nmi_cb.resolve_safe();
-
-	// clear slot
-	m_device = nullptr;
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void a2eauxslot_device::device_reset()
 {
 }
 
@@ -138,7 +134,7 @@ WRITE_LINE_MEMBER( a2eauxslot_device::nmi_w ) { m_out_nmi_cb(state); }
 device_a2eauxslot_card_interface::device_a2eauxslot_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
 		m_a2eauxslot(nullptr),
-		m_a2eauxslot_tag(nullptr), m_a2eauxslot_slottag(nullptr), m_slot(0), m_next(nullptr)
+		m_slot(0), m_next(nullptr)
 {
 }
 
@@ -151,8 +147,8 @@ device_a2eauxslot_card_interface::~device_a2eauxslot_card_interface()
 {
 }
 
-void device_a2eauxslot_card_interface::set_a2eauxslot_device()
+void device_a2eauxslot_card_interface::set_a2eauxslot_device(a2eauxslot_device *a2eauxslot)
 {
-	m_a2eauxslot = dynamic_cast<a2eauxslot_device *>(device().machine().device(m_a2eauxslot_tag));
+	m_a2eauxslot = a2eauxslot;
 	m_a2eauxslot->add_a2eauxslot_card(this);
 }

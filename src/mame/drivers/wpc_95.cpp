@@ -2249,22 +2249,24 @@ static INPUT_PORTS_START( ttt )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(wpc_95_state::wpc_95)
+void wpc_95_state::wpc_95(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(8'000'000)/4) // 68B09E
-	MCFG_DEVICE_PROGRAM_MAP(wpc_95_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(wpc_95_state, irq0_line_assert, XTAL(8'000'000)/8192.0)
+	MC6809E(config, maincpu, XTAL(8'000'000)/4); // 68B09E
+	maincpu->set_addrmap(AS_PROGRAM, &wpc_95_state::wpc_95_map);
+	maincpu->set_periodic_int(FUNC(wpc_95_state::irq0_line_assert), attotime::from_hz(XTAL(8'000'000)/8192.0));
+
 	TIMER(config, "zero_crossing").configure_periodic(FUNC(wpc_95_state::zc_timer), attotime::from_hz(120)); // Mains power zero crossing
 
-	MCFG_DEVICE_ADD("pic", WPC_PIC, 0)
-	MCFG_DEVICE_ADD("lamp", WPC_LAMP, 0)
-	MCFG_DEVICE_ADD("out", WPC_OUT, 0, 3)
-	MCFG_DEVICE_ADD("shift", WPC_SHIFT, 0)
+	WPC_PIC(config, pic, 0);
+	WPC_LAMP(config, lamp, 0);
+	WPC_OUT(config, out, 0, 3);
+	WPC_SHIFT(config, "shift", 0);
 	WPC_DMD(config, "dmd", 0).scanline_callback().set(FUNC(wpc_95_state::scanline_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	DCS_AUDIO_WPC(config, dcs, 0);
-MACHINE_CONFIG_END
+}
 
 /*-----------------
 /  Attack From Mars #50041

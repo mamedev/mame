@@ -53,6 +53,7 @@ public:
 		, m_cpu(*this, "cpu")
 		, m_iop(*this, "iop")
 		, m_ram(*this, "ram")
+		, m_rom(*this, "rx2030")
 		, m_rtc(*this, "rtc")
 		, m_fio(*this, "fio")
 		, m_kbdc(*this, "kbdc")
@@ -112,6 +113,7 @@ private:
 	required_device<r2000a_device> m_cpu;
 	required_device<v50_device> m_iop;
 	required_device<ram_device> m_ram;
+	required_region_ptr<u16> m_rom;
 
 	// i/o devices
 	required_device<mc146818_device> m_rtc;

@@ -63,8 +63,8 @@ public:
 	// Synchronous clock input
 	DECLARE_WRITE_LINE_MEMBER( phi_line );
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	auto p_out_cb(int n) { return m_write_p[n].bind(); }
 	auto read_cb() { return m_read_block.bind(); }

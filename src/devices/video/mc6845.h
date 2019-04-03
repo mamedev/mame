@@ -61,20 +61,16 @@ public:
 	auto out_vsync_callback() { return m_out_vsync_cb.bind(); }
 
 	/* select one of the registers for reading or writing */
-	DECLARE_WRITE8_MEMBER( address_w ) { write_address(data); }
-	void write_address(uint8_t data);
+	void address_w(uint8_t data);
 
 	/* read from the status register */
-	DECLARE_READ8_MEMBER( status_r ) { return read_status(); }
-	uint8_t read_status();
+	uint8_t status_r();
 
 	/* read from the currently selected register */
-	DECLARE_READ8_MEMBER( register_r ) { return read_register(); }
-	uint8_t read_register();
+	uint8_t register_r();
 
 	/* write to the currently selected register */
-	DECLARE_WRITE8_MEMBER( register_w ) { write_register(data); }
-	void write_register(uint8_t data);
+	void register_w(uint8_t data);
 
 	// read display enable line state
 	DECLARE_READ_LINE_MEMBER( de_r );
@@ -215,6 +211,7 @@ protected:
 	void set_hsync(int state);
 	void set_vsync(int state);
 	void set_cur(int state);
+	bool match_line();
 	void handle_line_timer();
 	virtual void update_cursor_state();
 	virtual uint8_t draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -347,9 +344,9 @@ class hd6345_device : public mc6845_device
 public:
 	hd6345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(address_w);
-	DECLARE_READ8_MEMBER(register_r);
-	DECLARE_WRITE8_MEMBER(register_w);
+	void address_w(uint8_t data);
+	uint8_t register_r();
+	void register_w(uint8_t data);
 
 protected:
 	virtual void device_start() override;
@@ -383,10 +380,10 @@ class mos8563_device : public mc6845_device,
 public:
 	mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( address_w );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_READ8_MEMBER( register_r );
-	DECLARE_WRITE8_MEMBER( register_w );
+	void address_w(uint8_t data);
+	uint8_t status_r();
+	uint8_t register_r();
+	void register_w(uint8_t data);
 
 	inline uint8_t read_videoram(offs_t offset);
 	inline void write_videoram(offs_t offset, uint8_t data);

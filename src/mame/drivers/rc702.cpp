@@ -331,7 +331,8 @@ static void floppies(device_slot_interface &device)
 	device.option_add("525qd", FLOPPY_525_QD);
 }
 
-MACHINE_CONFIG_START(rc702_state::rc702)
+void rc702_state::rc702(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rc702_state::rc702_mem);
@@ -358,8 +359,8 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 	m_dma->out_eop_callback().set(FUNC(rc702_state::eop_w)).invert();   // real line is active low, mame has it backwards
 	m_dma->in_memr_callback().set(FUNC(rc702_state::memory_read_byte));
 	m_dma->out_memw_callback().set(FUNC(rc702_state::memory_write_byte));
-	m_dma->in_ior_callback<1>().set(m_fdc, FUNC(upd765a_device::mdma_r));
-	m_dma->out_iow_callback<1>().set(m_fdc, FUNC(upd765a_device::mdma_w));
+	m_dma->in_ior_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_dma->out_iow_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dma->out_iow_callback<2>().set("crtc", FUNC(i8275_device::dack_w));
 	m_dma->out_iow_callback<3>().set("crtc", FUNC(i8275_device::dack_w));
 	m_dma->out_dack_callback<1>().set(FUNC(rc702_state::dack1_w));
@@ -378,11 +379,11 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 	m_7474->comp_output_cb().set(FUNC(rc702_state::qbar_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(272*2, 200+4*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 272*2-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_size(272*2, 200+4*8);
+	screen.set_visarea(0, 272*2-1, 0, 200-1);
+	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 
 	i8275_device &crtc(I8275(config, "crtc", 11640000/7));
 	crtc.set_character_width(7);
@@ -396,7 +397,7 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 1000).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 /* ROM definition */

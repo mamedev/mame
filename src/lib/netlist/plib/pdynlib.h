@@ -18,8 +18,8 @@ namespace plib {
 class dynlib : public nocopyassignmove
 {
 public:
-	explicit dynlib(const pstring libname);
-	dynlib(const pstring path, const pstring libname);
+	explicit dynlib(const pstring &libname);
+	dynlib(const pstring &path, const pstring &libname);
 
 	~dynlib();
 	COPYASSIGNMOVE(dynlib, delete)
@@ -27,12 +27,12 @@ public:
 	bool isLoaded() const;
 
 	template <typename T>
-	T getsym(const pstring name)
+	T getsym(const pstring &name)
 	{
 		return reinterpret_cast<T>(getsym_p(name));
 	}
 private:
-	void *getsym_p(const pstring name);
+	void *getsym_p(const pstring &name);
 
 	bool m_isLoaded;
 	void *m_lib;

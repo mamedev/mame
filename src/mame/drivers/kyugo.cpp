@@ -519,18 +519,18 @@ INTERRUPT_GEN_MEMBER(kyugo_state::vblank_irq)
 }
 
 
-MACHINE_CONFIG_START(kyugo_state::kyugo_base)
-
+void kyugo_state::kyugo_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6)  /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(kyugo_main_map)
-	MCFG_DEVICE_IO_MAP(kyugo_main_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kyugo_state,  vblank_irq)
+	Z80(config, m_maincpu, XTAL(18'432'000)/6);  /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kyugo_state::kyugo_main_map);
+	m_maincpu->set_addrmap(AS_IO, &kyugo_state::kyugo_main_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(kyugo_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("sub", Z80, XTAL(18'432'000)/6)  /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(gyrodine_sub_map)
-	MCFG_DEVICE_IO_MAP(gyrodine_sub_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(kyugo_state, irq0_line_hold, 4*60)
+	Z80(config, m_subcpu, XTAL(18'432'000)/6);  /* verified on pcb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &kyugo_state::gyrodine_sub_map);
+	m_subcpu->set_addrmap(AS_IO, &kyugo_state::gyrodine_sub_portmap);
+	m_subcpu->set_periodic_int(FUNC(kyugo_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
@@ -540,13 +540,13 @@ MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 	mainlatch.q_out_cb<2>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kyugo_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 36*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(kyugo_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kyugo);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
@@ -560,51 +560,51 @@ MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	AY8910(config, "ay2", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "mono", 0.30);  /* verified on pcb */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(kyugo_state::gyrodine)
+void kyugo_state::gyrodine(machine_config &config)
+{
 	kyugo_base(config);
 	/* add watchdog */
 	WATCHDOG_TIMER(config, "watchdog");
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(gyrodine_main_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &kyugo_state::gyrodine_main_map);
+}
 
-MACHINE_CONFIG_START(kyugo_state::repulse)
+void kyugo_state::repulse(machine_config &config)
+{
 	kyugo_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(repulse_sub_map)
-	MCFG_DEVICE_IO_MAP(repulse_sub_portmap)
-MACHINE_CONFIG_END
+	m_subcpu->set_addrmap(AS_PROGRAM, &kyugo_state::repulse_sub_map);
+	m_subcpu->set_addrmap(AS_IO, &kyugo_state::repulse_sub_portmap);
+}
 
-MACHINE_CONFIG_START(kyugo_state::srdmissn)
+void kyugo_state::srdmissn(machine_config &config)
+{
 	kyugo_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(srdmissn_sub_map)
-	MCFG_DEVICE_IO_MAP(srdmissn_sub_portmap)
-MACHINE_CONFIG_END
+	m_subcpu->set_addrmap(AS_PROGRAM, &kyugo_state::srdmissn_sub_map);
+	m_subcpu->set_addrmap(AS_IO, &kyugo_state::srdmissn_sub_portmap);
+}
 
-MACHINE_CONFIG_START(kyugo_state::flashgala)
+void kyugo_state::flashgala(machine_config &config)
+{
 	kyugo_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(flashgala_sub_map)
-	MCFG_DEVICE_IO_MAP(flashgala_sub_portmap)
-MACHINE_CONFIG_END
+	m_subcpu->set_addrmap(AS_PROGRAM, &kyugo_state::flashgala_sub_map);
+	m_subcpu->set_addrmap(AS_IO, &kyugo_state::flashgala_sub_portmap);
+}
 
-MACHINE_CONFIG_START(kyugo_state::legend)
+void kyugo_state::legend(machine_config &config)
+{
 	kyugo_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(legend_sub_map)
-	MCFG_DEVICE_IO_MAP(srdmissn_sub_portmap)
-MACHINE_CONFIG_END
+	m_subcpu->set_addrmap(AS_PROGRAM, &kyugo_state::legend_sub_map);
+	m_subcpu->set_addrmap(AS_IO, &kyugo_state::srdmissn_sub_portmap);
+}
 
 
 /*************************************

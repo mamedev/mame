@@ -676,7 +676,7 @@ void fastfred_state::fastfred(machine_config &config)
 	AY8910(config, "ay8910.1", XTAL(12'432'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.554 MHz; xtal from pcb pics, divider not verified */
 
 	AY8910(config, "ay8910.2", XTAL(12'432'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.554 MHz; xtal from pcb pics, divider not verified */
-MACHINE_CONFIG_END
+}
 
 void fastfred_state::jumpcoas(machine_config &config)
 {
@@ -918,7 +918,7 @@ ROM_END
 
 // main PCB is marked: "MC9003" and "MADE IN ITALY" on component side
 // main PCB is marked: "MADE IN ITALY" on solder side
-// ROMs PCB is marked: "MG25157" on component side 
+// ROMs PCB is marked: "MG25157" on component side
 ROM_START( boggy84b2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "boggy84-1.bin", 0x0000, 0x1000, CRC(97235e3a) SHA1(f493efd03331416a392cab7d73e39029d7e8098c) )

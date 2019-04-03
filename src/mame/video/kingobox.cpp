@@ -132,31 +132,31 @@ void kingofb_state::ringking_palette(palette_device &palette)
 	palette_init_common(palette, color_prom, &kingofb_state::ringking_get_rgb_data);
 }
 
-WRITE8_MEMBER(kingofb_state::kingofb_videoram_w)
+void kingofb_state::kingofb_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kingofb_state::kingofb_colorram_w)
+void kingofb_state::kingofb_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kingofb_state::kingofb_videoram2_w)
+void kingofb_state::kingofb_videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kingofb_state::kingofb_colorram2_w)
+void kingofb_state::kingofb_colorram2_w(offs_t offset, uint8_t data)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kingofb_state::kingofb_f800_w)
+void kingofb_state::kingofb_f800_w(uint8_t data)
 {
 	m_nmigate->in_w<1>(BIT(data, 5));
 

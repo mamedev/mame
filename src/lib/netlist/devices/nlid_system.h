@@ -11,10 +11,10 @@
 #ifndef NLID_SYSTEM_H_
 #define NLID_SYSTEM_H_
 
-#include "../analog/nlid_twoterm.h"
-#include "../nl_base.h"
-#include "../nl_setup.h"
-#include "../plib/putil.h"
+#include "netlist/analog/nlid_twoterm.h"
+#include "netlist/nl_base.h"
+#include "netlist/nl_setup.h"
+#include "plib/putil.h"
 
 namespace netlist
 {
@@ -28,7 +28,8 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(netlistparams)
 		, m_use_deactivate(*this, "USE_DEACTIVATE", false)
-		, m_startup_strategy(*this, "STARTUP_STRATEGY", 0)
+		, m_startup_strategy(*this, "STARTUP_STRATEGY", 1)
+		, m_mos_capmodel(*this, "DEFAULT_MOS_CAPMODEL", 2)
 		{
 		}
 		NETLIB_UPDATEI() { }
@@ -37,6 +38,7 @@ namespace netlist
 	public:
 		param_logic_t m_use_deactivate;
 		param_int_t   m_startup_strategy;
+		param_int_t   m_mos_capmodel;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -72,9 +74,9 @@ namespace netlist
 
 	public:
 		logic_output_t m_Q;
-
-		param_double_t m_freq;
 		netlist_time m_inc;
+	private:
+		param_double_t m_freq;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -96,7 +98,7 @@ namespace netlist
 		//NETLIB_RESETI();
 		NETLIB_UPDATE_PARAMI();
 
-	protected:
+	private:
 		logic_input_t m_feedback;
 		logic_output_t m_Q;
 
@@ -127,7 +129,7 @@ namespace netlist
 				std::vector<pstring> pat(plib::psplit(m_pattern(),","));
 				m_off = netlist_time::from_double(m_offset());
 
-				std::array<netlist_time::mult_type, 32> pati = { 0 };
+				std::array<std::int64_t, 32> pati = { 0 };
 
 				m_size = static_cast<std::uint8_t>(pat.size());
 				netlist_time::mult_type total = 0;
@@ -135,16 +137,17 @@ namespace netlist
 				{
 					// FIXME: use pstonum_ne
 					//pati[i] = plib::pstonum<decltype(pati[i])>(pat[i]);
-					pati[i] = plib::pstonum<netlist_time::mult_type>(pat[i]);
+					pati[i] = plib::pstonum<std::int64_t>(pat[i]);
 					total += pati[i];
 				}
 				netlist_time ttotal = netlist_time::zero();
-				for (unsigned i=0; i<m_size - 1; i++)
+				auto sm1 = static_cast<uint8_t>(m_size - 1);
+				for (unsigned i=0; i < sm1; i++)
 				{
 					m_inc[i] = base * pati[i];
 					ttotal += m_inc[i];
 				}
-				m_inc[m_size - 1] = base * total - ttotal;
+				m_inc[sm1] = base * total - ttotal;
 			}
 		}
 		NETLIB_UPDATEI();
@@ -154,7 +157,7 @@ namespace netlist
 		NETLIB_HANDLERI(clk2);
 		NETLIB_HANDLERI(clk2_pow2);
 
-	protected:
+	private:
 
 		param_double_t m_freq;
 		param_str_t m_pattern;
@@ -181,13 +184,14 @@ namespace netlist
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		{
 			set_logic_family(setup().family_from_model(m_FAMILY()));
+			m_Q.set_logic_family(this->logic_family());
 		}
 
 		NETLIB_UPDATEI() { }
 		NETLIB_RESETI() { m_Q.initial(0); }
 		NETLIB_UPDATE_PARAMI() { m_Q.push(m_IN() & 1, netlist_time::from_nsec(1)); }
 
-	protected:
+	private:
 		logic_output_t m_Q;
 
 		param_logic_t m_IN;
@@ -202,11 +206,11 @@ namespace netlist
 		{
 		}
 
-		NETLIB_UPDATEI() { 	}
+		NETLIB_UPDATEI() {  }
 		NETLIB_RESETI() { m_Q.initial(0.0); }
 		NETLIB_UPDATE_PARAMI() { m_Q.push(m_IN()); }
 
-	protected:
+	private:
 		analog_output_t m_Q;
 		param_double_t m_IN;
 	};
@@ -279,8 +283,8 @@ namespace netlist
 
 		NETLIB_RESETI()
 		{
-			m_RIN.set(1.0 / m_p_RIN(),0,0);
-			m_ROUT.set(1.0 / m_p_ROUT(),0,0);
+			m_RIN.set_G_V_I(1.0 / m_p_RIN(),0,0);
+			m_ROUT.set_G_V_I(1.0 / m_p_ROUT(),0,0);
 		}
 
 		NETLIB_UPDATEI()
@@ -317,7 +321,7 @@ namespace netlist
 			for (int i=0; i < m_N(); i++)
 			{
 				pstring n = plib::pfmt("A{1}")(i);
-				m_I.push_back(plib::make_unique<analog_input_t>(*this, n));
+				m_I.push_back(pool().make_poolptr<analog_input_t>(*this, n));
 				inps.push_back(n);
 				m_vals.push_back(0.0);
 			}
@@ -334,7 +338,7 @@ namespace netlist
 		param_int_t m_N;
 		param_str_t m_func;
 		analog_output_t m_Q;
-		std::vector<std::unique_ptr<analog_input_t>> m_I;
+		std::vector<pool_owned_ptr<analog_input_t>> m_I;
 
 		std::vector<double> m_vals;
 		plib::pfunction m_compiled;
@@ -358,16 +362,17 @@ namespace netlist
 			register_subalias("2", m_R.m_N);
 		}
 
+		NETLIB_RESETI();
+		//NETLIB_UPDATE_PARAMI();
+		NETLIB_UPDATEI();
+
 		analog::NETLIB_SUB(R_base) m_R;
 		logic_input_t m_I;
 		param_double_t m_RON;
 		param_double_t m_ROFF;
 
-		NETLIB_RESETI();
-		//NETLIB_UPDATE_PARAMI();
-		NETLIB_UPDATEI();
-
 	private:
+
 		state_var<netlist_sig_t> m_last_state;
 	};
 

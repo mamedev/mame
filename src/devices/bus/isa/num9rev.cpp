@@ -64,7 +64,7 @@ void isa8_number_9_rev_device::device_add_mconfig(machine_config &config)
 
 	UPD7220(config, m_upd7220, XTAL(4'433'619)/2); // unknown clock
 	m_upd7220->set_addrmap(0, &isa8_number_9_rev_device::upd7220_map);
-	m_upd7220->set_display_pixels_callback(FUNC(isa8_number_9_rev_device::hgdc_display_pixels), this);
+	m_upd7220->set_display_pixels(FUNC(isa8_number_9_rev_device::hgdc_display_pixels));
 	m_upd7220->set_screen("screen");
 }
 
@@ -94,7 +94,7 @@ void isa8_number_9_rev_device::device_start()
 {
 	set_isa_device();
 
-	m_isa->install_memory(0xc0000, 0xc0001, read8_delegate(FUNC(upd7220_device::read), (upd7220_device *)m_upd7220), write8_delegate(FUNC(upd7220_device::write), (upd7220_device *)m_upd7220));
+	m_isa->install_memory(0xc0000, 0xc0001, read8sm_delegate(FUNC(upd7220_device::read), (upd7220_device *)m_upd7220), write8sm_delegate(FUNC(upd7220_device::write), (upd7220_device *)m_upd7220));
 	m_isa->install_memory(0xc0100, 0xc03ff, read8_delegate(FUNC(isa8_number_9_rev_device::pal8_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::pal8_w), this));
 	m_isa->install_memory(0xc0400, 0xc0401, read8_delegate(FUNC(isa8_number_9_rev_device::bank_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::bank_w), this));
 	m_isa->install_memory(0xc0500, 0xc06ff, read8_delegate(FUNC(isa8_number_9_rev_device::overlay_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::overlay_w), this));

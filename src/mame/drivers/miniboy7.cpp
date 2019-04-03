@@ -513,11 +513,11 @@ GFXDECODE_END
 *         Machine Drivers          *
 ***********************************/
 
-MACHINE_CONFIG_START(miniboy7_state::miniboy7)
-
+void miniboy7_state::miniboy7(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
-	MCFG_DEVICE_PROGRAM_MAP(miniboy7_map)
+	M6502(config, m_maincpu, MASTER_CLOCK / 16); /* guess */
+	m_maincpu->set_addrmap(AS_PROGRAM, &miniboy7_state::miniboy7_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -529,12 +529,12 @@ MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 	pia.irqb_handler().set_inputline("maincpu", 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((47+1)*8, (39+1)*8)                  /* Taken from MC6845, registers 00 & 04. Normally programmed with (value-1) */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 37*8-1)    /* Taken from MC6845, registers 01 & 06 */
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((47+1)*8, (39+1)*8);                  /* Taken from MC6845, registers 00 & 04. Normally programmed with (value-1) */
+	screen.set_visarea(0*8, 37*8-1, 0*8, 37*8-1);    /* Taken from MC6845, registers 01 & 06 */
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_miniboy7);
 
@@ -553,8 +553,7 @@ MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 	ay8910.add_route(ALL_OUTPUTS, "mono", 0.75);
 	ay8910.port_a_write_callback().set(FUNC(miniboy7_state::ay_pa_w));
 	ay8910.port_b_write_callback().set(FUNC(miniboy7_state::ay_pb_w));
-
-MACHINE_CONFIG_END
+}
 
 
 /***********************************

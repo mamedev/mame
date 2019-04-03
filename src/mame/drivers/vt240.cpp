@@ -23,17 +23,6 @@
 #include "screen.h"
 
 
-#define VERBOSE_DBG 0       /* general debug messages */
-
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			logerror("%11.6f at %s: ",machine().time().as_double(),machine().describe_context()); \
-			logerror A; \
-		} \
-	} while (0)
-
 class vt240_state : public driver_device
 {
 public:
@@ -678,7 +667,7 @@ void vt240_state::vt240(machine_config &config)
 
 	UPD7220(config, m_hgdc, XTAL(16'097'280) / 16); // actually /8?
 	m_hgdc->set_addrmap(0, &vt240_state::upd7220_map);
-	m_hgdc->set_display_pixels_callback(FUNC(vt240_state::hgdc_draw), this);
+	m_hgdc->set_display_pixels(FUNC(vt240_state::hgdc_draw));
 	m_hgdc->vsync_wr_callback().set_inputline(m_i8085, I8085_RST75_LINE);
 	m_hgdc->blank_wr_callback().set_inputline(m_i8085, I8085_RST55_LINE);
 	m_hgdc->set_screen("screen");

@@ -611,10 +611,11 @@ void sun2_state::machine_reset()
 	m_maincpu->reset();
 }
 
-MACHINE_CONFIG_START(sun2_state::sun2vme)
+void sun2_state::sun2vme(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68010, 19.6608_MHz_XTAL / 2) // or 24_MHz_XTAL / 2 by jumper setting
-	MCFG_DEVICE_PROGRAM_MAP(sun2_mem)
+	M68010(config, m_maincpu, 19.6608_MHz_XTAL / 2); // or 24_MHz_XTAL / 2 by jumper setting
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun2_state::sun2_mem);
 
 	RAM(config, RAM_TAG).set_default_size("2M").set_extra_options("4M,6M,8M").set_default_value(0x00);
 
@@ -630,11 +631,11 @@ MACHINE_CONFIG_START(sun2_state::sun2vme)
 	// MMU Type 3 device space
 	ADDRESS_MAP_BANK(config, "type3").set_map(&sun2_state::vmetype3space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
-	MCFG_SCREEN_ADD("bwtwo", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(sun2_state, bw2_update)
-	MCFG_SCREEN_SIZE(1152,900)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
-	MCFG_SCREEN_REFRESH_RATE(72)
+	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
+	bwtwo.set_screen_update(FUNC(sun2_state::bw2_update));
+	bwtwo.set_size(1152,900);
+	bwtwo.set_visarea(0, 1152-1, 0, 900-1);
+	bwtwo.set_refresh_hz(72);
 
 	am9513a_device &timer(AM9513A(config, "timer", 19.6608_MHz_XTAL / 4));
 	timer.fout_cb().set("timer", FUNC(am9513_device::gate1_w));
@@ -661,12 +662,13 @@ MACHINE_CONFIG_START(sun2_state::sun2vme)
 	rs232b.rxd_handler().set(SCC2_TAG, FUNC(z80scc_device::rxb_w));
 	rs232b.dcd_handler().set(SCC2_TAG, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsb_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sun2_state::sun2mbus)
+void sun2_state::sun2mbus(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68010, 39.3216_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(sun2_mem)
+	M68010(config, m_maincpu, 39.3216_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun2_state::sun2_mem);
 
 	RAM(config, RAM_TAG).set_default_size("2M").set_extra_options("4M").set_default_value(0x00);
 
@@ -682,11 +684,11 @@ MACHINE_CONFIG_START(sun2_state::sun2mbus)
 	// MMU Type 3 device space
 	ADDRESS_MAP_BANK(config, "type3").set_map(&sun2_state::mbustype3space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
-	MCFG_SCREEN_ADD("bwtwo", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(sun2_state, bw2_update)
-	MCFG_SCREEN_SIZE(1152,900)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
-	MCFG_SCREEN_REFRESH_RATE(72)
+	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
+	bwtwo.set_screen_update(FUNC(sun2_state::bw2_update));
+	bwtwo.set_size(1152,900);
+	bwtwo.set_visarea(0, 1152-1, 0, 900-1);
+	bwtwo.set_refresh_hz(72);
 
 	am9513a_device &timer(AM9513A(config, "timer", 39.3216_MHz_XTAL / 8));
 	timer.fout_cb().set("timer", FUNC(am9513_device::gate1_w));
@@ -715,7 +717,7 @@ MACHINE_CONFIG_START(sun2_state::sun2mbus)
 	rs232b.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsb_w));
 
 	MM58167(config, "rtc", 32.768_kHz_XTAL);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( sun2_120 ) // ROMs are located on the '501-1007' CPU PCB at locations B11 and B10; J400 is set to 1-2 for 27128 EPROMs and 3-4 for 27256 EPROMs

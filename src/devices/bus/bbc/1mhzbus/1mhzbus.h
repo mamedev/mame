@@ -107,10 +107,10 @@ public:
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
-	virtual DECLARE_READ8_MEMBER(fred_r);
-	virtual DECLARE_WRITE8_MEMBER(fred_w);
-	virtual DECLARE_READ8_MEMBER(jim_r);
-	virtual DECLARE_WRITE8_MEMBER(jim_w);
+	virtual uint8_t fred_r(offs_t offset);
+	virtual void fred_w(offs_t offset, uint8_t data);
+	virtual uint8_t jim_r(offs_t offset);
+	virtual void jim_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
@@ -134,10 +134,10 @@ private:
 class device_bbc_1mhzbus_interface : public device_slot_card_interface
 {
 public:
-	virtual DECLARE_READ8_MEMBER(fred_r) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(fred_w) { }
-	virtual DECLARE_READ8_MEMBER(jim_r) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(jim_w) { }
+	virtual uint8_t fred_r(offs_t offset) { return 0xff; }
+	virtual void fred_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t jim_r(offs_t offset) { return 0xff; }
+	virtual void jim_w(offs_t offset, uint8_t data) { }
 
 protected:
 	device_bbc_1mhzbus_interface(const machine_config &mconfig, device_t &device);

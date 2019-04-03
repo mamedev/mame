@@ -199,20 +199,21 @@ static INPUT_PORTS_START( pp01 )
 INPUT_PORTS_END
 
 /* Machine driver */
-MACHINE_CONFIG_START(pp01_state::pp01)
+void pp01_state::pp01(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(pp01_mem)
-	MCFG_DEVICE_IO_MAP(pp01_io)
+	I8080(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pp01_state::pp01_mem);
+	m_maincpu->set_addrmap(AS_IO, &pp01_state::pp01_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pp01_state, screen_update_pp01)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0, 256-1);
+	screen.set_screen_update(FUNC(pp01_state::screen_update_pp01));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(pp01_state::pp01_palette), 8);
 
@@ -222,7 +223,7 @@ MACHINE_CONFIG_START(pp01_state::pp01)
 	//WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, "uart", 0);
 	// when rts and dtr are both high, the uart is being used for cassette operations
 
 	PIT8253(config, m_pit, 0);
@@ -243,7 +244,7 @@ MACHINE_CONFIG_START(pp01_state::pp01)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0x00);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 

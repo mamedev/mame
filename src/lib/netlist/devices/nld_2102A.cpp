@@ -6,7 +6,7 @@
  */
 
 #include "nld_2102A.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 
 #define ADDR2BYTE(a)    ((a) >> 3)
 #define ADDR2BIT(a)     ((a) & 0x7)
@@ -97,7 +97,7 @@ namespace netlist
 			m_ram[i] = 0;
 	}
 
-	NETLIB_DEVICE_IMPL(2102A,	 "RAM_2102A", 	"+CEQ,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+RWQ,+DI")
+	NETLIB_DEVICE_IMPL(2102A,    "RAM_2102A",   "+CEQ,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+RWQ,+DI")
 	NETLIB_DEVICE_IMPL(2102A_dip,"RAM_2102A_DIP","")
 
 	} //namespace devices

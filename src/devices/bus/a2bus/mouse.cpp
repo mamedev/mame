@@ -203,7 +203,7 @@ void a2bus_mouse_device::device_reset()
 
 uint8_t a2bus_mouse_device::read_c0nx(uint8_t offset)
 {
-	return m_pia->reg_r(offset & 3);
+	return m_pia->read(offset & 3);
 }
 
 /*-------------------------------------------------
@@ -212,7 +212,7 @@ uint8_t a2bus_mouse_device::read_c0nx(uint8_t offset)
 
 void a2bus_mouse_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-	m_pia->reg_w(offset & 3, data);
+	m_pia->write(offset & 3, data);
 }
 
 /*-------------------------------------------------

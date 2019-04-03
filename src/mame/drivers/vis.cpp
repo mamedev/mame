@@ -143,7 +143,6 @@ void vis_audio_device::device_add_mconfig(machine_config &config)
 	m_rdac->add_route(ALL_OUTPUTS, "rspeaker", 1.0); // sanyo lc7883k
 
 	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref"));
-	vreg.set_output(5.0);
 	vreg.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
 	vreg.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
 	vreg.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);

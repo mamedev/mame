@@ -30,8 +30,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs48/mcs48.h"
 #include "bus/uts_kbd/extw.h"
+
+#include "cpu/mcs48/mcs48.h"
+
 
 DEFINE_DEVICE_TYPE(UTS_EXTW_KEYBOARD, uts_extw_keyboard_device, "uts_extw", "UTS Expanded Typewriter Keyboard (F4725-25)")
 

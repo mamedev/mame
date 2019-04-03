@@ -242,7 +242,7 @@ WRITE16_MEMBER(cave_state::sound_cmd_w)
 {
 //  m_sound_flag[0] = 1;
 //  m_sound_flag[1] = 1;
-	m_soundlatch->write(space, offset, data, mem_mask);
+	m_soundlatch->write(data);
 	m_maincpu->spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 }
 
@@ -250,14 +250,14 @@ WRITE16_MEMBER(cave_state::sound_cmd_w)
 READ8_MEMBER(cave_state::soundlatch_lo_r)
 {
 //  m_sound_flag[0] = 0;
-	return m_soundlatch->read(space, offset, 0x00ff) & 0xff;
+	return m_soundlatch->read() & 0xff;
 }
 
 /* Sound CPU: read the high 8 bits of the 16 bit sound latch */
 READ8_MEMBER(cave_state::soundlatch_hi_r)
 {
 //  m_sound_flag[1] = 0;
-	return m_soundlatch->read(space, offset, 0xff00) >> 8;
+	return m_soundlatch->read() >> 8;
 }
 
 /* Main CPU: read the latch written by the sound CPU (acknowledge) */

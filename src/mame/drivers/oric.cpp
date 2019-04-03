@@ -307,11 +307,11 @@ void oric_state::update_psg(address_space &space)
 {
 	if(m_via_ca2)
 		if(m_via_cb2)
-			m_psg->address_w(space, 0, m_via_a);
+			m_psg->address_w(m_via_a);
 		else
-			m_via->write_pa(space, 0, m_psg->data_r(space, 0));
+			m_via->write_pa(space, 0, m_psg->data_r());
 	else if(m_via_cb2)
-		m_psg->data_w(space, 0, m_via_a);
+		m_psg->data_w(m_via_a);
 }
 
 void oric_state::update_irq()

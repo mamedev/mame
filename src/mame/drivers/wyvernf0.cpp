@@ -373,7 +373,7 @@ TIMER_CALLBACK_MEMBER(wyvernf0_state::nmi_callback)
 
 WRITE8_MEMBER(wyvernf0_state::sound_command_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(wyvernf0_state::nmi_callback),this), data);
 }
 
@@ -704,7 +704,6 @@ void wyvernf0_state::wyvernf0(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.25); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }

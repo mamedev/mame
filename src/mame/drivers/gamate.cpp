@@ -94,14 +94,14 @@ READ8_MEMBER( gamate_state::gamate_nmi_r )
 
 READ8_MEMBER(gamate_state::sound_r)
 {
-	m_ay->address_w(space, 0, offset);
-	return m_ay->data_r(space, 0);
+	m_ay->address_w(offset);
+	return m_ay->data_r();
 }
 
 WRITE8_MEMBER(gamate_state::sound_w)
 {
-	m_ay->address_w(space, 0, offset);
-	m_ay->data_w(space, 0, data);
+	m_ay->address_w(offset);
+	m_ay->data_w(data);
 }
 
 WRITE8_MEMBER(gamate_state::write_cart)

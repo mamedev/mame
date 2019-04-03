@@ -8,17 +8,17 @@
 	M-1  *MC0001-ATM  Artist Mini Volume 1 (untranslated artist)
 	M-2   MC0002-ATM  Artist Mini Volume 2 (untranslated artist)
 	M-3   MC0003-ATM  Artist Mini Volume 3 (untranslated artist)
-	M-4   MC0004-ATM  Artist Mini Volume 4 (w-inds)
+	M-4  *MC0004-ATM  Artist Mini Volume 4 (w-inds)
 	M-5   MC0005-     KSM? unknown Vol 1
-	M-6   MC0006-     KSM? TPM? unknown Vol 2 (TV)
+	M-6  *MC0006-KSM  KSM Mini Volume 2
 	M-7   MC0007-ATM  Artist Mini Volume 5 (SMAP, KinKi Kids)
 	M-8   MC0008-     KSM? TPM? unknown Vol 3 (TV)
 	M-9   MC0009-KSM  JPop Mix Mini Vol 1
 	M-10  MC0010-ATM  Artist Mini Volume 6 (untranslated artist)
 	M-11  MC0011-     KSM? unknown Vol 4
-	M-12  MC0012-ATM  Artist Mini Volume 7 (untranslated artist)
+	M-12 *MC0012-ATM  Artist Mini Volume 7 (untranslated artist)
 	M-13 *MC0013-KSM  KSM Mini Volume 5
-	M-14  MC0014-ATM  Artist Mini Volume 8 (BoA)
+	M-14 *MC0014-ATM  Artist Mini Volume 8 (BoA)
 	M-15  MC0015-     KSM? TPM? unknown Vol 6 (TV Pop)
 	M-16  MC0016-ATM  Artist Mini Volume 9  (untranslated artist)
 	M-17  MC0017-     KSM? TPM? TV Pop Mini Vol 7 (TV Pop)
@@ -34,7 +34,7 @@
 	<!-- these have unique presentation -->
 
 	<software name="mc0001">
-		<description>ATM Mini Volume 1 (Japan) (MC0001-ATM)</description>
+		<description>Artist Mini Volume 1 (untranslated artist) (Japan) (MC0001-ATM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -44,13 +44,57 @@
 		</part>
 	</software>
 
+	<software name="mc0004">
+		<description>Artist Mini Volume 4 (w-inds) (Japan) (MC0004-ATM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0004-atm.u1" size="0x080000" crc="e9ba14c1" sha1="3cad1a6b0d1ba24dfb6c1aec84a6d87816b16d54" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0006">
+		<description>KSM Mini Volume 2 (Japan) (MC0006-KSM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0006-ksm.u1" size="0x080000" crc="6d3c8c02" sha1="568a0e156a2189156149578277b6d615fe4e157f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0012">
+		<description>Artist Mini Volume 7 (untranslated artist) (Japan) (MC0012-ATM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0012-atm.u1" size="0x080000" crc="f31d3de9" sha1="41e4de960b2f348a4bed3b9b6d51229878e8c8f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc0013">
-		<description>KSM Mini Volume 5 (Japan) (MC0005-KSM)</description>
+		<description>KSM Mini Volume 5 (Japan) (MC0013-KSM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0013-ksm.u1" size="0x080000" crc="db05eafa" sha1="b58efcc41ad8d5571c319e0d88fa8a3d9badbe93" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0014">
+		<description>Artist Mini Volume 8 (BoA) (Japan) (MC0014-ATM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0014-atm.u1" size="0x080000" crc="170e02af" sha1="02b38146db7d74727f7dccf6dcc3d004979210a1" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -257,7 +257,7 @@ inline void itech8_state::consume_rle(int count)
  *
  *************************************/
 
-void itech8_state::perform_blit(address_space &space)
+void itech8_state::perform_blit()
 {
 	offs_t addr = m_tms34061->xyaddress() | ((m_tms34061->xyoffset() & 0x300) << 8);
 	uint8_t shift = (BLITTER_FLAGS & BLITFLAG_SHIFT) ? 4 : 0;
@@ -266,7 +266,7 @@ void itech8_state::perform_blit(address_space &space)
 	int xdir = (BLITTER_FLAGS & BLITFLAG_XFLIP) ? -1 : 1;
 	int xflip = (BLITTER_FLAGS & BLITFLAG_XFLIP);
 	int rle = (BLITTER_FLAGS & BLITFLAG_RLE);
-	int color = m_tms34061->latch_r(space, 0);
+	int color = m_tms34061->latch_r();
 	int width = BLITTER_WIDTH;
 	int height = BLITTER_HEIGHT;
 	uint8_t transmaskhi, transmasklo;
@@ -468,7 +468,7 @@ WRITE8_MEMBER(itech8_state::blitter_w)
 		}
 
 		/* perform the blit */
-		perform_blit(space);
+		perform_blit();
 		m_blit_in_progress = 1;
 
 		/* set a timer to go off when we're done */
@@ -498,7 +498,7 @@ WRITE8_MEMBER(itech8_state::tms34061_w)
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	m_tms34061->write(space, col, 0xff, func, data);
+	m_tms34061->write(col, 0xff, func, data);
 }
 
 
@@ -513,7 +513,7 @@ READ8_MEMBER(itech8_state::tms34061_r)
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	return m_tms34061->read(space, col, 0xff, func);
+	return m_tms34061->read(col, 0xff, func);
 }
 
 

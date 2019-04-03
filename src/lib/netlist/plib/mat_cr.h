@@ -10,13 +10,6 @@
 #ifndef MAT_CR_H_
 #define MAT_CR_H_
 
-#include <algorithm>
-#include <array>
-#include <cmath>
-#include <cstdlib>
-#include <type_traits>
-#include <vector>
-
 #include "palloc.h"
 #include "parray.h"
 #include "pconfig.h"
@@ -25,8 +18,18 @@
 #include "ptypes.h"
 #include "putil.h"
 
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstdlib>
+#include <type_traits>
+#include <vector>
+
 namespace plib
 {
+
+	// FIXME: causes a crash with GMRES handler
+	// template<typename T, int N, typename C = std::size_t>
 
 	template<typename T, int N, typename C = uint16_t>
 	struct matrix_compressed_rows_t
@@ -64,12 +67,19 @@ namespace plib
 		, m_size(n)
 		{
 			for (index_type i=0; i<n+1; i++)
-				A[i] = 0;
+				row_idx[i] = 0;
 		}
 
 		~matrix_compressed_rows_t() = default;
 
-		index_type size() const { return m_size; }
+		constexpr index_type size() const { return static_cast<index_type>((N>0) ? N : m_size); }
+
+		void clear()
+		{
+			nz_num = 0;
+			for (index_type i=0; i < size() + 1; i++)
+				row_idx[i] = 0;
+		}
 
 		void set_scalar(const T scalar)
 		{
@@ -83,7 +93,7 @@ namespace plib
 			while (ri < row_idx[r+1] && col_idx[ri] < c)
 			  ri++;
 			// we have the position now;
-			if (nz_num > 0 && col_idx[ri] == c)
+			if (ri < row_idx[r+1] && col_idx[ri] == c)
 				A[ri] = val;
 			else
 			{
@@ -94,7 +104,7 @@ namespace plib
 				}
 				A[ri] = val;
 				col_idx[ri] = c;
-				for (C i = row_idx[r]; i < size()+1;i++)
+				for (C i = r + 1; i < size() + 1; i++)
 					row_idx[i]++;
 				nz_num++;
 				if (c==r)
@@ -382,7 +392,7 @@ namespace plib
 			 *
 			 */
 
-			for (std::size_t i = 1; i < m_size; i++) // row i
+			for (std::size_t i = 1; i < size(); i++) // row i
 			{
 				const std::size_t p_i_end = row_idx[i + 1];
 				// loop over all columns k left of diag in row i
@@ -398,8 +408,8 @@ namespace plib
 					while (i_j < p_i_end && k_j < p_k_end )  // pj = (i, j)
 					{
 						// we can assume that within a row ja increases continuously */
-						const auto c_i_j = col_idx[i_j]; // row i, column j
-						const auto c_k_j = col_idx[k_j]; // row i, column j
+						const std::size_t c_i_j = col_idx[i_j]; // row i, column j
+						const std::size_t c_k_j = col_idx[k_j]; // row i, column j
 						if (c_k_j < c_i_j)
 							k_j++;
 						else if (c_k_j == c_i_j)
@@ -435,7 +445,7 @@ namespace plib
 			 * This can be solved for x using backwards elimination in U.
 			 *
 			 */
-			for (std::size_t i = 1; i < m_size; ++i )
+			for (std::size_t i = 1; i < size(); ++i )
 			{
 				T tmp = 0.0;
 				const std::size_t j1 = row_idx[i];
@@ -443,11 +453,10 @@ namespace plib
 
 				for (std::size_t j = j1; j < j2; ++j )
 					tmp +=  A[j] * r[col_idx[j]];
-
 				r[i] -= tmp;
 			}
 			// i now is equal to n;
-			for (std::size_t i = m_size; i-- > 0; )
+			for (std::size_t i = size(); i-- > 0; )
 			{
 				T tmp = 0.0;
 				const std::size_t di = diag[i];

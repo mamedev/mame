@@ -161,7 +161,6 @@ DEFINE_DEVICE_TYPE(SEGA315_5313, sega315_5313_device, "sega315_5313", "Sega 315-
 sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	// mode 4 support, for SMS compatibility, is implemented in 315_5124.cpp
 	: sega315_5313_mode4_device(mconfig, SEGA315_5313, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0x00, 0x1f, 0, 0, line_315_5313_mode4)
-	, device_mixer_interface(mconfig, *this, 2)
 	, m_render_bitmap(nullptr)
 	, m_render_line(nullptr)
 	, m_render_line_raw(nullptr)
@@ -210,7 +209,6 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 	, m_palette_lookup_highlight(nullptr)
 	, m_space68k(nullptr)
 	, m_cpu68k(*this, finder_base::DUMMY_TAG)
-	, m_snsnd(*this, "snsnd")
 {
 	m_use_alt_timing = 0;
 	m_palwrite_base = -1;
@@ -227,7 +225,7 @@ void sega315_5313_device::device_add_mconfig(machine_config &config)
 
 	m_palette->set_entries(0x200); // more entries for 32X - not really the cleanest way to do this
 
-	SEGAPSG(config, m_snsnd, DERIVED_CLOCK(1, 15)).add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 0);
+	SEGAPSG(config.replace(), m_snsnd, DERIVED_CLOCK(1, 15)).add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 0);
 }
 
 TIMER_CALLBACK_MEMBER(sega315_5313_device::irq6_on_timer_callback)
@@ -968,9 +966,9 @@ WRITE16_MEMBER( sega315_5313_device::vdp_w )
 		case 0x16:
 		{
 			// accessed by either segapsg_device or sn76496_device
-			if (m_snsnd && ACCESSING_BITS_0_7)
-				m_snsnd->write(data & 0xff);
-			//if (m_snsnd && ACCESSING_BITS_8_15) sn->write((data>>8) & 0xff);
+			if (ACCESSING_BITS_0_7)
+				psg_w(data & 0xff);
+			//if (ACCESSING_BITS_8_15) psg_w((data>>8) & 0xff);
 			break;
 		}
 

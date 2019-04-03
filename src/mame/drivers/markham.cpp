@@ -543,24 +543,24 @@ static GFXDECODE_START( gfx_markham )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0,   64 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(markham_state::markham)
-
+void markham_state::markham(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK/2) /* 4.000MHz */
-	MCFG_DEVICE_PROGRAM_MAP(markham_master_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", markham_state, irq0_line_hold)
+	Z80(config, m_maincpu, CPU_CLOCK/2); /* 4.000MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &markham_state::markham_master_map);
+	m_maincpu->set_vblank_int("screen", FUNC(markham_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("subcpu", Z80, CPU_CLOCK/2) /* 4.000MHz */
-	MCFG_DEVICE_PROGRAM_MAP(markham_slave_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", markham_state, irq0_line_hold)
+	Z80(config, m_subcpu, CPU_CLOCK/2); /* 4.000MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &markham_state::markham_slave_map);
+	m_subcpu->set_vblank_int("screen", FUNC(markham_state::irq0_line_hold));
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(markham_state, screen_update_markham)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(markham_state::screen_update_markham));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_markham);
 	PALETTE(config, m_palette, FUNC(markham_state::markham_palette), 1024, 256);
@@ -568,43 +568,36 @@ MACHINE_CONFIG_START(markham_state::markham)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76496, CPU_CLOCK/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	SN76496(config, m_sn[0], CPU_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	MCFG_DEVICE_ADD("sn2", SN76496, CPU_CLOCK/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_CONFIG_END
+	SN76496(config, m_sn[1], CPU_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.75);
+}
 
-MACHINE_CONFIG_START(markham_state::strnskil)
-
+void markham_state::strnskil(machine_config &config)
+{
 	markham(config);
 	/* basic machine hardware */
-	config.device_remove("maincpu");
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK/2) /* 4.000MHz */
-	MCFG_DEVICE_PROGRAM_MAP(strnskil_master_map)
+	Z80(config.replace(), m_maincpu, CPU_CLOCK/2); /* 4.000MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &markham_state::strnskil_master_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(markham_state::strnskil_scanline), "screen", 0, 1);
 
-	config.device_remove("subcpu");
-	MCFG_DEVICE_ADD("subcpu", Z80, CPU_CLOCK/2) /* 4.000MHz */
-	MCFG_DEVICE_PROGRAM_MAP(strnskil_slave_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(markham_state, irq0_line_hold, 2*(PIXEL_CLOCK/HTOTAL/VTOTAL))
+	Z80(config.replace(), m_subcpu, CPU_CLOCK/2); /* 4.000MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &markham_state::strnskil_slave_map);
+	m_subcpu->set_periodic_int(FUNC(markham_state::irq0_line_hold), attotime::from_hz(2*(PIXEL_CLOCK/HTOTAL/VTOTAL)));
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(markham_state, screen_update_strnskil)
+	m_screen->set_screen_update(FUNC(markham_state::screen_update_strnskil));
 
 	MCFG_VIDEO_START_OVERRIDE(markham_state, strnskil)
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("sn1")
-	MCFG_DEVICE_CLOCK(CPU_CLOCK/4)
-MACHINE_CONFIG_END
+	m_sn[0]->set_clock(CPU_CLOCK/4);
+}
 
-MACHINE_CONFIG_START(markham_state::banbam)
-
+void markham_state::banbam(machine_config &config)
+{
 	strnskil(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(banbam_master_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &markham_state::banbam_master_map);
 
 	MB8841(config, m_mcu, CPU_CLOCK/2); /* 4.000MHz */
 	// m_mcu->read_k().set(FUNC(markham_state::mcu_portk_r));
@@ -619,7 +612,7 @@ MACHINE_CONFIG_START(markham_state::banbam)
 	// m_mcu->read_r<3>().set(FUNC(markham_state::mcu_port_r3_r));
 	// m_mcu->write_r<3>().set(FUNC(markham_state::mcu_port_r3_w));
 	m_mcu->set_disable();
-MACHINE_CONFIG_END
+}
 
 /****************************************************************************/
 

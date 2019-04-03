@@ -1519,30 +1519,30 @@ TIMER_DEVICE_CALLBACK_MEMBER(zaurus_state::rtc_irq_callback)
 }
 
 // TODO: main CPU differs greatly between versions!
-MACHINE_CONFIG_START(zaurus_state::zaurus)
-
+void zaurus_state::zaurus(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu,PXA255,MAIN_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(zaurus_map)
+	PXA255(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zaurus_state::zaurus_map);
 
 	TIMER(config, "rtc_timer").configure_periodic(FUNC(zaurus_state::rtc_irq_callback), attotime::from_hz(XTAL(32'768)));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(zaurus_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(zaurus_state::screen_update));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 
-	MCFG_PALETTE_ADD("palette", 8)
+	PALETTE(config, "palette").set_entries(8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 //  AY8910(config, "aysnd", MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	PXA255_PERIPHERALS(config, m_pxa_periphs, MAIN_CLOCK, m_maincpu);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

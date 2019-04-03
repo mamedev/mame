@@ -153,23 +153,24 @@ void abc800c_state::abc800c_palette(palette_device &palette) const
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( abc800c_video )
+//  machine_config( abc800c_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc800c_state::abc800c_video)
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(abc800c_state, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(480, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 480-1)
+void abc800c_state::abc800c_video(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(abc800c_state::screen_update));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(480, 480);
+	screen.set_visarea(0, 480-1, 0, 480-1);
 
 	PALETTE(config, m_palette, FUNC(abc800c_state::abc800c_palette), 8);
 
 	SAA5052(config, m_trom, XTAL(12'000'000)/2);
 	m_trom->d_cb().set(FUNC(abc800c_state::char_ram_r));
 	m_trom->set_screen_size(40, 24, 40);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -273,7 +274,7 @@ uint32_t abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( abc800m_video )
+//  machine_config( abc800m_video )
 //-------------------------------------------------
 
 void abc800m_state::abc800m_video(machine_config &config)

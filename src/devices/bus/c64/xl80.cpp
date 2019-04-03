@@ -186,13 +186,13 @@ void c64_xl80_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_xl80_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_xl80_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io2 && BIT(offset, 2))
 	{
 		if (offset & 0x01)
 		{
-			data = m_crtc->register_r(space, 0);
+			data = m_crtc->register_r();
 		}
 	}
 	else if (offset >= 0x8000 && offset < 0x9000)
@@ -212,7 +212,7 @@ uint8_t c64_xl80_device::c64_cd_r(address_space &space, offs_t offset, uint8_t d
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_xl80_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_xl80_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (offset >= 0x9800 && offset < 0xa000)
 	{
@@ -222,11 +222,11 @@ void c64_xl80_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data
 	{
 		if (offset & 0x01)
 		{
-			m_crtc->register_w(space, 0, data);
+			m_crtc->register_w(data);
 		}
 		else
 		{
-			m_crtc->address_w(space, 0, data);
+			m_crtc->address_w(data);
 		}
 	}
 }

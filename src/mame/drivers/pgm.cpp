@@ -282,7 +282,7 @@ WRITE16_MEMBER(pgm_state::m68k_l1_w)
 	{
 		if (PGMLOGERROR)
 			logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, m_maincpu->pc());
-		m_soundlatch->write(space, 0, data);
+		m_soundlatch->write(data);
 		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
@@ -291,7 +291,7 @@ WRITE8_MEMBER(pgm_state::z80_l3_w)
 {
 	if (PGMLOGERROR)
 		logerror("SL 3 z80.w %02x (%04x)\n", data, m_soundcpu->pc());
-	m_soundlatch3->write(space, 0, data);
+	m_soundlatch3->write(data);
 }
 
 
@@ -490,7 +490,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pgm_state::pgm_interrupt)
 {
 	int scanline = param;
 
-// already being generated  by MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pgm_state,  irq6_line_hold)
+// already being generated  by m_maincpu->set_vblank_int("screen", FUNC(pgm_state::irq6_line_hold));
 //  if(scanline == 224)
 //      m_maincpu->set_input_line(6, HOLD_LINE);
 

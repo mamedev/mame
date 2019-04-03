@@ -193,7 +193,6 @@ void sgi_mc_device::set_cpu_buserr(uint32_t address)
 
 uint32_t sgi_mc_device::dma_translate(uint32_t address)
 {
-	machine().debug_break();
 	for (int entry = 0; entry < 4; entry++)
 	{
 		if ((address & 0xffe00000) == (m_dma_tlb_entry_hi[entry] & 0xffe00000))
@@ -211,26 +210,39 @@ void sgi_mc_device::dma_tick()
 {
 	uint32_t addr = m_dma_mem_addr;
 	if (m_dma_control & (1 << 8))
-	{	// Enable virtual address translation
+	{   // Enable virtual address translation
 		addr = dma_translate(addr);
 	}
 
 	if (m_dma_mode & (1 << 1))
-	{	// Graphics to host
+	{   // Graphics to host
 		if (m_dma_mode & (1 << 3))
-		{	// Fill mode
+		{   // Fill mode
 			m_space->write_dword(addr, m_dma_gio64_addr);
 			m_dma_count -= 4;
 		}
 		else
 		{
-			m_space->write_byte(addr, m_space->read_byte(m_dma_gio64_addr));
-			m_dma_mem_addr++;
-			m_dma_count--;
+			const uint32_t remaining = m_dma_count & 0x0000ffff;
+			uint32_t length = 8;
+			uint64_t shift = 56;
+			if (remaining < 8)
+				length = remaining;
+
+			uint64_t data = m_space->read_qword(m_dma_gio64_addr);
+			for (uint32_t i = 0; i < length; i++)
+			{
+				m_space->write_byte(addr, (uint8_t)(data >> shift));
+				addr++;
+				shift -= 8;
+			}
+
+			m_dma_mem_addr += length;
+			m_dma_count -= length;
 		}
 	}
 	else
-	{	// Host to graphics
+	{   // Host to graphics
 		const uint32_t remaining = m_dma_count & 0x0000ffff;
 		uint32_t length = 8;
 		uint64_t shift = 56;
@@ -251,14 +263,14 @@ void sgi_mc_device::dma_tick()
 	}
 
 	if ((m_dma_count & 0x0000ffff) == 0)
-	{	// If remaining byte count is 0, deduct zoom count
+	{   // If remaining byte count is 0, deduct zoom count
 		m_dma_count -= 0x00010000;
 		if (m_dma_count == 0)
-		{	// If remaining zoom count is also 0, move to next line
+		{   // If remaining zoom count is also 0, move to next line
 			m_dma_mem_addr += m_dma_stride & 0x0000ffff;
 			m_dma_size -= 0x00010000;
 			if ((m_dma_size & 0xffff0000) == 0)
-			{	// If no remaining lines, DMA is done.
+			{   // If no remaining lines, DMA is done.
 				m_dma_timer->adjust(attotime::never);
 				m_dma_run |= (1 << 3);
 				m_dma_run &= ~(1 << 6);
@@ -273,7 +285,7 @@ void sgi_mc_device::dma_tick()
 			}
 		}
 		else
-		{	// If remaining zoom count is non-zero, reload byte count and return source address to the beginning of the line.
+		{   // If remaining zoom count is non-zero, reload byte count and return source address to the beginning of the line.
 			m_dma_count |= m_dma_size & 0x0000ffff;
 			m_dma_mem_addr -= m_dma_size & 0x0000ffff;
 		}
@@ -705,6 +717,9 @@ void sgi_mc_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 	else if (id == TIMER_DMA)
 	{
-		dma_tick();
+		while (m_dma_run & (1 << 6))
+		{
+			dma_tick();
+		}
 	}
 }

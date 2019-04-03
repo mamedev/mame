@@ -48,7 +48,7 @@ void portfolio_ram_card_device::device_start()
 //  nrdi_r - read
 //-------------------------------------------------
 
-uint8_t portfolio_ram_card_device::nrdi_r(address_space &space, offs_t offset)
+uint8_t portfolio_ram_card_device::nrdi_r(offs_t offset)
 {
 	return m_nvram[offset];
 }
@@ -58,7 +58,7 @@ uint8_t portfolio_ram_card_device::nrdi_r(address_space &space, offs_t offset)
 //  nwri_w - write
 //-------------------------------------------------
 
-void portfolio_ram_card_device::nwri_w(address_space &space, offs_t offset, uint8_t data)
+void portfolio_ram_card_device::nwri_w(offs_t offset, uint8_t data)
 {
 	m_nvram[offset] = data;
 }

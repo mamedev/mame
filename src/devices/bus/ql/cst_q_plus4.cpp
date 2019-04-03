@@ -106,17 +106,17 @@ void cst_q_plus4_device::device_start()
 //  read -
 //-------------------------------------------------
 
-uint8_t cst_q_plus4_device::read(address_space &space, offs_t offset, uint8_t data)
+uint8_t cst_q_plus4_device::read(offs_t offset, uint8_t data)
 {
 	if (offset >= 0xc000 && offset < 0xc200)
 	{
 		data = m_rom->base()[offset & 0x1fff];
 	}
 
-	data = m_exp1->read(space, offset, data);
-	data = m_exp2->read(space, offset, data);
-	data = m_exp3->read(space, offset, data);
-	data = m_exp4->read(space, offset, data);
+	data = m_exp1->read(offset, data);
+	data = m_exp2->read(offset, data);
+	data = m_exp3->read(offset, data);
+	data = m_exp4->read(offset, data);
 
 	return data;
 }
@@ -126,10 +126,10 @@ uint8_t cst_q_plus4_device::read(address_space &space, offs_t offset, uint8_t da
 //  write -
 //-------------------------------------------------
 
-void cst_q_plus4_device::write(address_space &space, offs_t offset, uint8_t data)
+void cst_q_plus4_device::write(offs_t offset, uint8_t data)
 {
-	m_exp1->write(space, offset, data);
-	m_exp2->write(space, offset, data);
-	m_exp3->write(space, offset, data);
-	m_exp4->write(space, offset, data);
+	m_exp1->write(offset, data);
+	m_exp2->write(offset, data);
+	m_exp3->write(offset, data);
+	m_exp4->write(offset, data);
 }

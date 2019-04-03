@@ -370,25 +370,25 @@ INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
 }
 
 
-MACHINE_CONFIG_START(shougi_state::shougi)
-
+void shougi_state::shougi(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shougi_state, vblank_nmi)
+	Z80(config, m_maincpu, XTAL(10'000'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &shougi_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(shougi_state::vblank_nmi));
 
-	MCFG_DEVICE_ADD("sub", Z80, XTAL(10'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
-	MCFG_DEVICE_IO_MAP(readport_sub)
+	Z80(config, m_subcpu, XTAL(10'000'000)/4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &shougi_state::sub_map);
+	m_subcpu->set_addrmap(AS_IO, &shougi_state::readport_sub);
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(10'000'000)/4/8)
+	ALPHA_8201(config, m_alpha_8201, XTAL(10'000'000)/4/8);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set_nop(); // 0: sharedram = sub, 1: sharedram = main (TODO!)
 	mainlatch.q_out_cb<1>().set(FUNC(shougi_state::nmi_enable_w));
 	mainlatch.q_out_cb<2>().set_nop(); // ?
-	mainlatch.q_out_cb<3>().set("alpha_8201", FUNC(alpha_8201_device::mcu_start_w)); // start/halt ALPHA-8201
-	mainlatch.q_out_cb<4>().set("alpha_8201", FUNC(alpha_8201_device::bus_dir_w)).invert(); // ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
+	mainlatch.q_out_cb<3>().set(m_alpha_8201, FUNC(alpha_8201_device::mcu_start_w)); // start/halt ALPHA-8201
+	mainlatch.q_out_cb<4>().set(m_alpha_8201, FUNC(alpha_8201_device::bus_dir_w)).invert(); // ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
 	mainlatch.q_out_cb<7>().set_nop(); // nothing? connected to +5v via resistor
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
@@ -396,13 +396,13 @@ MACHINE_CONFIG_START(shougi_state::shougi)
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 0x10); // assuming it's the same as champbas
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 255)
-	MCFG_SCREEN_UPDATE_DRIVER(shougi_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 255, 0, 255);
+	screen.set_screen_update(FUNC(shougi_state::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(shougi_state::shougi_palette), 32);
 
@@ -410,7 +410,7 @@ MACHINE_CONFIG_START(shougi_state::shougi)
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, "aysnd", XTAL(10'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.30);
-MACHINE_CONFIG_END
+}
 
 
 

@@ -140,17 +140,17 @@ void learnwin_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(learnwin_state::learnwin)
-
+void learnwin_state::learnwin(machine_config &config)
+{
 	/* video hardware */
-//  MCFG_SCREEN_ADD("screen", LCD)
-//    MCFG_SCREEN_REFRESH_RATE(60)
-//    MCFG_SCREEN_SIZE(48, 32)
-//    MCFG_SCREEN_VISIBLE_AREA(0,47,0,31)
+//  screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+//  screen.set_refresh_hz(60);
+//  screen.set_size(48, 32);
+//  screen.set_visarea(0, 47, 0, 31);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

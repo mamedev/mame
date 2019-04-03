@@ -162,7 +162,7 @@ void c64_multiscreen_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_multiscreen_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_multiscreen_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{
@@ -199,7 +199,7 @@ uint8_t c64_multiscreen_cartridge_device::c64_cd_r(address_space &space, offs_t 
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_multiscreen_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_multiscreen_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (offset >= 0x8000 && offset < 0xa000)
 	{

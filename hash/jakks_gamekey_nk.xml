@@ -4,7 +4,7 @@
 
 	<!-- This list is for the 'NK' coded Game Keys, for Nicktoons and related systems -->
 
-	<software name="dora" supported="no">
+	<software name="dora">
 		<description>Soccer Shootout &amp; Juego De Futbol De Dora &amp; Dora's Star Mountain Adventure</description>
 		<year>2005</year>
 		<publisher>JAKKS Pacific / Handheld Games</publisher>
@@ -14,6 +14,30 @@
 				<rom size="0x200000" offset="0x200000" loadflag="reload" />
 				<rom size="0x200000" offset="0x400000" loadflag="reload" />
 				<rom size="0x200000" offset="0x600000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="volbird">
+		<description>Nicktoons Vollyball &amp; Birdie Putt</description>
+		<year>2005</year>
+		<publisher>JAKKS Pacific / Handheld Games</publisher>
+		<part name="cart" interface="jakks_gamekey">
+			<feature name="slot" value="rom_24lc04"/>
+			<dataarea name="rom" size="0x800000">
+				<rom name="nicktoonsgkvolleyballbirdie.bin" size="0x200000" crc="7eccb308" sha1="bf7f7ff752ea2652ad099d26e53dade4e4f9e9a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popsnow">
+		<description>Spongebob Sponge Pop &amp; Snowball Showdown (15 AUGUST 2005 D)</description>
+		<year>2005</year>
+		<publisher>JAKKS Pacific / HotGen Ltd</publisher>
+		<part name="cart" interface="jakks_gamekey">
+			<feature name="slot" value="rom_24lc04"/>
+			<dataarea name="rom" size="0x800000">
+				<rom name="spongebobgkpopsnowball.bin" size="0x200000" crc="8194baeb" sha1="cac7c6989696dc52088013d198314993d72f3c74" offset="0" />
 			</dataarea>
 		</part>
 	</software>

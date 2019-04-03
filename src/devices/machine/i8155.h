@@ -55,15 +55,15 @@ public:
 	auto out_pc_callback() { return m_out_pc_cb.bind(); }
 	auto out_to_callback() { return m_out_to_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( memory_r );
-	DECLARE_WRITE8_MEMBER( memory_w );
+	uint8_t memory_r(offs_t offset);
+	void memory_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( ale_w );
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	void ale_w(offs_t offset, uint8_t data);
+	uint8_t data_r();
+	void data_w(uint8_t data);
 
 protected:
 	i8155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

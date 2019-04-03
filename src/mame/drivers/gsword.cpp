@@ -318,12 +318,12 @@ void gsword_state_base::machine_reset()
 
 WRITE8_MEMBER(gsword_state_base::ay8910_control_port_0_w)
 {
-	m_ay0->address_w(space,offset,data);
+	m_ay0->address_w(data);
 	m_fake8910_0 = data;
 }
 WRITE8_MEMBER(gsword_state_base::ay8910_control_port_1_w)
 {
-	m_ay1->address_w(space,offset,data);
+	m_ay1->address_w(data);
 	m_fake8910_1 = data;
 }
 
@@ -395,7 +395,7 @@ WRITE8_MEMBER(gsword_state::nmi_set_w)
 
 WRITE8_MEMBER(gsword_state::sound_command_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 

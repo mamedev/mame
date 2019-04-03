@@ -951,7 +951,7 @@ void polepos_state::polepos(machine_config &config)
 WRITE8_MEMBER(polepos_state::bootleg_soundlatch_w)
 {
 	if (m_soundlatch.found()) // topracern also uses this; no idea what it should do there
-		m_soundlatch->write(space, 0, data | 0xfc);
+		m_soundlatch->write(data | 0xfc);
 }
 
 void polepos_state::topracern_io(address_map &map)
@@ -1053,7 +1053,6 @@ void polepos_state::topracern(machine_config &config)
 	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.12);
 
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }

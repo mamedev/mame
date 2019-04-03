@@ -17,7 +17,7 @@ public:
 	// construction/destruction
 	nes_jf11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -35,7 +35,7 @@ public:
 	// construction/destruction
 	nes_jf13_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -58,7 +58,7 @@ public:
 	// construction/destruction
 	nes_jf16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -76,7 +76,7 @@ public:
 	// construction/destruction
 	nes_jf17_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -98,7 +98,7 @@ public:
 	// construction/destruction
 	nes_jf17_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -116,7 +116,7 @@ public:
 	// construction/destruction
 	nes_jf19_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -136,7 +136,7 @@ public:
 	// construction/destruction
 	nes_jf19_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -154,8 +154,8 @@ public:
 	// construction/destruction
 	nes_ss88006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(ss88006_write);
-	virtual DECLARE_WRITE8_MEMBER(write_h) override { ss88006_write(space, offset, data, mem_mask); }
+	void ss88006_write(offs_t offset, uint8_t data);
+	virtual void write_h(offs_t offset, uint8_t data) override { ss88006_write(offset, data); }
 
 	virtual void pcb_reset() override;
 
@@ -188,7 +188,7 @@ protected:
 	// construction/destruction
 	nes_ss88006_adpcm_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void ss88006_adpcm_write(address_space &space, offs_t offset, uint8_t data, samples_device *dev);
+	void ss88006_adpcm_write(offs_t offset, uint8_t data, samples_device &dev);
 };
 
 
@@ -204,7 +204,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	virtual DECLARE_WRITE8_MEMBER(write_h) override { ss88006_adpcm_write(space, offset, data, m_samples); }
+	virtual void write_h(offs_t offset, uint8_t data) override { ss88006_adpcm_write(offset, data, *m_samples); }
 
 	required_device<samples_device> m_samples;
 };
@@ -222,7 +222,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	virtual DECLARE_WRITE8_MEMBER(write_h) override { ss88006_adpcm_write(space, offset, data, m_samples); }
+	virtual void write_h(offs_t offset, uint8_t data) override { ss88006_adpcm_write(offset, data, *m_samples); }
 
 	required_device<samples_device> m_samples;
 };
@@ -240,7 +240,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	virtual DECLARE_WRITE8_MEMBER(write_h) override { ss88006_adpcm_write(space, offset, data, m_samples); }
+	virtual void write_h(offs_t offset, uint8_t data) override { ss88006_adpcm_write(offset, data, *m_samples); }
 
 	required_device<samples_device> m_samples;
 };
@@ -258,7 +258,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	virtual DECLARE_WRITE8_MEMBER(write_h) override { ss88006_adpcm_write(space, offset, data, m_samples); }
+	virtual void write_h(offs_t offset, uint8_t data) override { ss88006_adpcm_write(offset, data, *m_samples); }
 
 	required_device<samples_device> m_samples;
 };

@@ -48,7 +48,7 @@ READ8_MEMBER( eti660_state::pia_r )
 {
 	uint8_t pia_offset = m_maincpu->get_memory_address() & 0x03;
 
-	return m_pia->read(space, pia_offset);
+	return m_pia->read(pia_offset);
 }
 
 WRITE8_MEMBER( eti660_state::pia_w )
@@ -66,7 +66,7 @@ WRITE8_MEMBER( eti660_state::pia_w )
 			data = 0x24;
 	}
 
-	m_pia->write(space, pia_offset, data);
+	m_pia->write(pia_offset, data);
 }
 
 WRITE8_MEMBER( eti660_state::colorram_w )

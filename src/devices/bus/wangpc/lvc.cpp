@@ -113,7 +113,7 @@ WRITE_LINE_MEMBER( wangpc_lvc_device::vsync_w )
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( wangpc_lvc )
+//  machine_config( wangpc_lvc )
 //-------------------------------------------------
 
 void wangpc_lvc_device::device_add_mconfig(machine_config &config)
@@ -203,7 +203,7 @@ void wangpc_lvc_device::device_reset()
 //  wangpcbus_mrdc_r - memory read
 //-------------------------------------------------
 
-uint16_t wangpc_lvc_device::wangpcbus_mrdc_r(address_space &space, offs_t offset, uint16_t mem_mask)
+uint16_t wangpc_lvc_device::wangpcbus_mrdc_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
@@ -222,7 +222,7 @@ uint16_t wangpc_lvc_device::wangpcbus_mrdc_r(address_space &space, offs_t offset
 //  wangpcbus_amwc_w - memory write
 //-------------------------------------------------
 
-void wangpc_lvc_device::wangpcbus_amwc_w(address_space &space, offs_t offset, uint16_t mem_mask, uint16_t data)
+void wangpc_lvc_device::wangpcbus_amwc_w(offs_t offset, uint16_t mem_mask, uint16_t data)
 {
 	if (OPTION_VRAM && (offset >= 0xe0000/2) && (offset < 0xf0000/2))
 	{
@@ -237,7 +237,7 @@ void wangpc_lvc_device::wangpcbus_amwc_w(address_space &space, offs_t offset, ui
 //  wangpcbus_iorc_r - I/O read
 //-------------------------------------------------
 
-uint16_t wangpc_lvc_device::wangpcbus_iorc_r(address_space &space, offs_t offset, uint16_t mem_mask)
+uint16_t wangpc_lvc_device::wangpcbus_iorc_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
@@ -246,7 +246,7 @@ uint16_t wangpc_lvc_device::wangpcbus_iorc_r(address_space &space, offs_t offset
 		switch (offset & 0x7f)
 		{
 		case 0x02/2:
-			data = 0xff00 | m_crtc->register_r(space, 0);
+			data = 0xff00 | m_crtc->register_r();
 			break;
 
 		case 0x30/2:
@@ -270,7 +270,7 @@ uint16_t wangpc_lvc_device::wangpcbus_iorc_r(address_space &space, offs_t offset
 //  wangpcbus_aiowc_w - I/O write
 //-------------------------------------------------
 
-void wangpc_lvc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, uint16_t mem_mask, uint16_t data)
+void wangpc_lvc_device::wangpcbus_aiowc_w(offs_t offset, uint16_t mem_mask, uint16_t data)
 {
 	if (sad(offset))
 	{
@@ -279,14 +279,14 @@ void wangpc_lvc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, u
 		case 0x00/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				m_crtc->address_w(space, 0, data & 0xff);
+				m_crtc->address_w(data & 0xff);
 			}
 			break;
 
 		case 0x02/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				m_crtc->register_w(space, 0, data & 0xff);
+				m_crtc->register_w(data & 0xff);
 			}
 			break;
 

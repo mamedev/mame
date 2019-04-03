@@ -306,20 +306,21 @@ void mwarr_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(mwarr_state::mwarr)
+void mwarr_state::mwarr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(mwarr_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mwarr_state,  irq4_line_hold)
+	M68000(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mwarr_state::mwarr_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mwarr_state::irq4_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(54)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8+1, 48*8-1-8-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mwarr_state, screen_update_mwarr)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(54);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8+1, 48*8-1-8-1, 0, 30*8-1);
+	screen.set_screen_update(FUNC(mwarr_state::screen_update_mwarr));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mwarr);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
@@ -340,13 +341,12 @@ MACHINE_CONFIG_START(mwarr_state::mwarr)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, SOUND_CLOCK/48 , okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	OKIM6295(config, "oki1", SOUND_CLOCK/48 , okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, SOUND_CLOCK/48 , okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
-MACHINE_CONFIG_END
+	okim6295_device &oki2(OKIM6295(config, "oki2", SOUND_CLOCK/48 , okim6295_device::PIN7_HIGH));
+	oki2.add_route(ALL_OUTPUTS, "mono", 1.0);
+	oki2.set_addrmap(0, &mwarr_state::oki2_map);
+}
 
 
 /*************************************

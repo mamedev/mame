@@ -926,68 +926,66 @@ void astrof_state::base(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(astrof_state::astrof)
+void astrof_state::astrof(machine_config &config)
+{
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(astrof_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrof_state::astrof_map);
 
 	MCFG_MACHINE_START_OVERRIDE(astrof_state,astrof)
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(astrof_state, screen_update_astrof)
+	m_screen->set_screen_update(FUNC(astrof_state::screen_update_astrof));
 
 	/* audio hardware */
 	astrof_audio(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(astrof_state::abattle)
+void astrof_state::abattle(machine_config &config)
+{
 	astrof(config);
 
 	/* basic machine hardware */
 
 	MCFG_MACHINE_START_OVERRIDE(astrof_state,abattle)
 	MCFG_MACHINE_RESET_OVERRIDE(astrof_state,abattle)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(astrof_state::spfghmk2)
+void astrof_state::spfghmk2(machine_config &config)
+{
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(spfghmk2_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrof_state::spfghmk2_map);
 
 	MCFG_MACHINE_START_OVERRIDE(astrof_state,spfghmk2)
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(astrof_state, screen_update_astrof)
+	m_screen->set_screen_update(FUNC(astrof_state::screen_update_astrof));
 
 	/* audio hardware */
 	spfghmk2_audio(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(astrof_state::tomahawk)
+void astrof_state::tomahawk(machine_config &config)
+{
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tomahawk_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrof_state::tomahawk_map);
 
 	MCFG_MACHINE_START_OVERRIDE(astrof_state,tomahawk)
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(astrof_state, screen_update_tomahawk)
+	m_screen->set_screen_update(FUNC(astrof_state::screen_update_tomahawk));
 
 	/* audio hardware */
 	tomahawk_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 

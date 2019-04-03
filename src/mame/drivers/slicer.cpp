@@ -98,10 +98,11 @@ static void slicer_floppies(device_slot_interface &device)
 	device.option_add("8dsdd", FLOPPY_8_DSDD);
 }
 
-MACHINE_CONFIG_START(slicer_state::slicer)
-	MCFG_DEVICE_ADD("maincpu", I80186, 16_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(slicer_map)
-	MCFG_DEVICE_IO_MAP(slicer_io)
+void slicer_state::slicer(machine_config &config)
+{
+	i80186_cpu_device &maincpu(I80186(config, "maincpu", 16_MHz_XTAL / 2));
+	maincpu.set_addrmap(AS_PROGRAM, &slicer_state::slicer_map);
+	maincpu.set_addrmap(AS_IO, &slicer_state::slicer_io);
 
 	scn2681_device &duart(SCN2681(config, "duart", 3.6864_MHz_XTAL));
 	duart.irq_cb().set("maincpu", FUNC(i80186_cpu_device::int0_w));
@@ -144,7 +145,7 @@ MACHINE_CONFIG_START(slicer_state::slicer)
 	m_sasi->set_output_latch(sasi_data_out);
 	INPUT_BUFFER(config, "sasi_data_in");
 	INPUT_BUFFER(config, "sasi_ctrl_in");
-MACHINE_CONFIG_END
+}
 
 ROM_START( slicer )
 	ROM_REGION(0x8001, "bios", 0)

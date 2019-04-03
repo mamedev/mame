@@ -154,13 +154,14 @@ void elekmono_state::elektron_map(address_map &map)
 	map(0x10000000, 0x107fffff).rom().region("maincpu", 0);
 }
 
-MACHINE_CONFIG_START(elekmono_state::elektron)
-	MCFG_DEVICE_ADD("maincpu", MCF5206E, XTAL(25'447'000))
-	MCFG_DEVICE_PROGRAM_MAP(elektron_map)
+void elekmono_state::elektron(machine_config &config)
+{
+	MCF5206E(config, m_maincpu, XTAL(25'447'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &elekmono_state::elektron_map);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( elektron )
 INPUT_PORTS_END

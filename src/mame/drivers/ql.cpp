@@ -254,15 +254,15 @@ READ8_MEMBER( ql_state::read )
 	}
 	if (m_qimi_enabled)
 	{
-		data = m_qimi->read(space, offset, data);
+		data = m_qimi->read(offset, data);
 	}
 
 	m_cart->romoeh_w(cart_romoeh);
-	data = m_cart->read(space, offset & 0x7fff, data);
+	data = m_cart->read(offset & 0x7fff, data);
 	m_cart->romoeh_w(0);
 
 	m_exp->romoeh_w(exp_romoeh);
-	data = m_exp->read(space, offset, data);
+	data = m_exp->read(offset, data);
 	m_exp->romoeh_w(0);
 
 	return data;
@@ -309,14 +309,14 @@ WRITE8_MEMBER( ql_state::write )
 	}
 	if (m_qimi_enabled)
 	{
-		m_qimi->write(space, offset, data);
+		m_qimi->write(offset, data);
 	}
 
 	m_cart->romoeh_w(0);
-	m_cart->write(space, offset & 0x7fff, data);
+	m_cart->write(offset & 0x7fff, data);
 
 	m_exp->romoeh_w(0);
-	m_exp->write(space, offset, data);
+	m_exp->write(offset, data);
 }
 
 
@@ -895,13 +895,14 @@ void ql_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ql )
+//  machine_config( ql )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ql_state::ql)
+void ql_state::ql(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(m_maincpu, M68008, X1/2)
-	MCFG_DEVICE_PROGRAM_MAP(ql_mem)
+	M68008(config, m_maincpu, X1/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ql_state::ql_mem);
 
 	I8749(config, m_ipc, X4);
 	m_ipc->set_addrmap(AS_IO, &ql_state::ipc_io);
@@ -912,12 +913,12 @@ MACHINE_CONFIG_START(ql_state::ql)
 	m_ipc->bus_in_cb().set(FUNC(ql_state::ipc_bus_r));
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50.08)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_UPDATE_DEVICE(ZX8301_TAG, zx8301_device, screen_update)
-	MCFG_SCREEN_SIZE(960, 312)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50.08);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_screen_update(ZX8301_TAG, FUNC(zx8301_device::screen_update));
+	screen.set_size(960, 312);
+	screen.set_visarea(0, 512-1, 0, 256-1);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -971,25 +972,26 @@ MACHINE_CONFIG_START(ql_state::ql)
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("128K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ql_ntsc )
+//  machine_config( ql_ntsc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ql_state::ql_ntsc)
+void ql_state::ql_ntsc(machine_config &config)
+{
 	ql(config);
 	// video hardware
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(960, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-MACHINE_CONFIG_END
+	screen_device &screen(*subdevice<screen_device>(SCREEN_TAG));
+	screen.set_refresh_hz(60);
+	screen.set_size(960, 262);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( opd )
+//  machine_config( opd )
 //-------------------------------------------------
 
 void ql_state::opd(machine_config &config)
@@ -1002,7 +1004,7 @@ void ql_state::opd(machine_config &config)
 
 /*
 //-------------------------------------------------
-//  MACHINE_CONFIG( megaopd )
+//  machine_config( megaopd )
 //-------------------------------------------------
 
 void ql_state::megaopd(machine_config &config)
