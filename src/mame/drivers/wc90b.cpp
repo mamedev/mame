@@ -202,7 +202,7 @@ void eurogael_state::map1(address_map &map)
 	map(0x8000, 0x9fff).ram(); /* Main RAM */
 	map(0xa000, 0xafff).ram().w(FUNC(wc90b_state::fgvideoram_w)).share("fgvideoram");
 	map(0xc000, 0xcfff).ram().w(FUNC(wc90b_state::bgvideoram_w)).share("bgvideoram");
-	map(0xd000, 0xdfff).ram().share("bgscroll");; // there are a bunch of read / write accesses in here (is it meant to mirror the bgram? - bg scroll regs are at df00 - df03
+	map(0xd000, 0xdfff).ram().share("bgscroll"); // there are a bunch of read / write accesses in here (is it meant to mirror the bgram? - bg scroll regs are at df00 - df03
 	map(0xe000, 0xefff).ram().w(FUNC(wc90b_state::txvideoram_w)).share("txvideoram");
 	map(0xf000, 0xf7ff).bankr("mainbank");
 	map(0xf800, 0xfbff).ram().share("share1");
