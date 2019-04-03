@@ -97,23 +97,28 @@ void wc90b_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 	{
 		if ( ( ~( m_spriteram[offs+3] >> 7 ) & 1 ) == priority )
 		{
-			int code = ( m_spriteram[offs + 3] & 0x3f ) << 4;
-			int bank = m_spriteram[offs + 0];
+
+			// 0   bbbb bbff   b = tile lower , f = flip bits
+			// 1   yyyy yyyy
+			// 2   xxxx xxxx
+			// 3   PXcc cccc   P = priority X = x high, c = tile upper
+			// 4   pppp ----   palette
+
+			int tilehigh = ( m_spriteram[offs + 3] & 0x3f ) << 6;
+			int tilelow = m_spriteram[offs + 0];
 			int flags = m_spriteram[offs + 4];
 
-			code += ( bank & 0xf0 ) >> 4;
-			code <<= 2;
-			code += ( bank & 0x0f ) >> 2;
+			tilehigh += ( tilelow & 0xfc ) >> 2;
 
 			int sx = m_spriteram[offs + 2];
 			if (!(m_spriteram[offs + 3] & 0x40)) sx -= 0x0100;
 
 			int sy = 240 - m_spriteram[offs + 1];
 
-			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, code,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, tilehigh,
 					flags >> 4, /* color */
-					bank & 1,   /* flipx */
-					bank & 2,   /* flipy */
+					tilelow & 1,   /* flipx */
+					tilelow & 2,   /* flipy */
 					sx,
 					sy,15 );
 		}
@@ -131,7 +136,76 @@ uint32_t wc90b_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	draw_sprites(bitmap,cliprect, 1 );
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	// TODO: if scoring on same Y as GOAL message, ball will be above it. Might be a btanb.
+	// TODO: if scoring on same Y as GOAL message, ball will be above it. Might be a btanb (or needs single pass draw + mix?)
+	draw_sprites(bitmap,cliprect, 0 );
+	return 0;
+}
+
+void eurogael_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+{
+	/* draw all visible sprites of specified priority */
+
+	// entry at start of RAM might not be a sprite
+	for ( int offs = 0x200 - 4 ; offs >= 4 ; offs -= 4 )
+	{
+		//if ( ( ~( m_spriteram[offs+3] >> 7 ) & 1 ) == priority )
+		{
+			// this is wrong
+
+			// 0      bbbb bbbb   b = tile lower
+			// 1      yyyy yyyy
+			// 2      xxxx xxxx
+			// 3      ffX- cccc   f = flip bits, X = X high?, c = tile upper
+			// 0x200  ---- -ppp   p = palette
+
+			int tilehigh = ( m_spriteram[offs + 3] & 0x0f ) << 8;
+			int attr = ( m_spriteram[offs + 3] & 0xf0 ) >> 4;
+
+			int tilelow = m_spriteram[offs + 0];
+			int flags = m_spriteram[offs + 0x200];
+
+			tilehigh += tilelow;
+
+			int sx = m_spriteram[offs + 2];
+			if (!(attr & 0x02)) sx -= 0x0100;
+
+			int sy = 240 - m_spriteram[offs + 1];
+
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, tilehigh,
+					(flags & 0x7) | 8, /* color */
+					attr & 4,   /* flipx */
+					attr & 8,   /* flipy */
+					sx,
+					sy,15 );
+		}
+	}
+}
+
+uint32_t eurogael_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// the code to write / clear tilemaps for fb and tx layers has been specifically modified to avoid writing to the last 4 bytes
+	// and the game instead writes scroll values there instead, there is no code to copy from there, so it looks like these are the scroll regs
+	
+	// this setup scrolls the background away on the high score table tho, and bg after inserting a coin won't scroll
+	// is it correct or is the bg still using something from the old scroll regs?
+	int fg_scrollx = ((m_fgvideoram[0xffc]) | (m_fgvideoram[0xffd]<<8)) + 33;
+	int fg_scrolly = ((m_fgvideoram[0xffe]) | (m_fgvideoram[0xfff]<<8)) + 1;
+	int bg_scrollx = fg_scrollx; // assume same scroll as fg? (maybe not, see note above)
+	int bg_scrolly = fg_scrolly;
+	int tx_scrollx = ((m_txvideoram[0xffc]) | (m_txvideoram[0xffd]<<8)) + 33;
+	int tx_scrolly = ((m_txvideoram[0xffe]) | (m_txvideoram[0xfff]<<8)) + 1;
+
+	m_bg_tilemap->set_scrollx(0, bg_scrollx);
+	m_bg_tilemap->set_scrolly(0, bg_scrolly);
+	m_fg_tilemap->set_scrollx(0, fg_scrollx);
+	m_fg_tilemap->set_scrolly(0, fg_scrolly);
+	m_tx_tilemap->set_scrollx(0, tx_scrollx);
+	m_tx_tilemap->set_scrolly(0, tx_scrolly);
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	draw_sprites(bitmap,cliprect, 1 );
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect, 0 );
 	return 0;
 }
