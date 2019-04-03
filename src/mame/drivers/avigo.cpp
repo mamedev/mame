@@ -751,9 +751,9 @@ void avigo_state::nvram_init(nvram_device &nvram, void *base, size_t size)
 
 MACHINE_CONFIG_START(avigo_state::avigo)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(avigo_mem)
-	MCFG_DEVICE_IO_MAP(avigo_io)
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &avigo_state::avigo_mem);
+	m_maincpu->set_addrmap(AS_IO, &avigo_state::avigo_io);
 	config.m_minimum_quantum = attotime::from_hz(60);
 
 	NS16550(config, m_uart, XTAL(1'843'200));
@@ -770,13 +770,13 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	m_serport->cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(avigo_state, screen_update)
-	MCFG_SCREEN_SIZE(AVIGO_SCREEN_WIDTH, AVIGO_SCREEN_HEIGHT + AVIGO_PANEL_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0, AVIGO_SCREEN_WIDTH-1, 0, AVIGO_SCREEN_HEIGHT + AVIGO_PANEL_HEIGHT -1)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(avigo_state::screen_update));
+	screen.set_size(AVIGO_SCREEN_WIDTH, AVIGO_SCREEN_HEIGHT + AVIGO_PANEL_HEIGHT);
+	screen.set_visarea_full();
+	screen.set_palette(m_palette);
 
 	config.set_default_layout(layout_avigo);
 

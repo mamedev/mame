@@ -127,9 +127,10 @@ private:
 
 	emu_timer *m_timer_a, *m_timer_b;
 	int m_clock;
+	int m_rate;
 
 	sound_stream * m_stream;
-	std::unique_ptr<int32_t[]> m_mix_buffer;
+	std::vector<int32_t> m_mix_buffer;
 	devcb_write_line m_irq_handler;
 	uint8_t m_last_fm_data;
 

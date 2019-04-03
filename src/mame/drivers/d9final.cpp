@@ -302,37 +302,36 @@ void d9final_state::machine_start()
 	membank("bank1")->set_entry(0);
 }
 
-MACHINE_CONFIG_START(d9final_state::d9final)
+void d9final_state::d9final(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 24000000/4)/* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(d9final_map)
-	MCFG_DEVICE_IO_MAP(d9final_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", d9final_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 24000000/4); /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &d9final_state::d9final_map);
+	m_maincpu->set_addrmap(AS_IO, &d9final_state::d9final_io);
+	m_maincpu->set_vblank_int("screen", FUNC(d9final_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // Sharp LH5116D-10 + battery
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(d9final_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(d9final_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_d9final);
 	PALETTE(config, "palette", palette_device::BLACK).set_format(palette_device::xBRG_444, 0x400);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	//MCFG_DEVICE_ADD("essnd", ES8712, 24000000/3) // clock unknown
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	//ES8712(config, "essnd", 24000000/3).add_route(ALL_OUTPUTS, "mono", 1.0); // clock unknown
 
 	RTC62421(config, "rtc", XTAL(32'768)); // internal oscillator
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( d9final )

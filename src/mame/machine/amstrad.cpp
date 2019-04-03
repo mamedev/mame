@@ -1939,10 +1939,10 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 			switch (b8b0)
 			{
 			case 0x02:
-				data = m_fdc->msr_r(space, 0);
+				data = m_fdc->msr_r();
 				break;
 			case 0x03:
-				data = m_fdc->fifo_r(space, 0);
+				data = m_fdc->fifo_r();
 				break;
 			default:
 				break;
@@ -2158,7 +2158,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 					break;
 
 				case 0x03: /* Write Data register of FDC */
-					m_fdc->fifo_w(space, 0,data);
+					m_fdc->fifo_w(data);
 					break;
 
 				default:

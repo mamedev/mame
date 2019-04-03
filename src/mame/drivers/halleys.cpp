@@ -1603,7 +1603,7 @@ WRITE8_MEMBER(halleys_state::sndnmi_msk_w)
 WRITE8_MEMBER(halleys_state::soundcommand_w)
 {
 	m_io_ram[0x8a] = data;
-	m_soundlatch->write(space,offset,data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 

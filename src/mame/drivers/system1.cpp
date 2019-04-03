@@ -529,7 +529,7 @@ READ8_MEMBER(system1_state::sound_data_r)
 	{
 		m_ppi8255->pc6_w(0);
 		m_ppi8255->pc6_w(1);
-		return m_soundlatch->read(space, offset);
+		return m_soundlatch->read();
 	}
 
 	/* if we have a Z80 PIO, get the data from the port and toggle the strobe */
@@ -548,7 +548,7 @@ READ8_MEMBER(system1_state::sound_data_r)
 WRITE8_MEMBER(system1_state::soundport_w)
 {
 	/* boost interleave when communicating with the sound CPU */
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
@@ -5631,7 +5631,7 @@ GAME( 1985, shtngmste,  shtngmst, sys2m,             shtngmst,  system1_state, i
 GAME( 1986, gardiab,    gardia,   sys2_317_0007,     gardia,    system1_state, init_bank44,       ROT270, "bootleg", "Gardia (317-0007?, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gardiaj,    gardia,   sys2_317_0006,     gardia,    system1_state, init_bank44,       ROT270, "Coreland / Sega", "Gardia (Japan, 317-0006)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboysys2,   wboy,     sys2_315_5177,     wboysys2,  system1_state, init_bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 1, 315-5177)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboysys2a,  wboy,     sys2_315_5176,     wboysys2,  system1_state, init_bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 2, 315-5176)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboysys2a,  wboy,     sys2_315_5176,     wboysys2,  system1_state, init_bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 2, 315-5176)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, tokisens,   0,        sys2xb,            tokisens,  system1_state, init_tokisens,     ROT90,  "Sega", "Toki no Senshi - Chrono Soldier (MC-8123, 317-0040)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, tokisensa,  tokisens, sys2,              tokisensa, system1_state, init_bank0c,       ROT90,  "Sega", "Toki no Senshi - Chrono Soldier (prototype?)", MACHINE_SUPPORTS_SAVE ) // or bootleg?
 GAME( 1987, wbml,       0,        sys2xb,            wbml,      system1_state, init_wbml,         ROT0,   "Sega / Westone", "Wonder Boy in Monster Land (Japan New Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )

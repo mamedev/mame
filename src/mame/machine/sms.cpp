@@ -1260,16 +1260,6 @@ VIDEO_RESET_MEMBER(sms_state,sms1)
 }
 
 
-READ32_MEMBER(sms_state::sms_pixel_color)
-{
-	bitmap_rgb32 &vdp_bitmap = m_vdp->get_bitmap();
-	int beam_x = m_main_scr->hpos();
-	int beam_y = m_main_scr->vpos();
-
-	return vdp_bitmap.pix32(beam_y, beam_x);
-}
-
-
 WRITE_LINE_MEMBER(sms_state::screen_vblank_sms1)
 {
 	// on falling edge

@@ -583,7 +583,7 @@ void topspeed_state::topspeed(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &topspeed_state::z80_io);
 
 	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(16'000'000) / 4));
-	ctc.intr_callback().set(FUNC(topspeed_state::z80ctc_to0));
+	ctc.zc_callback<0>().set(FUNC(topspeed_state::z80ctc_to0));
 
 	PC080SN(config, m_pc080sn[0], 0);
 	m_pc080sn[0]->set_gfx_region(1);

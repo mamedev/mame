@@ -185,7 +185,7 @@ WRITE8_MEMBER( ghosteo_state::qs1000_p3_w )
 	membank("qs1000:bank")->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
-		m_soundlatch->acknowledge_w(space, 0, !BIT(data, 5));
+		m_soundlatch->acknowledge_w();
 }
 
 

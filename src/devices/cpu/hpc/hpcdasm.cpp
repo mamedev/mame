@@ -16,6 +16,10 @@
 #include "util/strformat.h"
 #include <ctype.h>
 
+using osd::u32;
+using util::BIT;
+using offs_t = u32;
+
 const char *const hpc16083_disassembler::s_regs[128] =
 {
 	"psw", nullptr, "SP", "PC", "A", "K", "B", "X",

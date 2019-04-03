@@ -92,16 +92,16 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 			if((ch >= 4) && (m_channel[ch].m_noise_control & 0x80))
 			{
 				/* Noise mode */
-				uint32_t step = m_noise_freq_tab[(m_channel[ch].m_noise_control & 0x1F) ^ 0x1F];
+				uint32_t step = (m_channel[ch].m_noise_control & 0x1F) ^ 0x1F;
 				for (int i = 0; i < samples; i += 1)
 				{
 					static int data = 0;
-					m_channel[ch].m_noise_counter += step;
-					if(m_channel[ch].m_noise_counter >= 0x800)
+					if(m_channel[ch].m_noise_counter <= 0)
 					{
+						m_channel[ch].m_noise_counter = step << 2;
 						data = (machine().rand() & 1) ? 0x1F : 0;
 					}
-					m_channel[ch].m_noise_counter &= 0x7FF;
+					m_channel[ch].m_noise_counter--;
 					outputs[0][i] += (int16_t)(vll * (data - 16));
 					outputs[1][i] += (int16_t)(vlr * (data - 16));
 				}
@@ -118,28 +118,40 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 			}
 			else
 			{
-				if ((m_lfo_control & 0x80) && (ch < 2))
+				if ((m_lfo_control & 3) && (ch < 2))
 				{
 					if (ch == 0) // CH 0 only, CH 1 is muted
 					{
 						/* Waveform mode with LFO */
-						uint32_t step = m_channel[0].m_frequency;
-						uint16_t lfo_step = m_channel[1].m_frequency;
+						uint16_t lfo_step = m_channel[1].m_frequency ? m_channel[1].m_frequency : 0x1000;
 						for (int i = 0; i < samples; i += 1)
 						{
-							int offset, lfooffset;
-							int16_t data, lfo_data;
-							lfooffset = (m_channel[1].m_counter >> 12) & 0x1F;
-							m_channel[1].m_counter += m_wave_freq_tab[(lfo_step * m_lfo_frequency) & 0xfff]; // TODO : multiply? verify this from real hardware.
-							m_channel[1].m_counter &= 0x1FFFF;
-							lfo_data = m_channel[1].m_waveform[lfooffset];
-							if (m_lfo_control & 3)
+							int32_t step = m_channel[0].m_frequency ? m_channel[0].m_frequency : 0x1000;
+							if (m_lfo_control & 0x80) // reset LFO
+							{
+								m_channel[1].m_tick = lfo_step * m_lfo_frequency;
+								m_channel[1].m_counter = 0;
+							}
+							else
+							{
+								int lfooffset = m_channel[1].m_counter;
+								m_channel[1].m_tick--;
+								if (m_channel[1].m_tick <= 0)
+								{
+									m_channel[1].m_tick = lfo_step * m_lfo_frequency; // TODO : multiply? verify this from real hardware.
+									m_channel[1].m_counter = (m_channel[1].m_counter + 1) & 0x1f;
+								}
+								int16_t lfo_data = m_channel[1].m_waveform[lfooffset];
 								step += ((lfo_data - 16) << (((m_lfo_control & 3)-1)<<1)); // verified from patent, TODO : same in real hardware?
-
-							offset = (m_channel[0].m_counter >> 12) & 0x1F;
-							m_channel[0].m_counter += m_wave_freq_tab[step & 0xfff];
-							m_channel[0].m_counter &= 0x1FFFF;
-							data = m_channel[0].m_waveform[offset];
+							}
+							int offset = m_channel[0].m_counter;
+							m_channel[0].m_tick--;
+							if (m_channel[0].m_tick <= 0)
+							{
+								m_channel[0].m_tick = step;
+								m_channel[0].m_counter = (m_channel[0].m_counter + 1) & 0x1f;
+							}
+							int16_t data = m_channel[0].m_waveform[offset];
 							outputs[0][i] += (int16_t)(vll * (data - 16));
 							outputs[1][i] += (int16_t)(vlr * (data - 16));
 						}
@@ -148,15 +160,17 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 				else
 				{
 					/* Waveform mode */
-					uint32_t step = m_wave_freq_tab[m_channel[ch].m_frequency];
+					uint32_t step = m_channel[ch].m_frequency ? m_channel[ch].m_frequency : 0x1000;
 					for (int i = 0; i < samples; i += 1)
 					{
-						int offset;
-						int16_t data;
-						offset = (m_channel[ch].m_counter >> 12) & 0x1F;
-						m_channel[ch].m_counter += step;
-						m_channel[ch].m_counter &= 0x1FFFF;
-						data = m_channel[ch].m_waveform[offset];
+						int offset = m_channel[ch].m_counter;
+						m_channel[ch].m_tick--;
+						if (m_channel[ch].m_tick <= 0)
+						{
+							m_channel[ch].m_tick = step;
+							m_channel[ch].m_counter = (m_channel[ch].m_counter + 1) & 0x1f;
+						}
+						int16_t data = m_channel[ch].m_waveform[offset];
 						outputs[0][i] += (int16_t)(vll * (data - 16));
 						outputs[1][i] += (int16_t)(vlr * (data - 16));
 					}
@@ -204,6 +218,10 @@ WRITE8_MEMBER( c6280_device::c6280_w )
 			if((chan->m_control & 0x40) && ((data & 0x40) == 0))
 			{
 				chan->m_index = 0;
+			}
+			if(((chan->m_control & 0x80) == 0) && (data & 0x80))
+			{
+				chan->m_tick = chan->m_frequency;
 			}
 			chan->m_control = data;
 			break;
@@ -261,38 +279,9 @@ c6280_device::c6280_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-//-------------------------------------------------
-//  calculate_clocks - (re)calculate clock-derived
-//  members
-//-------------------------------------------------
-
-void c6280_device::calculate_clocks()
-{
-	int rate = clock() / 16;
-
-	/* Make waveform frequency table */
-	for (int i = 0; i < 4096; i += 1)
-	{
-		double step = (16 * 4096) / (i + 1);
-		m_wave_freq_tab[(1 + i) & 0xFFF] = (uint32_t)step;
-	}
-
-	/* Make noise frequency table */
-	for (int i = 0; i < 32; i += 1)
-	{
-		double step = (16 * 32) / (i+1);
-		m_noise_freq_tab[i] = (uint32_t)step;
-	}
-
-	if (m_stream != nullptr)
-		m_stream->set_sample_rate(rate);
-	else
-		m_stream = machine().sound().stream_alloc(*this, 0, 2, rate);
-}
-
 void c6280_device::device_clock_changed()
 {
-	calculate_clocks();
+	m_stream->set_sample_rate(clock());
 }
 
 //-------------------------------------------------
@@ -311,7 +300,7 @@ void c6280_device::device_start()
 	m_lfo_control = 0;
 	memset(m_channel, 0, sizeof(channel) * 8);
 
-	calculate_clocks();
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
 
 	/* Make volume table */
 	/* PSG has 48dB volume range spread over 32 steps */
@@ -338,5 +327,6 @@ void c6280_device::device_start()
 		save_item(NAME(m_channel[chan].m_noise_control), chan);
 		save_item(NAME(m_channel[chan].m_noise_counter), chan);
 		save_item(NAME(m_channel[chan].m_counter), chan);
+		save_item(NAME(m_channel[chan].m_tick), chan);
 	}
 }

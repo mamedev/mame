@@ -241,6 +241,7 @@
 	[super restoreConfigurationFromNode:node];
 	int const region = node->get_attribute_int("cpu", [dasmView selectedSubviewIndex]);
 	[dasmView selectSubviewAtIndex:region];
+	[window setTitle:[NSString stringWithFormat:@"Disassembly: %@", [dasmView selectedSubviewName]]];
 	[subviewButton selectItemAtIndex:[subviewButton indexOfItemWithTag:[dasmView selectedSubviewIndex]]];
 	[dasmView restoreConfigurationFromNode:node];
 }

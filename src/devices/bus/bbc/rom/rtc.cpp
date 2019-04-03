@@ -75,7 +75,7 @@ void bbc_pmsrtc_device::device_start()
 //  read
 //-------------------------------------------------
 
-READ8_MEMBER(bbc_stlrtc_device::read)
+uint8_t bbc_stlrtc_device::read(offs_t offset)
 {
 	uint8_t data = get_rom_base()[offset & 0x3fff];
 
@@ -85,7 +85,8 @@ READ8_MEMBER(bbc_stlrtc_device::read)
 		data = m_rtc->read(1);
 		break;
 	case 0x3e40:
-		m_rtc->write(0, data);
+		if (!machine().side_effects_disabled())
+			m_rtc->write(0, data);
 		break;
 	case 0x3e80:
 	case 0x3ec0:
@@ -95,27 +96,28 @@ READ8_MEMBER(bbc_stlrtc_device::read)
 	case 0x3f40:
 	case 0x3f80:
 	case 0x3fc0:
-		m_rtc->write(1, data);
+		if (!machine().side_effects_disabled())
+			m_rtc->write(1, data);
 		break;
 	}
 	return data;
 }
 
-READ8_MEMBER(bbc_pmsrtc_device::read)
+uint8_t bbc_pmsrtc_device::read(offs_t offset)
 {
 	uint8_t data = get_rom_base()[offset & 0x1fff];
 
 	switch (offset)
 	{
 	case 0x00:
-		data |= m_rtc->read_0(space, 0);
+		data |= m_rtc->read_0();
 		break;
 	case 0x01:
-		data |= m_rtc->read_1(space, 0);
+		data |= m_rtc->read_1();
 		break;
 	case 0x04:
 		if (m_rtc->chip_enable())
-			data = m_rtc->read_data(space, 0) & 0x01;
+			data = m_rtc->read_data() & 0x01;
 		break;
 	}
 	return data;

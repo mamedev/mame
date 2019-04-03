@@ -371,7 +371,7 @@ WRITE_LINE_MEMBER( mainboard8_device::dbin_in )
 	m_dbin_level = (line_state)state;
 }
 
-uint8_t mainboard8_device::setoffset(offs_t offset)
+void mainboard8_device::setaddress(offs_t mode, uint16_t offset)
 {
 	LOGMASKED(LOG_ADDRESS, "set %s %04x\n", (m_dbin_level==ASSERT_LINE)? "R" : "W", offset);
 
@@ -410,8 +410,6 @@ uint8_t mainboard8_device::setoffset(offs_t offset)
 	// AMIGO is the one to control the READY line to the CPU
 	// MOFETTA does not contribute to READY
 	m_ready(m_amigo->cpury_out());
-
-	return 0;
 }
 
 WRITE_LINE_MEMBER( mainboard8_device::reset_console )

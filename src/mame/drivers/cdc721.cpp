@@ -268,7 +268,7 @@ uint32_t cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	{
 		uint16_t ma = m_videoram[y * 2] | m_videoram[y * 2 + 1] << 8;
 
-		for (ra = 0; ra < 16; ra++)
+		for (ra = 0; ra < 15; ra++)
 		{
 			uint16_t *p = &bitmap.pix16(sy++);
 
@@ -304,12 +304,13 @@ uint32_t cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-MACHINE_CONFIG_START(cdc721_state::cdc721)
+void cdc721_state::cdc721(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, 6_MHz_XTAL) // Zilog Z8400B (Z80B)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cdc721_state, restart_cb)
+	Z80(config, m_maincpu, 6_MHz_XTAL); // Zilog Z8400B (Z80B)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cdc721_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &cdc721_state::io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(cdc721_state::restart_cb));
 
 	ADDRESS_MAP_BANK(config, "block0").set_map(&cdc721_state::block0_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, "block4").set_map(&cdc721_state::block4_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
@@ -319,13 +320,10 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MCM51L01C45 (256x4) + battery
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(cdc721_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(12.936_MHz_XTAL, 800, 0, 640, 539, 0, 450);
+	screen.set_screen_update(FUNC(cdc721_state::screen_update));
+	screen.set_palette("palette");
 	PALETTE(config, "palette", FUNC(cdc721_state::cdc721_palette), 3);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_cdc721);
 
@@ -398,7 +396,7 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	chb.ri_handler().set("pbuart", FUNC(ins8250_device::ri_w));
 
 	INPUT_MERGER_ANY_HIGH(config, "int2").output_handler().set(FUNC(cdc721_state::int_w<2>)); // 74S05 (open collector)
-MACHINE_CONFIG_END
+}
 
 ROM_START( cdc721 )
 	ROM_REGION( 0x4000, "resident", 0 )

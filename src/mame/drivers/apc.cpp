@@ -936,13 +936,13 @@ static void apc_floppies(device_slot_interface &device)
 	device.option_add("8", FLOPPY_8_DSDD);
 }
 
-MACHINE_CONFIG_START(apc_state::apc)
-
+void apc_state::apc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu,I8086,MAIN_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(apc_map)
-	MCFG_DEVICE_IO_MAP(apc_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	I8086(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apc_state::apc_map);
+	m_maincpu->set_addrmap(AS_IO, &apc_state::apc_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(MAIN_CLOCK); // heartbeat IRQ
@@ -1003,9 +1003,8 @@ MACHINE_CONFIG_START(apc_state::apc)
 
 	/* sound hardware */
 	SPEAKER(config, m_speaker).front_center();
-	MCFG_DEVICE_ADD(m_sound, UPD1771C, MAIN_CLOCK) //uPD1771C-006
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	UPD1771C(config, m_sound, MAIN_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.00); //uPD1771C-006
+}
 
 
 /***************************************************************************

@@ -489,12 +489,12 @@ READ32_MEMBER(firebeat_state::keyboard_wheel_r )
 
 READ8_MEMBER(firebeat_state::midi_uart_r )
 {
-	return m_duart_midi->read(space, offset >> 6);
+	return m_duart_midi->read(offset >> 6);
 }
 
 WRITE8_MEMBER(firebeat_state::midi_uart_w )
 {
-	m_duart_midi->write(space, offset >> 6, data);
+	m_duart_midi->write(offset >> 6, data);
 }
 
 WRITE_LINE_MEMBER(firebeat_state::midi_uart_ch0_irq_callback)

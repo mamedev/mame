@@ -266,7 +266,7 @@ WRITE16_MEMBER(unixpc_state::disk_control_w)
 
 	// TODO: bits 0-2 = head select
 
-	m_hdc->drdy_w(BIT(data, 3) && m_hdr0->exists());		
+	m_hdc->drdy_w(BIT(data, 3) && m_hdr0->exists());
 
 	if (!BIT(data, 4))
 		m_hdc->reset();

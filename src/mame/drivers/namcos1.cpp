@@ -347,12 +347,12 @@ C - uses sub board with support for player 3 and 4 controls
 
 /**********************************************************************/
 
-WRITE8_MEMBER(namcos1_state::audiocpu_irq_ack_w)
+void namcos1_state::audiocpu_irq_ack_w(u8 data)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(namcos1_state::mcu_irq_ack_w)
+void namcos1_state::mcu_irq_ack_w(u8 data)
 {
 	m_mcu->set_input_line(HD6301_IRQ_LINE, CLEAR_LINE);
 }
@@ -366,20 +366,20 @@ READ8_MEMBER(namcos1_state::dsw_r)
 	// ------1-  ls257 dsw selector 3y
 	// -------0  ls257 dsw selector 4y
 
-	m_dsw_sel->write_ba(m_io_dipsw->read());
+	m_dsw_sel->ba_w(m_io_dipsw->read());
 	m_dsw_sel->select_w(BIT(offset, 1));
 
-	return 0xf0 | bitswap<4>(m_dsw_sel->output_r(space, 0), 0, 1, 2, 3);
+	return 0xf0 | bitswap<4>(m_dsw_sel->output_r(), 0, 1, 2, 3);
 }
 
-WRITE8_MEMBER(namcos1_state::coin_w)
+void namcos1_state::coin_w(u8 data)
 {
 	machine().bookkeeping().coin_lockout_global_w(BIT(~data, 0));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
 }
 
-WRITE8_MEMBER(namcos1_state::dac_gain_w)
+void namcos1_state::dac_gain_w(u8 data)
 {
 	/* DAC0 (GAIN0 = bit0, GAIN1 = bit2) */
 	int dac0_gain = (BIT(data, 2) << 1) | BIT(data, 0);

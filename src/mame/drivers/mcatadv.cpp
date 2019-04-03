@@ -165,7 +165,7 @@ WRITE16_MEMBER(mcatadv_state::mcat_coin_w)
 
 READ16_MEMBER(mcatadv_state::mcat_wd_r)
 {
-	m_watchdog->reset_r(space, 0);
+	m_watchdog->watchdog_reset();
 	return 0xc00;
 }
 

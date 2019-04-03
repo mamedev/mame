@@ -518,6 +518,6 @@ CONS( 1985, fexcela,    fexcel,   0, fexcel,    fexcel,    excel_state, empty_in
 
 CONS( 1986, fexcelp,    0,        0, fexcelp,   fexcel,    excel_state, empty_init, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1986, fexcelpb,   fexcelp,  0, fexcelp,   fexcel,    excel_state, empty_init, "Fidelity Electronics", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1986, granits,    fexcelp,  0, granits,   fexcel,    excel_state, empty_init, "hack (RCS)", "Granit 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, granits,    fexcelp,  0, granits,   fexcel,    excel_state, empty_init, "hack (RCS)", "Granit S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1988, fdes2000,   fexcelp,  0, fdes2000,  fdes,      excel_state, empty_init, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1988, fdes2100,   fexcelp,  0, fdes2100,  fdes,      excel_state, empty_init, "Fidelity Electronics", "Designer 2100", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

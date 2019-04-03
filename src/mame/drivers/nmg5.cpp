@@ -335,7 +335,7 @@ WRITE16_MEMBER(nmg5_state::vram_w)
 
 WRITE8_MEMBER(nmg5_state::soundlatch_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 

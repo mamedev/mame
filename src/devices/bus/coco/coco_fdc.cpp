@@ -343,17 +343,17 @@ READ8_MEMBER(coco_fdc_device_base::scs_read)
 
 	case 0x38:  /* FF78 */
 		if (real_time_clock() == rtc_type::CLOUD9)
-			m_ds1315->read_0(space, offset);
+			m_ds1315->read_0();
 		break;
 
 	case 0x39:  /* FF79 */
 		if (real_time_clock() == rtc_type::CLOUD9)
-			m_ds1315->read_1(space, offset);
+			m_ds1315->read_1();
 		break;
 
 	case 0x3C:  /* FF7C */
 		if (real_time_clock() == rtc_type::CLOUD9)
-			result = m_ds1315->read_data(space, offset);
+			result = m_ds1315->read_data();
 		break;
 	}
 	return result;

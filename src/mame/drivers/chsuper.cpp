@@ -364,27 +364,27 @@ void chsuper_state::ramdac_map(address_map &map)
 *     Machine Drivers      *
 ***************************/
 
-MACHINE_CONFIG_START(chsuper_state::chsuper)
-
+void chsuper_state::chsuper(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'000'000) / 4)   /* HD64180RP8, 8 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(chsuper_prg_map)
-	MCFG_DEVICE_IO_MAP(chsuper_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chsuper_state,  irq0_line_hold)
+	Z180(config, m_maincpu, XTAL(12'000'000) / 4);   /* HD64180RP8, 8 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &chsuper_state::chsuper_prg_map);
+	m_maincpu->set_addrmap(AS_IO, &chsuper_state::chsuper_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(chsuper_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(chsuper_state, screen_update)
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0, 30*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update(FUNC(chsuper_state::screen_update));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 48*8-1, 0, 30*8-1);
+	screen.set_palette(m_palette);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chsuper);
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, m_palette).set_entries(0x100);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &chsuper_state::ramdac_map);
@@ -396,7 +396,7 @@ MACHINE_CONFIG_START(chsuper_state::chsuper)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 
 /***************************

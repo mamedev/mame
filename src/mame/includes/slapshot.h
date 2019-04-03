@@ -87,10 +87,8 @@ private:
 
 	// generic
 	DECLARE_READ16_MEMBER(service_input_r);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(msb_sound_w);
-	DECLARE_READ16_MEMBER(msb_sound_r);
-	DECLARE_WRITE8_MEMBER(coin_control_w);
+	void sound_bankswitch_w(u8 data);
+	void coin_control_w(u8 data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_taito_no_buffer);

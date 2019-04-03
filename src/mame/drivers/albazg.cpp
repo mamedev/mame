@@ -359,13 +359,13 @@ void albazg_state::machine_reset()
 	m_prot_lock = 0;
 }
 
-MACHINE_CONFIG_START(albazg_state::yumefuda)
-
+void albazg_state::yumefuda(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80 , MASTER_CLOCK/2) /* xtal is 12 Mhz, unknown divider*/
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(port_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", albazg_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK/2); /* xtal is 12 Mhz, unknown divider*/
+	m_maincpu->set_addrmap(AS_PROGRAM, &albazg_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &albazg_state::port_map);
+	m_maincpu->set_vblank_int("screen", FUNC(albazg_state::irq0_line_hold));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -377,13 +377,13 @@ MACHINE_CONFIG_START(albazg_state::yumefuda)
 	ppi.in_pc_callback().set(FUNC(albazg_state::mux_r));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(albazg_state, screen_update_yumefuda)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(albazg_state::screen_update_yumefuda));
+	screen.set_palette("palette");
 
 	h46505_device &crtc(H46505(config, "crtc", MASTER_CLOCK/16));   /* hand tuned to get ~60 fps */
 	crtc.set_screen("screen");
@@ -402,7 +402,7 @@ MACHINE_CONFIG_START(albazg_state::yumefuda)
 	aysnd.port_b_read_callback().set_ioport("DSW2");
 	aysnd.port_a_write_callback().set(FUNC(albazg_state::yumefuda_output_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************************/
 

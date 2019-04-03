@@ -363,7 +363,7 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 
 		case 4: /* 6502 sound cpu */
 			if (ACCESSING_BITS_0_7)
-				m_soundlatch->write(space, 0, data & 0xff);
+				m_soundlatch->write(data & 0xff);
 			break;
 
 		case 6: /* Intel 8751 microcontroller - Bad Dudes, Heavy Barrel, Birdy Try only */
@@ -398,7 +398,7 @@ WRITE16_MEMBER(dec0_automat_state::automat_control_w)
 	{
 		case 0xe: /* z80 sound cpu */
 			if (ACCESSING_BITS_0_7)
-				m_soundlatch->write(space, 0, data & 0xff);
+				m_soundlatch->write(data & 0xff);
 			break;
 
 		case 12: /* DMA flag */
@@ -425,7 +425,7 @@ WRITE16_MEMBER(dec0_automat_state::automat_control_w)
 WRITE16_MEMBER(dec0_state::midres_sound_w)
 {
 	if (ACCESSING_BITS_0_7)
-		m_soundlatch->write(space, 0, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 }
 
 /******************************************************************************/
@@ -795,7 +795,7 @@ READ16_MEMBER( dec0_automat_state::automat_palette_r )
 WRITE16_MEMBER( dec0_automat_state::automat_palette_w )
 {
 	offset ^=0xf;
-	m_palette->write16(space, offset, data, mem_mask);
+	m_palette->write16(offset, data, mem_mask);
 }
 
 

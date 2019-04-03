@@ -2828,8 +2828,8 @@ Game cartridges
 		</part>
 	</software>
 
-	<!-- Cart labeled as "Disney My Friends Tigger and Pooh - En Busca de la Miel", 
-             but game on screen title is "Disney Winnie the Pooh - En Busca de la Miel". -->
+	<!-- Cart labeled as "Disney My Friends Tigger and Pooh - En Busca de la Miel",
+	         but game on screen title is "Disney Winnie the Pooh - En Busca de la Miel". -->
 	<software name="poohsr1" cloneof="pooh" supported="yes">
 		<description>Disney Winnie the Pooh - En Busca de la Miel (Spa, Rev. 122)</description>
 		<year>2004?</year>
