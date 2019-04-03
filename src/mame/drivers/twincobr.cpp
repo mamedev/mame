@@ -413,7 +413,7 @@ void twincobr_state::main_program_map(address_map &map)
 	map(0x078008, 0x078009).portr("VBLANK");         /* V-Blank & FShark Coin/Start */
 	map(0x07800b, 0x07800b).w(m_coinlatch, FUNC(ls259_device::write_nibble_d0)); /* Flying Shark DSP Comms & coin stuff */
 	map(0x07800d, 0x07800d).w(m_mainlatch, FUNC(ls259_device::write_nibble_d0)); /* Twin Cobra DSP Comms & system control */
-	map(0x07a000, 0x07afff).rw(FUNC(twincobr_state::twincobr_sharedram_r), FUNC(twincobr_state::twincobr_sharedram_w));   /* 16-bit on 68000 side, 8-bit on Z80 side */
+	map(0x07a000, 0x07afff).rw(FUNC(twincobr_state::twincobr_sharedram_r), FUNC(twincobr_state::twincobr_sharedram_w)).umask16(0x00ff);   /* 16-bit on 68000 side, 8-bit on Z80 side */
 	map(0x07e000, 0x07e001).rw(FUNC(twincobr_state::twincobr_txram_r), FUNC(twincobr_state::twincobr_txram_w));   /* data for text video RAM */
 	map(0x07e002, 0x07e003).rw(FUNC(twincobr_state::twincobr_bgram_r), FUNC(twincobr_state::twincobr_bgram_w));   /* data for bg video RAM */
 	map(0x07e004, 0x07e005).rw(FUNC(twincobr_state::twincobr_fgram_r), FUNC(twincobr_state::twincobr_fgram_w));   /* data for fg video RAM */
@@ -626,8 +626,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,3),  /* 2048 characters */
 	3,              /* 3 bits per pixel */
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8             /* every char takes 8 consecutive bytes */
 };
 
@@ -637,8 +637,8 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,4),  /* 4096/8192 tiles */
 	4,              /* 4 bits per pixel */
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8             /* every tile takes 8 consecutive bytes */
 };
 
@@ -649,15 +649,15 @@ static GFXDECODE_START( gfx_twincobr )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(twincobr_state::twincobr)
-
+void twincobr_state::twincobr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000)/4)       /* 7MHz - Main board Crystal is 28MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_program_map)
+	M68000(config, m_maincpu, XTAL(28'000'000) / 4);    /* 7MHz - Main board Crystal is 28MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &twincobr_state::main_program_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)         /* 3.5MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_program_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(28'000'000)/8));  /* 3.5MHz */
+	audiocpu.set_addrmap(AS_PROGRAM, &twincobr_state::sound_program_map);
+	audiocpu.set_addrmap(AS_IO, &twincobr_state::sound_io_map);
 
 	TMS32010(config, m_dsp, XTAL(28'000'000)/2);         /* 14MHz CLKin */
 	m_dsp->set_addrmap(AS_PROGRAM, &twincobr_state::dsp_program_map);
@@ -665,9 +665,7 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 	m_dsp->set_addrmap(AS_IO, &twincobr_state::dsp_io_map);
 	m_dsp->bio().set(FUNC(twincobr_state::twincobr_bio_r));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-
-	MCFG_MACHINE_RESET_OVERRIDE(twincobr_state,twincobr)
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<2>().set(FUNC(twincobr_state::int_enable_w));
@@ -698,7 +696,7 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(28_MHz_XTAL/4, 446, 0, 320, 286, 0, 240);
-	m_screen->set_screen_update(FUNC(twincobr_state::screen_update_toaplan0));
+	m_screen->set_screen_update(FUNC(twincobr_state::screen_update));
 	m_screen->screen_vblank().set(m_spriteram16, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	m_screen->screen_vblank().append(FUNC(twincobr_state::twincobr_vblank_irq));
 	m_screen->set_palette(m_palette);
@@ -709,16 +707,16 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(28'000'000) / 8));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(twincobr_state::twincobrw)
+void twincobr_state::twincobrw(machine_config &config)
+{
 	twincobr(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(10'000'000)) /* The export versions have a dedicated OSC for the M68000 on the top right of the board */
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(XTAL(10'000'000)); /* The export versions have a dedicated OSC for the M68000 on the top right of the board */
+}
 
 void twincobr_state::fshark(machine_config &config)
 {
@@ -729,7 +727,6 @@ void twincobr_state::fshark(machine_config &config)
 	m_spritegen->set_xoffsets(32, 14);
 }
 
-
 void twincobr_state::fsharkbt(machine_config &config)
 {
 	fshark(config);
@@ -737,8 +734,6 @@ void twincobr_state::fsharkbt(machine_config &config)
 	I8741(config, "mcu", XTAL(28'000'000)/16).set_disable();  /* Internal program code is not dumped */
 	/* Program Map is internal to the CPU */
 }
-
-
 
 
 /***************************************************************************
@@ -1299,7 +1294,7 @@ ROM_END
 
 void twincobr_state::init_twincobr()
 {
-	twincobr_driver_savestate();
+	driver_savestate();
 }
 
 

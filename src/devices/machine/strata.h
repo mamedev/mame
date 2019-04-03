@@ -12,12 +12,12 @@ public:
 	strataflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// 8-bit access
-	DECLARE_READ8_MEMBER( read8 );
-	DECLARE_WRITE8_MEMBER( write8 );
+	uint8_t read8(offs_t offset);
+	void write8(offs_t offset, uint8_t data);
 
 	// 16-bit access
-	DECLARE_READ16_MEMBER( read16 );
-	DECLARE_WRITE16_MEMBER( write16 );
+	uint16_t read16(offs_t offset);
+	void write16(offs_t offset, uint16_t data);
 
 protected:
 	// device-level overrides
@@ -36,8 +36,8 @@ private:
 		bw_16
 	};
 
-	uint16_t read8_16(address_space& space, offs_t offset, bus_width_t bus_width);
-	void   write8_16(address_space& space, offs_t offset, uint16_t data, bus_width_t bus_width);
+	uint16_t read8_16(offs_t offset, bus_width_t bus_width);
+	void   write8_16(offs_t offset, uint16_t data, bus_width_t bus_width);
 
 	enum fm_mode_t
 	{

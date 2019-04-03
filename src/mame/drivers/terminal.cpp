@@ -45,10 +45,11 @@ static INPUT_PORTS_START( terminal )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START( terminal_state::terminal )
-	MCFG_DEVICE_ADD("maincpu", I8031, 12'000'000)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-MACHINE_CONFIG_END
+void terminal_state::terminal(machine_config &config)
+{
+	I8031(config, m_maincpu, 12'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &terminal_state::mem_map);
+}
 
 
 /* ROM definition */

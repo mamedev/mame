@@ -475,7 +475,8 @@ WRITE_LINE_MEMBER( play_3_state::q4013a_w )
 	m_clockcnt = 0;
 }
 
-MACHINE_CONFIG_START(play_3_state::play_3)
+void play_3_state::play_3(machine_config &config)
+{
 	/* basic machine hardware */
 	CDP1802(config, m_maincpu, 3.579545_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &play_3_state::play_3_map);
@@ -493,8 +494,8 @@ MACHINE_CONFIG_START(play_3_state::play_3)
 	config.set_default_layout(layout_play_3);
 
 	// Devices
-	MCFG_DEVICE_ADD("xpoint", CLOCK, 60) // crossing-point detector
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, play_3_state, clock2_w))
+	clock_device &xpoint(CLOCK(config, "xpoint", 60)); // crossing-point detector
+	xpoint.signal_handler().set(FUNC(play_3_state::clock2_w));
 
 	// This is actually a 4013 chip (has 2 RS flipflops)
 	TTL7474(config, m_4013a, 0);
@@ -518,28 +519,29 @@ MACHINE_CONFIG_START(play_3_state::play_3)
 	SPEAKER(config, "rspeaker").front_right();
 	AY8910(config, m_aysnd1, 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "lspeaker", 0.75);
 	AY8910(config, m_aysnd2, 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "rspeaker", 0.75);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(play_3_state::megaaton)
+void play_3_state::megaaton(machine_config &config)
+{
 	play_3(config);
 
 	m_maincpu->set_clock(2.95_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_IO, &play_3_state::megaaton_io);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(play_3_state::sklflite)
+void play_3_state::sklflite(machine_config &config)
+{
 	play_3(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(sklflite_io)
+	m_maincpu->set_addrmap(AS_IO, &play_3_state::sklflite_io);
 
-	MCFG_DEVICE_REMOVE("audiocpu")
-	MCFG_DEVICE_REMOVE("aysnd1")
-	MCFG_DEVICE_REMOVE("aysnd2")
-	MCFG_DEVICE_REMOVE("lspeaker")
-	MCFG_DEVICE_REMOVE("rspeaker")
+	config.device_remove("audiocpu");
+	config.device_remove("aysnd1");
+	config.device_remove("aysnd2");
+	config.device_remove("lspeaker");
+	config.device_remove("rspeaker");
 
 	EFO_ZSU1(config, m_zsu, 0);
-MACHINE_CONFIG_END
+}
 
 
 /*-------------------------------------------------------------------

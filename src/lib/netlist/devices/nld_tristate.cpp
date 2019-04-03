@@ -6,7 +6,7 @@
  */
 
 #include "nld_tristate.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 
 namespace netlist
 {
@@ -70,8 +70,8 @@ namespace netlist
 		m_Q.push(q, NLTIME_FROM_NS(1));
 	}
 
-	NETLIB_DEVICE_IMPL(tristate)
-	NETLIB_DEVICE_IMPL(tristate3)
+	NETLIB_DEVICE_IMPL(tristate,  "TTL_TRISTATE",  "+CEQ1,+D1,+CEQ2,+D2")
+	NETLIB_DEVICE_IMPL(tristate3, "TTL_TRISTATE3", "")
 
 	} //namespace devices
 } // namespace netlist

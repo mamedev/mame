@@ -46,6 +46,7 @@ public:
 private:
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -110,6 +111,7 @@ private:
 
 	static const int XMIT_RING_SIZE = 64;
 
+	required_device<beep_device> m_beep;
 	required_ioport_array<4> m_io_keyboard;
 	required_ioport_array<3> m_io_mouse;
 

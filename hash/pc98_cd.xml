@@ -1098,6 +1098,43 @@
 		</part>
 	</software>
 
+	<software name="cyberwar">
+		<!--
+		 Origin: Neo Kobe Collection
+		<rom name="cyber war (disc 1).ccd" size="771" crc="b00b4fc3" sha1="c0ca2f35f7f2c623a2cffefd00199fad85040ba8"/>
+		<rom name="cyber war (disc 1).cue" size="79" crc="4aa9158f" sha1="22e5bcad2ba79f857a7e025ca8d5dc75bbfa8894"/>
+		<rom name="cyber war (disc 1).img" size="614424720" crc="5513bd0a" sha1="21d2a3f27fa043cc8a486e47a236181eb15cbabb"/>
+		<rom name="cyber war (disc 1).sub" size="25078560" crc="81fb6f2b" sha1="93f38cd1fe5730af8918cc32e51cdc0c40645a0a"/>
+		<rom name="cyber war (disc 2).ccd" size="772" crc="209cd755" sha1="f78e9fe3536b4a7c5841636ea1ca0728b4a39222"/>
+		<rom name="cyber war (disc 2).cue" size="79" crc="63566323" sha1="1c22a830eb3307507db202142a5227816cd4750f"/>
+		<rom name="cyber war (disc 2).img" size="668755920" crc="0c1db581" sha1="88a733ef4014db7e827f13137fda1ac4a5bd6eb6"/>
+		<rom name="cyber war (disc 2).sub" size="27296160" crc="65914b39" sha1="eed5a88ae1fb798da6f9486565cad66be0f39f90"/>
+		<rom name="cyber war (disc 3).ccd" size="771" crc="ec671429" sha1="a84b25f3956ca6219fd54bda5f3632b758c7529f"/>
+		<rom name="cyber war (disc 3).cue" size="79" crc="7bfcb147" sha1="2913f71b0ddd72be5df2e6ce588662fe33f08c7b"/>
+		<rom name="cyber war (disc 3).img" size="698953248" crc="4fdbd398" sha1="463d2708b3e4a2581ea21ea90c2921f90d3a60bc"/>
+		<rom name="cyber war (disc 3).sub" size="28528704" crc="1ae19b0c" sha1="3dd896aeab94d76dd58c564333bac22d70ec71ee"/>
+		 -->
+		<description>Cyberwar</description>
+		<year>1995</year>
+		<publisher>塚本吉彦事務所 (Tsukamoto Yoshihiko Jimusho)</publisher>
+		<info name="alt_title" value="サイバーウォー" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cyber war (disc 1)" sha1="4b62409f228d06e30c4099d984863be76039a72b"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cyber war (disc 2)" sha1="4bc9c31c839caf73dc27dc05133656a4db6eac74"/>
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cyber war (disc 3)" sha1="0547eda244bcb5e11b4d9381cd5f372fb3fb8485"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Hybrid disc, also included in fmtowns_cd.xml -->
 	<software name="dangel">
 		<!--

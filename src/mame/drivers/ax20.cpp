@@ -132,29 +132,29 @@ static void ax20_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-MACHINE_CONFIG_START(ax20_state::ax20)
+void ax20_state::ax20(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(14'318'181)/3)
-	MCFG_DEVICE_PROGRAM_MAP(ax20_map)
-	MCFG_DEVICE_IO_MAP(ax20_io)
+	I8088(config, m_maincpu, XTAL(14'318'181)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ax20_state::ax20_map);
+	m_maincpu->set_addrmap(AS_IO, &ax20_state::ax20_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_COLOR(rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(ax20_state, screen_update)
-	MCFG_SCREEN_SIZE(80*8, 24*12)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*12-1)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ax20)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(ax20_state::screen_update));
+	screen.set_size(80*8, 24*12);
+	screen.set_visarea(0, 80*8-1, 0, 24*12-1);
+	screen.set_palette(m_palette);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ax20);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	I8272A(config, m_fdc, 8'000'000, true);
 
 	/* Devices */
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ax20_floppies, "525dd", isa8_fdc_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "fdc:0", ax20_floppies, "525dd", isa8_fdc_device::floppy_formats);
+}
 
 /* ROM definition */
 ROM_START( ax20 )

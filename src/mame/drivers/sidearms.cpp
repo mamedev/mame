@@ -599,32 +599,31 @@ static GFXDECODE_START( gfx_turtship )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(sidearms_state::sidearms)
-
+void sidearms_state::sidearms(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
-	MCFG_DEVICE_PROGRAM_MAP(sidearms_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 4000000); /* 4 MHz (?) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sidearms_state::sidearms_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sidearms_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* 4 MHz (?) */
-	MCFG_DEVICE_PROGRAM_MAP(sidearms_sound_map)
+	Z80(config, m_audiocpu, 4000000); /* 4 MHz (?) */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sidearms_state::sidearms_sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(sidearms_state::screen_update));
+	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sidearms)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sidearms);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024);
 
 	/* sound hardware */
@@ -632,47 +631,45 @@ MACHINE_CONFIG_START(sidearms_state::sidearms)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 4000000)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.25)
+	ym2203_device &ym1(YM2203(config, "ym1", 4000000));
+	ym1.irq_handler().set_inputline(m_audiocpu, 0);
+	ym1.add_route(0, "mono", 0.15);
+	ym1.add_route(1, "mono", 0.15);
+	ym1.add_route(2, "mono", 0.15);
+	ym1.add_route(3, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, 4000000)
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.25)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", 4000000));
+	ym2.add_route(0, "mono", 0.15);
+	ym2.add_route(1, "mono", 0.15);
+	ym2.add_route(2, "mono", 0.15);
+	ym2.add_route(3, "mono", 0.25);
+}
 
-
-MACHINE_CONFIG_START(sidearms_state::turtship)
-
+void sidearms_state::turtship(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
-	MCFG_DEVICE_PROGRAM_MAP(turtship_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 4000000); /* 4 MHz (?) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sidearms_state::turtship_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sidearms_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* 4 MHz (?) */
-	MCFG_DEVICE_PROGRAM_MAP(sidearms_sound_map)
+	Z80(config, m_audiocpu, 4000000); /* 4 MHz (?) */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sidearms_state::sidearms_sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
+	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.set_screen_update(FUNC(sidearms_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turtship)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turtship);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024);
 
 	/* sound hardware */
@@ -680,50 +677,49 @@ MACHINE_CONFIG_START(sidearms_state::turtship)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 4000000)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.25)
+	ym2203_device &ym1(YM2203(config, "ym1", 4000000));
+	ym1.irq_handler().set_inputline(m_audiocpu, 0);
+	ym1.add_route(0, "mono", 0.15);
+	ym1.add_route(1, "mono", 0.15);
+	ym1.add_route(2, "mono", 0.15);
+	ym1.add_route(3, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, 4000000)
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.25)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", 4000000));
+	ym2.add_route(0, "mono", 0.15);
+	ym2.add_route(1, "mono", 0.15);
+	ym2.add_route(2, "mono", 0.15);
+	ym2.add_route(3, "mono", 0.25);
+}
 
-MACHINE_CONFIG_START(sidearms_state::whizz)
-
+void sidearms_state::whizz(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)        /* 4 MHz (?) */
-	MCFG_DEVICE_PROGRAM_MAP(whizz_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 4000000);        /* 4 MHz (?) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sidearms_state::whizz_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sidearms_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(whizz_sound_map)
-	MCFG_DEVICE_IO_MAP(whizz_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
+	Z80(config, m_audiocpu, 4000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sidearms_state::whizz_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &sidearms_state::whizz_io_map);
+	m_audiocpu->set_vblank_int("screen", FUNC(sidearms_state::irq0_line_hold));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+	config.m_minimum_quantum = attotime::from_hz(60000);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(sidearms_state::screen_update));
+	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turtship)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turtship);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024);
 
 	/* sound hardware */
@@ -735,7 +731,7 @@ MACHINE_CONFIG_START(sidearms_state::whizz)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "mono", 1.0);
 	ymsnd.add_route(1, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 

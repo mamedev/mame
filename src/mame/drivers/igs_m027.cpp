@@ -316,14 +316,15 @@ WRITE_LINE_MEMBER(igs_m027_state::vblank_irq)
 }
 
 
-MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
-	MCFG_DEVICE_ADD("maincpu", ARM7, 20000000)
-	MCFG_DEVICE_PROGRAM_MAP(igs_majhong_map)
+void igs_m027_state::igs_majhong(machine_config &config)
+{
+	ARM7(config, m_maincpu, 20000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_majhong_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh(HZ_TO_ATTOSECONDS(60));
+	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-1);
@@ -338,20 +339,18 @@ MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
 
 	/* sound hardware */
 	// OK6295
-MACHINE_CONFIG_END
+}
 
 
-
-
-
-MACHINE_CONFIG_START(igs_m027_state::amazonia)
-	MCFG_DEVICE_ADD("maincpu", ARM7, 20000000)
-	MCFG_DEVICE_PROGRAM_MAP(igs_majhong_map)
+void igs_m027_state::amazonia(machine_config &config)
+{
+	ARM7(config, m_maincpu, 20000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_majhong_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh(HZ_TO_ATTOSECONDS(60));
+	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-1);
@@ -366,8 +365,7 @@ MACHINE_CONFIG_START(igs_m027_state::amazonia)
 
 	/* sound hardware */
 	// OK6295
-
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

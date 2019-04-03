@@ -500,9 +500,9 @@ void zaxxon_state::congo_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).mirror(0x1800).ram();
-	map(0x6000, 0x6000).mirror(0x1fff).w("sn1", FUNC(sn76489a_device::command_w));
+	map(0x6000, 0x6000).mirror(0x1fff).w("sn1", FUNC(sn76489a_device::write));
 	map(0x8000, 0x8003).mirror(0x1ffc).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xa000, 0xa000).mirror(0x1fff).w("sn2", FUNC(sn76489a_device::command_w));
+	map(0xa000, 0xa000).mirror(0x1fff).w("sn2", FUNC(sn76489a_device::write));
 }
 
 
@@ -915,11 +915,11 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(zaxxon_state::root)
-
+void zaxxon_state::root(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/16)
-	MCFG_DEVICE_PROGRAM_MAP(zaxxon_map)
+	Z80(config, m_maincpu, MASTER_CLOCK/16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zaxxon_state::zaxxon_map);
 
 	I8255A(config, m_ppi);
 	m_ppi->out_pa_callback().set(FUNC(zaxxon_state::zaxxon_sound_a_w));
@@ -944,29 +944,29 @@ MACHINE_CONFIG_START(zaxxon_state::root)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zaxxon);
 	PALETTE(config, m_palette, FUNC(zaxxon_state::zaxxon_palette), 256);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_zaxxon)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, zaxxon_state, vblank_int))
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	screen.set_screen_update(FUNC(zaxxon_state::screen_update_zaxxon));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(zaxxon_state::vblank_int));
+}
 
 
-MACHINE_CONFIG_START(zaxxon_state::zaxxon)
+void zaxxon_state::zaxxon(machine_config &config)
+{
 	root(config);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	zaxxon_samples(config);
-MACHINE_CONFIG_END
+}
 
 
-
-MACHINE_CONFIG_START(zaxxon_state::szaxxon)
+void zaxxon_state::szaxxon(machine_config &config)
+{
 	zaxxon(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_OPCODES, &zaxxon_state::decrypted_opcodes_map);
+}
 
 
 void zaxxon_state::szaxxone(machine_config &config)
@@ -980,8 +980,8 @@ void zaxxon_state::szaxxone(machine_config &config)
 }
 
 
-
-MACHINE_CONFIG_START(zaxxon_state::futspye)
+void zaxxon_state::futspye(machine_config &config)
+{
 	root(config);
 	sega_315_5061_device &maincpu(SEGA_315_5061(config.replace(), m_maincpu, MASTER_CLOCK/16));
 	maincpu.set_addrmap(AS_PROGRAM, &zaxxon_state::zaxxon_map);
@@ -991,19 +991,16 @@ MACHINE_CONFIG_START(zaxxon_state::futspye)
 
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_futspy)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(zaxxon_state::screen_update_futspy));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	zaxxon_samples(config);
-
-MACHINE_CONFIG_END
-
+}
 
 
-
-MACHINE_CONFIG_START(zaxxon_state::razmataze)
+void zaxxon_state::razmataze(machine_config &config)
+{
 	root(config);
 	sega_315_5098_device &maincpu(SEGA_315_5098(config.replace(), m_maincpu, MASTER_CLOCK/16));
 	maincpu.set_addrmap(AS_PROGRAM, &zaxxon_state::ixion_map);
@@ -1015,13 +1012,13 @@ MACHINE_CONFIG_START(zaxxon_state::razmataze)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(zaxxon_state,razmataz)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_razmataz)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(zaxxon_state::screen_update_razmataz));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	SEGAUSBROM(config, "usbsnd", 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
-MACHINE_CONFIG_END
+}
+
 
 void zaxxon_state::ixion(machine_config &config)
 {
@@ -1035,11 +1032,12 @@ void zaxxon_state::ixion(machine_config &config)
 	m_mainlatch[0]->q_out_cb<6>().set_nop(); // flip screen not used
 }
 
-MACHINE_CONFIG_START(zaxxon_state::congo)
+
+void zaxxon_state::congo(machine_config &config)
+{
 	root(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(congo_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &zaxxon_state::congo_map);
 
 	m_ppi->in_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
 	m_ppi->out_pa_callback().set_nop();
@@ -1056,31 +1054,27 @@ MACHINE_CONFIG_START(zaxxon_state::congo)
 	m_mainlatch[1]->q_out_cb<6>().set(FUNC(zaxxon_state::congo_fg_bank_w)); // BS
 	m_mainlatch[1]->q_out_cb<7>().set(FUNC(zaxxon_state::congo_color_bank_w)); // CBS
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(congo_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(zaxxon_state, irq0_line_hold, SOUND_CLOCK/16/16/16/4)
+	z80_device &audiocpu(Z80(config, "audiocpu", SOUND_CLOCK));
+	audiocpu.set_addrmap(AS_PROGRAM, &zaxxon_state::congo_sound_map);
+	audiocpu.set_periodic_int(FUNC(zaxxon_state::irq0_line_hold), attotime::from_hz(SOUND_CLOCK/16/16/16/4));
 
 	/* video hardware */
 	m_palette->set_entries(512).set_init(FUNC(zaxxon_state::zaxxon_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(zaxxon_state,congo)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_congo)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(zaxxon_state::screen_update_congo));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("sn1", SN76489A, SOUND_CLOCK) // schematic shows sn76489A
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	SN76489A(config, "sn1", SOUND_CLOCK).add_route(ALL_OUTPUTS, "speaker", 1.0); // schematic shows sn76489A
 
-	MCFG_DEVICE_ADD("sn2", SN76489A, SOUND_CLOCK/4) // schematic shows sn76489A
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	SN76489A(config, "sn2", SOUND_CLOCK/4).add_route(ALL_OUTPUTS, "speaker", 1.0); // schematic shows sn76489A
 
 	congo_samples(config);
-MACHINE_CONFIG_END
-
+}
 
 
 /*************************************

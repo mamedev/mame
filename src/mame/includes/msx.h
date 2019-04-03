@@ -13,6 +13,7 @@
 #include "machine/i8255.h"
 #include "machine/rp5c01.h"
 #include "machine/buffer.h"
+#include "machine/input_merger.h"
 #include "bus/centronics/ctronics.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -42,73 +43,6 @@
 
 #define TC8521_TAG  "rtc"
 
-#define MCFG_MSX_LAYOUT_ROM(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
-	MCFG_MSX_SLOT_ROM_ADD(_tag, _page, _numpages, _region, _offset) \
-	install_slot_pages(_prim, _sec, _page, _numpages, device);
-
-#define MCFG_MSX_LAYOUT_RAM(_tag, _prim, _sec, _page, _numpages) \
-	MCFG_MSX_SLOT_RAM_ADD(_tag, _page, _numpages) \
-	install_slot_pages(_prim, _sec, _page, _numpages, device);
-
-#define MCFG_MSX_LAYOUT_CARTRIDGE(_tag, _prim, _sec) \
-	MCFG_MSX_SLOT_CARTRIDGE_ADD(_tag, WRITELINE(DEVICE_SELF, msx_state, msx_irq_source1)) \
-	install_slot_pages(_prim, _sec, 0, 4, device);
-
-#define MCFG_MSX_LAYOUT_YAMAHA_EXPANSION(_tag, _prim, _sec, _default) \
-	MCFG_MSX_SLOT_YAMAHA_EXPANSION_ADD(_tag, WRITELINE(DEVICE_SELF, msx_state, msx_irq_source2), _default) \
-	install_slot_pages(_prim, _sec, 0, 4, device);
-
-#define MCFG_MSX_LAYOUT_RAM_MM(_tag, _prim, _sec, _total_size) \
-	MCFG_MSX_SLOT_RAM_MM_ADD(_tag, _total_size) \
-	install_slot_pages(_prim, _sec, 0, 4, device);
-
-#define MCFG_MSX_RAMIO_SET_BITS(_ramio_set_bits) \
-	MCFG_MSX_SLOT_RAMM_SET_RAMIO_BITS(_ramio_set_bits)
-
-#define MCFG_MSX_LAYOUT_DISK1(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
-	MCFG_MSX_SLOT_DISK1_ADD(_tag, _page, _numpages, _region, _offset, "fdc", "fdc:0", "fdc:1") \
-	install_slot_pages(_prim, _sec, _page, _numpages + 1, device);   /* Memory mapped FDC registers are also accessible through page 2 */
-
-#define MCFG_MSX_LAYOUT_DISK2(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
-	MCFG_MSX_SLOT_DISK2_ADD(_tag, _page, _numpages, _region, _offset, "fdc", "fdc:0", "fdc:1") \
-	install_slot_pages(_prim, _sec, _page, _numpages + 1, device);   /* Memory mapped FDC registers are also accessible through page 2 */
-
-#define MCFG_MSX_LAYOUT_DISK3(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
-	MCFG_MSX_SLOT_DISK3_ADD(_tag, _page, _numpages, _region, _offset, "fdc", "fdc:0", "fdc:1") \
-	install_slot_pages(_prim, _sec, _page, _numpages, device);
-
-#define MCFG_MSX_LAYOUT_DISK4(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
-	MCFG_MSX_SLOT_DISK4_ADD(_tag, _page, _numpages, _region, _offset, "fdc", "fdc:0", "fdc:1") \
-	install_slot_pages(_prim, _sec, _page, _numpages, device);
-
-#define MCFG_MSX_LAYOUT_DISK5(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
-	MCFG_MSX_SLOT_DISK5_ADD(_tag, _page, _numpages, _region, _offset, "fdc", "fdc:0", "fdc:1", "fdc:2", "fdc:3") \
-	install_slot_pages(_prim, _sec, _page, _numpages, device);
-
-#define MCFG_MSX_LAYOUT_DISK6(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
-	MCFG_MSX_SLOT_DISK6_ADD(_tag, _page, _numpages, _region, _offset, "fdc", "fdc:0", "fdc:1") \
-	install_slot_pages(_prim, _sec, _page, _numpages, device);
-
-#define MCFG_MSX_LAYOUT_MUSIC(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
-	MCFG_MSX_SLOT_MUSIC_ADD(_tag, _page, _numpages, _region, _offset, "ym2413" ) \
-	install_slot_pages(_prim, _sec, _page, _numpages, device);
-
-#define MCFG_MSX_LAYOUT_BUNSETSU(_tag, _prim, _sec, _page, _numpages, _region, _offset, _bunsetsu_tag) \
-	MCFG_MSX_SLOT_BUNSETSU_ADD(_tag, _page, _numpages, _region, _offset, _bunsetsu_tag) \
-	install_slot_pages(_prim, _sec, _page, _numpages, device);
-
-#define MCFG_MSX_LAYOUT_FS4600(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
-	MCFG_MSX_SLOT_FS4600_ADD(_tag, _page, _numpages, _region, _offset) \
-	install_slot_pages(_prim, _sec, _page, _numpages, device);
-
-#define MCFG_MSX_LAYOUT_PANASONIC08(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
-	MCFG_MSX_SLOT_PANASONIC08_ADD(_tag, _page, _numpages, _region, _offset) \
-	install_slot_pages(_prim, _sec, _page, _numpages, device);
-
-#define MCFG_MSX_LAYOUT_SONY08(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
-	MCFG_MSX_SLOT_SONY08_ADD(_tag, _page, _numpages, _region, _offset) \
-	install_slot_pages(_prim, _sec, _page, _numpages, device);
-
 
 class msx_state : public driver_device
 {
@@ -121,15 +55,14 @@ public:
 		, m_dac(*this, "dac")
 		, m_region_maincpu(*this, "maincpu")
 		, m_region_kanji(*this, "kanji")
-		, m_io_joy0(*this, "JOY0")
-		, m_io_joy1(*this, "JOY1")
+		, m_io_joy(*this, "JOY%u", 0U)
 		, m_io_dsw(*this, "DSW")
-		, m_io_mouse0(*this, "MOUSE0")
-		, m_io_mouse1(*this, "MOUSE1")
-		, m_io_key(*this, {"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5"})
+		, m_io_mouse(*this, "MOUSE%u", 0U)
+		, m_io_key(*this, "KEY%u", 0U)
 		, m_leds(*this, "led%u", 1U)
 		, m_psg_b(0)
 		, m_kanji_latch(0)
+		, m_empty_slot(mconfig, *this)
 		, m_primary_slot(0)
 		, m_port_c_old(0)
 		, m_keylatch(0)
@@ -148,10 +81,8 @@ public:
 		}
 		m_mouse[0] = m_mouse[1] = 0;
 		m_mouse_stat[0] = m_mouse_stat[1] = 0;
-		for (auto & elem : m_irq_state)
-		{
-			elem = CLEAR_LINE;
-		}
+		m_empty_slot.set_memory_space(m_maincpu, AS_PROGRAM);
+		m_empty_slot.set_io_space(m_maincpu, AS_IO);
 	}
 
 	void hc6(machine_config &config);
@@ -301,7 +232,57 @@ protected:
 	void msx_2_35_dd_drive(machine_config &config);
 
 	// static configuration helpers
-	void install_slot_pages(uint8_t prim, uint8_t sec, uint8_t page, uint8_t numpages, device_t *device);
+	void install_slot_pages(uint8_t prim, uint8_t sec, uint8_t page, uint8_t numpages, msx_internal_slot_interface &device);
+	template <typename T, typename U>
+	auto &add_internal_slot(machine_config &config, T &&type, U &&tag, uint8_t prim, uint8_t sec, uint8_t page, uint8_t numpages)
+	{
+		auto &device(std::forward<T>(type)(config, std::forward<U>(tag), 0U));
+		device.set_memory_space(m_maincpu, AS_PROGRAM);
+		device.set_io_space(m_maincpu, AS_IO);
+		device.set_start_address(page * 0x4000);
+		device.set_size(numpages * 0x4000);
+		install_slot_pages(prim, sec, page, numpages, device);
+		return device;
+	}
+	template <typename T, typename U>
+	auto &add_internal_slot(machine_config &config, T &&type, U &&tag, uint8_t prim, uint8_t sec, uint8_t page, uint8_t numpages, const char *region, uint32_t offset)
+	{
+		auto &device(std::forward<T>(type)(config, std::forward<U>(tag), 0U));
+		device.set_memory_space(m_maincpu, AS_PROGRAM);
+		device.set_io_space(m_maincpu, AS_IO);
+		device.set_start_address(page * 0x4000);
+		device.set_size(numpages * 0x4000);
+		device.set_rom_start(region, offset);
+		install_slot_pages(prim, sec, page, numpages, device);
+		return device;
+	}
+	template <typename T, typename U>
+	auto &add_internal_slot_mirrored(machine_config &config, T &&type, U &&tag, uint8_t prim, uint8_t sec, uint8_t page, uint8_t numpages, const char *region, uint32_t offset)
+	{
+		// Memory mapped FDC registers are also accessible through page 2
+		auto &device(type(config, std::forward<U>(tag), 0U));
+		device.set_memory_space(m_maincpu, AS_PROGRAM);
+		device.set_io_space(m_maincpu, AS_IO);
+		device.set_start_address(page * 0x4000);
+		device.set_size(0x4000);
+		device.set_rom_start(region, offset);
+		install_slot_pages(prim, sec, page, numpages, device);
+		return device;
+	}
+	template <int N, typename T, typename U, typename V>
+	auto &add_cartridge_slot(machine_config &config, T &&type, U &&tag, uint8_t prim, uint8_t sec, V &&intf, const char *deft)
+	{
+		auto &device(type(config, std::forward<U>(tag), 0U));
+		device.set_memory_space(m_maincpu, AS_PROGRAM);
+		device.set_io_space(m_maincpu, AS_IO);
+		device.option_reset();
+		intf(device);
+		device.set_default_option(deft);
+		device.set_fixed(false);
+		device.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<N>));
+		install_slot_pages(prim, sec, 0, 4, device);
+		return device;
+	}
 
 	virtual void driver_start() override;
 	virtual void machine_start() override;
@@ -332,12 +313,6 @@ private:
 
 	INTERRUPT_GEN_MEMBER(msx_interrupt);
 
-public:
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source0) { msx_irq_source(0, state); }  // usually tms9918/v9938/v9958
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source1) { msx_irq_source(1, state); }  // usually first cartridge slot
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source2) { msx_irq_source(2, state); }  // usually second cartridge slot
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source3) { msx_irq_source(3, state); }  // sometimes expansion slot
-
 protected:
 	void msx_io_map(address_map &map);
 	void msx_memory_map(address_map &map);
@@ -348,11 +323,9 @@ protected:
 	required_device<dac_bit_interface> m_dac;
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_kanji;
-	required_ioport m_io_joy0;
-	required_ioport m_io_joy1;
+	required_ioport_array<2> m_io_joy;
 	required_ioport m_io_dsw;
-	required_ioport m_io_mouse0;
-	required_ioport m_io_mouse1;
+	required_ioport_array<2> m_io_mouse;
 	required_ioport_array<6> m_io_key;
 	output_finder<2> m_leds;
 
@@ -373,11 +346,6 @@ private:
 	uint8_t m_secondary_slot[4];
 	int m_port_c_old;
 	int m_keylatch;
-
-	int m_irq_state[4];
-
-	void msx_irq_source(int source, int level);
-	void check_irq();
 };
 
 

@@ -463,7 +463,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			{
 				if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 				{
-					m_shift_timer->adjust(clocks_to_attotime(1) / 2);
+					m_shift_timer->adjust(clocks_to_attotime(1));
 				}
 				else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))
 				{

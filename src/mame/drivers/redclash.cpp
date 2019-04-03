@@ -36,7 +36,7 @@ WRITE8_MEMBER( redclash_state::irqack_w )
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-template <unsigned B> WRITE8_MEMBER(redclash_state::redclash_star_w)
+template <unsigned B> WRITE8_MEMBER(redclash_state::star_w)
 {
 	m_stars->set_speed(BIT(data, 0) << B, 1U << B);
 }
@@ -45,41 +45,41 @@ void redclash_state::zerohour_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
 	map(0x3000, 0x37ff).ram();
-	map(0x3800, 0x3bff).ram().share("spriteram");
-	map(0x4000, 0x43ff).ram().w(FUNC(redclash_state::redclash_videoram_w)).share("videoram");
+	map(0x3800, 0x3bff).ram().share(m_spriteram);
+	map(0x4000, 0x43ff).ram().w(FUNC(redclash_state::videoram_w)).share(m_videoram);
 	map(0x4800, 0x4800).portr("IN0");    /* IN0 */
 	map(0x4801, 0x4801).portr("IN1");    /* IN1 */
 	map(0x4802, 0x4802).portr("DSW1");   /* DSW0 */
 	map(0x4803, 0x4803).portr("DSW2");   /* DSW1 */
 	map(0x5000, 0x5007).nopw();    /* to sound board */
-	map(0x5800, 0x5800).w(FUNC(redclash_state::redclash_star_w<0>));
+	map(0x5800, 0x5800).w(FUNC(redclash_state::star_w<0>));
 	map(0x5801, 0x5804).nopw();    /* to sound board */
-	map(0x5805, 0x5805).w(FUNC(redclash_state::redclash_star_w<1>));
-	map(0x5806, 0x5806).w(FUNC(redclash_state::redclash_star_w<2>));
-	map(0x5807, 0x5807).w(FUNC(redclash_state::redclash_flipscreen_w));
-	map(0x7000, 0x7000).w(FUNC(redclash_state::redclash_star_reset_w));
+	map(0x5805, 0x5805).w(FUNC(redclash_state::star_w<1>));
+	map(0x5806, 0x5806).w(FUNC(redclash_state::star_w<2>));
+	map(0x5807, 0x5807).w(FUNC(redclash_state::flipscreen_w));
+	map(0x7000, 0x7000).w(FUNC(redclash_state::star_reset_w));
 	map(0x7800, 0x7800).w(FUNC(redclash_state::irqack_w));
 }
 
 void redclash_state::redclash_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
-//  AM_RANGE(0x3000, 0x3000) AM_WRITENOP
-//  AM_RANGE(0x3800, 0x3800) AM_WRITENOP
-	map(0x4000, 0x43ff).ram().w(FUNC(redclash_state::redclash_videoram_w)).share("videoram");
+//  map(0x3000, 0x3000).set_nopw();
+//  map(0x3800, 0x3800).set_nopw();
+	map(0x4000, 0x43ff).ram().w(FUNC(redclash_state::videoram_w)).share(m_videoram);
 	map(0x4800, 0x4800).portr("IN0");    /* IN0 */
 	map(0x4801, 0x4801).portr("IN1");    /* IN1 */
 	map(0x4802, 0x4802).portr("DSW1");   /* DSW0 */
 	map(0x4803, 0x4803).portr("DSW2");   /* DSW1 */
 	map(0x5000, 0x5007).nopw();    /* to sound board */
-	map(0x5800, 0x5800).w(FUNC(redclash_state::redclash_star_w<0>));
-	map(0x5801, 0x5801).w(FUNC(redclash_state::redclash_gfxbank_w));
-	map(0x5805, 0x5805).w(FUNC(redclash_state::redclash_star_w<1>));
-	map(0x5806, 0x5806).w(FUNC(redclash_state::redclash_star_w<2>));
-	map(0x5807, 0x5807).w(FUNC(redclash_state::redclash_flipscreen_w));
+	map(0x5800, 0x5800).w(FUNC(redclash_state::star_w<0>));
+	map(0x5801, 0x5801).w(FUNC(redclash_state::gfxbank_w));
+	map(0x5805, 0x5805).w(FUNC(redclash_state::star_w<1>));
+	map(0x5806, 0x5806).w(FUNC(redclash_state::star_w<2>));
+	map(0x5807, 0x5807).w(FUNC(redclash_state::flipscreen_w));
 	map(0x6000, 0x67ff).ram();
-	map(0x6800, 0x6bff).ram().share("spriteram");
-	map(0x7000, 0x7000).w(FUNC(redclash_state::redclash_star_reset_w));
+	map(0x6800, 0x6bff).ram().share(m_spriteram);
+	map(0x7000, 0x7000).w(FUNC(redclash_state::star_reset_w));
 	map(0x7800, 0x7800).w(FUNC(redclash_state::irqack_w));
 }
 
@@ -119,7 +119,7 @@ static INPUT_PORTS_START( redclash )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* Note that there are TWO VBlank inputs, one is active low, the other active */
-	/* high. There are probably other differencies in the hardware, but emulating */
+	/* high. There are probably other differences in the hardware, but emulating */
 	/* them this way is enough to get the game running. */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -213,7 +213,7 @@ static INPUT_PORTS_START( zerohour )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* Note that there are TWO VBlank inputs, one is active low, the other active */
-	/* high. There are probably other differencies in the hardware, but emulating */
+	/* high. There are probably other differences in the hardware, but emulating */
 	/* them this way is enough to get the game running. */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -345,54 +345,37 @@ void redclash_state::machine_reset()
 	m_gfxbank = 0;
 }
 
-MACHINE_CONFIG_START(redclash_state::zerohour)
-
+void redclash_state::zerohour(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(zerohour_map)
+	Z80(config, m_maincpu, 4000000);  /* 4 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &redclash_state::zerohour_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(redclash_state, screen_update_redclash)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, redclash_state, screen_vblank_redclash))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(1*8, 31*8-1, 4*8, 28*8-1);
+	screen.set_screen_update(FUNC(redclash_state::screen_update));
+	screen.screen_vblank().set(FUNC(redclash_state::screen_vblank));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_redclash);
-	PALETTE(config, m_palette, FUNC(redclash_state::redclash_palette), 4*8 + 4*16 + 32, 32 + 32);
+	PALETTE(config, m_palette, FUNC(redclash_state::palette), 4*8 + 4*16 + 32, 32 + 32);
 
 	ZEROHOUR_STARS(config, m_stars, 0);
 
 	/* sound hardware */
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(redclash_state::redclash)
+void redclash_state::redclash(machine_config &config)
+{
+	zerohour(config);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(redclash_map)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(redclash_state, screen_update_redclash)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, redclash_state, screen_vblank_redclash))
-	MCFG_SCREEN_PALETTE(m_palette)
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_redclash);
-	PALETTE(config, m_palette, FUNC(redclash_state::redclash_palette), 4*8 + 4*16 + 32, 32 + 32);
-
-	ZEROHOUR_STARS(config, m_stars, 0);
-
-	/* sound hardware */
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &redclash_state::redclash_map);
+}
 
 
 
@@ -560,6 +543,30 @@ ROM_START( redclashk )
 	ROM_LOAD( "3.11e",        0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* 6331.6w */
 ROM_END
 
+// 2 PCB set (K-00A and K-00B)
+ROM_START( redclashs )
+	ROM_REGION(0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.11c",       0x0000, 0x1000, CRC(62275f85) SHA1(8f5d7113a012cc29e3729d54c4a0319c838a7c0d) )
+	ROM_LOAD( "3.7c",        0x1000, 0x1000, CRC(c2090318) SHA1(71725cdf51aedf5f29fa1dd1a41ad5e62c9a580d) )
+	ROM_LOAD( "2.9c",        0x2000, 0x1000, CRC(b60e5ada) SHA1(37440f382c5e8852d804fa9837c36cc1e9d94d1d) )
+
+	ROM_REGION(0x0800, "gfx1", 0 )
+	ROM_LOAD( "6.a12",        0x0000, 0x0800, CRC(da9bbcc2) SHA1(4cbe03c7f5e99cc2f124e0089ea3c392156b5d92) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "4.3e",        0x0000, 0x0800, CRC(483a1293) SHA1(e7812475c7509389bcf8fee35598e9894428eb37) )
+	ROM_CONTINUE(            0x1000, 0x0800 )
+	ROM_LOAD( "5.3d",        0x0800, 0x0800, CRC(c45d9601) SHA1(2f156ad61161d65284df0cc55eb1b3b990eb41cb) )
+	ROM_CONTINUE(            0x1800, 0x0800 )
+
+	ROM_REGION( 0x2000, "gfx3", ROMREGION_ERASE00 )
+	/* gfx data will be rearranged here for 8x8 sprites */
+
+	ROM_REGION( 0x0060, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "1.12f",        0x0000, 0x0020, CRC(43989681) SHA1(0d471e6f499294f2f62f27392b8370e2af8e38a3) ) /* palette */
+	ROM_LOAD( "2.4a",         0x0020, 0x0020, CRC(9adabf46) SHA1(f3538fdbc4280b6be46a4d7ebb4c34bd1a1ce2b7) ) /* sprite color lookup table */
+	ROM_LOAD( "3.11e",        0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
+ROM_END
 
 void redclash_state::init_redclash()
 {
@@ -576,9 +583,10 @@ void redclash_state::init_redclash()
 }
 
 
-GAME( 1980, zerohour,  0,        zerohour, zerohour, redclash_state, init_redclash, ROT270, "Universal",               "Zero Hour (set 1)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohoura, zerohour, zerohour, zerohour, redclash_state, init_redclash, ROT270, "Universal",               "Zero Hour (set 2)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohouri, zerohour, zerohour, zerohour, redclash_state, init_redclash, ROT270, "bootleg (Inder SA)",      "Zero Hour (Inder)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redclash,  0,        redclash, redclash, redclash_state, init_redclash, ROT270, "Tehkan",                  "Red Clash (set 1)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redclasha, redclash, redclash, redclash, redclash_state, init_redclash, ROT270, "Tehkan",                  "Red Clash (set 2)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redclashk, redclash, redclash, redclash, redclash_state, init_redclash, ROT270, "Tehkan (Kaneko license)", "Red Clash (Kaneko)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohour,  0,        zerohour, zerohour, redclash_state, init_redclash, ROT270, "Universal",                   "Zero Hour (set 1)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohoura, zerohour, zerohour, zerohour, redclash_state, init_redclash, ROT270, "Universal",                   "Zero Hour (set 2)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohouri, zerohour, zerohour, zerohour, redclash_state, init_redclash, ROT270, "bootleg (Inder SA)",          "Zero Hour (Inder)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclash,  0,        redclash, redclash, redclash_state, init_redclash, ROT270, "Tehkan",                      "Red Clash (set 1)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclasha, redclash, redclash, redclash, redclash_state, init_redclash, ROT270, "Tehkan",                      "Red Clash (set 2)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclashk, redclash, redclash, redclash, redclash_state, init_redclash, ROT270, "Tehkan (Kaneko license)",     "Red Clash (Kaneko)",     MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, redclashs, redclash, redclash, redclash, redclash_state, init_redclash, ROT270, "Tehkan (Suntronics license)", "Red Clash (Suntronics)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

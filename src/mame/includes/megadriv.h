@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_INCLUDES_MEGADRIV_H
+#define MAME_INCLUDES_MEGADRIV_H
+
+#pragma once
 
 #include "coreutil.h"
 #include "cpu/m68000/m68000.h"
@@ -40,8 +44,8 @@ struct genesis_z80_vars
 class md_base_state : public driver_device
 {
 public:
-	md_base_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
+	md_base_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_z80snd(*this,"genesis_snd_z80"),
 		m_ymsnd(*this,"ymsnd"),
@@ -50,13 +54,13 @@ public:
 		m_megadrive_ram(*this,"megadrive_ram"),
 		m_io_reset(*this, "RESET")
 	{ }
+
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
 	optional_device<ym2612_device> m_ymsnd;
 	optional_device<timer_device> m_scan_timer;
 	required_device<sega315_5313_device> m_vdp;
 	optional_shared_ptr<uint16_t> m_megadrive_ram;
-
 
 	optional_ioport m_io_reset;
 	ioport_port *m_io_pad_3b[4];
@@ -145,12 +149,12 @@ public:
 class md_cons_state : public md_base_state
 {
 public:
-	md_cons_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag),
-	m_32x(*this,"sega32x"),
-	m_segacd(*this,"segacd"),
-	m_cart(*this, "mdslot"),
-	m_tmss(*this, "tmss")
+	md_cons_state(const machine_config &mconfig, device_type type, const char *tag) :
+		md_base_state(mconfig, type, tag),
+		m_32x(*this,"sega32x"),
+		m_segacd(*this,"segacd"),
+		m_cart(*this, "mdslot"),
+		m_tmss(*this, "tmss")
 	{ }
 
 	ioport_port *m_io_ctrlr;
@@ -202,3 +206,5 @@ public:
 	void genesis_scd(machine_config &config);
 	void genesis_tmss(machine_config &config);
 };
+
+#endif // MAME_INCLUDES_MEGADRIV_H

@@ -936,25 +936,24 @@ MACHINE_CONFIG_START(magictg_state::magictg)
 #endif
 	MCFG_PCI_BUS_LEGACY_DEVICE(9, DEVICE_SELF, magictg_state, zr36120_pci_r, zr36120_pci_w) // TODO: ZR36120 device
 
-	MCFG_DEVICE_ADD("voodoo_0", VOODOO_1, STD_VOODOO_1_CLOCK)
-	MCFG_VOODOO_FBMEM(2)
-	MCFG_VOODOO_TMUMEM(4,0)
-	MCFG_VOODOO_SCREEN_TAG("screen")
-	MCFG_VOODOO_CPU_TAG("mips")
+	VOODOO_1(config, m_voodoo[0], STD_VOODOO_1_CLOCK);
+	m_voodoo[0]->set_fbmem(2);
+	m_voodoo[0]->set_tmumem(4,0);
+	m_voodoo[0]->set_screen_tag("screen");
+	m_voodoo[0]->set_cpu_tag(m_mips);
 
-	MCFG_DEVICE_ADD("voodoo_1", VOODOO_1, STD_VOODOO_1_CLOCK)
-	MCFG_VOODOO_FBMEM(2)
-	MCFG_VOODOO_TMUMEM(4,0)
-	MCFG_VOODOO_SCREEN_TAG("screen")
-	MCFG_VOODOO_CPU_TAG("mips")
+	VOODOO_1(config, m_voodoo[1], STD_VOODOO_1_CLOCK);
+	m_voodoo[1]->set_fbmem(2);
+	m_voodoo[1]->set_tmumem(4,0);
+	m_voodoo[1]->set_screen_tag("screen");
+	m_voodoo[1]->set_cpu_tag(m_mips);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(1024, 1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 447)
-
-	MCFG_SCREEN_UPDATE_DRIVER(magictg_state, screen_update_magictg)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(1024, 1024);
+	screen.set_visarea(0, 511, 16, 447);
+	screen.set_screen_update(FUNC(magictg_state::screen_update_magictg));
 MACHINE_CONFIG_END
 
 

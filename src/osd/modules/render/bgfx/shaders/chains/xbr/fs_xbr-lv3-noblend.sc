@@ -166,11 +166,11 @@ void main()
 	// It uses CORNER_C if none of the others are defined.
 #ifdef CORNER_A
 	vec4 interp_restriction_lv1 = interp_restriction_lv0;
-#elif CORNER_B
+#elif defined(CORNER_B)
 	vec4 interp_restriction_lv1 = (interp_restriction_lv0 * (neq(f,b) * neq(h,d) + eq(e,i) * neq(f,i4) * neq(h,i5) + eq(e,g) + eq(e,c)));
-#elif CORNER_D
+#elif defined(CORNER_D)
 	vec4 interp_restriction_lv1 = (interp_restriction_lv0 * (neq(f,b) * neq(h,d) + eq(e,i) * neq(f,i4) * neq(h,i5) + eq(e,g) + eq(e,c)) * (vec4(notEqual(f,f4)) * vec4(notEqual(f,i)) + vec4(notEqual(h,h5)) * vec4(notEqual(h,i)) + vec4(notEqual(h,g)) + vec4(notEqual(f,c)) + eq(b,c1) * eq(d,g0)));
-#elif CORNER_C
+#elif defined(CORNER_C)
 	vec4 interp_restriction_lv1 = (interp_restriction_lv0 * (neq(f,b) * neq(f,c) + neq(h,d) * neq(h,g) + eq(e,i) * (neq(f,f4) * neq(f,i4) + neq(h,h5) * neq(h,i5)) + eq(e,g) + eq(e,c)));
 #endif
 

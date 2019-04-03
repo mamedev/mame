@@ -80,9 +80,9 @@ void redalert_state::get_pens(pen_t *pens)
 		uint8_t b0_bit = (data >> 0) & 0x01;
 		uint8_t b1_bit = (data >> 7) & 0x01;
 
-		uint8_t r = combine_3_weights(charmap_rg_weights, r0_bit, r1_bit, r2_bit);
-		uint8_t g = combine_3_weights(charmap_rg_weights, g0_bit, g1_bit, g2_bit);
-		uint8_t b = combine_2_weights(charmap_b_weights,  b0_bit, b1_bit);
+		uint8_t r = combine_weights(charmap_rg_weights, r0_bit, r1_bit, r2_bit);
+		uint8_t g = combine_weights(charmap_rg_weights, g0_bit, g1_bit, g2_bit);
+		uint8_t b = combine_weights(charmap_b_weights,  b0_bit, b1_bit);
 
 		pens[offs] = rgb_t(r, g, b);
 	}
@@ -402,28 +402,27 @@ uint32_t redalert_state::screen_update_panther(screen_device &screen, bitmap_rgb
  *
  *************************************/
 
-MACHINE_CONFIG_START(redalert_state::redalert_video_common)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(redalert_state, screen_update_redalert)
-MACHINE_CONFIG_END
+void redalert_state::redalert_video_common(machine_config &config)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(redalert_state::screen_update_redalert));
+}
 
-MACHINE_CONFIG_START(redalert_state::redalert_video)
-
+void redalert_state::redalert_video(machine_config &config)
+{
 	MCFG_VIDEO_START_OVERRIDE(redalert_state,redalert)
 	redalert_video_common(config);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(redalert_state::ww3_video)
-
+void redalert_state::ww3_video(machine_config &config)
+{
 	MCFG_VIDEO_START_OVERRIDE(redalert_state, ww3 )
 	redalert_video_common(config);
-
-MACHINE_CONFIG_END
+}
 
 
 /*************************************
@@ -432,26 +431,21 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(redalert_state::demoneye_video)
+void redalert_state::demoneye_video(machine_config &config)
+{
 	MCFG_VIDEO_START_OVERRIDE(redalert_state,redalert)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(redalert_state, screen_update_demoneye)
-MACHINE_CONFIG_END
+	redalert_video_common(config);
+
+	m_screen->set_screen_update(FUNC(redalert_state::screen_update_demoneye));
+}
 
 
-MACHINE_CONFIG_START(redalert_state::panther_video)
-
+void redalert_state::panther_video(machine_config &config)
+{
 	MCFG_VIDEO_START_OVERRIDE(redalert_state,ww3)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(redalert_state, screen_update_panther)
-MACHINE_CONFIG_END
+	redalert_video_common(config);
+
+	m_screen->set_screen_update(FUNC(redalert_state::screen_update_panther));
+}

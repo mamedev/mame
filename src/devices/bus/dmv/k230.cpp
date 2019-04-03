@@ -98,7 +98,10 @@ dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_dmvslot_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
-	, m_rom(*this, "rom"), m_bus(nullptr), m_io(nullptr), m_switch16(0), m_hold(0)
+	, m_rom(*this, "rom")
+	, m_bus(*this, DEVICE_SELF_OWNER)
+	, m_switch16(0)
+	, m_hold(0)
 {
 }
 
@@ -136,14 +139,12 @@ dmv_k235_device::dmv_k235_device(const machine_config &mconfig, const char *tag,
 
 void dmv_k230_device::device_start()
 {
-	m_bus = static_cast<dmvcart_slot_device*>(owner());
-	m_io = &machine().device<cpu_device>("maincpu")->space(AS_IO);
 }
 
 void dmv_k234_device::device_start()
 {
 	dmv_k230_device::device_start();
-	m_io->install_readwrite_handler(0xd8, 0xdf, read8_delegate(FUNC(dmv_k234_device::snr_r), this), write8_delegate(FUNC(dmv_k234_device::snr_w), this), 0);
+	m_bus->m_iospace->install_readwrite_handler(0xd8, 0xdf, read8_delegate(FUNC(dmv_k234_device::snr_r), this), write8_delegate(FUNC(dmv_k234_device::snr_w), this), 0);
 }
 
 //-------------------------------------------------
@@ -247,12 +248,12 @@ READ8_MEMBER(dmv_k230_device::rom_r)
 
 READ8_MEMBER( dmv_k230_device::io_r )
 {
-	return m_io->read_byte(offset);
+	return m_bus->m_iospace->read_byte(offset);
 }
 
 WRITE8_MEMBER( dmv_k230_device::io_w )
 {
-	m_io->write_byte(offset, data);
+	m_bus->m_iospace->write_byte(offset, data);
 }
 
 READ8_MEMBER( dmv_k230_device::program_r )

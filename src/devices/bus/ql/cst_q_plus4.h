@@ -37,8 +37,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_ql_expansion_card_interface overrides
-	virtual uint8_t read(address_space &space, offs_t offset, uint8_t data) override;
-	virtual void write(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t read(offs_t offset, uint8_t data) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER( exp1_extintl_w ) { m_exp1_extinl = state; update_extintl(); }

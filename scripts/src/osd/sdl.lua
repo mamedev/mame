@@ -52,16 +52,16 @@ function maintargetosdoptions(_target,_subtarget)
 			configuration { "mingw*"}
 				links {
 					"SDL2",
-					"Imm32",
-					"Version",
-					"Ole32",
-					"OleAut32",
+					"imm32",
+					"version",
+					"ole32",
+					"oleaut32",
 				}
 			configuration { "vs*" }
 				links {
 					"SDL2",
-					"Imm32",
-					"Version",
+					"imm32",
+					"version",
 				}
 			configuration { }
 		else
@@ -74,8 +74,8 @@ function maintargetosdoptions(_target,_subtarget)
 				configuration { "vs*" }
 					links {
 						"SDL2",
-						"Imm32",
-						"Version",
+						"imm32",
+						"version",
 					}
 				configuration { }
 			else
@@ -91,11 +91,11 @@ function maintargetosdoptions(_target,_subtarget)
 				libdirs {
 					path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x64")
 				}
+			configuration { }
 		end
 		links {
 			"psapi",
 		}
-		configuration {}
 	elseif _OPTIONS["targetos"]=="haiku" then
 		links {
 			"network",
@@ -107,7 +107,7 @@ function maintargetosdoptions(_target,_subtarget)
 		targetprefix "sdl"
 		links {
 			"psapi",
-			"Ole32",
+			"ole32",
 		}
 	configuration { }
 

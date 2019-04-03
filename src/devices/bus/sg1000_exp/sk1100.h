@@ -13,9 +13,9 @@
 
 
 #include "sg1000exp.h"
+#include "sk1100prn.h"
 #include "formats/sc3000_bit.h"
 #include "imagedev/cassette.h"
-#include "imagedev/printer.h"
 #include "machine/i8255.h"
 
 
@@ -55,6 +55,7 @@ private:
 
 	required_device<cassette_image_device> m_cassette;
 	required_device<i8255_device> m_ppi;
+	required_device<sk1100_printer_port_device> m_printer_port;
 	required_ioport_array<8> m_pa;
 	required_ioport_array<8> m_pb;
 

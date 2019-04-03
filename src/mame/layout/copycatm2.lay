@@ -9,6 +9,10 @@
 	<element name="static_green"><rect><color red="0.3" green="0.9" blue="0.3" /></rect></element>
 	<element name="static_yellow"><rect><color red="0.9" green="0.9" blue="0.3" /></rect></element>
 	<element name="static_orange"><rect><color red="0.9" green="0.6" blue="0.3" /></rect></element>
+	<element name="disk_red"><disk><color red="0.9" green="0.3" blue="0.3" /></disk></element>
+	<element name="disk_green"><disk><color red="0.3" green="0.9" blue="0.3" /></disk></element>
+	<element name="disk_yellow"><disk><color red="0.9" green="0.9" blue="0.3" /></disk></element>
+	<element name="disk_orange"><disk><color red="0.9" green="0.6" blue="0.3" /></disk></element>
 
 	<element name="text_u"><text string="REPLAY"><color red="0.9" green="0.89" blue="0.8" /></text></element>
 	<element name="text_d"><text string="Same Game Again"><color red="0.9" green="0.89" blue="0.8" /></text></element>
@@ -17,21 +21,21 @@
 
 	<element name="hlh" defstate="0">
 		<text string=" ">
-			<bounds x="0.0" y="0.0" width="2.0" height="1.0" />
+			<bounds x="0.0" y="0.0" width="3.0" height="1.0" />
 			<color red="0.0" green="0.0" blue="0.0" />
 		</text>
 		<disk state="1">
-			<bounds x="0.57" y="0.07" width="0.86" height="0.86" />
+			<bounds x="1.07" y="0.07" width="0.86" height="0.86" />
 			<color red="0.0" green="0.0" blue="0.0" />
 		</disk>
 	</element>
 	<element name="hlv" defstate="0">
 		<text string=" ">
-			<bounds x="0.0" y="0.0" width="1.0" height="2.0" />
+			<bounds x="0.0" y="0.0" width="1.0" height="3.0" />
 			<color red="0.0" green="0.0" blue="0.0" />
 		</text>
 		<disk state="1">
-			<bounds x="0.07" y="0.57" width="0.86" height="0.86" />
+			<bounds x="0.07" y="1.07" width="0.86" height="0.86" />
 			<color red="0.0" green="0.0" blue="0.0" />
 		</disk>
 	</element>
@@ -73,15 +77,26 @@
 
 	<!-- main buttons and leds -->
 
+		<bezel element="disk_red"><bounds x="1" y="3" width="2" height="2" /></bezel>
+		<bezel element="disk_red"><bounds x="1" y="7" width="2" height="2" /></bezel>
 		<bezel element="static_red"><bounds x="1" y="4" width="2" height="4" /></bezel>
+
+		<bezel element="disk_yellow"><bounds x="3" y="1" width="2" height="2" /></bezel>
+		<bezel element="disk_yellow"><bounds x="7" y="1" width="2" height="2" /></bezel>
 		<bezel element="static_yellow"><bounds x="4" y="1" width="4" height="2" /></bezel>
+
+		<bezel element="disk_orange"><bounds x="9" y="3" width="2" height="2" /></bezel>
+		<bezel element="disk_orange"><bounds x="9" y="7" width="2" height="2" /></bezel>
 		<bezel element="static_orange"><bounds x="9" y="4" width="2" height="4" /></bezel>
+
+		<bezel element="disk_green"><bounds x="3" y="9" width="2" height="2" /></bezel>
+		<bezel element="disk_green"><bounds x="7" y="9" width="2" height="2" /></bezel>
 		<bezel element="static_green"><bounds x="4" y="9" width="4" height="2" /></bezel>
 
-		<bezel element="hlv" inputtag="IN.0" inputmask="0x02"><bounds x="1" y="4" width="2" height="4" /><color alpha="0.15" /></bezel>
-		<bezel element="hlh" inputtag="IN.0" inputmask="0x04"><bounds x="4" y="1" width="4" height="2" /><color alpha="0.15" /></bezel>
-		<bezel element="hlv" inputtag="IN.0" inputmask="0x01"><bounds x="9" y="4" width="2" height="4" /><color alpha="0.15" /></bezel>
-		<bezel element="hlh" inputtag="IN.0" inputmask="0x08"><bounds x="4" y="9" width="4" height="2" /><color alpha="0.15" /></bezel>
+		<bezel element="hlv" inputtag="IN.0" inputmask="0x02"><bounds x="1" y="3" width="2" height="6" /><color alpha="0.15" /></bezel>
+		<bezel element="hlh" inputtag="IN.0" inputmask="0x04"><bounds x="3" y="1" width="6" height="2" /><color alpha="0.15" /></bezel>
+		<bezel element="hlv" inputtag="IN.0" inputmask="0x01"><bounds x="9" y="3" width="2" height="6" /><color alpha="0.15" /></bezel>
+		<bezel element="hlh" inputtag="IN.0" inputmask="0x08"><bounds x="3" y="9" width="6" height="2" /><color alpha="0.15" /></bezel>
 
 		<bezel name="0.3" element="ledg"><bounds x="5.75" y="8.25" width="0.5" height="0.5" /></bezel>
 		<bezel name="0.1" element="ledr"><bounds x="3.25" y="5.75" width="0.5" height="0.5" /></bezel>

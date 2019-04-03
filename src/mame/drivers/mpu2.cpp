@@ -74,10 +74,11 @@ INPUT_PORTS_END
 
 
 
-MACHINE_CONFIG_START(mpu2_state::mpu2)
-	MCFG_DEVICE_ADD("maincpu", M6800, 2000000) // ?
-	MCFG_DEVICE_PROGRAM_MAP(mpu2_basemap)
-MACHINE_CONFIG_END
+void mpu2_state::mpu2(machine_config &config)
+{
+	M6800(config, m_maincpu, 2000000); // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu2_state::mpu2_basemap);
+}
 
 // technically not a 'bios' because they're all on the same board.
 #define MPU2_MASKROM \

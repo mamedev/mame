@@ -267,11 +267,12 @@ WRITE8_MEMBER( hardbox_device::ppi1_pc_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(hardbox_device::device_add_mconfig)
+void hardbox_device::device_add_mconfig(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(hardbox_mem)
-	MCFG_DEVICE_IO_MAP(hardbox_io)
+	Z80(config, m_maincpu, XTAL(8'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hardbox_device::hardbox_mem);
+	m_maincpu->set_addrmap(AS_IO, &hardbox_device::hardbox_io);
 
 	// devices
 	i8255_device &ppi0(I8255A(config, I8255_0_TAG));
@@ -285,16 +286,12 @@ MACHINE_CONFIG_START(hardbox_device::device_add_mconfig)
 	ppi1.in_pc_callback().set(FUNC(hardbox_device::ppi1_pc_r));
 	ppi1.out_pc_callback().set(FUNC(hardbox_device::ppi1_pc_w));
 
-	MCFG_DEVICE_ADD(CORVUS_HDC_TAG, CORVUS_HDC, 0)
-	MCFG_HARDDISK_ADD("harddisk1")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	MCFG_HARDDISK_ADD("harddisk2")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	MCFG_HARDDISK_ADD("harddisk3")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	MCFG_HARDDISK_ADD("harddisk4")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-MACHINE_CONFIG_END
+	CORVUS_HDC(config, m_hdc, 0);
+	HARDDISK(config, "harddisk1", "corvus_hdd");
+	HARDDISK(config, "harddisk2", "corvus_hdd");
+	HARDDISK(config, "harddisk3", "corvus_hdd");
+	HARDDISK(config, "harddisk4", "corvus_hdd");
+}
 
 
 //-------------------------------------------------

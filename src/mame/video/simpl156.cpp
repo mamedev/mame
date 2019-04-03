@@ -12,23 +12,23 @@
 void simpl156_state::video_start()
 {
 	/* allocate the ram as 16-bit (we do it here because the CPU is 32-bit) */
-	m_pf1_rowscroll = make_unique_clear<uint16_t[]>(0x800/2);
-	m_pf2_rowscroll = make_unique_clear<uint16_t[]>(0x800/2);
-	m_spriteram = make_unique_clear<uint16_t[]>(0x2000/2);
+	m_rowscroll[0] = make_unique_clear<u16[]>(0x800/2);
+	m_rowscroll[1] = make_unique_clear<u16[]>(0x800/2);
+	m_spriteram = make_unique_clear<u16[]>(0x2000/2);
 
 	memset(m_spriteram.get(), 0xff, 0x2000);
 
 	/* and register the allocated ram so that save states still work */
-	save_pointer(NAME(m_pf1_rowscroll), 0x800/2);
-	save_pointer(NAME(m_pf2_rowscroll), 0x800/2);
+	save_pointer(NAME(m_rowscroll[0]), 0x800/2);
+	save_pointer(NAME(m_rowscroll[1]), 0x800/2);
 	save_pointer(NAME(m_spriteram), 0x2000/2);
 }
 
-uint32_t simpl156_state::screen_update_simpl156(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 simpl156_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0);
 
-	m_deco_tilegen->pf_update(m_pf1_rowscroll.get(), m_pf2_rowscroll.get());
+	m_deco_tilegen->pf_update(m_rowscroll[0].get(), m_rowscroll[1].get());
 
 	bitmap.fill(256, cliprect);
 

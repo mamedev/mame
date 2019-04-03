@@ -522,7 +522,8 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	m_centronics->set_data_input_buffer("cent_data_in");
 	m_centronics->busy_handler().set(FUNC(aussiebyte_state::write_centronics_busy));
 	INPUT_BUFFER(config, "cent_data_in");
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -575,10 +576,8 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	WD2797(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->intrq_wr_callback().set(FUNC(aussiebyte_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(aussiebyte_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	/* devices */
 	SY6545_1(config, m_crtc, 16_MHz_XTAL / 8);
@@ -591,7 +590,7 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	MSM5832(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", aussiebyte_state, aussiebyte, "com,cpm", 3)
+	MCFG_QUICKLOAD_ADD("quickload", aussiebyte_state, aussiebyte, "com,cpm", attotime::from_seconds(3))
 
 MACHINE_CONFIG_END
 

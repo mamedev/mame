@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   id="svg4563"
+   version="1.1"
+   viewBox="0 0 321.26581 91.07238"
+   height="91.07238mm"
+   width="321.26581mm">
+  <defs
+     id="defs4557">
+    <linearGradient
+       id="left-dark">
+      <stop
+         style="stop-color:#00274f;stop-opacity:1"
+         offset="0"
+         id="stop5213" />
+      <stop
+         style="stop-color:#68cafb;stop-opacity:1"
+         offset="1"
+         id="stop5215" />
+    </linearGradient>
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
+       y2="299.328"
+       x2="11"
+       y1="299.328"
+       x1="1213.16"
+       id="right-dark">
+      <stop
+         id="stop4"
+         stop-color="#68cafb"
+         offset="0" />
+      <stop
+         id="stop6"
+         stop-color="#00274f"
+         offset="1" />
+    </linearGradient>
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
+       y2="162.44048"
+       x2="237.65611"
+       y1="162.44048"
+       x1="-80.41803"
+       id="linearGradient5175"
+       xlink:href="#right-dark" />
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
+       y2="162.44048"
+       x2="237.65611"
+       y1="162.44048"
+       x1="-80.41803"
+       id="linearGradient5211"
+       xlink:href="#left-dark" />
+  </defs>
+  <g
+     transform="translate(82.012688,-116.4355)"
+     id="layer1">
+    <path
+       style="fill:url(#linearGradient5175);fill-rule:evenodd;stroke:url(#linearGradient5211);stroke-width:1.32291663px;stroke-linejoin:miter;stroke-opacity:0.75"
+       d="m -80.418029,184.88601 66.4546,-66.5869 v 28.92769 l 29.05998,-28.92769 v 46.56667 l 46.74315,-46.83125 v 52.51979 l 52.519789,-52.51979 v 29.19227 l 29.01579,-28.92769 v 44.6704 l 43.56815,-43.65625 h 50.71269 l -16.36184,16.36025 h -25.83921 l -7.40833,7.40833 h 13.44877 l -17.02064,17.24184 h -13.80332 l -7.67291,7.54062 h 44.93418 l -17.15293,17.02171 h -68.74748 l 4.14496,-4.54211 V 161.91118 L 101.6153,186.07663 V 158.0308 L 74.715911,184.88601 H 44.421121 V 162.17576 L -0.24927857,206.84642 H -26.707609 L -2.1013586,182.1518 V 162.17576 L -26.707609,186.6058 v -29.10417 l -27.25209,27.38438 z"
+       class="cls-1" />
+  </g>
+</svg>

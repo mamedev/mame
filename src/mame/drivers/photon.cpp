@@ -214,23 +214,23 @@ uint32_t photon_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return video_update(screen, bitmap, cliprect, memregion("maincpu")->base());
 }
 
-MACHINE_CONFIG_START(photon_state::photon)
-
+void photon_state::photon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8080, 1780000)
-	MCFG_DEVICE_PROGRAM_MAP(pk8000_mem)
-	MCFG_DEVICE_IO_MAP(pk8000_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", photon_state, interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(photon_state, irq_callback)
+	I8080(config, m_maincpu, 1780000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &photon_state::pk8000_mem);
+	m_maincpu->set_addrmap(AS_IO, &photon_state::pk8000_io);
+	m_maincpu->set_vblank_int("screen", FUNC(photon_state::interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(photon_state::irq_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256+32, 192+32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256+32-1, 0, 192+32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(photon_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256+32, 192+32);
+	screen.set_visarea(0, 256+32-1, 0, 192+32-1);
+	screen.set_screen_update(FUNC(photon_state::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(photon_state::pk8000_palette), 16);
 
@@ -247,7 +247,7 @@ MACHINE_CONFIG_START(photon_state::photon)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 /*
     Dump was made using custom adaptor, hence it is marked as bad dump.

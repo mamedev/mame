@@ -167,15 +167,15 @@ void tx1_state::buggyboy_math(address_map &map)
  *
  *************************************/
 
-MACHINE_CONFIG_START(tx1_state::tx1)
-	MCFG_DEVICE_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
-	MCFG_DEVICE_PROGRAM_MAP(tx1_main)
+void tx1_state::tx1(machine_config &config)
+{
+	I8086(config, m_maincpu, CPU_MASTER_CLOCK / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tx1_state::tx1_main);
 
-	WATCHDOG_TIMER(config, "watchdog");
-//  MCFG_WATCHDOG_TIME_INIT(5)
+	WATCHDOG_TIMER(config, "watchdog");//.set_time(5);
 
-	MCFG_DEVICE_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
-	MCFG_DEVICE_PROGRAM_MAP(tx1_math)
+	I8086(config, m_mathcpu, CPU_MASTER_CLOCK / 3);
+	m_mathcpu->set_addrmap(AS_PROGRAM, &tx1_state::tx1_math);
 
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,tx1)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -184,97 +184,96 @@ MACHINE_CONFIG_START(tx1_state::tx1)
 
 	config.set_default_layout(layout_triphsxs);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(TX1_PIXEL_CLOCK, TX1_HTOTAL, TX1_HBEND, TX1_HBSTART, TX1_VTOTAL, TX1_VBEND, TX1_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(tx1_state, screen_update_tx1_left)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_raw(TX1_PIXEL_CLOCK, TX1_HTOTAL, TX1_HBEND, TX1_HBSTART, TX1_VTOTAL, TX1_VBEND, TX1_VBSTART);
+	lscreen.set_screen_update(FUNC(tx1_state::screen_update_tx1_left));
+	lscreen.set_palette("palette");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(TX1_PIXEL_CLOCK, TX1_HTOTAL, TX1_HBEND, TX1_HBSTART, TX1_VTOTAL, TX1_VBEND, TX1_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(tx1_state, screen_update_tx1_middle)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(TX1_PIXEL_CLOCK, TX1_HTOTAL, TX1_HBEND, TX1_HBSTART, TX1_VTOTAL, TX1_VBEND, TX1_VBSTART);
+	m_screen->set_screen_update(FUNC(tx1_state::screen_update_tx1_middle));
+	m_screen->set_palette("palette");
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(TX1_PIXEL_CLOCK, TX1_HTOTAL, TX1_HBEND, TX1_HBSTART, TX1_VTOTAL, TX1_VBEND, TX1_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(tx1_state, screen_update_tx1_right)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tx1_state, screen_vblank_tx1))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_raw(TX1_PIXEL_CLOCK, TX1_HTOTAL, TX1_HBEND, TX1_HBSTART, TX1_VTOTAL, TX1_VBEND, TX1_VBSTART);
+	rscreen.set_screen_update(FUNC(tx1_state::screen_update_tx1_right));
+	rscreen.screen_vblank().set(FUNC(tx1_state::screen_vblank_tx1));
+	rscreen.set_palette("palette");
 
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,tx1)
 
-	MCFG_DEVICE_ADD("soundbrd", TX1_SOUND, TX1_PIXEL_CLOCK)
-MACHINE_CONFIG_END
+	TX1_SOUND(config, m_sound, TX1_PIXEL_CLOCK);
+}
 
-MACHINE_CONFIG_START(tx1_state::tx1j)
+void tx1_state::tx1j(machine_config &config)
+{
 	tx1(config);
 
-	MCFG_DEVICE_REMOVE("soundbrd")
+	TX1J_SOUND(config.replace(), m_sound, TX1_PIXEL_CLOCK);
+}
 
-	MCFG_DEVICE_ADD("soundbrd", TX1J_SOUND, TX1_PIXEL_CLOCK)
-MACHINE_CONFIG_END
+void tx1_state::buggyboy(machine_config &config)
+{
+	I8086(config, m_maincpu, CPU_MASTER_CLOCK / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tx1_state::buggyboy_main);
 
-MACHINE_CONFIG_START(tx1_state::buggyboy)
-	MCFG_DEVICE_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
-	MCFG_DEVICE_PROGRAM_MAP(buggyboy_main)
+	WATCHDOG_TIMER(config, "watchdog");//.set_time(5);
 
-	WATCHDOG_TIMER(config, "watchdog");
-//  MCFG_WATCHDOG_TIME_INIT(5)
-
-	MCFG_DEVICE_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
-	MCFG_DEVICE_PROGRAM_MAP(buggyboy_math)
+	I8086(config, m_mathcpu, CPU_MASTER_CLOCK / 3);
+	m_mathcpu->set_addrmap(AS_PROGRAM, &tx1_state::buggyboy_math);
 
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	config.set_default_layout(layout_triphsxs);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(tx1_state, screen_update_buggyboy_left)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_raw(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART);
+	lscreen.set_screen_update(FUNC(tx1_state::screen_update_buggyboy_left));
+	lscreen.set_palette("palette");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(tx1_state, screen_update_buggyboy_middle)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART);
+	m_screen->set_screen_update(FUNC(tx1_state::screen_update_buggyboy_middle));
+	m_screen->set_palette("palette");
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(tx1_state, screen_update_buggyboy_right)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tx1_state, screen_vblank_buggyboy))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_raw(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART);
+	rscreen.set_screen_update(FUNC(tx1_state::screen_update_buggyboy_right));
+	rscreen.screen_vblank().set(FUNC(tx1_state::screen_vblank_buggyboy));
+	rscreen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(tx1_state::buggyboy_palette), 256);
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,buggyboy)
 
-	MCFG_DEVICE_ADD("soundbrd", BUGGYBOY_SOUND, BUGGYBOY_ZCLK)
-MACHINE_CONFIG_END
+	BUGGYBOY_SOUND(config, m_sound, BUGGYBOY_ZCLK);
+}
 
 
-MACHINE_CONFIG_START(tx1_state::buggybjr)
-	MCFG_DEVICE_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
-	MCFG_DEVICE_PROGRAM_MAP(buggybjr_main)
+void tx1_state::buggybjr(machine_config &config)
+{
+	I8086(config, m_maincpu, CPU_MASTER_CLOCK / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tx1_state::buggybjr_main);
 
-	WATCHDOG_TIMER(config, "watchdog");
-//  MCFG_WATCHDOG_TIME_INIT(5)
+	WATCHDOG_TIMER(config, "watchdog");//.set_time(5);
 
-	MCFG_DEVICE_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
-	MCFG_DEVICE_PROGRAM_MAP(buggyboy_math)
+	I8086(config, m_mathcpu, CPU_MASTER_CLOCK / 3);
+	m_mathcpu->set_addrmap(AS_PROGRAM, &tx1_state::buggyboy_math);
 
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(tx1_state, screen_update_buggybjr)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tx1_state, screen_vblank_buggyboy))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART);
+	m_screen->set_screen_update(FUNC(tx1_state::screen_update_buggybjr));
+	m_screen->screen_vblank().set(FUNC(tx1_state::screen_vblank_buggyboy));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(tx1_state::buggyboy_palette), 256);
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,buggybjr)
 
-	MCFG_DEVICE_ADD("soundbrd", BUGGYBOYJR_SOUND, BUGGYBOY_ZCLK)
-MACHINE_CONFIG_END
+	BUGGYBOYJR_SOUND(config, m_sound, BUGGYBOY_ZCLK);
+}
 
 
 /*************************************

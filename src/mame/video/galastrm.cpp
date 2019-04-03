@@ -31,9 +31,7 @@ void galastrm_state::video_start()
 	save_item(NAME(m_rsxoffs));
 	save_item(NAME(m_rsyoffs));
 	save_item(NAME(m_frame_counter));
-	save_item(NAME(m_tc0110pcr_addr));
-	save_item(NAME(m_tc0610_0_addr));
-	save_item(NAME(m_tc0610_1_addr));
+	save_item(NAME(m_tc0610_addr));
 	save_item(NAME(m_tc0610_ctrl_reg));
 }
 
@@ -86,8 +84,6 @@ Heavy use is made of sprite zooming.
 
 void galastrm_state::draw_sprites_pre(int x_offs, int y_offs)
 {
-	uint32_t *spriteram32 = m_spriteram;
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
@@ -101,19 +97,19 @@ void galastrm_state::draw_sprites_pre(int x_offs, int y_offs)
 
 	for (offs = (m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
 	{
-		data = spriteram32[offs+0];
+		data = m_spriteram[offs+0];
 		flipx =    (data & 0x00800000) >> 23;
 		zoomx =    (data & 0x007f0000) >> 16;
 		tilenum =  (data & 0x00007fff);
 
 		if (!tilenum) continue;
 
-		data = spriteram32[offs+2];
+		data = m_spriteram[offs+2];
 		priority = (data & 0x000c0000) >> 18;
 		color =    (data & 0x0003fc00) >> 10;
 		x =        (data & 0x000003ff);
 
-		data = spriteram32[offs+3];
+		data = m_spriteram[offs+3];
 		dblsize =  (data & 0x00040000) >> 18;
 		flipy =    (data & 0x00020000) >> 17;
 		zoomy =    (data & 0x0001fc00) >> 10;
@@ -146,7 +142,7 @@ void galastrm_state::draw_sprites_pre(int x_offs, int y_offs)
 			if (flipx)  px = dimension-1-k;
 			if (flipy)  py = dimension-1-j;
 
-			code = spritemap[map_offset + px + (py<<(dblsize+1))];
+			code = m_spritemap_rom[map_offset + px + (py<<(dblsize+1))];
 
 			if (code==0xffff)
 			{

@@ -56,7 +56,7 @@ enum
 
 WRITE16_MEMBER( acclaim_rax_device::data_w )
 {
-	m_data_in->write(space, 0, data, 0xffff);
+	m_data_in->write(data);
 	m_cpu->set_input_line(ADSP2181_IRQL0, ASSERT_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(5));
 }
@@ -65,7 +65,7 @@ WRITE16_MEMBER( acclaim_rax_device::data_w )
 READ16_MEMBER( acclaim_rax_device::data_r )
 {
 	m_adsp_snd_pf0 = 1;
-	return m_data_out->read(space, 0);
+	return m_data_out->read();
 }
 
 
@@ -256,12 +256,12 @@ WRITE16_MEMBER( acclaim_rax_device::rom_bank_w )
 READ16_MEMBER( acclaim_rax_device::host_r )
 {
 	m_cpu->set_input_line(ADSP2181_IRQL0, CLEAR_LINE);
-	return m_data_in->read(space, 0);
+	return m_data_in->read();
 }
 
 WRITE16_MEMBER( acclaim_rax_device::host_w )
 {
-	m_data_out->write(space, 0, data, 0xffff);
+	m_data_out->write(data);
 	m_adsp_snd_pf0 = 0;
 }
 

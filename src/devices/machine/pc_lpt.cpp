@@ -46,7 +46,8 @@ void pc_lpt_device::device_reset()
 	m_cent_ctrl_out->write(m_control);
 }
 
-MACHINE_CONFIG_START(pc_lpt_device::device_add_mconfig)
+void pc_lpt_device::device_add_mconfig(machine_config &config)
+{
 	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
 	centronics.set_data_input_buffer(m_cent_data_in);
 	centronics.fault_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit3));
@@ -64,7 +65,8 @@ MACHINE_CONFIG_START(pc_lpt_device::device_add_mconfig)
 	INPUT_BUFFER(config, m_cent_ctrl_in);
 	INPUT_BUFFER(config, m_cent_status_in);
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	centronics.set_output_latch(*m_cent_data_out);
 
 	OUTPUT_LATCH(config, m_cent_ctrl_out);
 	m_cent_ctrl_out->bit_handler<0>().set("centronics", FUNC(centronics_device::write_strobe));
@@ -72,7 +74,7 @@ MACHINE_CONFIG_START(pc_lpt_device::device_add_mconfig)
 	m_cent_ctrl_out->bit_handler<2>().set("centronics", FUNC(centronics_device::write_init));
 	m_cent_ctrl_out->bit_handler<3>().set("centronics", FUNC(centronics_device::write_select_in));
 	m_cent_ctrl_out->bit_handler<4>().set(FUNC(pc_lpt_device::write_irq_enabled));
-MACHINE_CONFIG_END
+}
 
 
 READ8_MEMBER( pc_lpt_device::data_r )

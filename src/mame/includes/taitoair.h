@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "cpu/tms32025/tms32025.h"
 #include "machine/taitoio.h"
 #include "machine/taitoio_yoke.h"
 #include "video/tc0080vco.h"
@@ -71,7 +72,7 @@ private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_dsp;
+	required_device<tms32025_device> m_dsp;
 	required_device<tc0080vco_device> m_tc0080vco;
 	required_device<tc0220ioc_device> m_tc0220ioc;
 	required_device<taitoio_yoke_device> m_yoke;

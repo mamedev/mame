@@ -104,8 +104,7 @@ dio16_device::dio16_device(const machine_config &mconfig, const char *tag, devic
 
 dio16_device::dio16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_maincpu(*this, finder_base::DUMMY_TAG),
-	m_prgspace(nullptr),
+	m_prgspace(*this, finder_base::DUMMY_TAG, -1),
 	m_irq1_out_cb(*this),
 	m_irq2_out_cb(*this),
 	m_irq3_out_cb(*this),
@@ -136,8 +135,7 @@ void dio16_device::device_start()
 	m_dmar0_out_cb.resolve_safe();
 	m_dmar1_out_cb.resolve_safe();
 
-	m_prgspace = &m_maincpu->space(AS_PROGRAM);
-	m_prgwidth = m_maincpu->space_config(AS_PROGRAM)->data_width();
+	m_prgwidth = m_prgspace->data_width();
 
 	save_item(NAME(m_irq));
 	save_item(NAME(m_dmar));

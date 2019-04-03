@@ -108,10 +108,10 @@ public:
 
 	u8 peek(offs_t offset) const { return m_ram[offset & 0x7ff]; }
 
-	DECLARE_WRITE8_MEMBER(left_w);
-	DECLARE_READ8_MEMBER(left_r);
-	DECLARE_WRITE8_MEMBER(right_w);
-	DECLARE_READ8_MEMBER(right_r);
+	void left_w(offs_t offset, u8 data);
+	u8 left_r(offs_t offset);
+	void right_w(offs_t offset, u8 data);
+	u8 right_r(offs_t offset);
 
 protected:
 	mb8421_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -140,10 +140,10 @@ public:
 
 	u16 peek(offs_t offset) const { return m_ram[offset & 0x7ff]; }
 
-	DECLARE_WRITE16_MEMBER(left_w);
-	DECLARE_READ16_MEMBER(left_r);
-	DECLARE_WRITE16_MEMBER(right_w);
-	DECLARE_READ16_MEMBER(right_r);
+	void left_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
+	u16 left_r(offs_t offset, u16 mem_mask = 0xffff);
+	void right_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
+	u16 right_r(offs_t offset, u16 mem_mask = 0xffff);
 
 protected:
 	// device-level overrides

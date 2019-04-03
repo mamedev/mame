@@ -81,7 +81,8 @@ DEFINE_DEVICE_TYPE(MPU401, mpu401_device, "mpu401", "Roland MPU-401 I/O box")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(mpu401_device::device_add_mconfig)
+void mpu401_device::device_add_mconfig(machine_config &config)
+{
 	M6801(config, m_ourcpu, 4000000); /* 4 MHz as per schematics */
 	m_ourcpu->set_addrmap(AS_PROGRAM, &mpu401_device::mpu401_map);
 	m_ourcpu->in_p1_cb().set(FUNC(mpu401_device::port1_r));
@@ -90,11 +91,10 @@ MACHINE_CONFIG_START(mpu401_device::device_add_mconfig)
 	m_ourcpu->out_p2_cb().set(FUNC(mpu401_device::port2_w));
 	m_ourcpu->out_ser_tx_cb().set(MIDIOUT_TAG, FUNC(midi_port_device::write_txd));
 
-	MCFG_MIDI_PORT_ADD(MIDIIN_TAG, midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(DEVICE_SELF, mpu401_device, midi_rx_w))
+	MIDI_PORT(config, MIDIIN_TAG, midiin_slot, "midiin").rxd_handler().set(DEVICE_SELF, FUNC(mpu401_device::midi_rx_w));
 
-	MCFG_MIDI_PORT_ADD(MIDIOUT_TAG, midiout_slot, "midiout")
-MACHINE_CONFIG_END
+	MIDI_PORT(config, MIDIOUT_TAG, midiout_slot, "midiout");
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

@@ -35,7 +35,9 @@ To Do:
 #include "machine/z80scc.h"
 #include "bus/rs232/rs232.h"
 #include "machine/z8536.h"
+#include "sound/spkrdev.h"
 #include "emupal.h"
+#include "speaker.h"
 
 
 class c900_state : public driver_device
@@ -44,16 +46,25 @@ public:
 	c900_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_spkrdev(*this, "speaker")
 	{ }
 
 	void c900(machine_config &config);
 
 private:
+	void sound_pb_w(u8 data);
+
 	void data_map(address_map &map);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_spkrdev;
 };
+
+void c900_state::sound_pb_w(u8 data)
+{
+	m_spkrdev->level_w(BIT(data, 0));
+}
 
 void c900_state::mem_map(address_map &map)
 {
@@ -64,6 +75,7 @@ void c900_state::data_map(address_map &map)
 {
 	map(0x00000, 0x07fff).rom().region("roms", 0);
 	map(0x08000, 0x6ffff).ram();
+	map(0xf0000, 0xf1fff).ram();
 }
 
 void c900_state::io_map(address_map &map)
@@ -93,19 +105,21 @@ static GFXDECODE_START( gfx_c900 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, c900_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(c900_state::c900)
+void c900_state::c900(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z8001, XTAL(12'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_DATA_MAP(data_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z8001(config, m_maincpu, 12_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c900_state::mem_map);
+	m_maincpu->set_addrmap(AS_DATA, &c900_state::data_map);
+	m_maincpu->set_addrmap(AS_IO, &c900_state::io_map);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c900)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_c900);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	Z8036(config, "cio", 6'000'000);
+	z8036_device &cio(Z8036(config, "cio", 12_MHz_XTAL / 16)); // SNDCLK = 750kHz
+	cio.pb_wr_cb().set(FUNC(c900_state::sound_pb_w));
 
-	scc8030_device& scc(SCC8030(config, "scc", 6'000'000)); // 5'850'000 is the ideal figure
+	scc8030_device &scc(SCC8030(config, "scc", 12_MHz_XTAL / 2)); // 5'850'000 is the ideal figure
 	/* Port B */
 	scc.out_txdb_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	scc.out_dtrb_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
@@ -115,7 +129,10 @@ MACHINE_CONFIG_START(c900_state::c900)
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set("scc", FUNC(scc8030_device::rxb_w));
 	rs232.cts_handler().set("scc", FUNC(scc8030_device::ctsb_w));
-MACHINE_CONFIG_END
+
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_spkrdev).add_route(ALL_OUTPUTS, "mono", 0.05);
+}
 
 ROM_START( c900 )
 	ROM_REGION16_LE( 0x8000, "roms", 0 )

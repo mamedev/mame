@@ -493,10 +493,11 @@ INPUT_PORTS_END
 
 /*** MACHINE DRIVER **********************************************************/
 
-MACHINE_CONFIG_START(gstriker_state::base)
-	MCFG_DEVICE_ADD("audiocpu", Z80,8000000/2) /* 4 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
+void gstriker_state::base(machine_config &config)
+{
+	Z80(config, m_audiocpu, 8000000/2); /* 4 MHz ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gstriker_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &gstriker_state::sound_io_map);
 
 	vs9209_device &io(VS9209(config, "io", 0));
 	io.porta_input_cb().set_ioport("P1");
@@ -507,21 +508,20 @@ MACHINE_CONFIG_START(gstriker_state::base)
 	io.porth_input_cb().set(m_soundlatch, FUNC(generic_latch_8_device::pending_r)).lshift(0);
 	io.porth_output_cb().set("watchdog", FUNC(mb3773_device::write_line_ck)).bit(3);
 
-	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
+	MB3773(config, m_watchdog, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000) /* hand-tuned, it needs a bit */)
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gstriker_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gstriker_state, screen_vblank))
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//  m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(5000)); /* hand-tuned, it needs a bit */
+	m_screen->set_size(64*8, 64*8);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(gstriker_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(gstriker_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gstriker);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x800);
-
 
 	MB60553(config, m_bg, 0);
 	m_bg->set_gfxdecode_tag(m_gfxdecode);
@@ -544,13 +544,13 @@ MACHINE_CONFIG_START(gstriker_state::base)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
+}
 
 void gstriker_state::gstriker(machine_config &config)
 {

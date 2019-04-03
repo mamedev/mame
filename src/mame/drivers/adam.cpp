@@ -457,10 +457,10 @@ READ8_MEMBER( adam_state::mreq_r )
 		}
 	}
 
-	data = m_cart->bd_r(space, offset & 0x7fff, data, cs1, cs2, cs3, cs4);
-	data = m_slot1->bd_r(space, offset & 0xff, data, 1, biorq, 1, 1, 1);
-	data = m_slot2->bd_r(space, offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
-	data = m_slot3->bd_r(space, offset, data, 1, 1, 1, cas1, cas2);
+	data = m_cart->bd_r(offset & 0x7fff, data, cs1, cs2, cs3, cs4);
+	data = m_slot1->bd_r(offset & 0xff, data, 1, biorq, 1, 1, 1);
+	data = m_slot2->bd_r(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	data = m_slot3->bd_r(offset, data, 1, 1, 1, cas1, cas2);
 
 	return data;
 }
@@ -516,9 +516,9 @@ WRITE8_MEMBER( adam_state::mreq_w )
 		m_ram->pointer()[offset] = data;
 	}
 
-	m_slot1->bd_w(space, offset & 0xff, data, 1, biorq, 1, 1, 1);
-	m_slot2->bd_w(space, offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
-	m_slot3->bd_w(space, offset, data, 1, 1, 1, cas1, cas2);
+	m_slot1->bd_w(offset & 0xff, data, 1, biorq, 1, 1, 1);
+	m_slot2->bd_w(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	m_slot3->bd_w(offset, data, 1, 1, 1, cas1, cas2);
 }
 
 
@@ -557,9 +557,9 @@ READ8_MEMBER( adam_state::iorq_r )
 		break;
 	}
 
-	data = m_slot1->bd_r(space, offset & 0xff, data, 1, biorq, 1, 1, 1);
-	data = m_slot2->bd_r(space, offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
-	data = m_slot3->bd_r(space, offset, data, 1, 1, 1, cas1, cas2);
+	data = m_slot1->bd_r(offset & 0xff, data, 1, biorq, 1, 1, 1);
+	data = m_slot2->bd_r(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	data = m_slot3->bd_r(offset, data, 1, 1, 1, cas1, cas2);
 
 	return data;
 }
@@ -609,9 +609,9 @@ WRITE8_MEMBER( adam_state::iorq_w )
 		break;
 	}
 
-	m_slot1->bd_w(space, offset & 0xff, data, 1, biorq, 1, 1, 1);
-	m_slot2->bd_w(space, offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
-	m_slot3->bd_w(space, offset, data, 1, 1, 1, cas1, cas2);
+	m_slot1->bd_w(offset & 0xff, data, 1, biorq, 1, 1, 1);
+	m_slot2->bd_w(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	m_slot3->bd_w(offset, data, 1, 1, 1, cas1, cas2);
 }
 
 
@@ -1042,7 +1042,7 @@ void adam_state::adam(machine_config &config)
 	m_netcpu->out_p3_cb().set(FUNC(adam_state::m6801_p3_w));
 	m_netcpu->out_p4_cb().set(FUNC(adam_state::m6801_p4_w));
 	m_netcpu->out_sc2_cb().set(FUNC(adam_state::os3_w));
-	MCFG_QUANTUM_PERFECT_CPU(M6801_TAG)
+	config.m_perfect_cpu_quantum = subtag(M6801_TAG);
 
 	// video hardware
 	TMS9928A(config, m_vdc, XTAL(10'738'635)).set_screen("screen");

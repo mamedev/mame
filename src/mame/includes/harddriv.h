@@ -134,7 +134,7 @@ protected:
 	DECLARE_READ16_MEMBER( hd68k_zram_r );
 	DECLARE_WRITE16_MEMBER( hd68k_zram_w );
 
-	DECLARE_WRITE16_MEMBER( hdgsp_io_w );
+	void hdgsp_io_w(offs_t offset, u16 data, u16 mem_mask = ~u16(0));
 
 	DECLARE_WRITE16_MEMBER( hdgsp_protection_w );
 

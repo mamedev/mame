@@ -591,17 +591,24 @@ class delegate;
 template <typename ReturnType, typename... Params>
 class delegate<ReturnType (Params...)> : public delegate_base<ReturnType, Params...>
 {
+private:
 	using basetype = delegate_base<ReturnType, Params...>;
+
+protected:
+	template <class FunctionClass> using traits = typename basetype::template traits<FunctionClass>;
+	template <class FunctionClass> using member_func_type = typename traits<FunctionClass>::member_func_type;
+	template <class FunctionClass> using const_member_func_type = typename traits<FunctionClass>::const_member_func_type;
+	template <class FunctionClass> using static_ref_func_type = typename traits<FunctionClass>::static_ref_func_type;
 
 public:
 	// create a standard set of constructors
 	delegate() : basetype() { }
 	explicit delegate(const basetype &src) : basetype(src) { }
 	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
-	template <class FunctionClass> delegate(typename basetype::template traits<FunctionClass>::member_func_type funcptr, FunctionClass *object) : basetype(funcptr, object) { }
-	template <class FunctionClass> delegate(typename basetype::template traits<FunctionClass>::const_member_func_type funcptr, FunctionClass *object) : basetype(funcptr, object) { }
+	template <class FunctionClass> delegate(member_func_type<FunctionClass> funcptr, FunctionClass *object) : basetype(funcptr, object) { }
+	template <class FunctionClass> delegate(const_member_func_type<FunctionClass> funcptr, FunctionClass *object) : basetype(funcptr, object) { }
 	explicit delegate(std::function<ReturnType (Params...)> funcptr) : basetype(funcptr) { }
-	template <class FunctionClass> delegate(typename basetype::template traits<FunctionClass>::static_ref_func_type funcptr, FunctionClass *object) : basetype(funcptr, object) { }
+	template <class FunctionClass> delegate(static_ref_func_type<FunctionClass> funcptr, FunctionClass *object) : basetype(funcptr, object) { }
 	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
 };
 

@@ -11,12 +11,13 @@ class lwings_state : public driver_device
 public:
 	lwings_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_spriteram(*this, "spriteram") ,
+		m_spriteram(*this, "spriteram"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bg1videoram(*this, "bg1videoram"),
 		m_soundlatch2(*this, "soundlatch_2"),
 		m_nmi_mask(0),
 		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
 		m_msm(*this, "5205"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -91,6 +92,7 @@ private:
 	void trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	int avengers_fetch_paldata(  );
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 	optional_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

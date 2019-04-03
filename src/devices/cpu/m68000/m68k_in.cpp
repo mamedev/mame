@@ -8286,6 +8286,7 @@ M68KMAKE_OP(reset, 0, ., .)
 	{
 		if (!m_reset_instr_callback.isnull())
 			(m_reset_instr_callback)(1);
+		m68k_reset_peripherals();
 		m_remaining_cycles -= m_cyc_reset;
 		return;
 	}

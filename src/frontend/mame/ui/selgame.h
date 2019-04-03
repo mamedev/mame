@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Maurizio Petrarota
+// copyright-holders:Maurizio Petrarota, Vas Crabb
 /***************************************************************************
 
     ui/selgame.h
@@ -14,6 +14,8 @@
 
 #include "ui/selmenu.h"
 #include "ui/utils.h"
+
+#include <functional>
 
 
 class media_auditor;
@@ -37,21 +39,27 @@ private:
 		CONF_PLUGINS,
 	};
 
-	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
-	static bool first_start;
-	static int m_isabios;
+	using icon_cache = texture_lru<game_driver const *>;
 
-	static std::vector<const game_driver *> m_sortedlist;
-	std::vector<ui_system_info> m_availsortedlist;
-	std::vector<ui_system_info> m_displaylist;
+	class persistent_data;
 
-	const game_driver *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
+	persistent_data &m_persistent_data;
+	icon_cache m_icons;
+	std::string m_icon_paths;
+	std::vector<std::reference_wrapper<ui_system_info const> > m_displaylist;
+
+	std::vector<std::pair<double, std::reference_wrapper<ui_system_info const> > > m_searchlist;
+	unsigned m_searched_fields;
+	bool m_populated_favorites;
+
+	static bool s_first_start;
 
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
-	// draw left panel
+	// drawing
 	virtual float draw_left_panel(float x1, float y1, float x2, float y2) override;
+	virtual render_texture *get_icon_texture(int linenum, void *selectedref) override;
 
 	// get selected software and/or driver
 	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const override;
@@ -75,7 +83,6 @@ private:
 
 	bool isfavorite() const;
 	void populate_search();
-	void init_sorted_list();
 	bool load_available_machines();
 	void load_custom_filters();
 

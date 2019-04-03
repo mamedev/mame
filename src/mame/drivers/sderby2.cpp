@@ -298,32 +298,33 @@ void sderby2_state::machine_reset()
 
 }
 
-MACHINE_CONFIG_START(sderby2_state::sderby2)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(main_program_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby2_state, irq0_line_hold)
+void sderby2_state::sderby2(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(3'579'545));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sderby2_state::main_program_map);
+	m_maincpu->set_addrmap(AS_IO, &sderby2_state::main_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sderby2_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(sub_program_map)
-	MCFG_DEVICE_IO_MAP(sub_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby2_state, irq0_line_hold)
+	Z80(config, m_subcpu, XTAL(3'579'545));
+	m_subcpu->set_addrmap(AS_PROGRAM, &sderby2_state::sub_program_map);
+	m_subcpu->set_addrmap(AS_IO, &sderby2_state::sub_io_map);
+	m_subcpu->set_vblank_int("screen", FUNC(sderby2_state::irq0_line_hold));
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256 - 1, 0, 256 - 1)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_UPDATE_DRIVER(sderby2_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256 - 1, 0, 256 - 1);
+	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	screen.set_screen_update(FUNC(sderby2_state::screen_update));
+	screen.set_palette(m_palette);
 	PALETTE(config, m_palette, FUNC(sderby2_state::sderby2_palette), 256+256*3);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby2);
 
 	// sound hardware
-MACHINE_CONFIG_END
+}
 
 /*************************************
  *

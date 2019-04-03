@@ -626,19 +626,19 @@ void marinedt_state::marinedt_palette(palette_device &palette) const
 	}
 }
 
-MACHINE_CONFIG_START(marinedt_state::marinedt)
-
+void marinedt_state::marinedt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,MAIN_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(marinedt_map)
-	MCFG_DEVICE_IO_MAP(marinedt_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", marinedt_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MAIN_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &marinedt_state::marinedt_map);
+	m_maincpu->set_addrmap(AS_IO, &marinedt_state::marinedt_io);
+	m_maincpu->set_vblank_int("screen", FUNC(marinedt_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(marinedt_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 328, 0, 256, 263, 32, 256) // template to get ~60 fps
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update(FUNC(marinedt_state::screen_update));
+	m_screen->set_raw(MAIN_CLOCK/2, 328, 0, 256, 263, 32, 256); // template to get ~60 fps
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_marinedt);
 
@@ -647,7 +647,7 @@ MACHINE_CONFIG_START(marinedt_state::marinedt)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	//AY8910(config, "aysnd", MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

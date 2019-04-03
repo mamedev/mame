@@ -24,7 +24,7 @@
 #ifndef NLD_82S16_H_
 #define NLD_82S16_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define TTL_82S16(name)                                     \
 		NET_REGISTER_DEV(TTL_82S16, name)

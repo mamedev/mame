@@ -107,33 +107,40 @@ md_eeprom_blara_device::md_eeprom_blara_device(const machine_config &mconfig, co
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(md_std_eeprom_device::device_add_mconfig)
-	MCFG_24C01_ADD("i2cmem")
-MACHINE_CONFIG_END
+void md_std_eeprom_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C01(config, m_i2cmem);
+}
 
-MACHINE_CONFIG_START(md_eeprom_nbajam_device::device_add_mconfig)
-	MCFG_24C02_ADD("i2cmem")
-MACHINE_CONFIG_END
+void md_eeprom_nbajam_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C02(config, m_i2cmem);
+}
 
-MACHINE_CONFIG_START(md_eeprom_nbajamte_device::device_add_mconfig)
-	MCFG_24C02_ADD("i2cmem")
-MACHINE_CONFIG_END
+void md_eeprom_nbajamte_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C01(config, m_i2cmem);
+}
 
-MACHINE_CONFIG_START(md_eeprom_cslam_device::device_add_mconfig)
-	MCFG_24C64_ADD("i2cmem")
-MACHINE_CONFIG_END
+void md_eeprom_cslam_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C64(config, m_i2cmem);
+}
 
-MACHINE_CONFIG_START(md_eeprom_nflqb_device::device_add_mconfig)
-	MCFG_24C16_ADD("i2cmem")
-MACHINE_CONFIG_END
+void md_eeprom_nflqb_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C16(config, m_i2cmem);
+}
 
-MACHINE_CONFIG_START(md_eeprom_nhlpa_device::device_add_mconfig)
-	MCFG_24C01_ADD("i2cmem")
-MACHINE_CONFIG_END
+void md_eeprom_nhlpa_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C01(config, m_i2cmem);
+}
 
-MACHINE_CONFIG_START(md_eeprom_blara_device::device_add_mconfig)
-	MCFG_24C64_ADD("i2cmem")
-MACHINE_CONFIG_END
+void md_eeprom_blara_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C64(config, m_i2cmem);
+}
 
 void md_std_eeprom_device::device_start()
 {

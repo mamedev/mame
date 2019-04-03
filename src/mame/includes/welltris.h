@@ -7,6 +7,7 @@
 
 #include "machine/gen_latch.h"
 #include "video/vsystem_spr2.h"
+#include "screen.h"
 
 class welltris_state : public driver_device
 {
@@ -17,6 +18,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_spr_old(*this, "vsystem_spr_old"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
 		m_spriteram(*this, "spriteram"),
 		m_pixelram(*this, "pixelram"),
@@ -38,6 +40,7 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<vsystem_spr2_device> m_spr_old;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<uint16_t> m_spriteram;

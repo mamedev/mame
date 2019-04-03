@@ -637,11 +637,11 @@ void nes_pjoy84_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_nitra_device::write_h)
+void nes_nitra_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("nitra write_h, offset: %04x, data: %02x\n", offset, data));
 
-	txrom_write(space, (offset & 0x6000) | ((offset & 0x400) >> 10), offset & 0xff, mem_mask);
+	txrom_write((offset & 0x6000) | ((offset & 0x400) >> 10), offset & 0xff);
 }
 
 /*-------------------------------------------------
@@ -656,12 +656,12 @@ WRITE8_MEMBER(nes_nitra_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_ks7057_device::write_h)
+void nes_ks7057_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("ks7057 write_h, offset: %04x, data: %02x\n", offset, data));
 
 	offset = (BIT(offset, 0) << 1) | BIT(offset, 1) | (offset & ~0x03);
-	txrom_write(space, offset, data, mem_mask);
+	txrom_write(offset, data);
 }
 
 /*-------------------------------------------------
@@ -679,11 +679,11 @@ WRITE8_MEMBER(nes_ks7057_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_sbros11_device::write_h)
+void nes_sbros11_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("smb11 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	txrom_write(space, (offset & 0x6000) | ((offset & 0x04) >> 2), data, mem_mask);
+	txrom_write((offset & 0x6000) | ((offset & 0x04) >> 2), data);
 }
 
 /*-------------------------------------------------
@@ -711,14 +711,14 @@ void nes_malisb_device::chr_cb(int start, int bank, int source)
 	chr1_x(start, bank, source);
 }
 
-WRITE8_MEMBER(nes_malisb_device::write_h)
+void nes_malisb_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("malisb write_h, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset > 0x4000)
-		txrom_write(space, (offset & 0xfffe) | ((offset & 0x04) >> 2) | ((offset & 0x08) >> 3), data, mem_mask);
+		txrom_write((offset & 0xfffe) | ((offset & 0x04) >> 2) | ((offset & 0x08) >> 3), data);
 	else
-		txrom_write(space, (offset & 0xfffe) | ((offset & 0x08) >> 3), data, mem_mask);
+		txrom_write((offset & 0xfffe) | ((offset & 0x08) >> 3), data);
 }
 
 /*-------------------------------------------------
@@ -736,7 +736,7 @@ WRITE8_MEMBER(nes_malisb_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_family4646_device::write_m)
+void nes_family4646_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("family4646 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -763,7 +763,7 @@ WRITE8_MEMBER(nes_family4646_device::write_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_pikay2k_device::write_h)
+void nes_pikay2k_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("pikay2k write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -776,20 +776,20 @@ WRITE8_MEMBER(nes_pikay2k_device::write_h)
 		case 0x2000:
 			m_reg[0] = 0;
 		default:
-			txrom_write(space, offset, data, mem_mask);
+			txrom_write(offset, data);
 			break;
 	}
 }
 
 // strange WRAM usage: it is protected at start, and gets unprotected after the first write to 0xa000
-WRITE8_MEMBER(nes_pikay2k_device::write_m)
+void nes_pikay2k_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("pikay2k write_m, offset: %04x, data: %02x\n", offset, data));
 
 	m_prgram[offset & 0x1fff] = data;
 }
 
-READ8_MEMBER(nes_pikay2k_device::read_m)
+uint8_t nes_pikay2k_device::read_m(offs_t offset)
 {
 	LOG_MMC(("pikay2k read_m, offset: %04x\n", offset));
 
@@ -820,7 +820,7 @@ void nes_8237_device::chr_cb(int start, int bank, int source)
 	chr1_x(start, bank, source);
 }
 
-WRITE8_MEMBER(nes_8237_device::write_l)
+void nes_8237_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("unl_8237 write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -854,7 +854,7 @@ WRITE8_MEMBER(nes_8237_device::write_l)
 	}
 }
 
-WRITE8_MEMBER(nes_8237_device::write_h)
+void nes_8237_device::write_h(offs_t offset, uint8_t data)
 {
 	static const uint8_t conv_table[8] = {0, 2, 6, 1, 7, 3, 4, 5};
 	LOG_MMC(("unl_8237 write_h, offset: %04x, data: %02x\n", offset, data));
@@ -870,7 +870,7 @@ WRITE8_MEMBER(nes_8237_device::write_h)
 		case 0x3000:
 			m_cd_enable = 1;
 			data = (data & 0xc0) | conv_table[data & 0x07];
-			txrom_write(space, 0x0000, data, mem_mask);
+			txrom_write(0x0000, data);
 			break;
 
 		case 0x4000:
@@ -878,7 +878,7 @@ WRITE8_MEMBER(nes_8237_device::write_h)
 			if (m_cd_enable)
 			{
 				m_cd_enable = 0;
-				txrom_write(space, 0x0001, data, mem_mask);
+				txrom_write(0x0001, data);
 			}
 			break;
 
@@ -886,9 +886,9 @@ WRITE8_MEMBER(nes_8237_device::write_h)
 			break;
 
 		case 0x7000:
-			txrom_write(space, 0x6001, data, mem_mask);
-			txrom_write(space, 0x4000, data, mem_mask);
-			txrom_write(space, 0x4001, data, mem_mask);
+			txrom_write(0x6001, data);
+			txrom_write(0x4000, data);
+			txrom_write(0x4001, data);
 			break;
 	}
 }
@@ -907,7 +907,7 @@ WRITE8_MEMBER(nes_8237_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_sglionk_device::write_m)
+void nes_sglionk_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("sglionk write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -923,7 +923,7 @@ WRITE8_MEMBER(nes_sglionk_device::write_m)
 
 }
 
-WRITE8_MEMBER(nes_sglionk_device::write_h)
+void nes_sglionk_device::write_h(offs_t offset, uint8_t data)
 {
 	static const uint8_t conv_table[8] = {0, 3, 1, 5, 6, 7, 2, 4};
 	LOG_MMC(("sglionk write_h, offset: %04x, data: %02x\n", offset, data));
@@ -938,13 +938,13 @@ WRITE8_MEMBER(nes_sglionk_device::write_h)
 			case 0x2000:
 				m_reg_enabled = 1;
 				data = (data & 0xc0) | conv_table[data & 0x07];
-				txrom_write(space, 0x0000, data, mem_mask);
+				txrom_write(0x0000, data);
 				break;
 			case 0x4000:
 				if (m_reg_enabled && (m_reg & 0x80) == 0)
 				{
 					m_reg_enabled = 0;
-					txrom_write(space, 0x0001, data, mem_mask);
+					txrom_write(0x0001, data);
 				}
 				break;
 		}
@@ -954,12 +954,12 @@ WRITE8_MEMBER(nes_sglionk_device::write_h)
 		switch (offset & 0x03)
 		{
 			case 0x02:
-				txrom_write(space, 0x6000, data, mem_mask);
+				txrom_write(0x6000, data);
 				break;
 			case 0x03:
-				txrom_write(space, 0x6001, data, mem_mask);
-				txrom_write(space, 0x4000, data, mem_mask);
-				txrom_write(space, 0x4001, data, mem_mask);
+				txrom_write(0x6001, data);
+				txrom_write(0x4000, data);
+				txrom_write(0x4001, data);
 				break;
 		}
 	}
@@ -1022,7 +1022,7 @@ void nes_sgboog_device::set_prg(int prg_base, int prg_mask)
 	}
 }
 
-WRITE8_MEMBER(nes_sgboog_device::write_l)
+void nes_sgboog_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("sgboog write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -1046,7 +1046,7 @@ WRITE8_MEMBER(nes_sgboog_device::write_l)
 	}
 }
 
-WRITE8_MEMBER(nes_sgboog_device::write_m)
+void nes_sgboog_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("sgboog write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -1069,7 +1069,7 @@ WRITE8_MEMBER(nes_sgboog_device::write_m)
 	}
 }
 
-WRITE8_MEMBER(nes_sgboog_device::write_h)
+void nes_sgboog_device::write_h(offs_t offset, uint8_t data)
 {
 	static const uint8_t conv_table[8] = {0,2,5,3,6,1,7,4};
 	LOG_MMC(("sgboog write_h, offset: %04x, data: %02x\n", offset, data));
@@ -1085,14 +1085,14 @@ WRITE8_MEMBER(nes_sgboog_device::write_h)
 				if (m_reg[2] && ((m_reg[0] & 0x80) == 0 || (m_latch & 0x07) < 6)) // if we use the prg16 banks and cmd=6,7 DON'T enter!
 				{
 					m_reg[2] = 0;
-					txrom_write(space, 0x0001, data, mem_mask);
+					txrom_write(0x0001, data);
 				}
 				break;
 
 			case 0x2000:
 				data = (data & 0xc0) | conv_table[data & 0x07];
 				m_reg[2] = 1;
-				txrom_write(space, 0x0000, data, mem_mask);
+				txrom_write(0x0000, data);
 				break;
 
 			case 0x4000:
@@ -1100,21 +1100,21 @@ WRITE8_MEMBER(nes_sgboog_device::write_h)
 				break;
 
 			case 0x4001:
-				txrom_write(space, 0x6001, data, mem_mask);
+				txrom_write(0x6001, data);
 				break;
 
 			case 0x6001:
-				txrom_write(space, 0x4000, data, mem_mask);
-				txrom_write(space, 0x4001, data, mem_mask);
+				txrom_write(0x4000, data);
+				txrom_write(0x4001, data);
 				break;
 
 			default:
-				txrom_write(space, offset, data, mem_mask);
+				txrom_write(offset, data);
 				break;
 		}
 	}
 	else
-		txrom_write(space, offset, data, mem_mask);
+		txrom_write(offset, data);
 }
 
 /*-------------------------------------------------
@@ -1140,7 +1140,7 @@ void nes_kasing_device::prg_cb(int start, int bank)
 		prg8_x(start, bank);
 }
 
-WRITE8_MEMBER(nes_kasing_device::write_m)
+void nes_kasing_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("kasing write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -1172,7 +1172,7 @@ WRITE8_MEMBER(nes_kasing_device::write_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_kay_device::write_l)
+void nes_kay_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("kay write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -1195,7 +1195,7 @@ WRITE8_MEMBER(nes_kay_device::write_l)
 	}
 }
 
-READ8_MEMBER(nes_kay_device::read_l)
+uint8_t nes_kay_device::read_l(offs_t offset)
 {
 	LOG_MMC(("kay read_l, offset: %04x\n", offset));
 	offset += 0x100;
@@ -1269,14 +1269,14 @@ void nes_kay_device::chr_cb(int start, int bank, int source)
 	chr1_x(start, bank, source);
 }
 
-WRITE8_MEMBER(nes_kay_device::write_h)
+void nes_kay_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("kay write_h, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6003)
 	{
 		case 0x0000:
-			txrom_write(space, offset, data, mem_mask);
+			txrom_write(offset, data);
 			set_prg(m_prg_base, m_prg_mask);
 			break;
 
@@ -1285,19 +1285,19 @@ WRITE8_MEMBER(nes_kay_device::write_h)
 			| (BIT(data, 3) << 2) | (BIT(data, 4) << 1) | BIT(data, 5);
 			if (!m_reg[7])
 				update_regs();
-			txrom_write(space, offset, data, mem_mask);
+			txrom_write(offset, data);
 			set_prg(m_prg_base, m_prg_mask);
 			break;
 
 		case 0x0003:
 			m_reg[5] = data;
 			update_regs();
-			txrom_write(space, 0x0000, data, mem_mask);
+			txrom_write(0x0000, data);
 			set_prg(m_prg_base, m_prg_mask);
 			break;
 
 		default:
-			txrom_write(space, offset, data, mem_mask);
+			txrom_write(offset, data);
 			break;
 	}
 }
@@ -1314,7 +1314,7 @@ void nes_h2288_device::prg_cb(int start, int bank)
 		prg8_x(start, bank);
 }
 
-WRITE8_MEMBER(nes_h2288_device::write_l)
+void nes_h2288_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("h2288 write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -1334,7 +1334,7 @@ WRITE8_MEMBER(nes_h2288_device::write_l)
 	}
 }
 
-READ8_MEMBER(nes_h2288_device::read_l)
+uint8_t nes_h2288_device::read_l(offs_t offset)
 {
 	LOG_MMC(("h2288 read_l, offset: %04x\n", offset));
 	offset += 0x100;
@@ -1351,7 +1351,7 @@ READ8_MEMBER(nes_h2288_device::read_l)
 	return 0;
 }
 
-WRITE8_MEMBER(nes_h2288_device::write_h)
+void nes_h2288_device::write_h(offs_t offset, uint8_t data)
 {
 	static const uint8_t conv_table[8] = {0, 3, 1, 5, 6, 7, 2, 4};
 	LOG_MMC(("h2288 write_h, offset: %04x, data: %02x\n", offset, data));
@@ -1359,11 +1359,11 @@ WRITE8_MEMBER(nes_h2288_device::write_h)
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
-			txrom_write(space, 0x0000, (data & 0xc0) | conv_table[data & 0x07], mem_mask);
+			txrom_write(0x0000, (data & 0xc0) | conv_table[data & 0x07]);
 			break;
 
 		default:
-			txrom_write(space, offset, data, mem_mask);
+			txrom_write(offset, data);
 			break;
 	}
 }
@@ -1378,7 +1378,7 @@ WRITE8_MEMBER(nes_h2288_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_6035052_device::write_ex)
+void nes_6035052_device::write_ex(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("6035052 write_ex, offset: %04x, data: %02x\n", offset, data));
 	m_prot = data & 0x03;
@@ -1386,7 +1386,7 @@ WRITE8_MEMBER(nes_6035052_device::write_ex)
 		m_prot = 2;
 }
 
-READ8_MEMBER(nes_6035052_device::read_ex)
+uint8_t nes_6035052_device::read_ex(offs_t offset)
 {
 	LOG_MMC(("6035052 read_ex, offset: %04x\n", offset));
 	return m_prot;
@@ -1406,7 +1406,7 @@ READ8_MEMBER(nes_6035052_device::read_ex)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_txc_tw_device::write_l)
+void nes_txc_tw_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("txc_tw write_l, offset: %04x, data: %02x\n", offset, data));
 
@@ -1436,22 +1436,22 @@ inline uint8_t kof97_unscramble( uint8_t data )
 	return ((data >> 1) & 0x01) | ((data >> 4) & 0x02) | ((data << 2) & 0x04) | ((data >> 0) & 0xd8) | ((data << 3) & 0x20);
 }
 
-WRITE8_MEMBER(nes_kof97_device::write_h)
+void nes_kof97_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("kof97 write_h, offset: %04x, data: %02x\n", offset, data));
 
 	/* Addresses 0x9000, 0xa000, 0xd000 & 0xf000 behaves differently than MMC3 */
 	if (offset == 0x1000)
-		txrom_write(space, 0x0001, kof97_unscramble(data), mem_mask);
+		txrom_write(0x0001, kof97_unscramble(data));
 	else if (offset == 0x2000)
-		txrom_write(space, 0x0000, kof97_unscramble(data), mem_mask);
+		txrom_write(0x0000, kof97_unscramble(data));
 	else if (offset == 0x5000)
-		txrom_write(space, 0x4001, kof97_unscramble(data), mem_mask);
+		txrom_write(0x4001, kof97_unscramble(data));
 	else if (offset == 0x7000)
-		txrom_write(space, 0x6001, kof97_unscramble(data), mem_mask);
+		txrom_write(0x6001, kof97_unscramble(data));
 	/* Other addresses behaves like MMC3, up to unscrambling data */
 	else
-		txrom_write(space, offset, kof97_unscramble(data), mem_mask);
+		txrom_write(offset, kof97_unscramble(data));
 }
 
 /*-------------------------------------------------
@@ -1485,7 +1485,7 @@ void nes_kof96_device::chr_cb(int start, int bank, int source)
 	chr1_x(start, bank, source);
 }
 
-WRITE8_MEMBER(nes_kof96_device::write_l)
+void nes_kof96_device::write_l(offs_t offset, uint8_t data)
 {
 	uint8_t new_bank;
 	LOG_MMC(("kof96 write_l, offset: %04x, data: %02x\n", offset, data));
@@ -1532,11 +1532,11 @@ WRITE8_MEMBER(nes_kof96_device::write_l)
 	if (!m_reg[3] && offset > 0x1000)
 	{
 		m_reg[3] = 1;
-		space.write_byte(0x4017, 0x40);
+		poke(0x4017, 0x40); // FIXME
 	}
 }
 
-READ8_MEMBER(nes_kof96_device::read_l)
+uint8_t nes_kof96_device::read_l(offs_t offset)
 {
 	LOG_MMC(("kof96 read_l, offset: %04x\n", offset));
 	offset += 0x100;
@@ -1547,7 +1547,7 @@ READ8_MEMBER(nes_kof96_device::read_l)
 		return 0;
 }
 
-WRITE8_MEMBER(nes_kof96_device::write_h)
+void nes_kof96_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("kof96 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -1555,12 +1555,12 @@ WRITE8_MEMBER(nes_kof96_device::write_h)
 	{
 		case 0x0000:
 			m_reg[2] = 1;
-			txrom_write(space, 0x0000, data, mem_mask);
+			txrom_write(0x0000, data);
 			break;
 
 		case 0x0001:
 			if (m_reg[2])
-				txrom_write(space, 0x0001, data, mem_mask);
+				txrom_write(0x0001, data);
 			break;
 
 		case 0x0002:
@@ -1576,7 +1576,7 @@ WRITE8_MEMBER(nes_kof96_device::write_h)
 			break;
 
 		default:
-			txrom_write(space, offset, data, mem_mask);
+			txrom_write(offset, data);
 			break;
 	}
 }
@@ -1600,7 +1600,7 @@ void nes_sf3_device::set_chr(uint8_t chr_source, int chr_base, int chr_mask)
 	chr2_6(chr_base | (m_mmc_vrom_bank[2] & chr_mask), chr_source);
 }
 
-WRITE8_MEMBER(nes_sf3_device::write_h)
+void nes_sf3_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t cmd;
 	LOG_MMC(("sf3 write_h, offset: %04x, data: %02x\n", offset, data));
@@ -1624,7 +1624,7 @@ WRITE8_MEMBER(nes_sf3_device::write_h)
 			break;
 
 		default:
-			txrom_write(space, offset, data, mem_mask);
+			txrom_write(offset, data);
 			break;
 	}
 }
@@ -1643,7 +1643,7 @@ WRITE8_MEMBER(nes_sf3_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_gouder_device::write_l)
+void nes_gouder_device::write_l(offs_t offset, uint8_t data)
 {
 	static const uint8_t conv_table[256] =
 	{
@@ -1675,7 +1675,7 @@ WRITE8_MEMBER(nes_gouder_device::write_l)
 		prg32(((data >> 3) & 0x02) | (data & 0x01));
 }
 
-READ8_MEMBER(nes_gouder_device::read_l)
+uint8_t nes_gouder_device::read_l(offs_t offset)
 {
 	LOG_MMC(("gouder read_l, offset: %04x\n", offset));
 
@@ -1722,7 +1722,7 @@ void nes_sa9602b_device::prg_cb(int start, int bank)
 }
 
 
-WRITE8_MEMBER( nes_sa9602b_device::write_h )
+void nes_sa9602b_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("sa9602b write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -1738,7 +1738,7 @@ WRITE8_MEMBER( nes_sa9602b_device::write_h )
 			break;
 	}
 
-	txrom_write(space, offset, data, mem_mask);
+	txrom_write(offset, data);
 }
 
 /*-------------------------------------------------
@@ -1762,7 +1762,7 @@ void nes_sachen_shero_device::chr_cb( int start, int bank, int source )
 }
 
 
-WRITE8_MEMBER( nes_sachen_shero_device::write_l )
+void nes_sachen_shero_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("shero write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x4100;
@@ -1777,7 +1777,7 @@ WRITE8_MEMBER( nes_sachen_shero_device::write_l )
 	}
 }
 
-READ8_MEMBER( nes_sachen_shero_device::read_l )
+uint8_t nes_sachen_shero_device::read_l(offs_t offset)
 {
 	LOG_MMC(("shero read_l, offset: %04x\n", offset));
 	offset += 0x4100;
@@ -1786,7 +1786,7 @@ READ8_MEMBER( nes_sachen_shero_device::read_l )
 	{
 		// DSW read!
 	}
-	return m_open_bus;  // open bus
+	return get_open_bus();  // open bus
 }
 
 
@@ -1886,7 +1886,7 @@ void nes_fk23c_device::fk23c_set_chr()
 	}
 }
 
-WRITE8_MEMBER(nes_fk23c_device::write_l)
+void nes_fk23c_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("fk23c write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -1903,7 +1903,7 @@ WRITE8_MEMBER(nes_fk23c_device::write_l)
 	}
 }
 
-WRITE8_MEMBER(nes_fk23c_device::write_h)
+void nes_fk23c_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("fk23c write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -1929,7 +1929,7 @@ WRITE8_MEMBER(nes_fk23c_device::write_h)
 					fk23c_set_chr();
 				}
 				else
-					txrom_write(space, offset, data, mem_mask);
+					txrom_write(offset, data);
 				break;
 
 			case 0x2000:
@@ -1937,7 +1937,7 @@ WRITE8_MEMBER(nes_fk23c_device::write_h)
 				break;
 
 			default:
-				txrom_write(space, offset, data, mem_mask);
+				txrom_write(offset, data);
 				break;
 		}
 	}
@@ -1971,7 +1971,7 @@ void nes_s24in1sc03_device::chr_cb(int start, int bank, int source)
 	chr1_x(start, chr_base | bank, chr);
 }
 
-WRITE8_MEMBER(nes_s24in1sc03_device::write_l)
+void nes_s24in1sc03_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("s24in1sc03 write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -2009,7 +2009,7 @@ WRITE8_MEMBER(nes_s24in1sc03_device::write_l)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_bmc_15in1_device::write_m)
+void nes_bmc_15in1_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("bmc_15in1 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -2037,7 +2037,7 @@ WRITE8_MEMBER(nes_bmc_15in1_device::write_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_bmc_sbig7_device::write_h)
+void nes_bmc_sbig7_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t page;
 	LOG_MMC(("bmc_sbig7 write_h, offset: %04x, data: %02x\n", offset, data));
@@ -2058,7 +2058,7 @@ WRITE8_MEMBER(nes_bmc_sbig7_device::write_h)
 			break;
 
 		default:
-			txrom_write(space, offset, data, mem_mask);
+			txrom_write(offset, data);
 			break;
 	}
 }
@@ -2076,7 +2076,7 @@ WRITE8_MEMBER(nes_bmc_sbig7_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_bmc_hik8_device::write_m)
+void nes_bmc_hik8_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("bmc_hik8 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -2123,7 +2123,7 @@ WRITE8_MEMBER(nes_bmc_hik8_device::write_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_bmc_hik4_device::write_m)
+void nes_bmc_hik4_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("bmc_hik4 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -2162,7 +2162,7 @@ WRITE8_MEMBER(nes_bmc_hik4_device::write_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_bmc_mario7in1_device::write_m)
+void nes_bmc_mario7in1_device::write_m(offs_t offset, uint8_t data)
 {
 	uint8_t helper1, helper2;
 	LOG_MMC(("bmc_mario7in1 write_m, offset: %04x, data: %02x\n", offset, data));
@@ -2204,7 +2204,7 @@ WRITE8_MEMBER(nes_bmc_mario7in1_device::write_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_bmc_gold7in1_device::write_m)
+void nes_bmc_gold7in1_device::write_m(offs_t offset, uint8_t data)
 {
 	uint8_t helper1, helper2;
 	LOG_MMC(("bmc_gold7in1 write_m, offset: %04x, data: %02x\n", offset, data));
@@ -2265,7 +2265,7 @@ void nes_bmc_gc6in1_device::chr_cb(int start, int bank, int source)
 	chr1_x(start, ((m_reg[1] & 0x03) << 8) | bank, source);
 }
 
-WRITE8_MEMBER(nes_bmc_gc6in1_device::write_l)
+void nes_bmc_gc6in1_device::write_l(offs_t offset, uint8_t data)
 {
 	uint8_t bank;
 	LOG_MMC(("bmc_gc6in1 write_l, offset: %04x, data: %02x\n", offset, data));
@@ -2294,7 +2294,7 @@ WRITE8_MEMBER(nes_bmc_gc6in1_device::write_l)
 	}
 }
 
-WRITE8_MEMBER(nes_bmc_gc6in1_device::write_h)
+void nes_bmc_gc6in1_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t cmd;
 	static const uint8_t conv_table[8] = {0, 6, 3, 7, 5, 2, 4, 1};
@@ -2303,20 +2303,20 @@ WRITE8_MEMBER(nes_bmc_gc6in1_device::write_h)
 	if (!m_reg[2])
 	{
 		// in this case we act like MMC3, only with alt prg/chr handlers
-		txrom_write(space, offset, data, mem_mask);
+		txrom_write(offset, data);
 	}
 	else
 	{
 		switch (offset & 0x6001)
 		{
 			case 0x0000:
-				txrom_write(space, 0x4000, data, mem_mask);
+				txrom_write(0x4000, data);
 				break;
 
 			case 0x0001:
 				data = (data & 0xc0) | conv_table[data & 0x07];
 				m_reg[3] = 1;
-				txrom_write(space, 0x0000, data, mem_mask);
+				txrom_write(0x0000, data);
 				break;
 
 			case 0x2000:
@@ -2346,7 +2346,7 @@ WRITE8_MEMBER(nes_bmc_gc6in1_device::write_h)
 				break;
 
 			default:
-				txrom_write(space, offset, data, mem_mask);
+				txrom_write(offset, data);
 				break;
 		}
 	}
@@ -2377,7 +2377,7 @@ void nes_bmc_411120c_device::chr_cb(int start, int bank, int source)
 	chr1_x(start, bank | ((m_reg & 3) << 7), source);
 }
 
-WRITE8_MEMBER(nes_bmc_411120c_device::write_m)
+void nes_bmc_411120c_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("bmc_411120c write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -2422,7 +2422,7 @@ void nes_bmc_830118c_device::chr_cb(int start, int bank, int source)
 	chr1_x(start, (bank & 0x7f) | ((m_reg & 0x0c) << 5), source);
 }
 
-WRITE8_MEMBER(nes_bmc_830118c_device::write_m)
+void nes_bmc_830118c_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("bmc_830118c write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -2478,7 +2478,7 @@ inline void nes_pjoy84_device::set_base_mask()
 	m_chr_mask = BIT(m_reg[0], 7) ? 0x7f : 0xff;
 }
 
-WRITE8_MEMBER(nes_pjoy84_device::write_m)
+void nes_pjoy84_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("pjoy84 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -2523,7 +2523,7 @@ void nes_coolboy_device::chr_cb(int start, int bank, int source)
 	chr1_x(start, bank, source);
 }
 
-WRITE8_MEMBER(nes_coolboy_device::write_m)
+void nes_coolboy_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("coolboy write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -2593,7 +2593,7 @@ void nes_a9746_device::update_banks(uint8_t value)
 	}
 }
 
-WRITE8_MEMBER(nes_a9746_device::write_h)
+void nes_a9746_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("unl_a9746 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -2619,7 +2619,7 @@ WRITE8_MEMBER(nes_a9746_device::write_h)
 			break;
 
 		default:
-			txrom_write(space, offset, data, mem_mask);
+			txrom_write(offset, data);
 			break;
 	}
 }

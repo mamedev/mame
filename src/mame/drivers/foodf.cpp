@@ -386,7 +386,7 @@ void foodf_state::foodf(machine_config &config)
 
 	pokey_device &pokey3(POKEY(config, "pokey3", MASTER_CLOCK/2/10));
 	pokey3.add_route(ALL_OUTPUTS, "mono", 0.33);
-MACHINE_CONFIG_END
+}
 
 
 

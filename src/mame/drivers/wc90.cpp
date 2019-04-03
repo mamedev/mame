@@ -344,31 +344,31 @@ void wc90_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(wc90_state::wc90)
-
+void wc90_state::wc90(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(8'000'000))     /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(wc90_map_1)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(8'000'000));     /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wc90_state::wc90_map_1);
+	m_maincpu->set_vblank_int("screen", FUNC(wc90_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80, XTAL(8'000'000))     /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(wc90_map_2)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
+	z80_device &sub(Z80(config, "sub", XTAL(8'000'000)));     /* verified on pcb */
+	sub.set_addrmap(AS_PROGRAM, &wc90_state::wc90_map_2);
+	sub.set_vblank_int("screen", FUNC(wc90_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(8'000'000)/2)  /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(8'000'000)/2);  /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &wc90_state::sound_map);
 	/* NMIs are triggered by the main CPU */
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.17)         /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wc90_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.17);         /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(wc90_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wc90);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024).set_endianness(ENDIANNESS_BIG);
@@ -381,17 +381,18 @@ MACHINE_CONFIG_START(wc90_state::wc90)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2608, XTAL(8'000'000))  /* verified on pcb */
-	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym2608_device &ymsnd(YM2608(config, "ymsnd", XTAL(8'000'000)));  /* verified on pcb */
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(wc90_state::wc90t)
+void wc90_state::wc90t(machine_config &config)
+{
 	wc90(config);
 	MCFG_VIDEO_START_OVERRIDE(wc90_state, wc90t )
-MACHINE_CONFIG_END
+}
 
 void wc90_state::pac90(machine_config &config)
 {

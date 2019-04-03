@@ -428,6 +428,16 @@ void nes_cart_slot_device::call_load_ines()
 			bus_conflict = true;
 		else if (mapper == 7 && submapper == 2)
 			bus_conflict = true;
+		// 019: Namcot N163
+		else if (mapper == 19)
+		{
+			int vol = submapper & 0x07;
+			if (vol >= 0 && vol <= 5)
+			{
+				pcb_id = NAMCOT_163;
+				m_cart->set_n163_vol(vol);
+			}
+		}
 		// 021, 023, 025: VRC4 / VRC2
 		else if (mapper == 21 || mapper == 23 || mapper == 25)
 		{

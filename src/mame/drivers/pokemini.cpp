@@ -126,7 +126,7 @@ private:
 READ8_MEMBER( pokemini_state::rom_r )
 {
 	offset += 0x2100;
-	return m_cart->read_rom(space, offset & 0x1fffff);
+	return m_cart->read_rom(offset & 0x1fffff);
 }
 
 void pokemini_state::pokemini_mem_map(address_map &map)

@@ -29,13 +29,13 @@ public:
 		m_subcpu(*this, "sub"),
 		m_spriteram(*this, "spriteram"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_gga(*this, "gga"),
 		m_spr_old(*this, "vsystem_spr_old"),
 		m_videoram(*this, "videoram"),
 		m_sublatch(*this, "sublatch"),
-		m_msm(*this, "msm"),
-		m_screen(*this, "screen")
+		m_msm(*this, "msm")
 	{ }
 
 	void nekkyoku(machine_config &config);
@@ -51,6 +51,7 @@ protected:
 	required_device<cpu_device> m_subcpu;
 	optional_shared_ptr<uint8_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<vsystem_gga_device> m_gga;
 	optional_device<vsystem_spr2_device> m_spr_old; // only used by pipe dream, split this state up and clean things...
@@ -82,7 +83,6 @@ private:
 
 	optional_device<generic_latch_8_device> m_sublatch;
 	optional_device<msm5205_device> m_msm;
-	required_device<screen_device> m_screen;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

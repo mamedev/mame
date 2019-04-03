@@ -26,10 +26,10 @@ class horizon_ramdisk_device : public device_t, public device_ti99_peribox_card_
 public:
 	horizon_ramdisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	void cruwrite(offs_t offset, uint8_t data) override;
 
 	DECLARE_INPUT_CHANGED_MEMBER( hs_changed );
 

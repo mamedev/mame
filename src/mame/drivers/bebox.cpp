@@ -28,8 +28,8 @@
 #include "formats/pc_dsk.h"
 #include "machine/8042kbdc.h"
 
-READ8_MEMBER(bebox_state::at_dma8237_1_r)  { return m_dma8237[1]->read(space, offset / 2); }
-WRITE8_MEMBER(bebox_state::at_dma8237_1_w) { m_dma8237[1]->write(space, offset / 2, data); }
+READ8_MEMBER(bebox_state::at_dma8237_1_r)  { return m_dma8237[1]->read(offset / 2); }
+WRITE8_MEMBER(bebox_state::at_dma8237_1_w) { m_dma8237[1]->write(offset / 2, data); }
 
 void bebox_state::main_mem(address_map &map)
 {
@@ -117,8 +117,9 @@ FLOPPY_FORMATS_END
 
 void bebox_state::mpc105_config(device_t *device)
 {
-	MCFG_MPC105_CPU( "ppc1" )
-	MCFG_MPC105_BANK_BASE_DEFAULT( 0 )
+	mpc105_device &mpc105 = *downcast<mpc105_device *>(device);
+	mpc105.set_cpu(":ppc1");
+	mpc105.set_bank_base_default(0);
 }
 
 /*************************************
@@ -220,7 +221,7 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	pcislot0.set_option_machine_config("mpc105", mpc105_config);
 	add_pci_slot(config, "pcibus:1", 1, "cirrus");
 
-	/*MCFG_PCI_BUS_DEVICE(12, nullptr, scsi53c810_pci_read, scsi53c810_pci_write)*/
+	/*MCFG_PCI_BUS_LEGACY_DEVICE(12, nullptr, scsi53c810_pci_read, scsi53c810_pci_write)*/
 
 	SMC37C78(config, m_smc37c78, 24'000'000);
 	m_smc37c78->intrq_wr_callback().set(FUNC(bebox_state::fdc_interrupt));

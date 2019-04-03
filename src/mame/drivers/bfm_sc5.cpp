@@ -210,27 +210,28 @@ WRITE8_MEMBER(bfm_sc5_state::bfm_sc5_duart_output_w)
 	logerror("bfm_sc5_duart_output_w\n");
 }
 
-MACHINE_CONFIG_START(bfm_sc5_state::bfm_sc5)
-	MCFG_DEVICE_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
-	MCFG_DEVICE_PROGRAM_MAP(sc5_map)
-	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
+void bfm_sc5_state::bfm_sc5(machine_config &config)
+{
+	MCF5206E(config, m_maincpu, 40000000); /* MCF5206eFT */
+	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_sc5_state::sc5_map);
+	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("duart68681", MC68681, 16000000/4) // ?? Mhz
-	MCFG_MC68681_SET_EXTERNAL_CLOCKS(16000000/2/8, 16000000/2/16, 16000000/2/16, 16000000/2/8)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, bfm_sc5_state, bfm_sc5_duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, bfm_sc5_state, bfm_sc5_duart_txa))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, bfm_sc5_state, bfm_sc5_duart_input_r))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, bfm_sc5_state, bfm_sc5_duart_output_w))
+	MC68681(config, m_duart, 16000000/4); // ?? Mhz
+	m_duart->set_clocks(16000000/2/8, 16000000/2/16, 16000000/2/16, 16000000/2/8);
+	m_duart->irq_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_irq_handler));
+	m_duart->a_tx_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_txa));
+	m_duart->inport_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_input_r));;
+	m_duart->outport_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_output_w));;
 
 	BFM_BDA(config, m_vfd0, 60, 0);
 
 	config.set_default_layout(layout_bfm_sc5);
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YMZ280B(config, m_ymz, 16000000); // ?? Mhz
+	m_ymz->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 #include "bfm_sc5sw.hxx"

@@ -528,10 +528,11 @@ WRITE8_MEMBER(de_2_state::lamps_w)
 }
 
 
-MACHINE_CONFIG_START(de_2_state::de_bg_audio)
+void de_2_state::de_bg_audio(machine_config &config)
+{
 	/* sound CPU */
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
-	MCFG_DEVICE_PROGRAM_MAP(de_2_audio_map)
+	MC6809E(config, m_audiocpu, XTAL(8'000'000) / 4); // MC68B09E
+	m_audiocpu->set_addrmap(AS_PROGRAM, &de_2_state::de_2_audio_map);
 
 	SPEAKER(config, "bg").front_center();
 
@@ -539,11 +540,11 @@ MACHINE_CONFIG_START(de_2_state::de_bg_audio)
 	m_ym2151->irq_handler().set(FUNC(de_2_state::ym2151_irq_w));
 	m_ym2151->add_route(ALL_OUTPUTS, "bg", 0.50);
 
-	MCFG_DEVICE_ADD("msm5205", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, de_2_state, msm5205_irq_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm5205, XTAL(384'000));
+	m_msm5205->vck_legacy_callback().set(FUNC(de_2_state::msm5205_irq_w));
+	m_msm5205->set_prescaler_selector(msm5205_device::S96_4B);
+	m_msm5205->add_route(ALL_OUTPUTS, "bg", 0.50);
+}
 
 void de_2_state::de_type1(machine_config &config)
 {

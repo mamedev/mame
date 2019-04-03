@@ -15,14 +15,14 @@ class unico_state : public driver_device
 public:
 	unico_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_oki(*this, "oki"),
 		m_leds(*this, "led%u", 0U),
 		m_vram(*this, "vram", 0),
 		m_scroll(*this, "scroll", 0),
-		m_spriteram(*this, "spriteram", 0),
-		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki")
+		m_spriteram(*this, "spriteram", 0)
 	{ }
 
 	void burglarx(machine_config &config);
@@ -45,8 +45,10 @@ protected:
 
 	void burglarx_map(address_map &map);
 
+	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<okim6295_device> m_oki;
 	output_finder<2> m_leds;
 
 private:
@@ -56,9 +58,6 @@ private:
 	int m_sprites_scrolldx;
 	int m_sprites_scrolldy;
 	required_shared_ptr<uint16_t> m_spriteram;
-
-	required_device<cpu_device> m_maincpu;
-	optional_device<okim6295_device> m_oki;
 };
 
 class zeropnt_state : public unico_state
@@ -84,13 +83,14 @@ protected:
 
 	required_memory_bank m_okibank;
 
+	required_device<screen_device> m_screen;
+
 	void zeropnt_map(address_map &map);
 	void zeropnt_oki_map(address_map &map);
 
 private:
 	enum { Y0, X0, Y1, X1 }; // gun axis indices
 
-	required_device<screen_device> m_screen;
 	required_ioport_array<4> m_gun_axes;
 };
 

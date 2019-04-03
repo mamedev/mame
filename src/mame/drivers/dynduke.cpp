@@ -314,23 +314,24 @@ WRITE_LINE_MEMBER(dynduke_state::vblank_irq)
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(dynduke_state::dynduke)
+void dynduke_state::dynduke(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", V30, 16000000/2) // NEC V30-8 CPU
-	MCFG_DEVICE_PROGRAM_MAP(master_map)
+	V30(config, m_maincpu, 16000000/2); // NEC V30-8 CPU
+	m_maincpu->set_addrmap(AS_PROGRAM, &dynduke_state::master_map);
 
-	MCFG_DEVICE_ADD("slave", V30, 16000000/2) // NEC V30-8 CPU
-	MCFG_DEVICE_PROGRAM_MAP(slave_map)
+	V30(config, m_slave, 16000000/2); // NEC V30-8 CPU
+	m_slave->set_addrmap(AS_PROGRAM, &dynduke_state::slave_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
+	z80_device &audiocpu(Z80(config, "audiocpu", 14318180/4));
+	audiocpu.set_addrmap(AS_PROGRAM, &dynduke_state::sound_map);
+	audiocpu.set_addrmap(AS_OPCODES, &dynduke_state::sound_decrypted_opcodes_map);
+	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
 	sei80bu_device &sei80bu(SEI80BU(config, "sei80bu", 0));
 	sei80bu.set_addrmap(AS_PROGRAM, &dynduke_state::sei80bu_encrypted_full_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(3600))
+	config.m_minimum_quantum = attotime::from_hz(3600);
 
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
@@ -346,18 +347,17 @@ MACHINE_CONFIG_START(dynduke_state::dynduke)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dynduke);
-
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14318180/4));
+	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	okim6295_device &oki(OKIM6295(config, "oki", 1320000, okim6295_device::PIN7_LOW));
+	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
 	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
@@ -365,14 +365,13 @@ MACHINE_CONFIG_START(dynduke_state::dynduke)
 	m_seibu_sound->set_rombank_tag("seibu_bank1");
 	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dynduke_state::dbldyn)
+void dynduke_state::dbldyn(machine_config &config)
+{
 	dynduke(config);
-
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(masterj_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &dynduke_state::masterj_map);
+}
 
 /* ROMs */
 

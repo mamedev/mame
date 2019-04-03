@@ -380,20 +380,21 @@ void proteus3_state::machine_reset()
  Machine Drivers
 ******************************************************************************/
 
-MACHINE_CONFIG_START(proteus3_state::proteus3)
+void proteus3_state::proteus3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(3'579'545))  /* Divided by 4 internally */
-	MCFG_DEVICE_PROGRAM_MAP(proteus3_mem)
+	M6800(config, m_maincpu, XTAL(3'579'545));  /* Divided by 4 internally */
+	m_maincpu->set_addrmap(AS_PROGRAM, &proteus3_state::proteus3_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(200))
-	MCFG_SCREEN_SIZE(64*8, 16*12)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*12-1)
-	MCFG_SCREEN_UPDATE_DRIVER(proteus3_state, screen_update_proteus3)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_proteus3)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(200));
+	screen.set_size(64*8, 16*12);
+	screen.set_visarea(0, 64*8-1, 0, 16*12-1);
+	screen.set_screen_update(FUNC(proteus3_state::screen_update_proteus3));
+	screen.set_palette("palette");
+	GFXDECODE(config, "gfxdecode", "palette", gfx_proteus3);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Devices */
@@ -409,12 +410,12 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	ACIA6850(config, m_acia1, 0);
 	m_acia1->txd_handler().set(FUNC(proteus3_state::acia1_txdata_w));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", proteus3_state, timer_c, attotime::from_hz(4800))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", proteus3_state, timer_p, attotime::from_hz(40000))
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
+	TIMER(config, "timer_c").configure_periodic(FUNC(proteus3_state::timer_c), attotime::from_hz(4800));
+	TIMER(config, "timer_p").configure_periodic(FUNC(proteus3_state::timer_p), attotime::from_hz(40000));
 
 	// optional tty keyboard
 	ACIA6850(config, m_acia2, 0);
@@ -442,7 +443,7 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	m_brg->out_f<13>().set(FUNC(proteus3_state::write_f13_clock));
 	m_brg->out_f<14>().set(FUNC(proteus3_state::write_f14_clock));
 	m_brg->out_f<15>().set(FUNC(proteus3_state::write_f15_clock));
-MACHINE_CONFIG_END
+}
 
 
 

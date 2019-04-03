@@ -140,15 +140,15 @@ void monzagp_state::monzagp_palette(palette_device &palette) const
 
 		// red component
 		bit0 = BIT(d, 2);
-		int const r = combine_3_weights(rweights, bit0, bit1, bit2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
 
 		// green component
 		bit0 = BIT(d, 1);
-		int const g = combine_3_weights(gweights, bit0, bit1, bit2);
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
 
 		// blue component
 		bit0 = BIT(d, 0);
-		int const b = combine_3_weights(bweights, bit0, bit1, bit2);
+		int const b = combine_weights(bweights, bit0, bit1, bit2);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -504,7 +504,8 @@ static GFXDECODE_START( gfx_monzagp )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, tile_layout,   0, 8 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(monzagp_state::monzagp)
+void monzagp_state::monzagp(machine_config &config)
+{
 	I8035(config, m_maincpu, 12000000/4); /* 400KHz ??? - Main board Crystal is 12MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &monzagp_state::monzagp_map);
 	m_maincpu->set_addrmap(AS_IO, &monzagp_state::monzagp_io);
@@ -526,10 +527,10 @@ MACHINE_CONFIG_START(monzagp_state::monzagp)
 	PALETTE(config, m_palette, FUNC(monzagp_state::monzagp_palette), 0x200);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_monzagp);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("time_tick_timer", monzagp_state, time_tick_timer, attotime::from_hz(4))
+	TIMER(config, "time_tick_timer").configure_periodic(FUNC(monzagp_state::time_tick_timer), attotime::from_hz(4));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
-MACHINE_CONFIG_END
+}
 
 ROM_START( monzagp )
 	ROM_REGION( 0x1000, "maincpu", 0 )
