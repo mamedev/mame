@@ -64,15 +64,15 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ppi8255(*this, "ppi8255"),
-		m_led_delay(*this, "led_delay_%u", 0),
-		m_buttons(*this, "IN.%u", 0),
+		m_delay_display(*this, "delay_display_%u", 0),
+		m_keypad(*this, "IN.%u", 0),
 		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot"),
-		m_digit(*this, "digit%u", 0U),
-		m_led(*this, "led%u", 0U)
+		m_out_digit(*this, "digit%u", 0U),
+		m_out_led(*this, "led%u", 0U)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void intel02(machine_config &config);
 
 	// assume that reset button is tied to RESET pin
@@ -85,20 +85,20 @@ private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
-	required_device_array<timer_device, 6> m_led_delay;
-	required_ioport_array<2> m_buttons;
+	required_device_array<timer_device, 6> m_delay_display;
+	required_ioport_array<2> m_keypad;
 	required_device<dac_bit_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
-	output_finder<4> m_digit;
-	output_finder<2> m_led;
+	output_finder<4> m_out_digit;
+	output_finder<2> m_out_led;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
 
 	// display stuff
 	void update_display();
-	TIMER_DEVICE_CALLBACK_MEMBER(led_delay_off);
+	TIMER_DEVICE_CALLBACK_MEMBER(delay_display);
 
-	u8 m_7seg_data;
+	u8 m_digit_data;
 	u8 m_led_select;
 	u8 m_led_active;
 
@@ -108,26 +108,27 @@ private:
 
 	// I/O handlers
 	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(_7seg_w);
+	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(control_w);
 };
 
 void intel02_state::machine_start()
 {
 	// resolve handlers
-	m_led.resolve();
-	m_digit.resolve();
+	m_out_led.resolve();
+	m_out_digit.resolve();
 
 	// zerofill
-	m_7seg_data = 0;
+	m_digit_data = 0;
 	m_led_select = 0;
 	m_led_active = 0;
 
 	// register for savestates
-	save_item(NAME(m_7seg_data));
+	save_item(NAME(m_digit_data));
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_active));
 }
+
 
 
 /******************************************************************************
@@ -154,17 +155,17 @@ void intel02_state::update_display()
 	for (int i = 0; i < 4; i++)
 	{
 		if (BIT(m_led_select, i))
-			m_digit[i] = m_7seg_data;
+			m_out_digit[i] = m_digit_data;
 		else if (!BIT(m_led_active, i))
-			m_digit[i] = 0;
+			m_out_digit[i] = 0;
 	}
 
 	// led select d4: lose led, d5: win led
-	m_led[0] = BIT(m_led_active, 4);
-	m_led[1] = BIT(m_led_active, 5);
+	m_out_led[0] = BIT(m_led_active, 4);
+	m_out_led[1] = BIT(m_led_active, 5);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(intel02_state::led_delay_off)
+TIMER_DEVICE_CALLBACK_MEMBER(intel02_state::delay_display)
 {
 	u8 mask = 1 << param;
 	m_led_active = (m_led_active & ~mask) | (m_led_select & mask);
@@ -178,13 +179,13 @@ READ8_MEMBER(intel02_state::input_r)
 {
 	// d0-d3: buttons through a priority encoder
 	// d4-d7: buttons (direct)
-	return (count_leading_zeros(m_buttons[0]->read()) - 17) | (~m_buttons[1]->read() << 4 & 0xf0);
+	return (count_leading_zeros(m_keypad[0]->read()) - 17) | (~m_keypad[1]->read() << 4 & 0xf0);
 }
 
-WRITE8_MEMBER(intel02_state::_7seg_w)
+WRITE8_MEMBER(intel02_state::digit_w)
 {
 	// d0-d7: digit segment data
-	m_7seg_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
+	m_digit_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
 	update_display();
 }
 
@@ -196,9 +197,9 @@ WRITE8_MEMBER(intel02_state::control_w)
 		if (BIT(data, i))
 			m_led_active |= 1 << i;
 
-		// on falling edge, delay it going off to prevent flicker
+		// they're strobed, so on falling edge, delay them going off to prevent flicker or stuck display
 		else if (BIT(m_led_select, i))
-			m_led_delay[i]->adjust(attotime::from_msec(10), i);
+			m_delay_display[i]->adjust(attotime::from_msec(10), i);
 	}
 
 	m_led_select = data;
@@ -252,7 +253,7 @@ static INPUT_PORTS_START( intel02 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Input") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Game Select") PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Erase") PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Erase") PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Reset") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, intel02_state, reset_button, nullptr)
@@ -261,7 +262,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void intel02_state::intel02(machine_config &config)
@@ -274,13 +275,13 @@ void intel02_state::intel02(machine_config &config)
 	I8255(config, m_ppi8255);
 	m_ppi8255->in_pa_callback().set(FUNC(intel02_state::input_r));
 	m_ppi8255->tri_pa_callback().set_constant(0);
-	m_ppi8255->out_pb_callback().set(FUNC(intel02_state::_7seg_w));
+	m_ppi8255->out_pb_callback().set(FUNC(intel02_state::digit_w));
 	m_ppi8255->tri_pb_callback().set_constant(0);
 	m_ppi8255->out_pc_callback().set(FUNC(intel02_state::control_w));
 
-	/* display hardware */
+	/* video hardware */
 	for (int i = 0; i < 6; i++)
-		TIMER(config, m_led_delay[i]).configure_generic(FUNC(intel02_state::led_delay_off));
+		TIMER(config, m_delay_display[i]).configure_generic(FUNC(intel02_state::delay_display));
 
 	config.set_default_layout(layout_intellect02);
 

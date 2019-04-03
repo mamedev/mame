@@ -193,7 +193,7 @@ READ16_MEMBER(dio16_98644_device::io_r)
 	case 0x0d:
 	case 0x0e:
 	case 0x0f:
-		ret = m_uart->ins8250_r(space, offset & 0x07, mem_mask);
+		ret = m_uart->ins8250_r(offset & 0x07);
 		break;
 	}
 
@@ -230,7 +230,7 @@ WRITE16_MEMBER(dio16_98644_device::io_w)
 	case 0x0d:
 	case 0x0e:
 	case 0x0f:
-		m_uart->ins8250_w(space, offset & 0x07, data, mem_mask);
+		m_uart->ins8250_w(offset & 0x07, data);
 		break;
 	}
 }

@@ -102,21 +102,22 @@ static DEVICE_INPUT_DEFAULTS_START( asst128 )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x20)
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(asst128_state::asst128)
-	MCFG_DEVICE_ADD("maincpu", I8086, 4772720)
-	MCFG_DEVICE_PROGRAM_MAP(asst128_map)
-	MCFG_DEVICE_IO_MAP(asst128_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+void asst128_state::asst128(machine_config &config)
+{
+	I8086(config, m_maincpu, 4772720);
+	m_maincpu->set_addrmap(AS_PROGRAM, &asst128_state::asst128_map);
+	m_maincpu->set_addrmap(AS_IO, &asst128_state::asst128_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("mb", ASST128_MOTHERBOARD, 0)
-	downcast<asst128_mb_device &>(*device).set_cputag("maincpu");
-	MCFG_DEVICE_INPUT_DEFAULTS(asst128)
+	asst128_mb_device &mb(ASST128_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(asst128));
 
 	subdevice<cassette_image_device>("mb:cassette")->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("board0", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga_mc1502", true)
-	MCFG_DEVICE_ADD("board1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", true)
+	ISA8_SLOT(config, "board0", 0, "mb:isa", pc_isa8_cards, "cga_mc1502", true);
+	ISA8_SLOT(config, "board1", 0, "mb:isa", pc_isa8_cards, "lpt", true);
 
 	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
@@ -128,7 +129,7 @@ MACHINE_CONFIG_START(asst128_state::asst128)
 	PC_JOY(config, "pc_joy");
 
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("64K, 128K, 256K");
-MACHINE_CONFIG_END
+}
 
 ROM_START( asst128 )
 	ROM_REGION16_LE(0x10000,"bios", 0)

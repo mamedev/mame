@@ -1,323 +1,239 @@
 // license:BSD-3-Clause
-// copyright-holders:Sandro Ronco
+// copyright-holders:Sandro Ronco, hap
+// thanks-to:Sean Riddle
 /******************************************************************************
 
-    Acetronic Chess Traveller
+SciSys Chess Traveler
 
-    TODO:
-    - Add emulation of the 3870 MCU to the F8 core, including timer interrupt
-      that is used by the Boris Diplomat.
+- Fairchild 3870 MCU, label SL90387 (does not use the timer or irq at all)
+- 256 bytes RAM(3539)
+- 4-digit 7seg led panel
+
+It was also redistributed by Acetronic as "Chess Traveller"(British spelling there),
+and by Prinztronic as well, another British brand
+
+SciSys/Novag's "Chess Champion: Pocket Chess" is assumed to be the same game,
+with the exception that they added battery low voltage detection to it (rightmost
+digit DP lights up).
 
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/f8/f8.h"
+#include "machine/f3853.h"
 #include "machine/timer.h"
-#include "chesstrv.lh"
-#include "borisdpl.lh"
 
-class chesstrv_base_state : public driver_device
-{
-protected:
-	chesstrv_base_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-	{
-	}
+// internal artwork
+#include "chesstrv.lh" // clickable
 
-	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER(ram_addr_r);
-	DECLARE_WRITE8_MEMBER(ram_addr_w);
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_WRITE8_MEMBER(matrix_w);
+namespace {
 
-	void chesstrv_mem(address_map &map);
-
-	uint8_t m_ram_addr;
-	uint8_t *m_ram;
-	uint8_t m_matrix;
-	required_device<cpu_device> m_maincpu;
-};
-
-class chesstrv_state : public chesstrv_base_state
+class chesstrv_state : public driver_device
 {
 public:
-	chesstrv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: chesstrv_base_state(mconfig, type, tag)
-		, m_digits(*this, "digit%u", 0U)
-		, m_keypad(*this, "LINE%u", 1U)
-	{
-	}
+	chesstrv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_keypad(*this, "LINE%u", 1U),
+		m_delay_display(*this, "delay_display_%u", 0),
+		m_out_digit(*this, "digit%u", 0U)
+	{ }
 
 	void chesstrv(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
+
 private:
+	// devices/pointers
+	required_device<cpu_device> m_maincpu;
+	required_ioport_array<4> m_keypad;
+	required_device_array<timer_device, 4> m_delay_display;
+	output_finder<4> m_out_digit;
+
+	void chesstrv_mem(address_map &map);
 	void chesstrv_io(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(display_w);
-	DECLARE_READ8_MEMBER(keypad_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(delay_display);
 
-	output_finder<4> m_digits;
-	required_ioport_array<4> m_keypad;
+	DECLARE_WRITE8_MEMBER(matrix_w);
+	DECLARE_WRITE8_MEMBER(digit_w);
+	DECLARE_READ8_MEMBER(input_r);
+
+	// 256 bytes data RAM accessed via I/O ports
+	DECLARE_READ8_MEMBER(ram_address_r) { return m_ram_address; }
+	DECLARE_WRITE8_MEMBER(ram_address_w) { m_ram_address = data; }
+	DECLARE_READ8_MEMBER(ram_data_r) { return m_ram[m_ram_address]; }
+	DECLARE_WRITE8_MEMBER(ram_data_w) { m_ram[m_ram_address] = data; }
+
+	std::unique_ptr<u8[]> m_ram;
+	u8 m_ram_address;
+	u8 m_matrix;
 };
 
-class borisdpl_state : public chesstrv_base_state
+void chesstrv_state::machine_start()
 {
-public:
-	borisdpl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: chesstrv_base_state(mconfig, type, tag)
-		, m_digits(*this, "digit%u", 0U)
-		, m_keypad(*this, "LINE%u", 1U)
-	{
-	}
+	// resolve handlers
+	m_out_digit.resolve();
 
-	void borisdpl(machine_config &config);
-protected:
-	virtual void machine_start() override;
-private:
-	void borisdpl_io(address_map &map);
+	// zerofill
+	m_ram = make_unique_clear<u8[]>(0x100);
+	m_ram_address = 0;
+	m_matrix = 0;
 
-	DECLARE_WRITE8_MEMBER(display_w);
-	DECLARE_READ8_MEMBER(keypad_r);
-
-	//TIMER_DEVICE_CALLBACK_MEMBER(timer_interrupt);
-
-	output_finder<8> m_digits;
-	required_ioport_array<4> m_keypad;
-};
-
-WRITE8_MEMBER(chesstrv_base_state::ram_addr_w)
-{
-	m_ram_addr = data;
+	// register for savestates
+	save_pointer(NAME(m_ram), 0x100);
+	save_item(NAME(m_ram_address));
+	save_item(NAME(m_matrix));
 }
 
-READ8_MEMBER(chesstrv_base_state::ram_addr_r)
+
+
+/******************************************************************************
+    Devices, I/O
+******************************************************************************/
+
+// F3870 ports
+
+TIMER_DEVICE_CALLBACK_MEMBER(chesstrv_state::delay_display)
 {
-	return m_ram_addr;
+	// clear digits if inactive
+	if (BIT(m_matrix, 3 - param))
+		m_out_digit[param] = 0;
 }
 
-READ8_MEMBER(chesstrv_base_state::ram_r)
+WRITE8_MEMBER(chesstrv_state::digit_w)
 {
-	return m_ram[m_ram_addr];
+	// digit segments, update display here
+	for (int i = 0; i < 4; i++)
+		if (!BIT(m_matrix, 3 - i))
+			m_out_digit[i] = bitswap<8>(data,0,1,2,3,4,5,6,7) & 0x7f;
 }
 
-WRITE8_MEMBER(chesstrv_base_state::ram_w)
+WRITE8_MEMBER(chesstrv_state::matrix_w)
 {
-	m_ram[m_ram_addr] = data;
-}
+	// d0-d3: input/digit select (active low)
+	// they're strobed, so on rising edge, delay them going off to prevent flicker or stuck display
+	for (int i = 0; i < 4; i++)
+		if (BIT(~m_matrix & data, 3 - i))
+			m_delay_display[i]->adjust(attotime::from_msec(20), i);
 
-WRITE8_MEMBER(chesstrv_state::display_w)
-{
-	uint8_t seg_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
-
-	for (int digit = 0; digit < 4; digit++)
-		if (!BIT(m_matrix, 3 - digit))
-			m_digits[digit] = seg_data;
-}
-
-WRITE8_MEMBER(chesstrv_base_state::matrix_w)
-{
 	m_matrix = data;
 }
 
-READ8_MEMBER(chesstrv_state::keypad_r)
+READ8_MEMBER(chesstrv_state::input_r)
 {
-	uint8_t data = 0;
+	u8 data = m_matrix;
 
-	data |= m_keypad[0]->read();
-	data |= m_keypad[1]->read();
-	data |= m_keypad[2]->read();
-	data |= m_keypad[3]->read();
-	data |= (m_keypad[0]->read() ? 0x10 : 0);
-	data |= (m_keypad[1]->read() ? 0x20 : 0);
-	data |= (m_keypad[2]->read() ? 0x40 : 0);
-	data |= (m_keypad[3]->read() ? 0x80 : 0);
+	// d0-d3: multiplexed inputs from d4-d7
+	for (int i = 0; i < 4; i++)
+		if (BIT(m_matrix, i+4))
+			data |= m_keypad[i]->read();
 
-	return data;
-}
-
-WRITE8_MEMBER(borisdpl_state::display_w)
-{
-	m_digits[m_matrix & 7] = data ^ 0xff;
-}
-
-READ8_MEMBER(borisdpl_state::keypad_r)
-{
-	uint8_t data = m_matrix & 0x07;
-
-	switch (m_matrix & 7)
-	{
-		case 0:     data |= m_keypad[0]->read();    break;
-		case 1:     data |= m_keypad[1]->read();    break;
-		case 2:     data |= m_keypad[2]->read();    break;
-		case 3:     data |= m_keypad[3]->read();    break;
-	}
+	// d4-d7: multiplexed inputs from d0-d3
+	for (int i = 0; i < 4; i++)
+		if (m_matrix & m_keypad[i]->read())
+			data |= 1 << (i+4);
 
 	return data;
 }
 
 
-void chesstrv_base_state::chesstrv_mem(address_map &map)
+
+/******************************************************************************
+    Address Maps
+******************************************************************************/
+
+void chesstrv_state::chesstrv_mem(address_map &map)
 {
 	map.global_mask(0x7ff);
 	map(0x0000, 0x07ff).rom();
 }
 
-
 void chesstrv_state::chesstrv_io(address_map &map)
 {
-	map(0x00, 0x00).rw(FUNC(chesstrv_state::ram_addr_r), FUNC(chesstrv_state::ram_addr_w));
-	map(0x01, 0x01).w(FUNC(chesstrv_state::display_w));
-	map(0x04, 0x04).rw(FUNC(chesstrv_state::ram_r), FUNC(chesstrv_state::ram_w));
-	map(0x05, 0x05).rw(FUNC(chesstrv_state::keypad_r), FUNC(chesstrv_state::matrix_w));
+	map(0x00, 0x00).rw(FUNC(chesstrv_state::ram_address_r), FUNC(chesstrv_state::ram_address_w));
+	map(0x01, 0x01).w(FUNC(chesstrv_state::digit_w));
+	map(0x04, 0x07).rw("psu", FUNC(f38t56_device::read), FUNC(f38t56_device::write));
 }
 
-void borisdpl_state::borisdpl_io(address_map &map)
-{
-	map(0x00, 0x00).rw(FUNC(borisdpl_state::keypad_r), FUNC(borisdpl_state::matrix_w));
-	map(0x01, 0x01).w(FUNC(borisdpl_state::display_w));
-	map(0x04, 0x04).rw(FUNC(borisdpl_state::ram_r), FUNC(borisdpl_state::ram_w));
-	map(0x05, 0x05).rw(FUNC(borisdpl_state::ram_addr_r), FUNC(borisdpl_state::ram_addr_w));
-}
+
+
+/******************************************************************************
+    Input Ports
+******************************************************************************/
 
 static INPUT_PORTS_START( chesstrv )
 	PORT_START("LINE1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A1")  PORT_CODE(KEYCODE_A)    PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("B2")  PORT_CODE(KEYCODE_B)    PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("C3")  PORT_CODE(KEYCODE_C)    PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("D4")  PORT_CODE(KEYCODE_D)    PORT_CODE(KEYCODE_4)
-	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("A 1 / Pawn")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("B 2 / Knight")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("C 3 / Bishop")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("D 4 / Rook")
 
 	PORT_START("LINE2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("E5")  PORT_CODE(KEYCODE_E)    PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F6")  PORT_CODE(KEYCODE_F)    PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("G7")  PORT_CODE(KEYCODE_G)    PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8")  PORT_CODE(KEYCODE_H)    PORT_CODE(KEYCODE_8)
-	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("E 5 / Queen")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("F 6 / King")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("G 7 / White")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("H 8 / Black")
 
 	PORT_START("LINE3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV")  PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("FP")  PORT_CODE(KEYCODE_K)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("EP")  PORT_CODE(KEYCODE_O)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CB")  PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("LV / CS") // level/clear square
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("FP") // find position
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("EP") // enter position
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("CB") // clear board
 
 	PORT_START("LINE4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CE")  PORT_CODE(KEYCODE_DEL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ENTER")   PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("MM")  PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE") // clear entry
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("MM") // multi move
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( borisdpl )
-	PORT_START("LINE1")
-	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("0")       PORT_CODE(KEYCODE_0)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("-")       PORT_CODE(KEYCODE_MINUS)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("B/W")     PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ENTER")   PORT_CODE(KEYCODE_ENTER)
 
-	PORT_START("LINE2")
-	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A1")      PORT_CODE(KEYCODE_A)    PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("B2")      PORT_CODE(KEYCODE_B)    PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("C3")      PORT_CODE(KEYCODE_C)    PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RANK")    PORT_CODE(KEYCODE_R)
 
-	PORT_START("LINE3")
-	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("D4")      PORT_CODE(KEYCODE_D)    PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("E5")      PORT_CODE(KEYCODE_E)    PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F6")      PORT_CODE(KEYCODE_F)    PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("TIME")    PORT_CODE(KEYCODE_T)
+/******************************************************************************
+    Machine Configs
+******************************************************************************/
 
-	PORT_START("LINE4")
-	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("G7")      PORT_CODE(KEYCODE_G)    PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8")      PORT_CODE(KEYCODE_H)    PORT_CODE(KEYCODE_8)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("9/SET")   PORT_CODE(KEYCODE_S)    PORT_CODE(KEYCODE_9)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CE")      PORT_CODE(KEYCODE_DEL)
-
-INPUT_PORTS_END
-
-/*
-TIMER_DEVICE_CALLBACK_MEMBER(borisdpl_state::timer_interrupt)
+void chesstrv_state::chesstrv(machine_config &config)
 {
-    m_maincpu->set_input_line_and_vector(F8_INPUT_LINE_INT_REQ, HOLD_LINE, 0x20);
-}
-*/
-
-void chesstrv_base_state::machine_start()
-{
-	m_ram = memregion("ram")->base();
-
-	save_item(NAME(m_ram_addr));
-	save_item(NAME(m_matrix));
-}
-
-void chesstrv_state::machine_start()
-{
-	chesstrv_base_state::machine_start();
-	m_digits.resolve();
-}
-
-void borisdpl_state::machine_start()
-{
-	chesstrv_base_state::machine_start();
-	m_digits.resolve();
-}
-
-MACHINE_CONFIG_START(chesstrv_state::chesstrv)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", F8, 3000000 )      // Fairchild 3870
-	MCFG_DEVICE_PROGRAM_MAP( chesstrv_mem )
-	MCFG_DEVICE_IO_MAP( chesstrv_io )
+	F8(config, m_maincpu, 3000000/2); // Fairchild 3870, measured ~3MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &chesstrv_state::chesstrv_mem);
+	m_maincpu->set_addrmap(AS_IO, &chesstrv_state::chesstrv_io);
+
+	f38t56_device &psu(F38T56(config, "psu", 3000000/2));
+	psu.read_a().set(FUNC(chesstrv_state::ram_data_r));
+	psu.write_a().set(FUNC(chesstrv_state::ram_data_w));
+	psu.read_b().set(FUNC(chesstrv_state::input_r));
+	psu.write_b().set(FUNC(chesstrv_state::matrix_w));
 
 	/* video hardware */
+	for (int i = 0; i < 4; i++)
+		TIMER(config, m_delay_display[i]).configure_generic(FUNC(chesstrv_state::delay_display));
+
 	config.set_default_layout(layout_chesstrv);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(borisdpl_state::borisdpl)
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", F8, 30000000 )     // Motorola SC80265P
-	MCFG_DEVICE_PROGRAM_MAP( chesstrv_mem )
-	MCFG_DEVICE_IO_MAP( borisdpl_io )
 
-	/* video hardware */
-	config.set_default_layout(layout_borisdpl);
 
-	//TIMER(config, "timer_interrupt").configure_periodic(FUNC(borisdpl_state::timer_interrupt), attotime::from_hz(40));
-MACHINE_CONFIG_END
-
+/******************************************************************************
+    ROM Definitions
+******************************************************************************/
 
 ROM_START( chesstrv )
-	ROM_REGION(0x0800, "maincpu", 0)
-	ROM_LOAD("3870-sl90387", 0x0000, 0x0800, CRC(b76214d8) SHA1(7760903a64d9c513eb54c4787f535dabec62eb64))
-
-	ROM_REGION(0x0100, "ram", ROMREGION_ERASE)
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD("3870-sl90387", 0x0000, 0x0800, CRC(b76214d8) SHA1(7760903a64d9c513eb54c4787f535dabec62eb64) )
 ROM_END
 
-ROM_START( boris )
-	ROM_REGION(0x0c00, "maincpu", 0)
-	ROM_LOAD("007-7020-00_c10502_korea.bin", 0x0000, 0x0800, CRC(18182870) SHA1(cb717a4b5269b04b0d7ae61aaf4a8f6a019626a5))
-	ROM_LOAD("007-7021-00_c10503_korea.bin", 0x0800, 0x0400, CRC(49b77505) SHA1(474b665ee2955497f6d70878d817f1783ba1a835))
-
-	ROM_REGION(0x0100, "ram", ROMREGION_ERASE)
-ROM_END
-
-ROM_START( borisdpl )
-	ROM_REGION(0x0800, "maincpu", 0)
-	ROM_LOAD("007-7024-00_7847.u8", 0x0000, 0x0800, CRC(e20bac03) SHA1(9e17b9d90522371fbf7018926356150f70b9a3b6))
-
-	ROM_REGION(0x0100, "ram", ROMREGION_ERASE)
-ROM_END
+} // anonymous namespace
 
 
-//    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT        COMPANY             FULLNAME           FLAGS
-CONS( 1980,  chesstrv, 0,      0,      chesstrv, chesstrv, chesstrv_state, empty_init, "Acetronic",        "Chess Traveller", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
-CONS( 1979,  boris,    0,      0,      borisdpl, borisdpl, borisdpl_state, empty_init, "Applied Concepts", "Boris - Electronic Chess Computer",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
-CONS( 1979,  borisdpl, 0,      0,      borisdpl, borisdpl, borisdpl_state, empty_init, "Applied Concepts", "Boris Diplomat",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+
+/******************************************************************************
+    Drivers
+******************************************************************************/
+
+//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE           INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1980, chesstrv, 0,      0, chesstrv, chesstrv, chesstrv_state, empty_init, "SciSys", "Chess Traveler", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -111,11 +111,12 @@ static INPUT_PORTS_START( kramermc )
 INPUT_PORTS_END
 
 /* Machine driver */
-MACHINE_CONFIG_START(kramermc_state::kramermc)
+void kramermc_state::kramermc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 1500000)
-	MCFG_DEVICE_PROGRAM_MAP(kramermc_mem)
-	MCFG_DEVICE_IO_MAP(kramermc_io)
+	Z80(config, m_maincpu, 1500000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kramermc_state::kramermc_mem);
+	m_maincpu->set_addrmap(AS_IO, &kramermc_state::kramermc_io);
 
 	z80pio_device& pio(Z80PIO(config, "z80pio", 1500000));
 	pio.in_pa_callback().set(FUNC(kramermc_state::kramermc_port_a_r));
@@ -123,19 +124,18 @@ MACHINE_CONFIG_START(kramermc_state::kramermc)
 	pio.in_pb_callback().set(FUNC(kramermc_state::kramermc_port_b_r));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(64*8, 16*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kramermc_state, screen_update_kramermc)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 16*8);
+	screen.set_visarea(0, 64*8-1, 0, 16*8-1);
+	screen.set_screen_update(FUNC(kramermc_state::screen_update_kramermc));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kramermc);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( kramermc )

@@ -362,24 +362,24 @@ void chaknpop_state::machine_reset()
 	m_flip_y = 0;
 }
 
-MACHINE_CONFIG_START(chaknpop_state::chaknpop)
-
+void chaknpop_state::chaknpop(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'000'000) / 6)    // Verified on PCB
-	MCFG_DEVICE_PROGRAM_MAP(chaknpop_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chaknpop_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(18'000'000) / 6);    // Verified on PCB
+	m_maincpu->set_addrmap(AS_PROGRAM, &chaknpop_state::chaknpop_map);
+	m_maincpu->set_vblank_int("screen", FUNC(chaknpop_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL(18'000'000) / 6)    // Verified on PCB
+	TAITO68705_MCU(config, m_bmcu, XTAL(18'000'000) / 6);    // Verified on PCB
 	config.m_minimum_quantum = attotime::from_hz(6000);  // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.1828)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(chaknpop_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.1828);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(chaknpop_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chaknpop);
 	PALETTE(config, m_palette, FUNC(chaknpop_state::chaknpop_palette), 1024);
@@ -396,7 +396,7 @@ MACHINE_CONFIG_START(chaknpop_state::chaknpop)
 	ay2.port_a_write_callback().set(FUNC(chaknpop_state::unknown_port_1_w));   // ??
 	ay2.port_b_write_callback().set(FUNC(chaknpop_state::unknown_port_2_w));   // ??
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.10);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

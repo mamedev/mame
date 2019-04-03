@@ -43,7 +43,7 @@ WRITE8_MEMBER(pcktgal_state::sound_bank_w)
 
 WRITE8_MEMBER(pcktgal_state::sound_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -270,7 +270,7 @@ void pcktgal_state::bootleg(machine_config &config)
 	pcktgal(config);
 	m_gfxdecode->set_info(gfx_bootleg);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(pcktgal_state::screen_update_pcktgalb));
-MACHINE_CONFIG_END
+}
 
 void pcktgal_state::pcktgal2(machine_config &config)
 {

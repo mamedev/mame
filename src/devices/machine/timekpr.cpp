@@ -351,7 +351,7 @@ TIMER_CALLBACK_MEMBER(timekeeper_device::watchdog_callback)
 	m_data[m_offset_flags] |= FLAGS_WDF;
 	// WDS (bit 7) selects callback
 	if (m_data[m_offset_watchdog] & 0x80)
-	{ 
+	{
 		// Clear watchdog register
 		m_data[m_offset_watchdog] = 0;
 		m_reset_cb(ASSERT_LINE);

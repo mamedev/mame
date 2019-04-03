@@ -262,7 +262,7 @@ WRITE8_MEMBER(flipjack_state::layer_w)
 
 WRITE8_MEMBER(flipjack_state::soundlatch_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	if (BIT(data, 7))
 		m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
@@ -419,8 +419,8 @@ void flipjack_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(flipjack_state::flipjack)
-
+void flipjack_state::flipjack(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &flipjack_state::main_map);
@@ -462,7 +462,7 @@ MACHINE_CONFIG_START(flipjack_state::flipjack)
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	AY8910(config, "ay2", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( flipjack )

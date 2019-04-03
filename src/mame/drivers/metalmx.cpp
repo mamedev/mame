@@ -656,14 +656,14 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(metalmx_state::metalmx)
+void metalmx_state::metalmx(machine_config &config)
+{
+	M68EC020(config, m_maincpu, XTAL(14'318'181));
+	m_maincpu->set_addrmap(AS_PROGRAM, &metalmx_state::main_map);
 
-	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(14'318'181))
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-
-	MCFG_DEVICE_ADD("adsp", ADSP2105, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
-	MCFG_DEVICE_DATA_MAP(adsp_data_map)
+	ADSP2105(config, m_adsp, XTAL(10'000'000));
+	m_adsp->set_addrmap(AS_PROGRAM, &metalmx_state::adsp_program_map);
+	m_adsp->set_addrmap(AS_DATA, &metalmx_state::adsp_data_map);
 
 	TMS34020(config, m_gsp, 40000000);         /* Unverified */
 	m_gsp->set_addrmap(AS_PROGRAM, &metalmx_state::gsp_map);
@@ -672,26 +672,26 @@ MACHINE_CONFIG_START(metalmx_state::metalmx)
 	m_gsp->set_pixels_per_clock(2);
 	m_gsp->output_int().set_inputline("maincpu", 4);
 
-	MCFG_DEVICE_ADD("dsp32c_1", DSP32C, 40000000)      /* Unverified */
-	MCFG_DEVICE_PROGRAM_MAP(dsp32c_1_map)
+	DSP32C(config, m_dsp32c[0], 40000000);      /* Unverified */
+	m_dsp32c[0]->set_addrmap(AS_PROGRAM, &metalmx_state::dsp32c_1_map);
 
-	MCFG_DEVICE_ADD("dsp32c_2", DSP32C, 40000000)      /* Unverified */
-	MCFG_DEVICE_PROGRAM_MAP(dsp32c_2_map)
+	DSP32C(config, m_dsp32c[1], 40000000);      /* Unverified */
+	m_dsp32c[1]->set_addrmap(AS_PROGRAM, &metalmx_state::dsp32c_2_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(metalmx_state, screen_update_metalmx)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 384);
+	screen.set_visarea(0, 511, 0, 383);
+	screen.set_screen_update(FUNC(metalmx_state::screen_update_metalmx));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::RGB_565);
 
 	ATARI_CAGE(config, m_cage, 0);
 	m_cage->set_speedup(0); // TODO: speedup address
 	m_cage->irq_handler().set(FUNC(metalmx_state::cage_irq_callback));
-MACHINE_CONFIG_END
+}
 
 
 void metalmx_state::init_metalmx()

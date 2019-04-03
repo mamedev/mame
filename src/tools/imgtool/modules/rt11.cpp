@@ -6,68 +6,68 @@
 
     DEC RT-11 disk images
 
-	References:
+    References:
 
-	VaFFM -- bitsavers://pdf/dec/pdp11/rt11/v5.6_Aug91/AA-PD6PA-TC_RT-11_Volume_and_File_Formats_Manual_Aug91.pdf
-	DHM -- bitsavers://pdf/dec/pdp11/rt11/v5.6_Aug91/AA-PE7VA-TC_RT-11_Device_Handlers_Manual_Aug91.pdf
-	SSM -- bitsavers://pdf/dec/pdp11/rt11/v5.0_Mar83/AA-H379B-TC_5.0_SWsuppMar83.pdf
-	TSX+ -- bitsavers://pdf/dec/pdp11/tsxPlus/manuals_6.31/TSX-Plus_UsersRef_Jan88.pdf
-	PUTR -- http://www.dbit.com/pub/putr/putr.asm
+    VaFFM -- bitsavers://pdf/dec/pdp11/rt11/v5.6_Aug91/AA-PD6PA-TC_RT-11_Volume_and_File_Formats_Manual_Aug91.pdf
+    DHM -- bitsavers://pdf/dec/pdp11/rt11/v5.6_Aug91/AA-PE7VA-TC_RT-11_Device_Handlers_Manual_Aug91.pdf
+    SSM -- bitsavers://pdf/dec/pdp11/rt11/v5.0_Mar83/AA-H379B-TC_5.0_SWsuppMar83.pdf
+    TSX+ -- bitsavers://pdf/dec/pdp11/tsxPlus/manuals_6.31/TSX-Plus_UsersRef_Jan88.pdf
+    PUTR -- http://www.dbit.com/pub/putr/putr.asm
 
-	To do:
-	- filter for text files
-	- read-write support
-	- report empty 'last modified' time if date field is all zeros
-	- report free space
-	- arbitrary sized images
-	- don't crash when strings in home block have non-ascii chars (charconverter does not apply)
-	- do something about bootblock bug in imgtool (commit aca90520)
+    To do:
+    - filter for text files
+    - read-write support
+    - report empty 'last modified' time if date field is all zeros
+    - report free space
+    - arbitrary sized images
+    - don't crash when strings in home block have non-ascii chars (charconverter does not apply)
+    - do something about bootblock bug in imgtool (commit aca90520)
 
-	LBN	Contents
-	---	--------
-	0	Reserved (primary bootstrap)
-	1	Reserved (home block)
-	2-5	Reserved (secondary bootstrap)
-	6-7	Directory segment 1
-	...	Directory segment 2-n
-	...	Data
+    LBN Contents
+    --- --------
+    0   Reserved (primary bootstrap)
+    1   Reserved (home block)
+    2-5 Reserved (secondary bootstrap)
+    6-7 Directory segment 1
+    ... Directory segment 2-n
+    ... Data
 
-	Home block
-	----------
-	000-201	Bad block replacement table
-	202-203	?
-	204-251	INITIALIZE/RESTORE data area
-	252-273	BUP information area
-	274-677	?
-	700-701	(Reserved for Digital, must be zero)
-	702-703	(Reserved for Digital, must be zero)
-	704-721	?
-	722-723	Pack cluster size (= 1)
-	724-725	Block number of first directory segment
-	726-727	System version (RAD50)
-	730-742	Volume Identification
-	744-757	Owner name
-	760-773	System Identification
-	776-777	Checksum
+    Home block
+    ----------
+    000-201 Bad block replacement table
+    202-203 ?
+    204-251 INITIALIZE/RESTORE data area
+    252-273 BUP information area
+    274-677 ?
+    700-701 (Reserved for Digital, must be zero)
+    702-703 (Reserved for Digital, must be zero)
+    704-721 ?
+    722-723 Pack cluster size (= 1)
+    724-725 Block number of first directory segment
+    726-727 System version (RAD50)
+    730-742 Volume Identification
+    744-757 Owner name
+    760-773 System Identification
+    776-777 Checksum
 
-	Directory segment header
-	------------------------
-	0	The total number of segments in this directory.
-	1	The segment number of the next logical directory segment. If this word is 0, there are no more segments in the list.
-	2	The number of the highest segment currently in use.  Valid only in the first directory segment.
-	3	The number of extra bytes per directory entry, always an unsigned, even octal number.
-	4	The block number on the volume where the actual stored data identified by this segment begins.
+    Directory segment header
+    ------------------------
+    0   The total number of segments in this directory.
+    1   The segment number of the next logical directory segment. If this word is 0, there are no more segments in the list.
+    2   The number of the highest segment currently in use.  Valid only in the first directory segment.
+    3   The number of extra bytes per directory entry, always an unsigned, even octal number.
+    4   The block number on the volume where the actual stored data identified by this segment begins.
 
-	Directory entry
-	---------------
-	0	Status word
-	1	File name 1-3 (RAD50)
-	2	File name 4-6 (RAD50)
-	3	File type 1-3 (RAD50)
-	4	Total file length (blocks)
-	5	Job#, Channel# (RT-11 uses this information only for tentative files)
-	6	Creation date
-	7-	Optional extra words
+    Directory entry
+    ---------------
+    0   Status word
+    1   File name 1-3 (RAD50)
+    2   File name 4-6 (RAD50)
+    3   File type 1-3 (RAD50)
+    4   Total file length (blocks)
+    5   Job#, Channel# (RT-11 uses this information only for tentative files)
+    6   Creation date
+    7-  Optional extra words
 
 ****************************************************************************/
 

@@ -333,29 +333,29 @@ void lbeach_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(lbeach_state::lbeach)
-
+void lbeach_state::lbeach(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(16'000'000) / 32) // Motorola MC6800P, 500kHz
-	MCFG_DEVICE_PROGRAM_MAP(lbeach_map)
+	M6800(config, m_maincpu, XTAL(16'000'000) / 32); // Motorola MC6800P, 500kHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &lbeach_state::lbeach_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60) // ~60Hz
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511-32, 0, 255-24)
-	MCFG_SCREEN_UPDATE_DRIVER(lbeach_state, screen_update_lbeach)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE) // needed for collision detection
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60); // ~60Hz
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 511-32, 0, 255-24);
+	m_screen->set_screen_update(FUNC(lbeach_state::screen_update_lbeach));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // needed for collision detection
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lbeach);
 	PALETTE(config, m_palette, FUNC(lbeach_state::lbeach_palette), 2 + 8 + 2);
 	/* sound hardware */
 	// ...
-MACHINE_CONFIG_END
+}
 
 
 

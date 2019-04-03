@@ -3377,8 +3377,8 @@ static INPUT_PORTS_START( alpiner )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 ) // Decision / View Change
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY // L Selection
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_16WAY // R Selection
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state, alpine_motor_read, (void *)0) // steps are free
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state, alpine_motor_read, (void *)1) // steps are locked
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state, alpine_motor_read, 0) // steps are free
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state, alpine_motor_read, 1) // steps are locked
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ADC.0")
@@ -3877,12 +3877,12 @@ void namcos22_state::machine_start()
 }
 
 // System22
-MACHINE_CONFIG_START(namcos22_state::namcos22)
-
+void namcos22_state::namcos22(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68020, 49.152_MHz_XTAL/2) // MC68020RP25E
-	MCFG_DEVICE_PROGRAM_MAP(namcos22_am)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos22_state, namcos22_interrupt)
+	M68020(config, m_maincpu, 49.152_MHz_XTAL/2); // MC68020RP25E
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos22_state::namcos22_am);
+	m_maincpu->set_vblank_int("screen", FUNC(namcos22_state::namcos22_interrupt));
 
 	tms32025_device& master(TMS32025(config, m_master, 40_MHz_XTAL));
 	master.set_addrmap(AS_PROGRAM, &namcos22_state::master_dsp_program);
@@ -3906,58 +3906,59 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	slave.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
 	slave.dx_out_cb().set(FUNC(namcos22_state::slave_serial_io_w));
 
-	MCFG_DEVICE_ADD("mcu", NAMCO_C74, 49.152_MHz_XTAL/3) // C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
-	MCFG_DEVICE_PROGRAM_MAP(mcu_s22_program)
-	MCFG_DEVICE_IO_MAP(mcu_s22_io)
+	NAMCO_C74(config, m_mcu, 49.152_MHz_XTAL/3); // C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
+	m_mcu->set_addrmap(AS_PROGRAM, &namcos22_state::mcu_s22_program);
+	m_mcu->set_addrmap(AS_IO, &namcos22_state::mcu_s22_io);
 
-	MCFG_DEVICE_ADD("iomcu", NAMCO_C74, 6.144_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(iomcu_s22_program)
-	MCFG_DEVICE_IO_MAP(iomcu_s22_io)
+	NAMCO_C74(config, m_iomcu, 6.144_MHz_XTAL);
+	m_iomcu->set_addrmap(AS_PROGRAM, &namcos22_state::iomcu_s22_program);
+	m_iomcu->set_addrmap(AS_IO, &namcos22_state::iomcu_s22_io);
 
 	EEPROM_2864(config, "eeprom").write_time(attotime::zero);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos22_state, screen_update_namcos22)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos22_state, screen_vblank))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	//m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(namcos22_state::screen_update_namcos22));
+	m_screen->screen_vblank().set(FUNC(namcos22_state::screen_vblank));
 
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	PALETTE(config, m_palette).set_entries(0x8000);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos22);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("c352", C352, 49.152_MHz_XTAL/2, 288)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-MACHINE_CONFIG_END
+	C352(config, m_c352, 49.152_MHz_XTAL/2, 288);
+	m_c352->add_route(0, "lspeaker", 1.00);
+	m_c352->add_route(1, "rspeaker", 1.00);
+}
 
-MACHINE_CONFIG_START(namcos22_state::cybrcomm)
+void namcos22_state::cybrcomm(machine_config &config)
+{
 	namcos22(config);
 
 	SPEAKER(config, "rear_left").rear_left();
 	SPEAKER(config, "rear_right").rear_right();
 
-	MCFG_DEVICE_MODIFY("c352")
-	MCFG_SOUND_ROUTE(2, "rear_left", 1.00)
-	MCFG_SOUND_ROUTE(3, "rear_right", 1.00)
-MACHINE_CONFIG_END
+	m_c352->add_route(2, "rear_left", 1.00);
+	m_c352->add_route(3, "rear_right", 1.00);
+}
 
 // System Super22
-MACHINE_CONFIG_START(namcos22_state::namcos22s)
+void namcos22_state::namcos22s(machine_config &config)
+{
 	namcos22(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", M68EC020, 49.152_MHz_XTAL/2) // MC68EC020FG25
-	MCFG_DEVICE_PROGRAM_MAP(namcos22s_am)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos22_state, namcos22s_interrupt)
+	M68EC020(config.replace(), m_maincpu, 49.152_MHz_XTAL/2); // MC68EC020FG25
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos22_state::namcos22s_am);
+	m_maincpu->set_vblank_int("screen", FUNC(namcos22_state::namcos22s_interrupt));
 
-	MCFG_DEVICE_REPLACE("mcu", M37710S4, 49.152_MHz_XTAL/3)
-	MCFG_DEVICE_PROGRAM_MAP(mcu_program)
-	MCFG_DEVICE_IO_MAP(mcu_io)
+	M37710S4(config.replace(), m_mcu, 49.152_MHz_XTAL/3);
+	m_mcu->set_addrmap(AS_PROGRAM, &namcos22_state::mcu_program);
+	m_mcu->set_addrmap(AS_IO, &namcos22_state::mcu_io);
 	TIMER(config, "mcu_irq").configure_scanline(FUNC(namcos22_state::mcu_irq), "screen", 0, 240);
 	config.m_minimum_quantum = attotime::from_hz(9000); // erratic inputs otherwise, probably mcu vs maincpu shareram
 
@@ -3967,72 +3968,71 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	m_mb87078->gain_changed().set(FUNC(namcos22_state::mb87078_gain_changed));
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(namcos22_state, screen_update_namcos22s)
+	m_screen->set_screen_update(FUNC(namcos22_state::screen_update_namcos22s));
 
 	GFXDECODE(config.replace(), m_gfxdecode, m_palette, gfx_super);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(namcos22_state::airco22b)
+void namcos22_state::airco22b(machine_config &config)
+{
 	namcos22s(config);
 
 	SPEAKER(config, "bodysonic").subwoofer();
 
-	MCFG_DEVICE_MODIFY("c352")
-	MCFG_SOUND_ROUTE(2, "bodysonic", 0.50) // to subwoofer
-MACHINE_CONFIG_END
+	m_c352->add_route(2, "bodysonic", 0.50); // to subwoofer
+}
 
-MACHINE_CONFIG_START(namcos22_state::alpine)
+void namcos22_state::alpine(machine_config &config)
+{
 	namcos22s(config);
 
-	MCFG_DEVICE_MODIFY("mcu")
-	MCFG_DEVICE_IO_MAP(alpine_io_map)
+	m_mcu->set_addrmap(AS_IO, &namcos22_state::alpine_io_map);
 
 	TIMER(config, m_motor_timer).configure_generic(FUNC(namcos22_state::alpine_steplock_callback));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(namcos22_state::alpinesa)
+void namcos22_state::alpinesa(machine_config &config)
+{
 	alpine(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(alpinesa_am)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos22_state::alpinesa_am);
+}
 
-MACHINE_CONFIG_START(namcos22_state::cybrcycc)
+void namcos22_state::cybrcycc(machine_config &config)
+{
 	namcos22s(config);
 
 	SPEAKER(config, "tank", 0.0, 0.0, 0.0);
 
-	MCFG_DEVICE_MODIFY("c352")
-	MCFG_SOUND_ROUTE(2, "tank", 1.00)
-MACHINE_CONFIG_END
+	m_c352->add_route(2, "tank", 1.00);
+}
 
-MACHINE_CONFIG_START(namcos22_state::dirtdash)
+void namcos22_state::dirtdash(machine_config &config)
+{
 	namcos22s(config);
 
 	SPEAKER(config, "road", 0.0, 0.0, 0.0);
 
-	MCFG_DEVICE_MODIFY("c352")
-	MCFG_SOUND_ROUTE(3, "road", 1.00)
-MACHINE_CONFIG_END
+	m_c352->add_route(3, "road", 1.00);
+}
 
-MACHINE_CONFIG_START(namcos22_state::timecris)
+void namcos22_state::timecris(machine_config &config)
+{
 	namcos22s(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(timecris_am)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos22_state::timecris_am);
+}
 
-MACHINE_CONFIG_START(namcos22_state::tokyowar)
+void namcos22_state::tokyowar(machine_config &config)
+{
 	namcos22s(config);
 
 	SPEAKER(config, "vibration").subwoofer();
 	SPEAKER(config, "seat").rear_center();
 
-	MCFG_DEVICE_MODIFY("c352")
-	MCFG_SOUND_ROUTE(2, "vibration", 0.50) // to "bass shaker"
-	MCFG_SOUND_ROUTE(3, "seat", 1.00)
-MACHINE_CONFIG_END
+	m_c352->add_route(2, "vibration", 0.50); // to "bass shaker"
+	m_c352->add_route(3, "seat", 1.00);
+}
 
 void namcos22_state::propcycl(machine_config &config)
 {
@@ -4050,12 +4050,13 @@ MACHINE_START_MEMBER(namcos22_state,adillor)
 		elem = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos22_state::adillor_trackball_interrupt),this));
 }
 
-MACHINE_CONFIG_START(namcos22_state::adillor)
+void namcos22_state::adillor(machine_config &config)
+{
 	namcos22s(config);
 
 	TIMER(config, "ar_tb_upd").configure_periodic(FUNC(namcos22_state::adillor_trackball_update), attotime::from_msec(20));
 	MCFG_MACHINE_START_OVERRIDE(namcos22_state,adillor)
-MACHINE_CONFIG_END
+}
 
 
 

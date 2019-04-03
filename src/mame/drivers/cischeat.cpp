@@ -1949,37 +1949,37 @@ WRITE_LINE_MEMBER(cischeat_state::sound_irq)
 
 
 
-MACHINE_CONFIG_START(cischeat_state::bigrun)
-
+void cischeat_state::bigrun(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("cpu1", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(bigrun_map)
+	M68000(config, m_cpu1, 10000000);
+	m_cpu1->set_addrmap(AS_PROGRAM, &cischeat_state::bigrun_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(cischeat_state::bigrun_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("cpu2", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(bigrun_map2)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
+	M68000(config, m_cpu2, 10000000);
+	m_cpu2->set_addrmap(AS_PROGRAM, &cischeat_state::bigrun_map2);
+	m_cpu2->set_vblank_int("screen", FUNC(cischeat_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("cpu3", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(bigrun_map3)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
+	M68000(config, m_cpu3, 10000000);
+	m_cpu3->set_addrmap(AS_PROGRAM, &cischeat_state::bigrun_map3);
+	m_cpu3->set_vblank_int("screen", FUNC(cischeat_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", M68000, 6000000)
-	MCFG_DEVICE_PROGRAM_MAP(bigrun_sound_map)
+	M68000(config, m_soundcpu, 6000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &cischeat_state::bigrun_sound_map);
 	// timing set by the YM irqhandler
-//  MCFG_DEVICE_PERIODIC_INT_DRIVER(cischeat_state, irq4_line_hold, 16*30)
+//  m_soundcpu->set_periodic_int(FUNC(cischeat_state::irq4_line_hold), attotime::from_hz(16*30));
 
 	config.m_minimum_quantum = attotime::from_hz(1200);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,  0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_bigrun)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1,  0+16, 256-16-1);
+	m_screen->set_screen_update(FUNC(cischeat_state::screen_update_bigrun));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bigrun);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x4000/2);
@@ -2002,36 +2002,32 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	ymsnd.add_route(0, "lspeaker", 0.50);
 	ymsnd.add_route(1, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
+	OKIM6295(config, m_oki1, 4000000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_oki1->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 4000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki2, 4000000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+}
 
 
-MACHINE_CONFIG_START(cischeat_state::cischeat)
+void cischeat_state::cischeat(machine_config &config)
+{
 	bigrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_PROGRAM_MAP(cischeat_map)
+	m_cpu1->set_addrmap(AS_PROGRAM, &cischeat_state::cischeat_map);
 
-	MCFG_DEVICE_MODIFY("cpu2")
-	MCFG_DEVICE_PROGRAM_MAP(cischeat_map2)
+	m_cpu2->set_addrmap(AS_PROGRAM, &cischeat_state::cischeat_map2);
 
-	MCFG_DEVICE_MODIFY("cpu3")
-	MCFG_DEVICE_PROGRAM_MAP(cischeat_map3)
+	m_cpu3->set_addrmap(AS_PROGRAM, &cischeat_state::cischeat_map3);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(cischeat_sound_map)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &cischeat_state::cischeat_sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,  0+16, 256-16-8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_cischeat)
+	m_screen->set_visarea(0, 256-1,  0+16, 256-16-8-1);
+	m_screen->set_screen_update(FUNC(cischeat_state::screen_update_cischeat));
 
 	m_gfxdecode->set_info(gfx_cischeat);
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 0x8000/2);
@@ -2044,27 +2040,24 @@ MACHINE_CONFIG_START(cischeat_state::cischeat)
 
 	m_tmap[2]->set_colorbase(0x6c00/2);
 	m_tmap[2]->set_bits_per_color_code(5);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(cischeat_state::f1gpstar)
+void cischeat_state::f1gpstar(machine_config &config)
+{
 	bigrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_CLOCK(12000000)
-	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_map)
+	m_cpu1->set_clock(12000000);
+	m_cpu1->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstar_map);
 
-	MCFG_DEVICE_MODIFY("cpu2")
-	MCFG_DEVICE_CLOCK(12000000)
-	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_map2)
+	m_cpu2->set_clock(12000000);
+	m_cpu2->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstar_map2);
 
-	MCFG_DEVICE_MODIFY("cpu3")
-	MCFG_DEVICE_CLOCK(12000000)
-	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_map3)
+	m_cpu3->set_clock(12000000);
+	m_cpu3->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstar_map3);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_sound_map)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstar_sound_map);
 
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_f1gpstar);
@@ -2076,34 +2069,32 @@ MACHINE_CONFIG_START(cischeat_state::f1gpstar)
 
 	m_tmap[2]->set_colorbase(0x6e00/2);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_f1gpstar)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(cischeat_state::screen_update_f1gpstar));
+}
 
 
-MACHINE_CONFIG_START(cischeat_state::f1gpstr2)
+void cischeat_state::f1gpstr2(machine_config &config)
+{
 	f1gpstar(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_map)
+	m_cpu1->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstr2_map);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_sound_map)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstr2_sound_map);
 
-	MCFG_DEVICE_ADD("cpu5", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_io_map)
+	M68000(config, m_cpu5, 10000000);
+	m_cpu5->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstr2_io_map);
 
 	config.m_minimum_quantum = attotime::from_hz(12000);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(wildplt_state::wildplt)
+void wildplt_state::wildplt(machine_config &config)
+{
 	f1gpstr2(config);
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_PROGRAM_MAP(wildplt_map)
-MACHINE_CONFIG_END
+	m_cpu1->set_addrmap(AS_PROGRAM, &wildplt_state::wildplt_map);
+}
 
 
 /**************************************************************************
@@ -2128,24 +2119,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(cischeat_state::scudhamm)
-
+void cischeat_state::scudhamm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(scudhamm_map)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cischeat_state::scudhamm_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(cischeat_state::scudhamm_scanline), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(30) //TODO: wrong!
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0 +16, 256-1 -16)
-	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_refresh_hz(30); //TODO: wrong!
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0 +16, 256-1 -16);
+	m_screen->set_screen_update(FUNC(cischeat_state::screen_update_scudhamm));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scudhamm);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x8000/2);
@@ -2158,14 +2149,14 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
+	OKIM6295(config, m_oki1, 4000000/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_oki1->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 4000000/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki2, 4000000/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+}
 
 
 /**************************************************************************
@@ -2183,14 +2174,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::armchamp2_scanline)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(cischeat_state::armchmp2)
+void cischeat_state::armchmp2(machine_config &config)
+{
 	scudhamm(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(armchmp2_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cischeat_state::armchmp2_map);
 	subdevice<timer_device>("scantimer")->set_callback(FUNC(cischeat_state::armchamp2_scanline));
-MACHINE_CONFIG_END
+}
 
 
 /**************************************************************************
@@ -2215,11 +2206,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::captflag_scanline)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(cischeat_state::captflag)
-
+void cischeat_state::captflag(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(24'000'000) / 2)  // TMP68000P-12
-	MCFG_DEVICE_PROGRAM_MAP(captflag_map)
+	M68000(config, m_maincpu, XTAL(24'000'000) / 2);  // TMP68000P-12
+	m_maincpu->set_addrmap(AS_PROGRAM, &cischeat_state::captflag_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(cischeat_state::captflag_scanline), "screen", 0, 1);
 
 	TICKET_DISPENSER(config, m_captflag_hopper, attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
@@ -2228,14 +2219,14 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(30) //TODO: wrong!
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0 +16, 256-1 -16)
-	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//  m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_refresh_hz(30); //TODO: wrong!
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0 +16, 256-1 -16);
+	m_screen->set_screen_update(FUNC(cischeat_state::screen_update_scudhamm));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scudhamm);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x8000/2);
@@ -2255,16 +2246,16 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, captflag_oki1_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
+	OKIM6295(config, m_oki1, 4000000/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki1->set_addrmap(0, &cischeat_state::captflag_oki1_map);
+	m_oki1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_oki1->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 4000000/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, captflag_oki2_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki2, 4000000/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki2->set_addrmap(0, &cischeat_state::captflag_oki2_map);
+	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+}
 
 
 /***************************************************************************

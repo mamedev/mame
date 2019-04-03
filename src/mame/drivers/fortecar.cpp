@@ -682,24 +682,25 @@ void fortecar_state::machine_reset()
 *         Machine Drivers          *
 ***********************************/
 
-MACHINE_CONFIG_START(fortecar_state::fortecar)
+void fortecar_state::fortecar(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)      /* 3 MHz, measured */
-	MCFG_DEVICE_PROGRAM_MAP(fortecar_map)
-	MCFG_DEVICE_IO_MAP(fortecar_ports)
+	Z80(config, m_maincpu, CPU_CLOCK);      /* 3 MHz, measured */
+	m_maincpu->set_addrmap(AS_PROGRAM, &fortecar_state::fortecar_map);
+	m_maincpu->set_addrmap(AS_IO, &fortecar_state::fortecar_ports);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(200));   /* guess */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 600-1, 0, 240-1)    /* driven by CRTC */
-	MCFG_SCREEN_UPDATE_DRIVER(fortecar_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(640, 256);
+	screen.set_visarea(0, 600-1, 0, 240-1);    /* driven by CRTC */
+	screen.set_screen_update(FUNC(fortecar_state::screen_update));
+	screen.set_palette(m_palette);
 
 	EEPROM_93C56_16BIT(config, "eeprom").default_value(0);
 
@@ -728,7 +729,7 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 	aysnd.port_a_write_callback().set(FUNC(fortecar_state::ayporta_w));
 	aysnd.port_b_write_callback().set(FUNC(fortecar_state::ayportb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 /*******************************

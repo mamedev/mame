@@ -373,26 +373,27 @@ uint32_t ppmast93_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-MACHINE_CONFIG_START(ppmast93_state::ppmast93)
+void ppmast93_state::ppmast93(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,5000000)         /* 5 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ppmast93_cpu1_map)
-	MCFG_DEVICE_IO_MAP(ppmast93_cpu1_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ppmast93_state, irq0_line_hold)
+	Z80(config, m_maincpu, 5000000);         /* 5 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ppmast93_state::ppmast93_cpu1_map);
+	m_maincpu->set_addrmap(AS_IO, &ppmast93_state::ppmast93_cpu1_io);
+	m_maincpu->set_vblank_int("screen", FUNC(ppmast93_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80,5000000)         /* 5 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ppmast93_cpu2_map)
-	MCFG_DEVICE_IO_MAP(ppmast93_cpu2_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(ppmast93_state, irq0_line_hold, 8000)
+	z80_device &sub(Z80(config, "sub", 5000000));         /* 5 MHz */
+	sub.set_addrmap(AS_PROGRAM, &ppmast93_state::ppmast93_cpu2_map);
+	sub.set_addrmap(AS_IO, &ppmast93_state::ppmast93_cpu2_io);
+	sub.set_periodic_int(FUNC(ppmast93_state::irq0_line_hold), attotime::from_hz(8000));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(55)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ppmast93_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(55);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0, 256-1);
+	screen.set_screen_update(FUNC(ppmast93_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_ppmast93);
 
@@ -403,14 +404,13 @@ MACHINE_CONFIG_START(ppmast93_state::ppmast93)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 5000000/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	YM2413(config, "ymsnd", 5000000/2).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 ROM_START( ppmast93 )
 	ROM_REGION( 0x20000, "maincpu", 0 )

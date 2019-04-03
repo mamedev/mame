@@ -1862,24 +1862,20 @@ void chihiro_state::an2131sc_configuration(device_t *device)
 	MCFG_OHCI_HLEAN2131SC_REGION(":others", 0x2080)
 }
 
-MACHINE_CONFIG_START(chihiro_state::chihiro_base)
+void chihiro_state::chihiro_base(machine_config &config)
+{
 	xbox_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(chihiro_map)
-	MCFG_DEVICE_IO_MAP(chihiro_map_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &chihiro_state::chihiro_map);
+	m_maincpu->set_addrmap(AS_IO, &chihiro_state::chihiro_map_io);
 
-	//BUS_MASTER_IDE_CONTROLLER(config, "ide").options(ide_baseboard, nullptr, "bb", true);
-	MCFG_DEVICE_MODIFY(":pci:09.0:ide:0")
-	MCFG_DEVICE_SLOT_INTERFACE(ide_baseboard, nullptr, true)
-	MCFG_DEVICE_MODIFY(":pci:09.0:ide:1")
-	MCFG_DEVICE_SLOT_INTERFACE(ide_baseboard, "bb", true)
+	subdevice<ide_controller_32_device>(":pci:09.0:ide")->options(ide_baseboard, nullptr, "bb", true);
 
 	OHCI_USB_CONNECTOR(config, ":pci:02.0:port1", usb_baseboard, "an2131qc", true).set_option_machine_config("an2131qc", an2131qc_configuration);
 	OHCI_USB_CONNECTOR(config, ":pci:02.0:port2", usb_baseboard, "an2131sc", true).set_option_machine_config("an2131sc", an2131sc_configuration);
 	OHCI_USB_CONNECTOR(config, ":pci:02.0:port3", usb_baseboard, nullptr, false);
 	OHCI_USB_CONNECTOR(config, ":pci:02.0:port4", usb_baseboard, nullptr, false);
 
-	MCFG_DEVICE_ADD("jvs_master", JVS_MASTER, 0)
+	JVS_MASTER(config, "jvs_master", 0);
 	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "jvs_master"));
 	sega837.set_port_tag<0>("TILT");
 	sega837.set_port_tag<1>("P1");
@@ -1893,7 +1889,7 @@ MACHINE_CONFIG_START(chihiro_state::chihiro_base)
 	sega837.set_port_tag<9>("A6");
 	sega837.set_port_tag<10>("A7");
 	sega837.set_port_tag<11>("OUTPUT");
-MACHINE_CONFIG_END
+}
 
 void chihiro_state::chihirogd(machine_config &config)
 {

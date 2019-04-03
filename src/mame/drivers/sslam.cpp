@@ -366,7 +366,7 @@ WRITE8_MEMBER(sslam_state::sslam_snd_w)
 
 WRITE16_MEMBER(powerbls_state::powerbls_sound_w)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_audiocpu->set_input_line(MCS51_INT1_LINE, HOLD_LINE);
 }
 
@@ -426,12 +426,10 @@ READ8_MEMBER(sslam_state::playmark_snd_command_r)
 {
 	uint8_t data = 0;
 
-	if ((m_oki_control & 0x38) == 0x30) {
-		data = m_soundlatch->read(space,0);
-	}
-	else if ((m_oki_control & 0x38) == 0x28) {
+	if ((m_oki_control & 0x38) == 0x30)
+		data = m_soundlatch->read();
+	else if ((m_oki_control & 0x38) == 0x28)
 		data = (m_oki->read() & 0x0f);
-	}
 
 	return data;
 }

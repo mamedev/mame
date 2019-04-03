@@ -47,7 +47,7 @@ public:
 	u16 m_inp_mux;                  // multiplexed inputs mask
 
 	u8 read_inputs(int columns);
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
@@ -203,9 +203,11 @@ INPUT_CHANGED_MEMBER(hh_melps4_state::reset_button)
 
 /***************************************************************************
 
-  Minidrivers (subclass, I/O, Inputs, Machine Config)
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
+
+namespace {
 
 /***************************************************************************
 
@@ -219,8 +221,8 @@ INPUT_CHANGED_MEMBER(hh_melps4_state::reset_button)
 class cfrogger_state : public hh_melps4_state
 {
 public:
-	cfrogger_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_melps4_state(mconfig, type, tag)
+	cfrogger_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_melps4_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -290,12 +292,12 @@ static INPUT_PORTS_START( cfrogger )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x08, "2" )
 
-	PORT_START("IN.3") // fake
+	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, nullptr)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(cfrogger_state::cfrogger)
-
+void cfrogger_state::cfrogger(machine_config &config)
+{
 	/* basic machine hardware */
 	M58846(config, m_maincpu, 600_kHz_XTAL);
 	m_maincpu->read_k().set(FUNC(cfrogger_state::input_r));
@@ -306,17 +308,27 @@ MACHINE_CONFIG_START(cfrogger_state::cfrogger)
 	m_maincpu->write_t().set(FUNC(cfrogger_state::speaker_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(500, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 500-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", "svg"));
+	screen.set_refresh_hz(50);
+	screen.set_size(500, 1080);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_melps4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( cfrogger )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "m58846-701p", 0x0000, 0x1000, CRC(ba52a242) SHA1(7fa53b617f4bb54be32eb209e9b88131e11cb518) )
+
+	ROM_REGION( 786255, "svg", 0)
+	ROM_LOAD( "cfrogger.svg", 0, 786255, CRC(d8d6e2b6) SHA1(bc9a0260b211ed07021dfe1cc19a993569f4c544) )
+ROM_END
 
 
 
@@ -334,8 +346,8 @@ MACHINE_CONFIG_END
 class gjungler_state : public hh_melps4_state
 {
 public:
-	gjungler_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_melps4_state(mconfig, type, tag)
+	gjungler_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_melps4_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -405,12 +417,12 @@ static INPUT_PORTS_START( gjungler )
 	PORT_CONFSETTING(    0x00, "A" )
 	PORT_CONFSETTING(    0x08, "B" )
 
-	PORT_START("IN.3") // fake
+	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, nullptr)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(gjungler_state::gjungler)
-
+void gjungler_state::gjungler(machine_config &config)
+{
 	/* basic machine hardware */
 	M58846(config, m_maincpu, 600_kHz_XTAL);
 	m_maincpu->read_k().set(FUNC(gjungler_state::input_r));
@@ -422,36 +434,19 @@ MACHINE_CONFIG_START(gjungler_state::gjungler)
 	m_maincpu->write_t().set(FUNC(gjungler_state::speaker_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(481, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 481-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", "svg"));
+	screen.set_refresh_hz(50);
+	screen.set_size(481, 1080);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_melps4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
-
-
-
-
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
-
-ROM_START( cfrogger )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "m58846-701p", 0x0000, 0x1000, CRC(ba52a242) SHA1(7fa53b617f4bb54be32eb209e9b88131e11cb518) )
-
-	ROM_REGION( 786255, "svg", 0)
-	ROM_LOAD( "cfrogger.svg", 0, 786255, CRC(d8d6e2b6) SHA1(bc9a0260b211ed07021dfe1cc19a993569f4c544) )
-ROM_END
-
+// roms
 
 ROM_START( gjungler )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -462,6 +457,14 @@ ROM_START( gjungler )
 ROM_END
 
 
+
+} // anonymous namespace
+
+/***************************************************************************
+
+  Game driver(s)
+
+***************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1981, cfrogger, 0,      0, cfrogger, cfrogger, cfrogger_state, empty_init, "Coleco", "Frogger (Coleco)", MACHINE_SUPPORTS_SAVE )

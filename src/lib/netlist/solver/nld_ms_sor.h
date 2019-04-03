@@ -12,10 +12,10 @@
 #ifndef NLD_MS_SOR_H_
 #define NLD_MS_SOR_H_
 
-#include <algorithm>
-
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
+
+#include <algorithm>
 
 namespace netlist
 {
@@ -85,10 +85,10 @@ unsigned matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_rap
 		float_type RHS_t = 0.0;
 
 		const std::size_t term_count = this->m_terms[k]->count();
-		const float_type * const gt = this->m_terms[k]->gt();
-		const float_type * const go = this->m_terms[k]->go();
-		const float_type * const Idr = this->m_terms[k]->Idr();
-		auto other_cur_analog = this->m_terms[k]->connected_net_V();
+		const float_type * const gt = this->m_gtn[k];
+		const float_type * const go = this->m_gonn[k];
+		const float_type * const Idr = this->m_Idrn[k];
+		auto other_cur_analog = this->m_connected_net_Vn[k];
 
 		this->m_new_V[k] = this->m_nets[k]->Q_Analog();
 
@@ -99,7 +99,7 @@ unsigned matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_rap
 		}
 
 		for (std::size_t i = this->m_terms[k]->m_railstart; i < term_count; i++)
-			RHS_t = RHS_t  + go[i] * *other_cur_analog[i];
+			RHS_t = RHS_t  - go[i] * *other_cur_analog[i];
 
 		RHS[k] = RHS_t;
 
@@ -134,13 +134,13 @@ unsigned matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_rap
 		float_type err = 0;
 		for (std::size_t k = 0; k < iN; k++)
 		{
-			const int * net_other = this->m_terms[k]->connected_net_idx();
+			const int * net_other = this->m_terms[k]->m_connected_net_idx.data();
 			const std::size_t railstart = this->m_terms[k]->m_railstart;
-			const float_type * go = this->m_terms[k]->go();
+			const float_type * go = this->m_gonn[k];
 
 			float_type Idrive = 0.0;
 			for (std::size_t i = 0; i < railstart; i++)
-				Idrive = Idrive + go[i] * this->m_new_V[static_cast<std::size_t>(net_other[i])];
+				Idrive = Idrive - go[i] * this->m_new_V[static_cast<std::size_t>(net_other[i])];
 
 			const float_type new_val = this->m_new_V[k] * one_m_w[k] + (Idrive + RHS[k]) * w[k];
 

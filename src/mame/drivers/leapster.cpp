@@ -311,16 +311,16 @@ void leapster_state::leapster_aux(address_map &map)
 MACHINE_CONFIG_START(leapster_state::leapster)
 	/* basic machine hardware */
 	// CPU is ArcTangent-A5 '5.1' (ARCompact core)
-	MCFG_DEVICE_ADD("maincpu", ARCA5, 96000000/10)
-	MCFG_DEVICE_PROGRAM_MAP(leapster_map)
-	MCFG_DEVICE_IO_MAP(leapster_aux)
+	ARCA5(config, m_maincpu, 96000000/10);
+	m_maincpu->set_addrmap(AS_PROGRAM, &leapster_state::leapster_map);
+	m_maincpu->set_addrmap(AS_IO, &leapster_state::leapster_aux);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(160, 160)
-	MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 160-1)
-	MCFG_SCREEN_UPDATE_DRIVER(leapster_state, screen_update_leapster)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_size(160, 160);
+	screen.set_visarea(0, 160-1, 0, 160-1);
+	screen.set_screen_update(FUNC(leapster_state::screen_update_leapster));
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "leapster_cart")

@@ -957,7 +957,7 @@ void gl3000s_state::gl3000s(machine_config &config)
 
 	SOFTWARE_LIST(config, "gl2000_cart").set_compatible("gl2000");
 	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
-MACHINE_CONFIG_END
+}
 
 void gl4004_state::gl4000(machine_config &config)
 {

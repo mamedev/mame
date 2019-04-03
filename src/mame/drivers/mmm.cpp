@@ -26,9 +26,12 @@ public:
 	void mmm(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(strobe_w);
-	DECLARE_READ8_MEMBER(inputs_r);
-	DECLARE_WRITE8_MEMBER(ay_porta_w);
+	void strobe_w(u8 data);
+	u8 inputs_r();
+	void ay_porta_w(u8 data);
+
+	u8 ctc_r(offs_t offset);
+	void ctc_w(offs_t offset, u8 data);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -40,12 +43,12 @@ private:
 };
 
 
-WRITE8_MEMBER(mmm_state::strobe_w)
+void mmm_state::strobe_w(u8 data)
 {
 	m_strobe = data;
 }
 
-READ8_MEMBER(mmm_state::inputs_r)
+u8 mmm_state::inputs_r()
 {
 	u8 result = 0xff;
 	for (int i = 0; i < 8; i++)
@@ -54,9 +57,19 @@ READ8_MEMBER(mmm_state::inputs_r)
 	return result;
 }
 
-WRITE8_MEMBER(mmm_state::ay_porta_w)
+void mmm_state::ay_porta_w(u8 data)
 {
 	logerror("Writing %02X to AY-3-8910 port A\n", data);
+}
+
+u8 mmm_state::ctc_r(offs_t offset)
+{
+	return m_ctc->read(offset >> 4);
+}
+
+void mmm_state::ctc_w(offs_t offset, u8 data)
+{
+	m_ctc->write(offset >> 4, data);
 }
 
 void mmm_state::mem_map(address_map &map)
@@ -72,13 +85,7 @@ void mmm_state::io_map(address_map &map)
 	map(0x03, 0x03).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x04, 0x04).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x05, 0x05).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x06, 0x06).select(0x30).lrw8("ctc_rw",
-									  [this](address_space &space, offs_t offset, u8 mem_mask) {
-										  return m_ctc->read(space, offset >> 4, mem_mask);
-									  },
-									  [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-										  m_ctc->write(space, offset >> 4, data, mem_mask);
-									  });
+	map(0x06, 0x06).select(0x30).rw(FUNC(mmm_state::ctc_r), FUNC(mmm_state::ctc_w));
 	map(0x07, 0x07).r(FUNC(mmm_state::inputs_r));
 }
 

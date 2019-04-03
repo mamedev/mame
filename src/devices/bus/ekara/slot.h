@@ -36,7 +36,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_extra) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_extra) { }
 
-	virtual	DECLARE_WRITE_LINE_MEMBER(write_sda) { }
+	virtual DECLARE_WRITE_LINE_MEMBER(write_sda) { }
 	virtual DECLARE_WRITE_LINE_MEMBER(write_scl) { }
 	//virtual DECLARE_WRITE_LINE_MEMBER( write_wc )
 	virtual DECLARE_READ_LINE_MEMBER( read_sda ) { return 0; }
@@ -107,7 +107,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_extra);
 	virtual DECLARE_WRITE8_MEMBER(write_extra);
 
-	virtual	DECLARE_WRITE_LINE_MEMBER(write_sda);
+	virtual DECLARE_WRITE_LINE_MEMBER(write_sda);
 	virtual DECLARE_WRITE_LINE_MEMBER(write_scl);
 	//virtual DECLARE_WRITE_LINE_MEMBER( write_wc );
 	virtual DECLARE_READ_LINE_MEMBER( read_sda );

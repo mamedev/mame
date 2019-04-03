@@ -446,20 +446,21 @@ void mstation_state::mstation_palette(palette_device &palette) const
 }
 
 
-MACHINE_CONFIG_START(mstation_state::mstation)
+void mstation_state::mstation(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))      //unknown clock
-	MCFG_DEVICE_PROGRAM_MAP(mstation_mem)
-	MCFG_DEVICE_IO_MAP(mstation_io)
+	Z80(config, m_maincpu, XTAL(4'000'000));      //unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &mstation_state::mstation_mem);
+	m_maincpu->set_addrmap(AS_IO, &mstation_state::mstation_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(mstation_state, screen_update)
-	MCFG_SCREEN_SIZE(320, 128)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 128-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(mstation_state::screen_update));
+	screen.set_size(320, 128);
+	screen.set_visarea(0, 320-1, 0, 128-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(mstation_state::mstation_palette), 2);
 
@@ -480,7 +481,7 @@ MACHINE_CONFIG_START(mstation_state::mstation)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("128K");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( mstation )

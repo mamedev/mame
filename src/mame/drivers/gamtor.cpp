@@ -85,23 +85,23 @@ INPUT_PORTS_END
 
 
 
-MACHINE_CONFIG_START(gaminator_state::gaminator)
-	MCFG_DEVICE_ADD("maincpu", MCF5206E, 40000000) /* definitely Coldfire, model / clock uncertain */
-	MCFG_DEVICE_PROGRAM_MAP(gaminator_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaminator_state,  irq6_line_hold) // irq6 seems to be needed to get past the ROM checking
+void gaminator_state::gaminator(machine_config &config)
+{
+	MCF5206E(config, m_maincpu, 40000000); /* definitely Coldfire, model / clock uncertain */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gaminator_state::gaminator_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gaminator_state::irq6_line_hold)); // irq6 seems to be needed to get past the ROM checking
 	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", gamtor_vga_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
+	screen.set_screen_update("vga", FUNC(gamtor_vga_device::screen_update));
 
-	MCFG_DEVICE_ADD("vga", GAMTOR_VGA, 0)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	GAMTOR_VGA(config, "vga", 0).set_screen("screen");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound */
-MACHINE_CONFIG_END
+}
 
 
 

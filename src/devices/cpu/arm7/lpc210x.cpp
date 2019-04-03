@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /***************************************************************************
 
- NXP (Phillips) LPC2103 series
+ NXP (Philips) LPC2103 series
  covering LPC2101, LPC2102, LPC2103*
 
  *currently only LPC2103

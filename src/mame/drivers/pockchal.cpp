@@ -101,23 +101,22 @@ void pockchalv1_state::machine_reset()
 
 
 MACHINE_CONFIG_START(pockchalv1_state::pockchalv1)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMP90845,8000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(pockchalv1_map)
-//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pockchalv1_state,  irq0_line_hold)
+	TMP90845(config, m_maincpu, 8000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pockchalv1_state::pockchalv1_map);
+//  m_maincpu->->set_vblank_int("screen", FUNC(pockchalv1_state::irq0_line_hold));
 
 	// wrong, it's a b&w / greyscale thing
 	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 0x100).set_endianness(ENDIANNESS_BIG);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pockchalv1_state, screen_update_pockchalv1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(pockchalv1_state::screen_update_pockchalv1));
+	screen.set_palette("palette");
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pockchalw_cart")
 	MCFG_GENERIC_EXTENSIONS("bin")
@@ -125,7 +124,6 @@ MACHINE_CONFIG_START(pockchalv1_state::pockchalv1)
 	MCFG_GENERIC_MANDATORY
 
 	SOFTWARE_LIST(config, "pc1_list").set_compatible("pockchalw");
-
 MACHINE_CONFIG_END
 
 

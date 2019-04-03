@@ -8,12 +8,12 @@
 #ifndef NLD_MS_GMRES_H_
 #define NLD_MS_GMRES_H_
 
+#include "nld_ms_direct.h"
+#include "nld_solver.h"
 #include "plib/gmres.h"
 #include "plib/mat_cr.h"
 #include "plib/parray.h"
 #include "plib/vector_ops.h"
-#include "nld_ms_direct.h"
-#include "nld_solver.h"
 
 #include <algorithm>
 #include <cmath>
@@ -37,7 +37,6 @@ namespace devices
 		 */
 		matrix_solver_GMRES_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
 			: matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_solver_t::PREFER_BAND_MATRIX, params, size)
-			, m_term_cr(size)
 			//, m_ops(size, 2)
 			, m_ops(size, 4)
 			, m_gmres(size)
@@ -51,9 +50,7 @@ namespace devices
 
 		using mattype = typename plib::matrix_compressed_rows_t<FT, SIZE>::index_type;
 
-		plib::parray<plib::aligned_vector<FT *, PALIGN_VECTOROPT>, SIZE> m_term_cr;
 		plib::mat_precondition_ILU<FT, SIZE> m_ops;
-		//plib::mat_precondition_diag<FT, SIZE> m_ops;
 		plib::gmres_t<FT, SIZE> m_gmres;
 	};
 
@@ -86,17 +83,19 @@ namespace devices
 
 		for (std::size_t k=0; k<iN; k++)
 		{
+			std::size_t cnt = 0;
 			for (std::size_t j=0; j< this->m_terms[k]->m_railstart;j++)
 			{
 				for (std::size_t i = m_ops.m_mat.row_idx[k]; i<m_ops.m_mat.row_idx[k+1]; i++)
-					if (this->m_terms[k]->connected_net_idx()[j] == static_cast<int>(m_ops.m_mat.col_idx[i]))
+					if (this->m_terms[k]->m_connected_net_idx[j] == static_cast<int>(m_ops.m_mat.col_idx[i]))
 					{
-						m_term_cr[k].push_back(&m_ops.m_mat.A[i]);
+						this->m_mat_ptr[k][j] = &m_ops.m_mat.A[i];
+						cnt++;
 						break;
 					}
 			}
-			nl_assert(m_term_cr[k].size() == this->m_terms[k]->m_railstart);
-			m_term_cr[k].push_back(&m_ops.m_mat.A[m_ops.m_mat.diag[k]]);
+			nl_assert(cnt == this->m_terms[k]->m_railstart);
+			this->m_mat_ptr[k][this->m_terms[k]->m_railstart] = &m_ops.m_mat.A[m_ops.m_mat.diag[k]];
 		}
 	}
 
@@ -111,9 +110,10 @@ namespace devices
 		m_ops.m_mat.set_scalar(0.0);
 
 		/* populate matrix and V for first estimate */
+		this->fill_matrix(iN, this->m_mat_ptr, RHS);
+
 		for (std::size_t k = 0; k < iN; k++)
 		{
-			this->m_terms[k]->fill_matrix(m_term_cr[k], RHS[k]);
 			this->m_new_V[k] = this->m_nets[k]->Q_Analog();
 		}
 

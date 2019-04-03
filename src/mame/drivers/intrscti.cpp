@@ -189,30 +189,30 @@ static GFXDECODE_START( gfx_intrscti )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(intrscti_state::intrscti)
-
+void intrscti_state::intrscti(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)        /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(intrscti_map)
-	MCFG_DEVICE_IO_MAP(intrscti_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", intrscti_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 4000000);        /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &intrscti_state::intrscti_map);
+	m_maincpu->set_addrmap(AS_IO, &intrscti_state::intrscti_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(intrscti_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("subcpu", Z80, 4000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(intrscti_sub_map)
-	MCFG_DEVICE_IO_MAP(intrscti_sub_io_map)
+	Z80(config, m_subcpu, 4000000);         /* ? MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &intrscti_state::intrscti_sub_map);
+	m_subcpu->set_addrmap(AS_IO, &intrscti_state::intrscti_sub_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(intrscti_state, screen_update_intrscti)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0, 256-1);
+	screen.set_screen_update(FUNC(intrscti_state::screen_update_intrscti));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_intrscti);
-	MCFG_PALETTE_ADD("palette", 0x100)
-MACHINE_CONFIG_END
+	PALETTE(config, m_palette).set_entries(0x100);
+}
 
 
 ROM_START( intrscti )

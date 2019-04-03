@@ -367,7 +367,7 @@ void apple2_state::machine_start()
 
 void apple2_state::machine_reset()
 {
-	m_inh_slot = -1;
+	m_inh_slot = 0;
 	m_cnxx_slot = -1;
 	m_page2 = false;
 	m_an0 = m_an1 = m_an2 = m_an3 = false;
@@ -1492,14 +1492,15 @@ void apple2_state::space84(machine_config &config)
 	apple2p(config);
 }
 
-MACHINE_CONFIG_START(apple2_state::apple2jp)
+void apple2_state::apple2jp(machine_config &config)
+{
 	apple2p(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(apple2_state, screen_update_jp)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(apple2_state::screen_update_jp));
+}
 
 #if 0
-static MACHINE_CONFIG_START( laba2p )
+void apple2_state::laba2p(machine_config &config)
+{
 	apple2p(config);
 	MCFG_MACHINE_START_OVERRIDE(apple2_state,laba2p)
 
@@ -1509,8 +1510,7 @@ static MACHINE_CONFIG_START( laba2p )
 
 //  A2BUS_LAB_80COL("sl3", A2BUS_LAB_80COL).set_onboard(m_a2bus);
 	A2BUS_IWM_FDC("sl6", A2BUS_IWM_FDC).set_onboard(m_a2bus);
-
-MACHINE_CONFIG_END
+}
 #endif
 
 /***************************************************************************

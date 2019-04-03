@@ -175,26 +175,27 @@ static GFXDECODE_START( gfx_jonos )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(jonos_state::jonos)
+void jonos_state::jonos(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(16'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(jonos_mem)
+	I8085A(config, m_maincpu, XTAL(16'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jonos_state::jonos_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(jonos_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 288)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 287)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(jonos_state::screen_update));
+	screen.set_size(640, 288);
+	screen.set_visarea(0, 639, 0, 287);
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_jonos);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(jonos_state::kbd_put));
-MACHINE_CONFIG_END
+}
 
 
 /* ROM definition */

@@ -466,7 +466,8 @@ static GFXDECODE_START( gfx_nanos )
 	GFXDECODE_ENTRY( "chargen", 0x0000, nanos_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(nanos_state::nanos)
+void nanos_state::nanos(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &nanos_state::mem_map);
@@ -474,13 +475,13 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	m_maincpu->set_daisy_config(nanos_daisy_chain);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(nanos_state, screen_update)
-	MCFG_SCREEN_SIZE(80*8, 25*10)
-	MCFG_SCREEN_VISIBLE_AREA(0,80*8-1,0,25*10-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(nanos_state::screen_update));
+	screen.set_size(80*8, 25*10);
+	screen.set_visarea(0,80*8-1,0,25*10-1);
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_nanos);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -523,7 +524,7 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	RAM(config, RAM_TAG).set_default_size("64K");
 
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(nanos_state::keyboard_callback), attotime::from_hz(24000));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( nanos )

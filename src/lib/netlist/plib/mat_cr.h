@@ -10,13 +10,6 @@
 #ifndef MAT_CR_H_
 #define MAT_CR_H_
 
-#include <algorithm>
-#include <array>
-#include <cmath>
-#include <cstdlib>
-#include <type_traits>
-#include <vector>
-
 #include "palloc.h"
 #include "parray.h"
 #include "pconfig.h"
@@ -24,6 +17,13 @@
 #include "pstate.h"
 #include "ptypes.h"
 #include "putil.h"
+
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstdlib>
+#include <type_traits>
+#include <vector>
 
 namespace plib
 {
@@ -67,12 +67,19 @@ namespace plib
 		, m_size(n)
 		{
 			for (index_type i=0; i<n+1; i++)
-				A[i] = 0;
+				row_idx[i] = 0;
 		}
 
 		~matrix_compressed_rows_t() = default;
 
 		constexpr index_type size() const { return static_cast<index_type>((N>0) ? N : m_size); }
+
+		void clear()
+		{
+			nz_num = 0;
+			for (index_type i=0; i < size() + 1; i++)
+				row_idx[i] = 0;
+		}
 
 		void set_scalar(const T scalar)
 		{
@@ -86,7 +93,7 @@ namespace plib
 			while (ri < row_idx[r+1] && col_idx[ri] < c)
 			  ri++;
 			// we have the position now;
-			if (nz_num > 0 && col_idx[ri] == c)
+			if (ri < row_idx[r+1] && col_idx[ri] == c)
 				A[ri] = val;
 			else
 			{
@@ -97,7 +104,7 @@ namespace plib
 				}
 				A[ri] = val;
 				col_idx[ri] = c;
-				for (C i = row_idx[r]; i < size()+1;i++)
+				for (C i = r + 1; i < size() + 1; i++)
 					row_idx[i]++;
 				nz_num++;
 				if (c==r)

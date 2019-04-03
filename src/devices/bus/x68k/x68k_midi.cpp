@@ -39,10 +39,8 @@ x68k_midi_device::x68k_midi_device(const machine_config &mconfig, const char *ta
 
 void x68k_midi_device::device_start()
 {
-	device_t* cpu = machine().device("maincpu");
-	address_space& space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<x68k_expansion_slot_device *>(owner());
-	space.install_readwrite_handler(0xeafa00,0xeafa0f,read8_delegate(FUNC(x68k_midi_device::x68k_midi_reg_r),this),write8_delegate(FUNC(x68k_midi_device::x68k_midi_reg_w),this),0x00ff00ff);
+	m_slot->space().install_readwrite_handler(0xeafa00,0xeafa0f,read8_delegate(FUNC(x68k_midi_device::x68k_midi_reg_r),this),write8_delegate(FUNC(x68k_midi_device::x68k_midi_reg_w),this),0x00ff00ff);
 }
 
 void x68k_midi_device::device_reset()

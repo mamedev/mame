@@ -110,7 +110,7 @@ namespace netlist
 	}
 
 	// FIXME: Timing
-	static constexpr netlist_time delay[4] =
+	static constexpr const netlist_time delay[4] =
 	{
 			NLTIME_FROM_NS(40),
 			NLTIME_FROM_NS(40),
@@ -162,7 +162,7 @@ namespace netlist
 		m_CARRYQ.push(tCarry, NLTIME_FROM_NS(20)); //FIXME
 	}
 
-	NETLIB_DEVICE_IMPL(74192,	 "TTL_74192", "+A,+B,+C,+D,+CLEAR,+LOADQ,+CU,+CD")
+	NETLIB_DEVICE_IMPL(74192,    "TTL_74192", "+A,+B,+C,+D,+CLEAR,+LOADQ,+CU,+CD")
 	NETLIB_DEVICE_IMPL(74192_dip,"TTL_74192_DIP", "")
 
 	} //namespace devices

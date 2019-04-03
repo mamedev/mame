@@ -11,7 +11,7 @@
 
 #include "machine/hpc3.h"
 
-#define ENABLE_NEWVIEW_LOG		(0)
+#define ENABLE_NEWVIEW_LOG      (0)
 
 class newport_video_device : public device_t
 {
@@ -131,14 +131,14 @@ private:
 		int16_t m_x_end_i;
 		int16_t m_y_end_i;
 		uint32_t m_x_start_end_i;
-		uint32_t m_color_red;
-		uint32_t m_color_alpha;
-		uint32_t m_color_green;
-		uint32_t m_color_blue;
-		uint32_t m_slope_red;
-		uint32_t m_slope_alpha;
-		uint32_t m_slope_green;
-		uint32_t m_slope_blue;
+		int32_t m_color_red;
+		int32_t m_color_alpha;
+		int32_t m_color_green;
+		int32_t m_color_blue;
+		int32_t m_slope_red;
+		int32_t m_slope_alpha;
+		int32_t m_slope_green;
+		int32_t m_slope_blue;
 		uint32_t m_write_mask;
 		uint32_t m_color_i;
 		uint32_t m_zero_overflow;

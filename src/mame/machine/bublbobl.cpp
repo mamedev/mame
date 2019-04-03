@@ -22,7 +22,7 @@ void bublbobl_state::common_sreset(int state)
 		if (m_ym2203 != nullptr) m_ym2203->reset(); // ym2203, if present, is reset
 		if (m_ym3526 != nullptr) m_ym3526->reset(); // ym3526, if present, is reset
 		m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); // if a sound irq is active, it is cleared. is this necessary? if the above two devices de-assert /IRQ on reset (as a device_line write) properly, it shouldn't be...
-		m_sound_to_main->acknowledge_w(m_audiocpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // sound->main semaphore is cleared
+		m_sound_to_main->acknowledge_w(); // sound->main semaphore is cleared
 		m_soundnmi->in_w<0>(0); // sound nmi enable is unset
 	}
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state); // soundcpu is reset

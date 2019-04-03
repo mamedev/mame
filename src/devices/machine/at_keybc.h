@@ -30,10 +30,10 @@ public:
 	auto kbd_data() { return m_kbd_data_cb.bind(); } // open collector with 10kΩ pull-up
 
 	// host interface
-	virtual DECLARE_READ8_MEMBER(data_r);
-	virtual DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(data_w);
-	DECLARE_WRITE8_MEMBER(command_w);
+	virtual uint8_t data_r();
+	virtual uint8_t status_r();
+	void data_w(uint8_t data);
+	void command_w(uint8_t data);
 
 	// inputs from keyboard
 	DECLARE_WRITE_LINE_MEMBER(kbd_clk_w);
@@ -93,7 +93,7 @@ protected:
 
 private:
 	// MCU I/O handlers
-	DECLARE_WRITE8_MEMBER(p2_w);
+	void p2_w(uint8_t data);
 };
 
 
@@ -112,7 +112,7 @@ public:
 	auto mouse_data() { return m_mouse_data_cb.bind(); } // open collector with 10kΩ pull-up
 
 	// host interface
-	virtual DECLARE_READ8_MEMBER(data_r) override;
+	virtual uint8_t data_r() override;
 
 	// inputs from mouse
 	DECLARE_WRITE_LINE_MEMBER(mouse_clk_w);
@@ -143,8 +143,8 @@ private:
 	TIMER_CALLBACK_MEMBER(set_mouse_data_in);
 
 	// MCU I/O handlers
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p2_w);
+	uint8_t p1_r();
+	void p2_w(uint8_t data);
 
 	devcb_write_line m_mouse_irq_cb;
 	devcb_write_line m_mouse_clk_cb, m_mouse_data_cb;

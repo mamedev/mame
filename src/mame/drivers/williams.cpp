@@ -3185,7 +3185,7 @@ void williams_state::init_mayday()
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 
 	/* install a handler to catch protection checks */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa190, 0xa191, read8_delegate(FUNC(williams_state::mayday_protection_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa190, 0xa191, read8sm_delegate(FUNC(williams_state::mayday_protection_r),this));
 	m_mayday_protection = m_videoram + 0xa190;
 }
 
@@ -3220,7 +3220,7 @@ void williams_state::init_bubbles()
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0xc000);
 
 	/* bubbles has a full 8-bit-wide CMOS */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xcc00, 0xcfff, write8_delegate(FUNC(williams_state::bubbles_cmos_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xcc00, 0xcfff, write8sm_delegate(FUNC(williams_state::bubbles_cmos_w),this));
 }
 
 

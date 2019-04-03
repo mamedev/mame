@@ -563,12 +563,12 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(gatron_state::gat)
-
+void gatron_state::gat(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(gat_map)
-	MCFG_DEVICE_IO_MAP(gat_portmap)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gatron_state::gat_map);
+	m_maincpu->set_addrmap(AS_IO, &gatron_state::gat_portmap);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -578,23 +578,22 @@ MACHINE_CONFIG_START(gatron_state::gat)
 	ppi.out_pc_callback().set(FUNC(gatron_state::output_port_1_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(48*8, 16*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 16*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gatron_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(48*8, 16*16);
+	screen.set_visarea(0*8, 48*8-1, 0*8, 16*16-1);
+	screen.set_screen_update(FUNC(gatron_state::screen_update));
+	screen.set_palette("palette");
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_gat);
-	MCFG_PALETTE_ADD("palette", 8)
+	PALETTE(config, "palette").set_entries(8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("snsnd", SN76489, MASTER_CLOCK/8 )   // Present in Bingo PCB. Clock need to be verified.
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
-MACHINE_CONFIG_END
+	SN76489(config, "snsnd", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 2.00);   // Present in Bingo PCB. Clock need to be verified.
+}
 
 
 /*************************

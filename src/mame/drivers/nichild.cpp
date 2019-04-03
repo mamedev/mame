@@ -230,8 +230,8 @@ INTERRUPT_GEN_MEMBER(nichild_state::vdp_irq)
 }
 
 
-MACHINE_CONFIG_START(nichild_state::nichild)
-
+void nichild_state::nichild(machine_config &config)
+{
 	/* basic machine hardware */
 	TMPZ84C011(config, m_maincpu, MAIN_CLOCK/4);
 	//m_maincpu->set_daisy_config(daisy_chain_main);
@@ -256,7 +256,7 @@ MACHINE_CONFIG_START(nichild_state::nichild)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 //  YM3812(config, "fmsnd", SOUND_CLOCK).add_route(ALL_OUTPUTS, "speaker", 0.7);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

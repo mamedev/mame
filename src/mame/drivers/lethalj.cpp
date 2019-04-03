@@ -367,7 +367,7 @@ static INPUT_PORTS_START( eggvntdx )
 	PORT_INCLUDE(eggventr)
 
 	PORT_MODIFY("IN0")
-	PORT_DIPUNUSED_DIPLOC( 0x1000, IP_ACTIVE_LOW, "SW3:4" ) // Was "Slot Machine" - The slot machince is present in the code as a 'bonus stage'
+	PORT_DIPUNUSED_DIPLOC( 0x1000, IP_ACTIVE_LOW, "SW3:4" ) // Was "Slot Machine" - The slot machine is present in the code as a 'bonus stage'
 								//  (when the egg reaches Vegas?), but not actually called (EC).
 INPUT_PORTS_END
 
@@ -630,8 +630,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(lethalj_state::gameroom)
-
+void lethalj_state::gameroom(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS34010(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lethalj_state::lethalj_map);
@@ -643,35 +643,32 @@ MACHINE_CONFIG_START(lethalj_state::gameroom)
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 701, 0, 512, 263, 0, 236)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(VIDEO_CLOCK, 701, 0, 512, 263, 0, 236);
+	m_screen->set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_ind16));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::RGB_555);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, SOUND_CLOCK, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	OKIM6295(config, "oki1", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, SOUND_CLOCK, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	OKIM6295(config, "oki2", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	MCFG_DEVICE_ADD("oki3", OKIM6295, SOUND_CLOCK, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki3", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.8);
+}
 
 
-MACHINE_CONFIG_START(lethalj_state::lethalj)
+void lethalj_state::lethalj(machine_config &config)
+{
 	gameroom(config);
 
 	m_maincpu->set_pixel_clock(VIDEO_CLOCK_LETHALJ);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK_LETHALJ, 689, 0, 512, 259, 0, 236)
-MACHINE_CONFIG_END
+	m_screen->set_raw(VIDEO_CLOCK_LETHALJ, 689, 0, 512, 259, 0, 236);
+}
 
 
 

@@ -1488,8 +1488,8 @@ static const atari_rle_objects_config modesc_0x400 =
 MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68EC020(config, m_maincpu, ATARI_CLOCK_14MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarigx2_state::main_map);
 
 	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
 	m_adc->in_callback<0>().set_ioport("A2D0");
@@ -1508,16 +1508,16 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
 	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarigx2_state, get_playfield_tile_info, 8,8, atarigx2_playfield_scan, 128,64)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, atarigx2_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
+	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,32, 0).set_info_callback(FUNC(atarigx2_state::get_alpha_tile_info));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a pair of GALs to determine H and V parameters */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(atarigx2_state, screen_update_atarigx2)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarigx2_state, video_int_write_line))
+	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(atarigx2_state::screen_update_atarigx2));
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(atarigx2_state::video_int_write_line));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

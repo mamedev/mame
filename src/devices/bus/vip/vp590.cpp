@@ -50,7 +50,7 @@ READ_LINE_MEMBER( vp590_device::gd_r )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( vp590 )
+//  machine_config( vp590 )
 //-------------------------------------------------
 
 void vp590_device::device_add_mconfig(machine_config &config)

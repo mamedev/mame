@@ -62,10 +62,10 @@ WRITE_LINE_MEMBER( sv602_device::int_w ) { m_expander->int_w(state); }
 WRITE_LINE_MEMBER( sv602_device::romdis_w ) { m_expander->romdis_w(state); }
 WRITE_LINE_MEMBER( sv602_device::ramdis_w ) { m_expander->ramdis_w(state); }
 
-READ8_MEMBER( sv602_device::mreq_r ) { return m_slotbus->mreq_r(space, offset); }
-WRITE8_MEMBER( sv602_device::mreq_w ) { m_slotbus->mreq_w(space, offset, data); }
-READ8_MEMBER( sv602_device::iorq_r ) { return m_slotbus->iorq_r(space, offset); }
-WRITE8_MEMBER( sv602_device::iorq_w ) { m_slotbus->iorq_w(space, offset, data); }
+uint8_t sv602_device::mreq_r(offs_t offset) { return m_slotbus->mreq_r(offset); }
+void sv602_device::mreq_w(offs_t offset, uint8_t data) { m_slotbus->mreq_w(offset, data); }
+uint8_t sv602_device::iorq_r(offs_t offset) { return m_slotbus->iorq_r(offset); }
+void sv602_device::iorq_w(offs_t offset, uint8_t data) { m_slotbus->iorq_w(offset, data); }
 
 void sv602_device::bk21_w(int state) { m_slotbus->bk21_w(state); }
 void sv602_device::bk22_w(int state) { m_slotbus->bk22_w(state); }

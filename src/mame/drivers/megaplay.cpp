@@ -662,7 +662,8 @@ MACHINE_RESET_MEMBER(mplay_state,megaplay)
 	MACHINE_RESET_CALL_MEMBER(megadriv);
 }
 
-MACHINE_CONFIG_START(mplay_state::megaplay)
+void mplay_state::megaplay(machine_config &config)
+{
 	/* basic machine hardware */
 	md_ntsc(config);
 
@@ -691,11 +692,10 @@ MACHINE_CONFIG_START(mplay_state::megaplay)
 	io2.out_porte_cb().set(FUNC(mplay_state::bios_6404_w));
 
 	/* New update functions to handle the extra layer */
-	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \
+	subdevice<screen_device>("megadriv")->set_raw(XTAL(10'738'635)/2, \
 			sega315_5124_device::WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
-			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224)
-	MCFG_SCREEN_UPDATE_DRIVER(mplay_state, screen_update_megplay)
+			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
+	subdevice<screen_device>("megadriv")->set_screen_update(FUNC(mplay_state::screen_update_megplay));
 
 	// Megaplay has an additional SMS VDP as an overlay
 	SEGA315_5246(config, m_vdp1, MASTER_CLOCK / 5); /* ?? */
@@ -704,7 +704,7 @@ MACHINE_CONFIG_START(mplay_state::megaplay)
 	m_vdp1->irq().set_inputline(m_bioscpu, 0);
 	m_vdp1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
 	m_vdp1->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
-MACHINE_CONFIG_END
+}
 
 
 /* MegaPlay Games - Modified Genesis games */

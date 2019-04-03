@@ -333,20 +333,20 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(nibble_state::nibble)
-
+void nibble_state::nibble(machine_config &config)
+{
 	UPD7811(config, m_maincpu, MASTER_CLOCK / 3); // type guessed; clock not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &nibble_state::nibble_map);
 	//m_maincpu->set_vblank_int("screen", FUNC(nibble_state::nibble_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nibble_state, screen_update_nibble)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(nibble_state::screen_update_nibble));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_nibble);
 
@@ -367,7 +367,7 @@ MACHINE_CONFIG_START(nibble_state::nibble)
 
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, "aysnd", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 /*************************

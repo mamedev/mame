@@ -290,7 +290,7 @@ INTERRUPT_GEN_MEMBER( bfm_dm01_device::nmi_line_assert )
 
 void bfm_dm01_device::device_add_mconfig(machine_config &config)
 {
-	M6809(config, m_matrixcpu, 2000000);        /* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
+	MC6809(config, m_matrixcpu, 8000000); // MC68B09CP (clock unknown)
 	m_matrixcpu->set_addrmap(AS_PROGRAM, &bfm_dm01_device::bfm_dm01_memmap);
 	m_matrixcpu->set_periodic_int(FUNC(bfm_dm01_device::nmi_line_assert), attotime::from_hz(1500));          /* generate 1500 NMI's per second ?? what is the exact freq?? */
 

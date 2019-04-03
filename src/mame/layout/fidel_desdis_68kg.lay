@@ -195,36 +195,36 @@
 
 	<element name="text_king">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="&#x265a;"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="[K]"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_queen">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="&#x265b;"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="[Q]"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_rook">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="&#x265c;"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="[R]"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_bishop">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="&#x265d;"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="[B]"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_knight">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="&#x265e;"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="[N]"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_pawn">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="&#x265f;"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="[P]"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 
 
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-7" right="93" top="-2" bottom="103" />
+		<bounds left="-7" right="93" top="-2" bottom="102.5" />
 
-		<bezel element="white"><bounds x="-7.5" y="-2.5" width="101" height="106" /></bezel>
+		<bezel element="white"><bounds x="-7.5" y="-2.5" width="101" height="105.5" /></bezel>
 
 	<!-- chessboard coords -->
 
@@ -404,12 +404,12 @@
 		<bezel element="text_u5"><bounds x="64" y="96.3" width="10" height="1.8" /></bezel>
 		<bezel element="text_u6"><bounds x="73" y="96.3" width="10" height="1.8" /></bezel>
 
-		<bezel element="text_king"><bounds x="3" y="98" width="10" height="4" /></bezel>
-		<bezel element="text_queen"><bounds x="12" y="98" width="10" height="4" /></bezel>
-		<bezel element="text_rook"><bounds x="21" y="98" width="10" height="4" /></bezel>
-		<bezel element="text_bishop"><bounds x="55" y="98" width="10" height="4" /></bezel>
-		<bezel element="text_knight"><bounds x="64" y="98" width="10" height="4" /></bezel>
-		<bezel element="text_pawn"><bounds x="73" y="98" width="10" height="4" /></bezel>
+		<bezel element="text_king"><bounds x="3" y="98.5" width="10" height="2.65" /></bezel>
+		<bezel element="text_queen"><bounds x="12" y="98.5" width="10" height="2.65" /></bezel>
+		<bezel element="text_rook"><bounds x="21" y="98.5" width="10" height="2.65" /></bezel>
+		<bezel element="text_bishop"><bounds x="55" y="98.5" width="10" height="2.65" /></bezel>
+		<bezel element="text_knight"><bounds x="64" y="98.5" width="10" height="2.65" /></bezel>
+		<bezel element="text_pawn"><bounds x="73" y="98.5" width="10" height="2.65" /></bezel>
 
 		<bezel element="disk_black"><bounds x="6" y="92" width="4" height="4" /></bezel>
 		<bezel element="disk_black"><bounds x="15" y="92" width="4" height="4" /></bezel>

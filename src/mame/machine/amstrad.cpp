@@ -1939,10 +1939,10 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 			switch (b8b0)
 			{
 			case 0x02:
-				data = m_fdc->msr_r(space, 0);
+				data = m_fdc->msr_r();
 				break;
 			case 0x03:
-				data = m_fdc->fifo_r(space, 0);
+				data = m_fdc->fifo_r();
 				break;
 			default:
 				break;
@@ -2158,7 +2158,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 					break;
 
 				case 0x03: /* Write Data register of FDC */
-					m_fdc->fifo_w(space, 0,data);
+					m_fdc->fifo_w(data);
 					break;
 
 				default:
@@ -2485,20 +2485,18 @@ BDIR BC1       |
 /* PSG function selected */
 void amstrad_state::update_psg()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	if(m_aleste_mode & 0x20)  // RTC selected
 	{
 		switch(m_aleste_rtc_function)
 		{
 		case 0x02:  // AS
-			m_rtc->write(space, 0,m_ppi_port_outputs[amstrad_ppi_PortA]);
+			m_rtc->write(0, m_ppi_port_outputs[amstrad_ppi_PortA]);
 			break;
 		case 0x04:  // DS write
-			m_rtc->write(space, 1,m_ppi_port_outputs[amstrad_ppi_PortA]);
+			m_rtc->write(1, m_ppi_port_outputs[amstrad_ppi_PortA]);
 			break;
 		case 0x05:  // DS read
-			m_ppi_port_inputs[amstrad_ppi_PortA] = m_rtc->read(space, 1);
+			m_ppi_port_inputs[amstrad_ppi_PortA] = m_rtc->read(1);
 			break;
 		}
 		return;

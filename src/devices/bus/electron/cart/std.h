@@ -31,7 +31,7 @@ protected:
 	virtual void device_start() override;
 
 	// electron_cart_interface overrides
-	virtual uint8_t read(address_space &space, offs_t offset, int infc, int infd, int romqa, int oe, int oe2) override;
+	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2) override;
 };
 
 // device type definition

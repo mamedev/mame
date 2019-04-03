@@ -54,52 +54,9 @@ Notes:
 
 /******************************************************************************/
 
-void snk68_state::machine_start()
-{
-	save_item(NAME(m_invert_controls));
-}
-
-READ16_MEMBER(snk68_state::control_1_r)
-{
-	return (ioport("P1")->read() + (ioport("P2")->read() << 8));
-}
-
-READ16_MEMBER(snk68_state::rotary_1_r)
-{
-	return (( ~(1 << ioport("ROT1")->read()) )<<8)&0xff00;
-}
-
-READ16_MEMBER(snk68_state::rotary_2_r)
-{
-	return (( ~(1 << ioport("ROT2")->read()) )<<8)&0xff00;
-}
-
-READ16_MEMBER(snk68_state::rotary_lsb_r)
-{
-	return ((( ~(1 << ioport("ROT2")->read())  ) <<4)&0xf000)
-			+ ((( ~(1 << ioport("ROT1")->read())  )    )&0x0f00);
-}
-
-READ16_MEMBER(snk68_state::protcontrols_r)
-{
-	static const char *const portnames[] = { "P1", "P2", "SYSTEM" };
-
-	return ioport(portnames[offset])->read() ^ m_invert_controls;
-}
-
-WRITE16_MEMBER(snk68_state::protection_w)
-{
-	/* top byte is used, meaning unknown */
-	/* bottom byte is protection in ikari 3 and streetsm */
-	if (ACCESSING_BITS_0_7)
-	{
-		m_invert_controls = ((data & 0xff) == 0x07) ? 0xff : 0x00;
-	}
-}
-
 WRITE8_MEMBER(snk68_state::sound_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // caused by 74123
 }
 
@@ -109,40 +66,69 @@ void snk68_state::pow_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x043fff).ram();
-	map(0x080000, 0x080001).r(FUNC(snk68_state::control_1_r));
+	map(0x080000, 0x080000).lr8("P2_r", [this]() -> u8 { return m_p2_io->read(); });
+	map(0x080001, 0x080001).lr8("P1_r", [this]() -> u8 { return m_p1_io->read(); });
 	map(0x080000, 0x080000).w(FUNC(snk68_state::sound_w));
 	map(0x0c0000, 0x0c0001).portr("SYSTEM");
-	map(0x0c0000, 0x0c0001).w(FUNC(snk68_state::pow_flipscreen_w));   // + char bank
+	map(0x0c0001, 0x0c0001).w(FUNC(snk68_state::flipscreen_w));   // + char bank
 	map(0x0e0000, 0x0e0001).nopr(); /* Watchdog or IRQ ack */
 	map(0x0e8000, 0x0e8001).nopr(); /* Watchdog or IRQ ack */
 	map(0x0f0000, 0x0f0001).portr("DSW1");
 	map(0x0f0008, 0x0f0009).portr("DSW2");
-//  AM_RANGE(0x0f0008, 0x0f0009) AM_WRITENOP    /* ?? */
-	map(0x100000, 0x100fff).rw(FUNC(snk68_state::pow_fg_videoram_r), FUNC(snk68_state::pow_fg_videoram_w)).mirror(0x1000).share("pow_fg_videoram");   // 8-bit
+//  map(0x0f0008, 0x0f0009).nopw();    /* ?? */
+	map(0x100000, 0x100fff).rw(FUNC(snk68_state::fg_videoram_r), FUNC(snk68_state::fg_videoram_w)).mirror(0x1000).share("fg_videoram");   // 8-bit
 	map(0x200000, 0x207fff).rw(m_sprites, FUNC(snk68_spr_device::spriteram_r), FUNC(snk68_spr_device::spriteram_w)).share("spriteram");   // only partially populated
 	map(0x400000, 0x400fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 }
 
-void snk68_state::searchar_map(address_map &map)
+/*******************************************************************************/
+
+void searchar_state::machine_start()
+{
+	save_item(NAME(m_invert_controls));
+}
+
+READ16_MEMBER(searchar_state::rotary_1_r)
+{
+	return (( ~(1 << m_rotary_io[0]->read()) )<<8)&0xff00;
+}
+
+READ16_MEMBER(searchar_state::rotary_2_r)
+{
+	return (( ~(1 << m_rotary_io[1]->read()) )<<8)&0xff00;
+}
+
+READ16_MEMBER(searchar_state::rotary_lsb_r)
+{
+	return ((( ~(1 << m_rotary_io[1]->read())  ) <<4)&0xf000)
+			+ ((( ~(1 << m_rotary_io[0]->read())  )    )&0x0f00);
+}
+
+/*******************************************************************************/
+
+void searchar_state::searchar_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x043fff).ram();
-	map(0x080000, 0x080005).r(FUNC(snk68_state::protcontrols_r)); /* Player 1 & 2 */
-	map(0x080000, 0x080000).w(FUNC(snk68_state::sound_w));
-	map(0x080006, 0x080007).w(FUNC(snk68_state::protection_w)); /* top byte unknown, bottom is protection in ikari3 and streetsm */
-	map(0x0c0000, 0x0c0001).w(FUNC(snk68_state::searchar_flipscreen_w));
-	map(0x0c0000, 0x0c0001).r(FUNC(snk68_state::rotary_1_r)); /* Player 1 rotary */
-	map(0x0c8000, 0x0c8001).r(FUNC(snk68_state::rotary_2_r)); /* Player 2 rotary */
-	map(0x0d0000, 0x0d0001).r(FUNC(snk68_state::rotary_lsb_r)); /* Extra rotary bits */
+	map(0x080001, 0x080001).lr8("P1_invert_r", [this]() -> u8 { return m_p1_io->read() ^ m_invert_controls; });
+	map(0x080003, 0x080003).lr8("P2_invert_r", [this]() -> u8 { return m_p2_io->read() ^ m_invert_controls; });
+	map(0x080005, 0x080005).lr8("SYS_invert_r", [this]() -> u8 { return m_system_io->read() ^ m_invert_controls; });
+	map(0x080000, 0x080000).w(FUNC(searchar_state::sound_w));
+	/* top byte unknown, bottom is protection in ikari3 and streetsm */
+	map(0x080007, 0x080007).lw8("invctrl_w", [this](u8 data){ m_invert_controls = ((data & 0xff) == 0x07) ? 0xff : 0x00; } );
+	map(0x0c0001, 0x0c0001).w(FUNC(searchar_state::flipscreen_w));
+	map(0x0c0000, 0x0c0001).r(FUNC(searchar_state::rotary_1_r)); /* Player 1 rotary */
+	map(0x0c8000, 0x0c8001).r(FUNC(searchar_state::rotary_2_r)); /* Player 2 rotary */
+	map(0x0d0000, 0x0d0001).r(FUNC(searchar_state::rotary_lsb_r)); /* Extra rotary bits */
 	map(0x0e0000, 0x0e0001).nopr(); /* Watchdog or IRQ ack */
 	map(0x0e8000, 0x0e8001).nopr(); /* Watchdog or IRQ ack */
-//  AM_RANGE(0x0f0000, 0x0f0001) AM_WRITENOP    /* ?? */
+//  map(0x0f0000, 0x0f0001).nopw();    /* ?? */
 	map(0x0f0000, 0x0f0001).portr("DSW1");
 	map(0x0f0008, 0x0f0009).portr("DSW2");
 	map(0x0f8000, 0x0f8000).r("soundlatch2", FUNC(generic_latch_8_device::read));
 	map(0x100000, 0x107fff).rw(m_sprites, FUNC(snk68_spr_device::spriteram_r), FUNC(snk68_spr_device::spriteram_w)).share("spriteram");   // only partially populated
-	map(0x200000, 0x200fff).ram().w(FUNC(snk68_state::searchar_fg_videoram_w)).mirror(0x1000).share("pow_fg_videoram"); /* Mirror is used by Ikari 3 */
-	map(0x300000, 0x33ffff).rom().region("user1", 0); /* Extra code bank */
+	map(0x200000, 0x200fff).ram().w(FUNC(searchar_state::fg_videoram_w)).mirror(0x1000).share("fg_videoram"); /* Mirror is used by Ikari 3 */
+	map(0x300000, 0x33ffff).rom().region("maincpu", 0x40000); /* Extra code bank */
 	map(0x400000, 0x400fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 }
 
@@ -162,18 +148,13 @@ WRITE8_MEMBER(snk68_state::D7759_write_port_0_w)
 	m_upd7759->start_w(1);
 }
 
-WRITE8_MEMBER(snk68_state::D7759_upd_reset_w)
-{
-	m_upd7759->reset_w(BIT(data, 7));
-}
-
 void snk68_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
 	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::write_port_w));
 	map(0x40, 0x40).w(FUNC(snk68_state::D7759_write_port_0_w));
-	map(0x80, 0x80).w(FUNC(snk68_state::D7759_upd_reset_w));
+	map(0x80, 0x80).lw8("upd_reset", [this](u8 data){ m_upd7759->reset_w(BIT(data, 7)); } );
 }
 
 /******************************************************************************/
@@ -640,11 +621,11 @@ void snk68_state::streetsm(machine_config &config)
 	m_sprites->set_tile_indirect_cb(FUNC(snk68_state::tile_callback_notpow), this);
 }
 
-void snk68_state::searchar(machine_config &config)
+void searchar_state::searchar(machine_config &config)
 {
 	streetsm(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &snk68_state::searchar_map);
-	MCFG_VIDEO_START_OVERRIDE(snk68_state,searchar)
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &searchar_state::searchar_map);
 }
 
 
@@ -754,7 +735,7 @@ ROM_START( streetsm )
 ROM_END
 
 ROM_START( streetsm1 )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "s2-1ver1.9c",  0x00000, 0x20000, CRC(b59354c5) SHA1(086c87541d422f90bdaad8d63b14d0d520c12564) )
 	ROM_LOAD16_BYTE( "s2-2ver1.10c", 0x00001, 0x20000, CRC(e448b68b) SHA1(08d674ab3d9bd3d3b1d50967a56fa6a002ce0b8d) )
 
@@ -777,12 +758,10 @@ ROM_START( streetsm1 )
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* UPD7759 samples */
 	ROM_LOAD( "s2-6.18d",    0x000000, 0x20000, CRC(47db1605) SHA1(ae00e633eb98567f04ff97e3d63e04e049d955ec) )
-
-	ROM_REGION16_BE( 0x40000, "user1", ROMREGION_ERASE00 ) /* Extra code bank */
 ROM_END
 
 ROM_START( streetsmw )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "s-smart1.bin", 0x00000, 0x20000, CRC(a1f5ceab) SHA1(74f5a4288618fbce6ed3dc75b6ccfa695396193c) )
 	ROM_LOAD16_BYTE( "s-smart2.bin", 0x00001, 0x20000, CRC(263f615d) SHA1(4576f9d2abb31ecf747a5075716579e75613d57c) )
 
@@ -805,12 +784,10 @@ ROM_START( streetsmw )
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* UPD7759 samples */
 	ROM_LOAD( "s2-6.18d",    0x000000, 0x20000, CRC(47db1605) SHA1(ae00e633eb98567f04ff97e3d63e04e049d955ec) )
-
-	ROM_REGION16_BE( 0x40000, "user1", ROMREGION_ERASE00 ) /* Extra code bank */
 ROM_END
 
 ROM_START( streetsmj )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "s2v1j_01.bin", 0x00000, 0x20000, CRC(f031413c) SHA1(5d7dfeac03f786736914f047c28a7a0488175176) )
 	ROM_LOAD16_BYTE( "s2v1j_02.bin", 0x00001, 0x20000, CRC(e403a40b) SHA1(e740848d716586737eff6e3c201fb3e3da048a09) )
 
@@ -833,14 +810,14 @@ ROM_START( streetsmj )
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* UPD7759 samples */
 	ROM_LOAD( "s2-6.18d",    0x000000, 0x20000, CRC(47db1605) SHA1(ae00e633eb98567f04ff97e3d63e04e049d955ec) )
-
-	ROM_REGION16_BE( 0x40000, "user1", ROMREGION_ERASE00 ) /* Extra code bank */
 ROM_END
 
 ROM_START( ikari3 )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "ik3-2-ver1.c10", 0x000000, 0x20000, CRC(1bae8023) SHA1(42d590a545cbabc596f2e0d9a3d56b1bc270ec9a) ) /* 8-Way Joystick */
 	ROM_LOAD16_BYTE( "ik3-3-ver1.c9",  0x000001, 0x20000, CRC(10e38b66) SHA1(28cc82d868f59cd6dde1c4e4c890627012e5e978) ) /* 8-Way Joystick */
+	ROM_LOAD16_BYTE( "ik3-1.c8",       0x040000, 0x10000, CRC(47e4d256) SHA1(7c6921cf2f1b8c3dae867eb1fc14e3da218cc1e0) )
+	ROM_LOAD16_BYTE( "ik3-4.c12",      0x040001, 0x10000, CRC(a43af6b5) SHA1(1ad3acadbadd21642932028ecd7c282f7fd02856) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "ik3-5.16d",  0x000000, 0x10000, CRC(ce6706fc) SHA1(95505b90a9524abf0c8c1ec6b2c40d8f25cb1d92) )
@@ -875,16 +852,14 @@ ROM_START( ikari3 )
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* UPD7759 samples */
 	ROM_LOAD( "ik3-6.18e",  0x000000, 0x20000, CRC(59d256a4) SHA1(1e7b33329f761c695bc9a817bbc0c5e13386d073) )
-
-	ROM_REGION16_BE( 0x40000, "user1", 0 ) /* Extra code bank */
-	ROM_LOAD16_BYTE( "ik3-1.c8",   0x000000, 0x10000, CRC(47e4d256) SHA1(7c6921cf2f1b8c3dae867eb1fc14e3da218cc1e0) )
-	ROM_LOAD16_BYTE( "ik3-4.c12",  0x000001, 0x10000, CRC(a43af6b5) SHA1(1ad3acadbadd21642932028ecd7c282f7fd02856) )
 ROM_END
 
 ROM_START( ikari3w ) /* Initial boot shows Ikari III The Rescue, then the title changes to the Japanese title - No demo play - proto or test set?? */
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ik_2.c10", 0x000000, 0x20000, CRC(d0b690d3) SHA1(6c31b27e6b9f1438e8ddbefe41fa8ded22cdb51c) ) /* Rotary Joystick - hand written label  */
-	ROM_LOAD16_BYTE( "ik_3.c9",  0x000001, 0x20000, CRC(11a9e664) SHA1(bf2d8a5f3f2aeff99a45d26279c88ebf04b7f79b) ) /* Rotary Joystick - hand written label  */
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "ik_2.c10",  0x000000, 0x20000, CRC(d0b690d3) SHA1(6c31b27e6b9f1438e8ddbefe41fa8ded22cdb51c) ) /* Rotary Joystick - hand written label  */
+	ROM_LOAD16_BYTE( "ik_3.c9",   0x000001, 0x20000, CRC(11a9e664) SHA1(bf2d8a5f3f2aeff99a45d26279c88ebf04b7f79b) ) /* Rotary Joystick - hand written label  */
+	ROM_LOAD16_BYTE( "ik3-1.c8",  0x040000, 0x10000, CRC(47e4d256) SHA1(7c6921cf2f1b8c3dae867eb1fc14e3da218cc1e0) )
+	ROM_LOAD16_BYTE( "ik3-4.c12", 0x040001, 0x10000, CRC(a43af6b5) SHA1(1ad3acadbadd21642932028ecd7c282f7fd02856) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "ik3-5.16d",  0x000000, 0x10000, CRC(ce6706fc) SHA1(95505b90a9524abf0c8c1ec6b2c40d8f25cb1d92) )
@@ -908,10 +883,6 @@ ROM_START( ikari3w ) /* Initial boot shows Ikari III The Rescue, then the title 
 	ROM_REGION( 0x20000, "upd", 0 ) /* UPD7759 samples */
 	ROM_LOAD( "ik3-6.18e",  0x000000, 0x20000, CRC(59d256a4) SHA1(1e7b33329f761c695bc9a817bbc0c5e13386d073) )
 
-	ROM_REGION16_BE( 0x40000, "user1", 0 ) /* Extra code bank */
-	ROM_LOAD16_BYTE( "ik3-1.c8",   0x000000, 0x10000, CRC(47e4d256) SHA1(7c6921cf2f1b8c3dae867eb1fc14e3da218cc1e0) )
-	ROM_LOAD16_BYTE( "ik3-4.c12",  0x000001, 0x10000, CRC(a43af6b5) SHA1(1ad3acadbadd21642932028ecd7c282f7fd02856) )
-
 	/* stuff below isn't used but loaded because it was on the board .. */
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "a_pal20l10a.ic1", 0x0000, 0x00cc, CRC(1cadf26d) SHA1(348a9e4727df0a15247c7b9c5cd5ee935edd9752) )
@@ -920,9 +891,11 @@ ROM_START( ikari3w ) /* Initial boot shows Ikari III The Rescue, then the title 
 ROM_END
 
 ROM_START( ikari3u )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "ik3-2.c10", 0x000000, 0x20000, CRC(a7b34dcd) SHA1(7c2f20ae4f7dbebd3dfa3ec5408ed714e6535b6a) ) /* Rotary Joystick */
 	ROM_LOAD16_BYTE( "ik3-3.c9",  0x000001, 0x20000, CRC(50f2b83d) SHA1(b1f0c554b262614dd2cff7a3857cb974d361937f) ) /* Rotary Joystick */
+	ROM_LOAD16_BYTE( "ik3-1.c8",  0x040000, 0x10000, CRC(47e4d256) SHA1(7c6921cf2f1b8c3dae867eb1fc14e3da218cc1e0) )
+	ROM_LOAD16_BYTE( "ik3-4.c12", 0x040001, 0x10000, CRC(a43af6b5) SHA1(1ad3acadbadd21642932028ecd7c282f7fd02856) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "ik3-5.15d",  0x000000, 0x10000, CRC(ce6706fc) SHA1(95505b90a9524abf0c8c1ec6b2c40d8f25cb1d92) )
@@ -957,16 +930,14 @@ ROM_START( ikari3u )
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* UPD7759 samples */
 	ROM_LOAD( "ik3-6.18e",  0x000000, 0x20000, CRC(59d256a4) SHA1(1e7b33329f761c695bc9a817bbc0c5e13386d073) )
-
-	ROM_REGION16_BE( 0x40000, "user1", 0 ) /* Extra code bank */
-	ROM_LOAD16_BYTE( "ik3-1.c8",   0x000000, 0x10000, CRC(47e4d256) SHA1(7c6921cf2f1b8c3dae867eb1fc14e3da218cc1e0) )
-	ROM_LOAD16_BYTE( "ik3-4.c12",  0x000001, 0x10000, CRC(a43af6b5) SHA1(1ad3acadbadd21642932028ecd7c282f7fd02856) )
 ROM_END
 
 ROM_START( ikari3j )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "ik3-2-j.c10", 0x000000, 0x20000, CRC(7b1b4be4) SHA1(22b7504040da7364b811c07014a776fa5d1d5d9f) ) /* Rotary Joystick */
 	ROM_LOAD16_BYTE( "ik3-3-j.c9",  0x000001, 0x20000, CRC(8e6e2aa9) SHA1(e624809c42a79510b34d99d9ca152a38c7051e87) ) /* Rotary Joystick */
+	ROM_LOAD16_BYTE( "ik3-1.c8",    0x040000, 0x10000, CRC(47e4d256) SHA1(7c6921cf2f1b8c3dae867eb1fc14e3da218cc1e0) )
+	ROM_LOAD16_BYTE( "ik3-4.c12",   0x040001, 0x10000, CRC(a43af6b5) SHA1(1ad3acadbadd21642932028ecd7c282f7fd02856) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "ik3-5.16d",  0x000000, 0x10000, CRC(ce6706fc) SHA1(95505b90a9524abf0c8c1ec6b2c40d8f25cb1d92) )
@@ -1001,16 +972,14 @@ ROM_START( ikari3j )
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* UPD7759 samples */
 	ROM_LOAD( "ik3-6.18e",  0x000000, 0x20000, CRC(59d256a4) SHA1(1e7b33329f761c695bc9a817bbc0c5e13386d073) )
-
-	ROM_REGION16_BE( 0x40000, "user1", 0 ) /* Extra code bank */
-	ROM_LOAD16_BYTE( "ik3-1.c8",   0x000000, 0x10000, CRC(47e4d256) SHA1(7c6921cf2f1b8c3dae867eb1fc14e3da218cc1e0) )
-	ROM_LOAD16_BYTE( "ik3-4.c12",  0x000001, 0x10000, CRC(a43af6b5) SHA1(1ad3acadbadd21642932028ecd7c282f7fd02856) )
 ROM_END
 
 ROM_START( ikari3k )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "ik3-2k.c10", 0x000000, 0x20000, CRC(a15d2222) SHA1(7f9702516f9c74314b093435937dfecb69495b6c) ) /* 8-Way Joystick */
 	ROM_LOAD16_BYTE( "ik3-3k.c9",  0x000001, 0x20000, CRC(e3fc006e) SHA1(14e8ba1064e9bd168a4f7e5b5cc2a4b1ddbc7e32) ) /* 8-Way Joystick */
+	ROM_LOAD16_BYTE( "ik3-1.c8",   0x040000, 0x10000, CRC(47e4d256) SHA1(7c6921cf2f1b8c3dae867eb1fc14e3da218cc1e0) )
+	ROM_LOAD16_BYTE( "ik3-4.c12",  0x040001, 0x10000, CRC(a43af6b5) SHA1(1ad3acadbadd21642932028ecd7c282f7fd02856) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "ik3-5.16d",  0x000000, 0x10000, CRC(ce6706fc) SHA1(95505b90a9524abf0c8c1ec6b2c40d8f25cb1d92) )
@@ -1033,16 +1002,14 @@ ROM_START( ikari3k )
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* UPD7759 samples */
 	ROM_LOAD( "ik3-6.18e",  0x000000, 0x20000, CRC(59d256a4) SHA1(1e7b33329f761c695bc9a817bbc0c5e13386d073) )
-
-	ROM_REGION16_BE( 0x40000, "user1", 0 ) /* Extra code bank */
-	ROM_LOAD16_BYTE( "ik3-1.c8",   0x000000, 0x10000, CRC(47e4d256) SHA1(7c6921cf2f1b8c3dae867eb1fc14e3da218cc1e0) )
-	ROM_LOAD16_BYTE( "ik3-4.c12",  0x000001, 0x10000, CRC(a43af6b5) SHA1(1ad3acadbadd21642932028ecd7c282f7fd02856) )
 ROM_END
 
 ROM_START( searchar )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "bhw.2", 0x000000, 0x20000, CRC(e1430138) SHA1(eddc192524a13b2c09bd2bddcd5f8e8b771ceb21) )
 	ROM_LOAD16_BYTE( "bhw.3", 0x000001, 0x20000, CRC(ee1f9374) SHA1(fd41c74fd69d65713d8e1a9b8078328381119379) )
+	ROM_LOAD16_BYTE( "bhw.1", 0x040000, 0x20000, CRC(62b60066) SHA1(f7e7985c8f5f8191c580e777e1b7ed29d944d23f) )
+	ROM_LOAD16_BYTE( "bhw.4", 0x040001, 0x20000, CRC(16d8525c) SHA1(0098b0a7fcb23de2661bbec9a05254aa46579bb2) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "bh.5",       0x000000, 0x10000, CRC(53e2fa76) SHA1(cf25b1def82545a1fd013822ab3cf02483074623) )
@@ -1063,16 +1030,14 @@ ROM_START( searchar )
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* UPD7759 samples */
 	ROM_LOAD( "bh.v1",      0x000000, 0x20000, CRC(07a6114b) SHA1(224df4616b77a56f33974d3b1793473d48ad52ca) )
-
-	ROM_REGION16_BE( 0x40000, "user1", 0 ) /* Extra code bank */
-	ROM_LOAD16_BYTE( "bhw.1", 0x000000, 0x20000, CRC(62b60066) SHA1(f7e7985c8f5f8191c580e777e1b7ed29d944d23f) )
-	ROM_LOAD16_BYTE( "bhw.4", 0x000001, 0x20000, CRC(16d8525c) SHA1(0098b0a7fcb23de2661bbec9a05254aa46579bb2) )
 ROM_END
 
 ROM_START( searcharu )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "bh.2",  0x000000, 0x20000, CRC(c852e2e2) SHA1(c4b1b366f452122549046a3dec9b6b375bc273af) )
 	ROM_LOAD16_BYTE( "bh.3",  0x000001, 0x20000, CRC(bc04a4a1) SHA1(aa91583b987248a3e99813ab5e8ee03c02dac9b9) )
+	ROM_LOAD16_BYTE( "bh.1",  0x040000, 0x20000, CRC(ba9ca70b) SHA1(c46727473673554cbe4bbbc0288d66357f99a80e) )
+	ROM_LOAD16_BYTE( "bh.4",  0x040001, 0x20000, CRC(eabc5ddf) SHA1(08a2a8fcdf6a08a2694e00f4232a5bfbec98fd27) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "bh.5",       0x000000, 0x10000, CRC(53e2fa76) SHA1(cf25b1def82545a1fd013822ab3cf02483074623) )
@@ -1093,16 +1058,14 @@ ROM_START( searcharu )
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* UPD7759 samples */
 	ROM_LOAD( "bh.v1",      0x000000, 0x20000, CRC(07a6114b) SHA1(224df4616b77a56f33974d3b1793473d48ad52ca) )
-
-	ROM_REGION16_BE( 0x40000, "user1", 0 ) /* Extra code bank */
-	ROM_LOAD16_BYTE( "bh.1",  0x000000, 0x20000, CRC(ba9ca70b) SHA1(c46727473673554cbe4bbbc0288d66357f99a80e) )
-	ROM_LOAD16_BYTE( "bh.4",  0x000001, 0x20000, CRC(eabc5ddf) SHA1(08a2a8fcdf6a08a2694e00f4232a5bfbec98fd27) )
 ROM_END
 
 ROM_START( searcharj )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "bh2ver3j.9c", 0x000000, 0x20000, CRC(7ef7b172) SHA1(85669ba72f59e4ff3a483bf611bf41c73f4e1930) )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "bh2ver3j.9c",  0x000000, 0x20000, CRC(7ef7b172) SHA1(85669ba72f59e4ff3a483bf611bf41c73f4e1930) )
 	ROM_LOAD16_BYTE( "bh3ver3j.10c", 0x000001, 0x20000, CRC(3fdea793) SHA1(49bafb53466afb7e4486a4894e4fd6fa08ea2eb2) )
+	ROM_LOAD16_BYTE( "bhw.1",        0x040000, 0x20000, CRC(62b60066) SHA1(f7e7985c8f5f8191c580e777e1b7ed29d944d23f) )
+	ROM_LOAD16_BYTE( "bhw.4",        0x040001, 0x20000, CRC(16d8525c) SHA1(0098b0a7fcb23de2661bbec9a05254aa46579bb2) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "bh.5",       0x000000, 0x10000, CRC(53e2fa76) SHA1(cf25b1def82545a1fd013822ab3cf02483074623) )
@@ -1123,26 +1086,21 @@ ROM_START( searcharj )
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* UPD7759 samples */
 	ROM_LOAD( "bh.v1",      0x000000, 0x20000, CRC(07a6114b) SHA1(224df4616b77a56f33974d3b1793473d48ad52ca) )
-
-	ROM_REGION16_BE( 0x40000, "user1", 0 ) /* Extra code bank */
-	ROM_LOAD16_BYTE( "bhw.1", 0x000000, 0x20000, CRC(62b60066) SHA1(f7e7985c8f5f8191c580e777e1b7ed29d944d23f) )
-	ROM_LOAD16_BYTE( "bhw.4", 0x000001, 0x20000, CRC(16d8525c) SHA1(0098b0a7fcb23de2661bbec9a05254aa46579bb2) )
 ROM_END
 
 /******************************************************************************/
 
-GAME( 1988, pow,       0,        pow,      pow,      snk68_state, empty_init, ROT0,  "SNK", "P.O.W. - Prisoners of War (US version 1)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1988, powj,      pow,      pow,      powj,     snk68_state, empty_init, ROT0,  "SNK", "Datsugoku - Prisoners of War (Japan)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1989, streetsm,  0,        streetsm, streetsm, snk68_state, empty_init, ROT0,  "SNK", "Street Smart (US version 2)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1989, streetsm1, streetsm, searchar, streetsm, snk68_state, empty_init, ROT0,  "SNK", "Street Smart (US version 1)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1989, streetsmw, streetsm, searchar, streetsj, snk68_state, empty_init, ROT0,  "SNK", "Street Smart (World version 1)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, streetsmj, streetsm, searchar, streetsj, snk68_state, empty_init, ROT0,  "SNK", "Street Smart (Japan version 1)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ikari3,    0,        searchar, ikari3,   snk68_state, empty_init, ROT0,  "SNK", "Ikari III - The Rescue (World version 1, 8-Way Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ikari3w,   ikari3,   searchar, ikari3,   snk68_state, empty_init, ROT0,  "SNK", "Ikari III - The Rescue (World, Rotary Joystick)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ikari3u,   ikari3,   searchar, ikari3,   snk68_state, empty_init, ROT0,  "SNK", "Ikari III - The Rescue (US, Rotary Joystick)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ikari3j,   ikari3,   searchar, ikari3,   snk68_state, empty_init, ROT0,  "SNK", "Ikari Three (Japan, Rotary Joystick)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ikari3k,   ikari3,   searchar, ikari3,   snk68_state, empty_init, ROT0,  "SNK", "Ikari Three (Korea, 8-Way Joystick)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, searchar,  0,        searchar, searchar, snk68_state, empty_init, ROT90, "SNK", "SAR - Search And Rescue (World)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, searcharu, searchar, searchar, searchar, snk68_state, empty_init, ROT90, "SNK", "SAR - Search And Rescue (US)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1989, searcharj, searchar, searchar, searchar, snk68_state, empty_init, ROT90, "SNK", "SAR - Search And Rescue (Japan version 3)",                MACHINE_SUPPORTS_SAVE )
-
+GAME( 1988, pow,       0,        pow,      pow,      snk68_state,    empty_init, ROT0,  "SNK", "P.O.W. - Prisoners of War (US version 1)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, powj,      pow,      pow,      powj,     snk68_state,    empty_init, ROT0,  "SNK", "Datsugoku - Prisoners of War (Japan)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1989, streetsm,  0,        streetsm, streetsm, snk68_state,    empty_init, ROT0,  "SNK", "Street Smart (US version 2)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1989, streetsm1, streetsm, searchar, streetsm, searchar_state, empty_init, ROT0,  "SNK", "Street Smart (US version 1)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1989, streetsmw, streetsm, searchar, streetsj, searchar_state, empty_init, ROT0,  "SNK", "Street Smart (World version 1)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, streetsmj, streetsm, searchar, streetsj, searchar_state, empty_init, ROT0,  "SNK", "Street Smart (Japan version 1)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3,    0,        searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK", "Ikari III - The Rescue (World version 1, 8-Way Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3w,   ikari3,   searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK", "Ikari III - The Rescue (World, Rotary Joystick)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3u,   ikari3,   searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK", "Ikari III - The Rescue (US, Rotary Joystick)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3j,   ikari3,   searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK", "Ikari Three (Japan, Rotary Joystick)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3k,   ikari3,   searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK", "Ikari Three (Korea, 8-Way Joystick)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, searchar,  0,        searchar, searchar, searchar_state, empty_init, ROT90, "SNK", "SAR - Search And Rescue (World)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, searcharu, searchar, searchar, searchar, searchar_state, empty_init, ROT90, "SNK", "SAR - Search And Rescue (US)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, searcharj, searchar, searchar, searchar, searchar_state, empty_init, ROT90, "SNK", "SAR - Search And Rescue (Japan version 3)",                MACHINE_SUPPORTS_SAVE )

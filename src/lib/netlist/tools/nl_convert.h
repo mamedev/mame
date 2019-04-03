@@ -14,6 +14,7 @@
 #include "plib/pparser.h"
 #include "plib/pstring.h"
 #include "plib/ptypes.h"
+
 #include <memory>
 
 /*-------------------------------------------------
@@ -58,8 +59,8 @@ private:
 	struct net_t
 	{
 	public:
-		explicit net_t(const pstring &aname)
-		: m_name(aname), m_no_export(false) {}
+		explicit net_t(pstring aname)
+		: m_name(std::move(aname)), m_no_export(false) {}
 
 		const pstring &name() { return m_name;}
 		std::vector<pstring> &terminals() { return m_terminals; }
@@ -75,16 +76,28 @@ private:
 	struct dev_t
 	{
 	public:
-		dev_t(const pstring &atype, const pstring &aname, const pstring &amodel)
-		: m_type(atype), m_name(aname), m_model(amodel), m_val(0), m_has_val(false)
+		dev_t(pstring atype, pstring aname, pstring amodel)
+		: m_type(std::move(atype))
+		, m_name(std::move(aname))
+		, m_model(std::move(amodel))
+		, m_val(0)
+		, m_has_val(false)
 		{}
 
-		dev_t(const pstring &atype, const pstring &aname, double aval)
-		: m_type(atype), m_name(aname), m_model(""), m_val(aval), m_has_val(true)
+		dev_t(pstring atype, pstring aname, double aval)
+		: m_type(std::move(atype))
+		, m_name(std::move(aname))
+		, m_model("")
+		, m_val(aval)
+		, m_has_val(true)
 		{}
 
-		dev_t(const pstring &atype, const pstring &aname)
-		: m_type(atype), m_name(aname), m_model(""), m_val(0.0), m_has_val(false)
+		dev_t(pstring atype, pstring aname)
+		: m_type(std::move(atype))
+		, m_name(std::move(aname))
+		, m_model("")
+		, m_val(0.0)
+		, m_has_val(false)
 		{}
 
 		const pstring &name() { return m_name;}
@@ -112,8 +125,8 @@ private:
 	struct pin_alias_t
 	{
 	public:
-		pin_alias_t(const pstring &name, const pstring &alias)
-		: m_name(name), m_alias(alias)
+		pin_alias_t(pstring name, pstring alias)
+		: m_name(std::move(name)), m_alias(std::move(alias))
 		{}
 		const pstring &name() { return m_name; }
 		const pstring &alias() { return m_alias; }

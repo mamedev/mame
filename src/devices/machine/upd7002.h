@@ -30,9 +30,9 @@ public:
 	template <typename... T> void set_get_analogue_callback(T &&... args) { m_get_analogue_cb = get_analogue_delegate(std::forward<T>(args)...); }
 	template <typename... T> void set_eoc_callback(T &&... args) { m_eoc_cb = eoc_delegate(std::forward<T>(args)...); }
 
-	DECLARE_READ8_MEMBER(eoc_r);
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ_LINE_MEMBER(eoc_r);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

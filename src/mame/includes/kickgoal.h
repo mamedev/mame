@@ -47,11 +47,9 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ16_MEMBER(kickgoal_eeprom_r);
-	DECLARE_WRITE16_MEMBER(kickgoal_eeprom_w);
-	DECLARE_WRITE16_MEMBER(kickgoal_fgram_w);
-	DECLARE_WRITE16_MEMBER(kickgoal_bgram_w);
-	DECLARE_WRITE16_MEMBER(kickgoal_bg2ram_w);
+	DECLARE_WRITE16_MEMBER(fgram_w);
+	DECLARE_WRITE16_MEMBER(bgram_w);
+	DECLARE_WRITE16_MEMBER(bg2ram_w);
 	DECLARE_WRITE16_MEMBER(actionhw_snd_w);
 
 	DECLARE_WRITE8_MEMBER(soundio_port_a_w);
@@ -62,20 +60,20 @@ private:
 	DECLARE_WRITE16_MEMBER(to_pic_w);
 
 	TILE_GET_INFO_MEMBER(get_kickgoal_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_kickgoal_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_kickgoal_bg2_tile_info);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan_kicksfg);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan_kicksbg);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan_kicksbg2);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan_actionhwbg2);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(get_actionhw_fg_tile_info);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_8x8);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_16x16);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_32x32);
 	DECLARE_VIDEO_START(kickgoal);
 	DECLARE_VIDEO_START(actionhw);
 
 	INTERRUPT_GEN_MEMBER(kickgoal_interrupt);
 
-	uint32_t screen_update_kickgoal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void kickgoal_program_map(address_map &map);
+	void program_map(address_map &map);
 	void oki_map(address_map &map);
 
 	/* video-related */
@@ -87,8 +85,8 @@ private:
 	int         m_snd_new;
 	int         m_snd_sam[4];
 
-	uint8_t m_pic_portc;
-	uint8_t m_pic_portb;
+	u8 m_pic_portc;
+	u8 m_pic_portb;
 	int m_sound_command_sent;
 
 	int m_fg_base;
@@ -102,14 +100,14 @@ private:
 
 	int m_sprbase;
 
-	void kickgoal_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_fgram;
-	required_shared_ptr<uint16_t> m_bgram;
-	required_shared_ptr<uint16_t> m_bg2ram;
-	required_shared_ptr<uint16_t> m_scrram;
-	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<u16> m_fgram;
+	required_shared_ptr<u16> m_bgram;
+	required_shared_ptr<u16> m_bg2ram;
+	required_shared_ptr<u16> m_scrram;
+	required_shared_ptr<u16> m_spriteram;
 
 	/* devices */
 	required_device<eeprom_serial_93cxx_device> m_eeprom;

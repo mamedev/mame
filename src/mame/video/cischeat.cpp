@@ -224,7 +224,7 @@ READ16_MEMBER(cischeat_state::cischeat_ip_select_r)
 WRITE16_MEMBER(cischeat_state::cischeat_soundlatch_w)
 {
 	/* Sound CPU: reads latch during int 4, and stores command */
-	m_soundlatch->write(space, 0, data, mem_mask);
+	m_soundlatch->write(data);
 	m_soundcpu->set_input_line(4, HOLD_LINE);
 }
 

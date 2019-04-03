@@ -106,8 +106,7 @@ void miragemj_state::video_start()
 
 uint32_t miragemj_state::screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().dummy_space();
-	uint16_t flip = m_deco_tilegen->pf_control_r(space, 0, 0xffff);
+	uint16_t flip = m_deco_tilegen->pf_control_r(0);
 
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen->set_flip_screen(BIT(flip, 7));
@@ -291,31 +290,30 @@ void miragemj_state::machine_reset()
 	m_mux_data = 0;
 }
 
-MACHINE_CONFIG_START(miragemj_state::mirage)
-
+void miragemj_state::mirage(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 28000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(mirage_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", miragemj_state,  irq6_line_hold)
+	M68000(config, m_maincpu, 28000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &miragemj_state::mirage_map);
+	m_maincpu->set_vblank_int("screen", FUNC(miragemj_state::irq6_line_hold));
 
 	EEPROM_93C46_16BIT(config, "eeprom");  // 93C45
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(miragemj_state, screen_update_mirage)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(miragemj_state::screen_update_mirage));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_mirage);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 1024);
 
 	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_split(0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_trans_mask(0x0f);
@@ -337,12 +335,10 @@ MACHINE_CONFIG_START(miragemj_state::mirage)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki_bgm", OKIM6295, 2000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	OKIM6295(config, m_oki_bgm, 2000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30); // clock frequency & pin 7 not verified
 
-	MCFG_DEVICE_ADD("oki_sfx", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki_sfx, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.70); // clock frequency & pin 7 not verified
+}
 
 
 ROM_START( mirage )

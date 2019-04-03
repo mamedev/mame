@@ -348,21 +348,22 @@ static GFXDECODE_START( gfx_slotunbl )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x2,  0x0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(murogmbl_state::murogmbl)
+void murogmbl_state::murogmbl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 1000000) /* Z80? */
-	MCFG_DEVICE_PROGRAM_MAP(murogmbl_map)
+	Z80(config, m_maincpu, 1000000); /* Z80? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &murogmbl_state::murogmbl_map);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_murogmbl);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(murogmbl_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(murogmbl_state::screen_update));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(murogmbl_state::murogmbl_palette), 0x100);
 
@@ -371,23 +372,24 @@ MACHINE_CONFIG_START(murogmbl_state::murogmbl)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(slotunbl_state::slotunbl)
+void slotunbl_state::slotunbl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 1000000) /* Z80? */
-	MCFG_DEVICE_PROGRAM_MAP(slotunbl_map)
+	Z80(config, m_maincpu, 1000000); /* Z80? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &slotunbl_state::slotunbl_map);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slotunbl);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(slotunbl_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(slotunbl_state::screen_update));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(slotunbl_state::slotunbl_palette), 0x100);
 
@@ -396,7 +398,7 @@ MACHINE_CONFIG_START(slotunbl_state::slotunbl)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 ROM_START(murogmbl)
 	ROM_REGION( 0x10000, "maincpu", 0 )

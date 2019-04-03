@@ -788,26 +788,26 @@ void nightgal_state::machine_reset()
 	memset(m_blit_raw_data, 0, ARRAY_LENGTH(m_blit_raw_data));
 }
 
-MACHINE_CONFIG_START(nightgal_state::royalqn)
-
+void nightgal_state::royalqn(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK / 8)        /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(royalqn_map)
-	MCFG_DEVICE_IO_MAP(royalqn_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nightgal_state, irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK / 8);        /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nightgal_state::royalqn_map);
+	m_maincpu->set_addrmap(AS_IO, &nightgal_state::royalqn_io);
+	m_maincpu->set_vblank_int("screen", FUNC(nightgal_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", NSC8105, MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(royalqn_nsc_map)
+	NSC8105(config, m_subcpu, MASTER_CLOCK / 8);
+	m_subcpu->set_addrmap(AS_PROGRAM, &nightgal_state::royalqn_nsc_map);
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	JANGOU_BLITTER(config, m_blitter, MASTER_CLOCK/4);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4,320,0,256,264,16,240)
-	MCFG_SCREEN_UPDATE_DRIVER(nightgal_state, screen_update_nightgal)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MASTER_CLOCK/4,320,0,256,264,16,240);
+	screen.set_screen_update(FUNC(nightgal_state::screen_update_nightgal));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(nightgal_state::nightgal_palette), 0x20);
 
@@ -818,22 +818,21 @@ MACHINE_CONFIG_START(nightgal_state::royalqn)
 	aysnd.port_a_read_callback().set(FUNC(nightgal_state::input_1p_r));
 	aysnd.port_b_read_callback().set(FUNC(nightgal_state::input_2p_r));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nightgal_state::sexygal)
+void nightgal_state::sexygal(machine_config &config)
+{
 	royalqn(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sexygal_map)
-	MCFG_DEVICE_IO_MAP(sexygal_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nightgal_state::sexygal_map);
+	m_maincpu->set_addrmap(AS_IO, &nightgal_state::sexygal_io);
 
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(sexygal_nsc_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nightgal_state,  irq0_line_hold)
+	m_subcpu->set_addrmap(AS_PROGRAM, &nightgal_state::sexygal_nsc_map);
+	m_subcpu->set_vblank_int("screen", FUNC(nightgal_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", NSC8105, MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(sexygal_audio_map)
+	NSC8105(config, m_audiocpu, MASTER_CLOCK / 8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nightgal_state::sexygal_audio_map);
 
 	clock_device &sampleclk(CLOCK(config, "sampleclk", 6000)); // quite a wild guess
 	sampleclk.signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -849,37 +848,35 @@ MACHINE_CONFIG_START(nightgal_state::sexygal)
 	ymsnd.port_a_read_callback().set(FUNC(nightgal_state::input_1p_r));
 	ymsnd.port_b_read_callback().set(FUNC(nightgal_state::input_2p_r));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.40);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nightgal_state::sweetgal)
+void nightgal_state::sweetgal(machine_config &config)
+{
 	sexygal(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sweetgal_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nightgal_state::sweetgal_map);
 
 	// doesn't have the extra NSC8105 (so how does this play samples?)
 	config.device_remove("audiocpu");
 	config.device_remove("sampleclk");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nightgal_state::ngalsumr)
+void nightgal_state::ngalsumr(machine_config &config)
+{
 	royalqn(config);
-	MCFG_DEVICE_MODIFY("maincpu")
 	// TODO: happens from protection device
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 60)
+	m_maincpu->set_periodic_int(FUNC(nightgal_state::nmi_line_pulse), attotime::from_hz(60));
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(nightgal_state::sgaltrop)
+void nightgal_state::sgaltrop(machine_config &config)
+{
 	sexygal(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(sgaltrop_io)
+	m_maincpu->set_addrmap(AS_IO, &nightgal_state::sgaltrop_io);
 
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(sgaltrop_nsc_map)
+	m_subcpu->set_addrmap(AS_PROGRAM, &nightgal_state::sgaltrop_nsc_map);
 
 	config.device_remove("audiocpu");
 	config.device_remove("sampleclk");
-MACHINE_CONFIG_END
+}
 
 /*
 Night Gal

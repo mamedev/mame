@@ -39,7 +39,7 @@ Updates:
 WRITE8_MEMBER(kncljoe_state::sound_cmd_w)
 {
 	if ((data & 0x80) == 0)
-		m_soundlatch->write(space, 0, data & 0x7f);
+		m_soundlatch->write(data & 0x7f);
 	else
 		m_soundcpu->set_input_line(0, ASSERT_LINE);
 }
@@ -249,12 +249,12 @@ void kncljoe_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-MACHINE_CONFIG_START(kncljoe_state::kncljoe)
-
+void kncljoe_state::kncljoe(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(6'000'000))  /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kncljoe_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(6'000'000));  /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kncljoe_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(kncljoe_state::irq0_line_hold));
 
 	m6803_cpu_device &soundcpu(M6803(config, "soundcpu", XTAL(3'579'545))); /* verified on pcb */
 	soundcpu.set_addrmap(AS_PROGRAM, &kncljoe_state::sound_map);
@@ -265,14 +265,14 @@ MACHINE_CONFIG_START(kncljoe_state::kncljoe)
 	soundcpu.set_periodic_int(FUNC(kncljoe_state::sound_nmi), attotime::from_hz((double)3970)); //measured 3.970 kHz
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1500))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kncljoe_state, screen_update_kncljoe)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(1*8, 31*8-1, 0*8, 32*8-1);
+	m_screen->set_screen_update(FUNC(kncljoe_state::screen_update_kncljoe));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kncljoe);
 	PALETTE(config, m_palette, FUNC(kncljoe_state::kncljoe_palette), 16*8+16*8, 128+16);
@@ -287,12 +287,10 @@ MACHINE_CONFIG_START(kncljoe_state::kncljoe)
 	m_ay8910->port_b_write_callback().set(FUNC(kncljoe_state::unused_w));
 	m_ay8910->add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("sn1", SN76489, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	SN76489(config, "sn1", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.30); /* verified on pcb */
 
-	MCFG_DEVICE_ADD("sn2", SN76489, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	SN76489(config, "sn2", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.30); /* verified on pcb */
+}
 
 
 

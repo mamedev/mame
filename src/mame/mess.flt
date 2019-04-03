@@ -16,12 +16,15 @@ ac1.cpp
 accomm.cpp
 acd.cpp
 aceex.cpp
+aci_boris.cpp
+aci_borisdpl.cpp
 acrnsys1.cpp
 acrnsys.cpp
 acvirus.cpp
 adam.cpp
 adm23.cpp
 adm31.cpp
+adm36.cpp
 advision.cpp
 agat.cpp
 aim65.cpp
@@ -242,6 +245,7 @@ fccpu20.cpp
 fccpu30.cpp
 fidel_as12.cpp
 fidel_card.cpp
+fidel_cc1.cpp
 fidel_cc10.cpp
 fidel_cc7.cpp
 fidel_chesster.cpp
@@ -274,6 +278,7 @@ gamate.cpp
 gamecom.cpp
 gamecube.cpp
 gameking.cpp
+gamemachine.cpp
 gamepock.cpp
 gb.cpp
 gba.cpp
@@ -444,6 +449,7 @@ micral.cpp
 micro20.cpp
 microdec.cpp
 microkit.cpp
+micromon.cpp
 micronic.cpp
 microtan.cpp
 microterm.cpp
@@ -680,7 +686,6 @@ saturn.cpp
 savia84.cpp
 sbc6510.cpp
 sbrain.cpp
-sc1.cpp
 sc2.cpp
 scopus.cpp
 scorpion.cpp
@@ -702,6 +707,7 @@ si5500.cpp
 sitcom.cpp
 sk1.cpp
 slc1.cpp
+slc1a.cpp
 slicer.cpp
 sm1800.cpp
 sm7238.cpp
@@ -781,6 +787,7 @@ ti990_10.cpp
 ti990_4.cpp
 ticalc1x.cpp
 tiki100.cpp
+titan_soc.cpp
 tim011.cpp
 tim100.cpp
 timex.cpp

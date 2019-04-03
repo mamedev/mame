@@ -50,7 +50,7 @@ struct deco146port_xx
 class deco_146_base_device : public device_t
 {
 public:
-	void write_data(address_space &space, uint16_t address, uint16_t data, uint16_t mem_mask, uint8_t &csflags);
+	void write_data(uint16_t address, uint16_t data, uint16_t mem_mask, uint8_t &csflags);
 	uint16_t read_data(uint16_t address, uint16_t mem_mask, uint8_t &csflags);
 
 	auto port_a_cb() { return m_port_a_r.bind(); }
@@ -77,7 +77,7 @@ public:
 
 	auto soundlatch_irq_cb() { return m_soundlatch_irq_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( soundlatch_r );
+	u8 soundlatch_r();
 
 	devcb_read16 m_port_a_r;
 	devcb_read16 m_port_b_r;
@@ -101,7 +101,7 @@ protected:
 	virtual void device_reset() override;
 
 	uint16_t read_protport(uint16_t address, uint16_t mem_mask);
-	virtual void write_protport(address_space &space, uint16_t address, uint16_t data, uint16_t mem_mask);
+	virtual void write_protport(uint16_t address, uint16_t data, uint16_t mem_mask);
 	virtual uint16_t read_data_getloc(uint16_t address, int& location);
 
 	uint16_t m_rambank0[0x80];

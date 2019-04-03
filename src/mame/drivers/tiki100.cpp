@@ -98,7 +98,7 @@ READ8_MEMBER( tiki100_state::iorq_r )
 		break;
 
 	case 0x01: // SERS
-		data = m_dart->cd_ba_r(space, offset & 0x03);
+		data = m_dart->cd_ba_r(offset & 0x03);
 		break;
 
 	case 0x02: // PARS
@@ -119,7 +119,7 @@ READ8_MEMBER( tiki100_state::iorq_r )
 		break;
 
 	case 0x06: // TIMS
-		data = m_ctc->read(space, offset & 0x03);
+		data = m_ctc->read(offset & 0x03);
 		break;
 	}
 
@@ -137,7 +137,7 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 		break;
 
 	case 0x01: // SERS
-		m_dart->cd_ba_w(space, offset & 0x03, data);
+		m_dart->cd_ba_w(offset & 0x03, data);
 		break;
 
 	case 0x02: // PARS
@@ -170,7 +170,7 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 		break;
 
 	case 0x06: // TIMS
-		m_ctc->write(space, offset & 0x03, data);
+		m_ctc->write(offset & 0x03, data);
 		break;
 
 	case 0x07: // SYL

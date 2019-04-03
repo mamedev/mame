@@ -19,6 +19,7 @@
 #include "cpu/tms1000/tms0980.h"
 #include "cpu/tms1000/tms0270.h"
 #include "cpu/tms1000/tp0320.h"
+
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 
@@ -56,9 +57,14 @@ public:
 
 	u8 read_inputs(int columns);
 	u8 read_rotated_inputs(int columns, u8 rowmask = 0xf);
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
 	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
 	virtual void power_off();
+
+	void switch_change(int sel, u32 mask, bool next);
+	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_next) { if (newval) switch_change(Sel, (u32)(uintptr_t)param, true); }
+	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_prev) { if (newval) switch_change(Sel, (u32)(uintptr_t)param, false); }
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
@@ -83,18 +89,5 @@ protected:
 	virtual void machine_reset() override;
 };
 
-
-// LED segments
-enum
-{
-	lA = 0x01,
-	lB = 0x02,
-	lC = 0x04,
-	lD = 0x08,
-	lE = 0x10,
-	lF = 0x20,
-	lG = 0x40,
-	lDP = 0x80
-};
 
 #endif // MAME_INCLUDES_HH_TMS1K_H

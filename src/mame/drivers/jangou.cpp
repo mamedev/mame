@@ -260,14 +260,14 @@ READ8_MEMBER(jangou_state::input_system_r)
 
 WRITE8_MEMBER(jangou_state::sound_latch_w)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_cpu_1->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ8_MEMBER(jangou_state::sound_latch_r)
 {
 	m_cpu_1->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return m_soundlatch->read(space, 0);
+	return m_soundlatch->read();
 }
 
 /* Jangou HC-55516 CVSD */
@@ -870,8 +870,8 @@ MACHINE_RESET_MEMBER(jangou_state,jngolady)
 }
 
 /* Note: All frequencies and dividers are unverified */
-MACHINE_CONFIG_START(jangou_state::jangou)
-
+void jangou_state::jangou(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_cpu_0, MASTER_CLOCK / 8);
 	m_cpu_0->set_addrmap(AS_PROGRAM, &jangou_state::cpu0_map);

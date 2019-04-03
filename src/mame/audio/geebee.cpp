@@ -2,7 +2,7 @@
 // copyright-holders:Juergen Buchmueller
 /****************************************************************************
  *
- * geebee.c
+ * geebee.cpp
  *
  * sound driver
  * juergen buchmueller <pullmoll@t-online.de>, jan 2000
@@ -68,7 +68,7 @@ void geebee_sound_device::device_timer(emu_timer &timer, device_timer_id id, int
 	}
 }
 
-WRITE8_MEMBER( geebee_sound_device::sound_w )
+void geebee_sound_device::sound_w(u8 data)
 {
 	m_channel->update();
 	m_sound_latch = data;

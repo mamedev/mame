@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese, AJR
 /***************************************************************************
 
-    Ron II Mah-Jongg (c) 1981 Sanritsu
+    Futari Mahjong Ron II (c) 1981 Sanritsu
 
     TODO:
     - colors;
@@ -486,12 +486,12 @@ WRITE8_MEMBER(ron_state::ay_pa_w)
 {
 }
 
-MACHINE_CONFIG_START(ron_state::ron)
-
+void ron_state::ron(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(ron_map)
-	MCFG_DEVICE_IO_MAP(ron_io)
+	Z80(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ron_state::ron_map);
+	m_maincpu->set_addrmap(AS_IO, &ron_state::ron_io);
 
 	I8035(config, m_audiocpu, SOUND_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ron_state::ron_audio_map);
@@ -503,11 +503,11 @@ MACHINE_CONFIG_START(ron_state::ron)
 	m_audiocpu->t1_in_cb().set(FUNC(ron_state::audio_t1_r));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(ron_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 320, 0, 256, 264, 0, 240)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ron_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(ron_state::screen_update));
+	screen.set_raw(VIDEO_CLOCK, 320, 0, 256, 264, 0, 240);
+	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(ron_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_ron);
 
@@ -519,7 +519,7 @@ MACHINE_CONFIG_START(ron_state::ron)
 	AY8910(config, m_ay, 0); // T0 CLK from I8035 (not verified)
 	m_ay->add_route(ALL_OUTPUTS, "mono", 0.30);
 	m_ay->port_a_write_callback().set(FUNC(ron_state::ay_pa_w));
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -559,4 +559,4 @@ ROM_START( ron2 )
 	ROM_LOAD( "82s129_4.2m",  0x100, 0x100, CRC(f3c05d59) SHA1(bd48963aa9f2bedaa0c1fd031d7c93089161d1d9) )
 ROM_END
 
-GAME( 1981, ron2,  0,   ron,  ron, ron_state, empty_init, ROT270, "Sanritsu", "Ron II Mah-Jongg", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS )
+GAME( 1981, ron2,  0,   ron,  ron, ron_state, empty_init, ROT270, "Sanritsu", "Futari Mahjong Ron II", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS )

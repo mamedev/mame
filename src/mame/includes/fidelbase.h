@@ -31,9 +31,9 @@ public:
 		m_irq_on(*this, "irq_on"),
 		m_rombank(*this, "rombank"),
 		m_mainmap(*this, "mainmap"),
-		m_div_config(*this, "div_config"),
 		m_speech(*this, "speech"),
 		m_speech_rom(*this, "speech"),
+		m_language(*this, "language"),
 		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot")
 	{ }
@@ -41,8 +41,7 @@ public:
 	// in case reset button is directly tied to maincpu reset pin
 	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
-	// speech rom language, normally 0=English, 1=German, 2=French, 3=Spanish
-	template<int Language> void init_language() { m_language = Language; }
+	DECLARE_INPUT_CHANGED_MEMBER(div_changed) { div_refresh(newval); }
 
 protected:
 	// devices/pointers
@@ -50,13 +49,11 @@ protected:
 	optional_device<timer_device> m_irq_on;
 	optional_memory_bank m_rombank;
 	optional_device<address_map_bank_device> m_mainmap;
-	optional_ioport m_div_config;
 	optional_device<s14001a_device> m_speech;
 	optional_region_ptr<u8> m_speech_rom;
+	optional_region_ptr<u8> m_language;
 	optional_device<dac_bit_interface> m_dac;
 	optional_device<generic_slot_device> m_cart;
-
-	int m_language;
 
 	u8 m_speech_data;
 	u8 m_speech_bank; // speech rom higher address bits
@@ -74,7 +71,10 @@ protected:
 	u8 div_trampoline_r(offs_t offset);
 	void div_set_cpu_freq(offs_t offset);
 	void div_trampoline(address_map &map);
+	void div_refresh(ioport_value val = 0xff);
 	u16 m_div_status;
+	ioport_value m_div_config;
+	emu_timer *m_div_timer;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

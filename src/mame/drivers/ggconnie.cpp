@@ -37,9 +37,13 @@ public:
 		: pce_common_state(mconfig, type, tag)
 		, m_rtc(*this, "rtc")
 		, m_oki(*this, "oki")
+		, m_okibank(*this, "okibank")
 	{ }
 
 	void ggconnie(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	DECLARE_WRITE8_MEMBER(lamp_w);
@@ -47,9 +51,18 @@ private:
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
 	void sgx_io(address_map &map);
 	void sgx_mem(address_map &map);
+	void oki_map(address_map &map);
+
 	required_device <msm6242_device> m_rtc;
 	required_device <okim6295_device> m_oki;
+	required_memory_bank m_okibank;
 };
+
+
+void ggconnie_state::machine_start()
+{
+	m_okibank->configure_entries(0, 8, memregion("oki")->base(), 0x10000);
+}
 
 WRITE8_MEMBER(ggconnie_state::lamp_w)
 {
@@ -61,10 +74,11 @@ WRITE8_MEMBER(ggconnie_state::output_w)
 	// written in "Output Test" in test mode
 }
 
-/* TODO: banking not understood (is the ROM dumped correctly btw?) */
+// TODO: banking not understood for ggconnie (writes to 0x01f7400-03 range, while smf only to 00). Is the ROM dumped correctly btw?
 WRITE8_MEMBER(ggconnie_state::oki_bank_w)
 {
-	m_oki->set_rom_bank(data != 0);
+	m_okibank->set_entry(data & 0x07);
+	// popmessage("offset: %02x, bank: %02x\n", offset, data);
 }
 
 
@@ -78,7 +92,7 @@ void ggconnie_state::sgx_mem(address_map &map)
 	map(0x1f7100, 0x1f7100).portr("SWB");
 	map(0x1f7200, 0x1f7200).portr("SWC");
 	map(0x1f7300, 0x1f7300).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x1f7400, 0x1f74ff).w(FUNC(ggconnie_state::oki_bank_w));
+	map(0x1f7400, 0x1f7403).w(FUNC(ggconnie_state::oki_bank_w));
 	map(0x1f7500, 0x1f750f).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0x1f7700, 0x1f7700).portr("IN1");
 	map(0x1f7800, 0x1f7800).w(FUNC(ggconnie_state::output_w));
@@ -93,6 +107,11 @@ void ggconnie_state::sgx_io(address_map &map)
 	map(0x00, 0x03).rw("huc6202", FUNC(huc6202_device::io_read), FUNC(huc6202_device::io_write));
 }
 
+void ggconnie_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).bankr(m_okibank);
+	map(0x10000, 0x3ffff).rom().region("oki", 0);
+}
 
 static INPUT_PORTS_START(ggconnie)
 	PORT_START("IN0")
@@ -262,7 +281,8 @@ static INPUT_PORTS_START(smf)
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(ggconnie_state::ggconnie)
+void ggconnie_state::ggconnie(machine_config &config)
+{
 	/* basic machine hardware */
 	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ggconnie_state::sgx_mem);
@@ -273,12 +293,12 @@ MACHINE_CONFIG_START(ggconnie_state::ggconnie)
 	m_maincpu->add_route(1, "rspeaker", 1.00);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/3, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
-	MCFG_SCREEN_UPDATE_DRIVER( ggconnie_state, screen_update )
-	MCFG_SCREEN_PALETTE("huc6260")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
+	screen.set_screen_update(FUNC(ggconnie_state::screen_update));
+	screen.set_palette(m_huc6260);
 
-	HUC6260(config, m_huc6260, PCE_MAIN_CLOCK/3);
+	HUC6260(config, m_huc6260, PCE_MAIN_CLOCK);
 	m_huc6260->next_pixel_data().set("huc6202", FUNC(huc6202_device::next_pixel));
 	m_huc6260->time_til_next_event().set("huc6202", FUNC(huc6202_device::time_until_next_event));
 	m_huc6260->vsync_changed().set("huc6202", FUNC(huc6202_device::vsync_changed));
@@ -311,10 +331,11 @@ MACHINE_CONFIG_START(ggconnie_state::ggconnie)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, PCE_MAIN_CLOCK/12, okim6295_device::PIN7_HIGH) /* unknown clock / pin 7 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, PCE_MAIN_CLOCK/12, okim6295_device::PIN7_HIGH); /* unknown clock / pin 7 */
+	m_oki->set_addrmap(0, &ggconnie_state::oki_map);
+	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
+	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
+}
 
 ROM_START(ggconnie)
 	ROM_REGION( 0x180000, "maincpu", 0 )
@@ -326,7 +347,7 @@ ROM_START(ggconnie)
 	ROM_LOAD( "adpcm_u31.bin", 0x00000, 0x80000, CRC(de514c2b) SHA1(da73aa825d73646f556f6d4dbb46f43acf7c3357) )
 ROM_END
 
-// TODO: runs too slow (seems to run ok removing the /3 divider), OKI banking, hopper, lamps
+// TODO: verify OKI banking, hopper, lamps
 ROM_START(smf)
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD( "smf03.u3", 0x000000, 0x80000, CRC(2435ff3d) SHA1(4de1c5c2ed4ce2be5f3bb3fd31e176c8e24c7155) ) // 27c040

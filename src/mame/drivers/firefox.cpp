@@ -103,14 +103,14 @@ private:
 	uint32_t screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(video_timer_callback);
 	void set_rgba( int start, int index, unsigned char *palette_ram );
-	void firq_gen(phillips_22vp931_device &laserdisc, int state);
+	void firq_gen(philips_22vp931_device &laserdisc, int state);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
 
-	required_device<phillips_22vp931_device> m_laserdisc;
+	required_device<philips_22vp931_device> m_laserdisc;
 	required_shared_ptr<unsigned char> m_tileram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<unsigned char> m_sprite_palette;
@@ -445,7 +445,7 @@ WRITE_LINE_MEMBER(firefox_state::coin_counter_left_w)
 }
 
 
-void firefox_state::firq_gen(phillips_22vp931_device &laserdisc, int state)
+void firefox_state::firq_gen(philips_22vp931_device &laserdisc, int state)
 {
 	if (state)
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE );
@@ -456,7 +456,7 @@ void firefox_state::machine_start()
 {
 	m_mainbank->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x1000);
 
-	m_laserdisc->set_data_ready_callback(phillips_22vp931_device::data_ready_delegate(&firefox_state::firq_gen, this));
+	m_laserdisc->set_data_ready_callback(philips_22vp931_device::data_ready_delegate(&firefox_state::firq_gen, this));
 
 	m_sprite_bank = 0;
 }
@@ -650,13 +650,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(firefox_state::firefox)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_XTAL/8) // 68B09E
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MC6809E(config, m_maincpu, MASTER_XTAL/8); // 68B09E
+	m_maincpu->set_addrmap(AS_PROGRAM, &firefox_state::main_map);
 	/* interrupts count starting at end of VBLANK, which is 44, so add 44 */
 	TIMER(config, "32v").configure_scanline(FUNC(firefox_state::video_timer_callback), "screen", 96+44, 128);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, MASTER_XTAL/8)
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	M6502(config, m_audiocpu, MASTER_XTAL/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &firefox_state::audio_map);
 
 	config.m_minimum_quantum = attotime::from_hz(60000);
 
@@ -688,12 +688,14 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_firefox);
-	MCFG_PALETTE_ADD("palette", 512)
+	PALETTE(config, m_palette).set_entries(512);
 
-	MCFG_LASERDISC_22VP931_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_DRIVER(64*8, 525, firefox_state, screen_update_firefox)
-	MCFG_LASERDISC_OVERLAY_CLIP(7*8, 53*8-1, 44, 480+44)
-	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
+	PHILIPS_22VP931(config, m_laserdisc, 0);
+	m_laserdisc->set_overlay(64*8, 525, FUNC(firefox_state::screen_update_firefox));
+	m_laserdisc->set_overlay_clip(7*8, 53*8-1, 44, 480+44);
+	m_laserdisc->set_overlay_palette(m_palette);
+	m_laserdisc->add_route(0, "lspeaker", 0.50);
+	m_laserdisc->add_route(1, "rspeaker", 0.50);
 
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
@@ -716,29 +718,25 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_XTAL/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	pokey_device &pokey1(POKEY(config, "pokey1", MASTER_XTAL/8));
+	pokey1.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
+	pokey1.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_XTAL/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	pokey_device &pokey2(POKEY(config, "pokey2", MASTER_XTAL/8));
+	pokey2.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
+	pokey2.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
 
-	MCFG_DEVICE_ADD("pokey3", POKEY, MASTER_XTAL/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	pokey_device &pokey3(POKEY(config, "pokey3", MASTER_XTAL/8));
+	pokey3.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
+	pokey3.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
 
-	MCFG_DEVICE_ADD("pokey4", POKEY, MASTER_XTAL/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	pokey_device &pokey4(POKEY(config, "pokey4", MASTER_XTAL/8));
+	pokey4.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
+	pokey4.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
 
-	MCFG_DEVICE_ADD("tms", TMS5220, MASTER_XTAL/2/11)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-
-	MCFG_DEVICE_MODIFY("laserdisc")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	TMS5220(config, m_tms, MASTER_XTAL/2/11);
+	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 0.75);
+	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 0.75);
 MACHINE_CONFIG_END
 
 

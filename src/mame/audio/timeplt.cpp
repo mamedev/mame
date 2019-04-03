@@ -128,7 +128,7 @@ WRITE8_MEMBER( timeplt_audio_device::filter_w )
 
 WRITE8_MEMBER(timeplt_audio_device::sound_data_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 }
 
 

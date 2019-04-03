@@ -79,13 +79,13 @@ Mighty Guy board layout:
 
 WRITE8_MEMBER(cop01_state::cop01_sound_command_w)
 {
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(0, ASSERT_LINE );
+	m_soundlatch->write(data);
+	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
 READ8_MEMBER(cop01_state::cop01_sound_command_r)
 {
-	int res = (m_soundlatch->read(space, offset) & 0x7f) << 1;
+	int res = (m_soundlatch->read() & 0x7f) << 1;
 
 	/* bit 0 seems to be a timer */
 	if ((m_audiocpu->total_cycles() / TIMER_RATE) & 1)
@@ -446,27 +446,27 @@ void cop01_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(cop01_state::cop01)
-
+void cop01_state::cop01(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown clock / divider */
-	MCFG_DEVICE_PROGRAM_MAP(cop01_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cop01_state,  irq0_line_assert)
+	Z80(config, m_maincpu, MAINCPU_CLOCK/2);   /* unknown clock / divider */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cop01_state::cop01_map);
+	m_maincpu->set_addrmap(AS_IO, &cop01_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cop01_state::irq0_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'000'000))    /* unknown clock / divider, hand-tuned to match audio reference */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(audio_io_map)
+	Z80(config, m_audiocpu, XTAL(3'000'000));    /* unknown clock / divider, hand-tuned to match audio reference */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cop01_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &cop01_state::audio_io_map);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cop01_state, screen_update_cop01)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(cop01_state::screen_update_cop01));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cop01);
 	PALETTE(config, m_palette, FUNC(cop01_state::cop01_palette), 16+8*16+16*16, 256);
@@ -481,31 +481,31 @@ MACHINE_CONFIG_START(cop01_state::cop01)
 	AY8910(config, "ay2", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); /* unknown clock / divider, hand-tuned to match audio reference */
 
 	AY8910(config, "ay3", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); /* unknown clock / divider, hand-tuned to match audio reference */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mightguy_state::mightguy)
-
+void mightguy_state::mightguy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown divider */
-	MCFG_DEVICE_PROGRAM_MAP(cop01_map)
-	MCFG_DEVICE_IO_MAP(mightguy_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cop01_state,  irq0_line_assert)
+	Z80(config, m_maincpu, MAINCPU_CLOCK/2);   /* unknown divider */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mightguy_state::cop01_map);
+	m_maincpu->set_addrmap(AS_IO, &mightguy_state::mightguy_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cop01_state::irq0_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, AUDIOCPU_CLOCK/2) /* unknown divider */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(mightguy_audio_io_map)
+	Z80(config, m_audiocpu, AUDIOCPU_CLOCK/2); /* unknown divider */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &mightguy_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &mightguy_state::mightguy_audio_io_map);
 
 	NB1412M2(config, m_prot, XTAL(8'000'000)/2); // divided by 2 maybe
 	m_prot->dac_callback().set("dac", FUNC(dac_byte_interface::data_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cop01_state, screen_update_cop01)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(cop01_state::screen_update_cop01));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cop01);
 	PALETTE(config, m_palette, FUNC(cop01_state::cop01_palette), 16+8*16+16*16, 256);
@@ -515,14 +515,13 @@ MACHINE_CONFIG_START(mightguy_state::mightguy)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3526, AUDIOCPU_CLOCK/2) /* unknown divider */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM3526(config, "ymsnd", AUDIOCPU_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 1.0); /* unknown divider */
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.5); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 
 

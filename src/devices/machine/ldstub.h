@@ -17,23 +17,12 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_LASERDISC_PR7820_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PIONEER_PR7820, 0)
-#define MCFG_LASERDISC_22VP932_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PHILLIPS_22VP932, 0)
-
-
-//**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
 // device type definition
-DECLARE_DEVICE_TYPE(PIONEER_PR7820,   pioneer_pr7820_device)
-DECLARE_DEVICE_TYPE(PHILLIPS_22VP932, phillips_22vp932_device)
-
+DECLARE_DEVICE_TYPE(PIONEER_PR7820,  pioneer_pr7820_device)
+DECLARE_DEVICE_TYPE(PHILIPS_22VP932, philips_22vp932_device)
 
 
 //**************************************************************************
@@ -63,13 +52,13 @@ protected:
 };
 
 
-// ======================> phillips_22vp932_device
+// ======================> philips_22vp932_device
 
-class phillips_22vp932_device : public laserdisc_device
+class philips_22vp932_device : public laserdisc_device
 {
 public:
 	// construction/destruction
-	phillips_22vp932_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	philips_22vp932_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// input/output
 	uint8_t data_r() { return 0; }

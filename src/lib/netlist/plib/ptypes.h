@@ -8,11 +8,11 @@
 #ifndef PTYPES_H_
 #define PTYPES_H_
 
+#include "pconfig.h"
+
 #include <limits>
 #include <string>
 #include <type_traits>
-
-#include "pconfig.h"
 
 #define COPYASSIGNMOVE(name, def)  \
 		name(const name &) = def; \
@@ -81,38 +81,72 @@ namespace plib
 	template<typename... Ts>
 	inline void unused_var(Ts&&...) {}
 
-
-
 	//============================================================
-	//  penum - strongly typed enumeration
+	// is_pow2
 	//============================================================
-
-	struct penum_base
+	template <typename T>
+	constexpr bool is_pow2(T v) noexcept
 	{
-	protected:
-		static int from_string_int(const char *str, const char *x);
-		static std::string nthstr(int n, const char *str);
-	};
+		static_assert(is_integral<T>::value, "is_pow2 needs integer arguments");
+		return !(v & (v-1));
+	}
+
+
+	//============================================================
+	// abs, lcd, gcm
+	//============================================================
+
+	template<typename T>
+	constexpr
+	typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value, T>::type
+	abs(T v)
+	{
+		return v < 0 ? -v : v;
+	}
+
+	template<typename T>
+	constexpr
+	typename std::enable_if<std::is_integral<T>::value && std::is_unsigned<T>::value, T>::type
+	abs(T v)
+	{
+		return v;
+	}
+
+	template<typename M, typename N>
+	constexpr typename std::common_type<M, N>::type
+	gcd(M m, N n)
+	{
+		static_assert(std::is_integral<M>::value, "gcd: M must be an integer");
+		static_assert(std::is_integral<N>::value, "gcd: N must be an integer");
+
+		return m == 0 ? plib::abs(n)
+			 : n == 0 ? plib::abs(m)
+			 : gcd(n, m % n);
+	}
+
+	template<typename M, typename N>
+	constexpr typename std::common_type<M, N>::type
+	lcm(M m, N n)
+	{
+		static_assert(std::is_integral<M>::value, "lcm: M must be an integer");
+		static_assert(std::is_integral<N>::value, "lcm: N must be an integer");
+
+		return (m != 0 && n != 0) ? (plib::abs(m) / gcd(m, n)) * plib::abs(n) : 0;
+	}
 
 } // namespace plib
 
-#define P_ENUM(ename, ...) \
-	struct ename : public plib::penum_base { \
-		enum E { __VA_ARGS__ }; \
-		ename (E v) : m_v(v) { } \
-		bool set_from_string (const std::string &s) { \
-			static char const *const strings = # __VA_ARGS__; \
-			int f = from_string_int(strings, s.c_str()); \
-			if (f>=0) { m_v = static_cast<E>(f); return true; } else { return false; } \
-		} \
-		operator E() const {return m_v;} \
-		bool operator==(const ename &rhs) const {return m_v == rhs.m_v;} \
-		bool operator==(const E &rhs) const {return m_v == rhs;} \
-		std::string name() const { \
-			static char const *const strings = # __VA_ARGS__; \
-			return nthstr(static_cast<int>(m_v), strings); \
-		} \
-		private: E m_v; };
+//============================================================
+// Define a "has member" trait.
+//============================================================
 
+#define PDEFINE_HAS_MEMBER(name, member)                                        \
+	template <typename T> class name                                            \
+	{                                                                           \
+		template <typename U> static long test(decltype(&U:: member));          \
+		template <typename U> static char  test(...);                           \
+	public:                                                                     \
+		static constexpr const bool value = sizeof(test<T>(nullptr)) == sizeof(long);   \
+	}
 
 #endif /* PTYPES_H_ */

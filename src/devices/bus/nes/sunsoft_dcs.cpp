@@ -68,10 +68,10 @@ void nes_ntb_slot_device::device_start()
 	m_cart = dynamic_cast<ntb_cart_interface *>(get_card_device());
 }
 
-READ8_MEMBER(nes_ntb_slot_device::read)
+uint8_t nes_ntb_slot_device::read(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read(space, offset, mem_mask);
+		return m_cart->read(offset);
 
 	return 0xff;
 }
@@ -212,7 +212,7 @@ void nes_sunsoft_dcs_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_sunsoft_dcs_device::write_h)
+void nes_sunsoft_dcs_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("Sunsoft DCS write_h, offset %04x, data: %02x\n", offset, data));
 
@@ -224,27 +224,27 @@ WRITE8_MEMBER(nes_sunsoft_dcs_device::write_h)
 			m_wram_enable = BIT(data, 4);
 			break;
 		default:
-			sun4_write(space, offset, data, mem_mask);
+			sun4_write(offset, data);
 			break;
 	}
 }
 
-READ8_MEMBER(nes_sunsoft_dcs_device::read_h)
+uint8_t nes_sunsoft_dcs_device::read_h(offs_t offset)
 {
 	LOG_MMC(("Sunsoft DCS read_h, offset: %04x\n", offset));
 
 	if (m_exrom_enable && m_subslot->m_cart && offset < 0x4000)
 	{
 		if (m_timer_on)
-			return m_subslot->m_cart->read(space, offset, mem_mask);
+			return m_subslot->m_cart->read(offset);
 		else
-			return m_open_bus;   // after the timer is off, this returns open bus...
+			return get_open_bus();   // after the timer is off, this returns open bus...
 	}
 	else
 		return hi_access_rom(offset);
 }
 
-WRITE8_MEMBER(nes_sunsoft_dcs_device::write_m)
+void nes_sunsoft_dcs_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("Sunsoft DCS write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -260,7 +260,7 @@ WRITE8_MEMBER(nes_sunsoft_dcs_device::write_m)
 	}
 }
 
-READ8_MEMBER(nes_sunsoft_dcs_device::read_m)
+uint8_t nes_sunsoft_dcs_device::read_m(offs_t offset)
 {
 	LOG_MMC(("Sunsoft DCS read_m, offset: %04x\n", offset));
 
@@ -269,7 +269,7 @@ READ8_MEMBER(nes_sunsoft_dcs_device::read_m)
 	if (!m_prgram.empty() && m_wram_enable)
 		return m_prgram[offset & (m_prgram.size() - 1)];
 
-	return m_open_bus;   // open bus
+	return get_open_bus();   // open bus
 }
 
 

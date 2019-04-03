@@ -378,6 +378,22 @@ void nscsi_cdrom_device::scsi_command()
 				scsi_cmdbuf[pos++] = 0x00; // Double meh
 				break;
 
+			case 0x01: // Read-write error recovery
+				scsi_cmdbuf[pos++] = 0x01; // PS, page id
+				scsi_cmdbuf[pos++] = 0x0a; // Page length
+				scsi_cmdbuf[pos++] = 0x01;
+				scsi_cmdbuf[pos++] = 0x01;
+				scsi_cmdbuf[pos++] = 0x00;
+				scsi_cmdbuf[pos++] = 0x00;
+				scsi_cmdbuf[pos++] = 0x00;
+				scsi_cmdbuf[pos++] = 0x00;
+				scsi_cmdbuf[pos++] = 0x00;
+				scsi_cmdbuf[pos++] = 0x00;
+				scsi_cmdbuf[pos++] = 0x00;
+				scsi_cmdbuf[pos++] = 0x00;
+				scsi_cmdbuf[pos++] = 0x00;
+				break;
+
 			case 0x02: // Disconnect/reconnect control parameters (guessed)
 				scsi_cmdbuf[pos++] = 0x82; // PS, page id
 				scsi_cmdbuf[pos++] = 0x0e; // Page length

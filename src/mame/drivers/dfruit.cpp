@@ -371,28 +371,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::dfruit_irq_scanline)
 
 #define MASTER_CLOCK XTAL(14'000'000)
 
-MACHINE_CONFIG_START(dfruit_state::dfruit)
-
+void dfruit_state::dfruit(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,MASTER_CLOCK/2) //!!! TC0091LVC !!!
-	MCFG_DEVICE_PROGRAM_MAP(dfruit_map)
+	Z80(config, m_maincpu, MASTER_CLOCK/2); //!!! TC0091LVC !!!
+	m_maincpu->set_addrmap(AS_PROGRAM, &dfruit_state::dfruit_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(dfruit_state::dfruit_irq_scanline), "screen", 0, 1);
 
 	//MCFG_MACHINE_START_OVERRIDE(dfruit_state,4enraya)
 	//MCFG_MACHINE_RESET_OVERRIDE(dfruit_state,4enraya)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dfruit_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dfruit_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(dfruit_state::screen_update));
+	screen.screen_vblank().set(FUNC(dfruit_state::screen_vblank));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_dfruit);
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, "palette").set_entries(0x100);
 
 	TC0091LVC(config, m_vdp, 0);
 	m_vdp->set_gfxdecode_tag("gfxdecode");
@@ -408,7 +408,7 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	opn.port_a_read_callback().set_ioport("IN4");
 	opn.port_b_read_callback().set_ioport("IN5");
 	opn.add_route(ALL_OUTPUTS, "mono", 0.30);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

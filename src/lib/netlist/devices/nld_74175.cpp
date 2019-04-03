@@ -111,7 +111,7 @@ namespace netlist
 		m_data = 0xFF;
 	}
 
-	NETLIB_DEVICE_IMPL(74175,	"TTL_74175", "+CLK,+D1,+D2,+D3,+D4,+CLRQ")
+	NETLIB_DEVICE_IMPL(74175,   "TTL_74175", "+CLK,+D1,+D2,+D3,+D4,+CLRQ")
 	NETLIB_DEVICE_IMPL(74175_dip,"TTL_74175_DIP", "")
 
 	} //namespace devices

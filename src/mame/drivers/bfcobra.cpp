@@ -1638,28 +1638,29 @@ INTERRUPT_GEN_MEMBER(bfcobra_state::vblank_gen)
 	update_irqs();
 }
 
-MACHINE_CONFIG_START(bfcobra_state::bfcobra)
-	MCFG_DEVICE_ADD("maincpu", Z80, Z80_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(z80_prog_map)
-	MCFG_DEVICE_IO_MAP(z80_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bfcobra_state,  vblank_gen)
+void bfcobra_state::bfcobra(machine_config &config)
+{
+	Z80(config, m_maincpu, Z80_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bfcobra_state::z80_prog_map);
+	m_maincpu->set_addrmap(AS_IO, &bfcobra_state::z80_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(bfcobra_state::vblank_gen));
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809, M6809_XTAL) // MC6809P
-	MCFG_DEVICE_PROGRAM_MAP(m6809_prog_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfcobra_state, timer_irq, 1000)
+	MC6809(config, m_audiocpu, M6809_XTAL); // MC6809P
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bfcobra_state::m6809_prog_map);
+	m_audiocpu->set_periodic_int(FUNC(bfcobra_state::timer_irq), attotime::from_hz(1000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 	/* TODO */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 256 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(bfcobra_state, screen_update_bfcobra)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(512, 256);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(bfcobra_state::screen_update_bfcobra));
 
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, m_palette).set_entries(256);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
 	ramdac.set_addrmap(0, &bfcobra_state::ramdac_map);
@@ -1669,8 +1670,7 @@ MACHINE_CONFIG_START(bfcobra_state::bfcobra)
 
 	AY8910(config, "aysnd", M6809_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	/* ACIAs */
 	ACIA6850(config, m_acia6850_0, 0);
@@ -1688,7 +1688,7 @@ MACHINE_CONFIG_START(bfcobra_state::bfcobra)
 	acia_clock.signal_handler().set(FUNC(bfcobra_state::write_acia_clock));
 
 	METERS(config, m_meters, 0).set_number(8);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

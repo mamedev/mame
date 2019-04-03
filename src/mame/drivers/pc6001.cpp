@@ -1470,25 +1470,26 @@ GFXDECODE_END
 
 #define PC6001_MAIN_CLOCK 7987200
 
-MACHINE_CONFIG_START(pc6001_state::pc6001)
+void pc6001_state::pc6001(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, PC6001_MAIN_CLOCK / 2) // PD 780C-1, ~4 Mhz
-	MCFG_DEVICE_PROGRAM_MAP(pc6001_map)
-	MCFG_DEVICE_IO_MAP(pc6001_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc6001_state, vrtc_irq)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
+	Z80(config, m_maincpu, PC6001_MAIN_CLOCK / 2); // PD 780C-1, ~4 Mhz
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc6001_state::pc6001_map);
+	m_maincpu->set_addrmap(AS_IO, &pc6001_state::pc6001_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pc6001_state::vrtc_irq));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6001_state::irq_callback));
 
-//  MCFG_DEVICE_ADD("subcpu", I8049, 7987200)
+//  I8049(config, "subcpu", 7987200);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc6001m2);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(pc6001_state, screen_update_pc6001)
-	MCFG_SCREEN_SIZE(320, 25+192+26)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_screen_update(FUNC(pc6001_state::screen_update_pc6001));
+	m_screen->set_size(320, 25+192+26);
+	m_screen->set_visarea(0, 319, 0, 239);
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(pc6001_state::pc6001_palette), 16+4);
 
@@ -1520,59 +1521,57 @@ MACHINE_CONFIG_START(pc6001_state::pc6001)
 	/* TODO: accurate timing on this */
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(pc6001_state::keyboard_callback), attotime::from_hz(250));
 	TIMER(config, "cassette_timer").configure_periodic(FUNC(pc6001_state::cassette_callback), attotime::from_hz(1200/12));
-MACHINE_CONFIG_END
+}
 
 
 
-MACHINE_CONFIG_START(pc6001mk2_state::pc6001mk2)
+void pc6001mk2_state::pc6001mk2(machine_config &config)
+{
 	pc6001(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pc6001mk2_map)
-	MCFG_DEVICE_IO_MAP(pc6001mk2_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc6001mk2_state::pc6001mk2_map);
+	m_maincpu->set_addrmap(AS_IO, &pc6001mk2_state::pc6001mk2_io);
 
 //  MCFG_MACHINE_RESET_OVERRIDE(pc6001mk2_state,pc6001mk2)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(pc6001mk2_state, screen_update_pc6001mk2)
+	m_screen->set_screen_update(FUNC(pc6001mk2_state::screen_update_pc6001mk2));
 
 	m_palette->set_entries(16+16);
 	m_palette->set_init(FUNC(pc6001mk2_state::pc6001mk2_palette));
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pc6001m2);
 
-	MCFG_DEVICE_ADD("upd7752", UPD7752, PC6001_MAIN_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	UPD7752(config, "upd7752", PC6001_MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(pc6601_state::pc6601)
+void pc6601_state::pc6601(machine_config &config)
+{
 	pc6001mk2(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", Z80, PC6001_MAIN_CLOCK / 2)
-	MCFG_DEVICE_PROGRAM_MAP(pc6001mk2_map)
-	MCFG_DEVICE_IO_MAP(pc6601_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc6001_state, vrtc_irq)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
-MACHINE_CONFIG_END
+	Z80(config.replace(), m_maincpu, PC6001_MAIN_CLOCK / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc6601_state::pc6001mk2_map);
+	m_maincpu->set_addrmap(AS_IO, &pc6601_state::pc6601_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pc6001_state::vrtc_irq));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6001_state::irq_callback));
+}
 
-MACHINE_CONFIG_START(pc6001sr_state::pc6001sr)
+void pc6001sr_state::pc6001sr(machine_config &config)
+{
 	pc6001mk2(config);
 
 	/* basic machine hardware */
 	//*Yes*, PC-6001 SR Z80 CPU is actually slower than older models (better waitstates tho?)
-	MCFG_DEVICE_REPLACE("maincpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(pc6001sr_map)
-	MCFG_DEVICE_IO_MAP(pc6001sr_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc6001sr_state,  sr_vrtc_irq)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
+	Z80(config.replace(), m_maincpu, XTAL(3'579'545));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc6001sr_state::pc6001sr_map);
+	m_maincpu->set_addrmap(AS_IO, &pc6001sr_state::pc6001sr_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pc6001sr_state::sr_vrtc_irq));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6001_state::irq_callback));
 
 //  MCFG_MACHINE_RESET_OVERRIDE(pc6001sr_state,pc6001sr)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(pc6001sr_state, screen_update_pc6001sr)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(pc6001sr_state::screen_update_pc6001sr));
+}
 
 /* ROM definition */
 ROM_START( pc6001 )

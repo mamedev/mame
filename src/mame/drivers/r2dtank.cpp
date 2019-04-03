@@ -142,7 +142,7 @@ WRITE_LINE_MEMBER(r2dtank_state::main_cpu_irq)
 
 READ8_MEMBER(r2dtank_state::audio_command_r)
 {
-	uint8_t ret = m_soundlatch->read(space, 0);
+	uint8_t ret = m_soundlatch->read();
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", m_audiocpu->pc(), ret);
 
@@ -152,7 +152,7 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", m_audiocpu
 
 WRITE8_MEMBER(r2dtank_state::audio_command_w)
 {
-	m_soundlatch->write(space, 0, ~data);
+	m_soundlatch->write(~data);
 	m_audiocpu->set_input_line(M6802_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", m_maincpu->pc(), data^0xff);
@@ -161,7 +161,7 @@ if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", m_maincp
 
 READ8_MEMBER(r2dtank_state::audio_answer_r)
 {
-	uint8_t ret = m_soundlatch2->read(space, 0);
+	uint8_t ret = m_soundlatch2->read();
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", m_maincpu->pc(), ret);
 
 	return ret;
@@ -174,7 +174,7 @@ WRITE8_MEMBER(r2dtank_state::audio_answer_w)
 	if (m_audiocpu->pc() == 0xfb12)
 		data = 0x00;
 
-	m_soundlatch2->write(space, 0, data);
+	m_soundlatch2->write(data);
 	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", m_audiocpu->pc(), data);
@@ -445,19 +445,20 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(r2dtank_state::r2dtank)
-	MCFG_DEVICE_ADD("maincpu", MC6809, MAIN_CPU_MASTER_CLOCK / 4) // divider guessed
-	MCFG_DEVICE_PROGRAM_MAP(r2dtank_main_map)
+void r2dtank_state::r2dtank(machine_config &config)
+{
+	MC6809(config, m_maincpu, MAIN_CPU_MASTER_CLOCK / 4); // divider guessed
+	m_maincpu->set_addrmap(AS_PROGRAM, &r2dtank_state::r2dtank_main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6802, 3.579545_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(r2dtank_audio_map)
+	M6802(config, m_audiocpu, 3.579545_MHz_XTAL);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &r2dtank_state::r2dtank_audio_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 360, 0, 256, 276, 0, 224)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, 360, 0, 256, 276, 0, 224);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::BGR_3BIT);
 
@@ -507,8 +508,7 @@ MACHINE_CONFIG_START(r2dtank_state::r2dtank)
 	m_ay2->port_a_read_callback().set_ioport("IN1");
 	m_ay2->port_b_read_callback().set_ioport("DSWA");
 	m_ay2->add_route(ALL_OUTPUTS, "mono", 0.25);
-
-MACHINE_CONFIG_END
+}
 
 
 

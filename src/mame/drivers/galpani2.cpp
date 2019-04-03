@@ -622,27 +622,27 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt2)
 		m_subcpu->set_input_line(3, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(galpani2_state::galpani2)
-
+void galpani2_state::galpani2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(27'000'000)/2)       /* Confirmed on galpani2i PCB */
-	MCFG_DEVICE_PROGRAM_MAP(galpani2_mem1)
+	M68000(config, m_maincpu, XTAL(27'000'000)/2);       /* Confirmed on galpani2i PCB */
+	m_maincpu->set_addrmap(AS_PROGRAM, &galpani2_state::galpani2_mem1);
 	TIMER(config, "m_scantimer").configure_scanline(FUNC(galpani2_state::galpani2_interrupt1), "screen", 0, 1);
 	//config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_DEVICE_ADD("sub", M68000, XTAL(27'000'000)/2)           /* Confirmed on galpani2i PCB */
-	MCFG_DEVICE_PROGRAM_MAP(galpani2_mem2)
+	M68000(config, m_subcpu, XTAL(27'000'000)/2);           /* Confirmed on galpani2i PCB */
+	m_subcpu->set_addrmap(AS_PROGRAM, &galpani2_state::galpani2_mem2);
 	TIMER(config, "s_scantimer").configure_scanline(FUNC(galpani2_state::galpani2_interrupt2), "screen", 0, 1);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(galpani2_state, screen_update_galpani2)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(320, 256);
+	screen.set_visarea(0, 320-1, 0, 256-1-16);
+	screen.set_screen_update(FUNC(galpani2_state::screen_update_galpani2));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_galpani2);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x4000); // sprites
@@ -657,12 +657,10 @@ MACHINE_CONFIG_START(galpani2_state::galpani2)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(20'000'000)/10, okim6295_device::PIN7_HIGH)    /* Confirmed on galpani2i PCB */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	OKIM6295(config, "oki1", XTAL(20'000'000)/10, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "lspeaker", 1.0);    /* Confirmed on galpani2i PCB */
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(20'000'000)/10, okim6295_device::PIN7_HIGH)    /* Confirmed on galpani2i PCB */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki2, XTAL(20'000'000)/10, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "rspeaker", 1.0);    /* Confirmed on galpani2i PCB */
+}
 
 
 /***************************************************************************

@@ -47,19 +47,19 @@ namespace plib
 		C14CONSTEXPR ptime &operator-=(const ptime rhs) noexcept { m_time -= rhs.m_time; return *this; }
 		C14CONSTEXPR ptime &operator*=(const mult_type factor) noexcept { m_time *= static_cast<internal_type>(factor); return *this; }
 
-		friend C14CONSTEXPR ptime operator-(ptime lhs, const ptime rhs) noexcept
+		friend constexpr const ptime operator-(ptime lhs, const ptime rhs) noexcept
 		{
-			return lhs -= rhs;
+			return ptime(lhs.m_time - rhs.m_time);
 		}
 
-		friend C14CONSTEXPR ptime operator+(ptime lhs, const ptime rhs) noexcept
+		friend constexpr const ptime operator+(ptime lhs, const ptime rhs) noexcept
 		{
-			return lhs += rhs;
+			return ptime(lhs.m_time + rhs.m_time);
 		}
 
-		friend C14CONSTEXPR ptime operator*(ptime lhs, const mult_type &factor) noexcept
+		friend constexpr const ptime operator*(ptime lhs, const mult_type &factor) noexcept
 		{
-			return lhs *= factor;
+			return ptime(lhs.m_time * factor);
 		}
 
 		friend constexpr mult_type operator/(const ptime lhs, const ptime rhs) noexcept
@@ -112,7 +112,7 @@ namespace plib
 		static constexpr ptime from_sec(const internal_type s) noexcept   { return ptime(s,  UINT64_C(         1)); }
 		static constexpr ptime from_hz(const internal_type hz) noexcept { return ptime(1 , hz); }
 		static constexpr ptime from_raw(const internal_type raw) noexcept { return ptime(raw); }
-		static constexpr ptime from_double(const double t) noexcept { return ptime(static_cast<internal_type>( t * static_cast<double>(RES)), RES); }
+		static constexpr ptime from_double(const double t) noexcept { return ptime(static_cast<internal_type>(t * static_cast<double>(RES) + 0.5), RES); }
 
 		static constexpr ptime zero() noexcept { return ptime(0, RES); }
 		static constexpr ptime quantum() noexcept { return ptime(1, RES); }

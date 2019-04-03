@@ -771,14 +771,14 @@ READ16_MEMBER(toaplan2_state::batrider_z80rom_r)
 // these two latches are always written together, via a single move.l instruction
 WRITE8_MEMBER(toaplan2_state::batrider_soundlatch_w)
 {
-	m_soundlatch->write(space, offset, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
 WRITE8_MEMBER(toaplan2_state::batrider_soundlatch2_w)
 {
-	m_soundlatch2->write(space, offset, data & 0xff);
+	m_soundlatch2->write(data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 

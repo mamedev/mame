@@ -856,8 +856,8 @@ void taitof2_state::footchmp_map(address_map &map)
 	map(0x100000, 0x10ffff).ram();
 	map(0x200000, 0x20ffff).ram().share("spriteram");
 	map(0x300000, 0x30000f).w(FUNC(taitof2_state::taitof2_spritebank_w)); /* updated at $a6e, off irq5 */
-	map(0x400000, 0x40ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));     /* tilemaps */
-	map(0x430000, 0x43002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_word_r), FUNC(tc0480scp_device::ctrl_word_w));
+	map(0x400000, 0x40ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));     /* tilemaps */
+	map(0x430000, 0x43002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0x500000, 0x50001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0x00ff);  /* 500002 written like a watchdog?! */
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x700000, 0x70001f).rw("te7750", FUNC(te7750_device::read), FUNC(te7750_device::write)).umask16(0x00ff);
@@ -971,8 +971,8 @@ void taitof2_state::metalb_map(address_map &map)
 	map(0x100000, 0x10ffff).ram();
 	map(0x300000, 0x30ffff).ram().share("spriteram");
 //  AM_RANGE(0x42000c, 0x42000f) AM_WRITENOP   /* zeroed */
-	map(0x500000, 0x50ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));     /* tilemaps */
-	map(0x530000, 0x53002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_word_r), FUNC(tc0480scp_device::ctrl_word_w));
+	map(0x500000, 0x50ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));     /* tilemaps */
+	map(0x530000, 0x53002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0x600000, 0x60001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0x00ff);
 	map(0x700000, 0x703fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x800000, 0x80000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_wordswap_r), FUNC(tc0510nio_device::halfword_wordswap_w));
@@ -1020,9 +1020,9 @@ void taitof2_state::deadconx_map(address_map &map)
 	map(0x100000, 0x10ffff).ram();
 	map(0x200000, 0x20ffff).ram().share("spriteram");
 	map(0x300000, 0x30000f).w(FUNC(taitof2_state::taitof2_spritebank_w));
-	map(0x400000, 0x40ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));     /* tilemaps */
+	map(0x400000, 0x40ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));     /* tilemaps */
 //    AM_RANGE(0x42000c, 0x42000f) AM_WRITENOP   /* zeroed */
-	map(0x430000, 0x43002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_word_r), FUNC(tc0480scp_device::ctrl_word_w));
+	map(0x430000, 0x43002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0x500000, 0x50001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0x00ff);  /* uses 500002 like a watchdog !? */
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x700000, 0x70001f).rw("te7750", FUNC(te7750_device::read), FUNC(te7750_device::write)).umask16(0x00ff);
@@ -4815,7 +4815,9 @@ ROM_START( footchmp )
 
 	/* no Delta-T samples */
 
-// Pals c80-08.45  c80-09.46
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "c80-08.ic45", 0x000, 0x104, CRC(6137dd15) SHA1(fb20df118da69b52767d5e6c81fa85174c50c5c5) ) // pal16l8bcn
+	ROM_LOAD( "c80-09.ic46", 0x200, 0x104, CRC(4ca48869) SHA1(8ba46ab625d3cbf3431ca2e6f3a9207d402202ef) ) // pal16l8bcn
 ROM_END
 
 ROM_START( hthero )

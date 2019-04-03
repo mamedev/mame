@@ -55,8 +55,6 @@ uint32_t segaybd_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			uint16_t *src = &sprites.pix(y);
 			uint8_t *pri = &screen.priority().pix(y);
 
-
-
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
