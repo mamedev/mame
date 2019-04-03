@@ -36,9 +36,9 @@ public:
 	may be needed when tilemaps use a palette area from sprites. */
 
 	u16 ram_r(offs_t offset);
-	void ram_w(offs_t offset, u16 data, u16 mem_mask);
+	void ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 ctrl_r(offs_t offset);
-	void ctrl_w(offs_t offset, u16 data, u16 mem_mask);
+	void ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void tilemap_update();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority);
