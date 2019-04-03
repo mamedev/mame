@@ -1469,7 +1469,7 @@ void taitol_state::l_system_video(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, taito_l);
-	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_444, 256);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGRBBBBGGGGRRRR_bit0, 256);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(taitol_state::vbl_interrupt), "screen", 0, 1);
 }

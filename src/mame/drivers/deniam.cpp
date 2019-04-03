@@ -79,7 +79,7 @@ void deniam_state::deniam16b_map(address_map &map)
 	map(0x400000, 0x40ffff).ram().w(FUNC(deniam_state::deniam_videoram_w)).share("videoram");
 	map(0x410000, 0x410fff).ram().w(FUNC(deniam_state::deniam_textram_w)).share("textram");
 	map(0x440000, 0x4407ff).writeonly().share("spriteram");
-	map(0x840000, 0x840fff).w(FUNC(deniam_state::deniam_palette_w)).share("paletteram");
+	map(0x840000, 0x840fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xc40000, 0xc40000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xc40002, 0xc40003).rw(FUNC(deniam_state::deniam_coinctrl_r), FUNC(deniam_state::deniam_coinctrl_w));
 	map(0xc40004, 0xc40005).w(FUNC(deniam_state::deniam_irq_ack_w));
@@ -113,7 +113,7 @@ void deniam_state::deniam16c_map(address_map &map)
 	map(0x400000, 0x40ffff).ram().w(FUNC(deniam_state::deniam_videoram_w)).share("videoram");
 	map(0x410000, 0x410fff).ram().w(FUNC(deniam_state::deniam_textram_w)).share("textram");
 	map(0x440000, 0x4407ff).writeonly().share("spriteram");
-	map(0x840000, 0x840fff).w(FUNC(deniam_state::deniam_palette_w)).share("paletteram");
+	map(0x840000, 0x840fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xc40001, 0xc40001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xc40002, 0xc40003).rw(FUNC(deniam_state::deniam_coinctrl_r), FUNC(deniam_state::deniam_coinctrl_w));
 	map(0xc40004, 0xc40005).w(FUNC(deniam_state::deniam_irq_ack_w));
@@ -272,7 +272,7 @@ void deniam_state::deniam16b(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_deniam);
-	PALETTE(config, m_palette).set_entries(2048);
+	PALETTE(config, m_palette).set_format(palette_device::xBGRBBBBGGGGRRRR_bit0, 2048); // bit 15 is toggle shadow / hilight?
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -306,7 +306,7 @@ void deniam_state::deniam16c(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_deniam);
-	PALETTE(config, m_palette).set_entries(2048);
+	PALETTE(config, m_palette).set_format(palette_device::xBGRBBBBGGGGRRRR_bit0, 2048); // bit 15 is toggle shadow / hilight?
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

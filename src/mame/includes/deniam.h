@@ -19,7 +19,6 @@ public:
 		m_videoram(*this, "videoram"),
 		m_textram(*this, "textram"),
 		m_spriteram(*this, "spriteram"),
-		m_paletteram(*this, "paletteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
@@ -38,7 +37,6 @@ private:
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_textram;
 	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_paletteram;
 
 	/* video-related */
 	tilemap_t        *m_fg_tilemap;
@@ -63,7 +61,6 @@ private:
 	DECLARE_WRITE16_MEMBER(deniam_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(deniam_videoram_w);
 	DECLARE_WRITE16_MEMBER(deniam_textram_w);
-	DECLARE_WRITE16_MEMBER(deniam_palette_w);
 	DECLARE_READ16_MEMBER(deniam_coinctrl_r);
 	DECLARE_WRITE16_MEMBER(deniam_coinctrl_w);
 	DECLARE_WRITE8_MEMBER(deniam16b_oki_rom_bank_w);
