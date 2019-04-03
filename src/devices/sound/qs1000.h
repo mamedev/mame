@@ -40,6 +40,7 @@ public:
 	//auto serial_w() { return m_serial_w_cb.bind(); }
 
 	// external
+	i8052_device &cpu() const { return *m_cpu; }
 	void serial_in(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( set_irq );
 

@@ -299,9 +299,9 @@ void kungfur_state::machine_reset()
 void kungfur_state::kungfur(machine_config &config)
 {
 	/* basic machine hardware */
-	M6809(config, m_maincpu, 8000000/2);	// 4MHz?
+	M6809(config, m_maincpu, 8000000/2);    // 4MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &kungfur_state::kungfur_map);
-	m_maincpu->set_periodic_int(FUNC(kungfur_state::kungfur_irq), attotime::from_hz(975));	// close approximation
+	m_maincpu->set_periodic_int(FUNC(kungfur_state::kungfur_irq), attotime::from_hz(975));  // close approximation
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	// $4008 - always $83 (PPI mode 0, ports B & lower C as input)
@@ -321,12 +321,12 @@ void kungfur_state::kungfur(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MSM5205(config, m_adpcm1, XTAL(384'000));	// clock verified with recording
+	MSM5205(config, m_adpcm1, XTAL(384'000));   // clock verified with recording
 	m_adpcm1->vck_legacy_callback().set(FUNC(kungfur_state::kfr_adpcm1_int));
 	m_adpcm1->set_prescaler_selector(msm5205_device::S48_4B);
 	m_adpcm1->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
-	MSM5205(config, m_adpcm2, XTAL(384'000));	// clock verified with recording
+	MSM5205(config, m_adpcm2, XTAL(384'000));   // clock verified with recording
 	m_adpcm2->vck_legacy_callback().set(FUNC(kungfur_state::kfr_adpcm2_int));
 	m_adpcm2->set_prescaler_selector(msm5205_device::S48_4B);
 	m_adpcm2->add_route(ALL_OUTPUTS, "rspeaker", 1.0);

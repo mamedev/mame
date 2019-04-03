@@ -87,9 +87,9 @@ WRITE8_MEMBER(mephisto_pinball_state::t0_t1_w)
 void mephisto_pinball_state::ay8910_update()
 {
 	if (m_ay8910_bdir)
-		m_aysnd->data_address_w(machine().dummy_space(), m_ay8910_bc1, m_ay8910_data);
+		m_aysnd->data_address_w(m_ay8910_bc1, m_ay8910_data);
 	else if (m_ay8910_bc1)
-		m_ay8910_data = m_aysnd->data_r(machine().dummy_space(), 0);
+		m_ay8910_data = m_aysnd->data_r();
 }
 
 WRITE8_MEMBER(mephisto_pinball_state::ay8910_columns_w)
@@ -160,17 +160,18 @@ void mephisto_pinball_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
+void mephisto_pinball_state::mephisto(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(18'000'000)/3)
-	MCFG_DEVICE_PROGRAM_MAP(mephisto_map)
-	//MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("muart", i8256_device, inta_cb)
+	I8088(config, m_maincpu, XTAL(18'000'000)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_pinball_state::mephisto_map);
+	//m_maincpu->set_irq_acknowledge_callback("muart", FUNC(i8256_device::inta_cb));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	//MCFG_DEVICE_ADD("muart", I8256, XTAL(18'000'000)/3)
-	//MCFG_I8256_IRQ_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	//MCFG_I8256_TXD_HANDLER(INPUTLINE("audiocpu", MCS51_RX_LINE))
+	//i8256_device &muart(I8256(config, "muart", XTAL(18'000'000)/3));
+	//muart.irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	//muart.txd_handler().set_inputline("audiocpu", MCS51_RX_LINE);
 
 	I8155(config, "ic20", XTAL(18'000'000)/6);
 	//i8155_device &i8155_1(I8155(config, "ic20", XTAL(18'000'000)/6));
@@ -195,21 +196,20 @@ MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 	m_aysnd->port_b_read_callback().set(FUNC(mephisto_pinball_state::ay8910_inputs_r));
 	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("dac", DAC08, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC08(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
-MACHINE_CONFIG_START(mephisto_pinball_state::sport2k)
+void mephisto_pinball_state::sport2k(machine_config &config)
+{
 	mephisto(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_IO_MAP(sport2k_8051_io)
+	subdevice<i8051_device>("soundcpu")->set_addrmap(AS_IO, &mephisto_pinball_state::sport2k_8051_io);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	YM3812(config, "ymsnd", XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 /*-------------------------------------------------------------------
 / Mephisto

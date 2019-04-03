@@ -110,7 +110,7 @@ READ8_MEMBER( pes_state::data_to_i8031)
 
 WRITE8_MEMBER(pes_state::data_from_i8031)
 {
-	m_terminal->write(space,0,data);
+	m_terminal->write(data);
 #ifdef DEBUG_SERIAL_CB
 	fprintf(stderr,"callback: output from i8031/pes to pc/terminal: %02X\n",data);
 #endif
@@ -123,7 +123,7 @@ WRITE8_MEMBER( pes_state::rsq_wsq_w )
 	logerror("port0 write: RSWS states updated: /RS: %d, /WS: %d\n", (data&0x2)>>1, data&0x1);
 #endif
 	/* /RS is bit 1, /WS is bit 0 */
-	m_speech->combined_rsq_wsq_w(space, 0, data&0x3);
+	m_speech->combined_rsq_wsq_w(data&0x3);
 }
 
 WRITE8_MEMBER( pes_state::port1_w )

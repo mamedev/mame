@@ -344,12 +344,12 @@ void yunsung8_state::machine_reset()
 void yunsung8_state::yunsung8(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(16'000'000)/2);		/* Z80B @ 8MHz? */
+	Z80(config, m_maincpu, XTAL(16'000'000)/2);     /* Z80B @ 8MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &yunsung8_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &yunsung8_state::port_map);
-	m_maincpu->set_vblank_int("screen", FUNC(yunsung8_state::irq0_line_assert));	/* No nmi routine */
+	m_maincpu->set_vblank_int("screen", FUNC(yunsung8_state::irq0_line_assert));    /* No nmi routine */
 
-	Z80(config, m_audiocpu, XTAL(16'000'000)/4);	/* ? */
+	Z80(config, m_audiocpu, XTAL(16'000'000)/4);    /* ? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &yunsung8_state::sound_map);
 
 	/* video hardware */
@@ -376,7 +376,7 @@ void yunsung8_state::yunsung8(machine_config &config)
 
 	MSM5205(config, m_msm, XTAL(400'000)); /* verified on pcb */
 	m_msm->vck_legacy_callback().set(FUNC(yunsung8_state::adpcm_int)); /* interrupt function */
-	m_msm->set_prescaler_selector(msm5205_device::S96_4B);	/* 4KHz, 4 Bits */
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  /* 4KHz, 4 Bits */
 	m_msm->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
 	m_msm->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
 }

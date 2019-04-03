@@ -254,14 +254,14 @@ WRITE8_MEMBER(ppking_state::cpu2_irq_ack_w)
 
 WRITE8_MEMBER(gladiatr_state_base::adpcm_command_w)
 {
-	m_soundlatch->write(space,0,data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ8_MEMBER(gladiatr_state_base::adpcm_command_r)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return m_soundlatch->read(space,0);
+	return m_soundlatch->read();
 }
 
 WRITE_LINE_MEMBER(gladiatr_state_base::flipscreen_w)
@@ -550,7 +550,7 @@ WRITE8_MEMBER(ppking_state::ppking_qx0_w)
 		m_mcu[0].txd = data;
 
 		m_mcu[1].rst = 0;
-		m_soundlatch2->write(space, 0, data & 0xff);
+		m_soundlatch2->write(data & 0xff);
 
 		mcu_input_check();
 
@@ -580,7 +580,7 @@ READ8_MEMBER(ppking_state::ppking_qx1_r)
 	if(m_mcu[1].rst == 1)
 		return 0x40;
 
-	return m_soundlatch2->read(space,0);
+	return m_soundlatch2->read();
 }
 
 READ8_MEMBER(ppking_state::ppking_qx3_r)
@@ -941,17 +941,17 @@ GFXDECODE_END
 void ppking_state::ppking(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 12_MHz_XTAL/2);	/* verified on pcb */
+	Z80(config, m_maincpu, 12_MHz_XTAL/2);  /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ppking_state::ppking_cpu1_map);
 	m_maincpu->set_addrmap(AS_IO, &ppking_state::ppking_cpu1_io);
 	m_maincpu->set_vblank_int("screen", FUNC(ppking_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, 12_MHz_XTAL/4);	/* verified on pcb */
+	Z80(config, m_subcpu, 12_MHz_XTAL/4);   /* verified on pcb */
 	m_subcpu->set_addrmap(AS_PROGRAM, &ppking_state::cpu2_map);
 	m_subcpu->set_addrmap(AS_IO, &ppking_state::ppking_cpu2_io);
 	m_subcpu->set_periodic_int(FUNC(ppking_state::irq0_line_assert), attotime::from_hz(60));
 
-	MC6809(config, m_audiocpu, 12_MHz_XTAL/4);	/* verified on pcb */
+	MC6809(config, m_audiocpu, 12_MHz_XTAL/4);  /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ppking_state::ppking_cpu3_map);
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
@@ -999,23 +999,23 @@ void ppking_state::ppking(machine_config &config)
 	ymsnd.add_route(3, "mono", 0.50);
 
 	MSM5205(config, m_msm, 455_kHz_XTAL); /* verified on pcb */
-	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);	/* vclk input mode */
+	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);  /* vclk input mode */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.60);
 }
 
 void gladiatr_state::gladiatr(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 12_MHz_XTAL/2);	/* verified on pcb */
+	Z80(config, m_maincpu, 12_MHz_XTAL/2);  /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gladiatr_state::gladiatr_cpu1_map);
 	m_maincpu->set_addrmap(AS_IO, &gladiatr_state::gladiatr_cpu1_io);
 	m_maincpu->set_vblank_int("screen", FUNC(gladiatr_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, 12_MHz_XTAL/4);	/* verified on pcb */
+	Z80(config, m_subcpu, 12_MHz_XTAL/4);   /* verified on pcb */
 	m_subcpu->set_addrmap(AS_PROGRAM, &gladiatr_state::cpu2_map);
 	m_subcpu->set_addrmap(AS_IO, &gladiatr_state::gladiatr_cpu2_io);
 
-	MC6809(config, m_audiocpu, 12_MHz_XTAL/4);	/* verified on pcb */
+	MC6809(config, m_audiocpu, 12_MHz_XTAL/4);  /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gladiatr_state::gladiatr_cpu3_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(gladiatr_state,gladiator)
@@ -1089,8 +1089,8 @@ void gladiatr_state::gladiatr(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.60);
 	ymsnd.add_route(3, "mono", 0.50);
 
-	MSM5205(config, m_msm, 455_kHz_XTAL);	/* verified on pcb */
-	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);	/* vclk input mode */
+	MSM5205(config, m_msm, 455_kHz_XTAL);   /* verified on pcb */
+	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);  /* vclk input mode */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.60);
 
 	LS259(config, "filtlatch", 0); // 9R - filters on sound output

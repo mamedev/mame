@@ -335,7 +335,8 @@ void joctronic_state::machine_reset()
 static INPUT_PORTS_START( joctronic )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(joctronic_state::joctronic)
+void joctronic_state::joctronic(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000)/4); // 3 MHz - uses WAIT
 	m_maincpu->set_addrmap(AS_PROGRAM, &joctronic_state::maincpu_map); // 139

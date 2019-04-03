@@ -284,15 +284,67 @@ void favorite_manager::add_favorite_software(ui_software_info const &swinfo)
 
 void favorite_manager::add_favorite(running_machine &machine)
 {
-#if 0
 	apply_running_machine(
 			machine,
-			[this] (auto &&key, bool &done)
+			[this, &machine] (game_driver const &driver, device_image_interface *imagedev, software_info const *software, bool &done)
 			{
-				add_impl(std::forward<decltype(key)>(key));
-				done = true;
+				if (imagedev)
+				{
+					// creating this is fairly expensive, but we'll assume this usually succeeds
+					ui_software_info info;
+					software_part const *const part(imagedev->part_entry());
+					assert(software);
+					assert(part);
+
+					// start with simple stuff that can just be copied
+					info.shortname = software->shortname();
+					info.longname = imagedev->longname();
+					info.parentname = software->parentname();
+					info.year = imagedev->year();
+					info.publisher = imagedev->manufacturer();
+					info.supported = imagedev->supported();
+					info.part = part->name();
+					info.driver = &driver;
+					info.listname = imagedev->software_list_name();
+					info.interface = part->interface();
+					info.instance = imagedev->instance_name();
+					info.startempty = 0;
+					info.devicetype = strensure(imagedev->image_type_name());
+					info.available = true;
+
+					// look up the parent in the list if necessary (eugh, O(n) walk)
+					if (!info.parentname.empty())
+					{
+						auto const listdev = software_list_device::find_by_name(machine.config(), info.listname);
+						assert(listdev);
+						for (software_info const &other : listdev->get_info())
+						{
+							if (other.shortname() == info.parentname)
+							{
+								info.parentlongname = other.longname();
+								break;
+							}
+						}
+					}
+
+					// fill in with the first usage entry we find
+					for (feature_list_item const &feature : software->other_info())
+					{
+						if (feature.name() == "usage")
+						{
+							info.usage = feature.value();
+							break;
+						}
+					}
+
+					// hooray for move semantics!
+					add_impl(std::move(info));
+				}
+				else
+				{
+					add_impl(driver);
+				}
 			});
-#endif
 }
 
 template <typename T> void favorite_manager::add_impl(T &&key)
@@ -335,10 +387,12 @@ bool favorite_manager::is_favorite(running_machine &machine) const
 	bool result(false);
 	apply_running_machine(
 			machine,
-			[this, &result] (auto const &key, bool &done)
+			[this, &result] (game_driver const &driver, device_image_interface *imagedev, software_info const *software, bool &done)
 			{
 				assert(!result);
-				result = check_impl(key);
+				result = imagedev
+						? check_impl(running_software_key(driver, imagedev->software_list_name(), software->shortname()))
+						: check_impl(driver);
 				done = done || result;
 			});
 	return result;
@@ -371,7 +425,14 @@ void favorite_manager::remove_favorite_software(ui_software_info const &swinfo)
 
 void favorite_manager::remove_favorite(running_machine &machine)
 {
-	apply_running_machine(machine, [this] (auto const &key, bool &done) { done = remove_impl(key); });
+	apply_running_machine(
+			machine,
+			[this] (game_driver const &driver, device_image_interface *imagedev, software_info const *software, bool &done)
+			{
+				done = imagedev
+						? remove_impl(running_software_key(driver, imagedev->software_list_name(), software->shortname()))
+						: remove_impl(driver);
+			});
 }
 
 template <typename T> bool favorite_manager::remove_impl(T const &key)
@@ -401,10 +462,10 @@ void favorite_manager::apply_running_machine(running_machine &machine, T &&actio
 {
 	bool done(false);
 
-	// TODO: this should be changed - it interacts poorly with slotted arcade systems
+	// TODO: this should be changed - it interacts poorly with cartslots on arcade systems
 	if ((machine.system().flags & machine_flags::MASK_TYPE) == machine_flags::TYPE_ARCADE)
 	{
-		action(machine.system(), done);
+		action(machine.system(), nullptr, nullptr, done);
 	}
 	else
 	{
@@ -417,14 +478,14 @@ void favorite_manager::apply_running_machine(running_machine &machine, T &&actio
 				assert(image_dev.software_list_name());
 
 				have_software = true;
-				action(running_software_key(machine.system(), image_dev.software_list_name(), sw->shortname()), done);
+				action(machine.system(), &image_dev, sw, done);
 				if (done)
 					return;
 			}
 		}
 
 		if (!have_software)
-			action(machine.system(), done);
+			action(machine.system(), nullptr, nullptr, done);
 	}
 }
 

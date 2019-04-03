@@ -45,6 +45,12 @@ extern const char UI_VERSION_TAG[];
 
 namespace ui {
 
+namespace {
+
+constexpr uint32_t FLAGS_UI = ui::menu::FLAG_LEFT_ARROW | ui::menu::FLAG_RIGHT_ARROW;
+
+} // anonymous namespace
+
 class menu_select_game::persistent_data
 {
 public:
@@ -501,48 +507,61 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 
 	set_switch_image();
 	int old_item_selected = -1;
-	constexpr uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 
 	if (!isfavorite())
 	{
 		m_populated_favorites = false;
+		m_displaylist.clear();
+		machine_filter const *const flt(m_persistent_data.filter_data().get_current_filter());
+
+		// if search is not empty, find approximate matches
 		if (!m_search.empty())
 		{
-			// if search is not empty, find approximate matches
 			populate_search();
+			if (flt)
+			{
+				for (auto it = m_searchlist.begin(); (m_searchlist.end() != it) && (MAX_VISIBLE_SEARCH > m_displaylist.size()); ++it)
+				{
+					if (flt->apply(it->second))
+						m_displaylist.emplace_back(it->second);
+				}
+			}
+			else
+			{
+				std::transform(
+						m_searchlist.begin(),
+						std::next(m_searchlist.begin(), (std::min)(m_searchlist.size(), MAX_VISIBLE_SEARCH)),
+						std::back_inserter(m_displaylist),
+						[] (auto const &entry) { return entry.second; });
+			}
 		}
 		else
 		{
-			// reset search string
-			m_search.clear();
-			m_displaylist.clear();
-
 			// if filter is set on category, build category list
-			machine_filter const *const flt(m_persistent_data.filter_data().get_current_filter());
 			std::vector<ui_system_info> const &sorted(m_persistent_data.sorted_list());
 			if (!flt)
 				std::copy(sorted.begin(), sorted.end(), std::back_inserter(m_displaylist));
 			else
 				flt->apply(sorted.begin(), sorted.end(), std::back_inserter(m_displaylist));
+		}
 
-			// iterate over entries
-			int curitem = 0;
-			for (ui_system_info const &elem : m_displaylist)
+		// iterate over entries
+		int curitem = 0;
+		for (ui_system_info const &elem : m_displaylist)
+		{
+			if (old_item_selected == -1 && elem.driver->name == reselect_last::driver())
+				old_item_selected = curitem;
+
+			bool cloneof = strcmp(elem.driver->parent, "0");
+			if (cloneof)
 			{
-				if (old_item_selected == -1 && elem.driver->name == reselect_last::driver())
-					old_item_selected = curitem;
-
-				bool cloneof = strcmp(elem.driver->parent, "0");
-				if (cloneof)
-				{
-					int cx = driver_list::find(elem.driver->parent);
-					if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
-						cloneof = false;
-				}
-
-				item_append(elem.driver->type.fullname(), "", (cloneof) ? (flags_ui | FLAG_INVERT) : flags_ui, (void *)elem.driver);
-				curitem++;
+				int cx = driver_list::find(elem.driver->parent);
+				if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
+					cloneof = false;
 			}
+
+			item_append(elem.driver->type.fullname(), "", (cloneof) ? (FLAGS_UI | FLAG_INVERT) : FLAGS_UI, (void *)elem.driver);
+			curitem++;
 		}
 	}
 	else
@@ -566,30 +585,30 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 								cloneof = false;
 						}
 
-						item_append(info.longname, "", cloneof ? (flags_ui | FLAG_INVERT) : flags_ui, (void *)&info);
+						item_append(info.longname, "", cloneof ? (FLAGS_UI | FLAG_INVERT) : FLAGS_UI, (void *)&info);
 					}
 					else
 					{
 						if (old_item_selected == -1 && info.shortname == reselect_last::driver())
 							old_item_selected = curitem;
 						item_append(info.longname, info.devicetype,
-									info.parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui), (void *)&info);
+									info.parentname.empty() ? FLAGS_UI : (FLAG_INVERT | FLAGS_UI), (void *)&info);
 					}
 					curitem++;
 				});
 	}
 
-	item_append(menu_item_type::SEPARATOR, flags_ui);
+	item_append(menu_item_type::SEPARATOR, FLAGS_UI);
 
 	// add special items
 	if (stack_has_special_main_menu())
 	{
-		item_append(_("Configure Options"), "", flags_ui, (void *)(uintptr_t)CONF_OPTS);
-		item_append(_("Configure Machine"), "", flags_ui, (void *)(uintptr_t)CONF_MACHINE);
+		item_append(_("Configure Options"), "", FLAGS_UI, (void *)(uintptr_t)CONF_OPTS);
+		item_append(_("Configure Machine"), "", FLAGS_UI, (void *)(uintptr_t)CONF_MACHINE);
 		skip_main_items = 2;
 		if (machine().options().plugins())
 		{
-			item_append(_("Plugins"), "", flags_ui, (void *)(uintptr_t)CONF_PLUGINS);
+			item_append(_("Plugins"), "", FLAGS_UI, (void *)(uintptr_t)CONF_PLUGINS);
 			skip_main_items++;
 		}
 	}
@@ -996,24 +1015,11 @@ void menu_select_game::populate_search()
 		}
 	}
 
-	// sort according to edit distance and put up to 200 in the menu
+	// sort according to edit distance
 	std::stable_sort(
 			m_searchlist.begin(),
 			m_searchlist.end(),
 			[] (auto const &lhs, auto const &rhs) { return lhs.first < rhs.first; });
-	uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
-	for (int curitem = 0; (std::min)(m_searchlist.size(), MAX_VISIBLE_SEARCH) > curitem; ++curitem)
-	{
-		game_driver const &drv(*m_searchlist[curitem].second.get().driver);
-		bool cloneof = strcmp(drv.parent, "0") != 0;
-		if (cloneof)
-		{
-			int const cx = driver_list::find(drv.parent);
-			if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
-				cloneof = false;
-		}
-		item_append(drv.type.fullname(), "", !cloneof ? flags_ui : (FLAG_INVERT | flags_ui), (void *)&drv);
-	}
 }
 
 //-------------------------------------------------
@@ -1069,6 +1075,21 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 	else
 		str << _("Sound\tOK\n");
 
+	if (flags.unemulated_features() & device_t::feature::CAPTURE)
+		str << _("Capture\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::CAPTURE)
+		str << _("Capture\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::CAMERA)
+		str << _("Camera\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::CAMERA)
+		str << _("Camera\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::MICROPHONE)
+		str << _("Microphone\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::MICROPHONE)
+		str << _("Microphone\tImperfect\n");
+
 	if (flags.unemulated_features() & device_t::feature::CONTROLS)
 		str << _("Controls\tUnimplemented\n");
 	else if (flags.imperfect_features() & device_t::feature::CONTROLS)
@@ -1084,15 +1105,10 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 	else if (flags.imperfect_features() & device_t::feature::MOUSE)
 		str << _("Mouse\tImperfect\n");
 
-	if (flags.unemulated_features() & device_t::feature::MICROPHONE)
-		str << _("Microphone\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::MICROPHONE)
-		str << _("Microphone\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::CAMERA)
-		str << _("Camera\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::CAMERA)
-		str << _("Camera\tImperfect\n");
+	if (flags.unemulated_features() & device_t::feature::MEDIA)
+		str << _("Media\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::MEDIA)
+		str << _("Media\tImperfect\n");
 
 	if (flags.unemulated_features() & device_t::feature::DISK)
 		str << _("Disk\tUnimplemented\n");
@@ -1103,6 +1119,31 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 		str << _("Printer\tUnimplemented\n");
 	else if (flags.imperfect_features() & device_t::feature::PRINTER)
 		str << _("Printer\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::TAPE)
+		str << _("Mag. Tape\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::TAPE)
+		str << _("Mag. Tape\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::PUNCH)
+		str << _("Punch Tape\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::PUNCH)
+		str << _("Punch Tape\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::DRUM)
+		str << _("Mag. Drum\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::DRUM)
+		str << _("Mag. Drum\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::ROM)
+		str << _("(EP)ROM\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::ROM)
+		str << _("(EP)ROM\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::COMMS)
+		str << _("Communications\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::COMMS)
+		str << _("Communications\tImperfect\n");
 
 	if (flags.unemulated_features() & device_t::feature::LAN)
 		str << _("LAN\tUnimplemented\n");
@@ -1207,12 +1248,12 @@ render_texture *menu_select_game::get_icon_texture(int linenum, void *selectedre
 
 		bitmap_argb32 tmp;
 		emu_file snapfile(std::string(m_icon_paths), OPEN_FLAG_READ);
-		if (snapfile.open(std::string(driver->name).append(".ico")) == osd_file::error::NONE)
+		if (snapfile.open(std::string(driver->name), ".ico") == osd_file::error::NONE)
 		{
 			render_load_ico_highest_detail(snapfile, tmp);
 			snapfile.close();
 		}
-		if (!tmp.valid() && cloneof && (snapfile.open(std::string(driver->parent).append(".ico")) == osd_file::error::NONE))
+		if (!tmp.valid() && cloneof && (snapfile.open(std::string(driver->parent), ".ico") == osd_file::error::NONE))
 		{
 			render_load_ico_highest_detail(snapfile, tmp);
 			snapfile.close();
@@ -1228,30 +1269,22 @@ render_texture *menu_select_game::get_icon_texture(int linenum, void *selectedre
 void menu_select_game::inkey_export()
 {
 	std::vector<game_driver const *> list;
-	if (!m_search.empty())
+	if (m_populated_favorites)
 	{
-		for (int curitem = 0; (std::min)(m_searchlist.size(), MAX_VISIBLE_SEARCH); ++curitem)
-			list.push_back(m_searchlist[curitem].second.get().driver);
+		// iterate over favorites
+		mame_machine_manager::instance()->favorite().apply(
+				[&list] (ui_software_info const &info)
+				{
+					assert(info.driver);
+					if (info.startempty)
+						list.push_back(info.driver);
+				});
 	}
 	else
 	{
-		if (m_populated_favorites)
-		{
-			// iterate over favorites
-			mame_machine_manager::instance()->favorite().apply(
-					[&list] (ui_software_info const &info)
-					{
-						assert(info.driver);
-						if (info.startempty)
-							list.push_back(info.driver);
-					});
-		}
-		else
-		{
-			list.reserve(m_displaylist.size());
-			for (ui_system_info const &info : m_displaylist)
-				list.emplace_back(info.driver);
-		}
+		list.reserve(m_displaylist.size());
+		for (ui_system_info const &info : m_displaylist)
+			list.emplace_back(info.driver);
 	}
 
 	menu::stack_push<menu_export>(ui(), container(), std::move(list));

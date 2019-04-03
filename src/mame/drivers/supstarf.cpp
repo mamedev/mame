@@ -89,8 +89,8 @@ READ8_MEMBER(supstarf_state::psg_latch_r)
 	{
 		if (m_pcs[d])
 		{
-			m_psg[d]->address_w(space, 0, offset);
-			result &= m_psg[d]->data_r(space, 0);
+			m_psg[d]->address_w(offset);
+			result &= m_psg[d]->data_r();
 		}
 	}
 
@@ -106,8 +106,8 @@ WRITE8_MEMBER(supstarf_state::psg_latch_w)
 	{
 		if (m_pcs[d])
 		{
-			m_psg[d]->address_w(space, 0, offset);
-			m_psg[d]->data_w(space, 0, data);
+			m_psg[d]->address_w(offset);
+			m_psg[d]->data_w(data);
 		}
 	}
 

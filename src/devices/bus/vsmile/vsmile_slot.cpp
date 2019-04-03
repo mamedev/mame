@@ -50,7 +50,7 @@ void device_vsmile_cart_interface::rom_alloc(uint32_t size, const char *tag)
 	if (m_rom == nullptr)
 	{
 		// We always alloc 8MB of ROM region
-		m_rom = (uint16_t *)device().machine().memory().region_alloc(std::string(tag).append(VSMILE_SLOT_ROM_REGION_TAG).c_str(), 0x800000, 2, ENDIANNESS_BIG)->base();
+		m_rom = (uint16_t *)device().machine().memory().region_alloc(std::string(tag).append(VSMILE_SLOT_ROM_REGION_TAG).c_str(), size, 2, ENDIANNESS_BIG)->base();
 		m_rom_size = size;
 	}
 }
@@ -138,9 +138,9 @@ image_init_result vsmile_cart_slot_device::call_load()
 	if (m_cart)
 	{
 		uint32_t size = loaded_through_softlist() ? get_software_region_length("rom") : length();
-		if (size > 0x800000)
+		if (size > 0x1000000)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a cart larger than 8MB");
+			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a cart larger than 16MB");
 			return image_init_result::FAIL;
 		}
 
@@ -171,7 +171,6 @@ image_init_result vsmile_cart_slot_device::call_load()
 
 		if (m_cart->get_nvram_size())
 		{
-			printf("nvram_size 1\n");
 			battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0x00);
 		}
 
@@ -188,8 +187,6 @@ image_init_result vsmile_cart_slot_device::call_load()
 
 void vsmile_cart_slot_device::call_unload()
 {
-	if (m_cart)
-		printf("nvram_size: %d\n", m_cart->get_nvram_size());
 	if (m_cart && m_cart->get_nvram_size())
 	{
 		battery_save(m_cart->get_nvram_base(), m_cart->get_nvram_size());
@@ -208,7 +205,7 @@ std::string vsmile_cart_slot_device::get_default_card_software(get_default_card_
 
 
 /*-------------------------------------------------
- read
+ cart accessors
  -------------------------------------------------*/
 
 READ16_MEMBER(vsmile_cart_slot_device::bank0_r)
@@ -231,11 +228,6 @@ READ16_MEMBER(vsmile_cart_slot_device::bank3_r)
 	return m_cart->bank3_r(space, offset, mem_mask);
 }
 
-
-/*-------------------------------------------------
- write
- -------------------------------------------------*/
-
 WRITE16_MEMBER(vsmile_cart_slot_device::bank0_w)
 {
 	m_cart->bank0_w(space, offset, data, mem_mask);
@@ -254,4 +246,9 @@ WRITE16_MEMBER(vsmile_cart_slot_device::bank2_w)
 WRITE16_MEMBER(vsmile_cart_slot_device::bank3_w)
 {
 	m_cart->bank3_w(space, offset, data, mem_mask);
+}
+
+void vsmile_cart_slot_device::set_cs2(bool cs2)
+{
+	m_cart->set_cs2(cs2);
 }

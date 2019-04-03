@@ -758,7 +758,7 @@ void gaiden_state::shadoww(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(gaiden_state::irq5_line_assert));
 
 	Z80(config, m_audiocpu, 4000000);  /* 4 MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &gaiden_state::sound_map);	/* IRQs are triggered by the YM2203 */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gaiden_state::sound_map);  /* IRQs are triggered by the YM2203 */
 
 	WATCHDOG_TIMER(config, "watchdog");
 

@@ -110,10 +110,10 @@ WRITE8_MEMBER( chaos_state::port1f_w )
 	if (!data)
 		data = 0x24;
 
-	m_terminal->write(space, 0, data);
+	m_terminal->write(data);
 
 	if (data == 0x0d)
-		m_terminal->write(space, 0, 0x0a);
+		m_terminal->write(0x0a);
 }
 
 READ8_MEMBER( chaos_state::port90_r )
@@ -148,17 +148,18 @@ void chaos_state::machine_reset()
 	memcpy(m_p_ram+0x7000, ROM+0x3000, 0x1000);
 }
 
-MACHINE_CONFIG_START(chaos_state::chaos)
+void chaos_state::chaos(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(1'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_DATA_MAP(data_map)
+	S2650(config, m_maincpu, XTAL(1'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &chaos_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &chaos_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &chaos_state::data_map);
 
 	/* video hardware */
 	GENERIC_TERMINAL(config, m_terminal, 0);
 	m_terminal->set_keyboard_callback(FUNC(chaos_state::kbd_put));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( chaos )

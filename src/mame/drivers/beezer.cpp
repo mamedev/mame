@@ -278,9 +278,9 @@ void beezer_state::palette_init(palette_device &device)
 
 WRITE8_MEMBER( beezer_state::palette_w )
 {
-	int r = combine_3_weights(m_weights_r, BIT(data, 0), BIT(data, 1), BIT(data, 2));
-	int g = combine_3_weights(m_weights_g, BIT(data, 3), BIT(data, 4), BIT(data, 5));
-	int b = combine_2_weights(m_weights_b, BIT(data, 6), BIT(data, 7));
+	int r = combine_weights(m_weights_r, BIT(data, 0), BIT(data, 1), BIT(data, 2));
+	int g = combine_weights(m_weights_g, BIT(data, 3), BIT(data, 4), BIT(data, 5));
+	int b = combine_weights(m_weights_b, BIT(data, 6), BIT(data, 7));
 
 	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }

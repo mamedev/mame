@@ -540,8 +540,8 @@ void suprgolf_state::suprgolf(machine_config &config)
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	MSM5205(config, m_msm, XTAL(384'000)); /* guess */
-	m_msm->vck_legacy_callback().set(FUNC(suprgolf_state::adpcm_int));	/* interrupt function */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 4KHz 4-bit */
+	m_msm->vck_legacy_callback().set(FUNC(suprgolf_state::adpcm_int));  /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 4KHz 4-bit */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

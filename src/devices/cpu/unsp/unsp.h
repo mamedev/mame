@@ -26,15 +26,15 @@
 ***************************************************************************/
 
 /* map variables */
-#define MAPVAR_PC				M0
-#define MAPVAR_CYCLES			M1
+#define MAPVAR_PC               M0
+#define MAPVAR_CYCLES           M1
 
-#define SINGLE_INSTRUCTION_MODE	(0)
+#define SINGLE_INSTRUCTION_MODE (0)
 
-#define ENABLE_UNSP_DRC			(1)
+#define ENABLE_UNSP_DRC         (1)
 
-#define UNSP_LOG_OPCODES		(0)
-#define UNSP_LOG_REGS			(0)
+#define UNSP_LOG_OPCODES        (0)
+#define UNSP_LOG_REGS           (0)
 
 //**************************************************************************
 //  TYPE DEFINITIONS

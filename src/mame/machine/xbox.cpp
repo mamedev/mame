@@ -787,7 +787,7 @@ void xbox_base_state::machine_start()
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("xbox", CMDFLAG_NONE, 0, 1, 4, std::bind(&xbox_base_state::xbox_debug_commands, this, _1, _2));
 	}
-	subdevice<xbox_eeprom_device>("pci:01.1:54")->hack_eeprom =
+	subdevice<xbox_eeprom_device>("pci:01.1:154")->hack_eeprom =
 		[&](void)
 	{
 		hack_eeprom();
@@ -838,23 +838,24 @@ void xbox_base_state::xbox_base_map_io(address_map &map)
 #endif
 }
 
-MACHINE_CONFIG_START(xbox_base_state::xbox_base)
+void xbox_base_state::xbox_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, PENTIUM3, 733333333) /* Wrong! family 6 model 8 stepping 10 */
-	MCFG_DEVICE_PROGRAM_MAP(xbox_base_map)
-	MCFG_DEVICE_IO_MAP(xbox_base_map_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(xbox_base_state, irq_callback)
+	PENTIUM3(config, m_maincpu, 733333333); /* Wrong! family 6 model 8 stepping 10 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &xbox_base_state::xbox_base_map);
+	m_maincpu->set_addrmap(AS_IO, &xbox_base_state::xbox_base_map_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(xbox_base_state::irq_callback));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	PCI_ROOT(config,        ":pci", 0);
 	NV2A_HOST(config,       ":pci:00.0", 0, m_maincpu);
 	NV2A_RAM(config,        ":pci:00.3", 0);
 	MCPX_ISALPC(config,     ":pci:01.0", 0, 0).interrupt_output().set(FUNC(xbox_base_state::maincpu_interrupt));
 	MCPX_SMBUS(config,      ":pci:01.1", 0).interrupt_handler().set(FUNC(xbox_base_state::smbus_interrupt_changed));
-	XBOX_PIC16LC(config,    ":pci:01.1:10", 0);
-	XBOX_CX25871(config,    ":pci:01.1:45", 0);
-	XBOX_EEPROM(config,     ":pci:01.1:54", 0);
+	XBOX_PIC16LC(config,    ":pci:01.1:110", 0); // these 3 are on smbus number 1
+	XBOX_CX25871(config,    ":pci:01.1:145", 0);
+	XBOX_EEPROM(config,     ":pci:01.1:154", 0);
 	MCPX_OHCI(config,       ":pci:02.0", 0).interrupt_handler().set(FUNC(xbox_base_state::ohci_usb_interrupt_changed));
 	MCPX_OHCI(config,       ":pci:03.0", 0);
 	MCPX_ETH(config,        ":pci:04.0", 0);
@@ -867,11 +868,11 @@ MACHINE_CONFIG_START(xbox_base_state::xbox_base)
 	NV2A_GPU(config,        ":pci:1e.0:00.0", 0, m_maincpu).interrupt_handler().set(FUNC(xbox_base_state::nv2a_interrupt_changed));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DRIVER(xbox_base_state, screen_update_callback)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xbox_base_state, vblank_callback))
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 639, 0, 479);
+	screen.set_screen_update(FUNC(xbox_base_state::screen_update_callback));
+	screen.screen_vblank().set(FUNC(xbox_base_state::vblank_callback));
+}

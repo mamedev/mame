@@ -10,17 +10,8 @@
 #include "plists.h"
 
 #include <algorithm>
-#include <stack>
 #include <atomic>
-
-template <typename T>
-std::size_t strlen_mem(const T *s)
-{
-	std::size_t len(0);
-	while (*s++)
-		++len;
-	return len;
-}
+#include <stack>
 
 template<typename F>
 int pstring_t<F>::compare(const pstring_t &right) const

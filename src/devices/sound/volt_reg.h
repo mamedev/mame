@@ -14,13 +14,10 @@
 #pragma once
 
 
-#define MCFG_VOLTAGE_REGULATOR_OUTPUT(_output) \
-	downcast<voltage_regulator_device &>(*device).set_output(_output);
-
 class voltage_regulator_device : public device_t, public device_sound_interface
 {
 public:
-	voltage_regulator_device &set_output(double analogue_dc) { m_output = (analogue_dc * 32768) / 5.0f; return *this; }
+	voltage_regulator_device &set_output(double analogue_dc) { m_output = (analogue_dc * 0x7fff) / 5.0f; return *this; }
 
 	voltage_regulator_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 

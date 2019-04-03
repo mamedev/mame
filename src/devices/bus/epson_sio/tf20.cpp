@@ -86,7 +86,8 @@ static void tf20_floppies(device_slot_interface &device)
 	device.option_add("sd320", EPSON_SD_320);
 }
 
-MACHINE_CONFIG_START(epson_tf20_device::device_add_mconfig)
+void epson_tf20_device::device_add_mconfig(machine_config &config)
+{
 	Z80(config, m_cpu, XTAL_CR1 / 2); /* uPD780C */
 	m_cpu->set_addrmap(AS_PROGRAM, &epson_tf20_device::cpu_mem);
 	m_cpu->set_addrmap(AS_IO, &epson_tf20_device::cpu_io);
@@ -109,10 +110,10 @@ MACHINE_CONFIG_START(epson_tf20_device::device_add_mconfig)
 		FLOPPY_CONNECTOR(config, fd, tf20_floppies, "sd320", floppy_image_device::default_floppy_formats);
 
 	// serial interface to another device
-	MCFG_EPSON_SIO_ADD("sio", nullptr)
-	MCFG_EPSON_SIO_RX(WRITELINE(DEVICE_SELF, epson_tf20_device, rxc_w))
-	MCFG_EPSON_SIO_PIN(WRITELINE(DEVICE_SELF, epson_tf20_device, pinc_w))
-MACHINE_CONFIG_END
+	EPSON_SIO(config, m_sio_output, nullptr);
+	m_sio_output->rx_callback().set(DEVICE_SELF, FUNC(epson_tf20_device::rxc_w));
+	m_sio_output->pin_callback().set(DEVICE_SELF, FUNC(epson_tf20_device::pinc_w));
+}
 
 
 //**************************************************************************

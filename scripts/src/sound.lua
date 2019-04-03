@@ -590,6 +590,7 @@ end
 ---------------------------------------------------
 -- Namco custom sound chips
 --@src/devices/sound/namco.h,SOUNDS["NAMCO"] = true
+--@src/devices/sound/namco_163.h,SOUNDS["NAMCO_163"] = true
 --@src/devices/sound/n63701x.h,SOUNDS["NAMCO_63701X"] = true
 --@src/devices/sound/c140.h,SOUNDS["C140"] = true
 --@src/devices/sound/c352.h,SOUNDS["C352"] = true
@@ -599,6 +600,13 @@ if (SOUNDS["NAMCO"]~=null or SOUNDS["NAMCO_15XX"]~=null or SOUNDS["NAMCO_CUS30"]
 	files {
 		MAME_DIR .. "src/devices/sound/namco.cpp",
 		MAME_DIR .. "src/devices/sound/namco.h",
+	}
+end
+
+if (SOUNDS["NAMCO_163"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/namco_163.cpp",
+		MAME_DIR .. "src/devices/sound/namco_163.h",
 	}
 end
 
@@ -642,7 +650,6 @@ end
 ---------------------------------------------------
 -- Nintendo custom sound chips
 --@src/devices/sound/nes_apu.h,SOUNDS["NES_APU"] = true
---@src/devices/sound/nes_vt_apu.h,SOUNDS["NES_APU"] = true
 ---------------------------------------------------
 
 if (SOUNDS["NES_APU"]~=null) then
@@ -650,8 +657,6 @@ if (SOUNDS["NES_APU"]~=null) then
 		MAME_DIR .. "src/devices/sound/nes_apu.cpp",
 		MAME_DIR .. "src/devices/sound/nes_apu.h",
 		MAME_DIR .. "src/devices/sound/nes_defs.h",
-		MAME_DIR .. "src/devices/sound/nes_vt_apu.cpp",
-		MAME_DIR .. "src/devices/sound/nes_vt_apu.h"
 	}
 end
 

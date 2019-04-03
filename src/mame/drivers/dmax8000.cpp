@@ -152,11 +152,12 @@ static void floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(dmax8000_state::dmax8000)
+void dmax8000_state::dmax8000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4'000'000) // no idea what crystal is used, but 4MHz clock is confirmed
-	MCFG_DEVICE_PROGRAM_MAP(dmax8000_mem)
-	MCFG_DEVICE_IO_MAP(dmax8000_io)
+	Z80(config, m_maincpu, 4'000'000); // no idea what crystal is used, but 4MHz clock is confirmed
+	m_maincpu->set_addrmap(AS_PROGRAM, &dmax8000_state::dmax8000_mem);
+	m_maincpu->set_addrmap(AS_IO, &dmax8000_state::dmax8000_io);
 	MCFG_MACHINE_RESET_OVERRIDE(dmax8000_state, dmax8000)
 
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 4_MHz_XTAL));
@@ -192,14 +193,13 @@ MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 	FD1793(config, m_fdc, 2'000'000); // no idea
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_fdc->drq_wr_callback().set(FUNC(dmax8000_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "8dsdd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	mm58274c_device &rtc(MM58274C(config, "rtc", 0)); // MM58174
 	// this is all guess
 	rtc.set_mode24(0); // 12 hour
 	rtc.set_day1(1);   // monday
-MACHINE_CONFIG_END
+}
 
 
 /* ROM definition */

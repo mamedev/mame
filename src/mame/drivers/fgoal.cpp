@@ -359,28 +359,28 @@ void fgoal_state::machine_reset()
 	m_prev_coin = 0;
 }
 
-MACHINE_CONFIG_START(fgoal_state::fgoal)
-
+void fgoal_state::fgoal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 10065000 / 10) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	M6800(config, m_maincpu, 10065000 / 10); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &fgoal_state::cpu_map);
 
 	/* add shifter */
 	MB14241(config, "mb14241");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 263)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 255)
-	MCFG_SCREEN_UPDATE_DRIVER(fgoal_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 263);
+	m_screen->set_visarea(0, 255, 16, 255);
+	m_screen->set_screen_update(FUNC(fgoal_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fgoal);
 	PALETTE(config, m_palette, FUNC(fgoal_state::fgoal_palette), 128 + 16 + 1);
 
 	/* sound hardware */
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( fgoal )

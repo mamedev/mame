@@ -121,20 +121,21 @@ static DEVICE_INPUT_DEFAULTS_START( uart2 )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(sys9002_state::sys9002)
+void sys9002_state::sys9002(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(2'000'000)) // XTAL not visible on images
-	MCFG_DEVICE_PROGRAM_MAP(sys9002_mem)
-	MCFG_DEVICE_IO_MAP(sys9002_io)
+	I8085A(config, m_maincpu, XTAL(2'000'000)); // XTAL not visible on images
+	m_maincpu->set_addrmap(AS_PROGRAM, &sys9002_state::sys9002_mem);
+	m_maincpu->set_addrmap(AS_IO, &sys9002_state::sys9002_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not correct
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mx2178)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not correct
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	//GFXDECODE(config, "gfxdecode", m_palette, gfx_mx2178);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* Devices */
@@ -172,7 +173,7 @@ MACHINE_CONFIG_START(sys9002_state::sys9002)
 	rs232b.dsr_handler().set("uart2", FUNC(i8251_device::write_dsr));
 	rs232b.cts_handler().set("uart2", FUNC(i8251_device::write_cts));
 	rs232b.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(uart2));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( sys9002 )

@@ -1440,9 +1440,10 @@ void diablo_hd_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 	}
 }
 
-MACHINE_CONFIG_START(diablo_hd_device::device_add_mconfig)
-	MCFG_DIABLO_ADD("drive")
-MACHINE_CONFIG_END
+void diablo_hd_device::device_add_mconfig(machine_config &config)
+{
+	DIABLO(config, "drive", 0);
+}
 
 
 DEFINE_DEVICE_TYPE(DIABLO_HD, diablo_hd_device, "diablo_hd", "Diablo Disk")

@@ -169,7 +169,7 @@ DEFINE_DEVICE_TYPE(I8087, i8087_device, "i8087", "Intel 8087")
 
 i8087_device::i8087_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_memory_interface(mconfig, *this),
+	m_space(*this, finder_base::DUMMY_TAG, -1),
 	m_int_handler(*this),
 	m_busy_handler(*this)
 {
@@ -178,13 +178,6 @@ i8087_device::i8087_device(const machine_config &mconfig, device_type type, cons
 i8087_device::i8087_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 		i8087_device(mconfig, I8087, tag, owner, clock)
 {
-}
-
-device_memory_interface::space_config_vector i8087_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_space_config),
-	};
 }
 
 void i8087_device::device_start()
@@ -220,11 +213,6 @@ void i8087_device::device_start()
 	m_busy_handler(1);
 	m_timer = timer_alloc();
 	build_opcode_table();
-}
-
-void i8087_device::device_config_complete()
-{
-	m_space_config = address_space_config("program", ENDIANNESS_LITTLE, m_data_width, 20);
 }
 
 void i8087_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

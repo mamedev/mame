@@ -20,6 +20,9 @@
 1942p                           // prototype
 1942h                           // hack (Two Bit Score?)
 
+@source:gamemachine.cpp
+2001tgm                         //
+
 // hazeltin.cpp
 hazl1500                        // Hazeltine 1500 (c) 1977
 
@@ -83,7 +86,7 @@ stuntcyc                        // (c) 1976 Atari
 // Atari TTL Missing Rom Dumps
 //astrotrf                      // (c) 1975 Atari
 //lemans                        // (c) 1974 Atari
-//gtrak10                       // (c) 1974 Atari / Kee
+gtrak10                         // (c) 1974 Atari / Kee
 //gtrak20                       // (c) 1976 Atari / Kee
 //qwak                          // (c) 1974 Atari
 // Atari 100% TTL
@@ -98,7 +101,6 @@ stuntcyc                        // (c) 1976 Atari
 //pinpong                       // (c) 1974 Atari
 //pursuit                       // (c) 1975 Atari / Kee
 //quadpong                      // (c) 1974 Atari
-//rebound                       // (c) 1974 Atari / Kee
 //spacrace                      // (c) 1973 Atari
 //touchme                       // (c) 1974 Atari
 //worldcup                      // (c) 1974 Atari
@@ -108,6 +110,7 @@ breakout                        // (c) 1976 Atari
 pong                            // (c) 1972 Atari
 pongd                           // (c) 1973 Atari
 pongf                           // (c) 1972 Atari
+rebound                         // (c) 1974 Atari
 //coupedav                      // (c) 1973 Atari France
 //pongbarl                      // (c) 1973 Atari
 //cktpong                       // (c) 1974 Atari / National Entertainment Co.

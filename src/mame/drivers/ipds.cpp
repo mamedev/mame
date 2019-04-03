@@ -134,20 +134,21 @@ void ipds_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-MACHINE_CONFIG_START(ipds_state::ipds)
+void ipds_state::ipds(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(19'660'800) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(ipds_mem)
-	MCFG_DEVICE_IO_MAP(ipds_io)
+	I8085A(config, m_maincpu, XTAL(19'660'800) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ipds_state::ipds_mem);
+	m_maincpu->set_addrmap(AS_IO, &ipds_state::ipds_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ipds)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_screen_update("i8275", FUNC(i8275_device::screen_update));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_ipds);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	I8275(config, m_crtc, XTAL(19'660'800) / 4);
@@ -156,7 +157,7 @@ MACHINE_CONFIG_START(ipds_state::ipds)
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(ipds_state::kbd_put));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( ipds )

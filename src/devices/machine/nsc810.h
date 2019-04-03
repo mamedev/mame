@@ -29,7 +29,7 @@ public:
 		set_timer0_clock(clk0.value());
 		set_timer1_clock(clk1.value());
 	}
-	
+
 	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto portA_read_callback() { return m_portA_r.bind(); }
@@ -46,8 +46,8 @@ public:
 	void set_timer1_clock(uint32_t clk) { m_timer1_clock = clk; }
 	void set_timer1_clock(const XTAL &clk) { set_timer1_clock(clk.value()); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	virtual void device_start() override;

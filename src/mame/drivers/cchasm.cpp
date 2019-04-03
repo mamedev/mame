@@ -146,11 +146,11 @@ static const z80_daisy_config daisy_chain[] =
  *
  *************************************/
 
-MACHINE_CONFIG_START(cchasm_state::cchasm)
-
+void cchasm_state::cchasm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, CCHASM_68K_CLOCK)    /* 8 MHz (from schematics) */
-	MCFG_DEVICE_PROGRAM_MAP(memmap)
+	M68000(config, m_maincpu, CCHASM_68K_CLOCK);    /* 8 MHz (from schematics) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cchasm_state::memmap);
 
 	Z80(config, m_audiocpu, 3584229);       /* 3.58  MHz (from schematics) */
 	m_audiocpu->set_daisy_config(daisy_chain);
@@ -166,11 +166,11 @@ MACHINE_CONFIG_START(cchasm_state::cchasm)
 
 	/* video hardware */
 	VECTOR(config, m_vector, 0);
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(40)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
+	m_screen->set_refresh_hz(40);
+	m_screen->set_size(400, 300);
+	m_screen->set_visarea(0, 1024-1, 0, 768-1);
+	m_screen->set_screen_update("vector", FUNC(vector_device::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -184,17 +184,17 @@ MACHINE_CONFIG_START(cchasm_state::cchasm)
 
 	AY8910(config, "ay2", 1818182).add_route(ALL_OUTPUTS, "speaker", 0.2);
 
-	MCFG_DEVICE_ADD("dac1", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
 
 	/* 6840 PTM */
 	ptm6840_device &ptm(PTM6840(config, "6840ptm", CCHASM_68K_CLOCK/10));
 	ptm.set_external_clocks(0, (CCHASM_68K_CLOCK / 10).value(), 0);
 	ptm.irq_callback().set_inputline("maincpu", 4);
-MACHINE_CONFIG_END
+}
 
 
 

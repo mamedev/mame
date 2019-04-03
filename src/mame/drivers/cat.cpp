@@ -1054,23 +1054,23 @@ WRITE_LINE_MEMBER(cat_state::prn_ack_ff) // switch the flipflop state on the ris
 #endif
 }
 
-MACHINE_CONFIG_START(cat_state::cat)
-
+void cat_state::cat(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(19'968'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(cat_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cat_state,cat_int_ack)
+	M68000(config, m_maincpu, XTAL(19'968'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cat_state::cat_mem);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(cat_state::cat_int_ack));
 
 	MCFG_MACHINE_START_OVERRIDE(cat_state,cat)
 	MCFG_MACHINE_RESET_OVERRIDE(cat_state,cat)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(672, 344)
-	MCFG_SCREEN_VISIBLE_AREA(0, 672-1, 0, 344-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cat_state, screen_update_cat)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(672, 344);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(cat_state::screen_update_cat));
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 
@@ -1083,13 +1083,15 @@ MACHINE_CONFIG_START(cat_state::cat)
 	CENTRONICS(config, m_ctx, centronics_devices, "printer");
 	m_ctx->ack_handler().set(FUNC(cat_state::prn_ack_ff));
 	m_ctx->busy_handler().set(m_duart, FUNC(mc68681_device::ip4_w)).invert();
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", "ctx")
+
+	OUTPUT_LATCH(config, m_ctx_data_out);
+	m_ctx->set_output_latch(*m_ctx_data_out);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 ROM_START( cat )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )

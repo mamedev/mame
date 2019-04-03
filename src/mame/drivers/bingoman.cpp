@@ -379,28 +379,28 @@ void bingoman_state::bingoman_palette(palette_device &palette) const
 {
 }
 
-MACHINE_CONFIG_START(bingoman_state::bingoman)
-
+void bingoman_state::bingoman(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", H83002, XTAL(20'000'000)) /* TODO: correct CPU type */
-	MCFG_DEVICE_PROGRAM_MAP(bingoman_prg_map)
-	MCFG_DEVICE_IO_MAP(bingoman_io_map)
+	H83002(config, m_maincpu, XTAL(20'000'000)); /* TODO: correct CPU type */
+	m_maincpu->set_addrmap(AS_PROGRAM, &bingoman_state::bingoman_prg_map);
+	m_maincpu->set_addrmap(AS_IO, &bingoman_state::bingoman_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(bingoman_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(bingoman_state::screen_update));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea_full();
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_bingoman);
 	PALETTE(config, "palette", FUNC(bingoman_state::bingoman_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

@@ -1114,14 +1114,14 @@ void mpu4_state::update_ay(device_t *device)
 
 		case 0x02:
 			/* CA2 = 0 CB2 = 1? : Write to selected PSG register and write data to Port A */
-			m_ay8913->data_w(generic_space(), 0, m_pia6->a_output());
+			m_ay8913->data_w(m_pia6->a_output());
 			LOG(("AY Chip Write \n"));
 			break;
 
 		case 0x03:
 			/* CA2 = 1 CB2 = 1? : The register will now be selected and the user can read from or write to it.
 			The register will remain selected until another is chosen.*/
-			m_ay8913->address_w(generic_space(), 0, m_pia6->a_output());
+			m_ay8913->address_w(m_pia6->a_output());
 			LOG(("AY Chip Select \n"));
 			break;
 
@@ -1333,7 +1333,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic8_cb2_w)
 WRITE8_MEMBER(mpu4_state::pia_gb_porta_w)
 {
 	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", machine().describe_context(),data));
-	m_msm6376->write(space, 0, data);
+	m_msm6376->write(data);
 }
 
 WRITE8_MEMBER(mpu4_state::pia_gb_portb_w)
@@ -1422,7 +1422,7 @@ calculate the oscillation frequency in advance. We're running the timer for inte
 purposes, but the frequency calculation is done by plucking the values out as they are written.*/
 WRITE8_MEMBER(mpu4_state::ic3ss_w)
 {
-	m_ptm_ic3ss->write(space, offset,data);
+	m_ptm_ic3ss->write(offset,data);
 
 	if (offset == 3)
 	{
@@ -2115,12 +2115,12 @@ READ8_MEMBER(mpu4_state::bwb_characteriser_r)
 
 WRITE8_MEMBER(mpu4_state::mpu4_ym2413_w)
 {
-	if (m_ym2413) m_ym2413->write(space,offset,data);
+	if (m_ym2413) m_ym2413->write(offset,data);
 }
 
 READ8_MEMBER(mpu4_state::mpu4_ym2413_r)
 {
-//  if (m_ym2413) return m_ym2413->read(space,offset);
+//  if (m_ym2413) return m_ym2413->read(offset);
 	return 0xff;
 }
 
@@ -2135,8 +2135,8 @@ void mpu4_state::mpu4_install_mod4oki_space(address_space &space)
 {
 	pia6821_device *pia_ic4ss = subdevice<pia6821_device>("pia_ic4ss");
 
-	space.install_readwrite_handler(0x0880, 0x0883, read8_delegate(FUNC(pia6821_device::read), pia_ic4ss), write8_delegate(FUNC(pia6821_device::write), pia_ic4ss));
-	space.install_read_handler(0x08c0, 0x08c7, read8_delegate(FUNC(ptm6840_device::read), (ptm6840_device*)m_ptm_ic3ss));
+	space.install_readwrite_handler(0x0880, 0x0883, read8sm_delegate(FUNC(pia6821_device::read), pia_ic4ss), write8sm_delegate(FUNC(pia6821_device::write), pia_ic4ss));
+	space.install_read_handler(0x08c0, 0x08c7, read8sm_delegate(FUNC(ptm6840_device::read), (ptm6840_device*)m_ptm_ic3ss));
 	space.install_write_handler(0x08c0, 0x08c7, write8_delegate(FUNC(mpu4_state::ic3ss_w),this));
 }
 
@@ -3067,12 +3067,12 @@ void mpu4_state::mpu4_common2(machine_config &config)
 }
 
 /* machine driver for MOD 2 board */
-MACHINE_CONFIG_START(mpu4_state::mpu4base)
-
+void mpu4_state::mpu4base(machine_config &config)
+{
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mod2    )
 	MCFG_MACHINE_RESET_OVERRIDE(mpu4_state,mpu4)
-	MCFG_DEVICE_ADD("maincpu", MC6809, MPU4_MASTER_CLOCK) // MC68B09P
-	MCFG_DEVICE_PROGRAM_MAP(mpu4_memmap)
+	MC6809(config, m_maincpu, MPU4_MASTER_CLOCK); // MC68B09P
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap);
 
 	mpu4_common(config);
 
@@ -3082,7 +3082,7 @@ MACHINE_CONFIG_START(mpu4_state::mpu4base)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	config.set_default_layout(layout_mpu4);
-MACHINE_CONFIG_END
+}
 
 
 void mpu4_state::mod2(machine_config &config)
@@ -3109,71 +3109,77 @@ void mpu4_state::mod2_alt(machine_config &config)
 
 
 
-MACHINE_CONFIG_START(mpu4_state::mod4yam)
+void mpu4_state::mod4yam(machine_config &config)
+{
 	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
 
 	mpu4_std_6reel(config);
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, MPU4_MASTER_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	YM2413(config, m_ym2413, MPU4_MASTER_CLOCK/4);
+	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(mpu4_state::mod4oki)
+void mpu4_state::mod4oki(machine_config &config)
+{
 	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
 
 	mpu4_common2(config);
 	mpu4_std_6reel(config);
 
-	MCFG_DEVICE_ADD("msm6376", OKIM6376, 128000)     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	OKIM6376(config, m_msm6376, 128000);     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
+	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(mpu4_state::mod4oki_alt)
+void mpu4_state::mod4oki_alt(machine_config &config)
+{
 	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
 
 	mpu4_common2(config);
 	mpu4_type2_6reel(config);
 
-	MCFG_DEVICE_ADD("msm6376", OKIM6376, 128000)     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	OKIM6376(config, m_msm6376, 128000);     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
+	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(mpu4_state::mod4oki_5r)
+void mpu4_state::mod4oki_5r(machine_config &config)
+{
 	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
 
 	mpu4_common2(config);
 	mpu4_std_5reel(config);
 
-	MCFG_DEVICE_ADD("msm6376", OKIM6376, 128000)     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	OKIM6376(config, m_msm6376, 128000);     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
+	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(mpu4_state::bwboki)
+void mpu4_state::bwboki(machine_config &config)
+{
 	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4bwb)
 	mpu4_common2(config);
 	mpu4_bwb_5reel(config);
 
-	MCFG_DEVICE_ADD("msm6376", OKIM6376, 128000)     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	OKIM6376(config, m_msm6376, 128000);     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
+	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(mpu4_state::mpu4crys)
+void mpu4_state::mpu4crys(machine_config &config)
+{
 	mod2(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4cry)
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	upd7759_device &upd(UPD7759(config, "upd"));
+	upd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	upd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)

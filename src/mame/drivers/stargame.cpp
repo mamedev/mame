@@ -103,21 +103,22 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-MACHINE_CONFIG_START(stargame_state::stargame)
+void stargame_state::stargame(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 15000000 / 4); // clock line marked as CK4 and derived from 15MHz crystal
 	m_maincpu->set_addrmap(AS_PROGRAM, &stargame_state::maincpu_map);
 	m_maincpu->set_addrmap(AS_IO, &stargame_state::maincpu_io);
 	m_maincpu->set_daisy_config(daisy_chain);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 15000000 / 3) // ? check divider - clock line marked as CK6 and derived from 15MHz crystal
-	MCFG_DEVICE_PROGRAM_MAP(audiocpu_map)
-	MCFG_DEVICE_IO_MAP(audiocpu_io)
+	Z80(config, m_audiocpu, 15000000 / 3); // ? check divider - clock line marked as CK6 and derived from 15MHz crystal
+	m_audiocpu->set_addrmap(AS_PROGRAM, &stargame_state::audiocpu_map);
+	m_audiocpu->set_addrmap(AS_IO, &stargame_state::audiocpu_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(stargame_state, stargame)
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT()
+	//config.set_default_layout();
 
 	Z80CTC(config, m_ctc, 15000000 / 4);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -126,8 +127,7 @@ MACHINE_CONFIG_START(stargame_state::stargame)
 	/* sound hardware */
 	genpin_audio(config);
 	SPEAKER(config, "measnd").front_center();
-	MCFG_DEVICE_ADD("mea8000", MEA8000, 15000000 / 4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "measnd", 1.0)
+	MEA8000(config, "mea8000", 15000000 / 4).add_route(ALL_OUTPUTS, "measnd", 1.0);
 	SPEAKER(config, "aysnd").front_center();
 	AY8910(config, "ay", 15000000 / 8).add_route(ALL_OUTPUTS, "aysnd", 0.25); // clock line marked as CK2 and derived from 15MHz crystal
 
@@ -144,7 +144,7 @@ MACHINE_CONFIG_START(stargame_state::stargame)
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	WATCHDOG_TIMER(config, "watchdog");
-MACHINE_CONFIG_END
+}
 
 ROM_START(spcship)
 	ROM_REGION(0x4000, "maincpu", 0)

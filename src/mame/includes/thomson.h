@@ -379,14 +379,14 @@ private:
 
 	void to7_network_got_frame(uint8_t *data, int length);
 
-	void mo5(address_map &map);
-	void mo5nr(address_map &map);
-	void mo6(address_map &map);
-	void to7(address_map &map);
-	void to770(address_map &map);
-	void to8(address_map &map);
-	void to9(address_map &map);
-	void to9p(address_map &map);
+	void mo5_map(address_map &map);
+	void mo5nr_map(address_map &map);
+	void mo6_map(address_map &map);
+	void to7_map(address_map &map);
+	void to770_map(address_map &map);
+	void to8_map(address_map &map);
+	void to9_map(address_map &map);
+	void to9p_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;

@@ -520,7 +520,8 @@ to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char
 {
 }
 
-MACHINE_CONFIG_START(to7_io_line_device::device_add_mconfig)
+void to7_io_line_device::device_add_mconfig(machine_config &config)
+{
 	/// THIS PIO is part of CC 90-232 expansion
 	PIA6821(config, m_pia_io, 0);
 	m_pia_io->readpa_handler().set(FUNC(to7_io_line_device::porta_in));
@@ -535,13 +536,13 @@ MACHINE_CONFIG_START(to7_io_line_device::device_add_mconfig)
 	m_rs232->cts_handler().set(FUNC(to7_io_line_device::write_cts));
 	m_rs232->dsr_handler().set(FUNC(to7_io_line_device::write_dsr));
 
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(THOM_PIA_IO, pia6821_device, cb1_w))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, to7_io_line_device, write_centronics_busy))
+	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics.ack_handler().set(m_pia_io, FUNC(pia6821_device::cb1_w));
+	centronics.busy_handler().set(FUNC(to7_io_line_device::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-
-MACHINE_CONFIG_END
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	centronics.set_output_latch(cent_data_out);
+}
 
 
 void to7_io_line_device::device_start()
@@ -683,7 +684,7 @@ READ8_MEMBER( thomson_state::to7_modem_mea8000_r )
 		{
 		case 0:
 		case 1:
-			return m_acia->read(space, offset & 1);
+			return m_acia->read(offset & 1);
 
 		default:
 			return 0;
@@ -705,7 +706,7 @@ WRITE8_MEMBER( thomson_state::to7_modem_mea8000_w )
 		{
 		case 0:
 		case 1:
-			m_acia->write(space, offset & 1, data);
+			m_acia->write(offset & 1, data);
 			break;
 		}
 	}

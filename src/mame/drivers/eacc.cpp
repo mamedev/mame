@@ -245,10 +245,11 @@ WRITE8_MEMBER( eacc_state::eacc_digit_w )
  Machine Drivers
 ******************************************************************************/
 
-MACHINE_CONFIG_START(eacc_state::eacc)
+void eacc_state::eacc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(3'579'545))  /* Divided by 4 inside the m6802*/
-	MCFG_DEVICE_PROGRAM_MAP(eacc_mem)
+	M6802(config, m_maincpu, XTAL(3'579'545));  /* Divided by 4 inside the m6802*/
+	m_maincpu->set_addrmap(AS_PROGRAM, &eacc_state::eacc_mem);
 
 	config.set_default_layout(layout_eacc);
 
@@ -264,9 +265,9 @@ MACHINE_CONFIG_START(eacc_state::eacc)
 	m_pia->irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("eacc_nmi", eacc_state, eacc_nmi, attotime::from_hz(600))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("eacc_cb1", eacc_state, eacc_cb1, attotime::from_hz(30))
-MACHINE_CONFIG_END
+	TIMER(config, "eacc_nmi").configure_periodic(FUNC(eacc_state::eacc_nmi), attotime::from_hz(600));
+	TIMER(config, "eacc_cb1").configure_periodic(FUNC(eacc_state::eacc_cb1), attotime::from_hz(30));
+}
 
 
 

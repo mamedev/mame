@@ -4247,7 +4247,7 @@ void dynax_state::cdracula(machine_config &config)
 void dynax_state::hanamai(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 22000000 / 4);	/* 5.5MHz */
+	Z80(config, m_maincpu, 22000000 / 4);   /* 5.5MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::sprtmtch_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dynax_state::hanamai_io_map);
 	m_maincpu->set_irq_acknowledge_callback("mainirq", FUNC(rst_pos_buffer_device::inta_cb));   // IM 0 needs an opcode on the data bus
@@ -4303,8 +4303,8 @@ void dynax_state::hanamai(machine_config &config)
 	ym2203.add_route(3, "mono", 0.50);
 
 	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(dynax_state::adpcm_int));		/* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 KHz, 4 Bits  */
+	m_msm->vck_legacy_callback().set(FUNC(dynax_state::adpcm_int));     /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits  */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -4317,7 +4317,7 @@ void dynax_state::hanamai(machine_config &config)
 void dynax_state::hnoridur(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(22'000'000) / 4);	/* 5.5MHz */
+	Z80(config, m_maincpu, XTAL(22'000'000) / 4);   /* 5.5MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::hnoridur_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dynax_state::hnoridur_io_map);
 	m_maincpu->set_irq_acknowledge_callback("mainirq", FUNC(rst_pos_buffer_device::inta_cb));   // IM 0 needs an opcode on the data bus
@@ -4371,8 +4371,8 @@ void dynax_state::hnoridur(machine_config &config)
 	YM2413(config, "ym2413", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	MSM5205(config, m_msm, XTAL(384'000));
-	m_msm->vck_legacy_callback().set(FUNC(dynax_state::adpcm_int));	/* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 KHz, 4 Bits  */
+	m_msm->vck_legacy_callback().set(FUNC(dynax_state::adpcm_int)); /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits  */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -4387,7 +4387,7 @@ void dynax_state::hjingi(machine_config &config)
 	Z80(config, m_maincpu, XTAL(22'000'000) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::hjingi_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dynax_state::hjingi_io_map);
-	m_maincpu->set_irq_acknowledge_callback("mainirq", FUNC(rst_pos_buffer_device::inta_cb));	// IM 0 needs an opcode on the data bus
+	m_maincpu->set_irq_acknowledge_callback("mainirq", FUNC(rst_pos_buffer_device::inta_cb));   // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hjingi)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4440,8 +4440,8 @@ void dynax_state::hjingi(machine_config &config)
 	YM2413(config, "ym2413", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	MSM5205(config, m_msm, XTAL(384'000));
-	m_msm->vck_legacy_callback().set(FUNC(dynax_state::adpcm_int));		/* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 KHz, 4 Bits  */
+	m_msm->vck_legacy_callback().set(FUNC(dynax_state::adpcm_int));     /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits  */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -4453,10 +4453,10 @@ void dynax_state::hjingi(machine_config &config)
 void dynax_state::sprtmtch(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 22000000 / 4);	/* 5.5MHz */
+	Z80(config, m_maincpu, 22000000 / 4);   /* 5.5MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::sprtmtch_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dynax_state::sprtmtch_io_map);
-	m_maincpu->set_irq_acknowledge_callback("mainirq", FUNC(rst_pos_buffer_device::inta_cb));	// IM 0 needs an opcode on the data bus
+	m_maincpu->set_irq_acknowledge_callback("mainirq", FUNC(rst_pos_buffer_device::inta_cb));   // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4662,15 +4662,15 @@ MACHINE_START_MEMBER(dynax_state,jantouki)
 void dynax_state::jantouki(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 22000000 / 4);	/* 5.5MHz */
+	Z80(config, m_maincpu, 22000000 / 4);   /* 5.5MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::jantouki_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dynax_state::jantouki_io_map);
-	m_maincpu->set_irq_acknowledge_callback("mainirq", FUNC(rst_pos_buffer_device::inta_cb));	// IM 0 needs an opcode on the data bus
+	m_maincpu->set_irq_acknowledge_callback("mainirq", FUNC(rst_pos_buffer_device::inta_cb));   // IM 0 needs an opcode on the data bus
 
-	Z80(config, m_soundcpu, 22000000 / 4);	/* 5.5MHz */
+	Z80(config, m_soundcpu, 22000000 / 4);  /* 5.5MHz */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &dynax_state::jantouki_sound_mem_map);
 	m_soundcpu->set_addrmap(AS_IO, &dynax_state::jantouki_sound_io_map);
-	m_soundcpu->set_irq_acknowledge_callback("soundirq", FUNC(rst_pos_buffer_device::inta_cb));	// IM 0 needs an opcode on the data bus
+	m_soundcpu->set_irq_acknowledge_callback("soundirq", FUNC(rst_pos_buffer_device::inta_cb)); // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,jantouki)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4739,8 +4739,8 @@ void dynax_state::jantouki(machine_config &config)
 	ym2203.add_route(3, "mono", 0.50);
 
 	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(dynax_state::adpcm_int_cpu1));	/* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 KHz, 4 Bits  */
+	m_msm->vck_legacy_callback().set(FUNC(dynax_state::adpcm_int_cpu1));    /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits  */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* devices */

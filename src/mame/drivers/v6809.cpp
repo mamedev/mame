@@ -203,7 +203,7 @@ WRITE8_MEMBER( v6809_state::videoram_w )
 
 WRITE8_MEMBER( v6809_state::v6809_address_w )
 {
-	m_crtc->address_w( space, 0, data );
+	m_crtc->address_w(data);
 
 	m_video_index = data & 0x1f;
 
@@ -215,7 +215,7 @@ WRITE8_MEMBER( v6809_state::v6809_register_w )
 {
 	uint16_t temp = m_video_address;
 
-	m_crtc->register_w( space, 0, data );
+	m_crtc->register_w(data);
 
 	// Get transparent address
 	if (m_video_index == 18)
@@ -282,26 +282,26 @@ static void v6809_floppies(device_slot_interface &device)
 
 // *** Machine ****
 
-MACHINE_CONFIG_START(v6809_state::v6809)
+void v6809_state::v6809(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, 16_MHz_XTAL / 4) // divided by 4 again internally
-	MCFG_DEVICE_PROGRAM_MAP(v6809_mem)
+	MC6809(config, m_maincpu, 16_MHz_XTAL / 4); // divided by 4 again internally
+	m_maincpu->set_addrmap(AS_PROGRAM, &v6809_state::v6809_mem);
 	MCFG_MACHINE_RESET_OVERRIDE(v6809_state, v6809)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update("crtc", FUNC(sy6545_1_device::screen_update));
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_v6809)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_v6809);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
 	SY6545_1(config, m_crtc, 16_MHz_XTAL / 8);
@@ -349,9 +349,8 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	rtc.set_day1(1);   // monday
 
 	MB8876(config, m_fdc, 16_MHz_XTAL / 16);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+}
 
 /* ROM definition */
 ROM_START( v6809 )

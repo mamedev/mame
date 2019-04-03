@@ -35,7 +35,8 @@ DEFINE_DEVICE_TYPE(EF9364, ef9364_device, "ef9364", "Thomson EF9364")
 //-------------------------------------------------
 void ef9364_device::ef9364(address_map &map)
 {
-	map(0x00000, ef9364_device::TXTPLANE_MAX_SIZE * ef9364_device::MAX_TXTPLANES - 1).ram();
+	if (!has_configured_map(0))
+		map(0x00000, ef9364_device::TXTPLANE_MAX_SIZE * ef9364_device::MAX_TXTPLANES - 1).ram();
 }
 
 //-------------------------------------------------
@@ -66,7 +67,7 @@ ef9364_device::ef9364_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, EF9364, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("textram", ENDIANNESS_LITTLE, 8, 12, 0, address_map_constructor(), address_map_constructor(FUNC(ef9364_device::ef9364), this)),
+	m_space_config("textram", ENDIANNESS_LITTLE, 8, 12, 0, address_map_constructor(FUNC(ef9364_device::ef9364), this)),
 	m_charset(*this, DEVICE_SELF),
 	m_palette(*this, finder_base::DUMMY_TAG)
 {

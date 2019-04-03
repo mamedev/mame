@@ -18,18 +18,18 @@ public:
 	auto drq_cb() { return m_drq_cb.bind(); }
 
 	// Direct Addressing Interface
-	DECLARE_READ8_MEMBER(dir_r);
-	DECLARE_WRITE8_MEMBER(dir_w);
+	uint8_t dir_r(offs_t offset);
+	void dir_w(offs_t offset, uint8_t data);
 
 	// Indirect Addressing Interface
-	DECLARE_READ8_MEMBER(indir_r);
-	DECLARE_WRITE8_MEMBER(indir_w);
+	uint8_t indir_r(offs_t offset);
+	void indir_w(offs_t offset, uint8_t data);
 
 	// Alternative Indirect Addressing Interface
-	DECLARE_READ8_MEMBER(indir_addr_r);
-	DECLARE_WRITE8_MEMBER(indir_addr_w);
-	DECLARE_READ8_MEMBER(indir_reg_r);
-	DECLARE_WRITE8_MEMBER(indir_reg_w);
+	uint8_t indir_addr_r();
+	void indir_addr_w(uint8_t data);
+	uint8_t indir_reg_r();
+	void indir_reg_w(uint8_t data);
 
 	// Master Reset (MR) Interface
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
@@ -119,15 +119,15 @@ public:
 	wd33c92_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class wd33c93n_device : public wd33c9x_base_device
+class wd33c93_device : public wd33c9x_base_device
 {
 public:
-	wd33c93n_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: wd33c93n_device(mconfig, tag, owner, 0)
+	wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner)
+		: wd33c93_device(mconfig, tag, owner, 0)
 	{
 	}
 
-	wd33c93n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class wd33c93a_device : public wd33c9x_base_device
@@ -153,8 +153,8 @@ public:
 };
 
 
-DECLARE_DEVICE_TYPE(WD33C92, wd33c92_device)
-DECLARE_DEVICE_TYPE(WD33C93N, wd33c93n_device)
+DECLARE_DEVICE_TYPE(WD33C92,  wd33c92_device)
+DECLARE_DEVICE_TYPE(WD33C93,  wd33c93_device)
 DECLARE_DEVICE_TYPE(WD33C93A, wd33c93a_device)
 DECLARE_DEVICE_TYPE(WD33C93B, wd33c93b_device)
 

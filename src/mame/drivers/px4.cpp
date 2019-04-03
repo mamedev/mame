@@ -1146,7 +1146,7 @@ READ8_MEMBER( px4p_state::ramdisk_data_r )
 	else if (m_ramdisk_address < 0x40000)
 	{
 		// read from rom
-		ret = m_rdsocket->read_rom(space, m_ramdisk_address);
+		ret = m_rdsocket->read_rom(m_ramdisk_address);
 	}
 
 	m_ramdisk_address = (m_ramdisk_address & 0xffff00) | ((m_ramdisk_address & 0xff) + 1);
@@ -1485,19 +1485,20 @@ void px4p_state::px4p_palette(palette_device &palette) const
 //  MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(px4_state::px4)
+void px4_state::px4(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(7'372'800) / 2)    // uPD70008
-	MCFG_DEVICE_PROGRAM_MAP(px4_mem)
-	MCFG_DEVICE_IO_MAP(px4_io)
+	Z80(config, m_z80, XTAL(7'372'800) / 2);    // uPD70008
+	m_z80->set_addrmap(AS_PROGRAM, &px4_state::px4_mem);
+	m_z80->set_addrmap(AS_IO, &px4_state::px4_io);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(72)
-	MCFG_SCREEN_SIZE(240, 64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
-	MCFG_SCREEN_UPDATE_DRIVER(px4_state, screen_update_px4)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(72);
+	screen.set_size(240, 64);
+	screen.set_visarea(0, 239, 0, 63);
+	screen.set_screen_update(FUNC(px4_state::screen_update_px4));
+	screen.set_palette("palette");
 
 	config.set_default_layout(layout_px4);
 
@@ -1507,30 +1508,31 @@ MACHINE_CONFIG_START(px4_state::px4)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("one_sec", px4_state, upd7508_1sec_callback, attotime::from_seconds(1))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("frc", px4_state, frc_tick, attotime::from_hz(XTAL(7'372'800) / 2 / 6))
+	TIMER(config, "one_sec").configure_periodic(FUNC(px4_state::upd7508_1sec_callback), attotime::from_seconds(1));
+	TIMER(config, "frc").configure_periodic(FUNC(px4_state::frc_tick), attotime::from_hz(XTAL(7'372'800) / 2 / 6));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	// centronics printer
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, px4_state, centronics_busy_w))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, px4_state, centronics_perror_w))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(px4_state::centronics_busy_w));
+	m_centronics->perror_handler().set(FUNC(px4_state::centronics_perror_w));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
 	// external cassette
-	MCFG_CASSETTE_ADD("extcas")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
+	CASSETTE(config, m_ext_cas);
+	m_ext_cas->set_default_state(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
 
-	MCFG_TIMER_DRIVER_ADD("extcas_timer", px4_state, ext_cassette_read)
+	TIMER(config, m_ext_cas_timer).configure_generic(FUNC(px4_state::ext_cassette_read));
 
 	// sio port
-	MCFG_EPSON_SIO_ADD("sio", nullptr)
-	MCFG_EPSON_SIO_RX(WRITELINE(*this, px4_state, sio_rx_w))
-	MCFG_EPSON_SIO_PIN(WRITELINE(*this, px4_state, sio_pin_w))
+	EPSON_SIO(config, m_sio, nullptr);
+	m_sio->rx_callback().set(FUNC(px4_state::sio_rx_w));
+	m_sio->pin_callback().set(FUNC(px4_state::sio_pin_w));
 
 	// rs232 port
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
@@ -1540,25 +1542,25 @@ MACHINE_CONFIG_START(px4_state::px4)
 	m_rs232->cts_handler().set(FUNC(px4_state::rs232_cts_w));
 
 	// rom capsules
-	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, "px4_cart")
-	MCFG_GENERIC_CARTSLOT_ADD("capsule2", generic_plain_slot, "px4_cart")
+	GENERIC_CARTSLOT(config, m_caps1, generic_plain_slot, "px4_cart");
+	GENERIC_CARTSLOT(config, m_caps2, generic_plain_slot, "px4_cart");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "px4_cart")
-	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("px4_cart");
+	SOFTWARE_LIST(config, "epson_cpm_list").set_original("epson_cpm");
+}
 
-MACHINE_CONFIG_START(px4p_state::px4p)
+void px4p_state::px4p(machine_config &config)
+{
 	px4(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(px4p_io)
+	m_z80->set_addrmap(AS_IO, &px4p_state::px4p_io);
 
 	NVRAM(config, "rdnvram", nvram_device::DEFAULT_ALL_0);
 
 	subdevice<palette_device>("palette")->set_init(FUNC(px4p_state::px4p_palette));
 
-	MCFG_GENERIC_CARTSLOT_ADD("ramdisk_socket", generic_plain_slot, "px4_cart")
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, m_rdsocket, generic_plain_slot, "px4_cart");
+}
 
 
 //**************************************************************************

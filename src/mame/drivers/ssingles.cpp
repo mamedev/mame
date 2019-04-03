@@ -553,15 +553,15 @@ static GFXDECODE_START( gfx_atamanot )
 	GFXDECODE_ENTRY( "kanji_lc", 0, layout_8x16,     0, 8 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(ssingles_state::ssingles)
+void ssingles_state::ssingles(machine_config &config)
+{
+	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssingles_state::ssingles_map);
+	m_maincpu->set_addrmap(AS_IO, &ssingles_state::ssingles_io_map);
 
-	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ssingles_map)
-	MCFG_DEVICE_IO_MAP(ssingles_io_map)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(4000000, 256, 0, 256, 256, 0, 256);   /* temporary, CRTC will configure screen */
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, "palette").set_entries(4); //guess
 
@@ -580,27 +580,26 @@ MACHINE_CONFIG_START(ssingles_state::ssingles)
 	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.5); /* ? MHz */
 
 	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.5); /* ? MHz */
-
-MACHINE_CONFIG_END
+}
 
 WRITE_LINE_MEMBER(ssingles_state::atamanot_irq)
 {
 	// ...
 }
 
-MACHINE_CONFIG_START(ssingles_state::atamanot)
+void ssingles_state::atamanot(machine_config &config)
+{
 	ssingles(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(atamanot_map)
-	MCFG_DEVICE_IO_MAP(atamanot_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssingles_state::atamanot_map);
+	m_maincpu->set_addrmap(AS_IO, &ssingles_state::atamanot_io_map);
 
 	mc6845_device &crtc(*subdevice<mc6845_device>("crtc"));
 	crtc.set_update_row_callback(FUNC(ssingles_state::atamanot_update_row), this);
 	crtc.out_vsync_callback().set(FUNC(ssingles_state::atamanot_irq));
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atamanot);
-MACHINE_CONFIG_END
+}
 
 ROM_START( ssingles )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 main CPU  */

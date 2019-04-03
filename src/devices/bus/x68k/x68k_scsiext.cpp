@@ -37,7 +37,8 @@ const tiny_rom_entry *x68k_scsiext_device::device_rom_region() const
 }
 
 // device machine config
-MACHINE_CONFIG_START(x68k_scsiext_device::device_add_mconfig)
+void x68k_scsiext_device::device_add_mconfig(machine_config &config)
+{
 	SCSI_PORT(config, m_scsibus);
 	m_scsibus->set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 	m_scsibus->set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
@@ -48,10 +49,10 @@ MACHINE_CONFIG_START(x68k_scsiext_device::device_add_mconfig)
 	m_scsibus->set_slot_device(7, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
 
 	MB89352A(config, m_spc);
-	m_spc->set_scsi_port("scsi");
+	m_spc->set_scsi_port(m_scsibus);
 	m_spc->irq_cb().set(FUNC(x68k_scsiext_device::irq_w));
 	m_spc->drq_cb().set(FUNC(x68k_scsiext_device::drq_w));
-MACHINE_CONFIG_END
+}
 
 x68k_scsiext_device::x68k_scsiext_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, X68K_SCSIEXT, tag, owner, clock)
@@ -64,15 +65,14 @@ x68k_scsiext_device::x68k_scsiext_device(const machine_config &mconfig, const ch
 
 void x68k_scsiext_device::device_start()
 {
-	device_t* cpu = machine().device("maincpu");
-	uint8_t* ROM;
-	address_space& space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<x68k_expansion_slot_device *>(owner());
-	space.install_read_bank(0xea0020,0xea1fff,"scsi_ext");
-	space.unmap_write(0xea0020,0xea1fff);
-	ROM = machine().root_device().memregion(subtag("scsiexrom").c_str())->base();
+	m_slot->space().install_read_bank(0xea0020,0xea1fff,"scsi_ext");
+	m_slot->space().unmap_write(0xea0020,0xea1fff);
+
+	uint8_t *ROM = machine().root_device().memregion(subtag("scsiexrom").c_str())->base();
 	machine().root_device().membank("scsi_ext")->set_base(ROM);
-	space.install_readwrite_handler(0xea0000,0xea001f,read8_delegate(FUNC(x68k_scsiext_device::register_r),this),write8_delegate(FUNC(x68k_scsiext_device::register_w),this),0x00ff00ff);
+
+m_slot->space().install_readwrite_handler(0xea0000,0xea001f,read8_delegate(FUNC(x68k_scsiext_device::register_r),this),write8_delegate(FUNC(x68k_scsiext_device::register_w),this),0x00ff00ff);
 }
 
 void x68k_scsiext_device::device_reset()

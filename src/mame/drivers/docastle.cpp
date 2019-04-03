@@ -240,10 +240,10 @@ void docastle_state::docastle_map2(address_map &map)
 	map(0x8000, 0x87ff).ram();
 	map(0xa000, 0xa008).rw(FUNC(docastle_state::docastle_shared1_r), FUNC(docastle_state::docastle_shared0_w));
 	map(0xc000, 0xc007).select(0x0080).rw(FUNC(docastle_state::inputs_flipscreen_r), FUNC(docastle_state::flipscreen_w));
-	map(0xe000, 0xe000).w("sn1", FUNC(sn76489a_device::command_w));
-	map(0xe400, 0xe400).w("sn2", FUNC(sn76489a_device::command_w));
-	map(0xe800, 0xe800).w("sn3", FUNC(sn76489a_device::command_w));
-	map(0xec00, 0xec00).w("sn4", FUNC(sn76489a_device::command_w));
+	map(0xe000, 0xe000).w("sn1", FUNC(sn76489a_device::write));
+	map(0xe400, 0xe400).w("sn2", FUNC(sn76489a_device::write));
+	map(0xe800, 0xe800).w("sn3", FUNC(sn76489a_device::write));
+	map(0xec00, 0xec00).w("sn4", FUNC(sn76489a_device::write));
 }
 
 void docastle_state::docastle_map3(address_map &map)
@@ -280,10 +280,10 @@ void docastle_state::dorunrun_map2(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0xa000, 0xa000).w("sn1", FUNC(sn76489a_device::command_w));
-	map(0xa400, 0xa400).w("sn2", FUNC(sn76489a_device::command_w));
-	map(0xa800, 0xa800).w("sn3", FUNC(sn76489a_device::command_w));
-	map(0xac00, 0xac00).w("sn4", FUNC(sn76489a_device::command_w));
+	map(0xa000, 0xa000).w("sn1", FUNC(sn76489a_device::write));
+	map(0xa400, 0xa400).w("sn2", FUNC(sn76489a_device::write));
+	map(0xa800, 0xa800).w("sn3", FUNC(sn76489a_device::write));
+	map(0xac00, 0xac00).w("sn4", FUNC(sn76489a_device::write));
 	map(0xc000, 0xc007).select(0x0080).rw(FUNC(docastle_state::inputs_flipscreen_r), FUNC(docastle_state::flipscreen_w));
 	map(0xe000, 0xe008).rw(FUNC(docastle_state::docastle_shared1_r), FUNC(docastle_state::docastle_shared0_w));
 }

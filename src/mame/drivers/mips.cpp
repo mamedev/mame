@@ -231,6 +231,28 @@ void rx2030_state::rx2030_init()
 
 	if (!m_vram)
 		m_iop_interface |= VID_ABSENT;
+
+	/*
+	 * HACK: the prom bfs code broadcasts to the network address (i.e. the
+	 * host portion is "all zeroes"), instead of to the standard "all ones".
+	 * This makes it very difficult to receive the bfs request in a modern host
+	 * OS; the patch changes the code to broadcast to the standard broadcast
+	 * address instead.
+	 *
+	 * Technique is identical to that described for the rx3230 below.
+	 */
+	switch (system_bios())
+	{
+	case 1:
+		m_rom[0x1ab68 >> 1] = 0x0624;
+		m_rom[0x1ab6a >> 1] = 0xffff;
+		break;
+
+	case 2:
+		m_rom[0x1a7f8 >> 1] = 0x0624;
+		m_rom[0x1a7fa >> 1] = 0xffff;
+		break;
+	}
 }
 
 u16 rx2030_state::mmu_r(offs_t offset, u16 mem_mask)
@@ -268,7 +290,7 @@ void rx2030_state::iop_program_map(address_map &map)
 	map(0x00000, 0x1ffff).ram();
 	map(0x20000, 0x3ffff).rw(FUNC(rx2030_state::mmu_r), FUNC(rx2030_state::mmu_w));
 
-	map(0x80000, 0xbffff).rom().region("v50_ipl", 0).mirror(0x40000);
+	map(0x80000, 0xbffff).rom().region("rx2030", 0).mirror(0x40000);
 }
 
 void rx2030_state::iop_io_map(address_map &map)
@@ -311,10 +333,10 @@ void rx2030_state::iop_io_map(address_map &map)
 	map(0x0200, 0x0201).rw(m_fio, FUNC(z8038_device::fifo_r<1>), FUNC(z8038_device::fifo_w<1>)).umask16(0xff);
 	map(0x0202, 0x0203).rw(m_fio, FUNC(z8038_device::reg_r<1>), FUNC(z8038_device::reg_w<1>)).umask16(0xff);
 
-	map(0x0240, 0x0241).lw8("rtc", [this](address_space &space, offs_t offset, u8 data) { m_rtc->write(space, 0, data); }).umask16(0xff00);
+	map(0x0240, 0x0241).lw8("rtc", [this](u8 data) { m_rtc->write(0, data); }).umask16(0xff00);
 	map(0x0280, 0x0281).lrw8("rtc",
-		[this](address_space &space, offs_t offset) { return m_rtc->read(space, 1); },
-		[this](address_space &space, offs_t offset, u8 data) { m_rtc->write(space, 1, data); }).umask16(0xff00);
+		[this]() { return m_rtc->read(1); },
+		[this](u8 data) { m_rtc->write(1, data); }).umask16(0xff00);
 
 	map(0x02c0, 0x2c1).lw8("cpu_interface", [this](u8 data)
 	{
@@ -334,7 +356,7 @@ void rx2030_state::iop_io_map(address_map &map)
 			else
 				m_iop->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
 			m_iop_interface |= IOP_IACK;
-			m_iop_interface &= ~IOP_IRQ; // maybe?
+			m_iop_interface &= ~IOP_IRQ;
 			break;
 
 		default:
@@ -426,7 +448,7 @@ void rx2030_state::rx2030_map(address_map &map)
 
 				// interrupt the iop
 				m_iop_interface &= ~IOP_IACK;
-				m_iop_interface |= IOP_IRQ; // maybe?
+				m_iop_interface |= IOP_IRQ;
 				m_iop->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 				break;
 
@@ -477,13 +499,13 @@ static void mips_scsi_devices(device_slot_interface &device)
 void rx2030_state::rx2030(machine_config &config)
 {
 	R2000A(config, m_cpu, 33.333_MHz_XTAL / 2, 32768, 32768);
-	// TODO: FPU disabled until properly emulated
-	//m_cpu->set_fpurev(mips1_device_base::MIPS_R2010A);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R2010A);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
 	V50(config, m_iop, 20_MHz_XTAL / 2);
 	m_iop->set_addrmap(AS_PROGRAM, &rx2030_state::iop_program_map);
 	m_iop->set_addrmap(AS_IO, &rx2030_state::iop_io_map);
+	m_iop->out_handler<2>().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 
 	// general dma configuration
 	m_iop->out_hreq_cb().set(m_iop, FUNC(v50_device::hack_w));
@@ -520,6 +542,7 @@ void rx2030_state::rx2030(machine_config &config)
 	//m_kbdc->hot_res().set_inputline(m_maincpu, INPUT_LINE_RESET);
 	m_kbdc->kbd_clk().set(kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_kbdc->kbd_data().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_kbdc->set_default_bios_tag("award15");
 
 	SCC85C30(config, m_scc, 1.8432_MHz_XTAL);
 	m_scc->configure_channels(m_scc->clock(), m_scc->clock(), m_scc->clock(), m_scc->clock());
@@ -748,7 +771,7 @@ void rx3230_state::rx3230(machine_config &config)
 {
 	R3000A(config, m_cpu, 50_MHz_XTAL / 2, 32768, 32768);
 	m_cpu->set_addrmap(AS_PROGRAM, &rx3230_state::rx3230_map);
-	m_cpu->set_fpurev(mips1_device_base::MIPS_R3010A);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R3010A);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
 	// 32 SIMM slots, 8-128MB memory, banks of 8 1MB or 4MB SIMMs
@@ -943,7 +966,7 @@ void rx3230_state::lance_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 ROM_START(rx2030)
-	ROM_REGION16_LE(0x40000, "v50_ipl", 0)
+	ROM_REGION16_LE(0x40000, "rx2030", 0)
 	ROM_SYSTEM_BIOS(0, "v4.32", "Rx2030 v4.32, Jan 1991")
 	ROMX_LOAD("50-00121__005.u139", 0x00000, 0x10000, CRC(b2f42665) SHA1(81c83aa6b8865338fda5c03733ede91749997648), ROM_BIOS(0) | ROM_SKIP(1))
 	ROMX_LOAD("50-00120__005.u140", 0x00001, 0x10000, CRC(0ffa485e) SHA1(7cdfb81d1a547c5ccc88e1e0ef73d447cd03e9e2), ROM_BIOS(0) | ROM_SKIP(1))
@@ -955,9 +978,6 @@ ROM_START(rx2030)
 	ROMX_LOAD("50-00120__003.u140", 0x00001, 0x10000, CRC(e1991721) SHA1(028d33be271c95f198473b650f7800f9ca4a60b2), ROM_BIOS(1) | ROM_SKIP(1))
 	ROMX_LOAD("50-00119__003.u141", 0x20001, 0x10000, CRC(c8469906) SHA1(69bbf4b5c415b2e2156a4467bf9cb30e79f586ef), ROM_BIOS(1) | ROM_SKIP(1))
 	ROMX_LOAD("50-00118__003.u142", 0x20000, 0x10000, CRC(18cc001a) SHA1(198023e92e1e3ba2fc8637f5dd6f370e7e023fdd), ROM_BIOS(1) | ROM_SKIP(1))
-
-	ROM_REGION(0x800, "i8742_eprom", 0)
-	ROM_LOAD("keyboard_1.5.bin", 0x000, 0x800, CRC(f86ba0f7) SHA1(1ad475451db35a76d929824c035d582279fbe3a3))
 
 	/*
 	 * The following isn't a real dump, but a hand-made nvram image that allows

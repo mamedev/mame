@@ -655,7 +655,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 		}
 
 		case 0x60/2:
-			return m_watchdog->reset_r(space, 0);
+			return m_watchdog->reset_r(space);
 
 		default:
 			break;

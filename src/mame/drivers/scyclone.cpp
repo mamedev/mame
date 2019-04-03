@@ -534,24 +534,24 @@ WRITE8_MEMBER(scyclone_state::snd_3001_w)
 	// need to clear the latch somewhere, the command value is written back here and at 3005
 	// after acknowledging a command
 	// might actually reset the DACs as there are (at least) 2 of them?
-	m_soundlatch->clear_w(space, 0, data);
+	m_soundlatch->clear_w();
 }
 
 /*
 WRITE8_MEMBER(scyclone_state::snd_3003_w)
 {
-//  m_soundlatch->clear_w(space, 0, data);
+//  m_soundlatch->clear_w();
 }
 
 WRITE8_MEMBER(scyclone_state::snd_3004_w)
 {
-//  m_soundlatch->clear_w(space, 0, data);
+//  m_soundlatch->clear_w();
 }
 */
 
 WRITE8_MEMBER(scyclone_state::snd_3005_w)
 {
-//  m_soundlatch->clear_w(space, 0, data);
+//  m_soundlatch->clear_w();
 }
 
 
@@ -655,14 +655,12 @@ void scyclone_state::scyclone(machine_config &config)
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 
 	voltage_regulator_device &vref2(VOLTAGE_REGULATOR(config, "vref2", 0));
-	vref2.set_output(5.0);
 	vref2.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
 	vref2.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }

@@ -276,9 +276,9 @@ void vsnes_state::vsnes_bootleg_z80_map(address_map &map)
 	map(0x6001, 0x6001).r(FUNC(vsnes_state::vsnes_bootleg_z80_address_r)); // ^
 
 
-	map(0x60FA, 0x60FA).w("sn1", FUNC(sn76489_device::command_w));
-	map(0x60F9, 0x60F9).w("sn2", FUNC(sn76489_device::command_w));
-	map(0x60FF, 0x60FF).w("sn3", FUNC(sn76489_device::command_w));
+	map(0x60FA, 0x60FA).w("sn1", FUNC(sn76489_device::write));
+	map(0x60F9, 0x60F9).w("sn2", FUNC(sn76489_device::write));
+	map(0x60FF, 0x60FF).w("sn3", FUNC(sn76489_device::write));
 
 }
 
@@ -1704,8 +1704,8 @@ INPUT_PORTS_END
 void vsnes_state::vsnes(machine_config &config)
 {
 	/* basic machine hardware */
-	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu1_map);
+	n2a03_device &maincpu(N2A03(config, m_maincpu, NTSC_APU_CLOCK));
+	maincpu.set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu1_map);
 	/* some carts also trigger IRQs */
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
@@ -1724,6 +1724,7 @@ void vsnes_state::vsnes(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+	maincpu.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void vsnes_state::jajamaru(machine_config &config)
@@ -1769,11 +1770,11 @@ void vsnes_state::topgun(machine_config &config)
 void vsnes_state::vsdual(machine_config &config)
 {
 	/* basic machine hardware */
-	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu1_map);
+	n2a03_device &maincpu(N2A03(config, m_maincpu, NTSC_APU_CLOCK));
+	maincpu.set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu1_map);
 
-	N2A03(config, m_subcpu, NTSC_APU_CLOCK);
-	m_subcpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu2_map);
+	n2a03_device &subcpu(N2A03(config, m_subcpu, NTSC_APU_CLOCK));
+	subcpu.set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu2_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsdual)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsdual)
@@ -1804,6 +1805,8 @@ void vsnes_state::vsdual(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+	maincpu.add_route(ALL_OUTPUTS, "mono", 0.50);
+	subcpu.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void vsnes_state::vsdual_pi(machine_config &config)

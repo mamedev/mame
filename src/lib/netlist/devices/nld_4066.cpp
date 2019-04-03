@@ -7,9 +7,9 @@
 
 #include "nld_4066.h"
 
-#include "nlid_cmos.h"
 #include "netlist/analog/nlid_twoterm.h"
 #include "netlist/solver/nld_solver.h"
+#include "nlid_cmos.h"
 
 namespace netlist
 {
@@ -29,7 +29,7 @@ namespace netlist
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
-	public:
+	private:
 		NETLIB_SUB(vdd_vss)        m_supply;
 		analog::NETLIB_SUB(R_base) m_R;
 
@@ -41,45 +41,36 @@ namespace netlist
 	{
 		// Start in off condition
 		// FIXME: is ROFF correct?
-		m_R.set_R(NL_FCONST(1.0) / exec().gmin());
+		m_R.set_R(plib::constants<nl_double>::one() / exec().gmin());
 
 	}
 
 	NETLIB_UPDATE(CD4066_GATE)
 	{
 		nl_double sup = (m_supply.vdd() - m_supply.vss());
-		nl_double low = NL_FCONST(0.45) * sup;
-		nl_double high = NL_FCONST(0.55) * sup;
+		nl_double low = plib::constants<nl_double>::cast(0.45) * sup;
+		nl_double high = plib::constants<nl_double>::cast(0.55) * sup;
 		nl_double in = m_control() - m_supply.vss();
-		nl_double rON = m_base_r() * NL_FCONST(5.0) / sup;
+		nl_double rON = m_base_r() * plib::constants<nl_double>::cast(5.0) / sup;
 		nl_double R = -1.0;
 
 		if (in < low)
 		{
-			R = NL_FCONST(1.0) / exec().gmin();
+			R = plib::constants<nl_double>::one() / exec().gmin();
 		}
 		else if (in > high)
 		{
 			R = rON;
 		}
-		if (R > NL_FCONST(0.0))
+		if (R > plib::constants<nl_double>::zero())
 		{
-			// We only need to update the net first if this is a time stepping net
-			if ((1)) // m_R.m_P.net().as_analog().solver().is_timestep())
-			{
-				m_R.update_dev();
-				m_R.set_R(R);
-				m_R.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
-			}
-			else
-			{
-				m_R.set_R(R);
-				m_R.update_dev();
-			}
+			m_R.update();
+			m_R.set_R(R);
+			m_R.solve_later();
 		}
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(CD4066_GATE)
+	NETLIB_DEVICE_IMPL(CD4066_GATE,         "CD4066_GATE",            "")
 
 	} //namespace devices
 } // namespace netlist

@@ -157,7 +157,7 @@ WRITE8_MEMBER(tehkanwc_state::track_1_reset_w)
 
 WRITE8_MEMBER(tehkanwc_state::sound_command_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -175,7 +175,7 @@ void tehkanwc_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 WRITE8_MEMBER(tehkanwc_state::sound_answer_w)
 {
-	m_soundlatch2->write(space, 0, data);
+	m_soundlatch2->write(data);
 
 	/* in Gridiron, the sound CPU goes in a tight loop after the self test, */
 	/* probably waiting to be reset by a watchdog */
@@ -668,7 +668,7 @@ GFXDECODE_END
 void tehkanwc_state::tehkanwc(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 18432000/4);		/* 18.432000 / 4 */
+	Z80(config, m_maincpu, 18432000/4);     /* 18.432000 / 4 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &tehkanwc_state::main_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
@@ -681,7 +681,7 @@ void tehkanwc_state::tehkanwc(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &tehkanwc_state::sound_port);
 	m_audiocpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(600);	/* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
+	config.m_minimum_quantum = attotime::from_hz(600);  /* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -714,8 +714,8 @@ void tehkanwc_state::tehkanwc(machine_config &config)
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(tehkanwc_state::adpcm_int));	/* interrupt function */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8KHz */
+	m_msm->vck_legacy_callback().set(FUNC(tehkanwc_state::adpcm_int));  /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8KHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.45);
 }
 

@@ -82,7 +82,7 @@ READ8_MEMBER( sb8_device::ym3812_16_r )
 	uint8_t retVal = 0xff;
 	switch(offset)
 	{
-		case 0 : retVal = m_ym3812->status_port_r( space, offset ); break;
+		case 0 : retVal = m_ym3812->status_port_r(); break;
 	}
 	return retVal;
 }
@@ -91,8 +91,8 @@ WRITE8_MEMBER( sb8_device::ym3812_16_w )
 {
 	switch(offset)
 	{
-		case 0 : m_ym3812->control_port_w( space, offset, data ); break;
-		case 1 : m_ym3812->write_port_w( space, offset, data ); break;
+		case 0 : m_ym3812->control_port_w(data); break;
+		case 1 : m_ym3812->write_port_w(data); break;
 	}
 }
 
@@ -1147,7 +1147,6 @@ void sb_device::common(machine_config &config)
 	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
 	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
@@ -1261,9 +1260,9 @@ void sb8_device::device_start()
 	{
 		ymf262_device *ymf262 = subdevice<ymf262_device>("ymf262");
 
-		m_isa->install_device(0x0388, 0x038b, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-		m_isa->install_device(0x0220, 0x0223, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-		m_isa->install_device(0x0228, 0x0229, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
+		m_isa->install_device(0x0388, 0x038b, read8sm_delegate(FUNC(ymf262_device::read), ymf262), write8sm_delegate(FUNC(ymf262_device::write), ymf262));
+		m_isa->install_device(0x0220, 0x0223, read8sm_delegate(FUNC(ymf262_device::read), ymf262), write8sm_delegate(FUNC(ymf262_device::write), ymf262));
+		m_isa->install_device(0x0228, 0x0229, read8sm_delegate(FUNC(ymf262_device::read), ymf262), write8sm_delegate(FUNC(ymf262_device::write), ymf262));
 	}
 	else
 	{
@@ -1304,9 +1303,9 @@ void sb16_device::device_start()
 	m_isa->install_device(0x022e, 0x022f, read8_delegate(FUNC(sb_device::dsp_rbuf_status_r), this), write8_delegate(FUNC(sb_device::dsp_rbuf_status_w), this) );
 	m_isa->install_device(0x0224, 0x0225, read8_delegate(FUNC(sb16_device::mixer_r), this), write8_delegate(FUNC(sb16_device::mixer_w), this));
 	m_isa->install_device(0x0330, 0x0331, read8_delegate(FUNC(sb16_device::mpu401_r), this), write8_delegate(FUNC(sb16_device::mpu401_w), this));
-	m_isa->install_device(0x0388, 0x038b, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-	m_isa->install_device(0x0220, 0x0223, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-	m_isa->install_device(0x0228, 0x0229, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
+	m_isa->install_device(0x0388, 0x038b, read8sm_delegate(FUNC(ymf262_device::read), ymf262), write8sm_delegate(FUNC(ymf262_device::write), ymf262));
+	m_isa->install_device(0x0220, 0x0223, read8sm_delegate(FUNC(ymf262_device::read), ymf262), write8sm_delegate(FUNC(ymf262_device::write), ymf262));
+	m_isa->install_device(0x0228, 0x0229, read8sm_delegate(FUNC(ymf262_device::read), ymf262), write8sm_delegate(FUNC(ymf262_device::write), ymf262));
 
 	save_item(NAME(m_mixer.data));
 	save_item(NAME(m_mixer.status));

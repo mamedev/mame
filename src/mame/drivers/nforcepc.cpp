@@ -14,6 +14,7 @@
   - An IDE hard disk
   - A floppy disk drive
   - A keyboard
+  - A ddr dimm memory module
   Later add:
   - A Nvidia NV25 based AGP video card
 
@@ -27,6 +28,14 @@
 #include "includes/xbox_pci.h"
 #include "includes/nforcepc.h"
 
+// for now let's use this as the contents of the spd chip in the ddr dimm memory module
+static const uint8_t test_spd_data[] = {
+	0x80,0x08,0x07,0x0D,0x0A,0x01,0x40,0x00,0x04,0x75,0x75,0x00,0x82,0x10,0x00,0x01,0x0E,0x04,0x0C,0x01,0x02,0x20,0xC0,0xA0,0x75,0x00,
+	0x00,0x50,0x3C,0x50,0x2D,0x40,0x90,0x90,0x50,0x50,0x00,0x00,0x00,0x00,0x00,0x41,0x4B,0x30,0x32,0x75,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xEA,0xAD,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x48,0x59,0x4D,0x44,0x35,
+	0x33,0x32,0x4D,0x36,0x34,0x36,0x43,0x36,0x2D,0x48,0x20,0x20,0x20
+};
+
 /*
   Pci devices
 */
@@ -38,7 +47,7 @@ DEFINE_DEVICE_TYPE(CRUSH11, crush11_host_device, "crush11", "NVIDIA Corporation 
 void crush11_host_device::config_map(address_map &map)
 {
 	pci_host_device::config_map(map);
-	map(0x50, 0x50).rw(FUNC(crush11_host_device::test_r), FUNC(crush11_host_device::test_w));
+	map(0xf0, 0xf0).rw(FUNC(crush11_host_device::test_r), FUNC(crush11_host_device::test_w));
 }
 
 crush11_host_device::crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -93,7 +102,7 @@ void crush11_host_device::map_extra(uint64_t memory_window_start, uint64_t memor
 
 READ8_MEMBER(crush11_host_device::test_r)
 {
-	return 0;
+	return 4;
 }
 
 WRITE8_MEMBER(crush11_host_device::test_w)
@@ -101,7 +110,11 @@ WRITE8_MEMBER(crush11_host_device::test_w)
 	logerror("test = %02x\n", data);
 }
 
-// device connected to SMBus
+/*
+  Ddevices connected to SMBus
+*/
+
+// access logger
 
 DEFINE_DEVICE_TYPE(SMBUS_LOGGER, smbus_logger_device, "smbus_logger", "SMBUS LOGGER")
 
@@ -112,13 +125,13 @@ smbus_logger_device::smbus_logger_device(const machine_config &mconfig, const ch
 
 int smbus_logger_device::execute_command(int command, int rw, int data)
 {
-	if (rw == 1) // read
+	if (rw == 1)
 	{
-		logerror("smbus read  %02x %d %02x\n", command, rw, buffer[command]);
+		logerror("smbus read from %02x R %02x\n", command, buffer[command]);
 		return buffer[command];
 	}
 	buffer[command] = (uint8_t)data;
-	logerror("smbus write %02x %d %02d\n", command, rw, data);
+	logerror("smbus write to %02x W %02x\n", command, data);
 	return 0;
 }
 
@@ -129,6 +142,114 @@ void smbus_logger_device::device_start()
 
 void smbus_logger_device::device_reset()
 {
+}
+
+// read-only data
+
+DEFINE_DEVICE_TYPE(SMBUS_ROM, smbus_rom_device, "smbus_rom", "SMBUS ROM")
+
+smbus_rom_device::smbus_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SMBUS_ROM, tag, owner, clock)
+{
+}
+
+smbus_rom_device::smbus_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const uint8_t *data, int size) :
+	smbus_rom_device(mconfig, tag, owner, clock)
+{
+	buffer = data;
+	buffer_size = size;
+}
+
+int smbus_rom_device::execute_command(int command, int rw, int data)
+{
+	if ((rw == 1) && (command < buffer_size) && (buffer != nullptr))
+	{
+		logerror("smbus rom read from %02x %02x\n", command, buffer[command]);
+		return buffer[command];
+	}
+	return 0;
+}
+
+void smbus_rom_device::device_start()
+{
+}
+
+void smbus_rom_device::device_reset()
+{
+}
+
+// Asus AS99127F chip
+
+DEFINE_DEVICE_TYPE(AS99127F, as99127f_device, "as99127f", "Asus AS99127F")
+
+as99127f_device::as99127f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, AS99127F, tag, owner, clock)
+{
+}
+
+int as99127f_device::execute_command(int command, int rw, int data)
+{
+	if (rw == 1)
+	{
+		logerror("smbus read from %02x R %02x\n", command, buffer[command]);
+		return buffer[command];
+	}
+	buffer[command] = (uint8_t)data;
+	logerror("smbus write to %02x W %02x\n", command, data);
+	return 0;
+}
+
+void as99127f_device::device_start()
+{
+	memset(buffer, 0, sizeof(buffer));
+}
+
+DEFINE_DEVICE_TYPE(AS99127F_SENSOR2, as99127f_sensor2_device, "as99127f_sensor2", "Asus AS99127F temperature sensor 2")
+
+as99127f_sensor2_device::as99127f_sensor2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, AS99127F_SENSOR2, tag, owner, clock)
+{
+}
+
+int as99127f_sensor2_device::execute_command(int command, int rw, int data)
+{
+	if (rw == 1)
+	{
+		logerror("smbus read from %02x R %02x\n", command, buffer[command]);
+		return buffer[command];
+	}
+	buffer[command] = (uint8_t)data;
+	logerror("smbus write to %02x W %02x\n", command, data);
+	return 0;
+}
+
+void as99127f_sensor2_device::device_start()
+{
+	memset(buffer, 0, sizeof(buffer));
+}
+
+DEFINE_DEVICE_TYPE(AS99127F_SENSOR3, as99127f_sensor3_device, "as99127f_sensor3", "Asus AS99127F temperature sensor 3")
+
+as99127f_sensor3_device::as99127f_sensor3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, AS99127F_SENSOR3, tag, owner, clock)
+{
+}
+
+int as99127f_sensor3_device::execute_command(int command, int rw, int data)
+{
+	if (rw == 1)
+	{
+		logerror("smbus read from %02x R %02x\n", command, buffer[command]);
+		return buffer[command];
+	}
+	buffer[command] = (uint8_t)data;
+	logerror("smbus write to %02x W %02x\n", command, data);
+	return 0;
+}
+
+void as99127f_sensor3_device::device_start()
+{
+	memset(buffer, 0, sizeof(buffer));
 }
 
 /*
@@ -162,17 +283,20 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mcpx_isalpc_device> isalpc;
+	required_device<as99127f_device> m_as99127f;
 };
 
 nforcepc_state::nforcepc_state(const machine_config &mconfig, device_type type, const char *tag) :
 	driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	isalpc(*this, ":pci:01.0")
+	isalpc(*this, ":pci:01.0"),
+	m_as99127f(*this, ":pci:01.1:12d")
 {
 }
 
 void nforcepc_state::machine_start()
 {
+	m_as99127f->get_buffer()[0x4f] = 0x12;
 }
 
 void nforcepc_state::machine_reset()
@@ -194,7 +318,6 @@ WRITE8_MEMBER(nforcepc_state::boot_state_award_w)
 			break;
 		}
 	logerror("Boot state %02x - %s\n", data, desc);
-
 }
 
 IRQ_CALLBACK_MEMBER(nforcepc_state::irq_callback)
@@ -237,10 +360,13 @@ void nforcepc_state::nforcepc(machine_config &config)
 	isa.boot_state_hook().set(FUNC(nforcepc_state::boot_state_award_w));
 	isa.interrupt_output().set(FUNC(nforcepc_state::maincpu_interrupt));
 	MCPX_SMBUS(config, ":pci:01.1", 0); // 10de:01b4 NVIDIA Corporation nForce PCI System Management (SMBus)
-	SMBUS_LOGGER(config, ":pci:01.1:08", 0);
-	SMBUS_LOGGER(config, ":pci:01.1:2d", 0);
-	SMBUS_LOGGER(config, ":pci:01.1:48", 0);
-	SMBUS_LOGGER(config, ":pci:01.1:49", 0);
+	SMBUS_ROM(config, ":pci:01.1:050", 0, test_spd_data, sizeof(test_spd_data)); // these 3 are on smbus number 0
+	SMBUS_LOGGER(config, ":pci:01.1:051", 0);
+	SMBUS_LOGGER(config, ":pci:01.1:052", 0);
+	SMBUS_LOGGER(config, ":pci:01.1:108", 0); // these 4 are on smbus number 1
+	AS99127F(config, ":pci:01.1:12d", 0);
+	AS99127F_SENSOR2(config, ":pci:01.1:148", 0);
+	AS99127F_SENSOR3(config, ":pci:01.1:149", 0);
 	/*10de:01c2 NVIDIA Corporation nForce USB Controller
 	10de:01c2 NVIDIA Corporation nForce USB Controller
 	10de:01b0 NVIDIA Corporation nForce Audio Processing Unit

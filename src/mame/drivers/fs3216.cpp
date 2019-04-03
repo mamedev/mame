@@ -50,16 +50,16 @@ private:
 	MC6845_UPDATE_ROW(crt_update_row);
 
 	void mmu_reg_w(offs_t offset, u16 data);
-	DECLARE_READ16_MEMBER(mmu_read);
-	DECLARE_WRITE16_MEMBER(mmu_write);
+	u16 mmu_read(offs_t offset, u16 mem_mask);
+	void mmu_write(offs_t offset, u16 data, u16 mem_mask);
 	DECLARE_WRITE_LINE_MEMBER(mmu_reset_w);
 	void mmu_init_w(u16 data);
 
 	u16 irq_r();
 	IRQ_CALLBACK_MEMBER(intack);
 
-	DECLARE_READ8_MEMBER(ctc_r);
-	DECLARE_WRITE8_MEMBER(ctc_w);
+	u8 ctc_r(offs_t offset);
+	void ctc_w(offs_t offset, u8 data);
 	u16 earom_recall_r();
 	u16 earom_store_r();
 
@@ -171,7 +171,7 @@ void fs3216_state::mmu_reg_w(offs_t offset, u16 data)
 		reg = (reg & 0x00ffff) | (data & 0x00ff) << 16;
 }
 
-READ16_MEMBER(fs3216_state::mmu_read)
+u16 fs3216_state::mmu_read(offs_t offset, u16 mem_mask)
 {
 	const bool a23 = BIT(offset, 22);
 	const bool mmu_disable = !a23 && BIT(m_maincpu->get_fc(), 2);
@@ -184,10 +184,10 @@ READ16_MEMBER(fs3216_state::mmu_read)
 
 	offs_t clbaddr = offset + ((mmu_reg & 0x000fff) << 9);
 	clbaddr = (clbaddr & 0x1fffff) | (clbaddr & 0x100000) << 1;
-	return m_clb->read16(space, clbaddr, mem_mask);
+	return m_clb->read16(clbaddr, mem_mask);
 }
 
-WRITE16_MEMBER(fs3216_state::mmu_write)
+void fs3216_state::mmu_write(offs_t offset, u16 data, u16 mem_mask)
 {
 	const bool a23 = BIT(offset, 22);
 	const bool mmu_disable = !a23 && BIT(m_maincpu->get_fc(), 2);
@@ -200,7 +200,7 @@ WRITE16_MEMBER(fs3216_state::mmu_write)
 
 	offs_t clbaddr = offset + ((mmu_reg & 0x000fff) << 9);
 	clbaddr = (clbaddr & 0x1fffff) | (clbaddr & 0x100000) << 1;
-	m_clb->write16(space, clbaddr, data, mem_mask);
+	m_clb->write16(clbaddr, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER(fs3216_state::mmu_reset_w)
@@ -226,14 +226,14 @@ IRQ_CALLBACK_MEMBER(fs3216_state::intack)
 	return m_vecprom[irqline];
 }
 
-READ8_MEMBER(fs3216_state::ctc_r)
+u8 fs3216_state::ctc_r(offs_t offset)
 {
-	return m_ctc->read(space, offset >> 1);
+	return m_ctc->read(offset >> 1);
 }
 
-WRITE8_MEMBER(fs3216_state::ctc_w)
+void fs3216_state::ctc_w(offs_t offset, u8 data)
 {
-	m_ctc->write(space, offset >> 1, data);
+	m_ctc->write(offset >> 1, data);
 }
 
 u16 fs3216_state::earom_recall_r()
@@ -445,7 +445,7 @@ void fs3216_state::clb_map(address_map &map)
 
 void fs3216_state::wdcpu_prog_map(address_map &map)
 {
-	map(0x000, 0x7ff).rom().region("wdcpu", 0);
+	map(0x0000, 0x03ff).rom().region("wdcpu", 0);
 }
 
 void fs3216_state::wdcpu_bank_map(address_map &map)

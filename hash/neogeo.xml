@@ -8302,7 +8302,7 @@
 		</part>
 	</software>
 
-<software name="mslug3a" cloneof="mslug3"> <!-- see neogeo.cpp for notes on this set -->
+	<software name="mslug3a" cloneof="mslug3"> <!-- see neogeo.cpp for notes on this set -->
 		<description>Metal Slug 3 (NGM-2560, earlier)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>

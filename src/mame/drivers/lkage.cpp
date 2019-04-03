@@ -497,7 +497,7 @@ void lkage_state::lkage(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(lkage_state::irq0_line_hold));
 
 	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &lkage_state::lkage_sound_map);	/* IRQs are triggered by the YM2203 */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lkage_state::lkage_sound_map); /* IRQs are triggered by the YM2203 */
 
 	TAITO68705_MCU(config, m_bmcu, MCU_CLOCK);
 

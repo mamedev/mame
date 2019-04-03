@@ -21,6 +21,7 @@
 #include "natkeyboard.h"
 #include "render.h"
 #include <ctype.h>
+#include <algorithm>
 #include <fstream>
 
 
@@ -460,12 +461,17 @@ bool debugger_commands::validate_cpu_parameter(const char *param, device_t *&res
 		return false;
 	}
 
-	/* if we got a valid one, return */
-	device_execute_interface *exec = execute_interface_iterator(m_machine.root_device()).byindex(cpunum);
-	if (exec != nullptr)
+	// attempt to find by numerical index
+	int index = 0;
+	for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
 	{
-		result = &exec->device();
-		return true;
+		// real CPUs should have pcbase
+		const device_state_interface *state;
+		if (exec.device().interface(state) && state->state_find_entry(STATE_GENPCBASE) != nullptr && index++ == cpunum)
+		{
+			result = &exec.device();
+			return true;
+		}
 	}
 
 	/* if out of range, complain */
@@ -3215,13 +3221,6 @@ void debugger_commands::execute_memdump(int ref, const std::vector<std::string> 
     execute_symlist - execute the symlist command
 -------------------------------------------------*/
 
-static int CLIB_DECL symbol_sort_compare(const void *item1, const void *item2)
-{
-	const char *str1 = *(const char **)item1;
-	const char *str2 = *(const char **)item2;
-	return strcmp(str1, str2);
-}
-
 void debugger_commands::execute_symlist(int ref, const std::vector<std::string> &params)
 {
 	device_t *cpu = nullptr;
@@ -3257,7 +3256,9 @@ void debugger_commands::execute_symlist(int ref, const std::vector<std::string> 
 
 	/* sort the symbols */
 	if (count > 1)
-		qsort((void *)namelist, count, sizeof(namelist[0]), symbol_sort_compare);
+		std::sort(&namelist[0], &namelist[count], [](const char *item1, const char *item2) {
+			return strcmp(item1, item2) < 0;
+		});
 
 	/* iterate over symbols and print out relevant ones */
 	for (symnum = 0; symnum < count; symnum++)

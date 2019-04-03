@@ -715,7 +715,7 @@ void ojankohs_state::machine_reset()
 void ojankohs_state::ojankohs(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 12000000/2);		/* 6.00 MHz ? */
+	Z80(config, m_maincpu, 12000000/2);     /* 6.00 MHz ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ojankohs_state::ojankohs_map);
 	m_maincpu->set_addrmap(AS_IO, &ojankohs_state::ojankohs_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(ojankohs_state::irq0_line_hold));
@@ -749,15 +749,15 @@ void ojankohs_state::ojankohs(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(ojankohs_state::ojankohs_adpcm_int));		/* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 KHz */
+	m_msm->vck_legacy_callback().set(FUNC(ojankohs_state::ojankohs_adpcm_int));     /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void ojankohs_state::ojankoy(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 12000000/2);		/* 6.00 MHz ? */
+	Z80(config, m_maincpu, 12000000/2);     /* 6.00 MHz ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ojankohs_state::ojankoy_map);
 	m_maincpu->set_addrmap(AS_IO, &ojankohs_state::ojankoy_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(ojankohs_state::irq0_line_hold));
@@ -789,15 +789,15 @@ void ojankohs_state::ojankoy(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(ojankohs_state::ojankohs_adpcm_int));		/* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 KHz */
+	m_msm->vck_legacy_callback().set(FUNC(ojankohs_state::ojankohs_adpcm_int));     /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void ojankohs_state::ccasino(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 12000000/2);		/* 6.00 MHz ? */
+	Z80(config, m_maincpu, 12000000/2);     /* 6.00 MHz ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ojankohs_state::ojankoy_map);
 	m_maincpu->set_addrmap(AS_IO, &ojankohs_state::ccasino_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(ojankohs_state::irq0_line_hold));
@@ -831,15 +831,15 @@ void ojankohs_state::ccasino(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(ojankohs_state::ojankohs_adpcm_int));		/* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 KHz */
+	m_msm->vck_legacy_callback().set(FUNC(ojankohs_state::ojankohs_adpcm_int));     /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void ojankohs_state::ojankoc(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 8000000/2);	/* 4.00 MHz */
+	Z80(config, m_maincpu, 8000000/2);  /* 4.00 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ojankohs_state::ojankoc_map);
 	m_maincpu->set_addrmap(AS_IO, &ojankohs_state::ojankoc_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(ojankohs_state::irq0_line_hold));
@@ -870,8 +870,8 @@ void ojankohs_state::ojankoc(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MSM5205(config, m_msm, 8000000/22);
-	m_msm->vck_legacy_callback().set(FUNC(ojankohs_state::ojankohs_adpcm_int));		/* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 KHz */
+	m_msm->vck_legacy_callback().set(FUNC(ojankohs_state::ojankohs_adpcm_int));     /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 

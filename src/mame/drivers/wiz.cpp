@@ -790,25 +790,25 @@ INTERRUPT_GEN_MEMBER(wiz_state::wiz_sound_interrupt)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(wiz_state::kungfut)
-
+void wiz_state::kungfut(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6) /* 3.072 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(kungfut_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wiz_state, wiz_vblank_interrupt)
+	Z80(config, m_maincpu, 18432000/6); /* 3.072 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wiz_state::kungfut_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(wiz_state::wiz_vblank_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 18432000/6) /* 3.072 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(kungfut_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(wiz_state, wiz_sound_interrupt, 4*60) /* ??? */
+	Z80(config, m_audiocpu, 18432000/6); /* 3.072 MHz ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &wiz_state::kungfut_sound_map);
+	m_audiocpu->set_periodic_int(FUNC(wiz_state::wiz_sound_interrupt), attotime::from_hz(4*60)); /* ??? */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */ )
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_kungfut)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */ );
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(wiz_state::screen_update_kungfut));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stinger);
 	PALETTE(config, m_palette, FUNC(wiz_state::wiz_palette), 256);
@@ -823,57 +823,54 @@ MACHINE_CONFIG_START(wiz_state::kungfut)
 	AY8910(config, "8910.2", 18432000/12).add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	AY8910(config, "8910.3", 18432000/12).add_route(ALL_OUTPUTS, "mono", 0.10);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(wiz_state::wiz)
+void wiz_state::wiz(machine_config &config)
+{
 	kungfut(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(wiz_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &wiz_state::wiz_main_map);
 
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_wiz);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_wiz)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(wiz_state::screen_update_wiz));
+}
 
 
-MACHINE_CONFIG_START(wiz_state::stinger)
+void wiz_state::stinger(machine_config &config)
+{
 	kungfut(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(stinger_main_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &wiz_state::stinger_main_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &wiz_state::decrypted_opcodes_map);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(stinger_sound_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &wiz_state::stinger_sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_stinger)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(wiz_state::screen_update_stinger));
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("8910.3")
+	config.device_remove("8910.3");
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, stinger_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, stinger_discrete).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
-MACHINE_CONFIG_START(wiz_state::scion)
+void wiz_state::scion(machine_config &config)
+{
 	stinger(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
+	Z80(config.replace(), m_maincpu, 18432000/6); /* 3.072 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wiz_state::stinger_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(wiz_state::wiz_vblank_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(2*8, 32*8-1, 2*8, 30*8-1)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_visarea(2*8, 32*8-1, 2*8, 30*8-1);
+}
 
 
 

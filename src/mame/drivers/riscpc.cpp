@@ -814,86 +814,91 @@ void riscpc_state::machine_reset()
 	m_flyback_timer->adjust( attotime::never);
 }
 
-MACHINE_CONFIG_START(riscpc_state::rpc600)
+void riscpc_state::rpc600(machine_config &config)
+{
 	/* Basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", ARM7, 60_MHz_XTAL/2) // ARM610
-	MCFG_DEVICE_PROGRAM_MAP(a7000_mem)
+	ARM7(config, m_maincpu, 60_MHz_XTAL/2); // ARM610
+	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::a7000_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1900, 1080) //max available size
-	MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
-	MCFG_SCREEN_UPDATE_DRIVER(riscpc_state, screen_update)
-	MCFG_PALETTE_ADD("palette", 0x200)
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(1900, 1080); //max available size
+	m_screen->set_visarea(0, 1900-1, 0, 1080-1);
+	m_screen->set_screen_update(FUNC(riscpc_state::screen_update));
+	PALETTE(config, m_palette).set_entries(0x200);
+}
 
-MACHINE_CONFIG_START(riscpc_state::rpc700)
+void riscpc_state::rpc700(machine_config &config)
+{
 	/* Basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", ARM7, 80_MHz_XTAL/2) // ARM710
-	MCFG_DEVICE_PROGRAM_MAP(a7000_mem)
+	ARM7(config, m_maincpu, 80_MHz_XTAL/2); // ARM710
+	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::a7000_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1900, 1080) //max available size
-	MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
-	MCFG_SCREEN_UPDATE_DRIVER(riscpc_state, screen_update)
-	MCFG_PALETTE_ADD("palette", 0x200)
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(1900, 1080); //max available size
+	m_screen->set_visarea(0, 1900-1, 0, 1080-1);
+	m_screen->set_screen_update(FUNC(riscpc_state::screen_update));
+	PALETTE(config, m_palette).set_entries(0x200);
+}
 
-MACHINE_CONFIG_START(riscpc_state::a7000)
+void riscpc_state::a7000(machine_config &config)
+{
 	/* Basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", ARM7, XTAL(32'000'000) ) // ARM7500
-	MCFG_DEVICE_PROGRAM_MAP(a7000_mem)
+	ARM7(config, m_maincpu, XTAL(32'000'000)); // ARM7500
+	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::a7000_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1900, 1080) //max available size
-	MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
-	MCFG_SCREEN_UPDATE_DRIVER(riscpc_state, screen_update)
-	MCFG_PALETTE_ADD("palette", 0x200)
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(1900, 1080); //max available size
+	m_screen->set_visarea(0, 1900-1, 0, 1080-1);
+	m_screen->set_screen_update(FUNC(riscpc_state::screen_update));
+	PALETTE(config, m_palette).set_entries(0x200);
+}
 
-MACHINE_CONFIG_START(riscpc_state::a7000p)
+void riscpc_state::a7000p(machine_config &config)
+{
 	a7000(config);
-	MCFG_DEVICE_MODIFY("maincpu") // ARM7500FE
-	MCFG_DEVICE_CLOCK(XTAL(48'000'000))
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(XTAL(48'000'000)); // ARM7500FE
+}
 
-MACHINE_CONFIG_START(riscpc_state::sarpc)
+void riscpc_state::sarpc(machine_config &config)
+{
 	/* Basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", ARM7, 202000000 ) // StrongARM
-	MCFG_DEVICE_PROGRAM_MAP(a7000_mem)
+	ARM7(config, m_maincpu, 202000000); // StrongARM
+	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::a7000_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1900, 1080) //max available size
-	MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
-	MCFG_SCREEN_UPDATE_DRIVER(riscpc_state, screen_update)
-	MCFG_PALETTE_ADD("palette", 0x200)
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(1900, 1080); //max available size
+	m_screen->set_visarea(0, 1900-1, 0, 1080-1);
+	m_screen->set_screen_update(FUNC(riscpc_state::screen_update));
+	PALETTE(config, m_palette).set_entries(0x200);
+}
 
-MACHINE_CONFIG_START(riscpc_state::sarpc_j233)
+void riscpc_state::sarpc_j233(machine_config &config)
+{
 	/* Basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", ARM7, 233000000 ) // StrongARM
-	MCFG_DEVICE_PROGRAM_MAP(a7000_mem)
+	ARM7(config, m_maincpu, 233000000); // StrongARM
+	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::a7000_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1900, 1080) //max available size
-	MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
-	MCFG_SCREEN_UPDATE_DRIVER(riscpc_state, screen_update)
-	MCFG_PALETTE_ADD("palette", 0x200)
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(1900, 1080); //max available size
+	m_screen->set_visarea(0, 1900-1, 0, 1080-1);
+	m_screen->set_screen_update(FUNC(riscpc_state::screen_update));
+	PALETTE(config, m_palette).set_entries(0x200);
+}
 
 ROM_START(rpc600)
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )

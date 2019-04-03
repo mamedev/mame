@@ -392,8 +392,8 @@ void sothello_state::sothello(machine_config &config)
 	ymsnd.add_route(3, "mono", 0.50);
 
 	MSM5205(config, m_msm, XTAL(384'000));
-	m_msm->vck_legacy_callback().set(FUNC(sothello_state::adpcm_int));	/* interrupt function */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* changed on the fly */
+	m_msm->vck_legacy_callback().set(FUNC(sothello_state::adpcm_int));  /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* changed on the fly */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

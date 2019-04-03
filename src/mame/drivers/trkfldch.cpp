@@ -5,7 +5,15 @@
 Track & Field Challenge TV Game
 https://www.youtube.com/watch?v=wjn1lLylqog
 
-HELP!  what type of CPU / SoC is this? seems to be G65816 derived with custom vectors?
+Uses epoxy blobs for CPU etc.
+These have been identified as Winbond 2005 BA5962 (large glob) + Winbond 200506 BA5934 (smaller glob)
+seems to be G65816 derived with custom vectors?
+
+PCB               Game
+TV0001 R1.1       My First DDR
+TV0002 R1.0       Track & Field
+
+DDR & TF PCBs look identical, all the parts are in the same place, the traces are the same, and the silkscreened part # for resistors and caps are the same.
 
 currently dies after call at
 
@@ -151,7 +159,8 @@ void trkfldch_state::machine_reset()
 	m_maincpu->set_state_int(1, addr);
 }
 
-MACHINE_CONFIG_START(trkfldch_state::trkfldch)
+void trkfldch_state::trkfldch(machine_config &config)
+{
 	/* basic machine hardware */
 	G65816(config, m_maincpu, 20000000);
 	//m_maincpu->set_addrmap(AS_DATA, &tv965_state::mem_map);
@@ -169,12 +178,19 @@ MACHINE_CONFIG_START(trkfldch_state::trkfldch)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_trkfldch); // dummy
 	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 0x100).set_endianness(ENDIANNESS_BIG); // dummy
-MACHINE_CONFIG_END
+}
 
 ROM_START( trkfldch )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "trackandfield.bin", 0x000000, 0x400000,  CRC(f4f1959d) SHA1(344dbfe8df1897adf77da6e5ca0435c4d47d6842) )
 ROM_END
 
+ROM_START( my1stddr )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD( "myfirstddr.bin", 0x000000, 0x400000, CRC(2ef57bfc) SHA1(9feea5adb9de8fe17e915f3a037e8ddd70e58ae7) )
+ROM_END
+
+
 CONS( 2007, trkfldch,  0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",             "Track & Field Challenge", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2006, my1stddr,  0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",             "My First Dance Dance Revolution (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Japan version has different songs
 

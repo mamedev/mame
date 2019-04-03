@@ -24,9 +24,6 @@ DEFINE_DEVICE_TYPE(TMS0270, tms0270_cpu_device, "tms0270", "Texas Instruments TM
 // device definitions
 tms0270_cpu_device::tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms0980_cpu_device(mconfig, TMS0270, tag, owner, clock, 16 /* o pins */, 16 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 11 /* prg width */, address_map_constructor(FUNC(tms0270_cpu_device::program_11bit_9), this), 8 /* data width */, address_map_constructor(FUNC(tms0270_cpu_device::data_144x4), this))
-	, m_read_ctl(*this)
-	, m_write_ctl(*this)
-	, m_write_pdc(*this)
 {
 }
 
@@ -46,10 +43,6 @@ void tms0270_cpu_device::device_start()
 {
 	// common init
 	tms1k_base_device::device_start();
-
-	m_read_ctl.resolve_safe(0);
-	m_write_ctl.resolve_safe();
-	m_write_pdc.resolve_safe();
 
 	// zerofill
 	m_r_prev = 0;

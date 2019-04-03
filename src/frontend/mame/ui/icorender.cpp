@@ -10,8 +10,8 @@
     http://vitiy.info/Code/ico.cpp
 
     TODO:
-	* Add variant that loads all images from the file
-   	* Allow size hint for choosing best candidate
+    * Add variant that loads all images from the file
+    * Allow size hint for choosing best candidate
     * Allow selecting amongst candidates based on colour depth
 
 ***************************************************************************/

@@ -7,7 +7,7 @@
  */
 
 #include "nld_7475.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 
 namespace netlist
 {
@@ -101,7 +101,7 @@ namespace netlist
 	{
 		unsigned start_q = m_last_Q;
 
-		NETLIB_PARENT_UPDATE(7477);
+		NETLIB_NAME(7477)::update();
 
 		for (std::size_t i=0; i<4; i++)
 		{
@@ -148,10 +148,10 @@ namespace netlist
 
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(7475)
-	NETLIB_DEVICE_IMPL_DEPRECATED(7475_dip)
-	NETLIB_DEVICE_IMPL_DEPRECATED(7477)
-	NETLIB_DEVICE_IMPL_DEPRECATED(7477_dip)
+	NETLIB_DEVICE_IMPL(7475,     "TTL_7475",     "")
+	NETLIB_DEVICE_IMPL(7475_dip, "TTL_7475_DIP", "")
+	NETLIB_DEVICE_IMPL(7477,     "TTL_7477",     "")
+	NETLIB_DEVICE_IMPL(7477_dip, "TTL_7477_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

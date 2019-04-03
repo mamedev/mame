@@ -21,7 +21,7 @@
 #define LOG_PACKETS (1U << 1)
 #define LOG_TX      (1U << 2)
 #define LOG_RX      (1U << 3)
-#define LOG_FILTER	(1U << 4)
+#define LOG_FILTER  (1U << 4)
 //#define VERBOSE (LOG_GENERAL | LOG_PACKETS | LOG_TX | LOG_RX | LOG_FILTER)
 #include "logmacro.h"
 
@@ -89,7 +89,7 @@ void smc91c9x_device::device_start()
 
 	// These registers don't get cleared on reset
 	m_reg[B1_CONFIG] = 0x0030;   m_regmask[B1_CONFIG] = 0x17c6;
-	m_reg[B1_BASE]   = 0x1866;	 m_regmask[B1_BASE] = 0xfffe;
+	m_reg[B1_BASE]   = 0x1866;   m_regmask[B1_BASE] = 0xfffe;
 
 	m_reg[B1_IA0_1] = 0x0000;   m_regmask[B1_IA0_1] = 0xffff;
 	m_reg[B1_IA2_3] = 0x0000;   m_regmask[B1_IA2_3] = 0xffff;
@@ -291,9 +291,11 @@ void smc91c9x_device::dump_bytes(u8 *buf, int length)
 	if (VERBOSE & LOG_PACKETS)
 	{
 		std::stringstream ss_bytes;
+		ss_bytes << std::hex << std::setfill('0');
 		for (int i = 0; i < length; i++)
 		{
-			ss_bytes << std::hex << std::setw(2) << std::setfill('0') << (int) buf[i];
+			ss_bytes << std::setw(2) << (int) buf[i];
+			// Send newline every 16 bytes and at the end
 			if ((i & 0xf) == 0xf || i == length - 1)
 			{
 				LOGMASKED(LOG_PACKETS, "%s\n", ss_bytes.str());
@@ -370,8 +372,8 @@ int smc91c9x_device::address_filter(u8 *buf)
 
 /*-------------------------------------------------
 recv_start_cb - Start receiving packet
-	A return value of 0 will stop rx processing in dinetwork device
-	Any other value will be sent to the recv_complete_cb
+    A return value of 0 will stop rx processing in dinetwork device
+    Any other value will be sent to the recv_complete_cb
 -------------------------------------------------*/
 
 int smc91c9x_device::recv_start_cb(u8 *buf, int length)
@@ -415,7 +417,7 @@ int smc91c9x_device::recv_start_cb(u8 *buf, int length)
 
 /*-------------------------------------------------
 receive - Receive data into buffer
-	Returns the buffer packet number + 1 if successful
+    Returns the buffer packet number + 1 if successful
 -------------------------------------------------*/
 
 int smc91c9x_device::receive(u8 *buf, int length)
@@ -889,16 +891,16 @@ WRITE16_MEMBER( smc91c9x_device::write )
 			}
 			if (VERBOSE & LOG_GENERAL)
 			{
-				if (data & FDSE)		LOG("   FDSE\n");
-				if (data & EPH_LOOP)	LOG("   EPH LOOP\n");
-				if (data & STP_SQET)	LOG("   STP SQET\n");
-				if (data & FDUPLX)		LOG("   FDUPLX\n");
-				if (data & MON_CSN)		LOG("   MON_CSN\n");
-				if (data & NOCRC)		LOG("   NOCRC\n");
-				if (data & PAD_EN)		LOG("   PAD_EN\n");
-				if (data & FORCOL)		LOG("   FORCOL\n");
-				if (data & LOOP)		LOG("   LOOP\n");
-				if (data & TXENA)		LOG("   TXENA\n");
+				if (data & FDSE)        LOG("   FDSE\n");
+				if (data & EPH_LOOP)    LOG("   EPH LOOP\n");
+				if (data & STP_SQET)    LOG("   STP SQET\n");
+				if (data & FDUPLX)      LOG("   FDUPLX\n");
+				if (data & MON_CSN)     LOG("   MON_CSN\n");
+				if (data & NOCRC)       LOG("   NOCRC\n");
+				if (data & PAD_EN)      LOG("   PAD_EN\n");
+				if (data & FORCOL)      LOG("   FORCOL\n");
+				if (data & LOOP)        LOG("   LOOP\n");
+				if (data & TXENA)       LOG("   TXENA\n");
 			}
 			break;
 
@@ -921,13 +923,13 @@ WRITE16_MEMBER( smc91c9x_device::write )
 
 			if (VERBOSE & LOG_GENERAL)
 			{
-				if (data & SOFT_RST)	LOG("   SOFT RST\n");
-				if (data & FILT_CAR)	LOG("   FILT_CAR\n");
-				if (data & STRIP_CRC)	LOG("   STRIP CRC\n");
-				if (data & RXEN)		LOG("   RXEN\n");
-				if (data & ALMUL)		LOG("   ALMUL\n");
-				if (data & PRMS)		LOG("   PRMS\n");
-				if (data & RX_ABORT)	LOG("   RX_ABORT\n");
+				if (data & SOFT_RST)    LOG("   SOFT RST\n");
+				if (data & FILT_CAR)    LOG("   FILT_CAR\n");
+				if (data & STRIP_CRC)   LOG("   STRIP CRC\n");
+				if (data & RXEN)        LOG("   RXEN\n");
+				if (data & ALMUL)       LOG("   ALMUL\n");
+				if (data & PRMS)        LOG("   PRMS\n");
+				if (data & RX_ABORT)    LOG("   RX_ABORT\n");
 			}
 			break;
 
@@ -972,16 +974,16 @@ WRITE16_MEMBER( smc91c9x_device::write )
 			}
 			if (VERBOSE & LOG_GENERAL)
 			{
-				if (data & RCV_BAD)			LOG("   RCV_BAD\n");
-				if (data & PWRDN)			LOG("   PWRDN\n");
-				if (data & WAKEUP_EN)		LOG("   WAKEUP ENABLE\n");
-				if (data & AUTO_RELEASE)	LOG("   AUTO RELEASE\n");
-				if (data & LE_ENABLE)		LOG("   LE ENABLE\n");
-				if (data & CR_ENABLE)		LOG("   CR ENABLE\n");
-				if (data & TE_ENABLE)		LOG("   TE ENABLE\n");
-				if (data & EEPROM_SEL)		LOG("   EEPROM SELECT\n");
-				if (data & RELOAD)			LOG("   RELOAD\n");
-				if (data & STORE)			LOG("   STORE\n");
+				if (data & RCV_BAD)         LOG("   RCV_BAD\n");
+				if (data & PWRDN)           LOG("   PWRDN\n");
+				if (data & WAKEUP_EN)       LOG("   WAKEUP ENABLE\n");
+				if (data & AUTO_RELEASE)    LOG("   AUTO RELEASE\n");
+				if (data & LE_ENABLE)       LOG("   LE ENABLE\n");
+				if (data & CR_ENABLE)       LOG("   CR ENABLE\n");
+				if (data & TE_ENABLE)       LOG("   TE ENABLE\n");
+				if (data & EEPROM_SEL)      LOG("   EEPROM SELECT\n");
+				if (data & RELOAD)          LOG("   RELOAD\n");
+				if (data & STORE)           LOG("   STORE\n");
 			}
 			break;
 

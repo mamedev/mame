@@ -41,7 +41,6 @@ this reason.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
-#include "sound/sn76496.h"
 
 #include "includes/megadriv.h"
 
@@ -607,17 +606,16 @@ void mplay_state::megaplay_bios_map(address_map &map)
 
 READ8_MEMBER(mplay_state::vdp1_count_r)
 {
-	address_space &prg = m_bioscpu->space(AS_PROGRAM);
 	if (offset & 0x01)
-		return m_vdp1->hcount_read(prg, offset);
+		return m_vdp1->hcount_read();
 	else
-		return m_vdp1->vcount_read(prg, offset);
+		return m_vdp1->vcount_read();
 }
 
 void mplay_state::megaplay_bios_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).w("sn2", FUNC(sn76496_device::command_w));
+	map(0x7f, 0x7f).w(m_vdp1, FUNC(sega315_5124_device::psg_w));
 
 	map(0x40, 0x41).mirror(0x3e).r(FUNC(mplay_state::vdp1_count_r));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
@@ -664,17 +662,18 @@ MACHINE_RESET_MEMBER(mplay_state,megaplay)
 	MACHINE_RESET_CALL_MEMBER(megadriv);
 }
 
-MACHINE_CONFIG_START(mplay_state::megaplay)
+void mplay_state::megaplay(machine_config &config)
+{
 	/* basic machine hardware */
 	md_ntsc(config);
 
 	/* The Megaplay has an extra BIOS cpu which drives an SMS VDP
 	   which includes an SN76496 for sound */
-	MCFG_DEVICE_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
-	MCFG_DEVICE_PROGRAM_MAP(megaplay_bios_map)
-	MCFG_DEVICE_IO_MAP(megaplay_bios_io_map)
+	Z80(config, m_bioscpu, MASTER_CLOCK / 15); /* ?? */
+	m_bioscpu->set_addrmap(AS_PROGRAM, &mplay_state::megaplay_bios_map);
+	m_bioscpu->set_addrmap(AS_IO, &mplay_state::megaplay_bios_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	cxd1095_device &io1(CXD1095(config, "io1", 0));
 	io1.in_porta_cb().set_ioport("DSW0");
@@ -692,23 +691,20 @@ MACHINE_CONFIG_START(mplay_state::megaplay)
 	io2.in_porte_cb().set(FUNC(mplay_state::bios_6404_r));
 	io2.out_porte_cb().set(FUNC(mplay_state::bios_6404_w));
 
-	MCFG_DEVICE_ADD("sn2", SN76496, MASTER_CLOCK/15)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
-
 	/* New update functions to handle the extra layer */
-	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \
+	subdevice<screen_device>("megadriv")->set_raw(XTAL(10'738'635)/2, \
 			sega315_5124_device::WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
-			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224)
-	MCFG_SCREEN_UPDATE_DRIVER(mplay_state, screen_update_megplay)
+			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
+	subdevice<screen_device>("megadriv")->set_screen_update(FUNC(mplay_state::screen_update_megplay));
 
 	// Megaplay has an additional SMS VDP as an overlay
-	SEGA315_5246(config, m_vdp1, 0);
+	SEGA315_5246(config, m_vdp1, MASTER_CLOCK / 5); /* ?? */
 	m_vdp1->set_screen("megadriv");
 	m_vdp1->set_is_pal(false);
 	m_vdp1->irq().set_inputline(m_bioscpu, 0);
-MACHINE_CONFIG_END
+	m_vdp1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_vdp1->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+}
 
 
 /* MegaPlay Games - Modified Genesis games */

@@ -583,7 +583,7 @@ void topspeed_state::topspeed(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &topspeed_state::z80_io);
 
 	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(16'000'000) / 4));
-	ctc.intr_callback().set(FUNC(topspeed_state::z80ctc_to0));
+	ctc.zc_callback<0>().set(FUNC(topspeed_state::z80ctc_to0));
 
 	PC080SN(config, m_pc080sn[0], 0);
 	m_pc080sn[0]->set_gfx_region(1);
@@ -631,11 +631,11 @@ void topspeed_state::topspeed(machine_config &config)
 
 	MSM5205(config, m_msm[0], XTAL(384'000));
 	m_msm[0]->vck_legacy_callback().set(FUNC(topspeed_state::msm5205_1_vck));
-	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B);	// 8 kHz, 4-bit
+	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B);   // 8 kHz, 4-bit
 	m_msm[0]->add_route(ALL_OUTPUTS, "filter2", 1.0);
 
 	MSM5205(config, m_msm[1], XTAL(384'000));
-	m_msm[1]->set_prescaler_selector(msm5205_device::SEX_4B);	// Slave mode, 4-bit
+	m_msm[1]->set_prescaler_selector(msm5205_device::SEX_4B);   // Slave mode, 4-bit
 	m_msm[1]->add_route(ALL_OUTPUTS, "filter3", 1.0);
 
 	FILTER_VOLUME(config, "filter1l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);

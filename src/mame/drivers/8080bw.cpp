@@ -819,20 +819,18 @@ void _8080bw_state::spacecom_io_map(address_map &map)
 void _8080bw_state::spacecom(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080A(config, m_maincpu, XTAL(18'000'000) / 10); // divider guessed
+	I8080A(config, m_maincpu, XTAL(18'000'000) / 9); // divider guessed
 	// TODO: move irq handling away from mw8080.c, this game runs on custom hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::spacecom_map);
 	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::spacecom_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
 
 	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state, mw8080bw)
 	MCFG_MACHINE_RESET_OVERRIDE(mw8080bw_state, mw8080bw)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	m_screen->set_raw(XTAL(18'000'000) / 3, 384, 0, 256, 260, 0, 224); // parameters guessed
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_spacecom));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
@@ -1144,6 +1142,7 @@ void _8080bw_state::escmars(machine_config &config)
 	I8080(config, m_maincpu, XTAL(18'000'000) / 10); // divider guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::escmars_map);
 	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::lrescue_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, extra_8080bw)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
@@ -1243,7 +1242,6 @@ void _8080bw_state::cosmicmo(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::cosmicmo_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(_8080bw_state::irq0_line_hold));
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
@@ -1537,6 +1535,7 @@ void _8080bw_state::schaser(machine_config &config)
 	I8080(config.replace(), m_maincpu, 1996800); /* 19.968MHz / 10 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::schaser_map);
 	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::schaser_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,schaser)
@@ -1707,6 +1706,14 @@ CUSTOM_INPUT_MEMBER(_8080bw_state::sflush_80_r)
 	return (m_screen->vpos() & 0x80) ? 1 : 0;
 }
 
+uint8_t _8080bw_state::sflush_in0_r()
+{
+	// guess at interrupt acknowledgement
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+	return ioport("IN0")->read();
+}
+
 void _8080bw_state::sflush_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
@@ -1714,7 +1721,7 @@ void _8080bw_state::sflush_map(address_map &map)
 	map(0x8008, 0x8008).portr("PADDLE");
 	map(0x8009, 0x8009).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 	map(0x800a, 0x800a).portr("IN2");
-	map(0x800b, 0x800b).portr("IN0");
+	map(0x800b, 0x800b).r(FUNC(_8080bw_state::sflush_in0_r));
 	map(0x8018, 0x8018).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x8019, 0x8019).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x801a, 0x801a).nopw();
@@ -1769,7 +1776,6 @@ void _8080bw_state::sflush(machine_config &config)
 	/* basic machine hardware */
 	M6800(config.replace(), m_maincpu, 1500000); // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::sflush_map);
-	m_maincpu->set_vblank_int("screen", FUNC(_8080bw_state::irq0_line_hold));
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,sflush)
 
@@ -1934,14 +1940,17 @@ void _8080bw_state::lupin3a(machine_config &config)
 /*                                                     */
 /*******************************************************/
 
-INTERRUPT_GEN_MEMBER(_8080bw_state::polaris_interrupt)
+WRITE_LINE_MEMBER(_8080bw_state::polaris_60hz_w)
 {
-	m_polaris_cloud_speed++;
-
-	if (m_polaris_cloud_speed >= 4) /* every 4 frames - this was verified against real machine */
+	if (state)
 	{
-		m_polaris_cloud_speed = 0;
-		m_polaris_cloud_pos++;
+		m_polaris_cloud_speed++;
+
+		if (m_polaris_cloud_speed >= 4) /* every 4 frames - this was verified against real machine */
+		{
+			m_polaris_cloud_speed = 0;
+			m_polaris_cloud_pos++;
+		}
 	}
 }
 
@@ -2039,10 +2048,8 @@ void _8080bw_state::polaris(machine_config &config)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	I8080(config.replace(), m_maincpu, 1996800); /* 19.968MHz / 10 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::schaser_map);
 	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::polaris_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(_8080bw_state::polaris_interrupt));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
 
@@ -2053,6 +2060,7 @@ void _8080bw_state::polaris(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_polaris));
+	m_screen->screen_vblank().set(FUNC(_8080bw_state::polaris_60hz_w));
 
 	PALETTE(config, m_palette, palette_device::RBG_3BIT);
 
@@ -2741,6 +2749,7 @@ void _8080bw_state::shuttlei(machine_config &config)
 	// TODO: move irq handling away from mw8080.cpp, this game runs on custom hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::shuttlei_map);
 	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::shuttlei_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, extra_8080bw)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
@@ -2794,6 +2803,12 @@ MACHINE_START_MEMBER(_8080bw_state,darthvdr)
 MACHINE_RESET_MEMBER(_8080bw_state,darthvdr)
 {
 	/* do nothing for now - different interrupt system */
+}
+
+IRQ_CALLBACK_MEMBER(_8080bw_state::darthvdr_interrupt_vector)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	return 0xff;
 }
 
 READ8_MEMBER(_8080bw_state::darthvdr_01_r)
@@ -2867,7 +2882,7 @@ void _8080bw_state::darthvdr(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::darthvdr_map);
 	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::darthvdr_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(_8080bw_state::irq0_line_hold));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(_8080bw_state::darthvdr_interrupt_vector));
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,darthvdr)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state,darthvdr)
@@ -2877,6 +2892,7 @@ void _8080bw_state::darthvdr(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invaders));
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
 }
 
 

@@ -22,12 +22,12 @@ public:
 	virtual ~device_generic_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) { return 0xff; }
-	virtual DECLARE_READ16_MEMBER(read16_rom) { return 0xffff; }
-	virtual DECLARE_READ32_MEMBER(read32_rom) { return 0xffffffff; }
+	virtual uint8_t read_rom(offs_t offset) { return 0xff; }
+	virtual uint16_t read16_rom(offs_t offset, uint16_t mem_mask) { return 0xffff; }
+	virtual uint32_t read32_rom(offs_t offset, uint32_t mem_mask) { return 0xffffffff; }
 
-	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) {};
+	virtual uint8_t read_ram(offs_t offset) { return 0xff; }
+	virtual void write_ram(offs_t offset, uint8_t data) {}
 
 	virtual void rom_alloc(size_t size, int width, endianness_t end, const char *tag);
 	virtual void ram_alloc(uint32_t size);
@@ -138,12 +138,12 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_READ16_MEMBER(read16_rom);
-	virtual DECLARE_READ32_MEMBER(read32_rom);
+	virtual uint8_t read_rom(offs_t offset);
+	virtual uint16_t read16_rom(offs_t offset, uint16_t mem_mask = 0xffff);
+	virtual uint32_t read32_rom(offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	virtual uint8_t read_ram(offs_t offset);
+	virtual void write_ram(offs_t offset, uint8_t data);
 
 	virtual void rom_alloc(size_t size, int width, endianness_t end) { if (m_cart) m_cart->rom_alloc(size, width, end, tag()); }
 	virtual void ram_alloc(uint32_t size)  { if (m_cart) m_cart->ram_alloc(size); }

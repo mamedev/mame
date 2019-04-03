@@ -159,7 +159,7 @@ void tek440x_state::maincpu_map(address_map &map)
 	map(0x780000, 0x781fff).ram(); // map registers
 	// 782000-783fff: video address registers
 	// 784000-785fff: video control registers
-	map(0x788000, 0x788000).w("snsnd", FUNC(sn76496_device::command_w));
+	map(0x788000, 0x788000).w("snsnd", FUNC(sn76496_device::write));
 	// 78a000-78bfff: NS32081 FPU
 	map(0x78c000, 0x78c007).rw("aica", FUNC(mos6551_device::read), FUNC(mos6551_device::write)).umask16(0xff00);
 	// 7b1000-7b2fff: diagnostic registers
@@ -193,24 +193,24 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(tek440x_state::tek4404)
-
+void tek440x_state::tek4404(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68010, 40_MHz_XTAL / 4) // MC68010L10
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
+	M68010(config, m_maincpu, 40_MHz_XTAL / 4); // MC68010L10
+	m_maincpu->set_addrmap(AS_PROGRAM, &tek440x_state::maincpu_map);
 
-	MCFG_DEVICE_ADD("fdccpu", M6502, 1000000)
-	MCFG_DEVICE_PROGRAM_MAP(fdccpu_map)
+	M6502(config, m_fdccpu, 1000000);
+	m_fdccpu->set_addrmap(AS_PROGRAM, &tek440x_state::fdccpu_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DRIVER(tek440x_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 639, 0, 479);
+	screen.set_screen_update(FUNC(tek440x_state::screen_update));
+	screen.set_palette("palette");
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	mos6551_device &aica(MOS6551(config, "aica", 0));
@@ -227,9 +227,8 @@ MACHINE_CONFIG_START(tek440x_state::tek4404)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("snsnd", SN76496, VIDEO_CLOCK / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	SN76496(config, "snsnd", VIDEO_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
 

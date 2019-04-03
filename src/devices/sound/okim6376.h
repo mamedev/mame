@@ -13,7 +13,7 @@ class okim6376_device : public device_t,
 public:
 	okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( write );
+	void write(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( st_w );
 	DECLARE_WRITE_LINE_MEMBER( ch2_w );

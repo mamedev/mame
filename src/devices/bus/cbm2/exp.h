@@ -40,17 +40,6 @@
 #define CBM2_EXPANSION_SLOT_TAG     "exp"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CBM2_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, CBM2_EXPANSION_SLOT, _clock) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -77,8 +66,8 @@ public:
 	cbm2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// computer interface
-	uint8_t read(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3);
-	void write(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3);
+	uint8_t read(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3);
+	void write(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3);
 
 	// cartridge interface
 	int phi2() { return clock(); }
@@ -119,8 +108,8 @@ public:
 	// construction/destruction
 	virtual ~device_cbm2_expansion_card_interface();
 
-	virtual uint8_t cbm2_bd_r(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) { return data; };
-	virtual void cbm2_bd_w(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) { };
+	virtual uint8_t cbm2_bd_r(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) { return data; };
+	virtual void cbm2_bd_w(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) { };
 
 protected:
 	device_cbm2_expansion_card_interface(const machine_config &mconfig, device_t &device);

@@ -233,24 +233,25 @@ static GFXDECODE_START( gfx_plan80 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(plan80_state::plan80)
+void plan80_state::plan80(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8080, 2048000)
-	MCFG_DEVICE_PROGRAM_MAP(plan80_mem)
-	MCFG_DEVICE_IO_MAP(plan80_io)
+	I8080(config, m_maincpu, 2048000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &plan80_state::plan80_mem);
+	m_maincpu->set_addrmap(AS_IO, &plan80_state::plan80_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(plan80_state, screen_update)
-	MCFG_SCREEN_SIZE(48*6, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 48*6-1, 0, 32*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(plan80_state::screen_update));
+	screen.set_size(48*6, 32*8);
+	screen.set_visarea(0, 48*6-1, 0, 32*8-1);
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_plan80)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_plan80);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( plan80 )

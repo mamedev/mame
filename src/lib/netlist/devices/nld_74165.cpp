@@ -6,7 +6,7 @@
  */
 
 #include "nld_74165.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 
 namespace netlist
 {
@@ -86,6 +86,7 @@ namespace netlist
 		}
 		else if (!m_CLK() || m_CLKINH())
 		{
+			// FIXME: qh is overwritten below?
 			qh = old_qh;
 		}
 		else if (!m_last_CLK)
@@ -101,8 +102,8 @@ namespace netlist
 		m_QH.push(qh, NLTIME_FROM_NS(20)); // FIXME: Timing
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(74165)
-	NETLIB_DEVICE_IMPL_DEPRECATED(74165_dip)
+	NETLIB_DEVICE_IMPL(74165, "TTL_74165", "+CLK,+CLKINH,+SH_LDQ,+SER,+A,+B,+C,+D,+E,+F,+G,+H")
+	NETLIB_DEVICE_IMPL(74165_dip, "TTL_74165_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

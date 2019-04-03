@@ -117,7 +117,6 @@ public:
 
 	void amusco(machine_config &config);
 	void draw88pkr(machine_config &config);
-	void freeway(machine_config &config);
 
 	DECLARE_WRITE_LINE_MEMBER(coin_irq);
 
@@ -140,9 +139,8 @@ private:
 	MC6845_UPDATE_ROW(update_row);
 	void amusco_palette(palette_device &palette) const;
 
-	void amusco_mem_map(address_map &map);
-	void amusco_io_map(address_map &map);
-	void freeway_mem_map(address_map &map);
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
 
 	std::unique_ptr<uint8_t []> m_videoram;
 	tilemap_t *m_bg_tilemap;
@@ -211,31 +209,25 @@ void amusco_state::machine_start()
 * Memory Map Information *
 *************************/
 
-void amusco_state::amusco_mem_map(address_map &map)
+void amusco_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).ram();
 	map(0xf8000, 0xfffff).rom().region("maincpu", 0);
 }
 
-void amusco_state::freeway_mem_map(address_map &map)
-{
-	map(0x00000, 0x0ffff).ram();
-	map(0xf0000, 0xfffff).rom().region("maincpu", 0);
-}
-
 READ8_MEMBER( amusco_state::mc6845_r)
 {
 	if(offset & 1)
-		return m_crtc->register_r(space, 0);
+		return m_crtc->register_r();
 
-	return m_crtc->status_r(space,0); // not a plain 6845, requests update bit here ...
+	return m_crtc->status_r(); // not a plain 6845, requests update bit here ...
 }
 
 WRITE8_MEMBER( amusco_state::mc6845_w)
 {
 	if(offset & 1)
 	{
-		m_crtc->register_w(space, 0,data);
+		m_crtc->register_w(data);
 		if(m_mc6845_address == 0x12)
 			m_video_update_address = ((data & 0xff) << 8) | (m_video_update_address & 0x00ff);
 		if(m_mc6845_address == 0x13)
@@ -243,7 +235,7 @@ WRITE8_MEMBER( amusco_state::mc6845_w)
 	}
 	else
 	{
-		m_crtc->address_w(space,0,data);
+		m_crtc->address_w(data);
 		m_mc6845_address = data;
 	}
 }
@@ -373,14 +365,14 @@ WRITE8_MEMBER(amusco_state::rtc_control_w)
 	m_rtc->read_w(BIT(data, 4));
 }
 
-void amusco_state::amusco_io_map(address_map &map)
+void amusco_state::io_map(address_map &map)
 {
 	map(0x0000, 0x0001).rw(FUNC(amusco_state::mc6845_r), FUNC(amusco_state::mc6845_w));
 	map(0x0010, 0x0011).w(m_pic, FUNC(pic8259_device::write));
 	map(0x0020, 0x0023).w(m_pit, FUNC(pit8253_device::write));
 	map(0x0030, 0x0033).rw("ppi_outputs", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0040, 0x0043).rw("ppi_inputs", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x0060, 0x0060).w("sn", FUNC(sn76489a_device::command_w));
+	map(0x0060, 0x0060).w("sn", FUNC(sn76489a_device::write));
 	map(0x0070, 0x0071).w(FUNC(amusco_state::vram_w));
 	map(0x0280, 0x0283).rw("lpt_interface", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x0380, 0x0383).rw("rtc_interface", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
@@ -540,12 +532,12 @@ void amusco_state::amusco_palette(palette_device &palette) const
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(amusco_state::amusco)
-
+void amusco_state::amusco(machine_config &config)
+{
 	/* basic machine hardware */
 	I8088(config, m_maincpu, CPU_CLOCK);        // 5 MHz ?
-	m_maincpu->set_addrmap(AS_PROGRAM, &amusco_state::amusco_mem_map);
-	m_maincpu->set_addrmap(AS_IO, &amusco_state::amusco_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &amusco_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &amusco_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	PIC8259(config, m_pic, 0);
@@ -579,15 +571,15 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	i8155b.in_pc_callback().set(m_rtc, FUNC(msm5832_device::data_r));
 	i8155b.out_pc_callback().set(m_rtc, FUNC(msm5832_device::data_w));
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(30), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(30), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(88*8, 27*10)                           // screen size: 88*8 27*10
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 74*8-1, 0*10, 24*10-1)    // visible scr: 74*8 24*10
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(88*8, 27*10);                           // screen size: 88*8 27*10
+	m_screen->set_visarea(0*8, 74*8-1, 0*10, 24*10-1);    // visible scr: 74*8 24*10
+	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_amusco);
 	PALETTE(config, "palette", FUNC(amusco_state::amusco_palette), 8*8);
@@ -603,22 +595,13 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("sn", SN76489A, SND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	SN76489A(config, "sn", SND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 void amusco_state::draw88pkr(machine_config &config)
 {
 	amusco(config);
 	//MCFG_DEVICE_MODIFY("ppi_outputs") // Some bits are definitely different
-}
-
-void amusco_state::freeway(machine_config &config)
-{
-	amusco(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &amusco_state::freeway_mem_map);
-
-	//TODO: everything
 }
 
 /*************************
@@ -663,27 +646,6 @@ ROM_START( draw88pkr )
 	ROM_LOAD( "u37.bin",  0x8000, 0x4000, CRC(6e23b9f2) SHA1(6916828d84d1ecb44dc454e6786f97801a8550c7) )
 ROM_END
 
-// this might better fit another driver
-// 8088 CPU
-// Intel 8254 Programmable Interval Timer
-// Intel 8259
-// 2x 8k SRAM
-// 1x 32k SRAM
-// 6845 video chip
-// 5 roms
-// Oscillator 10 MHz
-
-ROM_START( freeway )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "vip88.bin", 0x00000, 0x10000, CRC(aeba6d5e) SHA1(bb84f7040bf1b6976cb2c50b1ffdc59ae88df223) )
-
-	ROM_REGION( 0x20000, "gfx1", 0 ) // loading might be wrong
-	ROM_LOAD( "sb_51.bin",  0x00000, 0x8000, CRC(d25bd328) SHA1(b8c692298f6dc5fd5ae2f9e7701e14b0436a95bb) ) // xxx0xxxxxxxxxxx = 0xFF
-	ROM_LOAD( "sb_52.bin",  0x08000, 0x8000, CRC(f2b33acd) SHA1(e4786b4f00871d771aadacd9d6ec767691f4d939) )
-	ROM_LOAD( "sb_53.bin",  0x10000, 0x8000, CRC(50407ae6) SHA1(2c6c4803905bed5f27c6783f99a24f8dee62c19b) )
-	ROM_LOAD( "sb_cor.bin", 0x18000, 0x8000, CRC(5f86a160) SHA1(f21b7e0e6a407371c252d6fde6fcb32a2682824c) ) // 00000xxxxxxxxxx = 0xFF
-ROM_END
-
 /*************************
 *      Game Drivers      *
 *************************/
@@ -691,4 +653,3 @@ ROM_END
 /*     YEAR  NAME       PARENT  MACHINE    INPUT      CLASS         INIT        ROT   COMPANY            FULLNAME                       FLAGS                                                LAYOUT    */
 GAMEL( 1987, amusco,    0,      amusco,    amusco,    amusco_state, empty_init, ROT0, "Amusco",          "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong
 GAMEL( 1988, draw88pkr, 0,      draw88pkr, draw88pkr, amusco_state, empty_init, ROT0, "BTE, Inc.",       "Draw 88 Poker (V2.0)",        MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong
-GAMEL( 1999, freeway,   0,      draw88pkr, draw88pkr, amusco_state, empty_init, ROT0, "NVC Electronica", "FreeWay (V5.12)",             MACHINE_IS_SKELETON      | MACHINE_NODEVICE_PRINTER, layout_amusco ) // might need an own driver

@@ -138,7 +138,8 @@ private:
 	emu_timer *m_internal_timer[2];
 
 	bool get_serial_in();
-	void sio_tick();
+	void sio_receive();
+	void sio_transmit();
 
 	template <int T> void timer_start();
 	template <int T> void timer_stop();

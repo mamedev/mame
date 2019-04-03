@@ -6,7 +6,7 @@
  */
 
 #include "nld_9310.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 
 #define MAXCNT 9
 
@@ -140,8 +140,8 @@ namespace netlist
 
 	NETLIB_RESET(9310)
 	{
-		sub.do_reset();
-		subABCD.do_reset();
+		sub.reset();
+		subABCD.reset();
 	}
 
 	NETLIB_RESET(9310_subABCD)
@@ -158,32 +158,35 @@ namespace netlist
 
 	NETLIB_UPDATE(9310_sub)
 	{
+		auto cnt(m_cnt);
+
 		if (m_loadq)
 		{
-			if (m_cnt < MAXCNT - 1)
+			if (cnt < MAXCNT - 1)
 			{
-				++m_cnt;
-				update_outputs(m_cnt);
+				++cnt;
+				update_outputs(cnt);
 			}
-			else if (m_cnt == MAXCNT - 1)
+			else if (cnt == MAXCNT - 1)
 			{
-				m_cnt = MAXCNT;
+				cnt = MAXCNT;
 				m_RC.push(m_ent, NLTIME_FROM_NS(20));
 				m_QA.push(1, NLTIME_FROM_NS(20));
 			}
 			else // MAXCNT
 			{
 				m_RC.push(0, NLTIME_FROM_NS(20));
-				m_cnt = 0;
-				update_outputs_all(m_cnt, NLTIME_FROM_NS(20));
+				cnt = 0;
+				update_outputs_all(cnt, NLTIME_FROM_NS(20));
 			}
 		}
 		else
 		{
-			m_cnt = m_ABCD->read_ABCD();
-			m_RC.push(m_ent & (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
-			update_outputs_all(m_cnt, NLTIME_FROM_NS(22));
+			cnt = m_ABCD->read_ABCD();
+			m_RC.push(m_ent & (cnt == MAXCNT), NLTIME_FROM_NS(27));
+			update_outputs_all(cnt, NLTIME_FROM_NS(22));
 		}
+		m_cnt = cnt;
 	}
 
 	NETLIB_UPDATE(9310)
@@ -224,10 +227,10 @@ namespace netlist
 	#if 0
 	//    for (int i=0; i<4; i++)
 	//        m_Q[i], (cnt >> i) & 1, delay[i]);
-		m_QA, (cnt >> 0) & 1, out_delay);
-		m_QB, (cnt >> 1) & 1, out_delay);
-		m_QC, (cnt >> 2) & 1, out_delay);
-		m_QD, (cnt >> 3) & 1, out_delay);
+		m_QA.push((cnt >> 0) & 1, out_delay);
+		m_QB.push((cnt >> 1) & 1, out_delay);
+		m_QC.push((cnt >> 2) & 1, out_delay);
+		m_QD.push((cnt >> 3) & 1, out_delay);
 	#else
 		if ((cnt & 1) == 1)
 			m_QA.push(1, out_delay);
@@ -263,8 +266,8 @@ namespace netlist
 	#endif
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(9310)
-	NETLIB_DEVICE_IMPL_DEPRECATED(9310_dip)
+	NETLIB_DEVICE_IMPL(9310,     "TTL_9310",     "")
+	NETLIB_DEVICE_IMPL(9310_dip, "TTL_9310_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

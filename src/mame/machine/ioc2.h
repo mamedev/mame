@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include "cpu/mips/mips3.h"
 #include "machine/8042kbdc.h"
 #include "machine/pc_lpt.h"
 #include "machine/pckeybrd.h"
@@ -155,7 +154,7 @@ protected:
 		DMA_SEL_CLOCK_SEL_EXT     = 0x20,
 	};
 
-	required_device<mips3_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<scc85230_device> m_scc;
 	required_device<pc_lpt_device> m_pi1;   // we assume standard parallel port (SPP) mode
 											// TODO: SGI parallel port (SGIPP), HP BOISE high speed parallel port (HPBPP), and Ricoh scanner modes

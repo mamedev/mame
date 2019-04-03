@@ -95,6 +95,8 @@ char const *const hover_msg[] = {
 
 } // anonymous namespace
 
+constexpr std::size_t menu_select_launch::MAX_VISIBLE_SEARCH; // stupid non-inline semantics
+
 
 class menu_select_launch::software_parts : public menu
 {

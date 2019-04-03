@@ -996,11 +996,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(exidy440_state::exidy440)
-
+void exidy440_state::exidy440(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, MAIN_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(exidy440_map)
+	MC6809E(config, m_maincpu, MAIN_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &exidy440_state::exidy440_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1011,20 +1011,19 @@ MACHINE_CONFIG_START(exidy440_state::exidy440)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("440audio", EXIDY440, EXIDY440_MC3418_CLOCK)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	EXIDY440(config, m_custom, EXIDY440_MC3418_CLOCK);
+	m_custom->add_route(0, "lspeaker", 1.0);
+	m_custom->add_route(1, "rspeaker", 1.0);
+}
 
 
-MACHINE_CONFIG_START(topsecex_state::topsecex)
+void topsecex_state::topsecex(machine_config &config)
+{
 	exidy440(config);
-
-	/* basic machine hardware */
 
 	/* video hardware */
 	topsecex_video(config);
-MACHINE_CONFIG_END
+}
 
 
 

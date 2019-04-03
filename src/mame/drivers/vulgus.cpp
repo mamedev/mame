@@ -216,27 +216,27 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(vulgus_state::vulgus)
-
+void vulgus_state::vulgus(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/4)  /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vulgus_state, vblank_irq)
+	Z80(config, m_maincpu, XTAL(12'000'000)/4);  /* 3 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &vulgus_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vulgus_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000)/4) /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(vulgus_state, irq0_line_hold, 8*60)
+	Z80(config, m_audiocpu, XTAL(12'000'000)/4); /* 3 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &vulgus_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(vulgus_state::irq0_line_hold), attotime::from_hz(8*60));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.59)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vulgus_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.59);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(vulgus_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_vulgus)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vulgus);
 
 	PALETTE(config, m_palette, FUNC(vulgus_state::vulgus_palette), 64*4+16*16+4*32*8, 256);
 
@@ -248,7 +248,7 @@ MACHINE_CONFIG_START(vulgus_state::vulgus)
 	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.5 MHz */
 
 	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.5 MHz */
-MACHINE_CONFIG_END
+}
 
 
 

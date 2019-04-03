@@ -1579,11 +1579,11 @@ WRITE16_MEMBER(seta_state::sub_ctrl_w)
 			break;
 
 		case 4/2:   // not sure
-			if (ACCESSING_BITS_0_7) if(m_soundlatch[0] != nullptr) m_soundlatch[0]->write(space, 0, data & 0xff);
+			if (ACCESSING_BITS_0_7) if(m_soundlatch[0] != nullptr) m_soundlatch[0]->write(data & 0xff);
 			break;
 
 		case 6/2:   // not sure
-			if (ACCESSING_BITS_0_7) if(m_soundlatch[1] != nullptr) m_soundlatch[1]->write(space, 0, data & 0xff);
+			if (ACCESSING_BITS_0_7) if(m_soundlatch[1] != nullptr) m_soundlatch[1]->write(data & 0xff);
 			break;
 	}
 
@@ -2923,7 +2923,6 @@ void kiwame_state::kiwame_map(address_map &map)
 	map(0xc00000, 0xc03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xd00000, 0xd00009).r(FUNC(kiwame_state::input_r));                 // mahjong panel
 	map(0xe00000, 0xe00003).r(FUNC(kiwame_state::seta_dsw_r));              // DSW
-	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));
 }
 
 
@@ -3063,7 +3062,7 @@ void seta_state::umanclub_map(address_map &map)
 WRITE8_MEMBER(seta_state::utoukond_sound_control_w)
 {
 	if (!BIT(data, 6))
-		m_soundlatch[0]->acknowledge_w(space, 0, 0);
+		m_soundlatch[0]->acknowledge_w();
 
 	// other bits used for banking? (low nibble seems to always be 2)
 }
@@ -3559,7 +3558,7 @@ WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 
 	// Bit 3: NMICLR
 	if (!BIT(data, 3))
-		m_soundlatch[0]->acknowledge_w(space, 0, 0);
+		m_soundlatch[0]->acknowledge_w();
 
 	// Bit 2: IRQCLR
 	if (!BIT(data, 2))
@@ -3571,7 +3570,7 @@ WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 
 WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
 {
-	m_soundlatch[1]->write(space,0,data);
+	m_soundlatch[1]->write(data);
 	m_subcpu->spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 }
 
@@ -8039,7 +8038,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::calibr50_interrupt)
 
 void usclssic_state::machine_start()
 {
-	m_buttonmux->write_ab(0xff);
+	m_buttonmux->ab_w(0xff);
 }
 
 
@@ -8414,7 +8413,7 @@ void seta_state::daioh(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57.42);	/* verified on PCB */;
+	screen.set_refresh_hz(57.42);   /* verified on PCB */
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
@@ -8451,7 +8450,7 @@ void seta_state::daiohp(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57.42);	/* verified on PCB */;
+	screen.set_refresh_hz(57.42);   /* verified on PCB */
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
@@ -9275,19 +9274,15 @@ void seta_state::triplfun(machine_config &config)
 WRITE_LINE_MEMBER(kiwame_state::kiwame_vblank)
 {
 	if (state)
-		m_tmp68301->external_interrupt_0();
+		m_maincpu->external_interrupt_0();
 }
 
 void kiwame_state::kiwame(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	TMP68301(config, m_maincpu, 16000000);   /* 16 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &kiwame_state::kiwame_map);
-	m_maincpu->set_irq_acknowledge_callback("tmp68301", FUNC(tmp68301_device::irq_callback));
-
-	tmp68301_device &tmp68301(TMP68301(config, "tmp68301", 0));
-	tmp68301.set_cputag(m_maincpu);
-	tmp68301.out_parallel_callback().set(FUNC(kiwame_state::row_select_w));
+	m_maincpu->out_parallel_callback().set(FUNC(kiwame_state::row_select_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -10836,8 +10831,7 @@ ROM_START( msgundamb ) // 2 PCB stack, one has a 'Tecnoval - tecnologia valencia
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1, on lower board */
 	ROM_LOAD16_BYTE( "27c8001-6.bin", 0x000000, 0x100000, CRC(8fbb5478) SHA1(247fd080f0ee18282c4d8b918171cfeab4b40d23) ) // 1ST AND 2ND HALF IDENTICAL, fa001006.u23 [even] IDENTICAL
-	ROM_LOAD16_BYTE( "27c8001-5.bin", 0x000001, 0x100000, BAD_DUMP CRC(9e10c071) SHA1(2ec1cee04433b30c908548642e7c19862151c8a2) ) // 1ST AND 2ND HALF IDENTICAL, fa001006.u23 [odd]  77.495193% - bad, causes GFX glitches
-	// ROM_LOAD16_BYTE( "5_handcrafted.bin", 0x000001, 0x100000, CRC(c83ae34a) SHA1(d7bf49843c443c5b7cb9187404a3518eaed577a6) ) // this was de-interleaved from the original, left here to easily verify an eventual redump
+	ROM_LOAD16_BYTE( "27c8001-5.bin", 0x000001, 0x100000, CRC(c83ae34a) SHA1(d7bf49843c443c5b7cb9187404a3518eaed577a6) ) // 1ST AND 2ND HALF IDENTICAL, fa001006.u23 [odd]  IDENTICAL
 
 	ROM_REGION( 0x080000, "gfx3", 0 )   /* Layer 2, on lower board, identical to the original but split */
 	ROM_LOAD16_BYTE( "d-8.bin", 0x000000, 0x040000, CRC(a03c8345) SHA1(d3c3f0045ebb3d82d82432c212db4a801cb53b60) ) // 27c020
@@ -12202,7 +12196,7 @@ GAME( 1993, madshark,  0,        madshark,  madshark,  seta_state,     empty_ini
 // end credits shows Allumer as developer.
 GAME( 1993, msgundam,  0,        msgundam,  msgundam,  seta_state,     empty_init,     ROT0,   "Banpresto / Allumer",       "Mobile Suit Gundam", 0 )
 GAME( 1993, msgundam1, msgundam, msgundam,  msgundam1, seta_state,     empty_init,     ROT0,   "Banpresto / Allumer",       "Mobile Suit Gundam (Japan)", 0 )
-GAME( 1993, msgundamb, msgundam, msgundamb, msgundam,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Mobile Suit Gundam (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // GFX glitches due to bad dump
+GAME( 1993, msgundamb, msgundam, msgundamb, msgundam,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Mobile Suit Gundam (bootleg)", 0 )
 
 GAME( 1993, oisipuzl,  0,        oisipuzl,  oisipuzl,  seta_state,     empty_init,     ROT0,   "Sunsoft / Atlus",           "Oishii Puzzle Ha Irimasenka", 0 )
 GAME( 1993, triplfun,  oisipuzl, triplfun,  oisipuzl,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Triple Fun", 0 )

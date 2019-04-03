@@ -361,10 +361,11 @@ uint32_t jedi_state::screen_update_jedi(screen_device &screen, bitmap_rgb32 &bit
  *
  *************************************/
 
-MACHINE_CONFIG_START(jedi_state::jedi_video)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(64*8, 262) /* verify vert size */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(jedi_state, screen_update_jedi)
-MACHINE_CONFIG_END
+void jedi_state::jedi_video(machine_config &config)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(64*8, 262); /* verify vert size */
+	m_screen->set_visarea(0*8, 37*8-1, 0*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(jedi_state::screen_update_jedi));
+}

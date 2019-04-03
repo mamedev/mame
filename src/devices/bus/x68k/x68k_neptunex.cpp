@@ -39,17 +39,15 @@ x68k_neptune_device::x68k_neptune_device(const machine_config &mconfig, const ch
 
 void x68k_neptune_device::device_start()
 {
-	device_t* cpu = machine().device("maincpu");
 	char mac[7];
 	uint32_t num = machine().rand();
-	address_space& space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<x68k_expansion_slot_device *>(owner());
 	memset(m_prom, 0x57, 16);
 	sprintf(mac+2, "\x1b%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
 	mac[0] = 0; mac[1] = 0;  // avoid gcc warning
 	memcpy(m_prom, mac, 6);
 	m_dp8390->set_mac(mac);
-	space.install_readwrite_handler(0xece000,0xece3ff,read16_delegate(FUNC(x68k_neptune_device::x68k_neptune_port_r),this),write16_delegate(FUNC(x68k_neptune_device::x68k_neptune_port_w),this),0xffffffff);
+	m_slot->space().install_readwrite_handler(0xece000,0xece3ff,read16_delegate(FUNC(x68k_neptune_device::x68k_neptune_port_r),this),write16_delegate(FUNC(x68k_neptune_device::x68k_neptune_port_w),this),0xffffffff);
 }
 
 void x68k_neptune_device::device_reset() {

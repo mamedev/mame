@@ -280,7 +280,7 @@ void ncr539x_device::device_timer(emu_timer &timer, device_timer_id tid, int par
 	}
 }
 
-READ8_MEMBER( ncr539x_device::read )
+uint8_t ncr539x_device::read(offs_t offset)
 {
 	uint8_t rv = 0;
 
@@ -412,7 +412,7 @@ READ8_MEMBER( ncr539x_device::read )
 	return rv;
 }
 
-WRITE8_MEMBER( ncr539x_device::write )
+void ncr539x_device::write(offs_t offset, uint8_t data)
 {
 	//if (offset != 2)
 		LOG("539x: Write %02x @ %s (%02x) (%s)\n", data, wrregs[offset], offset, machine().describe_context());

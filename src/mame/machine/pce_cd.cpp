@@ -248,8 +248,8 @@ void pce_cd_device::device_add_mconfig(machine_config &config)
 	CDROM(config, m_cdrom).set_interface("pce_cdrom");
 
 	MSM5205(config, m_msm, PCE_CD_CLOCK / 6);
-	m_msm->vck_legacy_callback().set(FUNC(pce_cd_device::msm5205_int));	/* interrupt function */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 1/48 prescaler, 4bit data */
+	m_msm->vck_legacy_callback().set(FUNC(pce_cd_device::msm5205_int)); /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 1/48 prescaler, 4bit data */
 	m_msm->add_route(ALL_OUTPUTS, "^lspeaker", 0.50);
 	m_msm->add_route(ALL_OUTPUTS, "^rspeaker", 0.50);
 

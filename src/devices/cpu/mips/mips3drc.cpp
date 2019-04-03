@@ -333,7 +333,7 @@ void mips3_device::code_compile_block(uint8_t mode, offs_t pc)
 				else
 				{
 					UML_LABEL(block, seqhead->pc | 0x80000000);                             // label   seqhead->pc | 0x80000000
-					UML_HASHJMP(block, m_core->mode, seqhead->pc, *m_nocode);				// hashjmp <mode>,seqhead->pc,nocode
+					UML_HASHJMP(block, m_core->mode, seqhead->pc, *m_nocode);               // hashjmp <mode>,seqhead->pc,nocode
 					continue;
 				}
 
@@ -367,11 +367,11 @@ void mips3_device::code_compile_block(uint8_t mode, offs_t pc)
 				/* if the last instruction can change modes, use a variable mode; otherwise, assume the same mode */
 				if (seqlast->flags & OPFLAG_CAN_CHANGE_MODES)
 				{
-					UML_HASHJMP(block, mem(&m_core->mode), nextpc, *m_nocode);				// hashjmp <mode>,nextpc,nocode
+					UML_HASHJMP(block, mem(&m_core->mode), nextpc, *m_nocode);              // hashjmp <mode>,nextpc,nocode
 				}
 				else if (seqlast->next() == nullptr || seqlast->next()->pc != nextpc)
 				{
-					UML_HASHJMP(block, m_core->mode, nextpc, *m_nocode);					// hashjmp <mode>,nextpc,nocode
+					UML_HASHJMP(block, m_core->mode, nextpc, *m_nocode);                    // hashjmp <mode>,nextpc,nocode
 				}
 			}
 
@@ -1308,13 +1308,13 @@ void mips3_device::generate_delay_slot_and_branch(drcuml_block &block, compiler_
 		}
 		else
 		{
-			UML_HASHJMP(block, m_core->mode, desc->targetpc, *m_nocode);			// hashjmp <mode>,desc->targetpc,nocode
+			UML_HASHJMP(block, m_core->mode, desc->targetpc, *m_nocode);            // hashjmp <mode>,desc->targetpc,nocode
 		}
 	}
 	else
 	{
 		generate_update_cycles(block, compiler_temp, uml::mem(&m_core->jmpdest), true); // <subtract cycles>
-		UML_HASHJMP(block, m_core->mode, mem(&m_core->jmpdest), *m_nocode);			// hashjmp <mode>,<rsreg>,nocode
+		UML_HASHJMP(block, m_core->mode, mem(&m_core->jmpdest), *m_nocode);         // hashjmp <mode>,<rsreg>,nocode
 	}
 
 	/* update the label */

@@ -2,7 +2,7 @@
 // copyright-holders:Juergen Buchmueller
 /****************************************************************************
  *
- * warpwarp.c
+ * warpwarp.cpp
  *
  * sound driver
  * juergen buchmueller <pullmoll@t-online.de>, jan 2000
@@ -90,7 +90,7 @@ void warpwarp_sound_device::device_timer(emu_timer &timer, device_timer_id id, i
 	}
 }
 
-WRITE8_MEMBER( warpwarp_sound_device::sound_w )
+void warpwarp_sound_device::sound_w(u8 data)
 {
 	m_channel->update();
 	m_sound_latch = data & 0x0f;
@@ -127,13 +127,13 @@ WRITE8_MEMBER( warpwarp_sound_device::sound_w )
 	}
 }
 
-WRITE8_MEMBER( warpwarp_sound_device::music1_w )
+void warpwarp_sound_device::music1_w(u8 data)
 {
 	m_channel->update();
 	m_music1_latch = data & 0x3f;
 }
 
-WRITE8_MEMBER( warpwarp_sound_device::music2_w )
+void warpwarp_sound_device::music2_w(u8 data)
 {
 	m_channel->update();
 	m_music2_latch = data & 0x3f;

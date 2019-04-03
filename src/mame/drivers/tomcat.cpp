@@ -97,7 +97,7 @@ private:
 
 WRITE8_MEMBER(tomcat_state::adcon_w)
 {
-	m_adc->address_w(space, 0, data & 7);
+	m_adc->address_w(data & 7);
 	m_adc->start_w(BIT(data, 3));
 }
 
@@ -308,25 +308,26 @@ void tomcat_state::machine_start()
 	m_dsp_bio = 0;
 }
 
-MACHINE_CONFIG_START(tomcat_state::tomcat)
-	MCFG_DEVICE_ADD("maincpu", M68010, 12.096_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(tomcat_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert,  5*60)
-	//MCFG_DEVICE_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert, 12.096_MHz_XTAL / 16 / 16 / 16 / 12)
+void tomcat_state::tomcat(machine_config &config)
+{
+	M68010(config, m_maincpu, 12.096_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tomcat_state::tomcat_map);
+	m_maincpu->set_periodic_int(FUNC(tomcat_state::irq1_line_assert), attotime::from_hz(5*60));
+	//m_maincpu->set_periodic_int(FUNC(tomcat_state::irq1_line_assert), attotime::from_hz(12.096_MHz_XTAL / 16 / 16 / 16 / 12));
 
 	TMS32010(config, m_dsp, 16_MHz_XTAL);
 	m_dsp->set_addrmap(AS_PROGRAM, &tomcat_state::dsp_map);
 	m_dsp->bio().set(FUNC(tomcat_state::dsp_bio_r));
 
-	MCFG_DEVICE_ADD("soundcpu", M6502, 14.318181_MHz_XTAL / 8)
-	MCFG_DEVICE_DISABLE()
-	MCFG_DEVICE_PROGRAM_MAP( sound_map)
+	m6502_device &soundcpu(M6502(config, "soundcpu", 14.318181_MHz_XTAL / 8));
+	soundcpu.set_disable();
+	soundcpu.set_addrmap(AS_PROGRAM, &tomcat_state::sound_map);
 
 	ADC0809(config, m_adc, 12.096_MHz_XTAL / 16);
 	m_adc->in_callback<0>().set_ioport("STICKY");
 	m_adc->in_callback<1>().set_ioport("STICKX");
 
-	MCFG_DEVICE_ADD("riot", RIOT6532, 14.318181_MHz_XTAL / 8)
+	RIOT6532(config, "riot", 14.318181_MHz_XTAL / 8);
 	/*
 	 PA0 = /WS   OUTPUT  (TMS-5220 WRITE STROBE)
 	 PA1 = /RS   OUTPUT  (TMS-5220 READ STROBE)
@@ -342,7 +343,7 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	// OUTB PB0 - PB7   OUTPUT  Speech Data
 	// IRQ CB connected to IRQ line of 6502
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(4000))
+	config.m_minimum_quantum = attotime::from_hz(4000);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set_output("led1").invert();
@@ -358,33 +359,31 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("m48t02", M48T02, 0)
+	M48T02(config, "m48t02", 0);
 
 	VECTOR(config, "vector", 0);
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(40)
-	//MCFG_SCREEN_REFRESH_RATE((double)XTAL(12'000'000) / 16 / 16 / 16 / 12  / 5 )
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 280, 0, 250)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
+	screen.set_refresh_hz(40);
+	//screen.set_refresh_hz((double)XTAL(12'000'000) / 16 / 16 / 16 / 12  / 5 );
+	screen.set_size(400, 300);
+	screen.set_visarea(0, 280, 0, 250);
+	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
 	avg_device &avg(AVG_TOMCAT(config, "avg", 0));
 	avg.set_vector_tag("vector");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("pokey1", POKEY, XTAL(14'318'181) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
+	POKEY(config, "pokey1", XTAL(14'318'181) / 8).add_route(ALL_OUTPUTS, "lspeaker", 0.20);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, XTAL(14'318'181) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
+	POKEY(config, "pokey2", XTAL(14'318'181) / 8).add_route(ALL_OUTPUTS, "rspeaker", 0.20);
 
-	MCFG_DEVICE_ADD("tms", TMS5220, 325000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	TMS5220(config, m_tms, 325000);
+	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	YM2151(config, "ymsnd", XTAL(14'318'181)/4).add_route(0, "lspeaker", 0.60).add_route(1, "rspeaker", 0.60);
-MACHINE_CONFIG_END
+}
 
 ROM_START( tomcat )
 	ROM_REGION( 0x10000, "maincpu", 0)

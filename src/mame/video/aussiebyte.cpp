@@ -76,7 +76,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( aussiebyte_state::crtc_update_addr )
 
 WRITE8_MEMBER( aussiebyte_state::address_w )
 {
-	m_crtc->address_w( space, 0, data );
+	m_crtc->address_w(data);
 
 	m_video_index = data & 0x1f;
 
@@ -100,7 +100,7 @@ WRITE8_MEMBER( aussiebyte_state::address_w )
 
 WRITE8_MEMBER( aussiebyte_state::register_w )
 {
-	m_crtc->register_w( space, 0, data );
+	m_crtc->register_w(data);
 	uint16_t temp = m_alpha_address;
 
 	// Get transparent address

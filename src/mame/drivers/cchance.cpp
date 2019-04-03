@@ -217,11 +217,11 @@ void cchance_state::machine_reset()
 	m_bell_io = 0;
 }
 
-MACHINE_CONFIG_START(cchance_state::cchance)
-
-	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cchance_state,  irq0_line_hold)
+void cchance_state::cchance(machine_config &config)
+{
+	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cchance_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cchance_state::irq0_line_hold));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_cchance);
 
@@ -229,14 +229,14 @@ MACHINE_CONFIG_START(cchance_state::cchance)
 	m_seta001->set_gfxdecode_tag("gfxdecode");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cchance_state, screen_update_tnzs)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cchance_state, screen_vblank_tnzs))
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(57.5);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(cchance_state::screen_update_tnzs));
+	m_screen->screen_vblank().set(FUNC(cchance_state::screen_vblank_tnzs));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(cchance_state::prompalette), 512);
 
@@ -246,7 +246,7 @@ MACHINE_CONFIG_START(cchance_state::cchance)
 	aysnd.port_a_read_callback().set_ioport("DSW1");
 	aysnd.port_b_read_callback().set_ioport("DSW2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
 ROM_START( cchance )
 	ROM_REGION( 0x10000, "maincpu", 0 )

@@ -281,13 +281,13 @@ void wackygtr_state::program_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-MACHINE_CONFIG_START(wackygtr_state::wackygtr)
-
-	MC6809(config, m_maincpu, XTAL(3'579'545));	// HD68B09P
+void wackygtr_state::wackygtr(machine_config &config)
+{
+	MC6809(config, m_maincpu, XTAL(3'579'545)); // HD68B09P
 	m_maincpu->set_addrmap(AS_PROGRAM, &wackygtr_state::program_map);
-	m_maincpu->set_periodic_int(FUNC(wackygtr_state::irq0_line_assert), attotime::from_hz(50));	// FIXME
+	m_maincpu->set_periodic_int(FUNC(wackygtr_state::irq0_line_assert), attotime::from_hz(50)); // FIXME
 
-	TIMER(config, "nmi_timer").configure_periodic(FUNC(wackygtr_state::nmi_timer), attotime::from_hz(100));	// FIXME
+	TIMER(config, "nmi_timer").configure_periodic(FUNC(wackygtr_state::nmi_timer), attotime::from_hz(100)); // FIXME
 
 	/* Video */
 	config.set_default_layout(layout_wackygtr);
@@ -295,8 +295,8 @@ MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
 	MSM5205(config, m_msm, XTAL(384'000));
-	m_msm->vck_legacy_callback().set(FUNC(wackygtr_state::adpcm_int));	/* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 KHz, 4 Bits  */
+	m_msm->vck_legacy_callback().set(FUNC(wackygtr_state::adpcm_int));  /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits  */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	ym2413_device &ymsnd(YM2413(config, "ymsnd", XTAL(3'579'545)));

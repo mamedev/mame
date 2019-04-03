@@ -37,7 +37,6 @@
  TM-019                   Pursuit (1975)                                                  K8P-B 90128                        NO
  TM-012,029,034           Quadrapong (1974)                                               A000845                            NO
  TM-009                   Qwak!/Quack (1974)                                              A000937,A000953                    YES       72074/37-2530N (K9)
- TM-001,023,029,032       Rebound/Spike/Volleyball (1974)                                 A000517,A000846,SPIKE-(A or B)     NO
  TM-047                   Shark JAWS (1975)                                               A003806                            YES       004182, 004183
  TM-008,029               Space Race (1973)                                               A000803                            NO
  TM-046                   Steeplechase/Astroturf (1975)                                   A003750                            YES       003774 ROM Bugle (C8), 003773-01 "A" Horse (C4), 003773-02 "B" Horse (D4)
@@ -53,7 +52,7 @@
  TM-018                   Dodgeball/Dodgem (Not Produced/Released) (1975)
  TM-024                   Qwakers (Not Produced/Released) (1974?) (Kee Games clone of Qwak!?)
 
- - Information (current as of 21 Dec. 2016) on what logic chips (and some analog parts) are still needed to be emulated in the
+ - Information (current as of 27 Mar. 2019) on what logic chips (and some analog parts) are still needed to be emulated in the
    netlist system per-game:
 
  TM-057 (Stunt Cycle)
@@ -63,9 +62,7 @@
 
  TM-055 (Indy 4)
     7406  Hex Inverter Buffers/Drivers with O.C. H.V. Outputs (note: Might not be needed, could just clone from 7404)
-    7414  Hex Schmitt-Trigger Inverters
     7417  Hex Buffers/Drivers
-    74164 8-bit Serial-In, Parallel-Out Shift Register
     9301  1-of-10 Decoder
     LM339 Quad Comparator
 
@@ -202,10 +199,14 @@ class gtrak10_state : public driver_device
 public:
 	gtrak10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_video(*this, "fixfreq")
 	{
 	}
 
 	void gtrak10(machine_config &config);
+
+private:
+	required_device<fixedfreq_device> m_video;
 };
 
 static NETLIST_START(atarikee)
@@ -324,27 +325,29 @@ uint32_t stuntcyc_state::screen_update_stuntcyc(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-MACHINE_CONFIG_START(atarikee_state::atarikee)
+void atarikee_state::atarikee(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(atarikee)
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
+	m_maincpu->set_constructor(netlist_atarikee);
 
 	/* video hardware */
-	MCFG_FIXFREQ_ADD("fixfreq", "screen")
-	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
-	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL)
-	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL)
-	MCFG_FIXFREQ_FIELDCOUNT(1)
-	MCFG_FIXFREQ_SYNC_THRESHOLD(0.30)
-MACHINE_CONFIG_END
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	FIXFREQ(config, m_video).set_screen("screen");
+	m_video->set_monitor_clock(MASTER_CLOCK);
+	m_video->set_horz_params(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL);
+	m_video->set_vert_params(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL);
+	m_video->set_fieldcount(1);
+	m_video->set_threshold(0.30);
+}
 
 //#define STUNTCYC_NL_CLOCK (14318181*69)
 #define STUNTCYC_NL_CLOCK (SC_HTOTAL*SC_VTOTAL*60*140)
 
 MACHINE_CONFIG_START(stuntcyc_state::stuntcyc)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, STUNTCYC_NL_CLOCK)
-	MCFG_NETLIST_SETUP(stuntcyc)
+	NETLIST_CPU(config, m_maincpu, STUNTCYC_NL_CLOCK);
+	m_maincpu->set_constructor(netlist_stuntcyc);
 
 	//MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "VIDEO_OUT", fixedfreq_device, update_vid, "fixfreq")
 	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit0",  "probe_bit0",  stuntcyc_state, probe_bit0_cb, "")
@@ -357,21 +360,20 @@ MACHINE_CONFIG_START(stuntcyc_state::stuntcyc)
 	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_clock", "probe_clock", stuntcyc_state, probe_clock_cb, "")
 
 /* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(stuntcyc_state, screen_update_stuntcyc)
-	MCFG_SCREEN_RAW_PARAMS(SC_HTOTAL*SC_VTOTAL*60, SC_HTOTAL, 0, SC_HTOTAL, SC_VTOTAL, 0, SC_VTOTAL)
-	//MCFG_FIXFREQ_ADD("fixfreq", "screen")
-	//MCFG_FIXFREQ_MONITOR_CLOCK(SC_VIDCLOCK)
-	//MCFG_FIXFREQ_HORZ_PARAMS(SC_HTOTAL-67,SC_HTOTAL-40,SC_HTOTAL-8, SC_HTOTAL)
-	//MCFG_FIXFREQ_VERT_PARAMS(SC_VTOTAL-22,SC_VTOTAL-19,SC_VTOTAL-12,SC_VTOTAL)
-	//MCFG_FIXFREQ_FIELDCOUNT(1)
-	//MCFG_FIXFREQ_SYNC_THRESHOLD(0.30)
+	SCREEN(config, m_probe_screen, SCREEN_TYPE_RASTER);
+	m_probe_screen->set_screen_update(FUNC(stuntcyc_state::screen_update_stuntcyc));
+	m_probe_screen->set_raw(SC_HTOTAL*SC_VTOTAL*60, SC_HTOTAL, 0, SC_HTOTAL, SC_VTOTAL, 0, SC_VTOTAL);
+	//FIXFREQ(config, m_video).set_screen("screen");
+	//m_video->set_monitor_clock(SC_VIDCLOCK);
+	//m_video->set_horz_params(SC_HTOTAL-67,SC_HTOTAL-40,SC_HTOTAL-8, SC_HTOTAL);
+	//m_video->set_vert_params(SC_VTOTAL-22,SC_VTOTAL-19,SC_VTOTAL-12,SC_VTOTAL);
+	//m_video->set_fieldcount(1);
+	//m_video->set_threshold(0.30);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gtrak10_state::gtrak10)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(gtrak10)
+	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_constructor(netlist_gtrak10);
 
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "VIDEO_OUT", fixedfreq_device, update_composite_monochrome, "fixfreq")
 
@@ -396,15 +398,16 @@ MACHINE_CONFIG_START(gtrak10_state::gtrak10)
 	   Vert Back Porch  =   0
 	*/
 
-	MCFG_FIXFREQ_ADD("fixfreq", "screen")
-	MCFG_FIXFREQ_MONITOR_CLOCK(GTRAK10_VIDCLOCK)
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	FIXFREQ(config, m_video).set_screen("screen");
+	m_video->set_monitor_clock(GTRAK10_VIDCLOCK);
 	//                    Length of active video,   end of front-porch,   end of sync signal,  end of line/frame
-	MCFG_FIXFREQ_HORZ_PARAMS(GTRAK10_HTOTAL*1 - 32,  GTRAK10_HTOTAL*1 - 32,  GTRAK10_HTOTAL*1 - 31,     GTRAK10_HTOTAL*1)
-	//MCFG_FIXFREQ_HORZ_PARAMS(GTRAK10_HTOTAL - 32,  GTRAK10_HTOTAL - 32,  GTRAK10_HTOTAL - 31,     GTRAK10_HTOTAL)
-	MCFG_FIXFREQ_VERT_PARAMS( GTRAK10_VTOTAL - 8,   GTRAK10_VTOTAL - 8,       GTRAK10_VTOTAL,     GTRAK10_VTOTAL)
-	MCFG_FIXFREQ_FIELDCOUNT(2)
-	MCFG_FIXFREQ_SYNC_THRESHOLD(1.0)
-	//MCFG_FIXFREQ_GAIN(1.50)
+	m_video->set_horz_params(GTRAK10_HTOTAL*1 - 32,  GTRAK10_HTOTAL*1 - 32,  GTRAK10_HTOTAL*1 - 31,     GTRAK10_HTOTAL*1);
+	//m_video->set_horz_params(GTRAK10_HTOTAL - 32,  GTRAK10_HTOTAL - 32,  GTRAK10_HTOTAL - 31,     GTRAK10_HTOTAL);
+	m_video->set_vert_params( GTRAK10_VTOTAL - 8,   GTRAK10_VTOTAL - 8,       GTRAK10_VTOTAL,     GTRAK10_VTOTAL);
+	m_video->set_fieldcount(2);
+	m_video->set_threshold(1.0);
+	//m_video->set_gain(1.50);
 
 MACHINE_CONFIG_END
 
@@ -679,10 +682,6 @@ ROM_START( quadpong )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( rebound )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-ROM_END
-
 ROM_START( spacrace )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
@@ -738,7 +737,6 @@ GAME(1975,  tankii,    0,        atarikee,       0, atarikee_state, empty_init, 
 //GAME(1974,  pinpong,   0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Pin Pong [TTL]",         MACHINE_IS_SKELETON)
 //GAME(1975,  pursuit,   0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Pursuit [TTL]",          MACHINE_IS_SKELETON)
 //GAME(1974,  quadpong,  eliminat, atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Quadrapong [TTL]",       MACHINE_IS_SKELETON)
-//GAME(1974,  rebound,   0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Rebound/Spike/Volleyball [TTL]",   MACHINE_IS_SKELETON)
 //GAME(1973,  spacrace,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Space Race [TTL]",       MACHINE_IS_SKELETON)
 //GAME(1974,  touchme,   0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Touch-Me [TTL]",         MACHINE_IS_SKELETON) //?
 //GAME(1974,  worldcup,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "World Cup/World Cup Football [TTL]",   MACHINE_IS_SKELETON)

@@ -260,11 +260,6 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 
 *************************************/
 
-READ8_MEMBER( snes_state::snes_open_bus_r )
-{
-	return snes_open_bus_r();
-}
-
 uint8_t snes_state::snes_open_bus_r()
 {
 	static uint8_t recurse = 0;

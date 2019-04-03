@@ -21,18 +21,18 @@ WRITE8_MEMBER( decodmd_type2_device::bank_w )
 
 WRITE8_MEMBER( decodmd_type2_device::crtc_address_w )
 {
-	m_mc6845->address_w(space,offset,data);
+	m_mc6845->address_w(data);
 	m_crtc_index = data;
 }
 
 READ8_MEMBER( decodmd_type2_device::crtc_status_r )
 {
-	return m_mc6845->register_r(space,offset);
+	return m_mc6845->register_r();
 }
 
 WRITE8_MEMBER( decodmd_type2_device::crtc_register_w )
 {
-	m_mc6845->register_w(space,offset,data);
+	m_mc6845->register_w(data);
 	m_crtc_reg[m_crtc_index] = data;
 }
 

@@ -881,7 +881,7 @@ void kurukuru_state::kurukuru(machine_config &config)
 
 	MSM5205(config, m_adpcm, M5205_CLOCK);
 	m_adpcm->vck_legacy_callback().set(FUNC(kurukuru_state::kurukuru_msm5205_vck));
-	m_adpcm->set_prescaler_selector(msm5205_device::S48_4B);	/* changed on the fly */
+	m_adpcm->set_prescaler_selector(msm5205_device::S48_4B);    /* changed on the fly */
 	m_adpcm->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 

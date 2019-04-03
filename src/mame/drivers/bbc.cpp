@@ -946,7 +946,7 @@ void bbc_state::bbcb(machine_config &config)
 	m_via6522_1->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 
 	/* adc */
-	UPD7002(config, m_upd7002, 0);
+	UPD7002(config, m_upd7002, 16_MHz_XTAL / 16);
 	m_upd7002->set_get_analogue_callback(FUNC(bbc_state::get_analogue_input), this);
 	m_upd7002->set_eoc_callback(FUNC(bbc_state::upd7002_eoc), this);
 
@@ -1046,7 +1046,7 @@ void bbc_state::bbcb_us(machine_config &config)
 	FLOPPY_CONNECTOR(config, "i8271:1", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
 
 	/* software lists */
-	SOFTWARE_LIST(config, "flop_ls_b_us").set_original("bbcb_cass_us");
+	SOFTWARE_LIST(config, "flop_ls_b_us").set_original("bbcb_flop_us");
 }
 
 
@@ -1401,7 +1401,7 @@ void bbcm_state::bbcm(machine_config &config)
 	m_acia_clock->signal_handler().set(FUNC(bbc_state::write_acia_clock));
 
 	/* adc */
-	UPD7002(config, m_upd7002, 0);
+	UPD7002(config, m_upd7002, 16_MHz_XTAL / 16);
 	m_upd7002->set_get_analogue_callback(FUNC(bbc_state::get_analogue_input), this);
 	m_upd7002->set_eoc_callback(FUNC(bbc_state::upd7002_eoc), this);
 

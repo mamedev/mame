@@ -22,8 +22,8 @@
  *
  *  When the rate input is binary 0 (all rate inputs low), Z remains high [and Y low].
  *
- *  The unity/cascade input, when connected to the clock input, passes 
- *    clock frequency (inverted) to the Y output when the rate input/decoding 
+ *  The unity/cascade input, when connected to the clock input, passes
+ *    clock frequency (inverted) to the Y output when the rate input/decoding
  *    gates are inhibited by the strobe.
  *
  *  When CLR is H, states of CLK and STRB can affect Y and Z.  Default are
@@ -35,7 +35,7 @@
 #ifndef NLD_7497_H_
 #define NLD_7497_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define TTL_7497(name, cCLK, cSTRB, cEN, cUNITY, cCLR, cB0, cB1, cB2, cB3, cB4, cB5) \
 		NET_REGISTER_DEV(TTL_7497, name)                                             \

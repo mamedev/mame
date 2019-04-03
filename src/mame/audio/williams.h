@@ -37,16 +37,16 @@ class williams_cvsd_sound_device :  public device_t,
 {
 public:
 	// construction/destruction
-	williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// read/write
-	DECLARE_WRITE16_MEMBER(write);
+	void write(u16 data);
 	DECLARE_WRITE_LINE_MEMBER(reset_write);
 
 	// internal communications
-	DECLARE_WRITE8_MEMBER(bank_select_w);
-	DECLARE_WRITE8_MEMBER(cvsd_digit_clock_clear_w);
-	DECLARE_WRITE8_MEMBER(cvsd_clock_set_w);
+	void bank_select_w(u8 data);
+	void cvsd_digit_clock_clear_w(u8 data);
+	void cvsd_clock_set_w(u8 data);
 
 	void williams_cvsd_map(address_map &map);
 
@@ -68,9 +68,9 @@ private:
 	required_memory_bank m_rombank;
 
 	// internal state
-	uint8_t m_talkback;
+	u8 m_talkback;
 
-	DECLARE_WRITE8_MEMBER(talkback_w);
+	void talkback_w(u8 data);
 };
 
 
@@ -81,25 +81,25 @@ class williams_narc_sound_device :  public device_t,
 {
 public:
 	// construction/destruction
-	williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// read/write
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	u16 read();
+	void write(u16 data);
 	DECLARE_WRITE_LINE_MEMBER(reset_write);
 
 	// internal communications
-	DECLARE_WRITE8_MEMBER(master_bank_select_w);
-	DECLARE_WRITE8_MEMBER(slave_bank_select_w);
-	DECLARE_READ8_MEMBER(command_r);
-	DECLARE_WRITE8_MEMBER(command2_w);
-	DECLARE_READ8_MEMBER(command2_r);
-	DECLARE_WRITE8_MEMBER(master_talkback_w);
-	DECLARE_WRITE8_MEMBER(master_sync_w);
-	DECLARE_WRITE8_MEMBER(slave_talkback_w);
-	DECLARE_WRITE8_MEMBER(slave_sync_w);
-	DECLARE_WRITE8_MEMBER(cvsd_digit_clock_clear_w);
-	DECLARE_WRITE8_MEMBER(cvsd_clock_set_w);
+	void master_bank_select_w(u8 data);
+	void slave_bank_select_w(u8 data);
+	u8 command_r();
+	void command2_w(u8 data);
+	u8 command2_r();
+	void master_talkback_w(u8 data);
+	void master_sync_w(u8 data);
+	void slave_talkback_w(u8 data);
+	void slave_sync_w(u8 data);
+	void cvsd_digit_clock_clear_w(u8 data);
+	void cvsd_clock_set_w(u8 data);
 
 	void williams_narc_master_map(address_map &map);
 	void williams_narc_slave_map(address_map &map);
@@ -130,11 +130,11 @@ private:
 	required_memory_bank m_slavebank;
 
 	// internal state
-	uint8_t m_latch;
-	uint8_t m_latch2;
-	uint8_t m_talkback;
-	uint8_t m_audio_sync;
-	uint8_t m_sound_int_state;
+	u8 m_latch;
+	u8 m_latch2;
+	u8 m_talkback;
+	u8 m_audio_sync;
+	u8 m_sound_int_state;
 };
 
 
@@ -145,18 +145,18 @@ class williams_adpcm_sound_device : public device_t,
 {
 public:
 	// construction/destruction
-	williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// read/write
-	DECLARE_WRITE16_MEMBER(write);
+	void write(u16 data);
 	DECLARE_WRITE_LINE_MEMBER(reset_write);
 	DECLARE_READ_LINE_MEMBER(irq_read);
 
 	// internal communications
-	DECLARE_WRITE8_MEMBER(bank_select_w);
-	DECLARE_WRITE8_MEMBER(oki6295_bank_select_w);
-	DECLARE_READ8_MEMBER(command_r);
-	DECLARE_WRITE8_MEMBER(talkback_w);
+	void bank_select_w(u8 data);
+	void oki6295_bank_select_w(u8 data);
+	u8 command_r();
+	void talkback_w(u8 data);
 
 	void williams_adpcm_map(address_map &map);
 	void williams_adpcm_oki_map(address_map &map);
@@ -185,7 +185,7 @@ private:
 	required_memory_bank m_okibank;
 
 	// internal state
-	uint8_t m_latch;
-	uint8_t m_talkback;
-	uint8_t m_sound_int_state;
+	u8 m_latch;
+	u8 m_talkback;
+	u8 m_sound_int_state;
 };

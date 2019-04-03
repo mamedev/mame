@@ -320,14 +320,15 @@ mephisto_display_modul_device::mephisto_display_modul_device(const machine_confi
 //  device_add_mconfig
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(mephisto_display_modul_device::device_add_mconfig)
+void mephisto_display_modul_device::device_add_mconfig(machine_config &config)
+{
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(16*6, 9*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 16*6-1, 0, 9*2-3)
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_size(16*6, 9*2);
+	screen.set_visarea(0, 16*6-1, 0, 9*2-3);
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_palette("palette");
 	PALETTE(config, "palette", FUNC(mephisto_display_modul_device::lcd_palette), 2);
 
 	HD44780(config, m_lcdc, 0);
@@ -335,9 +336,8 @@ MACHINE_CONFIG_START(mephisto_display_modul_device::device_add_mconfig)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	BEEP(config, m_beeper, 3250).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 void mephisto_display_modul_device::lcd_palette(palette_device &palette) const

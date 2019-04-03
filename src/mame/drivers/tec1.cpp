@@ -420,38 +420,39 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(tec1_state::tec1)
+void tec1_state::tec1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 1000000)   /* speed can be varied between 250kHz and 2MHz */
-	MCFG_DEVICE_PROGRAM_MAP(tec1_map)
-	MCFG_DEVICE_IO_MAP(tec1_io)
+	Z80(config, m_maincpu, 1000000);   /* speed can be varied between 250kHz and 2MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tec1_state::tec1_map);
+	m_maincpu->set_addrmap(AS_IO, &tec1_state::tec1_io);
 
 	/* video hardware */
 	config.set_default_layout(layout_tec1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(tec1_state::tecjmon)
+void tec1_state::tecjmon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(tecjmon_map)
-	MCFG_DEVICE_IO_MAP(tecjmon_io)
+	Z80(config, m_maincpu, XTAL(3'579'545) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tec1_state::tecjmon_map);
+	m_maincpu->set_addrmap(AS_IO, &tec1_state::tecjmon_io);
 
 	/* video hardware */
 	config.set_default_layout(layout_tec1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
-	MCFG_CASSETTE_ADD( "cassette" )
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cass);
+}
 
 
 /***************************************************************************

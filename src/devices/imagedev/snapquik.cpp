@@ -28,8 +28,6 @@ snapshot_image_device::snapshot_image_device(const machine_config &mconfig, devi
 	device_image_interface(mconfig, *this),
 	m_file_extensions(nullptr),
 	m_interface(nullptr),
-	m_delay_seconds(0),
-	m_delay_attoseconds(0),
 	m_timer(nullptr)
 {
 }
@@ -67,7 +65,7 @@ void snapshot_image_device::device_start()
 image_init_result snapshot_image_device::call_load()
 {
 	/* adjust the timer */
-	m_timer->adjust(attotime(m_delay_seconds, m_delay_attoseconds),0);
+	m_timer->adjust(m_delay,0);
 	return image_init_result::PASS;
 }
 

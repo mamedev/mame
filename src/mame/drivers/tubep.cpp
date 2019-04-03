@@ -827,15 +827,15 @@ void tubep_state::tubep(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tubep_state::tubep_main_map);
 	m_maincpu->set_addrmap(AS_IO, &tubep_state::tubep_main_portmap);
 
-	Z80(config, m_slave, 16000000 / 4);		/* 4 MHz */
+	Z80(config, m_slave, 16000000 / 4);     /* 4 MHz */
 	m_slave->set_addrmap(AS_PROGRAM, &tubep_state::tubep_second_map);
 	m_slave->set_addrmap(AS_IO, &tubep_state::tubep_second_portmap);
 
-	Z80(config, m_soundcpu, 19968000 / 8);	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
+	Z80(config, m_soundcpu, 19968000 / 8);  /* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &tubep_state::tubep_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &tubep_state::tubep_sound_portmap);
 
-	NSC8105(config, m_mcu, 6000000);		/* 6 MHz Xtal - divided internally ??? */
+	NSC8105(config, m_mcu, 6000000);        /* 6 MHz Xtal - divided internally ??? */
 	m_mcu->set_addrmap(AS_PROGRAM, &tubep_state::nsc_map);
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
@@ -893,21 +893,21 @@ void tubep_state::tubepb(machine_config &config)
 void tubep_state::rjammer(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 16000000 / 4);	/* 4 MHz */
+	Z80(config, m_maincpu, 16000000 / 4);   /* 4 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &tubep_state::rjammer_main_map);
 	m_maincpu->set_addrmap(AS_IO, &tubep_state::rjammer_main_portmap);
 
-	Z80(config, m_slave, 16000000 / 4);		/* 4 MHz */
+	Z80(config, m_slave, 16000000 / 4);     /* 4 MHz */
 	m_slave->set_addrmap(AS_PROGRAM, &tubep_state::rjammer_second_map);
 	m_slave->set_addrmap(AS_IO, &tubep_state::rjammer_second_portmap);
 
-	Z80(config, m_soundcpu, 19968000 / 8);	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
+	Z80(config, m_soundcpu, 19968000 / 8);  /* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &tubep_state::rjammer_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &tubep_state::rjammer_sound_portmap);
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	NSC8105(config, m_mcu, 6000000);	/* 6 MHz Xtal - divided internally ??? */
+	NSC8105(config, m_mcu, 6000000);    /* 6 MHz Xtal - divided internally ??? */
 	m_mcu->set_addrmap(AS_PROGRAM, &tubep_state::nsc_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 3A
@@ -947,8 +947,8 @@ void tubep_state::rjammer(machine_config &config)
 	ay3.add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(tubep_state::rjammer_adpcm_vck));		/* VCK function */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 KHz (changes at run time) */
+	m_msm->vck_legacy_callback().set(FUNC(tubep_state::rjammer_adpcm_vck));     /* VCK function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz (changes at run time) */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

@@ -185,12 +185,12 @@ void mbc55x_state::mbc55x_palette(palette_device &palette) const
 
 /* Video ram page register */
 
-READ8_MEMBER( mbc55x_state::vram_page_r )
+uint8_t mbc55x_state::vram_page_r()
 {
 	return m_vram_page;
 }
 
-WRITE8_MEMBER( mbc55x_state::vram_page_w )
+void mbc55x_state::vram_page_w(uint8_t data)
 {
 	logerror("%s : set vram page to %02X\n", machine().describe_context(),data);
 

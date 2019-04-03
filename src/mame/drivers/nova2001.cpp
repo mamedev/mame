@@ -124,7 +124,6 @@ e000 - e7ff        R/W      Work RAM
 #include "emu.h"
 #include "includes/nova2001.h"
 
-#include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "screen.h"
@@ -183,7 +182,7 @@ MACHINE_START_MEMBER(nova2001_state,ninjakun)
 void nova2001_state::nova2001_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xa000, 0xa7ff).ram().w(FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
+	map(0xa000, 0xa7ff).ram().w(FUNC(nova2001_state::fg_videoram_w)).share("fg_videoram");
 	map(0xa800, 0xafff).ram().w(FUNC(nova2001_state::nova2001_bg_videoram_w)).share("bg_videoram");
 	map(0xb000, 0xb7ff).ram().share("spriteram");
 	map(0xb800, 0xbfff).w(FUNC(nova2001_state::nova2001_flipscreen_w));
@@ -199,29 +198,8 @@ void nova2001_state::nova2001_map(address_map &map)
 }
 
 
-void nova2001_state::ninjakun_cpu1_map(address_map &map)
+void nova2001_state::ninjakun_shared_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x7fff).rom();
-	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
-	map(0x8001, 0x8001).r("ay1", FUNC(ay8910_device::data_r));
-	map(0x8002, 0x8003).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0x8003, 0x8003).r("ay2", FUNC(ay8910_device::data_r));
-	map(0xa000, 0xa000).portr("IN0");
-	map(0xa001, 0xa001).portr("IN1");
-	map(0xa002, 0xa002).portr("IN2").w(FUNC(nova2001_state::ninjakun_cpu1_io_A002_w));
-	map(0xa003, 0xa003).w(FUNC(nova2001_state::pkunwar_flipscreen_w));
-	map(0xc000, 0xc7ff).ram().w(FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
-	map(0xc800, 0xcfff).rw(FUNC(nova2001_state::ninjakun_bg_videoram_r), FUNC(nova2001_state::ninjakun_bg_videoram_w)).share("bg_videoram");
-	map(0xd000, 0xd7ff).ram().share("spriteram");
-	map(0xd800, 0xd9ff).ram().w(FUNC(nova2001_state::ninjakun_paletteram_w)).share("palette");
-	map(0xe000, 0xe3ff).ram().share("share1");
-	map(0xe400, 0xe7ff).ram().share("share2");
-}
-
-void nova2001_state::ninjakun_cpu2_map(address_map &map)
-{
-	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x7fff).rom().region("maincpu", 0x2000);
 	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x8001, 0x8001).r("ay1", FUNC(ay8910_device::data_r));
@@ -229,12 +207,29 @@ void nova2001_state::ninjakun_cpu2_map(address_map &map)
 	map(0x8003, 0x8003).r("ay2", FUNC(ay8910_device::data_r));
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa001, 0xa001).portr("IN1");
-	map(0xa002, 0xa002).portr("IN2").w(FUNC(nova2001_state::ninjakun_cpu2_io_A002_w));
-	map(0xa003, 0xa003).w(FUNC(nova2001_state::nova2001_flipscreen_w));
-	map(0xc000, 0xc7ff).ram().w(FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
+	map(0xa002, 0xa002).portr("IN2");
+	map(0xc000, 0xc7ff).ram().w(FUNC(nova2001_state::fg_videoram_w)).share("fg_videoram");
 	map(0xc800, 0xcfff).rw(FUNC(nova2001_state::ninjakun_bg_videoram_r), FUNC(nova2001_state::ninjakun_bg_videoram_w)).share("bg_videoram");
 	map(0xd000, 0xd7ff).ram().share("spriteram");
-	map(0xd800, 0xd9ff).ram().w(FUNC(nova2001_state::ninjakun_paletteram_w)).share("palette");
+	map(0xd800, 0xd9ff).ram().w(FUNC(nova2001_state::paletteram_w)).share("palette");
+}
+
+void nova2001_state::ninjakun_cpu1_map(address_map &map)
+{
+	ninjakun_shared_map(map);
+	map(0x0000, 0x1fff).rom().region("maincpu", 0);
+	map(0xa002, 0xa002).w(FUNC(nova2001_state::ninjakun_cpu1_io_A002_w));
+	map(0xa003, 0xa003).w(FUNC(nova2001_state::pkunwar_flipscreen_w));
+	map(0xe000, 0xe3ff).ram().share("share1");
+	map(0xe400, 0xe7ff).ram().share("share2");
+}
+
+void nova2001_state::ninjakun_cpu2_map(address_map &map)
+{
+	ninjakun_shared_map(map);
+	map(0x0000, 0x1fff).rom().region("sub", 0);
+	map(0xa002, 0xa002).w(FUNC(nova2001_state::ninjakun_cpu2_io_A002_w));
+	map(0xa003, 0xa003).w(FUNC(nova2001_state::nova2001_flipscreen_w));
 	map(0xe000, 0xe3ff).ram().share("share2"); /* swapped wrt CPU1 */
 	map(0xe400, 0xe7ff).ram().share("share1"); /* swapped wrt CPU1 */
 }
@@ -264,16 +259,16 @@ void nova2001_state::raiders5_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("spriteram");
-	map(0x8800, 0x8fff).ram().w(FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
+	map(0x8800, 0x8fff).ram().w(FUNC(nova2001_state::fg_videoram_w)).share("fg_videoram");
 	map(0x9000, 0x97ff).rw(FUNC(nova2001_state::ninjakun_bg_videoram_r), FUNC(nova2001_state::ninjakun_bg_videoram_w)).share("bg_videoram");
-	map(0xa000, 0xa000).w(FUNC(nova2001_state::nova2001_scroll_x_w));
-	map(0xa001, 0xa001).w(FUNC(nova2001_state::nova2001_scroll_y_w));
+	map(0xa000, 0xa000).w(FUNC(nova2001_state::scroll_x_w));
+	map(0xa001, 0xa001).w(FUNC(nova2001_state::scroll_y_w));
 	map(0xa002, 0xa002).w(FUNC(nova2001_state::pkunwar_flipscreen_w));
 	map(0xc000, 0xc001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0xc001, 0xc001).r("ay1", FUNC(ay8910_device::data_r));
 	map(0xc002, 0xc003).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0xc003, 0xc003).r("ay2", FUNC(ay8910_device::data_r));
-	map(0xd000, 0xd1ff).ram().w(FUNC(nova2001_state::ninjakun_paletteram_w)).share("palette");
+	map(0xd000, 0xd1ff).ram().w(FUNC(nova2001_state::paletteram_w)).share("palette");
 	map(0xe000, 0xe7ff).ram().share("share1");
 }
 
@@ -289,8 +284,8 @@ void nova2001_state::raiders5_cpu2_map(address_map &map)
 	map(0xc000, 0xc000).nopr(); /* unknown */
 	map(0xc800, 0xc800).nopr(); /* unknown */
 	map(0xd000, 0xd000).nopr(); /* unknown */
-	map(0xe000, 0xe000).w(FUNC(nova2001_state::nova2001_scroll_x_w));
-	map(0xe001, 0xe001).w(FUNC(nova2001_state::nova2001_scroll_y_w));
+	map(0xe000, 0xe000).w(FUNC(nova2001_state::scroll_x_w));
+	map(0xe001, 0xe001).w(FUNC(nova2001_state::scroll_y_w));
 	map(0xe002, 0xe002).w(FUNC(nova2001_state::pkunwar_flipscreen_w));
 }
 
@@ -646,22 +641,22 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(nova2001_state::nova2001)
-
+void nova2001_state::nova2001(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz verified on schematics
-	MCFG_DEVICE_PROGRAM_MAP(nova2001_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MAIN_CLOCK/4);  // 3 MHz verified on schematics
+	m_maincpu->set_addrmap(AS_PROGRAM, &nova2001_state::nova2001_map);
+	m_maincpu->set_vblank_int("screen", FUNC(nova2001_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_nova2001)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 4*8, 28*8-1);
+	screen.set_screen_update(FUNC(nova2001_state::screen_update_nova2001));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nova2001);
 	PALETTE(config, m_palette, FUNC(nova2001_state::nova2001_palette)).set_format(1, &nova2001_state::BBGGRRII, 512);
@@ -672,39 +667,38 @@ MACHINE_CONFIG_START(nova2001_state::nova2001)
 	SPEAKER(config, "mono").front_center();
 
 	ay8910_device &ay1(AY8910(config, "ay1", MAIN_CLOCK/6)); // 2 MHz verified on schematics
-	ay1.port_a_write_callback().set(FUNC(nova2001_state::nova2001_scroll_x_w));
-	ay1.port_b_write_callback().set(FUNC(nova2001_state::nova2001_scroll_y_w));
+	ay1.port_a_write_callback().set(FUNC(nova2001_state::scroll_x_w));
+	ay1.port_b_write_callback().set(FUNC(nova2001_state::scroll_y_w));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	ay8910_device &ay2(AY8910(config, "ay2", MAIN_CLOCK/6));
 	ay2.port_a_read_callback().set_ioport("DSW1");
 	ay2.port_b_read_callback().set_ioport("DSW2");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nova2001_state::ninjakun)
-
+void nova2001_state::ninjakun(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
-	MCFG_DEVICE_PROGRAM_MAP(ninjakun_cpu1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MAIN_CLOCK/4);  // 3 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &nova2001_state::ninjakun_cpu1_map);
+	m_maincpu->set_vblank_int("screen", FUNC(nova2001_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80, MAIN_CLOCK/4)  // 3 MHz
-	MCFG_DEVICE_PROGRAM_MAP(ninjakun_cpu2_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(nova2001_state, irq0_line_hold, 4*60) /* ? */
+	z80_device &subcpu(Z80(config, "sub", MAIN_CLOCK/4));  // 3 MHz
+	subcpu.set_addrmap(AS_PROGRAM, &nova2001_state::ninjakun_cpu2_map);
+	subcpu.set_periodic_int(FUNC(nova2001_state::irq0_line_hold), attotime::from_hz(4*60)); /* ? */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame */
 
 	MCFG_MACHINE_START_OVERRIDE(nova2001_state,ninjakun)
 
 	/* video hardware */
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_ninjakun)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 4*8, 28*8-1);
+	screen.set_screen_update(FUNC(nova2001_state::screen_update_ninjakun));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ninjakun);
 	PALETTE(config, m_palette).set_format(1, &nova2001_state::BBGGRRII, 768);
@@ -720,26 +714,26 @@ MACHINE_CONFIG_START(nova2001_state::ninjakun)
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.20);
 
 	ay8910_device &ay2(AY8910(config, "ay2", MAIN_CLOCK/4)); // 3 MHz
-	ay2.port_a_write_callback().set(FUNC(nova2001_state::nova2001_scroll_x_w));
-	ay2.port_b_write_callback().set(FUNC(nova2001_state::nova2001_scroll_y_w));
+	ay2.port_a_write_callback().set(FUNC(nova2001_state::scroll_x_w));
+	ay2.port_b_write_callback().set(FUNC(nova2001_state::scroll_y_w));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.20);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nova2001_state::pkunwar)
-
+void nova2001_state::pkunwar(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
-	MCFG_DEVICE_PROGRAM_MAP(pkunwar_map)
-	MCFG_DEVICE_IO_MAP(pkunwar_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MAIN_CLOCK/4);  // 3 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &nova2001_state::pkunwar_map);
+	m_maincpu->set_addrmap(AS_IO, &nova2001_state::pkunwar_io);
+	m_maincpu->set_vblank_int("screen", FUNC(nova2001_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_pkunwar)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 4*8, 28*8-1);
+	screen.set_screen_update(FUNC(nova2001_state::screen_update_pkunwar));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pkunwar);
 	PALETTE(config, m_palette, FUNC(nova2001_state::nova2001_palette)).set_format(1, &nova2001_state::BBGGRRII, 512);
@@ -758,29 +752,29 @@ MACHINE_CONFIG_START(nova2001_state::pkunwar)
 	ay2.port_a_read_callback().set_ioport("IN2");
 	ay2.port_b_read_callback().set_ioport("DSW1");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nova2001_state::raiders5)
-
+void nova2001_state::raiders5(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
-	MCFG_DEVICE_PROGRAM_MAP(raiders5_cpu1_map)
-	MCFG_DEVICE_IO_MAP(raiders5_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MAIN_CLOCK/4);  // 3 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &nova2001_state::raiders5_cpu1_map);
+	m_maincpu->set_addrmap(AS_IO, &nova2001_state::raiders5_io);
+	m_maincpu->set_vblank_int("screen", FUNC(nova2001_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80, MAIN_CLOCK/4)  // 3 MHz
-	MCFG_DEVICE_PROGRAM_MAP(raiders5_cpu2_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(nova2001_state, irq0_line_hold, 4*60)  /* ? */
+	z80_device &subcpu(Z80(config, "sub", MAIN_CLOCK/4));  // 3 MHz
+	subcpu.set_addrmap(AS_PROGRAM, &nova2001_state::raiders5_cpu2_map);
+	subcpu.set_periodic_int(FUNC(nova2001_state::irq0_line_hold), attotime::from_hz(4*60));  /* ? */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(24000))
+	config.m_minimum_quantum = attotime::from_hz(24000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_raiders5)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 4*8, 28*8-1);
+	screen.set_screen_update(FUNC(nova2001_state::screen_update_raiders5));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_raiders5);
 	PALETTE(config, m_palette).set_format(1, &nova2001_state::BBGGRRII, 768);
@@ -799,7 +793,7 @@ MACHINE_CONFIG_START(nova2001_state::raiders5)
 	ay2.port_a_read_callback().set_ioport("IN2");
 	ay2.port_b_read_callback().set_ioport("DSW1");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -866,13 +860,13 @@ ROM_START( nova2001u )
 ROM_END
 
 ROM_START( ninjakun ) /* Original Board? */
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "ninja-1.7a",  0x0000, 0x02000, CRC(1c1dc141) SHA1(423d3ed35e73a8d5bfce075a889b0322b207bd0d) )
 	ROM_LOAD( "ninja-2.7b",  0x2000, 0x02000, CRC(39cc7d37) SHA1(7f0d0e1e92cb6a57f15eb7fc51a67112f1c5fc8e) )
 	ROM_LOAD( "ninja-3.7d",  0x4000, 0x02000, CRC(d542bfe3) SHA1(3814d8f5b1acda21438fff4f71670fa653dc7b30) )
 	ROM_LOAD( "ninja-4.7e",  0x6000, 0x02000, CRC(a57385c6) SHA1(77925a281e64889bfe967c3d42a388529aaf7eb6) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "ninja-5.7h",  0x0000, 0x02000, CRC(164a42c4) SHA1(16b434b33b76b878514f67c23315d4c6da7bfc9e) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
@@ -921,11 +915,11 @@ ROM_START( pkunwarj )
 ROM_END
 
 ROM_START( raiders5 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "raiders5.1", 0x0000,  0x4000, CRC(47cea11f) SHA1(0499e6627ad9c16775fdc59f2ff56dfdfc23490a) )
 	ROM_LOAD( "raiders5.2", 0x4000,  0x4000, CRC(eb2ff410) SHA1(5c995b66b6301cd3cd58efd173481deaa036f842) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x4000, "sub", 0 )
 	ROM_LOAD( "raiders5.2", 0x0000,  0x4000, CRC(eb2ff410) SHA1(5c995b66b6301cd3cd58efd173481deaa036f842) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 ) // (need lineswapping)
@@ -937,11 +931,11 @@ ROM_START( raiders5 )
 ROM_END
 
 ROM_START( raiders5t )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "raiders1.4c", 0x0000,  0x4000, CRC(4e2d5679) SHA1(a1c1603ba98814a83b92ad024ca4422aea872111) )
 	ROM_LOAD( "raiders2.4d", 0x4000,  0x4000, CRC(c8604be1) SHA1(6d23f26174bb9b2f7db3a5fa6b39674fe237135b) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x4000, "sub", 0 )
 	ROM_LOAD( "raiders2.4d", 0x0000,  0x4000, CRC(c8604be1) SHA1(6d23f26174bb9b2f7db3a5fa6b39674fe237135b) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 ) // (need lineswapping)
@@ -973,7 +967,7 @@ To make it possible to decode graphics without resorting to ROM_CONTINUE
 trickery, this function makes an address line rotation, bringing bit "bit" to
 bit 0 and shifting left by one place all the intervening bits.
 
-This code is overly generic because it is used for several games in ninjakd2.c
+This code is overly generic because it is used for several games in ninjakd2.cpp
 
 ******************************************************************************/
 
@@ -981,9 +975,9 @@ void nova2001_state::lineswap_gfx_roms(const char *region, const int bit)
 {
 	const int length = memregion(region)->bytes();
 
-	uint8_t* const src = memregion(region)->base();
+	u8* const src = memregion(region)->base();
 
-	std::vector<uint8_t> temp(length);
+	std::vector<u8> temp(length);
 
 	const int mask = (1 << (bit + 1)) - 1;
 
@@ -1028,7 +1022,7 @@ void nova2001_state::init_raiders5()
 
 // many of these don't explicitly state Japan, eg. Nova 2001 could easily be used anywhere.
 
-//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,          INIT,          MONITOR,COMPANY,FULLNAME,FLAGS
 GAME( 1983, nova2001,  0,        nova2001, nova2001, nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, nova2001h, nova2001, nova2001, nova2001, nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan, hack?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, nova2001u, nova2001, nova2001, nova2001, nova2001_state, empty_init,    ROT0,   "UPL (Universal license)", "Nova 2001 (US)", MACHINE_SUPPORTS_SAVE )

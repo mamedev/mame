@@ -22,15 +22,15 @@
 			<color red="1" green="1" blue="0.25" />
 		</rect>
 		<rect>
-			<bounds left="0" top="88" right="192" bottom="236" />
+			<bounds left="0" top="88" right="192" bottom="231" />
 			<color red="1" green="1" blue="1" />
 		</rect>
 		<rect>
-			<bounds left="0" top="236" right="192" bottom="244" />
+			<bounds left="0" top="231" right="192" bottom="238" />
 			<color red="0.125" green="0.125" blue="1" />
 		</rect>
 		<rect>
-			<bounds left="0" top="244" right="192" bottom="258" />
+			<bounds left="0" top="238" right="192" bottom="244" />
 			<color red="1" green="1" blue="1" />
 		</rect>
 	</element>

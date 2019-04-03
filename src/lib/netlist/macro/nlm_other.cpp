@@ -2,7 +2,7 @@
 // copyright-holders:Couriersud
 #include "nlm_other.h"
 
-#include "../devices/nld_system.h"
+#include "netlist/devices/nld_system.h"
 
 /*
  *   MC14584B: Hex Schmitt Trigger

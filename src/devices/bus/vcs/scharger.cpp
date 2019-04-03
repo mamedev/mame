@@ -87,15 +87,15 @@ void a26_rom_ss_device::device_reset()
 }
 
 
-MACHINE_CONFIG_START(a26_rom_ss_device::device_add_mconfig)
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(a26_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("a2600_cass")
+void a26_rom_ss_device::device_add_mconfig(machine_config &config)
+{
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(a26_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("a2600_cass");
 
-//  MCFG_SOUND_WAVE_ADD("wave", "cassette")
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+//  WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 inline uint8_t a26_rom_ss_device::read_byte(uint32_t offset)
 {

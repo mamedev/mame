@@ -83,7 +83,7 @@ protected:
 	bool m_increment_pc;
 
 	address_space *m_program;
-	memory_access_cache<1, 0, ENDIANNESS_BIG> *m_cache;
+	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_cache;
 	address_space *m_io;
 
 	devcb_write8 m_sc_callback;  // Select Command (address latch)

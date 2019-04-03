@@ -128,14 +128,14 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 WRITE8_MEMBER(mermaid_state::mermaid_ay8910_write_port_w)
 {
-	if (m_ay8910_enable[0]) m_ay8910[0]->data_w(space, offset, data);
-	if (m_ay8910_enable[1]) m_ay8910[1]->data_w(space, offset, data);
+	if (m_ay8910_enable[0]) m_ay8910[0]->data_w(data);
+	if (m_ay8910_enable[1]) m_ay8910[1]->data_w(data);
 }
 
 WRITE8_MEMBER(mermaid_state::mermaid_ay8910_control_port_w)
 {
-	if (m_ay8910_enable[0]) m_ay8910[0]->address_w(space, offset, data);
-	if (m_ay8910_enable[1]) m_ay8910[1]->address_w(space, offset, data);
+	if (m_ay8910_enable[0]) m_ay8910[0]->address_w(data);
+	if (m_ay8910_enable[1]) m_ay8910[1]->address_w(data);
 }
 
 
@@ -422,7 +422,7 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 void mermaid_state::mermaid(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);	// ???
+	Z80(config, m_maincpu, 4000000);    // ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &mermaid_state::mermaid_map);
 
 	LS259(config, m_latch[0]);

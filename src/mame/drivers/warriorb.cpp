@@ -159,7 +159,7 @@ Colscroll effects?
 #include "speaker.h"
 
 
-WRITE8_MEMBER(warriorb_state::coin_control_w)
+void warriorb_state::coin_control_w(u8 data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -172,29 +172,13 @@ WRITE8_MEMBER(warriorb_state::coin_control_w)
                           SOUND
 ***********************************************************/
 
-WRITE8_MEMBER(warriorb_state::sound_bankswitch_w)
+void warriorb_state::sound_bankswitch_w(u8 data)
 {
 	m_z80bank->set_entry(data & 7);
 }
 
-WRITE16_MEMBER(warriorb_state::sound_w)
-{
-	if (offset == 0)
-		m_tc0140syt->master_port_w(space, 0, data & 0xff);
-	else if (offset == 1)
-		m_tc0140syt->master_comm_w(space, 0, data & 0xff);
-}
 
-READ16_MEMBER(warriorb_state::sound_r)
-{
-	if (offset == 1)
-		return ((m_tc0140syt->master_comm_r(space, 0) & 0xff));
-	else
-		return 0;
-}
-
-
-WRITE8_MEMBER(warriorb_state::pancontrol_w)
+void warriorb_state::pancontrol_w(offs_t offset, u8 data)
 {
 	filter_volume_device *flt = nullptr;
 	offset &= 3;
@@ -237,7 +221,8 @@ void warriorb_state::darius2d_map(address_map &map)
 	map(0x600000, 0x6013ff).ram().share("spriteram");
 	map(0x800000, 0x80000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ???
-	map(0x830000, 0x830003).rw(FUNC(warriorb_state::sound_r), FUNC(warriorb_state::sound_w));
+	map(0x830001, 0x830001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x830003, 0x830003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 }
 
 void warriorb_state::warriorb_map(address_map &map)
@@ -253,7 +238,8 @@ void warriorb_state::warriorb_map(address_map &map)
 	map(0x600000, 0x6013ff).ram().share("spriteram");
 	map(0x800000, 0x80000f).rw(m_tc0510nio, FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write)).umask16(0x00ff);
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ? uses bits 0,2,3
-	map(0x830000, 0x830003).rw(FUNC(warriorb_state::sound_r), FUNC(warriorb_state::sound_w));
+	map(0x830001, 0x830001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x830003, 0x830003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 }
 
 /***************************************************************************/
@@ -438,11 +424,11 @@ void warriorb_state::machine_reset()
 void warriorb_state::darius2d(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);	/* 12 MHz ??? (Might well be 16!) */
+	M68000(config, m_maincpu, 12000000);    /* 12 MHz ??? (Might well be 16!) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &warriorb_state::darius2d_map);
 	m_maincpu->set_vblank_int("lscreen", FUNC(warriorb_state::irq4_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 16000000/4));	/* 4 MHz ? */
+	z80_device &audiocpu(Z80(config, "audiocpu", 16000000/4));  /* 4 MHz ? */
 	audiocpu.set_addrmap(AS_PROGRAM, &warriorb_state::z80_sound_map);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
@@ -521,11 +507,11 @@ void warriorb_state::darius2d(machine_config &config)
 void warriorb_state::warriorb(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000);	/* 16 MHz ? */
+	M68000(config, m_maincpu, 16000000);    /* 16 MHz ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &warriorb_state::warriorb_map);
 	m_maincpu->set_vblank_int("lscreen", FUNC(warriorb_state::irq4_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 16000000/4));	/* 4 MHz ? */
+	z80_device &audiocpu(Z80(config, "audiocpu", 16000000/4));  /* 4 MHz ? */
 	audiocpu.set_addrmap(AS_PROGRAM, &warriorb_state::z80_sound_map);
 
 	TC0510NIO(config, m_tc0510nio, 0);
@@ -775,8 +761,8 @@ ROM_START( warriorb )
 	ROM_REGION( 0x01000, "user1", 0 )   /* unknown roms */
 	ROM_LOAD( "d24-13.37", 0x00000, 0x400, CRC(3ca18eb3) SHA1(54560f02c2be67993940831222130e90cd171991) ) /* AM27S33A or compatible like N82HS137A */
 	ROM_LOAD( "d24-14.38", 0x00000, 0x400, CRC(baf2a193) SHA1(b7f103b5f5aab0702dd21fd7e3a82261ae1760e9) ) /* AM27S33A or compatible like N82HS137A */
-//  ROM_LOAD( "d24-15.78", 0x00000, 0xa??, NO_DUMP )    /* 20L8B Pal */
-//  ROM_LOAD( "d24-16.79", 0x00000, 0xa??, NO_DUMP )    /* 20L8B Pal */
+	ROM_LOAD( "d24-15.78", 0x00000, 0x144, CRC(04992a7d) SHA1(82ce7ab7e3e7045776b660c32dac4abc28cabfa5) ) // PAL20L8BCNS
+	ROM_LOAD( "d24-16.79", 0x00000, 0x144, CRC(92c59a8d) SHA1(a83eb70cdc47af688a33505f60e5cb9960f8ba9f) ) // PAL20L8BCNS
 ROM_END
 
 

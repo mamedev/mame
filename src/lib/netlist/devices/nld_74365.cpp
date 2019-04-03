@@ -6,7 +6,7 @@
  */
 
 #include "nld_74365.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 
 namespace netlist
 {
@@ -76,8 +76,8 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(74365)
-	NETLIB_DEVICE_IMPL_DEPRECATED(74365_dip)
+	NETLIB_DEVICE_IMPL(74365, "TTL_74365", "+G1Q,+G2Q,+A1,+A2,+A3,+A4,+A5,+A6")
+	NETLIB_DEVICE_IMPL(74365_dip, "TTL_74365_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

@@ -37,7 +37,7 @@ Package: P = 60-Pin Plastic DIP
 Environmental Flow: C = Plastic Standard
 
 
-Example from Ms.Pac-Man/Galaga - 20 year Reunion hardare (see src/mame/drivers/20pacgal.c):
+Example from Ms.Pac-Man/Galaga - 20 year Reunion hardware (see src/mame/drivers/20pacgal.c):
 
    CPU is Z8S18020VSC = Z180, 20MHz, 68-Pin PLCC, 0C to +70C, Plastic Standard
 
