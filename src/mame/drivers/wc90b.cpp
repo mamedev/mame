@@ -394,11 +394,48 @@ void wc90b_state::wc90b(machine_config &config)
 
 void eurogael_state::eurogael(machine_config &config)
 {
-	wc90b(config);
+	// main board XTAL near Z80s is 16Mhz here
+	// sound board has 20Mhz and !6Mhz XTALs
+	// DSWs are on the sound board near the YM2203Cs
+	// use is guessed
 
+	/* basic machine hardware */
+	Z80(config, m_maincpu, XTAL(16'000'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eurogael_state::map1);
+	m_maincpu->set_vblank_int("screen", FUNC(wc90b_state::irq0_line_assert));
 
-	m_palette->set_format(palette_device::xBRG_444, 1024).set_endianness(ENDIANNESS_BIG);
+	Z80(config, m_subcpu, XTAL(16'000'000)/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &wc90b_state::wc90b_map2);
+	m_subcpu->set_vblank_int("screen", FUNC(wc90b_state::irq0_line_assert));
+
+	Z80(config, m_audiocpu, XTAL(20'000'000)/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &wc90b_state::sound_cpu);
+	/* IRQs are triggered by the main CPU */
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(eurogael_state::screen_update));
+	screen.set_palette(m_palette);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wc90b);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024).set_endianness(ENDIANNESS_BIG);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+
+	YM2203(config, "ymsnd1", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.40); // YM2203C
+	YM2203(config, "ymsnd2", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.40); // YM2203C
+
+	MSM5205(config, m_msm, MSM5205_CLOCK);
+	m_msm->vck_legacy_callback().set(FUNC(wc90b_state::adpcm_int)); /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  /* 4KHz 4-bit */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.20);
 }
 
 ROM_START( twcup90b1 )
