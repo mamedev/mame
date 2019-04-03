@@ -145,7 +145,7 @@ READ8_MEMBER( d6809_state::term_r )
 WRITE8_MEMBER( d6809_state::term_w )
 {
 	if ((data > 0) && (data < 0x80))
-		m_terminal->write(space, 0, data);
+		m_terminal->write(data);
 }
 
 void d6809_state::mem_map(address_map &map)

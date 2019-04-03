@@ -82,7 +82,7 @@ private:
 	required_device<input_merger_device> m_soundnmi;
 	required_device<input_merger_device> m_soundnmi2;
 	required_device<dac_8bit_r2r_device> m_dac;
-	required_device<discrete_device> m_dacvol;
+	required_device<discrete_sound_device> m_dacvol;
 	required_device<ay8910_device> m_ay1;
 	required_device<ay8910_device> m_ay2;
 	required_device<ay8910_device> m_ay3;

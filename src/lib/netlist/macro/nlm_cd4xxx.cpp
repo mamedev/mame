@@ -2,10 +2,10 @@
 // copyright-holders:Couriersud
 #include "nlm_cd4xxx.h"
 
-#include "../devices/nld_4020.h"
-#include "../devices/nld_4066.h"
-#include "../devices/nld_4316.h"
-#include "../devices/nld_system.h"
+#include "netlist/devices/nld_4020.h"
+#include "netlist/devices/nld_4066.h"
+#include "netlist/devices/nld_4316.h"
+#include "netlist/devices/nld_system.h"
 
 /*
  *   CD4001BC: Quad 2-Input NOR Buffered B Series Gate

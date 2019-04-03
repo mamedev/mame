@@ -123,10 +123,10 @@ class jalmah_state : public driver_device
 public:
 	jalmah_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_tmap(*this, "scroll%u", 0),
 		m_sharedram(*this, "sharedram"),
-		m_maincpu(*this, "maincpu"),
 		m_prirom(*this, "prirom"),
 		m_p1_key_io(*this, "P1_KEY%u", 0U),
 		m_p2_key_io(*this, "P2_KEY%u", 0U),
@@ -170,6 +170,7 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	optional_device_array<megasys1_tilemap_device, 4> m_tmap;
 
@@ -179,7 +180,6 @@ protected:
 
 private:
 	required_shared_ptr<uint16_t> m_sharedram;
-	required_device<cpu_device> m_maincpu;
 	optional_region_ptr<uint8_t> m_prirom;
 	required_ioport_array<3> m_p1_key_io;
 	optional_ioport_array<3> m_p2_key_io;
@@ -1086,10 +1086,11 @@ void urashima_state::machine_reset()
 	mcu_check_test_mode();
 }
 
-MACHINE_CONFIG_START(jalmah_state::jalmah)
-	MCFG_DEVICE_ADD("maincpu" , M68000, 12000000/2) // assume same as Mega System 1
-	MCFG_DEVICE_PROGRAM_MAP(jalmah_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jalmah_state,  irq2_line_hold)
+void jalmah_state::jalmah(machine_config &config)
+{
+	M68000(config, m_maincpu, 12000000/2); // assume same as Mega System 1
+	m_maincpu->set_addrmap(AS_PROGRAM, &jalmah_state::jalmah_map);
+	m_maincpu->set_vblank_int("screen", FUNC(jalmah_state::irq2_line_hold));
 
 	//M50747 MCU
 
@@ -1098,20 +1099,20 @@ MACHINE_CONFIG_START(jalmah_state::jalmah)
 	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x0200);
 	MEGASYS1_TILEMAP(config, m_tmap[3], m_palette, 0x0300);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(12000000/2,406,0,256,263,16,240) // assume same as nmk16 & mega system 1
-	MCFG_SCREEN_UPDATE_DRIVER(jalmah_state, screen_update_jalmah)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(12000000/2,406,0,256,263,16,240); // assume same as nmk16 & mega system 1
+	screen.set_screen_update(FUNC(jalmah_state::screen_update_jalmah));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x400);
 
 	TIMER(config, "mcusim").configure_periodic(FUNC(jalmah_state::mcu_sim), attotime::from_hz(10000));
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000, okim6295_device::PIN7_LOW)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 4000000, okim6295_device::PIN7_LOW));
+	oki.set_addrmap(0, &jalmah_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 static const gfx_layout charlayout =
 {
@@ -1144,18 +1145,18 @@ static GFXDECODE_START( gfx_urashima )
 	GFXDECODE_ENTRY( "scroll3", 0, charlayout, 0x000, 16 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(jalmah_state::jalmahv1)
+void jalmah_state::jalmahv1(machine_config &config)
+{
 	jalmah(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(jalmahv1_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &jalmah_state::jalmahv1_map);
+}
 
-MACHINE_CONFIG_START(urashima_state::urashima)
+void urashima_state::urashima(machine_config &config)
+{
 	jalmah(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(urashima_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &urashima_state::urashima_map);
 
 	// Urashima seems to use an earlier version of the Jaleco tilemaps (without range etc.)
 	// and with per-scanline video registers
@@ -1166,9 +1167,8 @@ MACHINE_CONFIG_START(urashima_state::urashima)
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_urashima);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(urashima_state, screen_update_urashima)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(urashima_state::screen_update_urashima));
+}
 
 // fake ROM containing 68k snippets
 // the original MCU actually uploads these into shared work ram area

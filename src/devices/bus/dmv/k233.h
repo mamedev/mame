@@ -27,7 +27,7 @@ protected:
 	virtual void device_reset() override;
 
 	// dmvcart_interface overrides
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, uint8_t data) override;
+	virtual void io_write(int ifsel, offs_t offset, uint8_t data) override;
 	virtual bool read(offs_t offset, uint8_t &data) override;
 	virtual bool write(offs_t offset, uint8_t data) override;
 

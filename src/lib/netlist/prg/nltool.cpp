@@ -17,7 +17,7 @@
 
 #include <cstring>
 
-#define NLTOOL_VERSION	20190202
+#define NLTOOL_VERSION  20190202
 
 class tool_app_t : public plib::app
 {
@@ -120,33 +120,32 @@ NETLIST_END()
 class netlist_data_folder_t : public netlist::source_t
 {
 public:
-	netlist_data_folder_t(netlist::setup_t &setup,
-			pstring folder)
-	: netlist::source_t(setup, netlist::source_t::DATA)
+	netlist_data_folder_t(const pstring &folder)
+	: netlist::source_t(netlist::source_t::DATA)
 	, m_folder(folder)
 	{
 	}
 
-	std::unique_ptr<plib::pistream> stream(const pstring &file) override;
+	plib::unique_ptr<plib::pistream> stream(const pstring &file) override;
 
 private:
 	pstring m_folder;
 };
 
-std::unique_ptr<plib::pistream> netlist_data_folder_t::stream(const pstring &file)
+plib::unique_ptr<plib::pistream> netlist_data_folder_t::stream(const pstring &file)
 {
 	pstring name = m_folder + "/" + file;
 	try
 	{
-		auto strm = plib::make_unique_base<plib::pistream, plib::pifilestream>(name);
-		return strm;
+		auto strm = plib::make_unique<plib::pifilestream>(name);
+		return std::move(strm);
 	}
 	catch (const plib::pexception &e)
 	{
 		if (dynamic_cast<const plib::file_open_e *>(&e) == nullptr )
 			throw;
 	}
-	return std::unique_ptr<plib::pistream>(nullptr);
+	return plib::unique_ptr<plib::pistream>(nullptr);
 }
 
 class netlist_tool_callbacks_t : public netlist::callbacks_t
@@ -172,8 +171,6 @@ public:
 	{
 	}
 
-	~netlist_tool_t() = default;
-
 	void init()
 	{
 	}
@@ -191,10 +188,9 @@ public:
 			setup().add_define(d);
 
 		for (auto & r : roms)
-			setup().register_source(plib::make_unique_base<netlist::source_t, netlist_data_folder_t>(setup(), r));
+			setup().register_source(plib::make_unique<netlist_data_folder_t>(r));
 
-		setup().register_source(plib::make_unique_base<netlist::source_t,
-				netlist::source_file_t>(setup(), filename));
+		setup().register_source(plib::make_unique<netlist::source_file_t>(filename));
 		setup().include(name);
 		create_dynamic_logs(logs);
 
@@ -315,7 +311,7 @@ struct input_t
 	double m_value;
 };
 
-static std::vector<input_t> read_input(const netlist::setup_t &setup, pstring fname)
+static std::vector<input_t> read_input(const netlist::setup_t &setup, const pstring &fname)
 {
 	std::vector<input_t> ret;
 	if (fname != "")
@@ -527,8 +523,7 @@ void tool_app_t::create_header()
 	nt.log().verbose.set_enabled(false);
 	nt.log().warning.set_enabled(false);
 
-	nt.setup().register_source(plib::make_unique_base<netlist::source_t,
-			netlist::source_proc_t>(nt.setup(), "dummy", &netlist_dummy));
+	nt.setup().register_source(plib::make_unique<netlist::source_proc_t>("dummy", &netlist_dummy));
 	nt.setup().include("dummy");
 
 	pout("// license:GPL-2.0+\n");
@@ -572,8 +567,7 @@ void tool_app_t::create_docheader()
 	nt.log().verbose.set_enabled(false);
 	nt.log().warning.set_enabled(false);
 
-	nt.setup().register_source(plib::make_unique_base<netlist::source_t,
-			netlist::source_proc_t>(nt.setup(), "dummy", &netlist_dummy));
+	nt.setup().register_source(plib::make_unique<netlist::source_proc_t>("dummy", &netlist_dummy));
 	nt.setup().include("dummy");
 
 	std::vector<pstring> devs;
@@ -625,21 +619,20 @@ void tool_app_t::listdevices()
 
 	netlist::factory::list_t &list = nt.setup().factory();
 
-	nt.setup().register_source(plib::make_unique_base<netlist::source_t,
-			netlist::source_proc_t>(nt.setup(), "dummy", &netlist_dummy));
+	nt.setup().register_source(plib::make_unique<netlist::source_proc_t>("dummy", &netlist_dummy));
 	nt.setup().include("dummy");
 
 
 	nt.setup().prepare_to_run();
 
-	std::vector<plib::owned_ptr<netlist::core_device_t>> devs;
+	std::vector<netlist::pool_owned_ptr<netlist::core_device_t>> devs;
 
 	for (auto & f : list)
 	{
 		pstring out = plib::pfmt("{1:-20} {2}(<id>")(f->classname())(f->name());
 
-		f->macro_actions(nt.setup().netlist(), f->name() + "_lc");
-		auto d = f->Create(nt.setup().netlist(), f->name() + "_lc");
+		f->macro_actions(nt.setup(), f->name() + "_lc");
+		auto d = f->Create(nt.nlstate(), f->name() + "_lc");
 		// get the list of terminals ...
 
 		std::vector<pstring> terms(nt.setup().get_terminals_for_device_name(d->name()));

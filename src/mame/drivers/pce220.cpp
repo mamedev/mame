@@ -944,21 +944,22 @@ void pce220_state::pce220_palette(palette_device &palette) const
 }
 
 
-MACHINE_CONFIG_START(pce220_state::pce220)
+void pce220_state::pce220(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, 3072000 ) // CMOS-SC7852
-	MCFG_DEVICE_PROGRAM_MAP(pce220_mem)
-	MCFG_DEVICE_IO_MAP(pce220_io)
+	Z80(config, m_maincpu, 3072000); // CMOS-SC7852
+	m_maincpu->set_addrmap(AS_PROGRAM, &pce220_state::pce220_mem);
+	m_maincpu->set_addrmap(AS_IO, &pce220_state::pce220_io);
 
 	/* video hardware */
 	// 4 lines x 24 characters, resp. 144 x 32 pixel
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(pce220_state, screen_update)
-	MCFG_SCREEN_SIZE(24*6, 4*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 24*6-1, 0, 4*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(pce220_state::screen_update));
+	screen.set_size(24*6, 4*8);
+	screen.set_visarea(0, 24*6-1, 0, 4*8-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(pce220_state::pce220_palette), 2);
 
@@ -974,23 +975,24 @@ MACHINE_CONFIG_START(pce220_state::pce220)
 	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
 	PCE220SERIAL(config, m_serial, 0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pcg850v_state::pcg815)
+void pcg850v_state::pcg815(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000) ) // 3.54MHz
-	MCFG_DEVICE_PROGRAM_MAP(pce220_mem)
-	MCFG_DEVICE_IO_MAP(pcg850v_io)
+	Z80(config, m_maincpu, XTAL(4'000'000)); // 3.54MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcg850v_state::pce220_mem);
+	m_maincpu->set_addrmap(AS_IO, &pcg850v_state::pcg850v_io);
 
 	/* video hardware */
 	// 4 lines x 24 characters, resp. 144 x 32 pixel
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(pcg850v_state, screen_update)
-	MCFG_SCREEN_SIZE(144, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 144-1, 0, 32-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(pcg850v_state::screen_update));
+	screen.set_size(144, 32);
+	screen.set_visarea(0, 144-1, 0, 32-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(pcg850v_state::pce220_palette), 2);
 
@@ -1006,23 +1008,24 @@ MACHINE_CONFIG_START(pcg850v_state::pcg815)
 	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
 	PCE220SERIAL(config, m_serial, 0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pcg850v_state::pcg850v)
+void pcg850v_state::pcg850v(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(8'000'000) ) // CMOS-SC7852
-	MCFG_DEVICE_PROGRAM_MAP(pce220_mem)
-	MCFG_DEVICE_IO_MAP(pcg850v_io)
+	Z80(config, m_maincpu, XTAL(8'000'000)); // CMOS-SC7852
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcg850v_state::pce220_mem);
+	m_maincpu->set_addrmap(AS_IO, &pcg850v_state::pcg850v_io);
 
 	/* video hardware */
 	// 6 lines x 24 characters, resp. 144 x 48 pixel
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(pcg850v_state, screen_update)
-	MCFG_SCREEN_SIZE(144, 48)
-	MCFG_SCREEN_VISIBLE_AREA(0, 144-1, 0, 48-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(pcg850v_state::screen_update));
+	screen.set_size(144, 48);
+	screen.set_visarea(0, 144-1, 0, 48-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(pcg850v_state::pce220_palette), 2);
 
@@ -1038,7 +1041,7 @@ MACHINE_CONFIG_START(pcg850v_state::pcg850v)
 	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
 	PCE220SERIAL(config, m_serial, 0);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( pce220 )

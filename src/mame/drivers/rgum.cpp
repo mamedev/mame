@@ -245,19 +245,20 @@ static GFXDECODE_START( gfx_rgum )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(rgum_state::rgum)
+void rgum_state::rgum(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M65C02,24000000/16)      /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(rgum_map)
+	M65C02(config, m_maincpu, 24000000/16);      /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rgum_state::rgum_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rgum_state, screen_update_royalgum)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0, 256-1);
+	screen.set_screen_update(FUNC(rgum_state::screen_update_royalgum));
+	screen.set_palette(m_palette);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 24000000/16));   /* unknown clock & type, hand tuned to get ~50 fps (?) */
 	crtc.set_screen("screen");
@@ -271,12 +272,12 @@ MACHINE_CONFIG_START(rgum_state::rgum)
 	ppi.in_pc_callback().set_ioport("IN2");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rgum);
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, m_palette).set_entries(0x100);
 
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, "aysnd", 24000000/16).add_route(ALL_OUTPUTS, "mono", 0.50); /* guessed to use the same xtal as the crtc */
-MACHINE_CONFIG_END
+}
 
 
 

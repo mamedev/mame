@@ -339,7 +339,7 @@ WRITE_LINE_MEMBER(firetrap_state::firetrap_adpcm_int)
 WRITE8_MEMBER(firetrap_state::adpcm_data_w)
 {
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-	m_adpcm_select->write_ba(data);
+	m_adpcm_select->ba_w(data);
 }
 
 WRITE8_MEMBER(firetrap_state::flip_screen_w)

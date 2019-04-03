@@ -111,13 +111,18 @@ public:
 
 	// adjustments
 	void reset() { adjust(attotime::never, 0, attotime::never); }
-	void adjust(const attotime &duration, s32 param = 0, const attotime &period = attotime::never) const { assert(m_type == TIMER_TYPE_GENERIC); m_timer->adjust(duration, param, period); }
+	void adjust(const attotime &duration, s32 param = 0, const attotime &period = attotime::never) const
+	{
+		assert(m_type == TIMER_TYPE_GENERIC);
+		m_timer->adjust(duration, param, period);
+	}
 
 	// timing information
 	attotime time_elapsed() const { return m_timer->elapsed(); }
 	attotime time_left() const { return m_timer->remaining(); }
 	attotime start_time() const { return m_timer->start(); }
 	attotime fire_time() const { return m_timer->expire(); }
+	attotime period() const { return m_timer ? m_timer->period() : m_period; }
 
 private:
 	// device-level overrides
@@ -136,7 +141,7 @@ private:
 
 	// configuration data
 	timer_type              m_type;             // type of timer
-	expired_delegate   m_callback;         // the timer's callback function
+	expired_delegate        m_callback;         // the timer's callback function
 	void *                  m_ptr;              // the pointer parameter passed to the timer callback
 
 	// periodic timers only

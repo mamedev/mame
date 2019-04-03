@@ -42,8 +42,8 @@ protected:
 	virtual void device_start() override;
 
 	// interface-specific overrides
-	virtual DECLARE_READ8_MEMBER(register_read) override;
-	virtual DECLARE_WRITE8_MEMBER(register_write) override;
+	virtual u8 register_read(offs_t offset) override;
+	virtual void register_write(offs_t offset, u8 data) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(f110_w) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(f300_w) override;
 
@@ -161,18 +161,18 @@ WRITE_LINE_MEMBER(ss50_mpc_device::count_select_w)
 //  register_read - read from a port register
 //-------------------------------------------------
 
-READ8_MEMBER(ss50_mpc_device::register_read)
+u8 ss50_mpc_device::register_read(offs_t offset)
 {
-	return m_pia->read(space, offset & 3, 0);
+	return m_pia->read(offset & 3);
 }
 
 //-------------------------------------------------
 //  register_write - write to a port register
 //-------------------------------------------------
 
-WRITE8_MEMBER(ss50_mpc_device::register_write)
+void ss50_mpc_device::register_write(offs_t offset, u8 data)
 {
-	m_pia->write(space, offset & 3, data);
+	m_pia->write(offset & 3, data);
 }
 
 WRITE_LINE_MEMBER(ss50_mpc_device::f110_w)

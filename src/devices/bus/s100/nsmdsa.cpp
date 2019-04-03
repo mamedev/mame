@@ -105,7 +105,7 @@ void s100_mds_a_device::device_reset()
 //  s100_smemr_r - memory read
 //-------------------------------------------------
 
-uint8_t s100_mds_a_device::s100_smemr_r(address_space &space, offs_t offset)
+uint8_t s100_mds_a_device::s100_smemr_r(offs_t offset)
 {
 	return 0xff;
 }

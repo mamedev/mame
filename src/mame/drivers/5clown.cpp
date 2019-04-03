@@ -509,7 +509,7 @@ private:
 	DECLARE_WRITE8_MEMBER(trigsnd_w);
 	DECLARE_READ8_MEMBER(pia0_b_r);
 	DECLARE_READ8_MEMBER(pia1_b_r);
-	DECLARE_WRITE8_MEMBER(fclown_ay8910_w);
+	void fclown_ay8910_w(offs_t offset, u8 data);
 	TILE_GET_INFO_MEMBER(get_fclown_tile_info);
 	void _5clown_palette(palette_device &palette) const;
 	uint32_t screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -714,10 +714,10 @@ WRITE8_MEMBER(_5clown_state::cpu_d800_w)
 *  AY3-8910 R/W Handlers        *
 ********************************/
 
-WRITE8_MEMBER(_5clown_state::fclown_ay8910_w)
+void _5clown_state::fclown_ay8910_w(offs_t offset, u8 data)
 {
-	m_ay8910->address_w(space, 0, offset);
-	m_ay8910->data_w(space, 0, data);
+	m_ay8910->address_w(offset);
+	m_ay8910->data_w(data);
 }
 
 
@@ -742,7 +742,7 @@ WRITE8_MEMBER(_5clown_state::snd_800_w)
 
 	if (m_snd_latch_0a02 == 0x00)
 	{
-		fclown_ay8910_w(space, m_ay8910_addr, m_snd_latch_0800);
+		fclown_ay8910_w(m_ay8910_addr, m_snd_latch_0800);
 	}
 }
 
@@ -1020,14 +1020,14 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(_5clown_state::fclown)
-
+void _5clown_state::fclown(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/8)  /* guess, seems ok */
-	MCFG_DEVICE_PROGRAM_MAP(fclown_map)
+	M6502(config, m_maincpu, MASTER_CLOCK/8);  /* guess, seems ok */
+	m_maincpu->set_addrmap(AS_PROGRAM, &_5clown_state::fclown_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, MASTER_CLOCK/8) /* guess, seems ok */
-	MCFG_DEVICE_PROGRAM_MAP(fcaudio_map)
+	M6502(config, m_audiocpu, MASTER_CLOCK/8); /* guess, seems ok */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &_5clown_state::fcaudio_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1043,13 +1043,13 @@ MACHINE_CONFIG_START(_5clown_state::fclown)
 	pia1.writepb_handler().set(FUNC(_5clown_state::mux_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(_5clown_state, screen_update_fclown)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((39+1)*8, (31+1)*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(_5clown_state::screen_update_fclown));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fclown);
 	PALETTE(config, m_palette, FUNC(_5clown_state::_5clown_palette), 256);
@@ -1065,10 +1065,8 @@ MACHINE_CONFIG_START(_5clown_state::fclown)
 
 	AY8910(config, m_ay8910, MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 1.00);        /* guess, seems ok */
 
-	MCFG_DEVICE_ADD("oki6295", OKIM6295, MASTER_CLOCK/12, okim6295_device::PIN7_LOW)    /* guess, seems ok; pin7 guessed, seems ok */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.20)
-
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki6295", MASTER_CLOCK/12, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.20);    /* guess, seems ok; pin7 guessed, seems ok */
+}
 
 
 /*************************

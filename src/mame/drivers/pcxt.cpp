@@ -494,33 +494,34 @@ static void filetto_isa8_cards(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(pcxt_state::filetto)
-	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(14'318'181)/3)
-	MCFG_DEVICE_PROGRAM_MAP(filetto_map)
-	MCFG_DEVICE_IO_MAP(filetto_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+void pcxt_state::filetto(machine_config &config)
+{
+	I8088(config, m_maincpu, XTAL(14'318'181)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcxt_state::filetto_map);
+	m_maincpu->set_addrmap(AS_IO, &pcxt_state::filetto_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", filetto_isa8_cards, "filetto", true) // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", filetto_isa8_cards, "filetto", true); // FIXME: determine ISA bus clock
 
-	MCFG_DEVICE_ADD("voice", HC55516, 8000000/4)//8923S-UM5100 is a HC55536 with ROM hook-up
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mb:mono", 0.60)
+	HC55516(config, "voice", 8000000/4).add_route(ALL_OUTPUTS, "mb:mono", 0.60); //8923S-UM5100 is a HC55536 with ROM hook-up
 
 	RAM(config, RAM_TAG).set_default_size("640K");
 
 	ADDRESS_MAP_BANK(config, "bank").set_map(&pcxt_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pcxt_state::tetriskr)
-	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(14'318'181)/3)
-	MCFG_DEVICE_PROGRAM_MAP(tetriskr_map)
-	MCFG_DEVICE_IO_MAP(tetriskr_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+void pcxt_state::tetriskr(machine_config &config)
+{
+	I8088(config, m_maincpu, XTAL(14'318'181)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcxt_state::tetriskr_map);
+	m_maincpu->set_addrmap(AS_IO, &pcxt_state::tetriskr_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", filetto_isa8_cards, "tetriskr", true) // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", filetto_isa8_cards, "tetriskr", true); // FIXME: determine ISA bus clock
 
 	RAM(config, RAM_TAG).set_default_size("640K");
-MACHINE_CONFIG_END
+}
 
 ROM_START( filetto )
 	ROM_REGION( 0x10000, "bios", 0 )

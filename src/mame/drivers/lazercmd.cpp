@@ -626,110 +626,110 @@ void lazercmd_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(lazercmd_state::lazercmd)
-
+void lazercmd_state::lazercmd(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz? */
+	S2650(config, m_maincpu, MASTER_CLOCK/12); /* 666 kHz? */
 /*  Main Clock is 8MHz divided by 12
     but memory and IO access is only possible
     within the line and frame blanking period
     thus requiring an extra loading of approx 3-5 */
-	MCFG_DEVICE_PROGRAM_MAP(lazercmd_map)
-	MCFG_DEVICE_DATA_MAP(lazercmd_portmap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &lazercmd_state::lazercmd_map);
+	m_maincpu->set_addrmap(AS_DATA, &lazercmd_state::lazercmd_portmap);
 	TIMER(config, "scantimer").configure_scanline(FUNC(lazercmd_state::lazercmd_timer), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR + 16)
-	MCFG_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1, 0 * VERT_CHR, (VERT_RES - 1) * VERT_CHR - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR + 16);
+	screen.set_visarea(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1, 0 * VERT_CHR, (VERT_RES - 1) * VERT_CHR - 1);
+	screen.set_screen_update(FUNC(lazercmd_state::screen_update_lazercmd));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lazercmd);
 	PALETTE(config, m_palette, FUNC(lazercmd_state::lazercmd_palette), 5);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac0", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_DEVICE_ADD("dac1", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_DEVICE_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_DEVICE_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac0", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_1BIT(config, m_dac0, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT);
+}
 
 
-MACHINE_CONFIG_START(lazercmd_state::medlanes)
-
+void lazercmd_state::medlanes(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz */
+	S2650(config, m_maincpu, MASTER_CLOCK/12); /* 666 kHz */
 /*  Main Clock is 8MHz divided by 12
     but memory and IO access is only possible
     within the line and frame blanking period
     thus requiring an extra loading of approx 3-5 */
-	MCFG_DEVICE_PROGRAM_MAP(medlanes_map)
-	MCFG_DEVICE_DATA_MAP(lazercmd_portmap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &lazercmd_state::medlanes_map);
+	m_maincpu->set_addrmap(AS_DATA, &lazercmd_state::lazercmd_portmap);
 	TIMER(config, "scantimer").configure_scanline(FUNC(lazercmd_state::lazercmd_timer), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR)
-	MCFG_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1, 0 * VERT_CHR, VERT_RES * VERT_CHR - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR);
+	screen.set_visarea(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1, 0 * VERT_CHR, VERT_RES * VERT_CHR - 1);
+	screen.set_screen_update(FUNC(lazercmd_state::screen_update_lazercmd));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lazercmd);
 	PALETTE(config, m_palette, FUNC(lazercmd_state::lazercmd_palette), 5);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_DEVICE_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT);
+}
 
 
-MACHINE_CONFIG_START(lazercmd_state::bbonk)
-
+void lazercmd_state::bbonk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz */
+	S2650(config, m_maincpu, MASTER_CLOCK/12); /* 666 kHz */
 /*  Main Clock is 8MHz divided by 12
     but memory and IO access is only possible
     within the line and frame blanking period
     thus requiring an extra loading of approx 3-5 */
-	MCFG_DEVICE_PROGRAM_MAP(bbonk_map)
-	MCFG_DEVICE_DATA_MAP(lazercmd_portmap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &lazercmd_state::bbonk_map);
+	m_maincpu->set_addrmap(AS_DATA, &lazercmd_state::lazercmd_portmap);
 	TIMER(config, "scantimer").configure_scanline(FUNC(lazercmd_state::bbonk_timer), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR)
-	MCFG_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1, 0 * VERT_CHR, (VERT_RES - 1) * VERT_CHR - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR);
+	screen.set_visarea(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1, 0 * VERT_CHR, (VERT_RES - 1) * VERT_CHR - 1);
+	screen.set_screen_update(FUNC(lazercmd_state::screen_update_lazercmd));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lazercmd);
 	PALETTE(config, m_palette, FUNC(lazercmd_state::lazercmd_palette), 5);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_DEVICE_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT);
+}
 
 /***************************************************************************
 

@@ -461,17 +461,17 @@ WRITE8_MEMBER( spinb_state::sndbank_m_w )
 void spinb_state::update_sound_a()
 {
 	if (m_sndbank_a != 0xff)
-		m_ic14a->write_ba(m_p_audio[m_sound_addr_a]);
+		m_ic14a->ba_w(m_p_audio[m_sound_addr_a]);
 	else
-		m_ic14a->write_ba(0);
+		m_ic14a->ba_w(0);
 }
 
 void spinb_state::update_sound_m()
 {
 	if (m_sndbank_m != 0xff)
-		m_ic14m->write_ba(m_p_music[m_sound_addr_m]);
+		m_ic14m->ba_w(m_p_music[m_sound_addr_m]);
 	else
-		m_ic14m->write_ba(0);
+		m_ic14m->ba_w(0);
 }
 
 WRITE_LINE_MEMBER( spinb_state::ic5a_w )

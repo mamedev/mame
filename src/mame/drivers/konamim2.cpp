@@ -1165,7 +1165,6 @@ void konamim2_state::konamim2(machine_config &config)
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
@@ -1454,8 +1453,8 @@ ROM_END
 
 void konamim2_state::install_m48t58()
 {
-	read8_delegate read_delegate(FUNC(m48t58_device::read), &(*m_m48t58));
-	write8_delegate write_delegate(FUNC(m48t58_device::write), &(*m_m48t58));
+	read8sm_delegate read_delegate(FUNC(m48t58_device::read), &(*m_m48t58));
+	write8sm_delegate write_delegate(FUNC(m48t58_device::write), &(*m_m48t58));
 
 	m_ppc1->space(AS_PROGRAM).install_readwrite_handler(0x36c00000, 0x36c03fff, read_delegate, write_delegate, 0xff00ff00ff00ff00ULL);
 	m_ppc2->space(AS_PROGRAM).install_readwrite_handler(0x36c00000, 0x36c03fff, read_delegate, write_delegate, 0xff00ff00ff00ff00ULL);

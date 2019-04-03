@@ -457,14 +457,14 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(rpunch_state::rpunch)
-
+void rpunch_state::rpunch(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rpunch_state::main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, MASTER_CLOCK/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rpunch_state::sound_map);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set("soundirq", FUNC(input_merger_device::in_w<0>));
@@ -472,12 +472,12 @@ MACHINE_CONFIG_START(rpunch_state::rpunch)
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(304, 224)
-	MCFG_SCREEN_VISIBLE_AREA(8, 303-8, 0, 223-8)
-	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(304, 224);
+	m_screen->set_visarea(8, 303-8, 0, 223-8);
+	m_screen->set_screen_update(FUNC(rpunch_state::screen_update_rpunch));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rpunch);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
@@ -495,25 +495,25 @@ MACHINE_CONFIG_START(rpunch_state::rpunch)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(rpunch_state::svolley)
+void rpunch_state::svolley(machine_config &config)
+{
 	rpunch(config);
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,svolley)
-MACHINE_CONFIG_END
+}
 
 
 // c+p of above for now, bootleg hw, things need verifying
-MACHINE_CONFIG_START(rpunch_state::svolleybl)
-
+void rpunch_state::svolleybl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rpunch_state::main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, MASTER_CLOCK/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rpunch_state::sound_map);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set("soundirq", FUNC(input_merger_device::in_w<0>));
@@ -521,12 +521,12 @@ MACHINE_CONFIG_START(rpunch_state::svolleybl)
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(304, 224)
-	MCFG_SCREEN_VISIBLE_AREA(8, 303-8, 0, 223-8)
-	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(304, 224);
+	m_screen->set_visarea(8, 303-8, 0, 223-8);
+	m_screen->set_screen_update(FUNC(rpunch_state::screen_update_rpunch));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_svolleybl);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
@@ -545,9 +545,8 @@ MACHINE_CONFIG_START(rpunch_state::svolleybl)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 

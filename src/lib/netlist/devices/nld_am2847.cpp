@@ -6,7 +6,7 @@
  */
 
 #include "nld_am2847.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 
 namespace netlist
 {
@@ -116,7 +116,7 @@ namespace netlist
 		/* do nothing */
 	}
 
-	NETLIB_FUNC_VOID(Am2847_shifter, shift, (void))
+	NETLIB_FUNC_VOID(Am2847_shifter, shift, ())
 	{
 		uint32_t out = m_buffer[0] & 1;
 		uint32_t in = (m_RC() ? out : m_IN());

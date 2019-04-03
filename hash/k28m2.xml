@@ -59,7 +59,7 @@
         <info name="serial" value="CM62218"/>
         <part name="cart" interface="k28m2">
             <dataarea name="rom" size="0x4000">
-                <rom name="cm62217.vsm" size="0x4000" crc="x" sha1="x" offset="0" />
+                <rom name="cm62218.vsm" size="0x4000" crc="x" sha1="x" offset="0" />
             </dataarea>
         </part>
     </software>

@@ -360,21 +360,22 @@ void sm7238_state::sm7238_palette(palette_device &palette) const
 	palette.set_pen_color(2, 0x00, 0xff, 0x00); // highlight
 }
 
-MACHINE_CONFIG_START(sm7238_state::sm7238)
-	MCFG_DEVICE_ADD("maincpu", I8080, 16.5888_MHz_XTAL/9)
-	MCFG_DEVICE_PROGRAM_MAP(sm7238_mem)
-	MCFG_DEVICE_IO_MAP(sm7238_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+void sm7238_state::sm7238(machine_config &config)
+{
+	I8080(config, m_maincpu, 16.5888_MHz_XTAL/9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sm7238_state::sm7238_mem);
+	m_maincpu->set_addrmap(AS_IO, &sm7238_state::sm7238_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	ADDRESS_MAP_BANK(config, "videobank").set_map(&sm7238_state::videobank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(20.625_MHz_XTAL, KSM_TOTAL_HORZ, 0, KSM_DISP_HORZ, KSM_TOTAL_VERT, 0, KSM_DISP_VERT);
-	MCFG_SCREEN_UPDATE_DRIVER(sm7238_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_pic8259, pic8259_device, ir2_w))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(20.625_MHz_XTAL, KSM_TOTAL_HORZ, 0, KSM_DISP_HORZ, KSM_TOTAL_VERT, 0, KSM_DISP_VERT);
+	m_screen->set_screen_update(FUNC(sm7238_state::screen_update));
+	m_screen->screen_vblank().set(m_pic8259, FUNC(pic8259_device::ir2_w));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(sm7238_state::sm7238_palette), 3);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_sm7238);
@@ -427,7 +428,7 @@ MACHINE_CONFIG_START(sm7238_state::sm7238)
 	prtr.rxd_handler().set(m_i8251prn, FUNC(i8251_device::write_rxd));
 	prtr.cts_handler().set(m_i8251prn, FUNC(i8251_device::write_cts));
 	prtr.dsr_handler().set(m_i8251prn, FUNC(i8251_device::write_dsr));
-MACHINE_CONFIG_END
+}
 
 ROM_START( sm7238 )
 	ROM_REGION(0xa000, "maincpu", ROMREGION_ERASE00)

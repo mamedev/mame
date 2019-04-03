@@ -173,13 +173,13 @@ READ8_MEMBER(sagitta180_state::memory_read_byte)
 	return prog_space.read_byte(offset);
 }
 
-MACHINE_CONFIG_START(sagitta180_state::sagitta180)
-
+void sagitta180_state::sagitta180(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(10'000'000)) /* guessed ! */
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
-	MCFG_DEVICE_IO_MAP(maincpu_io_map)
-//        MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("intlatch", i8212_device, inta_cb)
+	I8080(config, m_maincpu, XTAL(10'000'000)); /* guessed ! */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sagitta180_state::maincpu_map);
+	m_maincpu->set_addrmap(AS_IO, &sagitta180_state::maincpu_io_map);
+//  m_maincpu->set_irq_acknowledge_callback("intlatch", FUNC(i8212_device::inta_cb));
 
 	I8257(config, m_dma8257, XTAL(14'745'600)); /* guessed xtal */
 	m_dma8257->out_iow_cb<2>().set("crtc", FUNC(i8275_device::dack_w));
@@ -200,18 +200,18 @@ MACHINE_CONFIG_START(sagitta180_state::sagitta180)
 	uart_clock.signal_handler().set("uart", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart", FUNC(i8251_device::write_rxc));
 
-//  MCFG_DEVICE_ADD("intlatch", I8212, 0)
-//  MCFG_I8212_MD_CALLBACK(GND) // guessed !
-//  MCFG_I8212_DI_CALLBACK(READ8("picu", i8214_device, vector_r))
-//  MCFG_I8212_INT_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE)) // guessed !
+//  i8212_device &intlatch(I8212(config, "intlatch", 0));
+//  intlatch.md_rd_callback().set_constant(GND); // guessed !
+//  intlatch.di_rd_callback().set("picu", FUNC(i8214_device::vector_r));
+//  intlatch.int_wr_callback().set_inputline("maincpu", I8085_INTR_LINE); // guessed !
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(80*5, 25*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*5-1, 0, 25*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(80*5, 25*8);
+	screen.set_visarea(0, 80*5-1, 0, 25*8-1);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_sagitta180);
 
 	I8275(config, m_crtc, 12480000 / 8); /* guessed xtal */
@@ -221,8 +221,8 @@ MACHINE_CONFIG_START(sagitta180_state::sagitta180)
 	m_crtc->irq_wr_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
 	m_crtc->set_screen("screen");
 
-	MCFG_PALETTE_ADD("palette", 3)
-MACHINE_CONFIG_END
+	PALETTE(config, m_palette).set_entries(3);
+}
 
 
 ROM_START( sagitta180 )

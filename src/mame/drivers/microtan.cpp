@@ -209,21 +209,21 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(microtan_state::microtan)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, M6502, 6_MHz_XTAL / 8)  // 750 kHz
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", microtan_state, interrupt)
+	M6502(config, m_maincpu, 6_MHz_XTAL / 8);  // 750 kHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &microtan_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(microtan_state::interrupt));
 
 	// The 6502 IRQ line is active low and probably driven by open collector outputs (guess).
 	INPUT_MERGER_ANY_HIGH(config, m_irq_line).output_handler().set_inputline(m_maincpu, 0);
 
 	/* video hardware - include overscan */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(32*8, 16*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*16, 16*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(microtan_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 16*16);
+	screen.set_visarea(0*8, 32*8-1, 0*16, 16*16-1);
+	screen.set_screen_update(FUNC(microtan_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_microtan);
 
@@ -255,7 +255,7 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 	m_via6522[0]->cb2_handler().set(FUNC(microtan_state::via_0_out_cb2));
 	m_via6522[0]->irq_handler().set(m_irq_line, FUNC(input_merger_device::in_w<IRQ_VIA_0>));
 
-	MCFG_DEVICE_ADD(m_via6522[1], VIA6522, 6_MHz_XTAL / 8)
+	VIA6522(config, m_via6522[1], 6_MHz_XTAL / 8);
 	m_via6522[1]->writepa_handler().set(FUNC(microtan_state::via_1_out_a));
 	m_via6522[1]->writepb_handler().set(FUNC(microtan_state::via_1_out_b));
 	m_via6522[1]->ca2_handler().set(FUNC(microtan_state::via_1_out_ca2));

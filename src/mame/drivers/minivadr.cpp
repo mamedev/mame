@@ -110,23 +110,23 @@ static INPUT_PORTS_START( minivadr )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(minivadr_state::minivadr)
-
+void minivadr_state::minivadr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000) / 6)
-	MCFG_DEVICE_PROGRAM_MAP(minivadr_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", minivadr_state, irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(24'000'000) / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &minivadr_state::minivadr_map);
+	m_maincpu->set_vblank_int("screen", FUNC(minivadr_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(minivadr_state, screen_update_minivadr)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 240-1);
+	screen.set_screen_update(FUNC(minivadr_state::screen_update_minivadr));
 
 	/* the board has no sound hardware */
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

@@ -256,6 +256,7 @@ cpzodiac.cpp
 crbaloon.cpp
 crgolf.cpp
 crimfght.cpp
+cromptons.cpp
 crospang.cpp
 crshrace.cpp
 crystal.cpp
@@ -1306,6 +1307,7 @@ unianapc.cpp
 unico.cpp
 unkfr.cpp
 unkhorse.cpp
+unkpoker.cpp
 upscope.cpp
 usbilliards.cpp
 usgames.cpp

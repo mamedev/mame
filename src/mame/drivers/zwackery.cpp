@@ -479,7 +479,7 @@ READ8_MEMBER( zwackery_state::pia2_porta_r )
 READ8_MEMBER( zwackery_state::ptm_r )
 {
 	m_maincpu->adjust_icount(-14);
-	return m_ptm->read(space, offset);
+	return m_ptm->read(offset);
 }
 
 void zwackery_state::machine_start()

@@ -95,6 +95,7 @@ WRITE8_MEMBER(sms_gender_adapter_device::write_ram)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sms_gender_adapter_device::device_add_mconfig)
-	MCFG_SMS_CARTRIDGE_ADD("subslot", sms_cart, nullptr)
-MACHINE_CONFIG_END
+void sms_gender_adapter_device::device_add_mconfig(machine_config &config)
+{
+	SMS_CART_SLOT(config, "subslot", sms_cart, nullptr);
+}

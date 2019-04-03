@@ -528,13 +528,14 @@ DEFINE_DEVICE_TYPE(ISA8_EGA, isa8_ega_device, "ega", "IBM Enhanced Graphics Adap
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa8_ega_device::device_add_mconfig)
-	MCFG_SCREEN_ADD(EGA_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16.257_MHz_XTAL, 912, 0, 640, 262, 0, 200)
-	MCFG_SCREEN_UPDATE_DEVICE(EGA_CRTC_NAME, crtc_ega_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+void isa8_ega_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, EGA_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_raw(16.257_MHz_XTAL, 912, 0, 640, 262, 0, 200);
+	screen.set_screen_update(EGA_CRTC_NAME, FUNC(crtc_ega_device::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD( "palette", 64 )
+	PALETTE(config, m_palette).set_entries(64);
 
 	CRTC_EGA(config, m_crtc_ega, 16.257_MHz_XTAL/8);
 	m_crtc_ega->set_screen(EGA_SCREEN_NAME);
@@ -544,7 +545,7 @@ MACHINE_CONFIG_START(isa8_ega_device::device_add_mconfig)
 	m_crtc_ega->res_out_hsync_callback().set(FUNC(isa8_ega_device::hsync_changed));
 	m_crtc_ega->res_out_vsync_callback().set(FUNC(isa8_ega_device::vsync_changed));
 	m_crtc_ega->res_out_vblank_callback().set(FUNC(isa8_ega_device::vblank_changed));
-MACHINE_CONFIG_END
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -1168,7 +1169,7 @@ READ8_MEMBER( isa8_ega_device::pc_ega8_3X0_r )
 
 	/* CRT Controller - data register */
 	case 1: case 3: case 5: case 7:
-		data = m_crtc_ega->register_r( space, offset );
+		data = m_crtc_ega->register_r();
 		break;
 
 	/* Input Status Register 1 */
@@ -1203,12 +1204,12 @@ WRITE8_MEMBER( isa8_ega_device::pc_ega8_3X0_w )
 	{
 	/* CRT Controller - address register */
 	case 0: case 2: case 4: case 6:
-		m_crtc_ega->address_w( space, offset, data );
+		m_crtc_ega->address_w(data);
 		break;
 
 	/* CRT Controller - data register */
 	case 1: case 3: case 5: case 7:
-		m_crtc_ega->register_w( space, offset, data );
+		m_crtc_ega->register_w(data);
 		break;
 
 	/* Set Light Pen Flip Flop */

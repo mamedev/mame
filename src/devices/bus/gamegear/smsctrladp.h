@@ -42,7 +42,6 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(th_pin_w);
-	DECLARE_READ32_MEMBER(pixel_r);
 
 	required_device<sms_control_port_device> m_subctrl_port;
 };

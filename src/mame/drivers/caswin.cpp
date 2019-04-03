@@ -333,21 +333,22 @@ void caswin_state::caswin_palette(palette_device &palette) const
 }
 
 
-MACHINE_CONFIG_START(caswin_state::vvillage)
+void caswin_state::vvillage(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(vvillage_mem)
-	MCFG_DEVICE_IO_MAP(vvillage_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", caswin_state, irq0_line_hold)
+	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &caswin_state::vvillage_mem);
+	m_maincpu->set_addrmap(AS_IO, &caswin_state::vvillage_io);
+	m_maincpu->set_vblank_int("screen", FUNC(caswin_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(caswin_state, screen_update_vvillage)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(caswin_state::screen_update_vvillage));
+	screen.set_palette("palette");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -360,7 +361,7 @@ MACHINE_CONFIG_START(caswin_state::vvillage)
 	aysnd.port_a_read_callback().set_ioport("DSW1");
 	aysnd.port_b_read_callback().set_ioport("DSW2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
-MACHINE_CONFIG_END
+}
 
 ROM_START( caswin )
 	ROM_REGION( 0x8000, "maincpu", 0 )

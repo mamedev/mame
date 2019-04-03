@@ -88,22 +88,23 @@ uint32_t mpu4plasma_state::screen_update_mpu4plasma(screen_device &screen, bitma
 }
 
 
-MACHINE_CONFIG_START(mpu4plasma_state::mpu4plasma)
+void mpu4plasma_state::mpu4plasma(machine_config &config)
+{
 	mod2(config);
-	MCFG_DEVICE_ADD("plasmacpu", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(mpu4plasma_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mpu4plasma_state,  irq4_line_hold)
+	m68000_device &plasmacpu(M68000(config, "plasmacpu", 10000000));
+	plasmacpu.set_addrmap(AS_PROGRAM, &mpu4plasma_state::mpu4plasma_map);
+	plasmacpu.set_vblank_int("screen", FUNC(mpu4plasma_state::irq4_line_hold));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0*8, 40-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mpu4plasma_state, screen_update_mpu4plasma)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0, 128-1, 0*8, 40-1);
+	screen.set_screen_update(FUNC(mpu4plasma_state::screen_update_mpu4plasma));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-MACHINE_CONFIG_END
+	PALETTE(config, m_palette).set_entries(0x200);
+}
 
 // plasma v0.1
 #define M4BIGCHF_PLASMA \

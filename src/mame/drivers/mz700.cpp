@@ -372,21 +372,22 @@ GFXDECODE_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-MACHINE_CONFIG_START(mz_state::mz700)
+void mz_state::mz700(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(17'734'470)/5)
-	MCFG_DEVICE_PROGRAM_MAP(mz700_mem)
-	MCFG_DEVICE_IO_MAP(mz700_io)
+	Z80(config, m_maincpu, XTAL(17'734'470)/5);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mz_state::mz700_mem);
+	m_maincpu->set_addrmap(AS_IO, &mz_state::mz700_io);
 
 	ADDRESS_MAP_BANK(config, "banke").set_map(&mz_state::mz700_banke).set_options(ENDIANNESS_LITTLE, 8, 16, 0x2000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mz_state, mz700)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(17'734'470)/2, 568, 0, 40*8, 312, 0, 25*8)
-	MCFG_SCREEN_UPDATE_DRIVER(mz_state, screen_update_mz700)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(17'734'470)/2, 568, 0, 40*8, 312, 0, 25*8);
+	m_screen->set_screen_update(FUNC(mz_state::screen_update_mz700));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mz700);
@@ -426,28 +427,26 @@ MACHINE_CONFIG_START(mz_state::mz700)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(mz_state::mz800)
+void mz_state::mz800(machine_config &config)
+{
 	mz700(config);
 	config.device_remove("banke");
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mz800_mem)
-	MCFG_DEVICE_IO_MAP(mz800_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mz_state::mz800_mem);
+	m_maincpu->set_addrmap(AS_IO, &mz_state::mz800_io);
 
 	ADDRESS_MAP_BANK(config, "bankf").set_map(&mz_state::mz800_bankf).set_options(ENDIANNESS_LITTLE, 8, 16, 0x2000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mz_state, mz800)
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_mz800);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mz_state, screen_update_mz800)
+	m_screen->set_screen_update(FUNC(mz_state::screen_update_mz800));
 
-	MCFG_DEVICE_ADD("sn76489n", SN76489, XTAL(17'734'470)/5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SN76489(config, "sn76489n", XTAL(17'734'470)/5).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	config.device_remove("cass_list");
 	SOFTWARE_LIST(config, "cass_list").set_original("mz800_cass");
@@ -465,7 +464,7 @@ MACHINE_CONFIG_START(mz_state::mz800)
 
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

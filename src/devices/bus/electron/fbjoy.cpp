@@ -67,7 +67,7 @@ void electron_fbjoy_device::device_start()
 //  expbus_r - expansion data read
 //-------------------------------------------------
 
-uint8_t electron_fbjoy_device::expbus_r(address_space &space, offs_t offset)
+uint8_t electron_fbjoy_device::expbus_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 

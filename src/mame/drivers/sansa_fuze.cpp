@@ -43,13 +43,12 @@ static INPUT_PORTS_START( sansa_fuze )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(sansa_fuze_state::sansa_fuze)
-
+void sansa_fuze_state::sansa_fuze(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM7, 50000000) // arm based, speed unknown
-	MCFG_DEVICE_PROGRAM_MAP(sansa_fuze_map)
-
-MACHINE_CONFIG_END
+	 ARM7(config, m_maincpu, 50000000); // arm based, speed unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &sansa_fuze_state::sansa_fuze_map);
+}
 
 ROM_START( sanfuze2 )
 	ROM_REGION(0x20000, "maincpu", 0 )

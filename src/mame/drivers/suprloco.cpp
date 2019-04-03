@@ -163,8 +163,8 @@ static GFXDECODE_START( gfx_suprloco )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(suprloco_state::suprloco)
-
+void suprloco_state::suprloco(machine_config &config)
+{
 	/* basic machine hardware */
 	sega_315_5015_device &maincpu(SEGA_315_5015(config, m_maincpu, 4000000));   /* 4 MHz (?) */
 	maincpu.set_addrmap(AS_PROGRAM, &suprloco_state::main_map);
@@ -172,9 +172,9 @@ MACHINE_CONFIG_START(suprloco_state::suprloco)
 	maincpu.set_vblank_int("screen", FUNC(suprloco_state::irq0_line_hold));
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(suprloco_state, irq0_line_hold, 4*60)          /* NMIs are caused by the main CPU */
+	Z80(config, m_audiocpu, 4000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &suprloco_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(suprloco_state::irq0_line_hold), attotime::from_hz(4*60));          /* NMIs are caused by the main CPU */
 
 	i8255_device &ppi(I8255A(config, "ppi"));
 	ppi.out_pb_callback().set(FUNC(suprloco_state::control_w));
@@ -183,13 +183,13 @@ MACHINE_CONFIG_START(suprloco_state::suprloco)
 	ppi.out_pc_callback().append_inputline(m_audiocpu, INPUT_LINE_NMI).bit(7).invert();
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(suprloco_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(5000));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(1*8, 31*8-1, 0*8, 28*8-1);
+	screen.set_screen_update(FUNC(suprloco_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_suprloco);
 	PALETTE(config, "palette", FUNC(suprloco_state::suprloco_palette), 512+256);
@@ -197,12 +197,10 @@ MACHINE_CONFIG_START(suprloco_state::suprloco)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76496, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SN76496(config, "sn1", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("sn2", SN76496, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SN76496(config, "sn2", 2000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************

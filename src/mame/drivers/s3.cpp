@@ -436,10 +436,11 @@ TIMER_DEVICE_CALLBACK_MEMBER( s3_state::irq )
 		m_t_c++;
 }
 
-MACHINE_CONFIG_START(s3_state::s3)
+void s3_state::s3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 3580000)
-	MCFG_DEVICE_PROGRAM_MAP(s3_main_map)
+	M6800(config, m_maincpu, 3580000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &s3_state::s3_main_map);
 	TIMER(config, "irq").configure_periodic(FUNC(s3_state::irq), attotime::from_hz(250));
 	MCFG_MACHINE_RESET_OVERRIDE(s3_state, s3)
 
@@ -486,26 +487,28 @@ MACHINE_CONFIG_START(s3_state::s3)
 	m_pia30->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(s3_state::s3a)
+void s3_state::s3a(machine_config &config)
+{
 	s3(config);
 	/* Add the soundcard */
-	MCFG_DEVICE_ADD("audiocpu", M6802, 3580000)
-	MCFG_DEVICE_PROGRAM_MAP(s3_audio_map)
+	M6802(config, m_audiocpu, 3580000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &s3_state::s3_audio_map);
 	MCFG_MACHINE_RESET_OVERRIDE(s3_state, s3a)
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	PIA6821(config, m_pias, 0);
 	m_pias->readpb_handler().set(FUNC(s3_state::sound_r));
 	m_pias->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pias->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
 	m_pias->irqb_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
-MACHINE_CONFIG_END
+}
 
 
 //***************************************** SYSTEM 3 ******************************************************

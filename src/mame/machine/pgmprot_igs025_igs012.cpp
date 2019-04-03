@@ -125,7 +125,6 @@ void pgm_012_025_state::mem_map(address_map &map)
 void pgm_012_025_state::pgm_012_025_drgw2(machine_config &config)
 {
 	pgm(config);
-
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_012_025_state::mem_map);
 
 	IGS025(config, m_igs025, 0);

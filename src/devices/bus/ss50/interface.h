@@ -44,8 +44,8 @@ public:
 	auto firq_cb() { return m_firq_cb.bind(); }
 
 	// memory accesses
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	// baud rates
 	DECLARE_WRITE_LINE_MEMBER(f110_w);
@@ -79,8 +79,8 @@ protected:
 	ss50_card_interface(const machine_config &mconfig, device_t &device);
 
 	// required overrides
-	virtual DECLARE_READ8_MEMBER(register_read) = 0;
-	virtual DECLARE_WRITE8_MEMBER(register_write) = 0;
+	virtual u8 register_read(offs_t offset) = 0;
+	virtual void register_write(offs_t offset, u8 data) = 0;
 
 	// optional overrides
 	virtual DECLARE_WRITE_LINE_MEMBER(f110_w) { }

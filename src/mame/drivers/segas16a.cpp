@@ -318,7 +318,7 @@ READ8_MEMBER( segas16a_state::sound_data_r )
 {
 	// assert ACK
 	m_i8255->pc6_w(CLEAR_LINE);
-	return m_soundlatch->read(space, 0);
+	return m_soundlatch->read();
 }
 
 
@@ -526,7 +526,7 @@ READ8_MEMBER( segas16a_state::mcu_io_r )
 		case 0:
 			// access watchdog? (unsure about this one)
 			if (                         offset < 0x3fff)
-				return m_watchdog->reset_r(space, 0);
+				return m_watchdog->reset_r(space);
 
 			// access main work RAM
 			else if (offset >= 0x4000 && offset < 0x8000)
@@ -2022,7 +2022,6 @@ void segas16a_state::system16a(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -2096,15 +2095,15 @@ void segas16a_state::system16a_no7751p(machine_config &config)
 }
 
 /*
-static MACHINE_CONFIG_START( system16a_i8751_no7751 )
+void segas16a_state::system16a_i8751_no7751(machine_config &config)
+{
     system16a_i8751(config);
     config.device_remove("n7751");
     config.device_remove("dac");
     config.device_remove("vref");
 
-    MCFG_DEVICE_REPLACE("ymsnd", YM2151, 4000000)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+    YM2151(config.replace(), "ymsnd", 4000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 */
 
 void segas16a_state::system16a_fd1089a_no7751(machine_config &config)

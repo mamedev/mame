@@ -380,7 +380,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portd_w)
 READ8_MEMBER(exelv_state::rom_r)
 {
 	if (m_cart && m_cart->exists())
-		return m_cart->read_rom(space, offset + 0x200);
+		return m_cart->read_rom(offset + 0x200);
 
 	return 0;
 }

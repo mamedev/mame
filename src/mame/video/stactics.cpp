@@ -426,15 +426,16 @@ uint32_t stactics_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
  *
  *************************************/
 
-MACHINE_CONFIG_START(stactics_state::stactics_video)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(stactics_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+void stactics_state::stactics_video(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(stactics_state::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(stactics_state::stactics_palette), 0x400);
-MACHINE_CONFIG_END
+}

@@ -388,7 +388,8 @@ static void iq151_cart(device_slot_interface &device)
 	device.option_add("amos3",    IQ151_AMOS3);         // AMOS cart 3
 }
 
-MACHINE_CONFIG_START(iq151_state::iq151)
+void iq151_state::iq151(machine_config &config)
+{
 	/* basic machine hardware */
 	I8080(config, m_maincpu, XTAL(2'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &iq151_state::iq151_mem);
@@ -397,20 +398,19 @@ MACHINE_CONFIG_START(iq151_state::iq151)
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(iq151_state, screen_update)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(iq151_state::screen_update));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0, 32*8-1, 0, 32*8-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
@@ -467,7 +467,7 @@ MACHINE_CONFIG_START(iq151_state::iq151)
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("iq151_cart");
 	SOFTWARE_LIST(config, "flop_list").set_original("iq151_flop");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( iq151 )

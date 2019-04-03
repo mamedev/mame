@@ -261,12 +261,12 @@ void jailbrek_state::machine_reset()
 	m_nmi_enable = 0;
 }
 
-MACHINE_CONFIG_START(jailbrek_state::jailbrek)
-
+void jailbrek_state::jailbrek(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", KONAMI1, MASTER_CLOCK/12)
-	MCFG_DEVICE_PROGRAM_MAP(jailbrek_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(jailbrek_state, interrupt_nmi,  500) /* ? */
+	KONAMI1(config, m_maincpu, MASTER_CLOCK/12);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jailbrek_state::jailbrek_map);
+	m_maincpu->set_periodic_int(FUNC(jailbrek_state::interrupt_nmi), attotime::from_hz(500)); /* ? */
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -274,22 +274,21 @@ MACHINE_CONFIG_START(jailbrek_state::jailbrek)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jailbrek);
 	PALETTE(config, m_palette, FUNC(jailbrek_state::jailbrek_palette), 512, 32);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 396, 8, 248, 256, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(jailbrek_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, jailbrek_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MASTER_CLOCK/3, 396, 8, 248, 256, 16, 240);
+	screen.set_screen_update(FUNC(jailbrek_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(jailbrek_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("snsnd", SN76489A, MASTER_CLOCK/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SN76489A(config, "snsnd", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("vlm", VLM5030, VOICE_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
-MACHINE_CONFIG_END
+	VLM5030(config, m_vlm, VOICE_CLOCK);
+	m_vlm->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_vlm->set_addrmap(0, &jailbrek_state::vlm_map);
+}
 
 
 /***************************************************************************

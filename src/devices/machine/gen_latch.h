@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-    Generic 8bit and 16 bit latch devices
+    Generic 8 bit and 16 bit latch devices
 
 ***************************************************************************/
 
@@ -36,8 +36,8 @@ public:
 
 	DECLARE_READ_LINE_MEMBER(pending_r);
 
-	DECLARE_READ8_MEMBER( acknowledge_r );
-	DECLARE_WRITE8_MEMBER( acknowledge_w );
+	u8 acknowledge_r(address_space &space);
+	void acknowledge_w(u8 data = 0);
 
 protected:
 	// construction/destruction
@@ -67,15 +67,13 @@ public:
 	// construction/destruction
 	generic_latch_8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read();
+	void write(u8 data);
 
-	DECLARE_WRITE8_MEMBER( preset_w );
-	DECLARE_WRITE8_MEMBER( clear_w );
+	void preset_w(u8 data = 0xff);
+	void clear_w(u8 data = 0);
 	DECLARE_WRITE_LINE_MEMBER( preset );
 	DECLARE_WRITE_LINE_MEMBER( clear );
-
-	void preset_w(u8 value) { m_latched_value = value; }
 
 protected:
 	virtual void device_start() override;
@@ -95,15 +93,13 @@ public:
 	// construction/destruction
 	generic_latch_16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
+	u16 read();
+	void write(u16 data);
 
-	DECLARE_WRITE16_MEMBER( preset_w );
-	DECLARE_WRITE16_MEMBER( clear_w );
+	void preset_w(u16 data = 0xffff);
+	void clear_w(u16 data = 0);
 	DECLARE_WRITE_LINE_MEMBER( preset );
 	DECLARE_WRITE_LINE_MEMBER( clear );
-
-	void preset_w(u16 value) { m_latched_value = value; }
 
 protected:
 	virtual void device_start() override;

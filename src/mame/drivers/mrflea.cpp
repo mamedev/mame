@@ -255,17 +255,17 @@ void mrflea_state::machine_reset()
 	m_gfx_bank = 0;
 }
 
-MACHINE_CONFIG_START(mrflea_state::mrflea)
-
+void mrflea_state::mrflea(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(mrflea_master_map)
-	MCFG_DEVICE_IO_MAP(mrflea_master_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mrflea_state,  irq0_line_hold) /* NMI resets the game */
+	Z80(config, m_maincpu, 4000000); /* 4 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mrflea_state::mrflea_master_map);
+	m_maincpu->set_addrmap(AS_IO, &mrflea_state::mrflea_master_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mrflea_state::irq0_line_hold)); /* NMI resets the game */
 
-	MCFG_DEVICE_ADD("subcpu", Z80, 6000000) // runs in IM 1, so doesn't use 8259 INTA
-	MCFG_DEVICE_PROGRAM_MAP(mrflea_slave_map)
-	MCFG_DEVICE_IO_MAP(mrflea_slave_io_map)
+	Z80(config, m_subcpu, 6000000); // runs in IM 1, so doesn't use 8259 INTA
+	m_subcpu->set_addrmap(AS_PROGRAM, &mrflea_state::mrflea_slave_map);
+	m_subcpu->set_addrmap(AS_IO, &mrflea_state::mrflea_slave_io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(mrflea_state::mrflea_slave_interrupt), "screen", 0, 1);
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
@@ -285,13 +285,13 @@ MACHINE_CONFIG_START(mrflea_state::mrflea)
 	m_pic->out_int_callback().set_inputline(m_subcpu, 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mrflea_state, screen_update_mrflea)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(mrflea_state::screen_update_mrflea));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mrflea);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 32);
@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(mrflea_state::mrflea)
 	ay4.port_a_read_callback().set_ioport("UNKNOWN");
 	ay4.port_b_write_callback().set(FUNC(mrflea_state::mrflea_data1_w));
 	ay4.add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
 /*************************************
  *

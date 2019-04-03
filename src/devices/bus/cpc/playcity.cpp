@@ -87,44 +87,44 @@ void cpc_playcity_device::device_reset()
 
 READ8_MEMBER(cpc_playcity_device::ctc_r)
 {
-	return m_ctc->read(space,offset);
+	return m_ctc->read(offset);
 }
 
 WRITE8_MEMBER(cpc_playcity_device::ctc_w)
 {
-	m_ctc->write(space,offset,data);
+	m_ctc->write(offset,data);
 	if(offset == 0)
 		update_ymz_clock();
 }
 
 WRITE8_MEMBER(cpc_playcity_device::ymz1_address_w)
 {
-	m_ymz1->address_w(space,offset,data);
+	m_ymz1->address_w(data);
 }
 
 WRITE8_MEMBER(cpc_playcity_device::ymz2_address_w)
 {
-	m_ymz2->address_w(space,offset,data);
+	m_ymz2->address_w(data);
 }
 
 WRITE8_MEMBER(cpc_playcity_device::ymz1_data_w)
 {
-	m_ymz1->data_w(space,offset,data);
+	m_ymz1->data_w(data);
 }
 
 WRITE8_MEMBER(cpc_playcity_device::ymz2_data_w)
 {
-	m_ymz2->data_w(space,offset,data);
+	m_ymz2->data_w(data);
 }
 
 READ8_MEMBER(cpc_playcity_device::ymz1_data_r)
 {
-	return m_ymz1->data_r(space,offset);
+	return m_ymz1->data_r();
 }
 
 READ8_MEMBER(cpc_playcity_device::ymz2_data_r)
 {
-	return m_ymz2->data_r(space,offset);
+	return m_ymz2->data_r();
 }
 
 void cpc_playcity_device::update_ymz_clock()

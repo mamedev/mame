@@ -249,23 +249,23 @@ MACHINE_START_MEMBER(calcune_state,calcune)
 	m_vdp2->stop_timers();
 }
 
-MACHINE_CONFIG_START(calcune_state::calcune)
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(calcune_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(calcune_state,genesis_int_callback)
+void calcune_state::calcune(machine_config &config)
+{
+	M68000(config, m_maincpu, MASTER_CLOCK_NTSC / 7); /* 7.67 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &calcune_state::calcune_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(calcune_state::genesis_int_callback));
 
-	MCFG_DEVICE_ADD("z80", Z80, MASTER_CLOCK_NTSC / 15) /* 3.58 MHz */
-	MCFG_DEVICE_DISABLE() /* no code is ever uploaded for the Z80, so it's unused here even if it is present on the PCB */
+	Z80(config, "z80", MASTER_CLOCK_NTSC / 15).set_disable(); /* 3.58 MHz, no code is ever uploaded for the Z80, so it's unused here even if it is present on the PCB */
 
 	MCFG_MACHINE_START_OVERRIDE(calcune_state,calcune)
 	MCFG_MACHINE_RESET_OVERRIDE(calcune_state,calcune)
 
-	MCFG_SCREEN_ADD("megadriv", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
-	MCFG_SCREEN_SIZE(64*8, 620)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(calcune_state, screen_update_calcune)
+	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
+	screen.set_size(64*8, 620);
+	screen.set_visarea(0, 40*8-1, 0, 28*8-1);
+	screen.set_screen_update(FUNC(calcune_state::screen_update_calcune));
 
 	SEGA315_5313(config, m_vdp, MASTER_CLOCK_NTSC, m_maincpu);
 	m_vdp->set_is_pal(false);
@@ -293,7 +293,7 @@ MACHINE_CONFIG_START(calcune_state::calcune)
 	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
 	TIMER(config, "scantimer2").configure_scanline("gen_vdp2", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
 
-	MCFG_PALETTE_ADD("palette", 0xc0*2)
+	PALETTE(config, m_palette).set_entries(0xc0*2);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -301,10 +301,10 @@ MACHINE_CONFIG_START(calcune_state::calcune)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
+}
 
 void calcune_state::init_calcune()
 {

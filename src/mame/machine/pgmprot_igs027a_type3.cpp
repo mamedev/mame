@@ -204,7 +204,6 @@ void pgm_arm_type3_state::machine_start()
 void pgm_arm_type3_state::pgm_arm_type3(machine_config &config)
 {
 	pgm(config);
-
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type3_state::svg_68k_mem);
 
 	/* protection CPU */

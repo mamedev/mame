@@ -440,25 +440,25 @@ void quizdna_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(quizdna_state::quizdna)
-
+void quizdna_state::quizdna(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(quizdna_map)
-	MCFG_DEVICE_IO_MAP(quizdna_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", quizdna_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MCLK/2); /* 8.000 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &quizdna_state::quizdna_map);
+	m_maincpu->set_addrmap(AS_IO, &quizdna_state::quizdna_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(quizdna_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(quizdna_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, 56*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(quizdna_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_quizdna);
-	MCFG_PALETTE_ADD("palette", 2048)
+	PALETTE(config, m_palette).set_entries(2048);
 
 
 	/* sound hardware */
@@ -472,30 +472,27 @@ MACHINE_CONFIG_START(quizdna_state::quizdna)
 	ymsnd.add_route(2, "mono", 0.10);
 	ymsnd.add_route(3, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, (MCLK/1024)*132, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", (MCLK/1024)*132, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30); // clock frequency & pin 7 not verified
+}
 
-MACHINE_CONFIG_START(quizdna_state::gakupara)
+void quizdna_state::gakupara(machine_config &config)
+{
 	quizdna(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(gakupara_io_map)
+	m_maincpu->set_addrmap(AS_IO, &quizdna_state::gakupara_io_map);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(quizdna_state::gekiretu)
+void quizdna_state::gekiretu(machine_config &config)
+{
 	quizdna(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(gekiretu_map)
-	MCFG_DEVICE_IO_MAP(gekiretu_io_map)
-
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &quizdna_state::gekiretu_map);
+	m_maincpu->set_addrmap(AS_IO, &quizdna_state::gekiretu_io_map);
+}
 
 
 /****************************************************************************/

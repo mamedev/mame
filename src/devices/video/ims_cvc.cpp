@@ -101,36 +101,36 @@ void g332_device::microport_map(address_map &map)
 	// address mode, bank device does handles additional shift for 32 bit mode
 	const int shift = 3;
 
-	map(0x000 << shift, (0x000 << shift) | 0x3).w(FUNC(g332_device::boot_w));
+	map(0x000 << shift, (0x000 << shift) | 0x7).w(FUNC(g332_device::boot_w));
 
 	// data path registers
-	map(0x021 << shift, (0x021 << shift) | 0x3).rw(FUNC(g332_device::halfsync_r), FUNC(g332_device::halfsync_w));
-	map(0x022 << shift, (0x022 << shift) | 0x3).rw(FUNC(g332_device::backporch_r), FUNC(g332_device::backporch_w));
-	map(0x023 << shift, (0x023 << shift) | 0x3).rw(FUNC(g332_device::display_r), FUNC(g332_device::display_w));
-	map(0x024 << shift, (0x024 << shift) | 0x3).rw(FUNC(g332_device::shortdisplay_r), FUNC(g332_device::shortdisplay_w));
-	map(0x025 << shift, (0x025 << shift) | 0x3).rw(FUNC(g332_device::broadpulse_r), FUNC(g332_device::broadpulse_w));
-	map(0x026 << shift, (0x026 << shift) | 0x3).rw(FUNC(g332_device::vsync_r), FUNC(g332_device::vsync_w));
-	map(0x027 << shift, (0x027 << shift) | 0x3).rw(FUNC(g332_device::vpreequalise_r), FUNC(g332_device::vpreequalise_w));
-	map(0x028 << shift, (0x028 << shift) | 0x3).rw(FUNC(g332_device::vpostequalise_r), FUNC(g332_device::vpostequalise_w));
-	map(0x029 << shift, (0x029 << shift) | 0x3).rw(FUNC(g332_device::vblank_r), FUNC(g332_device::vblank_w));
-	map(0x02a << shift, (0x02a << shift) | 0x3).rw(FUNC(g332_device::vdisplay_r), FUNC(g332_device::vdisplay_w));
-	map(0x02b << shift, (0x02b << shift) | 0x3).rw(FUNC(g332_device::linetime_r), FUNC(g332_device::linetime_w));
-	map(0x02c << shift, (0x02c << shift) | 0x3).rw(FUNC(g332_device::linestart_r), FUNC(g332_device::linestart_w));
-	map(0x02d << shift, (0x02d << shift) | 0x3).rw(FUNC(g332_device::meminit_r), FUNC(g332_device::meminit_w));
-	map(0x02e << shift, (0x02e << shift) | 0x3).rw(FUNC(g332_device::transferdelay_r), FUNC(g332_device::transferdelay_w));
+	map(0x021 << shift, (0x021 << shift) | 0x7).rw(FUNC(g332_device::halfsync_r), FUNC(g332_device::halfsync_w));
+	map(0x022 << shift, (0x022 << shift) | 0x7).rw(FUNC(g332_device::backporch_r), FUNC(g332_device::backporch_w));
+	map(0x023 << shift, (0x023 << shift) | 0x7).rw(FUNC(g332_device::display_r), FUNC(g332_device::display_w));
+	map(0x024 << shift, (0x024 << shift) | 0x7).rw(FUNC(g332_device::shortdisplay_r), FUNC(g332_device::shortdisplay_w));
+	map(0x025 << shift, (0x025 << shift) | 0x7).rw(FUNC(g332_device::broadpulse_r), FUNC(g332_device::broadpulse_w));
+	map(0x026 << shift, (0x026 << shift) | 0x7).rw(FUNC(g332_device::vsync_r), FUNC(g332_device::vsync_w));
+	map(0x027 << shift, (0x027 << shift) | 0x7).rw(FUNC(g332_device::vpreequalise_r), FUNC(g332_device::vpreequalise_w));
+	map(0x028 << shift, (0x028 << shift) | 0x7).rw(FUNC(g332_device::vpostequalise_r), FUNC(g332_device::vpostequalise_w));
+	map(0x029 << shift, (0x029 << shift) | 0x7).rw(FUNC(g332_device::vblank_r), FUNC(g332_device::vblank_w));
+	map(0x02a << shift, (0x02a << shift) | 0x7).rw(FUNC(g332_device::vdisplay_r), FUNC(g332_device::vdisplay_w));
+	map(0x02b << shift, (0x02b << shift) | 0x7).rw(FUNC(g332_device::linetime_r), FUNC(g332_device::linetime_w));
+	map(0x02c << shift, (0x02c << shift) | 0x7).rw(FUNC(g332_device::linestart_r), FUNC(g332_device::linestart_w));
+	map(0x02d << shift, (0x02d << shift) | 0x7).rw(FUNC(g332_device::meminit_r), FUNC(g332_device::meminit_w));
+	map(0x02e << shift, (0x02e << shift) | 0x7).rw(FUNC(g332_device::transferdelay_r), FUNC(g332_device::transferdelay_w));
 
-	map(0x040 << shift, (0x040 << shift) | 0x3).rw(FUNC(g332_device::mask_r), FUNC(g332_device::mask_w));
-	map(0x060 << shift, (0x060 << shift) | 0x3).rw(FUNC(g332_device::control_a_r), FUNC(g332_device::control_a_w));
-	map(0x070 << shift, (0x070 << shift) | 0x3).rw(FUNC(g332_device::control_b_r), FUNC(g332_device::control_b_w));
-	map(0x080 << shift, (0x080 << shift) | 0x3).rw(FUNC(g332_device::tos_r), FUNC(g332_device::tos_w));
+	map(0x040 << shift, (0x040 << shift) | 0x7).rw(FUNC(g332_device::mask_r), FUNC(g332_device::mask_w));
+	map(0x060 << shift, (0x060 << shift) | 0x7).rw(FUNC(g332_device::control_a_r), FUNC(g332_device::control_a_w));
+	map(0x070 << shift, (0x070 << shift) | 0x7).rw(FUNC(g332_device::control_b_r), FUNC(g332_device::control_b_w));
+	map(0x080 << shift, (0x080 << shift) | 0x7).rw(FUNC(g332_device::tos_r), FUNC(g332_device::tos_w));
 
 	// cursor palette (0a1-0a3)
-	map(0x0a1 << shift, (0x0a3 << shift) | 0x3).rw(FUNC(g332_device::cursor_palette_r), FUNC(g332_device::cursor_palette_w));
+	map(0x0a1 << shift, (0x0a3 << shift) | 0x7).rw(FUNC(g332_device::cursor_palette_r), FUNC(g332_device::cursor_palette_w));
 
 	// checksum registers (0c0-0c2)
 
 	// colour palette
-	map(0x100 << shift, (0x1ff << shift) | 0x3).rw(FUNC(g332_device::colour_palette_r), FUNC(g332_device::colour_palette_w));
+	map(0x100 << shift, (0x1ff << shift) | 0x7).rw(FUNC(g332_device::colour_palette_r), FUNC(g332_device::colour_palette_w));
 
 	// cursor store (200-3ff)
 	// cursor position (0c7)

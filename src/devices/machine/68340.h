@@ -49,6 +49,8 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	virtual void m68k_reset_peripherals() override;
+
 private:
 	required_device<mc68340_serial_module_device> m_serial;
 	required_device_array<mc68340_timer_module_device, 2> m_timer;

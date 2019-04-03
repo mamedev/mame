@@ -12,6 +12,8 @@
 
 #include "pstring.h"
 
+#include <array>
+#include <type_traits>
 #include <vector>
 
 namespace plib {
@@ -29,12 +31,13 @@ class uninitialised_array_t
 {
 public:
 
-	typedef C* iterator;
-	typedef const C* const_iterator;
+	using iterator = C *;
+	using const_iterator = const C *;
 
-	uninitialised_array_t() = default;
+	uninitialised_array_t() noexcept = default;
 
-	~uninitialised_array_t()
+	COPYASSIGNMOVE(uninitialised_array_t, delete)
+	~uninitialised_array_t() noexcept
 	{
 		for (std::size_t i=0; i<N; i++)
 			(*this)[i].~C();
@@ -73,8 +76,8 @@ protected:
 private:
 
 	/* ensure proper alignment */
-	// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
-	typename std::aligned_storage<sizeof(C), alignof(C)>::type m_buf[N];
+	PALIGNAS_VECTOROPT()
+	std::array<typename std::aligned_storage<sizeof(C), alignof(C)>::type, N> m_buf;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -180,14 +183,12 @@ public:
 		friend class linkedlist_t<LC>;
 
 		constexpr element_t() : m_next(nullptr), m_prev(nullptr) {}
-		constexpr element_t(const element_t &rhs) = delete;
-		constexpr element_t(element_t &&rhs) = delete;
+		~element_t() noexcept = default;
+
+		COPYASSIGNMOVE(element_t, delete)
 
 		constexpr LC *next() const noexcept { return m_next; }
 		constexpr LC *prev() const noexcept { return m_prev; }
-
-	protected:
-		~element_t() = default;
 	private:
 		LC * m_next;
 		LC * m_prev;
@@ -199,12 +200,16 @@ public:
 		LC* p;
 	public:
 		explicit constexpr iter_t(LC* x) noexcept : p(x) { }
-		explicit constexpr iter_t(iter_t &rhs) noexcept : p(rhs.p) { }
+		constexpr iter_t(iter_t &rhs) noexcept : p(rhs.p) { }
 		iter_t(iter_t &&rhs) noexcept { std::swap(*this, rhs);  }
-		iter_t& operator=(const iter_t &rhs) { iter_t t(rhs); std::swap(*this, t); return *this; }
+		iter_t& operator=(const iter_t &rhs) noexcept { iter_t t(rhs); std::swap(*this, t); return *this; }
 		iter_t& operator=(iter_t &&rhs) noexcept { std::swap(*this, rhs); return *this; }
 		iter_t& operator++() noexcept {p = p->next();return *this;}
-		iter_t operator++(int) noexcept {iter_t tmp(*this); operator++(); return tmp;}
+		// NOLINTNEXTLINE(cert-dcl21-cpp)
+		iter_t operator++(int) & noexcept {const iter_t tmp(*this); operator++(); return tmp;}
+
+		~iter_t() = default;
+
 		constexpr bool operator==(const iter_t& rhs) const noexcept {return p == rhs.p;}
 		constexpr bool operator!=(const iter_t& rhs) const noexcept {return p != rhs.p;}
 		/* constexpr */ LC& operator*() noexcept {return *p;}
@@ -221,10 +226,10 @@ public:
 
 	void push_front(LC *elem) noexcept
 	{
+		if (m_head)
+			m_head->m_prev = elem;
 		elem->m_next = m_head;
 		elem->m_prev = nullptr;
-		if (elem->m_next)
-			elem->m_next->m_prev = elem;
 		m_head = elem;
 	}
 

@@ -86,7 +86,7 @@ PCB board that connects to 044 boards via J6 & J7
     or 039 EPROM + SIMM software
 
 More chips (from eBay auction):
-    2x Phillips / NXT 28C94 quad UART (8 serial channels total)
+    2x Philips / NXT 28C94 quad UART (8 serial channels total)
     ADV476 256 color RAMDAC
 */
 
@@ -607,11 +607,11 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
-
+void igt_gameking_state::igt_gameking(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I960, XTAL(24'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(igt_gameking_map)
+	I960(config, m_maincpu, XTAL(24'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &igt_gameking_state::igt_gameking_map);
 
 	SC28C94(config, m_quart1, XTAL(24'000'000) / 6);
 	m_quart1->d_tx_cb().set("diag", FUNC(rs232_port_device::write_txd));
@@ -625,17 +625,17 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_igt_gameking);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(1024, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igt_gameking_state, screen_update_igt_gameking)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igt_gameking_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(1024, 512);
+	m_screen->set_visarea(0, 640-1, 0, 480-1);
+	m_screen->set_screen_update(FUNC(igt_gameking_state::screen_update_igt_gameking));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(igt_gameking_state::vblank_irq));
 	// Xilinx used as video chip XTAL(26'666'666) on board
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, m_palette).set_entries(0x100);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &igt_gameking_state::ramdac_map);
@@ -643,17 +643,16 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400)) // enhanced sound on optional Media-Lite sub board
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YMZ280B(config, "ymz", XTAL(16'934'400)).add_route(ALL_OUTPUTS, "mono", 1.0); // enhanced sound on optional Media-Lite sub board
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(igt_gameking_state::igt_ms72c)
+void igt_gameking_state::igt_ms72c(machine_config &config)
+{
 	igt_gameking(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(igt_ms72c_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &igt_gameking_state::igt_ms72c_map);
+}
 
 ROM_START( ms3 )
 	ROM_REGION( 0x80000, "maincpu", 0 )

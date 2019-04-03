@@ -82,7 +82,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<n2a03_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 
 	std::unique_ptr<uint8_t[]> m_nt_ram;
@@ -544,6 +544,7 @@ void famibox_state::famibox(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 

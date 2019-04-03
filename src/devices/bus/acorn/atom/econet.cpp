@@ -63,7 +63,7 @@ void atom_econet_device::device_start()
 {
 	address_space &space = m_bus->memspace();
 
-	space.install_readwrite_handler(0xb400, 0xb403, read8_delegate(FUNC(mc6854_device::read), m_adlc.target()), write8_delegate(FUNC(mc6854_device::write), m_adlc.target()));
+	space.install_readwrite_handler(0xb400, 0xb403, read8sm_delegate(FUNC(mc6854_device::read), m_adlc.target()), write8sm_delegate(FUNC(mc6854_device::write), m_adlc.target()));
 	space.install_read_handler(0xb404, 0xb404, read8_delegate(FUNC(atom_econet_device::statid_r), this));
 }
 

@@ -30,6 +30,10 @@ private:
 	static char const *const R[];
 	static char const *const F[];
 
+	static char const *const PT[];
+	static char const *const ABX[];
+	static char const *const IBX[];
+
 	dasm_type const m_dasm_type;
 };
 

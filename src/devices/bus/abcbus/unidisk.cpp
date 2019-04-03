@@ -73,11 +73,12 @@ void unidisk_t::unidisk_io(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(unidisk_t::device_add_mconfig)
+void unidisk_t::device_add_mconfig(machine_config &config)
+{
 	TMS9995(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &unidisk_t::unidisk_mem);
 	m_maincpu->set_addrmap(AS_IO, &unidisk_t::unidisk_io);
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------

@@ -1572,7 +1572,7 @@ WRITE16_MEMBER(taitoz_state::nightstr_motor_w)
 }
 
 
-WRITE8_MEMBER(taitoz_state::coin_control_w)
+void taitoz_state::coin_control_w(u8 data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -1591,68 +1591,14 @@ READ16_MEMBER(taitoz_state::aquajack_unknown_r)
                         SOUND
 *****************************************************/
 
-WRITE8_MEMBER(taitoz_state::sound_bankswitch_w)
+void taitoz_state::sound_bankswitch_w(u8 data)
 {
 	membank("z80bank")->set_entry(data & 7);
 }
 
-WRITE16_MEMBER(taitoz_state::taitoz_sound_w)
-{
-	if (offset == 0)
-		m_tc0140syt->master_port_w(space, 0, data & 0xff);
-	else if (offset == 1)
-		m_tc0140syt->master_comm_w(space, 0, data & 0xff);
-
-#ifdef MAME_DEBUG
-//  if (data & 0xff00)
-//  {
-//      char buf[80];
-//
-//      sprintf(buf,"taitoz_sound_w to high byte: %04x",data);
-//      popmessage(buf);
-//  }
-#endif
-}
-
-READ16_MEMBER(taitoz_state::taitoz_sound_r)
-{
-	if (offset == 1)
-		return (m_tc0140syt->master_comm_r(space, 0) & 0xff);
-	else
-		return 0;
-}
-
-#if 0
-WRITE16_MEMBER(taitoz_state::taitoz_msb_sound_w)
-{
-	if (offset == 0)
-		m_tc0140syt->master_port_w(0, (data >> 8) & 0xff);
-	else if (offset == 1)
-		m_tc0140syt->master_comm_w(0, (data >> 8) & 0xff);
-
-#ifdef MAME_DEBUG
-	if (data & 0xff)
-	{
-		char buf[80];
-
-		sprintf(buf,"taitoz_msb_sound_w to low byte: %04x",data);
-		popmessage(buf);
-	}
-#endif
-}
-
-READ16_MEMBER(taitoz_state::taitoz_msb_sound_r)
-{
-	if (offset == 1)
-		return ((m_tc0140syt->master_comm_r(0) & 0xff) << 8);
-	else
-		return 0;
-}
-#endif
-
 
 /**** sound pan control ****/
-WRITE8_MEMBER(taitoz_state::taitoz_pancontrol)
+void taitoz_state::pancontrol_w(offs_t offset, u8 data)
 {
 	m_filter[offset & 3]->flt_volume_set_volume(data / 255.0f);
 }
@@ -1683,7 +1629,8 @@ void taitoz_state::contcirc_cpub_map(address_map &map)
 	map(0x084000, 0x087fff).ram().share("share1");
 	map(0x100001, 0x100001).r(FUNC(taitoz_state::contcirc_input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
 	map(0x100003, 0x100003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::watchdog_r), FUNC(tc0040ioc_device::port_w));
-	map(0x200000, 0x200003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x200001, 0x200001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x200003, 0x200003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 }
 
 
@@ -1696,7 +1643,8 @@ void taitoz_state::chasehq_map(address_map &map)
 	map(0x400001, 0x400001).r(FUNC(taitoz_state::chasehq_input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
 	map(0x400003, 0x400003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::watchdog_r), FUNC(tc0040ioc_device::port_w));
 	map(0x800000, 0x800001).w(FUNC(taitoz_state::chasehq_cpua_ctrl_w));
-	map(0x820000, 0x820003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x820001, 0x820001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x820003, 0x820003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0xa00000, 0xa00007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));  /* palette */
 	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
 	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
@@ -1731,7 +1679,8 @@ void taitoz_state::enforce_cpub_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x103fff).ram();
 	map(0x104000, 0x107fff).ram().share("share1");
-	map(0x200000, 0x200003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x200001, 0x200001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x200003, 0x200003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x300000, 0x300003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::read), FUNC(tc0040ioc_device::write)).umask16(0x00ff);
 }
 
@@ -1769,7 +1718,7 @@ void taitoz_state::bshark_cpub_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x108000, 0x10bfff).ram();
 	map(0x110000, 0x113fff).ram().share("share1");
-	map(0x400000, 0x400007).w(FUNC(taitoz_state::taitoz_pancontrol)).umask16(0x00ff);  /* pan */
+	map(0x400000, 0x400007).w(FUNC(taitoz_state::pancontrol_w)).umask16(0x00ff);  /* pan */
 //  map(0x40000a, 0x40000b).r(FUNC(taitoz_state::taitoz_unknown_r));  // ???
 	map(0x600000, 0x600007).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write)).umask16(0x00ff);
 	map(0x60000c, 0x60000d).noprw(); // interrupt controller?
@@ -1787,7 +1736,8 @@ void taitoz_state::sci_map(address_map &map)
 	map(0x200000, 0x20000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x200010, 0x20001f).r(FUNC(taitoz_state::sci_steer_input_r));
 //  map(0x400000, 0x400001).w(FUNC(taitoz_state::cpua_ctrl_w));  // ?? doesn't seem to fit what's written
-	map(0x420000, 0x420003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x420001, 0x420001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x420003, 0x420003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x800000, 0x801fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xa00000, 0xa0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
 	map(0xa20000, 0xa2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
@@ -1811,7 +1761,8 @@ void taitoz_state::nightstr_map(address_map &map)
 	map(0x110000, 0x113fff).ram().share("share1");
 	map(0x400000, 0x40000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x800000, 0x800001).w(FUNC(taitoz_state::cpua_ctrl_w));
-	map(0x820000, 0x820003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x820001, 0x820001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x820003, 0x820003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0xa00000, 0xa00007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));  /* palette */
 	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
 	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
@@ -1848,7 +1799,8 @@ void taitoz_state::aquajack_cpub_map(address_map &map)
 	map(0x100000, 0x103fff).ram();
 	map(0x104000, 0x107fff).ram().share("share1");
 	map(0x200000, 0x20000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
-	map(0x300000, 0x300003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x300001, 0x300001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x300003, 0x300003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x800800, 0x80083f).r(FUNC(taitoz_state::aquajack_unknown_r)); // Read regularly after write to 800800...
 //  map(0x800800, 0x800801).w(FUNC(taitoz_state::taitoz_unknown_w));
 //  map(0x900000, 0x900007).rw(FUNC(taitoz_state::taitoz_unknown_r), FUNC(taitoz_state::taitoz_unknown_w));
@@ -1875,7 +1827,7 @@ void taitoz_state::spacegun_cpub_map(address_map &map)
 	map(0xc00000, 0xc00007).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write)).umask16(0x00ff);
 	map(0xc0000c, 0xc0000d).noprw(); // interrupt controller?
 	map(0xc0000e, 0xc0000f).noprw();
-	map(0xc20000, 0xc20007).w(FUNC(taitoz_state::taitoz_pancontrol)).umask16(0x00ff);  /* pan */
+	map(0xc20000, 0xc20007).w(FUNC(taitoz_state::pancontrol_w)).umask16(0x00ff);  /* pan */
 	map(0xe00000, 0xe00001).w(FUNC(taitoz_state::spacegun_gun_output_w));    /* gun outputs */
 	map(0xf00000, 0xf0000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
 }
@@ -1889,11 +1841,12 @@ void taitoz_state::dblaxle_map(address_map &map)
 	map(0x400000, 0x40000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_wordswap_r), FUNC(tc0510nio_device::halfword_wordswap_w));
 	map(0x400010, 0x40001f).r(FUNC(taitoz_state::dblaxle_steer_input_r));
 	map(0x600000, 0x600001).w(FUNC(taitoz_state::dblaxle_cpua_ctrl_w));  /* could this be causing int6 ? */
-	map(0x620000, 0x620003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x620001, 0x620001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x620003, 0x620003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x800000, 0x801fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x900000, 0x90ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));      /* tilemap mirror */
-	map(0xa00000, 0xa0ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));      /* tilemaps */
-	map(0xa30000, 0xa3002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_word_r), FUNC(tc0480scp_device::ctrl_word_w));
+	map(0x900000, 0x90ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));      /* tilemap mirror */
+	map(0xa00000, 0xa0ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));      /* tilemaps */
+	map(0xa30000, 0xa3002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0xc00000, 0xc03fff).ram().share("spriteram"); /* mostly unused ? */
 	map(0xc08000, 0xc08001).rw(FUNC(taitoz_state::sci_spriteframe_r), FUNC(taitoz_state::sci_spriteframe_w)); /* set in int6, seems to stay zero */
 }
@@ -1916,10 +1869,11 @@ void taitoz_state::racingb_map(address_map &map)
 	map(0x300000, 0x30000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_wordswap_r), FUNC(tc0510nio_device::halfword_wordswap_w));
 	map(0x300010, 0x30001f).r(FUNC(taitoz_state::dblaxle_steer_input_r));
 	map(0x500002, 0x500003).w(FUNC(taitoz_state::cpua_ctrl_w));
-	map(0x520000, 0x520003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x520001, 0x520001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x520003, 0x520003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x700000, 0x701fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x900000, 0x90ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));      /* tilemaps */
-	map(0x930000, 0x93002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_word_r), FUNC(tc0480scp_device::ctrl_word_w));
+	map(0x900000, 0x90ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));      /* tilemaps */
+	map(0x930000, 0x93002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0xb00000, 0xb03fff).ram().share("spriteram"); /* mostly unused ? */
 	map(0xb08000, 0xb08001).rw(FUNC(taitoz_state::sci_spriteframe_r), FUNC(taitoz_state::sci_spriteframe_w)); /* alternates 0/0x100 */
 }
@@ -1944,7 +1898,7 @@ void taitoz_state::z80_sound_map(address_map &map)
 	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0xe200, 0xe200).nopr().w(m_tc0140syt, FUNC(tc0140syt_device::slave_port_w));
 	map(0xe201, 0xe201).rw(m_tc0140syt, FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
-	map(0xe400, 0xe403).w(FUNC(taitoz_state::taitoz_pancontrol)); /* pan */
+	map(0xe400, 0xe403).w(FUNC(taitoz_state::pancontrol_w)); /* pan */
 	map(0xea00, 0xea00).nopr();
 	map(0xee00, 0xee00).nopw(); /* ? */
 	map(0xf000, 0xf000).nopw(); /* ? */
@@ -2920,7 +2874,7 @@ static INPUT_PORTS_START( spacegnu )
 	TAITO_COINAGE_US_LOC(SW A)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( dblaxle )
+static INPUT_PORTS_START( dblaxle ) // Side by Side linkable versions
 	PORT_START("DSWA")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW A:1" )
 	PORT_DIPNAME( 0x02, 0x02, "Gear shift" )            PORT_DIPLOCATION("SW A:2")
@@ -2972,6 +2926,35 @@ static INPUT_PORTS_START( dblaxle )
 
 	PORT_START("STEER")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x40, 0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steering Wheel")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dblaxles ) // Single player versions
+	PORT_INCLUDE(dblaxle)
+
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, "Handle Pulse" ) PORT_DIPLOCATION("SW A:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Fast" )
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x04, 0x00, "Back Gear" )           PORT_DIPLOCATION("SW B:3") // If set to NORMAL you need to keep REVERSE pressed to go forward
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "No Back Gear" )
+	PORT_DIPNAME( 0x08, 0x08, "Vibration Mode" ) PORT_DIPLOCATION("SW B:4")
+	PORT_DIPSETTING(    0x08, "Partial Vibration" )
+	PORT_DIPSETTING(    0x00, "All The Time Vibration" )
+	PORT_DIPNAME( 0x10, 0x10, "Steering Wheel Vibration" ) PORT_DIPLOCATION("SW B:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Select Round" ) PORT_DIPLOCATION("SW B:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW B:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Buy-In" ) PORT_DIPLOCATION("SW B:8") // manual states "In countries except North America this setting should be ON"
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) ) // You buy truck upgrades like Big Tires, Engine and Nitro canisters before the race
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pwheelsj )
@@ -5334,7 +5317,7 @@ ROM_START( spacegunj )
 	ROM_LOAD( "pal16r4-c57-14.96", 0x0a00, 0x0104, CRC(75e1bf61) SHA1(e8358329a78ec0ab87641b2ecaec0b2b67c6ca30) )
 ROM_END
 
-ROM_START( dblaxle )
+ROM_START( dblaxle ) /* Manual refers to this version as the "Version Without Communication" */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 512K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE( "c78_49-1.2",  0x00000, 0x20000, CRC(a6f0c631) SHA1(371cb7807d2350ceca36fc0fb6a65d3179c011b0) )
 	ROM_LOAD16_BYTE( "c78_51-1.4",  0x00001, 0x20000, CRC(ef24e83b) SHA1(a0bc1d2192bccfcb6f859aa0a27f43cc92080e1e) )
@@ -5381,7 +5364,54 @@ ROM_START( dblaxle )
 	ROM_LOAD( "c84-11.17",  0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) )
 ROM_END
 
-ROM_START( dblaxleu )
+ROM_START( dblaxleu ) /* Manual refers to this version as the "Version Without Communication" */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 512K for 68000 code (CPU A) */
+	ROM_LOAD16_BYTE( "c78_49+.2",  0x00000, 0x20000, CRC(3bb0344a) SHA1(dad031033838bf65c83fb3715a9727f2d165909b) ) /* Actual label is C78 49* */
+	ROM_LOAD16_BYTE( "c78_51+.4",  0x00001, 0x20000, CRC(918176cb) SHA1(b78bce351e240b447fbb9a1f44c8efa3e6b98cbe) ) /* Actual label is C78 51* */
+	ROM_LOAD16_BYTE( "c78_50+.3",  0x40000, 0x20000, CRC(5a12e2bb) SHA1(53a91cc8fcf42934aa282f5a1bb286461dc2a421) ) /* Actual label is C78 50* */
+	ROM_LOAD16_BYTE( "c78_53+.5",  0x40001, 0x20000, CRC(62f910d4) SHA1(3d952ffcb30a264751b4b282ae8c26ecea09c05c) ) /* Actual label is C78 53* */
+
+	ROM_REGION( 0x40000, "sub", 0 ) /* 256K for 68000 code (CPU B) */
+	ROM_LOAD16_BYTE( "c78-30+.35", 0x00000, 0x20000, CRC(f73b3ce1) SHA1(1794d1c74599d58302c6dbfabcc1b3110d19b1fb) ) /* Label missing, it's either C78 30 or C78 30* */
+	ROM_LOAD16_BYTE( "c78-31+.36", 0x00001, 0x20000, CRC(4639adee) SHA1(24569dd4801c622758e60d3e526480ac6b5f85d2) ) /* Label missing, it's either C78 31 or C78 31* */
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD    ( "c78-34.c42", 0x00000, 0x20000, CRC(f2186943) SHA1(2e9aed39fddf3aa1db7e20f8a709b6b82cc3e7df) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "c78-10.12", 0x00000, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 8x8 */
+	ROM_LOAD16_BYTE( "c78-11.11", 0x00001, 0x80000, CRC(7db3d4a3) SHA1(fc3c44ed36b212688a5bd8dc61321a994578258e) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD32_BYTE( "c78-08.25", 0x000000, 0x100000, CRC(6c725211) SHA1(3c1765f44fe57b496d305e994516674f71bd4c3c) )    /* OBJ 16x8 */
+	ROM_LOAD32_BYTE( "c78-07.33", 0x000001, 0x100000, CRC(9da00d5b) SHA1(f6b664c7495b936ce1b99852da45ec92cb37062a) )
+	ROM_LOAD32_BYTE( "c78-06.23", 0x000002, 0x100000, CRC(8309e91b) SHA1(3f27557bc82bf42cc77e3c7e363b51a0b119144d) )
+	ROM_LOAD32_BYTE( "c78-05.31", 0x000003, 0x100000, CRC(90001f68) SHA1(5c08dfe6a2e12e6ca84035815563f38fc2c2c029) )
+//  ROMX_LOAD      ( "c78-05l.1", 0x000003, 0x080000, CRC(f24bf972) , ROM_SKIP(7) )
+//  ROMX_LOAD      ( "c78-05h.2", 0x000007, 0x080000, CRC(c01039b5) , ROM_SKIP(7) )
+
+	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
+	ROM_LOAD16_WORD( "c78-09.12", 0x000000, 0x80000, CRC(0dbde6f5) SHA1(4049271e3738b54e0c56d191889b1aea5664d49f) )    /* ROD, road lines */
+
+	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_LOAD16_WORD( "c78-04.3", 0x00000, 0x80000, CRC(cc1aa37c) SHA1(cfa2eb338dc81c98c637c2f0b14d2baea8b115f5) )   /* STY spritemap */
+
+	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_LOAD( "c78-12.33", 0x000000, 0x100000, CRC(b0267404) SHA1(ffd337336ff9b096e3725f733364762f6e6d3fab) )
+	ROM_LOAD( "c78-13.46", 0x100000, 0x080000, CRC(1b363aa2) SHA1(0aae3988024654e98cc0c784307b1c329c8f0783) )
+
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_LOAD( "c78-14.31",  0x00000, 0x80000, CRC(9cad4dfb) SHA1(9187ef827a3f1bc9233d0e45e72c72c0956c5912) )
+
+	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
+	ROM_LOAD( "c78-25.15",  0x00000, 0x10000, CRC(7245a6f6) SHA1(5bdde4e3bcde8c59dc84478c3cc079d7ef8ee9c5) )    // 98% compression
+	ROM_LOAD( "c78-15.22",  0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) )    // road A/B internal priority
+	ROM_LOAD( "c78-21.74",  0x00000, 0x00100, CRC(2926bf27) SHA1(bfbbe6c71bb29a05959f3de0d940816139f9ebfe) )    // road/sprite priority and palette select
+	ROM_LOAD( "c84-10.16",  0x00000, 0x00400, CRC(643e8bfc) SHA1(a6e6086fb8fbd102e01ec72fe60a4232f5909565) )
+	ROM_LOAD( "c84-11.17",  0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) )
+ROM_END
+
+ROM_START( dblaxleul ) /* Side by side linkable version */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 512K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE( "c78_41-1.2",  0x00000, 0x20000, CRC(cf297fe4) SHA1(4875de63e8336062c27d83b55938bcb3d08a24a3) )
 	ROM_LOAD16_BYTE( "c78_43-1.4",  0x00001, 0x20000, CRC(38a8bad6) SHA1(50977a6a364893549d2f7899bbc4e0c67086697e) )
@@ -5428,7 +5458,7 @@ ROM_START( dblaxleu )
 	ROM_LOAD( "c84-11.17",  0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) )
 ROM_END
 
-ROM_START( pwheelsj )
+ROM_START( pwheelsj ) /* Side by side linkable version */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 512K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE( "c78_26-2.2",  0x00000, 0x20000, CRC(25c8eb2e) SHA1(a526b886c76a19c9ce1abc25cf433574564605a3) )
 	ROM_LOAD16_BYTE( "c78_28-2.4",  0x00001, 0x20000, CRC(a9500eb1) SHA1(ad300add3439515512003703df46e2f9317f2ee8) )
@@ -5617,9 +5647,10 @@ GAME( 1990, spacegun,   0,        spacegun,  spacegun,  taitoz_state, init_bshar
 GAME( 1990, spacegunj,  spacegun, spacegun,  spacegnj,  taitoz_state, init_bshark,   ORIENTATION_FLIP_X, "Taito Corporation",         "Space Gun (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, spacegunu,  spacegun, spacegun,  spacegnu,  taitoz_state, init_bshark,   ORIENTATION_FLIP_X, "Taito America Corporation", "Space Gun (US)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1991, dblaxle,    0,        dblaxle,   dblaxle,   taitoz_state, init_taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
-GAMEL(1991, dblaxleu,   dblaxle,  dblaxle,   dblaxle,   taitoz_state, init_taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US, earlier)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
-GAMEL(1991, pwheelsj,   dblaxle,  dblaxle,   pwheelsj,  taitoz_state, init_taitoz,   ROT0,               "Taito Corporation",         "Power Wheels (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, dblaxle,    0,        dblaxle,   dblaxles,  taitoz_state, init_taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US, Rev 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, dblaxleu,   dblaxle,  dblaxle,   dblaxles,  taitoz_state, init_taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, dblaxleul,  dblaxle,  dblaxle,   dblaxle,   taitoz_state, init_taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US, Rev 1, Linkable)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, pwheelsj,   dblaxle,  dblaxle,   pwheelsj,  taitoz_state, init_taitoz,   ROT0,               "Taito Corporation",         "Power Wheels (Japan, Rev 2, Linkable)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
 
 GAMEL(1991, racingb,    0,        racingb,   racingb,   taitoz_state, init_taitoz,   ROT0,               "Taito Corporation Japan",   "Racing Beat (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
 GAMEL(1991, racingbj,   racingb,  racingb,   racingb,   taitoz_state, init_taitoz,   ROT0,               "Taito Corporation",         "Racing Beat (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )

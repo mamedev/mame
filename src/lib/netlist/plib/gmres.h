@@ -23,7 +23,7 @@ namespace plib
 	template <typename FT, int SIZE>
 	struct mat_precondition_ILU
 	{
-		typedef plib::matrix_compressed_rows_t<FT, SIZE> mat_type;
+		using mat_type = plib::matrix_compressed_rows_t<FT, SIZE>;
 
 		mat_precondition_ILU(std::size_t size, int ilu_scale = 4
 			, std::size_t bw = plib::matrix_compressed_rows_t<FT, SIZE>::FILL_INFINITY)
@@ -75,11 +75,13 @@ namespace plib
 			}
 		}
 
-		mat_type m_mat;
-		mat_type m_LU;
-		bool m_use_iLU_preconditioning;
-		std::size_t m_ILU_scale;
-		std::size_t m_band_width;
+		PALIGNAS_VECTOROPT()
+		mat_type                m_mat;
+		PALIGNAS_VECTOROPT()
+		mat_type                m_LU;
+		bool                    m_use_iLU_preconditioning;
+		std::size_t             m_ILU_scale;
+		std::size_t             m_band_width;
 	};
 
 	template <typename FT, int SIZE>
@@ -138,15 +140,15 @@ namespace plib
 	{
 	public:
 
-		typedef FT float_type;
+		using float_type = FT;
 		// FIXME: dirty hack to make this compile
 		static constexpr const std::size_t storage_N = plib::sizeabs<FT, SIZE>::ABS();
 
 		gmres_t(std::size_t size)
-			: m_use_more_precise_stop_condition(false)
-			, residual(size)
+			: residual(size)
 			, Ax(size)
 			, m_size(size)
+			, m_use_more_precise_stop_condition(false)
 			{
 			}
 
@@ -237,7 +239,7 @@ namespace plib
 
 				ops.calc_rhs(Ax, x);
 
-				vec_sub(n, rhs, Ax, residual);
+				vec_sub(n, residual, rhs, Ax);
 
 				ops.solve_LU_inplace(residual);
 
@@ -254,9 +256,9 @@ namespace plib
 				m_g[0] = rho;
 
 				//for (std::size_t i = 0; i < mr + 1; i++)
-				//	vec_set_scalar(mr, m_ht[i], NL_FCONST(0.0));
+				//  vec_set_scalar(mr, m_ht[i], NL_FCONST(0.0));
 
-				vec_mult_scalar(n, residual, constants<FT>::one() / rho, m_v[0]);
+				vec_mult_scalar(n, m_v[0], residual, constants<FT>::one() / rho);
 
 				for (std::size_t k = 0; k < RESTART; k++)
 				{
@@ -268,7 +270,7 @@ namespace plib
 					for (std::size_t j = 0; j <= k; j++)
 					{
 						m_ht[j][k] = vec_mult<FT>(n, m_v[kp1], m_v[j]);
-						vec_add_mult_scalar(n, m_v[j], -m_ht[j][k], m_v[kp1]);
+						vec_add_mult_scalar(n, m_v[kp1], m_v[j], -m_ht[j][k]);
 					}
 					m_ht[kp1][k] = std::sqrt(vec_mult2<FT>(n, m_v[kp1]));
 
@@ -313,7 +315,7 @@ namespace plib
 				}
 
 				for (std::size_t i = 0; i <= last_k; i++)
-					vec_add_mult_scalar(n, m_v[i], m_y[i], x);
+					vec_add_mult_scalar(n, x, m_v[i], m_y[i]);
 
 				if (rho <= rho_delta)
 					break;
@@ -324,23 +326,24 @@ namespace plib
 
 	private:
 
-		bool m_use_more_precise_stop_condition;
-
 		//typedef typename plib::mat_cr_t<FT, SIZE>::index_type mattype;
 
 		plib::parray<float_type, SIZE> residual;
 		plib::parray<float_type, SIZE> Ax;
 
-		std::array<float_type, RESTART + 1> m_c;  			/* mr + 1 */
-		std::array<float_type, RESTART + 1> m_g;  			/* mr + 1 */
-		std::array<std::array<float_type, RESTART>, RESTART + 1> m_ht;  /* (mr + 1), mr */
-		std::array<float_type, RESTART + 1> m_s;   			/* mr + 1 */
-		std::array<float_type, RESTART + 1> m_y;       		/* mr + 1 */
+		plib::parray<float_type, RESTART + 1> m_c;              /* mr + 1 */
+		plib::parray<float_type, RESTART + 1> m_g;              /* mr + 1 */
+		plib::parray<plib::parray<float_type, RESTART>, RESTART + 1> m_ht;  /* (mr + 1), mr */
+		plib::parray<float_type, RESTART + 1> m_s;              /* mr + 1 */
+		plib::parray<float_type, RESTART + 1> m_y;              /* mr + 1 */
 
 		//plib::parray<float_type, SIZE> m_v[RESTART + 1];  /* mr + 1, n */
-		std::array<std::array<float_type, storage_N>, RESTART + 1> m_v;  /* mr + 1, n */
+		plib::parray<plib::parray<float_type, storage_N>, RESTART + 1> m_v;  /* mr + 1, n */
 
 		std::size_t m_size;
+
+		bool m_use_more_precise_stop_condition;
+
 
 	};
 
@@ -415,10 +418,10 @@ namespace plib
 				}
 				else
 				{
-			          beta = alpha * ( c / 2.0)*( c / 2.0);
-			          alpha = 1.0 / (d - beta);
-			          for (std::size_t k = 0; k < size(); k++)
-			        	  p[k] = residual[k] + beta * p[k];
+					  beta = alpha * ( c / 2.0)*( c / 2.0);
+					  alpha = 1.0 / (d - beta);
+					  for (std::size_t k = 0; k < size(); k++)
+						  p[k] = residual[k] + beta * p[k];
 				}
 				plib::vec_add_mult_scalar(size(), p, alpha, x);
 				ops.calc_rhs(Ax, x);

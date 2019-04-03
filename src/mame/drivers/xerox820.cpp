@@ -609,9 +609,9 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	m_maincpu->set_daisy_config(xerox820_daisy_chain);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(xerox820_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(xerox820_state::screen_update));
+	screen.set_raw(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_xerox820);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
@@ -669,13 +669,13 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	MCFG_QUICKLOAD_ADD("quickload", xerox820_state, xerox820, "com,cpm", attotime::from_seconds(3))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(bigboard_state::bigboard)
+void bigboard_state::bigboard(machine_config &config)
+{
 	xerox820(config);
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 950)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* bigboard only */
-MACHINE_CONFIG_END
+	BEEP(config, m_beeper, 950).add_route(ALL_OUTPUTS, "mono", 1.00); /* bigboard only */
+}
 
 MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	/* basic machine hardware */
@@ -685,17 +685,16 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	m_maincpu->set_daisy_config(xerox820_daisy_chain);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(xerox820ii_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(xerox820ii_state::screen_update));
+	screen.set_raw(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_xerox820ii);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
 	Z80PIO(config, m_kbpio, 16_MHz_XTAL / 4);
@@ -758,8 +757,7 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	m_sasibus->cd_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit2)).exor(1);
 	m_sasibus->req_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit3)).exor(1);
 	m_sasibus->io_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit4)).exor(1);
-
-	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", SA1403D, SCSI_ID_0)
+	m_sasibus->set_slot_device(1, "harddisk", SA1403D, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 
 	output_latch_device &sasi_data_out(OUTPUT_LATCH(config, "sasi_data_out"));
 	m_sasibus->set_output_latch(sasi_data_out);
@@ -774,14 +772,15 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	MCFG_QUICKLOAD_ADD("quickload", xerox820_state, xerox820, "com,cpm", attotime::from_seconds(3))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(xerox820ii_state::xerox168)
+void xerox820ii_state::xerox168(machine_config &config)
+{
 	xerox820ii(config);
-	MCFG_DEVICE_ADD(I8086_TAG, I8086, 4770000)
-	MCFG_DEVICE_PROGRAM_MAP(xerox168_mem)
+	i8086_cpu_device &i8086(I8086(config, I8086_TAG, 4770000));
+	i8086.set_addrmap(AS_PROGRAM, &xerox820ii_state::xerox168_mem);
 
 	/* internal ram */
 	m_ram->set_default_size("192K").set_extra_options("320K");
-MACHINE_CONFIG_END
+}
 
 void xerox820_state::mk83(machine_config & config)
 {

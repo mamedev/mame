@@ -721,20 +721,20 @@ void sraider_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(ladybug_state::ladybug)
-
+void ladybug_state::ladybug(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ladybug_map)
+	Z80(config, m_maincpu, 4000000);   /* 4 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ladybug_state::ladybug_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ladybug_state, screen_update_ladybug)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(1*8, 31*8-1, 4*8, 28*8-1);
+	screen.set_screen_update(FUNC(ladybug_state::screen_update_ladybug));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_ladybug);
 	PALETTE(config, "palette", FUNC(ladybug_state::ladybug_palette), 4*8 + 4*16, 32);
@@ -749,36 +749,36 @@ MACHINE_CONFIG_START(ladybug_state::ladybug)
 
 	SN76489(config, "sn1", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
 	SN76489(config, "sn2", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dorodon_state::dorodon)
+void dorodon_state::dorodon(machine_config &config)
+{
 	ladybug(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_OPCODES, &dorodon_state::decrypted_opcodes_map);
+}
 
-MACHINE_CONFIG_START(sraider_state::sraider)
-
+void sraider_state::sraider(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sraider_cpu1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sraider_state,  irq0_line_hold)
+	z80_device &maincpu(Z80(config, "maincpu", 4000000));   /* 4 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &sraider_state::sraider_cpu1_map);
+	maincpu.set_vblank_int("screen", FUNC(sraider_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80, 4000000)   /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sraider_cpu2_map)
-	MCFG_DEVICE_IO_MAP(sraider_cpu2_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sraider_state,  irq0_line_hold)
+	z80_device &sub(Z80(config, "sub", 4000000));   /* 4 MHz */
+	sub.set_addrmap(AS_PROGRAM, &sraider_state::sraider_cpu2_map);
+	sub.set_addrmap(AS_IO, &sraider_state::sraider_cpu2_io_map);
+	sub.set_vblank_int("screen", FUNC(sraider_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sraider_state, screen_update_sraider)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sraider_state, screen_vblank_sraider))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(1*8, 31*8-1, 4*8, 28*8-1);
+	screen.set_screen_update(FUNC(sraider_state::screen_update_sraider));
+	screen.screen_vblank().set(FUNC(sraider_state::screen_vblank_sraider));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sraider);
 	PALETTE(config, m_palette, FUNC(sraider_state::sraider_palette), 4*8 + 4*16 + 32 + 2, 32 + 32 + 1);
@@ -794,7 +794,7 @@ MACHINE_CONFIG_START(sraider_state::sraider)
 	SN76489(config, "sn3", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
 	SN76489(config, "sn4", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
 	SN76489(config, "sn5", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

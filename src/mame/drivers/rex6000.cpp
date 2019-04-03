@@ -897,22 +897,22 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(rex6000_state::rex6000)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000)) //Toshiba microprocessor Z80 compatible at 4.3MHz
-	MCFG_DEVICE_PROGRAM_MAP(rex6000_mem)
-	MCFG_DEVICE_IO_MAP(rex6000_io)
+	Z80(config, m_maincpu, XTAL(4'000'000)); //Toshiba microprocessor Z80 compatible at 4.3MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &rex6000_state::rex6000_mem);
+	m_maincpu->set_addrmap(AS_IO, &rex6000_state::rex6000_io);
 
 	TIMER(config, "sec_timer").configure_periodic(FUNC(rex6000_state::sec_timer), attotime::from_hz(1));
 	TIMER(config, "irq_timer1").configure_periodic(FUNC(rex6000_state::irq_timer1), attotime::from_hz(32));
 	TIMER(config, "irq_timer2").configure_periodic(FUNC(rex6000_state::irq_timer2), attotime::from_hz(4096));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(rex6000_state, screen_update)
-	MCFG_SCREEN_SIZE(240, 120)
-	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 120-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(rex6000_state::screen_update));
+	screen.set_size(240, 120);
+	screen.set_visarea(0, 240-1, 0, 120-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(rex6000_state::rex6000_palettte), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_rex6000);
@@ -956,15 +956,14 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	BEEP(config, m_beep, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(oz750_state::oz750)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(9'830'400)) //Toshiba microprocessor Z80 compatible at 9.8MHz
-	MCFG_DEVICE_PROGRAM_MAP(rex6000_mem)
-	MCFG_DEVICE_IO_MAP(oz750_io)
+	Z80(config, m_maincpu, XTAL(9'830'400)); //Toshiba microprocessor Z80 compatible at 9.8MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &oz750_state::rex6000_mem);
+	m_maincpu->set_addrmap(AS_IO, &oz750_state::oz750_io);
 
 	TIMER(config, "sec_timer").configure_periodic(FUNC(rex6000_state::sec_timer), attotime::from_hz(1));
 	TIMER(config, "irq_timer1").configure_periodic(FUNC(rex6000_state::irq_timer1), attotime::from_hz(64));
@@ -984,13 +983,13 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	//serport.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(oz750_state, screen_update_oz)
-	MCFG_SCREEN_SIZE(240, 80)
-	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 80-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(oz750_state::screen_update_oz));
+	screen.set_size(240, 80);
+	screen.set_visarea(0, 240-1, 0, 80-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(rex6000_state::rex6000_palettte), 2);
 
@@ -1011,8 +1010,7 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	BEEP(config, m_beep, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
 MACHINE_CONFIG_END
 
 /* ROM definition */

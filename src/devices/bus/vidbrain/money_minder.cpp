@@ -47,7 +47,7 @@ void videobrain_money_minder_cartridge_device::device_start()
 //  videobrain_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t videobrain_money_minder_cartridge_device::videobrain_bo_r(address_space &space, offs_t offset, int cs1, int cs2)
+uint8_t videobrain_money_minder_cartridge_device::videobrain_bo_r(offs_t offset, int cs1, int cs2)
 {
 	uint8_t data = 0;
 
@@ -68,7 +68,7 @@ uint8_t videobrain_money_minder_cartridge_device::videobrain_bo_r(address_space 
 //  videobrain_bo_w - cartridge data write
 //-------------------------------------------------
 
-void videobrain_money_minder_cartridge_device::videobrain_bo_w(address_space &space, offs_t offset, uint8_t data, int cs1, int cs2)
+void videobrain_money_minder_cartridge_device::videobrain_bo_w(offs_t offset, uint8_t data, int cs1, int cs2)
 {
 	if (offset >= 0x3800)
 	{

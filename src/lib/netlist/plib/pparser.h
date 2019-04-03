@@ -8,16 +8,16 @@
 #ifndef PPARSER_H_
 #define PPARSER_H_
 
-#include <cstdint>
-#include <unordered_map>
-
 #include "plists.h"
 #include "pstream.h"
 #include "pstring.h"
 
+#include <cstdint>
+#include <unordered_map>
+
 
 namespace plib {
-class ptokenizer : public nocopyassignmove
+class ptokenizer
 {
 public:
 	template <typename T>
@@ -25,6 +25,8 @@ public:
 	: m_strm(std::forward<T>(strm)), m_lineno(0), m_cur_line(""), m_px(m_cur_line.begin()), m_unget(0), m_string('"')
 	{
 	}
+
+	COPYASSIGNMOVE(ptokenizer, delete)
 
 	virtual ~ptokenizer() = default;
 
@@ -96,18 +98,18 @@ public:
 	void require_token(const token_id_t &token_num);
 	void require_token(const token_t &tok, const token_id_t &token_num);
 
-	token_id_t register_token(pstring token)
+	token_id_t register_token(const pstring &token)
 	{
 		token_id_t ret(m_tokens.size());
 		m_tokens.emplace(token, ret);
 		return ret;
 	}
 
-	ptokenizer & identifier_chars(pstring s) { m_identifier_chars = s; return *this; }
-	ptokenizer & number_chars(pstring st, pstring rem) { m_number_chars_start = st; m_number_chars = rem; return *this; }
+	ptokenizer & identifier_chars(pstring s) { m_identifier_chars = std::move(s); return *this; }
+	ptokenizer & number_chars(pstring st, pstring rem) { m_number_chars_start = std::move(st); m_number_chars = std::move(rem); return *this; }
 	ptokenizer & string_char(pstring::value_type c) { m_string = c; return *this; }
-	ptokenizer & whitespace(pstring s) { m_whitespace = s; return *this; }
-	ptokenizer & comment(pstring start, pstring end, pstring line)
+	ptokenizer & whitespace(pstring s) { m_whitespace = std::move(s); return *this; }
+	ptokenizer & comment(const pstring &start, const pstring &end, const pstring &line)
 	{
 		m_tok_comment_start = register_token(start);
 		m_tok_comment_end = register_token(end);
@@ -182,6 +184,10 @@ public:
 		}
 		return *this;
 	}
+
+	COPYASSIGN(ppreprocessor, delete)
+	ppreprocessor &operator=(ppreprocessor &&src) = delete;
+
 
 	ppreprocessor(ppreprocessor &&s) noexcept
 	: m_defines(std::move(s.m_defines))

@@ -217,29 +217,29 @@ static INPUT_PORTS_START( quizo )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(quizo_state::quizo)
+void quizo_state::quizo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,XTAL1/2)
-	MCFG_DEVICE_PROGRAM_MAP(memmap)
-	MCFG_DEVICE_IO_MAP(portmap)
-
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", quizo_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL1/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &quizo_state::memmap);
+	m_maincpu->set_addrmap(AS_IO, &quizo_state::portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(quizo_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 320-1, 0*8, 200-1)
-	MCFG_SCREEN_UPDATE_DRIVER(quizo_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(320, 200);
+	screen.set_visarea(0*8, 320-1, 0*8, 200-1);
+	screen.set_screen_update(FUNC(quizo_state::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(quizo_state::quizo_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, "aysnd", XTAL2 / 16).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( quizo )

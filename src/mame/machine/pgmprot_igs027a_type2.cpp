@@ -138,7 +138,6 @@ void pgm_arm_type2_state::machine_start()
 void pgm_arm_type2_state::pgm_arm_type2(machine_config &config)
 {
 	pgm(config);
-
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type2_state::kov2_mem);
 
 	/* protection CPU */

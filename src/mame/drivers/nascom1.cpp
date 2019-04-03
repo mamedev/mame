@@ -14,6 +14,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "machine/ram.h"
 #include "machine/z80pio.h"
 
@@ -85,8 +86,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(nascom1_hd6402_so);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nascom1_cassette );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_cassette );
-	DECLARE_SNAPSHOT_LOAD_MEMBER( nascom1 );
-	DECLARE_SNAPSHOT_LOAD_MEMBER( charrom );
+	template<int Dest> DECLARE_SNAPSHOT_LOAD_MEMBER( nascom );
 };
 
 class nascom1_state : public nascom_state
@@ -119,7 +119,6 @@ public:
 	void nascom2(machine_config &config);
 	void nascom2c(machine_config &config);
 
-	void init_nascom2();
 	void init_nascom2c();
 
 private:
@@ -231,7 +230,8 @@ DEVICE_IMAGE_UNLOAD_MEMBER( nascom_state, nascom1_cassette )
 //  SNAPSHOTS
 //**************************************************************************
 
-SNAPSHOT_LOAD_MEMBER( nascom_state, nascom1 )
+template<int Dest>
+SNAPSHOT_LOAD_MEMBER( nascom_state, nascom )
 {
 	uint8_t line[29];
 
@@ -244,38 +244,15 @@ SNAPSHOT_LOAD_MEMBER( nascom_state, nascom1 )
 		{
 			for (int i = 0; i < 8; i++)
 			{
-				m_maincpu->space(AS_PROGRAM).write_byte(addr++, b[i]);
-			}
-		}
-		else
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported file format");
-			return image_init_result::FAIL;
-		}
-		dummy = 0x00;
-		while (!image.image_feof() && dummy != 0x0a && dummy != 0x1f)
-		{
-			image.fread(&dummy, 1);
-		}
-	}
-
-	return image_init_result::PASS;
-}
-
-SNAPSHOT_LOAD_MEMBER(nascom_state, charrom)
-{
-	uint8_t line[29];
-
-	while (image.fread(&line, sizeof(line)) == sizeof(line))
-	{
-		unsigned int addr, b[8], dummy;
-
-		if (sscanf((char *)line, "%4x %x %x %x %x %x %x %x %x",
-			&addr, &b[0], &b[1], &b[2], &b[3], &b[4], &b[5], &b[6], &b[7]) == 9)
-		{
-			for (int i = 0; i < 8; i++)
-			{
-				m_gfx1_region->base()[addr++] = b[i];
+				switch (Dest)
+				{
+				case 0: // snapshot
+					m_maincpu->space(AS_PROGRAM).write_byte(addr++, b[i]);
+					break;
+				case 1: // character rom
+					m_gfx1_region->base()[addr++] = b[i];
+					break;
+				}
 			}
 		}
 		else
@@ -393,15 +370,6 @@ void nascom2_state::machine_reset()
 	m_maincpu->set_state_int(Z80_PC, m_lsw1->read() << 12);
 }
 
-void nascom2_state::init_nascom2()
-{
-	init_nascom();
-
-	// setup nasbus
-	m_nasbus->set_program_space(&m_maincpu->space(AS_PROGRAM));
-	m_nasbus->set_io_space(&m_maincpu->space(AS_IO));
-}
-
 // since we don't know for which regions we should disable ram, we just let other devices
 // overwrite the region they need, and re-install our ram when they are disabled
 WRITE_LINE_MEMBER( nascom2_state::ram_disable_w )
@@ -417,10 +385,6 @@ void nascom2_state::init_nascom2c()
 {
 	// install memory
 	m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0000 + m_ram->size() - 1, m_ram->pointer());
-
-	// setup nasbus
-	m_nasbus->set_program_space(&m_maincpu->space(AS_PROGRAM));
-	m_nasbus->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 WRITE_LINE_MEMBER( nascom2_state::ram_disable_cpm_w )
@@ -701,10 +665,12 @@ void nascom_state::nascom(machine_config &config)
 
 	// uart
 	AY31015(config, m_hd6402);
-	m_hd6402->set_tx_clock((16_MHz_XTAL / 16) / 256);
-	m_hd6402->set_rx_clock((16_MHz_XTAL / 16) / 256);
 	m_hd6402->read_si_callback().set(FUNC(nascom_state::nascom1_hd6402_si));
 	m_hd6402->write_so_callback().set(FUNC(nascom_state::nascom1_hd6402_so));
+
+	clock_device &uart_clock(CLOCK(config, "uart_clock", (16_MHz_XTAL / 16) / 256));
+	uart_clock.signal_handler().set(m_hd6402, FUNC(ay31015_device::write_tcp));
+	uart_clock.signal_handler().append(m_hd6402, FUNC(ay31015_device::write_rcp));
 
 	// cassette is connected to the uart
 	CASSETTE(config, m_cassette);
@@ -718,10 +684,10 @@ void nascom_state::nascom(machine_config &config)
 
 	// devices
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot"));
-	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, nascom1), this), "nas", attotime::from_msec(500));
+	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, nascom<0>), this), "nas", attotime::from_msec(500));
 	snapshot.set_interface("nascom_snap");
 	snapshot_image_device &snapchar(SNAPSHOT(config, "snapchar"));
-	snapchar.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, charrom), this), "chr", attotime::from_msec(500));
+	snapchar.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, nascom<1>), this), "chr", attotime::from_msec(500));
 	snapchar.set_interface("nascom_char");
 }
 
@@ -761,6 +727,8 @@ void nascom2_state::nascom2(machine_config &config)
 	// nasbus expansion bus
 	nasbus_device &nasbus(NASBUS(config, NASBUS_TAG));
 	nasbus.ram_disable().set(FUNC(nascom2_state::ram_disable_w));
+	nasbus.set_program_space(m_maincpu, AS_PROGRAM);
+	nasbus.set_io_space(m_maincpu, AS_IO);
 	NASBUS_SLOT(config, "nasbus1", nasbus_slot_cards, nullptr);
 	NASBUS_SLOT(config, "nasbus2", nasbus_slot_cards, nullptr);
 	NASBUS_SLOT(config, "nasbus3", nasbus_slot_cards, nullptr);
@@ -845,5 +813,5 @@ ROM_END
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS          INIT           COMPANY                  FULLNAME           FLAGS
 COMP( 1978, nascom1,  0,       0,      nascom1,  nascom1,  nascom1_state, init_nascom,   "Nascom Microcomputers", "Nascom 1",        MACHINE_NO_SOUND_HW )
-COMP( 1979, nascom2,  0,       0,      nascom2,  nascom2,  nascom2_state, init_nascom2,  "Nascom Microcomputers", "Nascom 2",        MACHINE_NO_SOUND_HW )
+COMP( 1979, nascom2,  0,       0,      nascom2,  nascom2,  nascom2_state, init_nascom,   "Nascom Microcomputers", "Nascom 2",        MACHINE_NO_SOUND_HW )
 COMP( 1980, nascom2c, nascom2, 0,      nascom2c, nascom2c, nascom2_state, init_nascom2c, "Nascom Microcomputers", "Nascom 2 (CP/M)", MACHINE_NO_SOUND_HW )

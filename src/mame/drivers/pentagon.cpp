@@ -276,19 +276,18 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(pentagon_state::pentagon)
+void pentagon_state::pentagon(machine_config &config)
+{
 	spectrum_128(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(14'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(pentagon_mem)
-	MCFG_DEVICE_IO_MAP(pentagon_io)
-	MCFG_DEVICE_OPCODES_MAP(pentagon_switch)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pentagon_state,  pentagon_interrupt)
+	m_maincpu->set_clock(XTAL(14'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pentagon_state::pentagon_mem);
+	m_maincpu->set_addrmap(AS_IO, &pentagon_state::pentagon_io);
+	m_maincpu->set_addrmap(AS_OPCODES, &pentagon_state::pentagon_switch);
+	m_maincpu->set_vblank_int("screen", FUNC(pentagon_state::pentagon_interrupt));
 	MCFG_MACHINE_RESET_OVERRIDE(pentagon_state, pentagon )
 
-	MCFG_SCREEN_MODIFY("screen")
-	//MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 304)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 287)
+	//m_screen->set_raw(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 304);
+	m_screen->set_raw(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 287);
 	MCFG_VIDEO_START_OVERRIDE(pentagon_state, pentagon )
 
 	BETA_DISK(config, m_beta, 0);
@@ -306,7 +305,7 @@ MACHINE_CONFIG_START(pentagon_state::pentagon)
 	config.device_remove("exp");
 
 	SOFTWARE_LIST(config, "cass_list_pen").set_original("pentagon_cass");
-MACHINE_CONFIG_END
+}
 
 void pentagon_state::pent1024(machine_config &config)
 {

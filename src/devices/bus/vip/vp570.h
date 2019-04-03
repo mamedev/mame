@@ -36,8 +36,8 @@ protected:
 	virtual void device_start() override;
 
 	// device_vip_expansion_card_interface overrides
-	virtual uint8_t vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh) override;
-	virtual void vip_program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh) override;
+	virtual uint8_t vip_program_r(offs_t offset, int cs, int cdef, int *minh) override;
+	virtual void vip_program_w(offs_t offset, uint8_t data, int cdef, int *minh) override;
 
 private:
 	optional_shared_ptr<uint8_t> m_ram;

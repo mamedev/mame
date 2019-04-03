@@ -533,7 +533,7 @@ void dai3wksi_state::dai3wksi(machine_config &config)
 	m_ic81->set_enable(1);
 	m_ic81->add_route(ALL_OUTPUTS, "mono", 0.4);
 #endif
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

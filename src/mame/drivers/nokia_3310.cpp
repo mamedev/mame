@@ -700,20 +700,20 @@ static INPUT_PORTS_START( noki3310 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(noki3310_state::noki3310)
-
+void noki3310_state::noki3310(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM7_BE, 26000000 / 2)  // MAD2WD1 13 MHz, clock internally supplied to ARM core can be divided by 2, in sleep mode a 32768 Hz clock is used
-	MCFG_DEVICE_PROGRAM_MAP(noki3310_map)
+	ARM7_BE(config, m_maincpu, 26000000 / 2);  // MAD2WD1 13 MHz, clock internally supplied to ARM core can be divided by 2, in sleep mode a 32768 Hz clock is used
+	m_maincpu->set_addrmap(AS_PROGRAM, &noki3310_state::noki3310_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", LCD, rgb_t::white())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(84, 48)
-	MCFG_SCREEN_VISIBLE_AREA(0, 84-1, 0, 48-1)
-	MCFG_SCREEN_UPDATE_DEVICE("pcd8544", pcd8544_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD, rgb_t::white()));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(84, 48);
+	screen.set_visarea(0, 84-1, 0, 48-1);
+	screen.set_screen_update("pcd8544", FUNC(pcd8544_device::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
@@ -721,39 +721,35 @@ MACHINE_CONFIG_START(noki3310_state::noki3310)
 	m_pcd8544->set_screen_update_cb(FUNC(noki3310_state::pcd8544_screen_update), this);
 
 	INTEL_TE28F160(config, "flash");
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(noki3310_state::noki3330)
+void noki3310_state::noki3330(machine_config &config)
+{
 	noki3310(config);
 
 	INTEL_TE28F320(config.replace(), "flash");
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(noki3310_state::noki3410)
+void noki3310_state::noki3410(machine_config &config)
+{
 	noki3330(config);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(96, 65)    // Philips OM6206
+	subdevice<screen_device>("screen")->set_size(96, 65);    // Philips OM6206
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(noki3310_state::noki7110)
+void noki3310_state::noki7110(machine_config &config)
+{
 	noki3330(config);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(96, 65)    // Epson SED1565
+	subdevice<screen_device>("screen")->set_size(96, 65);    // Epson SED1565
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(noki3310_state::noki6210)
+void noki3310_state::noki6210(machine_config &config)
+{
 	noki3330(config);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(96, 60)
-
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_size(96, 60);
+}
 
 
 // MAD2 internal ROMS

@@ -4,7 +4,12 @@
 <!-- define elements -->
 
 	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="static_black2"><rect><color red="0.25" green="0.25" blue="0.25" /></rect></element>
 	<element name="static_grey"><rect><color red="0.6" green="0.6" blue="0.6" /></rect></element>
+
+	<element name="nothing" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
+	</element>
 
 	<element name="text_tie">
 		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
@@ -19,22 +24,74 @@
 		<text string="LOSE"><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
 
-	<element name="text_decision">
-		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
-		<text string="DECISION"><color red="0.6" green="0.6" blue="0.6" /></text>
+	<element name="text_1">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<text string="1"><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
-	<element name="text_longest">
-		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
-		<text string="LONGEST"><color red="0.6" green="0.6" blue="0.6" /></text>
+	<element name="text_2">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<text string="2"><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
-	<element name="text_last">
-		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
-		<text string="LAST"><color red="0.6" green="0.6" blue="0.6" /></text>
+	<element name="text_3">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<text string="3"><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
-	<element name="text_start">
-		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
-		<text string="START"><color red="0.6" green="0.6" blue="0.6" /></text>
+	<element name="text_4">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<text string="4"><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
+	<element name="text_5">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<text string="5"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="text_hh">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<text string="HEAD-HEAD" align="2"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="text_s1">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<text string="SIMPLE" align="1"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="text_s2">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<text string="NORMAL" align="1"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="text_s3">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<text string="SUPER" align="1"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+
+	<element name="text_speed"><text string="SPEED"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="text_game"><text string="GAME"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="text_skill"><text string="SKILL LV."><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="text_decision"><text string="DECISION"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="text_longest"><text string="LONGEST"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="text_last"><text string="LAST"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="text_start"><text string="START"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+
+	<element name="switch0" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
+		<rect state="0"><color red="0.6" green="0.6" blue="0.6" /></rect>
+	</element>
+	<element name="switch1" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
+		<rect state="1"><color red="0.6" green="0.6" blue="0.6" /></rect>
+	</element>
+	<element name="switch2" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
+		<rect state="2"><color red="0.6" green="0.6" blue="0.6" /></rect>
+	</element>
+	<element name="switch4" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
+		<rect state="4"><color red="0.6" green="0.6" blue="0.6" /></rect>
+	</element>
+	<element name="switch8" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
+		<rect state="8"><color red="0.6" green="0.6" blue="0.6" /></rect>
+	</element>
+
+	<element name="text_up"><text string="&#x25b2;"><color red="0.6" green="0.6" blue="0.1" /></text></element>
+	<element name="text_down"><text string="&#x25bc;"><color red="0.6" green="0.6" blue="0.1" /></text></element>
 
 	<element name="button" defstate="0">
 		<rect>
@@ -72,10 +129,7 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="0" right="47" top="0" bottom="53" />
-		<bezel element="static_black">
-			<bounds left="0" right="47" top="0" bottom="53" />
-		</bezel>
+		<bounds left="-8" right="55" top="0" bottom="53" />
 
 	<!-- lamps -->
 
@@ -109,15 +163,15 @@
 
 		<bezel element="static_grey"><bounds x="1" y="22" width="45" height="9" /></bezel>
 
-		<bezel element="text_tie"><bounds x="1" y="22.2" width="10" height="0.6" /></bezel>
-		<bezel element="text_lose"><bounds x="12" y="22.2" width="10" height="0.6" /></bezel>
-		<bezel element="text_win"><bounds x="25" y="22.2" width="10" height="0.6" /></bezel>
-		<bezel element="text_lose"><bounds x="36" y="22.2" width="10" height="0.6" /></bezel>
+		<bezel element="text_tie"><bounds x="1" y="22.2" width="10" height="0.9" /></bezel>
+		<bezel element="text_lose"><bounds x="12" y="22.2" width="10" height="0.9" /></bezel>
+		<bezel element="text_win"><bounds x="25" y="22.2" width="10" height="0.9" /></bezel>
+		<bezel element="text_lose"><bounds x="36" y="22.2" width="10" height="0.9" /></bezel>
 
-		<bezel element="text_tie"><bounds x="1" y="30.2" width="10" height="0.6" /></bezel>
-		<bezel element="text_win"><bounds x="12" y="30.2" width="10" height="0.6" /></bezel>
-		<bezel element="text_lose"><bounds x="25" y="30.2" width="10" height="0.6" /></bezel>
-		<bezel element="text_lose"><bounds x="36" y="30.2" width="10" height="0.6" /></bezel>
+		<bezel element="text_tie"><bounds x="1" y="29.9" width="10" height="0.9" /></bezel>
+		<bezel element="text_win"><bounds x="12" y="29.9" width="10" height="0.9" /></bezel>
+		<bezel element="text_lose"><bounds x="25" y="29.9" width="10" height="0.9" /></bezel>
+		<bezel element="text_lose"><bounds x="36" y="29.9" width="10" height="0.9" /></bezel>
 
 		<bezel element="static_black"><bounds x="2" y="24" width="7" height="2" /></bezel>
 		<bezel element="text_decision"><bounds x="2" y="24.3" width="7" height="1.4" /></bezel>
@@ -142,6 +196,88 @@
 		<bezel element="button" inputtag="IN.2" inputmask="0x01">
 			<bounds x="34.3" y="27" width="3.2" height="2" />
 		</bezel>
+
+	<!-- side switches -->
+
+		<bezel element="static_grey"><bounds x="-5" y="16" width="5" height="21" /></bezel>
+		<bezel element="static_black"><bounds x="-4.5" y="24" width="4" height="2" /></bezel>
+		<bezel element="static_black"><bounds x="-4.5" y="27" width="4" height="2" /></bezel>
+		<bezel element="text_speed"><bounds x="-4.5" y="27.6" width="4" height="0.9" /></bezel>
+
+		<bezel element="text_s1"><bounds x="-3.9" y="29.65" width="3.5" height="0.9" /></bezel>
+		<bezel element="text_s2"><bounds x="-3.9" y="30.90" width="3.5" height="0.9" /></bezel>
+		<bezel element="text_s3"><bounds x="-3.9" y="32.15" width="3.5" height="0.9" /></bezel>
+
+		<bezel element="static_black2"><bounds x="-6.5" y="29.125" width="0.5" height="4.5" /></bezel>
+		<bezel element="nothing" inputtag="DUMMY" inputmask="0x01"><bounds x="-7.25" y="29.125" width="2" height="4.5" /></bezel>
+		<bezel element="switch0" inputtag="IN.6" inputmask="0x03" inputraw="1"><bounds x="-7" y="29.625" width="1.5" height="1" /></bezel>
+		<bezel element="switch1" inputtag="IN.6" inputmask="0x03" inputraw="1"><bounds x="-7" y="30.875" width="1.5" height="1" /></bezel>
+		<bezel element="switch2" inputtag="IN.6" inputmask="0x03" inputraw="1"><bounds x="-7" y="32.125" width="1.5" height="1" /></bezel>
+
+		<bezel element="static_black"><bounds x="-6.25" y="30.00" width="2" height="0.25" /></bezel>
+		<bezel element="static_black"><bounds x="-6.25" y="31.25" width="2" height="0.25" /></bezel>
+		<bezel element="static_black"><bounds x="-6.25" y="32.50" width="2" height="0.25" /></bezel>
+
+		<bezel element="text_up"><bounds x="-7.7" y="27.25" width="3" height="1.6" /></bezel>
+		<bezel element="nothing" inputtag="SWITCH" inputmask="0x10"><bounds x="-7.2" y="27.15" width="2" height="1.8" /></bezel>
+		<bezel element="text_down"><bounds x="-7.7" y="33.75" width="3" height="1.6" /></bezel>
+		<bezel element="nothing" inputtag="SWITCH" inputmask="0x20"><bounds x="-7.2" y="33.65" width="2" height="1.8" /></bezel>
+
+		<bezel element="static_grey"><bounds x="47" y="16" width="5" height="21" /></bezel>
+		<bezel element="static_black"><bounds x="47.5" y="24" width="4" height="2" /></bezel>
+		<bezel element="static_black"><bounds x="47.5" y="27" width="4" height="2" /></bezel>
+		<bezel element="text_game"><bounds x="47.5" y="24.6" width="4" height="0.9" /></bezel>
+		<bezel element="text_skill"><bounds x="47.5" y="27.6" width="4" height="0.9" /></bezel>
+
+		<bezel element="text_5"><bounds x="50.25" y="17.40" width="1" height="0.9" /></bezel>
+		<bezel element="text_4"><bounds x="50.25" y="18.65" width="1" height="0.9" /></bezel>
+		<bezel element="text_3"><bounds x="50.25" y="19.90" width="1" height="0.9" /></bezel>
+		<bezel element="text_2"><bounds x="50.25" y="21.15" width="1" height="0.9" /></bezel>
+		<bezel element="text_1"><bounds x="50.25" y="22.40" width="1" height="0.9" /></bezel>
+
+		<bezel element="text_hh"><bounds x="47.25" y="29.65" width="4" height="0.9" /></bezel>
+		<bezel element="text_1"><bounds x="50.25" y="30.90" width="1" height="0.9" /></bezel>
+		<bezel element="text_2"><bounds x="50.25" y="32.15" width="1" height="0.9" /></bezel>
+		<bezel element="text_3"><bounds x="50.25" y="33.40" width="1" height="0.9" /></bezel>
+		<bezel element="text_4"><bounds x="50.25" y="34.65" width="1" height="0.9" /></bezel>
+
+		<bezel element="static_black2"><bounds x="53" y="16.875" width="0.5" height="7" /></bezel>
+		<bezel element="nothing" inputtag="DUMMY" inputmask="0x01"><bounds x="52.25" y="16.875" width="2" height="7" /></bezel>
+		<bezel element="switch0" inputtag="IN.0" inputmask="0x0f" inputraw="1"><bounds x="52.5" y="17.375" width="1.5" height="1" /></bezel>
+		<bezel element="switch8" inputtag="IN.0" inputmask="0x0f" inputraw="1"><bounds x="52.5" y="18.625" width="1.5" height="1" /></bezel>
+		<bezel element="switch4" inputtag="IN.0" inputmask="0x0f" inputraw="1"><bounds x="52.5" y="19.875" width="1.5" height="1" /></bezel>
+		<bezel element="switch2" inputtag="IN.0" inputmask="0x0f" inputraw="1"><bounds x="52.5" y="21.125" width="1.5" height="1" /></bezel>
+		<bezel element="switch1" inputtag="IN.0" inputmask="0x0f" inputraw="1"><bounds x="52.5" y="22.375" width="1.5" height="1" /></bezel>
+
+		<bezel element="static_black2"><bounds x="53" y="29.125" width="0.5" height="7" /></bezel>
+		<bezel element="nothing" inputtag="DUMMY" inputmask="0x01"><bounds x="52.25" y="29.125" width="2" height="7" /></bezel>
+		<bezel element="switch0" inputtag="IN.4" inputmask="0x0f" inputraw="1"><bounds x="52.5" y="29.625" width="1.5" height="1" /></bezel>
+		<bezel element="switch2" inputtag="IN.4" inputmask="0x0f" inputraw="1"><bounds x="52.5" y="30.875" width="1.5" height="1" /></bezel>
+		<bezel element="switch4" inputtag="IN.4" inputmask="0x0f" inputraw="1"><bounds x="52.5" y="32.125" width="1.5" height="1" /></bezel>
+		<bezel element="switch8" inputtag="IN.4" inputmask="0x0f" inputraw="1"><bounds x="52.5" y="33.375" width="1.5" height="1" /></bezel>
+		<bezel element="switch1" inputtag="IN.4" inputmask="0x0f" inputraw="1"><bounds x="52.5" y="34.625" width="1.5" height="1" /></bezel>
+
+		<bezel element="static_black"><bounds x="51.25" y="17.75" width="2" height="0.25" /></bezel>
+		<bezel element="static_black"><bounds x="51.25" y="19.00" width="2" height="0.25" /></bezel>
+		<bezel element="static_black"><bounds x="51.25" y="20.25" width="2" height="0.25" /></bezel>
+		<bezel element="static_black"><bounds x="51.25" y="21.50" width="2" height="0.25" /></bezel>
+		<bezel element="static_black"><bounds x="51.25" y="22.75" width="2" height="0.25" /></bezel>
+
+		<bezel element="static_black"><bounds x="51.25" y="30.00" width="2" height="0.25" /></bezel>
+		<bezel element="static_black"><bounds x="51.25" y="31.25" width="2" height="0.25" /></bezel>
+		<bezel element="static_black"><bounds x="51.25" y="32.50" width="2" height="0.25" /></bezel>
+		<bezel element="static_black"><bounds x="51.25" y="33.75" width="2" height="0.25" /></bezel>
+		<bezel element="static_black"><bounds x="51.25" y="35.00" width="2" height="0.25" /></bezel>
+
+		<bezel element="text_up"><bounds x="51.8" y="15" width="3" height="1.6" /></bezel>
+		<bezel element="nothing" inputtag="SWITCH" inputmask="0x02"><bounds x="52.3" y="14.9" width="2" height="1.8" /></bezel>
+		<bezel element="text_down"><bounds x="51.8" y="24" width="3" height="1.6" /></bezel>
+		<bezel element="nothing" inputtag="SWITCH" inputmask="0x01"><bounds x="52.3" y="23.9" width="2" height="1.8" /></bezel>
+
+		<bezel element="text_up"><bounds x="51.8" y="27.25" width="3" height="1.6" /></bezel>
+		<bezel element="nothing" inputtag="SWITCH" inputmask="0x04"><bounds x="52.3" y="27.15" width="2" height="1.8" /></bezel>
+		<bezel element="text_down"><bounds x="51.8" y="36.25" width="3" height="1.6" /></bezel>
+		<bezel element="nothing" inputtag="SWITCH" inputmask="0x08"><bounds x="52.3" y="36.15" width="2" height="1.8" /></bezel>
 
 	</view>
 </mamelayout>

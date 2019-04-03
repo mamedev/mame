@@ -193,22 +193,22 @@ static GFXDECODE_START( gfx_shaolins )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(shaolins_state::shaolins)
-
+void shaolins_state::shaolins(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/12)        /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(shaolins_map)
+	MC6809E(config, m_maincpu, MASTER_CLOCK/12);        /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &shaolins_state::shaolins_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(shaolins_state::interrupt), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(shaolins_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(shaolins_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shaolins);
 	PALETTE(config, m_palette, FUNC(shaolins_state::shaolins_palette), 16*8*16+16*8*16, 256);
@@ -216,23 +216,20 @@ MACHINE_CONFIG_START(shaolins_state::shaolins)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489A, MASTER_CLOCK/12)        /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SN76489A(config, "sn1", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 1.0);        /* verified on pcb */
 
-	MCFG_DEVICE_ADD("sn2", SN76489A, MASTER_CLOCK/6)        /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SN76489A(config, "sn2", MASTER_CLOCK/6).add_route(ALL_OUTPUTS, "mono", 1.0);        /* verified on pcb */
+}
 
 #if 0 // a bootleg board was found with downgraded sound hardware, but is otherwise the same
-static MACHINE_CONFIG_START( shaolinb )
+void shaolins_state::shaolinb(machine_config &config)
+{
 	shaolins(config);
 
-	MCFG_DEVICE_REPLACE("sn1", SN76489, MASTER_CLOCK/12) /* only type verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SN76489(config.replace(), "sn1", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 1.0); /* only type verified on pcb */
 
-	MCFG_DEVICE_REPLACE("sn2", SN76489, MASTER_CLOCK/6)  /* only type verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SN76489(config.replace(), "sn2", MASTER_CLOCK/6).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 #endif
 
 /***************************************************************************

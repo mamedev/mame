@@ -3010,10 +3010,8 @@ uint8_t m2_te_device::color_blend(uint8_t ct, uint8_t cti, uint8_t cs, uint8_t c
 
 uint8_t m2_te_device::alu_calc(uint16_t a, uint16_t b)
 {
-	uint16_t cinv;
-	uint16_t c = 0;
+	int32_t result = 0;
 	uint32_t blendout;
-	uint32_t result;
 	uint32_t carry = 0;
 	uint32_t borrow = 0;
 	uint32_t cntl = (m_db.alu_ctrl & DBALUCNTL_ALUOP_MASK) >> DBALUCNTL_ALUOP_SHIFT;
@@ -3021,7 +3019,7 @@ uint8_t m2_te_device::alu_calc(uint16_t a, uint16_t b)
 	// p271
 
 	/* ALU */
-	if ((cntl & 8)  == 0)
+	if ((cntl & 8) == 0)
 	{
 		if (!(cntl & 4))
 		{
@@ -3043,36 +3041,18 @@ uint8_t m2_te_device::alu_calc(uint16_t a, uint16_t b)
 	/* Boolean */
 	else
 	{
-		cinv = 0;
 		int i, j;
 
 		for (i = 0; i < 8; ++i)
 		{
 			j = (a & 1) *2 + (b & 1);
 
-			switch (j)
-			{
-				case 0: cinv |= (cntl & 1);         break;
-				case 1: cinv |= ((cntl & 2) != 0);  break;
-				case 2: cinv |= ((cntl & 4) != 0);  break;
-				case 3: cinv |= ((cntl & 8) != 0);  break;
-			}
+			result >>= 1;
+			result |= (cntl >> j & 1) ? 0x80 : 0;
 
-			cinv <<= 1;
 			a >>= 1;
 			b >>= 1;
 		}
-		cinv >>= 1;
-
-		for (i = 0; i < 8; ++i)
-		{
-			c |= cinv & 1;
-			c <<= 1;
-			cinv >>= 1;
-		}
-
-		c >>= 1;
-		result = (int)c;
 	}
 
 	result &= 0x1ff;
@@ -3102,7 +3082,7 @@ uint8_t m2_te_device::alu_calc(uint16_t a, uint16_t b)
 		alugel = 4;
 #endif
 
-	if ((cntl & 8)  == 0)
+	if ((cntl & 8) == 0)
 	{
 		/* Clamp? */
 		if (!(cntl & 1))

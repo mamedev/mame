@@ -38,8 +38,6 @@ DEFINE_DEVICE_TYPE(A2BUS_MCMS2, a2bus_mcms2_device, "a2mcms2", "Mountain Compute
 
 #define ENGINE_TAG  "engine"
 
-#define MCFG_MCMS_IRQ_CALLBACK(_cb) \
-	downcast<mcms_device &>(*device).set_irq_cb(DEVCB_##_cb);
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -49,16 +47,16 @@ DEFINE_DEVICE_TYPE(A2BUS_MCMS2, a2bus_mcms2_device, "a2mcms2", "Mountain Compute
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_mcms1_device::device_add_mconfig)
+void a2bus_mcms1_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "mcms_l").front_left();
 	SPEAKER(config, "mcms_r").front_right();
 
-	MCFG_DEVICE_ADD(ENGINE_TAG, MCMS, 1000000)
-	MCFG_MCMS_IRQ_CALLBACK(WRITELINE(*this, a2bus_mcms1_device, irq_w))
-
-	MCFG_SOUND_ROUTE(0, "mcms_l", 1.0)
-	MCFG_SOUND_ROUTE(1, "mcms_r", 1.0)
-MACHINE_CONFIG_END
+	MCMS(config, m_mcms, 1000000);
+	m_mcms->irq_cb().set(FUNC(a2bus_mcms1_device::irq_w));
+	m_mcms->add_route(0, "mcms_l", 1.0);
+	m_mcms->add_route(1, "mcms_r", 1.0);
+}
 
 //**************************************************************************
 //  LIVE DEVICE - Card 1

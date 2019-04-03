@@ -6,7 +6,7 @@
  */
 
 #include "nlid_proxy.h"
-#include "../solver/nld_solver.h"
+#include "netlist/solver/nld_solver.h"
 //#include "plib/pstream.h"
 //#include "plib/pfmtlog.h"
 //#include "nld_log.h"
@@ -20,7 +20,7 @@ namespace netlist
 	// nld_base_proxy
 	// -----------------------------------------------------------------------------
 
-	nld_base_proxy::nld_base_proxy(netlist_base_t &anetlist, const pstring &name,
+	nld_base_proxy::nld_base_proxy(netlist_state_t &anetlist, const pstring &name,
 			logic_t *inout_proxied, detail::core_terminal_t *proxy_inout)
 			: device_t(anetlist, name)
 	{
@@ -33,14 +33,14 @@ namespace netlist
 	// nld_a_to_d_proxy
 	// ----------------------------------------------------------------------------------------
 
-	nld_base_a_to_d_proxy::nld_base_a_to_d_proxy(netlist_base_t &anetlist, const pstring &name,
+	nld_base_a_to_d_proxy::nld_base_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name,
 			logic_input_t *in_proxied, detail::core_terminal_t *in_proxy)
 			: nld_base_proxy(anetlist, name, in_proxied, in_proxy)
 	, m_Q(*this, "Q")
 	{
 	}
 
-	nld_a_to_d_proxy::nld_a_to_d_proxy(netlist_base_t &anetlist, const pstring &name, logic_input_t *in_proxied)
+	nld_a_to_d_proxy::nld_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *in_proxied)
 			: nld_base_a_to_d_proxy(anetlist, name, in_proxied, &m_I)
 	, m_I(*this, "I")
 	{
@@ -58,9 +58,9 @@ namespace netlist
 		if (supply_V == 0.0) supply_V = 5.0;
 
 		if (m_I.Q_Analog() > logic_family()->high_thresh_V(0.0, supply_V))
-			out().push(1, NLTIME_FROM_NS(1));
+			out().push(1, netlist_time::quantum());
 		else if (m_I.Q_Analog() < logic_family()->low_thresh_V(0.0, supply_V))
-			out().push(0, NLTIME_FROM_NS(1));
+			out().push(0, netlist_time::quantum());
 		else
 		{
 			// do nothing
@@ -71,35 +71,32 @@ namespace netlist
 	// nld_d_to_a_proxy
 	// ----------------------------------------------------------------------------------------
 
-	nld_base_d_to_a_proxy::nld_base_d_to_a_proxy(netlist_base_t &anetlist, const pstring &name,
+	nld_base_d_to_a_proxy::nld_base_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name,
 			logic_output_t *out_proxied, detail::core_terminal_t &proxy_out)
 	: nld_base_proxy(anetlist, name, out_proxied, &proxy_out)
 	, m_I(*this, "I")
 	{
 	}
 
-	nld_d_to_a_proxy::nld_d_to_a_proxy(netlist_base_t &anetlist, const pstring &name, logic_output_t *out_proxied)
+	nld_d_to_a_proxy::nld_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *out_proxied)
 	: nld_base_d_to_a_proxy(anetlist, name, out_proxied, m_RV.m_P)
 	, m_GNDHack(*this, "_Q")
 	, m_RV(*this, "RV")
 	, m_last_state(*this, "m_last_var", -1)
 	, m_is_timestep(false)
 	{
-		const pstring power_syms[3][2] ={ {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
-		//register_sub(m_RV);
-		//register_term("1", m_RV.m_P);
-		//register_term("2", m_RV.m_N);
+		const std::vector<std::pair<pstring, pstring>> power_syms = { {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
 
 		register_subalias("Q", m_RV.m_P);
 
 		connect(m_RV.m_N, m_GNDHack);
 		bool f = false;
-		for (int i = 0; i < 3; i++)
+		for (auto & pwr_sym : power_syms)
 		{
 			pstring devname = out_proxied->device().name();
-			auto tp = setup().find_terminal(devname + "." + power_syms[i][0],
+			auto tp = setup().find_terminal(devname + "." + pwr_sym.first,
 					detail::terminal_type::INPUT, false);
-			auto tn = setup().find_terminal(devname + "." + power_syms[i][1],
+			auto tn = setup().find_terminal(devname + "." + pwr_sym.second,
 					detail::terminal_type::INPUT, false);
 			if (tp != nullptr && tn != nullptr)
 			{
@@ -125,7 +122,7 @@ namespace netlist
 		m_last_state = -1;
 		m_RV.reset();
 		m_is_timestep = m_RV.m_P.net().solver()->has_timestep_devices();
-		m_RV.set(plib::constants<nl_double>::one() / logic_family()->R_low(),
+		m_RV.set_G_V_I(plib::constants<nl_double>::one() / logic_family()->R_low(),
 				logic_family()->low_V(0.0, supply_V), 0.0);
 	}
 
@@ -146,7 +143,7 @@ namespace netlist
 			{
 				m_RV.update();
 			}
-			m_RV.set(plib::constants<nl_double>::one() / R, V, 0.0);
+			m_RV.set_G_V_I(plib::constants<nl_double>::one() / R, V, 0.0);
 			m_RV.solve_later();
 		}
 	}

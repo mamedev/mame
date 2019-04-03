@@ -605,12 +605,12 @@ void abc1600_state::update_drdy2()
 
 READ8_MEMBER( abc1600_state::dart_r )
 {
-	return m_dart->ba_cd_r(space, A2_A1 ^ 0x03);
+	return m_dart->ba_cd_r(A2_A1 ^ 0x03);
 }
 
 WRITE8_MEMBER( abc1600_state::dart_w )
 {
-	m_dart->ba_cd_w(space, A2_A1 ^ 0x03, data);
+	m_dart->ba_cd_w(A2_A1 ^ 0x03, data);
 }
 
 //-------------------------------------------------
@@ -873,7 +873,7 @@ void abc1600_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( abc1600 )
+//  machine_config( abc1600 )
 //-------------------------------------------------
 
 void abc1600_state::abc1600(machine_config &config)

@@ -106,7 +106,7 @@ INPUT_PORTS_START( apollo_config )
 //      PORT_CONFNAME(APOLLO_CONF_IDLE_SLEEP, 0x00, "Idle Sleep")
 //      PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 //      PORT_CONFSETTING(APOLLO_CONF_IDLE_SLEEP, DEF_STR ( On ) )
-
+#ifdef APOLLO_XXL
 		PORT_CONFNAME(APOLLO_CONF_TRAP_TRACE, 0x00, "Trap Trace")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_TRAP_TRACE, DEF_STR ( On ) )
@@ -114,7 +114,7 @@ INPUT_PORTS_START( apollo_config )
 		PORT_CONFNAME(APOLLO_CONF_FPU_TRACE, 0x00, "FPU Trace")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_FPU_TRACE, DEF_STR ( On ) )
-#ifdef APOLLO_XXL
+
 		PORT_CONFNAME(APOLLO_CONF_DISK_TRACE, 0x00, "Disk Trace")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_DISK_TRACE, DEF_STR ( On ) )
@@ -256,11 +256,11 @@ WRITE16_MEMBER(apollo_state::apollo_csr_control_register_w)
 		// disable FPU (i.e. FPU opcodes in CPU)
 		apollo_set_cpu_has_fpu(m_maincpu, 0);
 
-		if (!apollo_is_dn3000())
+		if (!apollo_is_dn3000() && !m_maincpu->get_pmmu_enable())
 		{
 			// hack: set APOLLO_CSR_SR_FP_TRAP in cpu status register for /sau7/self_test
 			// APOLLO_CSR_SR_FP_TRAP in status register should be set by next fmove instruction
-			// cpu_status_register |= APOLLO_CSR_SR_FP_TRAP;
+			cpu_status_register |= APOLLO_CSR_SR_FP_TRAP;
 		}
 	}
 
@@ -317,11 +317,11 @@ static uint8_t dn3000_dma_channel2 = 5; // 5 = memory dma channel
 
 WRITE8_MEMBER(apollo_state::apollo_dma_1_w){
 	SLOG1(("apollo_dma_1_w: writing DMA Controller 1 at offset %02x = %02x", offset, data));
-	m_dma8237_1->write(space, offset, data);
+	m_dma8237_1->write(offset, data);
 }
 
 READ8_MEMBER(apollo_state::apollo_dma_1_r){
-	uint8_t data = m_dma8237_1->read(space, offset);
+	uint8_t data = m_dma8237_1->read(offset);
 	SLOG1(("apollo_dma_1_r: reading DMA Controller 1 at offset %02x = %02x", offset, data));
 	return data;
 }
@@ -332,7 +332,7 @@ READ8_MEMBER(apollo_state::apollo_dma_1_r){
 
 WRITE8_MEMBER(apollo_state::apollo_dma_2_w){
 	SLOG1(("apollo_dma_2_w: writing DMA Controller 2 at offset %02x = %02x", offset/2, data));
-	m_dma8237_2->write(space, offset / 2, data);
+	m_dma8237_2->write(offset / 2, data);
 }
 
 READ8_MEMBER(apollo_state::apollo_dma_2_r){
@@ -351,7 +351,7 @@ READ8_MEMBER(apollo_state::apollo_dma_2_r){
 			break;
 		}
 	}
-	uint8_t data = m_dma8237_2->read(space, offset / 2);
+	uint8_t data = m_dma8237_2->read(offset / 2);
 	SLOG1(("apollo_dma_2_r: reading DMA Controller 2 at offset %02x = %02x", offset/2, data));
 	return data;
 }
@@ -672,8 +672,7 @@ WRITE_LINE_MEMBER(apollo_state::apollo_ptm_irq_function)
 
 WRITE8_MEMBER(apollo_state::apollo_rtc_w)
 {
-	m_rtc->write(space, 0, offset);
-	m_rtc->write(space, 1, data);
+	m_rtc->write_direct(offset, data);
 	if (offset >= 0x0b && offset <= 0x0c)
 	{
 		SLOG2(("writing MC146818 at offset %02x = %02x", offset, data));
@@ -683,8 +682,7 @@ WRITE8_MEMBER(apollo_state::apollo_rtc_w)
 READ8_MEMBER(apollo_state::apollo_rtc_r)
 {
 	uint8_t data;
-	m_rtc->write(space, 0, offset);
-	data = m_rtc->read(space, 1);
+	data = m_rtc->read_direct(offset);
 	if (offset >= 0x0b && offset <= 0x0c)
 	{
 		SLOG2(("reading MC146818 at offset %02x = %02x", offset, data));

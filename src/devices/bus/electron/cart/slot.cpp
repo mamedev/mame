@@ -229,13 +229,13 @@ std::string electron_cartslot_device::get_default_card_software(get_default_card
 //  read - cartridge read
 //-------------------------------------------------
 
-uint8_t electron_cartslot_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
+uint8_t electron_cartslot_device::read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
 {
 	uint8_t data = 0xff;
 
 	if (m_cart != nullptr)
 	{
-		data = m_cart->read(space, offset, infc, infd, romqa, oe, oe2);
+		data = m_cart->read(offset, infc, infd, romqa, oe, oe2);
 	}
 
 	return data;
@@ -245,11 +245,11 @@ uint8_t electron_cartslot_device::read(address_space &space, offs_t offset, int 
 //  write - cartridge write
 //-------------------------------------------------
 
-void electron_cartslot_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
+void electron_cartslot_device::write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
 {
 	if (m_cart != nullptr)
 	{
-		m_cart->write(space, offset, data, infc, infd, romqa, oe, oe2);
+		m_cart->write(offset, data, infc, infd, romqa, oe, oe2);
 	}
 }
 
@@ -266,7 +266,9 @@ void electron_cartslot_device::write(address_space &space, offs_t offset, uint8_
 #include "cumana.h"
 #include "mgc.h"
 #include "peg400.h"
-//#include "e2p.h"
+//#include "pmse2p.h"
+#include "romp144.h"
+//#include "rs423.h"
 #include "sndexp.h"
 #include "sndexp3.h"
 #include "sp64.h"
@@ -286,7 +288,9 @@ void electron_cart(device_slot_interface &device)
 	device.option_add_internal("cumana", ELECTRON_CUMANA);
 	device.option_add_internal("mgc", ELECTRON_MGC);
 	device.option_add_internal("peg400", ELECTRON_PEG400);
-	//device.option_add_internal("e2p", ELECTRON_E2P);
+	//device.option_add_internal("pmse2p", ELECTRON_PMSE2P);
+	device.option_add_internal("romp144", ELECTRON_ROMP144);
+	//device.option_add_internal("rs423", ELECTRON_RS423);
 	device.option_add_internal("sndexp", ELECTRON_SNDEXP);
 	device.option_add_internal("sndexp3", ELECTRON_SNDEXP3);
 	device.option_add_internal("sp64", ELECTRON_SP64);

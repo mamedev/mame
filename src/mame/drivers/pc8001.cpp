@@ -479,23 +479,23 @@ void pc8001_state::machine_start()
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START(pc8001_state::pc8001)
+void pc8001_state::pc8001(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(pc8001_mem)
-	MCFG_DEVICE_IO_MAP(pc8001_io)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001_state::pc8001_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc8001_state::pc8001_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DEVICE(UPD3301_TAG, upd3301_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 220)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
+	screen.set_size(640, 220);
+	screen.set_visarea(0, 640-1, 0, 200-1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 2000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	I8251(config, I8251_TAG, 0);
@@ -526,25 +526,25 @@ MACHINE_CONFIG_START(pc8001_state::pc8001)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K,64K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pc8001mk2_state::pc8001mk2)
+void pc8001mk2_state::pc8001mk2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(pc8001mk2_mem)
-	MCFG_DEVICE_IO_MAP(pc8001mk2_io)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001mk2_state::pc8001mk2_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc8001mk2_state::pc8001mk2_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DEVICE(UPD3301_TAG, upd3301_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 220)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
+	screen.set_size(640, 220);
+	screen.set_visarea(0, 640-1, 0, 200-1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 2000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	I8251(config, I8251_TAG, 0);
@@ -573,7 +573,7 @@ MACHINE_CONFIG_START(pc8001mk2_state::pc8001mk2)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

@@ -89,11 +89,11 @@ void usbilliards_state::video_start()
 {
 }
 
-MACHINE_CONFIG_START(usbilliards_state::usbilliards)
-
+void usbilliards_state::usbilliards(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(usbilliards)
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
+	m_maincpu->set_constructor(netlist_usbilliards);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -103,7 +103,7 @@ MACHINE_CONFIG_START(usbilliards_state::usbilliards)
 	m_video->set_vert_params(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL);
 	m_video->set_fieldcount(1);
 	m_video->set_threshold(0.30);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

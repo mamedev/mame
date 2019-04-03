@@ -39,13 +39,14 @@ void tandy200_state::tandy200_lcdc(address_map &map)
 	map(0x0000, 0x1fff).ram();
 }
 
-MACHINE_CONFIG_START(kc85_state::kc85_video)
-	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
-	MCFG_SCREEN_REFRESH_RATE(44)
-	MCFG_SCREEN_UPDATE_DRIVER(kc85_state, screen_update)
-	MCFG_SCREEN_SIZE(240, 64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
-	MCFG_SCREEN_PALETTE("palette")
+void kc85_state::kc85_video(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(44);
+	screen.set_screen_update(FUNC(kc85_state::screen_update));
+	screen.set_size(240, 64);
+	screen.set_visarea(0, 240-1, 0, 64-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(kc85_state::kc85_palette), 2);
 
@@ -62,19 +63,20 @@ MACHINE_CONFIG_START(kc85_state::kc85_video)
 
 //  MCFG_HD44103_MASTER_ADD("m11", SCREEN_TAG, CAP_P(18), RES_K(100), HD44103_FS_HIGH, HD44103_DUTY_1_32)
 //  MCFG_HD44103_SLAVE_ADD( "m12", "m11", SCREEN_TAG, HD44103_FS_HIGH, HD44103_DUTY_1_32)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(tandy200_state::tandy200_video)
-	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
-	MCFG_SCREEN_REFRESH_RATE(80)
-	MCFG_SCREEN_UPDATE_DRIVER(tandy200_state, screen_update)
-	MCFG_SCREEN_SIZE(240, 128)
-	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 128-1)
-	MCFG_SCREEN_PALETTE("palette")
+void tandy200_state::tandy200_video(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(80);
+	screen.set_screen_update(FUNC(tandy200_state::screen_update));
+	screen.set_size(240, 128);
+	screen.set_visarea(0, 240-1, 0, 128-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(tandy200_state::tandy200_palette), 2);
 
 	HD61830(config, m_lcdc, XTAL(4'915'200)/2/2);
 	m_lcdc->set_addrmap(0, &tandy200_state::tandy200_lcdc);
 	m_lcdc->set_screen(SCREEN_TAG);
-MACHINE_CONFIG_END
+}

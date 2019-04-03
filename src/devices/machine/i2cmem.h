@@ -55,7 +55,7 @@ public:
 
 protected:
 	// construction/destruction
-	i2cmem_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, int page_size, int data_size);
+	i2cmem_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int page_size, int data_size);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -92,6 +92,8 @@ protected:
 	int m_byteaddr;
 	std::vector<uint8_t> m_page;
 	int m_page_offset;
+	int m_page_written_size;
+	bool m_in_write;
 };
 
 #define DECLARE_I2C_DEVICE(name) \

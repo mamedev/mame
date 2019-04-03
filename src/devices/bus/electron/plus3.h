@@ -34,11 +34,11 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	virtual uint8_t expbus_r(address_space &space, offs_t offset) override;
-	virtual void expbus_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t expbus_r(offs_t offset) override;
+	virtual void expbus_w(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(wd1770_status_w);
+	void wd1770_status_w(uint8_t data);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<electron_expansion_slot_device> m_exp;

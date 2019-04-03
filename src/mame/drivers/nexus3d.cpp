@@ -122,24 +122,23 @@ void nexus3d_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(nexus3d_state::nexus3d)
-
+void nexus3d_state::nexus3d(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM920T, 200000000)
-	MCFG_DEVICE_PROGRAM_MAP(nexus3d_map)
+	ARM920T(config, m_maincpu, 200000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nexus3d_state::nexus3d_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nexus3d_state, screen_update_nexus3d)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(320, 256);
+	screen.set_visarea(0, 320-1, 0, 256-1);
+	screen.set_screen_update(FUNC(nexus3d_state::screen_update_nexus3d));
 
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, "palette").set_entries(256);
 
 	SERFLASH(config, m_serflash, 0);
-
-MACHINE_CONFIG_END
+}
 
 
 

@@ -258,26 +258,26 @@ uint32_t madmotor_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 /******************************************************************************/
 
-MACHINE_CONFIG_START(madmotor_state::madmotor)
-
+void madmotor_state::madmotor(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000) /* Custom chip 59, 24 MHz crystal */
-	MCFG_DEVICE_PROGRAM_MAP(madmotor_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", madmotor_state,  irq6_line_hold)/* VBL */
+	M68000(config, m_maincpu, 12000000); /* Custom chip 59, 24 MHz crystal */
+	m_maincpu->set_addrmap(AS_PROGRAM, &madmotor_state::madmotor_map);
+	m_maincpu->set_vblank_int("screen", FUNC(madmotor_state::irq6_line_hold)); /* VBL */
 
 	H6280(config, m_audiocpu, 8053000/2); /* Custom chip 45, Crystal near CPU is 8.053 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &madmotor_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */ /* frames per second, vblank duration taken from Burger Time */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(madmotor_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */ /* frames per second, vblank duration taken from Burger Time */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(madmotor_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_madmotor);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
@@ -303,20 +303,17 @@ MACHINE_CONFIG_START(madmotor_state::madmotor)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 21470000/6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	YM2203(config, "ym1", 21470000/6).add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	ym2151_device &ym2(YM2151(config, "ym2", 21470000/6));
 	ym2.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
 	ym2.add_route(0, "mono", 0.45);
 	ym2.add_route(1, "mono", 0.45);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 1023924, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	OKIM6295(config, "oki1", 1023924, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 2047848, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki2", 2047848, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.25); // clock frequency & pin 7 not verified
+}
 
 /******************************************************************************/
 

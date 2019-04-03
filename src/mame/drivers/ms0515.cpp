@@ -523,18 +523,19 @@ WRITE_LINE_MEMBER(ms0515_state::irq11_w)
 	irq_encoder(11, state);
 }
 
-MACHINE_CONFIG_START(ms0515_state::ms0515)
+void ms0515_state::ms0515(machine_config &config)
+{
 	/* basic machine hardware */
 	T11(config, m_maincpu, XTAL(15'000'000) / 2); // actual CPU is T11 clone, KR1807VM1
 	m_maincpu->set_initial_mode(0xf2ff);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms0515_state::ms0515_mem);
 
 	/* video hardware -- 50 Hz refresh rate */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( XTAL(15'000'000), 958,0,640, 313,0,200 )
-	MCFG_SCREEN_UPDATE_DRIVER(ms0515_state, screen_update_ms0515)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ms0515_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw( XTAL(15'000'000), 958,0,640, 313,0,200 );
+	screen.set_screen_update(FUNC(ms0515_state::screen_update_ms0515));
+	screen.screen_vblank().set(FUNC(ms0515_state::screen_vblank));
+	screen.set_palette("palette");
 	config.set_default_layout(layout_ms0515);
 
 	PALETTE(config, "palette", FUNC(ms0515_state::ms0515_palette), 16);
@@ -588,7 +589,7 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("128K");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( ms0515 )

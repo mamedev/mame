@@ -248,7 +248,7 @@ READ8_MEMBER( vic20_state::read )
 		break;
 	}
 
-	return m_exp->cd_r(space, offset & 0x1fff, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
+	return m_exp->cd_r(offset & 0x1fff, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 }
 
 
@@ -315,7 +315,7 @@ WRITE8_MEMBER( vic20_state::write )
 	case BLK5: blk5 = 0; break;
 	}
 
-	m_exp->cd_w(space, offset & 0x1fff, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
+	m_exp->cd_w(offset & 0x1fff, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 }
 
 
@@ -353,7 +353,7 @@ READ8_MEMBER( vic20_state::vic_videoram_r )
 		data = m_charom[offset & 0xfff];
 	}
 
-	return m_exp->cd_r(space, offset & 0x1fff, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
+	return m_exp->cd_r(offset & 0x1fff, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 }
 
 

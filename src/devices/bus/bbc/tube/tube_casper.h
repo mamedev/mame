@@ -36,8 +36,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	virtual DECLARE_READ8_MEMBER( host_r ) override;
-	virtual DECLARE_WRITE8_MEMBER( host_w ) override;
+	virtual uint8_t host_r(offs_t offset) override;
+	virtual void host_w(offs_t offset, uint8_t data) override;
 
 private:
 	required_device<cpu_device> m_m68000;

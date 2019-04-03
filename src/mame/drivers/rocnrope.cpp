@@ -206,11 +206,11 @@ WRITE_LINE_MEMBER(rocnrope_state::vblank_irq)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(rocnrope_state::rocnrope)
-
+void rocnrope_state::rocnrope(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", KONAMI1, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
-	MCFG_DEVICE_PROGRAM_MAP(rocnrope_map)
+	KONAMI1(config, m_maincpu, MASTER_CLOCK / 3 / 4);        /* Verified in schematics */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rocnrope_state::rocnrope_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // B2
 	mainlatch.q_out_cb<0>().set(FUNC(rocnrope_state::flip_screen_w));
@@ -223,21 +223,21 @@ MACHINE_CONFIG_START(rocnrope_state::rocnrope)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rocnrope_state, screen_update_rocnrope)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rocnrope_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(rocnrope_state::screen_update_rocnrope));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(rocnrope_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rocnrope);
 	PALETTE(config, m_palette, FUNC(rocnrope_state::rocnrope_palette), 16*16+16*16, 32);
 
 	/* sound hardware */
 	TIMEPLT_AUDIO(config, "timeplt_audio");
-MACHINE_CONFIG_END
+}
 
 /*************************************
  *

@@ -56,7 +56,7 @@ void electron_tube_device::device_start()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t electron_tube_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
+uint8_t electron_tube_device::read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
 {
 	uint8_t data = 0xff;
 
@@ -64,7 +64,7 @@ uint8_t electron_tube_device::read(address_space &space, offs_t offset, int infc
 	{
 		if (offset >= 0xe0 && offset < 0xf0)
 		{
-			data = m_tube->host_r(space, offset & 0x0f);
+			data = m_tube->host_r(offset & 0x0f);
 		}
 	}
 	else if (oe2)
@@ -79,13 +79,13 @@ uint8_t electron_tube_device::read(address_space &space, offs_t offset, int infc
 //  write - cartridge data write
 //-------------------------------------------------
 
-void electron_tube_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
+void electron_tube_device::write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
 {
 	if (infc)
 	{
 		if (offset >= 0xe0 && offset < 0xf0)
 		{
-			m_tube->host_w(space, offset & 0x0f, data);
+			m_tube->host_w(offset & 0x0f, data);
 		}
 	}
 }

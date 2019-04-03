@@ -183,11 +183,11 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(batman_state::batman)
-
+void batman_state::batman(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, ATARI_CLOCK_14MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &batman_state::main_map);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
@@ -204,13 +204,13 @@ MACHINE_CONFIG_START(batman_state::batman)
 	TILEMAP(config, "vad:alpha", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(DEVICE_SELF_OWNER, FUNC(batman_state::get_alpha_tile_info));
 	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, batman_state::s_mob_config).set_gfxdecode("gfxdecode");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a VAD chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(batman_state, screen_update_batman)
-	MCFG_SCREEN_PALETTE("palette")
+	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(batman_state::screen_update_batman));
+	m_screen->set_palette("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -219,7 +219,7 @@ MACHINE_CONFIG_START(batman_state::batman)
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("260010").bit(6);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 

@@ -3,41 +3,126 @@
 
 <!-- define elements -->
 
-	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
-
 	<element name="digit" defstate="0">
 		<led7seg><color red="1.0" green="0.20" blue="0.22" /></led7seg>
 	</element>
+
 	<element name="led" defstate="0">
-		<disk state="0"><color red="0.2" green="0.04" blue="0.05" /></disk>
+		<disk state="0"><color red="0.14" green="0.02" blue="0.03" /></disk>
 		<disk state="1"><color red="1.0" green="0.20" blue="0.22" /></disk>
 	</element>
 
 
 <!-- build screen -->
 
-	<view name="Test Layout">
-		<bounds left="0" right="64" top="0" bottom="64" />
-		<bezel element="static_black">
-			<bounds left="0" right="64" top="0" bottom="64" />
-		</bezel>
+	<view name="Internal Layout">
+		<bounds left="4" right="96.5" top="-2" bottom="172" />
 
-		<bezel name="digit0" element="digit"><bounds x="0" y="0" width="10" height="15" /></bezel>
-		<bezel name="digit1" element="digit"><bounds x="10" y="0" width="10" height="15" /></bezel>
-		<bezel name="digit2" element="digit"><bounds x="20" y="0" width="10" height="15" /></bezel>
+		<bezel name="digit0" element="digit"><bounds x="38" y="0" width="8" height="12" /></bezel>
+		<bezel name="digit1" element="digit"><bounds x="46" y="0" width="8" height="12" /></bezel>
+		<bezel name="digit2" element="digit"><bounds x="54" y="0" width="8" height="12" /></bezel>
 
-		<!-- 13*8 matrix (first 3 are the 7segs) -->
+		<bezel name="10.7" element="led"><bounds x="90.5" y="135" width="4" height="4" /></bezel> <!-- L1 -->
+		<bezel name="10.0" element="led"><bounds x="90.5" y="117" width="4" height="4" /></bezel> <!-- L2 -->
+		<bezel name="10.1" element="led"><bounds x="90.5" y="99" width="4" height="4" /></bezel> <!-- L3 -->
+		<bezel name="10.2" element="led"><bounds x="90.5" y="81.5" width="4" height="4" /></bezel> <!-- L4 -->
+		<bezel name="10.3" element="led"><bounds x="90.5" y="63.5" width="4" height="4" /></bezel> <!-- L5 -->
+		<bezel name="10.4" element="led"><bounds x="84" y="46" width="4" height="4" /></bezel> <!-- L6 -->
+		<bezel name="10.5" element="led"><bounds x="73" y="32.5" width="4" height="4" /></bezel> <!-- L7 -->
+		<bezel name="8.6" element="led"><bounds x="60.5" y="26" width="4" height="4" /></bezel> <!-- L8 -->
+		<bezel name="7.6" element="led"><bounds x="47.5" y="23.5" width="4" height="4" /></bezel> <!-- L9 -->
 
-		<repeat count="13">
-			<param name="ypos" start="20" increment="2" />
-			<param name="rowno" start="0" increment="10" />
-			<repeat count="8">
-				<param name="xpos" start="0" increment="2" />
-				<param name="lampno" start="~rowno~" increment="1" />
-				<bezel name="lamp~lampno~" element="led">
-					<bounds x="~xpos~" y="~ypos~" width="1" height="1" />
-				</bezel>
-			</repeat>
+		<bezel name="6.6" element="led"><bounds x="34.5" y="26" width="4" height="4" /></bezel> <!-- L10 -->
+		<bezel name="5.6" element="led"><bounds x="21.5" y="32.5" width="4" height="4" /></bezel> <!-- L11 -->
+		<bezel name="6.5" element="led"><bounds x="34.5" y="43.5" width="4" height="4" /></bezel> <!-- L12 -->
+		<bezel name="7.5" element="led"><bounds x="47.5" y="41.5" width="4" height="4" /></bezel> <!-- L13 -->
+		<bezel name="8.5" element="led"><bounds x="60.5" y="43.5" width="4" height="4" /></bezel> <!-- L14 -->
+		<bezel name="9.4" element="led"><bounds x="73" y="54.5" width="4" height="4" /></bezel> <!-- L15 -->
+		<bezel name="8.4" element="led"><bounds x="65" y="59" width="4" height="4" /></bezel> <!-- L16 -->
+		<bezel name="7.4" element="led"><bounds x="52" y="65.5" width="4" height="4" /></bezel> <!-- L17 -->
+		<bezel name="11.2" element="led"><bounds x="34.5" y="57.5" width="4" height="4" /></bezel> <!-- L18 -->
+		<bezel name="5.5" element="led"><bounds x="21.5" y="54.5" width="4" height="4" /></bezel> <!-- L19 -->
+
+		<bezel name="4.5" element="led"><bounds x="6.5" y="57.5" width="4" height="4" /></bezel> <!-- L20 -->
+		<bezel name="4.4" element="led"><bounds x="15.5" y="72.5" width="4" height="4" /></bezel> <!-- L21 -->
+		<bezel name="5.4" element="led"><bounds x="26" y="68" width="4" height="4" /></bezel> <!-- L22 -->
+		<bezel name="6.3" element="led"><bounds x="41" y="72.5" width="4" height="4" /></bezel> <!-- L23 -->
+		<bezel name="7.3" element="led"><bounds x="58.5" y="81.5" width="4" height="4" /></bezel> <!-- L24 -->
+		<bezel name="11.1" element="led"><bounds x="66.5" y="72.5" width="4" height="4" /></bezel> <!-- L25 -->
+		<bezel name="9.3" element="led"><bounds x="80" y="72.5" width="4" height="4" /></bezel> <!-- L26 -->
+		<bezel name="9.2" element="led"><bounds x="77.5" y="90" width="4" height="4" /></bezel> <!-- L27 -->
+		<bezel name="8.2" element="led"><bounds x="60.5" y="99" width="4" height="4" /></bezel> <!-- L28 -->
+		<bezel name="11.0" element="led"><bounds x="47.5" y="90" width="4" height="4" /></bezel> <!-- L29 -->
+
+		<bezel name="5.3" element="led"><bounds x="30.5" y="81.5" width="4" height="4" /></bezel> <!-- L30 -->
+		<bezel name="4.3" element="led"><bounds x="17.5" y="90" width="4" height="4" /></bezel> <!-- L31 -->
+		<bezel name="5.2" element="led"><bounds x="32.5" y="90" width="4" height="4" /></bezel> <!-- L32 -->
+		<bezel name="5.1" element="led"><bounds x="21.5" y="108" width="4" height="4" /></bezel> <!-- L33 -->
+		<bezel name="11.7" element="led"><bounds x="32.5" y="108" width="4" height="4" /></bezel> <!-- L34 -->
+		<bezel name="7.1" element="led"><bounds x="47.5" y="112.5" width="4" height="4" /></bezel> <!-- L35 -->
+		<bezel name="9.1" element="led"><bounds x="73" y="108" width="4" height="4" /></bezel> <!-- L36 -->
+		<bezel name="5.0" element="led"><bounds x="13" y="126" width="4" height="4" /></bezel> <!-- L37 -->
+		<bezel name="6.1" element="led"><bounds x="32.5" y="121.5" width="4" height="4" /></bezel> <!-- L38 -->
+		<bezel name="8.1" element="led"><bounds x="63" y="121.5" width="4" height="4" /></bezel> <!-- L39 -->
+
+		<bezel name="5.7" element="led"><bounds x="13" y="148.5" width="4" height="4" /></bezel> <!-- L40 -->
+		<bezel name="6.0" element="led"><bounds x="26" y="139" width="4" height="4" /></bezel> <!-- L41 -->
+		<bezel name="7.0" element="led"><bounds x="43" y="135" width="4" height="4" /></bezel> <!-- L42 -->
+		<bezel name="8.0" element="led"><bounds x="51.5" y="135" width="4" height="4" /></bezel> <!-- L43 -->
+		<bezel name="9.0" element="led"><bounds x="69" y="139" width="4" height="4" /></bezel> <!-- L44 -->
+		<bezel name="6.7" element="led"><bounds x="38.5" y="152.5" width="4" height="4" /></bezel> <!-- L45 -->
+		<bezel name="7.7" element="led"><bounds x="47.5" y="152.5" width="4" height="4" /></bezel> <!-- L46 -->
+		<bezel name="8.7" element="led"><bounds x="56.5" y="152.5" width="4" height="4" /></bezel> <!-- L47 -->
+		<bezel name="9.7" element="led"><bounds x="47.5" y="166" width="4" height="4" /></bezel> <!-- L48 -->
+		<bezel name="3.3" element="led"><bounds x="21.5" y="41.5" width="4" height="4" /></bezel> <!-- L70 -->
+
+		<repeat count="40">
+			<param name="x" start="10.8" increment="0.02308" />
+			<param name="y" start="72" increment="-0.15128" />
+			<bezel name="11.6" element="led"><bounds x="~x~" y="~y~" width="3" height="3" /></bezel> <!-- L50 -->
 		</repeat>
+
+		<repeat count="40">
+			<param name="x" start="28.6" increment="0.11795" />
+			<param name="y" start="119" increment="-0.07949" />
+			<bezel name="11.5" element="led"><bounds x="~x~" y="~y~" width="3" height="3" /></bezel> <!-- L51 -->
+		</repeat>
+
+		<repeat count="40">
+			<param name="x" start="78.7" increment="0.05128" />
+			<param name="y" start="110.7" increment="-0.13846" />
+			<bezel name="11.4" element="led"><bounds x="~x~" y="~y~" width="3" height="3" /></bezel> <!-- L52 -->
+		</repeat>
+
+		<repeat count="40">
+			<param name="x" start="10.7" increment="0.15897" />
+			<param name="y" start="154.7" increment="0.0" />
+			<bezel name="11.3" element="led"><bounds x="~x~" y="~y~" width="3" height="3" /></bezel> <!-- L53 -->
+		</repeat>
+
+		<repeat count="40">
+			<param name="x" start="61.8" increment="-0.11538" />
+			<param name="y" start="151.4" increment="-0.12308" />
+			<bezel name="3.6" element="led"><bounds x="~x~" y="~y~" width="3" height="3" /></bezel> <!-- L60 -->
+		</repeat>
+
+		<repeat count="40">
+			<param name="x" start="76.3" increment="0.13333" />
+			<param name="y" start="84.2" increment="0.03333" />
+			<bezel name="3.6" element="led"><bounds x="~x~" y="~y~" width="3" height="3" /></bezel> <!-- L61 -->
+		</repeat>
+
+		<repeat count="40">
+			<param name="x" start="34.2" increment="0.11538" />
+			<param name="y" start="151.4" increment="-0.12308" />
+			<bezel name="3.5" element="led"><bounds x="~x~" y="~y~" width="3" height="3" /></bezel> <!-- L62 -->
+		</repeat>
+
+		<repeat count="40">
+			<param name="x" start="14.2" increment="0.14615" />
+			<param name="y" start="86.5" increment="-0.05897" />
+			<bezel name="3.5" element="led"><bounds x="~x~" y="~y~" width="3" height="3" /></bezel> <!-- L63 -->
+		</repeat>
+
 	</view>
 </mamelayout>

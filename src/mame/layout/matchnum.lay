@@ -19,6 +19,11 @@
 		</disk>
 	</element>
 
+	<element name="buttonb" defstate="0">
+		<rect state="0"><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect state="1"><color red="0.35" green="0.35" blue="0.35" /></rect>
+	</element>
+
 	<element name="digit" defstate="0">
 		<led7seg><color red="1.0" green="0.2" blue="0.22" /></led7seg>
 	</element>
@@ -28,9 +33,26 @@
 		<disk state="1"><color red="1.0" green="0.2" blue="0.23" /></disk>
 	</element>
 
+	<element name="switch1" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
+		<rect state="0x01"><color red="0.55" green="0.55" blue="0.55" /></rect>
+	</element>
+	<element name="switch2" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
+		<rect state="0x00"><color red="0.55" green="0.55" blue="0.55" /></rect>
+	</element>
+
+	<element name="text_1p">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="1 PL."><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="text_2p">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="2 PL."><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
 	<element name="text_change">
 		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="CHANGE"><color red="0.15" green="0.15" blue="0.15" /></text>
+		<text string="CHANGE"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 	<element name="text_q">
 		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
@@ -46,7 +68,7 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="0" right="41" top="17" bottom="103" />
+		<bounds left="0" right="41" top="17" bottom="105" />
 
 	<!-- top part -->
 
@@ -119,11 +141,21 @@
 
 	<!-- bottom part -->
 
-		<bezel element="static_white"><bounds x="-1" y="92" width="43" height="12" /></bezel>
-		<bezel element="text_change"><bounds x="33" y="93" width="8" height="2" /></bezel>
+		<bezel element="static_white"><bounds x="-1" y="92" width="43" height="13.5" /></bezel>
 
-		<bezel element="static_black2"><bounds x="34" y="96" width="6" height="6" /></bezel>
-		<bezel element="hl" inputtag="IN.2" inputmask="0x04"><bounds x="34" y="96" width="6" height="6" /><color alpha="0.25" /></bezel>
+		<bezel element="text_1p"><bounds x="1" y="93" width="4" height="2" /></bezel>
+		<bezel element="text_2p"><bounds x="1" y="102.1" width="4" height="2" /></bezel>
+
+		<bezel element="static_black2"><bounds x="1" y="95.6" width="4" height="6" /></bezel>
+		<bezel element="switch1" inputtag="IN.2" inputmask="0x08" inputraw="1"><bounds x="0.8" y="95.4" width="4.4" height="3.4" /></bezel>
+		<bezel element="switch2" inputtag="IN.2" inputmask="0x08" inputraw="1"><bounds x="0.8" y="98.4" width="4.4" height="3.4" /></bezel>
+		<repeat count="12">
+			<param name="y" start="95.75" increment="0.5" />
+			<bezel element="static_black2"><bounds x="1.01" y="~y~" width="3.98" height="0.2" /></bezel>
+		</repeat>
+
+		<bezel element="text_change"><bounds x="33" y="93" width="8" height="2" /></bezel>
+		<bezel element="buttonb" inputtag="IN.2" inputmask="0x04"><bounds x="34" y="95.6" width="6" height="6" /></bezel>
 
 	</view>
 </mamelayout>

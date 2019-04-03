@@ -276,8 +276,7 @@ MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
 	m_uart->write_eps(1);
 	m_uart->write_np(m_io_lx_385->read() & 0x80 ? 1 : 0);
 	m_uart->write_cs(1);
-	m_uart->set_receiver_clock(m_cass_data.speed * 16.0);
-	m_uart->set_transmitter_clock(m_cass_data.speed * 16.0);
+	m_uart_clock->set_unscaled_clock(m_cass_data.speed * 16);
 
 	lx385_ctrl_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 
@@ -511,14 +510,13 @@ WRITE8_MEMBER(z80ne_state::lx385_ctrl_w)
 	 *     3 *TAPEA Enable (active low) (at reset: low)
 	 *     4 *TAPEB Enable (active low) (at reset: low)
 	 */
-	uint8_t uart_reset, uart_rdav, uart_tx_clock;
+	uint8_t uart_reset, uart_rdav;
 	uint8_t motor_a, motor_b;
 	uint8_t changed_bits = (m_lx385_ctrl ^ data) & 0x1C;
 	m_lx385_ctrl = data;
 
 	uart_reset = ((data & 0x03) == 0x00);
 	uart_rdav  = ((data & 0x03) == 0x01);
-	uart_tx_clock = ((data & 0x04) == 0x04);
 	motor_a = ((data & 0x08) == 0x00);
 	motor_b = ((data & 0x10) == 0x00);
 
@@ -537,10 +535,6 @@ WRITE8_MEMBER(z80ne_state::lx385_ctrl_w)
 
 	if (!changed_bits) return;
 
-	/* UART Tx Clock enable/disable */
-	if (changed_bits & 0x04)
-		m_uart->set_transmitter_clock(uart_tx_clock ? m_cass_data.speed * 16.0 : 0.0);
-
 	/* motors */
 	if(changed_bits & 0x18)
 	{
@@ -555,6 +549,12 @@ WRITE8_MEMBER(z80ne_state::lx385_ctrl_w)
 		else
 			m_cassette_timer->adjust(attotime::zero);
 	}
+}
+
+WRITE_LINE_MEMBER(z80ne_state::lx385_uart_tx_clock_w)
+{
+	if (BIT(m_lx385_ctrl, 2))
+		m_uart->write_tcp(state);
 }
 
 READ_LINE_MEMBER(z80ne_state::lx387_shift_r)

@@ -403,8 +403,8 @@ WRITE_LINE_MEMBER(junofrst_state::_30hz_irq)
 	}
 }
 
-MACHINE_CONFIG_START(junofrst_state::junofrst)
-
+void junofrst_state::junofrst(machine_config &config)
+{
 	/* basic machine hardware */
 	KONAMI1(config, m_maincpu, 1500000);         /* 1.5 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &junofrst_state::main_map);
@@ -452,17 +452,15 @@ MACHINE_CONFIG_START(junofrst_state::junofrst)
 	aysnd.add_route(1, "filter.0.1", 0.30);
 	aysnd.add_route(2, "filter.0.2", 0.30);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 100K (R56-63)/200K (R64-71) ladder network
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 100K (R56-63)/200K (R64-71) ladder network
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_DEVICE_ADD("filter.0.0", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_DEVICE_ADD("filter.0.1", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_DEVICE_ADD("filter.0.2", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	FILTER_RC(config, m_filter_0_0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_RC(config, m_filter_0_1).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_RC(config, m_filter_0_2).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 
 ROM_START( junofrst )

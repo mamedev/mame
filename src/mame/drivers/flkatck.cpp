@@ -69,13 +69,13 @@ WRITE8_MEMBER(flkatck_state::flkatck_ls138_w)
 			flkatck_bankswitch_w(space, 0, data);
 			break;
 		case 0x05:  /* sound code number */
-			m_soundlatch->write(space, 0, data);
+			m_soundlatch->write(data);
 			break;
 		case 0x06:  /* Cause interrupt on audio CPU */
 			m_audiocpu->set_input_line(0, HOLD_LINE);
 			break;
 		case 0x07:  /* watchdog reset */
-			m_watchdog->reset_w(space, 0, data);
+			m_watchdog->watchdog_reset();
 			break;
 	}
 }

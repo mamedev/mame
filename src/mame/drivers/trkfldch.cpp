@@ -159,7 +159,8 @@ void trkfldch_state::machine_reset()
 	m_maincpu->set_state_int(1, addr);
 }
 
-MACHINE_CONFIG_START(trkfldch_state::trkfldch)
+void trkfldch_state::trkfldch(machine_config &config)
+{
 	/* basic machine hardware */
 	G65816(config, m_maincpu, 20000000);
 	//m_maincpu->set_addrmap(AS_DATA, &tv965_state::mem_map);
@@ -177,7 +178,7 @@ MACHINE_CONFIG_START(trkfldch_state::trkfldch)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_trkfldch); // dummy
 	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 0x100).set_endianness(ENDIANNESS_BIG); // dummy
-MACHINE_CONFIG_END
+}
 
 ROM_START( trkfldch )
 	ROM_REGION( 0x400000, "maincpu", 0 )

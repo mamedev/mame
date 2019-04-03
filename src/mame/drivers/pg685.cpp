@@ -422,11 +422,12 @@ void pg685_state::pg685_module(machine_config &config)
 	MM58167(config, "rtc", XTAL(32'768));
 }
 
-MACHINE_CONFIG_START(pg685_state::pg675)
+void pg685_state::pg675(machine_config &config)
+{
 	// main cpu
-	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(15'000'000) / 3)
-	MCFG_DEVICE_PROGRAM_MAP(pg675_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
+	I8088(config, m_maincpu, XTAL(15'000'000) / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pg685_state::pg675_mem);
+	m_maincpu->set_irq_acknowledge_callback("mainpic", FUNC(pic8259_device::inta_cb));
 
 	pic8259_device &mainpic(PIC8259(config, "mainpic", 0));
 	mainpic.out_int_callback().set_inputline(m_maincpu, 0);
@@ -437,9 +438,9 @@ MACHINE_CONFIG_START(pg685_state::pg675)
 	// ram
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(12288000, 882, 0, 720, 370, 0, 350 ) // not real values
-	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(12288000, 882, 0, 720, 370, 0, 350 ); // not real values
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	mc6845_device &crtc(MC6845(config, "crtc", 12288000));
 	crtc.set_screen("screen");
@@ -452,7 +453,7 @@ MACHINE_CONFIG_START(pg685_state::pg675)
 	// devices
 	pg685_module(config);
 
-	MCFG_DEVICE_ADD("mainuart", I8251, XTAL(12'288'000) / 6) // divider guessed
+	I8251(config, "mainuart", XTAL(12'288'000) / 6); // divider guessed
 
 	// rs232 port
 
@@ -467,14 +468,14 @@ MACHINE_CONFIG_START(pg685_state::pg675)
 	// m_fdc->drq_wr_callback(FUNC(zorba_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", pg675_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", pg675_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(pg685_state::pg685)
+void pg685_state::pg685(machine_config &config)
+{
 	// main cpu
-	MCFG_DEVICE_ADD("maincpu", V20, XTAL(15'000'000) / 3)
-	MCFG_DEVICE_PROGRAM_MAP(pg685_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
+	V20(config, m_maincpu, XTAL(15'000'000) / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pg685_state::pg685_mem);
+	m_maincpu->set_irq_acknowledge_callback("mainpic", FUNC(pic8259_device::inta_cb));
 
 	pic8259_device &mainpic(PIC8259(config, "mainpic", 0));
 	mainpic.out_int_callback().set_inputline(m_maincpu, 0);
@@ -485,9 +486,9 @@ MACHINE_CONFIG_START(pg685_state::pg685)
 	// ram
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(12288000, 882, 0, 720, 370, 0, 350 ) // not real values
-	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(12288000, 882, 0, 720, 370, 0, 350 ); // not real values
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	mc6845_device &crtc(MC6845(config, "crtc", 12288000));
 	crtc.set_screen("screen");
@@ -501,7 +502,7 @@ MACHINE_CONFIG_START(pg685_state::pg685)
 	pg685_backplane(config);
 	pg685_module(config);
 
-	MCFG_DEVICE_ADD("mainuart", I8251, XTAL(12'288'000) / 6) // divider guessed
+	I8251(config, "mainuart", XTAL(12'288'000) / 6); // divider guessed
 
 	// rs232 port
 
@@ -519,13 +520,14 @@ MACHINE_CONFIG_START(pg685_state::pg685)
 	// harddisk
 	wd2010_device& hdc(WD2010(config, "hdc", XTAL(10'000'000) / 2)); // divider guessed
 	hdc.out_intrq_callback().set("mainpic", FUNC(pic8259_device::ir3_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pg685_state::pg685oua12)
+void pg685_state::pg685oua12(machine_config &config)
+{
 	// main cpu
-	MCFG_DEVICE_ADD("maincpu", I80286, XTAL(20'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(pg685oua12_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
+	I80286(config, m_maincpu, XTAL(20'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pg685_state::pg685oua12_mem);
+	m_maincpu->set_irq_acknowledge_callback("mainpic", FUNC(pic8259_device::inta_cb));
 
 	pic8259_device &mainpic(PIC8259(config, "mainpic", 0));
 	mainpic.out_int_callback().set_inputline(m_maincpu, 0);
@@ -536,9 +538,9 @@ MACHINE_CONFIG_START(pg685_state::pg685oua12)
 	// ram
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(12288000, 882, 0, 720, 370, 0, 350 ) // not real values
-	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(12288000, 882, 0, 720, 370, 0, 350 ); // not real values
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	mc6845_device &crtc(MC6845(config, "crtc", 12288000));
 	crtc.set_screen("screen");
@@ -552,7 +554,7 @@ MACHINE_CONFIG_START(pg685_state::pg685oua12)
 	pg685_backplane(config);
 	pg685_module(config);
 
-	MCFG_DEVICE_ADD("mainuart", I8251, 12288000 / 6) // wrong
+	I8251(config, "mainuart", 12288000 / 6); // wrong
 
 	// rs232 port
 
@@ -569,8 +571,7 @@ MACHINE_CONFIG_START(pg685_state::pg685oua12)
 	// harddisk
 	wd2010_device& hdc(WD2010(config, "hdc", XTAL(10'000'000) / 2)); // divider guessed
 	hdc.out_intrq_callback().set("mainpic", FUNC(pic8259_device::ir3_w));
-
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

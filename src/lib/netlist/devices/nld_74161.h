@@ -25,7 +25,7 @@
 #ifndef NLD_74161_H_
 #define NLD_74161_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define TTL_74161(name, cA, cB, cC, cD, cCLRQ, cLOADQ, cCLK, cENABLEP, cENABLET)    \
 		NET_REGISTER_DEV(TTL_74161, name)   \

@@ -25793,7 +25793,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 		</part>
 	</software>
 
-	<!-- There is official Game Foy flash cart where players could load official games on stores.
+	<!-- There is official Game Boy flash cart where players could load official games on stores.
 	    pcb="DMG-A20-01"
 	    u1="G-MMC1 (MX15002) [MX15002UCA]"
 	    u2="8M-FLASH [29F008ATC-14]"

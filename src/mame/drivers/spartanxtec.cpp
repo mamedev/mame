@@ -359,28 +359,28 @@ void spartanxtec_state::spartanxtec_palette(palette_device &palette) const
 
 
 
-MACHINE_CONFIG_START(spartanxtec_state::spartanxtec)
-
+void spartanxtec_state::spartanxtec(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(spartanxtec_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_assert)
+	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &spartanxtec_state::spartanxtec_map);
+	m_maincpu->set_vblank_int("screen", FUNC(spartanxtec_state::irq0_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)
-	MCFG_DEVICE_PROGRAM_MAP(spartanxtec_sound_map)
-	MCFG_DEVICE_IO_MAP(spartanxtec_sound_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(spartanxtec_state, irq0_line_assert, 1000) // controls speed of music
-//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_hold)
+	Z80(config, m_audiocpu, 4000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &spartanxtec_state::spartanxtec_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &spartanxtec_state::spartanxtec_sound_io);
+	m_audiocpu->set_periodic_int(FUNC(spartanxtec_state::irq0_line_assert), attotime::from_hz(1000)); // controls speed of music
+//  m_audiocpu->set_vblank_int("screen", FUNC(spartanxtec_state::irq0_line_hold));
 
 	/* video hardware */
 	// todo, proper screen timings for this bootleg PCB - as visible area is less it's probably ~60hz, not 55
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(spartanxtec_state, screen_update_spartanxtec)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1790));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1-16);
+	screen.set_screen_update(FUNC(spartanxtec_state::screen_update_spartanxtec));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(spartanxtec_state::spartanxtec_palette), 0x200);
 
@@ -397,8 +397,7 @@ MACHINE_CONFIG_START(spartanxtec_state::spartanxtec)
 	AY8912(config, "ay2", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	AY8912(config, "ay3", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
-
-MACHINE_CONFIG_END
+}
 
 
 

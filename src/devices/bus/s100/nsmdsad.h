@@ -39,7 +39,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_s100_card_interface overrides
-	virtual uint8_t s100_smemr_r(address_space &space, offs_t offset) override;
+	virtual uint8_t s100_smemr_r(offs_t offset) override;
 
 private:
 	required_device_array<floppy_connector, 2> m_floppy;

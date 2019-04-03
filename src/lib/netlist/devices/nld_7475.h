@@ -35,7 +35,7 @@
 #ifndef NLD_7475_H_
 #define NLD_7475_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define PARAMS_7475_7477(name, cC1C2, cC3C4, cD1, cD2, cD3, cD4)    \
 		NET_CONNECT(name, C1C2, cC1C2)      \

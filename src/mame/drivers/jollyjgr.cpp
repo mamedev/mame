@@ -676,19 +676,20 @@ void jollyjgr_state::machine_reset()
 	m_tilemap_bank = 0;
 }
 
-MACHINE_CONFIG_START(jollyjgr_state::jollyjgr)
+void jollyjgr_state::jollyjgr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'000'000)/6)  /* 3MHz verified */
-	MCFG_DEVICE_PROGRAM_MAP(jollyjgr_map)
+	Z80(config, m_maincpu, XTAL(18'000'000)/6);  /* 3MHz verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &jollyjgr_state::jollyjgr_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.18)     /* 59.1864Hz measured */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(jollyjgr_state, screen_update_jollyjgr)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, jollyjgr_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.18);     /* 59.1864Hz measured */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(jollyjgr_state::screen_update_jollyjgr));
+	screen.screen_vblank().set(FUNC(jollyjgr_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jollyjgr);
 	PALETTE(config, m_palette, FUNC(jollyjgr_state::jollyjgr_palette), 32); // tilemap and sprites
@@ -698,16 +699,15 @@ MACHINE_CONFIG_START(jollyjgr_state::jollyjgr)
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, "aysnd", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.45); /* 1.7897725MHz verified */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(jollyjgr_state::fspider)
+void jollyjgr_state::fspider(machine_config &config)
+{
 	jollyjgr(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(fspider_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &jollyjgr_state::fspider_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(jollyjgr_state, screen_update_fspider)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(jollyjgr_state::screen_update_fspider));
+}
 
 /*************************************
  *

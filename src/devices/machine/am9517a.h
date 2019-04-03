@@ -61,8 +61,8 @@ public:
 	template <unsigned C> auto out_iow_callback() { return m_out_iow_cb[C].bind(); }
 	template <unsigned C> auto out_dack_callback() { return m_out_dack_cb[C].bind(); }
 
-	virtual DECLARE_READ8_MEMBER( read );
-	virtual DECLARE_WRITE8_MEMBER( write );
+	virtual uint8_t read(offs_t offset);
+	virtual void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( hack_w );
 	DECLARE_WRITE_LINE_MEMBER( ready_w );
@@ -149,8 +149,8 @@ public:
 	template <unsigned C> auto in_io16r_callback() { return m_in_io16r_cb[C].bind(); }
 	template <unsigned C> auto out_io16w_callback() { return m_out_io16w_cb[C].bind(); }
 
-	virtual DECLARE_READ8_MEMBER( read ) override;
-	virtual DECLARE_WRITE8_MEMBER( write ) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides

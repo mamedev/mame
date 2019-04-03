@@ -658,15 +658,16 @@ static void fccpu30_vme_cards(device_slot_interface &device)
 /*
  * Machine configuration
  */
-MACHINE_CONFIG_START(cpu30_state::cpu30)
+void cpu30_state::cpu30(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68030, XTAL(25'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(cpu30_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("fga002", fga002_device, iack)
+	M68030(config, m_maincpu, XTAL(25'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &cpu30_state::cpu30_mem);
+	m_maincpu->set_irq_acknowledge_callback("fga002", FUNC(fga002_device::iack));
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD("vme", 1, fccpu30_vme_cards, nullptr)
+	VME(config, "vme", 0);
+	VME_SLOT(config, "slot1", fccpu30_vme_cards, nullptr, 1, "vme");
 	/* Terminal Port config */
 	/* Force CPU30 series of boards has up to four serial ports, p1-p4, the FGA boot uses p4 as console and subsequent
 	   firmware uses p1 as console and in an operating system environment there may be user login shells on the other.
@@ -760,56 +761,56 @@ MACHINE_CONFIG_START(cpu30_state::cpu30)
 
 	// dual ported ram
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("8M, 16M, 32M");
-MACHINE_CONFIG_END
+}
 
 /* SYS68K/CPU-30X Part No.1 01300: 16.7 MHz 68030 based CPU board with 68882 FPCP, DMAC, 1 Mbyte Dual Ported RAM capacity and VMEPROM. */
-MACHINE_CONFIG_START(cpu30_state::cpu30x)
+void cpu30_state::cpu30x(machine_config &config)
+{
 	cpu30(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(16'777'216)) /* 16.7 MHz  from description, crystal needs verification */
+	m_maincpu->set_clock(XTAL(16'777'216)); /* 16.7 MHz  from description, crystal needs verification */
 
 //  config.device_remove("");
 
 	// dual ported ram
 	m_ram->set_default_size("1M").set_extra_options("1M, 2M, 4M");
-MACHINE_CONFIG_END
+}
 
 /* SYS68K/CPU-30XA Part No.1 01301: 20.0 MHz 68030 based CPU board with 68882 FPCP, DMAC, 1 Mbyte Dual Ported RAM capacity and VMEPROM. Documentation included.*/
-MACHINE_CONFIG_START(cpu30_state::cpu30xa)
+void cpu30_state::cpu30xa(machine_config &config)
+{
 	cpu30x(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(20'000'000)) /* 20.0 MHz  from description, crystal needs verification */
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(XTAL(20'000'000)); /* 20.0 MHz  from description, crystal needs verification */
+}
 
 /* SYS68K/CPU-30ZA Part No.1 01302: 20.0 MHz 68030 based CPU board with 68882 FPCP, DMAC, 4 Mbyte Dual Ported RAM capacity and VMEPROM. Documentation included.*/
-MACHINE_CONFIG_START(cpu30_state::cpu30za)
+void cpu30_state::cpu30za(machine_config &config)
+{
 	cpu30xa(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(20'000'000)) /* 20.0 MHz  from description, crystal needs verification */
+	m_maincpu->set_clock(XTAL(20'000'000)); /* 20.0 MHz  from description, crystal needs verification */
 
 	// dual ported ram
 	m_ram->set_default_size("4M").set_extra_options("1M, 2M, 4M");
-MACHINE_CONFIG_END
+}
 
 /* SYS68K/CPU-30ZBE 68030/68882 CPU, 25 MHz,  4 Mbyte shared DRAM, 4 Mbyte Flash, SCSI, Ethernet, Floppy disk, 4 serial I/O ports, 32-bit VMEbus interface */
-MACHINE_CONFIG_START(cpu30_state::cpu30zbe)
+void cpu30_state::cpu30zbe(machine_config &config)
+{
 	cpu30za(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(25'000'000)) /* 25.0 MHz  from description, crystal needs verification */
+	m_maincpu->set_clock(XTAL(25'000'000)); /* 25.0 MHz  from description, crystal needs verification */
 
 	// dual ported ram
 	m_ram->set_default_size("4M").set_extra_options("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M");
-MACHINE_CONFIG_END
+}
 
 /* SYS68K/CPU-33 */
-MACHINE_CONFIG_START(cpu30_state::cpu33)
+void cpu30_state::cpu33(machine_config &config)
+{
 	cpu30zbe(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(25'000'000)) /* 25.0 MHz  from description, crystal needs verification */
+	m_maincpu->set_clock(XTAL(25'000'000)); /* 25.0 MHz  from description, crystal needs verification */
 
 	// dual ported ram
 	m_ram->set_default_size("4M").set_extra_options("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M");
-MACHINE_CONFIG_END
+}
 
 /* SYS68K/CPU-30BE/8 68030/68882 CPU, 25 MHz,  8 Mbyte shared DRAM, 4 Mbyte Flash, SCSI, Ethernet, Floppy disk, 4 serial I/O ports, 32-bit VMEbus interface, VMEPROM firmware*/
 void cpu30_state::cpu30be8(machine_config &config)

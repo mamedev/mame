@@ -90,13 +90,13 @@ protected:
 	struct pbus_dma_t
 	{
 		bool m_active;
-		uint32_t m_buf_ptr;
 		uint32_t m_cur_ptr;
 		uint32_t m_desc_ptr;
 		uint32_t m_desc_flags;
 		uint32_t m_next_ptr;
 		uint32_t m_bytes_left;
 		uint32_t m_config;
+		uint32_t m_control;
 		emu_timer *m_timer;
 	};
 

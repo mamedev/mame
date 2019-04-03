@@ -887,9 +887,9 @@ void segaxbd_state::palette_init()
 		int i2 = (value >> 2) & 1;
 		int i1 = (value >> 1) & 1;
 		int i0 = (value >> 0) & 1;
-		m_palette_normal[value] = combine_6_weights(weights_normal, i0, i1, i2, i3, i4, 0);
-		m_palette_shadow[value] = combine_6_weights(weights_sh, i0, i1, i2, i3, i4, 0);
-		m_palette_hilight[value] = combine_6_weights(weights_sh, i0, i1, i2, i3, i4, 1);
+		m_palette_normal[value] = combine_weights(weights_normal, i0, i1, i2, i3, i4, 0);
+		m_palette_shadow[value] = combine_weights(weights_sh, i0, i1, i2, i3, i4, 0);
+		m_palette_hilight[value] = combine_weights(weights_sh, i0, i1, i2, i3, i4, 1);
 	}
 }
 

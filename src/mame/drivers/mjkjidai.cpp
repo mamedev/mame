@@ -296,8 +296,8 @@ void mjkjidai_state::machine_reset()
 	m_adpcm_pos = m_adpcm_end = 0;
 }
 
-MACHINE_CONFIG_START(mjkjidai_state::mjkjidai)
-
+void mjkjidai_state::mjkjidai(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 10000000/2); /* 5 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mjkjidai_state::mjkjidai_map);

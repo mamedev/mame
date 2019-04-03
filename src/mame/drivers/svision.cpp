@@ -512,22 +512,23 @@ MACHINE_CONFIG_START(svision_state::svision_base)
 	SOFTWARE_LIST(config, "cart_list").set_original("svision");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(svision_state::svision)
+void svision_state::svision(machine_config &config)
+{
 	svision_base(config);
 
-	MCFG_DEVICE_ADD(m_maincpu, M65C02, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(svision_mem)
+	M65C02(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &svision_state::svision_mem);
 
-	MCFG_SCREEN_ADD(m_screen, LCD)
-	MCFG_SCREEN_REFRESH_RATE(61)
-	MCFG_SCREEN_SIZE(3+160+3, 160)
-	MCFG_SCREEN_VISIBLE_AREA(3+0, 3+160-1, 0, 160-1)
-	MCFG_SCREEN_UPDATE_DRIVER(svision_state, screen_update_svision)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, svision_state, frame_int_w))
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(61);
+	m_screen->set_size(3+160+3, 160);
+	m_screen->set_visarea(3+0, 3+160-1, 0, 160-1);
+	m_screen->set_screen_update(FUNC(svision_state::screen_update_svision));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(svision_state::frame_int_w));
 
 	PALETTE(config, m_palette, FUNC(svision_state::svision_palette), ARRAY_LENGTH(svision_pens));
-MACHINE_CONFIG_END
+}
 
 void svision_state::svisions(machine_config &config)
 {
@@ -535,22 +536,25 @@ void svision_state::svisions(machine_config &config)
 	TIMER(config, "pet_timer").configure_periodic(FUNC(svision_state::svision_pet_timer_dev), attotime::from_seconds(8));
 }
 
-MACHINE_CONFIG_START(svision_state::svisionp)
+void svision_state::svisionp(machine_config &config)
+{
 	svision(config);
 
 	m_maincpu->set_clock(4430000);
 	m_screen->set_refresh(HZ_TO_ATTOSECONDS(50));
 	m_palette->set_init(FUNC(svision_state::svisionp_palette));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(svision_state::svisionn)
+void svision_state::svisionn(machine_config &config)
+{
 	svision(config);
 	m_maincpu->set_clock(3560000/*?*/);
 	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
 	m_palette->set_init(FUNC(svision_state::svisionn_palette));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(svision_state::tvlinkp)
+void svision_state::tvlinkp(machine_config &config)
+{
 	svisionp(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::tvlink_mem, tag(), this));
 
@@ -558,7 +562,7 @@ MACHINE_CONFIG_START(svision_state::tvlinkp)
 	m_screen->set_screen_update(FUNC(svision_state::screen_update_tvlink));
 
 	MCFG_MACHINE_RESET_OVERRIDE(svision_state, tvlink)
-MACHINE_CONFIG_END
+}
 
 ROM_START(svision)
 	ROM_REGION(0x80000, "maincpu", ROMREGION_ERASE00)

@@ -709,11 +709,12 @@ void hp95lx_state::hp95lx_io(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(hp95lx_state::hp95lx)
-	MCFG_DEVICE_ADD("maincpu", V20, XTAL(5'370'000))
-	MCFG_DEVICE_PROGRAM_MAP(hp95lx_map)
-	MCFG_DEVICE_IO_MAP(hp95lx_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+void hp95lx_state::hp95lx(machine_config &config)
+{
+	V20(config, m_maincpu, XTAL(5'370'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp95lx_state::hp95lx_map);
+	m_maincpu->set_addrmap(AS_IO, &hp95lx_state::hp95lx_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	ADDRESS_MAP_BANK(config, "bankdev_c000").set_map(&hp95lx_state::hp95lx_romdos).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
 	ADDRESS_MAP_BANK(config, "bankdev_d000").set_map(&hp95lx_state::hp95lx_romdos).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
@@ -735,27 +736,27 @@ MACHINE_CONFIG_START(hp95lx_state::hp95lx)
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 
-	MCFG_DEVICE_ADD("board0", ISA8_SLOT, 0, "isa", pc_isa8_cards, "com", true)
+	ISA8_SLOT(config, "board0", 0, "isa", pc_isa8_cards, "com", true);
 
-	MCFG_DEVICE_ADD(KBDC_TAG, PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(*this, hp95lx_state, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(*this, hp95lx_state, keyboard_data_w))
-	MCFG_PC_KBDC_SLOT_ADD(KBDC_TAG, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, KBDC_TAG, 0));
+	pc_kbdc.out_clock_cb().set(FUNC(hp95lx_state::keyboard_clock_w));
+	pc_kbdc.out_data_cb().set(FUNC(hp95lx_state::keyboard_data_w));
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270).set_pc_kbdc_slot(&pc_kbdc);
 
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM
 	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // card slot
 
 	// XXX When the AC adapter is plugged in, the LCD refresh rate is 73.14 Hz.
 	// XXX When the AC adapter is not plugged in (ie, running off of batteries) the refresh rate is 56.8 Hz.
-	MCFG_SCREEN_ADD_MONOCHROME("screen", LCD, rgb_t::white())
-	MCFG_SCREEN_UPDATE_DRIVER(hp95lx_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(5'370'000) / 2, 300, 0, 240, 180, 0, 128)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD, rgb_t::white());
+	m_screen->set_screen_update(FUNC(hp95lx_state::screen_update));
+	m_screen->set_raw(XTAL(5'370'000) / 2, 300, 0, 240, 180, 0, 128);
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(hp95lx_state::hp95lx_palette), 2);
 
 	RAM(config, RAM_TAG).set_default_size("512K");
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( hp95lx )
