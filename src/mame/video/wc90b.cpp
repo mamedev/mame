@@ -148,14 +148,14 @@ void eurogael_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	// entry at start of RAM might not be a sprite
 	for ( int offs = 0x200 - 4 ; offs >= 4 ; offs -= 4 )
 	{
-		//if ( ( ~( m_spriteram[offs+3] >> 7 ) & 1 ) == priority )
+		if ( ( ( m_spriteram[offs+3] >> 4 ) & 1 ) == priority )
 		{
 			// this is wrong
 
 			// 0      bbbb bbbb   b = tile lower
 			// 1      yyyy yyyy
 			// 2      xxxx xxxx
-			// 3      ffX- cccc   f = flip bits, X = X high?, c = tile upper
+			// 3      ffXP cccc   f = flip bits, P = priority (inverted vs. other bootlegs) X = X high?, c = tile upper
 			// 0x200  ---- -ppp   p = palette
 
 			int tilehigh = ( m_spriteram[offs + 3] & 0x0f ) << 8;
