@@ -3356,7 +3356,7 @@ void royalcrdf_state::driver_init()
 
 void royalcrdf_state::royalcrdf(machine_config &config)
 {
-	fw2ndpal(config);
+	fw1stpal(config);
 	
 	_maincpu = reinterpret_cast<cpu_device*>(config.device("maincpu"));
 	_maincpu->set_addrmap(AS_OPCODES, &royalcrdf_state::royalcrdf_opcodes_map);
@@ -5608,8 +5608,8 @@ ROM_START( royalcrdf )  /* encrypted program rom */
 	ROM_LOAD( "rc_1.bin", 0x8000, 0x8000, CRC(8cdcc978) SHA1(489b58760a7c8646399c8cdfb86ec4341823e7dd) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "rc_3.bin", 0x0000, 0x8000, CRC(8612c6ed) SHA1(3306a252af479e0510f136020086015b60dce879) )
-	ROM_LOAD( "rc_2.bin", 0x8000, 0x8000, CRC(7f934488) SHA1(c537a09ef7e88a81ee9c2e1d971b3caf9d3dba0e) )
+	ROM_LOAD( "rc_2.bin", 0x0000, 0x8000, CRC(7f934488) SHA1(c537a09ef7e88a81ee9c2e1d971b3caf9d3dba0e) )
+	ROM_LOAD( "rc_3.bin", 0x8000, 0x8000, CRC(8612c6ed) SHA1(3306a252af479e0510f136020086015b60dce879) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(44dbf086) SHA1(43a2d615c00605db75a4fd4d57d9e056c0356f10) ) // sldh
