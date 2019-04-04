@@ -69,11 +69,12 @@ protected:
 	// dynamic cpu divider
 	void div_trampoline_w(offs_t offset, u8 data);
 	u8 div_trampoline_r(offs_t offset);
-	void div_set_cpu_freq(offs_t offset);
+	inline void div_set_cpu_freq(offs_t offset);
 	void div_trampoline(address_map &map);
 	void div_refresh(ioport_value val = 0xff);
 	u16 m_div_status;
 	ioport_value m_div_config;
+	double m_div_scale;
 	emu_timer *m_div_timer;
 
 	virtual void machine_start() override;
