@@ -69,21 +69,20 @@ void m68340_cpu_device::update_ipl()
 
 void m68340_cpu_device::internal_vectors_r(address_map &map)
 {
-	map(0xfffff2, 0xffffff).r(FUNC(m68340_cpu_device::int_ack));
+	map(0xfffff0, 0xffffff).r(FUNC(m68340_cpu_device::int_ack)).umask16(0x00ff);
 }
 
 
-u16 m68340_cpu_device::int_ack(offs_t offset)
+uint8_t m68340_cpu_device::int_ack(offs_t offset)
 {
-	int irqline = offset + 1;
-	uint8_t pit_iarb = pit_arbitrate(irqline);
-	uint8_t scu_iarb = m_serial->arbitrate(irqline);
-	uint8_t t1_iarb = m_timer[0]->arbitrate(irqline);
-	uint8_t t2_iarb = m_timer[1]->arbitrate(irqline);
+	uint8_t pit_iarb = pit_arbitrate(offset);
+	uint8_t scu_iarb = m_serial->arbitrate(offset);
+	uint8_t t1_iarb = m_timer[0]->arbitrate(offset);
+	uint8_t t2_iarb = m_timer[1]->arbitrate(offset);
 	uint8_t iarb = std::max({pit_iarb, scu_iarb, t1_iarb, t2_iarb});
-	LOGMASKED(LOG_IPL, "Level %d interrupt arbitration: PIT = %X, SCU = %X, T1 = %X, T2 = %X\n", irqline, pit_iarb, scu_iarb, t1_iarb, t2_iarb);
+	LOGMASKED(LOG_IPL, "Level %d interrupt arbitration: PIT = %X, SCU = %X, T1 = %X, T2 = %X\n", offset, pit_iarb, scu_iarb, t1_iarb, t2_iarb);
 	int response = 0;
-	uint32_t vector = 0x18; // Spurious interrupt
+	uint8_t vector = 0x18; // Spurious interrupt
 
 	// Valid IARB levels are F (high) to 1 (low) and should be unique among modules using the same interrupt level
 	if (iarb != 0)
@@ -118,9 +117,9 @@ u16 m68340_cpu_device::int_ack(offs_t offset)
 	}
 
 	if (response == 0)
-		logerror("Spurious interrupt (level %d)\n", irqline);
+		logerror("Spurious interrupt (level %d)\n", offset);
 	else if (response > 1)
-		logerror("%d modules responded to interrupt (level %d, IARB = %X)\n", response, irqline, iarb);
+		logerror("%d modules responded to interrupt (level %d, IARB = %X)\n", response, offset, iarb);
 
 	return vector;
 }

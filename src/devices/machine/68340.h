@@ -57,7 +57,7 @@ private:
 
 	void update_ipl();
 	void internal_vectors_r(address_map &map);
-	u16 int_ack(offs_t offset);
+	uint8_t int_ack(offs_t offset);
 
 	TIMER_CALLBACK_MEMBER(periodic_interrupt_timer_callback);
 

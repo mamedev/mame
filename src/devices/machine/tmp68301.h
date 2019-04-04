@@ -92,7 +92,7 @@ private:
 	uint8_t m_icr[10];
 
 	void internal_vectors_r(address_map &map);
-	u16 irq_callback(offs_t offset);
+	uint8_t irq_callback(offs_t offset);
 };
 
 DECLARE_DEVICE_TYPE(TMP68301, tmp68301_device)

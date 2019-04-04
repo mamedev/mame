@@ -200,19 +200,18 @@ void tmp68301_device::device_reset()
 
 void tmp68301_device::internal_vectors_r(address_map &map)
 {
-	map(0xfffff2, 0xffffff).r(FUNC(tmp68301_device::irq_callback));
+	map(0xfffff0, 0xffffff).r(FUNC(tmp68301_device::irq_callback)).umask16(0x00ff);
 }
 
 
-u16 tmp68301_device::irq_callback(offs_t offset)
+uint8_t tmp68301_device::irq_callback(offs_t offset)
 {
-	int irqline = offset + 1;
 	uint8_t IVNR = m_regs[0x9a/2] & 0xe0;      // Interrupt Vector Number Register (IVNR)
 
 	for (int src : { 0, 7, 3, 1, 8, 4, 5, 9, 2 })
 	{
 		// check if the IPL matches
-		if (irqline == (m_icr[src] & 0x07))
+		if (offset == (m_icr[src] & 0x07))
 		{
 			// check if interrupt is pending and not masked out
 			u16 mask = (src > 2 ? 2 : 1) << src;

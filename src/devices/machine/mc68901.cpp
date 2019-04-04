@@ -344,6 +344,7 @@ mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, d
 		m_out_so_cb(*this),
 		//m_out_rr_cb(*this),
 		//m_out_tr_cb(*this),
+		m_iack_chain_cb(*this),
 		m_aer(0),
 		m_ier(0),
 		m_gpio_input(0),
@@ -370,6 +371,7 @@ void mc68901_device::device_start()
 	m_out_so_cb.resolve_safe();
 	//m_out_rr_cb.resolve_safe();
 	//m_out_tr_cb.resolve_safe();
+	m_iack_chain_cb.resolve();
 
 	/* create the timers */
 	m_timer[TIMER_A] = timer_alloc(TIMER_A);
@@ -1114,7 +1116,7 @@ WRITE8_MEMBER( mc68901_device::write )
 }
 
 
-u16 mc68901_device::get_vector()
+uint8_t mc68901_device::get_vector()
 {
 	for (int ch = 15; ch >= 0; ch--)
 	{
@@ -1138,7 +1140,10 @@ u16 mc68901_device::get_vector()
 		}
 	}
 
-	return 0x18; // Spurious irq
+	if (!m_iack_chain_cb.isnull())
+		return m_iack_chain_cb();
+	else
+		return 0x18; // Spurious irq
 }
 
 WRITE_LINE_MEMBER( mc68901_device::i0_w ) { gpio_input(0, state); }

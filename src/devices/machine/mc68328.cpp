@@ -355,7 +355,7 @@ void mc68328_device::internal_map(address_map &map)
 
 void mc68328_device::cpu_space_map(address_map &map)
 {
-	map(0xfffff2, 0xffffff).r(FUNC(mc68328_device::irq_callback));
+	map(0xfffff0, 0xffffff).r(FUNC(mc68328_device::irq_callback)).umask16(0x00ff);
 }
 
 
@@ -387,6 +387,7 @@ mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, d
 	, m_in_spim_cb(*this)
 	, m_spim_xch_trigger_cb(*this)
 {
+	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(mc68328_device::cpu_space_map), this);
 }
 
 //-------------------------------------------------
@@ -708,9 +709,9 @@ void mc68328_device::set_port_d_lines(uint8_t state, int bit)
 	poll_port_d_interrupts();
 }
 
-u16 mc68328_device::irq_callback(offs_t offset)
+uint8_t mc68328_device::irq_callback(offs_t offset)
 {
-	return m_regs.ivr | (offset + 1);
+	return m_regs.ivr | offset;
 }
 
 uint32_t mc68328_device::get_timer_frequency(uint32_t index)

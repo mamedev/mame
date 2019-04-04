@@ -1219,7 +1219,7 @@ void st_state::ikbd_map(address_map &map)
 void st_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffffc, 0xfffffd).r(m_mfp, FUNC(mc68901_device::get_vector));
+	map(0xfffffd, 0xfffffd).r(m_mfp, FUNC(mc68901_device::get_vector));
 }
 
 //-------------------------------------------------
