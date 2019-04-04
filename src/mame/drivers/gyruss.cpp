@@ -473,18 +473,18 @@ WRITE_LINE_MEMBER(gyruss_state::vblank_irq)
 		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(gyruss_state::gyruss)
-
+void gyruss_state::gyruss(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_cpu1_map)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);    /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gyruss_state::main_cpu1_map);
 
-	MCFG_DEVICE_ADD("sub", KONAMI1, MASTER_CLOCK/12)     /* 1.536 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_cpu2_map)
+	KONAMI1(config, m_subcpu, MASTER_CLOCK/12);     /* 1.536 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &gyruss_state::main_cpu2_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/4)    /* 3.579545 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(audio_cpu1_map)
-	MCFG_DEVICE_IO_MAP(audio_cpu1_io_map)
+	Z80(config, m_audiocpu, SOUND_CLOCK/4);    /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gyruss_state::audio_cpu1_map);
+	m_audiocpu->set_addrmap(AS_IO, &gyruss_state::audio_cpu1_io_map);
 
 	I8039(config, m_audiocpu_2, XTAL(8'000'000));
 	m_audiocpu_2->set_addrmap(AS_PROGRAM, &gyruss_state::audio_cpu2_map);
@@ -501,11 +501,11 @@ MACHINE_CONFIG_START(gyruss_state::gyruss)
 	mainlatch.q_out_cb<5>().set(FUNC(gyruss_state::flipscreen_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(gyruss_state, screen_update_gyruss)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gyruss_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(gyruss_state::screen_update_gyruss));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(gyruss_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gyruss);
 	PALETTE(config, m_palette, FUNC(gyruss_state::gyruss_palette), 16*4+16*16, 32);
@@ -555,10 +555,10 @@ MACHINE_CONFIG_START(gyruss_state::gyruss)
 	ay5.add_route(1, "discrete", 1.0, 13);
 	ay5.add_route(2, "discrete", 1.0, 14);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, gyruss_sound_discrete)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, gyruss_sound_discrete);
+	m_discrete->add_route(0, "rspeaker", 1.0);
+	m_discrete->add_route(1, "lspeaker", 1.0);
+}
 
 
 

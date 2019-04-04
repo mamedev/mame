@@ -198,7 +198,7 @@ WRITE8_MEMBER(limenko_state::qs1000_p3_w)
 	membank("qs1000:bank")->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
-		m_soundlatch->acknowledge_w(space, 0, !BIT(data, 5));
+		m_soundlatch->acknowledge_w();
 }
 
 /*****************************************************************************************************
@@ -273,7 +273,7 @@ READ8_MEMBER(limenko_state::spotty_sound_r)
 	// check m_spotty_sound_cmd bits...
 
 	if(m_spotty_sound_cmd == 0xf7)
-		return m_soundlatch->read(space,0);
+		return m_soundlatch->read();
 	else
 		return m_oki->read();
 }

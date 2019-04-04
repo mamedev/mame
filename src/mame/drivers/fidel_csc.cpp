@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco,hap
-// thanks-to:Berger,yoyo_chessboard
+// copyright-holders:Kevin Horton, Jonathan Gevaryahu, Sandro Ronco, hap
+// thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
 *
 * fidel_csc.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
@@ -202,7 +202,7 @@ PCB label 510-1035A01
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_csc.lh" // clickable, with preliminary boardpieces simulation
+#include "fidel_csc.lh" // clickable
 #include "fidel_rsc_v2.lh" // clickable
 #include "fidel_su9.lh" // clickable
 

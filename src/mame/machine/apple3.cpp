@@ -47,8 +47,8 @@
 #include "emu.h"
 #include "includes/apple3.h"
 
-#define LOG_MEMORY      1
-#define LOG_INDXADDR    1
+#define LOG_MEMORY      0
+#define LOG_INDXADDR    0
 
 #define ENV_SLOWSPEED   (0x80)
 #define ENV_IOENABLE    (0x40)

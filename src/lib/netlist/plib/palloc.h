@@ -15,9 +15,9 @@
 #include <cstddef>
 #include <cstdlib>
 #include <memory>
+#include <type_traits>
 #include <utility>
 #include <vector>
-#include <type_traits>
 
 #if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
 #include <malloc.h>
@@ -147,6 +147,12 @@ namespace plib {
 			m_is_owned = false;
 			m_ptr = nullptr;
 		}
+
+		/**
+		 * \brief Return @c true if the stored pointer is not null.
+		 */
+		explicit operator bool() const noexcept { return m_ptr != nullptr; }
+
 		pointer  release()
 		{
 			pointer tmp = m_ptr;
@@ -191,7 +197,7 @@ namespace plib {
 
 		~arena_allocator() noexcept = default;
 
-		arena_allocator(const arena_allocator &rhs) noexcept : m_a(rhs.m_a) { printf("copy called\n"); }//= default;
+		arena_allocator(const arena_allocator &rhs) noexcept = default;
 		arena_allocator& operator=(const arena_allocator&) noexcept = delete;
 
 		arena_allocator(arena_allocator&&) noexcept = default;

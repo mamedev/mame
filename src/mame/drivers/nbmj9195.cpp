@@ -205,7 +205,7 @@ READ8_MEMBER(nbmj9195_state::others_cpu_portc_r)
 
 WRITE8_MEMBER(nbmj9195_state::soundcpu_porte_w)
 {
-	if (!(data & 0x01)) m_soundlatch->clear_w(space, 0, 0);
+	if (!(data & 0x01)) m_soundlatch->clear_w();
 }
 
 

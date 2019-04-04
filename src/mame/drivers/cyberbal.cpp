@@ -487,11 +487,11 @@ void cyberbal_state::cyberbalt(machine_config &config)
 	SLAPSTIC(config, "slapstic", 116, true);
 }
 
-MACHINE_CONFIG_START(cyberbal2p_state::cyberbal2p)
-
+void cyberbal2p_state::cyberbal2p(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(cyberbal2p_map)
+	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cyberbal2p_state::cyberbal2p_map);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
@@ -509,14 +509,14 @@ MACHINE_CONFIG_START(cyberbal2p_state::cyberbal2p)
 	m_mob->set_config(cyberbal2p_state::s_mob_config);
 	m_mob->set_gfxdecode("gfxdecode");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(cyberbal2p_state, screen_update_cyberbal2p)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cyberbal2p_state, video_int_write_line))
+	m_screen->set_raw(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(cyberbal2p_state::screen_update_cyberbal2p));
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(cyberbal2p_state::video_int_write_line));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -525,7 +525,7 @@ MACHINE_CONFIG_START(cyberbal2p_state::cyberbal2p)
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 	m_jsa->test_read_cb().set_ioport("IN2").bit(15);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 

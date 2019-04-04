@@ -7371,25 +7371,15 @@ ROM_START( redhawke ) /* Excellent Co., Ldt license (no code scramble), (c) 1997
 	ROM_LOAD( "5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
+void nmk16_state::init_redhawki()
+{
+	decryptcode( machine(), 23, 22, 21, 20, 19, 18, 15, 16, 17, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
+}
+
 ROM_START( redhawki )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
-	ROM_LOAD16_BYTE( "rhit-2.bin", 0x000000, 0x004000, CRC(30cade0e) SHA1(2123ca858bcaed5165739107ccc2830561af0b38) )
-	ROM_CONTINUE(0x20000,0x4000)
-	ROM_CONTINUE(0x10000,0x4000)
-	ROM_CONTINUE(0x30000,0x4000)
-	ROM_CONTINUE(0x08000,0x4000)
-	ROM_CONTINUE(0x28000,0x4000)
-	ROM_CONTINUE(0x18000,0x4000)
-	ROM_CONTINUE(0x38000,0x4000)
-
-	ROM_LOAD16_BYTE( "rhit-3.bin", 0x000001, 0x004000, CRC(37dbb3c2) SHA1(d1f8258f357b885d38f87d288f98046dbd7d56aa) )
-	ROM_CONTINUE(0x20001,0x4000)
-	ROM_CONTINUE(0x10001,0x4000)
-	ROM_CONTINUE(0x30001,0x4000)
-	ROM_CONTINUE(0x08001,0x4000)
-	ROM_CONTINUE(0x28001,0x4000)
-	ROM_CONTINUE(0x18001,0x4000)
-	ROM_CONTINUE(0x38001,0x4000)
+	ROM_LOAD16_BYTE( "rhit-2.bin", 0x000000, 0x020000, CRC(30cade0e) SHA1(2123ca858bcaed5165739107ccc2830561af0b38) )
+	ROM_LOAD16_BYTE( "rhit-3.bin", 0x000001, 0x020000, CRC(37dbb3c2) SHA1(d1f8258f357b885d38f87d288f98046dbd7d56aa) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Z80 Code */
 	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
@@ -7408,41 +7398,15 @@ ROM_START( redhawki )
 	ROM_LOAD( "5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
+void nmk16_state::init_redhawkg()
+{
+	decryptcode( machine(), 23, 22, 21, 20, 19, 18, 15, 14, 16, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
+}
+
 ROM_START( redhawkg ) // original Afega PCB with Delta Coin sticker
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
-	ROM_LOAD16_BYTE( "2.bin", 0x000000, 0x002000, CRC(ccd459eb) SHA1(677b03f1e3973f0e1f09272d336c2dd9da8f843c) )
-	ROM_CONTINUE(0x20000,0x2000)
-	ROM_CONTINUE(0x10000,0x2000)
-	ROM_CONTINUE(0x30000,0x2000)
-	ROM_CONTINUE(0x04000,0x2000)
-	ROM_CONTINUE(0x24000,0x2000)
-	ROM_CONTINUE(0x14000,0x2000)
-	ROM_CONTINUE(0x34000,0x2000)
-	ROM_CONTINUE(0x08000,0x2000)
-	ROM_CONTINUE(0x28000,0x2000)
-	ROM_CONTINUE(0x18000,0x2000)
-	ROM_CONTINUE(0x38000,0x2000)
-	ROM_CONTINUE(0x0c000,0x2000)
-	ROM_CONTINUE(0x2c000,0x2000)
-	ROM_CONTINUE(0x1c000,0x2000)
-	ROM_CONTINUE(0x3c000,0x2000)
-
-	ROM_LOAD16_BYTE( "3.bin", 0x000001, 0x002000, CRC(483802fd) SHA1(4ec2b15bc89c12806dab78ae30f5fe24e26d46eb) )
-	ROM_CONTINUE(0x20001,0x2000)
-	ROM_CONTINUE(0x10001,0x2000)
-	ROM_CONTINUE(0x30001,0x2000)
-	ROM_CONTINUE(0x04001,0x2000)
-	ROM_CONTINUE(0x24001,0x2000)
-	ROM_CONTINUE(0x14001,0x2000)
-	ROM_CONTINUE(0x34001,0x2000)
-	ROM_CONTINUE(0x08001,0x2000)
-	ROM_CONTINUE(0x28001,0x2000)
-	ROM_CONTINUE(0x18001,0x2000)
-	ROM_CONTINUE(0x38001,0x2000)
-	ROM_CONTINUE(0x0c001,0x2000)
-	ROM_CONTINUE(0x2c001,0x2000)
-	ROM_CONTINUE(0x1c001,0x2000)
-	ROM_CONTINUE(0x3c001,0x2000)
+	ROM_LOAD16_BYTE( "2.bin", 0x000000, 0x020000, CRC(ccd459eb) SHA1(677b03f1e3973f0e1f09272d336c2dd9da8f843c) )
+	ROM_LOAD16_BYTE( "3.bin", 0x000001, 0x020000, CRC(483802fd) SHA1(4ec2b15bc89c12806dab78ae30f5fe24e26d46eb) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Z80 Code */
 	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
@@ -8458,8 +8422,8 @@ GAME( 1995, dolmen,     0,        twinactn,     dolmen,       nmk16_state, empty
 
 GAME( 1998, stagger1,   0,        stagger1,     stagger1,     nmk16_state, empty_init,           ROT270, "Afega",                             "Stagger I (Japan)", 0 )
 GAME( 1997, redhawk,    stagger1, stagger1,     stagger1,     nmk16_state, init_redhawk,         ROT270, "Afega (New Vision Ent. license)",   "Red Hawk (US)", 0 )
-GAME( 1997, redhawki,   stagger1, redhawki,     stagger1,     nmk16_state, empty_init,           ROT0,   "Afega (Hea Dong Corp license)",     "Red Hawk (Italy)", 0 ) // bootleg? strange scroll regs
-GAME( 1997, redhawkg,   stagger1, redhawki,     stagger1,     nmk16_state, empty_init,           ROT0,   "Afega",                             "Red Hawk (Greece)", 0 )
+GAME( 1997, redhawki,   stagger1, redhawki,     stagger1,     nmk16_state, init_redhawki,        ROT0,   "Afega (Hea Dong Corp license)",     "Red Hawk (Italy)", 0 ) // bootleg? strange scroll regs
+GAME( 1997, redhawkg,   stagger1, redhawki,     stagger1,     nmk16_state, init_redhawkg,        ROT0,   "Afega",                             "Red Hawk (Greece)", 0 )
 GAME( 1997, redhawke,   stagger1, stagger1,     stagger1,     nmk16_state, empty_init,           ROT270, "Afega (Excellent Co. license)",     "Red Hawk (Excellent Co., Ltd)", 0 )
 GAME( 1997, redhawkk,   stagger1, stagger1,     stagger1,     nmk16_state, empty_init,           ROT270, "Afega",                             "Red Hawk (Korea)", 0 )
 GAME( 1997, redhawkb,   stagger1, redhawkb,     redhawkb,     nmk16_state, empty_init,           ROT0,   "bootleg",                           "Vince (bootleg of Red Hawk)", 0 )

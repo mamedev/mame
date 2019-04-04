@@ -845,7 +845,7 @@ int i8274_new_device::m1_r()
 //-------------------------------------------------
 //  cd_ba_r -
 //-------------------------------------------------
-READ8_MEMBER( z80sio_device::cd_ba_r )
+uint8_t z80sio_device::cd_ba_r(offs_t offset)
 {
 	int ba = BIT(offset, 0);
 	int cd = BIT(offset, 1);
@@ -858,7 +858,7 @@ READ8_MEMBER( z80sio_device::cd_ba_r )
 //-------------------------------------------------
 //  cd_ba_w -
 //-------------------------------------------------
-WRITE8_MEMBER( z80sio_device::cd_ba_w )
+void z80sio_device::cd_ba_w(offs_t offset, uint8_t data)
 {
 	int ba = BIT(offset, 0);
 	int cd = BIT(offset, 1);
@@ -874,7 +874,7 @@ WRITE8_MEMBER( z80sio_device::cd_ba_w )
 //-------------------------------------------------
 //  ba_cd_r -
 //-------------------------------------------------
-READ8_MEMBER( z80sio_device::ba_cd_r )
+uint8_t z80sio_device::ba_cd_r(offs_t offset)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);
@@ -887,7 +887,7 @@ READ8_MEMBER( z80sio_device::ba_cd_r )
 //-------------------------------------------------
 //  ba_cd_w -
 //-------------------------------------------------
-WRITE8_MEMBER( z80sio_device::ba_cd_w )
+void z80sio_device::ba_cd_w(offs_t offset, uint8_t data)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);

@@ -50,9 +50,9 @@ public:
 	auto write_cols() { return m_write_cols.bind(); } // COL/ROW pins (offset for ROW)
 	auto write_data() { return m_write_data.bind(); } // DATA OUT pin, don't use on HLCD0569
 
-	DECLARE_WRITE_LINE_MEMBER(write_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_cs);
-	DECLARE_WRITE_LINE_MEMBER(write_data) { m_data = (state) ? 1 : 0; }
+	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	DECLARE_WRITE_LINE_MEMBER(cs_w);
+	DECLARE_WRITE_LINE_MEMBER(data_w) { m_data = (state) ? 1 : 0; }
 
 protected:
 	hlcd0515_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 colmax);
@@ -67,7 +67,7 @@ protected:
 	const u8 m_colmax;    // number of column pins
 
 	int m_cs;       // input pin state
-	int m_pclock;   // "
+	int m_clk;      // "
 	int m_data;     // "
 	int m_count;
 	u8 m_control;

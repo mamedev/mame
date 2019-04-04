@@ -83,13 +83,13 @@ class hec2hrp_state : public driver_device
 public:
 	hec2hrp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
 		m_printer(*this, "printer"),
-		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette"),
 		m_disc2cpu(*this, "disc2cpu"),
 		m_discrete(*this, "discrete"),
 		m_sn(*this, "sn76477"),
-		m_palette(*this, "palette"),
 		m_videoram(*this,"videoram"),
 		m_hector_videoram(*this,"hector_videoram") ,
 		m_keyboard(*this, "KEY.%u", 0),
@@ -123,8 +123,10 @@ protected:
 	DECLARE_WRITE8_MEMBER(color_a_w);
 	DECLARE_WRITE8_MEMBER(color_b_w);
 
+	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	optional_device<printer_image_device> m_printer;
+	required_device<palette_device> m_palette;
 
 private:
 	DECLARE_WRITE8_MEMBER(minidisc_control_w);
@@ -149,11 +151,9 @@ private:
 
 	DECLARE_FLOPPY_FORMATS(minidisc_formats);
 
-	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_disc2cpu;
 	required_device<discrete_device> m_discrete;
 	required_device<sn76477_device> m_sn;
-	required_device<palette_device> m_palette;
 	optional_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_hector_videoram;
 	required_ioport_array<9> m_keyboard;

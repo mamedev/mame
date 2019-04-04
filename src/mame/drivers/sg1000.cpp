@@ -137,8 +137,7 @@ void sg1000_state::sg1000_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x40, 0x40).mirror(0x3f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-	map(0x80, 0x80).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
-	map(0x81, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0x80, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::read), FUNC(tms9918a_device::write));
 	map(0xdc, 0xdf).rw(FUNC(sg1000_state::peripheral_r), FUNC(sg1000_state::peripheral_w));
 }
 
@@ -160,8 +159,7 @@ void sg1000_state::omv_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x40, 0x40).mirror(0x3f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-	map(0x80, 0x80).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
-	map(0x81, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0x80, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::read), FUNC(tms9918a_device::write));
 	map(0xc0, 0xc0).mirror(0x38).portr("C0");
 	map(0xc1, 0xc1).mirror(0x38).portr("C1");
 	map(0xc2, 0xc2).mirror(0x38).portr("C2");
@@ -189,8 +187,7 @@ void sg1000_state::sc3000_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0xff).rw(CARTSLOT_TAG, FUNC(sega8_cart_slot_device::read_io), FUNC(sega8_cart_slot_device::write_io));
 	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-	map(0xbe, 0xbe).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
-	map(0xbf, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0xbe, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::read), FUNC(tms9918a_device::write));
 	map(0xdc, 0xdf).rw(FUNC(sg1000_state::peripheral_r), FUNC(sg1000_state::peripheral_w));
 }
 
@@ -200,8 +197,7 @@ void sg1000_state::sc3000_io_map(address_map &map)
     map.global_mask(0xff);
     map(0x00, 0x00).mirror(0xdf).rw(UPD9255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
     map(0x00, 0x00).mirror(0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-    map(0x00, 0x00).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
-    map(0x01, 0x01).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+    map(0x00, 0x01).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::read), FUNC(tms9918a_device::write));
     map(0x60, 0x60).mirror(0x9f).r(FUNC(sg1000_state::sc3000_r_r));
 }
 */
@@ -224,8 +220,7 @@ void sf7000_state::sf7000_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-	map(0xbe, 0xbe).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
-	map(0xbf, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0xbe, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::read), FUNC(tms9918a_device::write));
 	map(0xdc, 0xdf).rw(FUNC(sf7000_state::peripheral_r), FUNC(sf7000_state::peripheral_w));
 	map(0xe0, 0xe1).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xe4, 0xe7).rw(UPD9255_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));

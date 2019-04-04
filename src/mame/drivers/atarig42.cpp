@@ -515,10 +515,9 @@ static const atari_rle_objects_config modesc_0x400 =
  *************************************/
 
 MACHINE_CONFIG_START(atarig42_state::atarig42)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, ATARI_CLOCK_14MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarig42_state::main_map);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
@@ -529,16 +528,16 @@ MACHINE_CONFIG_START(atarig42_state::atarig42)
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
 	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarig42_state, get_playfield_tile_info, 8,8, atarig42_playfield_scan, 128,64)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, atarig42_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
+	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,32, 0).set_info_callback(FUNC(atarig42_state::get_alpha_tile_info));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(atarig42_state, screen_update_atarig42)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarig42_state, video_int_write_line))
+	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(atarig42_state::screen_update_atarig42));
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(atarig42_state::video_int_write_line));
 
 	MCFG_VIDEO_START_OVERRIDE(atarig42_state,atarig42)
 

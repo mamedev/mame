@@ -16,6 +16,7 @@
 #include "divtlb.h"
 
 #include "i386dasm.h"
+#include "cache.h"
 
 #define INPUT_LINE_A20      1
 #define INPUT_LINE_SMI      2
@@ -1631,10 +1632,34 @@ protected:
 	virtual void opcode_cpuid() override;
 	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
 	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
+	virtual void opcode_invd() override;
+	virtual void opcode_wbinvd() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	virtual u8 mem_pr8(offs_t address) override { return opcode_read_cache<u8, NATIVE_ENDIAN_VALUE_LE_BE(0, 3)>(address);   }
+	virtual u16 mem_pr16(offs_t address) override { return opcode_read_cache<u16, NATIVE_ENDIAN_VALUE_LE_BE(0, 2)>(address); }
+	virtual u32 mem_pr32(offs_t address) override { return opcode_read_cache<u32, 0>(address); }
+	virtual u8 mem_prd8(offs_t address) override { return program_read_cache<u8, NATIVE_ENDIAN_VALUE_LE_BE(0, 3)>(address); }
+	virtual u16 mem_prd16(offs_t address) override { return program_read_cache<u16, NATIVE_ENDIAN_VALUE_LE_BE(0, 2)>(address); }
+	virtual u32 mem_prd32(offs_t address) override { return program_read_cache<u32, 0>(address); }
+	virtual void mem_pwd8(offs_t address, u8 data) override { program_write_cache<u8, NATIVE_ENDIAN_VALUE_LE_BE(0, 3)>(address, data); }
+	virtual void mem_pwd16(offs_t address, u16 data) override { program_write_cache<u16, NATIVE_ENDIAN_VALUE_LE_BE(0, 2)>(address, data); }
+	virtual void mem_pwd32(offs_t address, u32 data) override { program_write_cache<u32, 0>(address, data); }
+
+private:
+	void parse_mtrrfix(u64 mtrr, offs_t base, int kblock);
+	int check_cacheable(offs_t address);
+	void invalidate_cache(bool writeback);
+
+	template <class dt, offs_t xorle> dt opcode_read_cache(offs_t address);
+	template <class dt, offs_t xorle> dt program_read_cache(offs_t address);
+	template <class dt, offs_t xorle> void program_write_cache(offs_t address, dt data);
+
 	uint8_t m_processor_name_string[48];
+	uint64_t m_msr_mtrrfix[11];
+	uint8_t m_memory_ranges_1m[1024 / 4];
+	cpucache<17, 9, Cache2Way, CacheLineBytes64> cache; // 512 sets, 2 ways (cachelines per set), 64 bytes per cacheline
 };
 
 

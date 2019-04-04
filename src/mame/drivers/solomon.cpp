@@ -19,7 +19,7 @@ driver by Mirko Buffoni
 
 WRITE8_MEMBER(solomon_state::solomon_sh_command_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 

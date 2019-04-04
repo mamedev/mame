@@ -297,31 +297,31 @@ void fp6000_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(fp6000_state::fp6000)
+void fp6000_state::fp6000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8086, 16000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(fp6000_map)
-	MCFG_DEVICE_IO_MAP(fp6000_io)
+	I8086(config, m_maincpu, 16000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fp6000_state::fp6000_map);
+	m_maincpu->set_addrmap(AS_IO, &fp6000_state::fp6000_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fp6000_state, screen_update_fp6000)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(fp6000_state::screen_update_fp6000));
+	screen.set_palette(m_palette);
 
 	H46505(config, m_crtc, 16000000/5);    /* unknown clock, hand tuned to get ~60 fps */
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 
-	MCFG_PALETTE_ADD("palette", 8)
-//  MCFG_PALETTE_INIT(black_and_white)
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fp6000);
+	PALETTE(config, m_palette).set_entries(8);
 
-MACHINE_CONFIG_END
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fp6000);
+}
 
 /* ROM definition */
 ROM_START( fp6000 )

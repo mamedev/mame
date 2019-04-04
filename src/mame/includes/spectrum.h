@@ -151,12 +151,14 @@ protected:
 
 	uint8_t *m_ram_0000;
 	uint8_t m_ram_disabled_by_beta;
+	DECLARE_READ8_MEMBER(opcode_fetch_r);
 	DECLARE_WRITE8_MEMBER(spectrum_rom_w);
 	DECLARE_READ8_MEMBER(spectrum_rom_r);
 	DECLARE_WRITE8_MEMBER(spectrum_port_fe_w);
 	DECLARE_READ8_MEMBER(spectrum_port_fe_r);
 	DECLARE_READ8_MEMBER(spectrum_port_ula_r);
 
+	DECLARE_READ8_MEMBER(spectrum_128_opcode_fetch_r);
 	DECLARE_WRITE8_MEMBER(spectrum_128_bank1_w);
 	DECLARE_READ8_MEMBER(spectrum_128_bank1_r);
 	DECLARE_WRITE8_MEMBER(spectrum_128_port_7ffd_w);
@@ -215,8 +217,10 @@ protected:
 
 	void spectrum_128_io(address_map &map);
 	void spectrum_128_mem(address_map &map);
+	void spectrum_128_fetch(address_map &map);
 	void spectrum_io(address_map &map);
 	void spectrum_mem(address_map &map);
+	void spectrum_fetch(address_map &map);
 	void spectrum_plus3_io(address_map &map);
 	void spectrum_plus3_mem(address_map &map);
 	void tc2048_io(address_map &map);

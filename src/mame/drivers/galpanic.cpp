@@ -232,24 +232,24 @@ static GFXDECODE_START( gfx_galpanic )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(galpanic_state::galpanic)
-
+void galpanic_state::galpanic(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(galpanic_map)
+	M68000(config, m_maincpu, XTAL(12'000'000)); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &galpanic_state::galpanic_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(galpanic_state::scanline), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(galpanic_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galpanic_state, screen_vblank))
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0, 224-1);
+	m_screen->set_screen_update(FUNC(galpanic_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(galpanic_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galpanic);
 	// fg palette RAM, bit 0 seems to be a transparency flag for the front bitmap
@@ -262,23 +262,23 @@ MACHINE_CONFIG_START(galpanic_state::galpanic)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/6, okim6295_device::PIN7_LOW) /* verified on pcb */
-	MCFG_DEVICE_ADDRESS_MAP(0, galpanic_oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000)/6, okim6295_device::PIN7_LOW)); /* verified on pcb */
+	oki.set_addrmap(0, &galpanic_state::galpanic_oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(galpanic_state::galpanica)
+void galpanic_state::galpanica(machine_config &config)
+{
 	galpanic(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(galpanica_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &galpanic_state::galpanica_map);
 
 	/* basic machine hardware */
 	KANEKO_HIT(config, "calc1_mcu").set_type(0);
 
 	/* arm watchdog */
 	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

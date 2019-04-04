@@ -241,7 +241,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",m_maincpu->pc(),data);
 
 WRITE8_MEMBER(mitchell_state::pang_paletteram_w)
 {
-	m_palette->write8(space, offset + (m_paletteram_bank ? 0x800 : 0x000), data);
+	m_palette->write8(offset + (m_paletteram_bank ? 0x800 : 0x000), data);
 }
 
 READ8_MEMBER(mitchell_state::pang_paletteram_r)

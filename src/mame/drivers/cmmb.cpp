@@ -146,12 +146,12 @@ WRITE8_MEMBER(cmmb_state::cmmb_charram_w)
 
 READ8_MEMBER(cmmb_state::flash_r)
 {
-	return m_flash->read(space, offset + 0x2000);
+	return m_flash->read(offset + 0x2000);
 }
 
 WRITE8_MEMBER(cmmb_state::flash_w)
 {
-	m_flash->write(space, offset + 0x2000, data);
+	m_flash->write(offset + 0x2000, data);
 }
 
 READ8_MEMBER(cmmb_state::cmmb_input_r)
@@ -416,22 +416,22 @@ void cmmb_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(cmmb_state::cmmb)
-
+void cmmb_state::cmmb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M65SC02, MAIN_CLOCK/5) // Unknown clock, but chip rated for 14MHz
-	MCFG_DEVICE_PROGRAM_MAP(cmmb_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cmmb_state, vblank_irq)
+	M65SC02(config, m_maincpu, MAIN_CLOCK/5); // Unknown clock, but chip rated for 14MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmmb_state::cmmb_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cmmb_state::vblank_irq));
 
 	AT29C020(config, "at29c020");
 
 	ADDRESS_MAP_BANK(config, "bnk2000").set_map(&cmmb_state::bnk2000_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x8000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/12, 384, 0, 256, 264, 0, 240) // TBD, not real measurements
-	MCFG_SCREEN_UPDATE_DRIVER(cmmb_state, screen_update_cmmb)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MAIN_CLOCK/12, 384, 0, 256, 264, 0, 240); // TBD, not real measurements
+	screen.set_screen_update(FUNC(cmmb_state::screen_update_cmmb));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cmmb);
 
@@ -440,7 +440,7 @@ MACHINE_CONFIG_START(cmmb_state::cmmb)
 	/* sound hardware */
 //  SPEAKER(config, "mono").front_center();
 //  AY8910(config, "aysnd", 8000000/4).add_route(ALL_OUTPUTS, "mono", 0.30);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

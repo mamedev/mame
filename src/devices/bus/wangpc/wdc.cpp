@@ -325,11 +325,11 @@ WRITE8_MEMBER( wangpc_wdc_device::status_w )
 }
 
 
-READ8_MEMBER( wangpc_wdc_device::ctc_ch0_r ) { return m_ctc->read(machine().dummy_space(), 0); }
-WRITE8_MEMBER( wangpc_wdc_device::ctc_ch0_w ) { m_ctc->write(machine().dummy_space(), 0, data); }
-READ8_MEMBER( wangpc_wdc_device::ctc_ch1_r ) { return m_ctc->read(machine().dummy_space(), 1); }
-WRITE8_MEMBER( wangpc_wdc_device::ctc_ch1_w ) { m_ctc->write(machine().dummy_space(), 1, data); }
-READ8_MEMBER( wangpc_wdc_device::ctc_ch2_r ) { return m_ctc->read(machine().dummy_space(), 2); }
-WRITE8_MEMBER( wangpc_wdc_device::ctc_ch2_w ) { m_ctc->write(machine().dummy_space(), 2, data); }
-READ8_MEMBER( wangpc_wdc_device::ctc_ch3_r ) { return m_ctc->read(machine().dummy_space(), 3); }
-WRITE8_MEMBER( wangpc_wdc_device::ctc_ch3_w ) { m_ctc->write(machine().dummy_space(), 3, data); }
+READ8_MEMBER( wangpc_wdc_device::ctc_ch0_r ) { return m_ctc->read(0); }
+WRITE8_MEMBER( wangpc_wdc_device::ctc_ch0_w ) { m_ctc->write(0, data); }
+READ8_MEMBER( wangpc_wdc_device::ctc_ch1_r ) { return m_ctc->read(1); }
+WRITE8_MEMBER( wangpc_wdc_device::ctc_ch1_w ) { m_ctc->write(1, data); }
+READ8_MEMBER( wangpc_wdc_device::ctc_ch2_r ) { return m_ctc->read(2); }
+WRITE8_MEMBER( wangpc_wdc_device::ctc_ch2_w ) { m_ctc->write(2, data); }
+READ8_MEMBER( wangpc_wdc_device::ctc_ch3_r ) { return m_ctc->read(3); }
+WRITE8_MEMBER( wangpc_wdc_device::ctc_ch3_w ) { m_ctc->write(3, data); }

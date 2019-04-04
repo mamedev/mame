@@ -224,40 +224,19 @@ TODO :
 #include "includes/witch.h"
 
 
-TILE_GET_INFO_MEMBER(witch_state::get_gfx0b_tile_info)
+TILE_GET_INFO_MEMBER(witch_state::get_gfx0_tile_info)
 {
 	int code  = m_gfx0_vram[tile_index];
 	int color = m_gfx0_cram[tile_index];
 
 	code=code | ((color & 0xe0) << 3);
-
-	if(color&0x10)
-	{
-		code=0;
-	}
 
 	SET_TILE_INFO_MEMBER(1,
 			code,   //tiles beyond 0x7ff only for sprites?
 			color & 0x0f,
 			0);
-}
 
-TILE_GET_INFO_MEMBER(witch_state::get_gfx0a_tile_info)
-{
-	int code  = m_gfx0_vram[tile_index];
-	int color = m_gfx0_cram[tile_index];
-
-	code=code | ((color & 0xe0) << 3);
-
-	if((color&0x10)==0)
-	{
-		code=0;
-	}
-
-	SET_TILE_INFO_MEMBER(1,
-			code,//tiles beyond 0x7ff only for sprites?
-			color & 0x0f,
-			0);
+	tileinfo.category = (color & 0x10) >> 4;
 }
 
 TILE_GET_INFO_MEMBER(witch_state::get_gfx1_tile_info)
@@ -284,11 +263,9 @@ TILE_GET_INFO_MEMBER(keirinou_state::get_keirinou_gfx1_tile_info)
 
 void witch_state::video_common_init()
 {
-	m_gfx0a_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(witch_state::get_gfx0a_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
-	m_gfx0b_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(witch_state::get_gfx0b_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_gfx0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(witch_state::get_gfx0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	m_gfx0a_tilemap->set_transparent_pen(0);
-	m_gfx0b_tilemap->set_transparent_pen(0);
+	m_gfx0_tilemap->set_transparent_pen(0);
 
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
@@ -301,8 +278,7 @@ void witch_state::video_start()
 	video_common_init();
 	m_gfx1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(witch_state::get_gfx1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	m_gfx0a_tilemap->set_palette_offset(0x100);
-	m_gfx0b_tilemap->set_palette_offset(0x100);
+	m_gfx0_tilemap->set_palette_offset(0x100);
 	m_gfx1_tilemap->set_palette_offset(0x200);
 
 	has_spr_rom_bank = false;
@@ -314,8 +290,7 @@ void keirinou_state::video_start()
 	video_common_init();
 	m_gfx1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(keirinou_state::get_keirinou_gfx1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	m_gfx0a_tilemap->set_palette_offset(0x000);
-	m_gfx0b_tilemap->set_palette_offset(0x000);
+	m_gfx0_tilemap->set_palette_offset(0x000);
 	m_gfx1_tilemap->set_palette_offset(0x100);
 
 	save_item(NAME(m_spr_bank));
@@ -370,30 +345,28 @@ void witch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	}
 }
 
-uint32_t witch_state::screen_update_witch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t witch_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_gfx1_tilemap->set_scrollx(0, m_scrollx-7 ); //offset to have it aligned with the sprites
 	m_gfx1_tilemap->set_scrolly(0, m_scrolly+8 );
 
 	m_gfx1_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	m_gfx0a_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_gfx0_tilemap->draw(screen, bitmap, cliprect, 1,0);
 	draw_sprites(bitmap, cliprect);
-	m_gfx0b_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_gfx0_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
 WRITE8_MEMBER(witch_state::gfx0_vram_w)
 {
 	m_gfx0_vram[offset] = data;
-	m_gfx0a_tilemap->mark_tile_dirty(offset);
-	m_gfx0b_tilemap->mark_tile_dirty(offset);
+	m_gfx0_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(witch_state::gfx0_cram_w)
 {
 	m_gfx0_cram[offset] = data;
-	m_gfx0a_tilemap->mark_tile_dirty(offset);
-	m_gfx0b_tilemap->mark_tile_dirty(offset);
+	m_gfx0_tilemap->mark_tile_dirty(offset);
 }
 
 #define FIX_OFFSET() do { \
@@ -989,7 +962,7 @@ void witch_state::witch(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
 	screen.set_visarea(8, 256-1-8, 8*4, 256-8*4-1);
-	screen.set_screen_update(FUNC(witch_state::screen_update_witch));
+	screen.set_screen_update(FUNC(witch_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_witch);
@@ -1029,7 +1002,7 @@ void keirinou_state::keirinou(machine_config &config)
 	PALETTE(config.replace(), m_palette).set_entries(0x200+0x80);
 	m_gfxdecode->set_info(gfx_keirinou);
 
-//  MCFG_PALETTE_FORMAT(IIBBGGRR)
+//  m_palette->set_format(palette_device::IIBBGGRR, 0x200+0x80);
 
 	// Keirin Ou does have two individual PPIs (NEC D8255AC-2)
 	m_ppi[0]->out_pc_callback().set(FUNC(keirinou_state::write_keirinou_a002));
@@ -1051,9 +1024,8 @@ void keirinou_state::keirinou(machine_config &config)
 }
 
 ROM_START( witch )
-	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "u_5b.u5", 0x10000, 0x20000, CRC(5c9f685a) SHA1(b75950048009ffb8c3b356592b1c69f905a1a2bd) )
-	ROM_COPY( "maincpu" , 0x10000, 0x0000, 0x8000 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "u_5b.u5", 0x00000, 0x20000, CRC(5c9f685a) SHA1(b75950048009ffb8c3b356592b1c69f905a1a2bd) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "6.s6", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0) )
@@ -1074,9 +1046,8 @@ ROM_END
 
 /* Witch (With ranking) */
 ROM_START( witchb )
-	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "x.u5", 0x10000, 0x20000, CRC(d0818777) SHA1(a6232fef84bec3cfb4a6122a48e96e7b7950e013) )
-	ROM_COPY( "maincpu" , 0x10000, 0x0000, 0x8000 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "x.u5", 0x00000, 0x20000, CRC(d0818777) SHA1(a6232fef84bec3cfb4a6122a48e96e7b7950e013) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "6.s6", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0) )
@@ -1096,9 +1067,8 @@ ROM_END
 
 
 ROM_START( witchs ) /* this set has (c)1992 Sega / Vic Tokai in the roms */
-	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "rom.u5", 0x10000, 0x20000, CRC(348fccb8) SHA1(947defd86c4a597fbfb9327eec4903aa779b3788) )
-	ROM_COPY( "maincpu" , 0x10000, 0x0000, 0x8000 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "rom.u5", 0x00000, 0x20000, CRC(348fccb8) SHA1(947defd86c4a597fbfb9327eec4903aa779b3788) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "6.s6", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0) ) /* Same data as the Witch set */
@@ -1118,9 +1088,8 @@ ROM_END
 
 
 ROM_START( pbchmp95 ) /* Licensed for Germany? */
-	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "3.bin", 0x10000, 0x20000, CRC(e881aa05) SHA1(10d259396cac4b9a1b72c262c11ffa5efbdac433) )
-	ROM_COPY( "maincpu" , 0x10000, 0x0000, 0x8000 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "3.bin", 0x00000, 0x20000, CRC(e881aa05) SHA1(10d259396cac4b9a1b72c262c11ffa5efbdac433) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "4.bin", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0) ) /* Same data as the Witch set */
@@ -1164,7 +1133,7 @@ ROM_END
 
 void witch_state::init_witch()
 {
-	m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000 + UNBANKED_SIZE, 0x8000);
+	m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + UNBANKED_SIZE, 0x8000);
 	m_mainbank->set_entry(0);
 
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), this));

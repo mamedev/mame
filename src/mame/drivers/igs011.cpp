@@ -259,6 +259,7 @@ private:
 	void drgnwrld_type3_decrypt();
 	void drgnwrld_type2_decrypt();
 	void drgnwrld_type1_decrypt();
+	void drgnwrldv40k_decrypt();
 	void lhb2_decrypt();
 	void nkishusp_decrypt();
 	void vbowl_decrypt();
@@ -807,6 +808,36 @@ void igs011_state::drgnwrld_type1_decrypt()
 	}
 }
 
+void igs011_state::drgnwrldv40k_decrypt()
+{
+	drgnwrld_type1_decrypt();
+
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
+
+	int rom_size = 0x80000;
+
+	for(int i = 0; i < rom_size / 2; i++)
+	{
+		uint16_t x = src[i];
+
+		if ((i & 0x0800) != 0x0800)
+			x ^= 0x0200;
+
+		if (((i & 0x3a00) == 0x0a00) ^ ((i & 0x3a00) == 0x2a00))
+			x ^= 0x0200;
+
+		if (((i & 0x3ae0) == 0x0860) ^ ((i & 0x3ae0) == 0x2860))
+			x ^= 0x0200;
+
+		if (((i & 0x1c00) == 0x1800) ^ ((i & 0x1e00) == 0x1e00))
+			x ^= 0x0200;
+
+		if ((i & 0x1ee0) == 0x1c60)
+			x ^= 0x0200;
+
+		src[i] = x;
+	}
+}
 
 void igs011_state::lhb2_decrypt()
 {
@@ -2277,7 +2308,7 @@ void igs011_state::init_drgnwrldv20j()
 
 void igs011_state::init_drgnwrldv40k()
 {
-	//drgnwrld_type3_decrypt(); // wrong
+	drgnwrldv40k_decrypt();
 	drgnwrld_gfx_decrypt();
 
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16_delegate(FUNC(igs011_state::drgnwrldv21_igs011_prot2_r), this)); // wrong
@@ -4986,7 +5017,7 @@ ROM_END
 ***************************************************************************/
 
 GAME( 1997, drgnwrld,     0,        drgnwrld,        drgnwrld,  igs011_state, init_drgnwrld,     ROT0, "IGS",                     "Dragon World (World, V040O)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv40k, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dragon World (Korea, V040K)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1995, drgnwrldv40k, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dragon World (Korea, V040K)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // protection handling needs to be updated for this set
 GAME( 1995, drgnwrldv30,  drgnwrld, drgnwrld,        drgnwrld,  igs011_state, init_drgnwrldv30,  ROT0, "IGS",                     "Dragon World (World, V030O)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1995, drgnwrldv21,  drgnwrld, drgnwrld_igs012, drgnwrld,  igs011_state, init_drgnwrldv21,  ROT0, "IGS",                     "Dragon World (World, V021O)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1995, drgnwrldv21j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv21j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V021J)",         MACHINE_SUPPORTS_SAVE )

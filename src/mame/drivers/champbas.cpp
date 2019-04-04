@@ -512,13 +512,6 @@ void champbas_state::machine_start()
 	save_item(NAME(m_gfx_bank));
 }
 
-void champbas_state::machine_reset()
-{
-	// 74LS259 is auto CLR on reset
-	for (int i = 0; i < 8; i++)
-		m_maincpu->space(AS_PROGRAM).write_byte(0xa000 + i, 0);
-}
-
 INTERRUPT_GEN_MEMBER(champbas_state::vblank_irq)
 {
 	if (m_irq_mask)
@@ -526,12 +519,12 @@ INTERRUPT_GEN_MEMBER(champbas_state::vblank_irq)
 }
 
 
-MACHINE_CONFIG_START(champbas_state::talbot)
-
+void champbas_state::talbot(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6)
-	MCFG_DEVICE_PROGRAM_MAP(champbasj_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
+	Z80(config, m_maincpu, XTAL(18'432'000)/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::champbasj_map);
+	m_maincpu->set_vblank_int("screen", FUNC(champbas_state::vblank_irq));
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(champbas_state::irq_enable_w));
@@ -543,18 +536,18 @@ MACHINE_CONFIG_START(champbas_state::talbot)
 	m_mainlatch->q_out_cb<6>().set(FUNC(champbas_state::mcu_start_w));
 	m_mainlatch->q_out_cb<7>().set(FUNC(champbas_state::mcu_switch_w));
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8)
+	ALPHA_8201(config, m_alpha_8201, XTAL(18'432'000)/6/8);
 	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(champbas_state::screen_update_champbas));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_talbot);
 	PALETTE(config, m_palette, FUNC(champbas_state::champbas_palette), 512, 32);
@@ -565,15 +558,15 @@ MACHINE_CONFIG_START(champbas_state::talbot)
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.5);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(champbas_state::champbas)
-
+void champbas_state::champbas(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6)
-	MCFG_DEVICE_PROGRAM_MAP(champbas_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
+	Z80(config, m_maincpu, XTAL(18'432'000)/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::champbas_map);
+	m_maincpu->set_vblank_int("screen", FUNC(champbas_state::vblank_irq));
 
 	LS259(config, m_mainlatch); // 9D; 8G on Champion Baseball II Double Board Configuration
 	m_mainlatch->q_out_cb<0>().set(FUNC(champbas_state::irq_enable_w));
@@ -585,18 +578,18 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 	m_mainlatch->q_out_cb<6>().set_nop(); // no MCU
 	m_mainlatch->q_out_cb<7>().set_nop(); // no MCU
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'432'000)/6)
-	MCFG_DEVICE_PROGRAM_MAP(champbas_sound_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(18'432'000)/6));
+	audiocpu.set_addrmap(AS_PROGRAM, &champbas_state::champbas_sound_map);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(champbas_state::screen_update_champbas));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_champbas);
 	PALETTE(config, m_palette, FUNC(champbas_state::champbas_palette), 512, 32);
@@ -612,70 +605,70 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(champbas_state::champbasj)
+void champbas_state::champbasj(machine_config &config)
+{
 	champbas(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(champbasj_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::champbasj_map);
 
 	m_mainlatch->q_out_cb<6>().set(FUNC(champbas_state::mcu_start_w));
 	m_mainlatch->q_out_cb<7>().set(FUNC(champbas_state::mcu_switch_w));
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // note: 8302 rom on champbb2 (same device!)
+	ALPHA_8201(config, m_alpha_8201, XTAL(18'432'000)/6/8); // note: 8302 rom on champbb2 (same device!)
 	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(champbas_state::champbasja)
+void champbas_state::champbasja(machine_config &config)
+{
 	champbas(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(champbasja_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::champbasja_map);
+}
 
-MACHINE_CONFIG_START(champbas_state::champbasjb)
+void champbas_state::champbasjb(machine_config &config)
+{
 	champbas(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(champbasjb_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::champbasjb_map);
+}
 
-MACHINE_CONFIG_START(champbas_state::champbb2)
+void champbas_state::champbb2(machine_config &config)
+{
 	champbasj(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(champbb2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::champbb2_map);
+}
 
-MACHINE_CONFIG_START(champbas_state::champbb2j)
+void champbas_state::champbb2j(machine_config &config)
+{
 	champbb2(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(champbb2j_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::champbb2j_map);
+}
 
 
-MACHINE_CONFIG_START(champbas_state::tbasebal)
+void champbas_state::tbasebal(machine_config &config)
+{
 	champbas(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tbasebal_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::tbasebal_map);
 
-	MCFG_DEVICE_ADD("mcu", M68705P3, XTAL(18'432'000)/6) // ?Mhz
-MACHINE_CONFIG_END
-
+	M68705P3(config, "mcu", XTAL(18'432'000)/6); // ?Mhz
+}
 
 
-MACHINE_CONFIG_START(exctsccr_state::exctsccr)
 
+void exctsccr_state::exctsccr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6 )
-	MCFG_DEVICE_PROGRAM_MAP(exctsccr_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exctsccr_state, vblank_irq)
+	Z80(config, m_maincpu, XTAL(18'432'000)/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &exctsccr_state::exctsccr_map);
+	m_maincpu->set_vblank_int("screen", FUNC(exctsccr_state::vblank_irq));
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(exctsccr_state::irq_enable_w));
@@ -687,27 +680,27 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccr)
 	m_mainlatch->q_out_cb<6>().set(FUNC(exctsccr_state::mcu_start_w));
 	m_mainlatch->q_out_cb<7>().set(FUNC(exctsccr_state::mcu_switch_w));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4 )
-	MCFG_DEVICE_PROGRAM_MAP(exctsccr_sound_map)
-	MCFG_DEVICE_IO_MAP(exctsccr_sound_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(exctsccr_state, nmi_line_pulse, 4000) // 4 kHz, updates the dac
+	Z80(config, m_audiocpu, XTAL(14'318'181)/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &exctsccr_state::exctsccr_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &exctsccr_state::exctsccr_sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(exctsccr_state::nmi_line_pulse), attotime::from_hz(4000)); // 4 kHz, updates the dac
 
 	timer_device &exc_snd_irq(TIMER(config, "exc_snd_irq"));
 	exc_snd_irq.configure_periodic(FUNC(exctsccr_state::exctsccr_sound_irq), attotime::from_hz(75)); // irq source unknown, determines music tempo
 	exc_snd_irq.set_start_delay(attotime::from_hz(75));
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // note: 8302 rom, or 8303 on exctscc2 (same device!)
+	ALPHA_8201(config, m_alpha_8201, XTAL(18'432'000)/6/8); // note: 8302 rom, or 8303 on exctscc2 (same device!)
 	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.54)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(exctsccr_state, screen_update_exctsccr)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60.54);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(exctsccr_state::screen_update_exctsccr));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exctsccr);
 	PALETTE(config, m_palette, FUNC(exctsccr_state::exctsccr_palette), 512, 32);
@@ -731,15 +724,15 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccr)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 /* Bootleg running on a modified Champion Baseball board */
-MACHINE_CONFIG_START(exctsccr_state::exctsccrb)
-
+void exctsccr_state::exctsccrb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6)
-	MCFG_DEVICE_PROGRAM_MAP(exctsccrb_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exctsccr_state, vblank_irq)
+	Z80(config, m_maincpu, XTAL(18'432'000)/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &exctsccr_state::exctsccrb_map);
+	m_maincpu->set_vblank_int("screen", FUNC(exctsccr_state::vblank_irq));
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(exctsccr_state::irq_enable_w));
@@ -751,21 +744,21 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccrb)
 	m_mainlatch->q_out_cb<6>().set(FUNC(exctsccr_state::mcu_start_w));
 	m_mainlatch->q_out_cb<7>().set(FUNC(exctsccr_state::mcu_switch_w));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'432'000)/6)
-	MCFG_DEVICE_PROGRAM_MAP(champbas_sound_map)
+	Z80(config, m_audiocpu, XTAL(18'432'000)/6);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &exctsccr_state::champbas_sound_map);
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // champbasj 8201 on pcb, though unused
+	ALPHA_8201(config, m_alpha_8201, XTAL(18'432'000)/6/8); // champbasj 8201 on pcb, though unused
 	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(exctsccr_state, screen_update_exctsccr)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(exctsccr_state::screen_update_exctsccr));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exctsccr);
 	PALETTE(config, m_palette, FUNC(exctsccr_state::exctsccr_palette), 512, 32);
@@ -781,7 +774,7 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccrb)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 
 

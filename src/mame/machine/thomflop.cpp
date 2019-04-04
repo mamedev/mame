@@ -412,12 +412,11 @@ void thomson_state::to7_5p14_index_pulse_callback( int state )
 
 void thomson_state::to7_5p14sd_reset()
 {
-	int i;
 	LOG(( "to7_5p14sd_reset: CD 90-015 controller\n" ));
-	for ( i = 0; i < floppy_get_count( machine() ); i++ )
+	for (auto &img : m_floppy_image)
 	{
-		legacy_floppy_image_device * img = floppy_get_device( machine(), i );
-		if (img) {
+		if (img.found())
+		{
 			img->floppy_drive_set_ready_state( FLOPPY_DRIVE_READY, 0 );
 			img->floppy_drive_set_rpm( 300. );
 			img->floppy_drive_seek( - img->floppy_drive_get_current_track() );
@@ -521,7 +520,7 @@ void thomson_state::to7_qdd_index_pulse_cb( int state )
 
 legacy_floppy_image_device * thomson_state::to7_qdd_image()
 {
-	return floppy_get_device( machine(), 0 );
+	return m_floppy_image[0].target();
 }
 
 
@@ -807,13 +806,12 @@ WRITE8_MEMBER( thomson_state::to7_qdd_w )
 
 void thomson_state::to7_qdd_reset()
 {
-	int i;
 	LOG(( "to7_qdd_reset: CQ 90-028 controller\n" ));
 
-	for ( i = 0; i < floppy_get_count( machine() ); i++ )
+	for (auto &img : m_floppy_image)
 	{
-		legacy_floppy_image_device * img = floppy_get_device( machine(), i );
-		if (img) {
+		if (img.found())
+		{
 			img->floppy_drive_set_ready_state(  FLOPPY_DRIVE_READY, 0 );
 
 			motor_on = CLEAR_LINE;
@@ -916,7 +914,7 @@ static emu_timer* thmfc_floppy_cmd;
 
 legacy_floppy_image_device * thomson_state::thmfc_floppy_image()
 {
-	return floppy_get_device( machine(), thmfc1->drive );
+	return m_floppy_image[thmfc1->drive].target();
 }
 
 
@@ -1498,13 +1496,12 @@ WRITE8_MEMBER( thomson_state::thmfc_floppy_w )
 
 void thomson_state::thmfc_floppy_reset()
 {
-	int i;
 	LOG(( "thmfc_floppy_reset: THMFC1 controller\n" ));
 
-	for ( i = 0; i < floppy_get_count( machine() ); i++ )
+	for (auto &img : m_floppy_image)
 	{
-		legacy_floppy_image_device * img = floppy_get_device( machine(), i );
-		if (img) {
+		if (img.found())
+		{
 			img->floppy_drive_set_ready_state( FLOPPY_DRIVE_READY, 0 );
 			img->floppy_drive_seek(  - img->floppy_drive_get_current_track() );
 		}

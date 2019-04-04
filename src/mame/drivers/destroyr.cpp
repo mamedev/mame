@@ -240,7 +240,7 @@ WRITE8_MEMBER(destroyr_state::misc_w)
 WRITE8_MEMBER(destroyr_state::cursor_load_w)
 {
 	m_cursor = data;
-	m_watchdog->reset_w(space, offset, data);
+	m_watchdog->watchdog_reset();
 }
 
 
@@ -465,12 +465,12 @@ void destroyr_state::machine_start()
 	save_item(NAME(m_potsense));
 }
 
-MACHINE_CONFIG_START(destroyr_state::destroyr)
-
+void destroyr_state::destroyr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(12'096'000) / 16)
-	MCFG_DEVICE_PROGRAM_MAP(destroyr_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(destroyr_state, irq0_line_assert,  4*60)
+	M6800(config, m_maincpu, XTAL(12'096'000) / 16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &destroyr_state::destroyr_map);
+	m_maincpu->set_periodic_int(FUNC(destroyr_state::irq0_line_assert), attotime::from_hz(4*60));
 
 	f9334_device &outlatch(F9334(config, "outlatch")); // F8
 	outlatch.q_out_cb<0>().set_output("led0").invert(); // LED 1
@@ -485,18 +485,18 @@ MACHINE_CONFIG_START(destroyr_state::destroyr)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(destroyr_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 262);
+	m_screen->set_visarea(0, 255, 0, 239);
+	m_screen->set_screen_update(FUNC(destroyr_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_destroyr);
 	PALETTE(config, m_palette, FUNC(destroyr_state::destroyr_palette), 8);
 
 	/* sound hardware */
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( destroyr )

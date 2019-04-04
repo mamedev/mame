@@ -35,17 +35,19 @@
  @054     uPD552C  1980, Epoch Invader From Space
 
  @031     uPD553C  1979, Bambino Superstar Football (ET-03)
- @049     uPD553C  1979, Mego Mini-Vid Break Free
+ @049     uPD553C  1979, Mego Mini-Vid: Break Free
  @055     uPD553C  1980, Bambino Space Laser Fight (ET-12)
  *073     uPD553C  1980, Sony ST-J75 FM Stereo Tuner
  @080     uPD553C  1980, Epoch Electronic Football
  *102     uPD553C  1981, Bandai Block Out
  @153     uPD553C  1981, Epoch Galaxy II
  @160     uPD553C  1982, Tomy Pac Man (TN-08)
+ *167     uPD553C  1982, Sony SL models (betamax) (have dump)
  @170     uPD553C  1982, Bandai Crazy Climber
  @192     uPD553C  1982, Tomy Scramble (TN-10)
  @202     uPD553C  1982, Epoch Astro Command
  @206     uPD553C  1982, Epoch Dracula
+ *207     uPD553C  1982, Sony SL-J30 (tape/cd deck)
  @209     uPD553C  1982, Tomy Caveman (TN-12)
  @258     uPD553C  1984, Tomy Alien Chase (TN-16)
  *296     uPD553C  1984, Epoch Computer Beam Gun Professional
@@ -76,12 +78,15 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
-// internal artwork
+// internal artwork (complete)
 #include "efball.lh"
 #include "grobot9.lh" // clickable
 #include "mcompgin.lh"
 #include "mvbfree.lh"
 #include "tactix.lh" // clickable
+
+// internal artwork (bezel overlay)
+#include "tmtennis.lh"
 
 //#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
@@ -349,7 +354,8 @@ void ufombs_state::ufombs(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(243, 1080);
-	screen.set_visarea(0, 243-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -506,7 +512,8 @@ void ssfball_state::ssfball(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 482);
-	screen.set_visarea(0, 1920-1, 0, 482-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -652,7 +659,8 @@ void bmsoccer_state::bmsoccer(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(271, 1080);
-	screen.set_visarea(0, 271-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -769,7 +777,8 @@ void bmsafari_state::bmsafari(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(248, 1080);
-	screen.set_visarea(0, 248-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -930,7 +939,8 @@ void splasfgt_state::splasfgt(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 476);
-	screen.set_visarea(0, 1920-1, 0, 476-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1044,7 +1054,8 @@ void bcclimbr_state::bcclimbr(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(310, 1080);
-	screen.set_visarea(0, 310-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1278,7 +1289,8 @@ void invspace_state::invspace(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(289, 1080);
-	screen.set_visarea(0, 289-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1511,7 +1523,8 @@ void galaxy2_state::galaxy2(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(304, 1080);
-	screen.set_visarea(0, 304-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1527,7 +1540,7 @@ void galaxy2_state::galaxy2b(machine_config &config)
 	/* video hardware */
 	screen_device *screen = subdevice<screen_device>("screen");
 	screen->set_size(306, 1080);
-	screen->set_visarea(0, 306-1, 0, 1080-1);
+	screen->set_visarea_full();
 }
 
 // roms
@@ -1649,7 +1662,8 @@ void astrocmd_state::astrocmd(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 525);
-	screen.set_visarea(0, 1920-1, 0, 525-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1755,7 +1769,8 @@ void edracula_state::edracula(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 526);
-	screen.set_visarea(0, 1920-1, 0, 526-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -1814,9 +1829,9 @@ WRITE8_MEMBER(mcompgin_state::lcd_w)
 	// E0: HLCD0530 _CS
 	// E1: HLCD0530 clock
 	// E2: HLCD0530 data in
-	m_lcd->write_cs(data & 1);
-	m_lcd->write_data(data >> 2 & 1);
-	m_lcd->write_clock(data >> 1 & 1);
+	m_lcd->cs_w(data & 1);
+	m_lcd->data_w(data >> 2 & 1);
+	m_lcd->clock_w(data >> 1 & 1);
 }
 
 // config
@@ -1864,7 +1879,7 @@ ROM_END
 
 /***************************************************************************
 
-  Mego Mini-Vid Break Free (manufactured in Japan)
+  Mego Mini-Vid: Break Free (manufactured in Japan)
   * PCB label Mego 79 rev F
   * NEC uCOM-43 MCU, label D553C 049
   * cyan VFD display Futaba DM-4.5 91
@@ -2179,7 +2194,8 @@ void tccombat_state::tccombat(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(300, 1080);
-	screen.set_visarea(0, 300-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2342,8 +2358,10 @@ void tmtennis_state::tmtennis(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 417);
-	screen.set_visarea(0, 1920-1, 0, 417-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_tmtennis);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2461,7 +2479,8 @@ void tmpacman_state::tmpacman(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 508);
-	screen.set_visarea(0, 1920-1, 0, 508-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2574,7 +2593,8 @@ void tmscramb_state::tmscramb(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 556);
-	screen.set_visarea(0, 1920-1, 0, 556-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2683,7 +2703,8 @@ void tcaveman_state::tcaveman(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 559);
-	screen.set_visarea(0, 1920-1, 0, 559-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2826,7 +2847,8 @@ void alnchase_state::alnchase(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(365, 1080);
-	screen.set_visarea(0, 365-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -2876,7 +2898,7 @@ CONS( 1982, edracula, 0,        0, edracula, edracula, edracula_state, empty_ini
 
 CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, empty_init, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  mvbfree_state,  empty_init, "Mego", "Mini-Vid Break Free", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  mvbfree_state,  empty_init, "Mego", "Mini-Vid: Break Free", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, grobot9,  0,        0, grobot9,  grobot9,  grobot9_state,  empty_init, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 

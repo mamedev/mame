@@ -787,7 +787,7 @@ void xbox_base_state::machine_start()
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("xbox", CMDFLAG_NONE, 0, 1, 4, std::bind(&xbox_base_state::xbox_debug_commands, this, _1, _2));
 	}
-	subdevice<xbox_eeprom_device>("pci:01.1:54")->hack_eeprom =
+	subdevice<xbox_eeprom_device>("pci:01.1:154")->hack_eeprom =
 		[&](void)
 	{
 		hack_eeprom();
@@ -853,9 +853,9 @@ void xbox_base_state::xbox_base(machine_config &config)
 	NV2A_RAM(config,        ":pci:00.3", 0);
 	MCPX_ISALPC(config,     ":pci:01.0", 0, 0).interrupt_output().set(FUNC(xbox_base_state::maincpu_interrupt));
 	MCPX_SMBUS(config,      ":pci:01.1", 0).interrupt_handler().set(FUNC(xbox_base_state::smbus_interrupt_changed));
-	XBOX_PIC16LC(config,    ":pci:01.1:10", 0);
-	XBOX_CX25871(config,    ":pci:01.1:45", 0);
-	XBOX_EEPROM(config,     ":pci:01.1:54", 0);
+	XBOX_PIC16LC(config,    ":pci:01.1:110", 0); // these 3 are on smbus number 1
+	XBOX_CX25871(config,    ":pci:01.1:145", 0);
+	XBOX_EEPROM(config,     ":pci:01.1:154", 0);
 	MCPX_OHCI(config,       ":pci:02.0", 0).interrupt_handler().set(FUNC(xbox_base_state::ohci_usb_interrupt_changed));
 	MCPX_OHCI(config,       ":pci:03.0", 0);
 	MCPX_ETH(config,        ":pci:04.0", 0);

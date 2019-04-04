@@ -287,25 +287,26 @@ INTERRUPT_GEN_MEMBER(homez80_state::homez80_interrupt)
 	m_irq ^= 1;
 }
 
-MACHINE_CONFIG_START(homez80_state::homez80)
+void homez80_state::homez80(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(8'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(homez80_mem)
-	MCFG_DEVICE_IO_MAP(homez80_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(homez80_state, homez80_interrupt,  50)
+	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &homez80_state::homez80_mem);
+	m_maincpu->set_addrmap(AS_IO, &homez80_state::homez80_io);
+	m_maincpu->set_periodic_int(FUNC(homez80_state::homez80_interrupt), attotime::from_hz(50));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(homez80_state, screen_update)
-	MCFG_SCREEN_SIZE(344, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 344-1, 0, 32*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(homez80_state::screen_update));
+	screen.set_size(344, 32*8);
+	screen.set_visarea(0, 344-1, 0, 32*8-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_homez80);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( homez80 )

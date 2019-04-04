@@ -214,11 +214,12 @@ void comquest_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(comquest_state::comquest)
+void comquest_state::comquest(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6805, 4000000)     /* 4000000? */
-	/*MCFG_DEVICE_ADD("maincpu", HD63705, 4000000)    instruction set looks like m6805/m6808 */
-	/*MCFG_DEVICE_ADD("maincpu", M68705, 4000000) instruction set looks like m6805/m6808 */
+	M6805(config, m_maincpu, 4000000);     /* 4000000? */
+	/* HD63705(config, m_maincpu, 4000000);    instruction set looks like m6805/m6808 */
+	/* M68705(config, m_maincpu, 4000000); instruction set looks like m6805/m6808 */
 
 /*
     8 bit bus, integrated io, serial io?,
@@ -244,25 +245,25 @@ MACHINE_CONFIG_START(comquest_state::comquest)
     not epson e0c88
 */
 
-	MCFG_DEVICE_PROGRAM_MAP(comquest_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &comquest_state::comquest_mem);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(64*4, 128) /* 160 x 102 */
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*4-1, 0, 128-1)
-	MCFG_SCREEN_UPDATE_DRIVER(comquest_state, screen_update_comquest)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(30);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*4, 128); /* 160 x 102 */
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(comquest_state::screen_update_comquest));
+	screen.set_palette("palette");
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_comquest );
+	GFXDECODE(config, "gfxdecode", "palette", gfx_comquest);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 
 	/* sound hardware */
 	/* unknown ? */
-MACHINE_CONFIG_END
+}
 
 ROM_START(comquest)
 //  ROM_REGION(0x10000,"maincpu",0)

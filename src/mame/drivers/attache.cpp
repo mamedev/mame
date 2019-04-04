@@ -771,12 +771,12 @@ WRITE8_MEMBER(attache_state::memmap_w)
 
 READ8_MEMBER(attache_state::dma_mask_r)
 {
-	return m_dma->read(space,0x0f);
+	return m_dma->read(0x0f);
 }
 
 WRITE8_MEMBER(attache_state::dma_mask_w)
 {
-	m_dma->write(space,0x0f,data);
+	m_dma->write(0x0f,data);
 }
 
 READ8_MEMBER(attache_state::fdc_dma_r)

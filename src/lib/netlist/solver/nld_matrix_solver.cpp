@@ -19,7 +19,7 @@ namespace devices
 		: m_railstart(0)
 		, m_last_V(0.0)
 		, m_DD_n_m_1(0.0)
-		, m_h_n_m_1(1e-9)
+		, m_h_n_m_1(1e-12)
 	{
 	}
 

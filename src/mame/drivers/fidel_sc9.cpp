@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:Berger,yoyo_chessboard
+// thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
 *
 * fidel_sc9.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
@@ -292,4 +292,4 @@ ROM_END
 CONS( 1982, fscc9,   0,       0, sc9d,      sc9,       sc9_state,  empty_init, "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // aka version "B"
 CONS( 1982, fscc9b,  fscc9,   0, sc9b,      sc9,       sc9_state,  empty_init, "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1982, fscc9c,  fscc9,   0, sc9b,      sc9c,      sc9c_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, fscc9ps, fscc9,   0, playmatic, playmatic, sc9_state,  empty_init, "Fidelity Deutschland", "Sensory 9 Playmatic 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, fscc9ps, fscc9,   0, playmatic, playmatic, sc9_state,  empty_init, "Fidelity Deutschland", "Sensory 9 Playmatic S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

@@ -211,6 +211,7 @@
 #include "merlin.lh" // clickable
 #include "mmerlin.lh" // clickable
 #include "monkeysee.lh"
+#include "phpball.lh"
 #include "quizwizc.lh"
 #include "raisedvl.lh"
 #include "simon.lh" // clickable
@@ -227,9 +228,9 @@
 #include "tcfballa.lh"
 #include "timaze.lh"
 #include "xl25.lh" // clickable
-#include "zodiac.lh"
+#include "zodiac.lh" // clickable
 
-#include "hh_tms1k_test.lh" // common test-layout - use external artwork
+//#include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
 
 // machine_start/reset
@@ -391,6 +392,23 @@ u8 hh_tms1k_state::read_rotated_inputs(int columns, u8 rowmask)
 			ret |= 1 << i;
 
 	return ret;
+}
+
+void hh_tms1k_state::switch_change(int sel, u32 mask, bool next)
+{
+	// config switches (for direct control)
+	ioport_field *inp = m_inp_matrix[sel]->field(mask);
+
+	if (next && inp->has_next_setting())
+		inp->select_next_setting();
+	else if (!next && inp->has_previous_setting())
+		inp->select_previous_setting();
+}
+
+INPUT_CHANGED_MEMBER(hh_tms1k_state::reset_button)
+{
+	// when an input is directly wired to MCU INIT pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
@@ -798,41 +816,13 @@ static INPUT_PORTS_START( mathmagi )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-// output PLA is not decapped
+// output PLA is not decapped, this was made by hand
 static const u16 mathmagi_output_pla[0x20] =
 {
-	lA+lB+lC+lD+lE+lF,      // 0
-	lB+lC,                  // 1
-	lA+lB+lG+lE+lD,         // 2
-	lA+lB+lG+lC+lD,         // 3
-	lF+lB+lG+lC,            // 4
-	lA+lF+lG+lC+lD,         // 5
-	lA+lF+lG+lC+lD+lE,      // 6
-	lA+lB+lC,               // 7
-	lA+lB+lC+lD+lE+lF+lG,   // 8
-	lA+lB+lG+lF+lC+lD,      // 9
-	lA+lB+lG+lE,            // question mark
-	lE+lG,                  // r
-	lD,                     // underscore?
-	lA+lF+lG+lE+lD,         // E
-	lG,                     // -
-	0,                      // empty
-	0,                      // empty
-	lG,                     // lamp 4 or MATH -
-	lD,                     // lamp 3
-	lF+lE+lD+lC+lG,         // b
-	lB,                     // lamp 2
-	lB+lG,                  // MATH +
-	lB+lC,                  // MATH mul
-	lF+lG+lB+lC+lD,         // y
-	lA,                     // lamp 1
-	lA+lG,                  // MATH div
-	lA+lD,                  // EQUALS
-	0,                      // ?
-	0,                      // ?
-	lE+lD+lC+lG,            // o
-	0,                      // ?
-	lA+lF+lE+lD+lC          // G
+	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, // 0, 1, 2, 3, 4, 5, 6, 7
+	0x7f, 0x6f, 0x53, 0x50, 0x08, 0x79, 0x40, 0x00, // 8, 9, questionmark, r, underscore?, E, -(negative), empty
+	0x00, 0x40, 0x08, 0x7c, 0x02, 0x42, 0x06, 0x6e, // empty, led4/-, led3, b, led2, +, ×, y
+	0x01, 0x41, 0x09, 0,    0,    0x5c, 0,    0x3d  // led1, ÷, =, ?, ?, o, ?, G
 };
 
 void mathmagi_state::mathmagi(machine_config &config)
@@ -1175,7 +1165,7 @@ WRITE16_MEMBER(zodiac_state::write_r)
 WRITE16_MEMBER(zodiac_state::write_o)
 {
 	// O0-O7: digit segment/led data
-	m_o = data;
+	m_o = bitswap<8>(data,0,7,6,5,4,3,2,1);
 	prepare_display();
 }
 
@@ -1234,7 +1224,7 @@ static INPUT_PORTS_START( zodiac )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter") PORT_CHAR(13)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("Clear") PORT_CHAR(8)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("Clear") PORT_CHAR(8)
 
 	PORT_START("IN.5") // R8
 	PORT_CONFNAME( 0x03, 0x01, "Mode")
@@ -1244,41 +1234,11 @@ static INPUT_PORTS_START( zodiac )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-// output PLA is not decapped
+// output PLA is not decapped, dumped electronically
 static const u16 zodiac_output_pla[0x20] =
 {
-	0x80,                   // empty/led 1/7
-	lC,                     // i/led 2/8
-	lE+lG,                  // r/led 3/9
-	lC+lE+lG,               // n
-	lF,                     // seg F/led 4/10
-	0,                      // ?
-	0,                      // ?
-	lC+lE+lF+lG,            // h
-	lB,                     // seg B/led 5/11
-	lD,                     // seg D/led 6/12
-	0,                      // ?
-	0,                      // ?
-	0,                      // ?
-	0,                      // ?
-	lA+lB+lE+lF+lG,         // P
-	0,                      // ?
-	lA+lB+lC+lD+lE+lF,      // 0
-	lB+lC,                  // 1
-	lA+lB+lD+lE+lG,         // 2
-	lA+lB+lC+lD+lG,         // 3
-	lB+lC+lF+lG,            // 4
-	lA+lC+lD+lF+lG,         // 5
-	lA+lC+lD+lE+lF+lG,      // 6
-	lA+lB+lC,               // 7
-	lA+lB+lC+lD+lE+lF+lG,   // 8
-	lA+lB+lC+lD+lF+lG,      // 9
-	lA+lB+lC+lE+lF+lG,      // A
-	lB+lC+lD+lE+lG,         // d
-	lA+lD+lE+lF+lG,         // E
-	lB+lC+lD+lE,            // J
-	lD+lE+lF,               // L
-	lB+lC+lD+lE+lF          // U
+	0x01, 0x08, 0xa0, 0xa8, 0x40, 0x48, 0xe0, 0xe8, 0x06, 0x10, 0xa6, 0xb0, 0x46, 0x50, 0xe6, 0xf0,
+	0x7e, 0x0c, 0xb6, 0x9e, 0xcc, 0xda, 0xfa, 0x0e, 0xfe, 0xce, 0xee, 0xbc, 0xf2, 0x3c, 0x70, 0x7c
 };
 
 void zodiac_state::zodiac(machine_config &config)
@@ -2906,7 +2866,7 @@ static const u16 cnfball2_output_pla[0x20] =
 	// first half was dumped electronically
 	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x40, 0x01, 0x08, 0x02, 0x04, 0x00,
 
-	// rest is unknown
+	// rest is unused, game only outputs with status bit clear
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0
 };
@@ -2972,8 +2932,6 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	void eleciq(machine_config &config);
 };
 
@@ -3056,14 +3014,8 @@ static INPUT_PORTS_START( eleciq )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, eleciq_state, reset_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, reset_button, nullptr)
 INPUT_PORTS_END
-
-INPUT_CHANGED_MEMBER(eleciq_state::reset_button)
-{
-	// reset button is directly wired to TMS1000 INIT pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
 
 void eleciq_state::eleciq(machine_config &config)
 {
@@ -3902,7 +3854,8 @@ void einvader_state::einvader(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(939, 1080);
-	screen.set_visarea(0, 939-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_einvader);
 
@@ -4374,8 +4327,6 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	void f2pbball(machine_config &config);
 };
 
@@ -4438,14 +4389,8 @@ static INPUT_PORTS_START( f2pbball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("P2 Fast")
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, f2pbball_state, reset_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, reset_button, nullptr)
 INPUT_PORTS_END
-
-INPUT_CHANGED_MEMBER(f2pbball_state::reset_button)
-{
-	// reset button is directly wired to TMS1000 INIT pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
 
 void f2pbball_state::f2pbball(machine_config &config)
 {
@@ -4728,7 +4673,7 @@ static INPUT_PORTS_START( gpoker )
 
 	PORT_START("IN.3") // R3
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CODE(KEYCODE_D) PORT_NAME("9/Deal") // DL, shares pad with 9
+	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // 9/DL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear Entry") // CE
 
@@ -4746,6 +4691,10 @@ static INPUT_PORTS_START( gpoker )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Total") // T
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Bet") // BT
+
+	PORT_START("FAKE") // 9/DL are electronically the same button
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Deal") // DL
 INPUT_PORTS_END
 
 void gpoker_state::gpoker(machine_config &config)
@@ -4827,7 +4776,7 @@ WRITE16_MEMBER(gjackpot_state::write_r)
                           DB]    SP]
     [1]    [2]    [3]    [DS]   [DR]
                           BT]    HT]
-    [10/1] [T]    [MD    [CH    [AC]
+    [10/0] [T]    [MD    [CH    [AC]
                    GO]    ST]
 */
 
@@ -5003,7 +4952,8 @@ void ginv1000_state::ginv1000(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(226, 1080);
-	screen.set_visarea(0, 226-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -5154,7 +5104,8 @@ void ginv2000_state::ginv2000(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(364, 1080);
-	screen.set_visarea(0, 364-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -5890,23 +5841,13 @@ static INPUT_PORTS_START( elecbowl )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) // 2 players sw?
 INPUT_PORTS_END
 
-// output PLA is not decapped
+// output PLA is not decapped, this was made by hand
 static const u16 elecbowl_output_pla[0x20] =
 {
-	lA+lB+lC+lD+lE+lF,      // 0
-	lB+lC,                  // 1
-	lA+lB+lG+lE+lD,         // 2
-	lA+lB+lG+lC+lD,         // 3
-	lF+lB+lG+lC,            // 4
-	lA+lF+lG+lC+lD,         // 5
-	lA+lF+lG+lC+lD+lE,      // 6
-	lA+lB+lC,               // 7
-	lA+lB+lC+lD+lE+lF+lG,   // 8
-	lA+lB+lG+lF+lC+lD,      // 9
-
-	0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
-	0,1,2,3,4,5,6,7,        // lamp muxes select
-	0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f
+	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, // 0-9
+	0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, // ?
+	0, 1, 2, 3, 4, 5, 6, 7, // lamp muxes select
+	0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f // ?
 };
 
 void elecbowl_state::elecbowl(machine_config &config)
@@ -6001,9 +5942,9 @@ WRITE16_MEMBER(horseran_state::write_r)
 	// R0: HLCD0569 clock
 	// R1: HLCD0569 data in
 	// R2: HLCD0569 _CS
-	m_lcd->write_cs(data >> 2 & 1);
-	m_lcd->write_data(data >> 1 & 1);
-	m_lcd->write_clock(data & 1);
+	m_lcd->cs_w(data >> 2 & 1);
+	m_lcd->data_w(data >> 1 & 1);
+	m_lcd->clock_w(data & 1);
 
 	// R3-R10: input mux
 	m_inp_mux = data >> 3 & 0xff;
@@ -6794,6 +6735,12 @@ static INPUT_PORTS_START( simon )
 	PORT_CONFSETTING(    0x04, "2" )
 	PORT_CONFSETTING(    0x08, "3" )
 	PORT_CONFSETTING(    0x01, "4" )
+
+	PORT_START("SWITCH") // fake
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<0>, 0x07)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<0>, 0x07)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<3>, 0x0f)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<3>, 0x0f)
 INPUT_PORTS_END
 
 void simon_state::simon(machine_config &config)
@@ -6952,6 +6899,14 @@ static INPUT_PORTS_START( ssimon )
 	PORT_CONFSETTING(    0x00, "Simple" )
 	PORT_CONFSETTING(    0x01, "Normal" )
 	PORT_CONFSETTING(    0x02, "Super" )
+
+	PORT_START("SWITCH") // fake
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<0>, 0x0f)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<0>, 0x0f)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<4>, 0x0f)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<4>, 0x0f)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<6>, 0x03)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<6>, 0x03)
 INPUT_PORTS_END
 
 void ssimon_state::ssimon(machine_config &config)
@@ -8443,8 +8398,6 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	TIMER_DEVICE_CALLBACK_MEMBER(show_arm_position);
-
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -8452,13 +8405,6 @@ public:
 };
 
 // handlers
-
-TIMER_DEVICE_CALLBACK_MEMBER(alphie_state::show_arm_position)
-{
-	// arm position 1(up) to 5(down)
-	output().set_value("q_pos", 32 - count_leading_zeros(m_inp_matrix[1]->read()));
-	output().set_value("a_pos", 32 - count_leading_zeros(m_inp_matrix[2]->read()));
-}
 
 WRITE16_MEMBER(alphie_state::write_r)
 {
@@ -8489,17 +8435,25 @@ READ8_MEMBER(alphie_state::read_k)
 
 // config
 
-static const ioport_value alphie_armpos_table[5] = { 0x01, 0x02, 0x04, 0x08, 0x10 };
-
 static INPUT_PORTS_START( alphie )
 	PORT_START("IN.0") // K1
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 
 	PORT_START("IN.1") // K2
-	PORT_BIT( 0x1f, 0x00, IPT_POSITIONAL_V ) PORT_PLAYER(2) PORT_POSITIONS(5) PORT_REMAP_TABLE(alphie_armpos_table) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Question Arm")
+	PORT_CONFNAME( 0x1f, 0x01, "Question" )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x04, "3" )
+	PORT_CONFSETTING(    0x08, "4" )
+	PORT_CONFSETTING(    0x10, "5" )
 
 	PORT_START("IN.2") // K4
-	PORT_BIT( 0x1f, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(5) PORT_REMAP_TABLE(alphie_armpos_table) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Answer Arm")
+	PORT_CONFNAME( 0x1f, 0x01, "Answer" )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x04, "3" )
+	PORT_CONFSETTING(    0x08, "4" )
+	PORT_CONFSETTING(    0x10, "5" )
 
 	PORT_START("IN.3") // K8
 	PORT_CONFNAME( 0x0f, 0x01, "Activity" )
@@ -8507,6 +8461,14 @@ static INPUT_PORTS_START( alphie )
 	PORT_CONFSETTING(    0x02, "Lunar Landing" )
 	PORT_CONFSETTING(    0x04, "Robot Land" )
 	PORT_CONFSETTING(    0x08, "Tunes" )
+
+	PORT_START("SWITCH") // fake
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<1>, 0x1f) PORT_NAME("Question Arm Up")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<1>, 0x1f) PORT_NAME("Question Arm Down")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<2>, 0x1f) PORT_NAME("Answer Arm Up")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<2>, 0x1f) PORT_NAME("Answer Arm Down")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<3>, 0x0f) PORT_NAME("Activity Selector Left")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<3>, 0x0f) PORT_NAME("Activity Selector Right")
 INPUT_PORTS_END
 
 // output PLA is guessed
@@ -8525,7 +8487,6 @@ void alphie_state::alphie(machine_config &config)
 	m_maincpu->r().set(FUNC(alphie_state::write_r));
 	m_maincpu->o().set(FUNC(alphie_state::write_o));
 
-	TIMER(config, "arm_position").configure_periodic(FUNC(alphie_state::show_arm_position), attotime::from_msec(50));
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_alphie);
 
@@ -8879,7 +8840,7 @@ static INPUT_PORTS_START( tandy12 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Button 5")
 INPUT_PORTS_END
 
-// output PLA is not decapped
+// output PLA is not decapped, this was made by hand
 static const u16 tandy12_output_pla[0x20] =
 {
 	// these are certain
@@ -10033,7 +9994,7 @@ void phpball_state::phpball(machine_config &config)
 	m_maincpu->o().set(FUNC(phpball_state::write_o));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_hh_tms1k_test);
+	config.set_default_layout(layout_phpball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -10396,7 +10357,7 @@ COMP( 1980, mathmagi,   0,         0, mathmagi,  mathmagi,  mathmagi_state,  emp
 CONS( 1979, bcheetah,   0,         0, bcheetah,  bcheetah,  bcheetah_state,  empty_init, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
 
 CONS( 1978, amaztron,   0,         0, amaztron,  amaztron,  amaztron_state,  empty_init, "Coleco", "Amaze-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
-COMP( 1979, zodiac,     0,         0, zodiac,    zodiac,    zodiac_state,    empty_init, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, zodiac,     0,         0, zodiac,    zodiac,    zodiac_state,    empty_init, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1978, cqback,     0,         0, cqback,    cqback,    cqback_state,    empty_init, "Coleco", "Electronic Quarterback", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, h2hfootb,   0,         0, h2hfootb,  h2hfootb,  h2hfootb_state,  empty_init, "Coleco", "Head to Head: Electronic Football", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, h2hbaskb,   0,         0, h2hbaskb,  h2hbaskb,  h2hbaskb_state,  empty_init, "Coleco", "Head to Head: Electronic Basketball (TMS1000 version)", MACHINE_SUPPORTS_SAVE )

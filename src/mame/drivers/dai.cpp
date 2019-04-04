@@ -187,12 +187,13 @@ static GFXDECODE_START( gfx_dai )
 GFXDECODE_END
 
 /* machine definition */
-MACHINE_CONFIG_START(dai_state::dai)
+void dai_state::dai(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(dai_mem)
-	MCFG_DEVICE_IO_MAP(dai_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(dai_state,int_ack)
+	I8080(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dai_state::dai_mem);
+	m_maincpu->set_addrmap(AS_IO, &dai_state::dai_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(dai_state::int_ack));
 	config.m_minimum_quantum = attotime::from_hz(60);
 
 	PIT8253(config, m_pit, 0);
@@ -206,13 +207,13 @@ MACHINE_CONFIG_START(dai_state::dai)
 	I8255(config, "ppi8255");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1056, 542)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1056-1, 0, 302-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dai_state, screen_update_dai)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(1056, 542);
+	screen.set_visarea(0, 1056-1, 0, 302-1);
+	screen.set_screen_update(FUNC(dai_state::screen_update_dai));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_dai);
 	PALETTE(config, m_palette, FUNC(dai_state::dai_palette), ARRAY_LENGTH(s_palette));
@@ -241,7 +242,7 @@ MACHINE_CONFIG_START(dai_state::dai)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_list").set_original("dai_cass");
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(dai)

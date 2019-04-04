@@ -16,8 +16,8 @@ public:
 	void set_day1(int day) { m_day1 = day; }
 	void set_mode_and_day(int mode, int day) { m_mode24 = mode; m_day1 = day; }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(rtc_increment_cb);
 	TIMER_CALLBACK_MEMBER(rtc_interrupt_cb);

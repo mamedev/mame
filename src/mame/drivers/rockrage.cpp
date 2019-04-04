@@ -81,7 +81,7 @@ WRITE8_MEMBER(rockrage_state::rockrage_bankswitch_w)
 
 WRITE8_MEMBER(rockrage_state::rockrage_sh_irqtrigger_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 

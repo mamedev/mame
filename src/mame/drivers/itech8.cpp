@@ -814,7 +814,7 @@ WRITE8_MEMBER(itech8_state::gtg2_sound_data_w)
 			((data & 0x5d) << 1) |
 			((data & 0x20) >> 3) |
 			((data & 0x02) << 5);
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 }
 
 

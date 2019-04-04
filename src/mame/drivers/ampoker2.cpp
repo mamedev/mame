@@ -1166,28 +1166,28 @@ GFXDECODE_END
 *     Machine Driver     *
 *************************/
 
-MACHINE_CONFIG_START(ampoker2_state::ampoker2)
-
+void ampoker2_state::ampoker2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/2)        /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(program_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(ampoker2_state, nmi_line_pulse, 1536)
+	Z80(config, m_maincpu, MASTER_CLOCK/2);        /* 3 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ampoker2_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &ampoker2_state::io_map);
+	m_maincpu->set_periodic_int(FUNC(ampoker2_state::nmi_line_pulse), attotime::from_hz(1536));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(200));   /* 200 ms, measured */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
 	/*  if VBLANK is used, the watchdog timer stop to work.
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	*/
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(20*8, 56*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ampoker2_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(20*8, 56*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(ampoker2_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_ampoker2);
 	PALETTE(config, "palette", FUNC(ampoker2_state::ampoker2_palette), 512);
@@ -1195,15 +1195,16 @@ MACHINE_CONFIG_START(ampoker2_state::ampoker2)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, "aysnd", MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);  /* 1.5 MHz, measured */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ampoker2_state::sigma2k)
+void ampoker2_state::sigma2k(machine_config &config)
+{
 	ampoker2(config);
 
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_sigma2k);
 	MCFG_VIDEO_START_OVERRIDE(ampoker2_state, sigma2k)
-MACHINE_CONFIG_END
+}
 
 
 /*************************

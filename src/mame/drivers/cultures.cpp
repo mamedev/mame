@@ -404,37 +404,35 @@ void cultures_state::machine_reset()
 
 
 
-MACHINE_CONFIG_START(cultures_state::cultures)
-
+void cultures_state::cultures(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(cultures_map)
-	MCFG_DEVICE_IO_MAP(cultures_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cultures_state,  cultures_interrupt)
+	Z80(config, m_maincpu, MCLK/2); /* 8.000 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cultures_state::cultures_map);
+	m_maincpu->set_addrmap(AS_IO, &cultures_state::cultures_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cultures_state::cultures_interrupt));
 
 	ADDRESS_MAP_BANK(config, "vrambank").set_map(&cultures_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 15, 0x4000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cultures_state, screen_update_cultures)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(cultures_state::screen_update_cultures));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_cultures);
-	MCFG_PALETTE_ADD("palette", 0x3000/2)
-	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
+	PALETTE(config, "palette").set_format(palette_device::xRGBRRRRGGGGBBBB_bit0, 0x3000/2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, MCLK/8, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", MCLK/8, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 0.30);
+	oki.set_addrmap(0, &cultures_state::oki_map);
+}
 
 /*
 

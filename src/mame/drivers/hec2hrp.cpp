@@ -110,7 +110,7 @@ void hec2hrp_state::hecdisc2_io(address_map &map)
 	map(0x050, 0x05f).rw(FUNC(hec2hrp_state::disc2_io50_port_r), FUNC(hec2hrp_state::disc2_io50_port_w));
 	// uPD765 link
 	map(0x060, 0x061).m(m_upd_fdc, FUNC(upd765a_device::map));
-	map(0x070, 0x07f).rw(m_upd_fdc, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
+	map(0x070, 0x070).mirror(0x00f).rw(m_upd_fdc, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
 }
 
 void hec2hrp_state::hec2hrp_mem(address_map &map)
@@ -394,23 +394,25 @@ static void minidisc_floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(hec2hrp_state::hec2hr)
-	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(hec2hrp_mem)
-	MCFG_DEVICE_IO_MAP(hec2hrp_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) /*  put on the Z80 irq in Hz*/
+void hec2hrp_state::hec2hr(machine_config &config)
+{
+	Z80(config, m_maincpu, 5_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hec2hrp_state::hec2hrp_mem);
+	m_maincpu->set_addrmap(AS_IO, &hec2hrp_state::hec2hrp_io);
+	m_maincpu->set_periodic_int(FUNC(hec2hrp_state::irq0_line_hold), attotime::from_hz(50)); /*  put on the Z80 irq in Hz*/
+
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrp)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
-	MCFG_SCREEN_SIZE(512, 230)
-	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
-	MCFG_SCREEN_UPDATE_DRIVER(hec2hrp_state, screen_update_hec2hrp)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(400)); /* 2500 not accurate */
+	screen.set_size(512, 230);
+	screen.set_visarea(0, 243, 0, 227);
+	screen.set_screen_update(FUNC(hec2hrp_state::screen_update_hec2hrp));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, m_palette).set_entries(16);
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	hector_audio(config);
@@ -420,25 +422,27 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hr)
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	PRINTER(config, m_printer, 0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hec2hrp_state::hec2hrp)
-	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(hec2hrp_mem)
-	MCFG_DEVICE_IO_MAP(hec2hrp_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) /*  put on the Z80 irq in Hz*/
+void hec2hrp_state::hec2hrp(machine_config &config)
+{
+	Z80(config, m_maincpu, 5_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hec2hrp_state::hec2hrp_mem);
+	m_maincpu->set_addrmap(AS_IO, &hec2hrp_state::hec2hrp_io);
+	m_maincpu->set_periodic_int(FUNC(hec2hrp_state::irq0_line_hold), attotime::from_hz(50)); /*  put on the Z80 irq in Hz*/
+
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrp)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
-	MCFG_SCREEN_SIZE(512, 230)
-	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
-	MCFG_SCREEN_UPDATE_DRIVER(hec2hrp_state, screen_update_hec2hrp)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(400)); /* 2500 not accurate */
+	screen.set_size(512, 230);
+	screen.set_visarea(0, 243, 0, 227);
+	screen.set_screen_update(FUNC(hec2hrp_state::screen_update_hec2hrp));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, m_palette).set_entries(16);
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	hector_audio(config);
@@ -448,39 +452,43 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hrp)
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	PRINTER(config, m_printer, 0);
-MACHINE_CONFIG_END
+}
 
 static void hector_floppies(device_slot_interface &device)
 {
 	device.option_add("525hd", FLOPPY_525_HD);
 }
 
-MACHINE_CONFIG_START(hec2hrp_state::hec2mx40)
-	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
-	MCFG_DEVICE_IO_MAP(hec2mx40_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
+void hec2hrp_state::hec2mx40(machine_config &config)
+{
+	Z80(config, m_maincpu, 5_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hec2hrp_state::hec2hrx_mem);
+	m_maincpu->set_addrmap(AS_IO, &hec2hrp_state::hec2mx40_io);
+	m_maincpu->set_periodic_int(FUNC(hec2hrp_state::irq0_line_hold), attotime::from_hz(50)); /*  put on the Z80 irq in Hz*/
 
-	MCFG_DEVICE_ADD("disc2cpu", Z80, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(hecdisc2_mem)
-	MCFG_DEVICE_IO_MAP(hecdisc2_io)
+	Z80(config, m_disc2cpu, 4_MHz_XTAL);
+	m_disc2cpu->set_addrmap(AS_PROGRAM, &hec2hrp_state::hecdisc2_mem);
+	m_disc2cpu->set_addrmap(AS_IO, &hec2hrp_state::hecdisc2_io);
+
 	UPD765A(config, m_upd_fdc, 8'000'000, false, true);
 	m_upd_fdc->intrq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_interrupt));
 	m_upd_fdc->drq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_dma_irq));
+
 	FLOPPY_CONNECTOR(config, m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_floppy_formats);
+
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
-	MCFG_SCREEN_SIZE(512, 230)
-	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
-	MCFG_SCREEN_UPDATE_DRIVER(hec2hrp_state, screen_update_hec2hrp)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(400)); /* 2500 not accurate */
+	screen.set_size(512, 230);
+	screen.set_visarea(0, 243, 0, 227);
+	screen.set_screen_update(FUNC(hec2hrp_state::screen_update_hec2hrp));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, m_palette).set_entries(16);
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	hector_audio(config);
@@ -490,35 +498,39 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mx40)
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	PRINTER(config, m_printer, 0);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(hec2hrp_state::hec2hrx)
-	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
-	MCFG_DEVICE_IO_MAP(hec2hrx_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
+void hec2hrp_state::hec2hrx(machine_config &config)
+{
+	Z80(config, m_maincpu, 5_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hec2hrp_state::hec2hrx_mem);
+	m_maincpu->set_addrmap(AS_IO, &hec2hrp_state::hec2hrx_io);
+	m_maincpu->set_periodic_int(FUNC(hec2hrp_state::irq0_line_hold), attotime::from_hz(50)); /*  put on the Z80 irq in Hz*/
+
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
 
-	MCFG_DEVICE_ADD("disc2cpu", Z80, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(hecdisc2_mem)
-	MCFG_DEVICE_IO_MAP(hecdisc2_io)
+	Z80(config, m_disc2cpu, 4_MHz_XTAL);
+	m_disc2cpu->set_addrmap(AS_PROGRAM, &hec2hrp_state::hecdisc2_mem);
+	m_disc2cpu->set_addrmap(AS_IO, &hec2hrp_state::hecdisc2_io);
+
 	UPD765A(config, m_upd_fdc, 8'000'000, false, true);
 	m_upd_fdc->intrq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_interrupt));
 	m_upd_fdc->drq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_dma_irq));
+
 	FLOPPY_CONNECTOR(config, m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_floppy_formats);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
-	MCFG_SCREEN_SIZE(512, 230)
-	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
-	MCFG_SCREEN_UPDATE_DRIVER(hec2hrp_state, screen_update_hec2hrp)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(400)); /* 2500 not accurate */
+	screen.set_size(512, 230);
+	screen.set_visarea(0, 243, 0, 227);
+	screen.set_screen_update(FUNC(hec2hrp_state::screen_update_hec2hrp));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, m_palette).set_entries(16);
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	hector_audio(config);
@@ -528,13 +540,15 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hrx)
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	PRINTER(config, m_printer, 0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hec2hrp_state::hec2mdhrx)
-	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
-	MCFG_DEVICE_IO_MAP(hec2mdhrx_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
+void hec2hrp_state::hec2mdhrx(machine_config &config)
+{
+	Z80(config, m_maincpu, 5_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hec2hrp_state::hec2hrx_mem);
+	m_maincpu->set_addrmap(AS_IO, &hec2hrp_state::hec2mdhrx_io);
+	m_maincpu->set_periodic_int(FUNC(hec2hrp_state::irq0_line_hold), attotime::from_hz(50)); /*  put on the Z80 irq in Hz*/
+
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2mdhrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2mdhrx)
 
@@ -542,16 +556,15 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mdhrx)
 	FD1793(config, m_minidisc_fdc, 1_MHz_XTAL);
 	FLOPPY_CONNECTOR(config, "wd179x:0", minidisc_floppies, "dd", hec2hrp_state::minidisc_formats);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
-	MCFG_SCREEN_SIZE(512, 230)
-	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
-	MCFG_SCREEN_UPDATE_DRIVER(hec2hrp_state, screen_update_hec2hrp)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(400)); /* 2500 not accurate */
+	screen.set_size(512, 230);
+	screen.set_visarea(0, 243, 0, 227);
+	screen.set_screen_update(FUNC(hec2hrp_state::screen_update_hec2hrp));
+	screen.set_palette(m_palette);
 
-	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, m_palette).set_entries(16);
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	hector_audio(config);
@@ -561,35 +574,39 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mdhrx)
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	PRINTER(config, m_printer, 0);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(hec2hrp_state::hec2mx80)
-	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
-	MCFG_DEVICE_IO_MAP(hec2mx80_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
+void hec2hrp_state::hec2mx80(machine_config &config)
+{
+	Z80(config, m_maincpu, 5_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hec2hrp_state::hec2hrx_mem);
+	m_maincpu->set_addrmap(AS_IO, &hec2hrp_state::hec2mx80_io);
+	m_maincpu->set_periodic_int(FUNC(hec2hrp_state::irq0_line_hold), attotime::from_hz(50)); /*  put on the Z80 irq in Hz*/
+
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
 
-	MCFG_DEVICE_ADD("disc2cpu", Z80, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(hecdisc2_mem)
-	MCFG_DEVICE_IO_MAP(hecdisc2_io)
+	Z80(config, m_disc2cpu, 4_MHz_XTAL);
+	m_disc2cpu->set_addrmap(AS_PROGRAM, &hec2hrp_state::hecdisc2_mem);
+	m_disc2cpu->set_addrmap(AS_IO, &hec2hrp_state::hecdisc2_io);
+
 	UPD765A(config, m_upd_fdc, 8'000'000, false, true);
 	m_upd_fdc->intrq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_interrupt));
 	m_upd_fdc->drq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_dma_irq));
+
 	FLOPPY_CONNECTOR(config, m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_floppy_formats);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
-	MCFG_SCREEN_SIZE(512, 230)
-	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
-	MCFG_SCREEN_UPDATE_DRIVER(hec2hrp_state, screen_update_hec2hrp)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(400)); /* 2500 not accurate */
+	screen.set_size(512, 230);
+	screen.set_visarea(0, 243, 0, 227);
+	screen.set_screen_update(FUNC(hec2hrp_state::screen_update_hec2hrp));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, m_palette).set_entries(16);
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	hector_audio(config);
@@ -599,7 +616,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mx80)
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	PRINTER(config, m_printer, 0);
-MACHINE_CONFIG_END
+}
 
 ROM_START( hec2hr )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )

@@ -381,7 +381,8 @@ void cz101_state::machine_reset()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START( cz101_state::cz101 )
+void cz101_state::cz101(machine_config &config)
+{
 	UPD7810(config, m_maincpu, 10_MHz_XTAL); // actually 7811, but internal ROM disabled
 	m_maincpu->set_addrmap(AS_PROGRAM, &cz101_state::maincpu_map);
 	m_maincpu->pa_in_cb().set(FUNC(cz101_state::port_a_r));
@@ -392,13 +393,13 @@ MACHINE_CONFIG_START( cz101_state::cz101 )
 	CLOCK(config, "midi_clock", 2_MHz_XTAL)/*.signal_handler().set(m_maincpu, FUNC(upd7810_device::sck_w))*/; // not supported yet
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(6*16+1, 19)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*16, 0, 19-1)
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(6*16+1, 19);
+	screen.set_visarea_full();
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(cz101_state::cz101_palette), 3);
 
@@ -407,7 +408,7 @@ MACHINE_CONFIG_START( cz101_state::cz101 )
 	m_hd44780->set_pixel_update_cb(FUNC(cz101_state::lcd_pixel_update), this);
 
 	config.set_default_layout(layout_cz101);
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

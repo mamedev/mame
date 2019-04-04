@@ -31,6 +31,10 @@ Sound: YM2203C
        MCM2018ANS45 (x2)
        HY6264P-15
 
+Actual Measured Clocks     Derived
+     Z180 - 6.14522MHz  (12.288000MHz/2)
+  YM2203C - 3.57543MHz  (14.318181MHz/4)
+
 Unknown 28 pin protection chip (possibly a PIC) at 5A (UC02 as silkscreened on PCB)
 
 ***************************************************************************/
@@ -280,7 +284,7 @@ void mosaic_state::machine_reset()
 void mosaic_state::mosaic(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'288'000)/2);  /* 6.144MHz */
+	Z180(config, m_maincpu, XTAL(12'288'000)/2);  /* 6.144MHz - Verified */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mosaic_state::mosaic_map);
 	m_maincpu->set_addrmap(AS_IO, &mosaic_state::mosaic_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mosaic_state::irq0_line_hold));
@@ -302,7 +306,7 @@ void mosaic_state::mosaic(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'288'000)/4)); /* 3.072MHz or 3.579545MHz (14.31818MHz/4)? */
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(14'318'181)/4)); /* 3.579545MHz - Verified */
 	ymsnd.port_a_read_callback().set_ioport("DSW");
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }

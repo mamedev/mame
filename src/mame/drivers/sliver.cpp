@@ -351,7 +351,7 @@ WRITE16_MEMBER(sliver_state::io_data_w)
 
 WRITE16_MEMBER(sliver_state::sound_w)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_audiocpu->set_input_line(MCS51_INT0_LINE, HOLD_LINE);
 }
 

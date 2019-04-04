@@ -352,26 +352,26 @@ void gcpinbal_state::machine_reset()
 	m_msm_bank = 0;
 }
 
-MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
-
+void gcpinbal_state::gcpinbal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(gcpinbal_map)
+	M68000(config, m_maincpu, 32_MHz_XTAL/2); /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gcpinbal_state::gcpinbal_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(gcpinbal_state::scanline_cb), "screen", 0, 1);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
+	MB3773(config, m_watchdog, 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */)
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gcpinbal_state, screen_update_gcpinbal)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */);
+	m_screen->set_size(40*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(gcpinbal_state::screen_update_gcpinbal));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gcpinbal);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
@@ -381,8 +381,7 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	OKIM6295(config, m_oki, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	ES8712(config, m_essnd, 0);
 	m_essnd->reset_handler().set_inputline("maincpu", 3);
@@ -393,7 +392,7 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 	msm.vck_legacy_callback().set("essnd", FUNC(es8712_device::msm_int));
 	msm.set_prescaler_selector(msm6585_device::S40); /* 16 kHz */
 	msm.add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 

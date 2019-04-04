@@ -37,8 +37,7 @@ uint32_t sshangha_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	const bool combine_tilemaps = (m_video_control&4) ? false : true;
 
 	// sprites are flipped relative to tilemaps
-	address_space &space = machine().dummy_space();
-	uint16_t flip = m_tilegen->pf_control_r(space, 0, 0xffff);
+	uint16_t flip = m_tilegen->pf_control_r(0);
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen1->set_flip_screen(!BIT(flip, 7));
 	m_sprgen2->set_flip_screen(!BIT(flip, 7));

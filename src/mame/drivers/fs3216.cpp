@@ -58,8 +58,8 @@ private:
 	u16 irq_r();
 	IRQ_CALLBACK_MEMBER(intack);
 
-	DECLARE_READ8_MEMBER(ctc_r);
-	DECLARE_WRITE8_MEMBER(ctc_w);
+	u8 ctc_r(offs_t offset);
+	void ctc_w(offs_t offset, u8 data);
 	u16 earom_recall_r();
 	u16 earom_store_r();
 
@@ -226,14 +226,14 @@ IRQ_CALLBACK_MEMBER(fs3216_state::intack)
 	return m_vecprom[irqline];
 }
 
-READ8_MEMBER(fs3216_state::ctc_r)
+u8 fs3216_state::ctc_r(offs_t offset)
 {
-	return m_ctc->read(space, offset >> 1);
+	return m_ctc->read(offset >> 1);
 }
 
-WRITE8_MEMBER(fs3216_state::ctc_w)
+void fs3216_state::ctc_w(offs_t offset, u8 data)
 {
-	m_ctc->write(space, offset >> 1, data);
+	m_ctc->write(offset >> 1, data);
 }
 
 u16 fs3216_state::earom_recall_r()

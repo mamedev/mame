@@ -47,7 +47,7 @@ void kingofb_state::scroll_interrupt_w(uint8_t data)
 
 void kingofb_state::sound_command_w(uint8_t data)
 {
-	m_soundlatch->write(machine().dummy_space(), 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 

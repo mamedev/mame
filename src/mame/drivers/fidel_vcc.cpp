@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco,hap
+// copyright-holders:Kevin Horton, Jonathan Gevaryahu, Sandro Ronco, hap
 /******************************************************************************
 *
 * fidel_vcc.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
@@ -151,7 +151,7 @@ void vcc_state::machine_start()
 {
 	fidelbase_state::machine_start();
 
-	// game relies on RAM initialized filled with 1
+	// game relies on RAM filled with FF at power-on
 	for (int i = 0; i < 0x400; i++)
 		m_maincpu->space(AS_PROGRAM).write_byte(i + 0x4000, 0xff);
 }
