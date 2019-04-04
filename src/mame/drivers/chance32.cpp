@@ -517,12 +517,12 @@ ROM_START( chance32 )
 	ROM_LOAD( "gal20v8a.u57.jed.bin", 0x0000, 0x157, CRC(787c4159) SHA1(f4a869b317c6be1024f1ca21bcc4af478c8227c8) )
 	ROM_LOAD( "gal20v8a.u58.jed.bin", 0x0000, 0x157, CRC(7b16053b) SHA1(cdb289d4f27c7a1a918393943bb8db9712e2f52e) )
 
-	ROM_LOAD( "gal16v8a.u47.jed.bin", 0x0000, 0x117, CRC(a733f0de) SHA1(6eec26043cedb3cae4efe93faa84a07327be468b) )
+	ROM_LOAD( "gal16v8a.u47.jed.bin", 0x0000, 0x117, NO_DUMP )
 	ROM_LOAD( "gal16v8a.u48.jed.bin", 0x0000, 0x117, CRC(5f1360ef) SHA1(56e4ee0dbae5602d810b2f7c744a71eb1a1e08a8) )
 
 	ROM_LOAD( "gal16v8a.u32.jed.bin", 0x0000, 0x117, CRC(c0784cd1) SHA1(0ae2ce482d379e29c2a9f130fc0d9ed928faef98) )
 
-	ROM_LOAD( "gal16v8a.u24.jed.bin", 0x0000, 0x117, CRC(a733f0de) SHA1(6eec26043cedb3cae4efe93faa84a07327be468b) )
+	ROM_LOAD( "gal16v8a.u24.jed.bin", 0x0000, 0x117, NO_DUMP )
 ROM_END
 
 
