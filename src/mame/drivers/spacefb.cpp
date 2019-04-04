@@ -147,7 +147,7 @@ TIMER_CALLBACK_MEMBER(spacefb_state::interrupt_callback)
 	/* compute vector and set the interrupt line */
 	int vpos = m_screen->vpos();
 	uint8_t vector = 0xc7 | ((vpos & 0x40) >> 2) | ((~vpos & 0x40) >> 3);
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, vector);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, vector); // Z80
 
 	/* set up for next interrupt */
 	if (vpos == SPACEFB_INT_TRIGGER_COUNT_1)

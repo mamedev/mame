@@ -148,6 +148,7 @@ tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag,
 {
 	memset(m_regs, 0, sizeof(m_regs));
 	memset(m_icr, 0, sizeof(m_icr));
+	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(tmp68301_device::internal_vectors_r), this);
 }
 
 
@@ -166,7 +167,6 @@ void tmp68301_device::device_start()
 	m_out_parallel_cb.resolve_safe();
 
 	m_program->install_device(0xfffc00, 0xffffff, *this, &tmp68301_device::tmp68301_regs);
-	m_int_ack_callback = device_irq_acknowledge_delegate(FUNC(tmp68301_device::irq_callback), this);
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_icr));
@@ -198,8 +198,15 @@ void tmp68301_device::device_reset()
 //  INLINE HELPERS
 //**************************************************************************
 
-IRQ_CALLBACK_MEMBER(tmp68301_device::irq_callback)
+void tmp68301_device::internal_vectors_r(address_map &map)
 {
+	map(0xfffff2, 0xffffff).r(FUNC(tmp68301_device::irq_callback));
+}
+
+
+u16 tmp68301_device::irq_callback(offs_t offset)
+{
+	int irqline = offset + 1;
 	uint8_t IVNR = m_regs[0x9a/2] & 0xe0;      // Interrupt Vector Number Register (IVNR)
 
 	for (int src : { 0, 7, 3, 1, 8, 4, 5, 9, 2 })

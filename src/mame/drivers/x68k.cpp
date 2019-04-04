@@ -314,7 +314,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::scc_ack)
 				m_mouse.irqactive = 1;
 				m_current_vector[5] = 0x54;
 				m_current_irq_line = 5;
-				m_maincpu->set_input_line_and_vector(5,ASSERT_LINE,0x54);
+				m_maincpu->set_input_line(5,ASSERT_LINE);
 			}
 		}
 	}
@@ -682,7 +682,7 @@ WRITE_LINE_MEMBER( x68k_state::fdc_irq )
 		m_ioc.irqstatus |= 0x80;
 		m_current_irq_line = 1;
 		LOGMASKED(LOG_FDC, "FDC: IRQ triggered\n");
-		m_maincpu->set_input_line_and_vector(1, ASSERT_LINE, m_current_vector[1]);
+		m_maincpu->set_input_line(1, ASSERT_LINE);
 	}
 	else
 		m_maincpu->set_input_line(1, CLEAR_LINE);
@@ -1003,7 +1003,7 @@ void x68k_state::dma_irq(int channel)
 	m_current_vector[3] = m_hd63450->get_vector(channel);
 	m_current_irq_line = 3;
 	LOGMASKED(LOG_SYS, "DMA#%i: DMA End (vector 0x%02x)\n",channel,m_current_vector[3]);
-	m_maincpu->set_input_line_and_vector(3,ASSERT_LINE,m_current_vector[3]);
+	m_maincpu->set_input_line(3,ASSERT_LINE);
 }
 
 WRITE8_MEMBER(x68k_state::dma_end)
@@ -1025,7 +1025,7 @@ WRITE8_MEMBER(x68k_state::dma_error)
 		m_current_vector[3] = m_hd63450->get_error_vector(offset);
 		m_current_irq_line = 3;
 		LOGMASKED(LOG_SYS, "DMA#%i: DMA Error (vector 0x%02x)\n",offset,m_current_vector[3]);
-		m_maincpu->set_input_line_and_vector(3,ASSERT_LINE,m_current_vector[3]);
+		m_maincpu->set_input_line(3,ASSERT_LINE);
 	}
 }
 
@@ -1067,19 +1067,25 @@ WRITE_LINE_MEMBER(x68k_state::mfp_irq_callback)
 	m_mfp_prev = state;
 }
 
-IRQ_CALLBACK_MEMBER(x68k_state::int_ack)
+void x68k_state::cpu_space_map(address_map &map)
 {
+	map(0xfffff2, 0xffffff).r(FUNC(x68k_state::int_ack));
+}
+
+u16 x68k_state::int_ack(offs_t offset)
+{
+	int irqline = offset+1;
 	if(irqline == 6)  // MFP
 	{
 		if(m_current_vector[6] != 0x4b && m_current_vector[6] != 0x4c)
 			m_current_vector[6] = m_mfpdev->get_vector();
 		else
-			m_maincpu->set_input_line_and_vector(irqline,CLEAR_LINE,m_current_vector[irqline]);
+			m_maincpu->set_input_line(irqline,CLEAR_LINE);
 		LOGMASKED(LOG_IRQ, "SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[6],irqline);
 		return m_current_vector[6];
 	}
 
-	m_maincpu->set_input_line_and_vector(irqline,CLEAR_LINE,m_current_vector[irqline]);
+	m_maincpu->set_input_line(irqline,CLEAR_LINE);
 	if(irqline == 1)  // IOSC
 	{
 		m_ioc.irqstatus &= ~0xf0;
@@ -1100,7 +1106,7 @@ WRITE_LINE_MEMBER(x68ksupr_state::scsi_irq)
 	{
 		m_current_vector[1] = 0x6c;
 		m_current_irq_line = 1;
-		m_maincpu->set_input_line_and_vector(1,ASSERT_LINE,m_current_vector[1]);
+		m_maincpu->set_input_line(1,ASSERT_LINE);
 	}
 }
 
@@ -1366,7 +1372,7 @@ void x68k_state::floppy_load_unload(bool load, floppy_image_device *dev)
 		m_current_vector[1] = 0x61;
 		m_ioc.irqstatus |= 0x40;
 		m_current_irq_line = 1;
-		m_maincpu->set_input_line_and_vector(1,ASSERT_LINE,m_current_vector[1]);  // Disk insert/eject interrupt
+		m_maincpu->set_input_line(1,ASSERT_LINE);  // Disk insert/eject interrupt
 		LOGMASKED(LOG_FDC, "IOC: Disk image inserted\n");
 	}
 }
@@ -1386,7 +1392,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::net_irq)
 {
 	m_current_vector[2] = 0xf9;
 	m_current_irq_line = 2;
-	m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
+	m_maincpu->set_input_line(2,ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(x68k_state::irq2_line)
@@ -1396,7 +1402,7 @@ WRITE_LINE_MEMBER(x68k_state::irq2_line)
 		m_net_timer->adjust(attotime::from_usec(16));
 	}
 	else
-		m_maincpu->set_input_line_and_vector(2,CLEAR_LINE,m_current_vector[2]);
+		m_maincpu->set_input_line(2,CLEAR_LINE);
 	LOGMASKED(LOG_IRQ, "EXP: IRQ2 set to %i\n",state);
 
 }
@@ -1404,7 +1410,7 @@ WRITE_LINE_MEMBER(x68k_state::irq2_line)
 WRITE_LINE_MEMBER(x68k_state::irq4_line)
 {
 	m_current_vector[4] = m_expansion->vector();
-	m_maincpu->set_input_line_and_vector(4,state,m_current_vector[4]);
+	m_maincpu->set_input_line(4,state);
 	LOGMASKED(LOG_IRQ, "EXP: IRQ4 set to %i (vector %02x)\n",state,m_current_vector[4]);
 }
 

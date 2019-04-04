@@ -804,34 +804,13 @@ WRITE_LINE_MEMBER( abc1600_state::nmi_w )
 //  MACHINE INITIALIZATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  IRQ_CALLBACK_MEMBER( abc1600_int_ack )
-//-------------------------------------------------
-
-IRQ_CALLBACK_MEMBER( abc1600_state::abc1600_int_ack )
+void abc1600_state::cpu_space_map(address_map &map)
 {
-	int data = 0;
-
-	switch (irqline)
-	{
-	case M68K_IRQ_2:
-		data = m_cio->intack_r();
-		break;
-
-	case M68K_IRQ_5:
-		data = m_dart->m1_r();
-		break;
-
-	case M68K_IRQ_7:
-		m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
-
-		data = M68K_INT_ACK_AUTOVECTOR;
-		break;
-	}
-
-	return data;
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff4, 0xfffff5).lr16("cio int", [this]() -> u16 { return m_cio->intack_r(); });
+	map(0xfffffa, 0xfffffb).lr16("dart int", [this]() -> u16 { return m_dart->m1_r(); });
+	map(0xfffffe, 0xffffff).lr16("hmi int", [this]() -> u16 { m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE); return 0x18+7; });
 }
-
 
 void abc1600_state::machine_start()
 {
@@ -881,7 +860,7 @@ void abc1600_state::abc1600(machine_config &config)
 	// basic machine hardware
 	M68008(config, m_maincpu, 64_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &abc1600_state::abc1600_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(abc1600_state::abc1600_int_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &abc1600_state::cpu_space_map);
 
 	// video hardware
 	ABC1600_MOVER(config, ABC1600_MOVER_TAG, 0);

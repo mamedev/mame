@@ -564,7 +564,7 @@ void apollo_state::apollo_pic_set_irq_line(int irq, int state)
 	}
 }
 
-IRQ_CALLBACK_MEMBER(apollo_state::apollo_pic_acknowledge)
+u16 apollo_state::apollo_pic_get_vector()
 {
 	uint32_t vector = m_pic8259_master->acknowledge();
 	if ((vector & 0x0f) == APOLLO_IRQ_PIC_SLAVE) {
@@ -612,7 +612,7 @@ WRITE_LINE_MEMBER( apollo_state::apollo_pic8259_master_set_int_line ) {
 		apollo_set_cache_status_register(this,0x10, state ? 0x10 : 0x00);
 	}
 
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_6,state ? ASSERT_LINE : CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line(M68K_IRQ_6,state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( apollo_state::apollo_pic8259_slave_set_int_line ) {

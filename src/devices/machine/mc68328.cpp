@@ -353,6 +353,11 @@ void mc68328_device::internal_map(address_map &map)
 	map(0xfff000, 0xffffff).rw(FUNC(mc68328_device::internal_read), FUNC(mc68328_device::internal_write));
 }
 
+void mc68328_device::cpu_space_map(address_map &map)
+{
+	map(0xfffff2, 0xffffff).r(FUNC(mc68328_device::irq_callback));
+}
+
 
 mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: m68000_device(mconfig, tag, owner, clock, MC68328, 16, 24, address_map_constructor(FUNC(mc68328_device::internal_map), this))
@@ -447,8 +452,6 @@ void mc68328_device::device_start()
 void mc68328_device::device_reset()
 {
 	m68000_device::device_reset();
-
-	m_int_ack_callback = device_irq_acknowledge_delegate(FUNC(mc68328_device::vector_gen), this);
 
 	m_regs.scr = 0x0c;
 	m_regs.grpbasea = 0x0000;
@@ -705,9 +708,9 @@ void mc68328_device::set_port_d_lines(uint8_t state, int bit)
 	poll_port_d_interrupts();
 }
 
-IRQ_CALLBACK_MEMBER( mc68328_device::vector_gen )
+u16 mc68328_device::irq_callback(offs_t offset)
 {
-	return m_regs.ivr | irqline;
+	return m_regs.ivr | (offset + 1);
 }
 
 uint32_t mc68328_device::get_timer_frequency(uint32_t index)

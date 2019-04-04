@@ -637,7 +637,7 @@ GFXDECODE_END
 WRITE_LINE_MEMBER(goodejan_state::vblank_irq)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x208/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x208/4); // V30
 /* vector 0x00c is just a reti */
 }
 

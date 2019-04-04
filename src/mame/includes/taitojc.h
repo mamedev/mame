@@ -154,4 +154,5 @@ private:
 	void taitojc_map(address_map &map);
 	void tms_data_map(address_map &map);
 	void tms_program_map(address_map &map);
+	void cpu_space_map(address_map &map);
 };

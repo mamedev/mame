@@ -359,11 +359,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(metlfrzr_state::scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x10); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x10); /* Z80 - RST 10h */
 
 	// TODO: check this irq.
 	if(scanline == 0) // vblank-in irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x08); /* Z80 - RST 08h */
 }
 
 void metlfrzr_state::metlfrzr(machine_config &config)

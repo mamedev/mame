@@ -256,7 +256,7 @@ WRITE8_MEMBER(firetrap_state::firetrap_8751_w)
 	{
 		m_i8751_current_command = 0;
 		m_i8751_return = 0xff; /* This value is XOR'd and must equal 0 */
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 		return;
 	}
 
@@ -307,7 +307,7 @@ WRITE8_MEMBER(firetrap_state::firetrap_8751_w)
 	}
 
 	/* Signal main cpu task is complete */
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 	m_i8751_current_command=data;
 }
 
@@ -410,7 +410,7 @@ INPUT_CHANGED_MEMBER(firetrap_state::coin_inserted)
 		if (m_coin_command_pending && !m_i8751_current_command)
 		{
 			m_i8751_return = m_coin_command_pending;
-			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 			m_coin_command_pending = 0;
 		}
 	}

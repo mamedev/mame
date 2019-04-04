@@ -166,9 +166,8 @@ void bim68153_device::device_reset()
   cycle is initiated in BIM by receiving IACK low R/W, A1, A2, A3 are latched, and the interrupt level on line A1-A3
   is compared with any interrupt requests pending in the chip. Further activity can be one of four cases.*/
 #define MAX_VECTOR 255
-IRQ_CALLBACK_MEMBER(bim68153_device::iack)
+u16 bim68153_device::iack(int irqline)
 {
-	int vec = M68K_INT_ACK_AUTOVECTOR;
 	int found = 0;
 	//  int level = 0;
 	int ch = -1;
@@ -183,7 +182,7 @@ IRQ_CALLBACK_MEMBER(bim68153_device::iack)
 		LOGIACK(" - IRQ cleared due to IACKIN\n");
 		m_out_iackout_cb(CLEAR_LINE);
 		m_out_int_cb(CLEAR_LINE);  // should really be tristated
-		return MAX_VECTOR + 1; // This is a 68K emulation specific response and will terminate the iack cycle
+		return 0x18;
 	}
 
 	for (auto & elem : m_chn)
@@ -205,10 +204,11 @@ IRQ_CALLBACK_MEMBER(bim68153_device::iack)
 	{
 		m_out_iackout_cb(CLEAR_LINE); // No more interrupts to serve, pass the message to next device in daisy chain
 		m_out_int_cb(CLEAR_LINE); // should really be tristated but board driver must make sure to mitigate if this is a problem
-		return MAX_VECTOR + 1; // This is a 68K emulation specific response and will terminate the iack cycle
+		return 0x18;
 	}
 
 	m_irq_level = m_chn[ch]->m_control & bim68153_channel::REG_CNTRL_INT_LVL_MSK;
+	int vec;
 
 	if ((m_chn[ch]->m_control & bim68153_channel::REG_CNTRL_INT_EXT) == 0)
 	{

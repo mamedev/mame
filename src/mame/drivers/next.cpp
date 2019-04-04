@@ -253,7 +253,7 @@ void next_state::irq_check()
 
 	if(level != irq_level) {
 		maincpu->set_input_line(irq_level, CLEAR_LINE);
-		maincpu->set_input_line_and_vector(level, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		maincpu->set_input_line(level, ASSERT_LINE);
 		irq_level = level;
 	}
 }

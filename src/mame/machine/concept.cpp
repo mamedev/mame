@@ -93,11 +93,11 @@ void concept_state::concept_set_interrupt(int level, int state)
 
 	if (final_level)
 		/* assert interrupt */
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_1 + final_level - 1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_1 + final_level - 1, ASSERT_LINE);
 	else
 	{
 		/* clear all interrupts */
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_1 + level - 1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_1 + level - 1, CLEAR_LINE);
 	}
 }
 

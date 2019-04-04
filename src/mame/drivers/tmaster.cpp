@@ -144,6 +144,7 @@ private:
 	DECLARE_WRITE16_MEMBER(rtc_w);
 
 	void tmaster_map(address_map &map);
+	void cpu_space_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -208,9 +209,15 @@ WRITE_LINE_MEMBER(tmaster_state::write_oki_bank1)
 
 ***************************************************************************/
 
+void tmaster_state::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff8, 0xfffff9).lr16("irq 2", [this]() -> u16 { return m_duart->get_irq_vector(); });
+}
+
 WRITE_LINE_MEMBER(tmaster_state::duart_irq_handler)
 {
-	m_maincpu->set_input_line_and_vector(4, state, m_duart->get_irq_vector());
+	m_maincpu->set_input_line(4, state);
 }
 
 /***************************************************************************
@@ -370,6 +377,7 @@ void tmaster_state::tm(machine_config &config)
 {
 	M68000(config, m_maincpu, XTAL(24'000'000) / 2); /* 12MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &tmaster_state::tmaster_map);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &tmaster_state::cpu_space_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(tmaster_state::scanline_interrupt), "screen", 0, 1);
 

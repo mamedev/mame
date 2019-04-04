@@ -2378,7 +2378,7 @@ WRITE8_MEMBER(ddenlovr_state::mmpanic_blitter2_w)
 WRITE_LINE_MEMBER(ddenlovr_state::mmpanic_blitter_irq)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf);    // RST 18
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf);    // Z80 - RST 18
 }
 
 void ddenlovr_state::mmpanic_update_leds()
@@ -2524,7 +2524,7 @@ WRITE8_MEMBER(ddenlovr_state::funkyfig_blitter_w)
 WRITE_LINE_MEMBER(ddenlovr_state::funkyfig_blitter_irq)
 {
 	if (0) // this vector looks wrong
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0); // Z80
 }
 
 WRITE8_MEMBER(ddenlovr_state::funkyfig_rombank_w)
@@ -9896,15 +9896,15 @@ WRITE_LINE_MEMBER(ddenlovr_state::mmpanic_irq)
 	//if (downcast<cpu_device *>(m_maincpu)->input_state(0))
 	//  return;
 
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // RST 08, vblank
-	m_soundcpu->set_input_line(0, HOLD_LINE);   // NMI by main cpu
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08, vblank
+	m_soundcpu->set_input_line(0, HOLD_LINE);   // Z80 - NMI by main cpu
 }
 
 
 WRITE_LINE_MEMBER(ddenlovr_state::mmpanic_rtc_irq)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf); // RST 18, clock
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf); // Z80 - RST 18, clock
 }
 
 void ddenlovr_state::mmpanic(machine_config &config)
@@ -9980,7 +9980,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::hanakanz_irq)
 	//if (downcast<cpu_device *>(m_maincpu)->input_state(0))
 	//  return;
 
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0); // Z80
 }
 
 WRITE_LINE_MEMBER(ddenlovr_state::hanakanz_rtc_irq)
@@ -9994,7 +9994,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::hanakanz_rtc_irq)
 	//if (downcast<cpu_device *>(drvm_maincpu)->input_state(0))
 	//  return;
 
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe2);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe2); // Z80
 }
 
 void ddenlovr_state::hanakanz(machine_config &config)

@@ -113,7 +113,7 @@ private:
 TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_irq_pulse)
 {
 	if (m_irq_ctl & 1)
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf); // I8080
 }
 
 READ8_MEMBER( h8_state::portf0_r )
@@ -261,7 +261,7 @@ But, all of this can only occur if bit 5 of port F0 is low. */
 			c = !m_ff_b; // from /Q of 2nd flipflop
 			m_ff_b = a; // from Q of 1st flipflop
 			if (c)
-				m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xd7);
+				m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xd7); // I8080
 		}
 	}
 	else

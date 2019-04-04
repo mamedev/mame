@@ -100,7 +100,7 @@ READ8_MEMBER(circusc_state::circusc_sh_timer_r)
 
 WRITE8_MEMBER(circusc_state::circusc_sh_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE_LINE_MEMBER(circusc_state::coin_counter_1_w)

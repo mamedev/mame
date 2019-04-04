@@ -69,6 +69,7 @@ private:
 	DECLARE_WRITE32_MEMBER (bootvect_w);
 
 	void cpu20_mem(address_map &map);
+	void cpu_space_map(address_map &map);
 
 	required_device<pit68230_device> m_pit;
 	required_device<bim68153_device> m_bim;

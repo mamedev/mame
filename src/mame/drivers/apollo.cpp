@@ -268,18 +268,21 @@ void apollo_state::apollo_bus_error()
 	apollo_csr_set_status_register(APOLLO_CSR_SR_CPU_TIMEOUT, APOLLO_CSR_SR_CPU_TIMEOUT);
 }
 
-IRQ_CALLBACK_MEMBER(apollo_state::apollo_irq_acknowledge)
+void apollo_state::cpu_space_map(address_map &map)
 {
-	int result = M68K_INT_ACK_AUTOVECTOR;
+	map(0xfffff2, 0xffffff).r(FUNC(apollo_state::apollo_irq_acknowledge));
+}
 
-	m_maincpu->set_input_line(irqline, CLEAR_LINE);
+u16 apollo_state::apollo_irq_acknowledge(offs_t offset)
+{
+	m_maincpu->set_input_line(offset+1, CLEAR_LINE);
 
-	MLOG2(("apollo_irq_acknowledge: interrupt level=%d", irqline));
+	MLOG2(("apollo_irq_acknowledge: interrupt level=%d", offset+1));
 
-	if (irqline == 6) {
-		result = apollo_pic_acknowledge(device, irqline);
-	}
-	return result;
+	if (offset+1 == 6)
+		return apollo_pic_get_vector();
+	else
+		return 0x19 + offset;
 }
 
 /***************************************************************************
@@ -414,7 +417,7 @@ READ32_MEMBER(apollo_state::ram_with_parity_r){
 
 		if (apollo_csr_get_control_register() & APOLLO_CSR_CR_INTERRUPT_ENABLE) {
 			// force parity error (if NMI is enabled)
-			m_maincpu->set_input_line_and_vector(7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+			m_maincpu->set_input_line(7, ASSERT_LINE);
 
 		}
 	}
@@ -1047,7 +1050,7 @@ void apollo_state::dn3500(machine_config &config)
 	/* basic machine hardware */
 	M68030(config, m_maincpu, 25000000); /* 25 MHz 68030 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dn3500_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(apollo_state::apollo_irq_acknowledge));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
 
 	config.m_minimum_quantum = attotime::from_hz(60);
 
@@ -1066,7 +1069,7 @@ void apollo_state::dsp3500(machine_config &config)
 {
 	M68030(config, m_maincpu, 25000000); /* 25 MHz 68030 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dsp3500_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(apollo_state::apollo_irq_acknowledge));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
 	config.m_minimum_quantum = attotime::from_hz(60);
 
 	apollo_terminal(config);
@@ -1102,7 +1105,7 @@ void apollo_state::dn3000(machine_config &config)
 {
 	dn3500(config);
 	M68020PMMU(config.replace(), m_maincpu, 12000000); /* 12 MHz */
-	m_maincpu->set_irq_acknowledge_callback(FUNC(apollo_state::apollo_irq_acknowledge));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dn3000_map);
 	config.device_remove( APOLLO_SIO2_TAG );
 	m_ram->set_default_size("8M").set_extra_options("4M");
@@ -1114,7 +1117,7 @@ void apollo_state::dn3000(machine_config &config)
 void apollo_state::dsp3000(machine_config &config)
 {
 	M68020PMMU(config, m_maincpu, 12000000); /* 12 MHz */
-	m_maincpu->set_irq_acknowledge_callback(FUNC(apollo_state::apollo_irq_acknowledge));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dsp3000_map);
 	config.m_minimum_quantum = attotime::from_hz(60);
 
@@ -1160,7 +1163,7 @@ void apollo_state::dsp5500(machine_config &config)
 {
 	M68040(config, m_maincpu, 25000000); /* 25 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dsp5500_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(apollo_state::apollo_irq_acknowledge));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
 	config.m_minimum_quantum = attotime::from_hz(60);
 
 	apollo_terminal(config);

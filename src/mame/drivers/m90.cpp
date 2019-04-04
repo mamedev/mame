@@ -718,13 +718,13 @@ INTERRUPT_GEN_MEMBER(m90_state::bomblord_fake_nmi)
 WRITE_LINE_MEMBER(m90_state::dynablsb_vblank_int_w)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x60/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x60/4); // V35
 }
 
 WRITE_LINE_MEMBER(m90_state::bomblord_vblank_int_w)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x50/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x50/4); // V35
 }
 
 

@@ -563,7 +563,7 @@ GFXDECODE_END
 WRITE_LINE_MEMBER(sengokmj_state::vblank_irq)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
 }
 
 WRITE16_MEMBER( sengokmj_state::layer_en_w )

@@ -67,8 +67,15 @@ void m68340_cpu_device::update_ipl()
 	}
 }
 
-IRQ_CALLBACK_MEMBER(m68340_cpu_device::int_ack)
+void m68340_cpu_device::internal_vectors_r(address_map &map)
 {
+	map(0xfffff2, 0xffffff).r(FUNC(m68340_cpu_device::int_ack));
+}
+
+
+u16 m68340_cpu_device::int_ack(offs_t offset)
+{
+	int irqline = offset + 1;
 	uint8_t pit_iarb = pit_arbitrate(irqline);
 	uint8_t scu_iarb = m_serial->arbitrate(irqline);
 	uint8_t t1_iarb = m_timer[0]->arbitrate(irqline);
@@ -76,7 +83,7 @@ IRQ_CALLBACK_MEMBER(m68340_cpu_device::int_ack)
 	uint8_t iarb = std::max({pit_iarb, scu_iarb, t1_iarb, t2_iarb});
 	LOGMASKED(LOG_IPL, "Level %d interrupt arbitration: PIT = %X, SCU = %X, T1 = %X, T2 = %X\n", irqline, pit_iarb, scu_iarb, t1_iarb, t2_iarb);
 	int response = 0;
-	uint32_t vector = standard_irq_callback(irqline);
+	uint32_t vector = 0x18; // Spurious interrupt
 
 	// Valid IARB levels are F (high) to 1 (low) and should be unique among modules using the same interrupt level
 	if (iarb != 0)
@@ -228,6 +235,7 @@ m68340_cpu_device::m68340_cpu_device(const machine_config &mconfig, const char *
 	m_m68340DMA = nullptr;
 	m_m68340_base = 0;
 	m_ipl = 0;
+	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(m68340_cpu_device::internal_vectors_r), this);
 }
 
 void m68340_cpu_device::device_reset()
@@ -259,8 +267,6 @@ void m68340_cpu_device::device_start()
 	m_m68340_base = 0x00000000;
 
 	m_internal = &space(AS_PROGRAM);
-
-	m_int_ack_callback = device_irq_acknowledge_delegate(FUNC(m68340_cpu_device::int_ack), this);
 }
 
 void m68340_cpu_device::m68k_reset_peripherals()
