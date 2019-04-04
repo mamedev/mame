@@ -2134,7 +2134,11 @@ void m68000_base_device::m68ki_exception_interrupt(uint32_t int_level)
 	/* We require the handlers for autovector to return the correct
 	   vector, including for spurious interrupts. */
 
-	vector = m_cpu_space->read_word(0xfffffff0 | (int_level << 1)) & 0xff;
+	// 68000 and 68010 assert UDS as well as LDS for IACK cycles but disregard D8-D15
+	if(CPU_TYPE_IS_EC020_PLUS() || m_cpu_type == CPU_TYPE_008)
+		vector = m_cpu_space->read_byte(0xfffffff1 | (int_level << 1));
+	else
+		vector = m_cpu_space->read_word(0xfffffff0 | (int_level << 1)) & 0xff;
 
 	/* Start exception processing */
 	sr = m68ki_init_exception();
@@ -2314,7 +2318,14 @@ void m68000_base_device::clear_all()
 void m68000_base_device::autovectors_map(address_map &map)
 {
 	// Eventually add the sync to E due to vpa
-	map(0x2, 0xf).lr16("autovectors", [](offs_t offset) -> u16 { return 0x19+offset; });
+	// 8-bit handlers are used here to be 68008-compatible
+	map(0x3, 0x3).lr8("avec1", []() -> u8 { return 0x19; });
+	map(0x5, 0x5).lr8("avec2", []() -> u8 { return 0x1a; });
+	map(0x7, 0x7).lr8("avec3", []() -> u8 { return 0x1b; });
+	map(0x9, 0x9).lr8("avec4", []() -> u8 { return 0x1c; });
+	map(0xb, 0xb).lr8("avec5", []() -> u8 { return 0x1d; });
+	map(0xd, 0xd).lr8("avec6", []() -> u8 { return 0x1e; });
+	map(0xf, 0xf).lr8("avec7", []() -> u8 { return 0x1f; });
 }
 
 void m68000_base_device::default_autovectors_map(address_map &map)
