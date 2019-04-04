@@ -35,6 +35,10 @@ constexpr int M68K_IRQ_5    = 5;
 constexpr int M68K_IRQ_6    = 6;
 constexpr int M68K_IRQ_7    = 7;
 
+constexpr int M68K_IRQ_IPL0 = 0;
+constexpr int M68K_IRQ_IPL1 = 1;
+constexpr int M68K_IRQ_IPL2 = 2;
+
 constexpr int M68K_SZ_LONG = 0;
 constexpr int M68K_SZ_BYTE = 1;
 constexpr int M68K_SZ_WORD = 2;

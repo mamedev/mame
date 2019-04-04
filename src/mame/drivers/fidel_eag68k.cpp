@@ -173,6 +173,7 @@ class eag_state : public fidelbase_state
 public:
 	eag_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "ram")
 	{ }
 
@@ -191,6 +192,7 @@ protected:
 	void eag_base(machine_config &config);
 
 	// devices/pointers
+	required_device<m68000_base_device> m_maincpu;
 	optional_device<ram_device> m_ram;
 
 	// address maps
@@ -519,12 +521,13 @@ void eag_state::eag_base(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->disable_interrupt_mixer();
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eag_map);
 
 	const attotime irq_period = attotime::from_hz(4.9152_MHz_XTAL/0x2000); // 4060 Q13, 600Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(eag_state::irq_on<M68K_IRQ_2>), irq_period);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(eag_state::irq_on<M68K_IRQ_IPL1>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(8250)); // active for 8.25us
-	TIMER(config, "irq_off").configure_periodic(FUNC(eag_state::irq_off<M68K_IRQ_2>), irq_period);
+	TIMER(config, "irq_off").configure_periodic(FUNC(eag_state::irq_off<M68K_IRQ_IPL1>), irq_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -573,7 +576,7 @@ void eagv5_state::eagv5(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_mainlatch);
 	GENERIC_LATCH_8(config, m_sublatch);
-	m_sublatch->data_pending_callback().set_inputline(m_maincpu, M68K_IRQ_1); // IPL0
+	m_sublatch->data_pending_callback().set_inputline(m_maincpu, M68K_IRQ_IPL0);
 
 	// gen_latch syncs on write, but this is still needed with tight cpu comms
 	// (not that it locks up or anything, but it will calculate moves much slower if timing is off)
@@ -586,6 +589,7 @@ void eag_state::eagv7(machine_config &config)
 
 	/* basic machine hardware */
 	M68020(config.replace(), m_maincpu, 20_MHz_XTAL); // also seen with 25MHz XTAL
+	m_maincpu->disable_interrupt_mixer();
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv7_map);
 }
 
@@ -595,6 +599,7 @@ void eag_state::eagv9(machine_config &config)
 
 	/* basic machine hardware */
 	M68030(config.replace(), m_maincpu, 32_MHz_XTAL/2); // also seen with 40MHz XTAL
+	m_maincpu->disable_interrupt_mixer();
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv7_map);
 }
 
@@ -604,6 +609,7 @@ void eag_state::eagv10(machine_config &config)
 
 	/* basic machine hardware */
 	M68040(config.replace(), m_maincpu, 25_MHz_XTAL);
+	m_maincpu->disable_interrupt_mixer();
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv10_map);
 }
 

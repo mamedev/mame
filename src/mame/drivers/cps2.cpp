@@ -657,7 +657,7 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 
 TIMER_DEVICE_CALLBACK_MEMBER(cps2_state::cps2_interrupt)
 {
-	/* direct irq line connection, irq1 is vblank, irq2 is some sort of scanline interrupt. */
+	/* direct irq line connection, IPL1 is vblank, IPL2 is some sort of scanline interrupt. */
 	if (param == 0)
 		m_scancalls = 0;
 
