@@ -172,6 +172,7 @@ tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type, 
 		m_get_intlevel(*this),
 		m_dbin_line(*this),
 		m_external_operation(*this),
+		m_ready_bufd(true),
 		m_program_index(NOPRG),
 		m_caller_index(NOPRG)
 {
