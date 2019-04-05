@@ -225,7 +225,8 @@ void m68307_cpu_device::licr2_interrupt()
 uint8_t m68307_cpu_device::int_ack(offs_t offset)
 {
 	uint8_t type = m_m68307SIM->get_int_type(this, offset);
-	logerror("Interrupt acknowledged: level %d, type %01X\n", offset, type);
+	if (!machine().side_effects_disabled())
+		logerror("Interrupt acknowledged: level %d, type %01X\n", offset, type);
 
 	// UART provides its own vector
 	if (type == 0x0c)

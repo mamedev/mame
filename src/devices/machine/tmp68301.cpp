@@ -217,12 +217,15 @@ uint8_t tmp68301_device::irq_callback(offs_t offset)
 			u16 mask = (src > 2 ? 2 : 1) << src;
 			if ((m_ipr & mask) != 0 && (m_imr & mask) == 0)
 			{
-				// add cause to interrupt in-service register
-				m_iisr |= mask;
+				if (!machine().side_effects_disabled())
+				{
+					// add cause to interrupt in-service register
+					m_iisr |= mask;
 
-				// no longer pending
-				m_ipr &= ~mask;
-				update_ipl();
+					// no longer pending
+					m_ipr &= ~mask;
+					update_ipl();
+				}
 
 				// vary vector number by type
 				if (src > 6)
