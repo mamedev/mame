@@ -1040,11 +1040,20 @@ void apollo_ni::set_node_id_from_disk()
 #undef VERBOSE
 #define VERBOSE 0
 
+DEVICE_INPUT_DEFAULTS_START(3c505)
+	DEVICE_INPUT_DEFAULTS("IO_BASE",  0x3f0, 0x300) // I/O address 0x300
+	DEVICE_INPUT_DEFAULTS("IRQ_DRQ",  0x0f, 0x0a)   // IRQ 10
+	DEVICE_INPUT_DEFAULTS("IRQ_DRQ",  0x70, 0x60)   // DRQ 6
+	DEVICE_INPUT_DEFAULTS("ROM_OPTS", 0x01, 0x01)   // host ROM enabled
+	DEVICE_INPUT_DEFAULTS("ROM_OPTS", 0xfe, 0x00)   // host ROM address 0x00000
+DEVICE_INPUT_DEFAULTS_END
+
 static void apollo_isa_cards(device_slot_interface &device)
 {
 	device.option_add("wdc", ISA16_OMTI8621_APOLLO);    // Combo ESDI/AT floppy controller
 	device.option_add("ctape", ISA8_SC499);             // Archive SC499 cartridge tape
-	device.option_add("3c505", ISA16_3C505);            // 3Com 3C505 Ethernet card
+	device.option_add("3c505", ISA16_3C505).default_bios("apollo"); // 3Com 3C505 Ethernet card
+	device.set_option_device_input_defaults("3c505", DEVICE_INPUT_DEFAULTS_NAME(3c505));
 }
 
 void apollo_state::common(machine_config &config)
