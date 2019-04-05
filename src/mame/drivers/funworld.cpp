@@ -483,6 +483,30 @@
   The main program is inside the battery backed RAM, and need to be dumped.
   See more notes below in the ROM loading.
 
+
+  * Royal Card (Italian, Dino 4 hardware, encrypted)
+
+  This game is highly encrypted and is running in Dino 4 hardware.
+  To initialize the NVRAM, you should press both service buttons together (keys 0-9) and then reset (key F3).
+  Due to the way the routine is programmed, the procedure is time sensitive and often doesn't work.
+
+  This game has a programming menu through the service mode (key 0), then pressing STOP 2 & STOP 4 together
+  and waiting for some seconds.
+
+  You can see two options...
+  
+  STOP 1 ---- OPZIONI 1
+  STOP 3 ---- OPZIONI 2
+
+  OPZIONI 1:
+  You can change game parameters for Gioco AB, Play Max, Play Min, Difficolt, Bonus, and Rilancio.
+  
+  OPZIONI 2:
+  You can change game parameters for Tabella Vincite, Velocita Simboli, Control Double, Valore Ticket,
+  Limit Credit, and Limit Scarico.
+
+  In both cases, you can exit pressing the START button (key 1).
+
   
 *****************************************************************************************
 
@@ -984,11 +1008,64 @@
   - Corrected technical notes...
 
 
+  [...2018/2019]
+
+  Note: there are some undocumented improvements, additions and changes.
+
+  - Added new Multi/Joker Card hardware from Funworld
+    with epoxy brick CPU.
+  - Added different sets from this hardware.
+  - Added technical notes about the hardware and behaviour.
+  - Change game description from Joker Card (Epoxy brick CPU)
+    to Joker Card / Multi Card (Epoxy brick CPU).
+  - Added NVRAM.
+
+  - Support for custom CPUs' opcode decryption, affecting
+    Multi Win, Power Card, Mega Card, Joker Card 300 (Amatic)
+	and Royal Card (Slovak Encrypted).
+
+  Fixed Saloon & added Nevada:
+  - Added I2C bus and default serial EEPROM.
+  - Added default NVRAM.
+  - Improved memory map.
+  - Removed PIAs.
+  - Added DIP switches.
+  - Reworked inputs.
+  - Fixed colors.
+  - Added technical notes.
+
+  Fun World encrypted games improvements:
+  - Moved the Multi Win class to the header.
+  - Reworked the memory maps.
+  - Fixed the ROM loads.
+  - Changed tilemaps size.
+  - Added new video start.
+  - Extended the encryption range to covering the new ROM space.
+  - Reworked inputs (still need some work).
+  - Fixed graphics bitplanes & palettes.
+  - Changed the jokercrd game description to Joker Card 300 (Ver.A267BC, encrypted).
+  - Marked jokercrd graphics ROM IC10 as bad dump.
+  - Demoted rcdino4 to not working since there are issues with the PIAs
+    that doesn't allow the game to boot.
+  - Added technical notes.
+
+  Royal Card (Slovak, encrypted) improvements:
+  - Modified the machine_config to bank the palette in a different way.
+  - Inverted the graphics ROM load, fixing the bitplanes.
+    Tiles now are visible, and have perfect colors.
+  - Moved the royalcrdf class to the header.
+  - Created new memory map.
+  - Fixed the VRAM offsets.
+
+  - Added default NVRAM to Royal Card (Italian, Dino 4 hardware, encrypted).
+  - Promoted the game to Working.
+  - Added technical and game notes.
+
+
   *** TO DO ***
 
-  - Figure out the royalcdc, jokercrd, multiwin and powercrd encryption.
+  - Figure out the royalcdc, royalcrdf & jokercrd encryption.
   - Figure out the remaining PIA connections for almost all games.
-  - Fix Saloon and move it to its own driver.
   - Reverse-engineering the boot code of Jolly Card Professional 2.0,
      and Royal Card Professional 2.0 to get the proper codes to boot.
   - Analyze the unknown writes to $2000/$4000 in some games.
@@ -6876,6 +6953,9 @@ ROM_END
 
   BP C17C (just after the CRTC init)
 
+  Code checks offset $32F0 for 0xFE, and has two NOPs... Maybe was requested to continue.
+  Same as China Town. WTH is mapped there?
+
 */
 
 ROM_START( rcdino4 )
@@ -6887,6 +6967,9 @@ ROM_START( rcdino4 )
 	ROM_IGNORE(                      0x8000 )   /* Identical halves. Discarding 2nd half */
 	ROM_LOAD( "m27c512.u20", 0x8000, 0x8000, CRC(86e55f5a) SHA1(be71301b6887e8cc5924864d0f97b54e0668875e) )
 	ROM_IGNORE(                      0x8000 )   /* Identical halves. Discarding 2nd half */
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_LOAD( "rcdino4_nvram.bin", 0x0000, 0x0800, CRC(a2dc069e) SHA1(23e296cc0cc0c6f0c34eccffff8c78d2cef2dbae) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "am27s29pc.u25", 0x0000, 0x0200, CRC(649e6ccc) SHA1(674a5ea3b4b2e7de766e787debef5f695bff7a40) )
