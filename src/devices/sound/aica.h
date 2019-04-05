@@ -14,7 +14,7 @@
 #include "aicadsp.h"
 
 
-class aica_device : public device_t, public device_sound_interface, public device_rom_interface
+class aica_device : public device_t, public device_sound_interface, public device_memory_interface
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
@@ -38,11 +38,13 @@ protected:
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
 
-	virtual void rom_bank_updated() override;
-
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
+	// device_memory_interface configuration
+	virtual space_config_vector memory_space_config() const override;
+
+	address_space_config m_data_config;
 private:
 	enum AICA_STATE {AICA_ATTACK,AICA_DECAY1,AICA_DECAY2,AICA_RELEASE};
 
@@ -144,6 +146,9 @@ private:
 	u16 m_IRQL, m_IRQR;
 	u16 m_EFSPAN[0x48];
 	AICA_SLOT m_Slots[64];
+
+	address_space                                *m_data;
+	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_cache;
 	sound_stream * m_stream;
 
 	u32 m_IrqTimA;

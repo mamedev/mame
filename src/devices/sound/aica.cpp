@@ -20,6 +20,8 @@
 #include "emu.h"
 #include "aica.h"
 
+#include <algorithm>
+
 static constexpr s32 clip16(int x) { return std::min(32767, std::max(-32768, x)); }
 static constexpr s32 clip18(int x) { return std::min(131071, std::max(-131072, x)); }
 
@@ -399,7 +401,7 @@ void aica_device::StartSlot(AICA_SLOT *slot)
 	if (PCMS(slot) >= 2)
 	{
 		slot->curstep = 0;
-		slot->adbase = (((SA(slot)) & 0x7fffff));
+		slot->adbase = SA(slot);
 		InitADPCM(&(slot->cur_sample), &(slot->cur_quant));
 		InitADPCM(&(slot->cur_lpsample), &(slot->cur_lpquant));
 
@@ -433,16 +435,17 @@ void aica_device::Init()
 	m_MidiR = m_MidiW = 0;
 	m_MidiOutR = m_MidiOutW = 0;
 
-	m_DSP.space = &this->space();
+	m_DSP.space = m_data;
+	m_DSP.cache = m_cache;
 	m_timerA = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aica_device::timerA_cb), this));
 	m_timerB = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aica_device::timerB_cb), this));
 	m_timerC = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aica_device::timerC_cb), this));
 
 	for (i = 0; i < 0x400; ++i)
 	{
-		float envDB = ((float)(3*(i - 0x3ff))) / 32.0f;
+		float envDB = ((float)(3 * (i - 0x3ff))) / 32.0f;
 		float scale = (float)(1 << SHIFT);
-		m_EG_TABLE[i] = (s32)(powf(10.0f, envDB / 20.0f)*scale);
+		m_EG_TABLE[i] = (s32)(powf(10.0f, envDB / 20.0f) * scale);
 	}
 
 	for (i = 0; i < 0x20000; ++i)
@@ -1109,8 +1112,8 @@ s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 
 	if (PCMS(slot) == 1) // 8-bit signed
 	{
-		s8 p1 = read_byte(SA(slot) + addr1);
-		s8 p2 = read_byte(SA(slot) + addr2);
+		s8 p1 = m_cache->read_byte(SA(slot) + addr1);
+		s8 p2 = m_cache->read_byte(SA(slot) + addr2);
 		s32 s;
 		s32 fpart=slot->cur_addr & ((1 << SHIFT) - 1);
 		s = (int)(p1 << 8) * ((1 << SHIFT) - fpart) + (int)(p2 << 8) * fpart;
@@ -1118,8 +1121,8 @@ s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 	}
 	else if (PCMS(slot) == 0)   //16 bit signed
 	{
-		s16 p1 = read_word(SA(slot) + addr1);
-		s16 p2 = read_word(SA(slot) + addr2);
+		s16 p1 = m_cache->read_word(SA(slot) + addr1);
+		s16 p2 = m_cache->read_word(SA(slot) + addr2);
 		s32 s;
 		s32 fpart = slot->cur_addr & ((1 << SHIFT) - 1);
 		s = (int)(p1) * ((1 << SHIFT) - fpart) + (int)(p2) * fpart;
@@ -1139,7 +1142,7 @@ s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 		while (curstep < steps_to_go)
 		{
 			int shift1 = 4 & (curstep << 2);
-			u8 delta1 = (read_byte(base) >> shift1) & 0xf;
+			u8 delta1 = (m_cache->read_byte(base) >> shift1) & 0xf;
 			DecodeADPCM(&(slot->cur_sample), delta1, &(slot->cur_quant));
 			if (!(++curstep & 1))
 				base++;
@@ -1326,7 +1329,7 @@ void aica_device::exec_dma()
 		{
 			for (i = 0; i < m_dma.dlg; i+=2)
 			{
-				this->space().write_word(m_dma.dmea, 0);
+				m_data->write_word(m_dma.dmea, 0);
 				m_dma.dmea += 2;
 			}
 		}
@@ -1336,7 +1339,7 @@ void aica_device::exec_dma()
 			{
 				u16 tmp;
 				tmp = r16(m_dma.drga);
-				this->space().write_word(m_dma.dmea, tmp);
+				m_data->write_word(m_dma.dmea, tmp);
 				m_dma.dmea += 4;
 				m_dma.drga += 4;
 			}
@@ -1356,7 +1359,7 @@ void aica_device::exec_dma()
 		{
 			for (i = 0; i < m_dma.dlg; i+=2)
 			{
-				u16 tmp = read_word(m_dma.dmea);
+				u16 tmp = m_cache->read_word(m_dma.dmea);
 				w16(m_dma.drga, tmp);
 				m_dma.dmea += 4;
 				m_dma.drga += 4;
@@ -1405,6 +1408,10 @@ void aica_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 void aica_device::device_start()
 {
+	m_data = &space(0);
+	// Find our direct access
+	m_cache = space().cache<1, 0, ENDIANNESS_LITTLE>();
+
 	// init the emulation
 	Init();
 
@@ -1506,9 +1513,14 @@ void aica_device::device_clock_changed()
 	m_stream->set_sample_rate((int)m_rate);
 }
 
-void aica_device::rom_bank_updated()
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector aica_device::memory_space_config() const
 {
-	m_stream->update();
+	return space_config_vector{ std::make_pair(0, &m_data_config) };
 }
 
 u16 aica_device::read(offs_t offset)
@@ -1539,57 +1551,57 @@ u8 aica_device::midi_out_r()
 DEFINE_DEVICE_TYPE(AICA, aica_device, "aica", "Yamaha AICA")
 
 aica_device::aica_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, AICA, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this, 23, ENDIANNESS_LITTLE, 16), // 16 bit confirmed
-		m_rate(44100.0),
-		m_irq_cb(*this),
-		m_main_irq_cb(*this),
-		m_IRQL(0),
-		m_IRQR(0),
-		m_IrqTimA(0),
-		m_IrqTimBC(0),
-		m_IrqMidi(0),
-		m_MidiOutW(0),
-		m_MidiOutR(0),
-		m_MidiW(0),
-		m_MidiR(0),
-		m_mcieb(0),
-		m_mcipd(0),
-		m_bufferl(nullptr),
-		m_bufferr(nullptr),
-		m_exts0(nullptr),
-		m_exts1(nullptr)
+	: device_t(mconfig, AICA, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
+	, m_data_config("data", ENDIANNESS_LITTLE, 16, 23) // 16 bit data bus confirmed
+	, m_rate(44100.0)
+	, m_irq_cb(*this)
+	, m_main_irq_cb(*this)
+	, m_IRQL(0)
+	, m_IRQR(0)
+	, m_IrqTimA(0)
+	, m_IrqTimBC(0)
+	, m_IrqMidi(0)
+	, m_MidiOutW(0)
+	, m_MidiOutR(0)
+	, m_MidiW(0)
+	, m_MidiR(0)
+	, m_mcieb(0)
+	, m_mcipd(0)
+	, m_bufferl(nullptr)
+	, m_bufferr(nullptr)
+	, m_exts0(nullptr)
+	, m_exts1(nullptr)
 
 {
 	memset(&m_udata.data, 0, sizeof(m_udata.data));
-	memset(m_EFSPAN, 0, sizeof(m_EFSPAN));
+	std::fill(std::begin(m_EFSPAN), std::end(m_EFSPAN), 0);
 	memset(m_Slots, 0, sizeof(m_Slots));
-	memset(m_MidiStack, 0, sizeof(m_MidiStack));
+	std::fill(std::begin(m_MidiStack), std::end(m_MidiStack), 0);
 
-	memset(m_LPANTABLE, 0, sizeof(m_LPANTABLE));
-	memset(m_RPANTABLE, 0, sizeof(m_RPANTABLE));
+	std::fill(std::begin(m_LPANTABLE), std::end(m_LPANTABLE), 0);
 
-	memset(m_TimPris, 0, sizeof(m_TimPris));
-	memset(m_TimCnt, 0, sizeof(m_TimCnt));
+	std::fill(std::begin(m_TimPris), std::end(m_TimPris), 0);
+	std::fill(std::begin(m_TimCnt), std::end(m_TimCnt), 0);
 
 	memset(&m_dma, 0, sizeof(m_dma));
 
-	memset(m_ARTABLE, 0, sizeof(m_ARTABLE));
-	memset(m_DRTABLE, 0, sizeof(m_DRTABLE));
+	std::fill(std::begin(m_ARTABLE), std::end(m_ARTABLE), 0);
+	std::fill(std::begin(m_DRTABLE), std::end(m_DRTABLE), 0);
 
 	memset(&m_DSP, 0, sizeof(m_DSP));
 
-	memset(m_EG_TABLE, 0, sizeof(m_EG_TABLE));
-	memset(m_PLFO_TRI, 0, sizeof(m_PLFO_TRI));
-	memset(m_PLFO_SQR, 0, sizeof(m_PLFO_SQR));
-	memset(m_PLFO_SAW, 0, sizeof(m_PLFO_SAW));
-	memset(m_PLFO_NOI, 0, sizeof(m_PLFO_NOI));
+	std::fill(std::begin(m_EG_TABLE), std::end(m_EG_TABLE), 0);
+	std::fill(std::begin(m_PLFO_TRI), std::end(m_PLFO_TRI), 0);
+	std::fill(std::begin(m_PLFO_SQR), std::end(m_PLFO_SQR), 0);
+	std::fill(std::begin(m_PLFO_SAW), std::end(m_PLFO_SAW), 0);
+	std::fill(std::begin(m_PLFO_NOI), std::end(m_PLFO_NOI), 0);
 
-	memset(m_ALFO_TRI, 0, sizeof(m_ALFO_TRI));
-	memset(m_ALFO_SQR, 0, sizeof(m_ALFO_SQR));
-	memset(m_ALFO_SAW, 0, sizeof(m_ALFO_SAW));
-	memset(m_ALFO_NOI, 0, sizeof(m_ALFO_NOI));
+	std::fill(std::begin(m_ALFO_TRI), std::end(m_ALFO_TRI), 0);
+	std::fill(std::begin(m_ALFO_SQR), std::end(m_ALFO_SQR), 0);
+	std::fill(std::begin(m_ALFO_SAW), std::end(m_ALFO_SAW), 0);
+	std::fill(std::begin(m_ALFO_NOI), std::end(m_ALFO_NOI), 0);
 
 	memset(m_PSCALES, 0, sizeof(m_PSCALES));
 	memset(m_ASCALES, 0, sizeof(m_ASCALES));
