@@ -102,8 +102,8 @@ void galastrm_state::main_map(address_map &map)
 	map(0x900000, 0x900003).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));                               /* TC0110PCR */
 	map(0xb00000, 0xb00003).w(FUNC(galastrm_state::tc0610_w<0>));                              /* TC0610 */
 	map(0xc00000, 0xc00003).w(FUNC(galastrm_state::tc0610_w<1>));
-	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::long_r), FUNC(tc0100scn_device::long_w));        /* piv tilemaps */
-	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_long_r), FUNC(tc0100scn_device::ctrl_long_w));
+	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));        /* piv tilemaps */
+	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 }
 
 /***********************************************************
