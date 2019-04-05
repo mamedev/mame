@@ -35,7 +35,7 @@ class dc_state : public driver_device
 	required_shared_ptr<uint64_t> dc_framebuffer_ram; // '32-bit access area'
 	required_shared_ptr<uint64_t> dc_texture_ram; // '64-bit access area'
 
-	required_shared_ptr<uint32_t> dc_sound_ram;
+	required_shared_ptr<uint16_t> dc_sound_ram;
 	required_shared_ptr<uint64_t> dc_ram;
 
 	/* machine related */
@@ -80,8 +80,8 @@ class dc_state : public driver_device
 	DECLARE_WRITE8_MEMBER( g1_irq );
 	DECLARE_WRITE8_MEMBER( pvr_irq );
 	DECLARE_WRITE8_MEMBER( maple_irq );
-	DECLARE_READ64_MEMBER( sh4_soundram_r );
-	DECLARE_WRITE64_MEMBER( sh4_soundram_w );
+	DECLARE_READ16_MEMBER( soundram_r );
+	DECLARE_WRITE16_MEMBER( soundram_w );
 	DECLARE_WRITE_LINE_MEMBER(aica_irq);
 	DECLARE_WRITE_LINE_MEMBER(sh4_aica_irq);
 
@@ -98,6 +98,7 @@ class dc_state : public driver_device
 	DECLARE_MACHINE_RESET(dc_console);
 
 	void naomi_aw_base(machine_config &config);
+	void aica_map(address_map &map);
 	void dc_audio_map(address_map &map);
 };
 
