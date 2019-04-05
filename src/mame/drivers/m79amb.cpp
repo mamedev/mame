@@ -191,7 +191,7 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(m79amb_state::m79amb_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);  /* RST 08h */
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);  /* Z80 - RST 08h */
 }
 
 void m79amb_state::m79amb(machine_config &config)

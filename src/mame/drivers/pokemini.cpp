@@ -304,7 +304,7 @@ void pokemini_state::check_irqs()
 	{
 		//logerror("Triggering IRQ with vector %02x\n", vector );
 		/* Trigger interrupt and set vector */
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector );
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector ); // MINX
 	}
 	else
 	{

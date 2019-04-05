@@ -135,7 +135,7 @@ WRITE16_MEMBER(gradius3_state::cpuB_irqtrigger_w)
 
 WRITE16_MEMBER(gradius3_state::sound_irq_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE8_MEMBER(gradius3_state::sound_bank_w)

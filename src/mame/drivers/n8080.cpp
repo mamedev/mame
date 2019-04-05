@@ -437,7 +437,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst1_tick)
 	int state = m_inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* V7 = 1, V6 = 0 */
-	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xcf);
+	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xcf); // I8080
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst2_tick)
@@ -445,7 +445,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst2_tick)
 	int state = m_inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* vblank */
-	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xd7);
+	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xd7); // I8080
 }
 
 WRITE_LINE_MEMBER(n8080_state::n8080_inte_callback)

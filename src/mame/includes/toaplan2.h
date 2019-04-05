@@ -184,8 +184,8 @@ private:
 	uint32_t screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	IRQ_CALLBACK_MEMBER(fixeightbl_irq_ack);
-	IRQ_CALLBACK_MEMBER(pipibibsbl_irq_ack);
+	void cpu_space_fixeightbl_map(address_map &map);
+	void cpu_space_pipibibsbl_map(address_map &map);
 	INTERRUPT_GEN_MEMBER(bbakraid_snd_interrupt);
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
 

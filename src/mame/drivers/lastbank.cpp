@@ -503,12 +503,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::irq_scanline)
 
 	if (scanline == 240 && (m_irq_enable & 4))
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[2]);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[2]); // Z80
 	}
 
 	if (scanline == 0 && (m_irq_enable & 2))
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[1]);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[1]); // Z80
 	}
 }
 

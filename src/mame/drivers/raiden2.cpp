@@ -247,7 +247,7 @@ void raiden2_state::combine32(u32 *val, offs_t offset, u16 data, u16 mem_mask)
 
 INTERRUPT_GEN_MEMBER(raiden2_state::interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0/4);   /* VBL */
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0/4);   /* V30 - VBL */
 }
 
 

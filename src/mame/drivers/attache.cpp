@@ -906,7 +906,7 @@ WRITE8_MEMBER(attache816_state::z80_comms_ctrl_w)
 WRITE_LINE_MEMBER(attache816_state::ppi_irq)
 {
 	if(m_x86_irq_enable & 0x01)
-		m_extcpu->set_input_line_and_vector(0,state,0x03);
+		m_extcpu->set_input_line_and_vector(0,state,0x03); // I8086
 }
 
 WRITE_LINE_MEMBER(attache816_state::x86_dsr)

@@ -1822,7 +1822,7 @@ TIMER_CALLBACK_MEMBER(saturn_state::vdp1_draw_end )
 	#if 0
 	if(!(m_scu.ism & IRQ_VDP1_END))
 	{
-		m_maincpu->set_input_line_and_vector(0x2, HOLD_LINE, 0x4d);
+		m_maincpu->set_input_line_and_vector(0x2, HOLD_LINE, 0x4d); // SH2
 		scu_do_transfer(6);
 	}
 	else

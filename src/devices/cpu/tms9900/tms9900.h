@@ -298,7 +298,6 @@ private:
 	void    alu_abs(void);
 	void    alu_x(void);
 	void    alu_b(void);
-	//void    alu_bl(void);
 	void    alu_blwp(void);
 	void    alu_ldcr(void);
 	void    alu_stcr(void);
@@ -330,6 +329,9 @@ private:
 
 	// Index of the interrupt program
 	int     m_interrupt_mp_index;
+
+	// For debugging only
+	bool    m_log_interrupt;
 
 	// State of the micro-operation. Needed for repeated ALU calls.
 	int     m_state;

@@ -41,6 +41,7 @@ public:
 	uint64_t debug_seglimit(symbol_table &table, int params, const uint64_t *param);
 	uint64_t debug_segofftovirt(symbol_table &table, int params, const uint64_t *param);
 	uint64_t debug_virttophys(symbol_table &table, int params, const uint64_t *param);
+	uint64_t debug_cacheflush(symbol_table &table, int params, const uint64_t *param);
 
 protected:
 	i386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_data_width, int program_addr_width, int io_data_width);
@@ -76,8 +77,14 @@ protected:
 	virtual void opcode_cpuid();
 	virtual uint64_t opcode_rdmsr(bool &valid_msr);
 	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr);
-	virtual void opcode_invd() {}
-	virtual void opcode_wbinvd() {}
+	virtual void opcode_invd() { cache_invalidate(); }
+	virtual void opcode_wbinvd() { cache_writeback(); cache_invalidate(); }
+
+	// routines for the cache
+	// default implementation assumes there is no cache
+	virtual void cache_writeback() {}
+	virtual void cache_invalidate() {}
+	virtual void cache_clean() {}
 
 	// routine to access memory
 	virtual u8 mem_pr8(offs_t address) { return macache32->read_byte(address); }
@@ -1632,8 +1639,9 @@ protected:
 	virtual void opcode_cpuid() override;
 	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
 	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
-	virtual void opcode_invd() override;
-	virtual void opcode_wbinvd() override;
+	virtual void cache_writeback() override;
+	virtual void cache_invalidate() override;
+	virtual void cache_clean() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -1650,7 +1658,6 @@ protected:
 private:
 	void parse_mtrrfix(u64 mtrr, offs_t base, int kblock);
 	int check_cacheable(offs_t address);
-	void invalidate_cache(bool writeback);
 
 	template <class dt, offs_t xorle> dt opcode_read_cache(offs_t address);
 	template <class dt, offs_t xorle> dt program_read_cache(offs_t address);

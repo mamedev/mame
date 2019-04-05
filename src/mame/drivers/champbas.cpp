@@ -113,7 +113,7 @@ WRITE_LINE_MEMBER(champbas_state::irq_enable_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(exctsccr_state::exctsccr_sound_irq)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 

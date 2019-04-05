@@ -325,10 +325,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::main_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xc4/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xc4/4); // V30
 
 	if(scanline == 0) // vblank-in irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xc8/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xc8/4); // V30
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::sub_scanline)
@@ -336,10 +336,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::sub_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_subcpu->set_input_line_and_vector(0, HOLD_LINE,0xc4/4);
+		m_subcpu->set_input_line_and_vector(0, HOLD_LINE,0xc4/4); // V30
 
 	if(scanline == 0) // vblank-in irq
-		m_subcpu->set_input_line_and_vector(0, HOLD_LINE,0xc8/4);
+		m_subcpu->set_input_line_and_vector(0, HOLD_LINE,0xc8/4); // V30
 }
 
 /* Machine Drivers */

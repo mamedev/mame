@@ -149,11 +149,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_state::ecoinfr_irq_timer)
 
 	if (irq_toggle==0)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe4); // Z80
 	}
 	else
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0); // Z80
 	}
 
 

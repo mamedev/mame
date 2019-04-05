@@ -209,11 +209,11 @@ private:
 	DECLARE_MACHINE_RESET(skattv);
 	void adp_palette(palette_device &device) const;
 	void fstation_palette(palette_device &device) const;
-	IRQ_CALLBACK_MEMBER(duart_iack_handler);
 	//INTERRUPT_GEN_MEMBER(adp_int);
 	void skattva_nvram_init(nvram_device &nvram, void *base, size_t size);
 
 	void adp_hd63484_map(address_map &map);
+	void fc7_map(address_map &map);
 	void fashiong_hd63484_map(address_map &map);
 	void fstation_hd63484_map(address_map &map);
 	void fstation_mem(address_map &map);
@@ -248,9 +248,9 @@ void adp_state::skattva_nvram_init(nvram_device &nvram, void *base, size_t size)
 
 ***************************************************************************/
 
-IRQ_CALLBACK_MEMBER(adp_state::duart_iack_handler)
+void adp_state::fc7_map(address_map &map)
 {
-	return m_duart->get_irq_vector();
+	map(0xfffff9, 0xfffff9).r(m_duart, FUNC(mc68681_device::get_irq_vector));
 }
 
 MACHINE_START_MEMBER(adp_state,skattv)
@@ -544,7 +544,7 @@ void adp_state::quickjac(machine_config &config)
 {
 	M68000(config, m_maincpu, 8000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::quickjac_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(adp_state::duart_iack_handler));
+	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &adp_state::fc7_map);
 
 	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
 	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)

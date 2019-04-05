@@ -272,7 +272,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(quasar_state::quasar_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03); // S2650
 }
 
 // ****************************************

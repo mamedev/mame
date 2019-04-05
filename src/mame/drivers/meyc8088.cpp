@@ -173,7 +173,7 @@ WRITE_LINE_MEMBER(meyc8088_state::screen_vblank)
 {
 	// LC255(200ns pulse) rising edge asserts INTR at start and end of vblank
 	// INTA wired back to INTR to clear it, vector is hardwired to $20
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x20);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x20); // I8088
 }
 
 

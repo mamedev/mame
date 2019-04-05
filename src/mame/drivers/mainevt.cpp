@@ -92,7 +92,7 @@ WRITE8_MEMBER(mainevt_state::mainevt_coin_w)
 
 WRITE8_MEMBER(mainevt_state::mainevt_sh_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 READ8_MEMBER(mainevt_state::mainevt_sh_busy_r)

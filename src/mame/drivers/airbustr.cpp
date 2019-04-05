@@ -525,17 +525,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(airbustr_state::airbustr_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_master->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_master->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 
 	/* Pandora "sprite end dma" irq? TODO: timing is likely off */
 	if(scanline == 64)
-		m_master->set_input_line_and_vector(0, HOLD_LINE, 0xfd);
+		m_master->set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
 }
 
 /* Sub Z80 uses IM2 too, but 0xff irq routine just contains an irq ack in it */
 INTERRUPT_GEN_MEMBER(airbustr_state::slave_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd);
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
 }
 
 /* Machine Initialization */

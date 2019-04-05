@@ -330,7 +330,8 @@ private:
 	// internal state
 	void set_interrupt_line(uint32_t line, uint32_t active);
 	void poll_port_d_interrupts();
-	IRQ_CALLBACK_MEMBER(vector_gen);
+	void cpu_space_map(address_map &map);
+	uint8_t irq_callback(offs_t offset);
 	uint32_t get_timer_frequency(uint32_t index);
 	void maybe_start_timer(uint32_t index, uint32_t new_enable);
 	void timer_compare_event(uint32_t index);

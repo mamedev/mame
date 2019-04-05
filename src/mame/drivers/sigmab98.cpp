@@ -2838,7 +2838,7 @@ MACHINE_RESET_MEMBER(sigmab98_state,sigmab98)
 
 INTERRUPT_GEN_MEMBER(sigmab98_state::sigmab98_vblank_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x5a);
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x5a); // Z80
 }
 
 void sigmab98_state::sigmab98(machine_config &config)
@@ -2921,11 +2921,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_state::lufykzku_irq)
 	int scanline = param;
 
 	if (scanline == 240)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_vblank_vector);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_vblank_vector); // Z80
 	else if (scanline == 128)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer0_vector);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer0_vector); // Z80
 	else if ((scanline % 8) == 0)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer1_vector); // this needs to be called often or the state of the door is not read at boot (at least 5 times before bb9 is called)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer1_vector); // Z*) - this needs to be called often or the state of the door is not read at boot (at least 5 times before bb9 is called)
 }
 
 void lufykzku_state::lufykzku(machine_config &config)
@@ -2990,13 +2990,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(sigmab98_state::sammymdl_irq)
 	int scanline = param;
 
 	if (scanline == 240)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_vblank_vector);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_vblank_vector); // Z80
 
 	if (scanline == 128)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer0_vector);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer0_vector); // Z80
 
 	if (scanline == 32)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer1_vector);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer1_vector); // Z80
 }
 
 void sigmab98_state::sammymdl(machine_config &config)
