@@ -3316,6 +3316,26 @@ uint64_t i386_device::debug_virttophys(symbol_table &table, int params, const ui
 	return result;
 }
 
+uint64_t i386_device::debug_cacheflush(symbol_table &table, int params, const uint64_t *param)
+{
+	uint32_t option;
+	bool invalidate;
+	bool clean;
+
+	if (params > 0)
+		option = param[0];
+	else
+		option = 0;
+	invalidate = (option & 1) != 0;
+	clean = (option & 2) != 0;
+	cache_writeback();
+	if (invalidate)
+		cache_invalidate();
+	if (clean)
+		cache_clean();
+	return 0;
+}
+
 void i386_device::device_debug_setup()
 {
 	using namespace std::placeholders;
@@ -3323,6 +3343,7 @@ void i386_device::device_debug_setup()
 	debug()->symtable().add("seglimit", 1, 1, std::bind(&i386_device::debug_seglimit, this, _1, _2, _3));
 	debug()->symtable().add("segofftovirt", 2, 2, std::bind(&i386_device::debug_segofftovirt, this, _1, _2, _3));
 	debug()->symtable().add("virttophys", 1, 1, std::bind(&i386_device::debug_virttophys, this, _1, _2, _3));
+	debug()->symtable().add("cacheflush", 0, 1, std::bind(&i386_device::debug_cacheflush, this, _1, _2, _3));
 }
 
 /*************************************************************************/
@@ -4929,30 +4950,36 @@ void athlonxp_device::program_write_cache(offs_t address, dt data)
 	}
 }
 
-void athlonxp_device::invalidate_cache(bool writeback)
+void athlonxp_device::cache_writeback()
 {
+	// dirty cachelines are written back to memory
+	u32 base;
+	u8 *data;
+
+	data = cache.first_dirty(base, false);
+	while (data != nullptr)
+	{
+		for (int w = 0; w < 64; w += 4)
+			m_program->write_dword(base + w, *(u32 *)(data + w));
+		data = cache.next_dirty(base, false);
+	}
+}
+
+void athlonxp_device::cache_invalidate()
+{
+	// dirty cachelines are not written back to memory
+	cache.reset();
+}
+
+void athlonxp_device::cache_clean()
+{
+	// dirty cachelines are marked as clean but not written back to memory
 	u32 base;
 	u8 *data;
 
 	data = cache.first_dirty(base, true);
 	while (data != nullptr)
-	{
-		if (writeback)
-			for (int w = 0; w < 64; w += 4)
-				m_program->write_dword(base + w, *(u32 *)(data + w));
 		data = cache.next_dirty(base, true);
-	}
-	cache.reset();
-}
-
-void athlonxp_device::opcode_invd()
-{
-	invalidate_cache(false);
-}
-
-void athlonxp_device::opcode_wbinvd()
-{
-	invalidate_cache(true);
 }
 
 
