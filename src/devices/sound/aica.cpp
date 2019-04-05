@@ -1448,6 +1448,7 @@ void aica_device::device_start()
 		save_item(NAME(m_Slots[slot].cur_lpquant), slot);
 		save_item(NAME(m_Slots[slot].cur_lpsample), slot);
 		save_item(NAME(m_Slots[slot].cur_lpstep), slot);
+		save_item(NAME(m_Slots[slot].adbase), slot);
 		save_item(NAME(m_Slots[slot].lpend), slot);
 	}
 	save_item(NAME(m_IrqTimA));
