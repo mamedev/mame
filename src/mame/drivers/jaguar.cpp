@@ -363,12 +363,6 @@ Notes:
  *
  *************************************/
 
-IRQ_CALLBACK_MEMBER(jaguar_state::jaguar_irq_callback)
-{
-	return (irqline == 6) ? 0x40 : -1;
-}
-
-
 /// HACK: Maximum force requests data but doesn't transfer it all before issuing another command.
 /// According to the ATA specification this is not allowed, more investigation is required.
 
@@ -1140,6 +1134,12 @@ void jaguar_state::jaguar_map(address_map &map)
 	map(0xf1d000, 0xf1dfff).rw(FUNC(jaguar_state::wave_rom_r16), FUNC(jaguar_state::wave_rom_w16));
 }
 
+void jaguar_state::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffffd, 0xfffffd).lr8("level6", []() -> u8 { return 0x40; });
+}
+
 /*
 CD-Rom emulation, chip codename Butch (the HW engineer was definitely obsessed with T&J somehow ...)
 TODO: this needs to be device-ized, of course ...
@@ -1886,7 +1886,7 @@ void jaguar_state::jaguar(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, JAGUAR_CLOCK/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::jaguar_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(jaguar_state::jaguar_irq_callback));
+	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &jaguar_state::cpu_space_map);
 
 	JAGUARGPU(config, m_gpu, JAGUAR_CLOCK);
 	m_gpu->irq().set(FUNC(jaguar_state::gpu_cpu_int));
