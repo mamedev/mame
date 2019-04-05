@@ -1290,6 +1290,22 @@ void funworld_state::fw_brick_map(address_map &map)
 	map(0xc000, 0xffff).rom();
 }
 
+void royalcrdf_state::royalcrdf_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x4000, 0x4fff).ram().w(FUNC(royalcrdf_state::funworld_videoram_w)).share("videoram");
+	map(0x5000, 0x5fff).ram().w(FUNC(royalcrdf_state::funworld_colorram_w)).share("colorram");
+	map(0x8000, 0xbfff).rom();
+	map(0xc000, 0xffff).rom();
+}
+
+
 /*************************
 *      Input ports       *
 *************************/
@@ -3146,8 +3162,10 @@ void funworld_state::fw1stpal(machine_config &config)
 void funworld_state::fw2ndpal(machine_config &config)
 {
 	fw1stpal(config);
+
 	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::funworld_map);
+
 	m_gfxdecode->set_info(gfx_fw2ndpal);
 }
 
@@ -3155,11 +3173,11 @@ void funworld_state::fw2ndpal(machine_config &config)
 
 void funworld_state::funquiz(machine_config &config)
 {
-	fw1stpal(config);
-//  fw2ndpal(config);
+	fw1stpal(config);  // gray background.
+//  fw2ndpal(config);  // blue background.
+
 	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::funquiz_map);
-
 
 	subdevice<ay8910_device>("ay8910")->port_a_read_callback().set(FUNC(funworld_state::funquiz_ay8910_a_r));
 	subdevice<ay8910_device>("ay8910")->port_b_read_callback().set(FUNC(funworld_state::funquiz_ay8910_b_r));
@@ -3185,6 +3203,7 @@ void magicrd2_state::magicrd2(machine_config &config)
 void funworld_state::royalcd1(machine_config &config)
 {
 	fw1stpal(config);
+
 	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* (G65SC02P in pro version) 2MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::magicrd2_map);
 }
@@ -3193,6 +3212,7 @@ void funworld_state::royalcd1(machine_config &config)
 void funworld_state::royalcd2(machine_config &config)
 {
 	fw2ndpal(config);
+
 	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::magicrd2_map);
 }
@@ -3201,6 +3221,7 @@ void funworld_state::royalcd2(machine_config &config)
 void funworld_state::cuoreuno(machine_config &config)
 {
 	fw1stpal(config);
+
 	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::cuoreuno_map);
 }
@@ -3209,8 +3230,10 @@ void funworld_state::cuoreuno(machine_config &config)
 void funworld_state::saloon(machine_config &config)
 {
 	fw1stpal(config);
+
 	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::saloon_map);
+
 	config.device_remove("pia0");
 	config.device_remove("pia1");
 }
@@ -3219,6 +3242,7 @@ void funworld_state::saloon(machine_config &config)
 void funworld_state::witchryl(machine_config &config)
 {
 	fw1stpal(config);
+
 	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::witchryl_map);
 }
@@ -3227,6 +3251,7 @@ void funworld_state::witchryl(machine_config &config)
 void lunapark_state::lunapark(machine_config &config)
 {
 	fw1stpal(config);
+
 	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &lunapark_state::lunapark_map);  // mirrored video RAM (4000/5000 to 6000/7000).
 }
@@ -3235,6 +3260,7 @@ void lunapark_state::lunapark(machine_config &config)
 void chinatow_state::chinatow(machine_config &config)
 {
 	fw2ndpal(config);
+
 	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &chinatow_state::chinatow_map);
 }
@@ -3242,6 +3268,7 @@ void chinatow_state::chinatow(machine_config &config)
 void chinatow_state::rcdino4(machine_config &config)
 {
 	fw1stpal(config);
+
 	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &chinatow_state::chinatow_map);
 }
@@ -3250,8 +3277,10 @@ void chinatow_state::rcdino4(machine_config &config)
 void funworld_state::intrgmes(machine_config &config)
 {
 	fw1stpal(config);
+
 	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::intergames_map);
+
 	m_gfxdecode->set_info(gfx_fw2ndpal);
 }
 
@@ -3259,42 +3288,23 @@ void funworld_state::intrgmes(machine_config &config)
 void funworld_state::fw_brick_1(machine_config &config)
 {
 	fw1stpal(config);
+
 	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::fw_brick_map);
+
 	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
-//  m_gfxdecode->set_info(gfx_fw2ndpal);
 }
 
 
 void funworld_state::fw_brick_2(machine_config &config)
 {
 	fw2ndpal(config);
+
 	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::fw_brick_map);
+
 	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
-//  m_gfxdecode->set_info(gfx_fw2ndpal);
 }
-
-// TO-DO: clean up and relocate, when convenient, all the opcode-encryption stuff
-
-class royalcrdf_state : public funworld_state
-{
-public:
-	royalcrdf_state(const machine_config &mconfig, device_type type, const char* tag)
-	: funworld_state(mconfig, type, tag)
-	{
-	}
-	
-	void royalcrdf(machine_config& config);
-	
-	void driver_init() override;
-	
-private:
-	cpu_device* _maincpu {};
-	DECLARE_READ8_MEMBER(royalcrdf_opcode_r);
-	
-	void royalcrdf_opcodes_map(address_map& map);
-};
 
 READ8_MEMBER(royalcrdf_state::royalcrdf_opcode_r)
 {	
@@ -3357,7 +3367,9 @@ void royalcrdf_state::driver_init()
 void royalcrdf_state::royalcrdf(machine_config &config)
 {
 	fw1stpal(config);
-	
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &royalcrdf_state::royalcrdf_map);
+
 	_maincpu = reinterpret_cast<cpu_device*>(config.device("maincpu"));
 	_maincpu->set_addrmap(AS_OPCODES, &royalcrdf_state::royalcrdf_opcodes_map);
 }
