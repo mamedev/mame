@@ -2135,6 +2135,7 @@ void m68000_base_device::m68ki_exception_interrupt(uint32_t int_level)
 	   vector, including for spurious interrupts. */
 
 	// 68000 and 68010 assert UDS as well as LDS for IACK cycles but disregard D8-D15
+	// 68008 definitely reads only one byte from CPU space, and the 68020 byte-sizes the request
 	if(CPU_TYPE_IS_EC020_PLUS() || m_cpu_type == CPU_TYPE_008)
 		vector = m_cpu_space->read_byte(0xfffffff1 | (int_level << 1));
 	else
