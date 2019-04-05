@@ -232,7 +232,7 @@ void galastrm_state::galastrm(machine_config &config)
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(3);
+	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(-40, -3);
 	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
