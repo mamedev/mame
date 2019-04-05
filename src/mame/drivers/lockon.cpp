@@ -414,12 +414,20 @@ WRITE_LINE_MEMBER(lockon_state::ym2203_irq)
 
 WRITE8_MEMBER(lockon_state::ym2203_out_b)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 0x80);
-	machine().bookkeeping().coin_counter_w(1, data & 0x40);
-	machine().bookkeeping().coin_counter_w(2, data & 0x20);
+	// we require that the value keeps stable for at least two writes
+	if (BIT(data, 7) == BIT(m_ym2203_port_b, 7))
+		machine().bookkeeping().coin_counter_w(0, BIT(~data, 7));
+
+	if (BIT(data, 6) == BIT(m_ym2203_port_b, 6))
+		machine().bookkeeping().coin_counter_w(1, BIT(~data, 6));
+
+	if (BIT(data, 5) == BIT(m_ym2203_port_b, 5))
+		machine().bookkeeping().coin_counter_w(2, BIT(~data, 5));
 
 	/* 'Lock-On' lamp */
 	m_lamp = BIT(~data, 4);
+
+	m_ym2203_port_b = data;
 }
 
 /*************************************
