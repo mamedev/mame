@@ -557,11 +557,11 @@ void kaneko16_sprite_device::copybitmap(bitmap_rgb32 &bitmap, const rectangle &c
 
 
 
-void kaneko16_sprite_device::kaneko16_render_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes) { kaneko16_render_sprites_common(bitmap, cliprect, priority_bitmap, spriteram16, spriteram16_bytes); }
-void kaneko16_sprite_device::kaneko16_render_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes) { kaneko16_render_sprites_common(bitmap, cliprect, priority_bitmap, spriteram16, spriteram16_bytes); }
+void kaneko16_sprite_device::render_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes) { render_sprites_common(bitmap, cliprect, priority_bitmap, spriteram16, spriteram16_bytes); }
+void kaneko16_sprite_device::render_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes) { render_sprites_common(bitmap, cliprect, priority_bitmap, spriteram16, spriteram16_bytes); }
 
 template<class _BitmapClass>
-void kaneko16_sprite_device::kaneko16_render_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes)
+void kaneko16_sprite_device::render_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes)
 {
 	/* Sprites last (rendered with pdrawgfx, so they can slip
 	   in between the layers) */
