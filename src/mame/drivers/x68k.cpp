@@ -1067,36 +1067,48 @@ WRITE_LINE_MEMBER(x68k_state::mfp_irq_callback)
 	m_mfp_prev = state;
 }
 
-void x68k_state::cpu_space_map(address_map &map)
+template <int Line>
+uint8_t x68k_state::int_ack()
 {
-	map(0xfffff2, 0xffffff).r(FUNC(x68k_state::int_ack));
+	if (!machine().side_effects_disabled())
+	{
+		m_maincpu->set_input_line(Line, CLEAR_LINE);
+		if(Line == 1)  // IOSC
+		{
+			m_ioc.irqstatus &= ~0xf0;
+		}
+		if(Line == 5)  // SCC
+		{
+			m_mouse.irqactive = 0;
+		}
+
+		LOGMASKED(LOG_IRQ, "SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[Line],Line);
+	}
+	return m_current_vector[Line];
 }
 
-u16 x68k_state::int_ack(offs_t offset)
+uint8_t x68k_state::mfp_ack()
 {
-	int irqline = offset+1;
-	if(irqline == 6)  // MFP
+	if (m_current_vector[6] != 0x4b && m_current_vector[6] != 0x4c)
+		m_current_vector[6] = m_mfpdev->get_vector();
+	else if (!machine().side_effects_disabled())
 	{
-		if(m_current_vector[6] != 0x4b && m_current_vector[6] != 0x4c)
-			m_current_vector[6] = m_mfpdev->get_vector();
-		else
-			m_maincpu->set_input_line(irqline,CLEAR_LINE);
-		LOGMASKED(LOG_IRQ, "SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[6],irqline);
-		return m_current_vector[6];
+		m_maincpu->set_input_line(6,CLEAR_LINE);
+		LOGMASKED(LOG_IRQ, "SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[6],6);
 	}
+	return m_current_vector[6];
+}
 
-	m_maincpu->set_input_line(irqline,CLEAR_LINE);
-	if(irqline == 1)  // IOSC
-	{
-		m_ioc.irqstatus &= ~0xf0;
-	}
-	if(irqline == 5)  // SCC
-	{
-		m_mouse.irqactive = 0;
-	}
-
-	LOGMASKED(LOG_IRQ, "SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[irqline],irqline);
-	return m_current_vector[irqline];
+void x68k_state::cpu_space_map(address_map &map)
+{
+	map.global_mask(0xffffff);
+	map(0xfffff3, 0xfffff3).r(FUNC(x68k_state::int_ack<1>));
+	map(0xfffff5, 0xfffff5).r(FUNC(x68k_state::int_ack<2>));
+	map(0xfffff7, 0xfffff7).r(FUNC(x68k_state::int_ack<3>));
+	map(0xfffff9, 0xfffff9).r(FUNC(x68k_state::int_ack<4>));
+	map(0xfffffb, 0xfffffb).r(FUNC(x68k_state::int_ack<5>));
+	map(0xfffffd, 0xfffffd).r(FUNC(x68k_state::mfp_ack));
+	map(0xffffff, 0xffffff).r(FUNC(x68k_state::int_ack<7>));
 }
 
 WRITE_LINE_MEMBER(x68ksupr_state::scsi_irq)
