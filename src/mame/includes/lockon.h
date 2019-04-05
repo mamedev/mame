@@ -36,7 +36,6 @@ public:
 		, m_scene_ram(*this, "scene_ram")
 		, m_ground_ram(*this, "ground_ram")
 		, m_object_ram(*this, "object_ram")
-		, m_ym2203_port_b(0xff)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_ground(*this, "ground")
@@ -98,7 +97,6 @@ private:
 	/* misc */
 	uint8_t       m_ctrl_reg;
 	uint32_t      m_main_inten;
-	uint8_t       m_ym2203_port_b;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
