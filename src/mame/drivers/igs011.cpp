@@ -208,6 +208,7 @@ private:
 	DECLARE_WRITE16_MEMBER(lhb_igs011_prot2_swap_w);
 	DECLARE_WRITE16_MEMBER(wlcc_igs011_prot2_swap_w);
 	DECLARE_WRITE16_MEMBER(vbowl_igs011_prot2_swap_w);
+	DECLARE_READ16_MEMBER(drgnwrldv40k_igs011_prot2_r);
 	DECLARE_READ16_MEMBER(drgnwrldv21_igs011_prot2_r);
 	DECLARE_READ16_MEMBER(drgnwrldv20j_igs011_prot2_r);
 	DECLARE_READ16_MEMBER(lhb_igs011_prot2_r);
@@ -1347,6 +1348,14 @@ WRITE16_MEMBER(igs011_state::vbowl_igs011_prot2_swap_w)
 
 
 // drgnwrld
+READ16_MEMBER(igs011_state::drgnwrldv40k_igs011_prot2_r)
+{
+	// b9 = (!b4 & !b0) | ((b3 & !b2) & !(b1 ^ b0)
+	uint8_t x = m_prot2;
+	uint8_t b9 = ((BIT(x, 4) ^ 1) & (BIT(x, 0) ^ 1)) | (((BIT(x, 3)) & ((BIT(x, 2)) ^ 1)) & (((BIT(x, 1)) ^ (BIT(x, 0))) ^ 1));
+	return (b9 << 9);
+}
+
 READ16_MEMBER(igs011_state::drgnwrldv21_igs011_prot2_r)
 {
 	// b9 = (!b4) | (!b0 & b2) | (!(b3 ^ b1) & !(!(b4 & b0) | b2))
@@ -2311,7 +2320,7 @@ void igs011_state::init_drgnwrldv40k()
 	drgnwrldv40k_decrypt();
 	drgnwrld_gfx_decrypt();
 
-	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16_delegate(FUNC(igs011_state::drgnwrldv21_igs011_prot2_r), this)); // wrong
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16_delegate(FUNC(igs011_state::drgnwrldv40k_igs011_prot2_r), this));
 }
 
 void igs011_state::init_drgnwrldv11h()
@@ -2579,8 +2588,8 @@ void igs011_state::init_nkishusp()
 void igs011_state::drgnwrld_mem(address_map &map)
 {
 //  drgnwrld: IGS011 protection dynamically mapped at 1dd7x
-//  AM_RANGE( 0x01dd70, 0x01dd77 ) AM_WRITE(igs011_prot1_w )
-//  AM_RANGE( 0x01dd78, 0x01dd79 ) AM_READ ( igs011_prot1_r )
+//  map(0x01dd70, 0x01dd77).w(FUNC(igs011_state::igs011_prot1_w));
+//  map(0x01dd78, 0x01dd79).r(FUNC(igs011_state::igs011_prot1_r));
 
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram().share("nvram");
@@ -2598,7 +2607,7 @@ void igs011_state::drgnwrld_mem(address_map &map)
 	map(0xa40000, 0xa40001).w(FUNC(igs011_state::igs_dips_w));
 
 	map(0xa50000, 0xa50001).w(FUNC(igs011_state::igs011_prot_addr_w));
-//  AM_RANGE( 0xa50000, 0xa50005 ) AM_READ(igs011_prot_fake_r )
+//  map(0xa50000, 0xa50005).r(FUNC(igs011_state::igs011_prot_fake_r));
 
 	map(0xa58000, 0xa58001).w(FUNC(igs011_state::igs011_blit_x_w));
 	map(0xa58800, 0xa58801).w(FUNC(igs011_state::igs011_blit_y_w));
@@ -2632,7 +2641,7 @@ void igs011_state::drgnwrld_igs012_mem(address_map &map)
 	map(0x00d4c0, 0x00d4ff).r(FUNC(igs011_state::drgnwrldv20j_igs011_prot2_r));   // read
 
 	map(0x902000, 0x902fff).w(FUNC(igs011_state::igs012_prot_reset_w));   // reset?
-//  AM_RANGE( 0x902000, 0x902005 ) AM_WRITE(igs012_prot_fake_r )
+//  map(0x902000, 0x902005).w(FUNC(igs011_state::igs012_prot_fake_r));
 }
 
 
@@ -2661,8 +2670,8 @@ void igs011_state::lhb_mem(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 
 //  lhb: IGS011 protection dynamically mapped at 834x
-//  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE(igs011_prot1_w )
-//  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )
+//  map(0x008340, 0x008347).w(FUNC(igs011_state::igs011_prot1_w));
+//  map(0x008348, 0x008349).r(FUNC(igs011_state::igs011_prot1_r));
 
 	map(0x010000, 0x010001).w(FUNC(igs011_state::lhb_okibank_w));
 
@@ -2685,7 +2694,7 @@ void igs011_state::lhb_mem(address_map &map)
 	map(0x840000, 0x840001).w(FUNC(igs011_state::igs_dips_w));
 
 	map(0x850000, 0x850001).w(FUNC(igs011_state::igs011_prot_addr_w));
-//  AM_RANGE( 0x850000, 0x850005 ) AM_WRITE(igs011_prot_fake_r )
+//  map(0x850000, 0x850005).w(FUNC(igs011_state::igs011_prot_fake_r));
 
 	map(0x858000, 0x858001).w(FUNC(igs011_state::igs011_blit_x_w));
 	map(0x858800, 0x858801).w(FUNC(igs011_state::igs011_blit_y_w));
@@ -2704,8 +2713,8 @@ void igs011_state::xymg_mem(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 
 //  xymg: IGS011 protection dynamically mapped at 834x
-//  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE(igs011_prot1_w )
-//  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )
+//  map(0x008340, 0x008347).w(FUNC(igs011_state::igs011_prot1_w));
+//  map(0x008348, 0x008349).r(FUNC(igs011_state::igs011_prot1_r));
 
 	map(0x010000, 0x010001).w(FUNC(igs011_state::lhb_okibank_w));
 
@@ -2727,7 +2736,7 @@ void igs011_state::xymg_mem(address_map &map)
 	map(0x840000, 0x840001).w(FUNC(igs011_state::igs_dips_w));
 
 	map(0x850000, 0x850001).w(FUNC(igs011_state::igs011_prot_addr_w));
-//  AM_RANGE( 0x850000, 0x850005 ) AM_WRITE(igs011_prot_fake_r )
+//  map(0x850000, 0x850005).w(FUNC(igs011_state::igs011_prot_fake_r));
 
 	map(0x858000, 0x858001).w(FUNC(igs011_state::igs011_blit_x_w));
 	map(0x858800, 0x858801).w(FUNC(igs011_state::igs011_blit_y_w));
@@ -2744,8 +2753,8 @@ void igs011_state::xymg_mem(address_map &map)
 void igs011_state::wlcc_mem(address_map &map)
 {
 //  wlcc: IGS011 protection dynamically mapped at 834x
-//  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE(igs011_prot1_w )
-//  AM_RANGE( 0x008348, 0x008349 ) AM_READ(igs011_prot1_r )
+//  map(0x008340, 0x008347).w(FUNC(igs011_state::igs011_prot1_w));
+//  map(0x008348, 0x008349).r(FUNC(igs011_state::igs011_prot1_r));
 
 	map(0x518000, 0x5181ff).w(FUNC(igs011_state::igs011_prot2_inc_w));   // inc   (33)
 	map(0x518200, 0x5183ff).w(FUNC(igs011_state::wlcc_igs011_prot2_swap_w));   // swap  (33)
@@ -2766,7 +2775,7 @@ void igs011_state::wlcc_mem(address_map &map)
 	map(0xa40000, 0xa40001).w(FUNC(igs011_state::igs_dips_w));
 
 	map(0xa50000, 0xa50001).w(FUNC(igs011_state::igs011_prot_addr_w));
-//  AM_RANGE( 0xa50000, 0xa50005 ) AM_READ(igs011_prot_fake_r )
+//  map(0xa50000, 0xa50005).r(FUNC(igs011_state::igs011_prot_fake_r));
 
 	map(0xa58000, 0xa58001).w(FUNC(igs011_state::igs011_blit_x_w));
 	map(0xa58800, 0xa58801).w(FUNC(igs011_state::igs011_blit_y_w));
@@ -2787,8 +2796,8 @@ void igs011_state::lhb2_mem(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 
 //  lhb2: IGS011 protection dynamically mapped at 1ff8x
-//  AM_RANGE( 0x01ff80, 0x01ff87 ) AM_WRITE(igs011_prot1_w )
-//  AM_RANGE( 0x01ff88, 0x01ff89 ) AM_READ ( igs011_prot1_r )
+//  map(0x01ff80, 0x01ff87).w(FUNC(igs011_state::igs011_prot1_w));
+//  map(0x01ff88, 0x01ff89).r(FUNC(igs011_state::igs011_prot1_r));
 
 	map(0x020000, 0x0201ff).w(FUNC(igs011_state::igs011_prot2_inc_w));   // inc   (55)
 	map(0x020200, 0x0203ff).w(FUNC(igs011_state::lhb_igs011_prot2_swap_w));   // swap  (33)
@@ -2809,7 +2818,7 @@ void igs011_state::lhb2_mem(address_map &map)
 	map(0xa40000, 0xa40001).w(FUNC(igs011_state::igs_dips_w));
 
 	map(0xa50000, 0xa50001).w(FUNC(igs011_state::igs011_prot_addr_w));
-//  AM_RANGE( 0xa50000, 0xa50005 ) AM_READ(igs011_prot_fake_r )
+//  map(0xa50000, 0xa50005).r(FUNC(igs011_state::igs011_prot_fake_r));
 
 	map(0xa58000, 0xa58001).w(FUNC(igs011_state::igs011_blit_x_w));
 	map(0xa58800, 0xa58801).w(FUNC(igs011_state::igs011_blit_y_w));
@@ -2830,8 +2839,8 @@ void igs011_state::nkishusp_mem(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 
 //  nkishusp: IGS011 protection dynamically mapped at 1ff8x
-//  AM_RANGE( 0x01ff80, 0x01ff87 ) AM_WRITE(igs011_prot1_w )
-//  AM_RANGE( 0x01ff88, 0x01ff89 ) AM_READ ( igs011_prot1_r )
+//  map(0x01ff80, 0x01ff87).w(FUNC(igs011_state::igs011_prot1_w));
+//  map(0x01ff88, 0x01ff89).r(FUNC(igs011_state::igs011_prot1_r));
 
 	// to be done:
 	map(0x023000, 0x0231ff).w(FUNC(igs011_state::igs011_prot2_inc_w));   // inc   (55)
@@ -2854,7 +2863,7 @@ void igs011_state::nkishusp_mem(address_map &map)
 	map(0xa40000, 0xa40001).w(FUNC(igs011_state::igs_dips_w));
 
 	map(0xa50000, 0xa50001).w(FUNC(igs011_state::igs011_prot_addr_w));
-//  AM_RANGE( 0xa50000, 0xa50005 ) AM_READ(igs011_prot_fake_r )
+//  map(0xa50000, 0xa50005).r(FUNC(igs011_state::igs011_prot_fake_r));
 
 	map(0xa58000, 0xa58001).w(FUNC(igs011_state::igs011_blit_x_w));
 	map(0xa58800, 0xa58801).w(FUNC(igs011_state::igs011_blit_y_w));
@@ -2905,8 +2914,8 @@ void igs011_state::vbowl_mem(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 
 //  vbowl: IGS011 protection dynamically mapped at 834x
-//  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE(igs011_prot1_w )
-//  AM_RANGE( 0x008348, 0x008349 ) AM_READ(igs011_prot1_r )
+//  map(0x008340, 0x008347).w(FUNC(igs011_state::igs011_prot1_w));
+//  map(0x008348, 0x008349).r(FUNC(igs011_state::igs011_prot1_r));
 
 	// IGS012
 	map(0x001600, 0x00160f).w(FUNC(igs011_state::igs012_prot_swap_w)).mirror(0x01c000); // swap (a5 / 55)
@@ -2929,7 +2938,7 @@ void igs011_state::vbowl_mem(address_map &map)
 	map(0x50f600, 0x50f7ff).r(FUNC(igs011_state::vbowl_igs011_prot2_r));   // read
 
 	map(0x902000, 0x902fff).w(FUNC(igs011_state::igs012_prot_reset_w));   // reset?
-//  AM_RANGE( 0x902000, 0x902005 ) AM_WRITE(igs012_prot_fake_r )
+//  map(0x902000, 0x902005).w(FUNC(igs011_state::igs012_prot_fake_r));
 
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200000, 0x200fff).ram().share("priority_ram");
@@ -2949,11 +2958,11 @@ void igs011_state::vbowl_mem(address_map &map)
 	map(0xa18000, 0xa18001).w(FUNC(igs011_state::vbowl_link_3_w));
 
 	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
-//  AM_RANGE( 0xa38000, 0xa38001 ) AM_WRITE(lhb_irq_enable_w )
+//  map(0xa38000, 0xa38001).w(FUNC(igs011_state::lhb_irq_enable_w));
 	map(0xa40000, 0xa40001).w(FUNC(igs011_state::igs_dips_w));
 
 	map(0xa48000, 0xa48001).w(FUNC(igs011_state::igs011_prot_addr_w));
-//  AM_RANGE( 0xa48000, 0xa48005 ) AM_WRITE(igs011_prot_fake_r )
+//  map(0xa48000, 0xa48005).w(FUNC(igs011_state::igs011_prot_fake_r));
 
 	map(0xa58000, 0xa58001).w(FUNC(igs011_state::igs011_blit_x_w));
 	map(0xa58800, 0xa58801).w(FUNC(igs011_state::igs011_blit_y_w));
@@ -5017,7 +5026,7 @@ ROM_END
 ***************************************************************************/
 
 GAME( 1997, drgnwrld,     0,        drgnwrld,        drgnwrld,  igs011_state, init_drgnwrld,     ROT0, "IGS",                     "Dragon World (World, V040O)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv40k, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dragon World (Korea, V040K)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // protection handling needs to be updated for this set
+GAME( 1995, drgnwrldv40k, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dragon World (Korea, V040K)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1995, drgnwrldv30,  drgnwrld, drgnwrld,        drgnwrld,  igs011_state, init_drgnwrldv30,  ROT0, "IGS",                     "Dragon World (World, V030O)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1995, drgnwrldv21,  drgnwrld, drgnwrld_igs012, drgnwrld,  igs011_state, init_drgnwrldv21,  ROT0, "IGS",                     "Dragon World (World, V021O)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1995, drgnwrldv21j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv21j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V021J)",         MACHINE_SUPPORTS_SAVE )
