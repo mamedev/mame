@@ -1653,6 +1653,7 @@ void a1000_state::a1000(machine_config &config)
 	// main cpu
 	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a1000_state::a1000_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&a1000_state::a1000_overlay_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, "bootrom").set_map(&a1000_state::a1000_bootrom_map).set_options(ENDIANNESS_BIG, 16, 19, 0x40000);
@@ -1689,6 +1690,7 @@ void a2000_state::a2000(machine_config &config)
 	// main cpu
 	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a2000_state::a2000_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
@@ -1737,6 +1739,7 @@ void a500_state::a500(machine_config &config)
 	// main cpu
 	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a500_state::a500_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
@@ -1775,6 +1778,7 @@ void cdtv_state::cdtv(machine_config &config)
 	// main cpu
 	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdtv_state::cdtv_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	// remote control input converter
 	m6502_device &u75(M6502(config, "u75", XTAL(3'000'000)));
@@ -1848,6 +1852,7 @@ void a3000_state::a3000(machine_config &config)
 	// main cpu
 	M68030(config, m_maincpu, XTAL(32'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a3000_state::a3000_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
@@ -1884,6 +1889,7 @@ void a500p_state::a500p(machine_config &config)
 	// main cpu
 	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a500p_state::a500p_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
@@ -1923,6 +1929,7 @@ void a600_state::a600(machine_config &config)
 	// main cpu
 	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a600_state::a600_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map16).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
@@ -1969,6 +1976,7 @@ void a1200_state::a1200(machine_config &config)
 	// main cpu
 	M68EC020(config, m_maincpu, amiga_state::CLK_28M_PAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a1200_state::a1200_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
@@ -2029,6 +2037,7 @@ void a4000_state::a4000(machine_config &config)
 	// main cpu
 	M68040(config, m_maincpu, XTAL(50'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a4000_state::a4000_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
@@ -2073,6 +2082,7 @@ void a4000_state::a400030(machine_config &config)
 	// main cpu
 	M68EC030(config.replace(), m_maincpu, XTAL(50'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a4000_state::a400030_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	// todo: ide
 }
@@ -2097,6 +2107,7 @@ void cd32_state::cd32(machine_config &config)
 	// main cpu
 	M68EC020(config, m_maincpu, amiga_state::CLK_28M_PAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cd32_state::cd32_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
@@ -2149,6 +2160,7 @@ void a4000_state::a4000t(machine_config &config)
 	// main cpu
 	M68040(config.replace(), m_maincpu, XTAL(50'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a4000_state::a4000t_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	// todo: ide, zorro3, scsi, super dmac
 }

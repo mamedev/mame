@@ -71,11 +71,12 @@ public:
 	auto out_so_cb() { return m_out_so_cb.bind(); }
 	//auto out_rr_cb() { return m_out_rr_cb.bind(); }
 	//auto out_tr_cb() { return m_out_tr_cb.bind(); }
+	auto iack_chain_cb() { return m_iack_chain_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	int get_vector();
+	uint8_t get_vector();
 
 	DECLARE_WRITE_LINE_MEMBER( i0_w );
 	DECLARE_WRITE_LINE_MEMBER( i1_w );
@@ -219,6 +220,8 @@ private:
 	devcb_write_line        m_out_so_cb;
 	//devcb_write_line        m_out_rr_cb;
 	//devcb_write_line        m_out_tr_cb;
+
+	devcb_read8             m_iack_chain_cb;
 
 	//int m_device_type;                      /* device type */
 

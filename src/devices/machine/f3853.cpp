@@ -359,8 +359,8 @@ WRITE8_MEMBER(f3856_device::write)
 	case 2:
 	{
 		// timer prescaler
-		static const u8 prescaler[8] = { 32, 128, 8, 2 };
-		m_prescaler = prescaler[data >> 5 & 7];
+		static const u8 prescaler[4] = { 32, 128, 8, 2 };
+		m_prescaler = prescaler[data >> 2 & 3];
 
 		// start/stop timer
 		bool prev = m_timer_start;

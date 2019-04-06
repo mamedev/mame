@@ -28,6 +28,20 @@ enum
 
 /***********************************************************************************/
 
+TC0100SCN_CB_MEMBER(taitof2_state::mjnquest_tmap_cb)
+{
+	*code = (*code & 0x7fff) | (m_gfxbank << 15);
+}
+
+void taitof2_state::mjnquest_gfxbank_w(u8 data)
+{
+	if ((data ^ m_gfxbank) & 1)
+	{
+		m_gfxbank = data & 1;
+		m_tc0100scn->tilemap_set_dirty();
+	}
+}
+
 void taitof2_state::taitof2_core_vh_start (int sprite_type, int hide, int flip_hide )
 {
 	int i;
@@ -139,8 +153,6 @@ VIDEO_START_MEMBER(taitof2_state,taitof2_thundfox)
 VIDEO_START_MEMBER(taitof2_state,taitof2_mjnquest)
 {
 	taitof2_core_vh_start(0, 0, 0);
-
-	m_tc0100scn->set_bg_tilemask(0x7fff);
 }
 
 VIDEO_START_MEMBER(taitof2_state,taitof2_footchmp)
@@ -207,7 +219,6 @@ VIDEO_START_MEMBER(taitof2_state,taitof2_driftout)
 	m_pivot_ydisp = 16;
 	taitof2_core_vh_start(0, 3, 3);
 }
-
 
 /********************************************************
           SPRITE READ AND WRITE HANDLERS

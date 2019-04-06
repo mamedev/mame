@@ -21,15 +21,12 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define MC68328_TAG "dragonball"
-
 class palm_state : public driver_device
 {
 public:
 	palm_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_lsi(*this, MC68328_TAG),
 		m_ram(*this, RAM_TAG),
 		m_io_penx(*this, "PENX"),
 		m_io_peny(*this, "PENY"),
@@ -64,8 +61,7 @@ private:
 	offs_t palm_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 	void palm_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<mc68328_device> m_lsi;
+	required_device<mc68328_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	uint8_t m_port_f_latch;
 	uint16_t m_spim_data;
@@ -85,15 +81,15 @@ INPUT_CHANGED_MEMBER(palm_state::pen_check)
 	uint8_t button = m_io_penb->read();
 
 	if(button)
-		m_lsi->set_penirq_line(1);
+		m_maincpu->set_penirq_line(1);
 	else
-		m_lsi->set_penirq_line(0);
+		m_maincpu->set_penirq_line(0);
 }
 
 INPUT_CHANGED_MEMBER(palm_state::button_check)
 {
 	uint8_t button_state = m_io_portd->read();
-	m_lsi->set_port_d_lines(button_state, (int)(uintptr_t)param);
+	m_maincpu->set_port_d_lines(button_state, (int)(uintptr_t)param);
 }
 
 WRITE8_MEMBER(palm_state::palm_port_f_out)
@@ -174,7 +170,6 @@ void palm_state::palm_palette(palette_device &palette) const
 void palm_state::palm_map(address_map &map)
 {
 	map(0xc00000, 0xe07fff).rom().region("bios", 0);
-	map(0xfff000, 0xffffff).rw(m_lsi, FUNC(mc68328_device::read), FUNC(mc68328_device::write));
 }
 
 
@@ -185,9 +180,16 @@ void palm_state::palm_map(address_map &map)
 void palm_state::palm(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 32768*506);        /* 16.580608 MHz */
+	MC68328(config, m_maincpu, 32768*506);        /* 16.580608 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &palm_state::palm_map);
 	m_maincpu->set_dasm_override(FUNC(palm_state::palm_dasm_override));
+	m_maincpu->out_port_f().set(FUNC(palm_state::palm_port_f_out));
+	m_maincpu->in_port_c().set(FUNC(palm_state::palm_port_c_in));
+	m_maincpu->in_port_f().set(FUNC(palm_state::palm_port_f_in));
+	m_maincpu->out_pwm().set("dac", FUNC(dac_bit_interface::write));
+	m_maincpu->out_spim().set(FUNC(palm_state::palm_spim_out));
+	m_maincpu->in_spim().set(FUNC(palm_state::palm_spim_in));
+	m_maincpu->spim_xch_trigger().set(FUNC(palm_state::palm_spim_exchange));
 
 	config.m_minimum_quantum = attotime::from_hz(60);
 
@@ -198,7 +200,7 @@ void palm_state::palm(machine_config &config)
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_size(160, 220);
 	screen.set_visarea(0, 159, 0, 219);
-	screen.set_screen_update(MC68328_TAG, FUNC(mc68328_device::screen_update));
+	screen.set_screen_update("maincpu", FUNC(mc68328_device::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(palm_state::palm_palette), 2);
@@ -208,15 +210,6 @@ void palm_state::palm(machine_config &config)
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-
-	MC68328(config, m_lsi, 0, "maincpu"); // on-board peripherals
-	m_lsi->out_port_f().set(FUNC(palm_state::palm_port_f_out));
-	m_lsi->in_port_c().set(FUNC(palm_state::palm_port_c_in));
-	m_lsi->in_port_f().set(FUNC(palm_state::palm_port_f_in));
-	m_lsi->out_pwm().set("dac", FUNC(dac_bit_interface::write));
-	m_lsi->out_spim().set(FUNC(palm_state::palm_spim_out));
-	m_lsi->in_spim().set(FUNC(palm_state::palm_spim_in));
-	m_lsi->spim_xch_trigger().set(FUNC(palm_state::palm_spim_exchange));
 }
 
 static INPUT_PORTS_START( palm )

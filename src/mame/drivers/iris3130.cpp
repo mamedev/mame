@@ -405,12 +405,12 @@ void sgi_ip2_state::sgi_ip2_map(address_map &map)
 
 WRITE_LINE_MEMBER(sgi_ip2_state::duarta_irq_handler)
 {
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line(M68K_IRQ_6, state);
 }
 
 WRITE_LINE_MEMBER(sgi_ip2_state::duartb_irq_handler)
 {
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line(M68K_IRQ_6, state);
 }
 
 static DEVICE_INPUT_DEFAULTS_START( ip2_terminal )

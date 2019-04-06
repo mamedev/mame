@@ -518,6 +518,7 @@ void vigilant_state::vigilant(machine_config &config)
 	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline("soundcpu", 0);
 
 	IREM_M72_AUDIO(config, m_audio);
+	m_audio->set_dac_tag("dac");
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
@@ -570,6 +571,7 @@ void vigilant_state::buccanrs(machine_config &config)
 	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline("soundcpu", 0);
 
 	IREM_M72_AUDIO(config, m_audio);
+	m_audio->set_dac_tag("dac");
 
 	ym2203_device &ym1(YM2203(config, "ym1", 18432000/6));
 	ym1.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
@@ -638,6 +640,7 @@ void vigilant_state::kikcubic(machine_config &config)
 	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline("soundcpu", 0);
 
 	IREM_M72_AUDIO(config, m_audio);
+	m_audio->set_dac_tag("dac");
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
@@ -689,7 +692,7 @@ ROM_START( vigilant ) // World Rev E
 	ROM_LOAD( "vg_b-1f-.ic3",  0x10000, 0x10000, CRC(d0d33673) SHA1(39761d97a71deaf7f17233d5bd5a55dbb1e6b30e) )
 	ROM_LOAD( "vg_b-1h-.ic4",  0x20000, 0x10000, CRC(aae81695) SHA1(ca8e136eca3543b27f3a61b105d4a280711cd6ea) )
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
 	ROM_LOAD( "vg_a-4d-.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
 	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - protected */
@@ -729,7 +732,7 @@ ROM_START( vigilantg ) // US Rev G
 	ROM_LOAD( "vg_b-1f-.ic3",  0x10000, 0x10000, CRC(d0d33673) SHA1(39761d97a71deaf7f17233d5bd5a55dbb1e6b30e) )
 	ROM_LOAD( "vg_b-1h-.ic4",  0x20000, 0x10000, CRC(aae81695) SHA1(ca8e136eca3543b27f3a61b105d4a280711cd6ea) )
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
 	ROM_LOAD( "vg_a-4d-.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
 	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - protected */
@@ -771,7 +774,7 @@ ROM_START( vigilanto ) // US (earliest base version)
 	ROM_LOAD( "612.ic4",  0x20000, 0x10000, CRC(85057c81) SHA1(47663e17f08f47d847605c14e849266468ff39ba) )
 	ROM_IGNORE(0x10000)
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
 	ROM_LOAD( "vg_a-4d-.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
 	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - protected */
@@ -813,7 +816,7 @@ ROM_START( vigilanta ) // World Rev A
 	ROM_LOAD( "612.ic4",  0x20000, 0x10000, CRC(85057c81) SHA1(47663e17f08f47d847605c14e849266468ff39ba) )
 	ROM_IGNORE(0x10000)
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples, matches base set */
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples, matches base set */
 	ROM_LOAD( "vg_a-4d-a.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
 	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - protected */
@@ -855,7 +858,7 @@ ROM_START( vigilantb ) // US Rev B
 	ROM_LOAD( "612.ic4",  0x20000, 0x10000, CRC(85057c81) SHA1(47663e17f08f47d847605c14e849266468ff39ba) )
 	ROM_IGNORE(0x10000)
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
 	ROM_LOAD( "vg_a-4d-.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
 	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - protected */
@@ -897,7 +900,7 @@ ROM_START( vigilantc ) // World Rev C
 	ROM_LOAD( "612.ic4",  0x20000, 0x10000, CRC(85057c81) SHA1(47663e17f08f47d847605c14e849266468ff39ba) )
 	ROM_IGNORE(0x10000)
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
 	ROM_LOAD( "vg_a-4d-.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
 	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - protected */
@@ -939,7 +942,7 @@ ROM_START( vigilantd ) // Japan Rev D
 	ROM_LOAD( "612.ic4",  0x20000, 0x10000, CRC(85057c81) SHA1(47663e17f08f47d847605c14e849266468ff39ba) )
 	ROM_IGNORE(0x10000)
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples, matches base set */
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples, matches base set */
 	ROM_LOAD( "vg_a-4d-d.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
 	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - protected */
@@ -979,7 +982,7 @@ ROM_START( vigilantbl ) /* Bootleg */
 	ROM_LOAD( "e01_c06.bin",  0x10000, 0x10000, CRC(d0d33673) SHA1(39761d97a71deaf7f17233d5bd5a55dbb1e6b30e) )
 	ROM_LOAD( "f01_c07.bin",  0x20000, 0x10000, CRC(aae81695) SHA1(ca8e136eca3543b27f3a61b105d4a280711cd6ea) )
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
 	ROM_LOAD( "d04_c01.bin",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
 	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - not convinced these exist in this form on bootleg */
@@ -1006,7 +1009,7 @@ ROM_START( kikcubic )
 	ROM_LOAD( "mqj-00",       0x00000, 0x40000, CRC(7fb0c58f) SHA1(f70ff39e2d648606686c87cf1a7a3ffb46c2656a) )
 	ROM_LOAD( "mqj-10",       0x40000, 0x40000, CRC(3a189205) SHA1(063d664d4cf709931b5e3a5b6eb7c75bcd57b518) )
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
 	ROM_LOAD( "mqj-v0",       0x00000, 0x10000, CRC(54762956) SHA1(f08e983af28b16d27505d465ca64e7c7a93373a4) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
@@ -1039,7 +1042,7 @@ ROM_START( kikcubicb )
 	ROM_LOAD( "8.bin",        0x50000, 0x10000, CRC(947dbd4e) SHA1(278ad7126bacb752886800cf48c6fe704427149d) )
 	ROM_RELOAD(               0x70000, 0x10000 )
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
 	ROM_LOAD( "mqj-v0",       0x00000, 0x10000, CRC(54762956) SHA1(f08e983af28b16d27505d465ca64e7c7a93373a4) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
@@ -1073,7 +1076,7 @@ ROM_START( buccanrs )
 	ROM_LOAD( "bc-009_k-163.u49",   0x20000, 0x20000, CRC(0c6188fb) SHA1(d49034384c6d0e94db2890223b32a2a49e79a639) )
 	ROM_LOAD( "bc-010_k-163.u27",  0x00000, 0x20000, CRC(2d383ff8) SHA1(3062baac27feba69c6ed94935c5ced72d89ed4fb) )
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
 	ROM_LOAD( "bc-002_k-0161.u74",  0x00000, 0x10000, CRC(36ee1dac) SHA1(6dfd2a885c0b1c9347abc4b204ade66551c4b404) )
 
 	ROM_REGION( 0x400, "proms", 0 )
@@ -1112,7 +1115,7 @@ ROM_START( buccanrsa )
 	ROM_LOAD( "bc-009_k-163.u49",   0x20000, 0x20000, CRC(0c6188fb) SHA1(d49034384c6d0e94db2890223b32a2a49e79a639) )
 	ROM_LOAD( "bc-010_k-163.u27",  0x00000, 0x20000, CRC(2d383ff8) SHA1(3062baac27feba69c6ed94935c5ced72d89ed4fb) )
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
 	ROM_LOAD( "bc-002_k-0161.u74",  0x00000, 0x10000, CRC(36ee1dac) SHA1(6dfd2a885c0b1c9347abc4b204ade66551c4b404) )
 
 	ROM_REGION( 0x400, "proms", 0 )
@@ -1147,7 +1150,7 @@ ROM_START( buccanrsb )
 	ROM_LOAD( "bc-009_k-163.u49",   0x20000, 0x20000, CRC(0c6188fb) SHA1(d49034384c6d0e94db2890223b32a2a49e79a639) )
 	ROM_LOAD( "bc-010_k-163.u27",  0x00000, 0x20000, CRC(2d383ff8) SHA1(3062baac27feba69c6ed94935c5ced72d89ed4fb) )
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
 	ROM_LOAD( "bc-002_k-0161.u74",  0x00000, 0x10000, CRC(36ee1dac) SHA1(6dfd2a885c0b1c9347abc4b204ade66551c4b404) )
 
 	ROM_REGION( 0x400, "proms", 0 )

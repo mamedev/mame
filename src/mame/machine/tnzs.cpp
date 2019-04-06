@@ -486,7 +486,7 @@ WRITE8_MEMBER(jpopnics_state::subbankswitch_w)
 WRITE8_MEMBER(tnzsb_state::sound_command_w)
 {
 	m_soundlatch->write(data);
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */

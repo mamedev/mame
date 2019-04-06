@@ -91,6 +91,7 @@ public:
 	void schick(machine_config &config);
 
 	void init_penta();
+	void init_schick();
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
@@ -901,6 +902,57 @@ void pengo_state::init_penta()
 	}
 }
 
+void pengo_state::init_schick()
+{
+	static const uint8_t data_xortable[4][8] =
+	{
+		{ 0xf1,0xd3,0x79,0x5b,0xd3,0xf1,0x5b,0x79 },    /* .......0.......0 */
+		{ 0xd9,0x5b,0xd3,0x51,0xd9,0x5b,0xd3,0x51 },    /* .......0.......1 */
+		{ 0xe1,0xc3,0x69,0x4b,0xc3,0xe1,0x4b,0x69 },    /* .......1.......0 */
+		{ 0xc9,0x4b,0xc3,0x41,0xc9,0x4b,0xc3,0x41 }     /* .......1.......1 */
+	};
+	static const uint8_t opcode_xortable[8][8] =
+	{
+		{ 0x53,0x59,0x7b,0x71,0x71,0x7b,0x59,0x53 },    /* ...0...0...0.... */
+		{ 0xd9,0xd9,0x51,0x51,0xd9,0xd9,0x51,0x51 },    /* ...0...0...1.... */
+		{ 0xc9,0x4b,0xc3,0x41,0xe1,0x63,0xeb,0x69 },    /* ...0...1...0.... */
+		{ 0xc9,0x4b,0xc3,0x41,0xe1,0x63,0xeb,0x69 },    /* ...0...1...1.... */
+		{ 0x7b,0x59,0x7b,0x59,0xdb,0xf9,0xdb,0xf9 },    /* ...1...0...0.... */
+		{ 0x7b,0x59,0x7b,0x59,0xdb,0xf9,0xdb,0xf9 },    /* ...1...0...1.... */
+		{ 0xc9,0x4b,0xc3,0x41,0xe1,0x63,0xeb,0x69 },    /* ...1...1...0.... */
+		{ 0xc9,0x4b,0xc3,0x41,0xe1,0x63,0xeb,0x69 }     /* ...1...1...1.... */
+	};
+
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int A = 0x0000;A < 0x10000;A++)
+	{
+		uint8_t src = rom[A];
+
+		/* pick the translation table from bits 0 and 8 of the address */
+		int i = (A & 1) + (((A >> 8) & 1) << 1);
+
+		/* pick the offset in the table from bits 1, 3 and 5 of the source data */
+		int j = ((src >> 1) & 1) + (((src >> 3) & 1) << 1) + (((src >> 5) & 1) << 2);
+		/* the bottom half of the translation table is the mirror image of the top */
+		if (src & 0x80) j = 7 - j;
+
+		/* decode the ROM data */
+		if (BIT(i, 1))
+			rom[A] = bitswap<8>(src ^ data_xortable[i][j], 7, 4, 5, 6, 3, 2, 1, 0);
+		else
+			rom[A] = bitswap<8>(src ^ data_xortable[i][j], 7, 6, 5, 0, 3, 2, 1, 4);
+
+		/* now decode the opcodes */
+		/* pick the translation table from bits 4, 8 and 12 of the address */
+		i = ((A >> 4) & 1) + (((A >> 8) & 1) << 1) + (((A >> 12) & 1) << 2);
+		if (BIT(i, 1))
+			m_decrypted_opcodes[A] = bitswap<8>(src ^ opcode_xortable[i][j], 7, 4, 5, 6, 3, 2, 1, 0);
+		else
+			m_decrypted_opcodes[A] = bitswap<8>(src ^ opcode_xortable[i][j], 7, 6, 5, 0, 3, 2, 1, 4);
+	}
+}
+
 
 /*************************************
  *
@@ -908,13 +960,13 @@ void pengo_state::init_penta()
  *
  *************************************/
 
-GAME( 1982, pengo,    0,        pengoe,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 1 rev c)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo2,   pengo,    pengoe,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 2)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo2u,  pengo,    pengou,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 2 not encrypted)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo3u,  pengo,    pengou,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 3 not encrypted)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo4,   pengo,    pengoe,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 4)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo5,   pengo,    pengoe,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 5)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengob,   pengo,    pengo,    pengo,    pengo_state, init_penta, ROT90, "bootleg",                  "Pengo (bootleg)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1982, penta,    pengo,    pengo,    pengo,    pengo_state, init_penta, ROT90, "bootleg (Grinbee Shouji)", "Penta",                        MACHINE_SUPPORTS_SAVE ) // Grinbee Shouji was a subsidiary of Orca
-GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, pengo_state, empty_init, ROT90, "bootleg",                  "Jr. Pac-Man (Pengo hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, schick,   0,        schick,   schick,   pengo_state, empty_init, ROT90, "Microhard",                "Super Chick",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // encrypted, scheme suspected similar to the Penta one
+GAME( 1982, pengo,    0,        pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 1 rev c)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo2,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 2)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo2u,  pengo,    pengou,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 2 not encrypted)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo3u,  pengo,    pengou,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 3 not encrypted)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo4,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 4)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo5,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 5)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengob,   pengo,    pengo,    pengo,    pengo_state, init_penta,  ROT90, "bootleg",                  "Pengo (bootleg)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1982, penta,    pengo,    pengo,    pengo,    pengo_state, init_penta,  ROT90, "bootleg (Grinbee Shouji)", "Penta",                        MACHINE_SUPPORTS_SAVE ) // Grinbee Shouji was a subsidiary of Orca
+GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, pengo_state, empty_init,  ROT90, "bootleg",                  "Jr. Pac-Man (Pengo hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, schick,   0,        schick,   schick,   pengo_state, init_schick, ROT90, "Microhard",                "Super Chick",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // encrypted, scheme suspected similar to the Penta one

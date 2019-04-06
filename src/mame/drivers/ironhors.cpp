@@ -42,7 +42,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::ironhors_scanline_tick)
 
 WRITE8_MEMBER(ironhors_state::sh_irqtrigger_w)
 {
-	m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE8_MEMBER(ironhors_state::filter_w)

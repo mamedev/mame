@@ -98,7 +98,7 @@ WRITE8_MEMBER(pandoras_state::i8039_irqen_and_status_w)
 
 WRITE8_MEMBER(pandoras_state::pandoras_z80_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE_LINE_MEMBER(pandoras_state::coin_counter_1_w)

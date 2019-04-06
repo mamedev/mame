@@ -171,10 +171,15 @@ void metro_state::update_irq_state()
 
 
 /* For games that supply an *IRQ Vector* on the data bus */
-IRQ_CALLBACK_MEMBER(metro_state::irq_callback)
+uint8_t metro_state::irq_vector_r(offs_t offset)
 {
-	// logerror("%s: irq callback returns %04X\n", device.machine().describe_context(), m_irq_vectors[int_level]);
-	return m_irq_vectors[irqline] & 0xff;
+	// logerror("%s: irq callback returns %04X\n", machine().describe_context(), m_irq_vectors[offset]);
+	return m_irq_vectors[offset] & 0xff;
+}
+
+void metro_state::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).r(FUNC(metro_state::irq_vector_r)).umask16(0x00ff);
 }
 
 
@@ -3337,7 +3342,7 @@ void metro_state::dokyusei(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::dokyusei_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(metro_state::irq_callback));
+	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &metro_state::cpu_space_map);
 
 	/* video hardware */
 	i4300_config(config);
@@ -3359,7 +3364,7 @@ void metro_state::dokyusp(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::dokyusp_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(metro_state::irq_callback));
+	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &metro_state::cpu_space_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -3385,7 +3390,7 @@ void metro_state::gakusai(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16000000); /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::gakusai_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(metro_state::irq_callback));
+	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &metro_state::cpu_space_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -3411,7 +3416,7 @@ void metro_state::gakusai2(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16000000); /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::gakusai2_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(metro_state::irq_callback));
+	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &metro_state::cpu_space_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -3570,7 +3575,7 @@ void metro_state::mouja(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::mouja_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(metro_state::irq_callback));
+	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &metro_state::cpu_space_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 

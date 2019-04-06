@@ -197,7 +197,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_cps1);
 	INTERRUPT_GEN_MEMBER(cps1_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ganbare_interrupt);
-	IRQ_CALLBACK_MEMBER(cps1_int_ack);
+	void cpu_space_map(address_map &map);
 
 	void kabuki_setup(void (*decode)(uint8_t *src, uint8_t *dst));
 

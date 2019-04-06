@@ -25,7 +25,7 @@ class fga002_device :  public device_t
 	DECLARE_WRITE_LINE_MEMBER( lirq6_w );
 	DECLARE_WRITE_LINE_MEMBER( lirq7_w );
 
-	IRQ_CALLBACK_MEMBER(iack);
+	u16 iack();
 	int acknowledge();
 	int get_irq_level();
 

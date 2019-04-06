@@ -1591,17 +1591,21 @@ void crystal_state::crzyddz2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &crystal_state::crzyddz2_mem);
 }
 
+#define CRYSBIOS \
+	ROM_REGION( 0x20000, "maincpu", 0 )  \
+	ROM_SYSTEM_BIOS( 0, "amg0110b", "AMG0110B PCB" ) \
+	ROMX_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(beff39a9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb), ROM_BIOS(0)) \
+	ROM_SYSTEM_BIOS( 1, "amg0110d", "AMG0110D PCB" ) /* newer? */ \
+	ROMX_LOAD("mx27l1000-alt.u14",  0x000000, 0x020000, CRC(1e8175c8) SHA1(f60c016be2ff11e47b2192acddb92676043af501), ROM_BIOS(1)) \
 
 ROM_START( crysbios )
-	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
-	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(beff39a9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb) )
+	CRYSBIOS
 
-	ROM_REGION32_LE( 0x1000000, "flash", ROMREGION_ERASEFF ) // Flash
+	ROM_REGION32_LE( 0x1000000, "flash", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( crysking )
-	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
-	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(beff39a9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
+	CRYSBIOS
 
 	ROM_REGION32_LE( 0x3000000, "flash", 0 ) // Flash
 	ROM_LOAD("bcsv0004f01.u1",  0x0000000, 0x1000000, CRC(8feff120) SHA1(2ea42fa893bff845b5b855e2556789f8354e9066) )
@@ -1610,8 +1614,7 @@ ROM_START( crysking )
 ROM_END
 
 ROM_START( evosocc )
-	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
-	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(beff39a9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
+	CRYSBIOS
 
 	ROM_REGION32_LE( 0x3000000, "flash", 0 ) // Flash
 	ROM_LOAD("bcsv0001u01",  0x0000000, 0x1000000, CRC(2581a0ea) SHA1(ee483ac60a3ed00a21cb515974cec4af19916a7d) )
@@ -1620,8 +1623,7 @@ ROM_START( evosocc )
 ROM_END
 
 ROM_START( topbladv )
-	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
-	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(beff39a9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
+	CRYSBIOS
 
 	ROM_REGION( 0x4300, "pic", 0 ) // pic16c727 - we don't have a core for this
 	ROM_LOAD("top_blade_v_pic16c727.bin",  0x000000, 0x4300, CRC(9cdea57b) SHA1(884156085f9e780cdf719aedc2e8a0fd5983613b) )
@@ -1643,8 +1645,7 @@ ROM_START( officeye )
 ROM_END
 
 ROM_START( donghaer )
-	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
-	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(beff39a9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
+	CRYSBIOS
 
 	ROM_REGION( 0x4280, "pic", 0 ) // pic16f84a - we don't have a core for this (or the dump in this case)
 	ROM_LOAD("donghaer_pic16f84a.bin",  0x000000, 0x4280, NO_DUMP )
@@ -1936,7 +1937,7 @@ GAME( 2001, crysking, crysbios, crystal,  crystal,  crystal_state, init_crysking
 GAME( 2001, evosocc,  crysbios, crystal,  crystal,  crystal_state, init_evosocc,  ROT0, "Evoga",               "Evolution Soccer",                     0 )
 GAME( 2003, topbladv, crysbios, crystal,  crystal,  crystal_state, init_topbladv, ROT0, "SonoKong / Expotato", "Top Blade V",                          0 )
 GAME( 2001, officeye, 0,        crystal,  officeye, crystal_state, init_officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
-GAME( 2001, donghaer, 0,        crystal,  crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, donghaer, crysbios, crystal,  crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2004?,menghong, 0,        crzyddz2, crzyddz2, crystal_state, empty_init,    ROT0, "Sealy",               "Meng Hong Lou",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2006, crzyddz2, 0,        crzyddz2, crzyddz2, crystal_state, empty_init,    ROT0, "Sealy",               "Crazy Dou Di Zhu II",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2009, trivrus,  0,        trivrus,  trivrus,  crystal_state, empty_init,    ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 )

@@ -136,7 +136,7 @@ void ti990_10_state::ti990_set_int_line(int line, int state)
 	{
 		for (level = 0; ! (m_intlines & (1 << level)); level++)
 			;
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, level);  /* interrupt it, baby */
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, level);  /* TI990_10 - interrupt it, baby */
 	}
 	else
 		m_maincpu->set_input_line(0, CLEAR_LINE);

@@ -9,7 +9,7 @@ Ernesto Corvi
 
 CPU #1 : Handles background & foreground tiles, controllers, dipswitches.
 CPU #2 : Handles sprites and palette
-CPU #3 : Audio. The audio chip is a YM2203. I need help with this!.
+CPU #3 : Audio
 
 Memory Layout:
 
@@ -190,6 +190,32 @@ void wc90b_state::sound_cpu(address_map &map)
 }
 
 
+WRITE8_MEMBER(eurogael_state::master_irq_ack_w)
+{
+	// this seems to be write based instead of read based
+	m_maincpu->set_input_line(0,CLEAR_LINE);
+}
+
+void eurogael_state::map1(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram(); /* Main RAM */
+	map(0xa000, 0xafff).ram().w(FUNC(wc90b_state::fgvideoram_w)).share("fgvideoram");
+	map(0xc000, 0xcfff).ram().w(FUNC(wc90b_state::bgvideoram_w)).share("bgvideoram");
+	map(0xd000, 0xdfff).ram().share("bgscroll"); // there are a bunch of read / write accesses in here (is it meant to mirror the bgram? - bg scroll regs are at df00 - df03
+	map(0xe000, 0xefff).ram().w(FUNC(wc90b_state::txvideoram_w)).share("txvideoram");
+	map(0xf000, 0xf7ff).bankr("mainbank");
+	map(0xf800, 0xfbff).ram().share("share1");
+	map(0xfc00, 0xfc00).w(FUNC(wc90b_state::bankswitch_w));
+	map(0xfd00, 0xfd00).portr("P1");
+	map(0xfd02, 0xfd02).portr("P2");
+	map(0xfd06, 0xfd06).portr("DSW1");
+	map(0xfd08, 0xfd08).portr("DSW2");
+	map(0xfd0c, 0xfd0c).w(FUNC(eurogael_state::master_irq_ack_w));
+	map(0xfd0e, 0xfd0e).w(FUNC(wc90b_state::sound_command_w));
+}
+
+
 
 static INPUT_PORTS_START( wc90b )
 	PORT_START("P1")
@@ -366,11 +392,50 @@ void wc90b_state::wc90b(machine_config &config)
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.20);
 }
 
-void wc90b_state::eurogael(machine_config &config)
+void eurogael_state::eurogael(machine_config &config)
 {
-	wc90b(config);
+	// main board XTAL near Z80s is 16Mhz here
+	// sound board has 20Mhz and !6Mhz XTALs
+	// DSWs are on the sound board near the YM2203Cs
+	// use is guessed
 
-	m_palette->set_format(palette_device::xBRG_444, 1024).set_endianness(ENDIANNESS_BIG);
+	/* basic machine hardware */
+	Z80(config, m_maincpu, XTAL(16'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &eurogael_state::map1);
+	m_maincpu->set_vblank_int("screen", FUNC(wc90b_state::irq0_line_assert));
+
+	Z80(config, m_subcpu, XTAL(16'000'000)/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &wc90b_state::wc90b_map2);
+	m_subcpu->set_vblank_int("screen", FUNC(wc90b_state::irq0_line_assert));
+
+	Z80(config, m_audiocpu, XTAL(20'000'000)/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &wc90b_state::sound_cpu);
+	/* IRQs are triggered by the main CPU */
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(eurogael_state::screen_update));
+	screen.set_palette(m_palette);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wc90b);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024).set_endianness(ENDIANNESS_BIG);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+
+	YM2203(config, "ymsnd1", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.40); // YM2203C
+	YM2203(config, "ymsnd2", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.40); // YM2203C
+
+	MSM5205(config, m_msm, MSM5205_CLOCK);
+	m_msm->vck_legacy_callback().set(FUNC(wc90b_state::adpcm_int)); /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  /* 4KHz 4-bit */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.20);
 }
 
 ROM_START( twcup90b1 )
@@ -593,14 +658,14 @@ ROM_START( eurogael )
 	ROM_LOAD( "r3_fu4b04.ic14",      0x010000, 0x10000, CRC(d54704d2) SHA1(7d4ec0120c3516a88abbe687e8916b44bffb7bcd) )		
 
 	ROM_REGION( 0x080000, "spritegfx", ROMREGION_INVERT )
-	ROM_LOAD( "r4_fu501.bin",  0x000000, 0x10000, CRC(d5a60096) SHA1(a8e351a4b020b4fc2b2cb7d3f0fdfb43fc44d7d9) )
-	ROM_LOAD( "r4_fu5a01.bin", 0x010000, 0x10000, CRC(36bbf467) SHA1(627b5847ffb098c92edfd58c25391799f3b209e0) )
-	ROM_LOAD( "r4_fu502.bin",  0x020000, 0x10000, CRC(26371c18) SHA1(0887041d86dc9f19dad264ae27dc56fb89ac3265) )
-	ROM_LOAD( "r4_fu5a02.bin", 0x030000, 0x10000, CRC(75aa9b86) SHA1(0c221bd2e8a5472bb0e515f27fb72b0c8e8c0ca4) )
-	ROM_LOAD( "r4_fu503.bin",  0x040000, 0x10000, CRC(0da825f9) SHA1(cfba0c85fc767726c1d63f87468335d1c2f1eed8) )
-	ROM_LOAD( "r4_fu5a03.bin", 0x050000, 0x10000, CRC(228429d8) SHA1(3b2dbea53807929c24d593c469a83172f7747f66) )
-	ROM_LOAD( "r4_fu504.bin",  0x060000, 0x10000, CRC(516b6c09) SHA1(9d02514dece864b087f67886009ce54bd51b5575) )
-	ROM_LOAD( "r4_fu5a04.bin", 0x070000, 0x10000, CRC(f36390a9) SHA1(e5ea36e91b3ced068281524ee79d0432f489715c) )
+	ROM_LOAD( "r4_fu504.bin",  0x000000, 0x10000, CRC(516b6c09) SHA1(9d02514dece864b087f67886009ce54bd51b5575) )
+	ROM_LOAD( "r4_fu5a04.bin", 0x010000, 0x10000, CRC(f36390a9) SHA1(e5ea36e91b3ced068281524ee79d0432f489715c) )
+	ROM_LOAD( "r4_fu503.bin",  0x020000, 0x10000, CRC(0da825f9) SHA1(cfba0c85fc767726c1d63f87468335d1c2f1eed8) )
+	ROM_LOAD( "r4_fu5a03.bin", 0x030000, 0x10000, CRC(228429d8) SHA1(3b2dbea53807929c24d593c469a83172f7747f66) )
+	ROM_LOAD( "r4_fu502.bin",  0x040000, 0x10000, CRC(26371c18) SHA1(0887041d86dc9f19dad264ae27dc56fb89ac3265) )
+	ROM_LOAD( "r4_fu5a02.bin", 0x050000, 0x10000, CRC(75aa9b86) SHA1(0c221bd2e8a5472bb0e515f27fb72b0c8e8c0ca4) )
+	ROM_LOAD( "r4_fu501.bin",  0x060000, 0x10000, CRC(d5a60096) SHA1(a8e351a4b020b4fc2b2cb7d3f0fdfb43fc44d7d9) )
+	ROM_LOAD( "r4_fu5a01.bin", 0x070000, 0x10000, CRC(36bbf467) SHA1(627b5847ffb098c92edfd58c25391799f3b209e0) )
 
 	ROM_REGION( 0x100, "prom", ROMREGION_ERASEFF )
 	ROM_LOAD( "r4_p0502_82s129.ic10",      0x000, 0x100, CRC(15085e44) SHA1(646e7100fcb112594023cf02be036bd3d42cc13c) )
@@ -647,5 +712,5 @@ GAME( 1989, twcup90ba, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bo
 GAME( 1989, twcup90b2, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bootleg", "Worldcup '90 (hack)",                                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, twcup90bb, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bootleg", "World Cup '90 (European hack, different title)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
  // not sure if it best fits here, in wc90.cpp, or in a new driver, it shares the weird tile decoding with the bootlegs tho
-GAME( 1989, eurogael,  twcup90, eurogael, wc90b, wc90b_state, init_wc90b, ROT0, "bootleg (Gaelco / Ervisa)", "Euro League (Gaelco bootleg, Modular System)", MACHINE_NOT_WORKING )
+GAME( 1989, eurogael,  twcup90, eurogael, wc90b, eurogael_state, init_wc90b, ROT0, "bootleg (Gaelco / Ervisa)", "Euro League (Gaelco bootleg, Modular System)", MACHINE_IMPERFECT_SOUND )
 

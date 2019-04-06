@@ -691,7 +691,7 @@ void segas32_state::update_irq_state()
 	for (vector = 0; vector < 5; vector++)
 		if (effirq & (1 << vector))
 		{
-			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector);
+			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector); // V60
 			break;
 		}
 
@@ -926,7 +926,7 @@ void segas32_state::update_sound_irq_state()
 	for (vector = 0; vector < 3; vector++)
 		if (effirq & (1 << vector))
 		{
-			m_soundcpu->set_input_line_and_vector(0, ASSERT_LINE, 2 * vector);
+			m_soundcpu->set_input_line_and_vector(0, ASSERT_LINE, 2 * vector); // Z80
 			break;
 		}
 

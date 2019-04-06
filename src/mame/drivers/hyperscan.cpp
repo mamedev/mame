@@ -539,7 +539,7 @@ void hyperscan_state::spg290_timers_update()
 					if (elem.control & 0x08000000)
 					{
 						elem.control |= 0x04000000;
-						m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 56);
+						m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 56); // SCORE7
 					}
 				}
 				else
@@ -558,12 +558,12 @@ WRITE_LINE_MEMBER(hyperscan_state::spg290_vblank_irq)
 	if (state && m_ppu.irq_control & 0x01)      // VBlanking Start IRQ
 	{
 		m_ppu.irq_status |= 0x01;
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 53);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 53); // SCORE7
 	}
 	else if (!state && m_ppu.irq_control & 0x02) // VBlanking End IRQ
 	{
 		m_ppu.irq_status |= 0x02;
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 53);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 53); // SCORE7
 	}
 }
 
@@ -581,7 +581,7 @@ void hyperscan_state::device_timer(emu_timer &timer, device_timer_id id, int par
 			// TODO: replace with real I2C emulation
 			m_i2c.rdata = 0;
 
-			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 39);
+			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 39); // SCORE7
 		}
 		break;
 	}

@@ -3151,10 +3151,13 @@ M68KMAKE_OP(bftst, 32, ., .)
 
 M68KMAKE_OP(bkpt, 0, ., .)
 {
-	if(CPU_TYPE_IS_010_PLUS())
+	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		if (!m_bkpt_ack_callback.isnull())
-			(m_bkpt_ack_callback)(*m_program, 0, CPU_TYPE_IS_EC020_PLUS() ? m_ir & 7 : 0, 0xffffffff);
+		(void)m_cpu_space->read_dword((m_ir & 7) << 2, 0xffffffff);
+	}
+	else if(CPU_TYPE_IS_010_PLUS())
+	{
+		(void)m_cpu_space->read_word(0x000000, 0xffff);
 	}
 	m68ki_exception_illegal();
 }

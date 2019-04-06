@@ -153,7 +153,7 @@ WRITE8_MEMBER(gyruss_state::gyruss_filter1_w)
 WRITE8_MEMBER(gyruss_state::gyruss_sh_irqtrigger_w)
 {
 	/* writing to this register triggers IRQ on the sound CPU */
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE8_MEMBER(gyruss_state::gyruss_i8039_irq_w)

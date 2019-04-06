@@ -1197,7 +1197,7 @@ void seibuspi_state::spi_ymf271_map(address_map &map)
 WRITE_LINE_MEMBER(seibuspi_state::ymf_irqhandler)
 {
 	if (state)
-		m_audiocpu->set_input_line_and_vector(0, ASSERT_LINE, 0xd7); // IRQ is RST10
+		m_audiocpu->set_input_line_and_vector(0, ASSERT_LINE, 0xd7); // Z80 - IRQ is RST10
 	else
 		m_audiocpu->set_input_line(0, CLEAR_LINE);
 }

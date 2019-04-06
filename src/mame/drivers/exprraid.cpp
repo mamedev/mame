@@ -472,7 +472,7 @@ GFXDECODE_END
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 WRITE_LINE_MEMBER(exprraid_state::irqhandler)
 {
-	m_slave->set_input_line_and_vector(0, state, 0xff);
+	m_slave->set_input_line_and_vector(0, state, 0xff); // M6809
 }
 
 void exprraid_state::machine_start()

@@ -166,7 +166,7 @@ WRITE8_MEMBER(tp84_state::tp84_filter_w)
 
 WRITE8_MEMBER(tp84_state::tp84_sh_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0,HOLD_LINE,0xff);
+	m_audiocpu->set_input_line_and_vector(0,HOLD_LINE,0xff); // Z80
 }
 
 

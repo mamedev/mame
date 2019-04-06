@@ -56,7 +56,8 @@ private:
 	required_device_array<mc68340_timer_module_device, 2> m_timer;
 
 	void update_ipl();
-	IRQ_CALLBACK_MEMBER(int_ack);
+	void internal_vectors_r(address_map &map);
+	uint8_t int_ack(offs_t offset);
 
 	TIMER_CALLBACK_MEMBER(periodic_interrupt_timer_callback);
 

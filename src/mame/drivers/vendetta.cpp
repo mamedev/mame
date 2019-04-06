@@ -187,12 +187,12 @@ WRITE8_MEMBER(vendetta_state::z80_arm_nmi_w)
 
 WRITE8_MEMBER(vendetta_state::z80_irq_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 READ8_MEMBER(vendetta_state::z80_irq_r)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 	return 0x00;
 }
 

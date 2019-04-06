@@ -163,7 +163,7 @@ TIMER_CALLBACK_MEMBER(mdisk_state::rom_timer_callback)
 void mdisk_state::update_irq(uint8_t vector)
 {
 	if (m_uart1_rxrdy || m_uart1_txrdy || m_fdc_irq)
-		m_cpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, vector);
+		m_cpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, vector); // Z80
 	else
 		m_cpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }

@@ -666,7 +666,7 @@ WRITE_LINE_MEMBER(segaybd_state::mb8421_intl)
 WRITE_LINE_MEMBER(segaybd_state::mb8421_intr)
 {
 	// shared ram interrupt request from maincpu side
-	m_linkcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xef); // RST $28
+	m_linkcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xef); // Z80 - RST $28
 }
 
 

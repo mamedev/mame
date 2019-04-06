@@ -87,7 +87,7 @@ WRITE_LINE_MEMBER(galaxia_state::vblank_irq)
 {
 	if (state)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03); // S2650
 		cvs_scroll_stars();
 	}
 }

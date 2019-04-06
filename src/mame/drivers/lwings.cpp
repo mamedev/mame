@@ -106,7 +106,7 @@ WRITE8_MEMBER(lwings_state::lwings_bankswitch_w)
 INTERRUPT_GEN_MEMBER(lwings_state::lwings_interrupt)
 {
 	if(m_nmi_mask)
-		device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
+		device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* Z80 - RST 10h */
 }
 
 INTERRUPT_GEN_MEMBER(lwings_state::avengers_interrupt)

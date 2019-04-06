@@ -596,10 +596,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(panicr_state::scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc4/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc4/4); // V20
 
 	if(scanline == 0) // <unknown>
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V20
 }
 
 void panicr_state::panicr(machine_config &config)

@@ -350,14 +350,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps_state::ganbare_interrupt)
 		m_maincpu->set_input_line(4, ASSERT_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(cps_state::cps1_int_ack)
+void cps_state::cpu_space_map(address_map &map)
 {
-	// clear the IPL1 and IPL2 flip-flops
-	m_maincpu->set_input_line(2, CLEAR_LINE);
-	m_maincpu->set_input_line(4, CLEAR_LINE);
-
-	// assert VPA
-	return M68K_INT_ACK_AUTOVECTOR;
+	// Eventually add the sync to E due to vpa
+	map(0xfffff2, 0xffffff).lr16("autovectors", [this](offs_t offset) -> u16 {
+									 // clear the IPL1 and IPL2 flip-flops
+									 m_maincpu->set_input_line(2, CLEAR_LINE);
+									 m_maincpu->set_input_line(4, CLEAR_LINE);
+									 return 0x19+offset; });
 }
 
 
@@ -3389,7 +3389,7 @@ void cps_state::cps1_10MHz(machine_config &config)
 	M68000(config, m_maincpu, XTAL(10'000'000));    /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(cps_state::cps1_int_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps_state::cpu_space_map);
 
 	Z80(config, m_audiocpu, XTAL(3'579'545));  /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps_state::sub_map);

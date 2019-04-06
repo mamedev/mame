@@ -321,6 +321,7 @@ void pencil2_state::pencil2(machine_config &config)
 	tms9929a_device &vdp(TMS9929A(config, "tms9928a", XTAL(10'738'635)));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
