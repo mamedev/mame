@@ -5,9 +5,6 @@
 *
 * novag_diablo.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
-TODO:
-- hook up RS232 port correctly (when connected, I'm only getting "New Game")
-
 *******************************************************************************
 
 Novag Diablo 68000 overview:

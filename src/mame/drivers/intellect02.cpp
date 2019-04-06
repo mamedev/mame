@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
+// thanks-to:Alex_LG, Berger
 /******************************************************************************
 
 Интеллект-02 (Intellect-02) driver
@@ -10,7 +11,7 @@ it's assumed to have been designed by НИИ БРЭА (SRI BREA). First shown in
 produced during around 1985-1992.
 
 hardware notes:
-- КР580ВМ80А CPU (i8080A clone), speed unknown
+- КР580ВМ80А CPU (i8080A clone) @ 1.5MHz
 - КР580ИК55 (i8255 clone)
 - 1 KB RAM (8*КР565РУ2), cartridge port
 - 4-digit 7seg panel, 2 leds, 16 buttons, game board above it
@@ -19,7 +20,8 @@ The chess/checkers board is detachable, with a board for Kalah underneath it.
 
 The hardware is very similar to Fidelity Chess Challenger 3. Actually, one of the
 first cartridges for this system, a Chess program, is a modified Chess Challenger 3 ROM.
-The chess engine was kept identical. (note: the "lose" LED is used for "check")
+The chess engine was kept identical. (note: the "lose" LED is used for "check" in this game)
+The 2nd(4-level) chess cartridge is completely different, not a CC3 clone.
 
 Intellect-01 looks like it didn't get further than a prototype. It was a dedicated
 chess computer, probably a clone of CC3.
@@ -34,8 +36,7 @@ keypad legend:
 УИ - уровень игры (game level)
 
 TODO:
-- identify ПП, УИ, 0, 9 buttons (only the chess program is dumped and it doesn't use them)
-- verify cpu speed
+- identify 0,9 buttons (unused on the chess games)
 
 ******************************************************************************/
 
@@ -44,8 +45,7 @@ TODO:
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "machine/timer.h"
-#include "sound/dac.h"
-#include "sound/volt_reg.h"
+#include "sound/beep.h"
 #include "speaker.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -64,9 +64,10 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ppi8255(*this, "ppi8255"),
+		m_delay_update(*this, "delay_update"),
 		m_delay_display(*this, "delay_display_%u", 0),
 		m_keypad(*this, "IN.%u", 0),
-		m_dac(*this, "dac"),
+		m_beeper(*this, "beeper"),
 		m_cart(*this, "cartslot"),
 		m_out_digit(*this, "digit%u", 0U),
 		m_out_led(*this, "led%u", 0U)
@@ -75,7 +76,7 @@ public:
 	// machine configs
 	void intel02(machine_config &config);
 
-	// assume that reset button is tied to RESET pin
+	// reset button is tied directly to CPU RESET pin
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
 protected:
@@ -85,9 +86,10 @@ private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
+	required_device<timer_device> m_delay_update;
 	required_device_array<timer_device, 6> m_delay_display;
 	required_ioport_array<2> m_keypad;
-	required_device<dac_bit_interface> m_dac;
+	required_device<beep_device> m_beeper;
 	required_device<generic_slot_device> m_cart;
 	output_finder<4> m_out_digit;
 	output_finder<2> m_out_led;
@@ -96,6 +98,7 @@ private:
 
 	// display stuff
 	void update_display();
+	TIMER_DEVICE_CALLBACK_MEMBER(delay_update) { update_display(); }
 	TIMER_DEVICE_CALLBACK_MEMBER(delay_display);
 
 	u8 m_digit_data;
@@ -177,9 +180,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(intel02_state::delay_display)
 
 READ8_MEMBER(intel02_state::input_r)
 {
-	// d0-d3: buttons through a priority encoder
-	// d4-d7: buttons (direct)
-	return (count_leading_zeros(m_keypad[0]->read()) - 17) | (~m_keypad[1]->read() << 4 & 0xf0);
+	// d0-d3: buttons through a maze of logic gates
+	// basically giving each button its own 4-bit scancode
+	u8 data = count_leading_zeros(m_keypad[0]->read()) - 17;
+
+	// d4: Vcc, d5-d7: buttons (direct)
+	return data | (~m_keypad[1]->read() << 4 & 0xf0);
 }
 
 WRITE8_MEMBER(intel02_state::digit_w)
@@ -199,17 +205,19 @@ WRITE8_MEMBER(intel02_state::control_w)
 
 		// they're strobed, so on falling edge, delay them going off to prevent flicker or stuck display
 		else if (BIT(m_led_select, i))
-			m_delay_display[i]->adjust(attotime::from_msec(10), i);
+			m_delay_display[i]->adjust(attotime::from_msec(25), i);
 	}
 
 	m_led_select = data;
-	update_display();
 
-	// d6: unused?
-	// it's a timer trigger on Chess Challenger 3
+	// don't update display immediately
+	if (!m_delay_update->enabled())
+		m_delay_update->adjust(attotime::from_usec(15));
 
-	// d7: speaker out
-	m_dac->write(BIT(data, 7));
+	// d6: N/C
+
+	// d7: enable beeper
+	m_beeper->set_state(BIT(data, 7));
 }
 
 
@@ -238,7 +246,10 @@ void intel02_state::main_io(address_map &map)
 
 static INPUT_PORTS_START( intel02 )
 	PORT_START("IN.0")
-	PORT_BIT(0x003f, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x0007, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("View Position") PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Game Level") PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H)
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("G7") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_G)
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F6") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_F)
@@ -250,7 +261,7 @@ static INPUT_PORTS_START( intel02 )
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Input") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Game Select") PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Erase") PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE)
@@ -268,18 +279,19 @@ INPUT_PORTS_END
 void intel02_state::intel02(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080A(config, m_maincpu, 2000000);
+	I8080A(config, m_maincpu, 1500000); // measured (no XTAL)
 	m_maincpu->set_addrmap(AS_PROGRAM, &intel02_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &intel02_state::main_io);
 
 	I8255(config, m_ppi8255);
 	m_ppi8255->in_pa_callback().set(FUNC(intel02_state::input_r));
-	m_ppi8255->tri_pa_callback().set_constant(0);
 	m_ppi8255->out_pb_callback().set(FUNC(intel02_state::digit_w));
 	m_ppi8255->tri_pb_callback().set_constant(0);
 	m_ppi8255->out_pc_callback().set(FUNC(intel02_state::control_w));
+	m_ppi8255->tri_pc_callback().set_constant(0);
 
 	/* video hardware */
+	TIMER(config, m_delay_update).configure_generic(FUNC(intel02_state::delay_update));
 	for (int i = 0; i < 6; i++)
 		TIMER(config, m_delay_display[i]).configure_generic(FUNC(intel02_state::delay_display));
 
@@ -287,8 +299,8 @@ void intel02_state::intel02(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	BEEP(config, m_beeper, 3640); // measured, from RC circuit
+	m_beeper->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "intellect02", "bin");

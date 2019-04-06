@@ -358,6 +358,7 @@ void elite_state::eas(machine_config &config)
 	m_ppi8255->tri_pa_callback().set_constant(0);
 	m_ppi8255->in_pb_callback().set(FUNC(elite_state::ppi_portb_r));
 	m_ppi8255->out_pc_callback().set(FUNC(elite_state::ppi_portc_w));
+	m_ppi8255->tri_pc_callback().set_constant(0);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
