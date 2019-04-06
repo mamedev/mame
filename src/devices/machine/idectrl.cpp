@@ -284,20 +284,25 @@ void bus_master_ide_controller_device::set_dmarq(int state)
 
 READ32_MEMBER( bus_master_ide_controller_device::bmdma_r )
 {
-	LOG("%s:ide_bus_master32_r(%d, %08x)\n", machine().describe_context(), offset, mem_mask);
-
+	uint32_t result = 0;
 	switch( offset )
 	{
 	case 0:
 		/* command register/status register */
-		return m_bus_master_command | (m_bus_master_status << 16);
-
+		result = m_bus_master_command | (m_bus_master_status << 16);
+		break;
 	case 1:
 		/* descriptor table register */
-		return m_bus_master_descriptor;
+		result = m_bus_master_descriptor;
+		break;
+	default:
+		result = 0xffffffff;
+		break;
 	}
 
-	return 0xffffffff;
+	LOG("%s:ide_bus_master32_r(%d, %08x, %08x)\n", machine().describe_context(), offset, mem_mask, result);
+
+	return result;
 }
 
 
@@ -396,8 +401,7 @@ void bus_master_ide_controller_device::execute_dma()
 			m_dma_bytes_left &= 0xfffe;
 			if (m_dma_bytes_left == 0)
 				m_dma_bytes_left = 0x10000;
-
-//          LOG("New DMA descriptor: address = %08X  bytes = %04X  last = %d\n", m_dma_address, m_dma_bytes_left, m_dma_last_buffer);
+			LOG("New DMA descriptor: address = %08X  bytes = %04X  last = %d time: %s\n", m_dma_address, m_dma_bytes_left, m_dma_last_buffer, machine().time().as_string());
 		}
 
 		if (m_bus_master_command & 8)
@@ -424,7 +428,7 @@ void bus_master_ide_controller_device::execute_dma()
 		if (m_dma_bytes_left == 0 && m_dma_last_buffer)
 		{
 			m_bus_master_status &= ~IDE_BUSMASTER_STATUS_ACTIVE;
-
+			LOG("DMA Complete time: %s\n", machine().time().as_string());
 			if (m_dmarq)
 			{
 				LOG("DMA Out of buffer space!\n");
