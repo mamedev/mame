@@ -2953,10 +2953,9 @@ void taitof2_state::finalb(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
 }
@@ -2976,10 +2975,9 @@ void taitof2_state::dondokod(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(3);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0280GRD(config, m_tc0280grd, 0);
 	m_tc0280grd->set_gfx_region(2);
@@ -3007,10 +3005,9 @@ void taitof2_state::megab(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 }
@@ -3030,23 +3027,21 @@ void taitof2_state::thundfox(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn_1, 0);
 	m_tc0100scn_1->set_gfx_region(1);
-	m_tc0100scn_1->set_tx_region(3);
 	m_tc0100scn_1->set_offsets(3, 0);
 	m_tc0100scn_1->set_offsets_flip(5, 0);
 	m_tc0100scn_1->set_offsets_fliptx(4, 1);
 	m_tc0100scn_1->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn_1->set_palette_tag(m_palette);
+	m_tc0100scn_1->set_palette(m_palette);
 
 	TC0100SCN(config, m_tc0100scn_2, 0);
 	m_tc0100scn_2->set_gfx_region(2);
-	m_tc0100scn_2->set_tx_region(4);
 	m_tc0100scn_2->set_offsets(3, 0);
 	m_tc0100scn_2->set_offsets_flip(5, 0);
 	m_tc0100scn_2->set_offsets_fliptx(4, 1);
 	m_tc0100scn_2->set_multiscr_xoffs(tc0100scn_device::SINGLE_VDU);
 	m_tc0100scn_2->set_multiscr_hack(1);
 	m_tc0100scn_2->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn_2->set_palette_tag(m_palette);
+	m_tc0100scn_2->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 }
@@ -3065,10 +3060,9 @@ void taitof2_state::cameltry(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(3);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0280GRD(config, m_tc0280grd, 0);
 	m_tc0280grd->set_gfx_region(2);
@@ -3090,9 +3084,8 @@ void taitof2_state::qtorimon(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
 }
@@ -3111,10 +3104,9 @@ void taitof2_state::liquidk(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 }
@@ -3132,9 +3124,8 @@ void taitof2_state::quizhq(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
 }
@@ -3155,10 +3146,9 @@ void taitof2_state::ssi(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 }
 
 void taitof2_state::gunfront(machine_config &config)
@@ -3177,10 +3167,9 @@ void taitof2_state::gunfront(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 }
@@ -3200,10 +3189,9 @@ void taitof2_state::growl(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 }
@@ -3220,9 +3208,8 @@ void taitof2_state::mjnquest(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 	m_tc0100scn->set_tile_callback(FUNC(taitof2_state::mjnquest_tmap_cb), this);
 
 	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
@@ -3299,11 +3286,10 @@ void taitof2_state::koshien(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_offsets_flip(2, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 }
@@ -3324,10 +3310,9 @@ void taitof2_state::yuyugogo(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 }
 
 void taitof2_state::ninjak(machine_config &config)
@@ -3353,10 +3338,9 @@ void taitof2_state::ninjak(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 }
@@ -3374,12 +3358,11 @@ void taitof2_state::solfigtr(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_offsets_flip(6, 0);
 	m_tc0100scn->set_offsets_fliptx(6, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 }
@@ -3396,9 +3379,8 @@ void taitof2_state::qzquest(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 }
 
 void taitof2_state::pulirula(machine_config &config)
@@ -3415,10 +3397,9 @@ void taitof2_state::pulirula(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(3);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0430GRW(config, m_tc0430grw, 0);
 	m_tc0430grw->set_gfx_region(2);
@@ -3466,12 +3447,11 @@ void taitof2_state::qzchikyu(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(0, 0);
 	m_tc0100scn->set_offsets_flip(-4, 0);
 	m_tc0100scn->set_offsets_fliptx(-11, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 }
 
 void taitof2_state::yesnoj(machine_config &config)
@@ -3490,10 +3470,9 @@ void taitof2_state::yesnoj(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC8521(config, "rtc", XTAL(32'768));
 }
@@ -3561,10 +3540,9 @@ void taitof2_state::dinorex(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 }
@@ -3584,10 +3562,9 @@ void taitof2_state::qjinsei(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 }
@@ -3607,10 +3584,9 @@ void taitof2_state::qcrayon(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 }
@@ -3630,10 +3606,9 @@ void taitof2_state::qcrayon2(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 }
@@ -3653,10 +3628,9 @@ void taitof2_state::driftout(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(3);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0430GRW(config, m_tc0430grw, 0);
 	m_tc0430grw->set_gfx_region(2);
@@ -3702,10 +3676,9 @@ void taitof2_state::cameltrya(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(3);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0280GRD(config, m_tc0280grd, 0);
 	m_tc0280grd->set_gfx_region(2);
@@ -3769,10 +3742,9 @@ void taitof2_state::driveout(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(3);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0430GRW(config, m_tc0430grw, 0);
 	m_tc0430grw->set_gfx_region(2);

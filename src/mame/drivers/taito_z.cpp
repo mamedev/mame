@@ -3203,9 +3203,8 @@ void taitoz_state::contcirc(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
@@ -3275,9 +3274,8 @@ void taitoz_state::chasehq(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(3);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
@@ -3349,9 +3347,8 @@ void taitoz_state::enforce(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
@@ -3420,9 +3417,8 @@ void taitoz_state::bshark_base(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
@@ -3507,9 +3503,8 @@ void taitoz_state::sci(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
@@ -3586,9 +3581,8 @@ void taitoz_state::nightstr(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(3);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
@@ -3660,9 +3654,8 @@ void taitoz_state::aquajack(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
@@ -3737,10 +3730,9 @@ void taitoz_state::spacegun(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(4, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0110PCR(config, m_tc0110pcr, 0, "palette");
 
