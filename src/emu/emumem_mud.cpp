@@ -60,7 +60,7 @@ template<int Width, int AddrShift, int Endian> memory_units_descriptor<Width, Ad
 
 	umasks[handler_entry::START]                    &= smask;
 	umasks[handler_entry::END]                      &= emask;
-	umasks[handler_entry::START|handler_entry::END] &= smask | emask;
+	umasks[handler_entry::START|handler_entry::END] &= smask & emask;
 
 	for(u32 i=0; i<4; i++)
 		m_keymap[i] = mask_to_ukey<uX>(umasks[i]);
