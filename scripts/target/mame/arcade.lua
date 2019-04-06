@@ -4617,6 +4617,7 @@ files {
 	MAME_DIR .. "src/mame/video/vrender0.h",
 	MAME_DIR .. "src/mame/drivers/cubeqst.cpp",
 	MAME_DIR .. "src/mame/drivers/cybertnk.cpp",
+	MAME_DIR .. "src/mame/drivers/daryde.cpp",
 	MAME_DIR .. "src/mame/drivers/dcheese.cpp",
 	MAME_DIR .. "src/mame/includes/dcheese.h",
 	MAME_DIR .. "src/mame/video/dcheese.cpp",

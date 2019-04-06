@@ -11019,6 +11019,9 @@ gatedoom1                       // MAC (c) 1990 Data East Corporation (US)
 @source:daruma.cpp
 ds348                           // Sigtron Daruma
 
+@source:daryde.cpp
+pandart                         //
+
 @source:dassault.cpp
 dassault                        // MAJ (c) 1991 Data East Corporation (US)
 dassault4                       // MAJ (c) 1991 Data East Corporation (US) - 4 Player only
