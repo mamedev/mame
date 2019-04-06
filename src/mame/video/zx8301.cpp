@@ -295,7 +295,8 @@ void zx8301_device::draw_line_mode8(bitmap_rgb32 &bitmap, int y, uint16_t da)
 
 			int color = (green << 2) | (red << 1) | blue;
 
-			if (flash_active) {
+			if (flash_active)
+			{
 				color = flash_color;
 			}
 
