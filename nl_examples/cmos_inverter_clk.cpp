@@ -32,7 +32,7 @@ NETLIST_START(cmos_inverter_clk)
 	//CLOCK(V, 500000)
 #else
 	VS(V, 5)
-	PARAM(V.FUNC, "T 5e6 *")
+	PARAM(V.FUNC, "T * 5e6")
 #endif
 
     MOSFET(P, "PMOS(VTO=-0.5 GAMMA=0.5 TOX=20n)")

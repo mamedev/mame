@@ -111,11 +111,11 @@ NETLIST_START(dummy)
 	NET_C(RX1.2, XU16.7)
 #endif
 
-	/* The opamp actually has an FPF of about 200k. This doesn't work here and causes oscillations.
+	/* The opamp actually has an FPF of about 1000k. This doesn't work here and causes oscillations.
 	 * FPF here therefore about half the Solver clock.
 	 */
-	PARAM(XU16.B.MODEL, "MB3614(TYPE=3 UGF=22k)")
-	PARAM(XU17.C.MODEL, "MB3614(TYPE=3 UGF=22k)")
+	PARAM(XU16.B.MODEL, "MB3614(TYPE=3)")
+	PARAM(XU17.C.MODEL, "MB3614(TYPE=3 UGF=44k)")
 #if 0
 	PARAM(XU17.A.MODEL, "MB3614(TYPE=1)")
 	PARAM(XU17.B.MODEL, "MB3614(TYPE=1)")

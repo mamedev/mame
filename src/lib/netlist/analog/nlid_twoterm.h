@@ -399,11 +399,12 @@ namespace analog
 		, m_V(*this, "V", 0.0)
 		, m_func(*this,"FUNC", "")
 		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
+		, m_funcparam({0.0})
 		{
 			register_subalias("P", m_P);
 			register_subalias("N", m_N);
 			if (m_func() != "")
-				m_compiled.compile_postfix(std::vector<pstring>({{"T"}}), m_func());
+				m_compiled.compile(std::vector<pstring>({{"T"}}), m_func());
 		}
 
 		NETLIB_IS_TIMESTEP(m_func() != "")
@@ -411,8 +412,9 @@ namespace analog
 		NETLIB_TIMESTEPI()
 		{
 			m_t += step;
+			m_funcparam[0] = m_t;
 			this->set_G_V_I(1.0 / m_R(),
-					m_compiled.evaluate(std::vector<double>({m_t})),
+					m_compiled.evaluate(m_funcparam),
 					0.0);
 		}
 
@@ -431,6 +433,7 @@ namespace analog
 		param_double_t m_V;
 		param_str_t m_func;
 		plib::pfunction m_compiled;
+		std::vector<double> m_funcparam;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -445,18 +448,20 @@ namespace analog
 		, m_I(*this, "I", 1.0)
 		, m_func(*this,"FUNC", "")
 		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
+		, m_funcparam({0.0})
 		{
 			register_subalias("P", m_P);
 			register_subalias("N", m_N);
 			if (m_func() != "")
-				m_compiled.compile_postfix(std::vector<pstring>({{"T"}}), m_func());
+				m_compiled.compile(std::vector<pstring>({{"T"}}), m_func());
 		}
 
 		NETLIB_IS_TIMESTEP(m_func() != "")
 		NETLIB_TIMESTEPI()
 		{
 			m_t += step;
-			const double I = m_compiled.evaluate(std::vector<double>({m_t}));
+			m_funcparam[0] = m_t;
+			const double I = m_compiled.evaluate(m_funcparam);
 			set_mat(0.0, 0.0, -I,
 					0.0, 0.0,  I);
 		}
@@ -476,6 +481,7 @@ namespace analog
 		param_double_t m_I;
 		param_str_t m_func;
 		plib::pfunction m_compiled;
+		std::vector<double> m_funcparam;
 	};
 
 

@@ -223,18 +223,14 @@ namespace netlist
 			m_EBUF->reset();
 			m_CP->reset();
 			m_RP.reset();
-#if 0
-			double CP = 0.0;
-			double RP = 1000;
-			double G = m_model.m_UGF / m_model.m_FPF / RP;
-#else
+
 			double CP = m_model.m_DAB / m_model.m_SLEW;
 			double RP = 0.5 / constants::pi() / CP / m_model.m_FPF;
 			double G = m_model.m_UGF / m_model.m_FPF / RP;
-#endif
-			printf("OPAMP %s: %g %g %g\n", name().c_str(), CP, RP, G);
+
+			//printf("OPAMP %s: %g %g %g\n", name().c_str(), CP, RP, G);
 			if (m_model.m_SLEW / (4.0 * constants::pi() * 0.0258) < m_model.m_UGF)
-				printf("failed!\n");
+				log().warning("Opamp <{1}> parameters fail convergence criteria", this->name());
 
 			m_CP->m_C.setTo(CP);
 			m_RP.set_R(RP);
