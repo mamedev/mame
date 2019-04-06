@@ -40,6 +40,7 @@ public:
 	void init_tabblue();
 	void init_dino4();
 	void init_ctunk();
+	void init_jolycdig();
 
 protected:
 	DECLARE_WRITE8_MEMBER(funworld_videoram_w);

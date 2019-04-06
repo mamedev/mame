@@ -507,7 +507,33 @@
 
   In both cases, you can exit pressing the START button (key 1).
 
-  
+
+  * Jolly Card (Italian, bootleg, set 2)
+
+  This game PCB has a TI EP910DC-30 CPLD, like others Italian bootlegs
+  that have an Altera EP910PC CPLD on board.
+
+  To init NVRAM, DIP switches must be in the following positions:
+  OFF ON ON ON ON ON ON ON
+
+  Then press SERVICE 1 + SERVICE 2 and reset, then release both buttons.
+
+  Once NVRAM is initialized, the hardware still complains about it due
+  to a hardware check (see more at the rom load), but is now working.
+
+  The game seems to work for a currency that needs decimal values.
+  Maybe Italian Lires...
+
+
+  * Jolly Card (Austrian, Fun World, bootleg)
+
+  This game is a bootleg made from a Fun World original program.
+  The game has hidden features, as a program mode.
+
+  In the Service menu (key 0), press HOLD 1 & HOLD 2 together for
+  some seconds and the programming menu will appear.
+
+
 *****************************************************************************************
 
   Memory Map (generic)
@@ -570,7 +596,7 @@
 
 *****************************************************************************************
 
-  *** Driver Updates by Roberto Fresca and Peter Ferrie ***
+  *** Driver Updates ***
 
 
   [2005/09/08]
@@ -1059,6 +1085,14 @@
 
   - Added default NVRAM to Royal Card (Italian, Dino 4 hardware, encrypted).
   - Promoted the game to Working.
+  - Added technical and game notes.
+
+  - Marked royalcrdc graphics ROM roj.ic26 as bad dump.
+    address line 08 is faulty, so you have 0x100 bytes blocks repeated
+    along the dump.
+  - Reworked jolycdig and added default NVRAM.
+  - Added button-lamps support to jolycdig & jolycdab.
+    Both games were promoted to working state.
   - Added technical and game notes.
 
 
@@ -4446,7 +4480,24 @@ ROM_END
    Then (SERVICE1 + SERVICE2) and reset,
    then another reset.
 
-   Once NVRAM is initialized, the hardware still complains about it. Need to be analyzed.
+   Once NVRAM is initialized, the hardware still complains about it.
+   The code checks for values 0x45 & 0x56 at ROM space offsets $E825
+   and $E826. If these values are there, the code jumps to $C8C2,
+   where the game stucks with a hardware error message.
+
+   C8B3: LDA $E825    AD 25 E8  ; load the contents of $E825.
+   C8B6: CMP #$45     C9 45     ; compare with #$45, ASCII "E".
+   C8B8: BEQ $C8C2    F0 08     ; if true, jumps to $C8C2.
+   C8BA: LDA $E826    AD 26 E8  ; load the contents of $E826.
+   C8BD: CMP #$56     C9 56     ; compare with #$56, ASCII "V".
+   C8BF: BEQ $C8C2    F0 01     ; if true, jumps to $C8C2.
+   C8C1: RTS          60        ; returns from subroutine.
+   ....
+   C8C2: JMP $C0D8    4C D8 C0  ; jumps to hardware error.
+
+   Maybe something is mapped virtual or physically there that
+   shows different values that the ones from the ROM.
+
 */
 ROM_START( jolycdig )
 	ROM_REGION( 0x10000, "maincpu", 0 )  // TI EP910DC-30 CPLD (DIP-40 Ceramic)
@@ -4454,9 +4505,12 @@ ROM_START( jolycdig )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "2__27c512.bin", 0x0000, 0x8000, CRC(a4452751) SHA1(a0b32a8801ebaee7ede7873b244f1a424433fe94) )
-	ROM_CONTINUE( 0x0000, 0x8000) /* Discarding 1nd half 1ST AND 2ND HALF IDENTICAL*/
+	ROM_IGNORE(                        0x8000)    // discarding 2nd half (identical halves)
 	ROM_LOAD( "1__27c512.bin", 0x8000, 0x8000, CRC(8b64d4c6) SHA1(8106cba31cd3fbda0855e6070182d248e3d52495) )
-	ROM_CONTINUE( 0x8000, 0x8000) /* Discarding 1nd half 1ST AND 2ND HALF IDENTICAL*/
+	ROM_IGNORE(                        0x8000)   // discarding 2nd half (identical halves)
+
+	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
+	ROM_LOAD( "jolycdig_nvram.bin", 0x0000, 0x0800, CRC(a85854cb) SHA1(601d45f936626a8df7ffe8e36aef17416bbb7cca) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "27s29pc.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
@@ -4503,15 +4557,14 @@ ROM_END
 
 
 ROM_START( jolycdab )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* program is testing/writing RAM in offset $8800-$BFFF (ROM)...?? */
+	ROM_REGION( 0x10000, "maincpu", 0 )  // program is testing/writing ROM offsets $8800-$BFFF (chksum?).
 	ROM_LOAD( "ig1poker.run", 0x8000, 0x8000, CRC(c96e6542) SHA1(ed6c0cf9fe8597dba9149b2225320d8d9c39219a) )
-//  ROM_RELOAD(               0x4000, 0x4000 )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "jn1poker.ch2", 0x0000, 0x8000, CRC(8d78e43d) SHA1(15c60f8e0cd88518b0dc72b92aff6d8d4b2149cf) )
 	ROM_LOAD( "jn1poker.ch1", 0x8000, 0x8000, CRC(d0a87f58) SHA1(6b7925557c4e40a1ebe52ecd14391cdd5e00b59a) )
 
-	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM.
 	ROM_LOAD( "jolycdab_nvram.bin", 0x0000, 0x0800, CRC(30fe661b) SHA1(323c9b5e4856601dbd40f8e48aa8cd9a112e08a9) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -5538,19 +5591,28 @@ ROM_START( royalcrdb )
 ROM_END
 
 /*
-    roj.ic12   NO MATCH
-    roj.ic25   NO MATCH
-    roj.ic26   NO MATCH
+  Royal Card (Austrian, set 4)
+
+  roj.ic12   NO MATCH
+  roj.ic25   NO MATCH
+  roj.ic26   NO MATCH
+
+  roj.ic26   BADADDR    xxxxxxx-xxxxxxxx
+  Bad dump. Address 08 is faulty.
+
+  GFX ROMS are double size.
+  Second half of GFX ROMs seems to be from Jolly Card.
+
 */
 ROM_START( royalcrdc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "roj.ic12", 0x8000, 0x8000, CRC(16923d58) SHA1(e865b91246ae5a21bdc9787e6e6e22be5182cabb) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "roj.ic26", 0x0000, 0x10000, CRC(3883cdcb) SHA1(b71a786822fe8fcb2c6fcdc463facb2738ec8c01) )
-//  ROM_IGNORE(                   0x8000)
-	ROM_LOAD( "roj.ic25", 0x8000, 0x10000, CRC(c5b787e8) SHA1(be88aa901c1f96d171af45c3602e0ce72b8fff34) )
-//  ROM_IGNORE(                   0x8000)
+	ROM_LOAD( "roj.ic26", 0x0000, 0x8000, BAD_DUMP CRC(3883cdcb) SHA1(b71a786822fe8fcb2c6fcdc463facb2738ec8c01) )
+	ROM_IGNORE(                   0x8000)
+	ROM_LOAD( "roj.ic25", 0x8000, 0x8000, CRC(c5b787e8) SHA1(be88aa901c1f96d171af45c3602e0ce72b8fff34) )
+	ROM_IGNORE(                   0x8000)
 
 	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "royalcrdc_nvram.bin", 0x0000, 0x0800, CRC(eacb0c7b) SHA1(513816623aa3843dd5d0416fc012060c7a9f6c71) )
@@ -7830,11 +7892,24 @@ void chinatow_state::init_rcdinch()
 	decrypt_rcdino4(memregion("maincpu")->base(), memregion("maincpu")->bytes(), memregion("gfx1")->base(), memregion("gfx1")->bytes(), memregion( "gfx1" )->base());
 }
 
+
+void funworld_state::init_jolycdig()
+{
+	// covering two values in ROM space checked for hardware errors.
+	// maybe some virtual or physically mapped there.
+
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0xe825] = 0xff;  // checks for #$45, ascii E.
+	rom[0xe826] = 0xff;  // checks for #$56, ascii V.
+}
+
+
 /**********************************************
 *                Game Drivers                 *
 **********************************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT      ROT    COMPANY            FULLNAME                                          FLAGS                  LAYOUT */
+/*     YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT           ROT    COMPANY            FULLNAME                                          FLAGS                    LAYOUT */
 
 // Jolly Card based...
 GAMEL( 1985, jollycrd,  0,        fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "TAB Austria",     "Jolly Card (Austrian, set 1)",                    0,                       layout_jollycrd )
@@ -7846,19 +7921,19 @@ GAMEL( 1998, jolycdev,  jollycrd, fw1stpal, funworld,  funworld_state, empty_ini
 GAMEL( 1985, jolyccra,  jollycrd, cuoreuno, jolycdcr,  funworld_state, empty_init,    ROT0, "TAB Austria",     "Jolly Card (Croatian, set 1)",                    0,                       layout_jollycrd )
 GAMEL( 1993, jolyccrb,  jollycrd, cuoreuno, jolycdcr,  funworld_state, empty_init,    ROT0, "Soft Design",     "Jolly Card (Croatian, set 2)",                    0,                       layout_jollycrd )
 GAMEL( 1985, sjcd2kx3,  jollycrd, fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "M.P.",            "Super Joly 2000 - 3x",                            0,                       layout_jollycrd )
-GAME(  1986, jolycdab,  jollycrd, fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "Inter Games",     "Jolly Card (Austrian, Fun World, bootleg)",       MACHINE_NOT_WORKING )
+GAMEL( 1986, jolycdab,  jollycrd, fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "Inter Games",     "Jolly Card (Austrian, Fun World, bootleg)",       0,                       layout_jollycrd )
 GAMEL( 1992, jolycdsp,  jollycrd, cuoreuno, jolycdit,  funworld_state, init_ctunk,    ROT0, "TAB Austria",     "Jolly Card (Spanish, blue TAB board, encrypted)", 0,                       layout_royalcrd )
 GAMEL( 1990, jolycdid,  jollycrd, cuoreuno, jolycdcr,  funworld_state, empty_init,    ROT0, "bootleg",         "Jolly Card (Italian, different colors, set 1)",   0,                       layout_jollycrd ) // italian, CPLD, different colors.
 GAMEL( 1990, jolycdie,  jollycrd, cuoreuno, jolycdib,  funworld_state, empty_init,    ROT0, "bootleg",         "Jolly Card (Italian, different colors, set 2)",   0,                       layout_jollycrd ) // not from TAB blue PCB.
 GAMEL( 1990, jolycdif,  jollycrd, cuoreuno, jolycdib,  funworld_state, empty_init,    ROT0, "bootleg",         "Jolly Card (Italian, bootleg, set 1)",            0,                       layout_jollycrd ) // italian, CPLD. doesn't need nvram init.
-GAME(  1993, jolycdig,  jollycrd, cuoreuno, jolycdib,  funworld_state, empty_init,    ROT0, "bootleg",         "Jolly Card (Italian, bootleg, set 2)",            MACHINE_NOT_WORKING )
+GAMEL( 1993, jolycdig,  jollycrd, cuoreuno, jolycdib,  funworld_state, init_jolycdig, ROT0, "bootleg",         "Jolly Card (Italian, bootleg, set 2)",            0,                       layout_jollycrd ) // italian, CPLD. needs nvram.
 GAMEL( 1990, jolycdih,  jollycrd, cuoreuno, jolycdib,  funworld_state, empty_init,    ROT0, "bootleg",         "Jolly Card (Italian, bootleg, set 3)",            0,                       layout_jollycrd )
 
 // Bonus Card based...
-GAMEL( 1986, bonuscrd,  0,        fw2ndpal, bonuscrd,  funworld_state, empty_init,    ROT0, "Fun World",       "Bonus Card (Austrian)",                           MACHINE_IMPERFECT_COLORS,   layout_bonuscrd ) // use fw1stpal machine for green background
-GAMEL( 1986, bonuscrda, bonuscrd, fw2ndpal, bonuscrd,  funworld_state, empty_init,    ROT0, "Fun World",       "Bonus Card (Austrian, ATG Electronic hack)",      MACHINE_IMPERFECT_COLORS,   layout_bonuscrd ) // use fw1stpal machine for green background
-GAMEL( 1986, bigdeal,   bonuscrd, fw2ndpal, bigdeal,   funworld_state, empty_init,    ROT0, "Fun World",       "Big Deal (Hungarian, set 1)",                     MACHINE_IMPERFECT_COLORS,   layout_bonuscrd )
-GAMEL( 1986, bigdealb,  bonuscrd, fw2ndpal, bigdeal,   funworld_state, empty_init,    ROT0, "Fun World",       "Big Deal (Hungarian, set 2)",                     MACHINE_IMPERFECT_COLORS,   layout_bonuscrd )
+GAMEL( 1986, bonuscrd,  0,        fw2ndpal, bonuscrd,  funworld_state, empty_init,    ROT0, "Fun World",       "Bonus Card (Austrian)",                           MACHINE_IMPERFECT_COLORS, layout_bonuscrd ) // use fw1stpal machine for green background
+GAMEL( 1986, bonuscrda, bonuscrd, fw2ndpal, bonuscrd,  funworld_state, empty_init,    ROT0, "Fun World",       "Bonus Card (Austrian, ATG Electronic hack)",      MACHINE_IMPERFECT_COLORS, layout_bonuscrd ) // use fw1stpal machine for green background
+GAMEL( 1986, bigdeal,   bonuscrd, fw2ndpal, bigdeal,   funworld_state, empty_init,    ROT0, "Fun World",       "Big Deal (Hungarian, set 1)",                     MACHINE_IMPERFECT_COLORS, layout_bonuscrd )
+GAMEL( 1986, bigdealb,  bonuscrd, fw2ndpal, bigdeal,   funworld_state, empty_init,    ROT0, "Fun World",       "Big Deal (Hungarian, set 2)",                     MACHINE_IMPERFECT_COLORS, layout_bonuscrd )
 
 // CMC Italian jamma PCB's...
 GAMEL( 1996, cuoreuno,  0,        cuoreuno, cuoreuno,  funworld_state, empty_init,    ROT0, "C.M.C.",          "Cuore 1 (Italian)",                               0,                       layout_jollycrd )
