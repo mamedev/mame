@@ -889,9 +889,8 @@ void asuka_state::bonzeadv(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0110PCR(config, m_tc0110pcr, 0, "palette");
 
@@ -950,9 +949,8 @@ void asuka_state::asuka(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0110PCR(config, m_tc0110pcr, 0, "palette");
 
@@ -1023,10 +1021,9 @@ void asuka_state::cadash(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0110PCR(config, m_tc0110pcr, 0, "palette");
 
@@ -1084,10 +1081,9 @@ void asuka_state::mofflott(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0110PCR(config, m_tc0110pcr, 0, "palette");
 
@@ -1153,10 +1149,9 @@ void asuka_state::eto(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0110PCR(config, m_tc0110pcr, 0, "palette");
 

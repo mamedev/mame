@@ -144,43 +144,39 @@ the wide tilemap mode)
 #include "tc0100scn.h"
 #include "screen.h"
 
+#include <algorithm>
+
 #define TC0100SCN_RAM_SIZE        0x14000   /* enough for double-width tilemaps */
 #define TC0100SCN_TOTAL_CHARS     256
 
 DEFINE_DEVICE_TYPE(TC0100SCN, tc0100scn_device, "tc0100scn", "Taito TC0100SCN")
 
 tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, TC0100SCN, tag, owner, clock),
-	m_ram(nullptr),
-	m_bg_ram(nullptr),
-	m_fg_ram(nullptr),
-	m_tx_ram(nullptr),
-	m_char_ram(nullptr),
-	m_bgscroll_ram(nullptr),
-	m_fgscroll_ram(nullptr),
-	m_colscroll_ram(nullptr),
-	m_bgscrollx(0),
-	m_bgscrolly(0),
-	m_fgscrollx(0),
-	m_fgscrolly(0),
-	m_bg0_colbank(0),
-	m_bg1_colbank(0),
-	m_tx_colbank(0),
-	m_dblwidth(0),
-	m_dirty(false),
-	m_gfxnum(0),
-	m_txnum(0),
-	m_x_offset(0),
-	m_y_offset(0),
-	m_flip_xoffs(0),
-	m_flip_yoffs(0),
-	m_flip_text_xoffs(0),
-	m_flip_text_yoffs(0),
-	m_multiscrn_xoffs(0),
-	m_multiscrn_hack(0),
-	m_gfxdecode(*this, finder_base::DUMMY_TAG),
-	m_palette(*this, finder_base::DUMMY_TAG)
+	: device_t(mconfig, TC0100SCN, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this)
+	, m_ram(nullptr)
+	, m_bgscroll_ram(nullptr)
+	, m_fgscroll_ram(nullptr)
+	, m_colscroll_ram(nullptr)
+	, m_bgscrollx(0)
+	, m_bgscrolly(0)
+	, m_fgscrollx(0)
+	, m_fgscrolly(0)
+	, m_tx_colbank(0)
+	, m_dblwidth(0)
+	, m_dirty(false)
+	, m_gfxnum(0)
+	, m_x_offset(0)
+	, m_y_offset(0)
+	, m_flip_xoffs(0)
+	, m_flip_yoffs(0)
+	, m_flip_text_xoffs(0)
+	, m_flip_text_yoffs(0)
+	, m_multiscrn_xoffs(0)
+	, m_multiscrn_hack(0)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
+	std::fill(std::begin(m_bg_colbank), std::end(m_bg_colbank), 0);
 }
 
 //-------------------------------------------------
@@ -192,7 +188,7 @@ void tc0100scn_device::device_start()
 	// bind callbacks
 	m_tc0100scn_cb.bind_relative_to(*owner());
 
-	static const gfx_layout tc0100scn_charlayout =
+	static const gfx_layout charlayout =
 	{
 	8,8,    /* 8*8 characters */
 	256,    /* 256 characters */
@@ -214,14 +210,14 @@ void tc0100scn_device::device_start()
 	   we're safe as it uses single width tilemaps. */
 
 	/* Single width versions */
-	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[2][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&tc0100scn_device::get_bg_tile_info<0x00000, 0>, "bg0_std", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&tc0100scn_device::get_bg_tile_info<0x04000, 1>, "bg1_std", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[2][0] = &machine().tilemap().create(*this,        tilemap_get_info_delegate(&tc0100scn_device::get_tx_tile_info<0x02000, 0>, "txt_std", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	/* Double width versions */
-	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_tilemap[2][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&tc0100scn_device::get_bg_tile_info<0x00000, 0>, "bg0_wide", this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&tc0100scn_device::get_bg_tile_info<0x04000, 1>, "bg1_wide", this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_tilemap[2][1] = &machine().tilemap().create(*this,        tilemap_get_info_delegate(&tc0100scn_device::get_tx_tile_info<0x09000, 1>, "txt_wide", this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 
 	m_tilemap[0][0]->set_transparent_pen(0);
 	m_tilemap[1][0]->set_transparent_pen(0);
@@ -270,15 +266,18 @@ void tc0100scn_device::device_start()
 	set_layer_ptrs();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(m_palette, tc0100scn_charlayout, (u8 *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 256, 0));
+	set_gfx(0, std::make_unique<gfx_element>(&palette(), charlayout, (u8 *)&m_ram[0x6000 / 2], NATIVE_ENDIAN_VALUE_LE_BE(8,0), 256, 0));
+	set_gfx(1, std::make_unique<gfx_element>(&palette(), charlayout, (u8 *)&m_ram[0x11000 / 2], NATIVE_ENDIAN_VALUE_LE_BE(8,0), 256, 0));
 
-	gfx_element *gfx = m_gfxdecode->gfx(m_gfxnum);
-	gfx_element *txt = m_gfxdecode->gfx(m_txnum);
+	gfx_element *bg_gfx = m_gfxdecode->gfx(m_gfxnum);
+	gfx_element *txt0 = gfx(0);
+	gfx_element *txt1 = gfx(1);
 
-	if (gfx->granularity() == 2)    /* Yuyugogo, Yesnoj */
-		gfx->set_granularity(16);
+	if (bg_gfx->granularity() == 2)    /* Yuyugogo, Yesnoj */
+		bg_gfx->set_granularity(16);
 
-	txt->set_granularity(gfx->granularity());
+	txt0->set_granularity(bg_gfx->granularity());
+	txt1->set_granularity(bg_gfx->granularity());
 
 	set_colbanks(0, 0, 0);  /* standard values, only Wgp & multiscreen games change them */
 									/* we call this here, so that they can be modified at video_start*/
@@ -305,10 +304,11 @@ void tc0100scn_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-void tc0100scn_device::common_get_tile_info( tile_data &tileinfo, int tile_index, u16 *ram, int colbank )
+template<unsigned Offset, unsigned Colbank>
+TILE_GET_INFO_MEMBER(tc0100scn_device::get_bg_tile_info)
 {
-	u32 code = ram[2 * tile_index + 1];
-	const u16 attr = ram[2 * tile_index];
+	u32 code = m_ram[(2 * tile_index) + 1 + Offset];
+	const u16 attr = m_ram[(2 * tile_index) + Offset];
 	u16 color = attr & 0xff;
 
 	/* Mahjong Quest (F2 system) inexplicably has a banking feature */
@@ -317,25 +317,16 @@ void tc0100scn_device::common_get_tile_info( tile_data &tileinfo, int tile_index
 
 	SET_TILE_INFO_MEMBER(m_gfxnum,
 			code,
-			((attr + colbank) & 0xff),
+			((color + m_bg_colbank[Colbank]) & 0xff),
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-TILE_GET_INFO_MEMBER(tc0100scn_device::get_bg_tile_info)
-{
-	common_get_tile_info(tileinfo, tile_index, m_bg_ram, m_bg0_colbank);
-}
-
-TILE_GET_INFO_MEMBER(tc0100scn_device::get_fg_tile_info)
-{
-	common_get_tile_info(tileinfo, tile_index, m_fg_ram, m_bg1_colbank);
-}
-
+template<unsigned Offset, unsigned Gfx>
 TILE_GET_INFO_MEMBER(tc0100scn_device::get_tx_tile_info)
 {
-	int attr = m_tx_ram[tile_index];
+	int attr = m_ram[Offset + tile_index];
 
-	SET_TILE_INFO_MEMBER(m_txnum,
+	SET_TILE_INFO_MEMBER(Gfx,
 			attr & 0x00ff,
 			((attr & 0x3f00) >> 8) + m_tx_colbank,
 			TILE_FLIPYX((attr & 0xc000) >> 14));
@@ -343,8 +334,8 @@ TILE_GET_INFO_MEMBER(tc0100scn_device::get_tx_tile_info)
 
 void tc0100scn_device::set_colbanks( int bg0, int bg1, int tx )
 {
-	m_bg0_colbank = bg0;
-	m_bg1_colbank = bg1;
+	m_bg_colbank[0] = bg0;
+	m_bg_colbank[1] = bg1;
 	m_tx_colbank = tx;
 }
 
@@ -358,31 +349,16 @@ void tc0100scn_device::set_layer_ptrs()
 {
 	if (!m_dblwidth)
 	{
-		m_bg_ram        = m_ram.get() + 0x0;
-		m_tx_ram        = m_ram.get() + 0x4000 /2;
-		m_char_ram      = m_ram.get() + 0x6000 /2;
-		m_fg_ram        = m_ram.get() + 0x8000 /2;
 		m_bgscroll_ram  = m_ram.get() + 0xc000 /2;
 		m_fgscroll_ram  = m_ram.get() + 0xc400 /2;
 		m_colscroll_ram = m_ram.get() + 0xe000 /2;
 	}
 	else
 	{
-		m_bg_ram        = m_ram.get() + 0x0;
-		m_fg_ram        = m_ram.get() + 0x08000 /2;
 		m_bgscroll_ram  = m_ram.get() + 0x10000 /2;
 		m_fgscroll_ram  = m_ram.get() + 0x10400 /2;
 		m_colscroll_ram = m_ram.get() + 0x10800 /2;
-		m_char_ram      = m_ram.get() + 0x11000 /2;
-		m_tx_ram        = m_ram.get() + 0x12000 /2;
 	}
-}
-
-void tc0100scn_device::dirty_tilemaps()
-{
-	m_tilemap[0][m_dblwidth]->mark_all_dirty();
-	m_tilemap[1][m_dblwidth]->mark_all_dirty();
-	m_tilemap[2][m_dblwidth]->mark_all_dirty();
 }
 
 void tc0100scn_device::restore_scroll()
@@ -417,8 +393,6 @@ void tc0100scn_device::device_post_load()
 	set_layer_ptrs();
 	restore_scroll();
 
-	m_gfxdecode->gfx(m_txnum)->set_source((u8 *)m_char_ram);
-
 	m_tilemap[0][0]->mark_all_dirty();
 	m_tilemap[1][0]->mark_all_dirty();
 	m_tilemap[2][0]->mark_all_dirty();
@@ -435,28 +409,36 @@ u16 tc0100scn_device::ram_r(offs_t offset)
 void tc0100scn_device::ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
-	if (!m_dblwidth)
+	/* Double-width tilemaps have a different memory map */
+	if (offset < 0x2000)
 	{
-		if (offset < 0x2000)
-			m_tilemap[0][0]->mark_tile_dirty(offset / 2);
-		else if (offset < 0x3000)
-			m_tilemap[2][0]->mark_tile_dirty((offset & 0x0fff));
-		else if (offset < 0x3800)
-			m_gfxdecode->gfx(m_txnum)->mark_dirty((offset - 0x3000) / 8);
-		else if (offset >= 0x4000 && offset < 0x6000)
-			m_tilemap[1][0]->mark_tile_dirty((offset & 0x1fff) / 2);
+		m_tilemap[0][0]->mark_tile_dirty(offset / 2);
+		m_tilemap[0][1]->mark_tile_dirty(offset / 2);
 	}
-	else    /* Double-width tilemaps have a different memory map */
+	else if (offset < 0x3000)
 	{
-		if (offset < 0x4000)
-			m_tilemap[0][1]->mark_tile_dirty(offset / 2);
-		else if (offset >= 0x4000 && offset < 0x8000)
-			m_tilemap[1][1]->mark_tile_dirty((offset & 0x3fff) / 2);
-		else if (offset >= 0x8800 && offset < 0x9000)
-			m_gfxdecode->gfx(m_txnum)->mark_dirty((offset - 0x8800) / 8);
-		else if (offset >= 0x9000)
-			m_tilemap[2][1]->mark_tile_dirty((offset & 0x0fff));
+		m_tilemap[2][0]->mark_tile_dirty((offset & 0x0fff));
+		m_tilemap[0][1]->mark_tile_dirty(offset / 2);
 	}
+	else if (offset < 0x3800)
+	{
+		gfx(0)->mark_dirty((offset - 0x3000) / 8);
+		m_tilemap[0][1]->mark_tile_dirty(offset / 2);
+	}
+	else if (offset < 0x4000)
+		m_tilemap[0][1]->mark_tile_dirty(offset / 2);
+	else if (offset < 0x6000)
+	{
+		m_tilemap[1][0]->mark_tile_dirty((offset & 0x1fff) / 2);
+		m_tilemap[1][1]->mark_tile_dirty((offset & 0x3fff) / 2);
+	}
+	else if (offset < 0x8000)
+		m_tilemap[1][1]->mark_tile_dirty((offset & 0x3fff) / 2);
+	else if (offset >= 0x8800 && offset < 0x9000)
+		gfx(1)->mark_dirty((offset - 0x8800) / 8);
+	else if (offset >= 0x9000)
+		m_tilemap[2][1]->mark_tile_dirty((offset & 0x0fff));
+
 }
 
 u16 tc0100scn_device::ctrl_r(offs_t offset)
@@ -507,12 +489,6 @@ void tc0100scn_device::ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 			{
 				/* Reinitialise layer pointers */
 				set_layer_ptrs();
-
-				/* and ensure full redraw of the tilemaps */
-				dirty_tilemaps();
-
-				/* reset the pointer to the text characters (and dirty them all) */
-				m_gfxdecode->gfx(m_txnum)->set_source((u8 *)m_char_ram);
 			}
 
 			break;
@@ -560,7 +536,7 @@ void tc0100scn_device::tilemap_update()
 		m_tilemap[1][m_dblwidth]->set_scrollx((j + m_fgscrolly) & 0x1ff, m_fgscrollx - m_fgscroll_ram[j]);
 }
 
-void tc0100scn_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, u32 priority, u8 pmask )
+void tc0100scn_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, u8 priority, u8 pmask )
 {
 	const bitmap_ind16 &src_bitmap = tmap->pixmap();
 	int width_mask, height_mask, x, y, p;
@@ -577,8 +553,9 @@ void tc0100scn_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bit
 
 	//We use cliprect.max_y and cliprect.max_x to support games which use more than 1 screen
 
+	src_y += cliprect.top();
 	// Row offsets are 'screen space' 0-255 regardless of Y scroll
-	for (y = 0; y <= cliprect.max_y; y++)
+	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		src_x = (m_fgscrollx - m_fgscroll_ram[(y + scrolly_delta) & 0x1ff] + scrollx_delta + cliprect.min_x) & width_mask;
 		if (m_ctrl[0x7] & 1) // Flipscreen
@@ -605,7 +582,7 @@ void tc0100scn_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bit
 	}
 }
 
-int tc0100scn_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u32 priority, u8 pmask )
+int tc0100scn_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u8 priority, u8 pmask )
 {
 	int disable = m_ctrl[6] & 0xf7;
 	rectangle clip = cliprect;

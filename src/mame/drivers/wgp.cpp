@@ -950,9 +950,8 @@ void wgp_state::wgp(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(3);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

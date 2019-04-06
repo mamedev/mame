@@ -10,17 +10,15 @@
 typedef device_delegate<void (u32 *code, u16 *color)> tc0100scn_cb_delegate;
 #define TC0100SCN_CB_MEMBER(_name)   void _name(u32 *code, u16 *color)
 
-class tc0100scn_device : public device_t
+class tc0100scn_device : public device_t, public device_gfx_interface
 {
 public:
 	tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 	template <typename... T> void set_tile_callback(T &&... args) { m_tc0100scn_cb = tc0100scn_cb_delegate(std::forward<T>(args)...); }
 	void set_gfx_region(int gfxregion) { m_gfxnum = gfxregion; }
-	void set_tx_region(int txregion) { m_txnum = txregion; }
 	void set_multiscr_xoffs(int xoffs) { m_multiscrn_xoffs = xoffs; }
 	void set_multiscr_hack(int hack) { m_multiscrn_hack = hack; }
 	void set_offsets(int x_offset, int y_offset)
@@ -51,7 +49,7 @@ public:
 	void ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void tilemap_update();
-	int tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u32 priority, u8 pmask = 0xff);
+	int tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u8 priority, u8 pmask = 0xff);
 	void tilemap_set_dirty();
 
 	/* returns 0 or 1 depending on the lowest priority tilemap set in the internal
@@ -71,10 +69,6 @@ private:
 	u16          m_ctrl[8];
 
 	std::unique_ptr<u16[]>    m_ram;
-	u16 *        m_bg_ram;
-	u16 *        m_fg_ram;
-	u16 *        m_tx_ram;
-	u16 *        m_char_ram;
 	u16 *        m_bgscroll_ram;
 	u16 *        m_fgscroll_ram;
 	u16 *        m_colscroll_ram;
@@ -84,12 +78,11 @@ private:
 	/* We keep two tilemaps for each of the 3 actual tilemaps: one at standard width, one double */
 	tilemap_t    *m_tilemap[3][2];
 
-	s32          m_bg0_colbank, m_bg1_colbank, m_tx_colbank;
+	s32          m_bg_colbank[2], m_tx_colbank;
 	int          m_dblwidth;
 	bool         m_dirty;
 
 	int          m_gfxnum;
-	int          m_txnum;
 	int          m_x_offset, m_y_offset;
 	int          m_flip_xoffs, m_flip_yoffs;
 	int          m_flip_text_xoffs, m_flip_text_yoffs;
@@ -97,17 +90,12 @@ private:
 	int          m_multiscrn_hack;
 
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	template<unsigned Offset, unsigned Colbank> TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	template<unsigned Offset, unsigned Gfx> TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
-	void common_get_tile_info(tile_data &tileinfo, int tile_index, u16 *ram, int colbank);
-
-	void tilemap_draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, u32 priority, u8 pmask = 0xff);
+	void tilemap_draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, u8 priority, u8 pmask = 0xff);
 	void set_layer_ptrs();
-	void dirty_tilemaps();
 	void restore_scroll();
 };
 
