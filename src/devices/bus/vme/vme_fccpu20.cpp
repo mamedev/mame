@@ -254,7 +254,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void vme_fccpu20_device::cpu_space_map(address_map &map)
 {
-	map(0xfffff2, 0xffffff).lr16("bim irq", [this](offs_t offset) -> u16 { return m_bim->iack(offset+1); });
+	map(0xfffffff2, 0xffffffff).lr16("bim irq", [this](offs_t offset) -> u16 { return m_bim->iack(offset+1); });
 }
 
 void vme_fccpu20_device::device_add_mconfig(machine_config &config)

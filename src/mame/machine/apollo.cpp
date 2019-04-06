@@ -571,16 +571,18 @@ u16 apollo_state::apollo_pic_get_vector()
 		vector = m_pic8259_slave->acknowledge();
 	}
 
-	// don't log ptm interrupts
-	if (vector != APOLLO_IRQ_VECTOR+APOLLO_IRQ_PTM) {
-		MLOG1(("apollo_pic_acknowledge: irq=%d vector=%x", vector & 0x0f, vector));
-	}
+	if (!machine().side_effects_disabled()) {
+		// don't log ptm interrupts
+		if (vector != APOLLO_IRQ_VECTOR+APOLLO_IRQ_PTM) {
+			MLOG1(("apollo_pic_acknowledge: irq=%d vector=%x", vector & 0x0f, vector));
+		}
 
-	if (apollo_is_dn3000()) {
-		apollo_csr_set_status_register(APOLLO_CSR_SR_INTERRUPT_PENDING, 0);
-	} else {
-		// clear bit Interrupt Pending in Cache Status Register
-		apollo_set_cache_status_register(this,0x10, 0x00);
+		if (apollo_is_dn3000()) {
+			apollo_csr_set_status_register(APOLLO_CSR_SR_INTERRUPT_PENDING, 0);
+		} else {
+			// clear bit Interrupt Pending in Cache Status Register
+			apollo_set_cache_status_register(this,0x10, 0x00);
+		}
 	}
 	return vector;
 }
