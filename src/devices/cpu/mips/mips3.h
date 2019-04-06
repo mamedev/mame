@@ -238,6 +238,9 @@ enum {
 #define MIPS3_MAX_FASTRAM       3
 #define MIPS3_MAX_HOTSPOTS      16
 
+/* COP1 CCR register */
+#define COP1_FCR31              (m_core->ccr[1][31])
+
 /***************************************************************************
 INTERRUPT CONSTANTS
 ***************************************************************************/
