@@ -3353,7 +3353,7 @@ GAME( 1985, powrplay,   0,        leland,   mayhem,     leland_state, init_powrp
 GAME( 1985, wseries,    0,        leland,   wseries,    leland_state, init_wseries,  ROT0,   "Cinematronics", "World Series: The Season (rev 1)", 0 )
 GAME( 1985, wseries0,   wseries,  leland,   wseries,    leland_state, init_wseries,  ROT0,   "Cinematronics", "World Series: The Season (rev 0)", 0 )
 GAME( 1986, alleymas,   0,        leland,   alleymas,   leland_state, init_alleymas, ROT270, "Cinematronics", "Alley Master", 0 )
-GAME( 1987, upyoural,   0,        leland,   upyoural,   leland_state, init_upyoural, ROT270, "Cinematronics", "Up Your Alley", 0 )
+GAME( 1986, upyoural,   alleymas, leland,   upyoural,   leland_state, init_upyoural, ROT270, "Cinematronics", "Up Your Alley", 0 ) // prototype of Alley Master?
 
 /* odd master banks, small slave banks */
 GAME( 1986, dangerz,    0,        leland,   dangerz,    leland_state, init_dangerz,  ROT0,   "Cinematronics", "Danger Zone", 0 )
