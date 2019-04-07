@@ -4935,8 +4935,8 @@ static INPUT_PORTS_START( ginv )
 
 	PORT_START("IN.1") // R10
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("IN.1", 0x03, EQUALS, 0x00) // joystick centered
+	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("IN.1", 0x05, EQUALS, 0x00) // joystick centered
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // K8
@@ -4946,17 +4946,17 @@ INPUT_PORTS_END
 void ginv_state::ginv(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1370(config, m_maincpu, 340000); // approximation - RC osc. R=47K, C=47pF
+	TMS1370(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(ginv_state::read_k));
 	m_maincpu->r().set(FUNC(ginv_state::write_r));
 	m_maincpu->o().set(FUNC(ginv_state::write_o));
 
 	/* video hardware */
-	/* screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
-	screen.set_size(226, 1080);
-	screen.set_visarea_full(); */
+	screen.set_size(236, 1080);
+	screen.set_visarea_full();
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 
@@ -4977,8 +4977,8 @@ ROM_START( ginv )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_ginv_output.pla", 0, 365, CRC(6e33a24e) SHA1(cdf7ecf12ddd3863e6301e20fe80f9737db429e5) )
 
-	//ROM_REGION( 226185, "svg", 0)
-	//ROM_LOAD( "ginv.svg", 0, 226185, CRC(1e1bafd1) SHA1(15868ef0c9dadbf537fed0e2d846451ba99fab7b) )
+	ROM_REGION( 142959, "svg", 0)
+	ROM_LOAD( "ginv.svg", 0, 142959, CRC(b0dc9bac) SHA1(18f8cc51a432d14f08fdf766275222f3ed184d89) )
 ROM_END
 
 
@@ -5072,7 +5072,7 @@ INPUT_PORTS_END
 void ginv1000_state::ginv1000(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1370(config, m_maincpu, 340000); // approximation
+	TMS1370(config, m_maincpu, 350000); // approximation
 	m_maincpu->k().set(FUNC(ginv1000_state::read_k));
 	m_maincpu->r().set(FUNC(ginv1000_state::write_r));
 	m_maincpu->o().set(FUNC(ginv1000_state::write_o));
