@@ -1655,15 +1655,28 @@ protected:
 	virtual void mem_pwd16(offs_t address, u16 data) override { program_write_cache<u16, NATIVE_ENDIAN_VALUE_LE_BE(0, 2)>(address, data); }
 	virtual void mem_pwd32(offs_t address, u32 data) override { program_write_cache<u32, 0>(address, data); }
 
+	// device_memory_interface override
+	virtual space_config_vector memory_space_config() const override;
+
 private:
 	void parse_mtrrfix(u64 mtrr, offs_t base, int kblock);
-	int check_cacheable(offs_t address);
+	inline int check_cacheable(offs_t address);
+	template <int wr> int address_mode(offs_t address);
 
 	template <class dt, offs_t xorle> dt opcode_read_cache(offs_t address);
 	template <class dt, offs_t xorle> dt program_read_cache(offs_t address);
 	template <class dt, offs_t xorle> void program_write_cache(offs_t address, dt data);
 
+	DECLARE_READ32_MEMBER(debug_read_memory);
+
+	address_space_config m_data_config;
+	address_space *m_data;
+	address_space_config m_opcodes_config;
+	address_space *m_opcodes;
+	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *mmacache32;
 	uint8_t m_processor_name_string[48];
+	offs_t m_msr_top_mem;
+	uint64_t m_msr_sys_cfg;
 	uint64_t m_msr_mtrrfix[11];
 	uint8_t m_memory_ranges_1m[1024 / 4];
 	cpucache<17, 9, Cache2Way, CacheLineBytes64> cache; // 512 sets, 2 ways (cachelines per set), 64 bytes per cacheline

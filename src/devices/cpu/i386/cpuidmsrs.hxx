@@ -347,6 +347,7 @@ uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 			// 20    MtrrVarDramEn    - Enable top of memory address and I/O range registers
 			// 19    MtrrFixDramModEn - Enable modification of RdDram and WrDram bits in fixed MTRRs
 			// 18    MtrrFixDramEn    - Enable RdDram and WrDram attributes in fixed MTRRs
+			ret = m_msr_sys_cfg;
 			break;
 		case 0xC0010015: // HWCR
 			break;
@@ -363,6 +364,7 @@ uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 			break;
 		case 0xC001001A: // TOP_MEM
 			// 39-23 TOM16-0 - Top of Memory, accesses from this address onward are directed to mmio
+			ret = (uint64_t)m_msr_top_mem;
 			break;
 		case 0xC001001D: // TOP_MEM2
 			break;
@@ -434,6 +436,7 @@ void athlonxp_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 		case 0x40c: // MC3_CTL
 			break;
 		case 0xC0010010: // SYS_CFG
+			m_msr_sys_cfg = data;
 			break;
 		case 0xC0010015: // HWCR
 			break;
@@ -443,6 +446,7 @@ void athlonxp_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 		case 0xC0010019:
 			break;
 		case 0xC001001A: // TOP_MEM
+			m_msr_top_mem = (offs_t)data;
 			break;
 		case 0xC0010113: // SMM_MASK
 			break;
