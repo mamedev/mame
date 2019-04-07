@@ -6,8 +6,10 @@
 
     driver by Phil Bennett
 
-    Known bugs:
-        * None
+    TODO:
+    * Coincounters add one coin at boot, caused by ay8910 writing 00 on
+      port direction change. Likely wrong I/O emulation in ay8910 device,
+      but not trivial to fix.
 
 ***************************************************************************/
 
@@ -28,7 +30,7 @@
 
 /*************************************
  *
- *  Forward definitions
+ *  Holy Space for The 5 Wise Enters
  *
  *************************************/
 
@@ -511,7 +513,6 @@ void lockon_state::lockon(machine_config &config)
 	ymsnd.irq_handler().set(FUNC(lockon_state::ym2203_irq));
 	ymsnd.port_a_read_callback().set_ioport("YM2203");
 	ymsnd.port_b_write_callback().set(FUNC(lockon_state::ym2203_out_b));
-	ymsnd.port_b_read_callback().set_constant(0xff);
 	ymsnd.add_route(0, "lspeaker", 0.40);
 	ymsnd.add_route(0, "rspeaker", 0.40);
 	ymsnd.add_route(1, "f2203.1l", 1.0);

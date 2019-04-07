@@ -966,9 +966,6 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 			if ((m_last_enable == -1) ||
 				((m_last_enable & 0x40) != (m_regs[AY_ENABLE] & 0x40)))
 			{
-				if (!m_port_a_read_cb.isnull())
-					m_regs[AY_PORTA] = m_port_a_read_cb(0);
-
 				/* write out 0xff if port set to input */
 				if (!m_port_a_write_cb.isnull())
 					m_port_a_write_cb((offs_t)0, (m_regs[AY_ENABLE] & 0x40) ? m_regs[AY_PORTA] : 0xff);
@@ -977,9 +974,6 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 			if ((m_last_enable == -1) ||
 				((m_last_enable & 0x80) != (m_regs[AY_ENABLE] & 0x80)))
 			{
-				if (!m_port_b_read_cb.isnull())
-					m_regs[AY_PORTB] = m_port_b_read_cb(0);
-
 				/* write out 0xff if port set to input */
 				if (!m_port_b_write_cb.isnull())
 					m_port_b_write_cb((offs_t)0, (m_regs[AY_ENABLE] & 0x80) ? m_regs[AY_PORTB] : 0xff);
