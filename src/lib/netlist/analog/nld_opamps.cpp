@@ -169,10 +169,10 @@ namespace netlist
 		}
 
 		NETLIB_UPDATEI();
-		NETLIB_RESETI();
-		NETLIB_UPDATE_PARAMI()
+		NETLIB_RESETI()
 		{
 		}
+		NETLIB_UPDATE_PARAMI();
 
 	private:
 
@@ -206,9 +206,8 @@ namespace netlist
 		m_VREF.push((m_VCC() + m_GND()) / 2.0);
 	}
 
-	NETLIB_RESET(opamp)
+	NETLIB_UPDATE_PARAM(opamp)
 	{
-		m_G1.reset();
 		m_G1.m_RI.setTo(m_model.m_RI);
 
 		if (m_type == 1)
@@ -220,10 +219,6 @@ namespace netlist
 		}
 		if (m_type == 3 || m_type == 2)
 		{
-			m_EBUF->reset();
-			m_CP->reset();
-			m_RP.reset();
-
 			double CP = m_model.m_DAB / m_model.m_SLEW;
 			double RP = 0.5 / constants::pi() / CP / m_model.m_FPF;
 			double G = m_model.m_UGF / m_model.m_FPF / RP;
@@ -244,8 +239,6 @@ namespace netlist
 		}
 		if (m_type == 3)
 		{
-			m_DP->reset();
-			m_DN->reset();
 			m_EBUF->m_G.setTo(1.0);
 			m_EBUF->m_RO.setTo(m_model.m_RO);
 		}

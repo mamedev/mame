@@ -126,7 +126,7 @@ namespace analog
 
 	// Have a common start for transistors
 
-	NETLIB_OBJECT(Q)
+	NETLIB_OBJECT(QBJT)
 	{
 	public:
 		enum q_type {
@@ -134,8 +134,8 @@ namespace analog
 			BJT_PNP
 		};
 
-		NETLIB_CONSTRUCTOR(Q)
-		, m_model(*this, "MODEL", "NPN")
+		NETLIB_CONSTRUCTOR_EX(QBJT, pstring model = "NPN")
+		, m_model(*this, "MODEL", model)
 		, m_qtype(BJT_NPN)
 		{
 		}
@@ -154,20 +154,6 @@ namespace analog
 	private:
 		q_type m_qtype;
 	};
-
-	NETLIB_OBJECT_DERIVED(QBJT, Q)
-	{
-	public:
-		NETLIB_CONSTRUCTOR_DERIVED(QBJT, Q)
-			{ }
-
-	protected:
-
-	private:
-	};
-
-
-
 
 	// -----------------------------------------------------------------------------
 	// nld_QBJT_switch
@@ -301,7 +287,7 @@ namespace analog
 	// nld_Q
 	// ----------------------------------------------------------------------------------------
 
-	NETLIB_UPDATE(Q)
+	NETLIB_UPDATE(QBJT)
 	{
 	//    netlist().solver()->schedule1();
 	}
@@ -313,7 +299,7 @@ namespace analog
 
 	NETLIB_RESET(QBJT_switch)
 	{
-		NETLIB_NAME(Q)::reset();
+		NETLIB_NAME(QBJT)::reset();
 
 		m_state_on = 0;
 
@@ -399,7 +385,7 @@ namespace analog
 
 	NETLIB_RESET(QBJT_EB)
 	{
-		NETLIB_NAME(Q)::reset();
+		NETLIB_NAME(QBJT)::reset();
 		if (m_CJE)
 		{
 			m_CJE->reset();

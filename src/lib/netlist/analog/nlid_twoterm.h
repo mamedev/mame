@@ -351,18 +351,7 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(D, twoterm)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(D, twoterm)
-		, m_model(*this, "MODEL", "D")
-		, m_D(*this, "m_D")
-		{
-			register_subalias("A", m_P);
-			register_subalias("K", m_N);
-		}
-
-		/* needed by nld_opamp ... */
-		template <class CLASS>
-		NETLIB_NAME(D)(CLASS &owner, const pstring &name, const pstring &model)
-		: NETLIB_NAME(twoterm)(owner, name)
+		NETLIB_CONSTRUCTOR_DERIVED_EX(D, twoterm, pstring model = "D")
 		, m_model(*this, "MODEL", model)
 		, m_D(*this, "m_D")
 		{
