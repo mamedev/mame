@@ -1325,6 +1325,7 @@ void a3000_state::a3000_mem(address_map &map)
 	map(0x00f00000, 0x00f7ffff).noprw(); // cartridge space
 	map(0x00f80000, 0x00ffffff).rom().region("kickstart", 0);
 	map(0x07f00000, 0x07ffffff).ram(); // motherboard ram (up to 16mb), grows downward
+	map(0xfff80000, 0xffffffff).rom().region("kickstart", 0);
 }
 
 // 1MB chip RAM and RTC
@@ -1421,6 +1422,7 @@ void a4000_state::a4000_mem(address_map &map)
 	map(0x01800000, 0x06ffffff).noprw(); // reserved (motherboard fast ram expansion)
 	map(0x07000000, 0x07bfffff).noprw(); // motherboard ram
 	map(0x07c00000, 0x07ffffff).ram(); // motherboard ram (up to 16mb), grows downward
+	map(0xfff80000, 0xffffffff).rom().region("kickstart", 0);
 }
 
 // 2MB chip RAM, 2 MB fast RAM, RTC and IDE
