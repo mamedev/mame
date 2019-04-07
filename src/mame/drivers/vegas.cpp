@@ -2005,7 +2005,7 @@ void vegas_state::nbagold(machine_config &config)
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_GAUNTDL);
-	m_ioasic->set_upper(494 /* 494 109 ??? */);
+	m_ioasic->set_upper(109 /* 494 109 ??? */);
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
 	//m_ioasic->set_auto_ack(1)
