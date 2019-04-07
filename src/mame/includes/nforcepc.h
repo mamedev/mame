@@ -20,6 +20,8 @@ public:
 
 	template <typename T> void set_cpu_tag(T &&tag) { cpu.set_tag(std::forward<T>(tag)); }
 	const char *get_cpu_tag() { return cpu.finder_tag(); }
+	void set_ram_size(uint32_t size) { ram_size = size; }
+	address_space *get_cpu_space(int spacenum) { return &cpu->space(spacenum); }
 
 protected:
 	virtual void device_start() override;
@@ -33,10 +35,13 @@ protected:
 	virtual void config_map(address_map &map) override;
 
 private:
+	uint32_t ram_size;
 	required_device<device_memory_interface> cpu;
 
-	DECLARE_READ8_MEMBER(test_r);
-	DECLARE_WRITE8_MEMBER(test_w);
+	DECLARE_READ8_MEMBER(unknown_r);
+	DECLARE_WRITE8_MEMBER(unknown_w);
+	DECLARE_READ32_MEMBER(ram_size_r);
+	DECLARE_WRITE32_MEMBER(ram_size_w);
 };
 
 DECLARE_DEVICE_TYPE(CRUSH11, crush11_host_device)
@@ -62,6 +67,8 @@ protected:
 private:
 	int ddr_ram_size;
 	std::vector<uint32_t> ram;
+	crush11_host_device *host;
+	address_space *ram_space;
 };
 
 DECLARE_DEVICE_TYPE(CRUSH11_MEMORY, crush11_memory_device)

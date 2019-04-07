@@ -63,19 +63,21 @@ DEFINE_DEVICE_TYPE(CRUSH11, crush11_host_device, "crush11", "NVIDIA Corporation 
 void crush11_host_device::config_map(address_map &map)
 {
 	pci_host_device::config_map(map);
-	map(0xf0, 0xf0).rw(FUNC(crush11_host_device::test_r), FUNC(crush11_host_device::test_w));
+	map(0x84, 0x87).rw(FUNC(crush11_host_device::ram_size_r), FUNC(crush11_host_device::ram_size_w));
+	map(0xf0, 0xf0).rw(FUNC(crush11_host_device::unknown_r), FUNC(crush11_host_device::unknown_w));
 }
 
 crush11_host_device::crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, CRUSH11, tag, owner, clock)
 	, cpu(*this, finder_base::DUMMY_TAG)
+	, ram_size(0)
 {
 }
 
 void crush11_host_device::device_start()
 {
 	pci_host_device::device_start();
-	memory_space = &cpu->space(AS_PROGRAM);
+	memory_space = &cpu->space(AS_DATA);
 	io_space = &cpu->space(AS_IO);
 
 	memory_window_start = 0;
@@ -107,14 +109,24 @@ void crush11_host_device::map_extra(uint64_t memory_window_start, uint64_t memor
 	memory_space->install_rom(0xfffc0000, 0xffffffff, m_region->base() + (0x000c0000 & mask));
 }
 
-READ8_MEMBER(crush11_host_device::test_r)
+READ8_MEMBER(crush11_host_device::unknown_r)
 {
 	return 4;
 }
 
-WRITE8_MEMBER(crush11_host_device::test_w)
+WRITE8_MEMBER(crush11_host_device::unknown_w)
 {
 	logerror("test = %02x\n", data);
+}
+
+READ32_MEMBER(crush11_host_device::ram_size_r)
+{
+	return ram_size * 1024 * 1024 - 1;
+}
+
+WRITE32_MEMBER(crush11_host_device::ram_size_w)
+{
+	logerror("trying to set size = %d\n", data);
 }
 
 // For ddr ram
@@ -152,25 +164,31 @@ crush11_memory_device::crush11_memory_device(const machine_config &mconfig, cons
 
 void crush11_memory_device::device_start()
 {
+	device_t *r = owner()->subdevice("00.0");
+
 	pci_device::device_start();
 	ram.resize(ddr_ram_size * 1024 * 1024 / 4);
+	host = dynamic_cast<crush11_host_device *>(r);
+	ram_space = host->get_cpu_space(AS_PROGRAM);
 }
 
 void crush11_memory_device::device_reset()
 {
 	pci_device::device_reset();
+	host->set_ram_size(ddr_ram_size);
 }
 
 void crush11_memory_device::set_ram_size(int ram_size)
 {
 	ddr_ram_size = ram_size;
+	if (ddr_ram_size < 16)
+		ddr_ram_size = 16;
 }
 
 void crush11_memory_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-	memory_space->install_ram(0x00000000, 0x0009ffff, &ram[0x00000000 / 4]);
-	memory_space->install_ram(0x00100000, ddr_ram_size * 1024 * 1024 - 1, &ram[0x00100000 / 4]);
+	ram_space->install_ram(0x00000000, ddr_ram_size * 1024 * 1024 - 1, &ram[0]);
 }
 
 /*
