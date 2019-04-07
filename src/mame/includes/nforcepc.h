@@ -35,8 +35,8 @@ protected:
 	virtual void config_map(address_map &map) override;
 
 private:
-	uint32_t ram_size;
 	required_device<device_memory_interface> cpu;
+	uint32_t ram_size;
 
 	DECLARE_READ8_MEMBER(unknown_r);
 	DECLARE_WRITE8_MEMBER(unknown_w);
