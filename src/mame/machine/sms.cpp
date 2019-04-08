@@ -2,6 +2,7 @@
 // copyright-holders:Wilbert Pol, Charles MacDonald,Mathis Rosenhauer,Brad Oliver,Michael Luong,Fabio Priuli,Enik Land
 #include "emu.h"
 #include "crsshair.h"
+#include "cpu/z80/z80.h"
 #include "video/315_5124.h"
 #include "sound/ym2413.h"
 #include "includes/sms.h"
@@ -1081,6 +1082,11 @@ void sms_state::machine_start()
 	if (m_is_gamegear)
 	{
 		save_item(NAME(m_gg_sio));
+		// The game Ecco requires SP to be initialized, so, to run on a BIOS-less Game
+		// Gear, probably a custom chip like the 315-5378 does the initialization, as
+		// done by the 315-5342 chip on the Power Base Converter for Sega Genesis/MD.
+		// Reference: http://www.smspower.org/forums/14084-PowerBaseConverterInfo
+		m_maincpu->set_state_int(Z80_SP, 0xdff0);
 	}
 
 	if (m_cartslot)
