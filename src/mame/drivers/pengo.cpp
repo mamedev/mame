@@ -902,7 +902,7 @@ void pengo_state::init_penta()
 	}
 }
 
-void pengo_state::init_schick()
+void pengo_state::init_schick() // only the 0x0000-0x7fff range is correctly decrypted. 0x8000-0xdfff is 0xff, then 0xe000-0xffff seems to be differently encrypted.
 {
 	static const uint8_t data_xortable[4][8] =
 	{
@@ -969,4 +969,4 @@ GAME( 1982, pengo5,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  RO
 GAME( 1982, pengob,   pengo,    pengo,    pengo,    pengo_state, init_penta,  ROT90, "bootleg",                  "Pengo (bootleg)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1982, penta,    pengo,    pengo,    pengo,    pengo_state, init_penta,  ROT90, "bootleg (Grinbee Shouji)", "Penta",                        MACHINE_SUPPORTS_SAVE ) // Grinbee Shouji was a subsidiary of Orca
 GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, pengo_state, empty_init,  ROT90, "bootleg",                  "Jr. Pac-Man (Pengo hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, schick,   0,        schick,   schick,   pengo_state, init_schick, ROT90, "Microhard",                "Super Chick",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // encrypted, scheme suspected similar to the Penta one
+GAME( 1988, schick,   0,        schick,   schick,   pengo_state, init_schick, ROT90, "Microhard",                "Super Chick",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // only partially decrypted
