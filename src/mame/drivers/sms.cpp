@@ -577,8 +577,9 @@ MACHINE_CONFIG_START(sms_state::sms2_ntsc)
 	SEGA315_5246(config, m_vdp, XTAL(10'738'635));
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(false);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->n_nmi_in().set([this] () { return (m_port_pause->read() & 0x80) ? 1 : 0; });
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	m_has_bios_full = true;
@@ -613,8 +614,9 @@ MACHINE_CONFIG_START(sms_state::sms1_ntsc)
 	SEGA315_5124(config, m_vdp, XTAL(10'738'635));
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(false);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->n_nmi_in().set([this] () { return (m_port_pause->read() & 0x80) ? 1 : 0; });
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// card and expansion slots, not present in Master System II
@@ -629,7 +631,7 @@ void smssdisp_state::sms_sdisp(machine_config &config)
 {
 	sms1_ntsc(config);
 
-	m_vdp->irq().set(FUNC(smssdisp_state::sms_store_int_callback));
+	m_vdp->n_int().set(FUNC(smssdisp_state::sms_store_int_callback));
 
 	Z80(config, m_control_cpu, XTAL(10'738'635)/3);
 	m_control_cpu->set_addrmap(AS_PROGRAM, &smssdisp_state::sms_store_mem);
@@ -670,8 +672,9 @@ MACHINE_CONFIG_START(sms_state::sms2_pal)
 	SEGA315_5246(config, m_vdp, MASTER_CLOCK_PAL/5);
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(true);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->n_nmi_in().set([this] () { return (m_port_pause->read() & 0x80) ? 1 : 0; });
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	m_has_bios_full = true;
@@ -705,8 +708,9 @@ MACHINE_CONFIG_START(sms_state::sms1_pal)
 	SEGA315_5124(config, m_vdp, MASTER_CLOCK_PAL/5);
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(true);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->n_nmi_in().set([this] () { return (m_port_pause->read() & 0x80) ? 1 : 0; });
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// card and expansion slots, not present in Master System II
@@ -740,8 +744,9 @@ MACHINE_CONFIG_START(sms_state::sms3_paln)
 	SEGA315_5246(config, m_vdp, MASTER_CLOCK_PALN);
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(true);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->n_nmi_in().set([this] () { return (m_port_pause->read() & 0x80) ? 1 : 0; });
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	m_has_bios_full = true;
@@ -775,8 +780,9 @@ MACHINE_CONFIG_START(sms_state::sms1_paln)
 	SEGA315_5124(config, m_vdp, MASTER_CLOCK_PALN);
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(true);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->n_nmi_in().set([this] () { return (m_port_pause->read() & 0x80) ? 1 : 0; });
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// card and expansion slots, not present in Tec Toy Master System III
@@ -811,8 +817,9 @@ MACHINE_CONFIG_START(sms_state::sms3_br)
 	SEGA315_5246(config, m_vdp, MASTER_CLOCK_PALM);
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(false); // PAL-M has same line count of NTSC
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->n_nmi_in().set([this] () { return (m_port_pause->read() & 0x80) ? 1 : 0; });
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	m_has_bios_full = true;
@@ -847,8 +854,9 @@ MACHINE_CONFIG_START(sms_state::sms1_br)
 	SEGA315_5124(config, m_vdp, MASTER_CLOCK_PALM);
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(false); // PAL-M has same line count of NTSC
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->n_nmi_in().set([this] () { return (m_port_pause->read() & 0x80) ? 1 : 0; });
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// card and expansion slots, not present in Tec Toy Master System III
@@ -891,7 +899,7 @@ void sms_state::sms1_kr(machine_config &config)
 
 	SOFTWARE_LIST(config, "cart_list2").set_original("sg1000");
 
-	m_vdp->csync().set(FUNC(sms_state::sms_csync_callback));
+	m_vdp->n_csync().set(FUNC(sms_state::sms_n_csync_callback));
 
 	m_has_bios_full = false;
 	m_has_bios_2000 = true;
@@ -963,8 +971,8 @@ MACHINE_CONFIG_START(sms_state::gamegear)
 	SEGA315_5377(config, m_vdp, MASTER_CLOCK_GG/3);
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(false);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->vblank().set(FUNC(sms_state::gg_pause_callback));
 	m_vdp->add_route(0, "lspeaker", 1.00);
 	m_vdp->add_route(1, "rspeaker", 1.00);
 

@@ -295,8 +295,9 @@ void smsbootleg_state::sms_supergame(machine_config &config)
 	SEGA315_5246(config, m_vdp, XTAL(10'738'635));
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(false);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->n_nmi_in().set([this] () { return (m_port_pause->read() & 0x80) ? 1 : 0; });
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 

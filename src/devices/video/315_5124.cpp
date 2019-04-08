@@ -187,9 +187,11 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, m_max_sprite_zoom_hcount(max_sprite_zoom_hcount)
 	, m_max_sprite_zoom_vcount(max_sprite_zoom_vcount)
 	, m_is_pal(false)
-	, m_int_cb(*this)
-	, m_csync_cb(*this)
-	, m_pause_cb(*this)
+	, m_vblank_cb(*this)
+	, m_n_csync_cb(*this)
+	, m_n_int_cb(*this)
+	, m_n_nmi_cb(*this)
+	, m_n_nmi_in_cb(*this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(FUNC(sega315_5124_device::sega315_5124), this))
 	, m_palette(*this, "palette")
 	, m_snsnd(*this, "snsnd")
@@ -349,20 +351,22 @@ u8 sega315_5124_device::vcount_read()
 
 u8 sega315_5124_device::hcount_read()
 {
+	m_hcounter_latched = false;
 	return m_hcounter;
 }
 
 
-void sega315_5124_device::hcount_latch_at_hpos(int hpos)
+void sega315_5124_device::hcount_latch()
 {
 	const int active_scr_start = 46;      /* 9 + 2 + 14 + 8 + 13 */
 
 	/* The hcount value returned by the VDP seems to be based on the previous hpos */
-	int hclock = hpos - 1;
+	int hclock = screen().hpos() - 1;
 	if (hclock < 0)
 		hclock += WIDTH;
 
 	m_hcounter = ((hclock - active_scr_start) >> 1) & 0xff;
+	m_hcounter_latched = true;
 }
 
 
@@ -427,10 +431,10 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 		{
 			if (BIT(m_reg[0x00], 4))
 			{
-				m_irq_state = 1;
+				m_n_int_state = 0;
 
-				if (!m_int_cb.isnull())
-					m_int_cb(ASSERT_LINE);
+				if (!m_n_int_cb.isnull())
+					m_n_int_cb(ASSERT_LINE);
 			}
 		}
 		break;
@@ -440,19 +444,48 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 		{
 			if (BIT(m_reg[0x01], 5))
 			{
-				m_irq_state = 1;
+				m_n_int_state = 0;
 
-				if (!m_int_cb.isnull())
-					m_int_cb(ASSERT_LINE);
+				if (!m_n_int_cb.isnull())
+					m_n_int_cb(ASSERT_LINE);
 			}
 		}
 		break;
 
 	case TIMER_NMI:
-		if (!m_pause_cb.isnull())
-			m_pause_cb(0);
+		if (!m_n_nmi_in_cb.isnull())
+		{
+			if (!m_n_nmi_in_cb())
+			{
+				if (m_n_nmi_state == 1)
+					m_n_nmi_cb(ASSERT_LINE);
+
+				m_n_nmi_state = 0;
+			}
+			else
+			{
+				if (m_n_nmi_state == 0)
+					m_n_nmi_cb(CLEAR_LINE);
+
+				m_n_nmi_state = 1;
+			}
+		}
 		break;
 	}
+}
+
+
+void sega315_5124_device::vblank_end(int vpos)
+{
+	m_nmi_timer->adjust(screen().time_until_pos(vpos, m_line_timing[NMI_HPOS]));
+}
+
+
+void sega315_5377_device::vblank_end(int vpos)
+{
+	// Assume the VBlank line is used to trigger the NMI logic performed by the 315-5378 chip.
+	if (!m_vblank_cb.isnull())
+		m_vblank_cb(0);
 }
 
 
@@ -468,7 +501,7 @@ void sega315_5124_device::process_line_timer()
 	m_reg8copy = m_reg[0x08];
 
 	/* Check if the /CSYNC signal must be active (low) */
-	if (!m_csync_cb.isnull())
+	if (!m_n_csync_cb.isnull())
 	{
 		/* /CSYNC is signals /HSYNC and /VSYNC (both internals) ANDed together.
 		   According to Charles MacDonald, /HSYNC goes low for 28 pixels on beginning
@@ -479,7 +512,7 @@ void sega315_5124_device::process_line_timer()
 		*/
 		if (vpos == 0 || vpos > (m_frame_timing[VERTICAL_SYNC] + 1))
 		{
-			m_csync_cb(0);
+			m_n_csync_cb(0);
 		}
 	}
 
@@ -520,6 +553,8 @@ void sega315_5124_device::process_line_timer()
 		{
 			m_vint_timer->adjust(screen().time_until_pos(vpos, m_line_timing[VINT_HPOS]));
 			m_pending_status |= STATUS_VINT;
+			if (!m_vblank_cb.isnull())
+				m_vblank_cb(1);
 		}
 
 		/* Draw borders */
@@ -575,7 +610,8 @@ void sega315_5124_device::process_line_timer()
 		/* Check if we're on the last line of the top border */
 		if (vpos == vpos_limit + m_frame_timing[TOP_BORDER] - 1)
 		{
-			m_nmi_timer->adjust(screen().time_until_pos(vpos, m_line_timing[NMI_HPOS]));
+			m_hcounter_latched = false;
+			vblank_end(vpos);
 		}
 
 		/* Draw borders */
@@ -672,12 +708,12 @@ u8 sega315_5124_device::control_read()
 		m_hint_occurred = false;
 		m_status = u8(~(STATUS_VINT | STATUS_SPROVR | STATUS_SPRCOL));
 
-		if (m_irq_state == 1)
+		if (m_n_int_state == 0)
 		{
-			m_irq_state = 0;
+			m_n_int_state = 1;
 
-			if (!m_int_cb.isnull())
-				m_int_cb(CLEAR_LINE);
+			if (!m_n_int_cb.isnull())
+				m_n_int_cb(CLEAR_LINE);
 		}
 	}
 
@@ -817,10 +853,10 @@ void sega315_5124_device::control_write(u8 data)
 				// For HINT disabling through register 00:
 				// "Line IRQ VCount" test, of Flubba's VDPTest ROM, disables HINT to wait
 				// for next VINT, but HINT occurs when the operation is about to execute.
-				// So here, where the setting is done, the irq_state needs to be cleared.
+				// So here, where the setting is done, the /INT state needs to be cleared.
 				//
 				// For VINT disabling through register 01:
-				// When running eagles5 on the smskr driver the irq_state is 1 because of some
+				// When running eagles5 on the smskr driver the /INT state is 0 because of some
 				// previous HINTs that occurred. eagles5 sets register 01 to 0x02 and expects
 				// the irq state to be cleared after that.
 				// The following bit of code takes care of that.
@@ -828,28 +864,28 @@ void sega315_5124_device::control_write(u8 data)
 				if ((reg_num == 0 && !BIT(m_reg[0x00], 4)) ||
 						(reg_num == 1 && !BIT(m_reg[0x01], 5)))
 				{
-					if (m_irq_state == 1)
+					if (m_n_int_state == 0)
 					{
-						m_irq_state = 0;
+						m_n_int_state = 1;
 
-						if (!m_int_cb.isnull())
+						if (!m_n_int_cb.isnull())
 						{
-							m_int_cb(CLEAR_LINE);
+							m_n_int_cb(CLEAR_LINE);
 						}
 					}
 				}
 				else
 				{
 					// For register 01 and VINT enabling:
-					// Assert the IRQ line for the scoreboard of robocop3,
+					// Assert the /INT line for the scoreboard of robocop3,
 					// on the sms/smspal driver, be displayed correctly.
 					//
 					// Assume the same behavior for reg0+HINT.
 					//
-					m_irq_state = 1;
+					m_n_int_state = 0;
 
-					if (!m_int_cb.isnull())
-						m_int_cb(ASSERT_LINE);
+					if (!m_n_int_cb.isnull())
+						m_n_int_cb(ASSERT_LINE);
 				}
 			}
 			m_addrmode = 0;
@@ -1830,9 +1866,11 @@ void sega315_5124_device::device_post_load()
 void sega315_5124_device::device_start()
 {
 	/* Resolve callbacks */
-	m_int_cb.resolve();
-	m_csync_cb.resolve();
-	m_pause_cb.resolve();
+	m_vblank_cb.resolve();
+	m_n_csync_cb.resolve();
+	m_n_int_cb.resolve();
+	m_n_nmi_cb.resolve();
+	m_n_nmi_in_cb.resolve();
 
 	/* Make temp bitmap for rendering */
 	screen().register_screen_bitmap(m_tmpbitmap);
@@ -1865,11 +1903,13 @@ void sega315_5124_device::device_start()
 	save_item(NAME(m_control_write_data_latch));
 	save_item(NAME(m_sega315_5124_compatibility_mode));
 	save_item(NAME(m_display_disabled));
-	save_item(NAME(m_irq_state));
+	save_item(NAME(m_n_int_state));
+	save_item(NAME(m_n_nmi_state));
 	save_item(NAME(m_vdp_mode));
 	save_item(NAME(m_y_pixels));
 	save_item(NAME(m_line_counter));
 	save_item(NAME(m_hcounter));
+	save_item(NAME(m_hcounter_latched));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_current_palette));
 
@@ -1915,9 +1955,11 @@ void sega315_5124_device::device_reset()
 	m_cram_dirty = true;
 	m_buffer = 0;
 	m_control_write_data_latch = 0;
-	m_irq_state = 0;
+	m_n_int_state = 1;
+	m_n_nmi_state = 1;
 	m_line_counter = 0;
 	m_hcounter = 0;
+	m_hcounter_latched = false;
 	m_draw_time = DRAW_TIME_SMS;
 
 	std::fill(std::begin(m_current_palette), std::end(m_current_palette), 0);
