@@ -18,7 +18,6 @@
 #include "emu.h"
 #include "includes/aztarac.h"
 
-#include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
@@ -89,7 +88,8 @@ void aztarac_state::main_map(address_map &map)
 	map(0x02700c, 0x02700d).portr("DIAL");
 	map(0x02700e, 0x02700f).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0xff8000, 0xffafff).ram().share("vectorram");
-	map(0xffb000, 0xffb001).w(FUNC(aztarac_state::ubr_w));
+	map(0xffb000, 0xffb001).nopr();
+	map(0xffb001, 0xffb001).w(FUNC(aztarac_state::ubr_w));
 	map(0xffe000, 0xffffff).ram();
 }
 
@@ -155,7 +155,6 @@ void aztarac_state::aztarac(machine_config &config)
 	/* basic machine hardware */
 	m68000_device &maincpu(M68000(config, m_maincpu, 16_MHz_XTAL / 2));
 	maincpu.set_addrmap(AS_PROGRAM, &aztarac_state::main_map);
-	maincpu.set_vblank_int("screen", FUNC(aztarac_state::irq4_line_hold));
 	maincpu.set_cpu_space(AS_PROGRAM);
 
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 8);
@@ -173,7 +172,7 @@ void aztarac_state::aztarac(machine_config &config)
 	m_screen->set_size(400, 300);
 	m_screen->set_visarea(0, 1024-1, 0, 768-1);
 	m_screen->set_screen_update("vector", FUNC(vector_device::screen_update));
-
+	m_screen->screen_vblank().set(FUNC(aztarac_state::video_interrupt));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
