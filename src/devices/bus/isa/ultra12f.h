@@ -13,6 +13,7 @@
 
 #include "isa.h"
 #include "cpu/hpc/hpc.h"
+#include "machine/upd765.h"
 
 class ultra12f_device : public device_t, public device_isa16_card_interface
 {
@@ -30,6 +31,7 @@ private:
 	void hpc_map(address_map &map);
 
 	required_device<hpc_device> m_hpc;
+	required_device<upd765_family_device> m_fdc;
 	required_region_ptr<u8> m_bios;
 };
 
