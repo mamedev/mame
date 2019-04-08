@@ -1335,7 +1335,7 @@ ROM_END
 
 
 /*
-For Baseball: The Season II, the label format is:
+For Alley Master, the label format is:
 ------------------------
 |(C)1985 Cinematronics | -> Copyright & Manufacturer
 |P/N 02-13518-00       | -> Part number with revision
