@@ -174,13 +174,13 @@ WRITE8_MEMBER(tmnt_state::glfgreat_sound_w)
 	m_k053260->main_write(space, offset, data);
 
 	if (offset)
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 
 WRITE16_MEMBER(tmnt_state::prmrsocr_sound_irq_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE8_MEMBER(tmnt_state::prmrsocr_audio_bankswitch_w)
@@ -441,7 +441,7 @@ WRITE16_MEMBER(tmnt_state::thndrx2_eeprom_w)
 
 		/* bit 5 triggers IRQ on sound cpu */
 		if (m_last == 0 && (data & 0x20) != 0)
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 		m_last = data & 0x20;
 
 		/* bit 6 = enable char ROM reading through the video RAM */
@@ -578,7 +578,7 @@ void tmnt_state::lgtnfght_main_map(address_map &map)
 WRITE16_MEMBER(tmnt_state::ssriders_soundkludge_w)
 {
 	/* I think this is more than just a trigger */
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 void tmnt_state::blswhstl_main_map(address_map &map)

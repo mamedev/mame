@@ -353,7 +353,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
 
-	void c76_io_map(address_map &map);
 	void c76_map(address_map &map);
 	void namcos11_map(address_map &map);
 	void ptblank2ua_map(address_map &map);
@@ -364,7 +363,7 @@ private:
 
 	required_shared_ptr<uint16_t> m_sharedram;
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
+	required_device<m37710_cpu_device> m_mcu;
 
 	optional_memory_region m_bankedroms;
 	optional_memory_bank_array<8> m_bank;
@@ -535,19 +534,6 @@ void namcos11_state::c76_map(address_map &map)
 	map(0x301000, 0x301001).nopw();
 }
 
-void namcos11_state::c76_io_map(address_map &map)
-{
-	map(M37710_ADC0_H, M37710_ADC7_H).nopr();
-	map(M37710_ADC0_L, M37710_ADC0_L).portr("ADC0");
-	map(M37710_ADC1_L, M37710_ADC1_L).portr("ADC1");
-	map(M37710_ADC2_L, M37710_ADC2_L).portr("ADC2");
-	map(M37710_ADC3_L, M37710_ADC3_L).portr("ADC3");
-	map(M37710_ADC4_L, M37710_ADC4_L).portr("ADC4");
-	map(M37710_ADC5_L, M37710_ADC5_L).portr("ADC5");
-	map(M37710_ADC6_L, M37710_ADC6_L).portr("ADC6");
-	map(M37710_ADC7_L, M37710_ADC7_L).portr("ADC7");
-}
-
 READ16_MEMBER(namcos11_state::c76_speedup_r)
 {
 	if ((m_mcu->pc() == 0xc153) && (!(m_su_83 & 0xff00)))
@@ -617,7 +603,14 @@ void namcos11_state::coh110(machine_config &config)
 	/* basic machine hardware */
 	NAMCO_C76(config, m_mcu, 16934400);
 	m_mcu->set_addrmap(AS_PROGRAM, &namcos11_state::c76_map);
-	m_mcu->set_addrmap(AS_IO, &namcos11_state::c76_io_map);
+	m_mcu->an0_cb().set_ioport("ADC0");
+	m_mcu->an1_cb().set_ioport("ADC1");
+	m_mcu->an2_cb().set_ioport("ADC2");
+	m_mcu->an3_cb().set_ioport("ADC3");
+	m_mcu->an4_cb().set_ioport("ADC4");
+	m_mcu->an5_cb().set_ioport("ADC5");
+	m_mcu->an6_cb().set_ioport("ADC6");
+	m_mcu->an7_cb().set_ioport("ADC7");
 
 	/* TODO: irq generation for these */
 	TIMER(config, "mcu_irq0").configure_periodic(FUNC(namcos11_state::mcu_irq0_cb), attotime::from_hz(60));

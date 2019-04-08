@@ -335,9 +335,7 @@ private:
 /* 2681 DUART */
 WRITE_LINE_MEMBER(dectalk_state::duart_irq_handler)
 {
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
-	//drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
-	//drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, HOLD_LINE, vector);
+	m_maincpu->set_input_line(M68K_IRQ_6, state);
 }
 
 READ8_MEMBER(dectalk_state::duart_input)
@@ -402,10 +400,10 @@ void dectalk_state::dsp_semaphore_w(bool state)
 #ifdef VERBOSE
 		logerror("speech int fired!\n");
 #endif
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_5, ASSERT_LINE);
 	}
 	else
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_5, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
 }
 
 // read the output fifo and set the interrupt line active on the dsp
@@ -602,7 +600,7 @@ WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (
 #ifdef SPC_LOG_68K
 			logerror("    speech int fired!\n");
 #endif
-			m_maincpu->set_input_line_and_vector(M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because semaphore was set
+			m_maincpu->set_input_line(M68K_IRQ_5, ASSERT_LINE); // set int because semaphore was set
 		}
 	}
 	else // data&0x40 == 0
@@ -610,7 +608,7 @@ WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (
 #ifdef SPC_LOG_68K
 		logerror(" | 0x40 = 0: speech int disabled\n");
 #endif
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_5, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
+		m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE); // clear int because int is now disabled
 	}
 }
 
@@ -642,7 +640,7 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 #ifdef TLC_LOG
 			logerror("    TLC int fired!\n");
 #endif
-			m_maincpu->set_input_line_and_vector(M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because tone detect was set
+			m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE); // set int because tone detect was set
 		}
 	}
 	else // data&0x40 == 0
@@ -651,7 +649,7 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 		logerror(" | 0x40 = 0: tone detect int disabled\n");
 #endif
 	if ((!(data&0x4000)) || (!m_tlc_ringdetect)) // check to be sure we don't disable int if both ints fired at once
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_4, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
+		m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE); // clear int because int is now disabled
 	}
 	if (data&0x100) // bit 8: answer phone relay enable
 	{
@@ -675,7 +673,7 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 #ifdef TLC_LOG
 			logerror("    TLC int fired!\n");
 #endif
-			m_maincpu->set_input_line_and_vector(M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because tone detect was set
+			m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE); // set int because tone detect was set
 		}
 	}
 	else // data&0x4000 == 0
@@ -684,7 +682,7 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 		logerror(" | 0x4000 = 0: ring detect int disabled\n");
 #endif
 	if ((!(data&0x40)) || (!m_tlc_tonedetect)) // check to be sure we don't disable int if both ints fired at once
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_4, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
+		m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE); // clear int because int is now disabled
 	}
 }
 

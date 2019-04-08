@@ -12081,6 +12081,18 @@ ROM_START( scobrab )
 	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, CRC(9b87f90d) SHA1(d11ac5e4a6057301ea2a9cbb404c2b978eb4c1dc) )
 ROM_END
 
+/*
+A PCB picture shows the following label format for the audio ROMs:
+
+SUPER COBRA
+RA1   5C
+1981    STERN
+
+On the A970 ASS'Y REV.B PCB:
+SUPER COBRA  RA1 5C  1981   STERN  (black dot on label)
+SUPER COBRA  RA1 5D  1981   STERN  (black dot on label)
+SUPER COBRA  RA1 5E  1981   STERN  (black dot on label)
+*/
 ROM_START( scobrae ) // main program is identical to the scobras set once decrypted
 	ROM_REGION( 0x10000, "maincpu", 0 ) // all roms have STERN labels
 	ROM_LOAD( "super cobra ra1 2c 1981.2c",   0x0000, 0x1000, CRC(ba9d4152) SHA1(f1792c0049804ac956ab7f95f699559fca4df960) )
@@ -12178,19 +12190,47 @@ ROM_START( suprheli )
 ROM_END
 
 
+/*
+A PCB picture shows the following label format:
+
+MOON WAR II
+RA22   2C(-37)
+1981    STERN
+
+Roms labels:
+
+On the A969 ASS'Y REV.B PCB:
+MOON WAR II  RA22 2C(-37)  1981   STERN
+MOON WAR II  RA22 2E(-37)  1981   STERN
+MOON WAR II  RA22 2F(-37)  1981   STERN
+MOON WAR II  RA22 2H(-37)  1981   STERN
+
+MOON WAR II  RA20 5F(-37)  1981   STERN  (blue dot on label)
+MOON WAR II  RA20 5H(-37)  1981   STERN  (blue dot on label)
+
+MOONWAR II COLOR 6EA1   (color BPROM)
+
+On the A970 ASS'Y REV.B PCB:
+MOON WAR II  RA20 5C(--36)  1981   STERN
+MOON WAR II  RA20 5D(--36)  1981   STERN
+ - socket 5E NOT populated
+
+Although the game displays Moon War as the title the "original" Moon War is/was a prototype on Stern Berzerk/Frenzy hardware,
+see berzerk.cpp  So this version is commonly refered to as Moon War II becuase the ROMs & PCB were labeled as MOON WAR II
+*/
 ROM_START( moonwar )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "mw2.2c",       0x0000, 0x1000, CRC(7c11b4d9) SHA1(a27bdff6ce728647ec811df843ac235c32c293d6) )
+	ROM_LOAD( "mw2.2c",       0x0000, 0x1000, CRC(7c11b4d9) SHA1(a27bdff6ce728647ec811df843ac235c32c293d6) ) /* Are these 4 the RA22 revision?? not verified */
 	ROM_LOAD( "mw2.2e",       0x1000, 0x1000, CRC(1b6362be) SHA1(2fbd95869146adcc0c8be1df653251fda8849e8e) )
 	ROM_LOAD( "mw2.2f",       0x2000, 0x1000, CRC(4fd8ba4b) SHA1(3da784267a96d05f66b00626a22cb3f06211d202) )
 	ROM_LOAD( "mw2.2h",       0x3000, 0x1000, CRC(56879f0d) SHA1(d1e9932863aebc5761e71fca8d24f3c400e1250d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "mw2.5c",       0x0000, 0x0800, CRC(c26231eb) SHA1(5b19edfaefe1a535059311d067ea53405879d627) )
+	ROM_LOAD( "mw2.5c",       0x0000, 0x0800, CRC(c26231eb) SHA1(5b19edfaefe1a535059311d067ea53405879d627) ) /* Are these 2 the RA20 revision?? not verified */
 	ROM_LOAD( "mw2.5d",       0x0800, 0x0800, CRC(bb48a646) SHA1(cf51202d16b03bbed12ff24501be68683f28c992) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "mw2.5f",       0x0000, 0x0800, CRC(c5fa1aa0) SHA1(6c6b5b2ce5de278ff436d3e7252ece5b086cc41d) )
+	ROM_LOAD( "mw2.5f",       0x0000, 0x0800, CRC(c5fa1aa0) SHA1(6c6b5b2ce5de278ff436d3e7252ece5b086cc41d) ) /* Are these 2 the RA20 revision?? not verified */
 	ROM_LOAD( "mw2.5h",       0x0800, 0x0800, CRC(a6ccc652) SHA1(286b3dc1f3a7da3ac66664e774b441ef075745f1) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
@@ -12199,17 +12239,17 @@ ROM_END
 
 ROM_START( moonwara )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2c",           0x0000, 0x1000, CRC(bc20b734) SHA1(c6fe550987d0052979aad43c67aa1b9248049669) )
+	ROM_LOAD( "2c",           0x0000, 0x1000, CRC(bc20b734) SHA1(c6fe550987d0052979aad43c67aa1b9248049669) ) /* Are these 4 the RA20 revision?? not verified */
 	ROM_LOAD( "2e",           0x1000, 0x1000, CRC(db6ffec2) SHA1(0fcd55b1e415e2e7041d10778052a235251f85fe) )
 	ROM_LOAD( "2f",           0x2000, 0x1000, CRC(378931b8) SHA1(663f1eea9b0e8dc38de818df66c5211dac41c33b) )
 	ROM_LOAD( "2h",           0x3000, 0x1000, CRC(031dbc2c) SHA1(5f2ca8b8763398bf161ee0c2c748a12d36cb40ec) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "mw2.5c",       0x0000, 0x0800, CRC(c26231eb) SHA1(5b19edfaefe1a535059311d067ea53405879d627) )
+	ROM_LOAD( "mw2.5c",       0x0000, 0x0800, CRC(c26231eb) SHA1(5b19edfaefe1a535059311d067ea53405879d627) ) /* Are these 2 the RA20 revision?? not verified */
 	ROM_LOAD( "mw2.5d",       0x0800, 0x0800, CRC(bb48a646) SHA1(cf51202d16b03bbed12ff24501be68683f28c992) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "mw2.5f",       0x0000, 0x0800, CRC(c5fa1aa0) SHA1(6c6b5b2ce5de278ff436d3e7252ece5b086cc41d) )
+	ROM_LOAD( "mw2.5f",       0x0000, 0x0800, CRC(c5fa1aa0) SHA1(6c6b5b2ce5de278ff436d3e7252ece5b086cc41d) ) /* Are these 2 the RA20 revision?? not verified */
 	ROM_LOAD( "mw2.5h",       0x0800, 0x0800, CRC(a6ccc652) SHA1(286b3dc1f3a7da3ac66664e774b441ef075745f1) )
 
 	ROM_REGION( 0x0020, "proms", 0 )

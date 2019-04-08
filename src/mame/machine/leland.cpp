@@ -330,8 +330,7 @@ void leland_state::machine_reset()
 	m_master_int_timer->adjust(m_screen->time_until_pos(8), 8);
 
 	/* reset globals */
-	m_gfx_control = 0x00;
-	sound_port_w(0xff);
+	sound_port_w(0);
 	m_wcol_enable = 0;
 
 	m_dangerz_x = 512;

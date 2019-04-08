@@ -36,7 +36,7 @@ kaneko16_sprite_device::kaneko16_sprite_device(
 		device_type type,
 		const char *tag,
 		device_t *owner,
-		uint32_t clock)
+		u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
@@ -65,8 +65,8 @@ kaneko16_sprite_device::kaneko16_sprite_device(
 
 void kaneko16_sprite_device::device_start()
 {
-	m_first_sprite = std::make_unique<struct kan_tempsprite[]>(0x400);
-	m_sprites_regs = make_unique_clear<uint16_t[]>(0x20/2);
+	m_first_sprite = std::make_unique<struct tempsprite_t[]>(0x400);
+	m_sprites_regs = make_unique_clear<u16[]>(0x20/2);
 	screen().register_screen_bitmap(m_sprites_bitmap);
 
 	save_item(NAME(m_sprite_flipx));
@@ -138,7 +138,7 @@ Offset:         Format:                     Value:
 #define USE_LATCHED_CODE    2
 #define USE_LATCHED_COLOR   4
 
-void kaneko_kc002_sprite_device::get_sprite_attributes(struct kan_tempsprite *s, uint16_t attr)
+void kaneko_kc002_sprite_device::get_sprite_attributes(struct tempsprite_t *s, u16 attr)
 {
 	s->color        =       (attr & 0x003f);
 	s->priority     =       (attr & 0x00c0) >> 6;
@@ -147,7 +147,7 @@ void kaneko_kc002_sprite_device::get_sprite_attributes(struct kan_tempsprite *s,
 	s->code         +=      (s->y & 1) << 16;   // bloodwar
 }
 
-void kaneko_vu002_sprite_device::get_sprite_attributes(struct kan_tempsprite *s, uint16_t attr)
+void kaneko_vu002_sprite_device::get_sprite_attributes(struct tempsprite_t *s, u16 attr)
 {
 	s->flipy        =       (attr & 0x0001);
 	s->flipx        =       (attr & 0x0002);
@@ -156,7 +156,7 @@ void kaneko_vu002_sprite_device::get_sprite_attributes(struct kan_tempsprite *s,
 }
 
 
-int kaneko16_sprite_device::kaneko16_parse_sprite_type012(int i, struct kan_tempsprite *s, uint16_t* spriteram16, int spriteram16_bytes)
+int kaneko16_sprite_device::parse_sprite_type012(int i, struct tempsprite_t *s, u16* spriteram16, int spriteram16_bytes)
 {
 	int attr, xoffs, offs;
 
@@ -198,12 +198,12 @@ int kaneko16_sprite_device::kaneko16_parse_sprite_type012(int i, struct kan_temp
 
 
 template<class _BitmapClass>
-void kaneko16_sprite_device::kaneko16_draw_sprites_custom(_BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,
-		uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,
+void kaneko16_sprite_device::draw_sprites_custom(_BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,
+		u32 code,u32 color,int flipx,int flipy,int sx,int sy,
 		bitmap_ind8 &priority_bitmap, int priority)
 {
 	pen_t pen_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-	const uint8_t *source_base = gfx->get_data(code % gfx->elements());
+	const u8 *source_base = gfx->get_data(code % gfx->elements());
 	int sprite_screen_height = ((1<<16)*gfx->height()+0x8000)>>16;
 	int sprite_screen_width = ((1<<16)*gfx->width()+0x8000)>>16;
 
@@ -275,9 +275,9 @@ void kaneko16_sprite_device::kaneko16_draw_sprites_custom(_BitmapClass &dest_bmp
 
 			for (int y = sy; y < ey; y++)
 			{
-				const uint8_t *source = source_base + (y_index >> 16) * gfx->rowbytes();
+				const u8 *source = source_base + (y_index >> 16) * gfx->rowbytes();
 				dest = &dest_bmp.pix(y);
-				uint8_t *pri = &priority_bitmap.pix8(y);
+				u8 *pri = &priority_bitmap.pix8(y);
 
 				int x_index = x_index_base;
 				for (int x = sx; x < ex; x++)
@@ -306,7 +306,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites_custom(_BitmapClass &dest_bmp
 
 /* Build a list of sprites to display & draw them */
 template<class _BitmapClass>
-void kaneko16_sprite_device::kaneko16_draw_sprites(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, uint16_t* spriteram16, int spriteram16_bytes)
+void kaneko16_sprite_device::draw_sprites(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes)
 {
 	/* Sprites *must* be parsed from the first in RAM to the last,
 	   because of the multisprite feature. But they *must* be drawn
@@ -320,7 +320,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(_BitmapClass &bitmap, const r
 	int max =   (screen().width() > 0x100) ? (0x200<<6) : (0x100<<6);
 
 	int i = 0;
-	struct kan_tempsprite *s = m_first_sprite.get();
+	struct tempsprite_t *s = m_first_sprite.get();
 
 	/* These values are latched from the last sprite. */
 	int x           =   0;
@@ -337,7 +337,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(_BitmapClass &bitmap, const r
 	{
 		int flags;
 
-		flags = kaneko16_parse_sprite_type012(i,s, spriteram16, spriteram16_bytes);
+		flags = parse_sprite_type012(i,s, spriteram16, spriteram16_bytes);
 
 		if (flags == -1)    // End of Sprites
 			break;
@@ -417,9 +417,9 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(_BitmapClass &bitmap, const r
 	{
 		int curr_pri = s->priority;
 
-		uint32_t primask = m_priority.sprite[curr_pri];
+		u32 primask = m_priority.sprite[curr_pri];
 
-		kaneko16_draw_sprites_custom(
+		draw_sprites_custom(
 										bitmap,cliprect,m_gfxdecode->gfx(0),
 										s->code,
 										s->color,
@@ -500,14 +500,14 @@ FLIP ON:
 900010: 0000 0400 A000 A400-1E00 2200 0000 0400     ; +1f<<6 on y
 */
 
-READ16_MEMBER(kaneko16_sprite_device::kaneko16_sprites_regs_r)
+u16 kaneko16_sprite_device::regs_r(offs_t offset)
 {
 	return m_sprites_regs[offset];
 }
 
-WRITE16_MEMBER(kaneko16_sprite_device::kaneko16_sprites_regs_w)
+void kaneko16_sprite_device::regs_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	uint16_t new_data;
+	u16 new_data;
 
 	COMBINE_DATA(&m_sprites_regs[offset]);
 	new_data  = m_sprites_regs[offset];
@@ -531,16 +531,16 @@ WRITE16_MEMBER(kaneko16_sprite_device::kaneko16_sprites_regs_w)
 }
 
 
-void kaneko16_sprite_device::kaneko16_copybitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void kaneko16_sprite_device::copybitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap_trans(bitmap,m_sprites_bitmap,0,0,0,0,cliprect,0);
 }
 
-void kaneko16_sprite_device::kaneko16_copybitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void kaneko16_sprite_device::copybitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pal = m_gfxdecode->gfx(0)->palette().pens();
-	uint16_t* srcbitmap;
-	uint32_t* dstbitmap;
+	u16* srcbitmap;
+	u32* dstbitmap;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -549,7 +549,7 @@ void kaneko16_sprite_device::kaneko16_copybitmap(bitmap_rgb32 &bitmap, const rec
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			uint16_t pix = srcbitmap[x];
+			u16 pix = srcbitmap[x];
 			if (pix) dstbitmap[x] = pal[pix];
 		}
 	}
@@ -557,11 +557,11 @@ void kaneko16_sprite_device::kaneko16_copybitmap(bitmap_rgb32 &bitmap, const rec
 
 
 
-void kaneko16_sprite_device::kaneko16_render_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, uint16_t* spriteram16, int spriteram16_bytes) { kaneko16_render_sprites_common(bitmap, cliprect, priority_bitmap, spriteram16, spriteram16_bytes); }
-void kaneko16_sprite_device::kaneko16_render_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, uint16_t* spriteram16, int spriteram16_bytes) { kaneko16_render_sprites_common(bitmap, cliprect, priority_bitmap, spriteram16, spriteram16_bytes); }
+void kaneko16_sprite_device::render_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes) { render_sprites_common(bitmap, cliprect, priority_bitmap, spriteram16, spriteram16_bytes); }
+void kaneko16_sprite_device::render_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes) { render_sprites_common(bitmap, cliprect, priority_bitmap, spriteram16, spriteram16_bytes); }
 
 template<class _BitmapClass>
-void kaneko16_sprite_device::kaneko16_render_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, uint16_t* spriteram16, int spriteram16_bytes)
+void kaneko16_sprite_device::render_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes)
 {
 	/* Sprites last (rendered with pdrawgfx, so they can slip
 	   in between the layers) */
@@ -569,31 +569,31 @@ void kaneko16_sprite_device::kaneko16_render_sprites_common(_BitmapClass &bitmap
 	if(m_keep_sprites)
 	{
 		/* keep sprites on screen - used by mgcrystl when you get the first gem and it shows instructions */
-		kaneko16_draw_sprites(m_sprites_bitmap, cliprect, priority_bitmap, spriteram16, spriteram16_bytes);
-		kaneko16_copybitmap(bitmap,cliprect);
+		draw_sprites(m_sprites_bitmap, cliprect, priority_bitmap, spriteram16, spriteram16_bytes);
+		copybitmap(bitmap,cliprect);
 	}
 	else
 	{
 		m_sprites_bitmap.fill(0, cliprect);
-		kaneko16_draw_sprites(bitmap,cliprect, priority_bitmap, spriteram16, spriteram16_bytes);
+		draw_sprites(bitmap,cliprect, priority_bitmap, spriteram16, spriteram16_bytes);
 	}
 }
 
-kaneko_vu002_sprite_device::kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kaneko_vu002_sprite_device::kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: kaneko16_sprite_device(mconfig, KANEKO_VU002_SPRITE, tag, owner, clock)
 {
 }
 
-kaneko_kc002_sprite_device::kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kaneko_kc002_sprite_device::kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: kaneko16_sprite_device(mconfig, KANEKO_KC002_SPRITE, tag, owner, clock)
 {
 }
 
 // this is a bootleg implementation, used by Gals Hustler and Zip Zap, the latter not really working at all well with the original
 // link features (assuming the bad program roms aren't the cause)  it's clearly derived from this sprite system tho.
-void kaneko16_sprite_device::bootleg_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram16, int spriteram16_bytes)
+void kaneko16_sprite_device::bootleg_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u16* spriteram16, int spriteram16_bytes)
 {
-//  uint16_t *spriteram16 = m_spriteram;
+//  u16 *spriteram16 = m_spriteram;
 	int offs;
 	int sx=0, sy=0;
 

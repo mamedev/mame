@@ -20,7 +20,6 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
@@ -32,15 +31,15 @@
  *
  *************************************/
 
-IRQ_CALLBACK_MEMBER(aztarac_state::irq_callback)
-{
-	return 0xc;
-}
-
-
 void aztarac_state::machine_start()
 {
 	save_item(NAME(m_sound_status));
+}
+
+void aztarac_state::machine_reset()
+{
+	m_nvram->recall(1);
+	m_nvram->recall(0);
 }
 
 
@@ -51,9 +50,10 @@ void aztarac_state::machine_start()
  *
  *************************************/
 
-READ16_MEMBER(aztarac_state::nvram_r)
+void aztarac_state::nvram_store_w(uint16_t data)
 {
-	return m_nvram[offset] | 0xfff0;
+	m_nvram->store(1);
+	m_nvram->store(0);
 }
 
 
@@ -81,7 +81,8 @@ READ16_MEMBER(aztarac_state::joystick_r)
 void aztarac_state::main_map(address_map &map)
 {
 	map(0x000000, 0x00bfff).rom();
-	map(0x022000, 0x0220ff).r(FUNC(aztarac_state::nvram_r)).writeonly().share("nvram");
+	map(0x021000, 0x021001).w(FUNC(aztarac_state::nvram_store_w));
+	map(0x022000, 0x0221ff).rw(m_nvram, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
 	map(0x027000, 0x027001).r(FUNC(aztarac_state::joystick_r));
 	map(0x027004, 0x027005).portr("INPUTS");
 	map(0x027008, 0x027009).rw(FUNC(aztarac_state::sound_r), FUNC(aztarac_state::sound_w));
@@ -152,16 +153,16 @@ INPUT_PORTS_END
 void aztarac_state::aztarac(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 8000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &aztarac_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(aztarac_state::irq4_line_hold));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(aztarac_state::irq_callback));
+	m68000_device &maincpu(M68000(config, m_maincpu, 16_MHz_XTAL / 2));
+	maincpu.set_addrmap(AS_PROGRAM, &aztarac_state::main_map);
+	maincpu.set_vblank_int("screen", FUNC(aztarac_state::irq4_line_hold));
+	maincpu.set_cpu_space(AS_PROGRAM);
 
-	Z80(config, m_audiocpu, 2000000);
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &aztarac_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(aztarac_state::snd_timed_irq), attotime::from_hz(100));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	X2212(config, m_nvram);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -179,13 +180,13 @@ void aztarac_state::aztarac(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.15);
+	AY8910(config, "ay1", 16_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.15);
+	AY8910(config, "ay2", 16_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	AY8910(config, "ay3", 2000000).add_route(ALL_OUTPUTS, "mono", 0.15);
+	AY8910(config, "ay3", 16_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	AY8910(config, "ay4", 2000000).add_route(ALL_OUTPUTS, "mono", 0.15);
+	AY8910(config, "ay4", 16_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 
 

@@ -101,7 +101,7 @@ protected:
 	{
 		type(config, m_maincpu, std::forward<Clock>(clock));
 		m_maincpu->set_addrmap(AS_PROGRAM, std::forward<AddrMap>(map));
-		m_maincpu->set_irq_acknowledge_callback(FUNC(x68k_state::int_ack));
+		m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &x68k_state::cpu_space_map);
 	}
 
 	required_device<m68000_base_device> m_maincpu;
@@ -317,10 +317,13 @@ protected:
 	DECLARE_WRITE16_MEMBER(tvram_write);
 	DECLARE_READ16_MEMBER(gvram_read);
 	DECLARE_WRITE16_MEMBER(gvram_write);
-	IRQ_CALLBACK_MEMBER(int_ack);
+
+	template <int Line> uint8_t int_ack();
+	uint8_t mfp_ack();
 
 	void x68k_base_map(address_map &map);
 	void x68k_map(address_map &map);
+	void cpu_space_map(address_map &map);
 
 	inline void plot_pixel(bitmap_rgb32 &bitmap, int x, int y, uint32_t color);
 	void draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectangle rect);

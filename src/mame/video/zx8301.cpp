@@ -278,6 +278,9 @@ void zx8301_device::draw_line_mode8(bitmap_rgb32 &bitmap, int y, uint16_t da)
 {
 	int x = 0;
 
+	bool flash_active = false;
+	int flash_color = 0;
+
 	for (int word = 0; word < 64; word++)
 	{
 		uint8_t byte_high = readbyte(da++);
@@ -292,9 +295,15 @@ void zx8301_device::draw_line_mode8(bitmap_rgb32 &bitmap, int y, uint16_t da)
 
 			int color = (green << 2) | (red << 1) | blue;
 
+			if (flash_active)
+			{
+				color = flash_color;
+			}
+
 			if (flash && m_flash)
 			{
-				color = 0;
+				flash_active = !flash_active;
+				flash_color = color;
 			}
 
 			bitmap.pix32(y, x++) = PALETTE_ZX8301[color];

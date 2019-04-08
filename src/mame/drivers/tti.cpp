@@ -53,6 +53,7 @@ private:
 	IRQ_CALLBACK_MEMBER(intack);
 
 	void prg_map(address_map &map);
+	void fc7_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68901_device> m_mfp;
@@ -126,6 +127,11 @@ void tti_state::prg_map(address_map &map)
 	map(0x8007d, 0x8007d).w(FUNC(tti_state::channel_w));
 }
 
+void tti_state::fc7_map(address_map &map)
+{
+	map(0xffff5, 0xffff5).r(m_mfp, FUNC(mc68901_device::get_vector));
+}
+
 static void tti_scsi_devices(device_slot_interface &device)
 {
 	// FIXME: these device options are placeholders
@@ -148,14 +154,14 @@ void tti_state::tti(machine_config &config)
 {
 	M68008(config, m_maincpu, 20_MHz_XTAL / 2); // guess
 	m_maincpu->set_addrmap(AS_PROGRAM, &tti_state::prg_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(tti_state::intack));
+	m_maincpu->set_addrmap(m68008_device::AS_CPU_SPACE, &tti_state::fc7_map);
 
 	MC68901(config, m_mfp, 20_MHz_XTAL / 2); // guess
 	m_mfp->set_timer_clock(20_MHz_XTAL / 2); // guess
 	m_mfp->set_rx_clock(9600); // for testing (FIXME: actually 16x)
 	m_mfp->set_tx_clock(9600); // for testing (FIXME: actually 16x)
 	m_mfp->out_so_cb().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_mfp->out_irq_cb().set_inputline("maincpu", M68K_IRQ_5);
+	m_mfp->out_irq_cb().set_inputline("maincpu", M68K_IRQ_2); // probably
 
 	NSCSI_BUS(config, "scsibus");
 	NSCSI_CONNECTOR(config, "scsibus:0", tti_scsi_devices, nullptr);

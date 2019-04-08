@@ -13,6 +13,7 @@
     - strobed I/O
     - instruction pipeline
     - internal diagnostic ROM in data space (requires high voltage reset)
+    - what really happens when register pairs are unaligned?
 
 */
 
@@ -1205,7 +1206,18 @@ void z8_device::device_start()
 		state_add(Z8_TOUT,       "TOUT",      m_tout);
 
 		for (int regnum = 0; regnum < 16; regnum++)
-			state_add(Z8_R0 + regnum, string_format("R%d", regnum).c_str(), m_fake_r[regnum]).callimport().callexport();
+		{
+			state_add<uint8_t>(Z8_R0 + regnum, string_format("R%d", regnum).c_str(),
+				[this, regnum]() { auto dis = machine().disable_side_effects(); return register_read((m_rp & 0xf0) | regnum); },
+				[this, regnum](uint8_t val) { auto dis = machine().disable_side_effects(); register_write((m_rp & 0xf0) | regnum, val); });
+		}
+
+		for (int regnum = 0; regnum < 16; regnum += 2)
+		{
+			state_add<uint16_t>(Z8_RR0 + (regnum / 2), string_format("RR%d", regnum).c_str(),
+				[this, regnum]() { auto dis = machine().disable_side_effects(); return register_pair_read((m_rp & 0xf0) | regnum); },
+				[this, regnum](uint16_t val) { auto dis = machine().disable_side_effects(); register_pair_write((m_rp & 0xf0) | regnum, val); }).noshow();
+		}
 	}
 
 	/* find address spaces */
@@ -1225,7 +1237,6 @@ void z8_device::device_start()
 	std::fill(std::begin(m_count), std::end(m_count), 0);
 	std::fill(std::begin(m_pre), std::end(m_pre), 0);
 	std::fill(std::begin(m_pre_count), std::end(m_pre_count), 0);
-	std::fill(std::begin(m_fake_r), std::end(m_fake_r), 0);
 	m_pc = 0;
 	m_ppc = 0;
 	m_sp.w = 0;
@@ -1504,31 +1515,8 @@ void z8_device::state_import(const device_state_entry &entry)
 			m_pc = m_ppc;
 			break;
 
-		case Z8_R0: case Z8_R1: case Z8_R2: case Z8_R3: case Z8_R4: case Z8_R5: case Z8_R6: case Z8_R7: case Z8_R8: case Z8_R9: case Z8_R10: case Z8_R11: case Z8_R12: case Z8_R13: case Z8_R14: case Z8_R15:
-		{
-			auto dis = machine().disable_side_effects();
-			register_write((m_rp & 0xf0) + (entry.index() - Z8_R0), m_fake_r[entry.index() - Z8_R0]);
-			break;
-		}
-
 		default:
 			fatalerror("CPU_IMPORT_STATE(z8) called for unexpected value\n");
-	}
-}
-
-void z8_device::state_export(const device_state_entry &entry)
-{
-	switch (entry.index())
-	{
-		case Z8_R0: case Z8_R1: case Z8_R2: case Z8_R3: case Z8_R4: case Z8_R5: case Z8_R6: case Z8_R7: case Z8_R8: case Z8_R9: case Z8_R10: case Z8_R11: case Z8_R12: case Z8_R13: case Z8_R14: case Z8_R15:
-		{
-			auto dis = machine().disable_side_effects();
-			m_fake_r[entry.index() - Z8_R0] = register_read((m_rp & 0xf0) + (entry.index() - Z8_R0));
-			break;
-		}
-
-		default:
-			fatalerror("CPU_EXPORT_STATE(z8) called for unexpected value\n");
 	}
 }
 

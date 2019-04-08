@@ -12,7 +12,7 @@ Simple layout for Little Casino (monochrome)
 	<element name="overlay">
 		<rect>
 			<bounds left="0" top="0" right="640" bottom="70" />
-			<color red="0.18" green="0.85" blue="0.33" />
+			<color red="0.87" green="0.91" blue="0.43" />
 		</rect>
 		<rect>
 			<bounds left="0" top="75" right="640" bottom="240" />

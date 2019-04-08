@@ -14,18 +14,19 @@
 class deniam_state : public driver_device
 {
 public:
-	deniam_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	deniam_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_textram(*this, "textram"),
 		m_spriteram(*this, "spriteram"),
-		m_paletteram(*this, "paletteram"),
+		m_spritegfx(*this, "spritegfx"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void deniam16c(machine_config &config);
 	void deniam16b(machine_config &config);
@@ -35,15 +36,16 @@ public:
 
 private:
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_videoram;
-	required_shared_ptr<uint16_t> m_textram;
-	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_paletteram;
+	required_shared_ptr<u16> m_videoram;
+	required_shared_ptr<u16> m_textram;
+	required_shared_ptr<u16> m_spriteram;
+
+	required_memory_region m_spritegfx;
 
 	/* video-related */
-	tilemap_t        *m_fg_tilemap;
-	tilemap_t        *m_bg_tilemap;
-	tilemap_t        *m_tx_tilemap;
+	tilemap_t      *m_fg_tilemap;
+	tilemap_t      *m_bg_tilemap;
+	tilemap_t      *m_tx_tilemap;
 	int            m_display_enable;
 	int            m_bg_scrollx_offs;
 	int            m_bg_scrolly_offs;
@@ -57,17 +59,16 @@ private:
 	int            m_fg_page_reg;
 	int            m_bg_page[4];
 	int            m_fg_page[4];
-	uint16_t         m_coinctrl;
+	u16            m_coinctrl;
 
 	/* devices */
-	DECLARE_WRITE16_MEMBER(deniam_irq_ack_w);
-	DECLARE_WRITE16_MEMBER(deniam_videoram_w);
-	DECLARE_WRITE16_MEMBER(deniam_textram_w);
-	DECLARE_WRITE16_MEMBER(deniam_palette_w);
-	DECLARE_READ16_MEMBER(deniam_coinctrl_r);
-	DECLARE_WRITE16_MEMBER(deniam_coinctrl_w);
-	DECLARE_WRITE8_MEMBER(deniam16b_oki_rom_bank_w);
-	DECLARE_WRITE16_MEMBER(deniam16c_oki_rom_bank_w);
+	void irq_ack_w(u16 data);
+	void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void textram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 coinctrl_r();
+	void coinctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void deniam16b_oki_rom_bank_w(u8 data);
+	void deniam16c_oki_rom_bank_w(u8 data);
 	TILEMAP_MAPPER_MEMBER(scan_pages);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -75,7 +76,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_deniam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void deniam_common_init(  );
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void set_bg_page( int page, int value );

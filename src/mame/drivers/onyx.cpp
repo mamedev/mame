@@ -106,8 +106,8 @@ void onyx_state::c8002_io(address_map &map)
 	map(0xff30, 0xff37).lrw8("ctc1_rw", [this](offs_t offset) { return m_ctc[0]->read(offset >> 1); }, [this](offs_t offset, u8 data) { m_ctc[0]->write(offset >> 1, data); });
 	map(0xff38, 0xff3f).lrw8("ctc2_rw", [this](offs_t offset) { return m_ctc[1]->read(offset >> 1); }, [this](offs_t offset, u8 data) { m_ctc[1]->write(offset >> 1, data); });
 	map(0xff40, 0xff47).lrw8("ctc3_rw", [this](offs_t offset) { return m_ctc[2]->read(offset >> 1); }, [this](offs_t offset, u8 data) { m_ctc[2]->write(offset >> 1, data); });
-	map(0xff50, 0xff57).lrw8("pio1_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_pio[0]->read(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_pio[0]->write(space, offset >> 1, data, mem_mask); });
-	map(0xff58, 0xff5f).lrw8("pio2_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_pio[1]->read(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_pio[1]->write(space, offset >> 1, data, mem_mask); });
+	map(0xff50, 0xff57).lrw8("pio1_rw", [this](offs_t offset) { return m_pio[0]->read(offset >> 1); }, [this](offs_t offset, u8 data) { m_pio[0]->write(offset >> 1, data); });
+	map(0xff58, 0xff5f).lrw8("pio2_rw", [this](offs_t offset) { return m_pio[1]->read(offset >> 1); }, [this](offs_t offset, u8 data) { m_pio[1]->write(offset >> 1, data); });
 	map(0xffb9, 0xffb9).w(FUNC(onyx_state::z8002_m1_w));
 }
 

@@ -52,10 +52,10 @@ void msx_cart_bm_012_device::device_add_mconfig(machine_config &config)
 	TMPZ84C015(config, m_tmpz84c015af, XTAL(12'000'000)/2);         /* 6 MHz */
 	m_tmpz84c015af->set_addrmap(AS_PROGRAM, &msx_cart_bm_012_device::bm_012_memory_map);
 	// PIO callbacks
-	m_tmpz84c015af->in_pa_callback().set("bm012_pio", FUNC(z80pio_device::pa_r));
-	m_tmpz84c015af->out_pa_callback().set("bm012_pio", FUNC(z80pio_device::pa_w));
-	m_tmpz84c015af->in_pb_callback().set("bm012_pio", FUNC(z80pio_device::pb_r));
-	m_tmpz84c015af->out_pb_callback().set("bm012_pio", FUNC(z80pio_device::pb_w));
+	m_tmpz84c015af->in_pa_callback().set("bm012_pio", FUNC(z80pio_device::port_a_read));
+	m_tmpz84c015af->out_pa_callback().set("bm012_pio", FUNC(z80pio_device::port_a_write));
+	m_tmpz84c015af->in_pb_callback().set("bm012_pio", FUNC(z80pio_device::port_b_read));
+	m_tmpz84c015af->out_pb_callback().set("bm012_pio", FUNC(z80pio_device::port_b_write));
 	m_tmpz84c015af->out_brdy_callback().set("bm012_pio", FUNC(z80pio_device::strobe_b));
 	// SIO callbacks
 	m_tmpz84c015af->out_txda_callback().set("mdout", FUNC(midi_port_device::write_txd));
@@ -94,8 +94,8 @@ const tiny_rom_entry *msx_cart_bm_012_device::device_rom_region() const
 void msx_cart_bm_012_device::device_start()
 {
 	// Install IO read/write handlers
-	io_space().install_write_handler(0x70, 0x73, write8_delegate(FUNC(z80pio_device::write_alt), m_bm012_pio.target()));
-	io_space().install_read_handler(0x70, 0x73, read8_delegate(FUNC(z80pio_device::read_alt), m_bm012_pio.target()));
+	io_space().install_write_handler(0x70, 0x73, write8sm_delegate(FUNC(z80pio_device::write_alt), m_bm012_pio.target()));
+	io_space().install_read_handler(0x70, 0x73, read8sm_delegate(FUNC(z80pio_device::read_alt), m_bm012_pio.target()));
 }
 
 

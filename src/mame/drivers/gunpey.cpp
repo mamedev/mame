@@ -581,9 +581,9 @@ void gunpey_state::irq_check(uint8_t irq_type)
 	m_irq_cause |= irq_type;
 
 	if(m_irq_cause & m_irq_mask)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x200/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x200/4); // V30
 	else
-		m_maincpu->set_input_line_and_vector(0, CLEAR_LINE, 0x200/4);
+		m_maincpu->set_input_line_and_vector(0, CLEAR_LINE, 0x200/4); // V30
 }
 
 WRITE8_MEMBER(gunpey_state::status_w)

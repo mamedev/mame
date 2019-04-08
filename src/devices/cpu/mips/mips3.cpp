@@ -37,6 +37,7 @@
 #define FTVALS_FR0  (((float *)&m_core->cpr[1][FTREG & 0x1E])[BYTE_XOR_LE(FTREG & 1)])
 #define FSVALS_FR0  (((float *)&m_core->cpr[1][FSREG & 0x1E])[BYTE_XOR_LE(FSREG & 1)])
 #define FDVALS_FR0  (((float *)&m_core->cpr[1][FDREG & 0x1E])[BYTE_XOR_LE(FDREG & 1)])
+#define FTVALW_FR0  (((uint32_t *)&m_core->cpr[1][FTREG & 0x1E])[BYTE_XOR_LE(FTREG & 1)])
 #define FSVALW_FR0  (((uint32_t *)&m_core->cpr[1][FSREG & 0x1E])[BYTE_XOR_LE(FSREG & 1)])
 #define FDVALW_FR0  (((uint32_t *)&m_core->cpr[1][FDREG & 0x1E])[BYTE_XOR_LE(FDREG & 1)])
 
@@ -44,6 +45,7 @@
 #define FTVALD_FR0  (*(double *)&m_core->cpr[1][FTREG & 0x1E])
 #define FSVALD_FR0  (*(double *)&m_core->cpr[1][FSREG & 0x1E])
 #define FDVALD_FR0  (*(double *)&m_core->cpr[1][FDREG & 0x1E])
+#define FTVALL_FR0  (*(uint64_t *)&m_core->cpr[1][FTREG & 0x1E])
 #define FSVALL_FR0  (*(uint64_t *)&m_core->cpr[1][FSREG & 0x1E])
 #define FDVALL_FR0  (*(uint64_t *)&m_core->cpr[1][FDREG & 0x1E])
 
@@ -1977,10 +1979,28 @@ void mips3_device::handle_cop1_fr0(uint32_t op)
 					break;
 
 				case 0x03:
-					if (IS_SINGLE(op))  /* DIV.S */
-						FDVALS_FR0 = FSVALS_FR0 / FTVALS_FR0;
-					else                /* DIV.D */
-						FDVALD_FR0 = FSVALD_FR0 / FTVALD_FR0;
+					if (IS_SINGLE(op)) { /* DIV.S */
+						if (FTVALW_FR0 == 0 && (COP1_FCR31 & (1 << (FCR31_ENABLE + FPE_DIV0)))) {
+							COP1_FCR31 |= (1 << (FCR31_FLAGS + FPE_DIV0));  // Set flag
+							COP1_FCR31 |= (1 << (FCR31_CAUSE + FPE_DIV0));	// Set cause
+							generate_exception(EXCEPTION_FPE, 1);
+							//machine().debug_break();
+						}
+						else {
+							FDVALS_FR0 = FSVALS_FR0 / FTVALS_FR0;
+						}
+					}
+					else {               /* DIV.D */
+						if (FTVALL_FR0 == 0ull && (COP1_FCR31 & (1 << (FCR31_ENABLE + FPE_DIV0)))) {
+							COP1_FCR31 |= (1 << (FCR31_FLAGS + FPE_DIV0));  // Set flag
+							COP1_FCR31 |= (1 << (FCR31_CAUSE + FPE_DIV0));	// Set cause
+							generate_exception(EXCEPTION_FPE, 1);
+							//machine().debug_break();
+						}
+						else {
+							FDVALD_FR0 = FSVALD_FR0 / FTVALD_FR0;
+						}
+					}
 					break;
 
 				case 0x04:

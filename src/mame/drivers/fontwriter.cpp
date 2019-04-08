@@ -54,7 +54,6 @@ private:
 		m_vbl2 ^= 0x88;
 		return m_vbl;
 	}
-	void io_map(address_map &map);
 	void main_map(address_map &map);
 	void fw600_map(address_map &map);
 
@@ -93,12 +92,6 @@ void fontwriter_state::main_map(address_map &map)
 	map(0x200000, 0x3fffff).rom().region("maincpu", 0x0000);
 }
 
-void fontwriter_state::io_map(address_map &map)
-{
-	map(M37710_PORT6, M37710_PORT6).r(FUNC(fontwriter_state::vbl_r));
-	map(M37710_PORT7, M37710_PORT7).r(FUNC(fontwriter_state::vbl2_r));
-}
-
 void fontwriter_state::fw600_map(address_map &map)
 {
 	map(0x000280, 0x0002ff).ram();
@@ -116,7 +109,8 @@ void fontwriter_state::fontwriter(machine_config &config)
 {
 	M37720S1(config, m_maincpu, XTAL(16'000'000)); /* M37720S1 @ 16MHz - main CPU */
 	m_maincpu->set_addrmap(AS_PROGRAM, &fontwriter_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &fontwriter_state::io_map);
+	m_maincpu->p6_in_cb().set(FUNC(fontwriter_state::vbl_r));
+	m_maincpu->p7_in_cb().set(FUNC(fontwriter_state::vbl2_r));
 
 	AT28C16(config, "at28c16", 0);
 
@@ -132,7 +126,8 @@ void fontwriter_state::fw600(machine_config &config)
 {
 	M37720S1(config, m_maincpu, XTAL(16'000'000)); /* M37720S1 @ 16MHz - main CPU */
 	m_maincpu->set_addrmap(AS_PROGRAM, &fontwriter_state::fw600_map);
-	m_maincpu->set_addrmap(AS_IO, &fontwriter_state::io_map);
+	m_maincpu->p6_in_cb().set(FUNC(fontwriter_state::vbl_r));
+	m_maincpu->p7_in_cb().set(FUNC(fontwriter_state::vbl2_r));
 
 	AT28C16(config, "at28c16", 0);
 

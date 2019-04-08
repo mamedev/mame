@@ -6,8 +6,10 @@
 
     driver by Phil Bennett
 
-    Known bugs:
-        * None
+    TODO:
+    * Coincounters add one coin at boot, caused by ay8910 writing 00 on
+      port direction change. Likely wrong I/O emulation in ay8910 device,
+      but not trivial to fix.
 
 ***************************************************************************/
 
@@ -28,7 +30,7 @@
 
 /*************************************
  *
- *  Forward definitions
+ *  Holy Space for The 5 Wise Enters
  *
  *************************************/
 
@@ -414,9 +416,9 @@ WRITE_LINE_MEMBER(lockon_state::ym2203_irq)
 
 WRITE8_MEMBER(lockon_state::ym2203_out_b)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 0x80);
-	machine().bookkeeping().coin_counter_w(1, data & 0x40);
-	machine().bookkeeping().coin_counter_w(2, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x80);
+	machine().bookkeeping().coin_counter_w(1, ~data & 0x40);
+	machine().bookkeeping().coin_counter_w(2, ~data & 0x20);
 
 	/* 'Lock-On' lamp */
 	m_lamp = BIT(~data, 4);

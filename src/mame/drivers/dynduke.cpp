@@ -307,8 +307,8 @@ WRITE_LINE_MEMBER(dynduke_state::vblank_irq)
 {
 	if (state)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
-		m_slave->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
+		m_slave->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
 	}
 }
 

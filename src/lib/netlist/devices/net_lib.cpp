@@ -52,6 +52,7 @@ namespace devices
 		LIB_ENTRY(log)
 		LIB_ENTRY(logD)
 		LIB_ENTRY(clock)
+		LIB_ENTRY(varclock)
 		LIB_ENTRY(extclock)
 		LIB_ENTRY(mainclock)
 		LIB_ENTRY(gnd)

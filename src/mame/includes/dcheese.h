@@ -91,15 +91,16 @@ private:
 	DECLARE_READ16_MEMBER(blitter_vidparam_r);
 	void dcheese_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank);
+	DECLARE_WRITE_LINE_MEMBER(vblank);
 	void signal_irq(u8 which);
 	void update_irq_state();
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	uint8_t iack_r(offs_t offset);
 	void update_scanline_irq();
 	void do_clear();
 	void do_blit();
 
 	void main_cpu_map(address_map &map);
+	void main_fc7_map(address_map &map);
 	void sound_cpu_map(address_map &map);
 };
 

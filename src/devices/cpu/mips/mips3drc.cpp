@@ -247,6 +247,7 @@ void mips3_device::code_flush_cache()
 		static_generate_exception(EXCEPTION_BADCOP,        true,  "exception_badcop");
 		static_generate_exception(EXCEPTION_OVERFLOW,      true,  "exception_overflow");
 		static_generate_exception(EXCEPTION_TRAP,          true,  "exception_trap");
+		static_generate_exception(EXCEPTION_FPE,           true,  "exception_fpe");
 
 		/* add subroutines for memory accesses */
 		for (mode = 0; mode < 3; mode++)
@@ -726,6 +727,14 @@ void mips3_device::static_generate_exception(uint8_t exception, int recover, con
 		/* set the upper bits of EntryHi and the lower bits of Context to the fault page */
 		UML_ROLINS(block, CPR032(COP0_EntryHi), I0, 0, 0xffffe000); // rolins  [EntryHi],i0,0,0xffffe000
 		UML_ROLINS(block, CPR032(COP0_Context), I0, 32-9, 0x7ffff0);    // rolins  [Context],i0,32-9,0x7ffff0
+	}
+
+	if (exception == EXCEPTION_FPE)
+	{
+		/* set the flag and cause */
+		UML_GETEXP(block, I0);                                      // getexp  i0
+		UML_ROLINS(block, CCR132(31), I0, FCR31_FLAGS, 0x0000007c); // rolins  [CCR31],i0,FCR31_FLAGS,0x0000007c
+		UML_ROLINS(block, CCR132(31), I0, FCR31_CAUSE, 0x0003f000); // rolins  [CCR31],i0,FCR31_CAUSE,0x0003f000
 	}
 
 	/* set the EPC and Cause registers */
@@ -2778,11 +2787,21 @@ bool mips3_device::generate_cop1(drcuml_block &block, compiler_state &compiler, 
 				case 0x03:
 					if (IS_SINGLE(op))  /* DIV.S - MIPS I */
 					{
-						UML_FSDIV(block, FPR32(FDREG), FPR32(FSREG), FPR32(FTREG));       // fsdiv   <fdreg>,<fsreg>,<ftreg>
+						UML_TEST(block, FPR32(FTREG), 0xffffffff);                              // test    <ftreg>,-1
+						UML_JMPc(block, COND_NZ, skip = compiler.labelnum++);                   // jmp     skip,NZ
+						UML_TEST(block, CCR132(31), 1 << (FCR31_ENABLE + FPE_DIV0));            // test    [FCR31], 1 << DIV0_EN
+						UML_EXHc(block, COND_NZ, *m_exception[EXCEPTION_FPE], 1 << FPE_DIV0);   // exh     FPE,cop,FPE_DIV0
+						UML_LABEL(block, skip);                                                 // skip:
+						UML_FSDIV(block, FPR32(FDREG), FPR32(FSREG), FPR32(FTREG));             // fsdiv   <fdreg>,<fsreg>,<ftreg>
 					}
 					else                /* DIV.D - MIPS I */
 					{
-						UML_FDDIV(block, FPR64(FDREG), FPR64(FSREG), FPR64(FTREG));       // fddiv   <fdreg>,<fsreg>,<ftreg>
+						UML_DTEST(block, FPR64(FTREG), 0xffffffff'ffffffffull);                 // dtest    <ftreg>,-1
+						UML_JMPc(block, COND_NZ, skip = compiler.labelnum++);                   // jmp     skip,NZ
+						UML_TEST(block, CCR132(31), 1 << (FCR31_ENABLE + FPE_DIV0));            // test    [FCR31], 1 << DIV0_EN
+						UML_EXHc(block, COND_NZ, *m_exception[EXCEPTION_FPE], 1 << FPE_DIV0);   // exh     FPE,cop,FPE_DIV0
+						UML_LABEL(block, skip);                                                 // skip:
+						UML_FDDIV(block, FPR64(FDREG), FPR64(FSREG), FPR64(FTREG));             // fddiv   <fdreg>,<fsreg>,<ftreg>
 					}
 					return true;
 

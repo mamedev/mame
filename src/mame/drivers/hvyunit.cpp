@@ -605,11 +605,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xfd);
+		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
 
 	/* Pandora "sprite end dma" irq? TODO: timing is likely off */
 	if(scanline == 64)
-		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 /*************************************

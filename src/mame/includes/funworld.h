@@ -40,6 +40,7 @@ public:
 	void init_tabblue();
 	void init_dino4();
 	void init_ctunk();
+	void init_jolycdig();
 
 protected:
 	DECLARE_WRITE8_MEMBER(funworld_videoram_w);
@@ -131,6 +132,45 @@ private:
 	DECLARE_READ8_MEMBER(chinatow_r_32f0);
 
 	void chinatow_map(address_map &map);
+};
+
+
+class multiwin_state : public funworld_state
+{
+public:
+
+	using funworld_state::funworld_state;
+	
+	void multiwin(machine_config& config);
+	
+	void driver_init() override;
+	
+protected:
+	virtual void video_start() override;
+
+private:
+	cpu_device* _maincpu {};
+	DECLARE_READ8_MEMBER(multiwin_opcode_r);
+	
+	void multiwin_opcodes_map(address_map& map);
+};
+
+class royalcrdf_state : public funworld_state
+{
+public:
+
+	using funworld_state::funworld_state;
+	
+	void royalcrdf(machine_config& config);
+	
+	void driver_init() override;
+	
+private:
+	cpu_device* _maincpu {};
+	DECLARE_READ8_MEMBER(royalcrdf_opcode_r);
+	
+	void royalcrdf_map(address_map& map);
+	void royalcrdf_opcodes_map(address_map& map);
 };
 
 #endif // MAME_INCLUDES_FUNWORLD_H

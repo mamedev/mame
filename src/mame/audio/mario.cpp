@@ -529,7 +529,7 @@ WRITE8_MEMBER(mario_state::masao_sh_irqtrigger_w)
 	if (m_last == 1 && data == 0)
 	{
 		/* setting bit 0 high then low triggers IRQ on the sound CPU */
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 	}
 
 	m_last = data;

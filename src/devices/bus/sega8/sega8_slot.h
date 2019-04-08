@@ -162,7 +162,7 @@ protected:
 	virtual void device_start() override;
 
 	int m_type;
-	bool m_is_card;
+	bool const m_is_card;
 	device_sega8_cart_interface*       m_cart;
 };
 

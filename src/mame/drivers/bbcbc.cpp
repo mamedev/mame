@@ -76,11 +76,11 @@ void bbcbc_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x7f).lrw8("z80pio_rw",
-						 [this](address_space &space, offs_t offset, u8 mem_mask) {
-							 return m_z80pio->read(space, offset >> 5, mem_mask);
+						 [this](offs_t offset) {
+							 return m_z80pio->read(offset >> 5);
 						 },
-						 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-							 m_z80pio->write(space, offset >> 5, data, mem_mask);
+						 [this](offs_t offset, u8 data) {
+							 m_z80pio->write(offset >> 5, data);
 						 });
 	map(0x80, 0x81).rw("tms9129", FUNC(tms9129_device::read), FUNC(tms9129_device::write));
 }

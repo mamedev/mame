@@ -454,7 +454,7 @@ WRITE8_MEMBER(dkong_state::memory_write_byte)
 WRITE_LINE_MEMBER(dkong_state::s2650_interrupt)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03); // Z80
 }
 
 /*************************************

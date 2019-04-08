@@ -805,7 +805,7 @@ WRITE_LINE_MEMBER(fantland_state::vblank_irq)
 
 INTERRUPT_GEN_MEMBER(fantland_state::fantland_sound_irq)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x80 / 4);
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x80 / 4); // I8088
 }
 
 void fantland_state::fantland(machine_config &config)
@@ -851,7 +851,7 @@ void fantland_state::fantland(machine_config &config)
 
 WRITE_LINE_MEMBER(fantland_state::galaxygn_sound_irq)
 {
-	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
+	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0x80/4); // I8088
 }
 
 void fantland_state::galaxygn(machine_config &config)
