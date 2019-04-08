@@ -49,9 +49,7 @@ private:
 		RELEASE
 	};
 
-
 	static constexpr unsigned SNES_SPCRAM_SIZE = 0x10000;
-
 
 	struct voice_state_type                      /* Voice state type             */
 	{
@@ -79,7 +77,6 @@ private:
 		u16  vptr;           /* Ptr to start of sample data  */
 		u16  lptr;           /* Loop pointer in sample data  */
 	};
-
 
 	u8 dsp_io_r(offs_t offset);
 	void dsp_io_w(offs_t offset, u8 data);
