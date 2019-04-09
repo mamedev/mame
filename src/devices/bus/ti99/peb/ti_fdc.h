@@ -51,6 +51,7 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_hld_w);
 
 	DECLARE_WRITE_LINE_MEMBER(dskpgena_w);
 	DECLARE_WRITE_LINE_MEMBER(kaclk_w);
@@ -65,17 +66,14 @@ private:
 	// Wait state logic
 	void operate_ready_line();
 
-	// Set the current floppy
-	void set_drive();
-
 	// Operate the floppy motors
 	void set_floppy_motors_running(bool run);
 
 	// Recent address
 	int     m_address;
 
-	// Holds the status of the DRQ and IRQ lines.
-	int  m_DRQ, m_IRQ;
+	// Holds the status of the DRQ, IRQ, and HLD lines.
+	int  m_DRQ, m_IRQ, m_HLD;
 
 	// Latched CRU outputs
 	required_device<ls259_device> m_crulatch;
@@ -91,16 +89,6 @@ private:
 
 	// WD chip selected
 	bool    m_WDsel;
-
-	// Indicates which drive has been selected. Values are 0, 1, 2, and 4.
-	// 000 = no drive
-	// 001 = drive 1
-	// 010 = drive 2
-	// 100 = drive 3
-	int         m_DSEL;
-
-	// Signal SIDSEL. 0 or 1, indicates the selected head.
-	int        m_SIDSEL;
 
 	// count 4.23s from rising edge of motor_on
 	emu_timer*  m_motor_on_timer;
