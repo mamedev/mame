@@ -634,7 +634,7 @@ void mu100_state::vl70_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom().region("vl70cpu", 0);
 	map(0x200000, 0x20ffff).ram(); // 64K work RAM
-	map(0x400000, 0x60007f).m(m_dspv, FUNC(dspv_device::map));
+	map(0x400000, 0x40007f).m(m_dspv, FUNC(dspv_device::map));
 	map(0x600000, 0x60001f).m(m_meg, FUNC(meg_device::map));
 }
 
