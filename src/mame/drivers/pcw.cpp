@@ -104,6 +104,7 @@
 // pcw/pcw16 beeper
 #include "sound/beep.h"
 #include "machine/ram.h"
+#include "render.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -694,10 +695,10 @@ void pcw_state::pcw_printer_fire_pins(uint16_t pins)
 TIMER_CALLBACK_MEMBER(pcw_state::pcw_stepper_callback)
 {
 	LOGPRN("PRN: P2 bits %s %s %s\nSerial: %02x\nHeadpos: %i",
-	       m_printer_p2 & 0x40 ? " " : "6",
-	       m_printer_p2 & 0x20 ? " " : "5",
-	       m_printer_p2 & 0x10 ? " " : "4",
-	       m_printer_shift_output,m_printer_headpos);
+		   m_printer_p2 & 0x40 ? " " : "6",
+		   m_printer_p2 & 0x20 ? " " : "5",
+		   m_printer_p2 & 0x10 ? " " : "4",
+		   m_printer_shift_output,m_printer_headpos);
 
 	if((m_printer_p2 & 0x10) == 0)  // print head motor active
 	{
@@ -1020,6 +1021,7 @@ void pcw_state::machine_reset()
 	m_printer_headpos = 0x00; // bring printer head to left margin
 	m_printer_shift = 0;
 	m_printer_shift_output = 0;
+	machine().render().first_target()->set_view(0);
 }
 
 void pcw_state::init_pcw()
@@ -1279,14 +1281,13 @@ void pcw_state::pcw(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(PCW_SCREEN_WIDTH, PCW_SCREEN_HEIGHT);
-	m_screen->set_visarea(0, PCW_SCREEN_WIDTH-1, 0, PCW_SCREEN_HEIGHT-1);
+	m_screen->set_raw(32_MHz_XTAL / 3, 720 + 20, 0, 720, 256 + 32, 16, 256 + 16); // Hand tuned to get 50Hz, it is all in the Amstrad ASIC, 32MHz in and video out
 	m_screen->set_screen_update(FUNC(pcw_state::screen_update_pcw));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, FUNC(pcw_state::pcw_colours), PCW_NUM_COLOURS);
+	PALETTE(config, m_palette, FUNC(pcw_state::set_9xxx_palette), PCW_NUM_COLOURS);
+	PALETTE(config, m_ppalette, FUNC(pcw_state::set_printer_palette), PCW_NUM_COLOURS);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1306,6 +1307,7 @@ void pcw_state::pcw(machine_config &config)
 void pcw_state::pcw8256(machine_config &config)
 {
 	pcw(config);
+	m_palette->set_init(FUNC(pcw_state::set_8xxx_palette));
 
 	FLOPPY_CONNECTOR(config, "upd765:0", pcw_ssfloppies, "3ssdd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", pcw_dsfloppies, nullptr, floppy_image_device::default_floppy_formats);
@@ -1315,7 +1317,7 @@ void pcw_state::pcw8256(machine_config &config)
 	printer.set_size(PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT);
 	printer.set_visarea(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1);
 	printer.set_screen_update(FUNC(pcw_state::screen_update_pcw_printer));
-	printer.set_palette(m_palette);
+	printer.set_palette(m_ppalette);
 
 	config.set_default_layout(layout_pcw);
 }
@@ -1323,6 +1325,7 @@ void pcw_state::pcw8256(machine_config &config)
 void pcw_state::pcw8512(machine_config &config)
 {
 	pcw(config);
+	m_palette->set_init(FUNC(pcw_state::set_8xxx_palette));
 
 	FLOPPY_CONNECTOR(config, "upd765:0", pcw_ssfloppies, "3ssdd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", pcw_dsfloppies, "3dsdd", floppy_image_device::default_floppy_formats);
@@ -1332,9 +1335,10 @@ void pcw_state::pcw8512(machine_config &config)
 	printer.set_size(PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT);
 	printer.set_visarea(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1);
 	printer.set_screen_update(FUNC(pcw_state::screen_update_pcw_printer));
-	printer.set_palette(m_palette);
+	printer.set_palette(m_ppalette);
 
 	config.set_default_layout(layout_pcw);
+
 	/* internal ram */
 	m_ram->set_default_size("512K");
 }
@@ -1343,6 +1347,7 @@ void pcw_state::pcw8512(machine_config &config)
 void pcw_state::pcw9512(machine_config &config)
 {
 	pcw(config);
+	m_palette->set_init(FUNC(pcw_state::set_9xxx_palette));
 
 	FLOPPY_CONNECTOR(config, "upd765:0", pcw_dsfloppies, "3dsdd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", pcw_dsfloppies, nullptr, floppy_image_device::default_floppy_formats);
@@ -1357,6 +1362,7 @@ void pcw_state::pcw9512(machine_config &config)
 void pcw_state::pcw9256(machine_config &config)
 {
 	pcw(config);
+	m_palette->set_init(FUNC(pcw_state::set_9xxx_palette));
 
 	FLOPPY_CONNECTOR(config, "upd765:0", pcw_35floppies, "35dd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", pcw_35floppies, nullptr, floppy_image_device::default_floppy_formats);
@@ -1368,6 +1374,7 @@ void pcw_state::pcw9256(machine_config &config)
 void pcw_state::pcw9512p(machine_config &config)
 {
 	pcw(config);
+	m_palette->set_init(FUNC(pcw_state::set_9xxx_palette));
 
 	FLOPPY_CONNECTOR(config, "upd765:0", pcw_35floppies, "35dd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", pcw_35floppies, nullptr, floppy_image_device::default_floppy_formats);
@@ -1382,6 +1389,7 @@ void pcw_state::pcw9512p(machine_config &config)
 void pcw_state::pcw10(machine_config &config)
 {
 	pcw(config);
+	m_palette->set_init(FUNC(pcw_state::set_9xxx_palette));
 
 	FLOPPY_CONNECTOR(config, "upd765:0", pcw_35floppies, "35dd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", pcw_35floppies, nullptr, floppy_image_device::default_floppy_formats);
@@ -1458,7 +1466,7 @@ ROM_END
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT CLASS      INIT      COMPANY        FULLNAME */
 COMP( 1985, pcw8256,  0,       0,      pcw8256,  pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW8256",       MACHINE_NOT_WORKING)
 COMP( 1985, pcw8512,  pcw8256, 0,      pcw8512,  pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW8512",       MACHINE_NOT_WORKING)
-COMP( 1987, pcw9512,  0,       0,      pcw9512,  pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW9512",       MACHINE_NOT_WORKING)
-COMP( 1991, pcw9256,  pcw9512, 0,      pcw9256,  pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW9256",       MACHINE_NOT_WORKING)
-COMP( 1991, pcw9512p, pcw9512, 0,      pcw9512p, pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW9512 (+)",   MACHINE_NOT_WORKING)
-COMP( 1993, pcw10,    pcw9512, 0,      pcw10,    pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW10",         MACHINE_NOT_WORKING)
+COMP( 1987, pcw9512,  pcw8256, 0,      pcw9512,  pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW9512",       MACHINE_NOT_WORKING)
+COMP( 1991, pcw9256,  pcw8256, 0,      pcw9256,  pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW9256",       MACHINE_NOT_WORKING)
+COMP( 1991, pcw9512p, pcw8256, 0,      pcw9512p, pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW9512 (+)",   MACHINE_NOT_WORKING)
+COMP( 1993, pcw10,    pcw8256, 0,      pcw10,    pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW10",         MACHINE_NOT_WORKING)

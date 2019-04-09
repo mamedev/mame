@@ -45,6 +45,7 @@ public:
 		, m_beeper(*this, "beeper")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_ppalette(*this, "ppalette")
 	{ }
 
 	int m_boot;
@@ -116,7 +117,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void pcw_colours(palette_device &palette) const;
+	void set_8xxx_palette(palette_device &palette) const;
+	void set_9xxx_palette(palette_device &palette) const;
+	void set_printer_palette(palette_device &palette) const;
 	uint32_t screen_update_pcw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pcw_printer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pcw_timer_pulse);
@@ -137,6 +140,7 @@ public:
 	required_device<beep_device> m_beeper;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<palette_device> m_ppalette;
 
 	inline void pcw_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 	void pcw_update_interrupt_counter();
