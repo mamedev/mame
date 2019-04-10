@@ -269,6 +269,14 @@ void nl_convert_spice_t::convert(const pstring &contents)
 	out("NETLIST_END()\n");
 }
 
+static pstring rem(const std::vector<pstring> &vps, std::size_t start)
+{
+	pstring r(vps[start]);
+	for (std::size_t i=start + 1; i<vps.size(); i++)
+		r += " " + vps[i];
+	return r;
+}
+
 void nl_convert_spice_t::process_line(const pstring &line)
 {
 	if (line != "")
@@ -286,7 +294,8 @@ void nl_convert_spice_t::process_line(const pstring &line)
 			case '.':
 				if (tt[0] == ".SUBCKT")
 				{
-					out("NETLIST_START({})\n", tt[1].c_str());
+					m_subckt = tt[1] + "_";
+					out("NETLIST_START({})\n", tt[1]);
 					for (std::size_t i=2; i<tt.size(); i++)
 						add_ext_alias(tt[i]);
 				}
@@ -294,6 +303,11 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				{
 					dump_nl();
 					out("NETLIST_END()\n");
+					m_subckt = "";
+				}
+				else if (tt[0] == ".MODEL")
+				{
+					out("NET_MODEL(\"{} {}\")\n", m_subckt + tt[1], rem(tt,2));
 				}
 				else
 					out("// {}\n", line.c_str());
@@ -309,7 +323,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				auto nval = plib::pstonum_ne<long>(tt[4], err);
 				plib::unused_var(nval);
 
-				if ((err || plib::startsWith(tt[4], "N")) && tt.size() > 5)
+				if ((!err || plib::startsWith(tt[4], "N")) && tt.size() > 5)
 					model = tt[5];
 				else
 					model = tt[4];
@@ -320,7 +334,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 						plib::perrlogger("error with model desc {}\n", model);
 					pins = plib::left(m[1], 3);
 				}
-				add_device("QBJT_EB", tt[0], m[0]);
+				add_device("QBJT_EB", tt[0], m_subckt + m[0]);
 				add_term(tt[1], tt[0] + "." + pins.at(0));
 				add_term(tt[2], tt[0] + "." + pins.at(1));
 				add_term(tt[3], tt[0] + "." + pins.at(2));
@@ -348,6 +362,19 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				add_device("CAP", tt[0], val);
 				add_term(tt[1], tt[0] + ".1");
 				add_term(tt[2], tt[0] + ".2");
+				break;
+			case 'B':  // arbitrary behavioural current source - needs manual work afterwords
+				add_device("CS", tt[0], "/*" + rem(tt, 3) + "*/");
+				add_term(tt[1], tt[0] + ".P");
+				add_term(tt[2], tt[0] + ".N");
+				break;
+			case 'E':
+				add_device("VCVS", tt[0]);
+				add_term(tt[1], tt[0] + ".OP");
+				add_term(tt[2], tt[0] + ".ON");
+				add_term(tt[3], tt[0] + ".IP");
+				add_term(tt[4], tt[0] + ".IN");
+				out("PARAM({}, {})\n", tt[0] + ".G", tt[5]);
 				break;
 			case 'V':
 				// just simple Voltage sources ....
