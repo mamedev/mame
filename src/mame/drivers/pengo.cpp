@@ -927,7 +927,7 @@ void pengo_state::init_penta()
 void pengo_state::decode_schick_extra(int size, uint8_t* rom)
 {
 	// schick has an extra layer of encryption in addition to the penta encryption
-	for (int A = 0x0000; A < 0x10000; A++)
+	for (int A = 0x0000; A < 0x8000; A++)
 	{
 		uint8_t srcdec = rom[A];
 
@@ -942,6 +942,81 @@ void pengo_state::decode_schick_extra(int size, uint8_t* rom)
 
 
 		rom[A] = srcdec;
+	}
+
+	for (int A = 0x8000; A < 0x10000; A++)
+	{
+		uint8_t srcdec = rom[A];
+
+		/* if we assume only bits we've seen changed by the 2nd layer are chagned by this then our bitswap possibilities are
+
+		 6, 4, 0
+		 6, 0, 4
+		 4, 6, 0
+		 4, 0, 6
+		 0, 4, 6
+		 0, 6, 4
+
+		 and XOR possibilities are
+
+		 00
+		 01
+		 10
+		 11
+		 40
+		 41
+		 50
+		 51
+
+		*/
+
+		// copy+paste these + modify
+		//rom[A] = bitswap<8>(srcdec ^ xx, 7, 0, 5, 6, 3, 2, 1, 4);
+		//rom[A] = bitswap<8>(srcdec ^ xx, 7, 0, 5, 4, 3, 2, 1, 6);
+		//rom[A] = bitswap<8>(srcdec ^ xx, 7, 4, 5, 0, 3, 2, 1, 6);
+		//rom[A] = bitswap<8>(srcdec ^ xx, 7, 4, 5, 6, 3, 2, 1, 0);
+		//rom[A] = bitswap<8>(srcdec ^ xx, 7, 6, 5, 0, 3, 2, 1, 4);
+		//rom[A] = bitswap<8>(srcdec ^ xx, 7, 6, 5, 4, 3, 2, 1, 0); // no swap
+
+		if (rom == m_decrypted_opcodes)
+		{
+			// these are wrong
+			if (A & 0x1000) // might be more conditions too, but there's certainly a boundary at efff-f000 (jump table)
+			{
+				//rom[A] = bitswap<8>(srcdec ^ 0x10, 7, 0, 5, 6, 3, 2, 1, 4); // NO
+				rom[A] = bitswap<8>(srcdec ^ 0x10, 7, 0, 5, 4, 3, 2, 1, 6); // potential, but no
+				//rom[A] = bitswap<8>(srcdec ^ 0x10, 7, 4, 5, 0, 3, 2, 1, 6); // NO
+				//rom[A] = bitswap<8>(srcdec ^ 0x10, 7, 4, 5, 6, 3, 2, 1, 0); // NO
+				//rom[A] = bitswap<8>(srcdec ^ 0x10, 7, 6, 5, 0, 3, 2, 1, 4); // NO
+				//rom[A] = bitswap<8>(srcdec ^ 0x10, 7, 6, 5, 4, 3, 2, 1, 0); // potential, but no (no swap)
+
+				//rom[A] = bitswap<8>(srcdec ^ 0x11, 7, 0, 5, 6, 3, 2, 1, 4); // NO(?)
+				//rom[A] = bitswap<8>(srcdec ^ 0x11, 7, 0, 5, 4, 3, 2, 1, 6); // NO
+				//rom[A] = bitswap<8>(srcdec ^ 0x11, 7, 4, 5, 0, 3, 2, 1, 6); // NO
+				//rom[A] = bitswap<8>(srcdec ^ 0x11, 7, 4, 5, 6, 3, 2, 1, 0); // NO
+				//rom[A] = bitswap<8>(srcdec ^ 0x11, 7, 6, 5, 0, 3, 2, 1, 4); // NO
+				//rom[A] = bitswap<8>(srcdec ^ 0x11, 7, 6, 5, 4, 3, 2, 1, 0);
+			}
+			else
+			{
+				//rom[A] = bitswap<8>(srcdec ^ 0x51, 7, 0, 5, 6, 3, 2, 1, 4); // NO
+				rom[A] = bitswap<8>(srcdec ^ 0x51, 7, 0, 5, 4, 3, 2, 1, 6);  // promising, but no
+				//rom[A] = bitswap<8>(srcdec ^ 0x51, 7, 4, 5, 0, 3, 2, 1, 6); // NO
+				//rom[A] = bitswap<8>(srcdec ^ 0x51, 7, 4, 5, 6, 3, 2, 1, 0); // NO
+				//rom[A] = bitswap<8>(srcdec ^ 0x51, 7, 6, 5, 0, 3, 2, 1, 4); // NO
+				// rom[A] = bitswap<8>(srcdec ^ 0x51, 7, 6, 5, 4, 3, 2, 1, 0); promising, but no (no swap)
+			}
+		}
+		else
+		{
+			// these are correct(?) give good text, good jump locations etc.
+			if (A & 0x10)
+				srcdec = bitswap<8>(srcdec ^ 0x11, 7, 0, 5, 6, 3, 2, 1, 4);
+			else
+				srcdec = bitswap<8>(srcdec ^ 0x51, 7, 4, 5, 0, 3, 2, 1, 6);
+
+			rom[A] = srcdec;
+		}
 	}
 }
 
