@@ -733,8 +733,7 @@ void mips3_device::static_generate_exception(uint8_t exception, int recover, con
 	{
 		/* set BadVAddr to the fault address */
 		UML_GETEXP(block, I0);                                                  // getexp  i0
-		UML_TEST(block, CPR032(COP0_Status), SR_EXL);                           // test    [Status],SR_EXL
-		UML_MOVc(block, COND_Z, CPR032(COP0_BadVAddr), I0);                     // mov     [BadVAddr],i0,Z
+		UML_MOV(block, CPR032(COP0_BadVAddr), I0);                              // mov     [BadVAddr],i0
 	}
 
 	if (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE)
