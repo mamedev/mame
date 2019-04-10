@@ -45,9 +45,10 @@ wd1007a_device::wd1007a_device(const machine_config &mconfig, const char *tag, d
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(wd1007a_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("mcu", AM8753, 10_MHz_XTAL)
-MACHINE_CONFIG_END
+void wd1007a_device::device_add_mconfig(machine_config &config)
+{
+	AM8753(config, "mcu", 10_MHz_XTAL);
+}
 
 
 //-------------------------------------------------

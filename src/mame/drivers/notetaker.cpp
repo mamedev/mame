@@ -102,7 +102,9 @@ DONE:
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "imagedev/floppy.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "machine/pic8259.h"
 #include "machine/wd_fdc.h"
 #include "sound/dac.h"
@@ -797,38 +799,38 @@ void notetaker_state::ep_reset()
 static INPUT_PORTS_START( notetakr )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(notetaker_state::notetakr)
+void notetaker_state::notetakr(machine_config &config)
+{
 	/* basic machine hardware */
 	/* IO CPU: 8086@8MHz */
-	MCFG_DEVICE_ADD("iop_cpu", I8086, 24_MHz_XTAL / 3) /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
-	MCFG_DEVICE_PROGRAM_MAP(iop_mem)
-	MCFG_DEVICE_IO_MAP(iop_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("iop_pic8259", pic8259_device, inta_cb)
+	I8086(config, m_iop_cpu, 24_MHz_XTAL / 3); /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
+	m_iop_cpu->set_addrmap(AS_PROGRAM, &notetaker_state::iop_mem);
+	m_iop_cpu->set_addrmap(AS_IO, &notetaker_state::iop_io);
+	m_iop_cpu->set_irq_acknowledge_callback("iop_pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("iop_pic8259", PIC8259, 0) // iP8259A-2 @ E6
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("iop_cpu", 0))
+	PIC8259(config, m_iop_pic, 0); // iP8259A-2 @ E6
+	m_iop_pic->out_int_callback().set_inputline(m_iop_cpu, 0);
 
 	/* Emulator CPU: 8086@5MHz */
-	MCFG_DEVICE_ADD("ep_cpu", I8086, 15_MHz_XTAL / 3)
-	MCFG_DEVICE_DISABLE() // TODO: implement the cpu control bits so this doesn't execute garbage/zeroes before its firmware gets loaded
-	MCFG_DEVICE_PROGRAM_MAP(ep_mem)
-	MCFG_DEVICE_IO_MAP(ep_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("ep_pic8259", pic8259_device, inta_cb)
+	I8086(config, m_ep_cpu, 15_MHz_XTAL / 3);
+	m_ep_cpu->set_disable(); // TODO: implement the cpu control bits so this doesn't execute garbage/zeroes before its firmware gets loaded
+	m_ep_cpu->set_addrmap(AS_PROGRAM, &notetaker_state::ep_mem);
+	m_ep_cpu->set_addrmap(AS_IO, &notetaker_state::ep_io);
+	m_ep_cpu->set_irq_acknowledge_callback("ep_pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("ep_pic8259", PIC8259, 0) // iP8259A-2 @ E6
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("ep_cpu", 0))
-
+	PIC8259(config, m_ep_pic, 0); // iP8259A-2 @ E6
+	m_ep_pic->out_int_callback().set_inputline(m_ep_cpu, 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.975)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
-	MCFG_SCREEN_UPDATE_DRIVER(notetaker_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60.975);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(250));
+	screen.set_screen_update(FUNC(notetaker_state::screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Devices */
 	CRT5027(config, m_crtc, (36_MHz_XTAL / 4) / 8); // See below
@@ -843,31 +845,36 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	// TODO: for now, we just hack it to the latter setting from start; this should be handled correctly in iop_reset();
 	m_crtc->set_char_width(8); //(8 pixels per column/halfword, 16 pixels per fullword)
 	// TODO: below is HACKED to trigger the odd/even int ir4 instead of vblank int ir7 since ir4 is required for anything to be drawn to screen! hence with the hack this interrupt triggers twice as often as it should
-	m_crtc->vsyn_callback().set("iop_pic8259", FUNC(pic8259_device::ir4_w)); // note this triggers interrupts on both the iop (ir7) and emulatorcpu (ir4)
+	m_crtc->vsyn_callback().set(m_iop_pic, FUNC(pic8259_device::ir4_w)); // note this triggers interrupts on both the iop (ir7) and emulatorcpu (ir4)
 	m_crtc->set_screen("screen");
 
 	AY31015(config, m_kbduart); // HD6402, == AY-3-1015D
-	m_kbduart->set_rx_clock(960_kHz_XTAL); // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
-	m_kbduart->set_tx_clock(960_kHz_XTAL); // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
-	m_kbduart->write_dav_callback().set("iop_pic8259", FUNC(pic8259_device::ir6_w)); // DataRecvd = KbdInt
+	m_kbduart->write_dav_callback().set(m_iop_pic, FUNC(pic8259_device::ir6_w)); // DataRecvd = KbdInt
+
+	clock_device &kbdclock(CLOCK(config, "kbdclock", 960_kHz_XTAL)); // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	kbdclock.signal_handler().set(m_kbduart, FUNC(ay31015_device::write_rcp));
+	kbdclock.signal_handler().append(m_kbduart, FUNC(ay31015_device::write_tcp));
 
 	AY31015(config, m_eiauart); // HD6402, == AY-3-1015D
-	m_eiauart->set_rx_clock(((960_kHz_XTAL/10)/4)/5); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
-	m_eiauart->set_tx_clock(((960_kHz_XTAL/10)/4)/5); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
-	m_eiauart->write_dav_callback().set("iop_pic8259", FUNC(pic8259_device::ir3_w)); // EIADataReady = EIAInt
+	m_eiauart->write_dav_callback().set(m_iop_pic, FUNC(pic8259_device::ir3_w)); // EIADataReady = EIAInt
+
+	clock_device &eiaclock(CLOCK(config, "eiaclock", ((960_kHz_XTAL/10)/4)/5)); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	eiaclock.signal_handler().set(m_eiauart, FUNC(ay31015_device::write_rcp));
+	eiaclock.signal_handler().append(m_eiauart, FUNC(ay31015_device::write_tcp));
 
 	/* Floppy */
 	FD1791(config, m_fdc, (((24_MHz_XTAL/3)/2)/2)); // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board
-	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", notetaker_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "wd1791:0", notetaker_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	// TODO: hook DAC up to two HA2425 (sample and hold) chips and hook those up to the speakers
-	MCFG_DEVICE_ADD("dac", DAC1200, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC1200(config, m_dac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 void notetaker_state::init_notetakr()
 {

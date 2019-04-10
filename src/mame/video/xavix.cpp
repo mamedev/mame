@@ -4,6 +4,12 @@
 #include "emu.h"
 #include "includes/xavix.h"
 
+#include <cmath>
+
+// #define VERBOSE 1
+#include "logmacro.h"
+
+
 inline void xavix_state::set_data_address(int address, int bit)
 {
 	m_tmp_dataaddress = address;
@@ -12,21 +18,15 @@ inline void xavix_state::set_data_address(int address, int bit)
 
 inline uint8_t xavix_state::get_next_bit()
 {
-	uint8_t bit;
-	
-	// if bank is > 0x80, or address is >0x8000 it's a plain ROM read
-	if ((m_tmp_dataaddress >= 0x80000) || (m_tmp_dataaddress & 0x8000))
+	// going through memory is slow, try not to do it too often!
+	if (m_tmp_databit == 0)
 	{
-		bit= m_rgn[m_tmp_dataaddress & (m_rgnlen - 1)];
-	}
-	else // otherwise we read from RAM etc.? (baseball 2 secret test mode relies on this as it puts 1bpp characters in RAM)
-	{
-		address_space& mainspace = m_maincpu->space(AS_PROGRAM);
-		bit = m_lowbus->read8(mainspace, m_tmp_dataaddress & 0x7fff);
+		//m_bit = m_maincpu->read_full_data_sp(m_tmp_dataaddress);
+		m_bit = read_full_data_sp_bypass(m_tmp_dataaddress);
 	}
 
-	bit = bit >> m_tmp_databit;
-	bit &= 1;
+	uint8_t ret = m_bit >> m_tmp_databit;
+	ret &= 1;
 
 	m_tmp_databit++;
 
@@ -36,7 +36,7 @@ inline uint8_t xavix_state::get_next_bit()
 		m_tmp_dataaddress++;
 	}
 
-	return bit;
+	return ret;
 }
 
 inline uint8_t xavix_state::get_next_byte()
@@ -61,78 +61,233 @@ void xavix_state::video_start()
 }
 
 
-double xavix_state::hue2rgb(double p, double q, double t)
+WRITE8_MEMBER(xavix_state::palram_sh_w)
 {
-	if (t < 0) t += 1;
-	if (t > 1) t -= 1;
-	if (t < 1 / 6.0f) return p + (q - p) * 6 * t;
-	if (t < 1 / 2.0f) return q;
-	if (t < 2 / 3.0f) return p + (q - p) * (2 / 3.0f - t) * 6;
-	return p;
+	m_palram_sh[offset] = data;
+	update_pen(offset, m_palram_sh[offset], m_palram_l[offset]);
+}
+
+WRITE8_MEMBER(xavix_state::palram_l_w)
+{
+	m_palram_l[offset] = data;
+	update_pen(offset, m_palram_sh[offset], m_palram_l[offset]);
+}
+
+WRITE8_MEMBER(xavix_state::bmp_palram_sh_w)
+{
+	m_bmp_palram_sh[offset] = data;
+	update_pen(offset+256, m_bmp_palram_sh[offset], m_bmp_palram_l[offset]);
+}
+
+WRITE8_MEMBER(xavix_state::bmp_palram_l_w)
+{
+	m_bmp_palram_l[offset] = data;
+	update_pen(offset+256, m_bmp_palram_sh[offset], m_bmp_palram_l[offset]);
 }
 
 
-void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+WRITE8_MEMBER(xavix_state::spriteram_w)
 {
-	// not verified
-	int offs = 0;
-	for (int index = 0; index < 257; index++)
+	if (offset < 0x100)
 	{
-		uint16_t dat;
-			
-		if (index < 256)
-		{
-			dat = m_palram_sh[offs];
-			dat |= m_palram_l[offs] << 8;
-		}
-		else
-		{
-			dat = m_colmix_sh[0];
-			dat |= m_colmix_l[0] << 8;
-		}
-
-		offs++;
-
-		int l_raw = (dat & 0x1f00) >> 8;
-		int sl_raw =(dat & 0x00e0) >> 5;
-		int h_raw = (dat & 0x001f) >> 0;
-
-		//if (h_raw > 24)
-		//  logerror("hraw >24 (%02x)\n", h_raw);
-
-		//if (l_raw > 17)
-		//  logerror("lraw >17 (%02x)\n", l_raw);
-
-		//if (sl_raw > 7)
-		//  logerror("sl_raw >5 (%02x)\n", sl_raw);
-
-		double l = (double)l_raw / 17.0f;
-		double s = (double)sl_raw / 7.0f;
-		double h = (double)h_raw / 24.0f;
-
-		double r, g, b;
-
-		if (s == 0) {
-			r = g = b = l; // greyscale
-		}
-		else {
-			double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
-			double p = 2 * l - q;
-			r = hue2rgb(p, q, h + 1 / 3.0f);
-			g = hue2rgb(p, q, h);
-			b = hue2rgb(p, q, h - 1 / 3.0f);
-		}
-
-		int r_real = r * 255.0f;
-		int g_real = g * 255.0f;
-		int b_real = b * 255.0f;
-
-		m_palette->set_pen_color(index, r_real, g_real, b_real);
-
+		m_fragment_sprite[offset] = data;
+		m_fragment_sprite[offset + 0x400] = data & 0x01;
+	}
+	else if (offset < 0x400)
+	{
+		m_fragment_sprite[offset] = data;
+	}
+	else if (offset < 0x500)
+	{
+		m_fragment_sprite[offset] = data & 1;
+		m_fragment_sprite[offset - 0x400] = (m_fragment_sprite[offset - 0x400] & 0xfe) | (data & 0x01);
+		m_sprite_xhigh_ignore_hack = false; // still doesn't help monster truck test mode case, which writes here, but still expects values to be ignored
+	}
+	else
+	{
+		m_fragment_sprite[offset] = data;
 	}
 }
 
+void xavix_state::update_pen(int pen, uint8_t shval, uint8_t lval)
+{
+	uint16_t dat;
+	dat = shval;
+	dat |= lval << 8;
+
+	int y_raw = (dat & 0x1f00) >> 8;
+	int c_raw = (dat & 0x00e0) >> 5;
+	int h_raw = (dat & 0x001f) >> 0;
+
+	// The dividers may be dynamic
+	double y = y_raw / 20.0;
+	double c = c_raw /  5.0;
+
+	// These weights may be dynamic too.  They're standard NTSC values, would they change on PAL?
+	const double wr = 0.299;
+	const double wg = 0.587;
+	const double wb = 0.114;
+
+	// Table of hues
+	// Values 24+ are transparent
+
+	const double hues[32][3] = {
+		{ 1.00, 0.00, 0.00 },
+		{ 1.00, 0.25, 0.00 },
+		{ 1.00, 0.50, 0.00 },
+		{ 1.00, 0.75, 0.00 },
+		{ 1.00, 1.00, 0.00 },
+		{ 0.75, 1.00, 0.00 },
+		{ 0.50, 1.00, 0.00 },
+		{ 0.25, 1.00, 0.00 },
+		{ 0.00, 1.00, 0.00 },
+		{ 0.00, 1.00, 0.25 },
+		{ 0.00, 1.00, 0.50 },
+		{ 0.00, 1.00, 0.75 },
+		{ 0.00, 1.00, 1.00 },
+		{ 0.00, 0.75, 1.00 },
+		{ 0.00, 0.50, 1.00 },
+		{ 0.00, 0.25, 1.00 },
+		{ 0.00, 0.00, 1.00 },
+		{ 0.25, 0.00, 1.00 },
+		{ 0.50, 0.00, 1.00 },
+		{ 0.75, 0.00, 1.00 },
+		{ 1.00, 0.00, 1.00 },
+		{ 1.00, 0.00, 0.75 },
+		{ 1.00, 0.00, 0.50 },
+		{ 1.00, 0.00, 0.25 },
+
+		{ 0   , 0   , 0    },
+		{ 0   , 0   , 0    },
+		{ 0   , 0   , 0    },
+		{ 0   , 0   , 0    },
+		{ 0   , 0   , 0    },
+		{ 0   , 0   , 0    },
+		{ 0   , 0   , 0    },
+		{ 0   , 0   , 0    },
+	};
+
+	double r0 = hues[h_raw][0];
+	double g0 = hues[h_raw][1];
+	double b0 = hues[h_raw][2];
+
+	double z = wr * r0 + wg * g0 + wb * b0;
+
+	if(y < z)
+		c *= y/z;
+	else if(z < 1)
+		c *= (1-y) / (1-z);
+
+	double r1 = (r0 - z) * c + y;
+	double g1 = (g0 - z) * c + y;
+	double b1 = (b0 - z) * c + y;
+
+	if(r1 < 0)
+		r1 = 0;
+	else if(r1 > 1)
+		r1 = 1.0;
+
+	if(g1 < 0)
+		g1 = 0;
+	else if(g1 > 1)
+		g1 = 1.0;
+
+	if(b1 < 0)
+		b1 = 0;
+	else if(b1 > 1)
+		b1 = 1.0;
+
+	int r_real = r1 * 255.0f;
+	int g_real = g1 * 255.0f;
+	int b_real = b1 * 255.0f;
+
+	m_palette->set_pen_color(pen, r_real, g_real, b_real);
+}
+
+
+
 void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
+{
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		draw_tilemap_line(screen, bitmap, cliprect, which, y);
+	}
+}
+
+void xavix_state::decode_inline_header(int &flipx, int &flipy, int &test, int &pal, int debug_packets)
+{
+	uint8_t byte1 = 0;
+	int done = 0;
+
+	flipx = 0;
+	flipy = 0;
+	test = 0;
+
+	int first = 1;
+
+	do
+	{
+		byte1 = get_next_byte();
+
+		// only the first byte matters when it comes to setting palette / flips, the rest are just ignored until we reach a 0x6 command, after which there is the tile data
+		if (first == 1)
+		{
+			pal = (byte1 & 0xf0) >> 4;
+			int cmd = (byte1 & 0x0f);
+
+			switch (cmd)
+			{
+			// these cases haven't been seen
+			case 0x0:
+			case 0x2:
+			case 0x4:
+			case 0x8:
+			case 0xa:
+			case 0xc:
+			case 0xe:
+
+			// this is just the end command, changes nothing, can be pointed at directly tho
+			case 0x6:
+				break;
+
+			// flip cases
+			// does bit 0x02 have a meaning here, we have 2 values for each case
+
+			case 0x1:
+			case 0x3:
+				flipx = 0; flipy = 0;
+				break;
+
+			case 0x5:
+			case 0x7:
+				flipx = 1; flipy = 0;
+				break;
+
+			case 0x9:
+			case 0xb:
+				flipx = 0; flipy = 1;
+				break;
+
+			case 0xd:
+			case 0xf:
+				flipx = 1; flipy = 1;
+				break;
+			}
+
+			first = 0;
+		}
+
+		if ((byte1 & 0x0f) == 0x06)
+		{
+			// tile data will follow after this, always?
+			done = 1;
+			//if (debug_packets) LOG(" (setting palette)");
+		}
+	} while (done == 0);
+	//if (debug_packets) LOG("\n");
+}
+
+void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int line)
 {
 	uint8_t* tileregs;
 	if (which == 0)
@@ -145,7 +300,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 	}
 
 	// bail if tilemap is disabled
-	if (!(tileregs[0x7] & 0x80)) 
+	if (!(tileregs[0x7] & 0x80))
 		return;
 
 	int alt_tileaddressing = 0;
@@ -155,6 +310,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 	int xdimension = 0;
 	int ytilesize = 0;
 	int xtilesize = 0;
+	int yshift = 0;
 
 	switch (tileregs[0x3] & 0x30)
 	{
@@ -163,6 +319,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 		xdimension = 32;
 		ytilesize = 8;
 		xtilesize = 8;
+		yshift = 3;
 		break;
 
 	case 0x10:
@@ -170,6 +327,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 		xdimension = 16;
 		ytilesize = 8;
 		xtilesize = 16;
+		yshift = 3;
 		break;
 
 	case 0x20: // guess
@@ -177,6 +335,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 		xdimension = 32;
 		ytilesize = 16;
 		xtilesize = 8;
+		yshift = 4;
 		break;
 
 	case 0x30:
@@ -184,6 +343,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 		xdimension = 16;
 		ytilesize = 16;
 		xtilesize = 16;
+		yshift = 4;
 		break;
 	}
 
@@ -198,219 +358,152 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 	if ((tileregs[0x7] & 0x7f) == 0x04)
 		alt_tileaddressing2 = 2;
 
-	/*
-	static int hackx = 1;
-
-	if (machine().input().code_pressed_once(KEYCODE_Q))
-	{
-		hackx--;
-		logerror("%02x\n", hackx);
-	}
-
-	if (machine().input().code_pressed_once(KEYCODE_W))
-	{
-		hackx++;
-		logerror("%02x\n", hackx);
-	}
-	*/
-
-	//logerror("draw tilemap %d, regs base0 %02x base1 %02x base2 %02x tilesize,bpp %02x scrollx %02x scrolly %02x pal %02x mode %02x\n", which, tileregs[0x0], tileregs[0x1], tileregs[0x2], tileregs[0x3], tileregs[0x4], tileregs[0x5], tileregs[0x6], tileregs[0x7]);
+	//LOG("draw tilemap %d, regs base0 %02x base1 %02x base2 %02x tilesize,bpp %02x scrollx %02x scrolly %02x pal %02x mode %02x\n", which, tileregs[0x0], tileregs[0x1], tileregs[0x2], tileregs[0x3], tileregs[0x4], tileregs[0x5], tileregs[0x6], tileregs[0x7]);
 
 	// there's a tilemap register to specify base in main ram, although in the monster truck test mode it points to an unmapped region
 	// and expected a fixed layout, we handle that in the memory map at the moment
-	int count = 0;
-	for (int y = 0; y < ydimension; y++)
+
+	int drawline = line;
+	int scrolly = tileregs[0x5];
+
+	drawline += scrolly;
+
+	drawline &= ((ydimension * ytilesize) - 1);
+
+	int y = drawline >> yshift;
+	int yyline = drawline & (ytilesize - 1);
+
+	for (int x = 0; x < xdimension; x++)
 	{
-		for (int x = 0; x < xdimension; x++)
+		int count = (y * xdimension) + x;
+
+		int tile = 0;
+
+		// the register being 0 probably isn't the condition here
+		if (tileregs[0x0] != 0x00)
 		{
-			address_space& mainspace = m_maincpu->space(AS_PROGRAM);
+			//tile |= m_maincpu->read_full_data_sp((tileregs[0x0] << 8) + count);
+			tile |= read_full_data_sp_bypass((tileregs[0x0] << 8) + count);
+		}
 
-			int tile = 0;
+		// only read the next byte if we're not in an 8-bit mode
+		if (((tileregs[0x7] & 0x7f) != 0x00) && ((tileregs[0x7] & 0x7f) != 0x08))
+		{
+			//tile |= m_maincpu->read_full_data_sp((tileregs[0x1] << 8) + count) << 8;
+			tile |= read_full_data_sp_bypass((tileregs[0x1] << 8) + count) << 8;
+		}
 
-			// the register being 0 probably isn't the condition here
-			if (tileregs[0x0] != 0x00) tile |= mainspace.read_byte((tileregs[0x0] << 8) + count);
-			
-			// only read the next byte if we're not in an 8-bit mode
-			if (((tileregs[0x7] & 0x7f) != 0x00) && ((tileregs[0x7] & 0x7f) != 0x08))
-				tile |= mainspace.read_byte((tileregs[0x1] << 8) + count) << 8;
-		
-			// 24 bit modes can use reg 0x2, otherwise it gets used as extra attribute in other modes
-			if (alt_tileaddressing2 == 2)
-				tile |= mainspace.read_byte((tileregs[0x2] << 8) + count) << 16;
+		// 24 bit modes can use reg 0x2, otherwise it gets used as extra attribute in other modes
+		if (alt_tileaddressing2 == 2)
+		{
+			//tile |= m_maincpu->read_full_data_sp((tileregs[0x2] << 8) + count) << 16;
+			tile |= read_full_data_sp_bypass((tileregs[0x2] << 8) + count) << 16;
+		}
 
 
-			int bpp = (tileregs[0x3] & 0x0e) >> 1;
-			bpp++;
-			int pal = (tileregs[0x6] & 0xf0) >> 4;
-			int zval = (tileregs[0x6] & 0x0f) >> 0;
-			int scrolly = tileregs[0x5];
-			int scrollx = tileregs[0x4];
+		int bpp = (tileregs[0x3] & 0x0e) >> 1;
+		bpp++;
+		int pal = (tileregs[0x6] & 0xf0) >> 4;
+		int zval = (tileregs[0x6] & 0x0f) >> 0;
+		int scrollx = tileregs[0x4];
 
-			int basereg;
-			int flipx = 0;
-			int flipy = 0;
-			int gfxbase;
+		int basereg;
+		int flipx = (tileregs[0x03]&0x40)>>6;
+		int flipy = (tileregs[0x03]&0x80)>>7;
+		int gfxbase;
 
-			// tile 0 is always skipped, doesn't even point to valid data packets in alt mode
-			// this is consistent with the top layer too
-			// should we draw as solid in solid layer?
-			if (tile == 0)
+		// tile 0 is always skipped, doesn't even point to valid data packets in alt mode
+		// this is consistent with the top layer too
+		// should we draw as solid in solid layer?
+		if (tile == 0)
+		{
+			continue;
+		}
+
+		int debug_packets = 1;
+		//if (line==128) debug_packets = 1;
+		//else debug_packets = 0;
+
+		int test = 0;
+
+		if (!alt_tileaddressing)
+		{
+			if (alt_tileaddressing2 == 0)
 			{
-				count++;
-				continue;
-			}
+				// Tile Based Addressing takes into account Tile Sizes and bpp
+				const int offset_multiplier = (ytilesize * xtilesize) / 8;
 
-			const int debug_packets = 0;
-			int test = 0;
-
-			if (!alt_tileaddressing)
-			{
-				if (alt_tileaddressing2 == 0)
-				{
-					// Tile Based Addressing takes into account Tile Sizes and bpp
-					const int offset_multiplier = (ytilesize * xtilesize)/8;
-					
-					basereg = 0;
-					gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
-
-					tile = tile * (offset_multiplier * bpp);
-					tile += gfxbase;
-				}
-				else if (alt_tileaddressing2 == 1)
-				{
-					// 8-byte alignment Addressing Mode uses a fixed offset? (like sprites)
-					tile = tile * 8;
-					basereg = (tile & 0x70000) >> 16;
-					tile &= 0xffff;
-					gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
-					tile += gfxbase;
-				}
-				else if (alt_tileaddressing2 == 2)
-				{
-					// 24-bit addressing
-					tile |= 0x800000;
-				}
-
-				// Tilemap specific mode extension with an 8-bit per tile attribute, works in all modes except 24-bit (no room for attribute) and header (not needed?)
-				if (tileregs[0x7] & 0x08)
-				{
-					uint8_t extraattr = mainspace.read_byte((tileregs[0x2] << 8) + count);
-					// make use of the extraattr stuff?
-					pal = (extraattr & 0xf0)>>4;
-					zval = (extraattr & 0x0f) >> 0;
-				}
-			}
-			else
-			{
-				// Addressing Mode 2 (plus Inline Header)
-
-				if (debug_packets) logerror("for tile %04x (at %d %d): ", tile, (((x * 16) + scrollx) & 0xff), (((y * 16) + scrolly) & 0xff));
-
-
-				basereg = (tile & 0xf000) >> 12;
-				tile &= 0x0fff;
+				basereg = 0;
 				gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
 
+				tile = tile * (offset_multiplier * bpp);
 				tile += gfxbase;
-				set_data_address(tile, 0);
-
-				// there seems to be a packet stored before the tile?!
-				// the offset used for flipped sprites seems to specifically be changed so that it picks up an extra byte which presumably triggers the flipping
-				uint8_t byte1 = 0;
-				int done = 0;
-				int skip = 0;
-
-				do
-				{
-					byte1 = get_next_byte();
-
-					if (debug_packets) logerror(" %02x, ", byte1);
-
-					if (skip == 1)
-					{
-						skip = 0;
-						//test = 1;
-					}
-					else if ((byte1 & 0x0f) == 0x01)
-					{
-						// used
-					}
-					else if ((byte1 & 0x0f) == 0x03)
-					{
-						// causes next byte to be skipped??
-						skip = 1;
-					}
-					else if ((byte1 & 0x0f) == 0x05)
-					{
-						// the upper bits are often 0x00, 0x10, 0x20, 0x30, why?
-						flipx = 1;
-					}
-					else if ((byte1 & 0x0f) == 0x06) // there must be other finish conditions too because sometimes this fails..
-					{
-						// tile data will follow after this, always?
-						pal = (byte1 & 0xf0) >> 4;
-						done = 1;
-					}
-					else if ((byte1 & 0x0f) == 0x07)
-					{
-						// causes next byte to be skipped??
-						skip = 1;
-					}
-					else if ((byte1 & 0x0f) == 0x09)
-					{
-						// used
-					}
-					else if ((byte1 & 0x0f) == 0x0a)
-					{
-						// not seen
-					}
-					else if ((byte1 & 0x0f) == 0x0b)
-					{
-						// used
-					}
-					else if ((byte1 & 0x0f) == 0x0c)
-					{
-						// not seen
-					}
-					else if ((byte1 & 0x0f) == 0x0d)
-					{
-						// used
-					}
-					else if ((byte1 & 0x0f) == 0x0e)
-					{
-						// not seen
-					}
-					else if ((byte1 & 0x0f) == 0x0f)
-					{
-						// used
-					}
-
-				} while (done == 0);
-				if (debug_packets) logerror("\n");
-				tile = get_current_address_byte();
+			}
+			else if (alt_tileaddressing2 == 1)
+			{
+				// 8-byte alignment Addressing Mode uses a fixed offset? (like sprites)
+				tile = tile * 8;
+				basereg = (tile & 0x70000) >> 16;
+				tile &= 0xffff;
+				gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
+				tile += gfxbase;
 			}
 
-			if (test == 1) pal = machine().rand() & 0xf;
+			// Tilemap specific mode extension with an 8-bit per tile attribute, works in all modes except 24-bit (no room for attribute) and header (not needed?)
+			if (tileregs[0x7] & 0x08)
+			{
+				//uint8_t extraattr = m_maincpu->read_full_data_sp((tileregs[0x2] << 8) + count);
+				uint8_t extraattr = read_full_data_sp_bypass((tileregs[0x2] << 8) + count);
 
-
-			draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, zval);
-			draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, zval); // wrap-y
-			draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, zval); // wrap-x
-			draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, zval); // wrap-y and x
-		
-			count++;
+				// make use of the extraattr stuff?
+				pal = (extraattr & 0xf0) >> 4;
+				zval = (extraattr & 0x0f) >> 0;
+			}
 		}
+		else
+		{
+			// Addressing Mode 2 (plus Inline Header)
+
+			//if (debug_packets) LOG("for tile %04x (at %d %d): ", tile, (((x * 16) + scrollx) & 0xff), (((y * 16) + scrolly) & 0xff));
+
+			basereg = (tile & 0xf000) >> 12;
+			tile &= 0x0fff;
+			gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
+
+			tile += gfxbase;
+			set_data_address(tile, 0);
+
+			decode_inline_header(flipx, flipy, test, pal, debug_packets);
+
+			tile = get_current_address_byte();
+		}
+
+		if (test == 1)
+		{
+			pal = machine().rand() & 0xf;
+		}
+
+		draw_tile_line(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, line, ytilesize, xtilesize, flipx, flipy, pal, zval, yyline);
+		draw_tile_line(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, line, ytilesize, xtilesize, flipx, flipy, pal, zval, yyline); // wrap-x
 	}
-	
 }
 
 void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		draw_sprites_line(screen, bitmap, cliprect, y);
+	}
+}
+
+void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int line)
+{
 	int alt_addressing = 0;
 
-	if (m_spritereg == 0x00)
+	if ((m_spritereg == 0x00) || (m_spritereg == 0x01))
 	{
 		// 8-bit addressing  (Tile Number)
+		// 16-bit addressing (Tile Number) (rad_rh)
 		alt_addressing = 1;
 	}
 	else if (m_spritereg == 0x02)
@@ -428,7 +521,8 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		popmessage("unknown sprite reg %02x", m_spritereg);
 	}
 
-	//logerror("frame\n");
+
+	//LOG("frame\n");
 	// priority doesn't seem to be based on list order, there are bad sprite-sprite priorities with either forward or reverse
 
 	for (int i = 0xff; i >= 0; i--)
@@ -454,23 +548,23 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		int ypos = spr_ypos[i];
 		int xpos = spr_xpos[i];
 		int tile = 0;
-		
+
 		// high 8-bits only used in 24-bit mode
 		if (((m_spritereg & 0x7f) == 0x04) || ((m_spritereg & 0x7f) == 0x15))
 			tile |= (spr_addr_hi[i] << 16);
-		
+
 		// mid 8-bits used in everything except 8-bit mode
 		if ((m_spritereg & 0x7f) != 0x00)
 			tile |= (spr_addr_md[i] << 8);
-		
+
 		// low 8-bits always read
 		tile |= spr_addr_lo[i];
-		
+
 		int attr0 = spr_attr0[i];
 		int attr1 = spr_attr1[i];
 
 		int pal = (attr0 & 0xf0) >> 4;
-		
+
 		int zval = (attr1 & 0xf0) >> 4;
 		int flipx = (attr1 & 0x01);
 		int flipy = (attr1 & 0x02);
@@ -479,150 +573,170 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		int drawwidth = 16;
 
 		int xpos_adjust = 0;
-		int ypos_adjust = 0;
-
-		tile &= (m_rgnlen - 1);
+		int ypos_adjust = -16;
 
 		// taito nost attr1 is 84 / 80 / 88 / 8c for the various elements of the xavix logo.  monster truck uses ec / fc / dc / 4c / 5c / 6c (final 6 sprites ingame are 00 00 f0 f0 f0 f0, radar?)
 
-		if ((attr1 & 0x0c) == 0x0c)
-		{
-			drawheight = 16;
-			drawwidth = 16;
-		}
-		else if ((attr1 & 0x0c) == 0x08)
-		{
-			drawheight = 16;
-			drawwidth = 8;
-			xpos_adjust = 4;
-		}
-		else if ((attr1 & 0x0c) == 0x04)
-		{
-			drawheight = 8;
-			drawwidth = 16;
-			ypos_adjust = -4;
-		}
-		else if ((attr1 & 0x0c) == 0x00)
-		{
-			drawheight = 8;
-			drawwidth = 8;
-			xpos_adjust = 4;
-			ypos_adjust = -4;
-		}
+		drawheight = 8;
+		drawwidth = 8;
 
-		// Everything except direct addressing (Addressing Mode 2) goes through the segment registers?
-		if (alt_addressing != 0)
-		{
-			// tile based addressing takes into account tile size (and bpp?)
-			if (alt_addressing == 1)
-				tile = (tile * drawheight * drawwidth) / 2;
+		if (attr1 & 0x04) drawwidth = 16;
+		if (attr1 & 0x08) drawheight = 16;
 
-			// 8-byte alignment Addressing Mode uses a fixed offset?
-			if (alt_addressing == 2)
-				tile = tile * 8;
-
-			int basereg = (tile & 0xf0000) >> 16;
-			tile &= 0xffff;
-			int gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
-			tile += gfxbase;
-		}
-		else
-		{
-			// ?? in 24-bit mode the upper bit isn't being set, which causes some things to be drawn from RAM instead
-			// which is not what we want at all. are the segment registers still involved even in this mode?
-			tile |= 0x800000;
-		}
-
-		/* coordinates are signed, based on screen position 0,0 being at the center of the screen
-		   tile addressing likewise, point 0,0 is center of tile?
-		   this makes the calculation a bit more annoying in terms of knowing when to apply offsets, when to wrap etc.
-		   this is likely still incorrect
-		   
-		   Use of additional x-bit is very confusing rad_snow, taitons1 (ingame) etc. clearly need to use it
-		   but the taitons1 xavix logo doesn't even initialize the RAM for it and behavior conflicts with ingame?
-		   maybe only works with certain tile sizes?
-
-		   some code even suggests this should be bit 0 of attr0, but it never gets set there
-
-		   there must be a register somewhere (or a side-effect of another mode) that enables / disables this
-		   behavior, as we need to make use of xposh for the left side in cases that need it, but that
-		   completely breaks the games that never set it at all (monster truck, xavix logo on taitons1)
-
-		 */
-
-		int xposh = spr_xposh[i]&1;
-
-		if (xpos & 0x80) // left side of center
-		{
-			xpos &=0x7f;
-			xpos = -0x80+xpos;
-		}
-		else // right side of center
-		{
-			xpos &= 0x7f;
-
-			if (xposh)
-				xpos += 0x80;
-		}
-
-		xpos += 128 - 8;
+		xpos_adjust = -(drawwidth/2);
+		ypos_adjust = -(drawheight/2);
 
 		ypos ^= 0xff;
 
 		if (ypos & 0x80)
 		{
-			ypos = -0x80+(ypos&0x7f);
+			ypos = -0x80 + (ypos & 0x7f);
 		}
 		else
 		{
 			ypos &= 0x7f;
 		}
 
-		ypos += 128 - 15 - 8;
+		ypos += 128 + 1;
 
+		ypos += ypos_adjust;
 
-		int bpp = 1;
+		int spritelowy = ypos;
+		int spritehighy = ypos + drawheight;
 
-		bpp = (attr0 & 0x0e) >> 1;
-		bpp += 1;
-
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, zval);
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - 256 - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, zval); // wrap-y
-
-		/*
-		if ((spr_ypos[i] != 0x81) && (spr_ypos[i] != 0x80) && (spr_ypos[i] != 0x00))
+		if ((line >= spritelowy) && (line < spritehighy))
 		{
-			logerror("sprite with enable? %02x attr0 %02x attr1 %02x attr3 %02x attr5 %02x attr6 %02x attr7 %02x\n", spr_ypos[i], spr_attr0[i], spr_attr1[i], spr_xpos[i], spr_addr_lo[i], spr_addr_md[i], spr_addr_hi[i] );
+			int drawline = line - spritelowy;
+
+
+			/* coordinates are signed, based on screen position 0,0 being at the center of the screen
+			   tile addressing likewise, point 0,0 is center of tile?
+			   this makes the calculation a bit more annoying in terms of knowing when to apply offsets, when to wrap etc.
+			   this is likely still incorrect
+
+			   -- NOTE! HACK!
+
+			   Use of additional x-bit is very confusing rad_snow, taitons1 (ingame) etc. clearly need to use it
+			   but the taitons1 xavix logo doesn't even initialize the RAM for it and behavior conflicts with ingame?
+			   maybe only works with certain tile sizes?
+
+			   some code even suggests this should be bit 0 of attr0, but it never gets set there
+			   (I'm mirroring the bits in the write handler at the moment)
+
+			   there must be a register somewhere (or a side-effect of another mode) that enables / disables this
+			   behavior, as we need to make use of xposh for the left side in cases that need it, but that
+			   completely breaks the games that never set it at all (monster truck, xavix logo on taitons1)
+
+			   monster truck hidden service mode ends up writing to the RAM, breaking the 'clock' display if
+			   we use the values for anything.. again suggesting there must be a way to ignore it entirely?
+
+			 */
+
+			int xposh = spr_xposh[i] & 1;
+
+			if (xpos & 0x80) // left side of center
+			{
+				xpos &= 0x7f;
+				xpos = -0x80 + xpos;
+
+				if (!m_sprite_xhigh_ignore_hack)
+					if (!xposh)
+						xpos -= 0x80;
+
+			}
+			else // right side of center
+			{
+				xpos &= 0x7f;
+
+				if (!m_sprite_xhigh_ignore_hack)
+					if (xposh)
+						xpos += 0x80;
+			}
+
+			xpos += 128;
+
+			xpos += xpos_adjust;
+
+			// galplus phalanx beam (sprite wraparound)
+			if (xpos<-0x80)
+				xpos += 256+128;
+
+			int bpp = 1;
+
+			bpp = (attr0 & 0x0e) >> 1;
+			bpp += 1;
+
+			// Everything except directdirect addressing (Addressing Mode 2) goes through the segment registers?
+			if (alt_addressing != 0)
+			{
+				int basereg = 0;
+
+				// tile based addressing takes into account tile size (and bpp?)
+				if (alt_addressing == 1)
+				{
+					tile = (tile * drawheight * drawwidth * bpp) / 8;
+					basereg = 0; // always uses segment register 0 in tile addressing mode?
+				}
+				else
+				{
+					// 8-byte alignment Addressing Mode uses a fixed offset?
+					if (alt_addressing == 2)
+						tile = tile * 8;
+
+					basereg = (tile & 0xf0000) >> 16;
+					tile &= 0xffff;
+				}
+
+				int gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
+				tile += gfxbase;
+			}
+
+			draw_tile_line(screen, bitmap, cliprect, tile, bpp, xpos , line, drawheight, drawwidth, flipx, flipy, pal, zval, drawline);
+
+			/*
+			if ((spr_ypos[i] != 0x81) && (spr_ypos[i] != 0x80) && (spr_ypos[i] != 0x00))
+			{
+			    LOG("sprite with enable? %02x attr0 %02x attr1 %02x attr3 %02x attr5 %02x attr6 %02x attr7 %02x\n", spr_ypos[i], spr_attr0[i], spr_attr1[i], spr_xpos[i], spr_addr_lo[i], spr_addr_md[i], spr_addr_hi[i] );
+			}
+			*/
 		}
-		*/
 	}
 }
 
-void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval)
+void xavix_state::draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line)
 {
-	// set the address here so we can increment in bits in the draw function
-	set_data_address(tile, 0);
+	//const pen_t *paldata = m_palette->pens();
+	if (ypos > cliprect.max_y || ypos < cliprect.min_y)
+		return;
 
-	for (int y = 0; y < drawheight; y++)
+	if ((xpos > cliprect.max_x) || ((xpos + drawwidth) < cliprect.min_x))
+		return;
+
+	if ((ypos >= cliprect.min_y && ypos <= cliprect.max_y))
 	{
-		int row;
+		// if bpp>4 then ignore unaligned palette selects bits based on bpp
+		// ttv_lotr uses 5bpp graphics (so 32 colour alignment) but sets palette 0xf (a 16 colour boundary) when it expects palette 0xe
+		if (bpp>4)
+			pal &= (0xf<<(bpp-4));
+
+		int bits_per_tileline = drawwidth * bpp;
+
+		// set the address here so we can increment in bits in the draw function
+		set_data_address(tile, 0);
+
 		if (flipy)
-		{
-			row = ypos + (drawheight-1) - y;
-		}
-		else
-		{
-			row = ypos + y;
-		}
+			line = (drawheight - 1) - line;
+
+		m_tmp_dataaddress = m_tmp_dataaddress + ((line * bits_per_tileline) / 8);
+		m_tmp_databit = (line * bits_per_tileline) % 8;
 
 		for (int x = 0; x < drawwidth; x++)
 		{
-
 			int col;
 
 			if (flipx)
 			{
-				col = xpos + (drawwidth-1) - x;
+				col = xpos + (drawwidth - 1) - x;
 			}
 			else
 			{
@@ -636,22 +750,25 @@ void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const r
 				dat |= (get_next_bit() << i);
 			}
 
-			if ((row >= cliprect.min_y && row <= cliprect.max_y) && (col >= cliprect.min_x && col <= cliprect.max_x))
+			if ((col >= cliprect.min_x && col <= cliprect.max_x))
 			{
-				uint16_t* rowptr = &bitmap.pix16(row);
-				uint16_t* zrowptr = &m_zbuffer.pix16(row);
+				uint16_t* zyposptr = &m_zbuffer.pix16(ypos);
 
-
-				if (zval >= zrowptr[col])
+				if (zval >= zyposptr[col])
 				{
 					int pen = (dat + (pal << 4)) & 0xff;
 
 					if ((m_palram_sh[pen] & 0x1f) < 24) // hue values 24-31 are transparent
 					{
-						rowptr[col] = pen;
-						zrowptr[col] = zval;
+						uint16_t* yposptr = &bitmap.pix16(ypos);
+						yposptr[col] = pen;
+
+						//uint32_t* yposptr = &bitmap.pix32(ypos);
+						//yposptr[col] = paldata[pen];
+
+						zyposptr[col] = zval;
 					}
-				}			
+				}
 			}
 		}
 	}
@@ -659,11 +776,9 @@ void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	handle_palette(screen, bitmap, cliprect);
-
 	// not sure what you end up with if you fall through all layers as transparent, so far no issues noticed
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	m_zbuffer.fill(0,cliprect);
+	m_zbuffer.fill(0, cliprect);
 
 	rectangle clip = cliprect;
 
@@ -685,8 +800,8 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		*/
 		if (((m_arena_start != 0x00) && (m_arena_end != 0x00)) && ((m_arena_start != 0xff) && (m_arena_end != 0xff)))
 		{
-			clip.max_x = m_arena_start - 3;
-			clip.min_x = m_arena_end - 1;
+			clip.max_x = m_arena_start - 3; // must be -3 to hide garbage on the right hand side of snowboarder
+			clip.min_x = m_arena_end - 2; // must be -2 to render a single pixel line of the left border on Mappy remix (verified to render), although this creates a single pixel gap on the left of snowboarder status bar (need to verify)
 
 			if (clip.min_x < cliprect.min_x)
 				clip.min_x = cliprect.min_x;
@@ -697,11 +812,81 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	}
 	bitmap.fill(0, clip);
 
-	draw_tilemap(screen,bitmap,clip,1);
-	draw_tilemap(screen,bitmap,clip,0);
-	draw_sprites(screen,bitmap,clip);
+	draw_tilemap(screen, bitmap, clip, 1);
+	draw_tilemap(screen, bitmap, clip, 0);
+	draw_sprites(screen, bitmap, clip);
 
 	//popmessage("%02x %02x %02x %02x   %02x %02x %02x %02x   %02x %02x %02x %02x   %02x %02x %02x %02x", m_soundregs[0],m_soundregs[1],m_soundregs[2],m_soundregs[3],m_soundregs[4],m_soundregs[5],m_soundregs[6],m_soundregs[7],m_soundregs[8],m_soundregs[9],m_soundregs[10],m_soundregs[11],m_soundregs[12],m_soundregs[13],m_soundregs[14],m_soundregs[15]);
+
+	// temp, needs priority, transparency etc. also it's far bigger than the screen, I guess it must get scaled?!
+	if (m_bmp_base)
+	{
+		// looks like it can zoom the bitmap using these?
+		uint16_t top = ((m_bmp_base[0x01] << 8) | m_bmp_base[0x00]);
+		uint16_t bot = ((m_bmp_base[0x03] << 8) | m_bmp_base[0x02]);
+		uint16_t lft = ((m_bmp_base[0x05] << 8) | m_bmp_base[0x04]);
+		uint16_t rgt = ((m_bmp_base[0x07] << 8) | m_bmp_base[0x06]);
+
+		// and can specify base address relative start / end positions with these for data reading to be cut off?
+		uint16_t topadr = ((m_bmp_base[0x09] << 8) | m_bmp_base[0x08]);
+		uint16_t botadr = ((m_bmp_base[0x0b] << 8) | m_bmp_base[0x0a]);
+		uint16_t lftadr = ((m_bmp_base[0x0d] << 8) | m_bmp_base[0x0c]);
+		uint16_t rgtadr = ((m_bmp_base[0x0f] << 8) | m_bmp_base[0x0e]);
+
+		uint16_t start = ((m_bmp_base[0x11] << 8) | m_bmp_base[0x10]);
+		uint8_t end = m_bmp_base[0x12]; // ?? related to width?
+		uint8_t size = m_bmp_base[0x13]; // some kind of additional scaling?
+		uint8_t mode = m_bmp_base[0x14]; // eanble,bpp, zval etc.
+
+		uint32_t unused = ((m_bmp_base[0x15] << 16) | (m_bmp_base[0x16] << 8) | (m_bmp_base[0x17] << 0));
+
+		if (mode & 0x01)
+		{
+			popmessage("bitmap t:%04x b:%04x l:%04x r:%04x  -- -- ba:%04x la:%04x ra:%04x   -- -- end:%02x - size:%02x unused:%08x",
+				top, bot, lft, rgt,
+				/*topadr*/ botadr, lftadr, rgtadr,
+				/*start*/ end, size, unused);
+
+			int base = start * 0x800;
+			int base2 = topadr * 0x8;
+
+			int bpp = ((mode & 0x0e) >> 1) + 1;
+			int zval = ((mode & 0xf0) >> 4);
+
+			int width = (rgtadr * 8) / bpp;
+
+			//int count = 0;
+			set_data_address(base + base2, 0);
+
+			for (int y = top; y < 256; y++)
+			{
+				for (int x = 0; x < width; x++)
+				{
+					uint16_t* yposptr = &bitmap.pix16(y);
+					uint16_t* zyposptr = &m_zbuffer.pix16(y);
+
+					uint8_t dat = 0;
+					for (int i = 0; i < bpp; i++)
+					{
+						dat |= (get_next_bit() << i);
+					}
+
+					if (((x <= cliprect.max_x) && (x >= cliprect.min_x)) && ((y <= cliprect.max_y) && (y >= cliprect.min_y)))
+					{
+						if ((m_bmp_palram_sh[dat] & 0x1f) < 24) // same transparency logic as everything else? (baseball title)
+						{
+							if (zval >= zyposptr[x])
+							{
+								yposptr[x] = dat + 0x100;
+								zyposptr[x] = zval;
+							}
+						}
+					}
+				}
+			}
+
+		}
+	}
 
 	return 0;
 }
@@ -720,12 +905,12 @@ WRITE8_MEMBER(xavix_state::spritefragment_dma_params_2_w)
 WRITE8_MEMBER(xavix_state::spritefragment_dma_trg_w)
 {
 	uint16_t len = data & 0x07;
-	uint16_t src = (m_spritefragment_dmaparam1[1]<<8) | m_spritefragment_dmaparam1[0];
-	uint16_t dst = (m_spritefragment_dmaparam2[0]<<8);
+	uint16_t src = (m_spritefragment_dmaparam1[1] << 8) | m_spritefragment_dmaparam1[0];
+	uint16_t dst = (m_spritefragment_dmaparam2[0] << 8);
 
 	uint8_t unk = m_spritefragment_dmaparam2[1];
 
-	logerror("%s: spritefragment_dma_trg_w with trg %02x size %04x src %04x dest %04x unk (%02x)\n", machine().describe_context(), data & 0xf8, len,src,dst,unk);
+	LOG("%s: spritefragment_dma_trg_w with trg %02x size %04x src %04x dest %04x unk (%02x)\n", machine().describe_context(), data & 0xf8, len, src, dst, unk);
 
 	if (unk)
 	{
@@ -735,7 +920,7 @@ WRITE8_MEMBER(xavix_state::spritefragment_dma_trg_w)
 	if (len == 0x00)
 	{
 		len = 0x08;
-		logerror(" (length was 0x0, assuming 0x8)\n");
+		LOG(" (length was 0x0, assuming 0x8)\n");
 	}
 
 	len = len << 8;
@@ -744,8 +929,10 @@ WRITE8_MEMBER(xavix_state::spritefragment_dma_trg_w)
 	{
 		for (int i = 0; i < len; i++)
 		{
-			uint8_t dat = m_maincpu->space(AS_PROGRAM).read_byte(src + i);
-			m_fragment_sprite[(dst + i) & 0x7ff] = dat;
+			//uint8_t dat = m_maincpu->read_full_data_sp(src + i);
+			uint8_t dat = read_full_data_sp_bypass(src + i);
+			//m_fragment_sprite[(dst + i) & 0x7ff] = dat;
+			spriteram_w(space, (dst + i) & 0x7ff, dat);
 		}
 	}
 }
@@ -774,8 +961,8 @@ WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 
 	   0x3 Fftt bbb-  Ff = flip Y,X
 	                  tt = tile/tilemap size
-					  b = bpp
-					  - = unused
+	                  b = bpp
+	                  - = unused
 
 	   0x4 scroll
 	   0x5 scroll
@@ -787,25 +974,25 @@ WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 	                  m = mode
 
 	   modes are
-		---0 0000 (00) 8-bit addressing  (Tile Number)
-		---0 0001 (01) 16-bit addressing (Tile Number) (monster truck, ekara)
-		---0 0010 (02) 16-bit addressing (8-byte alignment Addressing Mode) (boxing)
-		---0 0011 (03) 16-bit addressing (Addressing Mode 2) 
-		---0 0100 (04) 24-bit addressing (Addressing Mode 2) (epo_efdx)
+	    ---0 0000 (00) 8-bit addressing  (Tile Number)
+	    ---0 0001 (01) 16-bit addressing (Tile Number) (monster truck, ekara)
+	    ---0 0010 (02) 16-bit addressing (8-byte alignment Addressing Mode) (boxing)
+	    ---0 0011 (03) 16-bit addressing (Addressing Mode 2)
+	    ---0 0100 (04) 24-bit addressing (Addressing Mode 2) (epo_efdx)
 
-		---0 1000 (08) 8-bit+8 addressing  (Tile Number + 8-bit Attribute)
-		---0 1001 (09) 16-bit+8 addressing (Tile Number + 8-bit Attribute) (Taito Nostalgia 2)
-		---0 1010 (0a) 16-bit+8 addressing (8-byte alignment Addressing Mode + 8-bit Attribute) (boxing, Snowboard)
-		---0 1011 (0b) 16-bit+8 addressing (Addressing Mode 2 + 8-bit Attribute)
+	    ---0 1000 (08) 8-bit+8 addressing  (Tile Number + 8-bit Attribute)
+	    ---0 1001 (09) 16-bit+8 addressing (Tile Number + 8-bit Attribute) (Taito Nostalgia 2)
+	    ---0 1010 (0a) 16-bit+8 addressing (8-byte alignment Addressing Mode + 8-bit Attribute) (boxing, Snowboard)
+	    ---0 1011 (0b) 16-bit+8 addressing (Addressing Mode 2 + 8-bit Attribute)
 
-		---1 0011 (13) 16-bit addressing (Addressing Mode 2 + Inline Header)  (monster truck)
-		---1 0100 (14) 24-bit addressing (Addressing Mode 2 + Inline Header)
+	    ---1 0011 (13) 16-bit addressing (Addressing Mode 2 + Inline Header)  (monster truck)
+	    ---1 0100 (14) 24-bit addressing (Addressing Mode 2 + Inline Header)
 
 	*/
 
 	if ((offset != 0x4) && (offset != 0x5))
 	{
-		logerror("%s: tmap1_regs_w offset %02x data %02x\n", machine().describe_context(), offset, data);
+		LOG("%s: tmap1_regs_w offset %02x data %02x\n", machine().describe_context(), offset, data);
 	}
 
 	COMBINE_DATA(&m_tmap1_regs[offset]);
@@ -816,7 +1003,7 @@ WRITE8_MEMBER(xavix_state::tmap2_regs_w)
 	// same as above but for 2nd tilemap
 	if ((offset != 0x4) && (offset != 0x5))
 	{
-		logerror("%s: tmap2_regs_w offset %02x data %02x\n", machine().describe_context(), offset, data);
+		LOG("%s: tmap2_regs_w offset %02x data %02x\n", machine().describe_context(), offset, data);
 	}
 
 	COMBINE_DATA(&m_tmap2_regs[offset]);
@@ -825,31 +1012,31 @@ WRITE8_MEMBER(xavix_state::tmap2_regs_w)
 
 WRITE8_MEMBER(xavix_state::spriteregs_w)
 {
-	logerror("%s: spriteregs_w data %02x\n", machine().describe_context(), data);
+	LOG("%s: spriteregs_w data %02x\n", machine().describe_context(), data);
 	/*
-		This is similar to Tilemap reg 7 and is used to set the addressing mode for sprite data
+	    This is similar to Tilemap reg 7 and is used to set the addressing mode for sprite data
 
-		---0 -000 (00) 8-bit addressing  (Tile Number)
-		---0 -001 (01) 16-bit addressing (Tile Number)
-		---0 -010 (02) 16-bit addressing (8-byte alignment Addressing Mode)
-		---0 -011 (03) 16-bit addressing (Addressing Mode 2)
-		---0 -100 (04) 24-bit addressing (Addressing Mode 2)
+	    ---0 -000 (00) 8-bit addressing  (Tile Number)
+	    ---0 -001 (01) 16-bit addressing (Tile Number)
+	    ---0 -010 (02) 16-bit addressing (8-byte alignment Addressing Mode)
+	    ---0 -011 (03) 16-bit addressing (Addressing Mode 2)
+	    ---0 -100 (04) 24-bit addressing (Addressing Mode 2)
 
-		---1 -011 (13) 16-bit addressing (Addressing Mode 2 + Inline Header)
-		---1 -100 (14) 24-bit addressing (Addressing Mode 2 + Inline Header)
+	    ---1 -011 (13) 16-bit addressing (Addressing Mode 2 + Inline Header)
+	    ---1 -100 (14) 24-bit addressing (Addressing Mode 2 + Inline Header)
 	*/
 	m_spritereg = data;
 }
 
 READ8_MEMBER(xavix_state::tmap1_regs_r)
 {
-	logerror("%s: tmap1_regs_r offset %02x\n", offset, machine().describe_context());
+	LOG("%s: tmap1_regs_r offset %02x\n", offset, machine().describe_context());
 	return m_tmap1_regs[offset];
 }
 
 READ8_MEMBER(xavix_state::tmap2_regs_r)
 {
-	logerror("%s: tmap2_regs_r offset %02x\n", offset, machine().describe_context());
+	LOG("%s: tmap2_regs_r offset %02x\n", offset, machine().describe_context());
 	return m_tmap2_regs[offset];
 }
 
@@ -871,44 +1058,10 @@ WRITE8_MEMBER(xavix_state::xavix_memoryemu_txarray_w)
 	else if (offset < 0x1000)
 	{
 		m_txarray[2] = data;
-	}	
+	}
 }
 
 READ8_MEMBER(xavix_state::xavix_memoryemu_txarray_r)
 {
-	if (offset < 0x100)
-	{
-		offset &= 0xff;
-		return ((offset>>4) | (offset<<4));
-	}
-	else if (offset < 0x200)
-	{
-		offset &= 0xff;
-		return ((offset>>4) | (~offset<<4));
-	}
-	else if (offset < 0x300)
-	{
-		offset &= 0xff;
-		return ((~offset>>4) | (offset<<4));
-	}
-	else if (offset < 0x400)
-	{
-		offset &= 0xff;
-		return ((~offset>>4) | (~offset<<4));
-	}
-	else if (offset < 0x800)
-	{
-		return m_txarray[0];
-	}
-	else if (offset < 0xc00)
-	{
-		return m_txarray[1];
-	}
-	else if (offset < 0x1000)
-	{
-		return m_txarray[2];
-	}
-
-	return 0xff;
+	return txarray_r(offset);
 }
-

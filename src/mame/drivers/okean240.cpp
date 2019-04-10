@@ -507,21 +507,22 @@ static GFXDECODE_START( gfx_okean240a )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(okean240_state::okean240t)
+void okean240_state::okean240t(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(12'000'000) / 6)
-	MCFG_DEVICE_PROGRAM_MAP(okean240_mem)
-	MCFG_DEVICE_IO_MAP(okean240t_io)
+	I8080(config, m_maincpu, XTAL(12'000'000) / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &okean240_state::okean240_mem);
+	m_maincpu->set_addrmap(AS_IO, &okean240_state::okean240t_io);
 
 	i8251_device &uart(I8251(config, "uart", 0));
 	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("uart", FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set("uart", FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set("uart", FUNC(i8251_device::write_cts));
 
 	I8255(config, m_ppikbd);
 	m_ppikbd->in_pa_callback().set(FUNC(okean240_state::okean240_port40_r));
@@ -538,51 +539,45 @@ MACHINE_CONFIG_START(okean240_state::okean240t)
 	pit.out_handler<1>().set("uart", FUNC(i8251_device::write_txc));
 	pit.out_handler<1>().append("uart", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("pic", PIC8259, 0)
+	PIC8259(config, "pic", 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen1", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 255)
-	MCFG_SCREEN_UPDATE_DRIVER(okean240_state, screen_update_okean240)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
+	screen1.set_refresh_hz(50);
+	screen1.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen1.set_size(256, 256);
+	screen1.set_visarea(0, 255, 0, 255);
+	screen1.set_screen_update(FUNC(okean240_state::screen_update_okean240));
+	screen1.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-MACHINE_CONFIG_END
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+}
 
-MACHINE_CONFIG_START(okean240_state::okean240a)
+void okean240_state::okean240a(machine_config &config)
+{
 	okean240t(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(okean240a_io)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_okean240a)
-	MCFG_DEVICE_REMOVE("rs232")
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
+	m_maincpu->set_addrmap(AS_IO, &okean240_state::okean240a_io);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_okean240a);
+	subdevice<rs232_port_device>("rs232")->set_default_option("keyboard");
 
 	m_ppikbd->in_pa_callback().set(FUNC(okean240_state::okean240a_port40_r));
 	m_ppikbd->in_pb_callback().set(FUNC(okean240_state::okean240a_port41_r));
 	m_ppikbd->in_pc_callback().set(FUNC(okean240_state::okean240a_port42_r));
 
-	MCFG_DEVICE_MODIFY("pit")
-	MCFG_PIT8253_CLK1(1536000) // artificial rate
-MACHINE_CONFIG_END
+	subdevice<pit8253_device>("pit")->set_clk<1>(1536000); // artificial rate
+}
 
-MACHINE_CONFIG_START(okean240_state::okean240)
+void okean240_state::okean240(machine_config &config)
+{
 	okean240t(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(okean240_io)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_okean240)
-	MCFG_DEVICE_REMOVE("uart")
-	MCFG_DEVICE_REMOVE("rs232")
-	MCFG_DEVICE_MODIFY("pit")
-	MCFG_PIT8253_OUT1_HANDLER(NOOP)
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(okean240_state, kbd_put))
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &okean240_state::okean240_io);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_okean240);
+	config.device_remove("uart");
+	config.device_remove("rs232");
+	subdevice<pit8253_device>("pit")->out_handler<1>().set_nop();
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(okean240_state::kbd_put));
+}
 
 /* ROM definition */
 ROM_START( okean240 )

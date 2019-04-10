@@ -31,12 +31,12 @@ Audio handlers
 
 WRITE8_MEMBER(qix_state::qix_dac_w)
 {
-	m_discrete->write(space, QIX_DAC_DATA, data);
+	m_discrete->write(QIX_DAC_DATA, data);
 }
 
 WRITE8_MEMBER(qix_state::qix_vol_w)
 {
-	m_discrete->write(space, QIX_VOL_DATA, data);
+	m_discrete->write(QIX_VOL_DATA, data);
 }
 
 
@@ -171,9 +171,10 @@ void qix_state::audio_map(address_map &map)
  *
  *************************************/
 
-MACHINE_CONFIG_START(qix_state::qix_audio)
-	MCFG_DEVICE_ADD("audiocpu", M6802, SOUND_CLOCK_OSC/2)      /* 0.92 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+void qix_state::qix_audio(machine_config &config)
+{
+	M6802(config, m_audiocpu, SOUND_CLOCK_OSC/2); /* 0.92 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &qix_state::audio_map);
 
 	PIA6821(config, m_sndpia0, 0);
 	m_sndpia0->writepa_handler().set(FUNC(qix_state::sync_sndpia1_porta_w));
@@ -199,13 +200,13 @@ MACHINE_CONFIG_START(qix_state::qix_audio)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, qix_discrete)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, qix_discrete);
+	m_discrete->add_route(0, "lspeaker", 1.0);
+	m_discrete->add_route(1, "rspeaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(qix_state::slither_audio)
+void qix_state::slither_audio(machine_config &config)
+{
 	PIA6821(config, m_sndpia0, 0);
 	m_sndpia0->readpa_handler().set_ioport("P2");
 	m_sndpia0->writepb_handler().set(FUNC(qix_state::slither_coinctl_w));
@@ -215,9 +216,9 @@ MACHINE_CONFIG_START(qix_state::slither_audio)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489, SLITHER_CLOCK_OSC/4/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SN76489(config, m_sn1, SLITHER_CLOCK_OSC/4/4);
+	m_sn1->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("sn2", SN76489, SLITHER_CLOCK_OSC/4/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SN76489(config, m_sn2, SLITHER_CLOCK_OSC/4/4);
+	m_sn2->add_route(ALL_OUTPUTS, "mono", 0.50);
+}

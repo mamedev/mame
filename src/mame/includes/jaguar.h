@@ -54,6 +54,7 @@ public:
 		, m_config_io(*this, "CONFIG")
 		, m_joy(*this, "JOY%u", 0U)
 		, m_buttons(*this, "BUTTONS%u", 0U)
+		, m_system(*this, "SYSTEM")
 		, m_is_r3000(false)
 		, m_is_cojag(false)
 		, m_hacks_enabled(false)
@@ -128,6 +129,7 @@ private:
 	optional_ioport m_config_io;
 	optional_ioport_array<8> m_joy;
 	optional_ioport_array<8> m_buttons;
+	optional_ioport m_system;
 
 	// configuration
 	bool m_is_r3000;
@@ -269,9 +271,9 @@ private:
 
 	image_init_result quickload(device_image_interface &image, const char *file_type, int quickload_size);
 	void cart_start();
-	IRQ_CALLBACK_MEMBER(jaguar_irq_callback);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( jaguar_cart );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( jaguar );
+	void cpu_space_map(address_map &map);
 	void dsp_map(address_map &map);
 	void dsp_rom_map(address_map &map);
 	void gpu_map(address_map &map);

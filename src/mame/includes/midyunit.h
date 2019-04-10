@@ -6,6 +6,10 @@
     Williams/Midway Y/Z-unit system
 
 **************************************************************************/
+#ifndef MAME_INCLUDES_MIDYUNIT_H
+#define MAME_INCLUDES_MIDYUNIT_H
+
+#pragma once
 
 #include "audio/williams.h"
 
@@ -15,25 +19,6 @@
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
-
-/* protection data types */
-struct protection_data
-{
-	uint16_t  reset_sequence[3];
-	uint16_t  data_sequence[100];
-};
-
-struct dma_state_t
-{
-	uint32_t      offset;         /* source offset, in bits */
-	int32_t       rowbytes;       /* source bytes to skip each row */
-	int32_t       xpos;           /* x position, clipped */
-	int32_t       ypos;           /* y position, clipped */
-	int32_t       width;          /* horizontal pixel count */
-	int32_t       height;         /* vertical pixel count */
-	uint16_t      palette;        /* palette base */
-	uint16_t      color;          /* current foreground color with palette */
-};
 
 
 class midyunit_state : public driver_device
@@ -88,13 +73,32 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(adpcm_irq_state_r);
 
 private:
+	/* protection data types */
+	struct protection_data
+	{
+		uint16_t  reset_sequence[3];
+		uint16_t  data_sequence[100];
+	};
+
+	struct dma_state_t
+	{
+		uint32_t      offset;         // source offset, in bits
+		int32_t       rowbytes;       // source bytes to skip each row
+		int32_t       xpos;           // x position, clipped
+		int32_t       ypos;           // y position, clipped
+		int32_t       width;          // horizontal pixel count
+		int32_t       height;         // vertical pixel count
+		uint16_t      palette;        // palette base
+		uint16_t      color;          // current foreground color with palette
+	};
+
 	enum
 	{
 		TIMER_DMA,
 		TIMER_AUTOERASE_LINE
 	};
 
-	required_device<cpu_device> m_maincpu;
+	required_device<tms34010_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
 	required_device<palette_device> m_palette;
@@ -172,3 +176,5 @@ private:
 	void init_generic(int bpp, int sound, int prot_start, int prot_end);
 	void term2_init_common(write16_delegate hack_w);
 };
+
+#endif // MAME_INCLUDES_MIDYUNIT_H

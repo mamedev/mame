@@ -84,12 +84,11 @@ WRITE8_MEMBER(thedeep_state::vram_1_w)
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(thedeep_state, thedeep)
+void thedeep_state::thedeep_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-	for (i = 0;i < 512;i++)
-		palette.set_pen_color(i,pal4bit(color_prom[0x400 + i] >> 0),pal4bit(color_prom[0x400 + i] >> 4),pal4bit(color_prom[0x200 + i] >> 0));
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < 512; i++)
+		palette.set_pen_color(i, pal4bit(color_prom[0x400 + i] >> 0), pal4bit(color_prom[0x400 + i] >> 4), pal4bit(color_prom[0x200 + i] >> 0));
 }
 
 /***************************************************************************

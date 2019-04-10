@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+#ifndef MAME_INCLUDES_SUNA8_H
+#define MAME_INCLUDES_SUNA8_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -213,3 +217,5 @@ private:
 #endif
 	output_finder<2> m_leds;
 };
+
+#endif // MAME_INCLUDES_SUNA8_H

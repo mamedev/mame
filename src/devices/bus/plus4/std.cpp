@@ -47,7 +47,7 @@ void plus4_standard_cartridge_device::device_start()
 //  plus4_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t plus4_standard_cartridge_device::plus4_cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
+uint8_t plus4_standard_cartridge_device::plus4_cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
 	if (!c1l && m_c1l.bytes())
 	{

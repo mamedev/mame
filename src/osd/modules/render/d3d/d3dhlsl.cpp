@@ -877,7 +877,7 @@ int shaders::create_resources()
 
 	focus_effect->add_uniform("Defocus", uniform::UT_VEC2, uniform::CU_FOCUS_SIZE);
 
-        post_effect->add_uniform("ShadowAlpha", uniform::UT_FLOAT, uniform::CU_POST_SHADOW_ALPHA);
+	post_effect->add_uniform("ShadowAlpha", uniform::UT_FLOAT, uniform::CU_POST_SHADOW_ALPHA);
 	post_effect->add_uniform("ShadowCount", uniform::UT_VEC2, uniform::CU_POST_SHADOW_COUNT);
 	post_effect->add_uniform("ShadowUV", uniform::UT_VEC2, uniform::CU_POST_SHADOW_UV);
 	post_effect->add_uniform("ShadowUVOffset", uniform::UT_VEC2, uniform::CU_POST_SHADOW_UV_OFFSET);
@@ -1244,17 +1244,18 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 	float screen_offset[2] = { xoffset, yoffset };
 
 	rgb_t back_color_rgb = screen->has_palette()
-		? screen->palette().palette()->entry_color(0)
-		: rgb_t(0, 0, 0);
+			? screen->palette().palette()->entry_color(0)
+			: rgb_t(0, 0, 0);
 	back_color_rgb = apply_color_convolution(back_color_rgb);
 	float back_color[3] = {
-		float(back_color_rgb.r()) / 255.0f,
-		float(back_color_rgb.g()) / 255.0f,
-		float(back_color_rgb.b()) / 255.0f };
+			float(back_color_rgb.r()) / 255.0f,
+			float(back_color_rgb.g()) / 255.0f,
+			float(back_color_rgb.b()) / 255.0f };
 
 	curr_effect = post_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("ShadowTexture", shadow_texture == nullptr ? nullptr : shadow_texture->get_finaltex());	curr_effect->set_int("ShadowTileMode", options->shadow_mask_tile_mode);
+	curr_effect->set_texture("ShadowTexture", shadow_texture == nullptr ? nullptr : shadow_texture->get_finaltex());
+	curr_effect->set_int("ShadowTileMode", options->shadow_mask_tile_mode);
 	curr_effect->set_texture("DiffuseTexture", rt->target_texture[next_index]);
 	curr_effect->set_vector("BackColor", 3, back_color);
 	curr_effect->set_vector("ScreenScale", 2, screen_scale);
@@ -1298,9 +1299,9 @@ int shaders::downsample_pass(d3d_render_target *rt, int source_index, poly_info 
 	{
 		curr_effect->set_vector("TargetDims", 2, rt->bloom_dims[bloom_index]);
 		curr_effect->set_texture("DiffuseTexture",
-			bloom_index == 0
-				? rt->source_texture[next_index]
-				: rt->bloom_texture[bloom_index - 1]);
+				bloom_index == 0
+					? rt->source_texture[next_index]
+					: rt->bloom_texture[bloom_index - 1]);
 
 		blit(rt->bloom_surface[bloom_index], false, D3DPT_TRIANGLELIST, 0, 2);
 	}

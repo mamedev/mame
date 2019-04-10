@@ -59,6 +59,7 @@
  @MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
  @MP1801   TMS1700   1981, Tiger Ditto/Tandy Pocket Repeat (model 60-2152)
  @MP2105   TMS1370   1979, Gakken/Entex Poker (6005)
+ @MP2110   TMS1370   1980, Gakken Invader/Tandy Fire Away
  @MP2139   TMS1370   1981, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
  @MP2726   TMS1040   1979, Tomy Break Up
  *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
@@ -69,7 +70,7 @@
  *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
  @MP3300   TMS1000   1979, Milton Bradley Simon (Rev F)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
- *MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
+ @MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
  @MP3321A  TMS1000   1979, Coleco Head to Head: Electronic Hockey
  *MP3352   TMS1200   1979, Tiger Sub Wars (model 7-490)
  @M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
@@ -143,7 +144,6 @@
   - finish bshipb SN76477 sound
   - improve elecbowl driver
   - is alphie(patent) the same as the final version?
-  - h2hhockey R9 timing is wrong: passing seems too slow, and in-game clock too fast
 
 ***************************************************************************/
 
@@ -199,6 +199,7 @@
 #include "gjackpot.lh"
 #include "gpoker.lh"
 #include "h2hbaseb.lh"
+#include "h2hbaskb.lh"
 #include "h2hboxing.lh"
 #include "h2hfootb.lh"
 #include "h2hhockey.lh"
@@ -211,6 +212,7 @@
 #include "merlin.lh" // clickable
 #include "mmerlin.lh" // clickable
 #include "monkeysee.lh"
+#include "phpball.lh"
 #include "quizwizc.lh"
 #include "raisedvl.lh"
 #include "simon.lh" // clickable
@@ -227,9 +229,9 @@
 #include "tcfballa.lh"
 #include "timaze.lh"
 #include "xl25.lh" // clickable
-#include "zodiac.lh"
+#include "zodiac.lh" // clickable
 
-#include "hh_tms1k_test.lh" // common test-layout - use external artwork
+//#include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
 
 // machine_start/reset
@@ -393,6 +395,23 @@ u8 hh_tms1k_state::read_rotated_inputs(int columns, u8 rowmask)
 	return ret;
 }
 
+void hh_tms1k_state::switch_change(int sel, u32 mask, bool next)
+{
+	// config switches (for direct control)
+	ioport_field *inp = m_inp_matrix[sel]->field(mask);
+
+	if (next && inp->has_next_setting())
+		inp->select_next_setting();
+	else if (!next && inp->has_previous_setting())
+		inp->select_previous_setting();
+}
+
+INPUT_CHANGED_MEMBER(hh_tms1k_state::reset_button)
+{
+	// when an input is directly wired to MCU INIT pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
 INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 {
 	m_power_on = (bool)(uintptr_t)param;
@@ -416,9 +435,11 @@ void hh_tms1k_state::power_off()
 
 /***************************************************************************
 
-  Minidrivers (subclass, I/O, Inputs, Machine Config)
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
+
+namespace {
 
 /***************************************************************************
 
@@ -440,8 +461,8 @@ void hh_tms1k_state::power_off()
 class matchnum_state : public hh_tms1k_state
 {
 public:
-	matchnum_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	matchnum_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -529,23 +550,35 @@ INPUT_PORTS_END
 
 static const s16 matchnum_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
 
-MACHINE_CONFIG_START(matchnum_state::matchnum)
-
+void matchnum_state::matchnum(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, matchnum_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, matchnum_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, matchnum_state, write_o))
+	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set(FUNC(matchnum_state::read_k));
+	m_maincpu->r().set(FUNC(matchnum_state::write_r));
+	m_maincpu->o().set(FUNC(matchnum_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_matchnum);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(4, matchnum_speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(4, matchnum_speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( matchnum )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0163", 0x0000, 0x0400, CRC(37507600) SHA1(b1d4d8ea563e97ef378b42c44cb3ea4eb6abe0d2) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_matchnum_output.pla", 0, 365, CRC(da29670c) SHA1(bcec28bf25dc8c81d08851ad8a3f4e89f413017a) )
+ROM_END
 
 
 
@@ -569,8 +602,8 @@ MACHINE_CONFIG_END
 class arrball_state : public hh_tms1k_state
 {
 public:
-	arrball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	arrball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -629,23 +662,35 @@ INPUT_PORTS_END
 
 static const s16 arrball_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
 
-MACHINE_CONFIG_START(arrball_state::arrball)
-
+void arrball_state::arrball(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, arrball_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, arrball_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, arrball_state, write_o))
+	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set(FUNC(arrball_state::read_k));
+	m_maincpu->r().set(FUNC(arrball_state::write_r));
+	m_maincpu->o().set(FUNC(arrball_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_arrball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(4, arrball_speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(4, arrball_speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( arrball )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0166", 0x0000, 0x0400, CRC(a78694db) SHA1(362aa6e356288e8df7da610246bd01fe72985d57) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_arrball_output.pla", 0, 365, CRC(ffc206fb) SHA1(339be3f066fb2f075211c554e81260b49cd83d15) )
+ROM_END
 
 
 
@@ -677,8 +722,8 @@ MACHINE_CONFIG_END
 class mathmagi_state : public hh_tms1k_state
 {
 public:
-	mathmagi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	mathmagi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -772,57 +817,41 @@ static INPUT_PORTS_START( mathmagi )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-// output PLA is not decapped
+// output PLA is not decapped, this was made by hand
 static const u16 mathmagi_output_pla[0x20] =
 {
-	lA+lB+lC+lD+lE+lF,      // 0
-	lB+lC,                  // 1
-	lA+lB+lG+lE+lD,         // 2
-	lA+lB+lG+lC+lD,         // 3
-	lF+lB+lG+lC,            // 4
-	lA+lF+lG+lC+lD,         // 5
-	lA+lF+lG+lC+lD+lE,      // 6
-	lA+lB+lC,               // 7
-	lA+lB+lC+lD+lE+lF+lG,   // 8
-	lA+lB+lG+lF+lC+lD,      // 9
-	lA+lB+lG+lE,            // question mark
-	lE+lG,                  // r
-	lD,                     // underscore?
-	lA+lF+lG+lE+lD,         // E
-	lG,                     // -
-	0,                      // empty
-	0,                      // empty
-	lG,                     // lamp 4 or MATH -
-	lD,                     // lamp 3
-	lF+lE+lD+lC+lG,         // b
-	lB,                     // lamp 2
-	lB+lG,                  // MATH +
-	lB+lC,                  // MATH mul
-	lF+lG+lB+lC+lD,         // y
-	lA,                     // lamp 1
-	lA+lG,                  // MATH div
-	lA+lD,                  // EQUALS
-	0,                      // ?
-	0,                      // ?
-	lE+lD+lC+lG,            // o
-	0,                      // ?
-	lA+lF+lE+lD+lC          // G
+	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, // 0, 1, 2, 3, 4, 5, 6, 7
+	0x7f, 0x6f, 0x53, 0x50, 0x08, 0x79, 0x40, 0x00, // 8, 9, questionmark, r, underscore?, E, -(negative), empty
+	0x00, 0x40, 0x08, 0x7c, 0x02, 0x42, 0x06, 0x6e, // empty, led4/-, led3, b, led2, +, ×, y
+	0x01, 0x41, 0x09, 0,    0,    0x5c, 0,    0x3d  // led1, ÷, =, ?, ?, o, ?, G
 };
 
-MACHINE_CONFIG_START(mathmagi_state::mathmagi)
-
+void mathmagi_state::mathmagi(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 175000) // approximation - RC osc. R=68K, C=82pF
-	MCFG_TMS1XXX_OUTPUT_PLA(mathmagi_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, mathmagi_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, mathmagi_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, mathmagi_state, write_o))
+	TMS1100(config, m_maincpu, 175000); // approximation - RC osc. R=68K, C=82pF
+	m_maincpu->set_output_pla(mathmagi_output_pla);
+	m_maincpu->k().set(FUNC(mathmagi_state::read_k));
+	m_maincpu->r().set(FUNC(mathmagi_state::write_r));
+	m_maincpu->o().set(FUNC(mathmagi_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_mathmagi);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
+
+// roms
+
+ROM_START( mathmagi )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1030", 0x0000, 0x0800, CRC(a81d7ccb) SHA1(4756ce42f1ea28ce5fe6498312f8306f10370969) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_mathmagi_output.pla", 0, 365, NO_DUMP )
+ROM_END
 
 
 
@@ -849,8 +878,8 @@ MACHINE_CONFIG_END
 class bcheetah_state : public hh_tms1k_state
 {
 public:
-	bcheetah_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	bcheetah_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -915,18 +944,30 @@ static INPUT_PORTS_START( bcheetah )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(bcheetah_state::bcheetah)
-
+void bcheetah_state::bcheetah(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 100000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, bcheetah_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, bcheetah_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bcheetah_state, write_o))
+	TMS1000(config, m_maincpu, 100000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set(FUNC(bcheetah_state::read_k));
+	m_maincpu->r().set(FUNC(bcheetah_state::write_r));
+	m_maincpu->o().set(FUNC(bcheetah_state::write_o));
 
 	config.set_default_layout(layout_bcheetah);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
+
+// roms
+
+ROM_START( bcheetah )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0915", 0x0000, 0x0400, CRC(2968c81e) SHA1(d1e6691952600e88ccf626cb3d683419a1e8468c) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_bcheetah_output.pla", 0, 365, CRC(cc6d1ecd) SHA1(b0635a841d8850c36c1f414abe0571b81884b972) )
+ROM_END
 
 
 
@@ -947,8 +988,8 @@ MACHINE_CONFIG_END
 class amaztron_state : public hh_tms1k_state
 {
 public:
-	amaztron_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	amaztron_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1042,22 +1083,34 @@ static INPUT_PORTS_START( amaztron )
 	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(amaztron_state::amaztron)
-
+void amaztron_state::amaztron(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 300000) // approximation - RC osc. R=33K?, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, amaztron_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, amaztron_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, amaztron_state, write_o))
+	TMS1100(config, m_maincpu, 300000); // approximation - RC osc. R=33K?, C=100pF
+	m_maincpu->k().set(FUNC(amaztron_state::read_k));
+	m_maincpu->r().set(FUNC(amaztron_state::write_r));
+	m_maincpu->o().set(FUNC(amaztron_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_amaztron);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( amaztron )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp3405", 0x0000, 0x0800, CRC(9cbc0009) SHA1(17772681271b59280687492f37fa0859998f041d) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_amaztron_output.pla", 0, 365, CRC(f3875384) SHA1(3c256a3db4f0aa9d93cf78124db39f4cbdc57e4a) )
+ROM_END
 
 
 
@@ -1077,8 +1130,8 @@ MACHINE_CONFIG_END
 class zodiac_state : public hh_tms1k_state
 {
 public:
-	zodiac_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	zodiac_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1113,7 +1166,7 @@ WRITE16_MEMBER(zodiac_state::write_r)
 WRITE16_MEMBER(zodiac_state::write_o)
 {
 	// O0-O7: digit segment/led data
-	m_o = data;
+	m_o = bitswap<8>(data,0,7,6,5,4,3,2,1);
 	prepare_display();
 }
 
@@ -1172,7 +1225,7 @@ static INPUT_PORTS_START( zodiac )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter") PORT_CHAR(13)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("Clear") PORT_CHAR(8)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("Clear") PORT_CHAR(8)
 
 	PORT_START("IN.5") // R8
 	PORT_CONFNAME( 0x03, 0x01, "Mode")
@@ -1182,60 +1235,42 @@ static INPUT_PORTS_START( zodiac )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-// output PLA is not decapped
+// output PLA is not decapped, dumped electronically
 static const u16 zodiac_output_pla[0x20] =
 {
-	0x80,                   // empty/led 1/7
-	lC,                     // i/led 2/8
-	lE+lG,                  // r/led 3/9
-	lC+lE+lG,               // n
-	lF,                     // seg F/led 4/10
-	0,                      // ?
-	0,                      // ?
-	lC+lE+lF+lG,            // h
-	lB,                     // seg B/led 5/11
-	lD,                     // seg D/led 6/12
-	0,                      // ?
-	0,                      // ?
-	0,                      // ?
-	0,                      // ?
-	lA+lB+lE+lF+lG,         // P
-	0,                      // ?
-	lA+lB+lC+lD+lE+lF,      // 0
-	lB+lC,                  // 1
-	lA+lB+lD+lE+lG,         // 2
-	lA+lB+lC+lD+lG,         // 3
-	lB+lC+lF+lG,            // 4
-	lA+lC+lD+lF+lG,         // 5
-	lA+lC+lD+lE+lF+lG,      // 6
-	lA+lB+lC,               // 7
-	lA+lB+lC+lD+lE+lF+lG,   // 8
-	lA+lB+lC+lD+lF+lG,      // 9
-	lA+lB+lC+lE+lF+lG,      // A
-	lB+lC+lD+lE+lG,         // d
-	lA+lD+lE+lF+lG,         // E
-	lB+lC+lD+lE,            // J
-	lD+lE+lF,               // L
-	lB+lC+lD+lE+lF          // U
+	0x01, 0x08, 0xa0, 0xa8, 0x40, 0x48, 0xe0, 0xe8, 0x06, 0x10, 0xa6, 0xb0, 0x46, 0x50, 0xe6, 0xf0,
+	0x7e, 0x0c, 0xb6, 0x9e, 0xcc, 0xda, 0xfa, 0x0e, 0xfe, 0xce, 0xee, 0xbc, 0xf2, 0x3c, 0x70, 0x7c
 };
 
-MACHINE_CONFIG_START(zodiac_state::zodiac)
-
+void zodiac_state::zodiac(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 500000) // approximation - RC osc. R=18K, C=100pF
-	MCFG_TMS1XXX_OUTPUT_PLA(zodiac_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, zodiac_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, zodiac_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, zodiac_state, write_o))
+	TMS1100(config, m_maincpu, 500000); // approximation - RC osc. R=18K, C=100pF
+	m_maincpu->set_output_pla(zodiac_output_pla);
+	m_maincpu->k().set(FUNC(zodiac_state::read_k));
+	m_maincpu->r().set(FUNC(zodiac_state::write_r));
+	m_maincpu->o().set(FUNC(zodiac_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_zodiac);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( zodiac )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp3435", 0x0000, 0x0800, CRC(ecdc3160) SHA1(a7e82d66314a039fcffeddf99919d9f9ad42d61d) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, BAD_DUMP CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) ) // not verified
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_zodiac_output.pla", 0, 365, NO_DUMP )
+ROM_END
 
 
 
@@ -1256,8 +1291,8 @@ MACHINE_CONFIG_END
 class cqback_state : public hh_tms1k_state
 {
 public:
-	cqback_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	cqback_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1335,22 +1370,34 @@ static INPUT_PORTS_START( cqback )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(cqback_state::cqback)
-
+void cqback_state::cqback(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 310000) // approximation - RC osc. R=33K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cqback_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cqback_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cqback_state, write_o))
+	TMS1100(config, m_maincpu, 310000); // approximation - RC osc. R=33K, C=100pF
+	m_maincpu->k().set(FUNC(cqback_state::read_k));
+	m_maincpu->r().set(FUNC(cqback_state::write_r));
+	m_maincpu->o().set(FUNC(cqback_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_cqback);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( cqback )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp3415.u4", 0x0000, 0x0800, CRC(65ebdabf) SHA1(9b5cf5adaf9132ced87f611ae8c3148b9b62ba89) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_cqback_output.pla", 0, 365, CRC(c6dcbfd0) SHA1(593b6b7de981a28d1b4a33336b39df92d02ed4f4) )
+ROM_END
 
 
 
@@ -1374,8 +1421,8 @@ MACHINE_CONFIG_END
 class h2hfootb_state : public hh_tms1k_state
 {
 public:
-	h2hfootb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	h2hfootb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1453,22 +1500,34 @@ static INPUT_PORTS_START( h2hfootb )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(h2hfootb_state::h2hfootb)
-
+void h2hfootb_state::h2hfootb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 310000) // approximation - RC osc. R=39K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, h2hfootb_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, h2hfootb_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, h2hfootb_state, write_o))
+	TMS1100(config, m_maincpu, 310000); // approximation - RC osc. R=39K, C=100pF
+	m_maincpu->k().set(FUNC(h2hfootb_state::read_k));
+	m_maincpu->r().set(FUNC(h2hfootb_state::write_r));
+	m_maincpu->o().set(FUNC(h2hfootb_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_h2hfootb);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( h2hfootb )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp3460.u3", 0x0000, 0x0800, CRC(3a4e53a8) SHA1(5052e706f992c6c4bada1fa7769589eec3df6471) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_h2hfootb_output.pla", 0, 365, CRC(c8d85873) SHA1(16bd6fc8e3cd16d5f8fd32d0c74e67de77f5487e) )
+ROM_END
 
 
 
@@ -1476,45 +1535,63 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Coleco Head to Head: Electronic Basketball (model 2150)
+  * TMS1000NLL MP3320A (die label 1000E MP3320A)
+  * 2-digit 7seg LED display, LED grid display, 1-bit sound
+
   Coleco Head to Head: Electronic Hockey (model 2160)
   * TMS1000NLL E MP3321A (die label 1000E MP3321A)
-  * 2-digit 7seg LED display, LED grid display, 1-bit sound
+  * same PCB/hardware as above
 
   Unlike the COP420 version(see hh_cop400.cpp driver), each game has its own MCU.
 
 ***************************************************************************/
 
-class h2hhockey_state : public hh_tms1k_state
+class h2hbaskb_state : public hh_tms1k_state
 {
 public:
-	h2hhockey_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag),
+	h2hbaskb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
 		m_cap_empty_timer(*this, "cap_empty")
 	{ }
 
 	required_device<timer_device> m_cap_empty_timer;
 	TIMER_DEVICE_CALLBACK_MEMBER(cap_empty_callback);
-	bool m_cap;
+	bool m_cap_state;
+	attotime m_cap_charge;
 
 	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void h2hbaskb(machine_config &config);
 	void h2hhockey(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 };
 
-// handlers
-
-TIMER_DEVICE_CALLBACK_MEMBER(h2hhockey_state::cap_empty_callback)
+void h2hbaskb_state::machine_start()
 {
-	if (~m_r & 0x200)
-		m_cap = false;
+	hh_tms1k_state::machine_start();
+
+	// zerofill/register for savestates
+	m_cap_state = false;
+	m_cap_charge = attotime::zero;
+
+	save_item(NAME(m_cap_state));
+	save_item(NAME(m_cap_charge));
 }
 
-void h2hhockey_state::prepare_display()
+// handlers
+
+TIMER_DEVICE_CALLBACK_MEMBER(h2hbaskb_state::cap_empty_callback)
+{
+	if (~m_r & 0x200)
+		m_cap_state = false;
+}
+
+void h2hbaskb_state::prepare_display()
 {
 	// R6,R7 are commons for R0-R5
 	u16 sel = 0;
@@ -1525,7 +1602,7 @@ void h2hhockey_state::prepare_display()
 	display_matrix(7, 6+6, m_o, sel);
 }
 
-WRITE16_MEMBER(h2hhockey_state::write_r)
+WRITE16_MEMBER(h2hbaskb_state::write_r)
 {
 	// R0-R3: input mux
 	m_inp_mux = (data & 0xf);
@@ -1534,32 +1611,46 @@ WRITE16_MEMBER(h2hhockey_state::write_r)
 	m_speaker->level_w(data >> 8 & 1);
 
 	// R9: K8 and 15uF cap to V- (used as timer)
-	if (data & 0x200)
-		m_cap = true;
-	else if (m_r & 0x200) // falling edge
-		m_cap_empty_timer->adjust(attotime::from_msec(28)); // not accurate
+	// rising edge, remember the time
+	if (data & ~m_r & 0x200)
+	{
+		m_cap_state = true;
+		m_cap_charge = machine().time();
+	}
+	// falling edge, determine how long K8 should stay up
+	if (~data & m_r & 0x200)
+	{
+		const attotime full = attotime::from_usec(1300); // approx. charge time
+		const int factor = 27; // approx. factor for charge/discharge to logic 0
+
+		attotime charge = machine().time() - m_cap_charge;
+		if (charge > full)
+			charge = full;
+
+		m_cap_empty_timer->adjust(charge * factor);
+	}
 
 	// R0-R7: led select
 	m_r = data;
 	prepare_display();
 }
 
-WRITE16_MEMBER(h2hhockey_state::write_o)
+WRITE16_MEMBER(h2hbaskb_state::write_o)
 {
 	// O1-O7: led data
 	m_o = data >> 1 & 0x7f;
 	prepare_display();
 }
 
-READ8_MEMBER(h2hhockey_state::read_k)
+READ8_MEMBER(h2hbaskb_state::read_k)
 {
 	// K1-K4: multiplexed inputs, K8: R9 and capacitor
-	return (read_inputs(4) & 7) | (m_cap ? 8 : 0);
+	return (read_inputs(4) & 7) | (m_cap_state ? 8 : 0);
 }
 
 // config
 
-static INPUT_PORTS_START( h2hhockey )
+static INPUT_PORTS_START( h2hbaskb )
 	PORT_START("IN.0") // R0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Pass CW") // clockwise
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Pass CCW") // counter-clockwise
@@ -1580,38 +1671,65 @@ static INPUT_PORTS_START( h2hhockey )
 	PORT_CONFSETTING(    0x04, "2" )
 
 	PORT_START("IN.3") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Right")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Left")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void h2hhockey_state::machine_start()
+static INPUT_PORTS_START( h2hhockey )
+	PORT_INCLUDE( h2hbaskb )
+
+	PORT_MODIFY("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Left")
+INPUT_PORTS_END
+
+void h2hbaskb_state::h2hbaskb(machine_config &config)
 {
-	hh_tms1k_state::machine_start();
-
-	// zerofill/register for savestates
-	m_cap = false;
-	save_item(NAME(m_cap));
-}
-
-MACHINE_CONFIG_START(h2hhockey_state::h2hhockey)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 375000) // approximation - RC osc. R=43K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, h2hhockey_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, h2hhockey_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, h2hhockey_state, write_o))
+	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=43K, C=100pF
+	m_maincpu->k().set(FUNC(h2hbaskb_state::read_k));
+	m_maincpu->r().set(FUNC(h2hbaskb_state::write_r));
+	m_maincpu->o().set(FUNC(h2hbaskb_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD("cap_empty", h2hhockey_state, cap_empty_callback)
+	TIMER(config, "cap_empty").configure_generic(FUNC(h2hbaskb_state::cap_empty_callback));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_h2hhockey);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_h2hbaskb);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+void h2hbaskb_state::h2hhockey(machine_config &config)
+{
+	h2hbaskb(config);
+	config.set_default_layout(layout_h2hhockey);
+}
+
+// roms
+
+ROM_START( h2hbaskb )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3320a", 0x0000, 0x0400, CRC(39a63f43) SHA1(14a765e42a39f8d3a465c990e09dd651e595a1c5) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_h2hbaskb_output.pla", 0, 365, CRC(9d1a91e1) SHA1(96303eb22375129b0dfbfcd823c8ca5b919511bc) )
+ROM_END
+
+ROM_START( h2hhockey )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3321a", 0x0000, 0x0400, CRC(e974e604) SHA1(ed740c98ce96ad70ee5237eccae1f54a75ad8100) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_h2hhockey_output.pla", 0, 365, CRC(9d1a91e1) SHA1(96303eb22375129b0dfbfcd823c8ca5b919511bc) )
+ROM_END
 
 
 
@@ -1633,8 +1751,8 @@ MACHINE_CONFIG_END
 class h2hbaseb_state : public hh_tms1k_state
 {
 public:
-	h2hbaseb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	h2hbaseb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1643,14 +1761,27 @@ public:
 	DECLARE_READ8_MEMBER(read_k);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
 	void h2hbaseb(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
 };
 
+void h2hbaseb_state::machine_reset()
+{
+	hh_tms1k_state::machine_reset();
+	set_clock();
+}
+
 // handlers
+
+void h2hbaseb_state::set_clock()
+{
+	// MCU clock is from an RC circuit with C=47pF, and R value is depending on
+	// skill switch: R=51K(1) or 43K(2)
+	m_maincpu->set_unscaled_clock((m_inp_matrix[5]->read() & 1) ? 400000 : 350000);
+}
 
 void h2hbaseb_state::prepare_display()
 {
@@ -1717,40 +1848,34 @@ static INPUT_PORTS_START( h2hbaseb )
 	PORT_CONFSETTING(    0x01, "2" )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(h2hbaseb_state::skill_switch)
+void h2hbaseb_state::h2hbaseb(machine_config &config)
 {
-	set_clock();
-}
-
-void h2hbaseb_state::set_clock()
-{
-	// MCU clock is from an RC circuit with C=47pF, and R value is depending on
-	// skill switch: R=51K(1) or 43K(2)
-	m_maincpu->set_unscaled_clock((m_inp_matrix[5]->read() & 1) ? 400000 : 350000);
-}
-
-void h2hbaseb_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	set_clock();
-}
-
-MACHINE_CONFIG_START(h2hbaseb_state::h2hbaseb)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1170, 350000) // see set_clock
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, h2hbaseb_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, h2hbaseb_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, h2hbaseb_state, write_o))
+	TMS1170(config, m_maincpu, 350000); // see set_clock
+	m_maincpu->k().set(FUNC(h2hbaseb_state::read_k));
+	m_maincpu->r().set(FUNC(h2hbaseb_state::write_r));
+	m_maincpu->o().set(FUNC(h2hbaseb_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_h2hbaseb);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( h2hbaseb )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1525", 0x0000, 0x0800, CRC(b5d6bf9b) SHA1(2cc9f35f077c1209c46d16ec853af87e4725c2fd) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_h2hbaseb_output.pla", 0, 365, CRC(cb3d7e38) SHA1(6ab4a7c52e6010b7c7158463cb499973e52ff556) )
+ROM_END
 
 
 
@@ -1769,8 +1894,8 @@ MACHINE_CONFIG_END
 class h2hboxing_state : public hh_tms1k_state
 {
 public:
-	h2hboxing_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	h2hboxing_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -1847,22 +1972,34 @@ static INPUT_PORTS_START( h2hboxing )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Block")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(h2hboxing_state::h2hboxing)
-
+void h2hboxing_state::h2hboxing(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 350000) // approximation - RC osc. R=39K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, h2hboxing_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, h2hboxing_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, h2hboxing_state, write_o))
+	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=39K, C=100pF
+	m_maincpu->k().set(FUNC(h2hboxing_state::read_k));
+	m_maincpu->r().set(FUNC(h2hboxing_state::write_r));
+	m_maincpu->o().set(FUNC(h2hboxing_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_h2hboxing);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( h2hboxing )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "m34018", 0x0000, 0x0800, CRC(e26a11a3) SHA1(aa2735088d709fa8d9188c4fb7982a53e3a8c1bc) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_h2hboxing_output.pla", 0, 365, CRC(ffb0e63d) SHA1(31ee3f779270a23f05f9ad508283d2569ef069f1) )
+ROM_END
 
 
 
@@ -1896,8 +2033,8 @@ MACHINE_CONFIG_END
 class quizwizc_state : public hh_tms1k_state
 {
 public:
-	quizwizc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag),
+	quizwizc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
 		m_pinout(0)
 	{ }
 
@@ -1913,6 +2050,14 @@ public:
 protected:
 	virtual void machine_start() override;
 };
+
+void quizwizc_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+
+	// register for savestates
+	save_item(NAME(m_pinout));
+}
 
 // handlers
 
@@ -2010,36 +2155,40 @@ static INPUT_PORTS_START( quizwizc )
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void quizwizc_state::machine_start()
+void quizwizc_state::quizwizc(machine_config &config)
 {
-	hh_tms1k_state::machine_start();
-
-	// register for savestates
-	save_item(NAME(m_pinout));
-}
-
-MACHINE_CONFIG_START(quizwizc_state::quizwizc)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 300000) // approximation - RC osc. R=43K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, quizwizc_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, quizwizc_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, quizwizc_state, write_o))
+	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=43K, C=100pF
+	m_maincpu->k().set(FUNC(quizwizc_state::read_k));
+	m_maincpu->r().set(FUNC(quizwizc_state::write_r));
+	m_maincpu->o().set(FUNC(quizwizc_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_quizwizc);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "quizwiz_cart")
-	MCFG_GENERIC_MANDATORY
-	MCFG_GENERIC_LOAD(quizwizc_state, cartridge)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "quizwiz")
-MACHINE_CONFIG_END
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "quizwiz_cart"));
+	cartslot.set_must_be_loaded(true);
+	cartslot.set_device_load(device_image_load_delegate(&quizwizc_state::device_image_load_cartridge, this));
+	SOFTWARE_LIST(config, "cart_list").set_original("quizwiz");
+}
+
+// roms
+
+ROM_START( quizwizc )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "m32001", 0x0000, 0x0400, CRC(053657eb) SHA1(38c84f7416f79aa679f434a3d35df54cd9aa528a) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common3_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_quizwizc_output.pla", 0, 365, CRC(475b7053) SHA1(8f61bf736eb41d7029a6b165cc0a184ba0a70a2a) )
+ROM_END
 
 
 
@@ -2073,8 +2222,8 @@ MACHINE_CONFIG_END
 class tc4_state : public hh_tms1k_state
 {
 public:
-	tc4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag),
+	tc4_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
 		m_pinout(0)
 	{ }
 
@@ -2090,6 +2239,14 @@ public:
 protected:
 	virtual void machine_start() override;
 };
+
+void tc4_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+
+	// register for savestates
+	save_item(NAME(m_pinout));
+}
 
 // handlers
 
@@ -2186,36 +2343,41 @@ static INPUT_PORTS_START( tc4 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 D/K Button")
 INPUT_PORTS_END
 
-void tc4_state::machine_start()
+void tc4_state::tc4(machine_config &config)
 {
-	hh_tms1k_state::machine_start();
-
-	// register for savestates
-	save_item(NAME(m_pinout));
-}
-
-MACHINE_CONFIG_START(tc4_state::tc4)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1400, 450000) // approximation - RC osc. R=27.3K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tc4_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tc4_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tc4_state, write_o))
+	TMS1400(config, m_maincpu, 450000); // approximation - RC osc. R=27.3K, C=100pF
+	m_maincpu->k().set(FUNC(tc4_state::read_k));
+	m_maincpu->r().set(FUNC(tc4_state::write_r));
+	m_maincpu->o().set(FUNC(tc4_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_tc4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "tc4_cart")
-	MCFG_GENERIC_MANDATORY // system won't power on without cartridge
-	MCFG_GENERIC_LOAD(tc4_state, cartridge)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "tc4")
-MACHINE_CONFIG_END
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "tc4_cart"));
+	cartslot.set_must_be_loaded(true); // system won't power on without cartridge
+	cartslot.set_device_load(device_image_load_delegate(&tc4_state::device_image_load_cartridge, this));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("tc4");
+}
+
+// roms
+
+ROM_START( tc4 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp7334", 0x0000, 0x1000, CRC(923f3821) SHA1(a9ae342d7ff8dae1dedcd1e4984bcfae68586581) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_tc4_output.pla", 0, 557, CRC(3b908725) SHA1(f83bf5faa5b3cb51f87adc1639b00d6f9a71ad19) )
+ROM_END
 
 
 
@@ -2240,8 +2402,8 @@ MACHINE_CONFIG_END
 class cnbaskb_state : public hh_tms1k_state
 {
 public:
-	cnbaskb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	cnbaskb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -2309,22 +2471,34 @@ static INPUT_PORTS_START( cnbaskb )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(cnbaskb_state::cnbaskb)
-
+void cnbaskb_state::cnbaskb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 400000) // approximation - RC osc. R=39K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cnbaskb_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cnbaskb_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cnbaskb_state, write_o))
+	TMS1000(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
+	m_maincpu->k().set(FUNC(cnbaskb_state::read_k));
+	m_maincpu->r().set(FUNC(cnbaskb_state::write_r));
+	m_maincpu->o().set(FUNC(cnbaskb_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_cnbaskb);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( cnbaskb )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0907", 0x0000, 0x0400, CRC(35f84f0f) SHA1(744ca60bb853a2785184042e747530a9e02488f8) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_cnbaskb_output.pla", 0, 365, CRC(b4e28956) SHA1(8356112da71b351420a88d7e394e7d03e429368c) )
+ROM_END
 
 
 
@@ -2351,8 +2525,8 @@ MACHINE_CONFIG_END
 class cmsport_state : public hh_tms1k_state
 {
 public:
-	cmsport_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	cmsport_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -2422,22 +2596,34 @@ static INPUT_PORTS_START( cmsport )
 	PORT_CONFSETTING(    0x08, "2" ) // professional
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(cmsport_state::cmsport)
-
+void cmsport_state::cmsport(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 375000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cmsport_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cmsport_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cmsport_state, write_o))
+	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set(FUNC(cmsport_state::read_k));
+	m_maincpu->r().set(FUNC(cmsport_state::write_r));
+	m_maincpu->o().set(FUNC(cmsport_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_cmsport);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( cmsport )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0168.u1", 0x0000, 0x0400, CRC(0712a268) SHA1(bd4e23e5c17b28c52e7e769e44773cc9c8839bed) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_cmsport_output.pla", 0, 365, CRC(7defa140) SHA1(477e3cb55e79938d6acaa911e410f6dcb974c218) )
+ROM_END
 
 
 
@@ -2466,8 +2652,8 @@ MACHINE_CONFIG_END
 class cnfball_state : public hh_tms1k_state
 {
 public:
-	cnfball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	cnfball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -2548,23 +2734,35 @@ INPUT_PORTS_END
 
 static const s16 cnfball_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
 
-MACHINE_CONFIG_START(cnfball_state::cnfball)
-
+void cnfball_state::cnfball(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 400000) // approximation - RC osc. R=39K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cnfball_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cnfball_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cnfball_state, write_o))
+	TMS1000(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
+	m_maincpu->k().set(FUNC(cnfball_state::read_k));
+	m_maincpu->r().set(FUNC(cnfball_state::write_r));
+	m_maincpu->o().set(FUNC(cnfball_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_cnfball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(4, cnfball_speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(4, cnfball_speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( cnfball )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0170", 0x0000, 0x0400, CRC(50e8a44f) SHA1(fea6ae03c4ef329d825f8688e6854df15023d47e) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_cnfball_output.pla", 0, 365, CRC(0af52f64) SHA1(b4cf450e4d895eddb67448aa69e4f18a5a84e033) )
+ROM_END
 
 
 
@@ -2587,8 +2785,8 @@ MACHINE_CONFIG_END
 class cnfball2_state : public hh_tms1k_state
 {
 public:
-	cnfball2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	cnfball2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -2669,28 +2867,40 @@ static const u16 cnfball2_output_pla[0x20] =
 	// first half was dumped electronically
 	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x40, 0x01, 0x08, 0x02, 0x04, 0x00,
 
-	// rest is unknown
+	// rest is unused, game only outputs with status bit clear
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0
 };
 
-MACHINE_CONFIG_START(cnfball2_state::cnfball2)
-
+void cnfball2_state::cnfball2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_OUTPUT_PLA(cnfball2_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cnfball2_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cnfball2_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cnfball2_state, write_o))
+	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->set_output_pla(cnfball2_output_pla);
+	m_maincpu->k().set(FUNC(cnfball2_state::read_k));
+	m_maincpu->r().set(FUNC(cnfball2_state::write_r));
+	m_maincpu->o().set(FUNC(cnfball2_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_cnfball2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( cnfball2 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1181", 0x0000, 0x0800, CRC(4553a840) SHA1(2e1132c9bc51641f77ba7f2430b5a3b2766b3a3d) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_cnfball2_output.pla", 0, 365, NO_DUMP )
+ROM_END
 
 
 
@@ -2715,16 +2925,14 @@ MACHINE_CONFIG_END
 class eleciq_state : public hh_tms1k_state
 {
 public:
-	eleciq_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	eleciq_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	void eleciq(machine_config &config);
 };
 
@@ -2807,31 +3015,37 @@ static INPUT_PORTS_START( eleciq )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, eleciq_state, reset_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, reset_button, nullptr)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(eleciq_state::reset_button)
+void eleciq_state::eleciq(machine_config &config)
 {
-	// reset button is directly wired to TMS1000 INIT pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
-
-MACHINE_CONFIG_START(eleciq_state::eleciq)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=47K, C=50pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, eleciq_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, eleciq_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, eleciq_state, write_o))
+	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=50pF
+	m_maincpu->k().set(FUNC(eleciq_state::read_k));
+	m_maincpu->r().set(FUNC(eleciq_state::write_r));
+	m_maincpu->o().set(FUNC(eleciq_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_eleciq);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( eleciq )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0908", 0x0000, 0x0400, CRC(db59b82c) SHA1(c9a6bcba208969560495ad9f8775f53de16a69c3) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_eleciq_output.pla", 0, 365, CRC(b8e04232) SHA1(22eed6d9b1fb1e5c9974ea3df16cda71a39aad57) )
+ROM_END
 
 
 
@@ -2852,8 +3066,8 @@ MACHINE_CONFIG_END
 class esoccer_state : public hh_tms1k_state
 {
 public:
-	esoccer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	esoccer_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -2921,22 +3135,34 @@ static INPUT_PORTS_START( esoccer )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(esoccer_state::esoccer)
-
+void esoccer_state::esoccer(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 350000) // approximation - RC osc. R=47K, C=33pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, esoccer_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, esoccer_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, esoccer_state, write_o))
+	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=33pF
+	m_maincpu->k().set(FUNC(esoccer_state::read_k));
+	m_maincpu->r().set(FUNC(esoccer_state::write_r));
+	m_maincpu->o().set(FUNC(esoccer_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_esoccer);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( esoccer )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0158.ic1", 0x0000, 0x0400, CRC(ae4581ea) SHA1(5f6881f8247094abf8cffb17f6e6586e94cff38c) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_esoccer_output.pla", 0, 365, CRC(c6eeabbd) SHA1(99d07902126b5a1c1abf43340f30d3390da5fa92) )
+ROM_END
 
 
 
@@ -2976,8 +3202,8 @@ MACHINE_CONFIG_END
 class ebball_state : public hh_tms1k_state
 {
 public:
-	ebball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	ebball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -3055,22 +3281,34 @@ static INPUT_PORTS_START( ebball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Batter")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(ebball_state::ebball)
-
+void ebball_state::ebball(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 375000) // approximation - RC osc. R=43K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ebball_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ebball_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ebball_state, write_o))
+	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=43K, C=47pF
+	m_maincpu->k().set(FUNC(ebball_state::read_k));
+	m_maincpu->r().set(FUNC(ebball_state::write_r));
+	m_maincpu->o().set(FUNC(ebball_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_ebball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( ebball )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0914", 0x0000, 0x0400, CRC(3c6fb05b) SHA1(b2fe4b3ca72d6b4c9bfa84d67f64afdc215e7178) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_ebball_output.pla", 0, 365, CRC(062bf5bb) SHA1(8d73ee35444299595961225528b153e3a5fe66bf) )
+ROM_END
 
 
 
@@ -3106,8 +3344,8 @@ MACHINE_CONFIG_END
 class ebball2_state : public hh_tms1k_state
 {
 public:
-	ebball2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	ebball2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -3178,22 +3416,34 @@ static INPUT_PORTS_START( ebball2 )
 	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(ebball2_state::ebball2)
-
+void ebball2_state::ebball2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 350000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ebball2_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ebball2_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ebball2_state, write_o))
+	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set(FUNC(ebball2_state::read_k));
+	m_maincpu->r().set(FUNC(ebball2_state::write_r));
+	m_maincpu->o().set(FUNC(ebball2_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_ebball2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( ebball2 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0923", 0x0000, 0x0400, CRC(077acfe2) SHA1(a294ce7614b2cdb01c754a7a50d60d807e3f0939) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_ebball2_output.pla", 0, 365, CRC(adcd73d1) SHA1(d69e590d288ef99293d86716498f3971528e30de) )
+ROM_END
 
 
 
@@ -3234,8 +3484,8 @@ MACHINE_CONFIG_END
 class ebball3_state : public hh_tms1k_state
 {
 public:
-	ebball3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	ebball3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -3244,14 +3494,28 @@ public:
 	DECLARE_READ8_MEMBER(read_k);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
 	void ebball3(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
 };
 
+void ebball3_state::machine_reset()
+{
+	hh_tms1k_state::machine_reset();
+	set_clock();
+}
+
 // handlers
+
+void ebball3_state::set_clock()
+{
+	// MCU clock is from an RC circuit(R=47K, C=33pF) oscillating by default at ~340kHz,
+	// but on PRO, the difficulty switch adds an extra 150K resistor to Vdd to speed
+	// it up to around ~440kHz.
+	m_maincpu->set_unscaled_clock((m_inp_matrix[3]->read() & 1) ? 440000 : 340000);
+}
 
 void ebball3_state::prepare_display()
 {
@@ -3339,41 +3603,34 @@ static INPUT_PORTS_START( ebball3 )
 	PORT_CONFSETTING(    0x01, "Professional" )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(ebball3_state::skill_switch)
+void ebball3_state::ebball3(machine_config &config)
 {
-	set_clock();
-}
-
-void ebball3_state::set_clock()
-{
-	// MCU clock is from an RC circuit(R=47K, C=33pF) oscillating by default at ~340kHz,
-	// but on PRO, the difficulty switch adds an extra 150K resistor to Vdd to speed
-	// it up to around ~440kHz.
-	m_maincpu->set_unscaled_clock((m_inp_matrix[3]->read() & 1) ? 440000 : 340000);
-}
-
-void ebball3_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	set_clock();
-}
-
-MACHINE_CONFIG_START(ebball3_state::ebball3)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 340000) // see set_clock
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ebball3_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ebball3_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ebball3_state, write_o))
+	TMS1100(config, m_maincpu, 340000); // see set_clock
+	m_maincpu->k().set(FUNC(ebball3_state::read_k));
+	m_maincpu->r().set(FUNC(ebball3_state::write_r));
+	m_maincpu->o().set(FUNC(ebball3_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_ebball3);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( ebball3 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "6007_mp1204", 0x0000, 0x0800, CRC(987a29ba) SHA1(9481ae244152187d85349d1a08e439e798182938) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_ebball3_output.pla", 0, 365, CRC(00db663b) SHA1(6eae12503364cfb1f863df0e57970d3e766ec165) )
+ROM_END
 
 
 
@@ -3405,8 +3662,8 @@ MACHINE_CONFIG_END
 class esbattle_state : public hh_tms1k_state
 {
 public:
-	esbattle_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	esbattle_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -3469,22 +3726,34 @@ static INPUT_PORTS_START( esbattle )
 	PORT_CONFSETTING(    0x00, "2" ) // Manual
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(esbattle_state::esbattle)
-
+void esbattle_state::esbattle(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 425000) // approximation - RC osc. R=47K, C=33pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, esbattle_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, esbattle_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, esbattle_state, write_o))
+	TMS1000(config, m_maincpu, 425000); // approximation - RC osc. R=47K, C=33pF
+	m_maincpu->k().set(FUNC(esbattle_state::read_k));
+	m_maincpu->r().set(FUNC(esbattle_state::write_r));
+	m_maincpu->o().set(FUNC(esbattle_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_esbattle);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( esbattle )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "en-6004_mp0920", 0x0000, 0x0400, CRC(7460c179) SHA1(be855054b4a98b05b34fd931d5c247c5c0f9b036) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_esbattle_output.pla", 0, 365, CRC(861b45a2) SHA1(a5a9dc9bef8adb761845ad548058b55e970517d3) )
+ROM_END
 
 
 
@@ -3505,8 +3774,8 @@ MACHINE_CONFIG_END
 class einvader_state : public hh_tms1k_state
 {
 public:
-	einvader_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	einvader_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -3514,14 +3783,28 @@ public:
 	DECLARE_WRITE16_MEMBER(write_o);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
 	void einvader(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
 };
 
+void einvader_state::machine_reset()
+{
+	hh_tms1k_state::machine_reset();
+	set_clock();
+}
+
 // handlers
+
+void einvader_state::set_clock()
+{
+	// MCU clock is from an RC circuit(R=47K, C=56pF) oscillating by default at ~320kHz,
+	// but on PRO, the difficulty switch adds an extra 180K resistor to Vdd to speed
+	// it up to around ~400kHz.
+	m_maincpu->set_unscaled_clock((m_inp_matrix[0]->read() & 8) ? 400000 : 320000);
+}
 
 void einvader_state::prepare_display()
 {
@@ -3559,46 +3842,44 @@ static INPUT_PORTS_START( einvader )
 	PORT_CONFSETTING(    0x08, "Professional" )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(einvader_state::skill_switch)
+void einvader_state::einvader(machine_config &config)
 {
-	set_clock();
-}
-
-void einvader_state::set_clock()
-{
-	// MCU clock is from an RC circuit(R=47K, C=56pF) oscillating by default at ~320kHz,
-	// but on PRO, the difficulty switch adds an extra 180K resistor to Vdd to speed
-	// it up to around ~400kHz.
-	m_maincpu->set_unscaled_clock((m_inp_matrix[0]->read() & 8) ? 400000 : 320000);
-}
-
-void einvader_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	set_clock();
-}
-
-MACHINE_CONFIG_START(einvader_state::einvader)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 320000) // see set_clock
-	MCFG_TMS1XXX_READ_K_CB(IOPORT("IN.0"))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, einvader_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, einvader_state, write_o))
+	TMS1100(config, m_maincpu, 320000); // see set_clock
+	m_maincpu->k().set_ioport("IN.0");
+	m_maincpu->r().set(FUNC(einvader_state::write_r));
+	m_maincpu->o().set(FUNC(einvader_state::write_o));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(939, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 939-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(939, 1080);
+	screen.set_visarea_full();
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_einvader);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( einvader )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1211", 0x0000, 0x0800, CRC(b6efbe8e) SHA1(d7d54921dab22bb0c2956c896a5d5b56b6f64969) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_einvader_output.pla", 0, 365, CRC(490158e1) SHA1(61cace1eb09244663de98d8fb04d9459b19668fd) )
+
+	ROM_REGION( 44398, "svg", 0)
+	ROM_LOAD( "einvader.svg", 0, 44398, CRC(48de88fd) SHA1(56a2b9c997a447277b45902ab542eda54e7d5a2f) )
+ROM_END
 
 
 
@@ -3615,8 +3896,8 @@ MACHINE_CONFIG_END
 class efootb4_state : public hh_tms1k_state
 {
 public:
-	efootb4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	efootb4_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -3698,22 +3979,34 @@ static INPUT_PORTS_START( efootb4 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(efootb4_state::efootb4)
-
+void efootb4_state::efootb4(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1670, 475000) // approximation - RC osc. R=42K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, efootb4_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, efootb4_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, efootb4_state, write_o))
+	TMS1670(config, m_maincpu, 475000); // approximation - RC osc. R=42K, C=47pF
+	m_maincpu->k().set(FUNC(efootb4_state::read_k));
+	m_maincpu->r().set(FUNC(efootb4_state::write_r));
+	m_maincpu->o().set(FUNC(efootb4_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_efootb4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( efootb4 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "6009_mp7551", 0x0000, 0x1000, CRC(54fa7244) SHA1(4d16bd825c4a2db76ca8a263c373ade15c20e270) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_efootb4_output.pla", 0, 557, CRC(5c87c753) SHA1(bde9d4aa1e57a718affd969475c0a1edcf60f444) )
+ROM_END
 
 
 
@@ -3742,8 +4035,8 @@ MACHINE_CONFIG_END
 class ebaskb2_state : public hh_tms1k_state
 {
 public:
-	ebaskb2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	ebaskb2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -3819,22 +4112,34 @@ static INPUT_PORTS_START( ebaskb2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(ebaskb2_state::ebaskb2)
-
+void ebaskb2_state::ebaskb2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 360000) // approximation - RC osc. R=33K, C=82pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ebaskb2_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ebaskb2_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ebaskb2_state, write_o))
+	TMS1100(config, m_maincpu, 360000); // approximation - RC osc. R=33K, C=82pF
+	m_maincpu->k().set(FUNC(ebaskb2_state::read_k));
+	m_maincpu->r().set(FUNC(ebaskb2_state::write_r));
+	m_maincpu->o().set(FUNC(ebaskb2_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_ebaskb2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( ebaskb2 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "6010_mp1218", 0x0000, 0x0800, CRC(0089ede8) SHA1(c8a79d5aca7e37b637a4d152150acba9f41aad96) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_ebaskb2_output.pla", 0, 365, CRC(c18103ae) SHA1(5a9bb8e1d95a9f6919b05ff9471fa0a8014b8b81) )
+ROM_END
 
 
 
@@ -3866,8 +4171,8 @@ MACHINE_CONFIG_END
 class raisedvl_state : public hh_tms1k_state
 {
 public:
-	raisedvl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	raisedvl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -3876,14 +4181,31 @@ public:
 	DECLARE_READ8_MEMBER(read_k);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
 	void raisedvl(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
 };
 
+void raisedvl_state::machine_reset()
+{
+	hh_tms1k_state::machine_reset();
+	set_clock();
+}
+
 // handlers
+
+void raisedvl_state::set_clock()
+{
+	// MCU clock is from an RC circuit with C=47pF, R=47K by default. Skills
+	// 2 and 3 add a 150K resistor in parallel, and skill 4 adds a 100K one.
+	// 0:   R=47K  -> ~350kHz
+	// 2,3: R=35K8 -> ~425kHz (combined)
+	// 4:   R=32K  -> ~465kHz (combined)
+	u8 inp = m_inp_matrix[1]->read();
+	m_maincpu->set_unscaled_clock((inp & 0x20) ? 465000 : ((inp & 0x10) ? 425000 : 350000));
+}
 
 void raisedvl_state::prepare_display()
 {
@@ -3936,44 +4258,34 @@ static INPUT_PORTS_START( raisedvl )
 	PORT_CONFSETTING(    0x21, "4" )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(raisedvl_state::skill_switch)
+void raisedvl_state::raisedvl(machine_config &config)
 {
-	set_clock();
-}
-
-void raisedvl_state::set_clock()
-{
-	// MCU clock is from an RC circuit with C=47pF, R=47K by default. Skills
-	// 2 and 3 add a 150K resistor in parallel, and skill 4 adds a 100K one.
-	// 0:   R=47K  -> ~350kHz
-	// 2,3: R=35K8 -> ~425kHz (combined)
-	// 4:   R=32K  -> ~465kHz (combined)
-	u8 inp = m_inp_matrix[1]->read();
-	m_maincpu->set_unscaled_clock((inp & 0x20) ? 465000 : ((inp & 0x10) ? 425000 : 350000));
-}
-
-void raisedvl_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	set_clock();
-}
-
-MACHINE_CONFIG_START(raisedvl_state::raisedvl)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 350000) // see set_clock
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, raisedvl_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, raisedvl_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, raisedvl_state, write_o))
+	TMS1100(config, m_maincpu, 350000); // see set_clock
+	m_maincpu->k().set(FUNC(raisedvl_state::read_k));
+	m_maincpu->r().set(FUNC(raisedvl_state::write_r));
+	m_maincpu->o().set(FUNC(raisedvl_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_raisedvl);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( raisedvl )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1221", 0x0000, 0x0800, CRC(782791cc) SHA1(214249406fcaf44efc6350022bd534e59ec69c88) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_raisedvl_output.pla", 0, 365, CRC(00db663b) SHA1(6eae12503364cfb1f863df0e57970d3e766ec165) )
+ROM_END
 
 
 
@@ -4008,16 +4320,14 @@ MACHINE_CONFIG_END
 class f2pbball_state : public hh_tms1k_state
 {
 public:
-	f2pbball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	f2pbball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	void f2pbball(machine_config &config);
 };
 
@@ -4080,31 +4390,37 @@ static INPUT_PORTS_START( f2pbball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("P2 Fast")
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, f2pbball_state, reset_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, reset_button, nullptr)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(f2pbball_state::reset_button)
+void f2pbball_state::f2pbball(machine_config &config)
 {
-	// reset button is directly wired to TMS1000 INIT pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
-
-MACHINE_CONFIG_START(f2pbball_state::f2pbball)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=51K, C=39pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, f2pbball_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, f2pbball_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, f2pbball_state, write_o))
+	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=51K, C=39pF
+	m_maincpu->k().set(FUNC(f2pbball_state::read_k));
+	m_maincpu->r().set(FUNC(f2pbball_state::write_r));
+	m_maincpu->o().set(FUNC(f2pbball_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_f2pbball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( f2pbball )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0154", 0x0000, 0x0400, CRC(c5b45ace) SHA1(b2de32e83ab447b22d6828f0081843f364040b01) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_f2pbball_output.pla", 0, 365, CRC(30c2f28f) SHA1(db969b22475f37f083c3594f5e4f5759048377b8) )
+ROM_END
 
 
 
@@ -4125,8 +4441,8 @@ MACHINE_CONFIG_END
 class f3in1_state : public hh_tms1k_state
 {
 public:
-	f3in1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	f3in1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -4135,14 +4451,26 @@ public:
 	DECLARE_READ8_MEMBER(read_k);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
 	void f3in1(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
 };
 
+void f3in1_state::machine_reset()
+{
+	hh_tms1k_state::machine_reset();
+	set_clock();
+}
+
 // handlers
+
+void f3in1_state::set_clock()
+{
+	// MCU clock is from an RC circuit where C=47pF, R=39K(PROF) or 56K(REG)
+	m_maincpu->set_unscaled_clock((m_inp_matrix[4]->read() & 1) ? 400000 : 300000);
+}
 
 void f3in1_state::prepare_display()
 {
@@ -4209,39 +4537,34 @@ static INPUT_PORTS_START( f3in1 )
 	PORT_CONFSETTING(    0x01, "Professional" ) // PROF
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(f3in1_state::skill_switch)
+void f3in1_state::f3in1(machine_config &config)
 {
-	set_clock();
-}
-
-void f3in1_state::set_clock()
-{
-	// MCU clock is from an RC circuit where C=47pF, R=39K(PROF) or 56K(REG)
-	m_maincpu->set_unscaled_clock((m_inp_matrix[4]->read() & 1) ? 400000 : 300000);
-}
-
-void f3in1_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	set_clock();
-}
-
-MACHINE_CONFIG_START(f3in1_state::f3in1)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 300000) // see set_clock
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, f3in1_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, f3in1_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, f3in1_state, write_o))
+	TMS1100(config, m_maincpu, 300000); // see set_clock
+	m_maincpu->k().set(FUNC(f3in1_state::read_k));
+	m_maincpu->r().set(FUNC(f3in1_state::write_r));
+	m_maincpu->o().set(FUNC(f3in1_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_f3in1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( f3in1 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1185", 0x0000, 0x0800, CRC(53f7b28d) SHA1(2249890e3a259095193b4331ca88c29ccd81eefe) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_f3in1_output.pla", 0, 365, CRC(51d947bc) SHA1(f766397d84f038be96e83d40989195c98ddcb1d9) )
+ROM_END
 
 
 
@@ -4263,8 +4586,8 @@ MACHINE_CONFIG_END
 class gpoker_state : public hh_tms1k_state
 {
 public:
-	gpoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag),
+	gpoker_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
 		m_beeper(*this, "beeper")
 	{ }
 
@@ -4279,6 +4602,12 @@ public:
 protected:
 	virtual void machine_reset() override;
 };
+
+void gpoker_state::machine_reset()
+{
+	hh_tms1k_state::machine_reset();
+	m_beeper->set_state(0);
+}
 
 // handlers
 
@@ -4345,7 +4674,7 @@ static INPUT_PORTS_START( gpoker )
 
 	PORT_START("IN.3") // R3
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CODE(KEYCODE_D) PORT_NAME("9/Deal") // DL, shares pad with 9
+	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // 9/DL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear Entry") // CE
 
@@ -4363,30 +4692,40 @@ static INPUT_PORTS_START( gpoker )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Total") // T
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Bet") // BT
+
+	PORT_START("FAKE") // 9/DL are electronically the same button
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Deal") // DL
 INPUT_PORTS_END
 
-void gpoker_state::machine_reset()
+void gpoker_state::gpoker(machine_config &config)
 {
-	hh_tms1k_state::machine_reset();
-	m_beeper->set_state(0);
-}
-
-MACHINE_CONFIG_START(gpoker_state::gpoker)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1370, 350000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, gpoker_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, gpoker_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, gpoker_state, write_o))
+	TMS1370(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set(FUNC(gpoker_state::read_k));
+	m_maincpu->r().set(FUNC(gpoker_state::write_r));
+	m_maincpu->o().set(FUNC(gpoker_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_gpoker);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 2405) // astable multivibrator - C1 and C2 are 0.003uF, R1 and R4 are 1K, R2 and R3 are 100K
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	BEEP(config, m_beeper, 2405); // astable multivibrator - C1 and C2 are 0.003uF, R1 and R4 are 1K, R2 and R3 are 100K
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( gpoker )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp2105", 0x0000, 0x0800, CRC(95a8f5b4) SHA1(d14f00ba9f57e437264d972baa14a14a28ff8719) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_gpoker_output.pla", 0, 365, CRC(f7e2d812) SHA1(cc3abd89afb1d2145dc47636553ccd0ba7de70d9) )
+ROM_END
 
 
 
@@ -4408,8 +4747,8 @@ MACHINE_CONFIG_END
 class gjackpot_state : public gpoker_state
 {
 public:
-	gjackpot_state(const machine_config &mconfig, device_type type, const char *tag)
-		: gpoker_state(mconfig, type, tag)
+	gjackpot_state(const machine_config &mconfig, device_type type, const char *tag) :
+		gpoker_state(mconfig, type, tag)
 	{ }
 
 	virtual DECLARE_WRITE16_MEMBER(write_r) override;
@@ -4438,7 +4777,7 @@ WRITE16_MEMBER(gjackpot_state::write_r)
                           DB]    SP]
     [1]    [2]    [3]    [DS]   [DR]
                           BT]    HT]
-    [10/1] [T]    [MD    [CH    [AC]
+    [10/0] [T]    [MD    [CH    [AC]
                    GO]    ST]
 */
 
@@ -4484,22 +4823,34 @@ static INPUT_PORTS_START( gjackpot )
 	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(gjackpot_state::gjackpot)
-
+void gjackpot_state::gjackpot(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1670, 450000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, gpoker_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, gjackpot_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, gpoker_state, write_o))
+	TMS1670(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set(FUNC(gpoker_state::read_k));
+	m_maincpu->r().set(FUNC(gjackpot_state::write_r));
+	m_maincpu->o().set(FUNC(gpoker_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_gjackpot);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 2405) // see gpoker
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	BEEP(config, m_beeper, 2405); // see gpoker
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( gjackpot )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mpf553", 0x0000, 0x1000, CRC(f45fd008) SHA1(8d5d6407a8a031a833ceedfb931f5c9d2725ecd0) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_gjackpot_output.pla", 0, 557, CRC(50e471a7) SHA1(9d862cb9f51a563882b62662c5bfe61b52e3df00) )
+ROM_END
 
 
 
@@ -4507,7 +4858,136 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Gakken Galaxy Invader 1000
+  Gakken Invader
+  * PCB label GAKKEN, INVADER, KS-00779
+  * TMS1370 MP2110
+  * cyan VFD display Itron? CP5008A, 1-bit sound
+
+  known releases:
+  - World: Invader
+  - USA(1): Galaxy Invader, published by CGL
+  - USA(2): Fire Away, published by Tandy
+  - USA(3): Electron Blaster, published by Vanity Fair
+
+  On the real thing, the joystick is "sticky"(it doesn't autocenter when you let go).
+  There's also a version with a cyan/red VFD, possibly the same ROM.
+
+***************************************************************************/
+
+class ginv_state : public hh_tms1k_state
+{
+public:
+	ginv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	virtual DECLARE_WRITE16_MEMBER(write_r);
+	virtual DECLARE_WRITE16_MEMBER(write_o);
+	virtual DECLARE_READ8_MEMBER(read_k);
+	void ginv(machine_config &config);
+};
+
+// handlers
+
+void ginv_state::prepare_display()
+{
+	display_matrix(12, 9, m_plate, m_grid);
+}
+
+WRITE16_MEMBER(ginv_state::write_r)
+{
+	// R9,R10: input mux
+	m_inp_mux = data >> 9 & 3;
+
+	// R15: speaker out
+	m_speaker->level_w(data >> 15 & 1);
+
+	// R0-R8: VFD grid
+	// R11-R14: VFD plate
+	m_grid = data & 0x1ff;
+	m_plate = (m_plate & 0xff) | (data >> 3 & 0xf00);
+	prepare_display();
+}
+
+WRITE16_MEMBER(ginv_state::write_o)
+{
+	// O0-O7: VFD plate
+	m_plate = (m_plate & ~0xff) | data;
+	prepare_display();
+}
+
+READ8_MEMBER(ginv_state::read_k)
+{
+	// K1-K4: multiplexed inputs (K8 is fire button)
+	return m_inp_matrix[2]->read() | read_inputs(2);
+}
+
+// config
+
+static INPUT_PORTS_START( ginv )
+	PORT_START("IN.0") // R9
+	PORT_CONFNAME( 0x07, 0x02, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x04, "3" )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R10
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("IN.1", 0x05, EQUALS, 0x00) // joystick centered
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // K8
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+INPUT_PORTS_END
+
+void ginv_state::ginv(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1370(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set(FUNC(ginv_state::read_k));
+	m_maincpu->r().set(FUNC(ginv_state::write_r));
+	m_maincpu->o().set(FUNC(ginv_state::write_o));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(236, 1080);
+	screen.set_visarea_full();
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( ginv )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp2110", 0x0000, 0x0800, CRC(f09c5588) SHA1(06eb8ed512eaf5367ea30c2b633219e105ddfd14) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_ginv_output.pla", 0, 365, CRC(6e33a24e) SHA1(cdf7ecf12ddd3863e6301e20fe80f9737db429e5) )
+
+	ROM_REGION( 142959, "svg", 0)
+	ROM_LOAD( "ginv.svg", 0, 142959, CRC(b0dc9bac) SHA1(18f8cc51a432d14f08fdf766275222f3ed184d89) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Gakken Invader 1000
   * TMS1370 MP2139 (die label 1170 MP2139)
   * cyan/red VFD display Futaba DM-25Z 2D, 1-bit sound
 
@@ -4522,8 +5002,8 @@ MACHINE_CONFIG_END
 class ginv1000_state : public hh_tms1k_state
 {
 public:
-	ginv1000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	ginv1000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -4589,26 +5069,43 @@ static INPUT_PORTS_START( ginv1000 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(ginv1000_state::ginv1000)
-
+void ginv1000_state::ginv1000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1370, 340000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ginv1000_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ginv1000_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ginv1000_state, write_o))
+	TMS1370(config, m_maincpu, 350000); // approximation
+	m_maincpu->k().set(FUNC(ginv1000_state::read_k));
+	m_maincpu->r().set(FUNC(ginv1000_state::write_r));
+	m_maincpu->o().set(FUNC(ginv1000_state::write_o));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(226, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 226-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(226, 1080);
+	screen.set_visarea_full();
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( ginv1000 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp2139", 0x0000, 0x0800, CRC(036eab37) SHA1(0795878ad89296f7a6a0314c6e4db23c1cc3673e) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_ginv1000_output.pla", 0, 365, CRC(b0a5dc41) SHA1(d94746ec48661998173e7f60ccc7c96e56b3484e) )
+
+	ROM_REGION( 226185, "svg", 0)
+	ROM_LOAD( "ginv1000.svg", 0, 226185, CRC(1e1bafd1) SHA1(15868ef0c9dadbf537fed0e2d846451ba99fab7b) )
+ROM_END
 
 
 
@@ -4631,8 +5128,8 @@ MACHINE_CONFIG_END
 class ginv2000_state : public hh_tms1k_state
 {
 public:
-	ginv2000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag),
+	ginv2000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
 		m_expander(*this, "expander")
 	{ }
 
@@ -4648,6 +5145,12 @@ public:
 protected:
 	virtual void machine_reset() override;
 };
+
+void ginv2000_state::machine_reset()
+{
+	hh_tms1k_state::machine_reset();
+	m_expander->write_ms(1); // Vss
+}
 
 // handlers
 
@@ -4712,38 +5215,49 @@ static INPUT_PORTS_START( ginv2000 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 INPUT_PORTS_END
 
-void ginv2000_state::machine_reset()
+void ginv2000_state::ginv2000(machine_config &config)
 {
-	hh_tms1k_state::machine_reset();
-	m_expander->write_ms(1); // Vss
-}
-
-MACHINE_CONFIG_START(ginv2000_state::ginv2000)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1370, 425000) // approximation - RC osc. R=36K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ginv2000_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ginv2000_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ginv2000_state, write_o))
+	TMS1370(config, m_maincpu, 425000); // approximation - RC osc. R=36K, C=47pF
+	m_maincpu->k().set(FUNC(ginv2000_state::read_k));
+	m_maincpu->r().set(FUNC(ginv2000_state::write_r));
+	m_maincpu->o().set(FUNC(ginv2000_state::write_o));
 
-	MCFG_DEVICE_ADD("expander", TMS1024, 0)
-	MCFG_TMS1025_WRITE_PORT_CB(PORT4, WRITE8(*this, ginv2000_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT5, WRITE8(*this, ginv2000_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT6, WRITE8(*this, ginv2000_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT7, WRITE8(*this, ginv2000_state, expander_w))
+	TMS1024(config, m_expander);
+	m_expander->write_port4_callback().set(FUNC(ginv2000_state::expander_w));
+	m_expander->write_port5_callback().set(FUNC(ginv2000_state::expander_w));
+	m_expander->write_port6_callback().set(FUNC(ginv2000_state::expander_w));
+	m_expander->write_port7_callback().set(FUNC(ginv2000_state::expander_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(364, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 364-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(364, 1080);
+	screen.set_visarea_full();
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( ginv2000 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1604", 0x0000, 0x0800, CRC(f1646d0b) SHA1(65601931d81e3eef7bf22a08de5a146910ce8137) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_ginv2000_output.pla", 0, 365, CRC(520bb003) SHA1(1640ae54f8dcc257e0ad0cbe0281b38fcbd8da35) )
+
+	ROM_REGION( 374443, "svg", 0)
+	ROM_LOAD( "ginv2000.svg", 0, 374443, CRC(a4ce1e6d) SHA1(57d9ff05d634a8d495b9d544a2a959790cd10b6b) )
+ROM_END
 
 
 
@@ -4770,8 +5284,8 @@ MACHINE_CONFIG_END
 class fxmcr165_state : public hh_tms1k_state
 {
 public:
-	fxmcr165_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	fxmcr165_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -4866,22 +5380,34 @@ static INPUT_PORTS_START( fxmcr165 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("Address Set")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(fxmcr165_state::fxmcr165)
-
+void fxmcr165_state::fxmcr165(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 400_kHz_XTAL)
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, fxmcr165_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, fxmcr165_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, fxmcr165_state, write_o))
+	TMS1100(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->k().set(FUNC(fxmcr165_state::read_k));
+	m_maincpu->r().set(FUNC(fxmcr165_state::write_r));
+	m_maincpu->o().set(FUNC(fxmcr165_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fxmcr165);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( fxmcr165 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1312", 0x0000, 0x0800, CRC(6efc8bcc) SHA1(ced8a02b472a3178073691d3dccc0f19f57428fd) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_fxmcr165_output.pla", 0, 365, CRC(ce656866) SHA1(40e1614f5afcc7572fda596e1be453d54e95af0c) )
+ROM_END
 
 
 
@@ -4905,8 +5431,8 @@ MACHINE_CONFIG_END
 class elecdet_state : public hh_tms1k_state
 {
 public:
-	elecdet_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	elecdet_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -4985,33 +5511,49 @@ static INPUT_PORTS_START( elecdet )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.4") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("End Turn")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 INPUT_PORTS_END
 
 static const s16 elecdet_speaker_levels[4] = { 0, 0x3fff, 0x3fff, 0x7fff };
 
-MACHINE_CONFIG_START(elecdet_state::elecdet)
-
+void elecdet_state::elecdet(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS0980, 425000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, elecdet_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, elecdet_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, elecdet_state, write_o))
-	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(*this, hh_tms1k_state, auto_power_off))
+	TMS0980(config, m_maincpu, 425000); // approximation
+	m_maincpu->k().set(FUNC(elecdet_state::read_k));
+	m_maincpu->r().set(FUNC(elecdet_state::write_r));
+	m_maincpu->o().set(FUNC(elecdet_state::write_o));
+	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_elecdet);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(4, elecdet_speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(4, elecdet_speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( elecdet )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp6100a", 0x0000, 0x1000, CRC(9522fb2d) SHA1(240bdb44b7d67d3b13ebf75851635ac4b4ca2bfd) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 1982, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0980_common1_micro.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_elecdet_output.pla", 0, 352, CRC(5d12c24a) SHA1(e486802151a704c6273d4a8682c9c374d27d1e6d) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
+ROM_END
 
 
 
@@ -5032,8 +5574,8 @@ MACHINE_CONFIG_END
 class starwbc_state : public hh_tms1k_state
 {
 public:
-	starwbc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	starwbc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -5122,22 +5664,44 @@ static INPUT_PORTS_START( starwbc )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Right")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(starwbc_state::starwbc)
-
+void starwbc_state::starwbc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 325000) // approximation - RC osc. R=51K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, starwbc_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, starwbc_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, starwbc_state, write_o))
+	TMS1100(config, m_maincpu, 325000); // approximation - RC osc. R=51K, C=47pF
+	m_maincpu->k().set(FUNC(starwbc_state::read_k));
+	m_maincpu->r().set(FUNC(starwbc_state::write_r));
+	m_maincpu->o().set(FUNC(starwbc_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_starwbc);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( starwbc )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp3438a", 0x0000, 0x0800, CRC(c12b7069) SHA1(d1f39c69a543c128023ba11cc6228bacdfab04de) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_starwbc_output.pla", 0, 365, CRC(d358a76d) SHA1(06b60b207540e9b726439141acadea9aba718013) )
+ROM_END
+
+ROM_START( starwbcp )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "us4270755", 0x0000, 0x0800, BAD_DUMP CRC(fb3332f2) SHA1(a79ac81e239983cd699b7cfcc55f89b203b2c9ec) ) // from patent US4270755, may have errors
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_starwbc_output.pla", 0, 365, CRC(d358a76d) SHA1(06b60b207540e9b726439141acadea9aba718013) )
+ROM_END
 
 
 
@@ -5157,8 +5721,8 @@ MACHINE_CONFIG_END
 class astro_state : public hh_tms1k_state
 {
 public:
-	astro_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	astro_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -5249,19 +5813,31 @@ static INPUT_PORTS_START( astro )
 	PORT_CONFSETTING(    0x08, "Astro" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(astro_state::astro)
-
+void astro_state::astro(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1470, 450000) // approximation - RC osc. R=4.7K, C=33pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, astro_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, astro_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, astro_state, write_o))
+	TMS1470(config, m_maincpu, 450000); // approximation - RC osc. R=4.7K, C=33pF
+	m_maincpu->k().set(FUNC(astro_state::read_k));
+	m_maincpu->r().set(FUNC(astro_state::write_r));
+	m_maincpu->o().set(FUNC(astro_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_astro);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
+
+// roms
+
+ROM_START( astro )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp1133", 0x0000, 0x1000, CRC(bc21109c) SHA1(05a433cce587d5c0c2d28b5fda5f0853ea6726bf) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_astro_output.pla", 0, 557, CRC(eb08957e) SHA1(62ae0d13a1eaafb34f1b27d7df51441b400ccd56) )
+ROM_END
 
 
 
@@ -5296,8 +5872,8 @@ MACHINE_CONFIG_END
 class elecbowl_state : public hh_tms1k_state
 {
 public:
-	elecbowl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	elecbowl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -5395,42 +5971,44 @@ static INPUT_PORTS_START( elecbowl )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) // 2 players sw?
 INPUT_PORTS_END
 
-// output PLA is not decapped
+// output PLA is not decapped, this was made by hand
 static const u16 elecbowl_output_pla[0x20] =
 {
-	lA+lB+lC+lD+lE+lF,      // 0
-	lB+lC,                  // 1
-	lA+lB+lG+lE+lD,         // 2
-	lA+lB+lG+lC+lD,         // 3
-	lF+lB+lG+lC,            // 4
-	lA+lF+lG+lC+lD,         // 5
-	lA+lF+lG+lC+lD+lE,      // 6
-	lA+lB+lC,               // 7
-	lA+lB+lC+lD+lE+lF+lG,   // 8
-	lA+lB+lG+lF+lC+lD,      // 9
-
-	0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
-	0,1,2,3,4,5,6,7,        // lamp muxes select
-	0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f
+	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, // 0-9
+	0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, // ?
+	0, 1, 2, 3, 4, 5, 6, 7, // lamp muxes select
+	0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f // ?
 };
 
-MACHINE_CONFIG_START(elecbowl_state::elecbowl)
-
+void elecbowl_state::elecbowl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 350000) // approximation - RC osc. R=33K, C=100pF
-	MCFG_TMS1XXX_OUTPUT_PLA(elecbowl_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, elecbowl_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, elecbowl_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, elecbowl_state, write_o))
+	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
+	m_maincpu->set_output_pla(elecbowl_output_pla);
+	m_maincpu->k().set(FUNC(elecbowl_state::read_k));
+	m_maincpu->r().set(FUNC(elecbowl_state::write_r));
+	m_maincpu->o().set(FUNC(elecbowl_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_elecbowl);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( elecbowl )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp3403.u9", 0x0000, 0x0800, CRC(9eabaa7d) SHA1(b1f54587ed7f2bbf3a5d49075c807296384c2b06) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, BAD_DUMP CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) ) // not verified
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_elecbowl_output.pla", 0, 365, NO_DUMP )
+ROM_END
 
 
 
@@ -5456,8 +6034,8 @@ MACHINE_CONFIG_END
 class horseran_state : public hh_tms1k_state
 {
 public:
-	horseran_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag),
+	horseran_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
 		m_lcd(*this, "lcd")
 	{ }
 
@@ -5494,9 +6072,9 @@ WRITE16_MEMBER(horseran_state::write_r)
 	// R0: HLCD0569 clock
 	// R1: HLCD0569 data in
 	// R2: HLCD0569 _CS
-	m_lcd->write_cs(data >> 2 & 1);
-	m_lcd->write_data(data >> 1 & 1);
-	m_lcd->write_clock(data & 1);
+	m_lcd->cs_w(data >> 2 & 1);
+	m_lcd->data_w(data >> 1 & 1);
+	m_lcd->clock_w(data & 1);
 
 	// R3-R10: input mux
 	m_inp_mux = data >> 3 & 0xff;
@@ -5571,21 +6149,33 @@ static INPUT_PORTS_START( horseran )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(horseran_state::horseran)
-
+void horseran_state::horseran(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 300000) // approximation - RC osc. R=56K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, horseran_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, horseran_state, write_r))
+	TMS1100(config, m_maincpu, 300000); // approximation - RC osc. R=56K, C=47pF
+	m_maincpu->k().set(FUNC(horseran_state::read_k));
+	m_maincpu->r().set(FUNC(horseran_state::write_r));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("lcd", HLCD0569, 1100) // C=0.022uF
-	MCFG_HLCD0515_WRITE_COLS_CB(WRITE32(*this, horseran_state, lcd_output_w))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	HLCD0569(config, m_lcd, 1100); // C=0.022uF
+	m_lcd->write_cols().set(FUNC(horseran_state::lcd_output_w));
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_horseran);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
+
+// roms
+
+ROM_START( horseran )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp3491", 0x0000, 0x0800, CRC(a0081671) SHA1(a5a07b502c69d429e5bcd1d313e86b6ee057cda6) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
+	ROM_LOAD( "tms1100_horseran_output.pla", 0, 365, CRC(0fea09b0) SHA1(27a56fcf2b490e9a7dbbc6ad48cc8aaca4cada94) )
+ROM_END
 
 
 
@@ -5605,8 +6195,8 @@ MACHINE_CONFIG_END
 class mdndclab_state : public hh_tms1k_state
 {
 public:
-	mdndclab_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	mdndclab_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -5750,22 +6340,34 @@ static INPUT_PORTS_START( mdndclab )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Dragon Attacks / Dragon Wakes")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(mdndclab_state::mdndclab)
-
+void mdndclab_state::mdndclab(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 475000) // approximation - RC osc. R=27K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, mdndclab_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, mdndclab_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, mdndclab_state, write_o))
+	TMS1100(config, m_maincpu, 475000); // approximation - RC osc. R=27K, C=100pF
+	m_maincpu->k().set(FUNC(mdndclab_state::read_k));
+	m_maincpu->r().set(FUNC(mdndclab_state::write_r));
+	m_maincpu->o().set(FUNC(mdndclab_state::write_o));
 
 	/* no visual feedback! */
 	config.set_default_layout(layout_mdndclab); // playing board
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( mdndclab )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "m34012", 0x0000, 0x0800, CRC(e851fccd) SHA1(158362c2821678a51554e02dbb2f9ef5aaf5f59f) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_mdndclab_output.pla", 0, 365, CRC(592b40ba) SHA1(63a2531278a665ace54c541101e052eb84413511) )
+ROM_END
 
 
 
@@ -5792,8 +6394,8 @@ MACHINE_CONFIG_END
 class comp4_state : public hh_tms1k_state
 {
 public:
-	comp4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	comp4_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -5854,19 +6456,35 @@ static INPUT_PORTS_START( comp4 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(comp4_state::comp4)
-
+void comp4_state::comp4(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS0970, 250000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, comp4_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, comp4_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, comp4_state, write_o))
+	TMS0970(config, m_maincpu, 250000); // approximation
+	m_maincpu->k().set(FUNC(comp4_state::read_k));
+	m_maincpu->r().set(FUNC(comp4_state::write_r));
+	m_maincpu->o().set(FUNC(comp4_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_comp4);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
+
+// roms
+
+ROM_START( comp4 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc0904nl_cp0904a", 0x0000, 0x0400, CRC(6233ee1b) SHA1(738e109b38c97804b4ec52bed80b00a8634ad453) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common2_instr.pla", 0, 782, CRC(e038fc44) SHA1(dfc280f6d0a5828d1bb14fcd59ac29caf2c2d981) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_comp4_micro.pla", 0, 860, CRC(ee9d7d9e) SHA1(25484e18f6a07f7cdb21a07220e2f2a82fadfe7b) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_comp4_output.pla", 0, 352, CRC(144ce2d5) SHA1(459b92ad62421932df61b7e3965f1821f9636a2c) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_comp4_segment.pla", 0, 157, CRC(73426b07) SHA1(311be3f95a97936b6d1a4dcfa7746da26318ce54) )
+ROM_END
 
 
 
@@ -5896,8 +6514,8 @@ MACHINE_CONFIG_END
 class bship_state : public hh_tms1k_state
 {
 public:
-	bship_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	bship_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -6004,20 +6622,32 @@ static INPUT_PORTS_START( bship )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Clear Last Entry")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(bship_state::bship)
-
+void bship_state::bship(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=100K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, bship_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, bship_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bship_state, write_o))
+	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=100K, C=47pF
+	m_maincpu->k().set(FUNC(bship_state::read_k));
+	m_maincpu->r().set(FUNC(bship_state::write_r));
+	m_maincpu->o().set(FUNC(bship_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_bship);
 
 	/* sound hardware */
 	// TODO
-MACHINE_CONFIG_END
+}
+
+// roms
+
+ROM_START( bship )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3201", 0x0000, 0x0400, CRC(bf6104a6) SHA1(8d28b43a2aa39dcbbe71f669cdafc518715812c9) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_bship_output.pla", 0, 365, CRC(ea0570b0) SHA1(6eb803b40717486d7b24939985f245327ac8a7e9) )
+ROM_END
 
 
 
@@ -6038,8 +6668,8 @@ MACHINE_CONFIG_END
 class bshipb_state : public hh_tms1k_state
 {
 public:
-	bshipb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag),
+	bshipb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
 		m_sn(*this, "sn76477")
 	{ }
 
@@ -6107,35 +6737,47 @@ READ8_MEMBER(bshipb_state::read_k)
 
 // buttons are same as bship set
 
-MACHINE_CONFIG_START(bshipb_state::bshipb)
-
+void bshipb_state::bshipb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=100K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, bshipb_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, bshipb_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bshipb_state, write_o))
+	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=100K, C=47pF
+	m_maincpu->k().set(FUNC(bshipb_state::read_k));
+	m_maincpu->r().set(FUNC(bshipb_state::write_r));
+	m_maincpu->o().set(FUNC(bshipb_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_bship);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("sn76477", SN76477)
-	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(100), CAP_P(47)) // R18, R17, C8
-	MCFG_SN76477_DECAY_RES(RES_M(3.3))                          // R16
-	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.47), RES_K(15))          // C7, R20
-	MCFG_SN76477_AMP_RES(RES_K(100))                            // R19
-	MCFG_SN76477_FEEDBACK_RES(RES_K(39))                        // R7
-	MCFG_SN76477_VCO_PARAMS(5.0 * RES_VOLTAGE_DIVIDER(RES_K(47), RES_K(33)), CAP_U(0.01), RES_K(270)) // R15/R14, C5, switchable R5/R3/R4
-	MCFG_SN76477_PITCH_VOLTAGE(5.0)
-	MCFG_SN76477_SLF_PARAMS(CAP_U(22), RES_K(750))  // switchable C4, switchable R13/R12
-	MCFG_SN76477_ONESHOT_PARAMS(0, RES_INF)         // NC, switchable R11
-	MCFG_SN76477_VCO_MODE(0)                        // switchable
-	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)              // switchable, GND, GND
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)              // Vreg, GND
-	MCFG_SN76477_ENABLE(0)                          // switchable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-MACHINE_CONFIG_END
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(RES_K(47), RES_K(100), CAP_P(47));   // R18, R17, C8
+	m_sn->set_decay_res(RES_M(3.3));                            // R16
+	m_sn->set_attack_params(CAP_U(0.47), RES_K(15));            // C7, R20
+	m_sn->set_amp_res(RES_K(100));                              // R19
+	m_sn->set_feedback_res(RES_K(39));                          // R7
+	m_sn->set_vco_params(5.0 * RES_VOLTAGE_DIVIDER(RES_K(47), RES_K(33)), CAP_U(0.01), RES_K(270)); // R15/R14, C5, switchable R5/R3/R4
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_U(22), RES_K(750));    // switchable C4, switchable R13/R12
+	m_sn->set_oneshot_params(0, RES_INF);           // NC, switchable R11
+	m_sn->set_vco_mode(0);                          // switchable
+	m_sn->set_mixer_params(0, 0, 0);                // switchable, GND, GND
+	m_sn->set_envelope_params(1, 0);                // Vreg, GND
+	m_sn->set_enable(0);                            // switchable
+	m_sn->add_route(ALL_OUTPUTS, "mono", 0.35);
+}
+
+// roms
+
+ROM_START( bshipb )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3208", 0x0000, 0x0400, CRC(982fa720) SHA1(1c6dbbe7b9e55d62a510225a88cd2de55fe9b181) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_bshipb_output.pla", 0, 365, BAD_DUMP CRC(74a9a244) SHA1(479c1f1e37cf8f75352e10226b20322906bee813) ) // part of decap photo was obscured
+ROM_END
 
 
 
@@ -6160,8 +6802,8 @@ MACHINE_CONFIG_END
 class simon_state : public hh_tms1k_state
 {
 public:
-	simon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	simon_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -6223,23 +6865,51 @@ static INPUT_PORTS_START( simon )
 	PORT_CONFSETTING(    0x04, "2" )
 	PORT_CONFSETTING(    0x08, "3" )
 	PORT_CONFSETTING(    0x01, "4" )
+
+	PORT_START("SWITCH") // fake
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<0>, 0x07)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<0>, 0x07)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<3>, 0x0f)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<3>, 0x0f)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(simon_state::simon)
-
+void simon_state::simon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 350000) // approximation - RC osc. R=33K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, simon_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, simon_state, write_r))
+	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
+	m_maincpu->k().set(FUNC(simon_state::read_k));
+	m_maincpu->r().set(FUNC(simon_state::write_r));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_simon);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( simon )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms1000.u1", 0x0000, 0x0400, CRC(9961719d) SHA1(35dddb018a8a2b31f377ab49c1f0cb76951b81c0) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_simon_micro.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
+	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
+	ROM_LOAD( "tms1000_simon_output.pla", 0, 365, CRC(2943c71b) SHA1(bd5bb55c57e7ba27e49c645937ec1d4e67506601) )
+ROM_END
+
+ROM_START( simonf )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3300", 0x0000, 0x0400, CRC(b9fcf93a) SHA1(45960e4242a08495f2a99fc5d44728eabd93cd9f) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_simon_micro.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
+	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
+	ROM_LOAD( "tms1000_simon_output.pla", 0, 365, CRC(2943c71b) SHA1(bd5bb55c57e7ba27e49c645937ec1d4e67506601) )
+ROM_END
 
 
 
@@ -6259,22 +6929,38 @@ MACHINE_CONFIG_END
 class ssimon_state : public hh_tms1k_state
 {
 public:
-	ssimon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	ssimon_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(speed_switch);
+	DECLARE_INPUT_CHANGED_MEMBER(speed_switch) { set_clock(); }
 	void ssimon(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
 };
 
+void ssimon_state::machine_reset()
+{
+	hh_tms1k_state::machine_reset();
+	set_clock();
+}
+
 // handlers
+
+void ssimon_state::set_clock()
+{
+	// MCU clock is from an RC circuit with C=100pF, R=x depending on speed switch:
+	// 0 Simple: R=51K -> ~200kHz
+	// 1 Normal: R=37K -> ~275kHz
+	// 2 Super:  R=22K -> ~400kHz
+	u8 inp = m_inp_matrix[6]->read();
+	m_maincpu->set_unscaled_clock((inp & 2) ? 400000 : ((inp & 1) ? 275000 : 200000));
+}
 
 WRITE16_MEMBER(ssimon_state::write_r)
 {
@@ -6343,44 +7029,43 @@ static INPUT_PORTS_START( ssimon )
 	PORT_CONFSETTING(    0x00, "Simple" )
 	PORT_CONFSETTING(    0x01, "Normal" )
 	PORT_CONFSETTING(    0x02, "Super" )
+
+	PORT_START("SWITCH") // fake
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<0>, 0x0f)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<0>, 0x0f)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<4>, 0x0f)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<4>, 0x0f)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<6>, 0x03)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<6>, 0x03)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(ssimon_state::speed_switch)
+void ssimon_state::ssimon(machine_config &config)
 {
-	set_clock();
-}
-
-void ssimon_state::set_clock()
-{
-	// MCU clock is from an RC circuit with C=100pF, R=x depending on speed switch:
-	// 0 Simple: R=51K -> ~200kHz
-	// 1 Normal: R=37K -> ~275kHz
-	// 2 Super:  R=22K -> ~400kHz
-	u8 inp = m_inp_matrix[6]->read();
-	m_maincpu->set_unscaled_clock((inp & 2) ? 400000 : ((inp & 1) ? 275000 : 200000));
-}
-
-void ssimon_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	set_clock();
-}
-
-MACHINE_CONFIG_START(ssimon_state::ssimon)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 275000) // see set_clock
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ssimon_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ssimon_state, write_r))
+	TMS1100(config, m_maincpu, 275000); // see set_clock
+	m_maincpu->k().set(FUNC(ssimon_state::read_k));
+	m_maincpu->r().set(FUNC(ssimon_state::write_r));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_ssimon);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( ssimon )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp3476", 0x0000, 0x0800, CRC(98200571) SHA1(cbd0bcfc11a534aa0be5d011584cdcac58ff437a) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
+	ROM_LOAD( "tms1100_ssimon_output.pla", 0, 365, CRC(0fea09b0) SHA1(27a56fcf2b490e9a7dbbc6ad48cc8aaca4cada94) )
+ROM_END
 
 
 
@@ -6406,8 +7091,8 @@ MACHINE_CONFIG_END
 class bigtrak_state : public hh_tms1k_state
 {
 public:
-	bigtrak_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	bigtrak_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -6422,6 +7107,15 @@ public:
 protected:
 	virtual void machine_start() override;
 };
+
+void bigtrak_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+
+	// zerofill/register for savestates
+	m_gearbox_pos = 0;
+	save_item(NAME(m_gearbox_pos));
+}
 
 // handlers
 
@@ -6535,35 +7229,38 @@ static INPUT_PORTS_START( bigtrak )
 	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void bigtrak_state::machine_start()
-{
-	hh_tms1k_state::machine_start();
-
-	// zerofill/register for savestates
-	m_gearbox_pos = 0;
-	save_item(NAME(m_gearbox_pos));
-}
-
 static const s16 bigtrak_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
 
-MACHINE_CONFIG_START(bigtrak_state::bigtrak)
-
+void bigtrak_state::bigtrak(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=83K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, bigtrak_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, bigtrak_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bigtrak_state, write_o))
+	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=83K, C=100pF
+	m_maincpu->k().set(FUNC(bigtrak_state::read_k));
+	m_maincpu->r().set(FUNC(bigtrak_state::write_r));
+	m_maincpu->o().set(FUNC(bigtrak_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("gearbox", bigtrak_state, gearbox_sim_tick, attotime::from_msec(1))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "gearbox").configure_periodic(FUNC(bigtrak_state::gearbox_sim_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_bigtrak);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(8, bigtrak_speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(8, bigtrak_speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( bigtrak )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3301a", 0x0000, 0x0400, CRC(1351bcdd) SHA1(68865389c25b541c09a742be61f8fb6488134d4e) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common3_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_bigtrak_output.pla", 0, 365, CRC(63be45f6) SHA1(918e38a223152db883c1a6f7acf56e87d7074734) )
+ROM_END
 
 
 
@@ -6591,8 +7288,8 @@ MACHINE_CONFIG_END
 class mbdtower_state : public hh_tms1k_state
 {
 public:
-	mbdtower_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	mbdtower_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -6614,6 +7311,25 @@ public:
 protected:
 	virtual void machine_start() override;
 };
+
+void mbdtower_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+
+	// zerofill
+	m_motor_pos = 0;
+	m_motor_pos_prev = -1;
+	m_motor_decay = 0;
+	m_motor_on = false;
+	m_sensor_blind = false;
+
+	// register for savestates
+	save_item(NAME(m_motor_pos));
+	/* save_item(NAME(m_motor_pos_prev)); */ // don't save!
+	save_item(NAME(m_motor_decay));
+	save_item(NAME(m_motor_on));
+	save_item(NAME(m_sensor_blind));
+}
 
 // handlers
 
@@ -6760,42 +7476,35 @@ static INPUT_PORTS_START( mbdtower )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Tomb/Ruin")
 INPUT_PORTS_END
 
-void mbdtower_state::machine_start()
+void mbdtower_state::mbdtower(machine_config &config)
 {
-	hh_tms1k_state::machine_start();
-
-	// zerofill
-	m_motor_pos = 0;
-	m_motor_pos_prev = -1;
-	m_motor_decay = 0;
-	m_motor_on = false;
-	m_sensor_blind = false;
-
-	// register for savestates
-	save_item(NAME(m_motor_pos));
-	/* save_item(NAME(m_motor_pos_prev)); */ // don't save!
-	save_item(NAME(m_motor_decay));
-	save_item(NAME(m_motor_on));
-	save_item(NAME(m_sensor_blind));
-}
-
-MACHINE_CONFIG_START(mbdtower_state::mbdtower)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1400, 425000) // approximation - RC osc. R=43K, C=56pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, mbdtower_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, mbdtower_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, mbdtower_state, write_o))
+	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=43K, C=56pF
+	m_maincpu->k().set(FUNC(mbdtower_state::read_k));
+	m_maincpu->r().set(FUNC(mbdtower_state::write_r));
+	m_maincpu->o().set(FUNC(mbdtower_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("tower_motor", mbdtower_state, motor_sim_tick, attotime::from_msec(3500/0x80)) // ~3.5sec for a full rotation
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "tower_motor").configure_periodic(FUNC(mbdtower_state::motor_sim_tick), attotime::from_msec(3500/0x80)); // ~3.5sec for a full rotation
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_mbdtower);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( mbdtower )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp7332", 0x0000, 0x1000, CRC(ebeab91a) SHA1(7edbff437da371390fa8f28b3d183f833eaa9be9) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_mbdtower_output.pla", 0, 557, CRC(64c84697) SHA1(72ce6d24cedf9c606f1742cd5620f75907246e87) )
+ROM_END
 
 
 
@@ -6815,8 +7524,8 @@ MACHINE_CONFIG_END
 class arcmania_state : public hh_tms1k_state
 {
 public:
-	arcmania_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	arcmania_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -6882,31 +7591,43 @@ static INPUT_PORTS_START( arcmania )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // O6 (also O5 to power)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Orange Button 1") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Orange Button 2") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Orange Button 3") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Orange Button 1") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Orange Button 2") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Orange Button 3") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const s16 arcmania_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
 
-MACHINE_CONFIG_START(arcmania_state::arcmania)
-
+void arcmania_state::arcmania(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 250000) // approximation - RC osc. R=56K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, arcmania_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, arcmania_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, arcmania_state, write_o))
+	TMS1100(config, m_maincpu, 250000); // approximation - RC osc. R=56K, C=100pF
+	m_maincpu->k().set(FUNC(arcmania_state::read_k));
+	m_maincpu->r().set(FUNC(arcmania_state::write_r));
+	m_maincpu->o().set(FUNC(arcmania_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_arcmania);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(8, arcmania_speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(8, arcmania_speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( arcmania )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "m34078a", 0x0000, 0x0800, CRC(90ea0087) SHA1(9780c9c1ba89300b1bbe72c47e5fec68d8bb6a77) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_arcmania_output.pla", 0, 365, CRC(a1517b15) SHA1(72eedd7fd41de9c9102219f325fe8668a7c02663) )
+ROM_END
 
 
 
@@ -6927,8 +7648,8 @@ MACHINE_CONFIG_END
 class cnsector_state : public hh_tms1k_state
 {
 public:
-	cnsector_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	cnsector_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -7009,19 +7730,35 @@ static INPUT_PORTS_START( cnsector )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Teach Mode")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(cnsector_state::cnsector)
-
+void cnsector_state::cnsector(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS0970, 250000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cnsector_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cnsector_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cnsector_state, write_o))
+	TMS0970(config, m_maincpu, 250000); // approximation
+	m_maincpu->k().set(FUNC(cnsector_state::read_k));
+	m_maincpu->r().set(FUNC(cnsector_state::write_r));
+	m_maincpu->o().set(FUNC(cnsector_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_cnsector);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
+
+// roms
+
+ROM_START( cnsector )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0905bnl_za0379", 0x0000, 0x0400, CRC(201036e9) SHA1(b37fef86bb2bceaf0ac8bb3745b4702d17366914) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common2_instr.pla", 0, 782, CRC(e038fc44) SHA1(dfc280f6d0a5828d1bb14fcd59ac29caf2c2d981) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_cnsector_micro.pla", 0, 860, CRC(059f5bb4) SHA1(2653766f9fd74d41d44013bb6f54c0973a6080c9) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_cnsector_output.pla", 0, 352, CRC(c8bfb9d2) SHA1(30c3c73cec194debdcb1dd01b4adfefaeddf9516) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
+ROM_END
 
 
 
@@ -7052,8 +7789,8 @@ MACHINE_CONFIG_END
 class merlin_state : public hh_tms1k_state
 {
 public:
-	merlin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	merlin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	virtual DECLARE_WRITE16_MEMBER(write_r);
@@ -7123,23 +7860,35 @@ INPUT_PORTS_END
 
 static const s16 merlin_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
 
-MACHINE_CONFIG_START(merlin_state::merlin)
-
+void merlin_state::merlin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 350000) // approximation - RC osc. R=33K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, merlin_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, merlin_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, merlin_state, write_o))
+	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
+	m_maincpu->k().set(FUNC(merlin_state::read_k));
+	m_maincpu->r().set(FUNC(merlin_state::write_r));
+	m_maincpu->o().set(FUNC(merlin_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_merlin);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(8, merlin_speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(8, merlin_speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( merlin )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp3404", 0x0000, 0x0800, CRC(7515a75d) SHA1(76ca3605d3fde1df62f79b9bb1f534c2a2ae0229) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_merlin_output.pla", 0, 365, CRC(3921b074) SHA1(12bd58e4d6676eb8c7059ef53598279e4f1a32ea) )
+ROM_END
 
 
 
@@ -7170,8 +7919,8 @@ MACHINE_CONFIG_END
 class mmerlin_state : public merlin_state
 {
 public:
-	mmerlin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: merlin_state(mconfig, type, tag)
+	mmerlin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		merlin_state(mconfig, type, tag)
 	{ }
 
 	void mmerlin(machine_config &config);
@@ -7188,23 +7937,35 @@ static INPUT_PORTS_START( mmerlin )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Score") // instead of Hit Me
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(mmerlin_state::mmerlin)
-
+void mmerlin_state::mmerlin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1400, 425000) // approximation - RC osc. R=30K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, mmerlin_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, mmerlin_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, mmerlin_state, write_o))
+	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=30K, C=100pF
+	m_maincpu->k().set(FUNC(mmerlin_state::read_k));
+	m_maincpu->r().set(FUNC(mmerlin_state::write_r));
+	m_maincpu->o().set(FUNC(mmerlin_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_mmerlin);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(8, merlin_speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(8, merlin_speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( mmerlin )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp7351", 0x0000, 0x1000, CRC(0f7a4c83) SHA1(242c1278ddfe92c28fd7cd87300e48e7a4827831) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_mmerlin_output.pla", 0, 557, CRC(fd3dcd93) SHA1(f2afc52df700daa0eb7356c7876af9b2966f971b) )
+ROM_END
 
 
 
@@ -7226,8 +7987,8 @@ MACHINE_CONFIG_END
 class stopthief_state : public hh_tms1k_state
 {
 public:
-	stopthief_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	stopthief_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -7295,33 +8056,63 @@ static INPUT_PORTS_START( stopthief )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.2") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Tip")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Arrest")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Clue")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 INPUT_PORTS_END
 
 static const s16 stopthief_speaker_levels[7] = { 0, 0x7fff/6, 0x7fff/5, 0x7fff/4, 0x7fff/3, 0x7fff/2, 0x7fff };
 
-MACHINE_CONFIG_START(stopthief_state::stopthief)
-
+void stopthief_state::stopthief(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS0980, 425000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, stopthief_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, stopthief_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, stopthief_state, write_o))
-	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(*this, hh_tms1k_state, auto_power_off))
+	TMS0980(config, m_maincpu, 425000); // approximation
+	m_maincpu->k().set(FUNC(stopthief_state::read_k));
+	m_maincpu->r().set(FUNC(stopthief_state::write_r));
+	m_maincpu->o().set(FUNC(stopthief_state::write_o));
+	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_stopthief);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(7, stopthief_speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(7, stopthief_speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( stopthief )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp6101b", 0x0000, 0x1000, CRC(b9c9d64a) SHA1(481f8653064c142fe5d9314b750bcd73797b92b2) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 1982, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0980_common1_micro.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_stopthief_output.pla", 0, 352, CRC(680ca1c1) SHA1(dea6365f2e6b50a52f1a8f1d8417176b905d2bc9) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
+ROM_END
+
+ROM_START( stopthiefp )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "us4341385", 0x0000, 0x1000, CRC(07aec38a) SHA1(0a3d0956495c0d6d9ea771feae6c14a473a800dc) ) // from patent US4341385, data should be correct (it included checksums)
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 1982, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0980_common1_micro.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_stopthief_output.pla", 0, 352, CRC(680ca1c1) SHA1(dea6365f2e6b50a52f1a8f1d8417176b905d2bc9) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
+ROM_END
 
 
 
@@ -7346,8 +8137,8 @@ MACHINE_CONFIG_END
 class bankshot_state : public hh_tms1k_state
 {
 public:
-	bankshot_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	bankshot_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -7418,22 +8209,34 @@ static INPUT_PORTS_START( bankshot )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(bankshot_state::bankshot)
-
+void bankshot_state::bankshot(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1400, 475000) // approximation - RC osc. R=24K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, bankshot_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, bankshot_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bankshot_state, write_o))
+	TMS1400(config, m_maincpu, 475000); // approximation - RC osc. R=24K, C=100pF
+	m_maincpu->k().set(FUNC(bankshot_state::read_k));
+	m_maincpu->r().set(FUNC(bankshot_state::write_r));
+	m_maincpu->o().set(FUNC(bankshot_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_bankshot);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( bankshot )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp7313", 0x0000, 0x1000, CRC(7a5016a9) SHA1(a8730dc8a282ffaa3d89e675f371d43eb39f39b4) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_bankshot_output.pla", 0, 557, CRC(7539283b) SHA1(f791fa98259fc10c393ff1961d4c93040f1a2932) )
+ROM_END
 
 
 
@@ -7474,8 +8277,8 @@ MACHINE_CONFIG_END
 class splitsec_state : public hh_tms1k_state
 {
 public:
-	splitsec_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	splitsec_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -7535,22 +8338,34 @@ static INPUT_PORTS_START( splitsec )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(splitsec_state::splitsec)
-
+void splitsec_state::splitsec(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1400, 475000) // approximation - RC osc. R=24K, C=100pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, splitsec_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, splitsec_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, splitsec_state, write_o))
+	TMS1400(config, m_maincpu, 475000); // approximation - RC osc. R=24K, C=100pF
+	m_maincpu->k().set(FUNC(splitsec_state::read_k));
+	m_maincpu->r().set(FUNC(splitsec_state::write_r));
+	m_maincpu->o().set(FUNC(splitsec_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_splitsec);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( splitsec )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp7314", 0x0000, 0x1000, CRC(e94b2098) SHA1(f0fc1f56a829252185592a2508740354c50bedf8) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_splitsec_output.pla", 0, 557, CRC(7539283b) SHA1(f791fa98259fc10c393ff1961d4c93040f1a2932) )
+ROM_END
 
 
 
@@ -7570,8 +8385,8 @@ MACHINE_CONFIG_END
 class lostreas_state : public hh_tms1k_state
 {
 public:
-	lostreas_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	lostreas_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -7653,23 +8468,35 @@ static const s16 lostreas_speaker_levels[16] =
 	0x7fff/8, 0x7fff/7, 0x7fff/6, 0x7fff/5, 0x7fff/4, 0x7fff/3, 0x7fff/2, 0x7fff/1
 };
 
-MACHINE_CONFIG_START(lostreas_state::lostreas)
-
+void lostreas_state::lostreas(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 425000) // approximation - RC osc. R=39K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, lostreas_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, lostreas_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, lostreas_state, write_o))
+	TMS1100(config, m_maincpu, 425000); // approximation - RC osc. R=39K, C=47pF
+	m_maincpu->k().set(FUNC(lostreas_state::read_k));
+	m_maincpu->r().set(FUNC(lostreas_state::write_r));
+	m_maincpu->o().set(FUNC(lostreas_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_lostreas);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(16, lostreas_speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(16, lostreas_speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( lostreas )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "m34038", 0x0000, 0x0800, CRC(4c996f63) SHA1(ebbaa8b2f909f4300887aa2dbdb7185eedc75d3f) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_lostreas_output.pla", 0, 365, CRC(c62d850f) SHA1(d25974e6901eb10c52cdda12e6d4a13e26745e6f) )
+ROM_END
 
 
 
@@ -7697,11 +8524,9 @@ MACHINE_CONFIG_END
 class alphie_state : public hh_tms1k_state
 {
 public:
-	alphie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	alphie_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
-
-	TIMER_DEVICE_CALLBACK_MEMBER(show_arm_position);
 
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
@@ -7710,13 +8535,6 @@ public:
 };
 
 // handlers
-
-TIMER_DEVICE_CALLBACK_MEMBER(alphie_state::show_arm_position)
-{
-	// arm position 1(up) to 5(down)
-	output().set_value("q_pos", 32 - count_leading_zeros(m_inp_matrix[1]->read()));
-	output().set_value("a_pos", 32 - count_leading_zeros(m_inp_matrix[2]->read()));
-}
 
 WRITE16_MEMBER(alphie_state::write_r)
 {
@@ -7747,17 +8565,25 @@ READ8_MEMBER(alphie_state::read_k)
 
 // config
 
-static const ioport_value alphie_armpos_table[5] = { 0x01, 0x02, 0x04, 0x08, 0x10 };
-
 static INPUT_PORTS_START( alphie )
 	PORT_START("IN.0") // K1
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 
 	PORT_START("IN.1") // K2
-	PORT_BIT( 0x1f, 0x00, IPT_POSITIONAL_V ) PORT_PLAYER(2) PORT_POSITIONS(5) PORT_REMAP_TABLE(alphie_armpos_table) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Question Arm")
+	PORT_CONFNAME( 0x1f, 0x01, "Question" )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x04, "3" )
+	PORT_CONFSETTING(    0x08, "4" )
+	PORT_CONFSETTING(    0x10, "5" )
 
 	PORT_START("IN.2") // K4
-	PORT_BIT( 0x1f, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(5) PORT_REMAP_TABLE(alphie_armpos_table) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Answer Arm")
+	PORT_CONFNAME( 0x1f, 0x01, "Answer" )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x04, "3" )
+	PORT_CONFSETTING(    0x08, "4" )
+	PORT_CONFSETTING(    0x10, "5" )
 
 	PORT_START("IN.3") // K8
 	PORT_CONFNAME( 0x0f, 0x01, "Activity" )
@@ -7765,6 +8591,14 @@ static INPUT_PORTS_START( alphie )
 	PORT_CONFSETTING(    0x02, "Lunar Landing" )
 	PORT_CONFSETTING(    0x04, "Robot Land" )
 	PORT_CONFSETTING(    0x08, "Tunes" )
+
+	PORT_START("SWITCH") // fake
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<1>, 0x1f) PORT_NAME("Question Arm Up")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<1>, 0x1f) PORT_NAME("Question Arm Down")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<2>, 0x1f) PORT_NAME("Answer Arm Up")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<2>, 0x1f) PORT_NAME("Answer Arm Down")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<3>, 0x0f) PORT_NAME("Activity Selector Left")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<3>, 0x0f) PORT_NAME("Activity Selector Right")
 INPUT_PORTS_END
 
 // output PLA is guessed
@@ -7774,24 +8608,35 @@ static const u16 alphie_output_pla[0x20] =
 	0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1
 };
 
-MACHINE_CONFIG_START(alphie_state::alphie)
-
+void alphie_state::alphie(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 350000) // approximation
-	MCFG_TMS1XXX_OUTPUT_PLA(alphie_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, alphie_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, alphie_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, alphie_state, write_o))
+	TMS1000(config, m_maincpu, 350000); // approximation
+	m_maincpu->set_output_pla(alphie_output_pla);
+	m_maincpu->k().set(FUNC(alphie_state::read_k));
+	m_maincpu->r().set(FUNC(alphie_state::write_r));
+	m_maincpu->o().set(FUNC(alphie_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("arm_position", alphie_state, show_arm_position, attotime::from_msec(50))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_alphie);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( alphie )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "us4280809", 0x0000, 0x0400, CRC(f8f14013) SHA1(bf31b929fcbcb189bbe4623104e1da0a639b5954) ) // from patent US4280809, should be good
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, BAD_DUMP CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) ) // not in patent description
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_alphie_output.pla", 0, 365, NO_DUMP ) // "
+ROM_END
 
 
 
@@ -7812,8 +8657,8 @@ MACHINE_CONFIG_END
 class tcfball_state : public hh_tms1k_state
 {
 public:
-	tcfball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	tcfball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -7885,22 +8730,34 @@ static INPUT_PORTS_START( tcfball )
 	PORT_CONFSETTING(    0x08, "2" ) // professional
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tcfball_state::tcfball)
-
+void tcfball_state::tcfball(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=56K, C=24pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tcfball_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tcfball_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tcfball_state, write_o))
+	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=56K, C=24pF
+	m_maincpu->k().set(FUNC(tcfball_state::read_k));
+	m_maincpu->r().set(FUNC(tcfball_state::write_r));
+	m_maincpu->o().set(FUNC(tcfball_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_tcfball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tcfball )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1193", 0x0000, 0x0800, CRC(7d9f446f) SHA1(bb6af47b42d989494f21475a73f072cddf58c99f) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_tcfball_output.pla", 0, 365, CRC(26b2996e) SHA1(df0e706c552bf74123aa65e71b0c9b4d33cddb2b) )
+ROM_END
 
 
 
@@ -7924,8 +8781,8 @@ MACHINE_CONFIG_END
 class tcfballa_state : public tcfball_state
 {
 public:
-	tcfballa_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tcfball_state(mconfig, type, tag)
+	tcfballa_state(const machine_config &mconfig, device_type type, const char *tag) :
+		tcfball_state(mconfig, type, tag)
 	{ }
 
 	void tcfballa(machine_config &config);
@@ -7950,23 +8807,35 @@ static const u16 tcfballa_output_pla[0x20] =
 	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-MACHINE_CONFIG_START(tcfballa_state::tcfballa)
-
+void tcfballa_state::tcfballa(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=50pF
-	MCFG_TMS1XXX_OUTPUT_PLA(tcfballa_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tcfballa_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tcfballa_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tcfballa_state, write_o))
+	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=50pF
+	m_maincpu->set_output_pla(tcfballa_output_pla);
+	m_maincpu->k().set(FUNC(tcfballa_state::read_k));
+	m_maincpu->r().set(FUNC(tcfballa_state::write_r));
+	m_maincpu->o().set(FUNC(tcfballa_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_tcfballa);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tcfballa )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1183", 0x0000, 0x0800, CRC(2a4db1d5) SHA1(5df15d1115bb425578ad522d607a582dd478f35c) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_tcfballa_output.pla", 0, 365, NO_DUMP )
+ROM_END
 
 
 
@@ -8002,8 +8871,8 @@ MACHINE_CONFIG_END
 class tandy12_state : public hh_tms1k_state
 {
 public:
-	tandy12_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	tandy12_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -8101,7 +8970,7 @@ static INPUT_PORTS_START( tandy12 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Button 5")
 INPUT_PORTS_END
 
-// output PLA is not decapped
+// output PLA is not decapped, this was made by hand
 static const u16 tandy12_output_pla[0x20] =
 {
 	// these are certain
@@ -8114,23 +8983,35 @@ static const u16 tandy12_output_pla[0x20] =
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-MACHINE_CONFIG_START(tandy12_state::tandy12)
-
+void tandy12_state::tandy12(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 400000) // approximation - RC osc. R=39K, C=47pF
-	MCFG_TMS1XXX_OUTPUT_PLA(tandy12_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tandy12_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tandy12_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tandy12_state, write_o))
+	TMS1100(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
+	m_maincpu->set_output_pla(tandy12_output_pla);
+	m_maincpu->k().set(FUNC(tandy12_state::read_k));
+	m_maincpu->r().set(FUNC(tandy12_state::write_r));
+	m_maincpu->o().set(FUNC(tandy12_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_tandy12);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tandy12 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "cd7282sl", 0x0000, 0x0800, CRC(a10013dd) SHA1(42ebd3de3449f371b99937f9df39c240d15ac686) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, BAD_DUMP CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // not verified
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_tandy12_output.pla", 0, 365, NO_DUMP )
+ROM_END
 
 
 
@@ -8155,8 +9036,8 @@ MACHINE_CONFIG_END
 class monkeysee_state : public hh_tms1k_state
 {
 public:
-	monkeysee_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	monkeysee_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -8223,22 +9104,34 @@ static INPUT_PORTS_START( monkeysee )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(monkeysee_state::monkeysee)
-
+void monkeysee_state::monkeysee(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 250000) // approximation - RC osc. R=68K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, monkeysee_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, monkeysee_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, monkeysee_state, write_o))
+	TMS1000(config, m_maincpu, 250000); // approximation - RC osc. R=68K, C=47pF
+	m_maincpu->k().set(FUNC(monkeysee_state::read_k));
+	m_maincpu->r().set(FUNC(monkeysee_state::write_r));
+	m_maincpu->o().set(FUNC(monkeysee_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_monkeysee);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( monkeysee )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0271", 0x0000, 0x0400, CRC(acab0f05) SHA1(226f7688caf4a94a88241d3b61ddc4254e4a918c) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_monkeysee_micro.pla", 0, 867, CRC(368d878f) SHA1(956e700a04f453c1610cfdb974fce898ba4cf01f) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_monkeysee_output.pla", 0, 365, CRC(8a010e89) SHA1(3ffbabc5d6c9b34cc06d290817d15b2be42d8b17) )
+ROM_END
 
 
 
@@ -8260,8 +9153,8 @@ MACHINE_CONFIG_END
 class speechp_state : public hh_tms1k_state
 {
 public:
-	speechp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag),
+	speechp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
 		m_speech(*this, "speech")
 	{ }
 
@@ -8372,22 +9265,37 @@ static INPUT_PORTS_START( speechp )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(speechp_state::speechp)
-
+void speechp_state::speechp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 400000) // approximation - RC osc. R=39K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, speechp_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, speechp_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, speechp_state, write_o))
+	TMS1000(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
+	m_maincpu->k().set(FUNC(speechp_state::read_k));
+	m_maincpu->r().set(FUNC(speechp_state::write_r));
+	m_maincpu->o().set(FUNC(speechp_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_speechp);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speech", S14001A, 25000) // approximation
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_CONFIG_END
+	S14001A(config, m_speech, 25000); // approximation
+	m_speech->add_route(ALL_OUTPUTS, "mono", 0.75);
+}
+
+// roms
+
+ROM_START( speechp )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms1007nl", 0x0000, 0x0400, CRC(c2669d5c) SHA1(7943d6f39508a9a82bc21e4fe34a5b9f86e3add2) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_speechp_output.pla", 0, 365, CRC(e1b4197f) SHA1(258f4276a9f15c9bfbfa58df2f7202aed1542fdc) )
+
+	ROM_REGION( 0x0800, "speech", 0 )
+	ROM_LOAD("s14007-a", 0x0000, 0x0800, CRC(543b46d4) SHA1(99daf7fe3354c378b4bd883840c9bbd22b22ebe7) )
+ROM_END
 
 
 
@@ -8413,8 +9321,8 @@ MACHINE_CONFIG_END
 class timaze_state : public hh_tms1k_state
 {
 public:
-	timaze_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	timaze_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -8454,19 +9362,31 @@ static INPUT_PORTS_START( timaze )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(timaze_state::timaze)
-
+void timaze_state::timaze(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=80K, C=27pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, timaze_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, timaze_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, timaze_state, write_o))
+	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=80K, C=27pF
+	m_maincpu->k().set(FUNC(timaze_state::read_k));
+	m_maincpu->r().set(FUNC(timaze_state::write_r));
+	m_maincpu->o().set(FUNC(timaze_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_timaze);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
+
+// roms
+
+ROM_START( timaze )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "gb2040172a", 0x0000, 0x0400, CRC(0bab4dc6) SHA1(c9d40649fbb27a8b7cf7460d66c7e217b63376f0) ) // from patent GB2040172A, verified with source code
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, BAD_DUMP CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) ) // not in patent, use default one
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_timaze_output.pla", 0, 365, BAD_DUMP CRC(f0f36970) SHA1(a6ad1f5e804ac98e5e1a1d07466b3db3a8d6c256) ) // described in patent, but unsure about pin order
+ROM_END
 
 
 
@@ -8489,8 +9409,8 @@ MACHINE_CONFIG_END
 class copycat_state : public hh_tms1k_state
 {
 public:
-	copycat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	copycat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -8556,23 +9476,35 @@ INPUT_PORTS_END
 
 static const s16 copycat_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
 
-MACHINE_CONFIG_START(copycat_state::copycat)
-
+void copycat_state::copycat(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 320000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, copycat_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, copycat_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, copycat_state, write_o))
+	TMS1000(config, m_maincpu, 320000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set(FUNC(copycat_state::read_k));
+	m_maincpu->r().set(FUNC(copycat_state::write_r));
+	m_maincpu->o().set(FUNC(copycat_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_copycat);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(4, copycat_speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(4, copycat_speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( copycat )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0919", 0x0000, 0x0400, CRC(92a21299) SHA1(16daadb8dbf53aaab8a71833017b4a578d035d6d) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_copycat_output.pla", 0, 365, CRC(b1d0c96d) SHA1(ac1a003eab3f69e09e9050cb24ea17211e0523fe) )
+ROM_END
 
 
 
@@ -8599,8 +9531,8 @@ MACHINE_CONFIG_END
 class copycatm2_state : public hh_tms1k_state
 {
 public:
-	copycatm2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	copycatm2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -8632,23 +9564,35 @@ static INPUT_PORTS_START( copycatm2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Green Button")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(copycatm2_state::copycatm2)
-
+void copycatm2_state::copycatm2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1730, 275000) // approximation - RC osc. R=100K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(IOPORT("IN.0"))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, copycatm2_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, copycatm2_state, write_o))
+	TMS1730(config, m_maincpu, 275000); // approximation - RC osc. R=100K, C=47pF
+	m_maincpu->k().set_ioport("IN.0");
+	m_maincpu->r().set(FUNC(copycatm2_state::write_r));
+	m_maincpu->o().set(FUNC(copycatm2_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_copycatm2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(4, copycat_speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(4, copycat_speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( copycatm2 )
+	ROM_REGION( 0x0200, "maincpu", 0 )
+	ROM_LOAD( "mp3005n", 0x0000, 0x0200, CRC(a87649cb) SHA1(14ef7967a80578885f0b905772c3bb417b5b3255) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_copycatm2_micro.pla", 0, 867, CRC(2710d8ef) SHA1(cb7a13bfabedad43790de753844707fe829baed0) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_copycatm2_output.pla", 0, 365, CRC(d1999aaf) SHA1(0c27789b349e491d5230f9c75c4741e621f5a14e) )
+ROM_END
 
 
 
@@ -8670,8 +9614,8 @@ MACHINE_CONFIG_END
 class ditto_state : public hh_tms1k_state
 {
 public:
-	ditto_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	ditto_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -8703,23 +9647,35 @@ static INPUT_PORTS_START( ditto )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Red Button")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(ditto_state::ditto)
-
+void ditto_state::ditto(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1730, 275000) // approximation - RC osc. R=100K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(IOPORT("IN.0"))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ditto_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ditto_state, write_o))
+	TMS1730(config, m_maincpu, 275000); // approximation - RC osc. R=100K, C=47pF
+	m_maincpu->k().set_ioport("IN.0");
+	m_maincpu->r().set(FUNC(ditto_state::write_r));
+	m_maincpu->o().set(FUNC(ditto_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_ditto);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(4, copycat_speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(4, copycat_speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( ditto )
+	ROM_REGION( 0x0200, "maincpu", 0 )
+	ROM_LOAD( "mp1801", 0x0000, 0x0200, CRC(cee6043b) SHA1(4ec334be6835688413637ff9d9d7a5f0d61eba27) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_ditto_micro.pla", 0, 867, CRC(2710d8ef) SHA1(cb7a13bfabedad43790de753844707fe829baed0) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_ditto_output.pla", 0, 365, CRC(2b708a27) SHA1(e95415e51ffbe5da3bde1484fcd20467dde9f09a) )
+ROM_END
 
 
 
@@ -8744,8 +9700,8 @@ MACHINE_CONFIG_END
 class ss7in1_state : public hh_tms1k_state
 {
 public:
-	ss7in1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	ss7in1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -8819,22 +9775,34 @@ static INPUT_PORTS_START( ss7in1 )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(ss7in1_state::ss7in1)
-
+void ss7in1_state::ss7in1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1400, 450000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ss7in1_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ss7in1_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ss7in1_state, write_o))
+	TMS1400(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set(FUNC(ss7in1_state::read_k));
+	m_maincpu->r().set(FUNC(ss7in1_state::write_r));
+	m_maincpu->o().set(FUNC(ss7in1_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_7in1ss);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( 7in1ss )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp7304", 0x0000, 0x1000, CRC(2a1c8390) SHA1(fa10e60686af6828a61f05046abc3854ab49af95) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_7in1ss_output.pla", 0, 557, CRC(6b7660f7) SHA1(bb7d58fa04e7606ccdf5b209e1b089948bdd1e7c) )
+ROM_END
 
 
 
@@ -8878,12 +9846,12 @@ MACHINE_CONFIG_END
 class tbreakup_state : public hh_tms1k_state
 {
 public:
-	tbreakup_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag),
+	tbreakup_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
 		m_expander(*this, "expander")
 	{ }
 
-	required_device<tms1024_device> m_expander;
+	required_device<tms1025_device> m_expander;
 	u8 m_exp_port[7];
 	DECLARE_WRITE8_MEMBER(expander_w);
 
@@ -8893,7 +9861,7 @@ public:
 	DECLARE_READ8_MEMBER(read_k);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
 	void tbreakup(machine_config &config);
 
 protected:
@@ -8901,7 +9869,29 @@ protected:
 	virtual void machine_start() override;
 };
 
+void tbreakup_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+
+	// zerofill/register for savestates
+	memset(m_exp_port, 0, sizeof(m_exp_port));
+	save_item(NAME(m_exp_port));
+}
+
+void tbreakup_state::machine_reset()
+{
+	hh_tms1k_state::machine_reset();
+	set_clock();
+	m_expander->write_ms(1); // Vss
+}
+
 // handlers
+
+void tbreakup_state::set_clock()
+{
+	// MCU clock is from an analog circuit with resistor of 73K, PRO2 adds 100K
+	m_maincpu->set_unscaled_clock((m_inp_matrix[3]->read() & 1) ? 500000 : 325000);
+}
 
 void tbreakup_state::prepare_display()
 {
@@ -8985,58 +9975,43 @@ static INPUT_PORTS_START( tbreakup )
 	PORT_CONFSETTING(    0x01, "Pro 2" )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(tbreakup_state::skill_switch)
+void tbreakup_state::tbreakup(machine_config &config)
 {
-	set_clock();
-}
-
-void tbreakup_state::set_clock()
-{
-	// MCU clock is from an analog circuit with resistor of 73K, PRO2 adds 100K
-	m_maincpu->set_unscaled_clock((m_inp_matrix[3]->read() & 1) ? 500000 : 325000);
-}
-
-void tbreakup_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	set_clock();
-	m_expander->write_ms(1); // Vss
-}
-
-void tbreakup_state::machine_start()
-{
-	hh_tms1k_state::machine_start();
-
-	// zerofill/register for savestates
-	memset(m_exp_port, 0, sizeof(m_exp_port));
-	save_item(NAME(m_exp_port));
-}
-
-MACHINE_CONFIG_START(tbreakup_state::tbreakup)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1040, 325000) // see set_clock
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tbreakup_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tbreakup_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tbreakup_state, write_o))
+	TMS1040(config, m_maincpu, 325000); // see set_clock
+	m_maincpu->k().set(FUNC(tbreakup_state::read_k));
+	m_maincpu->r().set(FUNC(tbreakup_state::write_r));
+	m_maincpu->o().set(FUNC(tbreakup_state::write_o));
 
-	MCFG_DEVICE_ADD("expander", TMS1025, 0)
-	MCFG_TMS1025_WRITE_PORT_CB(PORT1, WRITE8(*this, tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT2, WRITE8(*this, tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT3, WRITE8(*this, tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT4, WRITE8(*this, tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT5, WRITE8(*this, tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT6, WRITE8(*this, tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT7, WRITE8(*this, tbreakup_state, expander_w))
+	TMS1025(config, m_expander);
+	m_expander->write_port1_callback().set(FUNC(tbreakup_state::expander_w));
+	m_expander->write_port2_callback().set(FUNC(tbreakup_state::expander_w));
+	m_expander->write_port3_callback().set(FUNC(tbreakup_state::expander_w));
+	m_expander->write_port4_callback().set(FUNC(tbreakup_state::expander_w));
+	m_expander->write_port5_callback().set(FUNC(tbreakup_state::expander_w));
+	m_expander->write_port6_callback().set(FUNC(tbreakup_state::expander_w));
+	m_expander->write_port7_callback().set(FUNC(tbreakup_state::expander_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_tbreakup);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tbreakup )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp2726a", 0x0000, 0x0400, CRC(1f7c28e2) SHA1(164cda4eb3f0b1d20955212a197c9aadf8d18a06) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_tbreakup_output.pla", 0, 365, CRC(a1ea035e) SHA1(fcf0b57ed90b41441a8974223a697f530daac0ab) )
+ROM_END
 
 
 
@@ -9074,8 +10049,8 @@ MACHINE_CONFIG_END
 class phpball_state : public hh_tms1k_state
 {
 public:
-	phpball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	phpball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -9083,7 +10058,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
 
-	DECLARE_INPUT_CHANGED_MEMBER(flipper_button);
+	DECLARE_INPUT_CHANGED_MEMBER(flipper_button) { prepare_display(); }
 	void phpball(machine_config &config);
 };
 
@@ -9140,27 +10115,34 @@ static INPUT_PORTS_START( phpball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Flipper") PORT_CHANGED_MEMBER(DEVICE_SELF, phpball_state, flipper_button, nullptr)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(phpball_state::flipper_button)
+void phpball_state::phpball(machine_config &config)
 {
-	prepare_display();
-}
-
-MACHINE_CONFIG_START(phpball_state::phpball)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, phpball_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, phpball_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, phpball_state, write_o))
+	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set(FUNC(phpball_state::read_k));
+	m_maincpu->r().set(FUNC(phpball_state::write_r));
+	m_maincpu->o().set(FUNC(phpball_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_hh_tms1k_test);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_phpball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( phpball )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1180", 0x0000, 0x0800, CRC(2163b92d) SHA1(bc53d1911e88b4e89d951c6f769703105c13389c) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_phpball_output.pla", 0, 365, CRC(87e67aaf) SHA1(ebc7bae1352f39173f1bf0dc10cdc6f635dedab4) )
+ROM_END
 
 
 
@@ -9182,8 +10164,8 @@ MACHINE_CONFIG_END
 class ssports4_state : public hh_tms1k_state
 {
 public:
-	ssports4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	ssports4_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void prepare_display();
@@ -9280,23 +10262,35 @@ static const u16 ssports4_output_pla[0x20] =
 	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x00, 0x40, 0x40, 0x40, 0x40, 0x40
 };
 
-MACHINE_CONFIG_START(ssports4_state::ssports4)
-
+void ssports4_state::ssports4(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=47pF
-	MCFG_TMS1XXX_OUTPUT_PLA(ssports4_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ssports4_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ssports4_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ssports4_state, write_o))
+	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->set_output_pla(ssports4_output_pla);
+	m_maincpu->k().set(FUNC(ssports4_state::read_k));
+	m_maincpu->r().set(FUNC(ssports4_state::write_r));
+	m_maincpu->o().set(FUNC(ssports4_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_ssports4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( ssports4 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1219", 0x0000, 0x0800, CRC(865c06d6) SHA1(12a625a13bdb57b82b35c42b175d38756a1e2e04) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_ssports4_output.pla", 0, 365, NO_DUMP )
+ROM_END
 
 
 
@@ -9316,12 +10310,12 @@ MACHINE_CONFIG_END
 class xl25_state : public hh_tms1k_state
 {
 public:
-	xl25_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+	xl25_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void update_halt();
-	DECLARE_INPUT_CHANGED_MEMBER(k4_button);
+	DECLARE_INPUT_CHANGED_MEMBER(k4_button) { update_halt(); }
 
 	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -9333,13 +10327,19 @@ protected:
 	virtual void machine_reset() override;
 };
 
+void xl25_state::machine_reset()
+{
+	hh_tms1k_state::machine_reset();
+	update_halt();
+}
+
 // handlers
 
 void xl25_state::update_halt()
 {
 	// O5+K4 go to HALT pin (used when pressing store/recall button)
 	bool halt = !((m_o & 0x20) || (read_k(machine().dummy_space(), 0) & 4));
-	m_maincpu->set_input_line(TMS1XXX_INPUT_LINE_HALT, halt ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, halt ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void xl25_state::prepare_display()
@@ -9439,861 +10439,24 @@ static INPUT_PORTS_START( xl25 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(xl25_state::k4_button)
+void xl25_state::xl25(machine_config &config)
 {
-	update_halt();
-}
-
-void xl25_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	update_halt();
-}
-
-MACHINE_CONFIG_START(xl25_state::xl25)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000C, 300000) // approximation - RC osc. R=5.6K, C=47pF
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, xl25_state, read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, xl25_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, xl25_state, write_o))
+	TMS1000C(config, m_maincpu, 300000); // approximation - RC osc. R=5.6K, C=47pF
+	m_maincpu->k().set(FUNC(xl25_state::read_k));
+	m_maincpu->r().set(FUNC(xl25_state::write_r));
+	m_maincpu->o().set(FUNC(xl25_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_xl25);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
-
-
-
-
-
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
-
-ROM_START( matchnum )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp0163", 0x0000, 0x0400, CRC(37507600) SHA1(b1d4d8ea563e97ef378b42c44cb3ea4eb6abe0d2) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_matchnum_output.pla", 0, 365, CRC(da29670c) SHA1(bcec28bf25dc8c81d08851ad8a3f4e89f413017a) )
-ROM_END
-
-
-ROM_START( arrball )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp0166", 0x0000, 0x0400, CRC(a78694db) SHA1(362aa6e356288e8df7da610246bd01fe72985d57) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_arrball_output.pla", 0, 365, CRC(ffc206fb) SHA1(339be3f066fb2f075211c554e81260b49cd83d15) )
-ROM_END
-
-
-ROM_START( mathmagi )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp1030", 0x0000, 0x0800, CRC(a81d7ccb) SHA1(4756ce42f1ea28ce5fe6498312f8306f10370969) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_mathmagi_output.pla", 0, 365, NO_DUMP )
-ROM_END
-
-
-ROM_START( bcheetah )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp0915", 0x0000, 0x0400, CRC(2968c81e) SHA1(d1e6691952600e88ccf626cb3d683419a1e8468c) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_bcheetah_output.pla", 0, 365, CRC(cc6d1ecd) SHA1(b0635a841d8850c36c1f414abe0571b81884b972) )
-ROM_END
-
-
-ROM_START( amaztron )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp3405", 0x0000, 0x0800, CRC(9cbc0009) SHA1(17772681271b59280687492f37fa0859998f041d) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_amaztron_output.pla", 0, 365, CRC(f3875384) SHA1(3c256a3db4f0aa9d93cf78124db39f4cbdc57e4a) )
-ROM_END
-
-
-ROM_START( zodiac )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp3435", 0x0000, 0x0800, CRC(ecdc3160) SHA1(a7e82d66314a039fcffeddf99919d9f9ad42d61d) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, BAD_DUMP CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_zodiac_output.pla", 0, 365, NO_DUMP )
-ROM_END
-
-
-ROM_START( cqback )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp3415.u4", 0x0000, 0x0800, CRC(65ebdabf) SHA1(9b5cf5adaf9132ced87f611ae8c3148b9b62ba89) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_cqback_output.pla", 0, 365, CRC(c6dcbfd0) SHA1(593b6b7de981a28d1b4a33336b39df92d02ed4f4) )
-ROM_END
-
-
-ROM_START( h2hfootb )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp3460.u3", 0x0000, 0x0800, CRC(3a4e53a8) SHA1(5052e706f992c6c4bada1fa7769589eec3df6471) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_h2hfootb_output.pla", 0, 365, CRC(c8d85873) SHA1(16bd6fc8e3cd16d5f8fd32d0c74e67de77f5487e) )
-ROM_END
-
-
-ROM_START( h2hhockey )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp3321a", 0x0000, 0x0400, CRC(e974e604) SHA1(ed740c98ce96ad70ee5237eccae1f54a75ad8100) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_h2hhockey_output.pla", 0, 365, CRC(9d1a91e1) SHA1(96303eb22375129b0dfbfcd823c8ca5b919511bc) )
-ROM_END
-
-
-ROM_START( h2hbaseb )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp1525", 0x0000, 0x0800, CRC(b5d6bf9b) SHA1(2cc9f35f077c1209c46d16ec853af87e4725c2fd) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_h2hbaseb_output.pla", 0, 365, CRC(cb3d7e38) SHA1(6ab4a7c52e6010b7c7158463cb499973e52ff556) )
-ROM_END
-
-
-ROM_START( h2hboxing )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "m34018", 0x0000, 0x0800, CRC(e26a11a3) SHA1(aa2735088d709fa8d9188c4fb7982a53e3a8c1bc) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_h2hboxing_output.pla", 0, 365, CRC(ffb0e63d) SHA1(31ee3f779270a23f05f9ad508283d2569ef069f1) )
-ROM_END
-
-
-ROM_START( quizwizc )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "m32001", 0x0000, 0x0400, CRC(053657eb) SHA1(38c84f7416f79aa679f434a3d35df54cd9aa528a) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common3_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_quizwizc_output.pla", 0, 365, CRC(475b7053) SHA1(8f61bf736eb41d7029a6b165cc0a184ba0a70a2a) )
-ROM_END
-
-
-ROM_START( tc4 )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mp7334", 0x0000, 0x1000, CRC(923f3821) SHA1(a9ae342d7ff8dae1dedcd1e4984bcfae68586581) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
-	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_tc4_output.pla", 0, 557, CRC(3b908725) SHA1(f83bf5faa5b3cb51f87adc1639b00d6f9a71ad19) )
-ROM_END
-
-
-ROM_START( cnbaskb )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp0907", 0x0000, 0x0400, CRC(35f84f0f) SHA1(744ca60bb853a2785184042e747530a9e02488f8) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_cnbaskb_output.pla", 0, 365, CRC(b4e28956) SHA1(8356112da71b351420a88d7e394e7d03e429368c) )
-ROM_END
-
-
-ROM_START( cmsport )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp0168.u1", 0x0000, 0x0400, CRC(0712a268) SHA1(bd4e23e5c17b28c52e7e769e44773cc9c8839bed) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_cmsport_output.pla", 0, 365, CRC(7defa140) SHA1(477e3cb55e79938d6acaa911e410f6dcb974c218) )
-ROM_END
-
-
-ROM_START( cnfball )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp0170", 0x0000, 0x0400, CRC(50e8a44f) SHA1(fea6ae03c4ef329d825f8688e6854df15023d47e) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_cnfball_output.pla", 0, 365, CRC(0af52f64) SHA1(b4cf450e4d895eddb67448aa69e4f18a5a84e033) )
-ROM_END
-
-
-ROM_START( cnfball2 )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp1181", 0x0000, 0x0800, CRC(4553a840) SHA1(2e1132c9bc51641f77ba7f2430b5a3b2766b3a3d) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_cnfball2_output.pla", 0, 365, NO_DUMP )
-ROM_END
-
-
-ROM_START( eleciq )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp0908", 0x0000, 0x0400, CRC(db59b82c) SHA1(c9a6bcba208969560495ad9f8775f53de16a69c3) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_eleciq_output.pla", 0, 365, CRC(b8e04232) SHA1(22eed6d9b1fb1e5c9974ea3df16cda71a39aad57) )
-ROM_END
-
-
-ROM_START( esoccer )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp0158.ic1", 0x0000, 0x0400, CRC(ae4581ea) SHA1(5f6881f8247094abf8cffb17f6e6586e94cff38c) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_esoccer_output.pla", 0, 365, CRC(c6eeabbd) SHA1(99d07902126b5a1c1abf43340f30d3390da5fa92) )
-ROM_END
-
-
-ROM_START( ebball )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp0914", 0x0000, 0x0400, CRC(3c6fb05b) SHA1(b2fe4b3ca72d6b4c9bfa84d67f64afdc215e7178) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_ebball_output.pla", 0, 365, CRC(062bf5bb) SHA1(8d73ee35444299595961225528b153e3a5fe66bf) )
-ROM_END
-
-
-ROM_START( ebball2 )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp0923", 0x0000, 0x0400, CRC(077acfe2) SHA1(a294ce7614b2cdb01c754a7a50d60d807e3f0939) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_ebball2_output.pla", 0, 365, CRC(adcd73d1) SHA1(d69e590d288ef99293d86716498f3971528e30de) )
-ROM_END
-
-
-ROM_START( ebball3 )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "6007_mp1204", 0x0000, 0x0800, CRC(987a29ba) SHA1(9481ae244152187d85349d1a08e439e798182938) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_ebball3_output.pla", 0, 365, CRC(00db663b) SHA1(6eae12503364cfb1f863df0e57970d3e766ec165) )
-ROM_END
-
-
-ROM_START( esbattle )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "en-6004_mp0920", 0x0000, 0x0400, CRC(7460c179) SHA1(be855054b4a98b05b34fd931d5c247c5c0f9b036) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_esbattle_output.pla", 0, 365, CRC(861b45a2) SHA1(a5a9dc9bef8adb761845ad548058b55e970517d3) )
-ROM_END
-
-
-ROM_START( einvader )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp1211", 0x0000, 0x0800, CRC(b6efbe8e) SHA1(d7d54921dab22bb0c2956c896a5d5b56b6f64969) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_einvader_output.pla", 0, 365, CRC(490158e1) SHA1(61cace1eb09244663de98d8fb04d9459b19668fd) )
-
-	ROM_REGION( 44398, "svg", 0)
-	ROM_LOAD( "einvader.svg", 0, 44398, CRC(48de88fd) SHA1(56a2b9c997a447277b45902ab542eda54e7d5a2f) )
-ROM_END
-
-
-ROM_START( efootb4 )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "6009_mp7551", 0x0000, 0x1000, CRC(54fa7244) SHA1(4d16bd825c4a2db76ca8a263c373ade15c20e270) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
-	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_efootb4_output.pla", 0, 557, CRC(5c87c753) SHA1(bde9d4aa1e57a718affd969475c0a1edcf60f444) )
-ROM_END
-
-
-ROM_START( ebaskb2 )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "6010_mp1218", 0x0000, 0x0800, CRC(0089ede8) SHA1(c8a79d5aca7e37b637a4d152150acba9f41aad96) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_ebaskb2_output.pla", 0, 365, CRC(c18103ae) SHA1(5a9bb8e1d95a9f6919b05ff9471fa0a8014b8b81) )
-ROM_END
-
-
-ROM_START( raisedvl )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp1221", 0x0000, 0x0800, CRC(782791cc) SHA1(214249406fcaf44efc6350022bd534e59ec69c88) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_raisedvl_output.pla", 0, 365, CRC(00db663b) SHA1(6eae12503364cfb1f863df0e57970d3e766ec165) )
-ROM_END
-
-
-ROM_START( f2pbball )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp0154", 0x0000, 0x0400, CRC(c5b45ace) SHA1(b2de32e83ab447b22d6828f0081843f364040b01) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_f2pbball_output.pla", 0, 365, CRC(30c2f28f) SHA1(db969b22475f37f083c3594f5e4f5759048377b8) )
-ROM_END
-
-
-ROM_START( f3in1 )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp1185", 0x0000, 0x0800, CRC(53f7b28d) SHA1(2249890e3a259095193b4331ca88c29ccd81eefe) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_f3in1_output.pla", 0, 365, CRC(51d947bc) SHA1(f766397d84f038be96e83d40989195c98ddcb1d9) )
-ROM_END
-
-
-ROM_START( gpoker )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp2105", 0x0000, 0x0800, CRC(95a8f5b4) SHA1(d14f00ba9f57e437264d972baa14a14a28ff8719) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_gpoker_output.pla", 0, 365, CRC(f7e2d812) SHA1(cc3abd89afb1d2145dc47636553ccd0ba7de70d9) )
-ROM_END
-
-
-ROM_START( gjackpot )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mpf553", 0x0000, 0x1000, CRC(f45fd008) SHA1(8d5d6407a8a031a833ceedfb931f5c9d2725ecd0) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
-	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_gjackpot_output.pla", 0, 557, CRC(50e471a7) SHA1(9d862cb9f51a563882b62662c5bfe61b52e3df00) )
-ROM_END
-
-
-ROM_START( ginv1000 )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp2139", 0x0000, 0x0800, CRC(036eab37) SHA1(0795878ad89296f7a6a0314c6e4db23c1cc3673e) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_ginv1000_output.pla", 0, 365, CRC(b0a5dc41) SHA1(d94746ec48661998173e7f60ccc7c96e56b3484e) )
-
-	ROM_REGION( 226185, "svg", 0)
-	ROM_LOAD( "ginv1000.svg", 0, 226185, CRC(1e1bafd1) SHA1(15868ef0c9dadbf537fed0e2d846451ba99fab7b) )
-ROM_END
-
-
-ROM_START( ginv2000 )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp1604", 0x0000, 0x0800, CRC(f1646d0b) SHA1(65601931d81e3eef7bf22a08de5a146910ce8137) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_ginv2000_output.pla", 0, 365, CRC(520bb003) SHA1(1640ae54f8dcc257e0ad0cbe0281b38fcbd8da35) )
-
-	ROM_REGION( 374443, "svg", 0)
-	ROM_LOAD( "ginv2000.svg", 0, 374443, CRC(a4ce1e6d) SHA1(57d9ff05d634a8d495b9d544a2a959790cd10b6b) )
-ROM_END
-
-
-ROM_START( fxmcr165 )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp1312", 0x0000, 0x0800, CRC(6efc8bcc) SHA1(ced8a02b472a3178073691d3dccc0f19f57428fd) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_fxmcr165_output.pla", 0, 365, CRC(ce656866) SHA1(40e1614f5afcc7572fda596e1be453d54e95af0c) )
-ROM_END
-
-
-ROM_START( elecdet )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mp6100a", 0x0000, 0x1000, CRC(9522fb2d) SHA1(240bdb44b7d67d3b13ebf75851635ac4b4ca2bfd) )
-
-	ROM_REGION( 1246, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
-	ROM_REGION( 1982, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0980_common1_micro.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
-	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_elecdet_output.pla", 0, 352, CRC(5d12c24a) SHA1(e486802151a704c6273d4a8682c9c374d27d1e6d) )
-	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
-ROM_END
-
-
-ROM_START( starwbc )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp3438a", 0x0000, 0x0800, CRC(c12b7069) SHA1(d1f39c69a543c128023ba11cc6228bacdfab04de) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_starwbc_output.pla", 0, 365, CRC(d358a76d) SHA1(06b60b207540e9b726439141acadea9aba718013) )
-ROM_END
-
-ROM_START( starwbcp )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "us4270755", 0x0000, 0x0800, BAD_DUMP CRC(fb3332f2) SHA1(a79ac81e239983cd699b7cfcc55f89b203b2c9ec) ) // from patent US4270755, may have errors
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_starwbc_output.pla", 0, 365, CRC(d358a76d) SHA1(06b60b207540e9b726439141acadea9aba718013) )
-ROM_END
-
-
-ROM_START( astro )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mp1133", 0x0000, 0x1000, CRC(bc21109c) SHA1(05a433cce587d5c0c2d28b5fda5f0853ea6726bf) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
-	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_astro_output.pla", 0, 557, CRC(eb08957e) SHA1(62ae0d13a1eaafb34f1b27d7df51441b400ccd56) )
-ROM_END
-
-
-ROM_START( elecbowl )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp3403.u9", 0x0000, 0x0800, CRC(9eabaa7d) SHA1(b1f54587ed7f2bbf3a5d49075c807296384c2b06) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, BAD_DUMP CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_elecbowl_output.pla", 0, 365, NO_DUMP )
-ROM_END
-
-
-ROM_START( horseran )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp3491", 0x0000, 0x0800, CRC(a0081671) SHA1(a5a07b502c69d429e5bcd1d313e86b6ee057cda6) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
-	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
-	ROM_LOAD( "tms1100_horseran_output.pla", 0, 365, CRC(0fea09b0) SHA1(27a56fcf2b490e9a7dbbc6ad48cc8aaca4cada94) )
-ROM_END
-
-
-ROM_START( mdndclab )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "m34012", 0x0000, 0x0800, CRC(e851fccd) SHA1(158362c2821678a51554e02dbb2f9ef5aaf5f59f) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_mdndclab_output.pla", 0, 365, CRC(592b40ba) SHA1(63a2531278a665ace54c541101e052eb84413511) )
-ROM_END
-
-
-ROM_START( comp4 )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "tmc0904nl_cp0904a", 0x0000, 0x0400, CRC(6233ee1b) SHA1(738e109b38c97804b4ec52bed80b00a8634ad453) )
-
-	ROM_REGION( 782, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0970_common2_instr.pla", 0, 782, CRC(e038fc44) SHA1(dfc280f6d0a5828d1bb14fcd59ac29caf2c2d981) )
-	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_comp4_micro.pla", 0, 860, CRC(ee9d7d9e) SHA1(25484e18f6a07f7cdb21a07220e2f2a82fadfe7b) )
-	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_comp4_output.pla", 0, 352, CRC(144ce2d5) SHA1(459b92ad62421932df61b7e3965f1821f9636a2c) )
-	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0980_comp4_segment.pla", 0, 157, CRC(73426b07) SHA1(311be3f95a97936b6d1a4dcfa7746da26318ce54) )
-ROM_END
-
-
-ROM_START( bship )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp3201", 0x0000, 0x0400, CRC(bf6104a6) SHA1(8d28b43a2aa39dcbbe71f669cdafc518715812c9) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_bship_output.pla", 0, 365, CRC(ea0570b0) SHA1(6eb803b40717486d7b24939985f245327ac8a7e9) )
-ROM_END
-
-ROM_START( bshipb )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp3208", 0x0000, 0x0400, CRC(982fa720) SHA1(1c6dbbe7b9e55d62a510225a88cd2de55fe9b181) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_bshipb_output.pla", 0, 365, BAD_DUMP CRC(74a9a244) SHA1(479c1f1e37cf8f75352e10226b20322906bee813) ) // part of decap photo was obscured
-ROM_END
-
-
-ROM_START( simon )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "tms1000.u1", 0x0000, 0x0400, CRC(9961719d) SHA1(35dddb018a8a2b31f377ab49c1f0cb76951b81c0) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_simon_micro.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
-	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
-	ROM_LOAD( "tms1000_simon_output.pla", 0, 365, CRC(2943c71b) SHA1(bd5bb55c57e7ba27e49c645937ec1d4e67506601) )
-ROM_END
-
-ROM_START( simonf )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp3300", 0x0000, 0x0400, CRC(b9fcf93a) SHA1(45960e4242a08495f2a99fc5d44728eabd93cd9f) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_simon_micro.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
-	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
-	ROM_LOAD( "tms1000_simon_output.pla", 0, 365, CRC(2943c71b) SHA1(bd5bb55c57e7ba27e49c645937ec1d4e67506601) )
-ROM_END
-
-
-ROM_START( ssimon )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp3476", 0x0000, 0x0800, CRC(98200571) SHA1(cbd0bcfc11a534aa0be5d011584cdcac58ff437a) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
-	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
-	ROM_LOAD( "tms1100_ssimon_output.pla", 0, 365, CRC(0fea09b0) SHA1(27a56fcf2b490e9a7dbbc6ad48cc8aaca4cada94) )
-ROM_END
-
-
-ROM_START( bigtrak )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp3301a", 0x0000, 0x0400, CRC(1351bcdd) SHA1(68865389c25b541c09a742be61f8fb6488134d4e) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common3_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_bigtrak_output.pla", 0, 365, CRC(63be45f6) SHA1(918e38a223152db883c1a6f7acf56e87d7074734) )
-ROM_END
-
-
-ROM_START( mbdtower )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mp7332", 0x0000, 0x1000, CRC(ebeab91a) SHA1(7edbff437da371390fa8f28b3d183f833eaa9be9) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
-	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_mbdtower_output.pla", 0, 557, CRC(64c84697) SHA1(72ce6d24cedf9c606f1742cd5620f75907246e87) )
-ROM_END
-
-
-ROM_START( arcmania )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "m34078a", 0x0000, 0x0800, CRC(90ea0087) SHA1(9780c9c1ba89300b1bbe72c47e5fec68d8bb6a77) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_arcmania_output.pla", 0, 365, CRC(a1517b15) SHA1(72eedd7fd41de9c9102219f325fe8668a7c02663) )
-ROM_END
-
-
-ROM_START( cnsector )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp0905bnl_za0379", 0x0000, 0x0400, CRC(201036e9) SHA1(b37fef86bb2bceaf0ac8bb3745b4702d17366914) )
-
-	ROM_REGION( 782, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0970_common2_instr.pla", 0, 782, CRC(e038fc44) SHA1(dfc280f6d0a5828d1bb14fcd59ac29caf2c2d981) )
-	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_cnsector_micro.pla", 0, 860, CRC(059f5bb4) SHA1(2653766f9fd74d41d44013bb6f54c0973a6080c9) )
-	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_cnsector_output.pla", 0, 352, CRC(c8bfb9d2) SHA1(30c3c73cec194debdcb1dd01b4adfefaeddf9516) )
-	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
-ROM_END
-
-
-ROM_START( merlin )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp3404", 0x0000, 0x0800, CRC(7515a75d) SHA1(76ca3605d3fde1df62f79b9bb1f534c2a2ae0229) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_merlin_output.pla", 0, 365, CRC(3921b074) SHA1(12bd58e4d6676eb8c7059ef53598279e4f1a32ea) )
-ROM_END
-
-
-ROM_START( mmerlin )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mp7351", 0x0000, 0x1000, CRC(0f7a4c83) SHA1(242c1278ddfe92c28fd7cd87300e48e7a4827831) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
-	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_mmerlin_output.pla", 0, 557, CRC(fd3dcd93) SHA1(f2afc52df700daa0eb7356c7876af9b2966f971b) )
-ROM_END
-
-
-ROM_START( stopthief )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mp6101b", 0x0000, 0x1000, CRC(b9c9d64a) SHA1(481f8653064c142fe5d9314b750bcd73797b92b2) )
-
-	ROM_REGION( 1246, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
-	ROM_REGION( 1982, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0980_common1_micro.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
-	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_stopthief_output.pla", 0, 352, CRC(680ca1c1) SHA1(dea6365f2e6b50a52f1a8f1d8417176b905d2bc9) )
-	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
-ROM_END
-
-ROM_START( stopthiefp )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD16_WORD( "us4341385", 0x0000, 0x1000, CRC(07aec38a) SHA1(0a3d0956495c0d6d9ea771feae6c14a473a800dc) ) // from patent US4341385, data should be correct (it included checksums)
-
-	ROM_REGION( 1246, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
-	ROM_REGION( 1982, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0980_common1_micro.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
-	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_stopthief_output.pla", 0, 352, CRC(680ca1c1) SHA1(dea6365f2e6b50a52f1a8f1d8417176b905d2bc9) )
-	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
-ROM_END
-
-
-ROM_START( bankshot )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mp7313", 0x0000, 0x1000, CRC(7a5016a9) SHA1(a8730dc8a282ffaa3d89e675f371d43eb39f39b4) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
-	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_bankshot_output.pla", 0, 557, CRC(7539283b) SHA1(f791fa98259fc10c393ff1961d4c93040f1a2932) )
-ROM_END
-
-
-ROM_START( splitsec )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mp7314", 0x0000, 0x1000, CRC(e94b2098) SHA1(f0fc1f56a829252185592a2508740354c50bedf8) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
-	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_splitsec_output.pla", 0, 557, CRC(7539283b) SHA1(f791fa98259fc10c393ff1961d4c93040f1a2932) )
-ROM_END
-
-
-ROM_START( lostreas )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "m34038", 0x0000, 0x0800, CRC(4c996f63) SHA1(ebbaa8b2f909f4300887aa2dbdb7185eedc75d3f) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_lostreas_output.pla", 0, 365, CRC(c62d850f) SHA1(d25974e6901eb10c52cdda12e6d4a13e26745e6f) )
-ROM_END
-
-
-ROM_START( alphie )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "us4280809", 0x0000, 0x0400, CRC(f8f14013) SHA1(bf31b929fcbcb189bbe4623104e1da0a639b5954) ) // from patent US4280809, should be good
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, BAD_DUMP CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) ) // not in patent description
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_alphie_output.pla", 0, 365, NO_DUMP ) // "
-ROM_END
-
-
-ROM_START( tcfball )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp1193", 0x0000, 0x0800, CRC(7d9f446f) SHA1(bb6af47b42d989494f21475a73f072cddf58c99f) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_tcfball_output.pla", 0, 365, CRC(26b2996e) SHA1(df0e706c552bf74123aa65e71b0c9b4d33cddb2b) )
-ROM_END
-
-ROM_START( tcfballa )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp1183", 0x0000, 0x0800, CRC(2a4db1d5) SHA1(5df15d1115bb425578ad522d607a582dd478f35c) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_tcfballa_output.pla", 0, 365, NO_DUMP )
-ROM_END
-
-
-ROM_START( tandy12 )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "cd7282sl", 0x0000, 0x0800, CRC(a10013dd) SHA1(42ebd3de3449f371b99937f9df39c240d15ac686) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, BAD_DUMP CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_tandy12_output.pla", 0, 365, NO_DUMP )
-ROM_END
-
-
-ROM_START( monkeysee )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp0271", 0x0000, 0x0400, CRC(acab0f05) SHA1(226f7688caf4a94a88241d3b61ddc4254e4a918c) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_monkeysee_micro.pla", 0, 867, CRC(368d878f) SHA1(956e700a04f453c1610cfdb974fce898ba4cf01f) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_monkeysee_output.pla", 0, 365, CRC(8a010e89) SHA1(3ffbabc5d6c9b34cc06d290817d15b2be42d8b17) )
-ROM_END
-
-
-ROM_START( speechp )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "tms1007nl", 0x0000, 0x0400, CRC(c2669d5c) SHA1(7943d6f39508a9a82bc21e4fe34a5b9f86e3add2) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_speechp_output.pla", 0, 365, CRC(e1b4197f) SHA1(258f4276a9f15c9bfbfa58df2f7202aed1542fdc) )
-
-	ROM_REGION( 0x0800, "speech", 0 )
-	ROM_LOAD("s14007-a", 0x0000, 0x0800, CRC(543b46d4) SHA1(99daf7fe3354c378b4bd883840c9bbd22b22ebe7) )
-ROM_END
-
-
-ROM_START( timaze )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "gb2040172a", 0x0000, 0x0400, CRC(0bab4dc6) SHA1(c9d40649fbb27a8b7cf7460d66c7e217b63376f0) ) // from patent GB2040172A, verified with source code
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, BAD_DUMP CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) ) // not in patent, use default one
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_timaze_output.pla", 0, 365, BAD_DUMP CRC(f0f36970) SHA1(a6ad1f5e804ac98e5e1a1d07466b3db3a8d6c256) ) // described in patent, but unsure about pin order
-ROM_END
-
-
-ROM_START( copycat )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp0919", 0x0000, 0x0400, CRC(92a21299) SHA1(16daadb8dbf53aaab8a71833017b4a578d035d6d) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_copycat_output.pla", 0, 365, CRC(b1d0c96d) SHA1(ac1a003eab3f69e09e9050cb24ea17211e0523fe) )
-ROM_END
-
-ROM_START( copycatm2 )
-	ROM_REGION( 0x0200, "maincpu", 0 )
-	ROM_LOAD( "mp3005n", 0x0000, 0x0200, CRC(a87649cb) SHA1(14ef7967a80578885f0b905772c3bb417b5b3255) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_copycatm2_micro.pla", 0, 867, CRC(2710d8ef) SHA1(cb7a13bfabedad43790de753844707fe829baed0) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_copycatm2_output.pla", 0, 365, CRC(d1999aaf) SHA1(0c27789b349e491d5230f9c75c4741e621f5a14e) )
-ROM_END
-
-
-ROM_START( ditto )
-	ROM_REGION( 0x0200, "maincpu", 0 )
-	ROM_LOAD( "mp1801", 0x0000, 0x0200, CRC(cee6043b) SHA1(4ec334be6835688413637ff9d9d7a5f0d61eba27) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_ditto_micro.pla", 0, 867, CRC(2710d8ef) SHA1(cb7a13bfabedad43790de753844707fe829baed0) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_ditto_output.pla", 0, 365, CRC(2b708a27) SHA1(e95415e51ffbe5da3bde1484fcd20467dde9f09a) )
-ROM_END
-
-
-ROM_START( 7in1ss )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mp7304", 0x0000, 0x1000, CRC(2a1c8390) SHA1(fa10e60686af6828a61f05046abc3854ab49af95) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
-	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_7in1ss_output.pla", 0, 557, CRC(6b7660f7) SHA1(bb7d58fa04e7606ccdf5b209e1b089948bdd1e7c) )
-ROM_END
-
-
-ROM_START( tbreakup )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp2726a", 0x0000, 0x0400, CRC(1f7c28e2) SHA1(164cda4eb3f0b1d20955212a197c9aadf8d18a06) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_tbreakup_output.pla", 0, 365, CRC(a1ea035e) SHA1(fcf0b57ed90b41441a8974223a697f530daac0ab) )
-ROM_END
-
-
-ROM_START( phpball )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp1180", 0x0000, 0x0800, CRC(2163b92d) SHA1(bc53d1911e88b4e89d951c6f769703105c13389c) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_phpball_output.pla", 0, 365, CRC(87e67aaf) SHA1(ebc7bae1352f39173f1bf0dc10cdc6f635dedab4) )
-ROM_END
-
-
-ROM_START( ssports4 )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp1219", 0x0000, 0x0800, CRC(865c06d6) SHA1(12a625a13bdb57b82b35c42b175d38756a1e2e04) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_ssports4_output.pla", 0, 365, NO_DUMP )
-ROM_END
-
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
 
 ROM_START( xl25 )
 	ROM_REGION( 0x0400, "maincpu", 0 )
@@ -10307,6 +10470,14 @@ ROM_END
 
 
 
+} // anonymous namespace
+
+/***************************************************************************
+
+  Game driver(s)
+
+***************************************************************************/
+
 //    YEAR  NAME        PARENT    CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1979, matchnum,   0,         0, matchnum,  matchnum,  matchnum_state,  empty_init, "A-One LSI", "Match Number", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1980, arrball,    0,         0, arrball,   arrball,   arrball_state,   empty_init, "A-One LSI", "Arrange Ball", MACHINE_SUPPORTS_SAVE )
@@ -10316,10 +10487,11 @@ COMP( 1980, mathmagi,   0,         0, mathmagi,  mathmagi,  mathmagi_state,  emp
 CONS( 1979, bcheetah,   0,         0, bcheetah,  bcheetah,  bcheetah_state,  empty_init, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
 
 CONS( 1978, amaztron,   0,         0, amaztron,  amaztron,  amaztron_state,  empty_init, "Coleco", "Amaze-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
-COMP( 1979, zodiac,     0,         0, zodiac,    zodiac,    zodiac_state,    empty_init, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, zodiac,     0,         0, zodiac,    zodiac,    zodiac_state,    empty_init, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1978, cqback,     0,         0, cqback,    cqback,    cqback_state,    empty_init, "Coleco", "Electronic Quarterback", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, h2hfootb,   0,         0, h2hfootb,  h2hfootb,  h2hfootb_state,  empty_init, "Coleco", "Head to Head: Electronic Football", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, h2hhockey,  0,         0, h2hhockey, h2hhockey, h2hhockey_state, empty_init, "Coleco", "Head to Head: Electronic Hockey (TMS1000 version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, h2hbaskb,   0,         0, h2hbaskb,  h2hbaskb,  h2hbaskb_state,  empty_init, "Coleco", "Head to Head: Electronic Basketball (TMS1000 version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, h2hhockey,  0,         0, h2hhockey, h2hhockey, h2hbaskb_state,  empty_init, "Coleco", "Head to Head: Electronic Hockey (TMS1000 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, h2hbaseb,   0,         0, h2hbaseb,  h2hbaseb,  h2hbaseb_state,  empty_init, "Coleco", "Head to Head: Electronic Baseball", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, h2hboxing,  0,         0, h2hboxing, h2hboxing, h2hboxing_state, empty_init, "Coleco", "Head to Head: Electronic Boxing", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, quizwizc,   0,         0, quizwizc,  quizwizc,  quizwizc_state,  empty_init, "Coleco", "Quiz Wiz Challenger", MACHINE_SUPPORTS_SAVE ) // ***
@@ -10346,6 +10518,7 @@ CONS( 1979, f3in1,      0,         0, f3in1,     f3in1,     f3in1_state,     emp
 
 CONS( 1979, gpoker,     0,         0, gpoker,    gpoker,    gpoker_state,    empty_init, "Gakken", "Poker (Gakken, 1979 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gjackpot,   0,         0, gjackpot,  gjackpot,  gjackpot_state,  empty_init, "Gakken", "Jackpot: Gin Rummy & Black Jack", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, ginv,       0,         0, ginv,      ginv,      ginv_state,      empty_init, "Gakken", "Invader (Gakken, cyan version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, ginv1000,   0,         0, ginv1000,  ginv1000,  ginv1000_state,  empty_init, "Gakken", "Galaxy Invader 1000", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, ginv2000,   0,         0, ginv2000,  ginv2000,  ginv2000_state,  empty_init, "Gakken", "Invader 2000", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, fxmcr165,   0,         0, fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

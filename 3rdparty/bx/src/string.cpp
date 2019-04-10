@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -8,11 +8,6 @@
 #include <bx/hash.h>
 #include <bx/readerwriter.h>
 #include <bx/string.h>
-
-#if !BX_CRT_NONE
-#	include <stdio.h> // vsnprintf, vsnwprintf
-#	include <wchar.h> // vswprintf
-#endif // !BX_CRT_NONE
 
 namespace bx
 {
@@ -54,7 +49,18 @@ namespace bx
 
 	bool isAlphaNum(char _ch)
 	{
-		return isAlpha(_ch) || isNumeric(_ch);
+		return false
+			|| isAlpha(_ch)
+			|| isNumeric(_ch)
+			;
+	}
+
+	bool isHexNum(char _ch)
+	{
+		return false
+			|| isInRange(toLower(_ch), 'a', 'f')
+			|| isNumeric(_ch)
+			;
 	}
 
 	bool isPrint(char _ch)
@@ -108,6 +114,11 @@ namespace bx
 	bool isAlphaNum(const StringView& _str)
 	{
 		return isCharTest<isAlphaNum>(_str);
+	}
+
+	bool isHexNum(const StringView& _str)
+	{
+		return isCharTest<isHexNum>(_str);
 	}
 
 	bool isPrint(const StringView& _str)
@@ -346,9 +357,15 @@ namespace bx
 		return strFindUnsafe(_str, strLen(_str, _max), _ch);
 	}
 
-	const char* strFind(const StringView& _str, char _ch)
+	StringView strFind(const StringView& _str, char _ch)
 	{
-		return strFind(_str.getPtr(), _str.getLength(), _ch);
+		const char* ptr = strFindUnsafe(_str.getPtr(), _str.getLength(), _ch);
+		if (NULL == ptr)
+		{
+			return StringView(_str.getTerm(), _str.getTerm() );
+		}
+
+		return StringView(ptr, ptr+1);
 	}
 
 	inline const char* strRFindUnsafe(const char* _str, int32_t _len, char _ch)
@@ -364,14 +381,15 @@ namespace bx
 		return NULL;
 	}
 
-	inline const char* strRFind(const char* _str, int32_t _max, char _ch)
+	StringView strRFind(const StringView& _str, char _ch)
 	{
-		return strRFindUnsafe(_str, strLen(_str, _max), _ch);
-	}
+		const char* ptr = strRFindUnsafe(_str.getPtr(), _str.getLength(), _ch);
+		if (NULL == ptr)
+		{
+			return StringView(_str.getTerm(), _str.getTerm() );
+		}
 
-	const char* strRFind(const StringView& _str, char _ch)
-	{
-		return strRFind(_str.getPtr(), _str.getLength(), _ch);
+		return StringView(ptr, ptr+1);
 	}
 
 	template<CharFn fn>
@@ -379,8 +397,8 @@ namespace bx
 	{
 		const char* ptr = _str;
 
-		int32_t       stringLen = strLen(_str,  _strMax);
-		const int32_t findLen   = strLen(_find, _findMax);
+		int32_t       stringLen = _strMax;
+		const int32_t findLen   = _findMax;
 
 		for (; stringLen >= findLen; ++ptr, --stringLen)
 		{
@@ -415,24 +433,42 @@ namespace bx
 		return NULL;
 	}
 
-	const char* strFind(const StringView& _str, const StringView& _find, int32_t _num)
+	StringView strFind(const StringView& _str, const StringView& _find, int32_t _num)
 	{
-		return strFind<toNoop>(
+		int32_t len = min(_find.getLength(), _num);
+
+		const char* ptr = strFind<toNoop>(
 			  _str.getPtr()
 			, _str.getLength()
 			, _find.getPtr()
-			, min(_find.getLength(), _num)
+			, len
 			);
+
+		if (NULL == ptr)
+		{
+			return StringView(_str.getTerm(), _str.getTerm() );
+		}
+
+		return StringView(ptr, len);
 	}
 
-	const char* strFindI(const StringView& _str, const StringView& _find, int32_t _num)
+	StringView strFindI(const StringView& _str, const StringView& _find, int32_t _num)
 	{
-		return strFind<toLower>(
+		int32_t len = min(_find.getLength(), _num);
+
+		const char* ptr = strFind<toLower>(
 			  _str.getPtr()
 			, _str.getLength()
 			, _find.getPtr()
-			, min(_find.getLength(), _num)
+			, len
 			);
+
+		if (NULL == ptr)
+		{
+			return StringView(_str.getTerm(), _str.getTerm() );
+		}
+
+		return StringView(ptr, len);
 	}
 
 	StringView strLTrim(const StringView& _str, const StringView& _chars)
@@ -449,29 +485,53 @@ namespace bx
 			}
 		}
 
-		return StringView();
+		return _str;
+	}
+
+	StringView strLTrimSpace(const StringView& _str)
+	{
+		for (const char* ptr = _str.getPtr(), *term = _str.getTerm(); ptr != term; ++ptr)
+		{
+			if (!isSpace(*ptr) )
+			{
+				return StringView(ptr, term);
+			}
+		}
+
+		return StringView(_str.getTerm(), _str.getTerm() );
+	}
+
+	StringView strLTrimNonSpace(const StringView& _str)
+	{
+		for (const char* ptr = _str.getPtr(), *term = _str.getTerm(); ptr != term; ++ptr)
+		{
+			if (isSpace(*ptr) )
+			{
+				return StringView(ptr, term);
+			}
+		}
+
+		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 
 	StringView strRTrim(const StringView& _str, const StringView& _chars)
 	{
-		if (_str.isEmpty() )
+		if (!_str.isEmpty() )
 		{
-			return StringView();
-		}
+			const char* ptr = _str.getPtr();
+			const char* chars = _chars.getPtr();
+			const uint32_t charsLen = _chars.getLength();
 
-		const char* ptr   = _str.getPtr();
-		const char* chars = _chars.getPtr();
-		const uint32_t charsLen = _chars.getLength();
-
-		for (int32_t len = _str.getLength(), ii = len-1; 0 <= ii; --ii)
-		{
-			if (NULL == strFindUnsafe(chars, charsLen, ptr[ii]) )
+			for (int32_t len = _str.getLength(), ii = len - 1; 0 <= ii; --ii)
 			{
-				return StringView(ptr, ii+1);
+				if (NULL == strFindUnsafe(chars, charsLen, ptr[ii]))
+				{
+					return StringView(ptr, ii + 1);
+				}
 			}
 		}
 
-		return StringView();
+		return _str;
 	}
 
 	StringView strTrim(const StringView& _str, const StringView& _chars)
@@ -479,92 +539,117 @@ namespace bx
 		return strLTrim(strRTrim(_str, _chars), _chars);
 	}
 
-	const char* strnl(const char* _str)
+	constexpr uint32_t kFindStep = 1024;
+
+	StringView strFindNl(const StringView& _str)
 	{
-		for (; '\0' != *_str; _str += strLen(_str, 1024) )
+		StringView str(_str);
+
+		for (; str.getPtr() != _str.getTerm()
+			; str = StringView(min(str.getPtr() + kFindStep, _str.getTerm() ), min(str.getPtr() + kFindStep*2, _str.getTerm() ) )
+			)
 		{
-			const char* eol = strFind(StringView(_str, 1024), "\r\n");
-			if (NULL != eol)
+			StringView eol = strFind(str, "\r\n");
+			if (!eol.isEmpty() )
 			{
-				return eol + 2;
+				return StringView(eol.getTerm(), _str.getTerm() );
 			}
 
-			eol = strFind(StringView(_str, 1024), "\n");
-			if (NULL != eol)
+			eol = strFind(str, '\n');
+			if (!eol.isEmpty() )
 			{
-				return eol + 1;
+				return StringView(eol.getTerm(), _str.getTerm() );
 			}
 		}
 
-		return _str;
+		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 
-	const char* streol(const char* _str)
+	StringView strFindEol(const StringView& _str)
 	{
-		for (; '\0' != *_str; _str += strLen(_str, 1024) )
+		StringView str(_str);
+
+		for (; str.getPtr() != _str.getTerm()
+			 ; str = StringView(min(str.getPtr() + kFindStep, _str.getTerm() ), min(str.getPtr() + kFindStep*2, _str.getTerm() ) )
+			)
 		{
-			const char* eol = strFind(StringView(_str, 1024), "\r\n");
-			if (NULL != eol)
+			StringView eol = strFind(str, "\r\n");
+			if (!eol.isEmpty() )
 			{
-				return eol;
+				return StringView(eol.getPtr(), _str.getTerm() );
 			}
 
-			eol = strFind(StringView(_str, 1024), "\n");
-			if (NULL != eol)
+			eol = strFind(str, '\n');
+			if (!eol.isEmpty() )
 			{
-				return eol;
+				return StringView(eol.getPtr(), _str.getTerm() );
 			}
 		}
 
-		return _str;
+		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 
-	const char* strws(const char* _str)
+	static const char* strSkipWord(const char* _str, int32_t _max)
 	{
-		for (; isSpace(*_str); ++_str) {};
-		return _str;
-	}
-
-	const char* strnws(const char* _str)
-	{
-		for (; !isSpace(*_str); ++_str) {};
-		return _str;
-	}
-
-	const char* strword(const char* _str)
-	{
-		for (char ch = *_str++; isAlphaNum(ch) || '_' == ch; ch = *_str++) {};
+		for (char ch = *_str++; 0 < _max && (isAlphaNum(ch) || '_' == ch); ch = *_str++, --_max) {};
 		return _str-1;
 	}
 
-	const char* strmb(const char* _str, char _open, char _close)
+	StringView strWord(const StringView& _str)
 	{
-		int count = 0;
-		for (char ch = *_str++; ch != '\0' && count >= 0; ch = *_str++)
+		const char* ptr  = _str.getPtr();
+		const char* term = strSkipWord(ptr, _str.getLength() );
+		return StringView(ptr, term);
+	}
+
+	StringView strFindBlock(const StringView& _str, char _open, char _close)
+	{
+		const char* curr  = _str.getPtr();
+		const char* term  = _str.getTerm();
+		const char* start = NULL;
+
+		int32_t count = 0;
+		for (char ch = *curr; curr != term && count >= 0; ch = *(++curr) )
 		{
 			if (ch == _open)
 			{
-				count++;
+				if (0 == count)
+				{
+					start = curr;
+				}
+
+				++count;
 			}
 			else if (ch == _close)
 			{
-				count--;
+				--count;
+
+				if (NULL == start)
+				{
+					break;
+				}
+
 				if (0 == count)
 				{
-					return _str-1;
+					return StringView(start, curr+1);
 				}
 			}
 		}
 
-		return NULL;
+		return StringView(term, term);
 	}
 
-	void eolLF(char* _out, int32_t _size, const char* _str)
+	StringView normalizeEolLf(char* _out, int32_t _size, const StringView& _str)
 	{
+		const char* start = _out;
+		const char* end   = _out;
+
 		if (0 < _size)
 		{
-			char* end = _out + _size - 1;
-			for (char ch = *_str++; ch != '\0' && _out < end; ch = *_str++)
+			const char* curr = _str.getPtr();
+			const char* term = _str.getTerm();
+			end  = _out + _size;
+			for (char ch = *curr; curr != term && _out < end; ch = *(++curr) )
 			{
 				if ('\r' != ch)
 				{
@@ -572,26 +657,25 @@ namespace bx
 				}
 			}
 
-			*_out = '\0';
+			end = _out;
 		}
+
+		return StringView(start, end);
 	}
 
-	const char* findIdentifierMatch(const char* _str, const char* _word)
+	StringView findIdentifierMatch(const StringView& _str, const StringView& _word)
 	{
-		int32_t len = strLen(_word);
-		const char* ptr = strFind(_str, _word);
-		for (; NULL != ptr; ptr = strFind(ptr + len, _word) )
+		const int32_t len = _word.getLength();
+		StringView ptr = strFind(_str, _word);
+		for (; !ptr.isEmpty(); ptr = strFind(StringView(ptr.getPtr() + len, _str.getTerm() ), _word) )
 		{
-			if (ptr != _str)
+			char ch = *(ptr.getPtr() - 1);
+			if (isAlphaNum(ch) || '_' == ch)
 			{
-				char ch = *(ptr - 1);
-				if (isAlphaNum(ch) || '_' == ch)
-				{
-					continue;
-				}
+				continue;
 			}
 
-			char ch = ptr[len];
+			ch = *(ptr.getPtr() + len);
 			if (isAlphaNum(ch) || '_' == ch)
 			{
 				continue;
@@ -600,21 +684,21 @@ namespace bx
 			return ptr;
 		}
 
-		return ptr;
+		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 
-	const char* findIdentifierMatch(const char* _str, const char* _words[])
+	StringView findIdentifierMatch(const StringView& _str, const char** _words)
 	{
-		for (const char* word = *_words; NULL != word; ++_words, word = *_words)
+		for (StringView word = *_words; !word.isEmpty(); ++_words, word = *_words)
 		{
-			const char* match = findIdentifierMatch(_str, word);
-			if (NULL != match)
+			StringView match = findIdentifierMatch(_str, word);
+			if (!match.isEmpty() )
 			{
 				return match;
 			}
 		}
 
-		return NULL;
+		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 
 	namespace
@@ -624,7 +708,7 @@ namespace bx
 			Param()
 				: width(0)
 				, base(10)
-				, prec(6)
+				, prec(INT32_MAX)
 				, fill(' ')
 				, bits(0)
 				, left(false)
@@ -635,8 +719,8 @@ namespace bx
 			}
 
 			int32_t width;
-			uint32_t base;
-			uint32_t prec;
+			int32_t base;
+			int32_t prec;
 			char fill;
 			uint8_t bits;
 			bool left;
@@ -694,7 +778,7 @@ namespace bx
 
 		static int32_t write(WriterI* _writer, const char* _str, const Param& _param, Error* _err)
 		{
-			return write(_writer, _str, INT32_MAX, _param, _err);
+			return write(_writer, _str, _param.prec, _param, _err);
 		}
 
 		static int32_t write(WriterI* _writer, int32_t _i, const Param& _param, Error* _err)
@@ -767,10 +851,11 @@ namespace bx
 			const char* dot = strFind(str, INT32_MAX, '.');
 			if (NULL != dot)
 			{
+				const int32_t prec = INT32_MAX == _param.prec ? 6 : _param.prec;
 				const int32_t precLen = int32_t(
 						dot
-						+ uint32_min(_param.prec + _param.spec, 1)
-						+ _param.prec
+						+ uint32_min(prec + _param.spec, 1)
+						+ prec
 						- str
 						);
 				if (precLen > len)
@@ -802,9 +887,9 @@ namespace bx
 		}
 	} // anonymous namespace
 
-	int32_t write(WriterI* _writer, const char* _format, va_list _argList, Error* _err)
+	int32_t write(WriterI* _writer, const StringView& _format, va_list _argList, Error* _err)
 	{
-		MemoryReader reader(_format, uint32_t(strLen(_format) ) );
+		MemoryReader reader(_format.getPtr(), _format.getLength() );
 
 		int32_t size = 0;
 
@@ -1014,9 +1099,16 @@ namespace bx
 			}
 		}
 
-		size += write(_writer, '\0', _err);
-
 		return size;
+	}
+
+	int32_t write(WriterI* _writer, Error* _err, const StringView* _format, ...)
+	{
+		va_list argList;
+		va_start(argList, _format);
+		int32_t total = write(_writer, *_format, argList, _err);
+		va_end(argList);
+		return total;
 	}
 
 	int32_t write(WriterI* _writer, Error* _err, const char* _format, ...)
@@ -1028,12 +1120,11 @@ namespace bx
 		return total;
 	}
 
-	int32_t vsnprintfRef(char* _out, int32_t _max, const char* _format, va_list _argList)
+	int32_t vsnprintf(char* _out, int32_t _max, const char* _format, va_list _argList)
 	{
 		if (1 < _max)
 		{
-			StaticMemoryBlockWriter writer(_out, uint32_t(_max-1) );
-			_out[_max-1] = '\0';
+			StaticMemoryBlockWriter writer(_out, uint32_t(_max) );
 
 			Error err;
 			va_list argListCopy;
@@ -1043,7 +1134,12 @@ namespace bx
 
 			if (err.isOk() )
 			{
-				return size;
+				size += write(&writer, '\0', &err);
+				return size - 1 /* size without '\0' terminator */;
+			}
+			else
+			{
+				_out[_max-1] = '\0';
 			}
 		}
 
@@ -1054,31 +1150,7 @@ namespace bx
 		int32_t size = write(&sizer, _format, argListCopy, &err);
 		va_end(argListCopy);
 
-		return size - 1 /* size without '\0' terminator */;
-	}
-
-	int32_t vsnprintf(char* _out, int32_t _max, const char* _format, va_list _argList)
-	{
-		va_list argList;
-		va_copy(argList, _argList);
-		int32_t total = 0;
-#if BX_CRT_NONE
-		total = vsnprintfRef(_out, _max, _format, argList);
-#elif BX_CRT_MSVC
-		int32_t len = -1;
-		if (NULL != _out)
-		{
-			va_list argListCopy;
-			va_copy(argListCopy, _argList);
-			len = ::vsnprintf_s(_out, _max, size_t(-1), _format, argListCopy);
-			va_end(argListCopy);
-		}
-		total = -1 == len ? ::_vscprintf(_format, argList) : len;
-#else
-		total = ::vsnprintf(_out, _max, _format, argList);
-#endif // BX_COMPILER_MSVC
-		va_end(argList);
-		return total;
+		return size;
 	}
 
 	int32_t snprintf(char* _out, int32_t _max, const char* _format, ...)
@@ -1090,44 +1162,9 @@ namespace bx
 		return total;
 	}
 
-	int32_t vsnwprintf(wchar_t* _out, int32_t _max, const wchar_t* _format, va_list _argList)
-	{
-		va_list argList;
-		va_copy(argList, _argList);
-		int32_t total = 0;
-#if BX_CRT_NONE
-		BX_UNUSED(_out, _max, _format, argList);
-#elif BX_CRT_MSVC
-		int32_t len = -1;
-		if (NULL != _out)
-		{
-			va_list argListCopy;
-			va_copy(argListCopy, _argList);
-			len = ::_vsnwprintf_s(_out, _max, size_t(-1), _format, argListCopy);
-			va_end(argListCopy);
-		}
-		total = -1 == len ? ::_vscwprintf(_format, _argList) : len;
-#elif BX_CRT_MINGW
-		total = ::vsnwprintf(_out, _max, _format, argList);
-#else
-		total = ::vswprintf(_out, _max, _format, argList);
-#endif // BX_COMPILER_MSVC
-		va_end(argList);
-		return total;
-	}
+	static const char s_units[] = { 'B', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y' };
 
-	int32_t swnprintf(wchar_t* _out, int32_t _max, const wchar_t* _format, ...)
-	{
-		va_list argList;
-		va_start(argList, _format);
-		int32_t len = vsnwprintf(_out, _max, _format, argList);
-		va_end(argList);
-		return len;
-	}
-
-	static const char s_units[] = { 'B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y' };
-
-	template<uint32_t Kilo, char KiloCh0, char KiloCh1>
+	template<uint32_t Kilo, char KiloCh0, char KiloCh1, CharFn fn>
 	inline int32_t prettify(char* _out, int32_t _count, uint64_t _value)
 	{
 		uint8_t idx = 0;
@@ -1141,7 +1178,7 @@ namespace bx
 		}
 
 		return snprintf(_out, _count, "%0.2f %c%c%c", value
-			, s_units[idx]
+			, fn(s_units[idx])
 			, idx > 0 ? KiloCh0 : '\0'
 			, KiloCh1
 			);
@@ -1151,10 +1188,10 @@ namespace bx
 	{
 		if (Units::Kilo == _units)
 		{
-			return prettify<1000, 'B', '\0'>(_out, _count, _value);
+			return prettify<1000, 'B', '\0', toNoop>(_out, _count, _value);
 		}
 
-		return prettify<1024, 'i', 'B'>(_out, _count, _value);
+		return prettify<1024, 'i', 'B', toUpper>(_out, _count, _value);
 	}
 
 } // namespace bx

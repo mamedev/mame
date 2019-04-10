@@ -8,7 +8,7 @@
 #include "includes/drgnmst.h"
 
 
-PALETTE_DECODER_MEMBER(drgnmst_state, drgnmst_IIIIRRRRGGGGBBBB)
+rgb_t drgnmst_state::drgnmst_IIIIRRRRGGGGBBBB(uint32_t raw)
 {
 	int const bright = 0x5 + ((raw >> 12) & 0xf);    // TODO : verify brightness value from real pcb
 	int r = (pal4bit((raw >> 8) & 0x0f) * bright) / 0x14;
@@ -21,6 +21,7 @@ PALETTE_DECODER_MEMBER(drgnmst_state, drgnmst_IIIIRRRRGGGGBBBB)
 	if (g > 0xff) g = 0xff;
 	if (b < 0) b = 0;
 	if (b > 0xff) b = 0xff;
+
 	return rgb_t(r, g, b);
 }
 
@@ -31,6 +32,7 @@ TILE_GET_INFO_MEMBER(drgnmst_state::get_fg_tile_info)
 	colour = m_fg_videoram[tile_index * 2 + 1] & 0x1f;
 	flipyx = (m_fg_videoram[tile_index * 2 + 1] & 0x60)>>5;
 
+	tileno |= (BIT(tile_index, 5)) << 15; // 8x8 tile bank seems like cps1
 	SET_TILE_INFO_MEMBER(1, tileno, colour, TILE_FLIPYX(flipyx));
 }
 

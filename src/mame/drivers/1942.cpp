@@ -175,10 +175,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::_1942_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* RST 10h - vblank */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* Z80 - RST 10h - vblank */
 
 	if(scanline == 0) // unknown irq event, presumably vblank-in or a periodic one (writes to the soundlatch and drives freeze dip-switch)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* Z80 - RST 08h */
 }
 
 
@@ -225,20 +225,20 @@ void _1942p_state::_1942p_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 
-	map(0xd000, 0xd7ff).ram().w(FUNC(_1942_state::_1942_fgvideoram_w)).share("fg_videoram");
-	map(0xd800, 0xdbff).ram().w(FUNC(_1942_state::_1942_bgvideoram_w)).share("bg_videoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(_1942p_state::_1942_fgvideoram_w)).share("fg_videoram");
+	map(0xd800, 0xdbff).ram().w(FUNC(_1942p_state::_1942_bgvideoram_w)).share("bg_videoram");
 
 	map(0xe000, 0xefff).ram();
 
 	map(0xce00, 0xcfff).ram().share("spriteram");
 
-	map(0xdc02, 0xdc03).w(FUNC(_1942_state::_1942_scroll_w));
-	map(0xc804, 0xc804).w(FUNC(_1942_state::_1942_c804_w));
-	map(0xc805, 0xc805).w(FUNC(_1942_state::_1942_palette_bank_w));
+	map(0xdc02, 0xdc03).w(FUNC(_1942p_state::_1942_scroll_w));
+	map(0xc804, 0xc804).w(FUNC(_1942p_state::_1942_c804_w));
+	map(0xc805, 0xc805).w(FUNC(_1942p_state::_1942_palette_bank_w));
 
 	map(0xf000, 0xf3ff).ram().w(FUNC(_1942p_state::_1942p_palette_w)).share("protopal");
 
-	map(0xf400, 0xf400).w(FUNC(_1942_state::_1942_bankswitch_w));
+	map(0xf400, 0xf400).w(FUNC(_1942p_state::_1942_bankswitch_w));
 	map(0xf500, 0xf500).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf600, 0xf600).w(FUNC(_1942p_state::_1942p_f600_w));
 
@@ -566,21 +566,20 @@ void _1942_state::machine_reset()
 MACHINE_CONFIG_START(_1942_state::_1942)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CPU_CLOCK)    /* 4 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(_1942_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", _1942_state, _1942_scanline, "screen", 0, 1)
+	Z80(config, m_maincpu, MAIN_CPU_CLOCK);    /* 4 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &_1942_state::_1942_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)  /* 3 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(_1942_state, irq0_line_hold, 4*60)
+	TIMER(config, "scantimer").configure_scanline(FUNC(_1942_state::_1942_scanline), "screen", 0, 1);
+
+	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);  /* 3 MHz ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &_1942_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(_1942_state::irq0_line_hold), attotime::from_hz(4*60));
 
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1942)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1942);
 
-	MCFG_PALETTE_ADD(m_palette, 64*4+4*32*8+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(_1942_state, 1942)
+	PALETTE(config, m_palette, FUNC(_1942_state::_1942_palette), 64*4+4*32*8+16*16, 256);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -595,21 +594,19 @@ MACHINE_CONFIG_START(_1942_state::_1942)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, AUDIO_CLOCK)  /* 1.5 MHz */
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
-	MCFG_AY8910_RES_LOADS(10000.0, 10000.0, 10000.0)
+	ay8910_device &ay1(AY8910(config, "ay1", AUDIO_CLOCK));  /* 1.5 MHz */
+	ay1.set_flags(AY8910_RESISTOR_OUTPUT);
+	ay1.set_resistors_load(10000.0, 10000.0, 10000.0);
+	ay1.add_route(0, "snd_nl", 1.0, 0);
+	ay1.add_route(1, "snd_nl", 1.0, 1);
+	ay1.add_route(2, "snd_nl", 1.0, 2);
 
-	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 2)
-
-	MCFG_DEVICE_ADD("ay2", AY8910, AUDIO_CLOCK)  /* 1.5 MHz */
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
-	MCFG_AY8910_RES_LOADS(10000.0, 10000.0, 10000.0)
-
-	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 3)
-	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 4)
-	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 5)
+	ay8910_device &ay2(AY8910(config, "ay2", AUDIO_CLOCK));  /* 1.5 MHz */
+	ay2.set_flags(AY8910_RESISTOR_OUTPUT);
+	ay2.set_resistors_load(10000.0, 10000.0, 10000.0);
+	ay2.add_route(0, "snd_nl", 1.0, 3);
+	ay2.add_route(1, "snd_nl", 1.0, 4);
+	ay2.add_route(2, "snd_nl", 1.0, 5);
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
@@ -631,25 +628,23 @@ MACHINE_CONFIG_START(_1942_state::_1942)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(_1942p_state::_1942p)
-
+void _1942p_state::_1942p(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CPU_CLOCK_1942P)    /* 4 MHz - verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(_1942p_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _1942_state,  irq0_line_hold) // note, powerups won't move down the screen with the original '1942' logic.
+	Z80(config, m_maincpu, MAIN_CPU_CLOCK_1942P);    /* 4 MHz - verified on PCB */
+	m_maincpu->set_addrmap(AS_PROGRAM, &_1942p_state::_1942p_map);
+	m_maincpu->set_vblank_int("screen", FUNC(_1942p_state::irq0_line_hold)); // note, powerups won't move down the screen with the original '1942' logic.
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK_1942P)  /* 4 MHz - verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(_1942p_sound_map)
-	MCFG_DEVICE_IO_MAP(_1942p_sound_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(_1942_state, irq0_line_hold, 4*60)
+	Z80(config, m_audiocpu, SOUND_CPU_CLOCK_1942P);  /* 4 MHz - verified on PCB */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &_1942p_state::_1942p_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &_1942p_state::_1942p_sound_io);
+	m_audiocpu->set_periodic_int(FUNC(_1942p_state::irq0_line_hold), attotime::from_hz(4*60));
 
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1942p)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1942p);
 
-	MCFG_PALETTE_ADD(m_palette, 0x500)
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
-	MCFG_PALETTE_INIT_OWNER(_1942p_state, 1942p)
+	PALETTE(config, m_palette, FUNC(_1942p_state::_1942p_palette), 0x500, 0x400);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -668,7 +663,7 @@ MACHINE_CONFIG_START(_1942p_state::_1942p)
 
 	AY8910(config, "ay1", AUDIO_CLOCK_1942P).add_route(ALL_OUTPUTS, "mono", 0.25); // 1.25 MHz - verified on PCB
 	AY8910(config, "ay2", AUDIO_CLOCK_1942P).add_route(ALL_OUTPUTS, "mono", 0.25); // 1.25 MHz - verified on PCB
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

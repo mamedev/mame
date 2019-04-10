@@ -29,6 +29,9 @@
 #include "nubus_specpdq.h"
 #include "screen.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 #define SPECPDQ_SCREEN_NAME "specpdq_screen"
 #define SPECPDQ_ROM_REGION  "specpdq_rom"
@@ -51,15 +54,16 @@ DEFINE_DEVICE_TYPE(NUBUS_SPECPDQ, nubus_specpdq_device, "nb_spdq", "SuperMac Spe
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nubus_specpdq_device::device_add_mconfig)
-	MCFG_SCREEN_ADD( SPECPDQ_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_specpdq_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_SIZE(1280,1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 844-1)
+void nubus_specpdq_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SPECPDQ_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(nubus_specpdq_device::screen_update));
+	screen.set_raw(25175000, 800, 0, 640, 525, 0, 480);
+	screen.set_size(1280, 1024);
+	screen.set_visarea(0, 1152-1, 0, 844-1);
 
-	MCFG_PALETTE_ADD("palette", 256)
-MACHINE_CONFIG_END
+	PALETTE(config, m_palette).set_entries(256);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -242,7 +246,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 	switch (offset)
 	{
 		case 0xc0054:   // mode 1
-//          logerror("%x to mode1\n", data);
+			LOG("%x to mode1\n", data);
 			break;
 
 		case 0xc005c:   // interrupt control
@@ -261,7 +265,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 			break;
 
 		case 0xc007a:
-//          logerror("%x to mode2\n", data);
+			LOG("%x to mode2\n", data);
 
 			switch (data)
 			{
@@ -278,11 +282,11 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 					break;
 			}
 
-//          logerror("m_mode = %d\n", m_mode);
+			LOG("m_mode = %d\n", m_mode);
 			break;
 
 		case 0x120000:  // DAC address
-//          logerror("%08x to DAC control %s\n", data,machine().describe_context());
+			LOG("%08x to DAC control %s\n", data,machine().describe_context());
 			m_clutoffs = ((data>>8)&0xff)^0xff;
 			break;
 
@@ -291,7 +295,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 
 			if (m_count == 3)
 			{
-//              logerror("RAMDAC: color %d = %02x %02x %02x %s\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], machine().describe_context());
+				LOG("RAMDAC: color %d = %02x %02x %02x %s\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], machine().describe_context());
 				m_palette->set_pen_color(m_clutoffs, rgb_t(m_colors[0], m_colors[1], m_colors[2]));
 				m_palette_val[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
@@ -368,7 +372,10 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 		case 0x18103d:
 		case 0x18103e:
 		case 0x18103f:
-//          logerror("Pattern %08x @ %x\n", data ^ 0xffffffff, offset);
+			if(offset == 0x181000) {
+				machine().debug_break();
+				LOG("Pattern %08x @ %x\n", data ^ 0xffffffff, offset);
+			}
 			m_fillbytes[((offset&0x3f)*4)] = ((data>>24) & 0xff) ^ 0xff;
 			m_fillbytes[((offset&0x3f)*4)+1] = ((data>>16) & 0xff) ^ 0xff;
 			m_fillbytes[((offset&0x3f)*4)+2] = ((data>>8) & 0xff) ^ 0xff;
@@ -377,81 +384,107 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 
 		// blitter control
 		case 0x182006:
-//          logerror("%08x (%d) to blitter ctrl 1 %s\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
+			LOG("%08x (%d) to blitter ctrl 1 %s rectangle\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
 			break;
 
 		case 0x182008:
-//          logerror("%08x (%d) to blitter ctrl 2 %s\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
+			LOG("%08x (%d) to blitter ctrl 2 %s rectangle\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
 			m_patofsx = (data ^ 0xffffffff) & 7;
 			m_patofsy = ((data ^ 0xffffffff)>>3) & 7;
 			break;
 
 		case 0x18200e:
-//          logerror("%08x (%d) to blitter ctrl 3 %s\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
+			LOG("%08x (%d) to blitter ctrl 3 %s\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
 			m_width = data ^ 0xffffffff;
 			break;
 
 		case 0x18200b:
-//          logerror("%08x (%d) to blitter ctrl 4 %s\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
+			LOG("%08x (%d) to blitter ctrl 4 %s\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
 			m_height = (data ^ 0xffffffff) & 0xffff;
 			break;
 
 		case 0x18200a:
 			data ^= 0xffffffff;
-//          logerror("%08x to blitter ctrl 5 %s\n", data, machine().describe_context());
+			LOG("%08x to blitter ctrl 5 %s\n", data, machine().describe_context());
 			m_vram_src = data>>2;
 			break;
 
 		case 0x182009:
 			data ^= 0xffffffff;
-//          logerror("%08x to blitter ctrl 6 %s\n", data, machine().describe_context());
+			LOG("%08x to blitter ctrl 6 %s\n", data, machine().describe_context());
 			m_vram_addr = data>>2;
 			break;
 
 		case 0x182007:
 			data ^= 0xffffffff;
-//          logerror("%08x to blitter ctrl 7 %s\n", data, machine().describe_context());
+			LOG("%08x to blitter ctrl 7 %s\n", data, machine().describe_context());
 
 			// fill rectangle
 			if (data == 2)
 			{
 				int x, y;
-				uint8_t *vram = &m_vram[m_vram_addr + m_patofsx]; // m_vram_addr is missing the low 2 bits, we add them back here
+				uint8_t *vram = &m_vram[m_vram_addr & ~3];
 
-//              logerror("Fill rectangle with %02x %02x %02x %02x, width %d height %d\n", m_fillbytes[0], m_fillbytes[1], m_fillbytes[2], m_fillbytes[3], m_width, m_height);
+				int ddx = m_vram_addr & 3;
 
-				for (y = 0; y < m_height; y++)
+				LOG("Fill rectangle with %02x %02x %02x %02x, adr %x (%d, %d) width %d height %d delta %d %d\n", m_fillbytes[0], m_fillbytes[1], m_fillbytes[2], m_fillbytes[3], m_vram_addr, m_vram_addr % 1152, m_vram_addr / 1152, m_width, m_height, m_patofsx, m_patofsy);
+
+				for (y = 0; y <= m_height; y++)
 				{
-					for (x = 0; x < m_width; x++)
+					for (x = 0; x <= m_width; x++)
 					{
-						vram[(y * 1152)+x] = m_fillbytes[((m_patofsx + x) & 0x1f)+(((m_patofsy + y) & 0x7)*32)];
+						vram[(y * 1152)+BYTE4_XOR_BE(x + ddx)] = m_fillbytes[((m_patofsx + x) & 0x1f)+(((m_patofsy + y) & 0x7) << 5)];
 					}
 				}
 			}
-			else if ((data == 0x101) || (data == 0x100))
+			else if (data == 0x100)
 			{
 				int x, y;
-				uint8_t *vram = &m_vram[m_vram_addr];
-				uint8_t *vramsrc = &m_vram[m_vram_src];
+				uint8_t *vram = &m_vram[m_vram_addr & ~3];
+				uint8_t *vramsrc = &m_vram[m_vram_src & ~3];
 
-//              logerror("Copy rectangle, width %d height %d  src %x dst %x\n", m_width, m_height, m_vram_addr, m_vram_src);
+				int sdx = m_vram_src & 3;
+				int ddx = m_vram_addr & 3;
+
+				LOG("Copy rectangle forwards, width %d height %d dst %x (%d, %d) src %x (%d, %d)\n", m_width, m_height, m_vram_addr, m_vram_addr % 1152, m_vram_addr / 1152, m_vram_src, m_vram_src % 1152, m_vram_src / 1152);
+
+				for (y = 0; y <= m_height; y++)
+				{
+					for (x = 0; x <= m_width; x++)
+					{
+						vram[(y * 1152)+BYTE4_XOR_BE(x + ddx)] = vramsrc[(y * 1152)+BYTE4_XOR_BE(x + sdx)];
+					}
+				}
+				(void)vramsrc; (void)sdx;
+			}
+			else if (data == 0x101)
+			{
+				int x, y;
+				uint8_t *vram = &m_vram[m_vram_addr & ~3];
+				uint8_t *vramsrc = &m_vram[m_vram_src & ~3];
+
+				int sdx = m_vram_src & 3;
+				int ddx = m_vram_addr & 3;
+
+				LOG("Copy rectangle backwards, width %d height %d dst %x (%d, %d) src %x (%d, %d)\n", m_width, m_height, m_vram_addr, m_vram_addr % 1152, m_vram_addr / 1152, m_vram_src, m_vram_src % 1152, m_vram_src / 1152);
 
 				for (y = 0; y < m_height; y++)
 				{
 					for (x = 0; x < m_width; x++)
 					{
-						vram[(y * 1152)+x] = vramsrc[(y * 1152)+x];
+						vram[(-y * 1152)+BYTE4_XOR_BE(-x + ddx)] = vramsrc[(-y * 1152)+BYTE4_XOR_BE(-x + sdx)];
 					}
 				}
+				(void)vramsrc; (void)sdx;
 			}
 			else
 			{
-				logerror("Unknown blitter command %08x\n", data);
+				LOG("Unknown blitter command %08x\n", data);
 			}
 			break;
 
 		default:
-//          logerror("specpdq_w: %08x @ %x (mask %08x  %s)\n", data^0xffffffff, offset, mem_mask, machine().describe_context());
+			LOG("specpdq_w: %08x @ %x (mask %08x  %s)\n", data^0xffffffff, offset, mem_mask, machine().describe_context());
 			break;
 	}
 }

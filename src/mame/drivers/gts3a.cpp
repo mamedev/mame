@@ -361,8 +361,7 @@ void gts3a_state::gts3a(machine_config &config)
 	screen.set_size(128, 32);
 	screen.set_visarea(0, 127, 0, 31);
 
-	PALETTE(config, m_palette, 2);
-	m_palette->set_init(DEVICE_SELF, FUNC(gts3a_state::palette_init));
+	PALETTE(config, m_palette, FUNC(gts3a_state::palette_init), 2);
 
 	mc6845_device &crtc(MC6845(config, "crtc", XTAL(3'579'545) / 2));
 	crtc.set_screen("screen");

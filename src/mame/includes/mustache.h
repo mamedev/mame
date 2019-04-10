@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
+#ifndef MAME_INCLUDES_MUSTACHE_H
+#define MAME_INCLUDES_MUSTACHE_H
+
+#pragma once
 
 #include "audio/seibu.h"    // for seibu_sound_decrypt on the MAIN cpu (not sound)
 #include "machine/timer.h"
@@ -9,15 +13,16 @@
 class mustache_state : public driver_device
 {
 public:
-	mustache_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mustache_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_dswb(*this, "DSWB") { }
+		m_dswb(*this, "DSWB")
+	{ }
 
 	void mustache(machine_config &config);
 
@@ -52,3 +57,5 @@ private:
 	void decrypted_opcodes_map(address_map &map);
 	void memmap(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MUSTACHE_H

@@ -293,7 +293,7 @@ static const unsigned char palette_gamate[] = {
 	0x6B, 0xA6, 0x4A, 0x43, 0x7A, 0x63, 0x25, 0x59, 0x55, 0x12, 0x42, 0x4C
 };
 
-PALETTE_INIT_MEMBER(gamate_video_device, gamate)
+void gamate_video_device::gamate_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 4; i++)
 		palette.set_pen_color(i, palette_gamate[i * 3 + 0], palette_gamate[i * 3 + 1], palette_gamate[i * 3 + 2]);
@@ -305,19 +305,19 @@ PALETTE_INIT_MEMBER(gamate_video_device, gamate)
     frame rate is 60.8093Hz.
 */
 
-MACHINE_CONFIG_START(gamate_video_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60.8093)
-	MCFG_SCREEN_SIZE(160, 150)
-	MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 150-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gamate_video_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE) // close approximate until we use timers to emulate exact video update
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+void gamate_video_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60.8093);
+	screen.set_size(160, 150);
+	screen.set_visarea(0, 160-1, 0, 150-1);
+	screen.set_screen_update(FUNC(gamate_video_device::screen_update));
+	screen.set_palette("palette");
+	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE); // close approximate until we use timers to emulate exact video update
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(gamate_video_device,gamate)
-MACHINE_CONFIG_END
+	PALETTE(config, "palette", FUNC(gamate_video_device::gamate_palette), 4);
+}
 
 void gamate_video_device::device_start()
 {

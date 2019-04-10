@@ -25,13 +25,13 @@ DEFINE_DEVICE_TYPE(BBC_BITSTIK2, bbc_bitstik2_device, "bbc_bitstik2", "Robo Bits
 //-------------------------------------------------
 
 ROM_START(bitstik1)
-	ROM_REGION(0x4000, "rom", 0)
+	ROM_REGION(0x4000, "exp_rom", 0)
 	ROM_LOAD("bitstik1.rom", 0x0000, 0x2000, CRC(a3c539f8) SHA1(c6f2cf2f6d1e48819a8381c6a1c97ca8fa5ab117))
 	ROM_RELOAD(0x2000, 0x2000)
 ROM_END
 
 ROM_START(bitstik2)
-	ROM_REGION(0x4000, "rom", 0)
+	ROM_REGION(0x4000, "exp_rom", 0)
 	ROM_LOAD("bitstik2.rom", 0x0000, 0x2000, CRC(a2b5a743) SHA1(4d0040af6bdc6a587e42d4aa36d528b768cf9549))
 	ROM_RELOAD(0x2000, 0x2000)
 ROM_END
@@ -93,8 +93,7 @@ bbc_bitstik_device::bbc_bitstik_device(const machine_config &mconfig, device_typ
 	device_t(mconfig, type, tag, owner, clock),
 	device_bbc_analogue_interface(mconfig, *this),
 	m_channel(*this, "CHANNEL%u", 0),
-	m_buttons(*this, "BUTTONS"),
-	m_rom(*this, "rom")
+	m_buttons(*this, "BUTTONS")
 {
 }
 
@@ -115,16 +114,6 @@ bbc_bitstik2_device::bbc_bitstik2_device(const machine_config &mconfig, const ch
 
 void bbc_bitstik_device::device_start()
 {
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_bitstik_device::device_reset()
-{
-	machine().root_device().membank("bank4")->configure_entry(13, memregion("rom")->base());
 }
 
 

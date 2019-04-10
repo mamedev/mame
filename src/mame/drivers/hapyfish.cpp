@@ -6,8 +6,7 @@
 
     Skeleton driver adapted from mini2440.cpp
 
-    TODO: bootloader fails b/c it can't find the second NAND.  Hookup in
-    s3c24xx may not be correct.
+    TODO: Linux kernel + initrd loads now but not much happens afterwards.
 
     To see bootloader messages, uncomment the UART_PRINTF define in s3c24xx.hxx.
 
@@ -22,6 +21,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 #define VERBOSE_LEVEL ( 0 )
 
 class hapyfish_state : public driver_device
@@ -35,7 +36,7 @@ public:
 		m_nand2(*this, "nand2"),
 		m_ldac(*this, "ldac"),
 		m_rdac(*this, "rdac")
-		{ }
+	{ }
 
 	void hapyfish(machine_config &config);
 
@@ -71,10 +72,10 @@ inline void hapyfish_state::verboselog(int n_level, const char *s_fmt, ...)
 	{
 		va_list v;
 		char buf[32768];
-		va_start( v, s_fmt);
-		vsprintf( buf, s_fmt, v);
-		va_end( v);
-		logerror( "%s: %s", machine().describe_context(), buf);
+		va_start(v, s_fmt);
+		vsprintf(buf, s_fmt, v);
+		va_end(v);
+		logerror("%s: %s", machine().describe_context(), buf);
 	}
 }
 
@@ -145,31 +146,54 @@ READ32_MEMBER(hapyfish_state::s3c2440_core_pin_r)
 
 WRITE8_MEMBER(hapyfish_state::s3c2440_nand_command_w )
 {
-	printf("%08x to NAND command\n", data);
-	m_nand->command_w(data);
+	if ((m_port[8] & 0x1800) != 0)
+	{
+		m_nand->command_w(data);
+	}
+	else
+	{
+		m_nand2->command_w(data);
+	}
 }
 
 WRITE8_MEMBER(hapyfish_state::s3c2440_nand_address_w )
 {
-	printf("%08x to NAND address\n", data);
-	m_nand->address_w(data);
+	if ((m_port[8] & 0x1800) != 0)
+	{
+		m_nand->address_w(data);
+	}
+	else
+	{
+		m_nand2->address_w(data);
+	}
 }
 
 READ8_MEMBER(hapyfish_state::s3c2440_nand_data_r )
 {
-	return m_nand->data_r();
+	if ((m_port[8] & 0x1800) != 0)
+	{
+		return m_nand->data_r();
+	}
+
+	return m_nand2->data_r();
 }
 
 WRITE8_MEMBER(hapyfish_state::s3c2440_nand_data_w )
 {
-	m_nand->data_w(data);
+	if ((m_port[8] & 0x1800) != 0)
+	{
+		m_nand->data_w(data);
+		return;
+	}
+
+	m_nand2->data_w(data);
 }
 
 // I2S
 
 WRITE16_MEMBER(hapyfish_state::s3c2440_i2s_data_w )
 {
-	if ( offset )
+	if (offset)
 		m_ldac->write(data);
 	else
 		m_rdac->write(data);
@@ -189,12 +213,14 @@ void hapyfish_state::machine_start()
 {
 	m_nand->set_data_ptr(memregion("nand")->base());
 	m_nand2->set_data_ptr(memregion("nand2")->base());
+	m_port[8] = 0x1800; // select NAND #1 (S3C2440 bootloader will happen before machine_reset())
 }
 
 void hapyfish_state::machine_reset()
 {
 	m_maincpu->reset();
-	memset( m_port, 0, sizeof( m_port));
+	std::fill(std::begin(m_port), std::end(m_port), 0);
+	m_port[8] = 0x1800; // select NAND #1
 }
 
 /***************************************************************************
@@ -215,48 +241,49 @@ void hapyfish_state::init_mini2440()
 	// do nothing
 }
 
-MACHINE_CONFIG_START(hapyfish_state::hapyfish)
-	MCFG_DEVICE_ADD("maincpu", ARM920T, 100000000)
-	MCFG_DEVICE_PROGRAM_MAP(hapyfish_map)
+void hapyfish_state::hapyfish(machine_config &config)
+{
+	ARM920T(config, m_maincpu, 100000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hapyfish_state::hapyfish_map);
 
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, "palette").set_entries(32768);
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1024, 768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-
-	MCFG_SCREEN_UPDATE_DEVICE("s3c2440", s3c2440_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(1024, 768);
+	screen.set_visarea(0, 639, 0, 479);
+	screen.set_screen_update("s3c2440", FUNC(s3c2440_device::screen_update));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ldac", UDA1341TS, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // uda1341ts.u12
-	MCFG_DEVICE_ADD("rdac", UDA1341TS, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // uda1341ts.u12
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	UDA1341TS(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // uda1341ts.u12
+	UDA1341TS(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // uda1341ts.u12
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_DEVICE_ADD("s3c2440", S3C2440, 12000000)
-	MCFG_S3C2440_PALETTE("palette")
-	MCFG_S3C2440_SCREEN("screen")
-	MCFG_S3C2440_CORE_PIN_R_CB(READ32(*this, hapyfish_state, s3c2440_core_pin_r))
-	MCFG_S3C2440_GPIO_PORT_R_CB(READ32(*this, hapyfish_state, s3c2440_gpio_port_r))
-	MCFG_S3C2440_GPIO_PORT_W_CB(WRITE32(*this, hapyfish_state, s3c2440_gpio_port_w))
-	MCFG_S3C2440_ADC_DATA_R_CB(READ32(*this, hapyfish_state, s3c2440_adc_data_r))
-	MCFG_S3C2440_I2S_DATA_W_CB(WRITE16(*this, hapyfish_state, s3c2440_i2s_data_w))
-	MCFG_S3C2440_NAND_COMMAND_W_CB(WRITE8(*this, hapyfish_state, s3c2440_nand_command_w))
-	MCFG_S3C2440_NAND_ADDRESS_W_CB(WRITE8(*this, hapyfish_state, s3c2440_nand_address_w))
-	MCFG_S3C2440_NAND_DATA_R_CB(READ8(*this, hapyfish_state, s3c2440_nand_data_r))
-	MCFG_S3C2440_NAND_DATA_W_CB(WRITE8(*this, hapyfish_state, s3c2440_nand_data_w))
+	S3C2440(config, m_s3c2440, 12000000);
+	m_s3c2440->set_palette_tag("palette");
+	m_s3c2440->set_screen_tag("screen");
+	m_s3c2440->core_pin_r_callback().set(FUNC(hapyfish_state::s3c2440_core_pin_r));
+	m_s3c2440->gpio_port_r_callback().set(FUNC(hapyfish_state::s3c2440_gpio_port_r));
+	m_s3c2440->gpio_port_w_callback().set(FUNC(hapyfish_state::s3c2440_gpio_port_w));
+	m_s3c2440->adc_data_r_callback().set(FUNC(hapyfish_state::s3c2440_adc_data_r));
+	m_s3c2440->i2s_data_w_callback().set(FUNC(hapyfish_state::s3c2440_i2s_data_w));
+	m_s3c2440->nand_command_w_callback().set(FUNC(hapyfish_state::s3c2440_nand_command_w));
+	m_s3c2440->nand_address_w_callback().set(FUNC(hapyfish_state::s3c2440_nand_address_w));
+	m_s3c2440->nand_data_r_callback().set(FUNC(hapyfish_state::s3c2440_nand_data_r));
+	m_s3c2440->nand_data_w_callback().set(FUNC(hapyfish_state::s3c2440_nand_data_w));
 
-	MCFG_DEVICE_ADD("nand", NAND, 0)
-	MCFG_NAND_TYPE(K9F1G08U0B)
-	MCFG_NAND_RNB_CALLBACK(WRITELINE("s3c2440", s3c2440_device, frnb_w))
+	NAND(config, m_nand, 0);
+	m_nand->set_nand_type(nand_device::chip::K9LAG08U0M);
+	m_nand->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 
-	MCFG_DEVICE_ADD("nand2", NAND, 0)
-	MCFG_NAND_TYPE(K9F1G08U0B)
-MACHINE_CONFIG_END
+	NAND(config, m_nand2, 0);
+	m_nand2->set_nand_type(nand_device::chip::K9LAG08U0M);
+	m_nand2->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
+}
 
 static INPUT_PORTS_START( hapyfish )
 INPUT_PORTS_END

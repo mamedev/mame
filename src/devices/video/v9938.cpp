@@ -73,7 +73,7 @@ enum
 
 #define EXPMEM_OFFSET 0x20000
 
-#define LONG_WIDTH (512 + 32)
+#define V9938_LONG_WIDTH (512 + 32)
 
 static const char *const v9938_modes[] = {
 	"TEXT 1", "MULTICOLOR", "GRAPHIC 1", "GRAPHIC 2", "GRAPHIC 3",
@@ -369,7 +369,7 @@ uint32_t v99x8_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	return 0;
 }
 
-READ8_MEMBER( v99x8_device::read )
+uint8_t v99x8_device::read(offs_t offset)
 {
 	switch (offset & 3)
 	{
@@ -379,7 +379,7 @@ READ8_MEMBER( v99x8_device::read )
 	return 0xff;
 }
 
-WRITE8_MEMBER( v99x8_device::write )
+void v99x8_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 3)
 	{
@@ -909,7 +909,7 @@ void v99x8_device::default_border(uint32_t *ln)
 	int i;
 
 	pen = pen16(m_cont_reg[7] & 0x0f);
-	i = LONG_WIDTH;
+	i = V9938_LONG_WIDTH;
 	while (i--) *ln++ = pen;
 }
 
@@ -919,7 +919,7 @@ void v99x8_device::graphic7_border(uint32_t *ln)
 	int i;
 
 	pen = pen256(m_cont_reg[7]);
-	i = LONG_WIDTH;
+	i = V9938_LONG_WIDTH;
 	while (i--) *ln++ = pen;
 }
 
@@ -931,7 +931,7 @@ void v99x8_device::graphic5_border(uint32_t *ln)
 
 	pen1 = pen16(m_cont_reg[7] & 0x03);
 	pen0 = pen16((m_cont_reg[7] >> 2) & 0x03);
-	i = LONG_WIDTH / 2;
+	i = V9938_LONG_WIDTH / 2;
 	while (i--) { *ln++ = pen0; *ln++ = pen1; }
 }
 

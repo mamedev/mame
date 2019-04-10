@@ -7,9 +7,10 @@
  * Macintosh driver declarations
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_MAC_H
 #define MAME_INCLUDES_MAC_H
+
+#pragma once
 
 #include "machine/8530scc.h"
 #include "machine/6522via.h"
@@ -65,8 +66,8 @@ void mac_fdc_set_enable_lines(device_t *device, int enable_mask);
 class mac_state : public driver_device
 {
 public:
-	mac_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mac_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via1(*this, "via6522_0"),
 		m_via2(*this, "via6522_1"),
@@ -529,8 +530,7 @@ private:
 	emu_timer *m_scanline_timer;
 	emu_timer *m_adb_timer;
 
-	void palette_init_mac(palette_device &palette);
-	void palette_init_macgsc(palette_device &palette);
+	void macgsc_palette(palette_device &palette) const;
 
 	DECLARE_VIDEO_START(mac);
 	DECLARE_VIDEO_START(macprtb);
@@ -599,8 +599,7 @@ private:
 	void kbd_shift_out(int data);
 	void keyboard_receive(int val);
 	void mac_driver_init(model_t model);
-	void mac_install_memory(offs_t memory_begin, offs_t memory_end,
-		offs_t memory_size, void *memory_data, int is_rom, const char *bank);
+	void mac_install_memory(offs_t memory_begin, offs_t memory_end, offs_t memory_size, void *memory_data, int is_rom, const char *bank);
 	offs_t mac_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
 

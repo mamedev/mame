@@ -11,9 +11,11 @@
 #include "hp98265a.h"
 #include "hp98543.h"
 #include "hp98544.h"
+#include "hp98550.h"
 #include "hp98603a.h"
 #include "hp98603b.h"
 #include "hp98620.h"
+#include "hp98643.h"
 #include "hp98644.h"
 #include "human_interface.h"
 
@@ -102,8 +104,7 @@ dio16_device::dio16_device(const machine_config &mconfig, const char *tag, devic
 
 dio16_device::dio16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_maincpu(*this, finder_base::DUMMY_TAG),
-	m_prgspace(nullptr),
+	m_prgspace(*this, finder_base::DUMMY_TAG, -1),
 	m_irq1_out_cb(*this),
 	m_irq2_out_cb(*this),
 	m_irq3_out_cb(*this),
@@ -134,8 +135,7 @@ void dio16_device::device_start()
 	m_dmar0_out_cb.resolve_safe();
 	m_dmar1_out_cb.resolve_safe();
 
-	m_prgspace = &m_maincpu->space(AS_PROGRAM);
-	m_prgwidth = m_maincpu->space_config(AS_PROGRAM)->data_width();
+	m_prgwidth = m_prgspace->data_width();
 
 	save_item(NAME(m_irq));
 	save_item(NAME(m_dmar));
@@ -206,7 +206,7 @@ void dio16_device::set_dmar(unsigned int index, unsigned int num, int state)
 		m_dmar[num] &= ~(1 << index);
 
 
-	for (auto & card:m_cards) {
+	for (auto &card : m_cards) {
 
 		if (card->get_index() == index)
 			continue;
@@ -224,7 +224,7 @@ void dio16_device::set_dmar(unsigned int index, unsigned int num, int state)
 
 void dio16_device::dmack_w_out(int index, int channel, uint8_t val)
 {
-	for (auto & card:m_cards) {
+	for (auto &card : m_cards) {
 		if (card->get_index() == index)
 			continue;
 		card->dmack_w_in(channel, val);
@@ -235,7 +235,7 @@ uint8_t dio16_device::dmack_r_out(int index, int channel)
 {
 	uint8_t ret = 0xff;
 
-	for (auto & card:m_cards) {
+	for (auto &card : m_cards) {
 		if (card->get_index() == index)
 			continue;
 		ret &= card->dmack_r_in(channel);
@@ -245,7 +245,7 @@ uint8_t dio16_device::dmack_r_out(int index, int channel)
 
 WRITE_LINE_MEMBER(dio16_device::reset_in)
 {
-	for (auto & card:m_cards) {
+	for (auto &card : m_cards) {
 		if (card->get_index() != m_bus_index)
 			card->reset_in(state);
 	}
@@ -257,11 +257,11 @@ void dio16_device::install_memory(offs_t start, offs_t end,
 	switch (m_prgwidth) {
 	case 16:
 		m_prgspace->install_readwrite_handler(start, end, rhandler,
-						      whandler);
+							  whandler);
 		break;
 	case 32:
 		m_prgspace->install_readwrite_handler(start, end, rhandler,
-						      whandler, 0xffffffff);
+							  whandler, 0xffffffff);
 		break;
 	default:
 		fatalerror("DIO: Bus width %d not supported\n", m_prgwidth);
@@ -359,12 +359,15 @@ void dio16_cards(device_slot_interface & device)
 	device.option_add("98544", HPDIO_98544);
 	device.option_add("98603a", HPDIO_98603A);
 	device.option_add("98603b", HPDIO_98603B);
+	device.option_add("98643", HPDIO_98643);
 	device.option_add("98644", HPDIO_98644);
 	device.option_add("human_interface", HPDIO_HUMAN_INTERFACE);
 }
 
 void dio32_cards(device_slot_interface & device)
 {
+	dio16_cards(device);
 	device.option_add("98265a", HPDIO_98265A);
+	device.option_add("98550", HPDIO_98550);
 	device.option_add("98620", HPDIO_98620);
 }

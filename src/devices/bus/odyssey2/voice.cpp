@@ -43,7 +43,8 @@ void o2_voice_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(o2_voice_device::device_add_mconfig)
+void o2_voice_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
 
 	SP0256(config, m_speech, 3120000);
@@ -51,8 +52,8 @@ MACHINE_CONFIG_START(o2_voice_device::device_add_mconfig)
 	// The Voice uses a speaker with its own volume control so the relative volumes to use are subjective, these sound good
 	m_speech->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_O2_CARTRIDGE_ADD("subslot", o2_cart, nullptr)
-MACHINE_CONFIG_END
+	O2_CART_SLOT(config, m_subslot, o2_cart, nullptr);
+}
 
 
 ROM_START( o2voice )

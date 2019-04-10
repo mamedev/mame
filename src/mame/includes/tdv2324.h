@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder,Jonathan Gevaryahu
-#pragma once
-
 #ifndef MAME_INCLUDES_TDV2324_H
 #define MAME_INCLUDES_TDV2324_H
+
+#pragma once
 
 
 #include "cpu/i8085/i8085.h"
 #include "cpu/m6800/m6800.h"
+#include "imagedev/floppy.h"
 #include "imagedev/harddriv.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
@@ -47,16 +48,16 @@ class tdv2324_state : public driver_device
 {
 public:
 	tdv2324_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, P8085AH_0_TAG),
-			m_subcpu(*this, P8085AH_1_TAG),
-			m_fdccpu(*this, MC68B02P_TAG),
-			m_sio(*this, MK3887N4_TAG),
-			m_pic(*this, P8259A_TAG),
-			m_pit0(*this, P8253_5_0_TAG),
-			m_pit1(*this, P8253_5_1_TAG),
-			m_tms(*this, TMS9937NL_TAG),
-			m_video_ram(*this, "video_ram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, P8085AH_0_TAG)
+		, m_subcpu(*this, P8085AH_1_TAG)
+		, m_fdccpu(*this, MC68B02P_TAG)
+		, m_sio(*this, MK3887N4_TAG)
+		, m_pic(*this, P8259A_TAG)
+		, m_pit0(*this, P8253_5_0_TAG)
+		, m_pit1(*this, P8253_5_1_TAG)
+		, m_tms(*this, TMS9937NL_TAG)
+		, m_video_ram(*this, "video_ram")
 	{ }
 
 	void tdv2324(machine_config &config);

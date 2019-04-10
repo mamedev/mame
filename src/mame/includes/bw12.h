@@ -7,6 +7,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "formats/bw12_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/6821pia.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/kb3600.h"

@@ -153,13 +153,13 @@ std::string videobrain_expansion_slot_device::get_default_card_software(get_defa
 //  bo_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t videobrain_expansion_slot_device::bo_r(address_space &space, offs_t offset, int cs1, int cs2)
+uint8_t videobrain_expansion_slot_device::bo_r(offs_t offset, int cs1, int cs2)
 {
 	uint8_t data = 0;
 
 	if (m_cart != nullptr)
 	{
-		data = m_cart->videobrain_bo_r(space, offset, cs1, cs2);
+		data = m_cart->videobrain_bo_r(offset, cs1, cs2);
 	}
 
 	return data;
@@ -170,11 +170,11 @@ uint8_t videobrain_expansion_slot_device::bo_r(address_space &space, offs_t offs
 //  bo_w - cartridge data write
 //-------------------------------------------------
 
-void videobrain_expansion_slot_device::bo_w(address_space &space, offs_t offset, uint8_t data, int cs1, int cs2)
+void videobrain_expansion_slot_device::bo_w(offs_t offset, uint8_t data, int cs1, int cs2)
 {
 	if (m_cart != nullptr)
 	{
-		m_cart->videobrain_bo_w(space, offset, data, cs1, cs2);
+		m_cart->videobrain_bo_w(offset, data, cs1, cs2);
 	}
 }
 

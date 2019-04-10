@@ -49,6 +49,10 @@ public:
 	void init_enc();
 	void init_deb();
 
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(ppi2_obf_w);
 	TIMER_CALLBACK_MEMBER(ppi2_ack);
@@ -56,7 +60,7 @@ private:
 	DECLARE_WRITE8_MEMBER(mainlamps_w);
 	DECLARE_WRITE8_MEMBER(soundlamps_w);
 	DECLARE_WRITE8_MEMBER(counterlamps_w);
-	DECLARE_PALETTE_INIT(norautp);
+	void norautp_palette(palette_device &palette) const;
 	uint32_t screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void dphl_map(address_map &map);
 	void dphla_map(address_map &map);
@@ -74,13 +78,10 @@ private:
 	void nortest1_map(address_map &map);
 	void ssjkrpkr_map(address_map &map);
 
-	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
-
 	std::unique_ptr<uint16_t[]> m_np_vram;
 	required_device<cpu_device> m_maincpu;
 	required_device_array<i8255_device, 3> m_ppi8255;
-	required_device<discrete_device> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

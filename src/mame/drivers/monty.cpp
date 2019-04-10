@@ -69,7 +69,7 @@ private:
 	void monty_io(address_map &map);
 	void monty_mem(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<sed1520_device> m_sed0;     // TODO: This isn't actually a SED1520, it's a SED1503F
 	//required_device<sed1520_device> m_sed1;   // TODO: Also, there are 2 SED1503Fs on the board - one is flipped upside down
@@ -264,35 +264,35 @@ SED1520_UPDATE_CB(monty_state::screen_update)
 
 
 // TODO: Additional machine definition - Master Monty has a different memory layout
-MACHINE_CONFIG_START(monty_state::monty)
+void monty_state::monty(machine_config &config)
+{
 	// Basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, 3580000)       // Ceramic resonator labeled 3.58MT
-	MCFG_DEVICE_PROGRAM_MAP(monty_mem)
-	MCFG_DEVICE_IO_MAP(monty_io)
-	MCFG_Z80_SET_HALT_CALLBACK(WRITELINE(*this, monty_state, halt_changed))
+	Z80(config, m_maincpu, 3580000);       // Ceramic resonator labeled 3.58MT
+	m_maincpu->set_addrmap(AS_PROGRAM, &monty_state::monty_mem);
+	m_maincpu->set_addrmap(AS_IO, &monty_state::monty_io);
+	m_maincpu->halt_cb().set(FUNC(monty_state::halt_changed));
 
 	// Video hardware
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not accurate
-	MCFG_SCREEN_SIZE(50, 32)    // Two SED1503s (42x16 pixels) control the top and bottom halves
-	MCFG_SCREEN_VISIBLE_AREA(0, 50-1, 0, 32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(monty_state, lcd_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // Not accurate
+	screen.set_size(50, 32); // Two SED1503s (42x16 pixels) control the top and bottom halves
+	screen.set_visarea(0, 50-1, 0, 32-1);
+	screen.set_screen_update(FUNC(monty_state::lcd_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	// LCD controller interfaces
-	MCFG_SED1520_ADD("sed1520_0", UPDATE(monty_state, screen_update))
-MACHINE_CONFIG_END
+	SED1520(config, m_sed0).set_screen_update_cb(FUNC(monty_state::screen_update));
+}
 
-MACHINE_CONFIG_START(monty_state::mmonty)
+void monty_state::mmonty(machine_config &config)
+{
 	monty(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(mmonty_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &monty_state::mmonty_mem);
+}
 
 
 // ROM definitions

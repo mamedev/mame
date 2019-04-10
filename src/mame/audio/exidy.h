@@ -126,25 +126,16 @@ protected:
 	required_device<pia6821_device> m_pia;
 };
 
-#define MCFG_EXIDY_VENTURE_WRITEPA_HANDLER(_devcb) \
-	downcast<venture_sound_device &>(*device).set_pa_callback(DEVCB_##_devcb);
-#define MCFG_EXIDY_VENTURE_WRITEPB_HANDLER(_devcb) \
-	downcast<venture_sound_device &>(*device).set_pb_callback(DEVCB_##_devcb);
-#define MCFG_EXIDY_VENTURE_CA2_HANDLER(_devcb) \
-	downcast<venture_sound_device &>(*device).set_ca2_callback(DEVCB_##_devcb);
-#define MCFG_EXIDY_VENTURE_CB2_HANDLER(_devcb) \
-	downcast<venture_sound_device &>(*device).set_cb2_callback(DEVCB_##_devcb);
-
 class venture_sound_device : public exidy_sh8253_sound_device
 {
 public:
 	venture_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration access
-	template<class Object> devcb_base &set_pa_callback(Object &&object) { return m_pa_callback.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_pb_callback(Object &&object) { return m_pb_callback.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_ca2_callback(Object &&object) { return m_ca2_callback.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_cb2_callback(Object &&object) { return m_cb2_callback.set_callback(std::forward<Object>(object)); }
+	auto pa_callback() { return m_pa_callback.bind(); }
+	auto pb_callback() { return m_pb_callback.bind(); }
+	auto ca2_callback() { return m_ca2_callback.bind(); }
+	auto cb2_callback() { return m_cb2_callback.bind(); }
 
 	// external access
 	DECLARE_WRITE8_MEMBER(pa_w);

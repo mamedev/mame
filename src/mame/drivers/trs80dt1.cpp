@@ -73,7 +73,7 @@ private:
 	virtual void machine_start() override;
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
-	required_device<cpu_device> m_maincpu;
+	required_device<i8051_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<i8276_device> m_crtc;
 	required_device<x2210_device> m_nvram;
@@ -310,22 +310,24 @@ I8275_DRAW_CHARACTER_MEMBER( trs80dt1_state::crtc_update_row )
 }
 
 
-MACHINE_CONFIG_START(trs80dt1_state::trs80dt1)
+void trs80dt1_state::trs80dt1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8051, 7372800)
-	MCFG_DEVICE_PROGRAM_MAP(prg_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, trs80dt1_state, port1_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, trs80dt1_state, port3_w))
+	I8051(config, m_maincpu, 7372800);
+	m_maincpu->set_addrmap(AS_PROGRAM, &trs80dt1_state::prg_map);
+	m_maincpu->set_addrmap(AS_IO, &trs80dt1_state::io_map);
+	m_maincpu->port_out_cb<1>().set(FUNC(trs80dt1_state::port1_w));
+	m_maincpu->port_out_cb<3>().set(FUNC(trs80dt1_state::port3_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8276_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(40*12, 16*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*12-1, 0, 16*16-1)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trs80dt1 )
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update("crtc", FUNC(i8276_device::screen_update));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(40*12, 16*16);
+	screen.set_visarea(0, 40*12-1, 0, 16*16-1);
+
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_trs80dt1);
 
 	I8276(config, m_crtc, 12480000 / 8);
 	m_crtc->set_character_width(8);
@@ -335,7 +337,8 @@ MACHINE_CONFIG_START(trs80dt1_state::trs80dt1)
 	m_crtc->irq_wr_callback().append(m_7474, FUNC(ttl7474_device::d_w));
 	m_crtc->vrtc_wr_callback().set(m_7474, FUNC(ttl7474_device::clock_w));
 	m_crtc->set_screen("screen");
-	MCFG_PALETTE_ADD("palette", 3)
+
+	PALETTE(config, "palette").set_entries(3);
 
 	X2210(config, "nvram");
 
@@ -344,9 +347,9 @@ MACHINE_CONFIG_START(trs80dt1_state::trs80dt1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 2000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	BEEP(config, m_beep, 2000);
+	m_beep->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 ROM_START( trs80dt1 )
 

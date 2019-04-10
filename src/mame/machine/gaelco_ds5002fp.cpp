@@ -38,15 +38,16 @@ WRITE8_MEMBER(gaelco_ds5002fp_device::hostmem_w)
 	m_hostmem->write_byte(offset, data);
 }
 
-MACHINE_CONFIG_START(gaelco_ds5002fp_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("mcu", DS5002FP, DERIVED_CLOCK(1, 1))
-	MCFG_DEVICE_PROGRAM_MAP(dallas_rom)
-	MCFG_DEVICE_IO_MAP(dallas_ram)
+void gaelco_ds5002fp_device::device_add_mconfig(machine_config &config)
+{
+	ds5002fp_device &mcu(DS5002FP(config, "mcu", DERIVED_CLOCK(1, 1)));
+	mcu.set_addrmap(AS_PROGRAM, &gaelco_ds5002fp_device::dallas_rom);
+	mcu.set_addrmap(AS_IO, &gaelco_ds5002fp_device::dallas_ram);
 
-	MCFG_QUANTUM_PERFECT_CPU("mcu")
+	config.m_perfect_cpu_quantum = subtag("mcu");
 
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 void gaelco_ds5002fp_device::device_start()
 {

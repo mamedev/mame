@@ -420,14 +420,14 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(liberatr_state::liberatr)
-
+void liberatr_state::liberatr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/16) /* 1.25Mhz divided from 20Mhz master clock */
-	MCFG_DEVICE_PROGRAM_MAP(liberatr_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(driver_device,irq0_line_hold,4*60)
+	m6502_device &maincpu(M6502(config, "maincpu", MASTER_CLOCK/16)); /* 1.25Mhz divided from 20Mhz master clock */
+	maincpu.set_addrmap(AS_PROGRAM, &liberatr_state::liberatr_map);
+	maincpu.set_periodic_int(FUNC(driver_device::irq0_line_hold), attotime::from_hz(4*60));
 
-	MCFG_DEVICE_ADD("earom", ER2055, 0)
+	ER2055(config, m_earom);
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<0>().set_output("led0").invert(); // START LED1
@@ -442,35 +442,34 @@ MACHINE_CONFIG_START(liberatr_state::liberatr)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_UPDATE_DRIVER(liberatr_state, screen_update)
-	MCFG_SCREEN_SIZE(256,256)
-	MCFG_SCREEN_VISIBLE_AREA(8, 247, 13, 244)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_screen_update(FUNC(liberatr_state::screen_update));
+	m_screen->set_size(256,256);
+	m_screen->set_visarea(8, 247, 13, 244);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW2"))
-	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(4.7), CAP_U(0.01), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	pokey_device &pokey1(POKEY(config, "pokey1", MASTER_CLOCK/16)); /* 1.25Mhz from Phi2 signal from 6502 */
+	pokey1.allpot_r().set_ioport("DSW2");
+	pokey1.set_output_opamp_low_pass(RES_K(4.7), CAP_U(0.01), 5.0);
+	pokey1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
-	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(4.7), CAP_U(0.01), 5.0)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	pokey_device &pokey2(POKEY(config, "pokey2", MASTER_CLOCK/16)); /* 1.25Mhz from Phi2 signal from 6502 */
+	pokey2.set_output_opamp_low_pass(RES_K(4.7), CAP_U(0.01), 5.0);
+	pokey2.allpot_r().set_ioport("DSW1");
+	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-
-MACHINE_CONFIG_START(liberatr_state::liberat2)
+void liberatr_state::liberat2(machine_config &config)
+{
 	liberatr(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(liberat2_map)
-MACHINE_CONFIG_END
+	subdevice<m6502_device>("maincpu")->set_addrmap(AS_PROGRAM, &liberatr_state::liberat2_map);
+}
 
 
 

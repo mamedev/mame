@@ -5,6 +5,10 @@
  Lasso and similar hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_LASSO_H
+#define MAME_INCLUDES_LASSO_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/sn76496.h"
@@ -13,8 +17,8 @@
 class lasso_state : public driver_device
 {
 public:
-	lasso_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	lasso_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
@@ -29,7 +33,8 @@ public:
 		m_sn_2(*this, "sn76489.2"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void base(machine_config &config);
 	void wwjgtin(machine_config &config);
@@ -38,6 +43,11 @@ public:
 	void pinbo(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	/* memory pointers */
@@ -77,22 +87,19 @@ private:
 	TILE_GET_INFO_MEMBER(lasso_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wwjgtin_get_track_tile_info);
 	TILE_GET_INFO_MEMBER(pinbo_get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(lasso);
+	void lasso_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(wwjgtin);
 	DECLARE_MACHINE_RESET(wwjgtin);
 	DECLARE_VIDEO_START(wwjgtin);
-	DECLARE_PALETTE_INIT(wwjgtin);
+	void wwjgtin_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(pinbo);
 	uint32_t screen_update_lasso(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_chameleo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_wwjgtin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	rgb_t get_color( int data );
+	static rgb_t get_color(int data);
 	void wwjgtin_set_last_four_colors();
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int reverse );
-	void draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int reverse);
+	void draw_lasso(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void chameleo_audio_map(address_map &map);
 	void chameleo_main_map(address_map &map);
 	void lasso_audio_map(address_map &map);
@@ -104,3 +111,5 @@ private:
 	void wwjgtin_audio_map(address_map &map);
 	void wwjgtin_main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_LASSO_H

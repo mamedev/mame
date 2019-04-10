@@ -7,6 +7,7 @@
 
 #include "sound/sn76477.h"
 #include "emupal.h"
+#include "screen.h"
 
 class route16_state : public driver_device
 {
@@ -20,6 +21,7 @@ public:
 		, m_videoram1(*this, "videoram1")
 		, m_videoram2(*this, "videoram2")
 		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
 		, m_protection_data(0)
 	{}
 
@@ -67,6 +69,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram1;
 	required_shared_ptr<uint8_t> m_videoram2;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	uint8_t m_protection_data;
 
 	uint8_t m_jongpute_port_select;

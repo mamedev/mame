@@ -207,6 +207,7 @@
 
 #include "emu.h"
 #include "cpu/tms9900/tms9980a.h"
+#include "machine/74259.h"
 #include "sound/sn76477.h"
 #include "video/mc6845.h"
 #include "emupal.h"
@@ -219,31 +220,39 @@
 class tmspoker_state : public driver_device
 {
 public:
-	tmspoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tmspoker_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_outlatch(*this, "outlatch%u", 0U),
+		m_inputs(*this, "IN%u", 0U)
+	{ }
 
 	void tmspoker(machine_config &config);
 
 	void init_bus();
 
-private:
-	required_shared_ptr<uint8_t> m_videoram;
-	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(tmspoker_videoram_w);
-	//DECLARE_WRITE8_MEMBER(debug_w);
-	DECLARE_READ8_MEMBER(unk_r);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(tmspoker);
-	uint32_t screen_update_tmspoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(tmspoker_interrupt);
+
+private:
+	required_shared_ptr<uint8_t> m_videoram;
+	tilemap_t *m_bg_tilemap;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device_array<ls259_device, 4> m_outlatch;
+	required_ioport_array<3> m_inputs;
+
+	DECLARE_WRITE8_MEMBER(tmspoker_videoram_w);
+	//DECLARE_WRITE8_MEMBER(debug_w);
+	uint8_t inputs_r(offs_t offset);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void tmspoker_palette(palette_device &palette) const;
+	uint32_t screen_update_tmspoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(tmspoker_interrupt);
 
 	void tmspoker_cru_map(address_map &map);
 	void tmspoker_map(address_map &map);
@@ -285,7 +294,7 @@ uint32_t tmspoker_state::screen_update_tmspoker(screen_device &screen, bitmap_in
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(tmspoker_state, tmspoker)
+void tmspoker_state::tmspoker_palette(palette_device &palette) const
 {
 }
 
@@ -343,15 +352,22 @@ void tmspoker_state::tmspoker_map(address_map &map)
 }
 
 
-READ8_MEMBER(tmspoker_state::unk_r)
+uint8_t tmspoker_state::inputs_r(offs_t offset)
 {
-	printf("%x\n",offset);
-	return 0;//0xff;//mame_rand(machine);
+	uint8_t q = m_outlatch[2]->output_state();
+	for (int n = 0; n < 3; n++)
+		if (BIT(q, 4 + n) && !BIT(m_inputs[n]->read(), offset))
+			return 0;
+
+	return 1;
 }
 
 void tmspoker_state::tmspoker_cru_map(address_map &map)
 {
-	map(0x0000, 0x07ff).r(FUNC(tmspoker_state::unk_r));
+	map(0x0c80, 0x0c8f).w(m_outlatch[0], FUNC(ls259_device::write_d0));
+	map(0x0c90, 0x0c9f).r(FUNC(tmspoker_state::inputs_r)).w(m_outlatch[1], FUNC(ls259_device::write_d0));
+	map(0x0ca0, 0x0caf).w(m_outlatch[2], FUNC(ls259_device::write_d0));
+	map(0x0cb0, 0x0cbf).w(m_outlatch[3], FUNC(ls259_device::write_d0));
 }
 
 /* I/O byte R/W
@@ -398,26 +414,6 @@ static INPUT_PORTS_START( tmspoker )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN2-6")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN2-7")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8")
-
-	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("IN3-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("IN3-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("IN3-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("IN3-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN3-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN3-8")
-
-	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("IN4-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("IN4-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("IN4-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("IN4-8")
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -560,33 +556,36 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(tmspoker_state::tmspoker)
-
+void tmspoker_state::tmspoker(machine_config &config)
+{
 	// CPU TMS9980A; no line connections
 	TMS9980A(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tmspoker_state::tmspoker_map);
 	m_maincpu->set_addrmap(AS_IO, &tmspoker_state::tmspoker_cru_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tmspoker_state::tmspoker_interrupt));
 
+	LS259(config, m_outlatch[0]);
+	LS259(config, m_outlatch[1]);
+	LS259(config, m_outlatch[2]);
+	LS259(config, m_outlatch[3]);
+
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tmspoker_state, screen_update_tmspoker)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(tmspoker_state::screen_update_tmspoker));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tmspoker)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_tmspoker);
+	PALETTE(config, "palette", FUNC(tmspoker_state::tmspoker_palette), 256);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(tmspoker_state, tmspoker)
-
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/4) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-
-MACHINE_CONFIG_END
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/4)); /* guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+}
 
 
 /*************************

@@ -102,7 +102,7 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
 
 WRITE_LINE_MEMBER(policetr_state::vblank)
 {
-	m_maincpu->set_input_line(state ? R3000_IRQ4 : R3000_IRQ5, ASSERT_LINE);
+	m_maincpu->set_input_line(state ? INPUT_LINE_IRQ4 : INPUT_LINE_IRQ5, ASSERT_LINE);
 }
 
 /*************************************
@@ -237,6 +237,8 @@ WRITE32_MEMBER(policetr_state::speedup_w)
 
 void policetr_state::mem(address_map &map)
 {
+	map.global_mask(0x3fffffff);
+
 	map(0x00000000, 0x0001ffff).ram().share(m_rambase);
 	map(0x00200000, 0x0020000f).w(FUNC(policetr_state::video_w));
 	map(0x00400000, 0x00400003).r(FUNC(policetr_state::video_r));
@@ -257,6 +259,8 @@ void policetr_state::mem(address_map &map)
 
 void sshooter_state::mem(address_map &map)
 {
+	map.global_mask(0x3fffffff);
+
 	map(0x00000000, 0x0001ffff).ram().share(m_rambase);
 	map(0x00200000, 0x00200003).w(FUNC(sshooter_state::bsmt2000_data_w));
 	map(0x00300001, 0x00300001).w(FUNC(sshooter_state::palette_offset_w));
@@ -421,7 +425,7 @@ void policetr_state::policetr(machine_config &config)
 	m_screen->set_screen_update(FUNC(policetr_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(policetr_state::vblank));
 
-	PALETTE(config, m_palette, 256);
+	PALETTE(config, m_palette).set_entries(256);
 
 	/* sound hardware */
 	SPEAKER(config, m_lspeaker).front_left();

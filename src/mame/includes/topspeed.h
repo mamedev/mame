@@ -5,6 +5,10 @@
     Top Speed / Full Throttle
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_TOPSPEED_H
+#define MAME_INCLUDES_TOPSPEED_H
+
+#pragma once
 
 #include "sound/msm5205.h"
 #include "sound/flt_vol.h"
@@ -38,6 +42,10 @@ public:
 	void topspeed(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(pedal_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_shared_ptr<uint16_t> m_spritemap;
@@ -74,10 +82,6 @@ private:
 	uint8_t   m_dislayer[5];
 #endif
 
-	// drivers/topspeed.c
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	void msm5205_update(int chip);
 
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
@@ -100,3 +104,5 @@ private:
 	void z80_io(address_map &map);
 	void z80_prg(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TOPSPEED_H

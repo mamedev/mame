@@ -13,16 +13,15 @@
 #include "speaker.h"
 
 
-#define VERBOSE_DBG 1       /* general debug messages */
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_DEBUG     (1U <<  1)
 
-#define DBG_LOG(N,M,A) \
-	do { \
-	if(VERBOSE_DBG>=N) \
-		{ \
-			logerror("%11.6f at %s: ",machine().time().as_double(),machine().describe_context()); \
-			logerror A; \
-		} \
-	} while (0)
+//#define VERBOSE (LOG_GENERAL | LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -57,13 +56,14 @@ void ms7004_device::ms7004_map(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ms7004_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(MS7004_CPU_TAG, I8035, XTAL(4'608'000))
-	MCFG_DEVICE_PROGRAM_MAP(ms7004_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, ms7004_device, p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, ms7004_device, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, ms7004_device, t1_r))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
+void ms7004_device::device_add_mconfig(machine_config &config)
+{
+	I8035(config, m_maincpu, XTAL(4'608'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ms7004_device::ms7004_map);
+	m_maincpu->p1_out_cb().set(FUNC(ms7004_device::p1_w));
+	m_maincpu->p2_out_cb().set(FUNC(ms7004_device::p2_w));
+	m_maincpu->t1_in_cb().set(FUNC(ms7004_device::t1_r));
+	m_maincpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
 
 	I8243(config, m_i8243);
 	m_i8243->p4_out_cb().set(FUNC(ms7004_device::i8243_port_w<0>));
@@ -72,9 +72,8 @@ MACHINE_CONFIG_START(ms7004_device::device_add_mconfig)
 	m_i8243->p7_out_cb().set(FUNC(ms7004_device::i8243_port_w<3>));
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(MS7004_SPK_TAG, BEEP, 3250)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	BEEP(config, m_speaker, 3250).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 const tiny_rom_entry *ms7004_device::device_rom_region() const
 {
@@ -104,54 +103,54 @@ bit sig XSn ????n
 14  22  4   3
 15  23  5   4
 
-0xc9	KEY_LANGLE_RANGLE	'резервная клавиша'
-0xbc	KEY_DELETE	ЗБ
-0xbd	KEY_RETURN	ВК
-0xbf	KEY_TILDE	'; +'
-0xc4	-		'Ъ'
-0xca	-		'/ ?'
-0xed	KEY_PERIOD	'Ю @'
-0xf1	-		'_'
+0xc9    KEY_LANGLE_RANGLE   'резервная клавиша'
+0xbc    KEY_DELETE  ЗБ
+0xbd    KEY_RETURN  ВК
+0xbf    KEY_TILDE   '; +'
+0xc4    -       'Ъ'
+0xca    -       '/ ?'
+0xed    KEY_PERIOD  'Ю @'
+0xf1    -       '_'
 <...>
 
-0x56	KEY_F1		СТОП КАДР
-0x57	KEY_F2		ПЕЧАТЬ КАДРА
-0x58	KEY_F3		ПАУЗА
-0x59	KEY_F4		УСТ РЕЖИМА
-0x5a	KEY_F5		Ф5
+0x56    KEY_F1      СТОП КАДР
+0x57    KEY_F2      ПЕЧАТЬ КАДРА
+0x58    KEY_F3      ПАУЗА
+0x59    KEY_F4      УСТ РЕЖИМА
+0x5a    KEY_F5      Ф5
 
-0x64	KEY_F6		ПРЕРЫВ
-0x65	KEY_F7		ПРОДОЛЖ
-0x66	KEY_F8		ОТМЕН
-0x67	KEY_F9		ОСНОВН КАДР
-0x69	KEY_F10		ВЫХОД
+0x64    KEY_F6      ПРЕРЫВ
+0x65    KEY_F7      ПРОДОЛЖ
+0x66    KEY_F8      ОТМЕН
+0x67    KEY_F9      ОСНОВН КАДР
+0x69    KEY_F10     ВЫХОД
 
-0x71	KEY_F11		Ф11 (АР2)
-0x72	KEY_F12		Ф12 (ВШ)
-0x73	KEY_F13		Ф13 (ПС)
-0x74	KEY_F14		ДОП ВАРИАНТ
+0x71    KEY_F11     Ф11 (АР2)
+0x72    KEY_F12     Ф12 (ВШ)
+0x73    KEY_F13     Ф13 (ПС)
+0x74    KEY_F14     ДОП ВАРИАНТ
 
-0x7c	KEY_HELP	ПМ
-0x7d	KEY_MENU	ИСП
+0x7c    KEY_HELP    ПМ
+0x7d    KEY_MENU    ИСП
 
-0x80	KEY_F17		Ф17
-0x81	KEY_F18		Ф18
-0x82	KEY_F19		Ф19
-0x83	KEY_F20		Ф20
+0x80    KEY_F17     Ф17
+0x81    KEY_F18     Ф18
+0x82    KEY_F19     Ф19
+0x83    KEY_F20     Ф20
 
-0xb0	KEY_LOCK	ФКС
-0xae	KEY_SHIFT	ВР
-0xaf	KEY_CTRL	СУ
+0xb0    KEY_LOCK    ФКС
+0xae    KEY_SHIFT   ВР
+0xaf    KEY_CTRL    СУ
 
-0xb1	KEY_META	КМП
-0xb2	-		РУС/ЛАТ
+0xb1    KEY_META    КМП
+0xb2    -       РУС/ЛАТ
 
-0x8a	KEY_FIND	НТ
-0x8b	KEY_INSERT_HERE	ВСТ
-0x8c	KEY_REMOVE	УДАЛ
-0x8d	KEY_SELECT	ВЫБР
-0x8e	KEY_PREV_SCREEN	ПРЕД КАДР
-0x8f	KEY_NEXT_SCREEN	СЛЕД КАДР
+0x8a    KEY_FIND    НТ
+0x8b    KEY_INSERT_HERE ВСТ
+0x8c    KEY_REMOVE  УДАЛ
+0x8d    KEY_SELECT  ВЫБР
+0x8e    KEY_PREV_SCREEN ПРЕД КАДР
+0x8f    KEY_NEXT_SCREEN СЛЕД КАДР
 
 nothing sends '@' or '`'
 
@@ -406,7 +405,7 @@ WRITE8_MEMBER( ms7004_device::p1_w )
 	    6
 	    7       Serial TX
 	*/
-	DBG_LOG(2,0,( "%s: p1_w %02x = send %d\n", tag(), data, BIT(data, 7)));
+	LOGDBG("p1_w %02x = send %d\n", data, BIT(data, 7));
 
 	m_p1 = data;
 	m_tx_handler(BIT(data, 7));
@@ -431,7 +430,7 @@ WRITE8_MEMBER( ms7004_device::p2_w )
 	    6       LED "Caps"
 	    7       LED "Hold"
 	*/
-	DBG_LOG(2,0,( "p2_w %02x = col %d\n", data, data&15));
+	LOGDBG("p2_w %02x = col %d\n", data, data&15);
 
 	m_p2 = data;
 	m_i8243->p2_w(data);
@@ -447,7 +446,7 @@ void ms7004_device::i8243_port_w(uint8_t data)
 {
 	int sense = 0;
 
-	DBG_LOG(2,0,( "8243 port %d data %02xH\n", P + 4, data));
+	LOGDBG("8243 port %d data %02xH\n", P + 4, data);
 
 	if (data) {
 		switch(data) {
@@ -458,8 +457,8 @@ void ms7004_device::i8243_port_w(uint8_t data)
 		}
 		m_keylatch = BIT(sense, (m_p1 & 7));
 		if (m_keylatch)
-		DBG_LOG(1,0,( "row %d col %02x t1 %d\n",
-			(m_p1 & 7), (P << 4 | data), m_keylatch));
+		LOG("row %d col %02x t1 %d\n",
+			(m_p1 & 7), (P << 4 | data), m_keylatch);
 	}
 }
 

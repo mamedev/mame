@@ -5,14 +5,18 @@
     Aeroboto
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_AEROBOTO_H
+#define MAME_INCLUDES_AEROBOTO_H
+
+#pragma once
 
 #include "emupal.h"
 
 class aeroboto_state : public driver_device
 {
 public:
-	aeroboto_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	aeroboto_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_videoram(*this, "videoram"),
 		m_hscroll(*this, "hscroll"),
@@ -25,7 +29,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_mainram;
@@ -77,3 +82,5 @@ public:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_AEROBOTO_H

@@ -7,22 +7,12 @@
 #include "cpu/mb88xx/mb88xx.h"
 
 
-#define MCFG_NAMCO_54XX_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, NAMCO_54XX, _clock)
-
-#define MCFG_NAMCO_54XX_DISCRETE(_tag) \
-	downcast<namco_54xx_device &>(*device).set_discrete(_tag);
-
-#define MCFG_NAMCO_54XX_BASENODE(_node) \
-	downcast<namco_54xx_device &>(*device).set_basenote(_node);
-
-
 class namco_54xx_device : public device_t
 {
 public:
 	namco_54xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_discrete(const char *tag) { m_discrete.set_tag(tag); }
+	template <typename T> void set_discrete(T &&tag) { m_discrete.set_tag(std::forward<T>(tag)); }
 	void set_basenote(int node) { m_basenode = node; }
 
 	DECLARE_READ8_MEMBER( K_r );

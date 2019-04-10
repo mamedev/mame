@@ -29,6 +29,7 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/t11/t11.h"
+#include "imagedev/floppy.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -80,8 +81,11 @@ public:
 
 	void ms0515(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
-	DECLARE_PALETTE_INIT(ms0515);
+	void ms0515_palette(palette_device &palette) const;
 	uint32_t screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
@@ -108,11 +112,9 @@ private:
 
 	void ms0515_mem(address_map &map);
 
-	virtual void machine_reset() override;
-
 	void irq_encoder(int irq, int state);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<t11_device> m_maincpu; // actual CPU is T11 clone, KR1807VM1
 	required_device<ram_device> m_ram;
 	required_device<kr1818vg93_device> m_fdc;
 	required_device<floppy_image_device> m_floppy0;
@@ -443,7 +445,7 @@ WRITE_LINE_MEMBER(ms0515_state::screen_vblank)
 		irq11_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-PALETTE_INIT_MEMBER(ms0515_state, ms0515)
+void ms0515_state::ms0515_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0, 0, 0));
 	palette.set_pen_color(1, rgb_t(0, 0, 127));
@@ -521,28 +523,26 @@ WRITE_LINE_MEMBER(ms0515_state::irq11_w)
 	irq_encoder(11, state);
 }
 
-MACHINE_CONFIG_START(ms0515_state::ms0515)
+void ms0515_state::ms0515(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", T11, XTAL(15'000'000) / 2) // actual CPU is T11 clone, KR1807VM1
-	MCFG_T11_INITIAL_MODE(0xf2ff)
-	MCFG_DEVICE_PROGRAM_MAP(ms0515_mem)
+	T11(config, m_maincpu, XTAL(15'000'000) / 2); // actual CPU is T11 clone, KR1807VM1
+	m_maincpu->set_initial_mode(0xf2ff);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ms0515_state::ms0515_mem);
 
 	/* video hardware -- 50 Hz refresh rate */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( XTAL(15'000'000), 958,0,640, 313,0,200 )
-	MCFG_SCREEN_UPDATE_DRIVER(ms0515_state, screen_update_ms0515)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ms0515_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw( XTAL(15'000'000), 958,0,640, 313,0,200 );
+	screen.set_screen_update(FUNC(ms0515_state::screen_update_ms0515));
+	screen.screen_vblank().set(FUNC(ms0515_state::screen_vblank));
+	screen.set_palette("palette");
 	config.set_default_layout(layout_ms0515);
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(ms0515_state, ms0515)
+	PALETTE(config, "palette", FUNC(ms0515_state::ms0515_palette), 16);
 
 	KR1818VG93(config, m_fdc, 1000000);
-	MCFG_FLOPPY_DRIVE_ADD("vg93:0", ms0515_floppies, "525qd", ms0515_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("vg93:1", ms0515_floppies, "525qd", ms0515_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "vg93:0", ms0515_floppies, "525qd", ms0515_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "vg93:1", ms0515_floppies, "525qd", ms0515_state::floppy_formats).enable_sound(true);
 
 	i8255_device &ppi(I8255(config, "ppi8255_1"));
 	ppi.out_pa_callback().set(FUNC(ms0515_state::ms0515_porta_w));
@@ -551,46 +551,45 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 
 	// serial connection to printer
 	I8251(config, m_i8251line, 0);
-	m_i8251line->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_i8251line->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_i8251line->rxrdy_handler().set(FUNC(ms0515_state::irq9_w));
 	m_i8251line->txrdy_handler().set(FUNC(ms0515_state::irq8_w));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_i8251line, i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_i8251line, i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_i8251line, i8251_device, write_dsr))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_i8251line, FUNC(i8251_device::write_rxd));
+	m_rs232->cts_handler().set(m_i8251line, FUNC(i8251_device::write_cts));
+	m_rs232->dsr_handler().set(m_i8251line, FUNC(i8251_device::write_dsr));
 
-//  MCFG_DEVICE_ADD("line_clock", CLOCK, 4800*16) // 8251 is set to /16 on the clock input
-//  MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ms0515_state, write_line_clock))
+//  clock_device &line_clock(CLOCK(config, "line_clock", 4800*16)); // 8251 is set to /16 on the clock input
+//  line_clock.signal_handler().set(FUNC(ms0515_state::write_line_clock));
 
 	// serial connection to MS7004 keyboard
 	I8251(config, m_i8251kbd, 0);
 	m_i8251kbd->rxrdy_handler().set(FUNC(ms0515_state::irq5_w));
 	m_i8251kbd->txd_handler().set("ms7004", FUNC(ms7004_device::write_rxd));
 
-	MCFG_DEVICE_ADD("ms7004", MS7004, 0)
-	MCFG_MS7004_TX_HANDLER(WRITELINE(m_i8251kbd, i8251_device, write_rxd))
-	MCFG_MS7004_RTS_HANDLER(WRITELINE(m_i8251kbd, i8251_device, write_cts))
+	MS7004(config, m_ms7004, 0);
+	m_ms7004->tx_handler().set(m_i8251kbd, FUNC(i8251_device::write_rxd));
+	m_ms7004->rts_handler().set(m_i8251kbd, FUNC(i8251_device::write_cts));
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
-	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4960*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ms0515_state, write_keyboard_clock))
+	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4960*16));
+	keyboard_clock.signal_handler().set(FUNC(ms0515_state::write_keyboard_clock));
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(2'000'000))
-//  MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, ms0515_state, write_keyboard_clock))
-	MCFG_PIT8253_CLK1(XTAL(2'000'000))
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, ms0515_state, write_line_clock))
-	MCFG_PIT8253_CLK2(XTAL(2'000'000))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, ms0515_state, pit8253_out2_changed))
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(XTAL(2'000'000));
+//  m_pit8253->out_handler<0>().set(FUNC(ms0515_state::write_keyboard_clock));
+	m_pit8253->set_clk<1>(XTAL(2'000'000));
+	m_pit8253->out_handler<0>().set(FUNC(ms0515_state::write_line_clock));
+	m_pit8253->set_clk<2>(XTAL(2'000'000));
+	m_pit8253->out_handler<2>().set(FUNC(ms0515_state::pit8253_out2_changed));
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.45);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("128K");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( ms0515 )

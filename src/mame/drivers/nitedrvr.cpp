@@ -140,34 +140,33 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(nitedrvr_state::nitedrvr)
-
+void nitedrvr_state::nitedrvr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 12.096_MHz_XTAL / 12) // 1 MHz
-	MCFG_DEVICE_PROGRAM_MAP(nitedrvr_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nitedrvr_state, irq0_line_hold)
+	M6502(config, m_maincpu, 12.096_MHz_XTAL / 12); // 1 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &nitedrvr_state::nitedrvr_map);
+	m_maincpu->set_vblank_int("screen", FUNC(nitedrvr_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 3);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("crash_timer", nitedrvr_state, nitedrvr_crash_toggle_callback, PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)))
+	TIMER(config, "crash_timer").configure_periodic(FUNC(nitedrvr_state::nitedrvr_crash_toggle_callback), PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL / 2, 384, 0, 256, 278, 0, 256) // ~57 Hz
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 278, 0, 256); // ~57 Hz
 	// PROM derives VRESET, VBLANK, VSYNC, IRQ from vertical scan count and last VBLANK
-	MCFG_SCREEN_UPDATE_DRIVER(nitedrvr_state, screen_update_nitedrvr)
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_screen_update(FUNC(nitedrvr_state::screen_update_nitedrvr));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nitedrvr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nitedrvr);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, nitedrvr_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, nitedrvr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /* ROMs */
 
@@ -187,8 +186,8 @@ ROM_END
 
 ROM_START( nitedrvr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "006569-01.d2", 0x9000, 0x0800, CRC(7afa7542) SHA1(81018e25ebdeae1daf1308676661063b6fd7fd22) ) // MASK ROM 1
-	ROM_LOAD( "006570-01.f2", 0x9800, 0x0800, CRC(bf5d77b1) SHA1(6f603f8b0973bd89e0e721b66944aac8e9f904d9) ) // MASK ROM 2
+	ROM_LOAD( "006569-01.d2", 0x9000, 0x0800, CRC(7afa7542) SHA1(81018e25ebdeae1daf1308676661063b6fd7fd22) ) // mask ROM 1
+	ROM_LOAD( "006570-01.f2", 0x9800, 0x0800, CRC(bf5d77b1) SHA1(6f603f8b0973bd89e0e721b66944aac8e9f904d9) ) // mask ROM 2
 	ROM_RELOAD(               0xf800, 0x0800 ) // vectors
 
 	ROM_REGION( 0x200, "gfx1", 0 )

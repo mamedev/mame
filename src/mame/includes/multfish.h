@@ -53,6 +53,10 @@ public:
 	void init_crzmon2();
 	void init_crzmon2lot();
 	void init_crzmon2ent();
+	void init_islandent();
+	void init_pirateent();
+	void init_sweetlent();
+	void init_rollfruit();
 
 private:
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_vid_w);

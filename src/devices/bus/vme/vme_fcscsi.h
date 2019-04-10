@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "imagedev/floppy.h"
 #include "machine/68230pit.h"
 #include "machine/wd_fdc.h"
 #include "machine/hd63450.h" // compatible with MC68450
@@ -34,8 +35,6 @@ protected:
 	int dmac_irq_vector;
 
 private:
-	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
-
 	//dmac
 	DECLARE_WRITE8_MEMBER(dma_end);
 	DECLARE_WRITE8_MEMBER(dma_error);
@@ -59,6 +58,7 @@ private:
 	DECLARE_WRITE8_MEMBER(scsi_w);
 
 	void fcscsi1_mem(address_map &map);
+	void cpu_space_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<wd1772_device> m_fdc;

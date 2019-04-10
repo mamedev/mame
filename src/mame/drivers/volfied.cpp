@@ -239,15 +239,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(volfied_state::cchip_irq_clear_cb)
 }
 
 
-MACHINE_CONFIG_START(volfied_state::volfied)
-
+void volfied_state::volfied(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK)   /* 8MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", volfied_state,  interrupt)
+	M68000(config, m_maincpu, CPU_CLOCK);   /* 8MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &volfied_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(volfied_state::interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)   /* 4MHz sound CPU, required to run the game */
-	MCFG_DEVICE_PROGRAM_MAP(z80_map)
+	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);   /* 4MHz sound CPU, required to run the game */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &volfied_state::z80_map);
 
 	TAITO_CCHIP(config, m_cchip, 20_MHz_XTAL/2); // 20MHz OSC next to C-Chip
 	m_cchip->in_pa_callback().set_ioport("F00007");
@@ -256,43 +256,42 @@ MACHINE_CONFIG_START(volfied_state::volfied)
 	m_cchip->in_ad_callback().set_ioport("F0000D");
 	m_cchip->out_pb_callback().set(FUNC(volfied_state::counters_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
+	config.m_minimum_quantum = attotime::from_hz(1200);
 
-	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", volfied_state, cchip_irq_clear_cb)
+	TIMER(config, m_cchip_irq_clear).configure_generic(FUNC(volfied_state::cchip_irq_clear_cb));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 8, 247)
-	MCFG_SCREEN_UPDATE_DRIVER(volfied_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(320, 256);
+	m_screen->set_visarea(0, 319, 8, 247);
+	m_screen->set_screen_update(FUNC(volfied_state::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_volfied)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_volfied);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 8192);
 
-	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
-	MCFG_PC090OJ_GFXDECODE("gfxdecode")
-	MCFG_PC090OJ_PALETTE("palette")
+	PC090OJ(config, m_pc090oj, 0);
+	m_pc090oj->set_gfxdecode_tag("gfxdecode");
+	m_pc090oj->set_palette_tag("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 4000000)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.60)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 4000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_a_read_callback().set_ioport("DSWA");
+	ymsnd.port_b_read_callback().set_ioport("DSWB");
+	ymsnd.add_route(0, "mono", 0.15);
+	ymsnd.add_route(1, "mono", 0.15);
+	ymsnd.add_route(2, "mono", 0.15);
+	ymsnd.add_route(3, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
-MACHINE_CONFIG_END
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
+}
 
 
 /***************************************************************************

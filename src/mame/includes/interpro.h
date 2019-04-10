@@ -14,6 +14,7 @@
 #include "machine/interpro_sga.h"
 #include "machine/interpro_arbga.h"
 
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/28fxxx.h"
 #include "machine/mc146818.h"

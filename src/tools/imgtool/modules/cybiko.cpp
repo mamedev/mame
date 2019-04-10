@@ -116,7 +116,7 @@ static uint16_t page_buffer_calc_checksum_2( uint8_t *buffer)
 	val ^= buffer_read_16_be( buffer + 0);
 	val ^= buffer_read_16_be( buffer + 2);
 	val ^= buffer_read_16_be( buffer + 4);
-	return flipendian_int16(val);
+	return swapendian_int16(val);
 }
 
 static int page_buffer_verify( uint8_t *buffer, uint32_t size, int block_type)

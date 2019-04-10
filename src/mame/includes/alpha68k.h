@@ -5,10 +5,15 @@
     SNK/Alpha 68000 based games
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ALPHA68K_H
+#define MAME_INCLUDES_ALPHA68K_H
+
+#pragma once
 
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "emupal.h"
+#include "screen.h"
 
 class alpha68k_state : public driver_device
 {
@@ -21,12 +26,14 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_outlatch(*this, "outlatch"),
 		m_soundlatch(*this, "soundlatch"),
 		m_color_proms(*this, "color_proms"),
 		m_in(*this, "IN%u", 0U),
-		m_audiobank(*this, "audiobank") { }
+		m_audiobank(*this, "audiobank")
+	{ }
 
 	void tnextspc(machine_config &config);
 	void alpha68k_II(machine_config &config);
@@ -84,8 +91,8 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_MACHINE_START(common);
 	DECLARE_MACHINE_RESET(common);
-	DECLARE_PALETTE_INIT(kyros);
-	DECLARE_PALETTE_INIT(paddlem);
+	void kyros_palette(palette_device &palette) const;
+	void paddlem_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(alpha68k_II);
 	DECLARE_MACHINE_RESET(alpha68k_II);
 	DECLARE_VIDEO_START(alpha68k);
@@ -132,6 +139,7 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<ls259_device> m_outlatch;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -170,3 +178,5 @@ enum
 	ALPHA68K_JONGBOU,           // used in kyros_alpha_trigger_r & kyros_draw_sprites
 	ALPHA68K_KYROS          // used in kyros_draw_sprites
 };
+
+#endif // MAME_INCLUDES_ALPHA68K_H

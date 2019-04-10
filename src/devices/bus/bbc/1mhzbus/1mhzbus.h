@@ -92,8 +92,8 @@ class bbc_1mhzbus_slot_device : public device_t, public device_slot_interface
 public:
 	// construction/destruction
 	template <typename T>
-	bbc_1mhzbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, const char *default_option)
-		: bbc_1mhzbus_slot_device(mconfig, tag, owner)
+	bbc_1mhzbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&slot_options, const char *default_option)
+		: bbc_1mhzbus_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
 		slot_options(*this);
@@ -101,16 +101,16 @@ public:
 		set_fixed(false);
 	}
 
-	bbc_1mhzbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+	bbc_1mhzbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
-	virtual DECLARE_READ8_MEMBER(fred_r);
-	virtual DECLARE_WRITE8_MEMBER(fred_w);
-	virtual DECLARE_READ8_MEMBER(jim_r);
-	virtual DECLARE_WRITE8_MEMBER(jim_w);
+	virtual uint8_t fred_r(offs_t offset);
+	virtual void fred_w(offs_t offset, uint8_t data);
+	virtual uint8_t jim_r(offs_t offset);
+	virtual void jim_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
@@ -134,10 +134,10 @@ private:
 class device_bbc_1mhzbus_interface : public device_slot_card_interface
 {
 public:
-	virtual DECLARE_READ8_MEMBER(fred_r) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(fred_w) { }
-	virtual DECLARE_READ8_MEMBER(jim_r) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(jim_w) { }
+	virtual uint8_t fred_r(offs_t offset) { return 0xff; }
+	virtual void fred_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t jim_r(offs_t offset) { return 0xff; }
+	virtual void jim_w(offs_t offset, uint8_t data) { }
 
 protected:
 	device_bbc_1mhzbus_interface(const machine_config &mconfig, device_t &device);
@@ -150,6 +150,7 @@ protected:
 DECLARE_DEVICE_TYPE(BBC_1MHZBUS_SLOT, bbc_1mhzbus_slot_device)
 
 void bbc_1mhzbus_devices(device_slot_interface &device);
+void bbcm_1mhzbus_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_BBC_1MHZBUS_1MHZBUS_H

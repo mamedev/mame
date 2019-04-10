@@ -40,6 +40,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(vblank_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(cpuA_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(cpuB_bankswitch_w);
@@ -66,10 +70,7 @@ private:
 	void cpu_map_B(address_map &map);
 	void sound_map(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-
-	inline int scanline_to_vcount(int scanline);
+	int scanline_to_vcount(int scanline);
 
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 

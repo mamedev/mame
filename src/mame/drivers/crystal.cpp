@@ -414,9 +414,8 @@ IRQ_CALLBACK_MEMBER(crystal_state::icallback)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint32_t IntPend = space.read_dword(0x01800c0c);
-	int i;
 
-	for (i = 0; i < 32; ++i)
+	for (int i = 0; i < 32; ++i)
 	{
 		if (BIT(IntPend, i))
 		{
@@ -498,15 +497,14 @@ WRITE32_MEMBER(crystal_state::DMA_w)
 {
 	if (((data ^ m_DMActrl[Which]) & (1 << 10)) && (data & (1 << 10)))   //DMAOn
 	{
-		uint32_t CTR = data;
-		uint32_t SRC = space.read_dword(0x01800804 + Which * 0x10);
-		uint32_t DST = space.read_dword(0x01800808 + Which * 0x10);
-		uint32_t CNT = space.read_dword(0x0180080C + Which * 0x10);
-		int i;
+		uint32_t const CTR = data;
+		uint32_t const SRC = space.read_dword(0x01800804 + Which * 0x10);
+		uint32_t const DST = space.read_dword(0x01800808 + Which * 0x10);
+		uint32_t const CNT = space.read_dword(0x0180080C + Which * 0x10);
 
 		if (CTR & 0x2)  //32 bits
 		{
-			for (i = 0; i < CNT; ++i)
+			for (int i = 0; i < CNT; ++i)
 			{
 				uint32_t v = space.read_dword(SRC + i * 4);
 				space.write_dword(DST + i * 4, v);
@@ -514,7 +512,7 @@ WRITE32_MEMBER(crystal_state::DMA_w)
 		}
 		else if (CTR & 0x1) //16 bits
 		{
-			for (i = 0; i < CNT; ++i)
+			for (int i = 0; i < CNT; ++i)
 			{
 				uint16_t v = space.read_word(SRC + i * 2);
 				space.write_word(DST + i * 2, v);
@@ -522,7 +520,7 @@ WRITE32_MEMBER(crystal_state::DMA_w)
 		}
 		else    //8 bits
 		{
-			for (i = 0; i < CNT; ++i)
+			for (int i = 0; i < CNT; ++i)
 			{
 				uint8_t v = space.read_byte(SRC + i);
 				space.write_byte(DST + i, v);
@@ -543,7 +541,7 @@ READ32_MEMBER(crystal_state::crtc_r)
 	switch (offset)
 	{
 		case 0: // CRTC Status / Mode
-			if ((m_crtcregs[0x30 / 4] & 1) == 0) // Interrace
+			if ((m_crtcregs[0x30 / 4] & 1) == 0) // Interlace
 				vdisp <<= 1;
 
 			if (m_screen->vpos() <= vdisp) // Vertical display enable status
@@ -637,12 +635,11 @@ void crystal_state::crtc_update()
 	// TODO : Implement other CRTC parameters
 	uint32_t hdisp = m_crtcregs[0x0c / 4] + 1;
 	uint32_t vdisp = m_crtcregs[0x1c / 4] + 1;
-	if ((m_crtcregs[0x30 / 4] & 1) == 0) // Interrace
+	if ((m_crtcregs[0x30 / 4] & 1) == 0) // Interlace
 		vdisp <<= 1;
 
-	rectangle visarea;
-	visarea.set(0, hdisp - 1, 0, vdisp - 1);
-	m_screen->configure(hdisp, vdisp, visarea, m_screen->frame_period().attoseconds() );
+	rectangle const visarea(0, hdisp - 1, 0, vdisp - 1);
+	m_screen->configure(hdisp, vdisp, visarea, m_screen->frame_period().attoseconds());
 }
 
 void crystal_state::internal_map(address_map &map)
@@ -1067,7 +1064,6 @@ uint32_t crystal_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	uint16_t *Front, *Back;
 	uint16_t *Visible, *DrawDest;
 	uint16_t *srcline;
-	int y;
 	uint16_t head, tail;
 	uint32_t width = cliprect.width();
 
@@ -1113,9 +1109,9 @@ uint32_t crystal_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		SetVidReg(space, 0x8e, GetVidReg(space, 0x8e) ^ 1);
 
 	srcline = (uint16_t *) Visible;
-	uint32_t dx = cliprect.left();
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
-		std::copy_n( &srcline[(y * 1024) + dx], width, &bitmap.pix16(y, dx));
+	uint32_t const dx = cliprect.left();
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+		std::copy_n(&srcline[(y * 1024) + dx], width, &bitmap.pix16(y, dx));
 
 	return 0;
 }
@@ -1564,7 +1560,7 @@ void crystal_state::crystal(machine_config &config)
 
 	VIDEO_VRENDER0(config, m_vr0vid, 14318180, m_maincpu);
 
-	PALETTE(config, "palette", 65536).set_init("palette", FUNC(palette_device::palette_init_RRRRRGGGGGGBBBBB));
+	PALETTE(config, "palette", palette_device::RGB_565);
 
 	DS1302(config, m_ds1302, 32.768_kHz_XTAL);
 
@@ -1595,17 +1591,21 @@ void crystal_state::crzyddz2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &crystal_state::crzyddz2_mem);
 }
 
+#define CRYSBIOS \
+	ROM_REGION( 0x20000, "maincpu", 0 )  \
+	ROM_SYSTEM_BIOS( 0, "amg0110b", "AMG0110B PCB" ) \
+	ROMX_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(beff39a9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb), ROM_BIOS(0)) \
+	ROM_SYSTEM_BIOS( 1, "amg0110d", "AMG0110D PCB" ) /* newer? */ \
+	ROMX_LOAD("mx27l1000-alt.u14",  0x000000, 0x020000, CRC(1e8175c8) SHA1(f60c016be2ff11e47b2192acddb92676043af501), ROM_BIOS(1)) \
 
 ROM_START( crysbios )
-	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
-	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(beff39a9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb) )
+	CRYSBIOS
 
-	ROM_REGION32_LE( 0x1000000, "flash", ROMREGION_ERASEFF ) // Flash
+	ROM_REGION32_LE( 0x1000000, "flash", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( crysking )
-	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
-	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(beff39a9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
+	CRYSBIOS
 
 	ROM_REGION32_LE( 0x3000000, "flash", 0 ) // Flash
 	ROM_LOAD("bcsv0004f01.u1",  0x0000000, 0x1000000, CRC(8feff120) SHA1(2ea42fa893bff845b5b855e2556789f8354e9066) )
@@ -1614,8 +1614,7 @@ ROM_START( crysking )
 ROM_END
 
 ROM_START( evosocc )
-	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
-	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(beff39a9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
+	CRYSBIOS
 
 	ROM_REGION32_LE( 0x3000000, "flash", 0 ) // Flash
 	ROM_LOAD("bcsv0001u01",  0x0000000, 0x1000000, CRC(2581a0ea) SHA1(ee483ac60a3ed00a21cb515974cec4af19916a7d) )
@@ -1624,8 +1623,7 @@ ROM_START( evosocc )
 ROM_END
 
 ROM_START( topbladv )
-	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
-	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(beff39a9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
+	CRYSBIOS
 
 	ROM_REGION( 0x4300, "pic", 0 ) // pic16c727 - we don't have a core for this
 	ROM_LOAD("top_blade_v_pic16c727.bin",  0x000000, 0x4300, CRC(9cdea57b) SHA1(884156085f9e780cdf719aedc2e8a0fd5983613b) )
@@ -1647,8 +1645,7 @@ ROM_START( officeye )
 ROM_END
 
 ROM_START( donghaer )
-	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
-	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(beff39a9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
+	CRYSBIOS
 
 	ROM_REGION( 0x4280, "pic", 0 ) // pic16f84a - we don't have a core for this (or the dump in this case)
 	ROM_LOAD("donghaer_pic16f84a.bin",  0x000000, 0x4280, NO_DUMP )
@@ -1940,7 +1937,7 @@ GAME( 2001, crysking, crysbios, crystal,  crystal,  crystal_state, init_crysking
 GAME( 2001, evosocc,  crysbios, crystal,  crystal,  crystal_state, init_evosocc,  ROT0, "Evoga",               "Evolution Soccer",                     0 )
 GAME( 2003, topbladv, crysbios, crystal,  crystal,  crystal_state, init_topbladv, ROT0, "SonoKong / Expotato", "Top Blade V",                          0 )
 GAME( 2001, officeye, 0,        crystal,  officeye, crystal_state, init_officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
-GAME( 2001, donghaer, 0,        crystal,  crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, donghaer, crysbios, crystal,  crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2004?,menghong, 0,        crzyddz2, crzyddz2, crystal_state, empty_init,    ROT0, "Sealy",               "Meng Hong Lou",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2006, crzyddz2, 0,        crzyddz2, crzyddz2, crystal_state, empty_init,    ROT0, "Sealy",               "Crazy Dou Di Zhu II",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2009, trivrus,  0,        trivrus,  trivrus,  crystal_state, empty_init,    ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 )

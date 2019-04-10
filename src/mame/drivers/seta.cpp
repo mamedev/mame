@@ -111,7 +111,7 @@ TODO:
   zombraid not aligned when flipped vertically or horizontally
 
 - bad sound in sokonuke?
-- in msgunda1, colors for the score display screw up after the second animation
+- in msgundam1, colors for the score display screw up after the second animation
   in attract mode. The end of the animation also has garbled sprites.
   Note that the animation is not present in msgundam.
 - Some games: battery backed portion of RAM (e.g. downtown, kiwame, zombraid)
@@ -1378,7 +1378,6 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "machine/pit8253.h"
-#include "machine/tmp68301.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/2612intf.h"
@@ -1396,7 +1395,9 @@ Note: on screen copyright is (c)1998 Coinmaster.
 
 #include <algorithm>
 
-#if __uPD71054_TIMER
+#define USE_uPD71054_TIMER 1
+
+#if USE_uPD71054_TIMER
 // this mess should be replaced with pit8254, see madshark
 
 #define USED_TIMER_NUM  1
@@ -1490,7 +1491,7 @@ WRITE16_MEMBER(seta_state::timer_regs_w)
 		break;
 	}
 }
-#endif  // __uPD71054_TIMER
+#endif  // USE_uPD71054_TIMER
 
 
 
@@ -1578,11 +1579,11 @@ WRITE16_MEMBER(seta_state::sub_ctrl_w)
 			break;
 
 		case 4/2:   // not sure
-			if (ACCESSING_BITS_0_7) if(m_soundlatch[0] != nullptr) m_soundlatch[0]->write(space, 0, data & 0xff);
+			if (ACCESSING_BITS_0_7) if(m_soundlatch[0] != nullptr) m_soundlatch[0]->write(data & 0xff);
 			break;
 
 		case 6/2:   // not sure
-			if (ACCESSING_BITS_0_7) if(m_soundlatch[1] != nullptr) m_soundlatch[1]->write(space, 0, data & 0xff);
+			if (ACCESSING_BITS_0_7) if(m_soundlatch[1] != nullptr) m_soundlatch[1]->write(data & 0xff);
 			break;
 	}
 
@@ -1776,14 +1777,14 @@ void seta_state::calibr50_map(address_map &map)
 	map(0xa00000, 0xa00001).portr("P1");                 // X1-004
 	map(0xa00002, 0xa00003).portr("P2");                 // X1-004
 	map(0xa00008, 0xa00009).portr("COINS");              // X1-004
-	map(0xa00010, 0xa00017).r(m_upd4701, FUNC(upd4701_device::read_xy)).umask16(0x00ff);
-	map(0xa00019, 0xa00019).r(m_upd4701, FUNC(upd4701_device::reset_xy_r));
+	map(0xa00010, 0xa00017).r("upd4701", FUNC(upd4701_device::read_xy)).umask16(0x00ff);
+	map(0xa00019, 0xa00019).r("upd4701", FUNC(upd4701_device::reset_xy_r));
 
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 	map(0xe00000, 0xe03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xb00001, 0xb00001).r("soundlatch2", FUNC(generic_latch_8_device::read)); // From Sub CPU
-	map(0xb00001, 0xb00001).w("soundlatch1", FUNC(generic_latch_8_device::write)); // To Sub CPU
+	map(0xb00001, 0xb00001).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)); // From Sub CPU
+	map(0xb00001, 0xb00001).w(m_soundlatch[0], FUNC(generic_latch_8_device::write)); // To Sub CPU
 	map(0xc00000, 0xc00001).ram();                             // ? $4000
 
 	map(0xff0000, 0xffffff).ram();                             // RAM
@@ -1794,7 +1795,7 @@ void seta_state::calibr50_map(address_map &map)
                                 U.S. Classic
 ***************************************************************************/
 
-READ16_MEMBER(seta_state::usclssic_dsw_r)
+uint16_t usclssic_state::dsw_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -1806,23 +1807,23 @@ READ16_MEMBER(seta_state::usclssic_dsw_r)
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(seta_state::usclssic_trackball_x_r)
+CUSTOM_INPUT_MEMBER(usclssic_state::trackball_x_r)
 {
-	return m_track_x[m_usclssic_port_select ? 1 : 0]->read();
+	return m_track_x[m_port_select ? 1 : 0]->read();
 }
 
-CUSTOM_INPUT_MEMBER(seta_state::usclssic_trackball_y_r)
+CUSTOM_INPUT_MEMBER(usclssic_state::trackball_y_r)
 {
-	return m_track_y[m_usclssic_port_select ? 1 : 0]->read();
+	return m_track_y[m_port_select ? 1 : 0]->read();
 }
 
 
-WRITE8_MEMBER(seta_state::usclssic_lockout_w)
+void usclssic_state::lockout_w(uint8_t data)
 {
 	int tiles_offset = BIT(data, 4) ? 0x4000: 0;
 
-	m_usclssic_port_select = BIT(data, 6);
-	m_buttonmux->select_w(m_usclssic_port_select);
+	m_port_select = BIT(data, 6);
+	m_buttonmux->select_w(m_port_select);
 
 	m_upd4701->resetx_w(BIT(data, 7));
 	m_upd4701->resety_w(BIT(data, 7));
@@ -1835,7 +1836,7 @@ WRITE8_MEMBER(seta_state::usclssic_lockout_w)
 }
 
 
-void seta_state::usclssic_map(address_map &map)
+void usclssic_state::usclssic_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                 // ROM
 	map(0xff0000, 0xffffff).ram();                                 // RAM
@@ -1845,15 +1846,15 @@ void seta_state::usclssic_map(address_map &map)
 	map(0xa00000, 0xa00005).ram().share("vctrl_0");         // VRAM Ctrl
 	map(0xb00000, 0xb003ff).ram().share("paletteram1");  // Palette
 	map(0xb40000, 0xb40007).r(m_upd4701, FUNC(upd4701_device::read_xy)).umask16(0x00ff);
-	map(0xb40001, 0xb40001).w(FUNC(seta_state::usclssic_lockout_w));  // Coin Lockout + Tiles Banking
-	map(0xb4000a, 0xb4000b).w(FUNC(seta_state::ipl1_ack_w));
+	map(0xb40001, 0xb40001).w(FUNC(usclssic_state::lockout_w));  // Coin Lockout + Tiles Banking
+	map(0xb4000a, 0xb4000b).w(FUNC(usclssic_state::ipl1_ack_w));
 	map(0xb40010, 0xb40011).portr("COINS");                  // Coins
-	map(0xb40011, 0xb40011).w("soundlatch1", FUNC(generic_latch_8_device::write)); // To Sub CPU
-	map(0xb40018, 0xb4001f).r(FUNC(seta_state::usclssic_dsw_r));                // 2 DSWs
+	map(0xb40011, 0xb40011).w(m_soundlatch[0], FUNC(generic_latch_8_device::write)); // To Sub CPU
+	map(0xb40018, 0xb4001f).r(FUNC(usclssic_state::dsw_r));                // 2 DSWs
 	map(0xb40018, 0xb40019).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0xb80000, 0xb80001).r(FUNC(seta_state::ipl2_ack_r));
+	map(0xb80000, 0xb80001).r(FUNC(usclssic_state::ipl2_ack_r));
 	map(0xc00000, 0xc03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));         // Sprites Code + X + Attr
-	map(0xd00000, 0xd03fff).ram().w(FUNC(seta_state::vram_w<0>)).share("vram_0"); // VRAM
+	map(0xd00000, 0xd03fff).ram().w(FUNC(usclssic_state::vram_w<0>)).share("vram_0"); // VRAM
 	map(0xd04000, 0xd04fff).ram();                                 //
 	map(0xe00000, 0xe00fff).ram();                                 // NVRAM? (odd bytes)
 }
@@ -1969,7 +1970,7 @@ void seta_state::blandiap_map(address_map &map)
                     and Zombie Raid (with slight variations)
 ***************************************************************************/
 
-double seta_state::zombraid_adc_cb(uint8_t input)
+double zombraid_state::adc_cb(uint8_t input)
 {
 	if (input == ADC083X_AGND)
 		return 0.0;
@@ -1979,13 +1980,13 @@ double seta_state::zombraid_adc_cb(uint8_t input)
 		return m_gun_inputs[input - ADC083X_CH0]->read() / 255.0;
 }
 
-READ16_MEMBER(seta_state::zombraid_gun_r)// Serial interface
+uint16_t zombraid_state::gun_r()// Serial interface
 {
 	return m_adc->do_read();
 }
 
 // Bit 0 is clock, 1 is data, 2 is reset
-WRITE16_MEMBER(seta_state::zombraid_gun_w)
+void zombraid_state::gun_w(uint16_t data)
 {
 	m_adc->cs_write(BIT(data, 2));
 	m_adc->di_write(BIT(data, 1));
@@ -2032,7 +2033,7 @@ void seta_state::wrofaero_map(address_map &map)
 	map(0xa80000, 0xa80001).ram();                             // ? 0x4000
 	map(0xb00000, 0xb03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
 	map(0xc00000, 0xc03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 	map(0xd00000, 0xd00007).w(FUNC(seta_state::timer_regs_w));             // ?
 #else
 	map(0xd00000, 0xd00007).nopw();                        // ?
@@ -2041,15 +2042,15 @@ void seta_state::wrofaero_map(address_map &map)
 	map(0xf00000, 0xf00001).nopw();                        // ? Sound  IRQ Ack
 }
 
-void seta_state::zombraid_map(address_map &map)
+void zombraid_state::zombraid_map(address_map &map)
 {
 	wrofaero_map(map);
 	map(0x300000, 0x30ffff).ram().share("nvram");           // actually 8K x8 SRAM
-	map(0xf00000, 0xf00001).w(FUNC(seta_state::zombraid_gun_w));
-	map(0xf00002, 0xf00003).r(FUNC(seta_state::zombraid_gun_r));
+	map(0xf00000, 0xf00001).w(FUNC(zombraid_state::gun_w));
+	map(0xf00002, 0xf00003).r(FUNC(zombraid_state::gun_r));
 }
 
-void seta_state::zombraid_x1_map(address_map &map)
+void zombraid_state::zombraid_x1_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).rom();
 	map(0x80000, 0xfffff).bankr("x1_bank");
@@ -2091,7 +2092,7 @@ void seta_state::zingzipbl_map(address_map &map)
 	map(0xa80000, 0xa80001).ram();                             // ? 0x4000
 	map(0xb00000, 0xb03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
 	map(0xc00000, 0xc03fff).ram(); // soundram on original
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 	map(0xd00000, 0xd00007).w(FUNC(seta_state::timer_regs_w));             // ?
 #else
 	map(0xd00000, 0xd00007).nopw();                        // ?
@@ -2126,7 +2127,7 @@ void seta_state::jjsquawb_map(address_map &map)
 //  AM_RANGE(0xa80000, 0xa80001) AM_RAM                              // ? 0x4000
 	map(0xb0c000, 0xb0ffff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // RZ: Sprites Code + X + Attr
 	map(0xc00000, 0xc03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 	map(0xd00000, 0xd00007).w(FUNC(seta_state::timer_regs_w));             // ?
 #else
 	map(0xd00000, 0xd00007).nopw();                        // ?
@@ -2788,6 +2789,32 @@ void seta_state::msgundam_map(address_map &map)
 	map(0xd00000, 0xd00007).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
 }
 
+void seta_state::msgundamb_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                             // ROM
+	map(0x100000, 0x1fffff).rom();                             // ROM
+	map(0x200000, 0x20ffff).ram();          // RAM
+	map(0x400000, 0x400001).portr("P1");                 // P1
+	map(0x400002, 0x400003).portr("P2");                 // P2
+	map(0x400004, 0x400005).portr("COINS");              // Coins
+	map(0x400000, 0x400001).w(FUNC(seta_state::ipl1_ack_w));               // Lev 2 IRQ Ack
+	map(0x400004, 0x400005).w(FUNC(seta_state::ipl2_ack_w));               // Lev 4 IRQ Ack
+	map(0x500001, 0x500001).w(FUNC(seta_state::seta_coin_counter_w));
+	map(0x500003, 0x500003).w(FUNC(seta_state::seta_vregs_w));              // Video Registers
+	map(0x500004, 0x500005).nopw();
+	map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));                // DSW
+	map(0x700400, 0x700fff).ram().share("paletteram1");  // Palette
+	map(0x800000, 0x803fff).ram().w(FUNC(seta_state::vram_w<0>)).share("vram_0"); // VRAM 0&1
+	map(0x880000, 0x883fff).ram().w(FUNC(seta_state::vram_w<1>)).share("vram_1"); // VRAM 2&3
+	map(0x900000, 0x900005).ram().share("vctrl_0");     // VRAM 0&1 Ctrl
+	map(0x980000, 0x980005).ram().share("vctrl_1");     // VRAM 2&3 Ctrl
+	map(0xa00000, 0xa005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
+	map(0xa00600, 0xa00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
+	map(0xa80000, 0xa80001).ram();                             // ? 0x4000
+	map(0xb00000, 0xb03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
+	map(0xc00000, 0xc03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
+	map(0xd00000, 0xd00007).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
+}
 
 /***************************************************************************
                                 Oishii Puzzle
@@ -2857,12 +2884,12 @@ void seta_state::triplfun_map(address_map &map)
                             Pro Mahjong Kiwame
 ***************************************************************************/
 
-WRITE16_MEMBER(seta_state::kiwame_row_select_w)
+void kiwame_state::row_select_w(uint16_t data)
 {
 	m_kiwame_row_select = data & 0x001f;
 }
 
-READ16_MEMBER(seta_state::kiwame_input_r)
+uint16_t kiwame_state::input_r(offs_t offset)
 {
 	int row_select = m_kiwame_row_select;
 	int i;
@@ -2884,7 +2911,7 @@ READ16_MEMBER(seta_state::kiwame_input_r)
 	}
 }
 
-void seta_state::kiwame_map(address_map &map)
+void kiwame_state::kiwame_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                             // ROM
 	map(0x200000, 0x20ffff).ram().share("nvram");                            // RAM
@@ -2894,9 +2921,8 @@ void seta_state::kiwame_map(address_map &map)
 	map(0xa00600, 0xa00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 	map(0xb00000, 0xb003ff).ram().share("paletteram1");  // Palette
 	map(0xc00000, 0xc03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0xd00000, 0xd00009).r(FUNC(seta_state::kiwame_input_r));            // mahjong panel
-	map(0xe00000, 0xe00003).r(FUNC(seta_state::seta_dsw_r));                // DSW
-	map(0xfffc00, 0xffffff).rw("tmp68301", FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));
+	map(0xd00000, 0xd00009).r(FUNC(kiwame_state::input_r));                 // mahjong panel
+	map(0xe00000, 0xe00003).r(FUNC(kiwame_state::seta_dsw_r));              // DSW
 }
 
 
@@ -2957,7 +2983,7 @@ void seta_state::thunderlbl_map(address_map &map)
 	map(0xb00004, 0xb00005).portr("COINS");              // Coins
 	map(0xb0000c, 0xb0000d).w(m_seta001, FUNC(seta001_device::spritectrl_w8)).umask16(0xff00); // the bootleg is modified to write the first byte of spritectrl here, rather than the usual address
 	map(0xb00008, 0xb00009).portr("P3"); // P3 (wits)
-	map(0xb00008, 0xb00008).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0xb00008, 0xb00008).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0xb0000a, 0xb0000b).portr("P4");                 // P4 (wits)
 	map(0xc00000, 0xc00001).ram();                             // ? 0x4000
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
@@ -2986,7 +3012,7 @@ void seta_state::wiggie_map(address_map &map)
 	map(0xb00004, 0xb00005).portr("COINS");              // Coins
 	map(0xb0000c, 0xb0000d).r(FUNC(seta_state::thunderl_protection_r));     // Protection (not in wits)
 	map(0xb00008, 0xb00009).portr("P3");                 // P3 (wits)
-	map(0xb00008, 0xb00008).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0xb00008, 0xb00008).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0xb0000a, 0xb0000b).portr("P4");                 // P4 (wits)
 	map(0xc00000, 0xc00001).ram();                             // ? 0x4000
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
@@ -3000,7 +3026,7 @@ void seta_state::wiggie_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xa000, 0xa000).r("soundlatch1", FUNC(generic_latch_8_device::read));
+	map(0xa000, 0xa000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 }
 
 
@@ -3036,7 +3062,7 @@ void seta_state::umanclub_map(address_map &map)
 WRITE8_MEMBER(seta_state::utoukond_sound_control_w)
 {
 	if (!BIT(data, 6))
-		m_soundlatch[0]->acknowledge_w(space, 0, 0);
+		m_soundlatch[0]->acknowledge_w();
 
 	// other bits used for banking? (low nibble seems to always be 2)
 }
@@ -3059,7 +3085,7 @@ void seta_state::utoukond_map(address_map &map)
 	map(0xa00000, 0xa005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xa00600, 0xa00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 	map(0xb00000, 0xb03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xc00001, 0xc00001).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0xc00001, 0xc00001).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0xe00000, 0xe00001).nopw();                        // ? ack
 }
 
@@ -3439,8 +3465,8 @@ void seta_state::tndrcade_sub_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();                             // RAM
 	map(0x0800, 0x0800).r(FUNC(seta_state::ff_r));                      // ? (bits 0/1/2/3: 1 -> do test 0-ff/100-1e0/5001-57ff/banked rom)
-	//AM_RANGE(0x0800, 0x0800) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)             //
-	//AM_RANGE(0x0801, 0x0801) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)            //
+	//AM_RANGE(0x0800, 0x0800) AM_DEVREAD(m_soundlatch[0], generic_latch_8_device, read)             //
+	//AM_RANGE(0x0801, 0x0801) AM_DEVREAD(m_soundlatch[1], generic_latch_8_device, read)            //
 	map(0x1000, 0x1000).portr("P1");                 // P1
 	map(0x1000, 0x1000).w(FUNC(seta_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x1001, 0x1001).portr("P2");                 // P2
@@ -3461,8 +3487,8 @@ void seta_state::tndrcade_sub_map(address_map &map)
 void seta_state::twineagl_sub_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();                         // RAM
-	map(0x0800, 0x0800).r("soundlatch1", FUNC(generic_latch_8_device::read));         //
-	map(0x0801, 0x0801).r("soundlatch2", FUNC(generic_latch_8_device::read));            //
+	map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));         //
+	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
 	map(0x1000, 0x1000).portr("P1");             // P1
 	map(0x1000, 0x1000).w(FUNC(seta_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x1001, 0x1001).portr("P2");             // P2
@@ -3504,8 +3530,8 @@ READ8_MEMBER(seta_state::downtown_ip_r)
 void seta_state::downtown_sub_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();                         // RAM
-	map(0x0800, 0x0800).r("soundlatch1", FUNC(generic_latch_8_device::read));         //
-	map(0x0801, 0x0801).r("soundlatch2", FUNC(generic_latch_8_device::read));            //
+	map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));         //
+	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
 	map(0x1000, 0x1007).r(FUNC(seta_state::downtown_ip_r));         // Input Ports
 	map(0x1000, 0x1000).w(FUNC(seta_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x5000, 0x57ff).ram().share("sharedram");       // Shared RAM
@@ -3532,7 +3558,7 @@ WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 
 	// Bit 3: NMICLR
 	if (!BIT(data, 3))
-		m_soundlatch[0]->acknowledge_w(space, 0, 0);
+		m_soundlatch[0]->acknowledge_w();
 
 	// Bit 2: IRQCLR
 	if (!BIT(data, 2))
@@ -3544,7 +3570,7 @@ WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 
 WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
 {
-	m_soundlatch[1]->write(space,0,data);
+	m_soundlatch[1]->write(data);
 	m_subcpu->spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 }
 
@@ -3553,7 +3579,7 @@ void seta_state::calibr50_sub_map(address_map &map)
 	map(0x0000, 0x1fff).lrw8("x1_soundram_rw",
 								 [this](offs_t offset) { return m_x1->read(offset ^ 0x1000); },
 								 [this](offs_t offset, u8 data) { m_x1->write(offset ^ 0x1000, data); }); // Sound
-	map(0x4000, 0x4000).r("soundlatch1", FUNC(generic_latch_8_device::read));             // From Main CPU
+	map(0x4000, 0x4000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));             // From Main CPU
 	map(0x4000, 0x4000).w(FUNC(seta_state::calibr50_sub_bankswitch_w));        // Bankswitching
 	map(0x8000, 0xbfff).bankr("subbank");                        // Banked ROM
 	map(0xc000, 0xffff).rom();                             // ROM
@@ -3568,8 +3594,8 @@ void seta_state::calibr50_sub_map(address_map &map)
 void seta_state::metafox_sub_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();                         // RAM
-	map(0x0800, 0x0800).r("soundlatch1", FUNC(generic_latch_8_device::read));         //
-	map(0x0801, 0x0801).r("soundlatch2", FUNC(generic_latch_8_device::read));            //
+	map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));         //
+	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
 	map(0x1000, 0x1000).portr("COINS");          // Coins
 	map(0x1000, 0x1000).w(FUNC(seta_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x1002, 0x1002).portr("P1");             // P1
@@ -3598,7 +3624,7 @@ void seta_state::utoukond_sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ymsnd", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
 	map(0x80, 0x80).w(FUNC(seta_state::utoukond_sound_control_w));
-	map(0xc0, 0xc0).r("soundlatch1", FUNC(generic_latch_8_device::read));
+	map(0xc0, 0xc0).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 }
 
 
@@ -4714,7 +4740,7 @@ static INPUT_PORTS_START( gundhara )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW)
+	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -4753,10 +4779,10 @@ static INPUT_PORTS_START( gundhara )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:3,4")
-	PORT_DIPSETTING(      0x0800, "1" )
-	PORT_DIPSETTING(      0x0c00, "2" )
-	PORT_DIPSETTING(      0x0400, "3" )
-	PORT_DIPSETTING(      0x0000, "4" )
+	PORT_DIPSETTING(      0x0800, "2" )
+	PORT_DIPSETTING(      0x0c00, "3" )
+	PORT_DIPSETTING(      0x0400, "4" )
+	PORT_DIPSETTING(      0x0000, "5" )
 	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(      0x3000, "200K" )
 	PORT_DIPSETTING(      0x2000, "200K, Every 200K" )
@@ -5404,11 +5430,11 @@ static INPUT_PORTS_START( msgundam )
 	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW1:8" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( msgunda1 )
+static INPUT_PORTS_START( msgundam1 )
 	PORT_INCLUDE(msgundam)
 
 	PORT_MODIFY("COINS") // IN2 - Coins - $400004.w
-	/* this set seems to be a japan set, english mode doesn't work correctly */
+	/* this set seems to be a Japan set, English mode doesn't work correctly */
 	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Language ) )
 //  PORT_DIPSETTING(      0x0080, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Japanese ) )
@@ -6414,10 +6440,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( usclssic )
 	PORT_START("TRACKX")
-	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seta_state, usclssic_trackball_x_r, nullptr)
+	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, usclssic_state, trackball_x_r, nullptr)
 
 	PORT_START("TRACKY")
-	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seta_state, usclssic_trackball_y_r, nullptr)
+	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, usclssic_state, trackball_y_r, nullptr)
 
 	PORT_START("TRACK1_X")     /* muxed port 0 */
 	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET
@@ -7847,32 +7873,32 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::tndrcade_sub_interrupt)
 		m_subcpu->set_input_line(0, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(seta_state::tndrcade)
-
+void seta_state::tndrcade(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(tndrcade_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::tndrcade_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(tndrcade_sub_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, tndrcade_sub_interrupt, "screen", 0, 1)
+	M65C02(config, m_subcpu, 16000000/8); /* 2 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &seta_state::tndrcade_sub_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::tndrcade_sub_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
@@ -7880,16 +7906,16 @@ MACHINE_CONFIG_START(seta_state::tndrcade)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 16000000/4)   /* 4 MHz */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, seta_state, dsw1_r))     /* input A: DSW 1 */
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, seta_state, dsw2_r))     /* input B: DSW 2 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
+	ym2203_device &ym1(YM2203(config, "ym1", 16000000/4));   /* 4 MHz */
+	ym1.port_a_read_callback().set(FUNC(seta_state::dsw1_r));     /* input A: DSW 1 */
+	ym1.port_b_read_callback().set(FUNC(seta_state::dsw2_r));     /* input B: DSW 2 */
+	ym1.add_route(ALL_OUTPUTS, "lspeaker", 0.35);
+	ym1.add_route(ALL_OUTPUTS, "rspeaker", 0.35);
 
-	MCFG_DEVICE_ADD("ym2", YM3812, 16000000/4)   /* 4 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym3812_device &ym2(YM3812(config, "ym2", 16000000/4));   /* 4 MHz */
+	ym2.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	ym2.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 
 /***************************************************************************
@@ -7902,44 +7928,44 @@ MACHINE_CONFIG_END
 
 /* twineagl lev 3 = lev 2 + lev 1 ! */
 
-MACHINE_CONFIG_START(seta_state::twineagl)
-
+void seta_state::twineagl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(downtown_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq3_line_assert)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::downtown_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq3_line_assert));
 
-	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(twineagl_sub_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", seta_state, seta_sub_interrupt, "screen", 0, 1)
+	M65C02(config, m_subcpu, 16000000/8); /* 2 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &seta_state::twineagl_sub_map);
+	TIMER(config, "s_scantimer").configure_scanline(FUNC(seta_state::seta_sub_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.42) // Possibly lower than 60Hz, Correct?
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.42); // Possibly lower than 60Hz, Correct?
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_downtown)
-	MCFG_PALETTE_ADD("palette", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_downtown);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,twineagl_1_layer)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
@@ -7948,44 +7974,44 @@ MACHINE_CONFIG_END
 
 /* downtown lev 3 = lev 2 + lev 1 ! */
 
-MACHINE_CONFIG_START(seta_state::downtown)
-
+void seta_state::downtown(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(downtown_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_assert)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::downtown_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	MCFG_DEVICE_ADD("sub", M65C02, XTAL(16'000'000)/8) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(downtown_sub_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", seta_state, seta_sub_interrupt, "screen", 0, 1)
+	M65C02(config, m_subcpu, XTAL(16'000'000)/8); /* verified on pcb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &seta_state::downtown_sub_map);
+	TIMER(config, "s_scantimer").configure_scanline(FUNC(seta_state::seta_sub_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.42) /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.42); /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_downtown)
-	MCFG_PALETTE_ADD("palette", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_downtown);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /***************************************************************************
@@ -8010,24 +8036,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::calibr50_interrupt)
 }
 
 
-MACHINE_START_MEMBER(seta_state, usclssic)
+void usclssic_state::machine_start()
 {
-	m_buttonmux->write_ab(0xff);
+	m_buttonmux->ab_w(0xff);
 }
 
 
-MACHINE_CONFIG_START(seta_state::usclssic)
-
+void usclssic_state::usclssic(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(usclssic_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, calibr50_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &usclssic_state::usclssic_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(usclssic_state::calibr50_interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(calibr50_sub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq0_line_assert)
+	M65C02(config, m_subcpu, 16000000/8); /* 2 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &usclssic_state::calibr50_sub_map);
+	m_subcpu->set_vblank_int("screen", FUNC(usclssic_state::irq0_line_assert));
 
 	UPD4701A(config, m_upd4701);
 	m_upd4701->set_portx_tag("TRACKX");
@@ -8038,40 +8064,36 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	m_buttonmux->out_callback().append(m_upd4701, FUNC(upd4701_device::right_w)).bit(1);
 	m_buttonmux->out_callback().append(m_upd4701, FUNC(upd4701_device::left_w)).bit(2);
 
-	MCFG_MACHINE_START_OVERRIDE(seta_state,usclssic)
-	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
+	MCFG_MACHINE_RESET_OVERRIDE(usclssic_state,calibr50)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(usclssic_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_usclssic)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(usclssic_state::screen_update_usclssic));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_usclssic)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_usclssic);
+	PALETTE(config, m_palette, FUNC(usclssic_state::usclssic_palette), 16*32 + 64*32*2, 0x400); // sprites, layer - layer is 6 planes deep
 
-	MCFG_PALETTE_ADD("palette", 16*32 + 64*32*2)        /* sprites, layer */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
-	MCFG_PALETTE_INIT_OWNER(seta_state,usclssic) /* layer is 6 planes deep */
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
+	MCFG_VIDEO_START_OVERRIDE(usclssic_state,seta_1_layer)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
+	m_soundlatch[0]->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
@@ -8083,57 +8105,57 @@ MACHINE_CONFIG_END
     Test mode shows a 16ms and 4ms counters. I wonder if every game has
     5 ints per frame */
 
-MACHINE_CONFIG_START(seta_state::calibr50)
-
+void seta_state::calibr50(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(calibr50_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, calibr50_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::calibr50_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::calibr50_interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("sub", M65C02, XTAL(16'000'000)/8) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(calibr50_sub_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(seta_state, irq0_line_assert, 4*60)  // IRQ: 4/frame
+	M65C02(config, m_subcpu, XTAL(16'000'000)/8); /* verified on pcb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &seta_state::calibr50_sub_map);
+	m_subcpu->set_periodic_int(FUNC(seta_state::irq0_line_assert), attotime::from_hz(4*60));  // IRQ: 4/frame
 
-	UPD4701A(config, m_upd4701);
-	m_upd4701->set_portx_tag("ROT1");
-	m_upd4701->set_porty_tag("ROT2");
+	upd4701_device &upd4701(UPD4701A(config, "upd4701"));
+	upd4701.set_portx_tag("ROT1");
+	upd4701.set_porty_tag("ROT2");
 
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.42)  /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.42); /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_downtown)
-	MCFG_PALETTE_ADD("palette", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_downtown);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
+	m_soundlatch[0]->set_separate_acknowledge(true);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /***************************************************************************
@@ -8142,81 +8164,81 @@ MACHINE_CONFIG_END
 
 /* metafox lev 3 = lev 2 + lev 1 ! */
 
-MACHINE_CONFIG_START(seta_state::metafox)
-
+void seta_state::metafox(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(downtown_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq3_line_assert)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::downtown_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq3_line_assert));
 
-	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(metafox_sub_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", seta_state, seta_sub_interrupt, "screen", 0, 1)
+	M65C02(config, m_subcpu, 16000000/8); /* 2 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &seta_state::metafox_sub_map);
+	TIMER(config, "s_scantimer").configure_scanline(FUNC(seta_state::seta_sub_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_downtown)
-	MCFG_PALETTE_ADD("palette", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_downtown);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
                                 Athena no Hatena?
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::atehate)
-
+void seta_state::atehate(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(atehate_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::atehate_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
@@ -8229,118 +8251,112 @@ MACHINE_CONFIG_END
     samples are bankswitched
 */
 
-MACHINE_CONFIG_START(seta_state::blandia)
-
+void seta_state::blandia(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(blandia_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::blandia_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_2_and_4), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.screen_vblank().set(FUNC(seta_state::screen_vblank_seta_buffer_sprites));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blandia)
-
-	MCFG_PALETTE_ADD("palette", (16*32+64*32*4)*2)  /* sprites, layer1, layer2, palette effect */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x600*2)
-	MCFG_PALETTE_INIT_OWNER(seta_state,blandia)              /* layers 1&2 are 6 planes deep */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_blandia);
+	PALETTE(config, m_palette, FUNC(seta_state::blandia_palette), (16*32 + 64*32*4)*2, 0x600*2);  // sprites, layer1, layer2, palette effect - layers 1&2 are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, blandia_x1_map)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->set_addrmap(0, &seta_state::blandia_x1_map);
+}
 
-MACHINE_CONFIG_START(seta_state::blandiap)
-
+void seta_state::blandiap(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(blandiap_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::blandiap_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_2_and_4), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.screen_vblank().set(FUNC(seta_state::screen_vblank_seta_buffer_sprites));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blandia)
-
-	MCFG_PALETTE_ADD("palette", (16*32+64*32*4)*2)  /* sprites, layer1, layer2, palette effect */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x600*2)
-	MCFG_PALETTE_INIT_OWNER(seta_state,blandia)              /* layers 1&2 are 6 planes deep */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_blandia);
+	PALETTE(config, m_palette, FUNC(seta_state::blandia_palette), (16*32 + 64*32*4)*2, 0x600*2);  // sprites, layer1, layer2, palette effect - layers 1&2 are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, blandia_x1_map)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->set_addrmap(0, &seta_state::blandia_x1_map);
+}
 
 
 /***************************************************************************
                                 Block Carnival
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::blockcar)
-
+void seta_state::blockcar(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(blockcar_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::blockcar_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq3_line_hold));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 void seta_state::blockcarb_sound_map(address_map &map)
@@ -8356,27 +8372,27 @@ void seta_state::blockcarb_sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 //  AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)
+//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_DEVREAD(m_soundlatch[0], generic_latch_8_device, read)
 }
 
-MACHINE_CONFIG_START(seta_state::blockcarb)
+void seta_state::blockcarb(machine_config &config)
+{
 	blockcar(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(blockcarb_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::blockcarb_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq3_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // unk freq
-	MCFG_DEVICE_PROGRAM_MAP(blockcarb_sound_map)
-	MCFG_DEVICE_IO_MAP(blockcarb_sound_portmap)
+	Z80(config, m_audiocpu, 4000000); // unk freq
+	m_audiocpu->set_addrmap(AS_PROGRAM, &seta_state::blockcarb_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &seta_state::blockcarb_sound_portmap);
 
 	/* the sound hardware / program is ripped from Tetris (S16B) */
-	MCFG_DEVICE_REMOVE("x1snd")
+	config.device_remove("x1snd");
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 
@@ -8384,74 +8400,75 @@ MACHINE_CONFIG_END
                                 Daioh
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::daioh)
-
+void seta_state::daioh(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))   /* 16 MHz, MC68000-16, Verified from PCB */
-	MCFG_DEVICE_PROGRAM_MAP(daioh_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, XTAL(16'000'000));   /* 16 MHz, MC68000-16, Verified from PCB */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::daioh_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.42)   /* verified on PCB */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.42);   /* verified on PCB */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(16'000'000))   /* 16 MHz, Verified from PCB audio */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, XTAL(16'000'000));   /* 16 MHz, Verified from PCB audio */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
                        Daioh (prototype)
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::daiohp)
-
+void seta_state::daiohp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))   /* 16 MHz, MC68000-16, Verified from PCB */
-	MCFG_DEVICE_PROGRAM_MAP(daiohp_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, XTAL(16'000'000));   /* 16 MHz, MC68000-16, Verified from PCB */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::daiohp_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.42)   /* verified on PCB */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.42);   /* verified on PCB */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_daiohp)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_daiohp);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(16'000'000))   /* 16 MHz, Verified from PCB audio */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, XTAL(16'000'000));   /* 16 MHz, Verified from PCB audio */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
 
 /***************************************************************************
                 Dragon Unit, Quiz Kokology, Strike Gunner
@@ -8463,65 +8480,65 @@ MACHINE_CONFIG_END
     lev 2 drives the game
 */
 
-MACHINE_CONFIG_START(seta_state::drgnunit)
-
+void seta_state::drgnunit(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(drgnunit_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::drgnunit_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.screen_vblank().set(FUNC(seta_state::screen_vblank_seta_buffer_sprites));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_downtown)
-	MCFG_PALETTE_ADD("palette", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_downtown);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /*  Same as qzkklogy, but with a 16MHz CPU and different
     layout for the layer's tiles    */
 
-MACHINE_CONFIG_START(seta_state::qzkklgy2)
-
+void seta_state::qzkklgy2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(drgnunit_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::drgnunit_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.screen_vblank().set(FUNC(seta_state::screen_vblank_seta_buffer_sprites));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_qzkklgy2)
-	MCFG_PALETTE_ADD("palette", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_qzkklgy2);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
@@ -8529,10 +8546,11 @@ MACHINE_CONFIG_START(seta_state::qzkklgy2)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(0, "lspeaker", 1.0);
+	m_x1->add_route(1, "rspeaker", 1.0);
+}
+
 
 /***************************************************************************
                                 The Roulette
@@ -8551,42 +8569,41 @@ TIMER_DEVICE_CALLBACK_MEMBER(setaroul_state::interrupt)
 	// lev 6: RS232
 }
 
-MACHINE_CONFIG_START(setaroul_state::setaroul)
-
+void setaroul_state::setaroul(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(setaroul_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", setaroul_state, interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &setaroul_state::setaroul_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(setaroul_state::interrupt), "screen", 0, 1);
+
 	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(setaroul_state, setaroul)
 	MCFG_MACHINE_RESET_OVERRIDE(setaroul_state, setaroul)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
 	/* devices */
 	UPD4992(config, m_rtc); // ! Actually D4911C !
-	MCFG_DEVICE_ADD ("acia0", ACIA6850, 0)
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
+	ACIA6850(config, "acia0", 0);
+	TICKET_DISPENSER(config, "hopper", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(setaroul_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, setaroul_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(setaroul_state::screen_update));
+	screen.screen_vblank().set(FUNC(setaroul_state::screen_vblank));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_setaroul)
-
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(setaroul_state,setaroul)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_setaroul);
+	PALETTE(config, m_palette, FUNC(setaroul_state::setaroul_palette), 512);
 
 	MCFG_VIDEO_START_OVERRIDE(setaroul_state,setaroul_1_layer)
 
@@ -8594,51 +8611,52 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(16'000'000))   /* 16 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	X1_010(config, m_x1, XTAL(16'000'000));   /* 16 MHz */
+	m_x1->add_route(0, "lspeaker", 1.0);
+	m_x1->add_route(1, "rspeaker", 1.0);
 
 	// layout
 	config.set_default_layout(layout_setaroul);
-MACHINE_CONFIG_END
+}
+
 
 /***************************************************************************
                                 Eight Force
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::eightfrc)
-
+void seta_state::eightfrc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::wrofaero_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, blandia_x1_map)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->set_addrmap(0, &seta_state::blandia_x1_map);
+}
 
 
 /***************************************************************************
@@ -8650,32 +8668,29 @@ MACHINE_CONFIG_END
     lev 1 == lev 3 (writes to $500000, bit 4 -> 1 then 0)
     lev 2 drives the game
 */
-MACHINE_CONFIG_START(seta_state::extdwnhl)
-
+void seta_state::extdwnhl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(extdwnhl_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::extdwnhl_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zingzip)
-
-	MCFG_PALETTE_ADD("palette", 16*32+16*32+64*32*2)    /* sprites, layer2, layer1 */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
-	MCFG_PALETTE_INIT_OWNER(seta_state,zingzip)          /* layer 1 gfx is 6 planes deep */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zingzip);
+	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -8683,23 +8698,23 @@ MACHINE_CONFIG_START(seta_state::extdwnhl)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(0, "lspeaker", 1.0);
+	m_x1->add_route(1, "rspeaker", 1.0);
+}
 
 
 /***************************************************************************
                                 Gundhara
 ***************************************************************************/
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 INTERRUPT_GEN_MEMBER(seta_state::wrofaero_interrupt)
 {
 	device.execute().set_input_line(2, HOLD_LINE );
 }
 
 MACHINE_START_MEMBER(seta_state,wrofaero){ uPD71054_timer_init(); }
-#endif  // __uPD71054_TIMER
+#endif  // USE_uPD71054_TIMER
 
 
 
@@ -8709,74 +8724,75 @@ MACHINE_START_MEMBER(seta_state,wrofaero){ uPD71054_timer_init(); }
     lev 2: VBlank
     lev 4: Sound (generated by a timer mapped at $d00000-6 ?)
 */
-MACHINE_CONFIG_START(seta_state::gundhara)
-
+void seta_state::gundhara(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
-#if __uPD71054_TIMER
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::wrofaero_map);
+#if USE_uPD71054_TIMER
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 #else
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
-#endif  // __uPD71054_TIMER
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_2_and_4), "screen", 0, 1);
+#endif  // USE_uPD71054_TIMER
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
-#endif  // __uPD71054_TIMER
+#endif  // USE_uPD71054_TIMER
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jjsquawk)
-
-	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
-	MCFG_PALETTE_INIT_OWNER(seta_state,gundhara)             /* layers are 6 planes deep (seta_state,but have only 4 palettes) */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jjsquawk);
+	PALETTE(config, m_palette, FUNC(seta_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
 
 /***************************************************************************
                                 Zombie Raid
 ***************************************************************************/
 
-MACHINE_START_MEMBER(seta_state,zombraid) { m_gun_recoil.resolve(); }
+MACHINE_START_MEMBER(zombraid_state,zombraid)
+{
+	uPD71054_timer_init();
+	m_gun_recoil.resolve();
+}
 
-MACHINE_CONFIG_START(seta_state::zombraid)
+void zombraid_state::zombraid(machine_config &config)
+{
 	gundhara(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(zombraid_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &zombraid_state::zombraid_map);
 
-	MCFG_MACHINE_START_OVERRIDE(seta_state, zombraid)
+	MCFG_MACHINE_START_OVERRIDE(zombraid_state, zombraid)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	adc0834_device &adc(ADC0834(config, "adc", 0));
-	adc.set_input_callback(FUNC(seta_state::zombraid_adc_cb));
+	adc0834_device &adc(ADC0834(config, "adc"));
+	adc.set_input_callback(FUNC(zombraid_state::adc_cb));
 
-	MCFG_DEVICE_MODIFY("x1snd")
-	MCFG_DEVICE_ADDRESS_MAP(0, zombraid_x1_map)
-MACHINE_CONFIG_END
+	m_x1->set_addrmap(0, &zombraid_state::zombraid_x1_map);
+}
 
 /***************************************************************************
                                 J.J.Squawkers
@@ -8786,118 +8802,115 @@ MACHINE_CONFIG_END
     lev 1 == lev 3 (writes to $500000, bit 4 -> 1 then 0)
     lev 2 drives the game
 */
-MACHINE_CONFIG_START(seta_state::jjsquawk)
-
+void seta_state::jjsquawk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::wrofaero_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jjsquawk)
-
-	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
-	MCFG_PALETTE_INIT_OWNER(seta_state,jjsquawk)             /* layers are 6 planes deep */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jjsquawk);
+	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(seta_state::jjsquawb)
-
+void seta_state::jjsquawb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(jjsquawb_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::jjsquawb_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jjsquawk)
-
-	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
-	MCFG_PALETTE_INIT_OWNER(seta_state,jjsquawk)             /* layers are 6 planes deep */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jjsquawk);
+	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
 
 /***************************************************************************
                 (Kamen) Masked Riders Club Battle Race
 ***************************************************************************/
 
 /*  kamenrid: lev 2 by vblank, lev 4 by timer */
-MACHINE_CONFIG_START(seta_state::kamenrid)
-
+void seta_state::kamenrid(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(kamenrid_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::kamenrid_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
+
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
-	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
+	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit.set_clk<0>(16000000/2/8);
+	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
 
 /***************************************************************************
                                 Orbs
@@ -8905,28 +8918,28 @@ MACHINE_CONFIG_END
 
 /* The CPU clock has been verified/measured, PCB only has one OSC and it's 14.318180 MHz */
 
-MACHINE_CONFIG_START(seta_state::orbs)
-
+void seta_state::orbs(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 14318180/2) /* 7.143 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(orbs_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 14318180/2); /* 7.143 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::orbs_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(1*8, 39*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_orbs)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_orbs);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
@@ -8934,42 +8947,40 @@ MACHINE_CONFIG_START(seta_state::orbs)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 14318180)   /* 14.318180 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
-
-
+	X1_010(config, m_x1, 14318180);   /* 14.318180 MHz */
+	m_x1->add_route(0, "lspeaker", 1.0);
+	m_x1->add_route(1, "rspeaker", 1.0);
+}
 
 
 /***************************************************************************
                   Kero Kero Keroppi no Issyoni Asobou
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::keroppij)
-
+void seta_state::keroppij(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 14318180/2) /* 7.143 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(keroppi_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 14318180/2); /* 7.143 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::keroppi_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
 	MCFG_MACHINE_START_OVERRIDE(seta_state,keroppi)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_orbs)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_orbs);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
@@ -8977,26 +8988,28 @@ MACHINE_CONFIG_START(seta_state::keroppij)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 14318180)   /* 14.318180 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 14318180);   /* 14.318180 MHz */
+	m_x1->add_route(0, "lspeaker", 1.0);
+	m_x1->add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(seta_state::keroppi)
+void seta_state::keroppi(machine_config &config)
+{
 	keroppij(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_tndrcade)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_tndrcade);
+}
+
 
 /***************************************************************************
                                 Krazy Bowl
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::krzybowl)
-
+void seta_state::krzybowl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(krzybowl_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::krzybowl_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
 	upd4701_device &upd1(UPD4701A(config, "upd1"));
 	upd1.set_portx_tag("TRACK1_X");
@@ -9006,30 +9019,30 @@ MACHINE_CONFIG_START(seta_state::krzybowl)
 	upd2.set_portx_tag("TRACK2_X");
 	upd2.set_porty_tag("TRACK2_Y");
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(1*8, 39*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
@@ -9037,46 +9050,44 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 /*  madshark: lev 2 by vblank, lev 4 by timer */
-MACHINE_CONFIG_START(seta_state::madshark)
-
+void seta_state::madshark(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(madshark_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::madshark_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
-	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
+	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit.set_clk<0>(16000000/2/8);
+	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jjsquawk)
-
-	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
-	MCFG_PALETTE_INIT_OWNER(seta_state,jjsquawk)             /* layers are 6 planes deep */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jjsquawk);
+	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
 
 /***************************************************************************
                                 Magical Speed
@@ -9085,45 +9096,45 @@ MACHINE_CONFIG_END
 MACHINE_START_MEMBER(seta_state,magspeed){ m_leds.resolve(); }
 
 /*  magspeed: lev 2 by vblank, lev 4 by timer */
-MACHINE_CONFIG_START(seta_state::magspeed)
-
+void seta_state::magspeed(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(magspeed_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::magspeed_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(seta_state, magspeed)
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
-	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
+	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit.set_clk<0>(16000000/2/8);
+	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
@@ -9132,71 +9143,76 @@ MACHINE_CONFIG_END
 
 /* msgundam lev 2 == lev 6 ! */
 
-MACHINE_CONFIG_START(seta_state::msgundam)
-
+void seta_state::msgundam(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(msgundam_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::msgundam_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
-	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
+	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit.set_clk<0>(16000000/2/8);
+	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(56.66) /* between 56 and 57 to match a real PCB's game speed */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(56.66); /* between 56 and 57 to match a real PCB's game speed */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.screen_vblank().set(FUNC(seta_state::screen_vblank_seta_buffer_sprites));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
+void seta_state::msgundamb(machine_config &config)
+{
+	msgundam(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::msgundamb_map);
+}
 
 /***************************************************************************
                             Oishii Puzzle
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::oisipuzl)
-
+void seta_state::oisipuzl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(oisipuzl_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::oisipuzl_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,oisipuzl_2_layers) // flip is inverted for the tilemaps
 
@@ -9204,10 +9220,11 @@ MACHINE_CONFIG_START(seta_state::oisipuzl)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(0, "lspeaker", 1.0);
+	m_x1->add_route(1, "rspeaker", 1.0);
+}
+
 
 /***************************************************************************
                             Triple Fun
@@ -9215,28 +9232,28 @@ MACHINE_CONFIG_END
 
 /* same as oisipuzl but with different interrupts and sound */
 
-MACHINE_CONFIG_START(seta_state::triplfun)
-
+void seta_state::triplfun(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(triplfun_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::triplfun_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq3_line_hold));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,oisipuzl_2_layers) // flip is inverted for the tilemaps
 
@@ -9244,55 +9261,58 @@ MACHINE_CONFIG_START(seta_state::triplfun)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 792000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 792000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
+
 
 /***************************************************************************
                             Pro Mahjong Kiwame
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::kiwame)
+WRITE_LINE_MEMBER(kiwame_state::kiwame_vblank)
+{
+	if (state)
+		m_maincpu->external_interrupt_0();
+}
 
+void kiwame_state::kiwame(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(kiwame_map)
-	/* lev 1-7 are the same. WARNING: the interrupt table is written to. */
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta_state, kiwame_row_select_w))
+	TMP68301(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kiwame_state::kiwame_map);
+	m_maincpu->out_parallel_callback().set(FUNC(kiwame_state::row_select_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(kiwame_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 56*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(kiwame_state::screen_update_seta_no_layers));
+	screen.screen_vblank().set(FUNC(kiwame_state::kiwame_vblank));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
+	MCFG_VIDEO_START_OVERRIDE(kiwame_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
-
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(0, "lspeaker", 1.0);
+	m_x1->add_route(1, "rspeaker", 1.0);
+}
 
 
 /***************************************************************************
@@ -9301,39 +9321,39 @@ MACHINE_CONFIG_END
 
 /* pretty much like wrofaero, but ints are 1&2, not 2&4 */
 
-MACHINE_CONFIG_START(seta_state::rezon)
-
+void seta_state::rezon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::wrofaero_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
+
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
@@ -9342,37 +9362,37 @@ MACHINE_CONFIG_END
 
 /*  thunderl lev 2 = lev 3 - other levels lead to an error */
 
-MACHINE_CONFIG_START(seta_state::thunderl)
-
+void seta_state::thunderl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(thunderl_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::thunderl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 void seta_state::thunderlbl_sound_map(address_map &map)
@@ -9388,177 +9408,174 @@ void seta_state::thunderlbl_sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x01).mirror(0x3e).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xc0, 0xc0).mirror(0x3f).r("soundlatch1", FUNC(generic_latch_8_device::read));
+	map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 }
 
-
-MACHINE_CONFIG_START(seta_state::thunderlbl)
+void seta_state::thunderlbl(machine_config &config)
+{
 	thunderl(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(thunderlbl_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::thunderlbl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 10000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(thunderlbl_sound_map)
-	MCFG_DEVICE_IO_MAP(thunderlbl_sound_portmap)
+	Z80(config, m_audiocpu, 10000000/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &seta_state::thunderlbl_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &seta_state::thunderlbl_sound_portmap);
 
 	/* the sound hardware / program is ripped from Tetris (S16B) */
-	MCFG_DEVICE_REMOVE("x1snd")
+	config.device_remove("x1snd");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 10000000/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM2151(config, "ymsnd", 10000000/2).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
-MACHINE_CONFIG_END
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, 0);
+}
 
 
-MACHINE_CONFIG_START(seta_state::wiggie)
-
+void seta_state::wiggie(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wiggie_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::wiggie_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16000000/4)   /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wiggie_sound_map)
+	Z80(config, m_audiocpu, 16000000/4);   /* 4 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &seta_state::wiggie_sound_map);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wiggie)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wiggie);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
-MACHINE_CONFIG_END
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, 0);
+}
 
-MACHINE_CONFIG_START(seta_state::superbar)
+void seta_state::superbar(machine_config &config)
+{
 	wiggie(config);
+	m_gfxdecode->set_info(gfx_superbar);
+}
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_superbar)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(seta_state::wits)
-
+void seta_state::wits(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(thunderl_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::thunderl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
                     Ultraman Club / SD Gundam Neo Battling
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::umanclub)
-
+void seta_state::umanclub(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(umanclub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::umanclub_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq3_line_hold));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
-	MCFG_PALETTE_ADD("palette", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
                             Ultra Toukond Densetsu
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::utoukond)
-
+void seta_state::utoukond(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(utoukond_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::utoukond_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16000000/4)   /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(utoukond_sound_map)
-	MCFG_DEVICE_IO_MAP(utoukond_sound_io_map)
+	Z80(config, m_audiocpu, 16000000/4);   /* 4 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &seta_state::utoukond_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &seta_state::utoukond_sound_io_map);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -9566,68 +9583,66 @@ MACHINE_CONFIG_START(seta_state::utoukond)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, 0);
+	m_soundlatch[0]->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	X1_010(config, m_x1, 16000000);
+	m_x1->add_route(0, "lspeaker", 1.0);
+	m_x1->add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3438, 16000000/4) /* 4 MHz */
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, seta_state, utoukond_ym3438_interrupt))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
-MACHINE_CONFIG_END
+	ym3438_device &ymsnd(YM3438(config, "ymsnd", 16000000/4)); /* 4 MHz */
+	ymsnd.irq_handler().set(FUNC(seta_state::utoukond_ym3438_interrupt));
+	ymsnd.add_route(0, "lspeaker", 0.30);
+	ymsnd.add_route(1, "rspeaker", 0.30);
+}
 
 
 /***************************************************************************
                                 War of Aero
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::wrofaero)
-
+void seta_state::wrofaero(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
-#if __uPD71054_TIMER
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::wrofaero_map);
+#if USE_uPD71054_TIMER
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::wrofaero_interrupt));
 #else
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
-#endif  // __uPD71054_TIMER
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_2_and_4), "screen", 0, 1);
+#endif  // USE_uPD71054_TIMER
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
-#endif  // __uPD71054_TIMER
+#endif  // USE_uPD71054_TIMER
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
@@ -9639,95 +9654,91 @@ MACHINE_CONFIG_END
    at int 1 is necessary: it plays the background music.
 */
 
-MACHINE_CONFIG_START(seta_state::zingzip)
-
+void seta_state::zingzip(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::wrofaero_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq3_line_hold));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.42) // taken from other games but seems to better match PCB videos
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.42); // taken from other games but seems to better match PCB videos
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zingzip)
-
-	MCFG_PALETTE_ADD("palette", 16*32+16*32+64*32*2)    /* sprites, layer2, layer1 */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
-	MCFG_PALETTE_INIT_OWNER(seta_state,zingzip)              /* layer 1 gfx is 6 planes deep */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zingzip);
+	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(seta_state::zingzipbl)
+void seta_state::zingzipbl(machine_config &config)
+{
 	zingzip(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_zingzipbl)
+	m_gfxdecode->set_info(gfx_zingzipbl);
 
-	MCFG_DEVICE_REMOVE("maincpu")
+	M68000(config.replace(), m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::zingzipbl_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(zingzipbl_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	config.device_remove("x1snd");
 
-	MCFG_DEVICE_REMOVE("x1snd")
+	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
 
 /***************************************************************************
                                 Pairs Love
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::pairlove)
-
+void seta_state::pairlove(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(pairlove_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::pairlove_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pairlove)
-	MCFG_PALETTE_ADD("palette", 2048)   /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pairlove);
+	PALETTE(config, m_palette).set_entries(2048);   // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
@@ -9745,43 +9756,41 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::crazyfgt_interrupt)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(seta_state::crazyfgt)
-
+void seta_state::crazyfgt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(crazyfgt_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, crazyfgt_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::crazyfgt_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::crazyfgt_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crazyfgt)
-
-	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer1, layer2 */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
-	MCFG_PALETTE_INIT_OWNER(seta_state,gundhara)             /* layers are 6 planes deep (seta_state,but have only 4 palettes) */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_crazyfgt);
+	PALETTE(config, m_palette, FUNC(seta_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 16000000/4) /* 4 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 16000000/4)); /* 4 MHz */
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)   // clock?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH));   // clock?
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
 
 /***************************************************************************
                                  Jockey Club
@@ -9814,40 +9823,39 @@ MACHINE_START_MEMBER(jockeyc_state, jockeyc)
 }
 
 
-MACHINE_CONFIG_START(jockeyc_state::jockeyc)
-
+void jockeyc_state::jockeyc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) // TMP68000N-8
-	MCFG_DEVICE_PROGRAM_MAP(jockeyc_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jockeyc_state, interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2); // TMP68000N-8
+	m_maincpu->set_addrmap(AS_PROGRAM, &jockeyc_state::jockeyc_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(jockeyc_state::interrupt), "screen", 0, 1);
+
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(2.0)); // jockeyc: watchdog test error if over 2.5s
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
 	MCFG_MACHINE_START_OVERRIDE(jockeyc_state, jockeyc)
 	/* devices */
 	UPD4992(config, m_rtc); // ! Actually D4911C !
-	MCFG_DEVICE_ADD ("acia0", ACIA6850, 0)
-	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
-	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
+	ACIA6850(config, "acia0", 0);
+	TICKET_DISPENSER(config, "hopper1", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, "hopper2", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jockeyc)
-
-	MCFG_PALETTE_ADD("palette", 512 * 1)
-	MCFG_PALETTE_INIT_OWNER(seta_state,palette_init_RRRRRGGGGGBBBBB_proms)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jockeyc);
+	PALETTE(config, m_palette, FUNC(seta_state::palette_init_RRRRRGGGGGBBBBB_proms), 512 * 1);
 
 	MCFG_VIDEO_START_OVERRIDE(jockeyc_state,jockeyc_1_layer)
 
@@ -9855,13 +9863,13 @@ MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	X1_010(config, m_x1, 16000000);
+	m_x1->add_route(0, "lspeaker", 1.0);
+	m_x1->add_route(1, "rspeaker", 1.0);
 
 	// layout
 	config.set_default_layout(layout_jockeyc);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -9874,23 +9882,25 @@ MACHINE_START_MEMBER(jockeyc_state, inttoote)
 	m_out_itstart.resolve();
 }
 
-MACHINE_CONFIG_START(jockeyc_state::inttoote)
+void jockeyc_state::inttoote(machine_config &config)
+{
 	jockeyc(config);
-	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // TMP68HC000N-16
-	MCFG_DEVICE_PROGRAM_MAP(inttoote_map)
+
+	M68000(config.replace(), m_maincpu, XTAL(16'000'000)); // TMP68HC000N-16
+	m_maincpu->set_addrmap(AS_PROGRAM, &jockeyc_state::inttoote_map);
 
 	MCFG_MACHINE_START_OVERRIDE(jockeyc_state, inttoote)
-	// I/O board (not hooked up yet)
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 
-	MCFG_DEVICE_ADD ("acia1", ACIA6850, 0)
-	MCFG_DEVICE_ADD ("acia2", ACIA6850, 0)
+	// I/O board (not hooked up yet)
+	PIA6821(config, "pia0", 0);
+	PIA6821(config, "pia1", 0);
+
+	ACIA6850(config, "acia1", 0);
+	ACIA6850(config, "acia2", 0);
 
 	// layout
 	config.set_default_layout(layout_inttoote);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -10803,6 +10813,32 @@ ROM_START( msgundam1 )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fa001004.u26",  0x000000, 0x100000, CRC(b965f07c) SHA1(ff7827cc80655465ffbb732d55ba81f21f51a5ca) )
+ROM_END
+
+ROM_START( msgundamb ) // 2 PCB stack, one has a 'Tecnoval - tecnologia valenciana del recreativo' sticker
+	ROM_REGION( 0x300000, "maincpu", 0 )        /* 68000 Code, on lower board */
+	ROM_LOAD16_BYTE( "d-4.bin", 0x000000, 0x040000, CRC(ca5bfa89) SHA1(108435cb65919b4b90be102e7ac2799501149fc8) ) // 27c020
+	ROM_LOAD16_BYTE( "d-2.bin", 0x000001, 0x040000, CRC(b4b86d1b) SHA1(d9b625cfdabcabed9308fccc29c66adfe566a996) ) // 27c020
+	ROM_LOAD16_BYTE( "27c8001-7.bin",   0x100000, 0x100000, CRC(803f279c) SHA1(1095ac434ce553ed56d106556e7d23ccac1f0cd4) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD16_BYTE( "27c8001-8.bin",   0x100001, 0x100000, CRC(a310fa93) SHA1(2ee1616699c95ed2b8c46d43de4cffece1b033ea) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x400000, "gfx1", 0 )   /* Sprites, on top board, almost identical to the original but split */
+	ROM_LOAD16_BYTE( "27c8001-3.bin", 0x000000, 0x100000, CRC(9f36d867) SHA1(01a15dcdcb1077d7c8678762f58ad705dc29e8c9) )
+	ROM_LOAD16_BYTE( "27c8001-2.bin", 0x000001, 0x100000, CRC(70d333d9) SHA1(9ef3b0e0567ceed082921a5c384cfcfeb154f048) )
+	ROM_LOAD16_BYTE( "27c8001-1.bin", 0x200000, 0x100000, CRC(2792692c) SHA1(ed99c589ed15f8c1a4e2ab435a379b35105ba503) )
+	ROM_LOAD16_BYTE( "4.bin", 0x200001, 0x080000, CRC(eb551f1a) SHA1(e9d2fc31c3076164c5ee9722ea1b1e60b4f6d663) ) // mx27c4000
+	ROM_LOAD16_BYTE( "5.bin", 0x300001, 0x080000, CRC(e9aa57e8) SHA1(699c0132f4be81570f748e5ca2f88fc4fc6802bb) ) // mx27c4000
+
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1, on lower board */
+	ROM_LOAD16_BYTE( "27c8001-6.bin", 0x000000, 0x100000, CRC(8fbb5478) SHA1(247fd080f0ee18282c4d8b918171cfeab4b40d23) ) // 1ST AND 2ND HALF IDENTICAL, fa001006.u23 [even] IDENTICAL
+	ROM_LOAD16_BYTE( "27c8001-5.bin", 0x000001, 0x100000, CRC(c83ae34a) SHA1(d7bf49843c443c5b7cb9187404a3518eaed577a6) ) // 1ST AND 2ND HALF IDENTICAL, fa001006.u23 [odd]  IDENTICAL
+
+	ROM_REGION( 0x080000, "gfx3", 0 )   /* Layer 2, on lower board, identical to the original but split */
+	ROM_LOAD16_BYTE( "d-8.bin", 0x000000, 0x040000, CRC(a03c8345) SHA1(d3c3f0045ebb3d82d82432c212db4a801cb53b60) ) // 27c020
+	ROM_LOAD16_BYTE( "d-9.bin", 0x000001, 0x040000, CRC(cfd47024) SHA1(ab4fbaf258d2694407dd6c896f45d69821ccc408) ) // 27c020
+
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples, on lower board */
+	ROM_LOAD( "27c8001-4.bin", 0x000000, 0x100000, CRC(b965f07c) SHA1(ff7827cc80655465ffbb732d55ba81f21f51a5ca) )  // identical to the original
 ROM_END
 
 ROM_START( oisipuzl )
@@ -12006,17 +12042,6 @@ void seta_state::init_eightfrc()
 	init_bankx1();
 }
 
-void seta_state::init_kiwame()
-{
-	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
-
-	/* WARNING: This game writes to the interrupt vector
-	   table. Lev 1 routine address is stored at $100 */
-
-	RAM[0x64/2] = 0x0000;
-	RAM[0x66/2] = 0x0dca;
-}
-
 void seta_state::init_rezon()
 {
 	m_maincpu->space(AS_PROGRAM).nop_read(0x500006, 0x500007);   // irq ack?
@@ -12030,7 +12055,7 @@ void seta_state::init_pairlove()
 	save_pointer(NAME(m_pairslove_protram_old), 0x200/2);
 }
 
-void seta_state::init_zombraid()
+void zombraid_state::init_zombraid()
 {
 	/* bank 1 is never explicitly selected, 0 is used in its place */
 	m_x1_bank->configure_entry(0, memregion("x1snd")->base() + 0x80000);
@@ -12103,7 +12128,7 @@ GAME( 1989, downtown2, downtown, downtown,  downtown,  seta_state,     init_down
 GAME( 1989, downtownj, downtown, downtown,  downtown,  seta_state,     init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (joystick hack)" , 0) // Country/License: DSW
 GAME( 1989, downtownp, downtown, downtown,  downtown,  seta_state,     init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (prototype)" , 0) // Country/License: DSW
 
-GAME( 1989, usclssic,  0,        usclssic,  usclssic,  seta_state,     init_bank6502,  ROT270, "Seta",                      "U.S. Classic" , 0) // Country/License: DSW
+GAME( 1989, usclssic,  0,        usclssic,  usclssic,  usclssic_state, init_bank6502,  ROT270, "Seta",                      "U.S. Classic" , 0) // Country/License: DSW
 
 GAME( 1989, calibr50,  0,        calibr50,  calibr50,  seta_state,     init_bank6502,  ROT270, "Athena / Seta",             "Caliber 50 (Ver. 1.01)" , 0) // Country/License: DSW
 
@@ -12168,8 +12193,10 @@ GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_ini
 
 GAME( 1993, madshark,  0,        madshark,  madshark,  seta_state,     empty_init,     ROT270, "Allumer",                   "Mad Shark", 0 )
 
-GAME( 1993, msgundam,  0,        msgundam,  msgundam,  seta_state,     empty_init,     ROT0,   "Banpresto",                 "Mobile Suit Gundam", 0 )
-GAME( 1993, msgundam1, msgundam, msgundam,  msgunda1,  seta_state,     empty_init,     ROT0,   "Banpresto",                 "Mobile Suit Gundam (Japan)", 0 )
+// end credits shows Allumer as developer.
+GAME( 1993, msgundam,  0,        msgundam,  msgundam,  seta_state,     empty_init,     ROT0,   "Banpresto / Allumer",       "Mobile Suit Gundam", 0 )
+GAME( 1993, msgundam1, msgundam, msgundam,  msgundam1, seta_state,     empty_init,     ROT0,   "Banpresto / Allumer",       "Mobile Suit Gundam (Japan)", 0 )
+GAME( 1993, msgundamb, msgundam, msgundamb, msgundam,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Mobile Suit Gundam (bootleg)", 0 )
 
 GAME( 1993, oisipuzl,  0,        oisipuzl,  oisipuzl,  seta_state,     empty_init,     ROT0,   "Sunsoft / Atlus",           "Oishii Puzzle Ha Irimasenka", 0 )
 GAME( 1993, triplfun,  oisipuzl, triplfun,  oisipuzl,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Triple Fun", 0 )
@@ -12182,7 +12209,7 @@ GAME( 1993, wrofaero,  0,        wrofaero,  wrofaero,  seta_state,     empty_ini
 
 GAME( 1994, eightfrc,  0,        eightfrc,  eightfrc,  seta_state,     init_eightfrc,  ROT90,  "Tecmo",                     "Eight Forces", 0 )
 
-GAME( 1994, kiwame,    0,        kiwame,    kiwame,    seta_state,     init_kiwame,    ROT0,   "Athena",                    "Pro Mahjong Kiwame", 0 )
+GAME( 1994, kiwame,    0,        kiwame,    kiwame,    kiwame_state,   empty_init,     ROT0,   "Athena",                    "Pro Mahjong Kiwame", 0 )
 
 GAME( 1994, krzybowl,  0,        krzybowl,  krzybowl,  seta_state,     empty_init,     ROT270, "American Sammy",            "Krazy Bowl", 0 )
 
@@ -12200,8 +12227,8 @@ GAME( 1995, gundharac, gundhara, gundhara,  gundhara,  seta_state,     empty_ini
 
 GAME( 1995, sokonuke,  0,        extdwnhl,  sokonuke,  seta_state,     empty_init,     ROT0,   "Sammy Industries",          "Sokonuke Taisen Game (Japan)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1995, zombraid,  0,        zombraid,  zombraid,  seta_state,     init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
-GAME( 1995, zombraidp, zombraid, zombraid,  zombraid,  seta_state,     init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
-GAME( 1995, zombraidpj,zombraid, zombraid,  zombraid,  seta_state,     init_zombraid,  ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
+GAME( 1995, zombraid,  0,        zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
+GAME( 1995, zombraidp, zombraid, zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
+GAME( 1995, zombraidpj,zombraid, zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
 
 GAME( 1996, crazyfgt,  0,        crazyfgt,  crazyfgt,  seta_state,     init_crazyfgt,  ROT0,   "Subsino",                   "Crazy Fight", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

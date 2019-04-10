@@ -174,13 +174,14 @@ public:
 	void init_mspacman();
 	void init_mschamp();
 	void init_mbrush();
+	void init_pengomc1();
 	TILEMAP_MAPPER_MEMBER(pacman_scan_rows);
 	TILE_GET_INFO_MEMBER(pacman_get_tile_info);
 	TILE_GET_INFO_MEMBER(s2650_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(jrpacman_scan_rows);
 	TILE_GET_INFO_MEMBER(jrpacman_get_tile_info);
 	DECLARE_VIDEO_START(pacman);
-	DECLARE_PALETTE_INIT(pacman);
+	void pacman_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(birdiy);
 	DECLARE_VIDEO_START(s2650games);
 	DECLARE_MACHINE_RESET(mschamp);

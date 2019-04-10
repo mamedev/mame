@@ -7,16 +7,18 @@
 
 #include "naomig1.h"
 
-#define MCFG_AW_ROM_BOARD_ADD(_tag, _keyregion, _irq_cb)  \
-	MCFG_NAOMI_G1_ADD(_tag, AW_ROM_BOARD, _irq_cb)        \
-	aw_rom_board::static_set_keyregion(*device, _keyregion);
 
 class aw_rom_board : public naomi_g1_device
 {
 public:
-	aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&keyregion_tag)
+		: aw_rom_board(mconfig, tag, owner, clock)
+	{
+		m_keyregion.set_tag(std::forward<T>(keyregion_tag));
+	}
 
-	static void static_set_keyregion(device_t &device, const char *keyregion);
+	aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void submap(address_map &map) override;
 

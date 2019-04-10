@@ -40,12 +40,12 @@
 class meyc8088_state : public driver_device
 {
 public:
-	meyc8088_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	meyc8088_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_vram(*this, "vram"),
 		m_heartbeat(*this, "heartbeat"),
-		m_switches(*this, {"C0", "C1", "C2", "C3"}),
+		m_switches(*this, "C%u", 0U),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -77,7 +77,7 @@ private:
 	DECLARE_WRITE8_MEMBER(lights2_w);
 	DECLARE_WRITE8_MEMBER(common_w);
 
-	DECLARE_PALETTE_INIT(meyc8088);
+	void meyc8088_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
@@ -131,9 +131,9 @@ static const res_net_info meyc8088_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER(meyc8088_state, meyc8088)
+void meyc8088_state:: meyc8088_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, meyc8088_decode_info, meyc8088_net_info);
@@ -173,7 +173,7 @@ WRITE_LINE_MEMBER(meyc8088_state::screen_vblank)
 {
 	// LC255(200ns pulse) rising edge asserts INTR at start and end of vblank
 	// INTA wired back to INTR to clear it, vector is hardwired to $20
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x20);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x20); // I8088
 }
 
 
@@ -364,11 +364,11 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(meyc8088_state::meyc8088)
-
+void meyc8088_state::meyc8088(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8088, (XTAL(15'000'000) / 3) * 0.95) // NOTE: underclocked to prevent errors on diagnostics, MAME i8088 cycle timing is probably inaccurate
-	MCFG_DEVICE_PROGRAM_MAP(meyc8088_map)
+	I8088(config, m_maincpu, (XTAL(15'000'000) / 3) * 0.95); // NOTE: underclocked to prevent errors on diagnostics, MAME i8088 cycle timing is probably inaccurate
+	m_maincpu->set_addrmap(AS_PROGRAM, &meyc8088_state::meyc8088_map);
 
 	i8155_device &i8155_1(I8155(config, "i8155_1", XTAL(15'000'000) / (3*1)));
 	// all ports set to input
@@ -386,25 +386,24 @@ MACHINE_CONFIG_START(meyc8088_state::meyc8088)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TIMER_DRIVER_ADD("heartbeat", meyc8088_state, heartbeat_callback)
+	TIMER(config, m_heartbeat).configure_generic(FUNC(meyc8088_state::heartbeat_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(15'000'000)/3, 320, 0, 256, 261, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(meyc8088_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, meyc8088_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(15'000'000)/3, 320, 0, 256, 261, 0, 224);
+	screen.set_screen_update(FUNC(meyc8088_state::screen_update));
+	screen.screen_vblank().set(FUNC(meyc8088_state::screen_vblank));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(meyc8088_state, meyc8088)
+	PALETTE(config, "palette", FUNC(meyc8088_state::meyc8088_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
 
 
 ROM_START( gldarrow )

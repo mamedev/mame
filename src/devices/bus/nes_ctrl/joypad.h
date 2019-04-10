@@ -80,6 +80,17 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 };
 
+// ======================> nes_vt_majesco_ddr_device
+
+class nes_vt_majesco_ddr_device : public nes_joypad_device
+{
+public:
+	// construction/destruction
+	nes_vt_majesco_ddr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual ioport_constructor device_input_ports() const override;
+};
+
 // ======================> nes_arcstick_device
 
 class nes_arcstick_device : public nes_joypad_device
@@ -102,10 +113,11 @@ protected:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(NES_JOYPAD,      nes_joypad_device)
-DECLARE_DEVICE_TYPE(NES_FCPAD_P2,    nes_fcpad2_device)
-DECLARE_DEVICE_TYPE(NES_CCPAD_LEFT,  nes_ccpadl_device)
-DECLARE_DEVICE_TYPE(NES_CCPAD_RIGHT, nes_ccpadr_device)
-DECLARE_DEVICE_TYPE(NES_ARCSTICK,    nes_arcstick_device)
+DECLARE_DEVICE_TYPE(NES_JOYPAD,         nes_joypad_device)
+DECLARE_DEVICE_TYPE(NES_FCPAD_P2,       nes_fcpad2_device)
+DECLARE_DEVICE_TYPE(NES_CCPAD_LEFT,     nes_ccpadl_device)
+DECLARE_DEVICE_TYPE(NES_CCPAD_RIGHT,    nes_ccpadr_device)
+DECLARE_DEVICE_TYPE(NES_ARCSTICK,       nes_arcstick_device)
+DECLARE_DEVICE_TYPE(NES_VT_MAJESCO_DDR, nes_vt_majesco_ddr_device)
 
 #endif // MAME_BUS_NES_CTRL_JOYPAD_H

@@ -43,10 +43,7 @@ protected:
 	virtual uint8_t read_id(int idx) override;
 
 private:
-	required_device<saturn_control_port_device> m_subctrl1_port;
-	required_device<saturn_control_port_device> m_subctrl2_port;
-	required_device<saturn_control_port_device> m_subctrl3_port;
-	required_device<saturn_control_port_device> m_subctrl4_port;
+	required_device_array<saturn_control_port_device, 4> m_subctrl_port;
 };
 
 

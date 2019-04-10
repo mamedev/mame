@@ -65,7 +65,7 @@ public:
 	// construction/destruction
 	dio16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	// inline configuration
-	template<typename T> void set_cputag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_program_space(T &&tag, int spacenum) { m_prgspace.set_tag(std::forward<T>(tag), spacenum); }
 
 	// callback configuration
 	auto dmar0_out_cb() { return m_dmar0_out_cb.bind(); }
@@ -82,14 +82,14 @@ public:
 
 	// DANGER: these will currently produce different results for a DIO-I card on DIO-I and DIO-II systems
 	//         due to the varying bus widths.  Using all install_memory() shields you from this problem.
-	//         either know what you're doing (m_prgwidth is available to cards for this purpose) or
+	//         Either know what you're doing (m_prgwidth is available to cards for this purpose) or
 	//         only use these for 32-bit DIO-II cards.
 	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
 	void install_rom(offs_t start, offs_t end, const char *tag, uint8_t *data);
 
 	void unmap_bank(offs_t start, offs_t end);
 	void unmap_rom(offs_t start, offs_t end);
-	address_space *program_space() { return m_prgspace; }
+	address_space &program_space() { return *m_prgspace; }
 
 	// IRQs 1, 2, and 7 are reserved for non-bus usage.
 
@@ -137,11 +137,10 @@ protected:
 	virtual void device_reset() override;
 
 	// internal state
-	required_device<cpu_device> m_maincpu;
-	std::list <device_dio16_card_interface *> m_cards;
+	std::list<device_dio16_card_interface *> m_cards;
 
 	// address spaces
-	address_space *m_prgspace;
+	required_address_space m_prgspace;
 	int m_bus_index;
 
 	// packed line states
@@ -187,7 +186,7 @@ protected:
 	virtual void interface_pre_start() override;
 
 	int get_index() { return m_index; };
-	address_space *program_space() { return m_dio_dev->program_space(); }
+	address_space &program_space() { return m_dio_dev->program_space(); }
 
 	DECLARE_WRITE_LINE_MEMBER(irq1_out) { m_dio_dev->set_irq(m_index, 0, state); }
 	DECLARE_WRITE_LINE_MEMBER(irq2_out) { m_dio_dev->set_irq(m_index, 1, state); }

@@ -107,16 +107,11 @@ private:
 
 	/* Callbacks */
 	devcb_read8 m_m68k_r_cb;
-	devcb_write8    m_m68k_w_cb;
+	devcb_write8 m_m68k_w_cb;
 };
 
 /* Device type */
 DECLARE_DEVICE_TYPE(PDC, pdc_device)
 
-/* MCFG defines */
-#define MCFG_PDC_R_CB(_devcb) \
-	downcast<pdc_device &>(*device).m68k_r_callback(DEVCB_##_devcb);
-#define MCFG_PDC_W_CB(_devcb) \
-	downcast<pdc_device &>(*device).m68k_w_callback(DEVCB_##_devcb);
 
 #endif // MAME_MACHINE_PDC_H

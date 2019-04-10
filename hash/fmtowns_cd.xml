@@ -184,7 +184,6 @@ Emit Vol. 3: Watashi ni Sayonara wo                           Koei              
 Engage Errands 2: Kouki wo Niau Mono                          Ponytail Soft                     1995/5     CD
 Engage Errands: Miwaku no Shito-tachi                         Ponytail Soft                     1995/4     CD
 English in Dream                                              SofMedia                          1990/6     CD
-Enkaiou                                                       Dennou Shoukai                    1989/10    CD
 Enkaiou Ver. 3: Chikyuu Saidai no Kessen                      Dennou Shoukai                    1993/12    CD
 Euphony 2 / MTR V1.1                                          Fujitsu                           1992/11    CD
 Euphony 2 / SCORE V1.1                                        Fujitsu                           1993/4     CD
@@ -341,8 +340,6 @@ JAF Drive Guide - Best Ski 150 (Resort-hen)                   JAF Shuppansha    
 JAF Drive Guide (Ver. 2)                                      JAF Shuppansha                    1992/2     SET(CD+FD)
 Jinmon Yuugi                                                  Fairytale (Red Zone)              1995/8     SET(CD+FD)
 Jintaizu System Skeleton                                      Medical System                    1995/8     CD
-Joker Towns                                                   Birdy Soft                        1992/7     CD
-Joshikou Seifuku Monogatari                                   Nihon Soft System                 1995/4     SET(CD+FD)
 Joshikousei Shoujo Densetsu                                   Byakuya Shobou                    1994/4     CD
 Jouhou Club                                                   Fujitsu Social Science Laboratory 1989/11    CD
 Jouhou Gijutsu Yougo Shuu CD-ROM                              Fujitsu                           1991/12    CD
@@ -533,7 +530,6 @@ Planet Harmony                                                Datt Japan        
 Pocky 1-2 & Ponyon                                            Ponytail Soft                     1994/6     CD
 Populous 2 Expert                                             Imagineer                         1993/2     CD
 Powers of Ten                                                 Datt Japan                        1995/10    CD
-Preasure                                                      Janis                             1994/2     CD
 Presence                                                      Orange House                      1992/12    ?
 Presence                                                      Sur de Wave                       1992/12    CD
 Present                                                       Orange House                      1991/6     ?
@@ -762,7 +758,6 @@ Yes! HG                                                       Himeya Soft       
 Yoshioka Mayumi: Last Nude                                    Janis                             1993/12    CD
 Youki de Cool na LA Towns                                     Media Art                         1990/12    CD
 Yubiwa Monogatari Daiikkan: Tabi no Nakama                    Starcraft                         1992/3     CD
-Yubiwa Monogatari Dainikan: Futatsu no Tou                    Starcraft                         1993/4     SET(CD+FD)
 Yumeutsutsu                                                   Megami                            1992/5     CD
 Z's Staff Pro Towns                                           Zeit                              1991/7     CD
 Z's Triphony DigitalCraft Towns                               Zeit                              1990/12    CD
@@ -3641,6 +3636,113 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="enkaio">
+		<!--
+		Origin: redump.org / r09
+		<rom name="Enkaiou (Japan) (Track 01).bin" size="105134400" crc="304cbfed" sha1="8c310e390bd0c4fd2ecc2c3eb842381fff549c1b"/>
+		<rom name="Enkaiou (Japan) (Track 02).bin" size="8079120" crc="2eeba401" sha1="6df382c1e3ae30af7e9f409660fe593ea2a84d64"/>
+		<rom name="Enkaiou (Japan) (Track 03).bin" size="7879200" crc="913a540c" sha1="0a5f3f815b1abc0b09044186ed1029634bda52e2"/>
+		<rom name="Enkaiou (Japan) (Track 04).bin" size="3386880" crc="cb72d1f5" sha1="2f057fd7aad55e972d065febe2aab08961730c4f"/>
+		<rom name="Enkaiou (Japan) (Track 05).bin" size="17228400" crc="8efa3549" sha1="7bd00457807138543c08a98c56382a9a8989a389"/>
+		<rom name="Enkaiou (Japan) (Track 06).bin" size="7166544" crc="563d4129" sha1="91598ee02fb330fa23e7a0cdef4347a80d4d11f9"/>
+		<rom name="Enkaiou (Japan) (Track 07).bin" size="10085376" crc="32158c68" sha1="af1d84c509ec1bf09a439131947ca5538f4f2aa0"/>
+		<rom name="Enkaiou (Japan) (Track 08).bin" size="9372720" crc="c5182e50" sha1="4f73ea47c732cef65eea08c266de48f4875bab39"/>
+		<rom name="Enkaiou (Japan) (Track 09).bin" size="8342544" crc="b53e3b34" sha1="dde37b48ad38b6b1434fcf5f0183693f4ab2e3ca"/>
+		<rom name="Enkaiou (Japan) (Track 10).bin" size="8027376" crc="cb120500" sha1="6aa1128b5b8c11502ed462617d83130ed5f8c85f"/>
+		<rom name="Enkaiou (Japan) (Track 11).bin" size="8067360" crc="3c0787ba" sha1="68118f371eba0a9bc8c5e1739dc66e8824001643"/>
+		<rom name="Enkaiou (Japan) (Track 12).bin" size="7707504" crc="6ee181ae" sha1="3754f4563fa14dd40a5712d48bb9736397d0f7d8"/>
+		<rom name="Enkaiou (Japan) (Track 13).bin" size="7408800" crc="0bd85c6d" sha1="78d8f836ae11076f37b23a6f7b08565382089be2"/>
+		<rom name="Enkaiou (Japan) (Track 14).bin" size="7815696" crc="60cd53ea" sha1="0971be6a6334f2e86a488264efe65614d8acc669"/>
+		<rom name="Enkaiou (Japan) (Track 15).bin" size="4544064" crc="d1710f30" sha1="4a4a3f717fd5b068981e70c57c3fc33becd59d0d"/>
+		<rom name="Enkaiou (Japan) (Track 16).bin" size="7298256" crc="806e4b1d" sha1="30396fe7b209b82e932a37ec789daedb606cdd33"/>
+		<rom name="Enkaiou (Japan) (Track 17).bin" size="10184160" crc="c39bd330" sha1="687f55887f7357c6d54b690d0e339a671ad75740"/>
+		<rom name="Enkaiou (Japan) (Track 18).bin" size="6825504" crc="8d98bbbf" sha1="203dd5bd7a1a203d344d291b41e90696465faedb"/>
+		<rom name="Enkaiou (Japan) (Track 19).bin" size="14664720" crc="e3d90dca" sha1="b56ba9b6d15764812f7f8f9cf1387e3ebbdff551"/>
+		<rom name="Enkaiou (Japan) (Track 20).bin" size="2187360" crc="218c5b70" sha1="f399f2704ecca15289ce03139ebfc222712f21e7"/>
+		<rom name="Enkaiou (Japan) (Track 21).bin" size="2175600" crc="3f63f478" sha1="abea4a76614a88240e5ada8eb5b0e0167854dfca"/>
+		<rom name="Enkaiou (Japan) (Track 22).bin" size="1959216" crc="5f098f2c" sha1="b252688fe8cef86006a20b5659c1ad9d32c8b6c5"/>
+		<rom name="Enkaiou (Japan) (Track 23).bin" size="2504880" crc="4f5c8545" sha1="9c90fecf3ccdd80b45fcd0f79a9929240a8f6da1"/>
+		<rom name="Enkaiou (Japan) (Track 24).bin" size="2074464" crc="ca462243" sha1="25d5b804def1c2ef2f9f1fee71ec7ca60d9dbee4"/>
+		<rom name="Enkaiou (Japan) (Track 25).bin" size="2488416" crc="9c877445" sha1="b46eff619bba918d2e2560998b6a295fcb595854"/>
+		<rom name="Enkaiou (Japan) (Track 26).bin" size="3104640" crc="b80021f0" sha1="3bce1e7b020aad555f6bd3ea573c36acbdd22a2b"/>
+		<rom name="Enkaiou (Japan) (Track 27).bin" size="2003904" crc="fe64d4e4" sha1="5732bde171d594aa0f64287472dbcd36ab837491"/>
+		<rom name="Enkaiou (Japan) (Track 28).bin" size="2504880" crc="df359f88" sha1="63b85b9ab63e3a4357867ebbd6a4c2d9c0bae933"/>
+		<rom name="Enkaiou (Japan) (Track 29).bin" size="1853376" crc="883c948a" sha1="134d54f9bf459ddc8427f87cdc7a1c12801397e7"/>
+		<rom name="Enkaiou (Japan) (Track 30).bin" size="1780464" crc="4c605035" sha1="23cc1c80d416fffb14ec9cbac8fa57d8d39e5322"/>
+		<rom name="Enkaiou (Japan) (Track 31).bin" size="2187360" crc="e428f58d" sha1="33386ed15262b3363d391ca573737b6125a39e30"/>
+		<rom name="Enkaiou (Japan) (Track 32).bin" size="2210880" crc="c6360e4d" sha1="46768c88a6050b5464826d625dea4c906a236240"/>
+		<rom name="Enkaiou (Japan) (Track 33).bin" size="1811040" crc="68c3894e" sha1="8148e3300a99f271e336c57d08b09194c7929b33"/>
+		<rom name="Enkaiou (Japan) (Track 34).bin" size="1735776" crc="5cb9f5ed" sha1="2fd0069ef1848e8a935592eac206edcfa074ee01"/>
+		<rom name="Enkaiou (Japan) (Track 35).bin" size="1975680" crc="90406b61" sha1="8e65cdafae27ac09710ea8b7c16808201062a28d"/>
+		<rom name="Enkaiou (Japan) (Track 36).bin" size="1815744" crc="d77ad108" sha1="76e51b802aeacf180f4a0620367fdd8d88bbfe4b"/>
+		<rom name="Enkaiou (Japan) (Track 37).bin" size="1611120" crc="6d0a1a19" sha1="92eae84a00e65076875174f644f4e4b50125f9d7"/>
+		<rom name="Enkaiou (Japan) (Track 38).bin" size="1658160" crc="714f23f8" sha1="d6f179db043c0a15338985a94e06b4b0f3272109"/>
+		<rom name="Enkaiou (Japan) (Track 39).bin" size="3386880" crc="327d6325" sha1="ec4e1da99e11b8b9492e4f1d41d21c6c37796ec5"/>
+		<rom name="Enkaiou (Japan) (Track 40).bin" size="2947056" crc="0961f05c" sha1="437e751ec0003730ea91f5bb11b2b218a84ee9cb"/>
+		<rom name="Enkaiou (Japan) (Track 41).bin" size="1886304" crc="8c226e2f" sha1="c21cc31eb8e596f448d95b48aee0c2fb0fabe1da"/>
+		<rom name="Enkaiou (Japan) (Track 42).bin" size="2034480" crc="7d16b544" sha1="69ff22ce51e3ecaf689d0dff0eb39fb23e71d194"/>
+		<rom name="Enkaiou (Japan) (Track 43).bin" size="1876896" crc="50633686" sha1="d3aab3d2e5b7e3768b5262ab820ab752fb80c6f9"/>
+		<rom name="Enkaiou (Japan) (Track 44).bin" size="2344944" crc="9084ef6d" sha1="17d16f51d229a802537b777b75bd24dfb3099866"/>
+		<rom name="Enkaiou (Japan) (Track 45).bin" size="2653056" crc="2c42196a" sha1="262d82bc4af379e966ace92b0a2b134b969467e9"/>
+		<rom name="Enkaiou (Japan) (Track 46).bin" size="1709904" crc="5d6a0701" sha1="b18dd11d14ef94846d0891211f9f1de101291f00"/>
+		<rom name="Enkaiou (Japan) (Track 47).bin" size="2551920" crc="a4598d64" sha1="f019377d3d9de9965fc399c4ddb7fdf11ea1d857"/>
+		<rom name="Enkaiou (Japan) (Track 48).bin" size="2958816" crc="d47a9aed" sha1="e866f8f5d45b93c4e2477514b3fe156dd5434bcd"/>
+		<rom name="Enkaiou (Japan) (Track 49).bin" size="2650704" crc="afdc3d25" sha1="0a6b8721ccc3dff92d70d561105bb5f257c82655"/>
+		<rom name="Enkaiou (Japan) (Track 50).bin" size="5287296" crc="61509964" sha1="d955e341b2b2c5a650fa0ab74c8e75fd12f1011c"/>
+		<rom name="Enkaiou (Japan) (Track 51).bin" size="1775760" crc="fa0429db" sha1="4e1d3d2e300f4a34ac8ccefda99d8522ac9d1ce7"/>
+		<rom name="Enkaiou (Japan) (Track 52).bin" size="1528800" crc="0e9198e5" sha1="070c33bf7e2b748196ec7d10787ca35c260af24f"/>
+		<rom name="Enkaiou (Japan) (Track 53).bin" size="1709904" crc="bee21452" sha1="60d4fd857f65919c6d27c215181f1d73a1607ea9"/>
+		<rom name="Enkaiou (Japan) (Track 54).bin" size="1465296" crc="42813624" sha1="b8470b1ac6e7e7d651868094813641c3ed54f5a3"/>
+		<rom name="Enkaiou (Japan) (Track 55).bin" size="1411200" crc="d72c767c" sha1="7f4cf94638ff86674a56a02c69c5fae92eb7fd86"/>
+		<rom name="Enkaiou (Japan) (Track 56).bin" size="1411200" crc="f73dc58c" sha1="c75476610a0dfcf74af22fb83954de1fcc02bac4"/>
+		<rom name="Enkaiou (Japan) (Track 57).bin" size="1411200" crc="9b2e4e63" sha1="2455e0c642d67d97b79ea1beeba401bdb6c978ed"/>
+		<rom name="Enkaiou (Japan) (Track 58).bin" size="10588704" crc="cdc66c89" sha1="a42c2e4818a97264e08f50f10e06ff413f220f40"/>
+		<rom name="Enkaiou (Japan) (Track 59).bin" size="11249616" crc="c82e5305" sha1="5c96c3d377efeda034611fd05b82ff397ea96d0e"/>
+		<rom name="Enkaiou (Japan) (Track 60).bin" size="11211984" crc="bcbba5db" sha1="1f92b1505a2cf1565693848c4e33bcfd67bc24da"/>
+		<rom name="Enkaiou (Japan) (Track 61).bin" size="11672976" crc="46a967c6" sha1="c60f53d061f376d78387ca08e444912f6543fc3e"/>
+		<rom name="Enkaiou (Japan) (Track 62).bin" size="10513440" crc="50452319" sha1="aef91feed7c18225578a946671346ec704f94398"/>
+		<rom name="Enkaiou (Japan) (Track 63).bin" size="10071264" crc="8fe9b9fb" sha1="974fbc26b1a7c0572caf8886845eae8ce024422f"/>
+		<rom name="Enkaiou (Japan) (Track 64).bin" size="7173600" crc="06a12659" sha1="dd4a81a484e39e8cbecfbe996819ea69596901dc"/>
+		<rom name="Enkaiou (Japan) (Track 65).bin" size="1430016" crc="3cbe31c8" sha1="e2386c4908eaed7d753c003de1b51f3be9a4b014"/>
+		<rom name="Enkaiou (Japan) (Track 66).bin" size="1545264" crc="e019d226" sha1="66c4f7bf603caf6717bc532e80f44da7523b90a1"/>
+		<rom name="Enkaiou (Japan) (Track 67).bin" size="1453536" crc="d799ca09" sha1="c2a2ab382c541c1bd33dc4fb792640d86d50bbde"/>
+		<rom name="Enkaiou (Japan) (Track 68).bin" size="1411200" crc="68588892" sha1="43d1fc2bc3a261aee7e843d912979876810112c6"/>
+		<rom name="Enkaiou (Japan) (Track 69).bin" size="3022320" crc="6dd6ce3a" sha1="00b2115d65092c1662505b6165414bb8d43023d2"/>
+		<rom name="Enkaiou (Japan) (Track 70).bin" size="1564080" crc="73c3ac34" sha1="bccae2c3ed1117155c13b7d27715e2a400badebc"/>
+		<rom name="Enkaiou (Japan) (Track 71).bin" size="7161840" crc="580cd158" sha1="6d873ec71c060686a8d797407ebd8bb6f2d13654"/>
+		<rom name="Enkaiou (Japan) (Track 72).bin" size="12418560" crc="bfb703c4" sha1="5a7342635e17976ada1095e41a2272650f393159"/>
+		<rom name="Enkaiou (Japan) (Track 73).bin" size="17722320" crc="5ae78b40" sha1="bc9c91f2f2a881a11fd0deb7dd0efea8bdf339a6"/>
+		<rom name="Enkaiou (Japan) (Track 74).bin" size="1505280" crc="9bdd4b39" sha1="4803811573aab67759cd4e845a043372c8a5b2bb"/>
+		<rom name="Enkaiou (Japan) (Track 75).bin" size="1411200" crc="12cdb7a9" sha1="9ce765a5a1745a2f5a5e83862657a98a5dbb3fc0"/>
+		<rom name="Enkaiou (Japan) (Track 76).bin" size="1446480" crc="e163b1e8" sha1="d9369e7aa4dd7b96959279835ead7a7516ac2ecf"/>
+		<rom name="Enkaiou (Japan) (Track 77).bin" size="2210880" crc="da675082" sha1="13f904610ce78e881e4ec9c4f055fcf0c444d817"/>
+		<rom name="Enkaiou (Japan) (Track 78).bin" size="9102240" crc="6d794ea4" sha1="96a51b7db77c143d2d4edf613149784aa6f2f773"/>
+		<rom name="Enkaiou (Japan) (Track 79).bin" size="2756544" crc="f843aee1" sha1="3c1a9e3b8c66158402338e439af43b7bb3d944d0"/>
+		<rom name="Enkaiou (Japan) (Track 80).bin" size="3151680" crc="dee01e61" sha1="e2d6294ce86df6bbd8d5ffd4ce703ec64e861424"/>
+		<rom name="Enkaiou (Japan) (Track 81).bin" size="2947056" crc="3d3bb2b5" sha1="d1f6cbc527887e1197d63b21ca2a14516bb66962"/>
+		<rom name="Enkaiou (Japan) (Track 82).bin" size="8142624" crc="a784c338" sha1="753403f9ec3b296334f8568f826543cfd8e4ec4a"/>
+		<rom name="Enkaiou (Japan) (Track 83).bin" size="10038336" crc="5a3e1747" sha1="12f1a42fe96e61e5b44359e5909c90590d2ade28"/>
+		<rom name="Enkaiou (Japan) (Track 84).bin" size="9996000" crc="2ef34f75" sha1="93867564178fb4fba3140a2de0893f8735593f29"/>
+		<rom name="Enkaiou (Japan) (Track 85).bin" size="6985440" crc="2ea8424b" sha1="936eeb40f5fb35c85514e9d82995619afef92f42"/>
+		<rom name="Enkaiou (Japan) (Track 86).bin" size="4426464" crc="8fb5f7e3" sha1="31d91faebfd8019ac6bd086a9d380463ef1c62d0"/>
+		<rom name="Enkaiou (Japan) (Track 87).bin" size="17164896" crc="2837ca5c" sha1="91136b8a7514d42179798db646f1d9e1c14be974"/>
+		<rom name="Enkaiou (Japan) (Track 88).bin" size="16962624" crc="4619679e" sha1="5d8df42de9c302abc34c6df219b1723d1750dd38"/>
+		<rom name="Enkaiou (Japan) (Track 89).bin" size="11371920" crc="e79c0eb0" sha1="ba23ac2c1871446a7d9cf7ba0063b7f33a54a8ea"/>
+		<rom name="Enkaiou (Japan) (Track 90).bin" size="2923536" crc="80d21630" sha1="4a4461335f0edd2b536806c0842c0973734cf254"/>
+		<rom name="Enkaiou (Japan).cue" size="9905" crc="134b2982" sha1="d9f8aa27bcaa2c793619c2951dff8c8751aedecb"/>
+		-->
+		<description>Enkaiou</description>
+		<year>1989</year>
+		<publisher>電脳商会 (Dennou Shoukai)</publisher>
+		<info name="alt_title" value="宴会王" />
+		<info name="release" value="198910xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="enkaiou (japan)" sha1="ffc1f51758abeffed4c5639002115fc3c6356ff8" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="enkaio2">
 		<!--
 		Origin: P2P
@@ -5217,6 +5319,23 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="joker">
+		<!--
+		Origin: redump.org / r09
+		<rom name="Joker Towns (Japan).bin" size="20815200" crc="2b3c7c6d" sha1="d9c07fdb96b0110020e3544d1fa1d14c22acd0fb"/>
+		<rom name="Joker Towns (Japan).cue" size="85" crc="df7897a1" sha1="2e27bb3a4d74326880501d3d7bb621694db9d229"/>
+		-->
+		<description>Joker Towns</description>
+		<year>1992</year>
+		<publisher>バーディーソフト (Birdy Soft)</publisher>
+		<info name="release" value="199207xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="joker towns (Japan)" sha1="bc09ad20f315dcd4804452b5885c06eca281b48d" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="joshikou">
 		<!--
 		Origin: Neo Kobe Collection
@@ -5232,6 +5351,28 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="joshikousei shoujo hakunetsu" sha1="e8d9cb254a16d113544a2e3dba6b73a93003b915" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="joshisei">
+		<!--
+		Origin: redump.org / r09
+		<rom name="Joshikou Seifuku Monogatari (Japan).bin" size="13778016" crc="afd0bf24" sha1="b37360c8b030467c5b5ef13e67a38d9d00bcfe19"/>
+		<rom name="Joshikou Seifuku Monogatari (Japan).cue" size="101" crc="767b1881" sha1="36ebfe1adadce7e5c7ec3f856d601e889382d559"/>
+		-->
+		<description>Joshikou Seifuku Monogatari</description>
+		<year>1995</year>
+		<publisher>ケイエスエス (KSS)</publisher>
+		<info name="release" value="199504xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="joshikou_seifuku_monogatari.hdm" size="1261568" crc="3fdba734" sha1="8e8aed41e329bd02479e6b55675110ddc29b33f2" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="joshikou seifuku monogatari (japan)" sha1="02c2c164c2554ac90faf6db3ee856357bd668110" />
 			</diskarea>
 		</part>
 	</software>
@@ -5901,6 +6042,32 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="libble rabble" sha1="5f3fef308eb0f59e7b6d8b4f6e87a9653ccfaa7b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="lotr2">
+		<!--
+		Origin: Tokugawa Corporate Forums (DamienD)
+		<rom name="The Lord of the Rings - The Two Towers.ccd" size="4543" crc="5ab9a7bb" sha1="36ccfad3da04b328225096502101c352829e60ab"/>
+		<rom name="The Lord of the Rings - The Two Towers.cue" size="894" crc="f75eccf5" sha1="a716c2f8cfd6ae9d75848c9c401f79f54dcbe088"/>
+		<rom name="The Lord of the Rings - The Two Towers.img" size="172695600" crc="a50adf2d" sha1="78a4470a4534bb2f31a8c441ca9f0c0d1462a01e"/>
+		<rom name="The Lord of the Rings - The Two Towers.sub" size="7048800" crc="7d00f289" sha1="23767eab20a0b431d6f2abc0e41330450253910a"/>
+		-->
+		<description>J. R. R. Tolkien's The Lord of the Rings, Vol. II - The Two Towers</description>
+		<year>1993</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<info name="alt_title" value="指輪物語 第二巻 二つの塔" />
+		<info name="release" value="199304xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="User Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="the lord of the rings - the two towers user disk.bin" size="1261568" crc="51c5461f" sha1="31548881ebfd4eb50281b3086709e5ff02a72ddd" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the lord of the rings - the two towers" sha1="a4115a04803cd309628e23a6ec40351612f06a44" />
 			</diskarea>
 		</part>
 	</software>
@@ -7206,6 +7373,25 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="pegasus" sha1="294bb21d28e4d40f94a6b18ca3b0cf205f394b58" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pleasure">
+		<!--
+		Origin: redump.org / r09
+		<rom name="Yuka Watanabe &amp; Tomo Kawai - Pleasure (Japan) (Track 1).bin" size="105487200" crc="3ac09566" sha1="fbab998bbfe2adc0dbcd607501b7cbd9c2865b04"/>
+		<rom name="Yuka Watanabe &amp; Tomo Kawai - Pleasure (Japan) (Track 2).bin" size="39690000" crc="9d6157d5" sha1="88140367f5b917f21a46d1ec5eb6ee24f07ce76c"/>
+		<rom name="Yuka Watanabe &amp; Tomo Kawai - Pleasure (Japan) (Track 3).bin" size="37396800" crc="6e2e590f" sha1="20e0a580b02344f91ec9748f6f3a2f3905dc9f22"/>
+		<rom name="Yuka Watanabe &amp; Tomo Kawai - Pleasure (Japan).cue" size="422" crc="deb51835" sha1="cabb91b0450e7e329ffd49834e7017ad78245926"/>
+		-->
+		<description>Yuka Watanabe &amp; Tomo Kawai - Pleasure</description>
+		<year>1994</year>
+		<publisher>ジャニス (Janis)</publisher>
+		<info name="release" value="199402xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="yuka watanabe &amp; tomo kawai - pleasure (japan)" sha1="8e0bc95a85c2189698b2a1bcc181f9fe8a80431c" />
 			</diskarea>
 		</part>
 	</software>

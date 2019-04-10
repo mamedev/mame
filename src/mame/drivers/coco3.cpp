@@ -242,14 +242,14 @@ DEVICE_INPUT_DEFAULTS_END
 //  MACHINE CONFIGURATION
 //**************************************************************************
 
-MACHINE_CONFIG_START(coco3_state::coco3)
-	MCFG_DEVICE_MODIFY(":")
-	MCFG_DEVICE_CLOCK(XTAL(28'636'363) / 32)
+void coco3_state::coco3(machine_config &config)
+{
+	this->set_clock(XTAL(28'636'363) / 32);
 
 	// basic machine hardware
-	MCFG_DEVICE_ADD(MAINCPU_TAG, MC6809E, DERIVED_CLOCK(1, 1))
-	MCFG_DEVICE_PROGRAM_MAP(coco3_mem)
-	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(coco_state, dasm_override)
+	MC6809E(config, m_maincpu, DERIVED_CLOCK(1, 1));
+	m_maincpu->set_addrmap(AS_PROGRAM, &coco3_state::coco3_mem);
+	m_maincpu->set_dasm_override(FUNC(coco_state::dasm_override));
 
 	// devices
 	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
@@ -271,49 +271,50 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	pia1.irqb_handler().set(FUNC(coco_state::pia1_firq_b));
 
 	// Becker Port device
-	MCFG_DEVICE_ADD(DWSOCK_TAG, COCO_DWSOCK, 0)
+	COCO_DWSOCK(config, DWSOCK_TAG, 0);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(coco_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "printer")
-	MCFG_RS232_DCD_HANDLER(WRITELINE(PIA1_TAG, pia6821_device, ca1_w))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("printer", printer)
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "printer"));
+	rs232.dcd_handler().set(PIA1_TAG, FUNC(pia6821_device::ca1_w));
+	rs232.set_option_device_input_defaults("printer", DEVICE_INPUT_DEFAULTS_NAME(printer));
 
 	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "fdcv11"));
 	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
-	MCFG_COCO_VHD_ADD(VHD0_TAG)
-	MCFG_COCO_VHD_ADD(VHD1_TAG)
+	COCO_VHD(config, m_vhd_0, 0, m_maincpu);
+	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
 
 	// video hardware
 	config.set_default_layout(layout_coco3);
 
-	MCFG_DEVICE_ADD(GIME_TAG, GIME_NTSC, XTAL(28'636'363), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG)
-	MCFG_GIME_HSYNC_CALLBACK(WRITELINE(PIA0_TAG, pia6821_device, ca1_w))
-	MCFG_GIME_FSYNC_CALLBACK(WRITELINE(PIA0_TAG, pia6821_device, cb1_w))
-	MCFG_GIME_IRQ_CALLBACK(WRITELINE(*this, coco3_state, gime_irq_w))
-	MCFG_GIME_FIRQ_CALLBACK(WRITELINE(*this, coco3_state, gime_firq_w))
-	MCFG_GIME_FLOATING_BUS_CALLBACK(READ8(*this, coco_state, floating_bus_r))
+	GIME_NTSC(config, m_gime, XTAL(28'636'363), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG);
+	m_gime->set_screen(COMPOSITE_SCREEN_TAG);
+	m_gime->hsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::ca1_w));
+	m_gime->fsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::cb1_w));
+	m_gime->irq_wr_callback().set(FUNC(coco3_state::gime_irq_w));
+	m_gime->firq_wr_callback().set(FUNC(coco3_state::gime_firq_w));
+	m_gime->floating_bus_rd_callback().set(FUNC(coco3_state::floating_bus_r));
 
 	// composite monitor
-	MCFG_SCREEN_ADD(COMPOSITE_SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(coco3_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 243)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 1, 241-1)
-	MCFG_SCREEN_VBLANK_TIME(0)
+	screen_device &composite_screen(SCREEN(config, COMPOSITE_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	composite_screen.set_refresh_hz(60);
+	composite_screen.set_screen_update(FUNC(coco3_state::screen_update));
+	composite_screen.set_size(640, 243);
+	composite_screen.set_visarea(0, 640-1, 1, 241-1);
+	composite_screen.set_vblank_time(0);
 
 	// RGB monitor
-	MCFG_SCREEN_ADD(RGB_SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(coco3_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 243)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 1, 241-1)
-	MCFG_SCREEN_VBLANK_TIME(0)
+	screen_device &rgb_screen(SCREEN(config, RGB_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	rgb_screen.set_refresh_hz(60);
+	rgb_screen.set_screen_update(FUNC(coco3_state::screen_update));
+	rgb_screen.set_size(640, 243);
+	rgb_screen.set_visarea(0, 640-1, 1, 241-1);
+	rgb_screen.set_vblank_time(0);
 
 	// sound hardware
 	coco_sound(config);
@@ -325,32 +326,32 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	coco_floating(config);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list","COCO3")
+	SOFTWARE_LIST(config, "cart_list").set_original("coco_cart").set_filter("COCO3");
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","coco_flop")
-	MCFG_SOFTWARE_LIST_FILTER("flop_list","COCO3")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("coco_flop").set_filter("COCO3");
+}
 
-MACHINE_CONFIG_START(coco3_state::coco3p)
+void coco3_state::coco3p(machine_config &config)
+{
 	coco3(config);
-	MCFG_DEVICE_MODIFY(":")
-	MCFG_DEVICE_CLOCK(XTAL(28'475'000) / 32)
+	this->set_clock(XTAL(28'475'000) / 32);
 
 	// An additional 4.433618 MHz XTAL is required for PAL color encoding
-	MCFG_DEVICE_REPLACE(GIME_TAG, GIME_PAL, XTAL(28'475'000), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG)
-	MCFG_GIME_HSYNC_CALLBACK(WRITELINE(PIA0_TAG, pia6821_device, ca1_w))
-	MCFG_GIME_FSYNC_CALLBACK(WRITELINE(PIA0_TAG, pia6821_device, cb1_w))
-	MCFG_GIME_IRQ_CALLBACK(WRITELINE(*this, coco3_state, gime_irq_w))
-	MCFG_GIME_FIRQ_CALLBACK(WRITELINE(*this, coco3_state, gime_firq_w))
-	MCFG_GIME_FLOATING_BUS_CALLBACK(READ8(*this, coco_state, floating_bus_r))
-MACHINE_CONFIG_END
+	GIME_PAL(config.replace(), m_gime, XTAL(28'475'000), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG);
+	m_gime->set_screen(COMPOSITE_SCREEN_TAG);
+	m_gime->hsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::ca1_w));
+	m_gime->fsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::cb1_w));
+	m_gime->irq_wr_callback().set(FUNC(coco3_state::gime_irq_w));
+	m_gime->firq_wr_callback().set(FUNC(coco3_state::gime_firq_w));
+	m_gime->floating_bus_rd_callback().set(FUNC(coco3_state::floating_bus_r));
+}
 
-MACHINE_CONFIG_START(coco3_state::coco3h)
+void coco3_state::coco3h(machine_config &config)
+{
 	coco3(config);
-	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
-	MCFG_DEVICE_PROGRAM_MAP(coco3_mem)
-MACHINE_CONFIG_END
+	HD6309E(config.replace(), m_maincpu, DERIVED_CLOCK(1, 1));
+	m_maincpu->set_addrmap(AS_PROGRAM, &coco3_state::coco3_mem);
+}
 
 void coco3_state::coco3dw1(machine_config &config)
 {

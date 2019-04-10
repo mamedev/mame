@@ -14,10 +14,6 @@
 #pragma once
 
 
-#define MCFG_SAM6883_RES_CALLBACK(_read) \
-	downcast<sam6883_device &>(*device).set_res_rd_callback(DEVCB_##_read);
-
-
 //**************************************************************************
 //  SAM6883 CORE
 //**************************************************************************
@@ -94,7 +90,7 @@ public:
 
 	sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_res_rd_callback(Object &&cb) { return m_read_res.set_callback(std::forward<Object>(cb)); }
+	auto res_rd_callback() { return m_read_res.bind(); }
 
 	// called to configure banks
 	void configure_bank(int bank, uint8_t *memory, uint32_t memory_size, bool is_read_only);

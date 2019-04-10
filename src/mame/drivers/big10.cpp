@@ -228,12 +228,12 @@ INPUT_PORTS_END
 *           Machine Driver            *
 **************************************/
 
-MACHINE_CONFIG_START(big10_state::big10)
-
+void big10_state::big10(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* guess */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_io)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);    /* guess */
+	m_maincpu->set_addrmap(AS_PROGRAM, &big10_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &big10_state::main_io);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -246,14 +246,14 @@ MACHINE_CONFIG_START(big10_state::big10)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/12)    /* guess */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, big10_state, mux_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ym2149_device &aysnd(YM2149(config, "aysnd", MASTER_CLOCK/12));    /* guess */
+	aysnd.port_a_read_callback().set_ioport("DSW2");
+	aysnd.port_b_read_callback().set_ioport("DSW1");
+	aysnd.port_a_write_callback().set(FUNC(big10_state::mux_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
-MACHINE_CONFIG_END
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW);
+}
 
 
 /**************************************

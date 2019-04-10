@@ -33,13 +33,12 @@ DEFINE_DEVICE_TYPE(NAMCO_C117, namco_c117_device, "namco_c117", "Namco C117 MMU"
 //  namco_c117_device - constructor
 //-------------------------------------------------
 
-namco_c117_device::namco_c117_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_C117, tag, owner, clock),
+namco_c117_device::namco_c117_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NAMCO_C117, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_subres_cb(*this),
 	m_program_config("program", ENDIANNESS_BIG, 8, 23),
-	m_maincpu_tag(nullptr),
-	m_subcpu_tag(nullptr),
+	m_cpuexec{ { *this, finder_base::DUMMY_TAG }, { *this, finder_base::DUMMY_TAG } },
 	m_watchdog(*this, "watchdog")
 {
 }
@@ -61,13 +60,8 @@ void namco_c117_device::device_start()
 
 	m_program = &space(AS_PROGRAM);
 
-	cpu_device *maincpu = siblingdevice<cpu_device>(m_maincpu_tag);
-	cpu_device *subcpu = siblingdevice<cpu_device>(m_subcpu_tag);
-
-	m_cpuexec[0] = maincpu;
-	m_cpuexec[1] = subcpu;
-	m_cpucache[0] = maincpu->space(AS_PROGRAM).cache<0, 0, ENDIANNESS_BIG>();
-	m_cpucache[1] = subcpu->space(AS_PROGRAM).cache<0, 0, ENDIANNESS_BIG>();
+	m_cpucache[0] = m_cpuexec[0]->space(AS_PROGRAM).cache<0, 0, ENDIANNESS_BIG>();
+	m_cpucache[1] = m_cpuexec[1]->space(AS_PROGRAM).cache<0, 0, ENDIANNESS_BIG>();
 
 	memset(&m_offsets, 0, sizeof(m_offsets));
 	m_subres = m_wdog = 0;
@@ -198,7 +192,7 @@ void namco_c117_device::register_w(int whichcpu, offs_t offset, uint8_t data)
 			unknown_reg = true;
 	}
 	if (unknown_reg)
-		logerror("'%s' writing to unknown CUS117 register %04X = %02X\n", (whichcpu ? m_subcpu_tag : m_maincpu_tag), offset, data);
+		logerror("'%s' writing to unknown CUS117 register %04X = %02X\n", m_cpuexec[whichcpu].finder_tag(), offset, data);
 }
 
 void namco_c117_device::bankswitch(int whichcpu, int whichbank, int a0, uint8_t data)

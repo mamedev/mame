@@ -5,7 +5,6 @@
 
 #pragma once
 
-
 #include "machine/taitocchip.h"
 #include "machine/taitoio.h"
 
@@ -17,7 +16,7 @@
 #include "video/tc0480scp.h"
 #include "machine/timer.h"
 #include "emupal.h"
-
+#include "screen.h"
 
 class taitof2_state : public driver_device
 {
@@ -42,6 +41,7 @@ public:
 		, m_tc0220ioc(*this, "tc0220ioc")
 		, m_tc0510nio(*this, "tc0510nio")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 	{ }
 
@@ -142,6 +142,7 @@ protected:
 	uint8_t           m_spriteblendmode; // todo - move into taitoic.c
 
 	int             m_prepare_sprites;
+	uint8_t         m_gfxbank;
 
 	/* misc */
 	int32_t           m_mjnquest_input;
@@ -168,6 +169,7 @@ protected:
 	optional_device<tc0220ioc_device> m_tc0220ioc;
 	optional_device<tc0510nio_device> m_tc0510nio;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE8_MEMBER(coin_nibble_w);
@@ -185,6 +187,8 @@ protected:
 	DECLARE_WRITE16_MEMBER(taitof2_spritebank_w);
 	DECLARE_WRITE16_MEMBER(koshien_spritebank_w);
 	DECLARE_WRITE8_MEMBER(cameltrya_porta_w);
+	void mjnquest_gfxbank_w(u8 data);
+	TC0100SCN_CB_MEMBER(mjnquest_tmap_cb);
 
 	DECLARE_MACHINE_START(f2);
 	DECLARE_VIDEO_START(taitof2_default);

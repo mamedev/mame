@@ -16,7 +16,6 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
-#include "imagedev/flopdrv.h"
 #include "formats/pk8020_dsk.h"
 #include "machine/ram.h"
 #include "screen.h"
@@ -190,26 +189,26 @@ static void pk8020_floppies(device_slot_interface &device)
  * 7    floppy
  */
 /* Machine driver */
-MACHINE_CONFIG_START(pk8020_state::pk8020)
+void pk8020_state::pk8020(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 20_MHz_XTAL / 8)
-	MCFG_DEVICE_PROGRAM_MAP(pk8020_mem)
-	MCFG_DEVICE_IO_MAP(pk8020_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pk8020_state,  pk8020_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	I8080(config, m_maincpu, 20_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pk8020_state::pk8020_mem);
+	m_maincpu->set_addrmap(AS_IO, &pk8020_state::pk8020_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pk8020_state::pk8020_interrupt));
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pk8020_state, screen_update_pk8020)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(pk8020_state::screen_update_pk8020));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pk8020)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(pk8020_state, pk8020)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pk8020);
+	PALETTE(config, m_palette, FUNC(pk8020_state::pk8020_palette), 16);
 
 	I8255(config, m_ppi8255_1);
 	m_ppi8255_1->in_pa_callback().set(FUNC(pk8020_state::pk8020_porta_r));
@@ -222,21 +221,21 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 
 	I8255(config, m_ppi8255_3);
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(20_MHz_XTAL / 10)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, pk8020_state,pk8020_pit_out0))
-	MCFG_PIT8253_CLK1(20_MHz_XTAL / 10)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, pk8020_state,pk8020_pit_out1))
-	MCFG_PIT8253_CLK2((20_MHz_XTAL / 8) / 164)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pic8259", pic8259_device, ir5_w))
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(20_MHz_XTAL / 10);
+	m_pit8253->out_handler<0>().set(FUNC(pk8020_state::pk8020_pit_out0));
+	m_pit8253->set_clk<1>(20_MHz_XTAL / 10);
+	m_pit8253->out_handler<1>().set(FUNC(pk8020_state::pk8020_pit_out1));
+	m_pit8253->set_clk<2>((20_MHz_XTAL / 8) / 164);
+	m_pit8253->out_handler<2>().set(m_pic8259, FUNC(pic8259_device::ir5_w));
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	I8251(config, m_rs232, 0);
 	m_rs232->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_rs232->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir1_w));
-	m_rs232->txrdy_handler().set("pic8259", FUNC(pic8259_device::ir2_w));
+	m_rs232->rxrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir1_w));
+	m_rs232->txrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir2_w));
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_rs232, FUNC(i8251_device::write_rxd));
@@ -248,24 +247,23 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	FD1793(config, m_wd1793, 20_MHz_XTAL / 20);
 	m_wd1793->intrq_wr_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", pk8020_floppies, "qd", pk8020_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", pk8020_floppies, "qd", pk8020_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1793:2", pk8020_floppies, "qd", pk8020_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1793:3", pk8020_floppies, "qd", pk8020_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "wd1793:0", pk8020_floppies, "qd", pk8020_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1793:1", pk8020_floppies, "qd", pk8020_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1793:2", pk8020_floppies, "qd", pk8020_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1793:3", pk8020_floppies, "qd", pk8020_state::floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "korvet_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("korvet_flop");
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	CASSETTE(config, "cassette").set_default_state(CASSETTE_PLAY);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("258K").set_default_value(0x00); // 64 + 4*48 + 2 = 258
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 

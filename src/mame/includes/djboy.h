@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "video/kan_pand.h"
@@ -76,7 +77,7 @@ private:
 	required_device<cpu_device> m_mastercpu;
 	required_device<cpu_device> m_slavecpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<cpu_device> m_beast;
+	required_device<i80c51_device> m_beast;
 	required_device<kaneko_pandora_device> m_pandora;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

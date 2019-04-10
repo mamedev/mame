@@ -116,36 +116,36 @@ void jedi_state::audio_map(address_map &map)
  *
  *************************************/
 
-MACHINE_CONFIG_START(jedi_state::jedi_audio)
-
-	MCFG_DEVICE_ADD("audiocpu", M6502, JEDI_AUDIO_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+void jedi_state::jedi_audio(machine_config &config)
+{
+	M6502(config, m_audiocpu, JEDI_AUDIO_CPU_CLOCK);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &jedi_state::audio_map);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, JEDI_POKEY_CLOCK)
-	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	pokey_device &pokey1(POKEY(config, "pokey1", JEDI_POKEY_CLOCK));
+	pokey1.set_output_opamp(RES_K(1), 0.0, 5.0);
+	pokey1.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
+	pokey1.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, JEDI_POKEY_CLOCK)
-	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	pokey_device &pokey2(POKEY(config, "pokey2", JEDI_POKEY_CLOCK));
+	pokey2.set_output_opamp(RES_K(1), 0.0, 5.0);
+	pokey2.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
+	pokey2.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
 
-	MCFG_DEVICE_ADD("pokey3", POKEY, JEDI_POKEY_CLOCK)
-	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	pokey_device &pokey3(POKEY(config, "pokey3", JEDI_POKEY_CLOCK));
+	pokey3.set_output_opamp(RES_K(1), 0.0, 5.0);
+	pokey3.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
 
-	MCFG_DEVICE_ADD("pokey4", POKEY, JEDI_POKEY_CLOCK)
-	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	pokey_device &pokey4(POKEY(config, "pokey4", JEDI_POKEY_CLOCK));
+	pokey4.set_output_opamp(RES_K(1), 0.0, 5.0);
+	pokey4.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
 
-	MCFG_DEVICE_ADD("tms", TMS5220, JEDI_TMS5220_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	TMS5220(config, m_tms, JEDI_TMS5220_CLOCK);
+	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch") // 5E (LS374) + 3E (LS279) pins 13-15
-	MCFG_GENERIC_LATCH_8_ADD("sacklatch") // 4E (LS374) + 3E (LS279) pins 1-4
-MACHINE_CONFIG_END
+	GENERIC_LATCH_8(config, m_soundlatch); // 5E (LS374) + 3E (LS279) pins 13-15
+	GENERIC_LATCH_8(config, m_sacklatch); // 4E (LS374) + 3E (LS279) pins 1-4
+}

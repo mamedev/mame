@@ -30,8 +30,8 @@ DEFINE_DEVICE_TYPE(CG_EXP_SLOT, cg_exp_slot_device, "cg_exp_slot", "Colour Genie
 cg_exp_slot_device::cg_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CG_EXP_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
-	m_program(nullptr),
-	m_io(nullptr),
+	m_program(*this, finder_base::DUMMY_TAG, -1),
+	m_io(*this, finder_base::DUMMY_TAG, -1),
 	m_cart(nullptr),
 	m_int_handler(*this),
 	m_nmi_handler(*this),
@@ -65,24 +65,6 @@ void cg_exp_slot_device::device_start()
 
 void cg_exp_slot_device::device_reset()
 {
-}
-
-//-------------------------------------------------
-//  set_program_space - set address space we are attached to
-//-------------------------------------------------
-
-void cg_exp_slot_device::set_program_space(address_space *program)
-{
-	m_program = program;
-}
-
-//-------------------------------------------------
-//  set_io_space - set address space we are attached to
-//-------------------------------------------------
-
-void cg_exp_slot_device::set_io_space(address_space *io)
-{
-	m_io = io;
 }
 
 

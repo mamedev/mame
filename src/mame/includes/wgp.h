@@ -5,6 +5,10 @@
     World Grand Prix
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_WGP_H
+#define MAME_INCLUDES_WGP_H
+
+#pragma once
 
 #include "audio/taitosnd.h"
 #include "machine/taitoio.h"
@@ -15,8 +19,8 @@
 class wgp_state : public driver_device
 {
 public:
-	wgp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	wgp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spritemap(*this, "spritemap"),
 		m_spriteram(*this, "spriteram"),
 		m_pivram(*this, "pivram"),
@@ -41,7 +45,7 @@ public:
 	void init_wgp();
 	void init_wgp2();
 
-private:
+protected:
 	enum
 	{
 		TIMER_INTERRUPT4,
@@ -49,6 +53,12 @@ private:
 		TIMER_CPUB_INTERRUPT6
 	};
 
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
 	DECLARE_WRITE8_MEMBER(coins_w);
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_READ16_MEMBER(lan_status_r);
@@ -66,11 +76,6 @@ private:
 	void cpu2_map(address_map &map);
 	void main_map(address_map &map);
 	void z80_sound_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	TILE_GET_INFO_MEMBER(get_piv0_tile_info);
 	TILE_GET_INFO_MEMBER(get_piv1_tile_info);
@@ -120,3 +125,5 @@ private:
 	optional_ioport m_unknown;
 	optional_ioport m_fake;
 };
+
+#endif // MAME_INCLUDES_WGP_H

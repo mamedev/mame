@@ -64,7 +64,7 @@ WRITE16_MEMBER(cbuster_state::twocrude_control_w)
 		return;
 
 	case 2: /* Sound CPU write */
-		m_soundlatch->write(space, 0, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 		return;
 
 	case 4: /* Protection, maybe this is a PAL on the board?
@@ -299,86 +299,80 @@ void cbuster_state::machine_reset()
 	m_pri = 0;
 }
 
-MACHINE_CONFIG_START(cbuster_state::twocrude)
-
+void cbuster_state::twocrude(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2) /* Custom chip 59 @ 12MHz Verified */
-	MCFG_DEVICE_PROGRAM_MAP(twocrude_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cbuster_state,  irq4_line_assert)/* VBL */
+	M68000(config, m_maincpu, XTAL(24'000'000)/2); /* Custom chip 59 @ 12MHz Verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cbuster_state::twocrude_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cbuster_state::irq4_line_assert)); /* VBL */
 
 	H6280(config, m_audiocpu, XTAL(24'000'000)/4); /* Custom chip 45, 6MHz Verified */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cbuster_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cbuster_state, screen_update_twocrude)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(cbuster_state::screen_update_twocrude));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cbuster)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XBGR)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_cbuster);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x20)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(cbuster_state, bank_callback)
-	MCFG_DECO16IC_BANK2_CB(cbuster_state, bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[0], 0);
+	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[0]->set_pf2_col_bank(0x20);
+	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(cbuster_state::bank_callback), this);
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(cbuster_state::bank_callback), this);
+	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
+	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x30)
-	MCFG_DECO16IC_PF2_COL_BANK(0x40)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(cbuster_state, bank_callback)
-	MCFG_DECO16IC_BANK2_CB(cbuster_state, bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(2)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[1], 0);
+	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf1_col_bank(0x30);
+	m_deco_tilegen[1]->set_pf2_col_bank(0x40);
+	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cbuster_state::bank_callback), this);
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cbuster_state::bank_callback), this);
+	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
+	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(3)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(3);
+	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	// YM2203_PITCH_HACK - Pitch is too low at 1.3425MHz (see also stfight.cpp)
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000)/24 * 3) /* 1.3425MHz Verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	YM2203(config, "ym1", XTAL(32'220'000)/24 * 3).add_route(ALL_OUTPUTS, "mono", 0.60); /* 1.3425MHz Verified */
 
-	MCFG_DEVICE_ADD("ym2", YM2151, XTAL(32'220'000)/9) /* 3.58MHz Verified */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+	ym2151_device &ym2(YM2151(config, "ym2", XTAL(32'220'000)/9)); /* 3.58MHz Verified */
+	ym2.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.45);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH) /* 1.0068MHz Verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	OKIM6295(config, "oki1", XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.75); /* 1.0068MHz Verified */
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(32'220'000)/16, okim6295_device::PIN7_HIGH) /* 2.01375MHz Verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki2", XTAL(32'220'000)/16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60); /* 2.01375MHz Verified */
+}
 
 /******************************************************************************/
 

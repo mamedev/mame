@@ -496,7 +496,7 @@ ini_t* ini_create( void* memctx )
     }
 
 
-ini_t* ini_load( char const* data, void* memctx )
+ini_t* ini_load( char const* data, unsigned int len, void* memctx )
     {
     ini_t* ini;
     char const* ptr;
@@ -504,17 +504,19 @@ ini_t* ini_load( char const* data, void* memctx )
     char const* start;
     char const* start2;
     int l;
+    char const* end;
 
     ini = ini_create( memctx );
 
     ptr = data;
+    end = ptr + len;
     if( ptr )
         {
         s = 0;
-        while( *ptr )
+        while( ptr < end && *ptr )
             {
             /* trim leading whitespace */
-            while( *ptr && *ptr <=' ' )
+            while( ptr < end && *ptr && *ptr <=' ' )
                 ++ptr;
 
             /* done? */
@@ -544,17 +546,17 @@ ini_t* ini_load( char const* data, void* memctx )
             else
                 {
                 start = ptr;
-                while( *ptr && *ptr !='=' && *ptr != '\n' )
+                while( ptr < end && *ptr && *ptr !='=' && *ptr != '\n' )
                     ++ptr;
 
                 if( *ptr == '=' )
                     {
                     l = (int)( ptr - start);
                     ++ptr;
-                    while( *ptr && *ptr <= ' ' && *ptr != '\n' )
+                    while( ptr < end && *ptr && *ptr <= ' ' && *ptr != '\n' )
                         ptr++;
                     start2 = ptr;
-                    while( *ptr && *ptr != '\n' )
+                    while( ptr < end && *ptr && *ptr != '\n' )
                         ++ptr;
                     while( *(--ptr) <= ' ' )
                         (void)ptr;

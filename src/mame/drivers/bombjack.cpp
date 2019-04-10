@@ -110,9 +110,9 @@ READ8_MEMBER(bombjack_state::soundlatch_read_and_clear)
 {
 	// An extra flip-flop is used to clear the LS273 after reading it through a LS245
 	// (this flip-flop is then cleared in sync with the sound CPU clock)
-	uint8_t res = m_soundlatch->read(space, 0);
+	uint8_t res = m_soundlatch->read();
 	if (!machine().side_effects_disabled())
-		m_soundlatch->clear_w(space, 0, 0);
+		m_soundlatch->clear_w();
 	return res;
 }
 
@@ -349,17 +349,17 @@ WRITE_LINE_MEMBER(bombjack_state::vblank_irq)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(bombjack_state::bombjack)
-
+void bombjack_state::bombjack(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))     /* Confirmed from PCB */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	Z80(config, m_maincpu, XTAL(4'000'000));     /* Confirmed from PCB */
+	m_maincpu->set_addrmap(AS_PROGRAM, &bombjack_state::main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000)/4) /* Confirmed from PCB */
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
-	MCFG_DEVICE_IO_MAP(audio_io_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(12'000'000)/4)); /* Confirmed from PCB */
+	audiocpu.set_addrmap(AS_PROGRAM, &bombjack_state::audio_map);
+	audiocpu.set_addrmap(AS_IO, &bombjack_state::audio_io_map);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -372,23 +372,19 @@ MACHINE_CONFIG_START(bombjack_state::bombjack)
 	screen.screen_vblank().set(FUNC(bombjack_state::vblank_irq));
 	screen.screen_vblank().append_inputline("audiocpu", INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bombjack)
-	MCFG_PALETTE_ADD("palette", 128)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bombjack);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 128);
 
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8) /* Confirmed from PCB */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
+	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.13); /* Confirmed from PCB */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
+	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.13);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, XTAL(12'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
-MACHINE_CONFIG_END
+	AY8910(config, "ay3", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.13);
+}
 
 
 

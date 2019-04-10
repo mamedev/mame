@@ -45,7 +45,7 @@
 #include "emu.h"
 #include "cococart.h"
 #include "coco_fdc.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/msm6242.h"
 #include "machine/ds1315.h"
 #include "machine/wd_fdc.h"
@@ -178,6 +178,15 @@ void coco_family_fdc_device_base::device_reset()
 uint8_t* coco_family_fdc_device_base::get_cart_base()
 {
 	return memregion("eprom")->base();
+}
+
+//-------------------------------------------------
+//  coco_family_fdc_device_base::get_cart_memregion
+//-------------------------------------------------
+
+memory_region* coco_family_fdc_device_base::get_cart_memregion()
+{
+	return memregion("eprom");
 }
 
 
@@ -334,17 +343,17 @@ READ8_MEMBER(coco_fdc_device_base::scs_read)
 
 	case 0x38:  /* FF78 */
 		if (real_time_clock() == rtc_type::CLOUD9)
-			m_ds1315->read_0(space, offset);
+			m_ds1315->read_0();
 		break;
 
 	case 0x39:  /* FF79 */
 		if (real_time_clock() == rtc_type::CLOUD9)
-			m_ds1315->read_1(space, offset);
+			m_ds1315->read_1();
 		break;
 
 	case 0x3C:  /* FF7C */
 		if (real_time_clock() == rtc_type::CLOUD9)
-			result = m_ds1315->read_data(space, offset);
+			result = m_ds1315->read_data();
 		break;
 	}
 	return result;
@@ -399,7 +408,7 @@ WRITE8_MEMBER(coco_fdc_device_base::scs_write)
 
 ROM_START(coco_fdc)
 	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD_OPTIONAL("disk10.rom", 0x0000, 0x2000, CRC(b4f9968e) SHA1(04115be3f97952b9d9310b52f806d04f80b40d03))
+	ROM_LOAD("disk10.rom", 0x0000, 0x2000, CRC(b4f9968e) SHA1(04115be3f97952b9d9310b52f806d04f80b40d03))
 ROM_END
 
 namespace
@@ -433,7 +442,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(COCO_FDC, coco_family_fdc_device_base, coco_fdc_devic
 
 ROM_START(coco_fdc_v11)
 	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD_OPTIONAL("disk11.rom", 0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))
+	ROM_LOAD("disk11.rom", 0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))
 	ROM_RELOAD(0x2000, 0x2000)
 	ROM_RELOAD(0x4000, 0x2000)
 	ROM_RELOAD(0x6000, 0x2000)

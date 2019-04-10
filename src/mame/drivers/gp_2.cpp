@@ -582,7 +582,8 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(gp_2_state::gp_2)
+void gp_2_state::gp_2(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 2457600);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gp_2_state::gp_2_map);
@@ -605,8 +606,8 @@ MACHINE_CONFIG_START(gp_2_state::gp_2)
 
 	Z80CTC(config, m_ctc, 2457600);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0); // Todo: absence of ints will cause a watchdog reset
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("gp1", gp_2_state, zero_timer, attotime::from_hz(120)) // mains freq*2
-MACHINE_CONFIG_END
+	TIMER(config, "gp1").configure_periodic(FUNC(gp_2_state::zero_timer), attotime::from_hz(120)); // mains freq*2
+}
 
 /*-------------------------------------------------------------------
 / Agents 777 (November 1984) - Model #770

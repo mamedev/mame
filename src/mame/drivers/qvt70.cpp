@@ -32,10 +32,11 @@ void qvt70_state::mem_map(address_map &map)
 static INPUT_PORTS_START( qvt70 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(qvt70_state::qvt70)
-	MCFG_DEVICE_ADD("maincpu", Z80, 2'000'000)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-MACHINE_CONFIG_END
+void qvt70_state::qvt70(machine_config &config)
+{
+	Z80(config, m_maincpu, 2'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &qvt70_state::mem_map);
+}
 
 /**************************************************************************************************************
 

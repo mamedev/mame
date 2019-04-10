@@ -7,8 +7,6 @@
 
 #include "pccard.h"
 
-#define MCFG_RF5C296_SLOT(name) \
-	downcast<rf5c296_device &>(*device).set_pccard(name);
 
 class rf5c296_device : public device_t
 {

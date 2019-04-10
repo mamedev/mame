@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -166,8 +166,13 @@ public:
 		m_debug  = BGFX_DEBUG_NONE;
 		m_reset  = BGFX_RESET_VSYNC;
 
-		bgfx::init(args.m_type, args.m_pciId);
-		bgfx::reset(m_width, m_height, m_reset);
+		bgfx::Init init;
+		init.type     = args.m_type;
+		init.vendorId = args.m_pciId;
+		init.resolution.width  = m_width;
+		init.resolution.height = m_height;
+		init.resolution.reset  = m_reset;
+		bgfx::init(init);
 
 		// Enable debug text.
 		bgfx::setDebug(m_debug);
@@ -306,13 +311,16 @@ public:
 				}
 
 				ImGui::SetNextWindowPos(
-					ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f)
-					, ImGuiSetCond_FirstUseEver
+					  ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f)
+					, ImGuiCond_FirstUseEver
+					);
+				ImGui::SetNextWindowSize(
+					  ImVec2(m_width / 5.0f, m_height / 3.0f)
+					, ImGuiCond_FirstUseEver
 					);
 				ImGui::Begin("Settings"
 					, NULL
-					, ImVec2(m_width / 5.0f, m_height / 3.0f)
-					, ImGuiWindowFlags_AlwaysAutoResize
+					, 0
 					);
 
 				ImGui::Separator();
@@ -338,13 +346,13 @@ public:
 				const double freq = double(bx::getHPFrequency() );
 				float time = (float)( (now-m_timeOffset)/freq);
 
-				// Reference:
-				// Weighted, Blended Order-Independent Transparency
-				// http://jcgt.org/published/0002/02/09/
-				// http://casual-effects.blogspot.com/2014/03/weighted-blended-order-independent.html
-
-				float at[3] = { 0.0f, 0.0f, 0.0f };
-				float eye[3] = { 0.0f, 0.0f, -7.0f };
+				// Reference(s):
+				// - Weighted, Blended Order-Independent Transparency
+				//   https://web.archive.org/save/http://jcgt.org/published/0002/02/09/
+				//   https://web.archive.org/web/20181126040455/http://casual-effects.blogspot.com/2014/03/weighted-blended-order-independent.html
+				//
+				const bx::Vec3 at  = { 0.0f, 0.0f,  0.0f };
+				const bx::Vec3 eye = { 0.0f, 0.0f, -7.0f };
 
 				float view[16];
 				float proj[16];
@@ -399,7 +407,7 @@ public:
 							if (m_fadeInOut
 							&&  zz == 1)
 							{
-								color[3] = bx::fsin(time*3.0f)*0.49f+0.5f;
+								color[3] = bx::sin(time*3.0f)*0.49f+0.5f;
 							}
 
 							bgfx::setUniform(u_color, color);
@@ -421,16 +429,16 @@ public:
 
 							const uint64_t state = 0
 								| BGFX_STATE_CULL_CW
-								| BGFX_STATE_RGB_WRITE
-								| BGFX_STATE_ALPHA_WRITE
+								| BGFX_STATE_WRITE_RGB
+								| BGFX_STATE_WRITE_A
 								| BGFX_STATE_DEPTH_TEST_LESS
 								| BGFX_STATE_MSAA
 								;
 
 							const uint64_t stateNoDepth = 0
 								| BGFX_STATE_CULL_CW
-								| BGFX_STATE_RGB_WRITE
-								| BGFX_STATE_ALPHA_WRITE
+								| BGFX_STATE_WRITE_RGB
+								| BGFX_STATE_WRITE_A
 								| BGFX_STATE_DEPTH_TEST_ALWAYS
 								| BGFX_STATE_MSAA
 								;
@@ -483,7 +491,7 @@ public:
 					bgfx::setTexture(0, s_texColor0, m_fbtextures[0]);
 					bgfx::setTexture(1, s_texColor1, m_fbtextures[1]);
 					bgfx::setState(0
-						| BGFX_STATE_RGB_WRITE
+						| BGFX_STATE_WRITE_RGB
 						| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_INV_SRC_ALPHA, BGFX_STATE_BLEND_SRC_ALPHA)
 						);
 					screenSpaceQuad( (float)m_width, (float)m_height, s_flipV);

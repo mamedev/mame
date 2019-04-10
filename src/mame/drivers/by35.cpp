@@ -644,7 +644,7 @@ WRITE_LINE_MEMBER( as2888_state::u11_cb2_as2888_w )
 	{
 		m_snd_sustain_timer->adjust(attotime::from_msec(5));
 
-		m_discrete->write(machine().dummy_space(), NODE_08, 11);  // 11 volt pulse
+		m_discrete->write(NODE_08, 11);  // 11 volt pulse
 	}
 
 	u11_cb2_w(state);
@@ -898,7 +898,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::u11_timer )
     -+                          +---+
 */
 
-	m_display_refresh_timer->adjust(attotime::from_msec(2.85));
+	m_display_refresh_timer->adjust(attotime::from_usec(2850));
 
 	m_u11_ca1 = true;
 	m_pia_u11->ca1_w(m_u11_ca1);
@@ -919,8 +919,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( as2888_state::timer_s )
 		m_snd_tone_gen = m_snd_sel;
 		m_snd_div++;
 
-		m_discrete->write(machine().dummy_space(), NODE_04, BIT(m_snd_div, 2) * 1);
-		m_discrete->write(machine().dummy_space(), NODE_01, BIT(m_snd_div, 0) * 1);
+		m_discrete->write(NODE_04, BIT(m_snd_div, 2) * 1);
+		m_discrete->write(NODE_01, BIT(m_snd_div, 0) * 1);
 
 		if (m_snd_sel == 0x01) LOG("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);
 	}
@@ -939,7 +939,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( as2888_state::timer_as2888 )
 		LOG("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);
 	}
 
-	m_discrete->write(machine().dummy_space(), NODE_08, 0);
+	m_discrete->write(NODE_08, 0);
 	m_snd_sustain_timer->adjust(attotime::never);
 
 	LOG("Sustain off\n");
@@ -1092,10 +1092,11 @@ DISCRETE_SOUND_END
 
 
 
-MACHINE_CONFIG_START(by35_state::by35)
+void by35_state::by35(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 530000) // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
-	MCFG_DEVICE_PROGRAM_MAP(by35_map)
+	M6800(config, m_maincpu, 530000); // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &by35_state::by35_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // 'F' filled causes Credit Display to be blank on first startup
 
@@ -1117,8 +1118,8 @@ MACHINE_CONFIG_START(by35_state::by35)
 	m_pia_u10->cb2_handler().set(FUNC(by35_state::u10_cb2_w));
 	m_pia_u10->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia_u10->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_z_freq", by35_state, timer_z_freq, attotime::from_hz(100)) // Mains Line Frequency * 2
-	MCFG_TIMER_DRIVER_ADD(m_zero_crossing_active_timer, by35_state, timer_z_pulse)  // Active pulse length from Zero Crossing detector
+	TIMER(config, "timer_z_freq").configure_periodic(FUNC(by35_state::timer_z_freq), attotime::from_hz(100)); // Mains Line Frequency * 2
+	TIMER(config, m_zero_crossing_active_timer).configure_generic(FUNC(by35_state::timer_z_pulse));  // Active pulse length from Zero Crossing detector
 
 	PIA6821(config, m_pia_u11, 0);
 	m_pia_u11->readpa_handler().set(FUNC(by35_state::u11_a_r));
@@ -1130,36 +1131,37 @@ MACHINE_CONFIG_START(by35_state::by35)
 	m_pia_u11->cb2_handler().set(FUNC(by35_state::u11_cb2_w));
 	m_pia_u11->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia_u11->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d_freq", by35_state, u11_timer, attotime::from_hz(317)) // 555 timer
-	MCFG_TIMER_DRIVER_ADD(m_display_refresh_timer, by35_state, timer_d_pulse)   // 555 Active pulse length
-MACHINE_CONFIG_END
+	TIMER(config, "timer_d_freq").configure_periodic(FUNC(by35_state::u11_timer), attotime::from_hz(317)); // 555 timer
+	TIMER(config, m_display_refresh_timer).configure_generic(FUNC(by35_state::timer_d_pulse));   // 555 Active pulse length
+}
 
-MACHINE_CONFIG_START(as2888_state::as2888_audio)
+void as2888_state::as2888_audio(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("discrete", DISCRETE, as2888_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	DISCRETE(config, m_discrete, as2888_discrete).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	m_pia_u11->writepb_handler().set(FUNC(as2888_state::u11_b_as2888_w));
 	m_pia_u11->cb2_handler().set(FUNC(as2888_state::u11_cb2_as2888_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s_freq", as2888_state, timer_s, attotime::from_hz(353000))     // Inverter clock on AS-2888 sound board
-	MCFG_TIMER_DRIVER_ADD(m_snd_sustain_timer, as2888_state, timer_as2888)
-MACHINE_CONFIG_END
+	TIMER(config, "timer_s_freq").configure_periodic(FUNC(as2888_state::timer_s), attotime::from_hz(353000));     // Inverter clock on AS-2888 sound board
+	TIMER(config, m_snd_sustain_timer).configure_generic(FUNC(as2888_state::timer_as2888));
+}
 
 
-MACHINE_CONFIG_START(as2888_state::as2888)
+void as2888_state::as2888(machine_config &config)
+{
 	by35(config);
 	as2888_audio(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(by35_state::nuovo)
+void by35_state::nuovo(machine_config &config)
+{
 	by35(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", M6802, 2000000) // ? MHz ?  Large crystal next to CPU, schematics don't indicate speed.
-	MCFG_DEVICE_PROGRAM_MAP(nuovo_map)
-
-MACHINE_CONFIG_END
+	M6802(config.replace(), m_maincpu, 2000000); // ? MHz ?  Large crystal next to CPU, schematics don't indicate speed.
+	m_maincpu->set_addrmap(AS_PROGRAM, &by35_state::nuovo_map);
+}
 
 
 
@@ -2300,7 +2302,7 @@ ROM_START(toppin)
 	ROM_RELOAD(0x28000, 0x8000)
 	ROM_LOAD("snd_u10.bin",0x10000,0x8000, CRC(bca9a805) SHA1(0deb3172b5c8fc91c4b02b21b1e3794ed7adef13))
 	ROM_RELOAD(0x30000, 0x8000)
-	ROM_LOAD("snd_u11.bin",0x18000,0x8000, BAD_DUMP CRC(1814a50d) SHA1(6fe22e774fa90725d0db9f1020bad88bae0ef85c))
+	ROM_LOAD("snd_u11.bin",0x18000,0x8000, CRC(513d06a9) SHA1(3785398649fde5579b5a0461b52360ef83d71323))
 	ROM_RELOAD(0x38000, 0x8000)
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_COPY("sound1", 0x0000, 0x8000,0x8000)

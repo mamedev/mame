@@ -140,35 +140,33 @@ static GFXDECODE_START( gfx_ssrj )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x10 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(ssrj_state::ssrj)
-
+void ssrj_state::ssrj(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,8000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(ssrj_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ssrj_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 8000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssrj_state::ssrj_map);
+	m_maincpu->set_vblank_int("screen", FUNC(ssrj_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 1*8, 31*8-1) // unknown res
-	MCFG_SCREEN_UPDATE_DRIVER(ssrj_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ssrj_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 34*8-1, 1*8, 31*8-1); // unknown res
+	screen.set_screen_update(FUNC(ssrj_state::screen_update));
+	screen.screen_vblank().set(FUNC(ssrj_state::screen_vblank));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ssrj)
-	MCFG_PALETTE_ADD("palette", 128)
-	MCFG_PALETTE_INIT_OWNER(ssrj_state, ssrj)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ssrj);
+	PALETTE(config, m_palette, FUNC(ssrj_state::ssrj_palette), 128);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/5)
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN3"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", 8000000/5));
+	aysnd.port_b_read_callback().set_ioport("IN3");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 /***************************************************************************
 

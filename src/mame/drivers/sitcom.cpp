@@ -87,7 +87,7 @@ protected:
 	virtual void machine_reset() override;
 
 	required_ioport                          m_buttons;
-	required_device<cpu_device>              m_maincpu;
+	required_device<i8085a_cpu_device>       m_maincpu;
 	required_device<address_map_bank_device> m_bank;
 	output_finder<15>                        m_digits;
 	output_finder<2, 8>                      m_leds;
@@ -347,18 +347,18 @@ void sitcom_timer_state::update_dac(uint8_t value)
 }
 
 
-MACHINE_CONFIG_START(sitcom_state::sitcom)
+void sitcom_state::sitcom(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL) // 3.072MHz can be used for an old slow 8085
-	MCFG_DEVICE_PROGRAM_MAP(sitcom_mem)
-	MCFG_DEVICE_IO_MAP(sitcom_io)
-	MCFG_I8085A_SID(READLINE(*this, sitcom_state, sid_line))
-	MCFG_I8085A_SOD(WRITELINE(*this, sitcom_state, sod_led))
+	I8085A(config, m_maincpu, 6.144_MHz_XTAL); // 3.072MHz can be used for an old slow 8085
+	m_maincpu->set_addrmap(AS_PROGRAM, &sitcom_state::sitcom_mem);
+	m_maincpu->set_addrmap(AS_IO, &sitcom_state::sitcom_io);
+	m_maincpu->in_sid_func().set(FUNC(sitcom_state::sid_line));
+	m_maincpu->out_sod_func().set(FUNC(sitcom_state::sod_led));
 
 	ADDRESS_MAP_BANK(config, "bank").set_map(&sitcom_state::sitcom_bank).set_options(ENDIANNESS_LITTLE, 8, 16, 0x8000);
 
-	MCFG_CLOCK_ADD("100hz", 100)
-	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", I8085_RST75_LINE))
+	CLOCK(config, "100hz", 100).signal_handler().set_inputline("maincpu", I8085_RST75_LINE);
 
 	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(sitcom_state::update_ppi_pa));
@@ -366,28 +366,23 @@ MACHINE_CONFIG_START(sitcom_state::sitcom)
 	ppi.in_pc_callback().set_ioport("PORTC");
 
 	// video hardware
-	MCFG_DEVICE_ADD("ds0", DL1414T, u32(0)) // left display
-	MCFG_DL1414_UPDATE_HANDLER(WRITE16(*this, sitcom_state, update_ds<0>))
-	MCFG_DEVICE_ADD("ds1", DL1414T, u32(0)) // right display
-	MCFG_DL1414_UPDATE_HANDLER(WRITE16(*this, sitcom_state, update_ds<1>))
+	DL1414T(config, "ds0", u32(0)).update().set(FUNC(sitcom_state::update_ds<0>)); // left display
+	DL1414T(config, "ds1", u32(0)).update().set(FUNC(sitcom_state::update_ds<1>)); // right display
 
 	// host interface
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "null_modem"));
 	rs232.rxd_handler().set(FUNC(sitcom_state::update_rxd));
 
-	MCFG_SOFTWARE_LIST_ADD("bitb_list", "sitcom")
+	SOFTWARE_LIST(config, "bitb_list").set_original("sitcom");
 	config.set_default_layout(layout_sitcom);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(sitcom_timer_state::sitcomtmr)
+void sitcom_timer_state::sitcomtmr(machine_config &config)
+{
 	sitcom(config);
-
-	MCFG_DEVICE_ADD("ds2", DL1414T, u32(0)) // remote display
-	MCFG_DL1414_UPDATE_HANDLER(WRITE16(*this, sitcom_timer_state, update_ds<2>))
-
+	DL1414T(config, m_ds2, u32(0)).update().set(FUNC(sitcom_timer_state::update_ds<2>)); // remote display
 	config.set_default_layout(layout_sitcomtmr);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( sitcom )

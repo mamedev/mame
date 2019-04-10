@@ -81,14 +81,14 @@ public:
 	auto dma_callback() { return m_write_dma.bind(); }
 
 	// computer interface
-	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2);
-	void cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2);
+	uint8_t cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2);
+	void cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2);
 	int game_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
 	int exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
 
 	// cartridge interface
-	DECLARE_READ8_MEMBER( dma_cd_r ) { return m_read_dma_cd(offset); }
-	DECLARE_WRITE8_MEMBER( dma_cd_w ) { m_write_dma_cd(offset, data); }
+	uint8_t dma_cd_r(offs_t offset) { return m_read_dma_cd(offset); }
+	void dma_cd_w(offs_t offset, uint8_t data) { m_write_dma_cd(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
 	DECLARE_WRITE_LINE_MEMBER( dma_w ) { m_write_dma(state); }
@@ -145,8 +145,8 @@ public:
 	// construction/destruction
 	virtual ~device_c64_expansion_card_interface();
 
-	virtual uint8_t c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) { return data; };
-	virtual void c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) { };
+	virtual uint8_t c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) { return data; };
+	virtual void c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) { };
 	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw) { return m_game; }
 	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw) { return m_exrom; }
 

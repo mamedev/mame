@@ -5,6 +5,10 @@
     Rock'n Rage
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ROCKRAGE_H
+#define MAME_INCLUDES_ROCKRAGE_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/vlm5030.h"
@@ -15,8 +19,8 @@
 class rockrage_state : public driver_device
 {
 public:
-	rockrage_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	rockrage_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k007342(*this, "k007342"),
@@ -25,7 +29,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_rombank(*this, "rombank") { }
+		m_rombank(*this, "rombank")
+	{ }
 
 	void rockrage(machine_config &config);
 
@@ -53,7 +58,7 @@ private:
 	DECLARE_WRITE8_MEMBER(rockrage_speech_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(rockrage);
+	void rockrage_palette(palette_device &palette) const;
 	uint32_t screen_update_rockrage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	K007342_CALLBACK_MEMBER(rockrage_tile_callback);
@@ -63,3 +68,5 @@ private:
 	void rockrage_sound_map(address_map &map);
 	void rockrage_vlm_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_ROCKRAGE_H

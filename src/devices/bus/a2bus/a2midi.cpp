@@ -32,7 +32,8 @@ DEFINE_DEVICE_TYPE(A2BUS_MIDI, a2bus_midi_device, "a2midi", "6850 MIDI card")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_midi_device::device_add_mconfig)
+void a2bus_midi_device::device_add_mconfig(machine_config &config)
+{
 	PTM6840(config, m_ptm, 1021800);
 	m_ptm->set_external_clocks(1021800.0f, 1021800.0f, 1021800.0f);
 	m_ptm->irq_callback().set(FUNC(a2bus_midi_device::ptm_irq_w));
@@ -41,14 +42,13 @@ MACHINE_CONFIG_START(a2bus_midi_device::device_add_mconfig)
 	m_acia->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_acia->irq_handler().set(FUNC(a2bus_midi_device::acia_irq_w));
 
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(MIDI_ACIA_TAG, acia6850_device, write_rxd))
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
 
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, a2bus_midi_device, write_acia_clock))
-MACHINE_CONFIG_END
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16));
+	acia_clock.signal_handler().set(FUNC(a2bus_midi_device::write_acia_clock));
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -91,11 +91,11 @@ uint8_t a2bus_midi_device::read_c0nx(uint8_t offset)
 
 	if (offset < 8)
 	{
-		return m_ptm->read(machine().dummy_space(), offset & 7);
+		return m_ptm->read(offset & 7);
 	}
 	else if (offset == 8 || offset == 9)
 	{
-		return m_acia->read(machine().dummy_space(), offset & 1);
+		return m_acia->read(offset & 1);
 	}
 
 	return 0;
@@ -109,11 +109,11 @@ void a2bus_midi_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	if (offset < 8)
 	{
-		m_ptm->write(machine().dummy_space(), offset & 7, data);
+		m_ptm->write(offset & 7, data);
 	}
 	else if (offset == 8 || offset == 9)
 	{
-		m_acia->write(machine().dummy_space(), offset & 1, data);
+		m_acia->write(offset & 1, data);
 	}
 }
 

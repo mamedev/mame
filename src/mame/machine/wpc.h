@@ -74,32 +74,6 @@
 #define WPC_WATCHDOG      (0x4f) /* xxxxxx W: Watchdog */
 
 
-#define MCFG_WMS_WPC_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, WPCASIC, 0);
-
-#define MCFG_WPC_IRQ_ACKNOWLEDGE(_irq) \
-	downcast<wpc_device *>(device)->set_irq_callback(DEVCB_##_irq);
-
-#define MCFG_WPC_FIRQ_ACKNOWLEDGE(_firq) \
-	downcast<wpc_device *>(device)->set_firq_callback(DEVCB_##_firq);
-
-#define MCFG_WPC_SOUND_DATA(_sounddata_r,_sounddata_w) \
-	downcast<wpc_device *>(device)->set_sound_data_read(DEVCB_##_sounddata_r); \
-	downcast<wpc_device *>(device)->set_sound_data_write(DEVCB_##_sounddata_w);
-
-#define MCFG_WPC_SOUND_CTRL(_soundctrl_r,_soundctrl_w) \
-	downcast<wpc_device *>(device)->set_sound_ctrl_read(DEVCB_##_soundctrl_r); \
-	downcast<wpc_device *>(device)->set_sound_ctrl_write(DEVCB_##_soundctrl_w);
-
-#define MCFG_WPC_SOUND_S11C(_sounds11_w) \
-	downcast<wpc_device *>(device)->set_sound_s11_write(DEVCB_##_sounds11_w);
-
-#define MCFG_WPC_ROMBANK(_bank_w) \
-	downcast<wpc_device *>(device)->set_bank_write(DEVCB_##_bank_w);
-
-#define MCFG_WPC_DMDBANK(_dmdbank_w) \
-	downcast<wpc_device *>(device)->set_dmdbank_write(DEVCB_##_dmdbank_w);
-
 class wpc_device : public device_t
 {
 public:
@@ -121,15 +95,15 @@ public:
 	void set_snd_firq() { m_snd_irqsrc = true; }
 
 	// callbacks
-	template <class Object> void set_irq_callback(Object &&cb) { m_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> void set_firq_callback(Object &&cb) { m_firq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> void set_sound_data_read(Object &&cb) { m_sounddata_r.set_callback(std::forward<Object>(cb)); }
-	template <class Object> void set_sound_data_write(Object &&cb) { m_sounddata_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> void set_sound_ctrl_read(Object &&cb) { m_soundctrl_r.set_callback(std::forward<Object>(cb)); }
-	template <class Object> void set_sound_ctrl_write(Object &&cb) { m_soundctrl_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> void set_sound_s11_write(Object &&cb) { m_sounds11_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> void set_bank_write(Object &&cb) { m_bank_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> void set_dmdbank_write(Object &&cb) { m_dmdbank_w.set_callback(std::forward<Object>(cb)); }
+	auto irq_callback() { return m_irq_cb.bind(); }
+	auto firq_callback() { return m_firq_cb.bind(); }
+	auto sound_data_read() { return m_sounddata_r.bind(); }
+	auto sound_data_write() { return m_sounddata_w.bind(); }
+	auto sound_ctrl_read() { return m_soundctrl_r.bind(); }
+	auto sound_ctrl_write() { return m_soundctrl_w.bind(); }
+	auto sound_s11_write() { return m_sounds11_w.bind(); }
+	auto bank_write() { return m_bank_w.bind(); }
+	auto dmdbank_write() { return m_dmdbank_w.bind(); }
 
 protected:
 	// overrides

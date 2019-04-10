@@ -93,7 +93,7 @@ private:
 	required_shared_ptr<uint16_t> m_vidram;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
+	required_device<at89c4051_device> m_mcu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -214,7 +214,7 @@ READ8_MEMBER(rbmk_state::mcu_io_r)
 {
 	if(m_mux_data & 8)
 	{
-		return m_ymsnd->read(space, offset & 1);
+		return m_ymsnd->read(offset & 1);
 	}
 	else if(m_mux_data & 4)
 	{
@@ -230,7 +230,7 @@ READ8_MEMBER(rbmk_state::mcu_io_r)
 
 WRITE8_MEMBER(rbmk_state::mcu_io_w)
 {
-	if(m_mux_data & 8) { m_ymsnd->write(space, offset & 1, data); }
+	if(m_mux_data & 8) { m_ymsnd->write(offset & 1, data); }
 	else if(m_mux_data & 4)
 	{
 		//printf("%02x %02x W\n",offset,data);
@@ -565,53 +565,52 @@ uint32_t rbmk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-MACHINE_CONFIG_START(rbmk_state::rbmk)
-	MCFG_DEVICE_ADD("maincpu", M68000, 22000000 /2)
-	MCFG_DEVICE_PROGRAM_MAP(rbmk_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbmk_state,  irq1_line_hold)
+void rbmk_state::rbmk(machine_config &config)
+{
+	M68000(config, m_maincpu, 22000000 /2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rbmk_state::rbmk_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(rbmk_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("mcu", AT89C4051, 22000000 / 4) // frequency isn't right
-	MCFG_DEVICE_PROGRAM_MAP(mcu_mem)
-	MCFG_DEVICE_IO_MAP(mcu_io)
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, rbmk_state, mcu_io_mux_w))
+	AT89C4051(config, m_mcu, 22000000 / 4); // frequency isn't right
+	m_mcu->set_addrmap(AS_PROGRAM, &rbmk_state::mcu_mem);
+	m_mcu->set_addrmap(AS_IO, &rbmk_state::mcu_io);
+	m_mcu->port_out_cb<3>().set(FUNC(rbmk_state::mcu_io_mux_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rbmk)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rbmk);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rbmk_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(rbmk_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1122000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
+	okim6295_device &oki(OKIM6295(config, "oki", 1122000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.47);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.47);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 22000000 / 8)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
-MACHINE_CONFIG_END
+	YM2151(config, m_ymsnd, 22000000 / 8);
+	m_ymsnd->add_route(0, "lspeaker", 0.60);
+	m_ymsnd->add_route(1, "rspeaker", 0.60);
+}
 
-MACHINE_CONFIG_START(rbmk_state::rbspm)
+void rbmk_state::rbspm(machine_config &config)
+{
 	rbmk(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(rbspm_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &rbmk_state::rbspm_mem);
 
-	MCFG_DEVICE_MODIFY("mcu")
-	MCFG_DEVICE_DISABLE() // until decapped
+	m_mcu->set_disable(); // until decapped
 
 	// PIC16F84 but no CPU core available
-MACHINE_CONFIG_END
+}
 
 // 实战麻将王 (Shízhàn Májiàng Wáng)
 ROM_START( rbmk )

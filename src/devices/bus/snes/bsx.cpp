@@ -244,17 +244,20 @@ static void bsx_cart(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sns_rom_bsx_device::device_add_mconfig)
-	MCFG_SNS_BSX_CARTRIDGE_ADD("bs_slot", bsx_cart, nullptr)
-MACHINE_CONFIG_END
+void sns_rom_bsx_device::device_add_mconfig(machine_config &config)
+{
+	SNS_BSX_CART_SLOT(config, m_slot, bsx_cart, nullptr);
+}
 
-MACHINE_CONFIG_START(sns_rom_bsxlo_device::device_add_mconfig)
-	MCFG_SNS_BSX_CARTRIDGE_ADD("bs_slot", bsx_cart, nullptr)
-MACHINE_CONFIG_END
+void sns_rom_bsxlo_device::device_add_mconfig(machine_config &config)
+{
+	SNS_BSX_CART_SLOT(config, m_slot, bsx_cart, nullptr);
+}
 
-MACHINE_CONFIG_START(sns_rom_bsxhi_device::device_add_mconfig)
-	MCFG_SNS_BSX_CARTRIDGE_ADD("bs_slot", bsx_cart, nullptr)
-MACHINE_CONFIG_END
+void sns_rom_bsxhi_device::device_add_mconfig(machine_config &config)
+{
+	SNS_BSX_CART_SLOT(config, m_slot, bsx_cart, nullptr);
+}
 
 
 /*-------------------------------------------------
@@ -280,13 +283,13 @@ void sns_rom_bsx_device::access_update()
 	}
 }
 
-READ8_MEMBER(sns_rom_bsx_device::read_l)
+uint8_t sns_rom_bsx_device::read_l(offs_t offset)
 {
 	if (offset < 0x200000 && access_00_1f)
 	{
 		// 0x00-0x1f:0x8000-0xffff -> CART
 		if (m_slot->m_cart && m_slot->m_cart->get_rom_size())
-			return m_slot->m_cart->read_l(space, offset);
+			return m_slot->m_cart->read_l(offset);
 	}
 	if (offset >= 0x200000 && offset < 0x400000)
 	{
@@ -331,13 +334,13 @@ READ8_MEMBER(sns_rom_bsx_device::read_l)
 }
 
 
-READ8_MEMBER(sns_rom_bsx_device::read_h)
+uint8_t sns_rom_bsx_device::read_h(offs_t offset)
 {
 	if (offset < 0x200000 && access_80_9f)
 	{
 		// 0x80-0x9f:0x8000-0xffff -> CART
 		if (m_slot->m_cart && m_slot->m_cart->get_rom_size())
-			return m_slot->m_cart->read_l(space, offset);
+			return m_slot->m_cart->read_l(offset);
 	}
 
 	// if not in any of the cases above...
@@ -355,7 +358,7 @@ READ8_MEMBER(sns_rom_bsx_device::read_h)
 	//return 0x00;
 }
 
-WRITE8_MEMBER(sns_rom_bsx_device::write_l)
+void sns_rom_bsx_device::write_l(offs_t offset, uint8_t data)
 {
 	if (offset < 0x200000 && access_00_1f)
 	{
@@ -397,7 +400,7 @@ WRITE8_MEMBER(sns_rom_bsx_device::write_l)
 }
 
 
-WRITE8_MEMBER(sns_rom_bsx_device::write_h)
+void sns_rom_bsx_device::write_h(offs_t offset, uint8_t data)
 {
 	if (offset < 0x200000 && access_80_9f)
 	{
@@ -413,7 +416,7 @@ WRITE8_MEMBER(sns_rom_bsx_device::write_h)
 }
 
 
-READ8_MEMBER(sns_rom_bsx_device::chip_read)
+uint8_t sns_rom_bsx_device::chip_read(offs_t offset)
 {
 	if ((offset & 0xffff) >= 0x2188 && (offset & 0xffff) < 0x21a0)
 		return m_base_unit->read(offset & 0xffff);
@@ -432,7 +435,7 @@ READ8_MEMBER(sns_rom_bsx_device::chip_read)
 	return 0x00;
 }
 
-WRITE8_MEMBER(sns_rom_bsx_device::chip_write)
+void sns_rom_bsx_device::chip_write(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xffff) >= 0x2188 && (offset & 0xffff) < 0x21a0)
 		m_base_unit->write(offset & 0xffff, data);
@@ -454,7 +457,7 @@ WRITE8_MEMBER(sns_rom_bsx_device::chip_write)
 
 // LoROM cart w/BS-X slot
 
-READ8_MEMBER(sns_rom_bsxlo_device::read_l)
+uint8_t sns_rom_bsxlo_device::read_l(offs_t offset)
 {
 	if (offset < 0x400000)
 	{
@@ -466,7 +469,7 @@ READ8_MEMBER(sns_rom_bsxlo_device::read_l)
 	return 0x00;
 }
 
-READ8_MEMBER(sns_rom_bsxlo_device::read_h)
+uint8_t sns_rom_bsxlo_device::read_h(offs_t offset)
 {
 	if (offset < 0x400000)
 	{
@@ -478,7 +481,7 @@ READ8_MEMBER(sns_rom_bsxlo_device::read_h)
 	else if (offset < 0x700000)
 	{
 		if (m_slot->m_cart && m_slot->m_cart->get_rom_size())
-			return m_slot->m_cart->read_h(space, offset);
+			return m_slot->m_cart->read_h(offset);
 	}
 	// RAM [70-7f]
 	return 0x00;
@@ -487,12 +490,12 @@ READ8_MEMBER(sns_rom_bsxlo_device::read_h)
 
 // HiROM cart w/BS-X slot
 
-READ8_MEMBER(sns_rom_bsxhi_device::read_l)
+uint8_t sns_rom_bsxhi_device::read_l(offs_t offset)
 {
-	return read_h(space, offset);
+	return read_h(offset);
 }
 
-READ8_MEMBER(sns_rom_bsxhi_device::read_h)
+uint8_t sns_rom_bsxhi_device::read_h(offs_t offset)
 {
 	if (offset < 0x200000 && (offset & 0xffff) >= 0x8000)
 	{
@@ -502,7 +505,7 @@ READ8_MEMBER(sns_rom_bsxhi_device::read_h)
 	if (offset >= 0x200000 && offset < 0x400000)
 	{
 		if (m_slot->m_cart && m_slot->m_cart->get_rom_size() && (offset & 0xffff) >= 0x8000)
-			return m_slot->m_cart->read_h(space, offset);
+			return m_slot->m_cart->read_h(offset);
 	}
 	if (offset >= 0x400000 && offset < 0x600000)
 	{
@@ -513,7 +516,7 @@ READ8_MEMBER(sns_rom_bsxhi_device::read_h)
 	if (offset >= 0x600000)
 	{
 		if (m_slot->m_cart && m_slot->m_cart->get_rom_size())
-			return m_slot->m_cart->read_h(space, offset);
+			return m_slot->m_cart->read_h(offset);
 	}
 	return 0xff;
 }
@@ -527,18 +530,18 @@ READ8_MEMBER(sns_rom_bsxhi_device::read_h)
 // Hence, we use low read handler for ROM access in the 0x8000-0xffff range (i.e. mempack mapped as LoROM) and
 // hi read handler for ROM access in the 0x0000-0xffff range (i.e. mempack mapped as HiROM)...
 
-READ8_MEMBER(sns_rom_bsmempak_device::read_l)
+uint8_t sns_rom_bsmempak_device::read_l(offs_t offset)
 {
 	int bank = offset / 0x10000;
 	return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 }
 
-READ8_MEMBER(sns_rom_bsmempak_device::read_h)
+uint8_t sns_rom_bsmempak_device::read_h(offs_t offset)
 {
 	int bank = offset / 0x8000;
 	return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 }
 
-WRITE8_MEMBER(sns_rom_bsmempak_device::write_l)
+void sns_rom_bsmempak_device::write_l(offs_t offset, uint8_t data)
 {
 }

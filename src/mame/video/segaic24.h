@@ -10,12 +10,6 @@
 
 #pragma once
 
-#define MCFG_S24TILE_XHOUT_CALLBACK(_write) \
-	downcast<segas24_tile_device &>(*device).set_xhout_write_callback(DEVCB_##_write);
-
-#define MCFG_S24TILE_XVOUT_CALLBACK(_write) \
-	downcast<segas24_tile_device &>(*device).set_xvout_write_callback(DEVCB_##_write);
-
 
 class segas24_tile_device : public device_t, public device_gfx_interface
 {
@@ -43,8 +37,8 @@ public:
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
 
-	template <class Object> devcb_base &set_xhout_write_callback(Object &&cb) { return m_xhout_write_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_xvout_write_callback(Object &&cb) { return m_xvout_write_cb.set_callback(std::forward<Object>(cb)); }
+	auto xhout_write_callback() { return m_xhout_write_cb.bind(); }
+	auto xvout_write_callback() { return m_xvout_write_cb.bind(); }
 
 protected:
 	virtual void device_start() override;

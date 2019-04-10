@@ -167,8 +167,8 @@ PCB - German Version:
 class geniusiq_state : public driver_device
 {
 public:
-	geniusiq_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	geniusiq_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
 		m_rom(*this, "maincpu"),
@@ -182,6 +182,10 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(send_input);
 	DECLARE_INPUT_CHANGED_MEMBER(send_mouse_input);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	enum
@@ -198,9 +202,7 @@ private:
 	required_shared_ptr<uint16_t> m_vram;
 	required_shared_ptr<uint16_t> m_mouse_gfx;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(geniusiq);
+	void geniusiq_palette(palette_device &palette) const;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER(input_r);
@@ -237,31 +239,30 @@ private:
 };
 
 
-PALETTE_INIT_MEMBER(geniusiq_state, geniusiq)
+void geniusiq_state::geniusiq_palette(palette_device &palette) const
 {
 	// shades need to be verified
-	const uint8_t palette_val[] =
+	constexpr rgb_t palette_val[] =
 	{
-		0x00, 0x00, 0x00,    // Black?? (used in the cursor for transparency)
-		0xff, 0xff, 0xff,    // White
-		0xa0, 0xa0, 0xa0,    // Light grey
-		0x7f, 0x7f, 0x7f,    // Dark grey
-		0x00, 0x00, 0x00,    // Black
-		0x00, 0x60, 0xff,    // Sky blue
-		0x00, 0x00, 0xff,    // Blue
-		0xff, 0x00, 0x00,    // Red
-		0x00, 0xff, 0x00,    // Green
-		0x00, 0x7f, 0x00,    // Dark green
-		0xff, 0xff, 0x00,    // Yellow
-		0xff, 0x7f, 0x00,    // Orange
-		0x7f, 0x40, 0x00,    // Brown
-		0x60, 0x40, 0x00,    // Dark brown
-		0x60, 0x00, 0xff,    // Mauve
-		0xff, 0x00, 0xff     // Pink
+		{ 0x00, 0x00, 0x00 },   // Black?? (used in the cursor for transparency)
+		{ 0xff, 0xff, 0xff },   // White
+		{ 0xa0, 0xa0, 0xa0 },   // Light grey
+		{ 0x7f, 0x7f, 0x7f },   // Dark grey
+		{ 0x00, 0x00, 0x00 },   // Black
+		{ 0x00, 0x60, 0xff },   // Sky blue
+		{ 0x00, 0x00, 0xff },   // Blue
+		{ 0xff, 0x00, 0x00 },   // Red
+		{ 0x00, 0xff, 0x00 },   // Green
+		{ 0x00, 0x7f, 0x00 },   // Dark green
+		{ 0xff, 0xff, 0x00 },   // Yellow
+		{ 0xff, 0x7f, 0x00 },   // Orange
+		{ 0x7f, 0x40, 0x00 },   // Brown
+		{ 0x60, 0x40, 0x00 },   // Dark brown
+		{ 0x60, 0x00, 0xff },   // Mauve
+		{ 0xff, 0x00, 0xff }    // Pink
 	};
 
-	for (int i=0; i<ARRAY_LENGTH(palette_val)/3; i++)
-		palette.set_pen_color(i, palette_val[i*3], palette_val[i*3+1], palette_val[i*3+2]);
+	palette.set_pen_colors(0, palette_val);
 }
 
 
@@ -699,21 +700,20 @@ DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state,iq128_cart)
 
 MACHINE_CONFIG_START(geniusiq_state::iq128)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) // The main crystal is at 32MHz, not sure whats the CPU freq
-	MCFG_DEVICE_PROGRAM_MAP(geniusiq_mem)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(geniusiq_state, irq6_line_hold,  125)  // the internal clock is increased by 1 sec every 125 interrupts
+	M68000(config, m_maincpu, XTAL(32'000'000)/2); // The main crystal is at 32MHz, not sure whats the CPU freq
+	m_maincpu->set_addrmap(AS_PROGRAM, &geniusiq_state::geniusiq_mem);
+	m_maincpu->set_periodic_int(FUNC(geniusiq_state::irq6_line_hold), attotime::from_hz(125));  // the internal clock is increased by 1 sec every 125 interrupts
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER( geniusiq_state, screen_update )
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(512, 256);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(geniusiq_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(geniusiq_state, geniusiq)
+	PALETTE(config, "palette", FUNC(geniusiq_state::geniusiq_palette), 16);
 
 	/* internal flash */
 	AMD_29F010(config, "flash");
@@ -724,7 +724,7 @@ MACHINE_CONFIG_START(geniusiq_state::iq128)
 	MCFG_GENERIC_UNLOAD(geniusiq_state, iq128_cart)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "iq128")
+	SOFTWARE_LIST(config, "cart_list").set_original("iq128");
 MACHINE_CONFIG_END
 
 void geniusiq_state::iqtv512(machine_config &config)

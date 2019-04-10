@@ -148,7 +148,7 @@ void k054338_device::fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &clipr
 	}
 }
 
-// addition blending unimplemented (requires major changes to drawgfx and tilemap.c)
+// addition blending unimplemented (requires major changes to drawgfx and tilemap.cpp)
 int k054338_device::set_alpha_level( int pblend )
 {
 	uint16_t *regs;

@@ -5,6 +5,11 @@
     The Main Event / Devastators
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_MAINEVT_H
+#define MAME_INCLUDES_MAINEVT_H
+
+#pragma once
+
 #include "sound/upd7759.h"
 #include "sound/k007232.h"
 #include "video/k052109.h"
@@ -76,3 +81,5 @@ private:
 	required_memory_bank m_rombank;
 	output_finder<4> m_leds;
 };
+
+#endif // MAME_INCLUDES_MAINEVT_H

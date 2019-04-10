@@ -2,8 +2,40 @@
 // copyright-holders:Andrew Gardner, Couriersud
 #include "netlist/devices/net_lib.h"
 
+#ifdef NLBASE_H_
+#error Somehow nl_base.h made it into the include chain.
+#endif
+
+#ifndef NLTOOL_VERSION
 #define USE_FRONTIERS 1
+#define USE_FIXED_STV 0
+#else
+#define USE_FRONTIERS 0
 #define USE_FIXED_STV 1
+#endif
+
+/*
+ * Schematic errors:
+ *
+ * The kungfu master schematics differ from the kidnik schematics in wiring
+ * D4, D5 and Q4 with other components. The manual corrections to the
+ * kungfu master schematics make sense and thus are used here.
+ *
+ * opamp XU1.B according to schematics has no feedback loop between output and
+ * inputs. The arrangement of components in the schematic however indicate that
+ * this is not the case and indeed a connection exists. This results in sounds
+ * at output XU1.14 to contain more detail.
+ *
+ * You can observe sounds at XU1.14 by doing
+ *
+ * NL_LOGS=XU1.14 ./mame64 kidniki
+ * nlwav -o x.wav log_XU1.14.log
+ * play x.wav
+ *
+ */
+
+#define FIX_SCHEMATIC_ERRORS (1)
+
 
 /* ----------------------------------------------------------------------------
  *  Library section header START
@@ -29,16 +61,9 @@ NETLIST_START(kidniki_schematics)
 	// IGNORED O_AUDIO0: O_AUDIO0  49 0
 	// .END
 
-	/*
-	 * Workaround: The simplified opamp model does not correctly
-	 * model the internals of the inputs.
-	 */
-
-	ANALOG_INPUT(VWORKAROUND, 2.061)
-	RES(RWORKAROUND, RES_K(27))
-	NET_C(VWORKAROUND.Q, RWORKAROUND.1)
-	NET_C(XU1.6, RWORKAROUND.2)
-
+#if FIX_SCHEMATIC_ERRORS
+	NET_C(XU1.7, C40.1)
+#endif
 	CAP(C200, CAP_N(100))
 	CAP(C28, CAP_U(1))
 	CAP(C31, CAP_N(470))
@@ -96,7 +121,7 @@ NETLIST_START(kidniki_schematics)
 	QBJT_EB(Q7, "2SC945")
 	QBJT_EB(Q9, "2SC945")
 
-	LM324_DIP(XU1)
+	LM2902_DIP(XU1)
 	LM358_DIP(XU2)
 
 	MC14584B_DIP(XU3)
@@ -132,6 +157,7 @@ NETLIST_START(kidniki_schematics)
 	RES(R43, 470)
 	RES(R44, RES_K(100))
 	RES(R45, RES_K(1))
+	//RES(R45, RES_K(10000000))
 	RES(R46, RES_K(12))
 	RES(R48, 470)
 	RES(R48_2, RES_K(100))
@@ -235,7 +261,12 @@ NETLIST_START(kidniki_schematics)
 	NET_C(R55.2, R90.2, C33.2, R37.1, Q3.E)
 	NET_C(R45.1, C44.2)
 	NET_C(C44.1, R66.2, Q4.B)
+#if FIX_SCHEMATIC_ERRORS
+	NET_C(Q4.C, D4.K, D5.K)
+	NET_C(C42.1, C43.1, R46.1, C35.2)
+#else
 	NET_C(Q4.C, C42.1, C43.1, R46.1, C35.2, D4.K, D5.K)
+#endif
 	NET_C(R70.2, R69.2, Q7.C)
 	NET_C(R63.1, Q7.E)
 	NET_C(R69.1, C49.2)
@@ -308,7 +339,7 @@ NETLIST_END()
 
 NETLIST_START(kidniki)
 
-#if (1 || USE_FRONTIERS)
+#if (0 || USE_FRONTIERS)
 	SOLVER(Solver, 18000)
 	PARAM(Solver.ACCURACY, 1e-7)
 	PARAM(Solver.NR_LOOPS, 100)
@@ -317,16 +348,19 @@ NETLIST_START(kidniki)
 	PARAM(Solver.METHOD, "MAT_CR")
 	//PARAM(Solver.METHOD, "MAT")
 	//PARAM(Solver.METHOD, "GMRES")
-	PARAM(Solver.SOR_FACTOR, 1.00)
+	PARAM(Solver.SOR_FACTOR, 1.313)
 	PARAM(Solver.DYNAMIC_TS, 0)
 	PARAM(Solver.DYNAMIC_LTE, 5e-4)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 20e-6)
 #else
-	SOLVER(Solver, 12000)
-	PARAM(Solver.ACCURACY, 1e-8)
-	PARAM(Solver.NR_LOOPS, 300)
-	PARAM(Solver.GS_LOOPS, 20)
+	SOLVER(Solver, 18000)
+	PARAM(Solver.ACCURACY, 1e-7)
+	PARAM(Solver.NR_LOOPS, 100)
+	PARAM(Solver.GS_LOOPS, 300)
+	//PARAM(Solver.METHOD, "MAT_CR")
 	PARAM(Solver.METHOD, "GMRES")
+	//PARAM(Solver.SOR_FACTOR, 1.73)
+	//PARAM(Solver.METHOD, "SOR")
 #endif
 
 #if (USE_FRONTIERS)
@@ -372,16 +406,13 @@ NETLIST_START(kidniki)
 	ALIAS(I_SINH0, SINH_DUMMY.2)
 #endif
 
-	NET_MODEL("AY8910PORT FAMILY(OVL=0.05 OVH=4.95 ORL=100.0 ORH=0.5k)")
+	NET_MODEL("AY8910PORT FAMILY(OVL=0.05 OVH=0.05 ORL=100.0 ORH=0.5k)")
 
 	LOGIC_INPUT(I_SD0, 1, "AY8910PORT")
-	//CLOCK(I_SD0, 5)
 	LOGIC_INPUT(I_BD0, 1, "AY8910PORT")
-	//CLOCK(I_BD0, 5)
 	LOGIC_INPUT(I_CH0, 1, "AY8910PORT")
-	//CLOCK(I_CH0, 2.2  )
 	LOGIC_INPUT(I_OH0, 1, "AY8910PORT")
-	//CLOCK(I_OH0, 1.0)
+
 	ANALOG_INPUT(I_MSM2K0, 0)
 	ANALOG_INPUT(I_MSM3K0, 0)
 

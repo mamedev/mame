@@ -37,7 +37,7 @@ READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
 	if ((offset & 0x900) == 0x100) // Floppy
 		data &= m_fdc->read(offset & 0x03);
 	if ((offset & 0x900) == 0x900) // IEEE488 PIA
-		data &= m_pia0->read(space, offset & 0x03);
+		data &= m_pia0->read(offset & 0x03);
 	if ((offset & 0xA00) == 0x200) // Keyboard
 	{
 		if (offset & 0x01) data &= m_keyb_row[0]->read();
@@ -51,14 +51,14 @@ READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
 	}
 	if ((offset & 0xA00) == 0xA00) // Serial
 	{
-		data &= m_acia->read(space, offset & 0x01);
+		data &= m_acia->read(offset & 0x01);
 	}
 	if ((offset & 0xC00) == 0x400) // SCREEN-PAC
 	{
 		if (m_screen_pac) data &= 0xFB;
 	}
 	if ((offset & 0xC00) == 0xC00) // Video PIA
-		data &= m_pia1->read(space, offset & 0x03);
+		data &= m_pia1->read(offset & 0x03);
 	return data;
 }
 
@@ -74,10 +74,10 @@ WRITE8_MEMBER( osborne1_state::bank_2xxx_3xxx_w )
 		if ((offset & 0x900) == 0x100) // Floppy
 			m_fdc->write(offset & 0x03, data);
 		if ((offset & 0x900) == 0x900) // IEEE488 PIA
-			m_pia0->write(space, offset & 0x03, data);
+			m_pia0->write(offset & 0x03, data);
 		if ((offset & 0xA00) == 0xA00) // Serial
 		{
-			m_acia->write(space, offset & 0x01, data);
+			m_acia->write(offset & 0x01, data);
 		}
 		if ((offset & 0xC00) == 0x400) // SCREEN-PAC
 		{
@@ -85,7 +85,7 @@ WRITE8_MEMBER( osborne1_state::bank_2xxx_3xxx_w )
 			m_hc_left = (data & 0x02) ? 0 : 1;
 		}
 		if ((offset & 0xC00) == 0xC00) // Video PIA
-			m_pia1->write(space, offset & 0x03, data);
+			m_pia1->write(offset & 0x03, data);
 	}
 }
 
@@ -477,13 +477,13 @@ bool osborne1_state::set_bit_9(uint8_t value)
 void osborne1_state::update_irq()
 {
 	if (m_pia0->irq_a_state())
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xF0);
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xF0); // Z80
 	else if (m_pia1->irq_a_state())
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xF8);
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xF8); // Z80
 	else if (m_acia_irq_state)
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xFC);
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xFC); // Z80
 	else
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, CLEAR_LINE, 0xFE);
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, CLEAR_LINE, 0xFE); // Z80
 }
 
 void osborne1_state::update_acia_rxc_txc()

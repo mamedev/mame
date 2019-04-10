@@ -11,7 +11,10 @@
 #ifndef MAME_INCLUDES_X68K_H
 #define MAME_INCLUDES_X68K_H
 
+#pragma once
+
 #include "cpu/m68000/m68000.h"
+#include "imagedev/floppy.h"
 #include "machine/8530scc.h"
 #include "machine/hd63450.h"
 #include "machine/i8255.h"
@@ -98,7 +101,7 @@ protected:
 	{
 		type(config, m_maincpu, std::forward<Clock>(clock));
 		m_maincpu->set_addrmap(AS_PROGRAM, std::forward<AddrMap>(map));
-		m_maincpu->set_irq_acknowledge_callback(FUNC(x68k_state::int_ack));
+		m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &x68k_state::cpu_space_map);
 	}
 
 	required_device<m68000_base_device> m_maincpu;
@@ -250,7 +253,6 @@ protected:
 	TILE_GET_INFO_MEMBER(get_bg0_tile_16);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_16);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(x68000);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(led_callback);
 	TIMER_CALLBACK_MEMBER(scc_ack);
@@ -315,10 +317,13 @@ protected:
 	DECLARE_WRITE16_MEMBER(tvram_write);
 	DECLARE_READ16_MEMBER(gvram_read);
 	DECLARE_WRITE16_MEMBER(gvram_write);
-	IRQ_CALLBACK_MEMBER(int_ack);
+
+	template <int Line> uint8_t int_ack();
+	uint8_t mfp_ack();
 
 	void x68k_base_map(address_map &map);
 	void x68k_map(address_map &map);
+	void cpu_space_map(address_map &map);
 
 	inline void plot_pixel(bitmap_rgb32 &bitmap, int x, int y, uint32_t color);
 	void draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectangle rect);
@@ -327,7 +332,7 @@ protected:
 	void draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
 
 public:
-	DECLARE_PALETTE_DECODER(GGGGGRRRRRBBBBBI);
+	static rgb_t GGGGGRRRRRBBBBBI(uint32_t raw);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

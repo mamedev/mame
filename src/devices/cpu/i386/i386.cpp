@@ -20,10 +20,12 @@
 
 #include "emu.h"
 #include "i386.h"
+#include "i386priv.h"
+#include "x87priv.h"
+#include "cycles.h"
+#include "i386ops.h"
 
 #include "debugger.h"
-#include "i386priv.h"
-
 #include "debug/debugcpu.h"
 
 /* seems to be defined on mingw-gcc */
@@ -34,9 +36,9 @@ DEFINE_DEVICE_TYPE(I386SX,      i386sx_device,      "i386sx",      "Intel I386SX
 DEFINE_DEVICE_TYPE(I486,        i486_device,        "i486",        "Intel I486")
 DEFINE_DEVICE_TYPE(I486DX4,     i486dx4_device,     "i486dx4",     "Intel I486DX4")
 DEFINE_DEVICE_TYPE(PENTIUM,     pentium_device,     "pentium",     "Intel Pentium")
+DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Intel Pentium MMX")
 DEFINE_DEVICE_TYPE(MEDIAGX,     mediagx_device,     "mediagx",     "Cyrix MediaGX")
 DEFINE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device, "pentium_pro", "Intel Pentium Pro")
-DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Intel Pentium MMX")
 DEFINE_DEVICE_TYPE(PENTIUM2,    pentium2_device,    "pentium2",    "Intel Pentium II")
 DEFINE_DEVICE_TYPE(PENTIUM3,    pentium3_device,    "pentium3",    "Intel Pentium III")
 DEFINE_DEVICE_TYPE(ATHLONXP,    athlonxp_device,    "athlonxp",    "Amd Athlon XP")
@@ -99,7 +101,12 @@ mediagx_device::mediagx_device(const machine_config &mconfig, const char *tag, d
 }
 
 pentium_pro_device::pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, PENTIUM_PRO, tag, owner, clock)
+	: pentium_pro_device(mconfig, PENTIUM_PRO, tag, owner, clock)
+{
+}
+
+pentium_pro_device::pentium_pro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: pentium_device(mconfig, type, tag, owner, clock)
 {
 }
 
@@ -111,14 +118,14 @@ pentium_mmx_device::pentium_mmx_device(const machine_config &mconfig, const char
 }
 
 pentium2_device::pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, PENTIUM2, tag, owner, clock)
+	: pentium_pro_device(mconfig, PENTIUM2, tag, owner, clock)
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
 	set_vtlb_dynamic_entries(96);
 }
 
 pentium3_device::pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, PENTIUM3, tag, owner, clock)
+	: pentium_pro_device(mconfig, PENTIUM3, tag, owner, clock)
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
 	set_vtlb_dynamic_entries(96);
@@ -126,6 +133,8 @@ pentium3_device::pentium3_device(const machine_config &mconfig, const char *tag,
 
 athlonxp_device::athlonxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pentium_device(mconfig, ATHLONXP, tag, owner, clock)
+	, m_data_config("mmio", ENDIANNESS_LITTLE, 32, 32, 0, 32, 12)
+	, m_opcodes_config("debugger", ENDIANNESS_LITTLE, 32, 32, 0, 32, 12)
 {
 	// TODO: put correct value
 	set_vtlb_dynamic_entries(256);
@@ -149,10 +158,166 @@ device_memory_interface::space_config_vector i386_device::memory_space_config() 
 int i386_parity_table[256];
 MODRM_TABLE i386_MODRM_table[256];
 
-#define FAULT(fault,error) {m_ext = 1; i386_trap_with_error(fault,0,0,error); return;}
-#define FAULT_EXP(fault,error) {m_ext = 1; i386_trap_with_error(fault,0,trap_level+1,error); return;}
-
 /*************************************************************************/
+
+uint32_t i386_device::i386_translate(int segment, uint32_t ip, int rwn)
+{
+	// TODO: segment limit access size, execution permission, handle exception thrown from exception handler
+	if (PROTECTED_MODE && !V8086_MODE && (rwn != -1))
+	{
+		if (!(m_sreg[segment].valid))
+			FAULT_THROW((segment == SS) ? FAULT_SS : FAULT_GP, 0);
+		if (i386_limit_check(segment, ip))
+			FAULT_THROW((segment == SS) ? FAULT_SS : FAULT_GP, 0);
+		if ((rwn == 0) && ((m_sreg[segment].flags & 8) && !(m_sreg[segment].flags & 2)))
+			FAULT_THROW(FAULT_GP, 0);
+		if ((rwn == 1) && ((m_sreg[segment].flags & 8) || !(m_sreg[segment].flags & 2)))
+			FAULT_THROW(FAULT_GP, 0);
+	}
+	return m_sreg[segment].base + ip;
+}
+
+vtlb_entry i386_device::get_permissions(uint32_t pte, int wp)
+{
+	vtlb_entry ret = VTLB_READ_ALLOWED | ((pte & 4) ? VTLB_USER_READ_ALLOWED : 0);
+	if (!wp)
+		ret |= VTLB_WRITE_ALLOWED;
+	if (pte & 2)
+		ret |= VTLB_WRITE_ALLOWED | ((pte & 4) ? VTLB_USER_WRITE_ALLOWED : 0);
+	return ret;
+}
+
+bool i386_device::i386_translate_address(int intention, offs_t *address, vtlb_entry *entry)
+{
+	uint32_t a = *address;
+	uint32_t pdbr = m_cr[3] & 0xfffff000;
+	uint32_t directory = (a >> 22) & 0x3ff;
+	uint32_t table = (a >> 12) & 0x3ff;
+	vtlb_entry perm = 0;
+	bool ret;
+	bool user = (intention & TRANSLATE_USER_MASK) ? true : false;
+	bool write = (intention & TRANSLATE_WRITE) ? true : false;
+	bool debug = (intention & TRANSLATE_DEBUG_MASK) ? true : false;
+
+	if (!(m_cr[0] & 0x80000000))
+	{
+		if (entry)
+			*entry = 0x77;
+		return true;
+	}
+
+	uint32_t page_dir = m_program->read_dword(pdbr + directory * 4);
+	if (page_dir & 1)
+	{
+		if ((page_dir & 0x80) && (m_cr[4] & 0x10))
+		{
+			a = (page_dir & 0xffc00000) | (a & 0x003fffff);
+			if (debug)
+			{
+				*address = a;
+				return true;
+			}
+			perm = get_permissions(page_dir, WP);
+			if (write && (!(perm & VTLB_WRITE_ALLOWED) || (user && !(perm & VTLB_USER_WRITE_ALLOWED))))
+				ret = false;
+			else if (user && !(perm & VTLB_USER_READ_ALLOWED))
+				ret = false;
+			else
+			{
+				if (write)
+					perm |= VTLB_FLAG_DIRTY;
+				if (!(page_dir & 0x40) && write)
+					m_program->write_dword(pdbr + directory * 4, page_dir | 0x60);
+				else if (!(page_dir & 0x20))
+					m_program->write_dword(pdbr + directory * 4, page_dir | 0x20);
+				ret = true;
+			}
+		}
+		else
+		{
+			uint32_t page_entry = m_program->read_dword((page_dir & 0xfffff000) + (table * 4));
+			if (!(page_entry & 1))
+				ret = false;
+			else
+			{
+				a = (page_entry & 0xfffff000) | (a & 0xfff);
+				if (debug)
+				{
+					*address = a;
+					return true;
+				}
+				perm = get_permissions(page_entry, WP);
+				if (write && (!(perm & VTLB_WRITE_ALLOWED) || (user && !(perm & VTLB_USER_WRITE_ALLOWED))))
+					ret = false;
+				else if (user && !(perm & VTLB_USER_READ_ALLOWED))
+					ret = false;
+				else
+				{
+					if (write)
+						perm |= VTLB_FLAG_DIRTY;
+					if (!(page_dir & 0x20))
+						m_program->write_dword(pdbr + directory * 4, page_dir | 0x20);
+					if (!(page_entry & 0x40) && write)
+						m_program->write_dword((page_dir & 0xfffff000) + (table * 4), page_entry | 0x60);
+					else if (!(page_entry & 0x20))
+						m_program->write_dword((page_dir & 0xfffff000) + (table * 4), page_entry | 0x20);
+					ret = true;
+				}
+			}
+		}
+	}
+	else
+		ret = false;
+	if (entry)
+		*entry = perm;
+	if (ret)
+		*address = a;
+	return ret;
+}
+
+//#define TEST_TLB
+
+bool i386_device::translate_address(int pl, int type, uint32_t *address, uint32_t *error)
+{
+	if (!(m_cr[0] & 0x80000000)) // Some (very few) old OS's won't work with this
+		return true;
+
+	const vtlb_entry *table = vtlb_table();
+	uint32_t index = *address >> 12;
+	vtlb_entry entry = table[index];
+	if (type == TRANSLATE_FETCH)
+		type = TRANSLATE_READ;
+	if (pl == 3)
+		type |= TRANSLATE_USER_MASK;
+#ifdef TEST_TLB
+	uint32_t test_addr = *address;
+#endif
+
+	if (!(entry & VTLB_FLAG_VALID) || ((type & TRANSLATE_WRITE) && !(entry & VTLB_FLAG_DIRTY)))
+	{
+		if (!i386_translate_address(type, address, &entry))
+		{
+			*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0);
+			if (entry)
+				*error |= 1;
+			return false;
+		}
+		vtlb_dynload(index, *address, entry);
+		return true;
+	}
+	if (!(entry & (1 << type)))
+	{
+		*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0) | 1;
+		return false;
+	}
+	*address = (entry & 0xfffff000) | (*address & 0xfff);
+#ifdef TEST_TLB
+	int test_ret = i386_translate_address(type | TRANSLATE_DEBUG_MASK, &test_addr, nullptr);
+	if (!test_ret || (test_addr != *address))
+		logerror("TLB-PTE mismatch! %06X %06X %06x\n", *address, test_addr, m_pc);
+#endif
+	return true;
+}
 
 uint32_t i386_device::i386_load_protected_mode_segment(I386_SREG *seg, uint64_t *desc )
 {
@@ -254,11 +419,15 @@ void i386_device::i386_load_segment_descriptor(int segment )
 {
 	if (PROTECTED_MODE)
 	{
+		uint16_t old_flags = m_sreg[segment].flags;
 		if (!V8086_MODE)
 		{
-			i386_load_protected_mode_segment(&m_sreg[segment], nullptr );
-			if(m_sreg[segment].selector)
+			i386_load_protected_mode_segment(&m_sreg[segment], nullptr);
+			if (m_sreg[segment].selector)
+			{
 				i386_set_descriptor_accessed(m_sreg[segment].selector);
+				m_sreg[segment].flags |= 0x0001;
+			}
 		}
 		else
 		{
@@ -268,6 +437,8 @@ void i386_device::i386_load_segment_descriptor(int segment )
 			m_sreg[segment].d = 0;
 			m_sreg[segment].valid = true;
 		}
+		if (segment == CS && m_sreg[segment].flags != old_flags)
+			debugger_privilege_hook();
 	}
 	else
 	{
@@ -275,11 +446,11 @@ void i386_device::i386_load_segment_descriptor(int segment )
 		m_sreg[segment].d = 0;
 		m_sreg[segment].valid = true;
 
-		if( segment == CS )
+		if (segment == CS)
 		{
-			if( !m_performed_intersegment_jump )
+			if (!m_performed_intersegment_jump)
 				m_sreg[segment].base |= 0xfff00000;
-			if(m_cpu_version < 0x500)
+			if (m_cpu_version < 0x500)
 				m_sreg[segment].flags = 0x93;
 		}
 	}
@@ -2819,48 +2990,6 @@ void i386_device::i386_protected_mode_iret(int operand32)
 	CHANGE_PC(m_eip);
 }
 
-#include "cycles.h"
-
-#define CYCLES_NUM(x)   (m_cycles -= (x))
-
-void i386_device::CYCLES(int x)
-{
-	if (PROTECTED_MODE)
-	{
-		m_cycles -= m_cycle_table_pm[x];
-	}
-	else
-	{
-		m_cycles -= m_cycle_table_rm[x];
-	}
-}
-
-void i386_device::CYCLES_RM(int modrm, int r, int m)
-{
-	if (modrm >= 0xc0)
-	{
-		if (PROTECTED_MODE)
-		{
-			m_cycles -= m_cycle_table_pm[r];
-		}
-		else
-		{
-			m_cycles -= m_cycle_table_rm[r];
-		}
-	}
-	else
-	{
-		if (PROTECTED_MODE)
-		{
-			m_cycles -= m_cycle_table_pm[m];
-		}
-		else
-		{
-			m_cycles -= m_cycle_table_rm[m];
-		}
-	}
-}
-
 void i386_device::build_cycle_table()
 {
 	int i, j;
@@ -2910,7 +3039,8 @@ void i386_device::report_invalid_modrm(const char* opcode, uint8_t modrm)
 #include "i486ops.hxx"
 #include "pentops.hxx"
 #include "x87ops.hxx"
-#include "i386ops.h"
+#include "cpuidmsrs.hxx"
+
 
 void i386_device::i386_decode_opcode()
 {
@@ -3188,6 +3318,26 @@ uint64_t i386_device::debug_virttophys(symbol_table &table, int params, const ui
 	return result;
 }
 
+uint64_t i386_device::debug_cacheflush(symbol_table &table, int params, const uint64_t *param)
+{
+	uint32_t option;
+	bool invalidate;
+	bool clean;
+
+	if (params > 0)
+		option = param[0];
+	else
+		option = 0;
+	invalidate = (option & 1) != 0;
+	clean = (option & 2) != 0;
+	cache_writeback();
+	if (invalidate)
+		cache_invalidate();
+	if (clean)
+		cache_clean();
+	return 0;
+}
+
 void i386_device::device_debug_setup()
 {
 	using namespace std::placeholders;
@@ -3195,6 +3345,7 @@ void i386_device::device_debug_setup()
 	debug()->symtable().add("seglimit", 1, 1, std::bind(&i386_device::debug_seglimit, this, _1, _2, _3));
 	debug()->symtable().add("segofftovirt", 2, 2, std::bind(&i386_device::debug_segofftovirt, this, _1, _2, _3));
 	debug()->symtable().add("virttophys", 1, 1, std::bind(&i386_device::debug_virttophys, this, _1, _2, _3));
+	debug()->symtable().add("cacheflush", 0, 1, std::bind(&i386_device::debug_cacheflush, this, _1, _2, _3));
 }
 
 /*************************************************************************/
@@ -3239,15 +3390,10 @@ void i386_device::i386_common_init()
 
 	m_program = &space(AS_PROGRAM);
 	if(m_program->data_width() == 16) {
-		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
-		m_pr8  = [cache](offs_t address) -> u8  { return cache->read_byte(address);  };
-		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address);  };
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		// for the 386sx
+		macache16 = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
 	} else {
-		auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
-		m_pr8  = [cache](offs_t address) -> u8  { return cache->read_byte(address);  };
-		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address);  };
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		macache32 = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
 	}
 
 	m_io = &space(AS_IO);
@@ -4039,6 +4185,24 @@ std::unique_ptr<util::disasm_interface> i386_device::create_disassembler()
 	return std::make_unique<i386_disassembler>(this);
 }
 
+void i386_device::opcode_cpuid()
+{
+	logerror("CPUID called with unsupported EAX=%08x at %08x!\n", REG32(EAX), m_eip);
+}
+
+uint64_t i386_device::opcode_rdmsr(bool &valid_msr)
+{
+	valid_msr = false;
+	logerror("RDMSR called with unsupported ECX=%08x at %08x!\n", REG32(ECX), m_eip);
+	return -1;
+}
+
+void i386_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
+{
+	valid_msr = false;
+	logerror("WRMSR called with unsupported ECX=%08x (%08x%08x) at %08x!\n", REG32(ECX), (uint32_t)(data >> 32), (uint32_t)data, m_eip);
+}
+
 /*****************************************************************************/
 /* Intel 486 */
 
@@ -4530,11 +4694,22 @@ void athlonxp_device::device_start()
 {
 	i386_common_init();
 	register_state_i386_x87_xmm();
+	m_data = &space(AS_DATA);
+	m_opcodes = &space(AS_OPCODES);
+	mmacache32 = m_data->cache<2, 0, ENDIANNESS_LITTLE>();
+	m_opcodes->install_read_handler(0, 0xffffffff, read32_delegate(FUNC(athlonxp_device::debug_read_memory), this));
 
 	build_x87_opcode_table();
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX | OP_SSE);
 	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
 	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
+
+	// put savestate calls here
+	save_item(NAME(m_processor_name_string));
+	save_item(NAME(m_msr_top_mem));
+	save_item(NAME(m_msr_sys_cfg));
+	save_item(NAME(m_msr_mtrrfix));
+	save_item(NAME(m_memory_ranges_1m));
 }
 
 void athlonxp_device::device_reset()
@@ -4578,6 +4753,14 @@ void athlonxp_device::device_reset()
 	m_cpuid_id0 = ('h' << 24) | ('t' << 16) | ('u' << 8) | 'A';   // Auth
 	m_cpuid_id1 = ('i' << 24) | ('t' << 16) | ('n' << 8) | 'e';   // enti
 	m_cpuid_id2 = ('D' << 24) | ('M' << 16) | ('A' << 8) | 'c';   // cAMD
+	memset(m_processor_name_string, 0, 48);
+	strcpy((char *)m_processor_name_string, "AMD Athlon(tm) Processor");
+	for (int n = 0; n < 11; n++)
+		m_msr_mtrrfix[n] = 0;
+	for (int n = 0; n < (1024 / 4); n++)
+		m_memory_ranges_1m[n] = 0;
+	m_msr_top_mem = 1024 * 1024;
+	m_msr_sys_cfg = 0;
 
 	m_cpuid_max_input_value_eax = 0x01;
 	m_cpu_version = REG32(EDX);
@@ -4587,6 +4770,254 @@ void athlonxp_device::device_reset()
 
 	CHANGE_PC(m_eip);
 }
+
+device_memory_interface::space_config_vector athlonxp_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config),
+		std::make_pair(AS_DATA,    &m_data_config),
+		std::make_pair(AS_OPCODES, &m_opcodes_config)
+	};
+}
+
+void athlonxp_device::parse_mtrrfix(u64 mtrr, offs_t base, int kblock)
+{
+	int nb = kblock / 4;
+	int range = (int)(base >> 12); // base must never be higher than 1 megabyte
+
+	for (int n = 0; n < 8; n++)
+	{
+		uint8_t type = mtrr & 0xff;
+
+		for (int b = 0; b < nb; b++)
+		{
+			m_memory_ranges_1m[range] = type;
+			range++;
+		}
+		mtrr = mtrr >> 8;
+	}
+}
+
+int athlonxp_device::check_cacheable(offs_t address)
+{
+	offs_t block;
+	int disabled;
+
+	disabled = 0;
+	if (m_cr[0] & (1 << 30))
+		disabled = 128;
+	if (address >= 0x100000)
+		return disabled;
+	block = address >> 12;
+	return m_memory_ranges_1m[block] | disabled;
+}
+
+template <int wr>
+int athlonxp_device::address_mode(offs_t address)
+{
+	if (address >= m_msr_top_mem)
+		return 1;
+	if (address >= 1 * 1024 * 1024)
+		return 0;
+	if ((m_memory_ranges_1m[address >> 12] & (1 << (3 + wr))) != 0)
+		return 0;
+	return 1;
+}
+
+READ32_MEMBER(athlonxp_device::debug_read_memory)
+{
+	offs_t address = offset << 2;
+	int mode = check_cacheable(address);
+	bool nocache = false;
+	address_space *m = m_program;
+	u8 *data;
+
+	if ((mode & 7) == 0)
+		nocache = true;
+	if (mode & 1)
+		nocache = true;
+	if (nocache == false)
+	{
+		int offset = (address & 63);
+		data = cache.search<CacheRead>(address);
+		if (data)
+			return *(u32 *)(data + offset);
+	}
+	if (address_mode<1>(address))
+		m = m_data;
+	return m->read_dword(address);
+}
+
+template <class dt, offs_t xorle>
+dt athlonxp_device::opcode_read_cache(offs_t address)
+{
+	int mode = check_cacheable(address);
+	bool nocache = false;
+	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m = macache32;
+	u8 *data;
+
+	if ((mode & 7) == 0)
+		nocache = true;
+	if (mode & 1)
+		nocache = true;
+	if (nocache == false)
+	{
+		int offset = (address & 63) ^ xorle;
+		data = cache.search<CacheRead>(address);
+		if (data)
+			return *(dt *)(data + offset);
+		if (!(mode & 128))
+		{
+			bool dirty = cache.allocate<CacheRead>(address, &data);
+			address = cache.base(address);
+			if (dirty)
+			{
+				offs_t old_address = cache.old();
+
+				for (int w = 0; w < 64; w += 4)
+					m->write_dword(old_address + w, *(u32 *)(data + w));
+			}
+			for (int r = 0; r < 64; r += 4)
+				*(u32 *)(data + r) = m->read_dword(address + r);
+			return *(dt *)(data + offset);
+		}
+	}
+	if (address_mode<1>(address))
+		m = mmacache32;
+	if (sizeof(dt) == 1)
+		return m->read_byte(address);
+	else if (sizeof(dt) == 2)
+		return m->read_word(address);
+	else
+		return m->read_dword(address);
+}
+
+template <class dt, offs_t xorle>
+dt athlonxp_device::program_read_cache(offs_t address)
+{
+	int mode = check_cacheable(address);
+	bool nocache = false;
+	address_space *m = m_program;
+	u8 *data;
+
+	if ((mode & 7) == 0)
+		nocache = true;
+	if (mode & 1)
+		nocache = true;
+	if (nocache == false)
+	{
+		int offset = (address & 63) ^ xorle;
+		data = cache.search<CacheRead>(address);
+		if (data)
+			return *(dt *)(data + offset);
+		if (!(mode & 128))
+		{
+			bool dirty = cache.allocate<CacheRead>(address, &data);
+			address = cache.base(address);
+			if (dirty)
+			{
+				offs_t old_address = cache.old();
+
+				for (int w = 0; w < 64; w += 4)
+					m->write_dword(old_address + w, *(u32 *)(data + w));
+			}
+			for (int r = 0; r < 64; r += 4)
+				*(u32 *)(data + r) = m->read_dword(address + r);
+			return *(dt *)(data + offset);
+		}
+	}
+	if (address_mode<1>(address))
+		m = m_data;
+	if (sizeof(dt) == 1)
+		return m->read_byte(address);
+	else if (sizeof(dt) == 2)
+		return m->read_word(address);
+	else
+		return m->read_dword(address);
+}
+
+template <class dt, offs_t xorle>
+void athlonxp_device::program_write_cache(offs_t address, dt data)
+{
+	int mode = check_cacheable(address);
+	bool nocache = false;
+	address_space *m = m_program;
+	u8 *dataw;
+
+	if ((mode & 7) == 0)
+		nocache = true;
+	if (mode & 1)
+		nocache = true;
+	if (nocache == false)
+	{
+		int offset = (address & 63) ^ xorle;
+		dataw = cache.search<CacheWrite>(address);
+		if (dataw)
+		{
+			*(dt *)(dataw + offset) = data;
+			return;
+		}
+		if (!(mode & 128))
+		{
+			bool dirty = cache.allocate<CacheWrite>(address, &dataw);
+			address = cache.base(address);
+			if (dirty)
+			{
+				offs_t old_address = cache.old();
+
+				for (int w = 0; w < 64; w += 4)
+					m->write_dword(old_address + w, *(u32 *)(dataw + w));
+			}
+			for (int r = 0; r < 64; r += 4)
+				*(u32 *)(dataw + r) = m->read_dword(address + r);
+			*(dt *)(dataw + offset) = data;
+			return;
+		}
+	}
+	if (address_mode<0>(address))
+		m = m_data;
+	if (sizeof(dt) == 1)
+		m->write_byte(address, data);
+	else if (sizeof(dt) == 2)
+		m->write_word(address, data);
+	else
+		m->write_dword(address, data);
+}
+
+void athlonxp_device::cache_writeback()
+{
+	// dirty cachelines are written back to memory
+	address_space *m = m_program;
+	u32 base;
+	u8 *data;
+
+	data = cache.first_dirty(base, false);
+	while (data != nullptr)
+	{
+		for (int w = 0; w < 64; w += 4)
+			m->write_dword(base + w, *(u32 *)(data + w));
+		data = cache.next_dirty(base, false);
+	}
+}
+
+void athlonxp_device::cache_invalidate()
+{
+	// dirty cachelines are not written back to memory
+	cache.reset();
+}
+
+void athlonxp_device::cache_clean()
+{
+	// dirty cachelines are marked as clean but not written back to memory
+	u32 base;
+	u8 *data;
+
+	data = cache.first_dirty(base, true);
+	while (data != nullptr)
+		data = cache.next_dirty(base, true);
+}
+
 
 /*****************************************************************************/
 /* Intel Pentium 4 */

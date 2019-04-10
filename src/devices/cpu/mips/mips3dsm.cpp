@@ -49,10 +49,14 @@ const char *const ee_disassembler::vireg[32] =
 
 const char *const mips3_disassembler::cacheop[32] =
 {
-	"I_Invd", "D_WBInvd", "Unknown 2", "Unknown 3", "I_IndexLoadTag", "D_IndexLoadTag", "Unknown 6", "Unknown 7",
-	"I_IndexStoreTag", "D_IndexStoreTag", "Unknown 10", "Unknown 11", "Unknown 12", "D_CreateDirtyExcl", "Unknown 14", "Unknown 15",
-	"I_HitInvalid", "D_HitInvalid", "Unknown 18", "Unknown 19", "I_Fill", "D_HitWBInvalid", "Unknown 22", "Unknown 23",
-	"I_HitWB", "D_HitWB", "Unknown 26", "Unknown 27", "Unknown 28", "Unknown 29", "Unknown 30", "Unknown 31"
+	"Index_Invalid_I", "Index_WB_Invalid_D", "Index_Invalid_SI", "Index_WB_Invalid_SD",
+	"Index_Load_Tag_I", "Index_Load_Tag_D", "Index_Load_Tag_SI", "Index_Load_Tag_SD",
+	"Index_Store_Tag_I", "Index_Store_Tag_D", "Index_Store_Tag_SI", "Index_Store_Tag_SD",
+	"Unknown 12", "Create_Dirty_Excl_D", "Unknown 14", "Create_Dirty_Excl_SD",
+	"Hit_Invalid_I", "Hit_Invalid_D", "Hit_Invalid_SI", "Hit_Invalid_SD",
+	"Fill_I", "Hit_WB_Invalid_D", "Unknown 22", "Hit_WB_Invalid_SD",
+	"Hit_WB_I", "Hit_WB_D", "Unknown 26", "Hit_WB_SD",
+	"Unknown 28", "Unknown 29", "Hit_Set_Virtual_SI", "Hit_Set_Virtual_SD"
 };
 
 

@@ -148,18 +148,18 @@ void rambo_state::machine_reset()
 	m_port_l = 0;
 }
 
-MACHINE_CONFIG_START(rambo_state::rambo)
+void rambo_state::rambo(machine_config &config)
+{
+	ATMEGA2560(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rambo_state::rambo_prg_map);
+	m_maincpu->set_addrmap(AS_DATA, &rambo_state::rambo_data_map);
+	m_maincpu->set_addrmap(AS_IO, &rambo_state::rambo_io_map);
 
-	MCFG_DEVICE_ADD("maincpu", ATMEGA2560, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(rambo_prg_map)
-	MCFG_DEVICE_DATA_MAP(rambo_data_map)
-	MCFG_DEVICE_IO_MAP(rambo_io_map)
-
-	MCFG_CPU_AVR8_EEPROM("eeprom")
-	MCFG_CPU_AVR8_LFUSE(0xFF)
-	MCFG_CPU_AVR8_HFUSE(0xDA)
-	MCFG_CPU_AVR8_EFUSE(0xF4)
-	MCFG_CPU_AVR8_LOCK(0x0F)
+	m_maincpu->set_eeprom_tag("eeprom");
+	m_maincpu->set_low_fuses(0xff);
+	m_maincpu->set_high_fuses(0xda);
+	m_maincpu->set_extended_fuses(0xf4);
+	m_maincpu->set_lock_bits(0x0f);
 
 	/*TODO: Add an ATMEGA32U2 for USB-Serial communications */
 	/*TODO: Emulate the AD5206 digipot */
@@ -167,7 +167,7 @@ MACHINE_CONFIG_START(rambo_state::rambo)
 	        for controlling the X, Y, Z, E1 (and optionally E2) motors */
 	/*TODO: Simulate the heating elements */
 	/*TODO: Implement the thermistor measurements */
-MACHINE_CONFIG_END
+}
 
 ROM_START( metamaq2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )

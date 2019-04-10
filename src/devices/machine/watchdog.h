@@ -30,12 +30,12 @@ public:
 	int32_t get_vblank_counter() const { return m_counter; }
 
 	// read/write handlers
-	DECLARE_WRITE8_MEMBER( reset_w );
-	DECLARE_READ8_MEMBER( reset_r );
-	DECLARE_WRITE16_MEMBER( reset16_w );
-	DECLARE_READ16_MEMBER( reset16_r );
-	DECLARE_WRITE32_MEMBER( reset32_w );
-	DECLARE_READ32_MEMBER( reset32_r );
+	void reset_w(u8 data = 0);
+	u8 reset_r(address_space &space);
+	void reset16_w(u16 data = 0);
+	u16 reset16_r(address_space &space);
+	void reset32_w(u32 data = 0);
+	u32 reset32_r(address_space &space);
 
 protected:
 	// device-level overrides

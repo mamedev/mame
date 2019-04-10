@@ -7,6 +7,7 @@
 
 #include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/com8116.h"
 #include "bus/centronics/ctronics.h"

@@ -28,6 +28,7 @@ public:
 	void init_dc();
 	void init_dcus();
 	void init_dcjp();
+	void init_tream();
 
 	DECLARE_READ64_MEMBER(dcus_idle_skip_r);
 	DECLARE_READ64_MEMBER(dcjp_idle_skip_r);
@@ -50,6 +51,7 @@ public:
 
 	static void gdrom_config(device_t *device);
 	void dc(machine_config &config);
+	void aica_map(address_map &map);
 	void dc_audio_map(address_map &map);
 	void dc_map(address_map &map);
 	void dc_port(address_map &map);

@@ -7,10 +7,10 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "hp98620.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
-#include "hp98620.h"
 
 
 DEFINE_DEVICE_TYPE_NS(HPDIO_98620, bus::hp_dio, dio16_98620_device, "hp98620", "HP98620 DMA Controller")
@@ -28,14 +28,6 @@ dio16_98620_device::dio16_98620_device(const machine_config &mconfig, device_typ
 	device_dio32_card_interface(mconfig, *this),
 	m_irq_state(false)
 {
-}
-
-static INPUT_PORTS_START(hp98620_port)
-INPUT_PORTS_END
-
-ioport_constructor dio16_98620_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(hp98620_port);
 }
 
 void dio16_98620_device::device_start()
@@ -82,7 +74,7 @@ void dio16_98620_device::device_reset()
 {
 	if (!m_installed_io)
 	{
-		program_space()->install_readwrite_handler(0x500000, 0x50020f,
+		program_space().install_readwrite_handler(0x500000, 0x50020f,
 				read16_delegate(FUNC(dio16_98620_device::dma_r), this),
 				write16_delegate(FUNC(dio16_98620_device::dma_w), this));
 		m_installed_io = true;
@@ -351,9 +343,9 @@ void dio16_98620_device::dma_transfer(int channel)
 
 
 	if (m_regs[channel].dma_out) {
-			dmack_w_out(channel, program_space()->read_byte(m_regs[channel].address++));
+			dmack_w_out(channel, program_space().read_byte(m_regs[channel].address++));
 	} else {
-			program_space()->write_byte(m_regs[channel].address++, dmack_r_out(channel));
+			program_space().write_byte(m_regs[channel].address++, dmack_r_out(channel));
 
 	}
 

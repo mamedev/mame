@@ -16,7 +16,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 
-#include "machine/clock.h"
+#include "imagedev/floppy.h"
 #include "machine/msm5832.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"

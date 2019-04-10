@@ -31,18 +31,6 @@ struct player_gfx {
 	int skipclip[PLAYER_GFX_SLOTS];
 };
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_TIA_READ_INPUT_PORT_CB(_devcb) \
-	downcast<tia_video_device &>(*device).set_read_input_port_callback(DEVCB_##_devcb);
-
-#define MCFG_TIA_DATABUS_CONTENTS_CB(_devcb) \
-	downcast<tia_video_device &>(*device).set_databus_contents_callback(DEVCB_##_devcb);
-
-#define MCFG_TIA_VSYNC_CB(_devcb) \
-	downcast<tia_video_device &>(*device).set_vsync_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -57,9 +45,9 @@ class tia_video_device :    public device_t,
 public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	template <class Object> devcb_base &set_read_input_port_callback(Object &&cb) { return m_read_input_port_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_databus_contents_callback(Object &&cb) { return m_databus_contents_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vsync_callback(Object &&cb) { return m_vsync_cb.set_callback(std::forward<Object>(cb)); }
+	auto read_input_port_callback() { return m_read_input_port_cb.bind(); }
+	auto databus_contents_callback() { return m_databus_contents_cb.bind(); }
+	auto vsync_callback() { return m_vsync_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -230,7 +218,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_PALETTE_INIT(tia_pal);
+	void tia_pal_palette(palette_device &palette) const;
 };
 
 class tia_ntsc_video_device : public tia_video_device
@@ -248,7 +236,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_PALETTE_INIT(tia_ntsc);
+	void tia_ntsc_palette(palette_device &palette) const;
 };
 
 

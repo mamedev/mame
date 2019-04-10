@@ -82,7 +82,7 @@ public:
 	void sm7238(machine_config &config);
 
 private:
-	DECLARE_PALETTE_INIT(sm7238);
+	void sm7238_palette(palette_device &palette) const;
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_printer_clock);
@@ -353,51 +353,51 @@ static GFXDECODE_START( gfx_sm7238 )
 	GFXDECODE_ENTRY("chargen", 0x0000, sm7238_charlayout, 0, 1)
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(sm7238_state, sm7238)
+void sm7238_state::sm7238_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
 	palette.set_pen_color(2, 0x00, 0xff, 0x00); // highlight
 }
 
-MACHINE_CONFIG_START(sm7238_state::sm7238)
-	MCFG_DEVICE_ADD("maincpu", I8080, 16.5888_MHz_XTAL/9)
-	MCFG_DEVICE_PROGRAM_MAP(sm7238_mem)
-	MCFG_DEVICE_IO_MAP(sm7238_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+void sm7238_state::sm7238(machine_config &config)
+{
+	I8080(config, m_maincpu, 16.5888_MHz_XTAL/9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sm7238_state::sm7238_mem);
+	m_maincpu->set_addrmap(AS_IO, &sm7238_state::sm7238_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	ADDRESS_MAP_BANK(config, "videobank").set_map(&sm7238_state::videobank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(20.625_MHz_XTAL, KSM_TOTAL_HORZ, 0, KSM_DISP_HORZ, KSM_TOTAL_VERT, 0, KSM_DISP_VERT);
-	MCFG_SCREEN_UPDATE_DRIVER(sm7238_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("pic8259", pic8259_device, ir2_w))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(20.625_MHz_XTAL, KSM_TOTAL_HORZ, 0, KSM_DISP_HORZ, KSM_TOTAL_VERT, 0, KSM_DISP_VERT);
+	m_screen->set_screen_update(FUNC(sm7238_state::screen_update));
+	m_screen->screen_vblank().set(m_pic8259, FUNC(pic8259_device::ir2_w));
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(sm7238_state, sm7238)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sm7238)
+	PALETTE(config, "palette", FUNC(sm7238_state::sm7238_palette), 3);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_sm7238);
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("t_hblank", PIT8253, 0)
-	MCFG_PIT8253_CLK1(16.384_MHz_XTAL/9) // XXX workaround -- keyboard is slower and doesn't sync otherwise
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, sm7238_state, write_keyboard_clock))
+	PIT8253(config, m_t_hblank, 0);
+	m_t_hblank->set_clk<1>(16.384_MHz_XTAL/9); // XXX workaround -- keyboard is slower and doesn't sync otherwise
+	m_t_hblank->out_handler<1>().set(FUNC(sm7238_state::write_keyboard_clock));
 
-	MCFG_DEVICE_ADD("t_vblank", PIT8253, 0)
-	MCFG_PIT8253_CLK2(16.5888_MHz_XTAL/9)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, sm7238_state, write_printer_clock))
+	PIT8253(config, m_t_vblank, 0);
+	m_t_vblank->set_clk<2>(16.5888_MHz_XTAL/9);
+	m_t_vblank->out_handler<2>().set(FUNC(sm7238_state::write_printer_clock));
 
-	MCFG_DEVICE_ADD("t_color", PIT8253, 0)
+	PIT8253(config, m_t_color, 0);
 
-	MCFG_DEVICE_ADD("t_iface", PIT8253, 0)
-	MCFG_PIT8253_CLK1(16.5888_MHz_XTAL/9)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("i8251line", i8251_device, write_txc))
-	MCFG_PIT8253_CLK2(16.5888_MHz_XTAL/9)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("i8251line", i8251_device, write_rxc))
+	PIT8253(config, m_t_iface, 0);
+	m_t_iface->set_clk<1>(16.5888_MHz_XTAL/9);
+	m_t_iface->out_handler<1>().set(m_i8251line, FUNC(i8251_device::write_txc));
+	m_t_iface->set_clk<2>(16.5888_MHz_XTAL/9);
+	m_t_iface->out_handler<2>().set(m_i8251line, FUNC(i8251_device::write_rxc));
 
 	// serial connection to host
 	I8251(config, m_i8251line, 0);
@@ -413,12 +413,12 @@ MACHINE_CONFIG_START(sm7238_state::sm7238)
 
 	// serial connection to KM-035 keyboard
 	I8251(config, m_i8251kbd, 0);
-	m_i8251kbd->txd_handler().set("keyboard", FUNC(km035_device::write_rxd));
-	m_i8251kbd->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir3_w));
+	m_i8251kbd->txd_handler().set(m_keyboard, FUNC(km035_device::write_rxd));
+	m_i8251kbd->rxrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir3_w));
 
-	MCFG_DEVICE_ADD("keyboard", KM035, 0)
-	MCFG_KM035_TX_HANDLER(WRITELINE("i8251kbd", i8251_device, write_rxd))
-	MCFG_KM035_RTS_HANDLER(WRITELINE("i8251kbd", i8251_device, write_cts))
+	KM035(config, m_keyboard, 0);
+	m_keyboard->tx_handler().set(m_i8251kbd, FUNC(i8251_device::write_rxd));
+	m_keyboard->rts_handler().set(m_i8251kbd, FUNC(i8251_device::write_cts));
 
 	// serial connection to printer
 	I8251(config, m_i8251prn, 0);
@@ -428,7 +428,7 @@ MACHINE_CONFIG_START(sm7238_state::sm7238)
 	prtr.rxd_handler().set(m_i8251prn, FUNC(i8251_device::write_rxd));
 	prtr.cts_handler().set(m_i8251prn, FUNC(i8251_device::write_cts));
 	prtr.dsr_handler().set(m_i8251prn, FUNC(i8251_device::write_dsr));
-MACHINE_CONFIG_END
+}
 
 ROM_START( sm7238 )
 	ROM_REGION(0xa000, "maincpu", ROMREGION_ERASE00)

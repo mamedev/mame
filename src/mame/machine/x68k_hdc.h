@@ -133,7 +133,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(X68KHDC, x68k_hdc_image_device)
 
-#define MCFG_X68KHDC_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, X68KHDC, 0)
-
 #endif // MAME_MACHINE_X68K_HDC_H

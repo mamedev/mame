@@ -375,45 +375,41 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(mainsnk_state::mainsnk)
+void mainsnk_state::mainsnk(machine_config &config)
+{
+	Z80(config, m_maincpu, 3360000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mainsnk_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mainsnk_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("maincpu", Z80, 3360000)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mainsnk_state,  irq0_line_hold)
-
-	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mainsnk_state, irq0_line_assert,  244)
+	Z80(config, m_audiocpu, 4000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &mainsnk_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &mainsnk_state::sound_portmap);
+	m_audiocpu->set_periodic_int(FUNC(mainsnk_state::irq0_line_assert), attotime::from_hz(244));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(36*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mainsnk_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(36*8, 28*8);
+	screen.set_visarea(0*8, 36*8-1, 1*8, 28*8-1);
+	screen.set_screen_update(FUNC(mainsnk_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mainsnk)
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_INIT_OWNER(mainsnk_state, mainsnk)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mainsnk);
+	PALETTE(config, m_palette, FUNC(mainsnk_state::mainsnk_palette), 0x400);
+	m_palette->enable_shadows();
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-
-	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-MACHINE_CONFIG_END
+	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);
+	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);
+}
 
 
-ROM_START( mainsnk)
+ROM_START(mainsnk)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "snk.p01",      0x0000, 0x2000, CRC(00db1ca2) SHA1(efe83488cf88adc185e6024b8f6ad5f8ef7f4cfd) )
 	ROM_LOAD( "snk.p02",      0x2000, 0x2000, CRC(df5c86b5) SHA1(e9c854524e3d8231c874314cdff321e66ec7f0c4) )
@@ -480,4 +476,4 @@ ROM_END
 
 
 GAME( 1984, mainsnk, 0, mainsnk, mainsnk, mainsnk_state, empty_init, ROT180, "SNK", "Main Event (1984)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, canvas,  0, mainsnk, canvas,  mainsnk_state, empty_init, ROT0, "SNK", "Canvas Croquis", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, canvas,  0, mainsnk, canvas,  mainsnk_state, empty_init, ROT0,   "SNK", "Canvas Croquis", MACHINE_SUPPORTS_SAVE )

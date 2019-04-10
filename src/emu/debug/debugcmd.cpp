@@ -21,6 +21,7 @@
 #include "natkeyboard.h"
 #include "render.h"
 #include <ctype.h>
+#include <algorithm>
 #include <fstream>
 
 
@@ -160,6 +161,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("ge",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_exception, this, _1, _2));
 	m_console.register_command("gtime",     CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1, _2));
 	m_console.register_command("gt",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1, _2));
+	m_console.register_command("gp",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_privilege, this, _1, _2));
 	m_console.register_command("next",      CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_next, this, _1, _2));
 	m_console.register_command("n",         CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_next, this, _1, _2));
 	m_console.register_command("focus",     CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_focus, this, _1, _2));
@@ -459,12 +461,17 @@ bool debugger_commands::validate_cpu_parameter(const char *param, device_t *&res
 		return false;
 	}
 
-	/* if we got a valid one, return */
-	device_execute_interface *exec = execute_interface_iterator(m_machine.root_device()).byindex(cpunum);
-	if (exec != nullptr)
+	// attempt to find by numerical index
+	int index = 0;
+	for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
 	{
-		result = &exec->device();
-		return true;
+		// real CPUs should have pcbase
+		const device_state_interface *state;
+		if (exec.device().interface(state) && state->state_find_entry(STATE_GENPCBASE) != nullptr && index++ == cpunum)
+		{
+			result = &exec.device();
+			return true;
+		}
 	}
 
 	/* if out of range, complain */
@@ -656,6 +663,18 @@ int debugger_commands::mini_printf(char *buffer, const char *format, int params,
 					param++;
 					params--;
 					break;
+				case 'C':
+				case 'c':
+					if (params == 0)
+					{
+						m_console.printf("Not enough parameters for format!\n");
+						return 0;
+					}
+					p += sprintf(p, "%c", char(*param));
+					param++;
+					params--;
+					break;
+
 			}
 		}
 
@@ -898,6 +917,19 @@ void debugger_commands::execute_go_time(int ref, const std::vector<std::string> 
 	m_cpu.get_visible_cpu()->debug()->go_milliseconds(milliseconds);
 }
 
+
+
+/*-------------------------------------------------
+    execute_go_privilege - execute the gp command
+-------------------------------------------------*/
+void debugger_commands::execute_go_privilege(int ref, const std::vector<std::string> &params)
+{
+	parsed_expression condition(&m_cpu.get_visible_cpu()->debug()->symtable());
+	if (params.size() > 0 && !debug_command_parameter_expression(params[0], condition))
+		return;
+
+	m_cpu.get_visible_cpu()->debug()->go_privilege((condition.is_empty()) ? "1" : condition.original_string());
+}
 
 /*-------------------------------------------------
     execute_next - execute the next command
@@ -3189,13 +3221,6 @@ void debugger_commands::execute_memdump(int ref, const std::vector<std::string> 
     execute_symlist - execute the symlist command
 -------------------------------------------------*/
 
-static int CLIB_DECL symbol_sort_compare(const void *item1, const void *item2)
-{
-	const char *str1 = *(const char **)item1;
-	const char *str2 = *(const char **)item2;
-	return strcmp(str1, str2);
-}
-
 void debugger_commands::execute_symlist(int ref, const std::vector<std::string> &params)
 {
 	device_t *cpu = nullptr;
@@ -3231,7 +3256,9 @@ void debugger_commands::execute_symlist(int ref, const std::vector<std::string> 
 
 	/* sort the symbols */
 	if (count > 1)
-		qsort((void *)namelist, count, sizeof(namelist[0]), symbol_sort_compare);
+		std::sort(&namelist[0], &namelist[count], [](const char *item1, const char *item2) {
+			return strcmp(item1, item2) < 0;
+		});
 
 	/* iterate over symbols and print out relevant ones */
 	for (symnum = 0; symnum < count; symnum++)

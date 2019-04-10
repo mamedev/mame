@@ -521,9 +521,15 @@ WRITE16_MEMBER(taitojc_state::main_to_dsp_7ff_w)
 	}
 }
 
+void taitojc_state::cpu_space_map(address_map &map)
+{
+	map(0xfffffff0, 0xffffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffffff4, 0xfffffff5).lr16("vblank irq", []() -> u16 { return 0x82; });
+}
+
 INTERRUPT_GEN_MEMBER(taitojc_state::taitojc_vblank)
 {
-	device.execute().set_input_line_and_vector(2, HOLD_LINE, 0x82); // where does it come from?
+	device.execute().set_input_line(2, HOLD_LINE); // where does it come from?
 }
 
 WRITE8_MEMBER(taitojc_state::jc_irq_unk_w)
@@ -1077,23 +1083,24 @@ void taitojc_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(taitojc_state::taitojc)
-
+void taitojc_state::taitojc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(10'000'000)*2) // 20MHz, clock source = CY7C991
-	MCFG_DEVICE_PROGRAM_MAP(taitojc_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitojc_state, taitojc_vblank)
+	M68040(config, m_maincpu, XTAL(10'000'000)*2); // 20MHz, clock source = CY7C991
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitojc_state::taitojc_map);
+	m_maincpu->set_vblank_int("screen", FUNC(taitojc_state::taitojc_vblank));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &taitojc_state::cpu_space_map);
 
-	MCFG_DEVICE_ADD("sub", MC68HC11, XTAL(16'000'000)/2) // 8MHz, MC68HC11M0
-	MCFG_DEVICE_PROGRAM_MAP(hc11_pgm_map)
-	MCFG_DEVICE_IO_MAP(hc11_io_map)
-	MCFG_MC68HC11_CONFIG( 1, 1280, 0x00 )
+	mc68hc11_cpu_device &sub(MC68HC11(config, "sub", XTAL(16'000'000)/2)); // 8MHz, MC68HC11M0
+	sub.set_addrmap(AS_PROGRAM, &taitojc_state::hc11_pgm_map);
+	sub.set_addrmap(AS_IO, &taitojc_state::hc11_io_map);
+	sub.set_config(1, 1280, 0x00);
 
-	MCFG_DEVICE_ADD("dsp", TMS32051, XTAL(10'000'000)*4) // 40MHz, clock source = CY7C991
-	MCFG_DEVICE_PROGRAM_MAP(tms_program_map)
-	MCFG_DEVICE_DATA_MAP(tms_data_map)
+	TMS32051(config, m_dsp, XTAL(10'000'000)*4); // 40MHz, clock source = CY7C991
+	m_dsp->set_addrmap(AS_PROGRAM, &taitojc_state::tms_program_map);
+	m_dsp->set_addrmap(AS_DATA, &taitojc_state::tms_data_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -1105,38 +1112,38 @@ MACHINE_CONFIG_START(taitojc_state::taitojc)
 	m_tc0640fio->write_4_callback().set(FUNC(taitojc_state::coin_control_w));
 	m_tc0640fio->read_7_callback().set_ioport("BUTTONS");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(taitojc_state, screen_update_taitojc)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(taitojc_state::screen_update_taitojc));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, m_palette).set_entries(32768);
 
-	MCFG_DEVICE_ADD("tc0780fpa", TC0780FPA, 0)
+	TC0780FPA(config, m_tc0780fpa, 0);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
-MACHINE_CONFIG_END
+	TAITO_EN(config, "taito_en", 0);
+}
 
-MACHINE_CONFIG_START(taitojc_state::dendego)
+void taitojc_state::dendego(machine_config &config)
+{
 	taitojc(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(dendego_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitojc_state::dendego_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(taitojc_state, screen_update_dendego)
+	m_screen->set_screen_update(FUNC(taitojc_state::screen_update_dendego));
 
 	/* sound hardware */
 	SPEAKER(config, "vibration").subwoofer();
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "vibration", 0.20)
-MACHINE_CONFIG_END
+
+	/* clock frequency & pin 7 not verified */
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "vibration", 0.20);
+}
 
 
 

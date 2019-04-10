@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "machine/i8251.h"
 #include "machine/z80dart.h"
@@ -403,38 +404,39 @@ static void pwrview_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-MACHINE_CONFIG_START(pwrview_state::pwrview)
-	MCFG_DEVICE_ADD("maincpu", I80186, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(pwrview_map)
-	MCFG_DEVICE_OPCODES_MAP(pwrview_fetch_map)
-	MCFG_DEVICE_IO_MAP(pwrview_io)
+void pwrview_state::pwrview(machine_config &config)
+{
+	I80186(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pwrview_state::pwrview_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &pwrview_state::pwrview_fetch_map);
+	m_maincpu->set_addrmap(AS_IO, &pwrview_state::pwrview_io);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(64'000'000)/8, 480, 0, 384, 1040, 0, 960)  // clock unknown
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(64'000'000)/8, 480, 0, 384, 1040, 0, 960);  // clock unknown
+	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(16'000'000)/16) // clocks unknown, fix above when found
-	MCFG_PIT8253_CLK1(XTAL(16'000'000)/16)
-	MCFG_PIT8253_CLK2(XTAL(16'000'000)/16)
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(XTAL(16'000'000)/16); // clocks unknown, fix above when found
+	m_pit->set_clk<1>(XTAL(16'000'000)/16);
+	m_pit->set_clk<2>(XTAL(16'000'000)/16);
 
 	// floppy disk controller
-	UPD765A(config, "fdc", true, true); // Rockwell R7675P
+	UPD765A(config, "fdc", 8'000'000, true, true); // Rockwell R7675P
 	//fdc.intrq_wr_callback().set("pic1", FUNC(pic8259_device::ir6_w));
 	//fdc.drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, "uart", 0);
 
 	Z80SIO2(config, "sio", 4000000);
 
-	MCFG_DEVICE_ADD("crtc", HD6845, XTAL(64'000'000)/64) // clock unknown
-	MCFG_MC6845_CHAR_WIDTH(32) // ??
-	MCFG_MC6845_UPDATE_ROW_CB(pwrview_state, update_row)
+	hd6845_device &crtc(HD6845(config, "crtc", XTAL(64'000'000)/64)); // clock unknown
+	crtc.set_char_width(32);   /* ? */
+	crtc.set_update_row_callback(FUNC(pwrview_state::update_row), this);
 
 	ADDRESS_MAP_BANK(config, "bios_bank").set_map(&pwrview_state::bios_bank).set_options(ENDIANNESS_LITTLE, 16, 17, 0x8000);
-MACHINE_CONFIG_END
+}
 
 ROM_START(pwrview)
 	ROM_REGION(0x8000, "bios", 0)

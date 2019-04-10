@@ -39,32 +39,6 @@
 #include "dirtc.h"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MSM58321_D0_HANDLER(_devcb) \
-	downcast<msm58321_device &>(*device).set_d0_handler(DEVCB_##_devcb);
-
-#define MCFG_MSM58321_D1_HANDLER(_devcb) \
-	downcast<msm58321_device &>(*device).set_d1_handler(DEVCB_##_devcb);
-
-#define MCFG_MSM58321_D2_HANDLER(_devcb) \
-	downcast<msm58321_device &>(*device).set_d2_handler(DEVCB_##_devcb);
-
-#define MCFG_MSM58321_D3_HANDLER(_devcb) \
-	downcast<msm58321_device &>(*device).set_d3_handler(DEVCB_##_devcb);
-
-#define MCFG_MSM58321_BUSY_HANDLER(_devcb) \
-	downcast<msm58321_device &>(*device).set_busy_handler(DEVCB_##_devcb);
-
-#define MCFG_MSM58321_YEAR0(_year0) \
-	downcast<msm58321_device &>(*device).set_year0(_year0);
-
-#define MCFG_MSM58321_DEFAULT_24H(_default_24h) \
-	downcast<msm58321_device &>(*device).set_default_24h(_default_24h);
-
 // ======================> msm58321_device
 
 class msm58321_device : public device_t,
@@ -76,11 +50,6 @@ public:
 	msm58321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_d0_handler(Object &&cb) { return m_d0_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_d1_handler(Object &&cb) { return m_d1_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_d2_handler(Object &&cb) { return m_d2_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_d3_handler(Object &&cb) { return m_d3_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_busy_handler(Object &&cb) { return m_busy_handler.set_callback(std::forward<Object>(cb)); }
 	auto d0_handler() { return m_d0_handler.bind(); }
 	auto d1_handler() { return m_d1_handler.bind(); }
 	auto d2_handler() { return m_d2_handler.bind(); }

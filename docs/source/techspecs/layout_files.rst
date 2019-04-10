@@ -32,7 +32,7 @@ There are two kinds of numbers in MAME layouts: integers and floating-point
 numbers.
 
 Integers may be supplied in decimal or hexadecimal notation.  A decimal integer
-consists of and optional # (hash) prefix, an optional +/- (plus or minus) sign
+consists of an optional # (hash) prefix, an optional +/- (plus or minus) sign
 character, and a sequence of digits 0-9.  A hexadecimal number consists of one
 of the prefixes $ (dollar sign) or 0x (zero ex) followed by a sequence of
 hexadecimal digits 0-9 and A-F.  Hexadecimal numbers are case-insensitive for
@@ -768,12 +768,14 @@ how digital displays may be connected to emulated outputs::
 
 If an element instantiating a layout element has ``inputtag`` and ``inputmask``
 attributes but lacks a ``name`` attribute, it will take its state from the value
-of the corresponding I/O port, masked with the ``inputmask`` value, and shifted
-to the right so that the least significant one bit of the mask aligns with the
-least significant bit of the value (for example a mask of 0x05 will result in no
-shift, while a mask of 0xb0 will result in the value being shifted four bits to
-the right).  This is often used to allow clickable buttons and toggle switches
-to provide visible feedback.
+of the corresponding I/O port, masked with the ``inputmask`` value and XORed
+with the I/O port default field value.  The latter is useful for inputs that are
+active-low.  If the result is non-zero, the state is 1, otherwise it's 0.  This
+is often used to allow clickable buttons and toggle switches to provide visible
+feedback.  By using ``inputraw="1"``, it's possible to obtain the raw data from
+the I/O port, masked with the ``inputmask`` value and shifted to the right to
+remove trailing zeroes (for example a mask of 0x05 will result in no shift, while
+a mask of 0xb0 will result in the value being shifted four bits to the right).
 
 When handling mouse input, MAME treats all layout elements as being rectangular,
 and only activates the frontmost element whose area includes the location of the
@@ -1055,6 +1057,12 @@ The following views will be automatically generated:
   play games that don't automatically rotate the display for the second player.
   The screen will be displayed at its physical aspect ratio, with rotation
   applied.
+* If the system has exactly two emulated screens, MAME will generate a view
+  showing the second screen above the first screen with a small gap between
+  them.  The second screen will be rotated by 180 degrees.  This view can be
+  used to play a dual-screen two-player game on a "cocktail table" cabinet with
+  a single screen.  The screens will be displayed at their physical aspect
+  ratios, with rotation applied.
 * If the system has exactly two emulated screens and no view in the internal or
   external layouts shows all screens, or if the system has more than two
   emulated screens, MAME will generate views with the screens arranged
@@ -1084,9 +1092,9 @@ when parameters are used, or recursively nested groups.  The ``complay.py``
 script is compatible with both Python 2.7 and Python 3 interpreters.
 
 The ``complay.py`` script takes three parameters -- an input file name, an
-output file name, and a base name for variables in the output::
+output file name, and a base name for variables in the output:
 
-    python scripts/build/complay.py input [output [varname]]
+    **python scripts/build/complay.py** *<input>* [*<output>* [*<varname>*]]
 
 The input file name is required.  If no output file name is supplied,
 ``complay.py`` will parse and check the input, reporting any errors found,
@@ -1098,6 +1106,6 @@ in case of an I/O error.  If an output file name is specified, the file will be
 created/overwritten on success or removed on failure.
 
 To check a layout file for common errors, run the script with the path to the
-file no check and no output file name or base variable name.  For example::
+file no check and no output file name or base variable name.  For example:
 
-    python scripts/build/complay.py artwork/dino/default.lay
+    **python scripts/build/complay.py artwork/dino/default.lay**

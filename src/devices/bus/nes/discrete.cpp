@@ -134,7 +134,7 @@ void nes_74x161x138_device::pcb_reset()
  -------------------------------------------------*/
 
 // there are two 'variants' depending on hardwired or mapper ctrl mirroring
-WRITE8_MEMBER(nes_74x161x161x32_device::write_h)
+void nes_74x161x161x32_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("74x161x161x32 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -155,7 +155,7 @@ WRITE8_MEMBER(nes_74x161x161x32_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_74x139x74_device::write_m)
+void nes_74x139x74_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("74x139x74 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -179,7 +179,7 @@ WRITE8_MEMBER(nes_74x139x74_device::write_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_74x377_device::write_h)
+void nes_74x377_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("74x377 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -200,7 +200,7 @@ WRITE8_MEMBER(nes_74x377_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_74x161x138_device::write_m)
+void nes_74x161x138_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("74x161x138 write_m, offset: %04x, data: %02x\n", offset, data));
 

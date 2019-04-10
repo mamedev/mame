@@ -2185,6 +2185,14 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
+	<!-- Notes:
+	    This game is compatible with the Nintendo VRSユニット [NUS-020(JPN)], a voice recognition unit that connects
+	    to controller 2 port and has the following hardware inside:
+	        pcb: NUS-VRU-01
+	        u1: Nintendo VRD-NUS 215 9915J3001
+	        u2: NEC D9930G 9912LP009 (linear CODEC LSI)
+	        u3: Nintendo VCI-NUS 9910XX003 011
+	-->
 	<software name="dendeg64">
 		<description>Densha de Go! 64 (Jpn)</description>
 		<year>1999</year>
@@ -3877,6 +3885,14 @@ This cart features a RTC, currently unemulated
 		</part>
 	</software>
 
+	<!-- Notes:
+	    This game requires the Nintendo VRU [NUS-020(USA)], a voice recognition unit that connects
+	    to controller 2 port and has the following hardware inside (parts from the Japanese version [NUS-020(JPN)]):
+	        pcb: NUS-VRU-01
+	        u1: Nintendo VRD-NUS 215 9915J3001
+	        u2: NEC D9930G 9912LP009 (linear CODEC LSI)
+	        u3: Nintendo VCI-NUS 9910XX003 011
+	-->
 	<software name="heypika">
 		<description>Hey You, Pikachu! (USA)</description>
 		<year>2000</year>
@@ -7597,6 +7613,14 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
+	<!-- Notes:
+	    This game requires the Nintendo VRSユニット [NUS-020(JPN)], a voice recognition unit that connects
+	    to controller 2 port and has the following hardware inside:
+	        pcb: NUS-VRU-01
+	        u1: Nintendo VRD-NUS 215 9915J3001
+	        u2: NEC D9930G 9912LP009 (linear CODEC LSI)
+	        u3: Nintendo VCI-NUS 9910XX003 011
+	-->
 	<software name="pikachu" cloneof="heypika">
 		<description>Pikachuu Genki de Chuu (Jpn)</description>
 		<year>1998</year>

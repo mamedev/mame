@@ -30,8 +30,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
 
-	static void ncr5380(device_t *device);
-
 protected:
 	a2bus_hsscsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

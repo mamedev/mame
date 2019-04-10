@@ -617,8 +617,8 @@ void wgp_state::main_map(address_map &map)
 	map(0x180000, 0x18000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
 	map(0x1c0000, 0x1c0001).w(FUNC(wgp_state::cpua_ctrl_w));
 	map(0x200000, 0x20000f).rw(FUNC(wgp_state::adinput_r), FUNC(wgp_state::adinput_w));
-	map(0x300000, 0x30ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));            /* tilemaps */
-	map(0x320000, 0x32000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x300000, 0x30ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));            /* tilemaps */
+	map(0x320000, 0x32000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x400000, 0x40bfff).ram().share("spritemap");   /* sprite tilemaps */
 	map(0x40c000, 0x40dfff).ram().share("spriteram");   /* sprite ram */
 	map(0x40fff0, 0x40fff1).nopw();    /* ?? (writes 0x8000 and 0 alternately - Wgp2 just 0) */
@@ -912,22 +912,21 @@ void wgp_state::machine_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(wgp_state::postload), this));
 }
 
-MACHINE_CONFIG_START(wgp_state::wgp)
-
+void wgp_state::wgp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wgp_state, irq4_line_hold)
+	M68000(config, m_maincpu, 12000000);    /* 12 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wgp_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(wgp_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16000000/4)   /* 4 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
+	Z80(config, m_audiocpu, 16000000/4);    /* 4 MHz ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &wgp_state::z80_sound_map);
 
-	MCFG_DEVICE_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wgp_state, cpub_interrupt)
+	M68000(config, m_subcpu, 12000000);     /* 12 MHz ??? */
+	m_subcpu->set_addrmap(AS_PROGRAM, &wgp_state::cpu2_map);
+	m_subcpu->set_vblank_int("screen", FUNC(wgp_state::cpub_interrupt));
 
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
+	config.m_minimum_quantum = attotime::from_hz(30000);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -938,53 +937,49 @@ MACHINE_CONFIG_START(wgp_state::wgp)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wgp_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(wgp_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wgp)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wgp);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
 
-	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(1)
-	MCFG_TC0100SCN_TX_REGION(3)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	TC0100SCN(config, m_tc0100scn, 0);
+	m_tc0100scn->set_gfx_region(1);
+	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) // assumes Z80 sandwiched between 68Ks
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0); // assumes Z80 sandwiched between 68Ks
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("sub")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
-MACHINE_CONFIG_END
+	TC0140SYT(config, m_tc0140syt, 0);
+	m_tc0140syt->set_master_tag(m_subcpu);
+	m_tc0140syt->set_slave_tag(m_audiocpu);
+}
 
-
-MACHINE_CONFIG_START(wgp_state::wgp2)
+void wgp_state::wgp2(machine_config &config)
+{
 	wgp(config);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+	config.m_minimum_quantum = attotime::from_hz(12000);
+
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(wgp_state, wgp2)
 
-	MCFG_DEVICE_MODIFY("tc0100scn")
-	MCFG_TC0100SCN_OFFSETS(4, 2)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
-MACHINE_CONFIG_END
+	m_tc0100scn->set_offsets(4, 2);
+}
 
 
 /***************************************************************************

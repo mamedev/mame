@@ -329,25 +329,25 @@ WRITE_LINE_MEMBER(raiden_state::vblank_irq)
 {
 	if (state)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
-		m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
+		m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
 	}
 }
 
-MACHINE_CONFIG_START(raiden_state::raiden)
-
+void raiden_state::raiden(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V30,XTAL(20'000'000)/2) /* NEC V30 CPU, 20MHz verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	V30(config, m_maincpu, XTAL(20'000'000)/2); /* NEC V30 CPU, 20MHz verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &raiden_state::main_map);
 
-	MCFG_DEVICE_ADD("sub", V30,XTAL(20'000'000)/2) /* NEC V30 CPU, 20MHz verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	V30(config, m_subcpu, XTAL(20'000'000)/2); /* NEC V30 CPU, 20MHz verified on pcb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &raiden_state::sub_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181)/4)); /* verified on pcb */
+	audiocpu.set_addrmap(AS_PROGRAM, &raiden_state::seibu_sound_map);
+	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+	config.m_minimum_quantum = attotime::from_hz(12000);
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
@@ -362,81 +362,72 @@ MACHINE_CONFIG_START(raiden_state::raiden)
 	screen.screen_vblank().append(FUNC(raiden_state::vblank_irq));
 	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_raiden);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'318'181)/4));
+	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH) // frequency and pin 7 verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH)); // frequency and pin 7 verified
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
-MACHINE_CONFIG_END
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
+}
 
-MACHINE_CONFIG_START(raiden_state::raidene)
+void raiden_state::raidene(machine_config &config)
+{
 	raiden(config);
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(raiden_sound_map)
-	MCFG_DEVICE_OPCODES_MAP(raiden_sound_decrypted_opcodes_map)
+	subdevice<z80_device>("audiocpu")->set_addrmap(AS_PROGRAM, &raiden_state::raiden_sound_map);
+	subdevice<z80_device>("audiocpu")->set_addrmap(AS_OPCODES, &raiden_state::raiden_sound_decrypted_opcodes_map);
 
-	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
-	MCFG_DEVICE_PROGRAM_MAP(sei80bu_encrypted_full_map)
-MACHINE_CONFIG_END
+	sei80bu_device &sei80bu(SEI80BU(config, "sei80bu", 0));
+	sei80bu.set_addrmap(AS_PROGRAM, &raiden_state::sei80bu_encrypted_full_map);
+}
 
-MACHINE_CONFIG_START(raiden_state::raidenu)
+void raiden_state::raidenu(machine_config &config)
+{
 	raidene(config);
-
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(raidenu_main_map)
-
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(raidenu_sub_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &raiden_state::raidenu_main_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &raiden_state::raidenu_sub_map);
+}
 
 WRITE16_MEMBER( raiden_state::raidenb_layer_scroll_w )
 {
 	COMBINE_DATA(&m_raidenb_scroll_ram[offset]);
 }
 
-MACHINE_CONFIG_START(raiden_state::raidenkb)
+void raiden_state::raidenkb(machine_config &config)
+{
+	raiden(config);
+	m_maincpu->set_clock(XTAL(32'000'000) / 4); // Xtal and clock verified
+	m_subcpu->set_clock(XTAL(32'000'000) / 4); // Xtal and clock verified
+}
+
+void raiden_state::raidenb(machine_config &config)
+{
 	raiden(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(32'000'000) / 4) // Xtal and clock verified
-
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_CLOCK(XTAL(32'000'000) / 4) // Xtal and clock verified
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(raiden_state::raidenb)
-	raiden(config);
-
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(raidenb_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &raiden_state::raidenb_main_map);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(raiden_state,raidenb)
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden_state, raidenb_layer_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, raiden_state, raidenb_layer_scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.layer_en_callback().set(FUNC(raiden_state::raidenb_layer_enable_w));
+	crtc.layer_scroll_callback().set(FUNC(raiden_state::raidenb_layer_scroll_w));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(raiden_state, screen_update_raidenb)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(raiden_state::screen_update_raidenb));
+}
 
 
 /***************************************************************************/
@@ -737,6 +728,42 @@ ROM_START( raidenb )/* Different hardware, Main & Sub CPU code not encrypted. */
 	ROM_LOAD( "jj3010.u0116", 0x0000, 0x0100, NO_DUMP )
 ROM_END
 
+ROM_START( raidenub ) // only region bits differ from raidenb
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
+	ROM_LOAD16_BYTE( "1.u0253", 0x0a0000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
+	ROM_LOAD16_BYTE( "2.u0252", 0x0a0001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
+	ROM_LOAD16_BYTE( "3u.u022", 0x0c0000, 0x20000, CRC(9d735bf5) SHA1(531981eac2ef0c0635f067a649899f98738d5c67) ) /* Simply labeled as 3u */
+	ROM_LOAD16_BYTE( "4u.u023", 0x0c0001, 0x20000, CRC(95c110ef) SHA1(e6aea374ca63cdd851af66240e51461882d170e8) ) /* Simply labeled as 4u */
+
+	ROM_REGION( 0x100000, "sub", 0 ) /* v30 sub cpu */
+	ROM_LOAD16_BYTE( "5__,raidenb.u042", 0x0c0000, 0x20000, CRC(7aca6d61) SHA1(4d80ec87e54d7495b9bdf819b9985b1c8183c80d) ) /* Simply labeled as 5 */
+	ROM_LOAD16_BYTE( "6__,raidenb.u043", 0x0c0001, 0x20000, CRC(e3d35cc2) SHA1(4329865985aaf3fb524618e2e958563c8fa6ead5) ) /* Simply labeled as 6 */
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_LOAD( "rai6.u212",   0x000000, 0x08000, CRC(723a483b) SHA1(50e67945e83ea1748fb748de3287d26446d4e0a0) ) /* Should be labeled "8" ??? */
+	ROM_CONTINUE(            0x010000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x010000, "gfx1", 0 ) /* Chars */
+	ROM_LOAD( "9",  0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* On some PCBs there is no explicit */
+	ROM_LOAD( "10", 0x08000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) /* U location for these two roms     */
+
+	ROM_REGION( 0x080000, "gfx2", 0 ) /* tiles */
+	ROM_LOAD( "sei420", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) /* U919 on this PCB */
+
+	ROM_REGION( 0x080000, "gfx3", 0 ) /* tiles */
+	ROM_LOAD( "sei430", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) /* U920 on this PCB */
+
+	ROM_REGION( 0x090000, "gfx4", 0 ) /* Sprites */
+	ROM_LOAD( "sei440", 0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) /* U165 on this PCB */
+
+	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
+	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+
+	ROM_REGION( 0x0100, "proms", 0 ) // N82S135N bipolar PROM
+	ROM_LOAD( "jj3010.u0116", 0x0000, 0x0100, NO_DUMP )
+ROM_END
+
 ROM_START( raidenua )/* Different hardware, Main, Sub & sound CPU code not encrypted. */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "1.c8",   0x0a0000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
@@ -833,3 +860,4 @@ GAME( 1990, raidenua, raiden, raidenu,  raiden, raiden_state,  empty_init,   ROT
 
 /* Alternate hardware. Main, Sub & Sound CPU code not encrypted. It also sports Seibu custom CRTC. */
 GAME( 1990, raidenb,  raiden, raidenb,  raiden, raiden_state,  empty_init,   ROT270, "Seibu Kaihatsu", "Raiden (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenub, raiden, raidenb,  raiden, raiden_state,  empty_init,   ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 3)", MACHINE_SUPPORTS_SAVE )

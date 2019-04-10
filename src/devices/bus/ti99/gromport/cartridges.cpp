@@ -138,6 +138,7 @@ void ti99_cartridge_device::prepare_cartridge()
 	m_pcb->m_rom_size = loaded_through_softlist() ? get_software_region_length("rom") : m_rpk->get_resource_length("rom_socket");
 	if (m_pcb->m_rom_size > 0)
 	{
+		if (m_pcb->m_rom_size > 0x200000) fatalerror("Cartridge ROM size exceeding 2 MiB");
 		LOGMASKED(LOG_CONFIG, "rom size=0x%04x\n", m_pcb->m_rom_size);
 		regr = memregion(CARTROM_TAG);
 		rom_ptr = loaded_through_softlist() ? get_software_region("rom") : m_rpk->get_contents_of_socket("rom_socket");
@@ -340,23 +341,23 @@ void ti99_cartridge_device::set_slot(int i)
 READ8Z_MEMBER(ti99_cartridge_device::readz)
 {
 	if (m_pcb != nullptr)
-		m_pcb->readz(space, offset, value);
+		m_pcb->readz(offset, value);
 }
 
-WRITE8_MEMBER(ti99_cartridge_device::write)
+void ti99_cartridge_device::write(offs_t offset, uint8_t data)
 {
 	if (m_pcb != nullptr)
-		m_pcb->write(space, offset, data);
+		m_pcb->write(offset, data);
 }
 
 READ8Z_MEMBER(ti99_cartridge_device::crureadz)
 {
-	if (m_pcb != nullptr) m_pcb->crureadz(space, offset, value);
+	if (m_pcb != nullptr) m_pcb->crureadz(offset, value);
 }
 
-WRITE8_MEMBER(ti99_cartridge_device::cruwrite)
+void ti99_cartridge_device::cruwrite(offs_t offset, uint8_t data)
 {
-	if (m_pcb != nullptr) m_pcb->cruwrite(space, offset, data);
+	if (m_pcb != nullptr) m_pcb->cruwrite(offset, data);
 }
 
 WRITE_LINE_MEMBER( ti99_cartridge_device::ready_line )
@@ -508,7 +509,7 @@ READ8Z_MEMBER(ti99_cartridge_pcb::readz)
 	}
 }
 
-WRITE8_MEMBER(ti99_cartridge_pcb::write)
+void ti99_cartridge_pcb::write(offs_t offset, uint8_t data)
 {
 	if (m_romspace_selected)
 	{
@@ -525,7 +526,7 @@ READ8Z_MEMBER(ti99_cartridge_pcb::crureadz)
 {
 }
 
-WRITE8_MEMBER(ti99_cartridge_pcb::cruwrite)
+void ti99_cartridge_pcb::cruwrite(offs_t offset, uint8_t data)
 {
 }
 
@@ -613,7 +614,7 @@ READ8Z_MEMBER(ti99_paged12k_cartridge::readz)
 	}
 }
 
-WRITE8_MEMBER(ti99_paged12k_cartridge::write)
+void ti99_paged12k_cartridge::write(offs_t offset, uint8_t data)
 {
 	if (m_romspace_selected)
 	{
@@ -662,7 +663,7 @@ READ8Z_MEMBER(ti99_paged16k_cartridge::readz)
 	}
 }
 
-WRITE8_MEMBER(ti99_paged16k_cartridge::write)
+void ti99_paged16k_cartridge::write(offs_t offset, uint8_t data)
 {
 	if (m_romspace_selected)
 	{
@@ -719,7 +720,7 @@ READ8Z_MEMBER(ti99_minimem_cartridge::readz)
 }
 
 /* Write function for the minimem cartridge. */
-WRITE8_MEMBER(ti99_minimem_cartridge::write)
+void ti99_minimem_cartridge::write(offs_t offset, uint8_t data)
 {
 	if (m_romspace_selected)
 	{
@@ -787,7 +788,7 @@ READ8Z_MEMBER(ti99_super_cartridge::readz)
 }
 
 /* Write function for the super cartridge. */
-WRITE8_MEMBER(ti99_super_cartridge::write)
+void ti99_super_cartridge::write(offs_t offset, uint8_t data)
 {
 	if (m_romspace_selected)
 	{
@@ -825,19 +826,15 @@ READ8Z_MEMBER(ti99_super_cartridge::crureadz)
 	//         SRL   R0,1        Restore Bank Number (optional)
 	//         RT
 
-	// Our implementation in MESS always gets 8 bits in one go. Also, the address
-	// is twice the bit number. That is, the offset value is always a multiple
-	// of 0x10.
-
 	if ((offset & 0xfff0) == 0x0800)
 	{
 		LOGMASKED(LOG_CRU, "CRU accessed at %04x\n", offset);
 		uint8_t val = 0x02 << (m_ram_page << 1);
-		*value = (val >> ((offset - 0x0800)>>1)) & 0xff;
+		*value = BIT(val, (offset & 0x000e) >> 1);
 	}
 }
 
-WRITE8_MEMBER(ti99_super_cartridge::cruwrite)
+void ti99_super_cartridge::cruwrite(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xfff0) == 0x0800)
 	{
@@ -922,7 +919,7 @@ READ8Z_MEMBER(ti99_mbx_cartridge::readz)
 }
 
 /* Write function for the mbx cartridge. */
-WRITE8_MEMBER(ti99_mbx_cartridge::write)
+void ti99_mbx_cartridge::write(offs_t offset, uint8_t data)
 {
 	if (m_romspace_selected)
 	{
@@ -998,7 +995,7 @@ READ8Z_MEMBER(ti99_paged7_cartridge::readz)
 }
 
 /* Write function for the paged7 cartridge. */
-WRITE8_MEMBER(ti99_paged7_cartridge::write)
+void ti99_paged7_cartridge::write(offs_t offset, uint8_t data)
 {
 	if (m_romspace_selected)
 	{
@@ -1070,7 +1067,7 @@ READ8Z_MEMBER(ti99_paged379i_cartridge::readz)
 }
 
 /* Write function for the paged379i cartridge. Only used to set the bank. */
-WRITE8_MEMBER(ti99_paged379i_cartridge::write)
+void ti99_paged379i_cartridge::write(offs_t offset, uint8_t data)
 {
 	// Bits: 011x xxxx xxxb bbbx
 	// x = don't care, bbbb = bank
@@ -1121,7 +1118,7 @@ READ8Z_MEMBER(ti99_paged378_cartridge::readz)
 }
 
 /* Write function for the paged378 cartridge. Only used to set the bank. */
-WRITE8_MEMBER(ti99_paged378_cartridge::write)
+void ti99_paged378_cartridge::write(offs_t offset, uint8_t data)
 {
 	// Bits: 011x xxxx xbbb bbbx
 	// x = don't care, bbbb = bank
@@ -1161,7 +1158,7 @@ READ8Z_MEMBER(ti99_paged377_cartridge::readz)
 }
 
 /* Write function for the paged377 cartridge. Only used to set the bank. */
-WRITE8_MEMBER(ti99_paged377_cartridge::write)
+void ti99_paged377_cartridge::write(offs_t offset, uint8_t data)
 {
 	// Bits: 011x xxxb bbbb bbbx
 	// x = don't care, bbbb = bank
@@ -1215,7 +1212,7 @@ READ8Z_MEMBER(ti99_pagedcru_cartridge::readz)
 }
 
 /* Write function for the pagedcru cartridge. No effect. */
-WRITE8_MEMBER(ti99_pagedcru_cartridge::write)
+void ti99_pagedcru_cartridge::write(offs_t offset, uint8_t data)
 {
 	return;
 }
@@ -1230,11 +1227,11 @@ READ8Z_MEMBER(ti99_pagedcru_cartridge::crureadz)
 		{
 			page = page-(bit/2);  // 4 page flags per 8 bits
 		}
-		*value = 1 << (page*2+1);
+		*value = (offset & 0x000e) == (page * 4 + 2) ? 1 : 0;
 	}
 }
 
-WRITE8_MEMBER(ti99_pagedcru_cartridge::cruwrite)
+void ti99_pagedcru_cartridge::cruwrite(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xf800)==0x0800)
 	{
@@ -1306,7 +1303,7 @@ READ8Z_MEMBER(ti99_gromemu_cartridge::readz)
 {
 	if (m_grom_selected)
 	{
-		if (m_grom_read_mode) gromemureadz(space, offset, value, mem_mask);
+		if (m_grom_read_mode) gromemureadz(offset, value);
 	}
 	else
 	{
@@ -1326,7 +1323,7 @@ READ8Z_MEMBER(ti99_gromemu_cartridge::readz)
 	}
 }
 
-WRITE8_MEMBER(ti99_gromemu_cartridge::write)
+void ti99_gromemu_cartridge::write(offs_t offset, uint8_t data)
 {
 	if (m_romspace_selected)
 	{
@@ -1347,7 +1344,7 @@ WRITE8_MEMBER(ti99_gromemu_cartridge::write)
 		// Will not change anything when not selected (preceding gsq=ASSERT)
 		if (m_grom_selected)
 		{
-			if (!m_grom_read_mode) gromemuwrite(space, offset, data, mem_mask);
+			if (!m_grom_read_mode) gromemuwrite(offset, data);
 		}
 	}
 }
@@ -1372,7 +1369,7 @@ READ8Z_MEMBER(ti99_gromemu_cartridge::gromemureadz)
 	m_waddr_LSB = false;
 }
 
-WRITE8_MEMBER(ti99_gromemu_cartridge::gromemuwrite)
+void ti99_gromemu_cartridge::gromemuwrite(offs_t offset, uint8_t data)
 {
 	// Set GROM address
 	if (m_grom_address_mode)

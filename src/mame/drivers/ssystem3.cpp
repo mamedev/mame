@@ -298,8 +298,7 @@ void ssystem3_state::ssystem3(machine_config &config)
 	screen.set_screen_update(FUNC(ssystem3_state::screen_update_ssystem3));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 242 + 32768);
-	m_palette->set_init(FUNC(ssystem3_state::palette_init));
+	PALETTE(config, m_palette, FUNC(ssystem3_state::palette_init), 242 + 32768);
 
 	/* via */
 	VIA6522(config, m_via6522_0, 1000000);

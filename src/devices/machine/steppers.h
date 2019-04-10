@@ -2,7 +2,7 @@
 // copyright-holders:James Wallace
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-// steppers.c steppermotor emulation                                     //
+// steppers.cpp steppermotor emulation                                   //
 //                                                                       //
 // Emulates : stepper motors driven with full step or half step          //
 //            also emulates the index optic                              //
@@ -33,8 +33,6 @@
 
 #define PROJECT_48STEP_REEL     10
 
-#define MCFG_STEPPER_OPTIC_CALLBACK(_write) \
-	downcast<stepper_device &>(*device).set_optic_handler(DEVCB_##_write);
 
 class stepper_device : public device_t
 {
@@ -47,7 +45,7 @@ public:
 
 	stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class Object> devcb_base &set_optic_handler(Object &&cb) { return m_optic_cb.set_callback(std::forward<Object>(cb)); }
+	auto optic_handler() { return m_optic_cb.bind(); }
 
 	/* total size of reel (in half steps) */
 	void set_max_steps(int16_t steps) { m_max_steps = steps; }

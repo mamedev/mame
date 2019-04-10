@@ -124,12 +124,15 @@ enum {
 	NB1413M3_PAIRSTEN
 };
 
-#define MCFG_NB1413M3_TYPE(_type) \
-	downcast<nb1413m3_device &>(*device).set_type(_type);
-
 class nb1413m3_device : public device_t
 {
 public:
+	nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int type) :
+		nb1413m3_device(mconfig, tag, owner, clock)
+	{
+		set_type(type);
+	}
+
 	nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~nb1413m3_device() {}
 
@@ -199,9 +202,5 @@ INPUT_PORTS_EXTERN( nbhf1_ctrl );
 INPUT_PORTS_EXTERN( nbhf2_ctrl );
 
 DECLARE_DEVICE_TYPE(NB1413M3, nb1413m3_device)
-
-
-#define MCFG_NB1413M3_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, NB1413M3, 0)
 
 #endif // MAME_MACHINE_NB1413M3_H

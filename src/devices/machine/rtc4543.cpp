@@ -57,7 +57,7 @@ rtc4543_device::rtc4543_device(const machine_config &mconfig, const char *tag, d
 rtc4543_device::rtc4543_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_rtc_interface(mconfig, *this)
-	, data_cb(*this)
+	, m_data_cb(*this)
 	, m_ce(0), m_clk(0), m_wr(0), m_data(0), m_curbit(0)
 	, m_clock_timer(nullptr)
 {
@@ -70,7 +70,7 @@ rtc4543_device::rtc4543_device(const machine_config &mconfig, device_type type, 
 
 void rtc4543_device::device_start()
 {
-	data_cb.resolve_safe();
+	m_data_cb.resolve_safe();
 
 	// allocate timers
 	m_clock_timer = timer_alloc();
@@ -279,7 +279,7 @@ void rtc4543_device::load_bit(int reg)
 
 	// shift data bit
 	m_data = (m_regs[reg] >> bit) & 1;
-	data_cb(m_data);
+	m_data_cb(m_data);
 }
 
 

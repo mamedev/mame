@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders:Sven Schnelle
+Hewlett-Packard HP 9122C floppy drive Layout
+-->
+<mamelayout version="2">
+	<element name="background"><rect><color red="0.30" green="0.30" blue="0.30"/></rect></element>
+	<element name="ledr" defstate="0">
+		<disk state="1"><color red="1.0" green="0.0" blue="0.0"/></disk>
+		<disk state="0"><color red="0.2" green="0.2" blue="0.2"/></disk>
+	</element>
+
+	<element name="led0_s"> <text string="0"> <color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="led1_s"> <text string="1"> <color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="led2_s"> <text string="E"> <color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<group name="panel">
+		<bezel element="background"><bounds x="0" y="0" width="~scr0width~" height="64"/></bezel>
+		<repeat count="3">
+			<param name="left" start="20" increment="20" />
+			<param name="right" start="36" increment="20" />
+			<param name="num" start="0" increment="1" />
+			<bezel name="led~num~_s" element="led~num~_s"><bounds left="~left~" right="~right~" top="8" bottom="24"/></bezel>
+			<bezel name="led~num~" element="ledr"><bounds left="~left~" right="~right~" top="32" bottom="48"/></bezel>
+		</repeat>
+	</group>
+
+	<view name="HP9122C">
+		<screen index="0"><bounds x="0" y="0" width="~scr0width~" height="~scr0height~"/></screen>
+		<group ref="panel"><bounds x="0" y="~scr0height~" width="~scr0width~" height="64"/></group>
+	</view>
+</mamelayout>

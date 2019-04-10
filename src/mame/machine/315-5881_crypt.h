@@ -10,9 +10,6 @@ typedef device_delegate<uint16_t (uint32_t)> sega_m2_read_delegate;
 
 DECLARE_DEVICE_TYPE(SEGA315_5881_CRYPT, sega_315_5881_crypt_device)
 
-#define MCFG_SET_READ_CALLBACK( _class, _method) \
-	downcast<sega_315_5881_crypt_device &>(*device).set_read_cb(sega_m2_read_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
-
 
 class sega_315_5881_crypt_device :  public device_t
 {

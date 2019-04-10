@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_TMNT_H
+#define MAME_INCLUDES_TMNT_H
+
+#pragma once
+
 #include "sound/samples.h"
 #include "sound/upd7759.h"
 #include "sound/k007232.h"
@@ -17,8 +22,8 @@
 class tmnt_state : public driver_device
 {
 public:
-	tmnt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tmnt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_tmnt2_rom(*this, "tmnt2_rom"),
 		m_sunset_104000(*this, "sunset_104000"),
@@ -37,7 +42,8 @@ public:
 		m_upd7759(*this, "upd"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void cuebrick(machine_config &config);
 	void blswhstl(machine_config &config);
@@ -141,8 +147,6 @@ private:
 	DECLARE_WRITE16_MEMBER(ssriders_soundkludge_w);
 	DECLARE_WRITE16_MEMBER(k053251_glfgreat_w);
 	DECLARE_WRITE16_MEMBER(tmnt2_1c0800_w);
-	DECLARE_READ8_MEMBER(k054539_ctrl_r);
-	DECLARE_WRITE8_MEMBER(k054539_ctrl_w);
 	DECLARE_WRITE16_MEMBER(tmnt_0a0000_w);
 	DECLARE_WRITE16_MEMBER(punkshot_0a0020_w);
 	DECLARE_WRITE16_MEMBER(lgtnfght_0a0018_w);
@@ -223,3 +227,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_TMNT_H

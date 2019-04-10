@@ -27,7 +27,8 @@ public:
 		m_usb(*this, "usbsnd"),
 		m_aysnd(*this, "aysnd"),
 		m_vector(*this, "vector"),
-		m_screen(*this, "screen"){ }
+		m_screen(*this, "screen")
+	{ }
 
 	void g80v_base(machine_config &config);
 	void tacscan(machine_config &config);

@@ -391,61 +391,61 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(redalert_state::redalert)
-
+void redalert_state::redalert(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(redalert_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
+	M6502(config, m_maincpu, MAIN_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &redalert_state::redalert_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(redalert_state::redalert_vblank_interrupt));
 
 	/* video hardware */
 	redalert_video(config);
 
 	/* audio hardware */
 	redalert_audio(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(redalert_state::ww3)
-
+void redalert_state::ww3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(ww3_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
+	M6502(config, m_maincpu, MAIN_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &redalert_state::ww3_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(redalert_state::redalert_vblank_interrupt));
 
 	/* video hardware */
 	ww3_video(config);
 
 	/* audio hardware */
 	ww3_audio(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(redalert_state::panther)
-
+void redalert_state::panther(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(panther_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
+	M6502(config, m_maincpu, MAIN_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &redalert_state::panther_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(redalert_state::redalert_vblank_interrupt));
 
 	/* video hardware */
 	panther_video(config);
 
 	/* audio hardware */
 	ww3_audio(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(redalert_state::demoneye)
-
+void redalert_state::demoneye(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(demoneye_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
+	M6502(config, m_maincpu, MAIN_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &redalert_state::demoneye_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(redalert_state::redalert_vblank_interrupt));
 
 	/* video hardware */
 	demoneye_video(config);
 
 	/* audio hardware */
 	demoneye_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 

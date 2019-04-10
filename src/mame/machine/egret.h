@@ -17,35 +17,6 @@
 #define EGRET_341S0850  0x2200
 #define EGRET_344S0100  0x3300
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_EGRET_ADD(_type) \
-	MCFG_DEVICE_ADD(EGRET_TAG, EGRET, 0) \
-	MCFG_EGRET_TYPE(_type)
-
-#define MCFG_EGRET_REPLACE(_type) \
-	MCFG_DEVICE_REPLACE(EGRET_TAG, EGRET, 0) \
-	MCFG_EGRET_TYPE(_type)
-
-#define MCFG_EGRET_TYPE(_type) \
-	downcast<egret_device &>(*device).set_type(_type);
-
-#define MCFG_EGRET_REMOVE() \
-	MCFG_DEVICE_REMOVE(EGRET_TAG)
-
-#define MCFG_EGRET_RESET_CALLBACK(_cb) \
-	downcast<egret_device &>(*device).set_reset_cb(DEVCB_##_cb);
-
-#define MCFG_EGRET_LINECHANGE_CALLBACK(_cb) \
-	downcast<egret_device &>(*device).set_linechange_cb(DEVCB_##_cb);
-
-#define MCFG_EGRET_VIA_CLOCK_CALLBACK(_cb) \
-	downcast<egret_device &>(*device).set_via_clock_cb(DEVCB_##_cb);
-
-#define MCFG_EGRET_VIA_DATA_CALLBACK(_cb) \
-	downcast<egret_device &>(*device).set_via_data_cb(DEVCB_##_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -100,10 +71,6 @@ public:
 
 	int rom_offset;
 
-	template <class Object> devcb_base &set_reset_cb(Object &&wr) { return write_reset.set_callback(std::forward<Object>(wr)); }
-	template <class Object> devcb_base &set_linechange_cb(Object &&wr) { return write_linechange.set_callback(std::forward<Object>(wr)); }
-	template <class Object> devcb_base &set_via_clock_cb(Object &&wr) { return write_via_clock.set_callback(std::forward<Object>(wr)); }
-	template <class Object> devcb_base &set_via_data_cb(Object &&wr) { return write_via_data.set_callback(std::forward<Object>(wr)); }
 	auto reset_callback() { return write_reset.bind(); }
 	auto linechange_callback() { return write_linechange.bind(); }
 	auto via_clock_callback() { return write_via_clock.bind(); }

@@ -89,10 +89,10 @@ void bbc_fdc_slot_device::device_reset()
 //  read
 //-------------------------------------------------
 
-READ8_MEMBER(bbc_fdc_slot_device::read)
+uint8_t bbc_fdc_slot_device::read(offs_t offset)
 {
 	if (m_card)
-		return m_card->read(space, offset);
+		return m_card->read(offset);
 	else
 		return 0xff;
 }
@@ -101,10 +101,10 @@ READ8_MEMBER(bbc_fdc_slot_device::read)
 //  write
 //-------------------------------------------------
 
-WRITE8_MEMBER(bbc_fdc_slot_device::write)
+void bbc_fdc_slot_device::write(offs_t offset, uint8_t data)
 {
 	if (m_card)
-		m_card->write(space, offset, data);
+		m_card->write(offset, data);
 }
 
 //-------------------------------------------------
@@ -121,7 +121,6 @@ WRITE8_MEMBER(bbc_fdc_slot_device::write)
 #include "opus.h"
 //#include "solidisk.h"
 #include "watford.h"
-//#include "zdfs.h"
 
 
 void bbc_fdc_devices(device_slot_interface &device)
@@ -142,5 +141,4 @@ void bbc_fdc_devices(device_slot_interface &device)
 	//device.option_add("stl1770_2", BBC_STL1770_2);
 	device.option_add("weddb2",    BBC_WEDDB2);
 	device.option_add("weddb3",    BBC_WEDDB3);
-	//device.option_add("zdfs",      BBC_ZDFS);
 }

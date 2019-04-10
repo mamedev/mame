@@ -33,13 +33,18 @@
 class photon2_state : public driver_device
 {
 public:
-	photon2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	photon2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_speaker(*this, "speaker"),
-		m_spectrum_video_ram(*this, "spectrum_vram") { }
+		m_spectrum_video_ram(*this, "spectrum_vram")
+	{ }
 
 	void photon2(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -57,9 +62,7 @@ private:
 	DECLARE_WRITE8_MEMBER(fe_w);
 	DECLARE_WRITE8_MEMBER(misc_w);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(photon2);
+	void photon2_palette(palette_device &palette) const;
 
 	uint32_t screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_spectrum);
@@ -96,7 +99,7 @@ private:
 #define SPEC_RETRACE_CYCLES       48   /* Cycles taken for horizonal retrace */
 #define SPEC_CYCLES_PER_LINE      224  /* Number of cycles to display a single line */
 
-static const rgb_t spectrum_palette[16] = {
+static constexpr rgb_t spectrum_palette[16] = {
 	rgb_t(0x00, 0x00, 0x00),
 	rgb_t(0x00, 0x00, 0xbf),
 	rgb_t(0xbf, 0x00, 0x00),
@@ -115,10 +118,10 @@ static const rgb_t spectrum_palette[16] = {
 	rgb_t(0xff, 0xff, 0xff)
 };
 
-/* Initialise the palette */
-PALETTE_INIT_MEMBER(photon2_state, photon2)
+// Initialise the palette
+void photon2_state::photon2_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, spectrum_palette, ARRAY_LENGTH(spectrum_palette));
+	palette.set_pen_colors(0, spectrum_palette);
 }
 
 void photon2_state::video_start()
@@ -355,33 +358,30 @@ void photon2_state::machine_start()
 	save_item(NAME(m_nmi_enable));
 }
 
-MACHINE_CONFIG_START(photon2_state::photon2)
+void photon2_state::photon2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(spectrum_mem)
-	MCFG_DEVICE_IO_MAP(spectrum_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", photon2_state, spec_interrupt_hack, "screen", 0, 1)
-
+	Z80(config, m_maincpu, 3500000);        /* 3.5 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &photon2_state::spectrum_mem);
+	m_maincpu->set_addrmap(AS_IO, &photon2_state::spectrum_io);
+	TIMER(config, "scantimer").configure_scanline(FUNC(photon2_state::spec_interrupt_hack), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50.08)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
-	MCFG_SCREEN_UPDATE_DRIVER(photon2_state, screen_update_spectrum)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, photon2_state, screen_vblank_spectrum))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50.08);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT);
+	screen.set_visarea(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1);
+	screen.set_screen_update(FUNC(photon2_state::screen_update_spectrum));
+	screen.screen_vblank().set(FUNC(photon2_state::screen_vblank_spectrum));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(photon2_state, photon2)
+	PALETTE(config, "palette", FUNC(photon2_state::photon2_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 /*************************************
  *

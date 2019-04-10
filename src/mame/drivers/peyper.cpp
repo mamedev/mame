@@ -601,12 +601,13 @@ void peyper_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(peyper_state::peyper)
+void peyper_state::peyper(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 2'500'000)
-	MCFG_DEVICE_PROGRAM_MAP(peyper_map)
-	MCFG_DEVICE_IO_MAP(peyper_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(peyper_state, irq0_line_hold,  1250)
+	Z80(config, m_maincpu, 2'500'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &peyper_state::peyper_map);
+	m_maincpu->set_addrmap(AS_IO, &peyper_state::peyper_io);
+	m_maincpu->set_periodic_int(FUNC(peyper_state::irq0_line_hold), attotime::from_hz(1250));
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
@@ -615,14 +616,14 @@ MACHINE_CONFIG_START(peyper_state::peyper)
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "ayvol").front_center();
-	MCFG_DEVICE_ADD("ay1", AY8910, 2500000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, peyper_state, p1a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, peyper_state, p1b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
-	MCFG_DEVICE_ADD("ay2", AY8910, 2500000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, peyper_state, p2a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, peyper_state, p2b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
+	ay8910_device &ay1(AY8910(config, "ay1", 2500000));
+	ay1.port_a_write_callback().set(FUNC(peyper_state::p1a_w));
+	ay1.port_b_write_callback().set(FUNC(peyper_state::p1b_w));
+	ay1.add_route(ALL_OUTPUTS, "ayvol", 1.0);
+	ay8910_device &ay2(AY8910(config, "ay2", 2500000));
+	ay2.port_a_write_callback().set(FUNC(peyper_state::p2a_w));
+	ay2.port_b_write_callback().set(FUNC(peyper_state::p2b_w));
+	ay2.add_route(ALL_OUTPUTS, "ayvol", 1.0);
 
 	/* Devices */
 	i8279_device &kbdc(I8279(config, "i8279", 2500000));
@@ -631,7 +632,7 @@ MACHINE_CONFIG_START(peyper_state::peyper)
 	kbdc.in_rl_callback().set(FUNC(peyper_state::sw_r));        // kbd RL lines
 	kbdc.in_shift_callback().set_constant(1);                   // Shift key
 	kbdc.in_ctrl_callback().set_constant(1);
-MACHINE_CONFIG_END
+}
 
 // Not allowed to set up an array all at once, so we have this mess
 void peyper_state::init_peyper()

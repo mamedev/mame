@@ -39,12 +39,6 @@
  * processor, as each is shared.
  */
 
-#define MCFG_NES_APU_IRQ_HANDLER(_devcb) \
-	downcast<nesapu_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
-#define MCFG_NES_APU_MEM_READ_CALLBACK(_devcb) \
-	downcast<nesapu_device &>(*device).set_mem_read_callback(DEVCB_##_devcb);
-
 class nesapu_device : public device_t,
 						public device_sound_interface
 {
@@ -54,6 +48,8 @@ public:
 	// configuration helpers
 	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_mem_read_callback(Object &&cb) { return m_mem_read_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq() { return m_irq_handler.bind(); }
+	auto mem_read() { return m_mem_read_cb.bind(); }
 
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;

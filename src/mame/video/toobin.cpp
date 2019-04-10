@@ -96,10 +96,8 @@ void toobin_state::video_start()
 
 WRITE16_MEMBER( toobin_state::paletteram_w )
 {
-	int newword;
-
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	newword = m_generic_paletteram_16[offset];
+	COMBINE_DATA(&m_paletteram[offset]);
+	uint16_t newword = m_paletteram[offset];
 
 	{
 		int red =   (((newword >> 10) & 31) * 224) >> 5;
@@ -128,7 +126,7 @@ WRITE16_MEMBER( toobin_state::intensity_w )
 		m_brightness = (double)(~data & 0x1f) / 31.0;
 
 		for (i = 0; i < 0x400; i++)
-			if (!(m_generic_paletteram_16[i] & 0x8000))
+			if (!BIT(m_paletteram[i], 15))
 				m_palette->set_pen_contrast(i, m_brightness);
 	}
 }

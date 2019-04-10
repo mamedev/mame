@@ -41,8 +41,8 @@ public:
 	void set_bits(tlc34076_bits bits) { m_dacbits = bits; }
 
 	// public interface
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
@@ -64,15 +64,6 @@ private:
 	uint8_t m_readindex;
 	uint8_t m_dacbits;
 };
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_TLC34076_ADD(tag, bits) \
-	MCFG_DEVICE_ADD((tag), TLC34076, 0) \
-	downcast<tlc34076_device &>(*device).set_bits((tlc34076_device::bits));
 
 
 DECLARE_DEVICE_TYPE(TLC34076, tlc34076_device)

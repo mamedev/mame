@@ -13,7 +13,6 @@
 
 #include "includes/slapstic.h"
 #include "cpu/m6502/m6502.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -148,7 +147,6 @@ protected:
 	// interrupt handling
 	void scanline_int_set(screen_device &screen, int scanline);
 	DECLARE_WRITE_LINE_MEMBER(scanline_int_write_line);
-	INTERRUPT_GEN_MEMBER(scanline_int_gen);
 	DECLARE_WRITE16_MEMBER(scanline_int_ack_w);
 
 	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
@@ -204,8 +202,6 @@ protected:
 
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;
-	optional_device<palette_device> m_palette;
-	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
 	optional_device<atari_slapstic_device> m_slapstic_device;
 
 private:

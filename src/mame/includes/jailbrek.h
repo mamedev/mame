@@ -5,6 +5,10 @@
     Jailbreak
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_JAILBREK_H
+#define MAME_INCLUDES_JAILBREK_H
+
+#pragma once
 
 #include "sound/vlm5030.h"
 #include "emupal.h"
@@ -15,8 +19,8 @@
 class jailbrek_state : public driver_device
 {
 public:
-	jailbrek_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	jailbrek_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -25,7 +29,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_vlm(*this, "vlm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void jailbrek(machine_config &config);
 
@@ -59,7 +64,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(jailbrek);
+	void jailbrek_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(interrupt_nmi);
@@ -67,3 +72,5 @@ private:
 	void jailbrek_map(address_map &map);
 	void vlm_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_JAILBREK_H

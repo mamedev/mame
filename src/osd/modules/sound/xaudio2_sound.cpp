@@ -196,11 +196,11 @@ private:
 	std::thread                      m_audioThread;
 	std::queue<xaudio2_buffer>       m_queue;
 	std::unique_ptr<bufferpool>      m_buffer_pool;
-	uint32_t                           m_overflows;
-	uint32_t                           m_underflows;
+	uint32_t                         m_overflows;
+	uint32_t                         m_underflows;
 	BOOL                             m_in_underflow;
 	BOOL                             m_initialized;
-	OSD_DYNAMIC_API(xaudio2, "dwrite.dll");
+	OSD_DYNAMIC_API(xaudio2, "XAudio2_9.dll", "XAudio2_8.dll");
 	OSD_DYNAMIC_API_FN(xaudio2, HRESULT, WINAPI, XAudio2Create, IXAudio2 **, uint32_t, XAUDIO2_PROCESSOR);
 
 public:

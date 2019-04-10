@@ -9,7 +9,7 @@ m24_z8000_device::m24_z8000_device(const machine_config &mconfig, const char *ta
 	device_t(mconfig, M24_Z8000, tag, owner, clock),
 	m_z8000(*this, "z8000"),
 	m_maincpu(*this, ":maincpu"),
-	m_pic(*this, ":mb:pic8259"),
+	m_pic(*this, ":pic"),
 	m_halt_out(*this),
 	m_z8000_halt(true)
 {
@@ -68,24 +68,25 @@ void m24_z8000_device::z8000_io(address_map &map)
 	map(0x80c1, 0x80c1).rw(FUNC(m24_z8000_device::handshake_r), FUNC(m24_z8000_device::handshake_w));
 }
 
-MACHINE_CONFIG_START(m24_z8000_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("z8000", Z8001, XTAL(8'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(z8000_prog)
-	MCFG_DEVICE_DATA_MAP(z8000_data)
-	MCFG_DEVICE_IO_MAP(z8000_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(m24_z8000_device, int_cb)
-	MCFG_Z8000_MO(WRITELINE(*this, m24_z8000_device, mo_w))
+void m24_z8000_device::device_add_mconfig(machine_config &config)
+{
+	Z8001(config, m_z8000, XTAL(8'000'000)/2);
+	m_z8000->set_addrmap(AS_PROGRAM, &m24_z8000_device::z8000_prog);
+	m_z8000->set_addrmap(AS_DATA, &m24_z8000_device::z8000_data);
+	m_z8000->set_addrmap(AS_IO, &m24_z8000_device::z8000_io);
+	m_z8000->set_irq_acknowledge_callback(FUNC(m24_z8000_device::int_cb));
+	m_z8000->mo().set(FUNC(m24_z8000_device::mo_w));
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(19660000/15)
-	MCFG_PIT8253_OUT0_HANDLER(NOOP) //8251
-	MCFG_PIT8253_CLK1(19660000/15)
-	MCFG_PIT8253_OUT1_HANDLER(NOOP)
-	MCFG_PIT8253_CLK2(19660000/15)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, m24_z8000_device, timer_irq_w))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(19660000/15); //8251
+	pit8253.out_handler<0>().set_nop();
+	pit8253.set_clk<1>(19660000/15);
+	pit8253.out_handler<1>().set_nop();
+	pit8253.set_clk<2>(19660000/15);
+	pit8253.out_handler<2>().set(FUNC(m24_z8000_device::timer_irq_w));
 
-	MCFG_DEVICE_ADD("i8251", I8251, 0)
-MACHINE_CONFIG_END
+	I8251(config, "i8251", 0);
+}
 
 const uint8_t m24_z8000_device::pmem_table[16][4] =
 	{{0, 1, 2, 3}, {1, 2, 3, 255}, {4, 5, 6, 7}, {46, 40, 41, 42},

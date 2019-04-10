@@ -33,8 +33,9 @@ private:
 static INPUT_PORTS_START( zt8802 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(zt8802_state::zt8802)
-MACHINE_CONFIG_END
+void zt8802_state::zt8802(machine_config &config)
+{
+}
 
 ROM_START( zt8802 )
 	ROM_REGION( 0x80000, "roms", 0 )

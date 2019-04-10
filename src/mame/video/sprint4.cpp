@@ -12,14 +12,14 @@ Atari Sprint 4 video emulation
 #include "screen.h"
 
 
-PALETTE_INIT_MEMBER(sprint4_state, sprint4)
+void sprint4_state::sprint4_palette(palette_device &palette) const
 {
-	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00)); /* black  */
-	palette.set_indirect_color(1, rgb_t(0xfc, 0xdf, 0x80)); /* peach  */
-	palette.set_indirect_color(2, rgb_t(0xf0, 0x00, 0xf0)); /* violet */
-	palette.set_indirect_color(3, rgb_t(0x00, 0xf0, 0x0f)); /* green  */
-	palette.set_indirect_color(4, rgb_t(0x30, 0x4f, 0xff)); /* blue   */
-	palette.set_indirect_color(5, rgb_t(0xff, 0xff, 0xff)); /* white  */
+	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00)); // black
+	palette.set_indirect_color(1, rgb_t(0xfc, 0xdf, 0x80)); // peach
+	palette.set_indirect_color(2, rgb_t(0xf0, 0x00, 0xf0)); // violet
+	palette.set_indirect_color(3, rgb_t(0x00, 0xf0, 0x0f)); // green
+	palette.set_indirect_color(4, rgb_t(0x30, 0x4f, 0xff)); // blue
+	palette.set_indirect_color(5, rgb_t(0xff, 0xff, 0xff)); // white
 
 	palette.set_pen_indirect(0, 0);
 	palette.set_pen_indirect(2, 0);
@@ -123,11 +123,10 @@ WRITE_LINE_MEMBER(sprint4_state::screen_vblank)
 
 		/* update sound status */
 
-		address_space &space = machine().dummy_space();
-		m_discrete->write(space, SPRINT4_MOTOR_DATA_1, m_videoram[0x391] & 15);
-		m_discrete->write(space, SPRINT4_MOTOR_DATA_2, m_videoram[0x393] & 15);
-		m_discrete->write(space, SPRINT4_MOTOR_DATA_3, m_videoram[0x395] & 15);
-		m_discrete->write(space, SPRINT4_MOTOR_DATA_4, m_videoram[0x397] & 15);
+		m_discrete->write(SPRINT4_MOTOR_DATA_1, m_videoram[0x391] & 15);
+		m_discrete->write(SPRINT4_MOTOR_DATA_2, m_videoram[0x393] & 15);
+		m_discrete->write(SPRINT4_MOTOR_DATA_3, m_videoram[0x395] & 15);
+		m_discrete->write(SPRINT4_MOTOR_DATA_4, m_videoram[0x397] & 15);
 	}
 }
 

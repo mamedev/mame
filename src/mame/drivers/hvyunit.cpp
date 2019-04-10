@@ -107,7 +107,7 @@ private:
 	/* Devices */
 	required_device<cpu_device> m_mastercpu;
 	required_device<cpu_device> m_slavecpu;
-	required_device<cpu_device> m_mermaid;
+	required_device<i80c51_device> m_mermaid;
 	required_device<cpu_device> m_soundcpu;
 	required_device<kaneko_pandora_device> m_pandora;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -327,10 +327,10 @@ READ8_MEMBER(hvyunit_state::mermaid_p0_r)
 WRITE8_MEMBER(hvyunit_state::mermaid_p0_w)
 {
 	if (!BIT(m_mermaid_p[0], 1) && BIT(data, 1))
-		m_slavelatch->write(space, 0, m_mermaid_p[1]);
+		m_slavelatch->write(m_mermaid_p[1]);
 
 	if (BIT(data, 0) == 0)
-		m_mermaid_p[1] = m_mermaidlatch->read(space, 0);
+		m_mermaid_p[1] = m_mermaidlatch->read();
 
 	m_mermaid_p[0] = data;
 }
@@ -605,11 +605,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xfd);
+		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
 
 	/* Pandora "sprite end dma" irq? TODO: timing is likely off */
 	if(scanline == 64)
-		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 /*************************************
@@ -618,65 +618,63 @@ TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::scanline)
  *
  *************************************/
 
-MACHINE_CONFIG_START(hvyunit_state::hvyunit)
+void hvyunit_state::hvyunit(machine_config &config)
+{
+	Z80(config, m_mastercpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
+	m_mastercpu->set_addrmap(AS_PROGRAM, &hvyunit_state::master_memory);
+	m_mastercpu->set_addrmap(AS_IO, &hvyunit_state::master_io);
+	TIMER(config, "scantimer").configure_scanline(FUNC(hvyunit_state::scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("master", Z80, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(master_memory)
-	MCFG_DEVICE_IO_MAP(master_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hvyunit_state, scanline, "screen", 0, 1)
+	Z80(config, m_slavecpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
+	m_slavecpu->set_addrmap(AS_PROGRAM, &hvyunit_state::slave_memory);
+	m_slavecpu->set_addrmap(AS_IO, &hvyunit_state::slave_io);
+	m_slavecpu->set_vblank_int("screen", FUNC(hvyunit_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("slave", Z80, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(slave_memory)
-	MCFG_DEVICE_IO_MAP(slave_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", hvyunit_state,  irq0_line_hold)
+	Z80(config, m_soundcpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &hvyunit_state::sound_memory);
+	m_soundcpu->set_addrmap(AS_IO, &hvyunit_state::sound_io);
+	m_soundcpu->set_vblank_int("screen", FUNC(hvyunit_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(sound_memory)
-	MCFG_DEVICE_IO_MAP(sound_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", hvyunit_state,  irq0_line_hold)
+	I80C51(config, m_mermaid, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
+	m_mermaid->port_in_cb<0>().set(FUNC(hvyunit_state::mermaid_p0_r));
+	m_mermaid->port_out_cb<0>().set(FUNC(hvyunit_state::mermaid_p0_w));
+	m_mermaid->port_in_cb<1>().set(FUNC(hvyunit_state::mermaid_p1_r));
+	m_mermaid->port_out_cb<1>().set(FUNC(hvyunit_state::mermaid_p1_w));
+	m_mermaid->port_in_cb<2>().set(FUNC(hvyunit_state::mermaid_p2_r));
+	m_mermaid->port_out_cb<2>().set(FUNC(hvyunit_state::mermaid_p2_w));
+	m_mermaid->port_in_cb<3>().set(FUNC(hvyunit_state::mermaid_p3_r));
+	m_mermaid->port_out_cb<3>().set(FUNC(hvyunit_state::mermaid_p3_w));
 
-	MCFG_DEVICE_ADD("mermaid", I80C51, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, hvyunit_state, mermaid_p0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, hvyunit_state, mermaid_p0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, hvyunit_state, mermaid_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, hvyunit_state, mermaid_p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, hvyunit_state, mermaid_p2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, hvyunit_state, mermaid_p2_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, hvyunit_state, mermaid_p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, hvyunit_state, mermaid_p3_w))
+	GENERIC_LATCH_8(config, m_mermaidlatch);
+	m_mermaidlatch->data_pending_callback().set_inputline(m_mermaid, INPUT_LINE_IRQ0);
 
-	MCFG_GENERIC_LATCH_8_ADD("mermaidlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("mermaid", INPUT_LINE_IRQ0))
+	GENERIC_LATCH_8(config, m_slavelatch);
 
-	MCFG_GENERIC_LATCH_8_ADD("slavelatch")
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 240-1);
+	screen.set_screen_update(FUNC(hvyunit_state::screen_update));
+	screen.screen_vblank().set(FUNC(hvyunit_state::screen_vblank));
+	screen.set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hvyunit_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hvyunit_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hvyunit);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hvyunit)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-
-	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
-	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
+	KANEKO_PANDORA(config, m_pandora, 0);
+	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/4) /* 3MHz verified on PCB */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	YM2203(config, "ymsnd", XTAL(12'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.80); /* 3MHz verified on PCB */
+}
 
 
 

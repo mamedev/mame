@@ -77,8 +77,7 @@ void emate_state::emate(machine_config &config)
 	screen.set_visarea(0, 480-1, 0, 320-1);
 	screen.set_screen_update(FUNC(emate_state::screen_update));
 
-	palette_device &palette(PALETTE(config, "palette", 16));
-	palette.set_init(DEVICE_SELF, FUNC(emate_state::palette_init));
+	PALETTE(config, "palette", FUNC(emate_state::palette_init), 16);
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("2M");

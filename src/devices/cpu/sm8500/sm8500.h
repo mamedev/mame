@@ -5,12 +5,6 @@
 
 #pragma once
 
-#define MCFG_SM8500_DMA_CB(_devcb) \
-	downcast<sm8500_cpu_device &>(*device).set_dma_cb(DEVCB_##_devcb);
-
-#define MCFG_SM8500_TIMER_CB(_devcb) \
-	downcast<sm8500_cpu_device &>(*device).set_timer_cb(DEVCB_##_devcb);
-
 enum
 {
 	/* "main" 16 bit register */
@@ -29,8 +23,8 @@ public:
 	sm8500_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_dma_cb(Object &&cb) { return m_dma_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_timer_cb(Object &&cb) { return m_timer_func.set_callback(std::forward<Object>(cb)); }
+	auto dma_cb() { return m_dma_func.bind(); }
+	auto timer_cb() { return m_timer_func.bind(); }
 
 	/* interrupts */
 	static constexpr int ILL_INT  = 0;

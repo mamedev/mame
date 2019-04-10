@@ -139,7 +139,7 @@ READ8_MEMBER( abc800c_state::char_ram_r )
 //  PALETTE_INIT( abc800c )
 //-------------------------------------------------
 
-PALETTE_INIT_MEMBER( abc800c_state, abc800c )
+void abc800c_state::abc800c_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red
@@ -153,24 +153,24 @@ PALETTE_INIT_MEMBER( abc800c_state, abc800c )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( abc800c_video )
+//  machine_config( abc800c_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc800c_state::abc800c_video)
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(abc800c_state, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(480, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 480-1)
+void abc800c_state::abc800c_video(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(abc800c_state::screen_update));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(480, 480);
+	screen.set_visarea(0, 480-1, 0, 480-1);
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(abc800c_state, abc800c)
+	PALETTE(config, m_palette, FUNC(abc800c_state::abc800c_palette), 8);
 
-	MCFG_DEVICE_ADD(SAA5052_TAG, SAA5052, XTAL(12'000'000)/2)
-	MCFG_SAA5050_D_CALLBACK(READ8(*this, abc800c_state, char_ram_r))
-	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
-MACHINE_CONFIG_END
+	SAA5052(config, m_trom, XTAL(12'000'000)/2);
+	m_trom->d_cb().set(FUNC(abc800c_state::char_ram_r));
+	m_trom->set_screen_size(40, 24, 40);
+}
 
 
 
@@ -274,10 +274,11 @@ uint32_t abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( abc800m_video )
+//  machine_config( abc800m_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc800m_state::abc800m_video)
+void abc800m_state::abc800m_video(machine_config &config)
+{
 	mc6845_device &mc6845(MC6845(config, MC6845_TAG, ABC800_CCLK));
 	mc6845.set_screen(SCREEN_TAG);
 	mc6845.set_show_border_area(true);
@@ -285,9 +286,9 @@ MACHINE_CONFIG_START(abc800m_state::abc800m_video)
 	mc6845.set_update_row_callback(FUNC(abc800m_state::abc800m_update_row), this);
 	mc6845.out_vsync_callback().set(m_dart, FUNC(z80dart_device::rib_w)).invert();
 
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t(0xff, 0xff, 0x00))
-	MCFG_SCREEN_UPDATE_DRIVER(abc800m_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xf0)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t(0xff, 0xff, 0x00)));
+	screen.set_screen_update(FUNC(abc800m_state::screen_update));
+	screen.set_raw(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xf0);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-MACHINE_CONFIG_END
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
+}

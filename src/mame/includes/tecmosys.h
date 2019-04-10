@@ -5,6 +5,10 @@
     tecmosys protection simulation
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_TECMOSYS_H
+#define MAME_INCLUDES_TECMOSYS_H
+
+#pragma once
 
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
@@ -44,6 +48,10 @@ public:
 	void init_tkdensha();
 	void init_deroon();
 	void init_tkdensho();
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -94,16 +102,13 @@ private:
 	DECLARE_READ16_MEMBER(eeprom_r);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void prot_init(int which);
 	void prot_reset();
 	inline void set_color_555(pen_t color, int rshift, int gshift, int bshift, uint16_t data);
-	void render_sprites_to_bitmap(bitmap_rgb32 &bitmap, uint16_t extrax, uint16_t extray );
+	void render_sprites_to_bitmap(bitmap_rgb32 &bitmap, uint16_t extrax, uint16_t extray);
 	void tilemap_copy_to_compose(uint16_t pri, const rectangle &cliprect);
 	void do_final_mix(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void descramble();
@@ -113,3 +118,5 @@ private:
 	void oki_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TECMOSYS_H

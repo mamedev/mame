@@ -49,16 +49,21 @@ template<int Width, int AddrShift, int Endian> memory_units_descriptor<Width, Ad
 	std::array<uX, 4> umasks;
 	umasks.fill(unitmask);
 
-	uX smask = ~make_bitmask<uX>((addrstart - m_addrstart) << (3 - AddrShift));
-	uX emask =  make_bitmask<uX>((addrend - m_addrend + 1) << (3 - AddrShift));
+	uX smask, emask;
+	if(Endian == ENDIANNESS_BIG) {
+		smask =  make_bitmask<uX>(8*sizeof(uX) - ((addrstart - m_addrstart) << (3 - AddrShift)));
+		emask = ~make_bitmask<uX>(8*sizeof(uX) - ((addrend - m_addrend + 1) << (3 - AddrShift)));
+	} else {
+		smask = ~make_bitmask<uX>((addrstart - m_addrstart) << (3 - AddrShift));
+		emask =  make_bitmask<uX>((addrend - m_addrend + 1) << (3 - AddrShift));
+	}
 
 	umasks[handler_entry::START]                    &= smask;
 	umasks[handler_entry::END]                      &= emask;
-	umasks[handler_entry::START|handler_entry::END] &= smask | emask;
+	umasks[handler_entry::START|handler_entry::END] &= smask & emask;
 
 	for(u32 i=0; i<4; i++)
 		m_keymap[i] = mask_to_ukey<uX>(umasks[i]);
-
 
 	// Compute the shift
 	uX dmask = make_bitmask<uX>(bits_per_access);

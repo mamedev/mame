@@ -16,18 +16,14 @@ public:
 	// construction/destruction
 	i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_read_slave_ack_callback(Object &&cb) { return m_read_slave_ack_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_chip_select_callback(Object &&cb) { return m_out_chip_select_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_tmrout0_handler(Object &&cb) { return m_out_tmrout0_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_tmrout1_handler(Object &&cb) { return m_out_tmrout1_func.set_callback(std::forward<Object>(cb)); }
 	auto read_slave_ack_callback() { return m_read_slave_ack_func.bind(); }
 	auto chip_select_callback() { return m_out_chip_select_func.bind(); }
 	auto tmrout0_handler() { return m_out_tmrout0_func.bind(); }
 	auto tmrout1_handler() { return m_out_tmrout1_func.bind(); }
 
 	IRQ_CALLBACK_MEMBER(int_callback);
-	DECLARE_WRITE_LINE_MEMBER(drq0_w) { if(state) drq_callback(0); m_dma[0].drq_state = state; }
-	DECLARE_WRITE_LINE_MEMBER(drq1_w) { if(state) drq_callback(1); m_dma[1].drq_state = state; }
+	DECLARE_WRITE_LINE_MEMBER(drq0_w) { m_dma[0].drq_state = state; }
+	DECLARE_WRITE_LINE_MEMBER(drq1_w) { m_dma[1].drq_state = state; }
 	DECLARE_WRITE_LINE_MEMBER(tmrin0_w) { if(state && (m_timer[0].control & 0x8004) == 0x8004) { inc_timer(0); } }
 	DECLARE_WRITE_LINE_MEMBER(tmrin1_w) { if(state && (m_timer[1].control & 0x8004) == 0x8004) { inc_timer(1); } }
 	DECLARE_WRITE_LINE_MEMBER(int0_w) { external_int(0, state); }
@@ -50,7 +46,12 @@ protected:
 		I80186_T_COUNT = I80186_DMA_CR + 2,
 		I80186_T_MAX_A = I80186_T_COUNT + 3,
 		I80186_T_MAX_B = I80186_T_MAX_A + 3,
-		I80186_T_CONTROL = I80186_T_MAX_B + 2
+		I80186_T_CONTROL = I80186_T_MAX_B + 2,
+		I80186_ISR = I80186_T_CONTROL + 3,
+		I80186_IRR, I80186_PMR, I80186_ICSR,
+		I80186_TMRCR, I80186_D0CR, I80186_D1CR,
+		I80186_I0CR, I80186_I1CR, I80186_I2CR, I80186_I3CR,
+		I80186_POLL
 	};
 
 	i80186_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size);
@@ -136,6 +137,7 @@ private:
 	dma_state       m_dma[2];
 	intr_state      m_intr;
 	mem_state       m_mem;
+	bool            m_last_dma;
 
 	static const device_timer_id TIMER_INT0 = 0;
 	static const device_timer_id TIMER_INT1 = 1;
@@ -159,17 +161,5 @@ public:
 	// construction/destruction
 	i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
-
-#define MCFG_80186_IRQ_SLAVE_ACK(_devcb) \
-	downcast<i80186_cpu_device &>(*device).set_read_slave_ack_callback(DEVCB_##_devcb);
-
-#define MCFG_80186_CHIP_SELECT_CB(_devcb) \
-	downcast<i80186_cpu_device &>(*device).set_chip_select_callback(DEVCB_##_devcb);
-
-#define MCFG_80186_TMROUT0_HANDLER(_devcb) \
-	downcast<i80186_cpu_device &>(*device).set_tmrout0_handler(DEVCB_##_devcb);
-
-#define MCFG_80186_TMROUT1_HANDLER(_devcb) \
-	downcast<i80186_cpu_device &>(*device).set_tmrout1_handler(DEVCB_##_devcb);
 
 #endif // MAME_CPU_I86_I186_H

@@ -1682,8 +1682,8 @@ int32_t mame_ui_manager::slider_refresh(running_machine &machine, void *arg, int
 	}
 
 	if (str)
-		*str = string_format(_("%1$.3ffps"), ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds()));
-	refresh = ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds());
+		*str = string_format(_("%1$.3ffps"), screen->frame_period().as_hz());
+	refresh = screen->frame_period().as_hz();
 	return floor((refresh - defrefresh) * 1000.0 + 0.5);
 }
 

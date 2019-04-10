@@ -78,10 +78,7 @@ private:
 	int m_reel_count[4];
 	int m_optic_pattern;
 
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
 	DECLARE_READ8_MEMBER( aces1_unk_r )
 	{
@@ -450,11 +447,11 @@ static INPUT_PORTS_START( aces1 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(aces1_state::aces1)
-
-	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(8'000'000) / 2 ) /* XTAL verified, divisor not */
-	MCFG_DEVICE_PROGRAM_MAP(aces1_map)
-	MCFG_DEVICE_IO_MAP(aces1_portmap)
+void aces1_state::aces1(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(8'000'000) / 2); /* XTAL verified, divisor not */
+	m_maincpu->set_addrmap(AS_PROGRAM, &aces1_state::aces1_map);
+	m_maincpu->set_addrmap(AS_IO, &aces1_state::aces1_portmap);
 
 	// 0xafb0 IC24 - lamps, 7segs
 	i8255_device &ic24(I8255A(config, "ic24"));
@@ -480,21 +477,21 @@ MACHINE_CONFIG_START(aces1_state::aces1)
 	SPEAKER(config, "mono").front_center();
 
 	// 0xadf0 - Dips, Sound
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(8'000'000) / 8) /* XTAL verified, divisor not */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(8'000'000) / 8)); /* XTAL verified, divisor not */
+	aysnd.port_a_read_callback().set_ioport("DSWA");
+	aysnd.port_b_read_callback().set_ioport("DSWB");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* steppers */
-	MCFG_DEVICE_ADD(m_reel[0], REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, aces1_state, reel0_optic_cb))
-	MCFG_DEVICE_ADD(m_reel[1], REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, aces1_state, reel1_optic_cb))
-	MCFG_DEVICE_ADD(m_reel[2], REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, aces1_state, reel2_optic_cb))
-	MCFG_DEVICE_ADD(m_reel[3], REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, aces1_state, reel3_optic_cb))
-MACHINE_CONFIG_END
+	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[0]->optic_handler().set(FUNC(aces1_state::reel_optic_cb<0>));
+	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[1]->optic_handler().set(FUNC(aces1_state::reel_optic_cb<1>));
+	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[2]->optic_handler().set(FUNC(aces1_state::reel_optic_cb<2>));
+	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[3]->optic_handler().set(FUNC(aces1_state::reel_optic_cb<3>));
+}
 
 
 ROM_START( ac1clbmn )
