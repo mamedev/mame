@@ -134,8 +134,8 @@ void pv1000_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 class pv1000_state : public driver_device
 {
 public:
-	pv1000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pv1000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "pv1000_sound"),
 		m_cart(*this, "cartslot"),
@@ -143,7 +143,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
-		{ }
+	{ }
 
 	void pv1000(machine_config &config);
 
@@ -177,12 +177,12 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void pv1000(address_map &map);
+	void pv1000_mem(address_map &map);
 	void pv1000_io(address_map &map);
 };
 
 
-void pv1000_state::pv1000(address_map &map)
+void pv1000_state::pv1000_mem(address_map &map)
 {
 	//AM_RANGE(0x0000, 0x7fff)      // mapped by the cartslot
 	map(0xb800, 0xbbff).ram().share("videoram");
@@ -395,7 +395,7 @@ void pv1000_state::machine_start()
 
 	if (m_cart->exists())
 	{
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x7fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x7fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
 		// FIXME: this is needed for gfx decoding, but there is probably a cleaner solution!
 		std::string region_tag;
@@ -441,25 +441,22 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(pv1000_state::pv1000)
-
-	MCFG_DEVICE_ADD( "maincpu", Z80, 17897725/5 )
-	MCFG_DEVICE_PROGRAM_MAP( pv1000 )
-	MCFG_DEVICE_IO_MAP( pv1000_io )
-
+	Z80(config, m_maincpu, 17897725/5);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pv1000_state::pv1000_mem);
+	m_maincpu->set_addrmap(AS_IO, &pv1000_state::pv1000_io);
 
 	/* D65010G031 - Video & sound chip */
-	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS( 17897725/3, 380, 0, 256, 262, 0, 192 )
-	MCFG_SCREEN_UPDATE_DRIVER(pv1000_state, screen_update_pv1000)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(17897725/3, 380, 0, 256, 262, 0, 192);
+	m_screen->set_screen_update(FUNC(pv1000_state::screen_update_pv1000));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD_3BIT_BGR("palette")
+	PALETTE(config, m_palette, palette_device::BGR_3BIT);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pv1000 )
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pv1000);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "pv1000_sound", PV1000, 17897725 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	PV1000(config, m_sound, 17897725).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* Cartridge slot */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "pv1000_cart")
@@ -467,7 +464,7 @@ MACHINE_CONFIG_START(pv1000_state::pv1000)
 	MCFG_GENERIC_LOAD(pv1000_state, pv1000_cart)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","pv1000")
+	SOFTWARE_LIST(config, "cart_list").set_original("pv1000");
 MACHINE_CONFIG_END
 
 

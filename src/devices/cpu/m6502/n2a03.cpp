@@ -53,6 +53,7 @@ void n2a03_device::n2a03_map(address_map &map)
 
 n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: m6502_device(mconfig, N2A03, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this, 1)
 	, m_apu(*this, "nesapu")
 {
 	program_config.m_internal_map = address_map_constructor(FUNC(n2a03_device::n2a03_map), this);
@@ -74,14 +75,13 @@ READ8_MEMBER(n2a03_device::apu_read_mem)
 	return mintf->program->read_byte(offset);
 }
 
-MACHINE_CONFIG_START(n2a03_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("nesapu", NES_APU, DERIVED_CLOCK(1,1) )
-	MCFG_NES_APU_IRQ_HANDLER(WRITELINE(*this, n2a03_device, apu_irq))
-	MCFG_NES_APU_MEM_READ_CALLBACK(READ8(*this, n2a03_device, apu_read_mem))
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":mono", 0.50)
-
-MACHINE_CONFIG_END
+void n2a03_device::device_add_mconfig(machine_config &config)
+{
+	NES_APU(config, m_apu, DERIVED_CLOCK(1,1));
+	m_apu->irq().set(FUNC(n2a03_device::apu_irq));
+	m_apu->mem_read().set(FUNC(n2a03_device::apu_read_mem));
+	m_apu->add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+}
 
 
 #include "cpu/m6502/n2a03.hxx"

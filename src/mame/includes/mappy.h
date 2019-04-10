@@ -14,8 +14,8 @@
 class mappy_state : public driver_device
 {
 public:
-	mappy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mappy_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
@@ -91,11 +91,11 @@ private:
 	template<uint8_t Chip> TIMER_CALLBACK_MEMBER(namcoio_run_timer);
 
 	DECLARE_VIDEO_START(superpac);
-	DECLARE_PALETTE_INIT(superpac);
+	void superpac_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(phozon);
-	DECLARE_PALETTE_INIT(phozon);
+	void phozon_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(mappy);
-	DECLARE_PALETTE_INIT(mappy);
+	void mappy_palette(palette_device &palette) const;
 	uint32_t screen_update_superpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_phozon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mappy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

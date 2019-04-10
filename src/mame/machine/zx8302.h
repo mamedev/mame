@@ -38,56 +38,6 @@
 
 
 ///*************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-///*************************************************************************
-
-#define MCFG_ZX8302_RTC_CLOCK(_clk) \
-	downcast<zx8302_device &>(*device).set_rtc_clock(_clk);
-
-#define MCFG_ZX8302_OUT_IPL1L_CB(_devcb) \
-	downcast<zx8302_device &>(*device).set_out_ipl1l_callback(DEVCB_##_devcb);
-
-#define MCFG_ZX8302_OUT_BAUDX4_CB(_devcb) \
-	downcast<zx8302_device &>(*device).set_out_baudx4_callback(DEVCB_##_devcb);
-
-#define MCFG_ZX8302_OUT_COMDATA_CB(_devcb) \
-	downcast<zx8302_device &>(*device).set_out_comdata_callback(DEVCB_##_devcb);
-
-#define MCFG_ZX8302_OUT_TXD1_CB(_devcb) \
-	downcast<zx8302_device &>(*device).set_out_txd1_callback(DEVCB_##_devcb);
-
-#define MCFG_ZX8302_OUT_TXD2_CB(_devcb) \
-	downcast<zx8302_device &>(*device).set_out_txd2_callback(DEVCB_##_devcb);
-
-#define MCFG_ZX8302_OUT_NETOUT_CB(_devcb) \
-	downcast<zx8302_device &>(*device).set_out_netout_callback(DEVCB_##_devcb);
-
-#define MCFG_ZX8302_OUT_MDSELCK_CB(_devcb) \
-	downcast<zx8302_device &>(*device).set_out_mdselck_callback(DEVCB_##_devcb);
-
-#define MCFG_ZX8302_OUT_MDSELD_CB(_devcb) \
-	downcast<zx8302_device &>(*device).set_out_mdseld_callback(DEVCB_##_devcb);
-
-#define MCFG_ZX8302_OUT_MDRDW_CB(_devcb) \
-	downcast<zx8302_device &>(*device).set_out_mdrdw_callback(DEVCB_##_devcb);
-
-#define MCFG_ZX8302_OUT_ERASE_CB(_devcb) \
-	downcast<zx8302_device &>(*device).set_out_erase_callback(DEVCB_##_devcb);
-
-#define MCFG_ZX8302_OUT_RAW1_CB(_devcb) \
-	downcast<zx8302_device &>(*device).set_out_raw1_callback(DEVCB_##_devcb);
-
-#define MCFG_ZX8302_IN_RAW1_CB(_devcb) \
-	downcast<zx8302_device &>(*device).set_in_raw1_callback(DEVCB_##_devcb);
-
-#define MCFG_ZX8302_OUT_RAW2_CB(_devcb) \
-	downcast<zx8302_device &>(*device).set_out_raw2_callback(DEVCB_##_devcb);
-
-#define MCFG_ZX8302_IN_RAW2_CB(_devcb) \
-	downcast<zx8302_device &>(*device).set_in_raw2_callback(DEVCB_##_devcb);
-
-
-///*************************************************************************
 //  TYPE DEFINITIONS
 ///*************************************************************************
 
@@ -102,20 +52,20 @@ public:
 
 	void set_rtc_clock(int rtc_clock) { m_rtc_clock = rtc_clock; }
 	void set_rtc_clock(const XTAL &rtc_clock) { set_rtc_clock(rtc_clock.value()); }
-	template <class Object> devcb_base &set_out_ipl1l_callback(Object &&cb) { return m_out_ipl1l_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_baudx4_callback(Object &&cb) { return m_out_baudx4_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_comdata_callback(Object &&cb) { return m_out_comdata_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_txd1_callback(Object &&cb) { return m_out_txd1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_txd2_callback(Object &&cb) { return m_out_txd2_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_netout_callback(Object &&cb) { return m_out_netout_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_mdselck_callback(Object &&cb) { return m_out_mdselck_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_mdseld_callback(Object &&cb) { return m_out_mdseld_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_mdrdw_callback(Object &&cb) { return m_out_mdrdw_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_erase_callback(Object &&cb) { return m_out_erase_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_raw1_callback(Object &&cb) { return m_out_raw1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_raw1_callback(Object &&cb) { return m_in_raw1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_raw2_callback(Object &&cb) { return m_out_raw2_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_raw2_callback(Object &&cb) { return m_in_raw2_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_ipl1l_callback() { return m_out_ipl1l_cb.bind(); }
+	auto out_baudx4_callback() { return m_out_baudx4_cb.bind(); }
+	auto out_comdata_callback() { return m_out_comdata_cb.bind(); }
+	auto out_txd1_callback() { return m_out_txd1_cb.bind(); }
+	auto out_txd2_callback() { return m_out_txd2_cb.bind(); }
+	auto out_netout_callback() { return m_out_netout_cb.bind(); }
+	auto out_mdselck_callback() { return m_out_mdselck_cb.bind(); }
+	auto out_mdseld_callback() { return m_out_mdseld_cb.bind(); }
+	auto out_mdrdw_callback() { return m_out_mdrdw_cb.bind(); }
+	auto out_erase_callback() { return m_out_erase_cb.bind(); }
+	auto out_raw1_callback() { return m_out_raw1_cb.bind(); }
+	auto in_raw1_callback() { return m_in_raw1_cb.bind(); }
+	auto out_raw2_callback() { return m_out_raw2_cb.bind(); }
+	auto in_raw2_callback() { return m_in_raw2_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( rtc_r );
 	DECLARE_WRITE8_MEMBER( rtc_w );

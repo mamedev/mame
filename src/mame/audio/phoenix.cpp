@@ -497,12 +497,12 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER( phoenix_sound_device::control_a_w )
 {
-	m_discrete->write(space, PHOENIX_EFFECT_2_DATA, data & 0x0f);
-	m_discrete->write(space, PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
+	m_discrete->write(PHOENIX_EFFECT_2_DATA, data & 0x0f);
+	m_discrete->write(PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
 #if 0
 	/* future handling of noise sounds */
-	m_discrete->write(space, PHOENIX_EFFECT_3_EN  , data & 0x40);
-	m_discrete->write(space, PHOENIX_EFFECT_4_EN  , data & 0x80);
+	m_discrete->write(PHOENIX_EFFECT_3_EN  , data & 0x40);
+	m_discrete->write(PHOENIX_EFFECT_4_EN  , data & 0x80);
 #endif
 	m_channel->update();
 	m_sound_latch_a = data;
@@ -510,9 +510,9 @@ WRITE8_MEMBER( phoenix_sound_device::control_a_w )
 
 WRITE8_MEMBER( phoenix_sound_device::control_b_w )
 {
-	m_discrete->write(space, PHOENIX_EFFECT_1_DATA, data & 0x0f);
-	m_discrete->write(space, PHOENIX_EFFECT_1_FILT, data & 0x20);
-	m_discrete->write(space, PHOENIX_EFFECT_1_FREQ, data & 0x10);
+	m_discrete->write(PHOENIX_EFFECT_1_DATA, data & 0x0f);
+	m_discrete->write(PHOENIX_EFFECT_1_FILT, data & 0x20);
+	m_discrete->write(PHOENIX_EFFECT_1_FREQ, data & 0x10);
 
 	/* update the tune that the MM6221AA is playing */
 	m_tms->mm6221aa_tune_w(data >> 6);

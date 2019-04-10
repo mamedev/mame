@@ -75,10 +75,10 @@ READ16_MEMBER(topcat_device::vram_r)
 	uint16_t ret = 0;
 
 	if (mem_mask & m_plane_mask)
-		ret |= m_vram[offset*2+1] ? m_plane_mask : 0;
+		ret |= m_vram[offset*2+1] & m_plane_mask;
 
 	if (mem_mask & m_plane_mask << 8)
-		ret |= m_vram[offset*2] ? m_plane_mask << 8 : 0;
+		ret |= (m_vram[offset*2] & m_plane_mask) << 8;
 	//LOG("%s: %04X: %04X (mask %04X)\n", __FUNCTION__, offset, ret, mem_mask);
 	return ret;
 }
@@ -386,10 +386,12 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 		update_int();
 		break;
 	case TOPCAT_REG_START_WMOVE:
-		window_move();
-		if (m_unknown_reg4a) {
-			m_wmove_intrq = m_plane_mask << 8;
-			update_int();
+		if (data & (m_plane_mask << 8)) {
+			window_move();
+			if (m_unknown_reg4a) {
+				m_wmove_intrq = m_plane_mask << 8;
+				update_int();
+			}
 		}
 		break;
 	case TOPCAT_REG_ENABLE_BLINK_PLANES:

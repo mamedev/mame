@@ -3,20 +3,17 @@
 #include "emu.h"
 #include "ibm6580_kbd.h"
 
-#include "cpu/mcs48/mcs48.h"
 
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_DEBUG     (1U <<  1)
+#define LOG_KEYBOARD  (1U <<  2)
 
-#define VERBOSE_DBG 0       /* general debug messages */
+//#define VERBOSE (LOG_GENERAL | LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
 
-#define DBG_LOG(N,M,A) \
-	do { \
-	if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f at %s: %-10s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
+#define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
 
 
 DEFINE_DEVICE_TYPE(DW_KEYBOARD, dw_keyboard_device, "dw_kbd", "IBM Displaywriter Keyboard")
@@ -32,16 +29,17 @@ const tiny_rom_entry *dw_keyboard_device::device_rom_region() const
 	return ROM_NAME( dw_keyboard );
 }
 
-MACHINE_CONFIG_START(dw_keyboard_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("mcu", I8049, XTAL(6'000'000))   // XXX RC oscillator
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, dw_keyboard_device, bus_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, dw_keyboard_device, bus_w))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, dw_keyboard_device, p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, dw_keyboard_device, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, dw_keyboard_device, p2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, dw_keyboard_device, t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, dw_keyboard_device, t1_r))
-MACHINE_CONFIG_END
+void dw_keyboard_device::device_add_mconfig(machine_config &config)
+{
+	I8049(config, m_mcu, XTAL(6'000'000));   // XXX RC oscillator
+	m_mcu->bus_in_cb().set(FUNC(dw_keyboard_device::bus_r));
+	m_mcu->bus_out_cb().set(FUNC(dw_keyboard_device::bus_w));
+	m_mcu->p1_out_cb().set(FUNC(dw_keyboard_device::p1_w));
+	m_mcu->p2_in_cb().set(FUNC(dw_keyboard_device::p2_r));
+	m_mcu->p2_out_cb().set(FUNC(dw_keyboard_device::p2_w));
+	m_mcu->t0_in_cb().set(FUNC(dw_keyboard_device::t0_r));
+	m_mcu->t1_in_cb().set(FUNC(dw_keyboard_device::t1_r));
+}
 
 
 INPUT_PORTS_START( dw_keyboard )
@@ -212,7 +210,7 @@ WRITE8_MEMBER( dw_keyboard_device::p1_w )
 {
 	m_drive = data;
 
-	DBG_LOG(2,"p1",( "<- %02x = drive %04x\n", data, m_drive));
+	LOGDBG("p1 <- %02x = drive %04x\n", data, m_drive);
 }
 
 WRITE8_MEMBER( dw_keyboard_device::p2_w )
@@ -224,28 +222,28 @@ WRITE8_MEMBER( dw_keyboard_device::p2_w )
 	m_p2 = data;
 	m_drive = ((data & 0xf0) << 4);
 
-	DBG_LOG(2,"p2",( "<- %02x = drive %04x sense row %d\n", data, m_drive, data & 7));
+	LOGDBG("p2 <- %02x = drive %04x sense row %d\n", data, m_drive, data & 7);
 }
 
 READ8_MEMBER( dw_keyboard_device::p2_r )
 {
 	uint8_t data = m_p2;
 
-	DBG_LOG(2,"p2",( "== %02x\n", data));
+	LOGDBG("p2 == %02x\n", data);
 
 	return data;
 }
 
 READ_LINE_MEMBER( dw_keyboard_device::t0_r )
 {
-	DBG_LOG(3,"t0",( "== %d\n", m_ack));
+	LOGKBD("t0 == %d\n", m_ack);
 
 	return m_ack;
 }
 
 READ_LINE_MEMBER( dw_keyboard_device::t1_r )
 {
-	DBG_LOG(2,"t1",( "== %d\n", m_keylatch));
+	LOGDBG("t1 == %d\n", m_keylatch);
 
 	return m_keylatch;
 }
@@ -268,8 +266,8 @@ WRITE8_MEMBER( dw_keyboard_device::bus_w )
 	*/
 
 	if ((data & 0x72) != 0x72)
-	DBG_LOG(1,"bus",( "<- %02x = send %d strobe %d clock %d | dip clk %d dip load %d\n",
-		data, BIT(data, 0), BIT(data, 1), BIT(data, 4), BIT(data, 5), BIT(data, 6)));
+	LOG("bus <- %02x = send %d strobe %d clock %d | dip clk %d dip load %d\n",
+		data, BIT(data, 0), BIT(data, 1), BIT(data, 4), BIT(data, 5), BIT(data, 6));
 
 	m_bus = data;
 
@@ -286,12 +284,12 @@ WRITE8_MEMBER( dw_keyboard_device::bus_w )
 		}
 		m_keylatch = BIT(sense, m_sense);
 		if (m_keylatch)
-		DBG_LOG(1,"bus",("key %02x pressed (drive %04x sense %x)\n", (i << 3) | m_sense, m_drive, m_sense));
+		LOG("bus key %02x pressed (drive %04x sense %x)\n", (i << 3) | m_sense, m_drive, m_sense);
 	}
 
 	if (!BIT(data, 6)) {
 		m_dip = ~ioport("DIP")->read();
-		DBG_LOG(1,"bus",("loaded DIP switch setting 0x%02x\n", m_dip));
+		LOG("bus loaded DIP switch setting 0x%02x\n", m_dip);
 		m_mcu->set_input_line(MCS48_INPUT_IRQ, m_dip & 1 ? ASSERT_LINE : CLEAR_LINE);
 	}
 

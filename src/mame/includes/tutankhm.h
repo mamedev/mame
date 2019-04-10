@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
+#ifndef MAME_INCLUDES_TUTANKHM_H
+#define MAME_INCLUDES_TUTANKHM_H
+
+#pragma once
 
 #include "audio/timeplt.h"
 #include "emupal.h"
@@ -51,3 +55,5 @@ protected:
 	required_device<palette_device> m_palette;
 	optional_device<timeplt_audio_device> m_timeplt_audio;
 };
+
+#endif // MAME_INCLUDES_TUTANKHM_H

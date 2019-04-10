@@ -48,7 +48,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(output_latch_w);
 	DECLARE_WRITE8_MEMBER(canyon_videoram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_PALETTE_INIT(canyon);
+	void canyon_palette(palette_device &palette) const;
 	uint32_t screen_update_canyon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(canyon_motor_w);
 	DECLARE_WRITE8_MEMBER(canyon_explode_w);
@@ -63,7 +63,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	required_device<f9334_device> m_outlatch;
-	required_device<discrete_device> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

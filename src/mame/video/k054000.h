@@ -6,9 +6,6 @@
 #pragma once
 
 
-#define MCFG_K054000_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, K054000, 0)
-
 class k054000_device : public device_t
 {
 public:

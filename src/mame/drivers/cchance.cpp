@@ -47,18 +47,23 @@ class cchance_state : public tnzs_base_state
 {
 public:
 	cchance_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tnzs_base_state(mconfig, type, tag) { }
+		: tnzs_base_state(mconfig, type, tag)
+	{ }
 
+	void cchance(machine_config &config);
+
+protected:
 	void machine_reset() override;
 	void machine_start() override;
 
-	uint8_t m_hop_io;
-	uint8_t m_bell_io;
+private:
 	DECLARE_WRITE8_MEMBER(output_0_w);
 	DECLARE_READ8_MEMBER(input_1_r);
 	DECLARE_WRITE8_MEMBER(output_1_w);
-	void cchance(machine_config &config);
 	void main_map(address_map &map);
+
+	uint8_t m_hop_io;
+	uint8_t m_bell_io;
 };
 
 
@@ -212,37 +217,36 @@ void cchance_state::machine_reset()
 	m_bell_io = 0;
 }
 
-MACHINE_CONFIG_START(cchance_state::cchance)
+void cchance_state::cchance(machine_config &config)
+{
+	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cchance_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cchance_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cchance_state,  irq0_line_hold)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_cchance);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cchance)
-
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag("gfxdecode");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cchance_state, screen_update_tnzs)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cchance_state, screen_vblank_tnzs))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(57.5);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(cchance_state::screen_update_tnzs));
+	m_screen->screen_vblank().set(FUNC(cchance_state::screen_vblank_tnzs));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(tnzs_base_state, prompalette)
+	PALETTE(config, m_palette, FUNC(cchance_state::prompalette), 512);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, 1500000/2)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	ym2149_device &aysnd(YM2149(config, "aysnd", 1500000/2));
+	aysnd.port_a_read_callback().set_ioport("DSW1");
+	aysnd.port_b_read_callback().set_ioport("DSW2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 ROM_START( cchance )
 	ROM_REGION( 0x10000, "maincpu", 0 )

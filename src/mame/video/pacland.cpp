@@ -59,75 +59,71 @@ sprite color 0x7f will erase the tilemap and force it to be transparent.
 
 void pacland_state::switch_palette()
 {
-	int i;
 	const uint8_t *color_prom = m_color_prom + 256 * m_palette_bank;
 
-	for (i = 0;i < 256;i++)
+	for (int i = 0; i < 256; i++)
 	{
 		int bit0,bit1,bit2,bit3;
-		int r,g,b;
 
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[0] >> 4) & 0x01;
-		bit1 = (color_prom[0] >> 5) & 0x01;
-		bit2 = (color_prom[0] >> 6) & 0x01;
-		bit3 = (color_prom[0] >> 7) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[1024] >> 0) & 0x01;
-		bit1 = (color_prom[1024] >> 1) & 0x01;
-		bit2 = (color_prom[1024] >> 2) & 0x01;
-		bit3 = (color_prom[1024] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[0], 0);
+		bit1 = BIT(color_prom[0], 1);
+		bit2 = BIT(color_prom[0], 2);
+		bit3 = BIT(color_prom[0], 3);
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		bit0 = BIT(color_prom[0], 4);
+		bit1 = BIT(color_prom[0], 5);
+		bit2 = BIT(color_prom[0], 6);
+		bit3 = BIT(color_prom[0], 7);
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		bit0 = BIT(color_prom[1024], 0);
+		bit1 = BIT(color_prom[1024], 1);
+		bit2 = BIT(color_prom[1024], 2);
+		bit3 = BIT(color_prom[1024], 3);
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		color_prom++;
 
-		m_palette->set_indirect_color(i,rgb_t(r,g,b));
+		m_palette->set_indirect_color(i, rgb_t(r, g, b));
 	}
 }
 
-PALETTE_INIT_MEMBER(pacland_state, pacland)
+void pacland_state::pacland_palette(palette_device &palette)
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *color_prom = &m_color_prom[0];
 
-	m_color_prom = color_prom;  /* we'll need this later */
-	/* skip the palette data, it will be initialized later */
+	// skip the palette data, it will be initialized later
 	color_prom += 2 * 0x400;
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 
-	for (i = 0;i < 0x400;i++)
+	for (int i = 0; i < 0x400; i++)
 		palette.set_pen_indirect(m_gfxdecode->gfx(0)->colorbase() + i, *color_prom++);
 
-	/* Background */
-	for (i = 0;i < 0x400;i++)
+	// Background
+	for (int i = 0; i < 0x400; i++)
 		palette.set_pen_indirect(m_gfxdecode->gfx(1)->colorbase() + i, *color_prom++);
 
-	/* Sprites */
-	for (i = 0;i < 0x400;i++)
+	// Sprites
+	for (int i = 0; i < 0x400; i++)
 		palette.set_pen_indirect(m_gfxdecode->gfx(2)->colorbase() + i, *color_prom++);
 
 	m_palette_bank = 0;
 	switch_palette();
 
-	/* precalculate transparency masks for sprites */
+	// precalculate transparency masks for sprites
 	m_transmask[0] = std::make_unique<uint32_t[]>(64);
 	m_transmask[1] = std::make_unique<uint32_t[]>(64);
 	m_transmask[2] = std::make_unique<uint32_t[]>(64);
-	for (i = 0; i < 64; i++)
+	for (int i = 0; i < 64; i++)
 	{
-		int palentry;
-
-		/* start with no transparency */
+		// start with no transparency
 		m_transmask[0][i] = m_transmask[1][i] = m_transmask[2][i] = 0;
 
-		/* iterate over all palette entries except the last one */
-		for (palentry = 0; palentry < 0x100; palentry++)
+		// iterate over all palette entries except the last one
+		for (int palentry = 0; palentry < 0x100; palentry++)
 		{
-			uint32_t mask = palette.transpen_mask(*m_gfxdecode->gfx(2), i, palentry);
+			uint32_t const mask = palette.transpen_mask(*m_gfxdecode->gfx(2), i, palentry);
 
 			/* transmask[0] is a mask that is used to draw only high priority sprite pixels; thus, pens
 			   $00-$7F are opaque, and others are transparent */

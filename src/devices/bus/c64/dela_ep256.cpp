@@ -22,24 +22,17 @@ DEFINE_DEVICE_TYPE(C64_DELA_EP256, c64_dela_ep256_cartridge_device, "delep256", 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_dela_ep256_cartridge_device::device_add_mconfig)
-	MCFG_GENERIC_SOCKET_ADD("rom1", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom2", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom3", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom4", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom5", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom6", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom7", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom8", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-MACHINE_CONFIG_END
+void c64_dela_ep256_cartridge_device::device_add_mconfig(machine_config &config)
+{
+	GENERIC_SOCKET(config, "rom1", generic_linear_slot, nullptr, "bin,rom");
+	GENERIC_SOCKET(config, "rom2", generic_linear_slot, nullptr, "bin,rom");
+	GENERIC_SOCKET(config, "rom3", generic_linear_slot, nullptr, "bin,rom");
+	GENERIC_SOCKET(config, "rom4", generic_linear_slot, nullptr, "bin,rom");
+	GENERIC_SOCKET(config, "rom5", generic_linear_slot, nullptr, "bin,rom");
+	GENERIC_SOCKET(config, "rom6", generic_linear_slot, nullptr, "bin,rom");
+	GENERIC_SOCKET(config, "rom7", generic_linear_slot, nullptr, "bin,rom");
+	GENERIC_SOCKET(config, "rom8", generic_linear_slot, nullptr, "bin,rom");
+}
 
 
 
@@ -94,7 +87,7 @@ void c64_dela_ep256_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_dela_ep256_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_dela_ep256_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{
@@ -105,7 +98,7 @@ uint8_t c64_dela_ep256_cartridge_device::c64_cd_r(address_space &space, offs_t o
 		else
 		{
 			offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-			data = m_eproms[m_socket]->read_rom(space, addr);
+			data = m_eproms[m_socket]->read_rom(addr);
 		}
 	}
 
@@ -117,7 +110,7 @@ uint8_t c64_dela_ep256_cartridge_device::c64_cd_r(address_space &space, offs_t o
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_dela_ep256_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_dela_ep256_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io2 && ((offset & 0xf0) == 0xa0))
 	{

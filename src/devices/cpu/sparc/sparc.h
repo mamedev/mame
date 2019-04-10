@@ -19,10 +19,6 @@
 #include <map>
 #endif
 
-// TODO: when there are more SPARC CPUs, move setter to a base class
-#define MCFG_SPARC_ADD_ASI_DESC(desc) \
-	downcast<mb86901_device &>(*device).add_asi_desc([](sparc_disassembler *dasm) { dasm->add_asi_desc(desc); });
-
 class mb86901_device : public cpu_device, public sparc_mmu_host_interface, protected sparc_disassembler::config
 {
 public:

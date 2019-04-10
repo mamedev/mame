@@ -94,13 +94,14 @@ const tiny_rom_entry *bsmt2000_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bsmt2000_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("bsmt2000", TMS32015, DERIVED_CLOCK(1,1))
-	MCFG_DEVICE_PROGRAM_MAP(tms_program_map)
+void bsmt2000_device::device_add_mconfig(machine_config &config)
+{
+	tms32015_device &tms(TMS32015(config, "bsmt2000", DERIVED_CLOCK(1,1)));
+	tms.set_addrmap(AS_PROGRAM, &bsmt2000_device::tms_program_map);
 	// data map is internal to the CPU
-	MCFG_DEVICE_IO_MAP(tms_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, bsmt2000_device, tms_write_pending_r))
-MACHINE_CONFIG_END
+	tms.set_addrmap(AS_IO, &bsmt2000_device::tms_io_map);
+	tms.bio().set(FUNC(bsmt2000_device::tms_write_pending_r));
+}
 
 
 //-------------------------------------------------
@@ -179,8 +180,8 @@ void bsmt2000_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	// just fill with current left/right values
 	for (int samp = 0; samp < samples; samp++)
 	{
-		outputs[0][samp] = m_left_data * 16;
-		outputs[1][samp] = m_right_data * 16;
+		outputs[0][samp] = m_left_data;
+		outputs[1][samp] = m_right_data;
 	}
 }
 
@@ -263,8 +264,8 @@ READ16_MEMBER( bsmt2000_device::tms_data_r )
 
 READ16_MEMBER( bsmt2000_device::tms_rom_r )
 {
-	// underlying logic assumes this is a sign-extended value
-	return (int8_t)read_byte((m_rom_bank << 16) + m_rom_address);
+	// DSP code expects a 16-bit value with the data in the high byte
+	return (int16_t)(read_byte((m_rom_bank << 16) + m_rom_address) << 8);
 }
 
 

@@ -417,6 +417,7 @@
 #include "bus/sbus/sbus.h"
 #include "bus/sbus/bwtwo.h"
 #include "cpu/sparc/sparc.h"
+#include "imagedev/floppy.h"
 #include "machine/am79c90.h"
 #include "machine/bankdev.h"
 #include "machine/ncr5390.h"
@@ -631,8 +632,6 @@ private:
 	DECLARE_WRITE8_MEMBER( auxio_w );
 	DECLARE_READ32_MEMBER( dma_r );
 	DECLARE_WRITE32_MEMBER( dma_w );
-	DECLARE_READ32_MEMBER( lance_dma_r ); // TODO: Should be 16 bits
-	DECLARE_WRITE32_MEMBER( lance_dma_w );
 	DECLARE_WRITE32_MEMBER( buserr_w );
 
 	DECLARE_WRITE_LINE_MEMBER( scsi_irq );
@@ -957,7 +956,7 @@ READ32_MEMBER( sun4_state::sun4_insn_data_r )
 		switch (entry.type)
 		{
 		case 0: // type 0 space
-			return m_type0space->read32(space, tmp, mem_mask);
+			return m_type0space->read32(tmp, mem_mask);
 
 		case 1: // type 1 space
 			// magic EPROM bypass
@@ -966,7 +965,7 @@ READ32_MEMBER( sun4_state::sun4_insn_data_r )
 				return m_rom_ptr[offset & 0x1ffff];
 			}
 			//printf("Read type 1 @ VA %08x, phys %08x\n", offset<<2, tmp<<2);
-			return m_type1space->read32(space, tmp, mem_mask);
+			return m_type1space->read32(tmp, mem_mask);
 
 		default:
 			//logerror("sun4: access to unhandled memory type\n");
@@ -1020,12 +1019,12 @@ WRITE32_MEMBER( sun4_state::sun4_insn_data_w )
 		switch (entry.type)
 		{
 		case 0: // type 0
-			m_type0space->write32(space, tmp, data, mem_mask);
+			m_type0space->write32(tmp, data, mem_mask);
 			return;
 
 		case 1: // type 1
 			//printf("write device space @ %x\n", tmp<<1);
-			m_type1space->write32(space, tmp, data, mem_mask);
+			m_type1space->write32(tmp, data, mem_mask);
 			return;
 
 		default:
@@ -1357,20 +1356,20 @@ READ8_MEMBER( sun4_state::fdc_r )
 	switch(offset)
 	{
 		case 0: // Main Status (R, 82072)
-			return m_fdc->msr_r(space, 0, 0xff);
+			return m_fdc->msr_r();
 
 		case 1: // FIFO Data Port (R, 82072)
 		case 5: // FIFO Data Port (R, 82077)
-			return m_fdc->fifo_r(space, 0, 0xff);
+			return m_fdc->fifo_r();
 
 		case 2: // Digital Output Register (R, 82077)
-			return m_fdc->dor_r(space, 0, 0xff);
+			return m_fdc->dor_r();
 
 		case 4: // Main Status Register (R, 82077)
-			return m_fdc->msr_r(space, 0, 0xff);
+			return m_fdc->msr_r();
 
 		case 7:// Digital Input Register (R, 82077)
-			return m_fdc->dir_r(space, 0, 0xff);
+			return m_fdc->dir_r();
 
 		default:
 			break;
@@ -1385,16 +1384,16 @@ WRITE8_MEMBER( sun4_state::fdc_w )
 	{
 		case 0: // Data Rate Select Register (W, 82072)
 		case 4: // Data Rate Select Register (W, 82077)
-			m_fdc->dsr_w(space, 0, data, 0xff);
+			m_fdc->dsr_w(data);
 			break;
 
 		case 1: // FIFO Data Port (W, 82072)
 		case 5: // FIFO Data Port (W, 82077)
-			m_fdc->fifo_w(space, 0, data, 0xff);
+			m_fdc->fifo_w(data);
 			break;
 
 		case 7: // Configuration Control REgister (W, 82077)
-			m_fdc->ccr_w(space, 0, data, 0xff);
+			m_fdc->ccr_w(data);
 			break;
 
 		default:
@@ -1805,22 +1804,6 @@ WRITE_LINE_MEMBER( sun4_state::fdc_irq )
 	}
 }
 
-READ32_MEMBER( sun4_state::lance_dma_r )
-{
-	if (m_arch == ARCH_SUN4)
-		return sun4_insn_data_r<SUPER_DATA>(space, offset, mem_mask);
-	else
-		return m_mmu->insn_data_r<sun4c_mmu_device::SUPER_DATA>(offset, mem_mask);
-}
-
-WRITE32_MEMBER( sun4_state::lance_dma_w )
-{
-	if (m_arch == ARCH_SUN4)
-		sun4_insn_data_w(space, offset, data, mem_mask);
-	else
-		m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA>(offset, data, mem_mask);
-}
-
 WRITE32_MEMBER( sun4_state::buserr_w )
 {
 	COMBINE_DATA(&m_buserr[offset]);
@@ -1856,17 +1839,18 @@ static void sun_scsi_devices(device_slot_interface &device)
 
 void sun4_state::ncr53c90a(device_t *device)
 {
-	devcb_base *devcb;
-	(void)devcb;
-	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_NCR5390_IRQ_HANDLER(WRITELINE(*this, sun4_state, scsi_irq))
-	MCFG_NCR5390_DRQ_HANDLER(WRITELINE(*this, sun4_state, scsi_drq))
+	ncr53c90a_device &adapter = downcast<ncr53c90a_device &>(*device);
+
+	adapter.set_clock(10000000);
+	adapter.irq_handler_cb().set(*this, FUNC(sun4_state::scsi_irq));
+	adapter.drq_handler_cb().set(*this, FUNC(sun4_state::scsi_drq));
 }
 
-MACHINE_CONFIG_START(sun4_state::sun4)
+void sun4_state::sun4(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, MB86901, 16'670'000)
-	MCFG_SPARC_ADD_ASI_DESC(sun4_asi_desc)
+	MB86901(config, m_maincpu, 16'670'000);
+		m_maincpu->add_asi_desc([](sparc_disassembler *dasm) { dasm->add_asi_desc(sun4_asi_desc); });
 	m_maincpu->set_addrmap(0, &sun4_state::sun4c_debugger_map);
 
 	// TODO: MMU for sun4 hardware
@@ -1897,9 +1881,20 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4_state::type1space_s4_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// Ethernet
-	AM79C90(config, m_lance, 10'000'000); // clock is a guess
-	m_lance->dma_in().set(FUNC(sun4_state::lance_dma_r));
-	m_lance->dma_out().set(FUNC(sun4_state::lance_dma_w));
+	AM79C90(config, m_lance);
+	m_lance->dma_in().set([this](address_space &space, offs_t offset)
+	{
+		u32 const data = sun4_insn_data_r<SUPER_DATA>(space, (0xff000000U | offset) >> 2);
+
+		return (offset & 2) ? u16(data) : u16(data >> 16);
+	});
+	m_lance->dma_out().set([this](address_space &space, offs_t offset, u16 data, u16 mem_mask)
+	{
+		if (offset & 2)
+			sun4_insn_data_w(space, (0xff000000U | offset) >> 2, data, mem_mask);
+		else
+			sun4_insn_data_w(space, (0xff000000U | offset) >> 2, u32(data) << 16, u32(mem_mask) << 16);
+	});
 
 	// Keyboard/mouse
 	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
@@ -1916,33 +1911,32 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc2->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsa_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
 
-	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsb_w))
+	NSCSI_BUS(config, "scsibus");
+	NSCSI_CONNECTOR(config, "scsibus:0", sun_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:1", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:2", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", sun_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:7", sun_scsi_devices, "ncr53c90a", true).set_option_machine_config("ncr53c90a", [this] (device_t *device) { ncr53c90a(device); });
+}
 
-	MCFG_NSCSI_BUS_ADD("scsibus")
-	MCFG_NSCSI_ADD("scsibus:0", sun_scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:1", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:2", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", sun_scsi_devices, "cdrom", false)
-	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr53c90a", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr53c90a", [this] (device_t *device) { ncr53c90a(device); })
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(sun4_state::sun4c)
+void sun4_state::sun4c(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, MB86901, 20'000'000)
-	MCFG_SPARC_ADD_ASI_DESC(sun4c_asi_desc)
+	MB86901(config, m_maincpu, 20'000'000);
+	m_maincpu->add_asi_desc([](sparc_disassembler *dasm) { dasm->add_asi_desc(sun4c_asi_desc); });
 	m_maincpu->set_addrmap(0, &sun4_state::sun4c_debugger_map);
 
 	SUN4C_MMU(config, m_mmu, 20'000'000, 7, 0x7f);
@@ -1971,9 +1965,20 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4_state::type1space_sbus_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// Ethernet
-	AM79C90(config, m_lance, 10'000'000); // clock is a guess
-	m_lance->dma_in().set(FUNC(sun4_state::lance_dma_r));
-	m_lance->dma_out().set(FUNC(sun4_state::lance_dma_w));
+	AM79C90(config, m_lance);
+	m_lance->dma_in().set([this](offs_t offset)
+	{
+		u32 const data = m_mmu->insn_data_r<sun4c_mmu_device::SUPER_DATA>((0xff000000U | offset) >> 2, 0xffffffffU);
+
+		return (offset & 2) ? u16(data) : u16(data >> 16);
+	});
+	m_lance->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask)
+	{
+		if (offset & 2)
+			m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA>((0xff000000U | offset) >> 2, data, mem_mask);
+		else
+			m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA>((0xff000000U | offset) >> 2, u32(data) << 16, u32(mem_mask) << 16);
+	});
 
 	// Keyboard/mouse
 	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
@@ -1990,33 +1995,32 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc2->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
 
-	MCFG_NSCSI_BUS_ADD("scsibus")
-	MCFG_NSCSI_ADD("scsibus:0", sun_scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:1", sun_scsi_devices, "cdrom", false)
-	MCFG_NSCSI_ADD("scsibus:2", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr53c90a", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr53c90a", [this] (device_t *device) { ncr53c90a(device); })
+	NSCSI_BUS(config, "scsibus");
+	NSCSI_CONNECTOR(config, "scsibus:0", sun_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:1", sun_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:2", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:7", sun_scsi_devices, "ncr53c90a", true).set_option_machine_config("ncr53c90a", [this] (device_t *device) { ncr53c90a(device); });
 
 	// SBus
 	SBUS(config, m_sbus, 20'000'000, "maincpu", "type1");
 	SBUS_SLOT(config, m_sbus_slot[0], 20'000'000, m_sbus, sbus_cards, nullptr);
 	SBUS_SLOT(config, m_sbus_slot[1], 20'000'000, m_sbus, sbus_cards, nullptr);
 	SBUS_SLOT(config, m_sbus_slot[2], 20'000'000, m_sbus, sbus_cards, nullptr);
-MACHINE_CONFIG_END
+}
 
 void sun4_state::sun4_20(machine_config &config)
 {

@@ -31,24 +31,28 @@ TODO:
 class jackpool_state : public driver_device
 {
 public:
-	jackpool_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	jackpool_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	void jackpool(machine_config &config);
 
 	void init_jackpool();
 
+protected:
+	virtual void video_start() override;
+
 private:
 	DECLARE_READ8_MEMBER(jackpool_io_r);
 	DECLARE_WRITE_LINE_MEMBER(map_vreg_w);
-	virtual void video_start() override;
 	uint32_t screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jackpool_interrupt);
+	void jackpool_mem(address_map &map);
 
 	required_shared_ptr<uint16_t> m_vram;
 	uint8_t m_map_vreg;
@@ -56,7 +60,6 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void jackpool_mem(address_map &map);
 };
 
 
@@ -230,20 +233,21 @@ INTERRUPT_GEN_MEMBER(jackpool_state::jackpool_interrupt)
 }
 
 
-MACHINE_CONFIG_START(jackpool_state::jackpool)
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000) // ?
-	MCFG_DEVICE_PROGRAM_MAP(jackpool_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jackpool_state, jackpool_interrupt)  // ?
+void jackpool_state::jackpool(machine_config &config)
+{
+	M68000(config, m_maincpu, 12000000); // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &jackpool_state::jackpool_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(jackpool_state::jackpool_interrupt));  // ?
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jackpool)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jackpool);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(jackpool_state, screen_update_jackpool)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(jackpool_state::screen_update_jackpool));
+	screen.set_palette(m_palette);
 
 	ls259_device &latch1(LS259(config, "latch1"));
 	latch1.q_out_cb<0>().set_nop(); // HOLD3 lamp
@@ -268,16 +272,14 @@ MACHINE_CONFIG_START(jackpool_state::jackpool)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("uart", NS16550, 1843200) // exact type and clock unknown
+	NS16550(config, "uart", 1843200); // exact type and clock unknown
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x200);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+}
 
 
 ROM_START( jackpool )

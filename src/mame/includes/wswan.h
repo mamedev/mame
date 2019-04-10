@@ -85,16 +85,16 @@ protected:
 	required_ioport m_cursy;
 	required_ioport m_buttons;
 
-	DECLARE_READ8_MEMBER(bios_r);
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_WRITE8_MEMBER(port_w);
+	uint8_t bios_r(offs_t offset);
+	uint8_t port_r(offs_t offset);
+	void port_w(offs_t offset, uint8_t data);
 
 	void set_irq_line(int irq);
 	void dma_sound_cb();
 	void common_start();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(wswan);
+	void wswan_palette(palette_device &palette) const;
 
 	void wswan_io(address_map &map);
 	void wswan_mem(address_map &map);
@@ -114,7 +114,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	void wscolor_mem(address_map &map);
-	DECLARE_PALETTE_INIT(wscolor);
+	void wscolor_palette(palette_device &palette) const;
 };
 
 #endif // MAME_INCLUDES_WSWAN_H

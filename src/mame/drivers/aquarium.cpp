@@ -87,13 +87,13 @@ uint8_t aquarium_state::aquarium_snd_bitswap( uint8_t scrambled_data )
 
 READ8_MEMBER(aquarium_state::aquarium_oki_r)
 {
-	return aquarium_snd_bitswap(m_oki->read(space, offset));
+	return aquarium_snd_bitswap(m_oki->read());
 }
 
 WRITE8_MEMBER(aquarium_state::aquarium_oki_w)
 {
 	logerror("%s:Writing %04x to the OKI M6295\n", machine().describe_context(), aquarium_snd_bitswap(data));
-	m_oki->write(space, offset, (aquarium_snd_bitswap(data)));
+	m_oki->write(aquarium_snd_bitswap(data));
 }
 
 
@@ -287,52 +287,51 @@ static GFXDECODE_START( gfx_aquarium )
 	GFXDECODE_ENTRY( "gfx4", 0, char5bpplayout,   0x400, 32 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(aquarium_state::aquarium)
-
+void aquarium_state::aquarium(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) // clock not verified on pcb
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aquarium_state,  irq1_line_hold)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2); // clock not verified on pcb
+	m_maincpu->set_addrmap(AS_PROGRAM, &aquarium_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(aquarium_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/6) // clock not verified on pcb
-	MCFG_DEVICE_PROGRAM_MAP(snd_map)
-	MCFG_DEVICE_IO_MAP(snd_portmap)
+	Z80(config, m_audiocpu, XTAL(32'000'000)/6); // clock not verified on pcb
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aquarium_state::snd_map);
+	m_audiocpu->set_addrmap(AS_IO, &aquarium_state::snd_portmap);
 
 	// Is this the actual IC type? Some other Excellent games from this period use a MAX693.
-	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
+	MB3773(config, m_watchdog, 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(2*8, 42*8-1, 2*8, 34*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(aquarium_state, screen_update_aquarium)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 64*8);
+	m_screen->set_visarea(2*8, 42*8-1, 2*8, 34*8-1);
+	m_screen->set_screen_update(FUNC(aquarium_state::screen_update_aquarium));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aquarium)
-	MCFG_PALETTE_ADD("palette", 0x1000/2)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aquarium);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x1000/2);
 
-	MCFG_DEVICE_ADD("spritegen", EXCELLENT_SPRITE, 0)
+	EXCELLENT_SPRITE(config, m_sprgen, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) // clock not verified on pcb
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181)/4)); // clock not verified on pcb
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.45);
+	ymsnd.add_route(1, "rspeaker", 0.45);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'056'000), okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(1'056'000), okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.47);
+	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.47);
+}
 
 ROM_START( aquarium )
 	ROM_REGION( 0x080000, "maincpu", 0 )     /* 68000 code */

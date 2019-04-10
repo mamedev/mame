@@ -50,8 +50,8 @@ public:
 	auto bkdet_handler() { return m_write_bkdet.bind(); }
 	auto xsync_handler() { return m_write_xsync.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( dsr_w );
 	DECLARE_WRITE_LINE_MEMBER( dcd_w );

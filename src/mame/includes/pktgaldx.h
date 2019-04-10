@@ -30,7 +30,7 @@ public:
 		m_sprgen(*this, "spritegen"),
 		m_maincpu(*this, "maincpu"),
 		m_oki2(*this, "oki2"),
-		m_deco_tilegen1(*this, "tilegen1"),
+		m_deco_tilegen(*this, "tilegen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes")
@@ -55,7 +55,7 @@ private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki2;
-	optional_device<deco16ic_device> m_deco_tilegen1;
+	optional_device<deco16ic_device> m_deco_tilegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;

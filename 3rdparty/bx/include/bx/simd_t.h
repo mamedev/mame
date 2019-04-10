@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -7,7 +7,6 @@
 #define BX_SIMD_T_H_HEADER_GUARD
 
 #include "bx.h"
-#include "math.h"
 
 #define BX_SIMD_FORCE_INLINE BX_FORCE_INLINE
 #define BX_SIMD_INLINE inline
@@ -16,6 +15,8 @@
 #define BX_SIMD_LANGEXT 0
 #define BX_SIMD_NEON    0
 #define BX_SIMD_SSE     0
+
+#define BX_CONFIG_SUPPORTS_SIMD 0
 
 #if defined(__AVX__) || defined(__AVX2__)
 #	include <immintrin.h>
@@ -39,7 +40,6 @@
 	&& !BX_PLATFORM_EMSCRIPTEN \
 	&& !BX_PLATFORM_IOS \
 	&&  BX_CLANG_HAS_EXTENSION(attribute_ext_vector_type)
-#	include <math.h>
 #	undef  BX_SIMD_LANGEXT
 #	define BX_SIMD_LANGEXT 1
 #endif //
@@ -485,6 +485,15 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw);
 #	include "inline/simd128_sse.inl"
 #endif // BX_SIMD_SSE
 
+#if (  BX_SIMD_LANGEXT \
+	|| BX_SIMD_NEON    \
+	|| BX_SIMD_SSE     \
+	|| BX_SIMD_AVX     \
+	)
+#	undef  BX_CONFIG_SUPPORTS_SIMD
+#	define BX_CONFIG_SUPPORTS_SIMD 1
+#endif // BX_SIMD_*
+
 namespace bx
 {
 	union simd128_ref_t
@@ -498,16 +507,13 @@ namespace bx
 #	define BX_SIMD_WARN_REFERENCE_IMPL 0
 #endif // BX_SIMD_WARN_REFERENCE_IMPL
 
-#if !( BX_SIMD_LANGEXT \
-	|| BX_SIMD_NEON \
-	|| BX_SIMD_SSE \
-	 )
+#if !BX_CONFIG_SUPPORTS_SIMD
 #	if BX_SIMD_WARN_REFERENCE_IMPL
 #		pragma message("*** Using SIMD128 reference implementation! ***")
 #	endif // BX_SIMD_WARN_REFERENCE_IMPL
 
 	typedef simd128_ref_t simd128_t;
-#endif //
+#endif // BX_SIMD_REFERENCE
 
 	struct simd256_ref_t
 	{

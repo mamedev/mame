@@ -5,9 +5,10 @@
  * includes/lviv.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_LVIV_H
 #define MAME_INCLUDES_LVIV_H
+
+#pragma once
 
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
@@ -42,7 +43,7 @@ public:
 private:
 	virtual void machine_reset() override;
 
-	DECLARE_PALETTE_INIT(lviv);
+	void lviv_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(io_r);
@@ -92,7 +93,7 @@ private:
 	uint8_t m_startup_mem_map;
 
 	/*----------- defined in video/lviv.c -----------*/
-	static const uint8_t s_palette[8*3];
+	static const rgb_t s_palette[8];
 };
 
 #endif // MAME_INCLUDES_LVIV_H

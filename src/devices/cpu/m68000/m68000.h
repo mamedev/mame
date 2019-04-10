@@ -22,6 +22,9 @@ constexpr int M68K_IC_SIZE = 128;
 
 /* There are 7 levels of interrupt to the 68K.
  * A transition from < 7 to 7 will cause a non-maskable interrupt (NMI).
+ *
+ * If disable_interrupt_mixer() has been called, the 3 interrupt lines
+ * are modeled instead, as numbers 0-2.
  */
 constexpr int M68K_IRQ_NONE = 0;
 constexpr int M68K_IRQ_1    = 1;
@@ -31,6 +34,10 @@ constexpr int M68K_IRQ_4    = 4;
 constexpr int M68K_IRQ_5    = 5;
 constexpr int M68K_IRQ_6    = 6;
 constexpr int M68K_IRQ_7    = 7;
+
+constexpr int M68K_IRQ_IPL0 = 0;
+constexpr int M68K_IRQ_IPL1 = 1;
+constexpr int M68K_IRQ_IPL2 = 2;
 
 constexpr int M68K_SZ_LONG = 0;
 constexpr int M68K_SZ_BYTE = 1;
@@ -73,23 +80,6 @@ constexpr int M68K_HMMU_DISABLE   = 0;   /* no translation */
 constexpr int M68K_HMMU_ENABLE_II = 1;   /* Mac II style fixed translation */
 constexpr int M68K_HMMU_ENABLE_LC = 2;   /* Mac LC style fixed translation */
 
-/* Special interrupt acknowledge values.
- * Use these as special returns from the interrupt acknowledge callback
- * (specified later in this header).
- */
-
-/* Causes an interrupt autovector (0x18 + interrupt level) to be taken.
- * This happens in a real 68K if VPA or AVEC is asserted during an interrupt
- * acknowledge cycle instead of DTACK.
- */
-constexpr uint32_t M68K_INT_ACK_AUTOVECTOR    = 0xffffffff;
-
-/* Causes the spurious interrupt vector (0x18) to be taken
- * This happens in a real 68K if BERR is asserted during the interrupt
- * acknowledge cycle (i.e. no devices responded to the acknowledge).
- */
-constexpr uint32_t M68K_INT_ACK_SPURIOUS      = 0xfffffffe;
-
 enum
 {
 	/* NOTE: M68K_SP fetches the current SP, be it USP, ISP, or MSP */
@@ -98,15 +88,22 @@ enum
 	M68K_D0, M68K_D1, M68K_D2, M68K_D3, M68K_D4, M68K_D5, M68K_D6, M68K_D7,
 	M68K_A0, M68K_A1, M68K_A2, M68K_A3, M68K_A4, M68K_A5, M68K_A6, M68K_A7,
 	M68K_FP0, M68K_FP1, M68K_FP2, M68K_FP3, M68K_FP4, M68K_FP5, M68K_FP6, M68K_FP7,
-	M68K_FPSR, M68K_FPCR
+	M68K_FPSR, M68K_FPCR, M68K_CRP_LIMIT, M68K_CRP_APTR, M68K_SRP_LIMIT, M68K_SRP_APTR,
+	M68K_MMU_TC, M68K_TT0, M68K_TT1, M68K_MMU_SR, M68K_ITT0, M68K_ITT1,
+	M68K_DTT0, M68K_DTT1, M68K_URP_APTR
 };
 
 class m68000_base_device : public cpu_device
 {
 public:
+	enum {
+		AS_CPU_SPACE = 4
+	};
 
 	// construction/destruction
 	m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void autovectors_map(address_map &map);
 
 protected:
 	void presave();
@@ -120,9 +117,8 @@ protected:
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-	virtual uint32_t execute_input_lines() const override { return 8; }; // number of input lines
-	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return M68K_INT_ACK_AUTOVECTOR; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == M68K_IRQ_7; }
+	virtual uint32_t execute_input_lines() const override { return m_interrupt_mixer ? 8 : 3; }; // number of input lines
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return m_interrupt_mixer ? inputnum == M68K_IRQ_7 : false; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -136,6 +132,7 @@ protected:
 
 	// address spaces
 	const address_space_config m_program_config, m_oprogram_config;
+	address_space_config m_cpu_space_config;
 
 	void define_state(void);
 
@@ -146,8 +143,11 @@ public:
 	void set_tas_write_callback(write8_delegate callback);
 	uint16_t get_fc();
 	void set_hmmu_enable(int enable);
+	int get_pmmu_enable() {return m_pmmu_enabled;};
 	void set_fpu_enable(int enable);
 	void set_buserror_details(uint32_t fault_addr, uint8_t rw, uint8_t fc);
+	void disable_interrupt_mixer() { m_interrupt_mixer = false; }
+	void set_cpu_space(int space_id) { m_cpu_space_id = space_id; }
 
 protected:
 	m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
@@ -158,6 +158,8 @@ protected:
 
 	int    m_has_fpu;      /* Indicates if a FPU is available (yes on 030, 040, may be on 020) */
 
+	bool   m_interrupt_mixer; /* Indicates whether to put a virtual 8->3 priority mixer on the input lines (default true) */
+	int    m_cpu_space_id;    /* CPU space address space id (default AS_CPU_SPACE) */
 
 	uint32_t m_cpu_type;     /* CPU Type: 68000, 68008, 68010, 68EC020, 68020, 68EC030, 68030, 68EC040, or 68040 */
 //
@@ -229,8 +231,6 @@ protected:
 	const uint8_t* m_cyc_exception;
 
 	/* Callbacks to host */
-	device_irq_acknowledge_delegate m_int_ack_callback;   /* Interrupt Acknowledge */
-	write32_delegate m_bkpt_ack_callback;                 /* Breakpoint Acknowledge */
 	write_line_delegate m_reset_instr_callback;           /* Called when a RESET instruction is encountered */
 	write32_delegate m_cmpild_instr_callback;             /* Called when a CMPI.L #v, Dn instruction is encountered */
 	write_line_delegate m_rte_instr_callback;             /* Called when a RTE instruction is encountered */
@@ -238,7 +238,7 @@ protected:
 	                                                        allowing writeback to be disabled globally or selectively
 	                                                        or other side effects to be implemented */
 
-	address_space *m_program, *m_oprogram;
+	address_space *m_program, *m_oprogram, *m_cpu_space;
 
 	/* Redirect memory calls */
 
@@ -290,6 +290,8 @@ protected:
 	uint16_t m_mmu_tmp_buserror_rw;   /* temporary hack: (first) bus error rw */
 	uint16_t m_mmu_tmp_buserror_sz;   /* temporary hack: (first) bus error size` */
 
+	bool m_mmu_tablewalk;             /* set when MMU walks page tables */
+	uint32_t m_mmu_last_logical_addr;
 	uint32_t m_ic_address[M68K_IC_SIZE];   /* instruction cache address data */
 	uint32_t m_ic_data[M68K_IC_SIZE];      /* instruction cache content data */
 	bool   m_ic_valid[M68K_IC_SIZE];     /* instruction cache valid flags */
@@ -319,6 +321,7 @@ protected:
 	void init_cpu_scc68070(void);
 	void init_cpu_coldfire(void);
 
+	void default_autovectors_map(address_map &map);
 
 	void m68ki_exception_interrupt(uint32_t int_level);
 
@@ -345,6 +348,8 @@ protected:
 #include "m68kops.h"
 #include "m68kfpu.hxx"
 #include "m68kmmu.h"
+
+	virtual void m68k_reset_peripherals() { }
 };
 
 
@@ -369,21 +374,6 @@ protected:
 
 	m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
 						const device_type type, uint32_t prg_data_width, uint32_t prg_address_bits, address_map_constructor internal_map);
-};
-
-class m68301_device : public m68000_base_device
-{
-public:
-	// construction/destruction
-	m68301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-
-	virtual uint32_t execute_min_cycles() const override { return 4; };
-	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -643,7 +633,6 @@ public:
 
 
 DECLARE_DEVICE_TYPE(M68000, m68000_device)
-DECLARE_DEVICE_TYPE(M68301, m68301_device)
 DECLARE_DEVICE_TYPE(M68008, m68008_device)
 DECLARE_DEVICE_TYPE(M68008PLCC, m68008plcc_device)
 DECLARE_DEVICE_TYPE(M68010, m68010_device)

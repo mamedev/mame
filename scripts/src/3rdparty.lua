@@ -633,6 +633,12 @@ end
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 		}
 
+	configuration { "vsllvm" }
+		buildoptions {
+			"-Wno-unused-function",
+			"-Wno-enum-conversion",
+		}
+
 	configuration { }
 		defines {
 			"WORDS_BIGENDIAN=0",
@@ -970,6 +976,12 @@ end
 			"SQLITE_OS_WINRT",
 		}
 
+	configuration { "vsllvm" }
+		buildoptions {
+			"-Wno-deprecated-declarations",
+			"-Wno-unused-variable",
+		}
+
 	configuration { }
 
 	files {
@@ -1198,6 +1210,7 @@ project "bimg"
 
 	files {
 		MAME_DIR .. "3rdparty/bimg/src/image.cpp",
+		MAME_DIR .. "3rdparty/bimg/src/image_gnf.cpp",
 	}
 
 --------------------------------------------------
@@ -1215,6 +1228,13 @@ project "bgfx"
 			"/wd4611", -- warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
 			"/wd4310", -- warning C4310: cast truncates constant value
 		}
+
+	configuration { "vsllvm" }
+		buildoptions {
+			"-Wno-unneeded-internal-declaration",
+			"-Wno-unused-const-variable",
+		}
+
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd906",              -- message #906: effect of this "#pragma pack" directive is local to function "xxx"
@@ -1324,12 +1344,10 @@ end
 	files {
 		MAME_DIR .. "3rdparty/bgfx/src/bgfx.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/debug_renderdoc.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/dxgi.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_egl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_glx.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_wgl.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/hmd.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/hmd_ovr.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/hmd_openvr.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/nvapi.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d11.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d12.cpp",
@@ -1347,8 +1365,9 @@ end
 		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg_bgfx.cpp",
-		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui.cpp",
-		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui_draw.cpp",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui.cpp",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui_draw.cpp",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui_widgets.cpp",
 	}
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
@@ -1387,6 +1406,15 @@ project "portaudio"
 	configuration { "vs2015*" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
+		}
+
+	configuration { "vsllvm" }
+		buildoptions {
+			"-Wno-deprecated-declarations",
+			"-Wno-missing-braces",
+			"-Wno-unused-variable",
+			"-Wno-switch",
+			"-Wno-unused-function",
 		}
 
 	configuration { "gmake or ninja" }

@@ -25,17 +25,12 @@
 #include "h8_sci.h"
 #include "h8_watchdog.h"
 
-#define MCFG_H83003_TEND0_CALLBACK(_devcb) \
-	downcast<h83003_device &>(*device).set_tend0_callback(DEVCB_##_devcb);
-#define MCFG_H83003_TEND1_CALLBACK(_devcb) \
-	downcast<h83003_device &>(*device).set_tend1_callback(DEVCB_##_devcb);
-
 class h83003_device : public h8h_device {
 public:
 	h83003_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class Object> devcb_base &set_tend0_callback(Object &&cb) { return tend0_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_tend1_callback(Object &&cb) { return tend1_cb.set_callback(std::forward<Object>(cb)); }
+	auto tend0() { return tend0_cb.bind(); }
+	auto tend1() { return tend1_cb.bind(); }
 
 	DECLARE_READ8_MEMBER(syscr_r);
 	DECLARE_WRITE8_MEMBER(syscr_w);

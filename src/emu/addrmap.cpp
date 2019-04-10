@@ -759,12 +759,6 @@ address_map::address_map(device_t &device, int spacenum)
 		memintf->get_addrmap(spacenum)(*this);
 		m_device = &device;
 	}
-	else
-	{
-		// if the owner didn't provide a map, use the default device map
-		if (!spaceconfig->m_default_map.isnull())
-			spaceconfig->m_default_map(*this);
-	}
 
 	// construct the internal device map (last so it takes priority)
 	if (!spaceconfig->m_internal_map.isnull())
@@ -1108,7 +1102,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 
 			// error if not found
 			if (!found)
-				osd_printf_error("%s space memory map entry %X-%X references non-existant region '%s'\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
+				osd_printf_error("%s space memory map entry %X-%X references nonexistent region '%s'\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
 		}
 
 		// make sure all devices exist

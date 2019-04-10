@@ -42,8 +42,8 @@ protected:
 
 	virtual uint8_t eack_r() override;
 
-	virtual uint8_t nrdi_r(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
-	virtual void nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
+	virtual uint8_t nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
+	virtual void nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
 
 private:
 	required_device<ins8250_device> m_uart;

@@ -84,7 +84,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="arcadegamecreator-dfs_e.adf" size="204800" crc="93d1e6a9" sha1="18c5b93ecf8f9a3268e8212ef583e5039c7033c5" offset="0"/>
+				<rom name="arcadegamecreator-dfs_e.ssd" size="204800" crc="93d1e6a9" sha1="18c5b93ecf8f9a3268e8212ef583e5039c7033c5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -365,7 +365,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="knitweardesigner-dfs_e.adf" size="204800" crc="101c0a1b" sha1="4a89840f0a4121b65f29add4bcb90e63aa9f8985" offset="0"/>
+				<rom name="knitweardesigner-dfs_e.ssd" size="204800" crc="101c0a1b" sha1="4a89840f0a4121b65f29add4bcb90e63aa9f8985" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -401,7 +401,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="magicsword-dfs_e.adf" size="204800" crc="c5c5f112" sha1="8e4eea8352df8411c772fb52d76f5df011b28681" offset="0"/>
+				<rom name="magicsword-dfs_e.ssd" size="204800" crc="c5c5f112" sha1="8e4eea8352df8411c772fb52d76f5df011b28681" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -425,7 +425,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="mathsolevelr1-dfs_e.adf" size="204800" crc="0b09763a" sha1="b269e68ac3eb82be97371b171cc9b33500f29ce5" offset="0"/>
+				<rom name="mathsolevelr1-dfs_e.ssd" size="204800" crc="0b09763a" sha1="b269e68ac3eb82be97371b171cc9b33500f29ce5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -484,7 +484,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="pias-dfs_e.adf" size="204800" crc="a45acc09" sha1="3c7413811a03c087bd7f88ca5cc93807a092ffb6" offset="0"/>
+				<rom name="pias-dfs_e.ssd" size="204800" crc="a45acc09" sha1="3c7413811a03c087bd7f88ca5cc93807a092ffb6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -654,7 +654,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="spellbinder-dfs_e.adf" size="204800" crc="dada2fca" sha1="9b3f7ba15aea5e68745242214f3bd4a7be6f79a2" offset="0"/>
+				<rom name="spellbinder-dfs_e.ssd" size="204800" crc="dada2fca" sha1="9b3f7ba15aea5e68745242214f3bd4a7be6f79a2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -702,7 +702,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="Starspell-Dictionary-dfs_e.adf" size="204800" crc="88c692d1" sha1="2cf05091b210d31f968a2ed90a4d1db253586415" offset="0" />
+				<rom name="Starspell-Dictionary-dfs_e.ssd" size="204800" crc="88c692d1" sha1="2cf05091b210d31f968a2ed90a4d1db253586415" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -816,6 +816,8 @@
 		</part>
 	</software>
 
+	<!-- Hardware -->
+
 	<software name="adfse00">
 		<description>P.R.E.S. ADFS E00</description>
 		<year>1987</year>
@@ -838,6 +840,33 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="acp_dfs_e00-adfs_e.adf" size="327680" crc="4f2910a6" sha1="704196274014bd27c337403e6b16e8c7e9a4b711" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="e2p" supported="no">
+		<description>E2P Operating System (Disk)</description>
+		<year>1986</year>
+		<publisher>Permanent Memory Systems</publisher>
+		<info name="author" value="John Wike" />
+		<info name="usage" value="Requires E2P-6502" />
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="pmse2p-adfs_e.adf" size="327680" crc="ba456694" sha1="7c29331f5e16ac88134e772999a2c15a642e0de1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="e2pbasic" supported="no">
+		<description>E2P Hi-Basic</description>
+		<year>1986</year>
+		<publisher>Permanent Memory Systems</publisher>
+		<info name="usage" value="Requires E2P-6502" />
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="pms_hi-basic-adfs_e.adf" size="327680" crc="370de8fe" sha1="bf5dcace99d386d939be9323b17cc9660a7cce2c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

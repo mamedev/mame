@@ -152,8 +152,8 @@ void esprit_state::esprit(machine_config &config)
 	screen.set_raw(16.5888_MHz_XTAL, 900, 0, 720, 307, 0, 288);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_esprit);
-	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_esprit);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* Devices */
 	mc6845_device &crtc(MC6845(config, "crtc", 16.5888_MHz_XTAL / 9));
@@ -170,7 +170,8 @@ void esprit_state::esprit3(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 
-	ACIA6850(config, "acia");
+	acia6850_device &acia(ACIA6850(config, "acia"));
+	acia.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
 	mos6551_device &acia1(MOS6551(config, "acia1", 17.9712_MHz_XTAL / 18));
 	acia1.set_xtal(1.8432_MHz_XTAL);
@@ -181,7 +182,9 @@ void esprit_state::esprit3(machine_config &config)
 	acia2.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
 	via6522_device &via(VIA6522(config, "via", 17.9712_MHz_XTAL / 18));
-	via.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
+	via.irq_handler().set_inputline(m_maincpu, m6502_device::NMI_LINE);
+	via.writepb_handler().set("acia", FUNC(acia6850_device::write_rxc)).bit(7);
+	via.writepb_handler().append("acia", FUNC(acia6850_device::write_txc)).bit(7);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -189,8 +192,8 @@ void esprit_state::esprit3(machine_config &config)
 	screen.set_raw(17.9712_MHz_XTAL, 936, 0, 720, 320, 0, 288);
 	screen.set_screen_update("crtc", FUNC(r6545_1_device::screen_update));
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_esprit);
-	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_esprit);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	r6545_1_device &crtc(R6545_1(config, "crtc", 17.9712_MHz_XTAL / 9));
 	crtc.set_screen("screen");
@@ -198,6 +201,7 @@ void esprit_state::esprit3(machine_config &config)
 	crtc.set_char_width(9);
 	crtc.set_update_row_callback(FUNC(esprit_state::crtc_update_row), this);
 	crtc.set_on_update_addr_change_callback(FUNC(esprit_state::crtc_update_addr), this);
+	crtc.out_hsync_callback().set("via", FUNC(via6522_device::write_pb6)).invert();
 }
 
 ROM_START( esprit )

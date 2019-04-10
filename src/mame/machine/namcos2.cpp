@@ -85,7 +85,7 @@ void namcos2_state::machine_start()
 void namcos2_state::machine_reset()
 {
 //  address_space &space = m_maincpu->space(AS_PROGRAM);
-//	address_space &audio_space = m_audiocpu->space(AS_PROGRAM);
+//  address_space &audio_space = m_audiocpu->space(AS_PROGRAM);
 
 	/* Initialise the bank select in the sound CPU */
 	m_audiobank->set_entry(0); /* Page in bank 0 */

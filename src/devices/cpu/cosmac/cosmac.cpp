@@ -733,10 +733,12 @@ inline void cosmac_device::run_state()
 
 	case cosmac_state::STATE_2_DMA_IN:
 		dma_input();
+		debug();
 		break;
 
 	case cosmac_state::STATE_2_DMA_OUT:
 		dma_output();
+		debug();
 		break;
 
 	case cosmac_state::STATE_3_INT:

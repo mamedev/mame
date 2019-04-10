@@ -59,29 +59,27 @@ public:
 	void init_proconn();
 
 private:
-	template <unsigned N> DECLARE_WRITE8_MEMBER( ay_w ) { m_ay->address_data_w(space, N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( ay_w ) { m_ay->address_data_w(N, data); }
 
-	template <unsigned N> DECLARE_WRITE8_MEMBER( ctc_w ) { m_z80ctc->write(space, N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( ctc_w ) { m_z80ctc->write(N, data); }
 
-	template <unsigned N> DECLARE_WRITE8_MEMBER( sio_w ) { m_z80sio->cd_ba_w(space, N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( sio_w ) { m_z80sio->cd_ba_w(N, data); }
 
-	template <unsigned N> DECLARE_WRITE8_MEMBER( pio1_w ) { m_z80pio[0]->write(space, N, data); }
-	template <unsigned N> DECLARE_WRITE8_MEMBER( pio2_w ) { m_z80pio[1]->write(space, N, data); }
-	template <unsigned N> DECLARE_WRITE8_MEMBER( pio3_w ) { m_z80pio[2]->write(space, N, data); }
-	template <unsigned N> DECLARE_WRITE8_MEMBER( pio4_w ) { m_z80pio[3]->write(space, N, data); }
-	template <unsigned N> DECLARE_WRITE8_MEMBER( pio5_w ) { m_z80pio[4]->write(space, N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( pio1_w ) { m_z80pio[0]->write(N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( pio2_w ) { m_z80pio[1]->write(N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( pio3_w ) { m_z80pio[2]->write(N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( pio4_w ) { m_z80pio[3]->write(N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( pio5_w ) { m_z80pio[4]->write(N, data); }
 
-	template <unsigned N> DECLARE_READ8_MEMBER( ay_r ) { return m_ay->data_r(space, N); }
+	template <unsigned N> DECLARE_READ8_MEMBER( ctc_r ) { return m_z80ctc->read(N); }
 
-	template <unsigned N> DECLARE_READ8_MEMBER( ctc_r ) { return m_z80ctc->read(space, N); }
+	template <unsigned N> DECLARE_READ8_MEMBER( sio_r ) { return m_z80sio->cd_ba_r(N); }
 
-	template <unsigned N> DECLARE_READ8_MEMBER( sio_r ) { return m_z80sio->cd_ba_r(space, N); }
-
-	template <unsigned N> DECLARE_READ8_MEMBER( pio1_r ) { return m_z80pio[0]->read(space, N); }
-	template <unsigned N> DECLARE_READ8_MEMBER( pio2_r ) { return m_z80pio[1]->read(space, N); }
-	template <unsigned N> DECLARE_READ8_MEMBER( pio3_r ) { return m_z80pio[2]->read(space, N); }
-	template <unsigned N> DECLARE_READ8_MEMBER( pio4_r ) { return m_z80pio[3]->read(space, N); }
-	template <unsigned N> DECLARE_READ8_MEMBER( pio5_r ) { return m_z80pio[4]->read(space, N); }
+	template <unsigned N> DECLARE_READ8_MEMBER( pio1_r ) { return m_z80pio[0]->read(N); }
+	template <unsigned N> DECLARE_READ8_MEMBER( pio2_r ) { return m_z80pio[1]->read(N); }
+	template <unsigned N> DECLARE_READ8_MEMBER( pio3_r ) { return m_z80pio[2]->read(N); }
+	template <unsigned N> DECLARE_READ8_MEMBER( pio4_r ) { return m_z80pio[3]->read(N); }
+	template <unsigned N> DECLARE_READ8_MEMBER( pio5_r ) { return m_z80pio[4]->read(N); }
 
 	/* PIO 1 */
 
@@ -176,7 +174,7 @@ void proconn_state::proconn_portmap(address_map &map)
 	map(0x03fe, 0x03fe).rw(FUNC(proconn_state::ctc_r<3>), FUNC(proconn_state::ctc_w<3>));
 
 	// ay (meters connected to it?)
-	map(0x00fd, 0x00fd).rw(FUNC(proconn_state::ay_r<0>), FUNC(proconn_state::ay_w<0>));
+	map(0x00fd, 0x00fd).r(m_ay, FUNC(ay8910_device::data_r)).w(FUNC(proconn_state::ay_w<0>));
 	map(0x00fc, 0x00fc).w(FUNC(proconn_state::ay_w<1>));
 
 	// ??
@@ -265,13 +263,14 @@ void proconn_state::machine_reset()
 	m_vfd->reset(); // reset display1
 }
 
-MACHINE_CONFIG_START(proconn_state::proconn)
+void proconn_state::proconn(machine_config &config)
+{
 	Z80(config, m_maincpu, 4000000); /* ?? Mhz */
 	m_maincpu->set_daisy_config(z80_daisy_chain);
 	m_maincpu->set_addrmap(AS_PROGRAM, &proconn_state::proconn_map);
 	m_maincpu->set_addrmap(AS_IO, &proconn_state::proconn_portmap);
 
-	MCFG_S16LF01_ADD("vfd",0)
+	S16LF01(config, m_vfd);
 
 	Z80PIO(config, m_z80pio[0], 4000000); /* ?? Mhz */
 	m_z80pio[0]->out_int_callback().set(FUNC(proconn_state::pio_1_m_out_int_w));
@@ -329,13 +328,13 @@ MACHINE_CONFIG_START(proconn_state::proconn)
 
 	config.set_default_layout(layout_proconn);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1000000) /* ?? Mhz */ // YM2149F on PC92?
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, proconn_state, meter_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
+	AY8910(config, m_ay, 1000000); /* ?? Mhz */ // YM2149F on PC92?
+	m_ay->port_b_write_callback().set(FUNC(proconn_state::meter_w));
+	m_ay->add_route(ALL_OUTPUTS, "rspeaker", 0.33);
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
-MACHINE_CONFIG_END
+	METERS(config, m_meters, 0);
+	m_meters->set_number(8);
+}
 
 
 

@@ -273,20 +273,22 @@ MC6845_UPDATE_ROW( isa8_aga_device::aga_update_row )
 }
 
 
-MACHINE_CONFIG_START(isa8_aga_device::device_add_mconfig)
-	MCFG_SCREEN_ADD( AGA_SCREEN_NAME, RASTER )
-	MCFG_SCREEN_RAW_PARAMS( XTAL(14'318'181),912,0,640,262,0,200 )
-	MCFG_SCREEN_UPDATE_DEVICE( AGA_MC6845_NAME, mc6845_device, screen_update )
+void isa8_aga_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, AGA_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(14'318'181), 912, 0, 640, 262, 0, 200);
+	screen.set_screen_update(AGA_MC6845_NAME, FUNC(mc6845_device::screen_update));
 
-	MCFG_PALETTE_ADD( "palette", /* CGA_PALETTE_SETS * 16*/ 65536 )
+	PALETTE(config, m_palette).set_entries(/* CGA_PALETTE_SETS * 16*/ 65536);
 
-	MCFG_MC6845_ADD(AGA_MC6845_NAME, MC6845, AGA_SCREEN_NAME, XTAL(14'318'181)/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(isa8_aga_device, aga_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, isa8_aga_device, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, isa8_aga_device, vsync_changed))
-MACHINE_CONFIG_END
+	MC6845(config, m_mc6845, XTAL(14'318'181)/8);
+	m_mc6845->set_screen(AGA_SCREEN_NAME);
+	m_mc6845->set_show_border_area(false);
+	m_mc6845->set_char_width(8);
+	m_mc6845->set_update_row_callback(FUNC(isa8_aga_device::aga_update_row), this);
+	m_mc6845->out_hsync_callback().set(FUNC(isa8_aga_device::hsync_changed));
+	m_mc6845->out_vsync_callback().set(FUNC(isa8_aga_device::vsync_changed));
+}
 
 
 /*************************************
@@ -688,7 +690,7 @@ READ8_MEMBER ( isa8_aga_device::pc_aga_mda_r )
 			/* return last written mc6845 address value here? */
 			break;
 		case 1: case 3: case 5: case 7:
-			data = m_mc6845->register_r(space, offset);
+			data = m_mc6845->register_r();
 			break;
 		case 10:
 			data = m_vsync | 0x08 | m_hsync;
@@ -705,10 +707,10 @@ WRITE8_MEMBER ( isa8_aga_device::pc_aga_mda_w )
 		switch( offset )
 		{
 			case 0: case 2: case 4: case 6:
-				m_mc6845->address_w( space, offset, data );
+				m_mc6845->address_w(data);
 				break;
 			case 1: case 3: case 5: case 7:
-				m_mc6845->register_w( space, offset, data );
+				m_mc6845->register_w(data);
 				break;
 			case 8:
 				m_mda_mode_control = data;
@@ -739,7 +741,7 @@ READ8_MEMBER ( isa8_aga_device::pc_aga_cga_r )
 			/* return last written mc6845 address value here? */
 			break;
 		case 1: case 3: case 5: case 7:
-			data = m_mc6845->register_r( space, offset);
+			data = m_mc6845->register_r();
 			break;
 		case 10:
 			data = m_vsync | ( ( data & 0x40 ) >> 4 ) | m_hsync;
@@ -790,10 +792,10 @@ WRITE8_MEMBER (isa8_aga_device:: pc_aga_cga_w )
 	if ( m_mode == AGA_COLOR ) {
 		switch(offset) {
 		case 0: case 2: case 4: case 6:
-			m_mc6845->address_w( space, offset, data );
+			m_mc6845->address_w(data);
 			break;
 		case 1: case 3: case 5: case 7:
-			m_mc6845->register_w( space, offset, data );
+			m_mc6845->register_w(data);
 			break;
 		case 8:
 			m_cga_mode_control = data;

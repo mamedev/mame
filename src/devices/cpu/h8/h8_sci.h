@@ -17,22 +17,14 @@
 #include "h8.h"
 #include "h8_intc.h"
 
-#define MCFG_H8_SCI_ADD( _tag, intc, eri, rxi, txi, tei ) \
-	MCFG_DEVICE_ADD( _tag, H8_SCI, 0 ) \
-	downcast<h8_sci_device *>(device)->set_info(intc, eri, rxi, txi, tei);
-
-#define MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(_period) \
-	downcast<h8_sci_device *>(device)->set_external_clock_period(_period);
-
-#define MCFG_H8_SCI_TX_CALLBACK(_devcb) \
-	downcast<h8_sci_device &>(*device).set_tx_cb(DEVCB_##_devcb);
-
-#define MCFG_H8_SCI_CLK_CALLBACK(_devcb) \
-	downcast<h8_sci_device &>(*device).set_clk_cb(DEVCB_##_devcb);
-
 class h8_sci_device : public device_t {
 public:
 	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc, int eri, int rxi, int txi, int tei)
+		: h8_sci_device(mconfig, tag, owner, 0)
+	{
+		set_info(intc, eri, rxi, txi, tei);
+	}
 
 	void set_info(const char *intc, int eri, int rxi, int txi, int tei);
 	void set_external_clock_period(const attotime &_period);

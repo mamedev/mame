@@ -25,12 +25,13 @@ TODO:
 class buster_state : public driver_device
 {
 public:
-	buster_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	buster_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_vram(*this, "vram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	DECLARE_WRITE8_MEMBER(coin_output_w);
 	uint32_t screen_update_buster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -321,34 +322,35 @@ static GFXDECODE_START( gfx_buster )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(buster_state::buster)
+void buster_state::buster(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(3'579'545))        /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mainmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", buster_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(3'579'545));        /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &buster_state::mainmap);
+	m_maincpu->set_vblank_int("screen", FUNC(buster_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(buster_state, screen_update_buster)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(buster_state::screen_update_buster));
+	screen.set_palette(m_palette);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(3'579'545)/4) //unknown clock / type
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", XTAL(3'579'545)/4)); //unknown clock / type
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_buster)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_buster);
 
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	AY8910(config, "aysnd", 1500000/2).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 ROM_START( buster )

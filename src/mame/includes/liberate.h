@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#ifndef MAME_INCLUDES_LIBERATE_H
+#define MAME_INCLUDES_LIBERATE_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
@@ -7,8 +11,8 @@
 class liberate_state : public driver_device
 {
 public:
-	liberate_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	liberate_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bg_vram(*this, "bg_vram"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
@@ -19,7 +23,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void liberate_base(machine_config &config);
 	void liberate(machine_config &config);
@@ -83,7 +88,7 @@ private:
 	DECLARE_MACHINE_START(liberate);
 	DECLARE_MACHINE_RESET(liberate);
 	DECLARE_VIDEO_START(liberate);
-	DECLARE_PALETTE_INIT(liberate);
+	void liberate_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(prosport);
 	DECLARE_VIDEO_START(boomrang);
 	DECLARE_VIDEO_START(prosoccr);
@@ -106,3 +111,5 @@ private:
 	void prosoccr_sound_map(address_map &map);
 	void prosport_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_LIBERATE_H

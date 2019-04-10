@@ -535,6 +535,7 @@ public:
 	void set_flip(u32 attributes) { if (m_attributes != attributes) { m_attributes = attributes; mappings_update(); } }
 
 	// dirtying
+	void mark_mapping_dirty() { mappings_update(); }
 	void mark_tile_dirty(tilemap_memory_index memindex);
 	void mark_all_dirty() { m_all_tiles_dirty = true; m_all_tiles_clean = false; }
 

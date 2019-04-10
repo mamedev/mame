@@ -16,7 +16,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/clock.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "bus/rs232/rs232.h"
@@ -62,19 +61,19 @@ static INPUT_PORTS_START( jade )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(jade_state::jade)
+void jade_state::jade(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &jade_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &jade_state::io_map);
 
 	Z80CTC(config, "ctc1", 4_MHz_XTAL);
 
 	z80ctc_device &ctc2(Z80CTC(config, "ctc2", 4_MHz_XTAL));
+	ctc2.set_clk<0>(4_MHz_XTAL / 2);
 	ctc2.zc_callback<0>().set("sio", FUNC(z80sio_device::rxca_w));
 	ctc2.zc_callback<0>().append("sio", FUNC(z80sio_device::txca_w));
-
-	CLOCK(config, "trg0", 4_MHz_XTAL / 2).signal_handler().set("ctc2", FUNC(z80ctc_device::trg0));
 
 	/* Devices */
 	z80sio_device& sio(Z80SIO(config, "sio", 4_MHz_XTAL));
@@ -83,10 +82,10 @@ MACHINE_CONFIG_START(jade_state::jade)
 	sio.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	sio.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsa_w))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxa_w));
+	rs232.cts_handler().set("sio", FUNC(z80sio_device::ctsa_w));
+}
 
 /* ROM definition */
 ROM_START( jade )

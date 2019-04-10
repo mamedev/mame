@@ -6,7 +6,8 @@
 #include "includes/shangkid.h"
 
 
-TILE_GET_INFO_MEMBER(shangkid_state::get_bg_tile_info){
+TILE_GET_INFO_MEMBER(shangkid_state::get_bg_tile_info)
+{
 	int attributes = m_videoram[tile_index+0x800];
 	int tile_number = m_videoram[tile_index]+0x100*(attributes&0x3);
 	int color;
@@ -190,35 +191,34 @@ uint32_t shangkid_state::screen_update_shangkid(screen_device &screen, bitmap_in
 }
 
 
-PALETTE_INIT_MEMBER(shangkid_state,dynamski)
+void shangkid_state::dynamski_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x20; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x20; i++)
 	{
-		uint16_t data = (color_prom[i | 0x20] << 8) | color_prom[i];
-		rgb_t color = rgb_t(pal5bit(data >> 1), pal5bit(data >> 6), pal5bit(data >> 11));
+		uint16_t const data = (color_prom[i | 0x20] << 8) | color_prom[i];
+		rgb_t const color(pal5bit(data >> 1), pal5bit(data >> 6), pal5bit(data >> 11));
 
 		palette.set_indirect_color(i, color);
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x40;
 
-	/* characters */
-	for (i = 0; i < 0x40; i++)
+	// characters
+	for (int i = 0; i < 0x40; i++)
 	{
-		uint8_t ctabentry = color_prom[i] & 0x0f;
+		uint8_t const ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	/* sprites */
-	for (i = 0x40; i < 0x80; i++)
+	// sprites
+	for (int i = 0; i < 0x40; i++)
 	{
-		uint8_t ctabentry = (color_prom[(i - 0x40) + 0x100] & 0x0f) | 0x10;
-		palette.set_pen_indirect(i, ctabentry);
+		uint8_t ctabentry = (color_prom[i + 0x100] & 0x0f) | 0x10;
+		palette.set_pen_indirect(i + 0x40, ctabentry);
 	}
 }
 

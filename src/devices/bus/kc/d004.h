@@ -10,6 +10,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"
 #include "machine/ataintf.h"
+#include "imagedev/floppy.h"
 #include "imagedev/harddriv.h"
 
 

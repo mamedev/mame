@@ -28,7 +28,9 @@
     designation also comes from there, since the actual IC is merely
     marked with its HP part number, 1820-2373.) DP8369 is another
     variant ordered by General Terminal Corp. for their SW10 terminal;
-    option “K” is its National designation.
+    option “K” is its National designation. Sperry Univac ordered
+    another variant whose actual number is unknown but appears to use
+    the option “A” parameters.
 
         Variant     Dot rate      Monitor type
         -------     --------      ------------
@@ -37,6 +39,7 @@
         DP8353      17.6256 MHz   Motorola M3003
         DP8367      25.7715 MHz   HP 13220
         DP8369      12.2472 MHz   GTC SW10
+        DP????      19.98 MHz     Sperry Univac UTS
 
 **********************************************************************/
 
@@ -55,6 +58,7 @@
 // device type definitions
 DEFINE_DEVICE_TYPE(DP8350, dp8350_device, "dp8350", "DP8350 CRTC")
 DEFINE_DEVICE_TYPE(DP8367, dp8367_device, "dp8367", "DP8367 CRTC")
+DEFINE_DEVICE_TYPE(DP835X_A, dp835x_a_device, "dp835x_a", "DP835X CRTC (option A)")
 
 
 //**************************************************************************
@@ -66,12 +70,12 @@ DEFINE_DEVICE_TYPE(DP8367, dp8367_device, "dp8367", "DP8367 CRTC")
 //-------------------------------------------------
 
 dp835x_device::dp835x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
-                             int char_width, int char_height, int chars_per_row, int rows_per_frame,
-                             int vsync_delay_f1, int vsync_width_f1, int vblank_interval_f1,
-                             int vsync_delay_f0, int vsync_width_f0, int vblank_interval_f0,
-                             int chars_per_line, int hsync_delay, int hsync_width, int vblank_stop,
-                             bool cursor_on_all_lines, int lbc_0_width, int hsync_serration,
-                             bool hsync_active, bool vsync_active, bool vblank_active)
+							 int char_width, int char_height, int chars_per_row, int rows_per_frame,
+							 int vsync_delay_f1, int vsync_width_f1, int vblank_interval_f1,
+							 int vsync_delay_f0, int vsync_width_f0, int vblank_interval_f0,
+							 int chars_per_line, int hsync_delay, int hsync_width, int vblank_stop,
+							 bool cursor_on_all_lines, int lbc_0_width, int hsync_serration,
+							 bool hsync_active, bool vsync_active, bool vblank_active)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_char_width(char_width)
@@ -124,12 +128,12 @@ dp835x_device::dp835x_device(const machine_config &mconfig, device_type type, co
 
 dp8350_device::dp8350_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: dp835x_device(mconfig, DP8350, tag, owner, clock,
-                        7, 10, 80, 24,
-                        4, 10, 20,
-                        30, 10, 72,
-                        100, 0, 43, 1, // yes, the horizontal sync pulse is more than twice as long as the blanking period
-                        true, 4, 0,
-                        true, false, true)
+						7, 10, 80, 24,
+						4, 10, 20,
+						30, 10, 72,
+						100, 0, 43, 1, // yes, the horizontal sync pulse is more than twice as long as the blanking period
+						true, 4, 0,
+						true, false, true)
 {
 }
 
@@ -140,14 +144,31 @@ dp8350_device::dp8350_device(const machine_config &mconfig, const char *tag, dev
 
 dp8367_device::dp8367_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: dp835x_device(mconfig, DP8367, tag, owner, clock,
-                        9, 15, 80, 26,
-                        0, 19, 25,
-                        38, 64, 108,
-                        115, -16, 7, 1, // value of vblank_stop assumed
-                        true, 5, 0, // values assumed
-                        true, true, true)
+						9, 15, 80, 26,
+						0, 19, 25,
+						38, 64, 108,
+						115, -16, 7, 1, // value of vblank_stop assumed
+						true, 5, 0, // values assumed
+						true, true, true)
 {
 }
+
+
+//-------------------------------------------------
+//  dp835x_a_device - constructor
+//-------------------------------------------------
+
+dp835x_a_device::dp835x_a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: dp835x_device(mconfig, DP835X_A, tag, owner, clock,
+						9, 14, 80, 25,
+						0, 14, 20, // sync parameters guessed
+						38, 59, 94, // sync parameters guessed
+						100, 4, 8, 1, // sync parameters and vblank_stop guessed
+						true, 5, 0, // values assumed
+						true, true, true) // values assumed
+{
+}
+
 
 
 //-------------------------------------------------
@@ -249,7 +270,7 @@ void dp835x_device::reconfigure_screen()
 		screen().configure(m_dots_per_line, lines_per_frame, screen().visible_area(), refresh.as_attoseconds());
 
 	logerror("Frame rate refresh: %.2f Hz (f%d); horizontal rate scan: %.4f kHz; character rate: %.4f MHz; dot rate: %.5f MHz\n",
-		ATTOSECONDS_TO_HZ(refresh.as_attoseconds()),
+		refresh.as_hz(),
 		m_60hz_refresh ? 1 : 0,
 		clock() / (m_dots_per_line * 1000.0),
 		clock() / (m_char_width * 1000000.0),

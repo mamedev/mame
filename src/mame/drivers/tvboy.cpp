@@ -76,36 +76,36 @@ void tvboy_state::tvboy_mem(address_map &map)
 
 #define MASTER_CLOCK_PAL    3546894
 
-MACHINE_CONFIG_START(tvboy_state::tvboyii)
+void tvboy_state::tvboyii(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(tvboy_mem)
-	MCFG_M6502_DISABLE_CACHE()
+	M6507(config, m_maincpu, MASTER_CLOCK_PAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tvboy_state::tvboy_mem);
+	m_maincpu->disable_cache();
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0, "tia")
-	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, tvboy_state, a2600_read_input_port))
-	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, tvboy_state, a2600_get_databus_contents))
-	MCFG_TIA_VSYNC_CB(WRITE16(*this, tvboy_state, a2600_tia_vsync_callback_pal))
+	TIA_PAL_VIDEO(config, m_tia, 0, "tia");
+	m_tia->read_input_port_callback().set(FUNC(tvboy_state::a2600_read_input_port));
+	m_tia->databus_contents_callback().set(FUNC(tvboy_state::a2600_get_databus_contents));
+	m_tia->vsync_callback().set(FUNC(tvboy_state::a2600_tia_vsync_callback_pal));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31 )
-	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
-	MCFG_SCREEN_PALETTE("tia_video:palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31);
+	m_screen->set_screen_update("tia_video", FUNC(tia_video_device::screen_update));
+	m_screen->set_palette("tia_video:palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK_PAL/114)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	TIA(config, "tia", MASTER_CLOCK_PAL/114).add_route(ALL_OUTPUTS, "mono", 0.90);
 
 	/* devices */
 #if USE_NEW_RIOT
-	MCFG_DEVICE_ADD("riot", MOS6532n, MASTER_CLOCK_PAL / 3)
-	MCFG_MOS6530n_IN_PA_CB(READ8(*this, tvboy_state, switch_A_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, tvboy_state, switch_A_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(*this, tvboy_state, riot_input_port_8_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, tvboy_state, switch_B_w))
-	MCFG_MOS6530n_IRQ_CB(WRITELINE(*this, tvboy_state, irq_callback))
+	MOS6532_NEW(config, m_riot, MASTER_CLOCK_PAL / 3);
+	m_riot->pa_rd_callback().set(FUNC(tvboy_state::switch_A_r));
+	m_riot->pa_wr_callback().set(FUNC(tvboy_state::switch_A_w));
+	m_riot->pb_rd_callback().set(FUNC(tvboy_state::riot_input_port_8_r));
+	m_riot->pb_wr_callback().set(FUNC(tvboy_state::switch_B_w));
+	m_riot->irq_wr_callback().set(FUNC(tvboy_state::irq_callback));
 #else
 	RIOT6532(config, m_riot, MASTER_CLOCK_PAL / 3);
 	m_riot->in_pa_callback().set(FUNC(tvboy_state::switch_A_r));
@@ -115,9 +115,9 @@ MACHINE_CONFIG_START(tvboy_state::tvboyii)
 	m_riot->irq_callback().set(FUNC(tvboy_state::irq_callback));
 #endif
 
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
-MACHINE_CONFIG_END
+	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, "joy");
+	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, nullptr);
+}
 
 static INPUT_PORTS_START( tvboyii )
 	PORT_START("SWB")

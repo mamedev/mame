@@ -5,6 +5,10 @@
     Blue Print
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_BLUEPRNT_H
+#define MAME_INCLUDES_BLUEPRNT_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
@@ -12,8 +16,8 @@
 class blueprnt_state : public driver_device
 {
 public:
-	blueprnt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	blueprnt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -22,7 +26,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_scrollram(*this, "scrollram"),
 		m_spriteram(*this, "spriteram"),
-		m_colorram(*this, "colorram") { }
+		m_colorram(*this, "colorram")
+	{ }
 
 	/* device/memory pointers */
 	required_device<cpu_device> m_maincpu;
@@ -54,7 +59,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(blueprnt);
-	DECLARE_PALETTE_INIT(blueprnt);
+	void blueprnt_palette(palette_device &palette) const;
 	uint32_t screen_update_blueprnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void blueprnt(machine_config &config);
@@ -64,3 +69,5 @@ public:
 	void sound_io(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_BLUEPRNT_H

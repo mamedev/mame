@@ -166,9 +166,9 @@ void senjyo_state::senjyo_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x43ff).ram();
-	map(0x8000, 0x8000).w("sn1", FUNC(sn76496_device::command_w));
-	map(0x9000, 0x9000).w("sn2", FUNC(sn76496_device::command_w));
-	map(0xa000, 0xa000).w("sn3", FUNC(sn76496_device::command_w));
+	map(0x8000, 0x8000).w("sn1", FUNC(sn76496_device::write));
+	map(0x9000, 0x9000).w("sn2", FUNC(sn76496_device::write));
+	map(0xa000, 0xa000).w("sn3", FUNC(sn76496_device::write));
 	map(0xd000, 0xd000).w(FUNC(senjyo_state::volume_w));
 }
 
@@ -231,9 +231,9 @@ void senjyo_state::starforb_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x43ff).ram();
-	map(0x8000, 0x8000).w("sn1", FUNC(sn76496_device::command_w));
-	map(0x9000, 0x9000).w("sn2", FUNC(sn76496_device::command_w));
-	map(0xa000, 0xa000).w("sn3", FUNC(sn76496_device::command_w));
+	map(0x8000, 0x8000).w("sn1", FUNC(sn76496_device::write));
+	map(0x9000, 0x9000).w("sn2", FUNC(sn76496_device::write));
+	map(0xa000, 0xa000).w("sn3", FUNC(sn76496_device::write));
 	map(0xd000, 0xd000).w(FUNC(senjyo_state::volume_w));
 	map(0xf000, 0xffff).ram();
 }
@@ -548,12 +548,12 @@ static GFXDECODE_START( gfx_senjyo )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(senjyo_state::senjyo)
-
+void senjyo_state::senjyo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(senjyo_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
+	Z80(config, m_maincpu, 4000000);   /* 4 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &senjyo_state::senjyo_map);
+	m_maincpu->set_vblank_int("screen", FUNC(senjyo_state::irq0_line_assert));
 
 	z80_device& sub(Z80(config, "sub", 2000000));   /* 2 MHz? */
 	sub.set_daisy_config(senjyo_daisy_chain);
@@ -570,69 +570,65 @@ MACHINE_CONFIG_START(senjyo_state::senjyo)
 	ctc.zc_callback<2>().set(FUNC(senjyo_state::sound_line_clock));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(senjyo_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(senjyo_state::screen_update));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_senjyo)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_senjyo);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512)
-	MCFG_PALETTE_FORMAT_CLASS(1, senjyo_state, IIBBGGRR)
-
-	MCFG_PALETTE_ADD("radar_palette", 2)
-	MCFG_PALETTE_INIT_OWNER(senjyo_state, radar)
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(1, &senjyo_state::IIBBGGRR, 512);
+	PALETTE(config, m_radar_palette, FUNC(senjyo_state::radar_palette), 2);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76496, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	SN76496(config, "sn1", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("sn2", SN76496, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	SN76496(config, "sn2", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("sn3", SN76496, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	SN76496(config, "sn3", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 
-MACHINE_CONFIG_START(senjyo_state::senjyox_e)
+void senjyo_state::senjyox_e(machine_config &config)
+{
 	senjyo(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(senjyo_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_315_5015_device &maincpu(SEGA_315_5015(config.replace(), m_maincpu, 4000000));   /* 4 MHz? */
+	maincpu.set_addrmap(AS_PROGRAM, &senjyo_state::senjyo_map);
+	maincpu.set_addrmap(AS_OPCODES, &senjyo_state::decrypted_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(senjyo_state::irq0_line_assert));
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(senjyo_state::senjyox_a)
+void senjyo_state::senjyox_a(machine_config &config)
+{
 	senjyo(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5018, 4000000)   /* 4 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(senjyo_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, 4000000));   /* 4 MHz? */
+	maincpu.set_addrmap(AS_PROGRAM, &senjyo_state::senjyo_map);
+	maincpu.set_addrmap(AS_OPCODES, &senjyo_state::decrypted_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(senjyo_state::irq0_line_assert));
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+}
 
 
-MACHINE_CONFIG_START(senjyo_state::starforb)
+void senjyo_state::starforb(machine_config &config)
+{
 	senjyox_e(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(starforb_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &senjyo_state::starforb_map);
 
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(starforb_sound_map)
-MACHINE_CONFIG_END
+	subdevice<z80_device>("sub")->set_addrmap(AS_PROGRAM, &senjyo_state::starforb_sound_map);
+}
 
 
 /***************************************************************************

@@ -355,47 +355,47 @@ TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::dfruit_irq_scanline)
 
 	if (scanline == 240 && (m_irq_enable & 4))
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[2]);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[2]); // TC0091LVC
 	}
 
 	if (scanline == 0 && (m_irq_enable & 2))
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[1]);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[1]); // TC0091LVC
 	}
 
 	if (scanline == 196 && (m_irq_enable & 1))
 	{
-		//m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[0]);
+		//m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[0]); // TC0091LVC
 	}
 }
 
 #define MASTER_CLOCK XTAL(14'000'000)
 
-MACHINE_CONFIG_START(dfruit_state::dfruit)
-
+void dfruit_state::dfruit(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,MASTER_CLOCK/2) //!!! TC0091LVC !!!
-	MCFG_DEVICE_PROGRAM_MAP(dfruit_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dfruit_state, dfruit_irq_scanline, "screen", 0, 1)
+	Z80(config, m_maincpu, MASTER_CLOCK/2); //!!! TC0091LVC !!!
+	m_maincpu->set_addrmap(AS_PROGRAM, &dfruit_state::dfruit_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(dfruit_state::dfruit_irq_scanline), "screen", 0, 1);
 
 	//MCFG_MACHINE_START_OVERRIDE(dfruit_state,4enraya)
 	//MCFG_MACHINE_RESET_OVERRIDE(dfruit_state,4enraya)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dfruit_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dfruit_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(dfruit_state::screen_update));
+	screen.screen_vblank().set(FUNC(dfruit_state::screen_vblank));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dfruit )
-	MCFG_PALETTE_ADD("palette", 0x100)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_dfruit);
+	PALETTE(config, "palette").set_entries(0x100);
 
-	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
-	MCFG_TC0091LVC_GFXDECODE("gfxdecode")
+	TC0091LVC(config, m_vdp, 0);
+	m_vdp->set_gfxdecode_tag("gfxdecode");
 
 	i8255_device &ppi(I8255A(config, "ppi8255_0"));
 	ppi.in_pa_callback().set_ioport("IN0");
@@ -404,11 +404,11 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("opn", YM2203, MASTER_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN4"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN5"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	ym2203_device &opn(YM2203(config, "opn", MASTER_CLOCK/4));
+	opn.port_a_read_callback().set_ioport("IN4");
+	opn.port_b_read_callback().set_ioport("IN5");
+	opn.add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 /***************************************************************************
 

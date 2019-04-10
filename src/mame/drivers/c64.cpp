@@ -332,14 +332,14 @@ uint8_t c64_state::read_memory(address_space &space, offs_t offset, offs_t va, i
 		case 1:
 		case 2:
 		case 3: // VIC
-			data = m_vic->read(space, offset & 0x3f);
+			data = m_vic->read(offset & 0x3f);
 			break;
 
 		case 4:
 		case 5:
 		case 6:
 		case 7: // SID
-			data = m_sid->read(space, offset & 0x1f);
+			data = m_sid->read(offset & 0x1f);
 			break;
 
 		case 0x8:
@@ -350,11 +350,11 @@ uint8_t c64_state::read_memory(address_space &space, offs_t offset, offs_t va, i
 			break;
 
 		case 0xc: // CIA1
-			data = m_cia1->read(space, offset & 0x0f);
+			data = m_cia1->read(offset & 0x0f);
 			break;
 
 		case 0xd: // CIA2
-			data = m_cia2->read(space, offset & 0x0f);
+			data = m_cia2->read(offset & 0x0f);
 			break;
 
 		case 0xe: // I/O1
@@ -369,7 +369,7 @@ uint8_t c64_state::read_memory(address_space &space, offs_t offset, offs_t va, i
 
 	int roml = BIT(plaout, PLA_OUT_ROML);
 	int romh = BIT(plaout, PLA_OUT_ROMH);
-	return m_exp->cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+	return m_exp->cd_r(offset, data, sphi2, ba, roml, romh, io1, io2);
 }
 
 
@@ -404,14 +404,14 @@ void c64_state::write_memory(address_space &space, offs_t offset, uint8_t data, 
 		case 1:
 		case 2:
 		case 3: // VIC
-			m_vic->write(space, offset & 0x3f, data);
+			m_vic->write(offset & 0x3f, data);
 			break;
 
 		case 4:
 		case 5:
 		case 6:
 		case 7: // SID
-			m_sid->write(space, offset & 0x1f, data);
+			m_sid->write(offset & 0x1f, data);
 			break;
 
 		case 0x8:
@@ -422,11 +422,11 @@ void c64_state::write_memory(address_space &space, offs_t offset, uint8_t data, 
 			break;
 
 		case 0xc: // CIA1
-			m_cia1->write(space, offset & 0x0f, data);
+			m_cia1->write(offset & 0x0f, data);
 			break;
 
 		case 0xd: // CIA2
-			m_cia2->write(space, offset & 0x0f, data);
+			m_cia2->write(offset & 0x0f, data);
 			break;
 
 		case 0xe: // I/O1
@@ -441,7 +441,7 @@ void c64_state::write_memory(address_space &space, offs_t offset, uint8_t data, 
 
 	int roml = BIT(plaout, PLA_OUT_ROML);
 	int romh = BIT(plaout, PLA_OUT_ROMH);
-	m_exp->cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+	m_exp->cd_w(offset, data, sphi2, ba, roml, romh, io1, io2);
 }
 
 
@@ -692,7 +692,7 @@ READ8_MEMBER( c64_state::sid_potx_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia1->read_pa() >> 6)
+	switch (m_cia1->pa_r() >> 6)
 	{
 	case 1: data = m_joy1->read_pot_x(); break;
 	case 2: data = m_joy2->read_pot_x(); break;
@@ -719,7 +719,7 @@ READ8_MEMBER( c64_state::sid_poty_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia1->read_pa() >> 6)
+	switch (m_cia1->pa_r() >> 6)
 	{
 	case 1: data = m_joy1->read_pot_y(); break;
 	case 2: data = m_joy2->read_pot_y(); break;
@@ -773,7 +773,7 @@ READ8_MEMBER( c64_state::cia1_pa_r )
 	data &= ~(!BIT(joy_b, 5) << 4);
 
 	// keyboard
-	uint8_t cia1_pb = m_cia1->read_pb();
+	uint8_t cia1_pb = m_cia1->pb_r();
 	uint32_t row[8] = { m_row[0]->read(), m_row[1]->read() & m_lock->read(), m_row[2]->read(), m_row[3]->read(),
 						m_row[4]->read(), m_row[5]->read(), m_row[6]->read(), m_row[7]->read() };
 
@@ -841,7 +841,7 @@ READ8_MEMBER( c64_state::cia1_pb_r )
 	data &= ~(!BIT(joy_a, 5) << 4);
 
 	// keyboard
-	uint8_t cia1_pa = m_cia1->read_pa();
+	uint8_t cia1_pa = m_cia1->pa_r();
 
 	if (!BIT(cia1_pa, 7)) data &= m_row[7]->read();
 	if (!BIT(cia1_pa, 6)) data &= m_row[6]->read();
@@ -1260,17 +1260,19 @@ void c64_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ntsc )
+//  machine_config( ntsc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_state::ntsc)
+void c64_state::ntsc(machine_config &config)
+{
 	// basic hardware
-	MCFG_DEVICE_ADD(M6510_TAG, M6510, XTAL(14'318'181)/14)
-	MCFG_DEVICE_PROGRAM_MAP(c64_mem)
-	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
-	MCFG_M6510_PORT_CALLBACKS(READ8(*this, c64_state, cpu_r), WRITE8(*this, c64_state, cpu_w))
-	MCFG_M6510_PORT_PULLS(0x17, 0xc8)
-	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
+	M6510(config, m_maincpu, XTAL(14'318'181)/14);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c64_state::c64_mem);
+	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
+	m_maincpu->read_callback().set(FUNC(c64_state::cpu_r));
+	m_maincpu->write_callback().set(FUNC(c64_state::cpu_w));
+	m_maincpu->set_pulls(0x17, 0xc8);
+	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
 	irq.output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
@@ -1286,46 +1288,52 @@ MACHINE_CONFIG_START(c64_state::ntsc)
 	mos6567.set_addrmap(0, &c64_state::vic_videoram_map);
 	mos6567.set_addrmap(1, &c64_state::vic_colorram_map);
 
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
-	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
-	MCFG_SCREEN_UPDATE_DEVICE(MOS6567_TAG, mos6567_device, screen_update)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(VIC6567_VRETRACERATE);
+	screen.set_size(VIC6567_COLUMNS, VIC6567_LINES);
+	screen.set_visarea(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
+	screen.set_screen_update(MOS6567_TAG, FUNC(mos6567_device::screen_update));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(MOS6581_TAG, MOS6581, XTAL(14'318'181)/14)
-	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, c64_state, sid_potx_r))
-	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, c64_state, sid_poty_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MOS6581(config, m_sid, XTAL(14'318'181)/14);
+	m_sid->potx().set(FUNC(c64_state::sid_potx_r));
+	m_sid->poty().set(FUNC(c64_state::sid_poty_r));
+	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// devices
-	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_DEVICE_ADD(MOS6526_1_TAG, MOS6526, XTAL(14'318'181)/14)
-	MCFG_MOS6526_TOD(60)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE("irq", input_merger_device, in_w<0>))
-	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_4))
-	MCFG_MOS6526_SP_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_5))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c64_state, cia1_pa_r))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c64_state, cia1_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c64_state, cia1_pb_w))
-	MCFG_DEVICE_ADD(MOS6526_2_TAG, MOS6526, XTAL(14'318'181)/14)
-	MCFG_MOS6526_TOD(60)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(m_nmi, input_merger_device, in_w<0>))
-	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6))
-	MCFG_MOS6526_SP_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_7))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c64_state, cia2_pa_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c64_state, cia2_pa_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c64_state, cia2_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c64_state, cia2_pb_w))
-	MCFG_MOS6526_PC_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_8))
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", WRITELINE(MOS6526_1_TAG, mos6526_device, flag_w))
-	MCFG_CBM_IEC_ADD("c1541")
-	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(MOS6526_1_TAG, mos6526_device, flag_w))
-	MCFG_CBM_IEC_BUS_ATN_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_9))
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
-	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(MOS6567_TAG, mos6567_device, lp_w))
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
+	PLS100(config, m_pla);
+
+	MOS6526(config, m_cia1, XTAL(14'318'181)/14);
+	m_cia1->set_tod_clock(60);
+	m_cia1->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<0>));
+	m_cia1->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_4));
+	m_cia1->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_5));
+	m_cia1->pa_rd_callback().set(FUNC(c64_state::cia1_pa_r));
+	m_cia1->pb_rd_callback().set(FUNC(c64_state::cia1_pb_r));
+	m_cia1->pb_wr_callback().set(FUNC(c64_state::cia1_pb_w));
+
+	MOS6526(config, m_cia2, XTAL(14'318'181)/14);
+	m_cia2->set_tod_clock(60);
+	m_cia2->irq_wr_callback().set(m_nmi, FUNC(input_merger_device::in_w<0>));
+	m_cia2->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_6));
+	m_cia2->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_7));
+	m_cia2->pa_rd_callback().set(FUNC(c64_state::cia2_pa_r));
+	m_cia2->pa_wr_callback().set(FUNC(c64_state::cia2_pa_w));
+	m_cia2->pb_rd_callback().set(FUNC(c64_state::cia2_pb_r));
+	m_cia2->pb_wr_callback().set(FUNC(c64_state::cia2_pb_w));
+	m_cia2->pc_wr_callback().set(m_user, FUNC(pet_user_port_device::write_8));
+
+	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, "c1530");
+	m_cassette->read_handler().set(m_cia1, FUNC(mos6526_device::flag_w));
+
+	cbm_iec_slot_device::add(config, m_iec, "c1541");
+	m_iec->srq_callback().set(m_cia1, FUNC(mos6526_device::flag_w));
+	m_iec->data_callback().set(m_user, FUNC(pet_user_port_device::write_9));
+
+	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
+	m_joy1->trigger_wr_callback().set(MOS6567_TAG, FUNC(mos6567_device::lp_w));
+	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
 
 	C64_EXPANSION_SLOT(config, m_exp, XTAL(14'318'181)/14, c64_expansion_cards, nullptr);
 	m_exp->irq_callback().set("irq", FUNC(input_merger_device::in_w<2>));
@@ -1353,89 +1361,94 @@ MACHINE_CONFIG_START(c64_state::ntsc)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	MCFG_QUICKLOAD_ADD("quickload", c64_state, cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c64_state, cbm_c64), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY);
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
-	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "c64_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "c64_flop")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "NTSC")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "NTSC")
-	MCFG_SOFTWARE_LIST_FILTER("cass_list", "NTSC")
-	MCFG_SOFTWARE_LIST_FILTER("flop_list", "NTSC")
+	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
+	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("c64_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("c64_flop");
+	subdevice<software_list_device>("cart_list_vic10")->set_filter("NTSC");
+	subdevice<software_list_device>("cart_list_c64")->set_filter("NTSC");
+	subdevice<software_list_device>("cass_list")->set_filter("NTSC");
+	subdevice<software_list_device>("flop_list")->set_filter("NTSC");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pet64 )
+//  machine_config( pet64 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_state::pet64)
+void c64_state::pet64(machine_config &config)
+{
 	ntsc(config);
 	// TODO monochrome green palette
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ntsc_sx )
+//  machine_config( ntsc_sx )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sx64_state::ntsc_sx)
+void sx64_state::ntsc_sx(machine_config &config)
+{
 	ntsc(config);
 
 	// basic hardware
-	MCFG_DEVICE_MODIFY(M6510_TAG)
-	MCFG_M6510_PORT_CALLBACKS(READ8(*this, sx64_state, cpu_r), WRITE8(*this, sx64_state, cpu_w))
-	MCFG_M6510_PORT_PULLS(0x07, 0xc0)
+	m_maincpu->read_callback().set(FUNC(sx64_state::cpu_r));
+	m_maincpu->write_callback().set(FUNC(sx64_state::cpu_w));
+	m_maincpu->set_pulls(0x07, 0xc0);
 
 	// devices
-	MCFG_DEVICE_MODIFY("iec8")
-	MCFG_DEVICE_SLOT_INTERFACE(sx1541_iec_devices, "sx1541", false)
-MACHINE_CONFIG_END
+	CBM_IEC_SLOT(config.replace(), "iec8", sx1541_iec_devices, "sx1541");
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ntsc_dx )
+//  machine_config( ntsc_dx )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sx64_state::ntsc_dx)
+void sx64_state::ntsc_dx(machine_config &config)
+{
 	ntsc_sx(config);
 
 	// devices
-	MCFG_DEVICE_MODIFY("iec9")
-	MCFG_DEVICE_SLOT_INTERFACE(sx1541_iec_devices, "sx1541", false)
-MACHINE_CONFIG_END
+	CBM_IEC_SLOT(config.replace(), "iec9", sx1541_iec_devices, "sx1541");
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ntsc_c )
+//  machine_config( ntsc_c )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64c_state::ntsc_c)
+void c64c_state::ntsc_c(machine_config &config)
+{
 	ntsc(config);
-	MCFG_DEVICE_REPLACE(MOS6581_TAG, MOS8580, XTAL(14'318'181)/14)
-	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, c64_state, sid_potx_r))
-	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, c64_state, sid_poty_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	MOS8580(config.replace(), m_sid, XTAL(14'318'181)/14);
+	m_sid->potx().set(FUNC(c64_state::sid_potx_r));
+	m_sid->poty().set(FUNC(c64_state::sid_poty_r));
+	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pal )
+//  machine_config( pal )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_state::pal)
+void c64_state::pal(machine_config &config)
+{
 	// basic hardware
-	MCFG_DEVICE_ADD(M6510_TAG, M6510, XTAL(17'734'472)/18)
-	MCFG_DEVICE_PROGRAM_MAP(c64_mem)
-	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
-	MCFG_M6510_PORT_CALLBACKS(READ8(*this, c64_state, cpu_r), WRITE8(*this, c64_state, cpu_w))
-	MCFG_M6510_PORT_PULLS(0x17, 0xc8)
-	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
+	M6510(config, m_maincpu, XTAL(17'734'472)/18);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c64_state::c64_mem);
+	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
+	m_maincpu->read_callback().set(FUNC(c64_state::cpu_r));
+	m_maincpu->write_callback().set(FUNC(c64_state::cpu_w));
+	m_maincpu->set_pulls(0x17, 0xc8);
+	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
 	irq.output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
@@ -1451,47 +1464,52 @@ MACHINE_CONFIG_START(c64_state::pal)
 	mos6569.set_addrmap(0, &c64_state::vic_videoram_map);
 	mos6569.set_addrmap(1, &c64_state::vic_colorram_map);
 
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
-	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES)
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1)
-	MCFG_SCREEN_UPDATE_DEVICE(MOS6569_TAG, mos6569_device, screen_update)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(VIC6569_VRETRACERATE);
+	screen.set_size(VIC6569_COLUMNS, VIC6569_LINES);
+	screen.set_visarea(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1);
+	screen.set_screen_update(MOS6569_TAG, FUNC(mos6569_device::screen_update));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(MOS6581_TAG, MOS6581, XTAL(17'734'472)/18)
-	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, c64_state, sid_potx_r))
-	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, c64_state, sid_poty_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MOS6581(config, m_sid, XTAL(17'734'472)/18);
+	m_sid->potx().set(FUNC(c64_state::sid_potx_r));
+	m_sid->poty().set(FUNC(c64_state::sid_poty_r));
+	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// devices
-	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_DEVICE_ADD(MOS6526_1_TAG, MOS6526, XTAL(17'734'472)/18)
-	MCFG_MOS6526_TOD(50)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE("irq", input_merger_device, in_w<0>))
-	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_4))
-	MCFG_MOS6526_SP_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_5))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c64_state, cia1_pa_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c64_state, cia1_pa_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c64_state, cia1_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c64_state, cia1_pb_w))
-	MCFG_DEVICE_ADD(MOS6526_2_TAG, MOS6526, XTAL(17'734'472)/18)
-	MCFG_MOS6526_TOD(50)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(m_nmi, input_merger_device, in_w<0>))
-	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6))
-	MCFG_MOS6526_SP_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_7))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c64_state, cia2_pa_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c64_state, cia2_pa_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c64_state, cia2_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c64_state, cia2_pb_w))
-	MCFG_MOS6526_PC_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_8))
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", WRITELINE(MOS6526_1_TAG, mos6526_device, flag_w))
-	MCFG_CBM_IEC_ADD("c1541")
-	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(MOS6526_1_TAG, mos6526_device, flag_w))
-	MCFG_CBM_IEC_BUS_ATN_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_9))
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
-	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(MOS6569_TAG, mos6569_device, lp_w))
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
+	PLS100(config, m_pla);
+
+	MOS6526(config, m_cia1, XTAL(17'734'472)/18);
+	m_cia1->set_tod_clock(50);
+	m_cia1->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<0>));
+	m_cia1->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_4));
+	m_cia1->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_5));
+	m_cia1->pa_rd_callback().set(FUNC(c64_state::cia1_pa_r));
+	m_cia1->pb_rd_callback().set(FUNC(c64_state::cia1_pb_r));
+	m_cia1->pb_wr_callback().set(FUNC(c64_state::cia1_pb_w));
+
+	MOS6526(config, m_cia2, XTAL(17'734'472)/18);
+	m_cia2->set_tod_clock(50);
+	m_cia2->irq_wr_callback().set(m_nmi, FUNC(input_merger_device::in_w<0>));
+	m_cia2->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_6));
+	m_cia2->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_7));
+	m_cia2->pa_rd_callback().set(FUNC(c64_state::cia2_pa_r));
+	m_cia2->pa_wr_callback().set(FUNC(c64_state::cia2_pa_w));
+	m_cia2->pb_rd_callback().set(FUNC(c64_state::cia2_pb_r));
+	m_cia2->pb_wr_callback().set(FUNC(c64_state::cia2_pb_w));
+	m_cia2->pc_wr_callback().set(m_user, FUNC(pet_user_port_device::write_8));
+
+	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, "c1530");
+	m_cassette->read_handler().set(m_cia1, FUNC(mos6526_device::flag_w));
+
+	cbm_iec_slot_device::add(config, m_iec, "c1541");
+	m_iec->srq_callback().set(m_cia1, FUNC(mos6526_device::flag_w));
+	m_iec->data_callback().set(m_user, FUNC(pet_user_port_device::write_9));
+
+	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
+	m_joy1->trigger_wr_callback().set(MOS6569_TAG, FUNC(mos6569_device::lp_w));
+	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
 
 	C64_EXPANSION_SLOT(config, m_exp, XTAL(17'734'472)/18, c64_expansion_cards, nullptr);
 	m_exp->irq_callback().set("irq", FUNC(input_merger_device::in_w<2>));
@@ -1519,66 +1537,70 @@ MACHINE_CONFIG_START(c64_state::pal)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	MCFG_QUICKLOAD_ADD("quickload", c64_state, cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c64_state, cbm_c64), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY);
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
-	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "c64_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "c64_flop")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
-	MCFG_SOFTWARE_LIST_FILTER("cass_list", "PAL")
-	MCFG_SOFTWARE_LIST_FILTER("flop_list", "PAL")
+	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
+	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("c64_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("c64_flop");
+	subdevice<software_list_device>("cart_list_vic10")->set_filter("PAL");
+	subdevice<software_list_device>("cart_list_c64")->set_filter("PAL");
+	subdevice<software_list_device>("cass_list")->set_filter("PAL");
+	subdevice<software_list_device>("flop_list")->set_filter("PAL");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pal_sx )
+//  machine_config( pal_sx )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sx64_state::pal_sx)
+void sx64_state::pal_sx(machine_config &config)
+{
 	pal(config);
 
 	// basic hardware
-	MCFG_DEVICE_MODIFY(M6510_TAG)
-	MCFG_M6510_PORT_CALLBACKS(READ8(*this, sx64_state, cpu_r), WRITE8(*this, sx64_state, cpu_w))
-	MCFG_M6510_PORT_PULLS(0x07, 0xc0)
+	m_maincpu->read_callback().set(FUNC(sx64_state::cpu_r));
+	m_maincpu->write_callback().set(FUNC(sx64_state::cpu_w));
+	m_maincpu->set_pulls(0x07, 0xc0);
 
 	// devices
-	MCFG_DEVICE_MODIFY("iec8")
-	MCFG_DEVICE_SLOT_INTERFACE(sx1541_iec_devices, "sx1541", false)
-MACHINE_CONFIG_END
+	CBM_IEC_SLOT(config.replace(), "iec8", sx1541_iec_devices, "sx1541");
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pal_c )
+//  machine_config( pal_c )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64c_state::pal_c)
+void c64c_state::pal_c(machine_config &config)
+{
 	pal(config);
-	MCFG_DEVICE_REPLACE(MOS6581_TAG, MOS8580, XTAL(17'734'472)/18)
-	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, c64_state, sid_potx_r))
-	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, c64_state, sid_poty_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	MOS8580(config.replace(), m_sid, XTAL(17'734'472)/18);
+	m_sid->potx().set(FUNC(c64_state::sid_potx_r));
+	m_sid->poty().set(FUNC(c64_state::sid_poty_r));
+	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pal_gs )
+//  machine_config( pal_gs )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64gs_state::pal_gs)
+void c64gs_state::pal_gs(machine_config &config)
+{
 	// basic hardware
-	MCFG_DEVICE_ADD(M6510_TAG, M6510, XTAL(17'734'472)/18)
-	MCFG_DEVICE_PROGRAM_MAP(c64_mem)
-	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
-	MCFG_M6510_PORT_CALLBACKS(READ8(*this, c64gs_state, cpu_r), WRITE8(*this, c64gs_state, cpu_w))
-	MCFG_M6510_PORT_PULLS(0x07, 0xc0)
-	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
+	M6510(config, m_maincpu, XTAL(17'734'472)/18);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c64gs_state::c64_mem);
+	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
+	m_maincpu->read_callback().set(FUNC(c64gs_state::cpu_r));
+	m_maincpu->write_callback().set(FUNC(c64gs_state::cpu_w));
+	m_maincpu->set_pulls(0x07, 0xc0);
+	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
 	irq.output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
@@ -1594,46 +1616,50 @@ MACHINE_CONFIG_START(c64gs_state::pal_gs)
 	mos8565.set_addrmap(0, &c64_state::vic_videoram_map);
 	mos8565.set_addrmap(1, &c64_state::vic_colorram_map);
 
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
-	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES)
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1)
-	MCFG_SCREEN_UPDATE_DEVICE(MOS6569_TAG, mos8565_device, screen_update)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(VIC6569_VRETRACERATE);
+	screen.set_size(VIC6569_COLUMNS, VIC6569_LINES);
+	screen.set_visarea(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1);
+	screen.set_screen_update(MOS6569_TAG, FUNC(mos8565_device::screen_update));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(MOS6581_TAG, MOS8580, XTAL(17'734'472)/18)
-	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, c64_state, sid_potx_r))
-	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, c64_state, sid_poty_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MOS8580(config, m_sid, XTAL(17'734'472)/18);
+	m_sid->potx().set(FUNC(c64_state::sid_potx_r));
+	m_sid->poty().set(FUNC(c64_state::sid_poty_r));
+	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// devices
-	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_DEVICE_ADD(MOS6526_1_TAG, MOS6526, XTAL(17'734'472)/18)
-	MCFG_MOS6526_TOD(50)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE("irq", input_merger_device, in_w<0>))
-	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_4))
-	MCFG_MOS6526_SP_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_5))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c64gs_state, cia1_pa_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c64_state, cia1_pa_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c64gs_state, cia1_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c64_state, cia1_pb_w))
-	MCFG_DEVICE_ADD(MOS6526_2_TAG, MOS6526, XTAL(17'734'472)/18)
-	MCFG_MOS6526_TOD(50)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(m_nmi, input_merger_device, in_w<0>))
-	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6))
-	MCFG_MOS6526_SP_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_7))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c64_state, cia2_pa_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c64_state, cia2_pa_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c64_state, cia2_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c64_state, cia2_pb_w))
-	MCFG_MOS6526_PC_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_8))
-	MCFG_CBM_IEC_ADD(nullptr)
-	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(MOS6526_1_TAG, mos6526_device, flag_w))
-	MCFG_CBM_IEC_BUS_ATN_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_9))
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
-	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(MOS6569_TAG, mos6569_device, lp_w))
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
+	PLS100(config, m_pla);
+
+	MOS6526(config, m_cia1, XTAL(17'734'472)/18);
+	m_cia1->set_tod_clock(50);
+	m_cia1->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<0>));
+	m_cia1->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_4));
+	m_cia1->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_5));
+	m_cia1->pa_rd_callback().set(FUNC(c64gs_state::cia1_pa_r));
+	m_cia1->pa_wr_callback().set(FUNC(c64_state::cia1_pa_w));
+	m_cia1->pb_rd_callback().set(FUNC(c64gs_state::cia1_pb_r));
+	m_cia1->pb_wr_callback().set(FUNC(c64_state::cia1_pb_w));
+
+	MOS6526(config, m_cia2, XTAL(17'734'472)/18);
+	m_cia2->set_tod_clock(50);
+	m_cia2->irq_wr_callback().set(m_nmi, FUNC(input_merger_device::in_w<0>));
+	m_cia2->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_6));
+	m_cia2->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_7));
+	m_cia2->pa_rd_callback().set(FUNC(c64_state::cia2_pa_r));
+	m_cia2->pa_wr_callback().set(FUNC(c64_state::cia2_pa_w));
+	m_cia2->pb_rd_callback().set(FUNC(c64_state::cia2_pb_r));
+	m_cia2->pb_wr_callback().set(FUNC(c64_state::cia2_pb_w));
+	m_cia2->pc_wr_callback().set(m_user, FUNC(pet_user_port_device::write_8));
+
+	cbm_iec_slot_device::add(config, m_iec, nullptr);
+	m_iec->srq_callback().set(m_cia1, FUNC(mos6526_device::flag_w));
+	m_iec->data_callback().set(m_user, FUNC(pet_user_port_device::write_9));
+
+	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
+	m_joy1->trigger_wr_callback().set(MOS6569_TAG, FUNC(mos6569_device::lp_w));
+	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
 
 	C64_EXPANSION_SLOT(config, m_exp, XTAL(17'734'472)/18, c64_expansion_cards, nullptr);
 	m_exp->irq_callback().set("irq", FUNC(input_merger_device::in_w<2>));
@@ -1661,17 +1687,18 @@ MACHINE_CONFIG_START(c64gs_state::pal_gs)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	MCFG_QUICKLOAD_ADD("quickload", c64_state, cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c64_state, cbm_c64), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY);
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
-	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
+	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
+	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart");
+	subdevice<software_list_device>("cart_list_vic10")->set_filter("PAL");
+	subdevice<software_list_device>("cart_list_c64")->set_filter("PAL");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 
 

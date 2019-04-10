@@ -117,14 +117,7 @@ public:
 		, m_aux2_port(*this, "AUX2")
 		, m_bank1(*this, "bank1")
 		, m_msm6376(*this, "msm6376")
-		, m_reel0(*this, "reel0")
-		, m_reel1(*this, "reel1")
-		, m_reel2(*this, "reel2")
-		, m_reel3(*this, "reel3")
-		, m_reel4(*this, "reel4")
-		, m_reel5(*this, "reel5")
-		, m_reel6(*this, "reel6")
-		, m_reel7(*this, "reel7")
+		, m_reel(*this, "reel%u", 0U)
 		, m_palette(*this, "palette")
 		, m_meters(*this, "meters")
 		, m_ym2413(*this, "ym2413")
@@ -331,14 +324,7 @@ protected:
 	required_ioport m_aux2_port;
 	optional_memory_bank m_bank1;
 	optional_device<okim6376_device> m_msm6376;
-	optional_device<stepper_device> m_reel0;
-	optional_device<stepper_device> m_reel1;
-	optional_device<stepper_device> m_reel2;
-	optional_device<stepper_device> m_reel3;
-	optional_device<stepper_device> m_reel4;
-	optional_device<stepper_device> m_reel5;
-	optional_device<stepper_device> m_reel6;
-	optional_device<stepper_device> m_reel7;
+	optional_device_array<stepper_device, 8> m_reel;
 	optional_device<palette_device> m_palette;
 	required_device<meters_device> m_meters;
 	optional_device<ym2413_device> m_ym2413;

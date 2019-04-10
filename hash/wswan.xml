@@ -1301,6 +1301,11 @@
 		</part>
 	</software>
 
+	<!--
+	The Robot Works cartridge has an integrated infrared port for programming an
+	external robot (the Wonder Borg).
+	There is an undumped Ver.1.5 cart labeled SWJ-BAN034.
+	-->
 	<software name="robworks">
 		<description>Wonder Borg Robot Works</description>
 		<year>2000</year>

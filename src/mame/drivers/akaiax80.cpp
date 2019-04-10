@@ -92,20 +92,21 @@ void ax80_state::ax80_map(address_map &map)
 	map(0xc000, 0xc7ff).mirror(0x3800).ram();
 }
 
-MACHINE_CONFIG_START(ax80_state::ax80)
-	MCFG_DEVICE_ADD("maincpu", UPD7810, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(ax80_map)
-	//MCFG_DEVICE_IO_MAP(ax80_io)
+void ax80_state::ax80(machine_config &config)
+{
+	UPD7810(config, m_maincpu, XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ax80_state::ax80_map);
+	//m_maincpu->set_addrmap(AS_IO, &ax80_state::ax80_io);
 
-	MCFG_DEVICE_ADD(PIT0_TAG, PIT8253, 0)
-	MCFG_DEVICE_ADD(PIT1_TAG, PIT8253, 0)
-	MCFG_DEVICE_ADD(PIT2_TAG, PIT8253, 0)
-	MCFG_DEVICE_ADD(PIT3_TAG, PIT8253, 0)
-	MCFG_DEVICE_ADD(PIT4_TAG, PIT8253, 0)
-	MCFG_DEVICE_ADD(PIT5_TAG, PIT8253, 0)
+	PIT8253(config, PIT0_TAG, 0);
+	PIT8253(config, PIT1_TAG, 0);
+	PIT8253(config, PIT2_TAG, 0);
+	PIT8253(config, PIT3_TAG, 0);
+	PIT8253(config, PIT4_TAG, 0);
+	PIT8253(config, PIT5_TAG, 0);
 
-	MCFG_DEVICE_ADD(PPI0_TAG, I8255A, 0)
-	MCFG_DEVICE_ADD(PPI1_TAG, I8255A, 0)
+	I8255A(config, PPI0_TAG);
+	I8255A(config, PPI1_TAG);
 
 	I8279(config, "kdc", 6554800 / 8); // Keyboard/Display Controller
 	//kdc.out_irq_calback().set_inputline("maincpu", UPD7810_INTF1);    // irq
@@ -114,7 +115,7 @@ MACHINE_CONFIG_START(ax80_state::ax80)
 	//kdc.in_rl_callback().set(FUNC(ax80_state::kbd_r))                 // kbd RL lines
 	//kdc.in_shift_callback().set_constant(1);                          // not connected
 	//kdc.in_ctrl_callback().set_constant(1);                           // not connected
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( ax80 )
 INPUT_PORTS_END

@@ -5,6 +5,10 @@
     Gottlieb Exterminator hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_EXTERM_H
+#define MAME_INCLUDES_EXTERM_H
+
+#pragma once
 
 #include "cpu/tms34010/tms34010.h"
 #include "machine/gen_latch.h"
@@ -15,8 +19,8 @@
 class exterm_state : public driver_device
 {
 public:
-	exterm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	exterm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_audioslave(*this, "audioslave"),
@@ -27,7 +31,8 @@ public:
 		m_master_videoram(*this, "master_videoram"),
 		m_slave_videoram(*this, "slave_videoram"),
 		m_dial(*this, "DIAL%u", 0U),
-		m_input(*this, "P%u", 1U)   { }
+		m_input(*this, "P%u", 1U)
+	{ }
 
 	void exterm(machine_config &config);
 
@@ -63,7 +68,7 @@ private:
 	DECLARE_READ8_MEMBER(sound_nmi_to_slave_r);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
 	DECLARE_WRITE8_MEMBER(ym2151_data_latch_w);
-	DECLARE_PALETTE_INIT(exterm);
+	void exterm_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(master_sound_nmi_callback);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg_master);
@@ -75,3 +80,5 @@ private:
 	void sound_master_map(address_map &map);
 	void sound_slave_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_EXTERM_H

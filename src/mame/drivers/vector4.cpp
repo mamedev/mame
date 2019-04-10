@@ -64,11 +64,12 @@ void vector4_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(vector4_state::vector4)
+void vector4_state::vector4(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(vector4_mem)
-	MCFG_DEVICE_IO_MAP(vector4_io)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &vector4_state::vector4_mem);
+	m_maincpu->set_addrmap(AS_IO, &vector4_state::vector4_io);
 
 	/* video hardware */
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
@@ -84,31 +85,31 @@ MACHINE_CONFIG_START(vector4_state::vector4)
 	uart1.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	uart1.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart1", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart1", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart1", i8251_device, write_cts))
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal"));
+	rs232a.rxd_handler().set("uart1", FUNC(i8251_device::write_rxd));
+	rs232a.dsr_handler().set("uart1", FUNC(i8251_device::write_dsr));
+	rs232a.cts_handler().set("uart1", FUNC(i8251_device::write_cts));
 
 	i8251_device &uart2(I8251(config, "uart2", 0));
 	uart2.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 	uart2.dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	uart2.rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart2", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart2", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart2", i8251_device, write_cts))
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set("uart2", FUNC(i8251_device::write_rxd));
+	rs232b.dsr_handler().set("uart2", FUNC(i8251_device::write_dsr));
+	rs232b.cts_handler().set("uart2", FUNC(i8251_device::write_cts));
 
 	i8251_device &uart3(I8251(config, "uart3", 0));
 	uart3.txd_handler().set("rs232c", FUNC(rs232_port_device::write_txd));
 	uart3.dtr_handler().set("rs232c", FUNC(rs232_port_device::write_dtr));
 	uart3.rts_handler().set("rs232c", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232c", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart3", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart3", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart3", i8251_device, write_cts))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232c(RS232_PORT(config, "rs232c", default_rs232_devices, nullptr));
+	rs232c.rxd_handler().set("uart3", FUNC(i8251_device::write_rxd));
+	rs232c.dsr_handler().set("uart3", FUNC(i8251_device::write_dsr));
+	rs232c.cts_handler().set("uart3", FUNC(i8251_device::write_cts));
+}
 
 /* ROM definition */
 ROM_START( vector4 )

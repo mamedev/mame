@@ -94,10 +94,11 @@ void vic1520_device::vic1520_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vic1520_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6500_1_TAG, M6502, XTAL(2'000'000)) // M6500/1
-	MCFG_DEVICE_PROGRAM_MAP(vic1520_mem)
-MACHINE_CONFIG_END
+void vic1520_device::device_add_mconfig(machine_config &config)
+{
+	m6502_device &cpu(M6502(config, M6500_1_TAG, XTAL(2'000'000))); // M6500/1
+	cpu.set_addrmap(AS_PROGRAM, &vic1520_device::vic1520_mem);
+}
 
 
 //-------------------------------------------------

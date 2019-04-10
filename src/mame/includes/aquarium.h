@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_INCLUDES_AQUARIUM_H
+#define MAME_INCLUDES_AQUARIUM_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/mb3773.h"
@@ -11,8 +15,8 @@
 class aquarium_state : public driver_device
 {
 public:
-	aquarium_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	aquarium_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_mid_videoram(*this, "mid_videoram"),
 		m_bak_videoram(*this, "bak_videoram"),
 		m_txt_videoram(*this, "txt_videoram"),
@@ -26,7 +30,7 @@ public:
 		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
 		m_watchdog(*this, "watchdog")
-		{ }
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_mid_videoram;
@@ -71,3 +75,5 @@ public:
 	void snd_map(address_map &map);
 	void snd_portmap(address_map &map);
 };
+
+#endif // MAME_INCLUDES_AQUARIUM_H

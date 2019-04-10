@@ -7,7 +7,10 @@
     Frank Palazzolo (palazzol@home.com)
 
 ****************************************************************************/
+#ifndef MAME_INCLUDES_STACTICS_H
+#define MAME_INCLUDES_STACTICS_H
 
+#pragma once
 
 #include "machine/74259.h"
 #include "emupal.h"
@@ -70,7 +73,7 @@ private:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(stactics);
+	void stactics_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_beam();
@@ -123,3 +126,5 @@ private:
 	uint16_t m_beam_states_per_frame;
 	uint8_t  m_palette_bank;
 };
+
+#endif // MAME_INCLUDES_STACTICS_H

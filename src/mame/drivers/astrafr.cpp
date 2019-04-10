@@ -311,56 +311,64 @@ MACHINE_START_MEMBER(astrafr_state,astra_2e)
 }
 
 
-MACHINE_CONFIG_START(astrafr_state::astrafr_dual)
-	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(astrafr_master_map)
+void astrafr_state::astrafr_dual(machine_config &config)
+{
+	M68340(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrafr_state::astrafr_master_map);
 
-	MCFG_DEVICE_ADD("slavecpu", M68340, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(astrafr_slave_map)
+	M68340(config, m_slavecpu, 16000000);
+	m_slavecpu->set_addrmap(AS_PROGRAM, &astrafr_state::astrafr_slave_map);
 
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(astrafr_state::astrafr_dual_2e)
+void astrafr_state::astrafr_dual_2e(machine_config &config)
+{
 	astrafr_dual(config);
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_2e )
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(astrafr_state::astrafr_dual_37)
+void astrafr_state::astrafr_dual_37(machine_config &config)
+{
 	astrafr_dual(config);
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_37 )
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(astrafr_state::astrafr_dual_alt)
-	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(astrafr_master_alt_map)
+void astrafr_state::astrafr_dual_alt(machine_config &config)
+{
+	M68340(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrafr_state::astrafr_master_alt_map);
 
-	MCFG_DEVICE_ADD("slavecpu", M68340, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(astrafr_slave_map)
-MACHINE_CONFIG_END
+	M68340(config, m_slavecpu, 16000000);
+	m_slavecpu->set_addrmap(AS_PROGRAM, &astrafr_state::astrafr_slave_map);
+}
 
-MACHINE_CONFIG_START(astrafr_state::astrafr_dual_alt_37)
+void astrafr_state::astrafr_dual_alt_37(machine_config &config)
+{
 	astrafr_dual_alt(config);
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_37 )
-MACHINE_CONFIG_END
+}
 
 
 
-MACHINE_CONFIG_START(astrafr_state::astra_single)
-	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(astra_map)
+void astrafr_state::astra_single(machine_config &config)
+{
+	M68340(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrafr_state::astra_map);
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(astrafr_state::astra_single_37)
+void astrafr_state::astra_single_37(machine_config &config)
+{
 	astra_single(config);
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_37 )
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(astrafr_state::astra_single_2e)
+void astrafr_state::astra_single_2e(machine_config &config)
+{
 	astra_single(config);
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_2e )
-MACHINE_CONFIG_END
+}
 
 MACHINE_START_MEMBER(astrafr_state,astra_57)
 {
@@ -371,21 +379,24 @@ MACHINE_START_MEMBER(astrafr_state,astra_57)
 }
 
 
-MACHINE_CONFIG_START(astrafr_state::astra_single_alt)
-	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(astra_map)
+void astrafr_state::astra_single_alt(machine_config &config)
+{
+	M68340(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrafr_state::astra_map);
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(astrafr_state::astra_single_alt_57)
+void astrafr_state::astra_single_alt_57(machine_config &config)
+{
 	astra_single_alt(config);
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_57 )
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(astrafr_state::astra_single_alt_37)
+void astrafr_state::astra_single_alt_37(machine_config &config)
+{
 	astra_single_alt(config);
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_37 )
-MACHINE_CONFIG_END
+}
 
 /* are the ptM roms Master and ptS roms Slave?
   or is as_partyd set actually the master, with the larger roms?

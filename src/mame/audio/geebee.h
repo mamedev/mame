@@ -15,7 +15,7 @@ public:
 		TIMER_VOLUME_DECAY
 	};
 
-	DECLARE_WRITE8_MEMBER( sound_w );
+	void sound_w(u8 data);
 
 protected:
 	// device-level overrides

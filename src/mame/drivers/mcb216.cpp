@@ -119,39 +119,41 @@ MACHINE_RESET_MEMBER( mcb216_state, cb308 )
 	m_maincpu->set_state_int(Z80_PC, 0xe000);
 }
 
-MACHINE_CONFIG_START(mcb216_state::mcb216)
+void mcb216_state::mcb216(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(mcb216_mem)
-	MCFG_DEVICE_IO_MAP(mcb216_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mcb216_state, irq_callback)
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcb216_state::mcb216_mem);
+	m_maincpu->set_addrmap(AS_IO, &mcb216_state::mcb216_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(mcb216_state::irq_callback));
 
 	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, mcb216)
 
 	TMS5501(config, m_tms5501, 8_MHz_XTAL / 4);
 	m_tms5501->xmt_callback().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_tms5501->int_callback().set_inputline("maincpu", 0);
+	m_tms5501->int_callback().set_inputline(m_maincpu, 0);
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set(m_tms5501, FUNC(tms5501_device::rcv_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mcb216_state::cb308)
+void mcb216_state::cb308(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(cb308_mem)
-	MCFG_DEVICE_IO_MAP(mcb216_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mcb216_state, irq_callback)
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcb216_state::cb308_mem);
+	m_maincpu->set_addrmap(AS_IO, &mcb216_state::mcb216_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(mcb216_state::irq_callback));
 
 	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, cb308)
 
 	TMS5501(config, m_tms5501, 8_MHz_XTAL / 4);
 	m_tms5501->xmt_callback().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_tms5501->int_callback().set_inputline("maincpu", 0);
+	m_tms5501->int_callback().set_inputline(m_maincpu, 0);
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set(m_tms5501, FUNC(tms5501_device::rcv_w));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( mcb216 )

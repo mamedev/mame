@@ -5,6 +5,11 @@
     S.P.Y.
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_SPY_H
+#define MAME_INCLUDES_SPY_H
+
+#pragma once
+
 #include "sound/k007232.h"
 #include "video/k052109.h"
 #include "video/k051960.h"
@@ -14,8 +19,8 @@
 class spy_state : public driver_device
 {
 public:
-	spy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	spy_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -23,7 +28,8 @@ public:
 		m_k007232_2(*this, "k007232_2"),
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void spy(machine_config &config);
 
@@ -68,3 +74,5 @@ private:
 	void spy_map(address_map &map);
 	void spy_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SPY_H

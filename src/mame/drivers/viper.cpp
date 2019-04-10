@@ -80,8 +80,7 @@
         ppp2nd              POST: "NO SECURITY ERROR"
         boxingm             Goes to attract mode when ran with memory card check. Coins up.
         code1d,b            RTC self check bad
-        gticlub2            Attract mode works. Coins up. Hangs in car selection.
-        gticlub2ea          Asks for password.
+        gticlub2,ea         Attract mode works. Coins up. Hangs in car selection.
         jpark3              POST?: Shows "Now loading..." then black screen (sets global timer 1 on EPIC) - with IRQ3 crashes at first 3d frame
         mocapglf            Security code error
         mocapb,j            Crash after self checks
@@ -600,20 +599,20 @@ static inline void write64le_with_32le_device_handler(write32_delegate handler, 
 
 static inline uint64_t read64be_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, uint64_t mem_mask)
 {
-	mem_mask = flipendian_int64(mem_mask);
+	mem_mask = swapendian_int64(mem_mask);
 	uint64_t result = 0;
 	if (ACCESSING_BITS_0_31)
 		result = (uint64_t)(handler)(space, offset * 2, mem_mask & 0xffffffff);
 	if (ACCESSING_BITS_32_63)
 		result |= (uint64_t)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
-	return flipendian_int64(result);
+	return swapendian_int64(result);
 }
 
 
 static inline void write64be_with_32le_device_handler(write32_delegate handler,  address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
-	data = flipendian_int64(data);
-	mem_mask = flipendian_int64(mem_mask);
+	data = swapendian_int64(data);
+	mem_mask = swapendian_int64(mem_mask);
 	if (ACCESSING_BITS_0_31)
 		handler(space, offset * 2, data & 0xffffffff, mem_mask & 0xffffffff);
 	if (ACCESSING_BITS_32_63)
@@ -1050,7 +1049,7 @@ READ32_MEMBER(viper_state::epic_r)
 		}
 	}
 
-	return flipendian_int32(ret);
+	return swapendian_int32(ret);
 }
 
 WRITE32_MEMBER(viper_state::epic_w)
@@ -1058,7 +1057,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 	int reg;
 	reg = offset * 4;
 
-	data = flipendian_int32(data);
+	data = swapendian_int32(data);
 
 #if VIPER_DEBUG_EPIC_REGS
 	if (reg != 0x600b0)     // interrupt clearing is spammy
@@ -2243,6 +2242,15 @@ INPUT_PORTS_START( gticlub2 )
 	// TODO: specific analog channel for hand brake
 INPUT_PORTS_END
 
+INPUT_PORTS_START( gticlub2ea )
+	PORT_INCLUDE( gticlub2 )
+
+	PORT_MODIFY("IN2")
+	PORT_DIPNAME( 0x02, 0x00, "DIP3" ) PORT_DIPLOCATION("SW:3") // This needs to be on or it asks for a password, parent doesn't care
+	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( boxingm )
 	PORT_INCLUDE( viper )
 
@@ -2414,10 +2422,10 @@ MACHINE_CONFIG_START(viper_state::viper)
 	screen.set_visarea(0, 1024 - 1, 0, 768 - 1);
 	screen.set_screen_update(FUNC(viper_state::screen_update_viper));
 
-	PALETTE(config, "palette", 65536);
+	PALETTE(config, "palette").set_entries(65536);
 
 	TIMER(config, "ds2430_timer2", 0);
-	//MCFG_TIMER_ADD_NONE("ds2430_timer2")
+	//TIMER(config, "ds2430_timer2").configure_generic(timer_device::expired_delegate());
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3050,46 +3058,46 @@ ROM_END
 /*****************************************************************************/
 
 /* Viper BIOS */
-GAME(1999, kviper,    0,         viper,    viper, viper_state, init_viper,    ROT0,  "Konami", "Konami Viper BIOS", MACHINE_IS_BIOS_ROOT)
+GAME(1999, kviper,    0,         viper,    viper,   viper_state, init_viper,    ROT0,  "Konami", "Konami Viper BIOS", MACHINE_IS_BIOS_ROOT)
 
-GAME(2001, ppp2nd,    kviper,    viper,   ppp2nd, viper_state, init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, ppp2nd,    kviper,    viper,   ppp2nd,   viper_state, init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 
-GAME(2001, boxingm,   kviper,    viper,  boxingm, viper_state, init_vipercf,  ROT0,  "Konami", "Boxing Mania: Ashita no Joe (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2000, code1d,    kviper,    viper,    viper, viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch (ver D)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2000, code1db,   code1d,    viper,    viper, viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch (ver B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, gticlub2,  kviper,    viper, gticlub2, viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, gticlub2ea,gticlub2,  viper, gticlub2, viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, jpark3,    kviper,    viper,   jpark3, viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver EBC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, jpark3u,   jpark3,    viper,   jpark3, viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver UA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, mocapglf,  kviper,    viper,    viper, viper_state, init_vipercf,  ROT90,  "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, mocapb,    kviper,    viper,    viper, viper_state, init_vipercf,  ROT90,  "Konami", "Mocap Boxing (ver AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, mocapbj,   mocapb,    viper,    viper, viper_state, init_vipercf,  ROT90,  "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, p911,      kviper,    viper,     p911, viper_state, init_vipercf,  ROT90,  "Konami", "Police 911 (ver UAD)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, p911uc,    p911,      viper,     p911, viper_state, init_vipercf,  ROT90,  "Konami", "Police 911 (ver UAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, p911kc,    p911,      viper,     p911, viper_state, init_vipercf,  ROT90,  "Konami", "Police 911 (ver KAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, p911e,     p911,      viper,     p911, viper_state, init_vipercf,  ROT90,  "Konami", "Police 24/7 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, p911ea,    p911,      viper,     p911, viper_state, init_vipercf,  ROT90,  "Konami", "Police 24/7 (ver EAA, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, p911j,     p911,      viper,     p911, viper_state, init_vipercf,  ROT90,  "Konami", "Keisatsukan Shinjuku 24ji (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, p9112,     kviper,    viper,     p911, viper_state, init_vipercf,  ROT90,  "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2003, popn9,     kviper,    viper,    viper, viper_state, init_vipercf,  ROT0,  "Konami", "Pop'n Music 9 (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, sscopex,   kviper,    viper,    viper, viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, sogeki,    sscopex,   viper,    viper, viper_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, sscopefh,  kviper,    viper,    viper, viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, thrild2,   kviper,    viper,  thrild2, viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EBB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, thrild2j,  thrild2,   viper,  thrild2, viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, thrild2a,  thrild2,   viper,  thrild2, viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, thrild2ab, thrild2,   viper,  thrild2, viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, thrild2ac, thrild2,   viper,  thrild2, viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt 2)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, thrild2c,  thrild2,   viper,  thrild2, viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, tsurugi,   kviper,    viper,  tsurugi, viper_state, init_vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, tsurugie,  tsurugi,   viper,  tsurugi, viper_state, init_vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, tsurugij,  tsurugi,   viper,  tsurugi, viper_state, init_vipercf,  ROT0,  "Konami", "Tsurugi (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, wcombat,   kviper,    viper,    viper, viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, wcombatb,  wcombat,   viper,    viper, viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, wcombatk,  wcombat,   viper,    viper, viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver KBC:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, wcombatu,  wcombat,   viper,    viper, viper_state, init_vipercf,  ROT0,  "Konami", "World Combat / Warzaid (ver UCD:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, wcombatj,  wcombat,   viper,    viper, viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, xtrial,    kviper,    viper,    viper, viper_state, init_vipercf,  ROT0,  "Konami", "Xtrial Racing (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, boxingm,   kviper,    viper,  boxingm,   viper_state, init_vipercf,  ROT0,  "Konami", "Boxing Mania: Ashita no Joe (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2000, code1d,    kviper,    viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch (ver D)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2000, code1db,   code1d,    viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch (ver B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, gticlub2,  kviper,    viper, gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, gticlub2ea,gticlub2,  viper, gticlub2ea, viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, jpark3,    kviper,    viper,   jpark3,   viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver EBC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, jpark3u,   jpark3,    viper,   jpark3,   viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver UA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, mocapglf,  kviper,    viper,    viper,   viper_state, init_vipercf,  ROT90,  "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, mocapb,    kviper,    viper,    viper,   viper_state, init_vipercf,  ROT90,  "Konami", "Mocap Boxing (ver AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, mocapbj,   mocapb,    viper,    viper,   viper_state, init_vipercf,  ROT90,  "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, p911,      kviper,    viper,     p911,   viper_state, init_vipercf,  ROT90,  "Konami", "Police 911 (ver UAD)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, p911uc,    p911,      viper,     p911,   viper_state, init_vipercf,  ROT90,  "Konami", "Police 911 (ver UAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, p911kc,    p911,      viper,     p911,   viper_state, init_vipercf,  ROT90,  "Konami", "Police 911 (ver KAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, p911e,     p911,      viper,     p911,   viper_state, init_vipercf,  ROT90,  "Konami", "Police 24/7 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, p911ea,    p911,      viper,     p911,   viper_state, init_vipercf,  ROT90,  "Konami", "Police 24/7 (ver EAA, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, p911j,     p911,      viper,     p911,   viper_state, init_vipercf,  ROT90,  "Konami", "Keisatsukan Shinjuku 24ji (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, p9112,     kviper,    viper,     p911,   viper_state, init_vipercf,  ROT90,  "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2003, popn9,     kviper,    viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Pop'n Music 9 (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, sscopex,   kviper,    viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, sogeki,    sscopex,   viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, sscopefh,  kviper,    viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, thrild2,   kviper,    viper,  thrild2,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EBB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, thrild2j,  thrild2,   viper,  thrild2,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, thrild2a,  thrild2,   viper,  thrild2,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, thrild2ab, thrild2,   viper,  thrild2,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, thrild2ac, thrild2,   viper,  thrild2,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt 2)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, thrild2c,  thrild2,   viper,  thrild2,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, tsurugi,   kviper,    viper,  tsurugi,   viper_state, init_vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, tsurugie,  tsurugi,   viper,  tsurugi,   viper_state, init_vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, tsurugij,  tsurugi,   viper,  tsurugi,   viper_state, init_vipercf,  ROT0,  "Konami", "Tsurugi (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, wcombat,   kviper,    viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, wcombatb,  wcombat,   viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, wcombatk,  wcombat,   viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver KBC:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, wcombatu,  wcombat,   viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "World Combat / Warzaid (ver UCD:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, wcombatj,  wcombat,   viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, xtrial,    kviper,    viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Xtrial Racing (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 
-GAME(2002, mfightc,   kviper,    viper,    viper, viper_state, init_vipercf,  ROT0,  "Konami", "Mahjong Fight Club (ver JAD)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, mfightcc,  mfightc,   viper,    viper, viper_state, init_vipercf,  ROT0,  "Konami", "Mahjong Fight Club (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, mfightc,   kviper,    viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Mahjong Fight Club (ver JAD)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, mfightcc,  mfightc,   viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Mahjong Fight Club (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

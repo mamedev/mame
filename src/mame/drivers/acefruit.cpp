@@ -47,23 +47,24 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_coinage_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_payout_r);
 
-private:
+protected:
 	enum
 	{
 		TIMER_ACEFRUIT_REFRESH
 	};
 
+	virtual void machine_start() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
 	DECLARE_WRITE8_MEMBER(acefruit_colorram_w);
 	DECLARE_WRITE8_MEMBER(acefruit_coin_w);
 	DECLARE_WRITE8_MEMBER(acefruit_sound_w);
 	DECLARE_WRITE8_MEMBER(acefruit_lamp_w);
 	DECLARE_WRITE8_MEMBER(acefruit_solenoid_w);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	DECLARE_PALETTE_INIT(acefruit);
+	void acefruit_palette(palette_device &palette) const;
 	uint32_t screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(acefruit_vblank);
 	void acefruit_update_irq(int vpos);
@@ -309,7 +310,7 @@ WRITE8_MEMBER(acefruit_state::acefruit_solenoid_w)
 		m_solenoids[i] = BIT(data, i);
 }
 
-PALETTE_INIT_MEMBER(acefruit_state, acefruit)
+void acefruit_state::acefruit_palette(palette_device &palette) const
 {
 	/* sprites */
 	palette.set_pen_color( 0, rgb_t(0x00, 0x00, 0x00) );
@@ -625,35 +626,33 @@ static GFXDECODE_START( gfx_acefruit )
 	GFXDECODE_ENTRY( "gfx1", 0x1800, charlayout, 8, 4 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(acefruit_state::acefruit)
-
+void acefruit_state::acefruit(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 2500000) /* 2.5MHz */
-	MCFG_DEVICE_PROGRAM_MAP(acefruit_map)
-	MCFG_DEVICE_IO_MAP(acefruit_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", acefruit_state,  acefruit_vblank)
+	Z80(config, m_maincpu, 2500000); /* 2.5MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &acefruit_state::acefruit_map);
+	m_maincpu->set_addrmap(AS_IO, &acefruit_state::acefruit_io);
+	m_maincpu->set_vblank_int("screen", FUNC(acefruit_state::acefruit_vblank));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_acefruit)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_acefruit);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
-	MCFG_SCREEN_UPDATE_DRIVER(acefruit_state, screen_update_acefruit)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea_full();
+	m_screen->set_screen_update(FUNC(acefruit_state::screen_update_acefruit));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(acefruit_state, acefruit)
+	PALETTE(config, m_palette, FUNC(acefruit_state::acefruit_palette), 16);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-
 	/* sound hardware */
-MACHINE_CONFIG_END
+}
 
 void acefruit_state::init_sidewndr()
 {

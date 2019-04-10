@@ -256,16 +256,16 @@ void pluto5_state::machine_start()
 
 }
 
-MACHINE_CONFIG_START(pluto5_state::pluto5)
-	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(pluto5_map)
-
+void pluto5_state::pluto5(machine_config &config)
+{
+	M68340(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pluto5_state::pluto5_map);
 
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound */
-MACHINE_CONFIG_END
+}
 
 ROM_START( hb_cr )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )

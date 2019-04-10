@@ -67,7 +67,4 @@ private:
 
 DECLARE_DEVICE_TYPE(K054338, k054338_device)
 
-#define MCFG_K054338_ALPHAINV(_alphainv) \
-	downcast<k054338_device &>(*device).set_alpha_invert(_alphainv);
-
 #endif // MAME_VIDEO_K054338_H

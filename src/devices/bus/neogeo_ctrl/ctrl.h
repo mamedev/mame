@@ -42,6 +42,15 @@ class neogeo_control_port_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
+	template <typename T>
+	neogeo_control_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, bool const fixed)
+		: neogeo_control_port_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(fixed);
+	}
 	neogeo_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~neogeo_control_port_device();
 
@@ -83,6 +92,15 @@ class neogeo_ctrl_edge_port_device : public device_t, public device_slot_interfa
 {
 public:
 	// construction/destruction
+	template <typename T>
+	neogeo_ctrl_edge_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, bool const fixed)
+		: neogeo_ctrl_edge_port_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(fixed);
+	}
 	neogeo_ctrl_edge_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~neogeo_ctrl_edge_port_device();
 
@@ -102,20 +120,6 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(NEOGEO_CONTROL_PORT,        neogeo_control_port_device)
 DECLARE_DEVICE_TYPE(NEOGEO_CTRL_EDGE_CONNECTOR, neogeo_ctrl_edge_port_device)
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_NEOGEO_CONTROL_PORT_ADD(_tag, _slot_intf, _def_slot, _fixed) \
-	MCFG_DEVICE_ADD(_tag, NEOGEO_CONTROL_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
-
-#define MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD(_tag, _slot_intf, _def_slot, _fixed) \
-	MCFG_DEVICE_ADD(_tag, NEOGEO_CTRL_EDGE_CONNECTOR, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
-
 
 
 void neogeo_controls(device_slot_interface &device);

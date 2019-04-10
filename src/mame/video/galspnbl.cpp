@@ -4,12 +4,10 @@
 #include "includes/galspnbl.h"
 
 
-PALETTE_INIT_MEMBER(galspnbl_state, galspnbl)
+void galspnbl_state::galspnbl_palette(palette_device &palette) const
 {
-	int i;
-
-	/* initialize 555 RGB lookup */
-	for (i = 0; i < 32768; i++)
+	// initialize 555 RGB lookup
+	for (int i = 0; i < 32768; i++)
 		palette.set_pen_color(i + 1024, pal5bit(i >> 5), pal5bit(i >> 10), pal5bit(i >> 0));
 }
 
@@ -17,14 +15,12 @@ PALETTE_INIT_MEMBER(galspnbl_state, galspnbl)
 
 void galspnbl_state::draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	offs_t offs;
+//  int const screenscroll = 4 - (m_scroll[0] & 0xff);
 
-//  int screenscroll = 4 - (m_scroll[0] & 0xff);
-
-	for (offs = 0; offs < 0x20000; offs++)
+	for (offs_t offs = 0; offs < 0x20000; offs++)
 	{
-		int y = offs >> 9;
-		int x = offs & 0x1ff;
+		int const y = offs >> 9;
+		int const x = offs & 0x1ff;
 
 		bitmap.pix16(y, x) = 1024 + (m_bgvideoram[offs] >> 1);
 	}

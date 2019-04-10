@@ -30,8 +30,8 @@ class videosaa_state : public driver_device
 {
 public:
 	videosaa_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void videosaa(machine_config &config);
@@ -100,8 +100,7 @@ void videosaa_state::videosaa(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx);
 
-	palette_device& palette(PALETTE(config, "palette", 8));
-	palette.set_init("palette", FUNC(palette_device::palette_init_3bit_rgb));
+	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
 	/* sound hardware */
 	UPD7759(config, "upd");

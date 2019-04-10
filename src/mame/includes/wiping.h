@@ -43,7 +43,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 
-	DECLARE_PALETTE_INIT(wiping);
+	void wiping_palette(palette_device &palette) const;
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

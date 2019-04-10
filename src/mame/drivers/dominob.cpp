@@ -72,16 +72,20 @@ Notes:
 class dominob_state : public driver_device
 {
 public:
-	dominob_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dominob_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_bgram(*this, "bgram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	void dominob(machine_config &config);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	/* memory pointers */
@@ -89,17 +93,18 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_bgram;
 
-	/* input-related */
-	//uint8_t m_paddle_select;
-	//uint8_t m_paddle_value;
-	DECLARE_WRITE8_MEMBER(dominob_d008_w);
-	DECLARE_READ8_MEMBER(dominob_unk_port02_r);
-	virtual void video_start() override;
-	uint32_t screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	/* input-related */
+	//uint8_t m_paddle_select;
+	//uint8_t m_paddle_value;
+
+	DECLARE_WRITE8_MEMBER(dominob_d008_w);
+	DECLARE_READ8_MEMBER(dominob_unk_port02_r);
+	uint32_t screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void memmap(address_map &map);
 	void portmap(address_map &map);
 };
@@ -187,8 +192,8 @@ void dominob_state::memmap(address_map &map)
 	map(0x0000, 0xbfff).rom().nopw(); // there are some garbage writes to ROM
 	map(0xc000, 0xc7ff).ram();
 
-	map(0xd000, 0xd001).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0xd001, 0xd001).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xd000, 0xd001).w("aysnd", FUNC(ym2149_device::address_data_w));
+	map(0xd001, 0xd001).r("aysnd", FUNC(ym2149_device::data_r));
 	map(0xd008, 0xd008).w(FUNC(dominob_state::dominob_d008_w));
 	map(0xd00c, 0xd00c).portr("IN0");
 	map(0xd010, 0xd010).portr("IN1").nopw();
@@ -297,34 +302,32 @@ static GFXDECODE_START( gfx_dominob )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(dominob_state::dominob)
-
+void dominob_state::dominob(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(12'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(memmap)
-	MCFG_DEVICE_IO_MAP(portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dominob_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dominob_state::memmap);
+	m_maincpu->set_addrmap(AS_IO, &dominob_state::portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(dominob_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.1524)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dominob_state, screen_update_dominob)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.1524);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(dominob_state::screen_update_dominob));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dominob)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dominob);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000)/4)
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	ym2149_device &aysnd(YM2149(config, "aysnd", XTAL(12'000'000)/4));
+	aysnd.port_b_read_callback().set_ioport("DSW");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 /***************************************************************************
 

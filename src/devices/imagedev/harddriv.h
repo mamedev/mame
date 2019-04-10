@@ -25,7 +25,12 @@ class harddisk_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	harddisk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	harddisk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intf)
+		: harddisk_image_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_interface(intf);
+	}
+	harddisk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~harddisk_image_device();
 
 	template <typename Object> void set_device_load(Object &&cb) { m_device_image_load = std::forward<Object>(cb); }

@@ -355,15 +355,12 @@ void softbox_state::ieee488_ifc(int state)
 //  MACHINE CONFIGURATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  MACHINE_CONFIG( softbox )
-//-------------------------------------------------
-
-MACHINE_CONFIG_START(softbox_state::softbox)
+void softbox_state::softbox(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(softbox_mem)
-	MCFG_DEVICE_IO_MAP(softbox_io)
+	Z80(config, m_maincpu, XTAL(8'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &softbox_state::softbox_mem);
+	m_maincpu->set_addrmap(AS_IO, &softbox_state::softbox_io);
 
 	// devices
 	i8251_device &i8251(I8251(config, I8251_TAG, 0));
@@ -371,11 +368,11 @@ MACHINE_CONFIG_START(softbox_state::softbox)
 	i8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	i8251.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_cts))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(I8251_TAG, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(I8251_TAG, FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set(I8251_TAG, FUNC(i8251_device::write_cts));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	i8255_device &ppi0(I8255A(config, I8255_0_TAG));
 	ppi0.in_pa_callback().set(FUNC(softbox_state::ppi0_pa_r));
@@ -392,23 +389,19 @@ MACHINE_CONFIG_START(softbox_state::softbox)
 	dbrg.fr_handler().set(I8251_TAG, FUNC(i8251_device::write_rxc));
 	dbrg.ft_handler().set(I8251_TAG, FUNC(i8251_device::write_txc));
 
-	MCFG_CBM_IEEE488_ADD("c8050")
+	ieee488_device::add_cbm_devices(config, "c8050");
 
-	MCFG_DEVICE_ADD(CORVUS_HDC_TAG, CORVUS_HDC, 0)
-	MCFG_HARDDISK_ADD("harddisk1")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	MCFG_HARDDISK_ADD("harddisk2")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	MCFG_HARDDISK_ADD("harddisk3")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	MCFG_HARDDISK_ADD("harddisk4")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
+	CORVUS_HDC(config, m_hdc, 0);
+	HARDDISK(config, "harddisk1", "corvus_hdd");
+	HARDDISK(config, "harddisk2", "corvus_hdd");
+	HARDDISK(config, "harddisk3", "corvus_hdd");
+	HARDDISK(config, "harddisk4", "corvus_hdd");
 
-	MCFG_IMI7000_BUS_ADD("imi5000h", nullptr, nullptr, nullptr)
+	imi7000_bus_device::add_config(config, "imi5000h", nullptr, nullptr, nullptr);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "softbox")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("softbox");
+}
 
 
 

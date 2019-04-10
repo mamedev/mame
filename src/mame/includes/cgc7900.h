@@ -81,7 +81,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_PALETTE_INIT(cgc7900);
+	void cgc7900_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER( keyboard_r );
@@ -118,6 +118,7 @@ public:
 	void cgc7900_video(machine_config &config);
 	void cgc7900_mem(address_map &map);
 	void keyboard_mem(address_map &map);
+	void cpu_space_map(address_map &map);
 private:
 	u16 kbd_mods;
 	u8 kbd_data;

@@ -16,10 +16,16 @@
     The cassette has no checksum, header or blocks. It is simply a stream
     of pulses. The successful loading of a tape is therefore a matter of luck.
 
+    To modify memory, press RST, then enter the 4-digit address (nothing happens
+    until the 4th digit is pressed), then press FN, then 0, then the 2 digit data.
+    It will enter the data (you won't see anything), then the address will increment.
+    Enter the data for this new address. If you want to skip this address, press FN.
+    When you're done, press RST. NOTE!!! Do NOT change any of these addresses:
+    0000,0001,0006-007F, or the system may crash. It's recommended to start all
+    your programs at 0200.
+
     Function keys:
-    FN 0 - Modify memory - firstly enter a 4-digit address, then 2-digit data
-                    the address will increment by itself, enter the next byte.
-                    FN by itself will step to the next address.
+    FN 0 - Modify memory - see above paragraph.
 
     FN 1 - Tape load. You must have entered the start address at 0002, and
            the end address+1 at 0004 (big-endian).
@@ -27,13 +33,13 @@
     FN 2 - Tape save. You must have entered the start address at 0002, and
            the end address+1 at 0004 (big-endian).
 
-    FN 3 - Run. You must have entered the 4-digit go address first.
+    FN 3 - Run. To use, press RST, then enter the 4-digit start address
+           (nothing happens until the 4th digit is pressed), then FN, then 3.
 
-    All CHIP-8 programs load at 0x200 (max size 4k), and exec address
+    All CHIP-8 programs load at 0200 (max size 4k), and exec address
     is C000.
 
     Information and programs can be found at http://chip8.com/?page=78
-
 
 **********************************************************************************/
 
@@ -74,6 +80,8 @@ public:
 
 
 	void d6800(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 private:
 	DECLARE_READ8_MEMBER( d6800_cassette_r );
@@ -185,13 +193,23 @@ static INPUT_PORTS_START( d6800 )
 	PORT_START("SHIFT")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("FN") PORT_CODE(KEYCODE_LSHIFT)
 
+	PORT_START("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RST") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, d6800_state, reset_button, nullptr)
+
 	PORT_START("VS")
 	/* vblank */
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
-/* Video */
+INPUT_CHANGED_MEMBER(d6800_state::reset_button)
+{
+	// RESET button wired to POR on the mc6875, which activates the Reset output pin which in turn connects to the CPU's Reset pin.
+	if (newval)
+		m_pia->reset();
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
+/* Video */
 uint32_t d6800_state::screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t x,y,gfx=0;
@@ -390,23 +408,23 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 
 MACHINE_CONFIG_START(d6800_state::d6800)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M6800, XTAL(4'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(d6800_map)
+	M6800(config, m_maincpu, XTAL(4'000'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &d6800_state::d6800_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(64, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 63, 0, 31)
-	MCFG_SCREEN_UPDATE_DRIVER(d6800_state, screen_update_d6800)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(25))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_size(64, 32);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(d6800_state::screen_update_d6800));
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(25));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.50);
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
@@ -419,14 +437,14 @@ MACHINE_CONFIG_START(d6800_state::d6800)
 	m_pia->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("d6800_c", d6800_state, d6800_c, attotime::from_hz(4800))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("d6800_p", d6800_state, d6800_p, attotime::from_hz(40000))
+	TIMER(config, "d6800_c").configure_periodic(FUNC(d6800_state::d6800_c), attotime::from_hz(4800));
+	TIMER(config, "d6800_p").configure_periodic(FUNC(d6800_state::d6800_p), attotime::from_hz(40000));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", d6800_state, d6800, "bin,c8,ch8", 1)
+	MCFG_QUICKLOAD_ADD("quickload", d6800_state, d6800, "bin,c8,ch8", attotime::from_seconds(1))
 MACHINE_CONFIG_END
 
 /* ROMs */

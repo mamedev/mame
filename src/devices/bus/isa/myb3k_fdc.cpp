@@ -26,7 +26,6 @@
 
 #include "emu.h"
 #include "myb3k_fdc.h"
-#include "imagedev/flopdrv.h"
 #include "formats/pc_dsk.h"
 #include "formats/imd_dsk.h"
 

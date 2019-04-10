@@ -5,9 +5,10 @@
  * includes/galeb.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_GALEB_H
 #define MAME_INCLUDES_GALEB_H
+
+#pragma once
 
 #include "sound/dac.h"
 #include "emupal.h"

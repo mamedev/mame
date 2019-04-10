@@ -225,11 +225,11 @@ std::string c64_expansion_slot_device::get_default_card_software(get_default_car
 //  cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_expansion_slot_device::cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (m_card != nullptr)
 	{
-		data = m_card->c64_cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+		data = m_card->c64_cd_r(offset, data, sphi2, ba, roml, romh, io1, io2);
 	}
 
 	return data;
@@ -240,11 +240,11 @@ uint8_t c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, uin
 //  cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_expansion_slot_device::cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (m_card != nullptr)
 	{
-		m_card->c64_cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+		m_card->c64_cd_w(offset, data, sphi2, ba, roml, romh, io1, io2);
 	}
 }
 

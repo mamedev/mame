@@ -6,6 +6,10 @@
   driver by Zsolt Vasvari
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_FASTFRED_H
+#define MAME_INCLUDES_FASTFRED_H
+
+#pragma once
 
 #include "machine/74259.h"
 #include "includes/galaxold.h"
@@ -87,7 +91,7 @@ private:
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(fastfred);
+	void fastfred_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(imago);
 	DECLARE_VIDEO_START(fastfred);
 	DECLARE_VIDEO_START(imago);
@@ -100,3 +104,5 @@ private:
 	void jumpcoas_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_FASTFRED_H

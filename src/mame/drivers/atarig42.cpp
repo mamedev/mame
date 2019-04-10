@@ -23,6 +23,7 @@
 #include "includes/atarig42.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -66,7 +67,7 @@ void atarig42_state::machine_reset()
 WRITE8_MEMBER(atarig42_state::a2d_select_w)
 {
 	if (m_adc.found())
-		m_adc->address_offset_start_w(space, offset, 0);
+		m_adc->address_offset_start_w(offset, 0);
 }
 
 
@@ -75,9 +76,9 @@ READ8_MEMBER(atarig42_state::a2d_data_r)
 	if (!m_adc.found())
 		return 0xff;
 
-	uint8_t result = m_adc->data_r(space, 0);
+	uint8_t result = m_adc->data_r();
 	if (!machine().side_effects_disabled())
-		m_adc->address_offset_start_w(space, offset, 0);
+		m_adc->address_offset_start_w(offset, 0);
 	return result;
 }
 
@@ -334,7 +335,7 @@ void atarig42_state::main_map(address_map &map)
 	map(0xf60000, 0xf60001).r(m_asic65, FUNC(asic65_device::read));
 	map(0xf80000, 0xf80003).w(m_asic65, FUNC(asic65_device::data_w));
 	map(0xfa0000, 0xfa0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
-	map(0xfc0000, 0xfc0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xfc0000, 0xfc0fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xff0000, 0xffffff).ram();
 	map(0xff0000, 0xff0fff).ram().share("rle");
 	map(0xff2000, 0xff5fff).w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
@@ -514,61 +515,62 @@ static const atari_rle_objects_config modesc_0x400 =
  *************************************/
 
 MACHINE_CONFIG_START(atarig42_state::atarig42)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, ATARI_CLOCK_14MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarig42_state::main_map);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarig42)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_atarig42);
+	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
 	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarig42_state, get_playfield_tile_info, 8,8, atarig42_playfield_scan, 128,64)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, atarig42_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
+	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,32, 0).set_info_callback(FUNC(atarig42_state::get_alpha_tile_info));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(atarig42_state, screen_update_atarig42)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarig42_state, video_int_write_line))
+	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(atarig42_state::screen_update_atarig42));
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(atarig42_state::video_int_write_line));
 
 	MCFG_VIDEO_START_OVERRIDE(atarig42_state,atarig42)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_III_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_5))
-	MCFG_ATARI_JSA_TEST_PORT("IN2", 6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ATARI_JSA_III(config, m_jsa, 0);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_5);
+	m_jsa->test_read_cb().set_ioport("IN2").bit(6);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(atarig42_0x200_state::atarig42_0x200)
+void atarig42_0x200_state::atarig42_0x200(machine_config &config)
+{
 	atarig42(config);
-	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x200);
 
 	ADC0809(config, m_adc, ATARI_CLOCK_14MHz / 16);
 	m_adc->in_callback<0>().set_ioport("A2D0");
 	m_adc->in_callback<1>().set_ioport("A2D1");
 
 	/* ASIC65 */
-	MCFG_ASIC65_ADD("asic65", ASIC65_ROMBASED)
-MACHINE_CONFIG_END
+	ASIC65(config, m_asic65, 0, ASIC65_ROMBASED);
+}
 
-MACHINE_CONFIG_START(atarig42_0x400_state::atarig42_0x400)
+void atarig42_0x400_state::atarig42_0x400(machine_config &config)
+{
 	atarig42(config);
-	MCFG_ATARIRLE_ADD("rle", modesc_0x400)
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x400);
 
 	/* ASIC65 */
-	MCFG_ASIC65_ADD("asic65", ASIC65_GUARDIANS)
-MACHINE_CONFIG_END
+	ASIC65(config, m_asic65, 0, ASIC65_GUARDIANS);
+}
 
 
 

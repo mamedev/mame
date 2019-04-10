@@ -59,8 +59,8 @@ modified by Hau
 class safarir_state : public driver_device
 {
 public:
-	safarir_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	safarir_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
 		m_ram(*this, "ram"),
@@ -93,7 +93,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(safarir);
+	void safarir_palette(palette_device &palette) const;
 	uint32_t screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void safarir_audio(machine_config &config);
 	void main_map(address_map &map);
@@ -156,14 +156,12 @@ static GFXDECODE_START( gfx_safarir )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(safarir_state, safarir)
+void safarir_state::safarir_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < palette.entries() / 2; i++)
+	for (int i = 0; i < palette.entries() >> 1; i++)
 	{
-		palette.set_pen_color((i * 2) + 0, rgb_t::black());
-		palette.set_pen_color((i * 2) + 1, rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
+		palette.set_pen_color((i << 1) | 0, rgb_t::black());
+		palette.set_pen_color((i << 1) | 1, rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
 	}
 }
 
@@ -306,13 +304,14 @@ static const char *const safarir_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START(safarir_state::safarir_audio)
+void safarir_state::safarir_audio(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(6)
-	MCFG_SAMPLES_NAMES(safarir_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(safarir_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -406,28 +405,26 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(safarir_state::safarir)
-
+void safarir_state::safarir(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'000'000)/12)  /* 1.5 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	I8080A(config, m_maincpu, XTAL(18'000'000)/12);  /* 1.5 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &safarir_state::main_map);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 2*8)
-	MCFG_PALETTE_INIT_OWNER(safarir_state, safarir)
+	PALETTE(config, "palette", FUNC(safarir_state::safarir_palette), 2 * 8);
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_safarir);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_safarir)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 26*8-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(safarir_state, screen_update_safarir)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 26*8-1);
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(FUNC(safarir_state::screen_update_safarir));
+	screen.set_palette("palette");
 
 	/* audio hardware */
 	safarir_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 

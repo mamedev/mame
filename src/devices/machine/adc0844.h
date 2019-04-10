@@ -34,7 +34,7 @@ class adc0844_device : public device_t
 {
 public:
 	// construction/destruction
-	adc0844_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc0844_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	auto intr_callback() { return m_intr_cb.bind(); }
@@ -43,8 +43,8 @@ public:
 	auto ch3_callback() { return m_ch3_cb.bind(); }
 	auto ch4_callback() { return m_ch4_cb.bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	u8 read();
+	virtual void write(u8 data);
 
 protected:
 	adc0844_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -70,7 +70,7 @@ class adc0848_device : public adc0844_device
 {
 public:
 	// construction/destruction
-	adc0848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc0848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	auto ch5_callback() { return m_ch5_cb.bind(); }
@@ -78,7 +78,7 @@ public:
 	auto ch7_callback() { return m_ch7_cb.bind(); }
 	auto ch8_callback() { return m_ch8_cb.bind(); }
 
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual void write(u8 data) override;
 
 protected:
 	// device-level overrides

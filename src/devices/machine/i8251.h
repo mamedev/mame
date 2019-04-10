@@ -43,8 +43,8 @@ public:
 	uint8_t status_r();
 	void control_w(uint8_t data);
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	virtual uint8_t read(offs_t offset);
+	virtual void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 	DECLARE_WRITE_LINE_MEMBER( write_cts );
@@ -54,10 +54,7 @@ public:
 
 	DECLARE_READ_LINE_MEMBER(txrdy_r);
 
-	/// TODO: REMOVE THIS
-	void receive_character(uint8_t ch);
-
-	/// TODO: this shouldn't be public
+protected:
 	enum
 	{
 		I8251_STATUS_FRAMING_ERROR = 0x20,
@@ -68,7 +65,6 @@ public:
 		I8251_STATUS_TX_READY = 0x01
 	};
 
-protected:
 	i8251_device(
 			const machine_config &mconfig,
 			device_type type,
@@ -82,6 +78,8 @@ protected:
 
 	void command_w(uint8_t data);
 	void mode_w(uint8_t data);
+
+	void receive_character(uint8_t ch);
 
 	void update_rx_ready();
 	void update_tx_ready();
@@ -138,20 +136,31 @@ private:
 	uint8_t m_tx_data;
 };
 
-class v53_scu_device :  public i8251_device
+class v5x_scu_device :  public i8251_device
 {
 public:
 	// construction/destruction
-	v53_scu_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
+	v5x_scu_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
 
-	void command_w(uint8_t data) { i8251_device::command_w(data); }
-	void mode_w(uint8_t data) { i8251_device::mode_w(data); }
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// TODO: currently unimplemented interrupt masking
+	u8 simk_r() { return m_simk; }
+	void simk_w(u8 data) { m_simk = data; }
+
+private:
+	u8 m_simk;
 };
 
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(I8251,   i8251_device)
-DECLARE_DEVICE_TYPE(V53_SCU, v53_scu_device)
+DECLARE_DEVICE_TYPE(V5X_SCU, v5x_scu_device)
 
 #endif // MAME_MACHINE_I8251_H

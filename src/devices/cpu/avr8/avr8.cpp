@@ -877,8 +877,7 @@ void avr8_device::device_reset()
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or nullptr if
-//  the space doesn't exist
+//  of the CPU's address spaces
 //-------------------------------------------------
 
 device_memory_interface::space_config_vector avr8_device::memory_space_config() const
@@ -914,11 +913,6 @@ void avr8_device::state_string_export(const device_state_entry &entry, std::stri
 	}
 }
 
-
-//-------------------------------------------------
-//  disassemble - call the disassembly
-//  helper function
-//-------------------------------------------------
 
 std::unique_ptr<util::disasm_interface> avr8_device::create_disassembler()
 {

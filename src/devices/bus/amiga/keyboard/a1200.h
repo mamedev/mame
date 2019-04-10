@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "cpu/m6805/m68hc05.h"
 #include "keyboard.h"
 
 
@@ -48,7 +49,7 @@ protected:
 
 private:
 	required_ioport_array<15>   m_rows;
-	required_device<cpu_device> m_mpu;
+	required_device<m68hc705c8a_device> m_mpu;
 
 	u16                         m_row_drive;
 	bool                        m_host_kdat, m_mpu_kdat;

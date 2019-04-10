@@ -35,8 +35,8 @@ TODO:
 class lbeach_state : public driver_device
 {
 public:
-	lbeach_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	lbeach_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_bg_vram(*this, "bg_vram"),
 		m_fg_vram(*this, "fg_vram"),
@@ -51,6 +51,11 @@ public:
 	{ }
 
 	void lbeach(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	/* devices / memory pointers */
@@ -70,6 +75,7 @@ private:
 	bitmap_ind16 m_colmap_car;
 	tilemap_t* m_bg_tilemap;
 	tilemap_t* m_fg_tilemap;
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
@@ -78,10 +84,7 @@ private:
 	DECLARE_READ8_MEMBER(lbeach_in1_r);
 	DECLARE_READ8_MEMBER(lbeach_in2_r);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(lbeach);
+	void lbeach_palette(palette_device &palette) const;
 	uint32_t screen_update_lbeach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void lbeach_map(address_map &map);
 };
@@ -94,7 +97,7 @@ private:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(lbeach_state, lbeach)
+void lbeach_state::lbeach_palette(palette_device &palette) const
 {
 	// tiles
 	palette.set_pen_color(0, 0x00, 0x00, 0x00);
@@ -330,30 +333,29 @@ void lbeach_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(lbeach_state::lbeach)
-
+void lbeach_state::lbeach(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(16'000'000) / 32) // Motorola MC6800P, 500kHz
-	MCFG_DEVICE_PROGRAM_MAP(lbeach_map)
+	M6800(config, m_maincpu, XTAL(16'000'000) / 32); // Motorola MC6800P, 500kHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &lbeach_state::lbeach_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60) // ~60Hz
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511-32, 0, 255-24)
-	MCFG_SCREEN_UPDATE_DRIVER(lbeach_state, screen_update_lbeach)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE) // needed for collision detection
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60); // ~60Hz
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 511-32, 0, 255-24);
+	m_screen->set_screen_update(FUNC(lbeach_state::screen_update_lbeach));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // needed for collision detection
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lbeach)
-	MCFG_PALETTE_ADD("palette", 2+8+2)
-	MCFG_PALETTE_INIT_OWNER(lbeach_state, lbeach)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lbeach);
+	PALETTE(config, m_palette, FUNC(lbeach_state::lbeach_palette), 2 + 8 + 2);
 	/* sound hardware */
 	// ...
-MACHINE_CONFIG_END
+}
 
 
 

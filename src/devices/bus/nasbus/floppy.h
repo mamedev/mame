@@ -12,6 +12,7 @@
 #pragma once
 
 #include "nasbus.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 
 

@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(VTECH_IOEXP_SLOT, vtech_ioexp_slot_device, "vtech_ioexp_slot"
 vtech_ioexp_slot_device::vtech_ioexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VTECH_IOEXP_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
-	m_io(nullptr),
+	m_io(*this, finder_base::DUMMY_TAG, -1),
 	m_cart(nullptr)
 {
 }
@@ -57,15 +57,6 @@ void vtech_ioexp_slot_device::device_start()
 
 void vtech_ioexp_slot_device::device_reset()
 {
-}
-
-//-------------------------------------------------
-//  set_io_space - set address space we are attached to
-//-------------------------------------------------
-
-void vtech_ioexp_slot_device::set_io_space(address_space *io)
-{
-	m_io = io;
 }
 
 

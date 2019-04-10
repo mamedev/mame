@@ -31,7 +31,8 @@ public:
 		m_mainbank(*this, "mainbank"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void _20pacgal(machine_config &config);
 	void _20pacgal_video(machine_config &config);
@@ -82,7 +83,7 @@ protected:
 	virtual void video_start() override;
 	uint32_t screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	DECLARE_PALETTE_INIT(starpal_init);
+	void starpal_init(palette_device &palette) const;
 	void get_pens();
 	void do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -100,8 +101,8 @@ protected:
 class _25pacman_state : public _20pacgal_state
 {
 public:
-	_25pacman_state(const machine_config &mconfig, device_type type, const char *tag)
-		: _20pacgal_state(mconfig, type, tag)
+	_25pacman_state(const machine_config &mconfig, device_type type, const char *tag) :
+		_20pacgal_state(mconfig, type, tag)
 	{ }
 
 	void _25pacman(machine_config &config);

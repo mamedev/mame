@@ -5,6 +5,10 @@
     Contra / Gryzor
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CONTRA_H
+#define MAME_INCLUDES_CONTRA_H
+
+#pragma once
 
 #include "video/k007121.h"
 #include "emupal.h"
@@ -13,8 +17,8 @@
 class contra_state : public driver_device
 {
 public:
-	contra_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	contra_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_fg_cram(*this, "fg_cram"),
 		m_fg_vram(*this, "fg_vram"),
 		m_tx_cram(*this, "tx_cram"),
@@ -29,7 +33,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	std::unique_ptr<uint8_t[]>       m_buffered_spriteram;
@@ -73,7 +78,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(contra);
+	void contra_palette(palette_device &palette) const;
 	uint32_t screen_update_contra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(contra_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int bank );
@@ -85,3 +90,5 @@ public:
 	void contra_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CONTRA_H

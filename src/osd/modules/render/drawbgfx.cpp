@@ -244,35 +244,40 @@ int renderer_bgfx::create()
 		sdlSetWindow(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window());
 #endif
 		std::string backend(m_options.bgfx_backend());
+		bgfx::Init init;
+		init.type = bgfx::RendererType::Count;
+		init.vendorId = BGFX_PCI_ID_NONE;
+		init.resolution.width = wdim.width();
+		init.resolution.height = wdim.height();
+		init.resolution.reset = BGFX_RESET_NONE;
 		if (backend == "auto")
 		{
-			bgfx::init();
 		}
 		else if (backend == "dx9" || backend == "d3d9")
 		{
-			bgfx::init(bgfx::RendererType::Direct3D9);
+			init.type = bgfx::RendererType::Direct3D9;
 		}
 		else if (backend == "dx11" || backend == "d3d11")
 		{
-			bgfx::init(bgfx::RendererType::Direct3D11);
+			init.type = bgfx::RendererType::Direct3D11;
 		}
 		else if (backend == "gles")
 		{
-			bgfx::init(bgfx::RendererType::OpenGLES);
+			init.type = bgfx::RendererType::OpenGLES;
 		}
 		else if (backend == "glsl" || backend == "opengl")
 		{
-			bgfx::init(bgfx::RendererType::OpenGL);
+			init.type = bgfx::RendererType::OpenGL;
 		}
 		else if (backend == "metal")
 		{
-			bgfx::init(bgfx::RendererType::Metal);
+			init.type = bgfx::RendererType::Metal;
 		}
 		else
 		{
 			printf("Unknown backend type '%s', going with auto-detection\n", backend.c_str());
-			bgfx::init();
 		}
+		bgfx::init(init);
 		bgfx::reset(m_width[win->m_index], m_height[win->m_index], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 		// Enable debug text.
 		bgfx::setDebug(m_options.bgfx_debug() ? BGFX_DEBUG_STATS : BGFX_DEBUG_TEXT);
@@ -321,7 +326,7 @@ int renderer_bgfx::create()
 	m_chains = new chain_manager(win->machine(), m_options, *m_textures, *m_targets, *m_effects, win->m_index, *this);
 	m_sliders_dirty = true;
 
-	uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
+	uint32_t flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
 	m_texture_cache = m_textures->create_texture("#cache", bgfx::TextureFormat::RGBA8, CACHE_SIZE, CACHE_SIZE, nullptr, flags);
 
 	memset(m_white, 0xff, sizeof(uint32_t) * 16 * 16);
@@ -490,10 +495,10 @@ void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bg
 	vertex(&vertices[4], x[2], y[2], 0, 0xffffffff, u[2], v[2]);
 	vertex(&vertices[5], x[0], y[0], 0, 0xffffffff, u[0], v[0]);
 
-	uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
+	uint32_t texture_flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
 	if (video_config.filter == 0)
 	{
-		texture_flags |= BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
+		texture_flags |= BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
 	}
 
 	uint32_t blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
@@ -550,10 +555,10 @@ void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::Transient
 	vertex(&vertices[4], x[2], y[2], 0, rgba, u[2], v[2]);
 	vertex(&vertices[5], x[0], y[0], 0, rgba, u[0], v[0]);
 
-	uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
+	uint32_t texture_flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
 	if (video_config.filter == 0)
 	{
-		texture_flags |= BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
+		texture_flags |= BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
 	}
 
 	uint16_t tex_width(prim->texture.width);
@@ -1061,7 +1066,7 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(bool atlas_valid, 
 
 void renderer_bgfx::set_bgfx_state(uint32_t blend)
 {
-	uint64_t flags = BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_DEPTH_TEST_ALWAYS;
+	uint64_t flags = BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_DEPTH_TEST_ALWAYS;
 	bgfx::setState(flags | bgfx_util::get_blend_state(blend));
 }
 

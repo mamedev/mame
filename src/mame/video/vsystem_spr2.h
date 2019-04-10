@@ -6,23 +6,13 @@
 
 typedef device_delegate<uint32_t (uint32_t)> vsystem_tile2_indirection_delegate;
 
-#define MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT(_class, _method) \
-	downcast<vsystem_spr2_device &>(*device).set_tile_indirect_cb(vsystem_tile2_indirection_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
-#define MCFG_VSYSTEM_SPR2_SET_PRITYPE(_val) \
-	downcast<vsystem_spr2_device &>(*device).set_pritype(_val);
-#define MCFG_VSYSTEM_SPR2_SET_GFXREGION(_rgn) \
-	downcast<vsystem_spr2_device &>(*device).set_gfx_region(_rgn);
-#define MCFG_VSYSTEM_SPR2_SET_OFFSETS(_xoffs, _yoffs) \
-	downcast<vsystem_spr2_device &>(*device).set_offsets(_xoffs,_yoffs);
-#define MCFG_VSYSTEM_SPR2_GFXDECODE(_gfxtag) \
-	downcast<vsystem_spr2_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 class vsystem_spr2_device : public device_t
 {
 public:
 	// configuration
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
-	template <typename Object> void set_tile_indirect_cb(Object &&cb) { m_newtilecb = std::forward<Object>(cb); }
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	template <typename... T> void set_tile_indirect_cb(T &&... args) { m_newtilecb = vsystem_tile2_indirection_delegate(std::forward<T>(args)...); }
 	void set_pritype(int pritype) { m_pritype = pritype; }
 	void set_gfx_region(int gfx_region) { m_gfx_region = gfx_region; }
 	void set_offsets(int xoffs, int yoffs)

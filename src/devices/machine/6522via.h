@@ -107,6 +107,7 @@ private:
 	static constexpr device_timer_id TIMER_SHIFT_IRQ = 4;
 
 	uint16_t get_counter1_value();
+	void counter2_decrement();
 
 	void set_int(int data);
 	void clear_int(int data);

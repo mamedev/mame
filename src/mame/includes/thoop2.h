@@ -18,6 +18,7 @@ public:
 		m_outlatch(*this, "outlatch"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_okibank(*this, "okibank"),
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
@@ -27,7 +28,7 @@ public:
 	void thoop2(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(OKIM6295_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
@@ -37,8 +38,7 @@ private:
 	DECLARE_WRITE8_MEMBER(shareram_w);
 	DECLARE_READ8_MEMBER(shareram_r);
 
-	TILE_GET_INFO_MEMBER(get_tile_info_screen0);
-	TILE_GET_INFO_MEMBER(get_tile_info_screen1);
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void mcu_hostmem_map(address_map &map);
@@ -59,11 +59,12 @@ private:
 	required_device<ls259_device> m_outlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_memory_bank m_okibank;
 
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_shareram;
+	required_shared_ptr<uint16_t> m_shareram;
 };
 
 #endif // MAME_INCLUDES_THOOP2_H

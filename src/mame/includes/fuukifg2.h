@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia,Paul Priest
+#ifndef MAME_INCLUDES_FUUKIFG2_H
+#define MAME_INCLUDES_FUUKIFG2_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
@@ -84,3 +88,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_FUUKIFG2_H

@@ -840,17 +840,17 @@ void kurukuru_state::machine_reset()
 *                 Machine Driver                 *
 *************************************************/
 
-MACHINE_CONFIG_START(kurukuru_state::kurukuru)
-
+void kurukuru_state::kurukuru(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(kurukuru_map)
-	MCFG_DEVICE_IO_MAP(kurukuru_io)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kurukuru_state::kurukuru_map);
+	m_maincpu->set_addrmap(AS_IO, &kurukuru_state::kurukuru_io);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(kurukuru_audio_map)
-	MCFG_DEVICE_IO_MAP(kurukuru_audio_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_neg_buffer_device, inta_cb)
+	Z80(config, m_audiocpu, CPU_CLOCK);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kurukuru_state::kurukuru_audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &kurukuru_state::kurukuru_audio_io);
+	m_audiocpu->set_irq_acknowledge_callback("soundirq", FUNC(rst_neg_buffer_device::inta_cb));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -861,7 +861,7 @@ MACHINE_CONFIG_START(kurukuru_state::kurukuru)
 	v9938.int_cb().set_inputline("maincpu", 0);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
+	TICKET_DISPENSER(config, "hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -873,31 +873,29 @@ MACHINE_CONFIG_START(kurukuru_state::kurukuru)
 	// if both are asserted, the vector becomes $f7 AND $ef = $e7 (rst $20)
 	RST_NEG_BUFFER(config, m_soundirq, 0).int_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ym2149", YM2149, YM2149_CLOCK)
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, kurukuru_state, ym2149_aout_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, kurukuru_state, ym2149_bout_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	ym2149_device &ym2149(YM2149(config, "ym2149", YM2149_CLOCK));
+	ym2149.port_b_read_callback().set_ioport("DSW2");
+	ym2149.port_a_write_callback().set(FUNC(kurukuru_state::ym2149_aout_w));
+	ym2149.port_b_write_callback().set(FUNC(kurukuru_state::ym2149_bout_w));
+	ym2149.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("adpcm", MSM5205, M5205_CLOCK)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, kurukuru_state, kurukuru_msm5205_vck))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* changed on the fly */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	MSM5205(config, m_adpcm, M5205_CLOCK);
+	m_adpcm->vck_legacy_callback().set(FUNC(kurukuru_state::kurukuru_msm5205_vck));
+	m_adpcm->set_prescaler_selector(msm5205_device::S48_4B);    /* changed on the fly */
+	m_adpcm->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
-
-MACHINE_CONFIG_START(kurukuru_state::ppj)
+void kurukuru_state::ppj(machine_config &config)
+{
 	kurukuru(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ppj_map)
-	MCFG_DEVICE_IO_MAP(ppj_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &kurukuru_state::ppj_map);
+	m_maincpu->set_addrmap(AS_IO, &kurukuru_state::ppj_io);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(ppj_audio_map)
-	MCFG_DEVICE_IO_MAP(ppj_audio_io)
-MACHINE_CONFIG_END
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kurukuru_state::ppj_audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &kurukuru_state::ppj_audio_io);
+}
 
 
 /*************************************************

@@ -9,28 +9,11 @@
 #include "cpu/z80/z80.h"
 
 
-#define MCFG_SEGACRPT_SET_DECRYPTED_TAG(_tag) \
-	downcast<segacrpt_z80_device &>(*device).set_decrypted_tag(_tag);
-
-#define MCFG_SEGACRPT_SET_DECRYPTED_PTR(_tag) \
-	downcast<segacrpt_z80_device &>(*device).set_decrypted_ptr(_ptr);
-
-#define MCFG_SEGACRPT_SET_SIZE(_size) \
-	downcast<segacrpt_z80_device &>(*device).set_size(_size);
-
-#define MCFG_SEGACRPT_SET_NUMBANKS(_numbanks) \
-	downcast<segacrpt_z80_device &>(*device).set_numbanks(_numbanks);
-
-#define MCFG_SEGACRPT_SET_BANKSIZE(_banksize) \
-	downcast<segacrpt_z80_device &>(*device).set_banksize(_banksize);
-
-
 // base class
 class segacrpt_z80_device : public z80_device
 {
 public:
 	void set_decrypted_tag(const char* decrypted_tag) { m_decrypted_tag = decrypted_tag; }
-	void set_decrypted_ptr(uint8_t* ptr) { m_decrypted_ptr = ptr; } // toprollr
 	void set_size(int size) { m_decode_size = size; }
 	void set_numbanks(int numbanks) { m_numbanks = numbanks; }
 	void set_banksize(int banksize) { m_banksize = banksize; }

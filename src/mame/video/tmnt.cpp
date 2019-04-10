@@ -297,7 +297,7 @@ WRITE16_MEMBER(tmnt_state::tmnt_0a0000_w)
 
 		/* bit 3 high then low triggers irq on sound CPU */
 		if (m_last == 0x08 && (data & 0x08) == 0)
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 
 		m_last = data & 0x08;
 
@@ -320,7 +320,7 @@ WRITE16_MEMBER(tmnt_state::punkshot_0a0020_w)
 
 		/* bit 2 = trigger irq on sound CPU */
 		if (m_last == 0x04 && (data & 0x04) == 0)
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 
 		m_last = data & 0x04;
 
@@ -339,7 +339,7 @@ WRITE16_MEMBER(tmnt_state::lgtnfght_0a0018_w)
 
 		/* bit 2 = trigger irq on sound CPU */
 		if (m_last == 0x00 && (data & 0x04) == 0x04)
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 
 		m_last = data & 0x04;
 

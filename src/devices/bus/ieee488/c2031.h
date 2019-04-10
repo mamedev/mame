@@ -13,6 +13,7 @@
 
 #include "ieee488.h"
 #include "cpu/m6502/m6502.h"
+#include "imagedev/floppy.h"
 #include "machine/64h156.h"
 #include "machine/6522via.h"
 

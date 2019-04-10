@@ -47,21 +47,17 @@ class pce220_state : public driver_device
 {
 public:
 	pce220_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ram(*this, RAM_TAG),
-			m_beep(*this, "beeper"),
-			m_serial(*this, PCE220SERIAL_TAG)
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_beep(*this, "beeper")
+		, m_serial(*this, PCE220SERIAL_TAG)
+	{ }
 
 	void pce220(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(on_irq);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(pce220_timer_callback);
-
-	DECLARE_PALETTE_INIT(pce220);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -88,6 +84,11 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(pce220_timer_callback);
+
+	void pce220_palette(palette_device &palette) const;
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER( lcd_status_r );
 	DECLARE_WRITE8_MEMBER( lcd_control_w );
@@ -936,114 +937,111 @@ TIMER_DEVICE_CALLBACK_MEMBER(pce220_state::pce220_timer_callback)
 	}
 }
 
-PALETTE_INIT_MEMBER(pce220_state,pce220)
+void pce220_state::pce220_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 
-MACHINE_CONFIG_START(pce220_state::pce220)
+void pce220_state::pce220(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, 3072000 ) // CMOS-SC7852
-	MCFG_DEVICE_PROGRAM_MAP(pce220_mem)
-	MCFG_DEVICE_IO_MAP(pce220_io)
+	Z80(config, m_maincpu, 3072000); // CMOS-SC7852
+	m_maincpu->set_addrmap(AS_PROGRAM, &pce220_state::pce220_mem);
+	m_maincpu->set_addrmap(AS_IO, &pce220_state::pce220_io);
 
 	/* video hardware */
 	// 4 lines x 24 characters, resp. 144 x 32 pixel
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(pce220_state, screen_update)
-	MCFG_SCREEN_SIZE(24*6, 4*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 24*6-1, 0, 4*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(pce220_state::screen_update));
+	screen.set_size(24*6, 4*8);
+	screen.set_visarea(0, 24*6-1, 0, 4*8-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(pce220_state,pce220)
+	PALETTE(config, "palette", FUNC(pce220_state::pce220_palette), 2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
+	TIMER(config, "pce220_timer").configure_periodic(FUNC(pce220_state::pce220_timer_callback), attotime::from_msec(468));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
-	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
-MACHINE_CONFIG_END
+	PCE220SERIAL(config, m_serial, 0);
+}
 
-MACHINE_CONFIG_START(pcg850v_state::pcg815)
+void pcg850v_state::pcg815(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000) ) // 3.54MHz
-	MCFG_DEVICE_PROGRAM_MAP(pce220_mem)
-	MCFG_DEVICE_IO_MAP(pcg850v_io)
+	Z80(config, m_maincpu, XTAL(4'000'000)); // 3.54MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcg850v_state::pce220_mem);
+	m_maincpu->set_addrmap(AS_IO, &pcg850v_state::pcg850v_io);
 
 	/* video hardware */
 	// 4 lines x 24 characters, resp. 144 x 32 pixel
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(pcg850v_state, screen_update)
-	MCFG_SCREEN_SIZE(144, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 144-1, 0, 32-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(pcg850v_state::screen_update));
+	screen.set_size(144, 32);
+	screen.set_visarea(0, 144-1, 0, 32-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(pce220_state,pce220)
+	PALETTE(config, "palette", FUNC(pcg850v_state::pce220_palette), 2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
+	TIMER(config, "pce220_timer").configure_periodic(FUNC(pcg850v_state::pce220_timer_callback), attotime::from_msec(468));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
-	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
-MACHINE_CONFIG_END
+	PCE220SERIAL(config, m_serial, 0);
+}
 
-MACHINE_CONFIG_START(pcg850v_state::pcg850v)
+void pcg850v_state::pcg850v(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(8'000'000) ) // CMOS-SC7852
-	MCFG_DEVICE_PROGRAM_MAP(pce220_mem)
-	MCFG_DEVICE_IO_MAP(pcg850v_io)
+	Z80(config, m_maincpu, XTAL(8'000'000)); // CMOS-SC7852
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcg850v_state::pce220_mem);
+	m_maincpu->set_addrmap(AS_IO, &pcg850v_state::pcg850v_io);
 
 	/* video hardware */
 	// 6 lines x 24 characters, resp. 144 x 48 pixel
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(pcg850v_state, screen_update)
-	MCFG_SCREEN_SIZE(144, 48)
-	MCFG_SCREEN_VISIBLE_AREA(0, 144-1, 0, 48-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(pcg850v_state::screen_update));
+	screen.set_size(144, 48);
+	screen.set_visarea(0, 144-1, 0, 48-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(pce220_state,pce220)
+	PALETTE(config, "palette", FUNC(pcg850v_state::pce220_palette), 2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
+	TIMER(config, "pce220_timer").configure_periodic(FUNC(pcg850v_state::pce220_timer_callback), attotime::from_msec(468));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
-	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
-MACHINE_CONFIG_END
+	PCE220SERIAL(config, m_serial, 0);
+}
 
 /* ROM definition */
 ROM_START( pce220 )

@@ -44,26 +44,6 @@
 #define UPD7220_DRAW_TEXT_LINE_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr)
 
 
-#define MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(_class, _method) \
-	downcast<upd7220_device &>(*device).set_display_pixels_callback(upd7220_device::display_pixels_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(_class, _method) \
-	downcast<upd7220_device &>(*device).set_draw_text_callback(upd7220_device::draw_text_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_UPD7220_DRQ_CALLBACK(_write) \
-	downcast<upd7220_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
-
-#define MCFG_UPD7220_HSYNC_CALLBACK(_write) \
-	downcast<upd7220_device &>(*device).set_hsync_wr_callback(DEVCB_##_write);
-
-#define MCFG_UPD7220_VSYNC_CALLBACK(_write) \
-	downcast<upd7220_device &>(*device).set_vsync_wr_callback(DEVCB_##_write);
-
-#define MCFG_UPD7220_BLANK_CALLBACK(_write) \
-	downcast<upd7220_device &>(*device).set_blank_wr_callback(DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -82,19 +62,58 @@ public:
 	// construction/destruction
 	upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename Object> void set_display_pixels_callback(Object &&cb) { m_display_cb = std::forward<Object>(cb); }
-	template <typename Object> void set_draw_text_callback(Object &&cb) { m_draw_text_cb = std::forward<Object>(cb); }
+	// FIXME: these should be aware of current device for resolving the tag
+	template <class FunctionClass>
+	void set_display_pixels(void (FunctionClass::*init)(bitmap_rgb32 &, int, int, uint32_t), const char *name)
+	{
+		m_display_cb = display_pixels_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr));
+	}
+	template <class FunctionClass>
+	void set_display_pixels(void (FunctionClass::*init)(bitmap_rgb32 &, int, int, uint32_t) const, const char *name)
+	{
+		m_display_cb = display_pixels_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr));
+	}
+	template <class FunctionClass>
+	void set_display_pixels(const char *devname, void (FunctionClass::*init)(bitmap_rgb32 &, int, int, uint32_t), const char *name)
+	{
+		m_display_cb = display_pixels_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr));
+	}
+	template <class FunctionClass>
+	void set_display_pixels(const char *devname, void (FunctionClass::*init)(bitmap_rgb32 &, int, int, uint32_t) const, const char *name)
+	{
+		m_display_cb = display_pixels_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr));
+	}
+	template <class FunctionClass>
+	void set_draw_text(void (FunctionClass::*init)(bitmap_rgb32 &, uint32_t, int, int, int, int, int, int), const char *name)
+	{
+		m_draw_text_cb = draw_text_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr));
+	}
+	template <class FunctionClass>
+	void set_draw_text(void (FunctionClass::*init)(bitmap_rgb32 &, uint32_t, int, int, int, int, int, int) const, const char *name)
+	{
+		m_draw_text_cb = draw_text_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr));
+	}
+	template <class FunctionClass>
+	void set_draw_text(const char *devname, void (FunctionClass::*init)(bitmap_rgb32 &, uint32_t, int, int, int, int, int, int), const char *name)
+	{
+		m_draw_text_cb = draw_text_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr));
+	}
+	template <class FunctionClass>
+	void set_draw_text(const char *devname, void (FunctionClass::*init)(bitmap_rgb32 &, uint32_t, int, int, int, int, int, int) const, const char *name)
+	{
+		m_draw_text_cb = draw_text_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr));
+	}
 
-	template <class Object> devcb_base &set_drq_wr_callback(Object &&cb) { return m_write_drq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_hsync_wr_callback(Object &&cb) { return m_write_hsync.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vsync_wr_callback(Object &&cb) { return m_write_vsync.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_blank_wr_callback(Object &&cb) { return m_write_blank.set_callback(std::forward<Object>(cb)); }
+	auto drq_wr_callback() { return m_write_drq.bind(); }
+	auto hsync_wr_callback() { return m_write_hsync.bind(); }
+	auto vsync_wr_callback() { return m_write_vsync.bind(); }
+	auto blank_wr_callback() { return m_write_blank.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( dack_r );
-	DECLARE_WRITE8_MEMBER( dack_w );
+	uint8_t dack_r();
+	void dack_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( ext_sync_w );
 	DECLARE_WRITE_LINE_MEMBER( lpen_w );

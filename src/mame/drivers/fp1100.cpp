@@ -247,7 +247,7 @@ WRITE8_MEMBER( fp1100_state::sub_to_main_w )
 {
 	m_main_latch = data;
 	LOG("%s: From sub:%X\n",machine().describe_context(),data);
-	//m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xf0);
+	//m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xf0); // Z80
 }
 
 /*
@@ -344,7 +344,7 @@ WRITE8_MEMBER( fp1100_state::portc_w )
 		if (BIT(m_irq_mask, 4))
 			if (!BIT(data, 3))
 			{
-				m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xf0);
+				m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xf0); // Z80
 				LOG("%s: PortC:%X\n",machine().describe_context(),data);
 			}
 	if (BIT(bits, 5))
@@ -596,7 +596,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( fp1100_state::timer_c )
 INTERRUPT_GEN_MEMBER( fp1100_state::vblank_irq )
 {
 //  if (BIT(m_irq_mask, 4))
-//      m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8);
+//      m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8); // Z80
 }
 
 void fp1100_state::machine_reset()
@@ -638,12 +638,13 @@ void fp1100_state::init_fp1100()
 	membank("bankw0")->configure_entry(0, &wram[0x0000]);
 }
 
-MACHINE_CONFIG_START(fp1100_state::fp1100)
+void fp1100_state::fp1100(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fp1100_state, vblank_irq)
+	Z80(config, m_maincpu, MAIN_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fp1100_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &fp1100_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fp1100_state::vblank_irq));
 
 	upd7801_device &sub(UPD7801(config, m_subcpu, MAIN_CLOCK/4));
 	sub.set_addrmap(AS_PROGRAM, &fp1100_state::sub_map);
@@ -655,14 +656,14 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 	sub.txd_func().set(FUNC(fp1100_state::cass_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fp1100)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea_full();
+	screen.set_screen_update("crtc", FUNC(h46505_device::screen_update));
+	PALETTE(config, m_palette).set_entries(8);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_fp1100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -670,21 +671,24 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 			.add_route(ALL_OUTPUTS, "mono", 0.50); // inside the keyboard
 
 	/* CRTC */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", MAIN_CLOCK/8)   /* hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(fp1100_state, crtc_update_row)
+	H46505(config, m_crtc, MAIN_CLOCK/8);   /* hand tuned to get ~60 fps */
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(fp1100_state::crtc_update_row), this);
 
 	/* Printer */
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fp1100_state, centronics_busy_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(fp1100_state::centronics_busy_w));
+
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
 	/* Cassette */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", fp1100_state, timer_c, attotime::from_hz(4800)) // cass write
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	TIMER(config, "timer_c").configure_periodic(FUNC(fp1100_state::timer_c), attotime::from_hz(4800)); // cass write
+}
 
 /* ROM definition */
 ROM_START( fp1100 )

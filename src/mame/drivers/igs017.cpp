@@ -86,13 +86,13 @@ class igs_bitswap_device : public device_t
 public:
 	igs_bitswap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_in_pa_callback(Object &&cb)  { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_pb_callback(Object &&cb)  { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_pc_callback(Object &&cb)  { return m_in_pc_cb.set_callback(std::forward<Object>(cb)); }
+	auto in_pa_callback()  { return m_in_pa_cb.bind(); }
+	auto in_pb_callback()  { return m_in_pb_cb.bind(); }
+	auto in_pc_callback()  { return m_in_pc_cb.bind(); }
 
-	template <class Object> devcb_base &set_out_pa_callback(Object &&cb) { return m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_pb_callback(Object &&cb) { return m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_pc_callback(Object &&cb) { return m_out_pc_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_pa_callback() { return m_out_pa_cb.bind(); }
+	auto out_pb_callback() { return m_out_pb_cb.bind(); }
+	auto out_pc_callback() { return m_out_pc_cb.bind(); }
 
 	DECLARE_WRITE8_MEMBER( address_w );
 	DECLARE_WRITE8_MEMBER( data_w );
@@ -161,43 +161,6 @@ void igs_bitswap_device::set_val_xor(uint16_t val_xor)
 	printf("igs_bitswap: INIT val_xor = %04x\n", m_val_xor);
 #endif
 }
-
-#define MCFG_IGS_BITSWAP_IN_PORTA_CB(_devcb) \
-	downcast<igs_bitswap_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
-
-#define MCFG_IGS_BITSWAP_IN_PORTB_CB(_devcb) \
-	downcast<igs_bitswap_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
-
-#define MCFG_IGS_BITSWAP_IN_PORTC_CB(_devcb) \
-	downcast<igs_bitswap_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
-
-#define MCFG_IGS_BITSWAP_OUT_PORTA_CB(_devcb) \
-	downcast<igs_bitswap_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
-
-#define MCFG_IGS_BITSWAP_OUT_PORTB_CB(_devcb) \
-	downcast<igs_bitswap_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
-
-#define MCFG_IGS_BITSWAP_OUT_PORTC_CB(_devcb) \
-	downcast<igs_bitswap_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
-
-// note: b3 seems fixed to ~15, it may go away in the future
-#define MCFG_IGS_BITSWAP_M3_0_BITS(_b0, _b1, _b2, _b3) \
-	downcast<igs_bitswap_device &>(*device).set_m3_bits(0, _b0, _b1, _b2, _b3);
-
-#define MCFG_IGS_BITSWAP_M3_1_BITS(_b0, _b1, _b2, _b3) \
-	downcast<igs_bitswap_device &>(*device).set_m3_bits(1, _b0, _b1, _b2, _b3);
-
-#define MCFG_IGS_BITSWAP_M3_2_BITS(_b0, _b1, _b2, _b3) \
-	downcast<igs_bitswap_device &>(*device).set_m3_bits(2, _b0, _b1, _b2, _b3);
-
-#define MCFG_IGS_BITSWAP_M3_3_BITS(_b0, _b1, _b2, _b3) \
-	downcast<igs_bitswap_device &>(*device).set_m3_bits(3, _b0, _b1, _b2, _b3);
-
-#define MCFG_IGS_BITSWAP_MF_BITS(_b0, _b1, _b2, _b3) \
-	downcast<igs_bitswap_device &>(*device).set_mf_bits(_b0, _b1, _b2, _b3);
-
-#define MCFG_IGS_BITSWAP_VAL_XOR(_val_xor) \
-	downcast<igs_bitswap_device &>(*device).set_val_xor(_val_xor);
 
 DEFINE_DEVICE_TYPE(IGS_BITSWAP, igs_bitswap_device, "igs_bitswap", "IGS Bitswap Protection")
 
@@ -490,8 +453,8 @@ void igs_incdec_device::device_reset()
 class igs017_state : public driver_device
 {
 public:
-	igs017_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	igs017_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_remap_addr(-1),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
@@ -577,10 +540,10 @@ private:
 	DECLARE_WRITE16_MEMBER(mgcs_magic_w);
 	DECLARE_READ16_MEMBER(mgcs_magic_r);
 
-	uint16_t mgcs_palette_bitswap(uint16_t bgr);
-	uint16_t lhzb2a_palette_bitswap(uint16_t bgr);
-	uint16_t tjsb_palette_bitswap(uint16_t bgr);
-	uint16_t slqz2_palette_bitswap(uint16_t bgr);
+	uint16_t mgcs_palette_bitswap(uint16_t bgr) const;
+	uint16_t lhzb2a_palette_bitswap(uint16_t bgr) const;
+	uint16_t tjsb_palette_bitswap(uint16_t bgr) const;
+	uint16_t slqz2_palette_bitswap(uint16_t bgr) const;
 
 	DECLARE_READ8_MEMBER(sdmg2_keys_r);
 	DECLARE_WRITE16_MEMBER(sdmg2_magic_w);
@@ -633,12 +596,12 @@ private:
 	void decrypted_opcodes_map(address_map &map);
 	void iqblocka_io(address_map &map);
 	void iqblocka_map(address_map &map);
-	void lhzb2(address_map &map);
-	void lhzb2a(address_map &map);
-	void mgcs(address_map &map);
+	void lhzb2_map(address_map &map);
+	void lhzb2a_map(address_map &map);
+	void mgcs_map(address_map &map);
 	void mgdha_map(address_map &map);
-	void sdmg2(address_map &map);
-	void slqz2(address_map &map);
+	void sdmg2_map(address_map &map);
+	void slqz2_map(address_map &map);
 	void spkrform_io(address_map &map);
 	void spkrform_map(address_map &map);
 	void tjsb_io(address_map &map);
@@ -666,26 +629,26 @@ uint32_t igs017_state::screen_update_igs017(screen_device &screen, bitmap_ind16 
 }
 
 // palette bitswap callbacks
-uint16_t igs017_state::mgcs_palette_bitswap(uint16_t bgr)
+uint16_t igs017_state::mgcs_palette_bitswap(uint16_t bgr) const
 {
 	bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
 
 	return bitswap<16>(bgr, 7, 8, 9, 2, 14, 3, 13, 15, 12, 11, 10, 0, 1, 4, 5, 6);
 }
 
-uint16_t igs017_state::lhzb2a_palette_bitswap(uint16_t bgr)
+uint16_t igs017_state::lhzb2a_palette_bitswap(uint16_t bgr) const
 {
 //  bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
 	return bitswap<16>(bgr, 15,9,13,12,11,5,4,8,7,6,0,14,3,2,1,10);
 }
 
-uint16_t igs017_state::tjsb_palette_bitswap(uint16_t bgr)
+uint16_t igs017_state::tjsb_palette_bitswap(uint16_t bgr) const
 {
 	// bitswap
 	return bitswap<16>(bgr, 15,12,3,6,10,5,4,2,9,13,8,7,11,1,0,14);
 }
 
-uint16_t igs017_state::slqz2_palette_bitswap(uint16_t bgr)
+uint16_t igs017_state::slqz2_palette_bitswap(uint16_t bgr) const
 {
 	return bitswap<16>(bgr, 15,14,9,4,11,10,12,3,7,6,5,8,13,2,1,0);
 }
@@ -1849,7 +1812,7 @@ READ8_MEMBER(igs017_state::mgcs_keys_r)
 	return 0xff;
 }
 
-void igs017_state::mgcs(address_map &map)
+void igs017_state::mgcs_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x300000, 0x303fff).ram();
@@ -1932,7 +1895,7 @@ READ16_MEMBER(igs017_state::sdmg2_magic_r)
 	return 0xffff;
 }
 
-void igs017_state::sdmg2(address_map &map)
+void igs017_state::sdmg2_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x1f0000, 0x1fffff).ram();
@@ -2239,7 +2202,7 @@ READ16_MEMBER(igs017_state::lhzb2_magic_r)
 	return 0xffff;
 }
 
-void igs017_state::lhzb2(address_map &map)
+void igs017_state::lhzb2_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x500000, 0x503fff).ram();
@@ -2334,7 +2297,7 @@ WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
 	}
 }
 
-void igs017_state::lhzb2a(address_map &map)
+void igs017_state::lhzb2a_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
@@ -2405,7 +2368,7 @@ READ16_MEMBER(igs017_state::slqz2_magic_r)
 	return 0xffff;
 }
 
-void igs017_state::slqz2(address_map &map)
+void igs017_state::slqz2_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram();
@@ -3553,11 +3516,12 @@ MACHINE_RESET_MEMBER(igs017_state,iqblocka)
 	m_input_select = 0;
 }
 
-MACHINE_CONFIG_START(igs017_state::iqblocka)
-	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(iqblocka_map)
-	MCFG_DEVICE_IO_MAP(iqblocka_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
+void igs017_state::iqblocka(machine_config &config)
+{
+	Z180(config, m_maincpu, XTAL(16'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::iqblocka_map);
+	m_maincpu->set_addrmap(AS_IO, &igs017_state::iqblocka_io);
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
 
@@ -3568,66 +3532,65 @@ MACHINE_CONFIG_START(igs017_state::iqblocka)
 	ppi.in_pc_callback().set_ioport("DSW3");
 
 	// protection
-	MCFG_DEVICE_ADD("igs_bitswap", IGS_BITSWAP, 0)
-	MCFG_IGS_BITSWAP_IN_PORTA_CB(IOPORT("PLAYER1"))
-	MCFG_IGS_BITSWAP_IN_PORTB_CB(IOPORT("PLAYER2"))
-	MCFG_IGS_BITSWAP_IN_PORTC_CB(IOPORT("COINS"))
-	MCFG_IGS_BITSWAP_OUT_PORTA_CB(WRITE8(*this, igs017_state, iqblocka_keyin_w))
-	MCFG_IGS_BITSWAP_VAL_XOR(0x15d6)
-	MCFG_IGS_BITSWAP_MF_BITS(3, 5, 9, 11)
-	MCFG_IGS_BITSWAP_M3_0_BITS(~5, 8,  ~10, ~15)
-	MCFG_IGS_BITSWAP_M3_1_BITS( 3, ~8, ~12, ~15)
-	MCFG_IGS_BITSWAP_M3_2_BITS( 2, ~6, ~11, ~15)
-	MCFG_IGS_BITSWAP_M3_3_BITS( 0, ~1,  ~3, ~15)
+	IGS_BITSWAP(config, m_igs_bitswap, 0);
+	m_igs_bitswap->in_pa_callback().set_ioport("PLAYER1");
+	m_igs_bitswap->in_pb_callback().set_ioport("PLAYER2");
+	m_igs_bitswap->in_pc_callback().set_ioport("COINS");
+	m_igs_bitswap->out_pa_callback().set(FUNC(igs017_state::iqblocka_keyin_w));
+	m_igs_bitswap->set_val_xor(0x15d6);
+	m_igs_bitswap->set_mf_bits(3, 5, 9, 11);
+	m_igs_bitswap->set_m3_bits(0, ~5,  8, ~10, ~15);
+	m_igs_bitswap->set_m3_bits(1,  3, ~8, ~12, ~15);
+	m_igs_bitswap->set_m3_bits(2,  2, ~6, ~11, ~15);
+	m_igs_bitswap->set_m3_bits(3,  0, ~1, ~3,  ~15);
 
-	MCFG_DEVICE_ADD("igs_incdec", IGS_INCDEC, 0)
+	IGS_INCDEC(config, m_igs_incdec, 0);
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(igs017_state::screen_update_igs017));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100*2);
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette("palette");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
-MACHINE_CONFIG_START(igs017_state::iqblockf)
+void igs017_state::iqblockf(machine_config &config)
+{
 	iqblocka(config);
-	MCFG_DEVICE_MODIFY("igs_bitswap") // tweaked protection bitswap
-	MCFG_IGS_BITSWAP_OUT_PORTB_CB(WRITE8(*this, igs017_state, iqblockf_keyout_w))
-	MCFG_IGS_BITSWAP_MF_BITS(0, 5, 9, 13)
-MACHINE_CONFIG_END
+	// tweaked protection bitswap
+	m_igs_bitswap->out_pb_callback().set(FUNC(igs017_state::iqblockf_keyout_w));
+	m_igs_bitswap->set_mf_bits(0, 5, 9, 13);
+}
 
-MACHINE_CONFIG_START(igs017_state::genius6)
+void igs017_state::genius6(machine_config &config)
+{
 	iqblockf(config);
-	MCFG_DEVICE_MODIFY("igs_bitswap") // tweaked protection bitswap
-	MCFG_IGS_BITSWAP_MF_BITS(2, 7, 9, 13)
-	MCFG_IGS_BITSWAP_M3_0_BITS(~5,  6,  ~7, ~15)
-	MCFG_IGS_BITSWAP_M3_1_BITS( 1, ~6,  ~9, ~15)
-	MCFG_IGS_BITSWAP_M3_2_BITS( 4, ~8, ~12, ~15)
-	MCFG_IGS_BITSWAP_M3_3_BITS( 3, ~5,  ~6, ~15)
-MACHINE_CONFIG_END
+	// tweaked protection bitswap
+	m_igs_bitswap->set_mf_bits(2, 7, 9, 13);
+	m_igs_bitswap->set_m3_bits(0, ~5,  6,  ~7, ~15);
+	m_igs_bitswap->set_m3_bits(1,  1, ~6,  ~9, ~15);
+	m_igs_bitswap->set_m3_bits(2,  4, ~8, ~12, ~15);
+	m_igs_bitswap->set_m3_bits(3,  3, ~5,  ~6, ~15);
+}
 
-MACHINE_CONFIG_START(igs017_state::starzan)
+void igs017_state::starzan(machine_config &config)
+{
 	iqblocka(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_OPCODES, &igs017_state::decrypted_opcodes_map);
+}
 
 
 // mgcs
@@ -3651,10 +3614,11 @@ MACHINE_RESET_MEMBER(igs017_state,mgcs)
 	memset(m_igs_magic, 0, sizeof(m_igs_magic));
 }
 
-MACHINE_CONFIG_START(igs017_state::mgcs)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(mgcs)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
+void igs017_state::mgcs(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(22'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::mgcs_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgcs_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
@@ -3663,37 +3627,36 @@ MACHINE_CONFIG_START(igs017_state::mgcs)
 	ppi.in_pa_callback().set_ioport("COINS");
 	ppi.in_pb_callback().set(FUNC(igs017_state::mgcs_keys_r));
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
+	TICKET_DISPENSER(config, m_hopperdev, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW );
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(igs017_state::screen_update_igs017));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100*2);
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_PALETTE_SCRAMBLE_CB( igs017_state, mgcs_palette_bitswap )
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::mgcs_palette_bitswap), this);
+	m_igs017_igs031->set_palette("palette");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'000'000) / 8, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(8'000'000) / 8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 
 // lhzb2
 
-MACHINE_CONFIG_START(igs017_state::lhzb2)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(lhzb2)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
+void igs017_state::lhzb2(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(22'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::lhzb2_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgcs_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
@@ -3704,32 +3667,30 @@ MACHINE_CONFIG_START(igs017_state::lhzb2)
 	ppi.in_pc_callback().set_ioport("DSW2");
 
 	// protection
-	MCFG_DEVICE_ADD("igs025", IGS025, 0)
-	MCFG_IGS025_SET_EXTERNAL_EXECUTE( igs017_state, igs025_to_igs022_callback )
+	IGS025(config, m_igs025, 0);
+	m_igs025->set_external_cb(FUNC(igs017_state::igs025_to_igs022_callback), this);
 
-	MCFG_DEVICE_ADD("igs022", IGS022, 0)
+	IGS022(config, m_igs022, 0);
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(igs017_state::screen_update_igs017));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100*2);
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_PALETTE_SCRAMBLE_CB( igs017_state, lhzb2a_palette_bitswap )
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap), this);
+	m_igs017_igs031->set_palette("palette");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'000'000) / 8, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(8'000'000) / 8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 
 // lhzb2a
@@ -3740,56 +3701,56 @@ MACHINE_RESET_MEMBER(igs017_state,lhzb2a)
 	lhzb2a_remap_addr_w(m_maincpu->space(AS_PROGRAM), 0, 0xf0);
 }
 
-MACHINE_CONFIG_START(igs017_state::lhzb2a)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(lhzb2a)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
+void igs017_state::lhzb2a(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(22'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::lhzb2a_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgcs_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,lhzb2a)
 
 	// i/o
-//  MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+//  I8255A(config, "ppi8255", 0);
 
 	// protection
-	MCFG_DEVICE_ADD("igs_bitswap", IGS_BITSWAP, 0)
-	MCFG_IGS_BITSWAP_VAL_XOR(0x289a)
-	MCFG_IGS_BITSWAP_MF_BITS(4, 7,  10, 13)
-	MCFG_IGS_BITSWAP_M3_0_BITS(~3,   8, ~12, ~15)
-	MCFG_IGS_BITSWAP_M3_1_BITS(~3,  ~6,  ~9, ~15)
-	MCFG_IGS_BITSWAP_M3_2_BITS(~3,   4,  ~5, ~15)
-	MCFG_IGS_BITSWAP_M3_3_BITS(~9, ~11,  12, ~15)
+	IGS_BITSWAP(config, m_igs_bitswap, 0);
+	m_igs_bitswap->set_val_xor(0x289a);
+	m_igs_bitswap->set_mf_bits(4, 7,  10, 13);
+	m_igs_bitswap->set_m3_bits(0, ~3,   8, ~12, ~15);
+	m_igs_bitswap->set_m3_bits(1, ~3,  ~6,  ~9, ~15);
+	m_igs_bitswap->set_m3_bits(2, ~3,   4,  ~5, ~15);
+	m_igs_bitswap->set_m3_bits(3, ~9, ~11,  12, ~15);
 
-	MCFG_DEVICE_ADD("igs_incdec", IGS_INCDEC, 0)
+	IGS_INCDEC(config, m_igs_incdec, 0);
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)    // VSync 60Hz, HSync 15.3kHz
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);    // VSync 60Hz, HSync 15.3kHz
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
+	m_screen->set_screen_update(FUNC(igs017_state::screen_update_igs017));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100*2);
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_PALETTE_SCRAMBLE_CB( igs017_state, lhzb2a_palette_bitswap )
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap), this);
+	m_igs017_igs031->set_palette("palette");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(22'000'000) / 22, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(22'000'000) / 22, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 
 // slqz2
 
-MACHINE_CONFIG_START(igs017_state::slqz2)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(slqz2)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
+void igs017_state::slqz2(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(22'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::slqz2_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgcs_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
@@ -3800,40 +3761,39 @@ MACHINE_CONFIG_START(igs017_state::slqz2)
 	ppi.in_pc_callback().set_ioport("DSW2");
 
 	// protection
-	MCFG_DEVICE_ADD("igs025", IGS025, 0)
-	MCFG_IGS025_SET_EXTERNAL_EXECUTE( igs017_state, igs025_to_igs022_callback )
+	IGS025(config, m_igs025, 0);
+	m_igs025->set_external_cb(FUNC(igs017_state::igs025_to_igs022_callback), this);
 
-	MCFG_DEVICE_ADD("igs022", IGS022, 0)
+	IGS022(config, m_igs022, 0);
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(igs017_state::screen_update_igs017));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100*2);
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_PALETTE_SCRAMBLE_CB( igs017_state, slqz2_palette_bitswap )
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::slqz2_palette_bitswap), this);
+	m_igs017_igs031->set_palette("palette");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'000'000) / 8, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(8'000'000) / 8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 
 // sdmg2
 
-MACHINE_CONFIG_START(igs017_state::sdmg2)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(sdmg2)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
+void igs017_state::sdmg2(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(22'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::sdmg2_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgcs_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
@@ -3843,25 +3803,23 @@ MACHINE_CONFIG_START(igs017_state::sdmg2)
 	ppi.in_pb_callback().set_ioport("DSW2");
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)    // VSync 60Hz, HSync 15.3kHz
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);    // VSync 60Hz, HSync 15.3kHz
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
+	m_screen->set_screen_update(FUNC(igs017_state::screen_update_igs017));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100*2);
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette("palette");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(22'000'000) / 22, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(22'000'000) / 22, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 
 // mgdh
@@ -3877,10 +3835,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgdh_interrupt)
 		m_maincpu->set_input_line(3, HOLD_LINE); // lev 3 instead of 2
 }
 
-MACHINE_CONFIG_START(igs017_state::mgdha)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(mgdha_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgdh_interrupt, "screen", 0, 1)
+void igs017_state::mgdha(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(22'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::mgdha_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgdh_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
@@ -3889,34 +3848,33 @@ MACHINE_CONFIG_START(igs017_state::mgdha)
 	ppi.in_pa_callback().set_ioport("DSW1");
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
+	m_screen->set_screen_update(FUNC(igs017_state::screen_update_igs017));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100*2);
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette("palette");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(22'000'000) / 22, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(22'000'000) / 22, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 
 // tjsb
 
-MACHINE_CONFIG_START(igs017_state::tjsb)
-	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(tjsb_map)
-	MCFG_DEVICE_IO_MAP(tjsb_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
+void igs017_state::tjsb(machine_config &config)
+{
+	Z180(config, m_maincpu, XTAL(16'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::tjsb_map);
+	m_maincpu->set_addrmap(AS_IO, &igs017_state::tjsb_io);
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
 
@@ -3927,38 +3885,36 @@ MACHINE_CONFIG_START(igs017_state::tjsb)
 	ppi.in_pc_callback().set_ioport("DSW3");
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(igs017_state::screen_update_igs017));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100*2);
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_PALETTE_SCRAMBLE_CB( igs017_state, tjsb_palette_bitswap )
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::tjsb_palette_bitswap), this);
+	m_igs017_igs031->set_palette("palette");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 
 // spkrform
 
-MACHINE_CONFIG_START(igs017_state::spkrform)
-	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(spkrform_map)
-	MCFG_DEVICE_IO_MAP(spkrform_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
+void igs017_state::spkrform(machine_config &config)
+{
+	Z180(config, m_maincpu, XTAL(16'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::spkrform_map);
+	m_maincpu->set_addrmap(AS_IO, &igs017_state::spkrform_io);
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
 
@@ -3969,28 +3925,25 @@ MACHINE_CONFIG_START(igs017_state::spkrform)
 	ppi.in_pc_callback().set_ioport("DSW3");
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(igs017_state::screen_update_igs017));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x100*2);
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette("palette");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 
 /***************************************************************************

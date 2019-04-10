@@ -8,15 +8,12 @@
 
 DECLARE_DEVICE_TYPE(NEOBOOT_PROT, neoboot_prot_device)
 
-#define MCFG_NEOBOOT_PROT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, NEOBOOT_PROT, 0)
-
 
 class neoboot_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	neoboot_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	neoboot_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void cx_decrypt(uint8_t* sprrom, uint32_t sprrom_size);
 	void sx_decrypt(uint8_t* fixed, uint32_t fixed_size, int value);

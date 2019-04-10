@@ -84,11 +84,12 @@ void systec_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(systec_state::systec)
+void systec_state::systec(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(systec_mem)
-	MCFG_DEVICE_IO_MAP(systec_io)
+	Z80(config, m_maincpu, XTAL(16'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &systec_state::systec_mem);
+	m_maincpu->set_addrmap(AS_IO, &systec_state::systec_io);
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
 	uart_clock.signal_handler().set("sio", FUNC(z80sio_device::txca_w));
@@ -101,10 +102,10 @@ MACHINE_CONFIG_START(systec_state::systec)
 	sio.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	sio.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsa_w))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxa_w));
+	rs232.cts_handler().set("sio", FUNC(z80sio_device::ctsa_w));
+}
 
 
 /* ROM definition */

@@ -254,37 +254,32 @@ void dday_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(dday_state::dday)
-
+void dday_state::dday(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 2000000)     /* 2 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(dday_map)
+	Z80(config, m_maincpu, 2000000);     /* 2 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dday_state::dday_map);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dday_state, screen_update_dday)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(dday_state::screen_update_dday));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dday)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256) /* HACK!!! */
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_INIT_OWNER(dday_state, dday)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dday);
+	PALETTE(config, m_palette, FUNC(dday_state::dday_palette), 256).enable_shadows();
+	m_palette->set_indirect_entries(256); // HACK!!!
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_DEVICE_ADD("ay2", AY8910, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	AY8910(config, m_ay1, 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, "ay2", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 

@@ -1259,7 +1259,7 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 		switch (info.trktype)
 		{
 			case CD_TRACK_MODE1:
-				mode = 0;
+				mode = 4;
 				size = 2048;
 				break;
 

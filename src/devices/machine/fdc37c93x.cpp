@@ -243,7 +243,7 @@ FLOPPY_FORMATS_END
 void fdc37c93x_device::device_add_mconfig(machine_config &config)
 {
 	// floppy disc controller
-	smc37c78_device &fdcdev(SMC37C78(config, floppy_controller_fdcdev));
+	smc37c78_device &fdcdev(SMC37C78(config, floppy_controller_fdcdev, 24'000'000));
 	fdcdev.intrq_wr_callback().set(FUNC(fdc37c93x_device::irq_floppy_w));
 	fdcdev.drq_wr_callback().set(FUNC(fdc37c93x_device::drq_floppy_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", fdc37c93x_device::floppy_formats);
@@ -581,12 +581,12 @@ void fdc37c93x_device::map_serial1(address_map &map)
 
 READ8_MEMBER(fdc37c93x_device::serial1_read)
 {
-	return pc_serial1_comdev->ins8250_r(space, offset, mem_mask);
+	return pc_serial1_comdev->ins8250_r(offset);
 }
 
 WRITE8_MEMBER(fdc37c93x_device::serial1_write)
 {
-	pc_serial1_comdev->ins8250_w(space, offset, data, mem_mask);
+	pc_serial1_comdev->ins8250_w(offset, data);
 }
 
 void fdc37c93x_device::map_serial1_addresses()
@@ -610,12 +610,12 @@ void fdc37c93x_device::map_serial2(address_map &map)
 
 READ8_MEMBER(fdc37c93x_device::serial2_read)
 {
-	return pc_serial2_comdev->ins8250_r(space, offset, mem_mask);
+	return pc_serial2_comdev->ins8250_r(offset);
 }
 
 WRITE8_MEMBER(fdc37c93x_device::serial2_write)
 {
-	pc_serial2_comdev->ins8250_w(space, offset, data, mem_mask);
+	pc_serial2_comdev->ins8250_w(offset, data);
 }
 
 void fdc37c93x_device::map_serial2_addresses()
@@ -639,12 +639,12 @@ void fdc37c93x_device::map_rtc(address_map &map)
 
 READ8_MEMBER(fdc37c93x_device::rtc_read)
 {
-	return ds12885_rtcdev->read(space, offset, mem_mask);
+	return ds12885_rtcdev->read(offset);
 }
 
 WRITE8_MEMBER(fdc37c93x_device::rtc_write)
 {
-	ds12885_rtcdev->write(space, offset, data, mem_mask);
+	ds12885_rtcdev->write(offset, data);
 }
 
 void fdc37c93x_device::map_rtc_addresses()

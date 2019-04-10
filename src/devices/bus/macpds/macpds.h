@@ -14,22 +14,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MACPDS_SLOT_REMOVE(_tag)    \
-	MCFG_DEVICE_REMOVE(_tag)
-
-#define MCFG_MACPDS_ONBOARD_ADD(_nbtag, _tag, _dev_type, _def_inp) \
-	MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
-	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
-	downcast<device_macpds_card_interface &>(*device).set_macpds_tag(_nbtag, _tag);
-
-#define MCFG_MACPDS_BUS_REMOVE(_tag) \
-	MCFG_DEVICE_REMOVE(_tag)
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************

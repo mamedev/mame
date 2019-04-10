@@ -40,7 +40,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(sprint8);
+	void sprint8_palette(palette_device &palette) const;
 
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
@@ -59,7 +59,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<discrete_device> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_shared_ptr<uint8_t> m_pos_h_ram;

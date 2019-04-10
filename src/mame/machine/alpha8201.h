@@ -9,6 +9,7 @@
 #ifndef MAME_MACHINE_ALPHA8201_H
 #define MAME_MACHINE_ALPHA8201_H
 
+#include "cpu/hmcs40/hmcs40.h"
 
 class alpha_8201_device : public device_t
 {
@@ -29,7 +30,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 private:
 	// devices/pointers
-	required_device<cpu_device> m_mcu;
+	required_device<hmcs40_cpu_device> m_mcu;
 
 	// internal state
 	int m_bus;                  // shared RAM bus direction

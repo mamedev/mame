@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_INCLUDES_WWFSSTAR_H
+#define MAME_INCLUDES_WWFSSTAR_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -9,8 +13,8 @@
 class wwfsstar_state : public driver_device
 {
 public:
-	wwfsstar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	wwfsstar_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -19,11 +23,15 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_spriteram(*this, "spriteram"),
 		m_fg0_videoram(*this, "fg0_videoram"),
-		m_bg0_videoram(*this, "bg0_videoram") { }
+		m_bg0_videoram(*this, "bg0_videoram")
+	{ }
 
 	void wwfsstar(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(vblank_r);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -55,11 +63,11 @@ private:
 	TILEMAP_MAPPER_MEMBER(bg0_scan);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 
-	virtual void video_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_WWFSSTAR_H

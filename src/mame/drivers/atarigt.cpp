@@ -65,7 +65,7 @@
 
 /*************************************
  *
- *  Initialization
+ *  Interrupt handling
  *
  *************************************/
 
@@ -75,6 +75,18 @@ void atarigt_state::update_interrupts()
 	m_maincpu->set_input_line(6, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
+
+INTERRUPT_GEN_MEMBER(atarigt_state::scanline_int_gen)
+{
+	scanline_int_write_line(1);
+}
+
+
+/*************************************
+ *
+ *  Initialization
+ *
+ *************************************/
 
 MACHINE_RESET_MEMBER(atarigt_state,atarigt)
 {
@@ -173,9 +185,9 @@ READ8_MEMBER(atarigt_state::analog_port_r)
 		return 0xff;
 	}
 #else
-	uint8_t result = m_adc->data_r(space, 0);
+	uint8_t result = m_adc->data_r();
 	if (!machine().side_effects_disabled())
-		m_adc->address_offset_start_w(space, offset, 0);
+		m_adc->address_offset_start_w(offset, 0);
 	return result;
 #endif
 }
@@ -794,36 +806,41 @@ static const atari_rle_objects_config modesc =
 MACHINE_CONFIG_START(atarigt_state::atarigt)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, ATARI_CLOCK_50MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(atarigt_state, scanline_int_gen, 250)
+	M68EC020(config, m_maincpu, ATARI_CLOCK_50MHz/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarigt_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(atarigt_state::scanline_int_gen), attotime::from_hz(250));
 
 	MCFG_MACHINE_RESET_OVERRIDE(atarigt_state,atarigt)
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarigt)
-	MCFG_PALETTE_ADD("palette", MRAM_ENTRIES)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_atarigt);
+	PALETTE(config, m_palette).set_entries(MRAM_ENTRIES);
 
 	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarigt_state, get_playfield_tile_info, 8,8, atarigt_playfield_scan, 128,64)
-	MCFG_TILEMAP_ADD_STANDARD("alpha", "gfxdecode", 2, atarigt_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64, 32)
+	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64, 32).set_info_callback(FUNC(atarigt_state::get_alpha_tile_info));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a pair of GALs to determine H and V parameters */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(atarigt_state, screen_update_atarigt)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarigt_state, video_int_write_line))
+	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(atarigt_state::screen_update_atarigt));
+	m_screen->screen_vblank().set(FUNC(atarigt_state::video_int_write_line));
 
 	MCFG_VIDEO_START_OVERRIDE(atarigt_state,atarigt)
 
-	MCFG_ATARIRLE_ADD("rle", modesc)
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc);
+
+	/* sound hardware */
+	ATARI_CAGE(config, m_cage, 0);
+	m_cage->irq_handler().set(FUNC(atarigt_state::cage_irq_callback));
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(atarigt_state::tmek)
+void atarigt_state::tmek(machine_config &config)
+{
 	atarigt(config);
 
 	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16); // should be 447 kHz according to schematics, but that fails the self-test
@@ -832,29 +849,22 @@ MACHINE_CONFIG_START(atarigt_state::tmek)
 	m_adc->in_callback<6>().set_ioport("AN2");
 	m_adc->in_callback<7>().set_ioport("AN3");
 
-	/* sound hardware */
-	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
-	MCFG_ATARI_CAGE_SPEEDUP(0x4fad)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(*this, atarigt_state,cage_irq_callback))
-MACHINE_CONFIG_END
+	m_cage->set_speedup(0x4fad);
+}
 
-MACHINE_CONFIG_START(atarigt_state::primrage)
+void atarigt_state::primrage(machine_config &config)
+{
 	atarigt(config);
 
-	/* sound hardware */
-	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
-	MCFG_ATARI_CAGE_SPEEDUP(0x42f2)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(*this, atarigt_state,cage_irq_callback))
-MACHINE_CONFIG_END
+	m_cage->set_speedup(0x42f2);
+}
 
-MACHINE_CONFIG_START(atarigt_state::primrage20)
+void atarigt_state::primrage20(machine_config &config)
+{
 	atarigt(config);
 
-	/* sound hardware */
-	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
-	MCFG_ATARI_CAGE_SPEEDUP(0x48a4)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(*this, atarigt_state,cage_irq_callback))
-MACHINE_CONFIG_END
+	m_cage->set_speedup(0x48a4);
+}
 
 /*************************************
  *

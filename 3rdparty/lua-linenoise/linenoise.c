@@ -175,12 +175,26 @@ static int l_refresh(lua_State *L)
     return handle_ln_ok(L);
 }
 
+static int l_historyget(lua_State *L)
+{
+    int len, i;
+    char **history = linenoiseHistory(&len);
+    lua_newtable(L);
+    for(i = 0; i < len; i++)
+    {
+        lua_pushstring(L, history[i]);
+        lua_rawseti(L, -2, i + 1);
+    }
+    return 1;
+}
+
 luaL_Reg linenoise_funcs[] = {
     { "linenoise", l_linenoise },
     { "historyadd", l_historyadd },
     { "historysetmaxlen", l_historysetmaxlen },
     { "historysave", l_historysave },
     { "historyload", l_historyload },
+    { "historyget", l_historyget },
     { "clearscreen", l_clearscreen },
     { "setcompletion", l_setcompletion},
     { "addcompletion", l_addcompletion },

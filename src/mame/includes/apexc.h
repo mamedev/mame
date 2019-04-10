@@ -40,8 +40,7 @@ protected:
 	void check_inputs();
 
 private:
-
-	DECLARE_PALETTE_INIT(apexc);
+	void apexc_palette(palette_device &palette) const;
 	uint32_t screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(apexc_interrupt);
 	DECLARE_WRITE8_MEMBER(tape_write);

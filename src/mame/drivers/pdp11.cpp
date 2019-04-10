@@ -108,7 +108,7 @@ public:
 	void pdp11qb(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<t11_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ16_MEMBER( teletype_ctrl_r );
 	DECLARE_WRITE16_MEMBER( teletype_ctrl_w );
@@ -156,7 +156,7 @@ WRITE16_MEMBER(pdp11_state::teletype_ctrl_w)
 	switch(offset)
 	{
 		case 3:
-			m_terminal->write(space, 0, data);
+			m_terminal->write(data);
 			break;
 	}
 }
@@ -353,33 +353,34 @@ void pdp11_state::kbd_put(u8 data)
 	m_teletype_status |= 0x80;
 }
 
-MACHINE_CONFIG_START(pdp11_state::pdp11)
+void pdp11_state::pdp11(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",T11, XTAL(4'000'000)) // Need proper CPU here
-	MCFG_T11_INITIAL_MODE(6 << 13)
-	MCFG_DEVICE_PROGRAM_MAP(pdp11_mem)
-
+	T11(config, m_maincpu, XTAL(4'000'000)); // Need proper CPU here
+	m_maincpu->set_initial_mode(6 << 13);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pdp11_state::pdp11_mem);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(pdp11_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(pdp11_state::kbd_put));
 
-	MCFG_RX01_ADD("rx01")
-MACHINE_CONFIG_END
+	RX01(config, "rx01", 0);
+}
 
-MACHINE_CONFIG_START(pdp11_state::pdp11ub2)
+void pdp11_state::pdp11ub2(machine_config &config)
+{
 	pdp11(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pdp11_state,pdp11ub2)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pdp11_state::pdp11qb)
+void pdp11_state::pdp11qb(machine_config &config)
+{
 	pdp11(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pdp11_state,pdp11qb)
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_T11_INITIAL_MODE(0 << 13)
-	MCFG_DEVICE_PROGRAM_MAP(pdp11qb_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_initial_mode(0 << 13);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pdp11_state::pdp11qb_mem);
+}
 
 /* ROM definition */
 ROM_START( pdp11ub )

@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "machine/pc_fdc.h"
+#include "imagedev/floppy.h"
 
 //#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
 
@@ -74,7 +75,7 @@ void pc_fdc_family_device::dma_w(uint8_t data)
 
 void pc_fdc_family_device::device_add_mconfig(machine_config &config)
 {
-	UPD765A(config, fdc, false, false);
+	UPD765A(config, fdc, 8'000'000, false, false);
 	fdc->intrq_wr_callback().set(FUNC(pc_fdc_family_device::irq_w));
 	fdc->drq_wr_callback().set(FUNC(pc_fdc_family_device::drq_w));
 }
@@ -156,7 +157,7 @@ uint8_t pc_fdc_family_device::do_dir_r()
 
 WRITE8_MEMBER( pc_fdc_xt_device::dor_fifo_w)
 {
-	fdc->fifo_w(space, 0, data, mem_mask);
+	fdc->fifo_w(data);
 	dor_w(space, 0, data, mem_mask);
 }
 

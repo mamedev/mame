@@ -155,10 +155,10 @@ protected:
 	virtual void driver_start() override;
 
 	required_device<ram_device> m_ram;
+	required_device<cpu_device> m_maincpu;
 
 private:
 	/* devices */
-	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pic8259_device> m_pic_master;
 	required_device<pic8259_device> m_pic_slave;

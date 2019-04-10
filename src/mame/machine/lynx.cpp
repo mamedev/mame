@@ -1020,7 +1020,7 @@ READ8_MEMBER(lynx_state::suzy_read)
 			break;
 		case RCART:
 			if (m_cart->exists())
-				value = m_cart->read_rom(space, (m_suzy.high * m_granularity) + m_suzy.low);
+				value = m_cart->read_rom((m_suzy.high * m_granularity) + m_suzy.low);
 			else
 				value = 0;
 			m_suzy.low = (m_suzy.low + 1) & (m_granularity - 1);

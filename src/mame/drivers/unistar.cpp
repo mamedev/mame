@@ -31,17 +31,20 @@ public:
 	{ }
 
 	void unistar(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
 private:
 	u8 dma_mem_r(offs_t offset);
 	void dma_mem_w(offs_t offset, u8 data);
 
-	DECLARE_PALETTE_INIT(unistar);
+	void unistar_palette(palette_device &palette) const;
 	I8275_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void unistar_io(address_map &map);
 	void unistar_mem(address_map &map);
 
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 };
@@ -66,8 +69,7 @@ void unistar_state::unistar_mem(address_map &map)
 
 void unistar_state::unistar_io(address_map &map)
 {
-	//ADDRESS_MAP_UNMAP_HIGH
-	map.global_mask(0xff);
+	//map.unmap_value_high();
 	map(0x00, 0x0f).rw("dmac", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x84, 0x84).portr("CONFIG");
 	map(0x8c, 0x8d).rw("stc", FUNC(am9513_device::read8), FUNC(am9513_device::write8));
@@ -91,11 +93,11 @@ void unistar_state::machine_reset()
 {
 }
 
-PALETTE_INIT_MEMBER( unistar_state, unistar )
+void unistar_state::unistar_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, 0, 0, 0 ); /* Black */
-	palette.set_pen_color(1, 0, 255, 0 );   /* Full */
-	palette.set_pen_color(2, 0, 128, 0 );   /* Dimmed */
+	palette.set_pen_color(0, 0,   0, 0); // Black
+	palette.set_pen_color(1, 0, 255, 0); // Full
+	palette.set_pen_color(2, 0, 128, 0); // Dimmed
 }
 
 I8275_DRAW_CHARACTER_MEMBER(unistar_state::draw_character)
@@ -157,7 +159,7 @@ void unistar_state::unistar(machine_config &config)
 	crtc.irq_wr_callback().set("rst75", FUNC(input_merger_device::in_w<0>));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_unistar);
-	PALETTE(config, "palette", 3).set_init(FUNC(unistar_state::palette_init_unistar));
+	PALETTE(config, "palette", FUNC(unistar_state::unistar_palette), 3);
 }
 
 /* ROM definition */

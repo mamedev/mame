@@ -38,10 +38,10 @@ private:
 	I8275_DRAW_CHARACTER_MEMBER(draw_character);
 
 	DECLARE_WRITE8_MEMBER(crtc_w);
-	DECLARE_READ8_MEMBER(pci_r);
-	DECLARE_WRITE8_MEMBER(pci_w);
+	uint8_t pci_r(offs_t offset);
+	void pci_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(rxrdy_w);
-	DECLARE_WRITE8_MEMBER(p2_w);
+	void p2_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(t1_r);
 
 	void prg_map(address_map &map);
@@ -75,14 +75,14 @@ WRITE8_MEMBER(wy100_state::crtc_w)
 	m_crtc[1]->write(space, offset >> 8, data);
 }
 
-READ8_MEMBER(wy100_state::pci_r)
+uint8_t wy100_state::pci_r(offs_t offset)
 {
-	return m_pci->read(space, offset >> 8);
+	return m_pci->read(offset >> 8);
 }
 
-WRITE8_MEMBER(wy100_state::pci_w)
+void wy100_state::pci_w(offs_t offset, uint8_t data)
 {
-	m_pci->write(space, offset >> 8, data);
+	m_pci->write(offset >> 8, data);
 }
 
 WRITE_LINE_MEMBER(wy100_state::rxrdy_w)
@@ -90,7 +90,7 @@ WRITE_LINE_MEMBER(wy100_state::rxrdy_w)
 	m_rxrdy = state;
 }
 
-WRITE8_MEMBER(wy100_state::p2_w)
+void wy100_state::p2_w(uint8_t data)
 {
 	m_bankdev->set_bank(data & 0x7f);
 }

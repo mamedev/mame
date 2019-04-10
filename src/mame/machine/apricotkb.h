@@ -21,16 +21,6 @@
 #define APRICOT_KEYBOARD_TAG    "aprikb"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_APRICOT_KEYBOARD_TXD_CALLBACK(_write) \
-	downcast<apricot_keyboard_device &>(*device).set_tcd_wr_callback(DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -43,7 +33,7 @@ public:
 	// construction/destruction
 	apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_txd_wr_callback(Object &&cb) { return m_write_txd.set_callback(std::forward<Object>(cb)); }
+	auto txd_wr_callback() { return m_write_txd.bind(); }
 
 	uint8_t read_keyboard();
 

@@ -7,19 +7,8 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_K051649_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, K051649, _clock)
-#define MCFG_K051649_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, K051649, _clock)
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
 
 // ======================> k051649_device
 
@@ -29,16 +18,16 @@ class k051649_device : public device_t,
 public:
 	k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( k051649_waveform_w );
-	DECLARE_READ8_MEMBER ( k051649_waveform_r );
-	DECLARE_WRITE8_MEMBER( k051649_volume_w );
-	DECLARE_WRITE8_MEMBER( k051649_frequency_w );
-	DECLARE_WRITE8_MEMBER( k051649_keyonoff_w );
-	DECLARE_WRITE8_MEMBER( k051649_test_w );
-	DECLARE_READ8_MEMBER ( k051649_test_r );
+	void    k051649_waveform_w(offs_t offset, uint8_t data);
+	uint8_t k051649_waveform_r(offs_t offset);
+	void    k051649_volume_w(offs_t offset, uint8_t data);
+	void    k051649_frequency_w(offs_t offset, uint8_t data);
+	void    k051649_keyonoff_w(uint8_t data);
+	void    k051649_test_w(uint8_t data);
+	uint8_t k051649_test_r();
 
-	DECLARE_WRITE8_MEMBER( k052539_waveform_w );
-	DECLARE_READ8_MEMBER ( k052539_waveform_r );
+	void    k052539_waveform_w(offs_t offset, uint8_t data);
+	uint8_t k052539_waveform_r(offs_t offset);
 
 	void scc_map(address_map &map);
 protected:

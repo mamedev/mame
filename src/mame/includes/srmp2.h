@@ -1,20 +1,25 @@
 // license:BSD-3-Clause
 // copyright-holders:Yochizo, Takahiro Nogi
+#ifndef MAME_INCLUDES_SRMP2_H
+#define MAME_INCLUDES_SRMP2_H
+
+#pragma once
+
 #include "sound/msm5205.h"
 #include "video/seta001.h"
 #include "emupal.h"
 
-struct iox_t
-{
-	int reset,ff_event,ff_1,protcheck[4],protlatch[4];
-	uint8_t data;
-	uint8_t mux;
-	uint8_t ff;
-};
-
 class srmp2_state : public driver_device
 {
 public:
+	struct iox_t
+	{
+		int reset,ff_event,ff_1,protcheck[4],protlatch[4];
+		uint8_t data;
+		uint8_t mux;
+		uint8_t ff;
+	};
+
 	srmp2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -74,9 +79,9 @@ private:
 
 	virtual void machine_start() override;
 	DECLARE_MACHINE_START(srmp2);
-	DECLARE_PALETTE_INIT(srmp2);
+	void srmp2_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(srmp3);
-	DECLARE_PALETTE_INIT(srmp3);
+	void srmp3_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(rmgoldyh);
 	DECLARE_MACHINE_START(mjyuugi);
 
@@ -94,3 +99,5 @@ private:
 	void srmp3_io_map(address_map &map);
 	void srmp3_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SRMP2_H

@@ -3,7 +3,7 @@
 /****************************************************************************
 
     drivers/4dpi.cpp
-    SGI 4D/PI IP6 family skeleton driver
+    SGI Personal IRIS family skeleton driver
 
     by Ryan Holtz
 
@@ -13,10 +13,16 @@
         R2000:
             NYI
 
+    Year  Model  Board  CPU    Clock    I/D Cache
+    1988  4D/20  IP6    R2000  12.5MHz  16KiB/8KiB
+          4D/25  IP10   R3000  20MHz    64KiB/32KiB
+          4D/30  IP14   R3000  30MHz
+    1991  4D/35  IP12   R3000  36MHz
+
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include "screen.h"
 
 
@@ -52,7 +58,7 @@ private:
 	uint32_t screen_update_sgi_ip6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sgi_ip6_vbl);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
-	required_device<cpu_device> m_maincpu;
+	required_device<r2000_device> m_maincpu;
 	void sgi_ip6_map(address_map &map);
 };
 
@@ -233,23 +239,21 @@ void sgi_ip6_state::sgi_ip6_map(address_map &map)
     MACHINE DRIVERS
 ***************************************************************************/
 
-MACHINE_CONFIG_START(sgi_ip6_state::sgi_ip6)
-	MCFG_DEVICE_ADD( "maincpu", R3041, 20000000 ) // FIXME: Should be R2000
-	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_DEVICE_PROGRAM_MAP( sgi_ip6_map )
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sgi_ip6_state,  sgi_ip6_vbl)
-
+void sgi_ip6_state::sgi_ip6(machine_config &config)
+{
+	R2000(config, m_maincpu, 25_MHz_XTAL / 2, 16384, 8192);
+	m_maincpu->set_endianness(ENDIANNESS_BIG);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sgi_ip6_state::sgi_ip6_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sgi_ip6_state::sgi_ip6_vbl));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sgi_ip6_state, screen_update_sgi_ip6)
-
-
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(sgi_ip6_state::screen_update_sgi_ip6));
+}
 
 static INPUT_PORTS_START( sgi_ip6 )
 	PORT_START("UNUSED") // unused IN0
@@ -271,5 +275,5 @@ ROM_START( sgi_ip6 )
 	ROM_LOAD( "4d202031.bin", 0x000000, 0x040000, CRC(065a290a) SHA1(6f5738e79643f94901e6efe3612468d14177f65b) )
 ROM_END
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY                 FULLNAME                FLAGS
-COMP( 1988, sgi_ip6, 0,      0,      sgi_ip6, sgi_ip6, sgi_ip6_state, init_sgi_ip6, "Silicon Graphics Inc", "4D/PI (R2000, 20MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY                 FULLNAME FLAGS
+COMP( 1988, sgi_ip6, 0,      0,      sgi_ip6, sgi_ip6, sgi_ip6_state, init_sgi_ip6, "Silicon Graphics Inc", "4D/20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

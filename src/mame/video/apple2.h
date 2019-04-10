@@ -15,14 +15,11 @@
 #define BORDER_RIGHT    (32)
 #define BORDER_TOP  (16)    // (plus bottom)
 
-class a2_video_device :
-	public device_t
+class a2_video_device : public device_t, public device_palette_interface
 {
 public:
 	// construction/destruction
 	a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	DECLARE_PALETTE_INIT(apple2);
 
 	bool m_page2;
 	bool m_flash;
@@ -63,6 +60,9 @@ public:
 protected:
 	virtual void device_reset() override;
 	virtual void device_start() override;
+
+	virtual uint32_t palette_entries() const override;
+	void init_palette();
 
 private:
 	void plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg);

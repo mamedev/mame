@@ -49,8 +49,8 @@
 class tv990_state : public driver_device
 {
 public:
-	tv990_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tv990_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_vram(*this, "vram"),
 		m_fontram(*this, "fontram"),
@@ -388,8 +388,7 @@ void tv990_state::tv990(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->screen_vblank().set(FUNC(tv990_state::vblank_irq));
 
-	palette_device &palette(PALETTE(config, "palette", 3));
-	palette.set_init("palette", FUNC(palette_device::palette_init_monochrome_highlight));
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	NS16450(config, m_uart[0], 3.6864_MHz_XTAL);
 	m_uart[0]->out_dtr_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_dtr));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -10,7 +10,6 @@
 #include <bx/string.h>
 #include <bx/uint32_t.h>
 
-#include "config.h"
 #include "vertexdecl.h"
 
 namespace bgfx
@@ -122,64 +121,35 @@ namespace bgfx
 
 	static const char* s_attrName[] =
 	{
-		"Attrib::Position",
-		"Attrib::Normal",
-		"Attrib::Tangent",
-		"Attrib::Bitangent",
-		"Attrib::Color0",
-		"Attrib::Color1",
-		"Attrib::Color2",
-		"Attrib::Color3",
-		"Attrib::Indices",
-		"Attrib::Weights",
-		"Attrib::TexCoord0",
-		"Attrib::TexCoord1",
-		"Attrib::TexCoord2",
-		"Attrib::TexCoord3",
-		"Attrib::TexCoord4",
-		"Attrib::TexCoord5",
-		"Attrib::TexCoord6",
-		"Attrib::TexCoord7",
+		"P",  "Attrib::Position",
+		"N",  "Attrib::Normal",
+		"T",  "Attrib::Tangent",
+		"B",  "Attrib::Bitangent",
+		"C0", "Attrib::Color0",
+		"C1", "Attrib::Color1",
+		"C2", "Attrib::Color2",
+		"C3", "Attrib::Color3",
+		"I",  "Attrib::Indices",
+		"W",  "Attrib::Weights",
+		"T0", "Attrib::TexCoord0",
+		"T1", "Attrib::TexCoord1",
+		"T2", "Attrib::TexCoord2",
+		"T3", "Attrib::TexCoord3",
+		"T4", "Attrib::TexCoord4",
+		"T5", "Attrib::TexCoord5",
+		"T6", "Attrib::TexCoord6",
+		"T7", "Attrib::TexCoord7",
 	};
-	BX_STATIC_ASSERT(BX_COUNTOF(s_attrName) == Attrib::Count);
+	BX_STATIC_ASSERT(BX_COUNTOF(s_attrName) == Attrib::Count*2);
+
+	const char* getAttribNameShort(Attrib::Enum _attr)
+	{
+		return s_attrName[_attr*2+0];
+	}
 
 	const char* getAttribName(Attrib::Enum _attr)
 	{
-		return s_attrName[_attr];
-	}
-
-	void dump(const VertexDecl& _decl)
-	{
-		if (BX_ENABLED(BGFX_CONFIG_DEBUG) )
-		{
-			bx::debugPrintf("vertexdecl %08x (%08x), stride %d\n"
-				, _decl.m_hash
-				, bx::hash<bx::HashMurmur2A>(_decl.m_attributes)
-				, _decl.m_stride
-				);
-
-			for (uint32_t attr = 0; attr < Attrib::Count; ++attr)
-			{
-				if (UINT16_MAX != _decl.m_attributes[attr])
-				{
-					uint8_t num;
-					AttribType::Enum type;
-					bool normalized;
-					bool asInt;
-					_decl.decode(Attrib::Enum(attr), num, type, normalized, asInt);
-
-					bx::debugPrintf("\tattr %d - %s, num %d, type %d, norm %d, asint %d, offset %d\n"
-						, attr
-						, getAttribName(Attrib::Enum(attr) )
-						, num
-						, type
-						, normalized
-						, asInt
-						, _decl.m_offset[attr]
-					);
-				}
-			}
-		}
+		return s_attrName[_attr*2+1];
 	}
 
 	struct AttribToId

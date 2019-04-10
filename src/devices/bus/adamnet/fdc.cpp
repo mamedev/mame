@@ -97,19 +97,6 @@ void adam_fdc_device::adam_fdc_mem(address_map &map)
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( fdc6801_io )
-//-------------------------------------------------
-
-void adam_fdc_device::adam_fdc_io(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).rw(FUNC(adam_fdc_device::p1_r), FUNC(adam_fdc_device::p1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(adam_fdc_device::p2_r), FUNC(adam_fdc_device::p2_w));
-	map(M6801_PORT3, M6801_PORT3);
-	map(M6801_PORT4, M6801_PORT4);
-}
-
-
-//-------------------------------------------------
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
@@ -131,7 +118,10 @@ void adam_fdc_device::device_add_mconfig(machine_config &config)
 {
 	M6801(config, m_maincpu, 4_MHz_XTAL),
 	m_maincpu->set_addrmap(AS_PROGRAM, &adam_fdc_device::adam_fdc_mem);
-	m_maincpu->set_addrmap(AS_IO, &adam_fdc_device::adam_fdc_io);
+	m_maincpu->in_p1_cb().set(FUNC(adam_fdc_device::p1_r));
+	m_maincpu->out_p1_cb().set(FUNC(adam_fdc_device::p1_w));
+	m_maincpu->in_p2_cb().set(FUNC(adam_fdc_device::p2_r));
+	m_maincpu->out_p2_cb().set(FUNC(adam_fdc_device::p2_w));
 
 	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);

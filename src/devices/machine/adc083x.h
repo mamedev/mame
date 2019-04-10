@@ -92,28 +92,28 @@ private:
 class adc0831_device : public adc083x_device
 {
 public:
-	adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 
 class adc0832_device : public adc083x_device
 {
 public:
-	adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 
 class adc0834_device : public adc083x_device
 {
 public:
-	adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 
 class adc0838_device : public adc083x_device
 {
 public:
-	adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 

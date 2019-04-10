@@ -31,8 +31,8 @@ public:
 	auto port_read_handler() { return m_port_read_handler.bind(); }
 	auto irq_handler() { return m_irq_handler.bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(write_rxd);
 	uint8_t get_irq_vector();
@@ -66,8 +66,9 @@ private:
 	enum
 	{
 		STATUS_TRANSMIT_READY = 0x01,
-		STATUS_RECEIVE_BUFFER_FULL = 0x2,
-		STATUS_OVERRUN_ERROR = 0x20,
+		STATUS_RECEIVE_BUFFER_FULL = 0x02,
+		STATUS_OVERRUN_ERROR = 0x10,
+		STATUS_FRAMING_ERROR = 0x20,
 		CONTROL_TRANSMIT_ENABLE = 0x01,
 		CONTROL_TRANSMIT_IRQ_ENABLE = 0x02,
 		CONTROL_RECEIVE_ENABLE = 0x04,

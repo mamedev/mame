@@ -64,7 +64,7 @@ private:
 
 	int key_depressed();
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8048_device> m_maincpu;
 	required_ioport_array<16> m_dr;
 	optional_ioport m_kbdida;
 	optional_ioport m_kbdidb;

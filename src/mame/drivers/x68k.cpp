@@ -314,7 +314,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::scc_ack)
 				m_mouse.irqactive = 1;
 				m_current_vector[5] = 0x54;
 				m_current_irq_line = 5;
-				m_maincpu->set_input_line_and_vector(5,ASSERT_LINE,0x54);
+				m_maincpu->set_input_line(5,ASSERT_LINE);
 			}
 		}
 	}
@@ -682,7 +682,7 @@ WRITE_LINE_MEMBER( x68k_state::fdc_irq )
 		m_ioc.irqstatus |= 0x80;
 		m_current_irq_line = 1;
 		LOGMASKED(LOG_FDC, "FDC: IRQ triggered\n");
-		m_maincpu->set_input_line_and_vector(1, ASSERT_LINE, m_current_vector[1]);
+		m_maincpu->set_input_line(1, ASSERT_LINE);
 	}
 	else
 		m_maincpu->set_input_line(1, CLEAR_LINE);
@@ -935,14 +935,14 @@ TIMER_CALLBACK_MEMBER(x68k_state::bus_error)
 	m_bus_error = false;
 }
 
-void x68k_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask)
+void x68k_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 {
 	if(m_bus_error)
 		return;
 	if(!ACCESSING_BITS_8_15)
 		address++;
 	m_bus_error = true;
-	m_maincpu->set_buserror_details(address, write, m_maincpu->get_fc());
+	m_maincpu->set_buserror_details(address, rw, m_maincpu->get_fc());
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
@@ -954,7 +954,7 @@ READ16_MEMBER(x68k_state::rom0_r)
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
 	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
-		set_bus_error((offset << 1) + 0xbffffc, 0, mem_mask);
+		set_bus_error((offset << 1) + 0xbffffc, true, mem_mask);
 	return 0xff;
 }
 
@@ -963,7 +963,7 @@ WRITE16_MEMBER(x68k_state::rom0_w)
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
 	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
-		set_bus_error((offset << 1) + 0xbffffc, 1, mem_mask);
+		set_bus_error((offset << 1) + 0xbffffc, false, mem_mask);
 }
 
 READ16_MEMBER(x68k_state::emptyram_r)
@@ -1003,7 +1003,7 @@ void x68k_state::dma_irq(int channel)
 	m_current_vector[3] = m_hd63450->get_vector(channel);
 	m_current_irq_line = 3;
 	LOGMASKED(LOG_SYS, "DMA#%i: DMA End (vector 0x%02x)\n",channel,m_current_vector[3]);
-	m_maincpu->set_input_line_and_vector(3,ASSERT_LINE,m_current_vector[3]);
+	m_maincpu->set_input_line(3,ASSERT_LINE);
 }
 
 WRITE8_MEMBER(x68k_state::dma_end)
@@ -1025,7 +1025,7 @@ WRITE8_MEMBER(x68k_state::dma_error)
 		m_current_vector[3] = m_hd63450->get_error_vector(offset);
 		m_current_irq_line = 3;
 		LOGMASKED(LOG_SYS, "DMA#%i: DMA Error (vector 0x%02x)\n",offset,m_current_vector[3]);
-		m_maincpu->set_input_line_and_vector(3,ASSERT_LINE,m_current_vector[3]);
+		m_maincpu->set_input_line(3,ASSERT_LINE);
 	}
 }
 
@@ -1045,12 +1045,12 @@ WRITE8_MEMBER(x68k_state::adpcm_w)
 {
 	switch(offset)
 	{
-		case 0x00:
-			m_okim6258->ctrl_w(space,0,data);
-			break;
-		case 0x01:
-			m_okim6258->data_w(space,0,data);
-			break;
+	case 0x00:
+		m_okim6258->ctrl_w(data);
+		break;
+	case 0x01:
+		m_okim6258->data_w(data);
+		break;
 	}
 }
 
@@ -1067,30 +1067,48 @@ WRITE_LINE_MEMBER(x68k_state::mfp_irq_callback)
 	m_mfp_prev = state;
 }
 
-IRQ_CALLBACK_MEMBER(x68k_state::int_ack)
+template <int Line>
+uint8_t x68k_state::int_ack()
 {
-	if(irqline == 6)  // MFP
+	if (!machine().side_effects_disabled())
 	{
-		if(m_current_vector[6] != 0x4b && m_current_vector[6] != 0x4c)
-			m_current_vector[6] = m_mfpdev->get_vector();
-		else
-			m_maincpu->set_input_line_and_vector(irqline,CLEAR_LINE,m_current_vector[irqline]);
-		LOGMASKED(LOG_IRQ, "SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[6],irqline);
-		return m_current_vector[6];
-	}
+		m_maincpu->set_input_line(Line, CLEAR_LINE);
+		if(Line == 1)  // IOSC
+		{
+			m_ioc.irqstatus &= ~0xf0;
+		}
+		if(Line == 5)  // SCC
+		{
+			m_mouse.irqactive = 0;
+		}
 
-	m_maincpu->set_input_line_and_vector(irqline,CLEAR_LINE,m_current_vector[irqline]);
-	if(irqline == 1)  // IOSC
-	{
-		m_ioc.irqstatus &= ~0xf0;
+		LOGMASKED(LOG_IRQ, "SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[Line],Line);
 	}
-	if(irqline == 5)  // SCC
-	{
-		m_mouse.irqactive = 0;
-	}
+	return m_current_vector[Line];
+}
 
-	LOGMASKED(LOG_IRQ, "SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[irqline],irqline);
-	return m_current_vector[irqline];
+uint8_t x68k_state::mfp_ack()
+{
+	if (m_current_vector[6] != 0x4b && m_current_vector[6] != 0x4c)
+		m_current_vector[6] = m_mfpdev->get_vector();
+	else if (!machine().side_effects_disabled())
+	{
+		m_maincpu->set_input_line(6,CLEAR_LINE);
+		LOGMASKED(LOG_IRQ, "SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[6],6);
+	}
+	return m_current_vector[6];
+}
+
+void x68k_state::cpu_space_map(address_map &map)
+{
+	map.global_mask(0xffffff);
+	map(0xfffff3, 0xfffff3).r(FUNC(x68k_state::int_ack<1>));
+	map(0xfffff5, 0xfffff5).r(FUNC(x68k_state::int_ack<2>));
+	map(0xfffff7, 0xfffff7).r(FUNC(x68k_state::int_ack<3>));
+	map(0xfffff9, 0xfffff9).r(FUNC(x68k_state::int_ack<4>));
+	map(0xfffffb, 0xfffffb).r(FUNC(x68k_state::int_ack<5>));
+	map(0xfffffd, 0xfffffd).r(FUNC(x68k_state::mfp_ack));
+	map(0xffffff, 0xffffff).r(FUNC(x68k_state::int_ack<7>));
 }
 
 WRITE_LINE_MEMBER(x68ksupr_state::scsi_irq)
@@ -1100,7 +1118,7 @@ WRITE_LINE_MEMBER(x68ksupr_state::scsi_irq)
 	{
 		m_current_vector[1] = 0x6c;
 		m_current_irq_line = 1;
-		m_maincpu->set_input_line_and_vector(1,ASSERT_LINE,m_current_vector[1]);
+		m_maincpu->set_input_line(1,ASSERT_LINE);
 	}
 }
 
@@ -1366,7 +1384,7 @@ void x68k_state::floppy_load_unload(bool load, floppy_image_device *dev)
 		m_current_vector[1] = 0x61;
 		m_ioc.irqstatus |= 0x40;
 		m_current_irq_line = 1;
-		m_maincpu->set_input_line_and_vector(1,ASSERT_LINE,m_current_vector[1]);  // Disk insert/eject interrupt
+		m_maincpu->set_input_line(1,ASSERT_LINE);  // Disk insert/eject interrupt
 		LOGMASKED(LOG_FDC, "IOC: Disk image inserted\n");
 	}
 }
@@ -1386,7 +1404,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::net_irq)
 {
 	m_current_vector[2] = 0xf9;
 	m_current_irq_line = 2;
-	m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
+	m_maincpu->set_input_line(2,ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(x68k_state::irq2_line)
@@ -1396,7 +1414,7 @@ WRITE_LINE_MEMBER(x68k_state::irq2_line)
 		m_net_timer->adjust(attotime::from_usec(16));
 	}
 	else
-		m_maincpu->set_input_line_and_vector(2,CLEAR_LINE,m_current_vector[2]);
+		m_maincpu->set_input_line(2,CLEAR_LINE);
 	LOGMASKED(LOG_IRQ, "EXP: IRQ2 set to %i\n",state);
 
 }
@@ -1404,7 +1422,7 @@ WRITE_LINE_MEMBER(x68k_state::irq2_line)
 WRITE_LINE_MEMBER(x68k_state::irq4_line)
 {
 	m_current_vector[4] = m_expansion->vector();
-	m_maincpu->set_input_line_and_vector(4,state,m_current_vector[4]);
+	m_maincpu->set_input_line(4,state);
 	LOGMASKED(LOG_IRQ, "EXP: IRQ4 set to %i (vector %02x)\n",state,m_current_vector[4]);
 }
 
@@ -1551,8 +1569,9 @@ static void keyboard_devices(device_slot_interface &device)
 	device.option_add("x68k", X68K_KEYBOARD);
 }
 
-MACHINE_CONFIG_START(x68k_state::x68000_base)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+void x68k_state::x68000_base(machine_config &config)
+{
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* device hardware */
 	MC68901(config, m_mfpdev, 16_MHz_XTAL / 4);
@@ -1577,8 +1596,8 @@ MACHINE_CONFIG_START(x68k_state::x68000_base)
 	m_hd63450->set_burst_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
 	m_hd63450->dma_end().set(FUNC(x68k_state::dma_end));
 	m_hd63450->dma_error().set(FUNC(x68k_state::dma_error));
-	m_hd63450->dma_read<0>().set("upd72065", FUNC(upd72065_device::mdma_r));
-	m_hd63450->dma_write<0>().set("upd72065", FUNC(upd72065_device::mdma_w));
+	m_hd63450->dma_read<0>().set("upd72065", FUNC(upd72065_device::dma_r));
+	m_hd63450->dma_write<0>().set("upd72065", FUNC(upd72065_device::dma_w));
 
 	SCC8530(config, m_scc, 40_MHz_XTAL / 8);
 
@@ -1592,8 +1611,8 @@ MACHINE_CONFIG_START(x68k_state::x68000_base)
 
 	GFXDECODE(config, m_gfxdecode, "pcgpalette", gfxdecode_device::empty);
 
-	PALETTE(config, m_gfxpalette, 256).set_format(raw_to_rgb_converter(2, &x68k_state::GGGGGRRRRRBBBBBI_decoder));
-	PALETTE(config, m_pcgpalette, 256).set_format(raw_to_rgb_converter(2, &x68k_state::GGGGGRRRRRBBBBBI_decoder));
+	PALETTE(config, m_gfxpalette).set_format(2, &x68k_state::GGGGGRRRRRBBBBBI, 256);
+	PALETTE(config, m_pcgpalette).set_format(2, &x68k_state::GGGGGRRRRRBBBBBI, 256);
 
 	config.set_default_layout(layout_x68000);
 
@@ -1616,7 +1635,7 @@ MACHINE_CONFIG_START(x68k_state::x68000_base)
 	FILTER_VOLUME(config, m_adpcm_out[0]).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, m_adpcm_out[1]).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	UPD72065(config, m_upd72065, 0, true, false);
+	UPD72065(config, m_upd72065, 16_MHz_XTAL / 2, true, false); // clocked through SED9420CAC
 	m_upd72065->intrq_wr_callback().set(FUNC(x68k_state::fdc_irq));
 	m_upd72065->drq_wr_callback().set(m_hd63450, FUNC(hd63450_device::drq0_w));
 	FLOPPY_CONNECTOR(config, "upd72065:0", x68k_floppies, "525hd", x68k_state::floppy_formats);
@@ -1626,17 +1645,17 @@ MACHINE_CONFIG_START(x68k_state::x68000_base)
 
 	SOFTWARE_LIST(config, "flop_list").set_original("x68k_flop");
 
-	MCFG_DEVICE_ADD("exp", X68K_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(x68000_exp_cards, nullptr, false)
-	MCFG_X68K_EXPANSION_SLOT_OUT_IRQ2_CB(WRITELINE(*this, x68k_state, irq2_line))
-	MCFG_X68K_EXPANSION_SLOT_OUT_IRQ4_CB(WRITELINE(*this, x68k_state, irq4_line))
-	MCFG_X68K_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", M68K_IRQ_7))
+	X68K_EXPANSION_SLOT(config, m_expansion, x68000_exp_cards, nullptr);
+	m_expansion->set_space(m_maincpu, AS_PROGRAM);
+	m_expansion->out_irq2_callback().set(FUNC(x68k_state::irq2_line));
+	m_expansion->out_irq4_callback().set(FUNC(x68k_state::irq4_line));
+	m_expansion->out_nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M,2M,3M,5M,6M,7M,8M,9M,10M,11M,12M");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 void x68k_state::x68000(machine_config &config)
 {

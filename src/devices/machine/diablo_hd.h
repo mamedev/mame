@@ -162,7 +162,4 @@ private:
 	void sector_mark_0();
 };
 
-#define MCFG_DIABLO_DRIVES_ADD()    \
-	MCFG_DEVICE_ADD(DIABLO_HD_0, DIABLO_HD, 3333333)    \
-	MCFG_DEVICE_ADD(DIABLO_HD_1, DIABLO_HD, 3333333)
 #endif  // !defined(_DIABLO_HD_DEVICE_)

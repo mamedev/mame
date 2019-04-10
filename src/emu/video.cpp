@@ -457,7 +457,7 @@ void video_manager::begin_recording_mng(const char *name, uint32_t index, screen
 	if (filerr == osd_file::error::NONE)
 	{
 		// start the capture
-		int rate = ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds());
+		int rate = int(screen->frame_period().as_hz());
 		png_error pngerr = mng_capture_start(*info.m_mng_file, m_snap_bitmap, rate);
 		if (pngerr != PNGERR_NONE)
 		{
@@ -493,7 +493,7 @@ void video_manager::begin_recording_avi(const char *name, uint32_t index, screen
 	// build up information about this new movie
 	avi_file::movie_info info;
 	info.video_format = 0;
-	info.video_timescale = 1000 * ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds());
+	info.video_timescale = 1000 * screen->frame_period().as_hz();
 	info.video_sampletime = 1000;
 	info.video_numsamples = 0;
 	info.video_width = m_snap_bitmap.width();
@@ -846,12 +846,17 @@ bool video_manager::finish_screen_updates()
 	// finish updating the screens
 	screen_device_iterator iter(machine().root_device());
 
+	bool has_screen = false;
 	for (screen_device &screen : iter)
+	{
 		screen.update_partial(screen.visible_area().max_y);
+		has_screen = true;
+	}
+
+	bool anything_changed = !has_screen || m_output_changed;
+	m_output_changed = false;
 
 	// now add the quads for all the screens
-	bool anything_changed = m_output_changed;
-	m_output_changed = false;
 	for (screen_device &screen : iter)
 		if (screen.update_quads())
 			anything_changed = true;
@@ -1045,7 +1050,11 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 	while (current_ticks < target_ticks)
 	{
 		// compute how much time to sleep for, taking into account the average oversleep
-		osd_ticks_t const delta = (target_ticks - current_ticks) * 1000 / (1000 + m_average_oversleep);
+		osd_ticks_t delta = target_ticks - current_ticks;
+		if (delta > m_average_oversleep / 1000)
+			delta -= m_average_oversleep / 1000;
+		else
+			delta = 0;
 
 		// see if we can sleep
 		bool const slept = allowed_to_sleep && delta;
@@ -1062,8 +1071,8 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 			osd_ticks_t const actual_ticks = new_ticks - current_ticks;
 			if (actual_ticks > delta)
 			{
-				// take 90% of the previous average plus 10% of the new value
-				osd_ticks_t const oversleep_milliticks = 1000 * (actual_ticks - delta) / delta;
+				// take 99% of the previous average plus 1% of the new value
+				osd_ticks_t const oversleep_milliticks = 1000 * (actual_ticks - delta);
 				m_average_oversleep = (m_average_oversleep * 99 + oversleep_milliticks) / 100;
 
 				if (LOG_THROTTLE)

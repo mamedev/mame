@@ -43,7 +43,7 @@ static const char opname[][5] =
 class tms99xx_device : public cpu_device
 {
 public:
-	static constexpr int AS_SETOFFSET = 4;
+	static constexpr int AS_SETADDRESS = 4;
 
 	~tms99xx_device();
 
@@ -95,10 +95,10 @@ protected:
 	void                decode(uint16_t inst);
 
 	const address_space_config  m_program_config;
-	const address_space_config  m_setoffset_config;
+	const address_space_config  m_setaddress_config;
 	const address_space_config  m_io_config;
 	address_space*          m_prgspace;
-	address_space*          m_sospace;
+	address_space*          m_setaddr;
 	address_space*          m_cru;
 
 	virtual uint16_t  read_workspace_register_debug(int reg);
@@ -298,7 +298,6 @@ private:
 	void    alu_abs(void);
 	void    alu_x(void);
 	void    alu_b(void);
-	//void    alu_bl(void);
 	void    alu_blwp(void);
 	void    alu_ldcr(void);
 	void    alu_stcr(void);
@@ -330,6 +329,9 @@ private:
 
 	// Index of the interrupt program
 	int     m_interrupt_mp_index;
+
+	// For debugging only
+	bool    m_log_interrupt;
 
 	// State of the micro-operation. Needed for repeated ALU calls.
 	int     m_state;

@@ -11,10 +11,11 @@
 #pragma once
 
 #include "audio/m72.h"
-#include "sound/dac.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/mb8421.h"
 #include "machine/pic8259.h"
 #include "machine/upd4701.h"
+#include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -77,6 +78,7 @@ public:
 	void rtype2(machine_config &config);
 	void m82(machine_config &config);
 	void rtype(machine_config &config);
+	void imgfightb(machine_config &config);
 
 	void init_dkgenm72();
 	void init_bchopper();
@@ -154,7 +156,6 @@ private:
 	DECLARE_READ8_MEMBER(mcu_data_r);
 	DECLARE_READ8_MEMBER(mcu_sample_r);
 	DECLARE_WRITE8_MEMBER(mcu_port1_w);
-	DECLARE_WRITE8_MEMBER(mcu_port3_w);
 	DECLARE_WRITE8_MEMBER(mcu_low_w);
 	DECLARE_WRITE8_MEMBER(mcu_high_w);
 	DECLARE_READ8_MEMBER(snd_cpu_sample_r);
@@ -202,7 +203,6 @@ private:
 	DECLARE_MACHINE_START(kengo);
 	DECLARE_MACHINE_RESET(kengo);
 
-	INTERRUPT_GEN_MEMBER(mcu_int);
 	INTERRUPT_GEN_MEMBER(fake_nmi);
 	TIMER_CALLBACK_MEMBER(synch_callback);
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);
@@ -239,6 +239,7 @@ private:
 	void m84_cpu1_common_map(address_map &map);
 	void m84_portmap(address_map &map);
 	void m84_v33_portmap(address_map &map);
+	void i80c31_mem_map(address_map &map);
 	void mcu_io_map(address_map &map);
 	void poundfor_portmap(address_map &map);
 	void poundfor_sound_portmap(address_map &map);

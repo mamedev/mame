@@ -222,7 +222,8 @@ const int STATUS_LIGHT_PEN_UPDATE       = 0x20;
 // default address map
 void crt9007_device::crt9007(address_map &map)
 {
-	map(0x0000, 0x3fff).ram();
+	if (!has_configured_map(0))
+		map(0x0000, 0x3fff).ram();
 }
 
 
@@ -428,7 +429,7 @@ inline void crt9007_device::recompute_parameters()
 	// visible area
 	rectangle visarea(m_hsync_end, horiz_pix_total - 1, m_vsync_end, vert_pix_total - 1);
 
-	LOG("CRT9007 Screen: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, ATTOSECONDS_TO_HZ(refresh.as_attoseconds()));
+	LOG("CRT9007 Screen: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, refresh.as_hz());
 	LOG("CRT9007 Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 
 	//screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh.as_attoseconds());
@@ -456,7 +457,7 @@ crt9007_device::crt9007_device(const machine_config &mconfig, const char *tag, d
 	device_t(mconfig, CRT9007, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(), address_map_constructor(FUNC(crt9007_device::crt9007), this)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(FUNC(crt9007_device::crt9007), this)),
 	m_write_int(*this),
 	m_write_dmar(*this),
 	m_write_hs(*this),

@@ -128,10 +128,11 @@
 
 	<software name="astrobas">
 		<description>Bally BASIC (Astrovision)</description>
-<!-- <note>The updated release of BASIC used an internal 2000 baud interface (not emulated) to load and save programs.</note> -->
+<!-- <note>The updated release of BASIC used an internal 2000 baud interface to load and save programs.</note> -->
 		<year>1981</year>
 		<publisher>Astrovision</publisher>
 		<part name="cart" interface="astrocde_cart">
+			<feature name="slot" value="rom_cass" />
 			<dataarea name="rom" size="4096">
 				<rom name="astrobas.bin" size="4096" crc="70514687" sha1="a2ac8995a6217b7190aa9b18f49261c0ed3c6b5a" offset="0" />
 			</dataarea>

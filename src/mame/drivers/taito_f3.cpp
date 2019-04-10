@@ -476,8 +476,8 @@ void taito_f3_state::f3(machine_config &config)
 	m_screen->set_screen_update(FUNC(taito_f3_state::screen_update_f3));
 	m_screen->screen_vblank().set(FUNC(taito_f3_state::screen_vblank_f3));
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_taito_f3);
-	PALETTE(config, m_palette, 0x2000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taito_f3);
+	PALETTE(config, m_palette).set_entries(0x2000);
 
 	/* sound hardware */
 	TAITO_EN(config, m_taito_en, 0);
@@ -569,8 +569,8 @@ void taito_f3_state::bubsympb(machine_config &config)
 	m_screen->set_screen_update(FUNC(taito_f3_state::screen_update_f3));
 	m_screen->screen_vblank().set(FUNC(taito_f3_state::screen_vblank_f3));
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_bubsympb);
-	PALETTE(config, m_palette, 0x2000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bubsympb);
+	PALETTE(config, m_palette).set_entries(0x2000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1592,8 +1592,8 @@ Notes:
                          PAL.7          PALCE16V8H
                          D49-12-1       PAL16L8B
 
-      D69-01 to D69-08          16M MASKROM (DIP42)
-      d69-09 to d69-11          8M MASKROM  (DIP42)
+      D69-01 to D69-08          16M mask ROM (DIP42)
+      d69-09 to d69-11          8M mask ROM  (DIP42)
       D69-13 to D69-15/D69-20   27C040 EPROM (DIP32)
       D69-18/D69-19             27C1001 EPROM (DIP32)
 */
@@ -2035,7 +2035,7 @@ ROM_START( bublbob2 )
 	ROM_REGION( 0x1200, "plds", 0 )
 	ROM_LOAD("d77-14_palce16v8q-15.ic21.bin", 0x000, 0x117, CRC(2c798a1c) SHA1(e8ac31c3cd53eb61fedfd710c31356e8fa968cbc) )
 	ROM_LOAD("d77-12_palce16v8q-15.ic48.bin", 0x000, 0x117, CRC(b1cc6195) SHA1(629ef8416a2cb51fcbc48e5c306dd04c96902726) )
-	ROM_LOAD("d77-11_palce16v8q-15.ic37.bin", 0x000, 0x117, CRC(a733f0de) SHA1(6eec26043cedb3cae4efe93faa84a07327be468b) )
+	ROM_LOAD("d77-11_palce16v8q-15.ic37.bin", 0x000, 0x117, NO_DUMP )
 ROM_END
 
 
@@ -3467,7 +3467,7 @@ ROM_START( kirameki )
 	ROM_LOAD( "d77-20.37",   0x0000, 0x0117, CRC(6bfbec07) SHA1(5dce4f2e9fc13273cd50b67f1d9a0d90128e7397) ) // PALCE16V8
 ROM_END
 
-ROM_START( puchicar )
+ROM_START( puchicar ) // an Asia cart was dumped and all ROMs match
 	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
 	ROM_LOAD32_BYTE("e46-16", 0x000000, 0x80000, CRC(cf2accdf) SHA1(b1e9808299a3c68c939009275108ee76cd7f5749) )
 	ROM_LOAD32_BYTE("e46-15", 0x000001, 0x80000, CRC(c32c6ed8) SHA1(b0c4cca836e6957ecabdaddff23439f9d038a161) )
@@ -4106,12 +4106,13 @@ void taito_f3_state::init_bubsymph()
 
 READ32_MEMBER(taito_f3_state::bubsympb_oki_r)
 {
-	return m_oki->read(space,0);
+	return m_oki->read();
 }
+
 WRITE32_MEMBER(taito_f3_state::bubsympb_oki_w)
 {
 	//printf("write %08x %08x\n",data,mem_mask);
-	if (ACCESSING_BITS_0_7) m_oki->write(space, 0,data&0xff);
+	if (ACCESSING_BITS_0_7) m_oki->write(data&0xff);
 	//if (mem_mask==0x000000ff) downcast<okim6295_device *>(device)->write(0,data&0xff);
 	if (ACCESSING_BITS_16_23)
 	{

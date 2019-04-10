@@ -5,8 +5,8 @@
 
 #pragma once
 
+#include "cpu/mcs48/mcs48.h"
 #include "sound/spkrdev.h"
-
 
 class kaypro_10_keyboard_device : public device_t
 {
@@ -35,7 +35,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(bus_w);
 
 private:
-	required_device<cpu_device>             m_mcu;
+	required_device<i8049_device>           m_mcu;
 	required_device<speaker_sound_device>   m_bell;
 	required_ioport_array<16>               m_matrix;
 	required_ioport                         m_modifiers;

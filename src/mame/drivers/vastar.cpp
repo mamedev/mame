@@ -473,12 +473,10 @@ void vastar_state::vastar(machine_config &config)
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(vastar_state::screen_update));
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vastar);
-	PALETTE(config, m_palette, 256);
-	m_palette->set_prom_region("proms");
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms));
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 }
 
 void dogfightp_state::dogfightp(machine_config &config)

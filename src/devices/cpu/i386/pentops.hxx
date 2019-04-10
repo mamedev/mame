@@ -56,14 +56,17 @@ void i386_device::WRITEXMM_HI64(uint32_t ea,i386_device::XMM_REG &r)
 void i386_device::pentium_rdmsr()          // Opcode 0x0f 32
 {
 	uint64_t data;
-	uint8_t valid_msr = 0;
+	bool valid_msr = false;
 
-	data = MSR_READ(REG32(ECX),&valid_msr);
-	REG32(EDX) = data >> 32;
-	REG32(EAX) = data & 0xffffffff;
-
-	if(m_CPL != 0 || valid_msr == 0) // if current privilege level isn't 0 or the register isn't recognized ...
-		FAULT(FAULT_GP,0) // ... throw a general exception fault
+	// call the model specific implementation
+	data = opcode_rdmsr(valid_msr);
+	if (m_CPL != 0 || valid_msr == false) // if current privilege level isn't 0 or the register isn't recognized ...
+		FAULT(FAULT_GP, 0) // ... throw a general exception fault
+	else
+	{
+		REG32(EDX) = data >> 32;
+		REG32(EAX) = data & 0xffffffff;
+	}
 
 	CYCLES(CYCLES_RDMSR);
 }
@@ -71,12 +74,13 @@ void i386_device::pentium_rdmsr()          // Opcode 0x0f 32
 void i386_device::pentium_wrmsr()          // Opcode 0x0f 30
 {
 	uint64_t data;
-	uint8_t valid_msr = 0;
+	bool valid_msr = false;
 
 	data = (uint64_t)REG32(EAX);
 	data |= (uint64_t)(REG32(EDX)) << 32;
 
-	MSR_WRITE(REG32(ECX),data,&valid_msr);
+	// call the model specific implementation
+	opcode_wrmsr(data, valid_msr);
 
 	if(m_CPL != 0 || valid_msr == 0) // if current privilege level isn't 0 or the register isn't recognized
 		FAULT(FAULT_GP,0) // ... throw a general exception fault
@@ -199,6 +203,7 @@ void i386_device::pentium_prefetch_m8()    // Opcode 0x0f 18
 {
 	uint8_t modrm = FETCH();
 	uint32_t ea = GetEA(modrm,0);
+	// TODO: manage the cache if present
 	CYCLES(1+(ea & 1)); // TODO: correct cycle count
 }
 
@@ -1041,7 +1046,7 @@ void i386_device::pentium_movnti_m16_r16() // Opcode 0f c3
 		// unsupported by cpu
 		CYCLES(1);     // TODO: correct cycle count
 	} else {
-		// since cache is not implemented
+		// TODO: manage the cache if present
 		uint32_t ea = GetEA(modrm, 0);
 		WRITE16(ea,LOAD_RM16(modrm));
 		CYCLES(1);     // TODO: correct cycle count
@@ -1055,7 +1060,7 @@ void i386_device::pentium_movnti_m32_r32() // Opcode 0f c3
 		// unsupported by cpu
 		CYCLES(1);     // TODO: correct cycle count
 	} else {
-		// since cache is not implemented
+		// TODO: manage the cache if present
 		uint32_t ea = GetEA(modrm, 0);
 		WRITE32(ea,LOAD_RM32(modrm));
 		CYCLES(1);     // TODO: correct cycle count
@@ -1112,7 +1117,7 @@ void i386_device::pentium_movntq_m64_r64() // Opcode 0f e7
 	if( modrm >= 0xc0 ) {
 		CYCLES(1);     // unsupported
 	} else {
-		// since cache is not implemented
+		// TODO: manage the cache if present
 		uint32_t ea = GetEA(modrm, 0);
 		WRITEMMX(ea, MMX((modrm >> 3) & 0x7));
 		CYCLES(1);     // TODO: correct cycle count
@@ -3313,7 +3318,7 @@ void i386_device::sse_movntps_m128_r128() // Opcode 0f 2b
 		// unsupported by cpu
 		CYCLES(1);     // TODO: correct cycle count
 	} else {
-		// since cache is not implemented
+		// TODO: manage the cache if present
 		uint32_t ea = GetEA(modrm, 0);
 		WRITEXMM(ea, XMM((modrm >> 3) & 0x7));
 		CYCLES(1);     // TODO: correct cycle count
@@ -5958,7 +5963,7 @@ void i386_device::sse_movntdq_m128_r128()  // Opcode 66 0f e7
 	if( modrm >= 0xc0 ) {
 		CYCLES(1);     // unsupported
 	} else {
-		// since cache is not implemented
+		// TODO: manage the cache if present
 		uint32_t ea = GetEA(modrm, 0);
 		WRITEXMM(ea, XMM((modrm >> 3) & 0x7));
 		CYCLES(1);     // TODO: correct cycle count
@@ -6272,7 +6277,7 @@ void i386_device::sse_movntpd_m128_r128()  // Opcode 66 0f 2b
 		// unsupported by cpu
 		CYCLES(1);     // TODO: correct cycle count
 	} else {
-		// since cache is not implemented
+		// TODO: manage the cache if present
 		uint32_t ea = GetEA(modrm, 0);
 		WRITEXMM(ea, XMM((modrm >> 3) & 0x7));
 		CYCLES(1);     // TODO: correct cycle count

@@ -67,20 +67,20 @@ void konami_pc_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(konami_pc_state::konami_pc)
-
+void konami_pc_state::konami_pc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 100000000) // not correct, but why bother?
-	MCFG_DEVICE_PROGRAM_MAP(konami_pc_map)
+	PENTIUM3(config, m_maincpu, 100000000); // not correct, but why bother?
+	m_maincpu->set_addrmap(AS_PROGRAM, &konami_pc_state::konami_pc_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(konami_pc_state, screen_update_konami_pc)
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(konami_pc_state::screen_update_konami_pc));
+}
 
 /***************************************************************************
 

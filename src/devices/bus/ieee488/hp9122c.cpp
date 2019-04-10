@@ -13,6 +13,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/i8291a.h"
 #include "machine/wd_fdc.h"
+#include "hp9122c.lh"
 
 DEFINE_DEVICE_TYPE(HP9122C, hp9122c_device, "hp9122c", "HP9122C Dual High density disk drive")
 
@@ -25,6 +26,7 @@ hp9122c_device::hp9122c_device(const machine_config &mconfig, const char *tag, d
 	  m_floppy{*this, "floppy%u", 0},
 	  m_hpib_addr{*this , "ADDRESS"},
 	  m_testmode{*this, "TESTMODE"},
+	  m_leds{*this, "led%d", 0U},
 	  m_intsel{3},
 	  m_fdc_irq{false},
 	  m_i8291a_irq{false},
@@ -72,6 +74,9 @@ ioport_constructor hp9122c_device::device_input_ports() const
 
 void hp9122c_device::device_start()
 {
+
+	m_leds.resolve();
+
 	for (auto &floppy : m_floppy)
 		floppy->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&hp9122c_device::index_pulse_cb, this));
 
@@ -292,19 +297,26 @@ WRITE8_MEMBER(hp9122c_device::cmd_w)
 
 	m_ds0 = !(data & REG_CNTL_DS0) && floppy0;
 	m_ds1 = !(data & REG_CNTL_DS1) && floppy1;
+	m_leds[2] = (data & 0x40) ? true : false;
 
-	 if (m_ds0) {
-		 floppy0->mon_w(0);
-		 floppy0->ss_w(!(data & REG_CNTL_HEADSEL));
-		 m_fdc->set_floppy(floppy0);
-		 m_motor_timer->reset();
-	 } else if (m_ds1) {
-		 floppy1->mon_w(0);
-		 floppy1->ss_w(!(data & REG_CNTL_HEADSEL));
-		 m_fdc->set_floppy(floppy1);
-		 m_motor_timer->reset();
+	if (m_ds0) {
+		floppy0->mon_w(0);
+		floppy0->ss_w(!(data & REG_CNTL_HEADSEL));
+		m_fdc->set_floppy(floppy0);
+		m_motor_timer->reset();
+		m_leds[0] = true;
+		m_leds[1] = false;
+	} else if (m_ds1) {
+		floppy1->mon_w(0);
+		floppy1->ss_w(!(data & REG_CNTL_HEADSEL));
+		m_fdc->set_floppy(floppy1);
+		m_motor_timer->reset();
+		m_leds[0] = false;
+		m_leds[1] = true;
 	} else {
 		m_motor_timer->adjust(attotime::from_msec(2000));
+		m_leds[0] = false;
+		m_leds[1] = false;
 	}
 
 	if (data & REG_CNTL_CLOCK_SEL)
@@ -364,13 +376,14 @@ void hp9122c_device::cpu_map(address_map &map)
 	map(0xc000, 0xffff).rom().region("cpu", 0);
 }
 
-MACHINE_CONFIG_START(hp9122c_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("cpu" , MC6809 , XTAL(8'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+void hp9122c_device::device_add_mconfig(machine_config &config)
+{
+	MC6809(config, m_cpu, XTAL(8'000'000));
+	m_cpu->set_addrmap(AS_PROGRAM, &hp9122c_device::cpu_map);
 
 	// without this flag, 'DMA' transfer via SYNC instruction
 	// will not work
-	MCFG_QUANTUM_PERFECT_CPU("cpu")
+	config.m_perfect_cpu_quantum = subtag("cpu");
 
 	MB8876(config, m_fdc, 8_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(hp9122c_device::fdc_intrq_w));
@@ -387,10 +400,7 @@ MACHINE_CONFIG_START(hp9122c_device::device_add_mconfig)
 	m_i8291a->int_write().set(FUNC(hp9122c_device::i8291a_int_w));
 	m_i8291a->dreq_write().set(FUNC(hp9122c_device::i8291a_dreq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("floppy0" , hp9122c_floppies , "35hd" , hp9122c_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_SLOT_FIXED(true)
-	MCFG_FLOPPY_DRIVE_ADD("floppy1" , hp9122c_floppies , "35hd" , hp9122c_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_SLOT_FIXED(true)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "floppy0" , hp9122c_floppies , "35hd" , hp9122c_floppy_formats, true).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "floppy1" , hp9122c_floppies , "35hd" , hp9122c_floppy_formats, true).enable_sound(true);
+	config.set_default_layout(layout_hp9122c);
+}

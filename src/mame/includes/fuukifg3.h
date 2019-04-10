@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Priest, David Haywood, Luca Elia
+#ifndef MAME_INCLUDES_FUUKIFG3_H
+#define MAME_INCLUDES_FUUKIFG3_H
+
+#pragma once
+
 #include "video/fuukifg.h"
 #include "emupal.h"
 #include "screen.h"
@@ -8,7 +13,6 @@
 
 #define CPU_CLOCK       (XTAL(40'000'000) / 2)        /* clock for 68020 */
 #define SOUND_CPU_CLOCK     (XTAL(12'000'000) / 2)        /* clock for Z80 sound CPU */
-#define FM_SOUND_CLOCK      (XTAL(33'868'800) / 2)       /* FM clock */
 
 /* NOTE: YMF278B_STD_CLOCK is defined in /src/emu/sound/ymf278b.h */
 
@@ -29,6 +33,10 @@ public:
 		, m_tilebank(*this, "tilebank")
 		, m_shared_ram(*this, "shared_ram")
 		, m_soundbank(*this, "soundbank")
+		, m_system(*this, "SYSTEM")
+		, m_inputs(*this, "INPUTS")
+		, m_dsw1(*this, "DSW1")
+		, m_dsw2(*this, "DSW2")
 	{ }
 
 	void fuuki32(machine_config &config);
@@ -58,6 +66,11 @@ private:
 	//uint32_t *    m_buf_spriteram2;
 
 	required_memory_bank m_soundbank;
+
+	required_ioport m_system;
+	required_ioport m_inputs;
+	required_ioport m_dsw1;
+	required_ioport m_dsw2;
 
 	/* video-related */
 	tilemap_t     *m_tilemap[4];
@@ -91,3 +104,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_FUUKIFG3_H

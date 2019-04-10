@@ -117,6 +117,8 @@ protected:
 	inline std::string get_ea_mode_str_16(u16 instruction) { return get_ea_mode_str(instruction, 1); }
 	inline std::string get_ea_mode_str_32(u16 instruction) { return get_ea_mode_str(instruction, 2); }
 
+	std::string fc_to_string(uint16_t modes);
+
 	inline std::pair<bool, std::string> limit_cpu_types(u32 allowed);
 
 	std::string d68000_illegal();
@@ -337,7 +339,6 @@ protected:
 	std::string d68020_pack_rr();
 	std::string d68020_pack_mm();
 	std::string d68000_pea();
-	std::string d68040_pflush();
 	std::string d68000_reset();
 	std::string d68000_ror_s_8();
 	std::string d68000_ror_s_16();
@@ -420,6 +421,7 @@ protected:
 	std::string d68000_unlk();
 	std::string d68020_unpk_rr();
 	std::string d68020_unpk_mm();
+	std::string d68040_p000();
 	std::string d68851_p000();
 	std::string d68851_pbcc16();
 	std::string d68851_pbcc32();

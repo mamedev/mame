@@ -392,7 +392,7 @@ int z80dart_device::m1_r()
 //  cd_ba_r -
 //-------------------------------------------------
 
-READ8_MEMBER( z80dart_device::cd_ba_r )
+uint8_t z80dart_device::cd_ba_r(offs_t offset)
 {
 	int ba = BIT(offset, 0);
 	int cd = BIT(offset, 1);
@@ -406,7 +406,7 @@ READ8_MEMBER( z80dart_device::cd_ba_r )
 //  cd_ba_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( z80dart_device::cd_ba_w )
+void z80dart_device::cd_ba_w(offs_t offset, uint8_t data)
 {
 	int ba = BIT(offset, 0);
 	int cd = BIT(offset, 1);
@@ -423,7 +423,7 @@ WRITE8_MEMBER( z80dart_device::cd_ba_w )
 //  ba_cd_r -
 //-------------------------------------------------
 
-READ8_MEMBER( z80dart_device::ba_cd_r )
+uint8_t z80dart_device::ba_cd_r(offs_t offset)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);
@@ -437,7 +437,7 @@ READ8_MEMBER( z80dart_device::ba_cd_r )
 //  ba_cd_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( z80dart_device::ba_cd_w )
+void z80dart_device::ba_cd_w(offs_t offset, uint8_t data)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);
@@ -920,7 +920,8 @@ void z80dart_channel::control_write(uint8_t data)
 		LOG("Z80DART \"%s\" Channel %c : Request to Send %u\n", owner()->tag(), 'A' + m_index, (data & WR5_RTS) ? 1 : 0);
 		LOG("Z80DART \"%s\" Channel %c : Data Terminal Ready %u\n", owner()->tag(), 'A' + m_index, (data & WR5_DTR) ? 1 : 0);
 
-		if (data != prev)
+		// don't update if parameters haven't changed; in fact, don't update at all since these ones are currently unused
+		if (0 && (data & WR5_TX_WORD_LENGTH_MASK) != (prev & WR5_TX_WORD_LENGTH_MASK))
 			update_serial();
 
 		if (data & WR5_RTS)
@@ -1271,7 +1272,7 @@ void z80dart_channel::update_serial()
 	{
 		set_tra_rate(m_txc / clocks);
 	}
-	receive_register_reset(); // if stop bits is changed from 0, receive register has to be reset
+	receive_register_reset(); // if stop bits is changed from 0, receive register has to be reset (FIXME: doing this without checking is stupid)
 }
 
 

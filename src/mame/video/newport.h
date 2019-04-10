@@ -9,20 +9,29 @@
 
 #pragma once
 
+#include "machine/hpc3.h"
+
+#define ENABLE_NEWVIEW_LOG      (0)
+
 class newport_video_device : public device_t
 {
 public:
-	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner)
+	template <typename T, typename U>
+	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&hpc3_tag)
 		: newport_video_device(mconfig, tag, owner, (uint32_t)0) // TODO: Use actual pixel clock
 	{
+		m_maincpu.set_tag(std::forward<T>(cpu_tag));
+		m_hpc3.set_tag(std::forward<U>(hpc3_tag));
 	}
 
 	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER( rex3_r );
-	DECLARE_WRITE32_MEMBER( rex3_w );
+	DECLARE_READ64_MEMBER(rex3_r);
+	DECLARE_WRITE64_MEMBER(rex3_w);
 
 	uint32_t screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 protected:
 	// device-level overrides
@@ -44,129 +53,169 @@ private:
 		DCR_CURSOR_SIZE_64 = 1
 	};
 
-	struct VC2_t
+	struct vc2_t
 	{
-		uint16_t nRegister[0x21];
-		uint16_t nRAM[0x8000];
-		uint8_t nRegIdx;
-		uint16_t nRegData;
+		uint16_t m_vid_entry;
+		uint16_t m_cursor_entry;
+		uint16_t m_cursor_x;
+		uint16_t m_cursor_y;
+		uint16_t m_cur_cursor_x;
+		uint16_t m_did_entry;
+		uint16_t m_scanline_len;
+		uint16_t m_ram_addr;
+		uint16_t m_vt_frame_ptr;
+		uint16_t m_vt_line_ptr;
+		uint16_t m_vt_line_run;
+		uint16_t m_vt_line_count;
+		uint16_t m_cursor_table_ptr;
+		uint16_t m_work_cursor_y;
+		uint16_t m_did_frame_ptr;
+		uint16_t m_did_line_ptr;
+		uint16_t m_display_ctrl;
+		uint16_t m_config;
+		uint16_t m_ram[0x8000];
+		uint8_t m_reg_idx;
+		uint16_t m_reg_data;
 	};
 
 
-	struct XMAP_t
+	struct xmap_t
 	{
-		uint32_t nRegister[0x08];
-		uint32_t nModeTable[0x20];
+		uint32_t m_config;
+		uint32_t m_revision;
+		uint32_t m_entries;
+		uint32_t m_cursor_cmap;
+		uint32_t m_popup_cmap;
+		uint32_t m_mode_table_idx;
+		uint32_t m_mode_table[0x20];
 	};
 
-	struct REX3_t
+	struct rex3_t
 	{
-		uint32_t nDrawMode1;
-		uint32_t nDrawMode0;
-		uint32_t nLSMode;
-		uint32_t nLSPattern;
-		uint32_t nLSPatSave;
-		uint32_t nZPattern;
-		uint32_t nColorBack;
-		uint32_t nColorVRAM;
-		uint32_t nAlphaRef;
-		//uint32_t nStall0;
-		uint32_t nSMask0X;
-		uint32_t nSMask0Y;
-		uint32_t nSetup;
-		uint32_t nStepZ;
-		uint32_t nXStart;
-		uint32_t nYStart;
-		uint32_t nXEnd;
-		uint32_t nYEnd;
-		uint32_t nXSave;
-		uint32_t nXYMove;
-		uint32_t nBresD;
-		uint32_t nBresS1;
-		uint32_t nBresOctInc1;
-		uint32_t nBresRndInc2;
-		uint32_t nBresE1;
-		uint32_t nBresS2;
-		uint32_t nAWeight0;
-		uint32_t nAWeight1;
-		uint32_t nXStartF;
-		uint32_t nYStartF;
-		uint32_t nXEndF;
-		uint32_t nYEndF;
-		uint32_t nXStartI;
-		//uint32_t nYEndF1;
-		uint32_t nXYStartI;
-		uint32_t nXYEndI;
-		uint32_t nXStartEndI;
-		uint32_t nColorRed;
-		uint32_t nColorAlpha;
-		uint32_t nColorGreen;
-		uint32_t nColorBlue;
-		uint32_t nSlopeRed;
-		uint32_t nSlopeAlpha;
-		uint32_t nSlopeGreen;
-		uint32_t nSlopeBlue;
-		uint32_t nWriteMask;
-		uint32_t nZeroFract;
-		uint32_t nZeroOverflow;
-		//uint32_t nColorIndex;
-		uint32_t nHostDataPortMSW;
-		uint32_t nHostDataPortLSW;
-		uint32_t nDCBMode;
-		uint32_t nDCBRegSelect;
-		uint32_t nDCBSlvSelect;
-		uint32_t nDCBDataMSW;
-		uint32_t nDCBDataLSW;
-		uint32_t nSMask1X;
-		uint32_t nSMask1Y;
-		uint32_t nSMask2X;
-		uint32_t nSMask2Y;
-		uint32_t nSMask3X;
-		uint32_t nSMask3Y;
-		uint32_t nSMask4X;
-		uint32_t nSMask4Y;
-		uint32_t nTopScanline;
-		uint32_t nXYWin;
-		uint32_t nClipMode;
-		uint32_t nConfig;
-		uint32_t nStatus;
-		uint8_t nXFerWidth;
-#if 0
-		uint32_t nCurrentX;
-		uint32_t nCurrentY;
-#endif
-		uint32_t nKludge_SkipLine;
+		uint32_t m_draw_mode0;
+		uint32_t m_draw_mode1;
+		uint32_t m_write_width;
+		uint32_t m_ls_mode;
+		uint32_t m_ls_pattern;
+		uint32_t m_ls_pattern_saved;
+		uint32_t m_z_pattern;
+		uint32_t m_color_back;
+		uint32_t m_color_vram;
+		uint32_t m_alpha_ref;
+		uint32_t m_setup;
+		uint32_t m_step_z;
+		int32_t m_x_start;
+		int32_t m_y_start;
+		int32_t m_x_end;
+		int32_t m_y_end;
+		int16_t m_x_save;
+		uint32_t m_xy_move;
+		int16_t m_x_move;
+		int16_t m_y_move;
+		uint32_t m_bres_d;
+		uint32_t m_bres_s1;
+		uint32_t m_bres_octant_inc1;
+		uint32_t m_bres_round_inc2;
+		uint32_t m_bres_e1;
+		uint32_t m_bres_s2;
+		uint32_t m_a_weight0;
+		uint32_t m_a_weight1;
+		uint32_t m_x_start_f;
+		uint32_t m_y_start_f;
+		uint32_t m_x_end_f;
+		uint32_t m_y_end_f;
+		int16_t m_x_start_i;
+		uint32_t m_xy_start_i;
+		int16_t m_y_start_i;
+		uint32_t m_xy_end_i;
+		int16_t m_x_end_i;
+		int16_t m_y_end_i;
+		uint32_t m_x_start_end_i;
+		int32_t m_color_red;
+		int32_t m_color_alpha;
+		int32_t m_color_green;
+		int32_t m_color_blue;
+		int32_t m_slope_red;
+		int32_t m_slope_alpha;
+		int32_t m_slope_green;
+		int32_t m_slope_blue;
+		uint32_t m_write_mask;
+		uint32_t m_color_i;
+		uint32_t m_zero_overflow;
+		uint64_t m_host_dataport;
+		uint32_t m_dcb_mode;
+		uint32_t m_dcb_reg_select;
+		uint32_t m_dcb_slave_select;
+		uint32_t m_dcb_data_msw;
+		uint32_t m_dcb_data_lsw;
+		uint32_t m_smask_x[5];
+		uint32_t m_smask_y[5];
+		uint32_t m_top_scanline;
+		uint32_t m_xy_window;
+		int16_t m_x_window;
+		int16_t m_y_window;
+		uint32_t m_clip_mode;
+		uint32_t m_config;
+		uint32_t m_status;
+		uint8_t m_xfer_width;
+		bool m_read_active;
 	};
 
-
-	struct CMAP_t
+	struct cmap_t
 	{
-		uint16_t nPaletteIndex;
-		uint32_t nPalette[0x10000];
+		uint16_t m_palette_idx;
+		uint32_t m_palette[0x10000];
 	};
 
-	uint32_t get_cursor_pixel(int x, int y);
+	uint8_t get_cursor_pixel(int x, int y);
 
 	// internal state
 
-	DECLARE_READ32_MEMBER( cmap0_r );
-	DECLARE_WRITE32_MEMBER( cmap0_w );
-	DECLARE_READ32_MEMBER( cmap1_r );
-	DECLARE_READ32_MEMBER( xmap0_r );
-	DECLARE_WRITE32_MEMBER( xmap0_w );
-	DECLARE_READ32_MEMBER( xmap1_r );
-	DECLARE_WRITE32_MEMBER( xmap1_w );
-	DECLARE_READ32_MEMBER( vc2_r );
-	DECLARE_WRITE32_MEMBER( vc2_w );
-	void DoREX3Command();
+	uint32_t cmap0_read();
+	void cmap0_write(uint32_t data);
+	uint32_t cmap1_read();
+	uint32_t xmap0_read();
+	void xmap0_write(uint32_t data);
+	uint32_t xmap1_read();
+	void xmap1_write(uint32_t data);
+	uint32_t vc2_read();
+	void vc2_write(uint32_t data);
 
-	VC2_t  m_VC2;
-	XMAP_t m_XMAP0;
-	XMAP_t m_XMAP1;
-	REX3_t m_REX3;
-	std::unique_ptr<uint32_t[]> m_base;
-	uint8_t  m_nDrawGreen;
-	CMAP_t m_CMAP0;
+	void write_x_start(int32_t val);
+	void write_y_start(int32_t val);
+	void write_x_end(int32_t val);
+	void write_y_end(int32_t val);
+
+	bool pixel_clip_pass(int16_t x, int16_t y);
+	void write_pixel(uint8_t color, bool shade);
+	void write_pixel(int16_t x, int16_t y, uint8_t color);
+	void store_pixel(uint8_t *dest_buf, uint8_t src);
+
+	void do_v_iline(uint8_t color, bool skip_last, bool shade);
+	void do_h_iline(uint8_t color, bool skip_last, bool shade);
+	void do_iline(uint8_t color, bool skip_last, bool shade);
+	uint8_t do_pixel_read();
+	uint64_t do_pixel_word_read();
+	void do_rex3_command();
+
+	required_device<cpu_device> m_maincpu;
+	required_device<hpc3_device> m_hpc3;
+	vc2_t  m_vc2;
+	xmap_t m_xmap0;
+	xmap_t m_xmap1;
+	rex3_t m_rex3;
+	std::unique_ptr<uint8_t[]> m_rgbci;
+	std::unique_ptr<uint8_t[]> m_olay;
+	std::unique_ptr<uint8_t[]> m_pup;
+	std::unique_ptr<uint8_t[]> m_cid;
+	cmap_t m_cmap0;
+
+#if ENABLE_NEWVIEW_LOG
+	void start_logging();
+	void stop_logging();
+
+	FILE *m_newview_log;
+#endif
 };
 
 DECLARE_DEVICE_TYPE(NEWPORT_VIDEO, newport_video_device)

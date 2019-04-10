@@ -15,7 +15,7 @@ public:
 	void set_flip_screen(bool flip) { m_flip_screen = flip; }
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_gfx_region(int region) { m_gfxregion = region; }
 
 protected:
@@ -29,11 +29,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(DECO_KARNOVSPRITES, deco_karnovsprites_device)
-
-#define MCFG_DECO_KARNOVSPRITES_GFXDECODE(_gfxtag) \
-	downcast<deco_karnovsprites_device &>(*device).set_gfxdecode_tag(_gfxtag);
-
-#define MCFG_DECO_KARNOVSPRITES_GFX_REGION(_region) \
-	downcast<deco_karnovsprites_device &>(*device).set_gfx_region(_region);
 
 #endif // MAME_VIDEO_DECKARN_H

@@ -131,20 +131,20 @@ void ym3812_device::device_reset()
 }
 
 
-READ8_MEMBER( ym3812_device::read )
+u8 ym3812_device::read(offs_t offset)
 {
 	return ym3812_read(m_chip, offset & 1);
 }
 
-WRITE8_MEMBER( ym3812_device::write )
+void ym3812_device::write(offs_t offset, u8 data)
 {
 	ym3812_write(m_chip, offset & 1, data);
 }
 
-READ8_MEMBER( ym3812_device::status_port_r ) { return read(space, 0); }
-READ8_MEMBER( ym3812_device::read_port_r ) { return read(space, 1); }
-WRITE8_MEMBER( ym3812_device::control_port_w ) { write(space, 0, data); }
-WRITE8_MEMBER( ym3812_device::write_port_w ) { write(space, 1, data); }
+u8 ym3812_device::status_port_r() { return read(0); }
+u8 ym3812_device::read_port_r() { return read(1); }
+void ym3812_device::control_port_w(u8 data) { write(0, data); }
+void ym3812_device::write_port_w(u8 data) { write(1, data); }
 
 
 DEFINE_DEVICE_TYPE(YM3812, ym3812_device, "ym3812", "YM3812 OPL2")

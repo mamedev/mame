@@ -242,15 +242,17 @@ DEFINE_DEVICE_TYPE(UPD7201_NEW,    upd7201_new_device, "upd7201_new",    "NEC uP
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_START(z80sio_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(CHANA_TAG, Z80SIO_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHANB_TAG, Z80SIO_CHANNEL, 0)
-MACHINE_CONFIG_END
+void z80sio_device::device_add_mconfig(machine_config &config)
+{
+	Z80SIO_CHANNEL(config, CHANA_TAG, 0);
+	Z80SIO_CHANNEL(config, CHANB_TAG, 0);
+}
 
-MACHINE_CONFIG_START(i8274_new_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(CHANA_TAG, I8274_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHANB_TAG, I8274_CHANNEL, 0)
-MACHINE_CONFIG_END
+void i8274_new_device::device_add_mconfig(machine_config &config)
+{
+	I8274_CHANNEL(config, CHANA_TAG, 0);
+	I8274_CHANNEL(config, CHANB_TAG, 0);
+}
 
 
 //**************************************************************************
@@ -843,7 +845,7 @@ int i8274_new_device::m1_r()
 //-------------------------------------------------
 //  cd_ba_r -
 //-------------------------------------------------
-READ8_MEMBER( z80sio_device::cd_ba_r )
+uint8_t z80sio_device::cd_ba_r(offs_t offset)
 {
 	int ba = BIT(offset, 0);
 	int cd = BIT(offset, 1);
@@ -856,7 +858,7 @@ READ8_MEMBER( z80sio_device::cd_ba_r )
 //-------------------------------------------------
 //  cd_ba_w -
 //-------------------------------------------------
-WRITE8_MEMBER( z80sio_device::cd_ba_w )
+void z80sio_device::cd_ba_w(offs_t offset, uint8_t data)
 {
 	int ba = BIT(offset, 0);
 	int cd = BIT(offset, 1);
@@ -872,7 +874,7 @@ WRITE8_MEMBER( z80sio_device::cd_ba_w )
 //-------------------------------------------------
 //  ba_cd_r -
 //-------------------------------------------------
-READ8_MEMBER( z80sio_device::ba_cd_r )
+uint8_t z80sio_device::ba_cd_r(offs_t offset)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);
@@ -885,7 +887,7 @@ READ8_MEMBER( z80sio_device::ba_cd_r )
 //-------------------------------------------------
 //  ba_cd_w -
 //-------------------------------------------------
-WRITE8_MEMBER( z80sio_device::ba_cd_w )
+void z80sio_device::ba_cd_w(offs_t offset, uint8_t data)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);

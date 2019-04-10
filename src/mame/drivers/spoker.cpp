@@ -42,8 +42,8 @@
 class spoker_state : public driver_device
 {
 public:
-	spoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	spoker_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -638,7 +638,7 @@ void spoker_state::spoker(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spoker);
-	PALETTE(config, m_palette, 0x400).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

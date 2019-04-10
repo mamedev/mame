@@ -37,7 +37,8 @@ DEFINE_DEVICE_TYPE(NUBUS_QUADRALINK, nubus_quadralink_device, "nb_qdlink", "Appl
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nubus_quadralink_device::device_add_mconfig)
+void nubus_quadralink_device::device_add_mconfig(machine_config &config)
+{
 	SCC8530N(config, m_scc1, 3.6864_MHz_XTAL);
 	m_scc1->out_txda_callback().set("serport0", FUNC(rs232_port_device::write_txd));
 	m_scc1->out_txdb_callback().set("serport1", FUNC(rs232_port_device::write_txd));
@@ -46,26 +47,26 @@ MACHINE_CONFIG_START(nubus_quadralink_device::device_add_mconfig)
 	m_scc2->out_txda_callback().set("serport2", FUNC(rs232_port_device::write_txd));
 	m_scc2->out_txdb_callback().set("serport3", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("serport0", RS232_PORT, isa_com, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc1, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc1, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc1, z80scc_device, ctsa_w))
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
+	serport0.rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
+	serport0.dcd_handler().set(m_scc1, FUNC(z80scc_device::dcda_w));
+	serport0.cts_handler().set(m_scc1, FUNC(z80scc_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("serport1", RS232_PORT, isa_com, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc1, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc1, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc1, z80scc_device, ctsb_w))
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
+	serport1.dcd_handler().set(m_scc1, FUNC(z80scc_device::dcdb_w));
+	serport1.cts_handler().set(m_scc1, FUNC(z80scc_device::ctsb_w));
 
-	MCFG_DEVICE_ADD("serport2", RS232_PORT, isa_com, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsa_w))
+	rs232_port_device &serport2(RS232_PORT(config, "serport2", isa_com, nullptr));
+	serport2.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxa_w));
+	serport2.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcda_w));
+	serport2.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("serport3", RS232_PORT, isa_com, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsb_w))
-MACHINE_CONFIG_END
+	rs232_port_device &serport3(RS232_PORT(config, "serport3", isa_com, nullptr));
+	serport3.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxb_w));
+	serport3.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
+	serport3.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

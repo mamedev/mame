@@ -276,7 +276,7 @@ void cms_state::cms6502(machine_config &config)
 
 	/* 7 Slot Backplane */
 	ACORN_BUS(config, m_bus, 0);
-	m_bus->set_cputag(m_maincpu);
+	m_bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set(FUNC(cms_state::bus_nmi_w));
 	ACORN_BUS_SLOT(config, "bus1", m_bus, cms_bus_devices, "4080term");

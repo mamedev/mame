@@ -169,7 +169,6 @@ Notes:
 #include "emu.h"
 #include "includes/namcona1.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/namcomcu.h"
 #include "speaker.h"
 
 #define MASTER_CLOCK    XTAL(50'113'000)
@@ -603,7 +602,7 @@ void xday2_namcona2_state::xday2_main_map(address_map &map)
 
 READ16_MEMBER(namcona1_state::na1mcu_shared_r)
 {
-	uint16_t data = flipendian_int16(m_workram[offset]);
+	uint16_t data = swapendian_int16(m_workram[offset]);
 
 #if 0
 	if (offset >= 0x70000/2)
@@ -616,36 +615,18 @@ READ16_MEMBER(namcona1_state::na1mcu_shared_r)
 
 WRITE16_MEMBER(namcona1_state::na1mcu_shared_w)
 {
-	mem_mask = flipendian_int16(mem_mask);
-	data = flipendian_int16(data);
+	mem_mask = swapendian_int16(mem_mask);
+	data = swapendian_int16(data);
 
 	COMBINE_DATA(&m_workram[offset]);
-}
-
-READ16_MEMBER(namcona1_state::snd_r)
-{
-	/* can't use DEVREADWRITE8 for this because it is opposite endianness to the CPU for some reason */
-	return m_c140->c140_r(space,offset*2+1) | m_c140->c140_r(space,offset*2)<<8;
-}
-
-WRITE16_MEMBER(namcona1_state::snd_w)
-{
-	/* can't use DEVREADWRITE8 for this because it is opposite endianness to the CPU for some reason */
-	if (ACCESSING_BITS_0_7)
-	{
-		m_c140->c140_w(space,(offset*2)+1, data);
-	}
-
-	if (ACCESSING_BITS_8_15)
-	{
-		m_c140->c140_w(space,(offset*2), data>>8);
-	}
 }
 
 void namcona1_state::namcona1_mcu_map(address_map &map)
 {
 	map(0x000800, 0x000fff).rw(FUNC(namcona1_state::mcu_mailbox_r), FUNC(namcona1_state::mcu_mailbox_w_mcu)); // "Mailslot" communications ports
-	map(0x001000, 0x001fff).rw(FUNC(namcona1_state::snd_r), FUNC(namcona1_state::snd_w)); // C140-alike sound chip
+	map(0x001000, 0x001fff).lrw8("c219_rw",
+		[this](offs_t offset) { return m_c140->c140_r(offset ^ 1)/* need ^ 1 because endian issue */; },
+		[this](offs_t offset, u8 data) { m_c140->c140_w(offset ^ 1, data); }); // C140-alike sound chip
 	map(0x002000, 0x002fff).rw(FUNC(namcona1_state::na1mcu_shared_r), FUNC(namcona1_state::na1mcu_shared_w)); // mirror of first page of shared work RAM
 	map(0x003000, 0x00afff).ram();                     // there is a 32k RAM chip according to CGFM
 	map(0x200000, 0x27ffff).rw(FUNC(namcona1_state::na1mcu_shared_r), FUNC(namcona1_state::na1mcu_shared_w)); // shared work RAM
@@ -754,22 +735,10 @@ void namcona1_state::machine_reset()
 // bit 2 => port 5
 // bit 3 => port 6
 // bit 7 => port 7
-READ8_MEMBER(namcona1_state::portana_r)
+template <int Bit>
+uint16_t namcona1_state::portana_r()
 {
-	static const uint8_t bitnum[8] = { 0x40, 0x20, 0x10, 0x01, 0x02, 0x04, 0x08, 0x80 };
-	uint8_t port = m_io_p3->read();
-
-	return (port & bitnum[offset>>1]) ? 0xff : 0x00;
-}
-
-void namcona1_state::namcona1_mcu_io_map(address_map &map)
-{
-	map(M37710_PORT4, M37710_PORT4).rw(FUNC(namcona1_state::port4_r), FUNC(namcona1_state::port4_w));
-	map(M37710_PORT5, M37710_PORT5).rw(FUNC(namcona1_state::port5_r), FUNC(namcona1_state::port5_w));
-	map(M37710_PORT6, M37710_PORT6).rw(FUNC(namcona1_state::port6_r), FUNC(namcona1_state::port6_w));
-	map(M37710_PORT7, M37710_PORT7).rw(FUNC(namcona1_state::port7_r), FUNC(namcona1_state::port7_w));
-	map(M37710_PORT8, M37710_PORT8).rw(FUNC(namcona1_state::port8_r), FUNC(namcona1_state::port8_w));
-	map(0x10, 0x1f).r(FUNC(namcona1_state::portana_r));
+	return BIT(m_io_p3->read(), Bit) ? 0xffff : 0x0000;
 }
 
 
@@ -975,7 +944,24 @@ void namcona1_state::c69(machine_config &config)
 {
 	NAMCO_C69(config, m_mcu, MASTER_CLOCK/4);
 	m_mcu->set_addrmap(AS_PROGRAM, &namcona1_state::namcona1_mcu_map);
-	m_mcu->set_addrmap(AS_IO, &namcona1_state::namcona1_mcu_io_map);
+	m_mcu->p4_in_cb().set(FUNC(namcona1_state::port4_r));
+	m_mcu->p4_out_cb().set(FUNC(namcona1_state::port4_w));
+	m_mcu->p5_in_cb().set(FUNC(namcona1_state::port5_r));
+	m_mcu->p5_out_cb().set(FUNC(namcona1_state::port5_w));
+	m_mcu->p6_in_cb().set(FUNC(namcona1_state::port6_r));
+	m_mcu->p6_out_cb().set(FUNC(namcona1_state::port6_w));
+	m_mcu->p7_in_cb().set(FUNC(namcona1_state::port7_r));
+	m_mcu->p7_out_cb().set(FUNC(namcona1_state::port7_w));
+	m_mcu->p8_in_cb().set(FUNC(namcona1_state::port8_r));
+	m_mcu->p8_out_cb().set(FUNC(namcona1_state::port8_w));
+	m_mcu->an0_cb().set(FUNC(namcona1_state::portana_r<6>));
+	m_mcu->an1_cb().set(FUNC(namcona1_state::portana_r<5>));
+	m_mcu->an2_cb().set(FUNC(namcona1_state::portana_r<4>));
+	m_mcu->an3_cb().set(FUNC(namcona1_state::portana_r<0>));
+	m_mcu->an4_cb().set(FUNC(namcona1_state::portana_r<1>));
+	m_mcu->an5_cb().set(FUNC(namcona1_state::portana_r<2>));
+	m_mcu->an6_cb().set(FUNC(namcona1_state::portana_r<3>));
+	m_mcu->an7_cb().set(FUNC(namcona1_state::portana_r<7>));
 }
 
 /* cropped at sides */
@@ -995,7 +981,7 @@ void namcona1_state::namcona_base(machine_config &config)
 	m_screen->set_screen_update(FUNC(namcona1_state::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, m_palette, 0x2000).enable_shadows();
+	PALETTE(config, m_palette).set_entries(0x2000).enable_shadows();
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcona1);
 
@@ -1020,8 +1006,25 @@ void namcona1_state::namcona1(machine_config &config)
 void namcona2_state::c70(machine_config &config)
 {
 	NAMCO_C70(config, m_mcu, MASTER_CLOCK/4);
-	m_mcu->set_addrmap(AS_PROGRAM, &namcona1_state::namcona1_mcu_map);
-	m_mcu->set_addrmap(AS_IO, &namcona1_state::namcona1_mcu_io_map);
+	m_mcu->set_addrmap(AS_PROGRAM, &namcona2_state::namcona1_mcu_map);
+	m_mcu->p4_in_cb().set(FUNC(namcona2_state::port4_r));
+	m_mcu->p4_out_cb().set(FUNC(namcona2_state::port4_w));
+	m_mcu->p5_in_cb().set(FUNC(namcona2_state::port5_r));
+	m_mcu->p5_out_cb().set(FUNC(namcona2_state::port5_w));
+	m_mcu->p6_in_cb().set(FUNC(namcona2_state::port6_r));
+	m_mcu->p6_out_cb().set(FUNC(namcona2_state::port6_w));
+	m_mcu->p7_in_cb().set(FUNC(namcona2_state::port7_r));
+	m_mcu->p7_out_cb().set(FUNC(namcona2_state::port7_w));
+	m_mcu->p8_in_cb().set(FUNC(namcona2_state::port8_r));
+	m_mcu->p8_out_cb().set(FUNC(namcona2_state::port8_w));
+	m_mcu->an0_cb().set(FUNC(namcona2_state::portana_r<6>));
+	m_mcu->an1_cb().set(FUNC(namcona2_state::portana_r<5>));
+	m_mcu->an2_cb().set(FUNC(namcona2_state::portana_r<4>));
+	m_mcu->an3_cb().set(FUNC(namcona2_state::portana_r<0>));
+	m_mcu->an4_cb().set(FUNC(namcona2_state::portana_r<1>));
+	m_mcu->an5_cb().set(FUNC(namcona2_state::portana_r<2>));
+	m_mcu->an6_cb().set(FUNC(namcona2_state::portana_r<3>));
+	m_mcu->an7_cb().set(FUNC(namcona2_state::portana_r<7>));
 }
 
 void namcona2_state::namcona2(machine_config &config)
@@ -1043,7 +1046,7 @@ void xday2_namcona2_state::xday2(machine_config &config)
 	EEPROM_2864(config, "eeprom");
 
 	// TODO: unknown sub type
-	MSM6242(config,"rtc", XTAL(32'768));
+	MSM6242(config, "rtc", XTAL(32'768));
 }
 
  /* NA-1 Hardware */

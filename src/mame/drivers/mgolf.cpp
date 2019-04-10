@@ -39,7 +39,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	DECLARE_PALETTE_INIT(mgolf);
+	void mgolf_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -302,7 +302,7 @@ static INPUT_PORTS_START( mgolf )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(mgolf_state, mgolf)
+void mgolf_state::mgolf_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x80, 0x80, 0x80));
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
@@ -368,27 +368,26 @@ void mgolf_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(mgolf_state::mgolf)
-
+void mgolf_state::mgolf(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 16) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	M6502(config, m_maincpu, 12096000 / 16); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mgolf_state::cpu_map);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
-	MCFG_SCREEN_UPDATE_DRIVER(mgolf_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 262);
+	m_screen->set_visarea(0, 255, 0, 223);
+	m_screen->set_screen_update(FUNC(mgolf_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mgolf)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(mgolf_state, mgolf)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mgolf);
+	PALETTE(config, m_palette, FUNC(mgolf_state::mgolf_palette), 4);
 
 	/* sound hardware */
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( mgolf )

@@ -76,19 +76,20 @@ void gamemasters_state::mem_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(gamemasters_state::gmsshoot)
-	MCFG_DEVICE_ADD("maincpu", R65C02, 4_MHz_XTAL / 4) // divider not verified
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+void gamemasters_state::gmsshoot(machine_config &config)
+{
+	R65C02(config, m_maincpu, 4_MHz_XTAL / 4); // divider not verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &gamemasters_state::mem_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MK48Z02B-25
 
 	// LCD video?
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8912, 4_MHz_XTAL / 4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	ay8912_device &aysnd(AY8912(config, "aysnd", 4_MHz_XTAL / 4));
+	aysnd.port_a_read_callback().set_ioport("DSW");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 
 static INPUT_PORTS_START(gmsshoot)

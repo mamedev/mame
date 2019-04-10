@@ -27,73 +27,75 @@
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(xevious_state,xevious)
+void xevious_state::xevious_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-	#define TOTAL_COLORS(gfxn) (m_gfxdecode->gfx(gfxn)->colors() *m_gfxdecode->gfx(gfxn)->granularity())
+	auto const TOTAL_COLORS = [this] (int gfxn) { return m_gfxdecode->gfx(gfxn)->colors() * m_gfxdecode->gfx(gfxn)->granularity(); };
 
-	for (i = 0;i < 128;i++)
+	for (int i = 0; i < 128; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int bit0, bit1, bit2, bit3;
 
-		/* red component */
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		/* green component */
-		bit0 = (color_prom[256] >> 0) & 0x01;
-		bit1 = (color_prom[256] >> 1) & 0x01;
-		bit2 = (color_prom[256] >> 2) & 0x01;
-		bit3 = (color_prom[256] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		/* blue component */
-		bit0 = (color_prom[2*256] >> 0) & 0x01;
-		bit1 = (color_prom[2*256] >> 1) & 0x01;
-		bit2 = (color_prom[2*256] >> 2) & 0x01;
-		bit3 = (color_prom[2*256] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// red component
+		bit0 = BIT(color_prom[0], 0);
+		bit1 = BIT(color_prom[0], 1);
+		bit2 = BIT(color_prom[0], 2);
+		bit3 = BIT(color_prom[0], 3);
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// green component
+		bit0 = BIT(color_prom[256], 0);
+		bit1 = BIT(color_prom[256], 1);
+		bit2 = BIT(color_prom[256], 2);
+		bit3 = BIT(color_prom[256], 3);
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// blue component
+		bit0 = BIT(color_prom[2*256], 0);
+		bit1 = BIT(color_prom[2*256], 1);
+		bit2 = BIT(color_prom[2*256], 2);
+		bit3 = BIT(color_prom[2*256], 3);
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette.set_indirect_color(i,rgb_t(r,g,b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 
-	/* color 0x80 is used by sprites to mark transparency */
-	palette.set_indirect_color(0x80,rgb_t(0,0,0));
+	// color 0x80 is used by sprites to mark transparency
+	palette.set_indirect_color(0x80, rgb_t(0, 0, 0));
 
-	color_prom += 128;  /* the bottom part of the PROM is unused */
+	color_prom += 128;  // the bottom part of the PROM is unused
 	color_prom += 2*256;
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 
-	/* background tiles */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
+	// background tiles
+	for (int i = 0; i < TOTAL_COLORS(1); i++)
 	{
-		palette.set_pen_indirect(m_gfxdecode->gfx(1)->colorbase() + i,
+		palette.set_pen_indirect(
+				m_gfxdecode->gfx(1)->colorbase() + i,
 				(color_prom[0] & 0x0f) | ((color_prom[TOTAL_COLORS(1)] & 0x0f) << 4));
 
 		color_prom++;
 	}
 	color_prom += TOTAL_COLORS(1);
 
-	/* sprites */
-	for (i = 0;i < TOTAL_COLORS(2);i++)
+	// sprites
+	for (int i = 0; i < TOTAL_COLORS(2); i++)
 	{
-		int c = (color_prom[0] & 0x0f) | ((color_prom[TOTAL_COLORS(2)] & 0x0f) << 4);
+		int const c = (color_prom[0] & 0x0f) | ((color_prom[TOTAL_COLORS(2)] & 0x0f) << 4);
 
-		palette.set_pen_indirect(m_gfxdecode->gfx(2)->colorbase() + i,
+		palette.set_pen_indirect(
+				m_gfxdecode->gfx(2)->colorbase() + i,
 				(c & 0x80) ? (c & 0x7f) : 0x80);
 
 		color_prom++;
 	}
 	color_prom += TOTAL_COLORS(2);
 
-	/* foreground characters */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
+	// foreground characters
+	for (int i = 0; i < TOTAL_COLORS(0); i++)
 	{
-		palette.set_pen_indirect(m_gfxdecode->gfx(0)->colorbase() + i,
-				(i % 2 != 0) ? (i / 2) : 0x80);
+		palette.set_pen_indirect(
+				m_gfxdecode->gfx(0)->colorbase() + i,
+				BIT(i, 0) ? (i >> 1) : 0x80);
 	}
 }
 

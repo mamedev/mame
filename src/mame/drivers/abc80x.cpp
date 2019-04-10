@@ -175,8 +175,8 @@ DISCRETE_SOUND_END
 
 READ8_MEMBER( abc800_state::pling_r )
 {
-	m_discrete->write(space, NODE_01, 0);
-	m_discrete->write(space, NODE_01, 1);
+	m_discrete->write(NODE_01, 0);
+	m_discrete->write(NODE_01, 1);
 
 	return 0xff;
 }
@@ -1049,7 +1049,7 @@ QUICKLOAD_LOAD_MEMBER( abc800_state, bac )
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( common )
+//  machine_config( common )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(abc800_state::common)
@@ -1065,7 +1065,7 @@ MACHINE_CONFIG_START(abc800_state::common)
 	m_ctc->zc_callback<1>().set(FUNC(abc800_state::ctc_z1_w));
 	m_ctc->zc_callback<2>().set(m_dart, FUNC(z80dart_device::rxca_w));
 	m_ctc->zc_callback<2>().append(m_dart, FUNC(z80dart_device::txca_w));
-	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_CTC_TAG, abc800_state, ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
+	TIMER(config, TIMER_CTC_TAG).configure_periodic(FUNC(abc800_state::ctc_tick), attotime::from_hz(ABC800_X01/2/2/2));
 
 	Z80SIO(config, m_sio, ABC800_X01/2/2);
 	m_sio->out_txda_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
@@ -1083,46 +1083,46 @@ MACHINE_CONFIG_START(abc800_state::common)
 	m_dart->out_txdb_callback().set(ABC_KEYBOARD_PORT_TAG, FUNC(abc_keyboard_port_device::txd_w));
 	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_CASSETTE_TAG, abc800_state, cassette_input_tick, attotime::from_hz(44100))
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
+	TIMER(config, TIMER_CASSETTE_TAG).configure_periodic(FUNC(abc800_state::cassette_input_tick), attotime::from_hz(44100));
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_dart, z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_dart, z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_dart, z80dart_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
+	rs232a.dcd_handler().set(m_dart, FUNC(z80dart_device::dcda_w));
+	rs232a.cts_handler().set(m_dart, FUNC(z80dart_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_sio, z80sio_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_sio, z80sio_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_sio, z80sio_device, ctsa_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_sio, FUNC(z80sio_device::rxa_w));
+	rs232b.dcd_handler().set(m_sio, FUNC(z80sio_device::dcda_w));
+	rs232b.cts_handler().set(m_sio, FUNC(z80sio_device::ctsa_w));
 
-	MCFG_ABC_KEYBOARD_PORT_ADD(ABC_KEYBOARD_PORT_TAG, nullptr)
-	MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(WRITELINE(m_dart, z80dart_device, rxb_w))
-	MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(WRITELINE(m_dart, z80dart_device, rxtxcb_w))
-	MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(WRITELINE(m_dart, z80dart_device, dcdb_w))
+	abc_keyboard_port_device &kb(ABC_KEYBOARD_PORT(config, ABC_KEYBOARD_PORT_TAG, abc_keyboard_devices, nullptr));
+	kb.out_rx_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
+	kb.out_trxc_handler().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
+	kb.out_keydown_handler().set(m_dart, FUNC(z80dart_device::dcdb_w));
 
-	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_cards, nullptr)
+	ABCBUS_SLOT(config, ABCBUS_TAG, ABC800_X01/2/2, abcbus_cards, nullptr);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, abc800_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	DISCRETE(config, m_discrete, abc800_discrete).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc800")
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "abc800_hdd")
+	SOFTWARE_LIST(config, "flop_list").set_original("abc800");
+	SOFTWARE_LIST(config, "hdd_list").set_original("abc800_hdd");
 
 	// quickload
-	MCFG_QUICKLOAD_ADD("quickload", abc800_state, bac, "bac", 2)
+	MCFG_QUICKLOAD_ADD("quickload", abc800_state, bac, "bac", attotime::from_seconds(2))
 MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( abc800c )
+//  machine_config( abc800c )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc800c_state::abc800c)
+void abc800c_state::abc800c(machine_config &config)
+{
 	common(config);
 
 	// basic machine hardware
@@ -1133,23 +1133,23 @@ MACHINE_CONFIG_START(abc800c_state::abc800c)
 	abc800c_video(config);
 
 	// peripheral hardware
-	MCFG_DEVICE_MODIFY(ABC_KEYBOARD_PORT_TAG)
-	MCFG_SLOT_DEFAULT_OPTION("abc800")
-	MCFG_SLOT_FIXED(true)
+	abc_keyboard_port_device &kb(*subdevice<abc_keyboard_port_device>(ABC_KEYBOARD_PORT_TAG));
+	kb.set_default_option("abc800");
+	kb.set_fixed(true);
 
-	MCFG_DEVICE_MODIFY(ABCBUS_TAG)
-	MCFG_SLOT_DEFAULT_OPTION("abc830")
+	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc830");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( abc800m )
+//  machine_config( abc800m )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc800m_state::abc800m)
+void abc800m_state::abc800m(machine_config &config)
+{
 	common(config);
 
 	// basic machine hardware
@@ -1160,23 +1160,23 @@ MACHINE_CONFIG_START(abc800m_state::abc800m)
 	abc800m_video(config);
 
 	// peripheral hardware
-	MCFG_DEVICE_MODIFY(ABC_KEYBOARD_PORT_TAG)
-	MCFG_SLOT_DEFAULT_OPTION("abc800")
-	MCFG_SLOT_FIXED(true)
+	abc_keyboard_port_device &kb(*subdevice<abc_keyboard_port_device>(ABC_KEYBOARD_PORT_TAG));
+	kb.set_default_option("abc800");
+	kb.set_fixed(true);
 
-	MCFG_DEVICE_MODIFY(ABCBUS_TAG)
-	MCFG_SLOT_DEFAULT_OPTION("abc830")
+	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc830");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( abc802 )
+//  machine_config( abc802 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc802_state::abc802)
+void abc802_state::abc802(machine_config &config)
+{
 	common(config);
 
 	// basic machine hardware
@@ -1190,22 +1190,21 @@ MACHINE_CONFIG_START(abc802_state::abc802)
 	m_dart->out_dtrb_callback().set(FUNC(abc802_state::lrs_w));
 	m_dart->out_rtsb_callback().set(FUNC(abc802_state::mux80_40_w));
 
-	MCFG_DEVICE_MODIFY(ABC_KEYBOARD_PORT_TAG)
-	MCFG_SLOT_DEFAULT_OPTION("abc55")
+	subdevice<abc_keyboard_port_device>(ABC_KEYBOARD_PORT_TAG)->set_default_option("abc55");
 
-	MCFG_DEVICE_MODIFY(ABCBUS_TAG)
-	MCFG_SLOT_DEFAULT_OPTION("abc834")
+	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc834");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( abc806 )
+//  machine_config( abc806 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc806_state::abc806)
+void abc806_state::abc806(machine_config &config)
+{
 	common(config);
 
 	// basic machine hardware
@@ -1220,18 +1219,16 @@ MACHINE_CONFIG_START(abc806_state::abc806)
 
 	m_dart->out_dtrb_callback().set(FUNC(abc806_state::keydtr_w));
 
-	MCFG_DEVICE_MODIFY(ABC_KEYBOARD_PORT_TAG)
-	MCFG_SLOT_DEFAULT_OPTION("abc77")
+	subdevice<abc_keyboard_port_device>(ABC_KEYBOARD_PORT_TAG)->set_default_option("abc77");
 
-	MCFG_DEVICE_MODIFY(ABCBUS_TAG)
-	MCFG_SLOT_DEFAULT_OPTION("abc832")
+	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc832");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("160K").set_extra_options("544K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list2", "abc806")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list2").set_original("abc806");
+}
 
 
 

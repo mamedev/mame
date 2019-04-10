@@ -110,7 +110,7 @@ READ8_MEMBER( pes_state::data_to_i8031)
 
 WRITE8_MEMBER(pes_state::data_from_i8031)
 {
-	m_terminal->write(space,0,data);
+	m_terminal->write(data);
 #ifdef DEBUG_SERIAL_CB
 	fprintf(stderr,"callback: output from i8031/pes to pc/terminal: %02X\n",data);
 #endif
@@ -123,7 +123,7 @@ WRITE8_MEMBER( pes_state::rsq_wsq_w )
 	logerror("port0 write: RSWS states updated: /RS: %d, /WS: %d\n", (data&0x2)>>1, data&0x1);
 #endif
 	/* /RS is bit 1, /WS is bit 0 */
-	m_speech->combined_rsq_wsq_w(space, 0, data&0x3);
+	m_speech->combined_rsq_wsq_w(data&0x3);
 }
 
 WRITE8_MEMBER( pes_state::port1_w )
@@ -247,22 +247,24 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-MACHINE_CONFIG_START(pes_state::pes)
+
+void pes_state::pes(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80C31, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(i80c31_mem)
-	MCFG_DEVICE_IO_MAP(i80c31_io)
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, pes_state, data_from_i8031))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, pes_state, data_to_i8031))
+	I80C31(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pes_state::i80c31_mem);
+	m_maincpu->set_addrmap(AS_IO, &pes_state::i80c31_io);
+	m_maincpu->serial_tx_cb().set(FUNC(pes_state::data_from_i8031));
+	m_maincpu->serial_rx_cb().set(FUNC(pes_state::data_to_i8031));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("tms5220", TMS5220C, 720000) /* 720Khz clock, 10khz output */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	TMS5220C(config, m_speech, 720000); /* 720Khz clock, 10khz output */
+	m_speech->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(pes_state, pes_kbd_input))
-MACHINE_CONFIG_END
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(pes_state::pes_kbd_input));
+}
 
 /******************************************************************************
  ROM Definitions

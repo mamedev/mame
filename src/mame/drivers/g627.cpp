@@ -296,11 +296,12 @@ WRITE8_MEMBER( g627_state::lamp_w )
 	}
 }
 
-MACHINE_CONFIG_START(g627_state::g627)
+void g627_state::g627(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 14138000/8)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, 14138000/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &g627_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &g627_state::io_map);
 
 	i8156_device &i8156(I8156(config, "i8156", 14138000/8));
 	i8156.in_pa_callback().set(FUNC(g627_state::porta_r));
@@ -313,12 +314,11 @@ MACHINE_CONFIG_START(g627_state::g627)
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("astrocade", ASTROCADE_IO, 14138000/8) // 0066-117XX audio chip
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ASTROCADE_IO(config, "astrocade", 14138000/8).add_route(ALL_OUTPUTS, "mono", 1.0); // 0066-117XX audio chip
 
 	/* Video */
 	config.set_default_layout(layout_g627);
-MACHINE_CONFIG_END
+}
 
 /*-------------------------------------------------------------------
 / Rotation VIII (09/1978)

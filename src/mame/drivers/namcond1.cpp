@@ -10,14 +10,15 @@
             Walter Fath
 
     abcheck TODOs:
-    - GFX rom banking is a mystery (bad ROMs? Encryption?)
+    - Ending has a rowscroll GFX bug;
     - Where is the extra data ROM mapped?
 
-	gynotai TODOs:
-	- printer (disable it in service mode);
-	- ball sensors aren't understood;
-	- Seems to dislike our YGV608 row/colscroll handling;
-	
+    gynotai TODOs:
+    - printer (disable it in service mode to suppress POST error);
+    - ball sensors aren't understood;
+    - Seems to dislike our YGV608 row/colscroll handling
+      (for example vertical bounding box is halved offset & size wise for Pac-Man goal stage);
+
     To make abcheck run when the EEPROM is clear:
     - F2 to enter service mode
     - Player 3 A/B to navigate to GAME OPTIONS
@@ -367,60 +368,60 @@ WRITE_LINE_MEMBER( namcond1_state::raster_irq_w )
 	m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-MACHINE_CONFIG_START(namcond1_state::namcond1)
-
+void namcond1_state::namcond1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(49'152'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(namcond1_map)
-//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
+	M68000(config, m_maincpu, XTAL(49'152'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcond1_state::namcond1_map);
+//  m_maincpu->set_vblank_int("screen", FUNC(namcond1_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("mcu", H83002, XTAL(49'152'000)/3 )
-	MCFG_DEVICE_PROGRAM_MAP( nd1h8rwmap)
-	MCFG_DEVICE_IO_MAP( nd1h8iomap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcond1_state,  mcu_interrupt)
+	H83002(config, m_mcu, XTAL(49'152'000)/3 );
+	m_mcu->set_addrmap(AS_PROGRAM, &namcond1_state::nd1h8rwmap);
+	m_mcu->set_addrmap(AS_IO, &namcond1_state::nd1h8iomap);
+	m_mcu->set_vblank_int("screen", FUNC(namcond1_state::mcu_interrupt));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_DEVICE_ADD("ygv608", YGV608, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_YGV608_VBLANK_HANDLER(WRITELINE(*this, namcond1_state, vblank_irq_w))
-	MCFG_YGV608_RASTER_HANDLER(WRITELINE(*this, namcond1_state, raster_irq_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	YGV608(config, m_ygv608, 0);
+	m_ygv608->set_palette("palette");
+	m_ygv608->vblank_callback().set(FUNC(namcond1_state::vblank_irq_w));
+	m_ygv608->raster_callback().set(FUNC(namcond1_state::raster_irq_w));
+	m_ygv608->set_screen("screen");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	/*
 	H 804 108 576 48 32
 	V 261 26 224 3 0
 	*/
-	MCFG_SCREEN_RAW_PARAMS( XTAL(49'152'000)/8, 804/2, 108/2, (108+576)/2, 261, 26, 26+224)
-	MCFG_SCREEN_UPDATE_DEVICE("ygv608", ygv608_device, update_screen)
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_raw( XTAL(49'152'000)/8, 804/2, 108/2, (108+576)/2, 261, 26, 26+224);
+	screen.set_screen_update("ygv608", FUNC(ygv608_device::update_screen));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, "palette").set_entries(256);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("c352", C352, XTAL(49'152'000)/2, 288)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
-	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
+	c352_device &c352(C352(config, "c352", XTAL(49'152'000)/2, 288));
+	c352.add_route(0, "lspeaker", 1.00);
+	c352.add_route(1, "rspeaker", 1.00);
+	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
+	//c352.add_route(3, "rspeaker", 1.00);
 
-	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
-MACHINE_CONFIG_END
+	AT28C16(config, "at28c16", 0);
+}
 
-MACHINE_CONFIG_START(namcond1_state::abcheck)
+void namcond1_state::abcheck(machine_config &config)
+{
 	namcond1(config);
-	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(49'152'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(abcheck_map)
-//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcond1_state::abcheck_map);
+//  m_maincpu->set_vblank_int("screen", FUNC(namcond1_state::irq1_line_hold));
 
 	NVRAM(config, "zpr1", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "zpr2", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 ROM_START( ncv1 )
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 16MB for Main CPU */
@@ -522,10 +523,10 @@ ROM_START( gynotai )
 
 	ROM_REGION( 0x800000, "ygv608", 0 )    /* 8MB character generator */
 	ROM_LOAD( "gy1cg0.10e",   0x000000, 0x400000, CRC(938c7912) SHA1(36278a945a00e1549ae55ec65a9b4001537023b0) )
-    ROM_LOAD( "gy1cg1.10f",   0x400000, 0x400000, CRC(5a518733) SHA1(b6ea91629bc6ddf67c47c4189084aa947f4e31ed) )
+	ROM_LOAD( "gy1cg1.10f",   0x400000, 0x400000, CRC(5a518733) SHA1(b6ea91629bc6ddf67c47c4189084aa947f4e31ed) )
 
 	ROM_REGION( 0x200000, "c352", 0 ) // Samples
-	ROM_LOAD( "gy1voic.7c",     0x000000, 0x200000, CRC(f135e79b) SHA1(01ce3e3b366d0b9045ad8599b60ca33c6d21f150) )
+	ROM_LOAD( "gy1voice.7c",  0x000000, 0x200000, CRC(f135e79b) SHA1(01ce3e3b366d0b9045ad8599b60ca33c6d21f150) )
 ROM_END
 
 ROM_START( abcheck )
@@ -537,11 +538,8 @@ ROM_START( abcheck )
 	ROM_LOAD( "an1sub.1d",    0x000000, 0x080000, CRC(50de9130) SHA1(470b3977f4bf12ca65bc42631ccdf81753ef56fd) )
 
 	ROM_REGION( 0x800000, "ygv608", 0 )    /* 4MB character generator */
-	// TODO: gynotai proves these might be underdumped, please check.
-	ROM_LOAD( "an1cg0.10e",   0x000000, 0x200000, BAD_DUMP CRC(6dae0531) SHA1(2f4a4a22d461eb9a5bb88bdfccc3aff44cd3faee) )
-	ROM_RELOAD(				  0x200000, 0x200000 )
-	ROM_LOAD( "an1cg1.10f",   0x400000, 0x200000, BAD_DUMP CRC(8485607a) SHA1(1b9a1950c6db61a2b546fe2f5e56333593e93fb4) )
-	ROM_RELOAD(				  0x600000, 0x200000 )
+	ROM_LOAD( "an1cg0.10e",   0x000000, 0x400000, CRC(14425378) SHA1(c690bd0f48fa2bc285b63e6bc379d2b345eafc7b) )
+	ROM_LOAD( "an1cg1.10f",   0x400000, 0x400000, CRC(0428d718) SHA1(4b4dca7196b9ba1a01558f41c761d3211be67fb0) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "an1voice.7c",  0x000000, 0x200000, CRC(d2bfa453) SHA1(6b7d6bb4d65290d8fd3df5d12b41ae7dce5f3f1c) )
@@ -571,4 +569,4 @@ GAME( 1995, ncv1j2, ncv1, namcond1, namcond1, namcond1_state, empty_init, ROT90,
 GAME( 1996, gynotai,   0, namcond1, gynotai,  namcond1_state, empty_init, ROT0,  "Namco", "Gynotai (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // 1.04
 GAME( 1996, ncv2,      0, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // 1.10
 GAME( 1996, ncv2j,  ncv2, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, abcheck,   0, abcheck,  abcheck,  namcond1_state, empty_init, ROT0,  "Namco", "Abnormal Check", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE ) // 1.20EM
+GAME( 1996, abcheck,   0, abcheck,  abcheck,  namcond1_state, empty_init, ROT0,  "Namco", "Abnormal Check", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE ) // 1.20EM

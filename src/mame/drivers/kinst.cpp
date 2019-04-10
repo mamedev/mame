@@ -718,33 +718,33 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(kinst_state::kinst)
-
+void kinst_state::kinst(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, R4600LE, MASTER_CLOCK*2)
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kinst_state,  irq0_start)
+	R4600LE(config, m_maincpu, MASTER_CLOCK*2);
+	m_maincpu->set_icache_size(16384);
+	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kinst_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(kinst_state::irq0_start));
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 	m_ata->irq_handler().set_inputline("maincpu", 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(kinst_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(320, 240);
+	screen.set_visarea(0, 319, 0, 239);
+	screen.set_screen_update(FUNC(kinst_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_BBBBBGGGGGRRRRR("palette")
+	PALETTE(config, "palette", palette_device::BGR_555);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD(m_dcs, DCS_AUDIO_2K, 0)
-MACHINE_CONFIG_END
+	DCS_AUDIO_2K(config, m_dcs, 0);
+}
 
 
 

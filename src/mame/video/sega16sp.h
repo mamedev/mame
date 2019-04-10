@@ -14,21 +14,6 @@
 #include "segaic16.h"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_BOOTLEG_SYS16A_SPRITES_YORIGIN(_yorigin) \
-	downcast<bootleg_sys16a_sprite_device &>(*device).set_local_originy(_yorigin);
-
-#define MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(_xorigin) \
-	downcast<sega_16bit_sprite_device &>(*device).set_local_originx(_xorigin);
-#define MCFG_BOOTLEG_SYS16B_SPRITES_YORIGIN(_yorigin) \
-	downcast<sega_16bit_sprite_device &>(*device).set_local_originy(_yorigin);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************

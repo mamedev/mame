@@ -11,7 +11,7 @@
 #include "machine/68230pit.h"
 #include "machine/scnxx562.h"
 #include "machine/terminal.h"
-#include "machine/wd33c93.h"
+#include "machine/wd33c9x.h"
 
 DECLARE_DEVICE_TYPE(VME_HCPU30, vme_hcpu30_card_device)
 

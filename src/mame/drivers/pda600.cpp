@@ -221,7 +221,7 @@ void pda600_state::pda600(machine_config &config)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_pda600);
-	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// NVRAM needs to be filled with random data to fail the checksum and be initialized correctly
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);

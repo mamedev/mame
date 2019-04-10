@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -1108,11 +1108,11 @@ void drawParagraph(struct NVGcontext* vg, float x, float y, float width, float h
 		nvgBeginPath(vg);
 		nvgFillColor(vg, nvgRGBA(255,192,0,255) );
 		nvgRoundedRect(vg
-			,  bx::fround(bounds[0])-4.0f
-			,  bx::fround(bounds[1])-2.0f
-			,  bx::fround(bounds[2]-bounds[0])+8.0f
-			,  bx::fround(bounds[3]-bounds[1])+4.0f
-			, (bx::fround(bounds[3]-bounds[1])+4.0f)/2.0f-1.0f
+			,  bx::round(bounds[0])-4.0f
+			,  bx::round(bounds[1])-2.0f
+			,  bx::round(bounds[2]-bounds[0])+8.0f
+			,  bx::round(bounds[3]-bounds[1])+4.0f
+			, (bx::round(bounds[3]-bounds[1])+4.0f)/2.0f-1.0f
 			);
 		nvgFill(vg);
 
@@ -1130,10 +1130,10 @@ void drawParagraph(struct NVGcontext* vg, float x, float y, float width, float h
 	nvgBeginPath(vg);
 	nvgFillColor(vg, nvgRGBA(220,220,220,255) );
 	nvgRoundedRect(vg
-		, bx::fround(bounds[0]-2.0f)
-		, bx::fround(bounds[1]-2.0f)
-		, bx::fround(bounds[2]-bounds[0])+4.0f
-		, bx::fround(bounds[3]-bounds[1])+4.0f
+		, bx::round(bounds[0]-2.0f)
+		, bx::round(bounds[1]-2.0f)
+		, bx::round(bounds[2]-bounds[0])+4.0f
+		, bx::round(bounds[3]-bounds[1])+4.0f
 		, 3.0f
 		);
 	px = float( (int)( (bounds[2]+bounds[0])/2) );
@@ -1250,8 +1250,13 @@ public:
 		m_debug  = BGFX_DEBUG_NONE;
 		m_reset  = BGFX_RESET_VSYNC;
 
-		bgfx::init(args.m_type, args.m_pciId);
-		bgfx::reset(m_width, m_height, m_reset);
+		bgfx::Init init;
+		init.type     = args.m_type;
+		init.vendorId = args.m_pciId;
+		init.resolution.width  = m_width;
+		init.resolution.height = m_height;
+		init.resolution.reset  = m_reset;
+		bgfx::init(init);
 
 		// Enable debug text.
 		bgfx::setDebug(m_debug);

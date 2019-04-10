@@ -216,11 +216,12 @@ void selz80_state::machine_start()
 	m_digits.resolve();
 }
 
-MACHINE_CONFIG_START(selz80_state::selz80)
+void selz80_state::selz80(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000)) // it's actually a 5MHz XTAL with a NEC uPD780C-1 cpu
-	MCFG_DEVICE_PROGRAM_MAP(selz80_mem)
-	MCFG_DEVICE_IO_MAP(selz80_io)
+	Z80(config, m_maincpu, XTAL(4'000'000)); // it's actually a 5MHz XTAL with a NEC uPD780C-1 cpu
+	m_maincpu->set_addrmap(AS_PROGRAM, &selz80_state::selz80_mem);
+	m_maincpu->set_addrmap(AS_IO, &selz80_state::selz80_io);
 	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, selz80 )
 
 	/* video hardware */
@@ -236,10 +237,10 @@ MACHINE_CONFIG_START(selz80_state::selz80)
 	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("uart", FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set("uart", FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set("uart", FUNC(i8251_device::write_cts));
 
 	i8279_device &kbdc(I8279(config, "i8279", 5000000 / 2)); // based on divider
 	kbdc.out_sl_callback().set(FUNC(selz80_state::scanlines_w));    // scan SL lines
@@ -247,14 +248,14 @@ MACHINE_CONFIG_START(selz80_state::selz80)
 	kbdc.in_rl_callback().set(FUNC(selz80_state::kbd_r));           // kbd RL lines
 	kbdc.in_shift_callback().set_constant(1);                       // Shift key
 	kbdc.in_ctrl_callback().set_constant(1);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(selz80_state::dagz80)
+void selz80_state::dagz80(machine_config &config)
+{
 	selz80(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(dagz80_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &selz80_state::dagz80_mem);
 	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, dagz80 )
-MACHINE_CONFIG_END
+}
 
 
 /* ROM definition */

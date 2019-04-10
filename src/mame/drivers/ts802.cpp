@@ -23,6 +23,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/terminal.h"
 #include "machine/z80dma.h"
@@ -190,7 +191,8 @@ void ts802_state::init_ts802()
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 }
 
-MACHINE_CONFIG_START(ts802_state::ts802)
+void ts802_state::ts802(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ts802_state::ts802_mem);
@@ -198,8 +200,8 @@ MACHINE_CONFIG_START(ts802_state::ts802)
 	//m_maincpu->set_daisy_config(daisy_chain_intf); // causes problems
 
 	/* Devices */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ts802_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(ts802_state::kbd_put));
 
 	z80dma_device& dma(Z80DMA(config, "dma", 16_MHz_XTAL / 4));
 	dma.out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
@@ -220,7 +222,7 @@ MACHINE_CONFIG_START(ts802_state::ts802)
 
 	FD1793(config, "fdc", 4'000'000 / 2);                  // unknown clock
 	FLOPPY_CONNECTOR(config, "fdc:0", ts802_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( ts802 )

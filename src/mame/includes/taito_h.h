@@ -34,6 +34,10 @@ public:
 	void dleague(machine_config &config);
 	void tetristh(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_m68000_mainram;
@@ -49,8 +53,6 @@ private:
 	DECLARE_WRITE8_MEMBER(coin_control_w);
 	DECLARE_READ8_MEMBER(syvalion_input_bypass_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint32_t screen_update_syvalion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_recordbr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dleague(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

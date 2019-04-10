@@ -133,11 +133,11 @@ READ16_MEMBER(symbolics_state::ram_parity_hack_r)
 {
     uint16_t *ram = (uint16_t *)(memregion("fepdram")->base());
     //m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
-    m_maincpu->set_input_line_and_vector(M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+    m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
     if (!(m_parity_error_has_occurred[offset]))
     {
         //m_maincpu->set_input_line(M68K_IRQ_7, ASSERT_LINE);
-        m_maincpu->set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+        m_maincpu->set_input_line(M68K_IRQ_7, ASSERT_LINE);
         m_parity_error_has_occurred[offset] = true;
     }
     ram += offset;
@@ -147,10 +147,10 @@ READ16_MEMBER(symbolics_state::ram_parity_hack_r)
 WRITE16_MEMBER(symbolics_state::ram_parity_hack_w)
 {
     uint16_t *ram = (uint16_t *)(memregion("fepdram")->base());
-    m_maincpu->set_input_line_and_vector(M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+    m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
     if (!(m_parity_error_has_occurred[offset]))
     {
-        m_maincpu->set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+        m_maincpu->set_input_line(M68K_IRQ_7, ASSERT_LINE);
         m_parity_error_has_occurred[offset] = true;
     }
     COMBINE_DATA(&ram[offset]);
@@ -318,22 +318,22 @@ void symbolics_state::machine_reset()
 	*/
 }
 
-MACHINE_CONFIG_START(symbolics_state::symbolics)
+void symbolics_state::symbolics(machine_config &config)
+{
 	/* basic machine hardware */
 	// per page 159 of http://bitsavers.trailing-edge.com/pdf/symbolics/3600_series/Lisp_Machine_Hardware_Memos.pdf:
 	//XTALS: 16MHz @H11 (68k CPU clock)
 	//       4.9152MHz @J5 (driving the two MPSCs serial clocks)
 	//       66.67MHz @J10 (main lispcpu/system clock)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11, verified from patent */
-	MCFG_DEVICE_PROGRAM_MAP(m68k_mem)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2); /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11, verified from patent */
+	m_maincpu->set_addrmap(AS_PROGRAM, &symbolics_state::m68k_mem);
 
 	//ADD ME:
 	// Framebuffer
 	// DMA Controller
 	// I8274 MPSC #1 (synchronous serial for keyboard)
 	// I8274 MPSC #2 (EIA/debug console?)
-
-MACHINE_CONFIG_END
+}
 
 /******************************************************************************
  ROM Definitions

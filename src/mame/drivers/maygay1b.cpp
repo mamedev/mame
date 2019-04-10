@@ -439,7 +439,7 @@ WRITE_LINE_MEMBER(maygay1b_state::srsel_w)
 
 WRITE8_MEMBER(maygay1b_state::latch_ch2_w)
 {
-	m_msm6376->write(space, 0, data&0x7f);
+	m_msm6376->write(data&0x7f);
 	m_msm6376->ch2_w(data&0x80);
 }
 
@@ -762,22 +762,22 @@ READ8_MEMBER(maygay1b_state::mcu_port2_r)
 
 // machine driver for maygay m1 board /////////////////////////////////
 
-MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
+void maygay1b_state::maygay_m1(machine_config &config)
+{
+	MC6809(config, m_maincpu, M1_MASTER_CLOCK/2); // claimed to be 4 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &maygay1b_state::m1_memmap);
 
-	MCFG_DEVICE_ADD("maincpu", MC6809, M1_MASTER_CLOCK/2) // claimed to be 4 MHz
-	MCFG_DEVICE_PROGRAM_MAP(m1_memmap)
+	I80C51(config, m_mcu, 2000000); //  EP840034.A-P-80C51AVW
+	m_mcu->port_in_cb<0>().set(FUNC(maygay1b_state::mcu_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(maygay1b_state::mcu_port0_w));
+	m_mcu->port_out_cb<1>().set(FUNC(maygay1b_state::mcu_port1_w));
+	m_mcu->port_in_cb<2>().set(FUNC(maygay1b_state::mcu_port2_r));
+	m_mcu->port_out_cb<2>().set(FUNC(maygay1b_state::mcu_port2_w));
+	m_mcu->port_out_cb<3>().set(FUNC(maygay1b_state::mcu_port3_w));
 
-	MCFG_DEVICE_ADD("mcu", I80C51, 2000000) //  EP840034.A-P-80C51AVW
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, maygay1b_state, mcu_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, maygay1b_state, mcu_port0_w))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, maygay1b_state, mcu_port1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, maygay1b_state, mcu_port2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, maygay1b_state, mcu_port2_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, maygay1b_state, mcu_port3_w))
-
-	MCFG_DEVICE_ADD("duart68681", MC68681, M1_DUART_CLOCK)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, maygay1b_state, duart_irq_handler))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, maygay1b_state, m1_duart_r))
+	MC68681(config, m_duart68681, M1_DUART_CLOCK);
+	m_duart68681->irq_cb().set(FUNC(maygay1b_state::duart_irq_handler));
+	m_duart68681->inport_cb().set(FUNC(maygay1b_state::m1_duart_r));;
 
 	pia6821_device &pia(PIA6821(config, "pia", 0));
 	pia.writepa_handler().set(FUNC(maygay1b_state::m1_pia_porta_w));
@@ -792,24 +792,24 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	mainlatch.q_out_cb<5>().set(FUNC(maygay1b_state::wdog_w));      // WDog
 	mainlatch.q_out_cb<6>().set(FUNC(maygay1b_state::srsel_w));     // Srsel
 
-	MCFG_S16LF01_ADD("vfd",0)
+	S16LF01(config, m_vfd);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("aysnd", YM2149, M1_MASTER_CLOCK)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, maygay1b_state, m1_meter_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, maygay1b_state, m1_lockout_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	YM2149(config, m_ay, M1_MASTER_CLOCK);
+	m_ay->port_a_write_callback().set(FUNC(maygay1b_state::m1_meter_w));
+	m_ay->port_b_write_callback().set(FUNC(maygay1b_state::m1_lockout_w));
+	m_ay->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_ay->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, M1_MASTER_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	ym2413_device &ymsnd(YM2413(config, "ymsnd", M1_MASTER_CLOCK/4));
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("msm6376", OKIM6376, 102400) //? Seems to work well with samples, but unconfirmed
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6376(config, m_msm6376, 102400); //? Seems to work well with samples, but unconfirmed
+	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", maygay1b_state, maygay1b_nmitimer_callback, attotime::from_hz(75)) // freq?
+	TIMER(config, "nmitimer").configure_periodic(FUNC(maygay1b_state::maygay1b_nmitimer_callback), attotime::from_hz(75)); // freq?
 
 	i8279_device &kbdc(I8279(config, "i8279", M1_MASTER_CLOCK/4));      // unknown clock
 	kbdc.out_sl_callback().set(FUNC(maygay1b_state::scanlines_w));      // scan SL lines
@@ -823,43 +823,43 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	kbdc2.out_disp_callback().set(FUNC(maygay1b_state::lamp_data_2_w)); // display A&B
 #endif
 
-	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, maygay1b_state, reel_optic_cb<0>))
-	MCFG_DEVICE_ADD("reel1", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, maygay1b_state, reel_optic_cb<1>))
-	MCFG_DEVICE_ADD("reel2", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, maygay1b_state, reel_optic_cb<2>))
-	MCFG_DEVICE_ADD("reel3", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, maygay1b_state, reel_optic_cb<3>))
-	MCFG_DEVICE_ADD("reel4", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, maygay1b_state, reel_optic_cb<4>))
-	MCFG_DEVICE_ADD("reel5", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, maygay1b_state, reel_optic_cb<5>))
+	REEL(config, m_reels[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reels[0]->optic_handler().set(FUNC(maygay1b_state::reel_optic_cb<0>));
+	REEL(config, m_reels[1], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reels[1]->optic_handler().set(FUNC(maygay1b_state::reel_optic_cb<1>));
+	REEL(config, m_reels[2], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reels[2]->optic_handler().set(FUNC(maygay1b_state::reel_optic_cb<2>));
+	REEL(config, m_reels[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reels[3]->optic_handler().set(FUNC(maygay1b_state::reel_optic_cb<3>));
+	REEL(config, m_reels[4], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reels[4]->optic_handler().set(FUNC(maygay1b_state::reel_optic_cb<4>));
+	REEL(config, m_reels[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reels[5]->optic_handler().set(FUNC(maygay1b_state::reel_optic_cb<5>));
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
+	METERS(config, m_meters, 0).set_number(8);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	config.set_default_layout(layout_maygay1b);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(maygay1b_state::maygay_m1_no_oki)
+void maygay1b_state::maygay_m1_no_oki(machine_config &config)
+{
 	maygay_m1(config);
-	MCFG_DEVICE_REMOVE("msm6376")
-MACHINE_CONFIG_END
+	config.device_remove("msm6376");
+}
 
-MACHINE_CONFIG_START(maygay1b_state::maygay_m1_nec)
+void maygay1b_state::maygay_m1_nec(machine_config &config)
+{
 	maygay_m1(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(m1_nec_memmap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &maygay1b_state::m1_nec_memmap);
 
-	MCFG_DEVICE_REMOVE("msm6376")
+	config.device_remove("msm6376");
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 WRITE8_MEMBER(maygay1b_state::m1ab_no_oki_w)
 {
