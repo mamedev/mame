@@ -1398,6 +1398,7 @@ void segaybd_state::yboard_deluxe(machine_config &config)
 //*************************************************************************************************************************
 //  Galaxy Force 2 (World), Sega Y-board
 //  CPU: 68000 (317-????)
+//  GAME BD: 834-6614-02 GALAXY FORCE 2
 //
 ROM_START( gforce2 )
 	ROM_REGION( 0x080000, "maincpu", 0 ) // M
