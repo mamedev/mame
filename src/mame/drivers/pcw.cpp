@@ -245,7 +245,7 @@ READ8_MEMBER(pcw_state::pcw_keyboard_data_r)
 void pcw_state::pcw_update_read_memory_block(int block, int bank)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	char block_name[10];
+	char block_name[32];
 
 	snprintf(block_name, sizeof(block_name), "bank%d", block + 1);
 	/* bank 3? */
