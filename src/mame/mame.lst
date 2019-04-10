@@ -21743,6 +21743,7 @@ mjsister                        // (c) 1986 Toaplan
 @source:mk1.cpp
 ccmk1                           // Chess Champion MK I
 cmpchess
+cncchess
 
 @source:mk14.cpp
 mk14                            //

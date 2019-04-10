@@ -35,9 +35,6 @@ keypad legend:
 ПП - просмотр позиции (view position)
 УИ - уровень игры (game level)
 
-TODO:
-- identify 0,9 buttons (unused on the chess games)
-
 ******************************************************************************/
 
 #include "emu.h"
@@ -76,8 +73,7 @@ public:
 	// machine configs
 	void intel02(machine_config &config);
 
-	// reset button is tied directly to CPU RESET pin
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 protected:
 	virtual void machine_start() override;
@@ -130,6 +126,14 @@ void intel02_state::machine_start()
 	save_item(NAME(m_digit_data));
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_active));
+}
+
+INPUT_CHANGED_MEMBER(intel02_state::reset_button)
+{
+	// reset button goes to 8080/8255 RESET pins simultaneously (via 7474, and also a maze of NAND gates to who knows where)
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	if (newval)
+		m_ppi8255->reset();
 }
 
 
@@ -190,8 +194,8 @@ READ8_MEMBER(intel02_state::input_r)
 
 WRITE8_MEMBER(intel02_state::digit_w)
 {
-	// d0-d7: digit segment data
-	m_digit_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
+	// d0-d6: digit segment data, d7: N/C
+	m_digit_data = bitswap<7>(data,0,1,2,3,4,5,6);
 	update_display();
 }
 
@@ -246,10 +250,10 @@ void intel02_state::main_io(address_map &map)
 
 static INPUT_PORTS_START( intel02 )
 	PORT_START("IN.0")
-	PORT_BIT(0x0007, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x0007, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("View Position") PORT_CODE(KEYCODE_V)
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Game Level") PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H)
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("G7") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_G)
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F6") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_F)
@@ -258,7 +262,7 @@ static INPUT_PORTS_START( intel02 )
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("C3") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_C)
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("B2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_B)
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD)
 
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -288,7 +292,7 @@ void intel02_state::intel02(machine_config &config)
 	m_ppi8255->out_pb_callback().set(FUNC(intel02_state::digit_w));
 	m_ppi8255->tri_pb_callback().set_constant(0);
 	m_ppi8255->out_pc_callback().set(FUNC(intel02_state::control_w));
-	m_ppi8255->tri_pc_callback().set_constant(0);
+	m_ppi8255->tri_pc_callback().set_constant(0x80);
 
 	/* video hardware */
 	TIMER(config, m_delay_update).configure_generic(FUNC(intel02_state::delay_update));

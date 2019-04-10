@@ -99,8 +99,8 @@
 		<bezel element="button" inputtag="IN.0" inputmask="0x0100"><bounds x="21.57" y="26.7" width="3" height="2.5" /></bezel>
 		<bezel element="button" inputtag="IN.0" inputmask="0x0080"><bounds x="25.93" y="26.7" width="3" height="2.5" /></bezel>
 		<bezel element="button" inputtag="IN.0" inputmask="0x0040"><bounds x="30.27" y="26.7" width="3" height="2.5" /></bezel>
-		<bezel element="button" inputtag="IN.x" inputmask="0x01"><bounds x="34.64" y="26.7" width="3" height="2.5" /></bezel>
-		<bezel element="button" inputtag="IN.x" inputmask="0x01"><bounds x="39" y="26.7" width="3" height="2.5" /></bezel>
+		<bezel element="button" inputtag="IN.0" inputmask="0x0020"><bounds x="34.64" y="26.7" width="3" height="2.5" /></bezel>
+		<bezel element="button" inputtag="IN.0" inputmask="0x4000"><bounds x="39" y="26.7" width="3" height="2.5" /></bezel>
 
 	</view>
 </mamelayout>
