@@ -75,9 +75,9 @@ void naomi_board::submap(address_map &map)
 }
 
 naomi_board::naomi_board(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: naomi_g1_device(mconfig, type, tag, owner, clock)
+	: naomi_g1_device(mconfig, type, tag, owner, clock),
+	eeprom(*this, finder_base::DUMMY_TAG)
 {
-	eeprom_tag = nullptr;
 }
 
 void naomi_board::device_start()
@@ -90,11 +90,6 @@ void naomi_board::device_start()
 	save_item(NAME(dma_cur_offset));
 	save_item(NAME(pio_ready));
 	save_item(NAME(dma_ready));
-
-	if (eeprom_tag != nullptr)
-		eeprom = owner()->subdevice<x76f100_device>(eeprom_tag);
-	else
-		eeprom = nullptr;
 }
 
 void naomi_board::device_reset()

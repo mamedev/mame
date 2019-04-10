@@ -226,12 +226,12 @@ static const z80_daisy_config daisy_chain_main[] =
 
 INTERRUPT_GEN_MEMBER(nichild_state::vdp_irq)
 {
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x76);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x76); // TMPZ84C011
 }
 
 
-MACHINE_CONFIG_START(nichild_state::nichild)
-
+void nichild_state::nichild(machine_config &config)
+{
 	/* basic machine hardware */
 	TMPZ84C011(config, m_maincpu, MAIN_CLOCK/4);
 	//m_maincpu->set_daisy_config(daisy_chain_main);
@@ -255,9 +255,8 @@ MACHINE_CONFIG_START(nichild_state::nichild)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+//  YM3812(config, "fmsnd", SOUND_CLOCK).add_route(ALL_OUTPUTS, "speaker", 0.7);
+}
 
 
 /***************************************************************************

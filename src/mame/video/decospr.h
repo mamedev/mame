@@ -20,10 +20,10 @@ public:
 	decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_gfx_region(int gfxregion) { m_gfxregion = gfxregion; }
-	void set_pri_callback(decospr_pri_cb_delegate callback) { m_pri_cb = callback; }
-	void set_col_callback(decospr_col_cb_delegate callback) { m_col_cb = callback; }
+	template <typename... T> void set_pri_callback(T &&... args) { m_pri_cb = decospr_pri_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_col_callback(T &&... args) { m_col_cb = decospr_col_cb_delegate(std::forward<T>(args)...); }
 	void set_is_bootleg(bool is_bootleg) { m_is_bootleg = is_bootleg; }
 	void set_bootleg_type(int bootleg_type) { m_bootleg_type = bootleg_type; }
 	void set_flipallx(int flipallx) { m_flipallx = flipallx; }
@@ -63,8 +63,8 @@ protected:
 	bool m_is_bootleg; // used by various bootlegs (disables masking of sprite tile number when multi-sprite is used)
 	int m_bootleg_type; // for Puzzlove, has sprite bits moved around (probably to prevent board swaps)
 	int m_x_offset, m_y_offset; // used by various bootlegs
-	bool m_flipallx; // used by esd16.c - hedpanico, multchmp, and nmg5.c
-	int m_transpen; // used by fncywld (tumbleb.c)
+	bool m_flipallx; // used by esd16.cpp - hedpanico, multchmp, and nmg5.cpp
+	int m_transpen; // used by fncywld (tumbleb.cpp)
 
 private:
 	template<class _BitmapClass>
@@ -73,32 +73,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(DECO_SPRITE, decospr_device)
-
-#define MCFG_DECO_SPRITE_GFX_REGION(_region) \
-	downcast<decospr_device &>(*device).set_gfx_region(_region);
-
-#define MCFG_DECO_SPRITE_PRIORITY_CB(_class, _method) \
-	downcast<decospr_device &>(*device).set_pri_callback(decospr_pri_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_DECO_SPRITE_COLOUR_CB(_class, _method) \
-	downcast<decospr_device &>(*device).set_col_callback(decospr_col_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_DECO_SPRITE_ISBOOTLEG(_boot) \
-	downcast<decospr_device &>(*device).set_is_bootleg(_boot);
-
-#define MCFG_DECO_SPRITE_BOOTLEG_TYPE(_bootleg_type) \
-	downcast<decospr_device &>(*device).set_bootleg_type(_bootleg_type);
-
-#define MCFG_DECO_SPRITE_FLIPALLX(_flip) \
-	downcast<decospr_device &>(*device).set_flipallx(_flip);
-
-#define MCFG_DECO_SPRITE_TRANSPEN(_pen) \
-	downcast<decospr_device &>(*device).set_transpen(_pen);
-
-#define MCFG_DECO_SPRITE_OFFSETS(_xoffs, _yoffs) \
-	downcast<decospr_device &>(*device).set_offsets(_xoffs, _yoffs);
-
-#define MCFG_DECO_SPRITE_GFXDECODE(_gfxtag) \
-	downcast<decospr_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_DECOSPR_H

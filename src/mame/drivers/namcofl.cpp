@@ -106,17 +106,17 @@ CUSTOM
 
 ROMs - Main Board
 -----------------
-23S: MASK ROM - SE1_VOI.23S (PCB LABEL 'VOICE'), mounted on a small plug-in PCB
+23S: mask ROM - SE1_VOI.23S (PCB LABEL 'VOICE'), mounted on a small plug-in PCB
      labelled MEMEXT 32M MROM PCB 8635909200 (8635909300). This chip is programmed in BYTE mode.
-18U: MB834000 MASK ROM - SE1_SSH.18U (PCB LABEL 'SSHAPE')
-21P: MB838000 MASK ROM - SE1_SCH0.21P (PCB LABEL 'SCHA0')
-20P: MB838000 MASK ROM - SE1_SCH1.20P (PCB LABEL 'SCHA1')
-19P: MB838000 MASK ROM - SE1_SCH2.19P (PCB LABEL 'SCHA2')
-18P: MB838000 MASK ROM - SE1_SCH3.18P (PCB LABEL 'SCHA3')
+18U: MB834000 mask ROM - SE1_SSH.18U (PCB LABEL 'SSHAPE')
+21P: MB838000 mask ROM - SE1_SCH0.21P (PCB LABEL 'SCHA0')
+20P: MB838000 mask ROM - SE1_SCH1.20P (PCB LABEL 'SCHA1')
+19P: MB838000 mask ROM - SE1_SCH2.19P (PCB LABEL 'SCHA2')
+18P: MB838000 mask ROM - SE1_SCH3.18P (PCB LABEL 'SCHA3')
 21L: M27C4002 EPROM - SE1_SPR.21L (PCB LABEL 'SPROG')
-14K: MB834000 MASK ROM - SE1_RSH.14K (PCB LABEL 'RSHAPE')
-19J: MB838000 MASK ROM - SE1_RCH0.19J (PCB LABEL 'RCHA0')
-18J: MB838000 MASK ROM - SE1_RCH1.18J (PCB LABEL 'RCHA1')
+14K: MB834000 mask ROM - SE1_RSH.14K (PCB LABEL 'RSHAPE')
+19J: MB838000 mask ROM - SE1_RCH0.19J (PCB LABEL 'RCHA0')
+18J: MB838000 mask ROM - SE1_RCH1.18J (PCB LABEL 'RCHA1')
 17J, 16J: RCH2, RCH3 but sockets not populated
 19A: D27C4096 EPROM - SE2MPEA4.19A (PCB LABEL 'PROGE')
 18A: D27C4096 EPROM - SE2MPOA4.18A (PCB LABEL 'PROGO')
@@ -128,10 +128,10 @@ ROMs - Main Board
 
 ROMs - Sub Board
 ----------------
-IC1: MB8316200 SOP44 MASK ROM - SE1OBJ0L.IC1 (PCB LABEL 'OBJ0L')
-IC2: MB8316200 SOP44 MASK ROM - SE1OBJ0U.IC2 (PCB LABEL 'OBJ0U')
-IC3: MB8316200 SOP44 MASK ROM - SE1OBJ1L.IC3 (PCB LABEL 'OBJ1L')
-IC4: MB8316200 SOP44 MASK ROM - SE1OBJ1U.IC4 (PCB LABEL 'OBJ1U')
+IC1: MB8316200 SOP44 mask ROM - SE1OBJ0L.IC1 (PCB LABEL 'OBJ0L')
+IC2: MB8316200 SOP44 mask ROM - SE1OBJ0U.IC2 (PCB LABEL 'OBJ0U')
+IC3: MB8316200 SOP44 mask ROM - SE1OBJ1L.IC3 (PCB LABEL 'OBJ1L')
+IC4: MB8316200 SOP44 mask ROM - SE1OBJ1U.IC4 (PCB LABEL 'OBJ1U')
 
 
 PALs
@@ -162,7 +162,6 @@ OSC3: 48.384MHz
 
 #include "cpu/i960/i960.h"
 #include "sound/c352.h"
-#include "machine/namcomcu.h"
 #include "machine/nvram.h"
 #include "speaker.h"
 
@@ -224,8 +223,8 @@ void namcofl_state::namcofl_mem(address_map &map)
 	map(0x30300000, 0x30303fff).ram(); /* COMRAM */
 	map(0x30380000, 0x303800ff).r(FUNC(namcofl_state::fl_network_r)); /* network registers */
 	map(0x30400000, 0x30407fff).r(m_c116, FUNC(namco_c116_device::read)).w(FUNC(namcofl_state::namcofl_c116_w));
-	map(0x30800000, 0x3080ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram_r), FUNC(namco_c123tmap_device::videoram_w));
-	map(0x30a00000, 0x30a0003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control_r), FUNC(namco_c123tmap_device::control_w));
+	map(0x30800000, 0x3080ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram16_r), FUNC(namco_c123tmap_device::videoram16_w));
+	map(0x30a00000, 0x30a0003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control16_r), FUNC(namco_c123tmap_device::control16_w));
 	map(0x30c00000, 0x30c1ffff).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
 	map(0x30d00000, 0x30d0001f).rw(m_c169roz, FUNC(namco_c169roz_device::control_r), FUNC(namco_c169roz_device::control_w));
 	map(0x30e00000, 0x30e1ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram");
@@ -316,20 +315,6 @@ void namcofl_state::namcoc75_am(address_map &map)
 	map(0x002000, 0x002fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
 	map(0x004000, 0x00bfff).ram().w(FUNC(namcofl_state::mcu_shared_w)).share("shareram");
 	map(0x200000, 0x27ffff).rom().region("c75data", 0);
-}
-
-void namcofl_state::namcoc75_io(address_map &map)
-{
-	map(M37710_PORT6, M37710_PORT6).rw(FUNC(namcofl_state::port6_r), FUNC(namcofl_state::port6_w));
-	map(M37710_PORT7, M37710_PORT7).r(FUNC(namcofl_state::port7_r));
-	map(M37710_ADC7_L, M37710_ADC7_L).r(FUNC(namcofl_state::dac7_r));
-	map(M37710_ADC6_L, M37710_ADC6_L).r(FUNC(namcofl_state::dac6_r));
-	map(M37710_ADC5_L, M37710_ADC5_L).r(FUNC(namcofl_state::dac5_r));
-	map(M37710_ADC4_L, M37710_ADC4_L).r(FUNC(namcofl_state::dac4_r));
-	map(M37710_ADC3_L, M37710_ADC3_L).r(FUNC(namcofl_state::dac3_r));
-	map(M37710_ADC2_L, M37710_ADC2_L).r(FUNC(namcofl_state::dac2_r));
-	map(M37710_ADC1_L, M37710_ADC1_L).r(FUNC(namcofl_state::dac1_r));
-	map(M37710_ADC0_L, M37710_ADC0_L).r(FUNC(namcofl_state::dac0_r));
 }
 
 
@@ -553,30 +538,41 @@ MACHINE_RESET_MEMBER(namcofl_state,namcofl)
 }
 
 
-MACHINE_CONFIG_START(namcofl_state::namcofl)
-	MCFG_DEVICE_ADD("maincpu", I960, 80_MHz_XTAL/4) // i80960KA-20 == 20 MHz part
-	MCFG_DEVICE_PROGRAM_MAP(namcofl_mem)
+void namcofl_state::namcofl(machine_config &config)
+{
+	I960(config, m_maincpu, 80_MHz_XTAL/4); // i80960KA-20 == 20 MHz part
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcofl_state::namcofl_mem);
 
-	MCFG_DEVICE_ADD("mcu", NAMCO_C75, 48.384_MHz_XTAL/3)
-	MCFG_DEVICE_PROGRAM_MAP(namcoc75_am)
-	MCFG_DEVICE_IO_MAP(namcoc75_io)
+	NAMCO_C75(config, m_mcu, 48.384_MHz_XTAL/3);
+	m_mcu->set_addrmap(AS_PROGRAM, &namcofl_state::namcoc75_am);
+	m_mcu->p6_in_cb().set(FUNC(namcofl_state::port6_r));
+	m_mcu->p6_out_cb().set(FUNC(namcofl_state::port6_w));
+	m_mcu->p7_in_cb().set(FUNC(namcofl_state::port7_r));
+	m_mcu->an7_cb().set(FUNC(namcofl_state::dac7_r));
+	m_mcu->an6_cb().set(FUNC(namcofl_state::dac6_r));
+	m_mcu->an5_cb().set(FUNC(namcofl_state::dac5_r));
+	m_mcu->an4_cb().set(FUNC(namcofl_state::dac4_r));
+	m_mcu->an3_cb().set(FUNC(namcofl_state::dac3_r));
+	m_mcu->an2_cb().set(FUNC(namcofl_state::dac2_r));
+	m_mcu->an1_cb().set(FUNC(namcofl_state::dac1_r));
+	m_mcu->an0_cb().set(FUNC(namcofl_state::dac0_r));
 	/* TODO: irq generation for these */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq0", namcofl_state, mcu_irq0_cb, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namcofl_state, mcu_irq2_cb, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_adc", namcofl_state, mcu_adc_cb, attotime::from_hz(60))
+	TIMER(config, "mcu_irq0").configure_periodic(FUNC(namcofl_state::mcu_irq0_cb), attotime::from_hz(60));
+	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namcofl_state::mcu_irq2_cb), attotime::from_hz(60));
+	TIMER(config, "mcu_adc").configure_periodic(FUNC(namcofl_state::mcu_adc_cb), attotime::from_hz(60));
 
 	MCFG_MACHINE_START_OVERRIDE(namcofl_state,namcofl)
 	MCFG_MACHINE_RESET_OVERRIDE(namcofl_state,namcofl)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(NAMCOFL_HTOTAL, NAMCOFL_VTOTAL)
-	MCFG_SCREEN_VISIBLE_AREA(0, NAMCOFL_HBSTART-1, 0, NAMCOFL_VBSTART-1)
-	MCFG_SCREEN_UPDATE_DRIVER(namcofl_state, screen_update_namcofl)
-	MCFG_SCREEN_PALETTE(m_c116)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(NAMCOFL_HTOTAL, NAMCOFL_VTOTAL);
+	m_screen->set_visarea(0, NAMCOFL_HBSTART-1, 0, NAMCOFL_VBSTART-1);
+	m_screen->set_screen_update(FUNC(namcofl_state::screen_update_namcofl));
+	m_screen->set_palette(m_c116);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_c116, gfx_namcofl)
+	GFXDECODE(config, "gfxdecode", m_c116, gfx_namcofl);
 
 	NAMCO_C169ROZ(config, m_c169roz, 0);
 	m_c169roz->set_palette(m_c116);
@@ -588,7 +584,7 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
-	m_c355spr->set_is_namcofl(true);
+	m_c355spr->set_scroll_offsets(0, 0);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namcofl_state::FLobjcode2tile, this));
 	m_c355spr->set_palxor(0x0);
 	m_c355spr->set_gfxregion(NAMCOFL_SPRITEGFX);
@@ -605,12 +601,12 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("c352", C352, 48.384_MHz_XTAL/2, 288)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
-	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
-MACHINE_CONFIG_END
+	c352_device &c352(C352(config, "c352", 48.384_MHz_XTAL/2, 288));
+	c352.add_route(0, "lspeaker", 1.00);
+	c352.add_route(1, "rspeaker", 1.00);
+	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
+	//c352.add_route(3, "rspeaker", 1.00);
+}
 
 ROM_START( speedrcr )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program

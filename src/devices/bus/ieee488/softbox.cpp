@@ -232,11 +232,12 @@ DEVICE_INPUT_DEFAULTS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(softbox_device::device_add_mconfig)
+void softbox_device::device_add_mconfig(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(softbox_mem)
-	MCFG_DEVICE_IO_MAP(softbox_io)
+	Z80(config, m_maincpu, XTAL(8'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &softbox_device::softbox_mem);
+	m_maincpu->set_addrmap(AS_IO, &softbox_device::softbox_io);
 
 	// devices
 	i8251_device &i8251(I8251(config, I8251_TAG, 0));
@@ -244,10 +245,10 @@ MACHINE_CONFIG_START(softbox_device::device_add_mconfig)
 	i8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	i8251.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(I8251_TAG, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(I8251_TAG, FUNC(i8251_device::write_dsr));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	i8255_device &ppi0(I8255A(config, I8255_0_TAG));
 	ppi0.in_pa_callback().set(FUNC(softbox_device::ppi0_pa_r));
@@ -264,17 +265,13 @@ MACHINE_CONFIG_START(softbox_device::device_add_mconfig)
 	m_dbrg->fr_handler().set(I8251_TAG, FUNC(i8251_device::write_rxc));
 	m_dbrg->ft_handler().set(I8251_TAG, FUNC(i8251_device::write_txc));
 
-	MCFG_DEVICE_ADD(m_hdc, CORVUS_HDC, 0)
-	MCFG_HARDDISK_ADD("harddisk1")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	MCFG_HARDDISK_ADD("harddisk2")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	MCFG_HARDDISK_ADD("harddisk3")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	MCFG_HARDDISK_ADD("harddisk4")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	//MCFG_IMI7000_BUS_ADD("imi5000h", nullptr, nullptr, nullptr)
-MACHINE_CONFIG_END
+	CORVUS_HDC(config, m_hdc, 0);
+	HARDDISK(config, "harddisk1", "corvus_hdd");
+	HARDDISK(config, "harddisk2", "corvus_hdd");
+	HARDDISK(config, "harddisk3", "corvus_hdd");
+	HARDDISK(config, "harddisk4", "corvus_hdd");
+	//imi7000_bus_device::add_config(config, "imi5000h", nullptr, nullptr, nullptr);
+}
 
 
 //-------------------------------------------------
@@ -381,6 +378,6 @@ void softbox_device::ieee488_ifc(int state)
 
 WRITE8_MEMBER( softbox_device::dbrg_w )
 {
-	m_dbrg->write_str(data & 0x0f);
-	m_dbrg->write_stt(data >> 4);
+	m_dbrg->str_w(data & 0x0f);
+	m_dbrg->stt_w(data >> 4);
 }

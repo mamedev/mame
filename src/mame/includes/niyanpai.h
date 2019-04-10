@@ -15,7 +15,6 @@ public:
 	niyanpai_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
-		m_tmp68301(*this, "tmp68301"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
@@ -34,8 +33,7 @@ private:
 		TIMER_BLITTER
 	};
 
-	required_device<cpu_device> m_maincpu;
-	required_device<tmp68301_device> m_tmp68301;
+	required_device<tmp68301_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 

@@ -34,17 +34,21 @@ rom 5 and 6 are prg roms
 class fresh_state : public driver_device
 {
 public:
-	fresh_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	fresh_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_bg_2_videoram(*this, "bg_videoram_2"),
 		m_attr_videoram(*this, "attr_videoram"),
 		m_attr_2_videoram(*this, "attr_videoram_2"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	void fresh(machine_config &config);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	tilemap_t *m_bg_tilemap;
@@ -54,6 +58,10 @@ private:
 	required_shared_ptr<uint16_t> m_bg_2_videoram;
 	required_shared_ptr<uint16_t> m_attr_videoram;
 	required_shared_ptr<uint16_t> m_attr_2_videoram;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE16_MEMBER(fresh_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(fresh_attr_videoram_w);
@@ -97,12 +105,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(fake_scanline);
 
-
-	virtual void video_start() override;
 	uint32_t screen_update_fresh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 	void fresh_map(address_map &map);
 };
 
@@ -594,33 +597,30 @@ TIMER_DEVICE_CALLBACK_MEMBER(fresh_state::fake_scanline)
 }
 
 
-MACHINE_CONFIG_START(fresh_state::fresh)
-
+void fresh_state::fresh(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24000000/2 )
-	MCFG_DEVICE_PROGRAM_MAP(fresh_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fresh_state, fake_scanline, "screen", 0, 1)
+	M68000(config, m_maincpu, 24000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fresh_state::fresh_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(fresh_state::fake_scanline), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fresh_state, screen_update_fresh)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(fresh_state::screen_update_fresh));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x1000) // or 0xc00
-	MCFG_PALETTE_FORMAT(XBGR)
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fresh)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0x1000); // or 0xc00
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fresh);
 
 	/* sound hw? */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 4000000) // actual clock and type unknown
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM2413(config, "ymsnd", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0); // actual clock and type unknown
+}
 
 
 ROM_START( fresh )

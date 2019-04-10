@@ -1,9 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Sven Schnelle
 #include "emu.h"
-#include "hlekbd.h"
+#include "hlemouse.h"
 
-#include "machine/keyboard.ipp"
 //#define VERBOSE 1
 #include "logmacro.h"
 
@@ -68,7 +67,7 @@ int hle_hp_46060b_device::hil_poll()
 		frames+=2;
 	}
 
-	while (!m_fifo.empty())	{
+	while (!m_fifo.empty()) {
 		m_hp_hil_mlc->hil_write(m_device_id16 | m_fifo.dequeue());
 		frames++;
 	}

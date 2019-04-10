@@ -120,7 +120,7 @@ private:
 	bool m_cassold;
 	bool m_speaker_state;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
 	output_finder<4> m_digits;
@@ -233,26 +233,27 @@ static INPUT_PORTS_START( dauphin )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(dauphin_state::dauphin)
+void dauphin_state::dauphin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(dauphin_mem)
-	MCFG_DEVICE_IO_MAP(dauphin_io)
-	MCFG_S2650_SENSE_INPUT(READLINE(*this, dauphin_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, dauphin_state, cass_w))
+	S2650(config, m_maincpu, XTAL(1'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &dauphin_state::dauphin_mem);
+	m_maincpu->set_addrmap(AS_IO, &dauphin_state::dauphin_io);
+	m_maincpu->sense_handler().set(FUNC(dauphin_state::cass_r));
+	m_maincpu->flag_handler().set(FUNC(dauphin_state::cass_w));
 
 	/* video hardware */
 	config.set_default_layout(layout_dolphunk);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("dauphin_c", dauphin_state, dauphin_c, attotime::from_hz(4000))
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cass);
+	TIMER(config, "dauphin_c").configure_periodic(FUNC(dauphin_state::dauphin_c), attotime::from_hz(4000));
+}
 
 /* ROM definition */
 ROM_START( dauphin )

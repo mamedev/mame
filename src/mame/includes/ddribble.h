@@ -5,6 +5,10 @@
     Double Dribble
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_DDRIBBLE_H
+#define MAME_INCLUDES_DDRIBBLE_H
+
+#pragma once
 
 #include "sound/flt_rc.h"
 #include "sound/vlm5030.h"
@@ -13,8 +17,8 @@
 class ddribble_state : public driver_device
 {
 public:
-	ddribble_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ddribble_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_spriteram_1(*this, "spriteram_1"),
 		m_sharedram(*this, "sharedram"),
@@ -27,7 +31,8 @@ public:
 		m_filter1(*this, "filter1"),
 		m_filter2(*this, "filter2"),
 		m_filter3(*this, "filter3"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
 	void ddribble(machine_config &config);
 
@@ -77,7 +82,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(ddribble);
+	void ddribble_palette(palette_device &palette) const;
 	uint32_t screen_update_ddribble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* source, int lenght, int gfxset, int flipscreen );
@@ -86,3 +91,5 @@ private:
 	void cpu2_map(address_map &map);
 	void vlm_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DDRIBBLE_H

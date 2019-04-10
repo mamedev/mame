@@ -12,6 +12,7 @@
 #pragma once
 
 #include "exp.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "formats/ql_dsk.h"
 
@@ -41,8 +42,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_ql_expansion_card_interface overrides
-	virtual uint8_t read(address_space &space, offs_t offset, uint8_t data) override;
-	virtual void write(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t read(offs_t offset, uint8_t data) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 private:
 

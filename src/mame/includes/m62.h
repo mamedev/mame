@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:smf, David Haywood
+#ifndef MAME_INCLUDES_M62_H
+#define MAME_INCLUDES_M62_H
+
+#pragma once
 
 #include "audio/irem.h"
 #include "emupal.h"
@@ -7,8 +11,8 @@
 class m62_state : public driver_device
 {
 public:
-	m62_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	m62_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_m62_tileram(*this, "m62_tileram"),
 		m_m62_textram(*this, "m62_textram"),
@@ -119,10 +123,10 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(m62_spr);
-	DECLARE_PALETTE_INIT(m62_chr);
-	DECLARE_PALETTE_INIT(m62_lotlot_fg);
-	DECLARE_PALETTE_INIT(m62_battroad_fg);
+	void m62_spr(palette_device &palette) const;
+	void m62_chr(palette_device &palette) const;
+	void m62_lotlot_fg(palette_device &palette) const;
+	void m62_battroad_fg(palette_device &palette) const;
 	DECLARE_VIDEO_START(kungfum);
 	DECLARE_VIDEO_START(battroad);
 	DECLARE_VIDEO_START(ldrun2);
@@ -131,7 +135,7 @@ private:
 	DECLARE_VIDEO_START(kidniki);
 	DECLARE_VIDEO_START(spelunkr);
 	DECLARE_VIDEO_START(spelunk2);
-	DECLARE_PALETTE_INIT(spelunk2);
+	void spelunk2_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(youjyudn);
 	DECLARE_VIDEO_START(horizon);
 	uint32_t screen_update_ldrun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -146,10 +150,10 @@ private:
 	uint32_t screen_update_youjyudn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_horizon(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void m62_amplify_contrast(bool include_fg);
-	void register_savestate(  );
-	void draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect, int colormask, int prioritymask, int priority );
-	void m62_start( tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 );
-	void m62_textlayer( tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 );
+	void register_savestate();
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int colormask, int prioritymask, int priority);
+	void m62_start(tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2);
+	void m62_textlayer(tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2);
 	required_device<cpu_device> m_maincpu;
 	optional_device<gfxdecode_device> m_fg_decode;
 	required_device<gfxdecode_device> m_spr_decode;
@@ -179,3 +183,5 @@ private:
 	void youjyudn_io_map(address_map &map);
 	void youjyudn_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_M62_H

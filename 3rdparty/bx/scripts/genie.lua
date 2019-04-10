@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2018 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bx#license-bsd-2-clause
 --
 
@@ -39,6 +39,7 @@ end
 
 dofile "bx.lua"
 dofile "bin2c.lua"
+dofile "lemon.lua"
 
 project "bx.test"
 	kind "ConsoleApp"

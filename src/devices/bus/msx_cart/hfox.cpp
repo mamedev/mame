@@ -19,8 +19,12 @@ msx_cart_hfox_device::msx_cart_hfox_device(const machine_config &mconfig, const 
 void msx_cart_hfox_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
+}
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_hfox_device::restore_banks), this));
+
+void msx_cart_hfox_device::device_post_load()
+{
+	restore_banks();
 }
 
 
@@ -48,7 +52,7 @@ void msx_cart_hfox_device::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_hfox_device::read_cart)
+uint8_t msx_cart_hfox_device::read_cart(offs_t offset)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -58,7 +62,7 @@ READ8_MEMBER(msx_cart_hfox_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_hfox_device::write_cart)
+void msx_cart_hfox_device::write_cart(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

@@ -43,8 +43,8 @@ ROM_END
 
 void bbc_ams3_device::device_add_mconfig(machine_config &config)
 {
-	I8271(config, m_fdc, 16_MHz_XTAL / 8);
-	m_fdc->intrq_wr_callback().set(FUNC(bbc_ams3_device::fdc_intrq_w));
+	I8271(config, m_fdc, DERIVED_CLOCK(1, 4));
+	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
 	m_fdc->hdl_wr_callback().set(FUNC(bbc_ams3_device::motor_w));
 	m_fdc->opt_wr_callback().set(FUNC(bbc_ams3_device::side_w));
 	// Hitachi HFD 305S
@@ -69,7 +69,6 @@ const tiny_rom_entry *bbc_ams3_device::device_rom_region() const
 bbc_ams3_device::bbc_ams3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BBC_AMS3, tag, owner, clock)
 	, device_bbc_fdc_interface(mconfig, *this)
-	, m_dfs_rom(*this, "dfs_rom")
 	, m_fdc(*this, "i8271")
 	, m_floppy0(*this, "i8271:0")
 	, m_floppy1(*this, "i8271:1")
@@ -85,45 +84,35 @@ void bbc_ams3_device::device_start()
 {
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_ams3_device::device_reset()
-{
-	machine().root_device().membank("bank4")->configure_entry(12, memregion("dfs_rom")->base() + 0x0000);
-	machine().root_device().membank("bank4")->configure_entry(13, memregion("dfs_rom")->base() + 0x4000);
-}
-
 
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_ams3_device::read)
+uint8_t bbc_ams3_device::read(offs_t offset)
 {
 	uint8_t data;
 
 	if (offset & 0x04)
 	{
-		data = m_fdc->data_r(space , 0);
+		data = m_fdc->data_r();
 	}
 	else
 	{
-		data = m_fdc->read(space, offset & 0x03);
+		data = m_fdc->read(offset & 0x03);
 	}
 	return data;
 }
 
-WRITE8_MEMBER(bbc_ams3_device::write)
+void bbc_ams3_device::write(offs_t offset, uint8_t data)
 {
 	if (offset & 0x04)
 	{
-		m_fdc->data_w(space, 0, data);
+		m_fdc->data_w(data);
 	}
 	else
 	{
-		m_fdc->write(space, offset & 0x03, data);
+		m_fdc->write(offset & 0x03, data);
 	}
 }
 
@@ -138,9 +127,4 @@ WRITE_LINE_MEMBER(bbc_ams3_device::side_w)
 {
 	if (m_floppy0->get_device()) m_floppy0->get_device()->ss_w(state);
 	if (m_floppy1->get_device()) m_floppy1->get_device()->ss_w(state);
-}
-
-WRITE_LINE_MEMBER(bbc_ams3_device::fdc_intrq_w)
-{
-	m_slot->intrq_w(state);
 }

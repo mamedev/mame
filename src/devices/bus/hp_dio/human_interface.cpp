@@ -36,15 +36,8 @@ void human_interface_device::device_add_mconfig(machine_config &config)
 	iocpu.t1_in_cb().set_constant(1);
 
 	HP_HIL_MLC(config, m_mlc, XTAL(8'000'000));
-	hp_hil_slot_device &keyboard(HP_HIL_SLOT(config, "hil1", 0));
-	hp_hil_devices(keyboard);
-	keyboard.set_default_option("hp_46021a");
-	keyboard.set_hp_hil_slot(this, "mlc");
-
-	hp_hil_slot_device &mouse(HP_HIL_SLOT(config, "hil2", 0));
-	hp_hil_devices(mouse);
-	mouse.set_default_option("hp_46060b");
-	mouse.set_hp_hil_slot(this, "mlc");
+	HP_HIL_SLOT(config, "hil1", m_mlc, hp_hil_devices, "hp_46021a");
+	HP_HIL_SLOT(config, "hil2", m_mlc, hp_hil_devices, "hp_46060b");
 
 	SPEAKER(config, "mono").front_center();
 	sn76494_device &sound(SN76494(config, "sn76494", 333333));
@@ -121,23 +114,25 @@ human_interface_device::human_interface_device(const machine_config &mconfig, de
 
 void human_interface_device::device_start()
 {
-	program_space()->install_readwrite_handler(0x420000, 0x420003, 0x0003, 0xfffc, 0,
+	program_space().install_readwrite_handler(0x420000, 0x420003, 0x0003, 0xfffc, 0,
 		read8_delegate(FUNC(upi41_cpu_device::upi41_master_r), &(*m_iocpu)),
 		write8_delegate(FUNC(upi41_cpu_device::upi41_master_w), &(*m_iocpu)), 0x00ff00ff);
 
-	program_space()->install_readwrite_handler(0x470000, 0x47001f, 0x1f, 0xffe0, 0,
+	program_space().install_readwrite_handler(0x470000, 0x47001f, 0x1f, 0xffe0, 0,
 		read8_delegate(FUNC(human_interface_device::gpib_r), this),
 		write8_delegate(FUNC(human_interface_device::gpib_w), this), 0x00ff00ff);
 
 	save_item(NAME(m_hil_read));
 	save_item(NAME(m_kbd_nmi));
 	save_item(NAME(m_gpib_irq_line));
+	save_item(NAME(m_gpib_dma_line));
 	save_item(NAME(m_old_latch_enable));
 	save_item(NAME(m_hil_data));
 	save_item(NAME(m_latch_data));
 	save_item(NAME(m_rtc_data));
 	save_item(NAME(m_ppoll_mask));
 	save_item(NAME(m_ppoll_sc));
+	save_item(NAME(m_gpib_dma_enable));
 }
 
 void human_interface_device::device_reset()
@@ -145,6 +140,7 @@ void human_interface_device::device_reset()
 	m_ppoll_sc = 0;
 	m_gpib_irq_line = false;
 	m_kbd_nmi = false;
+	m_old_latch_enable = true;
 	m_rtc->cs1_w(ASSERT_LINE);
 	m_rtc->cs2_w(CLEAR_LINE);
 	m_rtc->write_w(CLEAR_LINE);
@@ -161,7 +157,8 @@ WRITE_LINE_MEMBER(human_interface_device::reset_in)
 
 void human_interface_device::update_gpib_irq()
 {
-	irq3_out((m_gpib_irq_line || (m_ppoll_sc & PPOLL_IR)) ? ASSERT_LINE : CLEAR_LINE);
+	irq3_out((m_gpib_irq_line ||
+		((m_ppoll_sc & (PPOLL_IR|PPOLL_IE)) == (PPOLL_IR|PPOLL_IE))) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(human_interface_device::gpib_irq)
@@ -170,18 +167,26 @@ WRITE_LINE_MEMBER(human_interface_device::gpib_irq)
 	update_gpib_irq();
 }
 
+void human_interface_device::update_gpib_dma()
+{
+	dmar0_out(m_gpib_dma_enable && m_gpib_dma_line);
+}
+
 WRITE_LINE_MEMBER(human_interface_device::gpib_dreq)
 {
-	dmar0_out(state);
+	m_gpib_dma_line = state;
+	update_gpib_dma();
 }
 
 WRITE8_MEMBER(human_interface_device::ieee488_dio_w)
 {
+	if (m_ieee488->atn_r() || m_ieee488->eoi_r())
+		return;
+
 	if ((m_ppoll_mask & ~data) && (m_ppoll_sc & PPOLL_IE)) {
-		LOG("%s: PPOLL triggered\n");
-		m_ieee488->host_atn_w(1);
-		m_ieee488->host_eoi_w(1);
-		m_ppoll_sc |= PPOLL_IR;
+		LOG("%s: parallel poll triggered\n", __func__);
+		if (m_ppoll_sc & PPOLL_IE)
+			m_ppoll_sc |= PPOLL_IR;
 		update_gpib_irq();
 	}
 }
@@ -189,7 +194,7 @@ WRITE8_MEMBER(human_interface_device::ieee488_dio_w)
 WRITE8_MEMBER(human_interface_device::gpib_w)
 {
 	if (offset & 0x08) {
-		m_tms9914->reg8_w(space, offset & 0x07, data);
+		m_tms9914->write(offset & 0x07, data);
 		return;
 	}
 
@@ -198,6 +203,10 @@ WRITE8_MEMBER(human_interface_device::gpib_w)
 		device_reset();
 		break;
 
+	case 1:
+		m_gpib_dma_enable = data & 0x01;
+		update_gpib_dma();
+		break;
 	case 3:
 		m_ppoll_sc = data & PPOLL_IE;
 
@@ -208,12 +217,13 @@ WRITE8_MEMBER(human_interface_device::gpib_w)
 
 		if (m_ppoll_sc & PPOLL_IE) {
 			LOG("%s: start parallel poll\n", __func__);
-			m_ieee488->host_atn_w(0);
-			m_ieee488->host_eoi_w(0);
+			ieee488_dio_w(space, 0, m_ieee488->dio_r(space, 0));
 		}
 		break;
 	case 4:
 		m_ppoll_mask = data;
+		break;
+	default:
 		break;
 	}
 	LOG("gpib_w: %s %02X = %02X\n", machine().describe_context().c_str(), offset, data);
@@ -224,7 +234,7 @@ READ8_MEMBER(human_interface_device::gpib_r)
 	uint8_t data = 0xff;
 
 	if (offset & 0x8) {
-		data = m_tms9914->reg8_r(space, offset & 0x07);
+		data = m_tms9914->read(offset & 0x07);
 		return data;
 	}
 
@@ -234,7 +244,7 @@ READ8_MEMBER(human_interface_device::gpib_r)
 		break;
 	case 1:
 		/* Int control */
-		data = 0x80 | (m_gpib_irq_line ? 0x40 : 0);
+		data = 0x80 | (m_gpib_irq_line ? 0x40 : 0) | (m_gpib_dma_enable ? 0x01 : 0);
 		break;
 	case 2:
 		/* Address */
@@ -350,14 +360,14 @@ void human_interface_device::dmack_w_in(int channel, uint8_t data)
 {
 	if (channel)
 		return;
-	m_tms9914->reg8_w(*program_space(), 7, data);
+	m_tms9914->write(7, data);
 }
 
 uint8_t human_interface_device::dmack_r_in(int channel)
 {
-	if (channel)
+	if (channel || !m_gpib_dma_enable)
 		return 0xff;
-	return m_tms9914->reg8_r(machine().dummy_space(), 7);
+	return m_tms9914->read(7);
 }
 
 } // namespace bus::hp_dio

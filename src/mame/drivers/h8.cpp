@@ -97,7 +97,7 @@ private:
 	bool m_cassold;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<i8080_cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<cassette_image_device> m_cass;
 	required_device<beep_device> m_beep;
@@ -113,7 +113,7 @@ private:
 TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_irq_pulse)
 {
 	if (m_irq_ctl & 1)
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf); // I8080
 }
 
 READ8_MEMBER( h8_state::portf0_r )
@@ -261,7 +261,7 @@ But, all of this can only occur if bit 5 of port F0 is low. */
 			c = !m_ff_b; // from /Q of 2nd flipflop
 			m_ff_b = a; // from Q of 1st flipflop
 			if (c)
-				m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xd7);
+				m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xd7); // I8080
 		}
 	}
 	else
@@ -310,21 +310,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_p)
 	}
 }
 
-MACHINE_CONFIG_START(h8_state::h8)
+void h8_state::h8(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, H8_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(h8_mem)
-	MCFG_DEVICE_IO_MAP(h8_io)
-	MCFG_I8085A_STATUS(WRITE8(*this, h8_state, h8_status_callback))
-	MCFG_I8085A_INTE(WRITELINE(*this, h8_state, h8_inte_callback))
+	I8080(config, m_maincpu, H8_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &h8_state::h8_mem);
+	m_maincpu->set_addrmap(AS_IO, &h8_state::h8_io);
+	m_maincpu->out_status_func().set(FUNC(h8_state::h8_status_callback));
+	m_maincpu->out_inte_func().set(FUNC(h8_state::h8_inte_callback));
 
 	/* video hardware */
 	config.set_default_layout(layout_h8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", H8_BEEP_FRQ).add_route(ALL_OUTPUTS, "mono", 1.00);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beep, H8_BEEP_FRQ).add_route(ALL_OUTPUTS, "mono", 1.00);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	I8251(config, m_uart, 0);
@@ -334,14 +335,14 @@ MACHINE_CONFIG_START(h8_state::h8)
 	cassette_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	cassette_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("h8_cass")
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cass->set_interface("h8_cass");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("h8_c", h8_state, h8_c, attotime::from_hz(4800))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("h8_p", h8_state, h8_p, attotime::from_hz(40000))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("h8_timer", h8_state, h8_irq_pulse, attotime::from_hz(H8_IRQ_PULSE))
-MACHINE_CONFIG_END
+	TIMER(config, "h8_c").configure_periodic(FUNC(h8_state::h8_c), attotime::from_hz(4800));
+	TIMER(config, "h8_p").configure_periodic(FUNC(h8_state::h8_p), attotime::from_hz(40000));
+	TIMER(config, "h8_timer").configure_periodic(FUNC(h8_state::h8_irq_pulse), attotime::from_hz(H8_IRQ_PULSE));
+}
 
 /* ROM definition */
 ROM_START( h8 )

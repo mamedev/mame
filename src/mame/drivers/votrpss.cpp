@@ -224,7 +224,7 @@ WRITE8_MEMBER( votrpss_state::ppi_pa_w )
 WRITE8_MEMBER( votrpss_state::ppi_pb_w )
 {
 	m_portb = data;
-	m_terminal->write(space, offset, data&0x7f);
+	m_terminal->write(data&0x7f);
 }
 
 WRITE8_MEMBER( votrpss_state::ppi_pc_w )
@@ -242,28 +242,28 @@ void votrpss_state::kbd_put(u8 data)
  Machine Drivers
 ******************************************************************************/
 
-MACHINE_CONFIG_START(votrpss_state::votrpss)
+void votrpss_state::votrpss(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000)/2)  /* 4.000 MHz, verified */
-	MCFG_DEVICE_PROGRAM_MAP(votrpss_mem)
-	MCFG_DEVICE_IO_MAP(votrpss_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(votrpss_state,irq_ack)
+	Z80(config, m_maincpu, XTAL(8'000'000)/2);  /* 4.000 MHz, verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &votrpss_state::votrpss_mem);
+	m_maincpu->set_addrmap(AS_IO, &votrpss_state::votrpss_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(votrpss_state::irq_ack));
 
 	/* video hardware */
 	//config.set_default_layout(layout_votrpss);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay", AY8910, XTAL(8'000'000)/4) /* 2.000 MHz, verified */
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))        // port B read
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("votrax", votrax_sc01_device, write))     // port A write
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000) /* 720 kHz? needs verify */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	ay8910_device &ay(AY8910(config, "ay", XTAL(8'000'000)/4)); /* 2.000 MHz, verified */
+	ay.port_b_read_callback().set_ioport("DSW1");
+	ay.port_a_write_callback().set("votrax", FUNC(votrax_sc01_device::write));
+	ay.add_route(ALL_OUTPUTS, "mono", 0.25);
+	VOTRAX_SC01(config, "votrax", 720000).add_route(ALL_OUTPUTS, "mono", 1.00); /* 720 kHz? needs verify */
 
 	/* Devices */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(votrpss_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(votrpss_state::kbd_put));
 
 	i8251_device &uart(I8251(config, "uart", 0));
 	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -271,10 +271,10 @@ MACHINE_CONFIG_START(votrpss_state::votrpss)
 	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	// when serial is chosen, and you select terminal, nothing shows (by design). You can only type commands in.
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("uart", FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set("uart", FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set("uart", FUNC(i8251_device::write_cts));
 
 	pit8253_device &pit(PIT8253(config, "pit", 0));
 	pit.set_clk<0>(8_MHz_XTAL); // Timer 0: baud rate gen for 8251
@@ -291,8 +291,8 @@ MACHINE_CONFIG_START(votrpss_state::votrpss)
 	m_ppi->out_pb_callback().set(FUNC(votrpss_state::ppi_pb_w));
 	m_ppi->out_pc_callback().set(FUNC(votrpss_state::ppi_pc_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", votrpss_state, irq_timer, attotime::from_msec(10))
-MACHINE_CONFIG_END
+	TIMER(config, "irq_timer").configure_periodic(FUNC(votrpss_state::irq_timer), attotime::from_msec(10));
+}
 
 
 

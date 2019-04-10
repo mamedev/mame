@@ -12,7 +12,7 @@
 #include "machine/ram.h"
 #include "machine/bankdev.h"
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "machine/ay31015.h"
 #include "machine/com8116.h"
@@ -54,7 +54,7 @@ public:
 		, m_32kbanks(*this, "bank%u", 0U)
 		, m_16kbank(*this, "16kbank")
 		, m_vidbank(*this, "vidbank")
-		{ }
+	{ }
 
 	void model4p(machine_config &config);
 	void model3(machine_config &config);
@@ -64,6 +64,10 @@ public:
 	void init_trs80m3();
 	void init_trs80m4();
 	void init_trs80m4p();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -128,8 +132,6 @@ private:
 	bool m_drq_off;
 	bool m_intrq_off;
 	floppy_image_device *m_floppy;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_region_maincpu;
 	required_region_ptr<u8> m_p_chargen;

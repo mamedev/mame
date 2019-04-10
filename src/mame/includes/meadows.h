@@ -5,6 +5,11 @@
     Meadows S2650 hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_MEADOWS_H
+#define MAME_INCLUDES_MEADOWS_H
+
+#pragma once
+
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
@@ -85,3 +90,5 @@ private:
 	void minferno_data_map(address_map &map);
 	void minferno_main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MEADOWS_H

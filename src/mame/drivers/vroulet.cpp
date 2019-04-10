@@ -168,8 +168,8 @@ void vroulet_state::vroulet_map(address_map &map)
 void vroulet_state::vroulet_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x00, 0x00).r("aysnd", FUNC(ym2149_device::data_r));
+	map(0x00, 0x01).w("aysnd", FUNC(ym2149_device::data_address_w));
 	map(0x10, 0x13).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x80, 0x83).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
@@ -279,12 +279,13 @@ WRITE8_MEMBER(vroulet_state::ppi8255_c_w){}
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(vroulet_state::vroulet)
+void vroulet_state::vroulet(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   //???
-	MCFG_DEVICE_PROGRAM_MAP(vroulet_map)
-	MCFG_DEVICE_IO_MAP(vroulet_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vroulet_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 4000000);   //???
+	m_maincpu->set_addrmap(AS_PROGRAM, &vroulet_state::vroulet_map);
+	m_maincpu->set_addrmap(AS_IO, &vroulet_state::vroulet_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vroulet_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -299,26 +300,25 @@ MACHINE_CONFIG_START(vroulet_state::vroulet)
 	ppi1.out_pc_callback().set(FUNC(vroulet_state::ppi8255_c_w));
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vroulet_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(vroulet_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vroulet)
-	MCFG_PALETTE_ADD("palette", 128*4)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vroulet);
+	PALETTE(config, m_palette).set_entries(128*4);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-MACHINE_CONFIG_END
+	ym2149_device &aysnd(YM2149(config, "aysnd", 2000000));
+	aysnd.port_a_read_callback().set_ioport("DSWA");
+	aysnd.port_b_read_callback().set_ioport("DSWB");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 /* ROMs */
 

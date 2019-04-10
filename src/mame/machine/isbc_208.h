@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "machine/am9517a.h"
 

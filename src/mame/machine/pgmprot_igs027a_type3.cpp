@@ -190,20 +190,20 @@ MACHINE_START_MEMBER(pgm_arm_type3_state,pgm_arm_type3)
 
 /******* ARM 55857G *******/
 
-MACHINE_CONFIG_START(pgm_arm_type3_state::pgm_arm_type3)
+void pgm_arm_type3_state::pgm_arm_type3(machine_config &config)
+{
 	pgmbase(config);
 
 	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type3_state, pgm_arm_type3 )
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(svg_68k_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type3_state::svg_68k_mem);
 
 	/* protection CPU */
-	MCFG_DEVICE_ADD("prot", ARM7, XTAL(33'000'000))    // 55857G - 33Mhz Xtal, at least on SVG
-	MCFG_DEVICE_PROGRAM_MAP(_55857G_arm7_map)
+	ARM7(config, m_prot, XTAL(33'000'000));    // 55857G - 33Mhz Xtal, at least on SVG
+	m_prot->set_addrmap(AS_PROGRAM, &pgm_arm_type3_state::_55857G_arm7_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(pgm_arm_type3_state, pgm_arm_type3_reset)
-MACHINE_CONFIG_END
+}
 
 
 

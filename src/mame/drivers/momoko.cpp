@@ -255,50 +255,49 @@ void momoko_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-MACHINE_CONFIG_START(momoko_state::momoko)
-
+void momoko_state::momoko(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'000'000)/2)   /* 5.0MHz */
-	MCFG_DEVICE_PROGRAM_MAP(momoko_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", momoko_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(10'000'000)/2);   /* 5.0MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &momoko_state::momoko_map);
+	m_maincpu->set_vblank_int("screen", FUNC(momoko_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(10'000'000)/4)  /* 2.5MHz */
-	MCFG_DEVICE_PROGRAM_MAP(momoko_sound_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(10'000'000)/4));  /* 2.5MHz */
+	audiocpu.set_addrmap(AS_PROGRAM, &momoko_state::momoko_sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 29*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(momoko_state, screen_update_momoko)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(1*8, 31*8-1, 2*8, 29*8-1);
+	screen.set_screen_update(FUNC(momoko_state::screen_update_momoko));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_momoko)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_momoko);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 512);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(10'000'000)/8)
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(10'000'000)/8));
+	ym1.add_route(0, "mono", 0.15);
+	ym1.add_route(1, "mono", 0.15);
+	ym1.add_route(2, "mono", 0.15);
+	ym1.add_route(3, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(10'000'000)/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL(10'000'000)/8));
+	ym2.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
+	ym2.add_route(0, "mono", 0.15);
+	ym2.add_route(1, "mono", 0.15);
+	ym2.add_route(2, "mono", 0.15);
+	ym2.add_route(3, "mono", 0.40);
+}
 
 /****************************************************************************/
 

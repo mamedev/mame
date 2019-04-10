@@ -190,6 +190,7 @@ protected:
 	virtual bool cu_dump() = 0;
 
 	// receive unit
+	int recv_start(u8 *buf, int length);
 	virtual bool address_filter(u8 *mac);
 	virtual u16 ru_execute(u8 *buf, int length) = 0;
 	virtual void ru_complete(const u16 status) = 0;
@@ -210,9 +211,7 @@ protected:
 
 	devcb_write_line m_out_irq;
 	static const device_timer_id CU_TIMER = 0;
-	static const device_timer_id RU_TIMER = 1;
 	emu_timer *m_cu_timer;
-	emu_timer *m_ru_timer;
 
 	// interrupt state
 	bool m_cx;          // command executed (with interrupt)
@@ -233,9 +232,6 @@ protected:
 	u32 m_rfd;           // current receive frame descriptor address
 
 	u64 m_mac_multi; // multicast address hash table
-
-	u8 m_lb_buf[MAX_FRAME_SIZE]; // storage for loopback frames
-	u16 m_lb_length;             // length of loopback frame (relies on wrapping to match 64k max buffer size)
 
 	// configure parameters
 	enum lb_mode

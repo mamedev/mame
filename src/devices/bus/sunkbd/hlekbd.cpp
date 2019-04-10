@@ -789,11 +789,11 @@ WRITE_LINE_MEMBER( hle_device_base::input_txd )
     add machine configuration
 --------------------------------------------------*/
 
-MACHINE_CONFIG_START(hle_device_base::device_add_mconfig)
+void hle_device_base::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "bell").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, ATTOSECONDS_TO_HZ(480 * ATTOSECONDS_PER_MICROSECOND))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 1.0)
-MACHINE_CONFIG_END
+	BEEP(config, m_beeper, ATTOSECONDS_TO_HZ(480 * ATTOSECONDS_PER_MICROSECOND)).add_route(ALL_OUTPUTS, "bell", 1.0);
+}
 
 
 /*--------------------------------------------------
@@ -989,7 +989,6 @@ void hle_device_base::received_byte(uint8_t byte)
 		switch (byte)
 		{
 		case COMMAND_RESET:
-			printf("Resetting keyboard\n");
 			device_reset();
 			break;
 

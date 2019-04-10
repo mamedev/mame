@@ -23,8 +23,6 @@
 
 #define MCFG_LASERDISC_PR8210_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PIONEER_PR8210, 0)
-#define MCFG_LASERDISC_SIMUTREK_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SIMUTREK_SPECIAL, 0)
 
 
 //**************************************************************************

@@ -1009,12 +1009,17 @@ inline void m68ki_branch_32(uint32_t offset)
  */
 inline void m68ki_set_s_flag(uint32_t value)
 {
+	uint32_t old_s_flag = m_s_flag;
 	/* Backup the old stack pointer */
 	REG_SP_BASE()[m_s_flag | ((m_s_flag>>1) & m_m_flag)] = REG_SP();
 	/* Set the S flag */
 	m_s_flag = value;
 	/* Set the new stack pointer */
 	REG_SP() = REG_SP_BASE()[m_s_flag | ((m_s_flag>>1) & m_m_flag)];
+	if ((old_s_flag ^ m_s_flag) & SFLAG_SET)
+	{
+		debugger_privilege_hook();
+	}
 }
 
 /* Set the S and M flags and change the active stack pointer.
@@ -1022,6 +1027,7 @@ inline void m68ki_set_s_flag(uint32_t value)
  */
 inline void m68ki_set_sm_flag(uint32_t value)
 {
+	uint32_t old_s_flag = m_s_flag;
 	/* Backup the old stack pointer */
 	REG_SP_BASE()[m_s_flag | ((m_s_flag >> 1) & m_m_flag)] = REG_SP();
 	/* Set the S and M flags */
@@ -1029,14 +1035,23 @@ inline void m68ki_set_sm_flag(uint32_t value)
 	m_m_flag = value & MFLAG_SET;
 	/* Set the new stack pointer */
 	REG_SP() = REG_SP_BASE()[m_s_flag | ((m_s_flag>>1) & m_m_flag)];
+	if ((old_s_flag ^ m_s_flag) & SFLAG_SET)
+	{
+		debugger_privilege_hook();
+	}
 }
 
 /* Set the S and M flags.  Don't touch the stack pointer. */
 inline void m68ki_set_sm_flag_nosp(uint32_t value)
 {
+	uint32_t old_s_flag = m_s_flag;
 	/* Set the S and M flags */
 	m_s_flag = value & SFLAG_SET;
 	m_m_flag = value & MFLAG_SET;
+	if ((old_s_flag ^ m_s_flag) & SFLAG_SET)
+	{
+		debugger_privilege_hook();
+	}
 }
 
 

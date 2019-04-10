@@ -35,6 +35,11 @@ public:
 
 	void gotcha(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	DECLARE_WRITE16_MEMBER(gotcha_lamps_w);
 	DECLARE_WRITE16_MEMBER(gotcha_fgvideoram_w);
@@ -46,9 +51,6 @@ private:
 	TILEMAP_MAPPER_MEMBER(gotcha_tilemap_scan);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_gotcha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void get_tile_info( tile_data &tileinfo, int tile_index ,uint16_t *vram, int color_offs);
 	void gotcha_map(address_map &map);

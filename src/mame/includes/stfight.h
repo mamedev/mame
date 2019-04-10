@@ -1,5 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Mark McDougall
+#ifndef MAME_INCLUDES_STFIGHT_H
+#define MAME_INCLUDES_STFIGHT_H
+
+#pragma once
+
+#include "cpu/m6805/m68705.h"
 #include "sound/msm5205.h"
 #include "video/stfight_dev.h"
 #include "video/airraid_dev.h"
@@ -7,11 +13,6 @@
 class stfight_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_STFIGHT_INTERRUPT_1
-	};
-
 	stfight_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_coin_mech(*this, "COIN")
@@ -42,6 +43,17 @@ public:
 	void init_empcity();
 	void init_cshooter();
 
+protected:
+	enum
+	{
+		TIMER_STFIGHT_INTERRUPT_1
+	};
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(stfight_adpcm_int);
 
@@ -69,22 +81,17 @@ private:
 	void decrypted_opcodes_map(address_map &map);
 	void stfight_cpu1_map(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	required_ioport                  m_coin_mech;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	required_device<cpu_device>      m_maincpu;
+	required_device<cpu_device>      m_audiocpu;
+	required_device<m68705p5_device> m_mcu;
+	required_device<msm5205_device>  m_msm;
 
-	required_ioport                 m_coin_mech;
+	required_memory_bank             m_main_bank;
 
-	required_device<cpu_device>     m_maincpu;
-	required_device<cpu_device>     m_audiocpu;
-	required_device<cpu_device>     m_mcu;
-	required_device<msm5205_device> m_msm;
-
-	required_memory_bank            m_main_bank;
-
-	required_region_ptr<uint8_t>    m_samples;
-	optional_shared_ptr<uint8_t>    m_decrypted_opcodes;
+	required_region_ptr<uint8_t>     m_samples;
+	optional_shared_ptr<uint8_t>     m_decrypted_opcodes;
 
 	uint8_t     m_coin_state;
 
@@ -101,3 +108,5 @@ private:
 
 	emu_timer   *m_int1_timer;
 };
+
+#endif // MAME_INCLUDES_STFIGHT_H

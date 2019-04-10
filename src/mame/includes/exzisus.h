@@ -1,13 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Yochizo
+#ifndef MAME_INCLUDES_EXZIUS_H
+#define MAME_INCLUDES_EXZIUS_H
+
+#pragma once
 
 #include "emupal.h"
 
 class exzisus_state : public driver_device
 {
 public:
-	exzisus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	exzisus_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_cpuc(*this, "cpuc"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -16,7 +20,8 @@ public:
 		m_sharedram_ac(*this, "sharedram_ac"),
 		m_sharedram_ab(*this, "sharedram_ab"),
 		m_objectram0(*this, "objectram0"),
-		m_videoram0(*this, "videoram0") { }
+		m_videoram0(*this, "videoram0")
+	{ }
 
 	void exzisus(machine_config &config);
 
@@ -45,3 +50,5 @@ private:
 	void cpuc_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_EXZIUS_H

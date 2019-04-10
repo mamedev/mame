@@ -1,13 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
+#ifndef MAME_INCLUDES_SSOZUMO_H
+#define MAME_INCLUDES_SSOZUMO_H
+
+#pragma once
 
 #include "emupal.h"
 
 class ssozumo_state : public driver_device
 {
 public:
-	ssozumo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ssozumo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -17,11 +21,16 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_videoram2(*this, "videoram2"),
-		m_colorram2(*this, "colorram2") { }
+		m_colorram2(*this, "colorram2")
+	{ }
 
 	void ssozumo(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
@@ -38,14 +47,11 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	DECLARE_PALETTE_INIT(ssozumo);
+	void ssozumo_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void ssozumo_map(address_map &map);
 	void ssozumo_sound_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -66,3 +72,5 @@ private:
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
+
+#endif // MAME_INCLUDES_SSOZUMO_H

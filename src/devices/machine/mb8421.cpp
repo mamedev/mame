@@ -129,14 +129,14 @@ void mb8421_master_device::update_intr(offs_t offset)
 //  (write to 7FF asserts INTR)
 //-------------------------------------------------
 
-WRITE8_MEMBER(mb8421_device::left_w)
+void mb8421_device::left_w(offs_t offset, u8 data)
 {
 	offset &= 0x7ff;
 	m_ram[offset] = data;
 	update_intr<read_or_write::WRITE, false>(offset);
 }
 
-WRITE16_MEMBER(mb8421_mb8431_16_device::left_w)
+void mb8421_mb8431_16_device::left_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	offset &= 0x7ff;
 	COMBINE_DATA(&m_ram[offset]);
@@ -148,14 +148,14 @@ WRITE16_MEMBER(mb8421_mb8431_16_device::left_w)
 //  (read from 7FE acknowledges INTL)
 //-------------------------------------------------
 
-READ8_MEMBER(mb8421_device::left_r)
+u8 mb8421_device::left_r(offs_t offset)
 {
 	offset &= 0x7ff;
 	update_intr<read_or_write::READ, false>(offset);
 	return m_ram[offset];
 }
 
-READ16_MEMBER(mb8421_mb8431_16_device::left_r)
+u16 mb8421_mb8431_16_device::left_r(offs_t offset, u16 mem_mask)
 {
 	offset &= 0x7ff;
 	update_intr<read_or_write::READ, false>(offset);
@@ -167,14 +167,14 @@ READ16_MEMBER(mb8421_mb8431_16_device::left_r)
 //  (write to 7FE asserts INTL)
 //-------------------------------------------------
 
-WRITE8_MEMBER(mb8421_device::right_w)
+void mb8421_device::right_w(offs_t offset, u8 data)
 {
 	offset &= 0x7ff;
 	m_ram[offset] = data;
 	update_intr<read_or_write::WRITE, true>(offset);
 }
 
-WRITE16_MEMBER(mb8421_mb8431_16_device::right_w)
+void mb8421_mb8431_16_device::right_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	offset &= 0x7ff;
 	COMBINE_DATA(&m_ram[offset]);
@@ -186,14 +186,14 @@ WRITE16_MEMBER(mb8421_mb8431_16_device::right_w)
 //  (read from 7FF acknowledges INTR)
 //-------------------------------------------------
 
-READ8_MEMBER(mb8421_device::right_r)
+u8 mb8421_device::right_r(offs_t offset)
 {
 	offset &= 0x7ff;
 	update_intr<read_or_write::READ, true>(offset);
 	return m_ram[offset];
 }
 
-READ16_MEMBER(mb8421_mb8431_16_device::right_r)
+u16 mb8421_mb8431_16_device::right_r(offs_t offset, u16 mem_mask)
 {
 	offset &= 0x7ff;
 	update_intr<read_or_write::READ, true>(offset);

@@ -140,7 +140,7 @@ void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	{
 		stream_sample_t sampleout = 0;
 
-		for (auto & ch : m_channel)
+		for (auto &ch : m_channel)
 		{
 			if (ch.play)
 			{

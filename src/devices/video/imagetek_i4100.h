@@ -13,23 +13,7 @@
 
 #include "emupal.h"
 #include "screen.h"
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_I4100_GFXDECODE(gfxtag) \
-	downcast<imagetek_i4100_device &>(*device).set_gfxdecode_tag(gfxtag);
-
-#define MCFG_I4100_BLITTER_END_CALLBACK(_devcb) \
-	downcast<imagetek_i4100_device &>(*device).set_blitter_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_I4100_TILEMAP_XOFFSETS(_a, _b, _c) \
-	downcast<imagetek_i4100_device &>(*device).set_tmap_xoffsets(_a, _b, _c);
-
-#define MCFG_I4100_TILEMAP_YOFFSETS(_a, _b, _c) \
-	downcast<imagetek_i4100_device &>(*device).set_tmap_yoffsets(_a, _b, _c);
+#include "video/bufsprite.h"
 
 
 //**************************************************************************
@@ -39,6 +23,7 @@
 // ======================> i4100_device
 
 class imagetek_i4100_device : public device_t,
+							  public device_gfx_interface,
 							  public device_video_interface
 {
 public:
@@ -47,13 +32,14 @@ public:
 
 	void map(address_map &map);
 
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
 	void set_tmap_xoffsets(int x1, int x2, int x3) { m_tilemap_scrolldx[0] = x1; m_tilemap_scrolldx[1] = x2; m_tilemap_scrolldx[2] = x3; }
 	void set_tmap_yoffsets(int y1, int y2, int y3) { m_tilemap_scrolldy[0] = y1; m_tilemap_scrolldy[1] = y2; m_tilemap_scrolldy[2] = y3; }
 
-	template <class Object> devcb_base &set_blitter_irq_callback(Object &&cb) { return m_blit_irq_cb.set_callback(std::forward<Object>(cb)); }
+	auto blit_irq_cb() { return m_blit_irq_cb.bind(); }
+	void set_spriteram_buffered(bool buffer) { m_spriteram_buffered = buffer; }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_eof);
 
 protected:
 	imagetek_i4100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool has_ext_tiles);
@@ -70,13 +56,12 @@ protected:
 	required_shared_ptr<uint16_t> m_vram_2;
 	required_shared_ptr<uint16_t> m_scratchram;
 	required_shared_ptr<uint16_t> m_blitter_regs;
-	required_shared_ptr<uint16_t> m_spriteram;
+	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<uint16_t> m_tiletable;
 	required_shared_ptr<uint16_t> m_window;
 	required_shared_ptr<uint16_t> m_scroll;
 
 	required_device<palette_device> m_palette;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_region_ptr<uint8_t> m_gfxrom;
 
 	std::unique_ptr<uint8_t[]>      m_expanded_gfx1;
@@ -99,6 +84,7 @@ protected:
 	const bool m_support_8bpp, m_support_16x16;
 	int  m_tilemap_scrolldx[3];
 	int  m_tilemap_scrolldy[3];
+	bool m_spriteram_buffered;
 
 	void blt_write( address_space &space, const int tmap, const offs_t offs, const uint16_t data, const uint16_t mask );
 
@@ -163,9 +149,13 @@ protected:
 	DECLARE_WRITE16_MEMBER( rombank_w );
 
 	void draw_layers( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
-	inline uint8_t get_tile_pix( uint16_t code, uint8_t x, uint8_t y, bool big, uint16_t *pix );
-	void draw_tilemap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t flags, uint32_t pcode,
-					int sx, int sy, int wx, int wy, bool big, uint16_t *tilemapram, int layer );
+	inline uint8_t get_tile_pix( uint16_t code, uint8_t x, uint8_t y, bool const big, uint16_t *pix );
+	void draw_tilemap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t flags, uint32_t const pcode,
+					int sx, int sy, int wx, int wy, bool const big, uint16_t const *tilemapram, int const layer );
+	void draw_spritegfx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &clip,
+					uint32_t const gfxstart, uint16_t const width, uint16_t const height,
+					uint16_t color, int const flipx, int const flipy, int sx, int sy,
+					uint32_t const scale, uint8_t const prival );
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void expand_gfx1();
 
@@ -178,6 +168,8 @@ protected:
 	static constexpr uint32_t WIN_NY = (0x20);
 
 	bool m_inited_hack;
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
+	DECLARE_GFXDECODE_MEMBER(gfxinfo_ext);
 };
 
 class imagetek_i4220_device : public imagetek_i4100_device

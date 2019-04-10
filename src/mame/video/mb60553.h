@@ -11,7 +11,7 @@
 class mb60553_zooming_tilemap_device : public device_t
 {
 public:
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_gfx_region(int gfxregion) { m_gfx_region = gfxregion; }
 
 	mb60553_zooming_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -57,12 +57,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(MB60553, mb60553_zooming_tilemap_device)
-
-
-#define MCFG_MB60553_GFX_REGION(_region) \
-	downcast<mb60553_zooming_tilemap_device &>(*device).set_gfx_region(_region);
-
-#define MCFG_MB60553_GFXDECODE(_gfxtag) \
-	downcast<mb60553_zooming_tilemap_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_MB60533_H

@@ -12,7 +12,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/i8085/i8085.h"
 //#include "bus/s100/s100.h"
-#include "machine/i8251.h"
+#include "machine/mc2661.h"
 #include "machine/terminal.h"
 
 
@@ -46,7 +46,7 @@ private:
 
 WRITE16_MEMBER( dual68_state::terminal_w )
 {
-	m_terminal->write(space, 0, data >> 8);
+	m_terminal->write(data >> 8);
 }
 
 void dual68_state::dual68_mem(address_map &map)
@@ -68,14 +68,10 @@ void dual68_state::sio4_mem(address_map &map)
 void dual68_state::sio4_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x22, 0x22).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x23, 0x23).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x2a, 0x2a).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x2b, 0x2b).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x32, 0x32).rw("uart3", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x33, 0x33).rw("uart3", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x3a, 0x3a).rw("uart4", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x3b, 0x3b).rw("uart4", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x20, 0x23).rw("usart1", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
+	map(0x28, 0x2b).rw("usart2", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
+	map(0x30, 0x33).rw("usart3", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
+	map(0x38, 0x3b).rw("usart4", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 }
 
 /* Input ports */
@@ -97,24 +93,25 @@ void dual68_state::kbd_put(u8 data)
 	//m_term_data = data;
 }
 
-MACHINE_CONFIG_START(dual68_state::dual68)
+void dual68_state::dual68(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(dual68_mem)
+	M68000(config, m_maincpu, 16_MHz_XTAL / 2); // MC68000L8
+	m_maincpu->set_addrmap(AS_PROGRAM, &dual68_state::dual68_mem);
 
-	MCFG_DEVICE_ADD("siocpu", I8085A, XTAL(16'000'000) / 8)
-	MCFG_DEVICE_PROGRAM_MAP(sio4_mem)
-	MCFG_DEVICE_IO_MAP(sio4_io)
+	i8085a_cpu_device &siocpu(I8085A(config, "siocpu", 9.8304_MHz_XTAL)); // NEC D8085AC-2
+	siocpu.set_addrmap(AS_PROGRAM, &dual68_state::sio4_mem);
+	siocpu.set_addrmap(AS_IO, &dual68_state::sio4_io);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dual68_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(dual68_state::kbd_put));
 
-	MCFG_DEVICE_ADD("uart1", I8251, 0)
-	MCFG_DEVICE_ADD("uart2", I8251, 0)
-	MCFG_DEVICE_ADD("uart3", I8251, 0)
-	MCFG_DEVICE_ADD("uart4", I8251, 0)
-MACHINE_CONFIG_END
+	MC2661(config, "usart1", 9.8304_MHz_XTAL / 2); // SCN2661B
+	MC2661(config, "usart2", 9.8304_MHz_XTAL / 2); // SCN2661B
+	MC2661(config, "usart3", 9.8304_MHz_XTAL / 2); // SCN2661B
+	MC2661(config, "usart4", 9.8304_MHz_XTAL / 2); // SCN2661B
+}
 
 /* ROM definition */
 ROM_START( dual68 )

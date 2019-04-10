@@ -147,7 +147,8 @@ WRITE_LINE_MEMBER(cinemat_state::spacewar_sound4_w)
 	}
 }
 
-MACHINE_CONFIG_START(cinemat_state::spacewar_sound)
+void cinemat_state::spacewar_sound(machine_config &config)
+{
 	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_state::spacewar_sound0_w));
 	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::spacewar_sound1_w));
 	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_state::spacewar_sound2_w));
@@ -156,11 +157,11 @@ MACHINE_CONFIG_START(cinemat_state::spacewar_sound)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(8)
-	MCFG_SAMPLES_NAMES(spacewar_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(8);
+	m_samples->set_samples_names(spacewar_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -200,18 +201,19 @@ WRITE_LINE_MEMBER(cinemat_state::barrier_sound2_w)
 		m_samples->start(2, 2);
 }
 
-MACHINE_CONFIG_START(cinemat_state::barrier_sound)
+void cinemat_state::barrier_sound(machine_config &config)
+{
 	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_state::barrier_sound0_w));
 	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::barrier_sound1_w));
 	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_state::barrier_sound2_w));
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(3)
-	MCFG_SAMPLES_NAMES(barrier_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(3);
+	m_samples->set_samples_names(barrier_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -256,18 +258,19 @@ WRITE_LINE_MEMBER(cinemat_state::speedfrk_start_led_w)
 	m_led = !state;
 }
 
-MACHINE_CONFIG_START(cinemat_state::speedfrk_sound)
+void cinemat_state::speedfrk_sound(machine_config &config)
+{
 	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::speedfrk_start_led_w));
 	m_outlatch->q_out_cb<3>().set(FUNC(cinemat_state::speedfrk_sound3_w));
 	m_outlatch->q_out_cb<4>().set(FUNC(cinemat_state::speedfrk_sound4_w));
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(speedfrk_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(speedfrk_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -337,7 +340,8 @@ WRITE_LINE_MEMBER(cinemat_state::starhawk_sound7_w)
 		m_samples->stop(3);
 }
 
-MACHINE_CONFIG_START(cinemat_state::starhawk_sound)
+void cinemat_state::starhawk_sound(machine_config &config)
+{
 	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_state::starhawk_sound0_w));
 	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::starhawk_sound1_w));
 	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_state::starhawk_sound2_w));
@@ -347,11 +351,11 @@ MACHINE_CONFIG_START(cinemat_state::starhawk_sound)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(5)
-	MCFG_SAMPLES_NAMES(starhawk_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(5);
+	m_samples->set_samples_names(starhawk_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -415,7 +419,8 @@ WRITE_LINE_MEMBER(cinemat_16level_state::sundance_sound7_w)
 		m_samples->start(5, 5);
 }
 
-MACHINE_CONFIG_START(cinemat_16level_state::sundance_sound)
+void cinemat_16level_state::sundance_sound(machine_config &config)
+{
 	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_16level_state::sundance_sound0_w));
 	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_16level_state::sundance_sound1_w));
 	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_16level_state::sundance_sound2_w));
@@ -425,11 +430,11 @@ MACHINE_CONFIG_START(cinemat_16level_state::sundance_sound)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(6)
-	MCFG_SAMPLES_NAMES(sundance_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(sundance_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -497,16 +502,17 @@ WRITE_LINE_MEMBER(cinemat_state::tailg_sound_w)
 	}
 }
 
-MACHINE_CONFIG_START(cinemat_state::tailg_sound)
+void cinemat_state::tailg_sound(machine_config &config)
+{
 	m_outlatch->q_out_cb<4>().set(FUNC(cinemat_state::tailg_sound_w));
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(6)
-	MCFG_SAMPLES_NAMES(tailg_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(tailg_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -566,7 +572,8 @@ WRITE_LINE_MEMBER(cinemat_state::warrior_sound4_w)
 		m_samples->start(4, 4);
 }
 
-MACHINE_CONFIG_START(cinemat_state::warrior_sound)
+void cinemat_state::warrior_sound(machine_config &config)
+{
 	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_state::warrior_sound0_w));
 	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::warrior_sound1_w));
 	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_state::warrior_sound2_w));
@@ -575,11 +582,11 @@ MACHINE_CONFIG_START(cinemat_state::warrior_sound)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(5)
-	MCFG_SAMPLES_NAMES(warrior_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(5);
+	m_samples->set_samples_names(warrior_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -665,7 +672,8 @@ WRITE_LINE_MEMBER(cinemat_state::armora_sound3_w)
 		m_samples->stop(6);
 }
 
-MACHINE_CONFIG_START(cinemat_state::armora_sound)
+void cinemat_state::armora_sound(machine_config &config)
+{
 	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_state::armora_sound0_w));
 	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::armora_sound1_w));
 	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_state::armora_sound2_w));
@@ -674,11 +682,11 @@ MACHINE_CONFIG_START(cinemat_state::armora_sound)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(7)
-	MCFG_SAMPLES_NAMES(armora_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(7);
+	m_samples->set_samples_names(armora_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -761,7 +769,8 @@ WRITE_LINE_MEMBER(cinemat_state::ripoff_sound7_w)
 		m_samples->start(4, 4);
 }
 
-MACHINE_CONFIG_START(cinemat_state::ripoff_sound)
+void cinemat_state::ripoff_sound(machine_config &config)
+{
 	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::ripoff_sound1_w));
 	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_state::ripoff_sound2_w));
 	m_outlatch->q_out_cb<3>().set(FUNC(cinemat_state::ripoff_sound3_w));
@@ -770,11 +779,11 @@ MACHINE_CONFIG_START(cinemat_state::ripoff_sound)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(6)
-	MCFG_SAMPLES_NAMES(ripoff_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(ripoff_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -877,7 +886,8 @@ WRITE_LINE_MEMBER(cinemat_state::starcas_sound3_w)
 		m_samples->start(7, 7);
 }
 
-MACHINE_CONFIG_START(cinemat_state::starcas_sound)
+void cinemat_state::starcas_sound(machine_config &config)
+{
 	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_state::starcas_sound0_w));
 	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::starcas_sound1_w));
 	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_state::starcas_sound2_w));
@@ -886,11 +896,11 @@ MACHINE_CONFIG_START(cinemat_state::starcas_sound)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(8)
-	MCFG_SAMPLES_NAMES(starcas_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(8);
+	m_samples->set_samples_names(starcas_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 
 
@@ -1010,18 +1020,19 @@ WRITE_LINE_MEMBER(cinemat_64level_state::solarq_sound0_w)
 	}
 }
 
-MACHINE_CONFIG_START(cinemat_64level_state::solarq_sound)
+void cinemat_64level_state::solarq_sound(machine_config &config)
+{
 	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_64level_state::solarq_sound0_w));
 	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_64level_state::solarq_sound1_w));
 	m_outlatch->q_out_cb<4>().set(FUNC(cinemat_64level_state::solarq_sound4_w));
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(8)
-	MCFG_SAMPLES_NAMES(solarq_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(8);
+	m_samples->set_samples_names(solarq_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 
 
@@ -1147,7 +1158,8 @@ WRITE_LINE_MEMBER(cinemat_color_state::boxingb_sound3_w)
 		m_samples->start(11, 11);
 }
 
-MACHINE_CONFIG_START(cinemat_color_state::boxingb_sound)
+void cinemat_color_state::boxingb_sound(machine_config &config)
+{
 	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_color_state::boxingb_sound0_w));
 	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_color_state::boxingb_sound1_w));
 	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_color_state::boxingb_sound2_w));
@@ -1156,11 +1168,11 @@ MACHINE_CONFIG_START(cinemat_color_state::boxingb_sound)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(12)
-	MCFG_SAMPLES_NAMES(boxingb_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(12);
+	m_samples->set_samples_names(boxingb_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -1263,7 +1275,8 @@ WRITE_LINE_MEMBER(cinemat_state::wotw_sound3_w)
 		m_samples->start(7, 7);
 }
 
-MACHINE_CONFIG_START(cinemat_state::wotw_sound)
+void cinemat_state::wotw_sound(machine_config &config)
+{
 	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_state::wotw_sound0_w));
 	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::wotw_sound1_w));
 	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_state::wotw_sound2_w));
@@ -1272,11 +1285,11 @@ MACHINE_CONFIG_START(cinemat_state::wotw_sound)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(8)
-	MCFG_SAMPLES_NAMES(wotw_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(8);
+	m_samples->set_samples_names(wotw_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -1392,8 +1405,8 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-MACHINE_CONFIG_START(demon_state::demon_sound)
-
+void demon_state::demon_sound(machine_config &config)
+{
 	/* basic machine hardware */
 	z80_device& audiocpu(Z80(config, "audiocpu", 3579545));
 	audiocpu.set_daisy_config(daisy_chain);
@@ -1408,19 +1421,18 @@ MACHINE_CONFIG_START(demon_state::demon_sound)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 3579545)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, demon_state, sound_porta_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, demon_state, sound_portb_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, demon_state, sound_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay1, 3579545);
+	m_ay1->port_a_read_callback().set(FUNC(demon_state::sound_porta_r));
+	m_ay1->port_b_read_callback().set(FUNC(demon_state::sound_portb_r));
+	m_ay1->port_b_write_callback().set(FUNC(demon_state::sound_portb_w));
+	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay2", 3579545).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, 3579545)
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, demon_state, sound_output_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	ay8910_device &ay3(AY8910(config, "ay3", 3579545));
+	ay3.port_b_write_callback().set(FUNC(demon_state::sound_output_w));
+	ay3.add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 

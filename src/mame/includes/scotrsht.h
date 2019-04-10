@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Pierpaolo Prazzoli
+#ifndef MAME_INCLUDES_SCOTRSHT_H
+#define MAME_INCLUDES_SCOTRSHT_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
@@ -7,8 +11,8 @@
 class scotrsht_state : public driver_device
 {
 public:
-	scotrsht_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	scotrsht_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -17,7 +21,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_scroll(*this, "scroll")  { }
+		m_scroll(*this, "scroll")
+	{ }
 
 	void scotrsht(machine_config &config);
 
@@ -51,7 +56,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(scotrsht);
+	void scotrsht_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -59,3 +64,5 @@ private:
 	void scotrsht_sound_map(address_map &map);
 	void scotrsht_sound_port(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SCOTRSHT_H

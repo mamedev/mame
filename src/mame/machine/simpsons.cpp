@@ -45,7 +45,7 @@ WRITE8_MEMBER(simpsons_state::simpsons_coin_counter_w)
 
 READ8_MEMBER(simpsons_state::simpsons_sound_interrupt_r)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff );
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff ); // Z80
 	return 0x00;
 }
 

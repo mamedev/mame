@@ -5,6 +5,7 @@
 #include "hil_devices.h"
 
 #include "hlekbd.h"
+#include "hlemouse.h"
 
 void hp_hil_devices(device_slot_interface &device)
 {

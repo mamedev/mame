@@ -90,12 +90,12 @@ public:
 	void init_dking();
 	void init_rpatrol();
 	DECLARE_VIDEO_START(cclimber);
-	DECLARE_PALETTE_INIT(cclimber);
+	void cclimber_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(swimmer);
-	DECLARE_PALETTE_INIT(swimmer);
-	DECLARE_PALETTE_INIT(yamato);
+	void swimmer_palette(palette_device &palette) const;
+	void yamato_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(toprollr);
-	DECLARE_PALETTE_INIT(toprollr);
+	void toprollr_palette(palette_device &palette) const;
 
 	TILE_GET_INFO_MEMBER(cclimber_get_pf_tile_info);
 	TILE_GET_INFO_MEMBER(swimmer_get_pf_tile_info);

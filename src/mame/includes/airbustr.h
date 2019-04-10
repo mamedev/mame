@@ -5,6 +5,10 @@
     Air Buster
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_AIRBUSTR_H
+#define MAME_INCLUDES_AIRBUSTR_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -90,3 +94,5 @@ public:
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_AIRBUSTR_H

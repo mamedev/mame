@@ -5,7 +5,12 @@
     Irem M107 hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_M107_H
+#define MAME_INCLUDES_M107_H
 
+#pragma once
+
+#include "cpu/nec/v25.h"
 #include "machine/pic8259.h"
 #include "machine/timer.h"
 #include "video/bufsprite.h"
@@ -47,7 +52,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
+	required_device<v35_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -96,3 +101,5 @@ private:
 	void wpksoc_io_map(address_map &map);
 	void wpksoc_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_M107_H

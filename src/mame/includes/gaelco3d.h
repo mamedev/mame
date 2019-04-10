@@ -7,15 +7,20 @@
     driver by Aaron Giles
 
 **************************************************************************/
+#ifndef MAME_INCLUDES_GAELCO3D_H
+#define MAME_INCLUDES_GAELCO3D_H
 
-#include "sound/dmadac.h"
-#include "video/poly.h"
+#pragma once
+
+#include "cpu/adsp2100/adsp2100.h"
+#include "cpu/tms32031/tms32031.h"
+#include "machine/74259.h"
 #include "machine/eepromser.h"
 #include "machine/gaelco3d.h"
 #include "machine/gen_latch.h"
-#include "machine/74259.h"
 #include "machine/timer.h"
-#include "cpu/adsp2100/adsp2100.h"
+#include "sound/dmadac.h"
+#include "video/poly.h"
 #include "screen.h"
 
 #define SOUND_CHANNELS  4
@@ -25,28 +30,28 @@ class gaelco3d_state : public driver_device
 {
 public:
 	gaelco3d_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_adsp_ram_base(*this,"adsp_ram_base"),
-			m_m68k_ram_base(*this,"m68k_ram_base",0),
-			m_tms_comm_base(*this,"tms_comm_base",0),
-			m_adsp_control_regs(*this,"adsp_regs"),
-			m_adsp_fastram_base(*this,"adsp_fastram"),
-			m_maincpu(*this, "maincpu"),
-			m_adsp(*this, "adsp"),
-			m_eeprom(*this, "eeprom"),
-			m_tms(*this, "tms"),
-			m_dmadac(*this, "dac%u", 0U),
-			m_serial(*this, "serial"),
-			m_screen(*this, "screen"),
-			m_soundlatch(*this, "soundlatch"),
-			m_mainlatch(*this, "mainlatch"),
-			m_outlatch(*this, "outlatch"),
-			m_adsp_autobuffer_timer(*this, "adsp_timer"),
-			m_paletteram16(*this, "paletteram"),
-			m_paletteram32(*this, "paletteram"),
-			m_analog(*this, {"ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3"}),
-			m_adsp_bank(*this, "adspbank")
-			{ }
+		: driver_device(mconfig, type, tag)
+		, m_adsp_ram_base(*this, "adsp_ram_base")
+		, m_m68k_ram_base(*this, "m68k_ram_base", 0)
+		, m_tms_comm_base(*this, "tms_comm_base", 0)
+		, m_adsp_control_regs(*this, "adsp_regs")
+		, m_adsp_fastram_base(*this, "adsp_fastram")
+		, m_maincpu(*this, "maincpu")
+		, m_adsp(*this, "adsp")
+		, m_eeprom(*this, "eeprom")
+		, m_tms(*this, "tms")
+		, m_dmadac(*this, "dac%u", 0U)
+		, m_serial(*this, "serial")
+		, m_screen(*this, "screen")
+		, m_soundlatch(*this, "soundlatch")
+		, m_mainlatch(*this, "mainlatch")
+		, m_outlatch(*this, "outlatch")
+		, m_adsp_autobuffer_timer(*this, "adsp_timer")
+		, m_paletteram16(*this, "paletteram")
+		, m_paletteram32(*this, "paletteram")
+		, m_analog(*this, "ANALOG%u", 0U)
+		, m_adsp_bank(*this, "adspbank")
+	{ }
 
 	void footbpow(machine_config &config);
 	void gaelco3d2(machine_config &config);
@@ -105,7 +110,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<adsp21xx_device> m_adsp;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<cpu_device> m_tms;
+	required_device<tms32031_device> m_tms;
 	required_device_array<dmadac_sound_device, SOUND_CHANNELS> m_dmadac;
 	required_device<gaelco_serial_device> m_serial;
 	required_device<screen_device> m_screen;
@@ -176,3 +181,5 @@ private:
 	void main_map(address_map &map);
 	void tms_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GAELCO3D_H

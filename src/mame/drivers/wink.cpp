@@ -26,12 +26,13 @@
 class wink_state : public driver_device
 {
 public:
-	wink_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	wink_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_videoram(*this, "videoram") { }
+		m_videoram(*this, "videoram")
+	{ }
 
 	void wink(machine_config &config);
 
@@ -382,11 +383,12 @@ void wink_state::machine_reset()
 	m_sound_flag = 0;
 }
 
-MACHINE_CONFIG_START(wink_state::wink)
+void wink_state::wink(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 12000000 / 4)
-	MCFG_DEVICE_PROGRAM_MAP(wink_map)
-	MCFG_DEVICE_IO_MAP(wink_io)
+	Z80(config, m_maincpu, 12000000 / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wink_state::wink_map);
+	m_maincpu->set_addrmap(AS_IO, &wink_state::wink_io);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(wink_state::nmi_enable_w));
@@ -398,37 +400,35 @@ MACHINE_CONFIG_START(wink_state::wink)
 	mainlatch.q_out_cb<6>().set(FUNC(wink_state::coin_counter_w<1>));
 	mainlatch.q_out_cb<7>().set(FUNC(wink_state::coin_counter_w<2>));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000 / 8)
-	MCFG_DEVICE_PROGRAM_MAP(wink_sound_map)
-	MCFG_DEVICE_IO_MAP(wink_sound_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(wink_state, wink_sound,  15625)
+	Z80(config, m_audiocpu, 12000000 / 8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &wink_state::wink_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &wink_state::wink_sound_io);
+	m_audiocpu->set_periodic_int(FUNC(wink_state::wink_sound), attotime::from_hz(15625));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wink_state, screen_update_wink)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wink_state, nmi_clock_w))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(wink_state::screen_update_wink));
+	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(wink_state::nmi_clock_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wink)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
-
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_wink);
+	PALETTE(config, "palette").set_format(palette_device::xBRG_444, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, 12000000 / 8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, wink_state, sound_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ay8912_device &aysnd(AY8912(config, "aysnd", 12000000 / 8));
+	aysnd.port_a_read_callback().set(FUNC(wink_state::sound_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /***************************************************************************
 

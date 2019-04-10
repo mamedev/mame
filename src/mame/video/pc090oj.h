@@ -13,8 +13,8 @@ public:
 	pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
-	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 	void set_gfx_region(int gfxregion) { m_gfxnum = gfxregion; }
 	void set_usebuffer(int use_buf) { m_use_buffer = use_buf; }
 	void set_offsets(int x_offset, int y_offset)
@@ -61,21 +61,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(PC090OJ, pc090oj_device)
-
-
-#define MCFG_PC090OJ_GFX_REGION(_region) \
-	downcast<pc090oj_device &>(*device).set_gfx_region(_region);
-
-#define MCFG_PC090OJ_OFFSETS(_xoffs, _yoffs) \
-	downcast<pc090oj_device &>(*device).set_offsets(_xoffs, _yoffs);
-
-#define MCFG_PC090OJ_USEBUFFER(_use_buf) \
-	downcast<pc090oj_device &>(*device).set_usebuffer(_use_buf);
-
-#define MCFG_PC090OJ_GFXDECODE(_gfxtag) \
-	downcast<pc090oj_device &>(*device).set_gfxdecode_tag(_gfxtag);
-
-#define MCFG_PC090OJ_PALETTE(_palette_tag) \
-	downcast<pc090oj_device &>(*device).set_palette_tag(_palette_tag);
 
 #endif // MAME_VIDEO_PC090)J_H

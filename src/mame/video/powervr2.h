@@ -5,10 +5,6 @@
 
 #pragma once
 
-#define MCFG_POWERVR2_ADD(_tag, _irq_cb)                                \
-	MCFG_DEVICE_ADD(_tag, POWERVR2, 0)                                  \
-	downcast<powervr2_device *>(device)->set_irq_cb(DEVCB_ ## _irq_cb);
-
 class powervr2_device : public device_t,
 						public device_video_interface
 {
@@ -199,7 +195,7 @@ public:
 	int next_y;
 
 	powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	template <class Object> void set_irq_cb(Object &&cb) { irq_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq_callback() { return irq_cb.bind(); }
 
 	DECLARE_READ32_MEMBER(  id_r );
 	DECLARE_READ32_MEMBER(  revision_r );

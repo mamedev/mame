@@ -59,7 +59,7 @@ nes_bandai_pt554_device::nes_bandai_pt554_device(const machine_config &mconfig, 
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_bandai_pt554_device::write_m)
+void nes_bandai_pt554_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("Bandai PT-554 Sound write, data: %02x\n", data));
 
@@ -88,13 +88,13 @@ static const char *const pt554_sample_names[] =
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nes_bandai_pt554_device::device_add_mconfig)
-
+void nes_bandai_pt554_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(8)
-	MCFG_SAMPLES_NAMES(pt554_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(8);
+	m_samples->set_samples_names(pt554_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}

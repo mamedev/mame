@@ -8,19 +8,13 @@
 #include "sound/dac.h"
 
 
-#define MCFG_AD1848_IRQ_CALLBACK(cb) \
-	downcast<ad1848_device &>(*device).set_irq_callback((DEVCB_##cb));
-
-#define MCFG_AD1848_DRQ_CALLBACK(cb) \
-	downcast<ad1848_device &>(*device).set_drq_callback((DEVCB_##cb));
-
 class ad1848_device : public device_t
 {
 public:
 	ad1848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_drq_callback(Object &&cb) { return m_drq_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq() { return m_irq_cb.bind(); }
+	auto drq() { return m_drq_cb.bind(); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

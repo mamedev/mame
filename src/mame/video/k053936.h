@@ -55,10 +55,4 @@ private:
 
 DECLARE_DEVICE_TYPE(K053936, k053936_device)
 
-#define MCFG_K053936_WRAP(_wrap) \
-	downcast<k053936_device &>(*device).set_wrap(_wrap);
-
-#define MCFG_K053936_OFFSETS(_xoffs, _yoffs) \
-	downcast<k053936_device &>(*device).set_offsets(_xoffs, _yoffs);
-
 #endif // MAME_VIDEO_K053936_H

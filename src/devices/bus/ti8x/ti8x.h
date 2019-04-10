@@ -42,13 +42,6 @@
 DECLARE_DEVICE_TYPE(TI8X_LINK_PORT, ti8x_link_port_device)
 
 
-#define MCFG_TI8X_LINK_TIP_HANDLER(cb) \
-	downcast<ti8x_link_port_device &>(*device).set_tip_handler(DEVCB_##cb);
-
-#define MCFG_TI8X_LINK_RING_HANDLER(cb) \
-	downcast<ti8x_link_port_device &>(*device).set_ring_handler(DEVCB_##cb);
-
-
 class device_ti8x_link_port_interface;
 
 
@@ -67,8 +60,8 @@ public:
 	ti8x_link_port_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	// static configuration helpers
-	template <class Object> devcb_base &set_tip_handler(Object &&cb) { return m_tip_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ring_handler(Object &&cb) { return m_ring_handler.set_callback(std::forward<Object>(cb)); }
+	auto tip_handler() { return m_tip_handler.bind(); }
+	auto ring_handler() { return m_ring_handler.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(tip_w);
 	DECLARE_WRITE_LINE_MEMBER(ring_w);

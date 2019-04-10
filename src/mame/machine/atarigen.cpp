@@ -342,8 +342,6 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_16(*this, "paletteram"),
 		m_slapstic_device(*this, ":slapstic")
 {
 }
@@ -396,7 +394,7 @@ void atarigen_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 		case TID_SCANLINE_INTERRUPT:
 		{
-			scanline_int_gen(*m_maincpu);
+			scanline_int_write_line(1);
 			screen_device *screen = reinterpret_cast<screen_device *>(ptr);
 			timer.adjust(screen->frame_period());
 			break;
@@ -442,18 +440,6 @@ void atarigen_state::scanline_int_set(screen_device &screen, int scanline)
 WRITE_LINE_MEMBER(atarigen_state::scanline_int_write_line)
 {
 	m_scanline_int_state = state;
-	update_interrupts();
-}
-
-
-//-------------------------------------------------
-//  scanline_int_gen: Standard interrupt routine
-//  which sets the scanline interrupt state.
-//-------------------------------------------------
-
-INTERRUPT_GEN_MEMBER(atarigen_state::scanline_int_gen)
-{
-	m_scanline_int_state = 1;
 	update_interrupts();
 }
 

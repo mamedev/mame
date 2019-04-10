@@ -244,7 +244,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		static const int x_offset[4] = {0x0,0x1,0x4,0x5};
 		static const int y_offset[4] = {0x0,0x2,0x8,0xa};
 		int x,y, ex, ey, flipx, flipy, destx, desty;
-		
+
 		if (attr & 0x01) sx -= 256;
 		if (sy >= 240) sy -= 256;
 
@@ -254,7 +254,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		/* Flak Attack doesn't use a lookup PROM, it maps the color code directly */
 		/* to a palette entry */
-		// TODO: check if it's true or callback-ize this one and remove the per-game hack. 
+		// TODO: check if it's true or callback-ize this one and remove the per-game hack.
 		if (is_flakatck)
 			transparent_mask = 1 << 0;
 		else
@@ -313,7 +313,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 						transparent_mask);
 			}
 		}
- 
+
 		source += inc;
 	}
 }

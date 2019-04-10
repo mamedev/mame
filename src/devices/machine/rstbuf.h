@@ -54,7 +54,7 @@ class rst_pos_buffer_device : public rst_buffer_device
 {
 public:
 	// device constructor
-	rst_pos_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rst_pos_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// set RST 1/RST 08H request line (modifies bit 3 of vector)
 	DECLARE_WRITE_LINE_MEMBER(rst1_w) { sync_input(state, 0x08); }
@@ -76,7 +76,7 @@ class rst_neg_buffer_device : public rst_buffer_device
 {
 public:
 	// device constructor
-	rst_neg_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rst_neg_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// set RST 30H request line (modifies bit 3 of vector)
 	DECLARE_WRITE_LINE_MEMBER(rst30_w) { sync_input(state, 0x08); }

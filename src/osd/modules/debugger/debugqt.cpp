@@ -59,15 +59,19 @@ private:
 	running_machine *m_machine;
 };
 
+
+namespace {
+
 //============================================================
 //  "Global" variables to make QT happy
 //============================================================
 
-int qtArgc = 0;
-char** qtArgv = nullptr;
+int qtArgc = 1;
+char qtArg0[] = "mame";
+char *qtArgv[] = { qtArg0, nullptr };
 
 bool oneShot = true;
-static MainWindow* mainQtWindow = nullptr;
+MainWindow *mainQtWindow = nullptr;
 
 //============================================================
 //  XML configuration save/load
@@ -77,7 +81,7 @@ static MainWindow* mainQtWindow = nullptr;
 std::vector<WindowQtConfig*> xmlConfigurations;
 
 
-static void xml_configuration_load(running_machine &machine, config_type cfg_type, util::xml::data_node const *parentnode)
+ void xml_configuration_load(running_machine &machine, config_type cfg_type, util::xml::data_node const *parentnode)
 {
 	// We only care about game files
 	if (cfg_type != config_type::GAME)
@@ -112,7 +116,7 @@ static void xml_configuration_load(running_machine &machine, config_type cfg_typ
 }
 
 
-static void xml_configuration_save(running_machine &machine, config_type cfg_type, util::xml::data_node *parentnode)
+void xml_configuration_save(running_machine &machine, config_type cfg_type, util::xml::data_node *parentnode)
 {
 	// We only write to game configurations
 	if (cfg_type != config_type::GAME)
@@ -133,7 +137,7 @@ static void xml_configuration_save(running_machine &machine, config_type cfg_typ
 }
 
 
-static void gather_save_configurations()
+void gather_save_configurations()
 {
 	for (int i = 0; i < xmlConfigurations.size(); i++)
 		delete xmlConfigurations[i];
@@ -173,7 +177,7 @@ static void gather_save_configurations()
 //  Utilities
 //============================================================
 
-static void load_and_clear_main_window_config(std::vector<WindowQtConfig*>& configList)
+void load_and_clear_main_window_config(std::vector<WindowQtConfig*>& configList)
 {
 	for (int i = 0; i < configList.size(); i++)
 	{
@@ -188,7 +192,7 @@ static void load_and_clear_main_window_config(std::vector<WindowQtConfig*>& conf
 }
 
 
-static void setup_additional_startup_windows(running_machine& machine, std::vector<WindowQtConfig*>& configList)
+void setup_additional_startup_windows(running_machine& machine, std::vector<WindowQtConfig*>& configList)
 {
 	for (int i = 0; i < configList.size(); i++)
 	{
@@ -217,7 +221,7 @@ static void setup_additional_startup_windows(running_machine& machine, std::vect
 }
 
 
-static void bring_main_window_to_front()
+void bring_main_window_to_front()
 {
 	foreach (QWidget* widget, QApplication::topLevelWidgets())
 	{
@@ -227,6 +231,8 @@ static void bring_main_window_to_front()
 		widget->raise();
 	}
 }
+
+} // anonymous namespace
 
 
 //============================================================

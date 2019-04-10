@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Hau, Nicola Salmoria
+#ifndef MAME_INCLUDES_TECMO16_H
+#define MAME_INCLUDES_TECMO16_H
+
+#pragma once
 
 #include "video/bufsprite.h"
 #include "video/tecmo_spr.h"
@@ -92,3 +96,5 @@ private:
 	void ginkun_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TECMO16_H

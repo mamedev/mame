@@ -125,11 +125,12 @@ void abc_cadmouse_device::abc_cadmouse_io(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc_cadmouse_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(abc_cadmouse_mem)
-	MCFG_DEVICE_IO_MAP(abc_cadmouse_io)
-MACHINE_CONFIG_END
+void abc_cadmouse_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(8'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc_cadmouse_device::abc_cadmouse_mem);
+	m_maincpu->set_addrmap(AS_IO, &abc_cadmouse_device::abc_cadmouse_io);
+}
 
 //**************************************************************************
 //  LIVE DEVICE

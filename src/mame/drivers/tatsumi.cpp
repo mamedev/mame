@@ -175,7 +175,7 @@
 
 WRITE8_MEMBER(cyclwarr_state::cyclwarr_sound_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -847,7 +847,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(tatsumi_state::v30_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);   /* VBL */
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);   /* V30 - VBL */
 }
 
 WRITE_LINE_MEMBER(apache3_state::apache3_68000_reset)
@@ -864,25 +864,25 @@ MACHINE_RESET_MEMBER(apache3_state,apache3)
 }
 
 
-MACHINE_CONFIG_START(apache3_state::apache3)
-
+void apache3_state::apache3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V30, CLOCK_1 / 2)
-	MCFG_DEVICE_PROGRAM_MAP(apache3_v30_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tatsumi_state, v30_interrupt)
+	V30(config, m_maincpu, CLOCK_1 / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apache3_state::apache3_v30_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tatsumi_state::v30_interrupt));
 
-	MCFG_DEVICE_ADD("sub", M68000, CLOCK_2 / 4)
-	MCFG_DEVICE_PROGRAM_MAP(apache3_68000_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", apache3_state, irq4_line_hold)
+	M68000(config, m_subcpu, CLOCK_2 / 4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &apache3_state::apache3_68000_map);
+	m_subcpu->set_vblank_int("screen", FUNC(apache3_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", V20, CLOCK_1 / 2)
-	MCFG_DEVICE_PROGRAM_MAP(apache3_v20_map)
+	V20(config, m_audiocpu, CLOCK_1 / 2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &apache3_state::apache3_v20_map);
 
-	MCFG_DEVICE_ADD("sub2", Z80, CLOCK_2 / 8)
-	MCFG_DEVICE_PROGRAM_MAP(apache3_z80_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", apache3_state, irq0_line_hold)
+	Z80(config, m_subcpu2, CLOCK_2 / 8);
+	m_subcpu2->set_addrmap(AS_PROGRAM, &apache3_state::apache3_z80_map);
+	m_subcpu2->set_vblank_int("screen", FUNC(apache3_state::irq0_line_hold));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_MACHINE_RESET_OVERRIDE(apache3_state, apache3)
 
@@ -898,13 +898,12 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	I8255(config, "ppi");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240) // TODO: Hook up CRTC
-	MCFG_SCREEN_UPDATE_DRIVER(apache3_state, screen_update_apache3)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
+	screen.set_screen_update(FUNC(apache3_state::screen_update_apache3));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apache3)
-	MCFG_PALETTE_ADD("palette", 1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apache3);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024 + 4096); // 1024 real colours, and 4096 arranged as series of CLUTs
 
 	/* apache 3 schematics state
 	bit 4:  250
@@ -920,30 +919,30 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	YM2151(config, m_ym2151, CLOCK_1 / 4);
+	m_ym2151->irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	m_ym2151->add_route(0, "lspeaker", 0.45);
+	m_ym2151->add_route(1, "rspeaker", 0.45);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_1 / 4 / 2, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, CLOCK_1 / 4 / 2, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.75);
+	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+}
 
-MACHINE_CONFIG_START(roundup5_state::roundup5)
-
+void roundup5_state::roundup5(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V30, CLOCK_1 / 2)
-	MCFG_DEVICE_PROGRAM_MAP(roundup5_v30_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tatsumi_state, v30_interrupt)
+	V30(config, m_maincpu, CLOCK_1 / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &roundup5_state::roundup5_v30_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tatsumi_state::v30_interrupt));
 
-	MCFG_DEVICE_ADD("sub", M68000, CLOCK_2 / 4)
-	MCFG_DEVICE_PROGRAM_MAP(roundup5_68000_map)
+	M68000(config, m_subcpu, CLOCK_2 / 4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &roundup5_state::roundup5_68000_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, CLOCK_1 / 4)
-	MCFG_DEVICE_PROGRAM_MAP(roundup5_z80_map)
+	Z80(config, m_audiocpu, CLOCK_1 / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &roundup5_state::roundup5_z80_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.in_pa_callback().set_ioport("IN0");
@@ -951,15 +950,13 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 	ppi.out_pc_callback().set(FUNC(roundup5_state::output_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240) // TODO: Hook up CRTC
-	MCFG_SCREEN_UPDATE_DRIVER(roundup5_state, screen_update_roundup5)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
+	screen.set_screen_update(FUNC(roundup5_state::screen_update_roundup5));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_roundup5)
-	MCFG_PALETTE_ADD("palette", 1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_MEMBITS(8)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_roundup5);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024 + 4096); // 1024 real colours, and 4096 arranged as series of CLUTs
+	m_palette->set_membits(8).set_endianness(ENDIANNESS_BIG);
 
 	MCFG_VIDEO_START_OVERRIDE(roundup5_state,roundup5)
 
@@ -967,15 +964,15 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	YM2151(config, m_ym2151, CLOCK_1 / 4);
+	m_ym2151->irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	m_ym2151->add_route(0, "lspeaker", 0.45);
+	m_ym2151->add_route(1, "rspeaker", 0.45);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_1 / 4 / 2, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, CLOCK_1 / 4 / 2, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.75);
+	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+}
 
 void cyclwarr_state::machine_reset()
 {
@@ -1003,22 +1000,22 @@ void cyclwarr_state::machine_reset()
 	m_road_color_bank = m_prev_road_bank = 0;
 }
 
-MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
-
+void cyclwarr_state::cyclwarr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, CLOCK_2 / 4)
-	MCFG_DEVICE_PROGRAM_MAP(master_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyclwarr_state, irq5_line_hold)
+	M68000(config, m_maincpu, CLOCK_2 / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cyclwarr_state::master_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cyclwarr_state::irq5_line_hold));
 
-	MCFG_DEVICE_ADD("sub", M68000, CLOCK_2 / 4)
-	MCFG_DEVICE_PROGRAM_MAP(slave_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyclwarr_state, irq5_line_hold)
+	M68000(config, m_subcpu, CLOCK_2 / 4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &cyclwarr_state::slave_map);
+	m_subcpu->set_vblank_int("screen", FUNC(cyclwarr_state::irq5_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, CLOCK_1 / 4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, CLOCK_1 / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cyclwarr_state::sound_map);
 
 	// saner sync value (avoids crashing after crediting)
-	MCFG_QUANTUM_TIME(attotime::from_hz(CLOCK_2 / 1024))
+	config.m_minimum_quantum = attotime::from_hz(CLOCK_2 / 1024);
 
 	cxd1095_device &io1(CXD1095(config, "io1", 0));
 	io1.in_portb_cb().set_ioport("SERVICE");
@@ -1034,13 +1031,12 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 	io2.out_porte_cb().set(FUNC(cyclwarr_state::cyclwarr_control_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240) // TODO: Hook up CRTC
-	MCFG_SCREEN_UPDATE_DRIVER(cyclwarr_state, screen_update_cyclwarr)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
+	screen.set_screen_update(FUNC(cyclwarr_state::screen_update_cyclwarr));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyclwarr)
-	MCFG_PALETTE_ADD("palette", 8192 + 8192)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cyclwarr);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192 + 8192);
 
 	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, cyclwarr)
 
@@ -1048,33 +1044,32 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-//  MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+//  m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	YM2151(config, m_ym2151, CLOCK_1 / 4);
+	m_ym2151->irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	m_ym2151->add_route(0, "lspeaker", 0.45);
+	m_ym2151->add_route(1, "rspeaker", 0.45);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_1 / 8, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, CLOCK_1 / 8, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.75);
+	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+}
 
-MACHINE_CONFIG_START(cyclwarr_state::bigfight)
+void cyclwarr_state::bigfight(machine_config &config)
+{
 	cyclwarr(config);
 
 	// TODO: it's same video HW, we don't know how/where video registers are mapped
-//  MCFG_SCREEN_MODIFY("screen")
-//  MCFG_SCREEN_UPDATE_DRIVER(cyclwarr_state, screen_update_bigfight)
+//  subdevice<screen_device>("screen")->set_screen_update(FUNC(cyclwarr_state::screen_update_bigfight));
 
 	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, bigfight)
 
 	/* sound hardware */
 	// TODO: 2MHz was too fast. Can the clock be software controlled?
-	MCFG_DEVICE_MODIFY("oki")
-	MCFG_DEVICE_CLOCK(CLOCK_1 / 8 / 2)
-MACHINE_CONFIG_END
+	m_oki->set_clock(CLOCK_1 / 8 / 2);
+}
 
 /***************************************************************************/
 

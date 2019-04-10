@@ -1,8 +1,37 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+
+List of games which were planned but never finished or released.
+
+- A Bug's Life
+- Castlevania: Symphony of the Night (71-742)
+- Command and Conquer: Red Alert
+- Deer Hunter
+- Giga Pets Deluxe (71-748)
+- Holyfield Champion Boxing (71-749)
+- Furbyland
+- Godzilla
+- The Legend of the Lost Creator (unknown "Wyvern" game)
+- Madden Football 99   (71-705)
+- Metal Gear Solid
+- Mutoids
+- Name That Tune (71-729)
+- NASCAR Racing
+- NBA Live 99 (71-741)
+- Shadow Madness
+- Small Soldiers (71-743)
+- Sonic 3D Blast
+- Turok: Dinosaur Hunter
+- WCW Whiplash
+- X-Files
+
+-->
+
 <softwarelist name="gamecom" description="Tiger Game.com cartridges">
 
-	<software name="batmanr" supported="no">
+	<software name="batmanr">
 		<description>Batman &amp; Robin</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
@@ -14,7 +43,7 @@
 		</part>
 	</software>
 
-	<software name="centiped" supported="no">
+	<software name="centiped">
 		<description>Centipede</description>
 		<year>1999</year>
 		<publisher>Tiger Electronics</publisher>
@@ -26,7 +55,7 @@
 		</part>
 	</software>
 
-	<software name="dukenuke" supported="no">
+	<software name="dukenuke">
 		<description>Duke Nukem 3D</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
@@ -38,7 +67,7 @@
 		</part>
 	</software>
 
-	<software name="fightmix" supported="no">
+	<software name="fightmix">
 		<description>Fighters Megamix</description>
 		<year>1998</year>
 		<publisher>Tiger Electronics</publisher>
@@ -50,7 +79,7 @@
 		</part>
 	</software>
 
-	<software name="frogger" supported="no">
+	<software name="frogger">
 		<description>Frogger</description>
 		<year>1999</year>
 		<publisher>Tiger Electronics</publisher>
@@ -62,7 +91,7 @@
 		</part>
 	</software>
 
-	<software name="henry" supported="no">
+	<software name="henry">
 		<description>Henry - Match the Sounds Memory Game</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
@@ -74,7 +103,7 @@
 		</part>
 	</software>
 
-	<software name="indy500" supported="no">
+	<software name="indy500">
 		<description>Indy 500</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
@@ -86,7 +115,7 @@
 		</part>
 	</software>
 
-	<software name="jeopardy" supported="no">
+	<software name="jeopardy">
 		<description>Jeopardy!</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
@@ -110,7 +139,7 @@
 		</part>
 	</software>
 
-	<software name="lostwrld" supported="no">
+	<software name="lostwrld">
 		<description>The Lost World - Jurassic Park</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
@@ -122,7 +151,7 @@
 		</part>
 	</software>
 
-	<software name="monopoly" supported="no">
+	<software name="monopoly">
 		<description>Monopoly</description>
 		<year>1999</year>
 		<publisher>Tiger Electronics</publisher>
@@ -134,7 +163,7 @@
 		</part>
 	</software>
 
-	<software name="mktrilgy" supported="no">
+	<software name="mktrilgy">
 		<description>Mortal Kombat Trilogy</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
@@ -146,7 +175,7 @@
 		</part>
 	</software>
 
-	<software name="quizwiz" supported="no">
+	<software name="quizwiz">
 		<description>Quiz Wiz - Cyber Trivia</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
@@ -158,7 +187,7 @@
 		</part>
 	</software>
 
-	<software name="re2" supported="no">
+	<software name="re2">
 		<description>Resident Evil 2</description>
 		<year>1998</year>
 		<publisher>Tiger Electronics</publisher>
@@ -170,7 +199,7 @@
 		</part>
 	</software>
 
-	<software name="scrabble" supported="no">
+	<software name="scrabble">
 		<description>Scrabble</description>
 		<year>1999</year>
 		<publisher>Tiger Electronics</publisher>
@@ -182,7 +211,7 @@
 		</part>
 	</software>
 
-	<software name="sonicjam" supported="no">
+	<software name="sonicjam">
 		<description>Sonic Jam</description>
 		<year>1998</year>
 		<publisher>Tiger Electronics</publisher>
@@ -194,7 +223,7 @@
 		</part>
 	</software>
 
-	<software name="tcasino" supported="no">
+	<software name="tcasino">
 		<description>Tiger Casino</description>
 		<year>1998</year>
 		<publisher>Tiger Electronics</publisher>
@@ -206,7 +235,7 @@
 		</part>
 	</software>
 
-	<software name="wheelfor" supported="no">
+	<software name="wheelfor">
 		<description>Wheel of Fortune</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
@@ -218,7 +247,7 @@
 		</part>
 	</software>
 
-	<software name="wheelfo2" supported="no">
+	<software name="wheelfo2">
 		<description>Wheel of Fortune 2</description>
 		<year>1998</year>
 		<publisher>Tiger Electronics</publisher>
@@ -230,7 +259,7 @@
 		</part>
 	</software>
 
-	<software name="arcadecl" supported="no">
+	<software name="arcadecl">
 		<description>Williams Arcade Classics</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>

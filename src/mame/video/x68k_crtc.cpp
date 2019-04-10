@@ -203,8 +203,8 @@ void x68k_crtc_device::refresh_mode()
 		div = BIT(m_reg[20], 0) ? 3 : 6;
 	if ((m_reg[20] & 0x0c) == 0)
 		div *= 2;
-	attotime refresh = attotime::from_ticks(scr.max_x * scr.max_y, (BIT(m_reg[20], 4) ? 69.55199_MHz_XTAL : 38.86363_MHz_XTAL) / div);
-	LOG("screen().configure(%i,%i,[%i,%i,%i,%i],%f)\n", scr.max_x, scr.max_y, visiblescr.min_x, visiblescr.min_y, visiblescr.max_x, visiblescr.max_y, ATTOSECONDS_TO_HZ(refresh.as_attoseconds()));
+	attotime refresh = attotime::from_hz((BIT(m_reg[20], 4) ? 69.55199_MHz_XTAL : 38.86363_MHz_XTAL) / div) * (scr.max_x * scr.max_y);
+	LOG("screen().configure(%i,%i,[%i,%i,%i,%i],%f)\n", scr.max_x, scr.max_y, visiblescr.min_x, visiblescr.min_y, visiblescr.max_x, visiblescr.max_y, refresh.as_hz());
 	screen().configure(scr.max_x, scr.max_y, visiblescr, refresh.as_attoseconds());
 }
 

@@ -18,8 +18,8 @@
 #include "bus/einstein/pipe/pipe.h"
 #include "bus/einstein/userport/userport.h"
 #include "bus/rs232/rs232.h"
+#include "imagedev/floppy.h"
 #include "machine/adc0844.h"
-#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
@@ -390,10 +390,6 @@ void einstein_state::machine_start()
 	m_bank1->configure_entry(1, m_bios->base());
 	m_bank2->set_base(m_ram->pointer());
 	m_bank3->set_base(m_ram->pointer() + 0x8000);
-
-	// setup expansion slot
-	m_pipe->set_program_space(&m_maincpu->space(AS_PROGRAM));
-	m_pipe->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 void einstein_state::machine_reset()
@@ -428,8 +424,7 @@ void einstein_state::einstein_io(address_map &map)
 	map(0x00, 0x00).mirror(0xff04).rw(FUNC(einstein_state::reset_r), FUNC(einstein_state::reset_w));
 	map(0x02, 0x02).mirror(0xff04).rw(m_psg, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0x03, 0x03).mirror(0xff04).w(m_psg, FUNC(ay8910_device::data_w));
-	map(0x08, 0x08).mirror(0xff06).rw("vdp", FUNC(tms9129_device::vram_r), FUNC(tms9129_device::vram_w));
-	map(0x09, 0x09).mirror(0xff06).rw("vdp", FUNC(tms9129_device::register_r), FUNC(tms9129_device::register_w));
+	map(0x08, 0x09).mirror(0xff06).rw("vdp", FUNC(tms9129_device::read), FUNC(tms9129_device::write));
 	map(0x10, 0x11).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x18, 0x1b).mirror(0xff04).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
 	map(0x20, 0x20).mirror(0xff00).rw(FUNC(einstein_state::kybint_msk_r), FUNC(einstein_state::kybint_msk_w));
@@ -576,7 +571,8 @@ static void einstein_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
-MACHINE_CONFIG_START(einstein_state::einstein)
+void einstein_state::einstein(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL_X002 / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &einstein_state::einstein_mem);
@@ -585,7 +581,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	/* this is actually clocked at the system clock 4 MHz, but this would be too fast for our
 	driver. So we update at 50Hz and hope this is good enough. */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", einstein_state, keyboard_timer_callback, attotime::from_hz(50))
+	TIMER(config, "keyboard").configure_periodic(FUNC(einstein_state::keyboard_timer_callback), attotime::from_hz(50));
 
 	z80pio_device& pio(Z80PIO(config, IC_I063, XTAL_X002 / 2));
 	pio.out_int_callback().set(FUNC(einstein_state::int_w<0>));
@@ -597,14 +593,12 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	z80ctc_device& ctc(Z80CTC(config, IC_I058, XTAL_X002 / 2));
 	ctc.intr_callback().set(FUNC(einstein_state::int_w<1>));
+	ctc.set_clk<0>(XTAL_X002 / 4);
+	ctc.set_clk<1>(XTAL_X002 / 4);
+	ctc.set_clk<2>(XTAL_X002 / 4);
 	ctc.zc_callback<0>().set(IC_I060, FUNC(i8251_device::write_txc));
 	ctc.zc_callback<1>().set(IC_I060, FUNC(i8251_device::write_rxc));
 	ctc.zc_callback<2>().set(IC_I058, FUNC(z80ctc_device::trg3));
-
-	clock_device &ctc_trigger(CLOCK(config, "ctc_trigger", XTAL_X002 / 4));
-	ctc_trigger.signal_handler().set(IC_I058, FUNC(z80ctc_device::trg0));
-	ctc_trigger.signal_handler().append(IC_I058, FUNC(z80ctc_device::trg1));
-	ctc_trigger.signal_handler().append(IC_I058, FUNC(z80ctc_device::trg2));
 
 	/* Einstein daisy chain support for non-Z80 devices */
 	Z80DAISY_GENERIC(config, m_keyboard_daisy, 0xf7);
@@ -622,12 +616,12 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(IC_I030, AY8910, XTAL_X002 / 4)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, einstein_state, keyboard_data_read))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, einstein_state, keyboard_line_write))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	AY8910(config, m_psg, XTAL_X002 / 4);
+	m_psg->port_b_read_callback().set(FUNC(einstein_state::keyboard_data_read));
+	m_psg->port_a_write_callback().set(FUNC(einstein_state::keyboard_line_write));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	adc0844_device &adc(ADC0844(config, "adc", 0));
+	adc0844_device &adc(ADC0844(config, "adc"));
 	adc.intr_callback().set(m_adc_daisy, FUNC(z80daisy_generic_device::int_w));
 	adc.ch1_callback().set_ioport("analogue_1_x");
 	adc.ch2_callback().set_ioport("analogue_1_y");
@@ -635,15 +629,16 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	adc.ch4_callback().set_ioport("analogue_2_y");
 
 	/* printer */
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(IC_I063, z80pio_device, strobe_a))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, einstein_state, write_centronics_busy))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, einstein_state, write_centronics_perror))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, einstein_state, write_centronics_fault))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(IC_I063, FUNC(z80pio_device::strobe_a));
+	m_centronics->busy_handler().set(FUNC(einstein_state::write_centronics_busy));
+	m_centronics->perror_handler().set(FUNC(einstein_state::write_centronics_perror));
+	m_centronics->fault_handler().set(FUNC(einstein_state::write_centronics_fault));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
-	MCFG_TIMER_DRIVER_ADD("strobe", einstein_state, strobe_callback)
+	TIMER(config, m_strobe_timer).configure_generic(FUNC(einstein_state::strobe_callback));
 
 	// uart
 	i8251_device &ic_i060(I8251(config, IC_I060, XTAL_X002 / 4));
@@ -652,34 +647,35 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	ic_i060.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
 	// rs232 port
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(IC_I060, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(IC_I060, i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(IC_I060, i8251_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(IC_I060, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(IC_I060, FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set(IC_I060, FUNC(i8251_device::write_cts));
 
 	// floppy
 	WD1770(config, m_fdc, XTAL_X002);
 
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":2", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":3", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, IC_I042 ":2", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, IC_I042 ":3", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","einstein")
+	SOFTWARE_LIST(config, "disk_list").set_original("einstein");
 
 	/* RAM is provided by 8k DRAM ICs i009, i010, i011, i012, i013, i014, i015 and i016 */
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// tatung pipe connector
-	MCFG_TATUNG_PIPE_ADD("pipe")
-	MCFG_TATUNG_PIPE_NMI_HANDLER(INPUTLINE(IC_I001, INPUT_LINE_NMI))
+	TATUNG_PIPE(config, m_pipe, XTAL_X002 / 2, tatung_pipe_cards, nullptr);
+	m_pipe->set_program_space(m_maincpu, AS_PROGRAM);
+	m_pipe->set_io_space(m_maincpu, AS_IO);
+	m_pipe->nmi_handler().set_inputline(IC_I001, INPUT_LINE_NMI);
 
 	// user port
-	MCFG_EINSTEIN_USERPORT_ADD("user")
-	MCFG_EINSTEIN_USERPORT_BSTB_HANDLER(WRITELINE(IC_I063, z80pio_device, strobe_b))
-MACHINE_CONFIG_END
+	EINSTEIN_USERPORT(config, "user").bstb_handler().set(IC_I063, FUNC(z80pio_device::strobe_b));
+}
 
 
 /***************************************************************************

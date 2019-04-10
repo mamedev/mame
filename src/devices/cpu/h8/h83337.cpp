@@ -115,26 +115,27 @@ void h83337_device::map(address_map &map)
 	map(0xfff2, 0xfff2).rw("port6", FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
 }
 
-MACHINE_CONFIG_START(h83337_device::device_add_mconfig)
-	MCFG_H8_INTC_ADD("intc")
-	MCFG_H8_ADC_3337_ADD("adc", "intc", 35)
-	MCFG_H8_PORT_ADD("port1", h8_device::PORT_1, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("port2", h8_device::PORT_2, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("port3", h8_device::PORT_3, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("port4", h8_device::PORT_4, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("port5", h8_device::PORT_5, 0xf8, 0xf8)
-	MCFG_H8_PORT_ADD("port6", h8_device::PORT_6, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("port7", h8_device::PORT_7, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("port8", h8_device::PORT_8, 0x80, 0x80)
-	MCFG_H8_PORT_ADD("port9", h8_device::PORT_9, 0x00, 0x00)
-	MCFG_H8_TIMER8_CHANNEL_ADD("timer8_0", "intc", 19, 20, 21, 8, 2, 64, 32, 1024, 256)
-	MCFG_H8_TIMER8_CHANNEL_ADD("timer8_1", "intc", 22, 23, 24, 8, 2, 64, 128, 1024, 2048)
-	MCFG_H8_TIMER16_ADD("timer16", 1, 0xff)
-	MCFG_H8_TIMER16_CHANNEL_ADD("timer16:0", 4, 0, "intc", 32)
-	MCFG_H8_SCI_ADD("sci0", "intc", 27, 28, 29, 30)
-	MCFG_H8_SCI_ADD("sci1", "intc", 31, 32, 33, 34)
-	MCFG_H8_WATCHDOG_ADD("watchdog", "intc", 36, h8_watchdog_device::B)
-MACHINE_CONFIG_END
+void h83337_device::device_add_mconfig(machine_config &config)
+{
+	H8_INTC(config, "intc");
+	H8_ADC_3337(config, "adc", "intc", 35);
+	H8_PORT(config, "port1", h8_device::PORT_1, 0x00, 0x00);
+	H8_PORT(config, "port2", h8_device::PORT_2, 0x00, 0x00);
+	H8_PORT(config, "port3", h8_device::PORT_3, 0x00, 0x00);
+	H8_PORT(config, "port4", h8_device::PORT_4, 0x00, 0x00);
+	H8_PORT(config, "port5", h8_device::PORT_5, 0xf8, 0xf8);
+	H8_PORT(config, "port6", h8_device::PORT_6, 0x00, 0x00);
+	H8_PORT(config, "port7", h8_device::PORT_7, 0x00, 0x00);
+	H8_PORT(config, "port8", h8_device::PORT_8, 0x80, 0x80);
+	H8_PORT(config, "port9", h8_device::PORT_9, 0x00, 0x00);
+	H8_TIMER8_CHANNEL(config, "timer8_0", "intc", 19, 20, 21, 8, 2, 64, 32, 1024, 256);
+	H8_TIMER8_CHANNEL(config, "timer8_1", "intc", 22, 23, 24, 8, 2, 64, 128, 1024, 2048);
+	H8_TIMER16(config, "timer16", 1, 0xff);
+	H8_TIMER16_CHANNEL(config, "timer16:0", 4, 0, "intc", 32);
+	H8_SCI(config, "sci0", "intc", 27, 28, 29, 30);
+	H8_SCI(config, "sci1", "intc", 31, 32, 33, 34);
+	H8_WATCHDOG(config, "watchdog", "intc", 36, h8_watchdog_device::B);
+}
 
 void h83337_device::execute_set_input(int inputnum, int state)
 {

@@ -40,7 +40,7 @@ inline uint8_t* z88_state::convert_address(uint32_t offset)
 ***************************************************************************/
 
 // Initialise the palette
-PALETTE_INIT_MEMBER(z88_state, z88)
+void z88_state::z88_palette(palette_device &palette) const
 {
 	m_palette->set_pen_color(0, rgb_t(138, 146, 148));
 	m_palette->set_pen_color(1, rgb_t(92,  83,  88));

@@ -15,8 +15,6 @@
 
 #include "imagedev/flopdrv.h"
 
-#define MCFG_MC6843_IRQ_CALLBACK(_write) \
-	downcast<mc6843_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 class mc6843_device : public device_t
 {

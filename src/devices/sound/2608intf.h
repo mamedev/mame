@@ -11,9 +11,6 @@
 struct ssg_callbacks;
 
 
-#define MCFG_YM2608_IRQ_HANDLER(cb) \
-		downcast<ym2608_device &>(*device).set_irq_handler(DEVCB_##cb);
-
 class ym2608_device : public ay8910_device,
 	public device_rom_interface
 {
@@ -24,8 +21,8 @@ public:
 	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	auto irq_handler() { return m_irq_handler.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	// update request from fm.cpp
 	static void update_request(device_t *param) { downcast<ym2608_device *>(param)->update_request(); }

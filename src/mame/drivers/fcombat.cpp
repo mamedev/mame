@@ -140,12 +140,12 @@ void fcombat_state::audio_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x8001, 0x8001).r("ay1", FUNC(ay8910_device::data_r));
-	map(0x8002, 0x8003).w("ay1", FUNC(ay8910_device::data_address_w));
-	map(0xa001, 0xa001).r("ay2", FUNC(ay8910_device::data_r));
-	map(0xa002, 0xa003).w("ay2", FUNC(ay8910_device::data_address_w));
-	map(0xc001, 0xc001).r("ay3", FUNC(ay8910_device::data_r));
-	map(0xc002, 0xc003).w("ay3", FUNC(ay8910_device::data_address_w));
+	map(0x8001, 0x8001).r("ay1", FUNC(ym2149_device::data_r));
+	map(0x8002, 0x8003).w("ay1", FUNC(ym2149_device::data_address_w));
+	map(0xa001, 0xa001).r("ay2", FUNC(ym2149_device::data_r));
+	map(0xa002, 0xa003).w("ay2", FUNC(ym2149_device::data_address_w));
+	map(0xc001, 0xc001).r("ay3", FUNC(ym2149_device::data_r));
+	map(0xc002, 0xc003).w("ay3", FUNC(ym2149_device::data_address_w));
 }
 
 
@@ -288,41 +288,35 @@ void fcombat_state::machine_reset()
 	m_ty = 0;
 }
 
-MACHINE_CONFIG_START(fcombat_state::fcombat)
-
+void fcombat_state::fcombat(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 10000000/3)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	Z80(config, m_maincpu, 10000000/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fcombat_state::main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 10000000/3)
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
-
+	z80_device &audiocpu(Z80(config, "audiocpu", 10000000/3));
+	audiocpu.set_addrmap(AS_PROGRAM, &fcombat_state::audio_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(FCOMBAT_PIXEL_CLOCK, FCOMBAT_HTOTAL, FCOMBAT_HBEND, FCOMBAT_HBSTART, FCOMBAT_VTOTAL, FCOMBAT_VBEND, FCOMBAT_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(fcombat_state, screen_update_fcombat)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(FCOMBAT_PIXEL_CLOCK, FCOMBAT_HTOTAL, FCOMBAT_HBEND, FCOMBAT_HBSTART, FCOMBAT_VTOTAL, FCOMBAT_VBEND, FCOMBAT_VBSTART);
+	screen.set_screen_update(FUNC(fcombat_state::screen_update_fcombat));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fcombat)
-	MCFG_PALETTE_ADD("palette", 256*3)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(fcombat_state, fcombat)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fcombat);
+	PALETTE(config, m_palette, FUNC(fcombat_state::fcombat_palette), 256*3, 32);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
+	YM2149(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
+	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
-MACHINE_CONFIG_END
+	YM2149(config, "ay3", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
+}
 
 /*************************************
  *

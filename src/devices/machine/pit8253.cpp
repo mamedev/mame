@@ -74,11 +74,12 @@ fe2010_pit_device::fe2010_pit_device(const machine_config &mconfig, const char *
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pit8253_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("counter0", PIT_COUNTER, 0)
-	MCFG_DEVICE_ADD("counter1", PIT_COUNTER, 0)
-	MCFG_DEVICE_ADD("counter2", PIT_COUNTER, 0)
-MACHINE_CONFIG_END
+void pit8253_device::device_add_mconfig(machine_config &config)
+{
+	PIT_COUNTER(config, "counter0", 0);
+	PIT_COUNTER(config, "counter1", 0);
+	PIT_COUNTER(config, "counter2", 0);
+}
 
 
 //-------------------------------------------------

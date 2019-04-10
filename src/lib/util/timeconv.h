@@ -18,6 +18,7 @@
 
 #include <chrono>
 #include <algorithm>
+#include <stdexcept>
 
 
 namespace util {

@@ -333,7 +333,7 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 		m_cmos_write_enabled = true;
 		break;
 	case WDOG:
-		m_rtc->watchdog_write(space, offset, data);
+		m_rtc->watchdog_write();
 		break;
 	default:
 		if (LOG_IRQ)
@@ -345,7 +345,7 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 
 READ8_MEMBER(atlantis_state::cmos_r)
 {
-	uint8_t result = m_rtc->read(space, offset);
+	uint8_t result = m_rtc->read(offset);
 	// Initial RTC check expects reads to the RTC to take some time
 	if (offset == 0x7ff9)
 		m_maincpu->eat_cycles(30);
@@ -367,7 +367,7 @@ WRITE8_MEMBER(atlantis_state::cmos_w)
 			m_serial_count = 0;
 	}
 	else if (m_cmos_write_enabled) {
-		m_rtc->write(space, offset, data);
+		m_rtc->write(offset, data);
 		m_cmos_write_enabled = false;
 		if (LOG_RTC || offset >= 0x7ff0)
 			logerror("%s:RTC write to offset %04X = %08X & %08X\n", machine().describe_context(), offset, data, mem_mask);
@@ -809,8 +809,8 @@ DEVICE_INPUT_DEFAULTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(atlantis_state::mwskins)
-
+void atlantis_state::mwskins(machine_config &config)
+{
 	/* basic machine hardware */
 	VR4310LE(config, m_maincpu, 166666666);
 	m_maincpu->set_icache_size(16384);
@@ -860,8 +860,8 @@ MACHINE_CONFIG_START(atlantis_state::mwskins)
 	m_ioasic->set_auto_ack(1);
 	if DEBUG_CONSOLE {
 		m_ioasic->serial_tx_handler().set(m_uart0, FUNC(generic_terminal_device::write));
-		MCFG_DEVICE_ADD(m_uart0, GENERIC_TERMINAL, 0)
-		MCFG_GENERIC_TERMINAL_KEYBOARD_CB(DEVPUT("ioasic", midway_ioasic_device, serial_rx_w))
+		GENERIC_TERMINAL(config, m_uart0, 0);
+		m_uart0->set_keyboard_callback("ioasic", FUNC(midway_ioasic_device::serial_rx_w));
 	}
 
 	// TL16C552 UART
@@ -891,7 +891,7 @@ MACHINE_CONFIG_START(atlantis_state::mwskins)
 	com2.dsr_handler().set(m_uart2, FUNC(ins8250_uart_device::dsr_w));
 	com2.ri_handler().set(m_uart2, FUNC(ins8250_uart_device::ri_w));
 	com2.cts_handler().set(m_uart2, FUNC(ins8250_uart_device::cts_w));
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

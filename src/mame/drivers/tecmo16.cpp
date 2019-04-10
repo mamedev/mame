@@ -59,7 +59,7 @@ void tecmo16_state::fstarfrc_map(address_map &map)
 	map(0x150030, 0x150031).portr("DSW2").nopw();   /* ??? */
 	map(0x150040, 0x150041).portr("DSW1");
 	map(0x150050, 0x150051).portr("P1_P2");
-//	map(0x160000, 0x160001).nopr();   /* ??? Read at every scene changes */
+//  map(0x160000, 0x160001).nopr();   /* ??? Read at every scene changes */
 	map(0x160000, 0x160001).w(FUNC(tecmo16_state::scroll_char_x_w));
 	map(0x16000c, 0x16000d).w(FUNC(tecmo16_state::scroll_x_w));
 	map(0x160012, 0x160013).w(FUNC(tecmo16_state::scroll_y_w));
@@ -354,35 +354,34 @@ GFXDECODE_END
 #define MASTER_CLOCK XTAL(24'000'000)
 #define OKI_CLOCK XTAL(8'000'000)
 
-MACHINE_CONFIG_START(tecmo16_state::fstarfrc)
-
+void tecmo16_state::fstarfrc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,MASTER_CLOCK/2)          /* 12MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fstarfrc_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tecmo16_state,  irq5_line_hold)
+	M68000(config, m_maincpu, MASTER_CLOCK/2);          /* 12MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo16_state::fstarfrc_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tecmo16_state::irq5_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,MASTER_CLOCK/6)         /* 4MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, MASTER_CLOCK/6);         /* 4MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tecmo16_state::sound_map);
 								/* NMIs are triggered by the main CPU */
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tecmo16_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(tecmo16_state::screen_update));
+	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tecmo16)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 4096)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tecmo16);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_444, 4096);
 
-	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
-	MCFG_TECMO_SPRITE_GFX_REGION(2)
+	TECMO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(2);
 
 	TECMO_MIXER(config, m_mixer, 0);
 	m_mixer->set_mixer_shifts(10,9,4);
@@ -396,34 +395,34 @@ MACHINE_CONFIG_START(tecmo16_state::fstarfrc)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, MASTER_CLOCK/6) // 4 MHz
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", MASTER_CLOCK/6)); // 4 MHz
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.60);
+	ymsnd.add_route(1, "rspeaker", 0.60);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK/8, okim6295_device::PIN7_HIGH) // sample rate 1 MHz / 132
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", OKI_CLOCK/8, okim6295_device::PIN7_HIGH)); // sample rate 1 MHz / 132
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+}
 
-MACHINE_CONFIG_START(tecmo16_state::ginkun)
+void tecmo16_state::ginkun(machine_config &config)
+{
 	fstarfrc(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ginkun_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo16_state::ginkun_map);
 
 	MCFG_VIDEO_START_OVERRIDE(tecmo16_state,ginkun)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(tecmo16_state::riot)
+void tecmo16_state::riot(machine_config &config)
+{
 	ginkun(config);
 
 	/* basic machine hardware */
 	MCFG_VIDEO_START_OVERRIDE(tecmo16_state,riot)
-MACHINE_CONFIG_END
+}
 
 /******************************************************************************/
 

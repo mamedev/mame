@@ -267,9 +267,6 @@ DEFINE_DEVICE_TYPE(SRX_SLOT, srx_slot_device, "srx_slot", "InterPro SRX slot")
 
 void interpro_bus_device::device_resolve_objects()
 {
-	m_main_space = &m_maincpu->space(0);
-	m_io_space = &m_maincpu->space(1);
-
 	// resolve callbacks
 	m_out_irq0_cb.resolve_safe();
 	m_out_irq1_cb.resolve_safe();

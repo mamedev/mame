@@ -1,0 +1,33 @@
+// license:BSD-3-Clause
+// copyright-holders:Nigel Barnes
+/***************************************************************************
+
+    Memotech MTX
+
+    Disk image format
+
+***************************************************************************/
+
+#pragma once
+
+#ifndef __MTX_DSK_H__
+#define __MTX_DSK_H__
+
+#include "wd177x_dsk.h"
+
+class mtx_format : public wd177x_format
+{
+public:
+	mtx_format();
+
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
+
+private:
+	static const format formats[];
+};
+
+extern const floppy_format_type FLOPPY_MTX_FORMAT;
+
+#endif // __MTX_DSK_H__

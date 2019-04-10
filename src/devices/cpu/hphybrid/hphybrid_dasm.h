@@ -26,7 +26,7 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 protected:
-	typedef void (hp_hybrid_disassembler::*fn_dis_param)(std::ostream &stream , offs_t pc , uint16_t opcode);
+	typedef void (hp_hybrid_disassembler::*fn_dis_param)(std::ostream &stream, offs_t pc, uint16_t opcode);
 
 	typedef struct {
 		uint16_t m_op_mask;
@@ -42,17 +42,17 @@ protected:
 	static const dis_entry_t dis_table_emc[];
 	static const dis_entry_t dis_table_aec[];
 
-	void addr_2_str(std::ostream &stream, uint16_t addr , bool indirect);
-	void param_none(std::ostream &stream, offs_t pc , uint16_t opcode);
-	void param_loc(std::ostream &stream, offs_t pc , uint16_t opcode);
-	void param_addr32(std::ostream &stream, offs_t pc , uint16_t opcode);
-	void param_skip(std::ostream &stream, offs_t pc , uint16_t opcode);
-	void param_skip_sc(std::ostream &stream, offs_t pc , uint16_t opcode);
-	void param_ret(std::ostream &stream, offs_t pc , uint16_t opcode);
-	void param_n16(std::ostream &stream, offs_t pc , uint16_t opcode);
-	void param_reg_id(std::ostream &stream, offs_t pc , uint16_t opcode);
+	void addr_2_str(std::ostream &stream, uint16_t addr, bool indirect);
+	void param_none(std::ostream &stream, offs_t pc, uint16_t opcode);
+	void param_loc(std::ostream &stream, offs_t pc, uint16_t opcode);
+	void param_addr32(std::ostream &stream, offs_t pc, uint16_t opcode);
+	void param_skip(std::ostream &stream, offs_t pc, uint16_t opcode);
+	void param_skip_sc(std::ostream &stream, offs_t pc, uint16_t opcode);
+	void param_ret(std::ostream &stream, offs_t pc, uint16_t opcode);
+	void param_n16(std::ostream &stream, offs_t pc, uint16_t opcode);
+	void param_reg_id(std::ostream &stream, offs_t pc, uint16_t opcode);
 
-	offs_t disassemble_table(uint16_t opcode , offs_t pc , const dis_entry_t *table , std::ostream &stream);
+	offs_t disassemble_table(uint16_t opcode, offs_t pc, const dis_entry_t *table, std::ostream &stream);
 };
 
 class hp_5061_3001_disassembler : public hp_hybrid_disassembler

@@ -230,9 +230,9 @@ void c64_tdos_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_tdos_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_tdos_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	data = m_exp->cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+	data = m_exp->cd_r(offset, data, sphi2, ba, roml, romh, io1, io2);
 
 	if (m_enabled && !roml)
 	{
@@ -244,7 +244,7 @@ uint8_t c64_tdos_cartridge_device::c64_cd_r(address_space &space, offs_t offset,
 		switch ((offset >> 1) & 0x7f)
 		{
 		case 0:
-			data = m_ssda->read(space, offset & 0x01);
+			data = m_ssda->read(offset & 0x01);
 			break;
 
 		case 1:
@@ -277,16 +277,16 @@ uint8_t c64_tdos_cartridge_device::c64_cd_r(address_space &space, offs_t offset,
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_tdos_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_tdos_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	m_exp->cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+	m_exp->cd_w(offset, data, sphi2, ba, roml, romh, io1, io2);
 
 	if (m_enabled && !io2 && sphi2)
 	{
 		switch ((offset >> 1) & 0x7f)
 		{
 		case 0:
-			m_ssda->write(space, offset & 0x01, data);
+			m_ssda->write(offset & 0x01, data);
 			break;
 
 		case 1:

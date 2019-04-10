@@ -41,6 +41,9 @@ public:
 	void init_jumping();
 	void init_rbisland();
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	DECLARE_WRITE16_MEMBER(jumping_sound_w);
 	DECLARE_READ8_MEMBER(jumping_latch_r);
@@ -53,7 +56,6 @@ private:
 	DECLARE_WRITE16_MEMBER(jumping_spritectrl_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(counters_w);
-	virtual void machine_start() override;
 	DECLARE_VIDEO_START(jumping);
 	uint32_t screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jumping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -86,6 +88,5 @@ private:
 	required_device<palette_device> m_palette;
 	optional_device<timer_device> m_cchip_irq_clear;
 };
-
 
 #endif // MAME_INCLUDES_RBISLAND_H

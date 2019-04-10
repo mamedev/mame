@@ -41,9 +41,7 @@ project ("texturev")
 
 	if _OPTIONS["with-glfw"] then
 		defines { "ENTRY_CONFIG_USE_GLFW=1" }
-		links   {
-			"glfw3"
-		}
+		links   { "glfw3" }
 
 		configuration { "linux or freebsd" }
 			links {
@@ -59,52 +57,6 @@ project ("texturev")
 				"-framework CoreVideo",
 				"-framework IOKit",
 			}
-
-		configuration {}
-	end
-
-	if _OPTIONS["with-ovr"] then
-		links   {
-			"winmm",
-			"ws2_32",
-		}
-
-		-- Check for LibOVR 5.0+
-		if os.isdir(path.join(os.getenv("OVR_DIR"), "LibOVR/Lib/Windows/Win32/Debug/VS2012")) then
-
-			configuration { "x32", "Debug" }
-				libdirs { path.join("$(OVR_DIR)/LibOVR/Lib/Windows/Win32/Debug", _ACTION) }
-
-			configuration { "x32", "Release" }
-				libdirs { path.join("$(OVR_DIR)/LibOVR/Lib/Windows/Win32/Release", _ACTION) }
-
-			configuration { "x64", "Debug" }
-				libdirs { path.join("$(OVR_DIR)/LibOVR/Lib/Windows/x64/Debug", _ACTION) }
-
-			configuration { "x64", "Release" }
-				libdirs { path.join("$(OVR_DIR)/LibOVR/Lib/Windows/x64/Release", _ACTION) }
-
-			configuration { "x32 or x64" }
-				links { "libovr" }
-		else
-			configuration { "x32" }
-				libdirs { path.join("$(OVR_DIR)/LibOVR/Lib/Win32", _ACTION) }
-
-			configuration { "x64" }
-				libdirs { path.join("$(OVR_DIR)/LibOVR/Lib/x64", _ACTION) }
-
-			configuration { "x32", "Debug" }
-				links { "libovrd" }
-
-			configuration { "x32", "Release" }
-				links { "libovr" }
-
-			configuration { "x64", "Debug" }
-				links { "libovr64d" }
-
-			configuration { "x64", "Release" }
-				links { "libovr64" }
-		end
 
 		configuration {}
 	end
@@ -132,7 +84,7 @@ project ("texturev")
 			"psapi",
 		}
 
-	configuration { "winphone8*"}
+	configuration { "winstore*" }
 		removelinks {
 			"DelayImp",
 			"gdi32",
@@ -140,6 +92,7 @@ project ("texturev")
 		}
 		links {
 			"d3d11",
+			"d3d12",
 			"dxgi"
 		}
 		linkoptions {

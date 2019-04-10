@@ -19,7 +19,7 @@
 const char *const n8x300_disassembler::reg_names[32] =
 {
 	"AUX", "R1", "R2", "R3", "R4", "R5", "R6", "IVL", "OVF", "R11",
-	"Unused12", "Unused13", "Unused14", "Unused15", "Unused16", "IVR",
+	"R12", "R13", "R14", "R15", "R16", "IVR",
 	"LIV0", "LIV1", "LIV2", "LIV3", "LIV4", "LIV5", "LIV6", "LIV7",
 	"RIV0", "RIV1", "RIV2", "RIV3", "RIV4", "RIV5", "RIV6", "RIV7"
 };
@@ -43,7 +43,7 @@ bool n8x300_disassembler::is_src_rot(uint16_t opcode)
 
 u32 n8x300_disassembler::opcode_alignment() const
 {
-	return 2;
+	return 1;
 }
 
 offs_t n8x300_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
@@ -51,7 +51,7 @@ offs_t n8x300_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	unsigned startpc = pc;
 	uint16_t opcode = opcodes.r16(pc);
 	uint8_t inst = opcode >> 13;
-	pc+=2;
+	pc+=1;
 
 	// determine instruction
 	switch (inst)
@@ -127,7 +127,7 @@ offs_t n8x300_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		}
 		break;
 	case 0x07:
-		util::stream_format(stream, "JMP  %04XH", (opcode & 0x1fff) << 1);
+		util::stream_format(stream, "JMP  %04XH", (opcode & 0x1fff));
 		break;
 	}
 

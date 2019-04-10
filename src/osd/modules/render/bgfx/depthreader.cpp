@@ -27,7 +27,7 @@ uint64_t depth_reader::read_from_value(const Value& value, std::string prefix)
 	if (value.HasMember("writeenable"))
 	{
 		if (!READER_CHECK(value["writeenable"].IsBool(), (prefix + "Value 'writeenable' must be a boolean\n").c_str())) return 0;
-		write_enable = value["writeenable"].GetBool() ? BGFX_STATE_DEPTH_WRITE : 0;
+		write_enable = value["writeenable"].GetBool() ? BGFX_STATE_WRITE_Z : 0;
 	}
 
 	uint64_t function = get_enum_from_value(value, "function", BGFX_STATE_DEPTH_TEST_ALWAYS, FUNCTION_NAMES, FUNCTION_COUNT);

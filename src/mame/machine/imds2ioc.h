@@ -11,7 +11,7 @@
 #include "sound/beep.h"
 #include "machine/pit8253.h"
 #include "machine/i8271.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "bus/centronics/ctronics.h"
 #include "emupal.h"
 

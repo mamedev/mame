@@ -8,12 +8,6 @@
 #include "imagedev/chd_cd.h"
 #include "sound/spu.h"
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PSXCD_IRQ_HANDLER(_devcb) \
-	downcast<psxcd_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 class psxcd_device : public cdrom_image_device
 {
@@ -29,7 +23,7 @@ public:
 	psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 

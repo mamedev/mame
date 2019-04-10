@@ -22,8 +22,8 @@
 class fk1_state : public driver_device
 {
 public:
-	fk1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	fk1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG)
 	{ }
@@ -412,31 +412,32 @@ uint32_t fk1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-MACHINE_CONFIG_START(fk1_state::fk1)
+void fk1_state::fk1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(8'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(fk1_mem)
-	MCFG_DEVICE_IO_MAP(fk1_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fk1_state,fk1_irq_callback)
+	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fk1_state::fk1_mem);
+	m_maincpu->set_addrmap(AS_IO, &fk1_state::fk1_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(fk1_state::fk1_irq_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(fk1_state, screen_update)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(fk1_state::screen_update));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(50)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, fk1_state, fk1_pit_out0))
-	MCFG_PIT8253_CLK1(1000000)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, fk1_state, fk1_pit_out1))
-	MCFG_PIT8253_CLK2(0)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, fk1_state, fk1_pit_out2))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(50);
+	pit8253.out_handler<0>().set(FUNC(fk1_state::fk1_pit_out0));
+	pit8253.set_clk<1>(1000000);
+	pit8253.out_handler<1>().set(FUNC(fk1_state::fk1_pit_out1));
+	pit8253.set_clk<2>(0);
+	pit8253.out_handler<2>().set(FUNC(fk1_state::fk1_pit_out2));
 
 	i8255_device &ppi1(I8255(config, "ppi8255_1"));
 	ppi1.in_pa_callback().set(FUNC(fk1_state::fk1_ppi_1_a_r));
@@ -461,14 +462,14 @@ MACHINE_CONFIG_START(fk1_state::fk1)
 	ppi3.out_pc_callback().set(FUNC(fk1_state::fk1_ppi_3_c_w));
 
 	/* uart */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, "uart", 0);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("80K"); // 64 + 16
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", fk1_state, keyboard_callback, attotime::from_hz(24000))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("vsync_timer", fk1_state, vsync_callback, attotime::from_hz(50))
-MACHINE_CONFIG_END
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(fk1_state::keyboard_callback), attotime::from_hz(24000));
+	TIMER(config, "vsync_timer").configure_periodic(FUNC(fk1_state::vsync_callback), attotime::from_hz(50));
+}
 
 /* ROM definition */
 ROM_START( fk1 )

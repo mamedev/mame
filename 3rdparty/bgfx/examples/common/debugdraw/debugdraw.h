@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -21,12 +21,19 @@ struct Axis
 	};
 };
 
-struct SpriteHandle { uint16_t idx; };
+struct DdVertex
+{
+	float x, y, z;
+};
 
+struct SpriteHandle { uint16_t idx; };
 inline bool isValid(SpriteHandle _handle) { return _handle.idx != UINT16_MAX; }
 
+struct GeometryHandle { uint16_t idx; };
+inline bool isValid(GeometryHandle _handle) { return _handle.idx != UINT16_MAX; }
+
 ///
-void ddInit(bool _depthTestLess = true, bx::AllocatorI* _allocator = NULL);
+void ddInit(bx::AllocatorI* _allocator = NULL);
 
 ///
 void ddShutdown();
@@ -38,117 +45,153 @@ SpriteHandle ddCreateSprite(uint16_t _width, uint16_t _height, const void* _data
 void ddDestroy(SpriteHandle _handle);
 
 ///
-void ddBegin(uint8_t _viewId);
+GeometryHandle ddCreateGeometry(uint32_t _numVertices, const DdVertex* _vertices, uint32_t _numIndices = 0, const void* _indices = NULL, bool _index32 = false);
 
 ///
-void ddEnd();
+void ddDestroy(GeometryHandle _handle);
 
-///
-void ddPush();
 
-///
-void ddPop();
+struct DebugDrawEncoder
+{
+	///
+	DebugDrawEncoder();
 
-///
-void ddSetState(bool _depthTest, bool _depthWrite, bool _clockwise);
+	///
+	~DebugDrawEncoder();
 
-///
-void ddSetColor(uint32_t _abgr);
+	///
+	void begin(uint16_t _viewId, bool _depthTestLess = true, bgfx::Encoder* _encoder = NULL);
 
-///
-void ddSetLod(uint8_t _lod);
+	///
+	void end();
 
-///
-void ddSetWireframe(bool _wireframe);
+	///
+	void push();
 
-///
-void ddSetStipple(bool _stipple, float _scale = 1.0f, float _offset = 0.0f);
+	///
+	void pop();
 
-///
-void ddSetSpin(float _spin);
+	///
+	void setDepthTestLess(bool _depthTestLess);
 
-///
-void ddSetTransform(const void* _mtx);
+	///
+	void setState(bool _depthTest, bool _depthWrite, bool _clockwise);
 
-///
-void ddSetTranslate(float _x, float _y, float _z);
+	///
+	void setColor(uint32_t _abgr);
 
-///
-void ddMoveTo(float _x, float _y, float _z = 0.0f);
+	///
+	void setLod(uint8_t _lod);
 
-///
-void ddMoveTo(const void* _pos);
+	///
+	void setWireframe(bool _wireframe);
 
-///
-void ddLineTo(float _x, float _y, float _z = 0.0f);
+	///
+	void setStipple(bool _stipple, float _scale = 1.0f, float _offset = 0.0f);
 
-///
-void ddLineTo(const void* _pos);
+	///
+	void setSpin(float _spin);
 
-///
-void ddClose();
+	///
+	void setTransform(const void* _mtx);
 
-///
-void ddDraw(const Aabb& _aabb);
+	///
+	void setTranslate(float _x, float _y, float _z);
 
-///
-void ddDraw(const Cylinder& _cylinder);
+	///
+	void pushTransform(const void* _mtx);
 
-///
-void ddDraw(const Capsule& _capsule);
+	///
+	void popTransform();
 
-///
-void ddDraw(const Disk& _disk);
+	///
+	void moveTo(float _x, float _y, float _z = 0.0f);
 
-///
-void ddDraw(const Obb& _obb);
+	///
+	void moveTo(const void* _pos);
 
-///
-void ddDraw(const Sphere& _sphere);
+	///
+	void lineTo(float _x, float _y, float _z = 0.0f);
 
-///
-void ddDraw(const Cone& _cone);
+	///
+	void lineTo(const void* _pos);
 
-///
-void ddDrawFrustum(const void* _viewProj);
+	///
+	void close();
 
-///
-void ddDrawArc(Axis::Enum _axis, float _x, float _y, float _z, float _radius, float _degrees);
+	///
+	void draw(const Aabb& _aabb);
 
-///
-void ddDrawCircle(const void* _normal, const void* _center, float _radius, float _weight = 0.0f);
+	///
+	void draw(const Cylinder& _cylinder);
 
-///
-void ddDrawCircle(Axis::Enum _axis, float _x, float _y, float _z, float _radius, float _weight = 0.0f);
+	///
+	void draw(const Capsule& _capsule);
 
-///
-void ddDrawQuad(const float* _normal, const float* _center, float _size);
+	///
+	void draw(const Disk& _disk);
 
-///
-void ddDrawQuad(SpriteHandle _handle, const float* _normal, const float* _center, float _size);
+	///
+	void draw(const Obb& _obb);
 
-///
-void ddDrawQuad(bgfx::TextureHandle _handle, const float* _normal, const float* _center, float _size);
+	///
+	void draw(const Sphere& _sphere);
 
-///
-void ddDrawCone(const void* _from, const void* _to, float _radius);
+	///
+	void draw(const Cone& _cone);
 
-///
-void ddDrawCylinder(const void* _from, const void* _to, float _radius);
+	///
+	void draw(GeometryHandle _handle);
 
-///
-void ddDrawCapsule(const void* _from, const void* _to, float _radius);
+	///
+	void drawLineList(uint32_t _numVertices, const DdVertex* _vertices, uint32_t _numIndices = 0, const uint16_t* _indices = NULL);
 
-///
-void ddDrawAxis(float _x, float _y, float _z, float _len = 1.0f, Axis::Enum _highlight = Axis::Count, float _thickness = 0.0f);
+	///
+	void drawTriList(uint32_t _numVertices, const DdVertex* _vertices, uint32_t _numIndices = 0, const uint16_t* _indices = NULL);
 
-///
-void ddDrawGrid(const void* _normal, const void* _center, uint32_t _size = 20, float _step = 1.0f);
+	///
+	void drawFrustum(const void* _viewProj);
 
-///
-void ddDrawGrid(Axis::Enum _axis, const void* _center, uint32_t _size = 20, float _step = 1.0f);
+	///
+	void drawArc(Axis::Enum _axis, float _x, float _y, float _z, float _radius, float _degrees);
 
-///
-void ddDrawOrb(float _x, float _y, float _z, float _radius, Axis::Enum _highlight = Axis::Count);
+	///
+	void drawCircle(const void* _normal, const void* _center, float _radius, float _weight = 0.0f);
+
+	///
+	void drawCircle(Axis::Enum _axis, float _x, float _y, float _z, float _radius, float _weight = 0.0f);
+
+	///
+	void drawQuad(const float* _normal, const float* _center, float _size);
+
+	///
+	void drawQuad(SpriteHandle _handle, const float* _normal, const float* _center, float _size);
+
+	///
+	void drawQuad(bgfx::TextureHandle _handle, const float* _normal, const float* _center, float _size);
+
+	///
+	void drawCone(const void* _from, const void* _to, float _radius);
+
+	///
+	void drawCylinder(const void* _from, const void* _to, float _radius);
+
+	///
+	void drawCapsule(const void* _from, const void* _to, float _radius);
+
+	///
+	void drawAxis(float _x, float _y, float _z, float _len = 1.0f, Axis::Enum _highlight = Axis::Count, float _thickness = 0.0f);
+
+	///
+	void drawGrid(const void* _normal, const void* _center, uint32_t _size = 20, float _step = 1.0f);
+
+	///
+	void drawGrid(Axis::Enum _axis, const void* _center, uint32_t _size = 20, float _step = 1.0f);
+
+	///
+	void drawOrb(float _x, float _y, float _z, float _radius, Axis::Enum _highlight = Axis::Count);
+
+	BX_ALIGN_DECL_CACHE_LINE(uint8_t) m_internal[50<<10];
+};
 
 #endif // DEBUGDRAW_H_HEADER_GUARD

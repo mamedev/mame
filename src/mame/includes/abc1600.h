@@ -18,6 +18,7 @@
 #include "machine/z80dart.h"
 #include "machine/z80dma.h"
 #include "machine/z8536.h"
+#include "imagedev/floppy.h"
 #include "video/abc1600.h"
 
 
@@ -123,7 +124,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 
-	IRQ_CALLBACK_MEMBER( abc1600_int_ack );
+	void cpu_space_map(address_map &map);
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 

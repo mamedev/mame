@@ -97,8 +97,8 @@ TODO:
 class socrates_state : public driver_device
 {
 public:
-	socrates_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	socrates_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "soc_snd"),
 		m_screen(*this, "screen"),
@@ -110,15 +110,13 @@ public:
 		m_rambank1(*this, "rambank1"),
 		m_rambank2(*this, "rambank2"),
 		m_kbdrow(*this, "IN%u", 0)
-		{ }
+	{ }
 
 	void socrates_pal(machine_config &config);
 	void socrates(machine_config &config);
 
 	void init_socrates();
 	void init_iqunlimz();
-
-	DECLARE_PALETTE_INIT(socrates);
 
 protected:
 	enum
@@ -141,8 +139,6 @@ protected:
 	required_device<address_map_bank_device> m_rambank2;
 	optional_ioport_array<0xC> m_kbdrow;
 
-	rgb_t m_palette_val[256];
-
 	uint8_t m_rom_bank[2];
 	uint8_t m_ram_bank;
 	uint16_t m_scroll_offset;
@@ -158,6 +154,21 @@ protected:
 	uint8_t m_speech_dummy_read; // have we done a dummy read yet?
 	uint8_t m_speech_load_address_count; // number of times load address has happened
 	uint8_t m_speech_load_settings_count; // number of times load settings has happened
+
+	emu_timer *m_kbmcu_sim_timer;
+	emu_timer *m_clear_speech_timer;
+	emu_timer *m_clear_irq_timer;
+
+	struct
+	{
+		uint16_t   buffer[8];
+		uint8_t    head;
+		uint8_t    tail;
+		uint8_t    count;
+	} m_kb_queue;
+
+	void socrates_palette(palette_device &palete) const;
+
 	DECLARE_READ8_MEMBER(common_rom_bank_r);
 	DECLARE_WRITE8_MEMBER(common_rom_bank_w);
 	DECLARE_READ8_MEMBER(common_ram_bank_r);
@@ -189,18 +200,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(clear_irq_cb);
 	void socrates_update_kb();
 	void socrates_check_kb_latch();
-	rgb_t socrates_create_color(uint8_t color);
-	emu_timer *m_kbmcu_sim_timer;
-	emu_timer *m_clear_speech_timer;
-	emu_timer *m_clear_irq_timer;
-
-	struct
-	{
-		uint16_t   buffer[8];
-		uint8_t    head;
-		uint8_t    tail;
-		uint8_t    count;
-	} m_kb_queue;
+	static rgb_t socrates_create_color(uint8_t color);
 
 	void socrates_rambank_map(address_map &map);
 	void socrates_rombank_map(address_map &map);
@@ -214,13 +214,16 @@ protected:
 class iqunlimz_state : public socrates_state
 {
 public:
-	iqunlimz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: socrates_state(mconfig, type, tag)
-		{ }
+	iqunlimz_state(const machine_config &mconfig, device_type type, const char *tag) :
+		socrates_state(mconfig, type, tag)
+	{ }
 
 	void iqunlimz(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER( send_input );
+
+protected:
+	virtual void machine_reset() override;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -234,7 +237,6 @@ private:
 	void iqunlimz_rambank_map(address_map &map);
 	void iqunlimz_rombank_map(address_map &map);
 
-	virtual void machine_reset() override;
 	int get_color(int index, int y);
 
 	uint8_t   m_colors[8];
@@ -697,43 +699,40 @@ WRITE8_MEMBER(socrates_state::socrates_scroll_w)
 
 rgb_t socrates_state::socrates_create_color(uint8_t color)
 {
-	rgb_t composedcolor;
-	static const double lumatable[256] = {
-	LUMA_COL_0
-	LUMA_COL_COMMON
-	LUMA_COL_2
-	LUMA_COL_COMMON
-	LUMA_COL_COMMON
-	LUMA_COL_5
-	LUMA_COL_COMMON
-	LUMA_COL_COMMON
-	LUMA_COL_COMMON
-	LUMA_COL_COMMON
-	LUMA_COL_COMMON
-	LUMA_COL_COMMON
-	LUMA_COL_COMMON
-	LUMA_COL_COMMON
-	LUMA_COL_COMMON
-	LUMA_COL_F
-	};
-	static const double chromaintensity[256] = {
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	CHROMA_COL_COMMON
-	CHROMA_COL_2
-	CHROMA_COL_COMMON
-	CHROMA_COL_COMMON
-	CHROMA_COL_5
-	CHROMA_COL_COMMON
-	CHROMA_COL_COMMON
-	CHROMA_COL_COMMON
-	CHROMA_COL_COMMON
-	CHROMA_COL_COMMON
-	CHROMA_COL_COMMON
-	CHROMA_COL_COMMON
-	CHROMA_COL_COMMON
-	CHROMA_COL_COMMON
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-	};
+	static constexpr double lumatable[256] = {
+			LUMA_COL_0
+			LUMA_COL_COMMON
+			LUMA_COL_2
+			LUMA_COL_COMMON
+			LUMA_COL_COMMON
+			LUMA_COL_5
+			LUMA_COL_COMMON
+			LUMA_COL_COMMON
+			LUMA_COL_COMMON
+			LUMA_COL_COMMON
+			LUMA_COL_COMMON
+			LUMA_COL_COMMON
+			LUMA_COL_COMMON
+			LUMA_COL_COMMON
+			LUMA_COL_COMMON
+			LUMA_COL_F };
+	static constexpr double chromaintensity[256] = {
+			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+			CHROMA_COL_COMMON
+			CHROMA_COL_2
+			CHROMA_COL_COMMON
+			CHROMA_COL_COMMON
+			CHROMA_COL_5
+			CHROMA_COL_COMMON
+			CHROMA_COL_COMMON
+			CHROMA_COL_COMMON
+			CHROMA_COL_COMMON
+			CHROMA_COL_COMMON
+			CHROMA_COL_COMMON
+			CHROMA_COL_COMMON
+			CHROMA_COL_COMMON
+			CHROMA_COL_COMMON
+			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 	/* chroma colors and phases:
 	 0: black-through-grey (0 assumed chroma)
 	 1: purple (90 chroma seems correct)
@@ -752,19 +751,18 @@ rgb_t socrates_state::socrates_create_color(uint8_t color)
 	 E: blue-purple (more blue than color 1, 120 is closest)
 	 F: grey-through-white (0 assumed chroma)
 	*/
-	static const double phaseangle[16] = { 0, 90, 220, 150, 270, 40, 0, 315, 180, 210, 240, 300, 330, 60, 120, 0 }; // note: these are guessed, not measured yet!
-	int chromaindex = color&0x0F;
-	int swappedcolor = ((color&0xf0)>>4)|((color&0x0f)<<4);
-	double finalY, finalI, finalQ, finalR, finalG, finalB;
-	finalY = (1/LUMAMAX) * lumatable[swappedcolor];
-	finalI = (M_I * (cos((phaseangle[chromaindex]/180)*3.141592653589793)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
-	finalQ = (M_Q * (sin((phaseangle[chromaindex]/180)*3.141592653589793)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
+	static constexpr double phaseangle[16] = { 0, 90, 220, 150, 270, 40, 0, 315, 180, 210, 240, 300, 330, 60, 120, 0 }; // note: these are guessed, not measured yet!
+	int const chromaindex = color&0x0F;
+	int const swappedcolor = ((color&0xf0)>>4)|((color&0x0f)<<4);
+	double finalY = (1/LUMAMAX) * lumatable[swappedcolor];
+	double const finalI = (M_I * (cos((phaseangle[chromaindex]/180)*3.141592653589793)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
+	double const finalQ = (M_Q * (sin((phaseangle[chromaindex]/180)*3.141592653589793)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
 	if (finalY > 1) finalY = 1; // clamp luma
-	/* calculate the R, G and B values here, neato matrix math */
-	finalR = (finalY*1)+(finalI*0.9563)+(finalQ*0.6210);
-	finalG = (finalY*1)+(finalI*-0.2721)+(finalQ*-0.6474);
-	finalB = (finalY*1)+(finalI*-1.1070)+(finalQ*1.7046);
-	/* scale/clamp to 0-255 range */
+	// calculate the R, G and B values here, neato matrix math
+	double finalR = (finalY*1)+(finalI*0.9563)+(finalQ*0.6210);
+	double finalG = (finalY*1)+(finalI*-0.2721)+(finalQ*-0.6474);
+	double finalB = (finalY*1)+(finalI*-1.1070)+(finalQ*1.7046);
+	// scale/clamp to 0-255 range
 	if (finalR<0) finalR = 0;
 	if (finalR>1) finalR = 1;
 	if (finalG<0) finalG = 0;
@@ -775,19 +773,14 @@ rgb_t socrates_state::socrates_create_color(uint8_t color)
 	finalR = pow(finalR, 1/GAMMA)*255;
 	finalG = pow(finalG, 1/GAMMA)*255;
 	finalB = pow(finalB, 1/GAMMA)*255;
-composedcolor = rgb_t((int)finalR,(int)finalG,(int)finalB);
-return composedcolor;
+	return rgb_t((int)finalR,(int)finalG,(int)finalB);
 }
 
 
-PALETTE_INIT_MEMBER(socrates_state, socrates)
+void socrates_state::socrates_palette(palette_device &palette) const
 {
-	int i; // iterator
-	for (i = 0; i < 256; i++)
-	{
-		m_palette_val[i] = socrates_create_color(i);
-	}
-	palette.set_pen_colors(0, m_palette_val, ARRAY_LENGTH(m_palette_val));
+	for (int i = 0; i < 256; i++)
+		palette.set_pen_color(i, socrates_create_color(i));
 }
 
 void socrates_state::video_start()
@@ -1472,66 +1465,64 @@ TIMER_CALLBACK_MEMBER(socrates_state::kbmcu_sim_cb)
 	}
 }
 
-MACHINE_CONFIG_START(socrates_state::socrates)
+void socrates_state::socrates(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
-	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
-	MCFG_DEVICE_IO_MAP(z80_io)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
+	Z80(config, m_maincpu, XTAL(21'477'272)/6);  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &socrates_state::z80_mem);
+	m_maincpu->set_addrmap(AS_IO, &socrates_state::z80_io);
+	m_maincpu->set_vblank_int("screen", FUNC(socrates_state::assert_irq));
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	ADDRESS_MAP_BANK(config, "rombank1").set_map(&socrates_state::socrates_rombank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, "rambank1").set_map(&socrates_state::socrates_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, "rambank2").set_map(&socrates_state::socrates_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(264, 228) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
-	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 219) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
-	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(264, 228); // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
+	m_screen->set_visarea(0, 263, 0, 219); // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
+	m_screen->set_screen_update(FUNC(socrates_state::screen_update_socrates));
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(socrates_state, socrates)
+	PALETTE(config, "palette", FUNC(socrates_state::socrates_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256)) // this is correct, as strange as it sounds.
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SOCRATES_SOUND(config, m_sound, XTAL(21'477'272)/(512+256)).add_route(ALL_OUTPUTS, "mono", 0.25); // this is correct, as strange as it sounds.
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "socrates_cart")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "socrates_cart");
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "socrates")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("socrates");
+}
 
-MACHINE_CONFIG_START(socrates_state::socrates_pal)
+void socrates_state::socrates_pal(machine_config &config)
+{
 	socrates(config);
-	MCFG_DEVICE_REPLACE("maincpu", Z80, XTAL(26'601'712)/8)
-	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
-	MCFG_DEVICE_IO_MAP(z80_io)
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_SIZE(264, 238) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
-	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 229) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
-	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
+	m_maincpu->set_clock(XTAL(26'601'712)/8);
 
-	MCFG_DEVICE_REPLACE("soc_snd", SOCRATES_SOUND, XTAL(26'601'712)/(512+256)) // this is correct, as strange as it sounds.
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	config.m_minimum_quantum = attotime::from_hz(50);
 
-MACHINE_CONFIG_START(iqunlimz_state::iqunlimz)
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	m_screen->set_size(264, 238); // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
+	m_screen->set_visarea(0, 263, 0, 229); // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
+	m_screen->set_screen_update(FUNC(socrates_state::screen_update_socrates));
+
+	m_sound->set_clock(XTAL(26'601'712)/(512+256)); // this is correct, as strange as it sounds.
+}
+
+void iqunlimz_state::iqunlimz(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000)) /* not accurate */
-	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_mem)
-	MCFG_DEVICE_IO_MAP(iqunlimz_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", iqunlimz_state,  assert_irq)
+	Z80(config, m_maincpu, XTAL(4'000'000)); /* not accurate */
+	m_maincpu->set_addrmap(AS_PROGRAM, &iqunlimz_state::iqunlimz_mem);
+	m_maincpu->set_addrmap(AS_IO, &iqunlimz_state::iqunlimz_io);
+	m_maincpu->set_vblank_int("screen", FUNC(iqunlimz_state::assert_irq));
 
 	ADDRESS_MAP_BANK(config, "rombank1").set_map(&iqunlimz_state::iqunlimz_rombank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, "rombank2").set_map(&iqunlimz_state::iqunlimz_rombank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
@@ -1539,24 +1530,22 @@ MACHINE_CONFIG_START(iqunlimz_state::iqunlimz)
 	ADDRESS_MAP_BANK(config, "rambank2").set_map(&iqunlimz_state::iqunlimz_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(iqunlimz_state, screen_update)
-	MCFG_SCREEN_SIZE(256, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_screen_update(FUNC(iqunlimz_state::screen_update));
+	m_screen->set_size(256, 224);
+	m_screen->set_visarea(0, 256-1, 0, 224-1);
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(socrates_state, socrates)
+	PALETTE(config, "palette", FUNC(iqunlimz_state::socrates_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SOCRATES_SOUND(config, m_sound, XTAL(21'477'272)/(512+256)).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, nullptr);
+}
 
 /******************************************************************************
  ROM Definitions

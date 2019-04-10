@@ -301,11 +301,11 @@ void s100_dj2db_device::device_reset()
 //  s100_smemr_r - memory read
 //-------------------------------------------------
 
-uint8_t s100_dj2db_device::s100_smemr_r(address_space &space, offs_t offset)
+uint8_t s100_dj2db_device::s100_smemr_r(offs_t offset)
 {
 	uint8_t data = 0;
 
-//  if (!(m_board_enbl & m_phantom)) return 0;
+//  if (!(m_board_enbl & m_phantom)) return 0xff;
 
 	if ((offset >= 0xf800) && (offset < 0xfbf8))
 	{
@@ -368,7 +368,7 @@ uint8_t s100_dj2db_device::s100_smemr_r(address_space &space, offs_t offset)
 	}
 	else
 	{
-		return 0;
+		return 0xff;
 	}
 
 	// LS241 inverts data
@@ -380,7 +380,7 @@ uint8_t s100_dj2db_device::s100_smemr_r(address_space &space, offs_t offset)
 //  s100_mwrt_w - memory write
 //-------------------------------------------------
 
-void s100_dj2db_device::s100_mwrt_w(address_space &space, offs_t offset, uint8_t data)
+void s100_dj2db_device::s100_mwrt_w(offs_t offset, uint8_t data)
 {
 //  if (!(m_board_enbl & m_phantom)) return;
 
@@ -473,9 +473,9 @@ void s100_dj2db_device::s100_mwrt_w(address_space &space, offs_t offset, uint8_t
 //  s100_sinp_r - I/O read
 //-------------------------------------------------
 
-uint8_t s100_dj2db_device::s100_sinp_r(address_space &space, offs_t offset)
+uint8_t s100_dj2db_device::s100_sinp_r(offs_t offset)
 {
-	return 0;
+	return 0xff;
 }
 
 
@@ -483,7 +483,7 @@ uint8_t s100_dj2db_device::s100_sinp_r(address_space &space, offs_t offset)
 //  s100_sout_w - I/O write
 //-------------------------------------------------
 
-void s100_dj2db_device::s100_sout_w(address_space &space, offs_t offset, uint8_t data)
+void s100_dj2db_device::s100_sout_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0x41)
 	{

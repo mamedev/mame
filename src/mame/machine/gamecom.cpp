@@ -397,7 +397,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 		break;
 	case SM8521_SGDA:
 		m_sound.sgda = data;
-		if((m_sound.sgc & 0x88) == 0x88)
+		if((m_sound.sgc & 0x8f) == 0x88)
 			m_dac->write(data);
 		break;
 
@@ -538,10 +538,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 				// Get 4 pixels and remove the one about to be replaced
 				u8 other_pixels = m_dma.dest_bank[dst_addr] & ~(3 << dst_adj);
 				// Get palette of new pixel and place into the hole
-				if (m_dma.transfer_mode == 6 || m_dma.transfer_mode == 0)
-					m_dma.dest_bank[dst_addr] = other_pixels | (source_pixel << dst_adj);
-				else
-					m_dma.dest_bank[dst_addr] = other_pixels | (((m_dma.palette >> (source_pixel << 1)) & 3) << dst_adj);
+				m_dma.dest_bank[dst_addr] = other_pixels | (((m_dma.palette >> (source_pixel << 1)) & 3) << dst_adj);
 			}
 
 			/* Advance a pixel */

@@ -22,8 +22,8 @@
 
 struct vram_state_data
 {
-	uint16_t  m_addr;
-	uint8_t   m_latch[2];
+	u16  m_addr;
+	u8   m_latch[2];
 };
 
 class leland_80186_sound_device;
@@ -45,6 +45,8 @@ public:
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_io_in(*this, "IN%u", 0U)
+		, m_io_an(*this, "AN%u", 0U)
 		, m_dac(*this, "dac%u", 0U)
 		, m_ay8910(*this, "ay8910")
 		, m_ay8912(*this, "ay8912")
@@ -75,60 +77,63 @@ public:
 	void offroad_bankswitch();
 	void viper_bankswitch();
 
-	DECLARE_READ8_MEMBER(leland_raster_r);
-	DECLARE_WRITE8_MEMBER(leland_slave_video_addr_w);
-	DECLARE_WRITE8_MEMBER(leland_slave_large_banksw_w);
-	DECLARE_WRITE8_MEMBER(leland_master_video_addr_w);
+	u8 raster_r();
+	void slave_video_addr_w(offs_t offset, u8 data);
+	void slave_large_banksw_w(u8 data);
+	void master_video_addr_w(offs_t offset, u8 data);
 
 	TIMER_CALLBACK_MEMBER(ataxx_interrupt_callback);
 
 protected:
 	required_device<cpu_device> m_master;
 	required_device<cpu_device> m_slave;
-	required_shared_ptr<uint8_t> m_mainram;
+	required_shared_ptr<u8> m_mainram;
 	required_memory_bank_array<2> m_master_bankslot;
-	required_region_ptr<uint8_t> m_master_base;
+	required_region_ptr<u8> m_master_base;
 	required_memory_bank m_slave_bankslot;
-	required_region_ptr<uint8_t> m_slave_base;
+	required_region_ptr<u8> m_slave_base;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_shared_ptr<uint8_t> m_battery_ram;
+	required_shared_ptr<u8> m_battery_ram;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	emu_timer *m_master_int_timer;
-	uint8_t m_battery_ram_enable;
+	optional_ioport_array<4> m_io_in;
+	optional_ioport_array<6> m_io_an;
 
-	void leland_rotate_memory(const char *cpuname);
+	emu_timer *m_master_int_timer;
+	u8 m_battery_ram_enable;
+
+	void rotate_memory(const char *cpuname);
 
 	int dial_compute_value(int new_val, int indx);
-	uint8_t m_dial_last_input[4];
-	uint8_t m_dial_last_result[4];
-	uint8_t m_analog_result;
+	u8 m_dial_last_input[4];
+	u8 m_dial_last_result[4];
+	u8 m_analog_result;
 
 	int m_dangerz_x;
 	int m_dangerz_y;
 
-	void init_master_ports(uint8_t mvram_base, uint8_t io_base);
+	void init_master_ports(u8 mvram_base, u8 io_base);
 	void (leland_state::*m_update_master_bank)();
 
-	int leland_vram_port_r(address_space &space, int offset, int num);
-	void leland_vram_port_w(address_space &space, int offset, int data, int num);
+	int vram_port_r(offs_t offset, int num);
+	void vram_port_w(offs_t offset, u8 data, int num);
 
-	uint8_t m_wcol_enable;
+	u8 m_wcol_enable;
 
-	DECLARE_READ8_MEMBER(leland_master_analog_key_r);
-	DECLARE_WRITE8_MEMBER(leland_master_analog_key_w);
-	DECLARE_READ8_MEMBER(dangerz_input_y_r);
-	DECLARE_READ8_MEMBER(dangerz_input_x_r);
-	DECLARE_READ8_MEMBER(dangerz_input_upper_r);
-	DECLARE_WRITE8_MEMBER(leland_scroll_w);
-	DECLARE_WRITE8_MEMBER(leland_master_alt_bankswitch_w);
+	u8 master_analog_key_r(offs_t offset);
+	void master_analog_key_w(offs_t offset, u8 data);
+	u8 dangerz_input_y_r();
+	u8 dangerz_input_x_r();
+	u8 dangerz_input_upper_r();
+	void scroll_w(offs_t offset, u8 data);
+	void leland_master_alt_bankswitch_w(u8 data);
 
 	tilemap_t      *m_tilemap;
-	uint16_t m_xscroll;
-	uint16_t m_yscroll;
-	std::unique_ptr<uint8_t[]> m_video_ram;
+	u16 m_xscroll;
+	u16 m_yscroll;
+	std::unique_ptr<u8[]> m_video_ram;
 	struct vram_state_data m_vram_state[2];
 
 	void slave_map_program(address_map &map);
@@ -140,41 +145,41 @@ private:
 	optional_device<ay8910_device> m_ay8910;
 	optional_device<ay8912_device> m_ay8912;
 
-	required_region_ptr<uint8_t> m_bg_gfxrom;
-	optional_region_ptr<uint8_t> m_bg_prom;
+	required_region_ptr<u8> m_bg_gfxrom;
+	optional_region_ptr<u8> m_bg_prom;
 
-	uint8_t m_dac_control;
-	uint8_t *m_alleymas_kludge_mem;
-	uint8_t m_gfx_control;
-	uint8_t m_keycard_shift;
-	uint8_t m_keycard_bit;
-	uint8_t m_keycard_state;
-	uint8_t m_keycard_clock;
-	uint8_t m_keycard_command[3];
-	uint8_t m_top_board_bank;
-	uint8_t m_sound_port_bank;
-	uint8_t m_alternate_bank;
-	uint8_t m_gfxbank;
-	uint16_t m_last_scanline;
+	u8 m_dac_control;
+	u8 *m_alleymas_kludge_mem;
+	u8 m_gfx_control;
+	u8 m_keycard_shift;
+	u8 m_keycard_bit;
+	u8 m_keycard_state;
+	u8 m_keycard_clock;
+	u8 m_keycard_command[3];
+	u8 m_top_board_bank;
+	u8 m_sound_port_bank;
+	u8 m_alternate_bank;
+	u8 m_gfxbank;
+	u16 m_last_scanline;
 	emu_timer *m_scanline_timer;
 
-	DECLARE_READ8_MEMBER(cerberus_dial_1_r);
-	DECLARE_READ8_MEMBER(cerberus_dial_2_r);
-	DECLARE_WRITE8_MEMBER(alleymas_joystick_kludge);
-	DECLARE_WRITE8_MEMBER(leland_battery_ram_w);
-	DECLARE_READ8_MEMBER(leland_master_input_r);
-	DECLARE_WRITE8_MEMBER(leland_master_output_w);
-	DECLARE_WRITE8_MEMBER(leland_gated_paletteram_w);
-	DECLARE_READ8_MEMBER(leland_gated_paletteram_r);
-	DECLARE_WRITE8_MEMBER(leland_slave_small_banksw_w);
-	DECLARE_WRITE8_MEMBER(ataxx_slave_banksw_w);
-	DECLARE_WRITE8_MEMBER(leland_mvram_port_w);
-	DECLARE_READ8_MEMBER(leland_mvram_port_r);
-	DECLARE_WRITE8_MEMBER(leland_svram_port_w);
-	DECLARE_READ8_MEMBER(leland_svram_port_r);
-	DECLARE_READ8_MEMBER(leland_sound_port_r);
-	DECLARE_WRITE8_MEMBER(leland_sound_port_w);
-	DECLARE_WRITE8_MEMBER(leland_gfx_port_w);
+	u8 cerberus_dial_1_r();
+	u8 cerberus_dial_2_r();
+	void alleymas_joystick_kludge(u8 data);
+	void leland_battery_ram_w(offs_t offset, u8 data);
+	u8 leland_master_input_r(offs_t offset);
+	void leland_master_output_w(offs_t offset, u8 data);
+	void gated_paletteram_w(offs_t offset, u8 data);
+	u8 gated_paletteram_r(offs_t offset);
+	void slave_small_banksw_w(u8 data);
+	void ataxx_slave_banksw_w(u8 data);
+	void leland_mvram_port_w(offs_t offset, u8 data);
+	u8 leland_mvram_port_r(offs_t offset);
+	void leland_svram_port_w(offs_t offset, u8 data);
+	u8 leland_svram_port_r(offs_t offset);
+	u8 sound_port_r();
+	void sound_port_w(u8 data);
+	void gfx_port_w(u8 data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -182,17 +187,17 @@ private:
 
 	TILEMAP_MAPPER_MEMBER(leland_scan);
 	TILE_GET_INFO_MEMBER(leland_get_tile_info);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(leland_master_interrupt);
 	TIMER_CALLBACK_MEMBER(leland_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 
-	void leland_video_addr_w(address_space &space, int offset, int data, int num);
+	void video_addr_w(offs_t offset, u8 data, int num);
 
 	void update_dangerz_xy();
 
-	void leland_init_eeprom(uint8_t default_val, const uint16_t *data, uint8_t serial_offset, uint8_t serial_type);
-	void ataxx_init_eeprom(const uint16_t *data);
+	void leland_init_eeprom(u8 default_val, const u16 *data, u8 serial_offset, u8 serial_type);
+	void ataxx_init_eeprom(const u16 *data);
 	int keycard_r();
 	void keycard_w(int data);
 	void master_map_io(address_map &map);
@@ -227,14 +232,14 @@ public:
 	void lelandi(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(redline_pedal_1_r);
-	DECLARE_READ8_MEMBER(redline_pedal_2_r);
-	DECLARE_READ8_MEMBER(redline_wheel_1_r);
-	DECLARE_READ8_MEMBER(redline_wheel_2_r);
-	DECLARE_READ8_MEMBER(offroad_wheel_1_r);
-	DECLARE_READ8_MEMBER(offroad_wheel_2_r);
-	DECLARE_READ8_MEMBER(offroad_wheel_3_r);
-	DECLARE_WRITE8_MEMBER(redline_master_alt_bankswitch_w);
+	u8 redline_pedal_1_r();
+	u8 redline_pedal_2_r();
+	u8 redline_wheel_1_r();
+	u8 redline_wheel_2_r();
+	u8 offroad_wheel_1_r();
+	u8 offroad_wheel_2_r();
+	u8 offroad_wheel_3_r();
+	void redline_master_alt_bankswitch_w(u8 data);
 
 	void master_redline_map_io(address_map &map);
 	void slave_large_map_program(address_map &map);
@@ -249,7 +254,6 @@ public:
 	ataxx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: leland_state(mconfig, type, tag)
 		, m_sound(*this, "custom")
-		, m_track_axes(*this, "AN%u", 0U)
 		, m_xrom_base(*this, "xrom")
 	{
 	}
@@ -265,21 +269,21 @@ public:
 	void wsf(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(ataxx_trackball_r);
-	DECLARE_READ8_MEMBER(indyheat_analog_r);
-	DECLARE_WRITE8_MEMBER(indyheat_analog_w);
+	u8 ataxx_trackball_r(offs_t offset);
+	u8 indyheat_analog_r(offs_t offset);
+	void indyheat_analog_w(offs_t offset, u8 data);
 
-	DECLARE_WRITE8_MEMBER(ataxx_battery_ram_w);
-	DECLARE_READ8_MEMBER(ataxx_master_input_r);
-	DECLARE_WRITE8_MEMBER(ataxx_master_output_w);
-	DECLARE_WRITE8_MEMBER(ataxx_paletteram_and_misc_w);
-	DECLARE_READ8_MEMBER(ataxx_paletteram_and_misc_r);
-	DECLARE_WRITE8_MEMBER(ataxx_mvram_port_w);
-	DECLARE_WRITE8_MEMBER(ataxx_svram_port_w);
-	DECLARE_READ8_MEMBER(ataxx_mvram_port_r);
-	DECLARE_READ8_MEMBER(ataxx_svram_port_r);
-	DECLARE_READ8_MEMBER(ataxx_eeprom_r);
-	DECLARE_WRITE8_MEMBER(ataxx_eeprom_w);
+	void ataxx_battery_ram_w(offs_t offset, u8 data);
+	u8 ataxx_master_input_r(offs_t offset);
+	void ataxx_master_output_w(offs_t offset, u8 data);
+	void paletteram_and_misc_w(offs_t offset, u8 data);
+	u8 paletteram_and_misc_r(offs_t offset);
+	void ataxx_mvram_port_w(offs_t offset, u8 data);
+	void ataxx_svram_port_w(offs_t offset, u8 data);
+	u8 ataxx_mvram_port_r(offs_t offset);
+	u8 ataxx_svram_port_r(offs_t offset);
+	u8 eeprom_r();
+	void eeprom_w(u8 data);
 
 	TILEMAP_MAPPER_MEMBER(ataxx_scan);
 	TILE_GET_INFO_MEMBER(ataxx_get_tile_info);
@@ -298,15 +302,13 @@ private:
 
 	required_device<leland_80186_sound_device> m_sound;
 
-	optional_ioport_array<4> m_track_axes;
+	required_region_ptr<u8> m_xrom_base;
 
-	required_region_ptr<uint8_t> m_xrom_base;
-
-	std::unique_ptr<uint8_t[]> m_ataxx_qram;
-	uint8_t m_master_bank;
-	uint32_t m_xrom1_addr;
-	uint32_t m_xrom2_addr;
-	std::unique_ptr<uint8_t[]> m_extra_tram;
+	std::unique_ptr<u8[]> m_ataxx_qram;
+	u8 m_master_bank;
+	u32 m_xrom1_addr;
+	u32 m_xrom2_addr;
+	std::unique_ptr<u8[]> m_extra_tram;
 };
 
 

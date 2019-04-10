@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli, David Haywood
 /*
-	Electronic Devices video system
+    Electronic Devices video system
 
-	used by
-	stlforce.cpp
-	mwarr.cpp
+    used by
+    stlforce.cpp
+    mwarr.cpp
 
-	TODO:
-	Check if the sprites are an obvious clone of anything else and split out if neccessary
-	Steel Force doesn't use the variable height sprites, does the hardware support them?
-	Verify offsets / visible areas / overscan etc. especially text layer as Steel Force ending does not quite fit on screen
+    TODO:
+    Check if the sprites are an obvious clone of anything else and split out if neccessary
+    Steel Force doesn't use the variable height sprites, does the hardware support them?
+    Verify offsets / visible areas / overscan etc. especially text layer as Steel Force ending does not quite fit on screen
 */
 
 
@@ -247,15 +247,15 @@ void edevices_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, 
 	}
 }
 
-/* 
-	m_vidattrram
-	0 tx xscroll (or global x scroll?)
-	1 back yscroll
-	2 mlow yscroll
-	3 mhigh yscroll
-	4 tx yscroll
-	5 ---- ---- ---s tMmB  layer enables (s = sprites, t = tx, M = highmid, m = lowmid, B = back)
-	6 ---- ---- ---M -m-B rowscroll enables  (B = back, m = lowmid, M = highmid)
+/*
+    m_vidattrram
+    0 tx xscroll (or global x scroll?)
+    1 back yscroll
+    2 mlow yscroll
+    3 mhigh yscroll
+    4 tx yscroll
+    5 ---- ---- ---s tMmB  layer enables (s = sprites, t = tx, M = highmid, m = lowmid, B = back)
+    6 ---- ---- ---M -m-B rowscroll enables  (B = back, m = lowmid, M = highmid)
 
 */
 

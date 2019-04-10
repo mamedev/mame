@@ -5,7 +5,7 @@
 
 #include "sound/2203intf.h"
 #include "emupal.h"
-
+#include "screen.h"
 
 class mexico86_state : public driver_device
 {
@@ -20,7 +20,8 @@ public:
 		m_mcu(*this, "mcu"),
 		m_ymsnd(*this, "ymsnd"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen")
 	{
 	}
 
@@ -56,6 +57,7 @@ private:
 	required_device<ym2203_device>      m_ymsnd;
 	required_device<gfxdecode_device>   m_gfxdecode;
 	required_device<palette_device>     m_palette;
+	required_device<screen_device>      m_screen;
 
 	/* queue */
 	u8 m_queue[64];

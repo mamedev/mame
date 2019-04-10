@@ -18,35 +18,31 @@ WRITE8_MEMBER(n8080_state::n8080_video_control_w)
 }
 
 
-PALETTE_INIT_MEMBER(n8080_state,n8080)
+void n8080_state::n8080_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 		palette.set_pen_color(i, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 }
 
 
-PALETTE_INIT_MEMBER(n8080_state,helifire)
+void n8080_state::helifire_palette(palette_device &palette) const
 {
-	int i;
+	n8080_palette(palette);
 
-	PALETTE_INIT_NAME(n8080)(palette);
-
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
-		int level = 0xff * exp(-3 * i / 255.); /* capacitor discharge */
+		int const level = 0xff * exp(-3 * i / 255.); // capacitor discharge
 
-		palette.set_pen_color(0x000 + 8 + i, rgb_t(0x00, 0x00, level));   /* shades of blue */
-		palette.set_pen_color(0x100 + 8 + i, rgb_t(0x00, 0xC0, level));   /* shades of blue w/ green star */
+		palette.set_pen_color(0x000 + 8 + i, rgb_t(0x00, 0x00, level));   // shades of blue
+		palette.set_pen_color(0x100 + 8 + i, rgb_t(0x00, 0xc0, level));   // shades of blue w/ green star
 
-		palette.set_pen_color(0x200 + 8 + i, rgb_t(level, 0x00, 0x00));   /* shades of red */
-		palette.set_pen_color(0x300 + 8 + i, rgb_t(level, 0xC0, 0x00));   /* shades of red w/ green star */
+		palette.set_pen_color(0x200 + 8 + i, rgb_t(level, 0x00, 0x00));   // shades of red
+		palette.set_pen_color(0x300 + 8 + i, rgb_t(level, 0xc0, 0x00));   // shades of red w/ green star
 	}
 }
 
 
-void n8080_state::spacefev_start_red_cannon(  )
+void n8080_state::spacefev_start_red_cannon()
 {
 	m_spacefev_red_cannon = 1;
 	m_cannon_timer->adjust(attotime::from_usec(550 * 68 * 10));

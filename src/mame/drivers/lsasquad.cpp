@@ -555,127 +555,122 @@ MACHINE_RESET_MEMBER(lsasquad_state,lsasquad)
 }
 
 /* Note: lsasquad clock values are not verified */
-MACHINE_CONFIG_START(lsasquad_state::lsasquad)
-
+void lsasquad_state::lsasquad(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK / 4)
-	MCFG_DEVICE_PROGRAM_MAP(lsasquad_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lsasquad_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lsasquad_state::lsasquad_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lsasquad_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(lsasquad_sound_map)
+	Z80(config, m_audiocpu, MASTER_CLOCK / 8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lsasquad_state::lsasquad_sound_map);
 								/* IRQs are triggered by the YM2203 */
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MASTER_CLOCK / 8)
+	TAITO68705_MCU(config, m_bmcu, MASTER_CLOCK / 8);
 
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) /* 500 CPU slices per frame - an high value to ensure proper */
+	config.m_minimum_quantum = attotime::from_hz(30000); /* 500 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
 	MCFG_MACHINE_START_OVERRIDE(lsasquad_state,lsasquad)
 	MCFG_MACHINE_RESET_OVERRIDE(lsasquad_state,lsasquad)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, "soundnmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lsasquad_state, screen_update_lsasquad)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(lsasquad_state::screen_update_lsasquad));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lsasquad)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lsasquad);
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, MASTER_CLOCK / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
+	YM2149(config, "aysnd", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.12);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, lsasquad_state, unk))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lsasquad_state, unk))
-	MCFG_SOUND_ROUTE(0, "mono", 0.12)
-	MCFG_SOUND_ROUTE(1, "mono", 0.12)
-	MCFG_SOUND_ROUTE(2, "mono", 0.12)
-	MCFG_SOUND_ROUTE(3, "mono", 0.63)
-MACHINE_CONFIG_END
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 8));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_a_write_callback().set(FUNC(lsasquad_state::unk));
+	ymsnd.port_b_write_callback().set(FUNC(lsasquad_state::unk));
+	ymsnd.add_route(0, "mono", 0.12);
+	ymsnd.add_route(1, "mono", 0.12);
+	ymsnd.add_route(2, "mono", 0.12);
+	ymsnd.add_route(3, "mono", 0.63);
+}
 
-MACHINE_CONFIG_START(lsasquad_state::storming)
+void lsasquad_state::storming(machine_config &config)
+{
 	lsasquad(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(storming_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &lsasquad_state::storming_map);
 
-	MCFG_DEVICE_REMOVE("bmcu")
+	config.device_remove("bmcu");
 
-	MCFG_DEVICE_REPLACE("aysnd", AY8910, MASTER_CLOCK / 8) // AY-3-8910A
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
-MACHINE_CONFIG_END
+	AY8910(config.replace(), "aysnd", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.12); // AY-3-8910A
+}
 
-MACHINE_CONFIG_START(lsasquad_state::daikaiju)
-
+void lsasquad_state::daikaiju(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK / 4)
-	MCFG_DEVICE_PROGRAM_MAP(daikaiju_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lsasquad_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lsasquad_state::daikaiju_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lsasquad_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(daikaiju_sound_map)
+	Z80(config, m_audiocpu, MASTER_CLOCK / 8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lsasquad_state::daikaiju_sound_map);
 	/* IRQs are triggered by the YM2203 */
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MASTER_CLOCK / 8)
+	TAITO68705_MCU(config, m_bmcu, MASTER_CLOCK / 8);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) /* 500 CPU slices per frame - an high value to ensure proper */
+	config.m_minimum_quantum = attotime::from_hz(30000); /* 500 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
 	MCFG_MACHINE_START_OVERRIDE(lsasquad_state,lsasquad)
 	MCFG_MACHINE_RESET_OVERRIDE(lsasquad_state,lsasquad)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, "soundnmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lsasquad_state, screen_update_daikaiju)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(lsasquad_state::screen_update_daikaiju));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lsasquad)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lsasquad);
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, MASTER_CLOCK / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
+	YM2149(config, "aysnd", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.12);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, lsasquad_state, unk))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lsasquad_state, unk))
-	MCFG_SOUND_ROUTE(0, "mono", 0.12)
-	MCFG_SOUND_ROUTE(1, "mono", 0.12)
-	MCFG_SOUND_ROUTE(2, "mono", 0.12)
-	MCFG_SOUND_ROUTE(3, "mono", 0.63)
-MACHINE_CONFIG_END
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 8));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_a_write_callback().set(FUNC(lsasquad_state::unk));
+	ymsnd.port_b_write_callback().set(FUNC(lsasquad_state::unk));
+	ymsnd.add_route(0, "mono", 0.12);
+	ymsnd.add_route(1, "mono", 0.12);
+	ymsnd.add_route(2, "mono", 0.12);
+	ymsnd.add_route(3, "mono", 0.63);
+}
 
 
 /***************************************************************************

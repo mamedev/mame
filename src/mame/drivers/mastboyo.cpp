@@ -21,8 +21,8 @@
 class mastboyo_state : public driver_device
 {
 public:
-	mastboyo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mastboyo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_fgram(*this, "fgram"),
 		m_fgram2(*this, "fgram2"),
 		m_maincpu(*this, "maincpu"),
@@ -57,7 +57,7 @@ private:
 	DECLARE_WRITE8_MEMBER(rombank_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update_mastboyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(mastboyo);
+	void mastboyo_palette(palette_device &palette) const;
 };
 
 
@@ -94,7 +94,7 @@ WRITE8_MEMBER(mastboyo_state::fgram2_w)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-PALETTE_INIT_MEMBER(mastboyo_state, mastboyo)
+void mastboyo_state::mastboyo_palette(palette_device &palette) const
 {
 	for (int i = 0; i < palette.entries(); i++)
 	{
@@ -196,39 +196,37 @@ void mastboyo_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(mastboyo_state::mastboyo)
-
+void mastboyo_state::mastboyo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 20_MHz_XTAL / 6)
-	MCFG_DEVICE_PROGRAM_MAP(mastboyo_map)
-	MCFG_DEVICE_IO_MAP(mastboyo_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mastboyo_state, irq0_line_hold, 256.244f)  // not sure, INT0 pin was measured at 256.244Hz
+	Z80(config, m_maincpu, 20_MHz_XTAL / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mastboyo_state::mastboyo_map);
+	m_maincpu->set_addrmap(AS_IO, &mastboyo_state::mastboyo_portmap);
+	m_maincpu->set_periodic_int(FUNC(mastboyo_state::irq0_line_hold), attotime::from_hz(256.244f));  // not sure, INT0 pin was measured at 256.244Hz
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 2*8, 256-2*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mastboyo_state, screen_update_mastboyo)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 2*8, 256-2*8-1);
+	screen.set_screen_update(FUNC(mastboyo_state::screen_update_mastboyo));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mastboyo)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_mastboyo);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(mastboyo_state, mastboyo)
+	PALETTE(config, "palette", FUNC(mastboyo_state::mastboyo_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 20_MHz_XTAL / 4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW")) // DSW
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN0")) // player inputs
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", 20_MHz_XTAL / 4));
+	aysnd.port_a_read_callback().set_ioport("DSW"); // DSW
+	aysnd.port_b_read_callback().set_ioport("IN0"); // player inputs
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /*

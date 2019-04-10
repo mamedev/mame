@@ -187,33 +187,33 @@ static void b2m_floppies(device_slot_interface &device)
 
 
 /* Machine driver */
-MACHINE_CONFIG_START(b2m_state::b2m)
+void b2m_state::b2m(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(b2m_mem)
-	MCFG_DEVICE_IO_MAP(b2m_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", b2m_state,  b2m_vblank_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	I8080(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &b2m_state::b2m_mem);
+	m_maincpu->set_addrmap(AS_IO, &b2m_state::b2m_io);
+	m_maincpu->set_vblank_int("screen", FUNC(b2m_state::b2m_vblank_interrupt));
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(384, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(b2m_state, screen_update_b2m)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(384, 256);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(b2m_state::screen_update_b2m));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(b2m_state, b2m)
+	PALETTE(config, m_palette, FUNC(b2m_state::b2m_palette), 4);
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(0)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir1_w))
-	MCFG_PIT8253_CLK1(2000000)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, b2m_state,bm2_pit_out1))
-	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk0))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(0);
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir1_w));
+	m_pit->set_clk<1>(2000000);
+	m_pit->out_handler<1>().set(FUNC(b2m_state::bm2_pit_out1));
+	m_pit->set_clk<2>(2000000);
+	m_pit->out_handler<2>().set(m_pit, FUNC(pit8253_device::write_clk0));
 
 	i8255_device &ppi1(I8255(config, "ppi8255_1"));
 	ppi1.out_pa_callback().set(FUNC(b2m_state::b2m_8255_porta_w));
@@ -229,33 +229,32 @@ MACHINE_CONFIG_START(b2m_state::b2m)
 	ppi3.out_pb_callback().set(FUNC(b2m_state::b2m_romdisk_portb_w));
 	ppi3.out_pc_callback().set(FUNC(b2m_state::b2m_romdisk_portc_w));
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* uart */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, "uart", 0);
 
 	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->drq_wr_callback().set(FUNC(b2m_state::b2m_fdc_drq));
 
-	MCFG_FLOPPY_DRIVE_ADD("fd0", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","b2m")
+	FLOPPY_CONNECTOR(config, "fd0", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_original("b2m");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("128K").set_default_value(0x00);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(b2m_state::b2mrom)
+void b2m_state::b2mrom(machine_config &config)
+{
 	b2m(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(b2m_rom_io)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &b2m_state::b2m_rom_io);
+}
 
 /* ROM definition */
 

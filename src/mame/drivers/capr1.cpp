@@ -198,42 +198,41 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(capr1_state::cspin2)
-
+void capr1_state::cspin2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000) // clock frequency unknown
-	MCFG_DEVICE_PROGRAM_MAP(cspin2_map)
-	//MCFG_DEVICE_PERIODIC_INT_DRIVER(capr1_state, nmi_line_pulse, 20)
+	Z80(config, m_maincpu, 4000000); // clock frequency unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &capr1_state::cspin2_map);
+	//m_maincpu->set_periodic_int(FUNC(capr1_state::nmi_line_pulse), attotime::from_hz(20));
 
-	MCFG_DEVICE_ADD("te7750", TE7750, 0) // guess
-	MCFG_TE7750_IOS_CB(CONSTANT(7))
-	MCFG_TE7750_IN_PORT1_CB(IOPORT("IN1"))
-	MCFG_TE7750_IN_PORT2_CB(IOPORT("IN2"))
-	MCFG_TE7750_IN_PORT3_CB(IOPORT("IN3"))
-	MCFG_TE7750_IN_PORT4_CB(IOPORT("IN4"))
-	MCFG_TE7750_IN_PORT5_CB(IOPORT("IN5"))
-	MCFG_TE7750_IN_PORT6_CB(IOPORT("IN6"))
-	MCFG_TE7750_IN_PORT7_CB(IOPORT("IN7"))
-	MCFG_TE7750_IN_PORT8_CB(IOPORT("IN8"))
-	MCFG_TE7750_OUT_PORT9_CB(WRITE8(*this, capr1_state, output_w))
+	te7750_device &te7750(TE7750(config, "te7750")); // guess
+	te7750.ios_cb().set_constant(7);
+	te7750.in_port1_cb().set_ioport("IN1");
+	te7750.in_port2_cb().set_ioport("IN2");
+	te7750.in_port3_cb().set_ioport("IN3");
+	te7750.in_port4_cb().set_ioport("IN4");
+	te7750.in_port5_cb().set_ioport("IN5");
+	te7750.in_port6_cb().set_ioport("IN6");
+	te7750.in_port7_cb().set_ioport("IN7");
+	te7750.in_port8_cb().set_ioport("IN8");
+	te7750.out_port9_cb().set(FUNC(capr1_state::output_w));
 
 	/* no video! */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym", YM2203, 4000000) // clock frequency unknown
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("INB"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+	ym2203_device &ym(YM2203(config, "ym", 4000000)); // clock frequency unknown
+	ym.irq_handler().set_inputline(m_maincpu, 0);
+	ym.port_a_read_callback().set_ioport("INA");
+	ym.port_b_read_callback().set_ioport("INB");
+	ym.add_route(0, "mono", 0.15);
+	ym.add_route(1, "mono", 0.15);
+	ym.add_route(2, "mono", 0.15);
+	ym.add_route(3, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
+}
 
 
 

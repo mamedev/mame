@@ -14,14 +14,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_RTC9701_ADD(tag) \
-		MCFG_DEVICE_ADD((tag), RTC9701, XTAL(32'768))
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -34,7 +26,7 @@ class rtc9701_device :  public device_t,
 {
 public:
 	// construction/destruction
-	rtc9701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rtc9701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 32'768);
 
 
 	// I/O operations

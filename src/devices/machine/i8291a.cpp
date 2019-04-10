@@ -843,23 +843,10 @@ void i8291a_device::run_dc_fsm()
 	case device_clear_state::DCIS:
 		break;
 	case device_clear_state::DCAS:
+
 		m_ints1 |= REG_INTS1_DEC;
 		update_int();
-		update_state(m_t_state, talker_state::TIDS);
-		update_state(m_tp_state, talker_primary_state::TPIS);
-		update_state(m_tsp_state, talker_serial_poll_state::SPIS);
-		update_state(m_l_state, listener_state::LIDS);
-		update_state(m_rl_state, remote_local_state::LOCS);
-		update_state(m_pp_state, parallel_poll_state::PPIS);
 		update_state(m_dc_state, device_clear_state::DCIS);
-		update_state(m_dt_state, device_trigger_state::DTIS);
-		update_state(m_sh_state, source_handshake_state::SIDS);
-		update_state(m_ah_state, acceptor_handshake_state::AIDS);
-		update_state(m_lp_state, listener_primary_state::LPIS);
-
-		m_ints1 |= REG_INTS1_DEC;
-		update_int();
-
 		break;
 	}
 }

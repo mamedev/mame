@@ -167,11 +167,11 @@ std::string plus4_expansion_slot_device::get_default_card_software(get_default_c
 //  cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t plus4_expansion_slot_device::cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
+uint8_t plus4_expansion_slot_device::cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
 	if (m_card != nullptr)
 	{
-		data = m_card->plus4_cd_r(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+		data = m_card->plus4_cd_r(offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
 	}
 
 	return data;
@@ -182,11 +182,11 @@ uint8_t plus4_expansion_slot_device::cd_r(address_space &space, offs_t offset, u
 //  cd_w - cartridge data write
 //-------------------------------------------------
 
-void plus4_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
+void plus4_expansion_slot_device::cd_w(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
 	if (m_card != nullptr)
 	{
-		m_card->plus4_cd_w(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+		m_card->plus4_cd_w(offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
 	}
 }
 

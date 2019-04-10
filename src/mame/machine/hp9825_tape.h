@@ -27,7 +27,7 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	
+
 	// device_image_interface overrides
 	virtual image_init_result call_load() override;
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
@@ -51,16 +51,16 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(short_gap_w);
 	DECLARE_WRITE_LINE_MEMBER(long_gap_w);
-	
+
 private:
 	devcb_write_line m_flg_handler;
 	devcb_write_line m_sts_handler;
 	devcb_write_line m_dmar_handler;
 	devcb_write_line m_led_handler;
 
-	required_device<ttl74123_device> m_short_gap_timer;	// U43a
-	required_device<ttl74123_device> m_long_gap_timer;	// U43b
-	
+	required_device<ttl74123_device> m_short_gap_timer; // U43a
+	required_device<ttl74123_device> m_long_gap_timer;  // U43b
+
 	// Registers
 	uint8_t m_cmd_reg;
 	uint8_t m_stat_reg;
@@ -68,18 +68,18 @@ private:
 	// State
 	bool m_flg;
 	bool m_sts;
-	bool m_data_out;	// U38-9
-	bool m_data_in;	// U13-6
-	bool m_exception;	// U4-6
-	bool m_search_complete;	// U9-6
-	bool m_dma_req;	// U9-9
-	bool m_in_gap;	// U39-4
-	bool m_no_go;	// U6-3
+	bool m_data_out;    // U38-9
+	bool m_data_in; // U13-6
+	bool m_exception;   // U4-6
+	bool m_search_complete; // U9-6
+	bool m_dma_req; // U9-9
+	bool m_in_gap;  // U39-4
+	bool m_no_go;   // U6-3
 	bool m_present;
-	bool m_valid_bits;	// U39-5
-	uint8_t m_trans_cnt;	// U42
-	bool m_short_gap_out;	// U43-13
-	bool m_long_gap_out;	// U43-5
+	bool m_valid_bits;  // U39-5
+	uint8_t m_trans_cnt;    // U42
+	bool m_short_gap_out;   // U43-13
+	bool m_long_gap_out;    // U43-5
 
 	// Timers
 	emu_timer *m_bit_timer;
@@ -97,7 +97,7 @@ private:
 	hti_format_t::tape_pos_t m_next_tacho_pos;
 	hti_format_t::tape_pos_t m_next_hole_pos;
 	double m_speed;
-	attotime m_start_time;	// Tape moving if != never
+	attotime m_start_time;  // Tape moving if != never
 	bool m_accelerating;
 
 	// R/W
@@ -111,8 +111,8 @@ private:
 	int m_rw_stat;
 	hti_format_t::track_iterator_t m_rd_it;
 	bool m_rd_it_valid;
-	uint32_t m_rw_word;	// Need 17 bits because of sync bit
-	unsigned m_bit_idx;	// 0 is MSB, 15 is LSB, 16 is sync bit, >16 means "looking for sync"
+	uint32_t m_rw_word; // Need 17 bits because of sync bit
+	unsigned m_bit_idx; // 0 is MSB, 15 is LSB, 16 is sync bit, >16 means "looking for sync"
 	hti_format_t::tape_pos_t m_gap_start;
 
 	void clear_state();

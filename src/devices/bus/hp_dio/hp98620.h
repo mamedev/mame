@@ -23,12 +23,9 @@ public:
 protected:
 	dio16_98620_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_READ16_MEMBER(dma_r);
 	DECLARE_WRITE16_MEMBER(dma_w);
@@ -127,8 +124,8 @@ private:
 
 	bool dmar[2];
 };
-}
-}
+
+} } // namespace bus::hp_dio
 
 DECLARE_DEVICE_TYPE_NS(HPDIO_98620, bus::hp_dio, dio16_98620_device)
 

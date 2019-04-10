@@ -5,6 +5,10 @@
     Atari Football hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ATARIFB_H
+#define MAME_INCLUDES_ATARIFB_H
+
+#pragma once
 
 #include "sound/discrete.h"
 #include "emupal.h"
@@ -54,7 +58,7 @@ public:
 	TILE_GET_INFO_MEMBER(alpha1_get_tile_info);
 	TILE_GET_INFO_MEMBER(alpha2_get_tile_info);
 	TILE_GET_INFO_MEMBER(field_get_tile_info);
-	DECLARE_PALETTE_INIT(atarifb);
+	void atarifb_palette(palette_device &palette) const;
 	uint32_t screen_update_atarifb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_abaseb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_soccer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -114,6 +118,8 @@ protected:
 	output_finder<2> m_leds;
 };
 
-/*----------- defined in audio/atarifb.c -----------*/
+//----------- defined in audio/atarifb.cpp -----------
 DISCRETE_SOUND_EXTERN( atarifb_discrete );
 DISCRETE_SOUND_EXTERN( abaseb_discrete );
+
+#endif // MAME_INCLUDES_ATARIFB_H

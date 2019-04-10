@@ -25,6 +25,7 @@ What there is of the schematic shows no sign of a daisy chain or associated inte
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80daisy.h"
 #include "machine/z80pio.h"
@@ -32,7 +33,6 @@ What there is of the schematic shows no sign of a daisy chain or associated inte
 #include "machine/z80ctc.h"
 #include "machine/mm58274c.h"
 #include "bus/rs232/rs232.h"
-#include "machine/clock.h"
 
 
 
@@ -152,24 +152,23 @@ static void floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(dmax8000_state::dmax8000)
+void dmax8000_state::dmax8000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4'000'000) // no idea what crystal is used, but 4MHz clock is confirmed
-	MCFG_DEVICE_PROGRAM_MAP(dmax8000_mem)
-	MCFG_DEVICE_IO_MAP(dmax8000_io)
+	Z80(config, m_maincpu, 4'000'000); // no idea what crystal is used, but 4MHz clock is confirmed
+	m_maincpu->set_addrmap(AS_PROGRAM, &dmax8000_state::dmax8000_mem);
+	m_maincpu->set_addrmap(AS_IO, &dmax8000_state::dmax8000_io);
 	MCFG_MACHINE_RESET_OVERRIDE(dmax8000_state, dmax8000)
 
-	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 4_MHz_XTAL / 2)); // 2MHz
-	ctc_clock.signal_handler().set("ctc", FUNC(z80ctc_device::trg0));
-	ctc_clock.signal_handler().append("ctc", FUNC(z80ctc_device::trg1));
-	ctc_clock.signal_handler().append("ctc", FUNC(z80ctc_device::trg2));
-
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 4_MHz_XTAL));
+	ctc.set_clk<0>(4_MHz_XTAL / 2); // 2MHz
 	ctc.zc_callback<0>().set("dart1", FUNC(z80dart_device::rxca_w));
 	ctc.zc_callback<0>().append("dart1", FUNC(z80dart_device::txca_w));
 	ctc.zc_callback<0>().append("dart2", FUNC(z80dart_device::rxca_w));
 	ctc.zc_callback<0>().append("dart2", FUNC(z80dart_device::txca_w));
+	ctc.set_clk<1>(4_MHz_XTAL / 2); // 2MHz
 	ctc.zc_callback<1>().set("dart2", FUNC(z80dart_device::rxtxcb_w));
+	ctc.set_clk<2>(4_MHz_XTAL / 2); // 2MHz
 	ctc.zc_callback<2>().set("dart1", FUNC(z80dart_device::rxtxcb_w));
 
 	z80dart_device& dart1(Z80DART(config, "dart1", 4'000'000)); // A = terminal; B = aux
@@ -177,11 +176,11 @@ MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 	dart1.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	dart1.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("dart1", z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("dart1", z80dart_device, dcda_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("dart1", z80dart_device, ria_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("dart1", z80dart_device, ctsa_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("dart1", FUNC(z80dart_device::rxa_w));
+	rs232.dcd_handler().set("dart1", FUNC(z80dart_device::dcda_w));
+	rs232.ri_handler().set("dart1", FUNC(z80dart_device::ria_w));
+	rs232.cts_handler().set("dart1", FUNC(z80dart_device::ctsa_w));
 
 	Z80DART(config, "dart2", 4'000'000); // RS232 ports
 
@@ -194,14 +193,13 @@ MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 	FD1793(config, m_fdc, 2'000'000); // no idea
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_fdc->drq_wr_callback().set(FUNC(dmax8000_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "8dsdd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	MCFG_DEVICE_ADD("rtc", MM58274C, 0) // MM58174
+	mm58274c_device &rtc(MM58274C(config, "rtc", 0)); // MM58174
 	// this is all guess
-	MCFG_MM58274C_MODE24(0) // 12 hour
-	MCFG_MM58274C_DAY1(1)   // monday
-MACHINE_CONFIG_END
+	rtc.set_mode24(0); // 12 hour
+	rtc.set_day1(1);   // monday
+}
 
 
 /* ROM definition */

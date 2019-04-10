@@ -14,16 +14,6 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ATARIRLE_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, ATARI_RLE_OBJECTS, 0) \
-	downcast<atari_rle_objects_device &>(*device).set_config(_interface);
-
-
-
-//**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
@@ -78,6 +68,12 @@ class atari_rle_objects_device : public device_t,
 {
 public:
 	// construction/destruction
+	atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const atari_rle_objects_config &config)
+		: atari_rle_objects_device(mconfig, tag, owner, clock)
+	{
+		set_config(config);
+	}
+
 	atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers

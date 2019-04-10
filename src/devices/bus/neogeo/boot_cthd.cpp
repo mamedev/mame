@@ -48,9 +48,10 @@ void neogeo_cthd2k3_cart_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-MACHINE_CONFIG_START(neogeo_cthd2k3_cart_device::device_add_mconfig)
-	MCFG_CTHD_PROT_ADD("cthd_prot")
-MACHINE_CONFIG_END
+void neogeo_cthd2k3_cart_device::device_add_mconfig(machine_config &config)
+{
+	NG_CTHD_PROT(config, m_prot);
+}
 
 
 /*************************************************
@@ -122,8 +123,9 @@ void neogeo_matrimbl_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 }
 
 
- MACHINE_CONFIG_START(neogeo_matrimbl_cart_device::device_add_mconfig)
-	MCFG_KOF2002_PROT_ADD("kof2k2_prot")
-	MCFG_CMC_PROT_ADD("cmc_prot")
-	MCFG_CTHD_PROT_ADD("cthd_prot")
-MACHINE_CONFIG_END
+void neogeo_matrimbl_cart_device::device_add_mconfig(machine_config &config)
+{
+	NG_KOF2002_PROT(config, m_kof2k2_prot);
+	NG_CMC_PROT(config, m_cmc_prot);
+	NG_CTHD_PROT(config, m_prot);
+}

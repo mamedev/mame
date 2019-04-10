@@ -88,7 +88,7 @@ static INPUT_PORTS_START(hp98644_port)
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(REG_SWITCHES_MODEM_EN, DEF_STR(On))
 
-	PORT_DIPNAME(REG_SWITCHES_INT_LEVEL_MASK << REG_SWITCHES_INT_LEVEL_SHIFT, 0x02, "Interrupt level")
+	PORT_DIPNAME(REG_SWITCHES_INT_LEVEL_MASK << REG_SWITCHES_INT_LEVEL_SHIFT, 0x02 << REG_SWITCHES_INT_LEVEL_SHIFT, "Interrupt level")
 	PORT_DIPSETTING(0 << REG_SWITCHES_INT_LEVEL_SHIFT, "3")
 	PORT_DIPSETTING(1 << REG_SWITCHES_INT_LEVEL_SHIFT, "4")
 	PORT_DIPSETTING(2 << REG_SWITCHES_INT_LEVEL_SHIFT, "5")
@@ -193,7 +193,7 @@ READ16_MEMBER(dio16_98644_device::io_r)
 	case 0x0d:
 	case 0x0e:
 	case 0x0f:
-		ret = m_uart->ins8250_r(space, offset & 0x07, mem_mask);
+		ret = m_uart->ins8250_r(offset & 0x07);
 		break;
 	}
 
@@ -230,7 +230,7 @@ WRITE16_MEMBER(dio16_98644_device::io_w)
 	case 0x0d:
 	case 0x0e:
 	case 0x0f:
-		m_uart->ins8250_w(space, offset & 0x07, data, mem_mask);
+		m_uart->ins8250_w(offset & 0x07, data);
 		break;
 	}
 }

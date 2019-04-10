@@ -145,7 +145,7 @@ floppy_connector::~floppy_connector()
 {
 }
 
-void floppy_connector::set_formats(const floppy_format_type *_formats)
+void floppy_connector::set_formats(const floppy_format_type _formats[])
 {
 	formats = _formats;
 }
@@ -987,9 +987,8 @@ uint32_t floppy_image_device::get_variant() const
 //===================================================================
 //   Floppy sound
 //
-//   In order to enable floppy sound you must add the line
-//      MCFG_FLOPPY_DRIVE_SOUND(true)
-//   after MCFG_FLOPPY_DRIVE_ADD
+//   In order to enable floppy sound you must call
+//      enable_sound(true)
 //   and you must put audio samples (44100Hz, mono) with names as
 //   shown in floppy_sample_names into the directory samples/floppy
 //   Sound will be disabled when these samples are missing.

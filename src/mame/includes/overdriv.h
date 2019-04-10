@@ -5,6 +5,10 @@
     Over Drive
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_OVERDRIV_H
+#define MAME_INCLUDES_OVERDRIV_H
+
+#pragma once
 
 #include "machine/k053252.h"
 #include "machine/timer.h"
@@ -83,3 +87,5 @@ private:
 	output_finder<> m_led;
 	int m_fake_timer;
 };
+
+#endif // MAME_INCLUDES_OVERDRIV_H

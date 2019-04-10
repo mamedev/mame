@@ -95,7 +95,7 @@ void spc1000_fdd_exp_device::device_add_mconfig(machine_config &config)
 	m_ppi->out_pc_callback().set(FUNC(spc1000_fdd_exp_device::i8255_c_w));
 
 	// floppy disk controller
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 4'000'000, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 
 	// floppy drives

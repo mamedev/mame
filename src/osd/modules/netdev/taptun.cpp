@@ -28,10 +28,10 @@
 // for some reason this isn't defined in the header, and presumably it changes
 // with major? versions of the driver - perhaps it should be configurable?
 #define PRODUCT_TAP_WIN_COMPONENT_ID "tap0901"
+#endif
 
 // Ethernet minimum frame length
 static constexpr int ETHERNET_MIN_FRAME = 64;
-#endif
 
 class taptun_module : public osd_module, public netdev_module
 {
@@ -138,14 +138,14 @@ void netdev_tap::set_mac(const char *mac)
 	memcpy(m_mac, mac, 6);
 }
 
-#if defined(WIN32)
 static u32 finalise_frame(u8 buf[], u32 length)
 {
 	/*
-	 * On Windows, the taptun driver receives frames which are shorter
-	 * than the Ethernet minimum. Partly this is because it can't see
-	 * the frame check sequence bytes, but mainly it's because NDIS
-	 * expects the lower level device to add the required padding.
+	 * The taptun driver receives frames which are shorter than the Ethernet
+	 * minimum. Partly this is because it can't see the frame check sequence
+	 * bytes, but mainly it's because the OS expects the lower level device
+	 * to add the required padding.
+	 *
 	 * We do the equivalent padding here (i.e. pad with zeroes to the
 	 * minimum Ethernet length minus FCS), so that devices which check
 	 * for this will not reject these packets.
@@ -168,6 +168,7 @@ static u32 finalise_frame(u8 buf[], u32 length)
 	return length;
 }
 
+#if defined(WIN32)
 int netdev_tap::send(uint8_t *buf, int len)
 {
 	OVERLAPPED overlapped = {};
@@ -325,6 +326,10 @@ int netdev_tap::recv_dev(uint8_t **buf)
 	do {
 		len = read(m_fd, m_buf, sizeof(m_buf));
 	} while((len > 0) && memcmp(get_mac(), m_buf, 6) && !get_promisc() && !(m_buf[0] & 1));
+
+	if (len > 0)
+		len = finalise_frame(m_buf, len);
+
 	*buf = m_buf;
 	return (len == -1)?0:len;
 }

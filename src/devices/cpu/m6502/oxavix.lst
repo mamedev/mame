@@ -18,6 +18,14 @@ callf_xa3
 	set_codebank(TMP2);
 	prefetch();
 
+jmp_xa3
+	TMP2 = read_pc();
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	PC = TMP;
+	set_codebank(TMP2);
+	prefetch();
+
 retf_imp
 	read_pc_noinc();
 	read(SP);
@@ -64,7 +72,7 @@ brk_xav_imp
 			else
 			{
 				PC = read_arg(0xfffa);
-				PC = set_h(PC, read_arg(0xfffb));		
+				PC = set_h(PC, read_arg(0xfffb));
 			}
 		}
 
@@ -86,7 +94,7 @@ brk_xav_imp
 			else
 			{
 				PC = read_arg(0xfffe);
-				PC = set_h(PC, read_arg(0xffff));		
+				PC = set_h(PC, read_arg(0xffff));
 			}
 		}
 
@@ -113,7 +121,7 @@ rti_xav_imp
 	prefetch();
 
 
-xa_lda_idy
+xavlda_idy
 	TMP2 = read_pc(); // we need to fetch the zero page part from zero page, but the rest as if zero page wasn't there, similar to the 6509
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
@@ -122,4 +130,151 @@ xa_lda_idy
 	}
 	A = read_special(TMP+Y);
 	set_nz(A);
+	prefetch();
+
+xavadc_idy
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, Y)) {
+		read(set_l(TMP, TMP+Y));
+	}
+	do_adc(read_special(TMP+Y));
+	prefetch();
+
+xavcmp_idy
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, Y)) {
+		read(set_l(TMP, TMP+Y));
+	}
+	do_cmp(A, read_special(TMP+Y));
+	prefetch();
+
+xavsbc_idy
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, Y)) {
+		read(set_l(TMP, TMP+Y));
+	}
+	do_sbc(read_special(TMP+Y));
+	prefetch();
+
+xaveor_idy
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, Y)) {
+		read(set_l(TMP, TMP+Y));
+	}
+	A ^= read_special(TMP+Y);
+	set_nz(A);
+	prefetch();
+
+xavand_idy
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, Y)) {
+		read(set_l(TMP, TMP+Y));
+	}
+	A &= read_special(TMP+Y);
+	set_nz(A);
+	prefetch();
+
+xavora_idy
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, Y)) {
+		read(set_l(TMP, TMP+Y));
+	}
+	A |= read_special(TMP+Y);
+	set_nz(A);
+	prefetch();
+
+xavora_idx
+	TMP2 = read_pc();
+	read(TMP2);
+	TMP2 += X;
+	TMP = read(TMP2 & 0xff);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	A |= read_special(TMP);
+	set_nz(A);
+	prefetch();
+
+xavand_idx
+	TMP2 = read_pc();
+	read(TMP2);
+	TMP2 += X;
+	TMP = read(TMP2 & 0xff);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	A &= read_special(TMP);
+	set_nz(A);
+	prefetch();
+
+xaveor_idx
+	TMP2 = read_pc();
+	read(TMP2);
+	TMP2 += X;
+	TMP = read(TMP2 & 0xff);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	A ^= read_special(TMP);
+	set_nz(A);
+	prefetch();
+
+xavadc_idx
+	TMP2 = read_pc();
+	read(TMP2);
+	TMP2 += X;
+	TMP = read(TMP2 & 0xff);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	do_adc(read_special(TMP));
+	prefetch();
+
+xavlda_idx
+	TMP2 = read_pc();
+	read(TMP2);
+	TMP2 += X;
+	TMP = read(TMP2 & 0xff);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	A = read_special(TMP);
+	set_nz(A);
+	prefetch();
+
+xavcmp_idx
+	TMP2 = read_pc();
+	read(TMP2);
+	TMP2 += X;
+	TMP = read(TMP2 & 0xff);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	do_cmp(A, read_special(TMP));
+	prefetch();
+
+xavsbc_idx
+	TMP2 = read_pc();
+	read(TMP2);
+	TMP2 += X;
+	TMP = read(TMP2 & 0xff);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	do_sbc(read_special(TMP));
+	prefetch();
+
+xavsta_idy
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	read(set_l(TMP, TMP+Y));
+	write(TMP+Y, A); // TODO
+	prefetch();
+
+xavsta_idx
+	TMP2 = read_pc();
+	read(TMP2);
+	TMP2 += X;
+	TMP = read(TMP2 & 0xff);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	write(TMP, A); // TODO
 	prefetch();

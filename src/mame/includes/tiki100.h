@@ -12,6 +12,7 @@
 #include "machine/z80daisy.h"
 #include "formats/tiki100_dsk.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/z80ctc.h"

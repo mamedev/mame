@@ -10,10 +10,11 @@
 
 #pragma once
 
+#include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/k053252.h"
 #include "video/k051316.h"
-#include "video/konami_helper.h"
 #include "video/k053244_k053245.h"
+#include "video/konami_helper.h"
 
 class rollerg_state : public driver_device
 {
@@ -40,7 +41,7 @@ private:
 	emu_timer *m_nmi_timer;
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
+	required_device<konami_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k05324x_device> m_k053244;
 	required_device<k051316_device> m_k051316;

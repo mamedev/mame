@@ -139,13 +139,12 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
+	void es5506_clock_changed(u32 data);
 	void kt_map(address_map &map);
 };
 
 void esqkt_state::machine_start()
 {
-	// tell the pump about the ESP chips
-	m_pump->set_esp(m_esp);
 }
 
 void esqkt_state::machine_reset()
@@ -192,6 +191,11 @@ READ16_MEMBER(esqkt_state::esq5506_read_adc)
 	{
 		return 0x7f00;              // vBattery
 	}
+}
+
+void esqkt_state::es5506_clock_changed(u32 data)
+{
+	m_pump->set_unscaled_clock(data);
 }
 
 WRITE_LINE_MEMBER(esqkt_state::duart_irq_handler)
@@ -244,10 +248,12 @@ void esqkt_state::kt(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	ESQ_5505_5510_PUMP(config, m_pump, 16_MHz_XTAL / (16 * 32));
+	m_pump->set_esp(m_esp);
 	m_pump->add_route(0, "lspeaker", 1.0);
 	m_pump->add_route(1, "rspeaker", 1.0);
 
 	auto &es5506a(ES5506(config, "ensoniq1", 16_MHz_XTAL));
+	es5506a.sample_rate_changed().set(FUNC(esqkt_state::es5506_clock_changed)); // TODO : Sync with 2 chips?
 	es5506a.set_region0("waverom");  /* Bank 0 */
 	es5506a.set_region1("waverom2"); /* Bank 1 */
 	es5506a.set_region2("waverom3"); /* Bank 0 */

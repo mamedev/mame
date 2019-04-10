@@ -231,7 +231,7 @@ int sms_light_phaser_device::bright_aim_area( emu_timer *timer, int lgun_x, int 
 				/* brightness of the lightgray color in the frame drawn by Light Phaser games */
 				const uint8_t sensor_min_brightness = 0x7f;
 
-				color = m_port->pixel_r();
+				color = screen().pixel(beam_x, beam_y);
 
 				/* reference: http://www.w3.org/TR/AERT#color-contrast */
 				brightness = (color.r() * 0.299) + (color.g() * 0.587) + (color.b() * 0.114);

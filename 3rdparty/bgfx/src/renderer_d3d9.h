@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -240,7 +240,7 @@ namespace bgfx { namespace d3d9
 
 			switch (m_type)
 			{
-			case 0:  DX_RELEASE(m_vertexShader, 0);
+			case 0:  DX_RELEASE(m_vertexShader, 0); BX_FALLTHROUGH;
 			default: DX_RELEASE(m_pixelShader,  0);
 			}
 		}
@@ -259,17 +259,19 @@ namespace bgfx { namespace d3d9
 
 	struct ProgramD3D9
 	{
-		void create(const ShaderD3D9& _vsh, const ShaderD3D9& _fsh)
+		void create(const ShaderD3D9* _vsh, const ShaderD3D9* _fsh)
 		{
-			BX_CHECK(NULL != _vsh.m_vertexShader, "Vertex shader doesn't exist.");
-			m_vsh = &_vsh;
+			m_vsh = _vsh;
+			m_fsh = _fsh;
 
-			BX_CHECK(NULL != _fsh.m_pixelShader, "Fragment shader doesn't exist.");
-			m_fsh = &_fsh;
+			bx::memCopy(&m_predefined[0], _vsh->m_predefined, _vsh->m_numPredefined*sizeof(PredefinedUniform) );
+			m_numPredefined = _vsh->m_numPredefined;
 
-			bx::memCopy(&m_predefined[0], _vsh.m_predefined, _vsh.m_numPredefined*sizeof(PredefinedUniform) );
-			bx::memCopy(&m_predefined[_vsh.m_numPredefined], _fsh.m_predefined, _fsh.m_numPredefined*sizeof(PredefinedUniform) );
-			m_numPredefined = _vsh.m_numPredefined + _fsh.m_numPredefined;
+			if (NULL != _fsh)
+			{
+				bx::memCopy(&m_predefined[_vsh->m_numPredefined], _fsh->m_predefined, _fsh->m_numPredefined*sizeof(PredefinedUniform) );
+				m_numPredefined += _fsh->m_numPredefined;
+			}
 		}
 
 		void destroy()
@@ -312,11 +314,11 @@ namespace bgfx { namespace d3d9
 		void dirty(uint8_t _side, const Rect& _rect, uint16_t _z, uint16_t _depth);
 		IDirect3DSurface9* getSurface(uint8_t _side = 0, uint8_t _mip = 0) const;
 
-		void create(const Memory* _mem, uint32_t _flags, uint8_t _skip);
+		void create(const Memory* _mem, uint64_t _flags, uint8_t _skip);
 
 		void destroy(bool _resize = false)
 		{
-			if (0 == (m_flags & BGFX_TEXTURE_INTERNAL_SHARED) )
+			if (0 == (m_flags & BGFX_SAMPLER_INTERNAL_SHARED) )
 			{
 				if (_resize)
 				{
@@ -338,7 +340,7 @@ namespace bgfx { namespace d3d9
 		void overrideInternal(uintptr_t _ptr)
 		{
 			destroy();
-			m_flags |= BGFX_TEXTURE_INTERNAL_SHARED;
+			m_flags |= BGFX_SAMPLER_INTERNAL_SHARED;
 			m_ptr = (IDirect3DBaseTexture9*)_ptr;
 		}
 
@@ -346,7 +348,7 @@ namespace bgfx { namespace d3d9
 		void update(uint8_t _side, uint8_t _mip, const Rect& _rect, uint16_t _z, uint16_t _depth, uint16_t _pitch, const Memory* _mem);
 		void updateEnd();
 		void commit(uint8_t _stage, uint32_t _flags, const float _palette[][4]);
-		void resolve() const;
+		void resolve(uint8_t _resolve) const;
 
 		void preReset();
 		void postReset();
@@ -369,7 +371,7 @@ namespace bgfx { namespace d3d9
 			IDirect3DCubeTexture9*   m_stagingCube;
 		};
 
-		uint32_t m_flags;
+		uint64_t m_flags;
 		uint32_t m_width;
 		uint32_t m_height;
 		uint32_t m_depth;
@@ -393,7 +395,7 @@ namespace bgfx { namespace d3d9
 		}
 
 		void create(uint8_t _num, const Attachment* _attachment);
-		void create(uint16_t _denseIdx, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _depthFormat);
+		void create(uint16_t _denseIdx, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _format, TextureFormat::Enum _depthFormat);
 		uint16_t destroy();
 		HRESULT present();
 		void resolve() const;

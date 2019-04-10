@@ -177,6 +177,18 @@ public:
 	{
 		set_type(type);
 	}
+	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, screen_type_enum type, rgb_t color)
+		: screen_device(mconfig, tag, owner, u32(0))
+	{
+		set_type(type);
+		set_color(color);
+	}
+	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *region)
+		: screen_device(mconfig, tag, owner, u32(0))
+	{
+		set_type(SCREEN_TYPE_SVG);
+		set_svg_region(region);
+	}
 	~screen_device();
 
 	// configuration readers
@@ -217,6 +229,7 @@ public:
 	void set_vblank_time(attoseconds_t time) { m_vblank = time; m_oldstyle_vblank_supplied = true; }
 	void set_size(u16 width, u16 height) { m_width = width; m_height = height; }
 	void set_visarea(s16 minx, s16 maxx, s16 miny, s16 maxy) { m_visarea.set(minx, maxx, miny, maxy); }
+	void set_visarea_full() { m_visarea.set(0, m_width - 1, 0, m_height - 1); } // call after set_size
 	void set_default_position(double xscale, double xoffs, double yscale, double yoffs) {
 		m_xscale = xscale;
 		m_xoffset = xoffs;
@@ -258,6 +271,7 @@ public:
 
 	template<class Object> devcb_base &set_screen_vblank(Object &&object) { return m_screen_vblank.set_callback(std::forward<Object>(object)); }
 	auto screen_vblank() { return m_screen_vblank.bind(); }
+	auto scanline() { m_video_attributes |= VIDEO_UPDATE_SCANLINE; return m_scanline_cb.bind(); }
 	template<typename T> void set_palette(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 	void set_video_attributes(u32 flags) { m_video_attributes = flags; }
 	void set_color(rgb_t color) { m_color = color; }
@@ -268,6 +282,7 @@ public:
 	bitmap_ind8 &priority() { return m_priority; }
 	device_palette_interface &palette() const { assert(m_palette != nullptr); return *m_palette; }
 	bool has_palette() const { return m_palette != nullptr; }
+	screen_bitmap &curbitmap() { return m_bitmap[m_curtexture]; }
 
 	// dynamic configuration
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
@@ -289,6 +304,10 @@ public:
 	attotime scan_period() const { return attotime(0, m_scantime); }
 	attotime frame_period() const { return attotime(0, m_frame_period); }
 	u64 frame_number() const { return m_frame_number; }
+
+	// pixel-level access
+	u32 pixel(s32 x, s32 y);
+	void pixels(u32* buffer);
 
 	// updating
 	int partial_updates() const { return m_partial_updates_this_frame; }
@@ -350,6 +369,7 @@ private:
 	screen_update_ind16_delegate m_screen_update_ind16; // screen update callback (16-bit palette)
 	screen_update_rgb32_delegate m_screen_update_rgb32; // screen update callback (32-bit RGB)
 	devcb_write_line    m_screen_vblank;            // screen vblank line callback
+	devcb_write32       m_scanline_cb;              // screen scanline callback
 	optional_device<device_palette_interface> m_palette;      // our palette
 	u32                 m_video_attributes;         // flags describing the video system
 	const char *        m_svg_region;               // the region in which the svg data is in
@@ -513,21 +533,11 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
 #define MCFG_SCREEN_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, SCREEN, SCREEN_TYPE_##_type)
 
-#define MCFG_SCREEN_ADD_MONOCHROME(_tag, _type, _color) \
-	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
-	MCFG_SCREEN_TYPE(_type) \
-	MCFG_SCREEN_COLOR(_color)
-
 #define MCFG_SCREEN_MODIFY(_tag) \
 	MCFG_DEVICE_MODIFY(_tag)
 
 #define MCFG_SCREEN_TYPE(_type) \
 	downcast<screen_device &>(*device).set_type(SCREEN_TYPE_##_type);
-
-#define MCFG_SCREEN_SVG_ADD(_tag, _region) \
-	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
-	MCFG_SCREEN_TYPE(SVG) \
-	downcast<screen_device &>(*device).set_svg_region(_region);
 
 #define MCFG_SCREEN_RAW_PARAMS(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart) \
 	downcast<screen_device &>(*device).set_raw(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart);
@@ -543,8 +553,6 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
 
 #define MCFG_SCREEN_VISIBLE_AREA(_minx, _maxx, _miny, _maxy) \
 	downcast<screen_device &>(*device).set_visarea(_minx, _maxx, _miny, _maxy);
-#define MCFG_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)  \
-	downcast<screen_device &>(*device).set_default_position(_xscale, _xoffs, _yscale, _yoffs);
 #define MCFG_SCREEN_UPDATE_DRIVER(_class, _method) \
 	downcast<screen_device &>(*device).set_screen_update(&_class::_method, #_class "::" #_method);
 #define MCFG_SCREEN_UPDATE_DEVICE(_device, _class, _method) \
@@ -557,7 +565,5 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
 	downcast<screen_device &>(*device).set_palette(finder_base::DUMMY_TAG);
 #define MCFG_SCREEN_VIDEO_ATTRIBUTES(_flags) \
 	downcast<screen_device &>(*device).set_video_attributes(_flags);
-#define MCFG_SCREEN_COLOR(_color) \
-	downcast<screen_device &>(*device).set_color(_color);
 
 #endif // MAME_EMU_SCREEN_H

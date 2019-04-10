@@ -261,12 +261,12 @@ WRITE8_MEMBER(faceoffh_state::ay_w)
 
 	if (m_ay_cmd == 0x00 && data == 0x03)
 	{
-		m_aysnd->address_w(space, offset, m_ay_data, mem_mask);
+		m_aysnd->address_w(m_ay_data);
 //      logerror("%s: AY addr = %02X\n", machine().describe_context(), m_ay_data);
 	}
 	else if (m_ay_cmd == 0x00 && data == 0x02)
 	{
-		m_aysnd->data_w(space, offset, m_ay_data, mem_mask);
+		m_aysnd->data_w(m_ay_data);
 //      logerror("%s: AY data = %02X\n", machine().describe_context(), m_ay_data);
 	}
 	m_ay_cmd = data;

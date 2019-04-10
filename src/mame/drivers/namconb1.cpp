@@ -274,7 +274,6 @@ GFX:                Custom 145     ( 80 pin PQFP)
 #include "includes/namconb1.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/namcomcu.h"
 #include "sound/c352.h"
 
 #include "speaker.h"
@@ -701,8 +700,8 @@ void namconb1_state::namconb1_am(address_map &map)
 	map(0x580000, 0x5807ff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
 	map(0x600000, 0x61ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram");
 	map(0x620000, 0x620007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
-	map(0x640000, 0x64ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram_r), FUNC(namco_c123tmap_device::videoram_w));
-	map(0x660000, 0x66003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control_r), FUNC(namco_c123tmap_device::control_w));
+	map(0x640000, 0x64ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram16_r), FUNC(namco_c123tmap_device::videoram16_w));
+	map(0x660000, 0x66003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control16_r), FUNC(namco_c123tmap_device::control16_w));
 	map(0x680000, 0x68000f).ram().share("spritebank32");
 	map(0x6e0000, 0x6e001f).r(FUNC(namconb1_state::custom_key_r)).nopw();
 	map(0x700000, 0x707fff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write));
@@ -719,8 +718,8 @@ void namconb1_state::namconb2_am(address_map &map)
 	map(0x600000, 0x61ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram");
 	map(0x620000, 0x620007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
 	map(0x640000, 0x64000f).ram(); /* unknown xy offset */
-	map(0x680000, 0x68ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram_r), FUNC(namco_c123tmap_device::videoram_w));
-	map(0x6c0000, 0x6c003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control_r), FUNC(namco_c123tmap_device::control_w));
+	map(0x680000, 0x68ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram16_r), FUNC(namco_c123tmap_device::videoram16_w));
+	map(0x6c0000, 0x6c003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control16_r), FUNC(namco_c123tmap_device::control16_w));
 	map(0x700000, 0x71ffff).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
 	map(0x740000, 0x74001f).rw(m_c169roz, FUNC(namco_c169roz_device::control_r), FUNC(namco_c169roz_device::control_w));
 	map(0x800000, 0x807fff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write));
@@ -797,58 +796,10 @@ READ8_MEMBER(namconb1_state::port7_r)
 // Is this madness?  No, this is Namco.  They didn't have enough digital ports for all 4 players,
 // so the 8 bits of player 3 got routed to the 8 analog inputs.  +5V on the analog input will
 // register full scale, so it works...
-READ8_MEMBER(namconb1_state::dac7_r)// bit 7
+template <int Bit>
+uint16_t namconb1_state::dac_bit_r()
 {
-	return m_p3.read_safe(0xff)&0x80;
-}
-
-READ8_MEMBER(namconb1_state::dac6_r)// bit 3
-{
-	return (m_p3.read_safe(0xff)<<1)&0x80;
-}
-
-READ8_MEMBER(namconb1_state::dac5_r)// bit 2
-{
-	return (m_p3.read_safe(0xff)<<2)&0x80;
-}
-
-READ8_MEMBER(namconb1_state::dac4_r)// bit 1
-{
-	return (m_p3.read_safe(0xff)<<3)&0x80;
-}
-
-READ8_MEMBER(namconb1_state::dac3_r)// bit 0
-{
-	return (m_p3.read_safe(0xff)<<4)&0x80;
-}
-
-READ8_MEMBER(namconb1_state::dac2_r)// bit 4
-{
-	return (m_p3.read_safe(0xff)<<5)&0x80;
-}
-
-READ8_MEMBER(namconb1_state::dac1_r)// bit 5
-{
-	return (m_p3.read_safe(0xff)<<6)&0x80;
-}
-
-READ8_MEMBER(namconb1_state::dac0_r)// bit 6
-{
-	return (m_p3.read_safe(0xff)<<7)&0x80;
-}
-
-void namconb1_state::namcoc75_io(address_map &map)
-{
-	map(M37710_PORT6, M37710_PORT6).rw(FUNC(namconb1_state::port6_r), FUNC(namconb1_state::port6_w));
-	map(M37710_PORT7, M37710_PORT7).r(FUNC(namconb1_state::port7_r));
-	map(M37710_ADC7_L, M37710_ADC7_L).r(FUNC(namconb1_state::dac7_r));
-	map(M37710_ADC6_L, M37710_ADC6_L).r(FUNC(namconb1_state::dac6_r));
-	map(M37710_ADC5_L, M37710_ADC5_L).r(FUNC(namconb1_state::dac5_r));
-	map(M37710_ADC4_L, M37710_ADC4_L).r(FUNC(namconb1_state::dac4_r));
-	map(M37710_ADC3_L, M37710_ADC3_L).r(FUNC(namconb1_state::dac3_r));
-	map(M37710_ADC2_L, M37710_ADC2_L).r(FUNC(namconb1_state::dac2_r));
-	map(M37710_ADC1_L, M37710_ADC1_L).r(FUNC(namconb1_state::dac1_r));
-	map(M37710_ADC0_L, M37710_ADC0_L).r(FUNC(namconb1_state::dac0_r));
+	return (m_p3.read_safe(0xff)<<(7-Bit))&0x80;
 }
 
 
@@ -1036,22 +987,33 @@ void namconb1_state::machine_reset()
 
 /***************************************************************/
 
-MACHINE_CONFIG_START(namconb1_state::namconb1)
-	MCFG_DEVICE_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(namconb1_am)
+void namconb1_state::namconb1(machine_config &config)
+{
+	M68EC020(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namconb1_state::namconb1_am);
 
-	MCFG_DEVICE_ADD("mcu", NAMCO_C75, MASTER_CLOCK/3)
-	MCFG_DEVICE_PROGRAM_MAP(namcoc75_am)
-	MCFG_DEVICE_IO_MAP(namcoc75_io)
+	NAMCO_C75(config, m_mcu, MASTER_CLOCK/3);
+	m_mcu->set_addrmap(AS_PROGRAM, &namconb1_state::namcoc75_am);
+	m_mcu->p6_in_cb().set(FUNC(namconb1_state::port6_r));
+	m_mcu->p6_out_cb().set(FUNC(namconb1_state::port6_w));
+	m_mcu->p7_in_cb().set(FUNC(namconb1_state::port7_r));
+	m_mcu->an7_cb().set(FUNC(namconb1_state::dac_bit_r<7>));
+	m_mcu->an6_cb().set(FUNC(namconb1_state::dac_bit_r<3>));
+	m_mcu->an5_cb().set(FUNC(namconb1_state::dac_bit_r<2>));
+	m_mcu->an4_cb().set(FUNC(namconb1_state::dac_bit_r<1>));
+	m_mcu->an3_cb().set(FUNC(namconb1_state::dac_bit_r<0>));
+	m_mcu->an2_cb().set(FUNC(namconb1_state::dac_bit_r<4>));
+	m_mcu->an1_cb().set(FUNC(namconb1_state::dac_bit_r<5>));
+	m_mcu->an0_cb().set(FUNC(namconb1_state::dac_bit_r<6>));
 
 	EEPROM_2816(config, "eeprom");
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namconb1_state, scantimer, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(namconb1_state::scantimer), "screen", 0, 1);
 
 	// has to be 60 hz or music will go crazy in nebulray, vshoot, gslugrs*
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq0", namconb1_state, mcu_irq0_cb, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namconb1_state, mcu_irq2_cb, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_adc", namconb1_state, mcu_adc_cb, attotime::from_hz(60))
+	TIMER(config, "mcu_irq0").configure_periodic(FUNC(namconb1_state::mcu_irq0_cb), attotime::from_hz(60));
+	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namconb1_state::mcu_irq2_cb), attotime::from_hz(60));
+	TIMER(config, "mcu_adc").configure_periodic(FUNC(namconb1_state::mcu_adc_cb), attotime::from_hz(60));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK/8, 384, 0, 288, 264, 0, 224);
@@ -1059,12 +1021,12 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 	m_screen->screen_vblank().set(m_c355spr, FUNC(namco_c355spr_device::vblank));
 	m_screen->set_palette(m_c116);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_c116, gfx_namconb1)
+	GFXDECODE(config, "gfxdecode", m_c116, gfx_namconb1);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
-	m_c355spr->set_is_namcofl(false);
+	m_c355spr->set_scroll_offsets(0x26, 0x19);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB1objcode2tile, this));
 	m_c355spr->set_palxor(0x0);
 	m_c355spr->set_buffer(2); // triple buffered
@@ -1082,17 +1044,19 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("c352", C352, MASTER_CLOCK/2, 288)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
-	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(namconb1_state::namconb2)
+	c352_device &c352(C352(config, "c352", MASTER_CLOCK/2, 288));
+	c352.add_route(0, "lspeaker", 1.00);
+	c352.add_route(1, "rspeaker", 1.00);
+	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
+	//c352.add_route(3, "rspeaker", 1.00);
+}
+
+void namconb1_state::namconb2(machine_config &config)
+{
 	namconb1(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(namconb2_am)
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &namconb1_state::namconb2_am);
 
 	m_screen->set_screen_update(FUNC(namconb1_state::screen_update_namconb2));
 
@@ -1101,10 +1065,10 @@ MACHINE_CONFIG_START(namconb1_state::namconb2)
 	m_c169roz->set_is_namcofl(false);
 	m_c169roz->set_ram_words(0x20000/2);
 	m_c169roz->set_color_base(0x1800);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namconb1_state::machbrkr)
+void namconb1_state::machbrkr(machine_config &config)
+{
 	namconb2(config);
 
 	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namconb1_state::NB2TilemapCB_machbrkr, this));
@@ -1114,9 +1078,10 @@ MACHINE_CONFIG_START(namconb1_state::machbrkr)
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_machbrkr, this));
 
 	MCFG_VIDEO_START_OVERRIDE(namconb1_state,machbrkr)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(namconb1_state::outfxies)
+void namconb1_state::outfxies(machine_config &config)
+{
 	namconb2(config);
 
 	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namconb1_state::NB2TilemapCB_outfxies, this));
@@ -1126,18 +1091,18 @@ MACHINE_CONFIG_START(namconb1_state::outfxies)
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_outfxies, this));
 
 	MCFG_VIDEO_START_OVERRIDE(namconb1_state,outfxies)
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************/
 
-ROM_START( ptblank ) /* World set using 4Mb sound data rom (verified) */
+ROM_START( ptblank ) /* World set using 4Mb sound data ROM (verified) */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "gn2_mprlb.15b", 0x00002, 0x80000, CRC(fe2d9425) SHA1(51b166a629cbb522720d63720558816b496b6b76) )
 	ROM_LOAD32_WORD( "gn2_mprub.13b", 0x00000, 0x80000, CRC(3bf4985a) SHA1(f559e0d5f55d23d886fe61bd7d5ca556acc7f87c) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either rom is correct */
-//  ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb rom at 0x00000-0x1ffff */
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either ROM is correct */
+//  ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb ROM at 0x00000-0x1ffff */
 	ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -1167,8 +1132,8 @@ ROM_START( ptblanka ) /* World set using non standard ROM labels (NR is Namco's 
 	ROM_LOAD32_WORD( "nr3_spr0.15b", 0x00002, 0x80000, CRC(fe2d9425) SHA1(51b166a629cbb522720d63720558816b496b6b76) ) // == gn2_mprlb.15b
 	ROM_LOAD32_WORD( "nr2_spr0.13b", 0x00000, 0x80000, CRC(3bf4985a) SHA1(f559e0d5f55d23d886fe61bd7d5ca556acc7f87c) ) // == gn2_mprub.12b
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either rom is correct */
-//  ROM_LOAD( "nr1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb rom at 0x00000-0x1ffff */
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either ROM is correct */
+//  ROM_LOAD( "nr1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb ROM at 0x00000-0x1ffff */
 	ROM_LOAD( "nr1_spr0.5b", 0, 0x80000, CRC(a0bde3fb) SHA1(b5fac1d0339b1df6b8880fcd7aa2725a774765a4) ) /* 4Megabit, same data at 0x00000-0x1ffff repeated 4 time */
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -1193,13 +1158,13 @@ ROM_START( ptblanka ) /* World set using non standard ROM labels (NR is Namco's 
 	ROM_LOAD( "eeprom", 0x0000, 0x0800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
 ROM_END
 
-ROM_START( gunbuletw ) /* World set using 4Mb sound data rom (verified) */
+ROM_START( gunbuletw ) /* World set using 4Mb sound data ROM (verified) */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "gn3_mprlb.15b", 0x00002, 0x80000, CRC(9260fce5) SHA1(064579be1ac90e04082a8b403c6adf35dbb46a7e) )
 	ROM_LOAD32_WORD( "gn3_mprub.13b", 0x00000, 0x80000, CRC(6c1ac697) SHA1(7b52b5ef8154a5d741ac24673f3e6bbfa246a494) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either rom is correct */
-//  ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb rom at 0x00000-0x1ffff */
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either ROM is correct */
+//  ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb ROM at 0x00000-0x1ffff */
 	ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -1224,13 +1189,13 @@ ROM_START( gunbuletw ) /* World set using 4Mb sound data rom (verified) */
 	ROM_LOAD( "eeprom", 0x0000, 0x0800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
 ROM_END
 
-ROM_START( gunbuletj ) /* Japanese set using 1Mb sound data rom (verified) */
+ROM_START( gunbuletj ) /* Japanese set using 1Mb sound data ROM (verified) */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "gn1_mprl.15b", 0x00002, 0x80000, CRC(f99e309e) SHA1(3fe0ddf756e6849f8effc7672456cbe32f65c98a) )
 	ROM_LOAD32_WORD( "gn1_mpru.13b", 0x00000, 0x80000, CRC(72a4db07) SHA1(8c5e1e51cd961b311d03f7b21f36a5bd5e8e9104) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either rom is correct */
-	ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb rom at 0x00000-0x1ffff */
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either ROM is correct */
+	ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb ROM at 0x00000-0x1ffff */
 //  ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -1481,20 +1446,20 @@ ROM Label       Label     Type
 GS1MPRU.13B     PRGU      27C240        \ Main program
 GS1MPRL.15B     PRGL      27C240        /
 GS1SPR0.5B      SPRG      27C240        Sound program, linked to 75, C351 and C352
-GS1VOI-0.5J     VOICE     16M MASK      Sound voices
-GS1CHR-0.8J     CHR0      8M MASK       Character
-GS1CHR-1.9J     CHR1      8M MASK       Character
-GS1CHR-2.10J    CHR2      8M MASK       Character
-GS1CHR-3.11J    CHR3      8M MASK       Character
-GS1SHA-0.5M     SHAPE     4M MASK       Shape
+GS1VOI-0.5J     VOICE     16M mask      Sound voices
+GS1CHR-0.8J     CHR0      8M mask       Character
+GS1CHR-1.9J     CHR1      8M mask       Character
+GS1CHR-2.10J    CHR2      8M mask       Character
+GS1CHR-3.11J    CHR3      8M mask       Character
+GS1SHA-0.5M     SHAPE     4M mask       Shape
 
 ROMs, MEMEXT OBJ2 PCB  (All ROMs surface mounted)
 ---------------------
 Filename /      PCB       ROM
 ROM Label       Label     Type
 ----------------------------------------
-GS1OBJ-0.IC1    OBJL      16M MASK SOP44
-GS1OBJ-1.IC2    OBJU      16M MASK SOP44
+GS1OBJ-0.IC1    OBJL      16M mask SOP44
+GS1OBJ-1.IC2    OBJU      16M mask SOP44
 
 Note! All ROMs are different to the Great Sluggers '94 set.
 
@@ -1761,10 +1726,10 @@ ou2mprl.11c     PRGL      27C4002       \ Main program
 ou2mpru.11d     PRGU      27C4002       /
 ou1spr0.5b      SPRG      27C240        Sound program, linked to C352 and C382
 ou1voi0.6n      VOICE0    MB8316200B    Sound voices
-ou1shas.12s     SHAPE-S   16M MASK      Shape
-ou1shar.18s     SHAPE-R   16M MASK      Shape
+ou1shas.12s     SHAPE-S   16M mask      Shape
+ou1shar.18s     SHAPE-R   16M mask      Shape
 
-ROMs, MASK ROM PCB (All ROMs surface mounted)
+ROMs, mask ROM PCB (All ROMs surface mounted)
 ------------------
 Filename /      PCB       ROM
 ROM Label       Label     Type

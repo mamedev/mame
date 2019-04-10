@@ -32,8 +32,6 @@ public:
 	// construction/destruction
 	rp5c15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_out_alarm_callback(Object &&cb) { return m_out_alarm_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_clkout_callback(Object &&cb) { return m_out_clkout_cb.set_callback(std::forward<Object>(cb)); }
 	auto alarm() { return m_out_alarm_cb.bind(); }
 	auto clkout() { return m_out_clkout_cb.bind(); }
 

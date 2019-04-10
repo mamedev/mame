@@ -245,11 +245,12 @@ void poly880_state::machine_start()
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(poly880_state::poly880)
+void poly880_state::poly880(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(7'372'800)/8)
-	MCFG_DEVICE_PROGRAM_MAP(poly880_mem)
-	MCFG_DEVICE_IO_MAP(poly880_io)
+	Z80(config, m_maincpu, XTAL(7'372'800)/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &poly880_state::poly880_mem);
+	m_maincpu->set_addrmap(AS_IO, &poly880_state::poly880_io);
 
 	/* video hardware */
 	config.set_default_layout(layout_poly880);
@@ -270,12 +271,12 @@ MACHINE_CONFIG_START(poly880_state::poly880)
 	z80pio_device& pio2(Z80PIO(config, Z80PIO2_TAG, XTAL(7'372'800)/16));
 	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("1K");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

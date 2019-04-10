@@ -168,12 +168,14 @@ public:
 
 	void pitajr(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_rombank;
 
-	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(pitagjr);
+	void pitagjr_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pitajr_mem(address_map &map);
 };
@@ -196,7 +198,7 @@ void pitagjr_state::machine_start()
 	m_rombank->set_entry(1);
 }
 
-PALETTE_INIT_MEMBER(pitagjr_state, pitagjr)
+void pitagjr_state::pitagjr_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -207,23 +209,23 @@ uint32_t pitagjr_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-MACHINE_CONFIG_START(pitagjr_state::pitajr)
+void pitagjr_state::pitajr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD63705, XTAL(2'000'000))   // probably a m6805-based MCU with internal boot ROM
-	MCFG_DEVICE_PROGRAM_MAP(pitajr_mem)
+	HD63705(config, m_maincpu, XTAL(2'000'000));   // probably a m6805-based MCU with internal boot ROM
+	m_maincpu->set_addrmap(AS_PROGRAM, &pitagjr_state::pitajr_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(pitagjr_state, screen_update)
-	MCFG_SCREEN_SIZE( 200, 100 )    // FIXME
-	MCFG_SCREEN_VISIBLE_AREA( 0, 200-1, 0, 100-1 )
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(pitagjr_state::screen_update));
+	screen.set_size(200, 100);    // FIXME
+	screen.set_visarea(0, 200-1, 0, 100-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(pitagjr_state, pitagjr)
-MACHINE_CONFIG_END
+	PALETTE(config, "palette", FUNC(pitagjr_state::pitagjr_palette), 2);
+}
 
 /* ROM definition */
 

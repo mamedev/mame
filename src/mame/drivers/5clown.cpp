@@ -459,8 +459,8 @@
 class _5clown_state : public driver_device
 {
 public:
-	_5clown_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	_5clown_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_ay8910(*this, "ay8910"),
@@ -474,6 +474,10 @@ public:
 	void fclown(machine_config &config);
 
 	void init_fclown();
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -505,11 +509,9 @@ private:
 	DECLARE_WRITE8_MEMBER(trigsnd_w);
 	DECLARE_READ8_MEMBER(pia0_b_r);
 	DECLARE_READ8_MEMBER(pia1_b_r);
-	DECLARE_WRITE8_MEMBER(fclown_ay8910_w);
+	void fclown_ay8910_w(offs_t offset, u8 data);
 	TILE_GET_INFO_MEMBER(get_fclown_tile_info);
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(_5clown);
+	void _5clown_palette(palette_device &palette) const;
 	uint32_t screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void fcaudio_map(address_map &map);
@@ -578,42 +580,36 @@ uint32_t _5clown_state::screen_update_fclown(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(_5clown_state, _5clown)
+void _5clown_state::_5clown_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-/*
-    7654 3210
-    ---- ---x   RED component.
-    ---- --x-   GREEN component.
-    ---- -x--   BLUE component.
-    ---- x---   background killer.
-    xxxx ----   unused.
-*/
-	int i;
+	/*
+	    7654 3210
+	    ---- ---x   RED component.
+	    ---- --x-   GREEN component.
+	    ---- -x--   BLUE component.
+	    ---- x---   background killer.
+	    xxxx ----   unused.
+	*/
 
 	/* 0000KBGR */
 
-	if (color_prom == nullptr) return;
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
 
-	for (i = 0;i < m_palette->entries();i++)
+	for (int i = 0; i < m_palette->entries(); i++)
 	{
-		int bit0, bit1, bit2, bit3, r, g, b, bk;
+		// background killer
+		int const bk = BIT(color_prom[i], 3);
 
-		/* background killer */
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		bk = bit3;
+		// red component
+		int const r = BIT(color_prom[i], 0) * 0xff;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		r = (bit0 * 0xff);
+		// green component
+		int const g = BIT(color_prom[i], 1) * 0xff;
 
-		/* green component */
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		g = (bit1 * 0xff);
-
-		/* blue component */
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		b = bk * (bit2 * 0xff);
+		// blue component
+		int const b = bk * BIT(color_prom[i], 2) * 0xff;
 
 		m_palette->set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -718,10 +714,10 @@ WRITE8_MEMBER(_5clown_state::cpu_d800_w)
 *  AY3-8910 R/W Handlers        *
 ********************************/
 
-WRITE8_MEMBER(_5clown_state::fclown_ay8910_w)
+void _5clown_state::fclown_ay8910_w(offs_t offset, u8 data)
 {
-	m_ay8910->address_w(space, 0, offset);
-	m_ay8910->data_w(space, 0, data);
+	m_ay8910->address_w(offset);
+	m_ay8910->data_w(data);
 }
 
 
@@ -746,7 +742,7 @@ WRITE8_MEMBER(_5clown_state::snd_800_w)
 
 	if (m_snd_latch_0a02 == 0x00)
 	{
-		fclown_ay8910_w(space, m_ay8910_addr, m_snd_latch_0800);
+		fclown_ay8910_w(m_ay8910_addr, m_snd_latch_0800);
 	}
 }
 
@@ -1024,14 +1020,14 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(_5clown_state::fclown)
-
+void _5clown_state::fclown(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/8)  /* guess, seems ok */
-	MCFG_DEVICE_PROGRAM_MAP(fclown_map)
+	M6502(config, m_maincpu, MASTER_CLOCK/8);  /* guess, seems ok */
+	m_maincpu->set_addrmap(AS_PROGRAM, &_5clown_state::fclown_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, MASTER_CLOCK/8) /* guess, seems ok */
-	MCFG_DEVICE_PROGRAM_MAP(fcaudio_map)
+	M6502(config, m_audiocpu, MASTER_CLOCK/8); /* guess, seems ok */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &_5clown_state::fcaudio_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1047,33 +1043,30 @@ MACHINE_CONFIG_START(_5clown_state::fclown)
 	pia1.writepb_handler().set(FUNC(_5clown_state::mux_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(_5clown_state, screen_update_fclown)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((39+1)*8, (31+1)*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(_5clown_state::screen_update_fclown));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fclown)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(_5clown_state, _5clown)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fclown);
+	PALETTE(config, m_palette, FUNC(_5clown_state::_5clown_palette), 256);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/16)); /* guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/8)        /* guess, seems ok */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	AY8910(config, m_ay8910, MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 1.00);        /* guess, seems ok */
 
-	MCFG_DEVICE_ADD("oki6295", OKIM6295, MASTER_CLOCK/12, okim6295_device::PIN7_LOW)    /* guess, seems ok; pin7 guessed, seems ok */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.20)
-
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki6295", MASTER_CLOCK/12, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.20);    /* guess, seems ok; pin7 guessed, seems ok */
+}
 
 
 /*************************

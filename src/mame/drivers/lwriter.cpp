@@ -340,7 +340,7 @@ WRITE_LINE_MEMBER(lwriter_state::via_int_w)
 {
 	logerror(" VIA: INT output set to %d!\n", state);
 	//TODO: this is likely wrong, the VPA pin which controls whether autovector is enabled or not is controlled by PAL U8D, which is not dumped.
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_1, (state ? ASSERT_LINE : CLEAR_LINE), M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line(M68K_IRQ_1, (state ? ASSERT_LINE : CLEAR_LINE));
 }
 
 /* scc stuff */

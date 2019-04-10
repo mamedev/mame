@@ -12,18 +12,6 @@
 #include "cpu/i86/i86.h"
 #include "formats/pc_dsk.h"
 
-#define VERBOSE_DBG 0
-
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f: %-24s",machine().time().as_double(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS

@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include "machine/iopintc.h"
 
 class iop_spu_device : public device_t, public device_sound_interface

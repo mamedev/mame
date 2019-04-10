@@ -362,19 +362,19 @@ uint32_t trs80_state::screen_update_radionic(screen_device &screen, bitmap_ind16
 ***************************************************************************/
 
 /* Levels are unknown - guessing */
-static const rgb_t lnw80_palette[] =
+static constexpr rgb_t lnw80_pens[] =
 {
-	rgb_t(220, 220, 220), // white
-	rgb_t(0, 175, 0), // green
-	rgb_t(200, 200, 0), // yellow
-	rgb_t(255, 0, 0), // red
-	rgb_t(255, 0, 255), // magenta
-	rgb_t(0, 0, 175), // blue
-	rgb_t(0, 255, 255), // cyan
-	rgb_t(0, 0, 0), // black
+	{ 220, 220, 220 }, // white
+	{   0, 175,   0 }, // green
+	{ 200, 200,   0 }, // yellow
+	{ 255,   0,   0 }, // red
+	{ 255,   0, 255 }, // magenta
+	{   0,   0, 175 }, // blue
+	{   0, 255, 255 }, // cyan
+	{   0,   0,   0 }  // black
 };
 
-PALETTE_INIT_MEMBER(trs80_state,lnw80)
+void trs80_state::lnw80_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, lnw80_palette, ARRAY_LENGTH(lnw80_palette));
+	palette.set_pen_colors(0, lnw80_pens);
 }

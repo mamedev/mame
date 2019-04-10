@@ -42,6 +42,8 @@ protected:
 	required_device<cpu_device> m_cpu;
 	required_device<msm5205_device> m_adpcm1;
 	optional_device<msm5205_device> m_adpcm2;
+	required_device<ay8910_device> m_ay_45L;
+	required_device<ay8910_device> m_ay_45M;
 
 private:
 	// internal state
@@ -50,8 +52,6 @@ private:
 
 	uint8_t           m_soundlatch;
 
-	required_device<ay8910_device> m_ay_45L;
-	required_device<ay8910_device> m_ay_45M;
 	optional_device<netlist_mame_logic_input_device> m_audio_BD;
 	optional_device<netlist_mame_logic_input_device> m_audio_SD;
 	optional_device<netlist_mame_logic_input_device> m_audio_OH;

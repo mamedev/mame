@@ -14,14 +14,13 @@
 #pragma once
 
 #include "machine/ram.h"
-#include "emupal.h"
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class agat7video_device : public device_t
+class agat7video_device : public device_t, public device_palette_interface
 {
 public:
 	template <typename T, typename U>
@@ -42,6 +41,8 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	virtual u32 palette_entries() const override { return 16; }
+
 	void text_update_lores(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void text_update_hires(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void graph_update_mono(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
@@ -55,10 +56,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_PALETTE_INIT(agat7);
-
 	required_device<ram_device> m_ram_dev;
-	required_device<palette_device> m_palette;
 	required_memory_region m_char_region;
 
 	uint8_t *m_char_ptr;

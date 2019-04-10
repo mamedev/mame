@@ -127,6 +127,8 @@ private:
 	required_ioport m_hpib_addr;
 	required_ioport m_testmode;
 
+	output_finder<3> m_leds;
+
 	void index_pulse_cb(floppy_image_device *floppy, int state);
 	int m_intsel;
 	void update_intsel(void);

@@ -1,5 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller
+#ifndef MAME_INCLUDES_LAZERCMD_H
+#define MAME_INCLUDES_LAZERCMD_H
+
+#pragma once
 
 #include "cpu/s2650/s2650.h"
 #include "machine/timer.h"
@@ -28,8 +32,8 @@
 class lazercmd_state : public driver_device
 {
 public:
-	lazercmd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	lazercmd_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac0(*this, "dac0"),
 		m_dac1(*this, "dac1"),
@@ -78,7 +82,7 @@ private:
 	DECLARE_READ8_MEMBER(lazercmd_hardware_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(lazercmd);
+	void lazercmd_palette(palette_device &palette) const;
 	uint32_t screen_update_lazercmd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(lazercmd_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(bbonk_timer);
@@ -89,3 +93,5 @@ private:
 	void lazercmd_portmap(address_map &map);
 	void medlanes_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_LAZERCMD_H

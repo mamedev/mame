@@ -503,74 +503,73 @@ TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::irq_scanline)
 
 	if (scanline == 240 && (m_irq_enable & 4))
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[2]);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[2]); // Z80
 	}
 
 	if (scanline == 0 && (m_irq_enable & 2))
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[1]);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[1]); // Z80
 	}
 }
 
-MACHINE_CONFIG_START(lastbank_state::lastbank)
-
+void lastbank_state::lastbank(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,MASTER_CLOCK/4) //!!! TC0091LVC !!!
-	MCFG_DEVICE_PROGRAM_MAP(lastbank_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lastbank_state, irq_scanline, "screen", 0, 1)
+	Z80(config, m_maincpu, MASTER_CLOCK/4); //!!! TC0091LVC !!!
+	m_maincpu->set_addrmap(AS_PROGRAM, &lastbank_state::lastbank_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(lastbank_state::irq_scanline), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("audiocpu",Z80,MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(lastbank_audio_map)
-	MCFG_DEVICE_IO_MAP(lastbank_audio_io)
+	z80_device &audiocpu(Z80(config, "audiocpu", MASTER_CLOCK/4));
+	audiocpu.set_addrmap(AS_PROGRAM, &lastbank_state::lastbank_audio_map);
+	audiocpu.set_addrmap(AS_IO, &lastbank_state::lastbank_audio_io);
 	// yes, we have no interrupts
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	//MCFG_MACHINE_START_OVERRIDE(lastbank_state,lastbank)
 	//MCFG_MACHINE_RESET_OVERRIDE(lastbank_state,lastbank)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lastbank_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lastbank_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(lastbank_state::screen_update));
+	screen.screen_vblank().set(FUNC(lastbank_state::screen_vblank));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastbank )
-	MCFG_PALETTE_ADD("palette", 0x100)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_lastbank );
+	PALETTE(config, "palette").set_entries(0x100);
 
-	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
-	MCFG_TC0091LVC_GFXDECODE("gfxdecode")
+	TC0091LVC(config, m_vdp, 0);
+	m_vdp->set_gfxdecode_tag("gfxdecode");
 
 //  MCFG_VIDEO_START_OVERRIDE(lastbank_state,lastbank)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch1");
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	MCFG_ES8712_ADD("essnd", 0)
-	MCFG_ES8712_MSM_WRITE_CALLBACK(WRITE8("msm", msm6585_device, data_w))
-	MCFG_ES8712_MSM_TAG("msm")
+	ES8712(config, m_essnd, 0);
+	m_essnd->msm_write_handler().set("msm", FUNC(msm6585_device::data_w));
+	m_essnd->set_msm_tag("msm");
 
-	MCFG_DEVICE_ADD("msm", MSM6585, 640_kHz_XTAL) /* Not verified, It's actually MSM6585? */
-	MCFG_MSM6585_VCK_CALLBACK(WRITELINE("essnd", es8712_device, msm_int))
-	MCFG_MSM6585_PRESCALER_SELECTOR(S40)         /* Not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	msm6585_device &msm(MSM6585(config, "msm", 640_kHz_XTAL)); /* Not verified, It's actually MSM6585? */
+	msm.vck_legacy_callback().set("essnd", FUNC(es8712_device::msm_int));
+	msm.set_prescaler_selector(msm6585_device::S40); /* Not verified */
+	msm.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	// A RTC-62421 is present on the Last Bank PCB. However, the code
 	// that tries to read from it is broken and nonfunctional. The RTC
 	// is also absent from some other games on the same hardware.
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

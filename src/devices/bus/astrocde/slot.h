@@ -12,13 +12,15 @@
  TYPE DEFINITIONS
  ***************************************************************************/
 
+#define ASTROCADESLOT_ROM_REGION_TAG ":cart:rom"
 
 /* PCB */
 enum
 {
 	ASTROCADE_STD = 0,
 	ASTROCADE_256K,
-	ASTROCADE_512K
+	ASTROCADE_512K,
+	ASTROCADE_CASS
 };
 
 
@@ -54,7 +56,16 @@ class astrocade_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	astrocade_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	astrocade_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: astrocade_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	astrocade_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~astrocade_cart_slot_device();
 
 	// image-level overrides
@@ -87,20 +98,7 @@ protected:
 	device_astrocade_cart_interface*       m_cart;
 };
 
-
-
 // device type definition
 DECLARE_DEVICE_TYPE(ASTROCADE_CART_SLOT, astrocade_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define ASTROCADESLOT_ROM_REGION_TAG ":cart:rom"
-
-#define MCFG_ASTROCADE_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, ASTROCADE_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #endif // MAME_BUS_ASTROCADE_SLOT_H

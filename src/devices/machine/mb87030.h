@@ -205,6 +205,7 @@ private:
 	uint32_t m_tc;
 	uint8_t m_exbf;
 
+	uint8_t m_bus_data;
 	uint8_t m_hdb;
 	bool m_hdb_loaded;
 	bool m_send_atn_during_selection;

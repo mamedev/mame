@@ -5,9 +5,10 @@
  * includes/kc.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_KC_H
 #define MAME_INCLUDES_KC_H
+
+#pragma once
 
 /* Devices */
 #include "imagedev/cassette.h"
@@ -150,7 +151,7 @@ public:
 	int                 m_astb;
 	int                 m_cassette_in;
 
-	DECLARE_PALETTE_INIT(kc85);
+	void kc85_palette(palette_device &palette) const;
 	TIMER_CALLBACK_MEMBER(kc_cassette_oneshot_timer);
 	TIMER_CALLBACK_MEMBER(kc_cassette_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(kc_scanline);
@@ -167,7 +168,7 @@ class kc85_4_state : public kc_state
 public:
 	kc85_4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: kc_state(mconfig, type, tag)
-		{ }
+	{ }
 
 	// defined in machine/kc.c
 	virtual void machine_reset() override;

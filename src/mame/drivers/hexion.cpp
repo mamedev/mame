@@ -87,7 +87,6 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/k051649.h"
 
-#include "emupal.h"
 #include "speaker.h"
 
 
@@ -252,13 +251,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(hexion_state::scanline)
 	}
 }
 
-
-MACHINE_CONFIG_START(hexion_state::hexion)
-
+void hexion_state::hexion(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
-	MCFG_DEVICE_PROGRAM_MAP(hexion_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hexion_state, scanline, "screen", 0, 1)
+	Z80(config, m_maincpu, XTAL(24'000'000)/4); /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &hexion_state::hexion_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(hexion_state::scanline), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
 	K053252(config, m_k053252, XTAL(24'000'000)/2); /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
@@ -267,37 +265,37 @@ MACHINE_CONFIG_START(hexion_state::hexion)
 	m_k053252->int_time().set(FUNC(hexion_state::ccu_int_time_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 36*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hexion_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 36*8);
+	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(hexion_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hexion)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hexion);
+	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* MSM6295GS @ 5E, clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	/* MSM6295GS @ 5E, clock frequency & pin 7 not verified */
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_K051649_ADD("k051649", XTAL(24'000'000)/16) /* KONAMI 051649 // 2212P003 // JAPAN 8910EAJ @ 1D, xtal verified, divider not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	/* KONAMI 051649 // 2212P003 // JAPAN 8910EAJ @ 1D, xtal verified, divider not verified */
+	K051649(config, "k051649", XTAL(24'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
-MACHINE_CONFIG_START(hexion_state::hexionb)
+void hexion_state::hexionb(machine_config &config)
+{
 	hexion(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hexionb_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &hexion_state::hexionb_map);
 
-	MCFG_DEVICE_REMOVE("k051649")
+	config.device_remove("k051649");
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 1056000, okim6295_device::PIN7_LOW) // clock frequency & pin 7 not verified; this clock and pin 7 being low makes the pitch match the non-bootleg version, so is probably correct
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	// clock frequency & pin 7 not verified; this clock and pin 7 being low makes the pitch match the non-bootleg version, so is probably correct
+	OKIM6295(config, "oki2", 1056000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 
 /***************************************************************************

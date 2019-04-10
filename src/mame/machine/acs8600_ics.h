@@ -17,7 +17,7 @@ public:
 
 	auto irq1_callback() { return m_out_irq1_func.bind(); }
 	auto irq2_callback() { return m_out_irq2_func.bind(); }
-	template <typename T> void set_host_space(T &&tag, int index) { m_host_space_device.set_tag(std::forward<T>(tag)); m_host_space_index = index; }
+	template <typename T> void set_host_space(T &&tag, int index) { m_host_space.set_tag(std::forward<T>(tag), index); }
 	const tiny_rom_entry *device_rom_region() const override;
 
 protected:
@@ -37,9 +37,7 @@ private:
 	required_device<z80_device> m_icscpu;
 	devcb_write_line m_out_irq1_func;
 	devcb_write_line m_out_irq2_func;
-	required_device<device_memory_interface> m_host_space_device;
-	int m_host_space_index;
-	address_space *m_maincpu_mem;
+	required_address_space m_host_space;
 	u8 m_hiaddr;
 	u8 m_ctrl;
 };

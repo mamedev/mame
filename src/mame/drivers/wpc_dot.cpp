@@ -292,24 +292,27 @@ uint32_t wpc_dot_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-MACHINE_CONFIG_START(wpc_dot_state::wpc_dot)
+void wpc_dot_state::wpc_dot(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6809, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(wpc_dot_map)
+	M6809(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wpc_dot_state::wpc_dot_map);
 
-	MCFG_WMS_WPC_ADD("wpc")
-	MCFG_WPC_IRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_dot_state,wpc_irq_w))
-	MCFG_WPC_FIRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_dot_state,wpc_firq_w))
-	MCFG_WPC_ROMBANK(WRITE8(*this, wpc_dot_state,wpc_rombank_w))
-	MCFG_WPC_SOUND_CTRL(READ8(*this, wpc_dot_state,wpc_sound_ctrl_r),WRITE8(*this, wpc_dot_state,wpc_sound_ctrl_w))
-	MCFG_WPC_SOUND_DATA(READ8(*this, wpc_dot_state,wpc_sound_data_r),WRITE8(*this, wpc_dot_state,wpc_sound_data_w))
-	MCFG_WPC_DMDBANK(WRITE8(*this, wpc_dot_state,wpc_dmdbank_w))
+	WPCASIC(config, m_wpc, 0);
+	m_wpc->irq_callback().set(FUNC(wpc_dot_state::wpc_irq_w));
+	m_wpc->firq_callback().set(FUNC(wpc_dot_state::wpc_firq_w));
+	m_wpc->bank_write().set(FUNC(wpc_dot_state::wpc_rombank_w));
+	m_wpc->sound_ctrl_read().set(FUNC(wpc_dot_state::wpc_sound_ctrl_r));
+	m_wpc->sound_ctrl_write().set(FUNC(wpc_dot_state::wpc_sound_ctrl_w));
+	m_wpc->sound_data_read().set(FUNC(wpc_dot_state::wpc_sound_data_r));
+	m_wpc->sound_data_write().set(FUNC(wpc_dot_state::wpc_sound_data_w));
+	m_wpc->dmdbank_write().set(FUNC(wpc_dot_state::wpc_dmdbank_w));
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("wpcsnd", WPCSND)
-	MCFG_WPC_ROM_REGION("sound1")
-	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(*this, wpc_dot_state,wpcsnd_reply_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	WPCSND(config, m_wpcsnd);
+	m_wpcsnd->set_romregion("sound1");
+	m_wpcsnd->reply_callback().set(FUNC(wpc_dot_state::wpcsnd_reply_w));
+	m_wpcsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_native_aspect();
@@ -317,7 +320,7 @@ MACHINE_CONFIG_START(wpc_dot_state::wpc_dot)
 	screen.set_visarea(0, 128-1, 0, 32-1);
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(wpc_dot_state::screen_update));
-MACHINE_CONFIG_END
+}
 
 /*-----------------
 / Gilligan's Island #20003
@@ -383,6 +386,25 @@ ROM_START(gi_l6)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x40000, "code", 0)
 	ROM_LOAD("gi_l6.u6", 0x00000, 0x40000, CRC(7b73eef2) SHA1(fade23019600d84492d5a0fc6f4f5be52ec319be))
+	ROM_REGION(0x180000, "sound1",0)
+	ROM_LOAD("gi_u14.l2", 0x000000, 0x20000, CRC(0e7a4140) SHA1(c6408794120b5e45a48b35c380333879e1f0be78))
+	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
+	ROM_RELOAD( 0x000000 + 0x40000, 0x20000)
+	ROM_RELOAD( 0x000000 + 0x60000, 0x20000)
+	ROM_LOAD("gi_u15.l2", 0x080000, 0x20000, CRC(f8241dc9) SHA1(118a65555b9fff6f94e5e8324ed97d6ddec3d82b))
+	ROM_RELOAD( 0x080000 + 0x20000, 0x20000)
+	ROM_RELOAD( 0x080000 + 0x40000, 0x20000)
+	ROM_RELOAD( 0x080000 + 0x60000, 0x20000)
+	ROM_LOAD("gi_u18.l2", 0x100000, 0x20000, CRC(ea53e196) SHA1(5dcf3f44d2d658f6a7b130fa9e48d3cd616b4300))
+	ROM_RELOAD( 0x100000 + 0x20000, 0x20000)
+	ROM_RELOAD( 0x100000 + 0x40000, 0x20000)
+	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
+ROM_END
+
+ROM_START(gi_l8)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x40000, "code", 0)
+	ROM_LOAD("gilligans_l8.u6", 0x00000, 0x40000, CRC(d21d3bf8) SHA1(d41447a35b710297786d35aefe235ebd8b354b29))
 	ROM_REGION(0x180000, "sound1",0)
 	ROM_LOAD("gi_u14.l2", 0x000000, 0x20000, CRC(0e7a4140) SHA1(c6408794120b5e45a48b35c380333879e1f0be78))
 	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
@@ -662,6 +684,7 @@ GAME(1991,  gi_l9,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot
 GAME(1991,  gi_l3,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-3)",                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1991,  gi_l4,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-4)",                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1991,  gi_l6,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-6)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  gi_l8,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-8)",                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  hshot_p8,   0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Midway",       "Hot Shot Basketball (P-8)",                    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1991,  hurr_l2,    0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Hurricane (L-2)",                              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1991,  pz_f4,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "The Party Zone (F-4)",                         MACHINE_IS_SKELETON_MECHANICAL)

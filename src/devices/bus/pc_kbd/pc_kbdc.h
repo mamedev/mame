@@ -17,21 +17,6 @@ set the data line and then set the clock line.
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PC_KBDC_OUT_CLOCK_CB(_devcb) \
-	downcast<pc_kbdc_device &>(*device).set_out_clock_callback(DEVCB_##_devcb);
-
-#define MCFG_PC_KBDC_OUT_DATA_CB(_devcb) \
-	downcast<pc_kbdc_device &>(*device).set_out_data_callback(DEVCB_##_devcb);
-
-#define MCFG_PC_KBDC_SLOT_ADD(_kbdc_tag, _tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, PC_KBDC_SLOT, 0 ) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	downcast<pc_kbdc_slot_device &>(*device).set_pc_kbdc_slot(subdevice(_kbdc_tag) );
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -41,6 +26,15 @@ class pc_kbdc_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	pc_kbdc_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: pc_kbdc_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	pc_kbdc_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
@@ -67,8 +61,6 @@ public:
 	// construction/destruction
 	pc_kbdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_out_clock_callback(Object &&cb) { return m_out_clock_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_data_callback(Object &&cb) { return m_out_data_cb.set_callback(std::forward<Object>(cb)); }
 	auto out_clock_cb() { return m_out_clock_cb.bind(); }
 	auto out_data_cb() { return m_out_data_cb.bind(); }
 

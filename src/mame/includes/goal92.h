@@ -5,6 +5,10 @@
     Goal! '92
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_GOAL92_H
+#define MAME_INCLUDES_GOAL92_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
@@ -13,8 +17,8 @@
 class goal92_state : public driver_device
 {
 public:
-	goal92_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	goal92_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bg_data(*this, "bg_data"),
 		m_fg_data(*this, "fg_data"),
 		m_tx_data(*this, "tx_data"),
@@ -25,7 +29,8 @@ public:
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void goal92(machine_config &config);
 
@@ -79,3 +84,5 @@ private:
 	void goal92_map(address_map &map);
 	void sound_cpu(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GOAL92_H

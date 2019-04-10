@@ -56,7 +56,6 @@
 #include "cpu/m6502/m6502.h"
 
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
 
 #include "machine/bankdev.h"
 #include "machine/kb3600.h"
@@ -73,8 +72,6 @@
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
-
-#include "formats/ap2_dsk.h"
 
 
 #define A7_CPU_TAG "maincpu"
@@ -1079,21 +1076,21 @@ static void agat7_cards(device_slot_interface &device)
 	// Nippel Co-processor (R65C02 clone + dual-ported RAM)
 }
 
-MACHINE_CONFIG_START(agat7_state::agat7)
-	MCFG_DEVICE_ADD(m_maincpu, M6502, XTAL(14'300'000) / 14)
-	MCFG_DEVICE_PROGRAM_MAP(agat7_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER(A7_VIDEO_TAG ":a7screen", agat7_state, agat_vblank)
+void agat7_state::agat7(machine_config &config)
+{
+	M6502(config, m_maincpu, XTAL(14'300'000) / 14);
+	m_maincpu->set_addrmap(AS_PROGRAM, &agat7_state::agat7_map);
+	m_maincpu->set_vblank_int(A7_VIDEO_TAG ":a7screen", FUNC(agat7_state::agat_vblank));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", agat7_state, timer_irq, A7_VIDEO_TAG ":a7screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(agat7_state::timer_irq), A7_VIDEO_TAG ":a7screen", 0, 1);
 
-	MCFG_DEVICE_ADD(m_video, AGAT7VIDEO, RAM_TAG, "gfx1")
+	AGAT7VIDEO(config, m_video, RAM_TAG, "gfx1");
 
 	RAM(config, m_ram).set_default_size("32K").set_default_value(0);//.set_extra_options("64K,128K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(A7_SPEAKER_TAG, SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* /INH banking */
 	ADDRESS_MAP_BANK(config, m_upperbank).set_map(&agat7_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
@@ -1115,26 +1112,27 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	m_ay3600->ako().set(FUNC(agat7_state::ay3600_ako_w));
 
 	/* repeat timer.  10 Hz per Mymrin's book */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", agat7_state, ay3600_repeat, attotime::from_hz(10))
+	TIMER(config, "repttmr").configure_periodic(FUNC(agat7_state::ay3600_repeat), attotime::from_hz(10));
 
 	/*
 	 * slot 0 is reserved for SECAM encoder or Apple II compat card.
 	 * slot 1 always holds the CPU card.
 	 */
-	MCFG_DEVICE_ADD(m_a2bus, A2BUS, 0)
-	MCFG_A2BUS_CPU(A7_CPU_TAG)
-	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, agat7_state, a2bus_irq_w))
-	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, agat7_state, a2bus_nmi_w))
-	MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, agat7_state, a2bus_inh_w))
+	A2BUS(config, m_a2bus, 0);
+	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
+	m_a2bus->irq_w().set(FUNC(agat7_state::a2bus_irq_w));
+	m_a2bus->nmi_w().set(FUNC(agat7_state::a2bus_nmi_w));
+	m_a2bus->inh_w().set(FUNC(agat7_state::a2bus_inh_w));
+	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	A2BUS_SLOT(config, "sl2", m_a2bus, agat7_cards, "a7lang");
 	A2BUS_SLOT(config, "sl3", m_a2bus, agat7_cards, "a7fdc");
 	A2BUS_SLOT(config, "sl4", m_a2bus, agat7_cards, "a7ports");
 	A2BUS_SLOT(config, "sl5", m_a2bus, agat7_cards, nullptr);
 	A2BUS_SLOT(config, "sl6", m_a2bus, agat7_cards, "a7ram");
 
-	MCFG_CASSETTE_ADD(m_cassette)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-MACHINE_CONFIG_END
+	CASSETTE(config,m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+}
 
 
 /***************************************************************************

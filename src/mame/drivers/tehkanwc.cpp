@@ -157,7 +157,7 @@ WRITE8_MEMBER(tehkanwc_state::track_1_reset_w)
 
 WRITE8_MEMBER(tehkanwc_state::sound_command_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -175,7 +175,7 @@ void tehkanwc_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 WRITE8_MEMBER(tehkanwc_state::sound_answer_w)
 {
-	m_soundlatch2->write(space, 0, data);
+	m_soundlatch2->write(data);
 
 	/* in Gridiron, the sound CPU goes in a tight loop after the self test, */
 	/* probably waiting to be reset by a watchdog */
@@ -665,75 +665,73 @@ static GFXDECODE_START( gfx_tehkanwc )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(tehkanwc_state::tehkanwc)
-
+void tehkanwc_state::tehkanwc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/4)    /* 18.432000 / 4 */
-	MCFG_DEVICE_PROGRAM_MAP(main_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tehkanwc_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 18432000/4);     /* 18.432000 / 4 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tehkanwc_state::main_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80, 18432000/4)
-	MCFG_DEVICE_PROGRAM_MAP(sub_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tehkanwc_state,  irq0_line_hold)
+	Z80(config, m_subcpu, 18432000/4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &tehkanwc_state::sub_mem);
+	m_subcpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 18432000/4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
-	MCFG_DEVICE_IO_MAP(sound_port)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tehkanwc_state,  irq0_line_hold)
+	Z80(config, m_audiocpu, 18432000/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tehkanwc_state::sound_mem);
+	m_audiocpu->set_addrmap(AS_IO, &tehkanwc_state::sound_port);
+	m_audiocpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
+	config.m_minimum_quantum = attotime::from_hz(600);  /* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tehkanwc_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(tehkanwc_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tehkanwc)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tehkanwc);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 768).set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ay1", YM2149, 18432000/12)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tehkanwc_state, portA_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tehkanwc_state, portB_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2149_device &ay1(YM2149(config, "ay1", 18432000/12));
+	ay1.port_a_write_callback().set(FUNC(tehkanwc_state::portA_w));
+	ay1.port_b_write_callback().set(FUNC(tehkanwc_state::portB_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", YM2149, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, tehkanwc_state, portA_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, tehkanwc_state, portB_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2149_device &ay2(YM2149(config, "ay2", 18432000/12));
+	ay2.port_a_read_callback().set(FUNC(tehkanwc_state::portA_r));
+	ay2.port_b_read_callback().set(FUNC(tehkanwc_state::portB_r));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tehkanwc_state, adpcm_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(tehkanwc_state::adpcm_int));  /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8KHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.45);
+}
 
-MACHINE_CONFIG_START(tehkanwc_state::tehkanwcb)
+void tehkanwc_state::tehkanwcb(machine_config &config)
+{
 	tehkanwc(config);
-	MCFG_DEVICE_REPLACE("ay1", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tehkanwc_state, portA_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tehkanwc_state, portB_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config.replace(), "ay1", 18432000/12));
+	ay1.port_a_write_callback().set(FUNC(tehkanwc_state::portA_w));
+	ay1.port_b_write_callback().set(FUNC(tehkanwc_state::portB_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_REPLACE("ay2", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, tehkanwc_state, portA_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, tehkanwc_state, portB_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
-
+	ay8910_device &ay2(AY8910(config.replace(), "ay2", 18432000/12));
+	ay2.port_a_read_callback().set(FUNC(tehkanwc_state::portA_r));
+	ay2.port_b_read_callback().set(FUNC(tehkanwc_state::portB_r));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 void tehkanwc_state::init_teedoff()
 {
@@ -1007,7 +1005,7 @@ ROM_END
 /* There are some dumps out there that only have the year hacked to 1986 and a little bunch of bytes
    from the graphics zone. I think that not worth to support these hacks...
 */
- 
+
 
 GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 1)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1985, tehkanwcb, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )

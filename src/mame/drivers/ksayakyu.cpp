@@ -93,7 +93,7 @@ WRITE8_MEMBER(ksayakyu_state::bank_select_w)
 WRITE8_MEMBER(ksayakyu_state::latch_w)
 {
 	m_sound_status &= ~0x80;
-	m_soundlatch->write(space, 0, data | 0x80);
+	m_soundlatch->write(data | 0x80);
 }
 
 READ8_MEMBER(ksayakyu_state::sound_status_r)
@@ -104,7 +104,7 @@ READ8_MEMBER(ksayakyu_state::sound_status_r)
 WRITE8_MEMBER(ksayakyu_state::tomaincpu_w)
 {
 	m_sound_status |= 0x80;
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 }
 
 READ8_MEMBER(ksayakyu_state::int_ack_r)
@@ -258,52 +258,52 @@ void ksayakyu_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-MACHINE_CONFIG_START(ksayakyu_state::ksayakyu)
-
+void ksayakyu_state::ksayakyu(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,MAIN_CLOCK/8) //divider is guessed
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
+	Z80(config, m_maincpu, MAIN_CLOCK/8); //divider is guessed
+	m_maincpu->set_addrmap(AS_PROGRAM, &ksayakyu_state::maincpu_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, MAIN_CLOCK/8) //divider is guessed, controls DAC tempo
-	MCFG_DEVICE_PROGRAM_MAP(soundcpu_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(ksayakyu_state, irq0_line_hold, 60) //guess, controls music tempo
+	z80_device &audiocpu(Z80(config, "audiocpu", MAIN_CLOCK/8)); //divider is guessed, controls DAC tempo
+	audiocpu.set_addrmap(AS_PROGRAM, &ksayakyu_state::soundcpu_map);
+	audiocpu.set_periodic_int(FUNC(ksayakyu_state::irq0_line_hold), attotime::from_hz(60)); //guess, controls music tempo
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+	config.m_minimum_quantum = attotime::from_hz(60000);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ksayakyu_state, screen_update_ksayakyu)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", 0))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(ksayakyu_state::screen_update_ksayakyu));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ksayakyu)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(ksayakyu_state, ksayakyu)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ksayakyu);
+	PALETTE(config, m_palette, FUNC(ksayakyu_state::ksayakyu_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/16) //unknown clock
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ksayakyu_state, dummy1_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", MAIN_CLOCK/16)); //unknown clock
+	ay1.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	ay1.port_b_write_callback().set(FUNC(ksayakyu_state::dummy1_w));
+	ay1.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/16) //unknown clock
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ksayakyu_state, dummy2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ksayakyu_state, dummy3_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", MAIN_CLOCK/16)); //unknown clock
+	ay2.port_a_write_callback().set(FUNC(ksayakyu_state::dummy2_w));
+	ay2.port_b_write_callback().set(FUNC(ksayakyu_state::dummy3_w));
+	ay2.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_6BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 ROM_START( ksayakyu )
 	ROM_REGION( 0x20000, "maincpu", 0 )

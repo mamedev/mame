@@ -6,7 +6,7 @@
  */
 
 #include "nld_dm9314.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 
 namespace netlist
 {
@@ -107,8 +107,8 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL(9314)
-	NETLIB_DEVICE_IMPL(9314_dip)
+	NETLIB_DEVICE_IMPL(9314,     "TTL_9314",     "+EQ,+MRQ,+S0Q,+S1Q,+S2Q,+S3Q,+D0,+D1,+D2,+D3")
+	NETLIB_DEVICE_IMPL(9314_dip, "TTL_9314_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

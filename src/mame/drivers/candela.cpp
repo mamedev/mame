@@ -305,19 +305,19 @@ READ8_MEMBER( can09t_state::read )
 		{
 		case X0XX: // ACIA
 			LOGPLA("-- ACIA\n");
-			byte = m_acia->read(space, offset & 1);
+			byte = m_acia->read(offset & 1);
 			break;
 		case X1XX: // SYSPIA
 			LOGPLA("-- SYSPIA\n");
-			byte = m_syspia->read_alt(space, offset & 3);
+			byte = m_syspia->read_alt(offset & 3);
 			break;
 		case X2XX: // USRPIA
 			LOGPLA("-- USRPIA\n");
-			byte = m_usrpia->read_alt(space, offset & 3);
+			byte = m_usrpia->read_alt(offset & 3);
 			break;
 		case X3XX: // PTM
 			LOGPLA("-- PTM\n");
-			byte = m_ptm->read(space, offset & 7);
+			byte = m_ptm->read(offset & 7);
 			break;
 		case X4XX: //
 			LOGPLA("-- XX4X\n");
@@ -387,19 +387,19 @@ WRITE8_MEMBER( can09t_state::write )
 		{
 		case X0XX: // ACIA
 			LOGPLA("-- ACIA\n");
-			m_acia->write(space, offset & 1, data);
+			m_acia->write(offset & 1, data);
 			break;
 		case X1XX: // SYSPIA
 			LOGPLA("-- SYSPIA\n");
-			m_syspia->write_alt(space, offset & 3, data);
+			m_syspia->write_alt(offset & 3, data);
 			break;
 		case X2XX: // USRPIA
 			LOGPLA("-- USRPIA\n");
-			m_usrpia->write_alt(space, offset & 3, data);
+			m_usrpia->write_alt(offset & 3, data);
 			break;
 		case X3XX: // PTM
 			LOGPLA("-- PTM\n");
-			m_ptm->write(space, offset & 7, data);
+			m_ptm->write(offset & 7, data);
 			break;
 		case X4XX: //
 			LOGPLA("-- XX4X\n");
@@ -669,9 +669,10 @@ DEVICE_INPUT_DEFAULTS_END
 #define CAN09T_BAUDGEN_CLOCK 1.8432_MHz_XTAL
 #define CAN09T_ACIA_CLOCK (CAN09T_BAUDGEN_CLOCK / 12)
 
-MACHINE_CONFIG_START(can09t_state::can09t)
-	MCFG_DEVICE_ADD("maincpu", MC6809, 4.9152_MHz_XTAL) // IPL crystal
-	MCFG_DEVICE_PROGRAM_MAP(can09t_map)
+void can09t_state::can09t(machine_config &config)
+{
+	MC6809(config, m_maincpu, 4.9152_MHz_XTAL); // IPL crystal
+	m_maincpu->set_addrmap(AS_PROGRAM, &can09t_state::can09t_map);
 
 	/* --PIA inits----------------------- */
 	PIA6821(config, m_syspia, 0); // CPU board
@@ -704,28 +705,29 @@ MACHINE_CONFIG_START(can09t_state::can09t)
 	ACIA6850(config, m_acia, 0);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
+	rs232.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
 
-	MCFG_DEVICE_ADD ("acia_clock", CLOCK, CAN09T_ACIA_CLOCK)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, can09t_state, write_acia_clock))
-MACHINE_CONFIG_END
+	CLOCK(config, "acia_clock", CAN09T_ACIA_CLOCK).signal_handler().set(FUNC(can09t_state::write_acia_clock));
+}
 
 #define CAN09_X1_CLOCK 22.1184_MHz_XTAL        /* UKI 22118.40 Khz */
 #define CAN09_CPU_CLOCK (CAN09_X1_CLOCK / 16) /* ~1.38MHz Divider needs to be check but is the most likelly */
-MACHINE_CONFIG_START(can09_state::can09)
-	MCFG_DEVICE_ADD("maincpu", MC6809E, CAN09_CPU_CLOCK) // MC68A09EP
-	MCFG_DEVICE_PROGRAM_MAP(can09_map)
+void can09_state::can09(machine_config &config)
+{
+	MC6809E(config, m_maincpu, CAN09_CPU_CLOCK); // MC68A09EP
+	m_maincpu->set_addrmap(AS_PROGRAM, &can09_state::can09_map);
 
 	/* RAM banks */
 	RAM(config, RAM_TAG).set_default_size("768K");
 
 	// CRTC  init
-	MCFG_MC6845_ADD("crtc", H46505, "screen", CAN09_CPU_CLOCK) // TODO: Check actual clock source, An 8MHz UKI crystal is also nearby
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	//MCFG_MC6845_UPDATE_ROW_CB(can09_state, crtc_update_row) // not written yet
+	h46505_device &crtc(H46505(config, "crtc", CAN09_CPU_CLOCK)); // TODO: Check actual clock source, An 8MHz UKI crystal is also nearby
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	//crtc.set_update_row_callback(FUNC(can09_state::crtc_update_row), this); // not written yet
 
 	/* Setup loop from data table in ROM: 0xFFCB 0xE020 (CRTC register number), 0xFFD0 0xE021 (CRTC register value)
 	    Reg  Value Comment
@@ -751,18 +753,18 @@ MACHINE_CONFIG_START(can09_state::can09)
 
 
 	/* screen - totally faked value for now */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_RAW_PARAMS(4_MHz_XTAL / 2, 512, 0, 512, 576, 0, 576)
-	MCFG_SCREEN_UPDATE_DRIVER(can09_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_raw(4_MHz_XTAL / 2, 512, 0, 512, 576, 0, 576);
+	screen.set_screen_update(FUNC(can09_state::screen_update));
+	screen.set_palette("palette");
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Floppy */
 	WD1770(config, "wd1770", 8_MHz_XTAL); // TODO: Verify 8MHz UKI crystal assumed to be used
 #if 0
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", candela_floppies, "3dd", floppy_image_device::default_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop3_list", "candela")
+	FLOPPY_CONNECTOR(config, "wd1770:0", candela_floppies, "3dd", floppy_image_device::default_floppy_formats);
+	SOFTWARE_LIST(config, "flop3_list").set_original("candela");
 #endif
 
 	/* --PIA inits----------------------- */
@@ -781,11 +783,11 @@ MACHINE_CONFIG_START(can09_state::can09)
 	/* 0xFF93 0xE034 (PIA1 Port B)    = 0x18 - Write Data on Port B */
 
 #if 1
-	MCFG_DEVICE_ADD(PIA2_TAG, PIA6821, 0) // CPU board
-	MCFG_DEVICE_ADD("acia1", ACIA6850, 0) // CPU board
-	MCFG_DEVICE_ADD("acia2", ACIA6850, 0) // CPU board
+	PIA6821(config, PIA2_TAG, 0); // CPU board
+	ACIA6850(config, "acia1", 0); // CPU board
+	ACIA6850(config, "acia2", 0); // CPU board
 #endif
-MACHINE_CONFIG_END
+}
 
 ROM_START( can09t ) /* The smaller grey computer */
 	ROM_REGION(0x10000, "roms", 0)

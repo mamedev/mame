@@ -1075,31 +1075,30 @@ void twinkle_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, in
 
 void twinkle_state::cdrom_config(device_t *device)
 {
+	device->subdevice<cdda_device>("cdda")->add_route(0, "^^speakerleft", 1.0);
+	device->subdevice<cdda_device>("cdda")->add_route(1, "^^speakerright", 1.0);
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE( 0, "^^speakerleft", 1.0 )
-	MCFG_SOUND_ROUTE( 1, "^^speakerright", 1.0 )
 }
 
-MACHINE_CONFIG_START(twinkle_state::twinkle)
+void twinkle_state::twinkle(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
-	MCFG_DEVICE_PROGRAM_MAP( main_map )
+	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &twinkle_state::main_map);
+	m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&twinkle_state::scsi_dma_read, this));
+	m_maincpu->subdevice<psxdma_device>("dma")->install_write_handler(5, psxdma_device::write_delegate(&twinkle_state::scsi_dma_write, this));
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
 
-	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
-
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&twinkle_state::scsi_dma_read, this ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&twinkle_state::scsi_dma_write, this ) )
-
-	MCFG_DEVICE_ADD("audiocpu", M68000, 32000000/2)    /* 16.000 MHz */
-	MCFG_DEVICE_PROGRAM_MAP( sound_map )
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(twinkle_state, irq1_line_assert, 60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(twinkle_state, irq2_line_assert, 60)
+	M68000(config, m_audiocpu, 32000000/2);    /* 16.000 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &twinkle_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(twinkle_state::irq1_line_assert), attotime::from_hz(60));
+	m_audiocpu->set_periodic_int(FUNC(twinkle_state::irq2_line_assert), attotime::from_hz(60));
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(1200)); /* check TD pin on LTC1232 */
 
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_4)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
+	scsi.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
+	scsi.slot(1).set_option_machine_config("cdrom", cdrom_config);
 
 	AM53CF96(config, m_am53cf96, 0);
 	m_am53cf96->set_scsi_port("scsi");
@@ -1129,8 +1128,7 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	uart.out_rts_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
@@ -1138,15 +1136,15 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	SPEAKER(config, "speakerleft").front_left();
 	SPEAKER(config, "speakerright").front_right();
 
-	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
-	MCFG_SOUND_ROUTE( 0, "speakerleft", 0.75 )
-	MCFG_SOUND_ROUTE( 1, "speakerright", 0.75 )
+	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu")));
+	spu.add_route(0, "speakerleft", 0.75);
+	spu.add_route(1, "speakerright", 0.75);
 
-	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(33'868'800)/2);
-	MCFG_DEVICE_ADDRESS_MAP(0, rf5c400_map)
-	MCFG_SOUND_ROUTE(0, "speakerleft", 1.0)
-	MCFG_SOUND_ROUTE(1, "speakerright", 1.0)
-MACHINE_CONFIG_END
+	rf5c400_device &rf5c400(RF5C400(config, "rfsnd", XTAL(33'868'800)/2));
+	rf5c400.set_addrmap(0, &twinkle_state::rf5c400_map);
+	rf5c400.add_route(0, "speakerleft", 1.0);
+	rf5c400.add_route(1, "speakerright", 1.0);
+}
 
 void twinkle_state::twinklex(machine_config &config)
 {

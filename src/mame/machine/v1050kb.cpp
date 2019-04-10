@@ -72,18 +72,18 @@ DISCRETE_SOUND_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(v1050_keyboard_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(I8049_TAG, I8049, XTAL(4'608'000))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, v1050_keyboard_device, kb_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, v1050_keyboard_device, kb_p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, v1050_keyboard_device, kb_p2_w))
-	MCFG_DEVICE_DISABLE() // TODO
+void v1050_keyboard_device::device_add_mconfig(machine_config &config)
+{
+	I8049(config, m_maincpu, XTAL(4'608'000));
+	m_maincpu->p1_in_cb().set(FUNC(v1050_keyboard_device::kb_p1_r));
+	m_maincpu->p1_out_cb().set(FUNC(v1050_keyboard_device::kb_p1_w));
+	m_maincpu->p2_out_cb().set(FUNC(v1050_keyboard_device::kb_p2_w));
+	m_maincpu->set_disable(); // TODO
 
 	// discrete sound
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, v1050kb_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, v1050kb_discrete).add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
 //-------------------------------------------------
@@ -381,7 +381,7 @@ WRITE8_MEMBER( v1050_keyboard_device::kb_p2_w )
 	m_led = BIT(data, 5);
 
 	// speaker output
-	m_discrete->write(space, NODE_01, BIT(data, 6));
+	m_discrete->write(NODE_01, BIT(data, 6));
 
 	// serial output
 	m_out_tx_handler(BIT(data, 7));

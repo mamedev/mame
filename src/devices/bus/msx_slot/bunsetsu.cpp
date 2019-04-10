@@ -25,17 +25,17 @@ void msx_slot_bunsetsu_device::device_reset()
 }
 
 
-READ8_MEMBER(msx_slot_bunsetsu_device::read)
+uint8_t msx_slot_bunsetsu_device::read(offs_t offset)
 {
 	if (offset == 0xbfff)
 	{
 		return m_bunsetsu_region[m_bunsetsu_address++ & 0x1ffff];
 	}
-	return msx_slot_rom_device::read(space, offset);
+	return msx_slot_rom_device::read(offset);
 }
 
 
-WRITE8_MEMBER(msx_slot_bunsetsu_device::write)
+void msx_slot_bunsetsu_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

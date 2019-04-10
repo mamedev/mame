@@ -24,6 +24,7 @@
 #include "emu.h"
 
 #include "cpu/m6800/m6800.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
@@ -133,7 +134,6 @@ private:
 class goupil_g2_state : public goupil_base_state
 {
 public:
-
 	goupil_g2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: goupil_base_state(mconfig, type, tag)
 		, m_visu24x80_ram(*this, RAM_TAG)
@@ -573,7 +573,7 @@ void goupil_g1_state::goupil_g1(machine_config &config)
 	m_screen->set_size(64*8, 16*(8+4));
 	m_screen->set_visarea(0, 64*8-1, 0, 16*(8+4)-1);
 
-	PALETTE(config, m_palette, 16);
+	PALETTE(config, m_palette).set_entries(16);
 
 	EF9364(config, m_ef9364, VIDEO_CLOCK);
 	m_ef9364->set_palette_tag("palette");
@@ -597,8 +597,7 @@ void goupil_g2_state::goupil_g2(machine_config &config)
 	m_screen->set_size((80*8), (24*(8+4)));
 	m_screen->set_visarea(0, (80*8)-1, 0, (24*(8+4))-1);
 
-	PALETTE(config, m_palette, 3);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_monochrome_highlight));
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 14.318181_MHz_XTAL / 8));
 	crtc.set_show_border_area(false);

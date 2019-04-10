@@ -25,7 +25,7 @@ public:
 	template <typename T> nmk112_device &set_rom1_tag(T &&tag) { m_rom1.set_tag(std::forward<T>(tag)); return *this; }
 	nmk112_device &set_page_mask(uint8_t mask) { m_page_mask = ~mask; return *this; }
 
-	DECLARE_WRITE8_MEMBER( okibank_w );
+	void okibank_w(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
@@ -48,20 +48,6 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(NMK112, nmk112_device)
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_NMK112_ROM0(_tag) \
-	downcast<nmk112_device &>(*device).set_rom0_tag(_tag);
-
-#define MCFG_NMK112_ROM1(_tag) \
-	downcast<nmk112_device &>(*device).set_rom1_tag(_tag);
-
-#define MCFG_NMK112_DISABLE_PAGEMASK(_mask) \
-	downcast<nmk112_device &>(*device).set_page_mask(_mask);
 
 
 #endif // MAME_MACHINE_NMK112_H

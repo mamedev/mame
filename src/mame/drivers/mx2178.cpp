@@ -131,28 +131,30 @@ void mx2178_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(mx2178_state::mx2178)
+void mx2178_state::mx2178(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'869'600) / 5) // guess
-	MCFG_DEVICE_PROGRAM_MAP(mx2178_mem)
-	MCFG_DEVICE_IO_MAP(mx2178_io)
+	Z80(config, m_maincpu, XTAL(18'869'600) / 5); // guess
+	m_maincpu->set_addrmap(AS_PROGRAM, &mx2178_state::mx2178_mem);
+	m_maincpu->set_addrmap(AS_IO, &mx2178_state::mx2178_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not correct
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mx2178)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not correct
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_mx2178);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(18'869'600) / 8) // clk unknown
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mx2178_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", XTAL(18'869'600) / 8)); // clk unknown
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(mx2178_state::crtc_update_row), this);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL(18'869'600) / 30));
 	acia_clock.signal_handler().set("acia1", FUNC(acia6850_device::write_txc));
@@ -163,21 +165,21 @@ MACHINE_CONFIG_START(mx2178_state::mx2178)
 	acia6850_device &acia1(ACIA6850(config, "acia1", 0));
 	acia1.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 	acia1.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
-	acia1.irq_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
+	acia1.irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia1", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia1", acia6850_device, write_cts))
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set("acia1", FUNC(acia6850_device::write_rxd));
+	rs232a.cts_handler().set("acia1", FUNC(acia6850_device::write_cts));
 
 	acia6850_device &acia2(ACIA6850(config, "acia2", 0));
 	acia2.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 	acia2.rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));
-	acia2.irq_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
+	acia2.irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia2", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia2", acia6850_device, write_cts))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, "keyboard"));
+	rs232b.rxd_handler().set("acia2", FUNC(acia6850_device::write_rxd));
+	rs232b.cts_handler().set("acia2", FUNC(acia6850_device::write_cts));
+}
 
 /* ROM definition */
 ROM_START( mx2178 )

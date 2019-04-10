@@ -1072,6 +1072,9 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 				case 4: /* Gouraud shading */
 					m_vdp1.framebuffer_draw_lines[y][x] = stv_vdp1_apply_gouraud_shading( x, y, pix );
 					break;
+				// TODO: Pro Yakyuu Team mo Tsukurou (during team creation, on PR girl select)
+				//case 6:
+				//  break;
 				case 7: /* Gouraud-shading + half-transparent */
 					// Lupin the 3rd Pyramid no Kenja enemy shadows
 					// Death Crimson lives indicators
@@ -1819,7 +1822,7 @@ TIMER_CALLBACK_MEMBER(saturn_state::vdp1_draw_end )
 	#if 0
 	if(!(m_scu.ism & IRQ_VDP1_END))
 	{
-		m_maincpu->set_input_line_and_vector(0x2, HOLD_LINE, 0x4d);
+		m_maincpu->set_input_line_and_vector(0x2, HOLD_LINE, 0x4d); // SH2
 		scu_do_transfer(6);
 	}
 	else

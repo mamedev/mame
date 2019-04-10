@@ -73,7 +73,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	DECLARE_VIDEO_START(shangkid);
-	DECLARE_PALETTE_INIT(dynamski);
+	void dynamski_palette(palette_device &palette) const;
 	DECLARE_MACHINE_RESET(shangkid);
 
 	uint32_t screen_update_shangkid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
