@@ -99,9 +99,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
+	void decode_penta(int end, int nodecend);
+	void decode_schick_extra(int size, uint8_t* rom);
+
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	optional_device<ls259_device> m_latch;
 	void decrypted_opcodes_map(address_map &map);
+	void schick_decrypted_opcodes_map(address_map &map);
 	void jrpacmbl_map(address_map &map);
 	void pengo_map(address_map &map);
 	void schick_map(address_map &map);
@@ -204,6 +208,14 @@ void pengo_state::schick_map(address_map &map) // everything needs to be verifie
 	map(0x8800, 0x8fef).ram().share("mainram");
 	map(0x8ff0, 0x8fff).ram().share("spriteram");
 	map(0x9020, 0x902f).writeonly().share("spriteram2");
+	map(0xe000, 0xffff).rom();
+}
+
+void pengo_state::schick_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().share("decrypted_opcodes");
+	map(0x8800, 0x8fef).ram().share("mainram");
+	map(0x8ff0, 0x8fff).ram().share("spriteram");
 }
 
 void pengo_state::schick_audio_map(address_map &map)
@@ -530,7 +542,7 @@ void pengo_state::schick(machine_config &config) // all dividers unknown
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK/6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pengo_state::schick_map);
-	m_maincpu->set_addrmap(AS_OPCODES, &pengo_state::decrypted_opcodes_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &pengo_state::schick_decrypted_opcodes_map);
 
 	z80_device &audiocpu(Z80(config, "audiocpu", MASTER_CLOCK/6));
 	audiocpu.set_addrmap(AS_PROGRAM, &pengo_state::schick_audio_map);
@@ -835,7 +847,7 @@ ROM_END
 
 
 
-void pengo_state::init_penta()
+void pengo_state::decode_penta(int end, int nodecend)
 {
 /*
     the values vary, but the translation mask is always laid out like this:
@@ -880,7 +892,7 @@ void pengo_state::init_penta()
 
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (int A = 0x0000;A < 0x8000;A++)
+	for (int A = 0x0000;A < end;A++)
 	{
 		uint8_t src = rom[A];
 
@@ -900,57 +912,47 @@ void pengo_state::init_penta()
 		i = ((A >> 4) & 1) + (((A >> 8) & 1) << 1) + (((A >> 12) & 1) << 2);
 		m_decrypted_opcodes[A] = src ^ opcode_xortable[i][j];
 	}
+
+	for (int A = end; A < nodecend; A++)
+	{
+		m_decrypted_opcodes[A] = rom[A];
+	}
 }
 
-void pengo_state::init_schick() // only the 0x0000-0x7fff range is correctly decrypted. 0x8000-0xdfff is 0xff, then 0xe000-0xffff seems to be differently encrypted.
+void pengo_state::init_penta()
 {
-	static const uint8_t data_xortable[4][8] =
-	{
-		{ 0xf1,0xd3,0x79,0x5b,0xd3,0xf1,0x5b,0x79 },    /* .......0.......0 */
-		{ 0xd9,0x5b,0xd3,0x51,0xd9,0x5b,0xd3,0x51 },    /* .......0.......1 */
-		{ 0xe1,0xc3,0x69,0x4b,0xc3,0xe1,0x4b,0x69 },    /* .......1.......0 */
-		{ 0xc9,0x4b,0xc3,0x41,0xc9,0x4b,0xc3,0x41 }     /* .......1.......1 */
-	};
-	static const uint8_t opcode_xortable[8][8] =
-	{
-		{ 0x53,0x59,0x7b,0x71,0x71,0x7b,0x59,0x53 },    /* ...0...0...0.... */
-		{ 0xd9,0xd9,0x51,0x51,0xd9,0xd9,0x51,0x51 },    /* ...0...0...1.... */
-		{ 0xc9,0x4b,0xc3,0x41,0xe1,0x63,0xeb,0x69 },    /* ...0...1...0.... */
-		{ 0xc9,0x4b,0xc3,0x41,0xe1,0x63,0xeb,0x69 },    /* ...0...1...1.... */
-		{ 0x7b,0x59,0x7b,0x59,0xdb,0xf9,0xdb,0xf9 },    /* ...1...0...0.... */
-		{ 0x7b,0x59,0x7b,0x59,0xdb,0xf9,0xdb,0xf9 },    /* ...1...0...1.... */
-		{ 0xc9,0x4b,0xc3,0x41,0xe1,0x63,0xeb,0x69 },    /* ...1...1...0.... */
-		{ 0xc9,0x4b,0xc3,0x41,0xe1,0x63,0xeb,0x69 }     /* ...1...1...1.... */
-	};
+	decode_penta(0x8000, 0x8000);
+}
 
+void pengo_state::decode_schick_extra(int size, uint8_t* rom)
+{
+	// schick has an extra layer of encryption in addition to the penta encryption
+	for (int A = 0x0000; A < 0x10000; A++)
+	{
+		uint8_t srcdec = rom[A];
+
+		if (A & 0x100)
+		{
+			srcdec = bitswap<8>(srcdec^0x41, 7, 4, 5, 6, 3, 2, 1, 0);
+		}
+		else
+		{
+			srcdec = bitswap<8>(srcdec^0x51, 7, 6, 5, 0, 3, 2, 1, 4);
+		}
+
+
+		rom[A] = srcdec;
+	}
+}
+
+void pengo_state::init_schick()
+{
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (int A = 0x0000;A < 0x10000;A++)
-	{
-		uint8_t src = rom[A];
+	decode_penta(0x8000, 0x10000);
 
-		/* pick the translation table from bits 0 and 8 of the address */
-		int i = (A & 1) + (((A >> 8) & 1) << 1);
-
-		/* pick the offset in the table from bits 1, 3 and 5 of the source data */
-		int j = ((src >> 1) & 1) + (((src >> 3) & 1) << 1) + (((src >> 5) & 1) << 2);
-		/* the bottom half of the translation table is the mirror image of the top */
-		if (src & 0x80) j = 7 - j;
-
-		/* decode the ROM data */
-		if (BIT(i, 1))
-			rom[A] = bitswap<8>(src ^ data_xortable[i][j], 7, 4, 5, 6, 3, 2, 1, 0);
-		else
-			rom[A] = bitswap<8>(src ^ data_xortable[i][j], 7, 6, 5, 0, 3, 2, 1, 4);
-
-		/* now decode the opcodes */
-		/* pick the translation table from bits 4, 8 and 12 of the address */
-		i = ((A >> 4) & 1) + (((A >> 8) & 1) << 1) + (((A >> 12) & 1) << 2);
-		if (BIT(i, 1))
-			m_decrypted_opcodes[A] = bitswap<8>(src ^ opcode_xortable[i][j], 7, 4, 5, 6, 3, 2, 1, 0);
-		else
-			m_decrypted_opcodes[A] = bitswap<8>(src ^ opcode_xortable[i][j], 7, 6, 5, 0, 3, 2, 1, 4);
-	}
+	decode_schick_extra(0x10000, rom);
+	decode_schick_extra(0x10000, m_decrypted_opcodes);
 }
 
 
