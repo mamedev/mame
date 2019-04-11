@@ -282,13 +282,13 @@ NETLIST_START(zac1b11142)
 	//SOLVER(Solver, 48000)
 	SOLVER(Solver, 48000)
 	//PARAM(Solver.ACCURACY, 1e-10)
-	PARAM(Solver.ACCURACY, 1e-7)
-	PARAM(Solver.NR_LOOPS, 300)
+	PARAM(Solver.ACCURACY, 1e-6)
+	PARAM(Solver.NR_LOOPS, 3000)
 	PARAM(Solver.METHOD, "MAT_CR")
-	PARAM(Solver.PARALLEL, 0)
+	PARAM(Solver.PARALLEL, 2)
 	PARAM(Solver.DYNAMIC_TS, 0)
 	PARAM(Solver.DYNAMIC_LTE, 5e-4)
-	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 20e-6)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-7)
 
 	LOCAL_SOURCE(zac1b11142_schematics)
 
@@ -336,4 +336,15 @@ NETLIST_START(zac1b11142)
 
 	INCLUDE(zac1b11142_schematics)
 
+	RES(R1, RES_K(100))
+	RES(R3, RES_K(10))
+	CAP(C7, CAP_U(0.1))
+
+	NET_C(P1.2, R3.1)
+	NET_C(R3.2, C7.1)
+	NET_C(C7.2, R1.1)   // Connect to Pin 2 - also other sounds are mixed in here <- sound out
+	NET_C(R1.2, GND)    // Actually connected to ~6V from pin 3 of TDA1510
+
+	// FIXME: connect other sounds to netlist as well for proper mixing
+	// FIXME: make P1 controllable by mame ui (see pong for an example)
 NETLIST_END()
