@@ -699,6 +699,45 @@
 		</part>
 	</software>
 
+	<software name="antim10">
+		<description>Anti-M (version 1.0)</description>
+		<year>2019</year>
+		<publisher>4AM</publisher>
+		<info name="release" value="2019-03-11"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="anti-m-v1.0.po" size="143360" crc="71608be6" sha1="ecf1c27ab34e6a8ddeb33ac11cf704168761a521" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antim11">
+		<description>Anti-M (version 1.1)</description>
+		<year>2019</year>
+		<publisher>4AM</publisher>
+		<info name="release" value="2019-03-16"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="anti-m-v1.1-2019-03-16.po" size="143360" crc="52dcae11" sha1="db40eca7295b50b2b2c6607504ee138a7fc185da" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antim12">
+		<description>Anti-M (version 1.2)</description>
+		<year>2019</year>
+		<publisher>4AM</publisher>
+		<info name="release" value="2019-03-24"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="anti-m-v1.2-2019-03-24.po" size="143360" crc="ca093aac" sha1="ea4e414fc5f56f877f8b84bad40a8a288c005dc6" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ankh">
 		<description>Ankh</description>
 		<year>1984</year>
