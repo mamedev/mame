@@ -22,6 +22,7 @@
 #include "machine/wd_fdc.h"
 #include "machine/ram.h"
 #include "machine/74259.h"
+#include "machine/74123.h"
 
 namespace bus { namespace ti99 { namespace peb {
 
@@ -47,8 +48,6 @@ protected:
 	ioport_constructor device_input_ports() const override;
 
 private:
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
@@ -66,6 +65,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( sidsel_w );
 	DECLARE_WRITE_LINE_MEMBER( dden_w );
 
+	DECLARE_WRITE_LINE_MEMBER( motorona_w );
+
 	void select_drive(int n, int state);
 
 	// Debugger accessors
@@ -78,11 +79,8 @@ private:
 	// Set the current floppy
 	void set_drive();
 
-	// Operate the floppy motors
-	void set_floppy_motors_running(bool run);
-
 	// Holds the status of the DRQ and IRQ lines.
-	int      m_DRQ, m_IRQ;
+	int m_DRQ, m_IRQ;
 
 	// DIP switch state
 	int m_dip1, m_dip2, m_dip34;
@@ -105,14 +103,8 @@ private:
 	// Signal motor_on. When true, makes all drives turning.
 	int m_MOTOR_ON;
 
-	// Needed for triggering the motor monoflop
-	uint8_t m_lastmop;
-
 	// Recent address
 	int m_address;
-
-	// count 4.23s from rising edge of motor_on
-	emu_timer*      m_motor_on_timer;
 
 	// DSR ROM
 	uint8_t*          m_dsrrom;
@@ -135,6 +127,9 @@ private:
 	// Latched CRU outputs
 	required_device<ls259_device> m_crulatch0_7;
 	required_device<ls259_device> m_crulatch8_15;
+
+	// Motor monoflop
+	required_device<ttl74123_device> m_motormf;
 };
 
 } } } // end namespace bus::ti99::peb

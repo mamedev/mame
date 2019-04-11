@@ -45,6 +45,7 @@
 #include "emu.h"
 #include "bwg.h"
 #include "formats/ti99_dsk.h"
+#include "machine/rescap.h"
 
 // ----------------------------------
 // Flags for debugging
@@ -90,16 +91,15 @@ snug_bwg_device::snug_bwg_device(const machine_config &mconfig, const char *tag,
 	  m_lastK(false),
 	  m_dataregLB(false),
 	  m_MOTOR_ON(),
-	  m_lastmop(0),
 	  m_address(0),
-	  m_motor_on_timer(nullptr),
 	  m_dsrrom(nullptr),
 	  m_buffer_ram(*this, BUFFER),
 	  m_sel_floppy(0),
 	  m_wd1773(*this, FDC_TAG),
 	  m_clock(*this, CLOCK_TAG),
 	  m_crulatch0_7(*this, "crulatch0_7"),
-	  m_crulatch8_15(*this, "crulatch8_15")
+	  m_crulatch8_15(*this, "crulatch8_15"),
+	  m_motormf(*this, "motormf")
 	  { }
 
 /*
@@ -399,13 +399,7 @@ WRITE_LINE_MEMBER(snug_bwg_device::den_w)
 
 WRITE_LINE_MEMBER(snug_bwg_device::mop_w)
 {
-	// Activate motor on rising edge
-	if (state==ASSERT_LINE && m_lastmop==CLEAR_LINE)
-	{   // Monoflop lets motor run for 4.23s
-		LOGMASKED(LOG_CRU, "Trigger motor (bit 1)\n");
-		set_floppy_motors_running(true);
-	}
-	m_lastmop = state;
+	m_motormf->b_w(state);
 }
 
 WRITE_LINE_MEMBER(snug_bwg_device::waiten_w)
@@ -496,37 +490,19 @@ WRITE_LINE_MEMBER(snug_bwg_device::dden_w)
 }
 
 /*
-    Monoflop has gone back to the OFF state.
-*/
-void snug_bwg_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	set_floppy_motors_running(false);
-}
-
-/*
     All floppy motors are operated by the same line.
 */
-void snug_bwg_device::set_floppy_motors_running(bool run)
+WRITE_LINE_MEMBER(snug_bwg_device::motorona_w)
 {
-	if (run)
-	{
-		if (m_MOTOR_ON==CLEAR_LINE) LOGMASKED(LOG_MOTOR, "Motor START\n");
-		m_MOTOR_ON = ASSERT_LINE;
-		m_motor_on_timer->adjust(attotime::from_msec(4230));
-	}
-	else
-	{
-		if (m_MOTOR_ON==ASSERT_LINE) LOGMASKED(LOG_MOTOR, "Motor STOP\n");
-		m_MOTOR_ON = CLEAR_LINE;
-	}
+	m_MOTOR_ON = state;
+	LOGMASKED(LOG_MOTOR, "Motor %s\n", state? "on" : "off");
 
-	// The motor-on line is connected to pin 20 which is falsely called "MO"
-	// in the schematics; should be called "READY" as we are using the WD1773.
-	m_wd1773->set_force_ready(run);
+	// The monoflop is connected to the READY line
+	m_wd1773->set_force_ready(state==ASSERT_LINE);
 
 	// Set all motors
 	for (auto & elem : m_floppy)
-		if (elem != nullptr) elem->mon_w((run)? 0 : 1);
+		if (elem != nullptr) elem->mon_w((state==ASSERT_LINE)? 0 : 1);
 
 	// The motor-on line also connects to the wait state logic
 	operate_ready_line();
@@ -535,7 +511,6 @@ void snug_bwg_device::set_floppy_motors_running(bool run)
 void snug_bwg_device::device_start()
 {
 	m_dsrrom = memregion(TI99_DSRROM)->base();
-	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
 	m_cru_base = 0x1100;
 
 	save_item(NAME(m_DRQ));
@@ -547,7 +522,6 @@ void snug_bwg_device::device_start()
 	save_item(NAME(m_lastK));
 	save_item(NAME(m_dataregLB));
 	save_item(NAME(m_MOTOR_ON));
-	save_item(NAME(m_lastmop));
 	save_item(NAME(m_address));
 }
 
@@ -563,8 +537,6 @@ void snug_bwg_device::device_reset()
 		m_select_mask = 0x7e000;
 		m_select_value = 0x74000;
 	}
-
-	m_lastmop = 0;
 
 	m_DRQ = CLEAR_LINE;
 	m_IRQ = CLEAR_LINE;
@@ -672,6 +644,14 @@ void snug_bwg_device::device_add_mconfig(machine_config& config)
 	LS259(config, m_crulatch8_15); // U12
 	m_crulatch8_15->q_out_cb<0>().set(FUNC(snug_bwg_device::dsel4_w));
 	m_crulatch8_15->q_out_cb<2>().set(FUNC(snug_bwg_device::dden_w));
+
+	// TODO: Replace this by the actual 74HC4538
+	TTL74123(config, m_motormf, 0);
+	m_motormf->out_cb().set(FUNC(snug_bwg_device::motorona_w));
+	m_motormf->set_connection_type(TTL74123_GROUNDED);
+	m_motormf->set_resistor_value(RES_K(200));
+	m_motormf->set_capacitor_value(CAP_U(47));
+	m_motormf->set_clear_pin_value(1);
 }
 
 ioport_constructor snug_bwg_device::device_input_ports() const
