@@ -980,8 +980,8 @@ void pengo_state::decode_schick_extra(int size, uint8_t* rom)
 				case 0x11: srcdec = (srcdec & ~0x51) | 0x11; break;
 				case 0x40: srcdec = (srcdec & ~0x51) | 0x00; break; // nops at e538?
 				case 0x41: srcdec = (srcdec & ~0x51) | 0x40; break;
-				case 0x50: srcdec = (srcdec & ~0x51) | 0x50; break; 
-				case 0x51: srcdec = (srcdec & ~0x51) | 0x51; break;
+				case 0x50: srcdec = (srcdec & ~0x51) | 0x51; break;  // 51 = for push opcodes (e4fa)
+				case 0x51: srcdec = (srcdec & ~0x51) | 0x50; break;
 				}
 
 				rom[A] = srcdec;
