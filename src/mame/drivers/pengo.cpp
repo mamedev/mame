@@ -976,8 +976,10 @@ void pengo_state::decode_schick_extra(int size, uint8_t* rom)
 
 				// this sequence appears in several places
 				//E5C7 : CD 2B BE    call $FF6B // valid call
-				//E5CA : oo dd dd               // must be a 3 byte opcode, but NOT a jump dd are clearly data, bit 0x80 is set on oo tho and only 3 byte opcodes with is set are jumps?
+				//E5CA : oo dd dd               // must be a 3 byte opcode, but NOT a jump dd are clearly data, bit 0x80 is set on oo tho and only 3 byte opcodes with is set are jumps to invalid addresses?
 				//E5CD : C3 82 A2    jp   $F2D2 // valid jump
+
+				// this can't be right either, no combination of dropping 0x80 gives a 3 byte opcode
 
 				switch (srcdec & 0xd1)
 				{
