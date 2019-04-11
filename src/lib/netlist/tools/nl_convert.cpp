@@ -227,7 +227,8 @@ nl_convert_base_t::unit_t nl_convert_base_t::m_units[] = {
 		{"M",   "CAP_M({1})", 1.0e-3 },
 		{"u",   "CAP_U({1})", 1.0e-6 }, /* eagle */
 		{"U",   "CAP_U({1})", 1.0e-6 },
-		{"μ",  "CAP_U({1})",  1.0e-6 },
+		{"μ",   "CAP_U({1})",  1.0e-6 },
+		{"µ",   "CAP_U({1})",  1.0e-6 },
 		{"N",   "CAP_N({1})", 1.0e-9 },
 		{"pF",  "CAP_P({1})", 1.0e-12},
 		{"P",   "CAP_P({1})", 1.0e-12},
@@ -281,6 +282,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 {
 	if (line != "")
 	{
+		printf("// %s\n", line.c_str());
 		std::vector<pstring> tt(plib::psplit(line, " ", true));
 		double val = 0.0;
 		switch (tt[0].at(0))
@@ -388,6 +390,8 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				else
 					plib::perrlogger("Voltage Source {} not connected to GND\n", tt[0]);
 				break;
+#if 0
+			// This is wrong ... Need to use something else for inputs!
 			case 'I': // Input pin special notation
 				{
 					val = get_sp_val(tt[2]);
@@ -395,6 +399,16 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					add_term(tt[1], tt[0] + ".Q");
 				}
 				break;
+#else
+			case 'I':
+				{
+					val = get_sp_val(tt[3]);
+					add_device("CS", tt[0], val);
+					add_term(tt[1], tt[0] + ".1");
+					add_term(tt[2], tt[0] + ".2");
+				}
+				break;
+#endif
 			case 'D':
 				add_device("DIODE", tt[0], tt[3]);
 				/* FIXME ==> does Kicad use different notation from LTSPICE */
