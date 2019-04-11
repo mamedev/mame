@@ -19,7 +19,6 @@
 #define ENABLE_OVERFLOWS            (0)
 #define ENABLE_EE_ELF_LOADER        (0)
 #define ENABLE_EE_DECI2             (0)
-#define DELAY_SLOT_EXCEPTION_HACK   (0)
 
 /***************************************************************************
     HELPER MACROS
@@ -315,12 +314,8 @@ void mips3_device::generate_exception(int exception, int backup)
 	/* check if exception within another exception */
 	if (!(SR & SR_EXL))
 	{
-		/* if we were in a branch delay slot, adjust */
-#if DELAY_SLOT_EXCEPTION_HACK
-		if (((m_nextpc != ~0) || (m_delayslot)) && (m_ppc == m_core->pc - 4))
-#else
-		if ((m_nextpc != ~0) || (m_delayslot))
-#endif
+		/* if we were in a branch delay slot and we are backing up, adjust */
+		if (((m_nextpc != ~0) || (m_delayslot)) && backup)
 		{
 			m_delayslot = false;
 			m_nextpc = ~0;
