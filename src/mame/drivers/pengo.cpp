@@ -974,12 +974,12 @@ void pengo_state::decode_schick_extra(int size, uint8_t* rom)
 			{
 				switch (srcdec & 0x51)
 				{
-				case 0x00: srcdec = (srcdec & ~0x51) | 0x00; break;
+				case 0x00: srcdec = (srcdec & ~0x51) | 0x10; break;
 				case 0x01: srcdec = (srcdec & ~0x51) | 0x01; break; 
 				case 0x10: srcdec = (srcdec & ~0x51) | 0x41; break; // 92 -> c3 (jmp)
 				case 0x11: srcdec = (srcdec & ~0x51) | 0x11; break;
-				case 0x40: srcdec = (srcdec & ~0x51) | 0x40; break;
-				case 0x41: srcdec = (srcdec & ~0x51) | 0x10; break;
+				case 0x40: srcdec = (srcdec & ~0x51) | 0x00; break; // nops at e538?
+				case 0x41: srcdec = (srcdec & ~0x51) | 0x40; break;
 				case 0x50: srcdec = (srcdec & ~0x51) | 0x50; break; 
 				case 0x51: srcdec = (srcdec & ~0x51) | 0x51; break;
 				}
