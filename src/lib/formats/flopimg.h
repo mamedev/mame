@@ -157,6 +157,8 @@ LEGACY_FLOPPY_OPTIONS_EXTERN(default);
 #define INTERLEAVE(range)       "I" #range
 #define FIRST_SECTOR_ID(range)  "F" #range
 
+/* Max number of excess tracks to be discarded from disk image to fit floppy drive */
+#define DUMP_THRESHOLD 2
 
 /***************************************************************************
 
