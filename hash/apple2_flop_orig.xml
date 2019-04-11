@@ -4281,7 +4281,7 @@
 				<rom name="Kabul Spy side A.woz" size="234767" crc="c74eecb3" sha1="470af159c00cdbe598a6f90fbaf828d0811b9a4d" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="234113">
 				<rom name="Kabul Spy side B.woz" size="234113" crc="90125676" sha1="f693a45d7aa5d8f34726cbe2e4835b350770cdef" offset="0x0000" />
@@ -4319,7 +4319,7 @@
 				<rom name="Fantavision side A - program.woz" size="241390" crc="2f60d960" sha1="747244f6f014653f2485cf28f170c4ad04d26344" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B - Demos"/>
 			<dataarea name="flop" size="234732">
 				<rom name="Fantavision side B - demos.woz" size="234732" crc="f21e1a6b" sha1="f74a11d81992f8b2d755f8e7b43071c44d022753" offset="0x0000" />
@@ -4356,7 +4356,7 @@
 				<rom name="The Blade of Blackpoole side A.woz" size="233749" crc="f5970c35" sha1="e30e6f8608f4c2e58199bf7a5e26681663eaae5c" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="234773">
 				<rom name="The Blade of Blackpoole side B.woz" size="234773" crc="9ebc12b3" sha1="937247198db212cf7953e715c2d4fd9ac41ef521" offset="0x0000" />
@@ -4378,9 +4378,9 @@
 				<rom name="Wizardry III side A - master scenario disk.woz" size="234882" crc="b8f3c442" sha1="b41cf001e4c9aa74426ecf71809d1fe5ea50f256" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot disk"/>
 			<dataarea name="flop" size="234871">
-				<feature name="part_id" value="Side B - Boot disk"/>
 				<rom name="Wizardry III side B - boot.woz" size="234871" crc="4e0b9951" sha1="ed00134fb1006eeb3cd1299449759beae2218061" offset="0x0000" />
 			</dataarea>
 		</part>
