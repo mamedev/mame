@@ -7,11 +7,10 @@
     Disk image format for the ACT Apricot
 
 ***************************************************************************/
+#ifndef MAME_FORMATS_APRIDISK_H
+#define MAME_FORMATS_APRIDISK_H
 
 #pragma once
-
-#ifndef __APRIDISK_H__
-#define __APRIDISK_H__
 
 #include "flopimg.h"
 
@@ -54,4 +53,4 @@ private:
 
 extern const floppy_format_type FLOPPY_APRIDISK_FORMAT;
 
-#endif // __APRIDISK_H__
+#endif // MAME_FORMATS_APRIDISK_H

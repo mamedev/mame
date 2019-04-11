@@ -7,45 +7,44 @@
     HxC Floppy Emulator HFE file format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_HXCHFE_DSK_H
+#define MAME_FORMATS_HXCHFE_DSK_H
 
-#ifndef HXCHFE_DSK_H
-#define HXCHFE_DSK_H
+#pragma once
 
 #include "flopimg.h"
-
-#define HFE_FORMAT_HEADER   "HXCPICFE"
-
-enum encoding_t
-{
-	ISOIBM_MFM_ENCODING = 0x00,
-	AMIGA_MFM_ENCODING,
-	ISOIBM_FM_ENCODING,
-	EMU_FM_ENCODING,
-	UNKNOWN_ENCODING = 0xff
-};
-
-enum floppymode_t
-{
-	IBMPC_DD_FLOPPYMODE = 00,
-	IBMPC_HD_FLOPPYMODE,
-	ATARIST_DD_FLOPPYMODE,
-	ATARIST_HD_FLOPPYMODE,
-	AMIGA_DD_FLOPPYMODE,
-	AMIGA_HD_FLOPPYMODE,
-	CPC_DD_FLOPPYMODE,
-	GENERIC_SHUGART_DD_FLOPPYMODE,
-	IBMPC_ED_FLOPPYMODE,
-	MSX2_DD_FLOPPYMODE,
-	C64_DD_FLOPPYMODE,
-	EMU_SHUGART_FLOPPYMODE,
-	S950_DD_FLOPPYMODE,
-	S950_HD_FLOPPYMODE,
-	DISABLE_FLOPPYMODE = 0xfe
-};
 
 class hfe_format : public floppy_image_format_t
 {
 public:
+	enum encoding_t
+	{
+		ISOIBM_MFM_ENCODING = 0x00,
+		AMIGA_MFM_ENCODING,
+		ISOIBM_FM_ENCODING,
+		EMU_FM_ENCODING,
+		UNKNOWN_ENCODING = 0xff
+	};
+
+	enum floppymode_t
+	{
+		IBMPC_DD_FLOPPYMODE = 00,
+		IBMPC_HD_FLOPPYMODE,
+		ATARIST_DD_FLOPPYMODE,
+		ATARIST_HD_FLOPPYMODE,
+		AMIGA_DD_FLOPPYMODE,
+		AMIGA_HD_FLOPPYMODE,
+		CPC_DD_FLOPPYMODE,
+		GENERIC_SHUGART_DD_FLOPPYMODE,
+		IBMPC_ED_FLOPPYMODE,
+		MSX2_DD_FLOPPYMODE,
+		C64_DD_FLOPPYMODE,
+		EMU_SHUGART_FLOPPYMODE,
+		S950_DD_FLOPPYMODE,
+		S950_HD_FLOPPYMODE,
+		DISABLE_FLOPPYMODE = 0xfe
+	};
+
 	hfe_format();
 
 	virtual int identify(io_generic *io, uint32_t form_factor) override;
@@ -88,4 +87,4 @@ private:
 
 extern const floppy_format_type FLOPPY_HFE_FORMAT;
 
-#endif /* HXCHFE_DSK_H */
+#endif // MAME_FORMATS_HXCHFE_DSK_H

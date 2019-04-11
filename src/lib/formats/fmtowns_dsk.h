@@ -5,13 +5,15 @@
  *
  *  Created on: 23/03/2014
  */
+#ifndef MAME_FORMATS_FMTOWNS_DSK_H
+#define MAME_FORMATS_FMTOWNS_DSK_H
 
-#ifndef FMTOWNS_DSK_H_
-#define FMTOWNS_DSK_H_
+#pragma once
 
 #include "wd177x_dsk.h"
 
-class fmtowns_format : public wd177x_format {
+class fmtowns_format : public wd177x_format
+{
 public:
 	fmtowns_format();
 
@@ -25,5 +27,4 @@ private:
 
 extern const floppy_format_type FLOPPY_FMTOWNS_FORMAT;
 
-
-#endif /* FMTOWNS_DSK_H_ */
+#endif // MAME_FORMATS_FMTOWNS_DSK_H

@@ -101,6 +101,8 @@
 
 #include "hxchfe_dsk.h"
 
+#define HFE_FORMAT_HEADER   "HXCPICFE"
+
 #define HEADER_LENGTH 512
 #define TRACK_TABLE_LENGTH 1024
 

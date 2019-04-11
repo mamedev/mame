@@ -7,11 +7,10 @@
     Opus Discovery disk image formats
 
 ***************************************************************************/
+#ifndef MAME_FORMATS_OPD_DSK_H
+#define MAME_FORMATS_OPD_DSK_H
 
 #pragma once
-
-#ifndef OPD_DSK_H
-#define OPD_DSK_H
 
 #include "flopimg.h"
 #include "wd177x_dsk.h"
@@ -35,4 +34,4 @@ private:
 
 extern const floppy_format_type FLOPPY_OPD_FORMAT;
 
-#endif // OPD_DSK_H
+#endif // MAME_FORMATS_OPD_DSK_H

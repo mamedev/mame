@@ -7,13 +7,15 @@
     hp_ipc format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_HP_IPC_DSK_H
+#define MAME_FORMATS_HP_IPC_DSK_H
 
-#ifndef HP_IPC_DSK_H_
-#define HP_IPC_DSK_H_
+#pragma once
 
 #include "wd177x_dsk.h"
 
-class hp_ipc_format : public wd177x_format {
+class hp_ipc_format : public wd177x_format
+{
 public:
 	hp_ipc_format();
 
@@ -27,4 +29,4 @@ private:
 
 extern const floppy_format_type FLOPPY_HP_IPC_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_HP_IPC_DSK_H

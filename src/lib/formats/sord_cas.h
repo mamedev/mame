@@ -7,12 +7,13 @@
     Format code for Sord M5 cassette files
 
 *********************************************************************/
+#ifndef MAME_FORMATS_SORD_CAS_H
+#define MAME_FORMATS_SORD_CAS_H
 
-#ifndef SORD_CAS_H
-#define SORD_CAS_H
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(sordm5_cassette_formats);
 
-#endif /* SORD_CAS_H */
+#endif // MAME_FORMATS_SORD_CAS_H

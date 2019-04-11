@@ -9,11 +9,10 @@
     Used by Paul Burgin's PC-Dragon emulator
 
 ***************************************************************************/
+#ifndef MAME_FORMATS_VDK_DSK_H
+#define MAME_FORMATS_VDK_DSK_H
 
 #pragma once
-
-#ifndef __VDK_DSK_H__
-#define __VDK_DSK_H__
 
 #include "flopimg.h"
 
@@ -39,4 +38,4 @@ private:
 
 extern const floppy_format_type FLOPPY_VDK_FORMAT;
 
-#endif // __VDK_DSK_H__
+#endif // MAME_FORMATS_VDK_DSK_H

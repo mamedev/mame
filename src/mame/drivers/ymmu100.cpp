@@ -795,14 +795,12 @@ void mu100_state::pb_w_mu80(u16 data)
 u16 mu100_state::pb_r_mu80()
 {
 	if((cur_pa & PA_LCD_ENABLE)) {
-		if(cur_pa & PA_LCD_RW)
-		{
+		if(cur_pa & PA_LCD_RW) {
 			if(cur_pa & PA_LCD_RS)
 				return m_lcd->data_read();
 			else
 				return m_lcd->control_read();
-		} else
-		{
+		} else {
 			if(!(cur_pa & 0x10)) {
 				u8 val = 0xff;
 				if(!(cur_ic32 & 0x20))
@@ -833,18 +831,16 @@ void mu100_state::pa_w_mu80(u16 data)
 {
 	data ^= PA_LCD_ENABLE;
 	if(!(cur_pa & PA_LCD_ENABLE) && (data & PA_LCD_ENABLE)) {
-	if(!(cur_pa & PA_LCD_RW)) {
-		if(cur_pa & PA_LCD_RS)
-			m_lcd->data_write(cur_pb);
-		else
-			m_lcd->control_write(cur_pb);
+		if(!(cur_pa & PA_LCD_RW)) {
+			if(cur_pa & PA_LCD_RS)
+				m_lcd->data_write(cur_pb);
+			else
+				m_lcd->control_write(cur_pb);
 		}
 	}
 
 	if(!(cur_pa & 0x08) && (data & 0x08))
-	{
 		cur_ic32 = cur_pb;
-	}
 
 	cur_pa = data;
 }

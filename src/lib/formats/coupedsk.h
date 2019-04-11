@@ -7,9 +7,10 @@
     SAM Coupe disk image formats
 
 **************************************************************************/
+#ifndef MAME_FORMATS_COUPEDSK_H
+#define MAME_FORMATS_COUPEDSK_H
 
-#ifndef __COUPEDSK_H__
-#define __COUPEDSK_H__
+#pragma once
 
 #include "flopimg.h"
 
@@ -32,4 +33,4 @@ public:
 
 extern const floppy_format_type FLOPPY_MGT_FORMAT;
 
-#endif /* __COUPEDSK_H__ */
+#endif // MAME_FORMATS_COUPEDSK_H

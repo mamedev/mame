@@ -7,15 +7,17 @@
     MSX disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_MSX_DSK_H
+#define MAME_FORMATS_MSX_DSK_H
 
-#ifndef MSX_DSK_H
-#define MSX_DSK_H
+#pragma once
 
 //#include "wd177x_dsk.h"
 #include "upd765_dsk.h"
 
 //class msx_format : public wd177x_format {
-class msx_format: public upd765_format {
+class msx_format: public upd765_format
+{
 public:
 	msx_format();
 
@@ -29,4 +31,4 @@ private:
 
 extern const floppy_format_type FLOPPY_MSX_FORMAT;
 
-#endif /* MSX_DSK_H */
+#endif // MAME_FORMATS_MSX_DSK_H
