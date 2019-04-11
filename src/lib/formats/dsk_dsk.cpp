@@ -365,7 +365,7 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 
 	int img_tracks, img_heads;
 	image->get_maximal_geometry(img_tracks, img_heads);
-	if (tracks > img_tracks || heads > img_heads)
+	if (tracks > (img_tracks + 1) || heads > img_heads)
 		return false;
 
 	uint64_t track_offsets[84*2];
