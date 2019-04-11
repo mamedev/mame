@@ -1281,7 +1281,7 @@ void pcw_state::pcw(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(32_MHz_XTAL / 3, 720 + 20, 0, 720, 256 + 32, 16, 256 + 16); // Hand tuned to get 50Hz, it is all in the Amstrad ASIC, 32MHz in and video out
+	m_screen->set_raw(32_MHz_XTAL / 3, 720 + 20, 8, 720 + 8, 256 + 32, 8, 256 + 8); // Hand tuned to get 50Hz, it is all in the Amstrad ASIC, 32MHz in and video out
 	m_screen->set_screen_update(FUNC(pcw_state::screen_update_pcw));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_palette(m_palette);
