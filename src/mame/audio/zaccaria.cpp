@@ -413,12 +413,14 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	m_melodypsg1->add_route(0, "sound_nl", 1.0, 0);
 	m_melodypsg1->add_route(1, "sound_nl", 1.0, 1);
 	m_melodypsg1->add_route(2, "sound_nl", 1.0, 2);
+	m_melodypsg1->set_flags(AY8910_RESISTOR_OUTPUT);
 
 	m_melodypsg2->port_a_write_callback().set(FUNC(zac1b11142_audio_device::ay_4h_porta_w));
 	m_melodypsg2->port_b_write_callback().set(FUNC(zac1b11142_audio_device::ay_4h_portb_w));
 	m_melodypsg2->add_route(0, "sound_nl", 1.0, 3);
 	m_melodypsg2->add_route(1, "sound_nl", 1.0, 4);
 	m_melodypsg2->add_route(2, "sound_nl", 1.0, 5);
+	m_melodypsg2->set_flags(AY8910_RESISTOR_OUTPUT);
 
 	M6802(config, m_audiocpu, XTAL(3'579'545)); // verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &zac1b11142_audio_device::zac1b11142_audio_map);

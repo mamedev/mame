@@ -9,6 +9,7 @@
 
 #endif
 
+#define USE_FRONTIERS 1
 
 NETLIST_START(zac1b11142_schematics)
 
@@ -279,22 +280,19 @@ NETLIST_END()
 
 NETLIST_START(zac1b11142)
 
-	//SOLVER(Solver, 48000)
 	SOLVER(Solver, 48000)
-	//PARAM(Solver.ACCURACY, 1e-10)
-	PARAM(Solver.ACCURACY, 1e-6)
-	PARAM(Solver.NR_LOOPS, 3000)
+	PARAM(Solver.ACCURACY, 1e-7)
+	PARAM(Solver.NR_LOOPS, 300)
 	PARAM(Solver.METHOD, "MAT_CR")
-	PARAM(Solver.PARALLEL, 2)
+	PARAM(Solver.PARALLEL, 4)
 	PARAM(Solver.DYNAMIC_TS, 0)
-	PARAM(Solver.DYNAMIC_LTE, 5e-4)
+	PARAM(Solver.DYNAMIC_LTE, 5e-2)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-7)
 
 	LOCAL_SOURCE(zac1b11142_schematics)
 
 	ANALOG_INPUT(I_P12, 11.3) // +12V dropped with a 1N4004
 	ANALOG_INPUT(I_P5, 5)
-	//ANALOG_INPUT(I_V0, 0)
 	ANALOG_INPUT(I_M5, -5)
 	ALIAS(VCC, I_P5.Q)
 	ALIAS(I_V0.Q, GND)
@@ -347,4 +345,16 @@ NETLIST_START(zac1b11142)
 
 	// FIXME: connect other sounds to netlist as well for proper mixing
 	// FIXME: make P1 controllable by mame ui (see pong for an example)
+
+	#if (USE_FRONTIERS)
+	OPTIMIZE_FRONTIER(R124.1, RES_K(39), 50)
+	OPTIMIZE_FRONTIER(R105.1, RES_K(56), 50)
+	OPTIMIZE_FRONTIER(R106.1, RES_K(68), 50)
+	// R80 not connected
+	//OPTIMIZE_FRONTIER(R80.1,  RES_K(10), 50)
+
+	OPTIMIZE_FRONTIER(R90.1, RES_K(68), 50)
+	OPTIMIZE_FRONTIER(R96.1, RES_K(4.7), 50)
+	#endif
+
 NETLIST_END()
