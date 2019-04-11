@@ -5,10 +5,14 @@
 
 /*
  * 0 = Basic hack (Norton with just amplification, no voltage cutting)
- * 1 = Model from LTSPICE list - slow!
+ * 1 = Model from LTSPICE mailing list - slow!
  * 2 = Simplified model using diode inputs and netlist TYPE=3
+ * 3 = Model according to datasheet
+ *
+ * For Money Money 1 and 3 delivery comparable results.
+ * 3 is simpler (less BJTs) and converges a lot faster.
  */
-#define USE_LM3900_MODEL (2)
+#define USE_LM3900_MODEL (3)
 
 /*
  *   Generic layout with 4 opamps, VCC on pin 4 and GND on pin 11
@@ -290,7 +294,7 @@ NETLIST_END()
 static NETLIST_START(LM3900)
 	OPAMP(A, "LM3900")
 
-	DIODE(D1, "D(IS=1e-14 N=1)")
+	DIODE(D1, "D(IS=1e-15 N=1)")
 	CCCS(CS1) // Current Mirror
 
 	ALIAS(VCC, A.VCC)
@@ -304,6 +308,34 @@ static NETLIST_START(LM3900)
 	NET_C(CS1.OP, A.MINUS)
 	NET_C(CS1.ON, A.GND, D1.K)
 
+NETLIST_END()
+#endif
+
+#if USE_LM3900_MODEL == 3
+static NETLIST_START(LM3900)
+
+	ALIAS(VCC, Q5.C)
+	ALIAS(GND, Q1.E)
+	ALIAS(PLUS, Q1.B)
+	ALIAS(MINUS, Q1.C)
+	ALIAS(OUT, Q5.E)
+
+	CAP(C1, CAP_P(6.000000))
+	CS(I1, 1.300000e-3)
+	CS(I2, 200e-6)
+	QBJT_EB(Q1, "NPN")
+	QBJT_EB(Q2, "NPN")
+	QBJT_EB(Q3, "PNP")
+	QBJT_EB(Q4, "PNP")
+	QBJT_EB(Q5, "NPN")
+	QBJT_EB(Q6, "NPN")
+	NET_C(Q3.E, Q5.B, I2.2)
+	NET_C(Q3.C, Q4.E, Q5.E, I1.1)
+	NET_C(Q5.C, I2.1)
+	NET_C(Q1.B, Q6.C, Q6.B)
+	NET_C(Q1.E, Q2.E, Q4.C, C1.2, I1.2, Q6.E)
+	NET_C(Q1.C, Q2.B)
+	NET_C(Q2.C, Q3.B, Q4.B, C1.1)
 NETLIST_END()
 #endif
 
@@ -321,7 +353,8 @@ NETLIST_START(OPAMP_lib)
 	NET_MODEL("UA741       OPAMP(TYPE=3 VLH=1.0 VLL=1.0 FPF=5 UGF=1000k SLEW=0.5M RI=2000k RO=75 DAB=0.0017)")
 	NET_MODEL("LM747       OPAMP(TYPE=3 VLH=1.0 VLL=1.0 FPF=5 UGF=1000k SLEW=0.5M RI=2000k RO=50 DAB=0.0017)")
 	NET_MODEL("LM747A      OPAMP(TYPE=3 VLH=2.0 VLL=2.0 FPF=5 UGF=1000k SLEW=0.7M RI=6000k RO=50 DAB=0.0015)")
-	NET_MODEL("LM3900      OPAMP(TYPE=3 VLH=1.0 VLL=0.03 FPF=2k UGF=4M   SLEW=0.5M RI=10M    RO=2k DAB=0.0015)")
+	// TI and Motorola Datasheets differ - below are Motorola values values SLEW is average of LH and HL
+	NET_MODEL("LM3900      OPAMP(TYPE=3 VLH=1.0 VLL=0.03 FPF=2k UGF=4M SLEW=10M RI=10M RO=2k DAB=0.0015)")
 
 #if USE_LM3900_MODEL == 1
 	NET_MODEL("LM3900_NPN1 NPN(IS=1E-14 BF=150 TF=1E-9 CJC=1E-12 CJE=1E-12 VAF=150 RB=100 RE=5 IKF=0.002)")

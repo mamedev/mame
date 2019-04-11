@@ -54,7 +54,7 @@ NETLIST_START(main)
 	 * Fixed Frequency:
 	 * PARAM(vs.FUNC, "1.001 * sin(6.28 * 100 * T)")
 	 */
-	PARAM(vs.R, 50)
+	PARAM(vs.R, 0.1)
 	ALIAS(clk, vs.1)
 	NET_C(vs.2, GND)
     ANALOG_INPUT(V9, 9)
@@ -82,13 +82,13 @@ NETLIST_START(main)
     NET_C(op.MINUS, R2.2)
     NET_C(op.MINUS, R1.2)
 
-	CAP(C, 0.1e-6)
+	CAP(C, 10e-6)
 
 	NET_C(clk, C.1)
  	NET_C(C.2, R1.1)
     NET_C(op.OUT, R2.1)
 
-	CAP(CL, 1.0e-6)
+	CAP(CL, 10.0e-6)
     RES(RL, 2000)
     NET_C(RL.2, GND)
     NET_C(RL.1, CL.2)
