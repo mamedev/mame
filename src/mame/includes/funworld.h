@@ -7,6 +7,8 @@
 
 #include "emupal.h"
 #include "machine/i2cmem.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
 
 class funworld_state : public driver_device
 {
@@ -30,7 +32,6 @@ public:
 	void cuoreuno(machine_config &config);
 	void funquiz(machine_config &config);
 	void witchryl(machine_config &config);
-	void intrgmes(machine_config &config);
 	void fw_brick_1(machine_config &config);
 	void fw_brick_2(machine_config &config);
 
@@ -41,7 +42,6 @@ public:
 	void init_dino4();
 	void init_ctunk();
 	void init_jolycdig();
-	void init_intrgmes();
 
 protected:
 	DECLARE_WRITE8_MEMBER(funworld_videoram_w);
@@ -72,7 +72,6 @@ private:
 	void funquiz_map(address_map &map);
 	void funworld_map(address_map &map);
 	void fw_brick_map(address_map &map);
-	void intergames_map(address_map &map);
 	void saloon_map(address_map &map);
 	void witchryl_map(address_map &map);
 
@@ -159,11 +158,10 @@ private:
 class royalcrdf_state : public funworld_state
 {
 public:
-
 	using funworld_state::funworld_state;
 	
 	void royalcrdf(machine_config& config);
-	
+
 	void driver_init() override;
 	
 private:
@@ -172,6 +170,36 @@ private:
 	
 	void royalcrdf_map(address_map& map);
 	void royalcrdf_opcodes_map(address_map& map);
+};
+
+class intergames_state : public funworld_state
+{
+public:
+	intergames_state(const machine_config &mconfig, device_type type, const char *tag) :
+		funworld_state(mconfig, type, tag),
+		m_crtc(*this, "crtc"),
+		m_ay8910(*this, "ay8910"),
+		m_crtc_selected(false)
+	{ }
+
+	void intrgmes(machine_config &config);
+
+protected:
+	virtual void driver_init() override;
+	virtual void machine_reset() override;
+
+private:
+	uint8_t crtc_or_psg_r(offs_t offset);
+	void crtc_or_psg_w(offs_t offset, uint8_t data);
+	uint8_t prot_r(offs_t offset);
+	void prot_w(offs_t offset, uint8_t data);
+
+	void intergames_map(address_map &map);
+
+	required_device<mc6845_device> m_crtc;
+	required_device<ay8910_device> m_ay8910;
+
+	bool m_crtc_selected;
 };
 
 #endif // MAME_INCLUDES_FUNWORLD_H

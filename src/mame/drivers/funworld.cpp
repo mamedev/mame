@@ -1143,8 +1143,6 @@
 #include "cpu/m6502/r65c02.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
-#include "sound/ay8910.h"
-#include "video/mc6845.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1393,17 +1391,56 @@ void funworld_state::witchryl_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-void funworld_state::intergames_map(address_map &map)
+uint8_t intergames_state::crtc_or_psg_r(offs_t offset)
+{
+	if (m_crtc_selected)
+		return m_crtc->register_r();
+	else
+		return m_ay8910->data_r(); // read back from both $3000 and $3001!
+}
+
+void intergames_state::crtc_or_psg_w(offs_t offset, uint8_t data)
+{
+	if (!m_crtc_selected)
+		m_ay8910->address_data_w(offset, data);
+	else if (BIT(offset, 0))
+		m_crtc->register_w(data);
+	else
+		m_crtc->address_w(data);
+}
+
+uint8_t intergames_state::prot_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+	{
+		if (offset == 0x99)
+			m_crtc_selected = false;
+		else
+			logerror("%s: Protection read from $%04X\n", machine().describe_context(), offset + 0x3600);
+	}
+
+	return 0xff;
+}
+
+void intergames_state::prot_w(offs_t offset, uint8_t data)
+{
+	logerror("%s: Writing $#%02X to $%04X\n", machine().describe_context(), data, offset + 0x3600);
+}
+
+void intergames_state::machine_reset()
+{
+	m_crtc_selected = true;
+}
+
+void intergames_state::intergames_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("nvram");
-	map(0x2000, 0x2fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram");
-	map(0x3000, 0x3001).r("ay8910", FUNC(ay8910_device::data_r));
-	map(0x3000, 0x3001).w("ay8910", FUNC(ay8910_device::address_data_w));
-//	map(0x3000, 0x3000).w("crtc", FUNC(mc6845_device::address_w));
-//	map(0x3001, 0x3001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2000, 0x2fff).ram().w(FUNC(intergames_state::funworld_videoram_w)).share("videoram");
+	map(0x3000, 0x3001).rw(FUNC(intergames_state::crtc_or_psg_r), FUNC(intergames_state::crtc_or_psg_w));
 	map(0x3200, 0x3203).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x3400, 0x3403).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x5000, 0x5fff).mirror(0x2000).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x3600, 0x37ff).rw(FUNC(intergames_state::prot_r), FUNC(intergames_state::prot_w));
+	map(0x5000, 0x5fff).mirror(0x2000).ram().w(FUNC(intergames_state::funworld_colorram_w)).share("colorram");
 	map(0x8000, 0xdfff).rom();
 	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xffff).rom();
@@ -3471,15 +3508,13 @@ void chinatow_state::rcdino4(machine_config &config)
 }
 
 
-void funworld_state::intrgmes(machine_config &config)
+void intergames_state::intrgmes(machine_config &config)
 {
 	fw1stpal(config);
 
 	M65SC02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::intergames_map);
-	m_maincpu->set_periodic_int(FUNC(funworld_state::nmi_line_pulse), attotime::from_hz(60));
-
-	config.device_remove("crtc");
+	m_maincpu->set_addrmap(AS_PROGRAM, &intergames_state::intergames_map);
+	//m_maincpu->set_periodic_int(FUNC(intergames_state::nmi_line_pulse), attotime::from_hz(60));
 
 	m_gfxdecode->set_info(gfx_fw2ndpal);
 }
@@ -7176,10 +7211,6 @@ ROM_END
   AY8910 at $3000-$3001.
   CRTC at... $3000-$3001 too!!!.
 
-  Can't find a safe way to map both devices in the same address.  
-  For now, just mapped the sound device in this offset, and generated
-  a periodic interrupt at 60Hz.
-
   There are multiple buffers and compare from some registers,
   reminding the way some hardwares handle inputs without PIAs.
 
@@ -8003,7 +8034,7 @@ void funworld_state::init_jolycdig()
 }
 
 
-void funworld_state::init_intrgmes()
+void intergames_state::driver_init()
 {
 	// NOP'ing some values in ROM space to avoid the hardware error.
 
@@ -8153,7 +8184,7 @@ GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  funworld_state, init_socc
 // Other games...
 GAME(  198?, funquiz,   0,        funquiz,  funquiz,     funworld_state, empty_init,   ROT0, "Fun World",       "Fun World Quiz (Austrian)",                      0 )
 GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,    funworld_state, empty_init,   ROT0, "Admiral/Novomatic","Novo Play Multi Card / Club Card",              0,                       layout_novoplay )
-GAME(  1991, intrgmes,  0,        intrgmes, intrgmes,    funworld_state, init_intrgmes,ROT0, "Inter Games",     "Joker Card (Inter Games)",                       0 )
+GAME(  1991, intrgmes,  0,        intrgmes, intrgmes,    intergames_state, empty_init, ROT0, "Inter Games",     "Joker Card (Inter Games)",                       0 )
 GAMEL( 1985, fw_a7_11,  0,        fw_brick_2, fw_brick1, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A7-11 game 1",                 MACHINE_NOT_WORKING,     layout_jollycrd )
 GAMEL( 1985, fw_a7_11a, fw_a7_11, fw_brick_2, fw_brick1, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A7-11 game 2",                 MACHINE_NOT_WORKING,     layout_jollycrd )
 GAMEL( 1991, fw_a0_1,   0,        fw_brick_2, fw_brick1, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A0-1 game",                    MACHINE_NOT_WORKING,     layout_jollycrd )
