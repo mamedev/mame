@@ -9,20 +9,21 @@
         die markings show
         "SunPlus QL8041" ( also known as Sunplus SPG240 & PAC300 )
 
-            (all GameKeyReady units?)
-            Disney Princess (GKR)
-            Wheel of Fortune (GKR)
-            JAKKS WWE (GKR)
-            Fantastic 4 (GKR)
-            Justice League (GKR)
-            Dora the Explorer Nursery Rhyme (GKR)
-            Dora the Explorer Play Park (GKR)
-            Spiderman 5-in-1 (GKR)
-            etc.
+            All GameKeyReady units
+			    Disney Princess (GKR)
+				Wheel of Fortune (GKR)
+				JAKKS WWE (GKR)
+				Fantastic 4 (GKR)
+				Justice League (GKR)
+				Dora the Explorer Nursery Rhyme (GKR)
+				Dora the Explorer Play Park (GKR)
+				Spiderman 5-in-1 (GKR)
+				etc.
 
             (other non GKR JAKKS games)
             X-Men (Wolverine pad)
             Avatar: The Last Airbender
+			Superman in Super Villain Showdown
 
             (other games)
             Mattel Classic Sports
@@ -36,8 +37,32 @@
         "SunPlus QU7074-P69A"
 
             The Batman
+			Star Wars (non-gamekey, which model? falcon? - check)
+			Dream Life
+
+		"SunPlus QL8167b" (is the scrambling built into the CPU, or external?)
+
+			Lexibook Zeus IG900 20-in-1
+
+		"SunPlus QL8139C"
+
+			Radica Cricket
+			V Smile Baby (Sweden) - see vsmileb.cpp
 
         ---
+
+		Very likely the same
+
+		"Sunplus QL8167" (these might have ROM scrambling if that is a 8167 feature)
+
+			Disney Princess Magical Adventure
+			Go Diego Go
+			Shrek - Over the Hedge (this unit shows a 'GameKey Unlock More Games' on startup, but has no port, not even on the internal PCB)
+			Marvel Heroes (Spider-man)
+			Spiderman 3 (Movie - black)
+
+
+		---
 
         It is unknown if the following are close to this architecture or not (no dumps yet)
 
@@ -49,14 +74,6 @@
 
             Mission Paintball
 
-        "Sunplus QL8167"
-
-            Disney Princess Magical Adventure
-            Go Diego Go
-            Shrek - Over the Hedge (this unit shows a 'GameKey Unlock More Games' on startup, but has no port, not even on the internal PCB)
-            Marvel Heroes (Spider-man)
-            Spiderman 3 (Movie - black)
-
         ---
 
         These are definitely different
@@ -67,9 +84,12 @@
             EA Sports (NHL95 + Madden 95)
             Spiderman 5-in-1 (original release)
 
-        "GCM394" (this is clearly newer, has extra opcodes, different internal map etc.)
+        "GCM394" (this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob)
 
             Smart Fit Park
+			SpongeBob SquarePants Bikini Bottom 500
+			Spiderman - The Masked Menace 'Spider Sense' (pad type with Spiderman model)
+			(Wireless Hunting? - maybe)
 
     Status:
 
