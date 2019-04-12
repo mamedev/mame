@@ -948,68 +948,60 @@ void pengo_state::decode_schick_extra(int size, uint8_t* rom)
 	{
 		uint8_t srcdec = rom[A];
 
-		/* if we assume only bits we've seen changed by the 2nd layer are chagned by this then our bitswap possibilities are
-
-		 6, 4, 0
-		 6, 0, 4
-		 4, 6, 0
-		 4, 0, 6
-		 0, 4, 6
-		 0, 6, 4
-
-		 and XOR possibilities are
-
-		 00
-		 01
-		 10
-		 11
-		 40
-		 41
-		 50
-		 51
-
-		*/
-
-		// copy+paste these + modify
-		//rom[A] = bitswap<8>(srcdec ^ xx, 7, 0, 5, 6, 3, 2, 1, 4);
-		//rom[A] = bitswap<8>(srcdec ^ xx, 7, 0, 5, 4, 3, 2, 1, 6);
-		//rom[A] = bitswap<8>(srcdec ^ xx, 7, 4, 5, 0, 3, 2, 1, 6);
-		//rom[A] = bitswap<8>(srcdec ^ xx, 7, 4, 5, 6, 3, 2, 1, 0);
-		//rom[A] = bitswap<8>(srcdec ^ xx, 7, 6, 5, 0, 3, 2, 1, 4);
-		//rom[A] = bitswap<8>(srcdec ^ xx, 7, 6, 5, 4, 3, 2, 1, 0); // no swap
+		// this layer of encryption only affects bits 0,4,6 ?
 
 		if (rom == m_decrypted_opcodes)
 		{
 			// these are wrong
 			if (A & 0x1000) // might be more conditions too, but there's certainly a boundary at efff-f000 (jump table)
 			{
-				//rom[A] = bitswap<8>(srcdec ^ 0x10, 7, 0, 5, 6, 3, 2, 1, 4); // NO
-				rom[A] = bitswap<8>(srcdec ^ 0x10, 7, 0, 5, 4, 3, 2, 1, 6); // potential, but no
-				//rom[A] = bitswap<8>(srcdec ^ 0x10, 7, 4, 5, 0, 3, 2, 1, 6); // NO
-				//rom[A] = bitswap<8>(srcdec ^ 0x10, 7, 4, 5, 6, 3, 2, 1, 0); // NO
-				//rom[A] = bitswap<8>(srcdec ^ 0x10, 7, 6, 5, 0, 3, 2, 1, 4); // NO
-				//rom[A] = bitswap<8>(srcdec ^ 0x10, 7, 6, 5, 4, 3, 2, 1, 0); // potential, but no (no swap)
+				// note, bit substitution tables, each value 0x00, 0x01, 0x10, 0x11, 0x40, 0x41, 0x50, 0x51 can only be used once.
 
-				//rom[A] = bitswap<8>(srcdec ^ 0x11, 7, 0, 5, 6, 3, 2, 1, 4); // NO(?)
-				//rom[A] = bitswap<8>(srcdec ^ 0x11, 7, 0, 5, 4, 3, 2, 1, 6); // NO
-				//rom[A] = bitswap<8>(srcdec ^ 0x11, 7, 4, 5, 0, 3, 2, 1, 6); // NO
-				//rom[A] = bitswap<8>(srcdec ^ 0x11, 7, 4, 5, 6, 3, 2, 1, 0); // NO
-				//rom[A] = bitswap<8>(srcdec ^ 0x11, 7, 6, 5, 0, 3, 2, 1, 4); // NO
-				//rom[A] = bitswap<8>(srcdec ^ 0x11, 7, 6, 5, 4, 3, 2, 1, 0);
+				switch (srcdec & 0x51)
+				{
+				case 0x00: srcdec = (srcdec & ~0x51) | 0x10; break; // looks good for ld ops
+				case 0x01: srcdec = (srcdec & ~0x51) | 0x50; break; // ok?
+				case 0x10: srcdec = (srcdec & ~0x51) | 0x11; break; // ok?
+				case 0x11: srcdec = (srcdec & ~0x51) | 0x51; break; // push/pull opcodes, see f1a1, f1a2, f1fd etc  (d3 case too) 
+				case 0x40: srcdec = (srcdec & ~0x51) | 0x00; break; // ok for some NOPs? and jr ops
+				case 0x41: srcdec = (srcdec & ~0x51) | 0x40; break; // maybe, ret z at f3be
+				case 0x50: srcdec = (srcdec & ~0x51) | 0x01; break; // not 11, not 50, maybe 01? see fcc1
+				case 0x51: srcdec = (srcdec & ~0x51) | 0x41; break; // jmp
+				}
+				rom[A] = srcdec;
 			}
 			else
 			{
-				//rom[A] = bitswap<8>(srcdec ^ 0x51, 7, 0, 5, 6, 3, 2, 1, 4); // NO
-				rom[A] = bitswap<8>(srcdec ^ 0x51, 7, 0, 5, 4, 3, 2, 1, 6);  // promising, but no
-				//rom[A] = bitswap<8>(srcdec ^ 0x51, 7, 4, 5, 0, 3, 2, 1, 6); // NO
-				//rom[A] = bitswap<8>(srcdec ^ 0x51, 7, 4, 5, 6, 3, 2, 1, 0); // NO
-				//rom[A] = bitswap<8>(srcdec ^ 0x51, 7, 6, 5, 0, 3, 2, 1, 4); // NO
-				// rom[A] = bitswap<8>(srcdec ^ 0x51, 7, 6, 5, 4, 3, 2, 1, 0); promising, but no (no swap)
+				// does this REALLY affect bit 0x80?  more logical would be bits 0x55, but that doesn't seem to be the case  (answer, NO, doesn't help)
+
+				// this sequence appears in several places
+				//E5C7 : CD 2B BE    call $FF6B // valid call
+				//E5CA : oo dd dd               // must be a 3 byte opcode, but NOT a jump dd are clearly data, bit 0x80 is set on oo tho and only 3 byte opcodes with is set are jumps to invalid addresses?
+				//E5CD : C3 82 A2    jp   $F2D2 // valid jump
+				// this can't be right either, no combination of dropping 0x80 gives a 3 byte opcode
+
+				// unless these really are jumps and there is code there? or the data decryption is wrong? (it seems correct for the jump offsets tho, so would need to be another condition)
+				// I wouldn't put it past Microhard to have an MCU supplying code too... (but why, there's already plenty of extra code for this pengo hack)
+
+
+				switch (srcdec & 0x51)
+				{
+				case 0x00: srcdec = (srcdec & ~0x51) | 0x40; break;
+				case 0x01: srcdec = (srcdec & ~0x51) | 0x01; break; 
+				case 0x10: srcdec = (srcdec & ~0x51) | 0x41; break; // JMP table EFA0
+				case 0x11: srcdec = (srcdec & ~0x51) | 0x11; break;
+				case 0x40: srcdec = (srcdec & ~0x51) | 0x00; break; // NOPs at e538
+				case 0x41: srcdec = (srcdec & ~0x51) | 0x51; break;
+				case 0x50: srcdec = (srcdec & ~0x51) | 0x50; break;
+				case 0x51: srcdec = (srcdec & ~0x51) | 0x10; break;
+				}
+
+				rom[A] = srcdec;
 			}
 		}
 		else
 		{
-			// these are correct(?) give good text, good jump locations etc.
+			// these are correct(?) give good text, good jump locations etc.  note, based on above might be substitution table like the base encryption, not bitswap, so could still be some bad cases
 			if (A & 0x10)
 				srcdec = bitswap<8>(srcdec ^ 0x11, 7, 0, 5, 6, 3, 2, 1, 4);
 			else
