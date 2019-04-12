@@ -33620,7 +33620,7 @@
 		</part>
 	</software>
 
-	<software name="simcity" supported="partial">
+	<software name="simcity">
 		<description>SimCity (USA, Prototype)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
