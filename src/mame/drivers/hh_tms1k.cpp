@@ -138,8 +138,6 @@
   - some of the games rely on the fact that faster/longer strobed leds appear brighter,
     eg. tc4/h2hfootb(offense), bankshot(cue ball), f3in1(ball), ...
   - 7in1ss: in 2-player mode, game select and skill select can be configured after selecting a game?
-  - arrball: shot button is unresponsive sometimes, maybe BTANB? no video of game on Youtube
-    ROM is good, PLAs are good, input mux is good
   - bship discrete sound, netlist is documented
   - finish bshipb SN76477 sound
   - improve elecbowl driver
@@ -652,7 +650,7 @@ READ8_MEMBER(arrball_state::read_k)
 
 static INPUT_PORTS_START( arrball )
 	PORT_START("IN.0") // R8
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Shot")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Shot") // pressed when START lights up
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Stop")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x08, 0x00, "Speed" )
