@@ -23,6 +23,7 @@
             (other non GKR JAKKS games)
             X-Men (Wolverine pad)
             Avatar: The Last Airbender
+			Superman in Super Villain Showdown
 
             (other games)
             Mattel Classic Sports
@@ -36,10 +37,17 @@
         "SunPlus QU7074-P69A"
 
             The Batman
+			Star Wars (non-gamekey, which model? falcon? - check)
+			Dream Life
 
-		"Sunplus QL8167b" (is the scrambling built into the CPU, or external?)
+		"SunPlus QL8167b" (is the scrambling built into the CPU, or external?)
 
 			Lexibook Zeus IG900 20-in-1
+
+		"SunPlus QL8139C"
+
+			Radica Cricket
+			V Smile Baby (Sweden) - see vsmileb.cpp
 
         ---
 
@@ -80,6 +88,7 @@
 
             Smart Fit Park
 			SpongeBob SquarePants Bikini Bottom 500
+			Spiderman - The Masked Menace 'Spider Sense' (pad type with Spiderman model)
 			(Wireless Hunting? - maybe)
 
     Status:
