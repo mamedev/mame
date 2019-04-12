@@ -103,10 +103,8 @@ void tms9980a_device::resolve_lines()
 {
 	// Resolve our external connections
 	m_external_operation.resolve();
-	m_iaq_line.resolve();
 	m_clock_out_line.resolve();
 	m_holda_line.resolve();
-	m_dbin_line.resolve();
 }
 
 uint16_t tms9980a_device::read_workspace_register_debug(int reg)
@@ -197,9 +195,8 @@ void tms9980a_device::mem_read()
 	{
 	case 1:
 		m_pass = 4;         // make the CPU visit this method more than once
-		if (!m_dbin_line.isnull()) m_dbin_line(ASSERT_LINE);
 		if (m_setaddr)
-			m_setaddr->write_word(ASSERT_LINE, m_address & m_prgaddr_mask & ~1);
+			m_setaddr->write_word((TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0))<<1, m_address & m_prgaddr_mask & ~1);
 		LOGMASKED(LOG_ADDRESSBUS, "Set address bus %04x\n", m_address & m_prgaddr_mask & ~1);
 		m_check_ready = true;
 		break;
@@ -211,7 +208,7 @@ void tms9980a_device::mem_read()
 		break;
 	case 3:
 		if (m_setaddr)
-			m_setaddr->write_word(ASSERT_LINE, (m_address & m_prgaddr_mask) | 1);
+			m_setaddr->write_word((TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0))<<1, (m_address & m_prgaddr_mask) | 1);
 		LOGMASKED(LOG_ADDRESSBUS, "Set address bus %04x\n", (m_address & m_prgaddr_mask) | 1);
 		break;
 	case 4:
@@ -232,9 +229,8 @@ void tms9980a_device::mem_write()
 	{
 	case 1:
 		m_pass = 4;         // make the CPU visit this method once more
-		if (!m_dbin_line.isnull()) m_dbin_line(CLEAR_LINE);
 		if (m_setaddr)
-			m_setaddr->write_word(CLEAR_LINE, m_address & m_prgaddr_mask & ~1);
+			m_setaddr->write_word(TMS99xx_BUS_WRITE, m_address & m_prgaddr_mask & ~1);
 		LOGMASKED(LOG_ADDRESSBUS, "Set address bus %04x\n", m_address & m_prgaddr_mask & ~1);
 		m_prgspace->write_byte(m_address & 0x3ffe & ~1, (m_current_value >> 8)&0xff);
 		LOGMASKED(LOG_MEM, "Memory write high byte %04x <- %02x\n", m_address & m_prgaddr_mask & ~1, (m_current_value >> 8)&0xff);
@@ -245,7 +241,7 @@ void tms9980a_device::mem_write()
 		break;
 	case 3:
 		if (m_setaddr)
-			m_setaddr->write_word(CLEAR_LINE, (m_address & m_prgaddr_mask) | 1);
+			m_setaddr->write_word(TMS99xx_BUS_WRITE, (m_address & m_prgaddr_mask) | 1);
 		LOGMASKED(LOG_ADDRESSBUS, "Set address bus %04x\n", (m_address & m_prgaddr_mask) | 1);
 		m_prgspace->write_byte((m_address & m_prgaddr_mask) | 1, m_current_value & 0xff);
 		LOGMASKED(LOG_MEM, "Memory write low byte %04x <- %02x\n", (m_address & m_prgaddr_mask) | 1,  m_current_value & 0xff);
@@ -262,7 +258,7 @@ void tms9980a_device::acquire_instruction()
 {
 	if (m_mem_phase == 1)
 	{
-		if (!m_iaq_line.isnull()) m_iaq_line(ASSERT_LINE);
+		m_iaq = true;
 		m_address = PC;
 		m_first_cycle = m_icount;
 	}

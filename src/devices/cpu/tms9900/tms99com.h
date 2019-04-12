@@ -64,4 +64,15 @@ enum
 	LREX_OP = 7
 };
 
+/*
+   We are using setaddress this way: The address is the object to be
+   written; as address we use the values of the DBIN and IAQ lines. That
+   means we do not need separate dbin and iaq setting methods.
+*/
+enum
+{
+	TMS99xx_BUS_WRITE = 0,
+	TMS99xx_BUS_DBIN = 1,
+	TMS99xx_BUS_IAQ = 2
+};
 #endif /* __TMS99COMMON_H__ */

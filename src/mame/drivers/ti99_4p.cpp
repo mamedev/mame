@@ -170,11 +170,9 @@ private:
 	void setaddress(offs_t mode, uint16_t address);
 	uint16_t memread(offs_t offset);
 	void memwrite(offs_t offset, uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER( dbin_in );
 
 	void external_operation(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
-	DECLARE_WRITE_LINE_MEMBER( dbin_line );
 
 	// CRU (Communication Register Unit) handling
 	uint8_t cruread(offs_t offset);
@@ -435,6 +433,7 @@ void ti99_4p_state::setaddress(offs_t mode, uint16_t address)
 {
 	m_addr_buf = address;
 	m_waitcount = 0;
+	m_dbin = ((mode & TMS99xx_BUS_DBIN)!=0);
 
 	LOGMASKED(LOG_ADDRESS, "set address %04x\n", m_addr_buf);
 
@@ -611,14 +610,6 @@ void ti99_4p_state::debugger_write(offs_t offset, uint16_t data)
 	m_peribox->write(addrb+1, data & 0xff);
 	m_peribox->write(addrb,  (data>>8) & 0xff);
 	m_peribox->memen_in(CLEAR_LINE);
-}
-
-/*
-   Data bus in (DBIN) line from the CPU.
-*/
-WRITE_LINE_MEMBER( ti99_4p_state::dbin_line )
-{
-	m_dbin = (line_state)state;
 }
 
 /*
@@ -1006,7 +997,6 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 	m_cpu->extop_cb().set(FUNC(ti99_4p_state::external_operation));
 	m_cpu->intlevel_cb().set(FUNC(ti99_4p_state::interrupt_level));
 	m_cpu->clkout_cb().set(FUNC(ti99_4p_state::clock_out));
-	m_cpu->dbin_cb().set(FUNC(ti99_4p_state::dbin_line));
 
 	// tms9901
 	TMS9901(config, m_tms9901, 0);

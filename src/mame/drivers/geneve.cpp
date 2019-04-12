@@ -242,7 +242,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(video_wait_states);
 
 	DECLARE_WRITE_LINE_MEMBER(clock_out);
-	DECLARE_WRITE_LINE_MEMBER(dbin_line);
 
 	void external_operation(offs_t offset, uint8_t data);
 
@@ -648,14 +647,6 @@ WRITE_LINE_MEMBER( geneve_state::clock_out )
 	m_mapper->clock_in(state);
 }
 
-/*
-    DBIN line from the CPU. Used to control wait state generation.
-*/
-WRITE_LINE_MEMBER( geneve_state::dbin_line )
-{
-	m_mapper->dbin_in(state);
-}
-
 void geneve_state::init_geneve()
 {
 }
@@ -732,7 +723,6 @@ void geneve_state::geneve_common(machine_config &config)
 	m_cpu->set_addrmap(tms9995_device::AS_SETADDRESS, &geneve_state::memmap_setaddress);
 	m_cpu->extop_cb().set(FUNC(geneve_state::external_operation));
 	m_cpu->clkout_cb().set(FUNC(geneve_state::clock_out));
-	m_cpu->dbin_cb().set(FUNC(geneve_state::dbin_line));
 
 	// Video hardware
 	v99x8_device& video(V9938(config, TI_VDP_TAG, XTAL(21'477'272))); // typical 9938 clock, not verified

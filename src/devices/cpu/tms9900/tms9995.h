@@ -50,10 +50,8 @@ public:
 
 	// Callbacks
 	auto extop_cb() { return m_external_operation.bind(); }
-	auto iaq_cb() { return m_iaq_line.bind(); }
 	auto clkout_cb() { return m_clock_out_line.bind(); }
 	auto holda_cb() { return m_holda_line.bind(); }
-	auto dbin_cb() { return m_dbin_line.bind(); }
 
 	// For debugger access
 	uint8_t debug_read_onchip_memory(offs_t addr) { return m_onchip_memory[addr & 0xff]; };
@@ -103,6 +101,9 @@ private:
 	// The TMS9995 has a prefetch feature which causes a wrong display of the PC.
 	// We use this additional member for the debugger only.
 	uint16_t  PC_debug;
+
+	// Indicates the instruction acquisition phase
+	bool    m_iaq;
 
 	// 256 bytes of onchip memory
 	uint8_t   m_onchip_memory[256];
@@ -395,20 +396,11 @@ private:
 	// chip emulations we use a dedicated callback.
 	devcb_write8   m_external_operation;
 
-	// Signal to the outside world that we are now getting an instruction (IAQ).
-	// In the real hardware this line is shared with the HOLDA line, and the
-	// /MEMEN line is used to decide which signal we have on the line. We do not
-	// emulate the /MEMEN line, so we have to use two separate lines.
-	devcb_write_line   m_iaq_line;
-
 	// Clock output.
 	devcb_write_line   m_clock_out_line;
 
 	// Asserted when the CPU is in a HOLD state
 	devcb_write_line   m_holda_line;
-
-	// DBIN line. When asserted (high), the CPU has disabled the data bus output buffers.
-	devcb_write_line   m_dbin_line;
 };
 
 

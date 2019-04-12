@@ -251,7 +251,6 @@ private:
 	void cruwrite(offs_t offset, uint8_t data);
 	void external_operation(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
-	DECLARE_WRITE_LINE_MEMBER( dbin_line );
 
 	// Connections from outside towards the CPU (callbacks)
 	DECLARE_WRITE_LINE_MEMBER( console_ready );
@@ -691,14 +690,6 @@ WRITE_LINE_MEMBER( ti99_8_state::clock_out )
 	m_mainboard->clock_in(state);
 }
 
-/*
-   Data bus in (DBIN) line from the CPU.
-*/
-WRITE_LINE_MEMBER( ti99_8_state::dbin_line )
-{
-	m_mainboard->dbin_in(state);
-}
-
 void ti99_8_state::driver_start()
 {
 	// Need to configure the speech ROM for inverse bit order
@@ -740,7 +731,6 @@ void ti99_8_state::ti99_8(machine_config& config)
 	m_cpu->set_addrmap(tms9995_device::AS_SETADDRESS, &ti99_8_state::memmap_setaddress);
 	m_cpu->extop_cb().set(FUNC(ti99_8_state::external_operation));
 	m_cpu->clkout_cb().set(FUNC(ti99_8_state::clock_out));
-	m_cpu->dbin_cb().set(FUNC(ti99_8_state::dbin_line));
 	m_cpu->holda_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::holda_line));
 
 	// 9901 configuration

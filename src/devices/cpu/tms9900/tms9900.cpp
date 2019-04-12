@@ -146,7 +146,7 @@ enum
 #define LOG_DETAIL     (1U<<31)  // Increased detail
 
 // Minimum log should be warnings
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE ( LOG_GENERAL | LOG_WARN | LOG_ADDRESSBUS )
 
 #include "logmacro.h"
 
@@ -165,12 +165,11 @@ tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type, 
 		m_cru(nullptr),
 		m_prgaddr_mask((1<<prg_addr_bits)-1),
 		m_cruaddr_mask((2<<cru_addr_bits)-2),
+		m_iaq(false),
 		m_clock_out_line(*this),
 		m_wait_line(*this),
 		m_holda_line(*this),
-		m_iaq_line(*this),
 		m_get_intlevel(*this),
-		m_dbin_line(*this),
 		m_external_operation(*this),
 		m_ready_bufd(true),
 		m_program_index(NOPRG),
@@ -286,11 +285,9 @@ void tms99xx_device::resolve_lines()
 	// Resolve our external connections
 	m_external_operation.resolve();
 	m_get_intlevel.resolve();
-	m_iaq_line.resolve();
 	m_clock_out_line.resolve();
 	m_wait_line.resolve();
 	m_holda_line.resolve();
-	m_dbin_line.resolve();        // we need this for the set_address operation
 }
 
 /*
@@ -1260,7 +1257,7 @@ void tms99xx_device::execute_run()
 						m_pass = 1;
 						MPC++;
 						m_mem_phase = 1;
-						if (!m_iaq_line.isnull()) m_iaq_line(CLEAR_LINE);
+						m_iaq = false;
 					}
 				}
 			}
@@ -1496,7 +1493,7 @@ void tms99xx_device::acquire_instruction()
 {
 	if (m_mem_phase == 1)
 	{
-		if (!m_iaq_line.isnull()) m_iaq_line(ASSERT_LINE);
+		m_iaq = true;
 		m_address = PC;
 		m_first_cycle = m_icount;
 	}
@@ -1531,14 +1528,13 @@ void tms99xx_device::mem_read()
 	// set_address and read_word should pass the same address as argument
 	if (m_mem_phase==1)
 	{
-		if (!m_dbin_line.isnull()) m_dbin_line(ASSERT_LINE);
+		LOGMASKED(LOG_ADDRESSBUS, "set address (r) %04x\n", m_address);
 		if (m_setaddr)
-			m_setaddr->write_word(ASSERT_LINE, m_address & m_prgaddr_mask & 0xfffe);
+			// Note that the bus lines form a pseudo address that is shifted right by one in the handler
+			m_setaddr->write_word((TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0))<<1, m_address & m_prgaddr_mask & 0xfffe);
 		m_check_ready = true;
 		m_mem_phase = 2;
 		m_pass = 2;
-		LOGMASKED(LOG_ADDRESSBUS, "set address (r) %04x\n", m_address);
-
 		pulse_clock(1); // Concludes the first cycle
 		// If READY has been found to be low, the CPU will now stay in the wait state loop
 	}
@@ -1547,7 +1543,6 @@ void tms99xx_device::mem_read()
 		// Second phase (after READY was raised again)
 		m_current_value = m_prgspace->read_word(m_address & m_prgaddr_mask & 0xfffe);
 		pulse_clock(1);
-		if (!m_dbin_line.isnull()) m_dbin_line(CLEAR_LINE);
 		m_mem_phase = 1;        // reset to phase 1
 		LOGMASKED(LOG_MEM, "mem r %04x -> %04x\n", m_address, m_current_value);
 	}
@@ -1557,11 +1552,10 @@ void tms99xx_device::mem_write()
 {
 	if (m_mem_phase==1)
 	{
-		if (!m_dbin_line.isnull()) m_dbin_line(CLEAR_LINE);
-		// When writing, the data bus is asserted immediately after the address bus
 		LOGMASKED(LOG_ADDRESSBUS, "set address (w) %04x\n", m_address);
+		// When writing, the data bus is asserted immediately after the address bus
 		if (m_setaddr)
-			m_setaddr->write_word(CLEAR_LINE, m_address & m_prgaddr_mask & 0xfffe);
+			m_setaddr->write_word(TMS99xx_BUS_WRITE, m_address & m_prgaddr_mask & 0xfffe);
 		LOGMASKED(LOG_MEM, "mem w %04x <- %04x\n",  m_address, m_current_value);
 		m_prgspace->write_word(m_address & m_prgaddr_mask & 0xfffe, m_current_value);
 		m_check_ready = true;
