@@ -603,6 +603,16 @@ READ8_MEMBER( model1_state::dpram_r )
 	return m_dpram->right_r(offset);
 }
 
+WRITE8_MEMBER( model1_state::gen_outputs_w )
+{
+	// generic output lines, output to outx where x = bit
+	// eg. out0 = coin counter 1, see below for per-game descriptions
+	for (int i = 0; i < 8; i++)
+		m_outs[i] = BIT(data, i);
+
+	m_digits[1] = data;
+}
+
 WRITE8_MEMBER( model1_state::vf_outputs_w )
 {
 	// 7654----  unknown (not used?)
@@ -613,8 +623,6 @@ WRITE8_MEMBER( model1_state::vf_outputs_w )
 
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-
-	m_digits[1] = data;
 }
 
 WRITE8_MEMBER( model1_state::vr_outputs_w )
@@ -630,8 +638,6 @@ WRITE8_MEMBER( model1_state::vr_outputs_w )
 
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-
-	m_digits[1] = data;
 }
 
 WRITE8_MEMBER( model1_state::swa_outputs_w )
@@ -647,8 +653,6 @@ WRITE8_MEMBER( model1_state::swa_outputs_w )
 
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-
-	m_digits[1] = data;
 }
 
 WRITE8_MEMBER( model1_state::wingwar_outputs_w )
@@ -663,8 +667,6 @@ WRITE8_MEMBER( model1_state::wingwar_outputs_w )
 	// -------0  coin counter 1
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-
-	m_digits[1] = data;
 }
 
 WRITE8_MEMBER( model1_state::wingwar360_outputs_w )
@@ -677,8 +679,6 @@ WRITE8_MEMBER( model1_state::wingwar360_outputs_w )
 
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-
-	m_digits[1] = data;
 }
 
 WRITE8_MEMBER( model1_state::netmerc_outputs_w )
@@ -1751,6 +1751,7 @@ void model1_state::vf(machine_config &config)
 	ioboard.set_default_bios_tag("epr14869b");
 	ioboard.in_callback<2>().set_ioport("IN.2");
 	ioboard.output_callback().set(FUNC(model1_state::vf_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 }
 
 void model1_state::vr(machine_config &config)
@@ -1765,6 +1766,7 @@ void model1_state::vr(machine_config &config)
 	ioboard.an_callback<1>().set_ioport("ACCEL");
 	ioboard.an_callback<2>().set_ioport("BRAKE");
 	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15112");
 }
@@ -1781,6 +1783,7 @@ void model1_state::vformula(machine_config &config)
 	ioboard.an_callback<1>().set_ioport("ACCEL");
 	ioboard.an_callback<2>().set_ioport("BRAKE");
 	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15624");
 }
@@ -1797,6 +1800,7 @@ void model1_state::swa(machine_config &config)
 	ioboard.an_callback<4>().set_ioport("STICK2X");
 	ioboard.an_callback<5>().set_ioport("STICK2Y");
 	ioboard.output_callback().set(FUNC(model1_state::swa_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	SPEAKER(config, "dleft").front_left();
 	SPEAKER(config, "dright").front_right();
@@ -1824,6 +1828,7 @@ void model1_state::wingwar(machine_config &config)
 	ioboard.an_callback<1>().set_ioport("STICKY");
 	ioboard.an_callback<2>().set_ioport("THROTTLE");
 	ioboard.output_callback().set(FUNC(model1_state::wingwar_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	config.set_default_layout(layout_model1io2);
 
@@ -1839,6 +1844,7 @@ void model1_state::wingwar360(machine_config &config)
 	ioboard.drive_write_callback().set(FUNC(model1_state::r360_w));
 	ioboard.an_callback<2>().set_constant(0);
 	ioboard.output_callback().set(FUNC(model1_state::wingwar360_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	config.set_default_layout(layout_model1io2);
 }
@@ -1865,6 +1871,7 @@ void model1_state::netmerc(machine_config &config)
 	ioboard.an_callback<0>().set_ioport("STICKX");
 	ioboard.an_callback<2>().set_ioport("STICKY");
 	ioboard.output_callback().set(FUNC(model1_state::netmerc_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	config.set_default_layout(layout_model1io2);
 }
