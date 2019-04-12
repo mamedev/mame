@@ -168,15 +168,15 @@
 	<!-- the Spanish carts do not have a part number on the cartridge, PCB or box -->
 	
 	<!--
-	1.  "Cuentame Al Oido"               La Oreja De Van Gogh
-	2.  "La Ultima Noche"                Luis Miguel
-	3.  "Corazon Latino"                 David Bisbal
-	4.  "Ademas De Ti"                   David Bustamante
-	5.  "Quiero"                         Raul
-	6.  "No Rompas Mi Corazon"           Coyote Daxx
-	7.  "Atrevete"                       Chenoa
+	1.  "Cuéntame Al Oído"               La Oreja De Van Gogh
+	2.  "La Última Noche"                Luis Miguel
+	3.  "Corazón Latino"                 David Bisbal
+	4.  "Además De Ti"                   David Bustamante
+	5.  "Quiero"                         Raúl
+	6.  "No Rompas Mi Corazón"           Coyote Daxx
+	7.  "Atrévete"                       Chenoa
 	8.  "Europe's Living A Celebration"  Rosa
-	9.  "Maria"                          Ricky Martin
+	9.  "María"                          Ricky Martin
 	10. "Sin Miedo A Nada"               Alex Ubago
 	-->
 	<software name="spainvol1">
@@ -191,16 +191,16 @@
 	</software>	
 
 	<!--
-	1.  "Heroe"               Enrique Iglesias
+	1.  "Héroe"               Enrique Iglesias
 	2.  "Vida"                Gisela
 	3.  "Suerte"              Shakira
 	4.  "Torero"              Chayanne
 	5.  "Dile Que La Quiero"  David Civera
 	6.  "Soledad"             La Oreja De Van Gogh
-	7.  "Asereje"             Las Ketchup
-	8.  "Sueno Su Boca"       Raul
+	7.  "Aserejé"             Las Ketchup
+	8.  "Sueño Su Boca"       Raul
 	9.  "La Apuesta"          Rosa
-	10  "Ave Maria"           David Bisbal
+	10  "Ave María"           David Bisbal
 	-->
 	<software name="spainvol2">
 		<description>e-kara Spain 10-Songs Volume 2</description>
