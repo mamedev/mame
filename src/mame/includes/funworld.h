@@ -41,6 +41,7 @@ public:
 	void init_dino4();
 	void init_ctunk();
 	void init_jolycdig();
+	void init_intrgmes();
 
 protected:
 	DECLARE_WRITE8_MEMBER(funworld_videoram_w);

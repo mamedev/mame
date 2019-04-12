@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Roberto Fresca, Peter Ferrie
+// copyright-holders:Roberto Fresca, Grull Osgo, Andreas Naive, Peter Ferrie
 /****************************************************************************************
 
   Fun World / TAB / Impera
@@ -98,7 +98,7 @@
   * Novo Play Multi Card / Club Card,                           Admiral/Novomatic,  1986.
   * unknown encrypted Royal Card (Dino4 HW),                    unknown,            1998.
   * China Town (Ver 1B, Dino4 HW),                              unknown,            1998.
-  * Unknown Inter Games poker,                                  Inter Games,        1991.
+  * Joker Card (Inter Games),                                   Inter Games,        1991.
   * Unknown Fun World A7-11 game 1,                             Fun World,          1985.
   * Unknown Fun World A7-11 game 2,                             Fun World,          1985.
   * Unknown Fun World A0-1 game,                                Fun World,          1991.
@@ -1095,6 +1095,19 @@
     Both games were promoted to working state.
   - Added technical and game notes.
 
+  Unknown Inter Games poker improvements:
+  - Reworked memory map.
+  - Found the real VRAM offset.
+  - Added splitted attr/color RAM.
+  - Mirrored attr/color RAM for separated writes.
+  - Hooked the AY8910 properly.
+  - Generated periodic interrupts.
+  - Temporarily patched some hardware checks.
+  - Added default NVRAM.
+  - Promoted the game to Working.
+  - Added technical notes.
+  
+  
 
   *** TO DO ***
 
@@ -1373,16 +1386,18 @@ void funworld_state::witchryl_map(address_map &map)
 
 void funworld_state::intergames_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().share("nvram");
-	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));           // WRONG. just a placeholder...
-	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));  // WRONG. just a placeholder...
+	map(0x0000, 0x0fff).ram().share("nvram");
 	map(0x2000, 0x2fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram");
-	map(0x3000, 0x3000).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x3001, 0x3001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x3400, 0x3403).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));  // the bookkeeping mode requests a byte from $3400 to advance pages...
-	map(0x3800, 0x3803).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));  // WRONG. just a placeholder...
-	map(0x7000, 0x7fff).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram");
-	map(0x8000, 0xffff).rom();
+	map(0x3000, 0x3001).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x3000, 0x3001).w("ay8910", FUNC(ay8910_device::address_data_w));
+//	map(0x3000, 0x3000).w("crtc", FUNC(mc6845_device::address_w));
+//	map(0x3001, 0x3001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x3200, 0x3203).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x3400, 0x3403).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x5000, 0x5fff).mirror(0x2000).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x8000, 0xdfff).rom();
+	map(0xe000, 0xefff).ram();
+	map(0xf000, 0xffff).rom();
 }
 
 void funworld_state::fw_brick_map(address_map &map)
@@ -3089,6 +3104,68 @@ static INPUT_PORTS_START( fw_brick1 )
 	PORT_DIPSETTING(    0x00, "Joker Card (with Jokers)" )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( intrgmes )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Hold 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Cancel / Take")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Draw")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Hold 5 / Bet")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Hold 4 / High")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Hold 2 / Low")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Hold 3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("I /7")      PORT_CODE(KEYCODE_E)  // I /7
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("F. C.")     PORT_CODE(KEYCODE_R)  // F.C.
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Hopper SW") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("CAV")       PORT_CODE(KEYCODE_Y)  // CAV.
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Collect")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("SER. IN")   PORT_CODE(KEYCODE_A)  // SER. IN
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("II/D")      PORT_CODE(KEYCODE_S)  // II/D
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("SER. SEL.") PORT_CODE(KEYCODE_D)  // SER. SEL.
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("II/C")      PORT_CODE(KEYCODE_F)  // II/C
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("II/3")      PORT_CODE(KEYCODE_G)  // II/3
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("II/B")      PORT_CODE(KEYCODE_H)  // II/B
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("II/2")      PORT_CODE(KEYCODE_J)  // II/2
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )                 PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "55/77/99-Bonus" )            PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Language" )                  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, "English" )
+	PORT_DIPSETTING(    0x00, "Deutsche" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Auto Hold" )                 PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+INPUT_PORTS_END
+
+
 /*************************
 *    Graphics Layouts    *
 *************************/
@@ -3389,8 +3466,11 @@ void funworld_state::intrgmes(machine_config &config)
 {
 	fw1stpal(config);
 
-	R65C02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
+	M65SC02(config.replace(), m_maincpu, CPU_CLOCK); /* 2MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::intergames_map);
+	m_maincpu->set_periodic_int(FUNC(funworld_state::nmi_line_pulse), attotime::from_hz(60));
+
+	config.device_remove("crtc");
 
 	m_gfxdecode->set_info(gfx_fw2ndpal);
 }
@@ -7066,9 +7146,9 @@ ROM_END
 
 
 /*
-  Unknown poker game from Inter Games.
+  Joker Card from Inter Games (Austria).
 
-  1x G65C02P-2
+  1x G65SC02P-2
   2x MC68B21P
   1x MC68B45P
   1x AY38910A/P
@@ -7078,21 +7158,29 @@ ROM_END
   1x LM380N
   1x Crystal 16.0000 MHz.
 
-  The game has way different architecture.
+  The hardware has way different architecture.
 
   Video RAM splitted in two well separated offsets:
-  Video RAM at $2000 and Color Ram at $7000.
+  Video RAM at $2000 and Attr/Color Ram at $5000 mirrored at $7000.
 
-  Code expects some input at $3400 to pass through the bookkeeping pages,
-  so at least one PIA should be mapped there.
+  PIAs at $3200 and $3400.
+  AY8910 at $3000-$3001.
+  CRTC at... $3000-$3001 too!!!.
+
+  Can't find a safe way to map both devices in the same address.  
+  For now, just mapped the sound device in this offset, and generated
+  a periodic interrupt at 60Hz.
 
   There are multiple buffers and compare from some registers,
   reminding the way some hardwares handle inputs without PIAs.
 
+  Some jumps to hardware errors were patched till we can understand
+  a bit better the hardware behaviour.
+
   Bipolar PROM has the first half empty, so will black the screen
   after any attempt of ROM swap.
 
-  A lot to investigate/reverse...
+  A lot of reverse-engineering was needed to get this game working...
 */
 ROM_START( intrgmes )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7102,8 +7190,9 @@ ROM_START( intrgmes )
 	ROM_LOAD( "ig2ch2.bin", 0x0000, 0x8000, CRC(52f0bc70) SHA1(cd9ba34efb438c9610551900c3de2a09aea76cb9) )
 	ROM_LOAD( "ig2ch1.bin", 0x8000, 0x8000, CRC(8fc7d74e) SHA1(bf7ee7ef5c95877fe82fb6e04a5d8ab211fc730c) )
 
-	ROM_REGION( 0x0800, "nvram", 0 )    /* Default NVRAM. */
-	ROM_LOAD( "ds1220y.bin", 0x0000, 0x0800, CRC(7bc4554e) SHA1(c9ad1651e673f8edd0fd354b1098db8f27697d18) )
+	ROM_REGION( 0x1000, "nvram", 0 )  // Default NVRAM.
+	ROM_LOAD( "intrgmes_nvram.bin", 0x0000, 0x0800, CRC(7ce7c42c) SHA1(da5b2fbecd83ae87616f3c65fc0d6fd05f9fe7c5) )
+	ROM_LOAD( "ds1220y.bin",        0x0800, 0x0800, CRC(7bc4554e) SHA1(c9ad1651e673f8edd0fd354b1098db8f27697d18) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "am27s29.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
@@ -7905,6 +7994,39 @@ void funworld_state::init_jolycdig()
 }
 
 
+void funworld_state::init_intrgmes()
+{
+	// NOP'ing some values in ROM space to avoid the hardware error.
+
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0xadc5] = 0xea;
+	rom[0xadc6] = 0xea;
+
+	rom[0xadd2] = 0xea;
+	rom[0xadd3] = 0xea;
+
+	rom[0xade6] = 0xea;
+	rom[0xade7] = 0xea;
+
+	rom[0xadf8] = 0xea;
+	rom[0xadf9] = 0xea;
+
+	rom[0xae16] = 0xea;
+	rom[0xae17] = 0xea;
+
+	rom[0xaead] = 0xea;
+	rom[0xaeae] = 0xea;
+	rom[0xaeaf] = 0xea;
+
+//  verify checksum against values stored at 07F2-07F3.
+//	rom[0xaf69] = 0xea;
+//	rom[0xaf6a] = 0xea;
+//	rom[0xaf6b] = 0xea;
+
+}
+
+
 /**********************************************
 *                Game Drivers                 *
 **********************************************/
@@ -8022,7 +8144,7 @@ GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  funworld_state, init_socc
 // Other games...
 GAME(  198?, funquiz,   0,        funquiz,  funquiz,     funworld_state, empty_init,   ROT0, "Fun World",       "Fun World Quiz (Austrian)",                      0 )
 GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,    funworld_state, empty_init,   ROT0, "Admiral/Novomatic","Novo Play Multi Card / Club Card",              0,                       layout_novoplay )
-GAME(  1991, intrgmes,  0,        intrgmes, funworld,    funworld_state, empty_init,   ROT0, "Inter Games",     "unknown Inter Games poker",                      MACHINE_NOT_WORKING )
+GAME(  1991, intrgmes,  0,        intrgmes, intrgmes,    funworld_state, init_intrgmes,ROT0, "Inter Games",     "Joker Card (Inter Games)",                       0 )
 GAMEL( 1985, fw_a7_11,  0,        fw_brick_2, fw_brick1, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A7-11 game 1",                 MACHINE_NOT_WORKING,     layout_jollycrd )
 GAMEL( 1985, fw_a7_11a, fw_a7_11, fw_brick_2, fw_brick1, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A7-11 game 2",                 MACHINE_NOT_WORKING,     layout_jollycrd )
 GAMEL( 1991, fw_a0_1,   0,        fw_brick_2, fw_brick1, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A0-1 game",                    MACHINE_NOT_WORKING,     layout_jollycrd )
