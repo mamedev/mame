@@ -7039,6 +7039,57 @@ ROM_START( funquiz )    /* Fun World Quiz */
 	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(f990a9ae) SHA1(f7133798b5f20dd5b8dbe5d1a6876341710d93a8) )
 ROM_END
 
+/*
+  Fun World Quiz.
+  12-11-90
+
+  CPU Brick:
+  - Ricoh RP65C02G
+  - M27128A
+  - logic...
+
+*/
+ROM_START( funquiza )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a.ic12", 0xc000, 0x4000, CRC(e3b1fa5d) SHA1(3479db70249fd37b6e932d563b41550f910721c8) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "q3.ic7",   0x0000, 0x8000, CRC(7fe77d14) SHA1(0cc7395e1cdabd98206a2caa1cb6a1e165e56434) )
+	ROM_LOAD( "q2.ic6",   0x8000, 0x8000, CRC(bc4f1b8f) SHA1(5af1423d2d1c698141848a6d6864cd2f4a54ca1c) )
+
+	ROM_REGION( 0x100000, "questions", ROMREGION_ERASEFF )
+
+	/* 01 - Allgemein */
+	ROM_LOAD( "allg1.bin",   0x00000, 0x8000, CRC(1351cf56) SHA1(50e89c3e6d256bcf7f1d3c0dbef935e4e8561096) )
+	ROM_LOAD( "allg2.bin",   0x08000, 0x8000, CRC(021492a4) SHA1(b59e1303f17c9e5af05a808118ae729205690bb2) )
+	ROM_LOAD( "allg3.bin",   0x10000, 0x8000, CRC(4eb29de3) SHA1(5c5d47959c06261ab51fc4e821bff0fe41ac9176) )
+	ROM_LOAD( "allg4.bin",   0x18000, 0x8000, CRC(5c87177a) SHA1(a8a8318165008cb3295e25d4b4d38146f44a32fc) )
+	ROM_LOAD( "allg5.bin",   0x20000, 0x8000, CRC(83056686) SHA1(00f14ded371751d54a391bf583d940b32ddeae58) )
+
+	/* 02 - Technik */
+	ROM_LOAD( "tech1.bin",   0x28000, 0x8000, CRC(cf5b9edc) SHA1(f1085c9915d21c4da581d06c9568d2bb47d467ed) )
+
+	/* 03 - Sport */
+	ROM_LOAD( "sp1.bin",     0x30000, 0x8000, CRC(20fb1261) SHA1(ad029f1a2b19365543c77fcd1103f6c5783c9f68) )
+	ROM_LOAD( "sp2.bin",     0x38000, 0x8000, CRC(1988f5b7) SHA1(969ae64796e432c04862cb8c159e419a4793e9f0) )
+
+	/* 04 - Film - Unterhaltung */
+	ROM_LOAD( "unterh1.bin", 0x40000, 0x8000, CRC(996e7adc) SHA1(7b271cdb6ef555d31c2b17c6104bd30cd2eabcb3) )
+
+	/* 05 - Geographie */
+	ROM_LOAD( "geo1.bin",   0x48000, 0x8000, CRC(504da831) SHA1(4bef7bed4d300400c094cb30e9af55d3c6f47c29) )
+	ROM_LOAD( "geo2.bin",   0x50000, 0x8000, CRC(7c563119) SHA1(9f3ae3ba3e4f60d9ea4b5c95aa5aaada8bb446a3) )
+	ROM_LOAD( "geo3.bin",   0x58000, 0x8000, CRC(7c563119) SHA1(9f3ae3ba3e4f60d9ea4b5c95aa5aaada8bb446a3) )
+
+	/* 06 - Pop */
+	ROM_LOAD( "pop_1.bin",   0x60000, 0x8000, CRC(5c74781e) SHA1(0a50a706fd397bb220e31f1a7adaa4204b242888) )
+	ROM_LOAD( "pop_2.bin",   0x68000, 0x8000, CRC(10103648) SHA1(6fdc1aa4dcc8919e46def1c19adc2b9686c0f72d) )
+
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "m3-7649-5.bin", 0x0000, 0x0200, CRC(f990a9ae) SHA1(f7133798b5f20dd5b8dbe5d1a6876341710d93a8) )
+ROM_END
+
 
 /*
   Witch Royal
@@ -8181,8 +8232,11 @@ GAMEL( 1998, chinatow,  0,        chinatow, chinatow,  chinatow_state, init_rcdi
 GAME(  199?, mongolnw,  0,        royalcd1, royalcrd,  funworld_state, init_mongolnw, ROT0, "<unknown>",       "Mongolfier New (Italian)",                        MACHINE_UNEMULATED_PROTECTION )
 GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  funworld_state, init_soccernw, ROT0, "<unknown>",       "Soccer New (Italian)",                            MACHINE_UNEMULATED_PROTECTION )
 
+// Quiz games...
+GAME(  198?, funquiz,   0,        funquiz,  funquiz,   funworld_state, empty_init,    ROT0, "Fun World",       "Fun World Quiz (Austrian)",                       0 )
+GAME(  198?, funquiza,  0,        funquiz,  funquiza,  funworld_state, empty_init,    ROT0, "Fun World",       "Fun World Quiz (Austrian, 12-11-1990)",           MACHINE_NOT_WORKING )
+
 // Other games...
-GAME(  198?, funquiz,   0,        funquiz,  funquiz,     funworld_state, empty_init,   ROT0, "Fun World",       "Fun World Quiz (Austrian)",                      0 )
 GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,    funworld_state, empty_init,   ROT0, "Admiral/Novomatic","Novo Play Multi Card / Club Card",              0,                       layout_novoplay )
 GAME(  1991, intrgmes,  0,        intrgmes, intrgmes,    intergames_state, empty_init, ROT0, "Inter Games",     "Joker Card (Inter Games)",                       0 )
 GAMEL( 1985, fw_a7_11,  0,        fw_brick_2, fw_brick1, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A7-11 game 1",                 MACHINE_NOT_WORKING,     layout_jollycrd )
