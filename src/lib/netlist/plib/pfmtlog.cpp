@@ -23,7 +23,7 @@ pfmt &pfmt::format_element(const char *l, const unsigned cfmt_spec,  ...)
 {
 	va_list ap;
 	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-	std::array<char, 2048> buf;
+	std::array<char, 2048> buf = {0};
 	std::size_t sl;
 	bool found_abs = false;
 

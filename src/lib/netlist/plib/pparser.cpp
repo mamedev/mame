@@ -516,7 +516,7 @@ pstring  ppreprocessor::process_line(pstring line)
 				else
 				{
 					pstring arg("");
-					for (int i=2; i<lti.size() - 1; i++)
+					for (std::size_t i=2; i<lti.size() - 1; i++)
 						arg += lti[i] + " ";
 					arg += lti[lti.size()-1];
 					m_defines.insert({lti[1], define_t(lti[1], arg)});

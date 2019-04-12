@@ -63,6 +63,7 @@ namespace analog
 
 		nl_double Ieq(nl_double cap, nl_double v) const
 		{
+			plib::unused_var(v);
 			//return -m_h * 0.5 * ((cap + m_c) * m_v + (cap - m_c) * v) ;
 			return -m_h * 0.5 * (cap + m_c) * m_v;
 			//return -m_h * cap * m_v;
@@ -98,10 +99,15 @@ namespace analog
 
 		capacitor_e type() const { return capacitor_e::CONSTANT_CAPACITY; }
 		nl_double G(nl_double cap) const { return cap * m_h +  m_gmin; }
-		nl_double Ieq(nl_double cap, nl_double v) const { return - G(cap) * m_v; }
+		nl_double Ieq(nl_double cap, nl_double v) const
+		{
+			plib::unused_var(v);
+			return - G(cap) * m_v;
+		}
 
 		void timestep(nl_double cap, nl_double v, nl_double step)
 		{
+			plib::unused_var(cap);
 			m_h = 1.0 / step;
 			m_v = v;
 		}

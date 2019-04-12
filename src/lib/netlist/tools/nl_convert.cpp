@@ -282,7 +282,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 {
 	if (line != "")
 	{
-		printf("// %s\n", line.c_str());
+		//printf("// %s\n", line.c_str());
 		std::vector<pstring> tt(plib::psplit(line, " ", true));
 		double val = 0.0;
 		switch (tt[0].at(0))
