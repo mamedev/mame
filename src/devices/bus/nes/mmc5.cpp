@@ -70,9 +70,10 @@ void nes_exrom_device::device_start()
 	save_item(NAME(m_floodattr));
 	save_item(NAME(m_prg_mode));
 	save_item(NAME(m_chr_mode));
-	save_item(NAME(m_wram_base));
 	save_item(NAME(m_wram_protect_1));
 	save_item(NAME(m_wram_protect_2));
+	save_item(NAME(m_exram_control));
+	save_item(NAME(m_wram_base));
 	save_item(NAME(m_vrom_bank));
 	save_item(NAME(m_last_chr));
 	save_item(NAME(m_ex1_chr));
