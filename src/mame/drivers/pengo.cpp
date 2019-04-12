@@ -972,35 +972,28 @@ void pengo_state::decode_schick_extra(int size, uint8_t* rom)
 			}
 			else
 			{
-				// does this REALLY affect bit 0x80?  more logical would be bits 0x55, but that doesn't seem to be the case
+				// does this REALLY affect bit 0x80?  more logical would be bits 0x55, but that doesn't seem to be the case  (answer, NO, doesn't help)
 
 				// this sequence appears in several places
 				//E5C7 : CD 2B BE    call $FF6B // valid call
 				//E5CA : oo dd dd               // must be a 3 byte opcode, but NOT a jump dd are clearly data, bit 0x80 is set on oo tho and only 3 byte opcodes with is set are jumps to invalid addresses?
 				//E5CD : C3 82 A2    jp   $F2D2 // valid jump
-
 				// this can't be right either, no combination of dropping 0x80 gives a 3 byte opcode
 
-				switch (srcdec & 0xd1)
+				// unless these really are jumps and there is code there? or the data decryption is wrong? (it seems correct for the jump offsets tho, so would need to be another condition)
+				// I wouldn't put it past Microhard to have an MCU supplying code too... (but why, there's already plenty of extra code for this pengo hack)
+
+
+				switch (srcdec & 0x51)
 				{
-				case 0x00: srcdec = (srcdec & ~0xd1) | 0x40; break;
-				case 0x01: srcdec = (srcdec & ~0xd1) | 0x01; break; 
-				case 0x10: srcdec = (srcdec & ~0xd1) | 0x10; break;
-				case 0x11: srcdec = (srcdec & ~0xd1) | 0x11; break;
-				case 0x40: srcdec = (srcdec & ~0xd1) | 0x00; break; // NOPs at e538
-				case 0x41: srcdec = (srcdec & ~0xd1) | 0x41; break;
-				case 0x50: srcdec = (srcdec & ~0xd1) | 0x50; break;
-				case 0x51: srcdec = (srcdec & ~0xd1) | 0x51; break;
-
-				case 0x80: srcdec = (srcdec & ~0xd1) | 0x80; break;
-				case 0x81: srcdec = (srcdec & ~0xd1) | 0x81; break;
-				case 0x90: srcdec = (srcdec & ~0xd1) | 0xc1; break;  // JMP table at EFA0
-				case 0x91: srcdec = (srcdec & ~0xd1) | 0x91; break;
-				case 0xc0: srcdec = (srcdec & ~0xd1) | 0xc0; break;
-				case 0xc1: srcdec = (srcdec & ~0xd1) | 0x90; break;
-				case 0xd0: srcdec = (srcdec & ~0xd1) | 0xd0; break;
-				case 0xd1: srcdec = (srcdec & ~0xd1) | 0xd1; break;
-
+				case 0x00: srcdec = (srcdec & ~0x51) | 0x40; break;
+				case 0x01: srcdec = (srcdec & ~0x51) | 0x01; break; 
+				case 0x10: srcdec = (srcdec & ~0x51) | 0x41; break; // JMP table EFA0
+				case 0x11: srcdec = (srcdec & ~0x51) | 0x11; break;
+				case 0x40: srcdec = (srcdec & ~0x51) | 0x00; break; // NOPs at e538
+				case 0x41: srcdec = (srcdec & ~0x51) | 0x51; break;
+				case 0x50: srcdec = (srcdec & ~0x51) | 0x50; break;
+				case 0x51: srcdec = (srcdec & ~0x51) | 0x10; break;
 				}
 
 				rom[A] = srcdec;
