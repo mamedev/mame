@@ -138,7 +138,7 @@ WRITE8_MEMBER(splash_state::sound_bank_w)
 void splash_state::roldfrog_update_irq(  )
 {
 	int irq = (m_sound_irq ? 0x08 : 0) | ((m_vblank_irq) ? 0x18 : 0);
-	m_audiocpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq);
+	m_audiocpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); // Z80
 }
 
 WRITE8_MEMBER(splash_state::roldfrog_vblank_ack_w)
@@ -603,7 +603,7 @@ WRITE_LINE_MEMBER(funystrp_state::adpcm_int1)
 		if (m_msm_toggle1 == 0)
 		{
 			m_msm_source|=1;
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x38);
+			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x38); // Z80
 		}
 	}
 }
@@ -618,7 +618,7 @@ WRITE_LINE_MEMBER(funystrp_state::adpcm_int2)
 		if (m_msm_toggle2 == 0)
 		{
 			m_msm_source|=2;
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x38);
+			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x38); // Z80
 		}
 	}
 }

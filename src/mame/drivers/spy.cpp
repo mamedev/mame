@@ -64,7 +64,7 @@ WRITE8_MEMBER(spy_state::spy_bankedram1_w)
 {
 	if (m_rambank & 1)
 	{
-		m_palette->write8(space,offset,data);
+		m_palette->write8(offset,data);
 	}
 	else if (m_rambank & 2)
 	{
@@ -332,7 +332,7 @@ WRITE8_MEMBER(spy_state::spy_3f90_w)
 
 WRITE8_MEMBER(spy_state::spy_sh_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE8_MEMBER(spy_state::sound_bank_w)

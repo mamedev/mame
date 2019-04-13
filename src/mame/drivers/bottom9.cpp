@@ -90,7 +90,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_bankedram2_w)
 	if (m_k052109_selected)
 		k052109_051960_w(space, offset + 0x2000, data);
 	else
-		m_palette->write8(space, offset, data);
+		m_palette->write8(offset, data);
 }
 
 WRITE8_MEMBER(bottom9_state::bankswitch_w)
@@ -131,7 +131,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_1f90_w)
 
 WRITE8_MEMBER(bottom9_state::bottom9_sh_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 INTERRUPT_GEN_MEMBER(bottom9_state::bottom9_sound_interrupt)

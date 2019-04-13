@@ -321,7 +321,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 
 void rc702_state::kbd_put(u8 data)
 {
-	m_pio->pa_w(machine().dummy_space(), 0, data);
+	m_pio->port_a_write(data);
 	m_pio->strobe_a(0);
 	m_pio->strobe_a(1);
 }

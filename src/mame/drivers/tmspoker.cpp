@@ -207,6 +207,7 @@
 
 #include "emu.h"
 #include "cpu/tms9900/tms9980a.h"
+#include "machine/74259.h"
 #include "sound/sn76477.h"
 #include "video/mc6845.h"
 #include "emupal.h"
@@ -223,7 +224,9 @@ public:
 		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_outlatch(*this, "outlatch%u", 0U),
+		m_inputs(*this, "IN%u", 0U)
 	{ }
 
 	void tmspoker(machine_config &config);
@@ -240,10 +243,12 @@ private:
 	tilemap_t *m_bg_tilemap;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device_array<ls259_device, 4> m_outlatch;
+	required_ioport_array<3> m_inputs;
 
 	DECLARE_WRITE8_MEMBER(tmspoker_videoram_w);
 	//DECLARE_WRITE8_MEMBER(debug_w);
-	DECLARE_READ8_MEMBER(unk_r);
+	uint8_t inputs_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void tmspoker_palette(palette_device &palette) const;
 	uint32_t screen_update_tmspoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -347,15 +352,22 @@ void tmspoker_state::tmspoker_map(address_map &map)
 }
 
 
-READ8_MEMBER(tmspoker_state::unk_r)
+uint8_t tmspoker_state::inputs_r(offs_t offset)
 {
-	printf("%x\n",offset);
-	return 0;//0xff;//mame_rand(machine);
+	uint8_t q = m_outlatch[2]->output_state();
+	for (int n = 0; n < 3; n++)
+		if (BIT(q, 4 + n) && !BIT(m_inputs[n]->read(), offset))
+			return 0;
+
+	return 1;
 }
 
 void tmspoker_state::tmspoker_cru_map(address_map &map)
 {
-	map(0x0000, 0x0fff).r(FUNC(tmspoker_state::unk_r));
+	map(0x0c80, 0x0c8f).w(m_outlatch[0], FUNC(ls259_device::write_d0));
+	map(0x0c90, 0x0c9f).r(FUNC(tmspoker_state::inputs_r)).w(m_outlatch[1], FUNC(ls259_device::write_d0));
+	map(0x0ca0, 0x0caf).w(m_outlatch[2], FUNC(ls259_device::write_d0));
+	map(0x0cb0, 0x0cbf).w(m_outlatch[3], FUNC(ls259_device::write_d0));
 }
 
 /* I/O byte R/W
@@ -402,26 +414,6 @@ static INPUT_PORTS_START( tmspoker )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN2-6")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN2-7")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8")
-
-	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("IN3-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("IN3-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("IN3-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("IN3-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN3-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN3-8")
-
-	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("IN4-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("IN4-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("IN4-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("IN4-8")
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -571,6 +563,11 @@ void tmspoker_state::tmspoker(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tmspoker_state::tmspoker_map);
 	m_maincpu->set_addrmap(AS_IO, &tmspoker_state::tmspoker_cru_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tmspoker_state::tmspoker_interrupt));
+
+	LS259(config, m_outlatch[0]);
+	LS259(config, m_outlatch[1]);
+	LS259(config, m_outlatch[2]);
+	LS259(config, m_outlatch[3]);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

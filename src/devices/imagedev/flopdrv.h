@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods, Miodrag Milanovic
 /* flopdrv provides simple emulation of a disc drive */
-/* the 8271, upd765 and wd179x use this */
 
 #ifndef MAME_DEVICES_IMAGEDV_FLOPDRV_H
 #define MAME_DEVICES_IMAGEDV_FLOPDRV_H
@@ -251,6 +250,5 @@ protected:
 legacy_floppy_image_device *floppy_get_device(running_machine &machine,int drive);
 legacy_floppy_image_device *floppy_get_device_by_type(running_machine &machine,int ftype,int drive);
 int floppy_get_drive_by_type(legacy_floppy_image_device *image,int ftype);
-int floppy_get_count(running_machine &machine);
 
 #endif // MAME_DEVICES_IMAGEDV_FLOPDRV_H

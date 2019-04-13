@@ -433,7 +433,7 @@ void mitchell_state::mstworld_sound_map(address_map &map)
 
 WRITE8_MEMBER(mitchell_state::mstworld_sound_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 

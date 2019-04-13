@@ -98,7 +98,7 @@ WRITE8_MEMBER(pandoras_state::i8039_irqen_and_status_w)
 
 WRITE8_MEMBER(pandoras_state::pandoras_z80_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE_LINE_MEMBER(pandoras_state::coin_counter_1_w)
@@ -373,6 +373,44 @@ void pandoras_state::pandoras(machine_config &config)
 
 ***************************************************************************/
 
+
+/*
+A PCB picture shows the following label format:
+
+PANDORA'S PAL
+A1   J13
+
+Visible ROM labels on the GX328 main board PWB(A)20001109B PCB:
+PANDORA'S PAL   A1   13J
+PANDORA'S PAL   A1   12J
+PANDORA'S PAL   A1   10J
+PANDORA'S PAL   A1   9J
+  -- J14 is an empty socket --
+PANDORA'S PAL   A1   17J
+PANDORA'S PAL   A1   18J
+PANDORA'S PAL   A1   19J
+
+PANDORA'S PAL   A1   18A
+PANDORA'S PAL   A1   19A
+
+PANDORA'S PAL   A1   5J
+
+BPROM at 16A stamped 328F14
+BPROM at 17G stamped 328F15
+BPROM at A2 not visible in picture
+
+ROMs labels on the GX328 sound board PWB(B)3000154A PCB:
+PANDORA'S PAL   A1     6C
+PANDORA'S PAL   A1     7E
+
+
+PCB stickered:
+
+Pandora's Palace
+KOSUKA
+(c) Konami 1984
+
+*/
 ROM_START( pandoras )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64K for the CPU A */
 	ROM_LOAD( "pand_j13.cpu",   0x08000, 0x02000, CRC(7a0fe9c5) SHA1(e68c8d76d1abb69ac72b0e2cd8c1dfc540064ee3) )

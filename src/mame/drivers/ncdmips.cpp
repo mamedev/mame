@@ -119,7 +119,7 @@ void ncd_mips_state::hmxpro_map(address_map &map)
 
 WRITE_LINE_MEMBER(ncd_mips_state::duart_irq_handler)
 {
-	//m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
+	//m_maincpu->set_input_line(M68K_IRQ_6, state);
 }
 
 void ncd_mips_state::hmxpro(machine_config &config)

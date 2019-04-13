@@ -135,8 +135,10 @@
 #include "cpu/h8/h83003.h"
 #include "cpu/h8/h8s2655.h"
 #include "video/hd44780.h"
+#include "sound/swp20.h"
 #include "sound/swp30.h"
 #include "sound/meg.h"
+#include "sound/dspv.h"
 
 #include "debugger.h"
 #include "screen.h"
@@ -200,6 +202,9 @@ public:
 		, m_mu80cpu(*this, "mu80cpu")
 		, m_vl70cpu(*this, "vl70cpu")
 		, m_swp30(*this, "swp30")
+		, m_swp20_0(*this, "swp20_0")
+		, m_swp20_1(*this, "swp20_1")
+		, m_dspv(*this, "dspv")
 		, m_meg(*this, "meg")
 		, m_lcd(*this, "lcd")
 		, m_ioport_p7(*this, "P7")
@@ -319,6 +324,9 @@ private:
 	optional_device<h83002_device> m_mu80cpu;
 	optional_device<h83003_device> m_vl70cpu;
 	optional_device<swp30_device> m_swp30;
+	optional_device<swp20_device> m_swp20_0;
+	optional_device<swp20_device> m_swp20_1;
+	optional_device<dspv_device> m_dspv;
 	optional_device<meg_device> m_meg;
 	required_device<hd44780_device> m_lcd;
 	optional_ioport m_ioport_p7;
@@ -379,6 +387,7 @@ private:
 	void mu80_iomap(address_map &map);
 	void mu80_map(address_map &map);
 	void mu50_iomap(address_map &map);
+	void mu50_map(address_map &map);
 	void vl70_iomap(address_map &map);
 	void vl70_map(address_map &map);
 	void swp30_map(address_map &map);
@@ -606,17 +615,26 @@ u32 mu100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	return 0;
 }
 
+void mu100_state::mu50_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().region("mu80cpu", 0);
+	map(0x200000, 0x20ffff).ram(); // 64K work RAM
+}
+
 void mu100_state::mu80_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("mu80cpu", 0);
 	map(0x200000, 0x20ffff).ram(); // 64K work RAM
+	map(0x400000, 0x40003f).m(m_swp20_0, FUNC(swp20_device::map));
 	map(0x440000, 0x44001f).m(m_meg, FUNC(meg_device::map));
+	map(0x460000, 0x46003f).m(m_swp20_1, FUNC(swp20_device::map));
 }
 
 void mu100_state::vl70_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom().region("vl70cpu", 0);
 	map(0x200000, 0x20ffff).ram(); // 64K work RAM
+	map(0x400000, 0x40007f).m(m_dspv, FUNC(dspv_device::map));
 	map(0x600000, 0x60001f).m(m_meg, FUNC(meg_device::map));
 }
 
@@ -777,14 +795,12 @@ void mu100_state::pb_w_mu80(u16 data)
 u16 mu100_state::pb_r_mu80()
 {
 	if((cur_pa & PA_LCD_ENABLE)) {
-		if(cur_pa & PA_LCD_RW)
-		{
+		if(cur_pa & PA_LCD_RW) {
 			if(cur_pa & PA_LCD_RS)
 				return m_lcd->data_read();
 			else
 				return m_lcd->control_read();
-		} else
-		{
+		} else {
 			if(!(cur_pa & 0x10)) {
 				u8 val = 0xff;
 				if(!(cur_ic32 & 0x20))
@@ -815,18 +831,16 @@ void mu100_state::pa_w_mu80(u16 data)
 {
 	data ^= PA_LCD_ENABLE;
 	if(!(cur_pa & PA_LCD_ENABLE) && (data & PA_LCD_ENABLE)) {
-	if(!(cur_pa & PA_LCD_RW)) {
-		if(cur_pa & PA_LCD_RS)
-			m_lcd->data_write(cur_pb);
-		else
-			m_lcd->control_write(cur_pb);
+		if(!(cur_pa & PA_LCD_RW)) {
+			if(cur_pa & PA_LCD_RS)
+				m_lcd->data_write(cur_pb);
+			else
+				m_lcd->control_write(cur_pb);
 		}
 	}
 
 	if(!(cur_pa & 0x08) && (data & 0x08))
-	{
 		cur_ic32 = cur_pb;
-	}
 
 	cur_pa = data;
 }
@@ -1080,11 +1094,11 @@ void mu100_state::mu80(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	// In truth, dual swp-20
-	SWP30(config, m_swp30);
-	m_swp30->set_addrmap(0, &mu100_state::swp30_map);
-	m_swp30->add_route(0, "lspeaker", 1.0);
-	m_swp30->add_route(1, "rspeaker", 1.0);
+	SWP20(config, m_swp20_0);
+	m_swp20_0->set_device_rom_tag("swp20");
+
+	SWP20(config, m_swp20_1);
+	m_swp20_1->set_device_rom_tag("swp20");
 
 	MEG(config, m_meg);
 
@@ -1104,7 +1118,7 @@ void mu100_state::mu80(machine_config &config)
 void mu100_state::mu50(machine_config &config)
 {
 	H83002(config, m_mu80cpu, 16_MHz_XTAL);
-	m_mu80cpu->set_addrmap(AS_PROGRAM, &mu100_state::mu80_map);
+	m_mu80cpu->set_addrmap(AS_PROGRAM, &mu100_state::mu50_map);
 	m_mu80cpu->set_addrmap(AS_IO, &mu100_state::mu50_iomap);
 
 	HD44780(config, m_lcd);
@@ -1120,7 +1134,7 @@ void mu100_state::mu50(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	// In truth, dual swp-20
+	// In truth, swp00
 	SWP30(config, m_swp30);
 	m_swp30->set_addrmap(0, &mu100_state::swp30_map);
 	m_swp30->add_route(0, "lspeaker", 1.0);
@@ -1160,6 +1174,7 @@ void mu100_state::vl70(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
+	DSPV(config, m_dspv);
 	MEG(config, m_meg);
 
 	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
@@ -1223,7 +1238,7 @@ ROM_START( mu80 )
 	ROM_REGION( 0x80000, "mu80cpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "yamaha_mu80.bin", 0x000000, 0x080000, CRC(c31074c0) SHA1(a11bd4523cd8ff1e1744078c3b4c18112b73c61e) )
 
-	ROM_REGION( 0x1800000, "swp30", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "swp20", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x1000, "lcd", 0)
 	// Hand made, 3 characters unused

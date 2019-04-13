@@ -1314,7 +1314,7 @@ void midzeus2_state::midzeus2(machine_config &config)
 	m_screen->set_screen_update("zeus2", FUNC(zeus2_device::screen_update));
 
 	ZEUS2(config, m_zeus, ZEUS2_VIDEO_CLOCK);
-	m_zeus->vblank_callback().set(FUNC(midzeus2_state::zeus_irq));
+	m_zeus->irq_callback().set(FUNC(midzeus2_state::zeus_irq));
 
 	/* sound hardware */
 	DCS2_AUDIO_2104(config, "dcs", 0);

@@ -72,7 +72,7 @@ private:
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(sound_command_w);
+	void sound_command_w(u8 data);
 	void hedpanic_platform_w(u16 data);
 	u8 eeprom_r();
 	void eeprom_w(u8 data);

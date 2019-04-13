@@ -226,14 +226,15 @@ public:
 	expro02_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_view2(*this, "view2"),
+		m_kaneko_spr(*this, "kan_spr"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_paletteram(*this, "palette"),
 		m_fg_ind8_pixram(*this, "fg_ind8ram"),
 		m_bg_rgb555_pixram(*this, "bg_rgb555ram"),
-		m_view2_0(*this, "view2_0"),
-		m_kaneko_spr(*this, "kan_spr"),
-		m_spriteram(*this, "spriteram")
+		m_spriteram(*this, "spriteram"),
+		m_okibank(*this, "okibank")
 	{ }
 
 	void supmodel(machine_config &config);
@@ -250,17 +251,25 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	optional_device<kaneko_view2_tilemap_device> m_view2;
+	required_device<kaneko16_sprite_device> m_kaneko_spr;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
 	required_shared_ptr<uint16_t> m_paletteram;
 	required_shared_ptr<uint16_t> m_fg_ind8_pixram;
 	required_shared_ptr<uint16_t> m_bg_rgb555_pixram;
-	optional_device<kaneko_view2_tilemap_device> m_view2_0;
-	required_device<kaneko16_sprite_device> m_kaneko_spr;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	DECLARE_WRITE8_MEMBER(expro02_6295_bankswitch_w);
+	optional_memory_bank m_okibank;
+
+	uint16_t m_vram_tile_addition[2]; // galsnew
+
+	template<unsigned Layer> void tilebank_w(u8 data);
+
+	void tile_callback(u8 layer, u32 *code);
+
+	void oki_bankswitch_w(u8 data);
 
 	virtual void machine_start() override;
 	void expro02_palette(palette_device &palette) const;
@@ -286,10 +295,30 @@ private:
 	void zipzap_map(address_map &map);
 };
 
+/* some weird logic needed for Gals Panic on the EXPRO02 board */
+template<unsigned Layer>
+void expro02_state::tilebank_w(u8 data)
+{
+	int val = data << 8;
+
+	if (m_vram_tile_addition[Layer] != val)
+	{
+		m_vram_tile_addition[Layer] = val;
+		m_view2->mark_layer_dirty(Layer);
+	}
+}
+
+void expro02_state::tile_callback(u8 layer, u32 *code)
+{
+	u32 res = *code;
+	res += m_vram_tile_addition[layer];
+	*code = res;
+}
 
 void expro02_state::machine_start()
 {
-	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
+	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
+	save_item(NAME(m_vram_tile_addition));
 }
 
 void expro02_state::expro02_palette(palette_device &palette) const
@@ -347,12 +376,12 @@ uint32_t expro02_state::screen_update_backgrounds(screen_device &screen, bitmap_
 
 	screen.priority().fill(0, cliprect);
 
-	if (m_view2_0)
+	if (m_view2)
 	{
-		m_view2_0->kaneko16_prepare(bitmap, cliprect);
+		m_view2->prepare(bitmap, cliprect);
 
 		for (int i = 0; i < 8; i++)
-			m_view2_0->render_tilemap_chip(screen, bitmap, cliprect, i);
+			m_view2->render_tilemap(screen, bitmap, cliprect, i);
 	}
 
 	return 0;
@@ -361,7 +390,7 @@ uint32_t expro02_state::screen_update_backgrounds(screen_device &screen, bitmap_
 uint32_t expro02_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update_backgrounds(screen, bitmap, cliprect);
-	m_kaneko_spr->kaneko16_render_sprites(bitmap,cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
+	m_kaneko_spr->render_sprites(bitmap,cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
 	return 0;
 }
 
@@ -641,9 +670,9 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE8_MEMBER( expro02_state::expro02_6295_bankswitch_w )
+void expro02_state::oki_bankswitch_w(u8 data)
 {
-	membank("okibank")->set_entry(data & 0x0f);
+	m_okibank->set_entry(data & 0x0f);
 }
 
 
@@ -658,13 +687,13 @@ void expro02_state::expro02_video_base_map(address_map &map)
 {
 	map(0x500000, 0x51ffff).ram().share("fg_ind8ram");
 	map(0x520000, 0x53ffff).ram().share("bg_rgb555ram");
-	map(0x580000, 0x583fff).rw(m_view2_0, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x580000, 0x583fff).m(m_view2, FUNC(kaneko_view2_tilemap_device::vram_map));
 	map(0x600000, 0x600fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // palette?
-	map(0x680000, 0x68001f).rw(m_view2_0, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x680000, 0x68001f).rw(m_view2, FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
 	map(0x700000, 0x700fff).ram().share("spriteram");    // sprites? 0x72f words tested
-	map(0x780000, 0x78001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
-	map(0xd80000, 0xd80001).w(m_view2_0, FUNC(kaneko_view2_tilemap_device::galsnew_vram_1_tilebank_w));   /* ??? */
-	map(0xe80000, 0xe80001).w(m_view2_0, FUNC(kaneko_view2_tilemap_device::galsnew_vram_0_tilebank_w));   /* ??? */
+	map(0x780000, 0x78001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::regs_r), FUNC(kaneko16_sprite_device::regs_w));
+	map(0xd80001, 0xd80001).w(FUNC(expro02_state::tilebank_w<1>));   /* ??? */
+	map(0xe80001, 0xe80001).w(FUNC(expro02_state::tilebank_w<0>));   /* ??? */
 }
 
 void expro02_state::expro02_video_base_map_noview2(address_map &map)
@@ -675,7 +704,7 @@ void expro02_state::expro02_video_base_map_noview2(address_map &map)
 	map(0x600000, 0x600fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // palette?
 	map(0x680000, 0x68001f).noprw(); // games still makes leftover accesses
 	map(0x700000, 0x700fff).ram().share("spriteram");    // sprites? 0x72f words tested
-	map(0x780000, 0x78001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
+	map(0x780000, 0x78001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::regs_r), FUNC(kaneko16_sprite_device::regs_w));
 	map(0xd80000, 0xd80001).noprw(); // games still makes leftover accesses
 	map(0xe80000, 0xe80001).noprw(); // games still makes leftover accesses
 }
@@ -690,7 +719,7 @@ void expro02_state::expro02_map(address_map &map)
 	map(0x800000, 0x800001).portr("DSW1");
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
-	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));
+	map(0x900000, 0x900000).w(FUNC(expro02_state::oki_bankswitch_w));
 	map(0xa00000, 0xa00001).nopw();    /* ??? */
 	map(0xc80000, 0xc8ffff).ram();
 	map(0xe00000, 0xe00015).rw("calc1_mcu", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
@@ -706,7 +735,7 @@ void expro02_state::fantasia_map(address_map &map)
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
 	map(0x800006, 0x800007).noprw(); // ? used ?
-	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));
+	map(0x900000, 0x900000).w(FUNC(expro02_state::oki_bankswitch_w));
 	map(0xa00000, 0xa00001).nopw();    /* ??? */
 	map(0xc80000, 0xc8ffff).ram();
 	map(0xf00000, 0xf00000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -724,7 +753,7 @@ void expro02_state::comad_map(address_map &map)
 //  map(0x800006, 0x800007);    ??
 	map(0x80000a, 0x80000b).r(FUNC(expro02_state::comad_timer_r)); /* bits 8-a = timer? palette update code waits for them to be 111 */
 	map(0x80000c, 0x80000d).r(FUNC(expro02_state::comad_timer_r)); /* missw96 bits 8-a = timer? palette update code waits for them to be 111 */
-	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
+	map(0x900000, 0x900000).w(FUNC(expro02_state::oki_bankswitch_w));  /* not sure */
 	map(0xc00000, 0xc0ffff).ram();
 	map(0xc80000, 0xc8ffff).ram();
 	map(0xf00000, 0xf00000).r(FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* fantasia, missw96 */
@@ -740,7 +769,7 @@ void expro02_state::fantsia2_map(address_map &map)
 	map(0x800004, 0x800005).portr("SYSTEM");
 //  map(0x800006, 0x800007);    ??
 	map(0x800008, 0x800009).r(FUNC(expro02_state::comad_timer_r)); /* bits 8-a = timer? palette update code waits for them to be 111 */
-	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
+	map(0x900000, 0x900000).w(FUNC(expro02_state::oki_bankswitch_w));  /* not sure */
 	map(0xa00000, 0xa00001).nopw();    /* coin counters, + ? */
 	map(0xc80000, 0xc80000).r(FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write));
 	map(0xf80000, 0xf8ffff).ram();
@@ -759,7 +788,7 @@ void expro02_state::galhustl_map(address_map &map)
 	map(0x800000, 0x800001).portr("DSW1");
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
-	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));
+	map(0x900000, 0x900000).w(FUNC(expro02_state::oki_bankswitch_w));
 	map(0xa00000, 0xa00001).nopw(); // ?
 	map(0xd00000, 0xd00000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xe80000, 0xe8ffff).ram();
@@ -776,7 +805,7 @@ void expro02_state::zipzap_map(address_map &map)
 	map(0x800000, 0x800001).portr("DSW1");
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
-	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));
+	map(0x900000, 0x900000).w(FUNC(expro02_state::oki_bankswitch_w));
 	map(0xc00000, 0xc00000).r(FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* fantasia, missw96 */
 	map(0xc80000, 0xc8ffff).ram();     // main ram
 
@@ -793,7 +822,7 @@ void expro02_state::supmodel_map(address_map &map)
 	map(0x800004, 0x800005).portr("SYSTEM");
 	map(0x800006, 0x800007).r(FUNC(expro02_state::comad_timer_r));
 	map(0x800008, 0x800009).r(FUNC(expro02_state::comad_timer_r));
-	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
+	map(0x900000, 0x900000).w(FUNC(expro02_state::oki_bankswitch_w));  /* not sure */
 	map(0xa00000, 0xa00001).nopw();
 	map(0xc80000, 0xc8ffff).ram();
 	map(0xd80000, 0xd80001).nopw();
@@ -812,7 +841,7 @@ void expro02_state::smissw_map(address_map &map)
 	map(0x800004, 0x800005).portr("SYSTEM");
 	map(0x800006, 0x800007).r(FUNC(expro02_state::comad_timer_r));
 	map(0x80000e, 0x80000f).r(FUNC(expro02_state::comad_timer_r));
-	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
+	map(0x900000, 0x900000).w(FUNC(expro02_state::oki_bankswitch_w));  /* not sure */
 	map(0xa00000, 0xa00001).nopw();
 	map(0xc00000, 0xc0ffff).ram();
 	map(0xd80000, 0xd80001).nopw();
@@ -903,7 +932,7 @@ GFXDECODE_END
 void expro02_state::expro02(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &expro02_state::expro02_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(expro02_state::scanline), "screen", 0, 1);
 
@@ -921,10 +950,11 @@ void expro02_state::expro02(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_expro02);
 	PALETTE(config, m_palette, FUNC(expro02_state::expro02_palette)).set_format(palette_device::GRBx_555, 2048 + 32768);
 
-	KANEKO_TMAP(config, m_view2_0);
-	m_view2_0->set_gfx_region(1);
-	m_view2_0->set_offset(0x5b, 0x8, 256, 224);
-	m_view2_0->set_gfxdecode_tag("gfxdecode");
+	KANEKO_TMAP(config, m_view2);
+	m_view2->set_gfx_region(1);
+	m_view2->set_offset(0x5b, 0x8, 256, 224);
+	m_view2->set_gfxdecode_tag("gfxdecode");
+	m_view2->set_tile_callback(kaneko_view2_tilemap_device::view2_cb_delegate(FUNC(expro02_state::tile_callback), this));
 
 	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
 	m_kaneko_spr->set_priorities(8,8,8,8); // above all (not verified)
@@ -955,8 +985,8 @@ void expro02_state::comad(machine_config &config)
 	config.device_remove("calc1_mcu");
 
 	// these values might not be correct, behavior differs from original boards
-	m_view2_0->set_invert_flip(1);
-	m_view2_0->set_offset(-256, -216, 256, 224);
+	m_view2->set_invert_flip(1);
+	m_view2->set_offset(-256, -216, 256, 224);
 
 	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(0));  /* a guess, and certainly wrong */
 }
@@ -965,7 +995,7 @@ void expro02_state::comad_noview2(machine_config &config)
 {
 	comad(config);
 
-	config.device_remove("view2_0");
+	config.device_remove("view2");
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_expro02_noview2);
 }

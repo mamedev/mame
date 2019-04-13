@@ -89,7 +89,7 @@ WRITE8_MEMBER(bwing_state::bwp1_ctrl_w)
 				m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE); // SNMI
 			else
 			{
-				m_soundlatch->write(space, 0, data);
+				m_soundlatch->write(data);
 				m_audiocpu->set_input_line(DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
 			}
 		break;

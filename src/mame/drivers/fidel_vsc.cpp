@@ -299,7 +299,7 @@ READ8_MEMBER(vsc_state::main_io_trampoline_r)
 	if (~offset & 4)
 		data &= m_ppi8255->read(offset & 3);
 	if (~offset & 8)
-		data &= m_z80pio->read(space, offset & 3);
+		data &= m_z80pio->read(offset & 3);
 
 	return data;
 }
@@ -309,7 +309,7 @@ WRITE8_MEMBER(vsc_state::main_io_trampoline_w)
 	if (~offset & 4)
 		m_ppi8255->write(offset & 3, data);
 	if (~offset & 8)
-		m_z80pio->write(space, offset & 3, data);
+		m_z80pio->write(offset & 3, data);
 }
 
 void vsc_state::main_io(address_map &map)

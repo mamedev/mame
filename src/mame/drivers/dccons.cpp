@@ -392,7 +392,7 @@ void dc_cons_state::dc_map(address_map &map)
 	map(0x00600000, 0x006007ff).rw(FUNC(dc_cons_state::dc_modem_r), FUNC(dc_cons_state::dc_modem_w));
 	map(0x00700000, 0x00707fff).rw(FUNC(dc_cons_state::dc_aica_reg_r), FUNC(dc_cons_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x009fffff).rw(FUNC(dc_cons_state::sh4_soundram_r), FUNC(dc_cons_state::sh4_soundram_w));
+	map(0x00800000, 0x009fffff).rw(FUNC(dc_cons_state::soundram_r), FUNC(dc_cons_state::soundram_w));
 //  AM_RANGE(0x01000000, 0x01ffffff) G2 Ext Device #1
 //  AM_RANGE(0x02700000, 0x02707fff) AICA reg mirror
 //  AM_RANGE(0x02800000, 0x02ffffff) AICA wave mem mirror
@@ -433,8 +433,14 @@ void dc_cons_state::dc_port(address_map &map)
 void dc_cons_state::dc_audio_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000000, 0x001fffff).ram().share("dc_sound_ram");        /* shared with SH-4 */
+	map(0x00000000, 0x001fffff).rw(FUNC(dc_cons_state::soundram_r), FUNC(dc_cons_state::soundram_w));        /* shared with SH-4 */
 	map(0x00800000, 0x00807fff).rw(FUNC(dc_cons_state::dc_arm_aica_r), FUNC(dc_cons_state::dc_arm_aica_w));
+}
+
+void dc_cons_state::aica_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).ram().share("dc_sound_ram");
 }
 
 static INPUT_PORTS_START( dc )
@@ -670,9 +676,9 @@ void dc_cons_state::dc(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	AICA(config, m_aica, (XTAL(33'868'800)*2)/3); // 67.7376MHz(2*33.8688MHz), div 3 for audio block
-	m_aica->set_master(true);
 	m_aica->irq().set(FUNC(dc_state::aica_irq));
 	m_aica->main_irq().set(FUNC(dc_state::sh4_aica_irq));
+	m_aica->set_addrmap(0, &dc_cons_state::aica_map);
 	m_aica->add_route(0, "lspeaker", 1.0);
 	m_aica->add_route(1, "rspeaker", 1.0);
 

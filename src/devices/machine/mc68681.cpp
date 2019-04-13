@@ -357,6 +357,14 @@ void mc68681_device::update_interrupts()
 		m_read_vector = false;  // clear IACK too
 }
 
+uint8_t mc68681_device::get_irq_vector()
+{
+	if (!machine().side_effects_disabled())
+		m_read_vector = true;
+
+	return IVR;
+}
+
 double duart_base_device::get_ct_rate()
 {
 	double rate = 0.0f;

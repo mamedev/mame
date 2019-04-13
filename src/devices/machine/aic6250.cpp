@@ -21,7 +21,7 @@
  *
  * TODO
  *   - fix problems with ATN
- *   - 16 bit DMA odd address start
+ *   - 16 bit DMA odd address start and HBV/LBV selection
  *   - disconnect/reselect
  *   - phase checks
  */
@@ -230,7 +230,7 @@ void aic6250_device::device_reset()
 	m_offset_cntrl = 0;
 	m_dma_cntrl = 0;
 	m_port_a_latch = 0;
-	m_port_a_latch = 0;
+	m_port_b_latch = 0;
 
 	// registers 05, 09
 	m_offset_count_zero = true;
@@ -408,7 +408,11 @@ void aic6250_device::control_reg_0_w(u8 data)
 		data & R07W_TARGET_MODE ? "target" : "initiator");
 
 	if (data & R07W_P_MEM_CYCLE_REQ)
-		logerror("processor memory %s request not supported\n", data & R07W_P_MEM_RW ? "write" : "read");
+	{
+		LOGMASKED(LOG_DMA, "processor memory %s request initiated\n", data & R07W_P_MEM_RW ? "write" : "read");
+		m_status_reg_1 &= ~R08R_MEM_CYCLE_CMPL;
+		m_breq_cb(1);
+	}
 
 	m_control_reg_0 = data;
 }
@@ -547,9 +551,9 @@ void aic6250_device::memory_data_w(u8 data)
 
 u8 aic6250_device::port_a_r()
 {
-	// FIXME: not sure if port A can be read in differential mode
+	// FIXME: not sure if port A bits 2 and 7 can be read as GPIO in 8-bit differential mode
 	u8 const data = (m_control_reg_0 & R07W_SCSI_INTERFACE_MODE)
-		|| (m_control_reg_0 & R07W_EN_PORT_A_INP_OR_OUT) ? m_port_a_latch : m_port_a_r_cb();
+		|| (m_control_reg_0 & R07W_EN_PORT_A_INP_OR_OUT) ? (m_port_a_latch ^ 0xff) : m_port_a_r_cb();
 
 	LOGMASKED(LOG_REG, "port_a_r 0x%02x\n", data);
 
@@ -560,8 +564,9 @@ void aic6250_device::port_a_w(u8 data)
 {
 	LOGMASKED(LOG_REG, "port_a_w 0x%02x\n", data);
 
+	// Port A outputs are the inverse of data written to this register
 	if (!(m_control_reg_0 & R07W_SCSI_INTERFACE_MODE) && (m_control_reg_0 & R07W_EN_PORT_A_INP_OR_OUT))
-		m_port_a_w_cb(data);
+		m_port_a_w_cb(data ^ 0xff);
 
 	m_port_a_latch = data;
 }
@@ -1015,49 +1020,109 @@ WRITE_LINE_MEMBER(aic6250_device::back_w)
 
 	m_breq_cb(0);
 
-	if (m_dma_cntrl & R05W_TRANSFER_DIR)
-		if (m_fifo.full() || m_dma_count < 8)
-			m_state_timer->adjust(attotime::zero);
+	if (!(m_control_reg_0 & R07W_P_MEM_CYCLE_REQ))
+	{
+		if (m_dma_cntrl & R05W_TRANSFER_DIR)
+			if (m_fifo.full() || m_dma_count < 8)
+				m_state_timer->adjust(attotime::zero);
+			else
+				m_breq_cb(1);
 		else
-			m_breq_cb(1);
-	else
-		if (m_fifo.empty())
-			m_state_timer->adjust(attotime::zero);
-		else
-			m_breq_cb(1);
+			if (m_fifo.empty())
+				m_state_timer->adjust(attotime::zero);
+			else
+				m_breq_cb(1);
+	}
 }
 
 u8 aic6250_device::dma_r()
 {
-	u8 const data = m_fifo.dequeue();
+	if ((m_control_reg_0 & R07W_P_MEM_CYCLE_REQ) && (m_control_reg_0 & R07W_P_MEM_RW))
+	{
+		// 8-bit memory write cycle
+		u8 const data = m_memory_data;
 
-	LOGMASKED(LOG_DMA, "dma_r 0x%02x\n", data);
+		LOGMASKED(LOG_DMA, "DMA 0x%02x from reg 0C\n", data);
 
-	return data;
+		m_status_reg_1 |= R08R_MEM_CYCLE_CMPL;
+		m_control_reg_0 &= ~R07W_P_MEM_CYCLE_REQ;
+
+		return data;
+	}
+	else
+	{
+		u8 const data = m_fifo.dequeue();
+
+		LOGMASKED(LOG_DMA, "DMA 0x%02x from FIFO\n", data);
+
+		return data;
+	}
 }
 
 u16 aic6250_device::dma16_r()
 {
-	u16 data = m_fifo.dequeue();
+	if ((m_control_reg_0 & R07W_P_MEM_CYCLE_REQ) && (m_control_reg_0 & R07W_P_MEM_RW))
+	{
+		// 16-bit memory write cycle
+		u16 const data = m_memory_data | (u16(m_port_b_latch) << 8);
 
-	data |= u16(m_fifo.dequeue()) << 8;
+		LOGMASKED(LOG_DMA, "DMA 0x%04x from reg 0C and 0E\n", data);
 
-	LOGMASKED(LOG_DMA, "dma16_r 0x%04x\n", data);
+		m_status_reg_1 |= R08R_MEM_CYCLE_CMPL;
+		m_control_reg_0 &= ~R07W_P_MEM_CYCLE_REQ;
 
-	return data;
+		return data;
+	}
+	else
+	{
+		u16 data = m_fifo.dequeue();
+
+		data |= u16(m_fifo.dequeue()) << 8;
+
+		LOGMASKED(LOG_DMA, "DMA 0x%04x from FIFO\n", data);
+
+		return data;
+	}
 }
 
 void aic6250_device::dma_w(u8 data)
 {
-	LOGMASKED(LOG_DMA, "dma_w 0x%02x\n", data);
+	if ((m_control_reg_0 & R07W_P_MEM_CYCLE_REQ) && !(m_control_reg_0 & R07W_P_MEM_RW))
+	{
+		// 8-bit memory read cycle
+		LOGMASKED(LOG_DMA, "DMA 0x%02x to reg 0C\n", data);
 
-	m_fifo.enqueue(data);
+		m_status_reg_1 |= R08R_MEM_CYCLE_CMPL;
+		m_control_reg_0 &= ~R07W_P_MEM_CYCLE_REQ;
+
+		m_memory_data = data;
+	}
+	else
+	{
+		LOGMASKED(LOG_DMA, "DMA 0x%02x to FIFO\n", data);
+
+		m_fifo.enqueue(data);
+	}
 }
 
 void aic6250_device::dma16_w(u16 data)
 {
-	LOGMASKED(LOG_DMA, "dma16_w 0x%04x\n", data);
+	if ((m_control_reg_0 & R07W_P_MEM_CYCLE_REQ) && !(m_control_reg_0 & R07W_P_MEM_RW))
+	{
+		// 16-bit memory read cycle
+		LOGMASKED(LOG_DMA, "DMA 0x%04x to reg 0C and 0E\n", data);
 
-	m_fifo.enqueue(data);
-	m_fifo.enqueue(data >> 8);
+		m_status_reg_1 |= R08R_MEM_CYCLE_CMPL;
+		m_control_reg_0 &= ~R07W_P_MEM_CYCLE_REQ;
+
+		m_memory_data = data;
+		m_port_b_latch = data >> 8;
+	}
+	else
+	{
+		LOGMASKED(LOG_DMA, "DMA 0x%04x to FIFO\n", data);
+
+		m_fifo.enqueue(data);
+		m_fifo.enqueue(data >> 8);
+	}
 }

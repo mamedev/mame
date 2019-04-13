@@ -26,10 +26,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(higemaru_state::higemaru_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* RST 08h - vblank */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* Z80 - RST 08h - vblank */
 
 	if(scanline == 0) // unknown irq event, does various stuff like copying the spriteram
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* Z80 - RST 10h */
 }
 
 

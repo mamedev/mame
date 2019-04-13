@@ -57,7 +57,7 @@ WRITE8_MEMBER(crimfght_state::k052109_051960_w)
 WRITE8_MEMBER(crimfght_state::sound_w)
 {
 	// writing the latch asserts the irq line
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert,AJR
+// copyright-holders:AJR
 /************************************************************************************************************
 
     Skeleton driver for ADM 36 Video Display Terminal.
@@ -130,7 +130,6 @@ static const z80_daisy_config daisy_chain[] =
 
 void adm36_state::adm36(machine_config &config)
 {
-	// basic machine hardware
 	Z80(config, m_maincpu, 14.728_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &adm36_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &adm36_state::io_map);

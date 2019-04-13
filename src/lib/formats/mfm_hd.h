@@ -10,9 +10,10 @@
     February 2012: Rewritten as class
 
 *****************************************************************************/
+#ifndef MAME_FORMATS_MFM_HD_H
+#define MAME_FORMATS_MFM_HD_H
 
-#ifndef __MFMHDFMT__
-#define __MFMHDFMT__
+#pragma once
 
 #include "chd.h"
 
@@ -209,4 +210,4 @@ protected:
 
 extern const mfmhd_format_type MFMHD_GEN_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_MFM_HD_H

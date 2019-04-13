@@ -97,36 +97,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-// exotic 5-5-5 formats
-#define PALETTE_FORMAT_xRGBRRRRGGGGBBBB_bit0 raw_to_rgb_converter(2, &raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit0_decoder)
-#define PALETTE_FORMAT_xRGBRRRRGGGGBBBB_bit4 raw_to_rgb_converter(2, &raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit4_decoder)
-
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PALETTE_ADD(_tag, _entries) \
-	MCFG_DEVICE_ADD(_tag, PALETTE, 0) \
-	downcast<palette_device &>(*device).set_entries(_entries);
-
-
-#define MCFG_PALETTE_FORMAT(_format) \
-	downcast<palette_device &>(*device).set_format(PALETTE_FORMAT_##_format);
-
-
-// not implemented yet
-#if 0
-#define MCFG_PALETTE_ADD_HARDCODED(_tag, _array) \
-	MCFG_PALETTE_ADD(_tag, sizeof(_array) / 3) \
-	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms), downcast<palette_device *>(device)));
-#endif
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -190,6 +160,7 @@ public:
 	static rgb_t RRRRGGGGBBBBRGBx_decoder(u32 raw);  // bits 3/2/1 are LSb
 	static rgb_t xRGBRRRRGGGGBBBB_bit0_decoder(u32 raw);  // bits 14/13/12 are LSb
 	static rgb_t xRGBRRRRGGGGBBBB_bit4_decoder(u32 raw);  // bits 14/13/12 are MSb
+	static rgb_t xBGRBBBBGGGGRRRR_bit0_decoder(u32 raw);  // bits 12/13/14 are LSb
 
 private:
 	// internal data
@@ -273,7 +244,10 @@ public:
 	enum rgb_444_prom_t { RGB_444_PROMS, RRRRGGGGBBBB_PROMS };
 
 	// exotic formats
-	enum rrrrggggbbbbrgbx_t { RRRRGGGGBBBBRGBx };
+	enum rrrrggggbbbbrgbx_t      { RRRRGGGGBBBBRGBx };
+	enum xrgbrrrrggggbbbb_bit0_t { xRGBRRRRGGGGBBBB_bit0 };
+	enum xrgbrrrrggggbbbb_bit4_t { xRGBRRRRGGGGBBBB_bit4 };
+	enum xbgrbbbbggggrrrr_bit0_t { xBGRBBBBGGGGRRRR_bit0 };
 
 	// construction/destruction
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, init_delegate &&init, u32 entries = 0U, u32 indirect = 0U);
@@ -358,6 +332,9 @@ public:
 	palette_device &set_format(grbx_888_t, u32 entries);
 	palette_device &set_format(bgrx_888_t, u32 entries);
 	palette_device &set_format(rrrrggggbbbbrgbx_t, u32 entries);
+	palette_device &set_format(xrgbrrrrggggbbbb_bit0_t, u32 entries);
+	palette_device &set_format(xrgbrrrrggggbbbb_bit4_t, u32 entries);
+	palette_device &set_format(xbgrbbbbggggrrrr_bit0_t, u32 entries);
 	template <typename T> palette_device &set_format(T x, u32 entries, u32 indirect) { set_format(x, entries); set_indirect_entries(indirect); return *this; }
 	palette_device &set_membits(int membits) { m_membits = membits; m_membits_supplied = true; return *this; }
 	palette_device &set_endianness(endianness_t endianness) { m_endianness = endianness; m_endianness_supplied = true; return *this; }
@@ -404,18 +381,18 @@ public:
 	}
 
 	// generic read/write handlers
-	DECLARE_READ8_MEMBER(read8);
-	DECLARE_READ8_MEMBER(read8_ext);
-	DECLARE_WRITE8_MEMBER(write8);
-	DECLARE_WRITE8_MEMBER(write8_ext);
-	DECLARE_WRITE8_MEMBER(write_indirect);
-	DECLARE_WRITE8_MEMBER(write_indirect_ext);
-	DECLARE_READ16_MEMBER(read16);
-	DECLARE_READ16_MEMBER(read16_ext);
-	DECLARE_WRITE16_MEMBER(write16);
-	DECLARE_WRITE16_MEMBER(write16_ext);
-	DECLARE_READ32_MEMBER(read32);
-	DECLARE_WRITE32_MEMBER(write32);
+	u8 read8(offs_t offset);
+	u8 read8_ext(offs_t offset);
+	void write8(offs_t offset, u8 data);
+	void write8_ext(offs_t offset, u8 data);
+	void write_indirect(offs_t offset, u8 data);
+	void write_indirect_ext(offs_t offset, u8 data);
+	u16 read16(offs_t offset);
+	u16 read16_ext(offs_t offset);
+	void write16(offs_t offset, u16 data, u16 mem_mask = u16(~0));
+	void write16_ext(offs_t offset, u16 data, u16 mem_mask = u16(~0));
+	u32 read32(offs_t offset);
+	void write32(offs_t offset, u32 data, u32 mem_mask = u32(~0));
 
 	// helper to update palette when data changed
 	void update() { if (!m_init.isnull()) m_init(*this); }

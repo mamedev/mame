@@ -30,6 +30,7 @@
 
 #define PROBE_ADDRESS                   ~0
 
+#define LL_BREAK                        (0)
 
 /***************************************************************************
     CONSTANTS
@@ -155,10 +156,15 @@
 #define EXCEPTION_BADCOP        11
 #define EXCEPTION_OVERFLOW      12
 #define EXCEPTION_TRAP          13
+#define EXCEPTION_FPE           15
 #define EXCEPTION_TLBLOAD_FILL  16
 #define EXCEPTION_TLBSTORE_FILL 17
 #define EXCEPTION_COUNT         18
 
+#define FCR31_FLAGS     2	// FLAGS start bit
+#define FCR31_ENABLE    7	// Enable start bit
+#define FCR31_CAUSE     12	// Cause start bit
+#define FPE_DIV0        3	// Divide by zero bit index
 
 
 /***************************************************************************

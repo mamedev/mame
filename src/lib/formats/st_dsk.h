@@ -7,9 +7,10 @@
     Atari ST 9/10/11 sector-per-track formats
 
 *********************************************************************/
+#ifndef MAME_FORMATS_ST_DSK_H
+#define MAME_FORMATS_ST_DSK_H
 
-#ifndef ST_DSK_H_
-#define ST_DSK_H_
+#pragma once
 
 #include "flopimg.h"
 
@@ -54,4 +55,4 @@ private:
 extern const floppy_format_type FLOPPY_ST_FORMAT;
 extern const floppy_format_type FLOPPY_MSA_FORMAT;
 
-#endif /*ST_DSK_H_*/
+#endif // MAME_FORMATS_ST_DSK_H

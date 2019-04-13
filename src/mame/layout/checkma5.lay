@@ -9,7 +9,7 @@
 		</rect>
 		<text string="COLLECT">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.1" y="0.35" width="0.8" height="0.3" />
 		</text>
 	</element>
 
@@ -20,9 +20,13 @@
 		<rect state="1">
 			<color red="0.5" green="0.5" blue="0.5" />
 		</rect>
-		<text string="RED">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+		<text state="0" string="RED">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0.25" y="0.35" width="0.5" height="0.3" />
+		</text>
+		<text state="1" string="RED">
+			<color red="0.5" green="0.0" blue="0.0" />
+			<bounds x="0.25" y="0.35" width="0.5" height="0.3" />
 		</text>
 	</element>
 
@@ -33,9 +37,13 @@
 		<rect state="1">
 			<color red="0.5" green="0.5" blue="0.5" />
 		</rect>
-		<text string="1 LINE">
+		<text string="PLAY 1">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.1" y="0.2" width="0.8" height="0.3" />
+		</text>
+		<text string="LINE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.2" y="0.5" width="0.6" height="0.3" />
 		</text>
 	</element>
 
@@ -46,9 +54,13 @@
 		<rect state="1">
 			<color red="0.5" green="0.5" blue="0.5" />
 		</rect>
-		<text string="2 LINES">
+		<text string="PLAY 2">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.1" y="0.2" width="0.8" height="0.3" />
+		</text>
+		<text string="LINES">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.15" y="0.5" width="0.7" height="0.3" />
 		</text>
 	</element>
 
@@ -59,9 +71,13 @@
 		<rect state="1">
 			<color red="0.5" green="0.5" blue="0.5" />
 		</rect>
-		<text string="3 LINES">
+		<text string="PLAY 3">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.1" y="0.2" width="0.8" height="0.3" />
+		</text>
+		<text string="LINES">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.15" y="0.5" width="0.7" height="0.3" />
 		</text>
 	</element>
 
@@ -74,7 +90,7 @@
 		</rect>
 		<text string="BLACK">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.15" y="0.35" width="0.7" height="0.3" />
 		</text>
 	</element>
 
@@ -83,12 +99,11 @@
 			<color red="0.5" green="0.0" blue="0.7" />
 		</rect>
 		<rect state="1">
-		<color red="0.25" green="0.0" blue="0.35" />
-
+			<color red="0.25" green="0.0" blue="0.35" />
 		</rect>
 		<text string="GAMBLE">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.1" y="0.35" width="0.8" height="0.3" />
 		</text>
 	</element>
 
@@ -101,7 +116,7 @@
 		</rect>
 		<text string="RESERVE">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.1" y="0.35" width="0.8" height="0.3" />
 		</text>
 	</element>
 
@@ -112,35 +127,13 @@
 		<rect state="1">
 			<color red="0.5" green="0.5" blue="0.5" />
 		</rect>
-		<text string="HEART">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+		<text state="0" string="&#x2665;"> <!-- HEART -->
+			<color red="0.8" green="0.2" blue="0.8" />
+			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
 		</text>
-	</element>
-
-	<element name="BET1D">
-		<rect state="0">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</rect>
-		<rect state="1">
-			<color red="0.5" green="0.5" blue="0.5" />
-		</rect>
-		<text string="BET 1/DIAMOND">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
-		</text>
-	</element>
-
-	<element name="BET1R">
-		<rect state="0">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</rect>
-		<rect state="1">
-			<color red="0.5" green="0.5" blue="0.5" />
-		</rect>
-		<text string="BET 1/RED">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+		<text state="1" string="&#x2665;">
+			<color red="0.4" green="0.1" blue="0.4" />
+			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
 		</text>
 	</element>
 
@@ -151,9 +144,67 @@
 		<rect state="1">
 			<color red="0.5" green="0.5" blue="0.5" />
 		</rect>
-		<text string="DIAMOND">
+		<text state="0" string="&#x2666;"> <!-- DIAMOND -->
+			<color red="0.8" green="0.2" blue="0.8" />
+			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
+		</text>
+		<text state="1" string="&#x2666;">
+			<color red="0.4" green="0.1" blue="0.4" />
+			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
+		</text>
+	</element>
+
+	<element name="BET1D">
+		<rect state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.5" blue="0.5" />
+		</rect>
+		<text state="0" string="&#x2666;"> <!-- DIAMOND -->
+			<color red="0.8" green="0.2" blue="0.8" />
+			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
+		</text>
+		<text state="1" string="&#x2666;">
+			<color red="0.4" green="0.1" blue="0.4" />
+			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
+		</text>
+		<text string="BET 1">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.15" y="0.1" width="0.7" height="0.3" />
+		</text>
+		<text string="CREDIT">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.35" width="0.8" height="0.3" />
+		</text>
+		<text string="PER LINE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.6" width="0.8" height="0.3" />
+		</text>
+	</element>
+
+	<element name="BET1R">
+		<rect state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.5" blue="0.5" />
+		</rect>
+		<text string="BET 1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.15" y="0.1" width="0.7" height="0.3" />
+		</text>
+		<text string="CREDIT">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.35" width="0.8" height="0.3" />
+		</text>
+		<text state="0" string="RED">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0.25" y="0.6" width="0.5" height="0.3" />
+		</text>
+		<text state="1" string="RED">
+			<color red="0.5" green="0.0" blue="0.0" />
+			<bounds x="0.25" y="0.6" width="0.5" height="0.3" />
 		</text>
 	</element>
 
@@ -166,17 +217,33 @@
 		</rect>
 		<text string="BET 2">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.15" y="0.1" width="0.7" height="0.3" />
+		</text>
+		<text string="CREDITS">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.35" width="0.8" height="0.3" />
+		</text>
+		<text string="PER LINE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.6" width="0.8" height="0.3" />
 		</text>
 	</element>
 
-	<element name="unused">
+	<element name="BET2X">
 		<rect state="0">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
 		<rect state="1">
 			<color red="0.5" green="0.5" blue="0.5" />
 		</rect>
+		<text string="BET 2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.15" y="0.2" width="0.7" height="0.3" />
+		</text>
+		<text string="CREDITS">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.5" width="0.8" height="0.3" />
+		</text>
 	</element>
 
 	<element name="BET3">
@@ -188,7 +255,11 @@
 		</rect>
 		<text string="BET 3">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.15" y="0.2" width="0.7" height="0.3" />
+		</text>
+		<text string="CREDITS">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.5" width="0.8" height="0.3" />
 		</text>
 	</element>
 
@@ -199,22 +270,25 @@
 		<rect state="1">
 			<color red="0.5" green="0.5" blue="0.5" />
 		</rect>
-		<text string="BET 3/CLUB">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+		<text state="0" string="&#x2663;"> <!-- CLUB -->
+			<color red="0.4" green="0.4" blue="0.4" />
+			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
 		</text>
-	</element>
-
-	<element name="CLUB">
-		<rect state="0">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</rect>
-		<rect state="1">
-			<color red="0.5" green="0.5" blue="0.5" />
-		</rect>
-		<text string="CLUB">
+		<text state="1" string="&#x2663;">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
+		</text>
+		<text string="BET 3">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.15" y="0.1" width="0.7" height="0.3" />
+		</text>
+		<text string="CREDITS">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.35" width="0.8" height="0.3" />
+		</text>
+		<text string="PER LINE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.6" width="0.8" height="0.3" />
 		</text>
 	</element>
 
@@ -227,7 +301,11 @@
 		</rect>
 		<text string="BET 4">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.15" y="0.2" width="0.7" height="0.3" />
+		</text>
+		<text string="CREDITS">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.5" width="0.8" height="0.3" />
 		</text>
 	</element>
 
@@ -240,7 +318,11 @@
 		</rect>
 		<text string="BET 5">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.15" y="0.2" width="0.7" height="0.3" />
+		</text>
+		<text string="CREDITS">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.5" width="0.8" height="0.3" />
 		</text>
 	</element>
 
@@ -251,22 +333,55 @@
 		<rect state="1">
 			<color red="0.5" green="0.5" blue="0.5" />
 		</rect>
-		<text string="BET 5/BLACK">
+		<text string="BET 5">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.15" y="0.1" width="0.7" height="0.3" />
+		</text>
+		<text string="CREDITS">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.35" width="0.8" height="0.3" />
+		</text>
+		<text string="BLACK">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.15" y="0.6" width="0.7" height="0.3" />
 		</text>
 	</element>
 
-	<element name="BET10B">
+	<element name="CLUB">
 		<rect state="0">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
 		<rect state="1">
 			<color red="0.5" green="0.5" blue="0.5" />
 		</rect>
-		<text string="BET 10/BLACK">
+		<text state="0" string="&#x2663;"> <!-- CLUB -->
+			<color red="0.4" green="0.4" blue="0.4" />
+			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
+		</text>
+		<text state="1" string="&#x2663;">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
+		</text>
+	</element>
+
+	<element name="BET10">
+		<rect state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.5" blue="0.5" />
+		</rect>
+		<text string="BET 10">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.15" y="0.1" width="0.7" height="0.3" />
+		</text>
+		<text string="CREDITS">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.35" width="0.8" height="0.3" />
+		</text>
+		<text string="BLACK">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.15" y="0.6" width="0.7" height="0.3" />
 		</text>
 	</element>
 
@@ -277,9 +392,13 @@
 		<rect state="1">
 			<color red="0.5" green="0.5" blue="0.5" />
 		</rect>
-		<text string="SPADE">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+		<text state="0" string="&#x2660;"> <!-- SPADE -->
+			<color red="0.4" green="0.4" blue="0.4" />
+			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
+		</text>
+		<text state="1" string="&#x2660;">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
 		</text>
 	</element>
 
@@ -290,9 +409,13 @@
 		<rect state="1">
 			<color red="0.5" green="0.35" blue="0.0" />
 		</rect>
-		<text string="TAKE WIN/START FEATURE">
+		<text string="TAKE WIN">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.1" y="0.2" width="0.8" height="0.3" />
+		</text>
+		<text string="START FEATURE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.5" width="0.9" height="0.3" />
 		</text>
 	</element>
 
@@ -310,63 +433,60 @@
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<!-- Buttons lamps -->
+		<!-- Button lamps -->
 		<bezel name="lamp8" element="COLLECT" inputtag="P1" inputmask="0x100">
-			<bounds x="0.27" y="3.02" width="0.31" height="0.24" />
+			<bounds x="0.27" y="3.02" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp9" element="HEART" inputtag="P1" inputmask="0x200">
-			<bounds x="0.68" y="3.02" width="0.31" height="0.24" />
+			<bounds x="0.68" y="3.02" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp10" element="DIAMOND" inputtag="P1" inputmask="0x400">
-			<bounds x="1.09" y="3.02" width="0.31" height="0.24" />
-		</bezel>
-		<bezel name="lamp11" element="unused" inputtag="P1" inputmask="0x800">
-			<bounds x="1.51" y="3.02" width="0.31" height="0.24" />
+			<bounds x="1.09" y="3.02" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp12" element="CLUB" inputtag="P1" inputmask="0x1000">
-			<bounds x="1.91" y="3.02" width="0.31" height="0.24" />
+			<bounds x="1.91" y="3.02" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp13" element="SPADE" inputtag="P1" inputmask="0x2000">
-			<bounds x="2.32" y="3.02" width="0.31" height="0.24" />
+			<bounds x="2.32" y="3.02" width="0.3" height="0.3" />
 		</bezel>
 
 		<bezel name="lamp7" element="RESERVE" inputtag="P1" inputmask="0x80">
-			<bounds x="0.27" y="3.28" width="0.31" height="0.24" />
+			<bounds x="0.27" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp6" element="BET1R" inputtag="P1" inputmask="0x40">
-			<bounds x="0.68" y="3.28" width="0.31" height="0.24" />
+			<bounds x="0.68" y="3.43" width="0.3" height="0.3" />
 		</bezel>
-		<bezel name="lamp5" element="BET2" inputtag="P1" inputmask="0x20">
-			<bounds x="1.09" y="3.28" width="0.31" height="0.24" />
+		<bezel name="lamp5" element="BET2X" inputtag="P1" inputmask="0x20">
+			<bounds x="1.09" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp4" element="BET3" inputtag="P1" inputmask="0x10">
-			<bounds x="1.51" y="3.28" width="0.31" height="0.24" />
+			<bounds x="1.51" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp3" element="BET4" inputtag="P1" inputmask="0x08">
-			<bounds x="1.91" y="3.28" width="0.31" height="0.24" />
+			<bounds x="1.91" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp2" element="BET5B" inputtag="P1" inputmask="0x04">
-			<bounds x="2.32" y="3.28" width="0.31" height="0.24" />
+			<bounds x="2.32" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp0" element="GAMBLE" inputtag="P1" inputmask="0x01">
-			<bounds x="2.73" y="3.28" width="0.31" height="0.24" />
+			<bounds x="2.73" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp1" element="TAKE_WIN" inputtag="P1" inputmask="0x02">
-			<bounds x="3.14" y="3.28" width="0.31" height="0.24" />
+			<bounds x="3.14" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 
 		<!-- Tower lamps -->
 		<bezel name="lamp32" element="REDLAMP">
-			<bounds x="3.58" y="3.24" width="0.10" height="0.10" />
+			<bounds x="3.58" y="3.31" width="0.10" height="0.10" />
 		</bezel>
 		<bezel name="lamp33" element="REDLAMP">
-			<bounds x="3.58" y="3.36" width="0.10" height="0.10" />
+			<bounds x="3.58" y="3.43" width="0.10" height="0.10" />
 		</bezel>
 		<bezel name="lamp34" element="REDLAMP">
-			<bounds x="3.68" y="3.24" width="0.10" height="0.10" />
+			<bounds x="3.68" y="3.31" width="0.10" height="0.10" />
 		</bezel>
 		<bezel name="lamp35" element="REDLAMP">
-			<bounds x="3.68" y="3.36" width="0.10" height="0.10" />
+			<bounds x="3.68" y="3.43" width="0.10" height="0.10" />
 		</bezel>
 	</view>
 
@@ -375,63 +495,60 @@
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<!-- Buttons lamps -->
+		<!-- Button lamps -->
 		<bezel name="lamp8" element="COLLECT" inputtag="P1" inputmask="0x100">
-			<bounds x="0.27" y="3.02" width="0.31" height="0.24" />
+			<bounds x="0.27" y="3.02" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp9" element="HEART" inputtag="P1" inputmask="0x200">
-			<bounds x="0.68" y="3.02" width="0.31" height="0.24" />
+			<bounds x="0.68" y="3.02" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp10" element="DIAMOND" inputtag="P1" inputmask="0x400">
-			<bounds x="1.09" y="3.02" width="0.31" height="0.24" />
-		</bezel>
-		<bezel name="lamp11" element="unused" inputtag="P1" inputmask="0x800">
-			<bounds x="1.51" y="3.02" width="0.31" height="0.24" />
+			<bounds x="1.09" y="3.02" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp12" element="CLUB" inputtag="P1" inputmask="0x1000">
-			<bounds x="1.91" y="3.02" width="0.31" height="0.24" />
+			<bounds x="1.91" y="3.02" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp13" element="SPADE" inputtag="P1" inputmask="0x2000">
-			<bounds x="2.32" y="3.02" width="0.31" height="0.24" />
+			<bounds x="2.32" y="3.02" width="0.3" height="0.3" />
 		</bezel>
 
 		<bezel name="lamp7" element="RESERVE" inputtag="P1" inputmask="0x80">
-			<bounds x="0.27" y="3.28" width="0.31" height="0.24" />
+			<bounds x="0.27" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp6" element="BET1R" inputtag="P1" inputmask="0x40">
-			<bounds x="0.68" y="3.28" width="0.31" height="0.24" />
+			<bounds x="0.68" y="3.43" width="0.3" height="0.3" />
 		</bezel>
-		<bezel name="lamp5" element="BET2" inputtag="P1" inputmask="0x20">
-			<bounds x="1.09" y="3.28" width="0.31" height="0.24" />
+		<bezel name="lamp5" element="BET2X" inputtag="P1" inputmask="0x20">
+			<bounds x="1.09" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp4" element="BET3" inputtag="P1" inputmask="0x10">
-			<bounds x="1.51" y="3.28" width="0.31" height="0.24" />
+			<bounds x="1.51" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp3" element="BET5" inputtag="P1" inputmask="0x08">
-			<bounds x="1.91" y="3.28" width="0.31" height="0.24" />
+			<bounds x="1.91" y="3.43" width="0.3" height="0.3" />
 		</bezel>
-		<bezel name="lamp2" element="BET10B" inputtag="P1" inputmask="0x04">
-			<bounds x="2.32" y="3.28" width="0.31" height="0.24" />
+		<bezel name="lamp2" element="BET10" inputtag="P1" inputmask="0x04">
+			<bounds x="2.32" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp0" element="GAMBLE" inputtag="P1" inputmask="0x01">
-			<bounds x="2.73" y="3.28" width="0.31" height="0.24" />
+			<bounds x="2.73" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp1" element="TAKE_WIN" inputtag="P1" inputmask="0x02">
-			<bounds x="3.14" y="3.28" width="0.31" height="0.24" />
+			<bounds x="3.14" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 
 		<!-- Tower lamps -->
 		<bezel name="lamp32" element="REDLAMP">
-			<bounds x="3.58" y="3.24" width="0.10" height="0.10" />
+			<bounds x="3.58" y="3.31" width="0.10" height="0.10" />
 		</bezel>
 		<bezel name="lamp33" element="REDLAMP">
-			<bounds x="3.58" y="3.36" width="0.10" height="0.10" />
+			<bounds x="3.58" y="3.43" width="0.10" height="0.10" />
 		</bezel>
 		<bezel name="lamp34" element="REDLAMP">
-			<bounds x="3.68" y="3.24" width="0.10" height="0.10" />
+			<bounds x="3.68" y="3.31" width="0.10" height="0.10" />
 		</bezel>
 		<bezel name="lamp35" element="REDLAMP">
-			<bounds x="3.68" y="3.36" width="0.10" height="0.10" />
+			<bounds x="3.68" y="3.43" width="0.10" height="0.10" />
 		</bezel>
 	</view>
 
@@ -440,63 +557,63 @@
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<!-- Buttons lamps -->
+		<!-- Button lamps -->
 		<bezel name="lamp8" element="COLLECT" inputtag="P1" inputmask="0x100">
-			<bounds x="0.27" y="3.02" width="0.31" height="0.24" />
+			<bounds x="0.27" y="3.02" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp9" element="HEART" inputtag="P1" inputmask="0x200">
-			<bounds x="0.68" y="3.02" width="0.31" height="0.24" />
+			<bounds x="0.68" y="3.02" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp10" element="BET1D" inputtag="P1" inputmask="0x400">
-			<bounds x="1.09" y="3.02" width="0.31" height="0.24" />
+			<bounds x="1.09" y="3.02" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp11" element="BET2" inputtag="P1" inputmask="0x800">
-			<bounds x="1.51" y="3.02" width="0.31" height="0.24" />
+			<bounds x="1.51" y="3.02" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp12" element="BET3C" inputtag="P1" inputmask="0x1000">
-			<bounds x="1.91" y="3.02" width="0.31" height="0.24" />
+			<bounds x="1.91" y="3.02" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp13" element="SPADE" inputtag="P1" inputmask="0x2000">
-			<bounds x="2.32" y="3.02" width="0.31" height="0.24" />
+			<bounds x="2.32" y="3.02" width="0.3" height="0.3" />
 		</bezel>
 
 		<bezel name="lamp7" element="RESERVE" inputtag="P1" inputmask="0x80">
-			<bounds x="0.27" y="3.28" width="0.31" height="0.24" />
+			<bounds x="0.27" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp6" element="RED" inputtag="P1" inputmask="0x40">
-			<bounds x="0.68" y="3.28" width="0.31" height="0.24" />
+			<bounds x="0.68" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp5" element="1LINE" inputtag="P1" inputmask="0x20">
-			<bounds x="1.09" y="3.28" width="0.31" height="0.24" />
+			<bounds x="1.09" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp4" element="2LINES" inputtag="P1" inputmask="0x10">
-			<bounds x="1.51" y="3.28" width="0.31" height="0.24" />
+			<bounds x="1.51" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp3" element="3LINES" inputtag="P1" inputmask="0x08">
-			<bounds x="1.91" y="3.28" width="0.31" height="0.24" />
+			<bounds x="1.91" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp2" element="BLACK" inputtag="P1" inputmask="0x04">
-			<bounds x="2.32" y="3.28" width="0.31" height="0.24" />
+			<bounds x="2.32" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp0" element="GAMBLE" inputtag="P1" inputmask="0x01">
-			<bounds x="2.73" y="3.28" width="0.31" height="0.24" />
+			<bounds x="2.73" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 		<bezel name="lamp1" element="TAKE_WIN" inputtag="P1" inputmask="0x02">
-			<bounds x="3.14" y="3.28" width="0.31" height="0.24" />
+			<bounds x="3.14" y="3.43" width="0.3" height="0.3" />
 		</bezel>
 
 		<!-- Tower lamps -->
 		<bezel name="lamp32" element="REDLAMP">
-			<bounds x="3.58" y="3.24" width="0.10" height="0.10" />
+			<bounds x="3.58" y="3.31" width="0.10" height="0.10" />
 		</bezel>
 		<bezel name="lamp33" element="REDLAMP">
-			<bounds x="3.58" y="3.36" width="0.10" height="0.10" />
+			<bounds x="3.58" y="3.43" width="0.10" height="0.10" />
 		</bezel>
 		<bezel name="lamp34" element="REDLAMP">
-			<bounds x="3.68" y="3.24" width="0.10" height="0.10" />
+			<bounds x="3.68" y="3.31" width="0.10" height="0.10" />
 		</bezel>
 		<bezel name="lamp35" element="REDLAMP">
-			<bounds x="3.68" y="3.36" width="0.10" height="0.10" />
+			<bounds x="3.68" y="3.43" width="0.10" height="0.10" />
 		</bezel>
 	</view>
 

@@ -7,9 +7,8 @@
     Formats for Corvus Concept
 
 *********************************************************************/
-
-#ifndef CONCEPT_DSK_H_
-#define CONCEPT_DSK_H_
+#ifndef MAME_FORMATS_CONCEPT_DSK_H
+#define MAME_FORMATS_CONCEPT_DSK_H
 
 #include "flopimg.h"
 
@@ -35,4 +34,4 @@ private:
 
 extern const floppy_format_type FLOPPY_CONCEPT_525DSDD_FORMAT;
 
-#endif /* CONCEPT_DSK_H_ */
+#endif // MAME_FORMATS_CONCEPT_DSK_H

@@ -94,7 +94,7 @@ INTERRUPT_GEN_MEMBER(shanghai_state::half_vblank_irq)
 {
 	// definitely running at vblank / 2 (hd63484 irq mask not used)
 	if(m_screen->frame_number() & 1)
-		device.execute().set_input_line_and_vector(0,HOLD_LINE,0x80);
+		device.execute().set_input_line_and_vector(0,HOLD_LINE,0x80); // V30
 }
 
 WRITE8_MEMBER(shanghai_state::shanghai_coin_w)

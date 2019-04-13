@@ -560,8 +560,6 @@ void nes_konami_vrc4_device::write_h(offs_t offset, uint8_t data)
  In MESS: Supported. It also uses konami_irq (there are IRQ
  issues though: see Akumajou Densetsu intro).
 
- TODO: Add sound capabilities support!
-
  -------------------------------------------------*/
 
 void nes_konami_vrc6_device::write_h(offs_t offset, uint8_t data)
@@ -644,7 +642,7 @@ void nes_konami_vrc6_device::device_add_mconfig(machine_config &config)
 
 	// TODO: this is not how VRC6 clock signaling works!
 	// The board uses the CLK pin in reality, not hardcoded NTSC values!
-	VRC6(config, m_vrc6snd, XTAL(21'477'272)/12).add_route(ALL_OUTPUTS, "addon", 0.5);
+	VRC6(config, m_vrc6snd, XTAL(21'477'272)/12).add_route(ALL_OUTPUTS, "addon", 1.0);
 }
 
 /*-------------------------------------------------

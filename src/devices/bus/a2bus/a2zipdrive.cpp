@@ -7,18 +7,62 @@
     ZIP Technologies ZipDrive IDE card
     Parsons Engineering Focus Drive IDE card
 
-    These cards are very, very similar.  Maybe Parsons designed both?
+    These cards are basically identical, with
+    almost byte-identical firmware (written by "Burger" Becky).
 
-    NOTE: No known dump exists of the Zip formatter utility and the
-    format of the custom partition record (block 0) that the card
-    expects has not yet been determined, so this is largely untested
-    and will work only with a drive dump from real h/w.
+    Focus / ZIP partition sector (sector 0):
+    +000: "Parsons Engin" or "Zip Technolog"
+    +00e: String terminator 0
+    +00f: Number of partitions
+    +01c: Drive type (index into table of fixed geometries)
+    +020: Partition 0 start block
+    +024: Parition 0 block count
+    +028: P0 Write protect flag
+    +02d/02e/02f: Unknown (written by Focus s/w, not read by ROM or GS/OS driver)
+    +030: Partition 1 start block
+    +034: Partition 1 block count
+    +038: P1 write protect flag
+    +03d/03e/03f: Unknown (written by Focus s/w, not read by ROM or GS/OS driver)
+    +040: Partition 2
+    +050: Partition 3
+    +060: Partition 4
+    +070: Partition 5
+    +080: Partition 6
+    +090: Partition 7
+    [...]
+    +1E0: Partition 15
 
-    PLEASE use it only on a backup copy of said dump and contact MAMEdev
-    if you have one!
+    Sector 1:
+    +020: Partition 0 name
+    +040: Partition 1 name
+    +060: Partition 2 name
+    +080: Partition 3 name
+    +0a0: Partition 4 name
+    +0c0: Partition 5 name
+    +0e0: Partition 6 name
+    +100: Partition 7 name
+    [...]
+    +1E0: Partition 15 name
 
-    Partition block format:
-    +0000: ASCII "Zip Technologies"
+    Drive types:
+    Drive type 0: CHS=782,4,27, 84590 total blocks, capacity 43 MB
+    Drive type 1: CHS=782,3,27, 63449 total blocks, capacity 32 MB
+    Drive type 2: CHS=782,2,27, 42308 total blocks, capacity 21 MB
+    Drive type 3: CHS=1334,2,33, 88142 total blocks, capacity 45 MB
+    Drive type 4: CHS=1334,4,33, 176252 total blocks, capacity 90 MB
+    Drive type 5: CHS=1334,6,33, 264362 total blocks, capacity 135 MB
+    Drive type 6: CHS=1334,8,33, 352472 total blocks, capacity 180 MB
+    Drive type 7: CHS=670,4,31, 83234 total blocks, capacity 42 MB
+    Drive type 8: CHS=977,2,43, 84150 total blocks, capacity 43 MB
+    Drive type 9: CHS=614,4,17, 41836 total blocks, capacity 21 MB
+    Drive type 10: CHS=65535,5,17, 5570576 total blocks, capacity -1442 MB (???)
+    Drive type 11: CHS=872,4,24, 83831 total blocks, capacity 42 MB
+    Drive type 12: CHS=977,5,17, 83146 total blocks, capacity 42 MB
+    Drive type 13: CHS=547,4,38, 83333 total blocks, capacity 42 MB
+    Drive type 14: CHS=977,4,43, 168258 total blocks, capacity 86 MB
+    Drive type 15: CHS=973,4,43, 167570 total blocks, capacity 85 MB
+    Drive type 16: CHS=791,3,35, 83194 total blocks, capacity 42 MB
+    Drive type 17: CHS=548,8,38, 166933 total blocks, capacity 85 MB
 
 *********************************************************************/
 
@@ -108,6 +152,7 @@ void a2bus_zipdrivebase_device::device_start()
 
 void a2bus_zipdrivebase_device::device_reset()
 {
+	m_rom[0x1c44] = 0x03;
 }
 
 void a2bus_focusdrive_device::device_reset()
@@ -134,7 +179,7 @@ uint8_t a2bus_zipdrivebase_device::read_c0nx(uint8_t offset)
 			return m_ata->read_cs0(offset, 0xff);
 
 		case 8: // data port
-			m_lastdata = m_ata->read_cs0(offset, 0xffff);
+			m_lastdata = m_ata->read_cs0(0, 0xffff);
 //          printf("%04x @ IDE data\n", m_lastdata);
 			return m_lastdata&0xff;
 
@@ -164,7 +209,7 @@ uint8_t a2bus_focusdrive_device::read_c0nx(uint8_t offset)
 			return m_ata->read_cs0(offset&7, 0xff);
 
 		case 0: // data port
-			m_lastdata = m_ata->read_cs0(offset, 0xffff);
+			m_lastdata = m_ata->read_cs0(0, 0xffff);
 			//printf("%04x @ IDE data\n", m_lastdata);
 			return m_lastdata&0xff;
 

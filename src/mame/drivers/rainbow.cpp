@@ -1374,7 +1374,7 @@ void rainbow_state::update_8088_irqs()
 		{
 			if (m_irq_mask & (1 << i))
 			{
-				m_i8088->set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, vectors[i] | m_irq_high);
+				m_i8088->set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, vectors[i] | m_irq_high); // I8088
 				break;
 			}
 		}
@@ -2240,7 +2240,7 @@ WRITE8_MEMBER(rainbow_state::i8088_latch_w)
 	// The interrupt vector address(F7H) placed on the bus is hardwired into the Z80A interrupt vector encoder.
 	// The F7H interrupt vector address causes the Z80A processor to perform an RST 30 instruction in
 	// interrupt mode 0
-	m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf7);
+	m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf7); // Z80
 	m_z80_mailbox = data;
 
 	m_intz80 = true;
@@ -2756,7 +2756,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 	// Install 8088 read / write handler once loopback test is over
 	if ( !(data & 32) && (m_diagnostic & 32) )
 	{
-			io.install_readwrite_handler(0x40, 0x43, READ8_DEVICE_DELEGATE(m_mpsc, upd7201_new_device,cd_ba_r), WRITE8_DEVICE_DELEGATE(m_mpsc, upd7201_new_device, cd_ba_w) );
+			io.install_readwrite_handler(0x40, 0x43, read8sm_delegate(FUNC(upd7201_new_device::cd_ba_r), &*m_mpsc), write8sm_delegate(FUNC(upd7201_new_device::cd_ba_w), &*m_mpsc));
 			logerror("\n **** COMM HANDLER INSTALLED **** ");
 			//popmessage("Autoboot from drive %c", m_p_nvram[0xab] ? (64 + m_p_nvram[0xab]) : 0x3F );
 	}

@@ -281,6 +281,7 @@
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
 #include "machine/idectrl.h"
+#include "machine/idehd.h"
 #include "machine/midwayic.h"
 #include "machine/smc91c9x.h"
 #include "machine/timekpr.h"
@@ -527,6 +528,13 @@ void vegas_state::machine_reset()
 	m_wheel_force = 0;
 	m_wheel_offset = 0;
 	m_wheel_calibrated = false;
+
+	// Set the disk dma transfer speed
+	auto *hdd = subdevice<ide_hdd_device>(PCI_ID_IDE":ide:0:hdd");
+	hdd->set_dma_transfer_time(attotime::from_usec(15));
+	// Allow ultra dma
+	//uint16_t *identify_device = hdd->identify_device_buffer();
+	//identify_device[88] = 0x7f;
 }
 
 /*************************************
@@ -1997,7 +2005,7 @@ void vegas_state::nbagold(machine_config &config)
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_GAUNTDL);
-	m_ioasic->set_upper(494 /* 494 109 ??? */);
+	m_ioasic->set_upper(109 /* 494 109 ??? */);
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
 	//m_ioasic->set_auto_ack(1)

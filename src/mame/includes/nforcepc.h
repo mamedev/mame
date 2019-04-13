@@ -10,17 +10,18 @@
 class crush11_host_device : public pci_host_device {
 public:
 	template <typename T>
-	crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, int ram_size)
+	crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
 		: crush11_host_device(mconfig, tag, owner, clock)
 	{
 		set_ids_host(0x10de01a4, 0x01, 0x10430c11);
 		set_cpu_tag(std::forward<T>(cpu_tag));
-		set_ram_size(ram_size);
 	}
 	crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T> void set_cpu_tag(T &&tag) { cpu.set_tag(std::forward<T>(tag)); }
-	void set_ram_size(int ram_size);
+	const char *get_cpu_tag() { return cpu.finder_tag(); }
+	void set_ram_size(uint32_t size) { ram_size = size; }
+	address_space *get_cpu_space(int spacenum) { return &cpu->space(spacenum); }
 
 protected:
 	virtual void device_start() override;
@@ -34,15 +35,43 @@ protected:
 	virtual void config_map(address_map &map) override;
 
 private:
-	int ddr_ram_size;
 	required_device<device_memory_interface> cpu;
-	std::vector<uint32_t> ram;
+	uint32_t ram_size;
 
-	DECLARE_READ8_MEMBER(test_r);
-	DECLARE_WRITE8_MEMBER(test_w);
+	DECLARE_READ8_MEMBER(unknown_r);
+	DECLARE_WRITE8_MEMBER(unknown_w);
+	DECLARE_READ32_MEMBER(ram_size_r);
+	DECLARE_WRITE32_MEMBER(ram_size_w);
 };
 
 DECLARE_DEVICE_TYPE(CRUSH11, crush11_host_device)
+
+// For ddr ram
+
+class crush11_memory_device : public pci_device {
+public:
+	crush11_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int ram_size);
+	crush11_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void set_ram_size(int ram_size);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+
+	virtual void config_map(address_map &map) override;
+
+private:
+	int ddr_ram_size;
+	std::vector<uint32_t> ram;
+	crush11_host_device *host;
+	address_space *ram_space;
+};
+
+DECLARE_DEVICE_TYPE(CRUSH11_MEMORY, crush11_memory_device)
 
 // device connected to SMBus
 
@@ -84,7 +113,7 @@ private:
 DECLARE_DEVICE_TYPE(SMBUS_ROM, smbus_rom_device)
 
 // Asus AS99127F chip
-// It answerst to three smbus addresses, by default 0x2d 0x48 0x49
+// It answers to three smbus addresses, by default 0x2d 0x48 0x49
 
 class as99127f_device : public device_t, public smbus_interface
 {

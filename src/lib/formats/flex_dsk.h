@@ -5,13 +5,15 @@
  *
  *  Created on: 24/06/2014
  */
+#ifndef MAME_FORMATS_FLEX_DSK_H
+#define MAME_FORMATS_FLEX_DSK_H
 
-#ifndef FLEX_DSK_H_
-#define FLEX_DSK_H_
+#pragma once
 
 #include "flopimg.h"
 
-class flex_format : public floppy_image_format_t {
+class flex_format : public floppy_image_format_t
+{
 public:
 	flex_format();
 
@@ -45,4 +47,4 @@ private:
 
 extern const floppy_format_type FLOPPY_FLEX_FORMAT;
 
-#endif /* FLEX_DSK_H_ */
+#endif // MAME_FORMATS_FLEX_DSK_H

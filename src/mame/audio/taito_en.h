@@ -31,7 +31,6 @@ public:
 
 	void set_bank(int bank, int entry) { m_cpubank[bank]->set_entry(entry); }
 
-	void en_sound_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -39,6 +38,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	void en_sound_map(address_map &map);
+	void fc7_map(address_map &map);
+
 	// inherited devices/pointers
 	required_device<cpu_device> m_audiocpu;
 	required_device<es5505_device> m_ensoniq;

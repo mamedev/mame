@@ -37,7 +37,7 @@
 */
 TIMER_CALLBACK_MEMBER(tx1_state::interrupt_callback)
 {
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // I8086
 	m_interrupt_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 

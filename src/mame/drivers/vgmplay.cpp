@@ -2705,6 +2705,17 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		logerror("File version %x.%02x\n", version >> 8, version & 0xff);
 
 		uint32_t data_start = version >= 0x150 ? r32(0x34) + 0x34 : 0x40;
+		int volbyte = version >= 0x160 && data_start >= 0x7d ? r8(0x7c) : 0;
+		logerror("Volume %02x\n", volbyte);
+
+		if (volbyte == 0xc1) // 0x00~0xc0 0~192, 0xc1 -64, 0xc2~0xff -62~-1
+			volbyte = -0x40;
+		else if (volbyte > 0xc1)
+			volbyte -= 0x100;
+
+		float volume = powf(2.0f, float(volbyte) / float(0x20));
+		uint32_t chip_count = 0;
+
 		uint32_t extra_header_start = version >= 0x170 && data_start >= 0xc0 && r32(0xbc) ? r32(0xbc) + 0xbc : 0;
 		uint32_t header_size = extra_header_start ? extra_header_start : data_start;
 
@@ -2732,6 +2743,8 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 							break;
 						}
 					}
+
+				chip_count++;
 			}
 
 			device.set_unscaled_clock(c & ~0xc0000000);
@@ -2914,6 +2927,16 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		for (device_t &child : subdevices())
 			if (child.clock() != 0)
 				logerror("%s %d\n", child.tag(), child.clock());
+
+		if (chip_count == 0)
+			volume = 0.0f;
+		else
+			volume /= (float)chip_count;
+
+		for (int i = 0; i < m_lspeaker->inputs(); i++)
+			m_lspeaker->set_input_gain(i, volume); // TODO : Volume is related to chip number
+		for (int i = 0; i < m_rspeaker->inputs(); i++)
+			m_rspeaker->set_input_gain(i, volume);
 
 		//for (auto &stream : machine().sound().streams())
 		//  if (stream->sample_rate() != 0)
@@ -3631,20 +3654,14 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	N2A03(config, m_nescpu[0], 0);
 	m_nescpu[0]->set_addrmap(AS_PROGRAM, &vgmplay_state::nescpu_map<0>);
 	m_nescpu[0]->set_disable();
-
-	auto *nesapu_0(dynamic_cast<device_sound_interface *>(config.device_find(m_nescpu[0], "nesapu")));
-	nesapu_0->reset_routes();
-	nesapu_0->add_route(ALL_OUTPUTS, ":lspeaker", 0.50);
-	nesapu_0->add_route(ALL_OUTPUTS, ":rspeaker", 0.50);
+	m_nescpu[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_nescpu[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	N2A03(config, m_nescpu[1], 0);
 	m_nescpu[1]->set_addrmap(AS_PROGRAM, &vgmplay_state::nescpu_map<1>);
 	m_nescpu[1]->set_disable();
-
-	auto *nesapu_1(dynamic_cast<device_sound_interface *>(config.device_find(m_nescpu[1], "nesapu")));
-	nesapu_1->reset_routes();
-	nesapu_1->add_route(ALL_OUTPUTS, ":lspeaker", 0.50);
-	nesapu_1->add_route(ALL_OUTPUTS, ":rspeaker", 0.50);
+	m_nescpu[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_nescpu[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	MULTIPCM(config, m_multipcm[0], 0);
 	m_multipcm[0]->set_addrmap(0, &vgmplay_state::multipcm_map<0>);

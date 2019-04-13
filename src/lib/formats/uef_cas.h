@@ -5,9 +5,10 @@
 
     Format code for uef cassette files
 */
+#ifndef MAME_FORMATS_UEF_CAS_H
+#define MAME_FORMATS_UEF_CAS_H
 
-#ifndef UEF_CAS_H
-#define UEF_CAS_H
+#pragma once
 
 #include "cassimg.h"
 
@@ -15,4 +16,4 @@ extern const struct CassetteFormat uef_cassette_format;
 
 CASSETTE_FORMATLIST_EXTERN(uef_cassette_formats);
 
-#endif /* UEF_CAS_H */
+#endif // MAME_FORMATS_UEF_CAS_H

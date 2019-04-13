@@ -108,7 +108,9 @@ void m37720s1_device::map(address_map &map)
 m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, map_delegate)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_port_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_port_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_analog_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 {
 }
 
@@ -144,8 +146,7 @@ m37720s1_device::m37720s1_device(const machine_config &mconfig, const char *tag,
 std::vector<std::pair<int, const address_space_config *>> m37710_cpu_device::memory_space_config() const
 {
 	return std::vector<std::pair<int, const address_space_config *>> {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_IO,      &m_io_config)
+		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
 }
 
@@ -517,82 +518,82 @@ READ8_MEMBER(m37710_cpu_device::m37710_internal_r)
 		case 0x02: // p0
 			d = m_m37710_regs[0x04];
 			if (d != 0xff)
-				return (m_io->read_byte(M37710_PORT0)&~d) | (m_m37710_regs[offset]&d);
+				return (m_port_in_cb[0](0,~d)&~d) | (m_m37710_regs[offset]&d);
 			break;
 		case 0x03: // p1
 			d = m_m37710_regs[0x05];
 			if (d != 0xff)
-				return (m_io->read_byte(M37710_PORT1)&~d) | (m_m37710_regs[offset]&d);
+				return (m_port_in_cb[1](0,~d)&~d) | (m_m37710_regs[offset]&d);
 			break;
 		case 0x06: // p2
 			d = m_m37710_regs[0x08];
 			if (d != 0xff)
-				return (m_io->read_byte(M37710_PORT2)&~d) | (m_m37710_regs[offset]&d);
+				return (m_port_in_cb[2](0,~d)&~d) | (m_m37710_regs[offset]&d);
 			break;
 		case 0x07: // p3
 			d = m_m37710_regs[0x09];
 			if (d != 0xff)
-				return (m_io->read_byte(M37710_PORT3)&~d) | (m_m37710_regs[offset]&d);
+				return (m_port_in_cb[3](0,~d)&~d) | (m_m37710_regs[offset]&d);
 			break;
 		case 0x0a: // p4
 			d = m_m37710_regs[0x0c];
 			if (d != 0xff)
-				return (m_io->read_byte(M37710_PORT4)&~d) | (m_m37710_regs[offset]&d);
+				return (m_port_in_cb[4](0,~d)&~d) | (m_m37710_regs[offset]&d);
 			break;
 		case 0x0b: // p5
 			d = m_m37710_regs[0x0d];
 			if (d != 0xff)
-				return (m_io->read_byte(M37710_PORT5)&~d) | (m_m37710_regs[offset]&d);
+				return (m_port_in_cb[5](0,~d)&~d) | (m_m37710_regs[offset]&d);
 			break;
 		case 0x0e: // p6
 			d = m_m37710_regs[0x10];
 			if (d != 0xff)
-				return (m_io->read_byte(M37710_PORT6)&~d) | (m_m37710_regs[offset]&d);
+				return (m_port_in_cb[6](0,~d)&~d) | (m_m37710_regs[offset]&d);
 			break;
 		case 0x0f: // p7
 			d = m_m37710_regs[0x11];
 			if (d != 0xff)
-				return (m_io->read_byte(M37710_PORT7)&~d) | (m_m37710_regs[offset]&d);
+				return (m_port_in_cb[7](0,~d)&~d) | (m_m37710_regs[offset]&d);
 			break;
 		case 0x12: // p8
 			d = m_m37710_regs[0x14];
 			if (d != 0xff)
-				return (m_io->read_byte(M37710_PORT8)&~d) | (m_m37710_regs[offset]&d);
+				return (m_port_in_cb[8](0,~d)&~d) | (m_m37710_regs[offset]&d);
 			break;
 
 		// A-D regs
 		case 0x20:
-			return m_io->read_byte(M37710_ADC0_L);
+			return m_analog_cb[0]() & 0xff;
 		case 0x21:
-			return m_io->read_byte(M37710_ADC0_H);
+			return m_analog_cb[0]() >> 8;
 		case 0x22:
-			return m_io->read_byte(M37710_ADC1_L);
+			return m_analog_cb[1]() & 0xff;
 		case 0x23:
-			return m_io->read_byte(M37710_ADC1_H);
+			return m_analog_cb[1]() >> 8;
 		case 0x24:
-			return m_io->read_byte(M37710_ADC2_L);
+			return m_analog_cb[2]() & 0xff;
 		case 0x25:
-			return m_io->read_byte(M37710_ADC2_H);
+			return m_analog_cb[2]() >> 8;
 		case 0x26:
-			return m_io->read_byte(M37710_ADC3_L);
+			return m_analog_cb[3]() & 0xff;
 		case 0x27:
-			return m_io->read_byte(M37710_ADC3_H);
+			return m_analog_cb[3]() >> 8;
 		case 0x28:
-			return m_io->read_byte(M37710_ADC4_L);
+			return m_analog_cb[4]() & 0xff;
 		case 0x29:
-			return m_io->read_byte(M37710_ADC4_H);
+			return m_analog_cb[4]() >> 8;
 		case 0x2a:
-			return m_io->read_byte(M37710_ADC5_L);
+			return m_analog_cb[5]() & 0xff;
 		case 0x2b:
-			return m_io->read_byte(M37710_ADC5_H);
+			return m_analog_cb[5]() >> 8;
 		case 0x2c:
-			return m_io->read_byte(M37710_ADC6_L);
+			return m_analog_cb[6]() & 0xff;
 		case 0x2d:
-			return m_io->read_byte(M37710_ADC6_H);
+			return m_analog_cb[6]() >> 8;
 		case 0x2e:
-			return m_io->read_byte(M37710_ADC7_L);
+			return m_analog_cb[7]() & 0xff;
 		case 0x2f:
-			return m_io->read_byte(M37710_ADC7_H);
+			return m_analog_cb[7]() >> 8;
 
 		// UART control (not hooked up yet)
 		case 0x34: case 0x3c:
@@ -631,47 +632,47 @@ WRITE8_MEMBER(m37710_cpu_device::m37710_internal_w)
 		case 0x02: // p0
 			d = m_m37710_regs[0x04];
 			if (d != 0)
-				m_io->write_byte(M37710_PORT0, data&d);
+				m_port_out_cb[0](0,data&d,d);
 			break;
 		case 0x03: // p1
 			d = m_m37710_regs[0x05];
 			if (d != 0)
-				m_io->write_byte(M37710_PORT1, data&d);
+				m_port_out_cb[1](0,data&d,d);
 			break;
 		case 0x06: // p2
 			d = m_m37710_regs[0x08];
 			if (d != 0)
-				m_io->write_byte(M37710_PORT2, data&d);
+				m_port_out_cb[2](0,data&d,d);
 			break;
 		case 0x07: // p3
 			d = m_m37710_regs[0x09];
 			if (d != 0)
-				m_io->write_byte(M37710_PORT3, data&d);
+				m_port_out_cb[3](0,data&d,d);
 			break;
 		case 0x0a: // p4
 			d = m_m37710_regs[0x0c];
 			if (d != 0)
-				m_io->write_byte(M37710_PORT4, data&d);
+				m_port_out_cb[4](0,data&d,d);
 			break;
 		case 0x0b: // p5
 			d = m_m37710_regs[0x0d];
 			if (d != 0)
-				m_io->write_byte(M37710_PORT5, data&d);
+				m_port_out_cb[5](0,data&d,d);
 			break;
 		case 0x0e: // p6
 			d = m_m37710_regs[0x10];
 			if (d != 0)
-				m_io->write_byte(M37710_PORT6, data&d);
+				m_port_out_cb[6](0,data&d,d);
 			break;
 		case 0x0f: // p7
 			d = m_m37710_regs[0x11];
 			if (d != 0)
-				m_io->write_byte(M37710_PORT7, data&d);
+				m_port_out_cb[7](0,data&d,d);
 			break;
 		case 0x12: // p8
 			d = m_m37710_regs[0x14];
 			if (d != 0)
-				m_io->write_byte(M37710_PORT8, data&d);
+				m_port_out_cb[8](0,data&d,d);
 			break;
 
 		case 0x40:  // count start
@@ -1014,7 +1015,13 @@ void m37710_cpu_device::device_start()
 
 	m_program = &space(AS_PROGRAM);
 	m_cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
-	m_io = &space(AS_IO);
+
+	for (auto &cb : m_port_in_cb)
+		cb.resolve_safe(0xff);
+	for (auto &cb : m_port_out_cb)
+		cb.resolve_safe();
+	for (auto &cb : m_analog_cb)
+		cb.resolve_safe(0);
 
 	m_ICount = 0;
 

@@ -128,7 +128,7 @@ WRITE8_MEMBER( timeplt_audio_device::filter_w )
 
 WRITE8_MEMBER(timeplt_audio_device::sound_data_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 }
 
 
@@ -137,7 +137,7 @@ WRITE_LINE_MEMBER(timeplt_audio_device::sh_irqtrigger_w)
 	if (m_last_irq_state == 0 && state)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 	}
 
 	m_last_irq_state = state;

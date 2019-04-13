@@ -7,12 +7,13 @@
     Format code for SVI cassette files
 
 *********************************************************************/
+#ifndef MAME_FORMATS_SVI_CAS_H
+#define MAME_FORMATS_SVI_CAS_H
 
-#ifndef SVI_CAS_H
-#define SVI_CAS_H
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(svi_cassette_formats);
 
-#endif /* SVI_CAS_H */
+#endif // MAME_FORMATS_SVI_CAS_H

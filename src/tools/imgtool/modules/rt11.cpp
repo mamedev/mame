@@ -573,19 +573,19 @@ static imgtoolerr_t rt11_lookup_path(imgtool::image &image, const char *path,
 	creation_policy_t create, rt11_direnum *direnum, rt11_dirent *rt_ent)
 {
 	imgtoolerr_t err;
-	rt11_direnum my_direnum;
-	uint16_t this_segment;
-	uint32_t this_index;
-	char filename[16];
 
+	rt11_direnum my_direnum;
 	if (!direnum)
 		direnum = &my_direnum;
 
 	memset(direnum, 0, sizeof(*direnum));
 	err = rt11_enum_seek(image, direnum, 1, 0);
 	if (err)
-		goto done;
+		return err;
 
+	uint16_t this_segment;
+	uint32_t this_index;
+	char filename[16];
 	do
 	{
 		this_segment = direnum->segment;
@@ -593,7 +593,7 @@ static imgtoolerr_t rt11_lookup_path(imgtool::image &image, const char *path,
 
 		err = rt11_get_next_dirent(image, direnum, *rt_ent);
 		if (err)
-			goto done;
+			return err;
 		rt11_filename_from_rad50(filename, rt_ent->filename);
 	}
 	while(direnum->segment && (strcmp(path, filename) ||
@@ -603,22 +603,17 @@ static imgtoolerr_t rt11_lookup_path(imgtool::image &image, const char *path,
 	{
 		/* did not find file; maybe we need to create it */
 		if (create == CREATE_NONE)
-		{
-			err = IMGTOOLERR_FILENOTFOUND;
-			goto done;
-		}
+			return IMGTOOLERR_FILENOTFOUND;
 	}
 	else
 	{
 		/* we've found the file; seek that dirent */
 		err = rt11_enum_seek(image, direnum, this_segment, this_index);
 		if (err)
-			goto done;
+			return err;
 	}
 
-	err = IMGTOOLERR_SUCCESS;
-done:
-	return err;
+	return IMGTOOLERR_SUCCESS;
 }
 
 static imgtoolerr_t rt11_read_bootblock(imgtool::partition &partition, imgtool::stream &stream)

@@ -294,7 +294,6 @@ Notes & Todo:
 #include "emu.h"
 #include "includes/playch10.h"
 
-#include "cpu/m6502/n2a03.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/rp5h01.h"
@@ -694,6 +693,7 @@ void playch10_state::playch10(machine_config &config)
 	m_ppu->int_callback().append(FUNC(playch10_state::int_detect_w));
 
 	SPEAKER(config, "mono").front_center();
+	m_cartcpu->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	RP5H01(config, m_rp5h01, 0);
 }

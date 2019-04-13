@@ -16,7 +16,6 @@
  * Namcot 340 [mapper 210]
 
  TODO:
- - add sound feature of Namcot-163
  - Quinty is not working (same issue of Mendel Palace on TxROM boards, of course)
 
  ***********************************************************************************************************/
@@ -25,6 +24,8 @@
 #include "emu.h"
 #include "namcot.h"
 #include "ui/uimain.h"
+
+#include "speaker.h"
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -83,7 +84,7 @@ nes_namcot175_device::nes_namcot175_device(const machine_config &mconfig, const 
 }
 
 nes_namcot163_device::nes_namcot163_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_namcot340_device(mconfig, NES_NAMCOT163, tag, owner, clock), m_wram_protect(0), m_latch(0), m_chr_bank(0)
+	: nes_namcot340_device(mconfig, NES_NAMCOT163, tag, owner, clock), m_wram_protect(0), m_latch(0), m_chr_bank(0), m_namco163snd(*this, "n163")
 {
 }
 
@@ -208,6 +209,24 @@ void nes_namcot163_device::device_start()
 
 	m_mapper_sram_size = 0x2000;
 	m_mapper_sram = m_n163_ram;
+
+	// TODO : Measure actual volume
+	if (m_n163_vol == 2) // Submapper 2 - No expansion sound
+	{
+		m_namco163snd->set_output_gain(ALL_OUTPUTS, 0.0);
+	}
+	else if (m_n163_vol == 3) // Submapper 3 - N163 expansion sound: 11.0-13.0 dB louder than NES APU
+	{
+		m_namco163snd->set_output_gain(ALL_OUTPUTS, 1.125);
+	}
+	else if (m_n163_vol == 4) // Submapper 4 - N163 expansion sound: 16.0-17.0 dB louder than NES APU
+	{
+		m_namco163snd->set_output_gain(ALL_OUTPUTS, 1.17);
+	}
+	else if (m_n163_vol == 5) // Submapper 5 - N163 expansion sound: 18.0-19.5 dB louder than NES APU
+	{
+		m_namco163snd->set_output_gain(ALL_OUTPUTS, 1.19);
+	}
 }
 
 void nes_namcot163_device::pcb_reset()
@@ -550,13 +569,11 @@ void nes_namcot175_device::write_h(offs_t offset, uint8_t data)
 
  Compared to Namcot-175 here we have mapper controlled
  mirroring, NTRAM mapping to VRAM and additional
- sound hw inside the chip (currently unemulated) and
- some internal RAM.
+ sound hw inside the chip and some internal RAM.
 
  iNES: mapper 19
 
- In MESS: Supported (with no emulation of the
- sound component)
+ In MESS: Supported
 
  -------------------------------------------------*/
 
@@ -614,7 +631,7 @@ void nes_namcot163_device::write_l(offs_t offset, uint8_t data)
 	switch (offset & 0x1800)
 	{
 		case 0x0800:
-			LOG_MMC(("Namcot-163 sound reg write, data: %02x\n", data));
+			m_namco163snd->data_w(data);
 			break;
 		default:
 			n340_lowrite(offset, data);
@@ -630,8 +647,7 @@ uint8_t nes_namcot163_device::read_l(offs_t offset)
 	switch (offset & 0x1800)
 	{
 		case 0x0800:
-			LOG_MMC(("Namcot-163 sound reg read\n"));
-			return 0;
+			return m_namco163snd->data_r();
 		default:
 			return n340_loread(offset);
 	}
@@ -667,7 +683,7 @@ void nes_namcot163_device::write_h(offs_t offset, uint8_t data)
 			set_mirror(page, data);
 			break;
 		case 0x6000:
-			// TODO: data & 40 (or data & c0) disable sound if set
+			m_namco163snd->disable_w((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			prg8_89(data & 0x3f);
 			break;
 		case 0x6800:
@@ -677,10 +693,23 @@ void nes_namcot163_device::write_h(offs_t offset, uint8_t data)
 		case 0x7800:
 			// the lower 4 bits work *BOTH* as WRAM write protect *AND* as sound address!
 			m_wram_protect = data & 0x0f;
-			LOG_MMC(("Namcot-163 sound address write, data: %02x\n", data));
+			m_namco163snd->addr_w(data);
 			break;
 		default:
 			n340_hiwrite(offset, data);
 			break;
 	}
+}
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void nes_namcot163_device::device_add_mconfig(machine_config &config)
+{
+	// additional sound hardware
+	SPEAKER(config, "addon").front_center();
+
+	// TODO: Correct clock input / divider?
+	NAMCO_163(config, m_namco163snd, XTAL(21'477'272)/12).add_route(ALL_OUTPUTS, "addon", 0.5);
 }

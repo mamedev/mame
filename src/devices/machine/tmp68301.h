@@ -51,8 +51,6 @@ private:
 
 	void tmp68301_regs(address_map &map);
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -92,6 +90,9 @@ private:
 	uint16_t m_pdir;
 	uint16_t m_pdr;
 	uint8_t m_icr[10];
+
+	void internal_vectors_r(address_map &map);
+	uint8_t irq_callback(offs_t offset);
 };
 
 DECLARE_DEVICE_TYPE(TMP68301, tmp68301_device)

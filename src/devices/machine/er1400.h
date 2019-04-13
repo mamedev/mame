@@ -66,6 +66,9 @@ private:
 	void write_data();
 	void erase_data();
 
+	// optional default data
+	optional_region_ptr<u16> m_default_data;
+
 	// nonvolatile data
 	std::unique_ptr<u16[]> m_data_array;
 

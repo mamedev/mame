@@ -50,8 +50,8 @@ NETLIST_START(main)
     NET_C(RL.2, GND)
     NET_C(RL.1, op1.OUT)
 
-    LOG(logX, op1.OUT)
-    LOG(logY, clk)
+    LOG(log_X, op1.OUT)
+    LOG(log_Y, clk)
 NETLIST_END()
 
 NETLIST_START(opamp)

@@ -7,9 +7,10 @@
   Thomson 8-bit computers
 
 **********************************************************************/
+#ifndef MAME_FORMATS_THOM_CAS_H
+#define MAME_FORMATS_THOM_CAS_H
 
-#ifndef THOM_CAS
-#define THOM_CAS
+#pragma once
 
 #include "cassimg.h"
 
@@ -21,4 +22,4 @@ CASSETTE_FORMATLIST_EXTERN(to7_cassette_formats);
 
 CASSETTE_FORMATLIST_EXTERN(mo5_cassette_formats);
 
-#endif
+#endif // MAME_FORMATS_THOM_CAS_H

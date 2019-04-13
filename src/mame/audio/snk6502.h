@@ -27,6 +27,7 @@ public:
 	void mute_channel(int channel);
 	void unmute_channel(int channel);
 	void set_sound0_stop_on_rollover(int value) { m_sound0_stop_on_rollover = value; }
+	void reset_offset(int channel) { m_tone_channels[channel].offset = 0; }
 
 	void speech_w(uint8_t data, const uint16_t *table, int start);
 

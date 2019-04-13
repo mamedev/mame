@@ -1491,8 +1491,8 @@ ROM_END
 
 ROM_START( omegaa ) // ROM at M10 labeled "7" to indicate the original version skipping some initialization code
 	ROM_REGION(0xc000, "maincpu", 0) // encrypted
-	ROM_LOAD(" 7.m10",  0x0000, 0x4000, CRC(6e7d77e1) SHA1(7675cea41391595cd7a3e1893478185989f4c319) ) // 27128
-	ROM_LOAD(" 8.n10",  0x4000, 0x8000, CRC(9bb61910) SHA1(f8a1210dbf93e901e246e6adf4cd905acc3ef376) ) // 27256
+	ROM_LOAD( "7.m10",  0x0000, 0x4000, CRC(6e7d77e1) SHA1(7675cea41391595cd7a3e1893478185989f4c319) ) // 27128
+	ROM_LOAD( "8.n10",  0x4000, 0x8000, CRC(9bb61910) SHA1(f8a1210dbf93e901e246e6adf4cd905acc3ef376) ) // 27256
 
 	ROM_REGION(0x2000, "maincpu:key", 0) // MC8123 key
 	ROM_LOAD( "omega.key", 0x0000, 0x2000, CRC(0a63943f) SHA1(9e581ea0c5bf6c0ed5d402d3bab053766b8e44c2) )

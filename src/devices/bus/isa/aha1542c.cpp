@@ -213,11 +213,6 @@ ROM_START( aha1542cp )
 ROM_END
 
 
-u8 aha1542c_device::local_status_r()
-{
-	return m_eeprom->do_read() << 7;
-}
-
 void aha1542c_device::local_latch_w(u8 data)
 {
 	m_eeprom->cs_write(BIT(data, 2));
@@ -230,7 +225,7 @@ void aha1542c_device::z84c0010_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region(Z84C0010_TAG, 0);
 	map(0x8000, 0x9fff).ram();        // 2kb RAM chip
-	map(0xa000, 0xa000).r(FUNC(aha1542c_device::local_status_r));
+	map(0xa000, 0xa000).portr("SWITCHES");
 	map(0xb000, 0xb000).w(FUNC(aha1542c_device::local_latch_w));
 	map(0xe000, 0xe0ff).ram();        // probably PC<->Z80 communication area
 	map(0xe003, 0xe003).lr8("e003_r", []() { return 0x20; });
@@ -238,6 +233,7 @@ void aha1542c_device::z84c0010_mem(address_map &map)
 
 u8 aha1542cp_device::eeprom_r()
 {
+	// TODO: bits 4 and 5 are also used
 	return m_eeprom->do_read();
 }
 
@@ -252,8 +248,76 @@ void aha1542cp_device::local_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region(Z84C0010_TAG, 0);
 	map(0x8000, 0x9fff).ram();
+	map(0xc000, 0xc000).portr("SWITCHES");
 	map(0xc001, 0xc001).rw(FUNC(aha1542cp_device::eeprom_r), FUNC(aha1542cp_device::eeprom_w));
 	map(0xe003, 0xe003).nopr();
+}
+
+static INPUT_PORTS_START( aha1542c )
+	PORT_START("SWITCHES")
+	PORT_DIPNAME(0x07, 0x07, "I/O Port Address") PORT_DIPLOCATION("S1:2,3,4")
+	PORT_DIPSETTING(0x07, "330-333h")
+	PORT_DIPSETTING(0x06, "334-337h")
+	PORT_DIPSETTING(0x05, "230-233h")
+	PORT_DIPSETTING(0x04, "234-237h")
+	PORT_DIPSETTING(0x03, "130-133h")
+	PORT_DIPSETTING(0x02, "134-137h")
+	PORT_DIPSETTING(0x00, "Diagnostics Only") // not documented
+	PORT_DIPNAME(0x08, 0x08, "SCSI Termination") PORT_DIPLOCATION("S1:1")
+	PORT_DIPSETTING(0x00, "Installed")
+	PORT_DIPSETTING(0x08, "Software Controlled")
+	PORT_DIPNAME(0x70, 0x70, "BIOS Address") PORT_DIPLOCATION("S1:6,7,8")
+	PORT_DIPSETTING(0x00, "Disabled")
+	PORT_DIPSETTING(0x20, "C8000h")
+	PORT_DIPSETTING(0x30, "CC000h")
+	PORT_DIPSETTING(0x40, "D0000h")
+	PORT_DIPSETTING(0x50, "D4000h")
+	PORT_DIPSETTING(0x60, "D8000h")
+	PORT_DIPSETTING(0x70, "DC000h")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+
+	PORT_START("FDC_CONFIG")
+	PORT_DIPNAME(0x1, 0x1, "Floppy Disk Controller") PORT_DIPLOCATION("S1:5")
+	PORT_DIPSETTING(0x0, "Disabled")
+	PORT_DIPSETTING(0x1, "Enabled")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( aha1542cp )
+	PORT_START("SWITCHES")
+	PORT_DIPNAME(0x0e, 0x0e, "I/O Port Address") PORT_DIPLOCATION("S1:2,3,4")
+	PORT_DIPSETTING(0x0e, "330-333h")
+	PORT_DIPSETTING(0x0c, "334-337h")
+	PORT_DIPSETTING(0x0a, "230-233h")
+	PORT_DIPSETTING(0x08, "234-237h")
+	PORT_DIPSETTING(0x06, "130-133h")
+	PORT_DIPSETTING(0x04, "134-137h")
+	PORT_DIPSETTING(0x00, "Diagnostics Only") // not documented
+	PORT_DIPNAME(0x10, 0x10, "Plug and Play") PORT_DIPLOCATION("S1:1")
+	PORT_DIPSETTING(0x00, "Disabled")
+	PORT_DIPSETTING(0x10, "Enabled")
+	PORT_DIPNAME(0xe0, 0xe0, "BIOS Address") PORT_DIPLOCATION("S1:6,7,8")
+	PORT_DIPSETTING(0x00, "Disabled")
+	PORT_DIPSETTING(0x40, "C8000h")
+	PORT_DIPSETTING(0x60, "CC000h")
+	PORT_DIPSETTING(0x80, "D0000h")
+	PORT_DIPSETTING(0xa0, "D4000h")
+	PORT_DIPSETTING(0xc0, "D8000h")
+	PORT_DIPSETTING(0xe0, "DC000h")
+
+	PORT_START("FDC_CONFIG")
+	PORT_DIPNAME(0x1, 0x1, "Floppy Disk Controller") PORT_DIPLOCATION("S1:5")
+	PORT_DIPSETTING(0x0, "Disabled")
+	PORT_DIPSETTING(0x1, "Enabled")
+INPUT_PORTS_END
+
+ioport_constructor aha1542c_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( aha1542c );
+}
+
+ioport_constructor aha1542cp_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( aha1542cp );
 }
 
 const tiny_rom_entry *aha1542c_device::device_rom_region() const

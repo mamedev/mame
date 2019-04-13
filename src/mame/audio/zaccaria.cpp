@@ -413,12 +413,14 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	m_melodypsg1->add_route(0, "sound_nl", 1.0, 0);
 	m_melodypsg1->add_route(1, "sound_nl", 1.0, 1);
 	m_melodypsg1->add_route(2, "sound_nl", 1.0, 2);
+	m_melodypsg1->set_flags(AY8910_RESISTOR_OUTPUT);
 
 	m_melodypsg2->port_a_write_callback().set(FUNC(zac1b11142_audio_device::ay_4h_porta_w));
 	m_melodypsg2->port_b_write_callback().set(FUNC(zac1b11142_audio_device::ay_4h_portb_w));
 	m_melodypsg2->add_route(0, "sound_nl", 1.0, 3);
 	m_melodypsg2->add_route(1, "sound_nl", 1.0, 4);
 	m_melodypsg2->add_route(2, "sound_nl", 1.0, 5);
+	m_melodypsg2->set_flags(AY8910_RESISTOR_OUTPUT);
 
 	M6802(config, m_audiocpu, XTAL(3'579'545)); // verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &zac1b11142_audio_device::zac1b11142_audio_map);
@@ -428,7 +430,7 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	m_pia_1i->writepa_handler().set(m_speech, FUNC(tms5220_device::data_w));
 	m_pia_1i->writepb_handler().set(FUNC(zac1b11142_audio_device::pia_1i_portb_w));
 
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.40, AUTO_ALLOC_INPUT, 0); // mc1408.1f
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.30, AUTO_ALLOC_INPUT, 0); // mc1408.1f
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
@@ -438,7 +440,7 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	TMS5200(config, m_speech, 649200); // ROMCLK pin measured at 162.3Khz, OSC is exactly *4 of that)
 	m_speech->irq_cb().set(m_pia_1i, FUNC(pia6821_device::cb1_w));
 	m_speech->ready_cb().set(m_pia_1i, FUNC(pia6821_device::ca2_w));
-	m_speech->add_route(ALL_OUTPUTS, *this, 0.80, AUTO_ALLOC_INPUT, 0);
+	m_speech->add_route(ALL_OUTPUTS, *this, 0.60, AUTO_ALLOC_INPUT, 0);
 
 	netlist_mame_sound_device &sound_nl(NETLIST_SOUND(config, "sound_nl", 48000));
 	sound_nl.set_constructor(netlist_zac1b11142);
@@ -460,7 +462,7 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_STREAM_INPUT(config, "sound_nl:cin4", 4, "R_AY4H_B.R");
 	NETLIST_STREAM_INPUT(config, "sound_nl:cin5", 5, "R_AY4H_C.R");
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "P1.2").set_mult_offset(3000.0 * 10.0, 0.0); // FIXME: no clue what numbers to use here
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "C7.2").set_mult_offset(3000.0 * 10.0, 0.0); // FIXME: no clue what numbers to use here
 }
 
 ioport_constructor zac1b11142_audio_device::device_input_ports() const

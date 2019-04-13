@@ -88,29 +88,44 @@ enum
 };
 
 
-/* I/O ports */
-enum
-{
-	M37710_PORT0 = 0,
-	M37710_PORT1, M37710_PORT2, M37710_PORT3, M37710_PORT4,
-	M37710_PORT5, M37710_PORT6, M37710_PORT7, M37710_PORT8,
-
-	M37710_ADC0_L = 0x10, M37710_ADC0_H,
-	M37710_ADC1_L, M37710_ADC1_H, M37710_ADC2_L, M37710_ADC2_H, M37710_ADC3_L, M37710_ADC3_H,
-	M37710_ADC4_L, M37710_ADC4_H, M37710_ADC5_L, M37710_ADC5_H, M37710_ADC6_L, M37710_ADC6_H,
-	M37710_ADC7_L, M37710_ADC7_H,
-
-	M37710_SER0_REC = 0x20,
-	M37710_SER0_XMIT, M37710_SER1_REC, M37710_SER1_XMIT
-};
-
-
 // internal ROM region
 #define M37710_INTERNAL_ROM_REGION "internal"
 #define M37710_INTERNAL_ROM(_tag) (_tag ":" M37710_INTERNAL_ROM_REGION)
 
 class m37710_cpu_device : public cpu_device, public m7700_disassembler::config
 {
+public:
+	auto p0_in_cb() { return m_port_in_cb[0].bind(); }
+	auto p0_out_cb() { return m_port_out_cb[0].bind(); }
+	auto p1_in_cb() { return m_port_in_cb[1].bind(); }
+	auto p1_out_cb() { return m_port_out_cb[1].bind(); }
+	auto p2_in_cb() { return m_port_in_cb[2].bind(); }
+	auto p2_out_cb() { return m_port_out_cb[2].bind(); }
+	auto p3_in_cb() { return m_port_in_cb[3].bind(); }
+	auto p3_out_cb() { return m_port_out_cb[3].bind(); }
+	auto p4_in_cb() { return m_port_in_cb[4].bind(); }
+	auto p4_out_cb() { return m_port_out_cb[4].bind(); }
+	auto p5_in_cb() { return m_port_in_cb[5].bind(); }
+	auto p5_out_cb() { return m_port_out_cb[5].bind(); }
+	auto p6_in_cb() { return m_port_in_cb[6].bind(); }
+	auto p6_out_cb() { return m_port_out_cb[6].bind(); }
+	auto p7_in_cb() { return m_port_in_cb[7].bind(); }
+	auto p7_out_cb() { return m_port_out_cb[7].bind(); }
+	auto p8_in_cb() { return m_port_in_cb[8].bind(); }
+	auto p8_out_cb() { return m_port_out_cb[8].bind(); }
+	auto p9_in_cb() { return m_port_in_cb[9].bind(); }
+	auto p9_out_cb() { return m_port_out_cb[9].bind(); }
+	auto p10_in_cb() { return m_port_in_cb[10].bind(); }
+	auto p10_out_cb() { return m_port_out_cb[10].bind(); }
+	auto an0_cb() { return m_analog_cb[0].bind(); }
+	auto an1_cb() { return m_analog_cb[1].bind(); }
+	auto an2_cb() { return m_analog_cb[2].bind(); }
+	auto an3_cb() { return m_analog_cb[3].bind(); }
+	auto an4_cb() { return m_analog_cb[4].bind(); }
+	auto an5_cb() { return m_analog_cb[5].bind(); }
+	auto an6_cb() { return m_analog_cb[6].bind(); }
+	auto an7_cb() { return m_analog_cb[7].bind(); }
+
 protected:
 	DECLARE_READ8_MEMBER( m37710_internal_r );
 	DECLARE_WRITE8_MEMBER( m37710_internal_w );
@@ -145,6 +160,13 @@ protected:
 private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
+
+	// I/O port callbacks
+	devcb_read8 m_port_in_cb[11];
+	devcb_write8 m_port_out_cb[11];
+
+	// A-D callbacks
+	devcb_read16 m_analog_cb[8];
 
 	uint32_t m_a;         /* Accumulator */
 	uint32_t m_b;         /* holds high byte of accumulator */
@@ -183,7 +205,6 @@ private:
 	uint32_t m_destination;   /* temp register */
 	address_space *m_program;
 	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_cache;
-	address_space *m_io;
 	uint32_t m_stopped;       /* Sets how the CPU is stopped */
 
 	// on-board peripheral stuff

@@ -73,6 +73,7 @@
 static void cfunc_printf_exception(void *param);
 static void cfunc_get_cycles(void *param);
 static void cfunc_printf_probe(void *param);
+static void cfunc_debug_break(void *param);
 
 
 /***************************************************************************
@@ -247,6 +248,7 @@ void mips3_device::code_flush_cache()
 		static_generate_exception(EXCEPTION_BADCOP,        true,  "exception_badcop");
 		static_generate_exception(EXCEPTION_OVERFLOW,      true,  "exception_overflow");
 		static_generate_exception(EXCEPTION_TRAP,          true,  "exception_trap");
+		static_generate_exception(EXCEPTION_FPE,           true,  "exception_fpe");
 
 		/* add subroutines for memory accesses */
 		for (mode = 0; mode < 3; mode++)
@@ -529,6 +531,20 @@ static void cfunc_printf_probe(void *param)
 }
 
 /*-------------------------------------------------
+    func_debug_break - debugger break
+-------------------------------------------------*/
+
+void mips3_device::func_debug_break()
+{
+	machine().debug_break();
+}
+
+static void cfunc_debug_break(void *param)
+{
+	((mips3_device *)param)->func_debug_break();
+}
+
+/*-------------------------------------------------
     cfunc_unimplemented - handler for
     unimplemented opcdes
 -------------------------------------------------*/
@@ -717,8 +733,7 @@ void mips3_device::static_generate_exception(uint8_t exception, int recover, con
 	{
 		/* set BadVAddr to the fault address */
 		UML_GETEXP(block, I0);                                                  // getexp  i0
-		UML_TEST(block, CPR032(COP0_Status), SR_EXL);                           // test    [Status],SR_EXL
-		UML_MOVc(block, COND_Z, CPR032(COP0_BadVAddr), I0);                     // mov     [BadVAddr],i0,Z
+		UML_MOV(block, CPR032(COP0_BadVAddr), I0);                              // mov     [BadVAddr],i0
 	}
 
 	if (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE)
@@ -726,6 +741,14 @@ void mips3_device::static_generate_exception(uint8_t exception, int recover, con
 		/* set the upper bits of EntryHi and the lower bits of Context to the fault page */
 		UML_ROLINS(block, CPR032(COP0_EntryHi), I0, 0, 0xffffe000); // rolins  [EntryHi],i0,0,0xffffe000
 		UML_ROLINS(block, CPR032(COP0_Context), I0, 32-9, 0x7ffff0);    // rolins  [Context],i0,32-9,0x7ffff0
+	}
+
+	if (exception == EXCEPTION_FPE)
+	{
+		/* set the flag and cause */
+		UML_GETEXP(block, I0);                                      // getexp  i0
+		UML_ROLINS(block, CCR132(31), I0, FCR31_FLAGS, 0x0000007c); // rolins  [CCR31],i0,FCR31_FLAGS,0x0000007c
+		UML_ROLINS(block, CCR132(31), I0, FCR31_CAUSE, 0x0003f000); // rolins  [CCR31],i0,FCR31_CAUSE,0x0003f000
 	}
 
 	/* set the EPC and Cause registers */
@@ -764,6 +787,7 @@ void mips3_device::static_generate_exception(uint8_t exception, int recover, con
 		(PRINTF_MMU && (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE)))
 	{
 		UML_CALLC(block, cfunc_printf_exception, this);                            // callc   cfunc_printf_exception,nullptr
+		//UML_CALLC(block, cfunc_debug_break, this);                            // callc   cfunc_debug_break,nullptr
 	}
 
 	/* choose our target PC */
@@ -1501,12 +1525,15 @@ bool mips3_device::generate_opcode(drcuml_block &block, compiler_state &compiler
 
 		case 0x30:  /* LL - MIPS II */
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
-			UML_CALLH(block, *m_read32[m_core->mode >> 1]); // callh   read32
+			UML_MOV(block, mem(&m_core->cpr[0][COP0_LLAddr]), I0);          // mov     [LLAddr],i0
+			UML_CALLH(block, *m_read32[m_core->mode >> 1]);                 // callh   read32
 			if (RTREG != 0)
-				UML_DSEXT(block, R64(RTREG), I0, SIZE_DWORD);                       // dsext   <rtreg>,i0
-			UML_MOV(block, mem(&m_core->llbit), 1);                              // mov     [llbit],1
+				UML_DSEXT(block, R64(RTREG), I0, SIZE_DWORD);               // dsext   <rtreg>,i0
+			UML_MOV(block, mem(&m_core->llbit), 1);                         // mov     [llbit],1
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, true);
+			if LL_BREAK
+				UML_CALLC(block, cfunc_debug_break, this);                  // callc   cfunc_debug_break,nullptr
 			return true;
 
 		case 0x24:  /* LBU - MIPS I */
@@ -1547,12 +1574,15 @@ bool mips3_device::generate_opcode(drcuml_block &block, compiler_state &compiler
 
 		case 0x34:  /* LLD - MIPS III */
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
-			UML_CALLH(block, *m_read64[m_core->mode >> 1]); // callh   read64
+			UML_MOV(block, mem(&m_core->cpr[0][COP0_LLAddr]), I0);          // mov     [LLAddr],i0
+			UML_CALLH(block, *m_read64[m_core->mode >> 1]);                 // callh   read64
 			if (RTREG != 0)
-				UML_DMOV(block, R64(RTREG), I0);                                // dmov    <rtreg>,i0
-			UML_MOV(block, mem(&m_core->llbit), 1);                              // mov     [llbit],1
+				UML_DMOV(block, R64(RTREG), I0);                            // dmov    <rtreg>,i0
+			UML_MOV(block, mem(&m_core->llbit), 1);                         // mov     [llbit],1
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, true);
+			if LL_BREAK
+				UML_CALLC(block, cfunc_debug_break, this);                  // callc   cfunc_debug_break,nullptr
 			return true;
 
 		case 0x22:  /* LWL - MIPS I */
@@ -1694,13 +1724,16 @@ bool mips3_device::generate_opcode(drcuml_block &block, compiler_state &compiler
 			return true;
 
 		case 0x38:  /* SC - MIPS II */
-			UML_CMP(block, mem(&m_core->llbit), 0);                              // cmp     [llbit],0
-			UML_JMPc(block, COND_E, skip = compiler.labelnum++);                       // je      skip
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
 			UML_MOV(block, I1, R32(RTREG));                                 // mov     i1,<rtreg>
-			UML_CALLH(block, *m_write32[m_core->mode >> 1]);    // callh   write32
-			UML_LABEL(block, skip);                                             // skip:
-			UML_DSEXT(block, R64(RTREG), mem(&m_core->llbit), SIZE_DWORD);               // dsext   <rtreg>,[llbit],dword
+			UML_MOV(block, R32(RTREG), 0);                                  // mov     <rtreg>, 0
+			UML_CMP(block, mem(&m_core->llbit), 0);                         // cmp     [llbit],0
+			UML_JMPc(block, COND_E, skip = compiler.labelnum++);            // je      skip
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
+			UML_CMP(block, mem(&m_core->cpr[0][COP0_LLAddr]), I0);          // cmp [LLADDR], RSREG + SIMMVAL
+			UML_JMPc(block, COND_NE, skip);                                 // jne      skip
+			UML_CALLH(block, *m_write32[m_core->mode >> 1]);                // callh   write32
+			UML_MOV(block, R32(RTREG), 1);                                  // mov     <rtreg>, 0
+			UML_LABEL(block, skip);                                         // skip:
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, true);
 			return true;
@@ -1714,13 +1747,16 @@ bool mips3_device::generate_opcode(drcuml_block &block, compiler_state &compiler
 			return true;
 
 		case 0x3c:  /* SCD - MIPS III */
-			UML_CMP(block, mem(&m_core->llbit), 0);                              // cmp     [llbit],0
-			UML_JMPc(block, COND_E, skip = compiler.labelnum++);                       // je      skip
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
 			UML_DMOV(block, I1, R64(RTREG));                                    // dmov    i1,<rtreg>
-			UML_CALLH(block, *m_write64[m_core->mode >> 1]);    // callh   write64
+			UML_DMOV(block, R64(RTREG), 0);                                     // dmov   <rtreg>,0
+			UML_CMP(block, mem(&m_core->llbit), 0);                             // cmp     [llbit],0
+			UML_JMPc(block, COND_E, skip = compiler.labelnum++);                // je      skip
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                            // add     i0,<rsreg>,SIMMVAL
+			UML_CMP(block, mem(&m_core->cpr[0][COP0_LLAddr]), I0);              // cmp [LLADDR], RSREG + SIMMVAL
+			UML_JMPc(block, COND_NE, skip);                                     // jne      skip
+			UML_CALLH(block, *m_write64[m_core->mode >> 1]);                    // callh   write64
+			UML_DMOV(block, R64(RTREG), 1);                                     // dmov   <rtreg>,1
 			UML_LABEL(block, skip);                                             // skip:
-			UML_DSEXT(block, R64(RTREG), mem(&m_core->llbit), SIZE_DWORD);               // dsext   <rtreg>,[llbit],dword
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, true);
 			return true;
@@ -2778,11 +2814,21 @@ bool mips3_device::generate_cop1(drcuml_block &block, compiler_state &compiler, 
 				case 0x03:
 					if (IS_SINGLE(op))  /* DIV.S - MIPS I */
 					{
-						UML_FSDIV(block, FPR32(FDREG), FPR32(FSREG), FPR32(FTREG));       // fsdiv   <fdreg>,<fsreg>,<ftreg>
+						UML_TEST(block, FPR32(FTREG), 0xffffffff);                              // test    <ftreg>,-1
+						UML_JMPc(block, COND_NZ, skip = compiler.labelnum++);                   // jmp     skip,NZ
+						UML_TEST(block, CCR132(31), 1 << (FCR31_ENABLE + FPE_DIV0));            // test    [FCR31], 1 << DIV0_EN
+						UML_EXHc(block, COND_NZ, *m_exception[EXCEPTION_FPE], 1 << FPE_DIV0);   // exh     FPE,cop,FPE_DIV0
+						UML_LABEL(block, skip);                                                 // skip:
+						UML_FSDIV(block, FPR32(FDREG), FPR32(FSREG), FPR32(FTREG));             // fsdiv   <fdreg>,<fsreg>,<ftreg>
 					}
 					else                /* DIV.D - MIPS I */
 					{
-						UML_FDDIV(block, FPR64(FDREG), FPR64(FSREG), FPR64(FTREG));       // fddiv   <fdreg>,<fsreg>,<ftreg>
+						UML_DTEST(block, FPR64(FTREG), 0xffffffff'ffffffffull);                 // dtest    <ftreg>,-1
+						UML_JMPc(block, COND_NZ, skip = compiler.labelnum++);                   // jmp     skip,NZ
+						UML_TEST(block, CCR132(31), 1 << (FCR31_ENABLE + FPE_DIV0));            // test    [FCR31], 1 << DIV0_EN
+						UML_EXHc(block, COND_NZ, *m_exception[EXCEPTION_FPE], 1 << FPE_DIV0);   // exh     FPE,cop,FPE_DIV0
+						UML_LABEL(block, skip);                                                 // skip:
+						UML_FDDIV(block, FPR64(FDREG), FPR64(FSREG), FPR64(FTREG));             // fddiv   <fdreg>,<fsreg>,<ftreg>
 					}
 					return true;
 

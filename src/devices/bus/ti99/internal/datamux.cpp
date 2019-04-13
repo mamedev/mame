@@ -70,6 +70,7 @@
 
 #include "emu.h"
 #include "datamux.h"
+#include "cpu/tms9900/tms99com.h"
 
 #define LOG_WARN        (1U<<1)   // Warnings
 #define LOG_READY       (1U<<2)   // READY line
@@ -77,7 +78,7 @@
 #define LOG_ADDRESS     (1U<<4)   // Address register
 #define LOG_WAITCOUNT   (1U<<5)   // Wait state counter
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE ( LOG_GENERAL | LOG_WARN | LOG_ADDRESS )
 
 #include "logmacro.h"
 
@@ -427,21 +428,22 @@ void datamux_device::write(offs_t offset, uint16_t data)
     Called when the memory access starts by setting the address bus. From that
     point on, we suspend the CPU until all operations are done.
 */
-uint8_t datamux_device::setoffset(offs_t offset)
+void datamux_device::setaddress(offs_t mode, uint16_t addr)
 {
-	m_addr_buf = offset;
+	m_addr_buf = addr;
 	m_waitcount = 0;
+	m_dbin = ((mode & TMS99xx_BUS_DBIN)!=0);
 
 	LOGMASKED(LOG_ADDRESS, "Set address %04x\n", m_addr_buf);
 
 	if ((m_addr_buf & 0xe000) == 0x0000)
 	{
-		return 0; // console ROM
+		return; // console ROM
 	}
 
 	if ((m_addr_buf & 0xfc00) == 0x8000)
 	{
-		return 0; // console RAM
+		return; // console RAM
 	}
 
 	// Initialize counter
@@ -468,8 +470,6 @@ uint8_t datamux_device::setoffset(offs_t offset)
 		ready_join();
 	}
 	else m_waitcount = 0;
-
-	return 0;
 }
 
 /*
@@ -539,12 +539,6 @@ WRITE_LINE_MEMBER( datamux_device::clock_in )
 void datamux_device::ready_join()
 {
 	m_ready((m_sysready==CLEAR_LINE || m_muxready==CLEAR_LINE)? CLEAR_LINE : ASSERT_LINE);
-}
-
-WRITE_LINE_MEMBER( datamux_device::dbin_in )
-{
-	m_dbin = (line_state)state;
-	LOGMASKED(LOG_ADDRESS, "Data bus in = %d\n", (m_dbin==ASSERT_LINE)? 1:0 );
 }
 
 WRITE_LINE_MEMBER( datamux_device::ready_line )

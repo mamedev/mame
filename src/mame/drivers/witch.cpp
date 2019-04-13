@@ -1002,7 +1002,7 @@ void keirinou_state::keirinou(machine_config &config)
 	PALETTE(config.replace(), m_palette).set_entries(0x200+0x80);
 	m_gfxdecode->set_info(gfx_keirinou);
 
-//  MCFG_PALETTE_FORMAT(IIBBGGRR)
+//  m_palette->set_format(palette_device::IIBBGGRR, 0x200+0x80);
 
 	// Keirin Ou does have two individual PPIs (NEC D8255AC-2)
 	m_ppi[0]->out_pc_callback().set(FUNC(keirinou_state::write_keirinou_a002));

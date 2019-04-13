@@ -39,7 +39,6 @@ public:
 protected:
 	aha1542c_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	u8 local_status_r();
 	void local_latch_w(u8 data);
 
 	// device-level overrides
@@ -47,6 +46,7 @@ protected:
 	virtual void device_reset() override;
 
 	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
@@ -77,6 +77,7 @@ public:
 	aha1542cp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 

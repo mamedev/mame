@@ -4042,7 +4042,7 @@ READ8_MEMBER(apple2gs_state::doc_adc_read)
 
 int apple2gs_state::apple2_fdc_has_35()
 {
-	return (floppy_get_count(machine())); // - apple525_get_count(machine)) > 0;
+	return device_type_iterator<sonydriv_floppy_image_device>(*this).count(); // - apple525_get_count(machine)) > 0;
 }
 
 int apple2gs_state::apple2_fdc_has_525()

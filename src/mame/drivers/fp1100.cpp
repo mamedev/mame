@@ -247,7 +247,7 @@ WRITE8_MEMBER( fp1100_state::sub_to_main_w )
 {
 	m_main_latch = data;
 	LOG("%s: From sub:%X\n",machine().describe_context(),data);
-	//m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xf0);
+	//m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xf0); // Z80
 }
 
 /*
@@ -344,7 +344,7 @@ WRITE8_MEMBER( fp1100_state::portc_w )
 		if (BIT(m_irq_mask, 4))
 			if (!BIT(data, 3))
 			{
-				m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xf0);
+				m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xf0); // Z80
 				LOG("%s: PortC:%X\n",machine().describe_context(),data);
 			}
 	if (BIT(bits, 5))
@@ -596,7 +596,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( fp1100_state::timer_c )
 INTERRUPT_GEN_MEMBER( fp1100_state::vblank_irq )
 {
 //  if (BIT(m_irq_mask, 4))
-//      m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8);
+//      m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8); // Z80
 }
 
 void fp1100_state::machine_reset()

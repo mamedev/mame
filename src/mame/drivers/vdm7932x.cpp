@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/mcs51/mcs51.cpp"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"

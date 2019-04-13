@@ -321,8 +321,6 @@ void elite_state::pc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &elite_state::div_trampoline);
 	ADDRESS_MAP_BANK(config, m_mainmap).set_map(&elite_state::pc_map).set_options(ENDIANNESS_LITTLE, 8, 16);
 
-	TIMER(config, "dummy_timer").configure_periodic(timer_device::expired_delegate(), attotime::from_hz(4_MHz_XTAL));
-
 	const attotime irq_period = attotime::from_hz(38.4_kHz_XTAL/64); // through 4060 IC, 600Hz
 	TIMER(config, m_irq_on).configure_periodic(FUNC(elite_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_hz(38.4_kHz_XTAL*2)); // edge!
@@ -354,13 +352,13 @@ void elite_state::eas(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_clock(3_MHz_XTAL);
 	m_mainmap->set_addrmap(AS_PROGRAM, &elite_state::eas_map);
-	TIMER(config.replace(), "dummy_timer").configure_periodic(timer_device::expired_delegate(), attotime::from_hz(3_MHz_XTAL));
 
 	I8255(config, m_ppi8255); // port B: input, port A & C: output
 	m_ppi8255->out_pa_callback().set(FUNC(elite_state::ppi_porta_w));
 	m_ppi8255->tri_pa_callback().set_constant(0);
 	m_ppi8255->in_pb_callback().set(FUNC(elite_state::ppi_portb_r));
 	m_ppi8255->out_pc_callback().set(FUNC(elite_state::ppi_portc_w));
+	m_ppi8255->tri_pc_callback().set_constant(0);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -374,7 +372,6 @@ void elite_state::eas_priv(machine_config &config)
 	/* basic machine hardware */
 	M65C02(config.replace(), m_maincpu, 3.579545_MHz_XTAL); // UM6502C
 	m_maincpu->set_addrmap(AS_PROGRAM, &elite_state::div_trampoline);
-	TIMER(config.replace(), "dummy_timer").configure_periodic(timer_device::expired_delegate(), attotime::from_hz(3.579545_MHz_XTAL));
 
 	config.set_default_layout(layout_fidel_eas_priv);
 }
@@ -386,7 +383,6 @@ void elite_state::eag(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_clock(5_MHz_XTAL); // R65C02P4
 	m_mainmap->set_addrmap(AS_PROGRAM, &elite_state::eag_map);
-	TIMER(config.replace(), "dummy_timer").configure_periodic(timer_device::expired_delegate(), attotime::from_hz(5_MHz_XTAL));
 
 	config.device_remove("nvram");
 	NVRAM(config, "nvram.ic8", nvram_device::DEFAULT_ALL_0);

@@ -6,9 +6,10 @@
 
        Format code for rk cassette files
 */
+#ifndef MAME_FORMATS_RK_CAS_H
+#define MAME_FORMATS_RK_CAS_H
 
-#ifndef RK_CAS_H
-#define RK_CAS_H
+#pragma once
 
 #include "cassimg.h"
 
@@ -22,4 +23,4 @@ CASSETTE_FORMATLIST_EXTERN(rkm_cassette_formats);
 CASSETTE_FORMATLIST_EXTERN(rkp_cassette_formats);
 CASSETTE_FORMATLIST_EXTERN(gam_cassette_formats);
 
-#endif /* RK_CAS_H */
+#endif // MAME_FORMATS_RK_CAS_H

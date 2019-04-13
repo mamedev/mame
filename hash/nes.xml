@@ -3478,6 +3478,7 @@
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
 			<feature name="batt" value="yes" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="3296ff7a" sha1="ebb64e13f8c244eaa8187624771c84b9f67f8ea7" offset="00000" />
 			</dataarea>
@@ -8648,6 +8649,7 @@
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
 			<feature name="batt" value="yes" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="96533999" sha1="1fa339a59832562a3acd1b524f6e41ed125486bf" offset="00000" />
 			</dataarea>
@@ -9820,6 +9822,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<dataarea name="prg" size="131072">
 				<rom name="namcotdnpr" size="131072" crc="fba98643" sha1="6f79e0aae58654fe50ab5daf47a1c5f6f33c74ef" offset="00000" />
 			</dataarea>
@@ -10913,6 +10916,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 5" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="5f162195" sha1="f41389f92ad771633b1132558a31344a895f8c74" offset="00000" />
 			</dataarea>
@@ -12110,6 +12114,7 @@
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
 			<feature name="batt" value="yes" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<dataarea name="prg" size="131072">
 				<rom name="namcot f90 prg" size="131072" crc="429fd177" sha1="08f506bad1ffae78783ac35ffead1621df89c0ff" offset="00000" />
 			</dataarea>
@@ -12771,6 +12776,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 3" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="968dcf09" sha1="0dabc907e0608ac4d9dd38345a22a69c61484ac4" offset="00000" />
 			</dataarea>
@@ -17113,6 +17119,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<feature name="batt" value="yes" />
 			<dataarea name="prg" size="262144">
 				<rom name="0.prg" size="262144" crc="dd454208" sha1="21cdda0eaa26c688b63010abb490b810e87cfc28" offset="00000" />
@@ -19108,6 +19115,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<dataarea name="prg" size="262144">
 				<rom name="0.prg" size="262144" crc="29c61b41" sha1="278003c283a43826f75fade6a41d9058cd99a3e0" offset="00000" />
 			</dataarea>
@@ -19260,6 +19268,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<feature name="batt" value="yes" />
 			<dataarea name="prg" size="131072">
 				<rom name="namcot km prg" size="131072" crc="b1b9e187" sha1="cc1db05ce226c70752545fd82033a294f63aaa69" offset="00000" />
@@ -19941,6 +19950,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 5" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="1dd6619b" sha1="eca545c2a383584283cea2e73d7bd1f58698a25e" offset="00000" />
 			</dataarea>
@@ -23019,6 +23029,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 5" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="598fb9f5" sha1="5fa67a84067febcc63006553c5d6d86df614f9b2" offset="00000" />
 			</dataarea>
@@ -23733,6 +23744,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 3" />
 			<dataarea name="prg" size="262144">
 				<rom name="0.prg" size="262144" crc="1294ab5a" sha1="ade6b8872a24fc2e91fc717f2eeb05c773c18fdf" offset="00000" />
 			</dataarea>
@@ -24618,6 +24630,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<feature name="batt" value="yes" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="af15338f" sha1="0c792cff77e2bbfca9248cddaa073b69b191c821" offset="00000" />
@@ -25867,6 +25880,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<dataarea name="prg" size="262144">
 				<rom name="0.prg" size="262144" crc="2b825ce1" sha1="fa61d78845a7826768f07ba453eda15705223955" offset="00000" />
 			</dataarea>
@@ -25889,6 +25903,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 3" />
 			<dataarea name="prg" size="262144">
 				<rom name="0.prg" size="262144" crc="9a2b0641" sha1="781ee304241fdc19bbec4a66face364c64d904b8" offset="00000" />
 			</dataarea>
@@ -31223,6 +31238,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 4" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="3deac303" sha1="95ef5172c9634402d6fa9c638ce46fe70ed505b9" offset="00000" />
 			</dataarea>
@@ -32110,6 +32126,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 3" />
 			<dataarea name="prg" size="262144">
 				<rom name="0.prg" size="262144" crc="6901346e" sha1="4e17d6626bf5da9f40b93d9ad3aca16f869053c7" offset="00000" />
 			</dataarea>
@@ -32136,6 +32153,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 5" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="b78970d2" sha1="eb818027f68a436286b532cbdc14584921a8e685" offset="00000" />
 			</dataarea>
@@ -33598,6 +33616,41 @@
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcity">
+		<description>SimCity (USA, Prototype)</description>
+		<year>1991</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="exrom" />
+			<feature name="pcb" value="NES-ETEPROM" />
+			<feature name="pcb_model" value="NES-ETEPROM-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 MMC5" />
+			<feature name="u4" value="U4 W-RAM-0" />
+			<feature name="u5" value="U5 W-RAM-1" />
+			<feature name="u6" value="U6 CIC" />
+			<feature name="battery" value="+Batt CR2032" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="simcity prg.u1" size="131072" crc="ad8bfb35" sha1="88fef47ebeec6bad9b7aef07b40f4ecf00846ca0" offset="0"/>
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="simcity chr.u2" size="131072" crc="3fbc73b9" sha1="5697a2040fa80f9eb8052aabe507bd8451eefcc3" offset="0"/>
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+			<!-- 1k Internal RAM in the MMC5 chip (ExRAM) -->
+			<dataarea name="mapper_ram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -35237,6 +35290,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="8a2824bb" sha1="ce25e790bf205b37746cff327ca5c1a533919f86" offset="00000" />
 			</dataarea>
@@ -42824,6 +42878,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 5" />
 			<dataarea name="prg" size="131072">
 				<rom name="namcot yd prg" size="131072" crc="17421900" sha1="5fda17f7d44a1529924156c5a2983f9f7d6c765e" offset="00000" />
 			</dataarea>

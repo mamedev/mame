@@ -290,7 +290,7 @@ void icebox_state::port_f1_w(u8 data)
 WRITE_LINE_MEMBER(icebox_state::drq_w)
 {
 	if (BIT(m_f1, 2))
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE, 0x00);
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE, 0x00); // Z80
 }
 
 static void floppies(device_slot_interface &device)

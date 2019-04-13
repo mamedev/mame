@@ -40,6 +40,7 @@ so it could be by them instead
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "machine/bankdev.h"
 //#include "machine/i2cmem.h"
 #include "sound/ay8910.h"
 #include "emupal.h"
@@ -53,8 +54,10 @@ public:
 	hotblock_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")/*,
-		m_i2cmem(*this, "i2cmem")*/
+		m_palette(*this, "palette"),
+		m_video_bank(*this, "video_bank")/*,
+		m_i2cmem(*this, "i2cmem")*/,
+		m_vram(*this, "vram")
 	{ }
 
 	void hotblock(machine_config &config);
@@ -63,6 +66,7 @@ private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	required_device<address_map_bank_device> m_video_bank;
 //  required_device<i2cmem_device> m_i2cmem;
 
 	/* misc */
@@ -70,40 +74,23 @@ private:
 	int      m_port4;
 
 	/* memory */
-	std::unique_ptr<uint8_t[]> m_vram;
+	required_shared_ptr<uint8_t> m_vram;
 
-	DECLARE_READ8_MEMBER(video_read);
-	DECLARE_READ8_MEMBER(port4_r);
-	DECLARE_WRITE8_MEMBER(port4_w);
-	DECLARE_WRITE8_MEMBER(port0_w);
-	DECLARE_WRITE8_MEMBER(video_write);
+	u8 port4_r();
+	void port4_w(u8 data);
+	void port0_w(u8 data);
 
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void banked_video_map(address_map &map);
 	void hotblock_io(address_map &map);
 	void hotblock_map(address_map &map);
 };
 
 
-READ8_MEMBER(hotblock_state::video_read)
-{
-	/* right?, anything else?? */
-	if (m_port0 & 0x20) // port 0 = a8 e8 -- palette
-	{
-		if (offset < 0x200)
-			return m_palette->read8(space, offset);
-
-		return 0;
-	}
-	else // port 0 = 88 c8
-	{
-		return m_vram[offset];
-	}
-}
-
 /* port 4 is some kind of eeprom / storage .. used to store the scores */
-READ8_MEMBER(hotblock_state::port4_r)
+u8 hotblock_state::port4_r()
 {
 //  osd_printf_debug("port4_r\n");
 	//logerror("trying to read port 4 at maincpu pc %08x\n", m_maincpu->pc());
@@ -112,36 +99,23 @@ READ8_MEMBER(hotblock_state::port4_r)
 }
 
 
-WRITE8_MEMBER(hotblock_state::port4_w)
+void hotblock_state::port4_w(u8 data)
 {
 	//logerror("trying to write port 4 in %02x at maincpu pc %08x\n", data, m_maincpu->pc());
 	m_port4 = data;
 }
 
 
-WRITE8_MEMBER(hotblock_state::port0_w)
+void hotblock_state::port0_w(u8 data)
 {
 	m_port0 = data;
-}
-
-WRITE8_MEMBER(hotblock_state::video_write)
-{
-	/* right?, anything else?? */
-	if (m_port0 & 0x20) // port 0 = a8 e8 -- palette
-	{
-		if (offset < 0x200)
-			m_palette->write8(space, offset, data);
-	}
-	else // port 0 = 88 c8
-	{
-		m_vram[offset] = data;
-	}
+	m_video_bank->set_bank(m_port0 & ~0x40);
 }
 
 void hotblock_state::hotblock_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).ram();
-	map(0x10000, 0x1ffff).rw(FUNC(hotblock_state::video_read), FUNC(hotblock_state::video_write)).share("palette");
+	map(0x10000, 0x1ffff).m(m_video_bank, FUNC(address_map_bank_device::amap8));
 	map(0x20000, 0xfffff).rom();
 }
 
@@ -153,12 +127,16 @@ void hotblock_state::hotblock_io(address_map &map)
 	map(0x8001, 0x8001).r("aysnd", FUNC(ym2149_device::data_r));
 }
 
+/* right?, anything else?? */
+void hotblock_state::banked_video_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).mirror(0x9f0000).ram().share("vram"); // port 0 = 88 c8
+	map(0x200000, 0x2001ff).mirror(0x9f0000).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // port 0 = a8 e8 -- palette
+}
 
 
 void hotblock_state::video_start()
 {
-	m_vram = make_unique_clear<uint8_t[]>(0x10000);
-	save_pointer(NAME(m_vram), 0x10000);
 	save_item(NAME(m_port0));
 	save_item(NAME(m_port4)); //stored but not read for now
 }
@@ -215,6 +193,7 @@ void hotblock_state::hotblock(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &hotblock_state::hotblock_io);
 
 //  I2CMEM(config, m_i2cmem, 0).set_page_size(16).set_data_size(0x200); // 24C04
+	ADDRESS_MAP_BANK(config, m_video_bank).set_map(&hotblock_state::banked_video_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x10000);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

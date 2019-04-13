@@ -7,9 +7,10 @@
     Amiga disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_AMI_DSK_H
+#define MAME_FORMATS_AMI_DSK_H
 
-#ifndef AMI_DSK_H_
-#define AMI_DSK_H_
+#pragma once
 
 #include "flopimg.h"
 
@@ -34,4 +35,4 @@ private:
 
 extern const floppy_format_type FLOPPY_ADF_FORMAT;
 
-#endif /*AMI_DSK_H_*/
+#endif // MAME_FORMATS_AMI_DSK_H

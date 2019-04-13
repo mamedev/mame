@@ -59,6 +59,11 @@ class NETLIB_NAME(name) : public device_t
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name) \
 	: NETLIB_NAME(pclass)(owner, name)
 
+#define NETLIB_CONSTRUCTOR_DERIVED_EX(cname, pclass, ...)                      \
+	private: detail::family_setter_t m_famsetter;                              \
+	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name, __VA_ARGS__) \
+	: NETLIB_NAME(pclass)(owner, name)
+
 /*! Used to define the constructor of a netlist device.
  *  Use this to define the constructor of a netlist device. Please refer to
  *  #NETLIB_OBJECT for an example.
@@ -1010,7 +1015,7 @@ namespace netlist
 	public:
 		param_str_t(device_t &device, const pstring &name, const pstring &val);
 
-		const pstring &operator()() const NL_NOEXCEPT { return value(); }
+		const pstring &operator()() const NL_NOEXCEPT { return str(); }
 		void setTo(const pstring &param) NL_NOEXCEPT
 		{
 			if (m_param != param)
@@ -1022,7 +1027,7 @@ namespace netlist
 		}
 	protected:
 		virtual void changed();
-		const pstring &value() const NL_NOEXCEPT { return m_param; }
+		const pstring &str() const NL_NOEXCEPT { return m_param; }
 	private:
 		PALIGNAS_CACHELINE()
 		pstring m_param;
@@ -1036,31 +1041,35 @@ namespace netlist
 	{
 	public:
 
-		class value_t
+		template <typename T>
+		class value_base_t
 		{
 		public:
-			value_t(param_model_t &param, const pstring &name)
-			: m_value(param.model_value(name))
+			value_base_t(param_model_t &param, const pstring &name)
+			: m_value(static_cast<T>(param.value(name)))
 			{
 			}
-			double operator()() const noexcept { return m_value; }
-			operator double() const noexcept { return m_value; }
+			T operator()() const noexcept { return m_value; }
+			operator T() const noexcept { return m_value; }
 		private:
-			const double m_value;
+			const T m_value;
 		};
 
-		friend class value_t;
+		using value_t = value_base_t<nl_double>;
+
+		template <typename T>
+		friend class value_base_t;
 
 		param_model_t(device_t &device, const pstring &name, const pstring &val)
 		: param_str_t(device, name, val) { }
 
-		const pstring model_value_str(const pstring &entity) /*const*/;
-		const pstring model_type() /*const*/;
+		const pstring value_str(const pstring &entity) /*const*/;
+		nl_double value(const pstring &entity) /*const*/;
+		const pstring type() /*const*/;
 		/* hide this */
 		void setTo(const pstring &param) = delete;
 	protected:
 		void changed() override;
-		nl_double model_value(const pstring &entity) /*const*/;
 	private:
 };
 
@@ -1558,7 +1567,7 @@ namespace netlist
 		if (f != nullptr)
 			f->read(reinterpret_cast<plib::pistream::value_type *>(&m_data[0]),1<<AW);
 		else
-			device.state().log().warning("Rom {1} not found", value());
+			device.state().log().warning("Rom {1} not found", str());
 	}
 
 	inline void logic_input_t::inactivate() NL_NOEXCEPT
@@ -1710,7 +1719,7 @@ namespace netlist
 		if (newQ != m_my_net.Q_Analog())
 		{
 			m_my_net.set_Q_Analog(newQ);
-			m_my_net.toggle_and_push_to_queue(NLTIME_FROM_NS(1));
+			m_my_net.toggle_and_push_to_queue(netlist_time::quantum());
 		}
 	}
 

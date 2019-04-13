@@ -140,6 +140,6 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	if (layers_ctrl & 0x1) copybg15(screen, bitmap, cliprect);
 	if (layers_ctrl & 0x2) copybg8(screen, bitmap, cliprect, 0);
 	if (layers_ctrl & 0x4) copybg8(screen, bitmap, cliprect, 1);
-	if (layers_ctrl & 0x8) m_kaneko_spr->kaneko16_render_sprites(bitmap, cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
+	if (layers_ctrl & 0x8) m_kaneko_spr->render_sprites(bitmap, cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
 	return 0;
 }

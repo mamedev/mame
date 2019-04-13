@@ -586,7 +586,7 @@ INTERRUPT_GEN_MEMBER(dacholer_state::sound_irq)
 {
 	if (m_music_interrupt_enable == 1)
 	{
-		device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x30);
+		device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x30); // Z80
 	}
 }
 
@@ -599,7 +599,7 @@ WRITE_LINE_MEMBER(dacholer_state::adpcm_int)
 		m_msm_toggle ^= 1;
 		if (m_msm_toggle == 0)
 		{
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x38);
+			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x38); // Z80
 		}
 	}
 }

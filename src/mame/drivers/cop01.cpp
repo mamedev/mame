@@ -79,13 +79,13 @@ Mighty Guy board layout:
 
 WRITE8_MEMBER(cop01_state::cop01_sound_command_w)
 {
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(0, ASSERT_LINE );
+	m_soundlatch->write(data);
+	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
 READ8_MEMBER(cop01_state::cop01_sound_command_r)
 {
-	int res = (m_soundlatch->read(space, offset) & 0x7f) << 1;
+	int res = (m_soundlatch->read() & 0x7f) << 1;
 
 	/* bit 0 seems to be a timer */
 	if ((m_audiocpu->total_cycles() / TIMER_RATE) & 1)

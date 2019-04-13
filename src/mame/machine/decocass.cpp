@@ -57,7 +57,7 @@ READ8_MEMBER( decocass_state::decocass_sound_command_main_r)
 WRITE8_MEMBER(decocass_state::decocass_sound_command_w)
 {
 	LOG(2,("CPU %s sound command -> $%02x\n", m_maincpu->tag(), data));
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_sound_ack |= 0x80;
 	/* remove snd cpu data ack bit. i don't see it in the schems, but... */
 	m_sound_ack &= ~0x40;
@@ -66,7 +66,7 @@ WRITE8_MEMBER(decocass_state::decocass_sound_command_w)
 
 READ8_MEMBER(decocass_state::decocass_sound_data_r)
 {
-	uint8_t data = m_soundlatch2->read(space, 0);
+	uint8_t data = m_soundlatch2->read();
 	LOG(2,("CPU %s sound data    <- $%02x\n", m_maincpu->tag(), data));
 	return data;
 }
@@ -81,13 +81,13 @@ READ8_MEMBER(decocass_state::decocass_sound_ack_r)
 WRITE8_MEMBER(decocass_state::decocass_sound_data_w)
 {
 	LOG(2,("CPU %s sound data    -> $%02x\n", m_audiocpu->tag(), data));
-	m_soundlatch2->write(space, 0, data);
+	m_soundlatch2->write(data);
 	m_sound_ack |= 0x40;
 }
 
 READ8_MEMBER(decocass_state::decocass_sound_command_r)
 {
-	uint8_t data = m_soundlatch->read(space, 0);
+	uint8_t data = m_soundlatch->read();
 	LOG(4,("CPU %s sound command <- $%02x\n", m_audiocpu->tag(), data));
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	m_sound_ack &= ~0x80;

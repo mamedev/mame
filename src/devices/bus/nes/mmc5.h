@@ -36,6 +36,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 	void set_mirror(int page, int src);
@@ -74,6 +75,7 @@ protected:
 	uint8_t m_prg_ram_mapped[4];
 
 	uint8_t m_ex1_bank;
+	uint8_t m_ex1_attrib;
 
 	uint8_t m_high_chr;   // $5130
 
