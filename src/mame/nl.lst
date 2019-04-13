@@ -11,7 +11,7 @@
 
 /* Use CPUs */
 
-// 1942.cpp
+@source:1942.cpp
 1942                            // 12/1984 (c) 1984
 1942a                           // 12/1984 (c) 1984
 1942abl                         // bootleg
@@ -23,7 +23,7 @@
 @source:gamemachine.cpp
 2001tgm                         //
 
-// hazeltin.cpp
+@source:hazeltin.cpp
 hazl1500                        // Hazeltine 1500 (c) 1977
 
 @source:m62.cpp                 // m62.cpp
@@ -50,14 +50,17 @@ spelunkrj                       // (c) 1985 licensed from Broderbund
 yanchamr                        // (c) 1986 (Japan)
 youjyudn                        // (c) 1986 (Japan)
 
-// mario.cpp
+@source:mario.cpp
 mario                           // (c) 1983 Nintendo of America
 mariof                          // (c) 1983 Nintendo of America
 marioe                          // (c) 1983 Nintendo of America
 marioj                          // (c) 1983 Nintendo
 masao                           // bootleg
 
-// popeye.cpp
+@source:palestra.cpp
+palestra
+
+@source:popeye.cpp
 popeye                          // (c) 1982
 popeyeu                         // (c) 1982
 popeyef                         // (c) 1982
@@ -66,11 +69,15 @@ popeyebl                        // bootleg
 @source:prodigy.cpp
 prodigy                        // ACI Destiny Prodigy, 1981
 
+@source:testpat.cpp
+tp1983
+tp1985
+
 /******************************************************************************/
 
 /* Do not use CPUs */
 
-// atarittl.cpp
+@source:atarittl.cpp
 stuntcyc                        // (c) 1976 Atari
 //antiairc                      // (c) 1975 Atari
 //crashnsc                      // (c) 1975 Atari
@@ -105,7 +112,7 @@ gtrak10                         // (c) 1974 Atari / Kee
 //touchme                       // (c) 1974 Atari
 //worldcup                      // (c) 1974 Atari
 
-// pong.cpp
+@source:pong.cpp
 breakout                        // (c) 1976 Atari
 pong                            // (c) 1972 Atari
 pongd                           // (c) 1973 Atari
@@ -188,6 +195,11 @@ rebound                         // (c) 1974 Atari
 
 @source:cheekyms.cpp
 cheekyms                        // 8004 (c) [1980?]
+
+@source:cocoloco.cpp
+cocoloco                        // 198?, Petaco S.A.
+cocolocoa                       // 198?, Recel S.A.
+cocolocob                       // 198?, Petaco S.A.
 
 @source:zaccaria.cpp
 jackrabt                        // (c) 1984
