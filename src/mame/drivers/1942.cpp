@@ -614,12 +614,12 @@ MACHINE_CONFIG_START(_1942_state::_1942)
 	auto &snd_nl(NETLIST_SOUND(config, "snd_nl", AUDIO_CLOCK / 8 / 2));
 	snd_nl.set_constructor(NETLIST_NAME(nl_1942));
 	snd_nl.add_route(ALL_OUTPUTS, "mono", 5.0);
-	NETLIST_STREAM_INPUT(config, "snd_nl", 0, "R_AY1_1.R");
-	NETLIST_STREAM_INPUT(config, "snd_nl", 1, "R_AY1_2.R");
-	NETLIST_STREAM_INPUT(config, "snd_nl", 2, "R_AY1_3.R");
-	NETLIST_STREAM_INPUT(config, "snd_nl", 3, "R_AY2_1.R");
-	NETLIST_STREAM_INPUT(config, "snd_nl", 4, "R_AY2_2.R");
-	NETLIST_STREAM_INPUT(config, "snd_nl", 5, "R_AY2_3.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin0", 0, "R_AY1_1.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin1", 1, "R_AY1_2.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin2", 2, "R_AY1_3.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin3", 3, "R_AY2_1.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin4", 4, "R_AY2_2.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin5", 5, "R_AY2_3.R");
 
 	NETLIST_STREAM_OUTPUT(config, "snd_nl", 0, "R1.1").set_mult_offset(70000.0, 0.0);
 	//MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "VR.2")

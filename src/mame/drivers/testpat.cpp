@@ -106,7 +106,7 @@ MACHINE_CONFIG_START(tp1983_state::tp1983)
 	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
 	m_maincpu->set_constructor(netlist_tp1983);
 
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_composite_monochrome, "fixfreq")
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", FUNC(fixedfreq_device::update_composite_monochrome), "fixfreq");
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
@@ -122,7 +122,7 @@ MACHINE_CONFIG_START(tp1985_state::tp1985)
 	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
 	m_maincpu->set_constructor(netlist_tp1985);
 
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", tp1985_state, video_out_cb, "")
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", FUNC(tp1985_state::video_out_cb), "");
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
