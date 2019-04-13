@@ -300,6 +300,8 @@ class netlist_mame_analog_input_device : public device_t, public netlist_mame_su
 public:
 
 	// construction/destruction
+	netlist_mame_analog_input_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *param_name);
+
 	netlist_mame_analog_input_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_name(const char *param_name) { m_param_name = param_name; }

@@ -912,6 +912,7 @@ nl_double models_t::value(pstring model, pstring entity)
 	{
 		case 'M': factor = 1e6; break;
 		case 'k': factor = 1e3; break;
+		case 'K': factor = 1e3; break;
 		case 'm': factor = 1e-3; break;
 		case 'u': factor = 1e-6; break;
 		case 'n': factor = 1e-9; break;
