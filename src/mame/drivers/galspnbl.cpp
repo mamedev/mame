@@ -239,8 +239,7 @@ void galspnbl_state::galspnbl(machine_config &config)
 	PALETTE(config, m_palette, FUNC(galspnbl_state::galspnbl_palette)).set_format(palette_device::xBGR_444, 1024 + 32768);
 
 	TECMO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(1);
-	m_sprgen->set_bootleg(1);
+	m_sprgen->set_bootleg(true);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

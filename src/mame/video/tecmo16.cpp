@@ -233,8 +233,8 @@ uint32_t tecmo16_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	// 2 frame sprite lags
 	m_sprite_bitmap.fill(0, cliprect);
-	if (m_game_is_riot)  m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram->buffer(), 0, 0, flip_screen(),  m_sprite_bitmap);
-	else m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram->buffer(), 2, 0, flip_screen(),  m_sprite_bitmap);
+	if (m_game_is_riot)  m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode->gfx(2), cliprect, m_spriteram->buffer(), 0, 0, flip_screen(),  m_sprite_bitmap);
+	else m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode->gfx(2), cliprect, m_spriteram->buffer(), 2, 0, flip_screen(),  m_sprite_bitmap);
 
 	return 0;
 }
