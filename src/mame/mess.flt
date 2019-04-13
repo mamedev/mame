@@ -204,6 +204,7 @@ duet16.cpp
 dvk_kcgd.cpp
 dvk_ksm.cpp
 e100.cpp
+e9161.cpp
 eacc.cpp
 ec184x.cpp
 ec65.cpp

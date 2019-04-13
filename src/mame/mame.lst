@@ -11904,6 +11904,9 @@ dyndukeu                        // (c) 1989 Seibu Kaihatsu + Fabtek license (25J
 @source:e100.cpp
 e100                            //
 
+@source:e9161.cpp
+e9161                           //
+
 @source:eacc.cpp
 eacc                            //
 
