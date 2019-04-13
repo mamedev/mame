@@ -51,7 +51,7 @@ Addons (w/ yellow Smartridges)
 |        | 80-091324(GE)     | V.Smile Lern- und Tanzmatte                                                |
 |        | 80-091325(FR)     | V.Smile Defi Gym                                                           |
 |        | 80-091325(FR)     | V.Smile Tapis Multisport (box serial)                                      |
-|  SOON  | 80-091327(SP)     | V.Smile Gimnasio Interactivo                                               |
+|   XX   | 80-091327(SP)     | V.Smile Gimnasio Interactivo                                               |
 +========+===================+============================================================================+
 
 Game cartridges
@@ -67,7 +67,7 @@ Game cartridges
 |        | 80-090004(GE)     | Oben                                                                                                                                                     |
 |   XX   | 80-090004-004(GE) | Oben                                                                                                                                                     |
 |        | 80-090005(FR)     | La Haut                                                                                                                                                  |
-|  SOON  | 80-090007-022(SP) | Up                                                                                                                                                       |
+|   XX   | 80-090007-022(SP) | Up                                                                                                                                                       |
 +========+===================+==========================================================================================================================================================+
 |        | 80-090020(US)     | Handy Manny                                                                                                                                              |
 |        | 80-090023(UK)     | Handy Manny                                                                                                                                              |
@@ -1388,6 +1388,26 @@ Game cartridges
 		</part>
 	</software>
 
+	<!-- Controls not working -->
+	<software name="gyms" supported="no">
+		<description>Gimnasio Interactivo V.Smile (Spa)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-091327(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-91327 - V.Smile Gimnasio Interactivo (Spain).bin" size="0x800000" crc="a203eaf7" sha1="bb7c7ecf6b208cd8b81daba58748345d3109268a" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ltleinstn" supported="yes">
 		<description>Disney's Little Einsteins (US, Rev. 5?)</description>
 		<year>2009</year>
@@ -1908,6 +1928,24 @@ Game cartridges
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
 				<rom name="Up (Europe).bin" size="8388608" crc="739a10a0" sha1="1d88241675f304ad50b756af49b33062b7de05dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Controls not working, shows a "Please, connect the controller" message on screen. -->
+	<software name="ups" cloneof="upg" supported="no">
+		<description>Disney/Pixar Up (Spa, Rev. 022)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-090007-022(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-6" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="52-090007-022 - UP (Spain).bin" size="8388608" crc="772929e7" sha1="bf3adb9d3ff28dcc762db6019f492445a3ca0226" offset="0" />
 			</dataarea>
 		</part>
 	</software>
