@@ -7407,11 +7407,10 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="5080"/>
 		<part name="cart" interface="sms_cart">
-			<!-- PCB info based on SMS Power -->
-			<feature name="pcb" value="??" />
-			<feature name="ic1" value="MPR-10156" />
+			<feature name="pcb" value="171-5519" />
+			<feature name="ic1" value="MPR-11074" />
 			<dataarea name="rom" size="131072">
-				<rom name="mpr-10156.ic1" size="131072" crc="4aaad0d6" sha1="650f15ebbd149f5c357f089d7bd305fcb20b068f" offset="000000" />
+				<rom name="mpr-11074.ic1" size="131072" crc="4aaad0d6" sha1="650f15ebbd149f5c357f089d7bd305fcb20b068f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7423,7 +7422,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="5080, GB-1304"/>
 		<part name="cart" interface="sms_cart">
-			<!-- PCB info based on US cart (nepereny's), to check the cart with MPR-11074 reported at SMS Power -->
+			<!-- PCB info based on US cart (nepereny's), to check the cart with MPR-10156 listed at SMS Power -->
 			<feature name="pcb" value="171-5365-01" />
 			<feature name="ic1" value="315-5208" /> <!-- Sega Memory Controller -->
 			<feature name="ic2" value="MPR-10151" />

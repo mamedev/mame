@@ -141,6 +141,7 @@ CPUS["NS32000"] = true
 --CPUS["DSPP"] = true
 CPUS["HPC"] = true
 CPUS["MEG"] = true
+CPUS["DSPV"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -284,6 +285,7 @@ SOUNDS["DAVE"] = true
 --SOUNDS["LC7535"] = true
 SOUNDS["UPD934G"] = true
 SOUNDS["IOPSPU"] = true
+SOUNDS["SWP20"] = true
 SOUNDS["SWP30"] = true
 
 --------------------------------------------------
@@ -3845,6 +3847,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/dsb46.cpp",
 	MAME_DIR .. "src/mame/drivers/dual68.cpp",
 	MAME_DIR .. "src/mame/drivers/e100.cpp",
+	MAME_DIR .. "src/mame/drivers/e9161.cpp",
 	MAME_DIR .. "src/mame/drivers/eacc.cpp",
 	MAME_DIR .. "src/mame/drivers/elwro800.cpp",
 	MAME_DIR .. "src/mame/drivers/emate.cpp",
@@ -3875,6 +3878,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/hpz80unk.cpp",
 	MAME_DIR .. "src/mame/drivers/ht68k.cpp",
 	MAME_DIR .. "src/mame/drivers/hunter2.cpp",
+	MAME_DIR .. "src/mame/drivers/hunter16.cpp",
 	MAME_DIR .. "src/mame/drivers/i7000.cpp",
 	MAME_DIR .. "src/mame/drivers/ibm3153.cpp",
 	MAME_DIR .. "src/mame/drivers/icatel.cpp",

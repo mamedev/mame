@@ -226,7 +226,7 @@ static const z80_daisy_config daisy_chain_main[] =
 
 INTERRUPT_GEN_MEMBER(nichild_state::vdp_irq)
 {
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x76);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x76); // TMPZ84C011
 }
 
 

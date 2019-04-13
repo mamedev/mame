@@ -336,8 +336,8 @@ void asuka_state::bonzeadv_map(address_map &map)
 	map(0x3e0003, 0x3e0003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x800000, 0x8007ff).rw(m_cchip, FUNC(taito_cchip_device::mem68_r), FUNC(taito_cchip_device::mem68_w)).umask16(0x00ff);
 	map(0x800800, 0x800fff).rw(m_cchip, FUNC(taito_cchip_device::asic_r), FUNC(taito_cchip_device::asic68_w)).umask16(0x00ff);
-	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0xd00000, 0xd03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  /* sprite ram */
 }
 
@@ -352,9 +352,9 @@ void asuka_state::asuka_map(address_map &map)
 	map(0x3e0001, 0x3e0001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x3e0003, 0x3e0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
 	map(0x400000, 0x40000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
-	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
+	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
 	map(0xc10000, 0xc103ff).nopw();    /* error in Asuka init code */
-	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0xd00000, 0xd03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  /* sprite ram */
 }
 
@@ -370,8 +370,8 @@ void asuka_state::cadash_map(address_map &map)
 	map(0x900000, 0x90000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0xa00000, 0xa0000f).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_4bpg_word_w));
 	map(0xb00000, 0xb03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  /* sprite ram */
-	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 }
 
 void asuka_state::eto_map(address_map &map)
@@ -385,10 +385,10 @@ void asuka_state::eto_map(address_map &map)
 	map(0x4e0000, 0x4e0001).nopr();
 	map(0x4e0001, 0x4e0001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x4e0003, 0x4e0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
-	map(0xc00000, 0xc0ffff).w(m_tc0100scn, FUNC(tc0100scn_device::word_w));
+	map(0xc00000, 0xc0ffff).w(m_tc0100scn, FUNC(tc0100scn_device::ram_w));
 	map(0xc00000, 0xc03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  /* sprite ram */
-	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 }
 
 
@@ -889,9 +889,8 @@ void asuka_state::bonzeadv(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0110PCR(config, m_tc0110pcr, 0, "palette");
 
@@ -950,9 +949,8 @@ void asuka_state::asuka(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0110PCR(config, m_tc0110pcr, 0, "palette");
 
@@ -1023,10 +1021,9 @@ void asuka_state::cadash(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0110PCR(config, m_tc0110pcr, 0, "palette");
 
@@ -1084,10 +1081,9 @@ void asuka_state::mofflott(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0110PCR(config, m_tc0110pcr, 0, "palette");
 
@@ -1153,10 +1149,9 @@ void asuka_state::eto(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0110PCR(config, m_tc0110pcr, 0, "palette");
 

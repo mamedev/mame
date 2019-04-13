@@ -129,27 +129,27 @@ void lisa_state::field_interrupts()
 #if 0
 	if (RSIR)
 		// serial interrupt
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_6, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
 	else if (int0)
 		// external interrupt
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_5, ASSERT_LINE);
 	else if (int1)
 		// external interrupt
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 	else if (int2)
 		// external interrupt
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_3, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
 	else
 #endif
 	if (m_KBIR)
 		/* COPS VIA interrupt */
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
 	else if (m_FDIR || m_VTIR)
 		/* floppy disk or VBl */
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 	else
 		/* clear all interrupts */
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
 void lisa_state::set_parity_error_pending(int value)
@@ -159,7 +159,7 @@ void lisa_state::set_parity_error_pending(int value)
 	m_parity_error_pending = value;
 	if (m_parity_error_pending)
 	{
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_7, ASSERT_LINE);
 	}
 	else
 	{
@@ -170,7 +170,7 @@ void lisa_state::set_parity_error_pending(int value)
 	if ((! m_parity_error_pending) && value)
 	{
 		m_parity_error_pending = 1;
-		m_maincpu->pulse_input_line_and_vector(M68K_IRQ_7, attotime::zero, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->pulse_input_line(M68K_IRQ_7, attotime::zero);
 	}
 	else if (m_parity_error_pending && (! value))
 	{
@@ -293,7 +293,7 @@ void lisa_state::scan_keyboard()
 						if (keycode == m_NMIcode)
 						{   /* generate NMI interrupt */
 							pulse_input_line(M68K_IRQ_7, attotime::zero);
-							m_maincpu->set_input_line_vector(M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
+							m_maincpu->set_input_line(M68K_IRQ_7);
 						}
 #endif
 						COPS_queue_data(&keycode, 1);

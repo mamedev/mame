@@ -142,6 +142,7 @@ protected:
 	uint8_t           m_spriteblendmode; // todo - move into taitoic.c
 
 	int             m_prepare_sprites;
+	uint8_t         m_gfxbank;
 
 	/* misc */
 	int32_t           m_mjnquest_input;
@@ -186,6 +187,8 @@ protected:
 	DECLARE_WRITE16_MEMBER(taitof2_spritebank_w);
 	DECLARE_WRITE16_MEMBER(koshien_spritebank_w);
 	DECLARE_WRITE8_MEMBER(cameltrya_porta_w);
+	void mjnquest_gfxbank_w(u8 data);
+	TC0100SCN_CB_MEMBER(mjnquest_tmap_cb);
 
 	DECLARE_MACHINE_START(f2);
 	DECLARE_VIDEO_START(taitof2_default);

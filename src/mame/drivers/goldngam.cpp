@@ -269,7 +269,7 @@ private:
 	virtual void video_start() override;
 	void palette_init(palette_device &palette);
 	uint32_t screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	IRQ_CALLBACK_MEMBER(moviecrd_irq_ack);
+	void cpu_space_map(address_map &map);
 
 	void moviecrd_map(address_map &map);
 	void swisspkr_map(address_map &map);
@@ -385,19 +385,11 @@ void goldngam_state::swisspkr_map(address_map &map)
 
 */
 
-IRQ_CALLBACK_MEMBER(goldngam_state::moviecrd_irq_ack)
+void goldngam_state::cpu_space_map(address_map &map)
 {
-	switch (irqline)
-	{
-	case MOVIECRD_DUART1_IRQ:
-		return m_duart[0]->get_irq_vector();
-
-	case MOVIECRD_DUART2_IRQ:
-		return m_duart[1]->get_irq_vector();
-
-	default:
-		return M68K_INT_ACK_AUTOVECTOR;
-	}
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff4, 0xfffff5).lr16("duart0 int", [this]() -> u16 { return m_duart[0]->get_irq_vector(); });
+	map(0xfffff8, 0xfffff9).lr16("duart0 int", [this]() -> u16 { return m_duart[1]->get_irq_vector(); });
 }
 
 void goldngam_state::moviecrd_map(address_map &map)
@@ -638,7 +630,7 @@ void goldngam_state::moviecrd(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldngam_state::moviecrd_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(goldngam_state::moviecrd_irq_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &goldngam_state::cpu_space_map);
 
 	m_ptm->irq_callback().set_inputline("maincpu", M68K_IRQ_1);
 

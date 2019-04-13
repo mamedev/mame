@@ -26,7 +26,7 @@
 
 	<element name="text_b1"><text string="RESET"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_b2"><text string="SELECT"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_b3"><text string="POS."><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_b3"><text string="V. POS."><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_b4"><text string="A1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_b5"><text string="B2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_b6"><text string="C3"><color red="0.8" green="0.8" blue="0.8" /></text></element>
@@ -86,7 +86,7 @@
 
 		<bezel element="button" inputtag="RESET" inputmask="0x01"><bounds x="8.5" y="22" width="3" height="2.5" /></bezel>
 		<bezel element="button" inputtag="IN.1" inputmask="0x04"><bounds x="12.86" y="22" width="3" height="2.5" /></bezel>
-		<bezel element="button" inputtag="IN.x" inputmask="0x01"><bounds x="17.21" y="22" width="3" height="2.5" /></bezel>
+		<bezel element="button" inputtag="IN.0" inputmask="0x0008"><bounds x="17.21" y="22" width="3" height="2.5" /></bezel>
 		<bezel element="button" inputtag="IN.0" inputmask="0x2000"><bounds x="21.57" y="22" width="3" height="2.5" /></bezel>
 		<bezel element="button" inputtag="IN.0" inputmask="0x1000"><bounds x="25.93" y="22" width="3" height="2.5" /></bezel>
 		<bezel element="button" inputtag="IN.0" inputmask="0x0800"><bounds x="30.27" y="22" width="3" height="2.5" /></bezel>
@@ -95,12 +95,12 @@
 
 		<bezel element="button" inputtag="IN.1" inputmask="0x02"><bounds x="8.5" y="26.7" width="3" height="2.5" /></bezel>
 		<bezel element="button" inputtag="IN.1" inputmask="0x08"><bounds x="12.86" y="26.7" width="3" height="2.5" /></bezel>
-		<bezel element="button" inputtag="IN.x" inputmask="0x01"><bounds x="17.21" y="26.7" width="3" height="2.5" /></bezel>
+		<bezel element="button" inputtag="IN.0" inputmask="0x0010"><bounds x="17.21" y="26.7" width="3" height="2.5" /></bezel>
 		<bezel element="button" inputtag="IN.0" inputmask="0x0100"><bounds x="21.57" y="26.7" width="3" height="2.5" /></bezel>
 		<bezel element="button" inputtag="IN.0" inputmask="0x0080"><bounds x="25.93" y="26.7" width="3" height="2.5" /></bezel>
 		<bezel element="button" inputtag="IN.0" inputmask="0x0040"><bounds x="30.27" y="26.7" width="3" height="2.5" /></bezel>
-		<bezel element="button" inputtag="IN.x" inputmask="0x01"><bounds x="34.64" y="26.7" width="3" height="2.5" /></bezel>
-		<bezel element="button" inputtag="IN.x" inputmask="0x01"><bounds x="39" y="26.7" width="3" height="2.5" /></bezel>
+		<bezel element="button" inputtag="IN.0" inputmask="0x0020"><bounds x="34.64" y="26.7" width="3" height="2.5" /></bezel>
+		<bezel element="button" inputtag="IN.0" inputmask="0x4000"><bounds x="39" y="26.7" width="3" height="2.5" /></bezel>
 
 	</view>
 </mamelayout>

@@ -51,6 +51,7 @@ public:
 
 	static void gdrom_config(device_t *device);
 	void dc(machine_config &config);
+	void aica_map(address_map &map);
 	void dc_audio_map(address_map &map);
 	void dc_map(address_map &map);
 	void dc_port(address_map &map);

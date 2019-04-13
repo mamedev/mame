@@ -433,9 +433,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* Z80 - RST 10h */
 	else if((scanline == 0) || (scanline == 120) ) //timer irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* Z80 - RST 10h */
 }
 
 void gundealr_state::gundealr(machine_config &config)

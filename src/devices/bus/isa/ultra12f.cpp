@@ -4,6 +4,10 @@
 
     UltraStor Ultra 12F ESDI Caching Disk Controller
 
+    Two versions of this card are known as 12F/24 and 12F/32. The hardware
+    differences between these apparently have to do with drive speed; the
+    same firmware and microcode may be applicable to both.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -15,6 +19,7 @@ ultra12f_device::ultra12f_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, ULTRA12F, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_hpc(*this, "hpc")
+	, m_fdc(*this, "fdc")
 	, m_bios(*this, "bios")
 {
 }
@@ -25,13 +30,10 @@ void ultra12f_device::device_start()
 	u8 *firmware = memregion("firmware")->base();
 	for (offs_t b = 0; b < 0x8000; b += 0x100)
 	{
-		for (offs_t x = 0; x < 0x10; x++)
-		{
-			std::swap(firmware[b | x | 0x10], firmware[b | x | 0x80]);
-			std::swap(firmware[b | x | 0x30], firmware[b | x | 0xa0]);
-			std::swap(firmware[b | x | 0x50], firmware[b | x | 0xc0]);
-			std::swap(firmware[b | x | 0x70], firmware[b | x | 0xe0]);
-		}
+		std::swap_ranges(&firmware[b | 0x10], &firmware[b | 0x20], &firmware[b | 0x80]);
+		std::swap_ranges(&firmware[b | 0x30], &firmware[b | 0x40], &firmware[b | 0xa0]);
+		std::swap_ranges(&firmware[b | 0x50], &firmware[b | 0x60], &firmware[b | 0xc0]);
+		std::swap_ranges(&firmware[b | 0x70], &firmware[b | 0x80], &firmware[b | 0xe0]);
 	}
 }
 
@@ -42,8 +44,10 @@ void ultra12f_device::hpc_map(address_map &map)
 
 void ultra12f_device::device_add_mconfig(machine_config &config)
 {
-	HPC46003(config, m_hpc, 24_MHz_XTAL); // apparently a HPC46003V30 custom-labeled as "USC010-1-30"
+	HPC46003(config, m_hpc, 24_MHz_XTAL); // apparently a HPC46003V30 custom-marked as "USC010-1-30"
 	m_hpc->set_addrmap(AS_PROGRAM, &ultra12f_device::hpc_map);
+
+	DP8473(config, m_fdc, 24_MHz_XTAL); // unknown quad 52-pin floppy controller marked as "USC020-1-24"
 }
 
 ROM_START(ultra12f)

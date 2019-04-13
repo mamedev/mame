@@ -91,6 +91,7 @@ public:
 	void schick(machine_config &config);
 
 	void init_penta();
+	void init_schick();
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
@@ -98,9 +99,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
+	void decode_penta(int end, int nodecend);
+	void decode_schick_extra(int size, uint8_t* rom);
+
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	optional_device<ls259_device> m_latch;
 	void decrypted_opcodes_map(address_map &map);
+	void schick_decrypted_opcodes_map(address_map &map);
 	void jrpacmbl_map(address_map &map);
 	void pengo_map(address_map &map);
 	void schick_map(address_map &map);
@@ -203,6 +208,14 @@ void pengo_state::schick_map(address_map &map) // everything needs to be verifie
 	map(0x8800, 0x8fef).ram().share("mainram");
 	map(0x8ff0, 0x8fff).ram().share("spriteram");
 	map(0x9020, 0x902f).writeonly().share("spriteram2");
+	map(0xe000, 0xffff).rom();
+}
+
+void pengo_state::schick_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().share("decrypted_opcodes");
+	map(0x8800, 0x8fef).ram().share("mainram");
+	map(0x8ff0, 0x8fff).ram().share("spriteram");
 }
 
 void pengo_state::schick_audio_map(address_map &map)
@@ -529,7 +542,7 @@ void pengo_state::schick(machine_config &config) // all dividers unknown
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK/6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pengo_state::schick_map);
-	m_maincpu->set_addrmap(AS_OPCODES, &pengo_state::decrypted_opcodes_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &pengo_state::schick_decrypted_opcodes_map);
 
 	z80_device &audiocpu(Z80(config, "audiocpu", MASTER_CLOCK/6));
 	audiocpu.set_addrmap(AS_PROGRAM, &pengo_state::schick_audio_map);
@@ -834,7 +847,7 @@ ROM_END
 
 
 
-void pengo_state::init_penta()
+void pengo_state::decode_penta(int end, int nodecend)
 {
 /*
     the values vary, but the translation mask is always laid out like this:
@@ -879,7 +892,7 @@ void pengo_state::init_penta()
 
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (int A = 0x0000;A < 0x8000;A++)
+	for (int A = 0x0000;A < end;A++)
 	{
 		uint8_t src = rom[A];
 
@@ -899,6 +912,114 @@ void pengo_state::init_penta()
 		i = ((A >> 4) & 1) + (((A >> 8) & 1) << 1) + (((A >> 12) & 1) << 2);
 		m_decrypted_opcodes[A] = src ^ opcode_xortable[i][j];
 	}
+
+	for (int A = end; A < nodecend; A++)
+	{
+		m_decrypted_opcodes[A] = rom[A];
+	}
+}
+
+void pengo_state::init_penta()
+{
+	decode_penta(0x8000, 0x8000);
+}
+
+void pengo_state::decode_schick_extra(int size, uint8_t* rom)
+{
+	// schick has an extra layer of encryption in addition to the penta encryption
+	for (int A = 0x0000; A < 0x8000; A++)
+	{
+		uint8_t srcdec = rom[A];
+
+		if (A & 0x100)
+		{
+			srcdec = bitswap<8>(srcdec^0x41, 7, 4, 5, 6, 3, 2, 1, 0);
+		}
+		else
+		{
+			srcdec = bitswap<8>(srcdec^0x51, 7, 6, 5, 0, 3, 2, 1, 4);
+		}
+
+
+		rom[A] = srcdec;
+	}
+
+	for (int A = 0x8000; A < 0x10000; A++)
+	{
+		uint8_t srcdec = rom[A];
+
+		// this layer of encryption only affects bits 0,4,6 ?
+
+		if (rom == m_decrypted_opcodes)
+		{
+			// these are wrong
+			if (A & 0x1000) // might be more conditions too, but there's certainly a boundary at efff-f000 (jump table)
+			{
+				// note, bit substitution tables, each value 0x00, 0x01, 0x10, 0x11, 0x40, 0x41, 0x50, 0x51 can only be used once.
+
+				switch (srcdec & 0x51)
+				{
+				case 0x00: srcdec = (srcdec & ~0x51) | 0x10; break; // looks good for ld ops
+				case 0x01: srcdec = (srcdec & ~0x51) | 0x50; break; // ok?
+				case 0x10: srcdec = (srcdec & ~0x51) | 0x11; break; // ok?
+				case 0x11: srcdec = (srcdec & ~0x51) | 0x51; break; // push/pull opcodes, see f1a1, f1a2, f1fd etc  (d3 case too) 
+				case 0x40: srcdec = (srcdec & ~0x51) | 0x00; break; // ok for some NOPs? and jr ops
+				case 0x41: srcdec = (srcdec & ~0x51) | 0x40; break; // maybe, ret z at f3be
+				case 0x50: srcdec = (srcdec & ~0x51) | 0x01; break; // not 11, not 50, maybe 01? see fcc1
+				case 0x51: srcdec = (srcdec & ~0x51) | 0x41; break; // jmp
+				}
+				rom[A] = srcdec;
+			}
+			else
+			{
+				// does this REALLY affect bit 0x80?  more logical would be bits 0x55, but that doesn't seem to be the case  (answer, NO, doesn't help)
+
+				// this sequence appears in several places
+				//E5C7 : CD 2B BE    call $FF6B // valid call
+				//E5CA : oo dd dd               // must be a 3 byte opcode, but NOT a jump dd are clearly data, bit 0x80 is set on oo tho and only 3 byte opcodes with is set are jumps to invalid addresses?
+				//E5CD : C3 82 A2    jp   $F2D2 // valid jump
+				// this can't be right either, no combination of dropping 0x80 gives a 3 byte opcode
+
+				// unless these really are jumps and there is code there? or the data decryption is wrong? (it seems correct for the jump offsets tho, so would need to be another condition)
+				// I wouldn't put it past Microhard to have an MCU supplying code too... (but why, there's already plenty of extra code for this pengo hack)
+
+
+				switch (srcdec & 0x51)
+				{
+				case 0x00: srcdec = (srcdec & ~0x51) | 0x40; break;
+				case 0x01: srcdec = (srcdec & ~0x51) | 0x01; break; 
+				case 0x10: srcdec = (srcdec & ~0x51) | 0x41; break; // JMP table EFA0
+				case 0x11: srcdec = (srcdec & ~0x51) | 0x11; break;
+				case 0x40: srcdec = (srcdec & ~0x51) | 0x00; break; // NOPs at e538
+				case 0x41: srcdec = (srcdec & ~0x51) | 0x51; break;
+				case 0x50: srcdec = (srcdec & ~0x51) | 0x50; break;
+				case 0x51: srcdec = (srcdec & ~0x51) | 0x10; break;
+				}
+
+				rom[A] = srcdec;
+			}
+		}
+		else
+		{
+			// these are correct(?) give good text, good jump locations etc.  note, based on above might be substitution table like the base encryption, not bitswap, so could still be some bad cases
+			if (A & 0x10)
+				srcdec = bitswap<8>(srcdec ^ 0x11, 7, 0, 5, 6, 3, 2, 1, 4);
+			else
+				srcdec = bitswap<8>(srcdec ^ 0x51, 7, 4, 5, 0, 3, 2, 1, 6);
+
+			rom[A] = srcdec;
+		}
+	}
+}
+
+void pengo_state::init_schick()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	decode_penta(0x8000, 0x10000);
+
+	decode_schick_extra(0x10000, rom);
+	decode_schick_extra(0x10000, m_decrypted_opcodes);
 }
 
 
@@ -908,13 +1029,13 @@ void pengo_state::init_penta()
  *
  *************************************/
 
-GAME( 1982, pengo,    0,        pengoe,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 1 rev c)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo2,   pengo,    pengoe,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 2)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo2u,  pengo,    pengou,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 2 not encrypted)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo3u,  pengo,    pengou,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 3 not encrypted)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo4,   pengo,    pengoe,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 4)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo5,   pengo,    pengoe,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 5)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengob,   pengo,    pengo,    pengo,    pengo_state, init_penta, ROT90, "bootleg",                  "Pengo (bootleg)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1982, penta,    pengo,    pengo,    pengo,    pengo_state, init_penta, ROT90, "bootleg (Grinbee Shouji)", "Penta",                        MACHINE_SUPPORTS_SAVE ) // Grinbee Shouji was a subsidiary of Orca
-GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, pengo_state, empty_init, ROT90, "bootleg",                  "Jr. Pac-Man (Pengo hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, schick,   0,        schick,   schick,   pengo_state, empty_init, ROT90, "Microhard",                "Super Chick",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // encrypted, scheme suspected similar to the Penta one
+GAME( 1982, pengo,    0,        pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 1 rev c)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo2,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 2)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo2u,  pengo,    pengou,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 2 not encrypted)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo3u,  pengo,    pengou,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 3 not encrypted)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo4,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 4)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo5,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 5)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengob,   pengo,    pengo,    pengo,    pengo_state, init_penta,  ROT90, "bootleg",                  "Pengo (bootleg)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1982, penta,    pengo,    pengo,    pengo,    pengo_state, init_penta,  ROT90, "bootleg (Grinbee Shouji)", "Penta",                        MACHINE_SUPPORTS_SAVE ) // Grinbee Shouji was a subsidiary of Orca
+GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, pengo_state, empty_init,  ROT90, "bootleg",                  "Jr. Pac-Man (Pengo hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, schick,   0,        schick,   schick,   pengo_state, init_schick, ROT90, "Microhard",                "Super Chick",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // only partially decrypted

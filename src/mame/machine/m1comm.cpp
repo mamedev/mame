@@ -210,7 +210,7 @@ WRITE8_MEMBER(m1comm_device::dma_mem_w)
 
 WRITE_LINE_MEMBER(m1comm_device::dlc_int7_w)
 {
-	m_cpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff);
+	m_cpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80
 }
 
 READ8_MEMBER(m1comm_device::syn_r)
@@ -303,7 +303,7 @@ void m1comm_device::check_vint_irq()
 #ifndef M1COMM_SIMULATION
 	if (m_syn & 0x02)
 	{
-		m_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xef);
+		m_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xef); // Z80
 	}
 #else
 	comm_tick();

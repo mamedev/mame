@@ -160,6 +160,7 @@ public:
 	static rgb_t RRRRGGGGBBBBRGBx_decoder(u32 raw);  // bits 3/2/1 are LSb
 	static rgb_t xRGBRRRRGGGGBBBB_bit0_decoder(u32 raw);  // bits 14/13/12 are LSb
 	static rgb_t xRGBRRRRGGGGBBBB_bit4_decoder(u32 raw);  // bits 14/13/12 are MSb
+	static rgb_t xBGRBBBBGGGGRRRR_bit0_decoder(u32 raw);  // bits 12/13/14 are LSb
 
 private:
 	// internal data
@@ -246,6 +247,7 @@ public:
 	enum rrrrggggbbbbrgbx_t      { RRRRGGGGBBBBRGBx };
 	enum xrgbrrrrggggbbbb_bit0_t { xRGBRRRRGGGGBBBB_bit0 };
 	enum xrgbrrrrggggbbbb_bit4_t { xRGBRRRRGGGGBBBB_bit4 };
+	enum xbgrbbbbggggrrrr_bit0_t { xBGRBBBBGGGGRRRR_bit0 };
 
 	// construction/destruction
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, init_delegate &&init, u32 entries = 0U, u32 indirect = 0U);
@@ -332,6 +334,7 @@ public:
 	palette_device &set_format(rrrrggggbbbbrgbx_t, u32 entries);
 	palette_device &set_format(xrgbrrrrggggbbbb_bit0_t, u32 entries);
 	palette_device &set_format(xrgbrrrrggggbbbb_bit4_t, u32 entries);
+	palette_device &set_format(xbgrbbbbggggrrrr_bit0_t, u32 entries);
 	template <typename T> palette_device &set_format(T x, u32 entries, u32 indirect) { set_format(x, entries); set_indirect_entries(indirect); return *this; }
 	palette_device &set_membits(int membits) { m_membits = membits; m_membits_supplied = true; return *this; }
 	palette_device &set_endianness(endianness_t endianness) { m_endianness = endianness; m_endianness_supplied = true; return *this; }

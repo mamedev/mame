@@ -57,7 +57,7 @@ CPU/Video Board Parts:
 
 WRITE8_MEMBER(sbasketb_state::sbasketb_sh_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE_LINE_MEMBER(sbasketb_state::coin_counter_1_w)

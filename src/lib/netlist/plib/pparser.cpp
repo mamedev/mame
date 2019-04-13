@@ -282,6 +282,7 @@ ppreprocessor::ppreprocessor(defines_map_type *defines)
 	m_expr_sep.emplace_back("&&");
 	m_expr_sep.emplace_back("||");
 	m_expr_sep.emplace_back("==");
+	m_expr_sep.emplace_back(",");
 	m_expr_sep.emplace_back(" ");
 	m_expr_sep.emplace_back("\t");
 
@@ -508,9 +509,18 @@ pstring  ppreprocessor::process_line(pstring line)
 		{
 			if (m_ifflag == 0)
 			{
-				if (lti.size() != 3)
-					error("PREPRO: only simple defines allowed: " + line);
-				m_defines.insert({lti[1], define_t(lti[1], lti[2])});
+				if (lti.size() < 2)
+					error("PREPRO: define needs at least one argument: " + line);
+				else if (lti.size() == 2)
+					m_defines.insert({lti[1], define_t(lti[1], "")});
+				else
+				{
+					pstring arg("");
+					for (std::size_t i=2; i<lti.size() - 1; i++)
+						arg += lti[i] + " ";
+					arg += lti[lti.size()-1];
+					m_defines.insert({lti[1], define_t(lti[1], arg)});
+				}
 			}
 		}
 		else

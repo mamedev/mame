@@ -280,7 +280,7 @@ private:
 	DECLARE_WRITE32_MEMBER (bootvect_w);
 
 	/* Interrupt  support */
-	//  IRQ_CALLBACK_MEMBER(maincpu_iack_callback);
+	void cpu_space_map(address_map &map);
 	DECLARE_WRITE_LINE_MEMBER(fga_irq_callback);
 	uint8_t fga_irq_state;
 	//  int fga_irq_vector;
@@ -658,12 +658,18 @@ static void fccpu30_vme_cards(device_slot_interface &device)
 /*
  * Machine configuration
  */
+
+void cpu30_state::cpu_space_map(address_map &map)
+{
+	map(0xfffffff2, 0xffffffff).lr16("fga002 irq", [this](offs_t offset) -> u16 { return m_fga002->iack(); });
+}
+
 void cpu30_state::cpu30(machine_config &config)
 {
 	/* basic machine hardware */
 	M68030(config, m_maincpu, XTAL(25'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &cpu30_state::cpu30_mem);
-	m_maincpu->set_irq_acknowledge_callback("fga002", FUNC(fga002_device::iack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cpu30_state::cpu_space_map);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	VME(config, "vme", 0);

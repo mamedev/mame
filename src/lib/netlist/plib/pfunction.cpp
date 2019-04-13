@@ -52,6 +52,8 @@ void pfunction::compile_postfix(const std::vector<pstring> &inputs,
 			{ rc.m_cmd = SIN; stk -= 0; }
 		else if (cmd == "cos")
 			{ rc.m_cmd = COS; stk -= 0; }
+		else if (cmd == "trunc")
+			{ rc.m_cmd = TRUNC; stk -= 0; }
 		else if (cmd == "rand")
 			{ rc.m_cmd = RAND; stk += 1; }
 		else
@@ -72,16 +74,16 @@ void pfunction::compile_postfix(const std::vector<pstring> &inputs,
 				bool err;
 				rc.m_param = plib::pstonum_ne<decltype(rc.m_param)>(cmd, err);
 				if (err)
-					throw plib::pexception(plib::pfmt("nld_function: unknown/misformatted token <{1}> in <{2}>")(cmd)(expr));
+					throw plib::pexception(plib::pfmt("pfunction: unknown/misformatted token <{1}> in <{2}>")(cmd)(expr));
 				stk += 1;
 			}
 		}
 		if (stk < 1)
-			throw plib::pexception(plib::pfmt("nld_function: stack underflow on token <{1}> in <{2}>")(cmd)(expr));
+			throw plib::pexception(plib::pfmt("pfunction: stack underflow on token <{1}> in <{2}>")(cmd)(expr));
 		m_precompiled.push_back(rc);
 	}
 	if (stk != 1)
-		throw plib::pexception(plib::pfmt("nld_function: stack count different to one on <{2}>")(expr));
+		throw plib::pexception(plib::pfmt("pfunction: stack count different to one on <{2}>")(expr));
 }
 
 static int get_prio(const pstring &v)
@@ -103,7 +105,7 @@ static int get_prio(const pstring &v)
 static pstring pop_check(std::stack<pstring> &stk, const pstring &expr)
 {
 	if (stk.size() == 0)
-		throw plib::pexception(plib::pfmt("nld_function: stack underflow during infix parsing of: <{1}>")(expr));
+		throw plib::pexception(plib::pfmt("pfunction: stack underflow during infix parsing of: <{1}>")(expr));
 	pstring res = stk.top();
 	stk.pop();
 	return res;
@@ -201,6 +203,7 @@ double pfunction::evaluate(const std::vector<double> &values)
 			OP(POW,  1, std::pow(ST2, ST1))
 			OP(SIN,  0, std::sin(ST2))
 			OP(COS,  0, std::cos(ST2))
+			OP(TRUNC,  0, std::trunc(ST2))
 			case RAND:
 				stack[ptr++] = lfsr_random();
 				break;

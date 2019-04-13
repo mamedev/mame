@@ -300,6 +300,29 @@ ROM_START( tutankhm )
 ROM_END
 
 
+/*
+A PCB picture shows the following label format:
+
+TUTANKHAM     (C)
+RA1   1I (25)
+1982    STERN
+
+Visible ROM labels on the KT-3203-1B PCB:
+TUTANKHAM   RA1 1I (25)  1982   STERN
+TUTANKHAM   RA1 2I (25)  1982   STERN
+TUTANKHAM   RA1 3I (25)  1982   STERN
+TUTANKHAM   RA1 4I (25)  1982   STERN
+TUTANKHAM   RA1 5I (25)  1982   STERN
+TUTANKHAM   RA1 6I (25)  1982   STERN
+TUTANKHAM   RA1 7I (25)  1982   STERN
+TUTANKHAM   RA1 8I (25)  1982   STERN
+TUTANKHAM   RA1 9I (25)  1982   STERN
+
+ROMs labels on the KT-5112-2B PCB:
+TUTANKHAM   RA1 8A (26)  1982   STERN    (in socket 7A)
+TUTANKHAM   RA1 10E (25)  1982   STERN    (in socket 8A)
+
+*/
 ROM_START( tutankhms )
 	/* ROMS located on the KT-3203-1B board. */
 	ROM_REGION( 0x20000, "maincpu", 0 )      /* 64k for M6809 CPU code + 64k for ROM banks */

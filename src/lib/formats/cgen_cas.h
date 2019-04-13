@@ -7,12 +7,13 @@
     Format code for EACA Colour Genie .cas cassette files.
 
 *********************************************************************/
+#ifndef MAME_FORMATS_CGEN_CAS_H
+#define MAME_FORMATS_CGEN_CAS_H
 
-#ifndef __CGEN_CAS_H
-#define __CGEN_CAS_H
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(cgenie_cassette_formats);
 
-#endif /* __CGEN_CAS_H */
+#endif // MAME_FORMATS_CGEN_CAS_H

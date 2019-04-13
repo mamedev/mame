@@ -349,6 +349,12 @@ palette_device &palette_device::set_format(xrgbrrrrggggbbbb_bit4_t, u32 entries)
 	return *this;
 }
 
+palette_device &palette_device::set_format(xbgrbbbbggggrrrr_bit0_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::xBGRBBBBGGGGRRRR_bit0_decoder, entries);
+	return *this;
+}
+
 
 //**************************************************************************
 //  GENERIC WRITE HANDLERS
@@ -771,5 +777,13 @@ rgb_t raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit4_decoder(u32 raw)
 	u8 const r = pal5bit(((raw >> 8) & 0x0f) | ((raw >> 10) & 0x10));
 	u8 const g = pal5bit(((raw >> 4) & 0x0f) | ((raw >> 9)  & 0x10));
 	u8 const b = pal5bit(((raw >> 0) & 0x0f) | ((raw >> 8)  & 0x10));
+	return rgb_t(r, g, b);
+}
+
+rgb_t raw_to_rgb_converter::xBGRBBBBGGGGRRRR_bit0_decoder(u32 raw)
+{
+	u8 const r = pal5bit(((raw << 1) & 0x1e) | ((raw >> 12) & 0x01));
+	u8 const g = pal5bit(((raw >> 3) & 0x1e) | ((raw >> 13) & 0x01));
+	u8 const b = pal5bit(((raw >> 7) & 0x1e) | ((raw >> 14) & 0x01));
 	return rgb_t(r, g, b);
 }

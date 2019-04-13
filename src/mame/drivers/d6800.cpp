@@ -126,7 +126,8 @@ void d6800_state::d6800_map(address_map &map)
 {
 	map(0x0000, 0x00ff).ram();
 	map(0x0100, 0x01ff).ram().share("videoram");
-	map(0x0200, 0x0fff).ram();
+	map(0x0200, 0x17ff).ram();
+	//map(0x1800, 0x1fff).rom();   // for dreamsoft_1, if we can find a good copy
 	map(0x8010, 0x8013).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc000, 0xc7ff).mirror(0x3800).rom();
 }
@@ -451,11 +452,14 @@ MACHINE_CONFIG_END
 
 ROM_START( d6800 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_SYSTEM_BIOS(0, "0", "Original")
-	ROMX_LOAD( "d6800.bin", 0xc000, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877), ROM_BIOS(0) )
-	ROMX_LOAD( "d6800.bin", 0xc400, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS(1, "1", "Dreamsoft")
-	ROMX_LOAD( "d6800d.bin", 0xc000, 0x0800, CRC(ded5712f) SHA1(f594f313a74d7135c9fdd0bcb0093fc5771a9b7d), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(0, "0", "Original")   // "chipos"
+	ROMX_LOAD( "d6800.bin",     0xc000, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877), ROM_BIOS(0) )
+	ROM_RELOAD(                 0xc400, 0x0400 )
+	//ROMX_LOAD( "d6800d1.bin",   0x1800, 0x0800, BAD_DUMP CRC(e552cae3) SHA1(0b90504922d46b9c46278924768c45b1b276709f), ROM_BIOS(0) )   // need a good dump, this one is broken
+	ROM_SYSTEM_BIOS(1, "d2", "Dreamsoft2")
+	ROMX_LOAD( "d6800d2.bin",   0xc000, 0x0800, CRC(ded5712f) SHA1(f594f313a74d7135c9fdd0bcb0093fc5771a9b7d), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(2, "d2m", "Dreamsoft2m")
+	ROMX_LOAD( "d6800d2m.bin",  0xc000, 0x0800, CRC(eec8e56f) SHA1(f587ccbc0872f2982d61120d033f481a862b902b), ROM_BIOS(2) )
 ROM_END
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY          FULLNAME      FLAGS

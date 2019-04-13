@@ -348,7 +348,8 @@ READ8_MEMBER( wd1010_device::read )
 		LOGREGS("RD STATUS: %02x\n", m_status);
 
 		// reading the status register clears the interrupt
-		set_intrq(0);
+		if (!machine().side_effects_disabled())
+			set_intrq(0);
 
 		return m_status;
 	}

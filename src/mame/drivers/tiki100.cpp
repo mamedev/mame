@@ -102,7 +102,7 @@ READ8_MEMBER( tiki100_state::iorq_r )
 		break;
 
 	case 0x02: // PARS
-		data = m_pio->read(space, offset & 0x03);
+		data = m_pio->read(offset & 0x03);
 		break;
 
 	case 0x04: // FLOP
@@ -141,7 +141,7 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 		break;
 
 	case 0x02: // PARS
-		m_pio->write(space, offset & 0x03, data);
+		m_pio->write(offset & 0x03, data);
 		break;
 
 	case 0x03: // VIPB

@@ -198,10 +198,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(sbowling_state::interrupt)
 	int scanline = param;
 
 	if(scanline == 256)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* Z80 - RST 08h */
 
 	if(scanline == 128)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* Z80 - RST 10h */
 
 }
 

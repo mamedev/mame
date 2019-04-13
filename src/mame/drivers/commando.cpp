@@ -232,7 +232,7 @@ GFXDECODE_END
 WRITE_LINE_MEMBER(commando_state::vblank_irq)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // RST 10h - VBLANK
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h - VBLANK
 }
 
 /* Machine Driver */

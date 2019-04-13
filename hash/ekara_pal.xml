@@ -164,5 +164,53 @@
 			</dataarea>
 		</part>
 	</software>
+	
+	<!-- the Spanish carts do not have a part number on the cartridge, PCB or box -->
+	
+	<!--
+	1.  "Cuéntame Al Oído"               La Oreja De Van Gogh
+	2.  "La Última Noche"                Luis Miguel
+	3.  "Corazón Latino"                 David Bisbal
+	4.  "Además De Ti"                   David Bustamante
+	5.  "Quiero"                         Raúl
+	6.  "No Rompas Mi Corazón"           Coyote Daxx
+	7.  "Atrévete"                       Chenoa
+	8.  "Europe's Living A Celebration"  Rosa
+	9.  "María"                          Ricky Martin
+	10. "Sin Miedo A Nada"               Alex Ubago
+	-->
+	<software name="spainvol1">
+		<description>e-kara Spain 10-Songs Volume 1</description>
+		<year>2002</year>
+		<publisher>Takara / newgent</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="spainvol1.bin" size="0x100000" crc="b90366cc" sha1="f6bab71fc8cb420728ffa721d7c12767719099e5" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+
+	<!--
+	1.  "Héroe"               Enrique Iglesias
+	2.  "Vida"                Gisela
+	3.  "Suerte"              Shakira
+	4.  "Torero"              Chayanne
+	5.  "Dile Que La Quiero"  David Civera
+	6.  "Soledad"             La Oreja De Van Gogh
+	7.  "Aserejé"             Las Ketchup
+	8.  "Sueño Su Boca"       Raul
+	9.  "La Apuesta"          Rosa
+	10  "Ave María"           David Bisbal
+	-->
+	<software name="spainvol2">
+		<description>e-kara Spain 10-Songs Volume 2</description>
+		<year>2002</year>
+		<publisher>Takara / newgent</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="spainvol2.bin" size="0x100000" crc="a60f7b30" sha1="7c7736e692b9f4ce838dc064e214322aa3ae0e6a" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
 
 </softwarelist>

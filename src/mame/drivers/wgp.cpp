@@ -617,8 +617,8 @@ void wgp_state::main_map(address_map &map)
 	map(0x180000, 0x18000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
 	map(0x1c0000, 0x1c0001).w(FUNC(wgp_state::cpua_ctrl_w));
 	map(0x200000, 0x20000f).rw(FUNC(wgp_state::adinput_r), FUNC(wgp_state::adinput_w));
-	map(0x300000, 0x30ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));            /* tilemaps */
-	map(0x320000, 0x32000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x300000, 0x30ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));            /* tilemaps */
+	map(0x320000, 0x32000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x400000, 0x40bfff).ram().share("spritemap");   /* sprite tilemaps */
 	map(0x40c000, 0x40dfff).ram().share("spriteram");   /* sprite ram */
 	map(0x40fff0, 0x40fff1).nopw();    /* ?? (writes 0x8000 and 0 alternately - Wgp2 just 0) */
@@ -950,9 +950,8 @@ void wgp_state::wgp(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(3);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

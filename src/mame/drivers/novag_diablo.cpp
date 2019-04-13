@@ -5,9 +5,6 @@
 *
 * novag_diablo.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
-TODO:
-- hook up RS232 port (when connected, I'm only getting "New Game")
-
 *******************************************************************************
 
 Novag Diablo 68000 overview:
@@ -43,6 +40,7 @@ class diablo_state : public novagbase_state
 public:
 	diablo_state(const machine_config &mconfig, device_type type, const char *tag) :
 		novagbase_state(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_acia(*this, "acia"),
 		m_rs232(*this, "rs232")
@@ -54,6 +52,7 @@ public:
 
 private:
 	// devices/pointers
+	required_device<m68000_base_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<mos6551_device> m_acia;
 	required_device<rs232_port_device> m_rs232;
@@ -217,15 +216,23 @@ void diablo_state::diablo68k(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->disable_interrupt_mixer();
 	m_maincpu->set_addrmap(AS_PROGRAM, &diablo_state::diablo68k_map);
 
 	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL/128); // 256Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(diablo_state::irq_on<M68K_IRQ_2>), irq_period);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(diablo_state::irq_on<M68K_IRQ_IPL1>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1100)); // active for 1.1us
-	TIMER(config, "irq_off").configure_periodic(FUNC(diablo_state::irq_off<M68K_IRQ_2>), irq_period);
+	TIMER(config, "irq_off").configure_periodic(FUNC(diablo_state::irq_off<M68K_IRQ_IPL1>), irq_period);
 
 	MOS6551(config, m_acia).set_xtal(1.8432_MHz_XTAL);
+	m_acia->irq_handler().set_inputline("maincpu", M68K_IRQ_IPL2);
+	m_acia->rts_handler().set("acia", FUNC(mos6551_device::write_cts));
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set("acia", FUNC(mos6551_device::write_rxd));
+	m_rs232->dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

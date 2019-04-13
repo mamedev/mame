@@ -7,14 +7,13 @@
     Cassette code for Acorn Atom tap files
 
 *********************************************************************/
+#ifndef MAME_FORMATS_ATOM_TAP_H
+#define MAME_FORMATS_ATOM_TAP_H
 
 #pragma once
-
-#ifndef __ATOM_TAP__
-#define __ATOM_TAP__
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(atom_cassette_formats);
 
-#endif
+#endif // MAME_FORMATS_ATOM_TAP_H

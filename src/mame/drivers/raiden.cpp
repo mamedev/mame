@@ -329,8 +329,8 @@ WRITE_LINE_MEMBER(raiden_state::vblank_irq)
 {
 	if (state)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
-		m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
+		m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
 	}
 }
 

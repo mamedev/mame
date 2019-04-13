@@ -126,7 +126,6 @@ private:
 	void cruwrite(offs_t offset, uint8_t data);
 	void external_operation(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
-	DECLARE_WRITE_LINE_MEMBER( dbin_line );
 
 	// Connections from outside towards the CPU (callbacks)
 	DECLARE_WRITE_LINE_MEMBER( console_ready_dmux );
@@ -655,14 +654,6 @@ WRITE_LINE_MEMBER( ti99_4x_state::clock_out )
 }
 
 /*
-   Data bus in (DBIN) line from the CPU.
-*/
-WRITE_LINE_MEMBER( ti99_4x_state::dbin_line )
-{
-	m_datamux->dbin_in(state);
-}
-
-/*
     GROMCLK from VDP, propagating to datamux
 */
 WRITE_LINE_MEMBER( ti99_4x_state::gromclk_in )
@@ -851,7 +842,6 @@ void ti99_4x_state::ti99_4_common(machine_config& config)
 	m_cpu->extop_cb().set(FUNC(ti99_4x_state::external_operation));
 	m_cpu->intlevel_cb().set(FUNC(ti99_4x_state::interrupt_level));
 	m_cpu->clkout_cb().set(FUNC(ti99_4x_state::clock_out));
-	m_cpu->dbin_cb().set(FUNC(ti99_4x_state::dbin_line));
 
 	// Programmable system interface (driven by CLKOUT)
 	TMS9901(config, m_tms9901, 0);

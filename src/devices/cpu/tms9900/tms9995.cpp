@@ -168,6 +168,7 @@ tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, 
 		m_state_any(0),
 		PC(0),
 		PC_debug(0),
+		m_iaq(false),
 		m_program_config("program", ENDIANNESS_BIG, 8, 16),
 		m_setaddress_config("setaddress", ENDIANNESS_BIG, 16, 16),  // data = address
 		m_io_config("cru", ENDIANNESS_LITTLE, 8, 16, 1),
@@ -175,10 +176,8 @@ tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, 
 		m_setaddr(nullptr),
 		m_cru(nullptr),
 		m_external_operation(*this),
-		m_iaq_line(*this),
 		m_clock_out_line(*this),
-		m_holda_line(*this),
-		m_dbin_line(*this)
+		m_holda_line(*this)
 {
 	m_check_overflow = false;
 }
@@ -203,10 +202,8 @@ void tms9995_device::device_start()
 
 	// Resolve our external connections
 	m_external_operation.resolve();
-	m_iaq_line.resolve();
 	m_clock_out_line.resolve();
 	m_holda_line.resolve();
-	m_dbin_line.resolve();
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -1561,7 +1558,7 @@ void tms9995_device::prefetch_and_decode()
 		// Save these values; they have been computed during the current instruction execution
 		m_address_copy = m_address;
 		m_value_copy = m_current_value;
-		if (!m_iaq_line.isnull()) m_iaq_line(ASSERT_LINE);
+		m_iaq = true;
 		m_address = PC;
 		LOGMASKED(LOG_DETAIL, "** Prefetching new instruction at %04x **\n", PC);
 	}
@@ -1575,7 +1572,7 @@ void tms9995_device::prefetch_and_decode()
 		m_address = m_address_copy;     // restore m_address
 		m_current_value = m_value_copy; // restore m_current_value
 		PC = (PC + 2) & 0xfffe;     // advance PC
-		if (!m_iaq_line.isnull()) m_iaq_line(CLEAR_LINE);
+		m_iaq = false;
 		LOGMASKED(LOG_DETAIL, "++ Prefetch done ++\n");
 	}
 }
@@ -1845,7 +1842,6 @@ void tms9995_device::mem_read()
 		case 1:
 			// Set address
 			// If this is a word access, 4 passes, else 2 passes
-			if (!m_dbin_line.isnull()) m_dbin_line(ASSERT_LINE);
 			if (m_word_access || !m_byteop)
 			{
 				m_pass = 4;
@@ -1857,7 +1853,7 @@ void tms9995_device::mem_read()
 			m_check_hold = false;
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address & ~1);
 			if (m_setaddr)
-				m_setaddr->write_word(ASSERT_LINE, address);
+				m_setaddr->write_word((TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0))<<1, address);
 			m_request_auto_wait_state = m_auto_wait;
 			pulse_clock(1);
 			break;
@@ -1872,7 +1868,7 @@ void tms9995_device::mem_read()
 			// Set address + 1 (unless byte command)
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address | 1);
 			if (m_setaddr)
-				m_setaddr->write_word(ASSERT_LINE, m_address | 1);
+				m_setaddr->write_word((TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0))<<1, m_address | 1);
 			m_request_auto_wait_state = m_auto_wait;
 			pulse_clock(1);
 			break;
@@ -1979,8 +1975,6 @@ void tms9995_device::mem_write()
 		case 1:
 			// Set address
 			// If this is a word access, 4 passes, else 2 passes
-			if (!m_dbin_line.isnull()) m_dbin_line(CLEAR_LINE);
-
 			if (m_word_access || !m_byteop)
 			{
 				m_pass = 4;
@@ -1991,7 +1985,7 @@ void tms9995_device::mem_write()
 			m_check_hold = false;
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", address);
 			if (m_setaddr)
-				m_setaddr->write_word(CLEAR_LINE, address);
+				m_setaddr->write_word(TMS99xx_BUS_WRITE, address);
 			LOGMASKED(LOG_MEM, "memory write byte %04x <- %02x\n", address, (m_current_value >> 8)&0xff);
 			m_prgspace->write_byte(address, (m_current_value >> 8)&0xff);
 			m_request_auto_wait_state = m_auto_wait;
@@ -2005,7 +1999,7 @@ void tms9995_device::mem_write()
 			// Set address + 1 (unless byte command)
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address | 1);
 			if (m_setaddr)
-				m_setaddr->write_word(CLEAR_LINE, m_address | 1);
+				m_setaddr->write_word(TMS99xx_BUS_WRITE, m_address | 1);
 			LOGMASKED(LOG_MEM, "memory write byte %04x <- %02x\n", m_address | 1, m_current_value & 0xff);
 			m_prgspace->write_byte(m_address | 1, m_current_value & 0xff);
 			m_request_auto_wait_state = m_auto_wait;

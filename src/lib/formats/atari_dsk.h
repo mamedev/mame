@@ -7,12 +7,13 @@
     Atari disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_ATARI_DSK_H
+#define MAME_FORMATS_ATARI_DSK_H
 
-#ifndef ATARI_DSK_H
-#define ATARI_DSK_H
+#pragma once
 
 #include "flopimg.h"
 
 LEGACY_FLOPPY_OPTIONS_EXTERN(atari_only);
 
-#endif /* ATARI_DSK_H */
+#endif // MAME_FORMATS_ATARI_DSK_H

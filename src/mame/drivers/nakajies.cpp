@@ -440,7 +440,7 @@ void nakajies_state::nakajies_update_irqs()
 
 	if ( vector >= 0xf8 )
 	{
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector );
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector ); // V20
 	}
 	else
 	{

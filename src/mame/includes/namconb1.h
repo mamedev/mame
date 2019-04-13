@@ -11,6 +11,7 @@
 #pragma once
 
 #include "machine/eeprompar.h"
+#include "machine/namcomcu.h"
 #include "machine/timer.h"
 #include "screen.h"
 #include "video/namco_c116.h"
@@ -92,7 +93,7 @@ private:
 	required_device<namco_c355spr_device> m_c355spr;
 	optional_device<namco_c169roz_device> m_c169roz; // NB1 only, not NA1
 	required_device<screen_device> m_screen;
-	required_device<cpu_device> m_mcu;
+	required_device<m37710_cpu_device> m_mcu;
 	required_device<eeprom_parallel_28xx_device> m_eeprom;
 	required_ioport m_p1;
 	required_ioport m_p2;
@@ -129,14 +130,7 @@ private:
 	DECLARE_READ8_MEMBER(port6_r);
 	DECLARE_WRITE8_MEMBER(port6_w);
 	DECLARE_READ8_MEMBER(port7_r);
-	DECLARE_READ8_MEMBER(dac7_r);
-	DECLARE_READ8_MEMBER(dac6_r);
-	DECLARE_READ8_MEMBER(dac5_r);
-	DECLARE_READ8_MEMBER(dac4_r);
-	DECLARE_READ8_MEMBER(dac3_r);
-	DECLARE_READ8_MEMBER(dac2_r);
-	DECLARE_READ8_MEMBER(dac1_r);
-	DECLARE_READ8_MEMBER(dac0_r);
+	template <int Bit> uint16_t dac_bit_r();
 
 	DECLARE_WRITE32_MEMBER(rozbank32_w);
 	virtual void machine_start() override;
@@ -162,7 +156,6 @@ private:
 	void NB2RozCB_machbrkr(uint16_t code, int *tile, int *mask, int which);
 	void NB2RozCB_outfxies(uint16_t code, int *tile, int *mask, int which);
 	void namcoc75_am(address_map &map);
-	void namcoc75_io(address_map &map);
 	void namconb1_am(address_map &map);
 	void namconb2_am(address_map &map);
 };

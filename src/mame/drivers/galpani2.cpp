@@ -354,7 +354,7 @@ void galpani2_state::galpani2_mem1(address_map &map)
 	map(0x110000, 0x11000f).ram();                                  // ? corrupted? stack dumper on POST failure, pc+sr on gp2se
 	map(0x300000, 0x301fff).ram();                                  // ?
 	map(0x302000, 0x303fff).ram().share("spriteram");               // Sprites
-	map(0x304000, 0x30401f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
+	map(0x304000, 0x30401f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::regs_r), FUNC(kaneko16_sprite_device::regs_w));
 //  map(0x308000, 0x308001).nopw();                                 // ? 0 at startup
 	map(0x30c000, 0x30c001).nopw();                                 // ? hblank effect ?
 	map(0x310000, 0x3101ff).ram().w(m_bg8palette, FUNC(palette_device::write16)).share("bg8palette");    // ?

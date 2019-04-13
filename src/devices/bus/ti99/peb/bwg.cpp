@@ -45,6 +45,7 @@
 #include "emu.h"
 #include "bwg.h"
 #include "formats/ti99_dsk.h"
+#include "machine/rescap.h"
 
 // ----------------------------------
 // Flags for debugging
@@ -52,9 +53,9 @@
 #define LOG_WARN        (1U<<1)    // Warnings
 #define LOG_RW          (1U<<2)     // Read and write accesses
 #define LOG_CRU         (1U<<3)    // Show CRU bit accesses
-#define LOG_READY       (1U<<4)    // Show ready line activity
-#define LOG_SIGNALS     (1U<<5)    // Show detailed signal activity
-#define LOG_DATA        (1U<<6)    // Show sector data
+#define LOG_CRUD        (1U<<4)    // Show CRU bit accesses (details)
+#define LOG_READY       (1U<<5)    // Show ready line activity
+#define LOG_SIGNALS     (1U<<6)    // Show detailed signal activity
 #define LOG_ADDRESS     (1U<<7)    // Show address bus operations
 #define LOG_MOTOR       (1U<<8)    // Show motor operations
 #define LOG_CONFIG      (1U<<9)    // Configuration
@@ -81,14 +82,25 @@ namespace bus { namespace ti99 { namespace peb {
 snug_bwg_device::snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
 	  device_t(mconfig, TI99_BWG, tag, owner, clock),
 	  device_ti99_peribox_card_interface(mconfig, *this),
-	  m_DRQ(), m_IRQ(), m_dip1(0), m_dip2(0), m_dip34(0), m_ram_page(0),
-	  m_rom_page(0), m_WAITena(false), m_inDsrArea(false), m_WDsel(false),
-	  m_WDsel0(false), m_RTCsel(false), m_lastK(false), m_dataregLB(false),
-	  m_rtc_enabled(false), m_MOTOR_ON(), m_lastval(0), m_address(0),
-	  m_DSEL(0), m_SIDSEL(), m_motor_on_timer(nullptr), m_dsrrom(nullptr),
-	  m_buffer_ram(*this, BUFFER), m_current_floppy(nullptr),
+	  m_DRQ(), m_IRQ(),
+	  m_dip1(0), m_dip2(0), m_dip34(0),
+	  m_inDsrArea(false),
+	  m_WDsel(false),
+	  m_WDsel0(false),
+	  m_RTCsel(false),
+	  m_lastK(false),
+	  m_dataregLB(false),
+	  m_MOTOR_ON(),
+	  m_address(0),
+	  m_dsrrom(nullptr),
+	  m_buffer_ram(*this, BUFFER),
+	  m_sel_floppy(0),
 	  m_wd1773(*this, FDC_TAG),
-	  m_clock(*this, CLOCK_TAG) { }
+	  m_clock(*this, CLOCK_TAG),
+	  m_crulatch0_7(*this, "crulatch0_7"),
+	  m_crulatch8_15(*this, "crulatch8_15"),
+	  m_motormf(*this, "motormf")
+	  { }
 
 /*
     Operate the wait state logic.
@@ -98,7 +110,7 @@ void snug_bwg_device::operate_ready_line()
 	// This is the wait state logic
 	LOGMASKED(LOG_SIGNALS, "address=%04x, DRQ=%d, INTRQ=%d, MOTOR=%d\n", m_address & 0xffff, m_DRQ, m_IRQ, m_MOTOR_ON);
 	line_state nready = (m_dataregLB &&         // Are we accessing 5ff7
-			m_WAITena &&                        // and the wait state generation is active (SBO 2)
+			m_crulatch0_7->q2_r() &&            // and the wait state generation is active (SBO 2)
 			(m_DRQ==CLEAR_LINE) &&              // and we are waiting for a byte
 			(m_IRQ==CLEAR_LINE) &&              // and there is no interrupt yet
 			(m_MOTOR_ON==ASSERT_LINE)           // and the motor is turning?
@@ -147,14 +159,14 @@ SETADDRESS_DBIN_MEMBER( snug_bwg_device::setaddress_dbin )
 	// Is the WD chip on the card being selected?
 	// We need the even and odd addresses for the wait state generation,
 	// but only the even addresses when we access it
-	m_WDsel0 = m_inDsrArea && !m_rtc_enabled
+	m_WDsel0 = m_inDsrArea && m_crulatch8_15->q6_r()==CLEAR_LINE
 			&& ((state==ASSERT_LINE && ((m_address & 0x1ff8)==0x1ff0))    // read
 				|| (state==CLEAR_LINE && ((m_address & 0x1ff8)==0x1ff8)));  // write
 
 	m_WDsel = m_WDsel0 && WORD_ALIGNED(m_address);
 
 	// Is the RTC selected on the card? (even addr)
-	m_RTCsel = m_inDsrArea && m_rtc_enabled && ((m_address & 0x1fe1)==0x1fe0);
+	m_RTCsel = m_inDsrArea && m_crulatch8_15->q6_r()==ASSERT_LINE && ((m_address & 0x1fe1)==0x1fe0);
 
 	// RTC disabled:
 	// 5c00 - 5fef: RAM
@@ -189,10 +201,10 @@ void snug_bwg_device::debug_read(offs_t offset, uint8_t* value)
 		if ((offset & 0x1c00)==0x1c00)
 		{
 			if ((offset & 0x1fe0)!=0x1fe0)
-				*value = m_buffer_ram->pointer()[(m_ram_page<<10) | (offset & 0x03ff)];
+				*value = m_buffer_ram->pointer()[(m_crulatch8_15->q5_r()<<10) | (offset & 0x03ff)];
 		}
 		else
-			*value = m_dsrrom[(m_rom_page<<13) | (offset & 0x1fff)];
+			*value = m_dsrrom[(m_crulatch8_15->q7_r()<<14) | (m_crulatch8_15->q3_r()<<13) | (offset & 0x1fff)];
 	}
 }
 
@@ -201,7 +213,7 @@ void snug_bwg_device::debug_write(offs_t offset, uint8_t data)
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
 		if (((offset & 0x1c00)==0x1c00) && ((offset & 0x1fe0)!=0x1fe0))
-			m_buffer_ram->pointer()[(m_ram_page<<10) | (m_address & 0x03ff)] = data;
+			m_buffer_ram->pointer()[(m_crulatch8_15->q5_r()<<10) | (m_address & 0x03ff)] = data;
 	}
 }
 
@@ -223,7 +235,8 @@ READ8Z_MEMBER(snug_bwg_device::readz)
 		if (m_lastK)
 		{
 			// ...1 11xx xxxx xxxx
-			if (m_rtc_enabled)
+			int rampage = m_crulatch8_15->q5_r();
+			if (m_crulatch8_15->q6_r()==ASSERT_LINE)
 			{
 				if (m_RTCsel)
 				{
@@ -233,8 +246,8 @@ READ8Z_MEMBER(snug_bwg_device::readz)
 				}
 				else
 				{
-					*value = m_buffer_ram->pointer()[(m_ram_page<<10) | (m_address & 0x03ff)];
-					LOGMASKED(LOG_RW, "read ram: %04x (page %d)-> %02x\n", m_address & 0xffff, m_ram_page, *value);
+					*value = m_buffer_ram->pointer()[(rampage<<10) | (m_address & 0x03ff)];
+					LOGMASKED(LOG_RW, "read ram: %04x (page %d)-> %02x\n", m_address & 0xffff, rampage, *value);
 				}
 			}
 			else
@@ -246,19 +259,19 @@ READ8Z_MEMBER(snug_bwg_device::readz)
 					// so we can drop the inversion
 					*value = m_wd1773->read((m_address >> 1)&0x03);
 					LOGMASKED(LOG_RW, "read FDC: %04x -> %02x\n", m_address & 0xffff, *value);
-					LOGMASKED(LOG_DATA, "\n%04x: %02x", m_address&0xffff, *value);
 				}
 				else
 				{
-					*value = m_buffer_ram->pointer()[(m_ram_page<<10) | (m_address & 0x03ff)];
-					LOGMASKED(LOG_RW, "read ram: %04x (page %d)-> %02x\n", m_address & 0xffff, m_ram_page, *value);
+					*value = m_buffer_ram->pointer()[(rampage<<10) | (m_address & 0x03ff)];
+					LOGMASKED(LOG_RW, "read ram: %04x (page %d)-> %02x\n", m_address & 0xffff, rampage, *value);
 				}
 			}
 		}
 		else
 		{
-			*value = m_dsrrom[(m_rom_page<<13) | (m_address & 0x1fff)];
-			LOGMASKED(LOG_RW, "read dsr: %04x (page %d)-> %02x\n", m_address & 0xffff, m_rom_page, *value);
+			int rompage = (m_crulatch8_15->q7_r()<<1) | m_crulatch8_15->q3_r();
+			*value = m_dsrrom[(rompage << 13) | (m_address & 0x1fff)];
+			LOGMASKED(LOG_RW, "read dsr: %04x (page %d)-> %02x\n", m_address & 0xffff, rompage, *value);
 		}
 	}
 }
@@ -287,7 +300,8 @@ void snug_bwg_device::write(offs_t offset, uint8_t data)
 	{
 		if (m_lastK)
 		{
-			if (m_rtc_enabled)
+			int rampage = m_crulatch8_15->q5_r();
+			if (m_crulatch8_15->q6_r()==ASSERT_LINE)
 			{
 				if (m_RTCsel)
 				{
@@ -297,8 +311,8 @@ void snug_bwg_device::write(offs_t offset, uint8_t data)
 				}
 				else
 				{
-					LOGMASKED(LOG_RW, "write ram: %04x (page %d) <- %02x\n", m_address & 0xffff, m_ram_page, data);
-					m_buffer_ram->pointer()[(m_ram_page<<10) | (m_address & 0x03ff)] = data;
+					LOGMASKED(LOG_RW, "write ram: %04x (page %d) <- %02x\n", m_address & 0xffff, rampage, data);
+					m_buffer_ram->pointer()[(rampage<<10) | (m_address & 0x03ff)] = data;
 				}
 			}
 			else
@@ -313,8 +327,8 @@ void snug_bwg_device::write(offs_t offset, uint8_t data)
 				}
 				else
 				{
-					LOGMASKED(LOG_RW, "write ram: %04x (page %d) <- %02x\n", m_address & 0xffff, m_ram_page, data);
-					m_buffer_ram->pointer()[(m_ram_page<<10) | (m_address & 0x03ff)] = data;
+					LOGMASKED(LOG_RW, "write ram: %04x (page %d) <- %02x\n", m_address & 0xffff, rampage, data);
+					m_buffer_ram->pointer()[(rampage<<10) | (m_address & 0x03ff)] = data;
 				}
 			}
 		}
@@ -359,199 +373,136 @@ READ8Z_MEMBER(snug_bwg_device::crureadz)
 		}
 		else
 			*value = 0;
-		LOGMASKED(LOG_CRU, "Read CRU = %02x\n", *value);
+		LOGMASKED(LOG_CRUD, "Read CRU = %02x\n", *value);
 	}
 }
 
 void snug_bwg_device::cruwrite(offs_t offset, uint8_t data)
 {
-//  int drive, drivebit;
-
 	if ((offset & 0xff00)==m_cru_base)
 	{
-		int bit = (offset >> 1) & 0x0f;
-		switch (bit)
-		{
-		case 0:
-			/* (De)select the card. Indicated by a LED on the board. */
-			m_selected = (data != 0);
-			LOGMASKED(LOG_CRU, "Map DSR (bit 0) = %d\n", m_selected);
-			break;
-
-		case 1:
-			// Activate motor
-			if (data==1 && m_lastval==0)
-			{   // on rising edge, set motor_running for 4.23s
-				LOGMASKED(LOG_CRU, "trigger motor (bit 1)\n");
-				set_floppy_motors_running(true);
-			}
-			m_lastval = data;
-			break;
-
-		case 2:
-			/* Set disk ready/hold (bit 2) */
-			// 0: ignore IRQ and DRQ
-			// 1: TMS9900 is stopped until IRQ or DRQ are set
-			// OR the motor stops rotating - rotates for 4.23s after write
-			// to CRU bit 1
-			LOGMASKED(LOG_CRU, "arm wait state logic (bit 2) = %d\n", data);
-			m_WAITena = (data != 0);
-			break;
-
-		case 3:
-			// Load disk heads (HLT pin) (bit 3). Not implemented.
-			LOGMASKED(LOG_CRU, "set head load (bit 3) = %d\n", data);
-			break;
-
-		case 4:
-			// Select drive 0-2 (DSK1-DSK3) (bits 4-6)
-			m_DSEL = (data != 0)? (m_DSEL | 0x01) : (m_DSEL & 0xfe);
-			set_drive();
-			break;
-		case 5:
-			m_DSEL = (data != 0)? (m_DSEL | 0x02) : (m_DSEL & 0xfd);
-			set_drive();
-			break;
-		case 6:
-			m_DSEL = (data != 0)? (m_DSEL | 0x04) : (m_DSEL & 0xfb);
-			set_drive();
-			break;
-
-		case 7:
-			// Select side of disk (bit 7)
-			m_SIDSEL = (data==1)? ASSERT_LINE : CLEAR_LINE;
-			LOGMASKED(LOG_CRU, "set side (bit 7) = %d\n", data);
-			if (m_current_floppy != nullptr) m_current_floppy->ss_w(data);
-			break;
-
-		case 8:
-			// Select drive 3 (DSK4) (bit 8) */
-			m_DSEL = (data != 0)? (m_DSEL | 0x08) : (m_DSEL & 0xf7);
-			set_drive();
-			break;
-
-		case 10:
-			/* double density enable (active low) */
-			LOGMASKED(LOG_CRU, "set double density (bit 10) = %d\n", data);
-			m_wd1773->dden_w(data != 0);
-			break;
-
-		case 11:
-			/* EPROM A13 */
-			if (data != 0)
-				m_rom_page |= 1;
-			else
-				m_rom_page &= 0xfe;  // 11111110
-			LOGMASKED(LOG_CRU, "set ROM page (bit 11) = %d, page = %d\n", bit, m_rom_page);
-			break;
-
-		case 13:
-			/* RAM A10 */
-			m_ram_page = data;
-			LOGMASKED(LOG_CRU, "set RAM page (bit 13) = %d, page = %d\n", bit, m_ram_page);
-			break;
-
-		case 14:
-			/* Override FDC with RTC (active high) */
-			LOGMASKED(LOG_CRU, "turn on RTC (bit 14) = %d\n", data);
-			m_rtc_enabled = (data != 0);
-			break;
-
-		case 15:
-			/* EPROM A14 */
-			if (data != 0)
-				m_rom_page |= 2;
-			else
-				m_rom_page &= 0xfd; // 11111101
-			LOGMASKED(LOG_CRU, "set ROM page (bit 15) = %d, page = %d\n", bit, m_rom_page);
-			break;
-
-		case 9:
-		case 12:
-			/* Unused (bit 3, 9 & 12) */
-			LOGMASKED(LOG_CRU, "set unknown bit %d = %d\n", bit, data);
-			break;
-		}
+		LOGMASKED(LOG_CRUD, "Write CRU address %04x (bit %d) = %d\n", offset, (offset & 0xff)>>1, data);
+		int bitnumber = (offset >> 1) & 0x0f;
+		if (bitnumber < 8)
+			m_crulatch0_7->write_bit(bitnumber, BIT(data, 0));
+		else
+			m_crulatch8_15->write_bit(bitnumber & 0x07, BIT(data, 0));
 	}
 }
 
-/*
-    Set the current drive. See also ti_fdc.c
-*/
-void snug_bwg_device::set_drive()
+WRITE_LINE_MEMBER(snug_bwg_device::den_w)
 {
-	LOGMASKED(LOG_CRU, "new DSEL = %d\n", m_DSEL);
+	// (De)select the card. Indicated by a LED on the board.
+	m_selected = state;
+	LOGMASKED(LOG_CRU, "Map DSR (bit 0) = %d\n", m_selected);
+}
 
-	int bits = m_DSEL & 0x0f;
-	int num = -1;
+WRITE_LINE_MEMBER(snug_bwg_device::mop_w)
+{
+	m_motormf->b_w(state);
+}
 
-	// If the selected floppy drive is not attached, remove that line
-	if (m_floppy[3] == nullptr) bits &= 0x07;  // 0111
-	if (m_floppy[2] == nullptr) bits &= 0x0b;  // 1011
-	if (m_floppy[1] == nullptr) bits &= 0x0d;  // 1101
-	if (m_floppy[0] == nullptr) bits &= 0x0e;  // 1110
+WRITE_LINE_MEMBER(snug_bwg_device::waiten_w)
+{
+	/* Set disk ready/hold (bit 2) */
+	// 0: ignore IRQ and DRQ
+	// 1: TMS9900 is stopped until IRQ or DRQ are set
+	// OR the motor stops rotating - rotates for 4.23s after write
+	// to CRU bit 1
+	LOGMASKED(LOG_CRU, "Arm wait state logic (bit 2) = %d\n", state);
+}
 
-	if ((bits != 0) && (bits != 1) && (bits != 2) && (bits != 4) && (bits != 8))
-		LOGMASKED(LOG_WARN, "Warning - multiple drives selected\n");
+WRITE_LINE_MEMBER(snug_bwg_device::hlt_w)
+{
+	// Load disk heads (HLT pin) (bit 3). Not implemented.
+	LOGMASKED(LOG_CRU, "Set head load (bit 3) = %d\n", state);
+}
 
-	// The schematics do not reveal any countermeasures against multiple selection
-	// so we assume that the highest value wins.
+/* Drive selects */
+WRITE_LINE_MEMBER(snug_bwg_device::dsel1_w)
+{
+	select_drive(1, state);
+}
 
-	if (bits==0)
+WRITE_LINE_MEMBER(snug_bwg_device::dsel2_w)
+{
+	select_drive(2, state);
+}
+
+WRITE_LINE_MEMBER(snug_bwg_device::dsel3_w)
+{
+	select_drive(3, state);
+}
+
+WRITE_LINE_MEMBER(snug_bwg_device::dsel4_w)
+{
+	select_drive(4, state);
+}
+
+void snug_bwg_device::select_drive(int n, int state)
+{
+	if (state == CLEAR_LINE)
 	{
-		m_current_floppy = nullptr;
-		LOGMASKED(LOG_CRU, "All drives deselected\n");
+		LOGMASKED(LOG_CRU, "Unselect drive DSK%d\n", n);
+
+		// Only when no bit is set, unselect all drives.
+		// The DSR actually selects the new drive first, then unselects
+		// the old drive.
+		if ((m_crulatch0_7->q4_r() == 0) && (m_crulatch0_7->q5_r() == 0)
+			&& (m_crulatch0_7->q6_r() == 0) && (m_crulatch8_15->q0_r() == 0))
+		{
+			m_wd1773->set_floppy(nullptr);
+			m_sel_floppy = 0;
+		}
 	}
 	else
 	{
-		if ((bits & 0x08)!=0) num = 3;
-		else
+		LOGMASKED(LOG_CRU, "Select drive DSK%d\n", n);
+		if (m_sel_floppy != 0 && m_sel_floppy != n)
 		{
-			if ((bits & 0x04)!=0) num = 2;
-			else
-			{
-				if ((bits & 0x02)!=0) num = 1;
-				else num = 0;
-			}
+			LOGMASKED(LOG_WARN, "Warning: DSK%d selected while DSK%d not yet unselected\n", n, m_sel_floppy);
 		}
-		LOGMASKED(LOG_CRU, "Selected floppy DSK%d\n", num+1);
-		m_current_floppy = m_floppy[num];
+
+		if (m_floppy[n-1] != nullptr)
+		{
+			m_sel_floppy = n;
+			m_wd1773->set_floppy(m_floppy[n-1]);
+			m_floppy[n-1]->ss_w(m_crulatch0_7->q7_r());
+		}
 	}
-	m_wd1773->set_floppy(m_current_floppy);
 }
 
-/*
-    Monoflop has gone back to the OFF state.
-*/
-void snug_bwg_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+WRITE_LINE_MEMBER(snug_bwg_device::sidsel_w)
 {
-	set_floppy_motors_running(false);
+	// Select side of disk (bit 7)
+	if (m_sel_floppy != 0)
+	{
+		LOGMASKED(LOG_CRU, "Set side (bit 7) = %d on DSK%d\n", state, m_sel_floppy);
+		m_floppy[m_sel_floppy-1]->ss_w(m_crulatch0_7->q7_r());
+	}
+}
+
+WRITE_LINE_MEMBER(snug_bwg_device::dden_w)
+{
+	/* double density enable (active low) */
+	LOGMASKED(LOG_CRU, "Set density (bit 10) = %d (%s)\n", state, (state!=0)? "single" : "double");
+	m_wd1773->dden_w(state != 0);
 }
 
 /*
     All floppy motors are operated by the same line.
 */
-void snug_bwg_device::set_floppy_motors_running(bool run)
+WRITE_LINE_MEMBER(snug_bwg_device::motorona_w)
 {
-	if (run)
-	{
-		if (m_MOTOR_ON==CLEAR_LINE) LOGMASKED(LOG_MOTOR, "Motor START\n");
-		m_MOTOR_ON = ASSERT_LINE;
-		m_motor_on_timer->adjust(attotime::from_msec(4230));
-	}
-	else
-	{
-		if (m_MOTOR_ON==ASSERT_LINE) LOGMASKED(LOG_MOTOR, "Motor STOP\n");
-		m_MOTOR_ON = CLEAR_LINE;
-	}
+	m_MOTOR_ON = state;
+	LOGMASKED(LOG_MOTOR, "Motor %s\n", state? "on" : "off");
 
-	// The motor-on line is connected to pin 20 which is falsely called "MO"
-	// in the schematics; should be called "READY" as we are using the WD1773.
-	m_wd1773->set_force_ready(run);
+	// The monoflop is connected to the READY line
+	m_wd1773->set_force_ready(state==ASSERT_LINE);
 
 	// Set all motors
 	for (auto & elem : m_floppy)
-		if (elem != nullptr) elem->mon_w((run)? 0 : 1);
+		if (elem != nullptr) elem->mon_w((state==ASSERT_LINE)? 0 : 1);
 
 	// The motor-on line also connects to the wait state logic
 	operate_ready_line();
@@ -560,29 +511,18 @@ void snug_bwg_device::set_floppy_motors_running(bool run)
 void snug_bwg_device::device_start()
 {
 	m_dsrrom = memregion(TI99_DSRROM)->base();
-	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
 	m_cru_base = 0x1100;
 
 	save_item(NAME(m_DRQ));
 	save_item(NAME(m_IRQ));
-	save_item(NAME(m_dip1));
-	save_item(NAME(m_dip2));
-	save_item(NAME(m_dip34));
-	save_item(NAME(m_ram_page));
-	save_item(NAME(m_rom_page));
-	save_item(NAME(m_WAITena));
 	save_item(NAME(m_inDsrArea));
 	save_item(NAME(m_WDsel));
 	save_item(NAME(m_WDsel0));
 	save_item(NAME(m_RTCsel));
 	save_item(NAME(m_lastK));
 	save_item(NAME(m_dataregLB));
-	save_item(NAME(m_rtc_enabled));
 	save_item(NAME(m_MOTOR_ON));
-	save_item(NAME(m_lastval));
 	save_item(NAME(m_address));
-	save_item(NAME(m_DSEL));
-	save_item(NAME(m_SIDSEL));
 }
 
 void snug_bwg_device::device_reset()
@@ -598,20 +538,13 @@ void snug_bwg_device::device_reset()
 		m_select_value = 0x74000;
 	}
 
-	m_lastval = 0;
-
 	m_DRQ = CLEAR_LINE;
 	m_IRQ = CLEAR_LINE;
 	m_MOTOR_ON = CLEAR_LINE;
 
-	m_SIDSEL = CLEAR_LINE;
-
 	m_wd1773->set_force_ready(false);
 
-	m_DSEL = 0;
-	m_WAITena = false;
 	m_selected = false;
-	m_rtc_enabled = false;
 	m_dataregLB = false;
 	m_lastK = false;
 	m_RTCsel = false;
@@ -628,14 +561,11 @@ void snug_bwg_device::device_reset()
 			LOGMASKED(LOG_CONFIG, "Connector %d has no floppy attached\n", i);
 	}
 
-	m_wd1773->set_floppy(m_current_floppy = m_floppy[0]);
+	m_wd1773->set_floppy(nullptr);
 
 	m_dip1 = ioport("BWGDIP1")->read();
 	m_dip2 = ioport("BWGDIP2")->read();
 	m_dip34 = ioport("BWGDIP34")->read();
-
-	m_rom_page = 0;
-	m_ram_page = 0;
 }
 
 void snug_bwg_device::device_config_complete()
@@ -700,6 +630,28 @@ void snug_bwg_device::device_add_mconfig(machine_config& config)
 	FLOPPY_CONNECTOR(config, "3", bwg_floppies, nullptr, snug_bwg_device::floppy_formats).enable_sound(true);
 
 	RAM(config, BUFFER).set_default_size("2K").set_default_value(0);
+
+	LS259(config, m_crulatch0_7); // U13
+	m_crulatch0_7->q_out_cb<0>().set(FUNC(snug_bwg_device::den_w));
+	m_crulatch0_7->q_out_cb<1>().set(FUNC(snug_bwg_device::mop_w));
+	m_crulatch0_7->q_out_cb<2>().set(FUNC(snug_bwg_device::waiten_w));
+	m_crulatch0_7->q_out_cb<3>().set(FUNC(snug_bwg_device::hlt_w));
+	m_crulatch0_7->q_out_cb<4>().set(FUNC(snug_bwg_device::dsel1_w));
+	m_crulatch0_7->q_out_cb<5>().set(FUNC(snug_bwg_device::dsel2_w));
+	m_crulatch0_7->q_out_cb<6>().set(FUNC(snug_bwg_device::dsel3_w));
+	m_crulatch0_7->q_out_cb<7>().set(FUNC(snug_bwg_device::sidsel_w));
+
+	LS259(config, m_crulatch8_15); // U12
+	m_crulatch8_15->q_out_cb<0>().set(FUNC(snug_bwg_device::dsel4_w));
+	m_crulatch8_15->q_out_cb<2>().set(FUNC(snug_bwg_device::dden_w));
+
+	// TODO: Replace this by the actual 74HC4538
+	TTL74123(config, m_motormf, 0);
+	m_motormf->out_cb().set(FUNC(snug_bwg_device::motorona_w));
+	m_motormf->set_connection_type(TTL74123_GROUNDED);
+	m_motormf->set_resistor_value(RES_K(200));
+	m_motormf->set_capacitor_value(CAP_U(47));
+	m_motormf->set_clear_pin_value(1);
 }
 
 ioport_constructor snug_bwg_device::device_input_ports() const

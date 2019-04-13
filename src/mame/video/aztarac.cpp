@@ -14,6 +14,12 @@ m_vector->add_point (m_xcenter + ((x) << 16), m_ycenter - ((y) << 16), color, in
 
 
 
+WRITE_LINE_MEMBER(aztarac_state::video_interrupt)
+{
+	if (state)
+		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+}
+
 inline void aztarac_state::read_vectorram(uint16_t *vectorram, int addr, int *x, int *y, int *c)
 {
 	*c = vectorram[addr] & 0xffff;
@@ -23,10 +29,12 @@ inline void aztarac_state::read_vectorram(uint16_t *vectorram, int addr, int *x,
 	if (*y & 0x200) *y |= 0xfffffc00;
 }
 
-WRITE16_MEMBER(aztarac_state::ubr_w)
+void aztarac_state::ubr_w(uint8_t data)
 {
 	int x, y, c, intensity, xoffset, yoffset, color;
 	int defaddr, objaddr=0, ndefs;
+
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 
 	if (data) /* data is the global intensity (always 0xff in Aztarac). */
 	{

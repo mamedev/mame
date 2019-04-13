@@ -7,9 +7,10 @@
     Apple 3.5" disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_AP_DSK35_H
+#define MAME_FORMATS_AP_DSK35_H
 
-#ifndef AP_DSK35_H
-#define AP_DSK35_H
+#pragma once
 
 #include "flopimg.h"
 
@@ -46,4 +47,4 @@ private:
 
 extern const floppy_format_type FLOPPY_DC42_FORMAT;
 
-#endif /* AP_DSK35_H */
+#endif // MAME_FORMATS_AP_DSK35_H

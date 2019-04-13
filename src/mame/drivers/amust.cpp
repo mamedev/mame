@@ -240,7 +240,7 @@ void amust_state::do_int()
 		|| (BIT(m_port0a, 5) && m_drq))        // when reading from floppy, only do it when DRQ is high.
 	{
 		//printf("%X,%X,%X ",m_port0a,sync,m_drq);
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0x00);
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0x00); // Z80
 	}
 	else
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);

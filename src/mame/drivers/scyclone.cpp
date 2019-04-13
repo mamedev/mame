@@ -603,7 +603,7 @@ void scyclone_state::machine_reset()
 INTERRUPT_GEN_MEMBER(scyclone_state::irq)
 {
 	// CPU runs in IM0
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* RST 10h */
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* Z80 - RST 10h */
 }
 
 

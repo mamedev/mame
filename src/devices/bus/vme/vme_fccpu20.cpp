@@ -252,12 +252,17 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
+void vme_fccpu20_device::cpu_space_map(address_map &map)
+{
+	map(0xfffffff2, 0xffffffff).lr16("bim irq", [this](offs_t offset) -> u16 { return m_bim->iack(offset+1); });
+}
+
 void vme_fccpu20_device::device_add_mconfig(machine_config &config)
 {
 	/* basic machine hardware */
 	M68020(config, m_maincpu, CLOCK50 / 3); /* Crytstal verified from picture HCI */
 	m_maincpu->set_addrmap(AS_PROGRAM, &vme_fccpu20_device::cpu20_mem);
-	m_maincpu->set_irq_acknowledge_callback("bim", FUNC(bim68153_device::iack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &vme_fccpu20_device::cpu_space_map);
 
 	/* PIT Parallel Interface and Timer device, assumed strapped for on board clock */
 	PIT68230(config, m_pit, CLOCK32 / 4); /* Crystal not verified */

@@ -7,13 +7,15 @@
     Commodore 1581 disk image format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_D81_DSK_H
+#define MAME_FORMATS_D81_DSK_H
 
-#ifndef D81_DSK_H_
-#define D81_DSK_H_
+#pragma once
 
 #include "wd177x_dsk.h"
 
-class d81_format : public wd177x_format {
+class d81_format : public wd177x_format
+{
 public:
 	d81_format();
 
@@ -29,4 +31,4 @@ private:
 
 extern const floppy_format_type FLOPPY_D81_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_D81_DSK_H

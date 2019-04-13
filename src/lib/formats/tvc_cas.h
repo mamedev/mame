@@ -7,12 +7,13 @@
     Format code for Videoton TVC cassette files
 
 *********************************************************************/
+#ifndef MAME_FORMATS_TVC_CAS_H
+#define MAME_FORMATS_TVC_CAS_H
 
-#ifndef TVC_CAS_H
-#define TVC_CAS_H
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(tvc64_cassette_formats);
 
-#endif /* TVC_CAS_H */
+#endif // MAME_FORMATS_TVC_CAS_H

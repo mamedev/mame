@@ -913,6 +913,8 @@ void geneve_mapper_device::setaddress(offs_t mode, uint16_t address)
 	m_debug_no_ws = false;
 	m_decoded.offset = address;
 
+	m_read_mode = ((mode & TMS99xx_BUS_DBIN)!=0);
+
 	decode_logical(m_read_mode, &m_decoded);
 	if (m_decoded.function == MUNDEF)
 	{
@@ -993,15 +995,6 @@ WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 			m_ready_asserted = false;
 		}
 	}
-}
-
-/*
-    We need the DBIN line for the setaddress operation.
-*/
-WRITE_LINE_MEMBER( geneve_mapper_device::dbin_in )
-{
-	m_read_mode = (state==ASSERT_LINE);
-	LOGMASKED(LOG_DETAIL, "dbin = %02x\n", m_read_mode? 1:0);
 }
 
 /*

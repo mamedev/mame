@@ -55,7 +55,7 @@ All Clocks and Vsync verified by Corrado Tomaselli (August 2012)
 
 INTERRUPT_GEN_MEMBER(vulgus_state::vblank_irq)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h - vblank */
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* Z80 - RST 10h - vblank */
 }
 
 void vulgus_state::main_map(address_map &map)

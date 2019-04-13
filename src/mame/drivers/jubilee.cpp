@@ -340,7 +340,7 @@ WRITE8_MEMBER(jubilee_state::unk_w)
     is set to one. Maybe this one clears the interrupt.
     TODO: Check the schematics.
 */
-	if (((offset<<1)==0x0ce2)&&(data==1))
+	if (((offset<<1)==0x0cf2)&&(data==1))
 	{
 		m_maincpu->set_input_line(INT_9980A_LEVEL1, CLEAR_LINE);
 	}

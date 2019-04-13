@@ -284,7 +284,7 @@ void sega_scu_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			const uint16_t irqmask = 1 << (11-id);
 
 			if(!(m_ism & irqmask))
-				m_hostcpu->set_input_line_and_vector(irqlevel, HOLD_LINE, irqvector);
+				m_hostcpu->set_input_line_and_vector(irqlevel, HOLD_LINE, irqvector); // SH2
 			else
 				m_ist |= (irqmask);
 
@@ -400,7 +400,7 @@ void sega_scu_device::handle_dma_direct(uint8_t level)
 	{
 		//popmessage("Warning: SCU transfer from BIOS area, contact MAMEdev");
 		if(!(m_ism & IRQ_DMAILL))
-			m_hostcpu->set_input_line_and_vector(3, HOLD_LINE, 0x4c);
+			m_hostcpu->set_input_line_and_vector(3, HOLD_LINE, 0x4c); // SH2
 		else
 			m_ist |= (IRQ_DMAILL);
 		return;
@@ -620,7 +620,7 @@ void sega_scu_device::check_scanline_timers(int scanline,int y_step)
 	{
 		if(!(m_ism & IRQ_TIMER_0))
 		{
-			m_hostcpu->set_input_line_and_vector(0xc, HOLD_LINE, 0x43 );
+			m_hostcpu->set_input_line_and_vector(0xc, HOLD_LINE, 0x43 ); // SH2
 			dma_start_factor_ack(3);
 		}
 		else
@@ -635,7 +635,7 @@ void sega_scu_device::check_scanline_timers(int scanline,int y_step)
 	{
 		if(!(m_ism & IRQ_TIMER_1))
 		{
-			m_hostcpu->set_input_line_and_vector(0xb, HOLD_LINE, 0x44 );
+			m_hostcpu->set_input_line_and_vector(0xb, HOLD_LINE, 0x44 ); // SH2
 			dma_start_factor_ack(4);
 		}
 		else
@@ -692,7 +692,7 @@ void sega_scu_device::test_pending_irqs()
 		{
 			if(irq_level[i] != -1) /* TODO: cheap check for undefined irqs */
 			{
-				m_hostcpu->set_input_line_and_vector(irq_level[i], HOLD_LINE, 0x40 + i);
+				m_hostcpu->set_input_line_and_vector(irq_level[i], HOLD_LINE, 0x40 + i); // SH2
 				m_ist &= ~(1 << i);
 				return; /* avoid spurious irqs, correct? */
 			}
@@ -707,7 +707,7 @@ WRITE_LINE_MEMBER(sega_scu_device::vblank_out_w)
 
 	if(!(m_ism & IRQ_VBLANK_OUT))
 	{
-		m_hostcpu->set_input_line_and_vector(0xe, HOLD_LINE, 0x41);
+		m_hostcpu->set_input_line_and_vector(0xe, HOLD_LINE, 0x41); // SH2
 		dma_start_factor_ack(1);
 	}
 	else
@@ -721,7 +721,7 @@ WRITE_LINE_MEMBER(sega_scu_device::vblank_in_w)
 
 	if(!(m_ism & IRQ_VBLANK_IN))
 	{
-		m_hostcpu->set_input_line_and_vector(0xf, HOLD_LINE ,0x40);
+		m_hostcpu->set_input_line_and_vector(0xf, HOLD_LINE ,0x40); // SH2
 		dma_start_factor_ack(0);
 	}
 	else
@@ -735,7 +735,7 @@ WRITE_LINE_MEMBER(sega_scu_device::hblank_in_w)
 
 	if(!(m_ism & IRQ_HBLANK_IN))
 	{
-		m_hostcpu->set_input_line_and_vector(0xd, HOLD_LINE, 0x42);
+		m_hostcpu->set_input_line_and_vector(0xd, HOLD_LINE, 0x42); // SH2
 		dma_start_factor_ack(2);
 	}
 	else
@@ -749,7 +749,7 @@ WRITE_LINE_MEMBER(sega_scu_device::vdp1_end_w)
 
 	if(!(m_ism & IRQ_VDP1_END))
 	{
-		m_hostcpu->set_input_line_and_vector(0x2, HOLD_LINE, 0x4d);
+		m_hostcpu->set_input_line_and_vector(0x2, HOLD_LINE, 0x4d); // SH2
 		dma_start_factor_ack(6);
 	}
 	else
@@ -763,7 +763,7 @@ WRITE_LINE_MEMBER(sega_scu_device::sound_req_w)
 
 	if(!(m_ism & IRQ_SOUND_REQ))
 	{
-		m_hostcpu->set_input_line_and_vector(9, HOLD_LINE, 0x46);
+		m_hostcpu->set_input_line_and_vector(9, HOLD_LINE, 0x46); // SH2
 		dma_start_factor_ack(5);
 	}
 	else
@@ -776,7 +776,7 @@ WRITE_LINE_MEMBER(sega_scu_device::smpc_irq_w)
 		return;
 
 	if(!(m_ism & IRQ_SMPC))
-		m_hostcpu->set_input_line_and_vector(8, HOLD_LINE, 0x47);
+		m_hostcpu->set_input_line_and_vector(8, HOLD_LINE, 0x47); // SH2
 	else
 		m_ist |= (IRQ_SMPC);
 }
@@ -787,7 +787,7 @@ WRITE_LINE_MEMBER(sega_scu_device::scudsp_end_w)
 		return;
 
 	if(!(m_ism & IRQ_DSP_END))
-		m_hostcpu->set_input_line_and_vector(0xa, HOLD_LINE, 0x45);
+		m_hostcpu->set_input_line_and_vector(0xa, HOLD_LINE, 0x45); // SH2
 	else
 		m_ist |= (IRQ_DSP_END);
 
