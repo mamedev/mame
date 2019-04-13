@@ -61,10 +61,10 @@ public:
 	auto n_csync() { return m_n_csync_cb.bind(); }
 	auto n_int() { return m_n_int_cb.bind(); }
 	auto n_nmi() { return m_n_nmi_cb.bind(); }
+	auto n_nmi_in() { return m_n_nmi_in_cb.bind(); }
 
 	void psg_w(u8 data) { m_snsnd->write(data); }
 	void psg_stereo_w(u8 data) { m_snsnd->stereo_w(data); }
-	void n_nmi_in_write(int state) { m_n_nmi_in_state = state; } /* /NMI-IN line input, controls the /NMI state */
 	u8 data_read();
 	void data_write(u8 data);
 	u8 control_read();
@@ -150,7 +150,6 @@ protected:
 	bool             m_sega315_5124_compatibility_mode;    /* when true, GG VDP behaves as SMS VDP */
 	int              m_n_int_state;                /* The status of the /INT line of the VDP */
 	int              m_n_nmi_state;                /* The status of the /NMI line of the VDP */
-	int              m_n_nmi_in_state;             /* The status of the /NMI-IN line of the VDP */
 	int              m_vdp_mode;                 /* Current mode of the VDP: 0,1,2,3,4 */
 	int              m_y_pixels;                 /* 192, 224, 240 */
 	int              m_draw_time;
@@ -180,6 +179,7 @@ protected:
 	devcb_write_line m_n_csync_cb;     /* /C-SYNC line callback function */
 	devcb_write_line m_n_int_cb;       /* /INT (Interrupt) line callback function */
 	devcb_write_line m_n_nmi_cb;       /* /NMI (Non-Maskable Interrupt) line callback function */
+	devcb_read_line  m_n_nmi_in_cb;    /* /NMI-IN line callback, controls the /NMI state */
 	emu_timer        *m_display_timer;
 	emu_timer        *m_hint_timer;
 	emu_timer        *m_vint_timer;

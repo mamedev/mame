@@ -191,6 +191,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, m_n_csync_cb(*this)
 	, m_n_int_cb(*this)
 	, m_n_nmi_cb(*this)
+	, m_n_nmi_in_cb(*this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(FUNC(sega315_5124_device::sega315_5124), this))
 	, m_palette(*this, "palette")
 	, m_snsnd(*this, "snsnd")
@@ -452,17 +453,23 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 		break;
 
 	case TIMER_NMI:
-		if (!m_n_nmi_in_state)
+		if (!m_n_nmi_in_cb.isnull())
 		{
-			if (m_n_nmi_state)
-				m_n_nmi_cb(ASSERT_LINE);
+			if (!m_n_nmi_in_cb())
+			{
+				if (m_n_nmi_state == 1)
+					m_n_nmi_cb(ASSERT_LINE);
+
+				m_n_nmi_state = 0;
+			}
+			else
+			{
+				if (m_n_nmi_state == 0)
+					m_n_nmi_cb(CLEAR_LINE);
+
+				m_n_nmi_state = 1;
+			}
 		}
-		else
-		{
-			if (!m_n_nmi_state)
-				m_n_nmi_cb(CLEAR_LINE);
-		}
-		m_n_nmi_state = m_n_nmi_in_state;
 		break;
 	}
 }
@@ -1863,6 +1870,7 @@ void sega315_5124_device::device_start()
 	m_n_csync_cb.resolve();
 	m_n_int_cb.resolve();
 	m_n_nmi_cb.resolve();
+	m_n_nmi_in_cb.resolve();
 
 	/* Make temp bitmap for rendering */
 	screen().register_screen_bitmap(m_tmpbitmap);
@@ -1897,7 +1905,6 @@ void sega315_5124_device::device_start()
 	save_item(NAME(m_display_disabled));
 	save_item(NAME(m_n_int_state));
 	save_item(NAME(m_n_nmi_state));
-	save_item(NAME(m_n_nmi_in_state));
 	save_item(NAME(m_vdp_mode));
 	save_item(NAME(m_y_pixels));
 	save_item(NAME(m_line_counter));
@@ -1950,7 +1957,6 @@ void sega315_5124_device::device_reset()
 	m_control_write_data_latch = 0;
 	m_n_int_state = 1;
 	m_n_nmi_state = 1;
-	m_n_nmi_in_state = 1;
 	m_line_counter = 0;
 	m_hcounter = 0;
 	m_hcounter_latched = false;

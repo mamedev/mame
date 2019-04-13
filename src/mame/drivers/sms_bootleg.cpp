@@ -297,6 +297,7 @@ void smsbootleg_state::sms_supergame(machine_config &config)
 	m_vdp->set_is_pal(false);
 	m_vdp->n_int().set_inputline(m_maincpu, 0);
 	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->n_nmi_in().set([this] () { return (m_port_pause->read() & 0x80) ? 1 : 0; });
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
@@ -307,7 +308,7 @@ void smsbootleg_state::sms_supergame(machine_config &config)
 static INPUT_PORTS_START( sms_supergame )
 	PORT_START("PAUSE")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )// PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1) PORT_WRITE_LINE_DEVICE_MEMBER("sms_vdp", sega315_5124_device, n_nmi_in_write)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )// PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1)
 #if 0
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
