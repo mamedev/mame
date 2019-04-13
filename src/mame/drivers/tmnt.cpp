@@ -171,7 +171,7 @@ INTERRUPT_GEN_MEMBER(tmnt_state::lgtnfght_interrupt)
 
 WRITE8_MEMBER(tmnt_state::glfgreat_sound_w)
 {
-	m_k053260->main_write(space, offset, data);
+	m_k053260->main_write(offset, data);
 
 	if (offset)
 		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
