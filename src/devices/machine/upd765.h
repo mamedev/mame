@@ -257,7 +257,7 @@ protected:
 
 	static constexpr int rates[4] = { 500000, 300000, 250000, 1000000 };
 
-	bool ready_connected, ready_polled, select_connected;
+	bool ready_connected, ready_polled, select_connected, select_multiplexed;
 
 	bool external_ready;
 

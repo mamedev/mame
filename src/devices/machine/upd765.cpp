@@ -175,6 +175,7 @@ upd765_family_device::upd765_family_device(const machine_config &mconfig, device
 	ready_polled = true;
 	ready_connected = true;
 	select_connected = true;
+	select_multiplexed = true;
 	external_ready = false;
 	dor_reset = 0x00;
 	mode = MODE_AT;
@@ -295,7 +296,8 @@ void upd765_family_device::soft_reset()
 	cur_live.fi = nullptr;
 	tc_done = false;
 	st1 = st2 = st3 = 0x00;
-	selected_drive = -1;
+
+	set_ds(select_multiplexed ? 0 : -1);
 
 	check_irq();
 	if(ready_polled)
@@ -345,8 +347,11 @@ void upd765_family_device::set_ds(int fid)
 void upd765_family_device::set_floppy(floppy_image_device *flop)
 {
 	for(floppy_info & elem : flopi) {
-		if(elem.dev)
+		if(elem.dev) {
 			elem.dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
+			if(elem.dev != flop)
+				elem.dev->ds_w(-1);
+		}
 		elem.dev = flop;
 	}
 	if(flop)
@@ -2914,12 +2919,14 @@ smc37c78_device::smc37c78_device(const machine_config &mconfig, const char *tag,
 {
 	ready_connected = false;
 	select_connected = true;
+	select_multiplexed = false;
 }
 
 n82077aa_device::n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, N82077AA, tag, owner, clock)
 {
 	ready_connected = false;
 	select_connected = true;
+	select_multiplexed = false;
 }
 
 pc_fdc_superio_device::pc_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, tag, owner, clock)
@@ -2927,6 +2934,7 @@ pc_fdc_superio_device::pc_fdc_superio_device(const machine_config &mconfig, cons
 	ready_polled = false;
 	ready_connected = false;
 	select_connected = true;
+	select_multiplexed = false;
 }
 
 dp8473_device::dp8473_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, DP8473, tag, owner, clock)
@@ -2934,6 +2942,7 @@ dp8473_device::dp8473_device(const machine_config &mconfig, const char *tag, dev
 	ready_polled = false;
 	ready_connected = false;
 	select_connected = true;
+	select_multiplexed = false;
 }
 
 pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, PC8477A, tag, owner, clock)
@@ -2941,6 +2950,7 @@ pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, d
 	ready_polled = true;
 	ready_connected = false;
 	select_connected = true;
+	select_multiplexed = false;
 }
 
 wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, WD37C65C, tag, owner, clock)
@@ -2948,6 +2958,7 @@ wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag,
 	ready_polled = true;
 	ready_connected = false;
 	select_connected = true;
+	select_multiplexed = false;
 }
 
 mcs3201_device::mcs3201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -2958,6 +2969,7 @@ mcs3201_device::mcs3201_device(const machine_config &mconfig, const char *tag, d
 	ready_polled = false;
 	ready_connected = false;
 	select_connected = true;
+	select_multiplexed = false;
 }
 
 void mcs3201_device::device_start()
@@ -2978,6 +2990,7 @@ tc8566af_device::tc8566af_device(const machine_config &mconfig, const char *tag,
 	ready_polled = true;
 	ready_connected = true;
 	select_connected = true;
+	select_multiplexed = false;
 }
 
 void tc8566af_device::device_start()
