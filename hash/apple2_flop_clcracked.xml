@@ -35,7 +35,7 @@
 		<description>2400 A.D. (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Origin Systems</publisher>
-		<info name="release" value="2018-09-23"/>
+		<info name="release" value="2018-09-24"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -56,7 +56,7 @@
 		<description>A Christmas Adventure (cleanly cracked)</description>
 		<year>1984</year>
 		<publisher>Bitcards</publisher>
-		<info name="release" value="2019-01-15"/>
+		<info name="release" value="2019-01-16"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -90,6 +90,7 @@
 		<description>Aliens (cleanly cracked)</description>
 		<year>1986</year>
 		<publisher>Activision</publisher>
+		<info name="release" value="2015-08-27"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -110,6 +111,7 @@
 		<description>Aztec (cleanly cracked)</description>
 		<year>1982</year>
 		<publisher>Datamost</publisher>
+		<info name="release" value="2016-07-26"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -122,7 +124,7 @@
 	<software name="amchal">
 		<description>The American Challenge (cleanly cracked)</description>
 		<year>1986</year>
-		<publisher>MIndscape</publisher>
+		<publisher>Mindscape</publisher>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -156,6 +158,7 @@
 		<description>Batman (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Data East</publisher>
+		<info name="release" value="2015-08-02"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -176,6 +179,7 @@
 		<description>BASIC Building Blocks (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Micro Education</publisher>
+		<info name="release" value="2015-10-26"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -210,6 +214,7 @@
 		<description>Bubble Bobble (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Taito America / NovaLogic</publisher>
+		<info name="release" value="2017-08-23"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -364,10 +369,10 @@
 
 	<software name="genesis">
 		<description>Genesis (cleanly cracked)</description>
-		<!-- Original disk wouldn't boot on 65C02 or later -->
 		<year>1983</year>
 		<publisher>Datasoft / Design Labs</publisher>
 		<!-- No compatibility data known at this time. -->
+		<!-- Original disk wouldn't boot on 65C02 or later -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -417,10 +422,10 @@
 
 	<software name="heist">
 		<description>The Heist (cleanly cracked)</description>
-		<!-- High scores stored on disc, reset to AAA 5000, BBB 4000, CCC 3000, DDD 2000 & EEE 1000 -->
 		<year>1983</year>
 		<publisher>Microlab</publisher>
 		<!-- No compatibility data known at this time. -->
+		<!-- High scores stored on disc, reset to AAA 5000, BBB 4000, CCC 3000, DDD 2000 & EEE 1000 -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -457,10 +462,10 @@
 
 	<software name="minr2049">
 		<description>Miner 2049er (cleanly cracked)</description>
-		<!-- High scores stored on disc, reset to AAA 5000, AAA 4000, AAA 3000, AAA 2000 & AAA 1000 -->
 		<year>1982</year>
 		<publisher>Micro Fun</publisher>
 		<!-- No compatibility data known at this time. -->
+		<!-- High scores stored on disc, reset to AAA 5000, AAA 4000, AAA 3000, AAA 2000 & AAA 1000 -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -496,13 +501,13 @@
 	</software>
 
 	<software name="nightmar">
-		<!-- Left & Right arrows or Paddle0 for controls - Select with "K" for keyboard / "P" for paddle -->
-		<!-- press SLASH "/" to fire with keyboard or use Button0 when using the paddle -->
-		<!-- "C" for continuous fire, SPACE BAR for shields, CRTL-S toggles sound on/off, ESC for pause  -->
 		<description>Nightmare Gallery (cleanly cracked)</description>
 		<year>1982</year>
 		<publisher>Synergistic Software</publisher>
 		<!-- No compatibility data known at this time. -->
+		<!-- Left & Right arrows or Paddle0 for controls - Select with "K" for keyboard / "P" for paddle -->
+		<!-- press SLASH "/" to fire with keyboard or use Button0 when using the paddle -->
+		<!-- "C" for continuous fire, SPACE BAR for shields, CRTL-S toggles sound on/off, ESC for pause  -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -512,7 +517,7 @@
 	</software>
 
 	<software name="pacman">
-		<description>Pac-Man - Atari (cleanly cracked)</description>
+		<description>Pac-Man (Atari) (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<!-- No compatibility data known at this time. -->
@@ -525,7 +530,7 @@
 	</software>
 
 	<software name="pacmand">
-		<description>Pac-Man - Datasoft (cleanly cracked)</description>
+		<description>Pac-Man (Datasoft) (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Datasoft / Namco America</publisher>
 		<!-- No compatibility data known at this time. -->
@@ -538,7 +543,7 @@
 	</software>
 
 	<software name="pacmant">
-		<description>Pac-Man - Thunder Mountain (cleanly cracked)</description>
+		<description>Pac-Man (Thunder Mountain copyight) (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Thunder Mountain / Namco</publisher>
 		<!-- No compatibility data known at this time. -->
@@ -748,10 +753,10 @@
 
 	<software name="tapper">
 		<description>Tapper (cleanly cracked)</description>
-		<!-- Corrected rerip 09/19/2016 -->
 		<year>1983</year>
 		<publisher>Bally/Midway</publisher>
 		<!-- No compatibility data known at this time. -->
+		<!-- Corrected rerip 09/19/2016 -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -762,12 +767,12 @@
 
 	<software name="thief">
 		<description>Thief (cleanly cracked)</description>
-		<!-- Apple II clone of Berzerk arcade game by Bob Flanagan - Thief: "The damn things nearly killed me." -->
-		<!-- All files transfered from a highly protected DOS 3.2 disc to a PronoDOS disc -->
-		<!-- Also includes a single file BRUNable conversion of the game -->
 		<year>1981</year>
 		<publisher>Datamost</publisher>
 		<!-- No compatibility data known at this time. -->
+		<!-- Apple II clone of Berzerk arcade game by Bob Flanagan - Thief: "The damn things nearly killed me." -->
+		<!-- All files transfered from a highly protected DOS 3.2 disc to a PronoDOS disc -->
+		<!-- Also includes a single file BRUNable conversion of the game -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -806,6 +811,7 @@
 		<description>Ace Detective (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Mindplay</publisher>
+		<info name="release" value="2015-04-24"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -826,7 +832,7 @@
 		<description>Ace Detective revision 2 (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Mindplay</publisher>
-		<info name="release" value="2015-07-24"/>
+		<info name="release" value="2015-07-14"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -847,6 +853,7 @@
 		<description>Mathematics Courseware Series: Addition and Subtraction 1 (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>Scott, Foresman and Company</publisher>
+		<info name="release" value="2014-08-20"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -873,6 +880,7 @@
 		<description>Alfred's Basic Piano Theory Software (cleanly cracked)</description>
 		<year>1986</year>
 		<publisher>Alfred Publishing Company</publisher>
+		<info name="release" value="2014-08-21"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -886,6 +894,7 @@
 		<description>Agent USA (cleanly cracked)</description>
 		<year>1984</year>
 		<publisher>Scholastic</publisher>
+		<info name="release" value="2015-05-11"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -899,6 +908,7 @@
 		<description>Alphabet Circus (cleanly cracked)</description>
 		<year>1984</year>
 		<publisher>NeoSoft</publisher>
+		<info name="release" value="2015-05-26"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -912,6 +922,7 @@
 		<description>Alice in Wonderland (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>Windham Classics</publisher>
+		<info name="release" value="2015-05-04"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -928,10 +939,11 @@
 		</part>
 	</software>
 
-	<software name="algebra2">
+	<software name="ewalgeb2">
 		<description>Algebra 2 (cleanly cracked)</description>
 		<year>1982</year>
 		<publisher>Edu-Ware</publisher>
+		<info name="release" value="2014-04-25"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -945,6 +957,7 @@
 		<description>Alge-Blaster Plus! (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Davidson &amp; Associates, Inc.</publisher>
+		<info name="release" value="2014-11-17"/>
 		<info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
 		<!-- No compatibility data known at this time. -->
 
@@ -978,6 +991,7 @@
 		<description>Algernon (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Sunburst</publisher>
+		<info name="release" value="2015-03-17"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1004,6 +1018,7 @@
 		<description>Alien Addition (cleanly cracked)</description>
 		<year>1982</year>
 		<publisher>Developmental Learning Materials</publisher>
+		<info name="release" value="2015-03-20"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1037,6 +1052,7 @@
 		<description>Animal Kingdom (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>Unicorn Software</publisher>
+		<info name="release" value="2014-08-21"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1057,6 +1073,7 @@
 		<description>Arkanoid (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Taito America</publisher>
+		<info name="release" value="2015-03-03"/>
 		<info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
 		<!-- No compatibility data known at this time. -->
 
@@ -1084,6 +1101,7 @@
 		<description>Band Saw and Shaper Safety (cleanly cracked)</description>
 		<year>1986</year>
 		<publisher>Abraxas Basic Courseware</publisher>
+		<info name="release" value="2014-07-26"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1123,6 +1141,7 @@
 		<description>Beer Run (cleanly cracked)</description>
 		<year>1981</year>
 		<publisher>Sirius Software</publisher>
+		<info name="release" value="2015-05-25"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1273,6 +1292,7 @@
 		<description>BurgerTime (cleanly cracked)</description>
 		<year>1982</year>
 		<publisher>Mattel Electronics</publisher>
+		<info name="release" value="2015-12-31"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1286,6 +1306,7 @@
 		<description>Battlezone (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
+		<info name="release" value="2015-03-19"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1299,6 +1320,7 @@
 		<description>California Games (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
+		<info name="release" value="2014-08-20"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1319,6 +1341,7 @@
 		<description>Calendar Skills (version 08.31.86) (cleanly cracked)</description>
 		<year>1986</year>
 		<publisher>Hartley Courseware, Inc.</publisher>
+		<info name="release" value="2014-12-03"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1477,6 +1500,7 @@
 		<description>Championship Lode Runner (cleanly cracked)</description>
 		<year>1984</year>
 		<publisher>Broderbund</publisher>
+		<info name="release" value="2015-03-26"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1490,6 +1514,7 @@
 		<description>Championship Wrestling (cleanly cracked)</description>
 		<year>1986</year>
 		<publisher>Epyx</publisher>
+		<info name="release" value="2015-03-04"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2961,13 +2986,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
-				<dataarea name="flop" size="143360">
+			<dataarea name="flop" size="143360">
 				<rom name="a treasure hunt of facts (4am crack) disk 1 - addition and subtraction.dsk" size="143360" crc="1549243e" sha1="60a8e419d93f1e7fb36ac3d6479a9c565d5fba18" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
-				<dataarea name="flop" size="143360">
+			<dataarea name="flop" size="143360">
 				<rom name="a treasure hunt of facts (4am crack) disk 2 - multiplication and division.dsk" size="143360" crc="74a85cc3" sha1="45ad62fff8e7c4110ab0ec0dbacf147b734ee848" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -2996,6 +3021,393 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="a newbery adventure - a wrinkle in time (4am crack).dsk" size="143360" crc="76275127" sha1="8134d7e6c74917c1ab16abe33005b55eb0d53e25" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adjectiv">
+		<description>Adjectives (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2016-03-07"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="adjectives (4am crack).dsk" size="143360" crc="a7bcb572" sha1="9fb33b14557dd5d0bd8ccd5a691a5e2f7b2f125b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adjct062984">
+		<description>Adjectives (version 06.29.84) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2017-12-12"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="adjectives 06.29.84 (4am crack).dsk" size="143360" crc="ae4afb02" sha1="d78d91b0d4d3d11d098721470ed504ca978561c6" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="agendafl">
+		<description>Agenda Files (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Apple Computer</publisher>
+		<!-- Dump release date not known at this time. -->
+		<info name="release" value="2018-06-09"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="agenda files (4am and san inc crack).dsk" size="143360" crc="295200b8" sha1="af9f4e89b991375cfe7d5ebd44f00872ed096a81" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airnavwkshp">
+		<description>Air Nav Workshop (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Space-Time Associates</publisher>
+		<info name="release" value="2018-10-07"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="air nav workshop (4am crack).dsk" size="143360" crc="eeb1948e" sha1="4608930539bc0d13e15da6278154ae59e4896726" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ardprlhb">
+		<description>Air Raid Pearl Harbor (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>General Quarters Software</publisher>
+		<info name="release" value="2017-07-12"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="air raid pearl harbor (4am crack) side a.dsk" size="143360" crc="0b595d0e" sha1="0d37d9fc5e87aab354c49c789edca117a100f30e" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="air raid pearl harbor (4am crack) side b.dsk" size="143360" crc="3c761ff7" sha1="99edd40be58e355390bd2b51df6ffb282689ba62" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airtrafc">
+		<description>Air Traffic Controller (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Avant-Garde Creations</publisher>
+		<info name="release" value="2016-02-25"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="air traffic controller (4am crack).dsk" size="143360" crc="bfcd4275" sha1="ed4088671a278892ed80511b3034a3f086e71528" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alaska">
+		<description>Alaska (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Applecart Programs for Education</publisher>
+		<info name="release" value="2015-07-03"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - The Great Land"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alaska (4am crack) disk 1 - the great land.dsk" size="143360" crc="8e239ce9" sha1="00ba7b16a0823aebcf2291551401e211d632bcc8" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - First People - Alaska's Natives - Part 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alaska (4am crack) disk 2 - first people - alaska's natives part one.dsk" size="143360" crc="046574d5" sha1="95e854dd919e07dbd36da49d2b023fc63314f92d" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - First People - Alaska's Natives - Part 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alaska (4am crack) disk 3 - first people - alaska's natives part two.dsk" size="143360" crc="dc1b50ef" sha1="c2e38d925892446f4967e8eea6f1bae9410cace6" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - First People - Alaska's Natives - Part 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alaska (4am crack) disk 4 - first people - alaska's natives part three.dsk" size="143360" crc="81482b02" sha1="f46325e4961ea4ac9b11f252f4304a686aee8d0e" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 - First People - Alaska's Natives - Part 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alaska (4am crack) disk 5 - first people - alaska's natives part four.dsk" size="143360" crc="f2043041" sha1="4b36a0a1c81e8bf993d702057c42945d88e888bf" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6 - First People - Alaska's Natives - Questions"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alaska (4am crack) disk 6 - first people - alaska's natives questions.dsk" size="143360" crc="d2bd2d81" sha1="b22f4c6a8c149326a4b6c96fce17141ad11ecac1" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7 - New People - Russian Exploration"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alaska (4am crack) disk 7 - new people - russian exploration.dsk" size="143360" crc="f2c27648" sha1="9af6c43c81b00cc80cd1ab268678bb2db89f8c96" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 8 - New People - Russian America 1781-1819"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alaska (4am crack) disk 8 - new people - russian america 1781-1819.dsk" size="143360" crc="10285c07" sha1="9b92b9400ff8d6020bbcc03fbf704305a6b7b1bc" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 9 - New People - Russian America 1820-1867"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alaska (4am crack) disk 9 - new people - russian america 1820-1867.dsk" size="143360" crc="eb3e2059" sha1="6ece2cba863df073b511fb962fe110a8593e9b56" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 10 - Letters from Alaska"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alaska (4am crack) disk 10 - letters from alaska.dsk" size="143360" crc="b92335bb" sha1="d9b7dbfa493fe85ac029dda52e8332de60c661d2" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eaalibab">
+		<description>Ali Baba and the Forty Thieves (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2017-03-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ali baba and the forty thieves (4am and san inc crack).dsk" size="143360" crc="75d7cdc3" sha1="9b3abba0d6de9b01b0606618b7bd080d44f6c592" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliclogo">
+		<description>Alice in LogoLand (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Krell Software</publisher>
+		<info name="release" value="2014-08-20"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alice in logoland (4am crack).dsk" size="143360" crc="b10ee766" sha1="7f5f1fc4ee9c3e5b208a328ff9d62863695f1ec9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alcwndrlr2">
+		<description>Alice in Wonderland rev. 2 (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Windham Classics</publisher>
+		<info name="release" value="2018-09-28"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alice in wonderland rev. 2 (4am crack) side a.dsk" size="143360" crc="e9a946e8" sha1="1d23a33c504df204af50d32093010c41f15d8cdc" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alice in wonderland rev. 2 (4am crack) side b.dsk" size="143360" crc="f249da10" sha1="9ec87f245a6ad0a0414f0b5b1a9c66da94719db0" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abasband">
+		<description>Alfred's Basic Band Computer Tutor (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Alfred Publishing Company</publisher>
+		<info name="release" value="2015-06-16"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alfred's basic band computer tutor (4am crack) disk 1.dsk" size="143360" crc="b5baa46a" sha1="59fc23190829d0028c8c728c586251f8d0cb3366" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alfred's basic band computer tutor (4am crack) disk 2 - preview disk.dsk" size="143360" crc="40907345" sha1="39fd7f07099dd01905d7ebcfed5ece61da3cac35" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ewalgeb1">
+		<description>Algebra Volume 1 (Edu-Ware) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Edu-Ware</publisher>
+		<info name="release" value="2015-04-27"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="algebra volume 1 (edu-ware) (4am crack).dsk" size="143360" crc="3c53e46c" sha1="e9266c93e1acd293010aeaf44159812ceee5db47" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ewalg113">
+		<description>Algebra Volume 1 v1.3 (Edu-Ware) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Edu-Ware</publisher>
+		<info name="release" value="2015-07-17"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="algebra volume 1 v1.3 (4am crack).dsk" size="143360" crc="faef1e45" sha1="e970fd06712c05c06b005a7b548591d21ee2c907" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ewalg211">
+		<description>Algebra Volume 2 v1.1 (Edu-Ware) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Edu-Ware</publisher>
+		<info name="release" value="2015-08-07"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="algebra volume 2 v1.1 (4am crack).dsk" size="143360" crc="e217f095" sha1="2a826b7c367b33ee5aa310f47452e5dd66bf3d15" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ewalg312">
+		<description>Algebra Volume 3 v1.2 (Edu-Ware) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Edu-Ware</publisher>
+		<info name="release" value="2015-08-07"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="algebra volume 3 v1.2 (4am crack).dsk" size="143360" crc="6ba4aa97" sha1="297f0087730ab04d38c6dbde6405304d1c6ce26f" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ewalg410">
+		<description>Algebra Volume 4 v1.0 (Edu-Ware) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Edu-Ware</publisher>
+		<info name="release" value="2015-08-07"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="algebra volume 4 v1.0 (4am crack).dsk" size="143360" crc="968d3e45" sha1="91346a212faab28d992a1d6570bb85a878219674" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psalg512">
+		<description>Algebra Volume 5 v1.2 (Peachetree) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Peachtree Software</publisher>
+		<info name="release" value="2016-04-12"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="algebra volume 5 v1.2 (4am crack).dsk" size="143360" crc="28dbb4b0" sha1="088ce244d7fe5485ef2a732c560cbc685e1bbf88" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psalg612">
+		<description>Algebra Volume 6 v1.2 (Peachtree) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Peachtree Software</publisher>
+		<info name="release" value="2016-04-12"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="algebra volume 6 v1.2 (4am crack).dsk" size="143360" crc="7793768a" sha1="d4192d4ac569b610d67b9467b0010a9d89e286b5" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="algeblst">
+		<description>Alge-Blaster (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Davidson &amp; Associates</publisher>
+		<info name="release" value="2016-12-04"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alge-blaster (4am crack) side a.dsk" size="143360" crc="6281add0" sha1="ee14ba87d154b8892406b76b28df07153e94b012" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alge-blaster (4am crack) side b.dsk" size="143360" crc="df699a73" sha1="35835eb83a959ef0ba8b63683b3f674f3955d0aa" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alnaddv2">
+		<description>Alien Addition revision 2 (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Developmental Learning</publisher>
+		<info name="release" value="2015-11-07"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alien addition revision 2 (4am crack).dsk" size="143360" crc="431ff422" sha1="3b31f7f70b0b36a291fb32cf146ceb300be676a9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alnadd82">
+		<description>Alien Addition 1982.0 (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Developmental Learning</publisher>
+		<info name="release" value="2017-09-08"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alien addition 1982.0 (4am crack).dsk" size="143360" crc="ab9ad63c" sha1="3af54aab6b6001bcb5e40a6fbeee4540e44f938c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alnadd85">
+		<description>Alien Addition 1985 (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Developmental Learning</publisher>
+		<info name="release" value="2017-06-29"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alien addition 1985 (4am crack).dsk" size="143360" crc="6f49910e" sha1="1e5bceb1c965f06d11af6fb8f21bd2bbc9564665" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

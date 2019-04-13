@@ -6465,4 +6465,18 @@
 		</part>
 	</software>
 
+	<software name="avdemuf">
+		<description>Advanced Demuffin (version 1.5)</description>
+		<year>2014</year>
+		<publisher>4AM</publisher>
+		<info name="release" value="2014-08-21"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="advanced demuffin 1.5.dsk" size="143360" crc="ee5b1224" sha1="cc1991407cbdf37de68d33c2b39acdc973254207" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
