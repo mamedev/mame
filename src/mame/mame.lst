@@ -15533,6 +15533,10 @@ amu880                          //
 @source:hunter2.cpp
 hunter2                         //
 
+@source:hunter16.cpp
+hunter16                        //
+hunter1680                      //
+
 @source:hvyunit.cpp
 hvyunit                         // (c) 1988 Kaneko
 hvyunitj                        // (c) 1988 Kaneko

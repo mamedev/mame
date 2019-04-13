@@ -336,6 +336,7 @@ ht6000.cpp
 ht68k.cpp
 huebler.cpp
 hunter2.cpp
+hunter16.cpp
 hx20.cpp
 hyperscan.cpp
 i7000.cpp
