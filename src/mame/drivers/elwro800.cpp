@@ -115,8 +115,9 @@ uint8_t elwro800_state::nmi_r()
 
 WRITE8_MEMBER(elwro800_state::elwro800jr_fdc_control_w)
 {
-	m_upd765_0->get_device()->mon_w(!BIT(data, 0));
-	m_upd765_1->get_device()->mon_w(!BIT(data, 1));
+	for (int i = 0; i < 2; i++)
+		if (m_flop[i]->get_device())
+			m_flop[i]->get_device()->mon_w(!BIT(data, i));
 
 	m_upd765->tc_w(data & 0x04);
 

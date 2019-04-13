@@ -158,6 +158,9 @@ http://www.z88forever.org.uk/zxplus3e/
 
 #include "formats/tzx_cas.h"
 
+#define VERBOSE 0
+#include "logmacro.h"
+
 /****************************************************************************************************/
 /* Spectrum + 3 specific functions */
 /* This driver uses some of the spectrum_128 functions. The +3 is similar to a spectrum 128
@@ -200,12 +203,12 @@ void spectrum_state::spectrum_plus3_update_memory()
 {
 	if (m_port_7ffd_data & 8)
 	{
-		logerror("+3 SCREEN 1: BLOCK 7\n");
+		LOG("+3 SCREEN 1: BLOCK 7\n");
 		m_screen_location = m_ram->pointer() + (7 << 14);
 	}
 	else
 	{
-		logerror("+3 SCREEN 0: BLOCK 5\n");
+		LOG("+3 SCREEN 0: BLOCK 5\n");
 		m_screen_location = m_ram->pointer() + (5 << 14);
 	}
 
@@ -216,7 +219,7 @@ void spectrum_state::spectrum_plus3_update_memory()
 		unsigned char *ram_data = m_ram->pointer() + (ram_page<<14);
 		membank("bank4")->set_base(ram_data);
 
-		logerror("RAM at 0xc000: %02x\n", ram_page);
+		LOG("RAM at 0xc000: %02x\n", ram_page);
 
 		/* Reset memory between 0x4000 - 0xbfff in case extended paging was being used */
 		/* Bank 5 in 0x4000 - 0x7fff */
@@ -241,7 +244,7 @@ void spectrum_state::spectrum_plus3_update_memory()
 		ram_data = m_ram->pointer() + (memory_selection[3] << 14);
 		membank("bank4")->set_base(ram_data);
 
-		logerror("extended memory paging: %02x\n", MemorySelection);
+		LOG("extended memory paging: %02x\n", MemorySelection);
 	}
 }
 
@@ -315,8 +318,9 @@ WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_1ffd_w )
 	/* D3 - Disk motor on/off */
 	/* D4 - parallel port strobe */
 
-	m_upd765_0->get_device()->mon_w(!BIT(data, 3));
-	m_upd765_1->get_device()->mon_w(!BIT(data, 3));
+	for (auto &flop : m_flop)
+		if (flop->get_device())
+			flop->get_device()->mon_w(!BIT(data, 3));
 
 	m_port_1ffd_data = data;
 
@@ -373,6 +377,15 @@ void spectrum_state::init_plus2()
 	m_floppy = 0;
 }
 
+void spectrum_state::plus3_us_w(uint8_t data)
+{
+	// US1 is not connected, so US0 alone selects either drive
+	floppy_image_device *flop = m_flop[data & 1]->get_device();
+	m_upd765->set_floppy(flop);
+	if (flop)
+		flop->ds_w(data & 1);
+}
+
 static void specpls3_floppies(device_slot_interface &device)
 {
 	device.option_add("3ssdd", FLOPPY_3_SSDD);
@@ -410,9 +423,10 @@ void spectrum_state::spectrum_plus3(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_plus3 )
 
-	UPD765A(config, m_upd765, 4'000'000, true, true);
-	FLOPPY_CONNECTOR(config, "upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats);
+	UPD765A(config, m_upd765, 16_MHz_XTAL / 4, true, true); // clocked through SED9420
+	m_upd765->us_wr_callback().set(FUNC(spectrum_state::plus3_us_w));
+	FLOPPY_CONNECTOR(config, "upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats); // internal drive
+	FLOPPY_CONNECTOR(config, "upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats); // external drive
 
 	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, specpls3_expansion_devices, nullptr);
 	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

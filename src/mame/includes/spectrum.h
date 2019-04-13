@@ -77,8 +77,7 @@ public:
 		m_exp(*this, "exp"),
 		m_dock(*this, "dockslot"),
 		m_upd765(*this, "upd765"),
-		m_upd765_0(*this, "upd765:0"),
-		m_upd765_1(*this, "upd765:1"),
+		m_flop(*this, "upd765:%u", 0U),
 		m_io_line0(*this, "LINE0"),
 		m_io_line1(*this, "LINE1"),
 		m_io_line2(*this, "LINE2"),
@@ -171,6 +170,7 @@ protected:
 	DECLARE_READ8_MEMBER(spectrum_plus3_port_2ffd_r);
 	DECLARE_WRITE8_MEMBER(spectrum_plus3_port_7ffd_w);
 	DECLARE_WRITE8_MEMBER(spectrum_plus3_port_1ffd_w);
+	void plus3_us_w(uint8_t data);
 
 	DECLARE_READ8_MEMBER(ts2068_port_f4_r);
 	DECLARE_WRITE8_MEMBER(ts2068_port_f4_w);
@@ -234,8 +234,7 @@ protected:
 	optional_device<spectrum_expansion_slot_device> m_exp;
 	optional_device<generic_slot_device> m_dock;
 	optional_device<upd765a_device> m_upd765;
-	optional_device<floppy_connector> m_upd765_0;
-	optional_device<floppy_connector> m_upd765_1;
+	optional_device_array<floppy_connector, 2> m_flop;
 
 	// Regular spectrum ports; marked as optional because of other subclasses
 	optional_ioport m_io_line0;
