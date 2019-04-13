@@ -159,6 +159,14 @@ INPUT_PORTS_START(zac1b11142_ioports)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("P1") PORT_CHANGED_MEMBER(DEVICE_SELF, zac1b11142_audio_device, p1_changed, 0) // test button?  generates NMI on master CPU
+
+	PORT_START("VP1")
+	PORT_ADJUSTER( 50, "VP1 - Music volume" )   NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot1")
+	PORT_START("VP2")
+	PORT_ADJUSTER( 50, "VP2 - Speech volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot2")
+	PORT_START("VP3")
+	PORT_ADJUSTER( 50, "VP3 - DAC volume" )     NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot3")
+
 INPUT_PORTS_END
 
 
@@ -430,7 +438,8 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	m_pia_1i->writepa_handler().set(m_speech, FUNC(tms5220_device::data_w));
 	m_pia_1i->writepb_handler().set(FUNC(zac1b11142_audio_device::pia_1i_portb_w));
 
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.30, AUTO_ALLOC_INPUT, 0); // mc1408.1f
+	//MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.30, AUTO_ALLOC_INPUT, 0); // mc1408.1f
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "sound_nl", 1.0, 7); // mc1408.1f
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
@@ -440,7 +449,8 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	TMS5200(config, m_speech, 649200); // ROMCLK pin measured at 162.3Khz, OSC is exactly *4 of that)
 	m_speech->irq_cb().set(m_pia_1i, FUNC(pia6821_device::cb1_w));
 	m_speech->ready_cb().set(m_pia_1i, FUNC(pia6821_device::ca2_w));
-	m_speech->add_route(ALL_OUTPUTS, *this, 0.60, AUTO_ALLOC_INPUT, 0);
+	m_speech->add_route(0, "sound_nl", 1.0, 6);
+	//m_speech->add_route(ALL_OUTPUTS, *this, 0.60, AUTO_ALLOC_INPUT, 0);
 
 	netlist_mame_sound_device &sound_nl(NETLIST_SOUND(config, "sound_nl", 48000));
 	sound_nl.set_constructor(netlist_zac1b11142);
@@ -461,8 +471,24 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_STREAM_INPUT(config, "sound_nl:cin3", 3, "R_AY4H_A.R");
 	NETLIST_STREAM_INPUT(config, "sound_nl:cin4", 4, "R_AY4H_B.R");
 	NETLIST_STREAM_INPUT(config, "sound_nl:cin5", 5, "R_AY4H_C.R");
+	/* Speech
+	 * The 5200 output is a current source providing between 0 and 1.5mA.
+	 * This is explained in detail in the datasheet.
+	 */
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin6", 6, "I_SP.I").set_mult_offset(750e-6 / 16384.0, 750e-6);
+	/* DAC
+	 * The 1408 output is a current sink providing between 0 and 2.0mA.
+	 * This is explained in detail in the datasheet.
+	 */
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin7", 7, "I_DAC.I").set_mult_offset(1e-3 / 32768.0, 1e-3);
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "C7.2").set_mult_offset(3000.0 * 10.0, 0.0); // FIXME: no clue what numbers to use here
+
+	// Potentiometers
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot1", "P1.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot2", "P2.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot3", "P3.DIAL");
+
 }
 
 ioport_constructor zac1b11142_audio_device::device_input_ports() const
