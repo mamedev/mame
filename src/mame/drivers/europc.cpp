@@ -25,7 +25,6 @@
 *          See http://forum.classic-computing.de/index.php?page=Thread&threadID=8380 for screenshots.
 *        * use correct AT style keyboard for XT
 *        * make BIOS versions v2.04 and v2.05 work
-*		 * Euro XT character ROM is available but not used yet
 *
 *****************************************************************************************************/
 
