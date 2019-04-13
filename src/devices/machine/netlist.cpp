@@ -597,12 +597,6 @@ netlist_mame_analog_output_device::netlist_mame_analog_output_device(const machi
 {
 }
 
-void netlist_mame_analog_output_device::set_params(const char *in_name, output_delegate &&adelegate)
-{
-	m_in = in_name;
-	m_delegate = std::move(adelegate);
-}
-
 void netlist_mame_analog_output_device::custom_netlist_additions(netlist::netlist_state_t &nlstate)
 {
 	const pstring pin(m_in);
@@ -733,6 +727,15 @@ netlist_mame_ram_pointer_device::netlist_mame_ram_pointer_device(const machine_c
 	, netlist_mame_sub_interface(*owner)
 	, m_param(nullptr)
 	, m_param_name("")
+	, m_data(nullptr)
+{
+}
+
+netlist_mame_ram_pointer_device::netlist_mame_ram_pointer_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *pname)
+	: device_t(mconfig, NETLIST_RAM_POINTER, tag, owner, 0)
+	, netlist_mame_sub_interface(*owner)
+	, m_param(nullptr)
+	, m_param_name(pname)
 	, m_data(nullptr)
 {
 }

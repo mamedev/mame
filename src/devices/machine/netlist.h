@@ -30,10 +30,10 @@ namespace netlist {
 
 // MAME specific configuration
 
-
 #define MCFG_NETLIST_SETUP(_setup)                                                  \
 	downcast<netlist_mame_device &>(*device).set_constructor(NETLIST_NAME(_setup));
 
+#if 0
 #define MCFG_NETLIST_SETUP_MEMBER(_obj, _setup)                                \
 	downcast<netlist_mame_device &>(*device).set_constructor(_obj, _setup);
 
@@ -47,8 +47,7 @@ namespace netlist {
 #define MCFG_NETLIST_ANALOG_OUTPUT(_basetag, _tag, _IN, _class, _member, _class_tag) \
 	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_ANALOG_OUTPUT, 0)                    \
 	downcast<netlist_mame_analog_output_device &>(*device).set_params(_IN,              \
-				netlist_mame_analog_output_device::output_delegate(& _class :: _member, \
-						# _class "::" # _member, _class_tag, (_class *)nullptr)   );
+		FUNC(_class :: _member), _class_tag);
 
 #define MCFG_NETLIST_LOGIC_OUTPUT(_basetag, _tag, _IN, _class, _member, _class_tag) \
 	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_LOGIC_OUTPUT, 0)                    \
@@ -66,7 +65,7 @@ namespace netlist {
 
 #define MCFG_NETLIST_RAM_POINTER(_basetag, _tag, _name) \
 	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_RAM_POINTER, 0) \
-	downcast<netlist_mame_ram_pointer_device &>(*device).set_params(_name ".m_RAM");
+	downcast<netlist_mame_ram_pointer_device &>(*device).set_params(_name);
 
 #define MCFG_NETLIST_STREAM_INPUT(_basetag, _chan, _name)                           \
 	MCFG_DEVICE_ADD(_basetag ":cin" # _chan, NETLIST_STREAM_INPUT, 0)               \
@@ -75,6 +74,7 @@ namespace netlist {
 #define MCFG_NETLIST_STREAM_OUTPUT(_basetag, _chan, _name)                          \
 	MCFG_DEVICE_ADD(_basetag ":cout" # _chan, NETLIST_STREAM_OUTPUT, 0)             \
 	downcast<netlist_mame_stream_output_device &>(*device).set_params(_chan, _name);
+#endif
 
 #define NETLIST_LOGIC_PORT_CHANGED(_base, _tag)                                     \
 	PORT_CHANGED_MEMBER(_base ":" _tag, netlist_mame_logic_input_device, input_changed, 0)
@@ -345,7 +345,14 @@ public:
 	// construction/destruction
 	netlist_mame_analog_output_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void set_params(const char *in_name, output_delegate &&adelegate);
+	template <class FC>
+	void set_params(const char *in_name, void (FC::*callback)(const double, const attotime &),
+		const char *name, const char *tag)
+	{
+		m_in = in_name;
+		m_delegate = std::move(output_delegate(callback, name, tag, (FC *)nullptr));
+	}
+
 
 protected:
 	// device-level overrides
@@ -475,6 +482,7 @@ class netlist_mame_ram_pointer_device : public device_t, public netlist_mame_sub
 public:
 	// construction/destruction
 	netlist_mame_ram_pointer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	netlist_mame_ram_pointer_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *pname);
 
 	uint8_t* ptr() const { return m_data; }
 

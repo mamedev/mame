@@ -11,7 +11,7 @@
 
 //render a white square with the shape of the car window
 //instead of drawing the actual car sprite graphics
-#define CAR_WINDOW_HACK
+//#define CAR_WINDOW_HACK
 
 //generate a regular pattern of squares
 // instead of the race track

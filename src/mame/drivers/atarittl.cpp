@@ -350,14 +350,14 @@ MACHINE_CONFIG_START(stuntcyc_state::stuntcyc)
 	m_maincpu->set_constructor(netlist_stuntcyc);
 
 	//MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "VIDEO_OUT", fixedfreq_device, update_vid, "fixfreq")
-	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit0",  "probe_bit0",  stuntcyc_state, probe_bit0_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit1",  "probe_bit1",  stuntcyc_state, probe_bit1_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit2",  "probe_bit2",  stuntcyc_state, probe_bit2_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit3",  "probe_bit3",  stuntcyc_state, probe_bit3_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit4",  "probe_bit4",  stuntcyc_state, probe_bit4_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit5",  "probe_bit5",  stuntcyc_state, probe_bit5_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit6",  "probe_bit6",  stuntcyc_state, probe_bit6_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_clock", "probe_clock", stuntcyc_state, probe_clock_cb, "")
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit0", 0).set_params("probe_bit0", FUNC(stuntcyc_state::probe_bit0_cb));
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit1", 0).set_params("probe_bit1", FUNC(stuntcyc_state::probe_bit1_cb));
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit2", 0).set_params("probe_bit2", FUNC(stuntcyc_state::probe_bit2_cb));
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit3", 0).set_params("probe_bit3", FUNC(stuntcyc_state::probe_bit3_cb));
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit4", 0).set_params("probe_bit4", FUNC(stuntcyc_state::probe_bit4_cb));
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit5", 0).set_params("probe_bit5", FUNC(stuntcyc_state::probe_bit5_cb));
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit6", 0).set_params("probe_bit6", FUNC(stuntcyc_state::probe_bit6_cb));
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_clock", 0).set_params("probe_clock", FUNC(stuntcyc_state::probe_clock_cb));
 
 /* video hardware */
 	SCREEN(config, m_probe_screen, SCREEN_TYPE_RASTER);
@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(gtrak10_state::gtrak10)
 	/* basic machine hardware */
 	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_constructor(netlist_gtrak10);
 
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "VIDEO_OUT", fixedfreq_device, update_composite_monochrome, "fixfreq")
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("VIDEO_OUT", FUNC(fixedfreq_device::update_composite_monochrome), "fixfreq");
 
 	/* video hardware */
 

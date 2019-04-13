@@ -466,23 +466,23 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(pong_state::pong)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
+	//MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
 	//MCFG_NETLIST_SETUP(pong)
-	MCFG_NETLIST_SETUP_MEMBER(this, &pong_state::NETLIST_NAME(pong))
+	//MCFG_NETLIST_SETUP_MEMBER(this, &pong_state::NETLIST_NAME(pong))
 
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr0", "ic_b9_R.R")
-	MCFG_NETLIST_ANALOG_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr1", "ic_a9_R.R")
-	MCFG_NETLIST_ANALOG_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot0", "ic_b9_POT.DIAL")
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot1", "ic_a9_POT.DIAL")
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1a", "sw1a.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1b", "sw1b.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw", "coinsw.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.IN", 0)
+	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_constructor(this, &pong_state::NETLIST_NAME(pong));
 
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "snd0", "sound", pong_state, sound_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_composite_monochrome, "fixfreq")
+	NETLIST_ANALOG_INPUT(config, "maincpu:vr0", "ic_b9_R.R").set_mult_offset(1.0 / 100.0 * RES_K(50), RES_K(56) );
+	NETLIST_ANALOG_INPUT(config, "maincpu:vr1", "ic_a9_R.R").set_mult_offset(1.0 / 100.0 * RES_K(50), RES_K(56) );
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot0", "ic_b9_POT.DIAL");
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot1", "ic_a9_POT.DIAL");
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw1a", "sw1a.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw1b", "sw1b.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:coinsw", "coinsw.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:antenna", "antenna.IN", 0);
+
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0", 0).set_params("sound", FUNC(pong_state::sound_cb), "");
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("videomix", FUNC(fixedfreq_device::update_composite_monochrome), "fixfreq");
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -504,36 +504,35 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(breakout_state::breakout)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(breakout)
+	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_constructor(NETLIST_NAME(breakout));
 
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot1", "POTP1.DIAL")
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot2", "POTP2.DIAL")
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw1", "COIN1.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw2", "COIN2.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "startsw1", "START1.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "startsw2", "START2.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "servesw", "SERVE.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw4", "S4.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw3", "S3.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw2", "S2.POS", 0)
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot1", "POTP1.DIAL");
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot2", "POTP2.DIAL");
+	NETLIST_LOGIC_INPUT(config, "maincpu:coinsw1", "COIN1.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:coinsw2", "COIN2.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:startsw1", "START1.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:startsw2", "START2.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:servesw", "SERVE.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw4", "S4.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw3", "S3.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw2", "S2.POS", 0);
 
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1_1", "S1_1.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1_2", "S1_2.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1_3", "S1_3.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1_4", "S1_4.POS", 0)
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw1_1", "S1_1.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw1_2", "S1_2.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw1_3", "S1_3.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw1_4", "S1_4.POS", 0);
 
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.IN", 0)
+	NETLIST_LOGIC_INPUT(config, "maincpu:antenna", "antenna.IN", 0);
 
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "snd0", "sound", breakout_state, sound_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_composite_monochrome, "fixfreq")
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0", 0).set_params("sound", FUNC(breakout_state::sound_cb), "");
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("videomix", FUNC(fixedfreq_device::update_composite_monochrome), "fixfreq");
 
 	// Leds and lamps
 
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "led_serve", "CON_P", breakout_state, serve_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "lamp_credit1", "CON_CREDIT1", breakout_state, credit1_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "lamp_credit2", "CON_CREDIT2", breakout_state, credit2_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "coin_counter", "CON_T", breakout_state, coin_counter_cb, "")
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:led_serve", 0).set_params("CON_P", FUNC(breakout_state::serve_cb), "");
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:lamp_credit1", 0).set_params("CON_CREDIT1", FUNC(breakout_state::credit1_cb), "");
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:lamp_credit2", 0).set_params("CON_CREDIT2", FUNC(breakout_state::credit2_cb), "");
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:coin_counter", 0).set_params("CON_T", FUNC(breakout_state::coin_counter_cb), "");
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -560,6 +559,7 @@ MACHINE_CONFIG_START(pong_state::pongf)
 	pong(config);
 
 	/* basic machine hardware */
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_NETLIST_SETUP(pong_fast)
 
@@ -568,24 +568,23 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pong_state::pongd)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(pongdoubles)
+	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_constructor(NETLIST_NAME(pongdoubles));
 
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot0", "A10_POT.DIAL")
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot1", "B10_POT.DIAL")
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot2", "B9B_POT.DIAL")
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot3", "B9A_POT.DIAL")
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1a", "DIPSW1.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1b", "DIPSW2.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw", "COIN_SW.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "startsw", "START_SW.POS", 0)
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot0", "A10_POT.DIAL");
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot1", "B10_POT.DIAL");
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot2", "B9B_POT.DIAL");
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot3", "B9A_POT.DIAL");
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw1a", "DIPSW1.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw1b", "DIPSW2.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:coinsw", "COIN_SW.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:startsw", "START_SW.POS", 0);
 
 #if 0
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.IN", 0, 0x01)
+	NETLIST_LOGIC_INPUT(config, "maincpu:antenna", "antenna.IN", 0, 0x01)
 #endif
 
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "snd0", "AUDIO", pong_state, sound_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_composite_monochrome, "fixfreq")
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0", 0).set_params("AUDIO", FUNC(pong_state::sound_cb), "");
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("videomix", FUNC(fixedfreq_device::update_composite_monochrome), "fixfreq");
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -607,27 +606,24 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(rebound_state::rebound)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(rebound_schematics)
-	//FIXME: doesn't work - segmentation fault
-	//MCFG_NETLIST_SETUP_MEMBER(this, &rebound_state::NETLIST_NAME(rebound))
+	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_constructor(NETLIST_NAME(rebound_schematics));
 
 	// FIXME: Later
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot1", "POTP1.DIAL")
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot2", "POTP2.DIAL")
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.IN", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw", "COIN1_SW.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "startsw", "START_SW.POS", 0)
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot1", "POTP1.DIAL");
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot2", "POTP2.DIAL");
+	NETLIST_LOGIC_INPUT(config, "maincpu:antenna", "antenna.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:coinsw", "COIN1_SW.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:startsw", "START_SW.POS", 0);
 
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "dsw1a", "DSW1a.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "dsw1b", "DSW1b.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "dsw2", "DSW2.POS", 0)
+	NETLIST_LOGIC_INPUT(config, "maincpu:dsw1a", "DSW1a.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:dsw1b", "DSW1b.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:dsw2", "DSW2.POS", 0);
 
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "snd0", "sound", rebound_state, sound_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_composite_monochrome, "fixfreq")
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0", 0).set_params("sound", FUNC(rebound_state::sound_cb), "");
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("videomix", FUNC(fixedfreq_device::update_composite_monochrome), "fixfreq");
 
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "led_credit", "CON11", rebound_state, led_credit_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "coin_counter", "CON10", rebound_state, coin_counter_cb, "")
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:led_credit", 0).set_params("CON11", FUNC(rebound_state::led_credit_cb), "");
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:coin_counter", 0).set_params("CON10", FUNC(rebound_state::coin_counter_cb), "");
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);

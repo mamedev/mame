@@ -611,19 +611,18 @@ MACHINE_CONFIG_START(_1942_state::_1942)
 	/* NETLIST configuration using internal AY8910 resistor values */
 
 	/* Minimize resampling between ay8910 and netlist */
-	MCFG_DEVICE_ADD("snd_nl", NETLIST_SOUND, AUDIO_CLOCK / 8 / 2)
-	MCFG_NETLIST_SETUP(nl_1942)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 0, "R_AY1_1.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 1, "R_AY1_2.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 2, "R_AY1_3.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 3, "R_AY2_1.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 4, "R_AY2_2.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 5, "R_AY2_3.R")
+	auto &snd_nl(NETLIST_SOUND(config, "snd_nl", AUDIO_CLOCK / 8 / 2));
+	snd_nl.set_constructor(NETLIST_NAME(nl_1942));
+	snd_nl.add_route(ALL_OUTPUTS, "mono", 5.0);
+	NETLIST_STREAM_INPUT(config, "snd_nl", 0, "R_AY1_1.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl", 1, "R_AY1_2.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl", 2, "R_AY1_3.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl", 3, "R_AY2_1.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl", 4, "R_AY2_2.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl", 5, "R_AY2_3.R");
 
-	MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "R1.1")
+	NETLIST_STREAM_OUTPUT(config, "snd_nl", 0, "R1.1").set_mult_offset(70000.0, 0.0);
 	//MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "VR.2")
-	MCFG_NETLIST_ANALOG_MULT_OFFSET(70000.0, 0.0)
 
 MACHINE_CONFIG_END
 
