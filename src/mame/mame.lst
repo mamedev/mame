@@ -33698,6 +33698,7 @@ cycln_l4                        //
 cycln_l5                        //
 eatpm_4g                        //
 eatpm_4u                        //
+eatpm_f1                        //
 eatpm_l1                        //
 eatpm_l2                        //
 eatpm_l4                        //
@@ -33737,6 +33738,7 @@ whirl_lg3                       //
 bbnny_l2                        //
 bbnny_lu                        //
 dd_l2                           //
+dd_lu1                          //
 dd_p6                           //
 diner_f2                        //
 diner_l1                        //
