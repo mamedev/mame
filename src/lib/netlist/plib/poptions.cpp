@@ -158,7 +158,9 @@ namespace plib {
 				}
 				else
 				{
-					i++; // FIXME: are there more arguments?
+					i++;
+					if (i >= argc)
+						return i - 1;
 					if (opt->do_parse(pstring(argv[i])) != 0)
 						return i - 1;
 				}
