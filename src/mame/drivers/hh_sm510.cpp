@@ -3097,8 +3097,8 @@ ROM_START( gnw_zelda )
 	ROM_REGION( 282866, "svg_top", 0)
 	ROM_LOAD( "gnw_zelda_top.svg", 0, 282866, CRC(7bd167a0) SHA1(96955538d9c0ab94b144ff725524b601bdf9f28c) )
 
-	ROM_REGION( 424989, "svg_bottom", 0)
-	ROM_LOAD( "gnw_zelda_bottom.svg", 0, 424989, CRC(22783f93) SHA1(f8b2a6cbac9c5a83425ed93c6da63b7c95c0e379) )
+	ROM_REGION( 424727, "svg_bottom", 0)
+	ROM_LOAD( "gnw_zelda_bottom.svg", 0, 424727, CRC(2f4b3239) SHA1(026a1d43dd298ec05f4067ae1a7181984ec8ff83) )
 ROM_END
 
 
