@@ -144,6 +144,12 @@ void cdi_state::cdimono2_slave_mem(address_map &map)
 	map(0x0100, 0x1fff).rom().region("slave", 0x100);
 }
 
+
+void cdi_state::cdi070_cpuspace(address_map &map)
+{
+	map(0xfffffff0, 0xffffffff).r(m_scc, FUNC(cdi68070_device::iack_r)).umask16(0x00ff);
+}
+
 /*************************
 *      Input ports       *
 *************************/
@@ -752,9 +758,12 @@ void cdi_state::cdimono1_base(machine_config &config)
 {
 	SCC68070(config, m_maincpu, CLOCK_A/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono1_mem);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cdi_state::cdi070_cpuspace);
 
 	MCD212(config, m_mcd212, 0);
 	m_mcd212->set_screen("screen");
+	m_mcd212->int1_callback().set(m_scc, FUNC(cdi68070_device::int1_w));
+	m_mcd212->int2_callback().set(m_scc, FUNC(cdi68070_device::int2_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -775,9 +784,13 @@ void cdi_state::cdimono1_base(machine_config &config)
 	config.set_default_layout(layout_cdi);
 
 	CDI_68070(config, m_scc, 0, "maincpu");
+	m_scc->iack4_callback().set_constant(0x80);
 
 	CDI_CDIC(config, m_cdic, 0);
+	m_cdic->int_callback().set(m_scc, FUNC(cdi68070_device::in4_w));
+
 	CDI_SLAVE(config, m_slave_hle, 0);
+	m_slave_hle->int_callback().set(m_scc, FUNC(cdi68070_device::in2_w));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -801,9 +814,12 @@ void cdi_state::cdimono2(machine_config &config)
 {
 	SCC68070(config, m_maincpu, CLOCK_A/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_mem);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cdi_state::cdi070_cpuspace);
 
 	MCD212(config, m_mcd212, 0);
 	m_mcd212->set_screen("screen");
+	m_mcd212->int1_callback().set(m_scc, FUNC(cdi68070_device::int1_w));
+	m_mcd212->int2_callback().set(m_scc, FUNC(cdi68070_device::int2_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -826,9 +842,9 @@ void cdi_state::cdimono2(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
 
 	CDI_68070(config, m_scc, 0, "maincpu");
-	M68HC05EG(config, m_servo, 2000000); /* Unknown clock speed, docs say 2MHz internal clock */
+	M68HC05EG(config, m_servo, XTAL(4'000'000));
 	m_servo->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_servo_mem);
-	M68HC05EG(config, m_slave, 2000000); /* Unknown clock speed, docs say 2MHz internal clock */
+	M68HC05EG(config, m_slave, XTAL(4'000'000));
 	m_slave->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_slave_mem);
 
 	CDROM(config, "cdrom").set_interface("cdi_cdrom");
@@ -855,9 +871,12 @@ void cdi_state::cdi910(machine_config &config)
 {
 	SCC68070(config, m_maincpu, CLOCK_A/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdi910_mem);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cdi_state::cdi070_cpuspace);
 
 	MCD212(config, m_mcd212, 0);
 	m_mcd212->set_screen("screen");
+	m_mcd212->int1_callback().set(m_scc, FUNC(cdi68070_device::int1_w));
+	m_mcd212->int2_callback().set(m_scc, FUNC(cdi68070_device::int2_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -880,9 +899,9 @@ void cdi_state::cdi910(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
 
 	CDI_68070(config, m_scc, 0, "maincpu");
-	M68HC05EG(config, m_servo, 2000000); /* Unknown clock speed, docs say 2MHz internal clock */
+	M68HC05EG(config, m_servo, XTAL(4'000'000));
 	m_servo->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_servo_mem);
-	M68HC05EG(config, m_slave, 2000000); /* Unknown clock speed, docs say 2MHz internal clock */
+	M68HC05EG(config, m_slave, XTAL(4'000'000));
 	m_slave->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_slave_mem);
 
 	CDROM(config, "cdrom").set_interface("cdi_cdrom");
