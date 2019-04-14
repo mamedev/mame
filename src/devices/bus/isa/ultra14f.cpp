@@ -50,7 +50,7 @@ void ultra14f_device::scsic_config(device_t *device)
 
 void ultra14f_device::device_add_mconfig(machine_config &config)
 {
-	M68008FN(config, m_uscpu, 40_MHz_XTAL / 10); // custom-marked as USC080-5-10A
+	M68008FN(config, m_uscpu, 40_MHz_XTAL / 4); // custom-marked as USC080-5-10A
 	m_uscpu->set_addrmap(AS_PROGRAM, &ultra14f_device::uscpu_map);
 
 	NSCSI_BUS(config, "scsi");
