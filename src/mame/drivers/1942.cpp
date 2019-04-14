@@ -611,9 +611,9 @@ MACHINE_CONFIG_START(_1942_state::_1942)
 	/* NETLIST configuration using internal AY8910 resistor values */
 
 	/* Minimize resampling between ay8910 and netlist */
-	auto &snd_nl(NETLIST_SOUND(config, "snd_nl", AUDIO_CLOCK / 8 / 2));
-	snd_nl.set_constructor(NETLIST_NAME(nl_1942));
-	snd_nl.add_route(ALL_OUTPUTS, "mono", 5.0);
+	NETLIST_SOUND(config, "snd_nl", AUDIO_CLOCK / 8 / 2)
+		.set_source(NETLIST_NAME(nl_1942))
+		.add_route(ALL_OUTPUTS, "mono", 5.0);
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin0", 0, "R_AY1_1.R");
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin1", 1, "R_AY1_2.R");
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin2", 2, "R_AY1_3.R");
@@ -652,7 +652,6 @@ void _1942p_state::_1942p(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(_1942p_state::screen_update));
 	screen.set_palette(m_palette);
-
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

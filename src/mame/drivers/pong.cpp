@@ -470,7 +470,7 @@ MACHINE_CONFIG_START(pong_state::pong)
 	//MCFG_NETLIST_SETUP(pong)
 	//MCFG_NETLIST_SETUP_MEMBER(this, &pong_state::NETLIST_NAME(pong))
 
-	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_constructor(this, &pong_state::NETLIST_NAME(pong));
+	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(this, &pong_state::NETLIST_NAME(pong));
 
 	NETLIST_ANALOG_INPUT(config, "maincpu:vr0", "ic_b9_R.R").set_mult_offset(1.0 / 100.0 * RES_K(50), RES_K(56) );
 	NETLIST_ANALOG_INPUT(config, "maincpu:vr1", "ic_a9_R.R").set_mult_offset(1.0 / 100.0 * RES_K(50), RES_K(56) );
@@ -504,7 +504,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(breakout_state::breakout)
 
 	/* basic machine hardware */
-	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_constructor(NETLIST_NAME(breakout));
+	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(NETLIST_NAME(breakout));
 
 	NETLIST_ANALOG_INPUT(config, "maincpu:pot1", "POTP1.DIAL");
 	NETLIST_ANALOG_INPUT(config, "maincpu:pot2", "POTP2.DIAL");
@@ -568,7 +568,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pong_state::pongd)
 
 	/* basic machine hardware */
-	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_constructor(NETLIST_NAME(pongdoubles));
+	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(NETLIST_NAME(pongdoubles));
 
 	NETLIST_ANALOG_INPUT(config, "maincpu:pot0", "A10_POT.DIAL");
 	NETLIST_ANALOG_INPUT(config, "maincpu:pot1", "B10_POT.DIAL");
@@ -606,7 +606,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(rebound_state::rebound)
 
 	/* basic machine hardware */
-	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_constructor(NETLIST_NAME(rebound_schematics));
+	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(NETLIST_NAME(rebound_schematics));
 
 	// FIXME: Later
 	NETLIST_ANALOG_INPUT(config, "maincpu:pot1", "POTP1.DIAL");

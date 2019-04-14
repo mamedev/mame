@@ -450,11 +450,10 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	m_speech->irq_cb().set(m_pia_1i, FUNC(pia6821_device::cb1_w));
 	m_speech->ready_cb().set(m_pia_1i, FUNC(pia6821_device::ca2_w));
 	m_speech->add_route(0, "sound_nl", 1.0, 6);
-	//m_speech->add_route(ALL_OUTPUTS, *this, 0.60, AUTO_ALLOC_INPUT, 0);
 
-	netlist_mame_sound_device &sound_nl(NETLIST_SOUND(config, "sound_nl", 48000));
-	sound_nl.set_constructor(netlist_zac1b11142);
-	sound_nl.add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(netlist_zac1b11142)
+		.add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 
 	NETLIST_LOGIC_INPUT(config, "sound_nl:ioa0",   "I_IOA0.IN",   0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:ioa1",   "I_IOA1.IN",   0);

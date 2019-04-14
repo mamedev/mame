@@ -31,7 +31,7 @@ namespace netlist {
 // MAME specific configuration
 
 #define MCFG_NETLIST_SETUP(_setup)                                                  \
-	downcast<netlist_mame_device &>(*device).set_constructor(NETLIST_NAME(_setup));
+	downcast<netlist_mame_device &>(*device).set_setup_func(NETLIST_NAME(_setup));
 
 #if 0
 #define MCFG_NETLIST_SETUP_MEMBER(_obj, _setup)                                \
@@ -112,18 +112,10 @@ public:
 
 	// construction/destruction
 	netlist_mame_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual ~netlist_mame_device();
 
-	void set_constructor(void (*setup_func)(netlist::nlparse_t &))
-	{
-		m_setup_func = func_type(setup_func);
-	}
-
-	template <typename T, typename F>
-	void set_constructor(T *obj, F && f)
-	{
-		m_setup_func = std::move(std::bind(std::forward<F>(f), obj, std::placeholders::_1));
-	}
+	void set_setup_func(func_type &&func) { m_setup_func = std::move(func); }
 
 	ATTR_HOT inline netlist::setup_t &setup();
 	ATTR_HOT inline netlist_mame_t &netlist() { return *m_netlist; }
@@ -196,6 +188,19 @@ public:
 
 	offs_t genPC() const { return m_genPC; }
 
+	netlist_mame_cpu_device & set_source(void (*setup_func)(netlist::nlparse_t &))
+	{
+		set_setup_func(func_type(setup_func));
+		return *this;
+	}
+
+	template <typename T, typename F>
+	netlist_mame_cpu_device & set_source(T *obj, F && f)
+	{
+		set_setup_func(std::move(std::bind(std::forward<F>(f), obj, std::placeholders::_1)));
+		return *this;
+	}
+
 protected:
 	// netlist_mame_device
 	virtual void nl_register_devices() override;
@@ -234,6 +239,20 @@ class netlist_mame_sound_device : public netlist_mame_device,
 public:
 	// construction/destruction
 	netlist_mame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	netlist_mame_sound_device & set_source(void (*setup_func)(netlist::nlparse_t &))
+	{
+		set_setup_func(func_type(setup_func));
+		return *this;
+	}
+
+	template <typename T, typename F>
+	netlist_mame_sound_device & set_source(T *obj, F && f)
+	{
+		set_setup_func(std::move(std::bind(std::forward<F>(f), obj, std::placeholders::_1)));
+		return *this;
+	}
+
 
 	inline sound_stream *get_stream() { return m_stream; }
 

@@ -722,7 +722,7 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	AY51013(config, m_uart);
 	m_uart->write_dav_callback().set("mainint", FUNC(input_merger_device::in_w<0>));
 
-	NETLIST_CPU(config, NETLIST_TAG, VIDEOBRD_CLOCK).set_constructor(NETLIST_NAME(hazelvid));
+	NETLIST_CPU(config, NETLIST_TAG, VIDEOBRD_CLOCK).set_source(NETLIST_NAME(hazelvid));
 
 	// First 1K
 	NETLIST_RAM_POINTER(config, NETLIST_TAG ":u22", "u22.m_RAM");

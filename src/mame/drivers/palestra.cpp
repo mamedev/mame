@@ -72,8 +72,8 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(palestra_state::palestra)
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
-	m_maincpu->set_constructor(netlist_palestra);
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK)
+		.set_source(netlist_palestra);
 
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", FUNC(fixedfreq_device::update_composite_monochrome), "fixfreq");
 

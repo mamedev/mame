@@ -537,9 +537,9 @@ MACHINE_CONFIG_START(cocoloco_state::cocoloco)
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
-	auto &snd_nl(NETLIST_SOUND(config, "snd_nl", 48000));
-	snd_nl.set_constructor(NETLIST_NAME(nl_cocoloco));
-	snd_nl.add_route(ALL_OUTPUTS, "mono", 1.0);
+	NETLIST_SOUND(config, "snd_nl", 48000)
+		.set_source(NETLIST_NAME(nl_cocoloco))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin0", 0, "R_AY1_1.R");
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin1", 1, "R_AY1_2.R");

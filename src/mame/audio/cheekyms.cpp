@@ -40,10 +40,9 @@ WRITE_LINE_MEMBER(cheekyms_audio_device::coin_extra_w)  { m_coin_extra->write_li
 MACHINE_CONFIG_START(cheekyms_audio_device::device_add_mconfig)
 	SPEAKER(config, "mono").front_center();
 
-	auto &sound_nl(NETLIST_SOUND(config, "sound_nl", 48000));
-	sound_nl.set_constructor(NETLIST_NAME(cheekyms));
-	sound_nl.add_route(ALL_OUTPUTS, "mono", 1.0);
-
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(cheekyms))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	NETLIST_LOGIC_INPUT(config, "sound_nl:mute",       "I_MUTE.IN",       0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:cheese",     "I_CHEESE.IN",     0);
