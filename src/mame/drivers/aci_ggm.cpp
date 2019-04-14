@@ -238,16 +238,14 @@ WRITE8_MEMBER(ggm_state::control_w)
 
 READ8_MEMBER(ggm_state::input_r)
 {
-	u16 data = 0;
+	u8 data = 0;
 
 	// PB1-PB5: multiplexed inputs
 	for (int i = 0; i < 4; i++)
 		if (BIT(m_digit_select, i))
 			data |= m_inp_matrix[i]->read();
 
-	data |= data >> 8;
 	data = ~data << 1 & 0x3e;
-
 
 	// PB6: hardware version
 	return 0x81 | data | (m_inp_matrix[4]->read() << 6 & 0x40);
