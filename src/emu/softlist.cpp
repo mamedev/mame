@@ -697,7 +697,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 		if (!sizestr.empty())
 		{
 			u32 length = strtol(sizestr.c_str(), nullptr, 0);
-			u32 offset = !offsetstr.empty() ? 0 : strtol(offsetstr.c_str(), nullptr, 0);
+			u32 offset = offsetstr.empty() ? 0 : strtol(offsetstr.c_str(), nullptr, 0);
 
 			if (loadflag == "reload")
 				add_rom_entry("", "", offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS);
