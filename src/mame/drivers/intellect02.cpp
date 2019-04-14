@@ -6,7 +6,7 @@
 Интеллект-02 (Intellect-02) driver
 
 This is a Soviet electronic board game console, a dozen or so cartridge games were
-made for it(can't say for certain how many released). PCB labels have prefix ДМП,
+announced(can't say for certain how many released). PCB labels have prefix ДМП,
 it's assumed to have been designed by НИИ БРЭА (SRI BREA). First shown in 1983,
 produced during around 1985-1992.
 
@@ -218,7 +218,7 @@ WRITE8_MEMBER(intel02_state::control_w)
 	if (!m_delay_update->enabled())
 		m_delay_update->adjust(attotime::from_usec(15));
 
-	// d6: N/C
+	// d6: N/C (it's a delay timer on CC3)
 
 	// d7: enable beeper
 	m_beeper->set_state(BIT(data, 7));

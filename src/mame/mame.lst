@@ -879,6 +879,9 @@ borisa                          //
 @source:aci_borisdpl.cpp
 borisdpl                        //
 
+@source:aci_ggm.cpp
+ggm
+
 @source:acommand.cpp
 acommand                        // (c) 1990
 

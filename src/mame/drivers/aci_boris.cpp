@@ -44,10 +44,11 @@ public:
 
 	void boris(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(reset_switch);
+	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	// devices/pointers
@@ -59,6 +60,7 @@ private:
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
+	void update_reset(ioport_value state);
 	TIMER_DEVICE_CALLBACK_MEMBER(delay_display);
 
 	DECLARE_WRITE8_MEMBER(mux_w);
@@ -85,13 +87,18 @@ void boris_state::machine_start()
 	save_item(NAME(m_4042));
 }
 
-INPUT_CHANGED_MEMBER(boris_state::reset_switch)
+void boris_state::machine_reset()
+{
+	update_reset(ioport("RESET")->read());
+}
+
+void boris_state::update_reset(ioport_value state)
 {
 	// reset switch is tied to MK3850 RESET pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 
 	// clear display
-	if (newval)
+	if (state)
 	{
 		for (int i = 0; i < 8; i++)
 			m_delay_display[i]->adjust(attotime::zero, i);
@@ -211,7 +218,7 @@ static INPUT_PORTS_START( boris )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_R) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, boris_state, reset_switch, nullptr) PORT_NAME("Reset Switch")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, boris_state, reset_switch, nullptr) PORT_NAME("Reset Switch")
 INPUT_PORTS_END
 
 

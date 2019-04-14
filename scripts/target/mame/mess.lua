@@ -3783,6 +3783,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/aceex.cpp",
 	MAME_DIR .. "src/mame/drivers/aci_boris.cpp",
 	MAME_DIR .. "src/mame/drivers/aci_borisdpl.cpp",
+	MAME_DIR .. "src/mame/drivers/aci_ggm.cpp",
 	MAME_DIR .. "src/mame/drivers/adm23.cpp",
 	MAME_DIR .. "src/mame/drivers/adm31.cpp",
 	MAME_DIR .. "src/mame/drivers/adm36.cpp",

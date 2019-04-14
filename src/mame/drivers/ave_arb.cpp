@@ -23,11 +23,14 @@ The electronic magnetic chessboard is the first of is kind. AVE later licensed
 it to Fidelity (see fidel_elite.cpp).
 ARB is a romless system, the program ROM is on a cartridge.
 
-Known modules (*denotes not dumped yet):
+Known chess modules (*denotes not dumped yet):
 - Sargon 2.5
 - *Grand Master Series 3
 - *Grand Master Series 3.5
 - Grand Master Series 4.0
+
+Other games:
+- *Avelan (checkers)
 
 Newer modules included button label stickers for OPTIONS, Verify, Take Back, Clear.
 
