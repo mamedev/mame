@@ -47,7 +47,7 @@
  * PB7: CU (Cursor)
  */
 
-WRITE8_MEMBER( aim65_state::aim65_pia_a_w )
+void aim65_state::u1_pa_w( u8 data )
 {
 	LOG("pia a: a=%u /ce=%u,%u,%u,%u,%u /wr=%u\n",
 			data & 0x03, BIT(data, 2), BIT(data, 3), BIT(data, 4), BIT(data, 5), BIT(data, 6), BIT(data, 7));
@@ -60,7 +60,7 @@ WRITE8_MEMBER( aim65_state::aim65_pia_a_w )
 }
 
 
-WRITE8_MEMBER( aim65_state::aim65_pia_b_w )
+void aim65_state::u1_pb_w( u8 data )
 {
 	LOG("pia b: d=%02x /cu=%u\n", data & 0x7f, BIT(data, 7));
 	for (required_device<dl1416_device> &ds : m_ds)
@@ -71,16 +71,16 @@ WRITE8_MEMBER( aim65_state::aim65_pia_b_w )
 }
 
 
-template <unsigned D> WRITE16_MEMBER( aim65_state::aim65_update_ds )
+template <unsigned D> WRITE16_MEMBER( aim65_state::update_ds )
 {
 	m_digits[((D - 1) << 2) | (offset ^ 3)] = data;
 }
 
-template WRITE16_MEMBER( aim65_state::aim65_update_ds<1> );
-template WRITE16_MEMBER( aim65_state::aim65_update_ds<2> );
-template WRITE16_MEMBER( aim65_state::aim65_update_ds<3> );
-template WRITE16_MEMBER( aim65_state::aim65_update_ds<4> );
-template WRITE16_MEMBER( aim65_state::aim65_update_ds<5> );
+template WRITE16_MEMBER( aim65_state::update_ds<1> );
+template WRITE16_MEMBER( aim65_state::update_ds<2> );
+template WRITE16_MEMBER( aim65_state::update_ds<3> );
+template WRITE16_MEMBER( aim65_state::update_ds<4> );
+template WRITE16_MEMBER( aim65_state::update_ds<5> );
 
 
 /******************************************************************************
@@ -88,32 +88,17 @@ template WRITE16_MEMBER( aim65_state::aim65_update_ds<5> );
 ******************************************************************************/
 
 
-READ8_MEMBER( aim65_state::aim65_riot_b_r )
+u8 aim65_state::z33_pb_r()
 {
-	static const char *const keynames[] =
-	{
-		"keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
-		"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7"
-	};
-
-	uint8_t row, data = 0xff;
+	u8 data = 0xff;
 
 	/* scan keyboard rows */
-	for (row = 0; row < 8; row++)
-	{
-		if (!BIT(m_riot_port_a, row))
-			data &= ioport(keynames[row])->read();
-	}
+	for (u8 i = 0; i < 8; i++)
+		if (!BIT(m_riot_port_a, i))
+			data &= m_io_keyboard[i]->read();
 
 	return data;
 }
-
-
-WRITE8_MEMBER( aim65_state::aim65_riot_a_w )
-{
-	m_riot_port_a = data;
-}
-
 
 
 /***************************************************************************
@@ -147,11 +132,11 @@ void aim65_state::machine_start()
 	// Init RAM
 	space.install_ram(0x0000, m_ram->size() - 1, m_ram->pointer());
 
-	m_pb_save = 0;
-
 	// Register save state
 	save_item(NAME(m_riot_port_a));
 	save_item(NAME(m_pb_save));
+	save_item(NAME(m_kb_en));
+	save_item(NAME(m_ca2));
 }
 
 
@@ -171,54 +156,68 @@ void aim65_state::machine_start()
  Cassette
 ******************************************************************************/
 
-WRITE8_MEMBER( aim65_state::aim65_pb_w )
+void aim65_state::z32_pb_w( u8 data )
 {
 /*
     d7 = cass out (both decks)
     d5 = cass2 motor
     d4 = cass1 motor
-    d2 = tty out (not emulated)
+    d2 = tty out
     d0/1 = printer data (not emulated)
+
+    There seems to be a mistake in the code. When the cassettes should both be stopped, it turns them on instead.
 */
+
+	if ((data & 0x30)==0x30)
+		data &= ~0x30;    // fix bug with motors
 
 	uint8_t bits = data ^ m_pb_save;
 	m_pb_save = data;
 
-	if (BIT(bits, 7))
+	if (BIT(bits, 7) && !m_ca2)
 	{
-		m_cassette1->output(BIT(data, 7) ? -1.0 : +1.0);
-		m_cassette2->output(BIT(data, 7) ? -1.0 : +1.0);
+		if (BIT(data, 4))
+			m_cassette1->output(BIT(data, 7) ? -1.0 : +1.0);
+		if (BIT(data, 5))
+			m_cassette2->output(BIT(data, 7) ? -1.0 : +1.0);
 	}
 
 	if (BIT(bits, 5))
-	{
-		if (BIT(data, 5))
-			m_cassette2->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-		else
-			m_cassette2->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-	}
+			m_cassette2->change_state(BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	if (BIT(bits, 4))
-	{
-		if (BIT(data, 4))
-			m_cassette1->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-		else
-			m_cassette1->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-	}
+			m_cassette1->change_state(BIT(data, 4) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+
+	if (!m_kb_en)
+		m_rs232->write_txd(BIT(data, 2));
 }
 
 
-READ8_MEMBER( aim65_state::aim65_pb_r )
+u8 aim65_state::z32_pb_r ()
 {
 /*
-    d7 = cassette in (deck 1)
-    d6 = tty in (not emulated)
+    d7 = cassette in
+    d6 = tty in
     d3 = kb/tty switch
 */
 
 	uint8_t data = ioport("switches")->read();
-	data |= (m_cassette1->input() > +0.03) ? 0x80 : 0;
-	data |= 0x40; // TTY must be H if not used.
+	m_kb_en = BIT(data, 3);
+
+	if (m_ca2)
+	{
+		if (BIT(m_pb_save, 4))
+			data |= (m_cassette1->input() > +0.03) ? 0x80 : 0;
+		else
+		if (BIT(m_pb_save, 5))
+			data |= (m_cassette2->input() > +0.03) ? 0x80 : 0;
+	}
+
+	if (m_kb_en)
+		data |= 0x40; // TTY must be H if not used.
+	else
+		data |= (m_rs232->rxd_r()) ? 0x40 : 0;
+
 	data |= m_pb_save & 0x37;
 	return data;
 }
