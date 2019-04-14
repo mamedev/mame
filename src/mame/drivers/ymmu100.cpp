@@ -134,14 +134,13 @@
 #include "cpu/h8/h83002.h"
 #include "cpu/h8/h83003.h"
 #include "cpu/h8/h8s2655.h"
-#include "video/hd44780.h"
+#include "machine/mulcd.h"
 #include "sound/swp20.h"
 #include "sound/swp30.h"
 #include "sound/meg.h"
 #include "sound/dspv.h"
 
 #include "debugger.h"
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -328,7 +327,7 @@ private:
 	optional_device<swp20_device> m_swp20_1;
 	optional_device<dspv_device> m_dspv;
 	optional_device<meg_device> m_meg;
-	required_device<hd44780_device> m_lcd;
+	required_device<mulcd_device> m_lcd;
 	optional_ioport m_ioport_p7;
 	optional_ioport m_ioport_p8;
 	optional_ioport m_ioport_b0;
@@ -336,8 +335,7 @@ private:
 	optional_ioport m_ioport_b2;
 
 	u8 cur_p1, cur_p2, cur_p3, cur_p5, cur_p6, cur_pa, cur_pb, cur_pc, cur_pf, cur_pg;
-	u8 cur_ic32, cur_leds;
-	float contrast;
+	u8 cur_ic32;
 
 	u16 adc_zero_r();
 	u16 adc_ar_r();
@@ -379,8 +377,6 @@ private:
 	u16 pb_r_mu50();
 	void pb_w_mu50(u16 data);
 
-	float lightlevel(const u8 *src, const u8 *render);
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void machine_start() override;
 	void mu100_iomap(address_map &map);
 	void mu100_map(address_map &map);
@@ -559,60 +555,9 @@ void mu100_state::chan_write_tap(offs_t address, u16 data, u16 mem_mask)
 	}
 }
 
-#include "../drivers/ymmu100.hxx"
-
 void mu100_state::machine_start()
 {
 	cur_p1 = cur_p2 = cur_p3 = cur_p5 = cur_p6 = cur_pa = cur_pc = cur_pf = cur_pg = cur_ic32 = 0xff;
-	cur_leds = 0x00;
-	contrast = 1.0;
-}
-
-float mu100_state::lightlevel(const u8 *src, const u8 *render)
-{
-	u8 l = *src;
-	if(l == 0)
-		return 1.0;
-	int slot = (src[1] << 8) | src[2];
-	if(slot >= 0xff00)
-		return (255-l)/255.0;
-
-	int bit = slot & 7;
-	int adr = (slot >> 3);
-	if(render[adr] & (1 << bit))
-		return 1-(1-(255-l)/255.0f)*contrast;
-	return 0.95f;
-}
-
-u32 mu100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	const u8 *render = m_lcd->render();
-	const u8 *src = ymmu100_bkg + 15;
-
-	for(int y=0; y<241; y++) {
-		u32 *pix = reinterpret_cast<u32 *>(bitmap.raw_pixptr(y));
-		for(int x=0; x<800; x++) {
-			float light = lightlevel(src, render);
-			u32 col = (int(0xef*light) << 16) | (int(0xf5*light) << 8);
-			*pix++ = col;
-			src += 3;
-		}
-		for(int x=800; x<900; x++)
-			*pix++ = 0;
-	}
-
-	for(int i=0; i<6; i++)
-		if(cur_leds & (1 << i)) {
-			int x = 830 + 40*(i & 1);
-			int y = 55 + 65*(i >> 1);
-			for(int yy=-9; yy <= 9; yy++) {
-				int dx = int(sqrt((float)(99-yy*yy)));
-				u32 *pix = reinterpret_cast<u32 *>(bitmap.raw_pixptr(y+yy)) + (x-dx);
-				for(int xx=0; xx<2*dx+1; xx++)
-					*pix++ = 0x00ff00;
-			}
-		}
-	return 0;
 }
 
 void mu100_state::mu50_map(address_map &map)
@@ -732,7 +677,7 @@ void mu100_state::p2_w(u16 data)
 				m_lcd->control_write(cur_p1);
 		}
 	}
-	contrast = (8 - ((cur_p2 >> 3) & 7))/8.0;
+	m_lcd->set_contrast((8 - ((cur_p2 >> 3) & 7))/8.0);
 	cur_p2 = data;
 }
 
@@ -776,7 +721,7 @@ void mu100_state::pf_w(u16 data)
 {
 	if(!(cur_pf & 0x01) && (data & 0x01)) {
 		cur_ic32 = cur_p1;
-		cur_leds = (cur_p1 & 0x1f) | ((cur_p1 & 0x80) >> 2);
+		m_lcd->set_leds((cur_p1 & 0x1f) | ((cur_p1 & 0x80) >> 2));
 	}
 	cur_pf = data;
 }
@@ -866,7 +811,7 @@ void mu100_state::p6_w_vl70(u16 data)
 
 void mu100_state::pb_w_vl70(u16 data)
 {
-	cur_leds = bitswap<6>((data >> 2) ^ 0x3f, 5, 3, 1, 4, 2, 0);
+	m_lcd->set_leds(bitswap<6>((data >> 2) ^ 0x3f, 5, 3, 1, 4, 2, 0));
 }
 
 void mu100_state::pc_w_vl70(u16 data)
@@ -1044,15 +989,7 @@ void mu100_state::mu100(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mu100_state::mu100_map);
 	m_maincpu->set_addrmap(AS_IO, &mu100_state::mu100_iomap);
 
-	HD44780(config, m_lcd);
-	m_lcd->set_lcd_size(4, 20);
-
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_LCD);
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate, asynchronous updating anyway */
-	screen.set_screen_update(FUNC(mu100_state::screen_update));
-	screen.set_size(900, 241);
-	screen.set_visarea(0, 899, 0, 240);
+	MULCD(config, m_lcd);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1081,15 +1018,7 @@ void mu100_state::mu80(machine_config &config)
 	m_mu80cpu->set_addrmap(AS_PROGRAM, &mu100_state::mu80_map);
 	m_mu80cpu->set_addrmap(AS_IO, &mu100_state::mu80_iomap);
 
-	HD44780(config, m_lcd);
-	m_lcd->set_lcd_size(4, 20);
-
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_LCD);
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate, asynchronous updating anyway */
-	screen.set_screen_update(FUNC(mu100_state::screen_update));
-	screen.set_size(900, 241);
-	screen.set_visarea(0, 899, 0, 240);
+	MULCD(config, m_lcd);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1121,15 +1050,7 @@ void mu100_state::mu50(machine_config &config)
 	m_mu80cpu->set_addrmap(AS_PROGRAM, &mu100_state::mu50_map);
 	m_mu80cpu->set_addrmap(AS_IO, &mu100_state::mu50_iomap);
 
-	HD44780(config, m_lcd);
-	m_lcd->set_lcd_size(4, 20);
-
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_LCD);
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate, asynchronous updating anyway */
-	screen.set_screen_update(FUNC(mu100_state::screen_update));
-	screen.set_size(900, 241);
-	screen.set_visarea(0, 899, 0, 240);
+	MULCD(config, m_lcd);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1161,15 +1082,7 @@ void mu100_state::vl70(machine_config &config)
 	m_vl70cpu->set_addrmap(AS_PROGRAM, &mu100_state::vl70_map);
 	m_vl70cpu->set_addrmap(AS_IO, &mu100_state::vl70_iomap);
 
-	HD44780(config, m_lcd);
-	m_lcd->set_lcd_size(4, 20);
-
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_LCD);
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate, asynchronous updating anyway */
-	screen.set_screen_update(FUNC(mu100_state::screen_update));
-	screen.set_size(900, 241);
-	screen.set_visarea(0, 899, 0, 240);
+	MULCD(config, m_lcd);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1207,10 +1120,6 @@ ROM_START( mu100 )
 	ROM_LOAD32_WORD( "xt461a0-829.ic37", 0x0800002, 0x200000, CRC(a1d138a3) SHA1(46a7a7225cd7e1818ba551325d2af5ac1bf5b2bf) )
 	ROM_LOAD32_WORD( "xt462a0.ic39", 0x1000000, 0x400000, CRC(cbf037da) SHA1(37449e741243305de38cb913b17041942ad334cd) )
 	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
-
-	ROM_REGION( 0x1000, "lcd", 0)
-	// Hand made, 3 characters unused
-	ROM_LOAD( "mu100-font.bin", 0x0000, 0x1000, BAD_DUMP CRC(a7d6c1d6) SHA1(9f0398d678bdf607cb34d83ee535f3b7fcc97c41) )
 ROM_END
 
 // Identical to the mu100
