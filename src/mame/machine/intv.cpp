@@ -550,11 +550,11 @@ READ8_MEMBER( intv_state::intvkb_iocart_r )
 /* Set Reset and INTR/INTRM Vector */
 void intv_state::machine_reset()
 {
-	m_maincpu->set_input_line_vector(CP1610_RESET, 0x1000);
+	m_maincpu->set_input_line_vector(CP1610_RESET, 0x1000); // CP1610
 
 	/* These are actually the same vector, and INTR is unused */
-	m_maincpu->set_input_line_vector(CP1610_INT_INTRM, 0x1004);
-	m_maincpu->set_input_line_vector(CP1610_INT_INTR,  0x1004);
+	m_maincpu->set_input_line_vector(CP1610_INT_INTRM, 0x1004); // CP1610
+	m_maincpu->set_input_line_vector(CP1610_INT_INTR,  0x1004); // CP1610
 
 	/* Set initial PC */
 	m_maincpu->set_state_int(cp1610_cpu_device::CP1610_R7, 0x1000);

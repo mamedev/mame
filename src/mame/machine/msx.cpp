@@ -168,7 +168,7 @@ static const uint8_t cc_ex[0x100] = {
 
 void msx_state::driver_start()
 {
-	m_maincpu->set_input_line_vector(0, 0xff);
+	m_maincpu->set_input_line_vector(0, 0xff); // Z80
 
 	msx_memory_init();
 
