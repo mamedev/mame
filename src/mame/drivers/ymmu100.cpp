@@ -161,7 +161,6 @@ public:
 		, m_ioport_p8(*this, "P8")
 	{ }
 
-	void vl70(machine_config &config);
 	void mu100(machine_config &config);
 
 	void regs_s1_write_tap(offs_t address, u16 data, u16 mem_mask);
@@ -704,11 +703,6 @@ ROM_START( mu100r )
 	ROM_LOAD32_WORD( "xt461a0-829.ic37", 0x800002, 0x200000, CRC(a1d138a3) SHA1(46a7a7225cd7e1818ba551325d2af5ac1bf5b2bf) )
 	ROM_LOAD32_WORD( "xt462a0.ic39", 0x1000000, 0x400000, CRC(cbf037da) SHA1(37449e741243305de38cb913b17041942ad334cd) )
 	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
-ROM_END
-
-ROM_START( vl70 )
-	ROM_REGION( 0x200000, "vl70cpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "vl70m_v111_27c160.bin", 0x000000, 0x200000, CRC(efdba9f0) SHA1(cfa9fb7d2a991e4752393c9677e4ddcbe10866c7) )
 ROM_END
 
 CONS( 1997, mu100,  0,     0, mu100, mu100, mu100_state,  empty_init, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
