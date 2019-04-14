@@ -27,6 +27,7 @@
 
 /* Devices */
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "formats/tzx_cas.h"
 #include "machine/bankdev.h"
 
@@ -42,6 +43,8 @@ public:
 		m_i8251(*this, "i8251"),
 		m_i8255(*this, "ppi8255"),
 		m_centronics(*this, "centronics"),
+		m_upd765(*this, "upd765"),
+		m_flop(*this, "upd765:%u", 0U),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_io_ports(*this, {"LINE7", "LINE6", "LINE5", "LINE4", "LINE3", "LINE2", "LINE1", "LINE0", "LINE8"}),
@@ -79,6 +82,8 @@ private:
 	required_device<i8251_device> m_i8251;
 	required_device<i8255_device> m_i8255;
 	required_device<centronics_device> m_centronics;
+	required_device<upd765a_device> m_upd765;
+	required_device_array<floppy_connector, 2> m_flop;
 	required_device<address_map_bank_device> m_bank1;
 	required_device<address_map_bank_device> m_bank2;
 	required_ioport_array<9> m_io_ports;
