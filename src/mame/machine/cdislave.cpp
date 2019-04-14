@@ -23,10 +23,7 @@ TODO:
 
 #include "emu.h"
 #include "machine/cdislave.h"
-#include "machine/cdi070.h"
 #include "includes/cdi.h"
-
-#include "cpu/m68000/m68000.h"
 
 
 // device type definition
