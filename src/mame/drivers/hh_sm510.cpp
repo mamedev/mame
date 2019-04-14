@@ -3030,13 +3030,11 @@ static INPUT_PORTS_START( gnw_zelda )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) // Water of Life
 
 	PORT_START("IN.1") // S2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) // Attack
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // S3
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
@@ -3048,6 +3046,11 @@ static INPUT_PORTS_START( gnw_zelda )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 
 	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
 	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // Invincibility when playing on bottom screen only
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -3061,7 +3064,8 @@ void gnw_zelda_state::gnw_zelda(machine_config &config)
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_b().set_ioport("BA");
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
 	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
