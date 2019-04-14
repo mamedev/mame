@@ -20,7 +20,7 @@
 
 	<!-- build screen -->
 
-	<view name="Internal Layout">
+	<group name="displays">
 		<bounds left="50" top="20" right="770" bottom="141" />
 		<bezel element="static_black">
 			<bounds left="50" top="20" right="770" bottom="141" />
@@ -53,9 +53,24 @@
 			<repeat count="4">
 				<param name="digitno" start="~moduleno~" increment="1" />
 				<param name="digitx" start="~modulex~" increment="34" />
-				<bezel name="digit~digitno~" element="digit"><bounds x="~digitx~" y="80" width="25" height="40" /></bezel>
+				<bezel name="digit~digitno~" element="digit"><bounds x="~digitx~" y="40" width="25" height="70" /></bezel>
 			</repeat>
 		</repeat>
+	</group>
+
+	<view name="Internal Layout">
+		<group ref="displays">
+			<bounds x="0" y="0" width="241" height="22" />
+		</group>
+	</view>
+
+	<view name="Terminal Below">
+		<group ref="displays">
+			<bounds x="0" y="0" width="241" height="16" />
+		</group>
+		<screen index="0">
+			<bounds x="0" y="16" width="241" height="180.75" />
+		</screen>
 	</view>
 
 </mamelayout>
