@@ -161,7 +161,17 @@ ROM_START(pc)
 	ROMX_LOAD( "turbo_xt_3.10_2764.bin", 0x00000, 0x2000,  BAD_DUMP CRC(8aaca1e3) SHA1(9c03da16713e08c0112a04c8bdfa394e7341c1fc),ROM_BIOS(21))
 	ROM_SYSTEM_BIOS(22, "alco", "ALCO 8MHz") // another Phoenix v2.27 variant, probably overdumped, therefore BAD_DUMP
 	ROMX_LOAD( "alco8mhz.bin", 0x00000, 0x2000, BAD_DUMP CRC(96a56814) SHA1(7f752cbe1a25ed6ea5f77fed79cfbf608c667dc3),ROM_BIOS(22))
-	
+	ROM_SYSTEM_BIOS(23, "american", "American XT 1.32")
+	ROMX_LOAD( "americxt.rom", 0x00000, 0x2000, CRC(4c6e23f3) SHA1(6e16f42da9c3d7bd408cf885caf93de9aa02ebe4),ROM_BIOS(23))
+	ROM_SYSTEM_BIOS(24, "excel31", "Excel-Turbo Computer Version 3.1")
+	ROMX_LOAD( "excel-turbo_computer_3.1_2764.bin", 0x00000, 0x2000, CRC(d319fea7) SHA1(5b4b0eb35889602aa7f18de82800599528690e15),ROM_BIOS(24))
+	ROM_SYSTEM_BIOS(25, "s10b1", "Super 10-B1") // another Phoenix 2.51 variant
+	ROMX_LOAD( "super_10-b1_27c64.bin", 0x00000, 0x2000, CRC(ba7797db) SHA1(2ee8863640b860a1807cc41e1ac9d94f73a087aa),ROM_BIOS(25))
+	ROM_SYSTEM_BIOS(26, "td386", "TD 3.86")
+	ROMX_LOAD( "td3.86_id_75102637.bin", 0x00000, 0x2000, CRC(aec96e13) SHA1(6e3143418f439a0373fba626cf69df34e41815e5),ROM_BIOS(26))
+	ROM_SYSTEM_BIOS(27, "td393", "TD 3.93")
+	ROMX_LOAD( "td3.93.bin", 0x00000, 0x2000, CRC(807620d9) SHA1(3f0ca24e33feb32051de9e819b962df1528a0403),ROM_BIOS(27))
+		
 ROM_END
 
 #define rom_pcmda    rom_pc
