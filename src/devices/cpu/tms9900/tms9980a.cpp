@@ -79,10 +79,11 @@
 
 /****************************************************************************
     Constructor
+    The external clock is divided by 4 internally
 ****************************************************************************/
 
 tms9980a_device::tms9980a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: tms99xx_device(mconfig, type, tag, 8, 14, 11, owner, clock)
+	: tms99xx_device(mconfig, type, tag, 8, 14, 11, owner, clock / 4 )
 {
 }
 
