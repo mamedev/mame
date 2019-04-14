@@ -91,8 +91,7 @@ void fungames_state::video_start()
 void fungames_state::fungames(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
-	m_maincpu->set_constructor(netlist_fungames);
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_fungames);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
