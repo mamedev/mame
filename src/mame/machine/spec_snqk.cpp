@@ -94,7 +94,7 @@ void spectrum_state::update_paging()
 			m_port_1ffd_data = 0x04;
 		else
 			m_port_1ffd_data = 0x00;
-		spectrum_plus3_update_memory();
+		plus3_update_memory();
 	}
 }
 
