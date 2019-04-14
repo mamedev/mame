@@ -83,7 +83,7 @@ private:
 	required_ioport m_ioport_b1;
 	required_ioport m_ioport_b2;
 
-	u8 cur_p1, cur_p2, cur_p3, cur_p5, cur_p6, cur_pa, cur_pb, cur_pc, cur_pf, cur_pg;
+	u8 cur_p1, cur_p2, cur_p3, cur_p5, cur_p6, cur_pa, cur_pc, cur_pf, cur_pg;
 	u8 cur_ic32;
 
 	u16 adc_zero_r();
