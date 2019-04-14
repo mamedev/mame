@@ -201,6 +201,21 @@ files{
   MAME_DIR .. "src/mame/machine/nl_tp1985.cpp",
   MAME_DIR .. "src/mame/machine/nl_tp1985.h",
 
+  -- Skeletons ...
+  MAME_DIR .. "src/mame/drivers/a1supply.cpp",
+  MAME_DIR .. "src/mame/drivers/aleisttl.cpp",
+  MAME_DIR .. "src/mame/drivers/bailey.cpp",
+  MAME_DIR .. "src/mame/drivers/chicago.cpp",
+  MAME_DIR .. "src/mame/drivers/electra.cpp",
+  MAME_DIR .. "src/mame/drivers/exidyttl.cpp",
+  MAME_DIR .. "src/mame/drivers/fungames.cpp",
+  MAME_DIR .. "src/mame/drivers/meadwttl.cpp",
+  MAME_DIR .. "src/mame/drivers/monacogp.cpp",
+  MAME_DIR .. "src/mame/drivers/pse.cpp",
+  MAME_DIR .. "src/mame/drivers/ramtek.cpp",
+  MAME_DIR .. "src/mame/drivers/segattl.cpp",
+  MAME_DIR .. "src/mame/drivers/taitottl.cpp",
+  MAME_DIR .. "src/mame/drivers/usbilliards.cpp",
 }
 end
 
