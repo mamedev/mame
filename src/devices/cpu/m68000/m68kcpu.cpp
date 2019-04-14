@@ -2027,7 +2027,7 @@ std::unique_ptr<util::disasm_interface> m68008_device::create_disassembler()
 	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68008);
 }
 
-std::unique_ptr<util::disasm_interface> m68008plcc_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68008fn_device::create_disassembler()
 {
 	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68008);
 }
@@ -2319,14 +2319,14 @@ void m68000_base_device::clear_all()
 void m68000_base_device::autovectors_map(address_map &map)
 {
 	// Eventually add the sync to E due to vpa
-	// 8-bit handlers are used here to be 68008-compatible
-	map(0x3, 0x3).lr8("avec1", []() -> u8 { return 0x19; });
-	map(0x5, 0x5).lr8("avec2", []() -> u8 { return 0x1a; });
-	map(0x7, 0x7).lr8("avec3", []() -> u8 { return 0x1b; });
-	map(0x9, 0x9).lr8("avec4", []() -> u8 { return 0x1c; });
-	map(0xb, 0xb).lr8("avec5", []() -> u8 { return 0x1d; });
-	map(0xd, 0xd).lr8("avec6", []() -> u8 { return 0x1e; });
-	map(0xf, 0xf).lr8("avec7", []() -> u8 { return 0x1f; });
+	// 8-bit handlers are used here to be compatible with all bus widths
+	map(0x3, 0x3).lr8("avec1", []() -> u8 { return autovector(1); });
+	map(0x5, 0x5).lr8("avec2", []() -> u8 { return autovector(2); });
+	map(0x7, 0x7).lr8("avec3", []() -> u8 { return autovector(3); });
+	map(0x9, 0x9).lr8("avec4", []() -> u8 { return autovector(4); });
+	map(0xb, 0xb).lr8("avec5", []() -> u8 { return autovector(5); });
+	map(0xd, 0xd).lr8("avec6", []() -> u8 { return autovector(6); });
+	map(0xf, 0xf).lr8("avec7", []() -> u8 { return autovector(7); });
 }
 
 void m68000_base_device::default_autovectors_map(address_map &map)
@@ -2404,8 +2404,8 @@ device_memory_interface::space_config_vector m68000_base_device::memory_space_co
 
 
 DEFINE_DEVICE_TYPE(M68000,      m68000_device,      "m68000",       "Motorola MC68000")
-DEFINE_DEVICE_TYPE(M68008,      m68008_device,      "m68008",       "Motorola MC68008")
-DEFINE_DEVICE_TYPE(M68008PLCC,  m68008plcc_device,  "m68008plcc",   "Motorola MC68008PLCC")
+DEFINE_DEVICE_TYPE(M68008,      m68008_device,      "m68008",       "Motorola MC68008") // 48-pin plastic or ceramic DIP
+DEFINE_DEVICE_TYPE(M68008FN,    m68008fn_device,    "m68008fn",     "Motorola MC68008FN") // 52-pin PLCC
 DEFINE_DEVICE_TYPE(M68010,      m68010_device,      "m68010",       "Motorola MC68010")
 DEFINE_DEVICE_TYPE(M68EC020,    m68ec020_device,    "m68ec020",     "Motorola MC68EC020")
 DEFINE_DEVICE_TYPE(M68020,      m68020_device,      "m68020",       "Motorola MC68020")
@@ -2460,12 +2460,12 @@ void m68008_device::device_start()
 }
 
 
-m68008plcc_device::m68008plcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68008PLCC, 8,22)
+m68008fn_device::m68008fn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m68000_base_device(mconfig, tag, owner, clock, M68008FN, 8,22)
 {
 }
 
-void m68008plcc_device::device_start()
+void m68008fn_device::device_start()
 {
 	init_cpu_m68008();
 }

@@ -80,10 +80,10 @@ cdi68070_device::cdi68070_device(const machine_config &mconfig, const char *tag,
 
 void cdi68070_device::device_resolve_objects()
 {
-	m_iack2_callback.resolve_safe(0x1a); // Level 2 external autovector
-	m_iack4_callback.resolve_safe(0x1c); // Level 4 external autovector
-	m_iack5_callback.resolve_safe(0x1d); // Level 5 external autovector
-	m_iack7_callback.resolve_safe(0x1f); // Level 7 external autovector
+	m_iack2_callback.resolve_safe(scc68070_device::autovector(2));
+	m_iack4_callback.resolve_safe(scc68070_device::autovector(4));
+	m_iack5_callback.resolve_safe(scc68070_device::autovector(5));
+	m_iack7_callback.resolve_safe(scc68070_device::autovector(7));
 }
 
 //-------------------------------------------------

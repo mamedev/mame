@@ -464,7 +464,7 @@ u16 wildpkr_state::tabpkr_irq_ack(offs_t offset)
 	if (offset+1 == 2)
 		return m_duart->get_irq_vector();
 	else
-		return 0x19 + offset;
+		return m68000_device::autovector(offset+1);
 }
 
 

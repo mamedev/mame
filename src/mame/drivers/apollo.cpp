@@ -282,7 +282,7 @@ u16 apollo_state::apollo_irq_acknowledge(offs_t offset)
 	if (offset+1 == 6)
 		return apollo_pic_get_vector();
 	else
-		return 0x19 + offset;
+		return m68000_base_device::autovector(offset+1);
 }
 
 /***************************************************************************
