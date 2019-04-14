@@ -519,7 +519,6 @@
   - prg ROMs:       3x 2732 (32Kb) or similar.
   - gfx ROMs:       4x 2716 (16Kb) or similar.
   - sound:          (discrete).
-  - battery backup: 2x S8423
 
 
   PCB Layout (pmpoker):
