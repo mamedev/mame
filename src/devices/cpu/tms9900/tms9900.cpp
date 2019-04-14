@@ -146,7 +146,7 @@ enum
 #define LOG_DETAIL     (1U<<31)  // Increased detail
 
 // Minimum log should be warnings
-#define VERBOSE ( LOG_GENERAL | LOG_WARN | LOG_ADDRESSBUS )
+#define VERBOSE ( LOG_GENERAL | LOG_WARN )
 
 #include "logmacro.h"
 
