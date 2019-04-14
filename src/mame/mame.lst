@@ -36516,6 +36516,10 @@ srangero                        // (c) 1988
 srangerw                        // (c) 1988 SunA (WDK License)
 starfigh                        // (c) 1990 SunA
 
+@source:sunplus_gcm394.cpp
+smartfp                         // Smart Fit Park
+wrlshunt                        // Wireless: Hunting Video Game System
+
 @source:supbtime.cpp
 chinatwn                        // MAK (c) 1991 Data East Corporation (Japan)
 supbtime                        // MAE (c) 1990 Data East Corporation (World)
@@ -38811,7 +38815,6 @@ jak_nick                        //
 jak_sbfc                        //
 lexizeus                        // Lexibook
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
-wrlshunt                        // Wireless: Hunting Video Game System
 wirels60                        // Wireless 60
 wlsair60                        // Wireless Air 60
 zone40                          // Zone 40
@@ -38823,7 +38826,6 @@ rad_crik                        //
 rad_fb2                         //
 mattelcs                        //
 dreamlif                        //
-smartfp                         //
 icanguit                        //
 icanpian                        //
 

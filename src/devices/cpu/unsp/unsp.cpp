@@ -22,15 +22,16 @@
 #include "unspdasm.h"
 
 DEFINE_DEVICE_TYPE(UNSP, unsp_device, "unsp", "SunPlus u'nSP")
+DEFINE_DEVICE_TYPE(UNSP_NEWER, unsp_newer_device, "unsp_newer", "SunPlus u'nSP (newer)") // found on GCM394 die, has extra instructions
 
 /* size of the execution code cache */
 #define CACHE_SIZE                      (64 * 1024 * 1024)
 
-unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, UNSP, tag, owner, clock)
+unsp_device::unsp_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_core(nullptr)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 23, -1)
 	, m_program(nullptr)
-	, m_core(nullptr)
 	, m_debugger_temp(0)
 #if UNSP_LOG_OPCODES || UNSP_LOG_REGS
 	, m_log_ops(0)
@@ -52,6 +53,17 @@ unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
+unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: unsp_device(mconfig, UNSP, tag, owner, clock)
+{
+}
+
+unsp_newer_device::unsp_newer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: unsp_device(mconfig, UNSP_NEWER, tag, owner, clock)
+{
+}
+
+
 device_memory_interface::space_config_vector unsp_device::memory_space_config() const
 {
 	return space_config_vector {
@@ -62,6 +74,11 @@ device_memory_interface::space_config_vector unsp_device::memory_space_config() 
 std::unique_ptr<util::disasm_interface> unsp_device::create_disassembler()
 {
 	return std::make_unique<unsp_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> unsp_newer_device::create_disassembler()
+{
+	return std::make_unique<unsp_newer_disassembler>();
 }
 
 void unsp_device::unimplemented_opcode(uint16_t op)
@@ -349,6 +366,17 @@ void unsp_device::add_lpc(const int32_t offset)
 	m_core->m_r[REG_SR] &= 0xffc0;
 	m_core->m_r[REG_SR] |= (new_lpc >> 16) & 0x3f;
 }
+
+void unsp_device::execute_f_group(const uint16_t op)
+{
+	unimplemented_opcode(op);
+}
+
+void unsp_newer_device::execute_f_group(const uint16_t op)
+{
+	logerror("UNSP: unknown extended opcode %04x at %04x\n", op, UNSP_LPC);
+}
+
 
 inline void unsp_device::execute_one(const uint16_t op)
 {
@@ -942,6 +970,11 @@ inline void unsp_device::execute_one(const uint16_t op)
 		case 0x0d: // Store
 			write16(r2, r0);
 			return;
+
+		case 0x0f: // extended opcodes
+			execute_f_group(op);
+			return;
+
 		default:
 			unimplemented_opcode(op);
 			return;

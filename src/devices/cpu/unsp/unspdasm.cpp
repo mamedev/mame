@@ -72,6 +72,46 @@ void unsp_disassembler::print_indirect_op(std::ostream &stream, uint8_t opN, uin
 	util::stream_format(stream, forms[opN & 3], regs[opB]);
 }
 
+offs_t unsp_disassembler::disassemble_f_group(std::ostream& stream, offs_t pc, uint16_t op, uint16_t ximm, uint8_t opN, uint8_t opA, uint8_t opB, uint32_t len)
+{
+	switch (opN)
+	{
+	case 1:
+		if (opA == 7)
+		{
+			util::stream_format(stream, "<DUNNO f group>");
+			return UNSP_DASM_OK;
+		}
+		util::stream_format(stream, "mr = %s*%s, us", regs[opA], regs[opB]);
+		return UNSP_DASM_OK;
+	default:
+		util::stream_format(stream, "<DUNNO f group>");
+		return UNSP_DASM_OK;
+	}
+}
+
+offs_t unsp_newer_disassembler::disassemble_f_group(std::ostream& stream, offs_t pc, uint16_t op, uint16_t ximm, uint8_t opN, uint8_t opA, uint8_t opB, uint32_t len)
+{
+	// these are new opcodes on the later core
+
+	switch (opN)
+	{
+	case 1:
+		if (opA == 7)
+		{
+			util::stream_format(stream, "<EXTENDED f group>");
+			return UNSP_DASM_OK;
+		}
+		util::stream_format(stream, "mr = %s*%s, us", regs[opA], regs[opB]);
+		return UNSP_DASM_OK;
+	default:
+		util::stream_format(stream, "<EXTENDED f group>");
+		return UNSP_DASM_OK;
+	}
+}
+
+
+
 offs_t unsp_disassembler::disassemble(std::ostream &stream, offs_t pc, uint16_t op, uint16_t ximm)
 {
 	// the top four bits are the alu op or the branch condition, or E or F
@@ -344,20 +384,7 @@ offs_t unsp_disassembler::disassemble(std::ostream &stream, offs_t pc, uint16_t 
 
 
 	case 0x0f:
-		switch (opN)
-		{
-		case 1:
-			if (opA == 7)
-			{
-				util::stream_format(stream, "<DUNNO>");
-				return UNSP_DASM_OK;
-			}
-			util::stream_format(stream, "mr = %s*%s, us", regs[opA], regs[opB]);
-			return UNSP_DASM_OK;
-		default:
-			util::stream_format(stream, "<DUNNO>");
-			return UNSP_DASM_OK;
-		}
+		return disassemble_f_group(stream, pc, op, ximm, opN, opA, opB, len);
 
 	case 0x4f:
 		switch (opN)
