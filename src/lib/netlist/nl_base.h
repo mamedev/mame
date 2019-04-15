@@ -433,7 +433,11 @@ namespace netlist
 			void operator delete (void * mem) = delete;
 	#endif
 		protected:
-			~object_t() noexcept = default; // only childs should be destructible
+			// only childs should be destructible
+			~object_t() noexcept
+			{
+				name_hash().erase(name_hash().find(this));
+			}
 
 		private:
 			//pstring m_name;
@@ -1369,7 +1373,10 @@ namespace netlist
 		{
 			for (auto & d : m_devices)
 				if (d.first == name)
-					log().fatal(MF_1_DUPLICATE_NAME_DEVICE_LIST, d.first);
+				{
+					dev.release();
+					log().fatal(MF_1_DUPLICATE_NAME_DEVICE_LIST, name);
+				}
 			//m_devices.push_back(std::move(dev));
 			m_devices.insert(m_devices.end(), { name, std::move(dev) });
 		}

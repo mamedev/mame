@@ -272,8 +272,10 @@ pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def) 
 void setup_t::register_term(detail::core_terminal_t &term)
 {
 	if (!m_terminals.insert({term.name(), &term}).second)
+	{
 		log().fatal(MF_2_ADDING_1_2_TO_TERMINAL_LIST, termtype_as_str(term),
 				term.name());
+	}
 	log().debug("{1} {2}\n", termtype_as_str(term), term.name());
 }
 
@@ -1144,7 +1146,11 @@ bool source_t::parse(nlparse_t &setup, const pstring &name)
 		return false;
 	else
 	{
-		return setup.parse_stream(stream(name), name);
+		auto strm(stream(name));
+		if (strm)
+			return setup.parse_stream(std::move(strm), name);
+		else
+			return false;
 	}
 }
 

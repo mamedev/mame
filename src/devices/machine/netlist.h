@@ -20,6 +20,7 @@ class nld_sound_in;
 
 namespace netlist {
 	class setup_t;
+	class netlist_t;
 	class netlist_state_t;
 	class nlparse_t;
 	template <typename T>
@@ -131,7 +132,7 @@ protected:
 	netlist_mame_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// Custom to netlist ...
-	virtual void nl_register_devices() { }
+	virtual void nl_register_devices(netlist::setup_t &lsetup) const { }
 
 	// device_t overrides
 	virtual void device_config_complete() override;
@@ -147,6 +148,8 @@ protected:
 
 private:
 	void save_state();
+
+	void common_dev_start(netlist::netlist_t *lnetlist) const;
 
 	/* timing support here - so sound can hijack it ... */
 	netlist::netlist_time        m_rem;
@@ -186,6 +189,11 @@ public:
 	// construction/destruction
 	netlist_mame_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	~netlist_mame_cpu_device()
+	{
+
+	}
+
 	offs_t genPC() const { return m_genPC; }
 
 	netlist_mame_cpu_device & set_source(void (*setup_func)(netlist::nlparse_t &))
@@ -203,7 +211,7 @@ public:
 
 protected:
 	// netlist_mame_device
-	virtual void nl_register_devices() override;
+	virtual void nl_register_devices(netlist::setup_t &lsetup) const override;
 
 	// device_t overrides
 	virtual void device_start() override;
@@ -262,7 +270,7 @@ public:
 
 protected:
 	// netlist_mame_device
-	virtual void nl_register_devices() override;
+	virtual void nl_register_devices(netlist::setup_t &lsetup) const override;
 
 	// device_t overrides
 	virtual void device_start() override;
@@ -285,6 +293,10 @@ public:
 		: m_offset(0.0), m_mult(1.0)
 		, m_owner(dynamic_cast<netlist_mame_device *>(&aowner))
 		, m_sound(dynamic_cast<netlist_mame_sound_device *>(&aowner))
+	{
+	}
+
+	virtual ~netlist_mame_sub_interface()
 	{
 	}
 
