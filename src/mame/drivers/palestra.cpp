@@ -71,7 +71,8 @@ static INPUT_PORTS_START(palestra)
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(palestra_state::palestra)
+void palestra_state::palestra(machine_config &config)
+{
 	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK)
 		.set_source(netlist_palestra);
 
@@ -85,7 +86,7 @@ MACHINE_CONFIG_START(palestra_state::palestra)
 	m_video->set_fieldcount(1);
 	m_video->set_threshold(1);
 	m_video->set_gain(0.36);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( palestra ) /* dummy to satisfy game entry*/

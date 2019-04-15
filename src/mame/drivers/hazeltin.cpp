@@ -693,7 +693,8 @@ static GFXDECODE_START( gfx_hazl1500 )
 	GFXDECODE_ENTRY( CHAR_EPROM_TAG, 0x0000, hazl1500_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(hazl1500_state::hazl1500)
+void hazl1500_state::hazl1500(machine_config &config)
+{
 	/* basic machine hardware */
 	I8080(config, m_maincpu, XTAL(18'000'000)/9); // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
 	m_maincpu->set_addrmap(AS_PROGRAM, &hazl1500_state::hazl1500_mem);
@@ -773,7 +774,7 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	m_kbdc->shift().set(FUNC(hazl1500_state::ay3600_shift_r));
 	m_kbdc->control().set(FUNC(hazl1500_state::ay3600_control_r));
 	m_kbdc->data_ready().set(FUNC(hazl1500_state::ay3600_data_ready_w));
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( hazl1500 )

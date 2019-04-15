@@ -463,8 +463,8 @@ static INPUT_PORTS_START( rebound )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(pong_state::pong)
-
+void pong_state::pong(machine_config &config)
+{
 	/* basic machine hardware */
 	//MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
 	//MCFG_NETLIST_SETUP(pong)
@@ -499,10 +499,10 @@ MACHINE_CONFIG_START(pong_state::pong)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(breakout_state::breakout)
-
+void breakout_state::breakout(machine_config &config)
+{
 	/* basic machine hardware */
 	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(NETLIST_NAME(breakout));
 
@@ -553,20 +553,19 @@ MACHINE_CONFIG_START(breakout_state::breakout)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pong_state::pongf)
+void pong_state::pongf(machine_config &config)
+{
 	pong(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_NETLIST_SETUP(pong_fast)
+	subdevice<netlist_mame_device>("maincpu")->set_setup_func(NETLIST_NAME(pong_fast));
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(pong_state::pongd)
-
+void pong_state::pongd(machine_config &config)
+{
 	/* basic machine hardware */
 	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(NETLIST_NAME(pongdoubles));
 
@@ -601,10 +600,10 @@ MACHINE_CONFIG_START(pong_state::pongd)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(rebound_state::rebound)
-
+void rebound_state::rebound(machine_config &config)
+{
 	/* basic machine hardware */
 	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(NETLIST_NAME(rebound_schematics));
 
@@ -644,7 +643,7 @@ MACHINE_CONFIG_START(rebound_state::rebound)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

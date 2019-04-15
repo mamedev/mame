@@ -37,7 +37,8 @@ WRITE_LINE_MEMBER(cheekyms_audio_device::pest_dies_w)   { m_pest_dies->write_lin
 WRITE_LINE_MEMBER(cheekyms_audio_device::coin_extra_w)  { m_coin_extra->write_line(state); }
 
 
-MACHINE_CONFIG_START(cheekyms_audio_device::device_add_mconfig)
+void cheekyms_audio_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
 
 	NETLIST_SOUND(config, "sound_nl", 48000)
@@ -55,8 +56,7 @@ MACHINE_CONFIG_START(cheekyms_audio_device::device_add_mconfig)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:coin_extra", "I_COIN_EXTRA.IN", 0);
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "VR1.2").set_mult_offset(30000.0 * 10.0, 0.0);
-
-MACHINE_CONFIG_END
+}
 
 
 void cheekyms_audio_device::device_start()

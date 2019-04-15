@@ -511,8 +511,8 @@ INPUT_PORTS_END
 *         Machine Drivers          *
 ***********************************/
 
-MACHINE_CONFIG_START(cocoloco_state::cocoloco)
-
+void cocoloco_state::cocoloco(machine_config &config)
+{
 	/* basic machine hardware */
 	M6502(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cocoloco_state::cocoloco_map);
@@ -546,8 +546,7 @@ MACHINE_CONFIG_START(cocoloco_state::cocoloco)
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin2", 2, "R_AY1_3.R");
 
 	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "RAMP.1").set_mult_offset(30000.0 * 1.5, 0);
-
-MACHINE_CONFIG_END
+}
 
 
 /***********************************

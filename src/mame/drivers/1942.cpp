@@ -563,8 +563,8 @@ void _1942_state::machine_reset()
 	m_scroll[1] = 0;
 }
 
-MACHINE_CONFIG_START(_1942_state::_1942)
-
+void _1942_state::_1942(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MAIN_CPU_CLOCK);    /* 4 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &_1942_state::_1942_map);
@@ -623,8 +623,7 @@ MACHINE_CONFIG_START(_1942_state::_1942)
 
 	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "R1.1").set_mult_offset(70000.0, 0.0);
 	//MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "VR.2")
-
-MACHINE_CONFIG_END
+}
 
 
 void _1942p_state::_1942p(machine_config &config)

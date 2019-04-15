@@ -102,7 +102,8 @@ static INPUT_PORTS_START(tp1985)
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(tp1983_state::tp1983)
+void tp1983_state::tp1983(machine_config &config)
+{
 	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_tp1983);
 
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", FUNC(fixedfreq_device::update_composite_monochrome), "fixfreq");
@@ -115,9 +116,10 @@ MACHINE_CONFIG_START(tp1983_state::tp1983)
 	m_video->set_fieldcount(1);
 	m_video->set_threshold(1);
 	m_video->set_gain(0.36);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(tp1985_state::tp1985)
+void tp1985_state::tp1985(machine_config &config)
+{
 	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_tp1985);
 
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", FUNC(tp1985_state::video_out_cb), "");
@@ -130,7 +132,7 @@ MACHINE_CONFIG_START(tp1985_state::tp1985)
 	m_video->set_fieldcount(1);
 	m_video->set_threshold(1);
 	m_video->set_gain(0.36);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( tp1983 ) /* dummy to satisfy game entry*/
