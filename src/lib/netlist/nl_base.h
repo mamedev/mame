@@ -565,7 +565,11 @@ namespace netlist
 			net_t & net() noexcept { return *m_net;}
 
 			bool is_logic() const NL_NOEXCEPT;
+			bool is_logic_input() const NL_NOEXCEPT;
+			bool is_logic_output() const NL_NOEXCEPT;
 			bool is_analog() const NL_NOEXCEPT;
+			bool is_analog_input() const NL_NOEXCEPT;
+			bool is_analog_output() const NL_NOEXCEPT;
 
 			bool is_state(state_e astate) const noexcept { return (m_state == astate); }
 			state_e terminal_state() const noexcept { return m_state; }

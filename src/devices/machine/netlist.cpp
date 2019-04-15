@@ -20,6 +20,7 @@
 #include "netlist/plib/palloc.h"
 
 #include "debugger.h"
+#include "romload.h"
 
 #include <cmath>
 #include <memory>
@@ -67,11 +68,11 @@ protected:
 		case plib::plog_level::DEBUG:
 			m_parent.logerror("netlist DEBUG: %s\n", ls.c_str());
 			break;
-		case plib::plog_level::INFO:
-			m_parent.logerror("netlist INFO: %s\n", ls.c_str());
-			break;
 		case plib::plog_level::VERBOSE:
 			m_parent.logerror("netlist VERBOSE: %s\n", ls.c_str());
+			break;
+		case plib::plog_level::INFO:
+			m_parent.logerror("netlist INFO: %s\n", ls.c_str());
 			break;
 		case plib::plog_level::WARNING:
 			m_parent.logerror("netlist WARNING: %s\n", ls.c_str());
@@ -104,19 +105,19 @@ protected:
 		{
 		case plib::plog_level::DEBUG:
 			break;
-		case plib::plog_level::INFO:
-			break;
 		case plib::plog_level::VERBOSE:
 			break;
+		case plib::plog_level::INFO:
+			osd_printf_verbose("netlist INFO: %s\n", ls.c_str());
+			break;
 		case plib::plog_level::WARNING:
-			osd_printf_verbose("netlist WARNING: %s\n", ls.c_str());
+			osd_printf_warning("netlist WARNING: %s\n", ls.c_str());
 			break;
 		case plib::plog_level::ERROR:
 			osd_printf_error("netlist ERROR: %s\n", ls.c_str());
 			break;
 		case plib::plog_level::FATAL:
-			//throw emu_fatalerror(1, "netlist ERROR: %s\n", ls.c_str());
-			throw emu_fatalerror("netlist ERROR: %s\n", ls.c_str());
+			throw emu_fatalerror(1, "netlist ERROR: %s\n", ls.c_str());
 		}
 	}
 
@@ -307,10 +308,9 @@ private:
 
 plib::unique_ptr<plib::pistream> netlist_source_memregion_t::stream(const pstring &name)
 {
-	//memory_region *mem = static_cast<netlist_mame_device::netlist_mame_t &>(setup().setup().exec()).machine().root_device().memregion(m_name.c_str());
 	if (m_dev.has_running_machine())
 	{
-		memory_region *mem = m_dev.machine().root_device().memregion(m_name.c_str());
+		memory_region *mem = m_dev.memregion(m_name.c_str());
 		return plib::make_unique<plib::pimemstream>(mem->base(), mem->bytes());
 	}
 	else
@@ -323,19 +323,43 @@ netlist_data_memregions_t::netlist_data_memregions_t(const device_t &dev)
 {
 }
 
+static bool rom_exists(device_t &root, pstring name)
+{
+	// iterate, starting with the driver's ROMs and continuing with device ROMs
+	for (device_t &device : device_iterator(root))
+	{
+		// scan the ROM entries for this device
+		for (tiny_rom_entry const *romp = device.rom_region(); romp && !ROMENTRY_ISEND(romp); ++romp)
+		{
+			if (ROMENTRY_ISREGION(romp)) // if this is a region, check for rom
+			{
+				char const *const basetag = romp->name;
+				if (name == pstring(":") + basetag)
+					return true;
+			}
+		}
+	}
+	return false;
+}
+
 plib::unique_ptr<plib::pistream> netlist_data_memregions_t::stream(const pstring &name)
 {
 	//memory_region *mem = static_cast<netlist_mame_device::netlist_mame_t &>(setup().setup().exec()).parent().memregion(name.c_str());
-	memory_region *mem = m_dev.memregion(name.c_str());
-	if (mem != nullptr)
+	if (m_dev.has_running_machine())
 	{
-		return plib::make_unique<plib::pimemstream>(mem->base(), mem->bytes());
+		memory_region *mem = m_dev.memregion(name.c_str());
+		if (mem != nullptr)
+			return plib::make_unique<plib::pimemstream>(mem->base(), mem->bytes());
+		else
+			return plib::unique_ptr<plib::pistream>(nullptr);
 	}
 	else
 	{
-		// This should be the last data provider being called - last resort
-		fatalerror("data named %s not found in device rom regions\n", name.c_str());
-		return plib::unique_ptr<plib::pistream>(nullptr);
+		/* validation */
+		if (rom_exists(m_dev.mconfig().root_device(), pstring(m_dev.tag()) + ":" + name))
+			return plib::make_unique<plib::pimemstream>();
+		else
+			return plib::unique_ptr<plib::pistream>(nullptr);
 	}
 }
 
@@ -957,7 +981,7 @@ void netlist_mame_device::common_dev_start(netlist::netlist_t *lnetlist) const
 	}
 
 	/* add default data provider for roms - if not in validity check*/
-	if (has_running_machine())
+	//if (has_running_machine())
 		lsetup.register_source(plib::make_unique<netlist_data_memregions_t>(*this));
 
 	m_setup_func(lsetup);
@@ -978,9 +1002,12 @@ void netlist_mame_device::common_dev_start(netlist::netlist_t *lnetlist) const
 }
 
 
+
 void netlist_mame_device::device_validity_check(validity_checker &valid) const
 {
 #if 1
+
+	//rom_exists(mconfig().root_device());
 	LOGDEVCALLS("device_validity_check %s\n", this->mconfig().gamedrv().name);
 
 	try

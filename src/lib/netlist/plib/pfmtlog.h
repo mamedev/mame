@@ -17,8 +17,8 @@ namespace plib {
 
 P_ENUM(plog_level,
 	DEBUG,
-	INFO,
 	VERBOSE,
+	INFO,
 	WARNING,
 	ERROR,
 	FATAL)
