@@ -18,6 +18,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
+#include "machine/6840ptm.h"
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
@@ -29,25 +30,60 @@ public:
 	rd100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_keys(*this, "KEY%u", 0U)
 	{ }
 
 	void rd100(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
-	DECLARE_MACHINE_RESET(rd100);
 	HD44780_PIXEL_UPDATE(pixel_update);
+
+	uint8_t keys_r();
+	void key_scan_w(uint8_t data);
 
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_ioport_array<8> m_keys;
+
+	uint8_t m_key_scan;
 };
 
+
+void rd100_state::machine_start()
+{
+	save_item(NAME(m_key_scan));
+}
+
+HD44780_PIXEL_UPDATE(rd100_state::pixel_update)
+{
+	if (pos < 16)
+		bitmap.pix16(line * 8 + y, pos * 6 + x) = state;
+}
+
+uint8_t rd100_state::keys_r()
+{
+	uint8_t result = 0xff;
+	for (int i = 0; i < 8; i++)
+		if (!BIT(m_key_scan, i))
+			result &= m_keys[i]->read();
+
+	return result;
+}
+
+void rd100_state::key_scan_w(uint8_t data)
+{
+	m_key_scan = data;
+}
 
 void rd100_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).ram();
-	//map(0x8608, 0x860f).rw("timer", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0x8608, 0x860f).rw("ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x8640, 0x8643).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8680, 0x8683).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8700, 0x8701).rw("hd44780", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
@@ -56,13 +92,86 @@ void rd100_state::mem_map(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( rd100 )
-INPUT_PORTS_END
+	PORT_START("KEY0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-HD44780_PIXEL_UPDATE(rd100_state::pixel_update)
-{
-	if (pos < 16)
-		bitmap.pix16(line * 8 + y, pos * 6 + x) = state;
-}
+	PORT_START("KEY1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("KEY2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("KEY3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("KEY4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("KEY5")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("KEY6")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("KEY7")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+INPUT_PORTS_END
 
 void rd100_state::rd100(machine_config &config)
 {
@@ -70,9 +179,13 @@ void rd100_state::rd100(machine_config &config)
 	MC6809(config, m_maincpu, 4_MHz_XTAL); // MC6809P???
 	m_maincpu->set_addrmap(AS_PROGRAM, &rd100_state::mem_map);
 
-	PIA6821(config, "pia1");
+	pia6821_device &pia1(PIA6821(config, "pia1"));
+	pia1.readpa_handler().set(FUNC(rd100_state::keys_r));
+	pia1.writepb_handler().set(FUNC(rd100_state::key_scan_w));
 
 	PIA6821(config, "pia2");
+
+	PTM6840(config, "ptm", 4_MHz_XTAL / 4);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
