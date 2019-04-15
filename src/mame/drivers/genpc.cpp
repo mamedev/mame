@@ -137,40 +137,44 @@ ROM_START(pc)
 	ROMX_LOAD( "ami.bin", 0x00000, 0x2000, CRC(b381eb22) SHA1(9735193de119270c946a17ed58c3ab9554e0852e),ROM_BIOS(9))
 	ROM_SYSTEM_BIOS(10, "award", "XT Award 2.05")
 	ROMX_LOAD( "award2.05.bin", 0x00000, 0x2000, CRC(5b3953e5) SHA1(4a36171aa8d993008187f39f732b9296401b7b6c),ROM_BIOS(10))
-	ROM_SYSTEM_BIOS(11, "dtk", "XT DTK Erso bios 2.42")
-	ROMX_LOAD( "dtk2.42.bin", 0x00000, 0x2000, CRC(3f2d2a76) SHA1(02fa057f2c22ab199a8d9795ab1ae570f2b13a36),ROM_BIOS(11))
-	ROM_SYSTEM_BIOS(12, "peter", "XT Peter Kohlman 3.75") // V20 Rom only
-	ROMX_LOAD( "peterv203.75.bin", 0x00000, 0x2000, CRC(b053a6a4) SHA1(f53218ad3d725f12d9149b22d8afcf6a8869a3bd),ROM_BIOS(12))
-	ROM_SYSTEM_BIOS(13, "pho2271", "XT Phoenix Bios 2.27 #1")
-	ROMX_LOAD( "phoenix2.27.bin", 0x00000, 0x2000, CRC(168ffef0) SHA1(69465db2f9246a614044d1f433d374506a13a07f),ROM_BIOS(13))
-	ROM_SYSTEM_BIOS(14, "pho2272", "XT Phoenix Bios 2.27 #2") // V20 installed on board
-	ROMX_LOAD( "compatibility_software_phoenix_technologies_1985_1986_1121277.bin", 0x00000, 0x2000, CRC(33ceb81a) SHA1(7c7db75e61e19025938f30798d9d0f8b4f6ab0ee),ROM_BIOS(14))
-	ROM_SYSTEM_BIOS(15, "pho251", "XT Phoenix Bios 2.51")
-	ROMX_LOAD( "phoenix2.51.bin", 0x00000, 0x2000, CRC(9b7e9c40) SHA1(c948a8d3d715e469105c6e2acd8b46ec274b25a8),ROM_BIOS(15))
-	ROM_SYSTEM_BIOS(16, "turbo", "XT Turbo Bios 3.10")
-	ROMX_LOAD( "turbo3.10.bin", 0x00000, 0x2000, CRC(8aaca1e3) SHA1(9c03da16713e08c0112a04c8bdfa394e7341c1fc),ROM_BIOS(16))
-	ROM_SYSTEM_BIOS(17, "nestv200", "JUKO NEST v2.00") // use keytronic keyboard
-	ROMX_LOAD( "jukoa.bin", 0x00000, 0x2000, CRC(7d78707e) SHA1(8b09a32658a850e7f03254d1328fe6e336e91871),ROM_BIOS(17))
-	ROM_SYSTEM_BIOS(18, "nest230", "JUKO NEST v2.30")
-	ROMX_LOAD( "juko_st_v2.30.bin", 0x00000, 0x2000, CRC(7a1c6dfa) SHA1(0b343f3028ca06c9e6dc69427d1b15a47c74b9fc),ROM_BIOS(18))
-	ROM_SYSTEM_BIOS(19, "nest232", "JUKO NEST v2.32")
-	ROMX_LOAD( "xt-juko-st-2.32.bin", 0x00000, 0x2000, CRC(0768524e) SHA1(259520bb7a6796e5b987c2b9bef1acd501df1670),ROM_BIOS(19))
-	ROM_SYSTEM_BIOS(20, "sid41", "SID BIOS v4.1") // from X'GOLDEN mainboard
-	ROMX_LOAD( "sid_bios_version_v4.1.bin", 0x00000, 0x2000, CRC(c58daf4d) SHA1(7066f8f993500383b99103a9fa1e6c125c89581b),ROM_BIOS(20))
-	ROM_SYSTEM_BIOS(21, "txt310", "T U R B O  XT Version 3.10") // from X'GOLDEN Turbo mainboard, computer can operate in 8MHz mode, source mentions possible corruption
-	ROMX_LOAD( "turbo_xt_3.10_2764.bin", 0x00000, 0x2000,  BAD_DUMP CRC(8aaca1e3) SHA1(9c03da16713e08c0112a04c8bdfa394e7341c1fc),ROM_BIOS(21))
-	ROM_SYSTEM_BIOS(22, "alco", "ALCO 8MHz") // another Phoenix v2.27 variant, probably overdumped, therefore BAD_DUMP
-	ROMX_LOAD( "alco8mhz.bin", 0x00000, 0x2000, BAD_DUMP CRC(96a56814) SHA1(7f752cbe1a25ed6ea5f77fed79cfbf608c667dc3),ROM_BIOS(22))
-	ROM_SYSTEM_BIOS(23, "american", "American XT 1.32")
-	ROMX_LOAD( "americxt.rom", 0x00000, 0x2000, CRC(4c6e23f3) SHA1(6e16f42da9c3d7bd408cf885caf93de9aa02ebe4),ROM_BIOS(23))
-	ROM_SYSTEM_BIOS(24, "excel31", "Excel-Turbo Computer Version 3.1")
-	ROMX_LOAD( "excel-turbo_computer_3.1_2764.bin", 0x00000, 0x2000, CRC(d319fea7) SHA1(5b4b0eb35889602aa7f18de82800599528690e15),ROM_BIOS(24))
-	ROM_SYSTEM_BIOS(25, "s10b1", "Super 10-B1") // another Phoenix 2.51 variant
-	ROMX_LOAD( "super_10-b1_27c64.bin", 0x00000, 0x2000, CRC(ba7797db) SHA1(2ee8863640b860a1807cc41e1ac9d94f73a087aa),ROM_BIOS(25))
-	ROM_SYSTEM_BIOS(26, "td386", "TD 3.86")
-	ROMX_LOAD( "td3.86_id_75102637.bin", 0x00000, 0x2000, CRC(aec96e13) SHA1(6e3143418f439a0373fba626cf69df34e41815e5),ROM_BIOS(26))
-	ROM_SYSTEM_BIOS(27, "td393", "TD 3.93")
-	ROMX_LOAD( "td3.93.bin", 0x00000, 0x2000, CRC(807620d9) SHA1(3f0ca24e33feb32051de9e819b962df1528a0403),ROM_BIOS(27))
+	ROM_SYSTEM_BIOS(11, "dtk226", "XT DTK Erso bios 2.26")
+	ROMX_LOAD( "dtk-ers0.rom", 0x00000, 0x2000, CRC(85fd5e10) SHA1(2ae152f042e7e43e27621f071af763e3f9dc68d2),ROM_BIOS(11))
+	ROM_SYSTEM_BIOS(12, "dtk240", "XT DTK Erso bios 2.40")
+	ROMX_LOAD( "dtk2.40.bin", 0x00000, 0x2000, CRC(a4ed27c3) SHA1(66b67540d94c0d049ebc14ee14eadd2ab7304818),ROM_BIOS(12))
+	ROM_SYSTEM_BIOS(13, "dtk242", "XT DTK Erso bios 2.42")
+	ROMX_LOAD( "dtk2.42.bin", 0x00000, 0x2000, CRC(3f2d2a76) SHA1(02fa057f2c22ab199a8d9795ab1ae570f2b13a36),ROM_BIOS(13))
+	ROM_SYSTEM_BIOS(14, "peter", "XT Peter Kohlman 3.75") // V20 Rom only
+	ROMX_LOAD( "peterv203.75.bin", 0x00000, 0x2000, CRC(b053a6a4) SHA1(f53218ad3d725f12d9149b22d8afcf6a8869a3bd),ROM_BIOS(14))
+	ROM_SYSTEM_BIOS(15, "pho2271", "XT Phoenix Bios 2.27 #1")
+	ROMX_LOAD( "phoenix2.27.bin", 0x00000, 0x2000, CRC(168ffef0) SHA1(69465db2f9246a614044d1f433d374506a13a07f),ROM_BIOS(15))
+	ROM_SYSTEM_BIOS(16, "pho2272", "XT Phoenix Bios 2.27 #2") // V20 installed on board
+	ROMX_LOAD( "compatibility_software_phoenix_technologies_1985_1986_1121277.bin", 0x00000, 0x2000, CRC(33ceb81a) SHA1(7c7db75e61e19025938f30798d9d0f8b4f6ab0ee),ROM_BIOS(16))
+	ROM_SYSTEM_BIOS(17, "pho251", "XT Phoenix Bios 2.51")
+	ROMX_LOAD( "phoenix2.51.bin", 0x00000, 0x2000, CRC(9b7e9c40) SHA1(c948a8d3d715e469105c6e2acd8b46ec274b25a8),ROM_BIOS(17))
+	ROM_SYSTEM_BIOS(18, "turbo", "XT Turbo Bios 3.10")
+	ROMX_LOAD( "turbo3.10.bin", 0x00000, 0x2000, CRC(8aaca1e3) SHA1(9c03da16713e08c0112a04c8bdfa394e7341c1fc),ROM_BIOS(18))
+	ROM_SYSTEM_BIOS(19, "nestv200", "JUKO NEST v2.00") // use keytronic keyboard
+	ROMX_LOAD( "jukoa.bin", 0x00000, 0x2000, CRC(7d78707e) SHA1(8b09a32658a850e7f03254d1328fe6e336e91871),ROM_BIOS(19))
+	ROM_SYSTEM_BIOS(20, "nest230", "JUKO NEST v2.30")
+	ROMX_LOAD( "juko_st_v2.30.bin", 0x00000, 0x2000, CRC(7a1c6dfa) SHA1(0b343f3028ca06c9e6dc69427d1b15a47c74b9fc),ROM_BIOS(20))
+	ROM_SYSTEM_BIOS(21, "nest232", "JUKO NEST v2.32")
+	ROMX_LOAD( "xt-juko-st-2.32.bin", 0x00000, 0x2000, CRC(0768524e) SHA1(259520bb7a6796e5b987c2b9bef1acd501df1670),ROM_BIOS(21))
+	ROM_SYSTEM_BIOS(22, "sid41", "SID BIOS v4.1") // from X'GOLDEN mainboard
+	ROMX_LOAD( "sid_bios_version_v4.1.bin", 0x00000, 0x2000, CRC(c58daf4d) SHA1(7066f8f993500383b99103a9fa1e6c125c89581b),ROM_BIOS(22))
+	ROM_SYSTEM_BIOS(23, "txt310", "T U R B O  XT Version 3.10") // from X'GOLDEN Turbo mainboard, computer can operate in 8MHz mode, source mentions possible corruption
+	ROMX_LOAD( "turbo_xt_3.10_2764.bin", 0x00000, 0x2000,  BAD_DUMP CRC(8aaca1e3) SHA1(9c03da16713e08c0112a04c8bdfa394e7341c1fc),ROM_BIOS(23))
+	ROM_SYSTEM_BIOS(24, "alco", "ALCO 8MHz") // another Phoenix v2.27 variant, probably overdumped, therefore BAD_DUMP
+	ROMX_LOAD( "alco8mhz.bin", 0x00000, 0x2000, BAD_DUMP CRC(96a56814) SHA1(7f752cbe1a25ed6ea5f77fed79cfbf608c667dc3),ROM_BIOS(24))
+	ROM_SYSTEM_BIOS(25, "american", "American XT 1.32")
+	ROMX_LOAD( "americxt.rom", 0x00000, 0x2000, CRC(4c6e23f3) SHA1(6e16f42da9c3d7bd408cf885caf93de9aa02ebe4),ROM_BIOS(25))
+	ROM_SYSTEM_BIOS(26, "excel31", "Excel-Turbo Computer Version 3.1")
+	ROMX_LOAD( "excel-turbo_computer_3.1_2764.bin", 0x00000, 0x2000, CRC(d319fea7) SHA1(5b4b0eb35889602aa7f18de82800599528690e15),ROM_BIOS(26))
+	ROM_SYSTEM_BIOS(27, "s10b1", "Super 10-B1") // another Phoenix 2.51 variant
+	ROMX_LOAD( "super_10-b1_27c64.bin", 0x00000, 0x2000, CRC(ba7797db) SHA1(2ee8863640b860a1807cc41e1ac9d94f73a087aa),ROM_BIOS(27))
+	ROM_SYSTEM_BIOS(28, "td386", "TD 3.86")
+	ROMX_LOAD( "td3.86_id_75102637.bin", 0x00000, 0x2000, CRC(aec96e13) SHA1(6e3143418f439a0373fba626cf69df34e41815e5),ROM_BIOS(28))
+	ROM_SYSTEM_BIOS(29, "td393", "TD 3.93")
+	ROMX_LOAD( "td3.93.bin", 0x00000, 0x2000, CRC(807620d9) SHA1(3f0ca24e33feb32051de9e819b962df1528a0403),ROM_BIOS(29))
 		
 ROM_END
 
