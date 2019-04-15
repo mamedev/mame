@@ -162,7 +162,8 @@ protected:
 
 	m6805_hmos_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size);
 
-	virtual void map(address_map &map);
+	void map(address_map &map) { internal_map(map); }
+	virtual void internal_map(address_map &map);
 
 	template <std::size_t N> void set_port_open_drain(bool value);
 	template <std::size_t N> void set_port_mask(u8 mask);
@@ -225,7 +226,7 @@ protected:
 	{
 	}
 
-	virtual void map(address_map &map) override;
+	virtual void internal_map(address_map &map) override;
 };
 
 class m68705_device : public m6805_hmos_device, public device_nvram_interface
@@ -241,7 +242,7 @@ public:
 	};
 
 protected:
-	virtual void map(address_map &map) override;
+	virtual void internal_map(address_map &map) override;
 
 	m68705_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size);
 
@@ -283,7 +284,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_w) { port_input_w<2>(space, offset, data, mem_mask); }
 
 protected:
-	virtual void map(address_map &map) override;
+	virtual void internal_map(address_map &map) override;
 
 	m68705p_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type);
 
@@ -301,7 +302,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pd_w) { port_input_w<3>(space, offset, data, mem_mask); } // TODO: PD6 is also /INT2
 
 protected:
-	virtual void map(address_map &map) override;
+	virtual void internal_map(address_map &map) override;
 
 	m68705u_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type);
 
@@ -316,7 +317,7 @@ public:
 	// TODO: voltage inputs for ADC (shared with digital port D pins)
 
 protected:
-	virtual void map(address_map &map) override;
+	virtual void internal_map(address_map &map) override;
 
 	m68705r_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type);
 
@@ -344,7 +345,7 @@ public:
 	m6805r2_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void map(address_map &map) override;
+	virtual void internal_map(address_map &map) override;
 };
 
 class m6805r3_device : public m6805_mrom_device
@@ -353,7 +354,7 @@ public:
 	m6805r3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void map(address_map &map) override;
+	virtual void internal_map(address_map &map) override;
 };
 
 class m6805u2_device : public m6805_mrom_device

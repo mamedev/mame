@@ -584,9 +584,9 @@ template <std::size_t N> void m6805_hmos_device::add_port_ddr_state()
 	state_add(M68705_DDRA + N, util::string_format("DDR%c", 'A' + N).c_str(), m_port_ddr[N]).mask(~m_port_mask[N] & 0xff);
 }
 
-void m68705_device::map(address_map &map)
+void m68705_device::internal_map(address_map &map)
 {
-	m6805_hmos_device::map(map);
+	m6805_hmos_device::internal_map(map);
 
 	map(0x000b, 0x000b).rw(FUNC(m68705_device::pcr_r), FUNC(m68705_device::pcr_w));
 }
@@ -595,9 +595,9 @@ void m68705_device::map(address_map &map)
  * M68705Px family
  ****************************************************************************/
 
-void m68705p_device::map(address_map &map)
+void m68705p_device::internal_map(address_map &map)
 {
-	m68705_device::map(map);
+	m68705_device::internal_map(map);
 
 	map(0x0080, 0x0784).rw(FUNC(m68705p_device::eprom_r<0x0080>), FUNC(m68705p_device::eprom_w<0x0080>)); // User EPROM
 	map(0x0785, 0x07f7).rom().region("bootstrap", 0);
@@ -629,9 +629,9 @@ std::unique_ptr<util::disasm_interface> m68705p_device::create_disassembler()
  * M68705Ux family
  ****************************************************************************/
 
-void m68705u_device::map(address_map &map)
+void m68705u_device::internal_map(address_map &map)
 {
-	m68705_device::map(map);
+	m68705_device::internal_map(map);
 
 	map(0x0080, 0x0f38).rw(FUNC(m68705u_device::eprom_r<0x0080>), FUNC(m68705u_device::eprom_w<0x0080>)); // User EPROM
 	// 0x0f39-0x0f7f not used
@@ -662,9 +662,9 @@ std::unique_ptr<util::disasm_interface> m68705u_device::create_disassembler()
  * M68705Rx family
  ****************************************************************************/
 
-void m68705r_device::map(address_map &map)
+void m68705r_device::internal_map(address_map &map)
 {
-	m68705_device::map(map);
+	m68705_device::internal_map(map);
 
 	map(0x000e, 0x000e).rw(FUNC(m68705r_device::acr_r), FUNC(m68705r_device::acr_w));
 	map(0x000f, 0x000f).rw(FUNC(m68705r_device::arr_r), FUNC(m68705r_device::arr_w));
@@ -814,7 +814,7 @@ m6805u3_device::m6805u3_device(machine_config const &mconfig, char const *tag, d
 	m_timer.set_options(m6805_timer::TIMER_PGM);
 }
 
-void m6805_hmos_device::map(address_map &map)
+void m6805_hmos_device::internal_map(address_map &map)
 {
 	map.unmap_value_high();
 
@@ -833,15 +833,15 @@ void m6805_hmos_device::map(address_map &map)
 	if (m_port_mask[3] != 0xff)
 	{
 		map(0x0003, 0x0003).rw(FUNC(m6805_hmos_device::port_r<3>), FUNC(m6805_hmos_device::port_latch_w<3>));
-		map(0x000a, 0x000a).rw(FUNC(m6805u3_device::misc_r), FUNC(m6805u3_device::misc_w));
+		map(0x000a, 0x000a).rw(FUNC(m6805_hmos_device::misc_r), FUNC(m6805_hmos_device::misc_w));
 	}
 
 	map(0x80 - m_ram_size, 0x007f).ram();
 }
 
-void m6805_mrom_device::map(address_map &map)
+void m6805_mrom_device::internal_map(address_map &map)
 {
-	m6805_hmos_device::map(map);
+	m6805_hmos_device::internal_map(map);
 
 	/*
 	 * Mask ROM devices have address ranges defined as follows:
@@ -865,17 +865,17 @@ void m6805_mrom_device::map(address_map &map)
 	map(0x0080, end).rom().region(tag(), 0x80);
 }
 
-void m6805r2_device::map(address_map &map)
+void m6805r2_device::internal_map(address_map &map)
 {
-	m6805_hmos_device::map(map);
+	m6805_hmos_device::internal_map(map);
 
 	map(0x000e, 0x000e).rw(FUNC(m6805r2_device::acr_r), FUNC(m6805r2_device::acr_w));
 	map(0x000f, 0x000f).rw(FUNC(m6805r2_device::arr_r), FUNC(m6805r2_device::arr_w));
 }
 
-void m6805r3_device::map(address_map &map)
+void m6805r3_device::internal_map(address_map &map)
 {
-	m6805_hmos_device::map(map);
+	m6805_hmos_device::internal_map(map);
 
 	map(0x000e, 0x000e).rw(FUNC(m6805r3_device::acr_r), FUNC(m6805r3_device::acr_w));
 	map(0x000f, 0x000f).rw(FUNC(m6805r3_device::arr_r), FUNC(m6805r3_device::arr_w));
