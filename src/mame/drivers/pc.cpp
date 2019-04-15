@@ -68,6 +68,7 @@ public:
 	void cadd810(machine_config &config);
 	void juko16(machine_config &config);
 	void hyo88t(machine_config &config);
+	void kyoxt(machine_config &config);
 
 	void init_bondwell();
 
@@ -1235,6 +1236,19 @@ ROM_START( hyo88t )
 	ROM_LOAD( "hyosung_topstar_88t_v3.0.bin", 0xc000, 0x4000, CRC(2429046b) SHA1(e2a8e1ffdd4c6ff84791f486df3204811fa5f589))
 ROM_END
 
+/*************************************************************** Kyocera XT ***
+
+http://www.hampa.ch/pce/download.html
+
+******************************************************************************/
+
+ROM_START( kyoxt )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD( "kyocera.rom", 0xc000, 0x4000, CRC(cd732ac6) SHA1(7258fc18565135870e31962e4bd528a06d1ee0e0))
+ROM_END
+
+	
+
 
 
 /***************************************************************************
@@ -1276,3 +1290,4 @@ COMP( 1984, ittxtra,        ibm5150, 0,      pccga,          pccga,    pc_state,
 COMP( 198?, cadd810,		ibm5150, 0,		 cadd810,		 pccga,	   pc_state, empty_init,	"CompuAdd",						   "810",					MACHINE_NOT_WORKING )
 COMP( 198?, juko16,			ibm5150, 0,		 juko16,		 pccga,	   pc_state, empty_init,	"JUKO",							   "NEST 8086 and V30",		MACHINE_NOT_WORKING )
 COMP( 198?, hyo88t,			ibm5150, 0, 	 pccga,			 pccga,	   pc_state, empty_init, 	"Hyosung",						   "Topstar 88T",			MACHINE_NOT_WORKING )
+COMP( 198?, kyoxt,			ibm5150, 0,		 pccga,			 pccga,	   pc_state, empty_init,	"Kyocera",						   "XT",					MACHINE_NOT_WORKING )
