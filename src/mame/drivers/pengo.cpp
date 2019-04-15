@@ -955,7 +955,19 @@ void pengo_state::decode_schick_extra(int size, uint8_t* rom)
 			// these are wrong
 			if (A & 0x1000) // might be more conditions too, but there's certainly a boundary at efff-f000 (jump table)
 			{
-				srcdec = bitswap<8>(srcdec ^ 0x40, 7, 0, 5, 6, 3, 2, 1, 4);
+				// note, bit substitution tables, each value 0x00, 0x01, 0x10, 0x11, 0x40, 0x41, 0x50, 0x51 can only be used once.
+
+				switch (srcdec & 0x51)
+				{
+				case 0x00: srcdec = (srcdec & ~0x51) | 0x10; break; // looks good for ld ops
+				case 0x01: srcdec = (srcdec & ~0x51) | 0x50; break; // ok?
+				case 0x10: srcdec = (srcdec & ~0x51) | 0x11; break; // ok?
+				case 0x11: srcdec = (srcdec & ~0x51) | 0x51; break; // push/pull opcodes, see f1a1, f1a2, f1fd etc  (d3 case too) 
+				case 0x40: srcdec = (srcdec & ~0x51) | 0x00; break; // ok for some NOPs? and jr ops
+				case 0x41: srcdec = (srcdec & ~0x51) | 0x40; break; // maybe, ret z at f3be
+				case 0x50: srcdec = (srcdec & ~0x51) | 0x01; break; // not 11, not 50, maybe 01? see fcc1
+				case 0x51: srcdec = (srcdec & ~0x51) | 0x41; break; // jmp
+				}
 				rom[A] = srcdec;
 			}
 			else
@@ -972,7 +984,18 @@ void pengo_state::decode_schick_extra(int size, uint8_t* rom)
 				// I wouldn't put it past Microhard to have an MCU supplying code too... (but why, there's already plenty of extra code for this pengo hack)
 
 
-				srcdec = bitswap<8>(srcdec ^ 0x40, 7, 4, 5, 0, 3, 2, 1, 6);
+				switch (srcdec & 0x51)
+				{
+				case 0x00: srcdec = (srcdec & ~0x51) | 0x40; break;
+				case 0x01: srcdec = (srcdec & ~0x51) | 0x01; break; 
+				case 0x10: srcdec = (srcdec & ~0x51) | 0x41; break; // JMP table EFA0
+				case 0x11: srcdec = (srcdec & ~0x51) | 0x11; break;
+				case 0x40: srcdec = (srcdec & ~0x51) | 0x00; break; // NOPs at e538
+				case 0x41: srcdec = (srcdec & ~0x51) | 0x51; break;
+				case 0x50: srcdec = (srcdec & ~0x51) | 0x50; break;
+				case 0x51: srcdec = (srcdec & ~0x51) | 0x10; break;
+				}
+
 				rom[A] = srcdec;
 			}
 		}
@@ -997,28 +1020,6 @@ void pengo_state::init_schick()
 
 	decode_schick_extra(0x10000, rom);
 	decode_schick_extra(0x10000, m_decrypted_opcodes);
-
-	{
-		char filename[256];
-		sprintf(filename,"p_decrypted_%s", machine().system().name);
-		FILE *fp = fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(rom, 0x10000, 1, fp);
-			fclose(fp);
-		}
-	}
-
-	{
-		char filename[256];
-		sprintf(filename,"p_decrypted_opcodes_%s", machine().system().name);
-		FILE *fp = fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(m_decrypted_opcodes, 0x10000, 1, fp);
-			fclose(fp);
-		}
-	}
 }
 
 
