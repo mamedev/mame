@@ -3471,14 +3471,22 @@ void tms9995_device::alu_int()
 }
 
 /**************************************************************************/
+/*
+    The minimum number of cycles applies to a command like SETO R0 with
+    R0 in on-chip RAM.
+*/
 uint32_t tms9995_device::execute_min_cycles() const
 {
-	return 2;
+	return 3;
 }
 
+/*
+    The maximum number of cycles applies to a STCR command with the destination
+    operand off-chip and 16 bits of transfer.
+*/
 uint32_t tms9995_device::execute_max_cycles() const
 {
-	return 44;
+	return 47;
 }
 
 uint32_t tms9995_device::execute_input_lines() const
