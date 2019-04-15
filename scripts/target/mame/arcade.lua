@@ -1027,6 +1027,7 @@ files {
 
 createMAMEProjects(_target, _subtarget, "atari")
 files {
+	MAME_DIR .. "src/mame/drivers/akkaarrh.cpp",
 	MAME_DIR .. "src/mame/drivers/arcadecl.cpp",
 	MAME_DIR .. "src/mame/includes/arcadecl.h",
 	MAME_DIR .. "src/mame/video/arcadecl.cpp",
