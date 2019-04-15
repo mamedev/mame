@@ -45,6 +45,7 @@ public:
 	void ataripc1(machine_config &config);
 	void ncrpc4i(machine_config &config);
 	void kaypro16(machine_config &config);
+	void kaypropc(machine_config &config);
 	void epc(machine_config &config);
 	void m15(machine_config &config);
 	void bondwell(machine_config &config);
@@ -700,6 +701,16 @@ ROM_START( kaypro16 )
 	ROM_LOAD("pc102782.bin", 0xe000, 0x2000, CRC(ade4ed14) SHA1(de6d87ae83a71728d60df6a5964e680487ea8400))
 ROM_END
 
+/**************************************************************** Kaypro PC ***
+
+Links:  https://www.youtube.com/watch?v=2YAEOhYEZbc , 
+
+******************************************************************************/
+
+ROM_START( kaypropc )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("kpb203n.rom", 0xe000, 0x2000, CRC(49ea41e9) SHA1(14db6b8f302833f64f6e740a293d12f76e71f78f))
+ROM_END
 
 /******************************************************************** MK-88 ***
 
@@ -1247,9 +1258,6 @@ ROM_START( kyoxt )
 	ROM_LOAD( "kyocera.rom", 0xc000, 0x4000, CRC(cd732ac6) SHA1(7258fc18565135870e31962e4bd528a06d1ee0e0))
 ROM_END
 
-	
-
-
 
 /***************************************************************************
 
@@ -1291,3 +1299,4 @@ COMP( 198?, cadd810,		ibm5150, 0,		 cadd810,		 pccga,	   pc_state, empty_init,	"
 COMP( 198?, juko16,			ibm5150, 0,		 juko16,		 pccga,	   pc_state, empty_init,	"JUKO",							   "NEST 8086 and V30",		MACHINE_NOT_WORKING )
 COMP( 198?, hyo88t,			ibm5150, 0, 	 pccga,			 pccga,	   pc_state, empty_init, 	"Hyosung",						   "Topstar 88T",			MACHINE_NOT_WORKING )
 COMP( 198?, kyoxt,			ibm5150, 0,		 pccga,			 pccga,	   pc_state, empty_init,	"Kyocera",						   "XT",					MACHINE_NOT_WORKING )
+COMP( 198?, kaypropc,		ibm5150, 0,		 pccga,			 pccga,	   pc_state, empty_init,	"Kaypro Corporation",			   "PC",					MACHINE_NOT_WORKING )
