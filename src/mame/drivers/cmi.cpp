@@ -2306,25 +2306,25 @@ void cmi_state::cmi2x(machine_config &config)
 	cmi01a_0.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
 	cmi01a_device &cmi01a_1(CMI01A_CHANNEL_CARD(config, "cmi01a_1", 0));
 	cmi01a_1.add_route(ALL_OUTPUTS, "mono", 0.25);
-	cmi01a_1.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
+	cmi01a_1.irq_callback().set(FUNC(cmi_state::channel_irq<1>));
 	cmi01a_device &cmi01a_2(CMI01A_CHANNEL_CARD(config, "cmi01a_2", 0));
 	cmi01a_2.add_route(ALL_OUTPUTS, "mono", 0.25);
-	cmi01a_2.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
+	cmi01a_2.irq_callback().set(FUNC(cmi_state::channel_irq<2>));
 	cmi01a_device &cmi01a_3(CMI01A_CHANNEL_CARD(config, "cmi01a_3", 0));
 	cmi01a_3.add_route(ALL_OUTPUTS, "mono", 0.25);
-	cmi01a_3.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
+	cmi01a_3.irq_callback().set(FUNC(cmi_state::channel_irq<3>));
 	cmi01a_device &cmi01a_4(CMI01A_CHANNEL_CARD(config, "cmi01a_4", 0));
 	cmi01a_4.add_route(ALL_OUTPUTS, "mono", 0.25);
-	cmi01a_4.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
+	cmi01a_4.irq_callback().set(FUNC(cmi_state::channel_irq<4>));
 	cmi01a_device &cmi01a_5(CMI01A_CHANNEL_CARD(config, "cmi01a_5", 0));
 	cmi01a_5.add_route(ALL_OUTPUTS, "mono", 0.25);
-	cmi01a_5.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
+	cmi01a_5.irq_callback().set(FUNC(cmi_state::channel_irq<5>));
 	cmi01a_device &cmi01a_6(CMI01A_CHANNEL_CARD(config, "cmi01a_6", 0));
 	cmi01a_6.add_route(ALL_OUTPUTS, "mono", 0.25);
-	cmi01a_6.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
+	cmi01a_6.irq_callback().set(FUNC(cmi_state::channel_irq<6>));
 	cmi01a_device &cmi01a_7(CMI01A_CHANNEL_CARD(config, "cmi01a_7", 0));
 	cmi01a_7.add_route(ALL_OUTPUTS, "mono", 0.25);
-	cmi01a_7.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
+	cmi01a_7.irq_callback().set(FUNC(cmi_state::channel_irq<7>));
 }
 
 ROM_START( cmi2x )
