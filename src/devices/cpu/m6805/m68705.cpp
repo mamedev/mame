@@ -90,12 +90,14 @@ ROM_START( m68705u3 )
 	ROM_LOAD("bootstrap.bin", 0x0000, 0x0078, CRC(5946479b) SHA1(834ea00aef5de12dbcd6421a6e21d5ea96cfbf37))
 ROM_END
 
-constexpr u16 M68705_VECTOR_BOOTSTRAP   = 0xfff6;
-constexpr u16 M6805_VECTOR_TIMER       = 0xfff8;
-constexpr u16 M6805_VECTOR_INT2        = 0xfff8;
-constexpr u16 M6805_VECTOR_INT         = 0xfffa;
-constexpr u16 M6805_VECTOR_SWI         = 0xfffc;
-constexpr u16 M6805_VECTOR_RESET       = 0xfffe;
+enum : u16 {
+	M68705_VECTOR_BOOTSTRAP  = 0xfff6,
+	M6805_VECTOR_TIMER       = 0xfff8,
+	M6805_VECTOR_INT2        = 0xfff8,
+	M6805_VECTOR_INT         = 0xfffa,
+	M6805_VECTOR_SWI         = 0xfffc,
+	M6805_VECTOR_RESET       = 0xfffe
+};
 
 constexpr u16 M6805_INT_MASK           = 0x03;
 
