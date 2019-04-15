@@ -16,9 +16,11 @@
 *********************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
+#include "machine/6850acia.h"
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
@@ -83,7 +85,8 @@ void rd100_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).ram();
-	map(0x8608, 0x860f).rw("ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0x8608, 0x860f).rw("timer", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0x8610, 0x8611).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x8640, 0x8643).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8680, 0x8683).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8700, 0x8701).rw("hd44780", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
@@ -173,6 +176,15 @@ static INPUT_PORTS_START( rd100 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 INPUT_PORTS_END
 
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_2400 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_2400 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
+
 void rd100_state::rd100(machine_config &config)
 {
 	// basic machine hardware
@@ -185,7 +197,13 @@ void rd100_state::rd100(machine_config &config)
 
 	PIA6821(config, "pia2");
 
-	PTM6840(config, "ptm", 4_MHz_XTAL / 4);
+	ptm6840_device &timer(PTM6840(config, "timer", 4_MHz_XTAL / 4));
+	timer.o3_callback().set("acia", FUNC(acia6850_device::write_txc));
+	timer.o3_callback().append("acia", FUNC(acia6850_device::write_rxc));
+
+	acia6850_device &acia(ACIA6850(config, "acia"));
+	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -200,6 +218,12 @@ void rd100_state::rd100(machine_config &config)
 	hd44780.set_pixel_update_cb(FUNC(rd100_state::pixel_update), this);
 
 	PALETTE(config, "palette").set_entries(2);
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
+	rs232.cts_handler().set("acia", FUNC(acia6850_device::write_cts));
+	rs232.dsr_handler().set("acia", FUNC(acia6850_device::write_dcd));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 }
 
 ROM_START( rd100 )
