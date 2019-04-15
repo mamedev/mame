@@ -358,7 +358,7 @@ void saa1099_device::envelope_w(int ch)
 }
 
 
-WRITE8_MEMBER( saa1099_device::control_w )
+void saa1099_device::control_w(u8 data)
 {
 	if ((data & 0xff) > 0x1c)
 	{
@@ -378,7 +378,7 @@ WRITE8_MEMBER( saa1099_device::control_w )
 }
 
 
-WRITE8_MEMBER( saa1099_device::data_w )
+void saa1099_device::data_w(u8 data)
 {
 	int reg = m_selected_reg;
 	int ch;
@@ -462,10 +462,10 @@ WRITE8_MEMBER( saa1099_device::data_w )
 	}
 }
 
-WRITE8_MEMBER(saa1099_device::write)
+void saa1099_device::write(offs_t offset, u8 data)
 {
 	if (offset & 1)
-		control_w(space, 0, data);
+		control_w(data);
 	else
-		data_w(space, 0, data);
+		data_w(data);
 }

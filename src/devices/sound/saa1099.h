@@ -21,10 +21,10 @@ class saa1099_device : public device_t,
 public:
 	saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( control_w );
-	DECLARE_WRITE8_MEMBER( data_w );
+	void control_w(u8 data);
+	void data_w(u8 data);
 
-	DECLARE_WRITE8_MEMBER( write );
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
