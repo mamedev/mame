@@ -10288,6 +10288,41 @@ ROM_START( caspokera )
 ROM_END
 
 
+/*
+  COPYRIGHT 1984 GALANTHIS INC.
+  FOR AMUSEMENT ONLY.
+
+  COPYRIGHT (C) 1983
+  ZENITONE LIMITED
+  MALCOLM MAILER.
+  S/N 24165483.
+*/
+ROM_START( unknownpg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "5000_bonus_12000.bin",  0x5000, 0x1000, CRC(eb93b60b) SHA1(6d6dcc0899caf1cb2179264c311bb41050834aa4) )
+	ROM_LOAD( "5_6000.bin",            0x6000, 0x1000, CRC(9f444112) SHA1(cae3a092898b4cc12a4f3eac955d8c8590a7b1fd) )
+	ROM_LOAD( "hn462732g.bin",         0x7000, 0x1000, CRC(6fd3bf27) SHA1(8f9a53cd20dd6198dd0ed329ac0b9b3d9a62a323) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(                    0x0000, 0x1000, 0x0000 )  // filling the R-G bitplanes
+	ROM_LOAD( "poke_5.4_x.bin",  0x1000, 0x0800, CRC(ca9182b1) SHA1(4c440eb53a46c4f751cf8807cbe3187ad9dbc214) )  // text chars
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "bp_c1.bin",  0x0000, 0x0800, CRC(89a8c5f9) SHA1(e3aab20b2a962778a221ab96c691c37fad5b6877) )  // cards deck gfx, bitplane 1
+	ROM_LOAD( "bp_c2.bin",  0x0800, 0x0800, CRC(b59a8a11) SHA1(d378ac2615ec9990903d1ad9c63f785cb65f41ab) )  // cards deck gfx, bitplane 2
+	ROM_LOAD( "bp_c3.bin",  0x1000, 0x0800, CRC(cb4e8cb9) SHA1(c99f685f2f2ef4d360b48449e9520b40df58b3ae) )  // cards deck gfx, bitplane 3
+
+//	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM, otherwise settings parameters are incorrect
+//	ROM_LOAD( "unknown_nvram.bin", 0x0000, 0x0800, CRC(b0c63467) SHA1(0a031686821ce7da43816076ea498389310b98c6) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "74s387.b",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // color PROM
+
+	ROM_REGION( 0x0100, "proms2", 0 )
+	ROM_LOAD( "74s387.a",  0x0000, 0x0100, CRC(6cc491b9) SHA1(0a97518d11bfc9eb2b8a70ed6c75882209e1abd7) )  // decode?
+ROM_END
+
+
 ROM_START( royale )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "royalex.bin",    0x4000, 0x4000, CRC(ef370617) SHA1(0fc5679e9787aeea3bc592b36efcaa20e859f912) )
@@ -11553,6 +11588,7 @@ GAME(  1991, poker91,   0,        witchcrd, poker91,  goldnpkr_state, empty_init
 GAME(  198?, genie,     0,        genie,    genie,    goldnpkr_state, empty_init,    ROT0,   "Video Fun Games Ltd.",     "Genie (ICP-1, set 1)",                    0 )
 GAME(  198?, geniea,    genie,    geniea,   geniea,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Genie (ICP-1, set 2)",                    0 )
 GAMEL( 1983, silverga,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
+GAME(  1984, unknownpg, 0,        goldnpkr, caspoker, goldnpkr_state, empty_init,    ROT0,   "Galanthis Inc./Zenitone Ltd", "unknown Galanthis/Zenitone poker game",  MACHINE_NOT_WORKING )
 
 GAMEL( 198?, superdbl,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
 GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown French poker game",               MACHINE_NOT_WORKING )   // lacks of 2nd program ROM.
