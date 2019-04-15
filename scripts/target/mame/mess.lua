@@ -2167,6 +2167,10 @@ files {
 	MAME_DIR .. "src/mame/drivers/cmi.cpp",
 	MAME_DIR .. "src/mame/audio/cmi01a.cpp",
 	MAME_DIR .. "src/mame/audio/cmi01a.h",
+	MAME_DIR .. "src/mame/machine/cmi_ankbd.cpp",
+	MAME_DIR .. "src/mame/machine/cmi_ankbd.h",
+	MAME_DIR .. "src/mame/machine/cmi_mkbd.cpp",
+	MAME_DIR .. "src/mame/machine/cmi_mkbd.h",
 }
 
 createMESSProjects(_target, _subtarget, "force")
