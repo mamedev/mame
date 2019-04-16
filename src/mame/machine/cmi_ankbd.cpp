@@ -2,7 +2,11 @@
 // copyright-holders:Phil Bennett
 /***************************************************************************
 
-    Fairlight CMI Alphanumeric Keyboard
+    Fairlight Intelligent Alphanumeric Keyboard
+
+    This ASCII keyboard was developed for Fairlight's Qasar System. The
+    output signals are driven at RS232 levels, though the connector is
+    custom.
 
 ***************************************************************************/
 
@@ -13,7 +17,7 @@
 #include "machine/clock.h"
 #include "machine/input_merger.h"
 
-DEFINE_DEVICE_TYPE(CMI_ALPHANUMERIC_KEYBOARD, cmi_alphanumeric_keyboard_device, "cmi_ankbd", "Fairlight CMI Alphanumeric Keyboard")
+DEFINE_DEVICE_TYPE(CMI_ALPHANUMERIC_KEYBOARD, cmi_alphanumeric_keyboard_device, "cmi_ankbd", "Fairlight Intelligent Alphanumeric Keyboard")
 
 cmi_alphanumeric_keyboard_device::cmi_alphanumeric_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, CMI_ALPHANUMERIC_KEYBOARD, tag, owner, clock)

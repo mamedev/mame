@@ -2,7 +2,7 @@
 // copyright-holders:Phil Bennett
 /***************************************************************************
 
-    Fairlight CMI Alphanumeric Keyboard
+    Fairlight Intelligent Alphanumeric Keyboard
 
 ***************************************************************************/
 
