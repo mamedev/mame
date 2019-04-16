@@ -119,38 +119,34 @@ namespace plib {
 
 		void *allocate(size_t align, size_t size)
 		{
+			block *b = nullptr;
+
 			if (align < m_min_align)
 				align = m_min_align;
 
 			size_t rs = size + align;
-			for (auto &b : m_blocks)
+			for (auto &bs : m_blocks)
 			{
-				if (b->m_free > rs)
+				if (bs->m_free > rs)
 				{
-					b->m_free -= rs;
-					b->m_num_alloc++;
-					auto *ret = reinterpret_cast<void *>(b->m_data + b->m_cur);
-					auto capacity(rs);
-					ret = std::align(align, size, ret, capacity);
-					sinfo().insert({ ret, info(b, b->m_cur)});
-					rs -= (capacity - size);
-					b->m_cur += rs;
-
-					return ret;
+					b = bs;
+					break;
 				}
 			}
+			if (b == nullptr)
 			{
-				block *b = new_block(rs);
-				b->m_num_alloc = 1;
-				b->m_free = m_min_alloc - rs;
-				auto *ret = reinterpret_cast<void *>(b->m_data + b->m_cur);
-				auto capacity(rs);
-				ret = std::align(align, size, ret, capacity);
-				sinfo().insert({ ret, info(b, b->m_cur)});
-				rs -= (capacity - size);
-				b->m_cur += rs;
-				return ret;
+				b = new_block(rs);
 			}
+			b->m_free -= rs;
+			b->m_num_alloc++;
+			void *ret = reinterpret_cast<void *>(b->m_data + b->m_cur);
+			auto capacity(rs);
+			ret = std::align(align, size, ret, capacity);
+			sinfo().insert({ ret, info(b, b->m_cur)});
+			rs -= (capacity - size);
+			b->m_cur += rs;
+
+			return ret;
 		}
 
 		static void deallocate(void *ptr)
@@ -159,8 +155,7 @@ namespace plib {
 			auto it = sinfo().find(ptr);
 			if (it == sinfo().end())
 				plib::terminate("mempool::free - pointer not found\n");
-			info i = it->second;
-			block *b = i.m_block;
+			block *b = it->second.m_block;
 			if (b->m_num_alloc == 0)
 				plib::terminate("mempool::free - double free was called\n");
 			else
