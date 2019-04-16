@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Jonathan Gevaryahu, Sean Riddle
-// thanks-to:David Viens, Kevin Horton
+// copyright-holders:hap, Jonathan Gevaryahu
+// thanks-to:Sean Riddle, David Viens, Kevin Horton
 /***************************************************************************
 
   ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.cpp) **

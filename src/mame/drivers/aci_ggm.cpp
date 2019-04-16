@@ -9,7 +9,8 @@ TODO:
 - what's VIA PB0 for? game toggles it once per irq
 - identify XTAL (2MHz CPU/VIA is correct, compared to video reference)
 - add display DP segment (unused in boris25), and what about AP segment?
-- verify cartridge pinout, right now assume A0-A14 (max known cart size is 24KB)
+- verify cartridge pinout, right now assume A0-A14 (max known cart size is 24KB).
+  Boris/Sargon cartridge is A0-A11 and 2 CS lines.
 - auto-switch keypad overlays? no need for it yet
 
 *******************************************************************************
@@ -233,7 +234,6 @@ WRITE8_MEMBER(ggm_state::control_w)
 
 	// PB7: speaker out
 	m_dac->write(BIT(data, 7));
-
 }
 
 READ8_MEMBER(ggm_state::input_r)

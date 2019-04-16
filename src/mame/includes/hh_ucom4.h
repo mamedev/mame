@@ -32,7 +32,7 @@ public:
 
 	// devices
 	required_device<ucom4_cpu_device> m_maincpu;
-	optional_ioport_array<5> m_inp_matrix; // max 5
+	optional_ioport_array<6> m_inp_matrix; // max 6
 	output_finder<0x20, 0x20> m_out_x;
 	output_finder<0x20> m_out_a;
 	output_finder<0x20> m_out_digit;
@@ -63,6 +63,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
+	void set_display_segmask(u32 digits, u32 mask);
 	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
 
 protected:

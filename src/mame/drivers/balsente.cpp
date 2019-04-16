@@ -2496,13 +2496,13 @@ GAME( 1984, triviasp,  0,        balsente, triviag1, balsente_state, init_trivia
 GAME( 1984, triviayp,  0,        balsente, triviag1, balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (Young Players Edition)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, triviaes,  0,        balsente, triviaes, balsente_state, init_triviaes,  ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Volumen III, Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE ) // Genus Edition?
 GAME( 1985, toggle,    0,        balsente, toggle,   balsente_state, init_toggle,    ROT0, "Bally/Sente",  "Toggle (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, nametune,  0,        st1002,   nametune, balsente_state, init_nametune,  ROT0, "Bally/Sente",  "Name That Tune (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nametune,  0,        st1002,   nametune, balsente_state, init_nametune,  ROT0, "Bally/Sente",  "Name That Tune (Bally, set 1)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 007-8001-01-0C Rev C1 */
 GAME( 1987, triviaes2, triviaes, balsente, triviaes, balsente_state, init_triviaes2, ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Volumen II, Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE ) // "Jovenes Carrozas" Edition?
 
 /* Board: 006-8030-01-0A Rev A */
-GAME( 1986, nametune2, nametune, st1002,   nametune, balsente_state, init_nametune,  ROT0, "Bally/Sente",  "Name That Tune (3/23/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nametune2, nametune, st1002,   nametune, balsente_state, init_nametune,  ROT0, "Bally/Sente",  "Name That Tune (Bally, 3/23/86)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 006-8027-01-0B Rev B */
 GAME( 1986, nstocker,  0,        st1002,   nstocker, balsente_state, init_nstocker,  ROT0, "Bally/Sente",  "Night Stocker (10/6/86)", MACHINE_SUPPORTS_SAVE )

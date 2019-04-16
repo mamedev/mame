@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Kevin Horton
+// copyright-holders:hap
+// thanks-to:Kevin Horton, Sean Riddle
 /***************************************************************************
 
   NEC uCOM4 MCU tabletops/handhelds or other simple devices,
@@ -54,7 +55,7 @@
 
  @511     uPD557LC 1980, Takatoku Toys Game Robot 9/Mego Fabulous Fred
  @512     uPD557LC 1980, Castle Toy Tactix
- *513     uPD557LC 1980, Castle Toy Name That Tune
+ @513     uPD557LC 1980, Castle Toy Name That Tune
 
  @060     uPD650C  1979, Mattel Computer Gin
  *085     uPD650C  1980, Roland TR-808
@@ -79,6 +80,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork (complete)
+#include "ctntune.lh" // clickable
 #include "efball.lh"
 #include "grobot9.lh" // clickable
 #include "mcompgin.lh"
@@ -187,6 +189,17 @@ void hh_ucom4_state::set_display_size(int maxx, int maxy)
 {
 	m_display_maxx = maxx;
 	m_display_maxy = maxy;
+}
+
+void hh_ucom4_state::set_display_segmask(u32 digits, u32 mask)
+{
+	// set a segment mask per selected digit, but leave unselected ones alone
+	for (int i = 0; i < 0x20; i++)
+	{
+		if (digits & 1)
+			m_display_segmask[i] = mask;
+		digits >>= 1;
+	}
 }
 
 void hh_ucom4_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update)
@@ -1172,7 +1185,7 @@ INPUT_PORTS_END
 void tactix_state::tactix(machine_config &config)
 {
 	/* basic machine hardware */
-	NEC_D557L(config, m_maincpu, 400000); // approximation
+	NEC_D557L(config, m_maincpu, 200000); // approximation
 	m_maincpu->read_a().set(FUNC(tactix_state::input_r));
 	m_maincpu->write_c().set(FUNC(tactix_state::input_w));
 	m_maincpu->write_d().set(FUNC(tactix_state::leds_w));
@@ -1194,6 +1207,146 @@ void tactix_state::tactix(machine_config &config)
 ROM_START( tactix )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d557lc-512", 0x0000, 0x0800, CRC(1df738cb) SHA1(15a5de28a3c03e6894d29c56b5b424983569ccf2) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Castle Toy Name That Tune
+  * NEC uCOM-43 MCU, label D557LC 513
+  * 2 lamps, 1 7seg(+2 fake 7segs above a power-on lamp, showing "0")
+
+  This is a tabletop multiplayer game. Players are meant to place a bid,
+  and guess the song (by announcing it to everyone).
+
+***************************************************************************/
+
+class ctntune_state : public hh_ucom4_state
+{
+public:
+	ctntune_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
+	{ }
+
+	// start button powers unit back on
+	DECLARE_INPUT_CHANGED_MEMBER(start_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE); }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(_7seg_w);
+	DECLARE_WRITE8_MEMBER(speaker_w);
+	DECLARE_WRITE8_MEMBER(input_w);
+	DECLARE_READ8_MEMBER(input_r);
+	void ctntune(machine_config &config);
+};
+
+// handlers
+
+void ctntune_state::prepare_display()
+{
+	u8 sel = m_port[NEC_UCOM4_PORTD] >> 3 & 1; // turn off display when power is off
+	u8 lamps = m_port[NEC_UCOM4_PORTD] & 3;
+	u8 digit = (m_port[NEC_UCOM4_PORTF] << 4 | m_port[NEC_UCOM4_PORTE]) & 0x7f;
+	set_display_segmask(1, 0x7f);
+
+	display_matrix(7+2, 1, lamps << 7 | digit, sel);
+}
+
+WRITE8_MEMBER(ctntune_state::_7seg_w)
+{
+	// E,F012: 7seg data, F3: N/C
+	m_port[offset] = data;
+	prepare_display();
+}
+
+WRITE8_MEMBER(ctntune_state::speaker_w)
+{
+	// G0: speaker out
+	m_speaker->level_w(data & 1);
+}
+
+WRITE8_MEMBER(ctntune_state::input_w)
+{
+	// D3: trigger power-off on falling edge
+	if (offset == NEC_UCOM4_PORTD && ~data & m_port[NEC_UCOM4_PORTD] & 8)
+		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+	// C,D23: input mux
+	// D0,D1: yellow, red lamp
+	m_port[offset] = data;
+	m_inp_mux = (m_port[NEC_UCOM4_PORTD] << 2 & 0x30) | m_port[NEC_UCOM4_PORTC];
+	prepare_display();
+}
+
+READ8_MEMBER(ctntune_state::input_r)
+{
+	// A: multiplexed inputs
+	return read_inputs(6);
+}
+
+// config
+
+static INPUT_PORTS_START( ctntune )
+	PORT_START("IN.0") // C0 port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Button 1") // defaults to keyboard Z row
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Button 5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Button 9")
+
+	PORT_START("IN.1") // C1 port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Button 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Button 6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("Button 10")
+
+	PORT_START("IN.2") // C2 port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Button 3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Button 7")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Yellow Button")
+
+	PORT_START("IN.3") // C3 port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Button 4")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Button 8")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Red Button")
+
+	PORT_START("IN.4") // D2 port A
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("Play Button")
+
+	PORT_START("IN.5") // D3 port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, ctntune_state, start_button, nullptr)
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+void ctntune_state::ctntune(machine_config &config)
+{
+	/* basic machine hardware */
+	NEC_D557L(config, m_maincpu, 200000); // approximation
+	m_maincpu->read_a().set(FUNC(ctntune_state::input_r));
+	m_maincpu->write_c().set(FUNC(ctntune_state::input_w));
+	m_maincpu->write_d().set(FUNC(ctntune_state::input_w));
+	m_maincpu->write_e().set(FUNC(ctntune_state::_7seg_w));
+	m_maincpu->write_f().set(FUNC(ctntune_state::_7seg_w));
+	m_maincpu->write_g().set(FUNC(ctntune_state::speaker_w));
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_ctntune);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( ctntune )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d557lc-513", 0x0000, 0x0800, CRC(cd85ee23) SHA1(32b8fc8cb92fc1fd27da9148788a09d3bcd46a92) )
 ROM_END
 
 
@@ -2888,6 +3041,7 @@ CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, splasfgt_state, empty_ini
 CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, bcclimbr_state, empty_init, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, tactix,   0,        0, tactix,   tactix,   tactix_state,   empty_init, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, ctntune,  0,        0, ctntune,  ctntune,  ctntune_state,  empty_init, "Castle Toy", "Name That Tune (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
 CONS( 1980, invspace, 0,        0, invspace, invspace, invspace_state, empty_init, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, efball,   0,        0, efball,   efball,   efball_state,   empty_init, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
